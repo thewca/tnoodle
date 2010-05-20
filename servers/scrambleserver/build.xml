@@ -1,0 +1,53 @@
+<project name="ScrambleServer" default="dist" basedir=".">
+	<description>
+		Builds the ScrambleServer, ensuring to include JCubeExplorer
+    </description>
+
+	<property name="src" location="src" />
+	<property name="lib" location="lib" />
+	<property name="bin" location="bin" />
+	<property name="dist" location="dist" />
+	<property name="dest" location="${dist}/ScrambleServer.jar" />
+	<!-- First, I create my classpath from all the jar files in my lib directory -->
+	<path id="classpath">
+	  <fileset dir="${lib}">
+	    <include name="**/*.jar" />
+	  </fileset>
+	</path>
+	
+	<!-- This seems kinda weird, but is probably the only way to do this -->
+	<property name="jcubeexplorer" location="../../jcubeexplorer/" />
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<javac srcdir="${src}" destdir="${bin}" />
+	</target>
+
+	<target name="dist" depends="compile" description="generate the distribution">
+		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
+		<copy file="${jcubeexplorer}/dist/JCubeExplorer.jar" todir="${lib}" />
+		<!-- convert classpath to flat list for use in manifest task -->
+		<pathconvert property="classpath2" pathsep=" ">
+			<path refid="classpath" />
+			<flattenmapper />
+		</pathconvert>
+		<echo>${classpath2}</echo>
+		<jar jarfile="${dest}" basedir="${bin}">
+			<manifest>
+				<attribute name="Main-Class" value="net.gnehzr.cct.scrambles.ScrambleServer" />
+				<!-- TODO: fat jar this stuff!! -->
+				<attribute name="Class-Path" value="${classpath2}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+</project>

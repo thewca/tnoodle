@@ -1,0 +1,41 @@
+<project name="JCubeExplorer" default="dist" basedir=".">
+	<description>
+		Builds Herbert Kociemba's two phase java library with extensions by Jeremy Fleischman and Conrad Rider.
+    </description>
+
+	<property name="src" location="src" />
+	<property name="bin" location="bin" />
+	<property name="dist" location="dist" />
+	<property name="dest" location="${dist}/JCubeExplorer.jar" />
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<javac srcdir="${src}" destdir="${bin}" />
+	</target>
+
+	<target name="tables" depends="compile" description="build the pruning and transition tables for the two phase algorithm">
+		<echo>${dist}/org/kociemba.twophase</echo>
+		<java classname="org.kociemba.twophase.CoordCube">
+			<arg path="${bin}/org/kociemba/twophase/transition_tables" />
+			<arg path="${bin}/org/kociemba/twophase/pruning_tables" />
+			<classpath>
+				<pathelement location="${bin}" />
+				<pathelement path="${java.class.path}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="dist" depends="compile, tables" description="generate the distribution">
+		<jar jarfile="${dest}" basedir="${bin}" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+</project>
