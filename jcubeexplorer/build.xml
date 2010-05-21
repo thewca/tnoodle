@@ -15,7 +15,7 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source">
-		<javac srcdir="${src}" destdir="${bin}" />
+		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" />
 	</target>
 
 	<target name="tables" depends="compile" description="build the pruning and transition tables for the two phase algorithm">

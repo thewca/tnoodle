@@ -17,7 +17,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -35,12 +37,12 @@ import com.sun.net.httpserver.HttpServer;
 @SuppressWarnings("restriction")
 public class ScrambleServer {
 	
-	public ScrambleServer(int port) throws IOException {
+	public ScrambleServer(int port, File scrambleFolder) throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-
-		//TODO - get the scrambles folder in a more reliable fashion!
-//		HashMap<String, ScrambleGenerator> scramblers = ScrambleGenerator.getScrambleGenerators(new File("./bin", "scramblers"));
-		HashMap<String, ScrambleGenerator> scramblers = ScrambleGenerator.getScrambleGenerators(new File("C:/Users/Jeremy/My Dropbox/Programming/Java/CALCubeTimer/tnoodle/servers/scrambleserver/bin/scramblers"));
+		HashMap<String, ScrambleGenerator> scramblers = ScrambleGenerator.getScrambleGenerators(scrambleFolder);
+		if(scramblers == null) {
+			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
+		}
 		server.createContext("/scrambler", new ScramblerHandler(scramblers));
 		server.createContext("/viewer", new ScrambleViewerHandler(scramblers));
 		// the default executor invokes everything in 1 thread, so threading isn't an issue!
@@ -194,17 +196,36 @@ public class ScrambleServer {
 		}
 	}
 	
+	/**
+	 * @return A File representing the directory in which this program resides.
+	 * If this is a jar file, this should be obvious, otherwise things are a little ambiguous.
+	 */
+	public static File getProgramDirectory() {
+		File defaultScrambleFolder;
+		try {
+			defaultScrambleFolder = new File(ScrambleServer.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+		} catch (URISyntaxException e) {
+			return new File(".");
+		}
+		if(defaultScrambleFolder.isFile()) //this should indicate a jar file
+			defaultScrambleFolder = defaultScrambleFolder.getParentFile();
+		return defaultScrambleFolder;
+	}
+	
 	public static void main(String[] args) throws IOException {
 		OptionParser parser = new OptionParser();
-		OptionSpec<Integer> port = parser.accepts("port").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
-		OptionSet options;
+		OptionSpec<Integer> port = parser.accepts("port", "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
+		OptionSpec<File> scrambleFolder = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
+		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "?"), "Show this help");
 		try {
-			options = parser.parse(args);
+			OptionSet options = parser.parse(args);
+			if(!options.has(help)) {
+				new ScrambleServer(options.valueOf(port), options.valueOf(scrambleFolder));
+				return;
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
-			parser.printHelpOn(System.out);
-			return;
 		}
-		new ScrambleServer(options.valueOf(port));
+		parser.printHelpOn(System.out);
 	}
 }

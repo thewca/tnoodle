@@ -82,7 +82,7 @@ public abstract class ScrambleGenerator {
 	
 	/**
 	 * @param folder The folder containing the ScrambleGenerator classes.
-	 * @return A HashMap mapping shortNames to valid ScrambleGenerators found in folder.
+	 * @return A HashMap mapping shortNames to valid ScrambleGenerators found in folder. null if the directory was invalid. 
 	 */
 	public static HashMap<String, ScrambleGenerator> getScrambleGenerators(File folder) {
 		File[] files = folder.listFiles(new FileFilter() {
@@ -91,9 +91,9 @@ public abstract class ScrambleGenerator {
 				return f.isFile() && f.getName().indexOf('$') == -1 && f.getName().endsWith(PLUGIN_EXTENSION);
 			}
 		});
-		if(files == null) {
-			throw new RuntimeException("TODO - better erroring out!");
-		}
+		if(files == null)
+			return null;
+		
 		HashMap<String, ScrambleGenerator> scramblers = new HashMap<String, ScrambleGenerator>(files.length);
 		try {
 			ClassLoader cl = new URLClassLoader(new URL[] { folder.toURI().toURL() });

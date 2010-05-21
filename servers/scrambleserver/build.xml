@@ -2,21 +2,55 @@
 	<description>
 		Builds the ScrambleServer, ensuring to include JCubeExplorer
     </description>
-
+	
 	<property name="src" location="src" />
 	<property name="lib" location="lib" />
 	<property name="bin" location="bin" />
 	<property name="dist" location="dist" />
+	<property name="scrambles" location="${bin}/scramblers" />
 	<property name="dest" location="${dist}/ScrambleServer.jar" />
-	<!-- First, I create my classpath from all the jar files in my lib directory -->
-	<path id="classpath">
-	  <fileset dir="${lib}">
-	    <include name="**/*.jar" />
-	  </fileset>
-	</path>
-	
 	<!-- This seems kinda weird, but is probably the only way to do this -->
 	<property name="jcubeexplorer" location="../../jcubeexplorer/" />
+	<!--
+		We create the classpath from all the jar files in my lib directory.
+		NOTE: If the jars in the lib directory change,
+		we must update the call to fatjar and javac to use them!
+	-->
+	<property name="gson" location="${lib}/gson-1.4.jar" />
+	<property name="cube" location="${lib}/JCubeExplorer.jar" />
+	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
+	<!-- Failed attempt at automating the library files
+	<pathconvert property="libs" pathsep=";">
+		<path>
+			<fileset dir="${lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+	</pathconvert>
+	-->
+	
+    <!-- Properties for Fat-Jar Eclipse Plug-in -->
+    <property name="fjepPath" value="fatjar.jar" />
+    <taskdef name="fatjar.build"
+             classname="net.sf.fjep.anttask.FJBuildTask"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.manifest"
+             classname="net.sf.fjep.anttask.FJManifestType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.exclude"
+             classname="net.sf.fjep.anttask.FJExcludeType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.jarsource"
+             classname="net.sf.fjep.anttask.FJJarSourceType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.filesource"
+             classname="net.sf.fjep.anttask.FJFileSourceType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
 
 	<target name="init">
 		<tstamp />
@@ -25,28 +59,30 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source">
-		<javac srcdir="${src}" destdir="${bin}" />
+		<javac srcdir="${src}" classpath="${gson};${jopt};${cube}" destdir="${bin}" includeantruntime="false" />
 	</target>
 
 	<target name="dist" depends="compile" description="generate the distribution">
 		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
 		<copy file="${jcubeexplorer}/dist/JCubeExplorer.jar" todir="${lib}" />
-		<!-- convert classpath to flat list for use in manifest task -->
-		<pathconvert property="classpath2" pathsep=" ">
-			<path refid="classpath" />
-			<flattenmapper />
-		</pathconvert>
-		<echo>${classpath2}</echo>
-		<jar jarfile="${dest}" basedir="${bin}">
-			<manifest>
-				<attribute name="Main-Class" value="net.gnehzr.cct.scrambles.ScrambleServer" />
-				<!-- TODO: fat jar this stuff!! -->
-				<attribute name="Class-Path" value="${classpath2}" />
-			</manifest>
-		</jar>
+		<fatjar.build output="${dest}">
+			<fatjar.manifest mainclass="net.gnehzr.cct.scrambles.ScrambleServer"/>
+			<fatjar.filesource path="${bin}" relpath="">
+				<!--
+				<fatjar.exclude relpath="pkg/Main2.class"/>
+				-->
+			</fatjar.filesource>
+			<fatjar.jarsource file="${gson}" relpath=""/>
+			<fatjar.jarsource file="${jopt}" relpath=""/>
+			<fatjar.jarsource file="${cube}" relpath=""/>
+		</fatjar.build>
+		<copy todir="${dist}/scramblers">
+			<fileset dir="${scrambles}" />
+		</copy>
 	</target>
 
 	<target name="clean" description="clean up">
+		<ant antfile="${jcubeexplorer}/build.xml" target="clean" inheritAll="false" />
 		<delete dir="${bin}" />
 		<delete dir="${dist}" />
 	</target>
