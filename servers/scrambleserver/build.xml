@@ -59,22 +59,22 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source">
+		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
+		<copy file="${jcubeexplorer}/dist/JCubeExplorer.jar" todir="${lib}" />
 		<javac srcdir="${src}" classpath="${gson};${jopt};${cube}" destdir="${bin}" includeantruntime="false" />
 	</target>
 
 	<target name="dist" depends="compile" description="generate the distribution">
-		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
-		<copy file="${jcubeexplorer}/dist/JCubeExplorer.jar" todir="${lib}" />
 		<fatjar.build output="${dest}">
-			<fatjar.manifest mainclass="net.gnehzr.cct.scrambles.ScrambleServer"/>
+			<fatjar.manifest mainclass="net.gnehzr.cct.scrambles.ScrambleServer" />
 			<fatjar.filesource path="${bin}" relpath="">
 				<!--
-				<fatjar.exclude relpath="pkg/Main2.class"/>
+				<fatjar.exclude relpath="pkg/Main2.class" />
 				-->
 			</fatjar.filesource>
-			<fatjar.jarsource file="${gson}" relpath=""/>
-			<fatjar.jarsource file="${jopt}" relpath=""/>
-			<fatjar.jarsource file="${cube}" relpath=""/>
+			<fatjar.jarsource file="${gson}" relpath="" />
+			<fatjar.jarsource file="${jopt}" relpath="" />
+			<fatjar.jarsource file="${cube}" relpath="" />
 		</fatjar.build>
 		<copy todir="${dist}/scramblers">
 			<fileset dir="${scrambles}" />
