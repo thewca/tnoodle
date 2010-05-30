@@ -1,37 +1,79 @@
-import java.awt.Image;
-import java.io.BufferedReader;
+import java.awt.image.BufferedImage;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 
-public abstract class TNoodleServer {
-	private URL scrambler, viewer;
-	public TNoodleServer(String urlStr) {
-		String result = null;
-		if(!urlStr.startsWith("http://")) {
-			// TODO
-		}
-		scrambler = new URL(urlStr + "/scrambler");
-		scrambler = new URL(urlStr + "/viewer");
+import javax.imageio.ImageIO;
 
+import com.google.gson.Gson;
+
+public class TNoodleServer {
+	//TODO - comment!
+	//TODO - color scheme stuff/polygons
+	private static final Gson GSON = new Gson();
+	
+	private String[] puzzles;
+	private URI scramblerUri, viewerUri;
+	private String host;
+	private int port;
+	public TNoodleServer(String host, int port) {
+		this.host = host;
+		this.port = port;
 		try {
-			URLConnection conn = url.openConnection();
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			StringBuffer sb = new StringBuffer();
-			String line;
-			while((line = rd.readLine()) != null) {
-				sb.append(line);
-			}
-			rd.close();
-			result = sb.toString();
-		} catch (Exception e) {
+			URI server = new URI("http", null, host, port, null, null, null);
+			scramblerUri = server.resolve("/scrambler/");
+			viewerUri = server.resolve("/viewer/");
+		} catch(URISyntaxException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		try {
+			URLConnection conn = scramblerUri.toURL().openConnection();
+			puzzles = GSON.fromJson(new InputStreamReader(conn.getInputStream()), String[].class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return host + ":" + port;
 	}
 
-	public abstract String[] getAvailablePuzzles();
+	public String[] getAvailablePuzzles() {
+		return puzzles;
+	}
 
-	public abstract String[] getScramble(String puzzle);
+	public String[] getScramble(String puzzle) {
+		try {
+			URI scramble = scramblerUri.resolve(new URI(null, null, puzzle + ".json", null, null));
 
-	public abstract Image getScrambleImage(String puzzle, String scramble);
+			URLConnection conn = scramble.toURL().openConnection();
+			return GSON.fromJson(new InputStreamReader(conn.getInputStream()), String[][].class)[0];
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+			// TODO
+		}
+	}
+	
+	//TODO - scheme, callback
+	public BufferedImage getScrambleImage(String puzzle, String scramble, Integer width, Integer height) {
+		try {
+			String params = "scramble=" + scramble;
+			if(width != null)
+				params += "&width=" + width;
+			if(height != null)
+				params += "&height=" + height;
+			URI img = viewerUri.resolve(new URI(null, null, puzzle + ".png", params, null));
+			return ImageIO.read(img.toURL());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+			// TODO proper error messages/timeouts!
+		}
+	}
 }

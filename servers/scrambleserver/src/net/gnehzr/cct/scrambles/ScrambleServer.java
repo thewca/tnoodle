@@ -173,22 +173,23 @@ public class ScrambleServer {
 					generator.setSeed(toLong(seedStr, (long) seedStr.hashCode()));
 				}
 
+				boolean penis = query.get("penis") != null;
 				int count = toInt(query.get("count"), 1);
 				
 				if(name_ext[1] == null) {
 					StringBuilder sb = new StringBuilder();
-					for(int i = 0; i < count; i++)
+					for(int i = 0; i < count; i++) {
+						if(penis)
+							sb.append(i).append(" ");
 						sb.append(join(generator.generateScramble(seedStr != null), " ")).append('\n');
+					}
 					sendText(t, sb.toString());
 				} else if(name_ext[1].equals("json")) {
-					HashMap<String, Object> json = new HashMap<String, Object>();
-					json.put("seed", seedStr);
 					String[][] scrambles = new String[count][];
 					for(int i = 0; i < count; i++) {
 						scrambles[i] = generator.generateScramble(seedStr != null);
 					}
-					json.put("scrambles", scrambles);
-					sendJSON(t, GSON.toJson(json), query.get("callback"));
+					sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
 				} else {
 					sendText(t, "Invalid extension: " + name_ext[1]);
 				}

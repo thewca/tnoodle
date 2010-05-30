@@ -4,7 +4,7 @@
     </description>
 	
 	<property name="src" location="src" />
-	<property name="lib" location="lib" />
+	<property name="lib" location="../../lib" />
 	<property name="bin" location="bin" />
 	<property name="dist" location="dist" />
 	<property name="scrambles" location="${bin}/scramblers" />
@@ -21,7 +21,7 @@
 	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
 	
     <!-- Properties for Fat-Jar Eclipse Plug-in -->
-    <property name="fjepPath" value="fatjar.jar" />
+    <property name="fjepPath" value="${lib}/fatjar.jar" />
     <taskdef name="fatjar.build"
              classname="net.sf.fjep.anttask.FJBuildTask"
              classpath="${fjepPath}"
