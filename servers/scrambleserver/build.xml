@@ -20,6 +20,11 @@
 	<property name="cube" location="${jcubeexplorer}/dist/JCubeExplorer.jar" />
 	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
 	
+	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
+	<uptodate property="uptodate" targetfile="${dest}">
+		<srcfiles dir="${src}" />
+	</uptodate>
+	
     <!-- Properties for Fat-Jar Eclipse Plug-in -->
     <property name="fjepPath" value="${lib}/fatjar.jar" />
     <taskdef name="fatjar.build"
@@ -54,7 +59,7 @@
 		<javac srcdir="${src}" classpath="${gson};${jopt};${cube}" destdir="${bin}" includeantruntime="false" />
 	</target>
 
-	<target name="dist" depends="compile" description="generate the distribution">
+	<target name="dist" depends="compile" unless="uptodate" description="generate the distribution">
 		<fatjar.build output="${dest}">
 			<fatjar.manifest mainclass="net.gnehzr.cct.scrambles.ScrambleServer" />
 			<fatjar.filesource path="${bin}" relpath="">

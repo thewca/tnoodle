@@ -5,11 +5,17 @@
 
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
+	<property name="tables.transition" location="${bin}/org/kociemba/twophase/transition_tables" />
+	<property name="tables.pruning" location="${bin}/org/kociemba/twophase/pruning_tables" />
 	<property name="dist" location="dist" />
 	<property name="dest" location="${dist}/JCubeExplorer.jar" />
 
+	<!-- Set uptodate.tables if the tables have been generated with the most recent code -->
+	<uptodate property="uptodate.tables" targetfile="${tables.transition}">
+		<srcfiles dir="${src}" />
+	</uptodate>
+
 	<target name="init">
-		<tstamp />
 		<mkdir dir="${dist}" />
 		<mkdir dir="${bin}" />
 	</target>
@@ -17,12 +23,11 @@
 	<target name="compile" depends="init" description="compile the source">
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" />
 	</target>
-
-	<target name="tables" depends="compile" description="build the pruning and transition tables for the two phase algorithm">
-		<echo>${dist}/org/kociemba.twophase</echo>
+	
+	<target name="tables" depends="compile" unless="uptodate.tables" description="build the pruning and transition tables for the two phase algorithm">
 		<java classname="org.kociemba.twophase.CoordCube">
-			<arg path="${bin}/org/kociemba/twophase/transition_tables" />
-			<arg path="${bin}/org/kociemba/twophase/pruning_tables" />
+			<arg path="${tables.transition}" />
+			<arg path="${tables.pruning}" />
 			<classpath>
 				<pathelement location="${bin}" />
 				<pathelement path="${java.class.path}" />
