@@ -1,0 +1,35 @@
+.:
+README
+jcubeexplorer - This is a wrapper for Kociemba's excellent cube explorer java library
+lib	- The library folder you requested I put everything in
+middle - "middleware", for lack of a better word. It's code that will connect the clients to the servers we will write (for now, there is just the scramble server)
+servers - Servers! For now, this is just the ScrambleServer
+
+./lib:
+commons-lang-2.5.jar - This has a number of useful string utilities, specifically StringUtils.join()
+fatjar.jar - This is an awesome ant build task that creates a single "fat" jar from source code and numerous jar libraries.
+gson-1.4.jar - Java json library
+jopt-simple-3.2.jar - Java command line options parser
+libraries - text file keeping track of all the active libraries
+
+./middle:
+java - This directory contains the start of the java library that will connect clients to the servers
+
+./servers:
+scrambleserver
+
+./servers/scrambleserver:
+build.xml
+jstest - This is just a proof of concept html directory that generates scrambles using the ScrambleServer
+src
+
+./servers/scrambleserver/src:
+com
+net
+scramblers
+
+These all need to be updated to be prettier given the more simple api.
+./servers/scrambleserver/src/scramblers:
+ClockScrambler.java
+CubeScrambler.java
+MegaminxScrambler.java

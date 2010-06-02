@@ -31,7 +31,7 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 	private final int length;
 	public MegaminxScrambler(boolean pochmann) {
 		this.pochmann = pochmann;
-		length = pochmann ? 70 : 60;
+		length = pochmann ? 11*7 : 60;
 		image = new int[12][11];
 	}
 
@@ -149,6 +149,7 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 					int side = j % 2;
 					dir = r.nextInt(2);
 					scramble[i] = ((side == 0) ? "R" : "D") + ((dir == 0) ? "++" : "--");
+					scramble[i] += " ";
 					bigTurn(side, (dir == 0) ? 2 : 3);
 				}
 				//dir = random(2); use last direction
@@ -159,7 +160,7 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 				*/
 				scramble[i] = "U";
 				if(dir != 0) scramble[i] += "'";
-//				scramble[i] += "\n";
+				scramble[i] += "\n";
 				i++;
 				turn(0, (dir == 0) ? 1 : 4);
 			}

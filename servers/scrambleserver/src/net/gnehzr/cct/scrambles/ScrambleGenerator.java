@@ -69,7 +69,7 @@ public abstract class ScrambleGenerator {
 	 * This is useful for something like CubeScrambler, as generating random state solutions
 	 * is an expensive operation best done in a separate thread.
 	 * Most implementations of ScrambleGenerator can safely ignore this parameter. 
-	 * @return A String array where each element is one turn.
+	 * @return A String array where each element is one turn (possibly containing whitespace for formatting)
 	 */
 	protected abstract String[] generateScramble(Random r, boolean obeySeed);
 	

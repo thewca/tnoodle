@@ -70,10 +70,11 @@ public class CubeScrambler extends ScrambleImageGenerator {
 			mix(r);
 			return solve();
 		} else if(size == 3) {
-			if(obeySeed)
-				return Search.solution(Tools.randomCube(r), 30, 60, false).split(" ");
-			else
-				return herbertScrambler.newScramble().split(" ");
+			String[] scramble = (obeySeed ? Search.solution(Tools.randomCube(r), 30, 60, false) : herbertScrambler.newScramble()).split(" ");
+			for(int i = 0; i < scramble.length - 1; i++) {
+				scramble[i] += " ";
+			}
+			return scramble;
 		} else {
 			int turns = 0;
 			String[] scramble = new String[length];
@@ -120,11 +121,12 @@ public class CubeScrambler extends ScrambleImageGenerator {
 						}
 	
 						int n = ((slice * 6 + face) * 4 + direction);
-						scramble[turns++] = moveString(n);
+						scramble[turns++] = moveString(n) + " ";
 					}
 				}
 				lastAxis = axis;
 			}
+			scramble[scramble.length-1] = scramble[scramble.length-1].trim(); //remove trailing space
 			return scramble;
 		}
 	}
@@ -156,6 +158,7 @@ public class CubeScrambler extends ScrambleImageGenerator {
 		return move;
 	}
 	
+	//TODO - change to not rely upon whitespace
 	private final static String regexp2 = "^(\\s*[LDBRUF]2?'?)*\\s*$";
 	private final static String regexp345 = "^(\\s*(?:[LDBRUF]w?|[ldbruf])2?'?)*\\s*$";
 	private final static String regexp = "^(\\s*(\\d+)?([LDBRUF])2?'?)*\\s*$";
@@ -329,7 +332,7 @@ public class CubeScrambler extends ScrambleImageGenerator {
 		colors.put("B", Color.BLUE);
 		colors.put("D", Color.YELLOW);
 		colors.put("F", Color.GREEN);
-		colors.put("L", Color.ORANGE);
+		colors.put("L", new Color(255, 128, 0)); //orange heraldic tincture
 		colors.put("R", Color.RED);
 		colors.put("U", Color.WHITE);
 		return colors;
@@ -506,7 +509,8 @@ public class CubeScrambler extends ScrambleImageGenerator {
 	        	turnCount++;
 	        String[] turns = new String[turnCount];
 	        for(q=0; q<turnCount; q++)
-	            turns[q] = "URF".charAt(sol[q]/10) + new String[] { "'", "2", ""}[sol[q]%10];
+	            turns[q] = "URF".charAt(sol[q]/10) + new String[] { "'", "2", ""}[sol[q]%10] + " ";
+	        turns[turns.length-1] = turns[turns.length-1].trim(); //remove trailing space
 	        return turns;
 	    }
 	    return null;

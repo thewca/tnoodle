@@ -15,8 +15,32 @@ public final class ScrambleUtils {
 	
 	private ScrambleUtils() {}
 	
+	private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
+	static {
+		Color timPurple = new Color(98, 50, 122);
+		Color orangeHeraldicTincture = new Color(255, 128, 0);
+		WCA_COLORS.put("y", Color.YELLOW);
+		WCA_COLORS.put("yellow", Color.YELLOW);
+		WCA_COLORS.put("b", Color.BLUE);
+		WCA_COLORS.put("blue", Color.BLUE);
+		WCA_COLORS.put("r", Color.RED);
+		WCA_COLORS.put("red", Color.RED);
+		WCA_COLORS.put("w", Color.WHITE);
+		WCA_COLORS.put("white", Color.WHITE);
+		WCA_COLORS.put("g", Color.GREEN);
+		WCA_COLORS.put("green", Color.GREEN);
+		WCA_COLORS.put("o", orangeHeraldicTincture);
+		WCA_COLORS.put("orange", orangeHeraldicTincture);
+		WCA_COLORS.put("p", timPurple);
+		WCA_COLORS.put("purple", timPurple);
+		WCA_COLORS.put("0", Color.GRAY);
+		WCA_COLORS.put("grey", Color.GRAY);
+		WCA_COLORS.put("gray", Color.GRAY);
+	}
 	public static Color toColor(String s) {
 		try {
+			if(WCA_COLORS.containsKey(s))
+				return WCA_COLORS.get(s);
 			if(s.startsWith("#"))
 				s = s.substring(1);
 			if(s.length() != 6)
@@ -27,11 +51,14 @@ public final class ScrambleUtils {
 		}
 	}
 
-	public static String join(Object[] arr, String sep) {
-		StringBuilder s = new StringBuilder();
-		for(Object o : arr)
-			s.append(sep + o.toString());
-		return s.substring(sep.length());
+	//assumes m > 0
+	public static final int modulo(int x, int m) {
+		if(m < 0) {
+			throw new RuntimeException("m must be > 0");
+		}
+		int y = x % m;
+		if(y >= 0) return y;
+		return y + m;
 	}
 	
 	public static HashMap<String, String> parseQuery(String query) {
@@ -101,10 +128,10 @@ public final class ScrambleUtils {
 		sendJSON(t, GSON.toJson(json), callback);
 	}
 	
-	public static void sendText(HttpExchange t, String text) {
+	public static void sendBytes(HttpExchange t, ByteArrayOutputStream bytes) {
 		try {
-			t.sendResponseHeaders(200, text.length());
-			t.getResponseBody().write(text.getBytes());
+			t.sendResponseHeaders(200, bytes.size());
+			bytes.writeTo(t.getResponseBody());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -114,5 +141,24 @@ public final class ScrambleUtils {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static void sendBytes(HttpExchange t, byte[] bytes) {
+		try {
+			t.sendResponseHeaders(200, bytes.length);
+			t.getResponseBody().write(bytes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				t.getResponseBody().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void sendText(HttpExchange t, String text) {
+		sendBytes(t, text.getBytes()); //TODO - encoding charset?
 	}
 }

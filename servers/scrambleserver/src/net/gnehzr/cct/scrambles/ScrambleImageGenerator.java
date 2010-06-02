@@ -18,10 +18,9 @@ import java.util.HashMap;
  */
 public abstract class ScrambleImageGenerator extends ScrambleGenerator {
 	/**
-	 * Subclasses of ScrambleGenerator are expected to produce scrambles of one size,
-	 * the superclass will resize appropriately.
+	 * Subclasses of ScrambleImageGenerator are expected to produce scrambles of one size,
+	 * this abstract class will resize appropriately.
 	 * @return The size of the images this ScrambleGenerator will produce.
-	 *        null if this ScrambleGenerator does not produce images.
 	 */
 	protected abstract Dimension getPreferredSize();
 	
@@ -52,7 +51,7 @@ public abstract class ScrambleImageGenerator extends ScrambleGenerator {
 	 */
 	public Dimension getPreferredSize(int maxWidth, int maxHeight) {
 		if(maxWidth == 0 && maxHeight == 0)
-			return getPreferredSize(); //don't want to let them mutate our copy of preferred
+			return getPreferredSize();
 		if(maxWidth == 0)
 			maxWidth = Integer.MAX_VALUE;
 		else if(maxHeight == 0)
@@ -71,6 +70,35 @@ public abstract class ScrambleImageGenerator extends ScrambleGenerator {
 		ArrayList<String> faces = new ArrayList<String>(getDefaultColorScheme().keySet());
 		Collections.sort(faces);
 		return faces.toArray(new String[faces.size()]);
+	}
+	
+	
+	/**
+	 * TODO - document!
+	 * @param colorScheme
+	 * @return
+	 */
+	public HashMap<String, Color> parseColorScheme(String scheme) {
+		HashMap<String, Color> colorScheme = getDefaultColorScheme();
+		if(scheme != null && !scheme.isEmpty()) {
+			String[] colors = scheme.split(",");
+			String[] faces = getFaceNames();
+			if(colors.length != faces.length) {
+//				sendText(t, String.format("Incorrect number of colors specified (expecting %d, got %d)", faces.length, colors.length));
+				//TODO - exception
+				return null;
+			}
+			for(int i = 0; i < colors.length; i++) {
+				Color c = ScrambleUtils.toColor(colors[i]);
+				if(c == null) {
+//					sendText(t, "Invalid color: " + colors[i]);
+					//TODO - exception
+					return null;
+				}
+				colorScheme.put(faces[i], c);
+			}
+		}
+		return colorScheme;
 	}
 
 	/**
@@ -101,7 +129,7 @@ public abstract class ScrambleImageGenerator extends ScrambleGenerator {
 	
 	/**
 	 * Draws scramble onto g.
-	 * @param g The Graphics2D object to draw upon (of size width by height)
+	 * @param g The Graphics2D object to draw upon (of size size)
 	 * @param size The Dimension of the resulting image.
 	 * @param scramble The scramble to validate and apply to the puzzle. NOTE: May be null!
 	 * @param colorScheme A HashMap mapping face names to Colors.

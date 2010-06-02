@@ -19,6 +19,8 @@
 	<property name="gson" location="${lib}/gson-1.4.jar" />
 	<property name="cube" location="${jcubeexplorer}/dist/JCubeExplorer.jar" />
 	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
+	<property name="itext" location="${lib}/iText-5.0.2.jar" />
+	<property name="commons-lang" location="${lib}/commons-lang-2.5.jar" />
 	
 	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
 	<uptodate property="uptodate" targetfile="${dest}">
@@ -56,7 +58,7 @@
 
 	<target name="compile" depends="init" description="compile the source">
 		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
-		<javac srcdir="${src}" classpath="${gson};${jopt};${cube}" destdir="${bin}" includeantruntime="false" />
+		<javac srcdir="${src}" classpath="${gson};${jopt};${cube};${itext};${commons-lang}" destdir="${bin}" includeantruntime="false" />
 	</target>
 
 	<target name="dist" depends="compile" unless="uptodate" description="generate the distribution">
@@ -70,6 +72,8 @@
 			<fatjar.jarsource file="${gson}" relpath="" />
 			<fatjar.jarsource file="${jopt}" relpath="" />
 			<fatjar.jarsource file="${cube}" relpath="" />
+			<fatjar.jarsource file="${itext}" relpath="" />
+			<fatjar.jarsource file="${commons-lang}" relpath="" />
 		</fatjar.build>
 		<copy todir="${dist}/scramblers">
 			<fileset dir="${scrambles}" />

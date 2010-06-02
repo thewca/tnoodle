@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="C:/Users/Jeremy/My Dropbox/Programming/Java/CALCubeTimer/tnoodle/lib/fatjar.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Jeremy/My Dropbox/Programming/Java/CALCubeTimer/tnoodle/lib/gson-1.4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Jeremy/My Dropbox/Programming/Java/CALCubeTimer/tnoodle/lib/jopt-simple-3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Jeremy/My Dropbox/Programming/Java/CALCubeTimer/tnoodle/lib/iText-5.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Jeremy/My Dropbox/Programming/Java/CALCubeTimer/tnoodle/lib/commons-lang-2.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
