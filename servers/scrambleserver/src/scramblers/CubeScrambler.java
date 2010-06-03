@@ -65,19 +65,16 @@ public class CubeScrambler extends ScrambleImageGenerator {
 	}
 
 	@Override
-	public String[] generateScramble(Random r, boolean obeySeed) {
+	public String generateScramble(Random r, boolean obeySeed) {
 		if(size == 2) {
 			mix(r);
 			return solve();
 		} else if(size == 3) {
-			String[] scramble = (obeySeed ? Search.solution(Tools.randomCube(r), 30, 60, false) : herbertScrambler.newScramble()).split(" ");
-			for(int i = 0; i < scramble.length - 1; i++) {
-				scramble[i] += " ";
-			}
-			return scramble;
+			return (obeySeed ?
+						Search.solution(Tools.randomCube(r), 30, 60, false) :
+						herbertScrambler.newScramble());
 		} else {
-			int turns = 0;
-			String[] scramble = new String[length];
+			StringBuffer scramble = new StringBuffer(length*3);
 			int lastAxis = -1;
 			int axis = 0;
 			int slices = size - ((multislice || size % 2 != 0) ? 1 : 0);
@@ -121,13 +118,12 @@ public class CubeScrambler extends ScrambleImageGenerator {
 						}
 	
 						int n = ((slice * 6 + face) * 4 + direction);
-						scramble[turns++] = moveString(n) + " ";
+						scramble.append(" " + moveString(n));
 					}
 				}
 				lastAxis = axis;
 			}
-			scramble[scramble.length-1] = scramble[scramble.length-1].trim(); //remove trailing space
-			return scramble;
+			return scramble.substring(1);
 		}
 	}
 
@@ -460,7 +456,8 @@ public class CubeScrambler extends ScrambleImageGenerator {
 //	    }
 //	}
 	int[] sol=new int[100];
-	private String[] solve() {
+	static final String[] DIR_TO_STR = new String[] { "'", "2", ""};
+	private String solve() {
 	    calcadj();
 	    int[] opp= new int[100];
 	    for(int a=0;a<6;a++){
@@ -507,11 +504,11 @@ public class CubeScrambler extends ScrambleImageGenerator {
 	        int turnCount = 0;
 	        for(q=0;q<sol.length && sol[q] != -1;q++)
 	        	turnCount++;
-	        String[] turns = new String[turnCount];
-	        for(q=0; q<turnCount; q++)
-	            turns[q] = "URF".charAt(sol[q]/10) + new String[] { "'", "2", ""}[sol[q]%10] + " ";
-	        turns[turns.length-1] = turns[turns.length-1].trim(); //remove trailing space
-	        return turns;
+	        StringBuffer turns = new StringBuffer();
+	        for(q=0; q<turnCount; q++) {
+	            turns.append(" " + "URF".charAt(sol[q]/10) + DIR_TO_STR[sol[q]%10]);
+	        }
+	        return turns.substring(1);
 	    }
 	    return null;
 	}

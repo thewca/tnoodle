@@ -24,29 +24,6 @@ public abstract class ScrambleGenerator {
 	private static final String PLUGIN_EXTENSION = ".class";
 	
 	/**
-	 * ScrambleGenerators will get passed this instance of Random
-	 * in order to get seeded correctly.
-	 */
-	private Random r = new Random();
-	
-	/**
-	 * @param seed with which to seed the ScrambleGenerator
-	 */
-	public void setSeed(long seed) {
-		r.setSeed(seed);
-	}
-	
-	/**
-	 * Generates a scramble.
-	 * @param obeySeed Set this to true if you want the scramble generator 
-	 * to use the seeded instance of Random. If false, it may still choose to use it, however.
-	 * @return A String array where each element is one turn.
-	 */
-	public final String[] generateScramble(boolean obeySeed) {
-		return generateScramble(r, obeySeed);
-	}
-	
-	/**
 	 * Returns a String describing this ScrambleGenerator
 	 * appropriate for use in a url. This shouldn't contain any periods.
 	 * @return a url appropriate String unique to this ScrambleGenerator
@@ -69,9 +46,33 @@ public abstract class ScrambleGenerator {
 	 * This is useful for something like CubeScrambler, as generating random state solutions
 	 * is an expensive operation best done in a separate thread.
 	 * Most implementations of ScrambleGenerator can safely ignore this parameter. 
-	 * @return A String array where each element is one turn (possibly containing whitespace for formatting)
+	 * @return A String containing the scramble, where turns are assumed to be separated by whitespace.
 	 */
-	protected abstract String[] generateScramble(Random r, boolean obeySeed);
+	protected abstract String generateScramble(Random r, boolean obeySeed);
+	
+	
+	/**
+	 * ScrambleGenerators will get passed this instance of Random
+	 * in order to get seeded correctly.
+	 */
+	private Random r = new Random();
+	
+	/**
+	 * @param seed with which to seed the ScrambleGenerator
+	 */
+	public void setSeed(long seed) {
+		r.setSeed(seed);
+	}
+	
+	/**
+	 * Generates a scramble.
+	 * @param obeySeed Set this to true if you want the scramble generator 
+	 * to use the seeded instance of Random. If false, it may still choose to use it, however.
+	 * @return A String containing the scramble, where turns are assumed to be separated by whitespace.
+	 */
+	public final String generateScramble(boolean obeySeed) {
+		return generateScramble(r, obeySeed);
+	}
 	
 	/**
 	 * @return Simply returns getLongName()

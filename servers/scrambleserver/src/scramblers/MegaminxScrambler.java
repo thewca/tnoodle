@@ -16,8 +16,8 @@ import net.gnehzr.cct.scrambles.InvalidScrambleException;
 import net.gnehzr.cct.scrambles.ScrambleImageGenerator;
 
 //TODO - cleanup this mess! so much vestigal code...
-//TODO - are scramble lengths correct? http://www.worldcubeassociation.org/regulations/scrambles/scramble_megaminx2008.htm
 //TODO - convert to better naming scheme from sims
+//TODO - does old mega importing even work?
 public class MegaminxScrambler extends ScrambleImageGenerator {
 	public static MegaminxScrambler[] createScramblers() {
 		return new MegaminxScrambler[] { new MegaminxScrambler(true), new MegaminxScrambler(false) };
@@ -124,8 +124,8 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 		{0,0,0,0,0,0, 0,0,0,0,1,0},
 		{0,0,0,0,0,0, 0,0,0,0,0,1}};
 
-	public String[] generateScramble(Random r, boolean obeySeed) {
-		String[] scramble = new String[length];
+	public String generateScramble(Random r, boolean obeySeed) {
+		StringBuffer scramble = new StringBuffer(length*3);
 		if(!pochmann){
 			int last = -1;
 			for(int i = 0; i < length; i++){
@@ -135,21 +135,24 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 				} while(last >= 0 && comm[side][last] != 0);
 				last = side;
 				int dir = r.nextInt(4) + 1;
-				scramble[i] = ""+FACE_NAMES.charAt(side);
+				scramble.append(" "+FACE_NAMES.charAt(side));
 				if(dir != 1)
-					scramble[i] += dir;
+					scramble.append(dir);
 
 				turn(side, dir);
 			}
-		}
-		else{
-			for(int i = 0; i < length; ) {
+		} else {
+			int width = 10, height = 7;
+			for(int i = 0; i < height; i++) {
+				if(i > 0)
+					scramble.append("\n");
 				int dir = 0;
-				for(int j = 0; i < length - 1 && j < 10; i++, j++){
-					int side = j % 2;
+				for(int j = 0; j < width; j++){
+					if(j > 0)
+						scramble.append(" ");
+					char side = (j % 2 == 0) ? 'R' : 'D';
 					dir = r.nextInt(2);
-					scramble[i] = ((side == 0) ? "R" : "D") + ((dir == 0) ? "++" : "--");
-					scramble[i] += " ";
+					scramble.append(side + ((dir == 0) ? "++" : "--"));
 					bigTurn(side, (dir == 0) ? 2 : 3);
 				}
 				//dir = random(2); use last direction
@@ -158,14 +161,12 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 				bigTurn(1, (dir == 0) ? 2 : 3);
 				turn(0, (dir == 0) ? 3 : 2);
 				*/
-				scramble[i] = "U";
-				if(dir != 0) scramble[i] += "'";
-				scramble[i] += "\n";
-				i++;
+				scramble.append(" U");
+				if(dir != 0) scramble.append("'");
 				turn(0, (dir == 0) ? 1 : 4);
 			}
 		}
-		return scramble;
+		return scramble.toString();
 	}
 
 	private void turn(int side, int dir){

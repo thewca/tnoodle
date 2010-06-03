@@ -9,7 +9,6 @@ import static net.gnehzr.cct.scrambles.ScrambleUtils.sendJSON;
 import static net.gnehzr.cct.scrambles.ScrambleUtils.sendText;
 import static net.gnehzr.cct.scrambles.ScrambleUtils.toInt;
 import static net.gnehzr.cct.scrambles.ScrambleUtils.toLong;
-import static org.apache.commons.lang.StringUtils.join;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -205,8 +204,8 @@ public class ScrambleServer {
 					nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
 					table.addCell(nthscramble);
 					
-					String[] scramble = generator.generateScramble(isSeeded);
-					Chunk scrambleChunk = new Chunk(join(scramble, ""));
+					String scramble = generator.generateScramble(isSeeded);
+					Chunk scrambleChunk = new Chunk(scramble);
 					scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
 					try {
 						BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
@@ -226,7 +225,7 @@ public class ScrambleServer {
 							PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
 							Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
 
-							sig.drawScramble(g2, dim, join(scramble, ""), colorScheme);
+							sig.drawScramble(g2, dim, scramble, colorScheme);
 							g2.dispose();
 							PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
 							imgCell.setBackgroundColor(BaseColor.GRAY);
@@ -319,14 +318,16 @@ public class ScrambleServer {
 					for(int i = 0; i < count; i++) {
 						//we replace newlines with spaces because clients will assume that scrambles
 						//are separated by newlines
-						sb.append(join(generator.generateScramble(isSeeded), "").replaceAll("\n", " ")).append('\n');
+						sb.append(generator.generateScramble(isSeeded).replaceAll("\n", " ")).append('\n');
 					}
 					sendText(t, sb.toString());
 				} else if(ext.equals("json")) {
-					String[][] scrambles = new String[count][];
+					String[] scrambles = new String[count];
 					for(int i = 0; i < count; i++) {
 						scrambles[i] = generator.generateScramble(isSeeded);
 					}
+					System.out.println(Arrays.toString(scrambles));
+					System.out.println(GSON.toJson(scrambles));
 					sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
 				} else if(ext.equals("pdf")) {
 					ByteArrayOutputStream pdf = createPdf(generator, count, isSeeded, title, query.get("scheme"));

@@ -18,9 +18,8 @@ public class ClockScrambler extends ScrambleGenerator {
 	}
 	
 	@Override
-	public String[] generateScramble(Random r, boolean obeySeed) {
-		int index = 0;
-		String[] scramble = new String[4+5+1+4];
+	public String generateScramble(Random r, boolean obeySeed) {
+		StringBuffer scramble = new StringBuffer();
 		
 		String[] peg={"U","d"};
 //		String[] pegs={"UUdd ","dUdU ","ddUU ","UdUd "};
@@ -29,22 +28,22 @@ public class ClockScrambler extends ScrambleGenerator {
 //			if (verbose) {
 //				scram.append(pegs[x]);
 //			}
-			scramble[index++] = "u=" + (r.nextInt(12)-5) + ",d=" + (r.nextInt(12)-5) + " /";
+			scramble.append("u=" + (r.nextInt(12)-5) + ",d=" + (r.nextInt(12)-5) + " /");
 		}
 		for(int x=0;x<5; x++) {
 //			if (verbose) {	
 //				scram.append(upegs[x]);
 //			}
-			scramble[index++] = "u=" + (r.nextInt(12)-5) + " /";
+			scramble.append("u=" + (r.nextInt(12)-5) + " /");
 		}
 //		if (verbose) {
 //			scram.append("dddd ");
 //		}
-		scramble[index++] = "d=" + (r.nextInt(12)-5) + " /";
+		scramble.append("d=" + (r.nextInt(12)-5) + " /");
 		for(int x=0;x<4;x++) {
-			scramble[index++] = peg[r.nextInt(2)];
+			scramble.append(peg[r.nextInt(2)]);
 		}
 		
-		return scramble;
+		return scramble.toString();
 	}
 }

@@ -106,8 +106,11 @@ public class PyraminxScrambler extends ScrambleImageGenerator {
 						}
 					}
 	}
-	
-	protected String[] generateScramble(Random r, boolean obeySeed) {
+
+	private static final String TIPS = "lrbu";
+	private static final String SIDES = "ULRB";
+	private static final String[] DIR_TO_STR = new String[] { "", "'" };
+	protected String generateScramble(Random r, boolean obeySeed) {
 		turns = new int[20];
 		turnIndex = turns.length - 1;
 		int t = 0, s = 0, q = 0, m, l, p;
@@ -154,21 +157,15 @@ public class PyraminxScrambler extends ScrambleImageGenerator {
 				if (v(q, t, m, -1))
 					break;
 
-		String scramble = "";
+		StringBuffer scramble = new StringBuffer(2*(turns.length+4));
 		for (p = turnIndex + 1; p < turns.length; p++)
-			scramble += new String[] { "U", "L", "R", "B" }[turns[p] & 7]
-					+ new String[] { "", "'" }[(turns[p] & 8) / 8] + " ";
-		String[] tips = new String[] { "l", "r", "b", "u" };
+			scramble.append(" " + SIDES.charAt(turns[p] & 7) + DIR_TO_STR[(turns[p] & 8) / 8]);
 		for (p = 0; p < 4; p++) {
 			q = r.nextInt(3);
 			if (q < 2)
-				scramble += tips[p] + new String[] { "", "'" }[q] + " ";
+				scramble.append(" " + TIPS.charAt(p) + DIR_TO_STR[q]);
 		}
-		String[] split = scramble.split(" ");
-		for(int i = 0; i < split.length - 1; i++) {
-			split[i] += " ";
-		}
-		return split;
+		return scramble.substring(1);
 	}
 
 	private boolean v(int q, int t, int l, int c) {

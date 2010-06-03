@@ -46,7 +46,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 		turns = new int[length];
 	}
 
-	protected String[] generateScramble(Random r, boolean obeySeed) {
+	protected String generateScramble(Random r, boolean obeySeed) {
 		initializeImage();
 		int i,move,ls;
 		ls=-1;
@@ -72,7 +72,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 		return finalizeScrambleString();
 	}
 
-	private String[] finalizeScrambleString() {
+	private String finalizeScrambleString() {
 		StringBuilder scram = new StringBuilder();
 		int l=-1;
 		for(int i=0; i < turns.length; i++) {
@@ -95,11 +95,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 		}
 		if(l==1) scram.append("0");
 		if(l!=0) scram.append(")");
-		String[] split = scram.toString().trim().split(" ");
-		for(int i = 0; i < split.length - 1; i++) {
-			split[i] += " ";
-		}
-		return split;
+		return scram.toString().trim();
 	}
 	
 	//returns true if invalid, false if valid
