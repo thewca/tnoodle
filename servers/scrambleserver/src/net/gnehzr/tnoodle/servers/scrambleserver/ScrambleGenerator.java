@@ -1,4 +1,4 @@
-package net.gnehzr.cct.scrambles;
+package net.gnehzr.tnoodle.servers.scrambleserver;
 
 import java.io.File;
 import java.io.FileFilter;

@@ -1,4 +1,4 @@
-package net.gnehzr.cct.scrambles;
+package net.gnehzr.tnoodle.servers.scrambleserver;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
@@ -50,8 +50,29 @@ public final class ScrambleUtils {
 			return null;
 		}
 	}
+	
+	public static Color invertColor(Color c) {
+		if(c == null)
+			return Color.BLACK;
+		return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
+	}
 
-	//assumes m > 0
+	public static String colorToString(Color c) {
+		if(c == null)
+			return "";
+		return padWith0s(Integer.toHexString(c.getRGB() & 0xffffff));
+	}
+
+	private static String padWith0s(String s) {
+		int pad = 6 - s.length();
+		if(pad > 0) {
+			for(int i = 0; i < pad; i++)
+				s = "0" + s;
+		}
+		return s;
+	}
+
+	//requires that m > 0
 	public static final int modulo(int x, int m) {
 		if(m < 0) {
 			throw new RuntimeException("m must be > 0");

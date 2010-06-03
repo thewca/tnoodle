@@ -1,14 +1,14 @@
-package net.gnehzr.cct.scrambles;
+package net.gnehzr.tnoodle.servers.scrambleserver;
 
-import static net.gnehzr.cct.scrambles.ScrambleUtils.GSON;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.exceptionToString;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.parseExtension;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.parseQuery;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.sendBytes;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.sendJSON;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.sendText;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.toInt;
-import static net.gnehzr.cct.scrambles.ScrambleUtils.toLong;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.GSON;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.exceptionToString;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.parseExtension;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.parseQuery;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.sendBytes;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.sendJSON;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.sendText;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.toInt;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.toLong;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -326,8 +326,6 @@ public class ScrambleServer {
 					for(int i = 0; i < count; i++) {
 						scrambles[i] = generator.generateScramble(isSeeded);
 					}
-					System.out.println(Arrays.toString(scrambles));
-					System.out.println(GSON.toJson(scrambles));
 					sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
 				} else if(ext.equals("pdf")) {
 					ByteArrayOutputStream pdf = createPdf(generator, count, isSeeded, title, query.get("scheme"));

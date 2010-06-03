@@ -1,6 +1,6 @@
-package net.gnehzr.cct.scrambles;
+package net.gnehzr.tnoodle.servers.scrambleserver;
 
-import static net.gnehzr.cct.scrambles.ScrambleUtils.ceil;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.ceil;
 
 import java.awt.Color;
 import java.awt.Dimension;

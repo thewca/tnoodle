@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import net.gnehzr.cct.scrambles.InvalidScrambleException;
-import net.gnehzr.cct.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.servers.scrambleserver.InvalidScrambleException;
+import net.gnehzr.tnoodle.servers.scrambleserver.ScrambleImageGenerator;
 
 //TODO - cleanup this mess! so much vestigal code...
 //TODO - convert to better naming scheme from sims

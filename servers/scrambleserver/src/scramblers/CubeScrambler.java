@@ -12,8 +12,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.gnehzr.cct.scrambles.InvalidScrambleException;
-import net.gnehzr.cct.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.servers.scrambleserver.InvalidScrambleException;
+import net.gnehzr.tnoodle.servers.scrambleserver.ScrambleImageGenerator;
 
 import org.kociemba.twophase.ScrambleCacher;
 import org.kociemba.twophase.Search;

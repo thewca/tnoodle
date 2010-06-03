@@ -11,9 +11,9 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Random;
 
-import net.gnehzr.cct.scrambles.InvalidScrambleException;
-import net.gnehzr.cct.scrambles.ScrambleImageGenerator;
-import net.gnehzr.cct.scrambles.ScrambleUtils;
+import net.gnehzr.tnoodle.servers.scrambleserver.InvalidScrambleException;
+import net.gnehzr.tnoodle.servers.scrambleserver.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils;
 
 public class PyraminxScrambler extends ScrambleImageGenerator {
 	private static final int pieceSize = 30;

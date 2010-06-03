@@ -2,7 +2,7 @@ package scramblers;
 
 import java.util.Random;
 
-import net.gnehzr.cct.scrambles.ScrambleGenerator;
+import net.gnehzr.tnoodle.servers.scrambleserver.ScrambleGenerator;
 
 public class ClockScrambler extends ScrambleGenerator {
 //	private boolean verbose = false;

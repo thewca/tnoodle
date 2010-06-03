@@ -1,6 +1,6 @@
 package scramblers;
 
-import static net.gnehzr.cct.scrambles.ScrambleUtils.modulo;
+import static net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils.modulo;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -17,9 +17,9 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.gnehzr.cct.scrambles.InvalidScrambleException;
-import net.gnehzr.cct.scrambles.ScrambleImageGenerator;
-import net.gnehzr.cct.scrambles.ScrambleUtils;
+import net.gnehzr.tnoodle.servers.scrambleserver.InvalidScrambleException;
+import net.gnehzr.tnoodle.servers.scrambleserver.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.servers.scrambleserver.ScrambleUtils;
 
 public class SquareOneScrambler extends ScrambleImageGenerator {
 	private static final int length = 40;
