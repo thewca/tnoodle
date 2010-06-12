@@ -81,7 +81,7 @@ public class ScrambleCacher {
 			scrambles.notifyAll();
 		}
 		fireScrambleCacheUpdated();
-		return scramble;
+		return scramble.trim();
 	}
 	
 	public static void main(String[] args) throws InterruptedException {

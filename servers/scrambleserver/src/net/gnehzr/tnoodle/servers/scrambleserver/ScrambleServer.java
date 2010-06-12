@@ -132,7 +132,7 @@ public class ScrambleServer {
 					sendText(t, exceptionToString(e));
 				}
 			} else if(extension.equals("json")) {
-				sendJSON(t, GSON.toJson(generator.getFaces(dimension, colorScheme)), query.get("callback"));
+				sendJSON(t, GSON.toJson(generator.getPuzzleImageInfo(dimension, colorScheme)), query.get("callback"));
 			} else {
 				sendText(t, "Invalid extension: " + extension);
 			}
@@ -141,8 +141,22 @@ public class ScrambleServer {
 
 	private class ScramblerHandler implements HttpHandler {
 		private HashMap<String, ScrambleGenerator> scramblers;
+		private String puzzleNamesJSON;
 		public ScramblerHandler(HashMap<String, ScrambleGenerator> scramblers) {
 			this.scramblers = scramblers;
+			
+			//listing available scrambles
+			ArrayList<String> keys = new ArrayList<String>(scramblers.keySet());
+			//sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
+			Collections.sort(keys, Strings.getNaturalComparator());
+			String[][] puzzleNames = new String[keys.size()][2];
+			for(int i = 0; i < puzzleNames.length; i++) {
+				String shortName = keys.get(i);
+				String longName = scramblers.get(shortName).getLongName();
+				puzzleNames[i][0] = shortName;
+				puzzleNames[i][1] = longName;
+			}
+			puzzleNamesJSON = GSON.toJson(puzzleNames);
 		}
 		
 		@Override
@@ -272,11 +286,7 @@ public class ScrambleServer {
 			HashMap<String, String> query = parseQuery(t.getRequestURI().getQuery());
 
 			if(path.length == 1) {
-				//listing available scrambles
-				ArrayList<String> keys = new ArrayList<String>(scramblers.keySet());
-				//sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
-				Collections.sort(keys, Strings.getNaturalComparator());
-				sendJSON(t, GSON.toJson(keys), query.get("callback"));
+				sendJSON(t, puzzleNamesJSON, query.get("callback"));
 			} else {
 				String puzzle, title, ext;
 				String[] puzzle_title_ext = path[1].split("\\.");
@@ -312,6 +322,10 @@ public class ScrambleServer {
 					generator.setSeed(toLong(seedStr, (long) seedStr.hashCode()));
 
 				int count = toInt(query.get("count"), 1);
+				int offset = toInt(query.get("offset"), 0);
+				for(int i = 0; i < offset; i++) {
+					generator.generateScramble(isSeeded);
+				}
 				
 				if(ext == null || ext.equals("txt")) {
 					StringBuilder sb = new StringBuilder();

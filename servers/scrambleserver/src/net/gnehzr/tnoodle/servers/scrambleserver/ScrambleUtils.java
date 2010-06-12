@@ -1,17 +1,101 @@
 package net.gnehzr.tnoodle.servers.scrambleserver;
 
 import java.awt.Color;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.sun.net.httpserver.HttpExchange;
 
 @SuppressWarnings("restriction")
 public final class ScrambleUtils {
-	public static final Gson GSON = new Gson();
+	public static final Gson GSON = new GsonBuilder()
+									.registerTypeAdapter(Color.class, new Colorizer())
+									.registerTypeAdapter(GeneralPath.class, new Pather())
+									.create();
+	
+	private static class Colorizer implements JsonSerializer<Color>, JsonDeserializer<Color> {
+
+		@Override
+		public JsonElement serialize(Color c, Type t, JsonSerializationContext context) {
+			return new JsonPrimitive(toHex(c));
+		}
+
+		@Override
+		public Color deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
+			Color c = toColor(json.getAsString());
+			if(c == null)
+				throw new JsonParseException("Invalid color");
+			return c;
+		}
+
+	}
+	
+	private static class Pather implements JsonSerializer<GeneralPath>, JsonDeserializer<GeneralPath> {
+
+		@Override
+		public JsonElement serialize(GeneralPath s, Type t, JsonSerializationContext context) {
+			JsonArray areas = new JsonArray();
+			JsonArray area = null;
+			double[] coords = new double[2];
+			PathIterator pi = s.getPathIterator(null, 1.0);
+			while(!pi.isDone()) {
+				int val = pi.currentSegment(coords);
+				switch(val) {
+				case PathIterator.SEG_MOVETO:
+					area = new JsonArray();
+					areas.add(area);
+				case PathIterator.SEG_LINETO:
+				case PathIterator.SEG_CLOSE:
+					JsonArray pt = new JsonArray();
+					pt.add(new JsonPrimitive(coords[0]));
+					pt.add(new JsonPrimitive(coords[1]));
+					area.add(pt);
+					break;
+				default:
+					return null;
+				}
+				pi.next();
+			}
+			return areas;
+		}
+
+		@Override
+		public GeneralPath deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
+			GeneralPath path = new GeneralPath();
+			
+			JsonArray areas = json.getAsJsonArray();
+			for(int c = 0; c < areas.size(); c++) {
+				JsonArray area = areas.get(c).getAsJsonArray();
+				if(area.size() == 0)
+					continue;
+				
+				JsonArray pt = area.get(0).getAsJsonArray();
+				path.moveTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
+				for(int i = 1; i < area.size(); i++) {
+					pt = area.get(1).getAsJsonArray();
+					path.lineTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
+				}
+			}
+			path.closePath();
+			return path;
+		}
+		
+	}
 	
 	private ScrambleUtils() {}
 	
@@ -57,19 +141,10 @@ public final class ScrambleUtils {
 		return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
 	}
 
-	public static String colorToString(Color c) {
+	public static String toHex(Color c) {
 		if(c == null)
 			return "";
-		return padWith0s(Integer.toHexString(c.getRGB() & 0xffffff));
-	}
-
-	private static String padWith0s(String s) {
-		int pad = 6 - s.length();
-		if(pad > 0) {
-			for(int i = 0; i < pad; i++)
-				s = "0" + s;
-		}
-		return s;
+		return Integer.toHexString(0x1000000 | (c.getRGB() & 0xffffff)).substring(1);
 	}
 
 	//requires that m > 0

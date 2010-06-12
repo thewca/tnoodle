@@ -374,6 +374,7 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 		for(int ch = 1; ch < x.length; ch++) {
 			p.lineTo(x[ch], y[ch]);
 		}
+		p.lineTo(x[0], y[0]); //TODO - this is retarded, why do i need to do this? it would appear that closePath() isn't doing it's job
 		p.closePath();
 		return p;
 	}

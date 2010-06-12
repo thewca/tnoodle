@@ -71,7 +71,7 @@ public class CubeScrambler extends ScrambleImageGenerator {
 			return solve();
 		} else if(size == 3) {
 			return (obeySeed ?
-						Search.solution(Tools.randomCube(r), 30, 60, false) :
+						Search.solution(Tools.randomCube(r), 30, 60, false).trim() :
 						herbertScrambler.newScramble());
 		} else {
 			StringBuffer scramble = new StringBuffer(length*3);

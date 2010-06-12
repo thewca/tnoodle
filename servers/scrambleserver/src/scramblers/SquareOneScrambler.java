@@ -27,7 +27,8 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 	private static final int gap = 5;
 	private boolean turnTop = true, turnBottom = true;
 	
-	private int twistCount = 0; //this will tell us the state of the middle pieces
+	//TODO this variables aren't thread safe
+	private int twistCount; //this will tell us the state of the middle pieces
 	private int[] state, turns;
 	private boolean slashes;
 
@@ -42,6 +43,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 	//Ported from http://www.worldcubeassociation.org/regulations/scrambles/scramble_square1.htm by Jeremy Fleischman
 	/* Javascript written by Jaap Scherphuis,  jaapsch a t yahoo d o t com */
 	private void initializeImage() {
+		twistCount = 0;
 		state = new int[]{ 0,0,1,2,2,3,4,4,5,6,6,7,8,9,9,10,11,11,12,13,13,14,15,15 }; //piece array
 		turns = new int[length];
 	}
@@ -362,7 +364,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 	}
 	@Override
 	public HashMap<String, Color> getDefaultColorScheme() {
-		return defaultColorScheme;
+		return new HashMap<String, Color>(defaultColorScheme);
 	}
 
 	@Override

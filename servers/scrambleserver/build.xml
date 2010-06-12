@@ -63,7 +63,7 @@
 
 	<target name="dist" depends="compile" unless="uptodate" description="generate the distribution">
 		<fatjar.build output="${dest}">
-			<fatjar.manifest mainclass="net.gnehzr.cct.scrambles.ScrambleServer" />
+			<fatjar.manifest mainclass="net.gnehzr.tnoodle.servers.scrambleserver.ScrambleServer" />
 			<fatjar.filesource path="${bin}" relpath="">
 				<!--
 				<fatjar.exclude relpath="pkg/Main2.class" />

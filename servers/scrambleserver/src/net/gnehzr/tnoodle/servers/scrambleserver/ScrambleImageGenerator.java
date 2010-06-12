@@ -25,7 +25,7 @@ public abstract class ScrambleImageGenerator extends ScrambleGenerator {
 	protected abstract Dimension getPreferredSize();
 	
 	/**
-	 * @return A HashMap mapping face names to PuzzleFaces
+	 * @return A *new* HashMap mapping face names to PuzzleFaces.
 	 */
 	public abstract HashMap<String, Color> getDefaultColorScheme();
 	
@@ -106,13 +106,12 @@ public abstract class ScrambleImageGenerator extends ScrambleGenerator {
 	 * @param size
 	 * @return
 	 */
-	public HashMap<String, PuzzleFace> getFaces(Dimension size, HashMap<String, Color> colors) {
-		HashMap<String, PuzzleFace> faces = new HashMap<String, PuzzleFace>();
-		HashMap<String, GeneralPath> areas = getFaceBoundaries(size);
-		for(String face : colors.keySet()) {
-			faces.put(face, new PuzzleFace(colors.get(face), areas.get(face)));
-		}
-		return faces;
+	public PuzzleImageInfo getPuzzleImageInfo(Dimension size, HashMap<String, Color> colors) {
+		PuzzleImageInfo sii = new PuzzleImageInfo();
+		sii.faces = getFaceBoundaries(size);
+		sii.colorScheme = colors;
+		sii.size = size;
+		return sii;
 	}
 	
 	/**

@@ -495,7 +495,7 @@ public class PyraminxScrambler extends ScrambleImageGenerator {
 	
 	@Override
 	public HashMap<String, Color> getDefaultColorScheme() {
-		return defaultColorScheme;
+		return new HashMap<String, Color>(defaultColorScheme);
 	}
 
 	@Override
