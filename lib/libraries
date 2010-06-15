@@ -1,7 +1,7 @@
 json_simple-1.1.jar: http://code.google.com/p/json-simple/
 jopt-simple.jar: http://jopt-simple.sourceforge.net/
-commons-lang-2.5.jar: http://commons.apache.org/lang/
 iText-5.0.2.jar: http://itextpdf.com/
 
 Strings.java http://weblogs.java.net/blog/176/2006/01/13/natural-string-order
-mootools + colorroller
+MTRandom.java http://goui.net/doc/net/goui/util/MTRandom.html
+Base64.java http://www.wikihow.com/Encode-a-String-to-Base64-With-Java
