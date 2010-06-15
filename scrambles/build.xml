@@ -91,16 +91,21 @@
 			<fatjar.manifest mainclass="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
 			<fatjar.filesource path="${bin}" relpath="">
 				<fatjar.exclude relpath="net/gnehzr/tnoodle/scrambles/applet" />
+				<!-- We include scramblers in the jar, but look to the scramblers folder for extras/new versions.
+					This way, we can distribute 1 jar for the server.
 				<fatjar.exclude relpath="scramblers" />
+				-->
 			</fatjar.filesource>
 			<fatjar.jarsource file="${gson}" relpath="" />
 			<fatjar.jarsource file="${jopt}" relpath="" />
 			<fatjar.jarsource file="${cube}" relpath="" />
 			<fatjar.jarsource file="${itext}" relpath="" />
 		</fatjar.build>
+		<!-- see above comment about scramblers
 		<copy todir="${dist}/scramblers">
 			<fileset dir="${scramblers}" />
 		</copy>
+		-->
 	</target>
 	
 	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
