@@ -1,0 +1,126 @@
+<project name="ScrambleServer" default="dist" basedir=".">
+	<description>
+		Builds the ScrambleServer, ensuring to include JCubeExplorer
+    </description>
+	
+	<property name="src" location="src" />
+	<property name="lib" location="../lib" />
+	<property name="bin" location="bin" />
+	<property name="dist" location="dist" />
+	<property name="scramblers" location="${bin}/scramblers" />
+	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
+	<property name="readme-src" location="${src}/net/gnehzr/tnoodle/scrambles/server/readme.html" />
+	<property name="readme-bin" location="${bin}/net/gnehzr/tnoodle/scrambles/server/readme.html" />
+	<property name="server-jar" location="${dist}/ScrambleServer.jar" />
+	<property name="applet-jar" location="${dist}/ScrambleApplet.jar" />
+	<!-- This seems kinda weird, but is probably the only way to do this -->
+	<property name="jcubeexplorer" location="../jcubeexplorer/" />
+	<!--
+		We create the classpath from all the jar files in my lib directory.
+		NOTE: If the jars in the lib directory change,
+		we must update the call to fatjar and javac to use them!
+	-->
+	<property name="gson" location="${lib}/gson-1.4.jar" />
+	<property name="cube" location="${jcubeexplorer}/dist/JCubeExplorer.jar" />
+	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
+	<property name="itext" location="${lib}/iText-5.0.2.jar" />
+	<property name="jsobject" location="${lib}/plugin.jar" />
+	
+	
+    <!-- Properties for Fat-Jar Eclipse Plug-in -->
+    <property name="fjepPath" value="${lib}/fatjar.jar" />
+    <taskdef name="fatjar.build"
+             classname="net.sf.fjep.anttask.FJBuildTask"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.manifest"
+             classname="net.sf.fjep.anttask.FJManifestType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.exclude"
+             classname="net.sf.fjep.anttask.FJExcludeType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.jarsource"
+             classname="net.sf.fjep.anttask.FJJarSourceType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.filesource"
+             classname="net.sf.fjep.anttask.FJFileSourceType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
+		<javac srcdir="${src}" classpath="${gson};${jopt};${cube};${itext};${jsobject}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+		<copy file="${readme-src}" tofile="${readme-bin}" />
+		
+		<delete file="${plugin-list}" />
+		<pathconvert property="plugin-files" pathsep="${line.separator}">
+		    <path>
+		    	<fileset dir="${scramblers}" />
+		    </path>
+			<chainedmapper>
+				<flattenmapper />
+		    	<globmapper from="*.class" to="*" />
+			</chainedmapper>
+		</pathconvert>
+		<echo>Detected the following plugins</echo>
+		<echo>${plugin-files}</echo>
+		
+		<!-- TODO: automate this shit!!! -->
+		<echo file="${plugin-list}">${plugin-files}</echo>
+	</target>
+
+	<target name="dist" depends="dist-server,dist-applet" description="generate the distribution">
+	</target>
+
+	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
+	<uptodate property="uptodate-server" targetfile="${server-jar}">
+		<srcfiles dir="${src}" />
+	</uptodate>
+	
+	<target name="dist-server" depends="compile" unless="uptodate-server">
+		<fatjar.build output="${server-jar}">
+			<fatjar.manifest mainclass="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
+			<fatjar.filesource path="${bin}" relpath="">
+				<fatjar.exclude relpath="net/gnehzr/tnoodle/scrambles/applet" />
+				<fatjar.exclude relpath="scramblers" />
+			</fatjar.filesource>
+			<fatjar.jarsource file="${gson}" relpath="" />
+			<fatjar.jarsource file="${jopt}" relpath="" />
+			<fatjar.jarsource file="${cube}" relpath="" />
+			<fatjar.jarsource file="${itext}" relpath="" />
+		</fatjar.build>
+		<copy todir="${dist}/scramblers">
+			<fileset dir="${scramblers}" />
+		</copy>
+	</target>
+	
+	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
+	<uptodate property="uptodate-applet" targetfile="${applet-jar}">
+		<srcfiles dir="${src}" />
+	</uptodate>
+	
+	<target name="dist-applet" depends="compile" unless="uptodate-applet">
+		<fatjar.build output="${applet-jar}">
+			<fatjar.manifest mainclass="net.gnehzr.tnoodle.scrambles.ScrambleApplet" />
+			<fatjar.filesource path="${bin}" relpath="">
+				<fatjar.exclude relpath="net/gnehzr/tnoodle/scrambles/server" />
+			</fatjar.filesource>
+			<fatjar.jarsource file="${cube}" relpath="" />
+		</fatjar.build>
+	</target>
+
+	<target name="clean" description="clean up">
+		<ant antfile="${jcubeexplorer}/build.xml" target="clean" inheritAll="false" />
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+</project>

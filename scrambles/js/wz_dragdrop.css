@@ -1,0 +1,43 @@
+.titlebar {
+    height: 20px;
+    text-align: right;
+    background-color: #CCC;
+    border-bottom: 1px solid #666;
+    cursor: move;
+}
+.titletext {
+    float: left;
+    padding-left: 5px;
+}
+.window {
+    position: absolute;
+    overflow: hidden;
+    background-color: #EEE;
+    border: 1px solid #333;
+}
+.button {
+    font-family: sans-serif;
+    cursor: pointer;
+    padding: 2px;
+}
+.button:hover, .button.buttondown:hover {
+    background-color: #888;
+}
+.button.buttondown, .button:active {
+    background-color: #EEE;
+    border-left: 1px solid #666;
+    border-right: 1px solid #666;
+}
+.dragresize {
+    background: none repeat scroll 0 0 #FFF;
+    border: 1px solid #333;
+    font-size: 1px;
+    height: 5px;
+    position: absolute;
+    width: 5px;
+}
+.dragresize-br {
+    cursor: se-resize;
+    bottom: -1px;
+    right: -1px;
+}

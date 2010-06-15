@@ -21,7 +21,7 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source">
-		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" />
+		<javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 	</target>
 	
 	<target name="tables" depends="compile" unless="uptodate.tables" description="build the pruning and transition tables for the two phase algorithm">

@@ -47,15 +47,7 @@ public class Tools {
 	}
 
 	/**
-	 * Generates a random cube.
-	 * @return A random cube in the string representation. Each cube of the cube space has the same probability.
-	 */
-	public static String randomCube() {
-		return randomCube(new Random());
-	}
-	
-	/**
-	 * Generates a random cube using gen
+	 * Generates a random cube using supplied random generator. Alteration to accept Random object added by Conrad Rider
 	 * @param gen A (possibly seeded) instance of Random
 	 * @return A random cube in the string representation. Each cube of the cube space has the same probability.
 	 */
@@ -72,7 +64,7 @@ public class Tools {
 	}
 	
 	/**
-	 * Inverts a valid 3x3 sequence.
+	 * Inverts a valid 3x3 sequence: Added by Conrad Rider
 	 * @param seq A string of space separted turns, where each turn is of the form [FURBLD]2?'?
 	 * @return The inverted sequence.
 	 */

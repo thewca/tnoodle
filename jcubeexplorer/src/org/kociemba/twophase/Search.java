@@ -106,27 +106,6 @@ public class Search {
 		}
 		return s;
 	};
-	
-	
-// Unfortunately, this doesn't run even close to reasonably fast
-//	/**
-//	 * Finds an optimal solution for a given cube.
-//	 * @param facelets
-//	 * @param timeOut
-//	 * @param useSeparator
-//	 * @return
-//	 */
-//	public static String solution(String facelets, long timeOut, boolean useSeparator) {
-//		String solution = null;
-//		for(int depth = 0; depth < 25; depth++) {
-//			System.out.print("Searching depth " + depth + "...");
-//			solution = solution(facelets, depth, timeOut, useSeparator);
-//			System.out.println(solution);
-//			if(!solution.startsWith("Error 7")) //if we had any error other than not finding the solution in the given depth, give up
-//				break;
-//		}
-//		return solution;
-//	}
 
 	/**
 	 * Computes the solver string for a given cube.
@@ -157,7 +136,8 @@ public class Search {
 	 *         Error 8: Timeout, no solution within given time
 	 */
 	public static String solution(String facelets, int maxDepth, long timeOut, boolean useSeparator) {
-		CoordCube.init();
+		// Line added by Jeremy Fleischman. 
+		CoordCube.init(); // Lookup tables are now generated in functions rather than static blocks
 		int s;
 
 		// +++++++++++++++++++++check for wrong input +++++++++++++++++++++++++++++

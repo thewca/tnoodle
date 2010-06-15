@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ScramblerTest</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+
+<link type="text/css" rel="stylesheet" href="ScrambleArea.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="wz_dragdrop.css" media="screen" />
+<style type="text/css">
+img {
+    border: none;
+    padding: 1px;
+}
+</style>
+
+<script type="text/javascript" src="tnoodle.js"></script>
+<script type="text/javascript" src="wz_dragdrop.js"></script>
+<script type="text/javascript" src="ColorChooser.js"></script>
+<script type="text/javascript" src="ScrambleArea.js"></script>
+
+<script type="text/javascript">
+window.addEventListener('load', function() {	
+	var scrambleArea = new ScrambleArea();
+	
+	var scrambles = document.getElementById('scrambles');
+	scrambles.appendChild(scrambleArea.puzzleSelect);
+	
+	var scrambleButton = document.createElement('input');
+	scrambleButton.setAttribute('id', 'scrambler');
+	scrambleButton.setAttribute('type', 'button');
+	scrambleButton.value = "Scramble!";
+	scrambleButton.addEventListener('click', scrambleArea.scramble, false);
+	scrambles.appendChild(scrambleButton);
+	
+	scrambles.appendChild(document.createElement('br'));
+	scrambles.appendChild(scrambleArea.scramblePre);
+}, false);
+</script>
+</head>
+<body>
+<div id="scrambles"></div>
+</body>
+</html>

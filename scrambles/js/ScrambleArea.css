@@ -1,0 +1,14 @@
+span.turn {
+	color: black;
+	text-decoration: underline;
+	cursor: pointer;
+}
+span.currTurn {
+	color: red;
+}
+area {/* apparently this doesn't work in opera or chrome */
+    cursor: pointer;
+}
+pre {
+    white-space: pre-wrap;
+}
