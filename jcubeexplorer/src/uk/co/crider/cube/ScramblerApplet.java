@@ -59,7 +59,7 @@ public class ScramblerApplet extends JApplet implements ScrambleCacherListener {
 		return new String[][] {
 				{"bg-color", "#hex", "sets the background color of this applet"},
 				{"fg-color", "#hex", "sets the foreground color of this applet"},
-				{"gui", "boolean", "if true, enables the gui. otherwise, this applet is only useful for javascript calls"},
+				{"gui", "boolean", "if true (default false), enables the gui. otherwise, this applet is only useful for javascript liveconnect calls"},
 		};
 	}
 	
