@@ -15,18 +15,20 @@ import java.util.regex.Pattern;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
 
+import org.kociemba.twophase.CoordCube;
 import org.kociemba.twophase.Search;
 import org.kociemba.twophase.Tools;
 
-import uk.co.crider.cube.ScrambleCacher;
-
 //TODO - massive cleanup! so much vestigial code
 public class CubeScrambler extends ScrambleImageGenerator {
-	public static CubeScrambler[] createScramblers() {
-		ArrayList<CubeScrambler> scramblers = new ArrayList<CubeScrambler>();
-		for(int i = 2; i <= 11; i++)
-			scramblers.add(new CubeScrambler(i));
-		return scramblers.toArray(new CubeScrambler[0]);
+    private static final int MAX_SCRAMBLE_LENGTH = 25;
+    private static final int TIMEOUT = 60; //seconds
+    
+	public static synchronized CubeScrambler[] createScramblers() {
+		CubeScrambler[] scramblers = new CubeScrambler[10];
+		for(int i = 0; i < scramblers.length; i++)
+			scramblers[i] = new CubeScrambler(i+2);
+		return scramblers;
 	}
 	
 	private static final String FACES = "LDBRUFldbruf";
@@ -37,9 +39,8 @@ public class CubeScrambler extends ScrambleImageGenerator {
 	private boolean multislice = true;
 	private boolean wideNotation = false;
 	
-	private final int[][][] image;
+	private int[][][] image;
 	private final int size;
-	private ScrambleCacher herbertScrambler;
 	private int length;
 	public CubeScrambler(int size) {
 		if(size <= 0 || size >= DEFAULT_LENGTHS.length)
@@ -50,7 +51,8 @@ public class CubeScrambler extends ScrambleImageGenerator {
 		if(size == 2)
 			calcperm();
 		else if(size == 3) {
-			herbertScrambler = new ScrambleCacher();
+			CoordCube.setDebug(true);
+			CoordCube.init();
 		} else
 			length = DEFAULT_LENGTHS[size];
 	}
@@ -66,14 +68,12 @@ public class CubeScrambler extends ScrambleImageGenerator {
 	}
 
 	@Override
-	public String generateScramble(Random r, boolean obeySeed) {
+	public String generateScramble(Random r) {
 		if(size == 2) {
 			mix(r);
 			return solve();
 		} else if(size == 3) {
-			return (obeySeed ?
-						Search.solution(Tools.randomCube(r), 30, 60, false).trim() :
-						herbertScrambler.newScramble());
+			return Search.solution(Tools.randomCube(r), MAX_SCRAMBLE_LENGTH, TIMEOUT, false).trim();
 		} else {
 			StringBuffer scramble = new StringBuffer(length*3);
 			int lastAxis = -1;
@@ -89,8 +89,8 @@ public class CubeScrambler extends ScrambleImageGenerator {
 					axis = r.nextInt(3);
 				} while(axis == lastAxis);
 	
-				for(int j = 0; j < slices; j++) slicesMoved[j] = 0;
-				for(int j = 0; j < 3; j++) directionsMoved[j] = 0;
+				for(int j = 0; j < slicesMoved.length; j++) slicesMoved[j] = 0;
+				for(int j = 0; j < directionsMoved.length; j++) directionsMoved[j] = 0;
 	
 				do {
 					int slice;
@@ -286,7 +286,6 @@ public class CubeScrambler extends ScrambleImageGenerator {
 		return new Dimension(getCubeViewWidth(unitSize, gap, size), getCubeViewHeight(unitSize, gap, size));
 	}
 	private void drawCube(Graphics2D g, int[][][] state, int gap, int cubieSize, HashMap<String, Color> colorScheme) {
-		int size = state[0].length;
 		paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[0], colorScheme);
 		paintCubeFace(g, 2*gap+size*cubieSize, 3*gap+2*size*cubieSize, size, cubieSize, state[1], colorScheme);
 		paintCubeFace(g, 4*gap+3*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[2], colorScheme);

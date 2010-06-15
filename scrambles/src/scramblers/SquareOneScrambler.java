@@ -32,7 +32,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 	private int[] state, turns;
 	private boolean slashes;
 
-	public static SquareOneScrambler[] createScramblers() {
+	public static synchronized SquareOneScrambler[] createScramblers() {
 		return new SquareOneScrambler[] { new SquareOneScrambler(false), new SquareOneScrambler(true) };
 	}
 	
@@ -48,7 +48,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 		turns = new int[length];
 	}
 
-	protected String generateScramble(Random r, boolean obeySeed) {
+	protected String generateScramble(Random r) {
 		initializeImage();
 		int i,move,ls;
 		ls=-1;

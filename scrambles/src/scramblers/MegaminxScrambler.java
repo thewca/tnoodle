@@ -19,7 +19,7 @@ import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
 //TODO - convert to better naming scheme from sims
 //TODO - does old mega importing even work?
 public class MegaminxScrambler extends ScrambleImageGenerator {
-	public static MegaminxScrambler[] createScramblers() {
+	public static synchronized MegaminxScrambler[] createScramblers() {
 		return new MegaminxScrambler[] { new MegaminxScrambler(true), new MegaminxScrambler(false) };
 	}
 	
@@ -124,7 +124,7 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 		{0,0,0,0,0,0, 0,0,0,0,1,0},
 		{0,0,0,0,0,0, 0,0,0,0,0,1}};
 
-	public String generateScramble(Random r, boolean obeySeed) {
+	public String generateScramble(Random r) {
 		StringBuffer scramble = new StringBuffer(length*3);
 		if(!pochmann){
 			int last = -1;

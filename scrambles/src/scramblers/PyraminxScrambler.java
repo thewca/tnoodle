@@ -20,6 +20,10 @@ public class PyraminxScrambler extends ScrambleImageGenerator {
 	private static final int pieceSize = 30;
 	private static final int gap = 5;
 	
+	public static synchronized PyraminxScrambler[] createScramblers() {
+		return new PyraminxScrambler[] { new PyraminxScrambler() };
+	}
+	
 	private int[][] image;
 
 	private void initializeImage() {
@@ -111,7 +115,7 @@ public class PyraminxScrambler extends ScrambleImageGenerator {
 	private static final String TIPS = "lrbu";
 	private static final String SIDES = "ULRB";
 	private static final String[] DIR_TO_STR = new String[] { "", "'" };
-	protected String generateScramble(Random r, boolean obeySeed) {
+	protected String generateScramble(Random r) {
 		turns = new int[20];
 		turnIndex = turns.length - 1;
 		int t = 0, s = 0, q = 0, m, l, p;

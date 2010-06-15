@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -17,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -26,11 +28,10 @@ import net.goui.util.MTRandom;
 import com.eekboom.utils.Strings;
 
 /**
- * Subclasses of ScrambleGenerator can choose to create a method with the following signature
- * <p><code>public static ScrambleGenerator[] createScramblers();</code></p>
- * This method should return an array of ScrambleGenerators.
+ * Subclasses of ScrambleGenerator must method with the following signature
+ * <p><code>public static synchronized ScrambleGenerator[] createScramblers();</code></p>
+ * Note the synchronized keyword! This method should return an array of ScrambleGenerators.
  * This is useful for CubeScrambler, so one class can deal with 2x2 through NxN cube scrambles.<br>
- * If this method is not defined, the existence of a noarg constructor is assumed.<br>
 	//TODO - optimal cross solver? lol
  * @author Jeremy Fleischman
  */
@@ -55,48 +56,36 @@ public abstract class ScrambleGenerator {
 	public abstract String getLongName();
 	
 	/**
-	 * ScrambleGenerators will get passed this instance of Random
-	 * in order to have nice, as-secure-as-can-be scrambles.
-	 */
-	private static final Random r;
-	static {
-		byte[] seed = null;
-		try{
-			seed = SecureRandom.getInstance("SHA1PRNG").generateSeed(9);
-		} catch(NoSuchAlgorithmException e) {
-			seed = new SecureRandom().generateSeed(9);
-		}
-		r = new MTRandom(seed);
-	}
-	
-	/**
-	 * Generates a scramble appropriate for this ScrambleGenerator.
-	 * @param r The instance of Random to use as your source of randomness when generating scrambles.
-	 * @param obeySeed If this is true, the ScrambleGenerator must use r as its source of randomness.
-	 * If false, the generator could grab a scramble from a precomputed list.
-	 * This is useful for something like CubeScrambler, as generating random state solutions
-	 * is an expensive operation best done in a separate thread.
-	 * Most implementations of ScrambleGenerator can safely ignore this parameter. 
+	 * Generates a scramble appropriate for this ScrambleGenerator. It's important to note that
+	 * it's ok if this method takes some time to run, as it's going to be called many times and get queued up
+	 * by ScrambleGenerator (think of it as a sort of cache).
+	 * @param r The instance of Random you must use as your source of randomness when generating scrambles.
 	 * @return A String containing the scramble, where turns are assumed to be separated by whitespace.
 	 */
-	protected abstract String generateScramble(Random r, boolean obeySeed);
+	protected abstract String generateScramble(Random r);
 	
-	private String[] generateScrambles(Random r, boolean obeySeed, int count) {
+	private String[] generateScrambles(Random r, int count) {
 		String[] scrambles = new String[count];
 		for(int i = 0; i < count; i++)
-			scrambles[i] = generateScramble(r, obeySeed);
+			scrambles[i] = generateScramble(r);
 		return scrambles;
 	}
-	
-	/** secure, although possibly pregenerated scrambles **/
+
+	/**
+	 * TODO - USEEE
+	 */
+	private final ScrambleCacher cacher = new ScrambleCacher(this);
+
+
+	/** fast (cached) scrambles **/
 	public final String generateScramble() {
-		return generateScramble(r, false);
+		return cacher.newScramble();
 	}
 	public final String[] generateScrambles(int count) {
-		return generateScrambles(r, false, count);
+		return cacher.newScrambles(count);
 	}
 	
-	/** seeded scrambles **/
+	/** seeded scrambles, these can't be cached, so they'll be a little slower **/
 	public final String generateSeededScramble(String seed) {
 		return generateSeededScramble(seed, 0);
 	}
@@ -115,14 +104,14 @@ public abstract class ScrambleGenerator {
 	private final String generateSeededScramble(long seed, int offset) {
 		Random r = new MTRandom(seed);
 		r.setSeed(seed);
-		generateScrambles(r, true, offset); //burn up scrambles we don't care about
-		return generateScramble(r, true);
+		generateScrambles(r, offset); //burn up scrambles we don't care about
+		return generateScramble(r);
 	}
 	private final String[] generateSeededScrambles(long seed, int count, int offset) {
 		Random r = new MTRandom(seed);
 		r.setSeed(seed);
-		generateScrambles(r, true, offset); //burn up scrambles we don't care about
-		return generateScrambles(r, true, count);
+		generateScrambles(r, offset); //burn up scrambles we don't care about
+		return generateScrambles(r, count);
 	}
 	
 	/**
@@ -154,7 +143,7 @@ public abstract class ScrambleGenerator {
      * @param c The class we're looking to find subclasses of.
      * @return An ArrayList of the matching classes.
      */
-    public static HashSet<String> findLoadedGenerators() {
+    private static HashSet<String> findLoadedGenerators() {
     	HashSet<String> classNames = new HashSet<String>();
     	InputStream is = ScrambleGenerator.class.getResourceAsStream(SCRAMBLE_PLUGIN_LIST);
     	if(is == null)
@@ -171,8 +160,7 @@ public abstract class ScrambleGenerator {
 		return classNames;
     }
     
-
-    public static HashSet<String> findPluginGenerators(File folder) {
+    private static HashSet<String> findPluginGenerators(File folder) {
     	HashSet<String> potentialClasses = new HashSet<String>();
 		File[] files = folder.listFiles(new FileFilter() {
 			@Override
@@ -246,19 +234,15 @@ public abstract class ScrambleGenerator {
 		for(Class<? extends ScrambleGenerator> clz : loadedGenerators) {
 			try {
 				Method createScramblers = clz.getMethod("createScramblers");
+				if(!Modifier.isSynchronized(createScramblers.getModifiers())) {
+					throw new NoSuchMethodException("createScramblers() must be synchronized (class " + clz.getCanonicalName() + ")");
+				}
 				ScrambleGenerator[] generators = (ScrambleGenerator[]) createScramblers.invoke(null);
 				for(ScrambleGenerator scrambler : generators) {
 					scramblers.put(scrambler.getShortName(), scrambler);
 				}
 			} catch(NoSuchMethodException e) {
-				try {
-					ScrambleGenerator scrambler = clz.newInstance();
-					scramblers.put(scrambler.getShortName(), scrambler);
-				} catch (InstantiationException e1) {
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					e1.printStackTrace();
-				}
+				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
@@ -268,5 +252,108 @@ public abstract class ScrambleGenerator {
 			}
 		}
 		return scramblers;
+	}
+}
+interface ScrambleCacherListener {
+public void scrambleCacheUpdated(ScrambleCacher src);
+}
+class ScrambleCacher {
+	private static final int DEFAULT_CACHE_SIZE = 4;
+
+	/**
+	 * ScrambleGenerators will get passed this instance of Random
+	 * in order to have nice, as-secure-as-can-be scrambles.
+	 */
+	private static final Random r;
+	static {
+		byte[] seed = null;
+		try{
+			seed = SecureRandom.getInstance("SHA1PRNG").generateSeed(9);
+		} catch(NoSuchAlgorithmException e) {
+			seed = new SecureRandom().generateSeed(9);
+		}
+		r = new MTRandom(seed);
+	}
+
+	private String[] scrambles;
+	private volatile int startBuf = 0;
+	private volatile int available = 0;
+
+	public ScrambleCacher(ScrambleGenerator scrambler) {
+		this(scrambler, DEFAULT_CACHE_SIZE);
+	}
+
+	public ScrambleCacher(final ScrambleGenerator scrambler, int cacheSize) {
+		scrambles = new String[cacheSize];
+
+		new Thread() {
+			public void run() {
+				synchronized(scrambler.getClass()) {
+					//this thread starts running while scrambler
+					//is still initializing, we must wait until
+					//it has finished before we attempt to generate
+					//any scrambles
+				}
+				for(;;) {
+					String scramble = scrambler.generateScramble(r);
+
+					synchronized(scrambles) {
+						while(available == scrambles.length) {
+							try {
+								scrambles.wait();
+							} catch(InterruptedException e) {}
+						}
+						scrambles[(startBuf + available) % scrambles.length] = scramble;
+						available++;
+						scrambles.notifyAll();
+					}
+					fireScrambleCacheUpdated();
+				}
+			}
+		}.start();
+	}
+	private LinkedList<ScrambleCacherListener> ls = new LinkedList<ScrambleCacherListener>();
+	public void addScrambleCacherListener(ScrambleCacherListener l) {
+		ls.add(l);
+	}
+	/**
+	 * This method will notify all listeners that the cache size has changed.
+	 * NOTE: Do NOT call this method while holding any monitors!
+	 */
+	private void fireScrambleCacheUpdated() {
+		for(ScrambleCacherListener l : ls)
+			l.scrambleCacheUpdated(this);
+	}
+	
+	public int getAvailableCount() {
+		return available;
+	}
+
+	/**
+	 * Get a new scramble from the cache. Will block if necessary.
+	 * @return A new scramble from the cache.
+	 */
+	public String newScramble() {
+		String scramble;
+		synchronized(scrambles) {
+			while(available == 0) {
+				try {
+					scrambles.wait();
+				} catch(InterruptedException e) {}
+			}
+			scramble = scrambles[startBuf];
+			startBuf = (startBuf + 1) % scrambles.length;
+			available--;
+			scrambles.notifyAll();
+		}
+		fireScrambleCacheUpdated();
+		return scramble;
+	}
+
+	public String[] newScrambles(int count) {
+		String[] scrambles = new String[count];
+		for(int i = 0; i < count; i++)
+			scrambles[i] = newScramble();
+		return scrambles;
 	}
 }

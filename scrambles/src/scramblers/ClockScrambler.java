@@ -7,6 +7,10 @@ import net.gnehzr.tnoodle.scrambles.ScrambleGenerator;
 public class ClockScrambler extends ScrambleGenerator {
 //	private boolean verbose = false;
 	
+	public static synchronized ClockScrambler[] createScramblers() {
+		return new ClockScrambler[] { new ClockScrambler() };
+	}
+	
 	@Override
 	public String getLongName() {
 		return "Clock";
@@ -18,7 +22,7 @@ public class ClockScrambler extends ScrambleGenerator {
 	}
 	
 	@Override
-	public String generateScramble(Random r, boolean obeySeed) {
+	public String generateScramble(Random r) {
 		StringBuffer scramble = new StringBuffer();
 		
 		String[] peg={"U","d"};
