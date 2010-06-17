@@ -13,14 +13,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
 import org.kociemba.twophase.CoordCube;
 import org.kociemba.twophase.Search;
 import org.kociemba.twophase.Tools;
 
 //TODO - massive cleanup! so much vestigial code
-public class CubeScrambler extends ScrambleImageGenerator {
+public class CubeScrambler extends ScramblerViewer {
     private static final int MAX_SCRAMBLE_LENGTH = 25;
     private static final int TIMEOUT = 60; //seconds
     
@@ -314,7 +314,7 @@ public class CubeScrambler extends ScrambleImageGenerator {
 	}
 	
 	@Override
-	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		if(scramble == null) scramble = "";
 		initializeImage();
 		if(!validateScramble(scramble))

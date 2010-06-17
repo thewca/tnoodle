@@ -2,7 +2,6 @@ package net.gnehzr.tnoodle.scrambles.server;
 
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.exceptionToString;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.parseExtension;
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.parseQuery;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toColor;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toHex;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toInt;
@@ -13,18 +12,30 @@ import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -32,8 +43,8 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScrambleGenerator;
-import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -76,16 +87,17 @@ import com.sun.net.httpserver.HttpServer;
 public class ScrambleServer {
 	
 	public ScrambleServer(int port, File scrambleFolder) throws IOException {
-		SortedMap<String, ScrambleGenerator> scramblers = ScrambleGenerator.getScrambleGenerators(scrambleFolder);
+		SortedMap<String, Scrambler> scramblers = Scrambler.getScrambleGenerators(scrambleFolder);
 		if(scramblers == null) {
 			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
 		}
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 		server.createContext("/", new ReadmeHandler());
-		server.createContext("/scrambler", new ScramblerHandler(scramblers));
-		server.createContext("/viewer", new ScrambleViewerHandler(scramblers));
+		server.createContext("/import/", new ImporterHandler());
+		server.createContext("/scramble/", new ScramblerHandler(scramblers));
+		server.createContext("/view/", new ScrambleViewerHandler(scramblers));
 		// the default executor invokes everything in 1 thread, so threading isn't an issue!
-		server.setExecutor(null);
+		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
@@ -93,49 +105,75 @@ public class ScrambleServer {
 		System.out.println("Visit http://" + addr + " for a readme and demo.");
 	}
 	
-	private class ReadmeHandler implements HttpHandler {
-		
+	private class ImporterHandler extends SafeHttpHandler {
+		private final Pattern BOUNDARY_PATTERN = Pattern.compile("^.+boundary\\=(.+)$");
 		@Override
-		public void handle(HttpExchange t) throws IOException {
-			try {
-				wrapped(t);
-			} catch(Exception e) {
-				sendText(t, exceptionToString(e));
+		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception {
+			if(t.getRequestMethod().equals("POST")) {
+				// we assume this means we're uploading a file
+				// the following isn't terribly robust, but it should work for us
+				String boundary = t.getRequestHeaders().get("Content-Type").get(0);
+				Matcher m = BOUNDARY_PATTERN.matcher(boundary);
+				m.matches();
+				boundary = "--" + m.group(1);
+				
+				BufferedReader in = new BufferedReader(new InputStreamReader(t.getRequestBody()));
+				ArrayList<String> scrambles = new ArrayList<String>();
+				String line;
+				boolean finishedHeaders = false;
+				while((line = in.readLine()) != null) {
+					if(line.equals(boundary + "--"))
+						break;
+					if(finishedHeaders)
+						scrambles.add(line);
+					if(line.isEmpty()) //this indicates a CRLF CRLF
+						finishedHeaders = true;
+				}
+				//we need to escape our backslashes
+				String json = GSON.toJson(scrambles).replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
+				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+				BufferedWriter html = new BufferedWriter(new OutputStreamWriter(bytes));
+				html.append("<html><body><script>parent.postMessage('");
+				html.append(json);
+				html.append("', '*');</script></html>");
+				html.close();
+				sendHtml(t, bytes);
+			} else {
+				String urlStr = query.get("url");
+				URL url = new URL(urlStr);
+				URLConnection conn = url.openConnection();
+				ArrayList<String> scrambles = new ArrayList<String>();
+				BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				String line;
+				while((line = in.readLine()) != null) {
+					scrambles.add(line);
+				}
+				sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
 			}
 		}
 
-		private void wrapped(HttpExchange t) throws IOException {
-			InputStream is = getClass().getResourceAsStream("readme.html");
+	}
+	
+	private class ReadmeHandler extends SafeHttpHandler {
+		
+		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			final byte[] buffer = new byte[0x10000];
-			for(;;) {
-				int read = is.read(buffer);
-				if(read < 0)
-					break;
-				bytes.write(buffer, 0, read);
-			}
-			sendHtml(t, bytes.toByteArray());
+			fullyReadInputStream(getClass().getResourceAsStream("readme.html"), bytes);
+			sendHtml(t, bytes);
 		}
 	}
 	
-	private class ScrambleViewerHandler implements HttpHandler {
-		private SortedMap<String, ScrambleGenerator> scramblers;
-		public ScrambleViewerHandler(SortedMap<String, ScrambleGenerator> scramblers) {
+	private class ScrambleViewerHandler extends SafeHttpHandler {
+		private SortedMap<String, Scrambler> scramblers;
+		public ScrambleViewerHandler(SortedMap<String, Scrambler> scramblers) {
 			this.scramblers = scramblers;
 		}
-
-		@Override
-		public void handle(HttpExchange t) {
-			try {
-				wrapped(t);
-			} catch(Exception e) {
-				sendText(t, exceptionToString(e));
-			}
-		}
 		
-		private void wrapped(HttpExchange t) throws IOException {
-			//substring(1) gets rid of the leading /
-			String[] path = t.getRequestURI().getPath().substring(1).split("/");
+		protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
+			if(path.length == 1) {
+				sendText(t, "Please specify a puzzle.");
+				return;
+			}
 			String[] name_extension = parseExtension(path[1]);
 			if(name_extension[1] == null) {
 				sendText(t, "Please specify an extension");
@@ -144,16 +182,15 @@ public class ScrambleServer {
 			String puzzle = name_extension[0];
 			String extension = name_extension[1];
 			
-			HashMap<String, String> query = parseQuery(t.getRequestURI().getQuery());
-			ScrambleGenerator gen = scramblers.get(puzzle);
+			Scrambler gen = scramblers.get(puzzle);
 			if(gen == null) {
 				sendText(t, "Invalid scramble generator: " + puzzle);
 				return;
-			} else if(!(gen instanceof ScrambleImageGenerator)) {
+			} else if(!(gen instanceof ScramblerViewer)) {
 				sendText(t, "Specified scramble generator: " + puzzle + " does not support image generation.");
 				return;
 			}
-			ScrambleImageGenerator generator = (ScrambleImageGenerator) gen;
+			ScramblerViewer generator = (ScramblerViewer) gen;
 
 			HashMap<String, Color> colorScheme = generator.parseColorScheme(query.get("scheme"));
 			
@@ -182,16 +219,16 @@ public class ScrambleServer {
 		}
 	}
 
-	private class ScramblerHandler implements HttpHandler {
-		private SortedMap<String, ScrambleGenerator> scramblers;
+	private class ScramblerHandler extends SafeHttpHandler {
+		private SortedMap<String, Scrambler> scramblers;
 		private String puzzleNamesJSON;
-		public ScramblerHandler(SortedMap<String, ScrambleGenerator> scramblers) {
+		public ScramblerHandler(SortedMap<String, Scrambler> scramblers) {
 			this.scramblers = scramblers;
 			
 			//listing available scrambles
 			String[][] puzzleNames = new String[scramblers.size()][2];
 			int i = 0;
-			for(Entry<String, ScrambleGenerator> scrambler : scramblers.entrySet()) {
+			for(Entry<String, Scrambler> scrambler : scramblers.entrySet()) {
 				String shortName = scrambler.getValue().getShortName();
 				String longName = scrambler.getValue().getLongName();
 				puzzleNames[i][0] = shortName;
@@ -199,16 +236,6 @@ public class ScrambleServer {
 				i++;
 			}
 			puzzleNamesJSON = GSON.toJson(puzzleNames);
-		}
-		
-		@Override
-		public void handle(HttpExchange t) {
-			try {
-				wrapped(t);
-			} catch(Exception e) {
-				e.printStackTrace();
-				sendText(t, exceptionToString(e));
-			}
 		}
 		
 		private final DefaultSplitCharacter SPLIT_ON_SPACES = new DefaultSplitCharacter() {
@@ -220,7 +247,12 @@ public class ScrambleServer {
 			}
 		};
 
-		private ByteArrayOutputStream createPdf(ScrambleGenerator generator, String[] scrambles, String title, String scheme) {
+		private ByteArrayOutputStream createPdf(Scrambler generator, String[] scrambles, String title, Integer width, Integer height, String scheme) {
+			if(width == null)
+				width = 200;
+			if(height == null)
+				height = (int) (PageSize.LETTER.getHeight()/5); //optimizing for 5 scrambles per page
+				
 			PdfWriter docWriter = null;
 			try {
 				Document doc = new Document(PageSize.LETTER, 0, 0, 75, 75);
@@ -241,12 +273,12 @@ public class ScrambleServer {
 
 				doc.open();
 
-				ScrambleImageGenerator sig = null;
+				ScramblerViewer sig = null;
 				Dimension dim = new Dimension(0, 0);
 				HashMap<String, Color> colorScheme = null;
-				if(generator instanceof ScrambleImageGenerator) {
-					sig = (ScrambleImageGenerator)generator;
-					dim = sig.getPreferredSize(200, (int) (PageSize.LETTER.getHeight()/5)); //optimizing for 5 scrambles per page
+				if(generator instanceof ScramblerViewer && width > 0 && height > 0) {
+					sig = (ScramblerViewer)generator;
+					dim = sig.getPreferredSize(width, height);
 					colorScheme = sig.parseColorScheme(scheme);
 				}
 				
@@ -322,11 +354,7 @@ public class ScrambleServer {
 	        }
 	    }
 		
-		private void wrapped(HttpExchange t) {
-			//substring(1) gets rid of the leading /
-			String[] path = t.getRequestURI().getPath().substring(1).split("/");
-			HashMap<String, String> query = parseQuery(t.getRequestURI().getQuery());
-
+		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) {
 			if(path.length == 1) {
 				sendJSON(t, puzzleNamesJSON, query.get("callback"));
 			} else {
@@ -352,7 +380,7 @@ public class ScrambleServer {
 					sendText(t, "Invalid number of periods: " + path[1]);
 					return;
 				}
-				ScrambleGenerator generator = scramblers.get(puzzle);
+				Scrambler generator = scramblers.get(puzzle);
 				if(generator == null) {
 					sendText(t, "Invalid scramble generator: " + puzzle);
 					return;
@@ -371,14 +399,14 @@ public class ScrambleServer {
 					StringBuilder sb = new StringBuilder();
 					for(String scramble : scrambles) {
 						//we replace newlines with spaces because clients will assume that scrambles
-						//are separated by newlines
-						sb.append(scramble.replaceAll("\n", " ")).append('\n');
+						//are separated by carraige return line feeds
+						sb.append(scramble.replaceAll("\n", " ")).append("\r\n");
 					}
 					sendText(t, sb.toString());
 				} else if(ext.equals("json")) {
 					sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
 				} else if(ext.equals("pdf")) {
-					ByteArrayOutputStream pdf = createPdf(generator, scrambles, title, query.get("scheme"));
+					ByteArrayOutputStream pdf = createPdf(generator, scrambles, title, toInt(query.get("width"), null), toInt(query.get("height"), null), query.get("scheme"));
 					t.getResponseHeaders().set("Content-Type", "application/pdf");
 					t.getResponseHeaders().set("Content-Disposition", "inline");
 					//TODO - what's the right way to do caching?
@@ -467,58 +495,6 @@ public class ScrambleServer {
 		
 	}
 	
-	public static void sendJSON(HttpExchange t, String json, String callback) {
-		t.getResponseHeaders().set("Content-Type", "application/json");
-		if(callback != null) {
-			json = callback + "(" + json + ")";
-		}
-		sendText(t, json);
-	}
-	
-	public static void jsonError(HttpExchange t, String error, String callback) {
-		HashMap<String, String> json = new HashMap<String, String>();
-		json.put("error", error);
-		sendJSON(t, GSON.toJson(json), callback);
-	}
-	
-	public static void sendBytes(HttpExchange t, ByteArrayOutputStream bytes) {
-		try {
-			t.sendResponseHeaders(200, bytes.size());
-			bytes.writeTo(t.getResponseBody());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				t.getResponseBody().close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public static void sendBytes(HttpExchange t, byte[] bytes) {
-		try {
-			t.sendResponseHeaders(200, bytes.length);
-			t.getResponseBody().write(bytes);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				t.getResponseBody().close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public static void sendHtml(HttpExchange t, byte[] bytes) {
-		t.getResponseHeaders().set("Content-Type", "text/html");
-		sendBytes(t, bytes);
-	}
-	
-	public static void sendText(HttpExchange t, String text) {
-		sendBytes(t, text.getBytes()); //TODO - encoding charset?
-	}
 
 	/**
 	 * @return A File representing the directory in which this program resides.
@@ -552,4 +528,111 @@ public class ScrambleServer {
 		}
 		parser.printHelpOn(System.out);
 	}
+}
+
+@SuppressWarnings("restriction")
+abstract class SafeHttpHandler implements HttpHandler {
+
+	@Override
+	public final void handle(HttpExchange t) throws IOException {
+		try {
+			//substring(1) gets rid of the leading /
+			String[] path = t.getRequestURI().getPath().substring(1).split("/");
+			HashMap<String, String> query = parseQuery(t.getRequestURI().getRawQuery());
+			wrappedHandle(t, path, query);
+		} catch(Exception e) {
+			sendText(t, exceptionToString(e));
+		}
+	}
+	
+	protected abstract void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception;
+
+	private static HashMap<String, String> parseQuery(String query) {
+		HashMap<String, String> queryMap = new HashMap<String, String>();
+		if(query == null) return queryMap;
+		String[] pairs = query.split("&");
+		for(String pair : pairs) {
+			String[] key_value = pair.split("=");
+			if(key_value.length == 1)
+				queryMap.put(key_value[0], ""); //this allows for flags such as http://foo/blah?kill&burn
+			else
+				try {
+					queryMap.put(key_value[0], URLDecoder.decode(key_value[1], "utf-8"));
+				} catch (UnsupportedEncodingException e) {
+					queryMap.put(key_value[0], key_value[1]); //worst case, just put the undecoded string
+				}
+		}
+		return queryMap;
+	}
+
+	
+	protected static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
+		final byte[] buffer = new byte[0x10000];
+		for(;;) {
+			int read = is.read(buffer);
+			if(read < 0)
+				break;
+			bytes.write(buffer, 0, read);
+		}
+	}
+	
+	protected static void sendJSON(HttpExchange t, String json, String callback) {
+		t.getResponseHeaders().set("Content-Type", "application/json");
+		t.getResponseHeaders().set("Access-Control-Allow-Origin", "*"); //this allows x-domain ajax
+		if(callback != null) {
+			json = callback + "(" + json + ")";
+		}
+		sendBytes(t, json.getBytes()); //TODO - charset?
+	}
+	
+	protected static void jsonError(HttpExchange t, String error, String callback) {
+		HashMap<String, String> json = new HashMap<String, String>();
+		json.put("error", error);
+		sendJSON(t, ScrambleServer.GSON.toJson(json), callback);
+	}
+	
+	protected static void sendBytes(HttpExchange t, ByteArrayOutputStream bytes) {
+		try {
+			t.sendResponseHeaders(200, bytes.size());
+			bytes.writeTo(t.getResponseBody());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				t.getResponseBody().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	protected static void sendBytes(HttpExchange t, byte[] bytes) {
+		try {
+			t.sendResponseHeaders(200, bytes.length);
+			t.getResponseBody().write(bytes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				t.getResponseBody().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	protected static void sendHtml(HttpExchange t, ByteArrayOutputStream bytes) {
+		t.getResponseHeaders().set("Content-Type", "text/html");
+		sendBytes(t, bytes);
+	}
+	protected static void sendHtml(HttpExchange t, byte[] bytes) {
+		t.getResponseHeaders().set("Content-Type", "text/html");
+		sendBytes(t, bytes);
+	}
+	
+	protected static void sendText(HttpExchange t, String text) {
+		t.getResponseHeaders().set("Content-Type", "text/plain");
+		sendBytes(t, text.getBytes()); //TODO - encoding charset?
+	}
+
 }

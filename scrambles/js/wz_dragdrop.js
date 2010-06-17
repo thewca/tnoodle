@@ -338,8 +338,9 @@ dd.addProps = function(d_o)
 	d_o._setCrs(d_o.nodrag? 'auto' : d_o.cursor);
 	d_o.diaphan = d_o.diaphan || dd.diaphan || 0;
 	d_o.opacity = 1.0;
-	if(dd.ie && !dd.iemac && d_o.div && d_o.div.style)
-		d_o.div.style.filter = "Alpha(opacity=100)";
+	//the following is breaking anti aliasing on ie, making the draggable stuff ugly --jfly
+//	if(dd.ie && !dd.iemac && d_o.div && d_o.div.style)
+//		d_o.div.style.filter = "Alpha(opacity=100)";
 	d_o.visible = true;
 };
 dd.initz = function()
@@ -1103,7 +1104,7 @@ function PICK(d_ev)
 		{
 			dd.e.e.cancelBubble = true;
 			// any element within the draggable that has class dragresize will now allow resizing --Jeremy Fleischman
-			var d_rsz = (dd.e.modifKey && (dd.obj.resizable || dd.obj.scalable)) || d_ev.target.className.match(/\bdragresize\b/);
+			var d_rsz = (dd.e.modifKey && (dd.obj.resizable || dd.obj.scalable)) || dd.e.src.className.match(/\bdragresize\b/);
 			if(dd.op)
 			{
 				(d_o = document.getElementById('OpBlUr')).style.pixelLeft = dd.e.x;
@@ -1142,7 +1143,7 @@ function PICK(d_ev)
 				dd.setMovHdl(RESIZE);
 				dd.reszTo(dd.obj.w, dd.obj.h);
 			}
-			else if(isDraggable(d_ev.target)) {
+			else if(isDraggable(dd.e.src)) {
 				dd.obj.is_dragged = 1;
 				dd.setMovHdl(DRAG);
 			} else {

@@ -1,3 +1,11 @@
+function addListener(obj, event, func, useCapture) {
+	if(obj.addEventListener) {
+		obj.addEventListener(event, func, useCapture);
+	} else {
+		obj.attachEvent('on'+event, function(e) { func.call(obj, e); });
+	}
+}
+
 // callback is a function(color), where color is encoded as a hex string
 function ColorChooser(callback) {
 function rgb2hex(rgb) {
@@ -140,138 +148,141 @@ function getPoint(e) {
     var height = color_width;
 
     var box = document.createElement('canvas');
-    box.setAttribute('width', color_width+lum_width);
-    box.setAttribute('height', height);
-
-    var context = box.getContext('2d');
-    var colorCircleData = context.getImageData(0, 0, color_width+gap, height);
-    var data = colorCircleData.data;
-
-    // not sure if the color patch should reflect the luminance or not
-    new_hsl = {l: .5};
-    for(var i = 0; i < colorCircleData.height; i++) {
-        for(var j = 0; j < color_width; j++) {
-            var hs = i_jToHS(i, j);
-            new_hsl.h = hs.h;
-            new_hsl.s = hs.s;
-            if(new_hsl.s > 1)
-                continue;
-
-            var rgb = hsl2rgb(new_hsl);
-            var index = (i*colorCircleData.width + j)*4;
-            data[index] = rgb.r;
-            data[index+1] = rgb.g;
-            data[index+2] = rgb.b;
-            data[index+3] = 255;
-        }
+    if(box.getContext) {
+	    box.setAttribute('width', color_width+lum_width);
+	    box.setAttribute('height', height);
+	
+	    var context = box.getContext('2d');
+	    var colorCircleData = context.getImageData(0, 0, color_width+gap, height);
+	    var data = colorCircleData.data;
+	
+	    // not sure if the color patch should reflect the luminance or not
+	    new_hsl = {l: .5};
+	    for(var i = 0; i < colorCircleData.height; i++) {
+	        for(var j = 0; j < color_width; j++) {
+	            var hs = i_jToHS(i, j);
+	            new_hsl.h = hs.h;
+	            new_hsl.s = hs.s;
+	            if(new_hsl.s > 1)
+	                continue;
+	
+	            var rgb = hsl2rgb(new_hsl);
+	            var index = (i*colorCircleData.width + j)*4;
+	            data[index] = rgb.r;
+	            data[index+1] = rgb.g;
+	            data[index+2] = rgb.b;
+	            data[index+3] = 255;
+	        }
+	    }
+	
+	    var draggingColorCircle = false, draggingLum = false;
+	    addListener(box, 'mousedown', function(e) {
+	        if(e.button == 0) {
+	            var cursor = "pointer";
+	            if(inColorCircle(e))
+	                draggingColorCircle = true;
+	            else if(inLum(e))
+	                draggingLum = true;
+	            else
+	                cursor = "default";
+	            box.style.cursor = cursor; //this doesn't work in stupid chrome
+	
+	            mouseMoved(e);
+	        }
+	    }, false);
+	    addListener(box, 'mouseup', function(e) {
+	        if(e.button == 0) {
+	            draggingColorCircle = draggingLum = false;
+	            box.style.cursor = "default";
+	            redraw();
+	        }
+	    }, false);
+	
+	    function mouseMoved(e) {
+	        if(draggingColorCircle) {
+	            var pt = getPoint(e);
+	            var hs = i_jToHS(pt.y, pt.x);
+	            hs.s = Math.min(1, hs.s);
+	            hs.l = selectedHSL.l;
+	            setSelectedHSL(hs);
+	        } else if(draggingLum) {
+	            var pt = getPoint(e);
+	            var lum = 1-(pt.y-gap)/(height-2*gap);
+	            lum = Math.min(1, Math.max(0, lum));
+	            var hsl = { h: selectedHSL.h, s: selectedHSL.s, l: lum};
+	            setSelectedHSL(hsl);
+	        }
+	    }
+	    addListener(box, 'mousemove', mouseMoved , false);
+	    function redraw() {
+	    	if(!context) //not all browsers support the canvas element =(
+	    		return;
+	        context.clearRect(0, 0, color_width+lum_width, height);
+	        context.putImageData(colorCircleData, 0, 0);
+	
+	        var new_hsl = { h: selectedHSL.h, s: selectedHSL.s};
+	        var imgData = context.getImageData(color_width, 0, lum_width, height);
+	        var data = imgData.data;
+	        for(var i = gap; i < imgData.height-gap; i++) {
+	            new_hsl.l = 1 - ((i-gap) / (imgData.height-2*gap));
+	            var rgb = hsl2rgb(new_hsl);
+	            for(var j = gap; j < lum_width-gap; j++) {
+	                var index = (i*lum_width + j)*4;
+	                data[index] = rgb.r;
+	                data[index+1] = rgb.g;
+	                data[index+2] = rgb.b;
+	                data[index+3] = 255;
+	            }
+	        }
+	        context.putImageData(imgData, color_width, 0);
+	
+	        var rgb = [selectedRGB.r, selectedRGB.g, selectedRGB.b];
+	        for(var i = 0; i < rgb.length; i++) {
+	            rgb[i] = 255-rgb[i];
+	        }
+	        context.strokeStyle = 'rgb(' + rgb.join(',') + ')';
+	        if(!draggingColorCircle) {
+	            var ij = hsToIJ(selectedHSL);
+	            var x_size = 10;
+	            var x_hollow = 4;
+	            context.beginPath();
+	            context.moveTo(ij.j-x_size, ij.i);
+	            context.lineTo(ij.j-x_hollow, ij.i);
+	            context.closePath();
+	            context.stroke();
+	            context.beginPath();
+	            context.moveTo(ij.j+x_size, ij.i);
+	            context.lineTo(ij.j+x_hollow, ij.i);
+	            context.closePath();
+	            context.stroke();
+	            context.beginPath();
+	            context.moveTo(ij.j, ij.i+x_size);
+	            context.lineTo(ij.j, ij.i+x_hollow);
+	            context.closePath();
+	            context.stroke();
+	            context.beginPath();
+	            context.moveTo(ij.j, ij.i-x_size);
+	            context.lineTo(ij.j, ij.i-x_hollow);
+	            context.closePath();
+	            context.stroke();
+	        }
+	
+	        //drawing lum
+	        var y = (1-selectedHSL.l)*(height-2*gap) + gap;
+	        context.beginPath();
+	        context.moveTo(color_width, y);
+	        context.lineTo(color_width+gap, y);
+	        context.closePath();
+	        context.stroke();
+	        context.beginPath();
+	        context.moveTo(color_width+lum_width-gap, y);
+	        context.lineTo(color_width+lum_width, y);
+	        context.closePath();
+	        context.stroke();
+	    }
     }
 
-    var draggingColorCircle = false, draggingLum = false;
-    box.addEventListener('mousedown', function(e) {
-        if(e.button == 0) {
-            var cursor = "pointer";
-            if(inColorCircle(e))
-                draggingColorCircle = true;
-            else if(inLum(e))
-                draggingLum = true;
-            else
-                cursor = "default";
-            box.style.cursor = cursor; //this doesn't work in stupid chrome
-
-            mouseMoved(e);
-        }
-    }, false);
-    box.addEventListener('mouseup', function(e) {
-        if(e.button == 0) {
-            draggingColorCircle = draggingLum = false;
-            box.style.cursor = "default";
-            redraw();
-        }
-    }, false);
-    box.addEventListener('mousemove', mouseMoved , false);
-
-    function mouseMoved(e) {
-        if(draggingColorCircle) {
-            var pt = getPoint(e);
-            var hs = i_jToHS(pt.y, pt.x);
-            hs.s = Math.min(1, hs.s);
-            hs.l = selectedHSL.l;
-            setSelectedHSL(hs);
-        } else if(draggingLum) {
-            var pt = getPoint(e);
-            var lum = 1-(pt.y-gap)/(height-2*gap);
-            lum = Math.min(1, Math.max(0, lum));
-            var hsl = { h: selectedHSL.h, s: selectedHSL.s, l: lum};
-            setSelectedHSL(hsl);
-        }
-    }
-    function redraw() {
-        context.clearRect(0, 0, color_width+lum_width, height);
-        context.putImageData(colorCircleData, 0, 0);
-
-        var new_hsl = { h: selectedHSL.h, s: selectedHSL.s};
-        var imgData = context.getImageData(color_width, 0, lum_width, height);
-        var data = imgData.data;
-        for(var i = gap; i < imgData.height-gap; i++) {
-            new_hsl.l = 1 - ((i-gap) / (imgData.height-2*gap));
-            var rgb = hsl2rgb(new_hsl);
-            for(var j = gap; j < lum_width-gap; j++) {
-                var index = (i*lum_width + j)*4;
-                data[index] = rgb.r;
-                data[index+1] = rgb.g;
-                data[index+2] = rgb.b;
-                data[index+3] = 255;
-            }
-        }
-        context.putImageData(imgData, color_width, 0);
-
-        var rgb = [selectedRGB.r, selectedRGB.g, selectedRGB.b];
-        for(var i = 0; i < rgb.length; i++) {
-            rgb[i] = 255-rgb[i];
-        }
-        context.strokeStyle = 'rgb(' + rgb.join(',') + ')';
-        if(!draggingColorCircle) {
-            var ij = hsToIJ(selectedHSL);
-            var x_size = 10;
-            var x_hollow = 4;
-            context.beginPath();
-            context.moveTo(ij.j-x_size, ij.i);
-            context.lineTo(ij.j-x_hollow, ij.i);
-            context.closePath();
-            context.stroke();
-            context.beginPath();
-            context.moveTo(ij.j+x_size, ij.i);
-            context.lineTo(ij.j+x_hollow, ij.i);
-            context.closePath();
-            context.stroke();
-            context.beginPath();
-            context.moveTo(ij.j, ij.i+x_size);
-            context.lineTo(ij.j, ij.i+x_hollow);
-            context.closePath();
-            context.stroke();
-            context.beginPath();
-            context.moveTo(ij.j, ij.i-x_size);
-            context.lineTo(ij.j, ij.i-x_hollow);
-            context.closePath();
-            context.stroke();
-        }
-
-        //drawng lum
-        var y = (1-selectedHSL.l)*(height-2*gap) + gap;
-        context.beginPath();
-        context.moveTo(color_width, y);
-        context.lineTo(color_width+gap, y);
-        context.closePath();
-        context.stroke();
-        context.beginPath();
-        context.moveTo(color_width+lum_width-gap, y);
-        context.lineTo(color_width+lum_width, y);
-        context.closePath();
-        context.stroke();
-    }
-
-
-    var button_width = 100;
+    var button_width = 110;
 
     function rgbChanged() {
         var rgb = {r: redBox.value, g: greenBox.value, b: blueBox.value};
@@ -299,7 +310,7 @@ function getPoint(e) {
         input.setAttribute('min', 0);
         input.setAttribute('max', 255);
         input.setAttribute('step', 1);
-        input.addEventListener('change', rgbChanged, false);
+        addListener(input, 'change', rgbChanged, false);
 
         var div = document.createElement('div');
         div.field = input;
@@ -326,8 +337,6 @@ function getPoint(e) {
 
 
     var buttons = document.createElement('div');
-    buttons.style.cssFloat = 'right';
-
     buttons.appendChild(red);
     buttons.appendChild(document.createElement('br'));
     buttons.appendChild(green);
@@ -339,13 +348,32 @@ function getPoint(e) {
     buttons.appendChild(accept);
 
 	//TODO - the 15 and 26 were found via trial and error, and probably aren't too solid
-    this.preferredWidth = 15+color_width+lum_width+button_width;
-    this.preferredHeight = height + 26;
+    var weird_gap = 15;
+    var titlebar = 21;
+    
+    this.preferredWidth = weird_gap+button_width;
+    this.preferredHeight = height;
+    if(context) {
+    	this.preferredWidth += color_width + lum_width;
+    	//don't even bother figuring out what the next 2 lines do, just live with them
+    	this.preferredHeight += titlebar;
+    	titlebar += 10;
+    }
     var element = this.element = document.createElement('div');
+    element.style.width = this.preferredWidth + 'px';
+    element.style.height = this.preferredHeight + 'px';
+
+//    buttons.style.cssFloat = 'right';
+    buttons.style.position = 'absolute';
+//    buttons.style.left = (this.preferredWidth-button_width)/2. + 'px';
+    buttons.style.right = '5px';
+    buttons.style.top = titlebar + 'px';
+
+    
     this.element.appendChild(box);
     this.element.appendChild(buttons);
 
-    accept.addEventListener('click', function() {
+    addListener(accept, 'click', function() {
         callback(rgb2hex(selectedRGB));
     }, false);
 
@@ -372,7 +400,7 @@ function getPoint(e) {
         defaultRGB = hex2rgb(color);
         setSelectedRGB(defaultRGB);
     }
-    reset.addEventListener('click', function() {
+    addListener(reset, 'click', function() {
         setSelectedRGB(defaultRGB);
     }, false);
 }

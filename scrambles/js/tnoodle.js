@@ -1,4 +1,42 @@
+/*** STUPID IE ***/
+if(!Array.prototype.map) {
+	Array.prototype.map = function(func) {
+		var new_arr = [];
+		for(var i = 0; i < this.length; i++) {
+			new_arr[i] = func(this[i]);
+		}
+		return new_arr;
+	}
+}
+function addListener(obj, event, func, useCapture) {
+	if(obj.addEventListener) {
+		obj.addEventListener(event, func, useCapture);
+	} else {
+		obj.attachEvent('on'+event, function(e) { func.call(obj, e); });
+	}
+}
+/*** END STUPID IE ***/
+
 tnoodle = {};
+tnoodle.ajax = function(callback, url, data) {
+	var xhr = new XMLHttpRequest();
+	if(xhr.withCredentials == undefined) {
+		// freaking opera, man
+		// we'll make an attempt to use jsonp here
+		tnoodle.jsonp(callback, url, data);
+		return;
+	}
+	if(data) {
+		if(url.indexOf("?") < 0)
+			url += "?";
+		url += tnoodle.toQueryString(data);
+	}
+	xhr.open('get', url, true);
+	xhr.onload = function(a) {
+		callback(eval("(" + this.responseText + ")"));
+	};
+	xhr.send(null);
+};
 tnoodle.jsonpcount = 1;
 tnoodle.jsonp = function(callback, url, data) {
 		var callbackname = "tnoodle.jsonp.callback" + this.jsonpcount++;
@@ -27,21 +65,7 @@ tnoodle.toQueryString = function(data) {
 		return url.substring(1);
 	};
 tnoodle.scrambles = {
-	//TODO - document!
-	
-	/*
-	// this function can deal with java arrays
-	join: function(arr, sep) {
-	console.log(arr);
-		var joined = "";
-		for(var i = 0; i < joined; i++) {
-			if(i > 0)
-				joined += sep;
-			joined += join(arr[i], sep);
-		}
-		return joined;
-	},*/
-	
+	//TODO - document!	
 	//TODO - modify to take a size instead of a scale
 	createAreas: function(faces, scale) {
 		var areas = [];
@@ -127,7 +151,11 @@ tnoodle.scrambles = {
 				return js_arr;
 			}
 			
-			var isMap = java_obj.keySet && java_obj.get && java_obj.put;
+			var isMap = false;
+			try {
+				//we must call keySet() because ie throws a NoSuchFieldException otherwise, which makes sense
+				isMap = !!java_obj.keySet();
+			} catch(error) {}
 			if(isMap) {
 				var js_obj = {};
 				var keyIter = java_obj.keySet().iterator();
@@ -152,14 +180,18 @@ tnoodle.scrambles = {
 			//var puzzleImageInfo = { faces: js_obj, size: javaInfo.get("size"), colorScheme: javaInfo.get("colorScheme") };
 			callback(puzzleImageInfo);
 		};
+		this.toString = function() {
+			return "scramble applet";
+		};
 	},
 	server: function(host, port, callback) {
 		var server = "http://" + host + ":" + port;
 
-		this.scramblerUrl = server + "/scrambler/";
-		this.viewerUrl = server + "/viewer/";
+		this.scrambleUrl = server + "/scramble/";
+		this.viewUrl = server + "/view/";
+		this.importUrl = server + "/import/";
 		
-		tnoodle.jsonp(callback, this.scramblerUrl, null);
+		tnoodle.ajax(callback, this.scrambleUrl, null);
 		
 		this.loadScramble = function(callback, puzzle, seed) {
 			this.loadScrambles(function(scrambles) { callback(scrambles[0]); }, puzzle, seed, 1);
@@ -168,7 +200,7 @@ tnoodle.scrambles = {
 			var query = {};
 			if(seed) query['seed'] = seed;
 			if(count) query['count'] = count;
-			tnoodle.jsonp(callback, this.scramblerUrl + encodeURIComponent(puzzle) + ".json", query);
+			tnoodle.ajax(callback, this.scrambleUrl + encodeURIComponent(puzzle) + ".json", query);
 		};
 		this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
 			var query = { "scramble": scramble };
@@ -177,14 +209,58 @@ tnoodle.scrambles = {
             if(colorScheme) {
                 query['scheme'] = tnoodle.scrambles.flattenColorScheme(colorScheme);
             }
-			return this.viewerUrl + encodeURIComponent(puzzle) + ".png?" + tnoodle.toQueryString(query);
+			return this.viewUrl + encodeURIComponent(puzzle) + ".png?" + tnoodle.toQueryString(query);
 		};
 		this.loadPuzzleImageInfo = function(callback, puzzle) {
 			// callback must be a function(defaultPuzzleInfo)
 			// where defaultPuzzleInfo.faces is a {} mapping face names to arrays of points
             // defaultPuzzleInfo.size is the size of the scramble image
 			// defaultPuzzleInfo.colorScheme is a {} mapping facenames to hex color strings
-			tnoodle.jsonp(callback, this.viewerUrl + encodeURIComponent(puzzle) + ".json", null);
+			tnoodle.ajax(callback, this.viewUrl + encodeURIComponent(puzzle) + ".json", null);
 		};
+		this.importScrambles = function(callback, url) {
+			tnoodle.ajax(callback, this.importUrl, { url: url });
+		};
+		
+		// i'm not positive that multiple forms will work at once,
+		// hopefully this won't be an issue
+		var sendFileIframe = null;
+		this.getUploadForm = function(onsubmit, onload) {
+			var time = new Date().getTime();
+			if(sendFileIframe == null) {
+				sendFileIframe = document.createElement('iframe');
+				sendFileIframe.style.display = 'none';
+				sendFileIframe.name = 'sendFileIframe';
+				sendFileIframe.src = 'about:blank';
+				document.body.appendChild(sendFileIframe);
+				addListener(window, "message", function(e) {
+					//TODO - check origin!
+					var scrambles = eval(e.data);
+					onload(scrambles);
+				}, false);
+			}
+			
+			var form = document.createElement('form');
+			form.setAttribute('method', 'post');
+			form.setAttribute('action', this.importUrl);
+			form.setAttribute('enctype', 'multipart/form-data');
+			form.setAttribute('target', 'sendFileIframe');
+			addListener(form, 'submit', function() { onsubmit(fileInput.value); });
+			
+			var fileInput = document.createElement('input');
+			fileInput.setAttribute('type', 'file');
+			fileInput.setAttribute('name', 'scrambles');
+			
+			var submit = document.createElement('input');
+			submit.type = 'submit';
+			submit.value = 'Load Scrambles';
+			
+			form.appendChild(fileInput);
+			form.appendChild(submit);
+			return form;
+		}
+		this.toString = function() {
+			return server;
+		}
 	}
 };

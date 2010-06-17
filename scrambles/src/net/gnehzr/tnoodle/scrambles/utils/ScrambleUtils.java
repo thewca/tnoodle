@@ -99,20 +99,6 @@ public final class ScrambleUtils {
 		if(y >= 0) return y;
 		return y + m;
 	}
-	
-	public static HashMap<String, String> parseQuery(String query) {
-		HashMap<String, String> queryMap = new HashMap<String, String>();
-		if(query == null) return queryMap;
-		String[] pairs = query.split("&");
-		for(String pair : pairs) {
-			String[] key_value = pair.split("=");
-			if(key_value.length == 1)
-				queryMap.put(key_value[0], ""); //this allows for flags such as http://foo/blah?kill&burn
-			else
-				queryMap.put(key_value[0], key_value[1]);
-		}
-		return queryMap;
-	}
 
 	public static Integer toInt(String string, Integer def) {
 		try {

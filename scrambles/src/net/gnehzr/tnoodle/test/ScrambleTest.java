@@ -29,8 +29,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScrambleGenerator;
-import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
 @SuppressWarnings("serial")
 public class ScrambleTest {
@@ -40,9 +40,9 @@ public class ScrambleTest {
 	
 	private JLabel imageLabel;
 	
-	private SortedMap<String, ScrambleGenerator> scramblers;
+	private SortedMap<String, Scrambler> scramblers;
 	public ScrambleTest() {
-		scramblers = ScrambleGenerator.getScrambleGenerators(null);
+		scramblers = Scrambler.getScrambleGenerators(null);
 		if(scramblers == null) {
 			JOptionPane.showMessageDialog(null, "Could not find scramble plugins");
 			return;
@@ -117,11 +117,11 @@ public class ScrambleTest {
 		requestScramble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ScrambleGenerator puzzle = (ScrambleGenerator) puzzleBox.getSelectedItem();
+				Scrambler puzzle = (Scrambler) puzzleBox.getSelectedItem();
 				String scramble = puzzle.generateScramble();
 				scrambleArea.setText(scramble);
-				if(puzzle instanceof ScrambleImageGenerator) {
-					ScrambleImageGenerator sig = (ScrambleImageGenerator) puzzle;
+				if(puzzle instanceof ScramblerViewer) {
+					ScramblerViewer sig = (ScramblerViewer) puzzle;
 
 					scrambleImg = new BufferedImage(imageLabel.getWidth(), imageLabel.getHeight(), BufferedImage.TYPE_INT_ARGB);
 					try {

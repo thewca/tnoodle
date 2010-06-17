@@ -2,9 +2,9 @@ package scramblers;
 
 import java.util.Random;
 
-import net.gnehzr.tnoodle.scrambles.ScrambleGenerator;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
 
-public class ClockScrambler extends ScrambleGenerator {
+public class ClockScrambler extends Scrambler {
 //	private boolean verbose = false;
 	
 	public static synchronized ClockScrambler[] createScramblers() {
@@ -22,7 +22,7 @@ public class ClockScrambler extends ScrambleGenerator {
 	}
 	
 	@Override
-	public String generateScramble(Random r) {
+	public synchronized String generateScramble(Random r) {
 		StringBuffer scramble = new StringBuffer();
 		
 		String[] peg={"U","d"};

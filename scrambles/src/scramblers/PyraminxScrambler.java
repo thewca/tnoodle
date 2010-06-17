@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
-public class PyraminxScrambler extends ScrambleImageGenerator {
+public class PyraminxScrambler extends ScramblerViewer {
 	private static final int pieceSize = 30;
 	private static final int gap = 5;
 	
@@ -115,7 +115,7 @@ public class PyraminxScrambler extends ScrambleImageGenerator {
 	private static final String TIPS = "lrbu";
 	private static final String SIDES = "ULRB";
 	private static final String[] DIR_TO_STR = new String[] { "", "'" };
-	protected String generateScramble(Random r) {
+	protected synchronized String generateScramble(Random r) {
 		turns = new int[20];
 		turnIndex = turns.length - 1;
 		int t = 0, s = 0, q = 0, m, l, p;
@@ -479,7 +479,7 @@ public class PyraminxScrambler extends ScrambleImageGenerator {
 	}
 
 	@Override
-	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		if(!validateScramble(scramble))
 			throw new InvalidScrambleException(scramble);
 		

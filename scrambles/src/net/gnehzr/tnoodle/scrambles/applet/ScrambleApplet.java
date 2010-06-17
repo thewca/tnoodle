@@ -4,7 +4,7 @@ import java.util.SortedMap;
 
 import javax.swing.JApplet;
 
-import net.gnehzr.tnoodle.scrambles.ScrambleGenerator;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
 import netscape.javascript.JSObject;
 
 @SuppressWarnings("serial")
@@ -16,7 +16,7 @@ public class ScrambleApplet extends JApplet {
 		js = JSObject.getWindow(this);
 		String callback = getParameter("onload");
 		
-		SortedMap<String, ScrambleGenerator> scramblers = ScrambleGenerator.getScrambleGenerators(null);
+		SortedMap<String, Scrambler> scramblers = Scrambler.getScrambleGenerators(null);
 		if(callback != null) {
 			//TODO - apparently callback must be a top level function?
 			//something like tnoodle.scrambles.test doesn't work

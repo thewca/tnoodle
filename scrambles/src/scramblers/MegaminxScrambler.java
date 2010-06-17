@@ -13,12 +13,12 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
 //TODO - cleanup this mess! so much vestigal code...
 //TODO - convert to better naming scheme from sims
 //TODO - does old mega importing even work?
-public class MegaminxScrambler extends ScrambleImageGenerator {
+public class MegaminxScrambler extends ScramblerViewer {
 	public static synchronized MegaminxScrambler[] createScramblers() {
 		return new MegaminxScrambler[] { new MegaminxScrambler(true), new MegaminxScrambler(false) };
 	}
@@ -51,7 +51,7 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 	}
 	
 	@Override
-	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		if(scramble == null) scramble = "";
 		if(!validateScramble(scramble))
 			throw new InvalidScrambleException(scramble);
@@ -124,7 +124,7 @@ public class MegaminxScrambler extends ScrambleImageGenerator {
 		{0,0,0,0,0,0, 0,0,0,0,1,0},
 		{0,0,0,0,0,0, 0,0,0,0,0,1}};
 
-	public String generateScramble(Random r) {
+	public synchronized String generateScramble(Random r) {
 		StringBuffer scramble = new StringBuffer(length*3);
 		if(!pochmann){
 			int last = -1;

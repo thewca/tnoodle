@@ -19,9 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScrambleImageGenerator;
+import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
-public class SquareOneScrambler extends ScrambleImageGenerator {
+public class SquareOneScrambler extends ScramblerViewer {
 	private static final int length = 40;
 	private static final int radius = 32;
 	private static final int gap = 5;
@@ -48,7 +48,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 		turns = new int[length];
 	}
 
-	protected String generateScramble(Random r) {
+	protected synchronized String generateScramble(Random r) {
 		initializeImage();
 		int i,move,ls;
 		ls=-1;
@@ -311,7 +311,7 @@ public class SquareOneScrambler extends ScrambleImageGenerator {
 	}
 
 	@Override
-	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorSchemeMap) throws InvalidScrambleException {
+	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorSchemeMap) throws InvalidScrambleException {
 		if(!validateScramble(scramble))
 			throw new InvalidScrambleException(scramble);
 		Color[] colorScheme = new Color[6];
