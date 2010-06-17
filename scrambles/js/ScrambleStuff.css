@@ -1,0 +1,41 @@
+span.link {
+	color: black;
+	text-decoration: underline;
+	cursor: pointer;
+	color: #A0A0A0;
+	font-size: 10px;
+}
+span.link:hover {
+	text-decoration: none;
+	color: red;
+}
+span.turn {
+	color: black;
+	text-decoration: underline;
+	cursor: pointer;
+}
+span.turn:hover {
+	text-decoration: none;
+}
+span.currTurn {
+	color: red;
+}
+area {/* apparently this doesn't work in opera or chrome */
+    cursor: pointer;
+}
+pre {
+    white-space: pre-wrap;
+}
+
+div.scrambleArea {
+	/*TODO - even spacing between top and bottom of scrambles */
+    border: 1px solid #333;
+    padding: 5px;
+}
+div.scrambleHeader {
+	margin: -5px; /* I'm no css expert, but this seems to do the job */
+	padding: 5px;
+	position: relative;
+    border-bottom: 1px solid #333;
+    background-color: #EEE;
+}
