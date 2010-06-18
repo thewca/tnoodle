@@ -444,7 +444,6 @@ function promptSeed() {
 		    
 		    addListener(newScrambles, 'input', function(e) { importButton.update(); });
 		    addListener(importButton, 'click', function() {
-		    	//TODO - disable button based on what's in the text area
 		    	var scrambles = newScrambles.getScrambles();
 		    	if(scrambles.length > 0) {
 		    		importedScrambles = scrambles;
