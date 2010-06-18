@@ -20,11 +20,12 @@ span.turn:hover {
 span.currTurn {
 	color: red;
 }
-area {/* apparently this doesn't work in opera or chrome */
-    cursor: pointer;
-}
 pre {
     white-space: pre-wrap;
+}
+
+area {/* apparently this doesn't work in opera or chrome */
+    cursor: pointer;
 }
 
 div.scrambleArea {

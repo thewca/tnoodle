@@ -67,15 +67,22 @@ var puzzle = null;
 var colorScheme = null;
 var defaultColorScheme = null;
 
-function puzzleChanged(newPuzzle) {
+function puzzleChanged() {
+    var newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
+    if(newPuzzle == "null") { //puzzles haven't loaded yet
+    	puzzle = null; //this probably isn't necessary
+    	return;
+	}
+    
     colorScheme = null; //reset colorscheme
     currTurn = null;
-    faceMap = null; //this is going to be the indicator of if our puzzle supports scramble images
+    faceMap = null; //this indicates if the current puzzle support images
     puzzle = newPuzzle;
+    scrambleImg.clear();
 
     scrambler.loadPuzzleImageInfo(function(puzzleImageInfo) {
     	if(puzzleImageInfo.error) {
-    		faceMap = null;
+    		faceMap = null; //scramble images are not supported
     		scrambleDiv.setVisible(false, false);
     	} else {
     		faceMap = puzzleImageInfo.faces;
@@ -90,18 +97,13 @@ function puzzleChanged(newPuzzle) {
     		scrambleDiv.style.height = puzzleImageInfo.size.height + getScrambleVertPadding() + "px";
     		scrambleResized();
     	}
+    	scramble();
     }, puzzle);
+    
 }
 
 function scramble() {
-	//TODO - instant detection of puzzle change
-    var newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
-    if(newPuzzle == "null") //puzzles haven't loaded yet
-    	return;
-    if(newPuzzle != puzzle)
-    	puzzleChanged(newPuzzle);
-
-	scrambleImg.clear();
+	if(puzzle == null) return;
 	deleteChildren(scramblePre);
 
 	if(importedScrambles && scrambleIndex >= importedScrambles.length) {
@@ -144,7 +146,7 @@ function turnClicked(userInvoked) {
 function scrambleLoaded(scramble) {
     deleteChildren(scramblePre);
     if(!faceMap) {
-    	//this means images aren't supported
+    	//scramble images are not supported, so don't bother with links
     	scramblePre.appendChild(document.createTextNode(scramble));
     	return;
     }
@@ -237,7 +239,8 @@ function puzzlesLoaded(puzzles) {
     }
     
     //TODO - load selected puzzle
-    scramble(); //initialization
+    puzzleSelect.value = '3x3x3';
+    puzzleChanged();
 }
 
 var scrambleIndex = 0;
@@ -472,7 +475,7 @@ function promptSeed() {
     	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	addListener(document, 'click', function(e) {
-    		if(!e.target) e.target = e.srcElement;
+    		if(!e.target) e.target = e.srcElement; //freaking ie, man
     		var clz = e.target.className;
     		if(clz.match(/\blink\b/) || clz.match(/\btitlebar\b/)) //kinda hacky, but should work
     			return;
@@ -555,19 +558,18 @@ function promptSeed() {
 		scrambleImg.setAttribute('usemap', '#scrambleImgMap');
 		scrambleDiv.appendChild(scrambleImg);
 		
-		scrambleImg.currScramble = null;
+		scrambleImg.scramble = null;
 		scrambleImg.redraw = function() {
-		    this.drawScramble(this.currScramble);
+		    this.drawScramble(this.scramble);
 		};
 		scrambleImg.drawScramble = function(scramble) {
-		    this.currScramble = scramble;
+		    this.scramble = scramble;
 		    if(scrambleDiv.style.display != 'none') { //no need to waste bandwidth unless we're actually displaying images
-				this.clear(); //since the next image may take a while to load, we place this one first
+		    	this.clear(); //since the next image may take a while to load, we place this one first
 			    this.src = scrambler.getScrambleImageUrl(puzzle, scramble, colorScheme);
 		    }
 		}
 		scrambleImg.clear = function() {
-			//this gives us a loading image while we're waiting for the new one
 			this.src = LOADING_IMAGE;
 		}
 		
@@ -583,6 +585,7 @@ function promptSeed() {
     scrambleDivDD.resizeFunc = scrambleResized;
 
     var puzzleSelect = document.createElement('select');
+    puzzleSelect.onchange = puzzleChanged; //for some reason, the change event doesn't fire until the select loses focus
     puzzleSelect.disabled = true;
 
     var colorChooserDiv = document.createElement('div');
