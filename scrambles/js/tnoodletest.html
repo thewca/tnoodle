@@ -38,8 +38,8 @@ addListener(window, 'load', function() {
 	puzzleChooser.appendChild(scrambleStuff.puzzleSelect);
 	
 	var scrambleButton = document.createElement('input');
-	scrambleButton.setAttribute('id', 'scrambler');
-	scrambleButton.setAttribute('type', 'button');
+	scrambleButton.id = 'scrambler';
+	scrambleButton.type = 'button';
 	scrambleButton.value = "Next scramble";
 	addListener(scrambleButton, 'click', scrambleStuff.scramble, false);
 	puzzleChooser.appendChild(scrambleButton);

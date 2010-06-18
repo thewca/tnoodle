@@ -535,13 +535,13 @@ abstract class SafeHttpHandler implements HttpHandler {
 
 	@Override
 	public final void handle(HttpExchange t) throws IOException {
+		HashMap<String, String> query = parseQuery(t.getRequestURI().getRawQuery());
 		try {
 			//substring(1) gets rid of the leading /
 			String[] path = t.getRequestURI().getPath().substring(1).split("/");
-			HashMap<String, String> query = parseQuery(t.getRequestURI().getRawQuery());
 			wrappedHandle(t, path, query);
 		} catch(Exception e) {
-			sendText(t, exceptionToString(e));
+			jsonError(t, e, query.get("callback"));
 		}
 	}
 	
@@ -585,9 +585,9 @@ abstract class SafeHttpHandler implements HttpHandler {
 		sendBytes(t, json.getBytes()); //TODO - charset?
 	}
 	
-	protected static void jsonError(HttpExchange t, String error, String callback) {
+	protected static void jsonError(HttpExchange t, Throwable error, String callback) {
 		HashMap<String, String> json = new HashMap<String, String>();
-		json.put("error", error);
+		json.put("error", exceptionToString(error));
 		sendJSON(t, ScrambleServer.GSON.toJson(json), callback);
 	}
 	

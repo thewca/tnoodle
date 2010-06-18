@@ -5,7 +5,7 @@ span.link {
 	color: #A0A0A0;
 	font-size: 10px;
 }
-span.link:hover {
+span.link:hover, span.down {
 	text-decoration: none;
 	color: red;
 }
@@ -38,4 +38,13 @@ div.scrambleHeader {
 	position: relative;
     border-bottom: 1px solid #333;
     background-color: #EEE;
+}
+.importDiv {
+	position: absolute;
+	margin-top: 25px; /* Is this really the way people do css?! */
+	background-color: #EEE;
+	padding: 5px;
+	border-left: 1px solid;
+	border-right: 1px solid;
+	border-bottom: 1px solid;
 }

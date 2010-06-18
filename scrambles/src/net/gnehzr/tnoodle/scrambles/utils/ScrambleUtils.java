@@ -120,7 +120,7 @@ public final class ScrambleUtils {
 		return (int) Math.ceil(d);
 	}
 
-	public static String exceptionToString(Exception e) {
+	public static String exceptionToString(Throwable e) {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		e.printStackTrace(new PrintStream(bytes));
 		return bytes.toString();

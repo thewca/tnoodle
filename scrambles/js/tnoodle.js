@@ -53,7 +53,7 @@ tnoodle.ajax = function(callback, url, data) {
 	xhr.onerror = function(error) {
 		//attempting to resubmit
 		//TODO - notify the user! do some sort of exponential backoff
-		tnoodle.ajax(callback, url, data);
+//		tnoodle.ajax(callback, url, data);
 	};
 	xhr.send(null);
 };
@@ -115,6 +115,8 @@ tnoodle.scrambles = {
 		}
 		return scheme;
 	},
+	
+	/*** Applet code ***/
 	applet: function() {
 		var puzzleMap = null;
 		var puzzleNames = null;
@@ -213,6 +215,8 @@ tnoodle.scrambles = {
 			return "scramble applet";
 		};
 	},
+	
+	/*** Server code ***/
 	server: function(host, port) {
 		var server = "http://" + host + ":" + port;
 
@@ -257,7 +261,6 @@ tnoodle.scrambles = {
 		// hopefully this won't be an issue
 		var sendFileIframe = null;
 		this.getUploadForm = function(onsubmit, onload) {
-			var time = new Date().getTime();
 			if(sendFileIframe == null) {
 				sendFileIframe = document.createElement('iframe');
 				sendFileIframe.style.display = 'none';
@@ -276,12 +279,13 @@ tnoodle.scrambles = {
 			form.setAttribute('action', this.importUrl);
 			form.setAttribute('enctype', 'multipart/form-data');
 			form.setAttribute('target', 'sendFileIframe');
-			addListener(form, 'submit', function() { onsubmit(fileInput.value); });
+			addListener(form, 'submit', function() { onsubmit(fileInput.value); }, false);
 			
 			var fileInput = document.createElement('input');
 			fileInput.setAttribute('type', 'file');
 			fileInput.setAttribute('name', 'scrambles');
-			
+			addListener(fileInput, 'input', function() {
+			}, false);
 			var submit = document.createElement('input');
 			submit.type = 'submit';
 			submit.value = 'Load Scrambles';

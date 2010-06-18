@@ -5,6 +5,14 @@ function deleteChildren(element) {
 function parsePx(px) {
     return parseInt(px.replace(/px/g, ""));
 }
+function isOrIsChild(el, parent) {
+	while(el != null) {
+		if(el == parent)
+			return true;
+		el = el.parentNode;
+	}
+	return false;
+}
 //returns a shallow copy of obj
 function clone(obj) {
     var o = {};
@@ -91,10 +99,12 @@ function scramble() {
 		scrambler.loadScramble(scrambleLoaded, puzzle, null);
 	} else {
 		deleteChildren(scrambleInfo);
-		//TODO - update nth imported scramble chooser
-		//TODO - format scrambleSrc pretty-like
-		scrambleInfo.appendChild(document.createTextNode("Scramble (" + (scrambleIndex+1) + "/" + importedScrambles.length + ") from "));
-		scrambleInfo.appendChild(scrambleSrc);
+		//TODO - create & update nth imported scramble chooser
+		scrambleInfo.appendChild(document.createTextNode("Scramble (" + (scrambleIndex+1) + "/" + importedScrambles.length + ")"));
+		if(scrambleSrc) {
+			scrambleInfo.appendChild(document.createTextNode(" from "));
+			scrambleInfo.appendChild(scrambleSrc);
+		}
 		
 		scrambleLoaded(importedScrambles[scrambleIndex]);
 		scrambleIndex++;
@@ -162,7 +172,7 @@ function drawScramble(scramble) {
 function getScrambleVertPadding() {
     //var headerStyle = window.getComputedStyle(scrambleDivHeader, null);
     //var scrambleHeader = parsePx(headerStyle.getPropertyValue("height")) + parsePx(headerStyle.getPropertyValue("border-bottom-width"));
-    scrambleHeader = 20; //apprently dynamically computing this doesn't work on opera
+    var scrambleHeader = 20; //apprently dynamically computing this doesn't work on opera
     var scrambleStyle = window.getComputedStyle(scrambleImg, null);
     return parsePx(scrambleStyle.getPropertyValue("padding-top")) + parsePx(scrambleStyle.getPropertyValue("padding-bottom")) + scrambleHeader;
 }
@@ -225,69 +235,116 @@ function puzzlesLoaded(puzzles) {
 var scrambleIndex = 0;
 var importedScrambles = null;
 function scramblesImported(scrambles) {
-	uploadDiv.style.display = 'none';
-	importedScrambles = scrambles;
-	scrambleIndex = 0;
-	scramble();
+	newScrambles.value = scrambles.error || scrambles.join("\n");
+	importButton.update();
+}
+
+
+var currImportLink = null;
+function setCurrImportLink(newLink) {
+	if(currImportLink == newLink)
+		newLink = null;
+	if(currImportLink)
+		currImportLink.className = currImportLink.className.replace(/\bdown\b/, '');
+	if(newLink) {
+		newLink.className += ' down';
+		importDiv.style.display = 'inline';
+	} else {
+		importDiv.style.display = 'none';
+	}
+	currImportLink = newLink;
 }
 
 var scrambleSrc = null;
-var lastUrl = "http://nascarjon.us/sunday.txt";
+
+var urlForm = null;
+var urlText = null;
+var DEFAULT_URL = "http://nascarjon.us/sunday.txt";
 function promptImportUrl() {
-	//TODO - pretty prompt! validate url!
-	var newUrl = prompt("Enter the url of the scrambles", lastUrl);
-	if(newUrl) {
-		lastUrl = newUrl;
-		scrambleSrc = document.createElement('a');
-		scrambleSrc.href = lastUrl;
-		scrambleSrc.target = '_blank';
-		scrambleSrc.appendChild(document.createTextNode(lastUrl));
+	setCurrImportLink(this);
+	if(urlForm == null) { //pretty much copied from promptSeed()
+		urlForm = document.createElement('div');
+		urlText = document.createElement('input');
+		urlText.value = DEFAULT_URL;
+		urlText.type = 'text';
+		urlText.style.width = '200px'; //TODO - urgghhh!
+		addListener(urlText, 'input', function(e) {
+			loadScramblesButton.disabled = !this.value.match(/http:\/\/.+/); 
+		}, false);
+		var loadScramblesButton = document.createElement('input');
+		loadScramblesButton.type = 'button';
+		loadScramblesButton.value = 'Load Scrambles';
+		addListener(loadScramblesButton, 'click', function() {
+			var url = urlText.value; //TODO - validate url!
+			scrambleSrc = document.createElement('a');
+			scrambleSrc.href = url;
+			scrambleSrc.target = '_blank';
+			scrambleSrc.appendChild(document.createTextNode(url));
+
+			//TODO - notify user of wait
+			
+			scrambler.importScrambles(scramblesImported, url);
+		}, false);
 		
-		deleteChildren(scramblePre);
-		scramblePre.appendChild(document.createTextNode('Loading scrambles from '));
-		scramblePre.appendChild(scrambleSrc);
-		
-		scrambler.importScrambles(scramblesImported, lastUrl);
+		urlForm.appendChild(urlText);
+		urlForm.appendChild(loadScramblesButton);
 	}
+	deleteChildren(importArea);
+	importArea.appendChild(urlForm);
 }
 
-var uploadDiv = null;
+var uploadForm = null;
 function promptImportFile() {
-	if(uploadDiv == null) {
-		var uploadForm = scrambler.getUploadForm(localScramblesRequested, scramblesImported);
-		uploadDiv = document.createElement('div');
-		uploadDiv.appendChild(uploadForm);
-		uploadDiv.style.display = 'none';
-		uploadDiv.style.position = 'absolute';
-		scrambleArea.appendChild(uploadDiv);
+	setCurrImportLink(this);
+	if(uploadForm == null) {
+		function scramblesRequested(fileName) {
+    		scrambleSrc = document.createElement('span');
+    		var em = document.createElement('em');
+    		em.appendChild(document.createTextNode(fileName));
+    		scrambleSrc.appendChild(em);
+    		
+    		//TODO - notify user of wait
+    	}
+		uploadForm = scrambler.getUploadForm(scramblesRequested, scramblesImported);
 	}
-	if(uploadDiv.style.display == 'none')
-		uploadDiv.style.display = 'inline';
-	else
-		uploadDiv.style.display = 'none';
-	//TODO - disable other forms of input
+	deleteChildren(importArea);
+	importArea.appendChild(uploadForm);
 }
 
-var lastSeed = "choose a random seed";
+var seedForm = null; //TODO - create form
+var seedText = null;
+var scrambleCount = 5; //TODO make this an option
 function promptSeed() {
-	//TODO - pretty prompt! ask for # of scrambles?
-	//TODO - generate random seed? sounds fun =)
-	lastSeed = prompt("Enter a seed", lastSeed);
-	var scrambleCount = 5;
-	if(lastSeed) {
-		scrambleSrc = document.createElement('span');
-		scrambleSrc.appendChild(document.createTextNode("seed "));
-		var linky = document.createElement('em');
-		linky.appendChild(document.createTextNode(lastSeed));
-		scrambleSrc.appendChild(linky);
+	setCurrImportLink(this);
+	if(seedForm == null) {
+		seedForm = document.createElement('div');
+		seedText = document.createElement('input');
+		seedText.type = 'text';
+		seedText.style.width = '200px'; //TODO - urgghhh!
+		var loadScramblesButton = document.createElement('input');
+		loadScramblesButton.type = 'button';
+		loadScramblesButton.value = 'Seed Scrambles';
+		addListener(loadScramblesButton, 'click', function() {
+			var seed = seedText.value;
+			scrambleSrc = document.createElement('span');
+			scrambleSrc.appendChild(document.createTextNode("seed "));
+			var linky = document.createElement('em');
+			linky.appendChild(document.createTextNode(seed));
+			scrambleSrc.appendChild(linky);
+
+    		//TODO - notify user of wait
+			
+			scrambler.loadScrambles(scramblesImported, puzzle, seed, scrambleCount);
+		}, false);
 		
-		//TODO - write utility for this...
-		deleteChildren(scramblePre);
-		scramblePre.appendChild(document.createTextNode('Seeding ' + scrambleCount + ' scrambles with '));
-		scramblePre.appendChild(scrambleSrc);
-		
-		scrambler.loadScrambles(scramblesImported, puzzle, lastSeed, scrambleCount);
+		seedForm.appendChild(seedText);
+		seedForm.appendChild(loadScramblesButton);
 	}
+	deleteChildren(importArea);
+	importArea.appendChild(seedForm);
+
+	//TODO - generate random seed? sounds fun =)
+	seedText.value = 'randomnessss'; 
 }
 
     var isChangingColorScheme = false;
@@ -297,7 +354,63 @@ function promptSeed() {
     var scrambleArea = document.createElement('div');
     scrambleArea.className = 'scrambleArea';
     
-    	//TODO - disable these links until the server is up? maybe not a good idea, since the server could go down anyways
+	    var importDiv = document.createElement('div');
+	    importDiv.className = 'importDiv';
+	    scrambleArea.appendChild(importDiv);
+	    importDiv.style.display = 'none';
+	    
+	    	var importArea = document.createElement('div');
+	    	importDiv.appendChild(importArea);
+	    	
+		    var newScrambles = document.createElement('textarea');
+		    newScrambles.setAttribute('wrap', 'off');
+		    newScrambles.rows = 10;
+		    newScrambles.cols = 50;
+		    newScrambles.getScrambles = function() {
+		    	var scrambles = newScrambles.value.split('\n');
+		    	for(var i = scrambles.length-1; i >= 0; i--) {
+		    		if(scrambles[i].trim().length == 0) {
+		    			scrambles.splice(i, 1); //remove all empty rows
+		    		}
+		    	}
+		    	return scrambles;
+		    };
+		    importDiv.appendChild(newScrambles);
+		    
+		    var tempDiv = document.createElement('div');
+		    tempDiv.style.textAlign = 'right';
+		    importDiv.appendChild(tempDiv);
+		    
+		    var importButton = document.createElement('input');
+		    importButton.type = 'button';
+		    importButton.update = function() {
+		    	var scrambles = newScrambles.getScrambles();
+		    	importButton.value = 'Import';
+		    	if(scrambles.length > 0)
+		    		importButton.value += ' ' + scrambles.length + " scramble(s)";
+		    	importButton.disabled = scrambles.length == 0;
+		    };
+		    importButton.update();
+		    
+		    addListener(newScrambles, 'input', function(e) { importButton.update(); });
+		    addListener(importButton, 'click', function() {
+		    	//TODO - disable button based on what's in the text area
+		    	var scrambles = newScrambles.getScrambles();
+		    	if(scrambles.length > 0) {
+		    		importedScrambles = scrambles;
+		    		scrambleIndex = 0;
+		    		scramble();
+		    		setCurrImportLink(null);
+		    	}
+		    }, false);
+		    tempDiv.appendChild(importButton);
+		    
+		    var cancelImportButton = document.createElement('input');
+		    cancelImportButton.type = 'button';
+		    cancelImportButton.value = 'Cancel';
+		    addListener(cancelImportButton, 'click', function() { setCurrImportLink(null); });
+		    tempDiv.appendChild(cancelImportButton);
+	    
     	var scrambleHeader = document.createElement('div');
     	scrambleHeader.className = 'scrambleHeader';
     	scrambleArea.appendChild(scrambleHeader);
@@ -309,18 +422,6 @@ function promptSeed() {
     	importUrlLink.appendChild(document.createTextNode('From Url'));
     	scrambleHeader.appendChild(importUrlLink);
     	scrambleHeader.appendChild(document.createTextNode(' '));
-    	
-    	function localScramblesRequested(fileName) {
-    		scrambleSrc = document.createElement('span');
-    		var em = document.createElement('em');
-    		em.appendChild(document.createTextNode(fileName));
-    		scrambleSrc.appendChild(em);
-    		
-    		//TODO - write utility for this...
-    		deleteChildren(scramblePre);
-    		scramblePre.appendChild(document.createTextNode('Loading scrambles from '));
-    		scramblePre.appendChild(scrambleSrc);
-    	}
     	
     	var importFileLink = document.createElement('span');
     	importFileLink.title = "Import scrambles from file";
@@ -341,10 +442,22 @@ function promptSeed() {
     	var newScrambleLink = document.createElement('span');
     	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
     	newScrambleLink.className = 'link';
-    	addListener(newScrambleLink, 'click', scramble, false);
+    	addListener(newScrambleLink, 'click', function() { setCurrImportLink(null); scramble(); }, false);
     	newScrambleLink.appendChild(document.createTextNode('New Scramble'));
     	scrambleHeader.appendChild(newScrambleLink);
     	scrambleHeader.appendChild(document.createTextNode(' '));
+    	
+    	addListener(document, 'click', function(e) {
+    		try {
+    			//TODO - for some reason accessing className or parentNode is causing a permission error
+    			//Permission denied to access property 'className' from a non-chrome context
+    			var clz = e.originalTarget.className;
+    			if(clz.match(/\blink\b/) || clz.match(/\btitlebar\b/)) //kinda hacky, but should work
+    				return;
+    			if(!isOrIsChild(e.originalTarget, importDiv))
+    				setCurrImportLink(null);
+    		} catch(error) { }
+    	});
     	
     	/* TODO use something like zero copy here? or do what google maps does and popup a selected text box?
     	var copyLink = document.createElement('span');
