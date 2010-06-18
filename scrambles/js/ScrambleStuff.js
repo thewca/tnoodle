@@ -5,6 +5,10 @@ WAITING_ICON = 'ajax-loader.gif';
 //from http://en.wikipedia.org/wiki/Data_URI_scheme
 LOADING_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
 
+function isInteger(s) {
+	return s.toString().match(/^-?[0-9]+$/);
+}
+
 function deleteChildren(element) {
     while(element.firstChild)
         element.removeChild(element.firstChild);
@@ -68,6 +72,13 @@ var colorScheme = null;
 var defaultColorScheme = null;
 
 function puzzleChanged() {
+	if(importedScrambles) {
+		if(confirm("Since you're switching puzzles, would you like to clear the currently imported scrambles?")) {
+			importedScrambles = null;
+		} else {
+			scrambleIndex--;
+		}
+	}
     var newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
     if(newPuzzle == "null") { //puzzles haven't loaded yet
     	puzzle = null; //this probably isn't necessary
@@ -102,6 +113,18 @@ function puzzleChanged() {
     
 }
 
+var scrambleChooser = document.createElement('input');
+scrambleChooser.setAttribute('type', 'number');
+scrambleChooser.setAttribute('min', 1);
+scrambleChooser.setAttribute('step', 1);
+addListener(scrambleChooser, 'change', function() {
+	if(!isInteger(this.value) || this.value < 1 || this.value > importedScrambles.length) {
+		this.value = scrambleIndex;
+	} else {
+		scrambleIndex = this.value-1;
+		scramble();
+	}
+}, false);
 function scramble() {
 	if(puzzle == null) return;
 	deleteChildren(scramblePre);
@@ -120,8 +143,12 @@ function scramble() {
 		scrambler.loadScramble(scrambleLoaded, puzzle, null);
 	} else {
 		deleteChildren(scrambleInfo);
-		//TODO - create & update nth imported scramble chooser
-		scrambleInfo.appendChild(document.createTextNode("Scramble (" + (scrambleIndex+1) + "/" + importedScrambles.length + ")"));
+		scrambleInfo.appendChild(document.createTextNode("Scramble ("));
+		scrambleChooser.setAttribute('max', importedScrambles.length);
+		scrambleChooser.setAttribute('size', 1+Math.floor(Math.log(importedScrambles.length)/Math.log(10)));
+		scrambleChooser.value = (scrambleIndex+1);
+		scrambleInfo.appendChild(scrambleChooser);
+		scrambleInfo.appendChild(document.createTextNode("/" + importedScrambles.length + ")"));
 		if(scrambleSrc) {
 			scrambleInfo.appendChild(document.createTextNode(" from "));
 			scrambleInfo.appendChild(scrambleSrc);
@@ -254,6 +281,7 @@ function scramblesImported(scrambles) {
 
 var currImportLink = null;
 function setCurrImportLink(newLink) {
+	scrambleSrc = null;
 	if(currImportLink == newLink)
 		newLink = null;
 	if(currImportLink)
@@ -265,6 +293,8 @@ function setCurrImportLink(newLink) {
 		importDiv.style.display = 'none';
 	}
 	currImportLink = newLink;
+	
+	newScrambles.value = '';
 }
 
 var scrambleSrc = null;
@@ -279,7 +309,7 @@ function promptImportUrl() {
 		urlText = document.createElement('input');
 		urlText.value = DEFAULT_URL;
 		urlText.type = 'text';
-		urlText.style.width = '200px'; //TODO - urgghhh!
+		urlText.style.width = '200px';
 		addListener(urlText, 'input', function(e) {
 			loadScramblesButton.disabled = this.value.length == 0; 
 		}, false);
@@ -287,12 +317,11 @@ function promptImportUrl() {
 		loadScramblesButton.type = 'button';
 		loadScramblesButton.value = 'Load Scrambles';
 		addListener(loadScramblesButton, 'click', function() {
-			var url = urlText.value; //TODO - validate url!
+			var url = urlText.value;
 			scrambleSrc = document.createElement('a');
 			scrambleSrc.href = url;
 			scrambleSrc.target = '_blank';
 			scrambleSrc.appendChild(document.createTextNode(url));
-
 			waitingIcon.style.display = 'inline';
 			
 			scrambler.importScrambles(scramblesImported, url);
