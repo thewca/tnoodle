@@ -41,7 +41,7 @@ div.scrambleHeader {
 }
 .importDiv {
 	position: absolute;
-	margin-top: 25px; /* Is this really the way people do css?! */
+	margin-top: 24px; /* Is this really the way people do css?! */
 	background-color: #EEE;
 	padding: 5px;
 	border-left: 1px solid;

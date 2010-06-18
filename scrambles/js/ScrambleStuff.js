@@ -30,7 +30,7 @@ function clone(obj) {
 
 /*** START IE hacks ***/
 //from http://snipplr.com/view.php?codeview&id=13523
-if (!window.getComputedStyle) {
+if(!window.getComputedStyle) {
     window.getComputedStyle = function(el, pseudo) {
         this.el = el;
         this.getPropertyValue = function(prop) {
@@ -45,6 +45,11 @@ if (!window.getComputedStyle) {
         }
         return this;
     }
+}
+if(!String.prototype.trim) {
+	String.prototype.trim = function() {
+		return this.match(/\s*(\S*)\s*/)[1];
+	};
 }
 function addListener(obj, event, func, useCapture) {
 	if(obj.addEventListener) {
@@ -372,7 +377,7 @@ function promptSeed() {
 	    	var waitingIcon = document.createElement('img');
 	    	waitingIcon.src = WAITING_ICON;
 	    	waitingIcon.style.display = 'none';
-	    	waitingIcon.style.cssFloat = 'right';
+	    	waitingIcon.style.cssFloat = waitingIcon.style.styleFloat = 'right';
 	    	tempDiv.appendChild(waitingIcon);
 	    	
 		    var newScrambles = document.createElement('textarea');
@@ -467,15 +472,12 @@ function promptSeed() {
     	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	addListener(document, 'click', function(e) {
-    		try {
-    			//TODO - for some reason accessing className or parentNode is causing a permission error
-    			//Permission denied to access property 'className' from a non-chrome context
-    			var clz = e.originalTarget.className;
-    			if(clz.match(/\blink\b/) || clz.match(/\btitlebar\b/)) //kinda hacky, but should work
-    				return;
-    			if(!isOrIsChild(e.originalTarget, importDiv))
-    				setCurrImportLink(null);
-    		} catch(error) { }
+    		if(!e.target) e.target = e.srcElement;
+    		var clz = e.target.className;
+    		if(clz.match(/\blink\b/) || clz.match(/\btitlebar\b/)) //kinda hacky, but should work
+    			return;
+    		if(!isOrIsChild(e.target, importDiv))
+    			setCurrImportLink(null);
     	});
     	
     	/* TODO use something like zero copy here? or do what google maps does and popup a selected text box?
