@@ -1,3 +1,4 @@
+WAITING_ICON = 'ajax-loader.gif';
 function deleteChildren(element) {
     while(element.firstChild)
         element.removeChild(element.firstChild);
@@ -237,6 +238,7 @@ var importedScrambles = null;
 function scramblesImported(scrambles) {
 	newScrambles.value = scrambles.error || scrambles.join("\n");
 	importButton.update();
+	waitingIcon.style.display = 'none';
 }
 
 
@@ -263,7 +265,7 @@ var DEFAULT_URL = "http://nascarjon.us/sunday.txt";
 function promptImportUrl() {
 	setCurrImportLink(this);
 	if(urlForm == null) { //pretty much copied from promptSeed()
-		urlForm = document.createElement('div');
+		urlForm = document.createElement('span');
 		urlText = document.createElement('input');
 		urlText.value = DEFAULT_URL;
 		urlText.type = 'text';
@@ -281,7 +283,7 @@ function promptImportUrl() {
 			scrambleSrc.target = '_blank';
 			scrambleSrc.appendChild(document.createTextNode(url));
 
-			//TODO - notify user of wait
+			waitingIcon.style.display = 'inline';
 			
 			scrambler.importScrambles(scramblesImported, url);
 		}, false);
@@ -303,7 +305,7 @@ function promptImportFile() {
     		em.appendChild(document.createTextNode(fileName));
     		scrambleSrc.appendChild(em);
     		
-    		//TODO - notify user of wait
+    		waitingIcon.style.display = 'inline';
     	}
 		uploadForm = scrambler.getUploadForm(scramblesRequested, scramblesImported);
 	}
@@ -311,13 +313,13 @@ function promptImportFile() {
 	importArea.appendChild(uploadForm);
 }
 
-var seedForm = null; //TODO - create form
+var seedForm = null;
 var seedText = null;
 var scrambleCount = 5; //TODO make this an option
 function promptSeed() {
 	setCurrImportLink(this);
 	if(seedForm == null) {
-		seedForm = document.createElement('div');
+		seedForm = document.createElement('span');
 		seedText = document.createElement('input');
 		seedText.type = 'text';
 		seedText.style.width = '200px'; //TODO - urgghhh!
@@ -332,7 +334,7 @@ function promptSeed() {
 			linky.appendChild(document.createTextNode(seed));
 			scrambleSrc.appendChild(linky);
 
-    		//TODO - notify user of wait
+    		waitingIcon.style.display = 'inline';
 			
 			scrambler.loadScrambles(scramblesImported, puzzle, seed, scrambleCount);
 		}, false);
@@ -359,8 +361,17 @@ function promptSeed() {
 	    scrambleArea.appendChild(importDiv);
 	    importDiv.style.display = 'none';
 	    
-	    	var importArea = document.createElement('div');
-	    	importDiv.appendChild(importArea);
+	    	var tempDiv = document.createElement('div');
+	    	importDiv.appendChild(tempDiv);
+	    	
+	    	var importArea = document.createElement('span');
+	    	tempDiv.appendChild(importArea);
+	    	
+	    	var waitingIcon = document.createElement('img');
+	    	waitingIcon.src = WAITING_ICON;
+	    	waitingIcon.style.display = 'none';
+	    	waitingIcon.style.cssFloat = 'right';
+	    	tempDiv.appendChild(waitingIcon);
 	    	
 		    var newScrambles = document.createElement('textarea');
 		    newScrambles.setAttribute('wrap', 'off');
