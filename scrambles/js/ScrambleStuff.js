@@ -1,4 +1,10 @@
+//generated from http://ajaxload.info/
 WAITING_ICON = 'ajax-loader.gif';
+
+//LOADING_IMAGE = WAITING_ICON;
+//from http://en.wikipedia.org/wiki/Data_URI_scheme
+LOADING_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
+
 function deleteChildren(element) {
     while(element.firstChild)
         element.removeChild(element.firstChild);
@@ -55,30 +61,30 @@ function ScrambleStuff() {
 var puzzle = null;
 var colorScheme = null;
 var defaultColorScheme = null;
-function clearScrambleImage() {
-	//this gives us a loading image while we're waiting for the new one
-	//from http://en.wikipedia.org/wiki/Data_URI_scheme
-	scrambleImg.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
-}
 
 function puzzleChanged(newPuzzle) {
     colorScheme = null; //reset colorscheme
     currTurn = null;
-    faceMap = null;
+    faceMap = null; //this is going to be the indicator of if our puzzle supports scramble images
     puzzle = newPuzzle;
 
     scrambler.loadPuzzleImageInfo(function(puzzleImageInfo) {
-        faceMap = puzzleImageInfo.faces;
-        colorScheme = colorScheme || puzzleImageInfo.colorScheme;
-        defaultColorScheme = clone(puzzleImageInfo.colorScheme);
+    	if(puzzleImageInfo.error) {
+    		faceMap = null;
+    		scrambleDiv.setVisible(false, false);
+    	} else {
+    		faceMap = puzzleImageInfo.faces;
+    		colorScheme = colorScheme || puzzleImageInfo.colorScheme;
+    		defaultColorScheme = clone(puzzleImageInfo.colorScheme);
 
-        scrambleDivDD.minw = puzzleImageInfo.size.width;
-        scrambleDivDD.minh = puzzleImageInfo.size.height;
-        scrambleDivDD.paddingVert = getScrambleVertPadding();
-        scrambleDivDD.paddingHorz = getScrambleHorzPadding();
-        scrambleDiv.style.width = puzzleImageInfo.size.width + getScrambleHorzPadding() + "px";
-        scrambleDiv.style.height = puzzleImageInfo.size.height + getScrambleVertPadding() + "px";
-        scrambleResized();
+    		scrambleDivDD.minw = puzzleImageInfo.size.width;
+    		scrambleDivDD.minh = puzzleImageInfo.size.height;
+    		scrambleDivDD.paddingVert = getScrambleVertPadding();
+    		scrambleDivDD.paddingHorz = getScrambleHorzPadding();
+    		scrambleDiv.style.width = puzzleImageInfo.size.width + getScrambleHorzPadding() + "px";
+    		scrambleDiv.style.height = puzzleImageInfo.size.height + getScrambleVertPadding() + "px";
+    		scrambleResized();
+    	}
     }, puzzle);
 }
 
@@ -90,8 +96,15 @@ function scramble() {
     if(newPuzzle != puzzle)
     	puzzleChanged(newPuzzle);
 
-	clearScrambleImage();
+	scrambleImg.clear();
 	deleteChildren(scramblePre);
+
+	if(importedScrambles && scrambleIndex >= importedScrambles.length) {
+		alert("That was the last imported scramble, switching back to generated scrambles.");
+		scrambleIndex = 0;
+		scrambleSrc = null;
+		importedScrambles = null;
+	}
 	
 	if(importedScrambles == null) {
 		deleteChildren(scrambleInfo);
@@ -109,28 +122,27 @@ function scramble() {
 		
 		scrambleLoaded(importedScrambles[scrambleIndex]);
 		scrambleIndex++;
-		if(scrambleIndex >= importedScrambles.length) {
-			alert("This is the last scramble from " + scrambleSrc);
-			scrambleIndex = 0;
-			scrambleSrc = null;
-			importedScrambles = null;
-		}
 	}
 }
-function turnClicked() {
+function turnClicked(userInvoked) {
     if(isChangingColorScheme) {
         // first, we cancel editing of the colorscheme
         changeColorsClicked.call(changeColors);
     }
-    scrambleDiv.style.display = 'inline'; // make scramble visible
     if(currTurn)
         currTurn.className = 'turn';
     currTurn = this;
-    drawScramble(currTurn.incrementalScramble);
     currTurn.className = 'currTurn';
+    scrambleDiv.setVisible(true, userInvoked);
+    scrambleImg.drawScramble(currTurn.incrementalScramble);
 }
 function scrambleLoaded(scramble) {
     deleteChildren(scramblePre);
+    if(!faceMap) {
+    	//this means images aren't supported
+    	scramblePre.appendChild(document.createTextNode(scramble));
+    	return;
+    }
     var turns = scramble.split(' ');
     var incrementalScramble = "";
     for(var i = 0; i < turns.length; i++) {
@@ -140,10 +152,10 @@ function scrambleLoaded(scramble) {
         turnLink.appendChild(document.createTextNode(turn));
         turnLink.incrementalScramble = incrementalScramble;
         turnLink.className = 'turn';
-        addListener(turnLink, 'click', turnClicked, false);
+        addListener(turnLink, 'click', function() { turnClicked.call(this, true); }, false);
         scramblePre.appendChild(turnLink);
         if(i == turns.length-1) {
-            turnClicked.call(turnLink);
+            turnClicked.call(turnLink, false);
         } else {
             incrementalScramble += " ";
             scramblePre.appendChild(document.createTextNode(' '));
@@ -158,16 +170,6 @@ function faceClicked() {
     colorChooser.setDefaultColor(colorScheme[currFaceName]);
     deleteChildren(colorChooserHeaderText);
     colorChooserHeaderText.appendChild(document.createTextNode('Editing face ' + currFaceName));
-}
-
-var currScramble;
-function redrawScramble() {
-    drawScramble(currScramble);
-}
-function drawScramble(scramble) {
-    currScramble = scramble;
-	clearScrambleImage(); //since the next image may take a while to load, we place this one first
-    scrambleImg.src = scrambler.getScrambleImageUrl(puzzle, scramble, colorScheme);
 }
 
 function getScrambleVertPadding() {
@@ -210,7 +212,7 @@ function changeColorsClicked() {
             currTurn.className = "turn";
         this.className += " buttondown";
         resetColorScheme.style.display = 'inline';
-        drawScramble("");
+        scrambleImg.drawScramble("");
     } else {
         if(currTurn) //curr turn will not be defined if we just changed puzzles
             turnClicked.call(currTurn);
@@ -271,7 +273,7 @@ function promptImportUrl() {
 		urlText.type = 'text';
 		urlText.style.width = '200px'; //TODO - urgghhh!
 		addListener(urlText, 'input', function(e) {
-			loadScramblesButton.disabled = !this.value.match(/http:\/\/.+/); 
+			loadScramblesButton.disabled = this.value.length == 0; 
 		}, false);
 		var loadScramblesButton = document.createElement('input');
 		loadScramblesButton.type = 'button';
@@ -453,7 +455,13 @@ function promptSeed() {
     	var newScrambleLink = document.createElement('span');
     	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
     	newScrambleLink.className = 'link';
-    	addListener(newScrambleLink, 'click', function() { setCurrImportLink(null); scramble(); }, false);
+    	addListener(newScrambleLink, 'click', function() {
+    		if(!importedScrambles || confirm('This will clear any imported scrambles, are you sure you want to continue?')) {
+    			importedScrambles = null;
+    			setCurrImportLink(null);
+    			scramble();
+    		}
+    	}, false);
     	newScrambleLink.appendChild(document.createTextNode('New Scramble'));
     	scrambleHeader.appendChild(newScrambleLink);
     	scrambleHeader.appendChild(document.createTextNode(' '));
@@ -494,6 +502,21 @@ function promptSeed() {
 		scrambleDivHeader.className = 'titlebar';
 		scrambleDiv.appendChild(scrambleDivHeader);
 		scrambleDiv.id = 'scrambleDiv'; //have to have an id to make it draggable
+		scrambleDiv.visibleIfPossible = true;
+		scrambleDiv.setVisible = function(visible, userInvoked) {
+			if(userInvoked)
+				this.visibleIfPossible = visible;
+			else
+				visible &= this.visibleIfPossible;
+			if(visible) {
+				scrambleDiv.style.display = 'inline';
+			} else {
+				if(currTurn)
+					currTurn.className = 'turn';
+				scrambleDiv.style.display = 'none';
+				colorChooserDiv.style.display = 'none';
+			}
+		};
 		
 			var scrambleHeaderText = document.createElement("span");
 			scrambleHeaderText.className = 'titletext';
@@ -507,7 +530,7 @@ function promptSeed() {
 			addListener(resetColorScheme, 'click', function() {
 				if(confirm("Reset the color scheme?")) {
 					colorScheme = clone(defaultColorScheme);
-					redrawScramble();
+					scrambleImg.redraw();
 				}
 			}, false);
 			scrambleDivHeader.appendChild(resetColorScheme);
@@ -522,17 +545,29 @@ function promptSeed() {
 			var closeScramble = document.createElement('span');
 			closeScramble.appendChild(document.createTextNode('X'));
 			closeScramble.className = 'button';
-			addListener(closeScramble, 'click', function() {
-				currTurn.className = 'turn';
-				scrambleDiv.style.display = 'none';
-				colorChooserDiv.style.display = 'none';
-			}, false);
+			addListener(closeScramble, 'click', function() { scrambleDiv.setVisible(false, true); }, false);
 			scrambleDivHeader.appendChild(closeScramble);
 		//end scrambleDivHeader
 
 		var scrambleImg = document.createElement('img');
 		scrambleImg.setAttribute('usemap', '#scrambleImgMap');
 		scrambleDiv.appendChild(scrambleImg);
+		
+		scrambleImg.currScramble = null;
+		scrambleImg.redraw = function() {
+		    this.drawScramble(this.currScramble);
+		};
+		scrambleImg.drawScramble = function(scramble) {
+		    this.currScramble = scramble;
+		    if(scrambleDiv.style.display != 'none') { //no need to waste bandwidth unless we're actually displaying images
+				this.clear(); //since the next image may take a while to load, we place this one first
+			    this.src = scrambler.getScrambleImageUrl(puzzle, scramble, colorScheme);
+		    }
+		}
+		scrambleImg.clear = function() {
+			//this gives us a loading image while we're waiting for the new one
+			this.src = LOADING_IMAGE;
+		}
 		
 		var scrambleImgMap = document.createElement('map');
 		scrambleImgMap.setAttribute('name', 'scrambleImgMap');
@@ -571,7 +606,7 @@ function promptSeed() {
 		var colorChooser = new ColorChooser(function(newColor) {
 			colorScheme[currFaceName] = newColor;
 			colorChooserDiv.style.display = 'none';
-			redrawScramble();
+			scrambleImg.redraw();
 		});
 		colorChooserDiv.appendChild(colorChooser.element);
 	//end colorChooserDiv

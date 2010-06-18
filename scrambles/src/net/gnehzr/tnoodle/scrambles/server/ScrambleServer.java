@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.scrambles.server;
 
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.exceptionToString;
+import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.throwableToString;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.parseExtension;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toColor;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toHex;
@@ -140,6 +140,8 @@ public class ScrambleServer {
 				sendHtml(t, bytes);
 			} else {
 				String urlStr = query.get("url");
+				if(!urlStr.startsWith("http")) //might as well give it our best shot
+					urlStr = "http://" + urlStr;
 				URL url = new URL(urlStr);
 				URLConnection conn = url.openConnection();
 				ArrayList<String> scrambles = new ArrayList<String>();
@@ -170,13 +172,14 @@ public class ScrambleServer {
 		}
 		
 		protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
+			String callback = query.get("callback");
 			if(path.length == 1) {
-				sendText(t, "Please specify a puzzle.");
+				sendJSONError(t, "Please specify a puzzle.", callback);
 				return;
 			}
 			String[] name_extension = parseExtension(path[1]);
 			if(name_extension[1] == null) {
-				sendText(t, "Please specify an extension");
+				sendJSONError(t, "Please specify an extension", callback);
 				return;
 			}
 			String puzzle = name_extension[0];
@@ -184,10 +187,10 @@ public class ScrambleServer {
 			
 			Scrambler gen = scramblers.get(puzzle);
 			if(gen == null) {
-				sendText(t, "Invalid scramble generator: " + puzzle);
+				sendJSONError(t, "Invalid scramble generator: " + puzzle, callback);
 				return;
 			} else if(!(gen instanceof ScramblerViewer)) {
-				sendText(t, "Specified scramble generator: " + puzzle + " does not support image generation.");
+				sendJSONError(t, "Specified scramble generator: " + puzzle + " does not support image generation.", callback);
 				return;
 			}
 			ScramblerViewer generator = (ScramblerViewer) gen;
@@ -209,12 +212,12 @@ public class ScrambleServer {
 					t.getResponseBody().close();
 				} catch(InvalidScrambleException e) {
 					e.printStackTrace();
-					sendText(t, exceptionToString(e));
+					sendText(t, throwableToString(e));
 				}
 			} else if(extension.equals("json")) {
-				sendJSON(t, GSON.toJson(generator.getDefaultPuzzleImageInfo().jsonize()), query.get("callback"));
+				sendJSON(t, GSON.toJson(generator.getDefaultPuzzleImageInfo().jsonize()), callback);
 			} else {
-				sendText(t, "Invalid extension: " + extension);
+				sendJSONError(t, "Invalid extension: " + extension, callback);
 			}
 		}
 	}
@@ -585,10 +588,14 @@ abstract class SafeHttpHandler implements HttpHandler {
 		sendBytes(t, json.getBytes()); //TODO - charset?
 	}
 	
-	protected static void jsonError(HttpExchange t, Throwable error, String callback) {
+	protected static void sendJSONError(HttpExchange t, String error, String callback) {
 		HashMap<String, String> json = new HashMap<String, String>();
-		json.put("error", exceptionToString(error));
+		json.put("error", error);
 		sendJSON(t, ScrambleServer.GSON.toJson(json), callback);
+	}
+	
+	protected static void jsonError(HttpExchange t, Throwable error, String callback) {
+		sendJSONError(t, throwableToString(error), callback);
 	}
 	
 	protected static void sendBytes(HttpExchange t, ByteArrayOutputStream bytes) {
