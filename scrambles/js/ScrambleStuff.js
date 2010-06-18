@@ -175,7 +175,6 @@ function scrambleResized() {
     var imgWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
     scrambleImg.style.width = imgWidth + "px";
     scrambleImg.style.height = parsePx(scrambleDiv.style.height) - getScrambleVertPadding() + "px";
-
     deleteChildren(scrambleImgMap);
     if(isChangingColorScheme) {
         //TODO - only do the following when we're *done* resizing
@@ -252,7 +251,16 @@ function promptImportUrl() {
 	}
 }
 
+var uploadDiv = null;
 function promptImportFile() {
+	if(uploadDiv == null) {
+		var uploadForm = scrambler.getUploadForm(localScramblesRequested, scramblesImported);
+		uploadDiv = document.createElement('div');
+		uploadDiv.appendChild(uploadForm);
+		uploadDiv.style.display = 'none';
+		uploadDiv.style.position = 'absolute';
+		scrambleArea.appendChild(uploadDiv);
+	}
 	if(uploadDiv.style.display == 'none')
 		uploadDiv.style.display = 'inline';
 	else
@@ -281,10 +289,6 @@ function promptSeed() {
 		scrambler.loadScrambles(scramblesImported, puzzle, lastSeed, scrambleCount);
 	}
 }
-
-    var scrambler = new tnoodle.scrambles.server('localhost', 8080, puzzlesLoaded);
-//  scrambler.importScrambles(function(scrambles) {console.log(scrambles);}, "http://localhost:8080/scramble/3x3x3");
-//	var scrambler = new tnoodle.scrambles.applet(puzzlesLoaded);
 
     var isChangingColorScheme = false;
 
@@ -317,12 +321,6 @@ function promptSeed() {
     		scramblePre.appendChild(document.createTextNode('Loading scrambles from '));
     		scramblePre.appendChild(scrambleSrc);
     	}
-    	var uploadForm = scrambler.getUploadForm(localScramblesRequested, scramblesImported);
-    	uploadDiv = document.createElement('div');
-    	uploadDiv.appendChild(uploadForm);
-    	uploadDiv.style.display = 'none';
-    	uploadDiv.style.position = 'absolute';
-    	scrambleArea.appendChild(uploadDiv);
     	
     	var importFileLink = document.createElement('span');
     	importFileLink.title = "Import scrambles from file";
@@ -361,7 +359,6 @@ function promptSeed() {
     	scrambleHeader.appendChild(scrambleInfo);
     	
 	    var scramblePre = document.createElement('pre');
-	    scramblePre.appendChild(document.createTextNode('Connecting to ' + scrambler.toString() + "..."));
 	    scrambleArea.appendChild(scramblePre);
 	
     var scrambleDiv = document.createElement('div');
@@ -460,7 +457,11 @@ function promptSeed() {
     colorChooserDiv.style.height = colorChooser.preferredHeight + 'px';
     colorChooserDiv.style.display = 'none';
 
-	
+    var scrambler = new tnoodle.scrambles.server('localhost', 8080);
+//	var scrambler = new tnoodle.scrambles.applet(puzzlesLoaded);
+    scramblePre.appendChild(document.createTextNode('Connecting to ' + scrambler.toString() + "..."));
+    scrambler.connect(puzzlesLoaded);
+    
 	// public variables
 	this.puzzleSelect = puzzleSelect;
 	this.scrambleArea = scrambleArea;

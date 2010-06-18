@@ -19,21 +19,41 @@ function addListener(obj, event, func, useCapture) {
 
 tnoodle = {};
 tnoodle.ajax = function(callback, url, data) {
+	var dataUrl = url; //this is to avoid clobbering our original url
+	if(data) {
+		if(dataUrl.indexOf("?") < 0)
+			dataUrl += "?";
+		dataUrl += tnoodle.toQueryString(data);
+	}
+	
 	var xhr = new XMLHttpRequest();
 	if(xhr.withCredentials == undefined) {
-		// freaking opera, man
-		// we'll make an attempt to use jsonp here
-		tnoodle.jsonp(callback, url, data);
-		return;
+		xhr = null;
+		if(typeof(XDomainRequest) != "undefined") {
+			xhr = new XDomainRequest();
+			try {
+				xhr.open('get', dataUrl);
+			} catch(error) {
+				//this throws an exception when running locally on ie
+				xhr = null;
+			}
+		}
+		if(xhr == null) {
+			// freaking opera & ie, man
+			// we'll make an attempt to use jsonp here
+			tnoodle.jsonp(callback, url, data);
+			return;
+		}
+	} else {
+		xhr.open('get', dataUrl, true);
 	}
-	if(data) {
-		if(url.indexOf("?") < 0)
-			url += "?";
-		url += tnoodle.toQueryString(data);
-	}
-	xhr.open('get', url, true);
-	xhr.onload = function(a) {
+	xhr.onload = function() {
 		callback(eval("(" + this.responseText + ")"));
+	};
+	xhr.onerror = function(error) {
+		//attempting to resubmit
+		//TODO - notify the user! do some sort of exponential backoff
+		tnoodle.ajax(callback, url, data);
 	};
 	xhr.send(null);
 };
@@ -95,19 +115,21 @@ tnoodle.scrambles = {
 		}
 		return scheme;
 	},
-	applet: function(callback) {
+	applet: function() {
 		var puzzleMap = null;
+		var puzzleNames = null;
+		var puzzleCallback = null;
 		tnoodle_scrambles_applet_loaded = function(puzzles) {
 			//applet.style.display = 'none'; //the invisible applet seems to be stealing focus without this
 			puzzleMap = puzzles;
-			
-			var puzzleNames = [];
+			puzzleNames = [];
 			var valueIterator = puzzles.values().iterator();
 			while(valueIterator.hasNext()) {
 				var generator = valueIterator.next();
 				puzzleNames.push([generator.getShortName(), generator.getLongName()]);
 			}
-			callback(puzzleNames);
+			if(puzzleCallback)
+				puzzleCallback(puzzleNames);
 		};
 	
 		var applet = document.createElement('applet');
@@ -125,6 +147,13 @@ tnoodle.scrambles = {
 		
 		document.body.appendChild(applet);
 		
+		// can only be called once!
+		this.connect = function(callback) {
+			if(puzzleMap == null)
+				puzzleCallback = callback;
+			else
+				callback(puzzleNames);
+		}
 		this.loadScramble = function(callback, puzzle, seed) {
 			var generator = puzzleMap.get(puzzle);
 			var scramble = seed ? generator.generateSeededScramble(seed) : generator.generateScramble();
@@ -184,14 +213,16 @@ tnoodle.scrambles = {
 			return "scramble applet";
 		};
 	},
-	server: function(host, port, callback) {
+	server: function(host, port) {
 		var server = "http://" + host + ":" + port;
 
 		this.scrambleUrl = server + "/scramble/";
 		this.viewUrl = server + "/view/";
 		this.importUrl = server + "/import/";
 		
-		tnoodle.ajax(callback, this.scrambleUrl, null);
+		this.connect = function(callback) {
+			tnoodle.ajax(callback, this.scrambleUrl, null);
+		}
 		
 		this.loadScramble = function(callback, puzzle, seed) {
 			this.loadScrambles(function(scrambles) { callback(scrambles[0]); }, puzzle, seed, 1);
