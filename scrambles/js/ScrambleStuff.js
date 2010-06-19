@@ -1,10 +1,25 @@
 //generated from http://ajaxload.info/
+WAITING_ICON_HEIGHT = 11;
 WAITING_ICON = 'ajax-loader.gif';
 
 //LOADING_IMAGE = WAITING_ICON;
 //from http://en.wikipedia.org/wiki/Data_URI_scheme
 LOADING_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
 
+function setUnfocusable(el) {
+	addListener(el, 'focus', el.blur, false);
+}
+function randomString(length) {
+	var MIN = 'a'.charCodeAt(0);
+	var MAX = 'z'.charCodeAt(0);
+	
+	var str = "";
+	for(var i = 0; i < length; i++) {
+		str += String.fromCharCode(MIN + Math.floor(Math.random()*(MAX-MIN)));
+	}
+	
+	return str;
+}
 function isInteger(s) {
 	return s.toString().match(/^-?[0-9]+$/);
 }
@@ -275,6 +290,7 @@ var importedScrambles = null;
 function scramblesImported(scrambles) {
 	newScrambles.value = scrambles.error || scrambles.join("\n");
 	importButton.update();
+	activeImportButton.disabled = false;
 	waitingIcon.style.display = 'none';
 }
 
@@ -291,12 +307,21 @@ function setCurrImportLink(newLink) {
 		importDiv.style.display = 'inline';
 	} else {
 		importDiv.style.display = 'none';
+		
+		//cancel any outgoing requests
+		if(activeImportRequest)
+			activeImportRequest.abort()
+		if(activeImportButton)
+			activeImportButton.disabled = false;
+		waitingIcon.style.display = 'none';
 	}
 	currImportLink = newLink;
 	
 	newScrambles.value = '';
 }
 
+var activeImportRequest = null;
+var activeImportButton = null;
 var scrambleSrc = null;
 
 var urlForm = null;
@@ -305,48 +330,57 @@ var DEFAULT_URL = "http://nascarjon.us/sunday.txt";
 function promptImportUrl() {
 	setCurrImportLink(this);
 	if(urlForm == null) { //pretty much copied from promptSeed()
-		urlForm = document.createElement('span');
+		urlForm = document.createElement('form');
+		urlForm.style.cssFloat = urlForm.style.styleFloat = 'left'; //stupid ie
 		urlText = document.createElement('input');
 		urlText.value = DEFAULT_URL;
 		urlText.type = 'text';
 		urlText.style.width = '200px';
 		addListener(urlText, 'input', function(e) {
-			loadScramblesButton.disabled = this.value.length == 0; 
+			loadScramblesButton.disabled = (this.value.length == 0); 
 		}, false);
 		var loadScramblesButton = document.createElement('input');
-		loadScramblesButton.type = 'button';
+		loadScramblesButton.type = 'submit';
 		loadScramblesButton.value = 'Load Scrambles';
-		addListener(loadScramblesButton, 'click', function() {
+		urlForm.onsubmit = function() {
 			var url = urlText.value;
 			scrambleSrc = document.createElement('a');
 			scrambleSrc.href = url;
 			scrambleSrc.target = '_blank';
 			scrambleSrc.appendChild(document.createTextNode(url));
-			waitingIcon.style.display = 'inline';
 			
-			scrambler.importScrambles(scramblesImported, url);
-		}, false);
+			waitingIcon.style.display = 'inline';
+			activeImportRequest = scrambler.importScrambles(scramblesImported, url);
+			(activeImportButton = loadScramblesButton).disabled = true;
+			return false;
+		};
 		
 		urlForm.appendChild(urlText);
 		urlForm.appendChild(loadScramblesButton);
 	}
 	deleteChildren(importArea);
 	importArea.appendChild(urlForm);
+	
+	urlText.select();
+	urlText.focus();
 }
 
 var uploadForm = null;
 function promptImportFile() {
 	setCurrImportLink(this);
 	if(uploadForm == null) {
-		function scramblesRequested(fileName) {
+		function scramblesRequested(fileName, submitButton, request) {
     		scrambleSrc = document.createElement('span');
     		var em = document.createElement('em');
     		em.appendChild(document.createTextNode(fileName));
     		scrambleSrc.appendChild(em);
     		
     		waitingIcon.style.display = 'inline';
+			activeImportRequest = request;
+			(activeImportButton = submitButton).disabled = true;
     	}
 		uploadForm = scrambler.getUploadForm(scramblesRequested, scramblesImported);
+		uploadForm.style.cssFloat = uploadForm.style.styleFloat = 'left'; //stupid ie
 	}
 	deleteChildren(importArea);
 	importArea.appendChild(uploadForm);
@@ -354,38 +388,59 @@ function promptImportFile() {
 
 var seedForm = null;
 var seedText = null;
-var scrambleCount = 5; //TODO make this an option
+var scrambleCount = null;
 function promptSeed() {
 	setCurrImportLink(this);
 	if(seedForm == null) {
-		seedForm = document.createElement('span');
+		seedForm = document.createElement('form');
+		seedForm.style.cssFloat = seedForm.style.styleFloat = 'left'; //stupid ie
+		
 		seedText = document.createElement('input');
-		seedText.type = 'text';
-		seedText.style.width = '200px'; //TODO - urgghhh!
+		seedText.setAttribute('type', 'text');
+		seedText.style.width = '180px';
+		seedText.setAttribute('title', "If you agree upon a seed with someone else, you'll be guaranteed to get the same scrambles as them. " +
+				"Leave blank for totally random scrambles.");
+		
+		scrambleCount = document.createElement('input');
+		scrambleCount.setAttribute('type', 'number');
+		scrambleCount.setAttribute('step', '1');
+		scrambleCount.setAttribute('min', '1');
+		scrambleCount.setAttribute('size', '3');
+		scrambleCount.value = 12;
+		
 		var loadScramblesButton = document.createElement('input');
-		loadScramblesButton.type = 'button';
+		loadScramblesButton.setAttribute('type', 'submit');
 		loadScramblesButton.value = 'Seed Scrambles';
-		addListener(loadScramblesButton, 'click', function() {
+		seedForm.onsubmit = function() {
 			var seed = seedText.value;
+			if(seed.length == 0)
+				seed = null; //this will use pregenerated scrambles, which should be a lot faster
+			
+			var count = parseInt(scrambleCount.value);
+			if(!count)
+				return false;
 			scrambleSrc = document.createElement('span');
 			scrambleSrc.appendChild(document.createTextNode("seed "));
 			var linky = document.createElement('em');
 			linky.appendChild(document.createTextNode(seed));
 			scrambleSrc.appendChild(linky);
-
-    		waitingIcon.style.display = 'inline';
-			
-			scrambler.loadScrambles(scramblesImported, puzzle, seed, scrambleCount);
-		}, false);
+    		
+			waitingIcon.style.display = 'inline';
+			activeImportRequest = scrambler.loadScrambles(scramblesImported, puzzle, seed, count);
+			(activeImportButton = loadScramblesButton).disabled = true;
+			return false;
+		};
 		
 		seedForm.appendChild(seedText);
+		seedForm.appendChild(scrambleCount);
 		seedForm.appendChild(loadScramblesButton);
 	}
 	deleteChildren(importArea);
 	importArea.appendChild(seedForm);
 
-	//TODO - generate random seed? sounds fun =)
-	seedText.value = 'randomnessss'; 
+	seedText.value = randomString(10);
+	seedText.select();
+	seedText.focus();
 }
 
     var isChangingColorScheme = false;
@@ -409,6 +464,7 @@ function promptSeed() {
 	    	var waitingIcon = document.createElement('img');
 	    	waitingIcon.src = WAITING_ICON;
 	    	waitingIcon.style.display = 'none';
+	    	waitingIcon.style.marginTop = (18-11)/2 + 'px';
 	    	waitingIcon.style.cssFloat = waitingIcon.style.styleFloat = 'right';
 	    	tempDiv.appendChild(waitingIcon);
 	    	
@@ -507,6 +563,12 @@ function promptSeed() {
     		var clz = e.target.className;
     		if(clz.match(/\blink\b/) || clz.match(/\btitlebar\b/)) //kinda hacky, but should work
     			return;
+    		
+    		if(isOrIsChild(e.target, puzzleSelect)) {
+    			//we allow the user to switch scrambles while importing
+    			return;
+    		}
+    			
     		if(!isOrIsChild(e.target, importDiv))
     			setCurrImportLink(null);
     	});

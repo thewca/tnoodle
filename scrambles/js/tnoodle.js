@@ -51,11 +51,10 @@ tnoodle.ajax = function(callback, url, data) {
 		callback(eval("(" + this.responseText + ")"));
 	};
 	xhr.onerror = function(error) {
-		//attempting to resubmit
-		//TODO - notify the user! do some sort of exponential backoff
-//		tnoodle.ajax(callback, url, data);
+		callback({error: error});
 	};
 	xhr.send(null);
+	return xhr;
 };
 tnoodle.jsonpcount = 1;
 tnoodle.jsonp = function(callback, url, data) {
@@ -218,24 +217,24 @@ tnoodle.scrambles = {
 	
 	/*** Server code ***/
 	server: function(host, port) {
-		var server = "http://" + host + ":" + port;
+		this.server = "http://" + host + ":" + port;
 
-		this.scrambleUrl = server + "/scramble/";
-		this.viewUrl = server + "/view/";
-		this.importUrl = server + "/import/";
+		this.scrambleUrl = this.server + "/scramble/";
+		this.viewUrl = this.server + "/view/";
+		this.importUrl = this.server + "/import/";
 		
 		this.connect = function(callback) {
-			tnoodle.ajax(callback, this.scrambleUrl, null);
+			return tnoodle.ajax(callback, this.scrambleUrl, null);
 		}
 		
 		this.loadScramble = function(callback, puzzle, seed) {
-			this.loadScrambles(function(scrambles) { callback(scrambles[0]); }, puzzle, seed, 1);
+			return this.loadScrambles(function(scrambles) { callback(scrambles[0]); }, puzzle, seed, 1);
 		};
 		this.loadScrambles = function(callback, puzzle, seed, count) {
 			var query = {};
 			if(seed) query['seed'] = seed;
 			if(count) query['count'] = count;
-			tnoodle.ajax(callback, this.scrambleUrl + encodeURIComponent(puzzle) + ".json", query);
+			return tnoodle.ajax(callback, this.scrambleUrl + encodeURIComponent(puzzle) + ".json", query);
 		};
 		this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
 			var query = { "scramble": scramble };
@@ -251,51 +250,56 @@ tnoodle.scrambles = {
 			// where defaultPuzzleInfo.faces is a {} mapping face names to arrays of points
             // defaultPuzzleInfo.size is the size of the scramble image
 			// defaultPuzzleInfo.colorScheme is a {} mapping facenames to hex color strings
-			tnoodle.ajax(callback, this.viewUrl + encodeURIComponent(puzzle) + ".json", null);
+			return tnoodle.ajax(callback, this.viewUrl + encodeURIComponent(puzzle) + ".json", null);
 		};
 		this.importScrambles = function(callback, url) {
-			tnoodle.ajax(callback, this.importUrl, { url: url });
+			return tnoodle.ajax(callback, this.importUrl, { url: url });
 		};
 		
-		// i'm not positive that multiple forms will work at once,
-		// hopefully this won't be an issue
-		var sendFileIframe = null;
+		var uploadForm = null;
 		this.getUploadForm = function(onsubmit, onload) {
-			if(sendFileIframe == null) {
+			//onsubmit and onload are only used the first time this method is called
+			if(uploadForm == null) {
 				sendFileIframe = document.createElement('iframe');
 				sendFileIframe.style.display = 'none';
 				sendFileIframe.name = 'sendFileIframe';
 				sendFileIframe.src = 'about:blank';
 				document.body.appendChild(sendFileIframe);
+				var server = this.server;
 				addListener(window, "message", function(e) {
-					//TODO - check origin!
-					var scrambles = eval(e.data);
-					onload(scrambles);
+					if(e.origin == server) {
+						console.log(e.data);
+						var scrambles = eval(e.data);
+						onload(scrambles);
+					} else {
+						onload({error: "Bad origin: " + e.origin + ", expecting " + server});
+					}
 				}, false);
+				
+				uploadForm = document.createElement('form');
+				uploadForm.setAttribute('method', 'post');
+				uploadForm.setAttribute('action', this.importUrl);
+				uploadForm.setAttribute('enctype', 'multipart/form-data');
+				uploadForm.setAttribute('target', 'sendFileIframe');
+				addListener(uploadForm, 'submit', function() {
+					var abortSubmit = { abort: function() { sendFileIframe.src='about:blank'; } };
+					onsubmit(fileInput.value, submit, abortSubmit);
+				}, false);
+				
+				var fileInput = document.createElement('input');
+				fileInput.setAttribute('type', 'file');
+				fileInput.setAttribute('name', 'scrambles');
+				var submit = document.createElement('input');
+				submit.type = 'submit';
+				submit.value = 'Load Scrambles';
+				
+				uploadForm.appendChild(fileInput);
+				uploadForm.appendChild(submit);
 			}
-			
-			var form = document.createElement('form');
-			form.setAttribute('method', 'post');
-			form.setAttribute('action', this.importUrl);
-			form.setAttribute('enctype', 'multipart/form-data');
-			form.setAttribute('target', 'sendFileIframe');
-			addListener(form, 'submit', function() { onsubmit(fileInput.value); }, false);
-			
-			var fileInput = document.createElement('input');
-			fileInput.setAttribute('type', 'file');
-			fileInput.setAttribute('name', 'scrambles');
-			addListener(fileInput, 'input', function() {
-			}, false);
-			var submit = document.createElement('input');
-			submit.type = 'submit';
-			submit.value = 'Load Scrambles';
-			
-			form.appendChild(fileInput);
-			form.appendChild(submit);
-			return form;
+			return uploadForm;
 		}
 		this.toString = function() {
-			return server;
+			return this.server;
 		}
 	}
 };
