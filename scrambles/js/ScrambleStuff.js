@@ -318,6 +318,7 @@ function setCurrImportLink(newLink) {
 	currImportLink = newLink;
 	
 	newScrambles.value = '';
+	return currImportLink != null;
 }
 
 var activeImportRequest = null;
@@ -328,7 +329,8 @@ var urlForm = null;
 var urlText = null;
 var DEFAULT_URL = "http://nascarjon.us/sunday.txt";
 function promptImportUrl() {
-	setCurrImportLink(this);
+	if(!setCurrImportLink(this))
+		return;
 	if(urlForm == null) { //pretty much copied from promptSeed()
 		urlForm = document.createElement('form');
 		urlForm.style.cssFloat = urlForm.style.styleFloat = 'left'; //stupid ie
@@ -361,13 +363,14 @@ function promptImportUrl() {
 	deleteChildren(importArea);
 	importArea.appendChild(urlForm);
 	
-	urlText.select();
 	urlText.focus();
+	urlText.select();
 }
 
 var uploadForm = null;
 function promptImportFile() {
-	setCurrImportLink(this);
+	if(!setCurrImportLink(this))
+		return;
 	if(uploadForm == null) {
 		function scramblesRequested(fileName, submitButton, request) {
     		scrambleSrc = document.createElement('span');
@@ -390,14 +393,15 @@ var seedForm = null;
 var seedText = null;
 var scrambleCount = null;
 function promptSeed() {
-	setCurrImportLink(this);
+	if(!setCurrImportLink(this))
+		return;
 	if(seedForm == null) {
 		seedForm = document.createElement('form');
 		seedForm.style.cssFloat = seedForm.style.styleFloat = 'left'; //stupid ie
 		
 		seedText = document.createElement('input');
 		seedText.setAttribute('type', 'text');
-		seedText.style.width = '180px';
+		seedText.style.width = '160px';
 		seedText.setAttribute('title', "If you agree upon a seed with someone else, you'll be guaranteed to get the same scrambles as them. " +
 				"Leave blank for totally random scrambles.");
 		
@@ -405,7 +409,7 @@ function promptSeed() {
 		scrambleCount.setAttribute('type', 'number');
 		scrambleCount.setAttribute('step', '1');
 		scrambleCount.setAttribute('min', '1');
-		scrambleCount.setAttribute('size', '3');
+		scrambleCount.setAttribute('size', '4'); //adding 1 for opera
 		scrambleCount.value = 12;
 		
 		var loadScramblesButton = document.createElement('input');
@@ -439,8 +443,8 @@ function promptSeed() {
 	importArea.appendChild(seedForm);
 
 	seedText.value = randomString(10);
-	seedText.select();
 	seedText.focus();
+	seedText.select();
 }
 
     var isChangingColorScheme = false;
@@ -456,6 +460,7 @@ function promptSeed() {
 	    importDiv.style.display = 'none';
 	    
 	    	var tempDiv = document.createElement('div');
+		    tempDiv.style.overflow = 'hidden'; //need this for ie
 	    	importDiv.appendChild(tempDiv);
 	    	
 	    	var importArea = document.createElement('span');
@@ -470,8 +475,8 @@ function promptSeed() {
 	    	
 		    var newScrambles = document.createElement('textarea');
 		    newScrambles.setAttribute('wrap', 'off');
-		    newScrambles.rows = 10;
-		    newScrambles.cols = 50;
+		    newScrambles.style.width = '420px';
+		    newScrambles.style.height = '180px';
 		    newScrambles.getScrambles = function() {
 		    	var scrambles = newScrambles.value.split('\n');
 		    	for(var i = scrambles.length-1; i >= 0; i--) {

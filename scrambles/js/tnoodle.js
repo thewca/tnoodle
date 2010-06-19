@@ -268,7 +268,6 @@ tnoodle.scrambles = {
 				var server = this.server;
 				addListener(window, "message", function(e) {
 					if(e.origin == server) {
-						console.log(e.data);
 						var scrambles = eval(e.data);
 						onload(scrambles);
 					} else {
