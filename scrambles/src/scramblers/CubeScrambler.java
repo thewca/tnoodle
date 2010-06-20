@@ -68,7 +68,7 @@ public class CubeScrambler extends ScramblerViewer {
 	}
 
 	@Override
-	public String generateScramble(Random r) {
+	public synchronized String generateScramble(Random r) {
 		if(size == 2) {
 			mix(r);
 			return solve();

@@ -531,7 +531,6 @@ function promptSeed() {
     	addListener(importUrlLink, 'click', promptImportUrl, false);
     	importUrlLink.appendChild(document.createTextNode('From Url'));
     	scrambleHeader.appendChild(importUrlLink);
-    	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	var importFileLink = document.createElement('span');
     	importFileLink.title = "Import scrambles from file";
@@ -539,7 +538,6 @@ function promptSeed() {
     	addListener(importFileLink, 'click', promptImportFile, false);
     	importFileLink.appendChild(document.createTextNode('From File'));
     	scrambleHeader.appendChild(importFileLink);
-    	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	var seedLink = document.createElement('span');
     	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
@@ -547,7 +545,6 @@ function promptSeed() {
     	addListener(seedLink, 'click', promptSeed, false);
     	seedLink.appendChild(document.createTextNode('Seed'));
     	scrambleHeader.appendChild(seedLink);
-    	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	var newScrambleLink = document.createElement('span');
     	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
@@ -561,9 +558,51 @@ function promptSeed() {
     	}, false);
     	newScrambleLink.appendChild(document.createTextNode('New Scramble'));
     	scrambleHeader.appendChild(newScrambleLink);
-    	scrambleHeader.appendChild(document.createTextNode(' '));
     	
-    	addListener(document, 'click', function(e) {
+    	function createResizer(step) {
+    		var resize = function(e) {
+    			setTimeout(function() {
+    				if(!mouseDown)
+    					return;
+    				var size = parsePx(scramblePre.style.fontSize);
+    				size += step;
+    				decrease.style.visibility = 'visible';
+    				increase.style.visibility = 'visible';
+    				if(size <= 5) {
+    					decrease.style.visibility = 'hidden';
+    				} else if(size > 100) {
+    					increase.style.visibility = 'hidden';
+    				} else {
+    					scramblePre.style.fontSize = size + 'px';
+    					setTimeout(resize, 100);
+    				}
+    			}, 0); //wait for mouseDown to get set
+    		}
+    		return resize;
+    	}
+    	
+    	var increase = document.createElement('span');
+    	increase.className = 'increaseSize';
+    	increase.appendChild(document.createTextNode('+'));
+    	addListener(increase, 'mousedown', createResizer(1), false);
+    	
+    	var decrease = document.createElement('span');
+    	decrease.className = 'decreaseSize';
+    	decrease.appendChild(document.createTextNode('\u2013')); //en dash
+    	addListener(decrease, 'mousedown', createResizer(-1), false);
+    	
+    	var scrambleSize = document.createElement('span');
+    	scrambleSize.setAttribute('class', 'changeSize');
+    	scrambleSize.appendChild(increase);
+    	scrambleSize.appendChild(decrease);
+    	scrambleHeader.appendChild(scrambleSize);
+
+    	var mouseDown = false;
+    	addListener(document, 'mouseup', function(e) {
+    		mouseDown = false;
+    	}, false);
+    	addListener(document, 'mousedown', function(e) {
+    		mouseDown = true;
     		if(!e.target) e.target = e.srcElement; //freaking ie, man
     		var clz = e.target.className;
     		if(clz.match(/\blink\b/) || clz.match(/\btitlebar\b/)) //kinda hacky, but should work
@@ -576,7 +615,7 @@ function promptSeed() {
     			
     		if(!isOrIsChild(e.target, importDiv))
     			setCurrImportLink(null);
-    	});
+    	}, false);
     	
     	/* TODO use something like zero copy here? or do what google maps does and popup a selected text box?
     	var copyLink = document.createElement('span');
@@ -591,6 +630,7 @@ function promptSeed() {
     	scrambleHeader.appendChild(scrambleInfo);
     	
 	    var scramblePre = document.createElement('pre');
+	    scramblePre.style.fontSize = '20px'; //TODO - initialize!
 	    scrambleArea.appendChild(scramblePre);
 	
     var scrambleDiv = document.createElement('div');
