@@ -43,7 +43,8 @@ function isOrIsChild(el, parent) {
 function clone(obj) {
     var o = {};
     for(var k in obj)
-        o[k] = obj[k];
+    	if(obj.hasOwnProperty(k))
+    		o[k] = obj[k];
     return o;
 }
 
@@ -80,7 +81,7 @@ function addListener(obj, event, func, useCapture) {
 /*** END IE HACKS ***/
 
 
-function ScrambleStuff() {
+function ScrambleStuff(configuration) {
 
 var puzzle = null;
 var colorScheme = null;
@@ -104,6 +105,7 @@ function puzzleChanged() {
     currTurn = null;
     faceMap = null; //this indicates if the current puzzle support images
     puzzle = newPuzzle;
+    configuration.set('puzzle', puzzle);
     scrambleImg.clear();
 
     scrambler.loadPuzzleImageInfo(function(puzzleImageInfo) {
@@ -112,15 +114,16 @@ function puzzleChanged() {
     		scrambleDiv.setVisible(false, false);
     	} else {
     		faceMap = puzzleImageInfo.faces;
-    		colorScheme = colorScheme || puzzleImageInfo.colorScheme;
-    		defaultColorScheme = clone(puzzleImageInfo.colorScheme);
+    		colorScheme = configuration.get('scramble.'+puzzle+'.colorScheme', clone(puzzleImageInfo.colorScheme));
+    		defaultColorScheme = puzzleImageInfo.colorScheme;
 
     		scrambleDivDD.minw = puzzleImageInfo.size.width;
     		scrambleDivDD.minh = puzzleImageInfo.size.height;
     		scrambleDivDD.paddingVert = getScrambleVertPadding();
     		scrambleDivDD.paddingHorz = getScrambleHorzPadding();
-    		scrambleDiv.style.width = puzzleImageInfo.size.width + getScrambleHorzPadding() + "px";
-    		scrambleDiv.style.height = puzzleImageInfo.size.height + getScrambleVertPadding() + "px";
+    		scrambleDiv.style.width = configuration.get('scramble.' + puzzle + '.size.width', puzzleImageInfo.size.width + getScrambleHorzPadding() + "px");
+    		scrambleDiv.style.height = configuration.get('scramble.' + puzzle + '.size.height', puzzleImageInfo.size.height + getScrambleVertPadding() + "px");
+    		
     		scrambleResized();
     	}
     	scramble();
@@ -233,7 +236,13 @@ function getScrambleHorzPadding() {
     return parsePx(scrambleStyle.getPropertyValue("padding-left")) + parsePx(scrambleStyle.getPropertyValue("padding-right"));
 }
 
+function scrambleMoved() {
+	configuration.set('scramble.location.top', scrambleDiv.style.top);
+	configuration.set('scramble.location.left', scrambleDiv.style.left);
+}
 function scrambleResized() {
+	configuration.set('scramble.' + puzzle + '.size.width', scrambleDiv.style.width);
+	configuration.set('scramble.' + puzzle + '.size.height', scrambleDiv.style.height);
     var imgWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
     scrambleImg.style.width = imgWidth + "px";
     scrambleImg.style.height = parsePx(scrambleDiv.style.height) - getScrambleVertPadding() + "px";
@@ -280,8 +289,7 @@ function puzzlesLoaded(puzzles) {
         puzzleSelect.options[i] = new Option(puzzles[i][1], puzzles[i][0]);
     }
     
-    //TODO - load selected puzzle
-    puzzleSelect.value = '3x3x3';
+    puzzleSelect.value = configuration.get('puzzle', '3x3x3');
     puzzleChanged();
 }
 
@@ -573,7 +581,9 @@ function promptSeed() {
     				} else if(size > 100) {
     					increase.style.visibility = 'hidden';
     				} else {
-    					scramblePre.style.fontSize = size + 'px';
+    					size += 'px';
+    					scramblePre.style.fontSize = size;
+    					configuration.set('scramble.fontSize', size);
     					setTimeout(resize, 100);
     				}
     			}, 0); //wait for mouseDown to get set
@@ -630,7 +640,7 @@ function promptSeed() {
     	scrambleHeader.appendChild(scrambleInfo);
     	
 	    var scramblePre = document.createElement('pre');
-	    scramblePre.style.fontSize = '20px'; //TODO - initialize!
+	    scramblePre.style.fontSize = configuration.get('scramble.fontSize', '20px');
 	    scrambleArea.appendChild(scramblePre);
 	
     var scrambleDiv = document.createElement('div');
@@ -642,11 +652,12 @@ function promptSeed() {
 		scrambleDivHeader.className = 'titlebar';
 		scrambleDiv.appendChild(scrambleDivHeader);
 		scrambleDiv.id = 'scrambleDiv'; //have to have an id to make it draggable
-		scrambleDiv.visibleIfPossible = true;
+		scrambleDiv.visibleIfPossible = configuration.get('scramble.visible', true);
 		scrambleDiv.setVisible = function(visible, userInvoked) {
-			if(userInvoked)
+			if(userInvoked) {
 				this.visibleIfPossible = visible;
-			else
+				configuration.set('scramble.visible', visible);
+			} else
 				visible &= this.visibleIfPossible;
 			if(visible) {
 				scrambleDiv.style.display = 'inline';
@@ -670,6 +681,7 @@ function promptSeed() {
 			addListener(resetColorScheme, 'click', function() {
 				if(confirm("Reset the color scheme?")) {
 					colorScheme = clone(defaultColorScheme);
+					configuration.set('scramble.'+puzzle+'.colorScheme', colorScheme);
 					scrambleImg.redraw();
 				}
 			}, false);
@@ -716,8 +728,11 @@ function promptSeed() {
 		resizeDiv.className = "dragresize dragresize-br";
 		scrambleDiv.appendChild(resizeDiv);
 	//end scrambleDiv
+		scrambleDiv.style.top = configuration.get('scramble.location.top', '0px');
+		scrambleDiv.style.left = configuration.get('scramble.location.left', '0px');
     var scrambleDivDD = dragDrop.createDraggable(RESET_Z, SCALABLE, scrambleDiv.id);
     scrambleDivDD.resizeFunc = scrambleResized;
+    scrambleDivDD.moveFunc = scrambleMoved;
 
     var puzzleSelect = document.createElement('select');
     puzzleSelect.onchange = puzzleChanged; //for some reason, the change event doesn't fire until the select loses focus
@@ -745,6 +760,7 @@ function promptSeed() {
 		//end titlebar
 		var colorChooser = new ColorChooser(function(newColor) {
 			colorScheme[currFaceName] = newColor;
+			configuration.set('scramble.'+puzzle+'.colorScheme', colorScheme);
 			colorChooserDiv.style.display = 'none';
 			scrambleImg.redraw();
 		});

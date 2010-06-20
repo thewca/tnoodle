@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ScramblerTest</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+
+<link type="text/css" rel="stylesheet" href="ScrambleStuff.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="wz_dragdrop.css" media="screen" />
+<style type="text/css">
+body {
+	font-family: sans-serif;
+}
+img {
+    border: none;
+    padding: 1px;
+}
+</style>
+
+<script type="text/javascript" src="json.js"></script>
+<script type="text/javascript" src="tnoodleserver.js"></script>
+<script type="text/javascript" src="tnoodlescrambles.js"></script>
+<script type="text/javascript" src="wz_dragdrop.js"></script>
+<script type="text/javascript" src="ColorChooser.js"></script>
+<script type="text/javascript" src="ScrambleStuff.js"></script>
+
+<script type="text/javascript">
+//freaking ie
+function addListener(obj, event, func, useCapture) {
+	if(obj.addEventListener) {
+		obj.addEventListener(event, func, useCapture);
+	} else {
+		obj.attachEvent('on'+event, function(e) { func.call(obj, e); });
+	}
+}
+addListener(window, 'load', function() {
+	var configuration = new tnoodle.server().configuration;	
+	var scrambleStuff = new ScrambleStuff(configuration);
+	
+	var puzzleChooser = document.getElementById('puzzleChooser');
+	puzzleChooser.appendChild(scrambleStuff.puzzleSelect);
+	
+	var scrambleButton = document.createElement('input');
+	scrambleButton.id = 'scrambler';
+	scrambleButton.type = 'button';
+	scrambleButton.value = "Next scramble";
+	addListener(scrambleButton, 'click', scrambleStuff.scramble, false);
+	puzzleChooser.appendChild(scrambleButton);
+	
+	var scrambleArea = document.getElementById('scrambleArea');
+	scrambleArea.appendChild(scrambleStuff.scrambleArea);
+}, false);
+</script>
+</head>
+<body>
+<div id="puzzleChooser"></div>
+<div id="scrambleArea"></div>
+</body>
+</html>

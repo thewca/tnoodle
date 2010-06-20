@@ -134,6 +134,7 @@ dd.getCssXY = function(d_o)
 			dd.getPageXY(d_o.div);
 			d_o.cssx = d_o.x - dd.x;
 			d_o.cssy = d_o.y - dd.y;
+			
 			d_o.css.left = d_o.cssx + dd.px;
 			d_o.css.top = d_o.cssy + dd.px;
 		}
@@ -529,6 +530,10 @@ function DDObj(d_o, d_i)
 			this.div.pos_rel = ("" + (this.div.parentNode? this.div.parentNode.tagName : this.div.parentElement? this.div.parentElement.tagName : '').toLowerCase().indexOf('body') < 0);
 		}
 		dd.getPageXY(this.div);
+		if(this.div.style.left) //added by jeremy
+			dd.x += dd.Int(this.div.style.left);
+		if(this.div.style.top) //added by jeremy
+			dd.y += dd.Int(this.div.style.top);
 		this.defx = this.x = dd.x;
 		this.defy = this.y = dd.y;
 		dd.getCssXY(this);
@@ -1192,6 +1197,7 @@ function DRAG(d_ev)
 
 	if(window.my_DragFunc) my_DragFunc();
 	if(dd.obj.dragFunc) dd.obj.dragFunc();
+	if(dd.obj.moveFunc) dd.obj.moveFunc(d_ev); //added my jeremy fleischman
 	if(dd.moveFunc) return dd.moveFunc(d_ev);
 	return false;
 }
