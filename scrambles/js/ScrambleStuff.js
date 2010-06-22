@@ -81,7 +81,7 @@ function xAddListener(obj, event, func, useCapture) {
 /*** END IE HACKS ***/
 
 
-function ScrambleStuff(configuration) {
+function ScrambleStuff(configuration, loadedCallback) {
 
 var puzzle = null;
 var colorScheme = null;
@@ -96,17 +96,18 @@ function puzzleChanged() {
 		}
 	}
     var newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
-    if(newPuzzle == "null") { //puzzles haven't loaded yet
-    	puzzle = null; //this probably isn't necessary
-    	return;
-	}
+    if(newPuzzle == "null") //if nothing is selected
+    	newPuzzle = null;
     
     colorScheme = null; //reset colorscheme
     currTurn = null;
     faceMap = null; //this indicates if the current puzzle support images
     puzzle = newPuzzle;
-    configuration.set('puzzle', puzzle);
     scrambleImg.clear();
+    firePuzzleChanged();
+    
+    if(puzzle == null)
+    	return;
 
     scrambler.loadPuzzleImageInfo(function(puzzleImageInfo) {
     	if(puzzleImageInfo.error) {
@@ -289,9 +290,7 @@ function puzzlesLoaded(puzzles) {
     for(var i = 0; i < puzzles.length; i++) {
         puzzleSelect.options[i] = new Option(puzzles[i][1], puzzles[i][0]);
     }
-    
-    puzzleSelect.value = configuration.get('puzzle', '3x3x3');
-    puzzleChanged();
+    loadedCallback();
 }
 
 var scrambleIndex = 0;
@@ -325,8 +324,9 @@ function setCurrImportLink(newLink) {
 		waitingIcon.style.display = 'none';
 	}
 	currImportLink = newLink;
-	
+
 	newScrambles.value = '';
+	importButton.update();
 	return currImportLink != null;
 }
 
@@ -510,7 +510,6 @@ function promptSeed() {
 		    		importButton.value += ' ' + scrambles.length + " scramble(s)";
 		    	importButton.disabled = scrambles.length == 0;
 		    };
-		    importButton.update();
 		    
 		    xAddListener(newScrambles, 'input', function(e) { importButton.update(); });
 		    xAddListener(importButton, 'click', function() {
@@ -788,13 +787,27 @@ function promptSeed() {
 	this.getSelectedPuzzle = function() {
 		return puzzle;
 	}
+	//even if this is the same puzzle, will generate a new scramble
+	this.setSelectedPuzzle = function(newPuzzle) {
+		puzzleSelect.value = newPuzzle;
+		puzzleChanged();
+	}
 	
-	var listeners = [];
+	var scrambleListeners = [];
 	this.addScrambleChangeListener = function(l) {
-		listeners.push(l);
+		scrambleListeners.push(l);
 	}
 	function fireScrambleChanged() {
-		for(var i = 0; i < listeners.length; i++)
-			listeners[i](this);
+		for(var i = 0; i < scrambleListeners.length; i++)
+			scrambleListeners[i]();
+	}
+	
+	var puzzleListeners = [];
+	this.addPuzzleChangeListener = function(l) {
+		puzzleListeners.push(l);
+	}
+	function firePuzzleChanged() {
+		for(var i = 0; i < puzzleListeners.length; i++)
+			puzzleListeners[i](puzzle);
 	}
 }

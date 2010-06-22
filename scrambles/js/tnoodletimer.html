@@ -38,11 +38,21 @@ img {
 	text-decoration:none;
 	font-weight:bold;
 	background:#ddd;
-	padding:0.25em 1em;
+	padding:0.25em;
 	border-left:1px solid black;
 	border-right:1px solid black;
 }
 
+.tabs li .delete {
+	margin-left: 1em;
+	position: relative;
+	right: 0px;
+	cursor: pointer;
+}
+
+.tabs li .delete:hover {
+	background: white;
+}
 .tabs li:hover, .tabs li.active {
 	background: #efefef;
 }
@@ -53,9 +63,11 @@ img {
 	overflow: auto;
 }
 
+
 </style>
 
 <script type="text/javascript" src="mootools-1.2.4-core.js"></script>
+<script type="text/javascript" src="mootools-1.2.4.4-more.js"></script>
 <script type="text/javascript" src="tnoodleserver.js"></script>
 <script type="text/javascript" src="tnoodlescrambles.js"></script>
 <script type="text/javascript" src="wz_dragdrop.js"></script>
@@ -64,39 +76,91 @@ img {
 
 <script type="text/javascript">
 window.addEvent('domready', function() {
-	var configuration = new tnoodle.server().configuration;	
-	var scrambleStuff = new ScrambleStuff(configuration);
+	var sessions = new Hash({ "l4erux": { puzzle: "4x4x4", times: [ 65, 70 ] } });
 	
-	var puzzleChooser = document.getElementById('puzzleChooser');
-	puzzleChooser.appendChild(scrambleStuff.puzzleSelect);
+	var configuration = new tnoodle.server().configuration;
+
+	function scramblesLoaded() {
+		sessionClicked.call($(currSessionId), null);
+	}
+	var scrambleStuff = new ScrambleStuff(configuration, scramblesLoaded);
+	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
+	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 	
 	$('scrambler').addEvent('click', scrambleStuff.scramble);
-	
-	var scrambleArea = document.getElementById('scrambleArea');
-	scrambleArea.appendChild(scrambleStuff.scrambleArea);
 
-	function sessionClicked(session) {
+	
+	scrambleStuff.addPuzzleChangeListener(function(newPuzzle) {
+		sessions[currSessionId].puzzle = newPuzzle;
+	});
+
+	var currSessionId = null;
+	function sessionClicked(e) {
+		newId = this.get('id');
+		// if e == null, then this function wasn't called by the user clicking something,
+		// so we go ahead and select the session (this allows for initialization)
+		if(e != null && newId === currSessionId)
+			return;
+		currSessionId = newId;
+		var session = sessions[currSessionId];
+		
 		$$('#sessions .active').each(function(el) {
 			el.removeClass('active');
 		});
 		this.addClass('active');
+
+		var table = new HtmlTable($('timesTable'));
+		table.empty();
+		session.times.each(function(time) {
+			table.push([time]);
+		});
+
+		scrambleStuff.setSelectedPuzzle(session.puzzle);
+	}
+	function closeSession(e) {
+		e.stop(); //prevent the tab from activating
+
+		delete sessions[this.sessionId];
+		$(this.sessionId).dispose();
+		if(this.sessionId == currSessionId) {
+			//TODO - create new session?
+		}
+	}
+	function createSessionTab(sessionId) {
+		//TODO - puzzle icon
+		var newSession = new Element('li', { 'html': sessionId, 'id': sessionId });
+		newSession.addEvent('click', sessionClicked);
+
+		var close = new Element('span', { 'html': 'X', 'class': 'delete' });
+		close.sessionId = sessionId;
+		close.inject(newSession, 'bottom'); 
+		close.addEvent('click', closeSession);
+		return newSession;
 	}
 	
 	$('newSession').addEvent('click', function(e) {
-		var sessionIndex = $('sessions').children.length;
-		var newSession = new Element('li', { 'html': 'Session ' + sessionIndex });
-		newSession.addEvent('click', sessionClicked);
-		newSession.inject($('newSession'), 'before');
-		sessionClicked.call(newSession, null);
+		//sessionId is the number of seconds since the epoch encoded in base 36 for readability
+		var sessionId = Math.round(new Date().getTime()/1000).toString(36);
+		if(sessionId in sessions) //we don't want duplicate session ids
+			return;
+
+		//TODO - use default puzzle for session? if so, how does the user set the default puzzle?
+		sessions.set(sessionId, {puzzle: scrambleStuff.getSelectedPuzzle(), times: []});
+		var sessionTab = createSessionTab(sessionId);
+		sessionTab.inject($('newSession'), 'before');
+		sessionClicked.call(sessionTab, null);
 	});
 
-	function sessionClicked(session) {
-		$$('#sessions .active').each(function(el) {
-			el.removeClass('active');
-		});
-		this.addClass('active');
-	}
-
+	//TODO - do something if sessions is empty!
+	sessions.getKeys().sort().each(function(sessionId, index, ids) {
+		var sessionTab = createSessionTab(sessionId);
+		sessionTab.inject($('newSession'), 'before');
+		if(index == ids.length - 1) {
+			//we set the current session to the most recent session
+			currSessionId = sessionId;
+		}
+	});
+	
 	function resizeTimesArea() {
 		setTimeout(function() { //wait for laying-out to occur
 			var remainingHeight = window.getSize().y-$('chrome').getSize().y;
@@ -106,6 +170,7 @@ window.addEvent('domready', function() {
 	};
 	window.addEvent('load', resizeTimesArea);
 	scrambleStuff.addScrambleChangeListener(resizeTimesArea);
+
 	window.addEvent('resize', resizeTimesArea); //TODO - ensure that draggable windows (scramble) are visible
 });
 
@@ -115,14 +180,17 @@ window.addEvent('domready', function() {
 
 <div id="chrome">
 <span id="puzzleChooser"></span>
+<input id="scrambler" type="button" value="Next scramble"></input>
+
 <div id="scrambleArea"></div>
+
 <ul id="sessions" class="tabs">
 	<li id="newSession">+</li>
 </ul>
 </div>
 
 <div id="timesArea">
-<input id="scrambler" type="button" value="Next scramble"></input>
+<table id="timesTable"></table>
 </div>
 
 </body>
