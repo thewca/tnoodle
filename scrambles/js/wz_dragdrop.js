@@ -346,15 +346,19 @@ dd.addProps = function(d_o)
 };
 dd.initz = function()
 {
-	if(!(dd && (dd.n4 || dd.n6 || dd.ie || dd.op || dd.w3c))) return;
-	else if(dd.n6 || dd.ie || dd.op || dd.w3c) dd.recalc(1);
-	var d_drag = (document.onmousemove == DRAG),
-	d_resize = (document.onmousemove == RESIZE);
-	if(dd.loadFunc) dd.loadFunc();
-	if(d_drag) dd.setMovHdl(DRAG);
-	else if(d_resize) dd.setMovHdl(RESIZE);
-	if(d_drag || d_resize) dd.setUpHdl(DROP);
-	dd.setDwnHdl(PICK);
+	//added by jeremy fleischman because mootools was breaking things,
+	//this doesn't seem to be breaking anything
+	return;
+	
+//	if(!(dd && (dd.n4 || dd.n6 || dd.ie || dd.op || dd.w3c))) return;
+//	else if(dd.n6 || dd.ie || dd.op || dd.w3c) dd.recalc(1);
+//	var d_drag = (document.onmousemove == DRAG),
+//	d_resize = (document.onmousemove == RESIZE);
+//	if(dd.loadFunc) dd.loadFunc();
+//	if(d_drag) dd.setMovHdl(DRAG);
+//	else if(d_resize) dd.setMovHdl(RESIZE);
+//	if(d_drag || d_resize) dd.setUpHdl(DROP);
+//	dd.setDwnHdl(PICK);
 };
 dd.finlz = function()
 {

@@ -7,7 +7,7 @@ WAITING_ICON = 'ajax-loader.gif';
 LOADING_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
 
 function setUnfocusable(el) {
-	addListener(el, 'focus', el.blur, false);
+	xAddListener(el, 'focus', el.blur, false);
 }
 function randomString(length) {
 	var MIN = 'a'.charCodeAt(0);
@@ -71,7 +71,7 @@ if(!String.prototype.trim) {
 		return this.match(/\s*(\S*)\s*/)[1];
 	};
 }
-function addListener(obj, event, func, useCapture) {
+function xAddListener(obj, event, func, useCapture) {
 	if(obj.addEventListener) {
 		obj.addEventListener(event, func, useCapture);
 	} else {
@@ -128,14 +128,13 @@ function puzzleChanged() {
     	}
     	scramble();
     }, puzzle);
-    
 }
 
 var scrambleChooser = document.createElement('input');
 scrambleChooser.setAttribute('type', 'number');
 scrambleChooser.setAttribute('min', 1);
 scrambleChooser.setAttribute('step', 1);
-addListener(scrambleChooser, 'change', function() {
+xAddListener(scrambleChooser, 'change', function() {
 	if(!isInteger(this.value) || this.value < 1 || this.value > importedScrambles.length) {
 		this.value = scrambleIndex;
 	} else {
@@ -175,6 +174,8 @@ function scramble() {
 		scrambleLoaded(importedScrambles[scrambleIndex]);
 		scrambleIndex++;
 	}
+
+	fireScrambleChanged();
 }
 function turnClicked(userInvoked) {
     if(isChangingColorScheme) {
@@ -204,7 +205,7 @@ function scrambleLoaded(scramble) {
         turnLink.appendChild(document.createTextNode(turn));
         turnLink.incrementalScramble = incrementalScramble;
         turnLink.className = 'turn';
-        addListener(turnLink, 'click', function() { turnClicked.call(this, true); }, false);
+        xAddListener(turnLink, 'click', function() { turnClicked.call(this, true); }, false);
         scramblePre.appendChild(turnLink);
         if(i == turns.length-1) {
             turnClicked.call(turnLink, false);
@@ -254,10 +255,10 @@ function scrambleResized() {
         for(var i = 0; i < areas.length; i++) {
             var area = areas[i];
             area.setAttribute('alt', area.faceName);
-            addListener(area, 'click', faceClicked, false);
+            xAddListener(area, 'click', faceClicked, false);
 
-            addListener(area, 'mouseover', function() { deleteChildren(scrambleHeaderText); scrambleHeaderText.appendChild(document.createTextNode(this.faceName)); }, false);
-            addListener(area, 'mouseout', function() { deleteChildren(scrambleHeaderText); }, false);
+            xAddListener(area, 'mouseover', function() { deleteChildren(scrambleHeaderText); scrambleHeaderText.appendChild(document.createTextNode(this.faceName)); }, false);
+            xAddListener(area, 'mouseout', function() { deleteChildren(scrambleHeaderText); }, false);
             scrambleImgMap.appendChild(area);
         }
     }
@@ -346,7 +347,7 @@ function promptImportUrl() {
 		urlText.value = DEFAULT_URL;
 		urlText.type = 'text';
 		urlText.style.width = '200px';
-		addListener(urlText, 'input', function(e) {
+		xAddListener(urlText, 'input', function(e) {
 			loadScramblesButton.disabled = (this.value.length == 0); 
 		}, false);
 		var loadScramblesButton = document.createElement('input');
@@ -511,8 +512,8 @@ function promptSeed() {
 		    };
 		    importButton.update();
 		    
-		    addListener(newScrambles, 'input', function(e) { importButton.update(); });
-		    addListener(importButton, 'click', function() {
+		    xAddListener(newScrambles, 'input', function(e) { importButton.update(); });
+		    xAddListener(importButton, 'click', function() {
 		    	var scrambles = newScrambles.getScrambles();
 		    	if(scrambles.length > 0) {
 		    		importedScrambles = scrambles;
@@ -526,7 +527,7 @@ function promptSeed() {
 		    var cancelImportButton = document.createElement('input');
 		    cancelImportButton.type = 'button';
 		    cancelImportButton.value = 'Cancel';
-		    addListener(cancelImportButton, 'click', function() { setCurrImportLink(null); });
+		    xAddListener(cancelImportButton, 'click', function() { setCurrImportLink(null); });
 		    tempDiv.appendChild(cancelImportButton);
 	    
     	var scrambleHeader = document.createElement('div');
@@ -536,28 +537,28 @@ function promptSeed() {
     	var importUrlLink = document.createElement('span');
     	importUrlLink.title = "Import scrambles from url";
     	importUrlLink.className = 'link';
-    	addListener(importUrlLink, 'click', promptImportUrl, false);
+    	xAddListener(importUrlLink, 'click', promptImportUrl, false);
     	importUrlLink.appendChild(document.createTextNode('From Url'));
     	scrambleHeader.appendChild(importUrlLink);
     	
     	var importFileLink = document.createElement('span');
     	importFileLink.title = "Import scrambles from file";
     	importFileLink.className = 'link';
-    	addListener(importFileLink, 'click', promptImportFile, false);
+    	xAddListener(importFileLink, 'click', promptImportFile, false);
     	importFileLink.appendChild(document.createTextNode('From File'));
     	scrambleHeader.appendChild(importFileLink);
     	
     	var seedLink = document.createElement('span');
     	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
     	seedLink.className = 'link';
-    	addListener(seedLink, 'click', promptSeed, false);
+    	xAddListener(seedLink, 'click', promptSeed, false);
     	seedLink.appendChild(document.createTextNode('Seed'));
     	scrambleHeader.appendChild(seedLink);
     	
     	var newScrambleLink = document.createElement('span');
     	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
     	newScrambleLink.className = 'link';
-    	addListener(newScrambleLink, 'click', function() {
+    	xAddListener(newScrambleLink, 'click', function() {
     		if(!importedScrambles || confirm('This will clear any imported scrambles, are you sure you want to continue?')) {
     			importedScrambles = null;
     			setCurrImportLink(null);
@@ -594,12 +595,12 @@ function promptSeed() {
     	var increase = document.createElement('span');
     	increase.className = 'increaseSize';
     	increase.appendChild(document.createTextNode('+'));
-    	addListener(increase, 'mousedown', createResizer(1), false);
+    	xAddListener(increase, 'mousedown', createResizer(1), false);
     	
     	var decrease = document.createElement('span');
     	decrease.className = 'decreaseSize';
     	decrease.appendChild(document.createTextNode('\u2013')); //en dash
-    	addListener(decrease, 'mousedown', createResizer(-1), false);
+    	xAddListener(decrease, 'mousedown', createResizer(-1), false);
     	
     	var scrambleSize = document.createElement('span');
     	scrambleSize.setAttribute('class', 'changeSize');
@@ -608,10 +609,10 @@ function promptSeed() {
     	scrambleHeader.appendChild(scrambleSize);
 
     	var mouseDown = false;
-    	addListener(document, 'mouseup', function(e) {
+    	xAddListener(document, 'mouseup', function(e) {
     		mouseDown = false;
     	}, false);
-    	addListener(document, 'mousedown', function(e) {
+    	xAddListener(document, 'mousedown', function(e) {
     		mouseDown = true;
     		if(!e.target) e.target = e.srcElement; //freaking ie, man
     		var clz = e.target.className;
@@ -630,7 +631,7 @@ function promptSeed() {
     	/* TODO use something like zero copy here? or do what google maps does and popup a selected text box?
     	var copyLink = document.createElement('span');
     	copyLink.className = 'link';
-    	addListener(copyLink, 'click', function() { console.log(this); }, false);
+    	xAddListener(copyLink, 'click', function() { console.log(this); }, false);
     	copyLink.appendChild(document.createTextNode('Copy'));
     	scrambleHeader.appendChild(copyLink);
     	scrambleHeader.appendChild(document.createTextNode(' '));
@@ -640,6 +641,7 @@ function promptSeed() {
     	scrambleHeader.appendChild(scrambleInfo);
     	
 	    var scramblePre = document.createElement('pre');
+	    scramblePre.className = 'scrambleText';
 	    scramblePre.style.fontSize = configuration.get('scramble.fontSize', '20px');
 	    scrambleArea.appendChild(scramblePre);
 	
@@ -678,7 +680,7 @@ function promptSeed() {
 			resetColorScheme.setAttribute('title', 'Reset color scheme');
 			resetColorScheme.className = 'button';
 			resetColorScheme.style.display = 'none';
-			addListener(resetColorScheme, 'click', function() {
+			xAddListener(resetColorScheme, 'click', function() {
 				if(confirm("Reset the color scheme?")) {
 					colorScheme = clone(defaultColorScheme);
 					configuration.set('scramble.'+puzzle+'.colorScheme', colorScheme);
@@ -691,13 +693,13 @@ function promptSeed() {
 			changeColors.className = 'button';
 			changeColors.setAttribute('title', 'Change color scheme');
 			changeColors.appendChild(document.createTextNode('#'));
-			addListener(changeColors, 'click', changeColorsClicked, false);
+			xAddListener(changeColors, 'click', changeColorsClicked, false);
 			scrambleDivHeader.appendChild(changeColors);
 			
 			var closeScramble = document.createElement('span');
 			closeScramble.appendChild(document.createTextNode('X'));
 			closeScramble.className = 'button';
-			addListener(closeScramble, 'click', function() { scrambleDiv.setVisible(false, true); }, false);
+			xAddListener(closeScramble, 'click', function() { scrambleDiv.setVisible(false, true); }, false);
 			scrambleDivHeader.appendChild(closeScramble);
 		//end scrambleDivHeader
 
@@ -753,7 +755,7 @@ function promptSeed() {
 			var closeColorChooser = document.createElement('span');
 			closeColorChooser.className = "button";
 			closeColorChooser.appendChild(document.createTextNode('X'));
-			addListener(closeColorChooser, 'click', function() {
+			xAddListener(closeColorChooser, 'click', function() {
 				colorChooserDiv.style.display = 'none';
 			}, false);
 			titlebar.appendChild(closeColorChooser);
@@ -785,5 +787,14 @@ function promptSeed() {
 	this.scramble = scramble;
 	this.getSelectedPuzzle = function() {
 		return puzzle;
+	}
+	
+	var listeners = [];
+	this.addScrambleChangeListener = function(l) {
+		listeners.push(l);
+	}
+	function fireScrambleChanged() {
+		for(var i = 0; i < listeners.length; i++)
+			listeners[i](this);
 	}
 }

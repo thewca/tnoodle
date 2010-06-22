@@ -8,7 +8,7 @@ if(!Array.prototype.map) {
 		return new_arr;
 	}
 }
-function addListener(obj, event, func, useCapture) {
+function xAddListener(obj, event, func, useCapture) {
 	if(obj.addEventListener) {
 		obj.addEventListener(event, func, useCapture);
 	} else {
@@ -48,7 +48,7 @@ tnoodle.ajax = function(callback, url, data) {
 		xhr.open('get', dataUrl, true);
 	}
 	xhr.onload = function() {
-		callback(eval("(" + this.responseText + ")"));
+		callback(JSON.parse(this.responseText));
 	};
 	xhr.onerror = function(error) {
 		callback({error: error});
@@ -266,9 +266,9 @@ tnoodle.scrambles = {
 				sendFileIframe.src = 'about:blank';
 				document.body.appendChild(sendFileIframe);
 				var server = this.server;
-				addListener(window, "message", function(e) {
+				xAddListener(window, "message", function(e) {
 					if(e.origin == server) {
-						var scrambles = eval(e.data);
+						var scrambles = JSON.parse(e.data);
 						onload(scrambles);
 					} else {
 						onload({error: "Bad origin: " + e.origin + ", expecting " + server});
@@ -280,7 +280,7 @@ tnoodle.scrambles = {
 				uploadForm.setAttribute('action', this.importUrl);
 				uploadForm.setAttribute('enctype', 'multipart/form-data');
 				uploadForm.setAttribute('target', 'sendFileIframe');
-				addListener(uploadForm, 'submit', function() {
+				xAddListener(uploadForm, 'submit', function() {
 					var abortSubmit = { abort: function() { sendFileIframe.src='about:blank'; } };
 					onsubmit(fileInput.value, submit, abortSubmit);
 				}, false);

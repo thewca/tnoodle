@@ -36,8 +36,10 @@ span.currTurn {
 span.turn:hover {
 	text-decoration: none;
 }
-pre {
+.scrambleText {
     white-space: pre-wrap;
+    margin-top: 8px;
+    margin-bottom: 5px;
 }
 
 area {/* apparently this doesn't work in opera or chrome */
@@ -57,11 +59,10 @@ div.scrambleHeader {
     background-color: #EEE;
 }
 .importDiv {
+	z-index: 1;
 	position: absolute;
 	margin-top: 24px; /* Is this really the way people do css?! */
 	background-color: #EEE;
 	padding: 5px;
-	border-left: 1px solid;
-	border-right: 1px solid;
-	border-bottom: 1px solid;
+	border: 1px solid;
 }

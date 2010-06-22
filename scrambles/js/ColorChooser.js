@@ -1,4 +1,4 @@
-function addListener(obj, event, func, useCapture) {
+function xAddListener(obj, event, func, useCapture) {
 	if(obj.addEventListener) {
 		obj.addEventListener(event, func, useCapture);
 	} else {
@@ -176,7 +176,7 @@ function getPoint(e) {
 	    }
 	
 	    var draggingColorCircle = false, draggingLum = false;
-	    addListener(box, 'mousedown', function(e) {
+	    xAddListener(box, 'mousedown', function(e) {
 	        if(e.button == 0) {
 	            var cursor = "pointer";
 	            if(inColorCircle(e))
@@ -190,7 +190,7 @@ function getPoint(e) {
 	            mouseMoved(e);
 	        }
 	    }, false);
-	    addListener(box, 'mouseup', function(e) {
+	    xAddListener(box, 'mouseup', function(e) {
 	        if(e.button == 0) {
 	            draggingColorCircle = draggingLum = false;
 	            box.style.cursor = "default";
@@ -213,7 +213,7 @@ function getPoint(e) {
 	            setSelectedHSL(hsl);
 	        }
 	    }
-	    addListener(box, 'mousemove', mouseMoved , false);
+	    xAddListener(box, 'mousemove', mouseMoved , false);
 	    function redraw() {
 	    	if(!context) //not all browsers support the canvas element =(
 	    		return;
@@ -310,7 +310,7 @@ function getPoint(e) {
         input.setAttribute('min', 0);
         input.setAttribute('max', 255);
         input.setAttribute('step', 1);
-        addListener(input, 'change', rgbChanged, false);
+        xAddListener(input, 'change', rgbChanged, false);
 
         var div = document.createElement('div');
         div.field = input;
@@ -373,7 +373,7 @@ function getPoint(e) {
     this.element.appendChild(box);
     this.element.appendChild(buttons);
 
-    addListener(accept, 'click', function() {
+    xAddListener(accept, 'click', function() {
         callback(rgb2hex(selectedRGB));
     }, false);
 
@@ -400,7 +400,7 @@ function getPoint(e) {
         defaultRGB = hex2rgb(color);
         setSelectedRGB(defaultRGB);
     }
-    addListener(reset, 'click', function() {
+    xAddListener(reset, 'click', function() {
         setSelectedRGB(defaultRGB);
     }, false);
 }

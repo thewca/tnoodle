@@ -7,15 +7,55 @@
 <link type="text/css" rel="stylesheet" href="ScrambleStuff.css" media="screen" />
 <link type="text/css" rel="stylesheet" href="wz_dragdrop.css" media="screen" />
 <style type="text/css">
-body {
+html, body {
 	font-family: sans-serif;
+	height: 100%;
+	overflow: hidden;
 }
 img {
     border: none;
     padding: 1px;
 }
+
+.tabs {
+/* TODO: this doesn't overflow nicely */
+	overflow: auto;
+	
+	padding: 0 0 0 1em;
+	margin: 0 0 0 0;
+	list-style:none;
+	line-height:1em;
+}
+
+.tabs li {
+	float:left;
+	margin:0;
+	padding:0;
+	
+	cursor: default;
+	display:block;
+	color:#444;
+	text-decoration:none;
+	font-weight:bold;
+	background:#ddd;
+	padding:0.25em 1em;
+	border-left:1px solid black;
+	border-right:1px solid black;
+}
+
+.tabs li:hover, .tabs li.active {
+	background: #efefef;
+}
+
+#timesArea {
+	border: 1px solid;
+	padding: 5px;
+	overflow: auto;
+}
+
 </style>
 
+<script type="text/javascript" src="mootools-1.2.4-core.js"></script>
 <script type="text/javascript" src="tnoodleserver.js"></script>
 <script type="text/javascript" src="tnoodlescrambles.js"></script>
 <script type="text/javascript" src="wz_dragdrop.js"></script>
@@ -23,35 +63,67 @@ img {
 <script type="text/javascript" src="ScrambleStuff.js"></script>
 
 <script type="text/javascript">
-//freaking ie
-function addListener(obj, event, func, useCapture) {
-	if(obj.addEventListener) {
-		obj.addEventListener(event, func, useCapture);
-	} else {
-		obj.attachEvent('on'+event, function(e) { func.call(obj, e); });
-	}
-}
-addListener(window, 'load', function() {
+window.addEvent('domready', function() {
 	var configuration = new tnoodle.server().configuration;	
 	var scrambleStuff = new ScrambleStuff(configuration);
 	
 	var puzzleChooser = document.getElementById('puzzleChooser');
 	puzzleChooser.appendChild(scrambleStuff.puzzleSelect);
 	
-	var scrambleButton = document.createElement('input');
-	scrambleButton.id = 'scrambler';
-	scrambleButton.type = 'button';
-	scrambleButton.value = "Next scramble";
-	addListener(scrambleButton, 'click', scrambleStuff.scramble, false);
-	puzzleChooser.appendChild(scrambleButton);
+	$('scrambler').addEvent('click', scrambleStuff.scramble);
 	
 	var scrambleArea = document.getElementById('scrambleArea');
 	scrambleArea.appendChild(scrambleStuff.scrambleArea);
-}, false);
+
+	function sessionClicked(session) {
+		$$('#sessions .active').each(function(el) {
+			el.removeClass('active');
+		});
+		this.addClass('active');
+	}
+	
+	$('newSession').addEvent('click', function(e) {
+		var sessionIndex = $('sessions').children.length;
+		var newSession = new Element('li', { 'html': 'Session ' + sessionIndex });
+		newSession.addEvent('click', sessionClicked);
+		newSession.inject($('newSession'), 'before');
+		sessionClicked.call(newSession, null);
+	});
+
+	function sessionClicked(session) {
+		$$('#sessions .active').each(function(el) {
+			el.removeClass('active');
+		});
+		this.addClass('active');
+	}
+
+	function resizeTimesArea() {
+		setTimeout(function() { //wait for laying-out to occur
+			var remainingHeight = window.getSize().y-$('chrome').getSize().y;
+			remainingHeight -= 30; //TODO - what the heck is this all about?
+			$('timesArea').setStyle('height', remainingHeight);
+		}, 100); // 100 seems to work here ... man this feels hacky
+	};
+	window.addEvent('load', resizeTimesArea);
+	scrambleStuff.addScrambleChangeListener(resizeTimesArea);
+	window.addEvent('resize', resizeTimesArea); //TODO - ensure that draggable windows (scramble) are visible
+});
+
 </script>
 </head>
 <body>
-<div id="puzzleChooser"></div>
+
+<div id="chrome">
+<span id="puzzleChooser"></span>
 <div id="scrambleArea"></div>
+<ul id="sessions" class="tabs">
+	<li id="newSession">+</li>
+</ul>
+</div>
+
+<div id="timesArea">
+<input id="scrambler" type="button" value="Next scramble"></input>
+</div>
+
 </body>
 </html>
