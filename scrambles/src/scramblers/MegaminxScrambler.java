@@ -17,7 +17,6 @@ import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
 //TODO - cleanup this mess! so much vestigal code...
 //TODO - convert to better naming scheme from sims
-//TODO - does old mega importing even work?
 public class MegaminxScrambler extends ScramblerViewer {
 	public static synchronized MegaminxScrambler[] createScramblers() {
 		return new MegaminxScrambler[] { new MegaminxScrambler(true), new MegaminxScrambler(false) };
@@ -81,19 +80,21 @@ public class MegaminxScrambler extends ScramblerViewer {
 			for(int i = 0; i < strs.length; i++) {
 				if(strs[i].isEmpty()) continue;
 				char ch = strs[i].charAt(0);
-				if(ch == 'U') {
-					int dir = 1;
-					if(strs[i].length() > 1) dir = 4;
-					turn(0, dir);
-				} else if(ch == 'R' || ch == 'D') {
-					int dir = strs[i].charAt(1) == '+' ? 2 : 3;
-					if(strs[i].charAt(0) == 'R') {
-						bigTurn(0, dir);
-					} else if(strs[i].charAt(0) == 'D') {
-						bigTurn(1, dir);
-					} else {
-						bigTurn(1, dir);
-						turn(0, (-dir+5)%5);
+				if(pochmann) {
+					if(ch == 'U') {
+						int dir = 1;
+						if(strs[i].length() > 1) dir = 4;
+						turn(0, dir);
+					} else if(ch == 'R' || ch == 'D') {
+						int dir = strs[i].charAt(1) == '+' ? 2 : 3;
+						if(strs[i].charAt(0) == 'R') {
+							bigTurn(0, dir);
+						} else if(strs[i].charAt(0) == 'D') {
+							bigTurn(1, dir);
+						} else {
+							bigTurn(1, dir);
+							turn(0, (-dir+5)%5);
+						}
 					}
 				} else {
 					int face = FACE_NAMES.indexOf(ch);

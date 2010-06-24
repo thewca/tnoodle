@@ -9,17 +9,64 @@
 <style type="text/css">
 html, body {
 	font-family: sans-serif;
-	height: 100%;
-	overflow: hidden;
+}
+body {
+	margin: 8px;
 }
 img {
     border: none;
     padding: 1px;
 }
 
+#chrome {
+	margin-bottom: 10px;
+}
+.resize-br {
+    background: none repeat scroll 0 0 #FFF;
+    border: 1px solid #333;
+    font-size: 1px;
+    position: absolute;
+    width: 5px;
+    height: 5px;
+
+ /* unfortunately, dragging doesn't seem to work if I set the bottom and right attributes */
+    cursor: se-resize;
+    top: 195px;
+    left: 344px;
+}
+#topLeft {
+	width: 350px;
+	height: 200px;
+	
+	position: absolute;
+	left: 0px;
+	
+	text-align: center;
+}
+#topRight {
+	position: absolute;
+	right: 8px;
+}
+@font-face {  
+	font-family: lcd;
+	/*src: url( "digital-7 (mono).ttf" ) format("truetype");*/  
+	src: url( "Digiface Regular.ttf" ) format("truetype");  
+}
+#timer, #sizer {
+	font-family: lcd;
+	position: relative; /* this will let us manually center the text with js */ 
+}
+.scrambleText {
+	overflow: auto;
+}
+
 .tabs {
 /* TODO: this doesn't overflow nicely */
 	overflow: auto;
+	
+	/* This lets our tabs overflow the border */
+	position: relative;
+	top: 1px;
 	
 	padding: 0 0 0 1em;
 	margin: 0 0 0 0;
@@ -37,10 +84,9 @@ img {
 	color:#444;
 	text-decoration:none;
 	font-weight:bold;
-	background:#ddd;
+	background:#aaa;
 	padding:0.25em;
-	border-left:1px solid black;
-	border-right:1px solid black;
+	border:1px solid black;
 }
 
 .tabs li .delete {
@@ -53,16 +99,53 @@ img {
 .tabs li .delete:hover {
 	background: white;
 }
-.tabs li:hover, .tabs li.active {
+.tabs li.active {
+	border-bottom: 1px solid #efefef;
+}
+.tabs li:hover, .tabs li.active, #sessionInfo {
 	background: #efefef;
+}
+
+#sessionInfo {
+	padding: 5px;
 }
 
 #timesArea {
 	border: 1px solid;
-	padding: 5px;
 	overflow: auto;
 }
 
+#timesTable {
+	margin: 5px;
+	/*border-style: hidden;*/
+	border-collapse: collapse;
+}
+#timesTable th {
+	cursor: pointer;
+}
+#timesTable .table-th-sort .table-th-sort-span {
+	/*background: red;*/
+	background: transparent url('bullet_arrow_up.png') 0px 0px no-repeat;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+}
+
+#timesTable .table-th-sort-rev .table-th-sort-span {
+	background: transparent url('bullet_arrow_down.png') 0px 0px no-repeat;
+	width: 16px;
+	height: 16px;
+}
+
+#timesTable td, #timesTable th {
+	border: 1px solid;
+	padding: 1px 2px 1px 2px;
+	border-style: inset;
+	background-color: white;
+}
+
+#timesTable tr:nth-child(even) {background: #CCC}
+#timesTable tr:nth-child(odd) {background: #FFF}
 
 </style>
 
@@ -94,9 +177,30 @@ window.addEvent('domready', function() {
 		sessions[currSessionId].puzzle = newPuzzle;
 	});
 
+	function refreshSessionInfo() {
+		var session = sessions.get(currSessionId);
+		$('sessionInfo').empty();
+		$('sessionInfo').appendText(session.puzzle + " session ");
+		//$('sessionInfo').appendText(currSessionId + " ");
+		var date = new Date(1000*parseInt(currSessionId, 36));
+		var today = new Date();
+		var i, ago;
+		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
+		for(i = 0; i < resolutions.length; i++) {
+			ago = date.diff(today, resolutions[i]);
+			a = date; b = today;
+			if(ago > 0)
+				break;
+		}
+		if(i < resolutions.length) {
+			$('sessionInfo').appendText("started " + ago + " " + resolutions[i] + "(s) ago");
+		} else
+			$('sessionInfo').appendText("started seconds ago");
+	}
+	
 	var currSessionId = null;
 	function sessionClicked(e) {
-		newId = this.get('id');
+		newId = this.id;
 		// if e == null, then this function wasn't called by the user clicking something,
 		// so we go ahead and select the session (this allows for initialization)
 		if(e != null && newId === currSessionId)
@@ -109,21 +213,47 @@ window.addEvent('domready', function() {
 		});
 		this.addClass('active');
 
-		var table = new HtmlTable($('timesTable'));
-		table.empty();
-		session.times.each(function(time) {
-			table.push([time]);
+		refreshSessionInfo();
+		
+		// setting up the times table
+		var table = new HtmlTable({
+			properties: { id: 'timesTable' },
+			headers: [ '', 'Time' ],
+			rows: [],
+			sortable: true,
+			zebra: false,
 		});
+		table.addEvent('onSort', function(tbody, index) {
+			configuration.set('times.sort', this.sorted);
+		});
+		session.times.each(function(time, index) {
+			table.push([index+1, time]);
+		});
+		var sort = configuration.get('times.sort', { index: 0, reverse: false });
+		table.sort(sort.index, sort.reverse);
+		
+		$('timesTableArea').empty();
+		table.inject($('timesTableArea'));
 
 		scrambleStuff.setSelectedPuzzle(session.puzzle);
 	}
 	function closeSession(e) {
 		e.stop(); //prevent the tab from activating
 
+		var newTab = $(this.sessionId).nextSibling; //try the tab to the right
+		if(!sessions.has(newTab.id)) {
+			newTab = $(this.sessionId).previousSibling; //try the tab to the left
+			if(!sessions.has(newTab.id)) {
+				//TODO - create new session? for now, we just don't allow it
+				return;
+			}
+		}
+		
 		delete sessions[this.sessionId];
 		$(this.sessionId).dispose();
 		if(this.sessionId == currSessionId) {
-			//TODO - create new session?
+			//deleting the current session, so we select the next one to the left
+			sessionClicked.call(newTab);			
 		}
 	}
 	function createSessionTab(sessionId) {
@@ -160,37 +290,125 @@ window.addEvent('domready', function() {
 			currSessionId = sessionId;
 		}
 	});
-	
+
+	var isResizing = false;
 	function resizeTimesArea() {
+		//ie seems to be firing the resize event due to some of the actions
+		//that occur inside of this function, so we place a lock around it
+		if(isResizing)
+			return;
+		isResizing = true;
 		setTimeout(function() { //wait for laying-out to occur
-			var remainingHeight = window.getSize().y-$('chrome').getSize().y;
-			remainingHeight -= 30; //TODO - what the heck is this all about?
+			//TODO - I DO NOT believe that this can't be done with css!!!
+			
+			var viewSize = window.getSize();
+			var topLeftSize = $('topLeft').getSize();
+			var h = topLeftSize.y;
+
+			$('chrome').setStyle('height', h);
+			//$('topLeft').setStyle('height', h);
+			//$('topLeft').setStyle('width', .3*viewSize.x);
+
+			$('topRight').setStyle('height', h);
+			var newH = Math.max(0, viewSize.x-topLeftSize.x-$('topRight').getStyle('right').toInt());
+			$('topRight').setStyle('width', newH);
+			
+			h -= $('scrambleBorder').getSize().y;
+			$$('.scrambleArea')[0].setStyle('height', h);
+			h -= $$('.scrambleHeader')[0].getSize().y;
+			var scrambleText = $$('.scrambleText')[0];
+			var padding = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-top').toInt();
+			$$('.scrambleText')[0].setStyle('height', h-padding);
+
+			//figure out what the largest we can make the timer is
+			//this makes use of our "sizer" span
+			$('sizer').setStyle('display', 'inline');
+			$('sizer').set('html', $('timer').get('html'));
+			
+			var maxSize = $('topLeft').getSize();
+			var size = maxSize.y;
+			do {
+				$('sizer').setStyle('font-size', --size);
+				var width = $('sizer').getSize().x;
+			} while(width > maxSize.x);
+			$('sizer').setStyle('display', 'none');
+			$('timer').setStyle('font-size', size);
+			
+			//now that we've computed its font size, we center the time vertically
+			$('timer').setStyle('top', ($('topLeft').getSize().y - $('timer').getSize().y)/2);
+			
+			var remainingHeight = viewSize.y-$('chrome').getSize().y;
+			remainingHeight -= 60; //TODO - what the heck is this all about?
+			if(remainingHeight < 0) //ie freaks out if we try to set negative sizes
+				remainingHeight = 0;
 			$('timesArea').setStyle('height', remainingHeight);
+
+			//this just seems like as good a time as any to update the session info bar
+			refreshSessionInfo();
+			
+			isResizing = false;
 		}, 100); // 100 seems to work here ... man this feels hacky
 	};
 	window.addEvent('load', resizeTimesArea);
 	scrambleStuff.addScrambleChangeListener(resizeTimesArea);
 
 	window.addEvent('resize', resizeTimesArea); //TODO - ensure that draggable windows (scramble) are visible
+
+	var dragger = new Drag($('resizeTimer'));
+	dragger.addEvent('complete', function(el, e) {
+		var pos = el.getPosition();
+		var size = el.getSize();
+		var offset = $('topLeft').getPosition();
+		var newWidth = pos.x + size.x - offset.x - 1;
+		var newHeight = pos.y + size.y - offset.y - 2;
+		$('topLeft').setStyle('width', newWidth);
+		$('topLeft').setStyle('height', newHeight);
+		resizeTimesArea();
+	});
+	
+	/*
+	window.addEvent('keydown', function(e) {
+		console.log(e);
+		e.stop();
+	});
+	window.addEvent('keyup', function(e) {
+		console.log(e);
+		e.stop();
+	});
+	*/
+	new Keyboard().addShortcut('save', {
+	    'keys': 'ctrl+s',
+	    'description': 'Save the current document',
+	    'handler': function(e) { e.stop(); console.log(this); }
+	});
 });
 
 </script>
 </head>
 <body>
+<span id="sizer"></span>
 
 <div id="chrome">
-<span id="puzzleChooser"></span>
-<input id="scrambler" type="button" value="Next scramble"></input>
-
-<div id="scrambleArea"></div>
+	<div id="topLeft">
+		<div id="timer">1:00.53</div>
+		<div id="resizeTimer" class="resize-br"></div>
+	</div>
+	<div id="topRight">
+		<div id="scrambleBorder">
+			<span id="puzzleChooser"></span>
+			<input id="scrambler" type="button" value="Next scramble"></input>
+		</div>
+		
+		<div id="scrambleArea"></div>
+	</div>
+</div>
 
 <ul id="sessions" class="tabs">
 	<li id="newSession">+</li>
 </ul>
-</div>
-
 <div id="timesArea">
-<table id="timesTable"></table>
+	<div id="sessionInfo"></div>
+	<div id="timesTableArea"></div>
 </div>
 
 </body>

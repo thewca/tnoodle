@@ -102,6 +102,7 @@ function puzzleChanged() {
     colorScheme = null; //reset colorscheme
     currTurn = null;
     faceMap = null; //this indicates if the current puzzle support images
+    currScramble = null;
     puzzle = newPuzzle;
     scrambleImg.clear();
     firePuzzleChanged();
@@ -109,11 +110,16 @@ function puzzleChanged() {
     if(puzzle == null)
     	return;
 
+	scramble();
     scrambler.loadPuzzleImageInfo(function(puzzleImageInfo) {
     	if(puzzleImageInfo.error) {
     		faceMap = null; //scramble images are not supported
     		scrambleDiv.setVisible(false, false);
     	} else {
+    		//if the scramble has arrived, we format it into the turns
+    		if(currScramble)
+    			formatScramble();
+    		
     		faceMap = puzzleImageInfo.faces;
     		colorScheme = configuration.get('scramble.'+puzzle+'.colorScheme', clone(puzzleImageInfo.colorScheme));
     		defaultColorScheme = puzzleImageInfo.colorScheme;
@@ -127,7 +133,6 @@ function puzzleChanged() {
     		
     		scrambleResized();
     	}
-    	scramble();
     }, puzzle);
 }
 
@@ -190,14 +195,23 @@ function turnClicked(userInvoked) {
     scrambleDiv.setVisible(true, userInvoked);
     scrambleImg.drawScramble(currTurn.incrementalScramble);
 }
+
+var currScramble = null;
 function scrambleLoaded(scramble) {
-    deleteChildren(scramblePre);
+	currScramble = scramble;
+	
     if(!faceMap) {
     	//scramble images are not supported, so don't bother with links
+    	deleteChildren(scramblePre);
     	scramblePre.appendChild(document.createTextNode(scramble));
-    	return;
+    } else {
+    	formatScramble();
     }
-    var turns = scramble.split(' ');
+}
+
+function formatScramble() {
+	deleteChildren(scramblePre);
+    var turns = currScramble.split(' ');
     var incrementalScramble = "";
     for(var i = 0; i < turns.length; i++) {
         var turn = turns[i];
@@ -706,9 +720,8 @@ function promptSeed() {
 		scrambleImg.setAttribute('usemap', '#scrambleImgMap');
 		scrambleDiv.appendChild(scrambleImg);
 		
-		scrambleImg.scramble = null;
 		scrambleImg.redraw = function() {
-		    this.drawScramble(this.scramble);
+		    this.drawScramble(currScramble);
 		};
 		scrambleImg.drawScramble = function(scramble) {
 		    this.scramble = scramble;

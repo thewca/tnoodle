@@ -38,8 +38,8 @@ span.turn:hover {
 }
 .scrambleText {
     white-space: pre-wrap;
-    margin-top: 8px;
-    margin-bottom: 5px;
+    margin: 0px;
+    padding: 2px;
 }
 
 area {/* apparently this doesn't work in opera or chrome */
@@ -47,12 +47,9 @@ area {/* apparently this doesn't work in opera or chrome */
 }
 
 div.scrambleArea {
-	/*TODO - even spacing between top and bottom of scrambles */
     border: 1px solid #333;
-    padding: 5px;
 }
 div.scrambleHeader {
-	margin: -5px; /* I'm no css expert, but this seems to do the job */
 	padding: 5px;
 	position: relative;
     border-bottom: 1px solid #333;

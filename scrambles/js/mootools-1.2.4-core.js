@@ -724,7 +724,9 @@ Number.implement({
 	},
 
 	toInt: function(base){
-		return parseInt(this, base || 10);
+		//https://mootools.lighthouseapp.com/projects/2706-mootools/tickets/936-toint-bug-leads-to-datediff-bug
+		//return parseInt(this, base || 10);
+		return this | 0; //this has the effect of truncating the fractional part of this number
 	}
 
 });
@@ -800,7 +802,8 @@ String.implement({
 	},
 
 	toInt: function(base){
-		return parseInt(this, base || 10);
+		return parseInt(String(this).indexOf('e')>=0 ? parseFloat(this)<<0 : this, base)
+		//return parseInt(this, base || 10);
 	},
 
 	toFloat: function(){
