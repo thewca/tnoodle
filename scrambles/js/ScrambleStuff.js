@@ -243,7 +243,7 @@ function faceClicked() {
 function getScrambleVertPadding() {
     //var headerStyle = window.getComputedStyle(scrambleDivHeader, null);
     //var scrambleHeader = parsePx(headerStyle.getPropertyValue("height")) + parsePx(headerStyle.getPropertyValue("border-bottom-width"));
-    var scrambleHeader = 20; //apprently dynamically computing this doesn't work on opera
+    var scrambleHeader = 20 + 1 + 2; //apprently dynamically computing this doesn't work on opera
     var scrambleStyle = window.getComputedStyle(scrambleImg, null);
     return parsePx(scrambleStyle.getPropertyValue("padding-top")) + parsePx(scrambleStyle.getPropertyValue("padding-bottom")) + scrambleHeader;
 }
@@ -553,6 +553,7 @@ function promptSeed() {
     	xAddListener(importUrlLink, 'click', promptImportUrl, false);
     	importUrlLink.appendChild(document.createTextNode('From Url'));
     	scrambleHeader.appendChild(importUrlLink);
+    	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	var importFileLink = document.createElement('span');
     	importFileLink.title = "Import scrambles from file";
@@ -560,6 +561,7 @@ function promptSeed() {
     	xAddListener(importFileLink, 'click', promptImportFile, false);
     	importFileLink.appendChild(document.createTextNode('From File'));
     	scrambleHeader.appendChild(importFileLink);
+    	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	var seedLink = document.createElement('span');
     	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
@@ -567,6 +569,7 @@ function promptSeed() {
     	xAddListener(seedLink, 'click', promptSeed, false);
     	seedLink.appendChild(document.createTextNode('Seed'));
     	scrambleHeader.appendChild(seedLink);
+    	scrambleHeader.appendChild(document.createTextNode(' '));
     	
     	var newScrambleLink = document.createElement('span');
     	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
@@ -688,32 +691,32 @@ function promptSeed() {
 			scrambleHeaderText.className = 'titletext';
 			scrambleDivHeader.appendChild(scrambleHeaderText);
 			
+			var closeScramble = document.createElement('span');
+			closeScramble.appendChild(document.createTextNode('X'));
+			closeScramble.className = 'button close';
+			xAddListener(closeScramble, 'click', function() { scrambleDiv.setVisible(false, true); }, false);
+			scrambleDivHeader.appendChild(closeScramble);
+			
+			var changeColors = document.createElement('span');
+			changeColors.className = 'button changeColors';
+			changeColors.setAttribute('title', 'Change color scheme');
+			//changeColors.appendChild(document.createTextNode('#'));
+			xAddListener(changeColors, 'click', changeColorsClicked, false);
+			scrambleDivHeader.appendChild(changeColors);
+			
 			var resetColorScheme = document.createElement('span');
-			resetColorScheme.appendChild(document.createTextNode('*'));
+			//resetColorScheme.appendChild(document.createTextNode('*'));
 			resetColorScheme.setAttribute('title', 'Reset color scheme');
-			resetColorScheme.className = 'button';
+			resetColorScheme.className = 'button reset';
 			resetColorScheme.style.display = 'none';
 			xAddListener(resetColorScheme, 'click', function() {
 				if(confirm("Reset the color scheme?")) {
 					colorScheme = clone(defaultColorScheme);
 					configuration.set('scramble.'+puzzle+'.colorScheme', colorScheme);
-					scrambleImg.redraw();
+					scrambleImg.drawScramble("");
 				}
 			}, false);
 			scrambleDivHeader.appendChild(resetColorScheme);
-			
-			var changeColors = document.createElement('span');
-			changeColors.className = 'button';
-			changeColors.setAttribute('title', 'Change color scheme');
-			changeColors.appendChild(document.createTextNode('#'));
-			xAddListener(changeColors, 'click', changeColorsClicked, false);
-			scrambleDivHeader.appendChild(changeColors);
-			
-			var closeScramble = document.createElement('span');
-			closeScramble.appendChild(document.createTextNode('X'));
-			closeScramble.className = 'button';
-			xAddListener(closeScramble, 'click', function() { scrambleDiv.setVisible(false, true); }, false);
-			scrambleDivHeader.appendChild(closeScramble);
 		//end scrambleDivHeader
 
 		var scrambleImg = document.createElement('img');
@@ -724,7 +727,6 @@ function promptSeed() {
 		    this.drawScramble(currScramble);
 		};
 		scrambleImg.drawScramble = function(scramble) {
-		    this.scramble = scramble;
 		    if(scrambleDiv.style.display != 'none') { //no need to waste bandwidth unless we're actually displaying images
 		    	this.clear(); //since the next image may take a while to load, we place this one first
 			    this.src = scrambler.getScrambleImageUrl(puzzle, scramble, colorScheme);
@@ -776,7 +778,7 @@ function promptSeed() {
 			colorScheme[currFaceName] = newColor;
 			configuration.set('scramble.'+puzzle+'.colorScheme', colorScheme);
 			colorChooserDiv.style.display = 'none';
-			scrambleImg.redraw();
+			scrambleImg.drawScramble("");
 		});
 		colorChooserDiv.appendChild(colorChooser.element);
 	//end colorChooserDiv

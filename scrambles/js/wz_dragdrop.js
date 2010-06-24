@@ -378,7 +378,11 @@ dd.setDwnHdl = function(d_x)
 	if(document.onmousedown != d_x)
 	{
 		dd.downFunc = document.onmousedown;
-		document.onmousedown = d_x;
+		if(document.addEventListener) {
+			document.addEventListener('mousedown', d_x, false);
+		} else {
+			document.attachEvent('onmousedown', function(e) { d_x.call(document, e); });
+		}
 		if(dd.ce) dd.setCe(Event.MOUSEDOWN, d_x);
 	}
 };
@@ -1152,7 +1156,7 @@ function PICK(d_ev)
 				dd.setMovHdl(RESIZE);
 				dd.reszTo(dd.obj.w, dd.obj.h);
 			}
-			else if(isDraggable(dd.e.src)) {
+			else if(d_ev.altKey || isDraggable(dd.e.src)) {
 				dd.obj.is_dragged = 1;
 				dd.setMovHdl(DRAG);
 			} else {

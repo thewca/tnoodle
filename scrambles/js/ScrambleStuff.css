@@ -1,5 +1,7 @@
 span.changeSize {
-	float: left;
+	position: absolute;
+	left: 2px;
+	top: 4px;
 	line-height: 70%;
 }
 span.increaseSize {
@@ -15,6 +17,7 @@ span.increaseSize:hover, span.decreaseSize:hover {
 }
 
 span.link {
+	white-space: nowrap;
 	color: brown;
 	text-decoration: underline;
 	cursor: pointer;
@@ -62,4 +65,14 @@ div.scrambleHeader {
 	background-color: #EEE;
 	padding: 5px;
 	border: 1px solid;
+}
+
+.button.changeColors {
+	background: transparent url('color_wheel.png') no-repeat scroll center center;
+}
+.button.reset {
+	background: transparent url('arrow_undo.png') no-repeat scroll center center;
+}
+.button.close {
+	/* TODO - pretty close image? */
 }

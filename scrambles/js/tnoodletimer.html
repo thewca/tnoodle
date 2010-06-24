@@ -18,8 +18,19 @@ img {
     padding: 1px;
 }
 
+.importDiv {
+	right: 0px;
+}
+
 #chrome {
 	margin-bottom: 10px;
+}
+#resizeTimer, #horizontalRuler, #verticalRuler {
+	z-index: 1;
+}
+#horizontalRuler, #verticalRuler {
+	position: absolute;
+	background-color: black;
 }
 .resize-br {
     background: none repeat scroll 0 0 #FFF;
@@ -366,6 +377,31 @@ window.addEvent('domready', function() {
 		$('topLeft').setStyle('height', newHeight);
 		resizeTimesArea();
 	});
+	function positionRulers() {
+		//there's a lot of pixel pushing here, oh well
+		var loc = $('resizeTimer').getPosition();
+		var width = window.getSize().x;
+		$('horizontalRuler').setStyle('width', width);
+		$('horizontalRuler').setStyle('height', 3);
+		$('horizontalRuler').setPosition({x: 0, y: loc.y-6});
+		
+		$('verticalRuler').setStyle('width', 3);
+		$('verticalRuler').setStyle('height', loc.y-2);
+		$('verticalRuler').setPosition({x: loc.x+2, y: 0});
+	}
+	//should this be on start, on drag, or beforeStart?
+	dragger.addEvent('beforeStart', function(el) {
+		$('horizontalRuler').fade('in');
+		$('verticalRuler').fade('in');
+		positionRulers();
+	});
+	dragger.addEvent('drag', positionRulers);
+	function doneDragging() {
+		$('horizontalRuler').fade('out');
+		$('verticalRuler').fade('out');
+	}
+	dragger.addEvent('cancel', doneDragging);
+	dragger.addEvent('complete', doneDragging);
 	
 	/*
 	window.addEvent('keydown', function(e) {
@@ -392,6 +428,8 @@ window.addEvent('domready', function() {
 <div id="chrome">
 	<div id="topLeft">
 		<div id="timer">1:00.53</div>
+		<div id="horizontalRuler"></div>
+		<div id="verticalRuler"></div>
 		<div id="resizeTimer" class="resize-br"></div>
 	</div>
 	<div id="topRight">
