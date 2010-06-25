@@ -11,7 +11,7 @@ html, body {
 	font-family: sans-serif;
 }
 body {
-	margin: 8px;
+	margin: 0px 8px 8px 8px;
 }
 img {
     border: none;
@@ -40,15 +40,9 @@ img {
     width: 5px;
     height: 5px;
 
- /* unfortunately, dragging doesn't seem to work if I set the bottom and right attributes */
     cursor: se-resize;
-    top: 195px;
-    left: 344px;
 }
 #topLeft {
-	width: 350px;
-	height: 200px;
-	
 	position: absolute;
 	left: 0px;
 	
@@ -58,6 +52,11 @@ img {
 	position: absolute;
 	right: 8px;
 }
+.scrambleText {
+	overflow: auto;
+}
+
+/*** This is for KeyboardTimer.js***/
 @font-face {  
 	font-family: lcd;
 	src: url("Digiface Regular.eot");
@@ -66,17 +65,15 @@ img {
 }
 #timer, #sizer {
 	font-family: lcd;
-	position: relative; /* this will let us manually center the text with js */ 
+	position: relative;  
 }
-.scrambleText {
-	overflow: auto;
-}
+/*** End KeyboardTimer.js ***/
 
 .tabs {
 /* TODO: this doesn't overflow nicely */
 	overflow: auto;
 	
-	/* This lets our tabs overflow the border */
+	/* This lets our tabs overflow the border below */
 	position: relative;
 	top: 1px;
 	
@@ -168,12 +165,15 @@ img {
 <script type="text/javascript" src="wz_dragdrop.js"></script>
 <script type="text/javascript" src="ColorChooser.js"></script>
 <script type="text/javascript" src="ScrambleStuff.js"></script>
+<script type="text/javascript" src="KeyboardTimer.js"></script>
 
 <script type="text/javascript">
 window.addEvent('domready', function() {
 	var sessions = new Hash({ "l4erux": { puzzle: "4x4x4", times: [ 65, 70 ] } });
 	
 	var configuration = new tnoodle.server().configuration;
+	
+	var timer = new KeyboardTimer($('topLeft'));
 
 	function scramblesLoaded() {
 		sessionClicked.call($(currSessionId), null);
@@ -211,6 +211,12 @@ window.addEvent('domready', function() {
 	}
 	
 	var currSessionId = null;
+	var currSessionTable = null;
+	timer.addEvent('newTime', function(timeCentis) {
+		var times = sessions[currSessionId].times;
+		times.push(timeCentis);
+		currSessionTable.push([times.length, (timeCentis/100).toFixed(2)]);
+	});
 	function sessionClicked(e) {
 		newId = this.id;
 		// if e == null, then this function wasn't called by the user clicking something,
@@ -235,6 +241,7 @@ window.addEvent('domready', function() {
 			sortable: true,
 			zebra: false,
 		});
+		currSessionTable = table; //TODO - just a temp hack, right?
 		table.addEvent('onSort', function(tbody, index) {
 			configuration.set('times.sort', this.sorted);
 		});
@@ -317,9 +324,8 @@ window.addEvent('domready', function() {
 			var topLeftSize = $('topLeft').getSize();
 			var h = topLeftSize.y;
 
+			timer.redraw();
 			$('chrome').setStyle('height', h);
-			//$('topLeft').setStyle('height', h);
-			//$('topLeft').setStyle('width', .3*viewSize.x);
 
 			$('topRight').setStyle('height', h);
 			var newH = Math.max(0, viewSize.x-topLeftSize.x-$('topRight').getStyle('right').toInt());
@@ -331,23 +337,6 @@ window.addEvent('domready', function() {
 			var scrambleText = $$('.scrambleText')[0];
 			var padding = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-top').toInt();
 			$$('.scrambleText')[0].setStyle('height', h-padding);
-
-			//figure out what the largest we can make the timer is
-			//this makes use of our "sizer" span
-			$('sizer').setStyle('display', 'inline');
-			$('sizer').set('html', $('timer').get('html'));
-			
-			var maxSize = $('topLeft').getSize();
-			var size = maxSize.y;
-			do {
-				$('sizer').setStyle('font-size', --size);
-				var width = $('sizer').getSize().x;
-			} while(width > maxSize.x);
-			$('sizer').setStyle('display', 'none');
-			$('timer').setStyle('font-size', size);
-			
-			//now that we've computed its font size, we center the time vertically
-			$('timer').setStyle('top', ($('topLeft').getSize().y - $('timer').getSize().y)/2);
 			
 			var remainingHeight = viewSize.y-$('chrome').getSize().y;
 			remainingHeight -= 60; //TODO - what the heck is this all about?
@@ -366,6 +355,13 @@ window.addEvent('domready', function() {
 
 	window.addEvent('resize', resizeTimesArea); //TODO - ensure that draggable windows (scramble) are visible
 
+	//setting size of the timer
+	var width = configuration.get('timer.width', 350);
+	var height = configuration.get('timer.height', 200);
+	$('topLeft').setStyle('width', width);
+	$('topLeft').setStyle('height', height);
+	$('resizeTimer').setPosition({x: width-5-1, y: height-5});
+	
 	var dragger = new Drag($('resizeTimer'));
 	dragger.addEvent('complete', function(el, e) {
 		var pos = el.getPosition();
@@ -375,6 +371,8 @@ window.addEvent('domready', function() {
 		var newHeight = pos.y + size.y - offset.y - 2;
 		$('topLeft').setStyle('width', newWidth);
 		$('topLeft').setStyle('height', newHeight);
+		configuration.set('timer.width', newWidth);
+		configuration.set('timer.height', newHeight);
 		resizeTimesArea();
 	});
 	function positionRulers() {
@@ -383,10 +381,10 @@ window.addEvent('domready', function() {
 		var width = window.getSize().x;
 		$('horizontalRuler').setStyle('width', width);
 		$('horizontalRuler').setStyle('height', 3);
-		$('horizontalRuler').setPosition({x: 0, y: loc.y-6});
+		$('horizontalRuler').setPosition({x: 0, y: loc.y+2});
 		
 		$('verticalRuler').setStyle('width', 3);
-		$('verticalRuler').setStyle('height', loc.y-2);
+		$('verticalRuler').setStyle('height', loc.y);
 		$('verticalRuler').setPosition({x: loc.x+2, y: 0});
 	}
 	//should this be on start, on drag, or beforeStart?
@@ -403,16 +401,6 @@ window.addEvent('domready', function() {
 	dragger.addEvent('cancel', doneDragging);
 	dragger.addEvent('complete', doneDragging);
 	
-	/*
-	window.addEvent('keydown', function(e) {
-		console.log(e);
-		e.stop();
-	});
-	window.addEvent('keyup', function(e) {
-		console.log(e);
-		e.stop();
-	});
-	*/
 	new Keyboard().addShortcut('save', {
 	    'keys': 'ctrl+s',
 	    'description': 'Save the current document',
@@ -423,11 +411,8 @@ window.addEvent('domready', function() {
 </script>
 </head>
 <body>
-<span id="sizer"></span>
-
 <div id="chrome">
 	<div id="topLeft">
-		<div id="timer">1:00.53</div>
 		<div id="horizontalRuler"></div>
 		<div id="verticalRuler"></div>
 		<div id="resizeTimer" class="resize-br"></div>
