@@ -20,7 +20,8 @@ var KeyboardTimer = new Class({
 		
 		var keys = new Hash();
 		window.addEvent('keydown', function(e) {
-			//e.stop();
+			if(e.code == '32')
+				e.stop(); //stop space from scrolling
 			keys.set(e.code, true);
 			if(timer.timing) {
 				//stopping timer

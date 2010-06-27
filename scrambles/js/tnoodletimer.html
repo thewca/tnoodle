@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ScramblerTest</title>
+<title>TNoodleTimer</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 
 <link type="text/css" rel="stylesheet" href="ScrambleStuff.css" media="screen" />
@@ -121,7 +121,6 @@ img {
 
 #timesArea {
 	border: 1px solid;
-	overflow: auto;
 }
 
 #timesTable {
@@ -129,15 +128,23 @@ img {
 	/*border-style: hidden;*/
 	border-collapse: collapse;
 }
+#timesTable thead tr, #timesTable tfoot tr {
+	display: block;
+}
+#timesTable tbody {
+	overflow: auto;
+	display: block;
+}
 #timesTable th {
 	cursor: pointer;
 }
-#timesTable .table-th-sort .table-th-sort-span {
-	/*background: red;*/
-	background: transparent url('bullet_arrow_up.png') 0px 0px no-repeat;
+#timesTable .table-th-sort-span {
 	display: inline-block;
 	width: 16px;
 	height: 16px;
+}
+#timesTable .table-th-sort .table-th-sort-span {
+	background: transparent url('bullet_arrow_up.png') 0px 0px no-repeat;
 }
 
 #timesTable .table-th-sort-rev .table-th-sort-span {
@@ -150,7 +157,6 @@ img {
 	border: 1px solid;
 	padding: 1px 2px 1px 2px;
 	border-style: inset;
-	background-color: white;
 }
 
 #timesTable tr:nth-child(even) {background: #CCC}
@@ -166,35 +172,40 @@ img {
 <script type="text/javascript" src="ColorChooser.js"></script>
 <script type="text/javascript" src="ScrambleStuff.js"></script>
 <script type="text/javascript" src="KeyboardTimer.js"></script>
+<script type="text/javascript" src="TimesTable.js"></script>
 
 <script type="text/javascript">
 window.addEvent('domready', function() {
-	var sessions = new Hash({ "l4erux": { puzzle: "4x4x4", times: [ 65, 70 ] } });
-	
-	var configuration = new tnoodle.server().configuration;
+	var server = new tnoodle.server();
+	var configuration = server.configuration;
 	
 	var timer = new KeyboardTimer($('topLeft'));
 
-	function scramblesLoaded() {
-		sessionClicked.call($(currSessionId), null);
+	//we have to wait for both the scrambles and the sessions to load,
+	//and we can't know which will load first, so we use lastSessionTab and scramblesLoades
+	//to keep track
+	var lastSessionTab = null;
+	var scramblesLoaded = false;
+	function onScramblesLoaded() {
+		scramblesLoaded = true;
+		if(lastSessionTab)
+			sessionClicked.call(lastSessionTab, null);
 	}
-	var scrambleStuff = new ScrambleStuff(configuration, scramblesLoaded);
+	var scrambleStuff = new ScrambleStuff(configuration, onScramblesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 	
-	$('scrambler').addEvent('click', scrambleStuff.scramble);
-
-	
 	scrambleStuff.addPuzzleChangeListener(function(newPuzzle) {
-		sessions[currSessionId].puzzle = newPuzzle;
+		session.puzzle = newPuzzle;
 	});
 
 	function refreshSessionInfo() {
-		var session = sessions.get(currSessionId);
+		if(!session) return; //gotta wait for stuff to load
+		
 		$('sessionInfo').empty();
 		$('sessionInfo').appendText(session.puzzle + " session ");
-		//$('sessionInfo').appendText(currSessionId + " ");
-		var date = new Date(1000*parseInt(currSessionId, 36));
+		//$('sessionInfo').appendText(session.id + " ");
+		var date = new Date(1000*parseInt(session.id, 36));
 		var today = new Date();
 		var i, ago;
 		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
@@ -204,109 +215,86 @@ window.addEvent('domready', function() {
 			if(ago > 0)
 				break;
 		}
-		if(i < resolutions.length) {
-			$('sessionInfo').appendText("started " + ago + " " + resolutions[i] + "(s) ago");
-		} else
-			$('sessionInfo').appendText("started seconds ago");
+		var ago = (i < resolutions.length) ? 
+				ago + " " + resolutions[i] + "(s)" :
+				"seconds";
+		$('sessionInfo').appendText("started " + ago + " ago");
 	}
 	
-	var currSessionId = null;
-	var currSessionTable = null;
+	var session = null;
+	var timesTable = new TimesTable($('timesTable'), configuration);
 	timer.addEvent('newTime', function(timeCentis) {
-		var times = sessions[currSessionId].times;
-		times.push(timeCentis);
-		currSessionTable.push([times.length, (timeCentis/100).toFixed(2)]);
+		timesTable.addTime(timeCentis);
+		scrambleStuff.scramble();
 	});
 	function sessionClicked(e) {
-		newId = this.id;
-		// if e == null, then this function wasn't called by the user clicking something,
-		// so we go ahead and select the session (this allows for initialization)
-		if(e != null && newId === currSessionId)
+		lastSessionTab = this;
+		var newSession = this.session;
+		if(newSession === session)
 			return;
-		currSessionId = newId;
-		var session = sessions[currSessionId];
-		
+		session = newSession;
 		$$('#sessions .active').each(function(el) {
 			el.removeClass('active');
 		});
 		this.addClass('active');
 
+		timesTable.setSession(session);
 		refreshSessionInfo();
-		
-		// setting up the times table
-		var table = new HtmlTable({
-			properties: { id: 'timesTable' },
-			headers: [ '', 'Time' ],
-			rows: [],
-			sortable: true,
-			zebra: false,
-		});
-		currSessionTable = table; //TODO - just a temp hack, right?
-		table.addEvent('onSort', function(tbody, index) {
-			configuration.set('times.sort', this.sorted);
-		});
-		session.times.each(function(time, index) {
-			table.push([index+1, time]);
-		});
-		var sort = configuration.get('times.sort', { index: 0, reverse: false });
-		table.sort(sort.index, sort.reverse);
-		
-		$('timesTableArea').empty();
-		table.inject($('timesTableArea'));
-
 		scrambleStuff.setSelectedPuzzle(session.puzzle);
 	}
 	function closeSession(e) {
 		e.stop(); //prevent the tab from activating
-
-		var newTab = $(this.sessionId).nextSibling; //try the tab to the right
-		if(!sessions.has(newTab.id)) {
-			newTab = $(this.sessionId).previousSibling; //try the tab to the left
-			if(!sessions.has(newTab.id)) {
+		var deletedSession = this.session;
+		
+		var newTab = lastSessionTab.nextSibling; //try the tab to the right
+		if(!newTab.session) {
+			newTab = lastSessionTab.previousSibling; //try the tab to the left
+			if(!newTab.session) {
 				//TODO - create new session? for now, we just don't allow it
 				return;
 			}
 		}
-		
-		delete sessions[this.sessionId];
-		$(this.sessionId).dispose();
-		if(this.sessionId == currSessionId) {
+
+		server.disposeSession(deletedSession);
+		this.tab.dispose();
+		if(deletedSession == session) {
 			//deleting the current session, so we select the next one to the left
 			sessionClicked.call(newTab);			
 		}
 	}
-	function createSessionTab(sessionId) {
+	function createSessionTab(session) {
 		//TODO - puzzle icon
-		var newSession = new Element('li', { 'html': sessionId, 'id': sessionId });
-		newSession.addEvent('click', sessionClicked);
+		var tab = new Element('li', { 'html': session.id });
+		tab.addEvent('click', sessionClicked);
+		tab.session = session;
 
 		var close = new Element('span', { 'html': 'X', 'class': 'delete' });
-		close.sessionId = sessionId;
-		close.inject(newSession, 'bottom'); 
+		close.session = session;
+		close.tab = tab;
+		close.inject(tab, 'bottom'); 
 		close.addEvent('click', closeSession);
-		return newSession;
+		return tab;
 	}
 	
 	$('newSession').addEvent('click', function(e) {
-		//sessionId is the number of seconds since the epoch encoded in base 36 for readability
-		var sessionId = Math.round(new Date().getTime()/1000).toString(36);
-		if(sessionId in sessions) //we don't want duplicate session ids
+		var session = server.createSession(scrambleStuff.getSelectedPuzzle());
+		if(!session) //couldn't create session, for whatever reason
 			return;
 
-		//TODO - use default puzzle for session? if so, how does the user set the default puzzle?
-		sessions.set(sessionId, {puzzle: scrambleStuff.getSelectedPuzzle(), times: []});
-		var sessionTab = createSessionTab(sessionId);
-		sessionTab.inject($('newSession'), 'before');
-		sessionClicked.call(sessionTab, null);
+		var tab = createSessionTab(session);
+		tab.inject($('newSession'), 'before');
+		sessionClicked.call(tab, null);
 	});
 
 	//TODO - do something if sessions is empty!
-	sessions.getKeys().sort().each(function(sessionId, index, ids) {
-		var sessionTab = createSessionTab(sessionId);
+	server.sessions.each(function(sesh, index, ids) {
+		var sessionTab = createSessionTab(sesh);
 		sessionTab.inject($('newSession'), 'before');
 		if(index == ids.length - 1) {
 			//we set the current session to the most recent session
-			currSessionId = sessionId;
+			lastSessionTab = sessionTab;
+			if(scramblesLoaded)
+				sessionClicked.call(lastSessionTab);
 		}
 	});
 
@@ -319,6 +307,7 @@ window.addEvent('domready', function() {
 		isResizing = true;
 		setTimeout(function() { //wait for laying-out to occur
 			//TODO - I DO NOT believe that this can't be done with css!!!
+			//TODO - hide everything until the first resize occurs?
 			
 			var viewSize = window.getSize();
 			var topLeftSize = $('topLeft').getSize();
@@ -339,10 +328,13 @@ window.addEvent('domready', function() {
 			$$('.scrambleText')[0].setStyle('height', h-padding);
 			
 			var remainingHeight = viewSize.y-$('chrome').getSize().y;
-			remainingHeight -= 60; //TODO - what the heck is this all about?
+			remainingHeight -= 50; //TODO - what the heck is this all about?
 			if(remainingHeight < 0) //ie freaks out if we try to set negative sizes
 				remainingHeight = 0;
 			$('timesArea').setStyle('height', remainingHeight);
+
+			remainingHeight -= $('sessionInfo').getSize().y;
+			timesTable.resize();
 
 			//this just seems like as good a time as any to update the session info bar
 			refreshSessionInfo();
@@ -351,7 +343,7 @@ window.addEvent('domready', function() {
 		}, 100); // 100 seems to work here ... man this feels hacky
 	};
 	window.addEvent('load', resizeTimesArea);
-	scrambleStuff.addScrambleChangeListener(resizeTimesArea);
+	//scrambleStuff.addScrambleChangeListener(resizeTimesArea); //new scrambles no longer resize the window
 
 	window.addEvent('resize', resizeTimesArea); //TODO - ensure that draggable windows (scramble) are visible
 
@@ -420,7 +412,6 @@ window.addEvent('domready', function() {
 	<div id="topRight">
 		<div id="scrambleBorder">
 			<span id="puzzleChooser"></span>
-			<input id="scrambler" type="button" value="Next scramble"></input>
 		</div>
 		
 		<div id="scrambleArea"></div>
@@ -432,7 +423,7 @@ window.addEvent('domready', function() {
 </ul>
 <div id="timesArea">
 	<div id="sessionInfo"></div>
-	<div id="timesTableArea"></div>
+	<table id="timesTable"></table>
 </div>
 
 </body>
