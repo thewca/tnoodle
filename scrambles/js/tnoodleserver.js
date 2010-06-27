@@ -1,5 +1,4 @@
 var tnoodle = tnoodle || {};
-
 tnoodle.server = function(url) {
 	this.configuration = new function() {
 		var localFile = document.location.href.match(/^file:\/\/.*$/) && navigator.userAgent.match(/firefox/i); //TODO GAH! localStorage doesn't work offline in ff! wtf?
@@ -63,10 +62,72 @@ tnoodle.server = function(url) {
 			return (property in data) ? data[property] : def;
 		};
 	};
+
+	var server = this;
+	this.formatTime = function(timeCentis) {
+		//TODO - add gui option!!!
+		if(server.configuration.get('clockFormat', true))
+			return server.clockFormat(timeCentis);
+		else
+			return (timeCentis/100).toFixed(2);
+	};
+	this.clockFormat = function(timeCentis) {
+		var hours = (timeCentis / (100*60*60)).toInt();
+		timeCentis = timeCentis % (100*60*60);
+		var minutes = (timeCentis / (100*60)).toInt();
+		timeCentis = timeCentis % (100*60);
+		var seconds = (timeCentis / 100).toInt();
+		var centis = timeCentis % 100;
 	
-	this.sessions = [];// { id: "l4erux", puzzle: "4x4x4", times: [ 65, 70 ] } };
+		var clocked = "";
+		if(hours > 0) {
+			clocked += hours + ":";
+			if(minutes == 0)
+				clocked += "00:";
+			else if(minutes < 10)
+				clocked += "0";
+		}
+		if(minutes > 0) {
+			clocked += minutes + ":";
+			if(seconds < 10)
+				clocked += "0";
+		}
+		clocked += seconds + ".";
+		if(centis < 10)
+			clocked += "0";
+		clocked += centis;
+		return clocked;
+	};
+	
+	/* time can be either a number or a string */
+	function Time(time) {
+		this.format = function() {
+			return server.formatTime(this.centis);
+		};
+		this.parse = function(time) {
+			//TODO - be descriptive with errors
+			//TODO - support clock formatting
+			//TODO - +2, DNF
+			if(time.length == 0 || time == '.')
+				throw "time doesn't contain any digits"
+				if(!time.match(/^\d*(\.\d*)?$/))
+					throw "error parsing time";
+			this.centis = Math.round(time.toFloat()*100);
+		};
+		
+		if(typeof(time) === "number")
+			this.centis = time;
+		else
+			this.parse(time.toString());
+		
+		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = '';
+		//TODO - creation date
+		//TODO - tags
+		//TODO - comments?
+	}
+	this.sessions = [];
 	var sessions = this.sessions;
-	function session(id, puzzle) {
+	function Session(id, puzzle) {
 		this.id = id;
 		this.puzzle = puzzle;
 		//times is an array of objects with the following keys: centis, mean3, ra5, ra12, ave100, sessionAve
@@ -78,7 +139,10 @@ tnoodle.server = function(url) {
 		};
 		this.attemptCount = function() {
 			return this.times.length;
-		}
+		};
+		this.reset = function() {
+			this.times.length = 0;
+		};
 		this.bestTime = function() {
 			var minCentis = Infinity;
 			var min = { format: function() { return "?"; } }; //TODO - default NaN time?
@@ -91,18 +155,16 @@ tnoodle.server = function(url) {
 			return min;
 		};
 		this.addTime = function(timeCentis) {
-			var newTime = { 
-					centis: timeCentis,
-					format: function() {
-						return (this.centis/100).toFixed(2);
-					}
-			};
-			this.times.push(newTime);
-			return newTime;
+			var time = new Time(timeCentis);
+			this.times.push(time);
+			return time;
 		};
 		//returns the deleted time
-		this.disposeTime = function(index) {
+		this.disposeTimeAt = function(index) {
 			return this.times.splice(index, 1);
+		};
+		this.disposeTime = function(time) {
+			return this.times.splice(this.times.indexOf(time), 1);
 		};
 	}
 	//TODO - use default puzzle for session? if so, how does the user set the default puzzle?
@@ -111,7 +173,7 @@ tnoodle.server = function(url) {
 		var id = Math.round(new Date().getTime()/1000).toString(36);
 		if(id in this.sessions) //we don't want duplicate session ids
 			return null;
-		var sesh = new session(id, puzzle);
+		var sesh = new Session(id, puzzle);
 		this.sessions.push(sesh);
 		return sesh;
 	};
@@ -126,5 +188,5 @@ tnoodle.server = function(url) {
 	//TODO - load sessions from config!
 	var sesh = this.createSession("4x4x4");
 	for(var i = 0; i < 9; i++)
-		sesh.addTime(1384);
+		sesh.addTime(1384 + i);
 };

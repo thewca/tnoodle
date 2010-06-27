@@ -30,7 +30,7 @@ span.link:hover, span.down {
 
 span.turn {
 	color: black;
-	text-decoration: underline;
+	/*text-decoration: underline;*/
 	cursor: pointer;
 }
 span.currTurn {

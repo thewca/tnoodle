@@ -161,6 +161,14 @@ img {
 
 #timesTable tr:nth-child(even) {background: #CCC}
 #timesTable tr:nth-child(odd) {background: #FFF}
+#timesTable tbody tr:hover, #timesTable tr.addTime:hover {
+	background-color: rgb(160, 160, 255);
+}
+
+.deleteTime { /* TODO: pretty picture! */
+	cursor: pointer;
+}
+
 
 </style>
 
@@ -179,7 +187,7 @@ window.addEvent('domready', function() {
 	var server = new tnoodle.server();
 	var configuration = server.configuration;
 	
-	var timer = new KeyboardTimer($('topLeft'));
+	var timer = new KeyboardTimer($('topLeft'), server);
 
 	//we have to wait for both the scrambles and the sessions to load,
 	//and we can't know which will load first, so we use lastSessionTab and scramblesLoades
@@ -197,11 +205,15 @@ window.addEvent('domready', function() {
 	
 	scrambleStuff.addPuzzleChangeListener(function(newPuzzle) {
 		session.puzzle = newPuzzle;
+		refreshSessionInfo();
 	});
 
+	function resetSession() {
+		if(confirm("Are you sure you want to reset the session?"))
+			timesTable.reset();
+	}
 	function refreshSessionInfo() {
 		if(!session) return; //gotta wait for stuff to load
-		
 		$('sessionInfo').empty();
 		$('sessionInfo').appendText(session.puzzle + " session ");
 		//$('sessionInfo').appendText(session.id + " ");
@@ -219,6 +231,9 @@ window.addEvent('domready', function() {
 				ago + " " + resolutions[i] + "(s)" :
 				"seconds";
 		$('sessionInfo').appendText("started " + ago + " ago");
+		var reset = new Element('span', { 'class': 'link', 'html': 'Reset' });
+		reset.addEvent('click', resetSession);
+		reset.inject($('sessionInfo'));
 	}
 	
 	var session = null;
@@ -250,7 +265,9 @@ window.addEvent('domready', function() {
 		if(!newTab.session) {
 			newTab = lastSessionTab.previousSibling; //try the tab to the left
 			if(!newTab.session) {
-				//TODO - create new session? for now, we just don't allow it
+				if(confirm("You can't delete the last session! If you click ok, I will reset it.")) {
+					timesTable.reset();
+				}
 				return;
 			}
 		}
@@ -373,7 +390,7 @@ window.addEvent('domready', function() {
 		var width = window.getSize().x;
 		$('horizontalRuler').setStyle('width', width);
 		$('horizontalRuler').setStyle('height', 3);
-		$('horizontalRuler').setPosition({x: 0, y: loc.y+2});
+		$('horizontalRuler').setPosition({x: 0, y: loc.y+4});
 		
 		$('verticalRuler').setStyle('width', 3);
 		$('verticalRuler').setStyle('height', loc.y);
@@ -393,10 +410,21 @@ window.addEvent('domready', function() {
 	dragger.addEvent('cancel', doneDragging);
 	dragger.addEvent('complete', doneDragging);
 	
-	new Keyboard().addShortcut('save', {
+	var keyboard = new Keyboard();
+	keyboard.addShortcut('save', {
 	    'keys': 'ctrl+s',
 	    'description': 'Save the current document',
 	    'handler': function(e) { e.stop(); console.log(this); }
+	});
+	keyboard.addShortcut('add time', {
+		'keys': 'alt+a',
+		'description': 'Add time',
+		'handler': function(e) { e.stop(); timesTable.promptTime(); }
+	});
+	keyboard.addShortcut('reset', {
+		'keys': 'alt+r',
+		'description': 'Reset session',
+		'handler': resetSession
 	});
 });
 

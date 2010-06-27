@@ -2,8 +2,9 @@ var KeyboardTimer = new Class({
 	wcaInspection: true, //TODO - add gui option!
 	clockFormat: true, keyboardOnlyStarts: false, //TODO - implement these! and add gui...
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
-	initialize: function(parent) {
+	initialize: function(parent, server) {
 		this.parent = parent;
+		this.server = server;
 		
 		this.sizer = new Element('span');
 		this.sizer.id = 'sizer';
@@ -20,7 +21,10 @@ var KeyboardTimer = new Class({
 		
 		var keys = new Hash();
 		window.addEvent('keydown', function(e) {
-			if(e.code == '32')
+			//we disable the timer if an input of type text is focused
+			if(document.activeElement.type == "text")
+				return;
+			if(e.key == 'space')
 				e.stop(); //stop space from scrolling
 			keys.set(e.code, true);
 			if(timer.timing) {
@@ -32,9 +36,12 @@ var KeyboardTimer = new Class({
 			}
 		});
 		window.addEvent('keyup', function(e) {
+			//we disable the timer if an input of type text is focused
+			if(document.activeElement.type == "text")
+				return;
 			//e.stop();
 			keys.erase(e.code);
-			if(e.code != '32') //TODO - spacebar only starts?
+			if(e.key != 'space') //TODO - spacebar only starts?
 				return;
 			//TODO - alt-tabbing seems to be killing our keyboard state
 			if(true || keys.getLength() == 0) {
@@ -73,7 +80,7 @@ var KeyboardTimer = new Class({
 		if(this.inspecting)
 			return (15-this.getInspectionElapsedSeconds()).toString();
 		else
-			return (this.getTimeCentis()/100).toFixed(2);
+			return this.server.formatTime(this.getTimeCentis());
 	},
 	timerId: null,
 	startRender: function() {
