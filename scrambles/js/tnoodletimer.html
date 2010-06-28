@@ -367,6 +367,10 @@ window.addEvent('domready', function() {
 	}
 	window.addEvent('load', resizeTimesArea);
 
+	window.addEvent('focus', function(e) {
+		resizeTimesArea(); //this seems to be helping with some resizing issues i've been having
+	});
+	//window.addEvent('blur', function(e) {});
 	window.addEvent('resize', delayedResize); //TODO - ensure that draggable windows (scramble) are visible
 
 	//setting size of the timer
