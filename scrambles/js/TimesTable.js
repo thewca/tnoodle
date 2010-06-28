@@ -94,11 +94,12 @@ var TimesTable = new Class({
 	},
 	
 	//private!
-	resort: function() {
+	resort: function(preserveScrollbar) {
 		var scrollTop = this.tbody.scrollTop; //save scroll amount
 		var sort = this.configuration.get('times.sort', { index: 0, reverse: false });
 		this.sort(sort.index, sort.reverse);
-		this.tbody.scrollTo(0, scrollTop); //restore scroll amount
+		if(preserveScrollbar)
+			this.tbody.scrollTo(0, scrollTop); //restore scroll amount
 	},
 	selectedRow: null,
 	editRow: null,
@@ -128,7 +129,6 @@ var TimesTable = new Class({
 			deleteTime.addEvent('click', function(e) {
 				this.session.disposeTime(time); //remove time
 				this.deselectRow().dispose(); //deselect and remove current row
-				this.refreshData();
 			}.bind(this));
 		}
 		
@@ -264,16 +264,16 @@ var TimesTable = new Class({
 			this.attachSorts(true); //sorting doesn't work well with a selected row
 			
 			var addTime = this.selectedRow == this.addRow;
-			if(this.editRow) {
+			if(this.editRow)
 				this.selectedRow.replaces(this.editRow);
-			}
 			if(this.penaltyRow)
 				this.penaltyRow.dispose();
-			if(addTime)
-				this.resort();
-			else
-				this.selectedRow.refresh();
-			this.editRow = this.selectedRow = null;
+			this.selectedRow = this.editRow = this.penaltyRow = null;
+			
+			//changing the time could very well affect more than this row
+			//maybe someday we could be more efficient about the changes
+			this.refreshData();
+			this.resort();
 			
 			this.resize(); //changing the time may change the size of a column
 			if(addTime)
@@ -286,7 +286,7 @@ var TimesTable = new Class({
 		this.tbody.getChildren('tr').each(function(tr) {
 			tr.refresh();
 		});
-		this.resort();
+		this.resort(true);
 		this.infoRow.refresh();
 		this.resize();
 	},
