@@ -37,8 +37,6 @@ var KeyboardTimer = new Class({
 
 				timer.fireEvent('newTime', timer.getTimeCentis());
 				timer.pendingTime = true;
-				// this will virtually "release the keys" in the event that we've lost track of the keyboard state
-				setTimeout(function() { timer.pendingTime = false; timer.redraw(); }, 4*timer.delay);
 				timer.timing = false;
 			}
 			
@@ -50,7 +48,7 @@ var KeyboardTimer = new Class({
 			keys.erase(e.code);
 			
 			if(timer.pendingTime) {
-				timer.pendingTime = keys.getLength();
+				timer.pendingTime = (keys.getLength() > 0);
 			} else if((timer.onlySpaceStarts && e.key == 'space') || (!timer.onlySpaceStarts && keys.getLength() == 0)) {
 				if(new Date().getTime() - timer.timerStop > timer.delay) {
 					if(timer.wcaInspection && !timer.inspecting) {
@@ -66,10 +64,17 @@ var KeyboardTimer = new Class({
 					timer.startRender();
 				}
 			}
-			if(e.key == 'space') //releasing space resets the keyboard state
-				keys.empty();
+//			if(e.key == 'space') //releasing space resets the keyboard state
+//				keys.empty();
 			
 			timer.redraw();
+		});
+		window.addEvent('blur', function(e) {
+			//when the page loses focus, we clear the keyboard state, and accept any pending times
+			keys.empty();
+			timer.pendingTime = false;
+			timer.redraw();
+			console.log(keys);
 		});
 	},
 	isFocused: function() {
@@ -116,7 +121,7 @@ var KeyboardTimer = new Class({
 		var color = this.inspecting ? 'red' : 'black';
 		this.timer.set('html', this.stringy());
 		if(this.timerStatus) {
-			if((this.onlySpaceStarts && this.keys.get(32)) || (!this.onlySpaceStarts && this.keys.getLength() > 0))
+			if(!this.pendingTime && (this.onlySpaceStarts && this.keys.get(32)) || (!this.onlySpaceStarts && this.keys.getLength() > 0))
 				color = 'green';
 		}
 		this.timer.setStyle('color', color);
