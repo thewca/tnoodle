@@ -1,6 +1,6 @@
 var KeyboardTimer = new Class({
 	wcaInspection: false, //TODO - add gui option!
-	timerStatus: true, //TODO - implement!!! & add gui option!
+	timerStatus: true, //TODO - add gui option!
 	onlySpaceStarts: true, //TODO - add gui option!
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
 	initialize: function(parent, server) {
@@ -18,9 +18,11 @@ var KeyboardTimer = new Class({
 
 		var timer = this;
 
+		var keys = new Hash();
+		this.keys = keys;
+		
 		this.reset(); //this will update the display
 		
-		var keys = new Hash();
 		window.addEvent('keydown', function(e) {
 			if(!timer.isFocused())
 				return;
@@ -36,9 +38,11 @@ var KeyboardTimer = new Class({
 				timer.fireEvent('newTime', timer.getTimeCentis());
 				timer.pendingTime = true;
 				// this will virtually "release the keys" in the event that we've lost track of the keyboard state
-				setTimeout(function() { timer.pendingTime = false; }, 4*timer.delay);
+				setTimeout(function() { timer.pendingTime = false; timer.redraw(); }, 4*timer.delay);
 				timer.timing = false;
 			}
+			
+			timer.redraw();
 		});
 		window.addEvent('keyup', function(e) {
 			if(!timer.isFocused())
@@ -64,6 +68,8 @@ var KeyboardTimer = new Class({
 			}
 			if(e.key == 'space') //releasing space resets the keyboard state
 				keys.empty();
+			
+			timer.redraw();
 		});
 	},
 	isFocused: function() {
@@ -107,8 +113,13 @@ var KeyboardTimer = new Class({
 		this.stopRender();
 	},
 	redraw: function() {
-		this.timer.setStyle('color', this.inspecting ? 'red': 'black');
+		var color = this.inspecting ? 'red' : 'black';
 		this.timer.set('html', this.stringy());
+		if(this.timerStatus) {
+			if((this.onlySpaceStarts && this.keys.get(32)) || (!this.onlySpaceStarts && this.keys.getLength() > 0))
+				color = 'green';
+		}
+		this.timer.setStyle('color', color);
 		
 		//figure out what the largest we can make the timer is
 		//this makes use of our "sizer" span

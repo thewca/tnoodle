@@ -261,7 +261,6 @@ var TimesTable = new Class({
 		
 		var row = this.selectedRow;
 		if(this.selectedRow != null) {
-
 			this.attachSorts(true); //sorting doesn't work well with a selected row
 			
 			var addTime = this.selectedRow == this.addRow;
