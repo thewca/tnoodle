@@ -39,6 +39,15 @@ function isOrIsChild(el, parent) {
 	}
 	return false;
 }
+function getPosition(el) {
+	var currLeft = currTop = 0;
+	while(el) {
+		currLeft += el.offsetLeft;
+		currTop += el.offsetTop;
+		el = el.offsetParent;
+	}
+	return {x: currLeft, y: currTop};
+}
 //returns a shallow copy of obj
 function clone(obj) {
     var o = {};
@@ -330,6 +339,14 @@ function setCurrImportLink(newLink) {
 	if(newLink) {
 		newLink.className += ' down';
 		importDiv.style.display = 'inline';
+		
+		importDiv.style.right = null;
+		importDiv.style.left = null;
+		var windowWidth = window.innerWidth || window.clientWidth;
+		if(getPosition(importDiv).x+parseInt(importDiv.getStyle('width')) > windowWidth)
+			importDiv.style.right = '0px';
+		else
+			importDiv.style.left = '0px';
 	} else {
 		importDiv.style.display = 'none';
 		
@@ -634,9 +651,6 @@ function promptSeed() {
     	xAddListener(document, 'mousedown', function(e) {
     		mouseDown = true;
     		if(!e.target) e.target = e.srcElement; //freaking ie, man
-    		var clz = e.target.className;
-    		if(clz.match(/\blink\b/) || clz.match(/\btitlebar\b/)) //kinda hacky, but should work
-    			return;
     		
     		if(isOrIsChild(e.target, puzzleSelect)) {
     			//we allow the user to switch scrambles while importing
