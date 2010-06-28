@@ -277,7 +277,8 @@ var TimesTable = new Class({
 			this.resort(true);
 			
 			this.resize(); //changing the time may change the size of a column
-			this.scrollToRow(editedRow);
+			if(!addTime)
+				this.scrollToRow(editedRow);
 		}
 		return row;
 	},

@@ -4,8 +4,26 @@
 <title>TNoodleTimer</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 
-<link type="text/css" rel="stylesheet" href="ScrambleStuff.css" media="screen" />
+
+<script type="text/javascript" src="mootools-1.2.4-core.js"></script>
+<script type="text/javascript" src="mootools-1.2.4.4-more.js"></script>
+<script type="text/javascript" src="tnoodleserver.js"></script>
+<script type="text/javascript" src="tnoodlescrambles.js"></script>
+
 <link type="text/css" rel="stylesheet" href="wz_dragdrop.css" media="screen" />
+<script type="text/javascript" src="wz_dragdrop.js"></script>
+
+<script type="text/javascript" src="ColorChooser.js"></script>
+
+<link type="text/css" rel="stylesheet" href="ScrambleStuff.css" media="screen" />
+<script type="text/javascript" src="ScrambleStuff.js"></script>
+
+<link type="text/css" rel="stylesheet" href="KeyboardTimer.css" media="screen" />
+<script type="text/javascript" src="KeyboardTimer.js"></script>
+
+<link type="text/css" rel="stylesheet" href="TimesTable.css" media="screen" />
+<script type="text/javascript" src="TimesTable.js"></script>
+
 <style type="text/css">
 html, body {
 	font-family: sans-serif;
@@ -55,19 +73,6 @@ img {
 .scrambleText {
 	overflow: auto;
 }
-
-/*** This is for KeyboardTimer.js***/
-@font-face {  
-	font-family: lcd;
-	src: url("Digiface Regular.eot");
-	src: 	local('Digiface Regular'), 
-			url("Digiface Regular.ttf") format("truetype");  
-}
-#timer, #sizer {
-	font-family: lcd;
-	position: relative;  
-}
-/*** End KeyboardTimer.js ***/
 
 .tabs {
 /* TODO: this doesn't overflow nicely */
@@ -122,69 +127,7 @@ img {
 #timesArea {
 	border: 1px solid;
 }
-
-#timesTable {
-	margin: 5px;
-	/*border-style: hidden;*/
-	border-collapse: collapse;
-}
-#timesTable thead tr, #timesTable tfoot tr {
-	display: block;
-}
-#timesTable tbody {
-	overflow: auto;
-	display: block;
-}
-#timesTable th {
-	cursor: pointer;
-}
-#timesTable .table-th-sort-span {
-	display: inline-block;
-	width: 16px;
-	height: 16px;
-}
-#timesTable .table-th-sort .table-th-sort-span {
-	background: transparent url('bullet_arrow_up.png') 0px 0px no-repeat;
-}
-
-#timesTable .table-th-sort-rev .table-th-sort-span {
-	background: transparent url('bullet_arrow_down.png') 0px 0px no-repeat;
-	width: 16px;
-	height: 16px;
-}
-
-#timesTable td, #timesTable th {
-	border: 1px solid;
-	padding: 1px 2px 1px 2px;
-	border-style: inset;
-	border-color: black;
-}
-
-#timesTable tr:nth-child(even) {background: #CCC}
-#timesTable tr:nth-child(odd) {background: #FFF}
-#timesTable tbody tr:hover, #timesTable tr.addTime:hover, #timesTable tr.editRow, #timesTable tr.penaltyRow {
-	background-color: rgb(160, 160, 255);
-}
-.errorField {
-	color: red;
-}
-
-.deleteTime { /* TODO: pretty picture! */
-	cursor: pointer;
-}
-
-
 </style>
-
-<script type="text/javascript" src="mootools-1.2.4-core.js"></script>
-<script type="text/javascript" src="mootools-1.2.4.4-more.js"></script>
-<script type="text/javascript" src="tnoodleserver.js"></script>
-<script type="text/javascript" src="tnoodlescrambles.js"></script>
-<script type="text/javascript" src="wz_dragdrop.js"></script>
-<script type="text/javascript" src="ColorChooser.js"></script>
-<script type="text/javascript" src="ScrambleStuff.js"></script>
-<script type="text/javascript" src="KeyboardTimer.js"></script>
-<script type="text/javascript" src="TimesTable.js"></script>
 
 <script type="text/javascript">
 window.addEvent('domready', function() {

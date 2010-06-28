@@ -64,8 +64,10 @@ var KeyboardTimer = new Class({
 					timer.startRender();
 				}
 			}
-//			if(e.key == 'space') //releasing space resets the keyboard state
-//				keys.empty();
+			//even thought this may be odd behavior, it's better to do this
+			//then have the timer freeze up on a user
+			if(e.key == 'space') //releasing space resets the keyboard state
+				keys.empty();
 			
 			timer.redraw();
 		});
