@@ -95,20 +95,23 @@ function puzzleChanged() {
 			scrambleIndex--;
 		}
 	}
-    var newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
-    if(newPuzzle == "null") //if nothing is selected
-    	newPuzzle = null;
-    
+	if(puzzleSelect.selectedIndex < 0 || puzzleSelect.selectedIndex > puzzleSelect.options.length)
+		newPuzzle = null;
+	else
+		newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
+	
     colorScheme = null; //reset colorscheme
     currTurn = null;
     faceMap = null; //this indicates if the current puzzle support images
     currScramble = null;
     puzzle = newPuzzle;
     scrambleImg.clear();
-    firePuzzleChanged();
     
     if(puzzle == null)
     	return;
+    
+    //we only fire a change if a puzzle is actually selected
+    firePuzzleChanged();
 
 	scramble();
     scrambler.loadPuzzleImageInfo(function(puzzleImageInfo) {

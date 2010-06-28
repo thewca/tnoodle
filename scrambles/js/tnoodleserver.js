@@ -66,7 +66,9 @@ tnoodle.server = function(url) {
 	var server = this;
 	this.formatTime = function(timeCentis) {
 		//TODO - add gui option!!!
-		if(server.configuration.get('clockFormat', true))
+		if(timeCentis == Infinity)
+			return "DNF"
+		else if(server.configuration.get('clockFormat', true))
 			return server.clockFormat(timeCentis);
 		else
 			return (timeCentis/100).toFixed(2);
@@ -101,30 +103,109 @@ tnoodle.server = function(url) {
 	
 	/* time can be either a number or a string */
 	function Time(time) {
+		this.getValueCentis = function() {
+			if(this.penalty == "+2")
+				return this.centis + 2*100; 
+			else if(this.penalty == "DNF")
+				return Infinity;
+			else
+				return this.centis;
+		}
 		this.format = function() {
-			return server.formatTime(this.centis);
+			var time = server.formatTime(this.getValueCentis());
+			if(this.penalty == "+2") {
+				time += "+";
+			} /*else if(this.penalty == "DNF") TODO - implement qqtimer-esque DNF(value)
+				time += " (" + this.centis + ")";*/ 
+			return time;
 		};
 		this.parse = function(time) {
-			//TODO - be descriptive with errors
-			//TODO - support clock formatting
-			//TODO - +2, DNF
-			if(time.length == 0 || time == '.')
-				throw "time doesn't contain any digits"
-				if(!time.match(/^\d*(\.\d*)?$/))
-					throw "error parsing time";
-			this.centis = Math.round(time.toFloat()*100);
+			if(time.length == 0)
+				throw "Must enter a time";
+			if(time == "DNF") {
+				this.setPenalty("DNF");
+				return;
+			}
+			//we wait until we've valitdated the time to set the penalty
+			var penalty = null;
+			if(time.match(/\+$/)) {
+				penalty = "+2";
+				time = time.substring(0, time.length-1);
+			} else
+				penalty = null;
+				
+			var hours = null, minutes = null, seconds = null;
+			var coloned = time.split(':');
+			var i = coloned.length;
+			switch(i) {
+			case 1:
+				seconds = coloned[0];
+				break;
+			case 2:
+				minutes = coloned[0];
+				seconds = coloned[1];
+				break;
+			case 3:
+				hours = coloned[0];
+				minutes = coloned[1];
+				seconds = coloned[2];
+				break;
+			default:
+				throw "Too many colons";
+			}
+			
+			function strictToInt(str) {
+				if(!str.match(/^\d+$/))
+					throw "Not an integer: " + str;
+				return str.toInt();
+			}
+			
+			if(coloned[i-1] == ".")
+				throw "Invalid seconds value";
+			
+			var valueCentis = 0;
+			var seconds_centis = seconds.split('.');
+			if(seconds_centis.length == 2 && seconds_centis[1].length > 0) {
+				valueCentis += Math.round(100*strictToInt(seconds_centis[1])*Math.pow(10, -seconds_centis[1].length));
+			} else if(seconds_centis.length > 2) {
+				throw "Too many decimal points";
+			}
+			if(seconds_centis[0].length > 0)
+				valueCentis += 100*strictToInt(seconds_centis[0]);
+			if(minutes)
+				valueCentis += 60*100*strictToInt(minutes);
+			if(hours)
+				valueCentis += 60*60*100*strictToInt(hours);
+			
+			this.centis = valueCentis;
+			this.setPenalty(penalty);
 		};
-		
+		//penalty can be "+2" or "DNF"
+		//anything else is assumed to be no penalty
+		this.setPenalty = function(penalty) {
+			if(penalty != "+2" && penalty != "DNF") {
+				penalty = null
+			}
+			this.penalty = penalty;
+		};
+		//always returns one of null, "+2", "DNF"
+		this.getPenalty = function() {
+			return this.penalty;
+		};
 		if(typeof(time) === "number")
 			this.centis = time;
 		else
 			this.parse(time.toString());
 		
 		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = '';
+		this.penalty = null;
+		this.index = null;
 		//TODO - creation date
 		//TODO - tags
 		//TODO - comments?
 	}
+	this.Time = Time;
+	
 	this.sessions = [];
 	var sessions = this.sessions;
 	function Session(id, puzzle) {
@@ -157,16 +238,26 @@ tnoodle.server = function(url) {
 		this.addTime = function(timeCentis) {
 			var time = new Time(timeCentis);
 			this.times.push(time);
+			time.index = this.times.length;
 			return time;
+		};
+		this.reindex = function() {
+			for(var i = 0; i < this.times.length; i++) {
+				this.times[i].index = i+1;
+			}
 		};
 		//returns the deleted time
 		this.disposeTimeAt = function(index) {
-			return this.times.splice(index, 1);
+			var time = this.times.splice(index, 1);
+			this.reindex()
+			return time;
 		};
 		this.disposeTime = function(time) {
-			return this.times.splice(this.times.indexOf(time), 1);
+			this.times.splice(this.times.indexOf(time), 1);
+			this.reindex()
 		};
 	}
+	
 	//TODO - use default puzzle for session? if so, how does the user set the default puzzle?
 	this.createSession = function(puzzle) {
 		//id is the number of seconds since the epoch encoded in base 36 for readability

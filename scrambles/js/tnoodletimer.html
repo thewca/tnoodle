@@ -157,12 +157,16 @@ img {
 	border: 1px solid;
 	padding: 1px 2px 1px 2px;
 	border-style: inset;
+	border-color: black;
 }
 
 #timesTable tr:nth-child(even) {background: #CCC}
 #timesTable tr:nth-child(odd) {background: #FFF}
-#timesTable tbody tr:hover, #timesTable tr.addTime:hover {
+#timesTable tbody tr:hover, #timesTable tr.addTime:hover, #timesTable tr.editRow, #timesTable tr.penaltyRow {
 	background-color: rgb(160, 160, 255);
+}
+.errorField {
+	color: red;
 }
 
 .deleteTime { /* TODO: pretty picture! */
@@ -237,7 +241,7 @@ window.addEvent('domready', function() {
 	}
 	
 	var session = null;
-	var timesTable = new TimesTable($('timesTable'), configuration);
+	var timesTable = new TimesTable($('timesTable'), server);
 	timer.addEvent('newTime', function(timeCentis) {
 		timesTable.addTime(timeCentis);
 		scrambleStuff.scramble();
@@ -253,8 +257,8 @@ window.addEvent('domready', function() {
 		});
 		this.addClass('active');
 
-		timesTable.setSession(session);
 		refreshSessionInfo();
+		timesTable.setSession(session);
 		scrambleStuff.setSelectedPuzzle(session.puzzle);
 	}
 	function closeSession(e) {
@@ -322,47 +326,48 @@ window.addEvent('domready', function() {
 		if(isResizing)
 			return;
 		isResizing = true;
-		setTimeout(function() { //wait for laying-out to occur
-			//TODO - I DO NOT believe that this can't be done with css!!!
-			//TODO - hide everything until the first resize occurs?
-			
-			var viewSize = window.getSize();
-			var topLeftSize = $('topLeft').getSize();
-			var h = topLeftSize.y;
+		
+		//TODO - I DO NOT believe that this can't be done with css!!!
+		//TODO - hide everything until the first resize occurs?
+		
+		var viewSize = window.getSize();
+		var topLeftSize = $('topLeft').getSize();
+		var h = topLeftSize.y;
 
-			timer.redraw();
-			$('chrome').setStyle('height', h);
+		timer.redraw();
+		$('chrome').setStyle('height', h);
 
-			$('topRight').setStyle('height', h);
-			var newH = Math.max(0, viewSize.x-topLeftSize.x-$('topRight').getStyle('right').toInt());
-			$('topRight').setStyle('width', newH);
-			
-			h -= $('scrambleBorder').getSize().y;
-			$$('.scrambleArea')[0].setStyle('height', h);
-			h -= $$('.scrambleHeader')[0].getSize().y;
-			var scrambleText = $$('.scrambleText')[0];
-			var padding = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-top').toInt();
-			$$('.scrambleText')[0].setStyle('height', h-padding);
-			
-			var remainingHeight = viewSize.y-$('chrome').getSize().y;
-			remainingHeight -= 50; //TODO - what the heck is this all about?
-			if(remainingHeight < 0) //ie freaks out if we try to set negative sizes
-				remainingHeight = 0;
-			$('timesArea').setStyle('height', remainingHeight);
+		$('topRight').setStyle('height', h);
+		var newH = Math.max(0, viewSize.x-topLeftSize.x-$('topRight').getStyle('right').toInt());
+		$('topRight').setStyle('width', newH);
+		
+		h -= $('scrambleBorder').getSize().y;
+		$$('.scrambleArea')[0].setStyle('height', h);
+		h -= $$('.scrambleHeader')[0].getSize().y;
+		var scrambleText = $$('.scrambleText')[0];
+		var padding = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-top').toInt();
+		$$('.scrambleText')[0].setStyle('height', h-padding);
+		
+		var remainingHeight = viewSize.y-$('chrome').getSize().y;
+		remainingHeight -= 50; //TODO - what the heck is this all about?
+		if(remainingHeight < 0) //ie freaks out if we try to set negative sizes
+			remainingHeight = 0;
+		$('timesArea').setStyle('height', remainingHeight);
 
-			remainingHeight -= $('sessionInfo').getSize().y;
-			timesTable.resize();
+		remainingHeight -= $('sessionInfo').getSize().y;
+		timesTable.resize();
 
-			//this just seems like as good a time as any to update the session info bar
-			refreshSessionInfo();
-			
-			isResizing = false;
-		}, 100); // 100 seems to work here ... man this feels hacky
-	};
+		//this just seems like as good a time as any to update the session info bar
+		refreshSessionInfo();
+		
+		isResizing = false;
+	}
+	function delayedResize() {
+		setTimeout(resizeTimesArea, 100); // 100 seems to work here, man this feels hacky
+	}
 	window.addEvent('load', resizeTimesArea);
-	//scrambleStuff.addScrambleChangeListener(resizeTimesArea); //new scrambles no longer resize the window
 
-	window.addEvent('resize', resizeTimesArea); //TODO - ensure that draggable windows (scramble) are visible
+	window.addEvent('resize', delayedResize); //TODO - ensure that draggable windows (scramble) are visible
 
 	//setting size of the timer
 	var width = configuration.get('timer.width', 350);
