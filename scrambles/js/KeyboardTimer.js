@@ -74,7 +74,6 @@ var KeyboardTimer = new Class({
 			keys.empty();
 			timer.pendingTime = false;
 			timer.redraw();
-			console.log(keys);
 		});
 	},
 	isFocused: function() {
