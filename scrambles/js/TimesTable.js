@@ -133,7 +133,6 @@ var TimesTable = new Class({
 		}
 		
 		var textField = new Element('input');
-		//TODO - how do you listen for input in mootools?
 		var timeChanged = function(e) {
 			try {
 				new this.server.Time(textField.value);
@@ -142,6 +141,7 @@ var TimesTable = new Class({
 				errorField.set('html', error);
 			}
 		}.bind(this);
+		//TODO - how do you listen for input in mootools?
 		xAddListener(textField, 'input', timeChanged, false);
 		
 		textField.setAttribute('type', 'text');
@@ -230,6 +230,7 @@ var TimesTable = new Class({
 					//this shouldn't happen
 				}
 				textField.value = time.format();
+				timeChanged();
 			});
 			
 			this.penaltyRow = new Element('tr', {'class': 'penaltyRow'}).adopt(new Element('td', { colspan: this.options.headers.length}).adopt(form));
@@ -264,6 +265,7 @@ var TimesTable = new Class({
 			this.attachSorts(true); //sorting doesn't work well with a selected row
 			
 			var addTime = this.selectedRow == this.addRow;
+			var editedRow = addTime ? this.lastAddedRow : this.selectedRow;
 			if(this.editRow)
 				this.selectedRow.replaces(this.editRow);
 			if(this.penaltyRow)
@@ -273,11 +275,10 @@ var TimesTable = new Class({
 			//changing the time could very well affect more than this row
 			//maybe someday we could be more efficient about the changes
 			this.refreshData();
-			this.resort();
+			this.resort(true);
 			
 			this.resize(); //changing the time may change the size of a column
-			if(addTime)
-				this.scrollToLastTime();
+			this.scrollToRow(editedRow);
 		}
 		return row;
 	},

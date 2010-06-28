@@ -1,6 +1,7 @@
 var KeyboardTimer = new Class({
-	wcaInspection: true, //TODO - add gui option!
-	clockFormat: true, keyboardOnlyStarts: false, //TODO - implement these! and add gui...
+	wcaInspection: false, //TODO - add gui option!
+	timerStatus: true, //TODO - implement!!! & add gui option!
+	onlySpaceStarts: true, //TODO - add gui option!
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
 	initialize: function(parent, server) {
 		this.parent = parent;
@@ -21,8 +22,7 @@ var KeyboardTimer = new Class({
 		
 		var keys = new Hash();
 		window.addEvent('keydown', function(e) {
-			//we disable the timer if an input of type text is focused
-			if(document.activeElement.type == "text")
+			if(!timer.isFocused())
 				return;
 			if(e.key == 'space')
 				e.stop(); //stop space from scrolling
@@ -31,26 +31,24 @@ var KeyboardTimer = new Class({
 				//stopping timer
 				timer.timing = false;
 				timer.timerStop = new Date().getTime();
-				timer.pendingTime = timer.getTimeCentis();
 				timer.stopRender();
+
+				timer.fireEvent('newTime', timer.getTimeCentis());
+				timer.pendingTime = true;
+				// this will virtually "release the keys" in the event that we've lost track of the keyboard state
+				setTimeout(function() { timer.pendingTime = false; }, 4*timer.delay);
+				timer.timing = false;
 			}
 		});
 		window.addEvent('keyup', function(e) {
-			//we disable the timer if an input of type text is focused
-			if(document.activeElement.type == "text")
+			if(!timer.isFocused())
 				return;
-			//e.stop();
 			keys.erase(e.code);
-			if(e.key != 'space') //TODO - spacebar only starts?
-				return;
-			//TODO - alt-tabbing seems to be killing our keyboard state
-			if(true || keys.getLength() == 0) {
-				if(timer.pendingTime) {
-					//accepting time
-					timer.fireEvent('newTime', timer.pendingTime);
-					timer.pendingTime = null;
-					timer.timing = false;
-				} else if(new Date().getTime() - timer.timerStop > timer.delay) {
+			
+			if(timer.pendingTime) {
+				timer.pendingTime = keys.getLength();
+			} else if((timer.onlySpaceStarts && e.key == 'space') || (!timer.onlySpaceStarts && keys.getLength() == 0)) {
+				if(new Date().getTime() - timer.timerStop > timer.delay) {
 					if(timer.wcaInspection && !timer.inspecting) {
 						// if inspection's on and we're not inspecting, let's start!
 						timer.inspectionStart = new Date().getTime();
@@ -64,7 +62,14 @@ var KeyboardTimer = new Class({
 					timer.startRender();
 				}
 			}
+			if(e.key == 'space') //releasing space resets the keyboard state
+				keys.empty();
 		});
+	},
+	isFocused: function() {
+		//we disable the timer if a text field is focused
+		return (document.activeElement.type != "text" &&
+		   document.activeElement.type != "textarea")
 	},
 	getTimeCentis: function() {
 		var end = (this.timing ? new Date().getTime() : this.timerStop);
@@ -96,7 +101,6 @@ var KeyboardTimer = new Class({
 		this.timing = false;
 		this.timerStart = 0;
 		this.timerStop = 0;
-		this.pendingTime = null;
 		this.inspecting = false;
 		this.inspectionStart = null;
 		

@@ -200,8 +200,8 @@ window.addEvent('domready', function() {
 	var scramblesLoaded = false;
 	function onScramblesLoaded() {
 		scramblesLoaded = true;
-		if(lastSessionTab)
-			sessionClicked.call(lastSessionTab, null);
+		if(session)
+			scrambleStuff.setSelectedPuzzle(session.puzzle);
 	}
 	var scrambleStuff = new ScrambleStuff(configuration, onScramblesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
@@ -315,8 +315,7 @@ window.addEvent('domready', function() {
 		if(index == ids.length - 1) {
 			//we set the current session to the most recent session
 			lastSessionTab = sessionTab;
-			if(scramblesLoaded)
-				sessionClicked.call(lastSessionTab);
+			sessionClicked.call(lastSessionTab);
 		}
 	});
 

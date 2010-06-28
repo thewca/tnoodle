@@ -205,6 +205,7 @@ tnoodle.server = function(url) {
 		//TODO - comments?
 	}
 	this.Time = Time;
+	var EMPTY_TIME = { format: function() { return ""; }};
 	
 	this.sessions = [];
 	var sessions = this.sessions;
@@ -216,7 +217,12 @@ tnoodle.server = function(url) {
 		
 		//TODO - stats!!!
 		this.solveCount = function() {
-			return this.times.length;
+			var count = 0;
+			for(var i = 0; i < this.times.length; i++) {
+				if(this.times[i].getPenalty() != "DNF")
+					count++;
+			}
+			return count;
 		};
 		this.attemptCount = function() {
 			return this.times.length;
@@ -226,9 +232,9 @@ tnoodle.server = function(url) {
 		};
 		this.bestTime = function() {
 			var minCentis = Infinity;
-			var min = { format: function() { return "?"; } }; //TODO - default NaN time?
+			var min = EMPTY_TIME;
 			for(var i = 0; i < this.times.length; i++) {
-				if(this.times[i].centis < min) {
+				if(this.times[i].centis < minCentis) {
 					min = this.times[i];
 					minCentis = min.centis;
 				}
