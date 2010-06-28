@@ -275,7 +275,8 @@ window.addEvent('domready', function() {
 				return;
 			}
 		}
-
+		if(!confirm("Are you sure you want to delete session " + session.id + "?"))
+			return;
 		server.disposeSession(deletedSession);
 		this.tab.dispose();
 		if(deletedSession == session) {
