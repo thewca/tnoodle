@@ -6,5 +6,40 @@
 }
 #timer, #sizer {
 	font-family: lcd;
-	position: relative;  
+	position: relative;
+}
+.inspecting {
+	color: red;
+}
+.keysDown {
+	color: green;
+}
+.fullscreenTimer {
+	background-color: black;
+	color: red;
+	z-index: 2;
+}
+.optionsButton {
+	background-color: #fff;
+	color: #000;
+	
+	position: absolute;
+	top: 2px;
+	right: 5px;
+	width: 19px;
+	height: 22px;
+	text-align: center;
+}
+.optionsButtonHover {
+	background-color: #000;
+	color: #fff;
+}
+.options {
+	position: absolute;
+	background: white;
+	border: 1px solid black;
+	top: 24px;
+	right: 5px;
+	padding: 5px;
+	text-align: left;
 }

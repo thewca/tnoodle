@@ -44,6 +44,12 @@
 	color: red;
 }
 
-.deleteTime { /* TODO: pretty picture! */
+#timesTable tbody tr td.deleteTime { /* TODO: pretty picture! */
 	cursor: pointer;
+	border-bottom: none;
+	text-align: center;
+}
+#timesTable tbody tr td.extendedDeleteTime { /* TODO: pretty picture! */
+	cursor: pointer;
+	border-top: none;
 }

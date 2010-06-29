@@ -109,6 +109,9 @@ function puzzleChanged() {
 	else
 		newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
 	
+	if(newPuzzle == puzzle)
+		return;
+	
     colorScheme = null; //reset colorscheme
     currTurn = null;
     faceMap = null; //this indicates if the current puzzle support images
@@ -819,7 +822,6 @@ function promptSeed() {
 	this.getSelectedPuzzle = function() {
 		return puzzle;
 	}
-	//even if this is the same puzzle, will generate a new scramble
 	this.setSelectedPuzzle = function(newPuzzle) {
 		puzzleSelect.value = newPuzzle;
 		puzzleChanged();

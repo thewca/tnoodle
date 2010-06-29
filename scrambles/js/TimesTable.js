@@ -118,18 +118,18 @@ var TimesTable = new Class({
 		this.editRow = new Element('tr');
 		this.editRow.setStyle('width', this.selectedRow.getSize().x);
 		this.editRow.addClass('editRow');
-		var stopEvent = function(e) { e.stop(); };
-		this.editRow.addEvent('click', stopEvent); //we don't want this to propagate up to the current function
+		this.editRow.addEvent('click', function(e) { e.stop(); }); //we don't want this to propagate up to the current function
 		
+		var deleteTimeFunc = function(e) {
+			this.session.disposeTime(time); //remove time
+			this.deselectRow().dispose(); //deselect and remove current row
+		}.bind(this)
 		var deleteTime = new Element('td');
 		deleteTime.inject(this.editRow);
 		if(time) {
 			deleteTime.set('html', 'X');
 			deleteTime.addClass('deleteTime'); //TODO - pretty picture
-			deleteTime.addEvent('click', function(e) {
-				this.session.disposeTime(time); //remove time
-				this.deselectRow().dispose(); //deselect and remove current row
-			}.bind(this));
+			deleteTime.addEvent('click', deleteTimeFunc);
 		}
 		
 		var textField = new Element('input');
@@ -165,7 +165,6 @@ var TimesTable = new Class({
 				}
 				return true;
 			} catch(error) {
-				console.log(error);
 				return false;
 			} finally {
 				textField.addEvent('blur', onBlur);
@@ -233,7 +232,11 @@ var TimesTable = new Class({
 				timeChanged();
 			});
 			
-			this.penaltyRow = new Element('tr', {'class': 'penaltyRow'}).adopt(new Element('td', { colspan: this.options.headers.length}).adopt(form));
+			this.penaltyRow = new Element('tr', {'class': 'penaltyRow' });
+			var extraDelete = new Element('td', {'class': 'extendedDeleteTime'});
+			extraDelete.addEvent('click', deleteTimeFunc);
+			this.penaltyRow.adopt(extraDelete);
+			this.penaltyRow.adopt(new Element('td', { colspan: this.options.headers.length-1}).adopt(form));
 			this.penaltyRow.inject(this.editRow, 'after');
 			this.scrollToRow(this.penaltyRow);
 		} else
@@ -307,7 +310,7 @@ var TimesTable = new Class({
 		};
 		tr.refresh();
 	},
-	resize: function() {
+	resize: function(forceScrollToLatest) {
 		if(!this.session) return; //we're not ready to size this until we have a session
 		
 		//upon resizing, we first deselect any selected rows!
@@ -395,6 +398,7 @@ var TimesTable = new Class({
 		if(this.freshSession) {
 			this.freshSession = false;
 			this.scrollToLastTime();
-		}
+		} else if(forceScrollToLatest)
+			this.scrollToLastTime();
 	}
 });

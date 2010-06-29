@@ -1,11 +1,9 @@
 var KeyboardTimer = new Class({
-	wcaInspection: false, //TODO - add gui option!
-	timerStatus: true, //TODO - add gui option!
-	onlySpaceStarts: true, //TODO - add gui option!
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
 	initialize: function(parent, server) {
 		this.parent = parent;
 		this.server = server;
+		this.config = server.configuration;
 		
 		this.sizer = new Element('span');
 		this.sizer.id = 'sizer';
@@ -15,6 +13,42 @@ var KeyboardTimer = new Class({
 		this.timer.id = 'timer';
 		this.timer.inject(parent);
 		this.timer.setStyle('position', 'relative'); //this lets us manually center the text with js
+		
+		var optionsButton = new Element('div', { html: 'v', 'class': 'optionsButton' });
+		optionsButton.inject(parent);
+		
+		var optionsDiv = new Element('div', { 'class': 'options' });
+		optionsDiv.show = function() {
+			optionsDiv.fade('in');
+			optionsButton.morph('.optionsButtonHover');
+		};
+		optionsDiv.hide = function() {
+			optionsDiv.fade('out');
+			optionsButton.morph('.optionsButton');
+		};
+		optionsDiv.fade('out');
+		optionsDiv.inject(parent);
+		
+		optionsButton.addEvent('mouseover', optionsDiv.show);
+		optionsButton.addEvent('mouseout', optionsDiv.hide);
+		optionsDiv.addEvent('mouseover', optionsDiv.show);
+		optionsDiv.addEvent('mouseout', optionsDiv.hide);
+		
+		function createOptionBox(optionKey, description, def) {
+			var checkbox = new Element('input', { id: optionKey, type: 'checkbox' });
+			checkbox.checked = server.configuration.get(optionKey, def)
+			checkbox.addEvent('change', function(e) {
+				server.configuration.set(this.id, this.checked);
+			});
+			checkbox.addEvent('focus', function(e) {
+				this.blur();
+			});
+			return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': description, 'for': optionKey }));
+		}
+		optionsDiv.adopt(createOptionBox('timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
+		optionsDiv.adopt(createOptionBox('timer.wcaInspection', 'WCA style inspection', false));
+		optionsDiv.adopt(createOptionBox('timer.onlySpaceStarts', 'Only spacebar starts', true));
+		optionsDiv.adopt(createOptionBox('timer.showStatus', 'Show timer status', true));
 
 		var timer = this;
 
@@ -47,11 +81,12 @@ var KeyboardTimer = new Class({
 				return;
 			keys.erase(e.code);
 			
+			var onlySpaceStarts = timer.config.get('timer.onlySpaceStarts');
 			if(timer.pendingTime) {
 				timer.pendingTime = (keys.getLength() > 0);
-			} else if((timer.onlySpaceStarts && e.key == 'space') || (!timer.onlySpaceStarts && keys.getLength() == 0)) {
+			} else if((onlySpaceStarts && e.key == 'space') || (!onlySpaceStarts && keys.getLength() == 0)) {
 				if(new Date().getTime() - timer.timerStop > timer.delay) {
-					if(timer.wcaInspection && !timer.inspecting) {
+					if(timer.config.get('timer.wcaInspection') && !timer.inspecting) {
 						// if inspection's on and we're not inspecting, let's start!
 						timer.inspectionStart = new Date().getTime();
 						timer.inspecting = true;
@@ -66,16 +101,23 @@ var KeyboardTimer = new Class({
 			}
 			//even thought this may be odd behavior, it's better to do this
 			//then have the timer freeze up on a user
-			if(e.key == 'space') //releasing space resets the keyboard state
-				keys.empty();
+			if(e.key == 'space' || e.key == 'esc') { //releasing space or esc resets the keyboard state
+				resetKeys();
+			}
 			
 			timer.redraw();
 		});
-		window.addEvent('blur', function(e) {
-			//when the page loses focus, we clear the keyboard state, and accept any pending times
+		function resetKeys() {
 			keys.empty();
 			timer.pendingTime = false;
 			timer.redraw();
+		}
+		window.addEvent('click', function(e) {
+			resetKeys();
+		});
+		window.addEvent('blur', function(e) {
+			//when the page loses focus, we clear the keyboard state
+			resetKeys();
 		});
 	},
 	isFocused: function() {
@@ -119,20 +161,34 @@ var KeyboardTimer = new Class({
 		this.stopRender();
 	},
 	redraw: function() {
-		var color = this.inspecting ? 'red' : 'black';
+		var colorClass = this.inspecting ? 'inspecting' : '';
 		this.timer.set('html', this.stringy());
-		if(this.timerStatus) {
-			if(!this.pendingTime && (this.onlySpaceStarts && this.keys.get(32)) || (!this.onlySpaceStarts && this.keys.getLength() > 0))
-				color = 'green';
+		if(this.config.get('timer.showStatus')) {
+			var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
+			if(!this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0))
+				colorClass = 'keysDown';
 		}
-		this.timer.setStyle('color', color);
+		this.timer.erase('class');
+		this.timer.addClass(colorClass);
+		this.timer.setStyle('width', '');
+		this.timer.setStyle('height', '');
 		
 		//figure out what the largest we can make the timer is
 		//this makes use of our "sizer" span
+		this.sizer.erase('class');
 		this.sizer.setStyle('display', 'inline');
 		this.sizer.set('html', this.timer.get('html'));
 		
-		var maxSize = this.parent.getSize();
+		var parent;
+		if(this.config.get('timer.fullscreenWhileTiming') && this.timing) {
+			parent = window;
+			this.timer.addClass('fullscreenTimer');
+			this.sizer.addClass('fullscreenTimer');
+		} else {
+			parent = this.parent;
+		}
+		
+		var maxSize = parent.getSize();
 		var size = maxSize.y;
 		do {
 			this.sizer.setStyle('font-size', --size);
@@ -142,7 +198,10 @@ var KeyboardTimer = new Class({
 		this.timer.setStyle('font-size', size);
 		
 		//now that we've computed its font size, we center the time vertically
-		this.timer.setStyle('top', (this.parent.getSize().y - this.timer.getSize().y)/2);
+		var offset = (maxSize.y - this.timer.getSize().y)/2;
+		this.timer.setStyle('top', offset);
+		this.timer.setStyle('width', maxSize.x);
+		this.timer.setStyle('height', maxSize.y-offset); //hack hackity hack hack
 	}
 });
 KeyboardTimer.implement(new Events);

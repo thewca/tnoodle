@@ -27,6 +27,7 @@
 <style type="text/css">
 html, body {
 	font-family: sans-serif;
+	overflow: hidden;
 }
 body {
 	margin: 0px 8px 8px 8px;
@@ -144,14 +145,44 @@ window.addEvent('domready', function() {
 	function onScramblesLoaded() {
 		scramblesLoaded = true;
 		if(session)
-			scrambleStuff.setSelectedPuzzle(session.puzzle);
+			scrambleStuff.setSelectedPuzzle(session.getPuzzle());
 	}
 	var scrambleStuff = new ScrambleStuff(configuration, onScramblesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 	
+	var customizationSelect = new Element('select');
+	customizationSelect.refresh = function() {
+		var customizations = server.getCustomizations(session.getPuzzle());
+		customizationSelect.options.length = customizations.length;
+		for(var i = 0; i < customizations.length; i++)
+			customizationSelect.options[i] = new Option(customizations[i], customizations[i]);
+
+		customizationSelect.value = session.getCustomization();
+	};
+	$('puzzleChooser').adopt(customizationSelect);
+	var editCustomization = new Element('span', { 'class': 'link', 'html': 'Edit customizations' });
+	editCustomization.addEvent('click', function(e) {
+		//TODO - provide a better gui for this
+		var newCustomization = prompt("Enter name of new customization");
+		if(newCustomization) {
+			server.createCustomization(session.getPuzzle(), newCustomization);
+			customizationSelect.refresh();
+		}
+	});
+	$('puzzleChooser').adopt(editCustomization);
+
+	customizationSelect.onchange = function(e) {
+		session.setCustomization(customizationSelect.value);
+		refreshSessionInfo();
+	}; //for some reason, the change event doesn't fire until the select loses focus
 	scrambleStuff.addPuzzleChangeListener(function(newPuzzle) {
-		session.puzzle = newPuzzle;
+		if(session.getPuzzle() == newPuzzle)
+			return;
+		
+		session.setPuzzle(newPuzzle);
+		customizationSelect.refresh();
+		session.setCustomization(customizationSelect.value);
 		refreshSessionInfo();
 	});
 
@@ -162,7 +193,11 @@ window.addEvent('domready', function() {
 	function refreshSessionInfo() {
 		if(!session) return; //gotta wait for stuff to load
 		$('sessionInfo').empty();
-		$('sessionInfo').appendText(session.puzzle + " session ");
+		$('sessionInfo').appendText(session.getPuzzle());
+		if(session.getCustomization()) {
+			$('sessionInfo').appendText(" " + session.getCustomization());
+		}
+		$('sessionInfo').appendText(" session ");
 		//$('sessionInfo').appendText(session.id + " ");
 		var date = new Date(1000*parseInt(session.id, 36));
 		var today = new Date();
@@ -202,7 +237,8 @@ window.addEvent('domready', function() {
 
 		refreshSessionInfo();
 		timesTable.setSession(session);
-		scrambleStuff.setSelectedPuzzle(session.puzzle);
+		scrambleStuff.setSelectedPuzzle(session.getPuzzle());
+		customizationSelect.refresh();
 	}
 	function closeSession(e) {
 		e.stop(); //prevent the tab from activating
@@ -242,11 +278,11 @@ window.addEvent('domready', function() {
 	}
 	
 	$('newSession').addEvent('click', function(e) {
-		var session = server.createSession(scrambleStuff.getSelectedPuzzle());
-		if(!session) //couldn't create session, for whatever reason
+		var newSession = server.createSession(session.getPuzzle(), session.getCustomization());
+		if(!newSession) //couldn't create session, for whatever reason
 			return;
 
-		var tab = createSessionTab(session);
+		var tab = createSessionTab(newSession);
 		tab.inject($('newSession'), 'before');
 		sessionClicked.call(tab, null);
 	});
@@ -298,7 +334,7 @@ window.addEvent('domready', function() {
 		$('timesArea').setStyle('height', remainingHeight);
 
 		remainingHeight -= $('sessionInfo').getSize().y;
-		timesTable.resize();
+		timesTable.resize(true);
 
 		//this just seems like as good a time as any to update the session info bar
 		refreshSessionInfo();

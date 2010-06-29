@@ -59,7 +59,9 @@ tnoodle.server = function(url) {
 			}
 		};
 		this.get = function(property, def) {
-			return (property in data) ? data[property] : def;
+			if(!(property in data))
+				this.set(property, def);
+			return data[property];
 		};
 	};
 
@@ -122,7 +124,7 @@ tnoodle.server = function(url) {
 		this.parse = function(time) {
 			if(time.length == 0)
 				throw "Must enter a time";
-			if(time == "DNF") {
+			if(time.toUpperCase() == "DNF") {
 				this.setPenalty("DNF");
 				return;
 			}
@@ -177,6 +179,10 @@ tnoodle.server = function(url) {
 			if(hours)
 				valueCentis += 60*60*100*strictToInt(hours);
 			
+			if(penalty == "+2")
+				valueCentis -= 2*100;
+			if(valueCentis <= 0)
+				throw "Can't have times <= 0";
 			this.centis = valueCentis;
 			this.setPenalty(penalty);
 		};
@@ -192,10 +198,7 @@ tnoodle.server = function(url) {
 		this.getPenalty = function() {
 			return this.penalty;
 		};
-		if(typeof(time) === "number")
-			this.centis = time;
-		else
-			this.parse(time.toString());
+
 		
 		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = '';
 		this.penalty = null;
@@ -203,18 +206,38 @@ tnoodle.server = function(url) {
 		//TODO - creation date
 		//TODO - tags
 		//TODO - comments?
+		
+		if(typeof(time) === "number")
+			this.centis = time;
+		else
+			this.parse(time.toString());
 	}
 	this.Time = Time;
 	var EMPTY_TIME = { format: function() { return ""; }};
 	
 	this.sessions = [];
 	var sessions = this.sessions;
-	function Session(id, puzzle) {
+	function Session(id, puzzle, customization) {
 		this.id = id;
-		this.puzzle = puzzle;
-		//times is an array of objects with the following keys: centis, mean3, ra5, ra12, ave100, sessionAve
+		puzzle = puzzle;
+		customization = customization || null;
+		//times is an array of Time's
 		this.times = [];
 		
+		this.setPuzzle = function(newPuzzle) {
+			puzzle = newPuzzle;
+		};
+		this.getPuzzle = function() {
+			return puzzle;
+		};
+		this.setCustomization = function(custom) {
+			if(custom.length == 0)
+				custom = null;
+			customization = custom;
+		};
+		this.getCustomization = function() {
+			return customization;
+		};
 		//TODO - stats!!!
 		this.solveCount = function() {
 			var count = 0;
@@ -265,12 +288,12 @@ tnoodle.server = function(url) {
 	}
 	
 	//TODO - use default puzzle for session? if so, how does the user set the default puzzle?
-	this.createSession = function(puzzle) {
+	this.createSession = function(puzzle, customization) {
 		//id is the number of seconds since the epoch encoded in base 36 for readability
 		var id = Math.round(new Date().getTime()/1000).toString(36);
 		if(id in this.sessions) //we don't want duplicate session ids
 			return null;
-		var sesh = new Session(id, puzzle);
+		var sesh = new Session(id, puzzle, customization);
 		this.sessions.push(sesh);
 		return sesh;
 	};
@@ -281,9 +304,35 @@ tnoodle.server = function(url) {
 		this.sessions.splice(i, 1);
 		return true;
 	};
+	this.getCustomizations = function(puzzle) {
+		if(!(puzzle in customizations))
+			customizations[puzzle] = [ '' ];
+		customizations[puzzle].sort();
+		return customizations[puzzle];
+	};
+	this.createCustomization = function(puzzle, customization) {
+		if(customization in customizations[puzzle])
+			return false;
+		customizations[puzzle].push(customization);
+		return true;
+	};
+	this.removeCustomization = function(puzzle, customization) {
+		//TODO - urgh... editing too?
+	};
 	
 	//TODO - load sessions from config!
-	var sesh = this.createSession("4x4x4");
+	var sesh = this.createSession("4x4x4", "OH");
 	for(var i = 0; i < 9; i++)
 		sesh.addTime(1384 + i);
+
+	//initializing the available customizations
+	var customizations = {};
+	for(var i = 0; i < this.sessions.length; i++) {
+		var puzzle = this.sessions[i].getPuzzle();
+		var customization = this.sessions[i].getCustomization();
+		if(!(puzzle in customizations))
+			customizations[puzzle] = [ '' ];
+		if(!(customization in customizations[puzzle]))
+			customizations[puzzle].push(customization);
+	}
 };
