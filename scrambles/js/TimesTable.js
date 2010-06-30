@@ -196,10 +196,10 @@ var TimesTable = new Class({
 		col3.inject(this.editRow);
 
 		//sizing up w/ previous row
-		deleteTime.setStyle('width', this.selectedRow.getChildren()[0].getStyle('width'));
-		col2.setStyle('width', this.selectedRow.getChildren()[1].getStyle('width'));
-		var remainder = this.tbody.getSize().x - this.selectedRow.getChildren()[2].getPosition(this.tbody).x - 1; //subtract 1 for the border
-		col3.setStyle('width', remainder);
+//		deleteTime.setStyle('width', this.selectedRow.getChildren()[0].getStyle('width'));
+//		col2.setStyle('width', this.selectedRow.getChildren()[1].getStyle('width'));
+//		var remainder = this.tbody.getSize().x - this.selectedRow.getChildren()[2].getPosition(this.tbody).x - 1; //subtract 1 for the border
+//		col3.setStyle('width', remainder);
 		
 		this.editRow.replaces(this.selectedRow);
 		
@@ -399,16 +399,20 @@ var TimesTable = new Class({
 		var infoCells = this.infoRow.getChildren('td');
 		var addTimeCells = this.addRow.getChildren('td');
 		var headers = thead.getChildren('tr')[0].getChildren('th');
-		var tds = null;
-		if(tbody.getChildren('tr').length > 0) {
-			tds = tbody.getChildren('tr')[0].getChildren('td');
-			//clearing all column widths
-			tds.each(function(td) {
-				td.setStyle('width', null);
-			});
+		var tds = [];
+		if(this.sizerRow)
+			this.sizerRow.dispose();
+		this.sizerRow = new Element('tr'); //TODO - this row is still visible
+		this.sizerRow.setStyle('visibility', 'hidden');
+		this.sizerRow.refresh = function() {};
+		tbody.adopt(this.sizerRow);
+		for(var i = 0; i < headers.length; i++) {
+			var col = new Element('td');
+			tds.push(col);
+			this.sizerRow.adopt(col);
 		}
-		//clearing all column widths
 
+		//clearing all column widths
 		tfoot.getChildren('tr').each(function(tr) {
 			tr.setStyle('width', null);
 		});
