@@ -66,16 +66,21 @@ tnoodle.server = function(url) {
 	};
 
 	var server = this;
-	this.formatTime = function(timeCentis) {
-		//TODO - add gui option!!!
+	this.formatTime = function(timeCentis, decimalPlaces) {
+		if(decimalPlaces != 0)
+			decimalPlaces = decimalPlaces || 2;
+		
 		if(timeCentis == Infinity)
 			return "DNF"
 		else if(server.configuration.get('clockFormat', true))
-			return server.clockFormat(timeCentis);
+			return server.clockFormat(timeCentis, decimalPlaces);
 		else
-			return (timeCentis/100).toFixed(2);
+			return (timeCentis/100).toFixed(decimalPlaces);
 	};
-	this.clockFormat = function(timeCentis) {
+	this.clockFormat = function(timeCentis, decimalPlaces) {
+		if(decimalPlaces != 0)
+			decimalPlaces = decimalPlaces || 2;
+		
 		var hours = (timeCentis / (100*60*60)).toInt();
 		timeCentis = timeCentis % (100*60*60);
 		var minutes = (timeCentis / (100*60)).toInt();
@@ -96,10 +101,24 @@ tnoodle.server = function(url) {
 			if(seconds < 10)
 				clocked += "0";
 		}
-		clocked += seconds + ".";
-		if(centis < 10)
-			clocked += "0";
-		clocked += centis;
+		clocked += seconds;
+		if(decimalPlaces > 0) {
+			var decimals = "";
+			if(centis < 10)
+				decimals += "0";
+			decimals += centis;
+			if(decimalPlaces <= 2) {
+				decimals = decimals.substring(0, decimalPlaces);
+			} else {
+				//just for completeness
+				for(var i = 2; i < decimalPlaces; i++) {
+					decimals += "0";
+				}
+			}
+			
+			clocked += "." + decimals;
+		}
+		
 		return clocked;
 	};
 	

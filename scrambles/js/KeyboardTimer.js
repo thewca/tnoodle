@@ -1,5 +1,6 @@
 var KeyboardTimer = new Class({
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
+	decimalPlaces: 2,
 	initialize: function(parent, server) {
 		this.parent = parent;
 		this.server = server;
@@ -23,13 +24,11 @@ var KeyboardTimer = new Class({
 			optionsDiv.fade('in');
 			optionsButton.morph('.optionsButtonHover');
 		};
-		optionsDiv.hide = function() {
+		optionsDiv.hide = function(e) {
+			updateFrequency.blur(); //TODO - this is happening too often
 			optionsDiv.fade('out');
 			optionsButton.morph('.optionsButton');
 		};
-		optionsDiv.setStyle('display', 'none'); //for some reason, setting visiblity: none doesn't seem to work here
-		optionsDiv.hide(); //this allows the first show() to animate
-		optionsDiv.inject(parent);
 		
 		optionsButton.addEvent('mouseover', optionsDiv.show);
 		optionsButton.addEvent('mouseout', optionsDiv.hide);
@@ -51,7 +50,32 @@ var KeyboardTimer = new Class({
 		optionsDiv.adopt(createOptionBox('timer.wcaInspection', 'WCA style inspection', false));
 		optionsDiv.adopt(createOptionBox('timer.onlySpaceStarts', 'Only spacebar starts', true));
 		optionsDiv.adopt(createOptionBox('timer.showStatus', 'Show timer status', true));
+		
+		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
+		var frequencyChanged = function(e) {
+			if(!updateFrequency.value.match(/^\d+(\.\d*)?|\.\d+$/))
+				updateFrequency.value = "0.01";
+			
+			if(updateFrequency.value.indexOf('.') < 0)
+				this.decimalPlaces = 0;
+			else
+				this.decimalPlaces = updateFrequency.value.length - updateFrequency.value.indexOf('.') - 1;
+			
+			server.configuration.set('timer.frequency', updateFrequency.value.toFloat());
+		}.bind(this);
+		updateFrequency.addEvent('change', frequencyChanged);
+		updateFrequency.value = this.config.get('timer.frequency', "0.01");
+		frequencyChanged();
+		
+		var frequencyDiv = new Element('div');
+		frequencyDiv.adopt(updateFrequency);
+		frequencyDiv.adopt(new Element('label', { 'for': 'timer.frequency', html: 'Update frequency (seconds)' }));
+		optionsDiv.adopt(frequencyDiv);
 
+		optionsDiv.setStyle('display', 'none'); //for some reason, setting visiblity: none doesn't seem to work here
+		optionsDiv.hide(); //this allows the first show() to animate
+		optionsDiv.inject(parent);
+		
 		var timer = this;
 
 		var keys = new Hash();
@@ -140,13 +164,21 @@ var KeyboardTimer = new Class({
 		//TODO - wca style penalties
 		if(this.inspecting)
 			return (15-this.getInspectionElapsedSeconds()).toString();
-		else
-			return this.server.formatTime(this.getTimeCentis());
+		else {
+			var decimalPlaces = 2;
+			var centis = this.getTimeCentis();
+			if(this.timing) {
+				var frequency = this.config.get('timer.frequency');
+				centis = Math.round((frequency*100)*(Math.round(centis / (frequency*100))));
+				decimalPlaces = this.decimalPlaces;
+			}
+			return this.server.formatTime(centis, decimalPlaces);
+		}
 	},
 	timerId: null,
 	startRender: function() {
 		if(this.timerId == null)
-			this.timerId = this.redraw.periodical(10, this);
+			this.timerId = this.redraw.periodical(this.config.get('timer.frequency')*1000, this);
 	},
 	stopRender: function() {
 		$clear(this.timerId);
