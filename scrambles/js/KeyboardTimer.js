@@ -1,6 +1,7 @@
 var KeyboardTimer = new Class({
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
 	decimalPlaces: 2,
+	frequency: .01,
 	initialize: function(parent, server) {
 		this.parent = parent;
 		this.server = server;
@@ -61,7 +62,8 @@ var KeyboardTimer = new Class({
 			else
 				this.decimalPlaces = updateFrequency.value.length - updateFrequency.value.indexOf('.') - 1;
 			
-			server.configuration.set('timer.frequency', updateFrequency.value.toFloat());
+			server.configuration.set('timer.frequency', updateFrequency.value);
+			this.frequency = updateFrequency.value.toFloat();
 		}.bind(this);
 		updateFrequency.addEvent('change', frequencyChanged);
 		updateFrequency.value = this.config.get('timer.frequency', "0.01");
@@ -168,8 +170,10 @@ var KeyboardTimer = new Class({
 			var decimalPlaces = 2;
 			var centis = this.getTimeCentis();
 			if(this.timing) {
-				var frequency = this.config.get('timer.frequency');
-				centis = Math.round((frequency*100)*(Math.round(centis / (frequency*100))));
+				if(this.frequency == 0) {
+					return "...";
+				}
+				centis = Math.round((this.frequency*100)*(Math.round(centis / (this.frequency*100))));
 				decimalPlaces = this.decimalPlaces;
 			}
 			return this.server.formatTime(centis, decimalPlaces);
@@ -178,7 +182,7 @@ var KeyboardTimer = new Class({
 	timerId: null,
 	startRender: function() {
 		if(this.timerId == null)
-			this.timerId = this.redraw.periodical(this.config.get('timer.frequency')*1000, this);
+			this.timerId = this.redraw.periodical(this.frequency*1000, this);
 	},
 	stopRender: function() {
 		$clear(this.timerId);
