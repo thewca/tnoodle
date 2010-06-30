@@ -19,6 +19,7 @@ var KeyboardTimer = new Class({
 		
 		var optionsDiv = new Element('div', { 'class': 'options' });
 		optionsDiv.show = function() {
+			optionsDiv.setStyle('display', ''); //for some reason, setting visiblity: none doesn't seem to work here
 			optionsDiv.fade('in');
 			optionsButton.morph('.optionsButtonHover');
 		};
@@ -26,7 +27,8 @@ var KeyboardTimer = new Class({
 			optionsDiv.fade('out');
 			optionsButton.morph('.optionsButton');
 		};
-		optionsDiv.fade('out');
+		optionsDiv.setStyle('display', 'none'); //for some reason, setting visiblity: none doesn't seem to work here
+		optionsDiv.hide(); //this allows the first show() to animate
 		optionsDiv.inject(parent);
 		
 		optionsButton.addEvent('mouseover', optionsDiv.show);

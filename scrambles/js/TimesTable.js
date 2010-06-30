@@ -22,6 +22,8 @@ var TimesTable = new Class({
 		this.addEvent('onSort', function(tbody, index) {
 			this.configuration.set('times.sort', this.sorted);
 			this.scrollToLastTime();
+			if(this.sizerRow)
+				this.sizerRow.inject(this.tbody);
 		});
 		
 		this.tbody = $(this).getChildren('tbody')[0];
@@ -195,11 +197,13 @@ var TimesTable = new Class({
 		var col3 = new Element('td', { colspan: 5 }).adopt(errorField);
 		col3.inject(this.editRow);
 
-		//sizing up w/ previous row
-//		deleteTime.setStyle('width', this.selectedRow.getChildren()[0].getStyle('width'));
-//		col2.setStyle('width', this.selectedRow.getChildren()[1].getStyle('width'));
-//		var remainder = this.tbody.getSize().x - this.selectedRow.getChildren()[2].getPosition(this.tbody).x - 1; //subtract 1 for the border
-//		col3.setStyle('width', remainder);
+		//sizing up w/ previous row, i don't know why this doesn't just work when adding a time
+		if(!time) {
+			deleteTime.setStyle('width', this.selectedRow.getChildren()[0].getStyle('width'));
+			col2.setStyle('width', this.selectedRow.getChildren()[1].getStyle('width'));
+			var remainder = this.tbody.getSize().x - this.selectedRow.getChildren()[2].getPosition(this.tbody).x - 1; //subtract 1 for the border
+			col3.setStyle('width', remainder);
+		}
 		
 		this.editRow.replaces(this.selectedRow);
 		
@@ -247,6 +251,7 @@ var TimesTable = new Class({
 			var optionsDiv = new Element('div', { 'class': 'options' });
 			optionsDiv.setStyle('width', '200px'); //TODO - compute width dynamically
 			optionsDiv.show = function() {
+				optionsDiv.setStyle('display', '');
 				optionsDiv.position({relativeTo: optionsButton, position: 'topLeft', edge: 'bottomLeft'});
 				optionsDiv.fade('in');
 				optionsButton.morph('.optionsButtonHover');
@@ -255,7 +260,8 @@ var TimesTable = new Class({
 				optionsDiv.fade('out');
 				optionsButton.morph({ 'background-color': '#A0A0FF', color: '#000' }); //this is awful
 			};
-			optionsDiv.fade('out');
+			optionsDiv.setStyle('display', 'none'); //for some reason, setting visiblity: none doesn't seem to work here
+			optionsDiv.hide(); //this allows the first show() to animate
 			
 			optionsButton.addEvent('mouseover', optionsDiv.show);
 			optionsButton.addEvent('mouseout', optionsDiv.hide);
@@ -408,6 +414,7 @@ var TimesTable = new Class({
 		tbody.adopt(this.sizerRow);
 		for(var i = 0; i < headers.length; i++) {
 			var col = new Element('td');
+			col.setStyle('border-color', 'transparent');
 			tds.push(col);
 			this.sizerRow.adopt(col);
 		}
@@ -474,5 +481,6 @@ var TimesTable = new Class({
 			this.scrollToLastTime();
 		} else if(forceScrollToLatest)
 			this.scrollToLastTime();
+		
 	}
 });
