@@ -16,18 +16,6 @@ span.increaseSize:hover, span.decreaseSize:hover {
 	color: red;
 }
 
-span.link {
-	white-space: nowrap;
-	color: brown;
-	text-decoration: underline;
-	cursor: pointer;
-	padding-left: 10px;
-}
-span.link:hover, span.down {
-	text-decoration: none;
-	color: red;
-}
-
 span.turn {
 	color: black;
 	/*text-decoration: underline;*/

@@ -4,7 +4,6 @@
 <title>TNoodleTimer</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 
-
 <script type="text/javascript" src="mootools-1.2.4-core.js"></script>
 <script type="text/javascript" src="mootools-1.2.4.4-more.js"></script>
 <script type="text/javascript" src="tnoodleserver.js"></script>
@@ -35,6 +34,18 @@ body {
 img {
     border: none;
     padding: 1px;
+}
+
+span.link {
+	white-space: nowrap;
+	color: brown;
+	text-decoration: underline;
+	cursor: pointer;
+	padding-left: 10px;
+}
+span.link:hover, span.down {
+	text-decoration: none;
+	color: red;
 }
 
 .importDiv {
@@ -161,10 +172,11 @@ window.addEvent('domready', function() {
 		customizationSelect.value = session.getCustomization();
 	};
 	$('puzzleChooser').adopt(customizationSelect);
-	var editCustomization = new Element('span', { 'class': 'link', 'html': 'Edit customizations' });
+
+	var editCustomization = new Element('span', { 'class': 'link', 'html': 'Add customization' });
 	editCustomization.addEvent('click', function(e) {
 		//TODO - provide a better gui for this
-		var newCustomization = prompt("Enter name of new customization");
+		var newCustomization = prompt("Enter name of new customization (this will become a pretty gui someday, I promise!)");
 		if(newCustomization) {
 			server.createCustomization(session.getPuzzle(), newCustomization);
 			customizationSelect.refresh();

@@ -198,11 +198,23 @@ tnoodle.server = function(url) {
 		this.getPenalty = function() {
 			return this.penalty;
 		};
-
+		this.addTag = function(tag) {
+			if(!this.hasTag(tag))
+				this.tags.push(tag);
+		}
+		this.removeTag = function(tag) {
+			var index = this.tags.indexOf(tag);
+			if(index >= 0)
+				this.tags.splice(index, 1);
+		}
+		this.hasTag = function(tag) {
+			return this.tags.indexOf(tag) >= 0;
+		}
 		
 		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = '';
 		this.penalty = null;
 		this.index = null;
+		this.tags = [];
 		//TODO - creation date
 		//TODO - tags
 		//TODO - comments?
@@ -320,6 +332,20 @@ tnoodle.server = function(url) {
 		//TODO - urgh... editing too?
 	};
 	
+	this.getTags = function(puzzle) {
+		//TODO - should tags be per-puzzle? seems like a good idea
+		//although it does make changing session puzzles more complicated ... urgh
+		if(!(puzzle in tags))
+			tags[puzzle] = [ 'POP' ];
+		return tags[puzzle].sort();
+	};
+	this.createTag = function(puzzle, tag) {
+		if(tags[puzzle].indexOf(tag) >= 0)
+			return false;
+		tags[puzzle].push(tag);
+		return true;
+	};
+	
 	//TODO - load sessions from config!
 	var sesh = this.createSession("4x4x4", "OH");
 	for(var i = 0; i < 9; i++)
@@ -335,4 +361,6 @@ tnoodle.server = function(url) {
 		if(!(customization in customizations[puzzle]))
 			customizations[puzzle].push(customization);
 	}
+	//TODO - initialize the available tags, merge with customizations object?
+	var tags = { '3x3x3': [ 'PLL skip', 'POP' ] };
 };

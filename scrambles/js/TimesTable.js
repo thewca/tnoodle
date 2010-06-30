@@ -5,9 +5,16 @@ var TimesTable = new Class({
 	//TODO - tag time
 		this.server = server;
 		this.configuration = server.configuration;
+		HtmlTable.Parsers.time = {
+			match: /^.*$/,
+			convert: function() {
+				return this.timeCentis;
+			},
+			number: true
+		};
 		this.parent(id, {
 			headers: [ '', 'Time', 'Mean 3', 'Ra 5', 'Ra 12', 'Ave 100', 'Session Ave' ],
-			parsers: [ HtmlTable.Parsers.number, HtmlTable.Parsers.float ],
+			parsers: [ HtmlTable.Parsers.number, HtmlTable.Parsers.time ],
 			rows: [],
 			sortable: true,
 			zebra: false,
@@ -232,11 +239,71 @@ var TimesTable = new Class({
 				timeChanged();
 			});
 			
+			var optionsButton = new Element('div', { html: '^', 'class': 'optionsButton' });
+			optionsButton.setStyle('position', 'relative'); //so hacky
+			optionsButton.setStyle('left', '5px');
+			optionsButton.setStyle('background-color', '#A0A0FF');
+			
+			var optionsDiv = new Element('div', { 'class': 'options' });
+			optionsDiv.setStyle('width', '200px'); //TODO - compute width dynamically
+			optionsDiv.show = function() {
+				optionsDiv.position({relativeTo: optionsButton, position: 'topLeft', edge: 'bottomLeft'});
+				optionsDiv.fade('in');
+				optionsButton.morph('.optionsButtonHover');
+			};
+			optionsDiv.hide = function() {
+				optionsDiv.fade('out');
+				optionsButton.morph({ 'background-color': '#A0A0FF', color: '#000' }); //this is awful
+			};
+			optionsDiv.fade('out');
+			
+			optionsButton.addEvent('mouseover', optionsDiv.show);
+			optionsButton.addEvent('mouseout', optionsDiv.hide);
+			optionsDiv.addEvent('mouseover', optionsDiv.show);
+			optionsDiv.addEvent('mouseout', optionsDiv.hide);
+			
+			function createTagBox(tag, checked) {
+				var checkbox = new Element('input', { id: tag, type: 'checkbox' });
+				checkbox.checked = checked;
+				checkbox.addEvent('change', function(e) {
+					if(this.checked)
+						time.addTag(tag);
+					else
+						time.removeTag(tag);
+				});
+				checkbox.addEvent('focus', function(e) {
+					this.blur();
+				});
+				return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag }));
+			}
+			optionsDiv.refresh = function() {
+				var tags = this.server.getTags(this.session.getPuzzle());
+				for(var i = 0; i < tags.length; i++)
+					optionsDiv.adopt(createTagBox(tags[i], time.hasTag(tags[i])));
+				
+				// all of this tagging code is some of the worst code i've written for tnt,
+				// probably because it's 7:30 am, and i want to go to sleep
+				// TODO - but it's important that there eventually is a better dialog for editing tags 
+				// that doesn't cause the current row to lose focus
+				var addTagLink = new Element('span', { 'class': 'link', html: 'Add tag' });
+				addTagLink.addEvent('click', function(e) {
+					var tag = prompt("Enter name of new tag (I promise this will become a not-crappy gui someday)");
+					if(tag) {
+						this.server.createTag(this.session.getPuzzle(), tag);
+						optionsDiv.refresh();
+					}
+				}.bind(this));
+				optionsDiv.adopt(addTagLink);
+			}.bind(this);
+			optionsDiv.refresh();
+
 			this.penaltyRow = new Element('tr', {'class': 'penaltyRow' });
 			var extraDelete = new Element('td', {'class': 'extendedDeleteTime'});
 			extraDelete.addEvent('click', deleteTimeFunc);
 			this.penaltyRow.adopt(extraDelete);
-			this.penaltyRow.adopt(new Element('td', { colspan: this.options.headers.length-1}).adopt(form));
+			this.penaltyRow.adopt(new Element('td', { colspan: 4}).adopt(form));
+			this.penaltyRow.adopt(new Element('td', { colspan: 2}).adopt(optionsButton));
+			optionsDiv.inject(this.penaltyRow);
 			this.penaltyRow.inject(this.editRow, 'after');
 			this.scrollToRow(this.penaltyRow);
 		} else
@@ -301,7 +368,10 @@ var TimesTable = new Class({
 		tr.addEvent('click', function(e) { this.rowClicked(e, tr, time); }.bind(this));
 		tr.refresh = function() {
 			this.getChildren()[0].set('html', time.index);
+			
 			this.getChildren()[1].set('html', time.format());
+			this.getChildren()[1].timeCentis = time.getValueCentis();
+			
 			this.getChildren()[2].set('html', time.mean3);
 			this.getChildren()[3].set('html', time.ra5);
 			this.getChildren()[4].set('html', time.ra12);
