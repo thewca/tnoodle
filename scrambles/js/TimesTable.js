@@ -1,3 +1,13 @@
+//TODO - it would be nice to have this in mootools
+function isOrIsChild(el, parent) {
+	while(el != null) {
+		if(el == parent)
+			return true;
+		el = el.parentNode;
+	}
+	return false;
+}
+
 var TimesTable = new Class({
 	Extends: HtmlTable,
 	initialize: function(id, server) {
@@ -5,16 +15,30 @@ var TimesTable = new Class({
 	//TODO - tag time
 		this.server = server;
 		this.configuration = server.configuration;
+		var table = this;
 		HtmlTable.Parsers.time = {
 			match: /^.*$/,
 			convert: function() {
+				if(isOrIsChild(this, table.sizerRow))
+					return Infinity;
 				return this.timeCentis;
 			},
 			number: true
 		};
+		//this parser will ignore our sizer tr
+		HtmlTable.Parsers.num = {
+			match: HtmlTable.Parsers.number.match,
+			convert: function() {
+				if(isOrIsChild(this, table.sizerRow)) {
+					return Infinity;
+				}
+				return HtmlTable.Parsers.number.convert.call(this);
+			},
+			number: HtmlTable.Parsers.number.number
+		};
 		this.parent(id, {
 			headers: [ '', 'Time', 'Mean 3', 'Ra 5', 'Ra 12', 'Ave 100', 'Session Ave' ],
-			parsers: [ HtmlTable.Parsers.number, HtmlTable.Parsers.time ],
+			parsers: [ HtmlTable.Parsers.num, HtmlTable.Parsers.time ],
 			rows: [],
 			sortable: true,
 			zebra: false,
@@ -45,6 +69,11 @@ var TimesTable = new Class({
 		}.bind(this);
 		this.addRow.inject(this.infoRow, 'before'); //place the add row in the footer
 		
+		//this row serves as the spine for our tbody
+		this.sizerRow = new Element('tr');
+		this.sizerRow.setStyle('visibility', 'hidden');
+		this.sizerRow.refresh = function() {};
+		
 		window.addEvent('click', this.deselectRow.bind(this));
 		window.addEvent('keydown', function(e) {
 			if(e.key == 'esc')
@@ -74,7 +103,7 @@ var TimesTable = new Class({
 		this.add(time);
 		this.resort();
 		this.infoRow.refresh();
-		this.resize();
+		this.resize(true);
 	},
 	scrollToLastTime: function() {
 		this.scrollToRow(this.lastAddedRow);
@@ -107,6 +136,8 @@ var TimesTable = new Class({
 		var scrollTop = this.tbody.scrollTop; //save scroll amount
 		var sort = this.configuration.get('times.sort', { index: 0, reverse: false });
 		this.sort(sort.index, sort.reverse);
+		this.sizerRow.inject(this.tbody);
+		
 		if(preserveScrollbar)
 			this.tbody.scrollTo(0, scrollTop); //restore scroll amount
 	},
@@ -321,15 +352,6 @@ var TimesTable = new Class({
 	},
 	deselectRow: function(e) {
 		if(e) {
-			//TODO - would be nice to have this in mootools
-			function isOrIsChild(el, parent) {
-				while(el != null) {
-					if(el == parent)
-						return true;
-					el = el.parentNode;
-				}
-				return false;
-			}
 			if(e.rightClick) return null; //we don't let right clicking deselect a row
 			if(isOrIsChild(e.target, this.penaltyRow))
 				return null;
@@ -406,11 +428,8 @@ var TimesTable = new Class({
 		var addTimeCells = this.addRow.getChildren('td');
 		var headers = thead.getChildren('tr')[0].getChildren('th');
 		var tds = [];
-		if(this.sizerRow)
-			this.sizerRow.dispose();
-		this.sizerRow = new Element('tr'); //TODO - this row is still visible
-		this.sizerRow.setStyle('visibility', 'hidden');
-		this.sizerRow.refresh = function() {};
+		
+		this.sizerRow.empty();
 		tbody.adopt(this.sizerRow);
 		for(var i = 0; i < headers.length; i++) {
 			var col = new Element('td');
@@ -479,8 +498,9 @@ var TimesTable = new Class({
 		if(this.freshSession) {
 			this.freshSession = false;
 			this.scrollToLastTime();
-		} else if(forceScrollToLatest)
+		} else if(forceScrollToLatest) {
 			this.scrollToLastTime();
+		}
 		
 	}
 });

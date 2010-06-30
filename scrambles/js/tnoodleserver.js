@@ -67,6 +67,7 @@ tnoodle.server = function(url) {
 
 	var server = this;
 	this.formatTime = function(timeCentis, decimalPlaces) {
+		timeCentis = Math.round(timeCentis);
 		if(decimalPlaces != 0)
 			decimalPlaces = decimalPlaces || 2;
 		
@@ -78,6 +79,7 @@ tnoodle.server = function(url) {
 			return (timeCentis/100).toFixed(decimalPlaces);
 	};
 	this.clockFormat = function(timeCentis, decimalPlaces) {
+		timeCentis = Math.round(timeCentis);
 		if(decimalPlaces != 0)
 			decimalPlaces = decimalPlaces || 2;
 		

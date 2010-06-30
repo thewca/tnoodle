@@ -173,7 +173,7 @@ var KeyboardTimer = new Class({
 				if(this.frequency == 0) {
 					return "...";
 				}
-				centis = Math.round((this.frequency*100)*(Math.round(centis / (this.frequency*100))));
+				centis = (this.frequency*100)*(Math.round(centis / (this.frequency*100)));
 				decimalPlaces = this.decimalPlaces;
 			}
 			return this.server.formatTime(centis, decimalPlaces);
