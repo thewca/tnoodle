@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -106,6 +105,7 @@ public class ScrambleServer {
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
 		System.out.println("Server started on " + addr);
 		System.out.println("Visit http://" + addr + " for a readme and demo.");
+		System.out.println("Visit http://" + addr + "/tnt/ to try out TNT.");
 	}
 	
 	private class ReadmeHandler extends SafeHttpHandler {
@@ -132,7 +132,7 @@ public class ScrambleServer {
 		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 			String fileName;
-			if(path.length == 1 && path.equals("tnt"))
+			if(path.length == 1 && path[0].equals("tnt"))
 				fileName = "tnt/tnt.html";
 			else
 				fileName = t.getRequestURI().getPath().substring(1);
