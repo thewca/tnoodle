@@ -138,4 +138,16 @@ public final class ScrambleUtils {
 		}
 		return new String[] { name, extension };
 	}
+	
+	public static String join(Object[] arr, String separator) {
+		if(separator == null)
+			separator = ",";
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < arr.length; i++) {
+			if(i > 0)
+				sb.append(",");
+			sb.append(arr[i].toString());
+		}
+		return sb.toString();
+	}
 }

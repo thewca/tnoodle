@@ -811,8 +811,9 @@ function promptSeed() {
     var scrambler;
     if(applet)
     	scrambler = new tnoodle.scrambles.applet(puzzlesLoaded);
-    else
-    	scrambler = new tnoodle.scrambles.server('localhost', 8080);
+    else {
+    	scrambler = new tnoodle.scrambles.server(location.hostname, location.port);
+    }
     scramblePre.appendChild(document.createTextNode('Connecting to ' + scrambler.toString() + "..."));
     scrambler.connect(puzzlesLoaded);
     

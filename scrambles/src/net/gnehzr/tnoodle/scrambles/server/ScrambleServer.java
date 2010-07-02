@@ -1,7 +1,7 @@
 package net.gnehzr.tnoodle.scrambles.server;
 
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.throwableToString;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.parseExtension;
+import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.throwableToString;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toColor;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toHex;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toInt;
@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,12 +32,13 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 
 import joptsimple.OptionParser;
@@ -93,6 +95,7 @@ public class ScrambleServer {
 		}
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 		server.createContext("/", new ReadmeHandler());
+		server.createContext("/tnt/", new TNTHandler());
 		server.createContext("/import/", new ImporterHandler());
 		server.createContext("/scramble/", new ScramblerHandler(scramblers));
 		server.createContext("/view/", new ScrambleViewerHandler(scramblers));
@@ -103,6 +106,39 @@ public class ScrambleServer {
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
 		System.out.println("Server started on " + addr);
 		System.out.println("Visit http://" + addr + " for a readme and demo.");
+	}
+	
+	private class ReadmeHandler extends SafeHttpHandler {
+		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			fullyReadInputStream(getClass().getResourceAsStream("readme.html"), bytes);
+			sendHtml(t, bytes);
+		}
+	}
+	
+	private class TNTHandler extends SafeHttpHandler {
+		MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
+		{
+			mimes.addMimeTypes("text/css css");
+			mimes.addMimeTypes("text/html html htm");
+			
+			mimes.addMimeTypes("application/x-javascript js");
+			
+			mimes.addMimeTypes("application/png png");
+			mimes.addMimeTypes("application/gif gif");
+			mimes.addMimeTypes("application/octet-stream *");
+		}
+		
+		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			String fileName;
+			if(path.length == 1 && path.equals("tnt"))
+				fileName = "tnt/tnt.html";
+			else
+				fileName = t.getRequestURI().getPath().substring(1);
+			fullyReadInputStream(getClass().getResourceAsStream(fileName), bytes);
+			sendBytes(t, bytes, mimes.getContentType(fileName));
+		}
 	}
 	
 	private class ImporterHandler extends SafeHttpHandler {
@@ -154,15 +190,6 @@ public class ScrambleServer {
 			}
 		}
 
-	}
-	
-	private class ReadmeHandler extends SafeHttpHandler {
-		
-		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			fullyReadInputStream(getClass().getResourceAsStream("readme.html"), bytes);
-			sendHtml(t, bytes);
-		}
 	}
 	
 	private class ScrambleViewerHandler extends SafeHttpHandler {
@@ -410,10 +437,9 @@ public class ScrambleServer {
 					sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
 				} else if(ext.equals("pdf")) {
 					ByteArrayOutputStream pdf = createPdf(generator, scrambles, title, toInt(query.get("width"), null), toInt(query.get("height"), null), query.get("scheme"));
-					t.getResponseHeaders().set("Content-Type", "application/pdf");
 					t.getResponseHeaders().set("Content-Disposition", "inline");
 					//TODO - what's the right way to do caching?
-					sendBytes(t, pdf);
+					sendBytes(t, pdf, "application/pdf");
 				} else {
 					sendText(t, "Invalid extension: " + ext);
 				}
@@ -580,12 +606,11 @@ abstract class SafeHttpHandler implements HttpHandler {
 	}
 	
 	protected static void sendJSON(HttpExchange t, String json, String callback) {
-		t.getResponseHeaders().set("Content-Type", "application/json");
 		t.getResponseHeaders().set("Access-Control-Allow-Origin", "*"); //this allows x-domain ajax
 		if(callback != null) {
 			json = callback + "(" + json + ")";
 		}
-		sendBytes(t, json.getBytes()); //TODO - charset?
+		sendBytes(t, json.getBytes(), "application/json"); //TODO - charset?
 	}
 	
 	protected static void sendJSONError(HttpExchange t, String error, String callback) {
@@ -598,8 +623,9 @@ abstract class SafeHttpHandler implements HttpHandler {
 		sendJSONError(t, throwableToString(error), callback);
 	}
 	
-	protected static void sendBytes(HttpExchange t, ByteArrayOutputStream bytes) {
+	protected static void sendBytes(HttpExchange t, ByteArrayOutputStream bytes, String contentType) {
 		try {
+			t.getResponseHeaders().set("Content-Type", contentType);
 			t.sendResponseHeaders(200, bytes.size());
 			bytes.writeTo(t.getResponseBody());
 		} catch (IOException e) {
@@ -613,8 +639,9 @@ abstract class SafeHttpHandler implements HttpHandler {
 		}
 	}
 	
-	protected static void sendBytes(HttpExchange t, byte[] bytes) {
+	protected static void sendBytes(HttpExchange t, byte[] bytes, String contentType) {
 		try {
+			t.getResponseHeaders().set("Content-Type", contentType);
 			t.sendResponseHeaders(200, bytes.length);
 			t.getResponseBody().write(bytes);
 		} catch (IOException e) {
@@ -629,17 +656,14 @@ abstract class SafeHttpHandler implements HttpHandler {
 	}
 	
 	protected static void sendHtml(HttpExchange t, ByteArrayOutputStream bytes) {
-		t.getResponseHeaders().set("Content-Type", "text/html");
-		sendBytes(t, bytes);
+		sendBytes(t, bytes, "text/html");
 	}
 	protected static void sendHtml(HttpExchange t, byte[] bytes) {
-		t.getResponseHeaders().set("Content-Type", "text/html");
-		sendBytes(t, bytes);
+		sendBytes(t, bytes, "text/html");
 	}
 	
 	protected static void sendText(HttpExchange t, String text) {
-		t.getResponseHeaders().set("Content-Type", "text/plain");
-		sendBytes(t, text.getBytes()); //TODO - encoding charset?
+		sendBytes(t, text.getBytes(), "text/plain"); //TODO - encoding charset?
 	}
 
 }
