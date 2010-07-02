@@ -37,13 +37,19 @@
 
 #timesTable tr:nth-child(even) {background: #CCC}
 #timesTable tr:nth-child(odd) {background: #FFF}
-#timesTable tbody tr:hover, #timesTable tr.addTime:hover, #timesTable tr.editRow, #timesTable tr.penaltyRow {
-	background-color: rgb(160, 160, 255);
+#timesTable tbody tr:hover, tbody tr:hover td, #timesTable tr.addTime:hover, #timesTable tr.editRow, #timesTable tr.penaltyRow {
+	background-color: rgb(160, 160, 255) !important;
 }
+
 .errorField {
 	color: red;
 }
-
+#timesTable tbody tr.sizerRow {
+	visibility: hidden;
+}
+#timesTable tbody tr.sizerRow td {
+	border-color: transparent;
+}
 #timesTable tbody tr td.deleteTime { /* TODO: pretty picture! */
 	cursor: pointer;
 	border-bottom: none;
@@ -52,4 +58,23 @@
 #timesTable tbody tr td.extendedDeleteTime { /* TODO: pretty picture! */
 	cursor: pointer;
 	border-top: none;
+}
+#timesTable tbody tr td.currentRA {
+	border-left: 2px solid red;
+	border-right: 2px solid red;
+}
+#timesTable tbody tr td.topCurrentRA {
+	border-top: 2px solid red;
+}
+#timesTable tbody tr td.bottomCurrentRA {
+	border-bottom: 2px solid red;
+}
+.bestRA, #timesTable tbody tr td.bestRA {
+	background-color: rgba(196,255,255, .8);
+}
+.bestTime {
+	color: rgb(0,128,0);
+}
+.worstTime {
+	color: rgb(255,0,0);
 }

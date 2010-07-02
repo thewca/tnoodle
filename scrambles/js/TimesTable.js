@@ -10,11 +10,12 @@ function isOrIsChild(el, parent) {
 
 var TimesTable = new Class({
 	Extends: HtmlTable,
-	initialize: function(id, server) {
+	ras: [ 'mean3', 'ra5', 'ra12', 'ave100' ],
+	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
-	//TODO - tag time
 		this.server = server;
 		this.configuration = server.configuration;
+		this.scrambleStuff = scrambleStuff
 		var table = this;
 		HtmlTable.Parsers.time = {
 			match: /^.*$/,
@@ -48,6 +49,9 @@ var TimesTable = new Class({
 			this.scrollToLastTime();
 			if(this.sizerRow)
 				this.sizerRow.inject(this.tbody);
+			this.tbody.getChildren('tr').each(function(tr) {
+				tr.refresh();
+			});
 		});
 		
 		this.tbody = $(this).getChildren('tbody')[0];
@@ -62,16 +66,29 @@ var TimesTable = new Class({
 		//there needs to be some dummy content in this row so it gets sized correctly
 		//only vertical sizing matters though
 		this.infoRow = this.set('footers', [ 'J', '', '', '', '', '', '' ]).tr;
+
+		var format = server.formatTime;
 		this.infoRow.refresh = function() {
 			var cells = this.infoRow.getChildren();
-			cells[0].set('html', this.session.solveCount()+"/"+this.session.attemptCount());
-			cells[1].set('html', this.session.bestTime().format());
+			var col = -1;
+			
+			cells[++col].set('html', this.session.solveCount()+"/"+this.session.attemptCount());
+			cells[++col].set('html', format(this.session.bestWorst().best.centis));
+			cells[col].addClass('bestTime');
+			
+			for(var i = 0; i < this.ras.length; i++) {
+				var best = this.session.bestWorst(this.ras[i]).best;
+				cells[++col].set('html', format(best.centis));
+				cells[col].removeClass('bestRA');
+				if(best.index != null)
+					cells[col].addClass('bestRA');
+			}
+			cells[++col].set('html', '&sigma; = ' + format(this.session.stdDev()));
 		}.bind(this);
 		this.addRow.inject(this.infoRow, 'before'); //place the add row in the footer
 		
 		//this row serves as the spine for our tbody
-		this.sizerRow = new Element('tr');
-		this.sizerRow.setStyle('visibility', 'hidden');
+		this.sizerRow = new Element('tr', { 'class': 'sizerRow' });
 		this.sizerRow.refresh = function() {};
 		
 		window.addEvent('click', this.deselectRow.bind(this));
@@ -99,14 +116,16 @@ var TimesTable = new Class({
 		this.refreshData();
 	},
 	addTime: function(centis) {
-		var time = this.session.addTime(centis);
+		var time = this.session.addTime(centis, this.scrambleStuff.getScramble());
+		this.scrambleStuff.scramble();
 		this.add(time);
 		this.resort();
 		this.infoRow.refresh();
 		this.resize(true);
 	},
 	scrollToLastTime: function() {
-		this.scrollToRow(this.lastAddedRow);
+		if(this.lastAddedRow)
+			this.scrollToRow(this.lastAddedRow);
 	},
 	scrollToRow: function(tr) {
 		var scrollTop = this.tbody.scrollTop;
@@ -121,6 +140,7 @@ var TimesTable = new Class({
 		} else if(elBottom > scrollBottom) {
 			//we scroll down just until the bottom of the element is visible
 			var delta = elBottom - scrollBottom;
+			delta += 3; //add a couple for the border, TODO - compute border!
 			this.tbody.scrollTo(0, scrollTop + delta);
 		} else {
 			//the element's on screen!
@@ -202,6 +222,7 @@ var TimesTable = new Class({
 				} else {
 					time.parse(textField.value);
 					penalties[String(time.getPenalty())].checked = true;
+					this.session.reindex();
 				}
 				return true;
 			} catch(error) {
@@ -270,9 +291,10 @@ var TimesTable = new Class({
 				} else {
 					//this shouldn't happen
 				}
+				this.session.reindex();
 				textField.value = time.format();
 				timeChanged();
-			});
+			}.bind(this));
 			
 			var optionsButton = new Element('div', { html: '^', 'class': 'optionsButton' });
 			optionsButton.setStyle('position', 'relative'); //so hacky
@@ -394,19 +416,67 @@ var TimesTable = new Class({
 		var tr = this.push(['', '', '', '', '', '', '']).tr;
 		this.lastAddedRow = tr;
 		tr.addEvent('click', function(e) { this.rowClicked(e, tr, time); }.bind(this));
+		var server = this.server;
+		var session = this.session;
+		var ras = this.ras;
+		var THIS = this;
 		tr.refresh = function() {
-			this.getChildren()[0].set('html', time.index);
+			var cells = this.getChildren();
+			var col = -1;
+			cells[++col].set('html', time.index + 1);
 			
-			this.getChildren()[1].set('html', time.format());
-			this.getChildren()[1].timeCentis = time.getValueCentis();
+			cells[++col].set('html', time.format());
+			cells[col].timeCentis = time.getValueCentis();
+			cells[col].removeClass('bestRA');
+			cells[col].removeClass('currentRA');
+			cells[col].removeClass('topCurrentRA');
+			cells[col].removeClass('bottomCurrentRA');
+			cells[col].removeClass('bestTime');
+			cells[col].removeClass('worstTime');
+			var bw = session.bestWorst();
+			if(time.index == bw.best.index)
+				cells[col].addClass('bestTime');
+			else if(time.index == bw.worst.index)
+				cells[col].addClass('worstTime');
+			var bestRA12 = session.bestWorst('ra12').best;
+			var attemptCount = session.attemptCount();
+			if(attemptCount >= 12) {
+				if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
+					cells[col].addClass('bestRA');
+				}
+				if(THIS.sorted.index == 0) {
+					var firstSolve = session.attemptCount()-12;
+					var lastSolve = session.attemptCount()-1;
+					if(firstSolve <= time.index && time.index <= lastSolve)
+						cells[col].addClass('currentRA');
+					
+					if(THIS.sorted.reverse) {
+						//the top/bottom are switched
+						var temp = lastSolve;
+						lastSolve = firstSolve;
+						firstSolve = temp;
+					}
+					
+					if(time.index == firstSolve)
+						cells[col].addClass('topCurrentRA');
+					else if(time.index == lastSolve)
+						cells[col].addClass('bottomCurrentRA');
+				}
+			}
 			
-			this.getChildren()[2].set('html', time.mean3);
-			this.getChildren()[3].set('html', time.ra5);
-			this.getChildren()[4].set('html', time.ra12);
-			this.getChildren()[5].set('html', time.ave100);
-			this.getChildren()[6].set('html', time.sessionAve);
+			for(var i = 0; i < ras.length; i++) {
+				var key = ras[i];
+				cells[++col].set('html', server.formatTime(time[key]));
+				var bestIndex = session.bestWorst(key).best.index;
+				cells[col].removeClass('bestRA');
+				if(bestIndex == time.index)
+					cells[col].addClass('bestRA');
+			}
+			
+			cells[++col].set('html', server.formatTime(time.sessionAve));
 		};
-		tr.refresh();
+		//tr.refresh();
+		this.refreshData();
 	},
 	resize: function(forceScrollToLatest) {
 		if(!this.session) return; //we're not ready to size this until we have a session
@@ -433,7 +503,6 @@ var TimesTable = new Class({
 		tbody.adopt(this.sizerRow);
 		for(var i = 0; i < headers.length; i++) {
 			var col = new Element('td');
-			col.setStyle('border-color', 'transparent');
 			tds.push(col);
 			this.sizerRow.adopt(col);
 		}

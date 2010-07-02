@@ -1,7 +1,9 @@
 var tnoodle = tnoodle || {};
 tnoodle.server = function(url) {
 	this.configuration = new function() {
-		var localFile = document.location.href.match(/^file:\/\/.*$/) && navigator.userAgent.match(/firefox/i); //TODO GAH! localStorage doesn't work offline in ff! wtf?
+		//TODO GAH! localStorage doesn't work offline in ff! wtf?
+		//https://bugzilla.mozilla.org/show_bug.cgi?id=507361
+		var localFile = document.location.href.match(/^file:\/\/.*$/) && navigator.userAgent.match(/firefox/i);
 		var cookies = null;
 		if(!localStorage || localFile) {
 			cookies = new function() {
@@ -55,18 +57,23 @@ tnoodle.server = function(url) {
 				delete cookies[value];
 			} else {
 				data[property] = value;
-				cookies.setItem(property, JSON.stringify(value));
+//				cookies.setItem(property, JSON.stringify(value));
+				//it seems that mootools is breaking stringify with arrays?
+				cookies.setItem(property, JSON.encode(value));
 			}
 		};
 		this.get = function(property, def) {
-			if(!(property in data))
+			if(!(property in data)) {
 				this.set(property, def);
+			}
 			return data[property];
 		};
 	};
 
 	var server = this;
 	this.formatTime = function(timeCentis, decimalPlaces) {
+		if(timeCentis == null)
+			return "";
 		timeCentis = Math.round(timeCentis);
 		if(decimalPlaces != 0)
 			decimalPlaces = decimalPlaces || 2;
@@ -125,7 +132,7 @@ tnoodle.server = function(url) {
 	};
 	
 	/* time can be either a number or a string */
-	function Time(time) {
+	function Time(time, scramble) {
 		this.getValueCentis = function() {
 			if(this.penalty == "+2")
 				return this.centis + 2*100; 
@@ -206,6 +213,7 @@ tnoodle.server = function(url) {
 				throw "Can't have times <= 0";
 			this.centis = valueCentis;
 			this.setPenalty(penalty);
+			saveSessions();
 		};
 		//penalty can be "+2" or "DNF"
 		//anything else is assumed to be no penalty
@@ -214,30 +222,35 @@ tnoodle.server = function(url) {
 				penalty = null
 			}
 			this.penalty = penalty;
+			saveSessions();
 		};
 		//always returns one of null, "+2", "DNF"
 		this.getPenalty = function() {
 			return this.penalty;
 		};
 		this.addTag = function(tag) {
-			if(!this.hasTag(tag))
+			if(!this.hasTag(tag)) {
 				this.tags.push(tag);
+				saveSessions();
+			}
 		}
 		this.removeTag = function(tag) {
 			var index = this.tags.indexOf(tag);
-			if(index >= 0)
+			if(index >= 0) {
 				this.tags.splice(index, 1);
+				saveSessions();
+			}
 		}
 		this.hasTag = function(tag) {
 			return this.tags.indexOf(tag) >= 0;
 		}
 		
-		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = '';
+		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = null;
 		this.penalty = null;
 		this.index = null;
 		this.tags = [];
-		//TODO - creation date
-		//TODO - tags
+		this.date = new Date().getTime();
+		this.scramble = scramble;
 		//TODO - comments?
 		
 		if(typeof(time) === "number")
@@ -248,28 +261,28 @@ tnoodle.server = function(url) {
 	this.Time = Time;
 	var EMPTY_TIME = { format: function() { return ""; }};
 	
-	this.sessions = [];
-	var sessions = this.sessions;
 	function Session(id, puzzle, customization) {
 		this.id = id;
-		puzzle = puzzle;
-		customization = customization || null;
+		this.puzzle = puzzle;
+		this.customization = customization || '';
 		//times is an array of Time's
 		this.times = [];
 		
 		this.setPuzzle = function(newPuzzle) {
-			puzzle = newPuzzle;
+			this.puzzle = newPuzzle;
+			saveSessions();
 		};
 		this.getPuzzle = function() {
-			return puzzle;
+			return this.puzzle;
 		};
 		this.setCustomization = function(custom) {
-			if(custom.length == 0)
-				custom = null;
-			customization = custom;
+			this.customization = custom;
+			saveSessions();
 		};
 		this.getCustomization = function() {
-			return customization;
+			if(this.customization == null)
+				return '';
+			return this.customization;
 		};
 		//TODO - stats!!!
 		this.solveCount = function() {
@@ -285,56 +298,164 @@ tnoodle.server = function(url) {
 		};
 		this.reset = function() {
 			this.times.length = 0;
+			saveSessions();
 		};
-		this.bestTime = function() {
-			var minCentis = Infinity;
-			var min = EMPTY_TIME;
+		//TODO - cache!
+		this.bestWorst = function(key) {
+			var minKey = Infinity, maxKey = 0;
+			var minIndex = null, maxIndex = null;
 			for(var i = 0; i < this.times.length; i++) {
-				if(this.times[i].centis < minCentis) {
-					min = this.times[i];
-					minCentis = min.centis;
+				var val = key ? this.times[i][key] : this.times[i].getValueCentis();
+				if(val != null) {
+					//for min, we choose the *first* guy we can find
+					if(val < minKey || (minIndex == null && val == minKey)) {
+						minKey = val;
+						minIndex = i;
+					}
+					//for max, we choose the *last* guy we can find
+					if(val >= maxKey) {
+						maxKey = val;
+						maxIndex = i;
+					}
 				}
 			}
-			return min;
+			if(minIndex == null)
+				minKey = null;
+			if(maxIndex == null)
+				maxKey = null;
+			return {
+				best: { centis: minKey, index: minIndex },
+				worst: { centis: maxKey, index: maxIndex },
+			};
 		};
-		this.addTime = function(timeCentis) {
-			var time = new Time(timeCentis);
-			this.times.push(time);
-			time.index = this.times.length;
+		this.stdDev = function(lastSolve, count) {
+			lastSolve = lastSolve || this.times.length - 1;
+			var ave = computeAverage(lastSolve, count);
+			if(ave == null || ave == Infinity)
+				return ave;
+			var variance = 0;
+			var solveCount = 0;
+			for(var i = lastSolve; i >= 0; i--) {
+				var val = this.times[i].getValueCentis();
+				if(val < Infinity) {
+					val -= ave; 
+					variance += val*val;
+					solveCount++;
+				}
+				if(solveCount == count)
+					break;
+			}
+			variance /= solveCount;
+			return Math.sqrt(variance);
+		};
+		
+		var THIS = this;
+		
+		//this ignores all DNFs
+		function computeAverage(lastSolve, requiredSolveCount) {
+			if(lastSolve < 0)
+				return null;
+			var solveCount = 0;
+			var sum = 0;
+			for(var i = lastSolve; i >= 0; i--) {
+				var val = THIS.times[i].getValueCentis();
+				if(val < Infinity) {
+					sum += val;
+					solveCount++;
+				}
+				if(solveCount == requiredSolveCount)
+					break;
+			}
+			if(requiredSolveCount && solveCount != requiredSolveCount)
+				return null; //not enough solves
+			if(solveCount == 0)
+				return Infinity;
+			return sum / solveCount;
+		}
+		
+		function computeRA(lastSolve, size, trimmed) {
+			var firstSolve = lastSolve - size + 1;
+			if(firstSolve < 0 || size == 0)
+				return null; //not enough solves
+			
+			var sum = 0;
+			var solveCount = 0;
+			var best = Infinity, worst = 0;
+			for(var i = firstSolve; i <= lastSolve; i++) {
+				var val = THIS.times[i].getValueCentis();
+				best = Math.min(best, val);
+				worst = Math.max(worst, val);
+				if(val < Infinity) {
+					sum += val;
+					solveCount++;
+				}
+			}
+			var requiredSolveCount = trimmed ? size - 2 : size;
+			if(trimmed) {
+				sum -= best;
+				solveCount--;
+				if(worst < Infinity) { //our worst solve may have been a DNF
+					sum -= worst;
+					solveCount--;
+				}
+			}
+
+			if(solveCount != requiredSolveCount)
+				return Infinity; //there must have been too many DNFs, which makes this a DNF average
+			
+			return sum / requiredSolveCount;
+		}
+		function privateAdd(time) {
+			time.index = THIS.times.length;
+			THIS.times.push(time);
+			time.mean3 = computeRA(time.index, 3, false);
+			time.ra5 = computeRA(time.index, 5, true);
+			time.ra12 = computeRA(time.index, 12, true);
+			time.ave100 = computeAverage(time.index, 100);
+			time.sessionAve = computeAverage(time.index);
+		}
+		this.addTime = function(timeCentis, scramble) {
+			var time = new Time(timeCentis, scramble);
+			privateAdd(time);
+			saveSessions();
 			return time;
 		};
 		this.reindex = function() {
-			for(var i = 0; i < this.times.length; i++) {
-				this.times[i].index = i+1;
+			var oldTimes = this.times.slice();
+			this.times.length = 0;
+			for(var i = 0; i < oldTimes.length; i++) {
+				privateAdd(oldTimes[i]);
 			}
+			saveSessions();
 		};
 		//returns the deleted time
 		this.disposeTimeAt = function(index) {
 			var time = this.times.splice(index, 1);
-			this.reindex()
+			this.reindex();
 			return time;
 		};
 		this.disposeTime = function(time) {
 			this.times.splice(this.times.indexOf(time), 1);
-			this.reindex()
+			this.reindex();
 		};
 	}
 	
-	//TODO - use default puzzle for session? if so, how does the user set the default puzzle?
 	this.createSession = function(puzzle, customization) {
 		//id is the number of seconds since the epoch encoded in base 36 for readability
 		var id = Math.round(new Date().getTime()/1000).toString(36);
-		if(id in this.sessions) //we don't want duplicate session ids
+		if(id in sessions) //we don't want duplicate session ids
 			return null;
 		var sesh = new Session(id, puzzle, customization);
-		this.sessions.push(sesh);
+		sessions.push(sesh);
+		saveSessions();
 		return sesh;
 	};
 	this.disposeSession = function(session) {
-		var i = this.sessions.indexOf(session);
+		var i = sessions.indexOf(session);
 		if(i < 0) //couldn't find the session
 			return false;
-		this.sessions.splice(i, 1);
+		sessions.splice(i, 1);
+		saveSessions();
 		return true;
 	};
 	this.getCustomizations = function(puzzle) {
@@ -366,17 +487,64 @@ tnoodle.server = function(url) {
 		tags[puzzle].push(tag);
 		return true;
 	};
-	
 	//TODO - load sessions from config!
-	var sesh = this.createSession("4x4x4", "OH");
-	for(var i = 0; i < 9; i++)
-		sesh.addTime(1384 + i);
-
+	var sessions = this.configuration.get('sessions', []);
+	//transforming sessions (a JSON object) into an array of Sessions of Times
+	try {
+	for(var i = 0; i < sessions.length; i++) {
+		var sesh = new Session();
+		sesh.id = sessions[i].id;
+		sesh.puzzle = sessions[i].puzzle;
+		sesh.customization = sessions[i].customization;
+		sesh.times = [];
+		for(var j = 0; j < sessions[i].times.length; j++) {
+			var newTime = new Time(0);
+			sesh.times.push(newTime);
+			var oldTime = sessions[i].times[j];
+			
+			newTime.ave100 = oldTime.ave100;
+			newTime.centis = oldTime.centis;
+			newTime.index = oldTime.index;
+			newTime.mean3 = oldTime.mean3;
+			newTime.penalty = oldTime.penalty;
+			newTime.ra12 = oldTime.ra12;
+			newTime.ra5 = oldTime.ra5;
+			newTime.sessionAve = oldTime.sessionAve;
+			newTime.tags = oldTime.tags;
+			newTime.date = oldTime.date;
+			newTime.scramble = oldTime.scramble;
+		}
+		sessions[i] = sesh;
+	}
+	} catch(error) {
+		//bummer
+		sessions = [];
+	}
+	
+	this.sessions = sessions;
+	
+	
+	var config = this.configuration;
+	var pendingSave = false;
+	function bufferedSave() {
+		pendingSave = false;
+		config.set('sessions', sessions);
+	}
+	function saveSessions() {
+		if(pendingSave)
+			return;
+		pendingSave = true;
+		setTimeout(bufferedSave, 500);
+	}
+	
+	if(sessions.length == 0)
+		this.createSession("3x3x3", "");
+	
 	//initializing the available customizations
 	var customizations = {};
-	for(var i = 0; i < this.sessions.length; i++) {
-		var puzzle = this.sessions[i].getPuzzle();
-		var customization = this.sessions[i].getCustomization();
+	for(var i = 0; i < sessions.length; i++) {
+		var puzzle = sessions[i].getPuzzle();
+		var customization = sessions[i].getCustomization();
 		if(!(puzzle in customizations))
 			customizations[puzzle] = [ '' ];
 		if(!(customization in customizations[puzzle]))
@@ -384,4 +552,5 @@ tnoodle.server = function(url) {
 	}
 	//TODO - initialize the available tags, merge with customizations object?
 	var tags = { '3x3x3': [ 'PLL skip', 'POP' ] };
+
 };

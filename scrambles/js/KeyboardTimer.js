@@ -16,6 +16,10 @@ var KeyboardTimer = new Class({
 		this.timer.inject(parent);
 		this.timer.setStyle('position', 'relative'); //this lets us manually center the text with js
 		
+		this.fullscreenBG = new Element('div', { 'class': 'fullscreenTimerBg' });
+		this.fullscreenBG.setStyle('display', 'none');
+		this.fullscreenBG.inject(document.body);
+		
 		var optionsButton = new Element('div', { html: 'v', 'class': 'optionsButton' });
 		optionsButton.inject(parent);
 		
@@ -222,8 +226,10 @@ var KeyboardTimer = new Class({
 			parent = window;
 			this.timer.addClass('fullscreenTimer');
 			this.sizer.addClass('fullscreenTimer');
+			this.fullscreenBG.setStyle('display', '');
 		} else {
 			parent = this.parent;
+			this.fullscreenBG.setStyle('display', 'none');
 		}
 		
 		var maxSize = parent.getSize();

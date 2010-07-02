@@ -14,10 +14,18 @@
 .keysDown {
 	color: green;
 }
-.fullscreenTimer {
-	background-color: black;
-	color: red;
+.fullscreenTimerBg {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,1);
 	z-index: 2;
+}
+.fullscreenTimer {
+	color: red;
+	z-index: 3;
 }
 .optionsButton {
 	background-color: #fff;

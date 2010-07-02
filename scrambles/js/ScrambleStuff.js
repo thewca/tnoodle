@@ -90,7 +90,7 @@ function xAddListener(obj, event, func, useCapture) {
 /*** END IE HACKS ***/
 
 
-function ScrambleStuff(configuration, loadedCallback) {
+function ScrambleStuff(configuration, loadedCallback, applet) {
 
 var puzzle = null;
 var colorScheme = null;
@@ -319,7 +319,7 @@ function puzzlesLoaded(puzzles) {
     for(var i = 0; i < puzzles.length; i++) {
         puzzleSelect.options[i] = new Option(puzzles[i][1], puzzles[i][0]);
     }
-    loadedCallback();
+    loadedCallback(puzzles);
 }
 
 var scrambleIndex = 0;
@@ -808,8 +808,11 @@ function promptSeed() {
     colorChooserDiv.style.height = colorChooser.preferredHeight + 'px';
     colorChooserDiv.style.display = 'none';
 
-    var scrambler = new tnoodle.scrambles.server('localhost', 8080);
-//	var scrambler = new tnoodle.scrambles.applet(puzzlesLoaded);
+    var scrambler;
+    if(applet)
+    	scrambler = new tnoodle.scrambles.applet(puzzlesLoaded);
+    else
+    	scrambler = new tnoodle.scrambles.server('localhost', 8080);
     scramblePre.appendChild(document.createTextNode('Connecting to ' + scrambler.toString() + "..."));
     scrambler.connect(puzzlesLoaded);
     
@@ -821,16 +824,19 @@ function promptSeed() {
 	this.scramble = scramble;
 	this.getSelectedPuzzle = function() {
 		return puzzle;
-	}
+	};
 	this.setSelectedPuzzle = function(newPuzzle) {
 		puzzleSelect.value = newPuzzle;
 		puzzleChanged();
-	}
+	};
+	this.getScramble = function() {
+		return currScramble;
+	};
 	
 	var scrambleListeners = [];
 	this.addScrambleChangeListener = function(l) {
 		scrambleListeners.push(l);
-	}
+	};
 	function fireScrambleChanged() {
 		for(var i = 0; i < scrambleListeners.length; i++)
 			scrambleListeners[i]();
@@ -839,7 +845,7 @@ function promptSeed() {
 	var puzzleListeners = [];
 	this.addPuzzleChangeListener = function(l) {
 		puzzleListeners.push(l);
-	}
+	};
 	function firePuzzleChanged() {
 		for(var i = 0; i < puzzleListeners.length; i++)
 			puzzleListeners[i](puzzle);

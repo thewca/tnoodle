@@ -128,11 +128,11 @@ span.link:hover, span.down {
 .tabs li.active {
 	border-bottom: 1px solid #efefef;
 }
-.tabs li:hover, .tabs li.active, #sessionInfo {
+.tabs li:hover, .tabs li.active, #sessionInfoBar {
 	background: #efefef;
 }
 
-#sessionInfo {
+#sessionInfoBar {
 	padding: 5px;
 }
 
@@ -153,12 +153,12 @@ window.addEvent('domready', function() {
 	//to keep track
 	var lastSessionTab = null;
 	var scramblesLoaded = false;
-	function onScramblesLoaded() {
+	function onPuzzlesLoaded(puzzles) {
 		scramblesLoaded = true;
 		if(session)
 			scrambleStuff.setSelectedPuzzle(session.getPuzzle());
 	}
-	var scrambleStuff = new ScrambleStuff(configuration, onScramblesLoaded);
+	var scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 	
@@ -198,6 +198,35 @@ window.addEvent('domready', function() {
 		refreshSessionInfo();
 	});
 
+	//we try to be clever and change the href only after the anchor has been clicked
+	//this should save us a the bother of generating the csv over and over again
+	//TODO - this is probably getting called twice when clicking, due to the mousedown event, and then the click event
+	function downloadCSV() {
+		//TODO - a mapping of keys to descriptions/tooltips would clean up a this + lot of code in TimesTable.js
+		//TODO - comments?
+		var keys = [ 'index', null, 'mean3', 'ra5', 'ra12', 'ave100', 'sessionAve', 'tags', 'date', 'scramble' ];
+		var isTime = [ false, true, true, true, true, true, true, false, false, false ];
+		var data = ',Time,Mean 3,Ra 5,Ra12,Ave 100,Session Ave,Tags,Date,Scramble\n';
+		
+		var times = session.times;
+		for(var i = 0; i < session.times.length; i++) {
+			var time = session.times[i];
+			for(var j = 0; j < keys.length; j++) {
+				var key = keys[j];
+				var val = key ? time[key] : time.getValueCentis();
+				if(isTime[j])
+					val = server.formatTime(val);
+				//we surround each value with double quotes and escape each double quote, just to be safe
+				val = val == null ?
+						'' :
+						'"' + val.toString().replace(/"/g, '""') + '"';
+				data += val + ',';
+			}
+			data += "\n";
+		}
+		var uri = 'data:text/csv;charset=utf8,' + encodeURIComponent(data);
+		this.href = uri;
+	}
 	function resetSession() {
 		if(confirm("Are you sure you want to reset the session?"))
 			timesTable.reset();
@@ -206,7 +235,7 @@ window.addEvent('domready', function() {
 		if(!session) return; //gotta wait for stuff to load
 		$('sessionInfo').empty();
 		$('sessionInfo').appendText(session.getPuzzle());
-		if(session.getCustomization()) {
+		if(session.getCustomization().length > 0) {
 			$('sessionInfo').appendText(" " + session.getCustomization());
 		}
 		$('sessionInfo').appendText(" session ");
@@ -225,16 +254,12 @@ window.addEvent('domready', function() {
 				ago + " " + resolutions[i] + "(s)" :
 				"seconds";
 		$('sessionInfo').appendText("started " + ago + " ago");
-		var reset = new Element('span', { 'class': 'link', 'html': 'Reset' });
-		reset.addEvent('click', resetSession);
-		reset.inject($('sessionInfo'));
 	}
 	
 	var session = null;
-	var timesTable = new TimesTable($('timesTable'), server);
+	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
 	timer.addEvent('newTime', function(timeCentis) {
 		timesTable.addTime(timeCentis);
-		scrambleStuff.scramble();
 	});
 	function sessionClicked(e) {
 		lastSessionTab = this;
@@ -266,7 +291,7 @@ window.addEvent('domready', function() {
 				return;
 			}
 		}
-		if(!confirm("Are you sure you want to delete session " + session.id + "?"))
+		if(deletedSession.times.length > 0 && !confirm("Are you sure you want to delete session " + deletedSession.id + "?"))
 			return;
 		server.disposeSession(deletedSession);
 		this.tab.dispose();
@@ -298,6 +323,10 @@ window.addEvent('domready', function() {
 		tab.inject($('newSession'), 'before');
 		sessionClicked.call(tab, null);
 	});
+	
+	$('resetSession').addEvent('click', resetSession);
+	$('downloadCSV').addEvent('click', downloadCSV);
+	$('downloadCSV').addEvent('mousedown', downloadCSV);
 
 	//TODO - do something if sessions is empty!
 	server.sessions.each(function(sesh, index, ids) {
@@ -451,9 +480,12 @@ window.addEvent('domready', function() {
 	<li id="newSession">+</li>
 </ul>
 <div id="timesArea">
-	<div id="sessionInfo"></div>
+	<div id="sessionInfoBar">
+		<span id="sessionInfo"></span>
+		<span id="resetSession" class="link">Reset</span>
+		<a id="downloadCSV" class="link" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!">Download CSV</a>
+	</div>
 	<table id="timesTable"></table>
 </div>
-
 </body>
 </html>

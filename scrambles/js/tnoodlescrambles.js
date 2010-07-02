@@ -134,7 +134,8 @@ tnoodle.scrambles = {
 		};
 	
 		var applet = document.createElement('applet');
-		applet.setAttribute('codebase', '../dist');
+		//applet.setAttribute('codebase', '../dist');
+		applet.setAttribute('codebase', '.');
 		applet.setAttribute('archive', 'ScrambleApplet.jar');
 		applet.setAttribute('code', 'net.gnehzr.tnoodle.scrambles.applet.ScrambleApplet');
 		applet.setAttribute('width', '0');
