@@ -19,11 +19,11 @@
 	height: 16px;
 }
 #timesTable .table-th-sort .table-th-sort-span {
-	background: transparent url('bullet_arrow_up.png') 0px 0px no-repeat;
+	background: transparent url('../media/bullet_arrow_up.png') 0px 0px no-repeat;
 }
 
 #timesTable .table-th-sort-rev .table-th-sort-span {
-	background: transparent url('bullet_arrow_down.png') 0px 0px no-repeat;
+	background: transparent url('../media/bullet_arrow_down.png') 0px 0px no-repeat;
 	width: 16px;
 	height: 16px;
 }

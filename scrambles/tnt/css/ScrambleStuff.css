@@ -56,10 +56,10 @@ div.scrambleHeader {
 }
 
 .button.changeColors {
-	background: transparent url('color_wheel.png') no-repeat scroll center center;
+	background: transparent url('../media/color_wheel.png') no-repeat scroll center center;
 }
 .button.reset {
-	background: transparent url('arrow_undo.png') no-repeat scroll center center;
+	background: transparent url('../media/arrow_undo.png') no-repeat scroll center center;
 }
 .button.close {
 	/* TODO - pretty close image? */

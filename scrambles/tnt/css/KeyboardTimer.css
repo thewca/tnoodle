@@ -1,8 +1,8 @@
 @font-face {  
 	font-family: lcd;
-	src: url("Digiface Regular.eot");
+	src: url("../media/Digiface Regular.eot");
 	src: 	local('Digiface Regular'), 
-			url("Digiface Regular.ttf") format("truetype");  
+			url("../media/Digiface Regular.ttf") format("truetype");  
 }
 #timer, #sizer {
 	font-family: lcd;
