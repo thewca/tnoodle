@@ -3,3 +3,4 @@ dist/
 bin/
 JCubeExplorer.jar
 .settings
+.metadata/

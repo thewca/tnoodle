@@ -1,0 +1,5 @@
+INDEX VERSION 1.126+C:\Users\Jeremy\My Dropbox\Programming\Java\tnoodle\.metadata\.plugins\org.eclipse.jdt.core
+3523990103.index
+2037103719.index
+259082833.index
+4140928472.index

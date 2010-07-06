@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="fatjar.jar"/>
+	<classpathentry exported="true" kind="lib" path="gson-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="iText-5.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="jopt-simple-3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugin.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

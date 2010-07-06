@@ -135,7 +135,7 @@ public class ScramblerApplet extends JApplet implements ScrambleCacherListener {
 			scroller.append(s + "\n");
 			scroller.setCaretPosition(scroller.getDocument().getLength());
 		}
-	        return s;
+	    return s;
 	}
 	
 	@Override
