@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>StackApplet Test</title>
+<script type="text/javascript" src="StackApplet.js">
+</script>
+<script type="text/javascript">
+function onUpdate(state) {
+	var timerSpan = document.getElementById("timer");
+	var leftHand = document.getElementById("leftHand");
+	var rightHand = document.getElementById("rightHand");
+	if(state != null) {
+		timerSpan.innerHTML = state.centis;
+		leftHand.style.display = state.leftHand ? "inline" : "none";
+		rightHand.style.display = state.rightHand ? "inline" : "none";
+	}
+	if(!tnoodle.stackmat.isOn())
+		timerSpan.innerHTML = "OFF";
+}
+function onError(error) {
+	var timerSpan = document.getElementById("timer");
+	timerSpan.innerHTML = error;
+}
+window.addEventListener('load', function() {
+	var enableStackmat = document.getElementById('enableStackmat');
+	enableStackmat.addEventListener('change', function() {
+		if(enableStackmat.checked) {
+			tnoodle.stackmat.enable(onUpdate, onError);
+		} else {
+			tnoodle.stackmat.disable();
+		}
+	}, false);
+}, false);
+</script>
+</head>
+<body>
+<div>
+<span id="leftHand">\</span>
+<span id="rightHand">/</span>
+<span id="timer"></span>
+<input type="checkbox" id="enableStackmat" name="enableStackmat" />
+<label for="enableStackmat">Enable stackmat</label>
+</div>
+</body>
+</html>

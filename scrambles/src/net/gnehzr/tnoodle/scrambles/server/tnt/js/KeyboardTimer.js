@@ -3,6 +3,8 @@ var KeyboardTimer = new Class({
 	decimalPlaces: 2,
 	frequency: .01,
 	initialize: function(parent, server) {
+		var timer = this;
+
 		this.parent = parent;
 		this.server = server;
 		this.config = server.configuration;
@@ -40,12 +42,16 @@ var KeyboardTimer = new Class({
 		optionsDiv.addEvent('mouseover', optionsDiv.show);
 		optionsDiv.addEvent('mouseout', optionsDiv.hide);
 		
-		function createOptionBox(optionKey, description, def) {
+		function createOptionBox(optionKey, description, def, changeListener) {
 			var checkbox = new Element('input', { id: optionKey, type: 'checkbox' });
 			checkbox.checked = server.configuration.get(optionKey, def)
 			checkbox.addEvent('change', function(e) {
 				server.configuration.set(this.id, this.checked);
 			});
+			if(changeListener) {
+				checkbox.addEvent('change', changeListener);
+				changeListener.call(checkbox);
+			}
 			checkbox.addEvent('focus', function(e) {
 				this.blur();
 			});
@@ -82,8 +88,6 @@ var KeyboardTimer = new Class({
 		optionsDiv.hide(); //this allows the first show() to animate
 		optionsDiv.inject(parent);
 		
-		var timer = this;
-
 		var keys = new Hash();
 		this.keys = keys;
 		
@@ -94,6 +98,8 @@ var KeyboardTimer = new Class({
 				return;
 			if(e.key == 'space')
 				e.stop(); //stop space from scrolling
+			if(timer.config.get('timer.enableStackmat'))
+				return;
 			keys.set(e.code, true);
 			if(timer.timing) {
 				//stopping timer
@@ -109,7 +115,7 @@ var KeyboardTimer = new Class({
 			timer.redraw();
 		});
 		window.addEvent('keyup', function(e) {
-			if(!timer.isFocused())
+			if(!timer.isFocused() || timer.config.get('timer.enableStackmat'))
 				return;
 			keys.erase(e.code);
 			
@@ -151,6 +157,42 @@ var KeyboardTimer = new Class({
 			//when the page loses focus, we clear the keyboard state
 			resetKeys();
 		});
+		
+		function stackmatError(error) {
+			//TODO - pretty error message?
+			alert("Error loading stackmat: " + error);
+		}
+		
+		var acceptedTime = false;
+		function stackmatUpdated(state) {
+			if(state != null) {
+				timer.timing = state.running;
+				timer.stackCentis = state.centis;
+				timer.inspecting = false; //TODO - stackmat inspection
+				timer.inspectionStart = null;
+				timer.redraw();
+				//TODO - animate hand status!
+				//TODO - animate timer on/off status
+				if(timer.timing) {
+					acceptedTime = false;
+				} else if(state.centis > 0 && !acceptedTime) {
+					// new time!
+					acceptedTime = true; //this is to prevent redetecting the same time over and over
+					timer.fireEvent('newTime', timer.getTimeCentis());
+				}
+			}
+		}
+		
+		function stackmatEnabled() {
+			timer.reset();
+			if(this.checked) {
+				tnoodle.stackmat.enable(stackmatUpdated, stackmatError);
+			} else {
+				tnoodle.stackmat.disable();
+			}
+		}
+		optionsDiv.adopt(createOptionBox('timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
+		//TODO - add remaining stackmat config options!!!
 	},
 	isFocused: function() {
 		//we disable the timer if a text field is focused
@@ -158,8 +200,12 @@ var KeyboardTimer = new Class({
 		   document.activeElement.type != "textarea")
 	},
 	getTimeCentis: function() {
-		var end = (this.timing ? new Date().getTime() : this.timerStop);
-		return Math.round((end - this.timerStart)/10);
+		if(this.config.get('timer.enableStackmat')) {
+			return this.stackCentis;
+		} else {
+			var end = (this.timing ? new Date().getTime() : this.timerStop);
+			return Math.round((end - this.timerStart)/10);
+		}
 	},
 	getInspectionElapsedSeconds: function() {
 		var time = new Date().getTime();
@@ -194,6 +240,7 @@ var KeyboardTimer = new Class({
 		this.redraw();
 	},
 	reset: function() {
+		this.stackCentis = 0;
 		this.timing = false;
 		this.timerStart = 0;
 		this.timerStop = 0;

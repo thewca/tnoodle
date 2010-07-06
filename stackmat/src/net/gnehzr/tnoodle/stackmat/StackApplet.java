@@ -17,6 +17,7 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 	private StackmatInterpreter stackmat;
 	private JSObject jso;
 	private String updateCallback, errorCallback;
+	private int mixer, stackmatValue;
 	public void init() {
 		try {
 			jso = JSObject.getWindow(this);
@@ -25,21 +26,10 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 			// we absolutely need a jso object for this applet to function at all
 			return;
 		}
-		try {
-			updateCallback = getString("updateCallback", null);
-			errorCallback = getString("errorCallback", null);
-			int mixer = parseInt("mixer", -1);
-			int stackmatValue = parseInt("stackmatValue", -1);
-			stackmat = new StackmatInterpreter(-1, mixer, stackmatValue);
-			stackmat.addPropertyChangeListener(this);
-			stackmat.execute();
-		} catch(SecurityException e) {
-			e.printStackTrace();
-			jso.call(errorCallback, new Object[] { "Security error" });
-		} catch(LineUnavailableException e) {
-			e.printStackTrace();
-			jso.call(errorCallback, new Object[] { "Line unavailable" });
-		}
+		updateCallback = getString("updateCallback", null);
+		errorCallback = getString("errorCallback", null);
+		mixer = parseInt("mixer", -1);
+		stackmatValue = parseInt("stackmatValue", -1);
 	}
 	
 	private String getString(String param, String def) {
@@ -58,6 +48,31 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 		}
 	}
 	
+	@Override
+	public void start() {
+		try {
+			stackmat = new StackmatInterpreter(-1, mixer, stackmatValue);
+			stackmat.addPropertyChangeListener(this);
+			stackmat.execute();
+		} catch(SecurityException e) {
+			e.printStackTrace();
+			jso.call(errorCallback, new Object[] { "Security error" });
+		} catch(LineUnavailableException e) {
+			e.printStackTrace();
+			jso.call(errorCallback, new Object[] { "Line unavailable" });
+		} catch(IllegalArgumentException e) {
+			e.printStackTrace();
+			jso.call(errorCallback, new Object[] { "Line unavailable" });
+		}
+	}
+	
+	@Override
+	public void stop() {
+		if(stackmat != null)
+			stackmat.cancel(true);
+	}
+	
+	//TODO - check for stackmat == null in all of the following methods?
 	public void setStackmatValue(int value) {
 		stackmat.setStackmatValue(value);
 	}
