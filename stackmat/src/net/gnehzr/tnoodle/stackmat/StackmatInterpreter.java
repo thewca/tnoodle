@@ -162,7 +162,6 @@ public class StackmatInterpreter extends SwingWorker<String, StackmatState> {
 									newState = parseTime(currentPeriod);
 									newState.running = newState.centis > state.centis;
 									state = newState;
-									System.out.println(currentPeriod);
 								} else {
 									// if the signal was corrupt, we might as well use the previous period 
 									newState = state;
