@@ -24,7 +24,7 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 		} catch(Exception e) {
 			e.printStackTrace();
 			// we absolutely need a jso object for this applet to function at all
-			return;
+//			return;
 		}
 		updateCallback = getString("updateCallback", null);
 		errorCallback = getString("errorCallback", null);

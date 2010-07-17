@@ -162,6 +162,7 @@ public class StackmatInterpreter extends SwingWorker<String, StackmatState> {
 									newState = parseTime(currentPeriod);
 									newState.running = newState.centis > state.centis;
 									state = newState;
+									System.out.println(currentPeriod);
 								} else {
 									// if the signal was corrupt, we might as well use the previous period 
 									newState = state;
@@ -199,18 +200,18 @@ public class StackmatInterpreter extends SwingWorker<String, StackmatState> {
 
 	private void parseHeader(StackmatState state, ArrayList<Integer> periodData) {
 		int temp = 0;
-		for(int i = 1; i <= 5; i++) temp += periodData.get(i) << (5 - i);
+		for(int i = 1; i <= 5; i++) temp |= periodData.get(i) << (5 - i);
 
 		state.leftHand = temp == 6;
 		state.rightHand = temp == 9;
-		if(temp == 24 || temp == 16) state.rightHand = state.leftHand = true;
 		state.greenLight = temp == 16;
+		if(temp == 24 || state.greenLight) state.rightHand = state.leftHand = true;
 	}
 
 	private int parseDigit(ArrayList<Integer> periodData, int pos, boolean invert) {
 		int temp = 0;
-		for(int i = 1; i <= 4; i++) temp += periodData.get(pos * 10 + i) << (i - 1);
+		for(int i = 1; i <= 4; i++) temp |= periodData.get(pos * 10 + i) << (i - 1);
 
-		return invert ? 15 - temp : temp;
+		return invert ? 0xF ^ temp : temp;
 	}
 }
