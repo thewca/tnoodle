@@ -8,7 +8,7 @@
 <script type="text/javascript" src="js/TriLayout.js"></script>
 <script type="text/javascript">
 window.addEvent('domready', function() {
-	var triLayout = new TriLayout($('topLeft'), $('topRight'), $('bottom'));
+	var triLayout = new TriLayout($('topLeft'), $('topRight'), $('bottom'), { set: function() {}, get: function(a, b) { return b; } });
 });
 </script>
 </head>

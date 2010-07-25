@@ -21,7 +21,6 @@
 <script type="text/javascript" src="js/TimesTable.js"></script>
 <script type="text/javascript" src="js/StackApplet.js"></script>
 
-
 <style type="text/css">
 html, body {
 	font-family: sans-serif;
@@ -342,7 +341,7 @@ window.addEvent('domready', function() {
 		timesTable.resize();
 	};
 	
-	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'));
+	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
 	
 	var keyboard = new Keyboard();
 	keyboard.addShortcut('save', {

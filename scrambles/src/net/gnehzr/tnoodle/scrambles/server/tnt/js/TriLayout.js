@@ -1,7 +1,14 @@
 var TriLayout = new Class({
 	rotation: 0,
 	swaps: [ 0, 1, 2 ],
-	initialize: function(q1, q2, bar) {
+	margin: 5,
+	initialize: function(q1, q2, bar, config) {
+		this.config = config;
+		this.rotation = config.get('layout.rotation', this.rotation);
+		this.swaps = config.get('layout.order', this.swaps);
+		var space = window.getSize();
+		var center = config.get('layout.center', {x: space.x/2 - 3, y: space.y/2 - 3});
+		
 		q1.setStyle('position', 'absolute');
 		q2.setStyle('position', 'absolute');
 		bar.setStyle('position', 'absolute');
@@ -10,17 +17,18 @@ var TriLayout = new Class({
 		document.body.setStyle('overflow', 'hidden');
 		this.resizeDiv = new Element('div');
 		
-		var topLeft = { 'top': 0, 'right': null, 'left': 0, 'bottom': null };
-		var topRight = { 'top': 0, 'right': 0, 'left': null, 'bottom': null };
-		var bottomRight = { 'top': null, 'right': 0, 'left': null, 'bottom': 0 };
-		var bottomLeft = { 'top': null, 'right': null, 'left': 0, 'bottom': 0 };
+		var margin = this.margin;
+		var topLeft = { 'top': margin, 'right': null, 'left': margin, 'bottom': null };
+		var topRight = { 'top': margin, 'right': margin, 'left': null, 'bottom': null };
+		var bottomRight = { 'top': null, 'right': margin, 'left': null, 'bottom': margin };
+		var bottomLeft = { 'top': null, 'right': null, 'left': margin, 'bottom': margin };
 		
 		this.quarterPositions = [ topLeft, topRight, bottomRight, bottomLeft ];
 		
-		var top = { 'top': 0, 'right': 0, 'left': 0, 'bottom': null };
-		var right = { 'top': 0, 'right': 0, 'left': null, 'bottom': 0 };
-		var bottom = { 'top': null, 'right': 0, 'left': 0, 'bottom': 0 };
-		var left = { 'top': 0, 'right': null, 'left': 0, 'bottom': 0 };
+		var top = { 'top': margin, 'right': margin, 'left': margin, 'bottom': null };
+		var right = { 'top': margin, 'right': margin, 'left': null, 'bottom': margin };
+		var bottom = { 'top': null, 'right': margin, 'left': margin, 'bottom': margin };
+		var left = { 'top': margin, 'right': null, 'left': margin, 'bottom': margin };
 		
 		barPositions = [ bottom, left, top, right ];
 		
@@ -61,7 +69,7 @@ var TriLayout = new Class({
 		this.resizeDiv.setStyle('cursor', 'move');
 		this.resizeDiv.setStyle('background-color', 'white');
 		this.resizeDiv.setStyle('position', 'absolute');
-		this.resizeDiv.setStyle('z-index', '2');
+		this.resizeDiv.setStyle('z-index', '3');
 		this.clockwise.setStyle('z-index', '2');
 		this.counterClockwise.setStyle('z-index', '2');
 		this.swap.setStyle('z-index', '2');
@@ -76,8 +84,8 @@ var TriLayout = new Class({
 		this.resizeDiv.addEvent('mouseout', hideRotate);
 		this.swap.addEvent('mouseout', hideRotate);
 		
-		this.clockwise.addEvent('click', function() { this.rotation = (this.rotation + 1) % 4; this.resize(); }.bind(this));
-		this.counterClockwise.addEvent('click', function() { this.rotation = (this.rotation + 3) % 4; this.resize(); }.bind(this));
+		this.clockwise.addEvent('click', function() { this.rotation = (this.rotation + 1) % 4; this.resize(); config.set('layout.rotation', this.rotation); }.bind(this));
+		this.counterClockwise.addEvent('click', function() { this.rotation = (this.rotation + 3) % 4; this.resize(); config.set('layout.rotation', this.rotation); }.bind(this));
 		
 		var maskCount = 0;
 		function createMask(el) {
@@ -111,6 +119,7 @@ var TriLayout = new Class({
 		        	var b = swaps.indexOf(element.index);
 		        	swaps[a] = element.index;
 		        	swaps[b] = droppable.index;
+		        	config.set('layout.order', swaps);
 		        }
 		        resize();
 		    });
@@ -149,9 +158,7 @@ var TriLayout = new Class({
 			swappingTris = !swappingTris;
 			toggleMasks();
 		});
-
-		var space = window.getSize();
-		this.resizeDiv.setPosition({x: space.x/2 - 3, y: space.y/2 - 3});
+		this.resizeDiv.setPosition(center);
 		
 		window.addEvent('resize', this.resize.bind(this));
 		window.addEvent('load', this.resize.bind(this));
@@ -174,6 +181,7 @@ var TriLayout = new Class({
 		dragger.addEvent('drag', function() { showRotate(); this.resize() }.bind(this));
 	},
 	resize: function() {
+		this.config.set('layout.center', this.resizeDiv.getPosition());
 		if(this.masksVisible)
 			this.position(this.masks);
 		else
@@ -183,14 +191,21 @@ var TriLayout = new Class({
 		var q1 = divs[this.swaps[0]];
 		var q2 = divs[this.swaps[1]];
 		var bar = divs[this.swaps[2]];
-		var q1Vert = q1.getStyle('border-top').toInt() + q1.getStyle('border-bottom').toInt();
-		var q1Horz = q1.getStyle('border-right').toInt() + q1.getStyle('border-left').toInt();
+		var q1Vert = q1.getStyle('border-top').toInt() + q1.getStyle('border-bottom').toInt() + this.margin;
+		var q1Horz = q1.getStyle('border-right').toInt() + q1.getStyle('border-left').toInt() + this.margin;
 		
-		var q2Vert = q2.getStyle('border-top').toInt() + q2.getStyle('border-bottom').toInt();
-		var q2Horz = q2.getStyle('border-right').toInt() + q2.getStyle('border-left').toInt();
+		var q2Vert = q2.getStyle('border-top').toInt() + q2.getStyle('border-bottom').toInt() + this.margin;
+		var q2Horz = q2.getStyle('border-right').toInt() + q2.getStyle('border-left').toInt() + this.margin;
 		
 		var barVert = bar.getStyle('border-top').toInt() + bar.getStyle('border-bottom').toInt();
 		var barHorz = bar.getStyle('border-right').toInt() + bar.getStyle('border-left').toInt();
+		if(this.rotation % 2 == 0) {
+			barVert += this.margin;
+			barHorz += this.margin*2;
+		} else {
+			barVert += this.margin*2;
+			barHorz += this.margin;
+		}
 		
 		q1.setStyles(this.quarterPositions[this.rotation]);
 		
