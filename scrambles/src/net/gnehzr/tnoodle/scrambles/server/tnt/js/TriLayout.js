@@ -132,7 +132,6 @@ var TriLayout = new Class({
 		    	droppable.setStyle('background-color', 'rgba(100,100,100,.5)');
 		    });
 		 
-
 			drag.addEvent('start', function() {
 				div.setStyle('z-index', 2);
 				div.setStyle('border', '1px dashed black');

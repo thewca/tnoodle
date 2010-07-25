@@ -3053,7 +3053,8 @@ var Drag = new Class({
 			if (this.options.style) this.value.now[z] = this.element.getStyle(this.options.modifiers[z]).toInt();
 			else this.value.now[z] = this.element[this.options.modifiers[z]];
 			if (this.options.invert) this.value.now[z] *= -1;
-			this.mouse.pos[z] = event.page[z] - this.value.now[z];
+			//this.mouse.pos[z] = event.page[z] - this.value.now[z];
+			this.mouse.pos[z] = event.page[z] - this.element.getPosition()[z]; //hackity
 			if (limit && limit[z]){
 				for (var i = 2; i--; i){
 					if ($chk(limit[z][i])) this.limit[z][i] = $lambda(limit[z][i])();

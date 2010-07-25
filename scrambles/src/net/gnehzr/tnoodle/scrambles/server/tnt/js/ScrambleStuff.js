@@ -139,10 +139,10 @@ function puzzleChanged() {
     		colorScheme = configuration.get('scramble.'+puzzle+'.colorScheme', clone(puzzleImageInfo.colorScheme));
     		defaultColorScheme = puzzleImageInfo.colorScheme;
 
-    		scrambleDivDD.minw = puzzleImageInfo.size.width;
-    		scrambleDivDD.minh = puzzleImageInfo.size.height;
-    		scrambleDivDD.paddingVert = getScrambleVertPadding();
-    		scrambleDivDD.paddingHorz = getScrambleHorzPadding();
+//    		scrambleDivDD.minw = puzzleImageInfo.size.width;
+//    		scrambleDivDD.minh = puzzleImageInfo.size.height;
+//    		scrambleDivDD.paddingVert = getScrambleVertPadding();
+//    		scrambleDivDD.paddingHorz = getScrambleHorzPadding();
     		scrambleDiv.style.width = configuration.get('scramble.' + puzzle + '.size.width', puzzleImageInfo.size.width + getScrambleHorzPadding() + "px");
     		scrambleDiv.style.height = configuration.get('scramble.' + puzzle + '.size.height', puzzleImageInfo.size.height + getScrambleVertPadding() + "px");
     		
@@ -766,9 +766,14 @@ function promptSeed() {
 	//end scrambleDiv
 		scrambleDiv.style.top = configuration.get('scramble.location.top', '0px');
 		scrambleDiv.style.left = configuration.get('scramble.location.left', '0px');
-    var scrambleDivDD = dragDrop.createDraggable(RESET_Z, SCALABLE, scrambleDiv.id);
-    scrambleDivDD.resizeFunc = scrambleResized;
-    scrambleDivDD.moveFunc = scrambleMoved;
+		
+		//var scrambleDrag = new Drag(scrambleDiv);
+		//scrambleDrag.addEvent('complete', scrambleMoved);
+		scrambleDiv.makeResizable();
+		//TODO - enable resizing! -> test color editing!
+    //var scrambleDivDD = dragDrop.createDraggable(RESET_Z, SCALABLE, scrambleDiv.id);
+//    scrambleDivDD.resizeFunc = scrambleResized;
+//    scrambleDivDD.moveFunc = scrambleMoved;
 
     var puzzleSelect = document.createElement('select');
     puzzleSelect.onchange = puzzleChanged; //for some reason, the change event doesn't fire until the select loses focus
