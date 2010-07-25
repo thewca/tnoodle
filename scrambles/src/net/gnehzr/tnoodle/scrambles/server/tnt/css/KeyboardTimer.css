@@ -4,9 +4,10 @@
 	src: 	local('Digiface Regular'), 
 			url("../media/Digiface Regular.ttf") format("truetype");  
 }
-#timer, #sizer {
+#time, #sizer {
 	font-family: lcd;
 	position: relative;
+	text-align: center;
 }
 .inspecting {
 	color: red;

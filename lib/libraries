@@ -10,3 +10,12 @@ http://www.iconspedia.com/icon/rubik-cube-1165-.html
 http://www.famfamfam.com/lab/icons/silk/
 mootools-1.2.4-core.js: http://mootools.net
 mootools-1.2.4.4-more.js: http://mootools.net
+	attachSorts: function(attach){
+		this.element.removeEvents('click:relay(th)');
+		//TODO - bug in mootools?
+		this.bound = {
+			headClick: this.headClick.bind(this)
+		};
+		//end changes
+		this.element[$pick(attach, true) ? 'addEvent' : 'removeEvent']('click:relay(th)', this.bound.headClick);
+	},

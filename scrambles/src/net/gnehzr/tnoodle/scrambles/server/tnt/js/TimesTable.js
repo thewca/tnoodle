@@ -54,8 +54,6 @@ var TimesTable = new Class({
 			});
 		});
 		
-		this.tbody = $(this).getChildren('tbody')[0];
-		
 		//we create the add time row
 		this.addRow = this.push([ '', '<u>A</u>dd time', '', '', '', '', '' ]).tr.dispose();
 		this.addRow.addClass('addTime');
@@ -87,6 +85,11 @@ var TimesTable = new Class({
 		}.bind(this);
 		this.addRow.inject(this.infoRow, 'before'); //place the add row in the footer
 		
+		this.thead = $(this).getChildren('thead')[0];
+		this.tbody = $(this).getChildren('tbody')[0];
+		this.tfoot = $(this).getChildren('tfoot')[0];
+		this.parent = $(this).getParent();
+		
 		//this row serves as the spine for our tbody
 		this.sizerRow = new Element('tr', { 'class': 'sizerRow' });
 		this.sizerRow.refresh = function() {};
@@ -106,9 +109,7 @@ var TimesTable = new Class({
 			this.add(time);
 		}.bind(this));
 
-		this.resort();
-		this.infoRow.refresh();
-		this.resize();
+		this.refreshData();
 	},
 	reset: function() {
 		this.session.reset();
@@ -119,9 +120,8 @@ var TimesTable = new Class({
 		var time = this.session.addTime(centis, this.scrambleStuff.getScramble());
 		this.scrambleStuff.scramble();
 		this.add(time);
-		this.resort();
-		this.infoRow.refresh();
-		this.resize(true);
+		this.refreshData();
+		this.scrollToLastTime();
 	},
 	scrollToLastTime: function() {
 		if(this.lastAddedRow)
@@ -210,8 +210,8 @@ var TimesTable = new Class({
 		textField.setStyle('width', '90%');
 		
 		function onBlur(e) {
-			//accept time if at all possible
-			acceptTime();
+			if(time) //we try to accept the time if we were editing
+				acceptTime();
 		}
 		var acceptTime = function() {
 			//if successful, this function may cause blur, which causes double adding of timess
@@ -393,23 +393,24 @@ var TimesTable = new Class({
 			
 			//changing the time could very well affect more than this row
 			//maybe someday we could be more efficient about the changes
-			this.refreshData();
-			this.resort(true);
-			
-			this.resize(); //changing the time may change the size of a column
-			if(!addTime)
+			if(!addTime) {
+				this.refreshData();
+				this.resizeCols(); //changing the time may change the size of a column
 				this.scrollToRow(editedRow);
+			}
 		}
 		return row;
 	},
 	refreshData: function() {
+		$(this).toggle(); //prevent flickering?
 		this.deselectRow();
 		this.tbody.getChildren('tr').each(function(tr) {
 			tr.refresh();
 		});
 		this.resort(true);
 		this.infoRow.refresh();
-		this.resize();
+		$(this).toggle(); //prevent flickering?
+		this.resizeCols();
 	},
 	lastAddedRow: null,
 	add: function(time) {
@@ -475,32 +476,15 @@ var TimesTable = new Class({
 			
 			cells[++col].set('html', server.formatTime(time.sessionAve));
 		};
-		//tr.refresh();
-		this.refreshData();
 	},
-	resize: function(forceScrollToLatest) {
-		if(!this.session) return; //we're not ready to size this until we have a session
-		
-		//upon resizing, we first deselect any selected rows!
-		if(this.selectedRow) {
-			this.deselectRow();
-			return; //the previous line will cause a resize
-		}
-		var maxSize = $(this).getParent().getSize();
-		var offset = $(this).getPosition($(this).getParent());
-		maxSize.y -= offset.y;
-		
-		var thead = $(this).getChildren('thead')[0];
-		var tbody = $(this).getChildren('tbody')[0];
-		var tfoot = $(this).getChildren('tfoot')[0];
-
+	resizeCols: function() {
 		var infoCells = this.infoRow.getChildren('td');
 		var addTimeCells = this.addRow.getChildren('td');
-		var headers = thead.getChildren('tr')[0].getChildren('th');
+		var headers = this.thead.getChildren('tr')[0].getChildren('th');
 		var tds = [];
 		
 		this.sizerRow.empty();
-		tbody.adopt(this.sizerRow);
+		this.tbody.adopt(this.sizerRow);
 		for(var i = 0; i < headers.length; i++) {
 			var col = new Element('td');
 			tds.push(col);
@@ -508,10 +492,10 @@ var TimesTable = new Class({
 		}
 
 		//clearing all column widths
-		tfoot.getChildren('tr').each(function(tr) {
+		this.tfoot.getChildren('tr').each(function(tr) {
 			tr.setStyle('width', null);
 		});
-		tbody.setStyle('width', null); //we want everything to size itself as if there's enough space
+		this.tbody.setStyle('width', null); //we want everything to size itself as if there's enough space
 		infoCells.each(function(td) {
 			td.setStyle('width', null);
 		});
@@ -521,11 +505,6 @@ var TimesTable = new Class({
 		headers.each(function(td) {
 			td.setStyle('width', null);
 		});
-		
-		maxSize.y -= $(this).getStyle('margin-bottom').toInt();
-		maxSize.y -= thead.getSize().y;
-		maxSize.y -= tfoot.getSize().y;
-		tbody.setStyle('height', maxSize.y);
 		
 		var preferredWidth = 0;
 		
@@ -551,25 +530,45 @@ var TimesTable = new Class({
 				resizeme[j][i].setStyle('width', maxWidth - padding);
 			}
 		}
-		tfoot.getChildren('tr').each(function(tr) {
+		this.tfoot.getChildren('tr').each(function(tr) {
 			tr.setStyle('width', preferredWidth+1); //add 1 for border?
 		});
 
 		//preferredWidth += 18; //this accounts for the vert scrollbar
-		var width = tbody.getSize().x;
-		if(tbody.clientHeight < tbody.scrollHeight) {
+		var width = this.tbody.getSize().x;
+		if(this.tbody.clientHeight < this.tbody.scrollHeight) {
 			//if there are vertical scrollbars
 			width += 18;
 		} 
-		width = Math.min(width, maxSize.x);
-		tbody.setStyle('width', width);
+		width = Math.min(width, this.getTableSpace().x);
+		this.tbody.setStyle('width', width);
+	},
+	getTableSpace: function() {
+		var space = this.parent.getSize();
+		var offset = $(this).getPosition($(this).getParent());
+		space.y -= offset.y;
+		return space;
+	},
+	resize: function(forceScrollToLatest) {
+		if(!this.session) return; //we're not ready to size this until we have a session
 		
+		//upon resizing, we first deselect any selected rows!
+		if(this.selectedRow) {
+			this.deselectRow();
+			return; //the previous line will cause a resize
+		}
+		this.resizeCols();
+		var maxSize = this.getTableSpace();
+		maxSize.y -= $(this).getStyle('margin-bottom').toInt();
+		maxSize.y -= this.thead.getSize().y;
+		maxSize.y -= this.tfoot.getSize().y;
+		this.tbody.setStyle('height', maxSize.y);
+
 		if(this.freshSession) {
 			this.freshSession = false;
 			this.scrollToLastTime();
 		} else if(forceScrollToLatest) {
 			this.scrollToLastTime();
 		}
-		
 	}
 });

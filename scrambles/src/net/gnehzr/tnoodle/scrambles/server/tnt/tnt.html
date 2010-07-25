@@ -11,6 +11,7 @@
 
 <script type="text/javascript" src="js/mootools-1.2.4-core.js"></script>
 <script type="text/javascript" src="js/mootools-1.2.4.4-more.js"></script>
+<script type="text/javascript" src="js/TriLayout.js"></script>
 <script type="text/javascript" src="js/tnoodleserver.js"></script>
 <script type="text/javascript" src="js/tnoodlescrambles.js"></script>
 <script type="text/javascript" src="js/wz_dragdrop.js"></script>
@@ -50,16 +51,7 @@ span.link:hover, span.down {
 	z-index: 2; /*on top of scramble window */
 }
 
-#chrome {
-	margin-bottom: 10px;
-}
-#resizeTimer, #horizontalRuler, #verticalRuler {
-	z-index: 1;
-}
-#horizontalRuler, #verticalRuler {
-	position: absolute;
-	background-color: black;
-}
+/*
 .resize-br {
     background: none repeat scroll 0 0 #FFF;
     border: 1px solid #333;
@@ -70,16 +62,7 @@ span.link:hover, span.down {
 
     cursor: se-resize;
 }
-#topLeft {
-	position: absolute;
-	left: 0px;
-	
-	text-align: center;
-}
-#topRight {
-	position: absolute;
-	right: 8px;
-}
+*/
 .scrambleText {
 	overflow: auto;
 }
@@ -144,7 +127,7 @@ window.addEvent('domready', function() {
 	var server = new tnoodle.server();
 	var configuration = server.configuration;
 	
-	var timer = new KeyboardTimer($('topLeft'), server);
+	var timer = new KeyboardTimer($('timer'), server);
 
 	//we have to wait for both the scrambles and the sessions to load,
 	//and we can't know which will load first, so we use lastSessionTab and scramblesLoades
@@ -337,106 +320,29 @@ window.addEvent('domready', function() {
 		}
 	});
 
-	var isResizing = false;
-	function resizeTimesArea(dontScroll) {
-		//ie seems to be firing the resize event due to some of the actions
-		//that occur inside of this function, so we place a lock around it
-		if(isResizing)
-			return;
-		isResizing = true;
-		
-		//TODO - I DO NOT believe that this can't be done with css!!!
-		//TODO - hide everything until the first resize occurs?
-		//TODO - this is getting called way too freaking much, firefox is dying everytime you add a new time
-		
-		var viewSize = window.getSize();
-		var topLeftSize = $('topLeft').getSize();
-		var h = topLeftSize.y;
-
+	$('timer').resize = function() {
 		timer.redraw();
-		$('chrome').setStyle('height', h);
-
-		$('topRight').setStyle('height', h);
-		var newH = Math.max(0, viewSize.x-topLeftSize.x-$('topRight').getStyle('right').toInt());
-		$('topRight').setStyle('width', newH);
-		
-		h -= $('scrambleBorder').getSize().y;
-		$$('.scrambleArea')[0].setStyle('height', h);
-		h -= $$('.scrambleHeader')[0].getSize().y;
+	};
+	$('scrambles').resize = function() {
+		var space = $('scrambles').getSize();
+		space.y -= $('scrambleBorder').getSize().y;
+		$$('.scrambleArea')[0].setStyle('height', space.y);
+		space.y -= $$('.scrambleHeader')[0].getSize().y;
 		var scrambleText = $$('.scrambleText')[0];
 		var padding = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-top').toInt();
-		$$('.scrambleText')[0].setStyle('height', h-padding);
-		
-		var remainingHeight = viewSize.y-$('chrome').getSize().y;
-		remainingHeight -= 50; //TODO - what the heck is this all about?
-		if(remainingHeight < 0) //ie freaks out if we try to set negative sizes
-			remainingHeight = 0;
-		$('timesArea').setStyle('height', remainingHeight);
-
-		remainingHeight -= $('sessionInfo').getSize().y;
-		timesTable.resize(!dontScroll);
-
-		//this just seems like as good a time as any to update the session info bar
+		$$('.scrambleText')[0].setStyle('height', space.y-padding);
+	};
+	$('times').resize = function() {
+		//this seems like as good a time as any to update the session info bar
 		refreshSessionInfo();
 		
-		isResizing = false;
-	}
-	function delayedResize() {
-		setTimeout(resizeTimesArea, 100); // 100 seems to work here, man this feels hacky
-	}
-	window.addEvent('load', resizeTimesArea);
-
-	window.addEvent('focus', function(e) {
-		resizeTimesArea(true); //this seems to be helping with some resizing issues i've been having
-	});
-	//window.addEvent('blur', function(e) {});
-	window.addEvent('resize', delayedResize); //TODO - ensure that draggable windows (scramble) are visible
-
-	//setting size of the timer
-	var width = configuration.get('timer.width', 350);
-	var height = configuration.get('timer.height', 200);
-	$('topLeft').setStyle('width', width);
-	$('topLeft').setStyle('height', height);
-	$('resizeTimer').setPosition({x: width-5-1, y: height-5});
-	
-	var dragger = new Drag($('resizeTimer'));
-	dragger.addEvent('complete', function(el, e) {
-		var pos = el.getPosition();
-		var size = el.getSize();
-		var offset = $('topLeft').getPosition();
-		var newWidth = pos.x + size.x - offset.x - 1;
-		var newHeight = pos.y + size.y - offset.y - 2;
-		$('topLeft').setStyle('width', newWidth);
-		$('topLeft').setStyle('height', newHeight);
-		configuration.set('timer.width', newWidth);
-		configuration.set('timer.height', newHeight);
-		resizeTimesArea();
-	});
-	function positionRulers() {
-		//there's a lot of pixel pushing here, oh well
-		var loc = $('resizeTimer').getPosition();
-		var width = window.getSize().x;
-		$('horizontalRuler').setStyle('width', width);
-		$('horizontalRuler').setStyle('height', 3);
-		$('horizontalRuler').setPosition({x: 0, y: loc.y+4});
+		var remainingHeight = $('times').getSize().y - $('sessions').getSize().y - $('timesArea').getStyle('border-top').toInt() - $('timesArea').getStyle('border-bottom').toInt();
+		$('timesArea').setStyle('height', remainingHeight);
 		
-		$('verticalRuler').setStyle('width', 3);
-		$('verticalRuler').setStyle('height', loc.y);
-		$('verticalRuler').setPosition({x: loc.x+2, y: 0});
-	}
-	//should this be on start, on drag, or beforeStart?
-	dragger.addEvent('beforeStart', function(el) {
-		$('horizontalRuler').fade('in');
-		$('verticalRuler').fade('in');
-		positionRulers();
-	});
-	dragger.addEvent('drag', positionRulers);
-	function doneDragging() {
-		$('horizontalRuler').fade('out');
-		$('verticalRuler').fade('out');
-	}
-	dragger.addEvent('cancel', doneDragging);
-	dragger.addEvent('complete', doneDragging);
+		timesTable.resize();
+	};
+	
+	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'));
 	
 	var keyboard = new Keyboard();
 	keyboard.addShortcut('save', {
@@ -459,31 +365,27 @@ window.addEvent('domready', function() {
 </script>
 </head>
 <body>
-<div id="chrome">
-	<div id="topLeft">
-		<div id="horizontalRuler"></div>
-		<div id="verticalRuler"></div>
-		<div id="resizeTimer" class="resize-br"></div>
-	</div>
-	<div id="topRight">
-		<div id="scrambleBorder">
-			<span id="puzzleChooser"></span>
-		</div>
-		
-		<div id="scrambleArea"></div>
-	</div>
+<div id="timer">
 </div>
-
-<ul id="sessions" class="tabs">
-	<li id="newSession">+</li>
-</ul>
-<div id="timesArea">
-	<div id="sessionInfoBar">
-		<span id="sessionInfo"></span>
-		<span id="resetSession" class="link">Reset</span>
-		<a id="downloadCSV" class="link" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!">Download CSV</a>
+<div id="scrambles">
+	<div id="scrambleBorder">
+		<span id="puzzleChooser"></span>
 	</div>
-	<table id="timesTable"></table>
+	
+	<div id="scrambleArea"></div>
+</div>
+<div id="times">
+	<ul id="sessions" class="tabs">
+		<li id="newSession">+</li>
+	</ul>
+	<div id="timesArea">
+		<div id="sessionInfoBar">
+			<span id="sessionInfo"></span>
+			<span id="resetSession" class="link">Reset</span>
+			<a id="downloadCSV" class="link" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!">Download CSV</a>
+		</div>
+		<table id="timesTable"></table>
+	</div>
 </div>
 </body>
 </html>

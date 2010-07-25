@@ -14,7 +14,7 @@ var KeyboardTimer = new Class({
 		this.sizer.inject(document.body);
 		
 		this.timer = new Element('div');
-		this.timer.id = 'timer';
+		this.timer.id = 'time';
 		this.timer.inject(parent);
 		this.timer.setStyle('position', 'relative'); //this lets us manually center the text with js
 		
@@ -284,7 +284,7 @@ var KeyboardTimer = new Class({
 		do {
 			this.sizer.setStyle('font-size', --size);
 			var width = this.sizer.getSize().x;
-		} while(width > maxSize.x);
+		} while(width > maxSize.x && size > 0);
 		this.sizer.setStyle('display', 'none');
 		this.timer.setStyle('font-size', size);
 		

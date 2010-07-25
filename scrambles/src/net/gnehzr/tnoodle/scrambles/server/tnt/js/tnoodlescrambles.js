@@ -53,7 +53,11 @@ tnoodle.ajax = function(callback, url, data) {
 	xhr.onerror = function(error) {
 		callback({error: error});
 	};
-	xhr.send(null);
+	try {
+		xhr.send(null);
+	} catch(error) {
+		callback({error: error});
+	}
 	return xhr;
 };
 tnoodle.jsonpcount = 1;
