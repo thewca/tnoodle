@@ -95,6 +95,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 var puzzle = null;
 var colorScheme = null;
 var defaultColorScheme = null;
+var defaultSize = null;
 
 function puzzleChanged() {
 	if(importedScrambles) {
@@ -139,10 +140,7 @@ function puzzleChanged() {
     		colorScheme = configuration.get('scramble.'+puzzle+'.colorScheme', clone(puzzleImageInfo.colorScheme));
     		defaultColorScheme = puzzleImageInfo.colorScheme;
 
-//    		scrambleDivDD.minw = puzzleImageInfo.size.width;
-//    		scrambleDivDD.minh = puzzleImageInfo.size.height;
-//    		scrambleDivDD.paddingVert = getScrambleVertPadding();
-//    		scrambleDivDD.paddingHorz = getScrambleHorzPadding();
+    		defaultSize = puzzleImageInfo.size;
     		scrambleDiv.style.width = configuration.get('scramble.' + puzzle + '.size.width', puzzleImageInfo.size.width + getScrambleHorzPadding() + "px");
     		scrambleDiv.style.height = configuration.get('scramble.' + puzzle + '.size.height', puzzleImageInfo.size.height + getScrambleVertPadding() + "px");
     		
@@ -271,16 +269,26 @@ function scrambleMoved() {
 	configuration.set('scramble.location.top', scrambleDiv.style.top);
 	configuration.set('scramble.location.left', scrambleDiv.style.left);
 }
+
 function scrambleResized() {
+	var desiredWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
+	var desiredWidthHeight = desiredWidth*defaultSize.height/defaultSize.width;
+	var desiredHeight = parsePx(scrambleDiv.style.height) - getScrambleVertPadding();
+	var desiredHeightWidth = desiredHeight*defaultSize.width/defaultSize.height;
+	var imgWidth = Math.max(desiredWidth, desiredHeightWidth, defaultSize.width);
+	var imgHeight = Math.max(desiredHeight, desiredWidthHeight, defaultSize.height);
+	scrambleImg.style.width = imgWidth + "px";
+	scrambleImg.style.height = imgHeight + "px";
+	scrambleDiv.style.width = (imgWidth + getScrambleHorzPadding()) + "px";
+	scrambleDiv.style.height = (imgHeight + getScrambleVertPadding()) + "px";
+}
+function saveScrambleSize() {
 	configuration.set('scramble.' + puzzle + '.size.width', scrambleDiv.style.width);
 	configuration.set('scramble.' + puzzle + '.size.height', scrambleDiv.style.height);
-    var imgWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
-    scrambleImg.style.width = imgWidth + "px";
-    scrambleImg.style.height = parsePx(scrambleDiv.style.height) - getScrambleVertPadding() + "px";
     deleteChildren(scrambleImgMap);
     if(isChangingColorScheme) {
-        //TODO - only do the following when we're *done* resizing
-        var scale = imgWidth / scrambleDivDD.minw;
+    	var imgWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
+        var scale = imgWidth / defaultSize.width;
         var areas = tnoodle.scrambles.createAreas(faceMap, scale);
         for(var i = 0; i < areas.length; i++) {
             var area = areas[i];
@@ -309,7 +317,7 @@ function changeColorsClicked() {
         colorChooserDiv.style.display = 'none'; //close cholor chooser window
         resetColorScheme.style.display = 'none';
     }
-    scrambleResized(); //force image area map to be created
+	saveScrambleSize(); //force image area map to be created
 }
 
 function puzzlesLoaded(puzzles) {
@@ -494,8 +502,6 @@ function promptSeed() {
 }
 
     var isChangingColorScheme = false;
-
-    var dragDrop = new DragDrop();
 
     var scrambleArea = document.createElement('div');
     scrambleArea.className = 'scrambleArea';
@@ -682,13 +688,14 @@ function promptSeed() {
 	    scrambleArea.appendChild(scramblePre);
 	
     var scrambleDiv = document.createElement('div');
-    scrambleDiv.style.display = 'none'; //this has to be after the element is set draggable
+    scrambleDiv.style.display = 'none';
 	scrambleDiv.className = 'window';
 	document.body.appendChild(scrambleDiv);
 
 		var scrambleDivHeader = document.createElement("div");
 		scrambleDivHeader.className = 'titlebar';
 		scrambleDiv.appendChild(scrambleDivHeader);
+		scrambleDiv.setStyle('z-index', 4);
 		scrambleDiv.id = 'scrambleDiv'; //have to have an id to make it draggable
 		scrambleDiv.visibleIfPossible = configuration.get('scramble.visible', true);
 		scrambleDiv.setVisible = function(visible, userInvoked) {
@@ -767,13 +774,12 @@ function promptSeed() {
 		scrambleDiv.style.top = configuration.get('scramble.location.top', '0px');
 		scrambleDiv.style.left = configuration.get('scramble.location.left', '0px');
 		
-		//var scrambleDrag = new Drag(scrambleDiv);
-		//scrambleDrag.addEvent('complete', scrambleMoved);
-		scrambleDiv.makeResizable();
-		//TODO - enable resizing! -> test color editing!
-    //var scrambleDivDD = dragDrop.createDraggable(RESET_Z, SCALABLE, scrambleDiv.id);
-//    scrambleDivDD.resizeFunc = scrambleResized;
-//    scrambleDivDD.moveFunc = scrambleMoved;
+		var scrambleDrag = new Drag(scrambleDiv, { handle: scrambleDivHeader });
+		scrambleDrag.addEvent('complete', scrambleMoved);
+		
+		var scrambleResize = scrambleDiv.makeResizable({ handle: resizeDiv, snap: 0 });
+		scrambleResize.addEvent('drag', scrambleResized);
+		scrambleResize.addEvent('complete', saveScrambleSize);
 
     var puzzleSelect = document.createElement('select');
     puzzleSelect.onchange = puzzleChanged; //for some reason, the change event doesn't fire until the select loses focus
@@ -782,7 +788,7 @@ function promptSeed() {
     var colorChooserDiv = document.createElement('div');
 	colorChooserDiv.id = 'colorChooserDiv'; // need an id to make it draggable
 	colorChooserDiv.className = 'window';
-	colorChooserDiv.style.zIndex = 1;
+	colorChooserDiv.style.zIndex = 5;
 	document.body.appendChild(colorChooserDiv);
 		var titlebar = document.createElement('div');
 		titlebar.className = 'titlebar';
@@ -808,10 +814,10 @@ function promptSeed() {
 		colorChooserDiv.appendChild(colorChooser.element);
 	//end colorChooserDiv
 	
-    var colorChooserDD = dragDrop.createDraggable(RESET_Z, colorChooserDiv.id);
-    colorChooserDiv.style.width = colorChooser.preferredWidth + 'px';
-    colorChooserDiv.style.height = colorChooser.preferredHeight + 'px';
-    colorChooserDiv.style.display = 'none';
+	colorChooserDiv.style.width = colorChooser.preferredWidth + 'px';
+	colorChooserDiv.style.height = colorChooser.preferredHeight + 'px';
+	colorChooserDiv.style.display = 'none';
+	new Drag(colorChooserDiv, {handle: titlebar});
 
     var scrambler;
     if(applet)

@@ -19,3 +19,6 @@ mootools-1.2.4.4-more.js: http://mootools.net
 		//end changes
 		this.element[$pick(attach, true) ? 'addEvent' : 'removeEvent']('click:relay(th)', this.bound.headClick);
 	},
+	
+	//this.mouse.pos[z] = event.page[z] - this.value.now[z];
+	this.mouse.pos[z] = event.page[z] - this.element.getPosition()[z]; //hackity

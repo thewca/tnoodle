@@ -4,7 +4,7 @@
 <title>TNoodleTimer</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 
-<link type="text/css" rel="stylesheet" href="css/wz_dragdrop.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="css/Window.css" media="screen" />
 <link type="text/css" rel="stylesheet" href="css/ScrambleStuff.css" media="screen" />
 <link type="text/css" rel="stylesheet" href="css/KeyboardTimer.css" media="screen" />
 <link type="text/css" rel="stylesheet" href="css/TimesTable.css" media="screen" />
@@ -14,7 +14,6 @@
 <script type="text/javascript" src="js/TriLayout.js"></script>
 <script type="text/javascript" src="js/tnoodleserver.js"></script>
 <script type="text/javascript" src="js/tnoodlescrambles.js"></script>
-<script type="text/javascript" src="js/wz_dragdrop.js"></script>
 <script type="text/javascript" src="js/ColorChooser.js"></script>
 <script type="text/javascript" src="js/ScrambleStuff.js"></script>
 <script type="text/javascript" src="js/KeyboardTimer.js"></script>
@@ -50,18 +49,6 @@ span.link:hover, span.down {
 	z-index: 2; /*on top of scramble window */
 }
 
-/*
-.resize-br {
-    background: none repeat scroll 0 0 #FFF;
-    border: 1px solid #333;
-    font-size: 1px;
-    position: absolute;
-    width: 5px;
-    height: 5px;
-
-    cursor: se-resize;
-}
-*/
 .scrambleText {
 	overflow: auto;
 }
@@ -324,7 +311,7 @@ window.addEvent('domready', function() {
 	};
 	$('scrambles').resize = function() {
 		var space = $('scrambles').getSize();
-		space.y -= $('scrambleBorder').getSize().y;
+		space.y -= $('scrambleBorder').getSize().y + 2; //add 2 for border
 		$$('.scrambleArea')[0].setStyle('height', space.y);
 		space.y -= $$('.scrambleHeader')[0].getSize().y;
 		var scrambleText = $$('.scrambleText')[0];
