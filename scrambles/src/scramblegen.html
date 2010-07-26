@@ -1,0 +1,75 @@
+<html>
+
+<head>
+<title>WCA Scramble Maker</title>
+<script type="text/javascript">
+
+function scrambleLink(link,puzzlename,title) {
+	document.getElementById(link).setAttribute('action',window.location.protocol + "//" + window.location.host + '/scramble/' + document.getElementById(puzzlename).value + '.' + document.getElementById(title).value + '.pdf');
+}
+
+</script>
+<style type="text/css">
+body {
+	font-family:Tahoma,Arial,Verdana,sans-serif;
+	font-size:13px;
+}
+div#main {
+	padding:8px;
+	border:1px solid;
+	background-color:#66cc66;
+}
+div.color {
+	width:10px;
+	height:10px;
+	margin-bottom:2px;
+}
+input, select, table {
+	font-family:Tahoma,Arial,Verdana,sans-serif;
+	font-size:13px;
+}
+</style>
+</head>
+
+<body onload="scrambleLink('scramblepdf','puzzlename','title');">
+<div id="main">
+<table border=0>
+<tr>
+<td width=95%>
+<form id="scramblepdf" action="" target=_blank>
+Puzzle:
+<select id="puzzlename" onchange="scrambleLink('scramblepdf','puzzlename','title');">
+<option selected="selected" value="3x3x3">3x3x3</option>
+<option value="2x2x2">2x2x2</option>
+<option value="4x4x4">4x4x4</option>
+<option value="5x5x5">5x5x5</option>
+<option value="6x6x6">6x6x6</option>
+<option value="7x7x7">7x7x7</option>
+<option value="clock">Clock</option>
+<option value="pyro">Pyraminx</option>
+<option value="mega">Megaminx</option>
+<option value="sq1wca">Square-1</option>
+</select>
+Title:
+<input type="text" id="title" title="e.g. Round 1" onchange="scrambleLink('scramblepdf','puzzlename','title');">
+<select name="count" id="count">
+<option value=1>1</option>
+<option value=3>3</option>
+<option selected="selected" value=5>5</option>
+</select>
+<input type="submit" id="submitbutton" value="Get Scrambles">
+</form>
+</td>
+<td>
+<div style="margin-left:98%;">
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#cc6666';"><div class="color" style="background-color:#cc6666;"><!-- --></div></a>
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#66cc66';"><div class="color" style="background-color:#66cc66;"><!-- --></div></a>
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#6666ff';"><div class="color" style="background-color:#6666ff;"><!-- --></div></a>
+</div>
+</td>
+</tr>
+</table>
+</div>
+
+</body>
+</html>
