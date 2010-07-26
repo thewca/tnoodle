@@ -802,7 +802,7 @@ String.implement({
 	},
 
 	toInt: function(base){
-		return parseInt(String(this).indexOf('e')>=0 ? parseFloat(this)<<0 : this, base)
+		return parseInt(String(this).indexOf('e')>=0 ? parseFloat(this)<<0 : this, base);
 		//return parseInt(this, base || 10);
 	},
 

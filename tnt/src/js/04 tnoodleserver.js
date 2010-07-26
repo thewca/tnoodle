@@ -1,18 +1,18 @@
 var tnoodle = tnoodle || {};
 tnoodle.server = function(url) {
-	this.configuration = new function() {
+	function Configuration() {
 		//TODO GAH! localStorage doesn't work offline in ff! wtf?
 		//https://bugzilla.mozilla.org/show_bug.cgi?id=507361
 		var localFile = document.location.href.match(/^file:\/\/.*$/) && navigator.userAgent.match(/firefox/i);
 		var cookies = null;
 		if(!localStorage || localFile) {
-			cookies = new function() {
+			var Cookies = function() {
 				function setCookie(c_name,value,expiredays)
 				{
 				var exdate=new Date();
 				exdate.setDate(exdate.getDate()+expiredays);
 				document.cookie=c_name+ "=" +escape(value)+
-				((expiredays==null) ? "" : ";expires="+exdate.toUTCString());
+				((!expiredays) ? "" : ";expires="+exdate.toUTCString());
 				}
 				
 				var data = {};
@@ -35,9 +35,10 @@ tnoodle.server = function(url) {
 				};
 				this.setItem = function(key, val) {
 					data[key] = val;
-					setCookie(key, val.replace(/;/g, '\\u003b').replace(/=/g, '\\u003d'), 100);
+					setCookie(key, val.replace(/;/g, '\\u003b').replace(/\=/g, '\\u003d'), 100);
 				};
 			};
+			cookies = new Cookies();
 		} else {
 			cookies = localStorage;
 		}
@@ -52,7 +53,7 @@ tnoodle.server = function(url) {
 		}
 		
 		this.set = function(property, value) {
-			if(value == null) {
+			if(value === null || value === undefined) {
 				delete data[value];
 				delete cookies[value];
 			} else {
@@ -68,27 +69,32 @@ tnoodle.server = function(url) {
 			}
 			return data[property];
 		};
-	};
+	}
+	this.configuration = new Configuration();
 
 	var server = this;
 	this.formatTime = function(timeCentis, decimalPlaces) {
-		if(timeCentis == null)
+		if(timeCentis === null) {
 			return "";
+		}
 		timeCentis = Math.round(timeCentis);
-		if(decimalPlaces != 0)
+		if(decimalPlaces !== 0) {
 			decimalPlaces = decimalPlaces || 2;
+		}
 		
-		if(timeCentis == Infinity)
-			return "DNF"
-		else if(server.configuration.get('clockFormat', true))
+		if(timeCentis == Infinity) {
+			return "DNF";
+		} else if(server.configuration.get('clockFormat', true)) {
 			return server.clockFormat(timeCentis, decimalPlaces);
-		else
+		} else {
 			return (timeCentis/100).toFixed(decimalPlaces);
+		}
 	};
 	this.clockFormat = function(timeCentis, decimalPlaces) {
 		timeCentis = Math.round(timeCentis);
-		if(decimalPlaces != 0)
+		if(decimalPlaces !== 0) {
 			decimalPlaces = decimalPlaces || 2;
+		}
 		
 		var hours = (timeCentis / (100*60*60)).toInt();
 		timeCentis = timeCentis % (100*60*60);
@@ -100,21 +106,24 @@ tnoodle.server = function(url) {
 		var clocked = "";
 		if(hours > 0) {
 			clocked += hours + ":";
-			if(minutes == 0)
+			if(minutes === 0) {
 				clocked += "00:";
-			else if(minutes < 10)
+			} else if(minutes < 10) {
 				clocked += "0";
+			}
 		}
 		if(minutes > 0) {
 			clocked += minutes + ":";
-			if(seconds < 10)
+			if(seconds < 10) {
 				clocked += "0";
+			}
 		}
 		clocked += seconds;
 		if(decimalPlaces > 0) {
 			var decimals = "";
-			if(centis < 10)
+			if(centis < 10) {
 				decimals += "0";
+			}
 			decimals += centis;
 			if(decimalPlaces <= 2) {
 				decimals = decimals.substring(0, decimalPlaces);
@@ -134,13 +143,14 @@ tnoodle.server = function(url) {
 	/* time can be either a number or a string */
 	function Time(time, scramble) {
 		this.getValueCentis = function() {
-			if(this.penalty == "+2")
+			if(this.penalty == "+2") {
 				return this.centis + 2*100; 
-			else if(this.penalty == "DNF")
+			} else if(this.penalty == "DNF") {
 				return Infinity;
-			else
+			} else {
 				return this.centis;
-		}
+			}
+		};
 		this.format = function() {
 			var time = server.formatTime(this.getValueCentis());
 			if(this.penalty == "+2") {
@@ -150,8 +160,9 @@ tnoodle.server = function(url) {
 			return time;
 		};
 		this.parse = function(time) {
-			if(time.length == 0)
+			if(time.length === 0) {
 				throw "Must enter a time";
+			}
 			if(time.toUpperCase() == "DNF") {
 				this.setPenalty("DNF");
 				return;
@@ -161,8 +172,9 @@ tnoodle.server = function(url) {
 			if(time.match(/\+$/)) {
 				penalty = "+2";
 				time = time.substring(0, time.length-1);
-			} else
+			} else {
 				penalty = null;
+			}
 				
 			var hours = null, minutes = null, seconds = null;
 			var coloned = time.split(':');
@@ -185,13 +197,15 @@ tnoodle.server = function(url) {
 			}
 			
 			function strictToInt(str) {
-				if(!str.match(/^\d+$/))
+				if(!str.match(/^\d+$/)) {
 					throw "Not an integer: " + str;
+				}
 				return str.toInt();
 			}
 			
-			if(coloned[i-1] == ".")
+			if(coloned[i-1] == ".") {
 				throw "Invalid seconds value";
+			}
 			
 			var valueCentis = 0;
 			var seconds_centis = seconds.split('.');
@@ -200,17 +214,22 @@ tnoodle.server = function(url) {
 			} else if(seconds_centis.length > 2) {
 				throw "Too many decimal points";
 			}
-			if(seconds_centis[0].length > 0)
+			if(seconds_centis[0].length > 0) {
 				valueCentis += 100*strictToInt(seconds_centis[0]);
-			if(minutes)
+			}
+			if(minutes) {
 				valueCentis += 60*100*strictToInt(minutes);
-			if(hours)
+			}
+			if(hours) {
 				valueCentis += 60*60*100*strictToInt(hours);
+			}
 			
-			if(penalty == "+2")
+			if(penalty == "+2") {
 				valueCentis -= 2*100;
-			if(valueCentis <= 0)
+			}
+			if(valueCentis <= 0) {
 				throw "Can't have times <= 0";
+			}
 			this.centis = valueCentis;
 			this.setPenalty(penalty);
 			saveSessions();
@@ -219,7 +238,7 @@ tnoodle.server = function(url) {
 		//anything else is assumed to be no penalty
 		this.setPenalty = function(penalty) {
 			if(penalty != "+2" && penalty != "DNF") {
-				penalty = null
+				penalty = null;
 			}
 			this.penalty = penalty;
 			saveSessions();
@@ -233,17 +252,17 @@ tnoodle.server = function(url) {
 				this.tags.push(tag);
 				saveSessions();
 			}
-		}
+		};
 		this.removeTag = function(tag) {
 			var index = this.tags.indexOf(tag);
 			if(index >= 0) {
 				this.tags.splice(index, 1);
 				saveSessions();
 			}
-		}
+		};
 		this.hasTag = function(tag) {
 			return this.tags.indexOf(tag) >= 0;
-		}
+		};
 		
 		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = null;
 		this.penalty = null;
@@ -253,10 +272,11 @@ tnoodle.server = function(url) {
 		this.scramble = scramble;
 		//TODO - comments?
 		
-		if(typeof(time) === "number")
+		if(typeof(time) === "number") {
 			this.centis = time;
-		else
+		} else {
 			this.parse(time.toString());
+		}
 	}
 	this.Time = Time;
 	var EMPTY_TIME = { format: function() { return ""; }};
@@ -280,16 +300,18 @@ tnoodle.server = function(url) {
 			saveSessions();
 		};
 		this.getCustomization = function() {
-			if(this.customization == null)
+			if(this.customization === null) {
 				return '';
+			}
 			return this.customization;
 		};
 		//TODO - stats!!!
 		this.solveCount = function() {
 			var count = 0;
 			for(var i = 0; i < this.times.length; i++) {
-				if(this.times[i].getPenalty() != "DNF")
+				if(this.times[i].getPenalty() != "DNF") {
 					count++;
+				}
 			}
 			return count;
 		};
@@ -306,9 +328,9 @@ tnoodle.server = function(url) {
 			var minIndex = null, maxIndex = null;
 			for(var i = 0; i < this.times.length; i++) {
 				var val = key ? this.times[i][key] : this.times[i].getValueCentis();
-				if(val != null) {
+				if(val !== null) {
 					//for min, we choose the *first* guy we can find
-					if(val < minKey || (minIndex == null && val == minKey)) {
+					if(val < minKey || (minIndex === null && val == minKey)) {
 						minKey = val;
 						minIndex = i;
 					}
@@ -319,20 +341,23 @@ tnoodle.server = function(url) {
 					}
 				}
 			}
-			if(minIndex == null)
+			if(minIndex === null) {
 				minKey = null;
-			if(maxIndex == null)
+			}
+			if(maxIndex === null) {
 				maxKey = null;
+			}
 			return {
 				best: { centis: minKey, index: minIndex },
-				worst: { centis: maxKey, index: maxIndex },
+				worst: { centis: maxKey, index: maxIndex }
 			};
 		};
 		this.stdDev = function(lastSolve, count) {
 			lastSolve = lastSolve || this.times.length - 1;
 			var ave = computeAverage(lastSolve, count);
-			if(ave == null || ave == Infinity)
+			if(ave === null || ave == Infinity) {
 				return ave;
+			}
 			var variance = 0;
 			var solveCount = 0;
 			for(var i = lastSolve; i >= 0; i--) {
@@ -342,8 +367,9 @@ tnoodle.server = function(url) {
 					variance += val*val;
 					solveCount++;
 				}
-				if(solveCount == count)
+				if(solveCount == count) {
 					break;
+				}
 			}
 			variance /= solveCount;
 			return Math.sqrt(variance);
@@ -353,8 +379,9 @@ tnoodle.server = function(url) {
 		
 		//this ignores all DNFs
 		function computeAverage(lastSolve, requiredSolveCount) {
-			if(lastSolve < 0)
+			if(lastSolve < 0) {
 				return null;
+			}
 			var solveCount = 0;
 			var sum = 0;
 			for(var i = lastSolve; i >= 0; i--) {
@@ -363,20 +390,24 @@ tnoodle.server = function(url) {
 					sum += val;
 					solveCount++;
 				}
-				if(solveCount == requiredSolveCount)
+				if(solveCount == requiredSolveCount) {
 					break;
+				}
 			}
-			if(requiredSolveCount && solveCount != requiredSolveCount)
+			if(requiredSolveCount && solveCount != requiredSolveCount) {
 				return null; //not enough solves
-			if(solveCount == 0)
+			}
+			if(solveCount === 0) {
 				return Infinity;
+			}
 			return sum / solveCount;
 		}
 		
 		function computeRA(lastSolve, size, trimmed) {
 			var firstSolve = lastSolve - size + 1;
-			if(firstSolve < 0 || size == 0)
+			if(firstSolve < 0 || size === 0) {
 				return null; //not enough solves
+			}
 			
 			var sum = 0;
 			var solveCount = 0;
@@ -400,8 +431,9 @@ tnoodle.server = function(url) {
 				}
 			}
 
-			if(solveCount != requiredSolveCount)
+			if(solveCount != requiredSolveCount) {
 				return Infinity; //there must have been too many DNFs, which makes this a DNF average
+			}
 			
 			return sum / requiredSolveCount;
 		}
@@ -443,8 +475,10 @@ tnoodle.server = function(url) {
 	this.createSession = function(puzzle, customization) {
 		//id is the number of seconds since the epoch encoded in base 36 for readability
 		var id = Math.round(new Date().getTime()/1000).toString(36);
-		if(id in sessions) //we don't want duplicate session ids
+		if(id in sessions) {
+			//we don't want duplicate session ids
 			return null;
+		}
 		var sesh = new Session(id, puzzle, customization);
 		sessions.push(sesh);
 		saveSessions();
@@ -452,21 +486,25 @@ tnoodle.server = function(url) {
 	};
 	this.disposeSession = function(session) {
 		var i = sessions.indexOf(session);
-		if(i < 0) //couldn't find the session
+		if(i < 0) {
+			//couldn't find the session
 			return false;
+		}
 		sessions.splice(i, 1);
 		saveSessions();
 		return true;
 	};
 	this.getCustomizations = function(puzzle) {
-		if(!(puzzle in customizations))
+		if(!(puzzle in customizations)) {
 			customizations[puzzle] = [ '' ];
+		}
 		customizations[puzzle].sort();
 		return customizations[puzzle];
 	};
 	this.createCustomization = function(puzzle, customization) {
-		if(customization in customizations[puzzle])
+		if(customization in customizations[puzzle]) {
 			return false;
+		}
 		customizations[puzzle].push(customization);
 		return true;
 	};
@@ -477,21 +515,24 @@ tnoodle.server = function(url) {
 	this.getTags = function(puzzle) {
 		//TODO - should tags be per-puzzle? seems like a good idea
 		//although it does make changing session puzzles more complicated ... urgh
-		if(!(puzzle in tags))
+		if(!(puzzle in tags)) {
 			tags[puzzle] = [ 'POP' ];
+		}
 		return tags[puzzle].sort();
 	};
 	this.createTag = function(puzzle, tag) {
-		if(tags[puzzle].indexOf(tag) >= 0)
+		if(tags[puzzle].indexOf(tag) >= 0) {
 			return false;
+		}
 		tags[puzzle].push(tag);
 		return true;
 	};
 	//TODO - load sessions from config!
+	var i;
 	var sessions = this.configuration.get('sessions', []);
 	//transforming sessions (a JSON object) into an array of Sessions of Times
 	try {
-	for(var i = 0; i < sessions.length; i++) {
+	for(i = 0; i < sessions.length; i++) {
 		var sesh = new Session();
 		sesh.id = sessions[i].id;
 		sesh.puzzle = sessions[i].puzzle;
@@ -531,24 +572,28 @@ tnoodle.server = function(url) {
 		config.set('sessions', sessions);
 	}
 	function saveSessions() {
-		if(pendingSave)
+		if(pendingSave) {
 			return;
+		}
 		pendingSave = true;
 		setTimeout(bufferedSave, 500);
 	}
 	
-	if(sessions.length == 0)
+	if(sessions.length === 0) {
 		this.createSession("3x3x3", "");
+	}
 	
 	//initializing the available customizations
 	var customizations = {};
-	for(var i = 0; i < sessions.length; i++) {
+	for(i = 0; i < sessions.length; i++) {
 		var puzzle = sessions[i].getPuzzle();
 		var customization = sessions[i].getCustomization();
-		if(!(puzzle in customizations))
+		if(!(puzzle in customizations)) {
 			customizations[puzzle] = [ '' ];
-		if(!(customization in customizations[puzzle]))
+		}
+		if(!(customization in customizations[puzzle])) {
 			customizations[puzzle].push(customization);
+		}
 	}
 	//TODO - initialize the available tags, merge with customizations object?
 	var tags = { '3x3x3': [ 'PLL skip', 'POP' ] };

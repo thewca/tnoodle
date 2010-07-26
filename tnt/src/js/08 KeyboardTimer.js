@@ -1,7 +1,7 @@
 var KeyboardTimer = new Class({
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
 	decimalPlaces: 2,
-	frequency: .01,
+	frequency: 0.01,
 	initialize: function(parent, server) {
 		var timer = this;
 
@@ -44,7 +44,7 @@ var KeyboardTimer = new Class({
 		
 		function createOptionBox(optionKey, description, def, changeListener) {
 			var checkbox = new Element('input', { id: optionKey, type: 'checkbox' });
-			checkbox.checked = server.configuration.get(optionKey, def)
+			checkbox.checked = server.configuration.get(optionKey, def);
 			checkbox.addEvent('change', function(e) {
 				server.configuration.set(this.id, this.checked);
 			});
@@ -64,13 +64,15 @@ var KeyboardTimer = new Class({
 		
 		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
 		var frequencyChanged = function(e) {
-			if(!updateFrequency.value.match(/^\d+(\.\d*)?|\.\d+$/))
+			if(!updateFrequency.value.match(/^\d+(\.\d*)?|\.\d+$/)) {
 				updateFrequency.value = "0.01";
+			}
 			
-			if(updateFrequency.value.indexOf('.') < 0)
+			if(updateFrequency.value.indexOf('.') < 0) {
 				this.decimalPlaces = 0;
-			else
+			} else {
 				this.decimalPlaces = updateFrequency.value.length - updateFrequency.value.indexOf('.') - 1;
+			}
 			
 			server.configuration.set('timer.frequency', updateFrequency.value);
 			this.frequency = updateFrequency.value.toFloat();
@@ -94,12 +96,15 @@ var KeyboardTimer = new Class({
 		this.reset(); //this will update the display
 		
 		window.addEvent('keydown', function(e) {
-			if(!timer.isFocused())
+			if(!timer.isFocused()) {
 				return;
-			if(e.key == 'space')
+			}
+			if(e.key == 'space') {
 				e.stop(); //stop space from scrolling
-			if(timer.config.get('timer.enableStackmat'))
+			}
+			if(timer.config.get('timer.enableStackmat')) {
 				return;
+			}
 			keys.set(e.code, true);
 			if(timer.timing) {
 				//stopping timer
@@ -115,14 +120,15 @@ var KeyboardTimer = new Class({
 			timer.redraw();
 		});
 		window.addEvent('keyup', function(e) {
-			if(!timer.isFocused() || timer.config.get('timer.enableStackmat'))
+			if(!timer.isFocused() || timer.config.get('timer.enableStackmat')) {
 				return;
+			}
 			keys.erase(e.code);
 			
 			var onlySpaceStarts = timer.config.get('timer.onlySpaceStarts');
 			if(timer.pendingTime) {
 				timer.pendingTime = (keys.getLength() > 0);
-			} else if((onlySpaceStarts && e.key == 'space') || (!onlySpaceStarts && keys.getLength() == 0)) {
+			} else if((onlySpaceStarts && e.key == 'space') || (!onlySpaceStarts && keys.getLength() === 0)) {
 				if(new Date().getTime() - timer.timerStop > timer.delay) {
 					if(timer.config.get('timer.wcaInspection') && !timer.inspecting) {
 						// if inspection's on and we're not inspecting, let's start!
@@ -165,7 +171,7 @@ var KeyboardTimer = new Class({
 		
 		var acceptedTime = false;
 		function stackmatUpdated(state) {
-			if(state != null) {
+			if(state !== null) {
 				timer.timing = state.running;
 				timer.stackCentis = state.centis;
 				timer.inspecting = false; //TODO - stackmat inspection
@@ -197,7 +203,7 @@ var KeyboardTimer = new Class({
 	isFocused: function() {
 		//we disable the timer if a text field is focused
 		return (document.activeElement.type != "text" &&
-		   document.activeElement.type != "textarea")
+		   document.activeElement.type != "textarea");
 	},
 	getTimeCentis: function() {
 		if(this.config.get('timer.enableStackmat')) {
@@ -214,13 +220,13 @@ var KeyboardTimer = new Class({
 	//mootools doesn't like having a toString method? wtf?!
 	stringy: function() {
 		//TODO - wca style penalties
-		if(this.inspecting)
+		if(this.inspecting) {
 			return (15-this.getInspectionElapsedSeconds()).toString();
-		else {
+		} else {
 			var decimalPlaces = 2;
 			var centis = this.getTimeCentis();
 			if(this.timing) {
-				if(this.frequency == 0) {
+				if(this.frequency === 0) {
 					return "...";
 				}
 				centis = (this.frequency*100)*(Math.round(centis / (this.frequency*100)));
@@ -231,8 +237,9 @@ var KeyboardTimer = new Class({
 	},
 	timerId: null,
 	startRender: function() {
-		if(this.timerId == null)
+		if(this.timerId === null) {
 			this.timerId = this.redraw.periodical(this.frequency*1000, this);
+		}
 	},
 	stopRender: function() {
 		$clear(this.timerId);
@@ -254,8 +261,9 @@ var KeyboardTimer = new Class({
 		this.timer.set('html', this.stringy());
 		if(this.config.get('timer.showStatus')) {
 			var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
-			if(!this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0))
+			if(!this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0)) {
 				colorClass = 'keysDown';
+			}
 		}
 		this.timer.erase('class');
 		this.timer.addClass(colorClass);
@@ -281,9 +289,10 @@ var KeyboardTimer = new Class({
 		
 		var maxSize = parent.getSize();
 		var size = maxSize.y;
+		var width;
 		do {
 			this.sizer.setStyle('font-size', --size);
-			var width = this.sizer.getSize().x;
+			width = this.sizer.getSize().x;
 		} while(width > maxSize.x && size > 0);
 		this.sizer.setStyle('display', 'none');
 		this.timer.setStyle('font-size', size);
@@ -295,4 +304,4 @@ var KeyboardTimer = new Class({
 		this.timer.setStyle('height', maxSize.y-offset); //hack hackity hack hack
 	}
 });
-KeyboardTimer.implement(new Events);
+KeyboardTimer.implement(new Events());

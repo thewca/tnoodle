@@ -1,0 +1,85 @@
+html, body {
+	font-family: sans-serif;
+	overflow: hidden;
+}
+body {
+	margin: 0px 8px 8px 8px;
+}
+img {
+    border: none;
+    padding: 1px;
+}
+
+span.link {
+	white-space: nowrap;
+	color: brown;
+	text-decoration: underline;
+	cursor: pointer;
+	padding-left: 10px;
+}
+span.link:hover, span.down {
+	text-decoration: none;
+	color: red;
+}
+
+.importDiv {
+	z-index: 2; /*on top of scramble window */
+}
+
+.scrambleText {
+	overflow: auto;
+}
+
+.tabs {
+/* TODO: this doesn't overflow nicely */
+	overflow: auto;
+	
+	/* This lets our tabs overflow the border below */
+	position: relative;
+	top: 1px;
+	
+	padding: 0 0 0 1em;
+	margin: 0 0 0 0;
+	list-style:none;
+	line-height:1em;
+}
+
+.tabs li {
+	float:left;
+	margin:0;
+	padding:0;
+	
+	cursor: default;
+	display:block;
+	color:#444;
+	text-decoration:none;
+	font-weight:bold;
+	background:#aaa;
+	padding:0.25em;
+	border:1px solid black;
+}
+
+.tabs li .delete {
+	margin-left: 1em;
+	position: relative;
+	right: 0px;
+	cursor: pointer;
+}
+
+.tabs li .delete:hover {
+	background: white;
+}
+.tabs li.active {
+	border-bottom: 1px solid #efefef;
+}
+.tabs li:hover, .tabs li.active, #sessionInfoBar {
+	background: #efefef;
+}
+
+#sessionInfoBar {
+	padding: 5px;
+}
+
+#timesArea {
+	border: 1px solid;
+}

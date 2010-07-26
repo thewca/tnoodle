@@ -1,8 +1,9 @@
 //TODO - it would be nice to have this in mootools
 function isOrIsChild(el, parent) {
-	while(el != null) {
-		if(el == parent)
+	while(el !== null && el !== undefined) {
+		if(el == parent) {
 			return true;
+		}
 		el = el.parentNode;
 	}
 	return false;
@@ -15,13 +16,14 @@ var TimesTable = new Class({
 	//TODO - select multiple times for deletion
 		this.server = server;
 		this.configuration = server.configuration;
-		this.scrambleStuff = scrambleStuff
+		this.scrambleStuff = scrambleStuff;
 		var table = this;
 		HtmlTable.Parsers.time = {
 			match: /^.*$/,
 			convert: function() {
-				if(isOrIsChild(this, table.sizerRow))
+				if(isOrIsChild(this, table.sizerRow)) {
 					return Infinity;
+				}
 				return this.timeCentis;
 			},
 			number: true
@@ -42,13 +44,14 @@ var TimesTable = new Class({
 			parsers: [ HtmlTable.Parsers.num, HtmlTable.Parsers.time ],
 			rows: [],
 			sortable: true,
-			zebra: false,
+			zebra: false
 		});
 		this.addEvent('onSort', function(tbody, index) {
 			this.configuration.set('times.sort', this.sorted);
 			this.scrollToLastTime();
-			if(this.sizerRow)
+			if(this.sizerRow) {
 				this.sizerRow.inject(this.tbody);
+			}
 			this.tbody.getChildren('tr').each(function(tr) {
 				tr.refresh();
 			});
@@ -78,8 +81,9 @@ var TimesTable = new Class({
 				var best = this.session.bestWorst(this.ras[i]).best;
 				cells[++col].set('html', format(best.centis));
 				cells[col].removeClass('bestRA');
-				if(best.index != null)
+				if(best.index !== null) {
 					cells[col].addClass('bestRA');
+				}
 			}
 			cells[++col].set('html', '&sigma; = ' + format(this.session.stdDev()));
 		}.bind(this);
@@ -96,8 +100,9 @@ var TimesTable = new Class({
 		
 		window.addEvent('click', this.deselectRow.bind(this));
 		window.addEvent('keydown', function(e) {
-			if(e.key == 'esc')
+			if(e.key == 'esc') {
 				this.deselectRow();
+			}
 		}.bind(this));
 	},
 	freshSession: false,
@@ -124,8 +129,9 @@ var TimesTable = new Class({
 		this.scrollToLastTime();
 	},
 	scrollToLastTime: function() {
-		if(this.lastAddedRow)
+		if(this.lastAddedRow) {
 			this.scrollToRow(this.lastAddedRow);
+		}
 	},
 	scrollToRow: function(tr) {
 		var scrollTop = this.tbody.scrollTop;
@@ -158,17 +164,21 @@ var TimesTable = new Class({
 		this.sort(sort.index, sort.reverse);
 		this.sizerRow.inject(this.tbody);
 		
-		if(preserveScrollbar)
+		if(preserveScrollbar) {
 			this.tbody.scrollTo(0, scrollTop); //restore scroll amount
+		}
 	},
 	selectedRow: null,
 	editRow: null,
 	rowClicked: function(e, row, time) {
-		if(e) e.stop(); //don't want this to be treated as an unfocus event until we know which row was clicked
+		if(e) {
+			//don't want this to be treated as an unfocus event until we know which row was clicked
+			e.stop();
+		}
 		if(row == this.selectedRow) {
 			return;
 		}
-		if(this.selectedRow != null) {
+		if(this.selectedRow !== null) {
 			this.deselectRow();
 		}
 
@@ -183,7 +193,7 @@ var TimesTable = new Class({
 		var deleteTimeFunc = function(e) {
 			this.session.disposeTime(time); //remove time
 			this.deselectRow().dispose(); //deselect and remove current row
-		}.bind(this)
+		}.bind(this);
 		var deleteTime = new Element('td');
 		deleteTime.inject(this.editRow);
 		if(time) {
@@ -195,7 +205,7 @@ var TimesTable = new Class({
 		var textField = new Element('input');
 		var timeChanged = function(e) {
 			try {
-				new this.server.Time(textField.value);
+				var test = new this.server.Time(textField.value);
 				errorField.set('html', '');
 			} catch(error) {
 				errorField.set('html', error);
@@ -205,19 +215,20 @@ var TimesTable = new Class({
 		xAddListener(textField, 'input', timeChanged, false);
 		
 		textField.setAttribute('type', 'text');
-		textField.value = time == null ? "" : time.format();
+		textField.value = time === null ? "" : time.format();
 		//TODO - do something that doesn't depend on %
 		textField.setStyle('width', '90%');
 		
 		function onBlur(e) {
-			if(time) //we try to accept the time if we were editing
+			if(time) { //we try to accept the time if we were editing
 				acceptTime();
+			}
 		}
 		var acceptTime = function() {
 			//if successful, this function may cause blur, which causes double adding of timess
 			textField.removeEvent('blur', onBlur);
 			try {
-				if(time == null) {
+				if(time === null) {
 					this.addTime(textField.value);
 				} else {
 					time.parse(textField.value);
@@ -237,9 +248,11 @@ var TimesTable = new Class({
 				textField.removeEvent('blur', onBlur);
 				this.deselectRow();
 			}
-			if(e.key == 'enter')
-				if(acceptTime())
+			if(e.key == 'enter') {
+				if(acceptTime()) {
 					this.deselectRow();
+				}
+			}
 		}.bind(this));
 		textField.addEvent('blur', onBlur);
 		var col2 = new Element('td').adopt(textField);
@@ -260,11 +273,11 @@ var TimesTable = new Class({
 		this.editRow.replaces(this.selectedRow);
 		
 		if(time) {
-			function makeLabel(el) {
+			var makeLabel = function(el) {
 				var label = new Element('label', {'for': el.id, html: el.value});
 				el.inject(label, 'top');
 				return label;
-			}
+			};
 			
 			var fieldSet = new Element('fieldset');
 			fieldSet.adopt(new Element('legend', {html: "Penalty"}));
@@ -321,24 +334,24 @@ var TimesTable = new Class({
 			optionsDiv.addEvent('mouseover', optionsDiv.show);
 			optionsDiv.addEvent('mouseout', optionsDiv.hide);
 			
-			function createTagBox(tag, checked) {
-				var checkbox = new Element('input', { id: tag, type: 'checkbox' });
-				checkbox.checked = checked;
-				checkbox.addEvent('change', function(e) {
-					if(this.checked)
-						time.addTag(tag);
-					else
-						time.removeTag(tag);
-				});
-				checkbox.addEvent('focus', function(e) {
-					this.blur();
-				});
-				return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag }));
-			}
 			optionsDiv.refresh = function() {
+				function tagged(e) {
+					if(this.checked) {
+						time.addTag(this.id);
+					} else {
+						time.removeTag(this.id);
+					}
+				}
 				var tags = this.server.getTags(this.session.getPuzzle());
-				for(var i = 0; i < tags.length; i++)
-					optionsDiv.adopt(createTagBox(tags[i], time.hasTag(tags[i])));
+				for(var i = 0; i < tags.length; i++) {
+					var tag = tags[i];
+					var checked = time.hasTag(tags[i]);
+					var checkbox = new Element('input', { id: tag, type: 'checkbox' });
+					checkbox.checked = checked;
+					checkbox.addEvent('change', tagged);
+					checkbox.addEvent('focus', checkbox.blur);
+					optionsDiv.adopt(new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag })));
+				}
 				
 				// all of this tagging code is some of the worst code i've written for tnt,
 				// probably because it's 7:30 am, and i want to go to sleep
@@ -365,8 +378,9 @@ var TimesTable = new Class({
 			optionsDiv.inject(this.penaltyRow);
 			this.penaltyRow.inject(this.editRow, 'after');
 			this.scrollToRow(this.penaltyRow);
-		} else
+		} else {
 			this.penaltyRow = null;
+		}
 
 		timeChanged();
 		textField.focus(); //this has the added benefit of making the row visible
@@ -374,21 +388,26 @@ var TimesTable = new Class({
 	},
 	deselectRow: function(e) {
 		if(e) {
-			if(e.rightClick) return null; //we don't let right clicking deselect a row
-			if(isOrIsChild(e.target, this.penaltyRow))
+			if(e.rightClick) {
+				return null; //we don't let right clicking deselect a row
+			}
+			if(isOrIsChild(e.target, this.penaltyRow)) {
 				return null;
+			}
 		}
 		
 		var row = this.selectedRow;
-		if(this.selectedRow != null) {
+		if(this.selectedRow !== null) {
 			this.attachSorts(true); //sorting doesn't work well with a selected row
 			
 			var addTime = this.selectedRow == this.addRow;
 			var editedRow = addTime ? this.lastAddedRow : this.selectedRow;
-			if(this.editRow)
+			if(this.editRow) {
 				this.selectedRow.replaces(this.editRow);
-			if(this.penaltyRow)
+			}
+			if(this.penaltyRow) {
 				this.penaltyRow.dispose();
+			}
 			this.selectedRow = this.editRow = this.penaltyRow = null;
 			
 			//changing the time could very well affect more than this row
@@ -435,21 +454,23 @@ var TimesTable = new Class({
 			cells[col].removeClass('bestTime');
 			cells[col].removeClass('worstTime');
 			var bw = session.bestWorst();
-			if(time.index == bw.best.index)
+			if(time.index == bw.best.index) {
 				cells[col].addClass('bestTime');
-			else if(time.index == bw.worst.index)
+			} else if(time.index == bw.worst.index) {
 				cells[col].addClass('worstTime');
+			}
 			var bestRA12 = session.bestWorst('ra12').best;
 			var attemptCount = session.attemptCount();
 			if(attemptCount >= 12) {
 				if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
 					cells[col].addClass('bestRA');
 				}
-				if(THIS.sorted.index == 0) {
+				if(THIS.sorted.index === 0) {
 					var firstSolve = session.attemptCount()-12;
 					var lastSolve = session.attemptCount()-1;
-					if(firstSolve <= time.index && time.index <= lastSolve)
+					if(firstSolve <= time.index && time.index <= lastSolve) {
 						cells[col].addClass('currentRA');
+					}
 					
 					if(THIS.sorted.reverse) {
 						//the top/bottom are switched
@@ -458,10 +479,11 @@ var TimesTable = new Class({
 						firstSolve = temp;
 					}
 					
-					if(time.index == firstSolve)
+					if(time.index == firstSolve) {
 						cells[col].addClass('topCurrentRA');
-					else if(time.index == lastSolve)
+					} else if(time.index == lastSolve) {
 						cells[col].addClass('bottomCurrentRA');
+					}
 				}
 			}
 			
@@ -470,14 +492,16 @@ var TimesTable = new Class({
 				cells[++col].set('html', server.formatTime(time[key]));
 				var bestIndex = session.bestWorst(key).best.index;
 				cells[col].removeClass('bestRA');
-				if(bestIndex == time.index)
+				if(bestIndex == time.index) {
 					cells[col].addClass('bestRA');
+				}
 			}
 			
 			cells[++col].set('html', server.formatTime(time.sessionAve));
 		};
 	},
 	resizeCols: function() {
+		var i, j;
 		var infoCells = this.infoRow.getChildren('td');
 		var addTimeCells = this.addRow.getChildren('td');
 		var headers = this.thead.getChildren('tr')[0].getChildren('th');
@@ -485,7 +509,7 @@ var TimesTable = new Class({
 		
 		this.sizerRow.empty();
 		this.tbody.adopt(this.sizerRow);
-		for(var i = 0; i < headers.length; i++) {
+		for(i = 0; i < headers.length; i++) {
 			var col = new Element('td');
 			tds.push(col);
 			this.sizerRow.adopt(col);
@@ -509,12 +533,14 @@ var TimesTable = new Class({
 		var preferredWidth = 0;
 		
 		var resizeme = [headers, infoCells, addTimeCells, tds];
-		for(var i = 0; i < headers.length; i++) {
+		for(i = 0; i < headers.length; i++) {
 			var maxWidth = 0;
 			var maxWidthIndex = 0;
 			var padding = 0;
-			for(var j = 0; j < resizeme.length; j++) {
-				if(!resizeme[j]) continue;
+			for(j = 0; j < resizeme.length; j++) {
+				if(!resizeme[j]) {
+					continue;
+				}
 				var newWidth = resizeme[j][i].getSize().x;
 				if(newWidth >= maxWidth) {
 					maxWidth = newWidth;
@@ -524,9 +550,11 @@ var TimesTable = new Class({
 				}
 			}
 			preferredWidth += maxWidth;
-			for(var j = 0; j < resizeme.length; j++) {
+			for(j = 0; j < resizeme.length; j++) {
 				//setting everyone to the max width
-				if(!resizeme[j]) continue;
+				if(!resizeme[j]) {
+					continue;
+				}
 				resizeme[j][i].setStyle('width', maxWidth - padding);
 			}
 		}
@@ -550,7 +578,9 @@ var TimesTable = new Class({
 		return space;
 	},
 	resize: function(forceScrollToLatest) {
-		if(!this.session) return; //we're not ready to size this until we have a session
+		if(!this.session) {
+			return; //we're not ready to size this until we have a session
+		}
 		
 		//upon resizing, we first deselect any selected rows!
 		if(this.selectedRow) {

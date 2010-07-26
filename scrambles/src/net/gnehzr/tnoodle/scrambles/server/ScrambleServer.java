@@ -93,8 +93,7 @@ public class ScrambleServer {
 			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
 		}
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-		server.createContext("/", new ReadmeHandler());
-		server.createContext("/tnt/", new TNTHandler());
+		server.createContext("/", new FileHandler());
 		server.createContext("/import/", new ImporterHandler());
 		server.createContext("/scramble/", new ScramblerHandler(scramblers));
 		server.createContext("/view/", new ScrambleViewerHandler(scramblers));
@@ -105,18 +104,9 @@ public class ScrambleServer {
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
 		System.out.println("Server started on " + addr);
 		System.out.println("Visit http://" + addr + " for a readme and demo.");
-		System.out.println("Visit http://" + addr + "/tnt/ to try out TNT.");
 	}
 	
-	private class ReadmeHandler extends SafeHttpHandler {
-		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			fullyReadInputStream(getClass().getResourceAsStream("readme.html"), bytes);
-			sendHtml(t, bytes);
-		}
-	}
-	
-	private class TNTHandler extends SafeHttpHandler {
+	private class FileHandler extends SafeHttpHandler {
 		MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
 		{
 			mimes.addMimeTypes("text/css css");
@@ -132,11 +122,17 @@ public class ScrambleServer {
 		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 			String fileName;
-			if(path.length == 1 && path[0].equals("tnt"))
+			if(path.length == 1 && path[0].isEmpty())
+				fileName = "readme.html";
+			else if(path.length == 1 && path[0].equals("tnt")) {
+				// this is kind of breaking the abstraction,
+				// as this code shouldn't even know about tnt,
+				// but oh well...
 				fileName = "tnt/tnt.html";
-			else
+			} else
 				fileName = t.getRequestURI().getPath().substring(1);
-			fullyReadInputStream(getClass().getResourceAsStream(fileName), bytes);
+			
+			fullyReadInputStream(getClass().getResourceAsStream("/" + fileName), bytes);
 			sendBytes(t, bytes, mimes.getContentType(fileName));
 		}
 	}

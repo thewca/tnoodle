@@ -3,11 +3,11 @@ tnoodle.stackmat = {
 	//TODO - allow querying of mixers!
 	//TODO - allow setting of inverted!
 	//TODO - generate this file from stackmat project?
-	//TODO - add shelley's code & email her back
 	applet: null,
 	enable: function(updateCallback, errorCallback, stackmatValue, mixerIndex) {
-		if(tnoodle.stackmat.applet != null)
+		if(tnoodle.stackmat.applet !== null) {
 			tnoodle.stackmat.disable();
+		}
 		
 		window.stackmatUpdateCallback = updateCallback;
 		window.stackmatErrorCallback = errorCallback;
@@ -28,22 +28,25 @@ tnoodle.stackmat = {
 		applet.setAttribute('mayscript', 'mayscript');
 		applet.appendChild(createParam('updateCallback', 'stackmatUpdateCallback'));
 		applet.appendChild(createParam('errorCallback', 'stackmatErrorCallback'));
-		if(stackmatValue)
+		if(stackmatValue) {
 			applet.appendChild(createParam('stackmatValue', stackmatValue));
-		if(mixerIndex)
+		}
+		if(mixerIndex) {
 			applet.appendChild(createParam('mixer', mixerIndex));
+		}
 		document.body.appendChild(applet);
 		tnoodle.stackmat.applet = applet;
 	},
 	disable: function() {
-		if(tnoodle.stackmat.applet == null) return;
+		if(tnoodle.stackmat.applet === null) { return; }
 		document.body.removeChild(tnoodle.stackmat.applet);
 		tnoodle.stackmat.applet = null;
 		window.stackmatUpdateCallback(); // we want them to be notified that the timer is OFF
 	},
 	isOn: function() {
-		if(tnoodle.stackmat.applet == null)
+		if(tnoodle.stackmat.applet === null) {
 			return false;
+		}
 		return tnoodle.stackmat.applet.isOn();
 	}
 };

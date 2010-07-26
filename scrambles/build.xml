@@ -9,10 +9,8 @@
 	<property name="dist" location="dist" />
 	<property name="scramblers" location="${bin}/scramblers" />
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
-	<property name="tnt-src" location="${src}/net/gnehzr/tnoodle/scrambles/server/tnt" />
-	<property name="tnt-bin" location="${bin}/net/gnehzr/tnoodle/scrambles/server/tnt" />
-	<property name="readme-src" location="${src}/net/gnehzr/tnoodle/scrambles/server/readme.html" />
-	<property name="readme-bin" location="${bin}/net/gnehzr/tnoodle/scrambles/server/readme.html" />
+	<property name="readme-src" location="${src}/readme.html" />
+	<property name="readme-bin" location="${bin}/readme.html" />
 	<property name="server-jar" location="${dist}/ScrambleServer.jar" />
 	<property name="applet-jar" location="${dist}/ScrambleApplet.jar" />
 	<!-- This seems kinda weird, but is probably the only way to do this -->
@@ -63,10 +61,6 @@
 		<javac srcdir="${src}" classpath="${gson};${jopt};${cube};${itext};${jsobject}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 		<!-- copying readme.html -->
 		<copy file="${readme-src}" tofile="${readme-bin}" />
-		<!-- copying tnt -->
-		<copy todir="${tnt-bin}">
-			<fileset dir="${tnt-src}" />
-		</copy>
 		
 		<delete file="${plugin-list}" />
 		<pathconvert property="plugin-files" pathsep="${line.separator}">
@@ -86,7 +80,7 @@
 
 	<target name="dist" depends="dist-server,dist-applet" description="generate the distribution">
 	</target>
-
+	
 	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
 	<uptodate property="uptodate-server" targetfile="${server-jar}">
 		<srcfiles dir="${src}" />

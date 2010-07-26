@@ -1,0 +1,119 @@
+<project name="tnt" default="dist" basedir="." xmlns:jsl="antlib:com.googlecode.jslint4java">
+	<description>
+		Builds a special copy of ScrambleServer with tnt embedded,
+		and a copy of tnt built upon an applet.
+    </description>
+	
+	<property name="src" location="src" />
+	<property name="lib" location="../lib" />
+	<property name="bin" location="bin/tnt" />
+	<property name="dist" location="dist" />
+	<property name="scrambles" location="../scrambles" />
+	
+	<property name="scrambleserver-jar" location="${scrambles}/dist/ScrambleServer.jar" />
+	<property name="tntserver-jar" location="${dist}/TNTServer.jar" />
+	
+	<property name="js-src" location="${src}/js" />
+	<property name="js-bin" location="${bin}/js" />
+	<property name="js-all" location="${js-bin}/tnt.js" />
+	
+	<property name="css-src" location="${src}/css/" />
+	<property name="css-bin" location="${bin}/css/" />
+	<property name="css-all" location="${css-bin}/tnt.css" />
+	
+	<!-- setting up jslint -->
+	<path id="ant.tasks.classpath">
+		<fileset dir="${lib}" includes="*.jar" />
+	</path>
+	<taskdef uri="antlib:com.googlecode.jslint4java"
+		resource="com/googlecode/jslint4java/antlib.xml"
+		classpathref="ant.tasks.classpath" />
+	
+	<!-- setting up yuicompressor -->
+	<property 
+	    name="yui-compressor.jar" 
+	    location="${lib}/yuicompressor-2.4.2.jar" />
+	<property 
+	    name="yui-compressor-ant-task.jar" 
+	    location="${lib}/yui-compressor-ant-task-0.5.jar" />
+	<path id="task.classpath">
+	  <pathelement location="${yui-compressor.jar}" />
+	  <pathelement location="${yui-compressor-ant-task.jar}" />
+	</path>
+	<taskdef
+	    name="yui-compressor" 
+	    classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
+	  <classpath refid="task.classpath" />
+	</taskdef>
+	
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="concat" depends="init" description="compile the source">
+		<concat destfile="${js-all}" force="no">
+		  <!-- Order in which these files are concatenated _IS_ IMPORTANT! -->
+		  <fileset dir="${js-src}" includes="**/*.js" />
+		</concat>
+		<concat destfile="${css-all}" force="no">
+		  <fileset dir="${css-src}" includes="**/*.css" />
+		</concat>
+
+		<copy todir="${bin}/media">
+			<fileset dir="${src}/media" />
+		</copy>
+		
+		<copy tofile="${bin}/tnt.html" file="${src}/tnt.html" />
+
+		<echo>Globbed all the js files together.</echo>
+	</target>
+	
+	<target name="jslint">
+		<jsl:jslint options="browser,evil">
+		    <formatter type="plain" />
+		    <fileset dir="${js-src}" includes="*.js" excludes="*mootools*"/>
+		</jsl:jslint>
+		<echo>Successfully jslinted, good job!</echo>
+	</target>
+	
+	<target name="minify">
+		<yui-compressor 
+		    warn="false" 
+		    munge="true" 
+		    preserveallsemicolons="false"
+		    fromdir="${bin}" 
+		    todir="${bin}"
+			jsSuffix=".js.min" cssSuffix=".css.min">
+		  <include name="**/*.js" />
+		  <include name="**/*.css" />
+		</yui-compressor>
+		<move file="${js-all}.min" tofile="${js-all}" />
+		<move file="${css-all}.min" tofile="${css-all}" />
+	</target>
+	
+	<target name="scrambles">
+		<ant antfile="${scrambles}/build.xml" inheritAll="false" />
+	</target>
+	
+	<target name="tntserver" depends="scrambles">
+		<copy file="${scrambleserver-jar}" tofile="${tntserver-jar}" />
+		<jar file="${tntserver-jar}" update="true">
+			<fileset dir="bin" />
+		</jar>
+	</target>
+	
+	<target name="tntapplet" depends="scrambles">
+		<!-- TODO: actually DO this! -->
+	</target>
+	
+	<target name="dist" depends="init,jslint,concat,minify,tntserver,tntapplet" description="generate the distribution">
+	</target>
+	
+	<target name="clean" description="clean up">
+		<ant antfile="${scrambles}/build.xml" target="clean" inheritAll="false" />
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+</project>

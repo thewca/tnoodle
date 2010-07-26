@@ -6,7 +6,7 @@ if(!Array.prototype.map) {
 			new_arr[i] = func(this[i]);
 		}
 		return new_arr;
-	}
+	};
 }
 function xAddListener(obj, event, func, useCapture) {
 	if(obj.addEventListener) {
@@ -21,13 +21,14 @@ var tnoodle = tnoodle || {};
 tnoodle.ajax = function(callback, url, data) {
 	var dataUrl = url; //this is to avoid clobbering our original url
 	if(data) {
-		if(dataUrl.indexOf("?") < 0)
+		if(dataUrl.indexOf("?") < 0) {
 			dataUrl += "?";
+		}
 		dataUrl += tnoodle.toQueryString(data);
 	}
 	
 	var xhr = new XMLHttpRequest();
-	if(xhr.withCredentials == undefined) {
+	if(xhr.withCredentials === undefined) {
 		xhr = null;
 		if(typeof(XDomainRequest) != "undefined") {
 			xhr = new XDomainRequest();
@@ -38,7 +39,7 @@ tnoodle.ajax = function(callback, url, data) {
 				xhr = null;
 			}
 		}
-		if(xhr == null) {
+		if(xhr === null) {
 			// freaking opera & ie, man
 			// we'll make an attempt to use jsonp here
 			tnoodle.jsonp(callback, url, data);
@@ -55,8 +56,8 @@ tnoodle.ajax = function(callback, url, data) {
 	};
 	try {
 		xhr.send(null);
-	} catch(error) {
-		callback({error: error});
+	} catch(err) {
+		callback({error: err});
 	}
 	return xhr;
 };
@@ -64,10 +65,11 @@ tnoodle.jsonpcount = 1;
 tnoodle.jsonp = function(callback, url, data) {
 		var callbackname = "tnoodle.jsonp.callback" + this.jsonpcount++;
 	    eval(callbackname + "=callback");
-		if (url.indexOf("?") > -1)
+		if (url.indexOf("?") > -1) {
 			url += "&callback="; 
-		else
+		} else {
 			url += "?callback=";
+		}
 
 		url += callbackname + "&" + tnoodle.toQueryString(data);
 		url += "&" + new Date().getTime().toString(); // prevent caching
@@ -80,40 +82,50 @@ tnoodle.jsonp = function(callback, url, data) {
 tnoodle.toQueryString = function(data) {
 		var url = "";
 		for(var key in data) {
-			url += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+			if(data.hasOwnProperty(key)) {
+				url += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+			}
 		}
-		if(url.length == 0)
+		if(url.length === 0) {
 			return url;
+		}
 		
 		return url.substring(1);
 	};
 tnoodle.scrambles = {
 	//TODO - document!	
-	//TODO - modify to take a size instead of a scale
 	createAreas: function(faces, scale) {
+		var deepJoin = function(arr, sep) {
+			return arr.map(function(item) { return item.map(function(coord) { return coord*scale; }).join(sep); }).join(sep);
+		};
 		var areas = [];
 		for(var faceName in faces) {
-			var faceAreas = faces[faceName];
-			for(var i = 0; i < faceAreas.length; i++) {
-				var area = document.createElement('area');
-				area.faceName = faceName;
-				area.setAttribute('shape', 'poly');
-				var coords = faceAreas[i].map(function(item) { return item.map(function(coord) { return coord*scale; }).join(","); }).join(",");
-				area.setAttribute('coords', coords);
-
-				areas.push(area);
+			if(faces.hasOwnProperty(faceName)) {
+				var faceAreas = faces[faceName];
+				for(var i = 0; i < faceAreas.length; i++) {
+					var area = document.createElement('area');
+					area.faceName = faceName;
+					area.setAttribute('shape', 'poly');
+					var coords = deepJoin(faceAreas[i], ",");
+					area.setAttribute('coords', coords);
+	
+					areas.push(area);
+				}
 			}
 		}
 		return areas;
 	},
 	flattenColorScheme: function(colorScheme) {
 		var faces = [];
-		for(var face in colorScheme)
-			faces.push(face);
+		for(var face in colorScheme) {
+			if(colorScheme.hasOwnProperty(face)) {
+				faces.push(face);
+			}
+		}
 		faces.sort();
 		var scheme = '';
 		for(var i = 0; i < faces.length; i++) {
-			if(i > 0) scheme += ','
+			if(i > 0) { scheme += ','; }
 			scheme += colorScheme[faces[i]];
 		}
 		return scheme;
@@ -133,8 +145,9 @@ tnoodle.scrambles = {
 				var generator = valueIterator.next();
 				puzzleNames.push([generator.getShortName(), generator.getLongName()]);
 			}
-			if(puzzleCallback)
+			if(puzzleCallback) {
 				puzzleCallback(puzzleNames);
+			}
 		};
 	
 		var applet = document.createElement('applet');
@@ -155,11 +168,12 @@ tnoodle.scrambles = {
 		
 		// can only be called once!
 		this.connect = function(callback) {
-			if(puzzleMap == null)
+			if(puzzleMap === null) {
 				puzzleCallback = callback;
-			else
+			} else {
 				callback(puzzleNames);
-		}
+			}
+		};
 		this.loadScramble = function(callback, puzzle, seed) {
 			var generator = puzzleMap.get(puzzle);
 			var scramble = seed ? generator.generateSeededScramble(seed) : generator.generateScramble();
@@ -230,23 +244,23 @@ tnoodle.scrambles = {
 		
 		this.connect = function(callback) {
 			return tnoodle.ajax(callback, this.scrambleUrl, null);
-		}
+		};
 		
 		this.loadScramble = function(callback, puzzle, seed) {
 			return this.loadScrambles(function(scrambles) { callback(scrambles[0]); }, puzzle, seed, 1);
 		};
 		this.loadScrambles = function(callback, puzzle, seed, count) {
 			var query = {};
-			if(seed) query['seed'] = seed;
-			if(count) query['count'] = count;
+			if(seed) { query.seed = seed; }
+			if(count) { querycount = count; }
 			return tnoodle.ajax(callback, this.scrambleUrl + encodeURIComponent(puzzle) + ".json", query);
 		};
 		this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
 			var query = { "scramble": scramble };
-			if(width) query['width'] = width;
-			if(height) query['height'] = height;
+			if(width) { query.width = width; }
+			if(height) { query.height = height; }
             if(colorScheme) {
-                query['scheme'] = tnoodle.scrambles.flattenColorScheme(colorScheme);
+                query.scheme = tnoodle.scrambles.flattenColorScheme(colorScheme);
             }
 			return this.viewUrl + encodeURIComponent(puzzle) + ".png?" + tnoodle.toQueryString(query);
 		};
@@ -264,7 +278,7 @@ tnoodle.scrambles = {
 		var uploadForm = null;
 		this.getUploadForm = function(onsubmit, onload) {
 			//onsubmit and onload are only used the first time this method is called
-			if(uploadForm == null) {
+			if(uploadForm === null) {
 				sendFileIframe = document.createElement('iframe');
 				sendFileIframe.style.display = 'none';
 				sendFileIframe.name = 'sendFileIframe';
@@ -301,9 +315,9 @@ tnoodle.scrambles = {
 				uploadForm.appendChild(submit);
 			}
 			return uploadForm;
-		}
+		};
 		this.toString = function() {
 			return this.server;
-		}
+		};
 	}
 };
