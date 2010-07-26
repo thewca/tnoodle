@@ -112,7 +112,6 @@
 	</target>
 	
 	<target name="clean" description="clean up">
-		<ant antfile="${scrambles}/build.xml" target="clean" inheritAll="false" />
 		<delete dir="${bin}" />
 		<delete dir="${dist}" />
 	</target>
