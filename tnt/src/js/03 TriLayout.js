@@ -76,21 +76,24 @@ var TriLayout = new Class( {
 		barPositions = [ bottom, left, top, right ];
 
 		this.counterClockwise = new Element('img', {
-			src : 'media/arrow_rotate_anticlockwise.png'
+			src: 'media/arrow_rotate_anticlockwise.png',
+			title: 'Rotate tris counter clockwise'
 		});
 		this.counterClockwise.setStyle('position', 'absolute');
 		this.counterClockwise.setStyle('cursor', 'pointer');
 		this.counterClockwise.fade('hide');
 
 		this.clockwise = new Element('img', {
-			src : 'media/arrow_rotate_clockwise.png'
+			src: 'media/arrow_rotate_clockwise.png',
+			title: 'Rotate tris clockwise'
 		});
 		this.clockwise.setStyle('position', 'absolute');
 		this.clockwise.setStyle('cursor', 'pointer');
 		this.clockwise.fade('hide');
 
 		this.swap = new Element('img', {
-			src : 'media/arrow_switch.png'
+			src: 'media/arrow_switch.png',
+			title: 'Swap tris'
 		});
 		this.swap.setStyle('position', 'absolute');
 		this.swap.setStyle('cursor', 'pointer');
