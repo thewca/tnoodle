@@ -887,7 +887,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	colorChooserDiv.style.width = colorChooser.preferredWidth + 'px';
 	colorChooserDiv.style.height = colorChooser.preferredHeight + 'px';
 	colorChooserDiv.style.display = 'none';
-	var drag = new Drag(colorChooserDiv, {
+	var colorChooserDrag = new Drag(colorChooserDiv, {
 		handle : titlebar
 	});
 
@@ -936,4 +936,30 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			puzzleListeners[i](puzzle);
 		}
 	}
+	
+	function ensureVisible(el) {
+		var pos = el.getPosition();
+		var size = el.getSize();
+		var avail = window.getSize();
+		if(pos.x < 0) {
+			pos.x = 0;
+		}
+		if(pos.x + size.x > avail.x) {
+			pos.x = avail.x-size.x;
+		}
+		if(pos.y < 0) {
+			pos.y = 0;
+		}
+		if(pos.y + size.y > avail.y) {
+			pos.y = avail.y-size.y;
+		}
+		el.getParent().setPosition(pos); //must position the parent, not the titlebar
+	}
+	function positionWindows() {
+		ensureVisible(scrambleDivHeader);
+		ensureVisible(titlebar);
+	}
+	scrambleDrag.addEvent('complete', positionWindows);
+	colorChooserDrag.addEvent('complete', positionWindows);
+	window.addEvent('resize', positionWindows);
 }
