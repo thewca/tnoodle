@@ -112,6 +112,9 @@
 	<target name="dist" depends="init,jslint,concat,minify,tntserver,tntapplet" description="generate the distribution">
 	</target>
 	
+	<target name="nomin" depends="init,jslint,concat,tntserver,tntapplet" description="generate the distribution">
+	</target>
+	
 	<target name="clean" description="clean up">
 		<delete dir="${bin}" />
 		<delete dir="${dist}" />

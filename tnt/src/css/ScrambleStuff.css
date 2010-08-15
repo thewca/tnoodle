@@ -1,13 +1,12 @@
 span.changeSize {
-	position: absolute;
-	left: 2px;
-	top: 4px;
-	line-height: 70%;
 }
 span.increaseSize {
-	display: block;
-	margin-bottom: 0px;
+	font-size: 1.25em;
 }
+span.decreaseSize {
+	font-size: 0.75em;
+}
+	
 span.increaseSize, span.decreaseSize {
 	cursor: pointer;
 	color: brown;

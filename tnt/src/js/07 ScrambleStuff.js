@@ -625,6 +625,53 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var scrambleHeader = document.createElement('div');
 	scrambleHeader.className = 'scrambleHeader';
 	scrambleArea.appendChild(scrambleHeader);
+	
+	function createResizer(bigger) {
+		var downTime = 0;
+		var resize = function(e) {
+			setTimeout(function() {
+				console.log(downTime + " " + mouseDown);
+				if(!mouseDown) {
+					downTime = 0;
+					return;
+				}
+				downTime++;
+				var size = parsePx(scramblePre.style.fontSize);
+				var delta = Math.max(downTime/2, 1);
+				size += bigger ? delta : -delta;
+				decrease.style.visibility = 'visible';
+				increase.style.visibility = 'visible';
+				if(size <= 5) {
+					decrease.style.visibility = 'hidden';
+				} else if(size > 100) {
+					increase.style.visibility = 'hidden';
+				} else {
+					size += 'px';
+					scramblePre.style.fontSize = size;
+					configuration.set('scramble.fontSize', size);
+					setTimeout(resize, 100);
+				}
+			}, 0); // wait for mouseDown to get set
+		};
+		return resize;
+	}
+
+	var increase = document.createElement('span');
+	increase.className = 'increaseSize';
+	increase.appendChild(document.createTextNode('A'));
+	xAddListener(increase, 'mousedown', createResizer(true), false);
+	
+	var decrease = document.createElement('span');
+	decrease.className = 'decreaseSize';
+	//decrease.appendChild(document.createTextNode('\u2013')); // en dash
+	decrease.appendChild(document.createTextNode('A'));
+	xAddListener(decrease, 'mousedown', createResizer(false), false);
+
+	var scrambleSize = document.createElement('span');
+	scrambleSize.setAttribute('class', 'changeSize');
+	scrambleSize.appendChild(decrease);
+	scrambleSize.appendChild(increase);
+	scrambleHeader.appendChild(scrambleSize);
 
 	var importUrlLink = document.createElement('span');
 	importUrlLink.title = "Import scrambles from url";
@@ -662,47 +709,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	}, false);
 	newScrambleLink.appendChild(document.createTextNode('New Scramble'));
 	scrambleHeader.appendChild(newScrambleLink);
-
-	function createResizer(step) {
-		var resize = function(e) {
-			setTimeout(function() {
-				if(!mouseDown) {
-					return;
-				}
-				var size = parsePx(scramblePre.style.fontSize);
-				size += step;
-				decrease.style.visibility = 'visible';
-				increase.style.visibility = 'visible';
-				if(size <= 5) {
-					decrease.style.visibility = 'hidden';
-				} else if(size > 100) {
-					increase.style.visibility = 'hidden';
-				} else {
-					size += 'px';
-					scramblePre.style.fontSize = size;
-					configuration.set('scramble.fontSize', size);
-					setTimeout(resize, 100);
-				}
-			}, 0); // wait for mouseDown to get set
-		};
-		return resize;
-	}
-
-	var increase = document.createElement('span');
-	increase.className = 'increaseSize';
-	increase.appendChild(document.createTextNode('+'));
-	xAddListener(increase, 'mousedown', createResizer(1), false);
-
-	var decrease = document.createElement('span');
-	decrease.className = 'decreaseSize';
-	decrease.appendChild(document.createTextNode('\u2013')); // en dash
-	xAddListener(decrease, 'mousedown', createResizer(-1), false);
-
-	var scrambleSize = document.createElement('span');
-	scrambleSize.setAttribute('class', 'changeSize');
-	scrambleSize.appendChild(increase);
-	scrambleSize.appendChild(decrease);
-	scrambleHeader.appendChild(scrambleSize);
 
 	var mouseDown = false;
 	xAddListener(document, 'mouseup', function(e) {
