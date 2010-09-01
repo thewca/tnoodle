@@ -252,7 +252,7 @@ tnoodle.scrambles = {
 		this.loadScrambles = function(callback, puzzle, seed, count) {
 			var query = {};
 			if(seed) { query.seed = seed; }
-			if(count) { querycount = count; }
+			if(count) { query.count = count; }
 			return tnoodle.ajax(callback, this.scrambleUrl + encodeURIComponent(puzzle) + ".json", query);
 		};
 		this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {

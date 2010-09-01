@@ -1,6 +1,6 @@
 //generated from http://ajaxload.info/
 WAITING_ICON_HEIGHT = 11;
-WAITING_ICON = 'ajax-loader.gif';
+WAITING_ICON = 'media/ajax-loader.gif';
 
 // LOADING_IMAGE = WAITING_ICON;
 // from http://en.wikipedia.org/wiki/Data_URI_scheme
@@ -630,7 +630,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		var downTime = 0;
 		var resize = function(e) {
 			setTimeout(function() {
-				console.log(downTime + " " + mouseDown);
 				if(!mouseDown) {
 					downTime = 0;
 					return;
