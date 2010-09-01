@@ -11,7 +11,10 @@ function isOrIsChild(el, parent) {
 
 var TimesTable = new Class({
 	Extends: HtmlTable,
-	ras: [ 'mean3', 'ra5', 'ra12', 'ave100' ],
+//	cols:    [ 'index', 'getValueCentis', 'mean3',  'ra5',  'ra12',  'ra100',  'sessionAve' ],
+//	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Session Ave' ],
+	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12',  'ra100',  'sessionMedian',  'sessionAve' ],
+	headers: [ '',      'Time',           'Ra 5', 'Ra 12', 'Ra 100', 'Session Med',    'Session Ave' ],
 	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
 		this.server = server;
@@ -40,7 +43,7 @@ var TimesTable = new Class({
 			number: HtmlTable.Parsers.number.number
 		};
 		this.parent(id, {
-			headers: [ '', 'Time', 'Mean 3', 'Ra 5', 'Ra 12', 'Ave 100', 'Session Ave' ],
+			headers: this.headers,
 			parsers: [ HtmlTable.Parsers.num, HtmlTable.Parsers.time ],
 			rows: [],
 			sortable: true,
@@ -57,8 +60,13 @@ var TimesTable = new Class({
 			});
 		});
 		
+		this.emptyRow = [];
+		for(var i = 0; i < this.cols.length; i++) {
+			this.emptyRow[i] = '';
+		}
 		//we create the add time row
-		this.addRow = this.push([ '', '<u>A</u>dd time', '', '', '', '', '' ]).tr.dispose();
+		this.emptyRow[1] = '<u>A</u>dd time';
+		this.addRow = this.push(this.emptyRow).tr.dispose();
 		this.addRow.addClass('addTime');
 		this.addRow.addEvent('click', function(e) {
 			this.rowClicked(e, this.addRow, null);
@@ -66,26 +74,30 @@ var TimesTable = new Class({
 		
 		//there needs to be some dummy content in this row so it gets sized correctly
 		//only vertical sizing matters though
-		this.infoRow = this.set('footers', [ 'J', '', '', '', '', '', '' ]).tr;
+		this.infoRow = this.set('footers', this.emptyRow).tr;
+		this.emptyRow[1] = '';
 
 		var format = server.formatTime;
 		this.infoRow.refresh = function() {
 			var cells = this.infoRow.getChildren();
-			var col = -1;
-			
-			cells[++col].set('html', this.session.solveCount()+"/"+this.session.attemptCount());
-			cells[++col].set('html', format(this.session.bestWorst().best.centis));
-			cells[col].addClass('bestTime');
-			
-			for(var i = 0; i < this.ras.length; i++) {
-				var best = this.session.bestWorst(this.ras[i]).best;
-				cells[++col].set('html', format(best.centis));
-				cells[col].removeClass('bestRA');
-				if(best.index !== null) {
-					cells[col].addClass('bestRA');
+			for(var col = 0; col < this.cols.length; col++) {
+				var key = this.cols[col];
+				if(key == 'index') {
+					cells[col].set('html', this.session.solveCount()+"/"+this.session.attemptCount());
+				} else if(key == 'getValueCentis') {
+					cells[col].set('html', format(this.session.bestWorst().best.centis));
+				} else if(key == 'sessionAve') {
+					cells[col].set('html', '&sigma; = ' + format(this.session.stdDev()));	
+				} else {
+					var best = this.session.bestWorst(key).best;
+					cells[col].set('html', format(best.centis));
+					cells[col].removeClass('bestRA');
+					if(best.index !== null) {
+						cells[col].addClass('bestTime');
+						cells[col].addClass('bestRA');
+					}
 				}
 			}
-			cells[++col].set('html', '&sigma; = ' + format(this.session.stdDev()));
 		}.bind(this);
 		this.addRow.inject(this.infoRow, 'before'); //place the add row in the footer
 		
@@ -433,71 +445,129 @@ var TimesTable = new Class({
 	},
 	lastAddedRow: null,
 	add: function(time) {
-		var tr = this.push(['', '', '', '', '', '', '']).tr;
+		var tr = this.push(this.emptyRow).tr;
 		this.lastAddedRow = tr;
 		tr.addEvent('click', function(e) { this.rowClicked(e, tr, time); }.bind(this));
 		var server = this.server;
 		var session = this.session;
-		var ras = this.ras;
+		var cols = this.cols;
 		var THIS = this;
 		tr.refresh = function() {
 			var cells = this.getChildren();
-			var col = -1;
-			cells[++col].set('html', time.index + 1);
-			
-			cells[++col].set('html', time.format());
-			cells[col].timeCentis = time.getValueCentis();
-			cells[col].removeClass('bestRA');
-			cells[col].removeClass('currentRA');
-			cells[col].removeClass('topCurrentRA');
-			cells[col].removeClass('bottomCurrentRA');
-			cells[col].removeClass('bestTime');
-			cells[col].removeClass('worstTime');
-			var bw = session.bestWorst();
-			if(time.index == bw.best.index) {
-				cells[col].addClass('bestTime');
-			} else if(time.index == bw.worst.index) {
-				cells[col].addClass('worstTime');
-			}
-			var bestRA12 = session.bestWorst('ra12').best;
-			var attemptCount = session.attemptCount();
-			if(attemptCount >= 12) {
-				if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
-					cells[col].addClass('bestRA');
-				}
-				if(THIS.sorted.index === 0) {
-					var firstSolve = session.attemptCount()-12;
-					var lastSolve = session.attemptCount()-1;
-					if(firstSolve <= time.index && time.index <= lastSolve) {
-						cells[col].addClass('currentRA');
+			for(var col = 0; col < THIS.cols.length; col++) {
+				var key = THIS.cols[col];
+				//TODO - it would be nice to get rid of these if statements...
+				if(key == 'index') {
+					cells[col].set('html', time.index + 1);
+				} else if(key == 'getValueCentis') {
+					cells[col].set('html', time.format());
+					cells[col].timeCentis = time.getValueCentis();
+					cells[col].removeClass('bestRA');
+					cells[col].removeClass('currentRA');
+					cells[col].removeClass('topCurrentRA');
+					cells[col].removeClass('bottomCurrentRA');
+					cells[col].removeClass('bestTime');
+					cells[col].removeClass('worstTime');
+					var bw = session.bestWorst();
+					if(time.index == bw.best.index) {
+						cells[col].addClass('bestTime');
+					} else if(time.index == bw.worst.index) {
+						cells[col].addClass('worstTime');
 					}
-					
-					if(THIS.sorted.reverse) {
-						//the top/bottom are switched
-						var temp = lastSolve;
-						lastSolve = firstSolve;
-						firstSolve = temp;
+					var bestRA12 = session.bestWorst('ra12').best;
+					var attemptCount = session.attemptCount();
+					if(attemptCount >= 12) {
+						if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
+							cells[col].addClass('bestRA');
+						}
+						if(THIS.sorted.index === 0) {
+							var firstSolve = session.attemptCount()-12;
+							var lastSolve = session.attemptCount()-1;
+							if(firstSolve <= time.index && time.index <= lastSolve) {
+								cells[col].addClass('currentRA');
+							}
+							
+							if(THIS.sorted.reverse) {
+								//the top/bottom are switched
+								var temp = lastSolve;
+								lastSolve = firstSolve;
+								firstSolve = temp;
+							}
+							
+							if(time.index == firstSolve) {
+								cells[col].addClass('topCurrentRA');
+							} else if(time.index == lastSolve) {
+								cells[col].addClass('bottomCurrentRA');
+							}
+						}
 					}
-					
-					if(time.index == firstSolve) {
-						cells[col].addClass('topCurrentRA');
-					} else if(time.index == lastSolve) {
-						cells[col].addClass('bottomCurrentRA');
+				} else {
+					cells[col].set('html', server.formatTime(time[key]));
+					var bestIndex = session.bestWorst(key).best.index;
+					cells[col].removeClass('bestRA');
+					if(bestIndex == time.index) {
+						cells[col].addClass('bestRA');
 					}
 				}
 			}
+			return;
 			
-			for(var i = 0; i < ras.length; i++) {
-				var key = ras[i];
-				cells[++col].set('html', server.formatTime(time[key]));
-				var bestIndex = session.bestWorst(key).best.index;
-				cells[col].removeClass('bestRA');
-				if(bestIndex == time.index) {
-					cells[col].addClass('bestRA');
-				}
-			}
-			
-			cells[++col].set('html', server.formatTime(time.sessionAve));
+//			var col = -1;
+//			cells[++col].set('html', time.index + 1);
+//			
+//			cells[++col].set('html', time.format());
+//			cells[col].timeCentis = time.getValueCentis();
+//			cells[col].removeClass('bestRA');
+//			cells[col].removeClass('currentRA');
+//			cells[col].removeClass('topCurrentRA');
+//			cells[col].removeClass('bottomCurrentRA');
+//			cells[col].removeClass('bestTime');
+//			cells[col].removeClass('worstTime');
+//			var bw = session.bestWorst();
+//			if(time.index == bw.best.index) {
+//				cells[col].addClass('bestTime');
+//			} else if(time.index == bw.worst.index) {
+//				cells[col].addClass('worstTime');
+//			}
+//			var bestRA12 = session.bestWorst('ra12').best;
+//			var attemptCount = session.attemptCount();
+//			if(attemptCount >= 12) {
+//				if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
+//					cells[col].addClass('bestRA');
+//				}
+//				if(THIS.sorted.index === 0) {
+//					var firstSolve = session.attemptCount()-12;
+//					var lastSolve = session.attemptCount()-1;
+//					if(firstSolve <= time.index && time.index <= lastSolve) {
+//						cells[col].addClass('currentRA');
+//					}
+//					
+//					if(THIS.sorted.reverse) {
+//						//the top/bottom are switched
+//						var temp = lastSolve;
+//						lastSolve = firstSolve;
+//						firstSolve = temp;
+//					}
+//					
+//					if(time.index == firstSolve) {
+//						cells[col].addClass('topCurrentRA');
+//					} else if(time.index == lastSolve) {
+//						cells[col].addClass('bottomCurrentRA');
+//					}
+//				}
+//			}
+//			
+//			for(var i = 0; i < cols.length; i++) {
+//				var key = cols[i];
+//				cells[++col].set('html', server.formatTime(time[key]));
+//				var bestIndex = session.bestWorst(key).best.index;
+//				cells[col].removeClass('bestRA');
+//				if(bestIndex == time.index) {
+//					cells[col].addClass('bestRA');
+//				}
+//			}
+//			
+//			cells[++col].set('html', server.formatTime(time.sessionAve));
 		};
 	},
 	resizeCols: function() {

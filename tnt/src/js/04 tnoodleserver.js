@@ -167,7 +167,7 @@ tnoodle.server = function(url) {
 				this.setPenalty("DNF");
 				return;
 			}
-			//we wait until we've valitdated the time to set the penalty
+			//we wait until we've validated the time to set the penalty
 			var penalty = null;
 			if(time.match(/\+$/)) {
 				penalty = "+2";
@@ -403,6 +403,27 @@ tnoodle.server = function(url) {
 			return sum / solveCount;
 		}
 		
+		function computeMedian(lastSolve, size) {
+			if(!size) {
+				size = THIS.times.length;
+			}
+			var firstSolve = lastSolve - size + 1;
+			if(firstSolve < 0) {
+				return null;
+			}
+			var subset = THIS.times.slice(firstSolve, lastSolve + 1);
+			for(var i = 0; i < subset.length; i++) {
+				subset[i] = subset[i].getValueCentis();
+			}
+			subset.sort();
+			var midway = size/2;
+			if(isInteger(midway)) {
+				return (subset[midway-1] + subset[midway])/2;
+			} else {
+				return subset[Math.floor(midway)];
+			}
+		}
+		
 		function computeRA(lastSolve, size, trimmed) {
 			var firstSolve = lastSolve - size + 1;
 			if(firstSolve < 0 || size === 0) {
@@ -443,8 +464,10 @@ tnoodle.server = function(url) {
 			time.mean3 = computeRA(time.index, 3, false);
 			time.ra5 = computeRA(time.index, 5, true);
 			time.ra12 = computeRA(time.index, 12, true);
-			time.ave100 = computeAverage(time.index, 100);
+			time.ra100 = computeRA(time.index, 100, true);
+			time.median100 = computeMedian(time.index, 100);
 			time.sessionAve = computeAverage(time.index);
+			time.sessionMedian = computeMedian(time.index);
 		}
 		this.addTime = function(timeCentis, scramble) {
 			var time = new Time(timeCentis, scramble);
