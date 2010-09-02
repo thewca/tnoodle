@@ -364,6 +364,13 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		loadedCallback(puzzles);
 	}
 
+	//this is up here so hide() can have access to it
+	var waitingIcon = document.createElement('img');
+	waitingIcon.src = WAITING_ICON;
+	waitingIcon.style.display = 'none';
+	waitingIcon.style.marginTop = (18 - 11) / 2 + 'px';
+	waitingIcon.style.cssFloat = waitingIcon.style.styleFloat = 'right';
+	
 	var scrambleIndex = 0;
 	var importedScrambles = null;
 	function scramblesImported(scrambles) {
@@ -377,40 +384,17 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	function setCurrImportLink(newLink) {
 		scrambleSrc = null;
 		if(currImportLink == newLink) {
-			newLink = null;
+			return false;
 		}
 		if(currImportLink) {
 			currImportLink.className = currImportLink.className.replace(/\bdown\b/, '');
 		}
-		if(newLink) {
-			newLink.className += ' down';
-			importDiv.style.display = 'inline';
-
-			importDiv.style.right = null;
-			importDiv.style.left = null;
-			var windowWidth = window.innerWidth || window.clientWidth;
-			if(getPosition(importDiv).x + parseInt(importDiv.getStyle('width'), 10) > windowWidth) {
-				importDiv.style.right = '0px';
-			} else {
-				importDiv.style.left = '0px';
-			}
-		} else {
-			importDiv.style.display = 'none';
-
-			// cancel any outgoing requests
-			if(activeImportRequest) {
-				activeImportRequest.abort();
-			}
-			if(activeImportButton) {
-				activeImportButton.disabled = false;
-			}
-			waitingIcon.style.display = 'none';
-		}
+		newLink.className += ' down';
 		currImportLink = newLink;
 
 		newScrambles.value = '';
 		importButton.update();
-		return currImportLink !== null;
+		return true;
 	}
 
 	var activeImportRequest = null;
@@ -553,8 +537,61 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 
 	var importDiv = document.createElement('div');
 	importDiv.className = 'importDiv';
-	scrambleArea.appendChild(importDiv);
-	importDiv.style.display = 'none';
+	importDiv.style.zIndex = 5; //this belongs on top
+	document.body.appendChild(importDiv);
+
+	importDiv.show = function() {
+		if(currImportLink === null) {
+			//initialization
+			promptImportUrl.call(importUrlLink);
+		}
+		this.style.display = 'inline';
+		var windowWidth = window.innerWidth || window.clientWidth;
+		var windowHeight = window.innerHeight || window.clientHeight;
+		var importWidth = parseInt(importDiv.getStyle('width'), 10);
+		var importHeight = parseInt(importDiv.getStyle('height'), 10);
+		this.style.top = (windowHeight - importHeight)/2 + 'px';
+		this.style.left = (windowWidth - importWidth)/2 + 'px';
+	}.bind(importDiv);
+	importDiv.hide = function() {
+		importDiv.style.display = 'none';
+
+		// cancel any outgoing requests
+		if(activeImportRequest) {
+			activeImportRequest.abort();
+		}
+		if(activeImportButton) {
+			activeImportButton.disabled = false;
+		}
+		waitingIcon.style.display = 'none';
+	};
+	importDiv.hide();
+	
+	var importDivTabs = document.createElement('span');
+	importDiv.appendChild(importDivTabs);
+	
+	var importUrlLink = document.createElement('span');
+	importUrlLink.title = "Import scrambles from url";
+	importUrlLink.className = 'link';
+	xAddListener(importUrlLink, 'click', promptImportUrl, false);
+	importUrlLink.appendChild(document.createTextNode('From Url'));
+	importDivTabs.appendChild(importUrlLink);
+	importDivTabs.appendChild(document.createTextNode(' '));
+
+	var importFileLink = document.createElement('span');
+	importFileLink.title = "Import scrambles from file";
+	importFileLink.className = 'link';
+	xAddListener(importFileLink, 'click', promptImportFile, false);
+	importFileLink.appendChild(document.createTextNode('From File'));
+	importDivTabs.appendChild(importFileLink);
+	importDivTabs.appendChild(document.createTextNode(' '));
+
+	var seedLink = document.createElement('span');
+	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
+	seedLink.className = 'link';
+	xAddListener(seedLink, 'click', promptSeed, false);
+	seedLink.appendChild(document.createTextNode('Seed'));
+	importDivTabs.appendChild(seedLink);
 
 	var tempDiv = document.createElement('div');
 	tempDiv.style.overflow = 'hidden'; // need this for ie
@@ -563,11 +600,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var importArea = document.createElement('span');
 	tempDiv.appendChild(importArea);
 
-	var waitingIcon = document.createElement('img');
-	waitingIcon.src = WAITING_ICON;
-	waitingIcon.style.display = 'none';
-	waitingIcon.style.marginTop = (18 - 11) / 2 + 'px';
-	waitingIcon.style.cssFloat = waitingIcon.style.styleFloat = 'right';
 	tempDiv.appendChild(waitingIcon);
 
 	var newScrambles = document.createElement('textarea');
@@ -609,7 +641,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			importedScrambles = scrambles;
 			scrambleIndex = 0;
 			scramble();
-			setCurrImportLink(null);
+			importDiv.hide();
 		}
 	}, false);
 	tempDiv.appendChild(importButton);
@@ -618,7 +650,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	cancelImportButton.type = 'button';
 	cancelImportButton.value = 'Cancel';
 	xAddListener(cancelImportButton, 'click', function() {
-		setCurrImportLink(null);
+		importDiv.hide();
 	});
 	tempDiv.appendChild(cancelImportButton);
 
@@ -672,29 +704,28 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleSize.appendChild(increase);
 	scrambleHeader.appendChild(scrambleSize);
 
-	var importUrlLink = document.createElement('span');
-	importUrlLink.title = "Import scrambles from url";
-	importUrlLink.className = 'link';
-	xAddListener(importUrlLink, 'click', promptImportUrl, false);
-	importUrlLink.appendChild(document.createTextNode('From Url'));
-	scrambleHeader.appendChild(importUrlLink);
+	var importLink = document.createElement('span');
+	importLink.className = 'link';
+	xAddListener(importLink, 'click', importDiv.show, false);
+	importLink.appendChild(document.createTextNode('Import Scrambles'));
+	scrambleHeader.appendChild(importLink);
 	scrambleHeader.appendChild(document.createTextNode(' '));
 
-	var importFileLink = document.createElement('span');
-	importFileLink.title = "Import scrambles from file";
-	importFileLink.className = 'link';
-	xAddListener(importFileLink, 'click', promptImportFile, false);
-	importFileLink.appendChild(document.createTextNode('From File'));
-	scrambleHeader.appendChild(importFileLink);
-	scrambleHeader.appendChild(document.createTextNode(' '));
-
-	var seedLink = document.createElement('span');
-	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
-	seedLink.className = 'link';
-	xAddListener(seedLink, 'click', promptSeed, false);
-	seedLink.appendChild(document.createTextNode('Seed'));
-	scrambleHeader.appendChild(seedLink);
-	scrambleHeader.appendChild(document.createTextNode(' '));
+//	var importFileLink = document.createElement('span');
+//	importFileLink.title = "Import scrambles from file";
+//	importFileLink.className = 'link';
+//	xAddListener(importFileLink, 'click', promptImportFile, false);
+//	importFileLink.appendChild(document.createTextNode('From File'));
+//	scrambleHeader.appendChild(importFileLink);
+//	scrambleHeader.appendChild(document.createTextNode(' '));
+//
+//	var seedLink = document.createElement('span');
+//	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
+//	seedLink.className = 'link';
+//	xAddListener(seedLink, 'click', promptSeed, false);
+//	seedLink.appendChild(document.createTextNode('Seed'));
+//	scrambleHeader.appendChild(seedLink);
+//	scrambleHeader.appendChild(document.createTextNode(' '));
 
 	var newScrambleLink = document.createElement('span');
 	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
@@ -702,7 +733,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	xAddListener(newScrambleLink, 'click', function() {
 		if(!importedScrambles || confirm('This will clear any imported scrambles, are you sure you want to continue?')) {
 			importedScrambles = null;
-			setCurrImportLink(null);
+			importDiv.hide(); //TODO - does this really need to be here?
 			scramble();
 		}
 	}, false);
@@ -724,8 +755,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			return;
 		}
 
+		console.log(e.target, importDiv);
 		if(!isOrIsChild(e.target, importDiv)) {
-			setCurrImportLink(null);
+			importDiv.hide();
 		}
 	}, false);
 

@@ -13,8 +13,8 @@ var TimesTable = new Class({
 	Extends: HtmlTable,
 //	cols:    [ 'index', 'getValueCentis', 'mean3',  'ra5',  'ra12',  'ra100',  'sessionAve' ],
 //	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Session Ave' ],
-	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12',  'ra100',  'sessionMedian',  'sessionAve' ],
-	headers: [ '',      'Time',           'Ra 5', 'Ra 12', 'Ra 100', 'Session Med',    'Session Ave' ],
+	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12'   ],
+	headers: [ '',      'Time',           'Ra 5', 'Ra 12'  ],
 	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
 		this.server = server;
