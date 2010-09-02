@@ -197,7 +197,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			scrambler.loadScramble(scrambleLoaded, puzzle, null);
 		} else {
 			deleteChildren(scrambleInfo);
-			scrambleInfo.appendChild(document.createTextNode("Scramble ("));
+			scrambleInfo.appendChild(document.createTextNode(" Scramble ("));
 			scrambleChooser.setAttribute('max', importedScrambles.length);
 			scrambleChooser.setAttribute('size', 1 + Math.floor(Math.log(importedScrambles.length) / Math.log(10)));
 			scrambleChooser.value = (scrambleIndex + 1);
