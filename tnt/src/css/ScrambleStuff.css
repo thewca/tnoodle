@@ -29,7 +29,7 @@ span.turn:hover {
 .scrambleText {
     white-space: pre-wrap;
     margin: 0px;
-    padding: 2px;
+    padding: 5px 10px;
 }
 
 area {/* apparently this doesn't work in opera or chrome */
@@ -38,9 +38,10 @@ area {/* apparently this doesn't work in opera or chrome */
 
 div.scrambleArea {
     border: 1px solid #333;
+    border-right: 0px;
 }
 div.scrambleHeader {
-	padding: 5px;
+	padding: 5px 10px;
 	position: relative;
     border-bottom: 1px solid #333;
     background-color: #EEE;

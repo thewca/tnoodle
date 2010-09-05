@@ -2,7 +2,6 @@ window.addEvent('domready', function() {
 	var server = new tnoodle.server();
 	var configuration = server.configuration;
 	
-	var timer = new KeyboardTimer($('timer'), server);
 
 	//we have to wait for both the scrambles and the sessions to load,
 	//and we can't know which will load first, so we use lastSessionTab and scramblesLoades
@@ -18,6 +17,8 @@ window.addEvent('domready', function() {
 	var scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
+
+	var timer = new KeyboardTimer($('timer'), server, scrambleStuff);
 	
 	var customizationSelect = new Element('select');
 	customizationSelect.refresh = function() {
@@ -58,7 +59,7 @@ window.addEvent('domready', function() {
 	});
 
 	//we try to be clever and change the href only after the anchor has been clicked
-	//this should save us a the bother of generating the csv over and over again
+	//this should save us the bother of generating the csv over and over again
 	//TODO - this is probably getting called twice when clicking, due to the mousedown event, and then the click event
 	function downloadCSV() {
 		//TODO - a mapping of keys to descriptions/tooltips would clean up a this + lot of code in TimesTable.js
@@ -121,7 +122,7 @@ window.addEvent('domready', function() {
 	var session = null;
 	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
 	timer.addEvent('newTime', function(timeCentis) {
-		timesTable.addTime(timeCentis);
+		timesTable.addTime(timeCentis, true);
 	});
 	function sessionClicked(e) {
 		lastSessionTab = this;

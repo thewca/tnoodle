@@ -566,17 +566,11 @@ tnoodle.server = function(url) {
 			sesh.times.push(newTime);
 			var oldTime = sessions[i].times[j];
 			
-			newTime.ave100 = oldTime.ave100;
-			newTime.centis = oldTime.centis;
-			newTime.index = oldTime.index;
-			newTime.mean3 = oldTime.mean3;
-			newTime.penalty = oldTime.penalty;
-			newTime.ra12 = oldTime.ra12;
-			newTime.ra5 = oldTime.ra5;
-			newTime.sessionAve = oldTime.sessionAve;
-			newTime.tags = oldTime.tags;
-			newTime.date = oldTime.date;
-			newTime.scramble = oldTime.scramble;
+			for(var key in oldTime) {
+				if(oldTime.hasOwnProperty(key)) {
+					newTime[key] = oldTime[key];
+				}
+			}
 		}
 		sessions[i] = sesh;
 	}

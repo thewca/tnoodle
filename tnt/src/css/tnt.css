@@ -16,6 +16,7 @@ span.link {
 	text-decoration: underline;
 	cursor: pointer;
 	padding-left: 10px;
+	padding-right: 10px;
 }
 span.link:hover, span.down {
 	text-decoration: none;
@@ -38,7 +39,7 @@ span.link:hover, span.down {
 	position: relative;
 	top: 1px;
 	
-	padding: 0 0 0 1em;
+	padding: 0 0 0 0;
 	margin: 0 0 0 0;
 	list-style:none;
 	line-height:1em;
@@ -47,7 +48,6 @@ span.link:hover, span.down {
 .tabs li {
 	float:left;
 	margin:0;
-	padding:0;
 	
 	cursor: default;
 	display:block;
@@ -55,12 +55,12 @@ span.link:hover, span.down {
 	text-decoration:none;
 	font-weight:bold;
 	background:#aaa;
-	padding:0.25em;
+	padding: 5px 10px;
 	border:1px solid black;
 }
 
 .tabs li .delete {
-	margin-left: 1em;
+	margin-left: 10px;
 	position: relative;
 	right: 0px;
 	cursor: pointer;
@@ -77,9 +77,37 @@ span.link:hover, span.down {
 }
 
 #sessionInfoBar {
-	padding: 5px;
+	padding: 5px 10px;
 }
 
 #timesArea {
 	border: 1px solid;
+}
+
+.optionsButton {
+	background-color: #fff;
+	color: #000;
+	
+	position: absolute;
+	top: 2px;
+	right: 5px;
+	width: 19px;
+	height: 22px;
+	text-align: center;
+	z-index: 1;
+}
+.optionsButtonHover {
+	background-color: #000;
+	color: #fff;
+	z-index: 5;
+}
+.options {
+	position: absolute;
+	background: white;
+	border: 1px solid black;
+	top: 24px;
+	right: 5px;
+	padding: 5px;
+	text-align: left;
+	z-index: 5;
 }

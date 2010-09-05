@@ -136,7 +136,9 @@ public class MegaminxScrambler extends ScramblerViewer {
 				} while(last >= 0 && comm[side][last] != 0);
 				last = side;
 				int dir = r.nextInt(4) + 1;
-				scramble.append(" "+FACE_NAMES.charAt(side));
+				if(i > 0)
+					scramble.append(" ");
+				scramble.append(FACE_NAMES.charAt(side));
 				if(dir != 1)
 					scramble.append(dir);
 

@@ -1,5 +1,4 @@
 #timesTable {
-	margin: 5px;
 	/*border-style: hidden;*/
 	border-collapse: collapse;
 }
@@ -7,7 +6,7 @@
 	display: block;
 }
 #timesTable tbody {
-	overflow: auto;
+	overflow-y: scroll;
 	display: block;
 }
 #timesTable th {
@@ -30,9 +29,11 @@
 
 #timesTable td, #timesTable th {
 	border: 1px solid;
-	padding: 1px 2px 1px 2px;
+	padding: 1px 5px 1px 5px;
 	border-style: inset;
 	border-color: black;
+	text-align: right;
+	border-left: 0px;
 }
 
 #timesTable tr:nth-child(even) {background: #CCC}

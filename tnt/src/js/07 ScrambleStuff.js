@@ -701,6 +701,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var scrambleSize = document.createElement('span');
 	scrambleSize.setAttribute('class', 'changeSize');
 	scrambleSize.appendChild(decrease);
+	scrambleSize.appendChild(document.createTextNode(' '));
 	scrambleSize.appendChild(increase);
 	scrambleHeader.appendChild(scrambleSize);
 
@@ -710,22 +711,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	importLink.appendChild(document.createTextNode('Import Scrambles'));
 	scrambleHeader.appendChild(importLink);
 	scrambleHeader.appendChild(document.createTextNode(' '));
-
-//	var importFileLink = document.createElement('span');
-//	importFileLink.title = "Import scrambles from file";
-//	importFileLink.className = 'link';
-//	xAddListener(importFileLink, 'click', promptImportFile, false);
-//	importFileLink.appendChild(document.createTextNode('From File'));
-//	scrambleHeader.appendChild(importFileLink);
-//	scrambleHeader.appendChild(document.createTextNode(' '));
-//
-//	var seedLink = document.createElement('span');
-//	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
-//	seedLink.className = 'link';
-//	xAddListener(seedLink, 'click', promptSeed, false);
-//	seedLink.appendChild(document.createTextNode('Seed'));
-//	scrambleHeader.appendChild(seedLink);
-//	scrambleHeader.appendChild(document.createTextNode(' '));
 
 	var newScrambleLink = document.createElement('span');
 	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
@@ -755,7 +740,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			return;
 		}
 
-		console.log(e.target, importDiv);
 		if(!isOrIsChild(e.target, importDiv)) {
 			importDiv.hide();
 		}
@@ -799,6 +783,8 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		}
 		if(visible) {
 			scrambleDiv.style.display = 'inline';
+			//we must wait for the scramble to become visible before we make it fit on the page
+			setTimeout(positionWindows, 0);
 		} else {
 			if(currTurn) {
 				currTurn.className = 'turn';
@@ -995,6 +981,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	function positionWindows() {
 		ensureVisible(scrambleDivHeader);
 		ensureVisible(titlebar);
+		scrambleMoved();
 	}
 	scrambleDrag.addEvent('complete', positionWindows);
 	colorChooserDrag.addEvent('complete', positionWindows);

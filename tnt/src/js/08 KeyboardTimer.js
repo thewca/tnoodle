@@ -2,9 +2,10 @@ var KeyboardTimer = new Class({
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
 	decimalPlaces: 2,
 	frequency: 0.01,
-	initialize: function(parent, server) {
+	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
+		this.scrambleStuff = scrambleStuff;
 		this.parent = parent;
 		this.server = server;
 		this.config = server.configuration;
@@ -114,7 +115,6 @@ var KeyboardTimer = new Class({
 
 				timer.fireEvent('newTime', timer.getTimeCentis());
 				timer.pendingTime = true;
-				timer.timing = false;
 			}
 			
 			timer.redraw();
@@ -139,6 +139,7 @@ var KeyboardTimer = new Class({
 						timer.inspecting = false;
 						timer.timerStart = new Date().getTime();
 						timer.timing = true;
+						scrambleStuff.scramble();
 					}
 					timer.startRender();
 				}
@@ -172,6 +173,11 @@ var KeyboardTimer = new Class({
 		var acceptedTime = false;
 		function stackmatUpdated(state) {
 			if(state !== null) {
+				if(!time.timing && state.running) {
+					//this mean that the timer just started running,
+					//so we want to update the scramble
+					timer.scrambleStuff.scramble();
+				}
 				timer.timing = state.running;
 				timer.stackCentis = state.centis;
 				timer.inspecting = false; //TODO - stackmat inspection
@@ -274,7 +280,14 @@ var KeyboardTimer = new Class({
 		//this makes use of our "sizer" span
 		this.sizer.erase('class');
 		this.sizer.setStyle('display', 'inline');
-		this.sizer.set('html', this.timer.get('html'));
+		
+		var text = this.timer.get('html');
+		var w = "";
+		//assuming text contains no html tags...
+		for(var i = 0; i < text.length; i++) {
+			w += "8";
+		}
+		this.sizer.set('html', w);
 		
 		var parent;
 		if(this.config.get('timer.fullscreenWhileTiming') && this.timing) {

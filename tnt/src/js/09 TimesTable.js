@@ -11,10 +11,10 @@ function isOrIsChild(el, parent) {
 
 var TimesTable = new Class({
 	Extends: HtmlTable,
-//	cols:    [ 'index', 'getValueCentis', 'mean3',  'ra5',  'ra12',  'ra100',  'sessionAve' ],
-//	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Session Ave' ],
-	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12'   ],
-	headers: [ '',      'Time',           'Ra 5', 'Ra 12'  ],
+	cols:    [ 'index', 'getValueCentis', 'mean3',  'ra5',  'ra12',  'ra100',  'median100',  'sessionMedian' ],
+	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Med 100', 'Median' ],
+//	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12'   ],
+//	headers: [ '',      'Time',           'Ra 5', 'Ra 12'  ],
 	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
 		this.server = server;
@@ -84,11 +84,13 @@ var TimesTable = new Class({
 				var key = this.cols[col];
 				if(key == 'index') {
 					cells[col].set('html', this.session.solveCount()+"/"+this.session.attemptCount());
-				} else if(key == 'getValueCentis') {
-					cells[col].set('html', format(this.session.bestWorst().best.centis));
 				} else if(key == 'sessionAve') {
 					cells[col].set('html', '&sigma; = ' + format(this.session.stdDev()));	
 				} else {
+					if(key == 'getValueCentis') {
+						key = null;
+					}
+					//cells[col].set('html', format(this.session.bestWorst().best.centis));
 					var best = this.session.bestWorst(key).best;
 					cells[col].set('html', format(best.centis));
 					cells[col].removeClass('bestRA');
@@ -133,9 +135,11 @@ var TimesTable = new Class({
 		this.tbody.empty();
 		this.refreshData();
 	},
-	addTime: function(centis) {
+	addTime: function(centis, dontRescramble) {
 		var time = this.session.addTime(centis, this.scrambleStuff.getScramble());
-		this.scrambleStuff.scramble();
+		if(!dontRescramble) {
+			this.scrambleStuff.scramble();
+		}
 		this.add(time);
 		this.refreshData();
 		this.scrollToLastTime();
@@ -510,64 +514,6 @@ var TimesTable = new Class({
 					}
 				}
 			}
-			return;
-			
-//			var col = -1;
-//			cells[++col].set('html', time.index + 1);
-//			
-//			cells[++col].set('html', time.format());
-//			cells[col].timeCentis = time.getValueCentis();
-//			cells[col].removeClass('bestRA');
-//			cells[col].removeClass('currentRA');
-//			cells[col].removeClass('topCurrentRA');
-//			cells[col].removeClass('bottomCurrentRA');
-//			cells[col].removeClass('bestTime');
-//			cells[col].removeClass('worstTime');
-//			var bw = session.bestWorst();
-//			if(time.index == bw.best.index) {
-//				cells[col].addClass('bestTime');
-//			} else if(time.index == bw.worst.index) {
-//				cells[col].addClass('worstTime');
-//			}
-//			var bestRA12 = session.bestWorst('ra12').best;
-//			var attemptCount = session.attemptCount();
-//			if(attemptCount >= 12) {
-//				if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
-//					cells[col].addClass('bestRA');
-//				}
-//				if(THIS.sorted.index === 0) {
-//					var firstSolve = session.attemptCount()-12;
-//					var lastSolve = session.attemptCount()-1;
-//					if(firstSolve <= time.index && time.index <= lastSolve) {
-//						cells[col].addClass('currentRA');
-//					}
-//					
-//					if(THIS.sorted.reverse) {
-//						//the top/bottom are switched
-//						var temp = lastSolve;
-//						lastSolve = firstSolve;
-//						firstSolve = temp;
-//					}
-//					
-//					if(time.index == firstSolve) {
-//						cells[col].addClass('topCurrentRA');
-//					} else if(time.index == lastSolve) {
-//						cells[col].addClass('bottomCurrentRA');
-//					}
-//				}
-//			}
-//			
-//			for(var i = 0; i < cols.length; i++) {
-//				var key = cols[i];
-//				cells[++col].set('html', server.formatTime(time[key]));
-//				var bestIndex = session.bestWorst(key).best.index;
-//				cells[col].removeClass('bestRA');
-//				if(bestIndex == time.index) {
-//					cells[col].addClass('bestRA');
-//				}
-//			}
-//			
-//			cells[++col].set('html', server.formatTime(time.sessionAve));
 		};
 	},
 	resizeCols: function() {
