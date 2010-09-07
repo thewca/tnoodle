@@ -61,7 +61,7 @@ var KeyboardTimer = new Class({
 		optionsDiv.adopt(createOptionBox('timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
 		optionsDiv.adopt(createOptionBox('timer.wcaInspection', 'WCA style inspection', false));
 		optionsDiv.adopt(createOptionBox('timer.onlySpaceStarts', 'Only spacebar starts', true));
-		optionsDiv.adopt(createOptionBox('timer.showStatus', 'Show timer status', true));
+		//optionsDiv.adopt(createOptionBox('timer.showStatus', 'Show timer status', true));
 		
 		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
 		var frequencyChanged = function(e) {
@@ -111,13 +111,19 @@ var KeyboardTimer = new Class({
 				//stopping timer
 				timer.timing = false;
 				timer.timerStop = new Date().getTime();
-				timer.stopRender();
 
-				timer.fireEvent('newTime', timer.getTimeCentis());
 				timer.pendingTime = true;
+				timer.stopRender();
+				var time = timer.getTimeCentis();
+				var scramble = timer.scramble;
+				var addTime = function() {
+					timer.fireEvent('newTime', [ time, scramble ]);
+				};
+				//the timer lags if we don't queue up the addition of the time like this
+				setTimeout(addTime, 0);
+			} else {
+				timer.redraw();
 			}
-			
-			timer.redraw();
 		});
 		window.addEvent('keyup', function(e) {
 			if(!timer.isFocused() || timer.config.get('timer.enableStackmat')) {
@@ -139,6 +145,7 @@ var KeyboardTimer = new Class({
 						timer.inspecting = false;
 						timer.timerStart = new Date().getTime();
 						timer.timing = true;
+						timer.scramble = scrambleStuff.getScramble();
 						scrambleStuff.scramble();
 					}
 					timer.startRender();
@@ -176,7 +183,8 @@ var KeyboardTimer = new Class({
 				if(!time.timing && state.running) {
 					//this mean that the timer just started running,
 					//so we want to update the scramble
-					timer.scrambleStuff.scramble();
+					timer.scramble = scrambleStuff.getScramble();
+					timer.scrambleStuff.scramble(); //TODO - test this out using a stackmat!
 				}
 				timer.timing = state.running;
 				timer.stackCentis = state.centis;
@@ -190,7 +198,7 @@ var KeyboardTimer = new Class({
 				} else if(state.centis > 0 && !acceptedTime) {
 					// new time!
 					acceptedTime = true; //this is to prevent redetecting the same time over and over
-					timer.fireEvent('newTime', timer.getTimeCentis());
+					timer.fireEvent('newTime', timer.getTimeCentis(), timer.scramble);
 				}
 			}
 		}
@@ -263,14 +271,19 @@ var KeyboardTimer = new Class({
 		this.stopRender();
 	},
 	redraw: function() {
+		var string;
 		var colorClass = this.inspecting ? 'inspecting' : '';
-		this.timer.set('html', this.stringy());
-		if(this.config.get('timer.showStatus')) {
-			var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
-			if(!this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0)) {
+		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
+		var keysDown = !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
+		if(keysDown) {
+			string = "0.00";
+			if(this.config.get('timer.showStatus')) {
 				colorClass = 'keysDown';
 			}
+		} else {
+			string = this.stringy();
 		}
+		this.timer.set('html', string);
 		this.timer.erase('class');
 		this.timer.addClass(colorClass);
 		this.timer.setStyle('width', '');
@@ -281,13 +294,13 @@ var KeyboardTimer = new Class({
 		this.sizer.erase('class');
 		this.sizer.setStyle('display', 'inline');
 		
-		var text = this.timer.get('html');
-		var w = "";
-		//assuming text contains no html tags...
-		for(var i = 0; i < text.length; i++) {
-			w += "8";
-		}
-		this.sizer.set('html', w);
+//		var text = this.timer.get('html');
+//		var w = "";
+//		//assuming text contains no html tags...
+//		for(var i = 0; i < text.length; i++) {
+//			w += "8";
+//		}
+//		this.sizer.set('html', w);
 		
 		var parent;
 		if(this.config.get('timer.fullscreenWhileTiming') && this.timing) {
@@ -301,14 +314,15 @@ var KeyboardTimer = new Class({
 		}
 		
 		var maxSize = parent.getSize();
-		var size = maxSize.y;
-		var width;
-		do {
-			this.sizer.setStyle('font-size', --size);
-			width = this.sizer.getSize().x;
-		} while(width > maxSize.x && size > 0);
-		this.sizer.setStyle('display', 'none');
-		this.timer.setStyle('font-size', size);
+//		var size = maxSize.y;
+//		var width;
+//		do {
+//			this.sizer.setStyle('font-size', --size);
+//			width = this.sizer.getSize().x;
+//		} while(width > maxSize.x && size > 0);
+//		this.sizer.setStyle('display', 'none');
+//		this.timer.setStyle('font-size', size);
+		this.timer.setStyle('font-size', maxSize.y);
 		
 		//now that we've computed its font size, we center the time vertically
 		var offset = (maxSize.y - this.timer.getSize().y)/2;

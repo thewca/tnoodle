@@ -19,9 +19,11 @@ span.turn {
 	color: black;
 	/*text-decoration: underline;*/
 	cursor: pointer;
+	white-space: nowrap;
 }
 span.currTurn {
 	color: red;
+	white-space: nowrap;
 }
 span.turn:hover {
 	text-decoration: none;
@@ -30,8 +32,16 @@ span.turn:hover {
     white-space: pre-wrap;
     margin: 0px;
     padding: 5px 10px;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
+.importDiv {
+	z-index: 2; /*on top of scramble window */
+}
+
+.scrambleText {
+}
 area {/* apparently this doesn't work in opera or chrome */
     cursor: pointer;
 }

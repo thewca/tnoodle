@@ -23,14 +23,6 @@ span.link:hover, span.down {
 	color: red;
 }
 
-.importDiv {
-	z-index: 2; /*on top of scramble window */
-}
-
-.scrambleText {
-	overflow: auto;
-}
-
 .tabs {
 /* TODO: this doesn't overflow nicely */
 	overflow: auto;

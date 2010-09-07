@@ -121,8 +121,8 @@ window.addEvent('domready', function() {
 	
 	var session = null;
 	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
-	timer.addEvent('newTime', function(timeCentis) {
-		timesTable.addTime(timeCentis, true);
+	timer.addEvent('newTime', function(timeCentis, scramble) {
+		timesTable.addTime(timeCentis, scramble);
 	});
 	function sessionClicked(e) {
 		lastSessionTab = this;

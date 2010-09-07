@@ -248,8 +248,17 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		deleteChildren(scramblePre);
 		var turns = currScramble.split(' ');
 		var incrementalScramble = "";
-		for(var i = 0; i < turns.length; i++) {
-			var turn = turns[i];
+		var maxLength = 0;
+		var i, turn;
+		for(i = 0; i < turns.length; i++) {
+			turn = turns[i];
+			maxLength = Math.max(maxLength, turn.length);
+		}
+		for(i = 0; i < turns.length; i++) {
+			turn = turns[i];
+//			for(var j = turn.length; j < maxLength; j++) {
+//				turn += " "; //padding so all turns take up the same amount of space
+//			}
 			incrementalScramble += turn;
 			var turnLink = document.createElement('span');
 			turnLink.appendChild(document.createTextNode(turn));
@@ -976,6 +985,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		if(pos.y + size.y > avail.y) {
 			pos.y = avail.y-size.y;
 		}
+		pos.x--; pos.y--; //assuming that all windows have a border of size 1
 		el.getParent().setPosition(pos); //must position the parent, not the titlebar
 	}
 	function positionWindows() {

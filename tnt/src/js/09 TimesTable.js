@@ -135,11 +135,12 @@ var TimesTable = new Class({
 		this.tbody.empty();
 		this.refreshData();
 	},
-	addTime: function(centis, dontRescramble) {
-		var time = this.session.addTime(centis, this.scrambleStuff.getScramble());
-		if(!dontRescramble) {
+	addTime: function(centis, oldScramble) {
+		if(!oldScramble) {
+			oldScramble = this.scrambleStuff.getScramble();
 			this.scrambleStuff.scramble();
 		}
+		var time = this.session.addTime(centis, oldScramble);
 		this.add(time);
 		this.refreshData();
 		this.scrollToLastTime();
