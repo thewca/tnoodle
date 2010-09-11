@@ -586,11 +586,17 @@ abstract class SafeHttpHandler implements HttpHandler {
 	
 	protected static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
 		final byte[] buffer = new byte[0x10000];
-		for(;;) {
-			int read = is.read(buffer);
-			if(read < 0)
-				break;
-			bytes.write(buffer, 0, read);
+		try {
+			for(;;) {
+				int read = is.read(buffer);
+				if(read < 0)
+					break;
+				bytes.write(buffer, 0, read);
+			}
+		} catch(IOException e) {
+			throw e;
+		} finally {
+			is.close();
 		}
 	}
 	
