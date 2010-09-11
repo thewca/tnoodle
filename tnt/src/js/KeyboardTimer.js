@@ -2,6 +2,7 @@ var KeyboardTimer = new Class({
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
 	decimalPlaces: 2,
 	frequency: 0.01,
+	CHAR_AR: 1/2, 
 	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
@@ -9,10 +10,6 @@ var KeyboardTimer = new Class({
 		this.parent = parent;
 		this.server = server;
 		this.config = server.configuration;
-		
-		this.sizer = new Element('span');
-		this.sizer.id = 'sizer';
-		this.sizer.inject(document.body);
 		
 		this.timer = new Element('div');
 		this.timer.id = 'time';
@@ -276,7 +273,7 @@ var KeyboardTimer = new Class({
 		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
 		var keysDown = !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
 		if(keysDown) {
-			string = "0.00";
+			string = "0.00"; //TODO - reflect the current update frequency!
 			if(this.config.get('timer.showStatus')) {
 				colorClass = 'keysDown';
 			}
@@ -289,24 +286,10 @@ var KeyboardTimer = new Class({
 		this.timer.setStyle('width', '');
 		this.timer.setStyle('height', '');
 		
-		//figure out what the largest we can make the timer is
-		//this makes use of our "sizer" span
-		this.sizer.erase('class');
-		this.sizer.setStyle('display', 'inline');
-		
-//		var text = this.timer.get('html');
-//		var w = "";
-//		//assuming text contains no html tags...
-//		for(var i = 0; i < text.length; i++) {
-//			w += "8";
-//		}
-//		this.sizer.set('html', w);
-		
 		var parent;
 		if(this.config.get('timer.fullscreenWhileTiming') && this.timing) {
 			parent = window;
 			this.timer.addClass('fullscreenTimer');
-			this.sizer.addClass('fullscreenTimer');
 			this.fullscreenBG.setStyle('display', '');
 		} else {
 			parent = this.parent;
@@ -314,15 +297,8 @@ var KeyboardTimer = new Class({
 		}
 		
 		var maxSize = parent.getSize();
-//		var size = maxSize.y;
-//		var width;
-//		do {
-//			this.sizer.setStyle('font-size', --size);
-//			width = this.sizer.getSize().x;
-//		} while(width > maxSize.x && size > 0);
-//		this.sizer.setStyle('display', 'none');
-//		this.timer.setStyle('font-size', size);
-		this.timer.setStyle('font-size', maxSize.y);
+		var fontSize = Math.min(maxSize.y, maxSize.x/(this.CHAR_AR*string.length));
+		this.timer.setStyle('font-size', fontSize);
 		
 		//now that we've computed its font size, we center the time vertically
 		var offset = (maxSize.y - this.timer.getSize().y)/2;

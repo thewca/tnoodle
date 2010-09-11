@@ -200,7 +200,7 @@ tnoodle.server = function(url) {
 				if(!str.match(/^\d+$/)) {
 					throw "Not an integer: " + str;
 				}
-				return str.toInt();
+				return str.toInt(10);
 			}
 			
 			if(coloned[i-1] == ".") {
