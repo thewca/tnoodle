@@ -4,23 +4,29 @@
 		and a copy of tnt built upon an applet.
     </description>
 	
+	<condition property="isWin">
+		<os family="windows" />
+	</condition>
+	
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />
 	<property name="bin" location="bin" />
-	<property name="tnt-bin" location="bin/tnt" />
+	<property name="tnt_bin" location="bin/tnt" />
 	<property name="dist" location="dist" />
 	<property name="scrambles" location="../scrambles" />
 	
 	<property name="scrambleserver-jar" location="${scrambles}/dist/ScrambleServer.jar" />
 	<property name="tntserver-jar" location="${dist}/TNTServer.jar" />
 	
-	<property name="js-src" location="${src}/js" />
-	<property name="js-bin" location="${tnt-bin}/js" />
-	<property name="js-all" location="${js-bin}/tnt.js" />
+	<property name="js_src" location="${src}/js/" />
+	<property name="js_bin" location="${tnt_bin}/js/" />
+	<property name="js_globbed_rel" value="js/tnt.js" />
+	<property name="js_globbed" location="${tnt_bin}/${js_globbed_rel}" />
 	
-	<property name="css-src" location="${src}/css/" />
-	<property name="css-bin" location="${tnt-bin}/css/" />
-	<property name="css-all" location="${css-bin}/tnt.css" />
+	<property name="css_src" location="${src}/css/" />
+	<property name="css_bin" location="${tnt_bin}/css/" />
+	<property name="css_globbed_rel" value="css/tnt.css" />
+	<property name="css_globbed" location="${tnt_bin}/${css_globbed_rel}" />
 	
 	<!-- setting up jslint -->
 	<path id="ant.tasks.classpath">
@@ -53,20 +59,72 @@
 		<mkdir dir="${bin}" />
 	</target>
 
-	<target name="concat" depends="init" description="compile the source">
-		<concat destfile="${js-all}" force="no">
-		  <!-- Order in which these files are concatenated _IS_ IMPORTANT! -->
-		  <fileset dir="${js-src}" includes="**/*.js" />
-		</concat>
-		<concat destfile="${css-all}" force="no">
-		  <fileset dir="${css-src}" includes="**/*.css" />
-		</concat>
+	<target name="concat" depends="clean,init" description="compile the source">
+		<mkdir dir="${css_bin}" />
+		<mkdir dir="${js_bin}" />
+		<copy tofile="${tnt_bin}/index.html" file="${src}/index.html" />
+		<script language="javascript">
+		<![CDATA[
+			function append(printWriter, fileName) {
+				var reader = new java.io.BufferedReader(new java.io.FileReader(fileName));
+				var line;
+				while((line = reader.readLine()) != null) {
+					printWriter.println(line);
+				}
+				reader.close();
+			}
+			
+			var cssRegex = /^<link type="text\/css" rel="stylesheet" href="(.*)" media="screen" \/>$/;
+			var cssOut = new java.io.PrintWriter(new java.io.File(css_globbed));
+			var foundCss = false;
+			
+			var jsRegex = /^<script type="text\/javascript" src="(.*)"><\/script>$/;
+			var jsOut = new java.io.PrintWriter(new java.io.File(js_globbed));
+			var foundJs = false;
 
-		<copy todir="${tnt-bin}/media">
+			//var newIndex = java.io.File.createTempFile('newIndex', 'html');
+			var newIndex = new java.io.File(tnt_bin + "/newindex.html");
+			var out = new java.io.PrintWriter(newIndex);
+			var oldIndex = new java.io.File(tnt_bin + "/index.html");
+			var reader = new java.io.BufferedReader(new java.io.FileReader(oldIndex));
+
+			var line = reader.readLine();
+			while(line != null) {
+				var match = cssRegex.exec(line);
+				if(match) {
+					// found some css! add it to our globbed file
+					append(cssOut, src + "/" + match[1]);
+					if(!foundCss) {
+						foundCss = true;
+						out.println('<link type="text\/css" rel="stylesheet" href="' + css_globbed_rel + '" media="screen" \/>');
+					}
+				} else {
+					match = jsRegex.exec(line);
+					if(match) {
+						if(!foundJs) {
+							foundJs = true;
+							out.println('<script type="text\/javascript" src="' + js_globbed_rel + '"><\/script>');
+						}
+						// found some js! add it to our globbed file
+						append(jsOut, src + "/" + match[1]);
+					} else {
+						out.println(line);
+					}
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+			out.close();
+			cssOut.close();
+			jsOut.close();
+			oldIndex['delete'](); //lol @ javascript, can't do oldIndex.delete(), because delete is a keyword
+			newIndex.renameTo(oldIndex);
+]]>
+		</script>
+
+		<copy todir="${tnt_bin}/media">
 			<fileset dir="${src}/media" />
 		</copy>
-		
-		<copy tofile="${tnt-bin}/tnt.html" file="${src}/tnt.html" />
 
 		<echo>Globbed all the js files together.</echo>
 	</target>
@@ -74,7 +132,7 @@
 	<target name="jslint">
 		<jsl:jslint options="browser,evil">
 		    <formatter type="plain" />
-		    <fileset dir="${js-src}" includes="*.js" excludes="*mootools*"/>
+		    <fileset dir="${js_src}" includes="*.js" excludes="*mootools*"/>
 		</jsl:jslint>
 		<echo>Successfully jslinted, good job!</echo>
 	</target>
@@ -84,14 +142,14 @@
 		    warn="false" 
 		    munge="true" 
 		    preserveallsemicolons="false"
-		    fromdir="${tnt-bin}" 
-		    todir="${tnt-bin}"
+		    fromdir="${tnt_bin}" 
+		    todir="${tnt_bin}"
 			jsSuffix=".js.min" cssSuffix=".css.min">
 		  <include name="**/*.js" />
 		  <include name="**/*.css" />
 		</yui-compressor>
-		<move file="${js-all}.min" tofile="${js-all}" />
-		<move file="${css-all}.min" tofile="${css-all}" />
+		<move file="${js_globbed}.min" tofile="${js_globbed}" />
+		<move file="${css_globbed}.min" tofile="${css_globbed}" />
 	</target>
 	
 	<target name="scrambles">
@@ -109,24 +167,43 @@
 		<!-- TODO: actually DO this! -->
 	</target>
 	
-	<target name="run" depends="" description="">
-		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="clean" />
-		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="compile" />
+	<target name="dist" depends="jslint,concat,minify,tntserver,tntapplet" description="generate the distribution">
+		<echo>Successfully built TNTServer!</echo>
+	</target>
+	
+	<target name="nomin" depends="jslint,concat,tntserver,tntapplet" description="generate the distribution">
+		<echo>Successfully built TNTServer without minifying!</echo>
+	</target>
+	
+	<target name="symlinkWin" if="isWin">
+		<echo>WANDOWS</echo>
 		<exec executable="${lib}/mklink.bat">
 			<arg value="/D" />
 			<arg value="${scrambles}\bin\tnt" />
 			<arg value="${src}" />
 		</exec>
-		<!--
+	</target>
+	
+	<target name="symlinkUnix" unless="isWin">
+		<echo>UNIX</echo>
 		<symlink link="${scrambles}/bin/tnt" resource="${src}"></symlink>
+	</target>
+	
+	<target name="run" depends="" description="">
+		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="clean" />
+		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="compile" />
+		
+		<!-- 
+			Setting up a symlink to the tnt source code from the server
+			means we won't have to compile tnt to see the changes reflected
+			on the server. This makes development significantly easier and faster.
+			mklink is used on windows, ln -s is for linux.
+			TODO - test that this actually works on linux/mac!
 		-->
+		<antcall target="symlinkWin" />
+		<antcall target="symlinkUnix" />
+		
 		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="run" />
-	</target>
-	
-	<target name="dist" depends="init,jslint,concat,minify,tntserver,tntapplet" description="generate the distribution">
-	</target>
-	
-	<target name="nomin" depends="init,jslint,concat,tntserver,tntapplet" description="generate the distribution">
 	</target>
 	
 	<target name="clean" description="clean up">
