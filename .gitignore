@@ -4,3 +4,4 @@ bin/
 JCubeExplorer.jar
 .settings
 .metadata/
+.externalToolBuilders

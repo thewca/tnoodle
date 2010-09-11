@@ -109,6 +109,20 @@
 		<!-- TODO: actually DO this! -->
 	</target>
 	
+	<target name="run" depends="" description="">
+		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="clean" />
+		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="compile" />
+		<exec executable="${lib}/mklink.bat">
+			<arg value="/D" />
+			<arg value="${scrambles}\bin\tnt" />
+			<arg value="${src}" />
+		</exec>
+		<!--
+		<symlink link="${scrambles}/bin/tnt" resource="${src}"></symlink>
+		-->
+		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="run" />
+	</target>
+	
 	<target name="dist" depends="init,jslint,concat,minify,tntserver,tntapplet" description="generate the distribution">
 	</target>
 	

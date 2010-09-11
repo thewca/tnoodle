@@ -121,16 +121,9 @@ public class ScrambleServer {
 		
 		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			String fileName;
-			if(path.length == 1 && path[0].isEmpty())
-				fileName = "readme.html";
-			else if(path.length == 1 && path[0].equals("tnt")) {
-				// this is kind of breaking the abstraction,
-				// as this code shouldn't even know about tnt,
-				// but oh well...
-				fileName = "tnt/tnt.html";
-			} else
-				fileName = t.getRequestURI().getPath().substring(1);
+			String fileName = t.getRequestURI().getPath().substring(1);
+			if(fileName.isEmpty() || fileName.endsWith("/"))
+				fileName += "index.html";
 			
 			fullyReadInputStream(getClass().getResourceAsStream("/" + fileName), bytes);
 			sendBytes(t, bytes, mimes.getContentType(fileName));

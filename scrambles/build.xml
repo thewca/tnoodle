@@ -9,8 +9,8 @@
 	<property name="dist" location="dist" />
 	<property name="scramblers" location="${bin}/scramblers" />
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
-	<property name="readme-src" location="${src}/readme.html" />
-	<property name="readme-bin" location="${bin}/readme.html" />
+	<property name="readme-src" location="${src}/index.html" />
+	<property name="readme-bin" location="${bin}/index.html" />
 	<property name="shelley-src" location="${src}/scramblegen.html" />
 	<property name="shelley-bin" location="${bin}/scramblegen.html" />
 	<property name="server-jar" location="${dist}/ScrambleServer.jar" />
@@ -27,6 +27,10 @@
 	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
 	<property name="itext" location="${lib}/iText-5.0.2.jar" />
 	<property name="jsobject" location="${lib}/plugin.jar" />
+	
+	<property name="cp" value="${gson};${jopt};${cube};${itext};" />
+	
+	<property name="main" value="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
 	
 	
     <!-- Properties for Fat-Jar Eclipse Plug-in -->
@@ -60,7 +64,7 @@
 
 	<target name="compile" depends="init" description="compile the source">
 		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
-		<javac srcdir="${src}" classpath="${gson};${jopt};${cube};${itext};${jsobject}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+		<javac srcdir="${src}" classpath="${cp};${jsobject}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 		<!-- copying readme.html -->
 		<copy file="${readme-src}" tofile="${readme-bin}" />
 		<!-- copying scramblegen.html -->
@@ -81,6 +85,10 @@
 		
 		<echo file="${plugin-list}">${plugin-files}</echo>
 	</target>
+	
+	<target name="run" depends="compile" description="runs the server without compiling the jar file first">
+		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false" />
+	</target>
 
 	<target name="dist" depends="dist-server,dist-applet" description="generate the distribution">
 	</target>
@@ -92,11 +100,11 @@
 	
 	<target name="dist-server" depends="compile" unless="uptodate-server">
 		<fatjar.build output="${server-jar}">
-			<fatjar.manifest mainclass="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
+			<fatjar.manifest mainclass="${main}" />
 			<fatjar.filesource path="${bin}" relpath="">
 				<fatjar.exclude relpath="net/gnehzr/tnoodle/scrambles/applet" />
 				<!-- We include scramblers in the jar, but look to the scramblers folder for extras/new versions.
-					This way, we can distribute 1 jar for the server.
+					This way, we can distribute 1 jar (with no dependencies!) for the server.
 				<fatjar.exclude relpath="scramblers" />
 				-->
 			</fatjar.filesource>
@@ -128,7 +136,28 @@
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="${bin}" />
+		<!--
+			For the life of me, I can't get ant to stop
+			following symlinks. Since tnt symlinks to its
+			source in scrambles ${bin} folder, the ant delete
+			task effectively deletes the tnt src code, which is bad.
+			Hopefully either rm (linux) or rmdir (windows) will work
+			for us.
+			TODO - test this on a windows machine without cygwin
+			TODO - test on a pure linux machine
+			TODO - test on a mac...lol
+		<delete dir="${bin}" followsymlinks="false" />
+		-->
+		<exec executable="rm">
+			<arg value="-r" />
+			<arg value="${bin}" />
+		</exec>
+		<exec executable="rmdir.exe">
+			<arg value="/S" />
+			<arg value="/Q" />
+			<arg value="${bin}" />
+		</exec>
+		
 		<delete dir="${dist}" />
 	</target>
 </project>

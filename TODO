@@ -1,0 +1,47 @@
+BUGS
++seeding scrambles doesn't work
++format scramble source better
++importing scrambles window doesn't fit
++scramble shouldn't be on top of fullscreen or importing scrambles windows
++import scramble window is on top of fullscreen timer
++scramble automove doesn't save location
+    +apply more often than just resizing the window?
+
+-dan cohen: safari 5 + chrome for mac don't work with stackmat
+-cannot call split of undefined when getting scramble & server is down
+-cleanup tagging code?
+-cache bests and worsts
+-make times columns hideable, consolidate that code, add tooltips
+    -stdev is the standard deviation of times, not session averages
+-fix file permissions
+-bug in mootoools-more:~1913
+
+FEATURES
++added medians
++configurable columns
+    -add gui for this!
++ +/- looks like an underlined plus sign. Buttons? Like the AA buttons in rich text editors?
++load scramble once timer has started to reduce lag
+    -TODO - test with stackmat!!!
+
+-editing times doesn't work with fewer columns
+    -technically a bug, but should just switch it to use some sort of popup
+    -grid in background, a la excel...
+-"3x3 session started" should become a dropdown box, remove old box
+-improve behavior of update freq option, alignment?
+-All these (scramble stuff) can be buttons and dropdowns rather than text.
+-clickable stuff in timestable to get jnet/cct style stats?
+-big scramble view is blurry
+-add remaining stackmat options
+-undo redo
+-read times/metronome
+-background image/opacity
+-emulate stackmat?
+-shorcuts?
+-gmaps style copy scramble
+-pdf page #
+-server side icons
+-wca style penalties
+-solve/session comments
+-pretty gui for editing customizations & tags
+-save scramble view state on a per customization basis
