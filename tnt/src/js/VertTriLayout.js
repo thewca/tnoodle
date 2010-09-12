@@ -30,7 +30,7 @@ var TriLayout = new Class( {
 		this.resizeDiv.addEvent('mouseout', this.resizeDiv.hide);
 
 		var space = window.getSize();
-		this.resizeDiv.setPosition({ x: 0, y: space.y - config.get('layout.sizerHeight') });
+		this.resizeDiv.setPosition({ x: 0, y: space.y - config.get('layout.sizerHeight', 100) });
 		
 		topLeft.setStyles({ 'top': this.margin, 'left': this.margin });
 		bottomLeft.setStyles({ 'bottom': this.margin, 'left': this.margin });

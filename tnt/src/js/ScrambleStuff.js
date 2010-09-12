@@ -194,6 +194,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			deleteChildren(scrambleInfo);
 
 			scramblePre.appendChild(document.createTextNode('Loading scramble...'));
+			resize(); //update scramble font size
 			scrambler.loadScramble(scrambleLoaded, puzzle, null);
 		} else {
 			deleteChildren(scrambleInfo);
@@ -239,6 +240,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			// scramble images are not supported, so don't bother with links
 			deleteChildren(scramblePre);
 			scramblePre.appendChild(document.createTextNode(scramble));
+			resize(); //update scramble font size
 		} else {
 			formatScramble();
 		}
@@ -273,6 +275,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 				scramblePre.appendChild(document.createTextNode(' '));
 			}
 		}
+		resize(); //update scramble font size
 	}
 
 	var currFaceName = null;
@@ -707,12 +710,12 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	decrease.appendChild(document.createTextNode('A'));
 	xAddListener(decrease, 'mousedown', createResizer(false), false);
 
-	var scrambleSize = document.createElement('span');
-	scrambleSize.setAttribute('class', 'changeSize');
-	scrambleSize.appendChild(decrease);
-	scrambleSize.appendChild(document.createTextNode(' '));
-	scrambleSize.appendChild(increase);
-	scrambleHeader.appendChild(scrambleSize);
+//	var scrambleSize = document.createElement('span');
+//	scrambleSize.setAttribute('class', 'changeSize');
+//	scrambleSize.appendChild(decrease);
+//	scrambleSize.appendChild(document.createTextNode(' '));
+//	scrambleSize.appendChild(increase);
+//	scrambleHeader.appendChild(scrambleSize);
 
 	var importLink = document.createElement('span');
 	importLink.className = 'link';
@@ -948,6 +951,40 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	this.getScramble = function() {
 		return currScramble;
 	};
+	
+	//it's just too laggy to readjust constantly
+	var pendingFontAdjust = null;
+	function adjustFontNow() {
+		pendingFontAdjust = null;
+		var f = scramblePre.getStyle('height').toInt();
+		do {
+			scramblePre.setStyle('font-size', f--);
+			if(f <= 10)
+				break;
+		} while(scramblePre.clientHeight < scramblePre.scrollHeight);
+	}
+	function queueFontAdjust() {
+		if(pendingFontAdjust) {
+			clearTimeout(pendingFontAdjust);
+		}
+		pendingFontAdjust = setTimeout(adjustFontNow, 100);
+	}
+	
+	this.resize = function() {
+		var space = $('scrambles').getSize();
+		space.y -= $('scrambleBorder').getSize().y + 2; //add 2 for border
+		$$('.scrambleArea')[0].setStyle('height', space.y);
+		space.y -= $$('.scrambleHeader')[0].getSize().y;
+		var scrambleText = $$('.scrambleText')[0];
+		var paddingVert = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-bottom').toInt();
+		var paddingHorz = scrambleText.getStyle('padding-left').toInt() + scrambleText.getStyle('padding-right').toInt();
+		space.y -= paddingVert;
+		space.x -= paddingHorz; //this doesn't work if there's a vertical scrollbar
+		scramblePre.setStyle('height', space.y);
+		
+		queueFontAdjust();
+	};
+	var resize = this.resize;
 
 	var scrambleListeners = [];
 	this.addScrambleChangeListener = function(l) {

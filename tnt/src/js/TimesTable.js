@@ -615,6 +615,6 @@ var TimesTable = new Class({
 		}
 	},
 	getPreferredWidth: function() {
-		return this.preferredWidth + 2;
+		return this.preferredWidth + 2; //i have no idea what this 2 is for...
 	}
 });

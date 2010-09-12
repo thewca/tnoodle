@@ -208,15 +208,7 @@ window.addEvent('domready', function() {
 	$('timer').resize = function() {
 		timer.redraw();
 	};
-	$('scrambles').resize = function() {
-		var space = $('scrambles').getSize();
-		space.y -= $('scrambleBorder').getSize().y + 2; //add 2 for border
-		$$('.scrambleArea')[0].setStyle('height', space.y);
-		space.y -= $$('.scrambleHeader')[0].getSize().y;
-		var scrambleText = $$('.scrambleText')[0];
-		var padding = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-top').toInt();
-		$$('.scrambleText')[0].setStyle('height', space.y-padding);
-	};
+	$('scrambles').resize = scrambleStuff.resize;
 	$('times').resize = function() {
 		//this seems like as good a time as any to update the session info bar
 		refreshSessionInfo();
@@ -228,7 +220,6 @@ window.addEvent('domready', function() {
 	};
 	$('times').getPreferredWidth = function() {
 		return timesTable.getPreferredWidth();
-//		return $(timesTable).getSize().x;
 	};
 	
 	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
