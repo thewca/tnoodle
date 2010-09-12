@@ -11,10 +11,10 @@ function isOrIsChild(el, parent) {
 
 var TimesTable = new Class({
 	Extends: HtmlTable,
-	cols:    [ 'index', 'getValueCentis', 'mean3',  'ra5',  'ra12',  'ra100',  'median100',  'sessionMedian' ],
-	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Med 100', 'Median' ],
-//	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12'   ],
-//	headers: [ '',      'Time',           'Ra 5', 'Ra 12'  ],
+//	cols:    [ 'index', 'getValueCentis', 'mean3',  'ra5',  'ra12',  'ra100',  'median100',  'sessionMedian' ],
+//	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Med 100', 'Median' ],
+	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12',  'ra100'   ],
+	headers: [ '',      'Time',           'Ra 5', 'Ra 12', 'Ra 100'  ],
 	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
 		this.server = server;
@@ -558,7 +558,8 @@ var TimesTable = new Class({
 				if(!resizeme[j]) {
 					continue;
 				}
-				var newWidth = resizeme[j][i].getSize().x;
+				var newWidth = resizeme[j][i].getSize().x + 1; //add one for border
+				
 				if(newWidth >= maxWidth) {
 					maxWidth = newWidth;
 					maxWidthIndex = j;
@@ -576,17 +577,12 @@ var TimesTable = new Class({
 			}
 		}
 		this.tfoot.getChildren('tr').each(function(tr) {
-			tr.setStyle('width', preferredWidth+1); //add 1 for border?
+			tr.setStyle('width', preferredWidth);
 		});
 
-		//preferredWidth += 18; //this accounts for the vert scrollbar
-		var width = this.tbody.getSize().x;
-		if(this.tbody.clientHeight < this.tbody.scrollHeight) {
-			//if there are vertical scrollbars
-			width += 18;
-		} 
-		width = Math.min(width, this.getTableSpace().x);
-		this.tbody.setStyle('width', width);
+		preferredWidth += 17; //this accounts for the vert scrollbar
+		this.preferredWidth = preferredWidth;
+		this.tbody.setStyle('width', preferredWidth);
 	},
 	getTableSpace: function() {
 		var space = this.parent.getSize();
@@ -617,5 +613,8 @@ var TimesTable = new Class({
 		} else if(forceScrollToLatest) {
 			this.scrollToLastTime();
 		}
+	},
+	getPreferredWidth: function() {
+		return this.preferredWidth + 2;
 	}
 });

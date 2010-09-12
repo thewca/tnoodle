@@ -226,6 +226,10 @@ window.addEvent('domready', function() {
 		
 		timesTable.resize();
 	};
+	$('times').getPreferredWidth = function() {
+		return timesTable.getPreferredWidth();
+//		return $(timesTable).getSize().x;
+	};
 	
 	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
 	

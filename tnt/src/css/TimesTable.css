@@ -36,8 +36,9 @@
 	border-left: 0px;
 }
 
-#timesTable tr:nth-child(even) {background: #CCC}
-#timesTable tr:nth-child(odd) {background: #FFF}
+#timesTable tr:nth-child(even) {background: #CCC;}
+#timesTable tr:nth-child(odd) {background: transparent;}
+
 #timesTable tbody tr:hover, tbody tr:hover td, #timesTable tr.addTime:hover, #timesTable tr.editRow, #timesTable tr.penaltyRow {
 	background-color: rgb(160, 160, 255) !important;
 }

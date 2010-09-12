@@ -7,12 +7,16 @@ BUGS
 +scramble automove doesn't save location
     +apply more often than just resizing the window?
 
+-table should force its resizing up a to the layout manager
+-make times columns hideable, consolidate that code, add tooltips
+    -stdev is the standard deviation of times, not session averages
+-hovering/clicking on bests idea...?
+-scramble font dynamic max size
+
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cannot call split of undefined when getting scramble & server is down
 -cleanup tagging code?
 -cache bests and worsts
--make times columns hideable, consolidate that code, add tooltips
-    -stdev is the standard deviation of times, not session averages
 -fix file permissions
 -bug in mootoools-more:~1913
 

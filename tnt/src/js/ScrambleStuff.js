@@ -974,18 +974,18 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		var size = el.getSize();
 		var avail = window.getSize();
 		if(pos.x < 0) {
-			pos.x = 0;
+			pos.x = 1; //1 for the border
 		}
 		if(pos.x + size.x > avail.x) {
 			pos.x = avail.x-size.x;
 		}
 		if(pos.y < 0) {
-			pos.y = 0;
+			pos.y = 1; //1 for the border
 		}
 		if(pos.y + size.y > avail.y) {
 			pos.y = avail.y-size.y;
 		}
-		pos.x--; pos.y--; //assuming that all windows have a border of size 1
+		pos.x--; pos.y--; //assuming the border is 1px
 		el.getParent().setPosition(pos); //must position the parent, not the titlebar
 	}
 	function positionWindows() {
