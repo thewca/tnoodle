@@ -959,8 +959,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		var f = scramblePre.getStyle('height').toInt();
 		do {
 			scramblePre.setStyle('font-size', f--);
-			if(f <= 10)
+			if(f <= 10) {
 				break;
+			}
 		} while(scramblePre.clientHeight < scramblePre.scrollHeight);
 	}
 	function queueFontAdjust() {
