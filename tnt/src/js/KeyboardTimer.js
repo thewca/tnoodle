@@ -58,7 +58,6 @@ var KeyboardTimer = new Class({
 		optionsDiv.adopt(createOptionBox('timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
 		optionsDiv.adopt(createOptionBox('timer.wcaInspection', 'WCA style inspection', false));
 		optionsDiv.adopt(createOptionBox('timer.onlySpaceStarts', 'Only spacebar starts', true));
-		//optionsDiv.adopt(createOptionBox('timer.showStatus', 'Show timer status', true));
 		
 		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
 		var frequencyChanged = function(e) {
@@ -274,9 +273,7 @@ var KeyboardTimer = new Class({
 		var keysDown = !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
 		if(keysDown) {
 			string = "0.00"; //TODO - reflect the current update frequency!
-			if(this.config.get('timer.showStatus')) {
-				colorClass = 'keysDown';
-			}
+			colorClass = 'keysDown';
 		} else {
 			string = this.stringy();
 		}

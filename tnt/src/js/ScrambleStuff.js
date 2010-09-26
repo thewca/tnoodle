@@ -257,22 +257,29 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			maxLength = Math.max(maxLength, turn.length);
 		}
 		for(i = 0; i < turns.length; i++) {
-			turn = turns[i];
-//			for(var j = turn.length; j < maxLength; j++) {
-//				turn += " "; //padding so all turns take up the same amount of space
-//			}
-			incrementalScramble += turn;
-			var turnLink = document.createElement('span');
-			turnLink.appendChild(document.createTextNode(turn));
-			turnLink.incrementalScramble = incrementalScramble;
-			turnLink.className = 'turn';
-			xAddListener(turnLink, 'click', userClickedTurn, false);
-			scramblePre.appendChild(turnLink);
-			if(i == turns.length - 1) {
-				turnClicked.call(turnLink, false);
-			} else {
-				incrementalScramble += " ";
-				scramblePre.appendChild(document.createTextNode(' '));
+			var newLines = turns[i].split("\n");
+			for(var j = 0; j < newLines.length; j++) {
+				if(j > 0) {
+					scramblePre.appendChild(document.createElement('br'));
+				}
+				turn = newLines[j];
+				//TODO - disable if the scramble fits on one line!
+				for(var k = turn.length; k < maxLength; k++) {
+					turn += " "; //padding so all turns take up the same amount of space
+				}
+				incrementalScramble += turn;
+				var turnLink = document.createElement('span');
+				turnLink.appendChild(document.createTextNode(turn));
+				turnLink.incrementalScramble = incrementalScramble;
+				turnLink.className = 'turn';
+				xAddListener(turnLink, 'click', userClickedTurn, false);
+				scramblePre.appendChild(turnLink);
+				if(i == turns.length - 1) {
+					turnClicked.call(turnLink, false);
+				} else {
+					incrementalScramble += " ";
+					scramblePre.appendChild(document.createTextNode(' '));
+				}
 			}
 		}
 		resize(); //update scramble font size
@@ -952,23 +959,20 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		return currScramble;
 	};
 	
-	//it's just too laggy to readjust constantly
-	var pendingFontAdjust = null;
-	function adjustFontNow() {
-		pendingFontAdjust = null;
-		var f = scramblePre.getStyle('height').toInt();
+	function adjustFontSize() {
+		// increase font size until the scramble doesn't fit
+		var f = scramblePre.getStyle('font-size').toInt();
+		while(scramblePre.clientHeight >= scramblePre.scrollHeight) {
+			scramblePre.setStyle('font-size', ++f);
+		}
+		
+		// decrease font size until the scramble fits
 		do {
 			scramblePre.setStyle('font-size', f--);
 			if(f <= 10) {
 				break;
 			}
 		} while(scramblePre.clientHeight < scramblePre.scrollHeight);
-	}
-	function queueFontAdjust() {
-		if(pendingFontAdjust) {
-			clearTimeout(pendingFontAdjust);
-		}
-		pendingFontAdjust = setTimeout(adjustFontNow, 100);
 	}
 	
 	this.resize = function() {
@@ -983,7 +987,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		space.x -= paddingHorz; //this doesn't work if there's a vertical scrollbar
 		scramblePre.setStyle('height', space.y);
 		
-		queueFontAdjust();
+		adjustFontSize();
 	};
 	var resize = this.resize;
 

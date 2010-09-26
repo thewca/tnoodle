@@ -7,6 +7,7 @@ import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toHex;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toInt;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
@@ -24,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -83,11 +85,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-//TODO - put logical maximums on some of the inputs for safety purposes
 @SuppressWarnings("restriction")
 public class ScrambleServer {
+	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
+	private static final int MAX_COUNT = 100;
 	
-	public ScrambleServer(int port, File scrambleFolder) throws IOException {
+	public ScrambleServer(int port, File scrambleFolder, boolean browse) throws IOException {
 		SortedMap<String, Scrambler> scramblers = Scrambler.getScrambleGenerators(scrambleFolder);
 		if(scramblers == null) {
 			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
@@ -97,13 +100,26 @@ public class ScrambleServer {
 		server.createContext("/import/", new ImporterHandler());
 		server.createContext("/scramble/", new ScramblerHandler(scramblers));
 		server.createContext("/view/", new ScrambleViewerHandler(scramblers));
-		// the default executor invokes everything in 1 thread, so threading isn't an issue!
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
 		System.out.println("Server started on " + addr);
 		System.out.println("Visit http://" + addr + " for a readme and demo.");
+		if(browse) {
+			if(Desktop.isDesktopSupported()) {
+				Desktop d = Desktop.getDesktop();
+				if(d.isSupported(Desktop.Action.BROWSE)) {
+					try {
+						d.browse(new URI("http://" + addr));
+						return;
+					} catch(URISyntaxException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			System.out.println("Sorry, it appears the Desktop api is not supported on your platform");
+		}
 	}
 	
 	private class FileHandler extends SafeHttpHandler {
@@ -406,19 +422,20 @@ public class ScrambleServer {
 				}
 
 				String seed = query.get("seed");
-				int count = toInt(query.get("count"), 1);
+				int count = Math.min(toInt(query.get("count"), 1), MAX_COUNT);
 				String[] scrambles;
 				if(seed != null) {
-					int offset = toInt(query.get("offset"), 0);
+					int offset = Math.min(toInt(query.get("offset"), 0), MAX_COUNT);
 					scrambles = generator.generateSeededScrambles(seed, count, offset);
 				} else
 					scrambles = generator.generateScrambles(count);
-				
+
 				if(ext == null || ext.equals("txt")) {
 					StringBuilder sb = new StringBuilder();
 					for(String scramble : scrambles) {
-						//we replace newlines with spaces because clients will assume that scrambles
-						//are separated by carraige return line feeds
+						//we replace newlines with spaces
+						//TODO - if assume that scrambles are separated by CRLFs,
+						//       then having newlines in the scrambles should be fine
 						sb.append(scramble.replaceAll("\n", " ")).append("\r\n");
 					}
 					sendText(t, sb.toString());
@@ -534,11 +551,12 @@ public class ScrambleServer {
 		OptionParser parser = new OptionParser();
 		OptionSpec<Integer> port = parser.accepts("port", "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
 		OptionSpec<File> scrambleFolder = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
+		OptionSpec<?> noBrowser = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
-				new ScrambleServer(options.valueOf(port), options.valueOf(scrambleFolder));
+				new ScrambleServer(options.valueOf(port), options.valueOf(scrambleFolder), !options.has(noBrowser));
 				return;
 			}
 		} catch(Exception e) {

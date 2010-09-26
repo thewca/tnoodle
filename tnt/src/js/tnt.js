@@ -223,6 +223,7 @@ window.addEvent('domready', function() {
 	};
 	
 	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
+	timesTable.manager = triLayout;
 	
 	var keyboard = new Keyboard();
 	keyboard.addShortcut('save', {

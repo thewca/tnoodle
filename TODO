@@ -6,14 +6,19 @@ BUGS
 +import scramble window is on top of fullscreen timer
 +scramble automove doesn't save location
     +apply more often than just resizing the window?
++scramble autosizing causes a bit of lag on the timer...
++table should force its resizing up to the layout manager
 
--table should force its resizing up to the layout manager
+-TimesTable
+    -addtime grows the add time row
+    -weird stuff happens with extremely large times
+    -hovering to edit times...
+    -cell background in table (leyan's idea)
+    -save location of timestable scrollbar?
 -make times columns hideable, consolidate that code, add tooltips
+    -getValueCenties -> just centis...
     -stdev is the standard deviation of times, not session averages
 -hovering/clicking on bests idea...?
--hovering to edit times...
--cell background in table (leyan's idea)
--scramble font dynamic max size
 
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cannot call split of undefined when getting scramble & server is down

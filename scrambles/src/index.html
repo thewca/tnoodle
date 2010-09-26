@@ -97,10 +97,10 @@
 				<tr><td><em>seed</em></td><td>seed</td><td>Any string</td><td>Some (hopefully) secure random number.</td>
 					<td>This is extremely useful for racing people, as two people can now simply agree upon a seed and then independently go to the
 					ScrambleServer to get THE SAME scrambles!</td></tr>
-				<tr><td><em>count</em></td><td>scramble count</td><td>integer</td><td>1</td><td> 
+				<tr><td><em>count</em></td><td>scramble count</td><td>integer</td><td>1 (max 100)</td><td> 
 					The number of desired scrambles.</td></tr>
-				<tr><td><em>offset</em></td><td>hashed scrambles offset</td><td>integer</td><td>0</td><td> 
-					An offset into the list of scrambles from which to start generating scrambles (this is only really useful if using seeded scrambles).</td></tr>
+				<tr><td><em>offset</em></td><td>hashed scrambles offset</td><td>integer</td><td>0 (max 100)</td><td> 
+					An offset into the list of scrambles from which to start generating scrambles (this is only used if using seeded scrambles).</td></tr>
 				<tr><td><em>callback</em></td><td>jsonp callback</td><td>The name of a javascript function</td><td></td>
 					<td>This parameter only applies if the extension is .json, if so, the resulting json will be padded accordingly.</td></tr>
 				<tr><td><em>scheme</em></td><td>color scheme</td><td>A comma separated list of html colors or one of [ybrwgop0] for short. Or [ybrwgop0]*(number of faces)</td><td></td>

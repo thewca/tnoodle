@@ -68,7 +68,6 @@ var TriLayout = new Class( {
 	},
 	resize: function() {
 		this.resizeDiv.setStyle('top', window.getSize().y - this.config.get('layout.sizerHeight'));
-		
 		this.position();
 	},
 	position: function() {
@@ -89,6 +88,7 @@ var TriLayout = new Class( {
 		var size = this.resizeDiv.getSize();
 		var centerY = pos.y + size.y;
 		var space = window.getSize();
+		
 		this.resizeDiv.setStyle('width', space.x - right.getPreferredWidth() - this.margin);
 
 		tl.setStyle('width', space.x - rightHorz - right.getPreferredWidth() - tlHorz);
@@ -107,7 +107,7 @@ var TriLayout = new Class( {
 			bl.resize();
 		}
 		if(right.resize) {
-			right.resize();
+			right.resize(false, true);
 		}
 	}
 });

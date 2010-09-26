@@ -75,11 +75,7 @@ public abstract class Scrambler {
 		return scrambles;
 	}
 
-	/**
-	 * TODO - USEEE
-	 */
 	private final ScrambleCacher cacher = new ScrambleCacher(this, DEFAULT_CACHE_SIZE);
-
 
 	/** fast (cached) scrambles **/
 	public final String generateScramble() {
@@ -142,10 +138,7 @@ public abstract class Scrambler {
 	}
 	
     /**
-     * Searches for subclasses of the given class in the given package already loaded into the jvm.
-     * @param pkg The package to search.
-     * @param c The class we're looking to find subclasses of.
-     * @return An ArrayList of the matching classes.
+     * TODO - comment!
      */
     private static HashSet<String> findLoadedGenerators() {
     	HashSet<String> classNames = new HashSet<String>();
@@ -262,7 +255,7 @@ interface ScrambleCacherListener {
 	public void scrambleCacheUpdated(ScrambleCacher src);
 }
 /*
- * In addition to speeding things up, this class provide thread safety.
+ * In addition to speeding things up, this class provides thread safety.
  */
 class ScrambleCacher {
 	/**

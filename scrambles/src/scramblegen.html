@@ -5,7 +5,45 @@
 <script type="text/javascript">
 
 function scrambleLink(link,puzzlename,title) {
-	document.getElementById(link).setAttribute('action',window.location.protocol + "//" + window.location.host + '/scramble/' + document.getElementById(puzzlename).value + '.' + document.getElementById(title).value + '.pdf');
+	document.getElementById(link).setAttribute('action','http://localhost:8080/scramble/' + document.getElementById(puzzlename).value + '.' + document.getElementById(title).value + '.pdf');
+}
+
+var cubeType = new Array();
+cubeType['2x2x2'] = 'cuboid';
+cubeType['3x3x3'] = 'cuboid';
+cubeType['4x4x4'] = 'cuboid';
+cubeType['5x5x5'] = 'cuboid';
+cubeType['6x6x6'] = 'cuboid';
+cubeType['7x7x7'] = 'cuboid';
+cubeType['clock'] = 'noncuboid';
+cubeType['pyro'] = 'noncuboid';
+cubeType['mega'] = 'noncuboid';
+cubeType['sq1wca'] = 'noncuboid';
+
+var schemes = new Array();
+schemes['cuboid'] = new Array();
+schemes['cuboid'][0] = new Array('Western','Japanese');
+schemes['cuboid'][1] = new Array('bygorw','ybgorw');
+schemes['noncuboid'] = new Array();
+schemes['noncuboid'][0] = new Array('Default');
+schemes['noncuboid'][1] = new Array('');
+
+function emptyList(box) {
+	while (box.options.length) box.options[0] = null;
+}
+
+function fillList(box,arr) {
+	for(i=0; i<arr[0].length; i++) {
+		option = new Option(arr[0][i], arr[1][i]);
+		box.options[box.length] = option;
+	}
+	box.selectedIndex=0;
+}
+
+function changeList(box) {
+	list = schemes[cubeType[box.options[box.selectedIndex].value]];
+	emptyList(box.form.scheme);
+	fillList(box.form.scheme,list);
 }
 
 </script>
@@ -31,14 +69,14 @@ input, select, table {
 </style>
 </head>
 
-<body onload="scrambleLink('scramblepdf','puzzlename','title');">
+<body>
 <div id="main">
 <table border=0>
 <tr>
 <td width=95%>
-<form id="scramblepdf" action="" target=_blank>
+<form name="scramblepdf" id="scramblepdf" action="http://localhost:8080/scramble/3x3x3.scramble.pdf" target=_blank>
 Puzzle:
-<select id="puzzlename" onchange="scrambleLink('scramblepdf','puzzlename','title');">
+<select id="puzzlename" onchange="scrambleLink('scramblepdf','puzzlename','title'); changeList(this)">
 <option selected="selected" value="3x3x3">3x3x3</option>
 <option value="2x2x2">2x2x2</option>
 <option value="4x4x4">4x4x4</option>
@@ -52,10 +90,16 @@ Puzzle:
 </select>
 Title:
 <input type="text" id="title" title="e.g. Round 1" onchange="scrambleLink('scramblepdf','puzzlename','title');">
+Count:
 <select name="count" id="count">
 <option value=1>1</option>
 <option value=3>3</option>
 <option selected="selected" value=5>5</option>
+</select>
+Color scheme:
+<select name="scheme" id="scheme">
+<option selected="selected" value=bygorw>Western</option>
+<option value=ybgorw>Japanese</option>
 </select>
 <input type="submit" id="submitbutton" value="Get Scrambles">
 </form>

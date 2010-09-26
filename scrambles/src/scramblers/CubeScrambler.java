@@ -350,9 +350,9 @@ public class CubeScrambler extends ScramblerViewer {
 	}
 	
 	int[] posit;
-	{
-		initbrd();
-	}
+//	{
+//		initbrd();
+//	}
 	private void initbrd(){
 	    posit = new int[] {
 	                1,1,1,1,
@@ -371,10 +371,12 @@ public class CubeScrambler extends ScramblerViewer {
 //	    }
 //	    return true;
 //	}
-	int[][] cornerIndices = new int[][] { {15, 16, 21}, {14, 20, 4}, {13, 9, 17}, {12, 5, 8}, {3, 23, 18}, {2, 6, 22}, {1, 19, 11}, {0, 10, 7} };
-	String[] cornerNames =   new String[] { "URF", 		"UFL", 		"UBR", 		"ULB", 			"DFR", 		"DLF", 		"DRB", 		"DBL" };
-	HashMap<Character, Integer> faceToIndex = new HashMap<Character, Integer>();
-	{
+	
+	static int[][] cornerIndices = new int[][] { {15, 16, 21}, {13, 9, 17}, {12, 5, 8}, {14, 20, 4}, {3, 23, 18}, {1, 19, 11}, {0, 10, 7}, {2, 6, 22} };
+	static String[] cornerNames = new String[] { "URF", 		"UBR", 		"ULB", 		"UFL", 			"DFR", 		"DRB", 		"DBL", 		"DLF" };
+
+	static HashMap<Character, Integer> faceToIndex = new HashMap<Character, Integer>();
+	static {
 		faceToIndex.put('D', 1);
 		faceToIndex.put('L', 2);
 		faceToIndex.put('B', 5);
@@ -391,7 +393,6 @@ public class CubeScrambler extends ScramblerViewer {
 			cp.add(remaining.remove(r.nextInt(remaining.size())));
 		//it would appear that the solver only works if the BLD piece is fixed, which is fine
 		cp.add(7);
-
 	    initbrd();
 	    ArrayList<Integer> co = new ArrayList<Integer>();
 		int sum = 0;
@@ -455,6 +456,11 @@ public class CubeScrambler extends ScramblerViewer {
 //	        q--;
 //	    }
 //	}
+	
+	public static void main(String[] args) {
+		CubeScrambler cs = new CubeScrambler(2);
+		System.out.println(cs.generateScramble(new Random()));
+	}
 	int[] sol=new int[100];
 	static final String[] DIR_TO_STR = new String[] { "'", "2", ""};
 	private String solve() {
@@ -496,21 +502,21 @@ public class CubeScrambler extends ScramblerViewer {
 	    for(a=5;a>=0;a--){
 	        t=(int) (t*3+tws[a]-3*Math.floor(tws[a]/3));
 	    }
-	    if(q!=0 || t!=0){
-	    	Arrays.fill(sol, -1);
-	        for(int l=0;l<100;l++)
-	            if(search(0,q,t,l,-1))
-	            	break;
-	        int turnCount = 0;
-	        for(q=0;q<sol.length && sol[q] != -1;q++)
-	        	turnCount++;
-	        StringBuffer turns = new StringBuffer();
-	        for(q=0; q<turnCount; q++) {
-	            turns.append(" " + "URF".charAt(sol[q]/10) + DIR_TO_STR[sol[q]%10]);
-	        }
-	        return turns.substring(1);
+	    
+	    Arrays.fill(sol, -1);
+	    for(int l=0;l<100;l++)
+	    	if(search(0,q,t,l,-1))
+	    		break;
+	    int turnCount = 0;
+	    for(q=0;q<sol.length && sol[q] != -1;q++)
+	    	turnCount++;
+	    StringBuffer turns = new StringBuffer();
+	    for(q=q-1; q>=0; q--) {
+	    	turns.append(" " + "URF".charAt(sol[q]/10) + DIR_TO_STR[sol[q]%10]);
 	    }
-	    return null;
+	    if(turns.length() == 0)
+	    	return "";
+	    return turns.substring(1);
 	}
 	private boolean search(int d, int q, int t, int l, int lm) {
 	    //searches for solution, from position q|t, in l moves exactly. last move was lm, current depth=d
