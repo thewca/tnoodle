@@ -64,7 +64,7 @@ window.addEvent('domready', function() {
 	function downloadCSV() {
 		//TODO - a mapping of keys to descriptions/tooltips would clean up a this + lot of code in TimesTable.js
 		//TODO - comments?
-		var keys = [ 'index', null, 'mean3', 'ra5', 'ra12', 'ave100', 'sessionAve', 'tags', 'date', 'scramble' ];
+		var keys = [ 'index', 'centis', 'mean3', 'ra5', 'ra12', 'ave100', 'sessionAve', 'tags', 'date', 'scramble' ];
 		var isTime = [ false, true, true, true, true, true, true, false, false, false ];
 		var data = ',Time,Mean 3,Ra 5,Ra12,Ave 100,Session Ave,Tags,Date,Scramble\n';
 		
@@ -73,7 +73,7 @@ window.addEvent('domready', function() {
 			var time = session.times[i];
 			for(var j = 0; j < keys.length; j++) {
 				var key = keys[j];
-				var val = key ? time[key] : time.getValueCentis();
+				var val = time[key];
 				if(isTime[j]) {
 					val = server.formatTime(val);
 				}

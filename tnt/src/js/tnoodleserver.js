@@ -142,17 +142,8 @@ tnoodle.server = function(url) {
 	
 	/* time can be either a number or a string */
 	function Time(time, scramble) {
-		this.getValueCentis = function() {
-			if(this.penalty == "+2") {
-				return this.centis + 2*100; 
-			} else if(this.penalty == "DNF") {
-				return Infinity;
-			} else {
-				return this.centis;
-			}
-		};
 		this.format = function() {
-			var time = server.formatTime(this.getValueCentis());
+			var time = server.formatTime(this.centis);
 			if(this.penalty == "+2") {
 				time += "+";
 			} /*else if(this.penalty == "DNF") TODO - implement qqtimer-esque DNF(value)
@@ -230,7 +221,7 @@ tnoodle.server = function(url) {
 			if(valueCentis <= 0) {
 				throw "Can't have times <= 0";
 			}
-			this.centis = valueCentis;
+			this.rawCentis = valueCentis;
 			this.setPenalty(penalty);
 			saveSessions();
 		};
@@ -241,6 +232,16 @@ tnoodle.server = function(url) {
 				penalty = null;
 			}
 			this.penalty = penalty;
+			if(this.penalty == "+2") {
+				this.centis = this.rawCentis + 2*100; 
+			} else if(this.penalty == "DNF") {
+				this.centis = Infinity;
+				if(this.rawCentis === undefined) {
+					this.rawCentis = Infinity;
+				}
+			} else {
+				this.centis = this.rawCentis;
+			}
 			saveSessions();
 		};
 		//always returns one of null, "+2", "DNF"
@@ -273,7 +274,7 @@ tnoodle.server = function(url) {
 		//TODO - comments?
 		
 		if(typeof(time) === "number") {
-			this.centis = time;
+			this.centis = this.rawCentis = time;
 		} else {
 			this.parse(time.toString());
 		}
@@ -327,7 +328,7 @@ tnoodle.server = function(url) {
 			var minKey = Infinity, maxKey = 0;
 			var minIndex = null, maxIndex = null;
 			for(var i = 0; i < this.times.length; i++) {
-				var val = key ? this.times[i][key] : this.times[i].getValueCentis();
+				var val = key ? this.times[i][key] : this.times[i].centis;
 				if(val !== null) {
 					//for min, we choose the *first* guy we can find
 					if(val < minKey || (minIndex === null && val == minKey)) {
@@ -361,7 +362,7 @@ tnoodle.server = function(url) {
 			var variance = 0;
 			var solveCount = 0;
 			for(var i = lastSolve; i >= 0; i--) {
-				var val = this.times[i].getValueCentis();
+				var val = this.times[i].centis;
 				if(val < Infinity) {
 					val -= ave; 
 					variance += val*val;
@@ -385,7 +386,7 @@ tnoodle.server = function(url) {
 			var solveCount = 0;
 			var sum = 0;
 			for(var i = lastSolve; i >= 0; i--) {
-				var val = THIS.times[i].getValueCentis();
+				var val = THIS.times[i].centis;
 				if(val < Infinity) {
 					sum += val;
 					solveCount++;
@@ -413,7 +414,7 @@ tnoodle.server = function(url) {
 			}
 			var subset = THIS.times.slice(firstSolve, lastSolve + 1);
 			for(var i = 0; i < subset.length; i++) {
-				subset[i] = subset[i].getValueCentis();
+				subset[i] = subset[i].centis;
 			}
 			subset.sort();
 			var midway = size/2;
@@ -434,7 +435,7 @@ tnoodle.server = function(url) {
 			var solveCount = 0;
 			var best = Infinity, worst = 0;
 			for(var i = firstSolve; i <= lastSolve; i++) {
-				var val = THIS.times[i].getValueCentis();
+				var val = THIS.times[i].centis;
 				best = Math.min(best, val);
 				worst = Math.max(worst, val);
 				if(val < Infinity) {
@@ -490,8 +491,10 @@ tnoodle.server = function(url) {
 			return time;
 		};
 		this.disposeTime = function(time) {
-			this.times.splice(this.times.indexOf(time), 1);
-			this.reindex();
+			var index = this.times.indexOf(time);
+			if(index >= 0) {
+				this.disposeTimeAt(index);
+			}
 		};
 	}
 	

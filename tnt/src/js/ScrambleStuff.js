@@ -184,7 +184,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		deleteChildren(scramblePre);
 
 		if(importedScrambles && scrambleIndex >= importedScrambles.length) {
-			alert("That was the last imported scramble, switching back to generated scrambles.");
 			scrambleIndex = 0;
 			scrambleSrc = null;
 			importedScrambles = null;

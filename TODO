@@ -9,14 +9,17 @@ BUGS
 +scramble autosizing causes a bit of lag on the timer...
 +table should force its resizing up to the layout manager
 
+-1 line scrambles shouldn't get oddly spaced
+-formatting +2 penalties doesn't work
+    -saving DNF/+2 doesn't seem to work...
 -TimesTable
-    -addtime grows the add time row
+    +addtime grows the add time row
     -weird stuff happens with extremely large times
-    -hovering to edit times...
+    -hovering to penalize/tag times...
     -cell background in table (leyan's idea)
-    -save location of timestable scrollbar?
+    -save location of timestable scrollbar/selected session?
 -make times columns hideable, consolidate that code, add tooltips
-    -getValueCenties -> just centis...
+    +getValueCenties -> just centis...
     -stdev is the standard deviation of times, not session averages
 -hovering/clicking on bests idea...?
 
@@ -40,7 +43,6 @@ FEATURES
     -grid in background, a la excel...
 -"3x3 session started" should become a dropdown box, remove old box
 -improve behavior of update freq option, alignment?
--All these (scramble stuff) can be buttons and dropdowns rather than text.
 -clickable stuff in timestable to get jnet/cct style stats?
 -big scramble view is blurry
 -add remaining stackmat options

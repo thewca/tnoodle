@@ -11,9 +11,9 @@ function isOrIsChild(el, parent) {
 
 var TimesTable = new Class({
 	Extends: HtmlTable,
-//	cols:    [ 'index', 'getValueCentis', 'mean3',  'ra5',  'ra12',  'ra100',  'median100',  'sessionMedian' ],
+//	cols:    [ 'index', 'centis', 'mean3',  'ra5',  'ra12',  'ra100',  'median100',  'sessionMedian' ],
 //	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Med 100', 'Median' ],
-	cols:    [ 'index', 'getValueCentis', 'ra5',  'ra12',  'ra100'   ],
+	cols:    [ 'index', 'centis', 'ra5',  'ra12',  'ra100'   ],
 	headers: [ '',      'Time',           'Ra 5', 'Ra 12', 'Ra 100'  ],
 	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
@@ -66,13 +66,21 @@ var TimesTable = new Class({
 		for(var i = 0; i < this.cols.length; i++) {
 			this.emptyRow[i] = '';
 		}
+		
 		//we create the add time row
-		this.emptyRow[1] = '<u>A</u>dd time';
 		this.addRow = this.push(this.emptyRow).tr.dispose();
-		this.addRow.refresh = function() {};
+		this.addRow.refresh = function() {
+			this.getChildren()[1].set('html', '<u>A</u>dd time');
+		};
+		this.addRow.refresh();
+		this.addRow.select = this.createRowSelector(this.addRow, null);
+		this.addRow.deselect = function() {
+			this.getChildren()[1].setStyle('padding', '');
+			this.refresh();
+		};
 		this.addRow.addClass('addTime');
-		this.addRow.addEvent('click', function(e) {
-			this.rowClicked(e, this.addRow, null);
+		this.addRow.addEvent('click', function() {
+			this.rowClicked(null, this.addRow);
 		}.bind(this));
 		
 		//there needs to be some dummy content in this row so it gets sized correctly
@@ -90,9 +98,6 @@ var TimesTable = new Class({
 				} else if(key == 'sessionAve') {
 					cells[col].set('html', '&sigma; = ' + format(this.session.stdDev()));	
 				} else {
-					if(key == 'getValueCentis') {
-						key = null;
-					}
 					//cells[col].set('html', format(this.session.bestWorst().best.centis));
 					var best = this.session.bestWorst(key).best;
 					cells[col].set('html', format(best.centis));
@@ -169,7 +174,8 @@ var TimesTable = new Class({
 		
 	},
 	promptTime: function() {
-		this.rowClicked(null, this.addRow, null);
+		//TODO - implement!
+		this.rowClicked(null, this.addRow);
 	},
 	
 	//private!
@@ -183,31 +189,14 @@ var TimesTable = new Class({
 		}
 	},
 	selectedRow: null,
-	editRow: null,
-	rowClicked: function(e, row, time) {
+	rowClicked: function(e, row) {
 		//TODO - click to delete as well
 		//TODO - add whitespace between times table and scramble
 		if(row == this.selectedRow) {
 			return;
 		}
 		this.selectedRow = row;
-		var editCol = row.getChildren()[1];
-		editCol.setStyle('padding', 0);
-		var size = editCol.getSize();
-		var textField = new Element('input');
-		textField.value = editCol.get('text');
-		textField.setStyle('border', 'none');
-		textField.setStyle('width', size.x-2); //2 for the border around the current ra12
-		textField.setStyle('height', size.y-1);
-		textField.setStyle('text-align', 'right'); //not sure this is a good idea, left align might make a good visual indicator
-		textField.setStyle('padding', 0);
-
-		editCol.empty();
-		editCol.adopt(textField);
-		
-		textField.focus(); //this has the added benefit of making the row visible
-		textField.select();
-		return;
+		row.select();
 		
 //		if(e) {
 //			//don't want this to be treated as an unfocus event until we know which row was clicked
@@ -435,26 +424,9 @@ var TimesTable = new Class({
 		}
 		
 		var row = this.selectedRow;
-		if(this.selectedRow !== null) {
-			this.attachSorts(true); //sorting doesn't work well with a selected row
-			
-			var addTime = this.selectedRow == this.addRow;
-			var editedRow = addTime ? this.lastAddedRow : this.selectedRow;
-			if(this.editRow) {
-				this.selectedRow.replaces(this.editRow);
-			}
-			if(this.penaltyRow) {
-				this.penaltyRow.dispose();
-			}
-			this.selectedRow = this.editRow = this.penaltyRow = null;
-			
-			//changing the time could very well affect more than this row
-			//maybe someday we could be more efficient about the changes
-//			if(!addTime) {
-//				this.refreshData();
-//				this.resizeCols(); //changing the time may change the size of a column
-//				this.scrollToRow(editedRow);
-//			}
+		if(row !== null) {
+			this.selectedRow = null;
+			row.deselect();
 		}
 		return row;
 	},
@@ -469,11 +441,53 @@ var TimesTable = new Class({
 		$(this).toggle(); //prevent flickering?
 		this.resizeCols();
 	},
+	createRowSelector: function(tr, time) {
+		return function() {
+			tr.selected = true;
+			var editCol = tr.getChildren()[1];
+			var size = editCol.getSize(); //gotta get the size before we alter the padding
+			editCol.setStyle('padding', 0);
+			var textField = new Element('input');
+			textField.value = editCol.get('text');
+			textField.setStyle('border', 'none');
+			//TODO TEST THIS WITH THE BORDER BACK ON
+			textField.setStyle('width', size.x-1); //2 for the border around the current ra12
+			textField.setStyle('height', size.y-1);
+			textField.setStyle('text-align', 'right'); //not sure this is a good idea, left align might make a good visual indicator
+			textField.setStyle('padding', 0);
+
+			textField.addEvent('keydown', function(e) {
+				if(e.key == 'esc') {
+					this.deselectRow();
+				}
+				if(e.key == 'enter') {
+					try {
+						if(time) {
+							time.parse(textField.value);
+//							penalties[String(time.getPenalty())].checked = true;
+						} else {
+							this.addTime(textField.value);
+						}
+						this.session.reindex();
+						this.deselectRow();
+					} catch(error) {
+						alert(error);
+					}
+				}
+			}.bind(this));
+			
+			editCol.empty();
+			editCol.adopt(textField);
+			
+			textField.focus(); //this has the added benefit of making the row visible
+			textField.select();
+		}.bind(this);
+	},
 	lastAddedRow: null,
 	add: function(time) {
 		var tr = this.push(this.emptyRow).tr;
 		this.lastAddedRow = tr;
-		tr.addEvent('click', function(e) { this.rowClicked(e, tr, time); }.bind(this));
+		tr.addEvent('click', function(e) { this.rowClicked(e, tr); }.bind(this));
 		var server = this.server;
 		var session = this.session;
 		var cols = this.cols;
@@ -485,49 +499,51 @@ var TimesTable = new Class({
 				//TODO - it would be nice to get rid of these if statements...
 				if(key == 'index') {
 					cells[col].set('html', time.index + 1);
-				} else if(key == 'getValueCentis') {
-					cells[col].set('html', time.format());
-					cells[col].timeCentis = time.getValueCentis();
-					cells[col].removeClass('bestRA');
-					cells[col].removeClass('currentRA');
-					cells[col].removeClass('topCurrentRA');
-					cells[col].removeClass('bottomCurrentRA');
-					cells[col].removeClass('bestTime');
-					cells[col].removeClass('worstTime');
-					var bw = session.bestWorst();
-					if(time.index == bw.best.index) {
-						cells[col].addClass('bestTime');
-					} else if(time.index == bw.worst.index) {
-						cells[col].addClass('worstTime');
-					}
-					var bestRA12 = session.bestWorst('ra12').best;
-					var attemptCount = session.attemptCount();
-					if(attemptCount >= 12) {
-						if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
-							cells[col].addClass('bestRA');
-						}
-						if(THIS.sorted.index === 0) {
-							var firstSolve = session.attemptCount()-12;
-							var lastSolve = session.attemptCount()-1;
-							if(firstSolve <= time.index && time.index <= lastSolve) {
-								cells[col].addClass('currentRA');
-							}
-							
-							if(THIS.sorted.reverse) {
-								//the top/bottom are switched
-								var temp = lastSolve;
-								lastSolve = firstSolve;
-								firstSolve = temp;
-							}
-							
-							if(time.index == firstSolve) {
-								cells[col].addClass('topCurrentRA');
-							} else if(time.index == lastSolve) {
-								cells[col].addClass('bottomCurrentRA');
-							}
-						}
-					}
-				} else {
+				}
+//				else if(key == 'getValueCentis') {
+//					cells[col].set('html', time.format());
+//					cells[col].timeCentis = time.getValueCentis();
+//					cells[col].removeClass('bestRA');
+//					cells[col].removeClass('currentRA');
+//					cells[col].removeClass('topCurrentRA');
+//					cells[col].removeClass('bottomCurrentRA');
+//					cells[col].removeClass('bestTime');
+//					cells[col].removeClass('worstTime');
+//					var bw = session.bestWorst();
+//					if(time.index == bw.best.index) {
+//						cells[col].addClass('bestTime');
+//					} else if(time.index == bw.worst.index) {
+//						cells[col].addClass('worstTime');
+//					}
+//					var bestRA12 = session.bestWorst('ra12').best;
+//					var attemptCount = session.attemptCount();
+//					if(attemptCount >= 12) {
+//						if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
+//							cells[col].addClass('bestRA');
+//						}
+//						if(THIS.sorted.index === 0) {
+//							var firstSolve = session.attemptCount()-12;
+//							var lastSolve = session.attemptCount()-1;
+//							if(firstSolve <= time.index && time.index <= lastSolve) {
+//								cells[col].addClass('currentRA');
+//							}
+//							
+//							if(THIS.sorted.reverse) {
+//								//the top/bottom are switched
+//								var temp = lastSolve;
+//								lastSolve = firstSolve;
+//								firstSolve = temp;
+//							}
+//							
+//							if(time.index == firstSolve) {
+//								cells[col].addClass('topCurrentRA');
+//							} else if(time.index == lastSolve) {
+//								cells[col].addClass('bottomCurrentRA');
+//							}
+//						}
+//					}
+//				}
+				else {
 					cells[col].set('html', server.formatTime(time[key]));
 					var bestIndex = session.bestWorst(key).best.index;
 					cells[col].removeClass('bestRA');
@@ -537,6 +553,45 @@ var TimesTable = new Class({
 				}
 			}
 		};
+		var deleteTimeFunc = function(e) {
+			this.session.disposeTime(time); //remove time
+			
+			this.selectedRow = null;
+			//TODO - implement deleting multiple times!
+			tr.dispose();
+			
+			//changing the time could very well affect more than this row
+			//maybe someday we could be more efficient about the changes
+			this.refreshData();
+			this.resizeCols(); //changing the time may change the size of a column
+//			this.scrollToRow(editedRow);
+		}.bind(this);
+		var deleteCol = tr.getChildren()[0];
+		deleteCol.addEvent('click', deleteTimeFunc);
+		tr.hover = function() {
+			deleteCol.set('html', 'X');
+			deleteCol.addClass('deleteTime'); //TODO - pretty picture
+		}.bind(this);
+		tr.unhover = function() {
+			if(!tr.selected) {
+				tr.getChildren()[0].removeClass('deleteTime');
+				tr.refresh();
+			}
+		}.bind(this);
+		tr.select = this.createRowSelector(tr, time);
+		tr.deselect = function() {
+			tr.selected = false;
+			tr.unhover();
+			var editCol = tr.getChildren()[1];
+			editCol.setStyle('padding', '');
+			//changing the time could very well affect more than this row
+			//maybe someday we could be more efficient about the changes
+			this.refreshData();
+			this.resizeCols(); //changing the time may change the size of a column
+//			this.scrollToRow(editedRow);
+		}.bind(this);
+		tr.addEvent('mouseover', tr.hover);
+		tr.addEvent('mouseout', tr.unhover);
 	},
 	resizeCols: function() {
 		var i, j;
@@ -602,7 +657,7 @@ var TimesTable = new Class({
 		this.tbody.setStyle('width', preferredWidth);
 		
 		if(this.manager) {
-			this.manager.position()
+			this.manager.position();
 			//setTimeout(this.manager.position.bind(this.manager), 0);
 		}
 	},
@@ -612,20 +667,17 @@ var TimesTable = new Class({
 		space.y -= offset.y;
 		return space;
 	},
-	resize: function(forceScrollToLatest, vert) {
+	resize: function(forceScrollToLatest) {
 		if(!this.session) {
 			return; //we're not ready to size this until we have a session
 		}
 		
-		//upon resizing, we first deselect any selected rows!
-		if(this.selectedRow) {
-			this.deselectRow();
-			return; //the previous line will cause a resize
-		}
-
-//		if(!vert) {
-//			this.resizeCols();
+//		//upon resizing, we first deselect any selected rows!
+//		if(this.selectedRow) {
+//			this.deselectRow();
+//			return; //the previous line will cause a resize
 //		}
+
 		var maxSize = this.getTableSpace();
 		maxSize.y -= $(this).getStyle('margin-bottom').toInt();
 		maxSize.y -= this.thead.getSize().y;
