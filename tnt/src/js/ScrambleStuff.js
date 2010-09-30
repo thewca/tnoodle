@@ -169,18 +169,29 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleChooser.setAttribute('type', 'number');
 	scrambleChooser.setAttribute('min', 1);
 	scrambleChooser.setAttribute('step', 1);
-	xAddListener(scrambleChooser, 'change', function() {
-		if(!isInteger(this.value) || this.value < 1 || this.value > importedScrambles.length) {
-			this.value = scrambleIndex;
+	xAddListener(scrambleChooser, 'change', function(e) {
+		// the call to deleteChildren(scrambleInfo) in scramble()
+		// causes this listener to get called
+		if(scrambling) return;
+
+		if(!isInteger(this.value)) {
+			//don't do anything to scrambleIndex
+		} else if(this.value < 1) {
+			scrambleIndex = 0;
+		} else if(this.value > importedScrambles.length) {
+			scrambleIndex = importedScrambles.length - 1;
 		} else {
-			scrambleIndex = this.value - 1;
-			scramble();
+			scrambleIndex = (this.value - 1);
 		}
+		// scramble() will update scrambleChooser.value
+		scramble();
 	}, false);
+	var scrambling = false;
 	function scramble() {
 		if(puzzle === null) {
 			return;
 		}
+		scrambling = true;
 		deleteChildren(scramblePre);
 
 		if(importedScrambles && scrambleIndex >= importedScrambles.length) {
@@ -213,6 +224,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		}
 
 		fireScrambleChanged();
+		scrambling = false;
 	}
 	function turnClicked(userInvoked) {
 		if(isChangingColorScheme) {
