@@ -131,7 +131,7 @@ var KeyboardTimer = new Class({
 			if(timer.pendingTime) {
 				timer.pendingTime = (keys.getLength() > 0);
 			} else if((onlySpaceStarts && e.key == 'space') || (!onlySpaceStarts && keys.getLength() === 0)) {
-				if(new Date().getTime() - timer.timerStop > timer.delay) {
+				if(timer.hasDelayPassed()) {
 					if(timer.config.get('timer.wcaInspection') && !timer.inspecting) {
 						// if inspection's on and we're not inspecting, let's start!
 						timer.inspectionStart = new Date().getTime();
@@ -210,6 +210,9 @@ var KeyboardTimer = new Class({
 		optionsDiv.adopt(createOptionBox('timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
 		//TODO - add remaining stackmat config options!!!
 	},
+	hasDelayPassed: function() {
+		return new Date().getTime() - this.timerStop > this.delay;
+	},
 	isFocused: function() {
 		//we disable the timer if a text field is focused
 		return (document.activeElement.type != "text" &&
@@ -271,7 +274,7 @@ var KeyboardTimer = new Class({
 		var colorClass = this.inspecting ? 'inspecting' : '';
 		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
 		var keysDown = !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
-		if(keysDown) {
+		if(keysDown && this.hasDelayPassed()) {
 			string = "0.00"; //TODO - reflect the current update frequency!
 			colorClass = 'keysDown';
 		} else {

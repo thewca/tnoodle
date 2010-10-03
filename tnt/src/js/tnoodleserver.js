@@ -46,7 +46,8 @@ tnoodle.server = function(url) {
 		for(var i = 0; i < cookies.length; i++) {
 			var key = cookies.key(i);
 			try {
-				data[key] = JSON.parse(cookies.getItem(key));
+				//NOTE: JSON.encode is hacked to deal with Infinity
+				data[key] = JSON.decode(cookies.getItem(key));
 			} catch(error) {
 				//oh well
 			}
@@ -60,6 +61,8 @@ tnoodle.server = function(url) {
 				data[property] = value;
 //				cookies.setItem(property, JSON.stringify(value));
 				//it seems that mootools is breaking stringify with arrays?
+				
+				//NOTE: JSON.encode is hacked to deal with Infinity
 				cookies.setItem(property, JSON.encode(value));
 			}
 		};
@@ -142,12 +145,15 @@ tnoodle.server = function(url) {
 	
 	/* time can be either a number or a string */
 	function Time(time, scramble) {
-		this.format = function() {
-			var time = server.formatTime(this.centis);
-			if(this.penalty == "+2") {
-				time += "+";
-			} /*else if(this.penalty == "DNF") TODO - implement qqtimer-esque DNF(value)
-				time += " (" + this.centis + ")";*/ 
+		this.format = function(key) {
+			key = key || 'centis';
+			var time = server.formatTime(this[key]);
+			if(key == 'centis') {
+				if(this.penalty == "+2") {
+					time += "+";
+				} /*else if(this.penalty == "DNF") TODO - implement qqtimer-esque DNF(value)
+				time += " (" + this.centis + ")";*/
+			}
 			return time;
 		};
 		this.parse = function(time) {
@@ -280,7 +286,6 @@ tnoodle.server = function(url) {
 		}
 	}
 	this.Time = Time;
-	var EMPTY_TIME = { format: function() { return ""; }};
 	
 	function Session(id, puzzle, customization) {
 		this.id = id;
@@ -553,37 +558,38 @@ tnoodle.server = function(url) {
 		tags[puzzle].push(tag);
 		return true;
 	};
-	//TODO - load sessions from config!
 	var i;
 	var sessions = this.configuration.get('sessions', []);
 	//transforming sessions (a JSON object) into an array of Sessions of Times
 	try {
-	for(i = 0; i < sessions.length; i++) {
-		var sesh = new Session();
-		sesh.id = sessions[i].id;
-		sesh.puzzle = sessions[i].puzzle;
-		sesh.customization = sessions[i].customization;
-		sesh.times = [];
-		for(var j = 0; j < sessions[i].times.length; j++) {
-			var newTime = new Time(0);
-			sesh.times.push(newTime);
-			var oldTime = sessions[i].times[j];
-			
-			for(var key in oldTime) {
-				if(oldTime.hasOwnProperty(key)) {
-					newTime[key] = oldTime[key];
+		for(i = 0; i < sessions.length; i++) {
+			var sesh = new Session();
+			sesh.id = sessions[i].id;
+			sesh.puzzle = sessions[i].puzzle;
+			sesh.customization = sessions[i].customization;
+			sesh.times = [];
+			for(var j = 0; j < sessions[i].times.length; j++) {
+				var newTime = new Time(0);
+				sesh.times.push(newTime);
+				var oldTime = sessions[i].times[j];
+
+				for(var key in oldTime) {
+					if(oldTime.hasOwnProperty(key)) {
+						newTime[key] = oldTime[key];
+						if(oldTime[key] == null) {
+							//console.log(key + "!" + oldTime[key]);
+						}
+					}
 				}
 			}
+			sessions[i] = sesh;
 		}
-		sessions[i] = sesh;
-	}
 	} catch(error) {
 		//bummer
 		sessions = [];
 	}
 	
 	this.sessions = sessions;
-	
 	
 	var config = this.configuration;
 	var pendingSave = false;

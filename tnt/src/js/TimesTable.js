@@ -14,7 +14,7 @@ var TimesTable = new Class({
 //	cols:    [ 'index', 'centis', 'mean3',  'ra5',  'ra12',  'ra100',  'median100',  'sessionMedian' ],
 //	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Med 100', 'Median' ],
 	cols:    [ 'index', 'centis', 'ra5',  'ra12',  'ra100'   ],
-	headers: [ '',      'Time',           'Ra 5', 'Ra 12', 'Ra 100'  ],
+	headers: [ '',      'Time',   'Ra 5', 'Ra 12', 'Ra 100'  ],
 	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
 		this.server = server;
@@ -195,8 +195,8 @@ var TimesTable = new Class({
 		if(row == this.selectedRow) {
 			return;
 		}
-		this.selectedRow = row;
 		row.select();
+		this.selectedRow = row;
 		
 //		if(e) {
 //			//don't want this to be treated as an unfocus event until we know which row was clicked
@@ -443,16 +443,19 @@ var TimesTable = new Class({
 	},
 	createRowSelector: function(tr, time) {
 		return function() {
+			if(this.selectedRow) {
+				this.selectedRow.deselect();
+			}
 			tr.selected = true;
 			var editCol = tr.getChildren()[1];
-			var size = editCol.getSize(); //gotta get the size before we alter the padding
+			var width = editCol.getStyle('width').toInt() + editCol.getStyle('padding-left').toInt() + editCol.getStyle('padding-right').toInt();
+			var height = editCol.getStyle('height').toInt() + editCol.getStyle('padding-top').toInt() + editCol.getStyle('padding-bottom').toInt();
 			editCol.setStyle('padding', 0);
 			var textField = new Element('input');
 			textField.value = editCol.get('text');
 			textField.setStyle('border', 'none');
-			//TODO TEST THIS WITH THE BORDER BACK ON
-			textField.setStyle('width', size.x-1); //2 for the border around the current ra12
-			textField.setStyle('height', size.y-1);
+			textField.setStyle('width', width);
+			textField.setStyle('height', height);
 			textField.setStyle('text-align', 'right'); //not sure this is a good idea, left align might make a good visual indicator
 			textField.setStyle('padding', 0);
 
@@ -499,52 +502,51 @@ var TimesTable = new Class({
 				//TODO - it would be nice to get rid of these if statements...
 				if(key == 'index') {
 					cells[col].set('html', time.index + 1);
-				}
-//				else if(key == 'getValueCentis') {
-//					cells[col].set('html', time.format());
-//					cells[col].timeCentis = time.getValueCentis();
-//					cells[col].removeClass('bestRA');
-//					cells[col].removeClass('currentRA');
-//					cells[col].removeClass('topCurrentRA');
-//					cells[col].removeClass('bottomCurrentRA');
-//					cells[col].removeClass('bestTime');
-//					cells[col].removeClass('worstTime');
-//					var bw = session.bestWorst();
-//					if(time.index == bw.best.index) {
-//						cells[col].addClass('bestTime');
-//					} else if(time.index == bw.worst.index) {
-//						cells[col].addClass('worstTime');
-//					}
-//					var bestRA12 = session.bestWorst('ra12').best;
-//					var attemptCount = session.attemptCount();
-//					if(attemptCount >= 12) {
-//						if(bestRA12.index - 12 < time.index && time.index <= bestRA12.index) {
-//							cells[col].addClass('bestRA');
-//						}
-//						if(THIS.sorted.index === 0) {
-//							var firstSolve = session.attemptCount()-12;
-//							var lastSolve = session.attemptCount()-1;
-//							if(firstSolve <= time.index && time.index <= lastSolve) {
-//								cells[col].addClass('currentRA');
-//							}
-//							
-//							if(THIS.sorted.reverse) {
-//								//the top/bottom are switched
-//								var temp = lastSolve;
-//								lastSolve = firstSolve;
-//								firstSolve = temp;
-//							}
-//							
-//							if(time.index == firstSolve) {
-//								cells[col].addClass('topCurrentRA');
-//							} else if(time.index == lastSolve) {
-//								cells[col].addClass('bottomCurrentRA');
-//							}
-//						}
-//					}
-//				}
-				else {
-					cells[col].set('html', server.formatTime(time[key]));
+				} else if(key == 'centis') {
+					cells[col].set('html', time.format());
+					cells[col].timeCentis = time.centis;
+					cells[col].removeClass('bestRA');
+					cells[col].removeClass('currentRA');
+					cells[col].removeClass('topCurrentRA');
+					cells[col].removeClass('bottomCurrentRA');
+					cells[col].removeClass('bestTime');
+					cells[col].removeClass('worstTime');
+					var bw = session.bestWorst();
+					if(time.index == bw.best.index) {
+						cells[col].addClass('bestTime');
+					} else if(time.index == bw.worst.index) {
+						cells[col].addClass('worstTime');
+					}
+					var selectedRASize = 12;
+					var bestRA = session.bestWorst('ra' + selectedRASize).best;
+					var attemptCount = session.attemptCount();
+					if(attemptCount >= selectedRASize) {
+						if(bestRA.index - selectedRASize < time.index && time.index <= bestRA.index) {
+							cells[col].addClass('bestRA');
+						}
+						if(THIS.sorted.index === 0) {
+							var firstSolve = session.attemptCount()-selectedRASize;
+							var lastSolve = session.attemptCount()-1;
+							if(firstSolve <= time.index && time.index <= lastSolve) {
+								cells[col].addClass('currentRA');
+							}
+							
+							if(THIS.sorted.reverse) {
+								//the top/bottom are switched
+								var temp = lastSolve;
+								lastSolve = firstSolve;
+								firstSolve = temp;
+							}
+							
+							if(time.index == firstSolve) {
+								cells[col].addClass('topCurrentRA');
+							} else if(time.index == lastSolve) {
+								cells[col].addClass('bottomCurrentRA');
+							}
+						}
+					}
+				} else {
+					cells[col].set('html', time.format(key));
 					var bestIndex = session.bestWorst(key).best.index;
 					cells[col].removeClass('bestRA');
 					if(bestIndex == time.index) {

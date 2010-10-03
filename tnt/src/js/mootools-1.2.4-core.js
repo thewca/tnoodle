@@ -3159,7 +3159,10 @@ var JSON = new Hash(this.JSON && {
 				});
 				return '{' + string + '}';
 			case 'number': case 'boolean': return String(obj);
-			case false: return 'null';
+			case false: 
+				if(isNaN(obj) || Math.abs(obj)==Infinity)
+					return String(obj);
+				return 'null';
 		}
 		return null;
 	},

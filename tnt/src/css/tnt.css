@@ -10,7 +10,7 @@ img {
     padding: 1px;
 }
 
-span.link {
+.link {
 	white-space: nowrap;
 	color: brown;
 	text-decoration: underline;
@@ -18,7 +18,7 @@ span.link {
 	padding-left: 10px;
 	padding-right: 10px;
 }
-span.link:hover, span.down {
+.link:hover, .down {
 	text-decoration: none;
 	color: red;
 }
