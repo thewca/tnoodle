@@ -20,44 +20,19 @@ var KeyboardTimer = new Class({
 		this.fullscreenBG.setStyle('display', 'none');
 		this.fullscreenBG.inject(document.body);
 		
-		var optionsButton = new Element('div', { html: 'v', 'class': 'optionsButton' });
+		var options = tnoodle.tnt.createOptions();
+		var optionsDiv = options.div;
+		var optionsButton = options.button;
+		optionsButton.setStyles({
+			position: 'absolute',
+			top: 2,
+			right: 5
+		});
 		optionsButton.inject(parent);
 		
-		var optionsDiv = new Element('div', { 'class': 'options' });
-		optionsDiv.show = function() {
-			optionsDiv.setStyle('display', ''); //for some reason, setting visiblity: none doesn't seem to work here
-			optionsDiv.fade('in');
-			optionsButton.morph('.optionsButtonHover');
-		};
-		optionsDiv.hide = function(e) {
-			updateFrequency.blur(); //TODO - this is happening too often
-			optionsDiv.fade('out');
-			optionsButton.morph('.optionsButton');
-		};
-		
-		optionsButton.addEvent('mouseover', optionsDiv.show);
-		optionsButton.addEvent('mouseout', optionsDiv.hide);
-		optionsDiv.addEvent('mouseover', optionsDiv.show);
-		optionsDiv.addEvent('mouseout', optionsDiv.hide);
-		
-		function createOptionBox(optionKey, description, def, changeListener) {
-			var checkbox = new Element('input', { id: optionKey, type: 'checkbox' });
-			checkbox.checked = server.configuration.get(optionKey, def);
-			checkbox.addEvent('change', function(e) {
-				server.configuration.set(this.id, this.checked);
-			});
-			if(changeListener) {
-				checkbox.addEvent('change', changeListener);
-				changeListener.call(checkbox);
-			}
-			checkbox.addEvent('focus', function(e) {
-				this.blur();
-			});
-			return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': description, 'for': optionKey }));
-		}
-		optionsDiv.adopt(createOptionBox('timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
-		optionsDiv.adopt(createOptionBox('timer.wcaInspection', 'WCA style inspection', false));
-		optionsDiv.adopt(createOptionBox('timer.onlySpaceStarts', 'Only spacebar starts', true));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.wcaInspection', 'WCA style inspection', false));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.onlySpaceStarts', 'Only spacebar starts', true));
 		
 		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
 		var frequencyChanged = function(e) {
@@ -82,10 +57,6 @@ var KeyboardTimer = new Class({
 		frequencyDiv.adopt(updateFrequency);
 		frequencyDiv.adopt(new Element('label', { 'for': 'timer.frequency', html: 'Update frequency (seconds)' }));
 		optionsDiv.adopt(frequencyDiv);
-
-		optionsDiv.setStyle('display', 'none'); //for some reason, setting visiblity: none doesn't seem to work here
-		optionsDiv.hide(); //this allows the first show() to animate
-		optionsDiv.inject(parent);
 		
 		var keys = new Hash();
 		this.keys = keys;
@@ -207,7 +178,7 @@ var KeyboardTimer = new Class({
 				tnoodle.stackmat.disable();
 			}
 		}
-		optionsDiv.adopt(createOptionBox('timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
 		//TODO - add remaining stackmat config options!!!
 	},
 	hasDelayPassed: function() {

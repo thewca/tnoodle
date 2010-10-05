@@ -28,12 +28,16 @@
 }
 
 #timesTable td, #timesTable th {
-	border: 1px solid;
+	border-width: 1px 1px 1px 0px;
+	border-style: solid;
 	padding: 1px 5px 1px 5px;
 	border-style: inset;
 	border-color: black;
 	text-align: right;
-	border-left: 0px;
+}
+
+#timesTable th {
+	border-width: 1px 1px 0px 0px;
 }
 
 #timesTable tr:nth-child(even) {background: #CCC;}

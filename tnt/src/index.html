@@ -25,6 +25,7 @@
 
 <script type="text/javascript" src="js/mootools-1.2.4-core.js"></script>
 <script type="text/javascript" src="js/mootools-1.2.4.4-more.js"></script>
+<script type="text/javascript" src="js/tnt.js"></script>
 <script type="text/javascript" src="js/VertTriLayout.js"></script>
 <script type="text/javascript" src="js/tnoodleserver.js"></script>
 <script type="text/javascript" src="js/tnoodlescrambles.js"></script>
@@ -33,14 +34,13 @@
 <script type="text/javascript" src="js/KeyboardTimer.js"></script>
 <script type="text/javascript" src="js/TimesTable.js"></script>
 <script type="text/javascript" src="js/StackApplet.js"></script>
-<script type="text/javascript" src="js/tnt.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 
 </head>
 <body>
 <div id="timer"></div>
 <div id="scrambles">
 	<div id="scrambleBorder">
-		<span id="puzzleChooser"></span>
 	</div>
 	<div id="scrambleArea"></div>
 </div>
@@ -50,9 +50,10 @@
 	</ul>
 	<div id="timesArea">
 		<div id="sessionInfoBar">
+			<div id="puzzleChooser"></div>
 			<span id="sessionInfo"></span>
 			<span id="resetSession" class="link">Reset</span>
-			<a id="downloadCSV" class="link" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!">Download CSV</a>
+			<a id="downloadCSV" class="link" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!">Download</a>
 		</div>
 		<table id="timesTable"></table>
 	</div>

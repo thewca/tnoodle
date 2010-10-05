@@ -8,18 +8,19 @@ function isOrIsChild(el, parent) {
 	}
 	return false;
 }
-
+var SCROLLBAR_WIDTH = 13;
 var TimesTable = new Class({
 	Extends: HtmlTable,
-//	cols:    [ 'index', 'centis', 'mean3',  'ra5',  'ra12',  'ra100',  'median100',  'sessionMedian' ],
-//	headers: [ '',      'Time',           'Mean 3', 'Ra 5', 'Ra 12', 'Ra 100', 'Med 100', 'Median' ],
-	cols:    [ 'index', 'centis', 'ra5',  'ra12',  'ra100'   ],
-	headers: [ '',      'Time',   'Ra 5', 'Ra 12', 'Ra 100'  ],
+	cols: null,
+	headers: null,
 	initialize: function(id, server, scrambleStuff) {
 	//TODO - select multiple times for deletion
 		this.server = server;
 		this.configuration = server.configuration;
 		this.scrambleStuff = scrambleStuff;
+		this.cols = server.timeKeys;
+		this.headers = server.timeKeyNames;
+		
 		var table = this;
 		HtmlTable.Parsers.time = {
 			match: /^.*$/,
@@ -111,9 +112,41 @@ var TimesTable = new Class({
 		}.bind(this);
 		
 		this.thead = $(this).getChildren('thead')[0];
+		this.thead.getChildren('tr')[0].getChildren('th').each(function(th, index) {
+			var title = server.timeKeyDescriptions[index];
+			if(title) {
+				th.title = title;
+			}
+		});
 		this.tbody = $(this).getChildren('tbody')[0];
 		this.tfoot = $(this).getChildren('tfoot')[0];
 		this.parent = $(this).getParent();
+		
+		var columnOptions = tnoodle.tnt.createOptions();
+		var columnOptionsHeader = document.createElement('th');
+		this.thead.getChildren()[0].adopt(columnOptionsHeader.adopt(columnOptions.button));
+		columnOptionsHeader.setStyles({
+			cursor: 'default',
+			padding: 0,
+			borderRight: 'none',
+			borderBottom: '1px'
+		});
+		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH+4);
+		
+		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100' ]; //TODO - read from configuration!
+		var initing = true;
+		var refreshCols = function() {
+			if(initing) {
+				return;
+			}
+			this.refreshData();
+		}.bind(this);
+		for(var i = 0; i < this.cols.length; i++) {
+			var col = this.cols[i];
+			var desc = this.headers[i];
+			columnOptions.div.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'table.' + col, desc, defaultCols.contains(col), refreshCols));
+		}
+		initing = false;
 		
 		window.addEvent('click', this.deselectRow.bind(this));
 		window.addEvent('keydown', function(e) {
@@ -431,11 +464,31 @@ var TimesTable = new Class({
 		return row;
 	},
 	refreshData: function() {
+		var refreshCols = function(tr) {
+			var cells = tr.getChildren('td');
+			//nasty hack to get the headers of the thead
+			if(cells.length === 0) {
+				cells = tr.getChildren('th');
+			}
+			for(var i = 0; i < this.cols.length; i++) {
+				var colEnabled = this.configuration.get('table.' + this.cols[i], true);
+				if(colEnabled) {
+					cells[i].setStyle('display', '');
+				} else {
+					cells[i].setStyle('display', 'none');
+				}
+			}
+		}.bind(this);
+		
 		$(this).toggle(); //prevent flickering?
 		this.deselectRow();
 		this.tbody.getChildren('tr').each(function(tr) {
 			tr.refresh();
+			refreshCols(tr);
 		});
+		this.thead.getChildren('tr').each(refreshCols);
+		this.tfoot.getChildren('tr').each(refreshCols);
+		refreshCols(this.addRow); //addRow is not a part of the table at this point
 		this.resort(true);
 		this.infoRow.refresh();
 		$(this).toggle(); //prevent flickering?
@@ -494,12 +547,11 @@ var TimesTable = new Class({
 		var server = this.server;
 		var session = this.session;
 		var cols = this.cols;
-		var THIS = this;
+		var table = this;
 		tr.refresh = function() {
 			var cells = this.getChildren();
-			for(var col = 0; col < THIS.cols.length; col++) {
-				var key = THIS.cols[col];
-				//TODO - it would be nice to get rid of these if statements...
+			for(var col = 0; col < table.cols.length; col++) {
+				var key = table.cols[col];
 				if(key == 'index') {
 					cells[col].set('html', time.index + 1);
 				} else if(key == 'centis') {
@@ -524,14 +576,14 @@ var TimesTable = new Class({
 						if(bestRA.index - selectedRASize < time.index && time.index <= bestRA.index) {
 							cells[col].addClass('bestRA');
 						}
-						if(THIS.sorted.index === 0) {
+						if(table.sorted.index === 0) {
 							var firstSolve = session.attemptCount()-selectedRASize;
 							var lastSolve = session.attemptCount()-1;
 							if(firstSolve <= time.index && time.index <= lastSolve) {
 								cells[col].addClass('currentRA');
 							}
 							
-							if(THIS.sorted.reverse) {
+							if(table.sorted.reverse) {
 								//the top/bottom are switched
 								var temp = lastSolve;
 								lastSolve = firstSolve;
@@ -623,8 +675,8 @@ var TimesTable = new Class({
 		
 		var preferredWidth = 0;
 		
-		var resizeme = [headers, infoCells, addTimeCells];//, tds];
-		for(i = 0; i < headers.length; i++) {
+		var resizeme = [headers, infoCells, addTimeCells];
+		for(i = 0; i < this.headers.length; i++) {
 			var maxWidth = 0;
 			var maxWidthIndex = 0;
 			var padding = 0;
@@ -654,13 +706,12 @@ var TimesTable = new Class({
 			tr.setStyle('width', preferredWidth);
 		});
 
-		preferredWidth += 17; //this accounts for the vert scrollbar
+		preferredWidth += SCROLLBAR_WIDTH; //this accounts for the vert scrollbar
 		this.preferredWidth = preferredWidth;
 		this.tbody.setStyle('width', preferredWidth);
 		
 		if(this.manager) {
 			this.manager.position();
-			//setTimeout(this.manager.position.bind(this.manager), 0);
 		}
 	},
 	getTableSpace: function() {

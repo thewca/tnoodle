@@ -19,7 +19,7 @@ import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 //TODO - convert to better naming scheme from sims
 public class MegaminxScrambler extends ScramblerViewer {
 	public static synchronized MegaminxScrambler[] createScramblers() {
-		return new MegaminxScrambler[] { new MegaminxScrambler(true), new MegaminxScrambler(false) };
+		return new MegaminxScrambler[] { new MegaminxScrambler(true) };
 	}
 	
 	private static final String FACE_NAMES = "ABCDEFabcdef";
@@ -36,7 +36,7 @@ public class MegaminxScrambler extends ScramblerViewer {
 
 	@Override
 	public String getLongName() {
-		return (pochmann ? "Pochmann " : "Old style ") + "Megaminx";
+		return (pochmann ? "" : "Old style ") + "Megaminx";
 	}
 
 	@Override

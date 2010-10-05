@@ -147,14 +147,24 @@ tnoodle.server = function(url) {
 	function Time(time, scramble) {
 		this.format = function(key) {
 			key = key || 'centis';
-			var time = server.formatTime(this[key]);
-			if(key == 'centis') {
-				if(this.penalty == "+2") {
-					time += "+";
-				} /*else if(this.penalty == "DNF") TODO - implement qqtimer-esque DNF(value)
-				time += " (" + this.centis + ")";*/
+			if(key == 'tags') {
+				return this.tags.toString();
+			} else if(key == 'date') {
+				return this.date.toString();
+			} else if(key == 'scramble') {
+				return this.scramble;
+			} else if(key == 'index') {
+				return this.index.toString();
+			} else {
+				var time = server.formatTime(this[key]);
+				if(key == 'centis') {
+					if(this.penalty == "+2") {
+						time += "+";
+					} /*else if(this.penalty == "DNF") TODO - implement qqtimer-esque DNF(value)
+					time += " (" + this.centis + ")";*/
+				}
+				return time;
 			}
-			return time;
 		};
 		this.parse = function(time) {
 			if(time.length === 0) {
@@ -271,7 +281,7 @@ tnoodle.server = function(url) {
 			return this.tags.indexOf(tag) >= 0;
 		};
 		
-		this.mean3 = this.ra5 = this.ra12 = this.ave100 = this.sessionAve = null;
+		this.mean3 = this.ra5 = this.ra12 = this.ra100 = null;
 		this.penalty = null;
 		this.index = null;
 		this.tags = [];
@@ -285,6 +295,21 @@ tnoodle.server = function(url) {
 			this.parse(time.toString());
 		}
 	}
+	
+	var keyInfo = [
+		[ 'index', '', null ],
+		[ 'centis', 'Time', null ],
+		[ 'mean3', 'Mean 3', 'Untrimmed average of 3' ],
+		[ 'ra5', 'Ra 5', 'Trimmed average of 5' ],
+		[ 'ra12', 'Ra 12', 'Trimmed average of 12' ],
+		[ 'ra100', 'Ra 100', 'Trimmed average of 100' ],
+		[ 'tags', 'Tags', null ],
+		[ 'date', 'Date', 'Milliseconds since the epoch' ],
+		[ 'scramble', 'Scramble', null ]
+	];
+	this.timeKeys = keyInfo.map(function(a) { return a[0]; });
+	this.timeKeyNames = keyInfo.map(function(a) { return a[1]; });
+	this.timeKeyDescriptions = keyInfo.map(function(a) { return a[2]; });
 	this.Time = Time;
 	
 	function Session(id, puzzle, customization) {
@@ -302,7 +327,7 @@ tnoodle.server = function(url) {
 			return this.puzzle;
 		};
 		this.setCustomization = function(custom) {
-			this.customization = custom;
+			this.customization = custom || '';
 			saveSessions();
 		};
 		this.getCustomization = function() {
@@ -310,6 +335,13 @@ tnoodle.server = function(url) {
 				return '';
 			}
 			return this.customization;
+		};
+		this.toString = function() {
+			if(this.customization.length == '') {
+				return this.puzzle;
+			} else {
+				return this.puzzle + ":" + this.customization;
+			}
 		};
 		//TODO - stats!!!
 		this.solveCount = function() {
@@ -471,9 +503,7 @@ tnoodle.server = function(url) {
 			time.ra5 = computeRA(time.index, 5, true);
 			time.ra12 = computeRA(time.index, 12, true);
 			time.ra100 = computeRA(time.index, 100, true);
-			time.median100 = computeMedian(time.index, 100);
-			time.sessionAve = computeAverage(time.index);
-			time.sessionMedian = computeMedian(time.index);
+			//time.sessionAve = computeAverage(time.index);
 		}
 		this.addTime = function(timeCentis, scramble) {
 			var time = new Time(timeCentis, scramble);
@@ -576,9 +606,6 @@ tnoodle.server = function(url) {
 				for(var key in oldTime) {
 					if(oldTime.hasOwnProperty(key)) {
 						newTime[key] = oldTime[key];
-						if(oldTime[key] == null) {
-							//console.log(key + "!" + oldTime[key]);
-						}
 					}
 				}
 			}

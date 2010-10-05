@@ -11,15 +11,18 @@ BUGS
 +tapping space right after stopping timer turns green & 0.00, even though the timer can't run yet
 +formatting +2 penalties doesn't work
     +saving DNF/+2 doesn't seem to work...
++switching session with imported scrambles would ask if you wanted to clear the imported scrambles
++make times columns hideable, consolidate that code, add tooltips
+    +getValueCenties -> just centis...
 
 -1 line scrambles shouldn't get oddly spaced
+-don't let the scramble grow too large!
 -TimesTable
     +addtime grows the add time row
     -weird stuff happens with extremely large times
     -hovering to penalize/tag times...
     -save location of timestable scrollbar/selected session?
--make times columns hideable, consolidate that code, add tooltips
-    +getValueCenties -> just centis...
+-get consensus on what the hell a session average is!
     -stdev is the standard deviation of times, not session averages
 -hovering/clicking on bests idea...?
 
@@ -37,8 +40,9 @@ FEATURES
 + +/- looks like an underlined plus sign. Buttons? Like the AA buttons in rich text editors?
 +load scramble once timer has started to reduce lag
     -TODO - test with stackmat!!!
++"3x3 session started..." should become a dropdown box, remove old box
 
--"3x3 session started..." should become a dropdown box, remove old box
+-esc to get rid of import scrambles window
 -improve behavior of update freq option, alignment?
 -clickable stuff in timestable to get jnet/cct style stats?
 -big scramble view is blurry

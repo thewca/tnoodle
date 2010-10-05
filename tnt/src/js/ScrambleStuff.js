@@ -109,13 +109,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var defaultSize = null;
 
 	function puzzleChanged() {
-		if(importedScrambles) {
-			if(confirm("Since you're switching puzzles, would you like to clear the currently imported scrambles?")) {
-				importedScrambles = null;
-			} else {
-				scrambleIndex--;
-			}
-		}
 		if(puzzleSelect.selectedIndex < 0 || puzzleSelect.selectedIndex > puzzleSelect.options.length) {
 			newPuzzle = null;
 		} else {
@@ -124,6 +117,14 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 
 		if(newPuzzle == puzzle) {
 			return;
+		}
+		
+		if(importedScrambles) {
+			if(confirm("Since you're changing puzzles, would you like to clear the currently imported scrambles?")) {
+				importedScrambles = null;
+			} else {
+				scrambleIndex--;
+			}
 		}
 
 		colorScheme = null; // reset colorscheme
@@ -172,7 +173,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	xAddListener(scrambleChooser, 'change', function(e) {
 		// the call to deleteChildren(scrambleInfo) in scramble()
 		// causes this listener to get called
-		if(scrambling) return;
+		if(scrambling) {
+			return;
+		}
 
 		if(!isInteger(this.value)) {
 			//don't do anything to scrambleIndex
@@ -743,7 +746,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleHeader.appendChild(document.createTextNode(' '));
 
 	var newScrambleLink = document.createElement('span');
-	newScrambleLink.title = "Clear whatever may be imported and get a new scramble.";
+	newScrambleLink.title = "Get a new scramble (Note: Clears any imported scrambles!)";
 	newScrambleLink.className = 'link';
 	xAddListener(newScrambleLink, 'click', function() {
 		if(!importedScrambles || confirm('This will clear any imported scrambles, are you sure you want to continue?')) {
@@ -971,10 +974,18 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	};
 	
 	function adjustFontSize() {
-		// increase font size until the scramble doesn't fit
+		var height = scramblePre.getStyle("height").toInt();
+		// Increase font size until the scramble doesn't fit.
+		// Sometimes, this can get stuck in an inf loop where
+		// scramblePre grows to accomodate the increasing font
+		// size. We hold onto the original height to prevent this.
 		var f = scramblePre.getStyle('font-size').toInt();
 		while(scramblePre.clientHeight >= scramblePre.scrollHeight) {
 			scramblePre.setStyle('font-size', ++f);
+			if(f > height) {
+				console.log(scramblePre.clientHeight + " " + scramblePre.scrollHeight + " " + height);
+				break;
+			}
 		}
 		
 		// decrease font size until the scramble fits
@@ -995,6 +1006,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		var paddingVert = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-bottom').toInt();
 		var paddingHorz = scrambleText.getStyle('padding-left').toInt() + scrambleText.getStyle('padding-right').toInt();
 		space.y -= paddingVert;
+		if(space.y < 0) {
+			space.y = 0;
+		}
 		space.x -= paddingHorz; //this doesn't work if there's a vertical scrollbar
 		scramblePre.setStyle('height', space.y);
 		

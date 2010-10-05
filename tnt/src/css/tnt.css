@@ -79,12 +79,6 @@ img {
 .optionsButton {
 	background-color: #fff;
 	color: #000;
-	
-	position: absolute;
-	top: 2px;
-	right: 5px;
-	width: 19px;
-	height: 22px;
 	text-align: center;
 	z-index: 1;
 }
@@ -97,8 +91,6 @@ img {
 	position: absolute;
 	background: white;
 	border: 1px solid black;
-	top: 24px;
-	right: 5px;
 	padding: 5px;
 	text-align: left;
 	z-index: 5;

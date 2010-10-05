@@ -407,7 +407,7 @@ public class SquareOneScrambler extends ScramblerViewer {
 		if(slashes)
 			return "Square-1";
 		else
-			return "Square-1 (implicit slashes)";
+			return "Square-1 (wca)";
 	}
 
 	@Override
