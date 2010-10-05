@@ -141,7 +141,7 @@ var TimesTable = new Class({
 			}
 			this.refreshData();
 		}.bind(this);
-		for(var i = 0; i < this.cols.length; i++) {
+		for(i = 0; i < this.cols.length; i++) {
 			var col = this.cols[i];
 			var desc = this.headers[i];
 			columnOptions.div.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'table.' + col, desc, defaultCols.contains(col), refreshCols));
