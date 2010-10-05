@@ -14,9 +14,9 @@ BUGS
 +switching session with imported scrambles would ask if you wanted to clear the imported scrambles
 +make times columns hideable, consolidate that code, add tooltips
     +getValueCenties -> just centis...
++don't let the scramble grow too large!
 
 -1 line scrambles shouldn't get oddly spaced
--don't let the scramble grow too large!
 -TimesTable
     +addtime grows the add time row
     -weird stuff happens with extremely large times
