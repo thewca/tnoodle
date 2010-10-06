@@ -207,7 +207,6 @@ var TimesTable = new Class({
 		
 	},
 	promptTime: function() {
-		//TODO - implement!
 		this.rowClicked(null, this.addRow);
 	},
 	

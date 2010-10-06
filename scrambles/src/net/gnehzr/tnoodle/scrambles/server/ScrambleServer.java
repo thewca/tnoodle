@@ -127,9 +127,10 @@ public class ScrambleServer {
 		{
 			mimes.addMimeTypes("text/css css");
 			mimes.addMimeTypes("text/html html htm");
+			mimes.addMimeTypes("text/plain txt");
 			
 			mimes.addMimeTypes("application/x-javascript js");
-			
+			mimes.addMimeTypes("application/json json");
 			mimes.addMimeTypes("application/png png");
 			mimes.addMimeTypes("application/gif gif");
 			mimes.addMimeTypes("application/octet-stream *");
@@ -140,8 +141,23 @@ public class ScrambleServer {
 			String fileName = t.getRequestURI().getPath().substring(1);
 			if(fileName.isEmpty() || fileName.endsWith("/"))
 				fileName += "index.html";
-			
-			fullyReadInputStream(getClass().getResourceAsStream("/" + fileName), bytes);
+			else {
+				// It's impossible to check if a URI (what getResource() returns) is a directory,
+				// so we rely upon appending /index.html and checking if that path exists. If it does
+				// we redirect the browser to the given path with a trailing / appended.
+				// TODO - it would be nice to preserve parameters here
+				boolean isDir = getClass().getResource("/" + fileName + "/index.html") != null;
+				if(isDir) {
+					sendTrailingSlashRedirect(t);
+					return;
+				}
+			}
+			InputStream is = getClass().getResourceAsStream("/" + fileName);
+			if(is == null) {
+				send404(t, fileName);
+				return;
+			}
+			fullyReadInputStream(is, bytes);
 			sendBytes(t, bytes, mimes.getContentType(fileName));
 		}
 	}
@@ -657,6 +673,60 @@ abstract class SafeHttpHandler implements HttpHandler {
 		try {
 			t.getResponseHeaders().set("Content-Type", contentType);
 			t.sendResponseHeaders(200, bytes.length);
+			t.getResponseBody().write(bytes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				t.getResponseBody().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	protected static void sendTrailingSlashRedirect(HttpExchange t) {
+		URI request = t.getRequestURI();
+		//URI(String scheme, String userInfo, String host, int port, String path, String query, String fragment) 
+
+		URI dest = null;
+		try {
+			dest = new URI(request.getScheme(), 
+				request.getUserInfo(), 
+				request.getHost(), 
+				request.getPort(), 
+				request.getPath()+"/", 
+				request.getQuery(),
+				request.getFragment());
+		} catch(URISyntaxException e) {
+			e.printStackTrace();
+		}
+		send302(t, dest);
+	}
+	
+	protected static void send302(HttpExchange t, URI destination) {
+		try {
+			String dest = destination == null ? dest = "" : destination.toString();
+			byte[] bytes = ("Sorry, try going here instead " + destination).getBytes();
+			t.getResponseHeaders().set("Content-Type", "text/plain");
+			t.getResponseHeaders().set("Location", destination.toString());
+			t.sendResponseHeaders(302, bytes.length);
+			t.getResponseBody().write(bytes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				t.getResponseBody().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	protected static void send404(HttpExchange t, String fileName) {
+		try {
+			byte[] bytes = ("404! Could not find "+fileName).getBytes();
+			t.getResponseHeaders().set("Content-Type", "text/plain");
+			t.sendResponseHeaders(404, bytes.length);
 			t.getResponseBody().write(bytes);
 		} catch (IOException e) {
 			e.printStackTrace();

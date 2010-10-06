@@ -36,13 +36,13 @@ BUGS
 FEATURES
 +added medians
 +configurable columns
-    -add gui for this!
+    +add gui for this!
 + +/- looks like an underlined plus sign. Buttons? Like the AA buttons in rich text editors?
 +load scramble once timer has started to reduce lag
     -TODO - test with stackmat!!!
 +"3x3 session started..." should become a dropdown box, remove old box
++esc to get rid of import scrambles window
 
--esc to get rid of import scrambles window
 -improve behavior of update freq option, alignment?
 -clickable stuff in timestable to get jnet/cct style stats?
 -big scramble view is blurry

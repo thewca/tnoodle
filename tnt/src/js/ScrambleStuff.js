@@ -579,13 +579,16 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			promptImportUrl.call(importUrlLink);
 		}
 		this.style.display = 'inline';
+		this.center();
+	}.bind(importDiv);
+	importDiv.center = function() {
 		var windowWidth = window.innerWidth || window.clientWidth;
 		var windowHeight = window.innerHeight || window.clientHeight;
 		var importWidth = parseInt(importDiv.getStyle('width'), 10);
 		var importHeight = parseInt(importDiv.getStyle('height'), 10);
 		this.style.top = (windowHeight - importHeight)/2 + 'px';
 		this.style.left = (windowWidth - importWidth)/2 + 'px';
-	}.bind(importDiv);
+	};
 	importDiv.hide = function() {
 		importDiv.style.display = 'none';
 
@@ -599,6 +602,12 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		waitingIcon.style.display = 'none';
 	};
 	importDiv.hide();
+	xAddListener(document, 'keydown', function(e) {
+		if(e.keyCode == 27) {
+			importDiv.hide();
+		}
+	});
+	xAddListener(window, 'resize', importDiv.center.bind(importDiv));
 	
 	var importDivTabs = document.createElement('span');
 	importDiv.appendChild(importDivTabs);
