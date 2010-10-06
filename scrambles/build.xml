@@ -91,7 +91,9 @@
 	</target>
 	
 	<target name="run" depends="compile" description="runs the server without compiling the jar file first">
-		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false" />
+		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false">
+                   <arg value="-n" />
+                </java>
 	</target>
 
 	<target name="dist" depends="dist-server,dist-applet" description="generate the distribution">

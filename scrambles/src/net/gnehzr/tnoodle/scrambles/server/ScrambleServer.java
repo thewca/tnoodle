@@ -563,6 +563,7 @@ public class ScrambleServer {
 			e.printStackTrace();
 		}
 		parser.printHelpOn(System.out);
+		System.exit(1); // non zero exit status
 	}
 }
 
