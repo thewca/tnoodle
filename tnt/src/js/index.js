@@ -14,7 +14,7 @@ window.addEvent('domready', function() {
 			scrambleStuff.setSelectedPuzzle(session.getPuzzle());
 		}
 	}
-	var scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
+	scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 

@@ -2,7 +2,7 @@
 	<description>
 		Builds a special copy of ScrambleServer with tnt embedded,
 		and a copy of tnt built upon an applet.
-    </description>
+	</description>
 	
 	<condition property="isWin">
 		<os family="windows" />
@@ -176,7 +176,6 @@
 	</target>
 	
 	<target name="symlinkWin" if="isWin">
-		<echo>WANDOWS</echo>
 		<exec executable="${lib}/mklink.bat">
 			<arg value="/D" />
 			<arg value="${scrambles}\bin\tnt" />

@@ -1,8 +1,12 @@
 <project name="ScrambleServer" default="dist" basedir=".">
 	<description>
 		Builds the ScrambleServer, ensuring to include JCubeExplorer
-    </description>
+	</description>
 	
+        <condition property="isWin">
+		<os family="windows" />
+	</condition>
+
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />
 	<property name="bin" location="bin" />
@@ -135,6 +139,21 @@
 		</fatjar.build>
 	</target>
 
+	<target name="cleanUnix" unless="isWin">
+		<exec executable="rm">
+			<arg value="-r" />
+			<arg value="${bin}" />
+		</exec>
+	</target>
+
+	<target name="cleanWin" if="isWin">
+		<exec executable="rmdir.exe">
+			<arg value="/S" />
+			<arg value="/Q" />
+			<arg value="${bin}" />
+		</exec>
+	</target>
+
 	<target name="clean" description="clean up">
 		<!--
 			For the life of me, I can't get ant to stop
@@ -148,15 +167,8 @@
 			TODO - test on a mac...lol
 		<delete dir="${bin}" followsymlinks="false" />
 		-->
-		<exec executable="rm">
-			<arg value="-r" />
-			<arg value="${bin}" />
-		</exec>
-		<exec executable="rmdir.exe">
-			<arg value="/S" />
-			<arg value="/Q" />
-			<arg value="${bin}" />
-		</exec>
+                <antcall target="cleanWin" />
+                <antcall target="cleanUnix" />
 		
 		<delete dir="${dist}" />
 	</target>

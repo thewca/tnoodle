@@ -23,6 +23,11 @@
 <link type="text/css" rel="stylesheet" href="css/tnt.css" media="screen" />
 <link type="text/css" rel="stylesheet" href="css/Window.css" media="screen" />
 
+<script type="text/javascript">
+// Workaround for dev version of chromium
+// See: http://code.google.com/p/v8/source/detail?r=5135
+window.print = function() { };
+</script>
 <script type="text/javascript" src="js/mootools-1.2.4-core.js"></script>
 <script type="text/javascript" src="js/mootools-1.2.4.4-more.js"></script>
 <script type="text/javascript" src="js/tnt.js"></script>
