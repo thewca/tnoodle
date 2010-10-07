@@ -129,10 +129,13 @@ public class ScrambleServer {
 			mimes.addMimeTypes("text/html html htm");
 			mimes.addMimeTypes("text/plain txt");
 			
+			mimes.addMimeTypes("image/png png");
+			mimes.addMimeTypes("image/gif gif");
+
+			mimes.addMimeTypes("application/x-font-ttf ttf");
+
 			mimes.addMimeTypes("application/x-javascript js");
 			mimes.addMimeTypes("application/json json");
-			mimes.addMimeTypes("application/png png");
-			mimes.addMimeTypes("application/gif gif");
 			mimes.addMimeTypes("application/octet-stream *");
 		}
 		

@@ -584,13 +584,13 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	importDiv.center = function() {
 		var windowWidth = window.innerWidth || window.clientWidth;
 		var windowHeight = window.innerHeight || window.clientHeight;
-		var importWidth = parseInt(importDiv.getStyle('width'), 10);
-		var importHeight = parseInt(importDiv.getStyle('height'), 10);
+		var importWidth = parseInt(this.getStyle('width'), 10);
+		var importHeight = parseInt(this.getStyle('height'), 10);
 		this.style.top = (windowHeight - importHeight)/2 + 'px';
 		this.style.left = (windowWidth - importWidth)/2 + 'px';
-	};
+	}.bind(importDiv);
 	importDiv.hide = function() {
-		importDiv.style.display = 'none';
+		this.style.display = 'none';
 
 		// cancel any outgoing requests
 		if(activeImportRequest) {
@@ -600,14 +600,14 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			activeImportButton.disabled = false;
 		}
 		waitingIcon.style.display = 'none';
-	};
+	}.bind(importDiv);
 	importDiv.hide();
 	xAddListener(document, 'keydown', function(e) {
 		if(e.keyCode == 27) {
 			importDiv.hide();
 		}
 	});
-	xAddListener(window, 'resize', importDiv.center.bind(importDiv));
+	xAddListener(window, 'resize', importDiv.center);
 	
 	var importDivTabs = document.createElement('span');
 	importDiv.appendChild(importDivTabs);
