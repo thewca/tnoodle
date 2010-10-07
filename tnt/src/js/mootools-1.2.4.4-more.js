@@ -4966,10 +4966,13 @@ HtmlTable = Class.refactor(HtmlTable, {
 				value: value,
 				toString:  function() {
 					return value.toString();
-				}
+				},
+j:row.cells[0].get('text')
 			};
 		}, this);
-		data.reverse(true);
+		//TODO need this to provide a more stable sorting
+		if (this.sorted.reverse)
+			data.reverse(true);
 
 		data.sort(function(a, b){
 			if (a.value === b.value) return 0;

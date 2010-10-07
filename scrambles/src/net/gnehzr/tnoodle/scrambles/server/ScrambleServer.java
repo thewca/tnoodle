@@ -88,6 +88,7 @@ import com.sun.net.httpserver.HttpServer;
 @SuppressWarnings("restriction")
 public class ScrambleServer {
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
+	//TODO - it would be nice to rename the java process to something more descriptive
 	private static final int MAX_COUNT = 100;
 	
 	public ScrambleServer(int port, File scrambleFolder, boolean browse) throws IOException {

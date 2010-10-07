@@ -1,5 +1,4 @@
 #timesTable {
-	/*border-style: hidden;*/
 	border-collapse: collapse;
 }
 #timesTable thead tr, #timesTable tfoot tr {
@@ -40,11 +39,14 @@
 	border-width: 1px 1px 0px 0px;
 }
 
-#timesTable tr:nth-child(even) {background: #CCC;}
-#timesTable tr:nth-child(odd) {background: transparent;}
-
-#timesTable tbody tr:hover, tbody tr:hover td, #timesTable tr.addTime:hover, #timesTable tr.editRow, #timesTable tr.penaltyRow {
-	background-color: rgb(160, 160, 255) !important;
+#timesTable tbody tr:hover {
+	background-color: rgb(160, 160, 255);
+}
+#timesTable tbody tr.selected {
+	background-color: rgb(255, 160, 255);
+}
+#timesTable tbody tr:hover.selected {
+	background-color: rgb(207, 160, 255);
 }
 
 .errorField {

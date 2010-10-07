@@ -1,12 +1,15 @@
 //TODO - it would be nice to have this in mootools
 function isOrIsChild(el, parent) {
+	return findAncestor(el, function(e) { return e == parent; }) != null;
+}
+function findAncestor(el, cond) {
 	while(el !== null && el !== undefined) {
-		if(el == parent) {
-			return true;
+		if(cond(el)) {
+			return el;
 		}
 		el = el.parentNode;
 	}
-	return false;
+	return null;
 }
 var SCROLLBAR_WIDTH = 13;
 var TimesTable = new Class({
@@ -71,18 +74,23 @@ var TimesTable = new Class({
 		//we create the add time row
 		this.addRow = this.push(this.emptyRow).tr.dispose();
 		this.addRow.refresh = function() {
-			this.getChildren()[1].set('html', '<u>A</u>dd time');
-		};
+			if(this.addRow.selected) {
+				this.editCell(this.addRow.getChildren()[1], null);
+			} else {
+				this.addRow.getChildren()[1].setStyle('padding', '');
+				this.addRow.getChildren()[1].set('html', '<u>A</u>dd time');
+			}
+		}.bind(this);
 		this.addRow.refresh();
-		this.addRow.select = this.createRowSelector(this.addRow, null);
+		this.addRow.select = function() {
+			this.selected = true;
+			this.refresh();
+		};
 		this.addRow.deselect = function() {
-			this.getChildren()[1].setStyle('padding', '');
+			this.selected = false;
 			this.refresh();
 		};
 		this.addRow.addClass('addTime');
-		this.addRow.addEvent('click', function() {
-			this.rowClicked(null, this.addRow);
-		}.bind(this));
 		
 		//there needs to be some dummy content in this row so it gets sized correctly
 		//only vertical sizing matters though
@@ -148,10 +156,116 @@ var TimesTable = new Class({
 		}
 		initing = false;
 		
-		window.addEvent('click', this.deselectRow.bind(this));
+		var selectedRows = [];
+		var mostRecentRow = null;
+		function selectRow(row) {
+			if(selectedRows.contains(row)) {
+				return;
+			}
+			row.select();
+			selectedRows.push(row);
+		}
+		function deselectRows(ignoreRow) {
+			var ignorePresent = selectedRows.contains(ignoreRow);
+			for(var i = selectedRows.length-1; i >= 0; i--) {
+				var row = selectedRows[i];
+				if(!ignoreRow || row != ignoreRow) {
+					row.deselect();
+					selectedRows.splice(i, 1);
+				}
+			}
+			if(!ignorePresent && ignoreRow) {
+				selectRow(ignoreRow);
+			}
+		}
+		this.deselectRows = deselectRows;
+		this.promptTime = function() {
+			deselectRows();
+			selectRow(this.addRow);
+		}.bind(this);
+		window.addEvent('click', function(e) {
+			if(e.rightClick) {
+				return null; //we don't let right clicking deselect a row
+			}
+			//TODO - is there a better way of checking nodeName?
+			var row = findAncestor(e.target, function(el) { return el.nodeName == 'TR'; });
+			if(!isOrIsChild(row, table.tbody)) {
+				row = null;
+			}
+			if(row) {
+				if(e.control) {
+					if(table.addRow.selected || row === table.addRow) {
+						return;
+					}
+
+					// Deselecting and reselecting all of the current rows
+					// ensures that none of the rows are currently editing
+					selectedRows.each(function(row) { row.deselect(); row.select() });
+
+					if(selectedRows.contains(row)) {
+						// NOTE: We don't bother updating mostRecentRow
+						// This behavior may seem a little odd, but this
+						// will happen so infrequently, I can't imagine it'll
+						// matter.
+						row.deselect();
+						selectedRows.erase(row);
+					} else {
+						selectRow(row);
+						mostRecentRow = row;
+					}
+				} else if(e.shift && isOrIsChild(mostRecentRow, $(table))) {
+					if(row === table.addRow) {
+						return;
+					}
+					deselectRows();
+					selectRow(mostRecentRow);
+					var start = mostRecentRow;
+					var between = [];
+					// Try going forward from mostRecentRow to find row
+					while(start != null && start != row) {
+						between.push(start);
+						start = start.getNext();
+					}
+					if(start == null) {
+						// That didn't work, row must be behind mostRecentRow!
+						start = mostRecentRow;
+						between.length = 0;
+						while(start != null && start != row) {
+							between.push(start);
+							start = start.getPrevious();
+						}
+					}
+					between.each(function(row) {
+						selectRow(row);
+					});
+					selectRow(row);
+				} else {
+					var edit = selectedRows.contains(row);
+					deselectRows(row);
+					if(edit) {
+						row.editing = true;
+						row.refresh();
+					}
+					if(row === table.addRow) {
+						mostRecentRow = null;
+					} else {
+						mostRecentRow = row;
+					}
+				}
+			} else {
+				// Something other than a row of our table was clicked,
+				// so we clear the current selection
+				deselectRows();
+			}
+		});
 		window.addEvent('keydown', function(e) {
 			if(e.key == 'esc') {
-				this.deselectRow();
+				deselectRows();
+			} else if(e.key == 'delete') {
+				selectedRows.each(function(row) {
+					//TODO - add prompt! this is kinda inefficient...
+					row.deleteTime();
+				});
 			}
 		}.bind(this));
 	},
@@ -206,9 +320,6 @@ var TimesTable = new Class({
 		}
 		
 	},
-	promptTime: function() {
-		this.rowClicked(null, this.addRow);
-	},
 	
 	//private!
 	resort: function(preserveScrollbar) {
@@ -220,15 +331,22 @@ var TimesTable = new Class({
 			this.tbody.scrollTo(0, scrollTop); //restore scroll amount
 		}
 	},
-	selectedRow: null,
-	rowClicked: function(e, row) {
-		//TODO - click to delete as well
-		//TODO - add whitespace between times table and scramble
-		if(row == this.selectedRow) {
-			return;
-		}
-		row.select();
-		this.selectedRow = row;
+	//rowClicked: function(e, row) {
+		////TODO - click to delete as well
+		////TODO - add whitespace between times table and scramble
+		//if(row == this.selectedRow) {
+			//return;
+		//}
+		//if(this.selectedRow) {
+			//if(e) {
+				//if(e.control) {
+//
+				//}
+			//}
+			//this.selectedRow.deselect();
+		//}
+		//row.select();
+		//this.selectedRow = row;
 		
 //		if(e) {
 //			//don't want this to be treated as an unfocus event until we know which row was clicked
@@ -444,24 +562,16 @@ var TimesTable = new Class({
 //		timeChanged();
 //		textField.focus(); //this has the added benefit of making the row visible
 //		textField.select();
-	},
-	deselectRow: function(e) {
-		if(e) {
-			if(e.rightClick) {
-				return null; //we don't let right clicking deselect a row
-			}
-			if(isOrIsChild(e.target, this.selectedRow)) {
-				return null;
-			}
-		}
-		
-		var row = this.selectedRow;
-		if(row !== null) {
-			this.selectedRow = null;
-			row.deselect();
-		}
-		return row;
-	},
+	//},
+	//deselectRow: function(e) {
+		//
+		//var row = this.selectedRow;
+		//if(row !== null) {
+			//this.selectedRow = null;
+			//row.deselect();
+		//}
+		//return row;
+	//},
 	refreshData: function() {
 		var refreshCols = function(tr) {
 			var cells = tr.getChildren('td');
@@ -480,7 +590,6 @@ var TimesTable = new Class({
 		}.bind(this);
 		
 		$(this).toggle(); //prevent flickering?
-		this.deselectRow();
 		this.tbody.getChildren('tr').each(function(tr) {
 			tr.refresh();
 			refreshCols(tr);
@@ -493,106 +602,132 @@ var TimesTable = new Class({
 		$(this).toggle(); //prevent flickering?
 		this.resizeCols();
 	},
-	createRowSelector: function(tr, time) {
-		return function() {
-			if(this.selectedRow) {
-				this.selectedRow.deselect();
-			}
-			tr.selected = true;
-			var editCol = tr.getChildren()[1];
-			var width = editCol.getStyle('width').toInt() + editCol.getStyle('padding-left').toInt() + editCol.getStyle('padding-right').toInt();
-			var height = editCol.getStyle('height').toInt() + editCol.getStyle('padding-top').toInt() + editCol.getStyle('padding-bottom').toInt();
-			editCol.setStyle('padding', 0);
-			var textField = new Element('input');
-			textField.value = editCol.get('text');
-			textField.setStyle('border', 'none');
-			textField.setStyle('width', width);
-			textField.setStyle('height', height);
-			textField.setStyle('text-align', 'right'); //not sure this is a good idea, left align might make a good visual indicator
-			textField.setStyle('padding', 0);
+	editCell: function(cell, time) {
+		var width = cell.getStyle('width').toInt() + cell.getStyle('padding-left').toInt() + cell.getStyle('padding-right').toInt();
+		var height = cell.getStyle('height').toInt() + cell.getStyle('padding-top').toInt() + cell.getStyle('padding-bottom').toInt();
+		cell.setStyle('padding', 0);
+		var textField = new Element('input');
+		textField.value = time ? time.format() : "";
+		textField.setStyle('border', 'none');
+		textField.setStyle('width', width);
+		textField.setStyle('height', height);
+		textField.setStyle('text-align', 'right'); //not sure this is a good idea, left align might make a good visual indicator
+		textField.setStyle('padding', 0);
 
-			textField.addEvent('keydown', function(e) {
-				if(e.key == 'esc') {
-					this.deselectRow();
-				}
-				if(e.key == 'enter') {
-					try {
-						if(time) {
-							time.parse(textField.value);
+		textField.addEvent('keydown', function(e) {
+			if(e.key == 'enter') {
+				try {
+					this.deselectRows();
+					if(time) {
+						time.parse(textField.value);
 //							penalties[String(time.getPenalty())].checked = true;
-						} else {
-							this.addTime(textField.value);
-						}
 						this.session.reindex();
-						this.deselectRow();
-					} catch(error) {
-						alert(error);
+						this.refreshData();
+					} else {
+						this.addTime(textField.value);
 					}
+				} catch(error) {
+					alert("Error entering time " + textField.value + "\n" + error);
 				}
-			}.bind(this));
-			
-			editCol.empty();
-			editCol.adopt(textField);
-			
-			textField.focus(); //this has the added benefit of making the row visible
-			textField.select();
-		}.bind(this);
+			}
+		}.bind(this));
+		
+		cell.empty();
+		cell.adopt(textField);
+		
+		textField.focus(); //this has the added benefit of making the row visible
+		textField.select();
 	},
 	lastAddedRow: null,
 	add: function(time) {
 		var tr = this.push(this.emptyRow).tr;
 		this.lastAddedRow = tr;
-		tr.addEvent('click', function(e) { this.rowClicked(e, tr); }.bind(this));
 		var server = this.server;
 		var session = this.session;
 		var cols = this.cols;
 		var table = this;
+		tr.deleteTime = function(e) {
+			this.session.disposeTime(time); //remove time
+			
+			//TODO - implement deleting multiple times!
+			tr.dispose();
+			
+			//changing the time could very well affect more than this row
+			//maybe someday we could be more efficient about the changes
+			this.refreshData();
+			this.resizeCols(); //changing the time may change the size of a column
+//			this.scrollToRow(editedRow);
+		}.bind(this);
 		tr.refresh = function() {
-			var cells = this.getChildren();
+			tr.editing = tr.editing && tr.selected;
+			if(tr.selected) {
+				tr.addClass('selected');
+			} else {
+				tr.removeClass('selected');
+			}
+			var cells = tr.getChildren();
 			for(var col = 0; col < table.cols.length; col++) {
 				var key = table.cols[col];
 				if(key == 'index') {
-					cells[col].set('html', time.index + 1);
-				} else if(key == 'centis') {
-					cells[col].set('html', time.format());
-					cells[col].timeCentis = time.centis;
-					cells[col].removeClass('bestRA');
-					cells[col].removeClass('currentRA');
-					cells[col].removeClass('topCurrentRA');
-					cells[col].removeClass('bottomCurrentRA');
-					cells[col].removeClass('bestTime');
-					cells[col].removeClass('worstTime');
-					var bw = session.bestWorst();
-					if(time.index == bw.best.index) {
-						cells[col].addClass('bestTime');
-					} else if(time.index == bw.worst.index) {
-						cells[col].addClass('worstTime');
+					cells[col].removeEvent('click');
+					if(tr.selected || tr.hovered) {
+						cells[col].set('html', 'X');
+						cells[col].addClass('deleteTime'); //TODO - pretty picture
+						cells[col].addEvent('click', tr.deleteTime);
+					} else {
+						cells[col].set('html', time.index + 1);
+						cells[col].removeClass('deleteTime');
 					}
-					var selectedRASize = 12;
-					var bestRA = session.bestWorst('ra' + selectedRASize).best;
-					var attemptCount = session.attemptCount();
-					if(attemptCount >= selectedRASize) {
-						if(bestRA.index - selectedRASize < time.index && time.index <= bestRA.index) {
-							cells[col].addClass('bestRA');
+				} else if(key == 'centis') {
+					if(tr.editing) {
+						if(tr.editingOn) {
+							return;
 						}
-						if(table.sorted.index === 0) {
-							var firstSolve = session.attemptCount()-selectedRASize;
-							var lastSolve = session.attemptCount()-1;
-							if(firstSolve <= time.index && time.index <= lastSolve) {
-								cells[col].addClass('currentRA');
+						tr.editingOn = true;
+						this.editCell(cels[col], time);
+					} else {
+						tr.editingOn = false;
+						cells[col].set('html', time.format());
+						cells[col].timeCentis = time.centis;
+						cells[col].removeClass('bestRA');
+						cells[col].removeClass('currentRA');
+						cells[col].removeClass('topCurrentRA');
+						cells[col].removeClass('bottomCurrentRA');
+						cells[col].removeClass('bestTime');
+						cells[col].removeClass('worstTime');
+						cells[col].setStyle('padding', '');
+						var bw = session.bestWorst();
+						if(time.index == bw.best.index) {
+							cells[col].addClass('bestTime');
+						} else if(time.index == bw.worst.index) {
+							cells[col].addClass('worstTime');
+						}
+						var selectedRASize = 12;
+						var bestRA = session.bestWorst('ra' + selectedRASize).best;
+						var attemptCount = session.attemptCount();
+						if(attemptCount >= selectedRASize) {
+							if(bestRA.index - selectedRASize < time.index && time.index <= bestRA.index) {
+								cells[col].addClass('bestRA');
 							}
-							
-							if(table.sorted.reverse) {
-								//the top/bottom are switched
-								var temp = lastSolve;
-								lastSolve = firstSolve;
-								firstSolve = temp;
-							}
-							
-							if(time.index == firstSolve) {
-								cells[col].addClass('topCurrentRA');
-							} else if(time.index == lastSolve) {
-								cells[col].addClass('bottomCurrentRA');
+							if(table.sorted.index === 0) {
+								var firstSolve = session.attemptCount()-selectedRASize;
+								var lastSolve = session.attemptCount()-1;
+								if(firstSolve <= time.index && time.index <= lastSolve) {
+									cells[col].addClass('currentRA');
+								}
+								
+								if(table.sorted.reverse) {
+									//the top/bottom are switched
+									var temp = lastSolve;
+									lastSolve = firstSolve;
+									firstSolve = temp;
+								}
+								
+								if(time.index == firstSolve) {
+									cells[col].addClass('topCurrentRA');
+								} else if(time.index == lastSolve) {
+									cells[col].addClass('bottomCurrentRA');
+								}
 							}
 						}
 					}
@@ -605,44 +740,31 @@ var TimesTable = new Class({
 					}
 				}
 			}
-		};
-		var deleteTimeFunc = function(e) {
-			this.session.disposeTime(time); //remove time
-			
-			this.selectedRow = null;
-			//TODO - implement deleting multiple times!
-			tr.dispose();
-			
-			//changing the time could very well affect more than this row
-			//maybe someday we could be more efficient about the changes
-			this.refreshData();
-			this.resizeCols(); //changing the time may change the size of a column
-//			this.scrollToRow(editedRow);
 		}.bind(this);
-		var deleteCol = tr.getChildren()[0];
-		deleteCol.addEvent('click', deleteTimeFunc);
 		tr.hover = function() {
-			deleteCol.set('html', 'X');
-			deleteCol.addClass('deleteTime'); //TODO - pretty picture
-		}.bind(this);
+			this.hovered = true;
+			this.refresh();
+		};
 		tr.unhover = function() {
-			if(!tr.selected) {
-				tr.getChildren()[0].removeClass('deleteTime');
-				tr.refresh();
-			}
-		}.bind(this);
-		tr.select = this.createRowSelector(tr, time);
+			this.hovered = false;
+			this.refresh();
+		};
+		tr.select = function() {
+			this.selected = true;
+			this.refresh();
+		};
 		tr.deselect = function() {
-			tr.selected = false;
-			tr.unhover();
-			var editCol = tr.getChildren()[1];
-			editCol.setStyle('padding', '');
+			this.selected = false;
+			this.refresh();
+		};
+			//var editCol = tr.getChildren()[1];
+			//editCol.setStyle('padding', '');
 			//changing the time could very well affect more than this row
 			//maybe someday we could be more efficient about the changes
-			this.refreshData();
-			this.resizeCols(); //changing the time may change the size of a column
+			//this.refreshData();
+			//this.resizeCols(); //changing the time may change the size of a column
 //			this.scrollToRow(editedRow);
-		}.bind(this);
+		//}.bind(this);
 		tr.addEvent('mouseover', tr.hover);
 		tr.addEvent('mouseout', tr.unhover);
 	},
@@ -723,12 +845,6 @@ var TimesTable = new Class({
 		if(!this.session) {
 			return; //we're not ready to size this until we have a session
 		}
-		
-//		//upon resizing, we first deselect any selected rows!
-//		if(this.selectedRow) {
-//			this.deselectRow();
-//			return; //the previous line will cause a resize
-//		}
 
 		var maxSize = this.getTableSpace();
 		maxSize.y -= $(this).getStyle('margin-bottom').toInt();

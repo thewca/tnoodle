@@ -31,7 +31,8 @@ BUGS
 -cleanup tagging code?
 -cache bests and worsts
 -fix file permissions
--bug in mootoools-more:~1913
+-bug in mootools-more:~1913
+-but in mootools-more: //TODO need this to provide a more stable sorting
 
 FEATURES
 +added medians
