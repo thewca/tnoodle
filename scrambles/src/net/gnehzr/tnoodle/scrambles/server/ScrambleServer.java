@@ -145,7 +145,6 @@ public class ScrambleServer {
 				// It's impossible to check if a URI (what getResource() returns) is a directory,
 				// so we rely upon appending /index.html and checking if that path exists. If it does
 				// we redirect the browser to the given path with a trailing / appended.
-				// TODO - it would be nice to preserve parameters here
 				boolean isDir = getClass().getResource("/" + fileName + "/index.html") != null;
 				if(isDir) {
 					sendTrailingSlashRedirect(t);
