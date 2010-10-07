@@ -1,7 +1,4 @@
 //TODO - it would be nice to have this in mootools
-function isOrIsChild(el, parent) {
-	return findAncestor(el, function(e) { return e == parent; }) != null;
-}
 function findAncestor(el, cond) {
 	while(el !== null && el !== undefined) {
 		if(cond(el)) {
@@ -10,6 +7,9 @@ function findAncestor(el, cond) {
 		el = el.parentNode;
 	}
 	return null;
+}
+function isOrIsChild(el, parent) {
+	return findAncestor(el, function(e) { return e == parent; }) !== null;
 }
 var SCROLLBAR_WIDTH = 13;
 var TimesTable = new Class({
@@ -200,7 +200,7 @@ var TimesTable = new Class({
 
 					// Deselecting and reselecting all of the current rows
 					// ensures that none of the rows are currently editing
-					selectedRows.each(function(row) { row.deselect(); row.select() });
+					selectedRows.each(function(row) { row.deselect(); row.select(); });
 
 					if(selectedRows.contains(row)) {
 						// NOTE: We don't bother updating mostRecentRow
@@ -222,15 +222,15 @@ var TimesTable = new Class({
 					var start = mostRecentRow;
 					var between = [];
 					// Try going forward from mostRecentRow to find row
-					while(start != null && start != row) {
+					while(start !== null && start !== row) {
 						between.push(start);
 						start = start.getNext();
 					}
-					if(start == null) {
+					if(start === null) {
 						// That didn't work, row must be behind mostRecentRow!
 						start = mostRecentRow;
 						between.length = 0;
-						while(start != null && start != row) {
+						while(start !== null && start != row) {
 							between.push(start);
 							start = start.getPrevious();
 						}
