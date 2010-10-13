@@ -235,7 +235,7 @@ tnoodle.server = function(url) {
 				valueCentis -= 2*100;
 			}
 			if(valueCentis <= 0) {
-				throw "Can't have times <= 0";
+				throw "Can't have times &leq; 0";
 			}
 			this.rawCentis = valueCentis;
 			this.setPenalty(penalty);
