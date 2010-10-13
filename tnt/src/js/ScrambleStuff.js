@@ -992,7 +992,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		while(scramblePre.clientHeight >= scramblePre.scrollHeight) {
 			scramblePre.setStyle('font-size', ++f);
 			if(f > height) {
-				console.log(scramblePre.clientHeight + " " + scramblePre.scrollHeight + " " + height);
 				break;
 			}
 		}
@@ -1047,21 +1046,11 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	
 	function ensureVisible(el) {
 		var pos = el.getPosition();
+		pos.x--; pos.y--; //assuming the border is 1px
 		var size = el.getSize();
 		var avail = window.getSize();
-		if(pos.x < 0) {
-			pos.x = 1; //1 for the border
-		}
-		if(pos.x + size.x > avail.x) {
-			pos.x = avail.x-size.x-1; //1 for border
-		}
-		if(pos.y < 0) {
-			pos.y = 1; //1 for the border
-		}
-		if(pos.y + size.y > avail.y) {
-			pos.y = avail.y-size.y-1; //1 for border
-		}
-		pos.x--; pos.y--; //assuming the border is 1px
+		pos.x = Math.max(0, Math.min(pos.x, avail.x-size.x-2));
+		pos.y = Math.max(0, Math.min(pos.y, avail.y-size.y-1));
 		el.getParent().setPosition(pos); //must position the parent, not the titlebar
 	}
 	function positionWindows() {
