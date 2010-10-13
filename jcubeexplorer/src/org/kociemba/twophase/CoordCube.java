@@ -3,6 +3,7 @@ package org.kociemba.twophase;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.text.DecimalFormat;
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Representation of the cube on the coordinate level
@@ -409,6 +410,7 @@ public class CoordCube {
 	}
 	
 	private static boolean inited = false;
+	private static final DecimalFormat df = new DecimalFormat("#.###");
 	public static void init() {
 		if(inited)
 			return;
@@ -422,7 +424,7 @@ public class CoordCube {
 		}
 		
 		inited = true;
-		println("Done initing tables (took " + (System.nanoTime()-s)/1e9 + " seconds)");
+		println("Done initing tables (took " + df.format((System.nanoTime()-s)/1e9) + " seconds)");
 	}
 
 	private static boolean loadTransitionTables(InputStream in) {
@@ -447,7 +449,7 @@ public class CoordCube {
 				}
 			}
 
-			println("Done loading transition tables (took " + (System.nanoTime()-start)/1e9 + " seconds)");
+			println("Done loading transition tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -470,7 +472,7 @@ public class CoordCube {
 			}
 			in.close();
 
-			println("Done loading pruning tables (took " + (System.nanoTime()-start)/1e9 + " seconds)");
+			println("Done loading pruning tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -508,7 +510,7 @@ public class CoordCube {
 			FileOutputStream out = new FileOutputStream(file);
 			out.write(buff);
 			out.close();
-			println("Done dumping transition tables (took " + (System.nanoTime()-start)/1e9 + " seconds)");
+			println("Done dumping transition tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
