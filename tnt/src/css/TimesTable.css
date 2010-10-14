@@ -39,13 +39,13 @@
 	border-width: 1px 1px 0px 0px;
 }
 
-#timesTable tbody tr:hover {
+#timesTable tbody tr.hovered {
 	background-color: rgb(160, 160, 255);
 }
 #timesTable tbody tr.selected {
 	background-color: rgb(255, 160, 255);
 }
-#timesTable tbody tr:hover.selected {
+#timesTable tbody tr.hovered.selected {
 	background-color: rgb(207, 160, 255);
 }
 

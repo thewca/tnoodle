@@ -80,7 +80,7 @@ var KeyboardTimer = new Class({
 				timer.timerStop = new Date().getTime();
 
 				timer.pendingTime = true;
-				timer.stopRender();
+				timer.stopRender(); // this will cause a redraw()
 				var time = timer.getTimeCentis();
 				var scramble = timer.scramble;
 				var addTime = function() {

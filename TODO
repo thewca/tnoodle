@@ -44,6 +44,7 @@ FEATURES
 +"3x3 session started..." should become a dropdown box, remove old box
 +esc to get rid of import scrambles window
 
+-add space between table and scrambles (leyan)
 -improve behavior of update freq option, alignment?
 -clickable stuff in timestable to get jnet/cct style stats?
 -big scramble view is blurry
