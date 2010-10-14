@@ -92,11 +92,12 @@ public class ScrambleServer {
 	private static final int MAX_COUNT = 100;
 	
 	public ScrambleServer(int port, File scrambleFolder, boolean browse) throws IOException {
+		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+		
 		SortedMap<String, Scrambler> scramblers = Scrambler.getScrambleGenerators(scrambleFolder);
 		if(scramblers == null) {
 			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
 		}
-		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 		server.createContext("/", new FileHandler());
 		server.createContext("/import/", new ImporterHandler());
 		server.createContext("/scramble/", new ScramblerHandler(scramblers));
@@ -106,13 +107,15 @@ public class ScrambleServer {
 		
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
 		System.out.println("Server started on " + addr);
-		System.out.println("Visit http://" + addr + " for a readme and demo.");
+		String url = "http://" + addr;
 		if(browse) {
 			if(Desktop.isDesktopSupported()) {
 				Desktop d = Desktop.getDesktop();
 				if(d.isSupported(Desktop.Action.BROWSE)) {
 					try {
-						d.browse(new URI("http://" + addr));
+						URI uri = new URI(url);
+						System.out.println("Opening " + uri + " in browser. Pass -n to disable this!");
+						d.browse(uri);
 						return;
 					} catch(URISyntaxException e) {
 						e.printStackTrace();
@@ -121,6 +124,8 @@ public class ScrambleServer {
 			}
 			System.out.println("Sorry, it appears the Desktop api is not supported on your platform");
 		}
+		
+		System.out.println("Visit " + url + " for a readme and demo.");
 	}
 	
 	private class FileHandler extends SafeHttpHandler {
@@ -565,7 +570,7 @@ public class ScrambleServer {
 			defaultScrambleFolder = defaultScrambleFolder.getParentFile();
 		return defaultScrambleFolder;
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		OptionParser parser = new OptionParser();
 		OptionSpec<Integer> port = parser.accepts("port", "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
@@ -710,7 +715,7 @@ abstract class SafeHttpHandler implements HttpHandler {
 	protected static void send302(HttpExchange t, URI destination) {
 		try {
 			String dest = destination == null ? dest = "" : destination.toString();
-			byte[] bytes = ("Sorry, try going here instead " + destination).getBytes();
+			byte[] bytes = ("Sorry, try going here instead " + dest).getBytes();
 			t.getResponseHeaders().set("Content-Type", "text/plain");
 			t.getResponseHeaders().set("Location", destination.toString());
 			t.sendResponseHeaders(302, bytes.length);
