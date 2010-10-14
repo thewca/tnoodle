@@ -524,7 +524,7 @@ public class CoordCube {
 			for(byte[] table : pruning_tables)
 				out.write(table);
 			out.close();
-			println("Done dumping pruning tables (took " + (System.nanoTime()-start)/1e9 + " seconds)");
+			println("Done dumping pruning tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
