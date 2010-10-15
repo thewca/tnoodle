@@ -405,13 +405,17 @@ var TimesTable = new Class({
 				}
 			}
 			var el = timeHoverDiv.tr.getChildren()[1];
-			timeHoverDiv.position({relativeTo: el, position: 'bottomLeft', edge: 'topRight'});
-			//make sure this doesn't fall off the end of the world
-			if(timeHoverDiv.getPosition().y + timeHoverDiv.getSize().y > window.getSize().y) {
-				timeHoverDiv.position({relativeTo: el, position: 'topLeft', edge: 'bottomRight'});
+			if(isOrIsChild(el, this.tbody)) {
+				timeHoverDiv.position({relativeTo: el, position: 'bottomLeft', edge: 'topRight'});
+				//make sure this doesn't fall off the end of the world
+				if(timeHoverDiv.getPosition().y + timeHoverDiv.getSize().y > window.getSize().y) {
+					timeHoverDiv.position({relativeTo: el, position: 'topLeft', edge: 'bottomRight'});
+				}
+				timeHoverDiv.fade('in');
+			} else {
+				timeHoverDiv.fade('hide');
 			}
-			timeHoverDiv.fade('in');
-		};
+		}.bind(this);
 		timeHoverDiv.hide = function() {
 			//TODO - comment! SEE A
 			if(!timeHoverDiv.tr || !timeHoverDiv.tr.editing) {
@@ -419,6 +423,14 @@ var TimesTable = new Class({
 			}
 		};
 		this.timeHoverDiv = timeHoverDiv;
+	},
+	undo: function() {
+		this.session.undo();
+		this.setSession(this.session);
+	},
+	redo: function() {
+		this.session.redo();
+		this.setSession(this.session);
 	},
 	freshSession: false,
 	setSession: function(session) {
@@ -593,16 +605,7 @@ var TimesTable = new Class({
 			this.refreshData();
 			this.resizeCols(); //changing the time may change the size of a column
 
-			// We *immediately* hide the tagging div, because it
-			// no longer applies to a valid time. If we let it fade, the user
-			// would be able to keep it alive by putting their mouse over it.
-			// There seem to be some ocassional issues with immediately calling
-			// fade('hide'), so I'm wrapping it in a call to setTimeout().
-			setTimeout(function() {
-				this.timeHoverDiv.fade('hide');
-			}.bind(this), 0);
-
-//			this.scrollToRow(editedRow);
+			// timeHoverDiv will get hidden by its next refresh
 		}.bind(this);
 		tr.refresh = function() {
 			tr.editing = tr.editing && tr.selected;

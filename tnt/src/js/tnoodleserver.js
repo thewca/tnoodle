@@ -507,7 +507,13 @@ tnoodle.server = function(url) {
 		}
 		this.addTime = function(timeCentis, scramble) {
 			var time = new Time(timeCentis, scramble);
-			privateAdd(time);
+			var action = {
+				redo: privateAdd.bind(this, time),
+				undo: this.disposeTime.bind(this, time)
+			};
+			this.pushHistory(action);
+			action.redo();
+			//privateAdd(time);
 			saveSessions();
 			return time;
 		};
@@ -530,6 +536,30 @@ tnoodle.server = function(url) {
 			if(index >= 0) {
 				this.disposeTimeAt(index);
 			}
+		};
+		this.containsTime = function(time) {
+			return this.times.indexOf(time) >= 0;
+		}
+
+		var history = [];
+		var histIndex = -1; //this points to the last action taken
+		this.undo = function() {
+			if(histIndex >= 0 && histIndex < history.length) {
+				history[histIndex].undo();
+				histIndex--;
+			}
+		};
+		this.redo = function() {
+			if(histIndex+1 >= 0 && histIndex+1 < history.length) {
+				histIndex++;
+				history[histIndex].redo();
+			}
+		};
+		this.pushHistory = function(undo_redo_callback) {
+			histIndex++;
+			history[histIndex] = undo_redo_callback;
+			// we remove everything after what we just added
+			history.splice(histIndex+1, history.length-1);
 		};
 	}
 	

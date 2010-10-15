@@ -229,4 +229,14 @@ window.addEvent('domready', function() {
 		'description': 'Reset session',
 		'handler': resetSession
 	});
+	keyboard.addShortcut('undo', {
+		'keys': 'ctrl+z',
+		'description': 'Undo',
+		'handler': timesTable.undo.bind(timesTable)
+	});
+	keyboard.addShortcut('redo', {
+		'keys': 'ctrl+y',
+		'description': 'Redo',
+		'handler': timesTable.redo.bind(timesTable)
+	});
 });
