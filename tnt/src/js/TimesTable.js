@@ -135,12 +135,13 @@ var TimesTable = new Class({
 		for(i = 0; i < this.cols.length; i++) {
 			var col = this.cols[i];
 			var desc = this.headers[i];
-			columnOptions.div.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'table.' + col, desc, defaultCols.contains(col), refreshCols));
+			var opt = tnoodle.tnt.createOptionBox(server.configuration, 'table.' + col, desc, defaultCols.contains(col), refreshCols);
+			//TODO - disable disabling the times column!
+			columnOptions.div.adopt(opt);
 		}
 		initing = false;
 		
 		var selectedRows = [];
-		//TODO - bug where rows are still in array even though they're not selected!
 		var mostRecentRow = null;
 		var addRow = this.addRow;
 		function selectRow(row) {
@@ -382,8 +383,6 @@ var TimesTable = new Class({
 		});
 		var errorField = new Element('div', { 'class': 'errorField' });
 		timeHoverDiv.errorField = errorField;
-		//TODO - the penalties field is getting sized poorly when we stop editing, ugly as hell
-		//TODO - the error field jumps around at first, hopefully fixing above fixes this?
 		timeHoverDiv.show = function(tr, time) {
 			if(tr) {
 				//TODO - comment AAAA
@@ -405,8 +404,12 @@ var TimesTable = new Class({
 					optionsDiv.refresh();
 				}
 			}
-			//TODO - make sure this doesn't fall off the bottom (or side) of the world!
-			timeHoverDiv.position({relativeTo: timeHoverDiv.tr, position: 'bottom', edge: 'top'});
+			var el = timeHoverDiv.tr.getChildren()[1];
+			timeHoverDiv.position({relativeTo: el, position: 'bottomLeft', edge: 'topRight'});
+			//make sure this doesn't fall off the end of the world
+			if(timeHoverDiv.getPosition().y + timeHoverDiv.getSize().y > window.getSize().y) {
+				timeHoverDiv.position({relativeTo: el, position: 'topLeft', edge: 'bottomRight'});
+			}
 			timeHoverDiv.fade('in');
 		};
 		timeHoverDiv.hide = function() {
@@ -466,7 +469,6 @@ var TimesTable = new Class({
 		} else {
 			//the element's on screen!
 		}
-		
 	},
 	
 	//private!
@@ -479,15 +481,6 @@ var TimesTable = new Class({
 			this.tbody.scrollTo(0, scrollTop); //restore scroll amount
 		}
 	},
-	//deselectRow: function(e) {
-		//
-		//var row = this.selectedRow;
-		//if(row !== null) {
-			//this.selectedRow = null;
-			//row.deselect();
-		//}
-		//return row;
-	//},
 	refreshData: function() {
 		var refreshCols = function(tr) {
 			var cells = tr.getChildren('td');
@@ -505,7 +498,8 @@ var TimesTable = new Class({
 			}
 		}.bind(this);
 		
-		$(this).toggle(); //prevent flickering?
+		// The calls to toggle() seem to screw up scrolling to the edited time
+		//$(this).toggle(); //prevent flickering?
 		this.tbody.getChildren('tr').each(function(tr) {
 			tr.refresh();
 			refreshCols(tr);
@@ -515,7 +509,7 @@ var TimesTable = new Class({
 		refreshCols(this.addRow); //addRow is not a part of the table at this point
 		this.resort(true);
 		this.infoRow.refresh();
-		$(this).toggle(); //prevent flickering?
+		//$(this).toggle(); //prevent flickering?
 		this.resizeCols();
 	},
 	editCell: function(cell, time) {
