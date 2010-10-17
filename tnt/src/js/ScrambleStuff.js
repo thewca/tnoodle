@@ -400,7 +400,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			}
 			this.className += " buttondown";
 			resetColorScheme.style.display = 'inline';
-			scrambleImg.drawScramble("");
+			scrambleImg.redraw();
 		} else {
 			if(currTurn) { // curr turn will not be defined if we just changed puzzles
 				turnClicked.call(currTurn, false);
@@ -841,7 +841,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var changeColors = document.createElement('span');
 	changeColors.className = 'button changeColors';
 	changeColors.setAttribute('title', 'Change color scheme');
-	// changeColors.appendChild(document.createTextNode('#'));
 	xAddListener(changeColors, 'click', changeColorsClicked, false);
 	scrambleDivHeader.appendChild(changeColors);
 
@@ -865,7 +864,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleDiv.appendChild(scrambleImg);
 
 	scrambleImg.redraw = function() {
-		this.drawScramble(currScramble);
+		this.drawScramble(isChangingColorScheme ? "" : currScramble);
 	};
 	scrambleImg.drawScramble = function(scramble) {
 		// no need to waste bandwidth unless we're
@@ -942,7 +941,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		colorScheme[currFaceName] = newColor;
 		configuration.set('scramble.' + puzzle + '.colorScheme', colorScheme);
 		colorChooserDiv.style.display = 'none';
-		scrambleImg.drawScramble("");
+		scrambleImg.redraw();
 	});
 	colorChooserDiv.appendChild(colorChooser.element);
 	// end colorChooserDiv

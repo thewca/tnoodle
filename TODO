@@ -35,6 +35,7 @@ FEATURES
 +configurable columns
 	+add gui for this!
 + +/- looks like an underlined plus sign. Buttons? Like the AA buttons in rich text editors?
+	+scratch that idea, instead, automatically make the scramble fit
 +load scramble once timer has started to reduce lag
 +"3x3 session started..." should become a dropdown box, remove old box
 +esc to get rid of import scrambles window

@@ -3,6 +3,7 @@
     background-color: #CCC;
     border-bottom: 1px solid #666;
     cursor: move;
+	overflow: hidden;
 }
 .titletext {
     float: left;
