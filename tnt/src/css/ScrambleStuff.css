@@ -48,7 +48,7 @@ area {/* apparently this doesn't work in opera or chrome */
 
 div.scrambleArea {
     border: 1px solid #333;
-    border-right: 0px;
+	margin-right: 5px;
 }
 div.scrambleHeader {
 	padding: 5px 10px;

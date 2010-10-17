@@ -42,13 +42,13 @@ FEATURES
 +esc to get rid of import scrambles window
 +undo redo
 	+maintain scramble list! urghhhh
++add space between table and scrambles (leyan)
 
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
 -get consensus on what the hell a session average is!
 	-add new session average!
     -stdev is the standard deviation of times, not session averages
--add space between table and scrambles (leyan)
 -improve behavior of update freq option, alignment?
 -big scramble view is blurry
 -add remaining stackmat options
