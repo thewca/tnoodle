@@ -362,6 +362,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		scrambleImg.style.height = imgHeight + "px";
 		scrambleDiv.style.width = (imgWidth + getScrambleHorzPadding()) + "px";
 		scrambleDiv.style.height = (imgHeight + getScrambleVertPadding()) + "px";
+		positionWindows();
 	}
 	function saveScrambleSize() {
 		configuration.set('scramble.' + puzzle + '.size.width', scrambleDiv.style.width);
@@ -723,53 +724,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var scrambleHeader = document.createElement('div');
 	scrambleHeader.className = 'scrambleHeader';
 	scrambleArea.appendChild(scrambleHeader);
-	
-	function createResizer(bigger) {
-		var downTime = 0;
-		var resize = function(e) {
-			setTimeout(function() {
-				if(!mouseDown) {
-					downTime = 0;
-					return;
-				}
-				downTime++;
-				var size = parsePx(scramblePre.style.fontSize);
-				var delta = Math.max(downTime/2, 1);
-				size += bigger ? delta : -delta;
-				decrease.style.visibility = 'visible';
-				increase.style.visibility = 'visible';
-				if(size <= 5) {
-					decrease.style.visibility = 'hidden';
-				} else if(size > 100) {
-					increase.style.visibility = 'hidden';
-				} else {
-					size += 'px';
-					scramblePre.style.fontSize = size;
-					configuration.set('scramble.fontSize', size);
-					setTimeout(resize, 100);
-				}
-			}, 0); // wait for mouseDown to get set
-		};
-		return resize;
-	}
-
-	var increase = document.createElement('span');
-	increase.className = 'increaseSize';
-	increase.appendChild(document.createTextNode('A'));
-	xAddListener(increase, 'mousedown', createResizer(true), false);
-	
-	var decrease = document.createElement('span');
-	decrease.className = 'decreaseSize';
-	//decrease.appendChild(document.createTextNode('\u2013')); // en dash
-	decrease.appendChild(document.createTextNode('A'));
-	xAddListener(decrease, 'mousedown', createResizer(false), false);
-
-//	var scrambleSize = document.createElement('span');
-//	scrambleSize.setAttribute('class', 'changeSize');
-//	scrambleSize.appendChild(decrease);
-//	scrambleSize.appendChild(document.createTextNode(' '));
-//	scrambleSize.appendChild(increase);
-//	scrambleHeader.appendChild(scrambleSize);
 
 	var importLink = document.createElement('span');
 	importLink.className = 'link';
@@ -867,10 +821,23 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var closeScramble = document.createElement('span');
 	closeScramble.appendChild(document.createTextNode('X'));
 	closeScramble.className = 'button close';
+	closeScramble.title = 'Close';
 	xAddListener(closeScramble, 'click', function() {
 		scrambleDiv.setVisible(false, true);
 	}, false);
 	scrambleDivHeader.appendChild(closeScramble);
+
+	var minimizeScramble = document.createElement('span');
+	minimizeScramble.appendChild(document.createTextNode('.'));
+	minimizeScramble.className = 'button close';
+	minimizeScramble.title = 'Reset size';
+	xAddListener(minimizeScramble, 'click', function() {
+		scrambleDiv.style.width = defaultSize.width + getScrambleHorzPadding() + "px";
+		scrambleDiv.style.height = defaultSize.height	+ getScrambleVertPadding() + "px";
+		scrambleResized();
+		saveScrambleSize();
+	}, false);
+	scrambleDivHeader.appendChild(minimizeScramble);
 
 	var changeColors = document.createElement('span');
 	changeColors.className = 'button changeColors';
@@ -1089,8 +1056,11 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		pos.x--; pos.y--; //assuming the border is 1px
 		var size = el.getSize();
 		var avail = window.getSize();
-		pos.x = Math.max(0, Math.min(pos.x, avail.x-size.x-2));
-		pos.y = Math.max(0, Math.min(pos.y, avail.y-size.y-1));
+		// NOTE: the order of the min, max is important here!
+		// We can never let windows be clipped on the right hand size, else we lose
+		// ability to resize them!
+		pos.x = Math.min(Math.max(0, pos.x), avail.x-size.x-2);
+		pos.y = Math.min(Math.max(0, pos.y), avail.y-size.y-1);
 		el.getParent().setPosition(pos); //must position the parent, not the titlebar
 	}
 	function positionWindows() {

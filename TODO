@@ -49,6 +49,7 @@ FEATURES
 	+add new session average!
 	+stdev is the standard deviation of times, not session averages
 +big scramble view is blurry (pedro)
++fixed bug where resizing scramble image could make it permanently too big
 
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
