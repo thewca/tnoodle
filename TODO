@@ -20,11 +20,8 @@ BUGS
 -TimesTable
     +addtime grows the add time row
     -weird stuff happens with extremely large times
-    -hovering to penalize/tag times...
+    +hovering to penalize/tag times...
     -save location of timestable scrollbar/selected session?
--get consensus on what the hell a session average is!
-    -stdev is the standard deviation of times, not session averages
--hovering/clicking on bests idea...?
 
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cannot call split of undefined when getting scramble & server is down
@@ -43,14 +40,19 @@ FEATURES
     -TODO - test with stackmat!!!
 +"3x3 session started..." should become a dropdown box, remove old box
 +esc to get rid of import scrambles window
++undo redo
+	+maintain scramble list! urghhhh
 
--add new session average!
+-clickable stuff in timestable to get jnet/cct style stats?
+	-hovering/clicking on bests idea...?
+-get consensus on what the hell a session average is!
+	-add new session average!
+    -stdev is the standard deviation of times, not session averages
 -add space between table and scrambles (leyan)
 -improve behavior of update freq option, alignment?
--clickable stuff in timestable to get jnet/cct style stats?
 -big scramble view is blurry
 -add remaining stackmat options
--undo redo
+-auto scroll should show the add time row!
 -shorcuts?
 -read times/metronome
 -background image/opacity

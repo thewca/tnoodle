@@ -357,7 +357,13 @@ tnoodle.server = function(url) {
 			return this.times.length;
 		};
 		this.reset = function() {
-			this.times.length = 0;
+			var timesCopy = this.times.slice();
+			var action = {
+				undo: function() { this.times = timesCopy.slice(); }.bind(this),
+				redo: function() { this.times.length = 0; }.bind(this)
+			};
+			this.pushHistory(action);
+			action.redo();
 			saveSessions();
 		};
 		//TODO - cache!
@@ -505,15 +511,25 @@ tnoodle.server = function(url) {
 			time.ra100 = computeRA(time.index, 100, true);
 			//time.sessionAve = computeAverage(time.index);
 		}
-		this.addTime = function(timeCentis, scramble) {
+		this.addTime = function(timeCentis, scramble, doScramble, unscramble, importInfo) {
 			var time = new Time(timeCentis, scramble);
+			if(importInfo) {
+				time.importInfo = importInfo;
+			}
 			var action = {
-				redo: privateAdd.bind(this, time),
-				undo: this.disposeTime.bind(this, time)
+				undo: function() {
+					this.disposeTime(time, true);
+					unscramble(time);
+				}.bind(this),
+				redo: function(nothistory) {
+					privateAdd(time);
+					if(!nothistory) {
+						doScramble();
+					}
+				}
 			};
 			this.pushHistory(action);
-			action.redo();
-			//privateAdd(time);
+			action.redo(true);
 			saveSessions();
 			return time;
 		};
@@ -526,20 +542,60 @@ tnoodle.server = function(url) {
 			saveSessions();
 		};
 		//returns the deleted time
-		this.disposeTimeAt = function(index) {
-			var time = this.times.splice(index, 1);
-			this.reindex();
+		this.disposeTimeAt = function(index, nohistory) {
+			var time = this.times[index];
+			var action = {
+				undo: function() {
+					this.times.splice(index, 0, time);
+					this.reindex();
+				}.bind(this),
+				redo: function() {
+					this.times.splice(index, 1);
+					this.reindex();
+				}.bind(this)
+			};
+			if(!nohistory) {
+				this.pushHistory(action);
+			}
+			action.redo();
 			return time;
 		};
-		this.disposeTime = function(time) {
+		this.disposeTime = function(time, nohistory) {
 			var index = this.times.indexOf(time);
 			if(index >= 0) {
-				this.disposeTimeAt(index);
+				this.disposeTimeAt(index, nohistory);
+				return time;
 			}
+			return null;
+		};
+		this.disposeTimes = function(times) {
+			var sanitizedTimes = [];
+			for(var i = 0; i < times.length; i++) {
+				var time = times[i];
+				if(this.containsTime(time)) {
+					sanitizedTimes.push(time);
+				}
+			}
+			var action = {
+				undo: function() {
+					for(var i = 0; i < sanitizedTimes.length; i++) {
+						var time = sanitizedTimes[i];
+						this.times.splice(time.index, 0, time);
+					}
+					this.reindex();
+				}.bind(this),
+				redo: function() {
+					for(var i = 0; i < sanitizedTimes.length; i++) {
+						this.disposeTime(sanitizedTimes[i], true);
+					}
+				}.bind(this)
+			};
+			this.pushHistory(action);
+			action.redo();
 		};
 		this.containsTime = function(time) {
 			return this.times.indexOf(time) >= 0;
-		}
+		};
 
 		var history = [];
 		var histIndex = -1; //this points to the last action taken

@@ -83,8 +83,9 @@ var KeyboardTimer = new Class({
 				timer.stopRender(); // this will cause a redraw()
 				var time = timer.getTimeCentis();
 				var scramble = timer.scramble;
+				var importInfo = timer.importInfo;
 				var addTime = function() {
-					timer.fireEvent('newTime', [ time, scramble ]);
+					timer.fireEvent('newTime', [ time, scramble, importInfo ]);
 				};
 				//the timer lags if we don't queue up the addition of the time like this
 				setTimeout(addTime, 0);
@@ -113,6 +114,7 @@ var KeyboardTimer = new Class({
 						timer.timerStart = new Date().getTime();
 						timer.timing = true;
 						timer.scramble = scrambleStuff.getScramble();
+						timer.importInfo = scrambleStuff.getImportInfo();
 						scrambleStuff.scramble();
 					}
 					timer.startRender();
@@ -151,6 +153,7 @@ var KeyboardTimer = new Class({
 					//this mean that the timer just started running,
 					//so we want to update the scramble
 					timer.scramble = scrambleStuff.getScramble();
+					timer.importInfo = scrambleStuff.getImportInfo();
 					timer.scrambleStuff.scramble(); //TODO - test this out using a stackmat!
 				}
 				timer.timing = state.running;
@@ -165,7 +168,7 @@ var KeyboardTimer = new Class({
 				} else if(state.centis > 0 && !acceptedTime) {
 					// new time!
 					acceptedTime = true; //this is to prevent redetecting the same time over and over
-					timer.fireEvent('newTime', timer.getTimeCentis(), timer.scramble);
+					timer.fireEvent('newTime', [ timer.getTimeCentis(), timer.scramble, timer.importInfo ]);
 				}
 			}
 		}

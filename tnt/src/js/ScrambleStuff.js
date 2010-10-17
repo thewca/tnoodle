@@ -189,6 +189,20 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		// scramble() will update scrambleChooser.value
 		scramble();
 	}, false);
+	function unscramble(time) {
+		if(time.hasOwnProperty("importInfo") && time.importInfo.importedScrambles) {
+			var info = time.importInfo;
+			scrambleIndex = info.scrambleIndex;
+			scrambleSrc = info.scrambleSrc;
+			importedScrambles = info.importedScrambles;
+			scramble();
+		} else {
+			scrambleIndex = 0;
+			scrambleSrc = null;
+			importedScrambles = null;
+			scrambleLoaded(time.scramble);
+		}
+	}
 	var scrambling = false;
 	function scramble() {
 		if(puzzle === null) {
@@ -971,6 +985,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 
 	// public methods
 	this.scramble = scramble;
+	this.unscramble = unscramble;
 	this.getSelectedPuzzle = function() {
 		return puzzle;
 	};
@@ -980,6 +995,13 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	};
 	this.getScramble = function() {
 		return currScramble;
+	};
+	this.getImportInfo = function() {
+		return {
+			importedScrambles: importedScrambles,
+			scrambleIndex: scrambleIndex-1,
+			scrambleSrc: scrambleSrc
+		};
 	};
 	
 	function adjustFontSize() {

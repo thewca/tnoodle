@@ -109,8 +109,8 @@ window.addEvent('domready', function() {
 	
 	var session = null;
 	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
-	timer.addEvent('newTime', function(timeCentis, scramble) {
-		timesTable.addTime(timeCentis, scramble);
+	timer.addEvent('newTime', function(timeCentis, scramble, importInfo) {
+		timesTable.addTime(timeCentis, scramble, importInfo);
 	});
 	function sessionClicked(e) {
 		lastSessionTab = this;

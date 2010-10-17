@@ -134,9 +134,11 @@ var TimesTable = new Class({
 		}.bind(this);
 		for(i = 0; i < this.cols.length; i++) {
 			var col = this.cols[i];
+			if(col == 'centis') {
+				continue;
+			}
 			var desc = this.headers[i];
 			var opt = tnoodle.tnt.createOptionBox(server.configuration, 'table.' + col, desc, defaultCols.contains(col), refreshCols);
-			//TODO - disable disabling the times column!
 			columnOptions.div.adopt(opt);
 		}
 		initing = false;
@@ -278,9 +280,19 @@ var TimesTable = new Class({
 				} else {
 					times = times.substring(1);
 					if(confirm('Are you sure you want to delete these times?\n' + times)) {
+						var times = [];
 						selectedRows.each(function(row) {
-							row.deleteTime();
-						});
+							times.push(row.time);
+							row.dispose();
+						}.bind(this));
+//jfly
+						this.session.disposeTimes(times);
+						//changing the time could very well affect more than this row
+						//maybe someday we could be more efficient about the changes
+						this.refreshData();
+						this.resizeCols(); //changing the time may change the size of a column
+						// timeHoverDiv.show will hide itself
+						this.timeHoverDiv.show();
 					}
 				}
 			}
@@ -448,12 +460,12 @@ var TimesTable = new Class({
 		this.session.reset();
 		this.setSession(this.session);
 	},
-	addTime: function(centis, oldScramble) {
+	addTime: function(centis, oldScramble, importInfo) {
 		if(!oldScramble) {
 			oldScramble = this.scrambleStuff.getScramble();
 			this.scrambleStuff.scramble();
 		}
-		var time = this.session.addTime(centis, oldScramble);
+		var time = this.session.addTime(centis, oldScramble, this.scrambleStuff.scramble, this.scrambleStuff.unscramble, importInfo);
 		this.createRow(time);
 		this.refreshData();
 		this.scrollToLastTime();
@@ -595,17 +607,6 @@ var TimesTable = new Class({
 		var cols = this.cols;
 		var table = this;
 		tr.deleteTime = function(e) {
-			this.session.disposeTime(time); //remove time
-			
-			//TODO - implement deleting multiple times!
-			tr.dispose();
-			
-			//changing the time could very well affect more than this row
-			//maybe someday we could be more efficient about the changes
-			this.refreshData();
-			this.resizeCols(); //changing the time may change the size of a column
-
-			// timeHoverDiv will get hidden by its next refresh
 		}.bind(this);
 		tr.refresh = function() {
 			tr.editing = tr.editing && tr.selected;
@@ -645,10 +646,21 @@ var TimesTable = new Class({
 				}
 				if(key == 'index') {
 					cells[col].removeEvent('click');
-					if(tr.selected || tr.hovered) {
+					if(tr.hovered) {
 						cells[col].set('html', 'X');
 						cells[col].addClass('deleteTime'); //TODO - pretty picture
-						cells[col].addEvent('click', tr.deleteTime);
+						cells[col].addEvent('click', function() {
+							this.session.disposeTime(time); //remove time
+							
+							tr.dispose();
+							
+							//changing the time could very well affect more than this row
+							//maybe someday we could be more efficient about the changes
+							this.refreshData();
+							this.resizeCols(); //changing the time may change the size of a column
+							// timeHoverDiv will get hidden by its next refresh
+							this.timeHoverDiv.show();
+						}.bind(this));
 					} else {
 						cells[col].set('html', time.index + 1);
 						cells[col].removeClass('deleteTime');
