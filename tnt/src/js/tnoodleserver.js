@@ -328,6 +328,9 @@ as desired.";
 	
 	function Session(id, puzzle, customization) {
 		this.id = id;
+		this.getDate = function() {
+			return new Date(1000*parseInt(this.id, 36));
+		};
 		this.puzzle = puzzle;
 		this.customization = customization || '';
 		//times is an array of Time's

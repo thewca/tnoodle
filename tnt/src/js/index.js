@@ -87,10 +87,7 @@ window.addEvent('domready', function() {
 			timesTable.reset();
 		}
 	}
-	function refreshSessionInfo() {
-		if(!session) { return; }//gotta wait for stuff to load
-		$('sessionInfo').empty();
-		var date = new Date(1000*parseInt(session.id, 36));
+	function ago(date) {
 		var today = new Date();
 		var i, ago;
 		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
@@ -104,7 +101,12 @@ window.addEvent('domready', function() {
 		ago = (i < resolutions.length) ? 
 				ago + " " + resolutions[i] + "(s)" :
 				"seconds";
-		$('sessionInfo').appendText("Started " + ago + " ago");
+		return ago;
+	}
+	function refreshSessionInfo() {
+		if(!session) { return; }//gotta wait for stuff to load
+		$('sessionInfo').empty();
+		$('sessionInfo').appendText("Started " + ago(session.getDate()) + " ago");
 	}
 	
 	var session = null;
@@ -121,8 +123,10 @@ window.addEvent('domready', function() {
 		session = newSession;
 		$$('#sessions .active').each(function(el) {
 			el.removeClass('active');
+			el.getChildren()[0].empty();
 		});
 		this.addClass('active');
+		this.getChildren()[0].adopt(document.createTextNode(session.id));
 
 		refreshSessionInfo();
 		timesTable.setSession(session);
@@ -155,7 +159,11 @@ window.addEvent('domready', function() {
 	}
 	function createSessionTab(session) {
 		//TODO - puzzle icon
-		var tab = new Element('li', { 'html': session.toString() });
+		var tab = new Element('li');
+		tab.adopt(new Element('span'));
+		tab.addEvent('mouseover', function() {
+			tab.title = session.toString() + " session started " + ago(session.getDate()) + " ago";
+		});
 		tab.addEvent('click', sessionClicked);
 		tab.session = session;
 

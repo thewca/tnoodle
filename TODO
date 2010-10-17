@@ -51,8 +51,6 @@ FEATURES
 	+add new session average!
 	+stdev is the standard deviation of times, not session averages
 
--changing scramble doesn't update session tab
-
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
 -improve behavior of update freq option, alignment?
