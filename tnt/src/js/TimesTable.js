@@ -280,19 +280,7 @@ var TimesTable = new Class({
 				} else {
 					times = times.substring(1);
 					if(confirm('Are you sure you want to delete these times?\n' + times)) {
-						var times = [];
-						selectedRows.each(function(row) {
-							times.push(row.time);
-							row.dispose();
-						}.bind(this));
-//jfly
-						this.session.disposeTimes(times);
-						//changing the time could very well affect more than this row
-						//maybe someday we could be more efficient about the changes
-						this.refreshData();
-						this.resizeCols(); //changing the time may change the size of a column
-						// timeHoverDiv.show will hide itself
-						this.timeHoverDiv.show();
+						this.deleteRows(selectedRows);
 					}
 				}
 			}
@@ -435,6 +423,20 @@ var TimesTable = new Class({
 		};
 		this.timeHoverDiv = timeHoverDiv;
 	},
+	deleteRows: function(rows) {
+		var times = [];
+		rows.each(function(row) {
+			times.push(row.time);
+			row.dispose();
+		}.bind(this));
+		this.session.disposeTimes(times);
+		//changing the time could very well affect more than this row
+		//maybe someday we could be more efficient about the changes
+		this.refreshData();
+		this.resizeCols(); //changing the time may change the size of a column
+		// timeHoverDiv.show will hide itself
+		this.timeHoverDiv.show();
+	},
 	undo: function() {
 		this.session.undo();
 		this.setSession(this.session);
@@ -459,19 +461,21 @@ var TimesTable = new Class({
 		this.session.reset();
 		this.setSession(this.session);
 	},
-	addTime: function(centis, oldScramble, importInfo) {
-		if(!oldScramble) {
-			oldScramble = this.scrambleStuff.getScramble();
-			this.scrambleStuff.scramble();
-		}
-		var time = this.session.addTime(centis, oldScramble, this.scrambleStuff.scramble, this.scrambleStuff.unscramble, importInfo);
+	addTime: function(time) {
+		this.session.addTime(time, this.scrambleStuff.scramble, this.scrambleStuff.unscramble);
 		this.createRow(time);
 		this.refreshData();
 		this.scrollToLastTime();
 	},
 	scrollToLastTime: function() {
 		if(this.lastAddedRow) {
-			this.scrollToRow(this.lastAddedRow);
+			var row = this.lastAddedRow;
+			if(row.nextSibling == this.addRow) {
+				// this little hack will ensure that the addrow is visible
+				// whenever we're near the bottom
+				row = this.addRow;
+			}
+			this.scrollToRow(row);
 		}
 	},
 	scrollToRow: function(tr) {
@@ -556,19 +560,19 @@ var TimesTable = new Class({
 		textField.addEvent('keydown', function(e) {
 			if(e.key == 'enter') {
 				try {
-				//TODO SHOW STATE
 					this.deselectRows();
 					if(time) {
 						time.parse(textField.value);
-//							penalties[String(time.getPenalty())].checked = true;
 						this.session.reindex();
 						this.refreshData();
 					} else {
-						this.addTime(textField.value);
+						var newTime = new this.server.Time(textField.value, this.scrambleStuff.getScramble());
+						this.addTime(newTime);
+						this.scrambleStuff.scramble();
 					}
 				} catch(error) {
 					// No need for an alert
-					//alert("Error entering time " + textField.value + "\n" + error);
+					alert("Error entering time " + textField.value + "\n" + error);
 				}
 			}
 		}.bind(this));
@@ -605,8 +609,6 @@ var TimesTable = new Class({
 		var session = this.session;
 		var cols = this.cols;
 		var table = this;
-		tr.deleteTime = function(e) {
-		}.bind(this);
 		tr.refresh = function() {
 			tr.editing = tr.editing && tr.selected;
 			if(tr.selected) {
@@ -648,18 +650,7 @@ var TimesTable = new Class({
 					if(tr.hovered) {
 						cells[col].set('html', 'X');
 						cells[col].addClass('deleteTime'); //TODO - pretty picture
-						cells[col].addEvent('click', function() {
-							this.session.disposeTime(time); //remove time
-							
-							tr.dispose();
-							
-							//changing the time could very well affect more than this row
-							//maybe someday we could be more efficient about the changes
-							this.refreshData();
-							this.resizeCols(); //changing the time may change the size of a column
-							// timeHoverDiv will get hidden by its next refresh
-							this.timeHoverDiv.show();
-						}.bind(this));
+						cells[col].addEvent('click', this.deleteRows.bind(this, [tr]));
 					} else {
 						cells[col].set('html', time.index + 1);
 						cells[col].removeClass('deleteTime');
@@ -734,6 +725,7 @@ var TimesTable = new Class({
 			table.timeHoverDiv.hide();
 		};
 		tr.select = function() {
+			this.hover(); //the addRow can be selected without previously being hovered
 			this.selected = true;
 			this.refresh();
 		};
@@ -741,6 +733,7 @@ var TimesTable = new Class({
 			//TODO - remove yourself from the select array!
 			this.selected = false;
 			this.editing = false;
+			this.unhover();
 			this.refresh();
 		};
 		tr.addEvent('mouseover', tr.hover);

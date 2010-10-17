@@ -3,6 +3,7 @@ var KeyboardTimer = new Class({
 	decimalPlaces: 2,
 	frequency: 0.01,
 	CHAR_AR: 1/2, 
+	INSPECTION: 5,
 	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
@@ -81,14 +82,7 @@ var KeyboardTimer = new Class({
 
 				timer.pendingTime = true;
 				timer.stopRender(); // this will cause a redraw()
-				var time = timer.getTimeCentis();
-				var scramble = timer.scramble;
-				var importInfo = timer.importInfo;
-				var addTime = function() {
-					timer.fireEvent('newTime', [ time, scramble, importInfo ]);
-				};
-				//the timer lags if we don't queue up the addition of the time like this
-				setTimeout(addTime, 0);
+				timer.fireNewTime();
 			} else {
 				timer.redraw();
 			}
@@ -168,7 +162,7 @@ var KeyboardTimer = new Class({
 				} else if(state.centis > 0 && !acceptedTime) {
 					// new time!
 					acceptedTime = true; //this is to prevent redetecting the same time over and over
-					timer.fireEvent('newTime', [ timer.getTimeCentis(), timer.scramble, timer.importInfo ]);
+					timer.fireNewTime();
 				}
 			}
 		}
@@ -183,6 +177,19 @@ var KeyboardTimer = new Class({
 		}
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
 		//TODO - add remaining stackmat config options!!!
+	},
+	fireNewTime: function() {
+		var time = new this.server.Time(this.getTimeCentis(), this.scramble);
+		var penalty = this.getPenalty();
+		if(penalty) {
+			time.setPenalty(penalty);
+		}
+		time.importInfo = this.importInfo;
+		var addTime = function() {
+			this.fireEvent('newTime', [ time ]);
+		}.bind(this);
+		//the timer lags if we don't queue up the addition of the time like this
+		setTimeout(addTime, 0);
 	},
 	hasDelayPassed: function() {
 		return new Date().getTime() - this.timerStop > this.delay;
@@ -201,14 +208,32 @@ var KeyboardTimer = new Class({
 		}
 	},
 	getInspectionElapsedSeconds: function() {
-		var time = new Date().getTime();
+		var time;
+		if(this.inspecting)
+			time = new Date().getTime();
+		else
+			time = this.timerStart;
 		return ((time - this.inspectionStart)/1000).toInt();
+	},
+	getPenalty: function() {
+		if(!this.config.get('timer.wcaInspection')) {
+			return null;
+		}
+		var secondsLeft = this.INSPECTION-this.getInspectionElapsedSeconds();
+		if(secondsLeft <= -2) {
+			return "DNF";
+		} else if(secondsLeft <= 0) {
+			return "+2";
+		}
+		return null;
 	},
 	//mootools doesn't like having a toString method? wtf?!
 	stringy: function() {
-		//TODO - wca style penalties
 		if(this.inspecting) {
-			return (15-this.getInspectionElapsedSeconds()).toString();
+			var penalty = this.getPenalty();
+			if(penalty)
+				return penalty;
+			return (this.INSPECTION-this.getInspectionElapsedSeconds()).toString();
 		} else {
 			var decimalPlaces = 2;
 			var centis = this.getTimeCentis();
@@ -244,15 +269,16 @@ var KeyboardTimer = new Class({
 		this.stopRender();
 	},
 	redraw: function() {
-		var string;
+		var string = this.stringy();
 		var colorClass = this.inspecting ? 'inspecting' : '';
 		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
 		var keysDown = !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
 		if(keysDown && this.hasDelayPassed()) {
-			string = "0.00"; //TODO - reflect the current update frequency!
+			if(!this.inspecting) {
+				// we still want people to see their inspection time when they're pressing spacebar
+				string = this.server.formatTime(0, this.decimalPlaces);
+			}
 			colorClass = 'keysDown';
-		} else {
-			string = this.stringy();
 		}
 		this.timer.set('html', string);
 		this.timer.erase('class');

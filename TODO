@@ -43,6 +43,12 @@ FEATURES
 +undo redo
 	+maintain scramble list! urghhhh
 +add space between table and scrambles (leyan)
++auto scroll should show the add time row!
++save scramble view state on a per customization basis
++0.00 when keys down now reflects the update frequency
++wca style penalties
+
+-changing scramble doesn't update session tab
 
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
@@ -52,7 +58,9 @@ FEATURES
 -improve behavior of update freq option, alignment?
 -big scramble view is blurry
 -add remaining stackmat options
--auto scroll should show the add time row!
+-pretty gui for editing customizations & tags
+-solve/session comments
+
 -shorcuts?
 -read times/metronome
 -background image/opacity
@@ -60,7 +68,3 @@ FEATURES
 -gmaps style copy scramble
 -pdf page #
 -server side icons
--wca style penalties
--solve/session comments
--pretty gui for editing customizations & tags
--save scramble view state on a per customization basis

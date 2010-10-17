@@ -829,13 +829,13 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleDiv.appendChild(scrambleDivHeader);
 	scrambleDiv.setStyle('z-index', 4);
 	scrambleDiv.id = 'scrambleDiv'; // have to have an id to make it draggable
-	scrambleDiv.visibleIfPossible = configuration.get('scramble.visible', true);
+	scrambleDiv.invisiblePuzzles = configuration.get('scramble.invisiblePuzzles', {});
 	scrambleDiv.setVisible = function(visible, userInvoked) {
 		if(userInvoked) {
-			this.visibleIfPossible = visible;
-			configuration.set('scramble.visible', visible);
+			this.invisiblePuzzles[puzzle] = !visible;
+			configuration.set('scramble.invisiblePuzzles', this.invisiblePuzzles);
 		} else {
-			visible &= this.visibleIfPossible;
+			visible &= !this.invisiblePuzzles[puzzle];
 		}
 		if(visible) {
 			scrambleDiv.style.display = 'inline';

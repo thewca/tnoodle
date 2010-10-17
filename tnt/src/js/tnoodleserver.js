@@ -511,11 +511,8 @@ tnoodle.server = function(url) {
 			time.ra100 = computeRA(time.index, 100, true);
 			//time.sessionAve = computeAverage(time.index);
 		}
-		this.addTime = function(timeCentis, scramble, doScramble, unscramble, importInfo) {
-			var time = new Time(timeCentis, scramble);
-			if(importInfo) {
-				time.importInfo = importInfo;
-			}
+
+		this.addTime = function(time, scramble, unscramble) {
 			var action = {
 				undo: function() {
 					this.disposeTime(time, true);
@@ -524,14 +521,13 @@ tnoodle.server = function(url) {
 				redo: function(nothistory) {
 					privateAdd(time);
 					if(!nothistory) {
-						doScramble();
+						scramble();
 					}
 				}
 			};
 			this.pushHistory(action);
 			action.redo(true);
 			saveSessions();
-			return time;
 		};
 		this.reindex = function() {
 			var oldTimes = this.times.slice();
