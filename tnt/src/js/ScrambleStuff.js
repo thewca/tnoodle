@@ -738,7 +738,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	xAddListener(newScrambleLink, 'click', function() {
 		if(!importedScrambles || confirm('This will clear any imported scrambles, are you sure you want to continue?')) {
 			importedScrambles = null;
-			importDiv.hide(); //TODO - does this really need to be here?
 			scramble();
 		}
 	}, false);

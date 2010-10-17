@@ -208,11 +208,7 @@ var KeyboardTimer = new Class({
 		}
 	},
 	getInspectionElapsedSeconds: function() {
-		var time;
-		if(this.inspecting)
-			time = new Date().getTime();
-		else
-			time = this.timerStart;
+		var time = this.inspecting ? new Date().getTime() : this.timerStart;
 		return ((time - this.inspectionStart)/1000).toInt();
 	},
 	getPenalty: function() {
@@ -231,9 +227,7 @@ var KeyboardTimer = new Class({
 	stringy: function() {
 		if(this.inspecting) {
 			var penalty = this.getPenalty();
-			if(penalty)
-				return penalty;
-			return (this.INSPECTION-this.getInspectionElapsedSeconds()).toString();
+			return penalty ? penalty : (this.INSPECTION-this.getInspectionElapsedSeconds()).toString();
 		} else {
 			var decimalPlaces = 2;
 			var centis = this.getTimeCentis();

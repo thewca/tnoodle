@@ -296,16 +296,7 @@ tnoodle.server = function(url) {
 		}
 	}
 	
-	var description = "Michael Gottlieb and I have agreed to extend the definition \
-of a trimmed average from 5 and 12 solves to an arbitrary number \
-of solves. The objective is to throw out ~10% of the solves, \
-the best 5% and the worst 5%. Michael's clever idea to get \
-this to coincide with the current definitions of RA 5 (see WCA) and \
-RA 12 (by overwhelming convention) is to define the number of trimmed \
-solves as:\n\
-	trimmed(n) = 2*ceil[ (n/10)/2 ] = (n/10) rounded up to the nearest even integer\n\
-It should be easy to check that trimmed(5) = 2 and trimmed(12) = 2, \
-as desired.";
+	var description = "Michael Gottlieb and I have agreed to extend the definition of a trimmed average from 5 and 12 solves to an arbitrary number of solves. The objective is to throw out ~10% of the solves, the best 5% and the worst 5%. Michael's clever idea to get this to coincide with the current definitions of RA 5 (see WCA) and RA 12 (by overwhelming convention) is to define the number of trimmed solves as:\n trimmed(n) = 2*ceil[ (n/10)/2 ] = (n/10) rounded up to the nearest even integer\n It should be easy to check that trimmed(5) = 2 and trimmed(12) = 2, as desired.";
 	var TRIMMED = function(n) {
 		return 2*Math.ceil( (n/10)/2 );
 	};
@@ -465,43 +456,11 @@ as desired.";
 			}
 			
 			var times = THIS.times.slice(firstSolve, lastSolve+1);
-			times.sort(function(a, b) { return a.centis - b.centis });
+			times.sort(function(a, b) { return a.centis - b.centis; });
 			times.splice(0, trimmed/2); //trim the best trimmed/2 solves
 			times.splice(times.length - trimmed/2, times.length); //trim the worst trimmed/2 solves
-			times.sort(function(a, b) { return a.index - b.index });
+			times.sort(function(a, b) { return a.index - b.index; });
 			return times;
-			var sum = 0;
-			var solveCount = 0;
-			var times = [];
-			for(var i = firstSolve; i <= lastSolve; i++) {
-				var val = THIS.times[i].centis;
-				times.push(val);
-				if(val < Infinity) {
-					sum += val;
-					solveCount++;
-				}
-			}
-			var requiredSolveCount = size - trimmed;
-
-			function trim() {
-				for(var i = 0; i < trimmed/2; i++) {
-					var val = times[i];
-					if(val < Infinity) {
-						sum -= val;
-						solveCount--;
-					}
-				}
-			}
-			times.sort();
-			trim(); // trim the best trimmed/2 solves
-			times.reverse();
-			trim(); // trim the worst trimmed/2 solves
-
-			if(solveCount != requiredSolveCount) {
-				return Infinity; //there must have been too many DNFs, which makes this a DNF average
-			}
-			
-			return sum / requiredSolveCount;
 		}
 		function privateAdd(time) {
 			time.index = THIS.times.length;

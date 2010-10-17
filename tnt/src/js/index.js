@@ -89,19 +89,19 @@ window.addEvent('domready', function() {
 	}
 	function ago(date) {
 		var today = new Date();
-		var i, ago;
+		var i, agostr;
 		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
 		for(i = 0; i < resolutions.length; i++) {
-			ago = date.diff(today, resolutions[i]);
+			agostr = date.diff(today, resolutions[i]);
 			a = date; b = today;
-			if(ago > 0) {
+			if(agostr > 0) {
 				break;
 			}
 		}
-		ago = (i < resolutions.length) ? 
-				ago + " " + resolutions[i] + "(s)" :
+		agostr = (i < resolutions.length) ? 
+				agostr + " " + resolutions[i] + "(s)" :
 				"seconds";
-		return ago;
+		return agostr;
 	}
 	function refreshSessionInfo() {
 		if(!session) { return; }//gotta wait for stuff to load
