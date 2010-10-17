@@ -303,9 +303,8 @@ var TimesTable = new Class({
 		timeHoverDiv.fade('hide');
 		timeHoverDiv.setStyles({
 			position: 'absolute',
-			//border: '1px solid',
 			backgroundColor: 'white',
-			zIndex: 1
+			zIndex: 4
 		});
 		var makeLabel = function(el) {
 			var label = new Element('label', {'for': el.id, html: el.value});
