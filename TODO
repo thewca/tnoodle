@@ -50,16 +50,17 @@ FEATURES
 	+stdev is the standard deviation of times, not session averages
 +big scramble view is blurry (pedro)
 +fixed bug where resizing scramble image could make it permanently too big
++improve behavior of update freq option
 
--improve behavior of update freq option, alignment?
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
 -add remaining stackmat options
 	-TODO - test with stackmat!!!
 -pretty gui for editing customizations & tags
 -solve/session comments
+-add help/about
+	-shorcuts: documentation & configuration
 
--shorcuts?
 -read times/metronome
 -background image/opacity
 -emulate stackmat?

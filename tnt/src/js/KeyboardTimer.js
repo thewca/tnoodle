@@ -21,7 +21,13 @@ var KeyboardTimer = new Class({
 		this.fullscreenBG.setStyle('display', 'none');
 		this.fullscreenBG.inject(document.body);
 		
-		var options = tnoodle.tnt.createOptions();
+		function shownCallback() {
+
+		}
+		function hiddenCallback() {
+			updateFrequency.blur();
+		}
+		var options = tnoodle.tnt.createOptions(shownCallback, hiddenCallback);
 		var optionsDiv = options.div;
 		var optionsButton = options.button;
 		optionsButton.setStyles({
@@ -30,10 +36,6 @@ var KeyboardTimer = new Class({
 			right: 5
 		});
 		optionsButton.inject(parent);
-		
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.wcaInspection', 'WCA style inspection', false));
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.onlySpaceStarts', 'Only spacebar starts', true));
 		
 		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
 		var frequencyChanged = function(e) {
@@ -59,6 +61,11 @@ var KeyboardTimer = new Class({
 		frequencyDiv.adopt(new Element('label', { 'for': 'timer.frequency', html: 'Update frequency (seconds)' }));
 		optionsDiv.adopt(frequencyDiv);
 		
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.wcaInspection', 'WCA style inspection', false));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.onlySpaceStarts', 'Only spacebar starts', true));
+
+
 		var keys = new Hash();
 		this.keys = keys;
 		
