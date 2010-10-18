@@ -27,23 +27,24 @@ window.addEvent('domready', function() {
 		for(var i = 0; i < customizations.length; i++) {
 			customizationSelect.options[i] = new Option(customizations[i], customizations[i]);
 		}
+		customizationSelect.options[i] = new Option('Edit', null);
+		customizationSelect.options[i].setStyle('background-color', 'white');
 
 		customizationSelect.value = session.getCustomization();
 	};
 	$('puzzleChooser').adopt(customizationSelect);
 
-	var editCustomization = new Element('span', { 'class': 'link', 'html': 'Add customization' });
-	editCustomization.addEvent('click', function(e) {
-		//TODO - provide a better gui for this
-		var newCustomization = prompt("Enter name of new customization (this will become a pretty gui someday, I promise!)");
-		if(newCustomization) {
-			server.createCustomization(session.getPuzzle(), newCustomization);
-			customizationSelect.refresh();
-		}
-	});
-//	$('puzzleChooser').adopt(editCustomization);
-
 	customizationSelect.onchange = function(e) {
+		console.log(customizationSelect.value);
+		if(customizationSelect.value === "null") {
+			customizationSelect.value = session.getCustomization();
+			var newCustomization = prompt("Enter name of new customization (this will become a pretty gui someday, I promise!)");
+			if(newCustomization) {
+				server.createCustomization(session.getPuzzle(), newCustomization);
+				customizationSelect.refresh();
+			}
+			return;
+		}
 		session.setCustomization(customizationSelect.value);
 		refreshSessionInfo();
 	}; //for some reason, the change event doesn't fire until the select loses focus
