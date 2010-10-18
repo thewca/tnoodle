@@ -19,8 +19,7 @@ BUGS
 	+addtime grows the add time row
 	+weird stuff happens with extremely large times
 	+hovering to penalize/tag times...
-
--1 line scrambles shouldn't get oddly spaced
++1 line scrambles shouldn't get oddly spaced
 
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cannot call split of undefined when getting scramble & server is down
@@ -52,9 +51,9 @@ FEATURES
 +big scramble view is blurry (pedro)
 +fixed bug where resizing scramble image could make it permanently too big
 
+-improve behavior of update freq option, alignment?
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
--improve behavior of update freq option, alignment?
 -add remaining stackmat options
 	-TODO - test with stackmat!!!
 -pretty gui for editing customizations & tags

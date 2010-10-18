@@ -301,17 +301,23 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 					scramblePre.appendChild(document.createElement('br'));
 				}
 				turn = newLines[j];
-				//TODO - disable if the scramble fits on one line!
-				for(var k = turn.length; k < maxLength; k++) {
-					turn += " "; //padding so all turns take up the same amount of space
-				}
 				incrementalScramble += turn;
+				//TODO - disable if the scramble fits on one line!
+				var padding = "";
+				for(var k = turn.length; k < maxLength; k++) {
+					padding += " "; //padding so all turns take up the same amount of space
+				}
+				var turnPadding = document.createElement('span');
+				turnPadding.className = "padding";
+				turnPadding.appendChild(document.createTextNode(padding));
+				
 				var turnLink = document.createElement('span');
 				turnLink.appendChild(document.createTextNode(turn));
 				turnLink.incrementalScramble = incrementalScramble;
 				turnLink.className = 'turn';
 				xAddListener(turnLink, 'click', userClickedTurn, false);
 				scramblePre.appendChild(turnLink);
+				scramblePre.appendChild(turnPadding);
 				if(i == turns.length - 1) {
 					turnClicked.call(turnLink, false);
 				} else {
@@ -988,6 +994,10 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	};
 	
 	function adjustFontSize() {
+		var paddingSpans = $$('.padding');
+		paddingSpans.each(function(el) {
+			el.setStyle('display', '');
+		});
 		var height = scramblePre.getStyle("height").toInt();
 		// Increase font size until the scramble doesn't fit.
 		// Sometimes, this can get stuck in an inf loop where
@@ -1001,13 +1011,23 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			}
 		}
 		
-		// decrease font size until the scramble fits
+		// Decrease font size until the scramble fits
 		do {
 			scramblePre.setStyle('font-size', f--);
 			if(f <= 10) {
 				break;
 			}
 		} while(scramblePre.clientHeight < scramblePre.scrollHeight);
+
+		if(paddingSpans.length > 0) {
+			if(paddingSpans[0].getPosition().y == paddingSpans[paddingSpans.length-1].getPosition().y) {
+				//the scramble is only taking up 1 row! so we disable the padding
+				paddingSpans.each(function(el) {
+					el.setStyle('display', 'none');
+				});
+			}
+
+		}
 	}
 	
 	this.resize = function() {
