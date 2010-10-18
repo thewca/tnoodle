@@ -571,6 +571,8 @@ public class ScrambleServer {
 	}
 
 	public static void main(String[] args) throws IOException {
+		Launcher.wrapMain(args);
+
 		OptionParser parser = new OptionParser();
 		OptionSpec<Integer> port = parser.accepts("port", "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
 		OptionSpec<File> scrambleFolder = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
