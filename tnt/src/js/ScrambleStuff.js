@@ -285,6 +285,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	}
 
 	function formatScramble() {
+		if(!currScramble) {
+			return;
+		}
 		deleteChildren(scramblePre);
 		var turns = currScramble.split(' ');
 		var incrementalScramble = "";
