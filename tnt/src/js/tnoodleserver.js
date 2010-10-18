@@ -238,6 +238,9 @@ tnoodle.server = function(url) {
 				throw "Can't have times &leq; 0";
 			}
 			this.rawCentis = valueCentis;
+			if(this.rawCentis > 365*24*60*100) {
+				throw "Can't have times > 1 year";
+			}
 			this.setPenalty(penalty);
 			saveSessions();
 		};
