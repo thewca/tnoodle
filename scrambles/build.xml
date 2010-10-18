@@ -84,7 +84,7 @@
 		    	<globmapper from="*.class" to="*" />
 			</chainedmapper>
 		</pathconvert>
-		<echo>Detected the following plugins</echo>
+		<echo>Detected the following plugins:</echo>
 		<echo>${plugin-files}</echo>
 		
 		<echo file="${plugin-list}">${plugin-files}</echo>

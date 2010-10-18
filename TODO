@@ -5,57 +5,66 @@ BUGS
 +scramble shouldn't be on top of fullscreen or importing scrambles windows
 +import scramble window is on top of fullscreen timer
 +scramble automove doesn't save location
-    +apply more often than just resizing the window?
+	+apply more often than just resizing the window?
 +scramble autosizing causes a bit of lag on the timer...
 +table should force its resizing up to the layout manager
 +tapping space right after stopping timer turns green & 0.00, even though the timer can't run yet
 +formatting +2 penalties doesn't work
-    +saving DNF/+2 doesn't seem to work...
+	+saving DNF/+2 doesn't seem to work...
 +switching session with imported scrambles would ask if you wanted to clear the imported scrambles
 +make times columns hideable, consolidate that code, add tooltips
-    +getValueCenties -> just centis...
+	+getValueCenties -> just centis...
 +don't let the scramble grow too large!
-
--1 line scrambles shouldn't get oddly spaced
--TimesTable
-    +addtime grows the add time row
-    -weird stuff happens with extremely large times
-    -hovering to penalize/tag times...
-    -save location of timestable scrollbar/selected session?
--get consensus on what the hell a session average is!
-    -stdev is the standard deviation of times, not session averages
--hovering/clicking on bests idea...?
++TimesTable
+	+addtime grows the add time row
+	+weird stuff happens with extremely large times
+	+hovering to penalize/tag times...
++1 line scrambles shouldn't get oddly spaced
++cannot call split of undefined when getting scramble & server is down
 
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
--cannot call split of undefined when getting scramble & server is down
--cleanup tagging code?
 -cache bests and worsts
 -fix file permissions
--bug in mootoools-more:~1913
+-bug in mootools-more:~1913
+-but in mootools-more: //TODO need this to provide a more stable sorting
 
 FEATURES
 +added medians
 +configurable columns
-    +add gui for this!
+	+add gui for this!
 + +/- looks like an underlined plus sign. Buttons? Like the AA buttons in rich text editors?
+	+scratch that idea, instead, automatically make the scramble fit
 +load scramble once timer has started to reduce lag
-    -TODO - test with stackmat!!!
 +"3x3 session started..." should become a dropdown box, remove old box
 +esc to get rid of import scrambles window
++undo redo
+	+maintain scramble list! urghhhh
++add space between table and scrambles (leyan)
++auto scroll should show the add time row!
++save scramble view state on a per customization basis
++0.00 when keys down now reflects the update frequency
++wca style penalties
++get consensus on what the hell a session average is!
+	+add new session average!
+	+stdev is the standard deviation of times, not session averages
++big scramble view is blurry (pedro)
++fixed bug where resizing scramble image could make it permanently too big
++improve behavior of update freq option
 
--improve behavior of update freq option, alignment?
 -clickable stuff in timestable to get jnet/cct style stats?
--big scramble view is blurry
+	-hovering/clicking on bests idea...?
 -add remaining stackmat options
--undo redo
--shorcuts?
+	-TODO - test with stackmat!!!
+-pretty gui for editing customizations & tags
+	-cleanup tagging code?
+-solve/session comments
+-add help/about
+	-Add a note about running multiple instances of tnt
+	-shorcuts: documentation & configuration
+
 -read times/metronome
 -background image/opacity
 -emulate stackmat?
 -gmaps style copy scramble
 -pdf page #
 -server side icons
--wca style penalties
--solve/session comments
--pretty gui for editing customizations & tags
--save scramble view state on a per customization basis

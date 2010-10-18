@@ -235,9 +235,12 @@ tnoodle.server = function(url) {
 				valueCentis -= 2*100;
 			}
 			if(valueCentis <= 0) {
-				throw "Can't have times <= 0";
+				throw "Can't have times &leq; 0";
 			}
 			this.rawCentis = valueCentis;
+			if(this.rawCentis > 10*365*24*60*100) {
+				throw "Can't have times > 10 years";
+			}
 			this.setPenalty(penalty);
 			saveSessions();
 		};
@@ -281,7 +284,7 @@ tnoodle.server = function(url) {
 			return this.tags.indexOf(tag) >= 0;
 		};
 		
-		this.mean3 = this.ra5 = this.ra12 = this.ra100 = null;
+		this.ra5 = this.ra12 = this.ra100 = null;
 		this.penalty = null;
 		this.index = null;
 		this.tags = [];
@@ -296,13 +299,18 @@ tnoodle.server = function(url) {
 		}
 	}
 	
+	var description = "Michael Gottlieb and I have agreed to extend the definition of a trimmed average from 5 and 12 solves to an arbitrary number of solves. The objective is to throw out ~10% of the solves, the best 5% and the worst 5%. Michael's clever idea to get this to coincide with the current definitions of RA 5 (see WCA) and RA 12 (by overwhelming convention) is to define the number of trimmed solves as:\n trimmed(n) = 2*ceil[ (n/10)/2 ] = (n/10) rounded up to the nearest even integer\n It should be easy to check that trimmed(5) = 2 and trimmed(12) = 2, as desired.";
+	var TRIMMED = function(n) {
+		return 2*Math.ceil( (n/10)/2 );
+	};
+
 	var keyInfo = [
 		[ 'index', '', null ],
 		[ 'centis', 'Time', null ],
-		[ 'mean3', 'Mean 3', 'Untrimmed average of 3' ],
 		[ 'ra5', 'Ra 5', 'Trimmed average of 5' ],
 		[ 'ra12', 'Ra 12', 'Trimmed average of 12' ],
 		[ 'ra100', 'Ra 100', 'Trimmed average of 100' ],
+		[ 'sessionAve', 'Ave', description ],
 		[ 'tags', 'Tags', null ],
 		[ 'date', 'Date', 'Milliseconds since the epoch' ],
 		[ 'scramble', 'Scramble', null ]
@@ -314,6 +322,9 @@ tnoodle.server = function(url) {
 	
 	function Session(id, puzzle, customization) {
 		this.id = id;
+		this.getDate = function() {
+			return new Date(1000*parseInt(this.id, 36));
+		};
 		this.puzzle = puzzle;
 		this.customization = customization || '';
 		//times is an array of Time's
@@ -357,7 +368,13 @@ tnoodle.server = function(url) {
 			return this.times.length;
 		};
 		this.reset = function() {
-			this.times.length = 0;
+			var timesCopy = this.times.slice();
+			var action = {
+				undo: function() { this.times = timesCopy.slice(); }.bind(this),
+				redo: function() { this.times.length = 0; }.bind(this)
+			};
+			this.pushHistory(action);
+			action.redo();
 			saveSessions();
 		};
 		//TODO - cache!
@@ -391,125 +408,88 @@ tnoodle.server = function(url) {
 			};
 		};
 		this.stdDev = function(lastSolve, count) {
-			lastSolve = lastSolve || this.times.length - 1;
-			var ave = computeAverage(lastSolve, count);
-			if(ave === null || ave == Infinity) {
+			if(!lastSolve) {
+				lastSolve = this.times.length-1;
+				count = this.times.length;
+			}
+			var times = getTrimmedSolves(lastSolve, count, TRIMMED(count));
+			if(times === null || times.length === 0) {
+				return null;
+			}
+			times = times.map(function(a) { return a.centis; });
+			var ave = times.average();
+			if(ave === Infinity) {
 				return ave;
 			}
+
 			var variance = 0;
-			var solveCount = 0;
-			for(var i = lastSolve; i >= 0; i--) {
-				var val = this.times[i].centis;
-				if(val < Infinity) {
-					val -= ave; 
-					variance += val*val;
-					solveCount++;
-				}
-				if(solveCount == count) {
-					break;
-				}
+			for(var i = 0; i < times.length; i++) {
+				var val = times[i] - ave;
+				variance += val*val;
 			}
-			variance /= solveCount;
+			variance /= times.length;
 			return Math.sqrt(variance);
 		};
 		
 		var THIS = this;
 		
-		//this ignores all DNFs
-		function computeAverage(lastSolve, requiredSolveCount) {
-			if(lastSolve < 0) {
-				return null;
-			}
-			var solveCount = 0;
-			var sum = 0;
-			for(var i = lastSolve; i >= 0; i--) {
-				var val = THIS.times[i].centis;
-				if(val < Infinity) {
-					sum += val;
-					solveCount++;
-				}
-				if(solveCount == requiredSolveCount) {
-					break;
-				}
-			}
-			if(requiredSolveCount && solveCount != requiredSolveCount) {
-				return null; //not enough solves
-			}
-			if(solveCount === 0) {
-				return Infinity;
-			}
-			return sum / solveCount;
-		}
-		
 		function computeMedian(lastSolve, size) {
-			if(!size) {
-				size = THIS.times.length;
+			return computeRA(lastSolve, size, 2*Math.floor((size-1)/2));
+		}
+		function computeRA(lastSolve, size, trimmed) {
+			if(!trimmed) {
+				trimmed = TRIMMED(size);
+				return computeRA(lastSolve, size, trimmed);
 			}
-			var firstSolve = lastSolve - size + 1;
-			if(firstSolve < 0) {
+			var times = getTrimmedSolves(lastSolve, size, trimmed);
+			if(times === null) {
 				return null;
 			}
-			var subset = THIS.times.slice(firstSolve, lastSolve + 1);
-			for(var i = 0; i < subset.length; i++) {
-				subset[i] = subset[i].centis;
-			}
-			subset.sort();
-			var midway = size/2;
-			if(isInteger(midway)) {
-				return (subset[midway-1] + subset[midway])/2;
-			} else {
-				return subset[Math.floor(midway)];
-			}
+			return times.map(function(a) { return a.centis; }).average();
 		}
-		
-		function computeRA(lastSolve, size, trimmed) {
+		function getTrimmedSolves(lastSolve, size, trimmed) {
+			if(trimmed % 2 !== 0 || trimmed >= size) {
+				// trimmed must be even, and less than size
+				return null;
+			}
+
 			var firstSolve = lastSolve - size + 1;
 			if(firstSolve < 0 || size === 0) {
 				return null; //not enough solves
 			}
 			
-			var sum = 0;
-			var solveCount = 0;
-			var best = Infinity, worst = 0;
-			for(var i = firstSolve; i <= lastSolve; i++) {
-				var val = THIS.times[i].centis;
-				best = Math.min(best, val);
-				worst = Math.max(worst, val);
-				if(val < Infinity) {
-					sum += val;
-					solveCount++;
-				}
-			}
-			var requiredSolveCount = trimmed ? size - 2 : size;
-			if(trimmed) {
-				sum -= best;
-				solveCount--;
-				if(worst < Infinity) { //our worst solve may have been a DNF
-					sum -= worst;
-					solveCount--;
-				}
-			}
-
-			if(solveCount != requiredSolveCount) {
-				return Infinity; //there must have been too many DNFs, which makes this a DNF average
-			}
-			
-			return sum / requiredSolveCount;
+			var times = THIS.times.slice(firstSolve, lastSolve+1);
+			times.sort(function(a, b) { return a.centis - b.centis; });
+			times.splice(0, trimmed/2); //trim the best trimmed/2 solves
+			times.splice(times.length - trimmed/2, times.length); //trim the worst trimmed/2 solves
+			times.sort(function(a, b) { return a.index - b.index; });
+			return times;
 		}
 		function privateAdd(time) {
 			time.index = THIS.times.length;
 			THIS.times.push(time);
-			time.mean3 = computeRA(time.index, 3, false);
-			time.ra5 = computeRA(time.index, 5, true);
-			time.ra12 = computeRA(time.index, 12, true);
-			time.ra100 = computeRA(time.index, 100, true);
-			//time.sessionAve = computeAverage(time.index);
+			time.ra5 = computeRA(time.index, 5);
+			time.ra12 = computeRA(time.index, 12);
+			time.ra100 = computeRA(time.index, 100);
+			time.sessionAve = computeRA(time.index, time.index+1);
 		}
-		this.addTime = function(timeCentis, scramble) {
-			var time = new Time(timeCentis, scramble);
-			privateAdd(time);
+
+		this.addTime = function(time, scramble, unscramble) {
+			var action = {
+				undo: function() {
+					this.disposeTime(time, true);
+					unscramble(time);
+				}.bind(this),
+				redo: function(nothistory) {
+					privateAdd(time);
+					if(!nothistory) {
+						scramble();
+					}
+				}
+			};
+			this.pushHistory(action);
+			action.redo(true);
 			saveSessions();
-			return time;
 		};
 		this.reindex = function() {
 			var oldTimes = this.times.slice();
@@ -520,16 +500,80 @@ tnoodle.server = function(url) {
 			saveSessions();
 		};
 		//returns the deleted time
-		this.disposeTimeAt = function(index) {
-			var time = this.times.splice(index, 1);
-			this.reindex();
+		this.disposeTimeAt = function(index, nohistory) {
+			var time = this.times[index];
+			var action = {
+				undo: function() {
+					this.times.splice(index, 0, time);
+					this.reindex();
+				}.bind(this),
+				redo: function() {
+					this.times.splice(index, 1);
+					this.reindex();
+				}.bind(this)
+			};
+			if(!nohistory) {
+				this.pushHistory(action);
+			}
+			action.redo();
 			return time;
 		};
-		this.disposeTime = function(time) {
+		this.disposeTime = function(time, nohistory) {
 			var index = this.times.indexOf(time);
 			if(index >= 0) {
-				this.disposeTimeAt(index);
+				this.disposeTimeAt(index, nohistory);
+				return time;
 			}
+			return null;
+		};
+		this.disposeTimes = function(times) {
+			var sanitizedTimes = [];
+			for(var i = 0; i < times.length; i++) {
+				var time = times[i];
+				if(this.containsTime(time)) {
+					sanitizedTimes.push(time);
+				}
+			}
+			var action = {
+				undo: function() {
+					for(var i = 0; i < sanitizedTimes.length; i++) {
+						var time = sanitizedTimes[i];
+						this.times.splice(time.index, 0, time);
+					}
+					this.reindex();
+				}.bind(this),
+				redo: function() {
+					for(var i = 0; i < sanitizedTimes.length; i++) {
+						this.disposeTime(sanitizedTimes[i], true);
+					}
+				}.bind(this)
+			};
+			this.pushHistory(action);
+			action.redo();
+		};
+		this.containsTime = function(time) {
+			return this.times.indexOf(time) >= 0;
+		};
+
+		var history = [];
+		var histIndex = -1; //this points to the last action taken
+		this.undo = function() {
+			if(histIndex >= 0 && histIndex < history.length) {
+				history[histIndex].undo();
+				histIndex--;
+			}
+		};
+		this.redo = function() {
+			if(histIndex+1 >= 0 && histIndex+1 < history.length) {
+				histIndex++;
+				history[histIndex].redo();
+			}
+		};
+		this.pushHistory = function(undo_redo_callback) {
+			histIndex++;
+			history[histIndex] = undo_redo_callback;
+			// we remove everything after what we just added
+			history.splice(histIndex+1, history.length-1);
 		};
 	}
 	

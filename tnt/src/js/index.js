@@ -87,30 +87,32 @@ window.addEvent('domready', function() {
 			timesTable.reset();
 		}
 	}
-	function refreshSessionInfo() {
-		if(!session) { return; }//gotta wait for stuff to load
-		$('sessionInfo').empty();
-		var date = new Date(1000*parseInt(session.id, 36));
+	function ago(date) {
 		var today = new Date();
-		var i, ago;
+		var i, agostr;
 		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
 		for(i = 0; i < resolutions.length; i++) {
-			ago = date.diff(today, resolutions[i]);
+			agostr = date.diff(today, resolutions[i]);
 			a = date; b = today;
-			if(ago > 0) {
+			if(agostr > 0) {
 				break;
 			}
 		}
-		ago = (i < resolutions.length) ? 
-				ago + " " + resolutions[i] + "(s)" :
+		agostr = (i < resolutions.length) ? 
+				agostr + " " + resolutions[i] + "(s)" :
 				"seconds";
-		$('sessionInfo').appendText("Started " + ago + " ago");
+		return agostr;
+	}
+	function refreshSessionInfo() {
+		if(!session) { return; }//gotta wait for stuff to load
+		$('sessionInfo').empty();
+		$('sessionInfo').appendText("Started " + ago(session.getDate()) + " ago");
 	}
 	
 	var session = null;
 	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
-	timer.addEvent('newTime', function(timeCentis, scramble) {
-		timesTable.addTime(timeCentis, scramble);
+	timer.addEvent('newTime', function(time) {
+		timesTable.addTime(time);
 	});
 	function sessionClicked(e) {
 		lastSessionTab = this;
@@ -121,8 +123,10 @@ window.addEvent('domready', function() {
 		session = newSession;
 		$$('#sessions .active').each(function(el) {
 			el.removeClass('active');
+			el.getChildren()[0].empty();
 		});
 		this.addClass('active');
+		this.getChildren()[0].adopt(document.createTextNode(session.id));
 
 		refreshSessionInfo();
 		timesTable.setSession(session);
@@ -155,7 +159,11 @@ window.addEvent('domready', function() {
 	}
 	function createSessionTab(session) {
 		//TODO - puzzle icon
-		var tab = new Element('li', { 'html': session.toString() });
+		var tab = new Element('li');
+		tab.adopt(new Element('span'));
+		tab.addEvent('mouseover', function() {
+			tab.title = session.toString() + " session started " + ago(session.getDate()) + " ago";
+		});
 		tab.addEvent('click', sessionClicked);
 		tab.session = session;
 
@@ -228,5 +236,15 @@ window.addEvent('domready', function() {
 		'keys': 'alt+r',
 		'description': 'Reset session',
 		'handler': resetSession
+	});
+	keyboard.addShortcut('undo', {
+		'keys': 'ctrl+z',
+		'description': 'Undo',
+		'handler': timesTable.undo.bind(timesTable)
+	});
+	keyboard.addShortcut('redo', {
+		'keys': 'ctrl+y',
+		'description': 'Redo',
+		'handler': timesTable.redo.bind(timesTable)
 	});
 });

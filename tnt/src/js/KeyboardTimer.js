@@ -3,6 +3,7 @@ var KeyboardTimer = new Class({
 	decimalPlaces: 2,
 	frequency: 0.01,
 	CHAR_AR: 1/2, 
+	INSPECTION: 5,
 	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
@@ -20,7 +21,13 @@ var KeyboardTimer = new Class({
 		this.fullscreenBG.setStyle('display', 'none');
 		this.fullscreenBG.inject(document.body);
 		
-		var options = tnoodle.tnt.createOptions();
+		function shownCallback() {
+
+		}
+		function hiddenCallback() {
+			updateFrequency.blur();
+		}
+		var options = tnoodle.tnt.createOptions(shownCallback, hiddenCallback);
 		var optionsDiv = options.div;
 		var optionsButton = options.button;
 		optionsButton.setStyles({
@@ -29,10 +36,6 @@ var KeyboardTimer = new Class({
 			right: 5
 		});
 		optionsButton.inject(parent);
-		
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.wcaInspection', 'WCA style inspection', false));
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.onlySpaceStarts', 'Only spacebar starts', true));
 		
 		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
 		var frequencyChanged = function(e) {
@@ -58,6 +61,11 @@ var KeyboardTimer = new Class({
 		frequencyDiv.adopt(new Element('label', { 'for': 'timer.frequency', html: 'Update frequency (seconds)' }));
 		optionsDiv.adopt(frequencyDiv);
 		
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.wcaInspection', 'WCA style inspection', false));
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.onlySpaceStarts', 'Only spacebar starts', true));
+
+
 		var keys = new Hash();
 		this.keys = keys;
 		
@@ -80,14 +88,8 @@ var KeyboardTimer = new Class({
 				timer.timerStop = new Date().getTime();
 
 				timer.pendingTime = true;
-				timer.stopRender();
-				var time = timer.getTimeCentis();
-				var scramble = timer.scramble;
-				var addTime = function() {
-					timer.fireEvent('newTime', [ time, scramble ]);
-				};
-				//the timer lags if we don't queue up the addition of the time like this
-				setTimeout(addTime, 0);
+				timer.stopRender(); // this will cause a redraw()
+				timer.fireNewTime();
 			} else {
 				timer.redraw();
 			}
@@ -113,6 +115,7 @@ var KeyboardTimer = new Class({
 						timer.timerStart = new Date().getTime();
 						timer.timing = true;
 						timer.scramble = scrambleStuff.getScramble();
+						timer.importInfo = scrambleStuff.getImportInfo();
 						scrambleStuff.scramble();
 					}
 					timer.startRender();
@@ -151,6 +154,7 @@ var KeyboardTimer = new Class({
 					//this mean that the timer just started running,
 					//so we want to update the scramble
 					timer.scramble = scrambleStuff.getScramble();
+					timer.importInfo = scrambleStuff.getImportInfo();
 					timer.scrambleStuff.scramble(); //TODO - test this out using a stackmat!
 				}
 				timer.timing = state.running;
@@ -165,7 +169,7 @@ var KeyboardTimer = new Class({
 				} else if(state.centis > 0 && !acceptedTime) {
 					// new time!
 					acceptedTime = true; //this is to prevent redetecting the same time over and over
-					timer.fireEvent('newTime', timer.getTimeCentis(), timer.scramble);
+					timer.fireNewTime();
 				}
 			}
 		}
@@ -180,6 +184,19 @@ var KeyboardTimer = new Class({
 		}
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
 		//TODO - add remaining stackmat config options!!!
+	},
+	fireNewTime: function() {
+		var time = new this.server.Time(this.getTimeCentis(), this.scramble);
+		var penalty = this.getPenalty();
+		if(penalty) {
+			time.setPenalty(penalty);
+		}
+		time.importInfo = this.importInfo;
+		var addTime = function() {
+			this.fireEvent('newTime', [ time ]);
+		}.bind(this);
+		//the timer lags if we don't queue up the addition of the time like this
+		setTimeout(addTime, 0);
 	},
 	hasDelayPassed: function() {
 		return new Date().getTime() - this.timerStop > this.delay;
@@ -198,14 +215,26 @@ var KeyboardTimer = new Class({
 		}
 	},
 	getInspectionElapsedSeconds: function() {
-		var time = new Date().getTime();
+		var time = this.inspecting ? new Date().getTime() : this.timerStart;
 		return ((time - this.inspectionStart)/1000).toInt();
+	},
+	getPenalty: function() {
+		if(!this.config.get('timer.wcaInspection')) {
+			return null;
+		}
+		var secondsLeft = this.INSPECTION-this.getInspectionElapsedSeconds();
+		if(secondsLeft <= -2) {
+			return "DNF";
+		} else if(secondsLeft <= 0) {
+			return "+2";
+		}
+		return null;
 	},
 	//mootools doesn't like having a toString method? wtf?!
 	stringy: function() {
-		//TODO - wca style penalties
 		if(this.inspecting) {
-			return (15-this.getInspectionElapsedSeconds()).toString();
+			var penalty = this.getPenalty();
+			return penalty ? penalty : (this.INSPECTION-this.getInspectionElapsedSeconds()).toString();
 		} else {
 			var decimalPlaces = 2;
 			var centis = this.getTimeCentis();
@@ -241,15 +270,16 @@ var KeyboardTimer = new Class({
 		this.stopRender();
 	},
 	redraw: function() {
-		var string;
+		var string = this.stringy();
 		var colorClass = this.inspecting ? 'inspecting' : '';
 		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
 		var keysDown = !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
 		if(keysDown && this.hasDelayPassed()) {
-			string = "0.00"; //TODO - reflect the current update frequency!
+			if(!this.inspecting) {
+				// we still want people to see their inspection time when they're pressing spacebar
+				string = this.server.formatTime(0, this.decimalPlaces);
+			}
 			colorClass = 'keysDown';
-		} else {
-			string = this.stringy();
 		}
 		this.timer.set('html', string);
 		this.timer.erase('class');

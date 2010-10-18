@@ -15,7 +15,7 @@ tnoodle.tnt = {
 		});
 		return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': description, 'for': optionKey }));
 	},
-	createOptions: function() {
+	createOptions: function(showCallback, hiddenCallback) {
 		var optionsButton = new Element('div', { html: 'v', 'class': 'optionsButton' });
 		optionsButton.setStyles({
 			width: 19,
@@ -24,14 +24,26 @@ tnoodle.tnt = {
 
 		var optionsDiv = new Element('div', { 'class': 'options' });
 		optionsDiv.inject(document.body);
+		var timer = null;
 		optionsDiv.show = function() {
-			//TODO - some magic to keep the optionsDiv inside the window would be nice
+			if(timer !== null) {
+				clearTimeout(timer);
+			} else {
+				showCallback();
+			}
 			optionsDiv.position({relativeTo: optionsButton, position: 'bottomRight', edge: 'topRight'});
 			optionsDiv.fade('in');
 			optionsButton.morph('.optionsButtonHover');
 		};
+		function fireHidden() {
+			timer = null;
+			hiddenCallback();
+		}
 		optionsDiv.hide = function(e) {
 			optionsDiv.fade('out');
+			if(hiddenCallback) {
+				timer = setTimeout(fireHidden, 500);
+			}
 			optionsButton.morph('.optionsButton');
 		};
 		optionsDiv.fade('hide');

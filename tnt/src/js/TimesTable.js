@@ -1,12 +1,15 @@
 //TODO - it would be nice to have this in mootools
-function isOrIsChild(el, parent) {
+function findAncestor(el, cond) {
 	while(el !== null && el !== undefined) {
-		if(el == parent) {
-			return true;
+		if(cond(el)) {
+			return el;
 		}
 		el = el.parentNode;
 	}
-	return false;
+	return null;
+}
+function isOrIsChild(el, parent) {
+	return findAncestor(el, function(e) { return e == parent; }) !== null;
 }
 var SCROLLBAR_WIDTH = 13;
 var TimesTable = new Class({
@@ -14,7 +17,6 @@ var TimesTable = new Class({
 	cols: null,
 	headers: null,
 	initialize: function(id, server, scrambleStuff) {
-	//TODO - select multiple times for deletion
 		this.server = server;
 		this.configuration = server.configuration;
 		this.scrambleStuff = scrambleStuff;
@@ -39,7 +41,9 @@ var TimesTable = new Class({
 				if(isOrIsChild(this, table.addRow)) {
 					return Infinity;
 				}
-				return HtmlTable.Parsers.number.convert.call(this);
+				//We can't just look at the html because of the delete thingy
+				var val = this.getParent().time.format(this.key).toInt();
+				return val;
 			},
 			number: HtmlTable.Parsers.number.number
 		};
@@ -65,29 +69,16 @@ var TimesTable = new Class({
 		
 		this.emptyRow = [];
 		for(var i = 0; i < this.cols.length; i++) {
-			this.emptyRow[i] = '';
+			this.emptyRow.push('');
 		}
 		
 		//we create the add time row
-		this.addRow = this.push(this.emptyRow).tr.dispose();
-		this.addRow.refresh = function() {
-			this.getChildren()[1].set('html', '<u>A</u>dd time');
-		};
-		this.addRow.refresh();
-		this.addRow.select = this.createRowSelector(this.addRow, null);
-		this.addRow.deselect = function() {
-			this.getChildren()[1].setStyle('padding', '');
-			this.refresh();
-		};
+		this.addRow = this.createRow(null);
 		this.addRow.addClass('addTime');
-		this.addRow.addEvent('click', function() {
-			this.rowClicked(null, this.addRow);
-		}.bind(this));
 		
 		//there needs to be some dummy content in this row so it gets sized correctly
 		//only vertical sizing matters though
 		this.infoRow = this.set('footers', this.emptyRow).tr;
-		this.emptyRow[1] = '';
 
 		var format = server.formatTime;
 		this.infoRow.refresh = function() {
@@ -133,7 +124,7 @@ var TimesTable = new Class({
 		});
 		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH+4);
 		
-		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100' ]; //TODO - read from configuration!
+		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100' ];
 		var initing = true;
 		var refreshCols = function() {
 			if(initing) {
@@ -143,17 +134,316 @@ var TimesTable = new Class({
 		}.bind(this);
 		for(i = 0; i < this.cols.length; i++) {
 			var col = this.cols[i];
+			if(col == 'centis') {
+				continue;
+			}
 			var desc = this.headers[i];
-			columnOptions.div.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'table.' + col, desc, defaultCols.contains(col), refreshCols));
+			var opt = tnoodle.tnt.createOptionBox(server.configuration, 'table.' + col, desc, defaultCols.contains(col), refreshCols);
+			columnOptions.div.adopt(opt);
 		}
 		initing = false;
 		
-		window.addEvent('click', this.deselectRow.bind(this));
+		var selectedRows = [];
+		var mostRecentRow = null;
+		var addRow = this.addRow;
+		function selectRow(row) {
+			if(selectedRows.contains(row)) {
+				return;
+			}
+			row.select();
+			selectedRows.push(row);
+		}
+		function deselectRows(ignoreRow) {
+			var ignorePresent = selectedRows.contains(ignoreRow);
+			for(var i = selectedRows.length-1; i >= 0; i--) {
+				var row = selectedRows[i];
+				if(!ignoreRow || row != ignoreRow) {
+					row.deselect();
+				}
+			}
+			if(ignoreRow) {
+				if(!ignorePresent) {
+					selectRow(ignoreRow);
+				}
+				selectedRows = [ ignoreRow ];
+			} else {
+				selectedRows = [];
+			}
+
+			//This gets ride of the errorField if we were editing a time
+			//TODO - this gets rid of the hover if no times are selected!
+			timeHoverDiv.hide();
+		}
+		this.deselectRows = deselectRows;
+		this.promptTime = function() {
+			deselectRows();
+			selectRow(this.addRow);
+		}.bind(this);
+		window.addEvent('click', function(e) {
+			var timeHoverChild = findAncestor(e.target, function(e) {
+				return e == timeHoverDiv;
+			});
+			if(e.rightClick || timeHoverChild) {
+				// We don't let right clicking or tagging a time deselect a row
+				return;
+			}
+			//TODO - is there a better way of checking nodeName?
+			var row = findAncestor(e.target, function(el) { return el.nodeName == 'TR'; });
+			if(!isOrIsChild(row, table.tbody)) {
+				row = null;
+			}
+			if(row) {
+				if(e.control) {
+					if(table.addRow.selected || row === table.addRow) {
+						return;
+					}
+
+					// Deselecting and reselecting all of the current rows
+					// ensures that none of the rows are currently editing
+					selectedRows.each(function(row) { row.deselect(); row.select(); });
+
+					if(selectedRows.contains(row)) {
+						// NOTE: We don't bother updating mostRecentRow
+						// This behavior may seem a little odd, but this
+						// will happen so infrequently, I can't imagine it'll
+						// matter.
+						row.deselect();
+						selectedRows.erase(row);
+					} else {
+						selectRow(row);
+						mostRecentRow = row;
+					}
+				} else if(e.shift && isOrIsChild(mostRecentRow, $(table))) {
+					if(row === table.addRow) {
+						return;
+					}
+					deselectRows();
+					selectRow(mostRecentRow);
+					var start = mostRecentRow;
+					var between = [];
+					// Try going forward from mostRecentRow to find row
+					while(start !== null && start !== row) {
+						between.push(start);
+						start = start.getNext();
+					}
+					if(start === null) {
+						// That didn't work, row must be behind mostRecentRow!
+						start = mostRecentRow;
+						between.length = 0;
+						while(start !== null && start != row) {
+							between.push(start);
+							start = start.getPrevious();
+						}
+					}
+					between.each(function(row) {
+						selectRow(row);
+					});
+					selectRow(row);
+				} else {
+					var edit = selectedRows.contains(row);
+					deselectRows(row);
+					if(edit) {
+						row.editing = true;
+						row.refresh();
+					}
+					if(row === table.addRow) {
+						mostRecentRow = null;
+					} else {
+						mostRecentRow = row;
+					}
+				}
+			} else {
+				// Something other than a row of our table was clicked,
+				// so we clear the current selection
+				// If the user is holding down ctrl or shift, we give them a chance
+				// to keep selecting rows.
+				if(e.control || e.shift) {
+					return;
+				}
+				deselectRows();
+			}
+		});
 		window.addEvent('keydown', function(e) {
 			if(e.key == 'esc') {
-				this.deselectRow();
+				deselectRows();
+			} else if(e.key == 'delete') {
+				var times = "";
+				for(var i = 0; i < selectedRows.length; i++) {
+					var row = selectedRows[i];
+					// check to make sure the time is even in the session
+					if(this.session.times.contains(row.time)) {
+						times += "," + row.time.format();
+					}
+				}
+				if(times.length === 0) {
+					return;
+				} else {
+					times = times.substring(1);
+					if(confirm('Are you sure you want to delete these times?\n' + times)) {
+						this.deleteRows(selectedRows);
+					}
+				}
 			}
 		}.bind(this));
+
+		
+		var timeHoverDiv = new Element('div');
+		timeHoverDiv.fade('hide');
+		timeHoverDiv.setStyles({
+			position: 'absolute',
+			backgroundColor: 'white',
+			zIndex: 4
+		});
+		var makeLabel = function(el) {
+			var label = new Element('label', {'for': el.id, html: el.value});
+			el.inject(label, 'top');
+			return label;
+		};
+		
+		var fieldSet = new Element('fieldset');
+		timeHoverDiv.legend = new Element('legend');
+		fieldSet.adopt(timeHoverDiv.legend);
+		var noPenalty = new Element('input', { type: 'radio', name: 'penalty', value: 'No penalty', id: 'noPenalty' });
+		fieldSet.adopt(makeLabel(noPenalty));
+		var dnf = new Element('input', { type: 'radio', name: 'penalty', value: 'DNF', id: 'dnf' });
+		fieldSet.adopt(makeLabel(dnf));
+		var plusTwo = new Element('input', { type: 'radio', name: 'penalty', value: '+2', id: 'plusTwo' });
+		
+		//select the correct penalty
+		timeHoverDiv.penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };
+		
+		fieldSet.adopt(makeLabel(plusTwo));
+		var form = new Element('form');
+		form.adopt(fieldSet);
+		fieldSet.addEvent('change', function(e) {
+			if(noPenalty.checked) {
+				timeHoverDiv.time.setPenalty(null);
+			} else if(dnf.checked) {
+				timeHoverDiv.time.setPenalty("DNF");
+			} else if(plusTwo.checked) {
+				timeHoverDiv.time.setPenalty("+2");
+			} else {
+				//this shouldn't happen
+			}
+			table.session.reindex();
+			table.refreshData();
+		});
+		
+		var options = tnoodle.tnt.createOptions();
+		var optionsButton = options.button;
+		var optionsDiv = options.div;
+		
+		optionsDiv.refresh = function() {
+			function tagged(e) {
+				if(this.checked) {
+					time.addTag(this.id);
+				} else {
+					time.removeTag(this.id);
+				}
+			}
+			var tags = table.server.getTags(table.session.getPuzzle());
+			for(var i = 0; i < tags.length; i++) {
+				var tag = tags[i];
+				var checked = timeHoverDiv.time.hasTag(tags[i]);
+				var checkbox = new Element('input', { id: tag, type: 'checkbox' });
+				checkbox.checked = checked;
+				checkbox.addEvent('change', tagged);
+				checkbox.addEvent('focus', checkbox.blur);
+				optionsDiv.adopt(new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag })));
+			}
+			
+			// all of this tagging code is some of the worst code i've written for tnt,
+			// probably because it's 7:30 am, and i want to go to sleep
+			// TODO - but it's important that there eventually is a better dialog for editing tags 
+			// that doesn't cause the current row to lose focus
+			var addTagLink = new Element('span', { 'class': 'link', html: 'Add tag' });
+			addTagLink.addEvent('click', function(e) {
+				var tag = prompt("Enter name of new tag (I promise this will become a not-crappy gui someday)");
+				if(tag) {
+					table.server.createTag(table.session.getPuzzle(), tag);
+					optionsDiv.refresh();
+				}
+			});
+			optionsDiv.adopt(addTagLink);
+		};
+
+		timeHoverDiv.form = form;
+		//TODO - implement tagging properly!
+		//timeHoverDiv.adopt(optionsButton);
+		timeHoverDiv.adopt(timeHoverDiv.form);
+		document.body.adopt(timeHoverDiv);
+		timeHoverDiv.addEvent('mouseover', function(e) {
+			timeHoverDiv.tr.hover();	
+			timeHoverDiv.show();
+		});
+		timeHoverDiv.addEvent('mouseout', function(e) {
+			timeHoverDiv.tr.unhover();	
+			timeHoverDiv.hide();
+		});
+		var errorField = new Element('div', { 'class': 'errorField' });
+		timeHoverDiv.errorField = errorField;
+		timeHoverDiv.show = function(tr, time) {
+			if(tr) {
+				//TODO - comment AAAA
+				if(!timeHoverDiv.tr || !timeHoverDiv.tr.editing) {
+					timeHoverDiv.tr = tr;
+					timeHoverDiv.time = time;
+				}
+				timeHoverDiv.form.dispose();
+				timeHoverDiv.errorField.dispose();
+				// if we don't dispose of the form and errorField first, it'll get destroyed
+				timeHoverDiv.empty();
+				if(timeHoverDiv.tr.editing) {
+					timeHoverDiv.adopt(errorField);
+				} else if(timeHoverDiv.time !== null) {
+					timeHoverDiv.adopt(timeHoverDiv.form);
+
+					timeHoverDiv.legend.set('html', 'Penalty (time: ' + timeHoverDiv.time.format('rawCentis') + ')');
+					timeHoverDiv.penalties[String(timeHoverDiv.time.getPenalty())].checked = true;
+					optionsDiv.refresh();
+				}
+			}
+			var el = timeHoverDiv.tr.getChildren()[1];
+			if(isOrIsChild(el, this.tbody)) {
+				timeHoverDiv.position({relativeTo: el, position: 'bottomLeft', edge: 'topRight'});
+				//make sure this doesn't fall off the end of the world
+				if(timeHoverDiv.getPosition().y + timeHoverDiv.getSize().y > window.getSize().y) {
+					timeHoverDiv.position({relativeTo: el, position: 'topLeft', edge: 'bottomRight'});
+				}
+				timeHoverDiv.fade('in');
+			} else {
+				timeHoverDiv.fade('hide');
+			}
+		}.bind(this);
+		timeHoverDiv.hide = function() {
+			//TODO - comment! SEE A
+			if(!timeHoverDiv.tr || !timeHoverDiv.tr.editing) {
+				timeHoverDiv.fade('out');
+			}
+		};
+		this.timeHoverDiv = timeHoverDiv;
+	},
+	deleteRows: function(rows) {
+		var times = [];
+		rows.each(function(row) {
+			times.push(row.time);
+			row.dispose();
+		}.bind(this));
+		this.session.disposeTimes(times);
+		//changing the time could very well affect more than this row
+		//maybe someday we could be more efficient about the changes
+		this.refreshData();
+		this.resizeCols(); //changing the time may change the size of a column
+		// timeHoverDiv.show will hide itself
+		this.timeHoverDiv.show();
+	},
+	undo: function() {
+		this.session.undo();
+		this.setSession(this.session);
+	},
+	redo: function() {
+		this.session.redo();
+		this.setSession(this.session);
 	},
 	freshSession: false,
 	setSession: function(session) {
@@ -162,7 +452,7 @@ var TimesTable = new Class({
 		this.addRow.dispose(); //if we don't remove this row before calling empty(), it's children will get disposed
 		this.empty();
 		this.session.times.each(function(time) {
-			this.add(time);
+			this.createRow(time);
 		}.bind(this));
 
 		this.refreshData();
@@ -171,19 +461,21 @@ var TimesTable = new Class({
 		this.session.reset();
 		this.setSession(this.session);
 	},
-	addTime: function(centis, oldScramble) {
-		if(!oldScramble) {
-			oldScramble = this.scrambleStuff.getScramble();
-			this.scrambleStuff.scramble();
-		}
-		var time = this.session.addTime(centis, oldScramble);
-		this.add(time);
+	addTime: function(time) {
+		this.session.addTime(time, this.scrambleStuff.scramble, this.scrambleStuff.unscramble);
+		this.createRow(time);
 		this.refreshData();
 		this.scrollToLastTime();
 	},
 	scrollToLastTime: function() {
 		if(this.lastAddedRow) {
-			this.scrollToRow(this.lastAddedRow);
+			var row = this.lastAddedRow;
+			if(row.nextSibling == this.addRow) {
+				// this little hack will ensure that the addrow is visible
+				// whenever we're near the bottom
+				row = this.addRow;
+			}
+			this.scrollToRow(row);
 		}
 	},
 	scrollToRow: function(tr) {
@@ -204,10 +496,6 @@ var TimesTable = new Class({
 		} else {
 			//the element's on screen!
 		}
-		
-	},
-	promptTime: function() {
-		this.rowClicked(null, this.addRow);
 	},
 	
 	//private!
@@ -219,248 +507,6 @@ var TimesTable = new Class({
 		if(preserveScrollbar) {
 			this.tbody.scrollTo(0, scrollTop); //restore scroll amount
 		}
-	},
-	selectedRow: null,
-	rowClicked: function(e, row) {
-		//TODO - click to delete as well
-		//TODO - add whitespace between times table and scramble
-		if(row == this.selectedRow) {
-			return;
-		}
-		row.select();
-		this.selectedRow = row;
-		
-//		if(e) {
-//			//don't want this to be treated as an unfocus event until we know which row was clicked
-//			e.stop();
-//		}
-//		if(row == this.selectedRow) {
-//			return;
-//		}
-//		if(this.selectedRow !== null) {
-//			this.deselectRow();
-//		}
-//
-//		this.attachSorts(false); //sorting doesn't work well with a selected row
-//		this.selectedRow = row;
-//		
-//		this.editRow = new Element('tr');
-//		this.editRow.setStyle('width', this.selectedRow.getSize().x);
-//		this.editRow.addClass('editRow');
-//		this.editRow.addEvent('click', function(e) { e.stop(); }); //we don't want this to propagate up to the current function
-//		
-//		var deleteTimeFunc = function(e) {
-//			this.session.disposeTime(time); //remove time
-//			this.deselectRow().dispose(); //deselect and remove current row
-//		}.bind(this);
-//		var deleteTime = new Element('td');
-//		deleteTime.inject(this.editRow);
-//		if(time) {
-//			deleteTime.set('html', 'X');
-//			deleteTime.addClass('deleteTime'); //TODO - pretty picture
-//			deleteTime.addEvent('click', deleteTimeFunc);
-//		}
-//		
-//		var textField = new Element('input');
-//		var timeChanged = function(e) {
-//			try {
-//				var test = new this.server.Time(textField.value);
-//				errorField.set('html', '');
-//			} catch(error) {
-//				errorField.set('html', error);
-//			}
-//		}.bind(this);
-//		//TODO - how do you listen for input in mootools?
-//		xAddListener(textField, 'input', timeChanged, false);
-//		
-//		textField.setAttribute('type', 'text');
-//		textField.value = time === null ? "" : time.format();
-//		//TODO - do something that doesn't depend on %
-//		textField.setStyle('width', '90%');
-//		
-//		function onBlur(e) {
-//			if(time) { //we try to accept the time if we were editing
-//				acceptTime();
-//			}
-//		}
-//		var acceptTime = function() {
-//			//if successful, this function may cause blur, which causes double adding of timess
-//			textField.removeEvent('blur', onBlur);
-//			try {
-//				if(time === null) {
-//					this.addTime(textField.value);
-//				} else {
-//					time.parse(textField.value);
-//					penalties[String(time.getPenalty())].checked = true;
-//					this.session.reindex();
-//				}
-//				return true;
-//			} catch(error) {
-//				return false;
-//			} finally {
-//				textField.addEvent('blur', onBlur);
-//			}
-//		}.bind(this);
-//		textField.addEvent('keydown', function(e) {
-//			if(e.key == 'esc') {
-//				//calling deselectRow() will cause a blur, which would cause acceptance of the time
-//				textField.removeEvent('blur', onBlur);
-//				this.deselectRow();
-//			}
-//			if(e.key == 'enter') {
-//				if(acceptTime()) {
-//					this.deselectRow();
-//				}
-//			}
-//		}.bind(this));
-//		textField.addEvent('blur', onBlur);
-//		var col2 = new Element('td').adopt(textField);
-//		col2.inject(this.editRow);
-//
-//		var errorField = new Element('div', { 'class': 'errorField' });
-//		var col3 = new Element('td', { colspan: 5 }).adopt(errorField);
-//		col3.inject(this.editRow);
-//
-//		//sizing up w/ previous row, i don't know why this doesn't just work when adding a time
-//		if(!time) {
-//			deleteTime.setStyle('width', this.selectedRow.getChildren()[0].getStyle('width'));
-//			col2.setStyle('width', this.selectedRow.getChildren()[1].getStyle('width'));
-//			var remainder = this.tbody.getSize().x - this.selectedRow.getChildren()[2].getPosition(this.tbody).x - 1; //subtract 1 for the border
-//			col3.setStyle('width', remainder);
-//		}
-//		
-//		this.editRow.replaces(this.selectedRow);
-//		
-//		if(time) {
-//			var makeLabel = function(el) {
-//				var label = new Element('label', {'for': el.id, html: el.value});
-//				el.inject(label, 'top');
-//				return label;
-//			};
-//			
-//			var fieldSet = new Element('fieldset');
-//			fieldSet.adopt(new Element('legend', {html: "Penalty"}));
-//			var noPenalty = new Element('input', { type: 'radio', name: 'penalty', value: 'No penalty', id: 'noPenalty' });
-//			fieldSet.adopt(makeLabel(noPenalty));
-//			var dnf = new Element('input', { type: 'radio', name: 'penalty', value: 'DNF', id: 'dnf' });
-//			fieldSet.adopt(makeLabel(dnf));
-//			var plusTwo = new Element('input', { type: 'radio', name: 'penalty', value: '+2', id: 'plusTwo' });
-//			
-//			//select the correct penalty
-//			var penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };
-//			penalties[String(time.getPenalty())].checked = true;
-//			
-//			fieldSet.adopt(makeLabel(plusTwo));
-//			var form = new Element('form');
-//			form.adopt(fieldSet);
-//			fieldSet.addEvent('change', function(e) {
-//				if(noPenalty.checked) {
-//					time.setPenalty(null);
-//				} else if(dnf.checked) {
-//					time.setPenalty("DNF");
-//				} else if(plusTwo.checked) {
-//					time.setPenalty("+2");
-//				} else {
-//					//this shouldn't happen
-//				}
-//				this.session.reindex();
-//				textField.value = time.format();
-//				timeChanged();
-//			}.bind(this));
-//			
-//			var optionsButton = new Element('div', { html: '^', 'class': 'optionsButton' });
-//			optionsButton.setStyle('position', 'relative'); //so hacky
-//			optionsButton.setStyle('left', '5px');
-//			optionsButton.setStyle('background-color', '#A0A0FF');
-//			
-//			var optionsDiv = new Element('div', { 'class': 'options' });
-//			optionsDiv.setStyle('width', '200px'); //TODO - compute width dynamically
-//			optionsDiv.show = function() {
-//				optionsDiv.setStyle('display', '');
-//				optionsDiv.position({relativeTo: optionsButton, position: 'topLeft', edge: 'bottomLeft'});
-//				optionsDiv.fade('in');
-//				optionsButton.morph('.optionsButtonHover');
-//			};
-//			optionsDiv.hide = function() {
-//				optionsDiv.fade('out');
-//				optionsButton.morph({ 'background-color': '#A0A0FF', color: '#000' }); //this is awful
-//			};
-//			optionsDiv.setStyle('display', 'none'); //for some reason, setting visiblity: none doesn't seem to work here
-//			optionsDiv.hide(); //this allows the first show() to animate
-//			
-//			optionsButton.addEvent('mouseover', optionsDiv.show);
-//			optionsButton.addEvent('mouseout', optionsDiv.hide);
-//			optionsDiv.addEvent('mouseover', optionsDiv.show);
-//			optionsDiv.addEvent('mouseout', optionsDiv.hide);
-//			
-//			optionsDiv.refresh = function() {
-//				function tagged(e) {
-//					if(this.checked) {
-//						time.addTag(this.id);
-//					} else {
-//						time.removeTag(this.id);
-//					}
-//				}
-//				var tags = this.server.getTags(this.session.getPuzzle());
-//				for(var i = 0; i < tags.length; i++) {
-//					var tag = tags[i];
-//					var checked = time.hasTag(tags[i]);
-//					var checkbox = new Element('input', { id: tag, type: 'checkbox' });
-//					checkbox.checked = checked;
-//					checkbox.addEvent('change', tagged);
-//					checkbox.addEvent('focus', checkbox.blur);
-//					optionsDiv.adopt(new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag })));
-//				}
-//				
-//				// all of this tagging code is some of the worst code i've written for tnt,
-//				// probably because it's 7:30 am, and i want to go to sleep
-//				// TODO - but it's important that there eventually is a better dialog for editing tags 
-//				// that doesn't cause the current row to lose focus
-//				var addTagLink = new Element('span', { 'class': 'link', html: 'Add tag' });
-//				addTagLink.addEvent('click', function(e) {
-//					var tag = prompt("Enter name of new tag (I promise this will become a not-crappy gui someday)");
-//					if(tag) {
-//						this.server.createTag(this.session.getPuzzle(), tag);
-//						optionsDiv.refresh();
-//					}
-//				}.bind(this));
-//				optionsDiv.adopt(addTagLink);
-//			}.bind(this);
-//			optionsDiv.refresh();
-//
-//			this.penaltyRow = new Element('tr', {'class': 'penaltyRow' });
-//			var extraDelete = new Element('td', {'class': 'extendedDeleteTime'});
-//			extraDelete.addEvent('click', deleteTimeFunc);
-//			this.penaltyRow.adopt(extraDelete);
-//			this.penaltyRow.adopt(new Element('td', { colspan: 4}).adopt(form));
-//			this.penaltyRow.adopt(new Element('td', { colspan: 2}).adopt(optionsButton));
-//			optionsDiv.inject(this.penaltyRow);
-//			this.penaltyRow.inject(this.editRow, 'after');
-//			this.scrollToRow(this.penaltyRow);
-//		} else {
-//			this.penaltyRow = null;
-//		}
-//
-//		timeChanged();
-//		textField.focus(); //this has the added benefit of making the row visible
-//		textField.select();
-	},
-	deselectRow: function(e) {
-		if(e) {
-			if(e.rightClick) {
-				return null; //we don't let right clicking deselect a row
-			}
-			if(isOrIsChild(e.target, this.selectedRow)) {
-				return null;
-			}
-		}
-		
-		var row = this.selectedRow;
-		if(row !== null) {
-			this.selectedRow = null;
-			row.deselect();
-		}
-		return row;
 	},
 	refreshData: function() {
 		var refreshCols = function(tr) {
@@ -479,8 +525,8 @@ var TimesTable = new Class({
 			}
 		}.bind(this);
 		
-		$(this).toggle(); //prevent flickering?
-		this.deselectRow();
+		// The calls to toggle() seem to screw up scrolling to the edited time
+		//$(this).toggle(); //prevent flickering?
 		this.tbody.getChildren('tr').each(function(tr) {
 			tr.refresh();
 			refreshCols(tr);
@@ -490,109 +536,170 @@ var TimesTable = new Class({
 		refreshCols(this.addRow); //addRow is not a part of the table at this point
 		this.resort(true);
 		this.infoRow.refresh();
-		$(this).toggle(); //prevent flickering?
+		//$(this).toggle(); //prevent flickering?
 		this.resizeCols();
 	},
-	createRowSelector: function(tr, time) {
-		return function() {
-			if(this.selectedRow) {
-				this.selectedRow.deselect();
-			}
-			tr.selected = true;
-			var editCol = tr.getChildren()[1];
-			var width = editCol.getStyle('width').toInt() + editCol.getStyle('padding-left').toInt() + editCol.getStyle('padding-right').toInt();
-			var height = editCol.getStyle('height').toInt() + editCol.getStyle('padding-top').toInt() + editCol.getStyle('padding-bottom').toInt();
-			editCol.setStyle('padding', 0);
-			var textField = new Element('input');
-			textField.value = editCol.get('text');
-			textField.setStyle('border', 'none');
-			textField.setStyle('width', width);
-			textField.setStyle('height', height);
-			textField.setStyle('text-align', 'right'); //not sure this is a good idea, left align might make a good visual indicator
-			textField.setStyle('padding', 0);
+	editCell: function(cell, time) {
+		if(isOrIsChild(cell.textField, cell)) {
+			// we must be editing currently
+			return;
+		}
+		var width = cell.getStyle('width').toInt() + cell.getStyle('padding-left').toInt() + cell.getStyle('padding-right').toInt();
+		var height = cell.getStyle('height').toInt() + cell.getStyle('padding-top').toInt() + cell.getStyle('padding-bottom').toInt();
+		cell.setStyle('padding', 0);
+		var textField = new Element('input');
+		cell.textField = textField;
+		textField.value = time ? time.format() : "";
+		textField.setStyle('border', 'none');
+		textField.setStyle('width', width);
+		//TODO - the sizing isn't quite right on FF, be careful not to break this on chrome!
+		textField.setStyle('height', height);
+		textField.setStyle('text-align', 'right'); //not sure this is a good idea, left align might make a good visual indicator
+		textField.setStyle('padding', 0);
 
-			textField.addEvent('keydown', function(e) {
-				if(e.key == 'esc') {
-					this.deselectRow();
-				}
-				if(e.key == 'enter') {
-					try {
-						if(time) {
-							time.parse(textField.value);
-//							penalties[String(time.getPenalty())].checked = true;
-						} else {
-							this.addTime(textField.value);
-						}
+		textField.addEvent('keydown', function(e) {
+			if(e.key == 'enter') {
+				try {
+					this.deselectRows();
+					if(time) {
+						time.parse(textField.value);
 						this.session.reindex();
-						this.deselectRow();
-					} catch(error) {
-						alert(error);
+						this.refreshData();
+					} else {
+						var newTime = new this.server.Time(textField.value, this.scrambleStuff.getScramble());
+						this.addTime(newTime);
+						this.scrambleStuff.scramble();
 					}
+				} catch(error) {
+					// No need for an alert
+					alert("Error entering time " + textField.value + "\n" + error);
 				}
-			}.bind(this));
-			
-			editCol.empty();
-			editCol.adopt(textField);
-			
-			textField.focus(); //this has the added benefit of making the row visible
-			textField.select();
+			}
+		}.bind(this));
+		
+		var timeChanged = function(e) {
+			try {
+				var test = new this.server.Time(textField.value);
+				this.timeHoverDiv.errorField.set('html', '');
+			} catch(error) {
+				this.timeHoverDiv.errorField.set('html', error);
+			}
+			this.timeHoverDiv.show();
 		}.bind(this);
+		//TODO - how do you listen for input in mootools?
+		xAddListener(textField, 'input', timeChanged, false);
+		timeChanged();
+
+		cell.empty();
+		cell.adopt(textField);
+		
+		textField.focus(); //this has the added benefit of making the row visible
+		textField.select();
+
+		//TODO - comment see AAAA
+		this.timeHoverDiv.show(cell.getParent(), time);
 	},
+	timeHoverDiv: null,
 	lastAddedRow: null,
-	add: function(time) {
+	createRow: function(time) {
 		var tr = this.push(this.emptyRow).tr;
+		tr.time = time;
 		this.lastAddedRow = tr;
-		tr.addEvent('click', function(e) { this.rowClicked(e, tr); }.bind(this));
 		var server = this.server;
 		var session = this.session;
 		var cols = this.cols;
 		var table = this;
 		tr.refresh = function() {
-			var cells = this.getChildren();
+			tr.editing = tr.editing && tr.selected;
+			if(tr.selected) {
+				tr.addClass('selected');
+			} else {
+				tr.removeClass('selected');
+			}
+			if(tr.hovered) {
+				tr.addClass('hovered');
+				setTimeout(function() {
+					//This table may actually be hidden during this call...
+					//so positioning the hoverDiv doesn't work until later.
+					//TODO OMG WTF LOL, if there's only 1 call to show(), the
+					//hover is sized incorrectly when esc is pressed
+					this.timeHoverDiv.show(tr, tr.time);
+					this.timeHoverDiv.show(tr, tr.time);
+				}.bind(this), 0);
+			} else {
+				tr.removeClass('hovered');
+			}
+			var cells = tr.getChildren();
 			for(var col = 0; col < table.cols.length; col++) {
 				var key = table.cols[col];
-				if(key == 'index') {
-					cells[col].set('html', time.index + 1);
-				} else if(key == 'centis') {
-					cells[col].set('html', time.format());
-					cells[col].timeCentis = time.centis;
-					cells[col].removeClass('bestRA');
-					cells[col].removeClass('currentRA');
-					cells[col].removeClass('topCurrentRA');
-					cells[col].removeClass('bottomCurrentRA');
-					cells[col].removeClass('bestTime');
-					cells[col].removeClass('worstTime');
-					var bw = session.bestWorst();
-					if(time.index == bw.best.index) {
-						cells[col].addClass('bestTime');
-					} else if(time.index == bw.worst.index) {
-						cells[col].addClass('worstTime');
-					}
-					var selectedRASize = 12;
-					var bestRA = session.bestWorst('ra' + selectedRASize).best;
-					var attemptCount = session.attemptCount();
-					if(attemptCount >= selectedRASize) {
-						if(bestRA.index - selectedRASize < time.index && time.index <= bestRA.index) {
-							cells[col].addClass('bestRA');
+				cells[col].key = key;
+				if(time === null) {
+					if(key == 'centis') {
+						if(tr.selected) {
+							tr.editing = true;
+							this.editCell(cells[col], null);
+						} else {
+							cells[col].setStyle('padding', '');
+							cells[col].set('html', '<u>A</u>dd time');
 						}
-						if(table.sorted.index === 0) {
-							var firstSolve = session.attemptCount()-selectedRASize;
-							var lastSolve = session.attemptCount()-1;
-							if(firstSolve <= time.index && time.index <= lastSolve) {
-								cells[col].addClass('currentRA');
+					}
+					continue;
+				}
+				if(key == 'index') {
+					cells[col].removeEvent('click');
+					if(tr.hovered) {
+						cells[col].set('html', 'X');
+						cells[col].addClass('deleteTime'); //TODO - pretty picture
+						cells[col].addEvent('click', this.deleteRows.bind(this, [tr]));
+					} else {
+						cells[col].set('html', time.index + 1);
+						cells[col].removeClass('deleteTime');
+					}
+				} else if(key == 'centis') {
+					if(tr.editing) {
+						this.editCell(cells[col], time);
+					} else {
+						cells[col].set('html', time.format());
+						cells[col].timeCentis = time.centis;
+						cells[col].removeClass('bestRA');
+						cells[col].removeClass('currentRA');
+						cells[col].removeClass('topCurrentRA');
+						cells[col].removeClass('bottomCurrentRA');
+						cells[col].removeClass('bestTime');
+						cells[col].removeClass('worstTime');
+						cells[col].setStyle('padding', '');
+						var bw = session.bestWorst();
+						if(time.index == bw.best.index) {
+							cells[col].addClass('bestTime');
+						} else if(time.index == bw.worst.index) {
+							cells[col].addClass('worstTime');
+						}
+						var selectedRASize = 12;
+						var bestRA = session.bestWorst('ra' + selectedRASize).best;
+						var attemptCount = session.attemptCount();
+						if(attemptCount >= selectedRASize) {
+							if(bestRA.index - selectedRASize < time.index && time.index <= bestRA.index) {
+								cells[col].addClass('bestRA');
 							}
-							
-							if(table.sorted.reverse) {
-								//the top/bottom are switched
-								var temp = lastSolve;
-								lastSolve = firstSolve;
-								firstSolve = temp;
-							}
-							
-							if(time.index == firstSolve) {
-								cells[col].addClass('topCurrentRA');
-							} else if(time.index == lastSolve) {
-								cells[col].addClass('bottomCurrentRA');
+							if(table.sorted.index === 0) {
+								var firstSolve = session.attemptCount()-selectedRASize;
+								var lastSolve = session.attemptCount()-1;
+								if(firstSolve <= time.index && time.index <= lastSolve) {
+									cells[col].addClass('currentRA');
+								}
+								
+								if(table.sorted.reverse) {
+									//the top/bottom are switched
+									var temp = lastSolve;
+									lastSolve = firstSolve;
+									firstSolve = temp;
+								}
+								
+								if(time.index == firstSolve) {
+									cells[col].addClass('topCurrentRA');
+								} else if(time.index == lastSolve) {
+									cells[col].addClass('bottomCurrentRA');
+								}
 							}
 						}
 					}
@@ -605,46 +712,33 @@ var TimesTable = new Class({
 					}
 				}
 			}
-		};
-		var deleteTimeFunc = function(e) {
-			this.session.disposeTime(time); //remove time
-			
-			this.selectedRow = null;
-			//TODO - implement deleting multiple times!
-			tr.dispose();
-			
-			//changing the time could very well affect more than this row
-			//maybe someday we could be more efficient about the changes
-			this.refreshData();
-			this.resizeCols(); //changing the time may change the size of a column
-//			this.scrollToRow(editedRow);
 		}.bind(this);
-		var deleteCol = tr.getChildren()[0];
-		deleteCol.addEvent('click', deleteTimeFunc);
+
 		tr.hover = function() {
-			deleteCol.set('html', 'X');
-			deleteCol.addClass('deleteTime'); //TODO - pretty picture
-		}.bind(this);
-		tr.unhover = function() {
-			if(!tr.selected) {
-				tr.getChildren()[0].removeClass('deleteTime');
-				tr.refresh();
-			}
-		}.bind(this);
-		tr.select = this.createRowSelector(tr, time);
+			this.hovered = true;
+			this.refresh();
+			table.timeHoverDiv.show(this, time);
+		};
+		tr.unhover = function(e) {
+			this.hovered = false;
+			this.refresh();
+			table.timeHoverDiv.hide();
+		};
+		tr.select = function() {
+			this.hover(); //the addRow can be selected without previously being hovered
+			this.selected = true;
+			this.refresh();
+		};
 		tr.deselect = function() {
-			tr.selected = false;
-			tr.unhover();
-			var editCol = tr.getChildren()[1];
-			editCol.setStyle('padding', '');
-			//changing the time could very well affect more than this row
-			//maybe someday we could be more efficient about the changes
-			this.refreshData();
-			this.resizeCols(); //changing the time may change the size of a column
-//			this.scrollToRow(editedRow);
-		}.bind(this);
+			//TODO - remove yourself from the select array!
+			this.selected = false;
+			this.editing = false;
+			this.unhover();
+			this.refresh();
+		};
 		tr.addEvent('mouseover', tr.hover);
 		tr.addEvent('mouseout', tr.unhover);
+		return tr;
 	},
 	resizeCols: function() {
 		var i, j;
@@ -723,12 +817,6 @@ var TimesTable = new Class({
 		if(!this.session) {
 			return; //we're not ready to size this until we have a session
 		}
-		
-//		//upon resizing, we first deselect any selected rows!
-//		if(this.selectedRow) {
-//			this.deselectRow();
-//			return; //the previous line will cause a resize
-//		}
 
 		var maxSize = this.getTableSpace();
 		maxSize.y -= $(this).getStyle('margin-bottom').toInt();
