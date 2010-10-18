@@ -4,9 +4,8 @@
 		and a copy of tnt built upon an applet.
 	</description>
 	
-	<condition property="isWin">
-		<os family="windows" />
-	</condition>
+	<property name="NAME" value="TNTServer" />
+	<property name="VERSION" value="0.1.1" />
 	
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />
@@ -15,8 +14,9 @@
 	<property name="dist" location="dist" />
 	<property name="scrambles" location="../scrambles" />
 	
-	<property name="scrambleserver-jar" location="${scrambles}/dist/ScrambleServer.jar" />
-	<property name="tntserver-jar" location="${dist}/TNTServer.jar" />
+	<!-- TODO - it would be nice to read this value from the build.xml in scrambles -->
+	<property name="scrambleserver-jar" location="${scrambles}/dist/ScrambleServer-0.1.1.jar" />
+	<property name="tntserver-jar" location="${dist}/${NAME}-${VERSION}.jar" />
 	
 	<property name="js_src" location="${src}/js/" />
 	<property name="js_bin" location="${tnt_bin}/js/" />
@@ -28,6 +28,10 @@
 	<property name="css_globbed_rel" value="css/tnt.css" />
 	<property name="css_globbed" location="${tnt_bin}/${css_globbed_rel}" />
 	
+	<condition property="isWin">
+		<os family="windows" />
+	</condition>
+
 	<!-- setting up jslint -->
 	<path id="ant.tasks.classpath">
 		<fileset dir="${lib}" includes="*.jar" />
@@ -160,6 +164,10 @@
 		<copy file="${scrambleserver-jar}" tofile="${tntserver-jar}" />
 		<jar file="${tntserver-jar}" update="true">
 			<fileset dir="${bin}" />
+			<manifest>
+				<attribute name="Implementation-Title" value="${NAME}"/>
+				<attribute name="Implementation-Version" value="${VERSION}"/>
+			</manifest>
 		</jar>
 	</target>
 	
