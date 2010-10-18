@@ -2,10 +2,9 @@
 	<description>
 		Builds the ScrambleServer, ensuring to include JCubeExplorer
 	</description>
-	
-        <condition property="isWin">
-		<os family="windows" />
-	</condition>
+
+	<property name="NAME" value="ScrambleServer" />
+	<property name="VERSION" value="0.1.1" />
 
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />
@@ -17,7 +16,7 @@
 	<property name="readme-bin" location="${bin}/index.html" />
 	<property name="shelley-src" location="${src}/scramblegen.html" />
 	<property name="shelley-bin" location="${bin}/scramblegen.html" />
-	<property name="server-jar" location="${dist}/ScrambleServer.jar" />
+	<property name="server-jar" location="${dist}/${NAME}-${VERSION}.jar" />
 	<property name="applet-jar" location="${dist}/ScrambleApplet.jar" />
 	<!-- This seems kinda weird, but is probably the only way to do this -->
 	<property name="jcubeexplorer" location="../jcubeexplorer/" />
@@ -35,8 +34,11 @@
 	<property name="cp" value="${gson};${jopt};${cube};${itext};" />
 	
 	<property name="main" value="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
-	
-	
+
+	<condition property="isWin">
+		<os family="windows" />
+	</condition>
+
     <!-- Properties for Fat-Jar Eclipse Plug-in -->
     <property name="fjepPath" value="${lib}/fatjar.jar" />
     <taskdef name="fatjar.build"
@@ -124,6 +126,13 @@
 			<fileset dir="${scramblers}" />
 		</copy>
 		-->
+		<jar file="${server-jar}" update="true">
+			<manifest>
+				<attribute name="Main-Class" value="${main}"/>
+				<attribute name="Implementation-Title" value="${NAME}"/>
+				<attribute name="Implementation-Version" value="${VERSION}"/>
+			</manifest>
+		</jar>
 	</target>
 	
 	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
@@ -164,8 +173,6 @@
 			task effectively deletes the tnt src code, which is bad.
 			Hopefully either rm (linux) or rmdir (windows) will work
 			for us.
-			TODO - test this on a windows machine without cygwin
-			TODO - test on a pure linux machine
 			TODO - test on a mac...lol
 		<delete dir="${bin}" followsymlinks="false" />
 		-->

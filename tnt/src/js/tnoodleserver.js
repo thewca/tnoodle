@@ -607,7 +607,7 @@ tnoodle.server = function(url) {
 		return customizations[puzzle];
 	};
 	this.createCustomization = function(puzzle, customization) {
-		if(customization in customizations[puzzle]) {
+		if(customizations[puzzle].contains(customization)) {
 			return false;
 		}
 		customizations[puzzle].push(customization);
@@ -688,11 +688,10 @@ tnoodle.server = function(url) {
 		if(!(puzzle in customizations)) {
 			customizations[puzzle] = [ '' ];
 		}
-		if(!(customization in customizations[puzzle])) {
+		if(!customizations[puzzle].contains(customization)) {
 			customizations[puzzle].push(customization);
 		}
 	}
 	//TODO - initialize the available tags, merge with customizations object?
 	var tags = { '3x3x3': [ 'PLL skip', 'POP' ] };
-
 };

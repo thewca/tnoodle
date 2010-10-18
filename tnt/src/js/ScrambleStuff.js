@@ -544,8 +544,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		}
 		if(seedForm === null) {
 			seedForm = document.createElement('form');
-			seedForm.style.cssFloat = seedForm.style.styleFloat = 'left'; // stupid
-			// ie
+			seedForm.style.cssFloat = seedForm.style.styleFloat = 'left'; // stupid ie
 
 			seedText = document.createElement('input');
 			seedText.setAttribute('type', 'text');

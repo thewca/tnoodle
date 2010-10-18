@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.Package;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -88,7 +89,6 @@ import com.sun.net.httpserver.HttpServer;
 @SuppressWarnings("restriction")
 public class ScrambleServer {
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
-	//TODO - it would be nice to rename the java process to something more descriptive
 	private static final int MAX_COUNT = 100;
 	
 	public ScrambleServer(int port, File scrambleFolder, boolean browse) throws IOException {
@@ -106,7 +106,9 @@ public class ScrambleServer {
 		server.start();
 		
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
-		System.out.println("Server started on " + addr);
+		Package p = getClass().getPackage();
+		String name = p.getImplementationTitle() + "-" + p.getImplementationVersion();
+		System.out.println(name + " started on " + addr);
 		String url = "http://" + addr;
 		if(browse) {
 			if(Desktop.isDesktopSupported()) {
