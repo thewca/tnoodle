@@ -69,7 +69,6 @@ public class Launcher {
 		jvmArgs.add("-exe"); //TODO - document this!
 		jvmArgs.addAll(Arrays.asList(args));
 
-		System.out.println(jvmArgs);
 		try {
 			ProcessBuilder pb = new ProcessBuilder(jvmArgs);
 			pb.redirectErrorStream(true);
