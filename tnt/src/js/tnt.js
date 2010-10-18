@@ -41,8 +41,9 @@ tnoodle.tnt = {
 		}
 		optionsDiv.hide = function(e) {
 			optionsDiv.fade('out');
-			if(hiddenCallback)
+			if(hiddenCallback) {
 				timer = setTimeout(fireHidden, 500);
+			}
 			optionsButton.morph('.optionsButton');
 		};
 		optionsDiv.fade('hide');
