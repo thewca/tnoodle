@@ -90,7 +90,6 @@ var TimesTable = new Class({
 				} else if(key == 'sessionAve') {
 					cells[col].set('html', '&sigma; = ' + format(this.session.stdDev()));	
 				} else {
-					//cells[col].set('html', format(this.session.bestWorst().best.centis));
 					var best = this.session.bestWorst(key).best;
 					cells[col].set('html', format(best.centis));
 					cells[col].removeClass('bestRA');
@@ -124,7 +123,7 @@ var TimesTable = new Class({
 		});
 		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH+4);
 		
-		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100' ];
+		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100', 'sessionAve' ];
 		var initing = true;
 		var refreshCols = function() {
 			if(initing) {
@@ -177,6 +176,7 @@ var TimesTable = new Class({
 		this.deselectRows = deselectRows;
 		this.promptTime = function() {
 			deselectRows();
+			this.addRow.hover(); //hovering is necessary to get the timeHoverDiv to show up
 			selectRow(this.addRow);
 		}.bind(this);
 		window.addEvent('click', function(e) {
@@ -418,7 +418,9 @@ var TimesTable = new Class({
 		timeHoverDiv.hide = function() {
 			//TODO - comment! SEE A
 			if(!timeHoverDiv.tr || !timeHoverDiv.tr.editing) {
-				timeHoverDiv.fade('out');
+				setTimeout(function() {
+					timeHoverDiv.fade('out');
+				}, 0);
 			}
 		};
 		this.timeHoverDiv = timeHoverDiv;
@@ -725,7 +727,6 @@ var TimesTable = new Class({
 			table.timeHoverDiv.hide();
 		};
 		tr.select = function() {
-			this.hover(); //the addRow can be selected without previously being hovered
 			this.selected = true;
 			this.refresh();
 		};

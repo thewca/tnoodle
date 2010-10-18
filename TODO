@@ -21,7 +21,14 @@ BUGS
 	+hovering to penalize/tag times...
 +1 line scrambles shouldn't get oddly spaced
 +cannot call split of undefined when getting scramble & server is down
++sizing of table columns option is odd in chrome, fixed with nasty workaround
++selecting multiple times shows X on all times
++tagging div doesn't disappear in FF
 
+-sizing of columns doesn't work in windows chrome/FF
+
+-best session ave is colored, what's the point?
+	-same goes for some of the other columns
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cache bests and worsts
 -fix file permissions

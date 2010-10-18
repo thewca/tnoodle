@@ -144,11 +144,12 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		scramble();
 		var width = configuration.get('scramble.' + puzzle + '.size.width', null);
 		var height = configuration.get('scramble.' + puzzle + '.size.height', null);
-		if(width !== null && height !== null) {
+		if(width && height) {
 			scrambleDiv.style.height = height;
 			scrambleDiv.style.width = width;
 		} else {
 			//we'll have to wait for the scramble info to load to know how big to make the scramble
+			width = height = null;
 		}
 
 		scrambler.loadPuzzleImageInfo(
@@ -167,9 +168,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 					defaultColorScheme = puzzleImageInfo.colorScheme;
 
 					defaultSize = puzzleImageInfo.size;
-					if(width === null || height === null) {
+					if(!width || !height) {
 						scrambleDiv.style.width = puzzleImageInfo.size.width + getScrambleHorzPadding() + "px";
-						scrambleDiv.style.height = puzzleImageInfo.size.height	+ getScrambleVertPadding() + "px";
+						scrambleDiv.style.height = (puzzleImageInfo.size.height + getScrambleVertPadding()) + "px";
 					}
 					scrambleResized();
 				}
@@ -835,7 +836,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleDivHeader.appendChild(closeScramble);
 
 	var minimizeScramble = document.createElement('span');
-	minimizeScramble.appendChild(document.createTextNode('.'));
+	minimizeScramble.appendChild(document.createTextNode('*'));
 	minimizeScramble.className = 'button close';
 	minimizeScramble.title = 'Reset size';
 	xAddListener(minimizeScramble, 'click', function() {
@@ -884,11 +885,12 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			}
 			var width = configuration.get('scramble.' + puzzle + '.size.width', null);
 			var height = configuration.get('scramble.' + puzzle + '.size.height', null);
-			if(width === null || height === null) {
+			if(!width || !height) {
 				width = height = null;
+			} else {
+				width = width.toInt() - getScrambleHorzPadding();
+				height = height.toInt() - getScrambleVertPadding();
 			}
-			width = width.toInt() - getScrambleHorzPadding();
-			height = height.toInt() - getScrambleVertPadding();
 			this.src = scrambler.getScrambleImageUrl(puzzle, scramble, colorScheme, width, height);
 		}
 	};

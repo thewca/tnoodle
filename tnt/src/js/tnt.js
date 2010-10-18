@@ -25,10 +25,22 @@ tnoodle.tnt = {
 		var optionsDiv = new Element('div', { 'class': 'options' });
 		optionsDiv.inject(document.body);
 		var timer = null;
+		var width = null;
 		optionsDiv.show = function() {
+			//This is a really weird hack for windows chrome
+			//Apparently the first time the optionsDiv is shown,
+			//it has the right size. However, if you resize the window
+			//before showing it again, the size gets screwed up.
+			//This is a cheap workaround. TODO - fix?
+			if(!width) {
+				width = optionsDiv.getSize().x-10-2; //-10 for padding, -2 for border
+			} else {
+				optionsDiv.setStyle('width', width);
+			}
+
 			if(timer !== null) {
 				clearTimeout(timer);
-			} else {
+			} else if(showCallback) {
 				showCallback();
 			}
 			optionsDiv.position({relativeTo: optionsButton, position: 'bottomRight', edge: 'topRight'});
@@ -37,13 +49,13 @@ tnoodle.tnt = {
 		};
 		function fireHidden() {
 			timer = null;
-			hiddenCallback();
+			if(hiddenCallback) {
+				hiddenCallback();
+			}
 		}
 		optionsDiv.hide = function(e) {
 			optionsDiv.fade('out');
-			if(hiddenCallback) {
-				timer = setTimeout(fireHidden, 500);
-			}
+			timer = setTimeout(fireHidden, 500);
 			optionsButton.morph('.optionsButton');
 		};
 		optionsDiv.fade('hide');
