@@ -5,7 +5,7 @@
 	</description>
 	
 	<property name="NAME" value="TNTServer" />
-	<property name="VERSION" value="0.1.1" />
+	<property name="VERSION" value="0.1.2" />
 	
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />
