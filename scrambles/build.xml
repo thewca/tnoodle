@@ -92,6 +92,7 @@
 		<echo file="${plugin-list}">${plugin-files}</echo>
 	</target>
 	
+	<!-- TODO - command line args would be damn nice -->
 	<target name="run" depends="compile" description="runs the server without compiling the jar file first">
 		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false">
                    <arg value="-n" />
@@ -173,11 +174,10 @@
 			task effectively deletes the tnt src code, which is bad.
 			Hopefully either rm (linux) or rmdir (windows) will work
 			for us.
-			TODO - test on a mac...lol
 		<delete dir="${bin}" followsymlinks="false" />
 		-->
-                <antcall target="cleanWin" />
-                <antcall target="cleanUnix" />
+		<antcall target="cleanWin" />
+		<antcall target="cleanUnix" />
 		
 		<delete dir="${dist}" />
 	</target>

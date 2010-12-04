@@ -32,7 +32,7 @@ public class Launcher {
 		}
 		File jar = getJarFile();
 		if(jar == null) {
-			//we're not going to bother with this... too tricky
+			// We're not going to bother with this... too tricky
 			return;
 		}
 		if(name == null) {
@@ -92,8 +92,6 @@ public class Launcher {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		// TODO - can use this functionality to kill the old process and replace it
-		// with ourselves
 	}
 	public static void copyFile(File sourceFile, File destFile) throws IOException {
 		if(!destFile.exists()) {

@@ -160,8 +160,7 @@ tnoodle.server = function(url) {
 				if(key == 'centis') {
 					if(this.penalty == "+2") {
 						time += "+";
-					} /*else if(this.penalty == "DNF") TODO - implement qqtimer-esque DNF(value)
-					time += " (" + this.centis + ")";*/
+					}
 				}
 				return time;
 			}

@@ -294,25 +294,27 @@ var TimesTable = new Class({
 			backgroundColor: 'white',
 			zIndex: 4
 		});
-		var makeLabel = function(el) {
-			var label = new Element('label', {'for': el.id, html: el.value});
-			el.inject(label, 'top');
+		var makeLabelAndSettable = function(el) {
+			var label = new Element('label', {'for': el.id});
+			el.setText = function(text) {
+				label.set('html', text);
+				el.inject(label, 'top');
+			};
+			el.setText(el.value);
 			return label;
 		};
 		
 		var fieldSet = new Element('fieldset');
-		timeHoverDiv.legend = new Element('legend');
-		fieldSet.adopt(timeHoverDiv.legend);
-		var noPenalty = new Element('input', { type: 'radio', name: 'penalty', value: 'No penalty', id: 'noPenalty' });
-		fieldSet.adopt(makeLabel(noPenalty));
-		var dnf = new Element('input', { type: 'radio', name: 'penalty', value: 'DNF', id: 'dnf' });
-		fieldSet.adopt(makeLabel(dnf));
-		var plusTwo = new Element('input', { type: 'radio', name: 'penalty', value: '+2', id: 'plusTwo' });
+		var noPenalty = new Element('input', { type: 'radio', name: 'penalty', id: 'noPenalty', value: 'noPenalty' });
+		fieldSet.adopt(makeLabelAndSettable(noPenalty));
+		var dnf = new Element('input', { type: 'radio', name: 'penalty', id: 'dnf', value: 'dnf' });
+		fieldSet.adopt(makeLabelAndSettable(dnf));
+		var plusTwo = new Element('input', { type: 'radio', name: 'penalty', id: 'plusTwo', value: 'plusTwo' });
 		
 		//select the correct penalty
 		timeHoverDiv.penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };
 		
-		fieldSet.adopt(makeLabel(plusTwo));
+		fieldSet.adopt(makeLabelAndSettable(plusTwo));
 		var form = new Element('form');
 		form.adopt(fieldSet);
 		fieldSet.addEvent('change', function(e) {
@@ -397,15 +399,23 @@ var TimesTable = new Class({
 					timeHoverDiv.adopt(errorField);
 				} else if(timeHoverDiv.time !== null) {
 					timeHoverDiv.adopt(timeHoverDiv.form);
-
-					timeHoverDiv.legend.set('html', 'Penalty (time: ' + timeHoverDiv.time.format('rawCentis') + ')');
-					timeHoverDiv.penalties[String(timeHoverDiv.time.getPenalty())].checked = true;
+					var penalty = timeHoverDiv.time.getPenalty();
+					//TODO - loop over the kinds of penalties here
+					time.setPenalty("");
+					noPenalty.setText(time.format());
+					dnf.setText("DNF");
+					time.setPenalty("+2");
+					plusTwo.setText(time.format());
+					time.setPenalty(penalty);
+					// Note that calling String(null) = "null". Some browsers
+					// don't like null keys.
+					timeHoverDiv.penalties[String(penalty)].checked = true;
 					optionsDiv.refresh();
 				}
 			}
 			var el = timeHoverDiv.tr.getChildren()[1];
 			if(isOrIsChild(el, this.tbody)) {
-				timeHoverDiv.position({relativeTo: el, position: 'bottomLeft', edge: 'topRight'});
+				timeHoverDiv.position({relativeTo: el, position: 'right', edge: 'left'});
 				//make sure this doesn't fall off the end of the world
 				if(timeHoverDiv.getPosition().y + timeHoverDiv.getSize().y > window.getSize().y) {
 					timeHoverDiv.position({relativeTo: el, position: 'topLeft', edge: 'bottomRight'});

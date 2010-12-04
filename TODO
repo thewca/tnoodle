@@ -33,7 +33,7 @@ BUGS
 -cache bests and worsts
 -fix file permissions
 -bug in mootools-more:~1913
--but in mootools-more: //TODO need this to provide a more stable sorting
+-bug in mootools-more: //TODO need this to provide a more stable sorting
 
 FEATURES
 +added medians

@@ -24,6 +24,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.Package;
 import java.lang.reflect.Type;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -88,6 +89,19 @@ import com.sun.net.httpserver.HttpServer;
 
 @SuppressWarnings("restriction")
 public class ScrambleServer {
+	public static String NAME, VERSION;
+	static {
+		Package p = ScrambleServer.class.getPackage();
+
+		NAME = p.getImplementationTitle();
+		if(NAME == null) {
+			NAME = ScrambleServer.class.getName();
+		}
+		VERSION = p.getImplementationVersion();
+		if(VERSION == null) {
+			VERSION = "devel";
+		}
+	}
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
 	private static final int MAX_COUNT = 100;
 	
@@ -102,13 +116,12 @@ public class ScrambleServer {
 		server.createContext("/import/", new ImporterHandler());
 		server.createContext("/scramble/", new ScramblerHandler(scramblers));
 		server.createContext("/view/", new ScrambleViewerHandler(scramblers));
+		server.createContext("/kill/", new DeathHandler());
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		
 		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
-		Package p = getClass().getPackage();
-		String name = p.getImplementationTitle() + "-" + p.getImplementationVersion();
-		System.out.println(name + " started on " + addr);
+		System.out.println(NAME + "-" + VERSION + " started on " + addr);
 		String url = "http://" + addr;
 		if(browse) {
 			if(Desktop.isDesktopSupported()) {
@@ -130,6 +143,23 @@ public class ScrambleServer {
 		System.out.println("Visit " + url + " for a readme and demo.");
 	}
 	
+	private class DeathHandler extends SafeHttpHandler {
+		public DeathHandler() { }
+		
+		protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
+			if(path.length == 2 && path[1].equals("now")) {
+				// TODO - check that src ip is this machine!
+				// If localhost makes a request to
+				// http://localhost:PORT/kill/now
+				// that's enough for us to commit honorable suicide.
+				System.out.println("Asked to kill myself by ****");
+				sendText(t, "Nice knowing ya'!");
+				System.exit(0);
+			}
+			sendText(t, NAME + "-" + VERSION);
+		}
+	}
+
 	private class FileHandler extends SafeHttpHandler {
 		MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
 		{
@@ -458,11 +488,10 @@ public class ScrambleServer {
 
 				if(ext == null || ext.equals("txt")) {
 					StringBuilder sb = new StringBuilder();
-					for(String scramble : scrambles) {
-						//we replace newlines with spaces
-						//TODO - if assume that scrambles are separated by CRLFs,
-						//       then having newlines in the scrambles should be fine
-						sb.append(scramble.replaceAll("\n", " ")).append("\r\n");
+					for(int i = 0; i < scrambles.length; i++) {
+						String scramble = scrambles[i];
+						// We replace newlines with spaces
+						sb.append(i + ". " + scramble.replaceAll("\n", " ")).append("\r\n");
 					}
 					sendText(t, sb.toString());
 				} else if(ext.equals("json")) {
@@ -577,14 +606,44 @@ public class ScrambleServer {
 		Launcher.wrapMain(args);
 
 		OptionParser parser = new OptionParser();
-		OptionSpec<Integer> port = parser.accepts("port", "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
-		OptionSpec<File> scrambleFolder = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
-		OptionSpec<?> noBrowser = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
+		OptionSpec<Integer> portOpt = parser.accepts("port", "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
+		OptionSpec<File> scrambleFolderOpt = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
+		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
+		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, kill it before starting up");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
-				new ScrambleServer(options.valueOf(port), options.valueOf(scrambleFolder), !options.has(noBrowser));
+				int port = options.valueOf(portOpt);
+				File scrambleFolder = options.valueOf(scrambleFolderOpt);
+				boolean openBrowser = !options.has(noBrowserOpt);
+				try {
+					new ScrambleServer(port, scrambleFolder, openBrowser);
+				} catch(BindException e) {
+					// If this port is in use, we assume it's an instance of
+					// ScrambleServer, and ask it to commit honorable suicide.
+					// After that, we can start up. If it was a ScrambleServer,
+					// it hopefully will have freed up the port we want.
+					URL url = new URL("http://localhost:" + port + "/kill/now");
+					System.out.println("Detected server running on port " + port + ", maybe it's an old " + NAME + "? Sending request to " + url + " to hopefully kill it.");
+					URLConnection conn = url.openConnection();
+					InputStream in = conn.getInputStream();
+					in.close();
+					// If we've gotten here, then the previous server may be dead,
+					// lets try to start up.
+					System.out.println("Hopefully the old server is now dead, trying to start up.");
+					final int MAX_TRIES = 10;
+					for(int i = 1; i <= MAX_TRIES; i++) {
+						try {
+							Thread.sleep(1000);
+							System.out.println("Attempt " + i + "/" + MAX_TRIES + " to start up");
+							new ScrambleServer(port, scrambleFolder, openBrowser);
+							break;
+						} catch(Exception ee) {
+							ee.printStackTrace();
+						}
+					}
+				}
 				return;
 			}
 		} catch(Exception e) {
