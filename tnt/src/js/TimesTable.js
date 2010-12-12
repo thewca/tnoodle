@@ -300,11 +300,12 @@ var TimesTable = new Class({
 				label.set('html', text);
 				el.inject(label, 'top');
 			};
-			el.setText(el.value);
 			return label;
 		};
 		
 		var fieldSet = new Element('fieldset');
+		fieldSet.setStyle('margin', 0);
+		fieldSet.setStyle('border', '2px solid black');
 		var noPenalty = new Element('input', { type: 'radio', name: 'penalty', id: 'noPenalty', value: 'noPenalty' });
 		fieldSet.adopt(makeLabelAndSettable(noPenalty));
 		var dnf = new Element('input', { type: 'radio', name: 'penalty', id: 'dnf', value: 'dnf' });
@@ -415,10 +416,15 @@ var TimesTable = new Class({
 			}
 			var el = timeHoverDiv.tr.getChildren()[1];
 			if(isOrIsChild(el, this.tbody)) {
+				timeHoverDiv.setPosition({x:0,y:0}); // let it size itself properly
+				var oldWidth = timeHoverDiv.getSize().x;
 				timeHoverDiv.position({relativeTo: el, position: 'right', edge: 'left'});
-				//make sure this doesn't fall off the end of the world
-				if(timeHoverDiv.getPosition().y + timeHoverDiv.getSize().y > window.getSize().y) {
-					timeHoverDiv.position({relativeTo: el, position: 'topLeft', edge: 'bottomRight'});
+				if(timeHoverDiv.getSize().x < oldWidth) {
+					// keep the hover from getting squished, if at all possible
+					timeHoverDiv.setPosition({x:0,y:0}); // let it size itself properly
+					var row = el.getParent();
+					timeHoverDiv.setStyle('margin-right', '10px'); // this guarantees room to select a row
+					timeHoverDiv.position({relativeTo: row, position: 'right', edge: 'right'});
 				}
 				timeHoverDiv.fade('in');
 			} else {

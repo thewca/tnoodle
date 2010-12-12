@@ -58,6 +58,7 @@ FEATURES
 +fixed bug where resizing scramble image could make it permanently too big
 +improve behavior of update freq option
 
+-always manual time entry option
 -need a favicon.ico!
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
@@ -67,7 +68,7 @@ FEATURES
 	-cleanup tagging code?
 -solve/session comments
 -add help/about
-	-Add a note about running multiple instances of tnt
+	-Add a note about opening multiple instances of tnt
 	-shorcuts: documentation & configuration
 
 -read times/metronome
