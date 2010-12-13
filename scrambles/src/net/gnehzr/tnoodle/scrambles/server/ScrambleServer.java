@@ -152,9 +152,14 @@ public class ScrambleServer {
 				// If localhost makes a request to
 				// http://localhost:PORT/kill/now
 				// that's enough for us to commit honorable suicide.
-				System.out.println("Asked to kill myself by ****");
-				sendText(t, "Nice knowing ya'!");
-				System.exit(0);
+				String remote = t.getRemoteAddress().getAddress().getHostAddress();
+				System.out.print("Asked to kill myself by " + remote + "...");
+				if(remote.equals("127.0.0.1")) {
+					sendText(t, "Nice knowing ya'!");
+					System.out.println("committing suicide");
+					System.exit(0);
+				}
+				System.out.println("ignoring request");
 			}
 			sendText(t, NAME + "-" + VERSION);
 		}
