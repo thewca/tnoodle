@@ -5,7 +5,7 @@
 <script type="text/javascript">
 
 function scrambleLink(link,puzzlename,title) {
-	document.getElementById(link).setAttribute('action','http://localhost:8080/scramble/' + document.getElementById(puzzlename).value + '.' + document.getElementById(title).value + '.pdf');
+	document.getElementById(link).setAttribute('action',document.location.origin+'/scramble/' + document.getElementById(puzzlename).value + '.' + document.getElementById(title).value + '.pdf');
 }
 
 var cubeType = new Array();
@@ -74,7 +74,7 @@ input, select, table {
 <table border=0>
 <tr>
 <td width=95%>
-<form name="scramblepdf" id="scramblepdf" action="http://localhost:8080/scramble/3x3x3.scramble.pdf" target=_blank>
+<form name="scramblepdf" id="scramblepdf" action="" target=_blank>
 Puzzle:
 <select id="puzzlename" onchange="scrambleLink('scramblepdf','puzzlename','title'); changeList(this)">
 <option selected="selected" value="3x3x3">3x3x3</option>
@@ -115,5 +115,8 @@ Color scheme:
 </table>
 </div>
 
+<script type="text/javascript">
+scrambleLink('scramblepdf','puzzlename','title');
+</script>
 </body>
 </html>

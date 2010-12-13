@@ -615,7 +615,7 @@ public class ScrambleServer {
 		OptionSpec<File> scrambleFolderOpt = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, kill it before starting up");
-		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "?"), "Show this help");
+		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
