@@ -12,10 +12,14 @@
 	<property name="dist" location="dist" />
 	<property name="scramblers" location="${bin}/scramblers" />
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
+
 	<property name="readme-src" location="${src}/index.html" />
 	<property name="readme-bin" location="${bin}/index.html" />
 	<property name="shelley-src" location="${src}/scramblegen.html" />
 	<property name="shelley-bin" location="${bin}/scramblegen.html" />
+	<property name="favicon-src" location="${src}/favicon.ico" />
+	<property name="favicon-bin" location="${bin}/favicon.ico" />
+
 	<property name="server-jar" location="${dist}/${NAME}-${VERSION}.jar" />
 	<property name="applet-jar" location="${dist}/ScrambleApplet.jar" />
 	<!-- This seems kinda weird, but is probably the only way to do this -->
@@ -75,6 +79,8 @@
 		<copy file="${readme-src}" tofile="${readme-bin}" />
 		<!-- copying scramblegen.html -->
 		<copy file="${shelley-src}" tofile="${shelley-bin}" />
+		<!-- copying favicon.ico -->
+		<copy file="${favicon-src}" tofile="${favicon-bin}" />
 		
 		<delete file="${plugin-list}" />
 		<pathconvert property="plugin-files" pathsep="${line.separator}">
