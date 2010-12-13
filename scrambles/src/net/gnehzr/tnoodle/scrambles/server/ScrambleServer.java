@@ -148,13 +148,13 @@ public class ScrambleServer {
 		
 		protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
 			if(path.length == 2 && path[1].equals("now")) {
-				// TODO - check that src ip is this machine!
 				// If localhost makes a request to
 				// http://localhost:PORT/kill/now
 				// that's enough for us to commit honorable suicide.
 				String remote = t.getRemoteAddress().getAddress().getHostAddress();
 				System.out.print("Asked to kill myself by " + remote + "...");
 				if(remote.equals("127.0.0.1")) {
+					// Only kill ourselves if someone on thhis machine requested it
 					sendText(t, "Nice knowing ya'!");
 					System.out.println("committing suicide");
 					System.exit(0);
@@ -611,7 +611,7 @@ public class ScrambleServer {
 		Launcher.wrapMain(args);
 
 		OptionParser parser = new OptionParser();
-		OptionSpec<Integer> portOpt = parser.accepts("port", "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
+		OptionSpec<Integer> portOpt = parser.acceptsAll(Arrays.asList("p", "port"), "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(8080);
 		OptionSpec<File> scrambleFolderOpt = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, kill it before starting up");
