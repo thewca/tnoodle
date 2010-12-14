@@ -94,3 +94,10 @@ img {
 	text-align: left;
 	z-index: 5;
 }
+.popup {
+	z-index: 1;
+	position: absolute;
+	background-color: #EEE;
+	padding: 5px;
+	border: 1px solid;
+}

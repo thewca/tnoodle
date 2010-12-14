@@ -28,6 +28,7 @@ BUGS
 	+same goes for some of the other columns
 +fix file permissions
 
+-FF lags when the scramble loads
 -sizing of columns doesn't work in windows chrome/FF
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cache bests and worsts

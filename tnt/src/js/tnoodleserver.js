@@ -391,7 +391,7 @@ tnoodle.server = function(url) {
 				return {
 					best: { centis: null, index: null },
 					worst: { centis: null, index: null }
-				}
+				};
 			}
 			var minKey = Infinity, maxKey = 0;
 			var minIndex = null, maxIndex = null;

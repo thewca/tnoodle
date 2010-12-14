@@ -602,30 +602,13 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var scrambleArea = document.createElement('div');
 	scrambleArea.className = 'scrambleArea';
 
-	var importDiv = document.createElement('div');
-	importDiv.className = 'importDiv';
-	importDiv.style.zIndex = 5; //this belongs on top
-	document.body.appendChild(importDiv);
-
-	importDiv.show = function() {
+	function show() {
 		if(currImportLink === null) {
 			//initialization
 			promptImportUrl.call(importUrlLink);
 		}
-		this.style.display = 'inline';
-		this.center();
-	}.bind(importDiv);
-	importDiv.center = function() {
-		var windowWidth = window.innerWidth || window.clientWidth;
-		var windowHeight = window.innerHeight || window.clientHeight;
-		var importWidth = parseInt(this.getStyle('width'), 10);
-		var importHeight = parseInt(this.getStyle('height'), 10);
-		this.style.top = (windowHeight - importHeight)/2 + 'px';
-		this.style.left = (windowWidth - importWidth)/2 + 'px';
-	}.bind(importDiv);
-	importDiv.hide = function() {
-		this.style.display = 'none';
-
+	}
+	function hide() {
 		// cancel any outgoing requests
 		if(activeImportRequest) {
 			activeImportRequest.abort();
@@ -634,14 +617,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			activeImportButton.disabled = false;
 		}
 		waitingIcon.style.display = 'none';
-	}.bind(importDiv);
-	importDiv.hide();
-	xAddListener(document, 'keydown', function(e) {
-		if(e.keyCode == 27) {
-			importDiv.hide();
-		}
-	});
-	xAddListener(window, 'resize', importDiv.center);
+	}
+	
+	var importDiv = tnoodle.tnt.createPopup(show, hide);
 	
 	var importDivTabs = document.createElement('span');
 	importDiv.appendChild(importDivTabs);

@@ -68,5 +68,36 @@ tnoodle.tnt = {
 			div: optionsDiv,
 			button: optionsButton
 		};
+	},
+	createPopup: function(show, hide) {
+		var popup = document.createElement('div');
+		popup.className = 'popup';
+		popup.style.zIndex = 5; //this belongs on top
+		document.body.appendChild(popup);
+
+		popup.show = function() {
+			this.style.display = 'inline';
+			this.center();
+			show();
+		}.bind(popup);
+		popup.center = function() {
+			var windowWidth = window.innerWidth || window.clientWidth;
+			var windowHeight = window.innerHeight || window.clientHeight;
+			var importWidth = parseInt(this.getStyle('width'), 10);
+			var importHeight = parseInt(this.getStyle('height'), 10);
+			this.style.top = (windowHeight - importHeight)/2 + 'px';
+			this.style.left = (windowWidth - importWidth)/2 + 'px';
+		}.bind(popup);
+		popup.hide = function() {
+			this.style.display = 'none';
+		}.bind(popup);
+		popup.hide();
+		document.addEvent('keydown', function(e) {
+			if(e.keyCode == 27) {
+				popup.hide();
+			}
+		});
+		window.addEvent('resize', popup.center);
+		return popup;
 	}
 };

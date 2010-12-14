@@ -35,13 +35,6 @@ span.turn:hover {
 	overflow-x: hidden;
 	overflow-y: auto;
 }
-
-.importDiv {
-	z-index: 2; /*on top of scramble window */
-}
-
-.scrambleText {
-}
 area {/* apparently this doesn't work in opera or chrome */
     cursor: pointer;
 }
@@ -55,13 +48,6 @@ div.scrambleHeader {
 	position: relative;
     border-bottom: 1px solid #333;
     background-color: #EEE;
-}
-.importDiv {
-	z-index: 1;
-	position: absolute;
-	background-color: #EEE;
-	padding: 5px;
-	border: 1px solid;
 }
 
 .button.changeColors {
