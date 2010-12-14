@@ -58,8 +58,8 @@ FEATURES
 +fixed bug where resizing scramble image could make it permanently too big
 +improve behavior of update freq option
 +need a favicon.ico!
++always manual time entry option a la qqtimer
 
--always manual time entry option a la qqtimer
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
 -add remaining stackmat options

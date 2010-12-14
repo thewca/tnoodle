@@ -587,6 +587,8 @@ var TimesTable = new Class({
 						var newTime = new this.server.Time(textField.value, this.scrambleStuff.getScramble());
 						this.addTime(newTime);
 						this.scrambleStuff.scramble();
+
+						this.promptTime();
 					}
 				} catch(error) {
 					// No need for an alert
