@@ -314,9 +314,14 @@ tnoodle.server = function(url) {
 		[ 'date', 'Date', 'Milliseconds since the epoch' ],
 		[ 'scramble', 'Scramble', null ]
 	];
-	this.timeKeys = keyInfo.map(function(a) { return a[0]; });
-	this.timeKeyNames = keyInfo.map(function(a) { return a[1]; });
-	this.timeKeyDescriptions = keyInfo.map(function(a) { return a[2]; });
+	function nthEl(n) {
+		return function(a) {
+			return a[n];
+		};
+	}
+	this.timeKeys = keyInfo.map(nthEl(0));
+	this.timeKeyNames = keyInfo.map(nthEl(1));
+	this.timeKeyDescriptions = keyInfo.map(nthEl(2));
 	this.Time = Time;
 	
 	function Session(id, puzzle, customization) {
@@ -378,6 +383,16 @@ tnoodle.server = function(url) {
 		};
 		//TODO - cache!
 		this.bestWorst = function(key) {
+			if(key == 'sessionAve' || key == 'date' || key == 'tags') {
+				// The concept of a best and worst really doesn't
+				// exist or make sense for these keys.
+				// We don't want to return a valid index,
+				// else some cells will get marked as the "best" date, tags, etc.
+				return {
+					best: { centis: null, index: null },
+					worst: { centis: null, index: null }
+				}
+			}
 			var minKey = Infinity, maxKey = 0;
 			var minIndex = null, maxIndex = null;
 			for(var i = 0; i < this.times.length; i++) {

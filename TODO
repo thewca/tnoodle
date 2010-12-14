@@ -24,14 +24,13 @@ BUGS
 +sizing of table columns option is odd in chrome, fixed with nasty workaround
 +selecting multiple times shows X on all times
 +tagging div doesn't disappear in FF
++best session ave is colored, what's the point?
+	+same goes for some of the other columns
++fix file permissions
 
 -sizing of columns doesn't work in windows chrome/FF
-
--best session ave is colored, what's the point?
-	-same goes for some of the other columns
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cache bests and worsts
--fix file permissions
 -bug in mootools-more:~1913
 -bug in mootools-more: //TODO need this to provide a more stable sorting
 
@@ -57,9 +56,9 @@ FEATURES
 +big scramble view is blurry (pedro)
 +fixed bug where resizing scramble image could make it permanently too big
 +improve behavior of update freq option
++need a favicon.ico!
 
--always manual time entry option
--need a favicon.ico!
+-always manual time entry option a la qqtimer
 -clickable stuff in timestable to get jnet/cct style stats?
 	-hovering/clicking on bests idea...?
 -add remaining stackmat options

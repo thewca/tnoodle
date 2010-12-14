@@ -1,4 +1,4 @@
-*.class
+*.swp
 dist/
 bin/
 JCubeExplorer.jar

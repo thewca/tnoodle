@@ -670,7 +670,7 @@ var TimesTable = new Class({
 					cells[col].removeEvent('click');
 					if(tr.hovered) {
 						cells[col].set('html', 'X');
-						cells[col].addClass('deleteTime'); //TODO - pretty picture
+						cells[col].addClass('deleteTime');
 						cells[col].addEvent('click', deleteTime);
 					} else {
 						cells[col].set('html', time.index + 1);
