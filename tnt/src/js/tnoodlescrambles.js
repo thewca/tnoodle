@@ -43,7 +43,7 @@ tnoodle.ajax = function(callback, url, data) {
 			// freaking opera & ie, man
 			// we'll make an attempt to use jsonp here
 			tnoodle.jsonp(callback, url, data);
-			return;
+			return null;
 		}
 	} else {
 		xhr.open('get', dataUrl, true);

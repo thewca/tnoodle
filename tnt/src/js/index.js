@@ -14,7 +14,7 @@ window.addEvent('domready', function() {
 			scrambleStuff.setSelectedPuzzle(session.getPuzzle());
 		}
 	}
-	scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
+	var scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 
@@ -94,7 +94,7 @@ window.addEvent('domready', function() {
 		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
 		for(i = 0; i < resolutions.length; i++) {
 			agostr = date.diff(today, resolutions[i]);
-			a = date; b = today;
+			var a = date; var b = today;
 			if(agostr > 0) {
 				break;
 			}
