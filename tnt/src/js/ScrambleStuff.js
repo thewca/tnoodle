@@ -731,26 +731,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	newScrambleLink.appendChild(document.createTextNode('New Scramble'));
 	scrambleHeader.appendChild(newScrambleLink);
 
-	var mouseDown = false;
-	xAddListener(document, 'mouseup', function(e) {
-		mouseDown = false;
-	}, false);
-	xAddListener(document, 'mousedown', function(e) {
-		mouseDown = true;
-		if(!e.target) {
-			e.target = e.srcElement; // freaking ie, man
-		}
-
-		if(isOrIsChild(e.target, puzzleSelect)) {
-			// we allow the user to switch scrambles while importing
-			return;
-		}
-
-		if(!isOrIsChild(e.target, importDiv)) {
-			importDiv.hide();
-		}
-	}, false);
-
 	/*
 	 * TODO use something like zero copy here? or do what google maps does and
 	 * popup a selected text box? var copyLink = document.createElement('span');

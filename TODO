@@ -28,7 +28,9 @@ BUGS
 	+same goes for some of the other columns
 +fix file permissions
 
--FF lags when the scramble loads
+-FF issues that hopefully disappear with ff 4
+	-get rid of time jittering (appears to be only under linux)
+	-FF lags when the scramble loads
 -sizing of columns doesn't work in windows chrome/FF
 -dan cohen: safari 5 + chrome for mac don't work with stackmat
 -cache bests and worsts
@@ -58,16 +60,18 @@ FEATURES
 +fixed bug where resizing scramble image could make it permanently too big
 +improve behavior of update freq option
 +need a favicon.ico!
-+always manual time entry option a la qqtimer
++always manual time entry a la qqtimer
 
 -clickable stuff in timestable to get jnet/cct style stats?
-	-hovering/clicking on bests idea...?
 -add remaining stackmat options
 	-TODO - test with stackmat!!!
 -pretty gui for editing customizations & tags
 	-cleanup tagging code?
 -solve/session comments
--add help/about
+	-session comments -> tab name?
+	-need the exact dates of sessions somewhere
+	-deal with overflowing tabs...
+-add help/about (/login?)
 	-Add a note about opening multiple instances of tnt
 	-shorcuts: documentation & configuration
 

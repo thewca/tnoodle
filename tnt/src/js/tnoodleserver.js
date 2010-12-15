@@ -589,6 +589,9 @@ tnoodle.server = function(url) {
 			// we remove everything after what we just added
 			history.splice(histIndex+1, history.length-1);
 		};
+		this.formatTimes = function(raSize) {
+			return 'hellooo world! ' + raSize;
+		};
 	}
 	
 	this.createSession = function(puzzle, customization) {

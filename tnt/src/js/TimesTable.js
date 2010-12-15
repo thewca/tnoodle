@@ -16,6 +16,7 @@ var TimesTable = new Class({
 	Extends: HtmlTable,
 	cols: null,
 	headers: null,
+	selectedRASize: 12,
 	initialize: function(id, server, scrambleStuff) {
 		this.server = server;
 		this.configuration = server.configuration;
@@ -85,21 +86,127 @@ var TimesTable = new Class({
 			var cells = this.infoRow.getChildren();
 			for(var col = 0; col < this.cols.length; col++) {
 				var key = this.cols[col];
+				var cell = cells[col];
 				if(key == 'index') {
-					cells[col].set('html', this.session.solveCount()+"/"+this.session.attemptCount());
+					cell.set('html', this.session.solveCount()+"/"+this.session.attemptCount());
+					if(this.session.attemptCount() > 0) {
+						cell.setStyle('cursor', 'pointer');
+						cell.title = 'Click to show stats for session';
+					} else {
+						cell.setStyle('cursor', '');
+						cell.title = '';
+					}
 				} else if(key == 'sessionAve') {
-					cells[col].set('html', '&sigma; = ' + format(this.session.stdDev()));	
+					cell.set('html', '&sigma; = ' + format(this.session.stdDev()));	
+					cell.title = 'This is the standard deviation of all times that count toward your average';
 				} else {
 					var best = this.session.bestWorst(key).best;
-					cells[col].set('html', format(best.centis));
-					cells[col].removeClass('bestRA');
+					cell.set('html', format(best.centis));
+					cell.removeClass('bestRA');
 					if(best.index !== null) {
-						cells[col].addClass('bestTime');
-						cells[col].addClass('bestRA');
+						cell.addClass('bestTime');
+						cell.addClass('bestRA');
+
+						cell.setStyle('cursor', 'pointer');
+						if(key == 'centis') {
+							cell.title = 'Click to select best time';
+						} else {
+							cell.title = 'Click to show stats for best ' + key;
+						}
+					} else {
+						cell.setStyle('cursor', '');
+						cell.title = '';
 					}
 				}
 			}
 		}.bind(this);
+
+		var statsPopup = tnoodle.tnt.createPopup();
+		var statsArea = document.createElement('textarea');
+		statsArea.setAttribute('wrap', 'off');
+		statsArea.style.width = '420px';
+		statsArea.style.height = '180px';
+		statsPopup.appendChild(statsArea);
+		function showStats(raSize) {
+			statsPopup.show();
+			statsArea.value = table.session.formatTimes(raSize);
+		}
+
+		var oldRASize = null;
+		var selectedRA_TD = null;
+		function applyCurr(td) {
+			td.addClass('currentRA');
+			td.addClass('topCurrentRA');
+			td.addClass('bottomCurrentRA');
+		}
+		function removeCurr(td) {
+			td.removeClass('currentRA');
+			td.removeClass('topCurrentRA');
+			td.removeClass('bottomCurrentRA');
+		}
+		this.infoRow.getChildren().each(function(td, index) {
+			// Note that the cursor css and html title
+			// are set in infoRow.refresh.
+			var key = table.cols[index];
+			if(key.match(/^ra[0-9]+$/)) {
+				var raSize = key.substring(2).toInt();
+				td.addEvent('click', function(e) {
+					showStats(raSize);
+				});
+			} else if(key == "index") {
+				td.addEvent('click', function(e) {
+					showStats(-1);
+				});
+			} else if(key == "centis") {
+				// TODO
+				td.addEvent('click', function(e) {
+					var bestIndex = table.session.bestWorst(key).best.index;
+					var rows = table.tbody.getChildren();
+					for(var i = 0; i < rows.length; i++) {
+						if(rows[i].time.index == bestIndex) {
+							deselectRows();
+							rows[i].hover(); //hovering is necessary to get the timeHoverDiv to show up
+							selectRow(rows[i]);
+							table.scrollToRow(rows[i]);
+							e.stop(); // If we don't stop the event, it will clear our selection!
+							return;
+						}
+					}
+				});
+				return;
+			} else {
+				// We have nothing useful to do when this cell is clicked
+				return;
+			}
+			/*
+			if(raSize == table.selectedRASize) {
+				selectedRA_TD = td;
+				applyCurr(td);
+			}
+
+			td.addEvent('dblclick', function(e) {
+				if(selectedRA_TD == td) {
+					return;
+				}
+				removeCurr(selectedRA_TD);
+				selectedRA_TD = td;
+				oldRASize = null;
+			});
+			td.addEvent('mouseover', function(e) {
+				oldRASize = table.selectedRASize;
+				table.selectedRASize = raSize;
+				table.refreshData();
+				applyCurr(td);
+			});
+			td.addEvent('mouseout', function(e) {
+				if(oldRASize && oldRASize != table.selectedRASize) {
+					table.selectedRASize = oldRASize;
+					removeCurr(td);
+					table.refreshData();
+				}
+			});
+			*/
+		});
 		
 		this.thead = $(this).getChildren('thead')[0];
 		this.thead.getChildren('tr')[0].getChildren('th').each(function(th, index) {
@@ -489,7 +596,7 @@ var TimesTable = new Class({
 		if(this.lastAddedRow) {
 			var row = this.lastAddedRow;
 			if(row.nextSibling == this.addRow) {
-				// this little hack will ensure that the addrow is visible
+				// this little hack will ensure that the addRow is visible
 				// whenever we're near the bottom
 				row = this.addRow;
 			}
@@ -697,7 +804,7 @@ var TimesTable = new Class({
 						} else if(time.index == bw.worst.index) {
 							cells[col].addClass('worstTime');
 						}
-						var selectedRASize = 12;
+						var selectedRASize = this.selectedRASize;
 						var bestRA = session.bestWorst('ra' + selectedRASize).best;
 						var attemptCount = session.attemptCount();
 						if(attemptCount >= selectedRASize) {

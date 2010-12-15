@@ -58,23 +58,19 @@
 #timesTable tbody tr.sizerRow td {
 	border-color: transparent;
 }
-#timesTable tbody tr td.deleteTime { /* TODO: pretty picture! */
+#timesTable tbody tr td.deleteTime {
 	cursor: pointer;
 	border-bottom: none;
 	text-align: center;
 }
-#timesTable tbody tr td.extendedDeleteTime { /* TODO: pretty picture! */
-	cursor: pointer;
-	border-top: none;
-}
-#timesTable tbody tr td.currentRA {
+#timesTable .currentRA {
 	border-left: 2px solid red;
 	border-right: 2px solid red;
 }
-#timesTable tbody tr td.topCurrentRA {
+#timesTable .topCurrentRA {
 	border-top: 2px solid red;
 }
-#timesTable tbody tr td.bottomCurrentRA {
+#timesTable .bottomCurrentRA {
 	border-bottom: 2px solid red;
 }
 .bestRA, #timesTable tbody tr td.bestRA {

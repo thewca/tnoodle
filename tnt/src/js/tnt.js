@@ -69,7 +69,7 @@ tnoodle.tnt = {
 			button: optionsButton
 		};
 	},
-	createPopup: function(show, hide) {
+	createPopup: function(onShow, onHide) {
 		var popup = document.createElement('div');
 		popup.className = 'popup';
 		popup.style.zIndex = 5; //this belongs on top
@@ -78,7 +78,9 @@ tnoodle.tnt = {
 		popup.show = function() {
 			this.style.display = 'inline';
 			this.center();
-			show();
+			if(onShow) {
+				onShow();
+			}
 		}.bind(popup);
 		popup.center = function() {
 			var windowWidth = window.innerWidth || window.clientWidth;
@@ -90,14 +92,33 @@ tnoodle.tnt = {
 		}.bind(popup);
 		popup.hide = function() {
 			this.style.display = 'none';
+			if(onHide) {
+				onHide();
+			}
 		}.bind(popup);
 		popup.hide();
 		document.addEvent('keydown', function(e) {
-			if(e.keyCode == 27) {
+			if(e.code == 27) {
 				popup.hide();
 			}
 		});
 		window.addEvent('resize', popup.center);
+
+		var mouseDown = false;
+		document.addEvent('mouseup', function(e) {
+			mouseDown = false;
+		});
+		document.addEvent('mousedown', function(e) {
+			mouseDown = true;
+			if(!e.target) {
+				e.target = e.srcElement; // freaking ie, man
+			}
+
+			if(!isOrIsChild(e.target, popup)) {
+				popup.hide();
+			}
+		});
+
 		return popup;
 	}
 };
