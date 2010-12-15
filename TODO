@@ -63,6 +63,8 @@ FEATURES
 +always manual time entry a la qqtimer
 
 -build script should read version from other build script?
+-it would be nice if ctrl+c killed ant run on windows in mintty
+	-maybe have child listen to heartbeats from parent? lol...
 -add remaining stackmat options
 	-TODO - test with stackmat!!!
 -pretty gui for editing customizations & tags
