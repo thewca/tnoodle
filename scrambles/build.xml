@@ -101,6 +101,10 @@
 	<target name="run" depends="compile" description="runs the server without compiling the jar file first">
 		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false">
 			<arg value="-n" />
+			<!-- We do our development on port 8080 so we don't have to run ant with
+				 sudo privileges on linux -->
+			<arg value="-p" />
+			<arg value="8080" />
 		</java>
 	</target>
 
