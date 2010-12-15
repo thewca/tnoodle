@@ -95,7 +95,6 @@ tnoodle.toQueryString = function(data) {
 tnoodle.scrambles = {
 	//TODO - document!	
 	createAreas: function(faces, scale) {
-	console.log(scale);
 		var deepJoin = function(arr, sep) {
 			return arr.map(function(item) { return item.map(function(coord) { return coord*scale; }).join(sep); }).join(sep);
 		};

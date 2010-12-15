@@ -358,8 +358,11 @@ tnoodle.server = function(url) {
 				return this.puzzle + ":" + this.customization;
 			}
 		};
-		//TODO - stats!!!
-		this.solveCount = function() {
+		this.solveCount = function(lastTime, size) {
+			if(!$chk(lastTime) || !$chk(size)) {
+				lastTime = this.times.length-1;
+				size = this.times.length;
+			}
 			var count = 0;
 			for(var i = 0; i < this.times.length; i++) {
 				if(this.times[i].getPenalty() != "DNF") {
@@ -382,7 +385,11 @@ tnoodle.server = function(url) {
 			saveSessions();
 		};
 		//TODO - cache!
-		this.bestWorst = function(key) {
+		this.bestWorst = function(key, lastSolve, size) {
+			if(!$chk(lastSolve) || !$chk(size)) {
+				lastSolve = this.times.length-1;
+				size = this.times.length;
+			}
 			if(key == 'sessionAve' || key == 'date' || key == 'tags') {
 				// The concept of a best and worst really doesn't
 				// exist or make sense for these keys.
@@ -395,7 +402,7 @@ tnoodle.server = function(url) {
 			}
 			var minKey = Infinity, maxKey = 0;
 			var minIndex = null, maxIndex = null;
-			for(var i = 0; i < this.times.length; i++) {
+			for(var i = lastSolve-size+1; i <= lastSolve; i++) {
 				var val = key ? this.times[i][key] : this.times[i].centis;
 				if(val !== null) {
 					//for min, we choose the *first* guy we can find
@@ -426,7 +433,7 @@ tnoodle.server = function(url) {
 				lastSolve = this.times.length-1;
 				count = this.times.length;
 			}
-			var times = getTrimmedSolves(lastSolve, count, TRIMMED(count));
+			var times = trimSolves(lastSolve, count);
 			if(times === null || times.length === 0) {
 				return null;
 			}
@@ -451,17 +458,16 @@ tnoodle.server = function(url) {
 			return computeRA(lastSolve, size, 2*Math.floor((size-1)/2));
 		}
 		function computeRA(lastSolve, size, trimmed) {
-			if(!trimmed) {
-				trimmed = TRIMMED(size);
-				return computeRA(lastSolve, size, trimmed);
-			}
-			var times = getTrimmedSolves(lastSolve, size, trimmed);
+			var times = trimSolves(lastSolve, size, trimmed);
 			if(times === null) {
 				return null;
 			}
 			return times.map(function(a) { return a.centis; }).average();
 		}
-		function getTrimmedSolves(lastSolve, size, trimmed) {
+		function trimSolves(lastSolve, size, trimmed) {
+			if(!$chk(trimmed)) {
+				trimmed = TRIMMED(size);
+			}
 			if(trimmed % 2 !== 0 || trimmed >= size) {
 				// trimmed must be even, and less than size
 				return null;
@@ -590,7 +596,52 @@ tnoodle.server = function(url) {
 			history.splice(histIndex+1, history.length-1);
 		};
 		this.formatTimes = function(raSize) {
-			return 'hellooo world! ' + raSize;
+			var ra = (raSize > 0);
+			var lastSolve;
+			if(!ra) {
+				lastSolve = this.times.length-1;
+				raSize = this.times.length;
+			} else {
+				lastSolve = this.bestWorst('ra'+raSize).best.index;
+			}
+			var f = server.formatTime;
+
+			var date = this.getDate();
+			var solves = this.solveCount(lastSolve, raSize);
+			var attempts = raSize;
+			var average = f(computeRA(lastSolve, raSize));
+			var stdDev = f(this.stdDev(lastSolve, raSize));
+
+			var best_worst = this.bestWorst('centis', lastSolve, raSize);
+			var best = f(best_worst.best.centis);
+			var worst = f(best_worst.worst.centis);
+
+			var detailedTimes = '';
+			var simpleTimes = '';
+			var countingTimes = trimSolves(lastSolve, raSize);
+			var firstSolve = lastSolve-raSize+1;
+			for(var offset = 0; offset < raSize; offset++) {
+				var i = firstSolve+offset;
+				var time = this.times[i];
+				var timeStr = time.format();
+				if(!countingTimes.contains(time)) {
+					timeStr = "(" + timeStr + ")";
+				}
+				simpleTimes += (i>0?', ':'') + timeStr;
+				detailedTimes += (offset+1) + ". " + timeStr + " " + time.scramble + "\n";
+			}
+
+			var str = '';
+			str += 'Statistics for ' + date + '\n\n';
+			str += 'Average of ' + attempts + ': ' + average + "\n";
+			//str += 'Cubes solved: ' + solves + "/" + attempts + "\n";
+			//str += 'Standard deviation: ' + stdDev + "\n";
+			//str += 'Number of TAG';
+			str += 'Best time: ' + best + "\n";
+			//str += 'Worst time: ' + worst + "\n";
+			str += '\n';
+			str += detailedTimes;
+			return str;
 		};
 	}
 	
@@ -629,6 +680,9 @@ tnoodle.server = function(url) {
 		}
 		customizations[puzzle].push(customization);
 		return true;
+	};
+	this.renameCustomization = function(puzzle, oldcustomization, newcustomization) {
+		//TODO - urgh... editing too?
 	};
 	this.removeCustomization = function(puzzle, customization) {
 		//TODO - urgh... editing too?

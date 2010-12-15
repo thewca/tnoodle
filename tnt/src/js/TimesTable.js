@@ -121,11 +121,11 @@ var TimesTable = new Class({
 			}
 		}.bind(this);
 
-		var statsPopup = tnoodle.tnt.createPopup();
+		var statsPopup = tnoodle.tnt.createPopup(null, null, .7);
 		var statsArea = document.createElement('textarea');
 		statsArea.setAttribute('wrap', 'off');
-		statsArea.style.width = '420px';
-		statsArea.style.height = '180px';
+		statsArea.style.width = '100%';
+		statsArea.style.height = '100%';
 		statsPopup.appendChild(statsArea);
 		function showStats(raSize) {
 			statsPopup.show();
@@ -151,14 +151,19 @@ var TimesTable = new Class({
 			if(key.match(/^ra[0-9]+$/)) {
 				var raSize = key.substring(2).toInt();
 				td.addEvent('click', function(e) {
-					showStats(raSize);
+					if(this.getStyle('cursor') == 'pointer') {
+						// Clicking is only enabled if the cursor is a pointer
+						showStats(raSize);
+					}
 				});
 			} else if(key == "index") {
 				td.addEvent('click', function(e) {
-					showStats(-1);
+					if(this.getStyle('cursor') == 'pointer') {
+						// Clicking is only enabled if the cursor is a pointer
+						showStats(-1);
+					}
 				});
 			} else if(key == "centis") {
-				// TODO
 				td.addEvent('click', function(e) {
 					var bestIndex = table.session.bestWorst(key).best.index;
 					var rows = table.tbody.getChildren();

@@ -69,7 +69,7 @@ tnoodle.tnt = {
 			button: optionsButton
 		};
 	},
-	createPopup: function(onShow, onHide) {
+	createPopup: function(onShow, onHide, size) {
 		var popup = document.createElement('div');
 		popup.className = 'popup';
 		popup.style.zIndex = 5; //this belongs on top
@@ -85,10 +85,20 @@ tnoodle.tnt = {
 		popup.center = function() {
 			var windowWidth = window.innerWidth || window.clientWidth;
 			var windowHeight = window.innerHeight || window.clientHeight;
-			var importWidth = parseInt(this.getStyle('width'), 10);
-			var importHeight = parseInt(this.getStyle('height'), 10);
-			this.style.top = (windowHeight - importHeight)/2 + 'px';
-			this.style.left = (windowWidth - importWidth)/2 + 'px';
+			var width, height;
+			if($chk(size)) {
+				width = windowWidth*size;
+				height = windowHeight*size;
+				this.setStyle('width', width);
+				this.setStyle('height', height);
+				innerDiv.setStyle('width', width-8);
+				innerDiv.setStyle('height', height-8);
+			} else {
+				width = parseInt(this.getStyle('width'), 10);
+				height = parseInt(this.getStyle('height'), 10);
+			}
+			this.style.top = (windowHeight - height)/2 + 'px';
+			this.style.left = (windowWidth - width)/2 + 'px';
 		}.bind(popup);
 		popup.hide = function() {
 			this.style.display = 'none';
@@ -118,7 +128,26 @@ tnoodle.tnt = {
 				popup.hide();
 			}
 		});
+		
+		// adding an inner div helps us get a nice border
+		var innerDiv = document.createElement('div');
+		innerDiv.show = popup.show;
+		innerDiv.hide = popup.hide;
+		popup.appendChild(innerDiv);
+		return innerDiv;
+	},
+	createEditableList: function(items, onAdd, onRename, onDelete) {
+		items = items.slice(); // We don't want to mutate the list passed in
+		var list = new Element('select');
+		list.setStyle('width', 100);
+		list.setAttribute('multiple', 'multiple');
+		for(var i = 0; i < items.length; i++) {
+			list.options[i] = new Option(items[i], items[i]);
+		}
 
-		return popup;
+		//TODO - add/edit functionality?!
+		var editor = new Element('div');
+		editor.adopt(list);
+		return editor;
 	}
 };

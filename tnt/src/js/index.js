@@ -20,29 +20,47 @@ window.addEvent('domready', function() {
 
 	var timer = new KeyboardTimer($('timer'), server, scrambleStuff);
 	
+	function getCustomizations() {
+		return server.getCustomizations(session.getPuzzle());
+	}
 	var customizationSelect = new Element('select');
 	customizationSelect.refresh = function() {
-		var customizations = server.getCustomizations(session.getPuzzle());
+		var customizations = getCustomizations();
 		customizationSelect.options.length = customizations.length;
 		for(var i = 0; i < customizations.length; i++) {
 			customizationSelect.options[i] = new Option(customizations[i], customizations[i]);
 		}
-		customizationSelect.options[i] = new Option('Edit', null);
-		customizationSelect.options[i].setStyle('background-color', 'white');
+		var editOption = new Option('Edit', null);
+		editOption.setStyle('background-color', 'white');
+		customizationSelect.options[customizationSelect.options.length] = editOption;
 
 		customizationSelect.value = session.getCustomization();
 	};
 	$('puzzleChooser').adopt(customizationSelect);
 
 	customizationSelect.onchange = function(e) {
-		console.log(customizationSelect.value);
 		if(customizationSelect.value === "null") {
+			// We don't want to leave the "Edit" option selected
 			customizationSelect.value = session.getCustomization();
-			var newCustomization = prompt("Enter name of new customization (this will become a pretty gui someday, I promise!)");
+
+			var editCustomsPopup = tnoodle.tnt.createPopup(null, customizationSelect.refresh);
+			function onAdd(newItem) {
+				server.createCustomization(session.getPuzzle(), newItem);
+			}
+			function onRename(oldItem, newItem) {
+				server.renameCustomization(session.getPuzzle(), oldItem, newItem);
+			}
+			function onDelete(oldItem) {
+				server.deleteCustomization(session.getPuzzle(), oldItem);
+			}
+			editCustomsPopup.appendChild(tnoodle.tnt.createEditableList(getCustomizations(), onAdd, onRename, onDelete));
+			editCustomsPopup.show();						
+			/*var newCustomization = prompt("Enter name of new customization (this will become a pretty gui someday, I promise!)");
+			console.log(server.getCustomizations(session.getPuzzle()));
 			if(newCustomization) {
 				server.createCustomization(session.getPuzzle(), newCustomization);
 				customizationSelect.refresh();
-			}
+			}*/
 			return;
 		}
 		session.setCustomization(customizationSelect.value);
@@ -223,11 +241,11 @@ window.addEvent('domready', function() {
 	timesTable.manager = triLayout;
 	
 	var keyboard = new Keyboard();
-	keyboard.addShortcut('save', {
+	/*keyboard.addShortcut('save', {
 	    'keys': 'ctrl+s',
 	    'description': 'Save the current document',
-	    'handler': function(e) { e.stop(); console.log(this); }
-	});
+	    'handler': function(e) { e.stop(); }
+	});*/
 	keyboard.addShortcut('add time', {
 		'keys': 'alt+a',
 		'description': 'Add time',
