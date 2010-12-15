@@ -618,13 +618,14 @@ tnoodle.server = function(url) {
 
 			var detailedTimes = '';
 			var simpleTimes = '';
+			// NOTE: countingTimes may be null if we try to trim too many solves
 			var countingTimes = trimSolves(lastSolve, raSize);
 			var firstSolve = lastSolve-raSize+1;
 			for(var offset = 0; offset < raSize; offset++) {
 				var i = firstSolve+offset;
 				var time = this.times[i];
 				var timeStr = time.format();
-				if(!countingTimes.contains(time)) {
+				if(countingTimes && !countingTimes.contains(time)) {
 					timeStr = "(" + timeStr + ")";
 				}
 				simpleTimes += (i>0?', ':'') + timeStr;
@@ -633,7 +634,9 @@ tnoodle.server = function(url) {
 
 			var str = '';
 			str += 'Statistics for ' + date + '\n\n';
-			str += 'Average of ' + attempts + ': ' + average + "\n";
+			if(countingTimes) {
+				str += 'Average of ' + attempts + ': ' + average + "\n";
+			}
 			//str += 'Cubes solved: ' + solves + "/" + attempts + "\n";
 			//str += 'Standard deviation: ' + stdDev + "\n";
 			//str += 'Number of TAG';
