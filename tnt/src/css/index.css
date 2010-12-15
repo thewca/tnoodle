@@ -35,7 +35,10 @@ img {
 	list-style:none;
 	line-height:1em;
 }
-
+#sessions {
+	overflow: hidden;
+	height: 28px; /* lol, yeah right */
+}
 .tabs li {
 	float:left;
 	margin:0;
