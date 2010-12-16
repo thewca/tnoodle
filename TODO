@@ -61,8 +61,8 @@ FEATURES
 +improve behavior of update freq option
 +need a favicon.ico!
 +always manual time entry a la qqtimer
++scramble position not being saved
 
--scramble position not being saved
 -session domments & probably time comments not being saved
 -times table needs to gracefully scale down to 1 column, else there's no point in making the columns configurable
 -build script should read version from other build script?
@@ -71,7 +71,7 @@ FEATURES
 -add remaining stackmat options
 	-TODO - test with stackmat!!!
 -pretty gui for editing customizations & tags
-	-cleanup tagging code?
+	-create an editable table superclass for the editable list & times table
 -solve/session comments
 	-session comments -> tab name?
 	-need the exact dates of sessions somewhere

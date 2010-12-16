@@ -1043,10 +1043,18 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		pos.y = Math.min(Math.max(0, pos.y), avail.y-size.y-1);
 		el.getParent().setPosition(pos); //must position the parent, not the titlebar
 	}
+	var positioning = false;
 	function positionWindows() {
+		// We don't want this method to get called while it's getting called,
+		// and we also don't want it to be called when the scramble isn't even visible
+		if(positioning || scrambleDiv.style.display != 'inline') {
+			return;
+		}
+		positioning = true;
 		ensureVisible(scrambleDivHeader);
 		ensureVisible(titlebar);
 		scrambleMoved();
+		positioning = false;
 	}
 	scrambleDrag.addEvent('complete', positionWindows);
 	colorChooserDrag.addEvent('complete', positionWindows);
