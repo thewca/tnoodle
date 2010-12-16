@@ -121,7 +121,7 @@ var TimesTable = new Class({
 			}
 		}.bind(this);
 
-		var statsPopup = tnoodle.tnt.createPopup(null, null, .7);
+		var statsPopup = tnoodle.tnt.createPopup(null, null, 0.7);
 		var statsArea = document.createElement('textarea');
 		statsArea.setAttribute('wrap', 'off');
 		statsArea.style.width = '100%';
@@ -416,8 +416,9 @@ var TimesTable = new Class({
 		};
 		
 		var fieldSet = new Element('fieldset');
+		fieldSet.setStyle('display', 'inline');
 		fieldSet.setStyle('margin', 0);
-		fieldSet.setStyle('border', '2px solid black');
+		fieldSet.setStyle('border', 'none');
 		var noPenalty = new Element('input', { type: 'radio', name: 'penalty', id: 'noPenalty', value: 'noPenalty' });
 		fieldSet.adopt(makeLabelAndSettable(noPenalty));
 		var dnf = new Element('input', { type: 'radio', name: 'penalty', id: 'dnf', value: 'dnf' });
@@ -429,6 +430,7 @@ var TimesTable = new Class({
 		
 		fieldSet.adopt(makeLabelAndSettable(plusTwo));
 		var form = new Element('form');
+		form.setStyle('border', '2px solid black');
 		form.adopt(fieldSet);
 		fieldSet.addEvent('change', function(e) {
 			if(noPenalty.checked) {
@@ -445,18 +447,23 @@ var TimesTable = new Class({
 		});
 		
 		var options = tnoodle.tnt.createOptions();
-		var optionsButton = options.button;
-		var optionsDiv = options.div;
+		var tagsButton = options.button;
+		tagsButton.setStyle('display', 'inline');
+		tagsButton.setStyle('padding-left', '5px');
+		tagsButton.setStyle('padding-right', '5px');
+		var tagsDiv = options.div;
 		
-		optionsDiv.refresh = function() {
+		var editTagsPopup = tnoodle.tnt.createPopup(null, null);
+		tagsDiv.refresh = function() {
 			function tagged(e) {
 				if(this.checked) {
-					time.addTag(this.id);
+					timeHoverDiv.time.addTag(this.id);
 				} else {
-					time.removeTag(this.id);
+					timeHoverDiv.time.removeTag(this.id);
 				}
 			}
 			var tags = table.server.getTags(table.session.getPuzzle());
+			tagsDiv.empty();
 			for(var i = 0; i < tags.length; i++) {
 				var tag = tags[i];
 				var checked = timeHoverDiv.time.hasTag(tags[i]);
@@ -464,28 +471,39 @@ var TimesTable = new Class({
 				checkbox.checked = checked;
 				checkbox.addEvent('change', tagged);
 				checkbox.addEvent('focus', checkbox.blur);
-				optionsDiv.adopt(new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag })));
+				tagsDiv.adopt(new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag })));
 			}
 			
 			// all of this tagging code is some of the worst code i've written for tnt,
 			// probably because it's 7:30 am, and i want to go to sleep
 			// TODO - but it's important that there eventually is a better dialog for editing tags 
 			// that doesn't cause the current row to lose focus
-			var addTagLink = new Element('span', { 'class': 'link', html: 'Add tag' });
-			addTagLink.addEvent('click', function(e) {
+			var editTagsLink = new Element('span', { 'class': 'link', html: 'Edit tags' });
+			editTagsLink.addEvent('click', function(e) {
+				var onAdd = function(newItem) {
+					server.createTag(table.session.getPuzzle(), newItem);
+				};
+				var onRename = function(oldItem, newItem) {
+					server.renameTag(table.session.getPuzzle(), oldItem, newItem);
+				};
+				var onDelete = function(oldItem) {
+					server.deleteTag(table.session.getPuzzle(), oldItem);
+				};
+				editTagsPopup.empty();
+				editTagsPopup.appendChild(tnoodle.tnt.createEditableList(table.server.getTags(table.session.getPuzzle(), onAdd, onRename, onDelete)));
+				editTagsPopup.show();
+				/*
 				var tag = prompt("Enter name of new tag (I promise this will become a not-crappy gui someday)");
 				if(tag) {
 					table.server.createTag(table.session.getPuzzle(), tag);
-					optionsDiv.refresh();
+					tagsDiv.refresh();
 				}
+				*/
 			});
-			optionsDiv.adopt(addTagLink);
+			tagsDiv.adopt(editTagsLink);
 		};
 
 		timeHoverDiv.form = form;
-		//TODO - implement tagging properly!
-		//timeHoverDiv.adopt(optionsButton);
-		timeHoverDiv.adopt(timeHoverDiv.form);
 		document.body.adopt(timeHoverDiv);
 		timeHoverDiv.addEvent('mouseover', function(e) {
 			timeHoverDiv.tr.hover();	
@@ -512,18 +530,12 @@ var TimesTable = new Class({
 					timeHoverDiv.adopt(errorField);
 				} else if(timeHoverDiv.time !== null) {
 					timeHoverDiv.adopt(timeHoverDiv.form);
-					var penalty = timeHoverDiv.time.getPenalty();
-					//TODO - loop over the kinds of penalties here
-					time.setPenalty("");
-					noPenalty.setText(time.format());
+					timeHoverDiv.form.adopt(tagsButton);
+					//timeHoverDiv.adopt(tagsDiv); // If the div is a member of the hoverDiv, then hovering over it prevents timeHoverDiv from disappearing
+					noPenalty.setText(table.server.formatTime(time.rawCentis));
 					dnf.setText("DNF");
-					time.setPenalty("+2");
-					plusTwo.setText(time.format());
-					time.setPenalty(penalty);
-					// Note that calling String(null) = "null". Some browsers
-					// don't like null keys.
-					timeHoverDiv.penalties[String(penalty)].checked = true;
-					optionsDiv.refresh();
+					plusTwo.setText(table.server.formatTime(time.rawCentis+2*100)+"+");
+					tagsDiv.refresh();
 				}
 			}
 			var el = timeHoverDiv.tr.getChildren()[1];

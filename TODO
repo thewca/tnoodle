@@ -62,6 +62,9 @@ FEATURES
 +need a favicon.ico!
 +always manual time entry a la qqtimer
 
+-scramble position not being saved
+-session domments & probably time comments not being saved
+-times table needs to gracefully scale down to 1 column, else there's no point in making the columns configurable
 -build script should read version from other build script?
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...

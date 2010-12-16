@@ -44,15 +44,15 @@ window.addEvent('domready', function() {
 			customizationSelect.value = session.getCustomization();
 
 			var editCustomsPopup = tnoodle.tnt.createPopup(null, customizationSelect.refresh);
-			function onAdd(newItem) {
+			var onAdd = function(newItem) {
 				server.createCustomization(session.getPuzzle(), newItem);
-			}
-			function onRename(oldItem, newItem) {
+			};
+			var onRename = function(oldItem, newItem) {
 				server.renameCustomization(session.getPuzzle(), oldItem, newItem);
-			}
-			function onDelete(oldItem) {
+			};
+			var onDelete = function(oldItem) {
 				server.deleteCustomization(session.getPuzzle(), oldItem);
-			}
+			};
 			editCustomsPopup.appendChild(tnoodle.tnt.createEditableList(getCustomizations(), onAdd, onRename, onDelete));
 			editCustomsPopup.show();						
 			/*var newCustomization = prompt("Enter name of new customization (this will become a pretty gui someday, I promise!)");
@@ -142,10 +142,11 @@ window.addEvent('domready', function() {
 		session = newSession;
 		$$('#sessions .active').each(function(el) {
 			el.removeClass('active');
-			el.getChildren()[0].empty();
+			el.refreshTitle();
 		});
+
 		this.addClass('active');
-		this.getChildren()[0].adopt(document.createTextNode(session.id));
+		this.refreshTitle();
 
 		refreshSessionInfo();
 		timesTable.setSession(session);
@@ -179,9 +180,37 @@ window.addEvent('domready', function() {
 	function createSessionTab(session) {
 		//TODO - puzzle icon
 		var tab = new Element('li');
-		tab.adopt(new Element('span'));
+		var titleSpan = new Element('span');
+		tab.adopt(titleSpan);
+		tab.refreshTitle = function() {
+			titleSpan.empty();
+			titleSpan.setStyle('cursor', '');
+			if(tab.hasClass('active')) {
+				titleSpan.setStyle('cursor', 'pointer');
+			}
+			var title = session.comment || session.id;
+			var MAX_TITLE = 15;
+			if(title.length > MAX_TITLE) {
+				title = title.substring(0, MAX_TITLE-3) + '...';
+			}
+			titleSpan.adopt(document.createTextNode(title));
+		};
+		tab.refreshTitle();
+		titleSpan.addEvent('click', function() {
+			if(!tab.hasClass('active')) {
+				return;
+			}
+			var comment = prompt("Enter comment for session", session.comment);
+			if(comment !== null) {
+				session.comment = comment;
+			}
+			tab.refreshTitle();
+		});
 		tab.addEvent('mouseover', function() {
 			tab.title = session.toString() + " session started " + ago(session.getDate()) + " ago";
+			if(session.comment) {
+				tab.title += "\n" + session.comment;
+			}
 		});
 		tab.addEvent('click', sessionClicked);
 		tab.session = session;

@@ -326,6 +326,7 @@ tnoodle.server = function(url) {
 	
 	function Session(id, puzzle, customization) {
 		this.id = id;
+		this.comment = null;
 		this.getDate = function() {
 			return new Date(1000*parseInt(this.id, 36));
 		};
@@ -350,6 +351,13 @@ tnoodle.server = function(url) {
 				return '';
 			}
 			return this.customization;
+		};
+		this.setComment = function(comment) {
+			this.comment = comment == '' ? null : comment;
+			saveSessions();
+		};
+		this.getComment = function(comment) {
+			return this.comment;
 		};
 		this.toString = function() {
 			if(this.customization.length == '') {
@@ -706,26 +714,32 @@ tnoodle.server = function(url) {
 		tags[puzzle].push(tag);
 		return true;
 	};
+	this.removeTag = function(puzzle, oldTag) {
+		//TODO - urgh...
+	};
+	this.renameTag = function(puzzle, oldTag, newTag) {
+		//TODO - urgh...
+	};
+
+	// Utility function to copy all the properties from oldObj into newObj
+	function copyTo(oldObj, newObj) {
+		for(var key in oldObj) {
+			if(oldObj.hasOwnProperty(key)) {
+				newObj[key] = oldObj[key];
+			}
+		}
+	}
 	var i;
 	var sessions = this.configuration.get('sessions', []);
 	//transforming sessions (a JSON object) into an array of Sessions of Times
 	try {
 		for(i = 0; i < sessions.length; i++) {
 			var sesh = new Session();
-			sesh.id = sessions[i].id;
-			sesh.puzzle = sessions[i].puzzle;
-			sesh.customization = sessions[i].customization;
-			sesh.times = [];
-			for(var j = 0; j < sessions[i].times.length; j++) {
+			copyTo(sessions[i], sesh);
+			for(var j = 0; j < sesh.times.length; j++) {
 				var newTime = new Time(0);
-				sesh.times.push(newTime);
-				var oldTime = sessions[i].times[j];
-
-				for(var key in oldTime) {
-					if(oldTime.hasOwnProperty(key)) {
-						newTime[key] = oldTime[key];
-					}
-				}
+				copyTo(sesh.times[j], newTime);
+				sesh.times[j] = newTime;
 			}
 			sessions[i] = sesh;
 		}
