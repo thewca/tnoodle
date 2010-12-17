@@ -14,7 +14,7 @@ window.addEvent('domready', function() {
 			scrambleStuff.setSelectedPuzzle(session.getPuzzle());
 		}
 	}
-	scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
+	var scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 
@@ -106,6 +106,25 @@ window.addEvent('domready', function() {
 			timesTable.reset();
 		}
 	}
+<<<<<<< HEAD
+=======
+	function ago(date) {
+		var today = new Date();
+		var i, agostr;
+		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
+		for(i = 0; i < resolutions.length; i++) {
+			agostr = date.diff(today, resolutions[i]);
+			var a = date; var b = today;
+			if(agostr > 0) {
+				break;
+			}
+		}
+		agostr = (i < resolutions.length) ? 
+				agostr + " " + resolutions[i] + "(s)" :
+				"seconds";
+		return agostr;
+	}
+>>>>>>> 4d06f7793bb9cb1dabae072b9f50e56847b2f75c
 	function refreshSessionInfo() {
 		if(!session) { return; }//gotta wait for stuff to load
 		$('sessionInfo').empty();

@@ -199,10 +199,10 @@ function ColorChooser(callback) {
 		var data = colorCircleData.data;
 
 		// not sure if the color patch should reflect the luminance or not
-		new_hsl = {
+		var new_hsl = {
 			l : 0.5
 		};
-		for( var i = 0; i < colorCircleData.height; i++) {
+		for(var i = 0; i < colorCircleData.height; i++) {
 			for(var j = 0; j < color_width; j++) {
 				var hs = i_jToHS(i, j);
 				new_hsl.h = hs.h;
