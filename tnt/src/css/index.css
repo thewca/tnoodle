@@ -9,13 +9,16 @@ img {
     border: none;
 }
 
-.link {
+.link, .imglink {
 	white-space: nowrap;
 	color: brown;
 	text-decoration: underline;
 	cursor: pointer;
 	padding-left: 10px;
 	padding-right: 10px;
+}
+.imglink {
+	padding: 0px;
 }
 .link:hover, .down {
 	text-decoration: none;
@@ -73,7 +76,9 @@ img {
 #sessionInfoBar {
 	padding: 5px 10px;
 }
-
+#sessionInfo {
+	padding-right: 5px;
+}
 #timesArea {
 	border: 1px solid;
 }
@@ -83,6 +88,7 @@ img {
 	color: #000;
 	text-align: center;
 	z-index: 1;
+	font-size: 16px;
 }
 .optionsButtonHover {
 	background-color: #000;

@@ -62,23 +62,27 @@ FEATURES
 +need a favicon.ico!
 +always manual time entry a la qqtimer
 +scramble position not being saved
++build script should read version from other build script?
 
--session domments & probably time comments not being saved
--times table needs to gracefully scale down to 1 column, else there's no point in making the columns configurable
--build script should read version from other build script?
+-solve/session comments
+	+session comments & probably solve comments not being saved
+	+session comments -> tab name?
+	+need the exact dates of sessions somewhere
++times table needs to gracefully scale down to 1 column, else there's no point in making the columns configurable
+	-deal with overflowing tabs...
+	+vertically align penalty labels with radio buttons
+	+error message when adding time can get in the way
+	+icons for "Reset" and "Download" links
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
 -add remaining stackmat options
 	-TODO - test with stackmat!!!
 -pretty gui for editing customizations & tags
 	-create an editable table superclass for the editable list & times table
--solve/session comments
-	-session comments -> tab name?
-	-need the exact dates of sessions somewhere
-	-deal with overflowing tabs...
 -add help/about (/login?)
 	-Add a note about opening multiple instances of tnt
-	-shorcuts: documentation & configuration
+-keyboard shorcuts!!!
+	-documentation & configuration
 
 +clickable stuff in timestable to get jnet/cct style stats?
 	-does it need to be customizable?

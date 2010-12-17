@@ -245,7 +245,12 @@ var TimesTable = new Class({
 		}.bind(this);
 		for(i = 0; i < this.cols.length; i++) {
 			var col = this.cols[i];
-			if(col == 'centis') {
+			// We need at least these three columns to always be present
+			// in order to impose a minimum size on the times table.
+			if(col == 'centis' || col == 'index' || col == 'sessionAve') {
+				// We set these columns to be visible, just in case they weren't
+				// This can happen in an old version of tnt.
+				server.configuration.set('table.' + col, true);
 				continue;
 			}
 			var desc = this.headers[i];
@@ -404,9 +409,11 @@ var TimesTable = new Class({
 		timeHoverDiv.setStyles({
 			position: 'absolute',
 			backgroundColor: 'white',
-			zIndex: 4
+			zIndex: 4,
+			fontSize: 10
 		});
 		var makeLabelAndSettable = function(el) {
+			el.setStyle('vertical-align', 'bottom');
 			var label = new Element('label', {'for': el.id});
 			el.setText = function(text) {
 				label.set('html', text);
@@ -418,6 +425,7 @@ var TimesTable = new Class({
 		var fieldSet = new Element('fieldset');
 		fieldSet.setStyle('display', 'inline');
 		fieldSet.setStyle('margin', 0);
+		fieldSet.setStyle('padding', 0);
 		fieldSet.setStyle('border', 'none');
 		var noPenalty = new Element('input', { type: 'radio', name: 'penalty', id: 'noPenalty', value: 'noPenalty' });
 		fieldSet.adopt(makeLabelAndSettable(noPenalty));
@@ -536,19 +544,24 @@ var TimesTable = new Class({
 					dnf.setText("DNF");
 					plusTwo.setText(table.server.formatTime(time.rawCentis+2*100)+"+");
 					tagsDiv.refresh();
+					//timeHoverDiv.adopt(document.createTextNode('TESTING'));
 				}
 			}
 			var el = timeHoverDiv.tr.getChildren()[1];
 			if(isOrIsChild(el, this.tbody)) {
-				timeHoverDiv.setPosition({x:0,y:0}); // let it size itself properly
-				var oldWidth = timeHoverDiv.getSize().x;
-				timeHoverDiv.position({relativeTo: el, position: 'right', edge: 'left'});
-				if(timeHoverDiv.getSize().x < oldWidth) {
-					// keep the hover from getting squished, if at all possible
+				if(timeHoverDiv.time === null) {
+					timeHoverDiv.position({relativeTo: el, position: 'bottom', edge: 'top'});
+				} else {
 					timeHoverDiv.setPosition({x:0,y:0}); // let it size itself properly
-					var row = el.getParent();
-					timeHoverDiv.setStyle('margin-right', '10px'); // this guarantees room to select a row
-					timeHoverDiv.position({relativeTo: row, position: 'right', edge: 'right'});
+					var oldWidth = timeHoverDiv.getSize().x;
+					timeHoverDiv.position({relativeTo: el, position: 'right', edge: 'left'});
+					if(timeHoverDiv.getSize().x < oldWidth) {
+						// keep the hover from getting squished, if at all possible
+						timeHoverDiv.setPosition({x:0,y:0}); // let it size itself properly
+						var row = el.getParent();
+						timeHoverDiv.setStyle('margin-right', '10px'); // this guarantees room to select a row
+						timeHoverDiv.position({relativeTo: row, position: 'right', edge: 'right'});
+					}
 				}
 				timeHoverDiv.fade('in');
 			} else {

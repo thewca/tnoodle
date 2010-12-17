@@ -149,5 +149,21 @@ tnoodle.tnt = {
 		var editor = new Element('div');
 		editor.adopt(list);
 		return editor;
+	},
+	ago: function(date) {
+		var today = new Date();
+		var i, agostr;
+		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
+		for(i = 0; i < resolutions.length; i++) {
+			agostr = date.diff(today, resolutions[i]);
+			a = date; b = today;
+			if(agostr > 0) {
+				break;
+			}
+		}
+		agostr = (i < resolutions.length) ? 
+				agostr + " " + resolutions[i] + "(s)" :
+				"seconds";
+		return agostr;
 	}
 };

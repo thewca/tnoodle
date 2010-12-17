@@ -106,26 +106,11 @@ window.addEvent('domready', function() {
 			timesTable.reset();
 		}
 	}
-	function ago(date) {
-		var today = new Date();
-		var i, agostr;
-		var resolutions = [ 'year', 'month', 'day', 'hour', 'minute' ];
-		for(i = 0; i < resolutions.length; i++) {
-			agostr = date.diff(today, resolutions[i]);
-			a = date; b = today;
-			if(agostr > 0) {
-				break;
-			}
-		}
-		agostr = (i < resolutions.length) ? 
-				agostr + " " + resolutions[i] + "(s)" :
-				"seconds";
-		return agostr;
-	}
 	function refreshSessionInfo() {
 		if(!session) { return; }//gotta wait for stuff to load
 		$('sessionInfo').empty();
-		$('sessionInfo').appendText("Started " + ago(session.getDate()) + " ago");
+		$('sessionInfo').appendText(session.getDate().format("%x"));
+		//$('sessionInfo').appendText("Started " + tnoodle.tnt.ago(session.getDate()) + " ago");
 	}
 	
 	var session = null;
@@ -207,7 +192,7 @@ window.addEvent('domready', function() {
 			tab.refreshTitle();
 		});
 		tab.addEvent('mouseover', function() {
-			tab.title = session.toString() + " session started " + ago(session.getDate()) + " ago";
+			tab.title = session.toString() + " session started " + tnoodle.tnt.ago(session.getDate()) + " ago";
 			if(session.comment) {
 				tab.title += "\n" + session.comment;
 			}
