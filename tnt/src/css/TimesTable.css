@@ -4,6 +4,9 @@
 #timesTable thead tr, #timesTable tfoot tr {
 	display: block;
 }
+#timesTable thead tr th {
+	border-bottom: 1px solid black;
+}
 #timesTable tbody {
 	overflow-y: scroll;
 	display: block;

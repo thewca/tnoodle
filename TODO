@@ -67,6 +67,7 @@ FEATURES
 	+session comments & probably solve comments not being saved
 	+session comments -> tab name?
 	+need the exact dates of sessions somewhere
+    -!!!comments aren't being positioned nicely in chrome on os X
 
 +times table needs to gracefully scale down to 1 column, else there's no point in making the columns configurable
 	-deal with overflowing tabs...
