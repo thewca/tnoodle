@@ -409,7 +409,7 @@ var TimesTable = new Class({
 		timeHoverDiv.setStyles({
 			position: 'absolute',
 			backgroundColor: 'white',
-			zIndex: 4,
+			zIndex: 4
 		});
 		var makeLabelAndSettable = function(el) {
 			var label = new Element('label', {'for': el.id});
@@ -449,7 +449,7 @@ var TimesTable = new Class({
 			}
 		});
 		commentArea.setText = function(text) {
-			if(text == null) {
+			if(text === null) {
 				commentArea.setStyle('color', 'gray');
 				commentArea.value = "Enter comment here";
 			} else {
