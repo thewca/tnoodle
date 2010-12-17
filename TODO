@@ -63,11 +63,11 @@ FEATURES
 +always manual time entry a la qqtimer
 +scramble position not being saved
 +build script should read version from other build script?
-
--solve/session comments
++solve/session comments
 	+session comments & probably solve comments not being saved
 	+session comments -> tab name?
 	+need the exact dates of sessions somewhere
+
 +times table needs to gracefully scale down to 1 column, else there's no point in making the columns configurable
 	-deal with overflowing tabs...
 	+vertically align penalty labels with radio buttons
@@ -80,6 +80,7 @@ FEATURES
 -pretty gui for editing customizations & tags
 	-create an editable table superclass for the editable list & times table
 -add help/about (/login?)
+	-include version number in tnt client
 	-Add a note about opening multiple instances of tnt
 -keyboard shorcuts!!!
 	-documentation & configuration

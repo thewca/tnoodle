@@ -282,6 +282,16 @@ tnoodle.server = function(url) {
 		this.hasTag = function(tag) {
 			return this.tags.indexOf(tag) >= 0;
 		};
+		this.setComment = function(comment) {
+			if(this.comment == comment) {
+				return;
+			}
+			this.comment = (comment == "") ? null : comment;
+			saveSessions();
+		};
+		this.getComment = function() {
+			return this.comment;
+		};
 		
 		this.ra5 = this.ra12 = this.ra100 = null;
 		this.penalty = null;
@@ -289,7 +299,7 @@ tnoodle.server = function(url) {
 		this.tags = [];
 		this.date = new Date().getTime();
 		this.scramble = scramble;
-		//TODO - comments?
+		this.comment = null;
 		
 		if(typeof(time) === "number") {
 			this.centis = this.rawCentis = time;

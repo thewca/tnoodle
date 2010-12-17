@@ -410,11 +410,10 @@ var TimesTable = new Class({
 			position: 'absolute',
 			backgroundColor: 'white',
 			zIndex: 4,
-			fontSize: 10
 		});
 		var makeLabelAndSettable = function(el) {
-			el.setStyle('vertical-align', 'bottom');
 			var label = new Element('label', {'for': el.id});
+			label.setStyle('display', 'block');
 			el.setText = function(text) {
 				label.set('html', text);
 				el.inject(label, 'top');
@@ -424,20 +423,47 @@ var TimesTable = new Class({
 		
 		var fieldSet = new Element('fieldset');
 		fieldSet.setStyle('display', 'inline');
-		fieldSet.setStyle('margin', 0);
 		fieldSet.setStyle('padding', 0);
 		fieldSet.setStyle('border', 'none');
+
 		var noPenalty = new Element('input', { type: 'radio', name: 'penalty', id: 'noPenalty', value: 'noPenalty' });
 		fieldSet.adopt(makeLabelAndSettable(noPenalty));
+		var plusTwo = new Element('input', { type: 'radio', name: 'penalty', id: 'plusTwo', value: 'plusTwo' });
+		fieldSet.adopt(makeLabelAndSettable(plusTwo));
 		var dnf = new Element('input', { type: 'radio', name: 'penalty', id: 'dnf', value: 'dnf' });
 		fieldSet.adopt(makeLabelAndSettable(dnf));
-		var plusTwo = new Element('input', { type: 'radio', name: 'penalty', id: 'plusTwo', value: 'plusTwo' });
 		
 		//select the correct penalty
 		timeHoverDiv.penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };
 		
-		fieldSet.adopt(makeLabelAndSettable(plusTwo));
 		var form = new Element('form');
+		var commentArea = new Element('textarea');
+		timeHoverDiv.commentArea = commentArea;
+		form.adopt(commentArea);
+		commentArea.setStyle('height', 48);
+		commentArea.setStyle('margin', '0px 4px');
+		commentArea.setStyle('padding', '2px');
+		commentArea.addEvent('blur', function() {
+			if(commentArea.getStyle('color') == 'black') {
+				timeHoverDiv.time.setComment(commentArea.value);
+			}
+		});
+		commentArea.setText = function(text) {
+			if(text == null) {
+				commentArea.setStyle('color', 'gray');
+				commentArea.value = "Enter comment here";
+			} else {
+				commentArea.setStyle('color', 'black');
+				commentArea.value = text;
+			}
+		};
+		commentArea.addEvent('focus', function() {
+			if(commentArea.getStyle('color') == 'gray') {
+				commentArea.value = '';
+				commentArea.setStyle('color', 'black');
+			}
+		});
+
 		form.setStyle('border', '2px solid black');
 		form.adopt(fieldSet);
 		fieldSet.addEvent('change', function(e) {
@@ -459,6 +485,7 @@ var TimesTable = new Class({
 		tagsButton.setStyle('display', 'inline');
 		tagsButton.setStyle('padding-left', '5px');
 		tagsButton.setStyle('padding-right', '5px');
+		tagsButton.setStyle('margin-left', '5px');
 		var tagsDiv = options.div;
 		
 		var editTagsPopup = tnoodle.tnt.createPopup(null, null);
@@ -537,18 +564,20 @@ var TimesTable = new Class({
 				if(timeHoverDiv.tr.editing) {
 					timeHoverDiv.adopt(errorField);
 				} else if(timeHoverDiv.time !== null) {
+					timeHoverDiv.commentArea.setText(time.getComment());
 					timeHoverDiv.adopt(timeHoverDiv.form);
-					timeHoverDiv.form.adopt(tagsButton);
+					//timeHoverDiv.form.adopt(tagsButton);
 					//timeHoverDiv.adopt(tagsDiv); // If the div is a member of the hoverDiv, then hovering over it prevents timeHoverDiv from disappearing
 					noPenalty.setText(table.server.formatTime(time.rawCentis));
 					dnf.setText("DNF");
 					plusTwo.setText(table.server.formatTime(time.rawCentis+2*100)+"+");
 					tagsDiv.refresh();
-					//timeHoverDiv.adopt(document.createTextNode('TESTING'));
 				}
 			}
 			var el = timeHoverDiv.tr.getChildren()[1];
 			if(isOrIsChild(el, this.tbody)) {
+				timeHoverDiv.position({relativeTo: el.getParent(), position: 'left', edge: 'right'});
+				/*
 				if(timeHoverDiv.time === null) {
 					timeHoverDiv.position({relativeTo: el, position: 'bottom', edge: 'top'});
 				} else {
@@ -563,6 +592,7 @@ var TimesTable = new Class({
 						timeHoverDiv.position({relativeTo: row, position: 'right', edge: 'right'});
 					}
 				}
+				*/
 				timeHoverDiv.fade('in');
 			} else {
 				timeHoverDiv.fade('hide');
