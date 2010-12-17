@@ -3,8 +3,9 @@
 		Builds the ScrambleServer, ensuring to include JCubeExplorer
 	</description>
 
-	<property name="NAME" value="ScrambleServer" />
-	<property name="VERSION" value="0.1.1" />
+	<property file="version.properties" />
+	<fail message="Must define NAME property in file version.properties" unless="NAME" />
+	<fail message="Must define VERSION property in file version.properties" unless="VERSION" />
 
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />

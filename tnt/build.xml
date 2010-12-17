@@ -4,8 +4,9 @@
 		and a copy of tnt built upon an applet.
 	</description>
 	
-	<property name="NAME" value="TNTServer" />
-	<property name="VERSION" value="0.1.2" />
+	<property file="version.properties" />
+	<fail message="Must define NAME property in file version.properties" unless="NAME" />
+	<fail message="Must define VERSION property in file version.properties" unless="VERSION" />
 	
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />
@@ -13,9 +14,12 @@
 	<property name="tnt_bin" location="bin/tnt" />
 	<property name="dist" location="dist" />
 	<property name="scrambles" location="../scrambles" />
+
+	<property file="${scrambles}/version.properties" prefix="SS" />
+	<fail message="Must define NAME property in file ${scrambles}/version.properties" unless="SS.NAME" />
+	<fail message="Must define VERSION property in file ${scrambles}/version.properties" unless="SS.VERSION" />
 	
-	<!-- TODO - it would be nice to read this value from the build.xml in scrambles -->
-	<property name="scrambleserver-jar" location="${scrambles}/dist/ScrambleServer-0.1.1.jar" />
+	<property name="scrambleserver-jar" location="${scrambles}/dist/${SS.NAME}-${SS.VERSION}.jar" />
 	<property name="tntserver-jar" location="${dist}/${NAME}-${VERSION}.jar" />
 	
 	<property name="js_src" location="${src}/js/" />
