@@ -27,9 +27,9 @@ BUGS
 +best session ave is colored, what's the point?
 	+same goes for some of the other columns
 +fix file permissions
++tagging doesn't default correctly
++!!!comments aren't being positioned nicely in chrome on os X
 
--tagging doesn't default correctly
--!!!comments aren't being positioned nicely in chrome on os X
 -Xbrowser issues
 	-get rid of time jittering (appears to be only under linux)
 	-FF lags when the scramble loads
