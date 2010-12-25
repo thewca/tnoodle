@@ -27,8 +27,10 @@ BUGS
 +best session ave is colored, what's the point?
 	+same goes for some of the other columns
 +fix file permissions
++tagging doesn't default correctly
++!!!comments aren't being positioned nicely in chrome on os X
 
--FF issues that hopefully disappear with ff 4
+-Xbrowser issues
 	-get rid of time jittering (appears to be only under linux)
 	-FF lags when the scramble loads
 -sizing of columns doesn't work in windows chrome/FF
@@ -67,7 +69,6 @@ FEATURES
 	+session comments & probably solve comments not being saved
 	+session comments -> tab name?
 	+need the exact dates of sessions somewhere
-    -!!!comments aren't being positioned nicely in chrome on os X
 
 +times table needs to gracefully scale down to 1 column, else there's no point in making the columns configurable
 	-deal with overflowing tabs...

@@ -167,3 +167,19 @@ tnoodle.tnt = {
 		return agostr;
 	}
 };
+
+Element.implement({
+	findAncestor: function(cond) {
+		var el = this;
+		while(el !== null && el !== undefined) {
+			if(cond(el)) {
+				return el;
+			}
+			el = el.parentNode;
+		}
+		return null;
+	},
+	isOrIsChild: function(par) {
+		return this.findAncestor(function(e) { return e == par; }) !== null;
+	}
+});
