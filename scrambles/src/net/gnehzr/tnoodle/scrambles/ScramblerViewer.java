@@ -9,6 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +21,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import net.gnehzr.tnoodle.scrambles.utils.Base64;
+import net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils;
 
 /**
  * Any classes that wish to provide scramble images as well as scrambles
@@ -52,6 +57,42 @@ public abstract class ScramblerViewer extends Scrambler {
 	 * @throws InvalidScrambleException If scramble is invalid.
 	 */
 	protected abstract void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException;
+
+	/**
+	 * TODO - comment
+	 */
+	protected void drawPuzzleIcon(Graphics2D g) {
+		g.setColor(Color.RED);
+		g.fillRect(0, 0, 16, 16);
+	}
+
+	/**
+	 * TODO - comment
+	 */
+	public final void getPuzzleIcon(ByteArrayOutputStream bytes) {
+		InputStream in;
+		try {
+			File f = new File(getScramblePluginDirectory(), getShortName() + ".png");
+			in = new FileInputStream(f);
+		} catch(FileNotFoundException e) {
+			in = getClass().getResourceAsStream(getShortName() + ".png");
+		} 
+		if(in != null) {
+			try {
+				ScrambleUtils.fullyReadInputStream(in, bytes);
+			} catch(IOException e) {
+				return;
+			}
+		} else {
+			BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+			drawPuzzleIcon((Graphics2D) img.getGraphics());
+			try {
+				ImageIO.write(img, "png", bytes);
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	/**
 	 * Computes the best size to draw the scramble image.
@@ -171,10 +212,10 @@ public abstract class ScramblerViewer extends Scrambler {
 	}
 	public String getScrambleImageDataUrl(String scramble, String colorScheme, Integer width, Integer height) {
 		try {
-		return getScrambleImageDataUrl(scramble, parseColorScheme(colorScheme), width, height);
+			return getScrambleImageDataUrl(scramble, parseColorScheme(colorScheme), width, height);
 		} catch(Throwable e) {
 			e.printStackTrace();
 		}
-		return "hiya";
+		return null;
 	}
 }

@@ -125,7 +125,7 @@ public abstract class Scrambler {
 	 * @return A File representing the directory in which this program resides.
 	 * If this is a jar file, this should be obvious, otherwise things are a little ambiguous.
 	 */
-	private static File getProgramDirectory() {
+	protected static File getScramblePluginDirectory() {
 		File defaultScrambleFolder;
 		try {
 			defaultScrambleFolder = new File(Scrambler.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
@@ -134,7 +134,7 @@ public abstract class Scrambler {
 		}
 		if(defaultScrambleFolder.isFile()) //this should indicate a jar file
 			defaultScrambleFolder = defaultScrambleFolder.getParentFile();
-		return defaultScrambleFolder;
+		return new File(defaultScrambleFolder, "scramblers");
 	}
 	
     /**
@@ -191,7 +191,7 @@ public abstract class Scrambler {
 	/**
 	 * TODO - comment on merging w/ curr classpath
 	 * @param folder The folder containing the Scrambler classes.
-	 * If null, looks for a directory named scramblers in the "program's directory", as defined by getProgramDirectory(). 
+	 * If null, looks for a directory named scramblers in the "program's directory", as defined by getScramblePluginDirectory(). 
 	 * @return A HashMap mapping shortNames to valid Scramblers found in folder
 	 *  sorted in a "natural" order (such that 3x3x3 comes before 10x10x10).
 	 *  Returns null if the directory was invalid. 
@@ -199,7 +199,7 @@ public abstract class Scrambler {
 	public static SortedMap<String, Scrambler> getScramblers(File folder) {
 		if(folder == null) {
 			try {
-				folder = new File(getProgramDirectory(), "scramblers");
+				folder = getScramblePluginDirectory();
 			} catch(AccessControlException e) {
 				//we must be in an applet
 			}

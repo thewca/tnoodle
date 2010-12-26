@@ -264,6 +264,9 @@ tnoodle.scrambles = {
             }
 			return this.viewUrl + encodeURIComponent(puzzle) + ".png?" + tnoodle.toQueryString(query);
 		};
+		this.getPuzzleIconUrl = function(puzzle) {
+			return this.viewUrl + encodeURIComponent(puzzle) + ".png?icon=true";
+		};
 		this.loadPuzzleImageInfo = function(callback, puzzle) {
 			// callback must be a function(defaultPuzzleInfo)
 			// where defaultPuzzleInfo.faces is a {} mapping face names to arrays of points

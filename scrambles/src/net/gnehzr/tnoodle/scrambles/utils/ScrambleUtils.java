@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -149,5 +151,19 @@ public final class ScrambleUtils {
 			sb.append(arr[i].toString());
 		}
 		return sb.toString();
+	}
+
+	public static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
+		final byte[] buffer = new byte[0x10000];
+		try {
+			for(;;) {
+				int read = is.read(buffer);
+				if(read < 0)
+					break;
+				bytes.write(buffer, 0, read);
+			}
+		} finally {
+			is.close();
+		}
 	}
 }

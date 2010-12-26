@@ -1,5 +1,6 @@
 package net.gnehzr.tnoodle.scrambles.server;
 
+import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.fullyReadInputStream;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.parseExtension;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.throwableToString;
 import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toColor;
@@ -295,10 +296,14 @@ public class ScrambleServer {
 			Dimension dimension = generator.getPreferredSize(toInt(query.get("width"), 0), toInt(query.get("height"), 0));
 			if(extension.equals("png")) {
 				try {
-					BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
-					generator.drawScramble(img.createGraphics(), dimension, scramble, colorScheme);
 					ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-					ImageIO.write(img.getSubimage(0, 0, dimension.width, dimension.height), "png", bytes);
+					if(query.containsKey("icon")) {
+						generator.getPuzzleIcon(bytes);
+					} else {
+						BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
+						generator.drawScramble(img.createGraphics(), dimension, scramble, colorScheme);
+						ImageIO.write(img, "png", bytes);
+					}
 
 					t.getResponseHeaders().set("Content-Type", "image/png");
 					t.sendResponseHeaders(200, bytes.size());
@@ -308,22 +313,6 @@ public class ScrambleServer {
 					e.printStackTrace();
 					sendText(t, throwableToString(e));
 				}
-			} else if(extension.equals("ico")) {
-				/*
-				try {
-					BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
-					generator.drawPuzzleIcon(img.createGraphics(), dimension, scramble, colorScheme);
-					ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-					ImageIO.write(img.getSubimage(0, 0, dimension.width, dimension.height), "png", bytes);
-
-					t.getResponseHeaders().set("Content-Type", "image/microsoft.icon");
-					t.sendResponseHeaders(200, bytes.size());
-					t.getResponseBody().write(bytes.toByteArray());
-					t.getResponseBody().close();
-				} catch(InvalidScrambleException e) {
-					e.printStackTrace();
-					sendText(t, throwableToString(e));
-				}*/
 			} else if(extension.equals("json")) {
 				sendJSON(t, GSON.toJson(generator.getDefaultPuzzleImageInfo().jsonize()), callback);
 			} else {
@@ -711,23 +700,6 @@ abstract class SafeHttpHandler implements HttpHandler {
 		return queryMap;
 	}
 
-	
-	protected static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
-		final byte[] buffer = new byte[0x10000];
-		try {
-			for(;;) {
-				int read = is.read(buffer);
-				if(read < 0)
-					break;
-				bytes.write(buffer, 0, read);
-			}
-		} catch(IOException e) {
-			throw e;
-		} finally {
-			is.close();
-		}
-	}
-	
 	protected static void sendJSON(HttpExchange t, String json, String callback) {
 		t.getResponseHeaders().set("Access-Control-Allow-Origin", "*"); //this allows x-domain ajax
 		if(callback != null) {

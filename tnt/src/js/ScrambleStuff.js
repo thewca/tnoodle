@@ -940,6 +940,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	// public variables
 	this.puzzleSelect = puzzleSelect;
 	this.scrambleArea = scrambleArea;
+	this.scrambler = scrambler;
 
 	// public methods
 	this.scramble = scramble;

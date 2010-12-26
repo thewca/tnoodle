@@ -112,6 +112,9 @@ window.addEvent('domready', function() {
 		if(!session) { return; }//gotta wait for stuff to load
 		$('sessionInfo').empty();
 		$('sessionInfo').appendText(session.getDate().format("%x"));
+
+		// This will update the puzzle icon
+		lastSessionTab.refreshTitle();
 		//$('sessionInfo').appendText("Started " + tnoodle.tnt.ago(session.getDate()) + " ago");
 		//$$('#sessions li').each(function(el, i) {
 			//console.log(i);
@@ -169,7 +172,6 @@ window.addEvent('domready', function() {
 		}
 	}
 	function createSessionTab(session) {
-		//TODO - puzzle icon
 		var tab = new Element('li');
 		var titleSpan = new Element('span');
 		tab.adopt(titleSpan);
@@ -184,6 +186,10 @@ window.addEvent('domready', function() {
 			if(title.length > MAX_TITLE) {
 				title = title.substring(0, MAX_TITLE-3) + '...';
 			}
+			var puzzleIcon = new Element('img', { src: scrambleStuff.scrambler.getPuzzleIconUrl(session.getPuzzle()) });
+			puzzleIcon.setStyles({ 'vertical-align': 'bottom', 'margin-right': '2px' });
+			titleSpan.adopt(puzzleIcon);
+
 			titleSpan.adopt(document.createTextNode(title));
 		};
 		tab.refreshTitle();
