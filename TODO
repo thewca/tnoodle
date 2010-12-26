@@ -87,6 +87,7 @@ FEATURES
 	-documentation & configuration
 +puzzle icons!
 	-implemented, but now need some decent icons!
+-undo redo should probably work with tagging
 
 -saving times
 	-add login

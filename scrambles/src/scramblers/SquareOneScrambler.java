@@ -178,8 +178,6 @@ public class SquareOneScrambler extends ScramblerViewer {
 	}
 
 	private void drawFace(Graphics2D g, int[] face, double x, double y, int gap, int radius, Color[] colorScheme) {
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
 		for(int ch = 0; ch < 12; ch++) {
 			if(ch < 11 && face[ch] == face[ch+1])
 				ch++;
@@ -314,6 +312,10 @@ public class SquareOneScrambler extends ScramblerViewer {
 	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorSchemeMap) throws InvalidScrambleException {
 		if(!validateScramble(scramble))
 			throw new InvalidScrambleException(scramble);
+		
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+
 		Color[] colorScheme = new Color[6];
 		for(int i = 0; i < colorScheme.length; i++) {
 			colorScheme[i] = colorSchemeMap.get("LBRFUD".charAt(i)+"");
