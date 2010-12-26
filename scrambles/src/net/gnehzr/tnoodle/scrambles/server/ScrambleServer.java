@@ -108,7 +108,7 @@ public class ScrambleServer {
 	public ScrambleServer(int port, File scrambleFolder, boolean browse) throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 		
-		SortedMap<String, Scrambler> scramblers = Scrambler.getScrambleGenerators(scrambleFolder);
+		SortedMap<String, Scrambler> scramblers = Scrambler.getScramblers(scrambleFolder);
 		if(scramblers == null) {
 			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
 		}
@@ -174,6 +174,7 @@ public class ScrambleServer {
 			
 			mimes.addMimeTypes("image/png png");
 			mimes.addMimeTypes("image/gif gif");
+			mimes.addMimeTypes("image/vnd.microsoft.icon ico");
 
 			mimes.addMimeTypes("application/x-font-ttf ttf");
 
@@ -307,6 +308,22 @@ public class ScrambleServer {
 					e.printStackTrace();
 					sendText(t, throwableToString(e));
 				}
+			} else if(extension.equals("ico")) {
+				/*
+				try {
+					BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
+					generator.drawPuzzleIcon(img.createGraphics(), dimension, scramble, colorScheme);
+					ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+					ImageIO.write(img.getSubimage(0, 0, dimension.width, dimension.height), "png", bytes);
+
+					t.getResponseHeaders().set("Content-Type", "image/microsoft.icon");
+					t.sendResponseHeaders(200, bytes.size());
+					t.getResponseBody().write(bytes.toByteArray());
+					t.getResponseBody().close();
+				} catch(InvalidScrambleException e) {
+					e.printStackTrace();
+					sendText(t, throwableToString(e));
+				}*/
 			} else if(extension.equals("json")) {
 				sendJSON(t, GSON.toJson(generator.getDefaultPuzzleImageInfo().jsonize()), callback);
 			} else {

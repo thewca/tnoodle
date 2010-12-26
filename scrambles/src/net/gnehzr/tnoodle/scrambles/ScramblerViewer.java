@@ -20,14 +20,14 @@ import net.gnehzr.tnoodle.scrambles.utils.Base64;
 
 /**
  * Any classes that wish to provide scramble images as well as scrambles
- * should extend this class rather than ScrambleGenerator.
+ * should extend this class rather than Scrambler.
  * @author Jeremy Fleischman
  */
 public abstract class ScramblerViewer extends Scrambler {
 	/**
 	 * Subclasses of ScrambleImageGenerator are expected to produce scrambles of one size,
 	 * this abstract class will resize appropriately.
-	 * @return The size of the images this ScrambleGenerator will produce.
+	 * @return The size of the images this Scrambler will produce.
 	 */
 	protected abstract Dimension getPreferredSize();
 	

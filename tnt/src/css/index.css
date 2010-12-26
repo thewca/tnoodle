@@ -14,8 +14,7 @@ img {
 	color: brown;
 	text-decoration: underline;
 	cursor: pointer;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding-left: 5px;
 }
 .imglink {
 	padding: 0px;
@@ -23,6 +22,15 @@ img {
 .link:hover, .down {
 	text-decoration: none;
 	color: red;
+}
+
+#signIn {
+	z-index: 4;
+	position: absolute;
+	top: 4px;
+}
+#signIn .link {
+	/*display: block;*/
 }
 
 .tabs {
@@ -72,7 +80,6 @@ img {
 .tabs li:hover, .tabs li.active, #sessionInfoBar {
 	background: #efefef;
 }
-
 #sessionInfoBar {
 	padding: 5px 10px;
 }

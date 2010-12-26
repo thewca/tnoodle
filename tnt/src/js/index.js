@@ -6,6 +6,8 @@ window.addEvent('domready', function() {
 	//we have to wait for both the scrambles and the sessions to load,
 	//and we can't know which will load first, so we use lastSessionTab and scramblesLoades
 	//to keep track
+	//This above comment doesn't make much sense,
+	//is scramblesLoaded even being read anywhere?
 	var lastSessionTab = null;
 	var scramblesLoaded = false;
 	function onPuzzlesLoaded(puzzles) {
@@ -111,6 +113,10 @@ window.addEvent('domready', function() {
 		$('sessionInfo').empty();
 		$('sessionInfo').appendText(session.getDate().format("%x"));
 		//$('sessionInfo').appendText("Started " + tnoodle.tnt.ago(session.getDate()) + " ago");
+		//$$('#sessions li').each(function(el, i) {
+			//console.log(i);
+			//console.log(el);
+		//});
 	}
 	
 	var session = null;
@@ -253,6 +259,12 @@ window.addEvent('domready', function() {
 	
 	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
 	timesTable.manager = triLayout;
+	
+	//TODO - yeah...
+	$('helpLink').addEvent('click', function() {
+		var popup = tnoodle.tnt.createPopup();
+		popup.show();
+	});
 	
 	var keyboard = new Keyboard();
 	/*keyboard.addShortcut('save', {

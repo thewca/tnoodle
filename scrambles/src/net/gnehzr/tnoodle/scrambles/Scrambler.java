@@ -28,9 +28,9 @@ import net.goui.util.MTRandom;
 import com.eekboom.utils.Strings;
 
 /**
- * Subclasses of ScrambleGenerator must method with the following signature
- * <p><code>public static synchronized ScrambleGenerator[] createScramblers();</code></p>
- * Note the synchronized keyword! This method should return an array of ScrambleGenerators.
+ * Subclasses of Scrambler must method with the following signature
+ * <p><code>public static synchronized Scrambler[] createScramblers();</code></p>
+ * Note the synchronized keyword! This method should return an array of Scramblers.
  * This is useful for CubeScrambler, so one class can deal with 2x2 through NxN cube scrambles.<br>
 	//TODO - optimal cross solver? lol
  * @author Jeremy Fleischman
@@ -42,24 +42,24 @@ public abstract class Scrambler {
 	private static final String PLUGIN_EXTENSION = ".class";
 	
 	/**
-	 * Returns a String describing this ScrambleGenerator
+	 * Returns a String describing this Scrambler
 	 * appropriate for use in a url. This shouldn't contain any periods.
-	 * @return a url appropriate String unique to this ScrambleGenerator
+	 * @return a url appropriate String unique to this Scrambler
 	 */
 	public abstract String getShortName();
 	
 	/**
-	 * Returns a String fully describing this ScrambleGenerator.
+	 * Returns a String fully describing this Scrambler.
 	 * Unlike shortName(), may contain spaces and other url-inappropriate characters.
-	 * This will also be used for the toString method of this ScrambleGenerator.
+	 * This will also be used for the toString method of this Scrambler.
 	 * @return a String
 	 */
 	public abstract String getLongName();
 	
 	/**
-	 * Generates a scramble appropriate for this ScrambleGenerator. It's important to note that
+	 * Generates a scramble appropriate for this Scrambler. It's important to note that
 	 * it's ok if this method takes some time to run, as it's going to be called many times and get queued up
-	 * by ScrambleGenerator (think of it as a sort of cache).
+	 * by Scrambler (think of it as a sort of cache).
 	 * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing, 
 	 * use the synchronized keyword when implementing this method.<br>
 	 * <code>protected synchronized String generateScramble(Random r);</code>
@@ -190,13 +190,13 @@ public abstract class Scrambler {
 	
 	/**
 	 * TODO - comment on merging w/ curr classpath
-	 * @param folder The folder containing the ScrambleGenerator classes.
+	 * @param folder The folder containing the Scrambler classes.
 	 * If null, looks for a directory named scramblers in the "program's directory", as defined by getProgramDirectory(). 
-	 * @return A HashMap mapping shortNames to valid ScrambleGenerators found in folder
+	 * @return A HashMap mapping shortNames to valid Scramblers found in folder
 	 *  sorted in a "natural" order (such that 3x3x3 comes before 10x10x10).
 	 *  Returns null if the directory was invalid. 
 	 */
-	public static SortedMap<String, Scrambler> getScrambleGenerators(File folder) {
+	public static SortedMap<String, Scrambler> getScramblers(File folder) {
 		if(folder == null) {
 			try {
 				folder = new File(getProgramDirectory(), "scramblers");
@@ -259,7 +259,7 @@ interface ScrambleCacherListener {
  */
 class ScrambleCacher {
 	/**
-	 * ScrambleGenerators will get passed this instance of Random
+	 * Scramblers will get passed this instance of Random
 	 * in order to have nice, as-secure-as-can-be scrambles.
 	 */
 	private static final Random r;

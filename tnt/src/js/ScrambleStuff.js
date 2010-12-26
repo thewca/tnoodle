@@ -869,7 +869,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	resizeDiv.className = "dragresize dragresize-br";
 	scrambleDiv.appendChild(resizeDiv);
 	// end scrambleDiv
-	scrambleDiv.style.top = configuration.get('scramble.location.top', '0px');
+
+	// Defaulting to 30px to make room for "Sign In" and "Help" links
+	scrambleDiv.style.top = configuration.get('scramble.location.top', '30px');
 	scrambleDiv.style.left = configuration.get('scramble.location.left', '0px');
 
 	var scrambleDrag = new Drag(scrambleDiv, {

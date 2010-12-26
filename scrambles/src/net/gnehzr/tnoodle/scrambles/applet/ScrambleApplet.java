@@ -16,7 +16,7 @@ public class ScrambleApplet extends JApplet {
 		js = JSObject.getWindow(this);
 		String callback = getParameter("onload");
 		
-		SortedMap<String, Scrambler> scramblers = Scrambler.getScrambleGenerators(null);
+		SortedMap<String, Scrambler> scramblers = Scrambler.getScramblers(null);
 		if(callback != null) {
 			//TODO - apparently callback must be a top level function?
 			//something like tnoodle.scrambles.test doesn't work
