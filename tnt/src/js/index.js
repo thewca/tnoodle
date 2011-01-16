@@ -302,12 +302,27 @@ window.addEvent('domready', function() {
 		popup.show();
 	});
 	
+	// This wraps functions to ensure that they
+	// only get called if we're not timing
+	// This is useful so keyboard shortcuts won't work
+	// while the timer is running
+	function notTiming(func) {
+		return function(e) {
+			var focusedEl = document.activeElement.nodeName.toLowerCase();
+			// This is kinda weird, we want to avoid activating this shortcut
+			// if we're in a textarea, textfield, or input field
+			var isEditing = focusedEl == 'textarea' || focusedEl == 'textfield' || focusedEl == 'input';
+			if(!timer.timing && !isEditing) {
+				func(e);
+			}
+		};
+	}
 	var keyboard = new Keyboard();
-	/*keyboard.addShortcut('save', {
-	    'keys': 'ctrl+s',
-	    'description': 'Save the current document',
-	    'handler': function(e) { e.stop(); }
-	});*/
+	keyboard.addShortcut('save', {
+	    'keys': 'c',
+	    'description': 'Comment on latest solve',
+	    'handler': notTiming(timesTable.comment.bind(timesTable))
+	});
 	keyboard.addShortcut('add time', {
 		'keys': 'alt+a',
 		'description': 'Add time',

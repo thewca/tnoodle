@@ -587,10 +587,10 @@ var TimesTable = new Class({
 			var el = timeHoverDiv.tr.getChildren()[1];
 			if(el.isOrIsChild(this.tbody)) {
 				timeHoverDiv.position({relativeTo: el.getParent(), position: 'left', edge: 'right'});
-				timeHoverDiv.fade('in');
+				timeHoverDiv.fade('show');
 				timeHoverDiv.visible = true;
 			} else {
-				timeHoverDiv.fade('hide');
+				timeHoverDiv.fade('out');
 				timeHoverDiv.visible = false;
 			}
 		}.bind(this);
@@ -617,6 +617,11 @@ var TimesTable = new Class({
 			}
 		};
 		this.timeHoverDiv = timeHoverDiv;
+	},
+	comment: function(e) {
+		e.stop(); // we don't want the shortcut key to result in editing the comment
+		this.lastAddedRow.hover();
+		this.timeHoverDiv.commentArea.focus();
 	},
 	deleteRows: function(rows) {
 		var times = [];
