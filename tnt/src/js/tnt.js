@@ -15,7 +15,7 @@ tnoodle.tnt = {
 		});
 		return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': description, 'for': optionKey }));
 	},
-	createOptions: function(showCallback, hiddenCallback) {
+	createOptions: function(showCallback, hiddenCallback, canHide) {
 		var optionsButton = new Element('div', { html: 'v', 'class': 'optionsButton' });
 		optionsButton.setStyles({
 			width: 19,
@@ -54,6 +54,9 @@ tnoodle.tnt = {
 			}
 		}
 		optionsDiv.hide = function(e) {
+			if(canHide && !canHide()) {
+				return;
+			}
 			optionsDiv.fade('out');
 			timer = setTimeout(fireHidden, 500);
 			optionsButton.morph('.optionsButton');
@@ -64,6 +67,20 @@ tnoodle.tnt = {
 		optionsButton.addEvent('mouseout', optionsDiv.hide);
 		optionsDiv.addEvent('mouseover', optionsDiv.show);
 		optionsDiv.addEvent('mouseout', optionsDiv.hide);
+		document.addEvent('mousedown', function(e) {
+			if(!e.target) {
+				e.target = e.srcElement; // freaking ie, man
+			}
+
+			if(!e.target.isOrIsChild(optionsDiv)) {
+				// If we attempt to hide immediately, then
+				// textboxes may still focused.
+				// This lets focus events take place before
+				// we attempt to hide the box.
+				// Otherwise, it could fail when we call canHide().
+				setTimeout(optionsDiv.hide, 0);
+			}
+		});
 		return {
 			div: optionsDiv,
 			button: optionsButton
@@ -108,7 +125,7 @@ tnoodle.tnt = {
 		}.bind(popup);
 		popup.hide();
 		document.addEvent('keydown', function(e) {
-			if(e.code == 27) {
+			if(e.key == 'esc') {
 				popup.hide();
 			}
 		});
@@ -124,7 +141,7 @@ tnoodle.tnt = {
 				e.target = e.srcElement; // freaking ie, man
 			}
 
-			if(!isOrIsChild(e.target, popup)) {
+			if(!e.target.isOrIsChild(popup)) {
 				popup.hide();
 			}
 		});
@@ -181,5 +198,10 @@ Element.implement({
 	},
 	isOrIsChild: function(par) {
 		return this.findAncestor(function(e) { return e == par; }) !== null;
+	},
+	containsPoint: function(point, relativeTo) {
+		var tl = this.getPosition(relativeTo);
+		var size = this.getSize();
+		return point.x >= tl.x && point.x < tl.x+size.x && point.y >= tl.y && point.y < tl.y+size.y;
 	}
 });

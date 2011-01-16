@@ -21,13 +21,12 @@ var KeyboardTimer = new Class({
 		this.fullscreenBG.setStyle('display', 'none');
 		this.fullscreenBG.inject(document.body);
 		
-		function shownCallback() {
-
+		function shownCallback() { }
+		function hiddenCallback() { }
+		function canHide() {
+			return document.activeElement != updateFrequency;
 		}
-		function hiddenCallback() {
-			updateFrequency.blur();
-		}
-		var options = tnoodle.tnt.createOptions(shownCallback, hiddenCallback);
+		var options = tnoodle.tnt.createOptions(shownCallback, hiddenCallback, canHide);
 		var optionsDiv = options.div;
 		var optionsButton = options.button;
 		optionsButton.setStyles({

@@ -70,15 +70,6 @@ function deleteChildren(element) {
 function parsePx(px) {
 	return parseInt(px.replace(/px/g, ""), 10);
 }
-function isOrIsChild(el, parent) {
-	while(el) {
-		if(el == parent) {
-			return true;
-		}
-		el = el.parentNode;
-	}
-	return false;
-}
 function getPosition(el) {
 	var currLeft = 0;
 	var currTop = 0;
@@ -430,8 +421,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		deleteChildren(scramblePre);
 		puzzleSelect.disabled = false;
 		puzzleSelect.options.length = puzzles.length;
-		for( var i = 0; i < puzzles.length; i++) {
-			puzzleSelect.options[i] = new Option(puzzles[i][1], puzzles[i][0]);
+		for(var i = 0; i < puzzles.length; i++) {
+			var puzzleOption = new Option(puzzles[i][1], puzzles[i][0]);
+			puzzleSelect.options[i] = puzzleOption;
 		}
 		loadedCallback(puzzles);
 	}

@@ -1,16 +1,3 @@
-//TODO - it would be nice to have this in mootools
-function findAncestor(el, cond) {
-	while(el !== null && el !== undefined) {
-		if(cond(el)) {
-			return el;
-		}
-		el = el.parentNode;
-	}
-	return null;
-}
-function isOrIsChild(el, parent) {
-	return findAncestor(el, function(e) { return e == parent; }) !== null;
-}
 var SCROLLBAR_WIDTH = 13;
 var TimesTable = new Class({
 	Extends: HtmlTable,
@@ -28,7 +15,7 @@ var TimesTable = new Class({
 		HtmlTable.Parsers.time = {
 			match: /^.*$/,
 			convert: function() {
-				if(isOrIsChild(this, table.addRow)) {
+				if(this.isOrIsChild(table.addRow)) {
 					return Infinity;
 				}
 				return this.timeCentis;
@@ -39,7 +26,7 @@ var TimesTable = new Class({
 		HtmlTable.Parsers.num = {
 			match: HtmlTable.Parsers.number.match,
 			convert: function() {
-				if(isOrIsChild(this, table.addRow)) {
+				if(this.isOrIsChild(table.addRow)) {
 					return Infinity;
 				}
 				//We can't just look at the html because of the delete thingy
@@ -286,9 +273,16 @@ var TimesTable = new Class({
 				selectedRows = [];
 			}
 
-			//This gets ride of the errorField if we were editing a time
-			//TODO - this gets rid of the hover if no times are selected!
-			timeHoverDiv.hide();
+			// This gets ride of the errorField if we were editing a time
+			// This gets rid of the hover if we're hovering over times,
+			// but I guess that's ok behavior
+			if(timeHoverDiv.tr) {
+				timeHoverDiv.commentArea.blur();
+				setTimeout(timeHoverDiv.tr.unhover.bind(timeHoverDiv.tr, null, true), 0);
+			}
+			// Unfortunately, the call to unhover() doesn't result in
+			// hiding the timeHoverDiv, so we do so explicitly.
+			timeHoverDiv.hide(true);
 		}
 		this.deselectRows = deselectRows;
 		this.promptTime = function() {
@@ -297,7 +291,7 @@ var TimesTable = new Class({
 			selectRow(this.addRow);
 		}.bind(this);
 		window.addEvent('click', function(e) {
-			var timeHoverChild = findAncestor(e.target, function(e) {
+			var timeHoverChild = e.target.findAncestor(function(e) {
 				return e == timeHoverDiv;
 			});
 			if(e.rightClick || timeHoverChild) {
@@ -305,11 +299,11 @@ var TimesTable = new Class({
 				return;
 			}
 			//TODO - is there a better way of checking nodeName?
-			var row = findAncestor(e.target, function(el) { return el.nodeName == 'TR'; });
-			if(!isOrIsChild(row, table.tbody)) {
-				row = null;
-			}
+			var row = e.target.findAncestor(function(el) { return el.nodeName == 'TR'; });
 			if(row) {
+				if(!row.isOrIsChild(table.tbody)) {
+					return;
+				}
 				if(e.control) {
 					if(table.addRow.selected || row === table.addRow) {
 						return;
@@ -330,7 +324,7 @@ var TimesTable = new Class({
 						selectRow(row);
 						mostRecentRow = row;
 					}
-				} else if(e.shift && isOrIsChild(mostRecentRow, $(table))) {
+				} else if(e.shift && mostRecentRow.isOrIsChild($(table))) {
 					if(row === table.addRow) {
 						return;
 					}
@@ -406,7 +400,6 @@ var TimesTable = new Class({
 		
 		var timeHoverDiv = new Element('div');
 		timeHoverDiv.fade('hide');
-		timeHoverDiv.visible = false;
 		timeHoverDiv.setStyles({
 			position: 'absolute',
 			backgroundColor: 'white',
@@ -447,12 +440,6 @@ var TimesTable = new Class({
 		commentArea.setStyle('padding', padding);
 		commentArea.setStyle('border', '1px solid black');
 		form.setStyle('height', height+2*(margin+padding+1));
-		/*commentArea.addEvent('blur', function() {
-			if(commentArea.getStyle('color') == 'black') {
-				timeHoverDiv.time.setComment(commentArea.value);
-				commentArea.setText(timeHoverDiv.time.comment);
-			}
-		});*/
 		commentArea.setText = function(text) {
 			if(text === null) {
 				commentArea.setStyle('color', 'gray');
@@ -548,35 +535,27 @@ var TimesTable = new Class({
 
 		timeHoverDiv.form = form;
 		document.body.adopt(timeHoverDiv);
-		var hoverHider = null;
 		timeHoverDiv.addEvent('mouseover', function(e) {
 			timeHoverDiv.tr.hover();
 			timeHoverDiv.show();
 		});
 		timeHoverDiv.addEvent('mouseout', function(e) {
-			if(hoverHider !== null) {
+			// This should help dampen the unexpected mouseout events
+			if(timeHoverDiv.containsPoint(e.page)) {
 				return;
 			}
 			timeHoverDiv.tr.unhover();	
-			hoverHider = setTimeout(function() {
-				timeHoverDiv.hide();
-			}, 100);
 		});
 		var errorField = new Element('div', { 'class': 'errorField' });
 		timeHoverDiv.errorField = errorField;
 		timeHoverDiv.show = function(tr, time) {
-			if(hoverHider !== null) {
-				clearTimeout(hoverHider);
-				hoverHider = null;
-				return;
-			}
-			// Nastyness to save the comment
-			// This seems to work... urgh
-			if(timeHoverDiv.time !== null && commentArea.getStyle('color') == 'black') {
-				timeHoverDiv.time.setComment(commentArea.value);
-				commentArea.blur();
-			}
 			if(tr) {
+				// Nastyness to save the comment
+				// This seems to work... urgh
+				if(timeHoverDiv.time !== null && commentArea.getStyle('color') == 'black') {
+					timeHoverDiv.time.setComment(commentArea.value);
+					commentArea.blur();
+				}
 				//TODO - comment AAAA
 				if(!timeHoverDiv.tr || !timeHoverDiv.tr.editing) {
 					timeHoverDiv.tr = tr;
@@ -606,24 +585,8 @@ var TimesTable = new Class({
 				}
 			}
 			var el = timeHoverDiv.tr.getChildren()[1];
-			if(isOrIsChild(el, this.tbody)) {
+			if(el.isOrIsChild(this.tbody)) {
 				timeHoverDiv.position({relativeTo: el.getParent(), position: 'left', edge: 'right'});
-				/*
-				if(timeHoverDiv.time === null) {
-					timeHoverDiv.position({relativeTo: el, position: 'bottom', edge: 'top'});
-				} else {
-					timeHoverDiv.setPosition({x:0,y:0}); // let it size itself properly
-					var oldWidth = timeHoverDiv.getSize().x;
-					timeHoverDiv.position({relativeTo: el, position: 'right', edge: 'left'});
-					if(timeHoverDiv.getSize().x < oldWidth) {
-						// keep the hover from getting squished, if at all possible
-						timeHoverDiv.setPosition({x:0,y:0}); // let it size itself properly
-						var row = el.getParent();
-						timeHoverDiv.setStyle('margin-right', '10px'); // this guarantees room to select a row
-						timeHoverDiv.position({relativeTo: row, position: 'right', edge: 'right'});
-					}
-				}
-				*/
 				timeHoverDiv.fade('in');
 				timeHoverDiv.visible = true;
 			} else {
@@ -631,13 +594,26 @@ var TimesTable = new Class({
 				timeHoverDiv.visible = false;
 			}
 		}.bind(this);
-		timeHoverDiv.hide = function() {
+		var fader = timeHoverDiv.fade;
+		timeHoverDiv.fade = function(str) {
+			timeHoverDiv.get('tween').cancel();
+			fader.call(timeHoverDiv, str);
+		};
+		timeHoverDiv.hide = function(immediately) {
 			//TODO - comment! SEE A
+			if(!timeHoverDiv.visible) {
+				return;
+			}
+			function hide() {
+				timeHoverDiv.fade(immediately ? 'hide' : 'out');
+				timeHoverDiv.visible = false;
+			}
 			if(!timeHoverDiv.tr || !timeHoverDiv.tr.editing) {
-				setTimeout(function() {
-					timeHoverDiv.fade('out');
-					timeHoverDiv.visible = false;
-				}, 0);
+				if(immediately) {
+					hide();
+				} else {
+					setTimeout(hide, 0);
+				}
 			}
 		};
 		this.timeHoverDiv = timeHoverDiv;
@@ -759,8 +735,9 @@ var TimesTable = new Class({
 		this.resizeCols();
 	},
 	editCell: function(cell, time) {
-		if(isOrIsChild(cell.textField, cell)) {
+		if(cell.textField && cell.textField.isOrIsChild(cell)) {
 			// we must be editing currently
+			// The above comment makes no sense --jfly
 			return;
 		}
 		var width = cell.getStyle('width').toInt() + cell.getStyle('padding-left').toInt() + cell.getStyle('padding-right').toInt();
@@ -939,6 +916,16 @@ var TimesTable = new Class({
 		}.bind(this);
 
 		tr.hover = function() {
+			table.tbody.getChildren('tr').each(function(row) {
+				if(tr == row) {
+					return;
+				}
+				//ridiculous...
+				if(row.hovered) {
+					table.timeHoverDiv.commentArea.blur();
+					row.unhover();
+				}
+			});
 			if(this.pendingUnhover) {
 				clearTimeout(this.pendingUnhover);
 				this.pendingUnhover = null;
@@ -950,8 +937,17 @@ var TimesTable = new Class({
 			this.refresh();
 			table.timeHoverDiv.show(this, time);
 		};
-		tr.unhover = function(e) {
+		tr.unhover = function(e, immediately) {
 			if(this.pendingUnhover) {
+				return;
+			}
+			if(document.activeElement == table.timeHoverDiv.commentArea) {
+				return;
+			}
+			// If you place the cursor right on a vertical
+			// line between cells, it's considered a mouse-out.
+			// This prevents that.
+			if(e && tr.containsPoint(e.page)) {
 				return;
 			}
 			this.hovered = false;
@@ -959,7 +955,7 @@ var TimesTable = new Class({
 				this.refresh();
 				this.pendingUnhover = null;
 			}.bind(this), 100);
-			table.timeHoverDiv.hide();
+			table.timeHoverDiv.hide(immediately);
 		};
 		tr.select = function() {
 			this.selected = true;
@@ -969,7 +965,7 @@ var TimesTable = new Class({
 			//TODO - remove yourself from the select array!
 			this.selected = false;
 			this.editing = false;
-			this.unhover();
+			this.unhover(null, true);
 			this.refresh();
 		};
 		tr.addEvent('mouseover', tr.hover);

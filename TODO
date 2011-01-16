@@ -88,10 +88,15 @@ FEATURES
 +puzzle icons!
 	-implemented, but now need some decent icons!
 -undo redo should probably work with tagging
+-sq1 scramble spacing
 
 -saving times
 	-add login
 	-deal with overflowing tabs...
+		-switching to 1 tab per customization sounds like a good idea to me
+		-only issue is how to deal with diff types of sorting?
+		-maybe have the vertical tree style gui thing with expandable triangles?
+		-find a place to use the lovely icons...
 
 +clickable stuff in timestable to get jnet/cct style stats?
 	-does it need to be customizable?

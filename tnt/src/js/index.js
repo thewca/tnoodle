@@ -146,6 +146,33 @@ window.addEvent('domready', function() {
 		timesTable.setSession(session);
 		scrambleStuff.setSelectedPuzzle(session.getPuzzle());
 		customizationSelect.refresh();
+		refreshTabs();
+	}
+	// Returns true iff el1 completely contains el2
+	// This "containing" need not be strict, that is, el1 contains el1.
+	function contains(el1, el2) {
+		var p1 = el1.getPosition();
+		var p2 = el2.getPosition();
+		var s1 = el1.getSize();
+		var s2 = el2.getSize();
+		return p2.x >= p1.x && p2.y >= p1.y && p2.x+s2.x <= p1.x+s1.x && p2.y+s2.y <= p1.y+s1.y;
+	}
+	function refreshTabs() {
+		$('sessions').getChildren().each(function(li) {
+			li.setStyle('width', '');
+		});
+
+		if(!contains($('sessions'), ($('newSession')))) {
+			// The newSession tab doesn't fit, so we shrink everything
+			$('sessions').getChildren().each(function(li) {
+				if(li == $('newSession')) {
+					return;
+				}
+				if(!li.hasClass('active')) {
+					li.setStyle('width', 1);
+				}
+			});
+		}
 	}
 	function closeSession(e) {
 		e.stop(); //prevent the tab from activating
@@ -170,6 +197,7 @@ window.addEvent('domready', function() {
 			//deleting the current session, so we select the next one to the left
 			sessionClicked.call(newTab);			
 		}
+		refreshTabs();
 	}
 	function createSessionTab(session) {
 		var tab = new Element('li');
@@ -217,6 +245,7 @@ window.addEvent('domready', function() {
 		close.tab = tab;
 		close.inject(tab, 'bottom'); 
 		close.addEvent('click', closeSession);
+		refreshTabs();
 		return tab;
 	}
 	
@@ -258,6 +287,7 @@ window.addEvent('domready', function() {
 		$('timesArea').setStyle('height', remainingHeight);
 		
 		timesTable.resize();
+		refreshTabs();
 	};
 	$('times').getPreferredWidth = function() {
 		return timesTable.getPreferredWidth();
