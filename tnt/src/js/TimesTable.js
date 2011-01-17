@@ -14,11 +14,11 @@ var TimesTable = new Class({
 		var table = this;
 		HtmlTable.Parsers.time = {
 			match: /^.*$/,
-			convert: function() {
+			convert: function(a, b, c) {
 				if(this.isOrIsChild(table.addRow)) {
 					return Infinity;
 				}
-				return this.timeCentis;
+				return this.getParent().time[this.key];
 			},
 			number: true
 		};
@@ -35,9 +35,21 @@ var TimesTable = new Class({
 			},
 			number: HtmlTable.Parsers.number.number
 		};
+		var time = HtmlTable.Parsers.time;
+		var num = HtmlTable.Parsers.num;
+		var parsers = server.timeKeyTypes.map(function(type) {
+			if(type == Number) {
+				return num;
+			} else if(type == server.Time) {
+				return time;
+			} else {
+				return null;
+			}
+		});
+		console.log(parsers);
 		this.parent(id, {
 			headers: this.headers,
-			parsers: [ HtmlTable.Parsers.num, HtmlTable.Parsers.time ],
+			parsers: parsers,
 			rows: [],
 			sortable: true,
 			zebra: false
@@ -47,7 +59,6 @@ var TimesTable = new Class({
 			
 			this.configuration.set('times.sort', this.sorted);
 			this.scrollToLastTime();
-			this.addRow.inject(this.tbody);
 			
 			//sorting can change the box around the best ra
 			this.tbody.getChildren('tr').each(function(tr) {
@@ -295,7 +306,7 @@ var TimesTable = new Class({
 				return e == timeHoverDiv;
 			});
 			if(e.rightClick || timeHoverChild) {
-				// We don't let right clicking or tagging a time deselect a row
+				// We don't let right clicking or clicking on the timeHover deselect a row
 				return;
 			}
 			//TODO - is there a better way of checking nodeName?
@@ -475,63 +486,6 @@ var TimesTable = new Class({
 			table.refreshData();
 		});
 		
-		var options = tnoodle.tnt.createOptions();
-		var tagsButton = options.button;
-		tagsButton.setStyle('display', 'inline');
-		tagsButton.setStyle('padding-left', '5px');
-		tagsButton.setStyle('padding-right', '5px');
-		tagsButton.setStyle('margin-left', '5px');
-		var tagsDiv = options.div;
-		
-		var editTagsPopup = tnoodle.tnt.createPopup(null, null);
-		tagsDiv.refresh = function() {
-			function tagged(e) {
-				if(this.checked) {
-					timeHoverDiv.time.addTag(this.id);
-				} else {
-					timeHoverDiv.time.removeTag(this.id);
-				}
-			}
-			var tags = table.server.getTags(table.session.getPuzzle());
-			tagsDiv.empty();
-			for(var i = 0; i < tags.length; i++) {
-				var tag = tags[i];
-				var checked = timeHoverDiv.time.hasTag(tags[i]);
-				var checkbox = new Element('input', { id: tag, type: 'checkbox' });
-				checkbox.checked = checked;
-				checkbox.addEvent('change', tagged);
-				checkbox.addEvent('focus', checkbox.blur);
-				tagsDiv.adopt(new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': tag, 'for': tag })));
-			}
-			
-			// all of this tagging code is some of the worst code i've written for tnt,
-			// probably because it's 7:30 am, and i want to go to sleep
-			// TODO - but it's important that there eventually is a better dialog for editing tags 
-			// that doesn't cause the current row to lose focus
-			var editTagsLink = new Element('span', { 'class': 'link', html: 'Edit tags' });
-			editTagsLink.addEvent('click', function(e) {
-				var onAdd = function(newItem) {
-					server.createTag(table.session.getPuzzle(), newItem);
-				};
-				var onRename = function(oldItem, newItem) {
-					server.renameTag(table.session.getPuzzle(), oldItem, newItem);
-				};
-				var onDelete = function(oldItem) {
-					server.deleteTag(table.session.getPuzzle(), oldItem);
-				};
-				editTagsPopup.empty();
-				editTagsPopup.appendChild(tnoodle.tnt.createEditableList(table.server.getTags(table.session.getPuzzle(), onAdd, onRename, onDelete)));
-				editTagsPopup.show();
-				/*
-				var tag = prompt("Enter name of new tag (I promise this will become a not-crappy gui someday)");
-				if(tag) {
-					table.server.createTag(table.session.getPuzzle(), tag);
-					tagsDiv.refresh();
-				}
-				*/
-			});
-			tagsDiv.adopt(editTagsLink);
-		};
 
 		timeHoverDiv.form = form;
 		document.body.adopt(timeHoverDiv);
@@ -570,12 +524,9 @@ var TimesTable = new Class({
 				} else if(timeHoverDiv.time !== null) {
 					timeHoverDiv.commentArea.setText(time.getComment());
 					timeHoverDiv.adopt(timeHoverDiv.form);
-					//timeHoverDiv.form.adopt(tagsButton);
-					//timeHoverDiv.adopt(tagsDiv); // If the div is a member of the hoverDiv, then hovering over it prevents timeHoverDiv from disappearing
 					noPenalty.setText(table.server.formatTime(time.rawCentis));
 					dnf.setText("DNF");
 					plusTwo.setText(table.server.formatTime(time.rawCentis+2*100)+"+");
-					tagsDiv.refresh();
 
 					// Select the correct penalty
 					var penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };
@@ -651,6 +602,7 @@ var TimesTable = new Class({
 		this.session = session;
 		this.addRow.dispose(); //if we don't remove this row before calling empty(), it's children will get disposed
 		this.empty();
+		this.addRow.inject(this.tbody); // adding the addRow back
 		this.session.times.each(function(time) {
 			this.createRow(time);
 		}.bind(this));
@@ -733,7 +685,6 @@ var TimesTable = new Class({
 		});
 		this.thead.getChildren('tr').each(refreshCols);
 		this.tfoot.getChildren('tr').each(refreshCols);
-		refreshCols(this.addRow); //addRow is not a part of the table at this point
 		this.resort(true);
 		this.infoRow.refresh();
 		//$(this).toggle(); //prevent flickering?
@@ -866,7 +817,6 @@ var TimesTable = new Class({
 						this.editCell(cells[col], time);
 					} else {
 						cells[col].set('html', time.format());
-						cells[col].timeCentis = time.centis;
 						cells[col].removeClass('bestRA');
 						cells[col].removeClass('currentRA');
 						cells[col].removeClass('topCurrentRA');

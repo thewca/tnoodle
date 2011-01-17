@@ -147,15 +147,8 @@ tnoodle.server = function(url) {
 	function Time(time, scramble) {
 		this.format = function(key) {
 			key = key || 'centis';
-			if(key == 'tags') {
-				return this.tags.toString();
-			} else if(key == 'date') {
-				return this.date.toString();
-			} else if(key == 'scramble') {
-				return this.scramble;
-			} else if(key == 'index') {
-				return this.index.toString();
-			} else {
+			var type = server.timeKeyTypeMap[key];
+			if(type == Time) {
 				var time = server.formatTime(this[key]);
 				if(key == 'centis') {
 					if(this.penalty == "+2") {
@@ -163,6 +156,16 @@ tnoodle.server = function(url) {
 					}
 				}
 				return time;
+			} else if(type == Date) {
+				return this[key].toString();
+			} else if(type == String) {
+				return this[key].toString();
+			} else if(type == Array) {
+				return this[key].toString();
+			} else if(type == Number) {
+				return this[key].toString();
+			} else {
+				alert("Unrecognized type: " + type);
 			}
 		};
 		this.parse = function(time) {
@@ -266,27 +269,12 @@ tnoodle.server = function(url) {
 		this.getPenalty = function() {
 			return this.penalty;
 		};
-		this.addTag = function(tag) {
-			if(!this.hasTag(tag)) {
-				this.tags.push(tag);
-				saveSessions();
-			}
-		};
-		this.removeTag = function(tag) {
-			var index = this.tags.indexOf(tag);
-			if(index >= 0) {
-				this.tags.splice(index, 1);
-				saveSessions();
-			}
-		};
-		this.hasTag = function(tag) {
-			return this.tags.indexOf(tag) >= 0;
-		};
 		this.setComment = function(comment) {
 			if(this.comment == comment) {
 				return;
 			}
 			this.comment = (comment == "") ? null : comment;
+			console.log(comment.match(/#\S+/g));
 			saveSessions();
 		};
 		this.getComment = function() {
@@ -314,15 +302,15 @@ tnoodle.server = function(url) {
 	};
 
 	var keyInfo = [
-		[ 'index', '', null ],
-		[ 'centis', 'Time', null ],
-		[ 'ra5', 'Ra 5', 'Trimmed average of 5' ],
-		[ 'ra12', 'Ra 12', 'Trimmed average of 12' ],
-		[ 'ra100', 'Ra 100', 'Trimmed average of 100' ],
-		[ 'sessionAve', 'Ave', description ],
-		[ 'tags', 'Tags', null ],
-		[ 'date', 'Date', 'Milliseconds since the epoch' ],
-		[ 'scramble', 'Scramble', null ]
+		[ 'index', '', null, Number ],
+		[ 'centis', 'Time', null, Time ],
+		[ 'ra5', 'Ra 5', 'Trimmed average of 5', Time ],
+		[ 'ra12', 'Ra 12', 'Trimmed average of 12', Time ],
+		[ 'ra100', 'Ra 100', 'Trimmed average of 100', Time ],
+		[ 'sessionAve', 'Ave', description, Time ],
+		[ 'tags', 'Tags', null, Array ],
+		[ 'date', 'Date', 'Milliseconds since the epoch', Date ],
+		[ 'scramble', 'Scramble', null, String ]
 	];
 	function nthEl(n) {
 		return function(a) {
@@ -332,6 +320,11 @@ tnoodle.server = function(url) {
 	this.timeKeys = keyInfo.map(nthEl(0));
 	this.timeKeyNames = keyInfo.map(nthEl(1));
 	this.timeKeyDescriptions = keyInfo.map(nthEl(2));
+	this.timeKeyTypes = keyInfo.map(nthEl(3));
+	this.timeKeyTypeMap = {};
+	for(var i = 0; i < keyInfo.length; i++) {
+		this.timeKeyTypeMap[keyInfo[i][0]] = keyInfo[i][3];
+	}
 	this.Time = Time;
 	
 	function Session(id, puzzle, customization) {
@@ -708,28 +701,6 @@ tnoodle.server = function(url) {
 	this.removeCustomization = function(puzzle, customization) {
 		//TODO - urgh... editing too?
 	};
-	
-	this.getTags = function(puzzle) {
-		//TODO - should tags be per-puzzle? seems like a good idea
-		//although it does make changing session puzzles more complicated ... urgh
-		if(!(puzzle in tags)) {
-			tags[puzzle] = [ 'POP' ];
-		}
-		return tags[puzzle].sort();
-	};
-	this.createTag = function(puzzle, tag) {
-		if(tags[puzzle].indexOf(tag) >= 0) {
-			return false;
-		}
-		tags[puzzle].push(tag);
-		return true;
-	};
-	this.removeTag = function(puzzle, oldTag) {
-		//TODO - urgh...
-	};
-	this.renameTag = function(puzzle, oldTag, newTag) {
-		//TODO - urgh...
-	};
 
 	// Utility function to copy all the properties from oldObj into newObj
 	function copyTo(oldObj, newObj) {
@@ -790,6 +761,4 @@ tnoodle.server = function(url) {
 			customizations[puzzle].push(customization);
 		}
 	}
-	//TODO - initialize the available tags, merge with customizations object?
-	var tags = { '3x3x3': [ 'PLL skip', 'POP' ] };
 };
