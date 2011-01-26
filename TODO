@@ -73,12 +73,13 @@ FEATURES
 	+vertically align penalty labels with radio buttons
 	+error message when adding time can get in the way
 	+icons for "Reset" and "Download" links
++twitter style hashtags in comments
 
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
 -add remaining stackmat options
 	-TODO - test with stackmat!!!
--pretty gui for editing customizations & tags
+-pretty gui for editing
 	-create an editable table superclass for the editable list & times table
 -add help/about
 	-include version number in tnt client
@@ -87,16 +88,12 @@ FEATURES
 	-documentation & configuration
 +puzzle icons!
 	-implemented, but now need some decent icons!
--undo redo should probably work with tagging
 -sq1 scramble spacing
 
 -saving times
 	-add login
-	-deal with overflowing tabs...
-		-switching to 1 tab per customization sounds like a good idea to me
-		-only issue is how to deal with diff types of sorting?
-		-maybe have the vertical tree style gui thing with expandable triangles?
-		-find a place to use the lovely icons...
+	-find a place to use the lovely icons...
+	-implement stuff on scratch paper!!!
 
 +clickable stuff in timestable to get jnet/cct style stats?
 	-does it need to be customizable?

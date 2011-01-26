@@ -297,8 +297,12 @@ window.addEvent('domready', function() {
 	timesTable.manager = triLayout;
 	
 	//TODO - yeah...
-	$('helpLink').addEvent('click', function() {
+	aboutText = '<h2>TNoodle Timer (TNT) vFOOOBAR</h2><br/>' +
+				'Created by Jeremy Fleischman from the ashes of CCT.<br/>' +
+				'Thanks to Leyan Lo for ideas/couch';
+	$('aboutLink').addEvent('click', function() {
 		var popup = tnoodle.tnt.createPopup();
+		popup.innerHTML = aboutText;
 		popup.show();
 	});
 	
@@ -312,6 +316,7 @@ window.addEvent('domready', function() {
 			// This is kinda weird, we want to avoid activating this shortcut
 			// if we're in a textarea, textfield, or input field
 			var isEditing = focusedEl == 'textarea' || focusedEl == 'textfield' || focusedEl == 'input';
+			console.log(isEditing);
 			if(!timer.timing && !isEditing) {
 				func(e);
 			}
@@ -336,11 +341,11 @@ window.addEvent('domready', function() {
 	keyboard.addShortcut('undo', {
 		'keys': 'ctrl+z',
 		'description': 'Undo',
-		'handler': timesTable.undo.bind(timesTable)
+		'handler': notTiming(timesTable.undo.bind(timesTable))
 	});
 	keyboard.addShortcut('redo', {
 		'keys': 'ctrl+y',
 		'description': 'Redo',
-		'handler': timesTable.redo.bind(timesTable)
+		'handler': notTiming(timesTable.redo.bind(timesTable))
 	});
 });

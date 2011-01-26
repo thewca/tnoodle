@@ -274,7 +274,7 @@ tnoodle.server = function(url) {
 				return;
 			}
 			this.comment = (comment == "") ? null : comment;
-			console.log(comment.match(/#\S+/g));
+			this.tags = comment.match(/#\S+/g) || [];
 			saveSessions();
 		};
 		this.getComment = function() {
@@ -308,7 +308,8 @@ tnoodle.server = function(url) {
 		[ 'ra12', 'Ra 12', 'Trimmed average of 12', Time ],
 		[ 'ra100', 'Ra 100', 'Trimmed average of 100', Time ],
 		[ 'sessionAve', 'Ave', description, Time ],
-		[ 'tags', 'Tags', null, Array ],
+		//The tags column doesn't resize nicely when tags are added
+		//[ 'tags', 'Tags', null, Array ],
 		[ 'date', 'Date', 'Milliseconds since the epoch', Date ],
 		[ 'scramble', 'Scramble', null, String ]
 	];
@@ -700,6 +701,27 @@ tnoodle.server = function(url) {
 	};
 	this.removeCustomization = function(puzzle, customization) {
 		//TODO - urgh... editing too?
+	};
+	this.getTags = function() {
+		//TODO - optimize the hell out of this!
+		var availableTags = {};
+		for(var i = 0; i < sessions.length; i++) {
+			var times = sessions[i].times;
+			for(var j = 0; j < times.length; j++) {
+				var tags = times[j].tags;
+				for(var k = 0; k < tags.length; k++) {
+					availableTags[tags[k]] = true;
+				}
+			}
+		}
+		var tags = [];
+		for(var tag in availableTags) {
+			if(availableTags.hasOwnProperty(tag)) {
+				tags.push(tag);
+			}
+		}
+		tags.sort();
+		return tags;
 	};
 
 	// Utility function to copy all the properties from oldObj into newObj

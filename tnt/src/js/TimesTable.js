@@ -46,7 +46,6 @@ var TimesTable = new Class({
 				return null;
 			}
 		});
-		console.log(parsers);
 		this.parent(id, {
 			headers: this.headers,
 			parsers: parsers,
@@ -460,6 +459,13 @@ var TimesTable = new Class({
 				commentArea.value = text;
 			}
 		};
+		commentArea.saveComment = function() {
+			// Nastyness to save the comment
+			if(timeHoverDiv.time !== null && commentArea.getStyle('color') == 'black') {
+				timeHoverDiv.time.setComment(commentArea.value);
+				commentArea.blur();
+			}
+		};
 		commentArea.addEvent('focus', function() {
 			if(commentArea.getStyle('color') == 'gray') {
 				commentArea.value = '';
@@ -504,12 +510,7 @@ var TimesTable = new Class({
 		timeHoverDiv.errorField = errorField;
 		timeHoverDiv.show = function(tr, time) {
 			if(tr) {
-				// Nastyness to save the comment
-				// This seems to work... urgh
-				if(timeHoverDiv.time !== null && commentArea.getStyle('color') == 'black') {
-					timeHoverDiv.time.setComment(commentArea.value);
-					commentArea.blur();
-				}
+				commentArea.saveComment();
 				//TODO - comment AAAA
 				if(!timeHoverDiv.tr || !timeHoverDiv.tr.editing) {
 					timeHoverDiv.tr = tr;
@@ -556,6 +557,7 @@ var TimesTable = new Class({
 				return;
 			}
 			function hide() {
+				commentArea.saveComment();
 				timeHoverDiv.fade(immediately ? 'hide' : 'out');
 				timeHoverDiv.visible = false;
 			}
