@@ -165,6 +165,9 @@ var TimesTable = new Class({
 					var bestIndex = table.session.bestWorst(key).best.index;
 					var rows = table.tbody.getChildren();
 					for(var i = 0; i < rows.length; i++) {
+						if(rows[i] == addRow) {
+							continue;
+						}
 						if(rows[i].time.index == bestIndex) {
 							deselectRows();
 							rows[i].hover(); //hovering is necessary to get the timeHoverDiv to show up
