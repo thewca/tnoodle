@@ -92,6 +92,11 @@ img {
 #timesArea {
 	border: 1px solid;
 }
+#puzzleChooser {
+	border-bottom: 1px solid black;
+	padding: 5px;
+	background: #d0d0d0;
+}
 
 .optionsButton {
 	background-color: #fff;

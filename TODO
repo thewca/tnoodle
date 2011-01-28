@@ -74,8 +74,8 @@ FEATURES
 	+error message when adding time can get in the way
 	+icons for "Reset" and "Download" links
 +twitter style hashtags in comments
++ensure that times table is wide enough for all 3 selects
 
--ensure that times table is wide enough for all 3 selects
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
 -add remaining stackmat options
@@ -95,6 +95,7 @@ FEATURES
 	-add login
 	-find a place to use the lovely icons...
 	-implement stuff on scratch paper!!!
+		***** SYSTEM TO CHANGE PUZZLE/EVENT OF CURRENT SESSION *****
 
 +clickable stuff in timestable to get jnet/cct style stats?
 	-does it need to be customizable?
