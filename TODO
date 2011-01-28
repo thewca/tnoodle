@@ -30,14 +30,12 @@ BUGS
 +tagging doesn't default correctly
 +!!!comments aren't being positioned nicely in chrome on os X
 
--Xbrowser issues
-	-get rid of time jittering (appears to be only under linux)
+-Xbrowser stuff
 	-FF lags when the scramble loads
--sizing of columns doesn't work in windows chrome/FF
--dan cohen: safari 5 + chrome for mac don't work with stackmat
--cache bests and worsts
--bug in mootools-more:~1913
--bug in mootools-more: //TODO need this to provide a more stable sorting
+	-dan cohen: safari 5 + chrome for mac don't work with stackmat
+-mootools stuff
+	-bug in mootools-more:~1913
+	-bug in mootools-more: //TODO need this to provide a more stable sorting
 
 FEATURES
 +added medians
@@ -75,6 +73,7 @@ FEATURES
 	+icons for "Reset" and "Download" links
 +twitter style hashtags in comments
 +ensure that times table is wide enough for all 3 selects
++sq1 scramble spacing: only pad if it can be done in <= 3 spaces
 
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
@@ -89,7 +88,6 @@ FEATURES
 	-documentation & configuration
 +puzzle icons!
 	-implemented, but now need some decent icons!
--sq1 scramble spacing
 
 -saving times
 	-add login

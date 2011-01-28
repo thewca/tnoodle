@@ -155,7 +155,7 @@ public class ScrambleServer {
 				String remote = t.getRemoteAddress().getAddress().getHostAddress();
 				System.out.print("Asked to kill myself by " + remote + "...");
 				if(remote.equals("127.0.0.1")) {
-					// Only kill ourselves if someone on thhis machine requested it
+					// Only kill ourselves if someone on this machine requested it
 					sendText(t, "Nice knowing ya'!");
 					System.out.println("committing suicide");
 					System.exit(0);

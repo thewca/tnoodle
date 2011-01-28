@@ -303,8 +303,14 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 				incrementalScramble += turn;
 				//TODO - disable if the scramble fits on one line!
 				var padding = "";
-				for(var k = turn.length; k < maxLength; k++) {
-					padding += " "; //padding so all turns take up the same amount of space
+				if(maxLength - turn.length <= 3) {
+					// We only pad if it can be done in <= 3 spaces.
+					// If we can't, we'll just leave the turn be.
+					// This is basically a hack so the "/" turns in sq1
+					// don't get padded.
+					for(var k = turn.length; k < maxLength; k++) {
+						padding += " "; //padding so all turns take up the same amount of space
+					}
 				}
 				var turnPadding = document.createElement('span');
 				turnPadding.className = "padding";
