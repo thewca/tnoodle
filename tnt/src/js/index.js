@@ -33,7 +33,9 @@ window.addEvent('domready', function() {
 		eventSelect.options[eventSelect.options.length] = editOption;
 
 		var event = configuration.get('scramble.puzzle.event', '');
-		//TODO - check that event exists!
+		if(getEvents().indexOf(event) < 0) {
+			alert("Event " + event + " not found in " + getEvents());
+		}
 		eventSelect.value = event;
 		eventSelect.onchange();
 	};
