@@ -14,6 +14,7 @@ window.addEvent('domready', function() {
 	var session = null;
 	
 	scrambleStuff.addPuzzleChangeListener(function(newPuzzle) {
+		configuration.set('scramble.puzzle', newPuzzle);
 		eventSelect.refresh();
 	});
 
@@ -32,12 +33,9 @@ window.addEvent('domready', function() {
 		eventSelect.options[eventSelect.options.length] = editOption;
 
 		var event = configuration.get('scramble.puzzle.event', '');
-		var oldValue = eventSelect.value;
+		//TODO - check that event exists!
 		eventSelect.value = event;
-		if(oldValue == event) {
-			// Hack to fire the onchange event even if nothing changed.
-			eventSelect.onchange();
-		}
+		eventSelect.onchange();
 	};
 	$('puzzleChooser').adopt(eventSelect);
 
@@ -66,6 +64,7 @@ window.addEvent('domready', function() {
 			}
 			return;
 		}
+		configuration.set('scramble.puzzle.event', eventSelect.value);
 		sessionSelect.refresh();
 	}; //for some reason, the change event doesn't fire until the select loses focus
 
