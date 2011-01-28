@@ -75,6 +75,7 @@ FEATURES
 	+icons for "Reset" and "Download" links
 +twitter style hashtags in comments
 
+-ensure that times table is wide enough for all 3 selects
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
 -add remaining stackmat options

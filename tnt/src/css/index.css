@@ -86,6 +86,9 @@ img {
 #sessionInfo {
 	padding-right: 5px;
 }
+#sessionComment {
+	vertical-align: bottom;
+}
 #timesArea {
 	border: 1px solid;
 }

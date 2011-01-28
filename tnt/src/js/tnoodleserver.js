@@ -301,41 +301,16 @@ tnoodle.server = function(url) {
 		return 2*Math.ceil( (n/10)/2 );
 	};
 
-	var keyInfo = [
-		[ 'index', '', null, Number ],
-		[ 'centis', 'Time', null, Time ],
-		[ 'ra5', 'Ra 5', 'Trimmed average of 5', Time ],
-		[ 'ra12', 'Ra 12', 'Trimmed average of 12', Time ],
-		[ 'ra100', 'Ra 100', 'Trimmed average of 100', Time ],
-		[ 'sessionAve', 'Ave', description, Time ],
-		//The tags column doesn't resize nicely when tags are added
-		//[ 'tags', 'Tags', null, Array ],
-		[ 'date', 'Date', 'Milliseconds since the epoch', Date ],
-		[ 'scramble', 'Scramble', null, String ]
-	];
-	function nthEl(n) {
-		return function(a) {
-			return a[n];
-		};
-	}
-	this.timeKeys = keyInfo.map(nthEl(0));
-	this.timeKeyNames = keyInfo.map(nthEl(1));
-	this.timeKeyDescriptions = keyInfo.map(nthEl(2));
-	this.timeKeyTypes = keyInfo.map(nthEl(3));
-	this.timeKeyTypeMap = {};
-	for(var i = 0; i < keyInfo.length; i++) {
-		this.timeKeyTypeMap[keyInfo[i][0]] = keyInfo[i][3];
-	}
 	this.Time = Time;
 	
-	function Session(id, puzzle, customization) {
+	function Session(id, puzzle, event) {
 		this.id = id;
 		this.comment = null;
 		this.getDate = function() {
 			return new Date(1000*parseInt(this.id, 36));
 		};
 		this.puzzle = puzzle;
-		this.customization = customization || '';
+		this.event = event || '';
 		//times is an array of Time's
 		this.times = [];
 		
@@ -346,15 +321,15 @@ tnoodle.server = function(url) {
 		this.getPuzzle = function() {
 			return this.puzzle;
 		};
-		this.setCustomization = function(custom) {
-			this.customization = custom || '';
+		this.setEvent = function(event) {
+			this.event = event || '';
 			saveSessions();
 		};
-		this.getCustomization = function() {
-			if(this.customization === null) {
+		this.getEvent = function() {
+			if(this.event === null) {
 				return '';
 			}
-			return this.customization;
+			return this.event;
 		};
 		this.setComment = function(comment) {
 			this.comment = comment == '' ? null : comment;
@@ -364,10 +339,10 @@ tnoodle.server = function(url) {
 			return this.comment;
 		};
 		this.toString = function() {
-			if(this.customization.length == '') {
+			if(this.event.length == '') {
 				return this.puzzle;
 			} else {
-				return this.puzzle + ":" + this.customization;
+				return this.puzzle + ":" + this.event;
 			}
 		};
 		this.solveCount = function(lastTime, size) {
@@ -660,14 +635,14 @@ tnoodle.server = function(url) {
 		};
 	}
 	
-	this.createSession = function(puzzle, customization) {
+	this.createSession = function(puzzle, event) {
 		//id is the number of seconds since the epoch encoded in base 36 for readability
 		var id = Math.round(new Date().getTime()/1000).toString(36);
 		if(id in sessions) {
 			//we don't want duplicate session ids
 			return null;
 		}
-		var sesh = new Session(id, puzzle, customization);
+		var sesh = new Session(id, puzzle, event);
 		sessions.push(sesh);
 		saveSessions();
 		return sesh;
@@ -682,39 +657,54 @@ tnoodle.server = function(url) {
 		saveSessions();
 		return true;
 	};
-	this.getCustomizations = function(puzzle) {
-		if(!(puzzle in customizations)) {
-			customizations[puzzle] = [ '' ];
+	this.getSessions = function(puzzle, event) {
+		var sessions = this.sessions.slice();
+		if($defined(puzzle)) {
+			sessions = sessions.filter(function(session) { return session.getPuzzle() == puzzle; });
 		}
-		customizations[puzzle].sort();
-		return customizations[puzzle];
+		if($defined(event)) {
+			sessions = sessions.filter(function(session) { return session.getEvent() == event; });
+		}
+		sessions.sort(function(a, b) {
+			return b.getDate().diff(a.getDate());
+		});
+		return sessions;
 	};
-	this.createCustomization = function(puzzle, customization) {
-		if(customizations[puzzle].contains(customization)) {
+
+	this.getEvents = function(puzzle) {
+		if(!(puzzle in events)) {
+			events[puzzle] = [ '' ];
+		}
+		events[puzzle].sort();
+		return events[puzzle];
+	};
+	this.createEvent = function(puzzle, event) {
+		if(events[puzzle].contains(event)) {
 			return false;
 		}
-		customizations[puzzle].push(customization);
+		events[puzzle].push(event);
 		return true;
 	};
-	this.renameCustomization = function(puzzle, oldcustomization, newcustomization) {
+	this.renameEvent = function(puzzle, oldevent, newevent) {
 		//TODO - urgh... editing too?
 	};
-	this.removeCustomization = function(puzzle, customization) {
+	this.removeEvent = function(puzzle, event) {
 		//TODO - urgh... editing too?
 	};
 	this.getTags = function() {
 		//TODO - optimize the hell out of this!
 		var availableTags = {};
+		var tags;
 		for(var i = 0; i < sessions.length; i++) {
 			var times = sessions[i].times;
 			for(var j = 0; j < times.length; j++) {
-				var tags = times[j].tags;
+				tags = times[j].tags;
 				for(var k = 0; k < tags.length; k++) {
 					availableTags[tags[k]] = true;
 				}
 			}
 		}
-		var tags = [];
+		tags = [];
 		for(var tag in availableTags) {
 			if(availableTags.hasOwnProperty(tag)) {
 				tags.push(tag);
@@ -724,6 +714,32 @@ tnoodle.server = function(url) {
 		return tags;
 	};
 
+	var keyInfo = [
+		[ 'index', '', null, Number ],
+		[ 'centis', 'Time', null, Time ],
+		[ 'ra5', 'Ra 5', 'Trimmed average of 5', Time ],
+		[ 'ra12', 'Ra 12', 'Trimmed average of 12', Time ],
+		[ 'ra100', 'Ra 100', 'Trimmed average of 100', Time ],
+		[ 'sessionAve', 'Ave', description, Time ],
+		//The tags column doesn't resize nicely when tags are added
+		//[ 'tags', 'Tags', null, Array ],
+		[ 'date', 'Date', 'Milliseconds since the epoch', Date ],
+		[ 'scramble', 'Scramble', null, String ]
+	];
+	function nthEl(n) {
+		return function(a) {
+			return a[n];
+		};
+	}
+	this.timeKeys = keyInfo.map(nthEl(0));
+	this.timeKeyNames = keyInfo.map(nthEl(1));
+	this.timeKeyDescriptions = keyInfo.map(nthEl(2));
+	this.timeKeyTypes = keyInfo.map(nthEl(3));
+	this.timeKeyTypeMap = {};
+	
+	for(var i = 0; i < keyInfo.length; i++) {
+		this.timeKeyTypeMap[keyInfo[i][0]] = keyInfo[i][3];
+	}
 	// Utility function to copy all the properties from oldObj into newObj
 	function copyTo(oldObj, newObj) {
 		for(var key in oldObj) {
@@ -732,10 +748,10 @@ tnoodle.server = function(url) {
 			}
 		}
 	}
-	var i;
 	var sessions = this.configuration.get('sessions', []);
 	//transforming sessions (a JSON object) into an array of Sessions of Times
 	try {
+		var newSessions = [];
 		for(i = 0; i < sessions.length; i++) {
 			var sesh = new Session();
 			copyTo(sessions[i], sesh);
@@ -744,8 +760,11 @@ tnoodle.server = function(url) {
 				copyTo(sesh.times[j], newTime);
 				sesh.times[j] = newTime;
 			}
-			sessions[i] = sesh;
+			if(sesh.times.length > 0) {
+				newSessions.push(sesh);
+			}
 		}
+		sessions = newSessions;
 	} catch(error) {
 		//bummer
 		sessions = [];
@@ -771,16 +790,16 @@ tnoodle.server = function(url) {
 		this.createSession("3x3x3", "");
 	}
 	
-	//initializing the available customizations
-	var customizations = {};
+	//initializing the available events
+	var events = {};
 	for(i = 0; i < sessions.length; i++) {
 		var puzzle = sessions[i].getPuzzle();
-		var customization = sessions[i].getCustomization();
-		if(!(puzzle in customizations)) {
-			customizations[puzzle] = [ '' ];
+		var event = sessions[i].getEvent();
+		if(!(puzzle in events)) {
+			events[puzzle] = [ '' ];
 		}
-		if(!customizations[puzzle].contains(customization)) {
-			customizations[puzzle].push(customization);
+		if(!events[puzzle].contains(event)) {
+			events[puzzle].push(event);
 		}
 	}
 };
