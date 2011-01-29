@@ -204,7 +204,7 @@ tnoodle.tnt = {
 		};
 		select.setSelected = function(value) {
 			if(optionsHaveChanged) {
-				this.refresh();
+				refresh();
 			}
 			var index = options.map(function(el) { return el.value; }).indexOf(value);
 			if(index < 0) {
@@ -229,7 +229,7 @@ tnoodle.tnt = {
 				div.setStyle('background', '');
 			});
 		}
-		select.refresh = function() {
+		var refresh = function() {
 			if(disabled) {
 				this.setStyle('color', 'gray');
 			} else {
@@ -277,16 +277,16 @@ tnoodle.tnt = {
 				optionsDiv.fade('hide');
 				select.setStyle('background', '-webkit-gradient(linear, 0% 40%, 0% 70%, from(#F9F9F9), to(#E3E3E3))');
 			}
-		};
+		}.bind(select);
 
 		var mouseover = false;
 		select.addEvent('mouseover', function() {
 			mouseover = true;
-			this.refresh();
+			refresh();
 		});
 		select.addEvent('mouseout', function() {
 			mouseover = false;
-			this.refresh();
+			refresh();
 		});
 		select.addEvent('click', function(e) {
 			if(disabled) {
@@ -294,12 +294,12 @@ tnoodle.tnt = {
 			}
 			visible = !visible;
 			hoveredIndex = this.selectedIndex;
-			this.refresh();
+			refresh();
 			e.stop();
 		});
 		window.addEvent('click', function(e) {
 			visible = false;
-			this.refresh();
+			refresh();
 		}.bind(select));
 		function keyDown(e) {
 			if(e.key == 'up') {
@@ -314,17 +314,17 @@ tnoodle.tnt = {
 			} else {
 				return;
 			}
-			select.refresh();
+			refresh();
 		}
 
 		var disabled = false;
 		select.setDisabled = function(new_disabled) {
 			disabled = new_disabled;
 			visible = false;
-			this.refresh();
+			refresh();
 		};
 
-		select.refresh();
+		refresh();
 		return select;
 	},
 	ago: function(date) {

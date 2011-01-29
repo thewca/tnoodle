@@ -1017,9 +1017,6 @@ var TimesTable = new Class({
 				resizeme[j][i].setStyle('width', maxWidth - padding);
 			}
 		}
-		this.tfoot.getChildren('tr').each(function(tr) {
-			tr.setStyle('width', preferredWidth);
-		});
 
 		preferredWidth += SCROLLBAR_WIDTH; //this accounts for the vert scrollbar
 		var MIN_WIDTH = 350;
@@ -1041,6 +1038,10 @@ var TimesTable = new Class({
 			}
 		}
 		this.preferredWidth = preferredWidth;
+
+		this.tfoot.getChildren('tr').each(function(tr) {
+			tr.setStyle('width', preferredWidth-SCROLLBAR_WIDTH);
+		});
 		this.tbody.setStyle('width', preferredWidth);
 		headerRow.setStyle('width', preferredWidth);
 		headerRow.setStyle('border-bottom', '1px solid black');
