@@ -241,6 +241,16 @@ tnoodle.tnt = {
 				div.setStyle('background', '');
 			});
 		}
+		function hover() {
+			clearOptions();
+			this.setStyle('background', 'white');
+		}
+		function mouseOver() {
+			hoveredIndex = this.index;
+		}
+		function optionClicked() {
+			select.setSelected(this.value);
+		}
 		var refresh = function() {
 			if(disabled) {
 				this.setStyle('color', 'gray');
@@ -266,17 +276,9 @@ tnoodle.tnt = {
 						option.value = options[i].value;
 						option.index = i;
 						optionsDiv.adopt(option);
-						option.hover = function() {
-							clearOptions();
-							this.setStyle('background', 'white');
-						}.bind(option);
-						option.addEvent('mouseover', function(i) {
-							hoveredIndex = i;
-						}.bind(null, i));
-						option.addEvent('click', function() {
-							select.setSelected(this.value);
-						});
-					}
+						option.hover = hover;
+						option.addEvent('mouseover', mouseOver);
+						option.addEvent('click', optionClicked);					}
 				}
 
 				select.setStyle('background', '-webkit-gradient(linear, 0% 40%, 0% 70%, from(#777), to(#999))');

@@ -720,7 +720,7 @@ tnoodle.server = function(url) {
 		[ 'ra5', 'Ra 5', 'Trimmed average of 5', Time ],
 		[ 'ra12', 'Ra 12', 'Trimmed average of 12', Time ],
 		[ 'ra100', 'Ra 100', 'Trimmed average of 100', Time ],
-		[ 'sessionAve', 'Ave', description, Time ],
+		[ 'sessionAve', 'Ave', description, Time ]
 		//The following columns seem silly
 		//[ 'tags', 'Tags', null, Array ],
 		//[ 'date', 'Date', 'Milliseconds since the epoch', Date ],
@@ -803,3 +803,4 @@ tnoodle.server = function(url) {
 		}
 	}
 };
+

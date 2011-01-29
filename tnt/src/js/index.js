@@ -37,7 +37,6 @@ window.addEvent('domready', function() {
 		eventSelect.setOptions(options);
 
 		var event = configuration.get('scramble.puzzle.event', '');
-		var events = getEvents();
 		if(events.indexOf(event) < 0) {
 			event = events[0];
 		}
@@ -47,7 +46,7 @@ window.addEvent('domready', function() {
 
 	eventSelect.onchange = function(e) {
 		var event = eventSelect.getSelected();
-		if(event == null) {
+		if(event === null) {
 			// We don't want to leave the "Edit" option selected
 			eventSelect.setSelected(session.getEvent() || '');
 			/*
