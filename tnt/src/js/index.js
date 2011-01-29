@@ -207,10 +207,24 @@ window.addEvent('domready', function() {
 	aboutText = '<h2>TNoodle Timer (TNT) vFOOOBAR</h2><br/>' +
 				'Created by Jeremy Fleischman from the ashes of CCT.<br/>' +
 				'Thanks to Leyan Lo for ideas/couch';
+	var aboutPopup = tnoodle.tnt.createPopup();
+	aboutPopup.innerHTML = aboutText;
 	$('aboutLink').addEvent('click', function() {
-		var popup = tnoodle.tnt.createPopup();
-		popup.innerHTML = aboutText;
-		popup.show();
+		aboutPopup.show();
+	});
+	
+	var greyOut = document.createElement('div');
+	document.body.appendChild(greyOut);
+	greyOut.setStyle('z-index', 4);
+	greyOut.id='gray';
+	greyOut.setStyle('position', 'absolute');
+
+
+	var helpPopup = tnoodle.tnt.createPopup();
+	helpPopup.innerHTML = 'foooobar';
+	$('helpLink').addEvent('click', function() {
+		var shortcuts = keyboard.shortcuts;
+		helpPopup.show();
 	});
 	
 	// This wraps functions to ensure that they
@@ -223,7 +237,7 @@ window.addEvent('domready', function() {
 			// This is kinda weird, we want to avoid activating this shortcut
 			// if we're in a textarea, textfield, or input field
 			var isEditing = focusedEl == 'textarea' || focusedEl == 'textfield' || focusedEl == 'input';
-			if(!timer.timing && !isEditing) {
+			if(!timer.timing && !isEditing && !tnoodle.tnt.isSelecting()) {
 				func(e);
 			}
 		};

@@ -33,54 +33,6 @@ img {
 #signIn .link {
 	/*display: block;*/
 }
-
-.tabs {
-/* TODO: this doesn't overflow nicely */
-	overflow: auto;
-	
-	/* This lets our tabs overflow the border below */
-	position: relative;
-	top: 1px;
-	
-	padding: 0 0 0 0;
-	margin: 0 0 0 0;
-	list-style:none;
-	line-height:1em;
-}
-#sessions {
-	overflow: hidden;
-	height: 28px; /* lol, yeah right */
-}
-.tabs li {
-	float:left;
-	margin:0;
-	
-	cursor: default;
-	display:block;
-	color:#444;
-	text-decoration:none;
-	font-weight:bold;
-	background:#aaa;
-	padding: 5px 10px;
-	border:1px solid black;
-}
-
-.tabs li .delete {
-	margin-left: 10px;
-	position: relative;
-	right: 0px;
-	cursor: pointer;
-}
-
-.tabs li .delete:hover {
-	background: white;
-}
-.tabs li.active {
-	border-bottom: 1px solid #efefef;
-}
-.tabs li:hover, .tabs li.active, #sessionInfoBar {
-	background: #efefef;
-}
 #sessionInfoBar {
 	padding: 5px 10px;
 }
@@ -96,30 +48,3 @@ img {
 	background: #d0d0d0;
 }
 
-.optionsButton {
-	background-color: #fff;
-	color: #000;
-	text-align: center;
-	z-index: 1;
-	font-size: 16px;
-}
-.optionsButtonHover {
-	background-color: #000;
-	color: #fff;
-	z-index: 5;
-}
-.options {
-	position: absolute;
-	background: white;
-	border: 1px solid black;
-	padding: 5px;
-	text-align: left;
-	z-index: 5;
-}
-.popup {
-	z-index: 1;
-	position: absolute;
-	background-color: #EEE;
-	padding: 5px;
-	border: 1px solid;
-}

@@ -1,0 +1,79 @@
+.grayOut {
+	z-index: 5;
+	background: black;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	opacity: 0.3;
+}
+
+.optionsButton {
+	background-color: #fff;
+	color: #000;
+	text-align: center;
+	font-size: 16px;
+}
+.optionsButtonHover {
+	background-color: #000;
+	color: #fff;
+}
+.options {
+	z-index: 5;
+	position: absolute;
+	background: white;
+	border: 1px solid black;
+	padding: 5px;
+	text-align: left;
+}
+.popup {
+	z-index: 5;
+	position: absolute;
+	background-color: #EEE;
+	padding: 5px;
+	border: 1px solid;
+}
+
+span.select {
+	white-space: nowrap;
+	cursor: default;
+	margin: 5px;
+	border: 1px solid gray;
+	border-radius: 2px;
+	padding-left: 5px;
+
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	color: black;
+	background: -webkit-gradient(linear, 0% 40%, 0% 70%, from(#F9F9F9), to(#E3E3E3));
+}
+
+.select.selecting {
+	background: -webkit-gradient(linear, 0% 40%, 0% 70%, from(#777), to(#999));
+}
+
+.select:hover {
+	border-color: black;
+}
+
+.select.disabled {
+	color: gray;
+}
+
+.select .options {
+	z-index: 4;
+	padding: 5px;
+	position: absolute;
+	background: #e3e3e3;
+	-webkit-box-shadow: #8B8B8B 0px 4px 10px;
+}
+
+.select .option {
+	white-space: nowrap;
+}
+
+.select .option.hovered {
+	background: white;
+}

@@ -31,6 +31,8 @@ BUGS
 +!!!comments aren't being positioned nicely in chrome on os X
 
 -Xbrowser stuff
+	-keyDown only gets called once on ff, makes sense
+	-select dropdown styling...
 	-FF lags when the scramble loads
 	-dan cohen: safari 5 + chrome for mac don't work with stackmat
 -mootools stuff

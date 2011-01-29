@@ -203,7 +203,8 @@ var KeyboardTimer = new Class({
 	isFocused: function() {
 		//we disable the timer if a text field is focused
 		return (document.activeElement.type != "text" &&
-		   document.activeElement.type != "textarea");
+		   document.activeElement.type != "textarea" &&
+		   !tnoodle.tnt.isSelecting());
 	},
 	getTimeCentis: function() {
 		if(this.config.get('timer.enableStackmat')) {

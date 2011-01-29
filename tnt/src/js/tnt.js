@@ -86,13 +86,33 @@ tnoodle.tnt = {
 			button: optionsButton
 		};
 	},
-	createPopup: function(onShow, onHide, size) {
+	grayOut_: null,
+	grayOut: function(show) {
+		if(this.grayOut_ == null) {
+			this.grayOut_ = document.createElement('div');
+			this.grayOut_.addClass('grayOut');
+			document.body.appendChild(this.grayOut_);
+		}
+		if(show) {
+			this.grayOut_.setStyle('display', 'inline');
+		} else {
+			this.grayOut_.setStyle('display', 'none');
+		}
+	},
+	createPopup: function(onShow, onHide, size, noGrayBg) {
 		var popup = document.createElement('div');
 		popup.className = 'popup';
-		popup.style.zIndex = 5; //this belongs on top
 		document.body.appendChild(popup);
 
 		popup.show = function() {
+			document.addEvent('keydown', keydown);
+			window.addEvent('resize', popup.center);
+			document.addEvent('mouseup', mouseup);
+			document.addEvent('mousedown', mousedown);
+			
+			if(!noGrayBg) {
+				tnoodle.tnt.grayOut(true);
+			}
 			this.style.display = 'inline';
 			this.center();
 			if(onShow) {
@@ -118,24 +138,31 @@ tnoodle.tnt = {
 			this.style.left = (windowWidth - width)/2 + 'px';
 		}.bind(popup);
 		popup.hide = function() {
+			document.removeEvent('keydown', keydown);
+			window.removeEvent('resize', popup.center);
+			document.removeEvent('mouseup', mouseup);
+			document.removeEvent('mousedown', mousedown);
+
+			if(!noGrayBg) {
+				tnoodle.tnt.grayOut(false);
+			}
 			this.style.display = 'none';
 			if(onHide) {
 				onHide();
 			}
 		}.bind(popup);
 		popup.hide();
-		document.addEvent('keydown', function(e) {
+
+		function keydown(e) {
 			if(e.key == 'esc') {
 				popup.hide();
 			}
-		});
-		window.addEvent('resize', popup.center);
-
+		}
 		var mouseDown = false;
-		document.addEvent('mouseup', function(e) {
+		function mouseup(e) {
 			mouseDown = false;
-		});
-		document.addEvent('mousedown', function(e) {
+		}
+		function mousedown(e) {
 			mouseDown = true;
 			if(!e.target) {
 				e.target = e.srcElement; // freaking ie, man
@@ -144,7 +171,7 @@ tnoodle.tnt = {
 			if(!e.target.isOrIsChild(popup)) {
 				popup.hide();
 			}
-		});
+		}
 		
 		// adding an inner div helps us get a nice border
 		var innerDiv = document.createElement('div');
@@ -167,35 +194,25 @@ tnoodle.tnt = {
 		editor.adopt(list);
 		return editor;
 	},
+	isSelecting: function() {
+		return $$('.selecting').length > 0; //lol
+	},
 	createSelect: function() {
 		var select = document.createElement('span');
+		select.addClass('select');
 		select.selectedIndex = 0;
-		select.setStyle('cursor', 'default');
-		select.setStyle('margin', '5px');
-		select.setStyle('border', '1px solid gray');
-		select.setStyle('border-radius', '2px');
-		select.setStyle('padding-left', '5px');
-
-		select.setStyle('user-select', 'none');
-		select.setStyle('-moz-user-select', 'none');
-		select.setStyle('-webkit-user-select', 'none');
 
 		var selected = document.createElement('span');
 		selected.appendText('');
 		select.appendChild(selected);
+		// Add a nice little upside down triangle
 		select.appendChild(document.createTextNode('\u25BC'));
 		
 		var optionsDiv = document.createElement('div');
-		optionsDiv.appendText('boohoo');
-		var visible = false;
+		optionsDiv.addClass('options');
+		var selecting = false;
 		optionsDiv.fade('hide');
 		optionsDiv.inject(select);
-
-		optionsDiv.setStyle('padding', '5px');
-		optionsDiv.setStyle('z-index', '10'); //TODO -random
-		optionsDiv.setStyle('position', 'absolute');
-		optionsDiv.setStyle('background', '#e3e3e3');
-		optionsDiv.setStyle('-webkit-box-shadow', '#8B8B8B 0px 4px 10px');
 
 		var options = [];
 		var optionsHaveChanged = true;
@@ -238,12 +255,12 @@ tnoodle.tnt = {
 		var hoveredIndex = null;
 		function clearOptions() {
 			optionsDiv.getChildren('div').each(function(div) {
-				div.setStyle('background', '');
+				div.removeClass('hovered');
 			});
 		}
 		function hover() {
 			clearOptions();
-			this.setStyle('background', 'white');
+			this.addClass('hovered');
 		}
 		function mouseOver() {
 			hoveredIndex = this.index;
@@ -253,18 +270,13 @@ tnoodle.tnt = {
 		}
 		var refresh = function() {
 			if(disabled) {
-				this.setStyle('color', 'gray');
+				select.addClass('disabled');
 			} else {
-				this.setStyle('color', 'black');
-			}
-			if(mouseover && !disabled) {
-				this.setStyle('border-color', 'black');
-			} else {
-				this.setStyle('border-color', 'gray');
+				select.removeClass('disabled');
 			}
 			window.removeEvent('keydown', keyDown);
 			window.removeEvent('click', windowClicked);
-			if(visible) {
+			if(selecting) {
 				window.addEvent('keydown', keyDown);
 				window.addEvent('click', windowClicked);
 				if(optionsHaveChanged) {
@@ -272,6 +284,7 @@ tnoodle.tnt = {
 					optionsDiv.empty();
 					for(var i = 0; i < options.length; i++) {
 						var option = document.createElement('div');
+						option.addClass('option');
 						option.adopt(options[i].el.clone());
 						option.value = options[i].value;
 						option.index = i;
@@ -281,7 +294,7 @@ tnoodle.tnt = {
 						option.addEvent('click', optionClicked);					}
 				}
 
-				select.setStyle('background', '-webkit-gradient(linear, 0% 40%, 0% 70%, from(#777), to(#999))');
+				select.addClass('selecting');
 				optionsDiv.position({relativeTo: select, position: 'bottomLeft', edge: 'topLeft'});
 				optionsDiv.fade('show');
 				optionsDiv.getChildren()[hoveredIndex].hover();
@@ -291,7 +304,7 @@ tnoodle.tnt = {
 					showItem(select.selectedIndex);
 				}
 				optionsDiv.fade('hide');
-				select.setStyle('background', '-webkit-gradient(linear, 0% 40%, 0% 70%, from(#F9F9F9), to(#E3E3E3))');
+				select.removeClass('selecting');
 			}
 		}.bind(select);
 
@@ -308,7 +321,7 @@ tnoodle.tnt = {
 			if(disabled) {
 				return;
 			}
-			visible = !visible;
+			selecting = !selecting;
 			hoveredIndex = this.selectedIndex;
 			// If we run refresh() immediately, the current
 			// mouse click will cause windowClicked() to get called,
@@ -316,19 +329,24 @@ tnoodle.tnt = {
 			setTimeout(refresh, 0);
 		});
 		function windowClicked(e) {
-			visible = false;
+			selecting = false;
 			refresh();
 		}
 		function keyDown(e) {
+			//TODO - search as you type for items?
 			if(e.key == 'up') {
-				hoveredIndex = Math.max(0, hoveredIndex-1);
+				hoveredIndex = (hoveredIndex+options.length-1) % options.length;
 			} else if(e.key == 'down') {
-				hoveredIndex = Math.min(options.length-1, hoveredIndex+1);
-			} else if(e.key == 'enter') {
+				hoveredIndex = (hoveredIndex+1) % options.length;
+			} else if(e.key == 'home') {
+				hoveredIndex = 0;
+			} else if(e.key == 'end') {
+				hoveredIndex = options.length-1;
+			}else if(e.key == 'enter') {
 				select.setSelected(options[hoveredIndex].value);
-				visible = false;
+				selecting = false;
 			} else if(e.key == 'esc') {
-				visible = false;
+				selecting = false;
 			} else {
 				return;
 			}
@@ -338,7 +356,7 @@ tnoodle.tnt = {
 		var disabled = false;
 		select.setDisabled = function(new_disabled) {
 			disabled = new_disabled;
-			visible = false;
+			selecting = false;
 			refresh();
 		};
 
