@@ -430,7 +430,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			var title = document.createElement('span');
 			title.adopt(img);
 			title.adopt(document.createTextNode(puzzles[i][1]));
-			options.push({ value: puzzles[i][0], html: title.innerHTML });
+			options.push({ value: puzzles[i][0], el: title });
 		}
 		puzzleSelect.setOptions(options);
 		loadedCallback(puzzles);

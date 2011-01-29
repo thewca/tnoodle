@@ -171,6 +171,7 @@ tnoodle.tnt = {
 		var select = document.createElement('span');
 		select.selectedIndex = 0;
 		select.setStyle('cursor', 'default');
+		select.setStyle('margin', '5px');
 		select.setStyle('border', '1px solid gray');
 		select.setStyle('border-radius', '2px');
 		select.setStyle('padding-left', '5px');
@@ -201,7 +202,18 @@ tnoodle.tnt = {
 		select.setOptions = function(new_options) {
 			options = new_options;
 			optionsHaveChanged = true;
+			selectedIndex = null;
 		};
+		var selectedIndex = null;
+		function showItem(index) {
+			if(index == selectedIndex) {
+				return;
+			}
+			selected.empty();
+			var newEl = options[index].el.clone();
+			selected.adopt(newEl);
+			selectedIndex = index;
+		}
 		select.setSelected = function(value) {
 			if(optionsHaveChanged) {
 				refresh();
@@ -209,11 +221,11 @@ tnoodle.tnt = {
 			var index = options.map(function(el) { return el.value; }).indexOf(value);
 			if(index < 0) {
 				//TODO - proper error messages
-				alert("Couldn't find " + value);
+				alert("Couldn't find " + value + ' in [' + options.join(",") + ']');
 				index = 0;
 			}
 			
-			selected.innerHTML = options[index].html;
+			showItem(index);
 			select.selectedIndex = index;
 			if(select.onchange) {
 				select.onchange();
@@ -241,14 +253,16 @@ tnoodle.tnt = {
 				this.setStyle('border-color', 'gray');
 			}
 			window.removeEvent('keydown', keyDown);
+			window.removeEvent('click', windowClicked);
 			if(visible) {
 				window.addEvent('keydown', keyDown);
+				window.addEvent('click', windowClicked);
 				if(optionsHaveChanged) {
 					optionsHaveChanged = false;
 					optionsDiv.empty();
 					for(var i = 0; i < options.length; i++) {
 						var option = document.createElement('div');
-						option.innerHTML = options[i].html;
+						option.adopt(options[i].el.clone());
 						option.value = options[i].value;
 						option.index = i;
 						optionsDiv.adopt(option);
@@ -267,12 +281,12 @@ tnoodle.tnt = {
 
 				select.setStyle('background', '-webkit-gradient(linear, 0% 40%, 0% 70%, from(#777), to(#999))');
 				optionsDiv.position({relativeTo: select, position: 'bottomLeft', edge: 'topLeft'});
-				optionsDiv.getChildren()[hoveredIndex].hover();
-				selected.innerHTML = options[hoveredIndex].html;
 				optionsDiv.fade('show');
+				optionsDiv.getChildren()[hoveredIndex].hover();
+				showItem(hoveredIndex);
 			} else {
 				if(options.length > select.selectedIndex) {
-					selected.innerHTML = options[select.selectedIndex].html;
+					showItem(select.selectedIndex);
 				}
 				optionsDiv.fade('hide');
 				select.setStyle('background', '-webkit-gradient(linear, 0% 40%, 0% 70%, from(#F9F9F9), to(#E3E3E3))');
@@ -294,13 +308,15 @@ tnoodle.tnt = {
 			}
 			visible = !visible;
 			hoveredIndex = this.selectedIndex;
-			refresh();
-			e.stop();
+			// If we run refresh() immediately, the current
+			// mouse click will cause windowClicked() to get called,
+			// which will make our dropdown invisible.
+			setTimeout(refresh, 0);
 		});
-		window.addEvent('click', function(e) {
+		function windowClicked(e) {
 			visible = false;
 			refresh();
-		}.bind(select));
+		}
 		function keyDown(e) {
 			if(e.key == 'up') {
 				hoveredIndex = Math.max(0, hoveredIndex-1);

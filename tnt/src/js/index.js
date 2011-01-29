@@ -21,31 +21,35 @@ window.addEvent('domready', function() {
 	function getEvents() {
 		return server.getEvents(scrambleStuff.getSelectedPuzzle());
 	}
-	var eventSelect = new Element('select');
+	var eventSelect = tnoodle.tnt.createSelect();
 	eventSelect.refresh = function() {
 		var events = getEvents();
-		eventSelect.options.length = events.length;
+		var options = [];
 		for(var i = 0; i < events.length; i++) {
-			eventSelect.options[i] = new Option(events[i], events[i]);
+			var txt = events[i];
+			if(txt == '') {
+				// If we left txt as an empty string, it would take up no space on our page
+				txt = '&nbsp;';
+			}
+			options.push({ value: events[i], el: new Element('span', { html: txt }) });
 		}
-		var editOption = new Option('Edit', null);
-		editOption.setStyle('background-color', 'white');
-		eventSelect.options[eventSelect.options.length] = editOption;
+		options.push({ value: null, el: new Element('b', { text: 'Edit' }) });
+		eventSelect.setOptions(options);
 
 		var event = configuration.get('scramble.puzzle.event', '');
 		var events = getEvents();
 		if(events.indexOf(event) < 0) {
 			event = events[0];
 		}
-		eventSelect.value = event;
-		eventSelect.onchange();
+		eventSelect.setSelected(event);
 	};
 	$('puzzleChooser').adopt(eventSelect);
 
 	eventSelect.onchange = function(e) {
-		if(eventSelect.value === "null") {
+		var event = eventSelect.getSelected();
+		if(event == null) {
 			// We don't want to leave the "Edit" option selected
-			eventSelect.value = session.getEvent() || '';
+			eventSelect.setSelected(session.getEvent() || '');
 			/*
 			var editEventsPopup = tnoodle.tnt.createPopup(null, eventSelect.refresh);
 			var onAdd = function(newItem) {
@@ -67,47 +71,44 @@ window.addEvent('domready', function() {
 			}
 			return;
 		}
-		configuration.set('scramble.puzzle.event', eventSelect.value);
+		configuration.set('scramble.puzzle.event', event);
 		sessionSelect.refresh();
 	}; //for some reason, the change event doesn't fire until the select loses focus
 
-	var sessionSelect = new Element('select');
+	var sessionSelect = tnoodle.tnt.createSelect();
 	$('puzzleChooser').adopt(sessionSelect);
 	sessionSelect.refresh = function() {
 		var puzzle = scrambleStuff.getSelectedPuzzle();
-		var event = eventSelect.value;
+		var event = eventSelect.getSelected();
 
-		var options = sessionSelect.options;
-
-		var editOption = new Option('New session', null);
-		editOption.setStyle('background-color', 'white');
-		options[0] = editOption;
+		var options = [];
+		options.push({ value: null, el: new Element('b', { text: 'New session' }) });
 
 		var sessions = server.getSessions(puzzle, event);
 		sessions.reverse(); // We want to list our sessions starting with the most recent
 		if(sessions.length === 0) {
 			sessions.push(server.createSession(puzzle, event));
 		}
-		options.length = sessions.length;
 		for(var i = 0; i < sessions.length; i++) {
-			options[1+i] = new Option(sessions[i].getDate().format('%b %d, %Y %H:%M'), sessions[i]);
-			options[1+i].session = sessions[i];
+			var date = sessions[i].getDate().format('%b %d, %Y %H:%M');
+			var el = new Element('span', { text: date });
+			options.push({ value: sessions[i], el: el });
 		}
+		sessionSelect.setOptions(options);
 		session = sessions[0];
-		options.selectedIndex = 1;
-		sessionSelect.onchange();
+		sessionSelect.setSelected(session);
 	};
 	sessionSelect.onchange = function(e) {
 		var puzzle = scrambleStuff.getSelectedPuzzle();
-		var event = eventSelect.value;
-		if(sessionSelect.selectedIndex === 0) {
+		var event = eventSelect.getSelected();
+		var session = sessionSelect.getSelected();
+		if(session === null) {
 			// We create a new session, and then refresh our list
 			// Refreshing will cause the newest session to be selected
 			server.createSession(puzzle, event);
 			sessionSelect.refresh();
 			return;
 		}
-		session = sessionSelect.options[sessionSelect.selectedIndex].session;
 		timesTable.setSession(session);
 		$('sessionComment').refresh();
 	};
