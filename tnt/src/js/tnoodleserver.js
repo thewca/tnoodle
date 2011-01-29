@@ -721,10 +721,10 @@ tnoodle.server = function(url) {
 		[ 'ra12', 'Ra 12', 'Trimmed average of 12', Time ],
 		[ 'ra100', 'Ra 100', 'Trimmed average of 100', Time ],
 		[ 'sessionAve', 'Ave', description, Time ],
-		//The tags column doesn't resize nicely when tags are added
+		//The following columns seem silly
 		//[ 'tags', 'Tags', null, Array ],
-		[ 'date', 'Date', 'Milliseconds since the epoch', Date ],
-		[ 'scramble', 'Scramble', null, String ]
+		//[ 'date', 'Date', 'Milliseconds since the epoch', Date ],
+		//[ 'scramble', 'Scramble', null, String ]
 	];
 	function nthEl(n) {
 		return function(a) {

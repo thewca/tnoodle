@@ -18,6 +18,7 @@ img {
 }
 .imglink {
 	padding: 0px;
+	vertical-align: middle;
 }
 .link:hover, .down {
 	text-decoration: none;
@@ -85,9 +86,6 @@ img {
 }
 #sessionInfo {
 	padding-right: 5px;
-}
-#sessionComment {
-	vertical-align: bottom;
 }
 #timesArea {
 	border: 1px solid;

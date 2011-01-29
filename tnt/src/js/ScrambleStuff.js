@@ -103,12 +103,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var defaultSize = null;
 
 	function puzzleChanged() {
-        var newPuzzle;
-		if(puzzleSelect.selectedIndex < 0 || puzzleSelect.selectedIndex > puzzleSelect.options.length) {
-			newPuzzle = null;
-		} else {
-			newPuzzle = puzzleSelect.options[puzzleSelect.selectedIndex].value;
-		}
+		newPuzzle = puzzleSelect.getSelected();
 
 		if(newPuzzle == puzzle) {
 			return;
@@ -425,12 +420,19 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 
 	function puzzlesLoaded(puzzles) {
 		deleteChildren(scramblePre);
-		puzzleSelect.disabled = false;
-		puzzleSelect.options.length = puzzles.length;
+		puzzleSelect.setDisabled(false);
+		var options = [];
 		for(var i = 0; i < puzzles.length; i++) {
-			var puzzleOption = new Option(puzzles[i][1], puzzles[i][0]);
-			puzzleSelect.options[i] = puzzleOption;
+			var img = document.createElement('img');
+			img.setStyle('vertical-align', 'middle');
+			img.setStyle('padding', '0px 2px 2px 0px');
+			img.src = scrambler.getPuzzleIconUrl(puzzles[i][0]);
+			var title = document.createElement('span');
+			title.adopt(img);
+			title.adopt(document.createTextNode(puzzles[i][1]));
+			options.push({ value: puzzles[i][0], html: title.innerHTML });
 		}
+		puzzleSelect.setOptions(options);
 		loadedCallback(puzzles);
 	}
 
@@ -884,11 +886,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleResize.addEvent('drag', scrambleResized);
 	scrambleResize.addEvent('complete', saveScrambleSize);
 
-	var puzzleSelect = document.createElement('select');
-	puzzleSelect.onchange = puzzleChanged; // for some reason, the change event
-	// doesn't fire until the select
-	// loses focus
-	puzzleSelect.disabled = true;
+	var puzzleSelect = tnoodle.tnt.createSelect();
+	puzzleSelect.onchange = puzzleChanged;
+	puzzleSelect.setDisabled(true);
 
 	var colorChooserDiv = document.createElement('div');
 	colorChooserDiv.id = 'colorChooserDiv'; // need an id to make it draggable
@@ -947,8 +947,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		return puzzle;
 	};
 	this.setSelectedPuzzle = function(newPuzzle) {
-		puzzleSelect.value = newPuzzle;
-		puzzleChanged();
+		puzzleSelect.setSelected(newPuzzle);
 	};
 	this.getScramble = function() {
 		return currScramble;
@@ -959,6 +958,12 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			scrambleIndex: scrambleIndex-1,
 			scrambleSrc: scrambleSrc
 		};
+	};
+	this.importScrambles = function(scrambles, src) {
+		scrambleSrc = src;
+		importedScrambles = scrambles;
+		scrambleIndex = 0;
+		scramble();
 	};
 	
 	function adjustFontSize() {

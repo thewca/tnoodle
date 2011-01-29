@@ -74,6 +74,8 @@ FEATURES
 +twitter style hashtags in comments
 +ensure that times table is wide enough for all 3 selects
 +sq1 scramble spacing: only pad if it can be done in <= 3 spaces
++show some details on the currently selected solve?
+	+how about an "import scramble" link?
 
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
@@ -88,16 +90,16 @@ FEATURES
 	-documentation & configuration
 +puzzle icons!
 	-implemented, but now need some decent icons!
+	-find a place to use the icons...custom <select> with support for icons
+		-similar vein: create a sexy session selector w/ a date picker
 
 -saving times
 	-add login
-	-find a place to use the lovely icons...
 	-implement stuff on scratch paper!!!
 		***** SYSTEM TO CHANGE PUZZLE/EVENT OF CURRENT SESSION *****
 
 +clickable stuff in timestable to get jnet/cct style stats?
 	-does it need to be customizable?
--show some details on the currently selected solve?
 -read times/metronome
 -background image/opacity
 -emulate stackmat?

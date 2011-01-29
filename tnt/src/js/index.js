@@ -33,8 +33,9 @@ window.addEvent('domready', function() {
 		eventSelect.options[eventSelect.options.length] = editOption;
 
 		var event = configuration.get('scramble.puzzle.event', '');
-		if(getEvents().indexOf(event) < 0) {
-			alert("Event " + event + " not found in " + getEvents());
+		var events = getEvents();
+		if(events.indexOf(event) < 0) {
+			event = events[0];
 		}
 		eventSelect.value = event;
 		eventSelect.onchange();
@@ -253,4 +254,12 @@ window.addEvent('domready', function() {
 		'description': 'Redo',
 		'handler': notTiming(timesTable.redo.bind(timesTable))
 	});
+	//TODO - just plain r to reset?
+	//TODO - d to delete session
+	//TODO - n for new session
+	//TODO - p for puzzle, e for event
+	//TODO - shortcut to resize scramble area
+	//TODO - hide/show scramble view
+	//TODO - / to search
+	//TODO - shortcut for tagging jkl?
 });

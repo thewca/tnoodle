@@ -233,7 +233,7 @@ var TimesTable = new Class({
 			borderRight: 'none',
 			borderBottom: '1px'
 		});
-		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH+4);
+		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH+3);
 		
 		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100', 'sessionAve' ];
 		var initing = true;
@@ -247,7 +247,7 @@ var TimesTable = new Class({
 			var col = this.cols[i];
 			// We need at least these three columns to always be present
 			// in order to impose a minimum size on the times table.
-			if(col == 'centis' || col == 'index' || col == 'sessionAve') {
+			if(col == 'centis') {// || col == 'index' || col == 'sessionAve') {
 				// We set these columns to be visible, just in case they weren't
 				// This can happen in an old version of tnt.
 				server.configuration.set('table.' + col, true);
@@ -445,7 +445,7 @@ var TimesTable = new Class({
 		var commentArea = new Element('textarea');
 		timeHoverDiv.commentArea = commentArea;
 		form.adopt(commentArea);
-		var height = 55;
+		var height = 75;
 		var margin = 4;
 		var padding = 2;
 		commentArea.setStyle('height', height);
@@ -481,6 +481,19 @@ var TimesTable = new Class({
 
 		form.setStyle('border', '2px solid black');
 		form.adopt(fieldSet);
+		var importScramble = document.createElement('span');
+		importScramble.addClass('link');
+		importScramble.title = 'Click to load scramble';
+		var scrambledCube = document.createElement('img');
+		scrambledCube.src = 'media/cube_scrambled.png';
+		scrambledCube.style.width=24+'px';
+		scrambledCube.style.height=24+'px';
+		importScramble.adopt(scrambledCube);
+		importScramble.addEvent('click', function() {
+			var src = document.createTextNode(timeHoverDiv.time.format() + 's solve');
+			table.scrambleStuff.importScrambles([ timeHoverDiv.time.scramble ], src);
+		});
+		fieldSet.adopt(importScramble);
 		fieldSet.addEvent('change', function(e) {
 			if(noPenalty.checked) {
 				timeHoverDiv.time.setPenalty(null);
@@ -794,7 +807,17 @@ var TimesTable = new Class({
 			var cells = tr.getChildren();
 			for(var col = 0; col < table.cols.length; col++) {
 				var key = table.cols[col];
-				cells[col].key = key;
+				try{
+					cells[col].key = key;
+				} catch(err) {
+					console.log(err);
+					//TODO - debugging code to hopefully figure out intermittent failure
+					console.log(tr);
+					console.log(cells);
+					console.log(col);
+					console.log(table.cols);
+					console.log(key);
+				}
 				if(time === null) {
 					if(key == 'centis') {
 						if(tr.selected) {
@@ -936,7 +959,8 @@ var TimesTable = new Class({
 		var i, j;
 		var infoCells = this.infoRow.getChildren('td');
 		var addTimeCells = this.addRow.getChildren('td');
-		var headers = this.thead.getChildren('tr')[0].getChildren('th');
+		var headerRow = this.thead.getChildren('tr')[0];
+		var headers = headerRow.getChildren('th');
 		var tds = [];
 		
 		// ok, this is way nasty, but it seems to be the only way
@@ -957,11 +981,17 @@ var TimesTable = new Class({
 		headers.each(function(td) {
 			td.setStyle('width', null);
 		});
+		headerRow.setStyle('width', null);
 		
 		var preferredWidth = 0;
 		
+		var visibleColCount = 0;
 		var resizeme = [headers, infoCells, addTimeCells];
 		for(i = 0; i < this.headers.length; i++) {
+			if(headers[i].getStyle('display') == 'none') {
+				continue;
+			}
+			visibleColCount++;
 			var maxWidth = 0;
 			var maxWidthIndex = 0;
 			var padding = 0;
@@ -992,8 +1022,28 @@ var TimesTable = new Class({
 		});
 
 		preferredWidth += SCROLLBAR_WIDTH; //this accounts for the vert scrollbar
+		var MIN_WIDTH = 350;
+		if(preferredWidth < MIN_WIDTH) {
+			var extra = (MIN_WIDTH-preferredWidth)/visibleColCount;
+			preferredWidth = MIN_WIDTH;
+			for(i = 0; i < this.headers.length; i++) {
+				if(headers[i].getStyle('display') == 'none') {
+					continue;
+				}
+				for(j = 0; j < resizeme.length; j++) {
+					if(!resizeme[j]) {
+						continue;
+					}
+					var cell = resizeme[j][i];
+					var oldWidth = cell.getStyle('width').toInt();
+					cell.setStyle('width', oldWidth+extra);
+				}
+			}
+		}
 		this.preferredWidth = preferredWidth;
 		this.tbody.setStyle('width', preferredWidth);
+		headerRow.setStyle('width', preferredWidth);
+		headerRow.setStyle('border-bottom', '1px solid black');
 		
 		if(this.manager) {
 			this.manager.position();

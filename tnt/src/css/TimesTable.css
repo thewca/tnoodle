@@ -4,9 +4,6 @@
 #timesTable thead tr, #timesTable tfoot tr {
 	display: block;
 }
-#timesTable thead tr th {
-	border-bottom: 1px solid black;
-}
 #timesTable tbody {
 	overflow-y: scroll;
 	display: block;
@@ -37,7 +34,9 @@
 	border-color: black;
 	text-align: right;
 }
-
+#timesTable td {
+	white-space: nowrap;
+}
 #timesTable th {
 	border-width: 1px 1px 0px 0px;
 }
