@@ -59,13 +59,16 @@ var TriLayout = new Class( {
 		dragger.addEvent('complete', stopDragging);
 		dragger.addEvent('drag', function() {
 			this.resizeDiv.show();
-			this.config.set('layout.sizerHeight', window.getSize().y - this.resizeDiv.getPosition().y);
+			this.saveSize();
 			this.resize();
 		}.bind(this));
 
 		window.addEvent('resize', this.resize.bind(this));
 		window.addEvent('load', this.resize.bind(this));
 		setTimeout(this.resize.bind(this), 0);
+	},
+	saveSize: function() {
+		this.config.set('layout.sizerHeight', window.getSize().y - this.resizeDiv.getPosition().y);
 	},
 	resize: function() {
 		var top = window.getSize().y - this.config.get('layout.sizerHeight');
@@ -77,6 +80,7 @@ var TriLayout = new Class( {
 			top = window.getSize().y - MIN_SCRAMBLE_HEIGHT;
 		}
 		this.resizeDiv.setStyle('top', top);
+		this.saveSize();
 		this.position();
 	},
 	position: function() {

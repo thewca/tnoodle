@@ -751,7 +751,6 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 
 	var scramblePre = document.createElement('pre');
 	scramblePre.className = 'scrambleText';
-	scramblePre.style.fontSize = configuration.get('scramble.fontSize', '20px');
 	scrambleArea.appendChild(scramblePre);
 
 	var scrambleDiv = document.createElement('div');

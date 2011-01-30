@@ -290,6 +290,26 @@ window.addEvent('domready', function() {
 				description: 'Help',
 				default: 'shift+/',
 				handler: $('helpLink').doClick
+			},
+			{
+				description: 'Increase scramble area (10px)',
+				default: '=',
+				handler: resizeScrambleArea.bind(null, 10)
+			},
+			{
+				description: 'Decrease scramble area (10px)',
+				default: '-',
+				handler: resizeScrambleArea.bind(null, -10)
+			},
+			{
+				description: 'Increase scramble area (50px)',
+				default: 'shift+=',
+				handler: resizeScrambleArea.bind(null, 50)
+			},
+			{
+				description: 'Decrease scramble area (50px)',
+				default: 'shift+-',
+				handler: resizeScrambleArea.bind(null, -50)
 			}
 		]
 		//TODO - p for puzzle, e for event
@@ -298,6 +318,13 @@ window.addEvent('domready', function() {
 		//TODO - / to search
 		//TODO - shortcut for tagging... jkl?
 	});
+
+	function resizeScrambleArea(delta) {
+		var scrambleSpace = configuration.get('layout.sizerHeight');
+		scrambleSpace += delta;
+		configuration.set('layout.sizerHeight', scrambleSpace);
+		triLayout.resize();
+	}
 
 	// NOTE: We don't need to explicitly call this function in
 	//       order to initialize stuff, because the onHide() method
