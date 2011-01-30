@@ -89,7 +89,9 @@ FEATURES
 	-include version number in tnt client
 	-Add a note about opening multiple instances of tnt
 -keyboard shorcuts!!!
-	-documentation & configuration
+	+documentation & configuration
+	-configure by pressing?
+	-avoid duplicates as best as possible
 +puzzle icons!
 	-implemented, but now need some decent icons!
 	+find a place to use the icons...custom <select> with support for icons
