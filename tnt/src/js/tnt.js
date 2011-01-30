@@ -99,6 +99,9 @@ tnoodle.tnt = {
 			this.grayOut_.setStyle('display', 'none');
 		}
 	},
+	isGrayedOut: function() {
+		return this.grayOut_ != null && this.grayOut_.getStyle('display') != 'none';
+	},
 	createPopup: function(onShow, onHide, size, noGrayBg) {
 		var popup = document.createElement('div');
 		popup.className = 'popup';

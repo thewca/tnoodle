@@ -201,10 +201,11 @@ var KeyboardTimer = new Class({
 		return new Date().getTime() - this.timerStop > this.delay;
 	},
 	isFocused: function() {
-		//we disable the timer if a text field is focused
-		return (document.activeElement.type != "text" &&
-		   document.activeElement.type != "textarea" &&
-		   !tnoodle.tnt.isSelecting());
+		// This is kinda weird, we want to avoid activating the timer 
+		// if we're in a textarea, textfield, or input field
+		var focusedEl = document.activeElement.nodeName.toLowerCase();
+		var isEditing = focusedEl == 'textarea' || focusedEl == 'input';
+		return !isEditing && !tnoodle.tnt.isSelecting() && !tnoodle.tnt.isGrayedOut();
 	},
 	getTimeCentis: function() {
 		if(this.config.get('timer.enableStackmat')) {

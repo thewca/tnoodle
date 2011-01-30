@@ -98,14 +98,10 @@ window.addEvent('domready', function() {
 		sessionSelect.setSelected(session);
 	};
 	sessionSelect.onchange = function(e) {
-		var puzzle = scrambleStuff.getSelectedPuzzle();
-		var event = eventSelect.getSelected();
 		var session = sessionSelect.getSelected();
 		if(session === null) {
-			// We create a new session, and then refresh our list
-			// Refreshing will cause the newest session to be selected
-			server.createSession(puzzle, event);
-			sessionSelect.refresh();
+			// New session will create & select a new session
+			newSession();
 			return;
 		}
 		timesTable.setSession(session);
@@ -173,10 +169,18 @@ window.addEvent('domready', function() {
 			sessionSelect.refresh(); // This will cause the latest session to be selected
 		}
 	}
+	function newSession() {
+		var puzzle = scrambleStuff.getSelectedPuzzle();
+		var event = eventSelect.getSelected();
+		// We create a new session, and then refresh our list
+		// Refreshing will cause the newest session to be selected
+		server.createSession(puzzle, event);
+		sessionSelect.refresh();
+	}
 	
 	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
 	timer.addEvent('newTime', function(time) {
-		//TODO - this may need to way for the sessions to load...
+		//TODO - this may need to wait for the sessions to load...
 		timesTable.addTime(time);
 	});
 	
@@ -212,68 +216,164 @@ window.addEvent('domready', function() {
 	$('aboutLink').addEvent('click', function() {
 		aboutPopup.show();
 	});
-	
-	var greyOut = document.createElement('div');
-	document.body.appendChild(greyOut);
-	greyOut.setStyle('z-index', 4);
-	greyOut.id='gray';
-	greyOut.setStyle('position', 'absolute');
 
-
-	var helpPopup = tnoodle.tnt.createPopup();
-	helpPopup.innerHTML = 'foooobar';
-	$('helpLink').addEvent('click', function() {
-		var shortcuts = keyboard.shortcuts;
+	$('helpLink').doClick = function() {
+		helpPopup.refresh();
 		helpPopup.show();
-	});
-	
-	// This wraps functions to ensure that they
-	// only get called if we're not timing
-	// This is useful so keyboard shortcuts won't work
-	// while the timer is running
-	function notTiming(func) {
-		return function(e) {
-			var focusedEl = document.activeElement.nodeName.toLowerCase();
-			// This is kinda weird, we want to avoid activating this shortcut
-			// if we're in a textarea, textfield, or input field
-			var isEditing = focusedEl == 'textarea' || focusedEl == 'textfield' || focusedEl == 'input';
-			if(!timer.timing && !isEditing && !tnoodle.tnt.isSelecting()) {
-				func(e);
-			}
-		};
 	}
-	var keyboard = new Keyboard();
-	keyboard.addShortcut('save', {
-	    'keys': 'c',
-	    'description': 'Comment on latest solve',
-	    'handler': notTiming(timesTable.comment.bind(timesTable))
+	$('helpLink').addEvent('click', $('helpLink').doClick);
+	
+	// This subclass of Keyboard ensures that
+	// shortcuts only work when we're not timing,
+	// editing a text box, or doing something else
+	// we care about.
+	var BlockingKeyboard = new Class({
+		Extends: Keyboard,
+		handle: function(event, type) {
+			//console.log(event + " " + type);
+			if(!timer.timing && timer.isFocused()) {
+				this.parent(event, type);
+			}
+		}
 	});
-	keyboard.addShortcut('add time', {
-		'keys': 'alt+a',
-		'description': 'Add time',
-		'handler': function(e) { e.stop(); timesTable.promptTime(); }
+	var keyboard = new BlockingKeyboard();
+	var shortcuts = new Hash({
+		'Times': [
+			{
+				description: 'Comment on last solve',
+				default: 'c',
+				handler: timesTable.comment.bind(timesTable)
+			},
+			{
+				description: 'Add time',
+				default: 'alt+a',
+				handler: function(e) { e.stop(); timesTable.promptTime(); }
+			},
+			{
+				description: 'Undo',
+				default: 'ctrl+z',
+				handler: timesTable.undo.bind(timesTable)
+			},
+			{
+				description: 'Redo',
+				default: 'ctrl+y',
+				handler: timesTable.redo.bind(timesTable)
+			}
+		],
+		'Sessions': [
+			{
+				description: 'Reset session',
+				default: 'r',
+				handler: resetSession
+			},
+			{
+				description: 'Delete session',
+				default: 'd',
+				handler: deleteSession
+			},
+			{
+				description: 'New session',
+				default: 'n',
+				handler: newSession
+			},
+			{
+				description: 'Comment on session',
+				default: 'shift+c',
+				handler: function(e) {
+					e.stop(); // Must stop the event, else a 'C' will show up in the box
+					sessionComment.focus();
+				}
+			}
+		],
+		'Miscellaneous': [
+			{
+				description: 'Help',
+				default: 'shift+/',
+				handler: $('helpLink').doClick
+			}
+		]
+		//TODO - p for puzzle, e for event
+		//TODO - shortcut to resize scramble area
+		//TODO - hide/show scramble view
+		//TODO - / to search
+		//TODO - shortcut for tagging... jkl?
 	});
-	keyboard.addShortcut('reset', {
-		'keys': 'alt+r',
-		'description': 'Reset session',
-		'handler': resetSession
-	});
-	keyboard.addShortcut('undo', {
-		'keys': 'ctrl+z',
-		'description': 'Undo',
-		'handler': notTiming(timesTable.undo.bind(timesTable))
-	});
-	keyboard.addShortcut('redo', {
-		'keys': 'ctrl+y',
-		'description': 'Redo',
-		'handler': notTiming(timesTable.redo.bind(timesTable))
-	});
-	//TODO - just plain r to reset?
-	//TODO - d to delete session
-	//TODO - n for new session
-	//TODO - p for puzzle, e for event
-	//TODO - shortcut to resize scramble area
-	//TODO - hide/show scramble view
-	//TODO - / to search
-	//TODO - shortcut for tagging jkl?
+
+	// NOTE: We don't need to explicitly call this function in
+	//       order to initialize stuff, because the onHide() method
+	//       calls it, and onHide() is called by createPopup().
+	function refreshShortcuts() {
+		keyboard.removeEvents();
+		shortcuts.getValues().each(function(category) {
+			category.each(function(shortcut) {
+				var keys = shortcut.keys || shortcut.default;
+				if(keys) {
+					keyboard.addEvent(keys, shortcut.handler);
+				}
+			});
+		});
+	}
+	function onHide() {
+		shortcuts.getValues().each(function(category) {
+			category.each(function(shortcut) {
+				if(shortcut.editor) {
+					shortcut.keys = shortcut.editor.value;
+				}
+			});
+		});
+		refreshShortcuts();
+	}
+	var helpPopup = tnoodle.tnt.createPopup(null, onHide);
+	helpPopup.refresh = function() {
+		helpPopup.empty();
+		shortcuts.getKeys().each(function(category) {
+			var categorySpan = document.createElement('span');
+			categorySpan.appendText(category);
+			categorySpan.setStyle('font-weight', 'bold');
+			helpPopup.appendChild(categorySpan);
+			//helpPopup.appendChild(document.createElement('hr'));
+			shortcuts[category].each(function(shortcut) {
+				var shortcutDiv = document.createElement('div');
+
+				var label = document.createElement('label');
+				label.setStyle('float', 'left');
+				label.setStyle('margin-left', 10);
+				label.setStyle('width', 200);
+				label.appendText(shortcut.description + ':');
+				shortcutDiv.appendChild(label);
+
+				var textField = document.createElement('input');
+				textField.type = 'text';
+				textField.value = shortcut.keys || shortcut.default;
+				textField.shortcut = shortcut;
+				textField.addEvent('keydown', function(e) {
+					if(e.key == 'esc') {
+						// If we don't stop the event, then the popup will disappear
+						e.stop();
+						this.blur();
+					}
+				});
+				shortcutDiv.appendChild(textField);
+				shortcut.editor = textField;
+
+				helpPopup.appendChild(shortcutDiv);
+			});
+		});
+		var reset = document.createElement('input');
+		reset.type = 'button';
+		reset.value = 'Reset';
+		reset.setStyle('float', 'right');
+		reset.addEvent('click', function() {
+			if(!confirm('This will reset all shortcuts! Are you sure you wish to continue?')) {
+				return;
+			}
+			shortcuts.getValues().each(function(category) {
+				category.each(function(shortcut) {
+					shortcut.keys = shortcut.default;
+				});
+			});
+			helpPopup.refresh();
+		});
+		helpPopup.appendChild(reset);
+	};
 });
