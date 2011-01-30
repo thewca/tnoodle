@@ -220,7 +220,7 @@ window.addEvent('domready', function() {
 	$('helpLink').doClick = function() {
 		helpPopup.refresh();
 		helpPopup.show();
-	}
+	};
 	$('helpLink').addEvent('click', $('helpLink').doClick);
 	
 	// This subclass of Keyboard ensures that
@@ -236,64 +236,72 @@ window.addEvent('domready', function() {
 			}
 		}
 	});
+
+	function resizeScrambleArea(delta) {
+		var scrambleSpace = configuration.get('layout.sizerHeight');
+		scrambleSpace += delta;
+		configuration.set('layout.sizerHeight', scrambleSpace);
+		triLayout.resize();
+	}
+
 	var keyboard = new BlockingKeyboard();
 	var shortcuts = new Hash({
 		'Times': [
 			{
 				description: 'Comment on last solve',
-				default: 'c',
+				'default': 'c',
 				handler: timesTable.comment.bind(timesTable)
 			},
 			{
 				description: 'Add time',
-				default: 'alt+a',
+				'default': 'alt+a',
 				handler: function(e) { e.stop(); timesTable.promptTime(); }
 			},
 			{
 				description: 'No penalty',
-				default: 'i',
+				'default': 'i',
 				handler: timesTable.penalize.bind(timesTable, null)
 			},
 			{
 				description: '+2',
-				default: 'o',
+				'default': 'o',
 				handler: timesTable.penalize.bind(timesTable, '+2')
 			},
 			{
 				description: 'DNF',
-				default: 'p',
+				'default': 'p',
 				handler: timesTable.penalize.bind(timesTable, 'DNF')
 			},
 			{
 				description: 'Undo',
-				default: 'ctrl+z',
+				'default': 'ctrl+z',
 				handler: timesTable.undo.bind(timesTable)
 			},
 			{
 				description: 'Redo',
-				default: 'ctrl+y',
+				'default': 'ctrl+y',
 				handler: timesTable.redo.bind(timesTable)
 			}
 		],
 		'Sessions': [
 			{
 				description: 'Reset session',
-				default: 'r',
+				'default': 'r',
 				handler: resetSession
 			},
 			{
 				description: 'Delete session',
-				default: 'd',
+				'default': 'd',
 				handler: deleteSession
 			},
 			{
 				description: 'New session',
-				default: 'n',
+				'default': 'n',
 				handler: newSession
 			},
 			{
 				description: 'Comment on session',
-				default: 'shift+c',
+				'default': 'shift+c',
 				handler: function(e) {
 					e.stop(); // Must stop the event, else a 'C' will show up in the box
 					sessionComment.focus();
@@ -303,49 +311,49 @@ window.addEvent('domready', function() {
 		'Gui stuff': [
 			{
 				description: '+10px scramble area',
-				default: '=',
+				'default': '=',
 				handler: resizeScrambleArea.bind(null, 10)
 			},
 			{
 				description: '-10px scramble area',
-				default: '-',
+				'default': '-',
 				handler: resizeScrambleArea.bind(null, -10)
 			},
 			{
 				description: '+50px scramble area',
-				default: 'shift+=',
+				'default': 'shift+=',
 				handler: resizeScrambleArea.bind(null, 50)
 			},
 			{
 				description: '-50px scramble area',
-				default: 'shift+-',
+				'default': 'shift+-',
 				handler: resizeScrambleArea.bind(null, -50)
 			},
 			{
 				description: 'Toggle scramble view',
-				default: 's',
+				'default': 's',
 				handler: scrambleStuff.toggleScrambleView
 			}
 		],
 		'Miscellaneous': [
 			{
 				description: 'Help',
-				default: 'shift+/',
+				'default': 'shift+/',
 				handler: $('helpLink').doClick
 			},
 			{
 				description: 'Select puzzle',
-				default: 'q',
+				'default': 'q',
 				handler: scrambleStuff.puzzleSelect.show
 			},
 			{
 				description: 'Select event',
-				default: 'w',
+				'default': 'w',
 				handler: eventSelect.show
 			},
 			{
 				description: 'Select session',
-				default: 'e',
+				'default': 'e',
 				handler: sessionSelect.show
 			}
 		]
@@ -360,13 +368,6 @@ window.addEvent('domready', function() {
 		});
 	});
 
-	function resizeScrambleArea(delta) {
-		var scrambleSpace = configuration.get('layout.sizerHeight');
-		scrambleSpace += delta;
-		configuration.set('layout.sizerHeight', scrambleSpace);
-		triLayout.resize();
-	}
-
 	// NOTE: We don't need to explicitly call this function in
 	//       order to initialize stuff, because the onHide() method
 	//       calls it, and onHide() is called by createPopup().
@@ -377,7 +378,7 @@ window.addEvent('domready', function() {
 			category.each(function(shortcut) {
 				var keys = shortcut.keys || null;
 				configuration.set('shortcuts.' + shortcut.description, keys);
-				keys = keys || shortcut.default;
+				keys = keys || shortcut['default'];
 				if(keys) {
 					keyboard.addEvent(keys, shortcut.handler);
 				}
@@ -416,7 +417,7 @@ window.addEvent('domready', function() {
 
 				var textField = document.createElement('input');
 				textField.type = 'text';
-				textField.value = shortcut.keys || shortcut.default;
+				textField.value = shortcut.keys || shortcut['default'];
 				textField.shortcut = shortcut;
 				textField.addEvent('keydown', function(e) {
 					if(e.key == 'esc') {
@@ -444,7 +445,7 @@ window.addEvent('domready', function() {
 			}
 			shortcuts.getValues().each(function(category) {
 				category.each(function(shortcut) {
-					shortcut.keys = shortcut.default;
+					shortcut.keys = shortcut['default'];
 				});
 			});
 			helpPopup.refresh();

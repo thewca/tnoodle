@@ -88,7 +88,7 @@ tnoodle.tnt = {
 	},
 	grayOut_: null,
 	grayOut: function(show) {
-		if(this.grayOut_ == null) {
+		if(this.grayOut_ === null) {
 			this.grayOut_ = document.createElement('div');
 			this.grayOut_.addClass('grayOut');
 			document.body.appendChild(this.grayOut_);
@@ -100,7 +100,7 @@ tnoodle.tnt = {
 		}
 	},
 	isGrayedOut: function() {
-		return this.grayOut_ != null && this.grayOut_.getStyle('display') != 'none';
+		return this.grayOut_ !== null && this.grayOut_.getStyle('display') != 'none';
 	},
 	createPopup: function(onShow, onHide, size, noGrayBg) {
 		var popup = document.createElement('div');
