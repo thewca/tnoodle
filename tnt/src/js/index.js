@@ -250,6 +250,21 @@ window.addEvent('domready', function() {
 				handler: function(e) { e.stop(); timesTable.promptTime(); }
 			},
 			{
+				description: 'No penalty',
+				default: 'i',
+				handler: timesTable.penalize.bind(timesTable, null)
+			},
+			{
+				description: '+2',
+				default: 'o',
+				handler: timesTable.penalize.bind(timesTable, '+2')
+			},
+			{
+				description: 'DNF',
+				default: 'p',
+				handler: timesTable.penalize.bind(timesTable, 'DNF')
+			},
+			{
 				description: 'Undo',
 				default: 'ctrl+z',
 				handler: timesTable.undo.bind(timesTable)
@@ -285,31 +300,38 @@ window.addEvent('domready', function() {
 				}
 			}
 		],
+		'Gui stuff': [
+			{
+				description: '+10px scramble area',
+				default: '=',
+				handler: resizeScrambleArea.bind(null, 10)
+			},
+			{
+				description: '-10px scramble area',
+				default: '-',
+				handler: resizeScrambleArea.bind(null, -10)
+			},
+			{
+				description: '+50px scramble area',
+				default: 'shift+=',
+				handler: resizeScrambleArea.bind(null, 50)
+			},
+			{
+				description: '-50px scramble area',
+				default: 'shift+-',
+				handler: resizeScrambleArea.bind(null, -50)
+			},
+			{
+				description: 'Toggle scramble view',
+				default: 's',
+				handler: scrambleStuff.toggleScrambleView
+			}
+		],
 		'Miscellaneous': [
 			{
 				description: 'Help',
 				default: 'shift+/',
 				handler: $('helpLink').doClick
-			},
-			{
-				description: 'Increase scramble area (10px)',
-				default: '=',
-				handler: resizeScrambleArea.bind(null, 10)
-			},
-			{
-				description: 'Decrease scramble area (10px)',
-				default: '-',
-				handler: resizeScrambleArea.bind(null, -10)
-			},
-			{
-				description: 'Increase scramble area (50px)',
-				default: 'shift+=',
-				handler: resizeScrambleArea.bind(null, 50)
-			},
-			{
-				description: 'Decrease scramble area (50px)',
-				default: 'shift+-',
-				handler: resizeScrambleArea.bind(null, -50)
 			},
 			{
 				description: 'Select puzzle',
@@ -327,9 +349,7 @@ window.addEvent('domready', function() {
 				handler: sessionSelect.show
 			}
 		]
-		//TODO - hide/show scramble view
 		//TODO - / to search
-		//TODO - shortcut for tagging... jkl?
 	});
 
 	shortcuts.getValues().each(function(category) {
@@ -387,6 +407,7 @@ window.addEvent('domready', function() {
 				var shortcutDiv = document.createElement('div');
 
 				var label = document.createElement('label');
+				label.setStyle('font-size', '12px');
 				label.setStyle('float', 'left');
 				label.setStyle('margin-left', 10);
 				label.setStyle('width', 200);

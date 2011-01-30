@@ -146,7 +146,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			function(puzzleImageInfo) {
 				if(puzzleImageInfo.error) {
 					faceMap = null; // scramble images are not supported
-					scrambleDiv.setVisible(false, false);
+					scrambleDiv.setVisible(false, true);
 				} else {
 					// if the scramble has arrived, we format it into the turns
 					if(currScramble) {
@@ -244,7 +244,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		fireScrambleChanged();
 		scrambling = false;
 	}
-	function turnClicked(userInvoked) {
+	function turnClicked(automated) {
 		if(isChangingColorScheme) {
 			// first, we cancel editing of the colorscheme
 			changeColorsClicked.call(changeColors);
@@ -254,11 +254,11 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		}
 		currTurn = this;
 		currTurn.className = 'currTurn';
-		scrambleDiv.setVisible(true, userInvoked);
+		scrambleDiv.setVisible(true, automated);
 		scrambleImg.drawScramble(currTurn.incrementalScramble);
 	}
 	function userClickedTurn() {
-		turnClicked.call(this, true);
+		turnClicked.call(this, false);
 	}
 
 	var currScramble = null;
@@ -319,7 +319,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 				scramblePre.appendChild(turnLink);
 				scramblePre.appendChild(turnPadding);
 				if(i == turns.length - 1) {
-					turnClicked.call(turnLink, false);
+					turnClicked.call(turnLink, true);
 				} else {
 					incrementalScramble += " ";
 					scramblePre.appendChild(document.createTextNode(' '));
@@ -409,7 +409,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			scrambleImg.redraw();
 		} else {
 			if(currTurn) { // curr turn will not be defined if we just changed puzzles
-				turnClicked.call(currTurn, false);
+				turnClicked.call(currTurn, true);
 			}
 			this.className = this.className.replace(/\bbuttondown\b/, "");
 			colorChooserDiv.style.display = 'none'; // close cholor chooser window
@@ -764,12 +764,12 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleDiv.setStyle('z-index', 4);
 	scrambleDiv.id = 'scrambleDiv'; // have to have an id to make it draggable
 	scrambleDiv.invisiblePuzzles = configuration.get('scramble.invisiblePuzzles', {});
-	scrambleDiv.setVisible = function(visible, userInvoked) {
-		if(userInvoked) {
+	scrambleDiv.setVisible = function(visible, automated) {
+		if(automated) {
+			visible &= !this.invisiblePuzzles[puzzle];
+		} else {
 			this.invisiblePuzzles[puzzle] = !visible;
 			configuration.set('scramble.invisiblePuzzles', this.invisiblePuzzles);
-		} else {
-			visible &= !this.invisiblePuzzles[puzzle];
 		}
 		if(visible) {
 			scrambleDiv.style.display = 'inline';
@@ -793,7 +793,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	closeScramble.className = 'button close';
 	closeScramble.title = 'Close';
 	xAddListener(closeScramble, 'click', function() {
-		scrambleDiv.setVisible(false, true);
+		scrambleDiv.setVisible(false, false);
 	}, false);
 	scrambleDivHeader.appendChild(closeScramble);
 
@@ -1030,6 +1030,15 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 			scrambleListeners[i]();
 		}
 	}
+
+	this.toggleScrambleView = function() {
+		if(scrambleDiv.style.display == 'none') {
+			var turns = $$('.turn'); //fun with css!
+			turnClicked.call(turns[turns.length-1], false);
+		} else {
+			scrambleDiv.setVisible(false);
+		}
+	};
 
 	var puzzleListeners = [];
 	this.addPuzzleChangeListener = function(l) {

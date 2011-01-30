@@ -592,6 +592,11 @@ var TimesTable = new Class({
 		this.lastAddedRow.hover();
 		this.timeHoverDiv.commentArea.focus();
 	},
+	penalize: function(penalty) {
+		this.lastAddedRow.time.setPenalty(penalty);
+		this.session.reindex();
+		this.refreshData();
+	},
 	deleteRows: function(rows) {
 		var times = [];
 		rows.each(function(row) {
