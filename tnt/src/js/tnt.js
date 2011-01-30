@@ -320,7 +320,7 @@ tnoodle.tnt = {
 			mouseover = false;
 			refresh();
 		});
-		select.addEvent('click', function(e) {
+		select.show = function() {
 			if(disabled) {
 				return;
 			}
@@ -330,7 +330,8 @@ tnoodle.tnt = {
 			// mouse click will cause windowClicked() to get called,
 			// which will make our dropdown invisible.
 			setTimeout(refresh, 0);
-		});
+		}.bind(select);
+		select.addEvent('click', select.show);
 		function windowClicked(e) {
 			selecting = false;
 			refresh();

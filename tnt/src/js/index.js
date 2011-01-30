@@ -310,13 +310,34 @@ window.addEvent('domready', function() {
 				description: 'Decrease scramble area (50px)',
 				default: 'shift+-',
 				handler: resizeScrambleArea.bind(null, -50)
+			},
+			{
+				description: 'Select puzzle',
+				default: 'q',
+				handler: scrambleStuff.puzzleSelect.show
+			},
+			{
+				description: 'Select event',
+				default: 'w',
+				handler: eventSelect.show
+			},
+			{
+				description: 'Select session',
+				default: 'e',
+				handler: sessionSelect.show
 			}
 		]
-		//TODO - p for puzzle, e for event
-		//TODO - shortcut to resize scramble area
 		//TODO - hide/show scramble view
 		//TODO - / to search
 		//TODO - shortcut for tagging... jkl?
+	});
+
+	shortcuts.getValues().each(function(category) {
+		category.each(function(shortcut) {
+			var keys = configuration.get('shortcuts.' + shortcut.description, null);
+			shortcut.keys = keys;
+			//TODO - check for duplicates
+		});
 	});
 
 	function resizeScrambleArea(delta) {
@@ -330,10 +351,13 @@ window.addEvent('domready', function() {
 	//       order to initialize stuff, because the onHide() method
 	//       calls it, and onHide() is called by createPopup().
 	function refreshShortcuts() {
+		//TODO - check for duplicates
 		keyboard.removeEvents();
 		shortcuts.getValues().each(function(category) {
 			category.each(function(shortcut) {
-				var keys = shortcut.keys || shortcut.default;
+				var keys = shortcut.keys || null;
+				configuration.set('shortcuts.' + shortcut.description, keys);
+				keys = keys || shortcut.default;
 				if(keys) {
 					keyboard.addEvent(keys, shortcut.handler);
 				}
@@ -379,6 +403,9 @@ window.addEvent('domready', function() {
 						e.stop();
 						this.blur();
 					}
+				});
+				textField.addEvent('change', function() {
+					//TODO - check for duplicates
 				});
 				shortcutDiv.appendChild(textField);
 				shortcut.editor = textField;
