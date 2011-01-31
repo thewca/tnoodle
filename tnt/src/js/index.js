@@ -208,7 +208,7 @@ window.addEvent('domready', function() {
 	timesTable.manager = triLayout;
 	
 	//TODO - yeah...
-	aboutText = '<h2>TNoodle Timer (TNT) vFOOOBAR</h2><br/>' +
+	aboutText = '<h2 style="margin: 0;">TNoodle Timer (TNT) vFOOOBAR</h2><br/>' +
 				'Created by Jeremy Fleischman from the ashes of CCT.<br/>' +
 				'Thanks to Leyan Lo for ideas/couch';
 	var aboutPopup = tnoodle.tnt.createPopup();
