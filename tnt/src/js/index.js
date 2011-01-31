@@ -359,41 +359,67 @@ window.addEvent('domready', function() {
 		]
 		//TODO - / to search
 	});
+	function getShortcutMap() {
+		var shortcutMap = {};
+		shortcuts.getValues().each(function(category) {
+			category.each(function(shortcut) {
+				var keys = shortcut.keys || shortcut['default'];
+				if(!keys) {
+					keys = '';
+				}
+				var shortArr = shortcutMap[keys];
+				if(!shortArr) {
+					shortArr = [];
+					shortcutMap[keys] = shortArr;
+				}
+				shortArr.push(shortcut);
+			});
+		});
+		return new Hash(shortcutMap);
+	}
 
 	shortcuts.getValues().each(function(category) {
 		category.each(function(shortcut) {
 			var keys = configuration.get('shortcuts.' + shortcut.description, null);
 			shortcut.keys = keys;
-			//TODO - check for duplicates
 		});
 	});
 
 	// NOTE: We don't need to explicitly call this function in
 	//       order to initialize stuff, because the onHide() method
 	//       calls it, and onHide() is called by createPopup().
-	function refreshShortcuts() {
-		//TODO - check for duplicates
+	function addShortcutListeners() {
 		keyboard.removeEvents();
-		shortcuts.getValues().each(function(category) {
-			category.each(function(shortcut) {
+		getShortcutMap().getValues().each(function(shortcuts) {
+			for(var i = 0; i < shortcuts.length; i++) {
+				var shortcut = shortcuts[0];
 				var keys = shortcut.keys || null;
 				configuration.set('shortcuts.' + shortcut.description, keys);
 				keys = keys || shortcut['default'];
-				if(keys) {
+				if(keys && shortcuts.length == 1) {
+					// If we have duplicate shortcuts, don't program any of them
+					// Note that we still save all the settings to configuration
 					keyboard.addEvent(keys, shortcut.handler);
 				}
-			});
+			}
+		});
+	}
+	function highlightDuplicates() {
+		getShortcutMap().getValues().each(function(shortcuts) {
+			var duplicates = shortcuts.length > 1;
+			for(var i = 0; i < shortcuts.length; i++) {
+				var shortcut = shortcuts[i];
+				shortcut.editor.setStyle('color', '');
+				shortcut.editor.setStyle('border-color', '');
+				if(duplicates) {
+					shortcut.editor.setStyle('color', 'red');
+					shortcut.editor.setStyle('border-color', 'red');
+				}
+			}
 		});
 	}
 	function onHide() {
-		shortcuts.getValues().each(function(category) {
-			category.each(function(shortcut) {
-				if(shortcut.editor) {
-					shortcut.keys = shortcut.editor.value;
-				}
-			});
-		});
-		refreshShortcuts();
+		addShortcutListeners();
 	}
 	var helpPopup = tnoodle.tnt.createPopup(null, onHide);
 	helpPopup.refresh = function() {
@@ -402,7 +428,6 @@ window.addEvent('domready', function() {
 		shortcutsDiv.setStyle("overflow", 'auto');
 		helpPopup.overflow = function() {
 			var size = helpPopup.getParent().getSize();
-			console.log(size.y);
 			shortcutsDiv.setStyle("height", size.y-40);
 			shortcutsDiv.setStyle("margin-right", '');
 		};
@@ -442,15 +467,22 @@ window.addEvent('domready', function() {
 						this.blur();
 					}
 				});
-				textField.addEvent('change', function() {
-					//TODO - check for duplicates
+				//TODO - check for copy paste, does keyup really work?
+				textField.addEvent('keyup', function(e) {
+					this.shortcut.keys = this.value;
+					highlightDuplicates();
 				});
+				//textField.addEvent('change', function() {
+					//this.shortcut.keys = this.value;
+					//highlightDuplicates();
+				//});
 				shortcutDiv.appendChild(textField);
 				shortcut.editor = textField;
 
 				shortcutsDiv.appendChild(shortcutDiv);
 			});
 		});
+		highlightDuplicates();
 		var reset = document.createElement('input');
 		reset.type = 'button';
 		reset.value = 'Reset';
