@@ -70,6 +70,17 @@ var KeyboardTimer = new Class({
 		
 		this.reset(); //this will update the display
 		
+        function stopTimer() {
+            if(!timer.timing) {
+                alert('We should be timing if this is being called!'); //TODO - proper error message solution...
+            }
+            timer.timing = false;
+            timer.timerStop = new Date().getTime();
+
+            timer.pendingTime = true;
+            timer.stopRender(); // this will cause a redraw()
+            timer.fireNewTime();
+        }
 		window.addEvent('keydown', function(e) {
 			if(!timer.isFocused()) {
 				return;
@@ -82,13 +93,7 @@ var KeyboardTimer = new Class({
 			}
 			keys.set(e.code, true);
 			if(timer.timing) {
-				//stopping timer
-				timer.timing = false;
-				timer.timerStop = new Date().getTime();
-
-				timer.pendingTime = true;
-				timer.stopRender(); // this will cause a redraw()
-				timer.fireNewTime();
+                stopTimer();
 			} else {
 				timer.redraw();
 			}
@@ -108,7 +113,14 @@ var KeyboardTimer = new Class({
 						// if inspection's on and we're not inspecting, let's start!
 						timer.inspectionStart = new Date().getTime();
 						timer.inspecting = true;
-					} else {
+					} else if(timer.timing) {
+                        // It is possible to witness keyup events without a
+                        // preceeding keydown. This can happen when exiting
+                        // a screensaver or when switching tabs. Either way,
+                        // we treat this is a request to stop the timer.
+                        // Huge thanks to Dan Dzoan for pointing this out!
+                        stopTimer();
+                    } else{
 						// starting timer
 						timer.inspecting = false;
 						timer.timerStart = new Date().getTime();
