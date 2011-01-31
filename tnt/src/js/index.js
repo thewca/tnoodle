@@ -398,24 +398,40 @@ window.addEvent('domready', function() {
 	var helpPopup = tnoodle.tnt.createPopup(null, onHide);
 	helpPopup.refresh = function() {
 		helpPopup.empty();
+		shortcutsDiv = document.createElement('div');
+		shortcutsDiv.setStyle("overflow", 'auto');
+		helpPopup.overflow = function() {
+			var size = helpPopup.getParent().getSize();
+			console.log(size.y);
+			shortcutsDiv.setStyle("height", size.y-40);
+			shortcutsDiv.setStyle("margin-right", '');
+		};
+		helpPopup.reset = function() {
+			//TODO - wow this is nasty
+			shortcutsDiv.setStyle("height", '');
+			shortcutsDiv.setStyle("width", '');
+			shortcutsDiv.setStyle("margin-right", 20);
+		};
+		helpPopup.appendChild(shortcutsDiv);
 		shortcuts.getKeys().each(function(category) {
 			var categorySpan = document.createElement('span');
 			categorySpan.appendText(category);
 			categorySpan.setStyle('font-weight', 'bold');
-			helpPopup.appendChild(categorySpan);
-			//helpPopup.appendChild(document.createElement('hr'));
+			shortcutsDiv.appendChild(categorySpan);
 			shortcuts[category].each(function(shortcut) {
 				var shortcutDiv = document.createElement('div');
+				shortcutDiv.setStyle('margin-left', 10);
 
 				var label = document.createElement('label');
 				label.setStyle('font-size', '12px');
 				label.setStyle('float', 'left');
-				label.setStyle('margin-left', 10);
+				//label.setStyle('margin-left', 10);
 				label.setStyle('width', 200);
 				label.appendText(shortcut.description + ':');
 				shortcutDiv.appendChild(label);
 
 				var textField = document.createElement('input');
+				textField.setStyle('width', 50);
 				textField.type = 'text';
 				textField.value = shortcut.keys || shortcut['default'];
 				textField.shortcut = shortcut;
@@ -432,13 +448,12 @@ window.addEvent('domready', function() {
 				shortcutDiv.appendChild(textField);
 				shortcut.editor = textField;
 
-				helpPopup.appendChild(shortcutDiv);
+				shortcutsDiv.appendChild(shortcutDiv);
 			});
 		});
 		var reset = document.createElement('input');
 		reset.type = 'button';
 		reset.value = 'Reset';
-		reset.setStyle('float', 'right');
 		reset.addEvent('click', function() {
 			if(!confirm('This will reset all shortcuts! Are you sure you wish to continue?')) {
 				return;

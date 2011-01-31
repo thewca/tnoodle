@@ -134,9 +134,27 @@ tnoodle.tnt = {
 				innerDiv.setStyle('width', width-8);
 				innerDiv.setStyle('height', height-8);
 			} else {
-				width = parseInt(this.getStyle('width'), 10);
-				height = parseInt(this.getStyle('height'), 10);
+				innerDiv.setStyle('height', '');
+				innerDiv.setStyle('width', '');
+				if(innerDiv.reset) {
+					//TODO - wowow
+					innerDiv.reset();
+				}
+				width = parseInt(innerDiv.getStyle('width'), 10);
+				height = parseInt(innerDiv.getStyle('height'), 10);
+				var MAX_HEIGHT = windowHeight-20;
+				var overflow = false;
+				if(height > MAX_HEIGHT) {
+					height = MAX_HEIGHT;
+					overflow = true;
+				}
+				this.setStyle('width', width);
+				this.setStyle('height', height);
+				if(overflow && innerDiv.overflow) {
+					innerDiv.overflow();
+				}
 			}
+			height += 12; //TODO - border/padding
 			this.style.top = (windowHeight - height)/2 + 'px';
 			this.style.left = (windowWidth - width)/2 + 'px';
 		}.bind(popup);
