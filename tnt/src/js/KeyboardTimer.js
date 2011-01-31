@@ -3,7 +3,7 @@ var KeyboardTimer = new Class({
 	decimalPlaces: 2,
 	frequency: 0.01,
 	CHAR_AR: 1/2, 
-	INSPECTION: 5,
+	INSPECTION: 15,
 	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
