@@ -218,8 +218,10 @@ tnoodle.tnt = {
 	isSelecting: function() {
 		return $$('.selecting').length > 0; //lol
 	},
+	selects_: [],
 	createSelect: function() {
 		var select = document.createElement('span');
+		this.selects_.push(select);
 		select.addClass('select');
 		select.selectedIndex = 0;
 
@@ -329,13 +331,10 @@ tnoodle.tnt = {
 			}
 		}.bind(select);
 
-		var mouseover = false;
 		select.addEvent('mouseover', function() {
-			mouseover = true;
 			refresh();
 		});
 		select.addEvent('mouseout', function() {
-			mouseover = false;
 			refresh();
 		});
 		select.show = function() {
@@ -369,6 +368,14 @@ tnoodle.tnt = {
 				selecting = false;
 			} else if(e.key == 'esc') {
 				selecting = false;
+			} else if(e.key == 'tab') {
+				e.stop();
+
+				select.show();
+				var selects = tnoodle.tnt.selects_;
+				var delta = e.shift ? selects.length-1 : 1; // silly js modulo
+				var index = (selects.indexOf(select) + delta) % selects.length;
+				selects[index].show();
 			} else {
 				return;
 			}
