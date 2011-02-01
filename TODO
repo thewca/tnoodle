@@ -100,7 +100,7 @@ FEATURES
 		-similar vein: create a sexy session selector w/ a date picker
 
 -holding down space and then tapping "n" gives odd behavior
--pgup pgdown should scroll the times table
+-pgup, pgdown should scroll the times table
 -BOLD for "Edit" and "New session"
 
 -saving times
