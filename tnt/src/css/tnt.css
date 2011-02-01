@@ -41,7 +41,6 @@ span.select {
 	margin: 5px;
 	border: 1px solid gray;
 	border-radius: 2px;
-	padding-left: 5px;
 
 	user-select: none;
 	-moz-user-select: none;
@@ -76,4 +75,20 @@ span.select {
 
 .select .option.hovered {
 	background: white;
+}
+
+.leftarrow, .rightarrow {
+	font-size: 12px;
+}
+.rightarrow {
+	border-left: 1px solid gray;
+	margin-left: 3px;
+}
+.leftarrow {
+	border-right: 1px solid gray;
+	margin-right: 3px;
+}
+.leftarrow.hovered, .rightarrow.hovered {
+	border-color: black;
+	color: white;
 }

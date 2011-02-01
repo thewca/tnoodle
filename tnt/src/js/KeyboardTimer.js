@@ -113,6 +113,9 @@ var KeyboardTimer = new Class({
 						// if inspection's on and we're not inspecting, let's start!
 						timer.inspectionStart = new Date().getTime();
 						timer.inspecting = true;
+						//TODO - it's likely that we could use lastTime to hold our
+						//penalties, and thereby clean up a good bit of code
+						timer.lastTime = null;
 					} else if(timer.timing) {
                         // It is possible to witness keyup events without a
                         // preceeding keydown. This can happen when exiting
@@ -122,6 +125,7 @@ var KeyboardTimer = new Class({
                         stopTimer();
                     } else{
 						// starting timer
+						timer.lastTime = null;
 						timer.inspecting = false;
 						timer.timerStart = new Date().getTime();
 						timer.timing = true;
@@ -196,8 +200,10 @@ var KeyboardTimer = new Class({
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
 		//TODO - add remaining stackmat config options!!!
 	},
+	lastTime: null,
 	fireNewTime: function() {
 		var time = new this.server.Time(this.getTimeCentis(), this.scramble);
+		this.lastTime = time;
 		var penalty = this.getPenalty();
 		if(penalty) {
 			time.setPenalty(penalty);
@@ -257,6 +263,10 @@ var KeyboardTimer = new Class({
 				}
 				centis = (this.frequency*100)*(Math.round(centis / (this.frequency*100)));
 				decimalPlaces = this.decimalPlaces;
+			} else if(this.lastTime) {
+				// This little tricky bit lets the user see penalties they've applied to the
+				// most recent solve.
+				return this.lastTime.format();
 			}
 			return this.server.formatTime(centis, decimalPlaces);
 		}

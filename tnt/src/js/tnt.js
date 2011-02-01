@@ -219,17 +219,25 @@ tnoodle.tnt = {
 		return $$('.selecting').length > 0; //lol
 	},
 	selects_: [],
-	createSelect: function() {
+	createSelect: function(rightTip, leftTip) {
 		var select = document.createElement('span');
 		this.selects_.push(select);
 		select.addClass('select');
 		select.selectedIndex = 0;
 
 		var selected = document.createElement('span');
-		selected.appendText('');
-		select.appendChild(selected);
 		// Add a nice little upside down triangle
-		select.appendChild(document.createTextNode('\u25BC'));
+		var arrow = document.createElement('span');
+		arrow.appendText('\u25BC');
+		if(leftTip) {
+			select.arrow1 = arrow.clone();
+			select.arrow1.addClass('leftarrow');
+			select.appendChild(select.arrow1);
+		}
+		select.appendChild(selected);
+		select.arrow2 = arrow.clone();
+		select.arrow2.addClass('rightarrow');
+		select.appendChild(select.arrow2);
 		
 		var optionsDiv = document.createElement('div');
 		optionsDiv.addClass('options');
@@ -268,7 +276,7 @@ tnoodle.tnt = {
 			showItem(index);
 			select.selectedIndex = index;
 			if(select.onchange) {
-				select.onchange();
+				select.onchange(select.arrow2.hasClass('hovered'));
 			}
 		};
 		select.getSelected = function() {
@@ -285,7 +293,7 @@ tnoodle.tnt = {
 			clearOptions();
 			this.addClass('hovered');
 		}
-		function mouseOver() {
+		function mouseOver(e) {
 			hoveredIndex = this.index;
 		}
 		function optionClicked() {
@@ -297,6 +305,32 @@ tnoodle.tnt = {
 			} else {
 				select.removeClass('disabled');
 			}
+
+			if(!selecting) {
+				// If we're not selecting, then we remove the arrow highlights
+				if(select.arrow1) {
+					select.arrow1.removeClass('hovered');
+				}
+				select.arrow2.removeClass('hovered');
+			}
+			if(mousePos != null && select.containsPoint(mousePos)) {
+				// Whether we're selecting or not, if the mouse is on top of the
+				// status part of the select, we update the hovered dropdown arrow accordingly
+				select.arrow2.removeClass('hovered');
+				if(select.arrow1) {
+					select.arrow1.removeClass('hovered');
+					var pos = (mousePos.x - select.getPosition().x)/select.getSize().x;
+					if(pos > .5) {
+						select.arrow2.addClass('hovered');
+					} else {
+						select.arrow1.addClass('hovered');
+					}
+				} else {
+					select.arrow2.addClass('hovered');
+				}
+			}
+			select.title = select.arrow2.hasClass('hovered') ? rightTip : leftTip;
+
 			window.removeEvent('keydown', keyDown);
 			window.removeEvent('click', windowClicked);
 			if(selecting) {
@@ -334,14 +368,21 @@ tnoodle.tnt = {
 		select.addEvent('mouseover', function() {
 			refresh();
 		});
-		select.addEvent('mouseout', function() {
+		var mousePos = null;
+		select.addEvent('mouseout', function(e) {
+			mousePos = null;
+			refresh();
+		});
+		select.addEvent('mousemove', function(e) {
+			mousePos = e.page;
 			refresh();
 		});
 		select.show = function() {
 			if(disabled) {
 				return;
 			}
-			selecting = !selecting;
+			selecting = true;
+			select.arrow2.addClass('hovered');
 			hoveredIndex = this.selectedIndex;
 			// If we run refresh() immediately, the current
 			// mouse click will cause windowClicked() to get called,
@@ -368,10 +409,15 @@ tnoodle.tnt = {
 				selecting = false;
 			} else if(e.key == 'esc') {
 				selecting = false;
+			} else if(e.key == 'left' || e.key == 'right') {
+				if(select.arrow1) {
+					select.arrow1.toggleClass('hovered');
+					select.arrow2.toggleClass('hovered');
+				}
 			} else if(e.key == 'tab') {
 				e.stop();
 
-				select.show();
+				selecting = false;
 				var selects = tnoodle.tnt.selects_;
 				var delta = e.shift ? selects.length-1 : 1; // silly js modulo
 				var index = (selects.indexOf(select) + delta) % selects.length;

@@ -21,7 +21,7 @@ window.addEvent('domready', function() {
 	function getEvents() {
 		return server.getEvents(scrambleStuff.getSelectedPuzzle());
 	}
-	var eventSelect = tnoodle.tnt.createSelect();
+	var eventSelect = tnoodle.tnt.createSelect('righty', 'lefty');
 	eventSelect.refresh = function() {
 		var events = getEvents();
 		var options = [];
@@ -182,6 +182,10 @@ window.addEvent('domready', function() {
 	timer.addEvent('newTime', function(time) {
 		//TODO - this may need to wait for the sessions to load...
 		timesTable.addTime(time);
+	});
+	timesTable.addEvent('tableChanged', function() {
+		//timer.setStringy(timesTable.lastAddedRow.time.format());
+		timer.redraw();
 	});
 	
 	$('resetSession').addEvent('click', resetSession);

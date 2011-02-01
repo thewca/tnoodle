@@ -712,6 +712,7 @@ var TimesTable = new Class({
 		this.infoRow.refresh();
 		//$(this).toggle(); //prevent flickering?
 		this.resizeCols();
+		this.fireEvent('tableChanged');
 	},
 	editCell: function(cell, time) {
 		if(cell.textField && cell.textField.isOrIsChild(cell)) {
@@ -1083,3 +1084,4 @@ var TimesTable = new Class({
 		return this.preferredWidth + 2; //i have no idea what this 2 is for...
 	}
 });
+TimesTable.implement(new Events());
