@@ -39,6 +39,7 @@ span.select {
 	white-space: nowrap;
 	cursor: default;
 	margin: 5px;
+	padding: 1px 0px 1px 3px; /* If you change this, you may need to change .leftarrow */
 	border: 1px solid gray;
 	border-radius: 2px;
 
@@ -71,6 +72,7 @@ span.select {
 
 .select .option {
 	white-space: nowrap;
+	height: 19px; /* what a magic number */
 }
 
 .select .option.hovered {
@@ -87,6 +89,7 @@ span.select {
 .leftarrow {
 	border-right: 1px solid gray;
 	margin-right: 3px;
+	margin-left: -3px; /* This is pretty cool that it works, see span.select */
 }
 .leftarrow.hovered, .rightarrow.hovered {
 	border-color: black;

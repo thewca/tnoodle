@@ -220,6 +220,7 @@ tnoodle.tnt = {
 	},
 	selects_: [],
 	createSelect: function(rightTip, leftTip) {
+		rightTip = rightTip || null;
 		var select = document.createElement('span');
 		this.selects_.push(select);
 		select.addClass('select');
@@ -252,31 +253,42 @@ tnoodle.tnt = {
 			optionsHaveChanged = true;
 			selectedIndex = null;
 		};
+		function fillWithOption(el, option) {
+			el.empty();
+			if(option.icon) {
+				var img = document.createElement('img');
+				img.setStyle('vertical-align', 'middle');
+				img.setStyle('padding', '0px 2px 2px 0px');
+				img.src = option.icon;
+				el.appendChild(img);
+			}
+			el.appendText(option.text);
+		}
 		var selectedIndex = null;
 		function showItem(index) {
 			if(index == selectedIndex) {
 				return;
 			}
-			selected.empty();
-			var newEl = options[index].el.clone();
-			selected.adopt(newEl);
+			fillWithOption(selected, options[index]);
 			selectedIndex = index;
 		}
 		select.setSelected = function(value) {
 			if(optionsHaveChanged) {
 				refresh();
 			}
-			var index = options.map(function(el) { return el.value; }).indexOf(value);
+			var values = options.map(function(el) { return el.value; });
+			var index = values.indexOf(value);
 			if(index < 0) {
 				//TODO - proper error messages
-				alert("Couldn't find " + value + ' in [' + options.join(",") + ']');
+				//alert("Couldn't find " + value + ' in [' + values.join(",") + ']');
+				console.log("Couldn't find " + value + ' in [' + values.join(",") + ']');
 				index = 0;
 			}
 			
 			showItem(index);
 			select.selectedIndex = index;
 			if(select.onchange) {
-				select.onchange(select.arrow2.hasClass('hovered'));
+				select.onchange(select.arrow1 && select.arrow1.hasClass('hovered'));
 			}
 		};
 		select.getSelected = function() {
@@ -342,7 +354,7 @@ tnoodle.tnt = {
 					for(var i = 0; i < options.length; i++) {
 						var option = document.createElement('div');
 						option.addClass('option');
-						option.adopt(options[i].el.clone());
+						fillWithOption(option, options[i]);
 						option.value = options[i].value;
 						option.index = i;
 						optionsDiv.adopt(option);

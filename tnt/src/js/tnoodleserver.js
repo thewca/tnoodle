@@ -671,18 +671,30 @@ tnoodle.server = function(url) {
 		return sessions;
 	};
 
-	this.getEvents = function(puzzle) {
-		if(!(puzzle in events)) {
-			events[puzzle] = [ '' ];
+	var events = {};
+	this.getEvents = function(new_puzzle) {
+		//initializing the available events
+		for(i = 0; i < sessions.length; i++) {
+			var puzzle = sessions[i].getPuzzle();
+			var event = sessions[i].getEvent();
+			if(!(puzzle in events)) {
+				events[puzzle] = [ '' ];
+			}
+			if(!events[puzzle].contains(event)) {
+				events[puzzle].push(event);
+			}
 		}
-		events[puzzle].sort();
-		return events[puzzle];
+		if(!(new_puzzle in events)) {
+			events[new_puzzle] = [ '' ];
+		}
+		events[new_puzzle].sort();
+		return events[new_puzzle];
 	};
 	this.createEvent = function(puzzle, event) {
-		if(events[puzzle].contains(event)) {
-			return false;
+		var events = this.getEvents(puzzle);
+		if(!events.contains(event)) {
+			events.push(event);
 		}
-		events[puzzle].push(event);
 		return true;
 	};
 	this.renameEvent = function(puzzle, oldevent, newevent) {
@@ -790,17 +802,5 @@ tnoodle.server = function(url) {
 		this.createSession("3x3x3", "");
 	}
 	
-	//initializing the available events
-	var events = {};
-	for(i = 0; i < sessions.length; i++) {
-		var puzzle = sessions[i].getPuzzle();
-		var event = sessions[i].getEvent();
-		if(!(puzzle in events)) {
-			events[puzzle] = [ '' ];
-		}
-		if(!events[puzzle].contains(event)) {
-			events[puzzle].push(event);
-		}
-	}
 };
 

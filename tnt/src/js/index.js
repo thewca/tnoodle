@@ -13,38 +13,47 @@ window.addEvent('domready', function() {
 	var timer = new KeyboardTimer($('timer'), server, scrambleStuff);
 	var session = null;
 	
-	scrambleStuff.addPuzzleChangeListener(function(newPuzzle) {
+	var updatingSession = false;
+	scrambleStuff.addPuzzleChangeListener(function(newPuzzle, updateSession) {
+		updatingSession = true;
+		if(updateSession) {
+			session.setPuzzle(newPuzzle);
+		} else {
+			session = null;
+		}
 		configuration.set('scramble.puzzle', newPuzzle);
 		eventSelect.refresh();
+		updatingSession = false;
 	});
 
 	function getEvents() {
 		return server.getEvents(scrambleStuff.getSelectedPuzzle());
 	}
-	var eventSelect = tnoodle.tnt.createSelect('righty', 'lefty');
+	var eventSelect = tnoodle.tnt.createSelect('Open last session with event', 'Change current session to event');
 	eventSelect.refresh = function() {
 		var events = getEvents();
 		var options = [];
 		for(var i = 0; i < events.length; i++) {
 			var txt = events[i];
-			if(txt == '') {
-				// If we left txt as an empty string, it would take up no space on our page
-				txt = '&nbsp;';
-			}
-			options.push({ value: events[i], el: new Element('span', { html: txt }) });
+			options.push({ value: events[i], text: txt });
 		}
-		options.push({ value: null, el: new Element('b', { text: 'Edit' }) });
+		options.push({ value: null, text: 'Edit' });
 		eventSelect.setOptions(options);
 
-		var event = configuration.get('scramble.puzzle.event', '');
-		if(events.indexOf(event) < 0) {
-			event = events[0];
+		var event;
+		if(session === null) {
+			event = configuration.get('scramble.puzzle.event', '');
+			if(events.indexOf(event) < 0) {
+				event = events[0];
+			}
+		} else {
+			event = session.getEvent();
 		}
 		eventSelect.setSelected(event);
 	};
 	$('puzzleChooser').adopt(eventSelect);
 
-	eventSelect.onchange = function(e) {
+	eventSelect.onchange = function(updateSession) {
 		var event = eventSelect.getSelected();
 		if(event === null) {
 			// We don't want to leave the "Edit" option selected
@@ -70,6 +79,11 @@ window.addEvent('domready', function() {
 			}
 			return;
 		}
+		if(!updateSession && !updatingSession) {
+			session = null;
+		} else if(session !== null) {
+			session.setEvent(event);
+		}
 		configuration.set('scramble.puzzle.event', event);
 		sessionSelect.refresh();
 	}; //for some reason, the change event doesn't fire until the select loses focus
@@ -81,7 +95,7 @@ window.addEvent('domready', function() {
 		var event = eventSelect.getSelected();
 
 		var options = [];
-		options.push({ value: null, el: new Element('b', { text: 'New session' }) });
+		options.push({ value: null, text: 'New session' });
 
 		var sessions = server.getSessions(puzzle, event);
 		sessions.reverse(); // We want to list our sessions starting with the most recent
@@ -90,15 +104,18 @@ window.addEvent('domready', function() {
 		}
 		for(var i = 0; i < sessions.length; i++) {
 			var date = sessions[i].getDate().format('%b %d, %Y %H:%M');
-			var el = new Element('span', { text: date });
-			options.push({ value: sessions[i], el: el });
+			options.push({ value: sessions[i], text: date });
 		}
 		sessionSelect.setOptions(options);
-		session = sessions[0];
+		if(session === null || sessions.indexOf(session) < 0) {
+			// If the current session was just deleted,
+			// select the newest one
+			session = sessions[0];
+		}
 		sessionSelect.setSelected(session);
 	};
 	sessionSelect.onchange = function(e) {
-		var session = sessionSelect.getSelected();
+		session = sessionSelect.getSelected();
 		if(session === null) {
 			// New session will create & select a new session
 			newSession();
@@ -173,8 +190,8 @@ window.addEvent('domready', function() {
 		var puzzle = scrambleStuff.getSelectedPuzzle();
 		var event = eventSelect.getSelected();
 		// We create a new session, and then refresh our list
-		// Refreshing will cause the newest session to be selected
-		server.createSession(puzzle, event);
+		// Refreshing will cause session to be selected
+		session = server.createSession(puzzle, event);
 		sessionSelect.refresh();
 	}
 	

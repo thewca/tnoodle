@@ -102,7 +102,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	var defaultColorScheme = null;
 	var defaultSize = null;
 
-	function puzzleChanged() {
+	function puzzleChanged(altArrow) {
 		newPuzzle = puzzleSelect.getSelected();
 
 		if(newPuzzle == puzzle) {
@@ -129,7 +129,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		}
 
 		// we only fire a change if a puzzle is actually selected
-		firePuzzleChanged();
+		firePuzzleChanged(altArrow);
 
 		scramble();
 		var width = configuration.get('scramble.' + puzzle + '.size.width', null);
@@ -423,14 +423,8 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		puzzleSelect.setDisabled(false);
 		var options = [];
 		for(var i = 0; i < puzzles.length; i++) {
-			var img = document.createElement('img');
-			img.setStyle('vertical-align', 'middle');
-			img.setStyle('padding', '0px 2px 2px 0px');
-			img.src = scrambler.getPuzzleIconUrl(puzzles[i][0]);
-			var title = document.createElement('span');
-			title.adopt(img);
-			title.adopt(document.createTextNode(puzzles[i][1]));
-			options.push({ value: puzzles[i][0], el: title });
+			var iconUrl = scrambler.getPuzzleIconUrl(puzzles[i][0]);
+			options.push({ value: puzzles[i][0], text: puzzles[i][1], icon: iconUrl });
 		}
 		puzzleSelect.setOptions(options);
 		loadedCallback(puzzles);
@@ -885,7 +879,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleResize.addEvent('drag', scrambleResized);
 	scrambleResize.addEvent('complete', saveScrambleSize);
 
-	var puzzleSelect = tnoodle.tnt.createSelect();
+	var puzzleSelect = tnoodle.tnt.createSelect('Open last session of puzzle', 'Change current session to puzzle');
 	puzzleSelect.onchange = puzzleChanged;
 	puzzleSelect.setDisabled(true);
 
@@ -1044,9 +1038,9 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	this.addPuzzleChangeListener = function(l) {
 		puzzleListeners.push(l);
 	};
-	function firePuzzleChanged() {
+	function firePuzzleChanged(altArrow) {
 		for( var i = 0; i < puzzleListeners.length; i++) {
-			puzzleListeners[i](puzzle);
+			puzzleListeners[i](puzzle, altArrow);
 		}
 	}
 	

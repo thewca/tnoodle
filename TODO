@@ -94,9 +94,14 @@ FEATURES
 	+avoid duplicates as best as possible
 +puzzle icons!
 	-implemented, but now need some decent icons!
+	-gracefully degrade for plugins with no icon
 	+find a place to use the icons...custom <select> with support for icons
 		-ignore puzzles with no icon
 		-similar vein: create a sexy session selector w/ a date picker
+
+-holding down space and then tapping "n" gives odd behavior
+-pgup pgdown should scroll the times table
+-BOLD for "Edit" and "New session"
 
 -saving times
 	-add login
@@ -110,4 +115,3 @@ FEATURES
 -emulate stackmat?
 -gmaps style copy scramble
 -pdf page #
--server side icons
