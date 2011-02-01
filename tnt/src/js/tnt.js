@@ -325,14 +325,14 @@ tnoodle.tnt = {
 				}
 				select.arrow2.removeClass('hovered');
 			}
-			if(mousePos != null && select.containsPoint(mousePos)) {
+			if(mousePos !== null && select.containsPoint(mousePos)) {
 				// Whether we're selecting or not, if the mouse is on top of the
 				// status part of the select, we update the hovered dropdown arrow accordingly
 				select.arrow2.removeClass('hovered');
 				if(select.arrow1) {
 					select.arrow1.removeClass('hovered');
 					var pos = (mousePos.x - select.getPosition().x)/select.getSize().x;
-					if(pos > .5) {
+					if(pos > 0.5) {
 						select.arrow2.addClass('hovered');
 					} else {
 						select.arrow1.addClass('hovered');
