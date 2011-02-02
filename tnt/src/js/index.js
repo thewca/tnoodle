@@ -251,8 +251,7 @@ window.addEvent('domready', function() {
 	var BlockingKeyboard = new Class({
 		Extends: Keyboard,
 		handle: function(event, type) {
-			//console.log(event + " " + type);
-			if(!timer.timing && timer.isFocused()) {
+			if(!timer.timing && timer.isFocused() && !timer.keysDown() && !timer.pendingTime) {
 				this.parent(event, type);
 			}
 		}
@@ -263,6 +262,17 @@ window.addEvent('domready', function() {
 		scrambleSpace += delta;
 		configuration.set('layout.sizerHeight', scrambleSpace);
 		triLayout.resize();
+	}
+	function scrollTable(delta) {
+		var pos;
+		if(delta == Infinity) {
+			pos = timesTable.tbody.scrollHeight;
+		} else if(delta == -Infinity) {
+			pos = 0;
+		} else {
+			pos = timesTable.tbody.scrollTop + delta;
+		}
+		timesTable.tbody.scrollTo(0, pos);
 	}
 
 	var keyboard = new BlockingKeyboard();
@@ -354,6 +364,26 @@ window.addEvent('domready', function() {
 				description: 'Toggle scramble view',
 				'default': 's',
 				handler: scrambleStuff.toggleScrambleView
+			},
+			{
+				description: 'Scroll up times table',
+				'default': 'pageup',
+				handler: scrollTable.bind(null, -100)
+			},
+			{
+				description: 'Scroll down times table',
+				'default': 'pagedown',
+				handler: scrollTable.bind(null, 100)
+			},
+			{
+				description: 'Scroll to top of times table',
+				'default': 'home',
+				handler: scrollTable.bind(null, -Infinity)
+			},
+			{
+				description: 'Scroll to bottom of times table',
+				'default': 'end',
+				handler: scrollTable.bind(null, Infinity)
 			}
 		],
 		'Miscellaneous': [

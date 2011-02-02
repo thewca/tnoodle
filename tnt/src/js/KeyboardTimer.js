@@ -292,11 +292,14 @@ var KeyboardTimer = new Class({
 		
 		this.stopRender();
 	},
+	keysDown: function() {
+		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
+		return !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
+	},
 	redraw: function() {
 		var string = this.stringy();
 		var colorClass = this.inspecting ? 'inspecting' : '';
-		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
-		var keysDown = !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
+		var keysDown = this.keysDown();
 		if(keysDown && this.hasDelayPassed()) {
 			if(!this.inspecting) {
 				// we still want people to see their inspection time when they're pressing spacebar

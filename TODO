@@ -78,6 +78,8 @@ FEATURES
 +sq1 scramble spacing: only pad if it can be done in <= 3 spaces
 +show some details on the currently selected solve?
 	+how about an "import scramble" link?
++holding down space and then tapping "n" gives odd behavior - fixed
++pgup pgdown should scroll the times table
 
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
@@ -99,8 +101,6 @@ FEATURES
 		-ignore puzzles with no icon
 		-similar vein: create a sexy session selector w/ a date picker
 
--holding down space and then tapping "n" gives odd behavior
--pgup pgdown should scroll the times table
 -BOLD for "Edit" and "New session"
 
 -saving times
