@@ -262,6 +262,10 @@ tnoodle.tnt = {
 				img.src = option.icon;
 				el.appendChild(img);
 			}
+			el.setStyle('font-weight', '');
+			if(option.value === null) {
+				el.setStyle('font-weight', 'bold');
+			}
 			el.appendText(option.text);
 		}
 		var selectedIndex = null;
