@@ -77,6 +77,10 @@
 				var reader = new java.io.BufferedReader(new java.io.FileReader(fileName));
 				var line;
 				while((line = reader.readLine()) != null) {
+					// This might be a pretty heavy hammer, but who in the world
+					// would legitimately want to use the string "%%VERSION%%"?
+					// Famous last words?
+					line = line.replaceAll("%%VERSION%%", VERSION);
 					printWriter.println(line);
 				}
 				reader.close();
@@ -208,7 +212,6 @@
 			means we won't have to compile tnt to see the changes reflected
 			on the server. This makes development significantly easier and faster.
 			mklink is used on windows, ln -s is for linux.
-			TODO - test that this actually works on linux/mac!
 		-->
 		<antcall target="symlinkWin" />
 		<antcall target="symlinkUnix" />

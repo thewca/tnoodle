@@ -90,7 +90,7 @@ FEATURES
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
 -add help/about
-	-include version number in tnt client
+	+include version number in tnt client
 	-Add a note about opening multiple instances of tnt
 -keyboard shorcuts!!!
 	+documentation & configuration

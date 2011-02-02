@@ -229,7 +229,7 @@ window.addEvent('domready', function() {
 	timesTable.manager = triLayout;
 	
 	//TODO - yeah...
-	aboutText = '<h2 style="margin: 0;">TNoodle Timer (TNT) vFOOOBAR</h2><br/>' +
+	aboutText = '<h2 style="margin: 0;">TNoodle Timer (TNT) v' + tnoodle.tnt.version + '</h2><br/>' +
 				'Created by Jeremy Fleischman from the ashes of CCT.<br/>' +
 				'Thanks to Leyan Lo for ideas/couch';
 	var aboutPopup = tnoodle.tnt.createPopup();
@@ -472,7 +472,9 @@ window.addEvent('domready', function() {
 	function onHide() {
 		addShortcutListeners();
 	}
+
 	var helpPopup = tnoodle.tnt.createPopup(null, onHide);
+
 	helpPopup.refresh = function() {
 		helpPopup.empty();
 		shortcutsDiv = document.createElement('div');

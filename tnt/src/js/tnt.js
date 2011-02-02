@@ -1,5 +1,6 @@
 var tnoodle = tnoodle || {};
 tnoodle.tnt = {
+	version: '%%VERSION%%',
 	createOptionBox: function(config, optionKey, description, def, changeListener) {
 		var checkbox = new Element('input', { id: optionKey, type: 'checkbox' });
 		checkbox.checked = config.get(optionKey, def);
