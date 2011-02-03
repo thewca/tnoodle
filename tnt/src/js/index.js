@@ -430,7 +430,7 @@ window.addEvent('domready', function() {
 	});
 	function getShortcutKeys(shortcut) {
 		var keys = shortcut.keys;
-		if(keys === null || keys == undefined) {
+		if(keys === null || keys === undefined) {
 			keys = shortcuts['default'] || '';
 		}
 		return keys;

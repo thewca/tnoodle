@@ -272,7 +272,7 @@ tnoodle.server = function(url) {
 			return this.penalty;
 		};
 		this.setComment = function(comment) {
-			this.comment = (comment == null) ? "" : comment;
+			this.comment = (comment === null) ? "" : comment;
 			this.tags = this.comment.match(/#\S+/g) || [];
 			if(this.penalty) {
 				this.tags.push(this.penalty);
@@ -280,7 +280,7 @@ tnoodle.server = function(url) {
 			saveSessions();
 		};
 		this.getComment = function() {
-			return this.comment == null ? "" : this.comment;
+			return this.comment === null ? "" : this.comment;
 		};
 		
 		this.ra5 = this.ra12 = this.ra100 = null;
@@ -648,7 +648,7 @@ tnoodle.server = function(url) {
 				'%t': [ 'Times list', simpleTimes ],
 				'%T': [ 'Times+scrambles list', detailedTimes ],
 				'%a': [ 'Average', average ],
-				'%%': [ '%', '%'],
+				'%%': [ '%', '%']
 			};
 
 			formatStr = formatStr.replace(/%#\S+/g, function(match) {
@@ -657,7 +657,9 @@ tnoodle.server = function(url) {
 			//TODO - switch to replaceall?
 			// this doesn't work quite right... %%T
 			for(var key in this.formatLegend) {
-				formatStr = formatStr.replace(key, this.formatLegend[key][1]);
+				if(this.formatLegend.hasOwnProperty(key)) {
+					formatStr = formatStr.replace(key, this.formatLegend[key][1]);
+				}
 			}
 			return formatStr;
 		};

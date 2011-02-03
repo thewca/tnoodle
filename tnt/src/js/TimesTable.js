@@ -146,7 +146,7 @@ var TimesTable = new Class({
 
 			statsArea.value = table.session.formatTimes(statsPopup.raSize, getFormat());
 			statsArea.focus();
-		};
+		}
 		statsTab.addEvent('click', activateStats);
 
 		var configureTab = document.createElement('li');
@@ -172,7 +172,7 @@ var TimesTable = new Class({
 			statsArea.addEvent('keyup', saveFormat);
 			statsArea.value = getFormat();
 			statsArea.focus();
-		};
+		}
 		configureTab.addEvent('click', activateConfigure);
 		configureTab.appendText('Format');
 		statsTabs.appendChild(statsTab);
@@ -206,8 +206,10 @@ var TimesTable = new Class({
 			ul.setStyle('margin', '0px');
 			legend.adopt(ul);
 			for(var key in table.session.formatLegend) {
-				var desc = table.session.formatLegend[key][0];
-				ul.adopt(new Element('li', {html: "<b>" + key + "</b>: " + desc}));
+				if(table.session.formatLegend.hasOwnProperty(key)) {
+					var desc = table.session.formatLegend[key][0];
+					ul.adopt(new Element('li', {html: "<b>" + key + "</b>: " + desc}));
+				}
 			}
 			legend.appendChild(resetFormatButton);
 			
