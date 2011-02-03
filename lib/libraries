@@ -1,3 +1,5 @@
+***NOTE: To build, you need ant & ant-nodeps***
+
 json_simple-1.1.jar: http://code.google.com/p/json-simple/
 jopt-simple.jar: http://jopt-simple.sourceforge.net/
 iText-5.0.2.jar: http://itextpdf.com/
