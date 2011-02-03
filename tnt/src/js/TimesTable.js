@@ -174,7 +174,7 @@ var TimesTable = new Class({
 			statsArea.focus();
 		};
 		configureTab.addEvent('click', activateConfigure);
-		configureTab.appendText('Configure');
+		configureTab.appendText('Format');
 		statsTabs.appendChild(statsTab);
 		statsTabs.appendChild(configureTab);
 		statsPopup.appendChild(statsTabs);
