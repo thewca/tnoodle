@@ -119,14 +119,76 @@ var TimesTable = new Class({
 		}.bind(this);
 
 		var statsPopup = tnoodle.tnt.createPopup(null, null, 0.7);
+		statsPopup.resize = function() {
+			var size = statsPopup.getSize();
+			var height = size.y - 5*2 - statsTabs.getSize().y;
+			var width = size.x - 2; // 2 for border
+			tabArea.setStyle('width', width);
+			tabArea.setStyle('height', height);
+			height -= legend.getSize().y;
+			statsArea.setStyle('width', width-4);
+			statsArea.setStyle('height', height-4);
+		};
+
+		var statsTabs = document.createElement('ul');
+		statsTabs.addClass('tabs');
+		var statsTab = document.createElement('li');
+		statsTab.appendText('Stats');
+		function activateStats() {
+			statsTab.addClass('active');
+			statsTab.addClass('white');
+			configureTab.removeClass('active');
+			legend.setStyle('display', 'none');
+			statsPopup.resize();
+
+			statsArea.value = table.session.formatTimes(statsPopup.raSize);
+		};
+		statsTab.addEvent('click', activateStats);
+
+		var configureTab = document.createElement('li');
+		function activateConfigure() {
+			statsTab.removeClass('active');
+			configureTab.addClass('active');
+			legend.setStyle('display', '');
+			statsPopup.resize();
+
+			statsArea.value = 'configuring...';
+		};
+		configureTab.addEvent('click', activateConfigure);
+		configureTab.appendText('Configure');
+		statsTabs.appendChild(statsTab);
+		statsTabs.appendChild(configureTab);
+		statsPopup.appendChild(statsTabs);
+
 		var statsArea = document.createElement('textarea');
+		//statsArea.setStyle('margin', '-1px 0px 0px -1px');
+		statsArea.setStyle('border', 'none');
 		statsArea.setAttribute('wrap', 'off');
-		statsArea.style.width = '100%';
-		statsArea.style.height = '100%';
-		statsPopup.appendChild(statsArea);
+
+		var legend = new Element('div');
+		legend.setStyle('border-bottom', '1px solid black');
+		var tabArea = new Element('div');
+		tabArea.setStyle('border', '1px solid black');
+		tabArea.setStyle('margin-top', '3px');
+		statsPopup.appendChild(tabArea);
+		tabArea.appendChild(legend);
+		tabArea.appendChild(statsArea);
+
 		function showStats(raSize) {
+			statsPopup.raSize = raSize;
+			activateStats();
+
+			legend.empty();
+			var ul = new Element('ul');
+			ul.setStyle('padding', '5px');
+			ul.setStyle('margin', '0px');
+			legend.adopt(ul);
+			for(var key in table.session.formatLegend) {
+				var desc = table.session.formatLegend[key][0];
+				ul.adopt(new Element('li', {html: "<b>" + key + "</b>: " + desc}));
+			}
+			
 			statsPopup.show();
-			statsArea.value = table.session.formatTimes(raSize);
 		}
 
 		var oldRASize = null;
@@ -454,7 +516,7 @@ var TimesTable = new Class({
 		commentArea.setStyle('border', '1px solid black');
 		form.setStyle('height', height+2*(margin+padding+1));
 		commentArea.setText = function(text) {
-			if(text === null) {
+			if(text == "") {
 				commentArea.setStyle('color', 'gray');
 				commentArea.value = "Enter comment here";
 			} else {

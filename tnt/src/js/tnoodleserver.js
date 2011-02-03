@@ -263,22 +263,24 @@ tnoodle.server = function(url) {
 			} else {
 				this.centis = this.rawCentis;
 			}
-			saveSessions();
+
+			//This updates our tags array, and will call saveSessions()
+			this.setComment(this.comment);
 		};
 		//always returns one of null, "+2", "DNF"
 		this.getPenalty = function() {
 			return this.penalty;
 		};
 		this.setComment = function(comment) {
-			if(this.comment == comment) {
-				return;
+			this.comment = (comment == null) ? "" : comment;
+			this.tags = this.comment.match(/#\S+/g) || [];
+			if(this.penalty) {
+				this.tags.push(this.penalty);
 			}
-			this.comment = (comment == "") ? null : comment;
-			this.tags = comment.match(/#\S+/g) || [];
 			saveSessions();
 		};
 		this.getComment = function() {
-			return this.comment;
+			return this.comment == null ? "" : this.comment;
 		};
 		
 		this.ra5 = this.ra12 = this.ra100 = null;
@@ -608,9 +610,14 @@ tnoodle.server = function(url) {
 			// NOTE: countingTimes may be null if we try to trim too many solves
 			var countingTimes = trimSolves(lastSolve, raSize);
 			var firstSolve = lastSolve-raSize+1;
+			var tagCounts = {};
 			for(var offset = 0; offset < raSize; offset++) {
 				var i = firstSolve+offset;
 				var time = this.times[i];
+				for(var j = 0; j < time.tags.length; j++) {
+					var tag = time.tags[j].toLowerCase();
+					tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+				}
 				var timeStr = time.format();
 				if(countingTimes && !countingTimes.contains(time)) {
 					timeStr = "(" + timeStr + ")";
@@ -619,18 +626,38 @@ tnoodle.server = function(url) {
 				detailedTimes += (offset+1) + ". " + timeStr + " " + time.scramble + "\n";
 			}
 
+			//TODO - silly little hack to avoid duplicating this structure
+			//maybe there's something better?
+			this.formatLegend = {
+				'%d': [ 'Date', date ],
+				'%n': [ 'Solves', solves ],
+				'%N': [ 'Attempts', attempts ],
+				'%s': [ 'Stdev', stdDev ],
+				'%#TAG': [ '# of solves with #TAG (TAG is case-insensitve and can be +2/dnf)', 42 ],
+				'%b': [ 'Best time', best ],
+				'%w': [ 'Worst time', worst ],
+				'%t': [ 'Times list', simpleTimes ],
+				'%T': [ 'Times+scrambles list', detailedTimes ],
+				'%a': [ 'Average', average ],
+				'%%': [ '%', '%'],
+			};
 			var str = '';
-			str += 'Statistics for ' + date + '\n\n';
-			if(countingTimes) {
-				str += 'Average of ' + attempts + ': ' + average + "\n";
+			str += 'Statistics for %d\n\n';
+			str += 'Average of %n/%N: %a\n';
+			str += 'Standard deviation: %s\n';
+			str += 'Number of DNFs: %#dnf\n';
+			str += 'Best time: %b\n';
+			str += 'Worst time: %w\n\n';
+			str += '%T';
+
+			str = str.replace(/%#\S+/g, function(match) {
+				return tagCounts[match.substring(2).toLowerCase()] || 0;
+			});
+			//TODO - switch to replaceall?
+			// this doesn't work quite right... %%T
+			for(var key in this.formatLegend) {
+				str = str.replace(key, this.formatLegend[key][1]);
 			}
-			//str += 'Cubes solved: ' + solves + "/" + attempts + "\n";
-			//str += 'Standard deviation: ' + stdDev + "\n";
-			//str += 'Number of TAG';
-			str += 'Best time: ' + best + "\n";
-			//str += 'Worst time: ' + worst + "\n";
-			str += '\n';
-			str += detailedTimes;
 			return str;
 		};
 	}

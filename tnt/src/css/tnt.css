@@ -9,6 +9,29 @@
 	opacity: 0.3;
 }
 
+ul.tabs {
+	margin: 5px 0px 0px 0px;
+}
+
+ul.tabs li {
+	background-color: gray;
+	display: inline;
+	border: 1px solid black;
+	padding: 4px;
+}
+ul.tabs li:hover {
+	background-color: black;
+	color: white;
+}
+ul.tabs li.active {
+	background-color: transparent;
+	border-bottom: 1px solid #EEE;
+}
+ul.tabs li.active.white {
+	background-color: white;
+	border-bottom: 1px solid white;
+}
+
 .optionsButton {
 	background-color: #fff;
 	color: #000;

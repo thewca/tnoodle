@@ -132,8 +132,12 @@ tnoodle.tnt = {
 				height = windowHeight*size;
 				this.setStyle('width', width);
 				this.setStyle('height', height);
-				innerDiv.setStyle('width', width-8);
-				innerDiv.setStyle('height', height-8);
+				innerDiv.setStyle('width', width);//-8);
+				innerDiv.setStyle('height', height);//-8);
+				if(innerDiv.resize) {
+					// Oh man, this is just wonderful
+					innerDiv.resize();
+				}
 			} else {
 				innerDiv.setStyle('height', '');
 				innerDiv.setStyle('width', '');
