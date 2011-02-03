@@ -125,7 +125,7 @@ var TimesTable = new Class({
 			var width = size.x - 2; // 2 for border
 			tabArea.setStyle('width', width);
 			tabArea.setStyle('height', height);
-			height -= legend.getSize().y;
+			height -= legend.getSize().y;// + resetFormatButton.getSize().y + 10;
 			statsArea.setStyle('width', width-4);
 			statsArea.setStyle('height', height-4);
 		};
@@ -135,24 +135,43 @@ var TimesTable = new Class({
 		var statsTab = document.createElement('li');
 		statsTab.appendText('Stats');
 		function activateStats() {
+			statsArea.removeEvent('click', saveFormat);
+			statsArea.removeEvent('keydown', saveFormat);
 			statsTab.addClass('active');
 			statsTab.addClass('white');
 			configureTab.removeClass('active');
 			legend.setStyle('display', 'none');
+			resetFormatButton.setStyle('display', 'none');
 			statsPopup.resize();
 
-			statsArea.value = table.session.formatTimes(statsPopup.raSize);
+			statsArea.value = table.session.formatTimes(statsPopup.raSize, getFormat());
+			statsArea.focus();
 		};
 		statsTab.addEvent('click', activateStats);
 
 		var configureTab = document.createElement('li');
+		function getFormat() {
+			return table.configuration.get('times.statsFormat', table.session.defaultFormatStr);
+		}
+		function saveFormat() {
+			table.configuration.set('times.statsFormat', statsArea.value);
+		}
+		function resetFormat() {
+			if(confirm('Are you sure you want to reset the format string?')) {
+				table.configuration.set('times.statsFormat', null);
+				statsArea.value = getFormat();
+			}
+		}
 		function activateConfigure() {
 			statsTab.removeClass('active');
 			configureTab.addClass('active');
 			legend.setStyle('display', '');
+			resetFormatButton.setStyle('display', '');
 			statsPopup.resize();
-
-			statsArea.value = 'configuring...';
+			statsArea.addEvent('click', saveFormat);
+			statsArea.addEvent('keyup', saveFormat);
+			statsArea.value = getFormat();
+			statsArea.focus();
 		};
 		configureTab.addEvent('click', activateConfigure);
 		configureTab.appendText('Configure');
@@ -167,6 +186,10 @@ var TimesTable = new Class({
 
 		var legend = new Element('div');
 		legend.setStyle('border-bottom', '1px solid black');
+		var resetFormatButton = document.createElement('input');
+		resetFormatButton.type = 'button';
+		resetFormatButton.addEvent('click', resetFormat);
+		resetFormatButton.value = "Reset";
 		var tabArea = new Element('div');
 		tabArea.setStyle('border', '1px solid black');
 		tabArea.setStyle('margin-top', '3px');
@@ -176,7 +199,6 @@ var TimesTable = new Class({
 
 		function showStats(raSize) {
 			statsPopup.raSize = raSize;
-			activateStats();
 
 			legend.empty();
 			var ul = new Element('ul');
@@ -187,8 +209,10 @@ var TimesTable = new Class({
 				var desc = table.session.formatLegend[key][0];
 				ul.adopt(new Element('li', {html: "<b>" + key + "</b>: " + desc}));
 			}
+			legend.appendChild(resetFormatButton);
 			
 			statsPopup.show();
+			activateStats();
 		}
 
 		var oldRASize = null;

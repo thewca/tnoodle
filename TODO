@@ -82,6 +82,8 @@ FEATURES
 +pgup pgdown should scroll the times table
 +BOLD for "Edit" and "New session"
 + =) ***** SYSTEM TO CHANGE PUZZLE/EVENT OF CURRENT SESSION *****
++clickable stuff in timestable to get jnet/cct style stats?
+	+customizable =)
 
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
@@ -106,9 +108,6 @@ FEATURES
 -saving times
 	-add login
 	-implement stuff on scratch paper!!!
-
-+clickable stuff in timestable to get jnet/cct style stats?
-	-does it need to be customizable?
 -read times/metronome
 -background image/opacity
 -emulate stackmat?

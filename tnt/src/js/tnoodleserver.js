@@ -55,8 +55,8 @@ tnoodle.server = function(url) {
 		
 		this.set = function(property, value) {
 			if(value === null || value === undefined) {
-				delete data[value];
-				delete cookies[value];
+				delete data[property];
+				delete cookies[property];
 			} else {
 				data[property] = value;
 //				cookies.setItem(property, JSON.stringify(value));
@@ -584,7 +584,16 @@ tnoodle.server = function(url) {
 			// we remove everything after what we just added
 			history.splice(histIndex+1, history.length-1);
 		};
-		this.formatTimes = function(raSize) {
+		var str = '';
+		str += 'Statistics for %d\n\n';
+		str += 'Average of %n/%N: %a\n';
+		str += 'Standard deviation: %s\n';
+		str += 'Number of DNFs: %#dnf\n';
+		str += 'Best time: %b\n';
+		str += 'Worst time: %w\n\n';
+		str += '%T';
+		this.defaultFormatStr = str;
+		this.formatTimes = function(raSize, formatStr) {
 			var ra = (raSize > 0);
 			var lastSolve;
 			if(!ra) {
@@ -641,24 +650,16 @@ tnoodle.server = function(url) {
 				'%a': [ 'Average', average ],
 				'%%': [ '%', '%'],
 			};
-			var str = '';
-			str += 'Statistics for %d\n\n';
-			str += 'Average of %n/%N: %a\n';
-			str += 'Standard deviation: %s\n';
-			str += 'Number of DNFs: %#dnf\n';
-			str += 'Best time: %b\n';
-			str += 'Worst time: %w\n\n';
-			str += '%T';
 
-			str = str.replace(/%#\S+/g, function(match) {
+			formatStr = formatStr.replace(/%#\S+/g, function(match) {
 				return tagCounts[match.substring(2).toLowerCase()] || 0;
 			});
 			//TODO - switch to replaceall?
 			// this doesn't work quite right... %%T
 			for(var key in this.formatLegend) {
-				str = str.replace(key, this.formatLegend[key][1]);
+				formatStr = formatStr.replace(key, this.formatLegend[key][1]);
 			}
-			return str;
+			return formatStr;
 		};
 	}
 	
