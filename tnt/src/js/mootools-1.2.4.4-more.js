@@ -5488,7 +5488,10 @@ provides: [Keyboard]
 			if (event[mod]) keys.push(mod);
 		});
 		
-		if (!regex.test(event.key)) keys.push(event.key);
+		//if (!regex.test(event.key)) keys.push(event.key);
+		//TODO - another mootools bug?
+		if(!keys.contains(event.key))  keys.push(event.key);
+
 		Keyboard.manager.handle(event, event.type + ':' + keys.join('+'));
 	};
 	

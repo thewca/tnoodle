@@ -27,7 +27,7 @@ public class SquareOneScrambler extends ScramblerViewer {
 	private static final int gap = 5;
 	private boolean turnTop = true, turnBottom = true;
 	
-	//TODO this variables aren't thread safe
+	//TODO these variables aren't thread safe
 	private int twistCount; //this will tell us the state of the middle pieces
 	private int[] state, turns;
 	private boolean slashes;

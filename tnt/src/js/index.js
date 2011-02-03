@@ -248,9 +248,28 @@ window.addEvent('domready', function() {
 	// shortcuts only work when we're not timing,
 	// editing a text box, or doing something else
 	// we care about.
+	var editingShortcutField = null;
 	var BlockingKeyboard = new Class({
 		Extends: Keyboard,
 		handle: function(event, type) {
+			if(document.activeElement == editingShortcutField) {
+				var type_keys = type.split(":");
+				if(type_keys[1].contains('tab')) {
+					return;
+				}
+				if(type_keys[1] == "") {
+					return;
+				}
+				if(type_keys[1].contains('backspace')) {
+					type_keys[1] = "";
+				}
+				if(type_keys[0] == "keydown") {
+					editingShortcutField.value = type_keys[1];
+					editingShortcutField.shortcut.keys = type_keys[1];
+					highlightDuplicates();
+				}
+				event.stop();
+			}
 			if(!timer.timing && timer.isFocused() && !timer.keysDown() && !timer.pendingTime) {
 				this.parent(event, type);
 			}
@@ -408,16 +427,19 @@ window.addEvent('domready', function() {
 				handler: sessionSelect.show
 			}
 		]
-		//TODO - / to search
 	});
+	function getShortcutKeys(shortcut) {
+		var keys = shortcut.keys;
+		if(keys === null || keys == undefined) {
+			keys = shortcuts['default'] || '';
+		}
+		return keys;
+	}
 	function getShortcutMap() {
 		var shortcutMap = {};
 		shortcuts.getValues().each(function(category) {
 			category.each(function(shortcut) {
-				var keys = shortcut.keys || shortcut['default'];
-				if(!keys) {
-					keys = '';
-				}
+				var keys = getShortcutKeys(shortcut);
 				var shortArr = shortcutMap[keys];
 				if(!shortArr) {
 					shortArr = [];
@@ -444,10 +466,10 @@ window.addEvent('domready', function() {
 		getShortcutMap().getValues().each(function(shortcuts) {
 			for(var i = 0; i < shortcuts.length; i++) {
 				var shortcut = shortcuts[0];
-				var keys = shortcut.keys || null;
+				var keys = shortcut.keys;
 				configuration.set('shortcuts.' + shortcut.description, keys);
-				keys = keys || shortcut['default'];
-				if(keys && shortcuts.length == 1) {
+				keys = getShortcutKeys(shortcut);
+				if(keys !== '' && shortcuts.length == 1) {
 					// If we have duplicate shortcuts, don't program any of them
 					// Note that we still save all the settings to configuration
 					keyboard.addEvent(keys, shortcut.handler);
@@ -462,7 +484,7 @@ window.addEvent('domready', function() {
 				var shortcut = shortcuts[i];
 				shortcut.editor.setStyle('color', '');
 				shortcut.editor.setStyle('border-color', '');
-				if(duplicates) {
+				if(getShortcutKeys(shortcut) !== '' && duplicates) {
 					shortcut.editor.setStyle('color', 'red');
 					shortcut.editor.setStyle('border-color', 'red');
 				}
@@ -511,7 +533,7 @@ window.addEvent('domready', function() {
 				var textField = document.createElement('input');
 				textField.setStyle('width', 50);
 				textField.type = 'text';
-				textField.value = shortcut.keys || shortcut['default'];
+				textField.value = getShortcutKeys(shortcut);
 				textField.shortcut = shortcut;
 				textField.addEvent('keydown', function(e) {
 					if(e.key == 'esc') {
@@ -521,9 +543,12 @@ window.addEvent('domready', function() {
 					}
 				});
 				//TODO - check for copy paste, does keyup really work?
-				textField.addEvent('keyup', function(e) {
-					this.shortcut.keys = this.value;
-					highlightDuplicates();
+				//textField.addEvent('keyup', function(e) {
+					//this.shortcut.keys = this.value;
+					//highlightDuplicates();
+				//});
+				textField.addEvent('focus', function() {
+					editingShortcutField = this;
 				});
 				//textField.addEvent('change', function() {
 					//this.shortcut.keys = this.value;
@@ -545,7 +570,7 @@ window.addEvent('domready', function() {
 			}
 			shortcuts.getValues().each(function(category) {
 				category.each(function(shortcut) {
-					shortcut.keys = shortcut['default'];
+					shortcut.keys = shortcut['default'] || '';
 				});
 			});
 			helpPopup.refresh();

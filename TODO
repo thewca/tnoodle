@@ -38,6 +38,7 @@ BUGS
 -mootools stuff
 	-bug in mootools-more:~1913
 	-bug in mootools-more: //TODO need this to provide a more stable sorting
+	-bug in mootools-more:~5492
 
 FEATURES
 +added medians
@@ -84,20 +85,16 @@ FEATURES
 + =) ***** SYSTEM TO CHANGE PUZZLE/EVENT OF CURRENT SESSION *****
 +clickable stuff in timestable to get jnet/cct style stats?
 	+customizable =)
++add help/about
+	+include version number in tnt client
++keyboard shorcuts!!!
+	+documentation & configuration
+	+configure by pressing?
+	+avoid duplicates as best as possible
 
--it would be nice if ctrl+c killed ant run on windows in mintty
-	-maybe have child listen to heartbeats from parent? lol...
 -add remaining stackmat options
-	-TODO - test with stackmat!!!
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
--add help/about
-	+include version number in tnt client
-	-Add a note about opening multiple instances of tnt
--keyboard shorcuts!!!
-	+documentation & configuration
-	-configure by pressing?
-	+avoid duplicates as best as possible
 +puzzle icons!
 	-implemented, but now need some decent icons!
 	-gracefully degrade for plugins with no icon
@@ -106,8 +103,12 @@ FEATURES
 		-similar vein: create a sexy session selector w/ a date picker
 
 -saving times
+	-Add a note about opening multiple instances of tnt
 	-add login
 	-implement stuff on scratch paper!!!
+
+-it would be nice if ctrl+c killed ant run on windows in mintty
+	-maybe have child listen to heartbeats from parent? lol...
 -read times/metronome
 -background image/opacity
 -emulate stackmat?
