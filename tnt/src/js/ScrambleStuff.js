@@ -283,14 +283,17 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		var turns = currScramble.split(' ');
 		var incrementalScramble = "";
 		var maxLength = 0;
-		var i, turn;
+		var i, j, turn, newLines;
 		for(i = 0; i < turns.length; i++) {
-			turn = turns[i];
-			maxLength = Math.max(maxLength, turn.length);
+			newLines = turns[i].split("\n");
+			for(j = 0; j < newLines.length; j++) {
+				turn = newLines[j];
+				maxLength = Math.max(maxLength, turn.length);
+			}
 		}
 		for(i = 0; i < turns.length; i++) {
-			var newLines = turns[i].split("\n");
-			for(var j = 0; j < newLines.length; j++) {
+			newLines = turns[i].split("\n");
+			for(j = 0; j < newLines.length; j++) {
 				if(j > 0) {
 					scramblePre.appendChild(document.createElement('br'));
 				}
