@@ -331,12 +331,12 @@ window.addEvent('domready', function() {
 			},
 			{
 				description: 'Undo',
-				'default': 'ctrl+z',
+				'default': 'control+z',
 				handler: timesTable.undo.bind(timesTable)
 			},
 			{
 				description: 'Redo',
-				'default': 'ctrl+y',
+				'default': 'control+y',
 				handler: timesTable.redo.bind(timesTable)
 			}
 		],
@@ -543,7 +543,7 @@ window.addEvent('domready', function() {
 				shortcutDiv.appendChild(label);
 
 				var textField = document.createElement('input');
-				textField.setStyle('width', 50);
+				textField.setStyle('width', 60);
 				textField.type = 'text';
 				textField.value = getShortcutKeys(shortcut);
 				textField.shortcut = shortcut;
