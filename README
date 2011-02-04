@@ -1,0 +1,12 @@
+Tnoodle is really a collection of 4 projects.
+
+jcubeexplorer: A wrapper for Herbert Kociemba's excellent Java implementation of the 2-phase algorithm to save its tables to disk. This shaves the ~10 seconds normally spent starting up down to a fraction of a second. The original source is available here: http://kociemba.org/cube.htm
+
+scrambles: A Java scrambling suite. There is a webserver that serves up scrambles and scramble images. TODO - documentation It uses jcubeexplorer. Java applications can use this project as a library. TODO - documentation for java library
+    net.gnehzr.tnoodle.scrambles.server.ScrambleServer - An http server that can do a number of useful things (see its readme for a more detailed description).
+    net.gnehzr.tnoodle.scrambles.applet.ScrambleApplet - A java applet that can serve scrambles and images (in the form of a data uri) to javascript through LiveConnect.
+    net.gnehzr.tnoodle.scrambles.wca??? - A gui to generate wca competition scrambles? This is all up to Lucas.
+
+stackmat: A Java library that parses a Stackmat plugged into an audio port. TODO - documentation
+
+tnt: A Javascript Rubik's Cube timer that uses tnt-scrambles as a backend.
