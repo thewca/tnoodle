@@ -301,7 +301,7 @@ window.addEvent('domready', function() {
 		'Times': [
 			{
 				description: tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT,
-				'default': 'a+;',
+				'default': 'space',
 				handler: function() {}
 			},
 			{
