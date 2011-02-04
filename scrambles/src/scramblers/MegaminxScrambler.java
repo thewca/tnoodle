@@ -13,11 +13,11 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 //TODO - cleanup this mess! so much vestigal code...
 //TODO - convert to better naming scheme from sims
-public class MegaminxScrambler extends ScramblerViewer {
+public class MegaminxScrambler extends Scrambler {
 	public static synchronized MegaminxScrambler[] createScramblers() {
 		return new MegaminxScrambler[] { new MegaminxScrambler(true) };
 	}

@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
 
-public class PyraminxScrambler extends ScramblerViewer {
+public class PyraminxScrambler extends Scrambler {
 	private static final int pieceSize = 30;
 	private static final int gap = 5;
 	

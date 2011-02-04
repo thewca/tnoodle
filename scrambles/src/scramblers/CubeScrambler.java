@@ -13,14 +13,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 import org.kociemba.twophase.CoordCube;
 import org.kociemba.twophase.Search;
 import org.kociemba.twophase.Tools;
 
 //TODO - massive cleanup! so much vestigial code
-public class CubeScrambler extends ScramblerViewer {
+public class CubeScrambler extends Scrambler {
     private static final int MAX_SCRAMBLE_LENGTH = 25;
     private static final int TIMEOUT = 60; //seconds
     

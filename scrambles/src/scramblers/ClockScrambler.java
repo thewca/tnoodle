@@ -1,7 +1,13 @@
 package scramblers;
 
 import java.util.Random;
+import java.util.HashMap;
+import java.awt.geom.GeneralPath;
+import java.awt.Graphics2D;
+import java.awt.Dimension;
+import java.awt.Color;
 
+import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 public class ClockScrambler extends Scrambler {
@@ -50,4 +56,15 @@ public class ClockScrambler extends Scrambler {
 		
 		return scramble.toString();
 	}
+
+	protected Dimension getPreferredSize() {
+		return new Dimension(0, 0);
+	}
+	public HashMap<String, Color> getDefaultColorScheme() {
+		return new HashMap<String, Color>();
+	}
+	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
+		return new HashMap<String, GeneralPath>();
+	}
+	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {}
 }

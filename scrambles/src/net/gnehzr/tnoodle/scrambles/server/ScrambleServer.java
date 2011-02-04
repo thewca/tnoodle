@@ -50,7 +50,6 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
-import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -280,28 +279,24 @@ public class ScrambleServer {
 			String puzzle = name_extension[0];
 			String extension = name_extension[1];
 			
-			Scrambler gen = scramblers.get(puzzle);
-			if(gen == null) {
-				sendJSONError(t, "Invalid scramble generator: " + puzzle, callback);
-				return;
-			} else if(!(gen instanceof ScramblerViewer)) {
-				sendJSONError(t, "Specified scramble generator: " + puzzle + " does not support image generation.", callback);
+			Scrambler scrambler = scramblers.get(puzzle);
+			if(scrambler == null) {
+				sendJSONError(t, "Invalid scramble scrambler: " + puzzle, callback);
 				return;
 			}
-			ScramblerViewer generator = (ScramblerViewer) gen;
 
-			HashMap<String, Color> colorScheme = generator.parseColorScheme(query.get("scheme"));
+			HashMap<String, Color> colorScheme = scrambler.parseColorScheme(query.get("scheme"));
 			
 			String scramble = query.get("scramble");
-			Dimension dimension = generator.getPreferredSize(toInt(query.get("width"), 0), toInt(query.get("height"), 0));
+			Dimension dimension = scrambler.getPreferredSize(toInt(query.get("width"), 0), toInt(query.get("height"), 0));
 			if(extension.equals("png")) {
 				try {
 					ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 					if(query.containsKey("icon")) {
-						generator.getPuzzleIcon(bytes);
+						scrambler.loadPuzzleIcon(bytes);
 					} else {
 						BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
-						generator.drawScramble(img.createGraphics(), dimension, scramble, colorScheme);
+						scrambler.drawScramble(img.createGraphics(), dimension, scramble, colorScheme);
 						ImageIO.write(img, "png", bytes);
 					}
 
@@ -314,7 +309,7 @@ public class ScrambleServer {
 					sendText(t, throwableToString(e));
 				}
 			} else if(extension.equals("json")) {
-				sendJSON(t, GSON.toJson(generator.getDefaultPuzzleImageInfo().jsonize()), callback);
+				sendJSON(t, GSON.toJson(scrambler.getDefaultPuzzleImageInfo().jsonize()), callback);
 			} else {
 				sendJSONError(t, "Invalid extension: " + extension, callback);
 			}
@@ -349,7 +344,7 @@ public class ScrambleServer {
 			}
 		};
 
-		private ByteArrayOutputStream createPdf(Scrambler generator, String[] scrambles, String title, Integer width, Integer height, String scheme) {
+		private ByteArrayOutputStream createPdf(Scrambler scrambler, String[] scrambles, String title, Integer width, Integer height, String scheme) {
 			if(width == null)
 				width = 200;
 			if(height == null)
@@ -369,20 +364,16 @@ public class ScrambleServer {
 					doc.addTitle(title);
 				
 				docWriter.setBoxSize("art", new Rectangle(36, 54, PageSize.LETTER.getWidth()-36, PageSize.LETTER.getHeight()-54));
-				docWriter.setPageEvent(new HeaderFooter(generator.getLongName(), title));
+				docWriter.setPageEvent(new HeaderFooter(scrambler.getLongName(), title));
 
 				doc.setPageSize(PageSize.LETTER);
 
 				doc.open();
 
-				ScramblerViewer sig = null;
 				Dimension dim = new Dimension(0, 0);
 				HashMap<String, Color> colorScheme = null;
-				if(generator instanceof ScramblerViewer && width > 0 && height > 0) {
-					sig = (ScramblerViewer)generator;
-					dim = sig.getPreferredSize(width, height);
-					colorScheme = sig.parseColorScheme(scheme);
-				}
+				dim = scrambler.getPreferredSize(width, height);
+				colorScheme = scrambler.parseColorScheme(scheme);
 				
 				PdfPTable table = new PdfPTable(3);
 
@@ -407,24 +398,20 @@ public class ScrambleServer {
 					scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
 					table.addCell(scrambleCell);
 					
-					if(sig == null) {
-						table.addCell("Scramble images not implemented for this puzzle");
-					} else {
-						try {
-							PdfContentByte cb = docWriter.getDirectContent();
-							PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-							Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+					try {
+						PdfContentByte cb = docWriter.getDirectContent();
+						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+						Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
 
-							sig.drawScramble(g2, dim, scramble, colorScheme);
-							g2.dispose();
-							PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
-							imgCell.setBackgroundColor(BaseColor.GRAY);
-							imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-							table.addCell(imgCell);
-						} catch (Exception e) {
-							table.addCell("Error drawing scramble: " + e.getMessage());
-							e.printStackTrace();
-						}
+						scrambler.drawScramble(g2, dim, scramble, colorScheme);
+						g2.dispose();
+						PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
+						imgCell.setBackgroundColor(BaseColor.GRAY);
+						imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+						table.addCell(imgCell);
+					} catch (Exception e) {
+						table.addCell("Error drawing scramble: " + e.getMessage());
+						e.printStackTrace();
 					}
 				}
 				maxWidth*=2; //TODO - i have no freaking clue why i need to do this
@@ -482,9 +469,9 @@ public class ScrambleServer {
 					sendText(t, "Invalid number of periods: " + path[1]);
 					return;
 				}
-				Scrambler generator = scramblers.get(puzzle);
-				if(generator == null) {
-					sendText(t, "Invalid scramble generator: " + puzzle);
+				Scrambler scrambler = scramblers.get(puzzle);
+				if(scrambler == null) {
+					sendText(t, "Invalid scramble scrambler: " + puzzle);
 					return;
 				}
 
@@ -493,9 +480,9 @@ public class ScrambleServer {
 				String[] scrambles;
 				if(seed != null) {
 					int offset = Math.min(toInt(query.get("offset"), 0), MAX_COUNT);
-					scrambles = generator.generateSeededScrambles(seed, count, offset);
+					scrambles = scrambler.generateSeededScrambles(seed, count, offset);
 				} else
-					scrambles = generator.generateScrambles(count);
+					scrambles = scrambler.generateScrambles(count);
 
 				if(ext == null || ext.equals("txt")) {
 					StringBuilder sb = new StringBuilder();
@@ -508,7 +495,7 @@ public class ScrambleServer {
 				} else if(ext.equals("json")) {
 					sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
 				} else if(ext.equals("pdf")) {
-					ByteArrayOutputStream pdf = createPdf(generator, scrambles, title, toInt(query.get("width"), null), toInt(query.get("height"), null), query.get("scheme"));
+					ByteArrayOutputStream pdf = createPdf(scrambler, scrambles, title, toInt(query.get("width"), null), toInt(query.get("height"), null), query.get("scheme"));
 					t.getResponseHeaders().set("Content-Disposition", "inline");
 					//TODO - what's the right way to do caching?
 					sendBytes(t, pdf, "application/pdf");

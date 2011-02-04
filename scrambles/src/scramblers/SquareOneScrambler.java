@@ -19,9 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
+import net.gnehzr.tnoodle.scrambles.Scrambler;
 
-public class SquareOneScrambler extends ScramblerViewer {
+public class SquareOneScrambler extends Scrambler {
 	private static final int length = 40;
 	private static final int radius = 32;
 	private static final int gap = 5;

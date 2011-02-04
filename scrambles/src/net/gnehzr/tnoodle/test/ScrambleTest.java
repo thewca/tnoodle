@@ -30,7 +30,6 @@ import javax.swing.SwingUtilities;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
-import net.gnehzr.tnoodle.scrambles.ScramblerViewer;
 
 @SuppressWarnings("serial")
 public class ScrambleTest {
@@ -117,24 +116,20 @@ public class ScrambleTest {
 		requestScramble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Scrambler puzzle = (Scrambler) puzzleBox.getSelectedItem();
-				String scramble = puzzle.generateScramble();
+				Scrambler scrambler = (Scrambler) puzzleBox.getSelectedItem();
+				String scramble = scrambler.generateScramble();
 				scrambleArea.setText(scramble);
-				if(puzzle instanceof ScramblerViewer) {
-					ScramblerViewer sig = (ScramblerViewer) puzzle;
-
-					scrambleImg = new BufferedImage(imageLabel.getWidth(), imageLabel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-					try {
-						sig.drawScramble(scrambleImg.createGraphics(), imageLabel.getSize(), scramble, colorScheme);
-					} catch (InvalidScrambleException e1) {
-						e1.printStackTrace();
-					}
-					faceBoundaries = sig.getDefaultFaceBoundaries();
-					if(colorScheme == null) {
-						colorScheme = sig.getDefaultColorScheme();
-					}
-					imageLabel.repaint();
+				scrambleImg = new BufferedImage(imageLabel.getWidth(), imageLabel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				try {
+					scrambler.drawScramble(scrambleImg.createGraphics(), imageLabel.getSize(), scramble, colorScheme);
+				} catch (InvalidScrambleException e1) {
+					e1.printStackTrace();
 				}
+				faceBoundaries = scrambler.getDefaultFaceBoundaries();
+				if(colorScheme == null) {
+					colorScheme = scrambler.getDefaultColorScheme();
+				}
+				imageLabel.repaint();
 			}
 		});
 		tester.add(sideBySide(puzzleBox, requestScramble), BorderLayout.SOUTH);
