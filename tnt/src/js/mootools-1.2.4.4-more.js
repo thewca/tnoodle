@@ -5495,6 +5495,11 @@ provides: [Keyboard]
 		Keyboard.manager.handle(event, event.type + ':' + keys.join('+'));
 		*/
 		
+		modifiers.each(function(mod){
+			if(event[mod]) {
+				keys[mod] = true;
+			}
+		});
 		if(event.type == 'keyup') {
 			delete keys[event.key];
 		} else if(event.type == 'keydown') {
