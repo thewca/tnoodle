@@ -136,7 +136,7 @@ var TimesTable = new Class({
 		statsTab.appendText('Stats');
 		function activateStats() {
 			statsArea.removeEvent('click', saveFormat);
-			statsArea.removeEvent('keydown', saveFormat);
+			statsArea.removeEvent('keyup', saveFormat);
 			statsTab.addClass('active');
 			statsTab.addClass('white');
 			configureTab.removeClass('active');
@@ -168,9 +168,9 @@ var TimesTable = new Class({
 			legend.setStyle('display', '');
 			resetFormatButton.setStyle('display', '');
 			statsPopup.resize();
+			statsArea.value = getFormat();
 			statsArea.addEvent('click', saveFormat);
 			statsArea.addEvent('keyup', saveFormat);
-			statsArea.value = getFormat();
 			statsArea.focus();
 		}
 		configureTab.addEvent('click', activateConfigure);
@@ -180,8 +180,8 @@ var TimesTable = new Class({
 		statsPopup.appendChild(statsTabs);
 
 		var statsArea = document.createElement('textarea');
-		//statsArea.setStyle('margin', '-1px 0px 0px -1px');
 		statsArea.setStyle('border', 'none');
+		statsArea.setStyle('resize', 'none');
 		statsArea.setAttribute('wrap', 'off');
 
 		var legend = new Element('div');
@@ -202,7 +202,7 @@ var TimesTable = new Class({
 
 			legend.empty();
 			var ul = new Element('ul');
-			ul.setStyle('padding', '5px');
+			ul.setStyle('padding-left', '30px');
 			ul.setStyle('margin', '0px');
 			legend.adopt(ul);
 			for(var key in table.session.formatLegend) {
@@ -540,6 +540,7 @@ var TimesTable = new Class({
 		commentArea.setStyle('margin', margin);
 		commentArea.setStyle('padding', padding);
 		commentArea.setStyle('border', '1px solid black');
+		commentArea.setStyle('resize', 'none');
 		form.setStyle('height', height+2*(margin+padding+1));
 		commentArea.setText = function(text) {
 			if(text == "") {
