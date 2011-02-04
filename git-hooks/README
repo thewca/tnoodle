@@ -1,0 +1,5 @@
+This directory contains scripts that are run when certain git commands are executed.
+Right now, the only git command we're hooking into is "git commit". I've commited code that fails jslint too many times now, and this should prevent it.
+
+For these scripts to actually *do* anything, they must be in the .git/git-hooks directory. I recommend soft linking them there, so you won't have to keep 2 files in sync:
+	ln -s ../../git-hooks/pre-commit pre-commit
