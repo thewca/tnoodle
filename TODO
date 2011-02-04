@@ -91,6 +91,7 @@ FEATURES
 	+documentation & configuration
 	+configure by pressing?
 	+avoid duplicates as best as possible
++emulate stackmat?
 
 -add remaining stackmat options
 -pretty gui for editing
@@ -111,6 +112,5 @@ FEATURES
 	-maybe have child listen to heartbeats from parent? lol...
 -read times/metronome
 -background image/opacity
--emulate stackmat?
 -gmaps style copy scramble
 -pdf page #

@@ -5482,22 +5482,36 @@ provides: [Keyboard]
 		});
 	};
 	
+	var keys = new Hash();
 	var handler = function(event){
+		/*
 		var keys = [];
 		modifiers.each(function(mod){
 			if (event[mod]) keys.push(mod);
 		});
 		
-		//if (!regex.test(event.key)) keys.push(event.key);
-		//TODO - another mootools bug?
-		if(!keys.contains(event.key))  keys.push(event.key);
+		if (!regex.test(event.key)) keys.push(event.key);
 
 		Keyboard.manager.handle(event, event.type + ':' + keys.join('+'));
+		*/
+		
+		if(event.type == 'keyup') {
+			delete keys[event.key];
+		} else if(event.type == 'keydown') {
+			keys[event.key] = true;
+		} else {
+			alert("fooo"); //TODO - proper error handling
+		}
+		Keyboard.manager.handle(event, event.type + ':' + keys.getKeys().join('+'));
 	};
 	
 	document.addEvents({
 		'keyup': handler,
 		'keydown': handler
+	});
+	window.addEvent('blur', function(e) {
+		// This lets us deal with someone holding down a key when they switch tabs
+		keys = new Hash();
 	});
 
 	Event.Keys.extend({

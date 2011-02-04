@@ -62,7 +62,6 @@ var KeyboardTimer = new Class({
 		
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.wcaInspection', 'WCA style inspection', false));
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.onlySpaceStarts', 'Only spacebar starts', true));
 
 
 		var keys = new Hash();
@@ -81,18 +80,28 @@ var KeyboardTimer = new Class({
             timer.stopRender(); // this will cause a redraw()
             timer.fireNewTime();
         }
+		var keysDown = false;
 		window.addEvent('keydown', function(e) {
 			if(!timer.isFocused()) {
 				return;
 			}
-			if(e.key == 'space') {
-				e.stop(); //stop space from scrolling
-			}
+			//if(e.key == 'space') {
+				//e.stop(); //stop space from scrolling
+			//}
 			if(timer.config.get('timer.enableStackmat')) {
 				return;
 			}
-			keys.set(e.code, true);
+			keys.set(e.key, true);
+			keysDown = timer.keysDown();
 			if(timer.timing) {
+				if(timer.startKeys().length > 1 && !keysDown) {
+					// If the user has specified more than one key
+					// to start the timer, then it is likely that they
+					// want to emulate the functionality of a stackmat,
+					// so we only stop the timer if they're holding down
+					// all the keys they specified.
+					return;
+				}
                 stopTimer();
 			} else {
 				timer.redraw();
@@ -102,12 +111,12 @@ var KeyboardTimer = new Class({
 			if(!timer.isFocused() || timer.config.get('timer.enableStackmat')) {
 				return;
 			}
-			keys.erase(e.code);
+			keys.erase(e.key);
 			
-			var onlySpaceStarts = timer.config.get('timer.onlySpaceStarts');
 			if(timer.pendingTime) {
 				timer.pendingTime = (keys.getLength() > 0);
-			} else if((onlySpaceStarts && e.key == 'space') || (!onlySpaceStarts && keys.getLength() === 0)) {
+			} else if(keysDown && !timer.keysDown()) {
+				keysDown = false;
 				if(timer.hasDelayPassed()) {
 					if(timer.config.get('timer.wcaInspection') && !timer.inspecting) {
 						// if inspection's on and we're not inspecting, let's start!
@@ -292,9 +301,12 @@ var KeyboardTimer = new Class({
 		
 		this.stopRender();
 	},
+	startKeys: function() {
+		var startKey = this.config.get("shortcuts."+tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT, 'space');
+		return startKey.split("+");
+    },
 	keysDown: function() {
-		var onlySpaceStarts = this.config.get('timer.onlySpaceStarts');
-		return !this.pendingTime && (onlySpaceStarts && this.keys.get(32)) || (!onlySpaceStarts && this.keys.getLength() > 0);
+		return !this.pendingTime && this.keys.getKeys().containsAll(this.startKeys());
 	},
 	redraw: function() {
 		var string = this.stringy();

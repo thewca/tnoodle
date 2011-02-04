@@ -252,6 +252,7 @@ window.addEvent('domready', function() {
 	var BlockingKeyboard = new Class({
 		Extends: Keyboard,
 		handle: function(event, type) {
+			//console.log(type);
 			if(document.activeElement == editingShortcutField) {
 				var type_keys = type.split(":");
 				if(type_keys[1].contains('tab')) {
@@ -295,8 +296,14 @@ window.addEvent('domready', function() {
 	}
 
 	var keyboard = new BlockingKeyboard();
+	tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT = 'Start timer (try "a+;")';
 	var shortcuts = new Hash({
 		'Times': [
+			{
+				description: tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT,
+				'default': 'a+;',
+				handler: function() {}
+			},
 			{
 				description: 'Comment on last solve',
 				'default': 'c',
@@ -347,7 +354,11 @@ window.addEvent('domready', function() {
 			{
 				description: 'New session',
 				'default': 'n',
-				handler: newSession
+				handler: function() {
+					if(confirm("Are you sure you wish to create a new session?")) {
+						newSession();
+					}
+				}
 			},
 			{
 				description: 'Comment on session',
@@ -431,7 +442,7 @@ window.addEvent('domready', function() {
 	function getShortcutKeys(shortcut) {
 		var keys = shortcut.keys;
 		if(keys === null || keys === undefined) {
-			keys = shortcuts['default'] || '';
+			keys = shortcut['default'] || '';
 		}
 		return keys;
 	}
@@ -478,6 +489,7 @@ window.addEvent('domready', function() {
 		});
 	}
 	function highlightDuplicates() {
+		//TODO - do something more clever to detect n & n+m
 		getShortcutMap().getValues().each(function(shortcuts) {
 			var duplicates = shortcuts.length > 1;
 			for(var i = 0; i < shortcuts.length; i++) {
