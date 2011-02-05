@@ -1114,7 +1114,7 @@ var TimesTable = new Class({
 		}
 
 		preferredWidth += SCROLLBAR_WIDTH; //this accounts for the vert scrollbar
-		var MIN_WIDTH = 350;
+		var MIN_WIDTH = 0;
 		if(preferredWidth < MIN_WIDTH) {
 			var extra = (MIN_WIDTH-preferredWidth)/visibleColCount;
 			preferredWidth = MIN_WIDTH;

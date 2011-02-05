@@ -95,7 +95,6 @@ span.select {
 
 .select .option {
 	white-space: nowrap;
-	height: 19px; /* what a magic number */
 }
 
 .select .option.hovered {

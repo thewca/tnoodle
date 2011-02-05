@@ -263,6 +263,8 @@ tnoodle.tnt = {
 			if(option.icon) {
 				var img = document.createElement('img');
 				img.setStyle('vertical-align', 'middle');
+				img.setStyle('width', '32px');
+				img.setStyle('height', '32px');
 				img.setStyle('padding', '0px 2px 2px 0px');
 				img.src = option.icon;
 				el.appendChild(img);
@@ -272,6 +274,10 @@ tnoodle.tnt = {
 				el.setStyle('font-weight', 'bold');
 			}
 			el.appendText(option.text);
+			if(option.text == "" && !option.icon) {
+				// Nasty little hack to deal with empty options
+				el.setStyle('height', '19px');
+			}
 		}
 		var selectedIndex = null;
 		function showItem(index) {

@@ -306,15 +306,16 @@ public abstract class Scrambler {
 	 * TODO - comment
 	 */
 	protected void drawPuzzleIcon(Graphics2D g, Dimension size) {
-		try {
-			drawScramble(g, size, "", null);
-		} catch(InvalidScrambleException e) {
-			e.printStackTrace();
-		}
+		//try {
+			//drawScramble(g, size, "", null);
+		//} catch(InvalidScrambleException e) {
+			//e.printStackTrace();
+		//}
 	}
 
 	/**
 	 * TODO - comment
+	 * We should probably assert that the icons are of a particular size.
 	 */
 	public final void loadPuzzleIcon(ByteArrayOutputStream bytes) {
 		InputStream in;
@@ -331,7 +332,7 @@ public abstract class Scrambler {
 				return;
 			}
 		} else {
-			Dimension dim = new Dimension(16, 16);
+			Dimension dim = new Dimension(32, 32);
 			BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
 			drawPuzzleIcon((Graphics2D) img.getGraphics(), dim);
 			try {
