@@ -24,7 +24,7 @@ var KeyboardTimer = new Class({
 		function shownCallback() { }
 		function hiddenCallback() { }
 		function canHide() {
-			return document.activeElement != updateFrequency;
+			return document.activeElement != updateFrequency && document.activeElement != inspectionSeconds;
 		}
 		var options = tnoodle.tnt.createOptions(shownCallback, hiddenCallback, canHide);
 		var optionsDiv = options.div;
@@ -70,7 +70,12 @@ var KeyboardTimer = new Class({
 			this.INSPECTION = str.toInt(10);
 			server.configuration.set('timer.inspectionSeconds', this.INSPECTION);
 		}.bind(this);
-		var inspectionSeconds = new Element('input', {type: 'number', 'name': 'timer.inspectionSeconds', size: 2, min: 0});
+		var inspectionSeconds = document.createElement('input');
+        inspectionSeconds.setAttribute('type', 'number');
+        inspectionSeconds.setProperties({'type': 'number', 'name': 'timer.inspectionSeconds', 'min': "0"});
+        inspectionSeconds.setStyle('width', 52);
+        inspectionSeconds.setStyle('margin-left', 2);
+        //TODO - for some crazy reason, chrome is not displaying the spinners
 		inspectionDiv.adopt(inspectionSeconds);
 		inspectionDiv.adopt(new Element('label', { 'for': 'timer.inspectionSeconds', html: 'second WCA inspection' }));
 		inspectionSeconds.addEvent('change', inspectionChanged);
