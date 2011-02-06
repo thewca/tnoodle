@@ -92,18 +92,16 @@ FEATURES
 	+configure by pressing?
 	+avoid duplicates as best as possible
 +emulate stackmat?
++holding down spacebar while focusing comment area is bad
 
 -holding down spacebar w/ defocusing tnt will result in the timer starting upon refocusing
--holding down spacebar while focusing comment area is bad
 
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
 +puzzle icons!
-	-implemented, but now need some decent icons!
 	+gracefully degrade for plugins with no icon
 	+find a place to use the icons...custom <select> with support for icons
-		-ignore puzzles with no icon
 		-similar vein: create a sexy session selector w/ a date picker
 
 -saving times

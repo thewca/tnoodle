@@ -82,8 +82,20 @@ var KeyboardTimer = new Class({
         }
 		var keysDown = false;
 		window.addEvent('keydown', function(e) {
+			keys.set(e.key, true);
 			if(!timer.isFocused()) {
 				return;
+			}
+			if(e.key == 'tab') {
+				// This is a fun little hack:
+				//   Pressing tab could cause the timer to lose focus,
+				//   but even if it does, at this point in time
+				//   timer.isFocused() will still return true.
+				//   We must return to the dispatch thread and *then* call
+				//   redraw, which will clear the keysDown css of our timer display.
+				setTimeout(function() {
+					timer.redraw();
+				}, 0);
 			}
 			//if(e.key == 'space') {
 				//e.stop(); //stop space from scrolling
@@ -91,7 +103,6 @@ var KeyboardTimer = new Class({
 			if(timer.config.get('timer.enableStackmat')) {
 				return;
 			}
-			keys.set(e.key, true);
 			keysDown = timer.keysDown();
 			if(timer.timing) {
 				if(timer.startKeys().length > 1 && !keysDown) {
@@ -108,10 +119,13 @@ var KeyboardTimer = new Class({
 			}
 		});
 		window.addEvent('keyup', function(e) {
+			keys.erase(e.key);
 			if(!timer.isFocused() || timer.config.get('timer.enableStackmat')) {
+				// A key may have been released which was 
+				// being held down when the timer lost focus
+				timer.redraw();
 				return;
 			}
-			keys.erase(e.key);
 			
 			if(timer.pendingTime) {
 				timer.pendingTime = (keys.getLength() > 0);
@@ -155,6 +169,7 @@ var KeyboardTimer = new Class({
 		});
 		function resetKeys() {
 			keys.empty();
+			keysDown = false;
 			timer.pendingTime = false;
 			timer.redraw();
 		}
@@ -312,7 +327,7 @@ var KeyboardTimer = new Class({
 		var string = this.stringy();
 		var colorClass = this.inspecting ? 'inspecting' : '';
 		var keysDown = this.keysDown();
-		if(keysDown && this.hasDelayPassed()) {
+		if(this.isFocused() && keysDown && this.hasDelayPassed()) {
 			if(!this.inspecting) {
 				// we still want people to see their inspection time when they're pressing spacebar
 				string = this.server.formatTime(0, this.decimalPlaces);
