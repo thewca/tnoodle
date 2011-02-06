@@ -104,6 +104,11 @@ tnoodle.tnt = {
 		return this.grayOut_ !== null && this.grayOut_.getStyle('display') != 'none';
 	},
 	createPopup: function(onShow, onHide, size, noGrayBg) {
+        // The gray out must be created *before* any popups, else
+        // they'll get hidden behind the gray out. This isn't the best solution,
+        // but it is the easiest for now.
+        tnoodle.tnt.grayOut(false);
+
 		var popup = document.createElement('div');
 		popup.className = 'popup';
 		document.body.appendChild(popup);
@@ -118,10 +123,12 @@ tnoodle.tnt = {
 				tnoodle.tnt.grayOut(true);
 			}
 			this.style.display = 'inline';
-			this.center();
 			if(onShow) {
 				onShow();
 			}
+            // Calling onShow() may cause a resize, so we don't
+            // center until after
+			this.center();
 		}.bind(popup);
 		popup.center = function() {
 			var windowWidth = window.innerWidth || window.clientWidth;
