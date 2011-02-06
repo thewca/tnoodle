@@ -3,7 +3,7 @@ var KeyboardTimer = new Class({
 	decimalPlaces: 2,
 	frequency: 0.01,
 	CHAR_AR: 1/2, 
-	INSPECTION: 15,
+	INSPECTION: 0,
 	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
@@ -64,7 +64,7 @@ var KeyboardTimer = new Class({
 		var inspectionChanged = function(e) {
 			var str = inspectionSeconds.value;
 			if(!str.match(/^\d+$/)) {
-				str = '15'; //TODO so sleepy...
+				str = '0'; //TODO so sleepy...
 				inspectionSeconds.value = str;
 			}
 			this.INSPECTION = str.toInt(10);

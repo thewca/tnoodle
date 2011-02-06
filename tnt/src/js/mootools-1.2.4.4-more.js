@@ -5507,6 +5507,9 @@ provides: [Keyboard]
 		} else {
 			alert("fooo"); //TODO - proper error handling
 		}
+        if(event.key == 'esc') {
+            keys.empty();
+        }
 		Keyboard.manager.handle(event, event.type + ':' + keys.getKeys().join('+'));
 	};
 	
@@ -5516,7 +5519,10 @@ provides: [Keyboard]
 	});
 	window.addEvent('blur', function(e) {
 		// This lets us deal with someone holding down a key when they switch tabs
-		keys = new Hash();
+        keys.empty();
+	});
+	window.addEvent('click', function(e) {
+        keys.empty();
 	});
 
 	Event.Keys.extend({

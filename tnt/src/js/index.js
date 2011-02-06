@@ -290,15 +290,20 @@ window.addEvent('domready', function() {
 				if(type_keys[1] == "") {
 					return;
 				}
+				event.stop();
 				if(type_keys[1].contains('backspace')) {
 					type_keys[1] = "";
 				}
 				if(type_keys[0] == "keydown") {
-					editingShortcutField.value = type_keys[1];
+                    setTimeout(function() {
+                        // For some reason, calling event.stop() isn't
+                        // enough to stpo opera from adding the key to the textfield
+                        // This little hack seems to work, however
+                        editingShortcutField.value = type_keys[1];
+                    }, 0);
 					editingShortcutField.shortcut.keys = type_keys[1];
 					highlightDuplicates();
 				}
-				event.stop();
 			}
 			if(!timer.timing && timer.isFocused() && !timer.keysDown() && !timer.pendingTime) {
 				this.parent(event, type);
@@ -334,7 +339,7 @@ window.addEvent('domready', function() {
 			{
 				description: tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT,
 				'default': 'space',
-				handler: function() {}
+				handler: null
 			},
 			{
 				description: 'Comment on last solve',
@@ -344,7 +349,7 @@ window.addEvent('domready', function() {
 			{
 				description: 'Add time',
 				'default': 'alt+a',
-				handler: function(e) { e.stop(); timesTable.promptTime(); }
+				handler: timesTable.promptTime.bind(timesTable)
 			},
 			{
 				description: 'No penalty',
@@ -399,10 +404,7 @@ window.addEvent('domready', function() {
 			{
 				description: 'Comment on session',
 				'default': 'shift+c',
-				handler: function(e) {
-					e.stop(); // Must stop the event, else a 'C' will show up in the box
-					$('sessionComment').focus();
-				}
+				handler: $('sessionComment').focus.bind($('sessionComment'))
 			}
 		],
 		'Gui stuff': [
@@ -505,6 +507,14 @@ window.addEvent('domready', function() {
 		});
 	});
 
+
+    function keyStopper(func) {
+        return function(e) {
+            e.stop();
+            setTimeout(func, 0);
+            //func(e);
+        };
+    }
 	// NOTE: We don't need to explicitly call this function in
 	//       order to initialize stuff, because the onHide() method
 	//       calls it, and onHide() is called by createPopup().
@@ -516,10 +526,10 @@ window.addEvent('domready', function() {
 				var keys = shortcut.keys;
 				configuration.set('shortcuts.' + shortcut.description, keys);
 				keys = getShortcutKeys(shortcut);
-				if(keys !== '' && shortcuts.length == 1) {
+				if(keys !== '' && shortcuts.length == 1 && shortcut.handler) {
 					// If we have duplicate shortcuts, don't program any of them
 					// Note that we still save all the settings to configuration
-					keyboard.addEvent(keys, shortcut.handler);
+					keyboard.addEvent(keys, keyStopper(shortcut.handler));
 				}
 			}
 		});
@@ -547,7 +557,7 @@ window.addEvent('domready', function() {
 
 	helpPopup.refresh = function() {
 		helpPopup.empty();
-		shortcutsDiv = document.createElement('div');
+		var shortcutsDiv = document.createElement('div');
 		shortcutsDiv.setStyle("overflow", 'auto');
 		helpPopup.overflow = function() {
 			var size = helpPopup.getParent().getSize();
