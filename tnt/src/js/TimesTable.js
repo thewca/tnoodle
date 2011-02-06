@@ -1,4 +1,4 @@
-var SCROLLBAR_WIDTH = 13;
+var SCROLLBAR_WIDTH = 16;
 var TimesTable = new Class({
 	Extends: HtmlTable,
 	cols: null,
@@ -321,7 +321,7 @@ var TimesTable = new Class({
 			borderRight: 'none',
 			borderBottom: '1px'
 		});
-		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH+3);
+		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH);
 		
 		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100', 'sessionAve' ];
 		var initing = true;
