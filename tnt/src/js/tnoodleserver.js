@@ -68,7 +68,8 @@ tnoodle.server = function(url) {
 		};
 		this.get = function(property, def) {
 			if(!(property in data)) {
-				this.set(property, def);
+				this.set(property, def); // This is pretty silly
+				return def;
 			}
 			return data[property];
 		};

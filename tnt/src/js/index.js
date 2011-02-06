@@ -268,6 +268,49 @@ window.addEvent('domready', function() {
 		aboutPopup.show();
 	});
 
+	var bgImg = $$('.background')[0];
+	var bgImgSize = null;
+	function setBgUrl(url) {
+		if(url === undefined || url === null) {
+			url = "";
+		}
+		configuration.set('gui.backgroundImage', url);
+		if(url == "") {
+			bgImg.setStyle('display', 'none');
+			window.removeEvent('resize', resizeBgImg);
+		} else {
+			bgImgSize = null;
+			bgImg.src = url;
+			bgImg.setStyle('display', 'inline');
+			bgImg.setStyle('width', '');
+			bgImg.setStyle('height', '');
+			bgImg.addEvent('load', function() {
+				bgImgSize = bgImg.getSize();
+				resizeBgImg();
+			});
+			window.addEvent('resize', resizeBgImg);
+		}
+	}
+	function resizeBgImg() {
+		if(bgImgSize === null) {
+			// image hasn't loaded yet, so there's nothing we can do
+			return;
+		}
+		var available = document.body.getSize();
+		var height = available.y;
+		var width = Math.max(available.x, available.y * (bgImgSize.x/bgImgSize.y));
+		height = width * bgImgSize.y/bgImgSize.x;
+		bgImg.setStyle('width', width);
+		bgImg.setStyle('height', height);
+
+		bgImg.setStyle('left', (available.x - width) / 2);
+		bgImg.setStyle('top', (available.y - height) / 2);
+	}
+	$('bgLink').addEvent('click', function() {
+		setBgUrl(prompt("Url?"));
+	});
+	setBgUrl(configuration.get('gui.backgroundImage', ''));
+	
 	$('helpLink').doClick = function() {
 		helpPopup.refresh();
 		helpPopup.show();
@@ -282,7 +325,6 @@ window.addEvent('domready', function() {
 	var BlockingKeyboard = new Class({
 		Extends: Keyboard,
 		handle: function(event, type) {
-			//console.log(type);
 			if(document.activeElement == editingShortcutField) {
 				var type_keys = type.split(":");
 				if(type_keys[1].contains('tab')) {

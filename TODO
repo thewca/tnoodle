@@ -102,6 +102,8 @@ FEATURES
 	+gracefully degrade for plugins with no icon
 	+find a place to use the icons...custom <select> with support for icons
 		-similar vein: create a sexy session selector w/ a date picker
+-confugrable length wca style inspection? apparently some people use this
+-shortcuts menu on gerty doesn't work
 
 -saving times
 	-Add a note about opening multiple instances of tnt
