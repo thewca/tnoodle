@@ -1,8 +1,6 @@
 //generated from http://ajaxload.info/
 var WAITING_ICON_HEIGHT = 11;
 var WAITING_ICON = 'media/ajax-loader.gif';
-var IMPORT_ICON = 'media/control_eject.png';
-var NEXT_ICON = 'media/control_end.png';
 
 // LOADING_IMAGE = WAITING_ICON;
 // from http://en.wikipedia.org/wiki/Data_URI_scheme
@@ -713,18 +711,17 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleHeader.className = 'scrambleHeader';
 	scrambleArea.appendChild(scrambleHeader);
 
-	var importLink = document.createElement('img');
-	importLink.className = 'imglink';
-        importLink.src = IMPORT_ICON;
-	importLink.title = 'Import scrambles';
+	var importLink = document.createElement('span');
+	importLink.className = 'link';
+	importLink.appendText('Import');
 	xAddListener(importLink, 'click', importDiv.show, false);
 	scrambleHeader.appendChild(importLink);
 	scrambleHeader.appendChild(document.createTextNode(' '));
 
-	var newScrambleLink = document.createElement('img');
-        newScrambleLink.src = NEXT_ICON;
+	var newScrambleLink = document.createElement('span');
+	newScrambleLink.className = 'link';
 	newScrambleLink.title = "Get a new scramble (Note: Clears any imported scrambles!)";
-	newScrambleLink.className = 'imglink';
+	newScrambleLink.appendText('New scramble');
 	xAddListener(newScrambleLink, 'click', function() {
 		if(!importedScrambles || confirm('This will clear any imported scrambles, are you sure you want to continue?')) {
 			importedScrambles = null;
