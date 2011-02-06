@@ -94,6 +94,7 @@ FEATURES
 +emulate stackmat?
 +holding down spacebar while focusing comment area is bad
 +holding down spacebar w/ defocusing tnt will result in the timer starting upon refocusing
++shortcuts menu on gerty doesn't work
 
 -add remaining stackmat options
 -pretty gui for editing
@@ -103,7 +104,6 @@ FEATURES
 	+find a place to use the icons...custom <select> with support for icons
 		-similar vein: create a sexy session selector w/ a date picker
 -confugrable length wca style inspection? apparently some people use this
--shortcuts menu on gerty doesn't work
 
 -saving times
 	-Add a note about opening multiple instances of tnt
