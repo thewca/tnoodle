@@ -313,15 +313,18 @@ window.addEvent('domready', function() {
 		triLayout.resize();
 	}
 	function scrollTable(delta) {
-		var pos;
-		if(delta == Infinity) {
-			pos = timesTable.tbody.scrollHeight;
-		} else if(delta == -Infinity) {
-			pos = 0;
-		} else {
-			pos = timesTable.tbody.scrollTop + delta;
-		}
-		timesTable.tbody.scrollTo(0, pos);
+		return function(e) {
+			e.stop();
+			var pos;
+			if(delta == Infinity) {
+				pos = timesTable.tbody.scrollHeight;
+			} else if(delta == -Infinity) {
+				pos = 0;
+			} else {
+				pos = timesTable.tbody.scrollTop + delta;
+			}
+			timesTable.tbody.scrollTo(0, pos);
+		};
 	}
 
 	var keyboard = new BlockingKeyboard();
@@ -398,7 +401,7 @@ window.addEvent('domready', function() {
 				'default': 'shift+c',
 				handler: function(e) {
 					e.stop(); // Must stop the event, else a 'C' will show up in the box
-					sessionComment.focus();
+					$('sessionComment').focus();
 				}
 			}
 		],
@@ -431,22 +434,22 @@ window.addEvent('domready', function() {
 			{
 				description: 'Scroll up times table',
 				'default': 'pageup',
-				handler: scrollTable.bind(null, -100)
+				handler: scrollTable(-100)
 			},
 			{
 				description: 'Scroll down times table',
 				'default': 'pagedown',
-				handler: scrollTable.bind(null, 100)
+				handler: scrollTable(100)
 			},
 			{
 				description: 'Scroll to top of times table',
 				'default': 'home',
-				handler: scrollTable.bind(null, -Infinity)
+				handler: scrollTable(-Infinity)
 			},
 			{
 				description: 'Scroll to bottom of times table',
 				'default': 'end',
-				handler: scrollTable.bind(null, Infinity)
+				handler: scrollTable(Infinity)
 			}
 		],
 		'Miscellaneous': [

@@ -97,9 +97,10 @@ var KeyboardTimer = new Class({
 					timer.redraw();
 				}, 0);
 			}
-			//if(e.key == 'space') {
-				//e.stop(); //stop space from scrolling
-			//}
+			if(e.key == 'space') {
+				// This is needed to stop space from scrolling on ff
+				e.stop();
+			}
 			if(timer.config.get('timer.enableStackmat')) {
 				return;
 			}
