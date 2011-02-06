@@ -636,8 +636,7 @@ tnoodle.server = function(url) {
 				detailedTimes += (offset+1) + ". " + timeStr + " " + time.scramble + "\n";
 			}
 
-			//TODO - silly little hack to avoid duplicating this structure
-			//maybe there's something better?
+			// TODO - this thing is duplicated, GAH!!! find something better
 			this.formatLegend = {
 				'%d': [ 'Date', date ],
 				'%n': [ 'Solves', solves ],
@@ -664,6 +663,19 @@ tnoodle.server = function(url) {
 			}
 			return formatStr;
 		};
+        this.formatLegend = {
+            '%d': [ 'Date' ],
+            '%n': [ 'Solves' ],
+            '%N': [ 'Attempts' ],
+            '%s': [ 'Stdev' ],
+            '%#TAG': [ '# of solves with #TAG (TAG is case-insensitve and can be +2/dnf)' ],
+            '%b': [ 'Best time' ],
+            '%w': [ 'Worst time' ],
+            '%t': [ 'Times list' ],
+            '%T': [ 'Times+scrambles list' ],
+            '%a': [ 'Average' ],
+            '%%': [ '%', '%']
+        };
 	}
 	
 	this.createSession = function(puzzle, event) {
