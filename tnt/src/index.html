@@ -59,13 +59,15 @@ var blah = document.getElementById;
 </div>
 <div id="times">
 	<div id="timesArea">
-		<div id="puzzleChooser"></div>
+		<div id="puzzleChooser">
+			<img id="newSession" src="media/page_add.png" class="imglink" title="New session" />
+			<img id="resetSession" src="media/page_refresh.png" class="imglink" title="Reset session" />
+			<img id="deleteSession" src="media/page_delete.png" class="imglink" title="Delete session" />
+			<a id="downloadCSV" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!"><img class="imglink" src="media/csv_icon_sm.gif" /></a>
+		</div>
 		<div id="sessionInfoBar">
 			<span id="sessionInfo"></span>
 				<input id="sessionComment" type="text" />
-            	<img id="resetSession" src="media/page_refresh.png" class="imglink" title="Reset session" />
-                <img id="deleteSession" src="media/page_delete.png" class="imglink" title="Delete session" />
-                <a id="downloadCSV" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!"><img class="imglink" src="media/csv_icon_sm.gif" /></a>
 		</div>
 		<table id="timesTable"></table>
 	</div>

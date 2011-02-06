@@ -181,9 +181,7 @@ window.addEvent('domready', function() {
 		this.href = uri;
 	}
 	function resetSession() {
-		if(confirm("Are you sure you want to reset the session?")) {
-			timesTable.reset();
-		}
+		timesTable.reset();
 	}
 	function deleteSession() {
 		if(confirm("Are you sure you want to delete the session?")) {
@@ -210,6 +208,7 @@ window.addEvent('domready', function() {
 		timer.redraw();
 	});
 	
+	$('newSession').addEvent('click', newSession);
 	$('resetSession').addEvent('click', resetSession);
 	$('deleteSession').addEvent('click', deleteSession);
 	$('downloadCSV').addEvent('click', downloadCSV);
@@ -228,7 +227,7 @@ window.addEvent('domready', function() {
 		var available = $('times').getSize();
 		var remainingHeight = available.y - $('timesArea').getStyle('border-top').toInt() - $('timesArea').getStyle('border-bottom').toInt();
 		$('timesArea').setStyle('height', remainingHeight);
-		var seshCommentWidth = available.x - 20 - $('resetSession').getSize().y - $('deleteSession').getSize().y - $('downloadCSV').getSize().y - 20;
+		var seshCommentWidth = available.x - 30;
 		$('sessionComment').setStyle('width', Math.max(50, seshCommentWidth));
 
 		var selects = [ scrambleStuff.puzzleSelect, eventSelect, sessionSelect ];
@@ -373,7 +372,11 @@ window.addEvent('domready', function() {
 			{
 				description: 'Reset session',
 				'default': 'r',
-				handler: resetSession
+				handler: function() {
+					if(confirm("Are you sure you want to reset the session?")) {
+						resetSession();
+					}
+				}
 			},
 			{
 				description: 'Delete session',

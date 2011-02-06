@@ -94,14 +94,14 @@ FEATURES
 +emulate stackmat?
 +holding down spacebar while focusing comment area is bad
 +holding down spacebar w/ defocusing tnt will result in the timer starting upon refocusing
++puzzle icons!
+	+gracefully degrade for plugins with no icon
+	+find a place to use the icons...custom <select> with support for icons
++add a "new session" icon
 
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
-+puzzle icons!
-	+gracefully degrade for plugins with no icon
-	+find a place to use the icons...custom <select> with support for icons
-		-similar vein: create a sexy session selector w/ a date picker
 -confugrable length wca style inspection? apparently some people use this
 -shortcuts menu on gerty doesn't work
 
