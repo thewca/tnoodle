@@ -93,8 +93,7 @@ FEATURES
 	+avoid duplicates as best as possible
 +emulate stackmat?
 +holding down spacebar while focusing comment area is bad
-
--holding down spacebar w/ defocusing tnt will result in the timer starting upon refocusing
++holding down spacebar w/ defocusing tnt will result in the timer starting upon refocusing
 
 -add remaining stackmat options
 -pretty gui for editing
