@@ -60,8 +60,25 @@ var KeyboardTimer = new Class({
 		frequencyDiv.adopt(new Element('label', { 'for': 'timer.frequency', html: 'Update frequency (seconds)' }));
 		optionsDiv.adopt(frequencyDiv);
 		
+		var inspectionDiv = new Element('div');
+		var inspectionChanged = function(e) {
+			var str = inspectionSeconds.value;
+			if(!str.match(/^\d+$/)) {
+				str = '15'; //TODO so sleepy...
+				inspectionSeconds.value = str;
+			}
+			this.INSPECTION = str.toInt(10);
+			server.configuration.set('timer.inspectionSeconds', this.INSPECTION);
+		}.bind(this);
+		var inspectionSeconds = new Element('input', {type: 'number', 'name': 'timer.inspectionSeconds', size: 2, min: 0});
+		inspectionDiv.adopt(inspectionSeconds);
+		inspectionDiv.adopt(new Element('label', { 'for': 'timer.inspectionSeconds', html: 'second WCA inspection' }));
+		inspectionSeconds.addEvent('change', inspectionChanged);
+		optionsDiv.adopt(inspectionDiv);
+		inspectionSeconds.value = "" + this.config.get('timer.inspectionSeconds', '');
+		inspectionChanged();
+
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
-		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.wcaInspection', 'WCA style inspection', false));
 
 
 		var keys = new Hash();
@@ -133,7 +150,7 @@ var KeyboardTimer = new Class({
 			} else if(keysDown && !timer.keysDown()) {
 				keysDown = false;
 				if(timer.hasDelayPassed()) {
-					if(timer.config.get('timer.wcaInspection') && !timer.inspecting) {
+					if(timer.INSPECTION > 0 && !timer.inspecting) {
 						// if inspection's on and we're not inspecting, let's start!
 						timer.inspectionStart = new Date().getTime();
 						timer.inspecting = true;
@@ -263,7 +280,7 @@ var KeyboardTimer = new Class({
 		return ((time - this.inspectionStart)/1000).toInt();
 	},
 	getPenalty: function() {
-		if(!this.config.get('timer.wcaInspection')) {
+		if(this.INSPECTION === 0) {
 			return null;
 		}
 		var secondsLeft = this.INSPECTION-this.getInspectionElapsedSeconds();

@@ -99,11 +99,11 @@ FEATURES
 	+find a place to use the icons...custom <select> with support for icons
 +add a "new session" icon
 +shortcuts menu on gerty doesn't work
++configurable length wca style inspection? apparently some people use this
 
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
--configurable length wca style inspection? apparently some people use this
 +background image/opacity
 	-provide some system for uploading your own image?
 
