@@ -33,13 +33,11 @@ ul.tabs li.active.white {
 }
 
 .optionsButton {
-	background-color: #fff;
 	color: #000;
 	text-align: center;
 	font-size: 16px;
 }
 .optionsButtonHover {
-	background-color: #000;
 	color: #fff;
 }
 .options {

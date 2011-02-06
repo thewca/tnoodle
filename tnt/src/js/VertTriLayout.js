@@ -13,11 +13,12 @@ var TriLayout = new Class( {
 		document.body.setStyle('overflow', 'hidden');
 		
 		this.resizeDiv = new Element('div');
+		this.resizeDiv.setStyle('background-color', 'black');
 		this.resizeDiv.show = function() {
-			this.morph({ 'background-color': '#000' });
+			this.morph({ 'opacity': '1' });
 		};
 		this.resizeDiv.hide = function() {
-			this.morph({ 'background-color': '#fff' });
+			this.morph({ 'opacity': '0.01' });
 		};
 
 		this.resizeDiv.hide();

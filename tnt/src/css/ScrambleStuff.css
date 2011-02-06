@@ -29,6 +29,7 @@ span.turn:hover {
 	text-decoration: none;
 }
 .scrambleText {
+	background: rgba(250, 250, 250, .8);
     white-space: pre-wrap;
     margin: 0px;
     padding: 5px 10px;
@@ -47,7 +48,7 @@ div.scrambleHeader {
 	padding: 5px 10px;
 	position: relative;
     border-bottom: 1px solid #333;
-    background-color: #EEE;
+    background: rgba(233, 233, 233, .7);
 }
 
 .button.changeColors {
