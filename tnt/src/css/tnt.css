@@ -63,16 +63,20 @@ span.select {
 	padding: 1px 0px 1px 3px; /* If you change this, you may need to change .leftarrow */
 	border: 1px solid gray;
 	border-radius: 2px;
+	-moz-border-radius: 2px;
 
 	user-select: none;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	color: black;
+	background: -moz-gradient(linear, 0% 40%, 0% 70%, from(#F9F9F9), to(#E3E3E3));
 	background: -webkit-gradient(linear, 0% 40%, 0% 70%, from(#F9F9F9), to(#E3E3E3));
+	background:-moz-linear-gradient(top, #f9f9f9, #e3e3e3);
 }
 
 .select.selecting {
 	background: -webkit-gradient(linear, 0% 40%, 0% 70%, from(#777), to(#999));
+	background:-moz-linear-gradient(top, #777, #999);
 }
 
 .select:hover {
@@ -101,6 +105,7 @@ span.select {
 
 .leftarrow, .rightarrow {
 	font-size: 12px;
+	padding: 2px;
 }
 .rightarrow {
 	border-left: 1px solid gray;

@@ -90,6 +90,7 @@ window.addEvent('domready', function() {
 		sessionSelect.refresh();
 	}; //for some reason, the change event doesn't fire until the select loses focus
 
+	//TODO - actually delete this
 	var sessionSelect = tnoodle.tnt.createSelect('Click to open session');
 	sessionSelect.linebreak = new Element('br');
 	sessionSelect.linebreak.setStyle('font-size', 22); // omg, this is disgusting
