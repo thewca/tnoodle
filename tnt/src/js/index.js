@@ -554,7 +554,7 @@ window.addEvent('domready', function() {
 			//TODO - wow this is nasty
 			shortcutsDiv.setStyle("height", '');
 			shortcutsDiv.setStyle("width", '');
-			shortcutsDiv.setStyle("margin-right", 20);
+			shortcutsDiv.setStyle("margin-right", 21);
 		};
 		helpPopup.appendChild(shortcutsDiv);
 		shortcuts.getKeys().each(function(category) {
