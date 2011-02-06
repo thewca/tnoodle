@@ -402,6 +402,10 @@ tnoodle.tnt = {
 				}
 			}
 			select.title = select.arrow2.hasClass('hovered') ? rightTip : leftTip;
+			var selected = options[select.selectedIndex];
+			if(selected && selected.text != '') {
+				select.title = selected.text + '\n' + select.title;
+			}
 
 			window.removeEvent('keydown', keyDown);
 			window.removeEvent('click', windowClicked);

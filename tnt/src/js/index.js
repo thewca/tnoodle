@@ -29,7 +29,7 @@ window.addEvent('domready', function() {
 	function getEvents() {
 		return server.getEvents(scrambleStuff.getSelectedPuzzle());
 	}
-	var eventSelect = tnoodle.tnt.createSelect('Open last session with event', 'Change current session to event');
+	var eventSelect = tnoodle.tnt.createSelect('Click to open last session with event', 'Click to change current session to event');
 	eventSelect.refresh = function() {
 		var events = getEvents();
 		var options = [];
@@ -90,7 +90,7 @@ window.addEvent('domready', function() {
 		sessionSelect.refresh();
 	}; //for some reason, the change event doesn't fire until the select loses focus
 
-	var sessionSelect = tnoodle.tnt.createSelect('Open session');
+	var sessionSelect = tnoodle.tnt.createSelect('Click to open session');
 	sessionSelect.linebreak = new Element('br');
 	sessionSelect.linebreak.setStyle('font-size', 22); // omg, this is disgusting
 	$('puzzleChooser').adopt(sessionSelect.linebreak);
