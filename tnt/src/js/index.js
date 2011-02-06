@@ -511,8 +511,9 @@ window.addEvent('domready', function() {
     function keyStopper(func) {
         return function(e) {
             e.stop();
+            // Silly hack for opera. Apparently calling stop() isn't enough
+            // to stop keypress events from entering text into a textfield.
             setTimeout(func, 0);
-            //func(e);
         };
     }
 	// NOTE: We don't need to explicitly call this function in

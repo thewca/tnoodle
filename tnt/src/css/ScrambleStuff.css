@@ -28,9 +28,14 @@ span.currTurn {
 span.turn:hover {
 	text-decoration: none;
 }
-.scrambleText {
-	background: rgba(250, 250, 250, .8);
+.padding {
+    /** TODO this works on chrome, but not opera **/
     white-space: pre-wrap;
+}
+.scrambleText {
+    white-space: normal;
+
+	background: rgba(250, 250, 250, .8);
     margin: 0px;
     padding: 5px 10px;
 	overflow-x: hidden;

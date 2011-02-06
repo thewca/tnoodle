@@ -33,7 +33,8 @@ BUGS
 -Xbrowser stuff
 	+keyDown only gets called once on ff, makes sense
 	+select dropdown styling...
-    -scramble doesn't wrap on opera
+    +scramble doesn't wrap on opera
+        -wrapping fixed, but now spacing is broken
     +opera keyboard shortcuts are iffy, fixed as best as possible
         +apparently opera binds all sorts of crap, like ctrl+z, ctrl+y, but they're blocked when in a text field. This means that a user can configure ctrl+z as a shortcut, but when they try to use it, they won't be focused on a text box, so opera goes and does its thing. Maybe there's a solution here that involves focusing the user on an invisible text box and listening to events there, lol
 	-FF lags when the scramble loads
