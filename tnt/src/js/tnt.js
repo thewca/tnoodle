@@ -224,6 +224,7 @@ tnoodle.tnt = {
 		return $$('.selecting').length > 0; //lol
 	},
 	selects_: [],
+	textSizer_: null,
 	createSelect: function(rightTip, leftTip) {
 		rightTip = rightTip || null;
 		var select = document.createElement('span');
@@ -258,7 +259,33 @@ tnoodle.tnt = {
 			optionsHaveChanged = true;
 			selectedIndex = null;
 		};
-		function fillWithOption(el, option) {
+		var THIS = this;
+		function resizeStr(str, maxWidth) {
+			if(!THIS.textSizer_) {
+				THIS.textSizer_ = document.createElement('div');
+				THIS.textSizer_.setStyle('position', 'absolute');
+				document.body.adopt(THIS.textSizer_);
+			} else {
+				THIS.textSizer_.empty();
+				THIS.textSizer_.setStyle('display', '');
+			}
+			THIS.textSizer_.appendText(str);
+			if(THIS.textSizer_.getSize().x < maxWidth) {
+				// The whole string fit! Yay!
+				THIS.textSizer_.setStyle('display', 'none');
+				return str;
+			}
+			// The whole string didn't fit, so we try to fit it with ellipsis
+			THIS.textSizer_.empty();
+			THIS.textSizer_.appendText("...");
+			var i;
+			for(i = 0; i < str.length && THIS.textSizer_.getSize().x < maxWidth; i++) {
+				THIS.textSizer_.appendText(str[i]);
+			}
+			THIS.textSizer_.setStyle('display', 'none');
+			return str.substring(0, i) + '...';
+		}
+		function fillWithOption(el, option, maxWidth) {
 			el.empty();
 			if(option.icon) {
 				var img = document.createElement('img');
@@ -268,23 +295,41 @@ tnoodle.tnt = {
 				img.setStyle('padding', '0px 2px 2px 0px');
 				img.src = option.icon;
 				el.appendChild(img);
+				maxWidth -= 32 + 2;
+			}
+			maxWidth -= select.arrow2.getSize().x;
+			if(select.arrow1) {
+				maxWidth -= select.arrow1.getSize().x;
 			}
 			el.setStyle('font-weight', '');
 			if(option.value === null) {
 				el.setStyle('font-weight', 'bold');
 			}
-			el.appendText(option.text);
+			maxWidth -= 20; // css voodoo
+			el.appendText(resizeStr(option.text, maxWidth));
 			if(option.text == "" && !option.icon) {
 				// Nasty little hack to deal with empty options
 				el.setStyle('height', '19px');
 			}
 		}
+		var maxWidth = Infinity;
+		select.setMaxWidth = function(width) {
+			if(width === null) {
+				width = Infinity;
+			}
+			maxWidth = width;
+			
+			// Trickyness to get past the dampening in showItem
+			var index = selectedIndex;
+			selectedIndex = null;
+			showItem(index);
+		};
 		var selectedIndex = null;
 		function showItem(index) {
 			if(index == selectedIndex) {
 				return;
 			}
-			fillWithOption(selected, options[index]);
+			fillWithOption(selected, options[index], maxWidth);
 			selectedIndex = index;
 		}
 		select.setSelected = function(value) {
@@ -380,6 +425,14 @@ tnoodle.tnt = {
 
 				select.addClass('selecting');
 				optionsDiv.position({relativeTo: select, position: 'bottomLeft', edge: 'topLeft'});
+				var posX = optionsDiv.getPosition().x;
+				var offscreen = posX + optionsDiv.getSize().x - document.body.getSize().x;
+				if(offscreen > 0) {
+					// Ensuring stuff stays onscreen...
+					var left = optionsDiv.getStyle('left').toInt();
+					left -= offscreen;
+					optionsDiv.setStyle('left', left);
+				}
 				optionsDiv.fade('show');
 				optionsDiv.getChildren()[hoveredIndex].hover();
 				showItem(hoveredIndex);

@@ -51,6 +51,8 @@ window.addEvent('domready', function() {
 		}
 		eventSelect.setSelected(event);
 	};
+	eventSelect.linebreak = new Element('br');
+	$('puzzleChooser').adopt(eventSelect.linebreak);
 	$('puzzleChooser').adopt(eventSelect);
 
 	eventSelect.onchange = function(updateSession) {
@@ -88,7 +90,10 @@ window.addEvent('domready', function() {
 		sessionSelect.refresh();
 	}; //for some reason, the change event doesn't fire until the select loses focus
 
-	var sessionSelect = tnoodle.tnt.createSelect();
+	var sessionSelect = tnoodle.tnt.createSelect('Open session');
+	sessionSelect.linebreak = new Element('br');
+	sessionSelect.linebreak.setStyle('font-size', 22); // omg, this is disgusting
+	$('puzzleChooser').adopt(sessionSelect.linebreak);
 	$('puzzleChooser').adopt(sessionSelect);
 	sessionSelect.refresh = function() {
 		var puzzle = scrambleStuff.getSelectedPuzzle();
@@ -214,9 +219,34 @@ window.addEvent('domready', function() {
 		timer.redraw();
 	};
 	$('scrambles').resize = scrambleStuff.resize;
+	function getMaxWidth(el) {
+		// Returns the maximum size the element can take up without falling
+		// off the right side of the screen.
+		return document.body.getSize().x - el.getPosition().x;
+	}
 	$('times').resize = function() {
-		var remainingHeight = $('times').getSize().y - $('timesArea').getStyle('border-top').toInt() - $('timesArea').getStyle('border-bottom').toInt();
+		var available = $('times').getSize();
+		var remainingHeight = available.y - $('timesArea').getStyle('border-top').toInt() - $('timesArea').getStyle('border-bottom').toInt();
 		$('timesArea').setStyle('height', remainingHeight);
+		var seshCommentWidth = available.x - 20 - $('resetSession').getSize().y - $('deleteSession').getSize().y - $('downloadCSV').getSize().y - 20;
+		$('sessionComment').setStyle('width', Math.max(50, seshCommentWidth));
+
+		var selects = [ scrambleStuff.puzzleSelect, eventSelect, sessionSelect ];
+		selects.each(function(select) {
+			if(select.linebreak) {
+				select.linebreak.setStyle('display', 'none');
+			}
+			select.setMaxWidth(null);
+		});
+		selects.each(function(select) {
+			var maxWidth = getMaxWidth(select);
+			if(select.linebreak && select.getSize().x > maxWidth) {
+				select.linebreak.setStyle('display', '');
+				// Adding a newline gives us more space
+				maxWidth = getMaxWidth(select);
+			}
+			select.setMaxWidth(maxWidth);
+		});
 		
 		timesTable.resize();
 	};

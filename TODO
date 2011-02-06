@@ -93,6 +93,9 @@ FEATURES
 	+avoid duplicates as best as possible
 +emulate stackmat?
 
+-holding down spacebar w/ defocusing tnt will result in the timer starting upon refocusing
+-holding down spacebar while focusing comment area is bad
+
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table

@@ -111,7 +111,7 @@ span.select {
 .leftarrow {
 	border-right: 1px solid gray;
 	margin-right: 3px;
-	margin-left: -3px; /* This is pretty cool that it works, see span.select */
+	margin-left: -3px; /* This is pretty cool that it works, see .select */
 }
 .leftarrow.hovered, .rightarrow.hovered {
 	border-color: black;
