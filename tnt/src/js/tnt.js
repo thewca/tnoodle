@@ -286,6 +286,9 @@ tnoodle.tnt = {
 			return str.substring(0, i) + '...';
 		}
 		function fillWithOption(el, option, maxWidth) {
+			if(!maxWidth) {
+				maxWidth = Infinity;
+			}
 			el.empty();
 			if(option.icon) {
 				var img = document.createElement('img');
@@ -312,11 +315,8 @@ tnoodle.tnt = {
 				el.setStyle('height', '19px');
 			}
 		}
-		var maxWidth = Infinity;
+		var maxWidth = null;
 		select.setMaxWidth = function(width) {
-			if(width === null) {
-				width = Infinity;
-			}
 			maxWidth = width;
 			
 			// Trickyness to get past the dampening in showItem
