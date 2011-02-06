@@ -29,7 +29,7 @@ window.addEvent('domready', function() {
 	function getEvents() {
 		return server.getEvents(scrambleStuff.getSelectedPuzzle());
 	}
-	var eventSelect = tnoodle.tnt.createSelect('Click to open last session with event', 'Click to change current session to event');
+	var eventSelect = tnoodle.tnt.createSelect('Click to open last session with event', 'Click to change current session event');
 	eventSelect.refresh = function() {
 		var events = getEvents();
 		var options = [];
@@ -222,7 +222,7 @@ window.addEvent('domready', function() {
 	function getMaxWidth(el) {
 		// Returns the maximum size the element can take up without falling
 		// off the right side of the screen.
-		return document.body.getSize().x - el.getPosition().x;
+		return document.body.getSize().x - el.getPosition().x - 20;
 	}
 	$('times').resize = function() {
 		var available = $('times').getSize();

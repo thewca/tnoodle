@@ -308,7 +308,6 @@ tnoodle.tnt = {
 			if(option.value === null) {
 				el.setStyle('font-weight', 'bold');
 			}
-			maxWidth -= 20; // css voodoo
 			el.appendText(resizeStr(option.text, maxWidth));
 			if(option.text == "" && !option.icon) {
 				// Nasty little hack to deal with empty options

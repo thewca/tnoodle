@@ -105,6 +105,7 @@ FEATURES
 
 -saving times
 	-Add a note about opening multiple instances of tnt
+		-screw this, just store everything in the db, just make it easy to create an account
 	-add login
 	-implement stuff on scratch paper!!!
 

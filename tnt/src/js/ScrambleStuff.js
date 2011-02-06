@@ -882,7 +882,7 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 	scrambleResize.addEvent('drag', scrambleResized);
 	scrambleResize.addEvent('complete', saveScrambleSize);
 
-	var puzzleSelect = tnoodle.tnt.createSelect('Click to open last session of puzzle', 'Click to change current session to puzzle');
+	var puzzleSelect = tnoodle.tnt.createSelect('Click to open last session of puzzle', 'Click to change session puzzle');
 	puzzleSelect.onchange = puzzleChanged;
 	puzzleSelect.setDisabled(true);
 
