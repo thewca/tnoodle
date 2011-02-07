@@ -194,13 +194,13 @@
 	<target name="symlinkWin" if="isWin">
 		<exec executable="${lib}/mklink.bat">
 			<arg value="/D" />
-			<arg value="${scrambles}\bin\tnt" />
+			<arg value="${scrambles}\bin\www\tnt" />
 			<arg value="${src}" />
 		</exec>
 	</target>
 	
 	<target name="symlinkUnix" unless="isWin">
-		<symlink link="${scrambles}/bin/tnt" resource="${src}"></symlink>
+		<symlink link="${scrambles}/bin/www/tnt" resource="${src}"></symlink>
 	</target>
 	
 	<target name="run" depends="" description="">

@@ -112,6 +112,8 @@ public class ScrambleServer {
 		if(scramblers == null) {
 			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
 		}
+		// TODO - check that the directories in www don't conflict with
+		// import, scramble, view, or kill
 		server.createContext("/", new FileHandler());
 		server.createContext("/import/", new ImporterHandler());
 		server.createContext("/scramble/", new ScramblerHandler(scramblers));
@@ -192,13 +194,13 @@ public class ScrambleServer {
 				// It's impossible to check if a URI (what getResource() returns) is a directory,
 				// so we rely upon appending /index.html and checking if that path exists. If it does
 				// we redirect the browser to the given path with a trailing / appended.
-				boolean isDir = getClass().getResource("/" + fileName + "/index.html") != null;
+				boolean isDir = getClass().getResource("/www/" + fileName + "/index.html") != null;
 				if(isDir) {
 					sendTrailingSlashRedirect(t);
 					return;
 				}
 			}
-			InputStream is = getClass().getResourceAsStream("/" + fileName);
+			InputStream is = getClass().getResourceAsStream("/www/" + fileName);
 			if(is == null) {
 				send404(t, fileName);
 				return;

@@ -15,10 +15,10 @@
 
 	<property name="scramblers-src" location="${src}/scramblers" />
 	<property name="scramblers-bin" location="${bin}/scramblers" />
-	<property name="readme-src" location="${src}/index.html" />
-	<property name="readme-bin" location="${bin}/index.html" />
-	<property name="shelley-src" location="${src}/scramblegen.html" />
-	<property name="shelley-bin" location="${bin}/scramblegen.html" />
+
+	<property name="www-src" location="${src}/www" />
+	<property name="www-bin" location="${bin}/www" />
+
 	<property name="favicon-src" location="${src}/favicon.ico" />
 	<property name="favicon-bin" location="${bin}/favicon.ico" />
 
@@ -77,17 +77,18 @@
 	<target name="compile" depends="init" description="compile the source">
 		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
 		<javac srcdir="${src}" classpath="${cp};${jsobject}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+
+		<!-- copying root www directory -->
+		<copy todir="${www-bin}">
+			<fileset dir="${www-src}" includes="**" />
+		</copy>
+		
 		<!-- copying plugin icons -->
 		<copy todir="${scramblers-bin}">
 			<fileset dir="${scramblers-src}" includes="*.png" />
 		</copy>
-		<!-- copying readme.html -->
-		<copy file="${readme-src}" tofile="${readme-bin}" />
-		<!-- copying scramblegen.html -->
-		<copy file="${shelley-src}" tofile="${shelley-bin}" />
-		<!-- copying favicon.ico -->
-		<copy file="${favicon-src}" tofile="${favicon-bin}" />
-		
+
+		<!-- indexing plugins (they were copied to ${bin} when we compiled them) -->
 		<delete file="${plugin-list}" />
 		<pathconvert property="plugin-files" pathsep="${line.separator}">
 		    <path>
@@ -108,7 +109,7 @@
 		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false">
 			<arg value="-n" />
 			<!-- We do our development on port 8080 so we don't have to run ant with
-				 sudo privileges on linux -->
+				 root privileges on linux -->
 			<arg value="-p" />
 			<arg value="8080" />
 		</java>
@@ -185,7 +186,7 @@
 		<!--
 			For the life of me, I can't get ant to stop
 			following symlinks. Since tnt symlinks to its
-			source in scrambles ${bin} folder, the ant delete
+			source in the ${bin} folder, the ant delete
 			task effectively deletes the tnt src code, which is bad.
 			Hopefully either rm (linux) or rmdir (windows) will work
 			for us.

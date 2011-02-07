@@ -9,4 +9,4 @@ Tnoodle is really a collection of 4 projects.
 
 * stackmat: A Java library that parses a Stackmat plugged into an audio port. TODO - documentation
 
-* tnt: A Javascript Rubik's Cube timer that uses tnt-scrambles as a backend.
+* tnt: A Javascript Rubik's Cube timer that uses tnoodlescrambles as a backend.
