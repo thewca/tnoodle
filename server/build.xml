@@ -101,14 +101,7 @@
 		<srcfiles dir="${src}" />
 	</uptodate>
 	
-	<target name="dist-server" depends="compile" unless="uptodate-server">
-		<!-- We only compile tnt when distributing the server because we don't want it to
-			 happen when doing a "run" -->
-		<ant antfile="${timer}/build.xml" inheritAll="false" target="compile" />
-		<copy todir="${bin}/www">
-			<fileset dir="${timer}/bin/" includes="**" />
-		</copy>
-
+	<target name="dist-server" depends="compile,copy-tnt" unless="uptodate-server">
 		<fatjar.build output="${server-jar}">
 			<fatjar.manifest mainclass="${main}" />
 			<fatjar.filesource path="${bin}" relpath="">
@@ -143,8 +136,8 @@
 	<target name="link-tnt-win" if="is-win">
 		<exec executable="${lib}/mklink.bat">
 			<arg value="/D" />
-			<arg value="${scrambles}\bin\www\tnt" />
-			<arg value="${src}" />
+			<arg value="${bin}\www\tnt" />
+			<arg value="${timer}/src" />
 		</exec>
 	</target>
 	<target name="link-tnt-unix" unless="is-win">
@@ -183,6 +176,16 @@
 		mklink is used on windows, ln -s is for linux.
 	-->
 	<target name="link-tnt" depends="unlink-tnt,link-tnt-unix,link-tnt-win" />
+
+	<target name="copy-tnt" depends="unlink-tnt" />
+		<!-- We only compile tnt when distributing the server because we don't want it to
+			 happen when doing a "run" -->
+		<ant antfile="${timer}/build.xml" inheritAll="false" target="compile" />
+		<copy todir="${bin}/www">
+			<fileset dir="${timer}/bin/" includes="**" />
+		</copy>
+	</target>
+
 
 	<target name="clean">
 		<!-- Note: unlink-tnt MUST occur before deleting dist! -->
