@@ -1,2 +1,2 @@
 #!/bin/sh
-( cd tnt; ant jslint )
+( cd timer; ant jslint )

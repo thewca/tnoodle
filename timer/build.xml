@@ -1,27 +1,17 @@
-<project name="tnt" default="dist" basedir="." xmlns:jsl="antlib:com.googlecode.jslint4java">
+<project name="tnoodletimer" default="compile" basedir="." xmlns:jsl="antlib:com.googlecode.jslint4java">
 	<description>
-		Builds a special copy of ScrambleServer with tnt embedded,
-		and a copy of tnt built upon an applet.
+		TODO
 	</description>
 	
-	<property file="version.properties" />
-	<fail message="Must define NAME property in file version.properties" unless="NAME" />
-	<fail message="Must define VERSION property in file version.properties" unless="VERSION" />
-	
+	<property file="../VERSION" />
+	<fail message="Must define VERSION property in file ../VERSION (in the form VERSION=somestring)" unless="VERSION" />
+
 	<property name="src" location="src" />
 	<property name="lib" location="../lib" />
 	<property name="bin" location="bin" />
 	<property name="tnt_bin" location="bin/tnt" />
-	<property name="dist" location="dist" />
 	<property name="scrambles" location="../scrambles" />
 
-	<property file="${scrambles}/version.properties" prefix="SS" />
-	<fail message="Must define NAME property in file ${scrambles}/version.properties" unless="SS.NAME" />
-	<fail message="Must define VERSION property in file ${scrambles}/version.properties" unless="SS.VERSION" />
-	
-	<property name="scrambleserver-jar" location="${scrambles}/dist/${SS.NAME}-${SS.VERSION}.jar" />
-	<property name="tntserver-jar" location="${dist}/${NAME}-${VERSION}.jar" />
-	
 	<property name="js_src" location="${src}/js/" />
 	<property name="js_bin" location="${tnt_bin}/js/" />
 	<property name="js_globbed_rel" value="js/tnt.js" />
@@ -31,10 +21,6 @@
 	<property name="css_bin" location="${tnt_bin}/css/" />
 	<property name="css_globbed_rel" value="css/tnt.css" />
 	<property name="css_globbed" location="${tnt_bin}/${css_globbed_rel}" />
-	
-	<condition property="isWin">
-		<os family="windows" />
-	</condition>
 
 	<!-- setting up jslint -->
 	<path id="ant.tasks.classpath">
@@ -45,12 +31,8 @@
 		classpathref="ant.tasks.classpath" />
 	
 	<!-- setting up yuicompressor -->
-	<property 
-	    name="yui-compressor.jar" 
-	    location="${lib}/yuicompressor-2.4.2.jar" />
-	<property 
-	    name="yui-compressor-ant-task.jar" 
-	    location="${lib}/yui-compressor-ant-task-0.5.jar" />
+	<property name="yui-compressor.jar" location="${lib}/yuicompressor-2.4.2.jar" />
+	<property name="yui-compressor-ant-task.jar" location="${lib}/yui-compressor-ant-task-0.5.jar" />
 	<path id="task.classpath">
 	  <pathelement location="${yui-compressor.jar}" />
 	  <pathelement location="${yui-compressor-ant-task.jar}" />
@@ -63,11 +45,10 @@
 	
 	<target name="init">
 		<tstamp />
-		<mkdir dir="${dist}" />
 		<mkdir dir="${bin}" />
 	</target>
 
-	<target name="concat" depends="clean,init" description="compile the source">
+	<target name="concat" depends="clean,init">
 		<mkdir dir="${css_bin}" />
 		<mkdir dir="${js_bin}" />
 		<copy tofile="${tnt_bin}/index.html" file="${src}/index.html" />
@@ -100,6 +81,8 @@
 			var oldIndex = new java.io.File(tnt_bin + "/index.html");
 			var reader = new java.io.BufferedReader(new java.io.FileReader(oldIndex));
 
+			var jsCount = 0;
+			var cssCount = 0;
 			var line = reader.readLine();
 			while(line != null) {
 				var match = cssRegex.exec(line);
@@ -107,12 +90,14 @@
 					// found some css! add it to our globbed file
 					append(cssOut, src + "/" + match[1]);
 					if(!foundCss) {
+						cssCount++;
 						foundCss = true;
 						out.println('<link type="text\/css" rel="stylesheet" href="' + css_globbed_rel + '" media="screen" \/>');
 					}
 				} else {
 					match = jsRegex.exec(line);
 					if(match) {
+						jsCount++;
 						if(!foundJs) {
 							foundJs = true;
 							out.println('<script type="text\/javascript" src="' + js_globbed_rel + '"><\/script>');
@@ -131,6 +116,9 @@
 			jsOut.close();
 			oldIndex['delete'](); //lol @ javascript, can't do oldIndex.delete(), because delete is a keyword
 			newIndex.renameTo(oldIndex);
+
+			println("Globbed " + jsCount + " js files to " + css_globbed);
+			println("Globbed " + cssCount + " css files to " + js_globbed);
 ]]>
 		</script>
 
@@ -138,7 +126,6 @@
 			<fileset dir="${src}/media" />
 		</copy>
 
-		<echo>Globbed all the js files together.</echo>
 	</target>
 	
 	<target name="jslint">
@@ -156,7 +143,8 @@
 		    preserveallsemicolons="false"
 		    fromdir="${tnt_bin}" 
 		    todir="${tnt_bin}"
-			jsSuffix=".js.min" cssSuffix=".css.min">
+			jsSuffix=".js.min"
+			cssSuffix=".css.min">
 		  <include name="**/*.js" />
 		  <include name="**/*.css" />
 		</yui-compressor>
@@ -168,59 +156,15 @@
 		<ant antfile="${scrambles}/build.xml" inheritAll="false" />
 	</target>
 	
-	<target name="tntserver" depends="scrambles">
-		<copy file="${scrambleserver-jar}" tofile="${tntserver-jar}" />
-		<jar file="${tntserver-jar}" update="true">
-			<fileset dir="${bin}" />
-			<manifest>
-				<attribute name="Implementation-Title" value="${NAME}"/>
-				<attribute name="Implementation-Version" value="${VERSION}"/>
-			</manifest>
-		</jar>
+	<target name="compile" depends="jslint,concat,minify">
+		<echo>Successfully built ${ant.project.name}!</echo>
 	</target>
 	
-	<target name="tntapplet" depends="scrambles">
-		<!-- TODO: actually DO this! -->
+	<target name="compile-nomin" depends="jslint,concat">
+		<echo>Successfully built ${ant.project.name} without minifying!</echo>
 	</target>
 	
-	<target name="dist" depends="jslint,concat,minify,tntserver,tntapplet" description="generate the distribution">
-		<echo>Successfully built TNTServer!</echo>
-	</target>
-	
-	<target name="nomin" depends="jslint,concat,tntserver,tntapplet" description="generate the distribution">
-		<echo>Successfully built TNTServer without minifying!</echo>
-	</target>
-	
-	<target name="symlinkWin" if="isWin">
-		<exec executable="${lib}/mklink.bat">
-			<arg value="/D" />
-			<arg value="${scrambles}\bin\www\tnt" />
-			<arg value="${src}" />
-		</exec>
-	</target>
-	
-	<target name="symlinkUnix" unless="isWin">
-		<symlink link="${scrambles}/bin/www/tnt" resource="${src}"></symlink>
-	</target>
-	
-	<target name="run" depends="" description="">
-		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="clean" />
-		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="compile" />
-		
-		<!-- 
-			Setting up a symlink to the tnt source code from the server
-			means we won't have to compile tnt to see the changes reflected
-			on the server. This makes development significantly easier and faster.
-			mklink is used on windows, ln -s is for linux.
-		-->
-		<antcall target="symlinkWin" />
-		<antcall target="symlinkUnix" />
-		
-		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="run" />
-	</target>
-	
-	<target name="clean" description="clean up">
+	<target name="clean">
 		<delete dir="${bin}" />
-		<delete dir="${dist}" />
 	</target>
 </project>

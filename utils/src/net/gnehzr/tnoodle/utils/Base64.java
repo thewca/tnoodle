@@ -1,4 +1,4 @@
-package net.gnehzr.tnoodle.scrambles.utils;
+package net.gnehzr.tnoodle.utils;
 
 /*
  * http://www.wikihow.com/Encode-a-String-to-Base64-With-Java

@@ -1,0 +1,16 @@
+<project name="utils" default="compile" basedir=".">
+   <property name="src" location="src" />
+   <property name="bin" location="bin" />
+   <target name="init">
+      <tstamp />
+      <mkdir dir="${bin}" />
+   </target>
+
+   <target name="compile" depends="init">
+      <javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+   </target>
+
+   <target name="clean">
+      <delete dir="${bin}" />
+   </target>
+</project>

@@ -1,4 +1,4 @@
-package net.gnehzr.tnoodle.scrambles.utils;
+package net.gnehzr.tnoodle.utils;
 
 import java.awt.Color;
 import java.awt.geom.GeneralPath;

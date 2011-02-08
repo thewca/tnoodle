@@ -1,72 +1,23 @@
-<project name="ScrambleServer" default="dist" basedir=".">
+<project name="tnoodlescrambles" default="compile" basedir=".">
 	<description>
-		Builds the ScrambleServer, ensuring to include JCubeExplorer
+		TODO
 	</description>
 
-	<property file="version.properties" />
-	<fail message="Must define NAME property in file version.properties" unless="NAME" />
-	<fail message="Must define VERSION property in file version.properties" unless="VERSION" />
-
 	<property name="src" location="src" />
-	<property name="lib" location="../lib" />
 	<property name="bin" location="bin" />
 	<property name="dist" location="dist" />
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
 
-	<property name="scramblers-src" location="${src}/scramblers" />
-	<property name="scramblers-bin" location="${bin}/scramblers" />
-
-	<property name="www-src" location="${src}/www" />
-	<property name="www-bin" location="${bin}/www" />
-
-	<property name="favicon-src" location="${src}/favicon.ico" />
-	<property name="favicon-bin" location="${bin}/favicon.ico" />
-
-	<property name="server-jar" location="${dist}/${NAME}-${VERSION}.jar" />
-	<property name="applet-jar" location="${dist}/ScrambleApplet.jar" />
-	<!-- This seems kinda weird, but is probably the only way to do this -->
+	<!-- Dependencies! -->
 	<property name="jcubeexplorer" location="../jcubeexplorer/" />
+	<property name="utils" location="../utils/" />
+
+	<property name="cp" value="" />
+	
 	<!--
-		We create the classpath from all the jar files in my lib directory.
-		NOTE: If the jars in the lib directory change,
-		we must update the call to fatjar and javac to use them!
+		 TODO - maybe make a neat command line utility for generating scrambles?
+	<property name="main" value="" />
 	-->
-	<property name="gson" location="${lib}/gson-1.4.jar" />
-	<property name="cube" location="${jcubeexplorer}/dist/JCubeExplorer.jar" />
-	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
-	<property name="itext" location="${lib}/iText-5.0.2.jar" />
-	<property name="jsobject" location="${lib}/plugin.jar" />
-	
-	<property name="cp" value="${gson};${jopt};${cube};${itext};" />
-	
-	<property name="main" value="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
-
-	<condition property="isWin">
-		<os family="windows" />
-	</condition>
-
-    <!-- Properties for Fat-Jar Eclipse Plug-in -->
-    <property name="fjepPath" value="${lib}/fatjar.jar" />
-    <taskdef name="fatjar.build"
-             classname="net.sf.fjep.anttask.FJBuildTask"
-             classpath="${fjepPath}"
-             loaderref="${fjepPath}" />
-    <typedef name="fatjar.manifest"
-             classname="net.sf.fjep.anttask.FJManifestType"
-             classpath="${fjepPath}"
-             loaderref="${fjepPath}" />
-    <typedef name="fatjar.exclude"
-             classname="net.sf.fjep.anttask.FJExcludeType"
-             classpath="${fjepPath}"
-             loaderref="${fjepPath}" />
-    <typedef name="fatjar.jarsource"
-             classname="net.sf.fjep.anttask.FJJarSourceType"
-             classpath="${fjepPath}"
-             loaderref="${fjepPath}" />
-    <typedef name="fatjar.filesource"
-             classname="net.sf.fjep.anttask.FJFileSourceType"
-             classpath="${fjepPath}"
-             loaderref="${fjepPath}" />
 
 	<target name="init">
 		<tstamp />
@@ -74,25 +25,24 @@
 		<mkdir dir="${bin}" />
 	</target>
 
-	<target name="compile" depends="init" description="compile the source">
-		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" />
-		<javac srcdir="${src}" classpath="${cp};${jsobject}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
-
-		<!-- copying root www directory -->
-		<copy todir="${www-bin}">
-			<fileset dir="${www-src}" includes="**" />
+	<target name="compile" depends="init">
+		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" target="compile" />
+		<copy todir="${bin}">
+			<fileset dir="${jcubeexplorer}/bin" includes="**" />
 		</copy>
 		
-		<!-- copying plugin icons -->
-		<copy todir="${scramblers-bin}">
-			<fileset dir="${scramblers-src}" includes="*.png" />
+		<ant antfile="${utils}/build.xml" inheritAll="false" target="compile" />
+		<copy todir="${bin}">
+			<fileset dir="${utils}/bin" includes="**" />
 		</copy>
+
+		<javac srcdir="${src}" classpath="${cp}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 
 		<!-- indexing plugins (they were copied to ${bin} when we compiled them) -->
 		<delete file="${plugin-list}" />
 		<pathconvert property="plugin-files" pathsep="${line.separator}">
 		    <path>
-		    	<fileset dir="${scramblers-bin}" />
+				<fileset dir="${bin}/scramblers" />
 		    </path>
 			<chainedmapper>
 				<flattenmapper />
@@ -103,98 +53,19 @@
 		<echo>${plugin-files}</echo>
 		
 		<echo file="${plugin-list}">${plugin-files}</echo>
-	</target>
-	
-	<target name="run" depends="compile" description="runs the server without compiling the jar file first">
-		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false">
-			<arg value="-n" />
-			<!-- We do our development on port 8080 so we don't have to run ant with
-				 root privileges on linux -->
-			<arg value="-p" />
-			<arg value="8080" />
-		</java>
-	</target>
-
-	<target name="dist" depends="dist-server,dist-applet" description="generate the distribution">
-	</target>
-	
-	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
-	<uptodate property="uptodate-server" targetfile="${server-jar}">
-		<srcfiles dir="${src}" />
-	</uptodate>
-	
-	<target name="dist-server" depends="compile" unless="uptodate-server">
-		<fatjar.build output="${server-jar}">
-			<fatjar.manifest mainclass="${main}" />
-			<fatjar.filesource path="${bin}" relpath="">
-				<fatjar.exclude relpath="net/gnehzr/tnoodle/scrambles/applet" />
-				<!-- We include scramblers in the jar, but look to the scramblers folder for extras/new versions.
-					This way, we can distribute 1 jar (with no dependencies!) for the server.
-				<fatjar.exclude relpath="scramblers" />
-				-->
-			</fatjar.filesource>
-			<fatjar.jarsource file="${gson}" relpath="" />
-			<fatjar.jarsource file="${jopt}" relpath="" />
-			<fatjar.jarsource file="${cube}" relpath="" />
-			<fatjar.jarsource file="${itext}" relpath="" />
-		</fatjar.build>
-		<!-- see above comment about scramblers
-		<copy todir="${dist}/scramblers">
-			<fileset dir="${scramblers-bin}" />
-		</copy>
-		-->
-		<jar file="${server-jar}" update="true">
-			<manifest>
-				<attribute name="Main-Class" value="${main}"/>
-				<attribute name="Implementation-Title" value="${NAME}"/>
-				<attribute name="Implementation-Version" value="${VERSION}"/>
-			</manifest>
-		</jar>
-	</target>
-	
-	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
-	<uptodate property="uptodate-applet" targetfile="${applet-jar}">
-		<srcfiles dir="${src}" />
-	</uptodate>
-	
-	<target name="dist-applet" depends="compile" unless="uptodate-applet">
-		<fatjar.build output="${applet-jar}">
-			<fatjar.manifest mainclass="net.gnehzr.tnoodle.scrambles.ScrambleApplet" />
-			<fatjar.filesource path="${bin}" relpath="">
-				<fatjar.exclude relpath="net/gnehzr/tnoodle/scrambles/server" />
-			</fatjar.filesource>
-			<fatjar.jarsource file="${cube}" relpath="" />
-		</fatjar.build>
-	</target>
-
-	<target name="cleanUnix" unless="isWin">
-		<exec executable="rm">
-			<arg value="-r" />
-			<arg value="${bin}" />
-		</exec>
-	</target>
-
-	<target name="cleanWin" if="isWin">
-		<exec executable="${lib}/rmdir.bat">
-			<arg value="/S" />
-			<arg value="/Q" />
-			<arg value="${bin}" />
-		</exec>
-	</target>
-
-	<target name="clean" description="clean up">
-		<!--
-			For the life of me, I can't get ant to stop
-			following symlinks. Since tnt symlinks to its
-			source in the ${bin} folder, the ant delete
-			task effectively deletes the tnt src code, which is bad.
-			Hopefully either rm (linux) or rmdir (windows) will work
-			for us.
-		<delete dir="${bin}" followsymlinks="false" />
-		-->
-		<antcall target="cleanWin" />
-		<antcall target="cleanUnix" />
 		
+		<!-- copying plugin icons -->
+		<copy todir="${bin}/scramblers">
+			<fileset dir="${src}/scramblers" includes="*.png" />
+		</copy>
+	</target>
+
+	<target name="dist"> 
+		<!-- TODO - can make a library jar later -->
+	</target>
+	
+	<target name="clean">
+		<delete dir="${bin}" />
 		<delete dir="${dist}" />
 	</target>
 </project>

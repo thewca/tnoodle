@@ -1,0 +1,192 @@
+<project name="tnoodleserver" default="dist" basedir=".">
+	<description>
+		TODO
+	</description>
+
+	<property file="../VERSION" />
+	<fail message="Must define VERSION property in file ../VERSION (in the form VERSION=somestring)" unless="VERSION" />
+
+	<property name="src" location="src" />
+	<property name="lib" location="../lib" />
+	<property name="bin" location="bin" />
+	<property name="dist" location="dist" />
+	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
+
+	<property name="www-src" location="${src}/www" />
+	<property name="www-bin" location="${bin}/www" />
+
+	<property name="favicon-src" location="${src}/favicon.ico" />
+	<property name="favicon-bin" location="${bin}/favicon.ico" />
+
+	<property name="server-jar" location="${dist}/${ant.project.name}-${VERSION}.jar" />
+
+	<property name="gson" location="${lib}/gson-1.4.jar" />
+	<property name="jopt" location="${lib}/jopt-simple-3.2.jar" />
+	<property name="itext" location="${lib}/iText-5.0.2.jar" />
+	<property name="jsobject" location="${lib}/plugin.jar" />
+
+	<!-- Dependencies! -->
+	<property name="scrambles" location="../scrambles/" />
+	<property name="utils" location="../utils/" />
+	<property name="timer" location="../timer/" />
+	
+	<property name="cp" value="${gson};${jopt};${itext};" />
+	
+	<property name="main" value="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
+
+    <!-- Properties for Fat-Jar Eclipse Plug-in -->
+    <property name="fjepPath" value="${lib}/fatjar.jar" />
+    <taskdef name="fatjar.build"
+             classname="net.sf.fjep.anttask.FJBuildTask"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.manifest"
+             classname="net.sf.fjep.anttask.FJManifestType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.exclude"
+             classname="net.sf.fjep.anttask.FJExcludeType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.jarsource"
+             classname="net.sf.fjep.anttask.FJJarSourceType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+    <typedef name="fatjar.filesource"
+             classname="net.sf.fjep.anttask.FJFileSourceType"
+             classpath="${fjepPath}"
+             loaderref="${fjepPath}" />
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<!-- Compiling dependencies -->
+		<ant antfile="${scrambles}/build.xml" inheritAll="false" target="compile" />
+		<copy todir="${bin}">
+			<fileset dir="${scrambles}/bin" includes="**" />
+		</copy>
+
+		<ant antfile="${utils}/build.xml" inheritAll="false" target="compile" />
+		<copy todir="${bin}">
+			<fileset dir="${utils}/bin" includes="**" />
+		</copy>
+
+		<javac srcdir="${src}" classpath="${cp};${jsobject}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+
+		<!-- copying root www directory -->
+		<copy todir="${www-bin}">
+			<fileset dir="${www-src}" includes="**" />
+		</copy>
+	</target>
+	
+	<target name="run" depends="compile,link-tnt" description="runs the server without compiling the jar file first">
+		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false">
+			<arg value="-n" />
+			<!-- We do our development on port 8080 so we don't have to run ant with
+				 root privileges on linux -->
+			<arg value="-p" />
+			<arg value="8080" />
+		</java>
+	</target>
+
+	<target name="dist" depends="dist-server">
+	</target>
+	
+	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
+	<uptodate property="uptodate-server" targetfile="${server-jar}">
+		<srcfiles dir="${src}" />
+	</uptodate>
+	
+	<target name="dist-server" depends="compile" unless="uptodate-server">
+		<!-- We only compile tnt when distributing the server because we don't want it to
+			 happen when doing a "run" -->
+		<ant antfile="${timer}/build.xml" inheritAll="false" target="compile" />
+		<copy todir="${bin}/www">
+			<fileset dir="${timer}/bin/" includes="**" />
+		</copy>
+
+		<fatjar.build output="${server-jar}">
+			<fatjar.manifest mainclass="${main}" />
+			<fatjar.filesource path="${bin}" relpath="">
+				<fatjar.exclude relpath="net/gnehzr/tnoodle/scrambles/applet" />
+				<!-- We include scramblers in the jar, but look to the scramblers folder for extras/new versions.
+					This way, we can distribute 1 jar (with no dependencies!) for the server.
+				<fatjar.exclude relpath="scramblers" />
+				-->
+			</fatjar.filesource>
+			<fatjar.jarsource file="${gson}" relpath="" />
+			<fatjar.jarsource file="${jopt}" relpath="" />
+			<fatjar.jarsource file="${itext}" relpath="" />
+		</fatjar.build>
+		<!-- see above comment about scramblers
+		<copy todir="${dist}/scramblers">
+			<fileset dir="${scramblers-bin}" />
+		</copy>
+		-->
+		<jar file="${server-jar}" update="true">
+			<manifest>
+				<attribute name="Main-Class" value="${main}"/>
+				<attribute name="Implementation-Title" value="${ant.project.name}"/>
+				<attribute name="Implementation-Version" value="${VERSION}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<condition property="is-win">
+		<os family="windows" />
+	</condition>
+
+	<target name="link-tnt-win" if="is-win">
+		<exec executable="${lib}/mklink.bat">
+			<arg value="/D" />
+			<arg value="${scrambles}\bin\www\tnt" />
+			<arg value="${src}" />
+		</exec>
+	</target>
+	<target name="link-tnt-unix" unless="is-win">
+		<symlink link="${bin}/www/tnt" resource="${timer}/src"></symlink>
+	</target>
+	
+	<target name="unlink-tnt-unix" unless="is-win">
+		<exec executable="rm">
+			<arg value="-r" />
+			<arg value="${www-bin}/tnt" />
+		</exec>
+	</target>
+	<target name="unlink-tnt-win" if="is-win">
+		<exec executable="${lib}/rmdir.bat">
+			<arg value="/S" />
+			<arg value="/Q" />
+			<arg value="${www-bin}/tnt" />
+		</exec>
+	</target>
+
+	<!--
+		For the life of me, I can't get ant to stop
+		following symlinks. Since tnt symlinks to its
+		source in the ${bin} folder, the ant delete
+		task effectively deletes the tnt src code, which is bad.
+		Hopefully either rm (linux) or rmdir (windows) will work
+		for us.
+	<delete dir="${bin}" followsymlinks="false" />
+	-->
+	<target name="unlink-tnt" depends="unlink-tnt-unix,unlink-tnt-win" />
+
+	<!-- 
+		Setting up a symlink to the tnt source code from the server
+		means that changes to tnt will be reflected on a running server.
+		This makes development significantly easier and faster.
+		mklink is used on windows, ln -s is for linux.
+	-->
+	<target name="link-tnt" depends="unlink-tnt,link-tnt-unix,link-tnt-win" />
+
+	<target name="clean">
+		<!-- Note: unlink-tnt MUST occur before deleting dist! -->
+		<antcall target="unlink-tnt" />
+		<delete dir="${dist}" />
+	</target>
+</project>
