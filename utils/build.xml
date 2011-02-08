@@ -1,13 +1,16 @@
 <project name="utils" default="compile" basedir=".">
    <property name="src" location="src" />
    <property name="bin" location="bin" />
+   <!-- TODO - this is terrible! create a proper dependency manager -->
+   <property name="gson" location="../lib/gson-1.4.jar" />
+
    <target name="init">
       <tstamp />
       <mkdir dir="${bin}" />
    </target>
 
    <target name="compile" depends="init">
-      <javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+	   <javac srcdir="${src}" destdir="${bin}" classpath="${gson}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
    </target>
 
    <target name="clean">

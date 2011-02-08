@@ -1,6 +1,6 @@
 package scramblers;
 
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toColor;
+import static net.gnehzr.tnoodle.utils.Utils.toColor;
 
 import java.awt.Color;
 import java.awt.Dimension;

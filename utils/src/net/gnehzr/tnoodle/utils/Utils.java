@@ -7,11 +7,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public final class ScrambleUtils {
-	private ScrambleUtils() {}
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
+public final class Utils {
+	private Utils() {}
 	
 	private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
 	static {
@@ -164,6 +176,84 @@ public final class ScrambleUtils {
 			}
 		} finally {
 			is.close();
+		}
+	}
+
+
+
+	public static final Gson GSON = new GsonBuilder()
+									.registerTypeAdapter(Color.class, new Colorizer())
+									.registerTypeAdapter(GeneralPath.class, new Pather())
+									.create();
+	
+	private static class Colorizer implements JsonSerializer<Color>, JsonDeserializer<Color> {
+
+		@Override
+		public JsonElement serialize(Color c, Type t, JsonSerializationContext context) {
+			return new JsonPrimitive(toHex(c));
+		}
+
+		@Override
+		public Color deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
+			Color c = toColor(json.getAsString());
+			if(c == null)
+				throw new JsonParseException("Invalid color");
+			return c;
+		}
+
+	}
+	
+	private static class Pather implements JsonSerializer<GeneralPath>, JsonDeserializer<GeneralPath> {
+
+		/*
+		 * NOTE: this is ported from Utils.toPoints()
+		 */
+		@Override
+		public JsonElement serialize(GeneralPath s, Type t, JsonSerializationContext context) {
+			JsonArray areas = new JsonArray();
+			JsonArray area = null;
+			double[] coords = new double[2];
+			PathIterator pi = s.getPathIterator(null, 1.0);
+			while(!pi.isDone()) {
+				int val = pi.currentSegment(coords);
+				switch(val) {
+				case PathIterator.SEG_MOVETO:
+					area = new JsonArray();
+					areas.add(area);
+				case PathIterator.SEG_LINETO:
+				case PathIterator.SEG_CLOSE:
+					JsonArray pt = new JsonArray();
+					pt.add(new JsonPrimitive(coords[0]));
+					pt.add(new JsonPrimitive(coords[1]));
+					area.add(pt);
+					break;
+				default:
+					return null;
+				}
+				pi.next();
+			}
+			return areas;
+		}
+
+		@Override
+		public GeneralPath deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
+			GeneralPath path = new GeneralPath();
+			
+			JsonArray areas = json.getAsJsonArray();
+			for(int c = 0; c < areas.size(); c++) {
+				JsonArray area = areas.get(c).getAsJsonArray();
+				if(area.size() == 0)
+					continue;
+				
+				JsonArray pt = area.get(0).getAsJsonArray();
+				path.moveTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
+				for(int i = 1; i < area.size(); i++) {
+					pt = area.get(1).getAsJsonArray();
+					path.lineTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
+				}
+			}
+			path.closePath();
+			return path;
 		}
 	}
 }

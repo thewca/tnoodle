@@ -1,7 +1,7 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toHex;
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toPoints;
+import static net.gnehzr.tnoodle.utils.Utils.toHex;
+import static net.gnehzr.tnoodle.utils.Utils.toPoints;
 
 import java.awt.Color;
 import java.awt.Dimension;

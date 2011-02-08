@@ -1,7 +1,7 @@
 package scramblers;
 
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.modulo;
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toColor;
+import static net.gnehzr.tnoodle.utils.Utils.modulo;
+import static net.gnehzr.tnoodle.utils.Utils.toColor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

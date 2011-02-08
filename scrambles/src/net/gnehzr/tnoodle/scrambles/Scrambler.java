@@ -1,7 +1,7 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.ceil;
-import static net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils.toColor;
+import static net.gnehzr.tnoodle.utils.Utils.ceil;
+import static net.gnehzr.tnoodle.utils.Utils.toColor;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,8 +44,8 @@ import net.goui.util.MTRandom;
 
 import com.eekboom.utils.Strings;
 
-import net.gnehzr.tnoodle.scrambles.utils.Base64;
-import net.gnehzr.tnoodle.scrambles.utils.ScrambleUtils;
+import net.gnehzr.tnoodle.utils.Base64;
+import net.gnehzr.tnoodle.utils.Utils;
 
 /**
  * Subclasses of Scrambler must have a method with the following signature
@@ -327,7 +327,7 @@ public abstract class Scrambler {
 		} 
 		if(in != null) {
 			try {
-				ScrambleUtils.fullyReadInputStream(in, bytes);
+				Utils.fullyReadInputStream(in, bytes);
 			} catch(IOException e) {
 				return;
 			}
