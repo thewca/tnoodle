@@ -676,8 +676,7 @@ var TimesTable = new Class({
 		};
 		this.timeHoverDiv = timeHoverDiv;
 	},
-	comment: function(e) {
-		e.stop(); // we don't want the shortcut key to result in editing the comment
+	comment: function() {
 		this.lastAddedRow.hover();
 		this.timeHoverDiv.commentArea.focus();
 	},
