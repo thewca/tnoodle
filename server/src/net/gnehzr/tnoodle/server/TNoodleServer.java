@@ -74,10 +74,51 @@ public class TNoodleServer {
 		// TODO - check that the directories in www don't conflict with
 		// import, scramble, view, or kill
 		server.createContext("/", new FileHandler());
+		server.createContext("/kill/", new DeathHandler());
+
+		// Stateless scramble handlers
 		server.createContext("/import/", new ImporterHandler());
 		server.createContext("/scramble/", new ScrambleHandler(scramblers));
 		server.createContext("/view/", new ScrambleViewHandler(scramblers));
-		server.createContext("/kill/", new DeathHandler());
+		
+		// Stateful account/times management
+		// TODO - plan API before trying to implement it, lol
+		// What's needed?
+		//
+		// Account
+		//  -login
+		//  -get/set settings
+		//  -upload background =)
+		//
+		// Sessions
+		//  -get latest session of an event
+		//  	-integrate w/ Querying somehow?
+		//  -delete
+		//  -create
+		//  -edit
+		//  	-comments
+		//  	-change puzzle/event
+		//
+		// Events
+		// 	-create/edit/delete?
+		//
+		// Times
+		// 	-add
+		// 	-edit (comment, penalize, tag)
+		// 	-delete
+		//
+		// Querying
+		// 	-awesomness! -> be able to open old sessions?
+		//
+		server.createContext("/login", new ScrambleViewHandler(scramblers));
+		//TODO - get & set
+		server.createContext("/settings", new ScrambleViewHandler(scramblers));
+		//TODO 
+		server.createContext("/times/get/lastSession", new ScrambleViewHandler(scramblers));
+		//TODO =)
+		server.createContext("/times/get/query", new ScrambleViewHandler(scramblers));
+		server.createContext("/times/set", new ScrambleViewHandler(scramblers));
+
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		

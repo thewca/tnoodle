@@ -1,12 +1,12 @@
 window.addEvent('domready', function() {
-	var server = new tnoodle.server();
+	var server = new tnoodle.server(location.hostname, location.port);
 	var configuration = server.configuration;
 	
 	function onPuzzlesLoaded(puzzles) {
 		var puzzle = configuration.get('scramble.puzzle', '3x3x3');
 		scrambleStuff.setSelectedPuzzle(puzzle);
 	}
-	var scrambleStuff = new ScrambleStuff(configuration, onPuzzlesLoaded);
+	var scrambleStuff = new ScrambleStuff(server, onPuzzlesLoaded);
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 

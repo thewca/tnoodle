@@ -8,8 +8,8 @@ var TimesTable = new Class({
 		this.server = server;
 		this.configuration = server.configuration;
 		this.scrambleStuff = scrambleStuff;
-		this.cols = server.timeKeys;
-		this.headers = server.timeKeyNames;
+		this.cols = tnoodle.Time.timeKeys;
+		this.headers = tnoodle.Time.timeKeyNames;
 		
 		var table = this;
 		HtmlTable.Parsers.time = {
@@ -37,10 +37,10 @@ var TimesTable = new Class({
 		};
 		var time = HtmlTable.Parsers.time;
 		var num = HtmlTable.Parsers.num;
-		var parsers = server.timeKeyTypes.map(function(type) {
+		var parsers = tnoodle.Time.timeKeyTypes.map(function(type) {
 			if(type == Number) {
 				return num;
-			} else if(type == server.Time) {
+			} else if(type == tnoodle.Time) {
 				return time;
 			} else {
 				return null;
@@ -303,7 +303,7 @@ var TimesTable = new Class({
 		
 		this.thead = $(this).getChildren('thead')[0];
 		this.thead.getChildren('tr')[0].getChildren('th').each(function(th, index) {
-			var title = server.timeKeyDescriptions[index];
+			var title = tnoodle.Time.timeKeyDescriptions[index];
 			if(title) {
 				th.title = title;
 			}
@@ -630,9 +630,9 @@ var TimesTable = new Class({
 				} else if(timeHoverDiv.time !== null) {
 					timeHoverDiv.commentArea.setText(time.getComment());
 					timeHoverDiv.adopt(timeHoverDiv.form);
-					noPenalty.setText(table.server.formatTime(time.rawCentis));
+					noPenalty.setText(server.formatTime(time.rawCentis));
 					dnf.setText("DNF");
-					plusTwo.setText(table.server.formatTime(time.rawCentis+2*100)+"+");
+					plusTwo.setText(server.formatTime(time.rawCentis+2*100)+"+");
 
 					// Select the correct penalty
 					var penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };
@@ -830,7 +830,7 @@ var TimesTable = new Class({
 						this.session.reindex();
 						this.refreshData();
 					} else {
-						var newTime = new this.server.Time(textField.value, this.scrambleStuff.getScramble());
+						var newTime = new tnoodle.Time(this.session, textField.value, this.scrambleStuff.getScramble());
 						this.addTime(newTime);
 						this.scrambleStuff.scramble();
 
@@ -845,7 +845,7 @@ var TimesTable = new Class({
 		
 		var timeChanged = function(e) {
 			try {
-				var test = new this.server.Time(textField.value);
+				var test = new tnoodle.Time(null, textField.value);
 				this.timeHoverDiv.errorField.set('html', '');
 			} catch(error) {
 				this.timeHoverDiv.errorField.set('html', error);

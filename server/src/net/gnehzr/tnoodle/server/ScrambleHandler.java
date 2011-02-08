@@ -221,7 +221,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 			}
 			Scrambler scrambler = scramblers.get(puzzle);
 			if(scrambler == null) {
-				sendText(t, "Invalid scramble scrambler: " + puzzle);
+				sendText(t, "Invalid scrambler: " + puzzle);
 				return;
 			}
 

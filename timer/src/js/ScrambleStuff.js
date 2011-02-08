@@ -92,8 +92,8 @@ function clone(obj) {
 	return o;
 }
 
-function ScrambleStuff(configuration, loadedCallback, applet) {
-
+function ScrambleStuff(scrambler, loadedCallback, applet) {
+	var configuration = scrambler.configuration;
 	var puzzle = null;
 	var colorScheme = null;
 	var faceMap = null;
@@ -919,14 +919,8 @@ function ScrambleStuff(configuration, loadedCallback, applet) {
 		handle : titlebar
 	});
 
-	var scrambler;
-	if(applet) {
-		scrambler = new tnoodle.scrambles.applet(puzzlesLoaded);
-	} else {
-		scrambler = new tnoodle.scrambles.server(location.hostname, location.port);
-	}
 	scramblePre.appendChild(document.createTextNode('Connecting to ' + scrambler.toString() + "..."));
-	scrambler.connect(puzzlesLoaded);
+	scrambler.loadPuzzles(puzzlesLoaded);
 
 	// public variables
 	this.puzzleSelect = puzzleSelect;

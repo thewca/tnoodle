@@ -70,7 +70,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 		
 		Scrambler scrambler = scramblers.get(puzzle);
 		if(scrambler == null) {
-			sendJSONError(t, "Invalid scramble scrambler: " + puzzle, callback);
+			sendJSONError(t, "Invalid scrambler: " + puzzle, callback);
 			return;
 		}
 

@@ -249,7 +249,7 @@ var KeyboardTimer = new Class({
 	},
 	lastTime: null,
 	fireNewTime: function() {
-		var time = new this.server.Time(this.getTimeCentis(), this.scramble);
+		var time = new tnoodle.Time(this.getTimeCentis(), this.scramble);
 		this.lastTime = time;
 		var penalty = this.getPenalty();
 		if(penalty) {
