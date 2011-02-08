@@ -92,16 +92,19 @@
 			<arg value="8080" />
 		</java>
 	</target>
-
-	<target name="dist" depends="dist-server">
-	</target>
 	
 	<!-- Set uptodate if the source has changed, stupid fatjar doesn't do this for us -->
 	<uptodate property="uptodate-server" targetfile="${server-jar}">
 		<srcfiles dir="${src}" />
+		<!-- Note: Changing tnt will require us to update our jar file -->
+		<srcfiles dir="${timer}/src" />
 	</uptodate>
-	
-	<target name="dist-server" depends="compile,copy-tnt" unless="uptodate-server">
+
+	<target name="dist" unless="uptodate-server">
+		<!-- TODO - look into using ivy, this is getting silly -->
+		<antcall target="dist-server" />
+	</target>
+	<target name="dist-server" depends="compile,copy-tnt">
 		<fatjar.build output="${server-jar}">
 			<fatjar.manifest mainclass="${main}" />
 			<fatjar.filesource path="${bin}" relpath="">
@@ -177,19 +180,18 @@
 	-->
 	<target name="link-tnt" depends="unlink-tnt,link-tnt-unix,link-tnt-win" />
 
-	<target name="copy-tnt" depends="unlink-tnt" />
+	<target name="copy-tnt" depends="unlink-tnt">
 		<!-- We only compile tnt when distributing the server because we don't want it to
 			 happen when doing a "run" -->
-		<ant antfile="${timer}/build.xml" inheritAll="false" target="compile" />
+		<ant antfile="${timer}/build.xml" inheritAll="false" target="compile-nomin" />
 		<copy todir="${bin}/www">
 			<fileset dir="${timer}/bin/" includes="**" />
 		</copy>
 	</target>
 
 
-	<target name="clean">
+	<target name="clean" depends="unlink-tnt">
 		<!-- Note: unlink-tnt MUST occur before deleting dist! -->
-		<antcall target="unlink-tnt" />
 		<delete dir="${dist}" />
 	</target>
 </project>
