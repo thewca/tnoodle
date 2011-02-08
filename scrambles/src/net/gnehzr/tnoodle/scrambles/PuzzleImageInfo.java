@@ -18,7 +18,6 @@ public class PuzzleImageInfo {
 	/**
 	 * This method allows GSON to handle this object, and also allows js to
 	 * deal with PuzzleImageInfo objects through liveconnect.
-	 * This method is basically copied from ScrambleServer.Colorizer and ScrambleServer.Pather
 	 * @return An object safe to pass to GSON.
 	 */
 	public HashMap<String, Object> jsonize() {

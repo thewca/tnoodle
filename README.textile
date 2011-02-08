@@ -1,4 +1,4 @@
-Tnoodle is really a collection of 4 projects.
+TNoodle is really a collection of 4 projects.
 
 * jcubeexplorer: A wrapper for Herbert Kociemba's excellent Java implementation of the 2-phase algorithm to save its tables to disk. This shaves the ~10 seconds normally spent starting up down to a fraction of a second. The original source is available here: http://kociemba.org/cube.htm
 

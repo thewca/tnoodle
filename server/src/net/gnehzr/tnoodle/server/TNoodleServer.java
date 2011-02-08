@@ -88,14 +88,14 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 @SuppressWarnings("restriction")
-public class ScrambleServer {
+public class TNoodleServer {
 	public static String NAME, VERSION;
 	static {
-		Package p = ScrambleServer.class.getPackage();
+		Package p = TNoodleServer.class.getPackage();
 
 		NAME = p.getImplementationTitle();
 		if(NAME == null) {
-			NAME = ScrambleServer.class.getName();
+			NAME = TNoodleServer.class.getName();
 		}
 		VERSION = p.getImplementationVersion();
 		if(VERSION == null) {
@@ -105,7 +105,7 @@ public class ScrambleServer {
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
 	private static final int MAX_COUNT = 100;
 	
-	public ScrambleServer(int port, File scrambleFolder, boolean browse) throws IOException {
+	public TNoodleServer(int port, File scrambleFolder, boolean browse) throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 		
 		SortedMap<String, Scrambler> scramblers = Scrambler.getScramblers(scrambleFolder);
@@ -593,7 +593,7 @@ public class ScrambleServer {
 	public static File getProgramDirectory() {
 		File defaultScrambleFolder;
 		try {
-			defaultScrambleFolder = new File(ScrambleServer.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			defaultScrambleFolder = new File(TNoodleServer.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 		} catch (URISyntaxException e) {
 			return new File(".");
 		}
@@ -618,11 +618,11 @@ public class ScrambleServer {
 				File scrambleFolder = options.valueOf(scrambleFolderOpt);
 				boolean openBrowser = !options.has(noBrowserOpt);
 				try {
-					new ScrambleServer(port, scrambleFolder, openBrowser);
+					new TNoodleServer(port, scrambleFolder, openBrowser);
 				} catch(BindException e) {
 					// If this port is in use, we assume it's an instance of
-					// ScrambleServer, and ask it to commit honorable suicide.
-					// After that, we can start up. If it was a ScrambleServer,
+					// TNoodleServer, and ask it to commit honorable suicide.
+					// After that, we can start up. If it was a TNoodleServer,
 					// it hopefully will have freed up the port we want.
 					URL url = new URL("http://localhost:" + port + "/kill/now");
 					System.out.println("Detected server running on port " + port + ", maybe it's an old " + NAME + "? Sending request to " + url + " to hopefully kill it.");
@@ -637,7 +637,7 @@ public class ScrambleServer {
 						try {
 							Thread.sleep(1000);
 							System.out.println("Attempt " + i + "/" + MAX_TRIES + " to start up");
-							new ScrambleServer(port, scrambleFolder, openBrowser);
+							new TNoodleServer(port, scrambleFolder, openBrowser);
 							break;
 						} catch(Exception ee) {
 							ee.printStackTrace();
@@ -700,7 +700,7 @@ abstract class SafeHttpHandler implements HttpHandler {
 	protected static void sendJSONError(HttpExchange t, String error, String callback) {
 		HashMap<String, String> json = new HashMap<String, String>();
 		json.put("error", error);
-		sendJSON(t, ScrambleServer.GSON.toJson(json), callback);
+		sendJSON(t, TNoodleServer.GSON.toJson(json), callback);
 	}
 	
 	protected static void jsonError(HttpExchange t, Throwable error, String callback) {

@@ -32,7 +32,7 @@
 	
 	<property name="cp" value="${gson};${jopt};${itext};" />
 	
-	<property name="main" value="net.gnehzr.tnoodle.scrambles.server.ScrambleServer" />
+	<property name="main" value="net.gnehzr.tnoodle.scrambles.server.TNoodleServer" />
 
     <!-- Properties for Fat-Jar Eclipse Plug-in -->
     <property name="fjepPath" value="${lib}/fatjar.jar" />
