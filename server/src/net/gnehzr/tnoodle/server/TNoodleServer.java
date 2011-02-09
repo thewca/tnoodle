@@ -1,15 +1,9 @@
-package net.gnehzr.tnoodle.scrambles.server;
+package net.gnehzr.tnoodle.server;
 
-import static net.gnehzr.tnoodle.utils.Utils.fullyReadInputStream;
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
+import static net.gnehzr.tnoodle.utils.Utils.fullyReadInputStream;
 
-import java.awt.Color;
 import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -18,8 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.Package;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -27,11 +19,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -47,7 +37,6 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
-@SuppressWarnings("restriction")
 public class TNoodleServer {
 	public static String NAME, VERSION;
 	static {
@@ -288,7 +277,7 @@ public class TNoodleServer {
 		OptionSpec<Integer> portOpt = parser.acceptsAll(Arrays.asList("p", "port"), "The port to run the http server on").withOptionalArg().ofType(Integer.class).defaultsTo(80);
 		OptionSpec<File> scrambleFolderOpt = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
-		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, kill it before starting up");
+		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, do not attempt to kill it and start up");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
@@ -304,7 +293,12 @@ public class TNoodleServer {
 					// After that, we can start up. If it was a TNoodleServer,
 					// it hopefully will have freed up the port we want.
 					URL url = new URL("http://localhost:" + port + "/kill/now");
-					System.out.println("Detected server running on port " + port + ", maybe it's an old " + NAME + "? Sending request to " + url + " to hopefully kill it.");
+					System.out.println("Detected server running on port " + port + ", maybe it's an old " + NAME + "?");
+					if(options.has(noUpgradeOpt)) {
+						System.out.println("noupgrade option set. You'll have to free up port " + port + " manually, or clear this option.");
+						return;
+					}
+					System.out.println("Sending request to " + url + " to hopefully kill it.");
 					URLConnection conn = url.openConnection();
 					InputStream in = conn.getInputStream();
 					in.close();

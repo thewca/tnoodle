@@ -1,15 +1,14 @@
-package  net.gnehzr.tnoodle.scrambles.server;
+package  net.gnehzr.tnoodle.server;
 
-import java.util.Arrays;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Launcher {
 	/*

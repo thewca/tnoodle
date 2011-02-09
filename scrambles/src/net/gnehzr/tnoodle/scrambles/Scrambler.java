@@ -9,15 +9,14 @@ import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -29,23 +28,21 @@ import java.security.AccessControlException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
+import net.gnehzr.tnoodle.utils.Base64;
+import net.gnehzr.tnoodle.utils.Utils;
 import net.goui.util.MTRandom;
 
 import com.eekboom.utils.Strings;
-
-import net.gnehzr.tnoodle.utils.Base64;
-import net.gnehzr.tnoodle.utils.Utils;
 
 /**
  * Subclasses of Scrambler must have a method with the following signature

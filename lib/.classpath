@@ -5,6 +5,7 @@
 	<classpathentry exported="true" kind="lib" path="iText-5.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="jopt-simple-3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugin.jar"/>
+	<classpathentry exported="true" kind="lib" path="h2-1.2.147.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
