@@ -105,6 +105,9 @@ FEATURES
 +shortcuts menu on gerty doesn't work
 +configurable length wca style inspection? apparently some people use this
 
+-undoing now causes an exception
+	-what's up with penalizing orphaned times?
+
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
