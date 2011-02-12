@@ -105,6 +105,11 @@ FEATURES
 +shortcuts menu on gerty doesn't work
 +configurable length wca style inspection? apparently some people use this
 
+-BUILD PROBLEMS
+	-sometimes index.html,tnt.js,tnt.css get clobbered by ant build =(
+	-uncompiled jcubeexplorer doesn't work, tables don't get saved?
+	-ant script task broken on fedora 14?
+
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
