@@ -117,8 +117,8 @@
 			oldIndex['delete'](); //lol @ javascript, can't do oldIndex.delete(), because delete is a keyword
 			newIndex.renameTo(oldIndex);
 
-			println("Globbed " + jsCount + " js files to " + css_globbed);
-			println("Globbed " + cssCount + " css files to " + js_globbed);
+			java.lang.System.out.println("Globbed " + jsCount + " js files to " + css_globbed);
+			java.lang.System.out.println("Globbed " + cssCount + " css files to " + js_globbed);
 ]]>
 		</script>
 
@@ -145,8 +145,8 @@
 		    todir="${tnt_bin}"
 			jsSuffix=".js.min"
 			cssSuffix=".css.min">
-		  <include name="**/*.js" />
-		  <include name="**/*.css" />
+			<include name="${js_globbed_rel}" />
+			<include name="${css_globbed_rel}" />
 		</yui-compressor>
 		<move file="${js_globbed}.min" tofile="${js_globbed}" />
 		<move file="${css_globbed}.min" tofile="${css_globbed}" />
