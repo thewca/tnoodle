@@ -105,15 +105,11 @@ FEATURES
 +shortcuts menu on gerty doesn't work
 +configurable length wca style inspection? apparently some people use this
 
-<<<<<<< HEAD
 -undoing now causes an exception
 	-what's up with penalizing orphaned times?
-=======
 -BUILD PROBLEMS
 	-sometimes index.html,tnt.js,tnt.css get clobbered by ant build =(
 	-uncompiled jcubeexplorer doesn't work, tables don't get saved?
-	-ant script task broken on fedora 14?
->>>>>>> master
 
 -add remaining stackmat options
 -pretty gui for editing
