@@ -1,0 +1,29 @@
+<project name="tnoodle" default="server" basedir=".">
+	<description>
+		See README.textile
+	</description>
+
+	<property name="server" location="server" />
+
+	<target name="server">
+		<ant antfile="${server}/build.xml" inheritAll="false" target="dist" />
+	</target>
+
+	<target name="graph">
+		<echo>
+			TODO - do something awesome here, like generating a dependency graph
+		</echo>
+	</target>
+
+	<target name="release">
+		<echo>
+			TODO - increment VERSION and build?
+		</echo>
+	</target>
+
+	<target name="bugs">
+		<echo>
+			TODO - there could be some fun stuff here using TODO as a backend
+		</echo>
+	</target>
+</project>
