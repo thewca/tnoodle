@@ -15,3 +15,6 @@ bin/
 # Presumably, the .history directory will change all
 # the time, so we ignore it
 .metadata/.plugins/org.eclipse.core.resources/.history
+# These .markers files are apparently uncessary, and they keep changing,
+# so we'll just ignore them
+.metadata/.plugins/org.eclipse.core.resources/.projects/*/.markers
