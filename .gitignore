@@ -3,5 +3,15 @@ dist/
 bin/
 .settings
 .externalToolBuilders
-.metadata/
-!.metadata/.plugins/org.eclipse.core.resources/
+
+# This is some magic to (hopefully) get a proper
+# eclipse workspace commited to the repository
+# This way, you can check out the repository, and
+# simply open it up as an eclipse workspace.
+.metadata/*
+!.metadata/.plugins
+.metadata/.plugins/*
+!.metadata/.plugins/org.eclipse.core.resources
+# Presumably, the .history directory will change all
+# the time, so we ignore it
+.metadata/.plugins/org.eclipse.core.resources/.history
