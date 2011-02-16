@@ -9,9 +9,16 @@ bin/
 # This way, you can check out the repository, and
 # simply open it up as an eclipse workspace.
 .metadata/*
-!.metadata/.plugins
+!.metadata/.plugins/
 .metadata/.plugins/*
-!.metadata/.plugins/org.eclipse.core.resources
+!.metadata/.plugins/org.eclipse.core.resources/
 # Presumably, the .history directory will change all
 # the time, so we ignore it
-.metadata/.plugins/org.eclipse.core.resources/.history
+.metadata/.plugins/org.eclipse.core.resources/.history/
+# TODO comment
+.metadata/.plugins/org.eclipse.core.resources/.root/
+!.metadata/.plugins/org.eclipse.core.resources/.root/10.tree
+
+#TODO - comment
+.metadata/.plugins/org.eclipse.core.resources/.projects/*/org.eclipse.jdt.core/state.dat
+.metadata/.plugins/org.eclipse.core.resources/.projects/*/.markers
