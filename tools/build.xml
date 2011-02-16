@@ -1,4 +1,4 @@
-<project name="tnoodletools">
+<project name="tnoodletools" default="link-hooks">
 	<description>
 		This project contains scripts that are run when certain git commands are executed.
 		Right now, the only git command we're hooking into is "git commit". I've commited code that fails jslint too many times now, and this should prevent it.
@@ -6,4 +6,40 @@
 		For these scripts to actually *do* anything, they must be in the .git/git-hooks directory. I recommend soft linking them there, so you won't have to keep 2 files in sync:
 			ln -s ../../git-hooks/pre-commit pre-commit
 	</description>
+
+	<property name="tools" location="." />
+	<property name="git-hooks-bin" location="../.git/hooks" />
+	<property name="git-hooks-src" location="git-hooks" />
+
+	<!-- TODO it would be nice to have an ant task for symlinking
+		 that works on unix & windows -->
+	<target name="link-hooks-win" if="is-win">
+		<exec executable="${tools}/mklink.bat">
+			<arg value="/D" />
+			<arg value="${git-hooks-bin}" />
+			<arg value="${git-hooks-src}" />
+		</exec>
+	</target>
+	<target name="link-hooks-unix" unless="is-win">
+		<symlink link="${git-hooks-bin}" resource="${git-hooks-src}"></symlink>
+	</target>
+
+	<target name="unlink-hooks-unix" unless="is-win">
+		<exec executable="rm">
+			<arg value="-r" />
+			<arg value="${git-hooks-bin}" />
+		</exec>
+	</target>
+	<target name="unlink-hooks-win" if="is-win">
+		<exec executable="${tools}/rmdir.bat">
+			<arg value="/S" />
+			<arg value="/Q" />
+			<arg value="${git-hooks-bin}" />
+		</exec>
+	</target>
+
+	<target name="link-hooks" depends="unlink-hooks,link-hooks-win,link-hooks-unix" />
+	<target name="unlink-hooks" depends="unlink-hooks-win,unlink-hooks-unix" />
+
+	<target name="clean" depends="unlink-hooks" />
 </project>
