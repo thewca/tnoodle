@@ -21,7 +21,7 @@
 	<uptodate property="uptodate.tables" targetfile="${tables.transition}">
 		<srcfiles dir="${src}" />
 	</uptodate>
-	<target name="tables" depends="compile" unless="uptodate.tables" description="build the pruning and transition tables for the two phase algorithm">
+	<target name="tables" unless="uptodate.tables" description="build the pruning and transition tables for the two phase algorithm">
 		<java classname="org.kociemba.twophase.CoordCube">
 			<arg path="${tables.transition}" />
 			<arg path="${tables.pruning}" />
@@ -36,8 +36,9 @@
 		<ant antfile="../build.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
+		<antcall target="tables" />
 	</target>
-	<target name="dist" depends="compile, tables">
+	<target name="dist" depends="compile">
 		<ant antfile="../build.xml" target="dist" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
