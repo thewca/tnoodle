@@ -177,7 +177,8 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		}
 
 		if(!isInteger(this.value)) {
-			//don't do anything to scrambleIndex
+			//TODO - is there some way to make jslint happy with empty blocks?
+			var nop; //don't do anything to scrambleIndex
 		} else if(this.value < 1) {
 			scrambleIndex = 0;
 		} else if(this.value > importedScrambles.length) {

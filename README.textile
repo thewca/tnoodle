@@ -1,5 +1,8 @@
 TNoodle is really a collection of projects. Each project can be treated as a full fledged Eclipse project (they each have a .classpath and .project file). Furthermore, the whole tnoodle directory can be opened as an Eclipse workspace. Simply go to File > Import > Existing Projects into Workspace, and enter your tnoodle directory under "Select root directory". Eclipse should automagically detect all the tnoodle projects.
 
+TODO - add comment about custom ant installation, maybe add top level scripts to set up PATH and ANT_HOME?
+TODO - git submodule init ?
+
 * jcubeexplorer: A wrapper for Herbert Kociemba's excellent Java implementation of the 2-phase algorithm to save its tables to disk. This shaves the ~10 seconds normally spent starting up down to a fraction of a second. The original source is available here: http://kociemba.org/cube.htm
 
 * tnoodlelib: Java libraries used throughought tnoodle.

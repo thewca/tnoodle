@@ -543,7 +543,7 @@ var TimesTable = new Class({
 		commentArea.setStyle('resize', 'none');
 		form.setStyle('height', height+2*(margin+padding+1));
 		commentArea.setText = function(text) {
-			if(text == "") {
+			if(text === "") {
 				commentArea.setStyle('color', 'gray');
 				commentArea.value = "Enter comment here";
 			} else {
@@ -591,7 +591,7 @@ var TimesTable = new Class({
 			} else if(plusTwo.checked) {
 				timeHoverDiv.time.setPenalty("+2");
 			} else {
-				//this shouldn't happen
+				alert("ERROR"); //TODO - proper error system
 			}
 			table.session.reindex();
 			table.refreshData();
@@ -757,7 +757,8 @@ var TimesTable = new Class({
 			delta += 3; //add a couple for the border, TODO - compute border!
 			this.tbody.scrollTo(0, scrollTop + delta);
 		} else {
-			//the element's on screen!
+			//TODO - is there a better way to make jslint happy?
+			var nop; //the element's on screen!
 		}
 	},
 	

@@ -23,25 +23,20 @@
 	<property name="css_globbed" location="${tnt_bin}/${css_globbed_rel}" />
 
 	<!-- setting up jslint -->
-	<path id="ant.tasks.classpath">
-		<fileset dir="${lib}" includes="*.jar" />
-	</path>
 	<taskdef uri="antlib:com.googlecode.jslint4java"
-		resource="com/googlecode/jslint4java/antlib.xml"
-		classpathref="ant.tasks.classpath" />
+		resource="com/googlecode/jslint4java/antlib.xml" />
 	
 	<!-- setting up yuicompressor -->
-	<property name="yui-compressor.jar" location="${lib}/yuicompressor-2.4.2.jar" />
-	<property name="yui-compressor-ant-task.jar" location="${lib}/yui-compressor-ant-task-0.5.jar" />
 	<path id="task.classpath">
-	  <pathelement location="${yui-compressor.jar}" />
-	  <pathelement location="${yui-compressor-ant-task.jar}" />
+		<fileset dir="${lib}">
+			<include name="yui-compressor-ant-task-0.5.2.jar" />
+			<include name="yuicompressor-2.4.2.jar" />
+		</fileset>
 	</path>
 	<taskdef
 	    name="yui-compressor" 
-	    classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
-	  <classpath refid="task.classpath" />
-	</taskdef>
+		classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask"
+		classpathref="task.classpath" />
 	
 	<target name="init">
 		<tstamp />

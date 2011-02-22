@@ -1,19 +1,28 @@
 <project name="utils" default="compile" basedir=".">
-   <property name="src" location="src" />
-   <property name="bin" location="bin" />
-   <!-- TODO - this is terrible! create a proper dependency manager -->
-   <property name="gson" location="../lib/gson-1.4.jar" />
+	<property name="src" location="src" />
+	<property name="bin" location="bin" />
+	<property name="dist" location="dist" />
 
-   <target name="init">
-      <tstamp />
-      <mkdir dir="${bin}" />
-   </target>
+	<property name="proj" location="." />
+	<property name="name" value="${ant.project.name}" />
+	<propertyset id="tnoodle">
+		<propertyref name="proj" />
+		<propertyref name="name" />
+	</propertyset>
 
-   <target name="compile" depends="init">
-	   <javac srcdir="${src}" destdir="${bin}" classpath="${gson}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
-   </target>
+	<!-- TODO - this is terrible! create a proper dependency manager -->
+	<property name="gson" location="../lib/gson-1.4.jar" />
 
-   <target name="clean">
-      <delete dir="${bin}" />
-   </target>
+	<target name="compile">
+		<ant antfile="../build.xml" target="compile" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
+		<!--<javac srcdir="${src}" destdir="${bin}" classpath="${gson}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />-->
+	</target>
+
+	<target name="clean">
+		<ant antfile="../build.xml" target="clean" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
+	</target>
 </project>

@@ -287,7 +287,7 @@ window.addEvent('domready', function() {
 				if(type_keys[1].contains('tab')) {
 					return;
 				}
-				if(type_keys[1] == "") {
+				if(type_keys[1] === "") {
 					return;
 				}
 				event.stop();
@@ -648,7 +648,7 @@ window.addEvent('domready', function() {
 			url = "";
 		}
 		configuration.set('gui.backgroundImage', url);
-		if(url == "") {
+		if(url === "") {
 			$('bgLink').reset();
 			bgImg.setStyle('display', 'none');
 			window.removeEvent('resize', resizeBgImg);

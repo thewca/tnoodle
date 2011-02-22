@@ -102,7 +102,11 @@
 		<srcfiles dir="${timer}/src" />
 	</uptodate>
 
+	<property name="foo" location="." />
 	<target name="dist" unless="uptodate-server">
+		<echo>
+			!!!! ${foo}
+		</echo>
 		<!-- TODO - look into using ivy, this is getting silly -->
 		<antcall target="dist-server" />
 	</target>

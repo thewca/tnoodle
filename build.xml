@@ -23,7 +23,51 @@
 
 	<target name="bugs">
 		<echo>
-			TODO - there could be some fun stuff here using TODO as a backend
+			TODO - there could be some fun stuff here using the TODO file as a backend
 		</echo>
 	</target>
+
+
+	<!-- TODO - document!
+		guard all calls to these functions
+		 -->
+	<property file="VERSION" />
+	<fail message="Must define VERSION property in file VERSION (in the form VERSION=somestring)" unless="VERSION" />
+	<fail message="TODO" unless="proj" />
+	<fail message="TODO" unless="name" />
+
+	<property name="src" value="${proj}/src" />
+	<property name="bin" value="${proj}/bin" />
+	<property name="dist" value="${proj}/dist" />
+	<property name="classpath" value="${proj}/.classpath" />
+
+	<target name="init">
+		<mkdir dir="${dist}" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<!-- TODO -
+			  1. extract each jar into the bin directory
+			  2. build children, copy their bin into our bin
+			  -->
+		<echo>${classpath}</echo>
+		<xmlproperty file="${classpath}" collapseAttributes="true" />
+		<echoproperties/>
+
+		<javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+	</target>
+
+	<target name="dist" depends="compile">
+		<!-- TODO
+			 option main class?
+			 -->
+		<jar jarfile="${dist}/${name}-${VERSION}.jar" basedir="${bin}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+
 </project>

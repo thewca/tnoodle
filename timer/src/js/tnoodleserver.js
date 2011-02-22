@@ -671,14 +671,14 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		return this.event;
 	};
 	this.setComment = function(comment) {
-		this.comment = comment == '' ? null : comment;
+		this.comment = comment === '' ? null : comment;
 		server.saveSessions();
 	};
 	this.getComment = function(comment) {
 		return this.comment;
 	};
 	this.toString = function() {
-		if(this.event.length == '') {
+		if(this.event.length === '') {
 			return this.puzzle;
 		} else {
 			return this.puzzle + ":" + this.event;

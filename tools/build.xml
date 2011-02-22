@@ -1,15 +1,20 @@
-<project name="tnoodletools" default="link-hooks">
+<project name="tnoodletools" default="all">
 	<description>
 		This project contains scripts that are run when certain git commands are executed.
 		Right now, the only git command we're hooking into is "git commit". I've commited code that fails jslint too many times now, and this should prevent it.
 
-		For these scripts to actually *do* anything, they must be in the .git/git-hooks directory. I recommend soft linking them there, so you won't have to keep 2 files in sync:
-			ln -s ../../git-hooks/pre-commit pre-commit
+		For these scripts to actually *do* anything, they must be in the .git/git-hooks directory. The 'link-hooks' target symlinks .git/git-hooks -> tools/git-hooks.
 	</description>
 
 	<property name="tools" location="." />
 	<property name="git-hooks-bin" location="../.git/hooks" />
 	<property name="git-hooks-src" location="git-hooks" />
+	<property name="ant" location="apache-ant-1.8.2" />
+
+	<target name="all" depends="link-hooks" />
+
+	<!-- TODO what about setting up our custom ant? -->
+	<!-- TODO symlinking our ant lib files? this is a chicken & egg problem... -->
 
 	<!-- TODO it would be nice to have an ant task for symlinking
 		 that works on unix & windows -->
@@ -40,6 +45,7 @@
 
 	<target name="link-hooks" depends="unlink-hooks,link-hooks-win,link-hooks-unix" />
 	<target name="unlink-hooks" depends="unlink-hooks-win,unlink-hooks-unix" />
+
 
 	<target name="clean" depends="unlink-hooks" />
 </project>

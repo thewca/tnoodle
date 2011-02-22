@@ -316,7 +316,7 @@ tnoodle.tnt = {
 				el.setStyle('font-weight', 'bold');
 			}
 			el.appendText(resizeStr(option.text, maxWidth));
-			if(option.text == "" && !option.icon) {
+			if(option.text === "" && !option.icon) {
 				// Nasty little hack to deal with empty options
 				el.setStyle('height', '19px');
 			}
@@ -409,7 +409,7 @@ tnoodle.tnt = {
 			}
 			select.title = select.arrow2.hasClass('hovered') ? rightTip : leftTip;
 			var selected = options[select.selectedIndex];
-			if(selected && selected.text != '') {
+			if(selected && selected.text !== '') {
 				select.title = selected.text + '\n' + select.title;
 			}
 
