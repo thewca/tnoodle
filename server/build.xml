@@ -17,14 +17,13 @@
 	</propertyset>
 
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
-
+	<property name="timer" location="../timer" />
 	<property name="www-src" location="${src}/www" />
 	<property name="www-bin" location="${bin}/www" />
-
 	<property name="favicon-src" location="${src}/favicon.ico" />
 	<property name="favicon-bin" location="${bin}/favicon.ico" />
 
-	<target name="compile">
+	<target name="compile" depends="copy-tnt">
 		<ant antfile="../build.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>

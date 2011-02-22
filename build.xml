@@ -58,7 +58,10 @@
 		<javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 	</target>
 
-	<target name="dist" depends="compile">
+	<target name="dist">
+		<!-- This is some pretty tricky oop stuff =) -->
+		<ant antfile="${proj}/build.xml" target="compile" inheritAll="false" />
+
 		<!-- TODO
 			 optional main class?
 			 -->
