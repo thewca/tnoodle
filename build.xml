@@ -53,7 +53,6 @@
 			  1. extract each jar into the bin directory
 			  2. build children, copy their bin into our bin
 			  -->
-		<echo>${classpath}</echo>
 		<build-dependencies project="${proj}" />
 
 		<javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
@@ -63,7 +62,13 @@
 		<!-- TODO
 			 optional main class?
 			 -->
-		<jar jarfile="${dist}/${name}-${VERSION}.jar" basedir="${bin}" />
+		<jar jarfile="${dist}/${name}-${VERSION}.jar" basedir="${bin}">
+			<manifest>
+				<attribute name="Main-Class" value="${main}"/>
+				<attribute name="Implementation-Title" value="${name}"/>
+				<attribute name="Implementation-Version" value="${VERSION}"/>
+			</manifest>
+		</jar>
 	</target>
 
 	<target name="clean">

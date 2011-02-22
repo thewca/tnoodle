@@ -6,37 +6,25 @@
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="dist" location="dist" />
+
+	<property name="proj" location="." />
+	<property name="name" value="${ant.project.name}" />
+	<propertyset id="tnoodle">
+		<propertyref name="proj" />
+		<propertyref name="name" />
+	</propertyset>
+
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
 
-	<!-- Dependencies! -->
-	<property name="jcubeexplorer" location="../jcubeexplorer/" />
-	<property name="utils" location="../utils/" />
-
-	<property name="cp" value="" />
-	
 	<!--
 		 TODO - maybe make a neat command line utility for generating scrambles?
 	<property name="main" value="" />
 	-->
 
-	<target name="init">
-		<tstamp />
-		<mkdir dir="${dist}" />
-		<mkdir dir="${bin}" />
-	</target>
-
-	<target name="compile" depends="init">
-		<ant antfile="${jcubeexplorer}/build.xml" inheritAll="false" target="compile" />
-		<copy todir="${bin}">
-			<fileset dir="${jcubeexplorer}/bin" includes="**" />
-		</copy>
-		
-		<ant antfile="${utils}/build.xml" inheritAll="false" target="compile" />
-		<copy todir="${bin}">
-			<fileset dir="${utils}/bin" includes="**" />
-		</copy>
-
-		<javac srcdir="${src}" classpath="${cp}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+	<target name="compile">
+		<ant antfile="../build.xml" target="compile" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
 
 		<!-- indexing plugins (they were copied to ${bin} when we compiled them) -->
 		<delete file="${plugin-list}" />
@@ -61,11 +49,14 @@
 	</target>
 
 	<target name="dist"> 
-		<!-- TODO - can make a library jar later -->
+		<ant antfile="../build.xml" target="dist" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
 	</target>
 	
 	<target name="clean">
-		<delete dir="${bin}" />
-		<delete dir="${dist}" />
+		<ant antfile="../build.xml" target="clean" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
 	</target>
 </project>
