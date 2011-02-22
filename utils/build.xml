@@ -10,14 +10,16 @@
 		<propertyref name="name" />
 	</propertyset>
 
-	<!-- TODO - this is terrible! create a proper dependency manager -->
-	<property name="gson" location="../lib/gson-1.4.jar" />
-
 	<target name="compile">
 		<ant antfile="../build.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
-		<!--<javac srcdir="${src}" destdir="${bin}" classpath="${gson}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />-->
+	</target>
+
+	<target name="dist">
+		<ant antfile="../build.xml" target="dist" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
 	</target>
 
 	<target name="clean">
