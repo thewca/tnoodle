@@ -108,8 +108,9 @@ FEATURES
 -undoing now causes an exception
 	-what's up with penalizing orphaned times?
 -BUILD PROBLEMS
+	-FIX MINIFICATION
 	-sometimes index.html,tnt.js,tnt.css get clobbered by ant build =(
-	-uncompiled jcubeexplorer doesn't work, tables don't get saved?
+	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
 
 -add remaining stackmat options
 -pretty gui for editing

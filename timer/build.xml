@@ -151,7 +151,7 @@
 		<ant antfile="${scrambles}/build.xml" inheritAll="false" />
 	</target>
 	
-	<target name="compile" depends="jslint,concat,minify">
+	<target name="compile" depends="jslint,concat">
 		<echo>Successfully built ${ant.project.name}!</echo>
 	</target>
 	
