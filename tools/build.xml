@@ -7,14 +7,22 @@
 	</description>
 
 	<property name="tools" location="." />
+	<property name="lib" location="../lib" />
+	<property name="src" location="src" />
+	<property name="bin" location="bin" />
 	<property name="git-hooks-bin" location="../.git/hooks" />
 	<property name="git-hooks-src" location="git-hooks" />
-	<property name="ant" location="apache-ant-1.8.2" />
+	<property name="ant-lib" location="apache-ant-1.8.2/lib" />
+	<property name="tnoodle-ant-tasks-jar" location="${ant-lib}/TNoodleTasks.jar" />
+	<patternset id="prebuilt-tasks-pattern">
+		<include name="jslint4java-1.4.6.jar" />
+		<include name="yui-compressor-ant-task-0.5.2.jar" />
+		<include name="yuicompressor-2.4.2.jar" />
+	</patternset>
 
-	<target name="all" depends="link-hooks" />
+	<target name="all" depends="link-hooks,make-ant-tasks" />
 
 	<!-- TODO what about setting up our custom ant? -->
-	<!-- TODO symlinking our ant lib files? this is a chicken & egg problem... -->
 
 	<!-- TODO it would be nice to have an ant task for symlinking
 		 that works on unix & windows -->
@@ -46,6 +54,22 @@
 	<target name="link-hooks" depends="unlink-hooks,link-hooks-win,link-hooks-unix" />
 	<target name="unlink-hooks" depends="unlink-hooks-win,unlink-hooks-unix" />
 
+	<target name="make-ant-tasks">
+		<javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+		<jar destfile="${tnoodle-ant-tasks-jar}" basedir="${bin}"/>
+		<copy todir="${ant-lib}">
+			<fileset dir="${lib}">
+				<patternset refid="prebuilt-tasks-pattern" />
+			</fileset>
+		</copy>
+	</target>
 
-	<target name="clean" depends="unlink-hooks" />
+	<target name="clean" depends="unlink-hooks">
+		<delete file="${tnoodle-ant-tasks-jar}" />
+		<delete verbose="true">
+			<fileset dir="${ant-lib}">
+				<patternset refid="prebuilt-tasks-pattern" />
+			</fileset>
+		</delete>
+	</target>
 </project>

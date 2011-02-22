@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="yuicompressor-2.4.2/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="yuicompressor-2.4.2/lib/jargs-1.0.jar"/>
+	<classpathentry kind="lib" path="apache-ant-1.8.2/lib/ant.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
