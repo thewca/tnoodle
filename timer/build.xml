@@ -22,21 +22,8 @@
 	<property name="css_globbed_rel" value="css/tnt.css" />
 	<property name="css_globbed" location="${tnt_bin}/${css_globbed_rel}" />
 
-	<!-- setting up jslint -->
-	<taskdef uri="antlib:com.googlecode.jslint4java"
-		resource="com/googlecode/jslint4java/antlib.xml" />
-	
-	<!-- setting up yuicompressor -->
-	<path id="task.classpath">
-		<fileset dir="${lib}">
-			<include name="yui-compressor-ant-task-0.5.2.jar" />
-			<include name="yuicompressor-2.4.2.jar" />
-		</fileset>
-	</path>
-	<taskdef
-	    name="yui-compressor" 
-		classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask"
-		classpathref="task.classpath" />
+	<taskdef uri="antlib:com.googlecode.jslint4java" resource="com/googlecode/jslint4java/antlib.xml" />
+	<taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask" />
 	
 	<target name="init">
 		<tstamp />
@@ -151,7 +138,7 @@
 		<ant antfile="${scrambles}/build.xml" inheritAll="false" />
 	</target>
 	
-	<target name="compile" depends="jslint,concat">
+	<target name="compile" depends="jslint,concat,minify">
 		<echo>Successfully built ${ant.project.name}!</echo>
 	</target>
 	
