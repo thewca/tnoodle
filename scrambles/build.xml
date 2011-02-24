@@ -1,4 +1,4 @@
-<project name="tnoodlescrambles" default="compile" basedir=".">
+<project name="tnoodlescrambles" default="dist" basedir=".">
 	<description>
 		TODO
 	</description>
@@ -9,17 +9,14 @@
 
 	<property name="proj" location="." />
 	<property name="name" value="${ant.project.name}" />
+	<property name="main" value="net.gnehzr.tnoodle.scrambles.Main" />
 	<propertyset id="tnoodle">
 		<propertyref name="proj" />
 		<propertyref name="name" />
+		<propertyref name="main" />
 	</propertyset>
 
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
-
-	<!--
-		 TODO - maybe make a neat command line utility for generating scrambles?
-	<property name="main" value="" />
-	-->
 
 	<target name="compile">
 		<ant antfile="../build.xml" target="compile" inheritAll="false">
@@ -46,6 +43,12 @@
 		<copy todir="${bin}/scramblers">
 			<fileset dir="${src}/scramblers" includes="*.png" />
 		</copy>
+	</target>
+
+	<target name="run"> 
+		<ant antfile="../build.xml" target="run" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
 	</target>
 
 	<target name="dist"> 

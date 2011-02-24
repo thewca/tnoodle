@@ -1,4 +1,4 @@
-***NOTE: To build, you need ant & ant-nodeps***
+***NOTE: To build, you must set your PATH (and ANT_HOME?) ***
 
 **** Java libraries ****
 gson-1.4.jar: http://code.google.com/p/google-gson/ - Java JSON library that works with generics!
@@ -25,5 +25,4 @@ mootools-1.2.4.4-more.js: http://mootools.net
 **** Ant/development libaries *****
 yui-compressor-ant-task-0.5.jar & yuicompressor-2.4.2.jar: https://github.com/jfly/yui-compressor-ant-task
 jslint4java-1.3.3.jar: http://jslint4java.googlecode.com/svn/docs/1.3.3/ant.html
-fatjar.jar: http://sourceforge.net/projects/fjep/ - This is an awesome ant build task that creates a single "fat" jar from source code and numerous jar libraries. It seems to run really slowly though, maybe there's a better solution?
-plugin.jar: Needed to compile code using the JSObject object. This applies only to applets. The library isn't fatjared becuase browsers seem to provide it.
+plugin.jar: Needed to compile code using the JSObject object. This applies only to applets. The library isn't included in the dist jar becuase browsers seem to provide it.

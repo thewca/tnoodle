@@ -6,15 +6,14 @@
 	<property name="server" location="server" />
 
 	<taskdef name="build-dependencies" classname="tk.tnoodle.tools.ant.BuildEclipseDependenciesTask" />
+	<taskdef name="draw-dependency-graph" classname="tk.tnoodle.tools.ant.DrawEclipseDependenciesTask" />
 
 	<target name="server">
 		<ant antfile="${server}/build.xml" inheritAll="false" target="dist" />
 	</target>
 
 	<target name="graph">
-		<echo>
-			TODO - do something awesome here, like generating a dependency graph
-		</echo>
+		<draw-dependency-graph project="${server}" />
 	</target>
 
 	<target name="release">
@@ -35,13 +34,15 @@
 		 -->
 	<property file="VERSION" />
 	<fail message="Must define VERSION property in file VERSION (in the form VERSION=somestring)" unless="VERSION" />
+	<!--
+		 TODO check main + argv
 	<fail message="TODO" unless="proj" />
 	<fail message="TODO" unless="name" />
+	-->
 
 	<property name="src" value="${proj}/src" />
 	<property name="bin" value="${proj}/bin" />
 	<property name="dist" value="${proj}/dist" />
-	<property name="classpath" value="${proj}/.classpath" />
 
 	<target name="init">
 		<mkdir dir="${dist}" />
@@ -49,18 +50,38 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<!-- TODO -
-			  1. extract each jar into the bin directory
-			  2. build children, copy their bin into our bin
-			  -->
+		<echo>Compiling ${name}</echo>
+
+		<!-- build-dependencies sets ${classpath} -->
 		<build-dependencies project="${proj}" />
 
-		<javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+		<javac srcdir="${src}" classpath="${classpath}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+	</target>
+
+	<target name="run">
+		<!-- We can't just call the compile task defined in this file, because the building
+			 project may have defined it's own customized compile task. -->
+		<ant antfile="${proj}/build.xml" target="compile" inheritAll="false" />
+
+		<!-- We need to call build-dependencies to get ${classpath} set,
+			 the nobuild attribute ensures that we don't do too much work,
+			 since we just compiled our dependencies in the above call to compile. -->
+		<build-dependencies project="${proj}" nobuild="true" />
+
+		<java classname="${main}" classpath="${bin};${classpath}" fork="true" spawn="false">
+			<arg line="${argv}" />
+		</java>
 	</target>
 
 	<target name="dist">
-		<!-- This is some pretty tricky oop stuff =) -->
+		<!-- See comment in the "run" task -->
 		<ant antfile="${proj}/build.xml" target="compile" inheritAll="false" />
+
+		<!-- The compile task we just called will build our dependencies.
+			 There's no need to redo this work, so we set noBuild="true", and
+			 just turn on copyDependencies, which will put everything we need to run
+			 into ${bin}. -->
+		<build-dependencies project="${proj}" noBuild="true" copyDependencies="true" />
 
 		<!-- TODO
 			 optional main class?
@@ -70,6 +91,18 @@
 				<attribute name="Main-Class" value="${main}"/>
 				<attribute name="Implementation-Title" value="${name}"/>
 				<attribute name="Implementation-Version" value="${VERSION}"/>
+			</manifest>
+		</jar>
+
+		<!--
+		<antcall target="addMainToJar" />
+		-->
+	</target>
+
+	<target name="addMainToJar" if="main">
+		<jar jarfile="${dist}/${name}-${VERSION}.jar" update="true">
+			<manifest>
+				<attribute name="Main-Class" value="${main}"/>
 			</manifest>
 		</jar>
 	</target>

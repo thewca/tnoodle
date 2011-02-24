@@ -109,6 +109,7 @@ FEATURES
 	-what's up with penalizing orphaned times?
 -BUILD PROBLEMS
 	-FIX MINIFICATION
+	-get rid of main class from jars that don't need them
 	-sometimes index.html,tnt.js,tnt.css get clobbered by ant build =(
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
 

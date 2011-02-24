@@ -10,10 +10,14 @@
 	<property name="proj" location="." />
 	<property name="name" value="${ant.project.name}" />
 	<property name="main" value="net.gnehzr.tnoodle.server.TNoodleServer" />
+	<!-- We do our development on port 8080 so we don't have to run ant with
+		 root privileges on linux -->
+	<property name="argv" value="-n -p 8080" />
 	<propertyset id="tnoodle">
 		<propertyref name="proj" />
 		<propertyref name="name" />
 		<propertyref name="main" />
+		<propertyref name="argv" />
 	</propertyset>
 
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
@@ -23,7 +27,7 @@
 	<property name="favicon-src" location="${src}/favicon.ico" />
 	<property name="favicon-bin" location="${bin}/favicon.ico" />
 
-	<target name="compile" depends="copy-tnt">
+	<target name="compile">
 		<ant antfile="../build.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
@@ -34,18 +38,15 @@
 		</copy>
 	</target>
 	
-	<target name="run" depends="compile,link-tnt" description="runs the server without compiling the jar file first">
-		<!-- TODO cp -->
-		<java classname="${main}" classpath="${bin};${cp}" fork="true" spawn="false">
-			<arg value="-n" />
-			<!-- We do our development on port 8080 so we don't have to run ant with
-				 root privileges on linux -->
-			<arg value="-p" />
-			<arg value="8080" />
-		</java>
+	<target name="run" description="runs the server without compiling the jar file first">
+		<mkdir dir="${www-bin}" /> <!-- nasty hack to deal with nonexistent www directory -->
+		<antcall target="link-tnt" />
+		<ant antfile="../build.xml" target="run" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
 	</target>
 
-	<target name="dist">
+	<target name="dist" depends="copy-tnt">
 		<ant antfile="../build.xml" target="dist" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
@@ -55,7 +56,7 @@
 		<os family="windows" />
 	</condition>
 
-	<!-- TODO create a mklink rmlink ant task -->
+	<!-- TODO create a mklink/rmlink ant task -->
 	<target name="link-tnt-win" if="is-win">
 		<exec executable="${tools}/mklink.bat">
 			<arg value="/D" />

@@ -51,7 +51,6 @@ public class CubeScrambler extends Scrambler {
 		if(size == 2)
 			calcperm();
 		else if(size == 3) {
-			CoordCube.setDebug(true);
 			CoordCube.init();
 		} else
 			length = DEFAULT_LENGTHS[size];

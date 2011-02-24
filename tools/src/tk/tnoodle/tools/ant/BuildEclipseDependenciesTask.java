@@ -10,90 +10,95 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.Task;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class BuildEclipseDependenciesTask extends Task {
 	@Override
 	public void execute() throws BuildException {
-		if(project == null) {
+		if(buildingProject == null) {
 			throw new BuildException("No project specified");
 		}
-		System.out.println("Building dependencies of " + project);
 		
-		try {
-			//TODO error checking!
-			File classpathFile = new File(project, ".classpath");
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(classpathFile);
-			doc.getDocumentElement().normalize();
-
-			NodeList nList = doc.getElementsByTagName("classpathentry");
-
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-
-				Node nNode = nList.item(temp);	    
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-					Element eElement = (Element) nNode;
-					String kind = eElement.getAttribute("kind");
-					boolean exported = "true".equals(eElement.getAttribute("exported"));
-					String path = eElement.getAttribute("path");
-					File pathFile;
-					if(path.startsWith("/")) {
-						pathFile = new File(root, path);
-					} else {
-						pathFile = new File(project, path);
-					}
-					if(kind.equals("lib")) {
-						if(path.endsWith(".jar")) {
-							// project depends on a precompiled jar, so we simply
-							// extract the jar to our bin directory.
-							extractJar(pathFile, bin);
-						} else {
-							throw new BuildException();
-						}
-					} else if(kind.equals("con")) {
-						// I'm not sure what this is, but I think we can safely ignore it
-					} else if(kind.equals("output")) {
-						if(!pathFile.equals(bin))
-							throw new BuildException();
-					} else if(kind.equals("src")) {
-						if(!pathFile.equals(src)) {
-							// We assume this is an eclipse style project (that is,
-							// it has a .classpath file) and build it and then copy its
-							// contents into our bin directory.
-							File subproject = pathFile;
-							if(!subproject.isDirectory()) {
-								throw new BuildException();
-							}
-							if(!new File(subproject, ".classpath").exists()) {
-								throw new BuildException();
-							}
-							build(subproject);
-							//throw new BuildException(pathFile.getAbsolutePath() + " != " + src.getAbsolutePath());
-						}
-					}
-				}
+		String classpath = getClasspath(null, graph.rootNode);
+		getProject().setProperty("classpath", classpath);
+		
+		if(buildDependencies) {
+			for(EclipseDependencyNode use : graph.rootNode.uses) {
+				build(use.dependency);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		}
+		
+		if(copyDependencies) {
+			copyDependencies(null, graph.rootNode);
+		}
+	}
+
+	private void copyDependencies(EclipseDependencyNode parent, EclipseDependencyNode project) {
+		if(parent == null) {
+			// We don't want to copy the root project's bin directory into itself
+		} else if(project.dependency.getName().endsWith(".jar")) {
+			File jar = project.dependency;
+			System.out.println("Extracting " + jar.getAbsolutePath() + " to " + buildingProjectBin.getAbsolutePath());
+			try {
+				extractJar(jar, buildingProjectBin);
+			} catch (IOException e) {
+				throw new BuildException(e);
+			}
+		} else {
+			File projectBin = new File(project.dependency, "bin");
+			System.out.println("Copying " + projectBin.getAbsolutePath() + " to " + buildingProjectBin.getAbsolutePath());
+			try {
+				copyDirectory(projectBin, buildingProjectBin);
+			} catch (IOException e) {
+				throw new BuildException(e);
+			}
+		}
+		for(EclipseDependencyNode use : project.uses) {
+			copyDependencies(project, use);
+		}
+	}
+
+	private String getClasspath(EclipseDependencyNode parent, EclipseDependencyNode project) {
+		String classpath = "";
+		if(parent != null) {
+			// We don't want to include the root project in the generated classpath
+			classpath += project.getClasspathEntry();
+		}
+		for(EclipseDependencyNode use : project.uses) {
+			classpath += ";" + getClasspath(project, use);
+		}
+		if(classpath.startsWith(";")) {
+			classpath = classpath.substring(1);
+		}
+		return classpath;
+	}
+	
+	private void build(File project) {
+		if(project.getName().endsWith(".jar")) {
+			// No building required if we're dealing with a jar file,
+		} else {
+			System.out.println("Invoking 'compile' on " + project.getName());
+			// We're dealing with an eclipse project. Building it will cause its children to be built.
+			File buildFile = new File(project, "build.xml");
+			if(!buildFile.isFile()) {
+				throw new BuildException();
+			}
+	
+			Project p = new Project();
+			p.setUserProperty("ant.file", buildFile.getAbsolutePath());
+			p.init();
+			ProjectHelper helper = ProjectHelper.getProjectHelper();
+			p.addReference("ant.projectHelper", helper);
+			helper.parse(p, buildFile);
+			p.executeTarget("compile");
 		}
 	}
 	
-	//TODO - can this get sped up?
+//	//TODO - can this get sped up?
 	private void extractJar(File jarFile, File destDir) throws IOException {
-		System.out.println("Extracting " + jarFile + " to " + destDir);
 		JarFile jar = new JarFile(jarFile);
 		Enumeration<JarEntry> entries = jar.entries();
 		while (entries.hasMoreElements()) {
@@ -104,36 +109,28 @@ public class BuildEclipseDependenciesTask extends Task {
 				continue;
 			}
 			f.getParentFile().mkdirs(); // apparently files can show up without their ancestor directories
-			InputStream is = jar.getInputStream(file);
-			FileOutputStream fos = new FileOutputStream(f);
-			while(is.available() > 0) {
-				fos.write(is.read());
-			}
-			fos.close();
-			is.close();
+			InputStream in = jar.getInputStream(file);
+			FileOutputStream out = new FileOutputStream(f);
+			copy(in, out);
+//			while(is.available() > 0) {
+//				fos.write(is.read());
+//			}
+//			fos.close();
+//			is.close();
 		}
-	}
-
-	private void build(File project) throws IOException {
-		System.out.println("Compiling " + this.project + " dependency: " + project);
-		File buildFile = new File(project, "build.xml");
-		File childBin = new File(project, "bin");
-		if(!buildFile.isFile()) {
-			throw new BuildException();
-		}
-
-		Project p = new Project();
-		p.setUserProperty("ant.file", buildFile.getAbsolutePath());
-		p.init();
-		ProjectHelper helper = ProjectHelper.getProjectHelper();
-		p.addReference("ant.projectHelper", helper);
-		helper.parse(p, buildFile);
-		p.executeTarget("compile");
-		
-		System.out.println("Copying" + childBin + " to " + this.bin);
-		copyDirectory(childBin, this.bin);
 	}
 	
+	private void copy(InputStream in, OutputStream out) throws IOException {
+		// Copy the bits from instream to outstream
+		byte[] buf = new byte[1024];
+		int len;
+		while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		in.close();
+		out.close();
+	}
+
 	// Copied from: http://www.java-tips.org/java-se-tips/java.io/how-to-copy-a-directory-from-one-location-to-another-loc-2.html
 	// If targetLocation does not exist, it will be created.
 	public void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
@@ -145,29 +142,30 @@ public class BuildEclipseDependenciesTask extends Task {
 			String[] children = sourceLocation.list();
 			for(int i=0; i<children.length; i++) {
 				copyDirectory(new File(sourceLocation, children[i]),
-						new File(targetLocation, children[i]));
+							  new File(targetLocation, children[i]));
 			}
 		} else {
 			InputStream in = new FileInputStream(sourceLocation);
 			OutputStream out = new FileOutputStream(targetLocation);
-
-			// Copy the bits from instream to outstream
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-			in.close();
-			out.close();
+			copy(in, out);
 		}
 	}
 	
-	private File project, src, bin, root;
+	private File buildingProject, buildingProjectBin;
+	private EclipseDependencyGraph graph;
 	public void setProject(File project) {
-		this.project = project;
-		this.src = new File(project, "src");
-		this.bin = new File(project, "bin");
-		this.root = project.getParentFile();
-		
+		this.buildingProject = project;
+		this.buildingProjectBin = new File(this.buildingProject, "bin");
+		this.graph = new EclipseDependencyGraph(project);
+	}
+	
+	private boolean buildDependencies = true;
+	public void setNoBuild(boolean noBuild) {
+		this.buildDependencies = !noBuild;
+	}
+	
+	private boolean copyDependencies = false;
+	public void setCopyDependencies(boolean copyDependencies) {
+		this.copyDependencies = copyDependencies;
 	}
 }

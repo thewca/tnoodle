@@ -235,6 +235,14 @@ public abstract class Scrambler {
     	return found;
     }
 	
+    /**
+     * TODO comment
+     * @return
+     */
+	public static SortedMap<String, Scrambler> getScramblers() {
+		return getScramblers(null);
+	}
+	
 	/**
 	 * TODO - comment on merging w/ curr classpath
 	 * @param folder The folder containing the Scrambler classes.
