@@ -43,6 +43,7 @@
 	<property name="src" value="${proj}/src" />
 	<property name="bin" value="${proj}/bin" />
 	<property name="dist" value="${proj}/dist" />
+	<property name="dist-jar" value="${dist}/${name}-${VERSION}.jar" />
 
 	<target name="init">
 		<mkdir dir="${dist}" />
@@ -86,21 +87,19 @@
 		<!-- TODO
 			 optional main class?
 			 -->
-		<jar jarfile="${dist}/${name}-${VERSION}.jar" basedir="${bin}">
+		<jar jarfile="${dist-jar}" basedir="${bin}">
 			<manifest>
-				<attribute name="Main-Class" value="${main}"/>
 				<attribute name="Implementation-Title" value="${name}"/>
 				<attribute name="Implementation-Version" value="${VERSION}"/>
 			</manifest>
 		</jar>
 
-		<!--
 		<antcall target="addMainToJar" />
-		-->
 	</target>
 
 	<target name="addMainToJar" if="main">
-		<jar jarfile="${dist}/${name}-${VERSION}.jar" update="true">
+		<echo>Setting ${dist-jar} Main-Class to ${main}</echo>
+		<jar jarfile="${dist-jar}" update="true">
 			<manifest>
 				<attribute name="Main-Class" value="${main}"/>
 			</manifest>
