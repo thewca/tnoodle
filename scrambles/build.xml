@@ -19,10 +19,12 @@
 	<property name="plugin-list" location="${bin}/scramblers/plugins.txt" />
 
 	<target name="compile">
-		<ant antfile="../build.xml" target="compile" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
+	</target>
 
+	<target name="__compile__">
 		<!-- indexing plugins (they were copied to ${bin} when we compiled them) -->
 		<delete file="${plugin-list}" />
 		<pathconvert property="plugin-files" pathsep="${line.separator}">
@@ -46,19 +48,19 @@
 	</target>
 
 	<target name="run"> 
-		<ant antfile="../build.xml" target="run" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="run" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
 
 	<target name="dist"> 
-		<ant antfile="../build.xml" target="dist" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="dist" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
 	
 	<target name="clean">
-		<ant antfile="../build.xml" target="clean" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="clean" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>

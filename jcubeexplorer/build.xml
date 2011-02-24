@@ -17,11 +17,13 @@
 	<property name="tables.transition" location="${bin}/org/kociemba/twophase/transition_tables" />
 	<property name="tables.pruning" location="${bin}/org/kociemba/twophase/pruning_tables" />
 
-	<!-- Set uptodate.tables if the tables have been generated with the most recent code -->
-	<uptodate property="uptodate.tables" targetfile="${tables.transition}">
-		<srcfiles dir="${src}" />
-	</uptodate>
-	<target name="tables" unless="uptodate.tables" description="build the pruning and transition tables for the two phase algorithm">
+	<target name="compile">
+		<ant antfile="../buildlib.xml" target="compile" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
+	</target>
+	<target name="__compile__">
+		<!-- build the pruning and transition tables for the two phase algorithm -->
 		<java classname="org.kociemba.twophase.CoordCube">
 			<arg path="${tables.transition}" />
 			<arg path="${tables.pruning}" />
@@ -31,20 +33,13 @@
 			</classpath>
 		</java>
 	</target>
-
-	<target name="compile">
-		<ant antfile="../build.xml" target="compile" inheritAll="false">
-			<propertyset refid="tnoodle" />
-		</ant>
-		<antcall target="tables" />
-	</target>
 	<target name="dist" depends="compile">
-		<ant antfile="../build.xml" target="dist" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="dist" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
 	<target name="clean">
-		<ant antfile="../build.xml" target="clean" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="clean" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>

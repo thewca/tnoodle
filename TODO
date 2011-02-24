@@ -108,8 +108,10 @@ FEATURES
 -undoing now causes an exception
 	-what's up with penalizing orphaned times?
 -BUILD PROBLEMS
+	-ant's javac task doesn't work will empty .java files, it thinks they've always been modified, since there's no corresponding .class file
 	-FIX MINIFICATION
 	-sometimes index.html,tnt.js,tnt.css get clobbered by ant build =(
+	+ant, ant -> the second call does nothing! =)
 	+get rid of Main-Class from jars that don't need them
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
 
@@ -121,7 +123,7 @@ FEATURES
 
 -saving times
 	-Add a note about opening multiple instances of tnt
-		-screw this, just store everything in the db, just make it easy to create an account
+		-screw this, just store everything in the db, and make it easy to create an account
 	-add login
 	-implement stuff on scratch paper!!!
 

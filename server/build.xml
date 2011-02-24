@@ -28,7 +28,7 @@
 	<property name="favicon-bin" location="${bin}/favicon.ico" />
 
 	<target name="compile">
-		<ant antfile="../build.xml" target="compile" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 
@@ -41,13 +41,13 @@
 	<target name="run" description="runs the server without compiling the jar file first">
 		<mkdir dir="${www-bin}" /> <!-- nasty hack to deal with nonexistent www directory -->
 		<antcall target="link-tnt" />
-		<ant antfile="../build.xml" target="run" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="run" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
 
 	<target name="dist" depends="copy-tnt">
-		<ant antfile="../build.xml" target="dist" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="dist" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>

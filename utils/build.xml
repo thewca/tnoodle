@@ -11,19 +11,20 @@
 	</propertyset>
 
 	<target name="compile">
-		<ant antfile="../build.xml" target="compile" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
+	<target name="__compile__" />
 
 	<target name="dist">
-		<ant antfile="../build.xml" target="dist" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="dist" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
 
 	<target name="clean">
-		<ant antfile="../build.xml" target="clean" inheritAll="false">
+		<ant antfile="../buildlib.xml" target="clean" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>

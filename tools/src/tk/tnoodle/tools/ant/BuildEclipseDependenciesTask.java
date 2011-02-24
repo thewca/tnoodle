@@ -10,7 +10,9 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.Task;
@@ -25,14 +27,23 @@ public class BuildEclipseDependenciesTask extends Task {
 		String classpath = getClasspath(null, graph.rootNode);
 		getProject().setProperty("classpath", classpath);
 		
+		boolean uptodate_src = graph.rootNode.getLastSourceTimestamp() <= graph.rootNode.getLastBuildTimestamp();
 		if(buildDependencies) {
+			long lastBuilt = graph.rootNode.getLastBuildTimestamp();
 			for(EclipseDependencyNode use : graph.rootNode.uses) {
-				build(use.dependency);
+				build(use);
+				uptodate_src &= (lastBuilt >= use.getLastBuildTimestamp());
 			}
+			if(uptodate_src)
+				getProject().setProperty("uptodate-src", "true");
 		}
 		
 		if(copyDependencies) {
 			copyDependencies(null, graph.rootNode);
+		}
+		
+		if(uptodate_src && graph.rootNode.getLastDistTimestamp() >= graph.rootNode.getLastBuildTimestamp()) {
+			getProject().setProperty("uptodate-dist", "true");
 		}
 	}
 
@@ -76,18 +87,48 @@ public class BuildEclipseDependenciesTask extends Task {
 		return classpath;
 	}
 	
-	private void build(File project) {
-		if(project.getName().endsWith(".jar")) {
+	private void build(EclipseDependencyNode project) {
+		if(project.dependency.getName().endsWith(".jar")) {
 			// No building required if we're dealing with a jar file,
 		} else {
-			System.out.println("Invoking 'compile' on " + project.getName());
+			System.out.println("Invoking 'compile' on " + project.dependency.getName());
 			// We're dealing with an eclipse project. Building it will cause its children to be built.
-			File buildFile = new File(project, "build.xml");
+			File buildFile = new File(project.dependency, "build.xml");
 			if(!buildFile.isFile()) {
 				throw new BuildException();
 			}
 	
 			Project p = new Project();
+			
+			// Without this BuildListener weirdness, stdout from task execution doesn't getting printed.
+			BuildListener bl = new BuildListener() {
+				@Override
+				public void taskStarted(BuildEvent arg0) {}
+				
+				@Override
+				public void taskFinished(BuildEvent arg0) {}
+				
+				@Override
+				public void targetStarted(BuildEvent arg0) {}
+				
+				@Override
+				public void targetFinished(BuildEvent arg0) {}
+				
+				@Override
+				public void messageLogged(BuildEvent e) {
+					if(e.getPriority() <= 2) {
+						System.out.println(e.getTarget() + ": " + e.getMessage());
+					}
+				}
+				
+				@Override
+				public void buildStarted(BuildEvent arg0) {}
+				
+				@Override
+				public void buildFinished(BuildEvent arg0) {}
+			};
+			p.addBuildListener(bl);
+			
 			p.setUserProperty("ant.file", buildFile.getAbsolutePath());
 			p.init();
 			ProjectHelper helper = ProjectHelper.getProjectHelper();
@@ -97,7 +138,6 @@ public class BuildEclipseDependenciesTask extends Task {
 		}
 	}
 	
-//	//TODO - can this get sped up?
 	private void extractJar(File jarFile, File destDir) throws IOException {
 		JarFile jar = new JarFile(jarFile);
 		Enumeration<JarEntry> entries = jar.entries();

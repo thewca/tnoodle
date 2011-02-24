@@ -1,0 +1,76 @@
+<project>
+	<!-- TODO - document!
+		 -->
+	<property file="VERSION" />
+	<fail message="Must define VERSION property in file VERSION (in the form VERSION=somestring)" unless="VERSION" />
+	<fail message="TODO" unless="proj" />
+	<fail message="TODO" unless="name" />
+	<fail message="TODO" if="argv" unless="main" />
+
+	<property name="src" value="${proj}/src" />
+	<property name="bin" value="${proj}/bin" />
+	<property name="dist" value="${proj}/dist" />
+	<property name="dist-jar" value="${dist}/${name}-${VERSION}.jar" />
+
+	<taskdef name="build-dependencies" classname="tk.tnoodle.tools.ant.BuildEclipseDependenciesTask" />
+
+	<target name="init">
+		<mkdir dir="${dist}" />
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<echo>Compiling ${name}</echo>
+
+		<!-- build-dependencies sets ${classpath} and ${uptodate-src} -->
+		<build-dependencies project="${proj}" />
+
+		<antcall target="compile-javac" />
+	</target>
+
+	<target name="compile-javac" unless="uptodate-src">
+		<javac srcdir="${src}" classpath="${classpath}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+
+		<!-- TODO - comment & update other buildfiles -->
+		<ant antfile="${proj}/build.xml" target="__compile__" inheritAll="false" />
+	</target>
+
+	<target name="run" depends="compile">
+		<java classname="${main}" classpath="${bin};${classpath}" fork="true" spawn="false">
+			<arg line="${argv}" />
+		</java>
+	</target>
+
+	<target name="dist" depends="compile">
+		<antcall target="dist-jar" />
+	</target>
+	<target name="dist-jar" unless="uptodate-dist">
+		<!-- The compile task we just called built our dependencies.
+			 There's no need to redo this work, so we set noBuild="true", and
+			 just turn on copyDependencies, which will put everything we need 
+			 in order to run into ${bin}. -->
+		<build-dependencies project="${proj}" noBuild="true" copyDependencies="true" />
+
+		<jar jarfile="${dist-jar}" basedir="${bin}">
+			<manifest>
+				<attribute name="Implementation-Title" value="${name}"/>
+				<attribute name="Implementation-Version" value="${VERSION}"/>
+			</manifest>
+		</jar>
+		<antcall target="addMainToJar" />
+	</target>
+
+	<target name="addMainToJar" if="main">
+		<echo>Setting ${dist-jar} Main-Class to ${main}</echo>
+		<jar jarfile="${dist-jar}" update="true">
+			<manifest>
+				<attribute name="Main-Class" value="${main}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+</project>

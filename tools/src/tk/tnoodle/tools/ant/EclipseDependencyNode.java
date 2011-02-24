@@ -22,4 +22,41 @@ public class EclipseDependencyNode {
 		}
 		return new File(dependency, "bin").getAbsolutePath();
 	}
+	
+	public long getLastSourceTimestamp() {
+		if(dependency.getName().endsWith(".jar")) {
+			return dependency.lastModified();
+		}
+		return getLatestTimestamp(new File(dependency, "src"));
+	}
+	
+	public long getLastDistTimestamp() {
+		if(dependency.getName().endsWith(".jar")) {
+			return dependency.lastModified();
+		}
+		return getLatestTimestamp(new File(dependency, "dist"));
+	}
+	
+	public long getLastBuildTimestamp() {
+		if(dependency.getName().endsWith(".jar")) {
+			return dependency.lastModified();
+		}
+		return getLatestTimestamp(new File(dependency, "bin"));
+	}
+	
+	private long getLatestTimestamp(File f) {
+		if(f.isFile()) {
+			return f.lastModified();
+		}
+		long latest = 0;
+		for(File child : f.listFiles()) {
+			latest = Math.max(latest, getLatestTimestamp(child));
+		}
+		return latest;
+	}
+	
+	@Override
+	public String toString() {
+		return dependency.getName();
+	}
 }
