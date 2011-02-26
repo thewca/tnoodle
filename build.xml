@@ -5,8 +5,7 @@
 
 	<property name="server" location="server" />
 	<property name="tools" location="tools" />
-
-	<taskdef name="draw-dependency-graph" classname="tk.tnoodle.tools.ant.DrawEclipseDependenciesTask" />
+	<property name="lib" location="lib" />
 
 	<target name="server">
 		<ant antfile="${server}/build.xml" inheritAll="false" target="dist" />
@@ -20,6 +19,8 @@
 	</target>
 
 	<target name="graph">
+		<ant antfile="${tools}/build.xml" inheritAll="false" />
+		<taskdef name="draw-dependency-graph" classname="tk.tnoodle.tools.ant.DrawEclipseDependenciesTask" classpath="${lib}/TNoodleTasks.jar" />
 		<draw-dependency-graph project="${server}" />
 	</target>
 

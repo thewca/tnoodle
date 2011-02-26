@@ -12,15 +12,19 @@
 	<property name="bin" location="bin" />
 	<property name="git-hooks-bin" location="../.git/hooks" />
 	<property name="git-hooks-src" location="git-hooks" />
-	<property name="ant-lib" location="apache-ant-1.8.2/lib" />
-	<property name="tnoodle-ant-tasks-jar" location="${ant-lib}/TNoodleTasks.jar" />
-	<patternset id="prebuilt-tasks-pattern">
-		<include name="jslint4java-1.4.6.jar" />
-		<include name="yui-compressor-ant-task-0.5.2.jar" />
-		<include name="yuicompressor-2.4.2.jar" />
-	</patternset>
+	<property name="tnoodle-ant-tasks-jar" location="${lib}/TNoodleTasks.jar" />
 
-	<target name="all" depends="link-hooks,make-ant-tasks" />
+	<!-- The "all" target gets called a lot (almost every build file needs
+		 our ant tasks). This helps keep us from rebuilding tools unnecessarily. -->
+	<uptodate property="uptodate" targetfile="${tnoodle-ant-tasks-jar}">
+		<srcfiles dir="${src}" includes="**/*" />
+		<srcfiles dir="git-hooks" includes="**/*" />
+	</uptodate>
+
+	<target name="all" unless="uptodate">
+		<antcall target="link-hooks" />
+		<antcall target="make-ant-tasks" />
+	</target>
 
 	<!-- TODO what about setting up our custom ant? -->
 
@@ -55,21 +59,11 @@
 	<target name="unlink-hooks" depends="unlink-hooks-win,unlink-hooks-unix" />
 
 	<target name="make-ant-tasks">
-		<javac srcdir="${src}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
+		<javac srcdir="${src}" destdir="${bin}" classpath="${ant-jar}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 		<jar destfile="${tnoodle-ant-tasks-jar}" basedir="${bin}"/>
-		<copy todir="${ant-lib}">
-			<fileset dir="${lib}">
-				<patternset refid="prebuilt-tasks-pattern" />
-			</fileset>
-		</copy>
 	</target>
 
 	<target name="clean" depends="unlink-hooks">
 		<delete file="${tnoodle-ant-tasks-jar}" />
-		<delete verbose="true">
-			<fileset dir="${ant-lib}">
-				<patternset refid="prebuilt-tasks-pattern" />
-			</fileset>
-		</delete>
 	</target>
 </project>

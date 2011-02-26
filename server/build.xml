@@ -31,7 +31,8 @@
 		<ant antfile="../buildlib.xml" target="compile" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
-
+	</target>
+	<target name="__compile__">
 		<!-- copying root www directory -->
 		<copy todir="${www-bin}">
 			<fileset dir="${www-src}" includes="**" />

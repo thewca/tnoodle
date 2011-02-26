@@ -11,8 +11,12 @@
 	<property name="bin" value="${proj}/bin" />
 	<property name="dist" value="${proj}/dist" />
 	<property name="dist-jar" value="${dist}/${name}-${VERSION}.jar" />
+	
+	<property name="lib" location="lib" />
+	<property name="tools" location="tools" />
 
-	<taskdef name="build-dependencies" classname="tk.tnoodle.tools.ant.BuildEclipseDependenciesTask" />
+	<ant antfile="${tools}/build.xml" inheritAll="false" />
+	<taskdef name="build-dependencies" classname="tk.tnoodle.tools.ant.BuildEclipseDependenciesTask" classpath="${lib}/TNoodleTasks.jar" />
 
 	<target name="init">
 		<mkdir dir="${dist}" />
