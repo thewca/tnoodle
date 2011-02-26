@@ -109,7 +109,7 @@ FEATURES
 	-what's up with penalizing orphaned times?
 -BUILD PROBLEMS
 	-ant's javac task doesn't work with empty .java files, it thinks they've always been modified, since there's no corresponding .class file
-	-FIX MINIFICATION
+	+FIX MINIFICATION (by reverting to old jslint, lol)
 	+optimize git commit hook to only jslint when a .js file has been modified
 	+sometimes index.html,tnt.js,tnt.css get clobbered by ant build =(
 	+ant, ant -> the second call does nothing! =)
