@@ -1,2 +1,12 @@
-#!/bin/sh
-( cd timer; ant jslint )
+#!/usr/bin/python
+
+import os, sys
+
+files = os.popen("git diff --name-only").read().split('\n')
+files = filter(lambda f: f.endswith('.js'), files)
+if files:
+	success = os.system("ant -f timer/build.xml jslint")
+
+	# TODO - returning 256 is treated as success?
+	if success != 0:
+		sys.exit("Failed jslint. Use git commit --no-verify if you really know what you're doing.")
