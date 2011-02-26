@@ -87,7 +87,7 @@ public class EclipseDependencyGraph {
 				if(node.getNodeType() == Node.ELEMENT_NODE) {
 					Element classpathEntry = (Element) node;
 					String kind = classpathEntry.getAttribute("kind");
-					boolean exported = "true".equals(classpathEntry.getAttribute("exported"));
+//					boolean exported = "true".equals(classpathEntry.getAttribute("exported"));
 					String path = classpathEntry.getAttribute("path");
 					File pathFile;
 					if(path.startsWith("/")) {

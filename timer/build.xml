@@ -10,7 +10,6 @@
 	<property name="lib" location="../lib" />
 	<property name="bin" location="bin" />
 	<property name="tnt_bin" location="bin/tnt" />
-	<property name="scrambles" location="../scrambles" />
 
 	<property name="js_src" location="${src}/js/" />
 	<property name="js_bin" location="${tnt_bin}/js/" />
@@ -134,17 +133,16 @@
 		<move file="${css_globbed}.min" tofile="${css_globbed}" />
 	</target>
 	
-	<target name="scrambles">
-		<ant antfile="${scrambles}/build.xml" inheritAll="false" />
-	</target>
-	
-	<target name="compile" depends="jslint,concat,minify">
+	<!-- TODO: comment on assumption about which files are edited -->
+	<uptodate property="uptodate" targetfile="${js_globbed}">
+		<srcfiles dir="${src}" includes="**/*" />
+	</uptodate>
+
+	<target name="compile" unless="uptodate">
+		<antcall target="__compile__" />
 		<echo>Successfully built ${ant.project.name}!</echo>
 	</target>
-	
-	<target name="compile-nomin" depends="jslint,concat">
-		<echo>Successfully built ${ant.project.name} without minifying!</echo>
-	</target>
+	<target name="__compile__" depends="jslint,concat,minify" />
 	
 	<target name="clean">
 		<delete dir="${bin}" />

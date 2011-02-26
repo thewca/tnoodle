@@ -52,6 +52,7 @@
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
+	<target name="__prerun__" /> 
 
 	<target name="dist"> 
 		<ant antfile="../buildlib.xml" target="dist" inheritAll="false">

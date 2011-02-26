@@ -40,6 +40,8 @@
 	</target>
 
 	<target name="run" depends="compile">
+		<!-- TODO - comment & update other buildfiles -->
+		<ant antfile="${proj}/build.xml" target="__prerun__" inheritAll="false" />
 		<java classname="${main}" classpath="${bin};${classpath}" fork="true" spawn="false">
 			<arg line="${argv}" />
 		</java>

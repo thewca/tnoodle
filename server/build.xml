@@ -37,6 +37,8 @@
 		<copy todir="${www-bin}">
 			<fileset dir="${www-src}" includes="**" />
 		</copy>
+		<!-- copying tnt (it was automatically built for us by buildlib) -->
+		<antcall target="copy-tnt" />
 	</target>
 	
 	<target name="run" description="runs the server without compiling the jar file first">
@@ -46,8 +48,12 @@
 			<propertyset refid="tnoodle" />
 		</ant>
 	</target>
+	<target name="__prerun__">
+		<!-- TODO comment, it would be nice to prevent "compile", but i think that's impossible -->
+		<antcall target="link-tnt" />
+	</target>
 
-	<target name="dist" depends="copy-tnt">
+	<target name="dist">
 		<ant antfile="../buildlib.xml" target="dist" inheritAll="false">
 			<propertyset refid="tnoodle" />
 		</ant>
@@ -103,10 +109,6 @@
 	<target name="link-tnt" depends="unlink-tnt,link-tnt-unix,link-tnt-win" />
 
 	<target name="copy-tnt" depends="unlink-tnt">
-		<!-- We only compile tnt when distributing the server because we don't want it to
-			 get compiled when doing a "run". If we're doing a "run" with compiled code,
-			 it's very hard to debug. -->
-		<ant antfile="${timer}/build.xml" inheritAll="false" target="compile" />
 		<copy todir="${bin}/www">
 			<fileset dir="${timer}/bin/" includes="**" />
 		</copy>
