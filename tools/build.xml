@@ -12,6 +12,9 @@
 	<property name="bin" location="bin" />
 	<property name="git-hooks-bin" location="../.git/hooks" />
 	<property name="git-hooks-src" location="git-hooks" />
+	<property name="ant" location="apache-ant-1.8.2" />
+	<property name="ant-lib" location="${ant}/lib" />
+	<property name="ant-jar" location="${ant-lib}/ant.jar" />
 	<property name="tnoodle-ant-tasks-jar" location="${lib}/TNoodleTasks.jar" />
 
 	<!-- The "all" target gets called a lot (almost every build file needs
@@ -58,7 +61,10 @@
 	<target name="link-hooks" depends="unlink-hooks,link-hooks-win,link-hooks-unix" />
 	<target name="unlink-hooks" depends="unlink-hooks-win,unlink-hooks-unix" />
 
-	<target name="make-ant-tasks">
+	<target name="init">
+		<mkdir dir="${bin}" />
+	</target>
+	<target name="make-ant-tasks" depends="init">
 		<javac srcdir="${src}" destdir="${bin}" classpath="${ant-jar}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 		<jar destfile="${tnoodle-ant-tasks-jar}" basedir="${bin}"/>
 	</target>
