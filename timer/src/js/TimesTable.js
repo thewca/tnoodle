@@ -888,10 +888,7 @@ var TimesTable = new Class({
 				setTimeout(function() {
 					//This table may actually be hidden during this call...
 					//so positioning the hoverDiv doesn't work until later.
-					//TODO OMG WTF LOL, if there's only 1 call to show(), the
-					//hover is sized incorrectly when esc is pressed
 					this.timeHoverDiv.show(tr, tr.time);
-					//this.timeHoverDiv.show(tr, tr.time);
 				}.bind(this), 0);
 			} else {
 				tr.removeClass('hovered');

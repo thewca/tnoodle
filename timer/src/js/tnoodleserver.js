@@ -449,7 +449,10 @@ tnoodle.Time = function(time, scramble) {
 	var server = null;
 	this.setSession = function(sesh) {
 		session = sesh;
-		server = session.getServer();
+		server = session === null ? null : session.getServer();
+	};
+	this.getSession = function() {
+		return session;
 	};
 	/* time can be either a number or a string */
 	this.format = function(key) {
@@ -824,7 +827,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		var session = this;
 		var action = {
 			undo: function() {
-				//TODO - this is causing exceptions
+				// Orphaned times have a null session
 				time.setSession(null);
 				this.disposeTime(time, true);
 				unscramble(time);

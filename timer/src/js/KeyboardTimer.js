@@ -313,7 +313,13 @@ var KeyboardTimer = new Class({
 			} else if(this.lastTime) {
 				// This little tricky bit lets the user see penalties they've applied to the
 				// most recent solve.
-				return this.lastTime.format();
+				if(this.lastTime.getSession() === null) {
+					// Note: A time's session is set to null when deleted
+					// In this event, we just reset the timer
+					centis = 0;
+				} else {
+					return this.lastTime.format();
+				}
 			}
 			return this.server.formatTime(centis, decimalPlaces);
 		}

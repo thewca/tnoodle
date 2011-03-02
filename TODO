@@ -104,10 +104,7 @@ FEATURES
 +add a "new session" icon
 +shortcuts menu on gerty doesn't work
 +configurable length wca style inspection? apparently some people use this
-
--undoing now causes an exception
-	-what's up with penalizing orphaned times?
--BUILD PROBLEMS
++build problems
 	-ant's javac task doesn't work with empty .java files, it thinks they've always been modified, since there's no corresponding .class file
 	+FIX MINIFICATION (by reverting to old jslint, lol)
 	+optimize git commit hook to only jslint when a .js file has been modified
@@ -115,6 +112,9 @@ FEATURES
 	+ant, ant -> the second call does nothing! =)
 	+get rid of Main-Class from jars that don't need them
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
+
+-undoing now causes an exception
+	-what's up with penalizing orphaned times?
 
 -add remaining stackmat options
 -pretty gui for editing
