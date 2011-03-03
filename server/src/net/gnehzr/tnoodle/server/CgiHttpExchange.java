@@ -108,9 +108,10 @@ public class CgiHttpExchange extends HttpExchange {
 		for(String key : responseHeaders.keySet()) {
 			if(key == null) continue;
 			for(String value : responseHeaders.get(key)) {
-				System.out.println(key + ": " + value);
+				System.out.print(key + ": " + value + "\r\n");
 			}
 		}
+		System.out.print("\r\n");
 	}
 
 	@Override

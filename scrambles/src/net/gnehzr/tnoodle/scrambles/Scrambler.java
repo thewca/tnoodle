@@ -86,7 +86,7 @@ public abstract class Scrambler {
 	protected abstract String generateScramble(Random r);
 
 	/**
-	 * Subclasses of ScrambleImageGenerator are expected to produce scrambles of one size,
+	 * Subclasses of Scrambler are expected to produce scrambles of one size,
 	 * this abstract class will resize appropriately.
 	 * @return The size of the images this Scrambler will produce.
 	 */
@@ -187,40 +187,46 @@ public abstract class Scrambler {
     /**
      * TODO - comment!
      */
-    private static HashSet<String> findLoadedGenerators() {
-    	HashSet<String> classNames = new HashSet<String>();
-    	InputStream is = Scrambler.class.getResourceAsStream(SCRAMBLE_PLUGIN_LIST);
-    	if(is == null)
-    		return classNames;
-    	BufferedReader in = new BufferedReader(new InputStreamReader(is));
-    	try {
-    		String line = null;
-			while((line = in.readLine()) != null) {
-				classNames.add(SCRAMBLE_PLUGIN_PACKAGE + line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return classNames;
-    }
-    
-    private static HashSet<String> findPluginGenerators(File folder) {
-    	HashSet<String> potentialClasses = new HashSet<String>();
-		File[] files = folder.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.isFile() && f.getName().indexOf('$') == -1 && f.getName().endsWith(PLUGIN_EXTENSION);
-			}
-		});
-		if(files != null) {
-			for(File f : files) {
-				potentialClasses.add(SCRAMBLE_PLUGIN_PACKAGE + f.getName().substring(0, f.getName().length()-PLUGIN_EXTENSION.length()));
+	private static HashSet<String> jarredScramblers = null;
+    private static HashSet<String> findJarredScramblers() {
+		if(jarredScramblers == null) {
+    		jarredScramblers = new HashSet<String>();
+    		InputStream is = Scrambler.class.getResourceAsStream(SCRAMBLE_PLUGIN_LIST);
+    		if(is != null) {
+    			BufferedReader in = new BufferedReader(new InputStreamReader(is));
+    			try {
+    				String line = null;
+					while((line = in.readLine()) != null) {
+						jarredScramblers.add(SCRAMBLE_PLUGIN_PACKAGE + line);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		return potentialClasses;
+		return jarredScramblers;
     }
     
-    private static ArrayList<Class<? extends Scrambler>> loadGenerators(ClassLoader cl, HashSet<String> potentialClassNames) {
+	private static HashSet<String> pluginScramblers = null;
+    private static HashSet<String> findPluginScramblers(File folder) {
+		if(pluginScramblers == null) {
+			pluginScramblers = new HashSet<String>();
+			File[] files = folder.listFiles(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					return f.isFile() && f.getName().indexOf('$') == -1 && f.getName().endsWith(PLUGIN_EXTENSION);
+				}
+			});
+			if(files != null) {
+				for(File f : files) {
+					pluginScramblers.add(SCRAMBLE_PLUGIN_PACKAGE + f.getName().substring(0, f.getName().length()-PLUGIN_EXTENSION.length()));
+				}
+			}
+		}
+		return pluginScramblers;
+    }
+    
+    private static ArrayList<Class<? extends Scrambler>> loadScramblers(ClassLoader cl, HashSet<String> potentialClassNames) {
 		ArrayList<Class<? extends Scrambler>> found = new ArrayList<Class<? extends Scrambler>>();
 		if(cl == null)
 			return found;
@@ -234,24 +240,49 @@ public abstract class Scrambler {
 		}
     	return found;
     }
+
+	/**
+	 * TODO - optimate for CGI?
+	 */
+	public static Scrambler getScrambler(String puzzle) {
+		Scrambler s = getScramblers().get(puzzle);
+		//if(s == null) {
+			//TODO
+		//}
+		return s;
+	}
 	
     /**
      * TODO comment
      * @return
      */
 	public static SortedMap<String, Scrambler> getScramblers() {
-		return getScramblers(null);
+		return getScramblers(null, false);
 	}
 	
+	//sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
+	private static SortedMap<String, Scrambler> scramblers = new TreeMap<String, Scrambler>(Strings.getNaturalComparator());
+	private static boolean loadedAllScrambles = false;
+
 	/**
-	 * TODO - comment on merging w/ curr classpath
+	 * TODO - comment on merging w/ curr classpath and caching
 	 * @param folder The folder containing the Scrambler classes.
 	 * If null, looks for a directory named scramblers in the "program's directory", as defined by getScramblePluginDirectory(). 
 	 * @return A HashMap mapping shortNames to valid Scramblers found in folder
 	 *  sorted in a "natural" order (such that 3x3x3 comes before 10x10x10).
 	 *  Returns null if the directory was invalid. 
 	 */
-	public static SortedMap<String, Scrambler> getScramblers(File folder) {
+	public static SortedMap<String, Scrambler> getScramblers(File folder, boolean forceReload) {
+		if(forceReload) {
+			pluginScramblers = null; //this should force a rescan of the plugin folder
+			jarredScramblers = null; //I can't imagine that checking the jar file again will have any effect, but it can't hurt
+			loadedAllScrambles = false;
+			scramblers.clear();
+		}
+		if(loadedAllScrambles) {
+			return scramblers;
+		}
+
 		if(folder == null) {
 			try {
 				folder = getScramblePluginDirectory();
@@ -260,37 +291,33 @@ public abstract class Scrambler {
 			}
 		}
 
-		ArrayList<Class<? extends Scrambler>> loadedGenerators = null;
-		HashSet<String> loadedGeneratorNames = findLoadedGenerators();
-		if(folder == null) {
-			//we're must be in an applet, so we look to our classloader
-			loadedGenerators = loadGenerators(Scrambler.class.getClassLoader(), loadedGeneratorNames);
-		} else {
-			//we're not in an applet
-			HashSet<String> pluginGeneratorNames = findPluginGenerators(folder);
-			loadedGeneratorNames.removeAll(pluginGeneratorNames); //we default to plugins
+		ArrayList<Class<? extends Scrambler>> loadedScramblers = null;
+		HashSet<String> jarredScramblerNames = findJarredScramblers();
+		HashSet<String> pluginScramblerNames = findPluginScramblers(folder);
+		// We prefer plugin Scramblers over jarred Scramblers
+		jarredScramblerNames.removeAll(pluginScramblerNames);
 
-			loadedGenerators = loadGenerators(Scrambler.class.getClassLoader(), loadedGeneratorNames);
-			URLClassLoader cl = null;
-			try {
-				cl = new URLClassLoader(new URL[] { folder.getParentFile().toURI().toURL() });
-			} catch (MalformedURLException e2) {
-				e2.printStackTrace();
-			}
-			ArrayList<Class<? extends Scrambler>> pluginGenerators = loadGenerators(cl, pluginGeneratorNames);
-			loadedGenerators.addAll(pluginGenerators); //now all the classpath generators are in loadedGenerators, followed by the plugins
+		// load the Scramblers from the jar file (minus the Scramblers in our plugin directory)
+		loadedScramblers = loadScramblers(Scrambler.class.getClassLoader(), jarredScramblerNames);
+
+		// load the Scramblers from the plugin directory
+		URLClassLoader cl = null;
+		try {
+			cl = new URLClassLoader(new URL[] { folder.getParentFile().toURI().toURL() });
+		} catch (MalformedURLException e2) {
+			e2.printStackTrace();
 		}
-		
-		//sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
-		TreeMap<String, Scrambler> scramblers = new TreeMap<String, Scrambler>(Strings.getNaturalComparator());
-		for(Class<? extends Scrambler> clz : loadedGenerators) {
+		ArrayList<Class<? extends Scrambler>> pluginScramblers = loadScramblers(cl, pluginScramblerNames);
+		loadedScramblers.addAll(pluginScramblers); //now all the classpath scramblers are in loadedScramblers, followed by the plugins
+
+		for(Class<? extends Scrambler> clz : loadedScramblers) {
 			try {
 				Method createScramblers = clz.getMethod("createScramblers");
 				if(!Modifier.isSynchronized(createScramblers.getModifiers())) {
 					throw new NoSuchMethodException("createScramblers() must be synchronized (class " + clz.getCanonicalName() + ")");
 				}
-				Scrambler[] generators = (Scrambler[]) createScramblers.invoke(null);
-				for(Scrambler scrambler : generators) {
+				Scrambler[] scramblerArray = (Scrambler[]) createScramblers.invoke(null);
+				for(Scrambler scrambler : scramblerArray) {
 					scramblers.put(scrambler.getShortName(), scrambler);
 				}
 			} catch(NoSuchMethodException e) {
@@ -303,6 +330,7 @@ public abstract class Scrambler {
 				e.printStackTrace();
 			}
 		}
+		loadedAllScrambles = true;
 		return scramblers;
 	}
 
