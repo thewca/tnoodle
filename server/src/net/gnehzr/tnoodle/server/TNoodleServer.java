@@ -35,6 +35,7 @@ import joptsimple.OptionSpec;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 public class TNoodleServer {
@@ -159,7 +160,7 @@ public class TNoodleServer {
 		}
 	}
 
-	private class FileHandler extends SafeHttpHandler {
+	private static class FileHandler extends SafeHttpHandler {
 		MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
 		{
 			mimes.addMimeTypes("text/css css");
@@ -284,8 +285,11 @@ public class TNoodleServer {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
 				if(options.has(cgiOpt)) {
-					System.out.print("Content-type: text/plain\n\n");
-					System.out.println("Hello world!");
+					HttpHandler handler = new FileHandler();
+					CgiHttpExchange cgiExchange = new CgiHttpExchange(); ;
+					handler.handle(cgiExchange);
+					//System.out.print("Content-type: text/plain\n\n");
+					//System.out.println("Hello world!");
 					return;
 				}
 				int port = options.valueOf(portOpt);

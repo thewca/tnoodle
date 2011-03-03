@@ -61,9 +61,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 	
 	private final DefaultSplitCharacter SPLIT_ON_SPACES = new DefaultSplitCharacter() {
 		@Override
-		public boolean isSplitCharacter(int start,
-				int current, int end, char[] cc,
-				PdfChunk[] ck) {
+		public boolean isSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
 			return getCurrentCharacter(current, cc, ck) == ' '; //only allow splitting on spaces
 		}
 	};

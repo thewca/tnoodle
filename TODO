@@ -113,14 +113,15 @@ FEATURES
 	+get rid of Main-Class from jars that don't need them
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
 
--undoing now causes an exception
-	-what's up with penalizing orphaned times?
-
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
 +background image/opacity
 	-provide some system for uploading your own image?
+-cleanup readme.textile & root html (just add name, lol)
+-create website with download (automate releasing?)
+-invent some cgi wrapper for lucas's server?
+
 
 -saving times
 	-Add a note about opening multiple instances of tnt
