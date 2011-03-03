@@ -6,6 +6,8 @@
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="dist" location="dist" />
+	
+	<property name="tools" location="../tools" />
 
 	<property name="proj" location="." />
 	<property name="name" value="${ant.project.name}" />
