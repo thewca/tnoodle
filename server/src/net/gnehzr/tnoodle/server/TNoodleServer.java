@@ -278,10 +278,16 @@ public class TNoodleServer {
 		OptionSpec<File> scrambleFolderOpt = parser.accepts("scramblers", "The directory of the scramble plugins").withOptionalArg().ofType(File.class).defaultsTo(new File(getProgramDirectory(), "scramblers"));
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, do not attempt to kill it and start up");
+		OptionSpec<?> cgiOpt = parser.acceptsAll(Arrays.asList("cgi"), "Run as a cgi script");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
+				if(options.has(cgiOpt)) {
+					System.out.print("Content-type: text/plain\n\n");
+					System.out.println("Hello world!");
+					return;
+				}
 				int port = options.valueOf(portOpt);
 				File scrambleFolder = options.valueOf(scrambleFolderOpt);
 				boolean openBrowser = !options.has(noBrowserOpt);

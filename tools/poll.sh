@@ -5,13 +5,9 @@ while true; do
 	echo 'Checking for update...'
 	if [ "$PULL" != "Already up-to-date." ]
 	then
-		echo '******Killing old server*******'
-		# Upon dying, the server will rebuild
-		# and start back up.
-		# TODO - make the port configurable
-		#        for now, this is just a hack that will work on all the current servers
-		wget localhost/kill/now; rm now
-		wget localhost:8080/kill/now; rm now
+		# We've just pulled in some changes from our remote repo,
+		# so we evaluate the command line args given to us
+		eval "$@"
 	else
 		echo 'No update found'
 	fi
