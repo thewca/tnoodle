@@ -43,8 +43,8 @@ public class ScrambleHandler extends SafeHttpHandler {
 
 	private SortedMap<String, Scrambler> scramblers;
 	private String puzzleNamesJSON;
-	public ScrambleHandler(SortedMap<String, Scrambler> scramblers) {
-		this.scramblers = scramblers;
+	public ScrambleHandler() {
+		this.scramblers = Scrambler.getScramblers();
 		
 		//listing available scrambles
 		String[][] puzzleNames = new String[scramblers.size()][2];

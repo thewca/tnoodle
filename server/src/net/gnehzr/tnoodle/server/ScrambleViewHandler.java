@@ -22,8 +22,8 @@ import com.sun.net.httpserver.HttpExchange;
 
 public class ScrambleViewHandler extends SafeHttpHandler {
 	private SortedMap<String, Scrambler> scramblers;
-	public ScrambleViewHandler(SortedMap<String, Scrambler> scramblers) {
-		this.scramblers = scramblers;
+	public ScrambleViewHandler() {
+		this.scramblers = Scrambler.getScramblers();
 	}
 	
 	protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {

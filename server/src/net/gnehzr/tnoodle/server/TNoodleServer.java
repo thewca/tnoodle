@@ -22,7 +22,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.SortedMap;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +31,6 @@ import javax.activation.MimetypesFileTypeMap;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -52,24 +50,18 @@ public class TNoodleServer {
 			VERSION = "devel";
 		}
 	}
-	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
 	
-	public TNoodleServer(int port, File scrambleFolder, boolean browse) throws IOException {
-		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-		
-		SortedMap<String, Scrambler> scramblers = Scrambler.getScramblers(scrambleFolder);
-		if(scramblers == null) {
-			throw new IOException("Invalid directory: " + scrambleFolder.getAbsolutePath());
-		}
-		// TODO - check that the directories in www don't conflict with
-		// import, scramble, view, or kill
-		server.createContext("/", new FileHandler());
-		server.createContext("/kill/", new DeathHandler());
+	// TODO - check that the directories in www don't conflict with
+	// the other root "directories" we're defining here
+	private static HashMap<String, HttpHandler> pathHandlers = new HashMap<String, HttpHandler>();
+	static {
+		pathHandlers.put("/", new FileHandler());
+		pathHandlers.put("/kill/", new DeathHandler());
 
 		// Stateless scramble handlers
-		server.createContext("/import/", new ImporterHandler());
-		server.createContext("/scramble/", new ScrambleHandler(scramblers));
-		server.createContext("/view/", new ScrambleViewHandler(scramblers));
+		pathHandlers.put("/import/", new ImporterHandler());
+		pathHandlers.put("/scramble/", new ScrambleHandler());
+		pathHandlers.put("/view/", new ScrambleViewHandler());
 		
 		// Stateful account/times management
 		// TODO - plan API before trying to implement it, lol
@@ -100,14 +92,23 @@ public class TNoodleServer {
 		// Querying
 		// 	-awesomness! -> be able to open old sessions?
 		//
-		server.createContext("/login", new ScrambleViewHandler(scramblers));
+		pathHandlers.put("/login", new ScrambleViewHandler());
 		//TODO - get & set
-		server.createContext("/settings", new ScrambleViewHandler(scramblers));
+		pathHandlers.put("/settings", new ScrambleViewHandler());
 		//TODO 
-		server.createContext("/times/get/lastSession", new ScrambleViewHandler(scramblers));
+		pathHandlers.put("/times/get/lastSession", new ScrambleViewHandler());
 		//TODO =)
-		server.createContext("/times/get/query", new ScrambleViewHandler(scramblers));
-		server.createContext("/times/set", new ScrambleViewHandler(scramblers));
+		pathHandlers.put("/times/get/query", new ScrambleViewHandler());
+		pathHandlers.put("/times/set", new ScrambleViewHandler());
+	}
+	
+	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
+	public TNoodleServer(int port, File scrambleFolder, boolean browse) throws IOException {
+		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+		
+		for(String path : pathHandlers.keySet()) {
+			server.createContext(path, pathHandlers.get(path));
+		}
 
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
@@ -138,7 +139,7 @@ public class TNoodleServer {
 		System.out.println("Visit " + url + " for a readme and demo.");
 	}
 	
-	private class DeathHandler extends SafeHttpHandler {
+	private static class DeathHandler extends SafeHttpHandler {
 		public DeathHandler() { }
 		
 		protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
@@ -203,7 +204,7 @@ public class TNoodleServer {
 		}
 	}
 	
-	private class ImporterHandler extends SafeHttpHandler {
+	private static class ImporterHandler extends SafeHttpHandler {
 		private final Pattern BOUNDARY_PATTERN = Pattern.compile("^.+boundary\\=(.+)$");
 		@Override
 		protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception {
@@ -285,11 +286,21 @@ public class TNoodleServer {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
 				if(options.has(cgiOpt)) {
-					HttpHandler handler = new FileHandler();
-					CgiHttpExchange cgiExchange = new CgiHttpExchange(); ;
+					CgiHttpExchange cgiExchange = new CgiHttpExchange();
+					HttpHandler handler = null;
+					String path = cgiExchange.getRequestURI().getPath();
+					for(int i = path.length(); i > 0; i--) {
+						handler = pathHandlers.get(path.substring(0, i));
+						if(handler != null) {
+							break;
+						}
+					}
+					if(handler == null) {
+						System.out.print("Content-type: text/plain\n\n");
+						System.out.println("No handler found for: " + cgiExchange.getRequestURI().getPath());
+						return;
+					}
 					handler.handle(cgiExchange);
-					//System.out.print("Content-type: text/plain\n\n");
-					//System.out.println("Hello world!");
 					return;
 				}
 				int port = options.valueOf(portOpt);

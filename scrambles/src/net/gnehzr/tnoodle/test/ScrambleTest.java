@@ -41,7 +41,7 @@ public class ScrambleTest {
 	
 	private SortedMap<String, Scrambler> scramblers;
 	public ScrambleTest() {
-		scramblers = Scrambler.getScramblers(null);
+		scramblers = Scrambler.getScramblers(null, false);
 		if(scramblers == null) {
 			JOptionPane.showMessageDialog(null, "Could not find scramble plugins");
 			return;
