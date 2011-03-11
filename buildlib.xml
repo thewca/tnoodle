@@ -33,6 +33,11 @@
 	</target>
 
 	<target name="compile-javac" unless="uptodate-src">
+		<!-- We must nuke the bin directory because the javac task is
+			 unaware of dependencies changing -->
+		<antcall target="clean" />
+		<antcall target="init" />
+
 		<javac srcdir="${src}" classpath="${classpath}" destdir="${bin}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" />
 
 		<!-- TODO - comment & update other buildfiles -->
@@ -76,7 +81,7 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="${bin}" />
-		<delete dir="${dist}" />
+		<delete failonerror="false" dir="${bin}" />
+		<delete failonerror="false" dir="${dist}" />
 	</target>
 </project>

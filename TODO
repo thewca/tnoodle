@@ -105,9 +105,9 @@ FEATURES
 +shortcuts menu on gerty doesn't work
 +configurable length wca style inspection? apparently some people use this
 +build problems
-	-A uses B, & is built, B changes (A doesn't), now we compile A and nothing happens (silly optimization of the ant java task)!
-		-ant clean; ant; ant -> 1st ant fails, 2nd ant succeeds
+	-check out google's ClosureCompiler
 	-ant's javac task doesn't work with empty .java files, it thinks they've always been modified, since there's no corresponding .class file
+	+A uses B, A & B are built, B changes (A doesn't), now we compile A and nothing happens (silly optimization of the ant java task)!
 	+FIX MINIFICATION (by reverting to old jslint, lol)
 	+optimize git commit hook to only jslint when a .js file has been modified
 	+sometimes index.html,tnt.js,tnt.css get clobbered by ant build =(
