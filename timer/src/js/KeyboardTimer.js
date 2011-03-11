@@ -161,6 +161,7 @@ var KeyboardTimer = new Class({
 						timer.inspecting = true;
 						//TODO - it's likely that we could use lastTime to hold our
 						//penalties, and thereby clean up a good bit of code
+						//UPDATE -  I think i thought through this and decided it was a bad idea...
 						timer.lastTime = null;
 					} else if(timer.timing) {
                         // It is possible to witness keyup events without a
@@ -302,6 +303,15 @@ var KeyboardTimer = new Class({
 			var penalty = this.getPenalty();
 			return penalty ? penalty : (this.INSPECTION-this.getInspectionElapsedSeconds()).toString();
 		} else {
+			if(this.lastTime) {
+				// This little tricky bit lets the user see penalties they've applied to the
+				// most recent solve.
+				// Note: A time's session is set to null when deleted
+				if(this.lastTime.getSession() !== null) {
+					return this.lastTime.format();
+				}
+			}
+
 			var decimalPlaces = 2;
 			var centis = this.getTimeCentis();
 			if(this.timing) {
@@ -310,16 +320,6 @@ var KeyboardTimer = new Class({
 				}
 				centis = (this.frequency*100)*(Math.round(centis / (this.frequency*100)));
 				decimalPlaces = this.decimalPlaces;
-			} else if(this.lastTime) {
-				// This little tricky bit lets the user see penalties they've applied to the
-				// most recent solve.
-				if(this.lastTime.getSession() === null) {
-					// Note: A time's session is set to null when deleted
-					// In this event, we just reset the timer
-					centis = 0;
-				} else {
-					return this.lastTime.format();
-				}
 			}
 			return this.server.formatTime(centis, decimalPlaces);
 		}
