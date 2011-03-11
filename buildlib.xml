@@ -17,6 +17,7 @@
 
 	<ant antfile="${tools}/build.xml" inheritAll="false" />
 	<taskdef name="build-dependencies" classname="tk.tnoodle.tools.ant.BuildEclipseDependenciesTask" classpath="${lib}/TNoodleTasks.jar" />
+	<taskdef name="delete-sans-symlinks" classname="tk.tnoodle.tools.ant.DeleteSansSymlinksTask" classpath="${lib}/TNoodleTasks.jar" />
 
 	<target name="init">
 		<mkdir dir="${dist}" />
@@ -80,8 +81,17 @@
 		</jar>
 	</target>
 
+	<!--
+		For the life of me, I can't get ant to stop
+		following symlinks. Since tnt symlinks to its
+		source in the ${bin} folder, the ant delete
+		task effectively deletes the tnt src code, which is bad.
+		Hopefully either rm (linux) or rmdir (windows) will work
+		for us.
+	<delete dir="${bin}" followsymlinks="false" />
+	-->
 	<target name="clean">
-		<delete failonerror="false" dir="${bin}" />
-		<delete failonerror="false" dir="${dist}" />
+		<delete-sans-symlinks dir="${bin}" />
+		<delete-sans-symlinks dir="${dist}" />
 	</target>
 </project>

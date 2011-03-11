@@ -8,6 +8,7 @@
 	<property name="dist" location="dist" />
 	
 	<property name="tools" location="../tools" />
+	<property name="lib" location="../lib" />
 
 	<property name="proj" location="." />
 	<property name="name" value="${ant.project.name}" />
@@ -65,50 +66,20 @@
 		<os family="windows" />
 	</condition>
 
-	<!-- TODO create a mklink/rmlink ant task -->
-	<target name="link-tnt-win" if="is-win">
-		<exec executable="${tools}/mklink.bat">
-			<arg value="/D" />
-			<arg value="${bin}\www\tnt" />
-			<arg value="${timer}/src" />
-		</exec>
+	<target name="unlink-tnt">
+		<taskdef name="delete-sans-symlinks" classname="tk.tnoodle.tools.ant.DeleteSansSymlinksTask" classpath="${lib}/TNoodleTasks.jar" />
+		<delete-sans-symlinks dir="${bin}/www/tnt"></delete-sans-symlinks>
 	</target>
-	<target name="link-tnt-unix" unless="is-win">
-		<symlink link="${bin}/www/tnt" resource="${timer}/src"></symlink>
-	</target>
-	
-	<target name="unlink-tnt-unix" unless="is-win">
-		<exec executable="rm">
-			<arg value="-r" />
-			<arg value="${www-bin}/tnt" />
-		</exec>
-	</target>
-	<target name="unlink-tnt-win" if="is-win">
-		<exec executable="${tools}/rmdir.bat">
-			<arg value="/S" />
-			<arg value="/Q" />
-			<arg value="${www-bin}/tnt" />
-		</exec>
-	</target>
-
-	<!--
-		For the life of me, I can't get ant to stop
-		following symlinks. Since tnt symlinks to its
-		source in the ${bin} folder, the ant delete
-		task effectively deletes the tnt src code, which is bad.
-		Hopefully either rm (linux) or rmdir (windows) will work
-		for us.
-	<delete dir="${bin}" followsymlinks="false" />
-	-->
-	<target name="unlink-tnt" depends="unlink-tnt-unix,unlink-tnt-win" />
-
 	<!-- 
 		Setting up a symlink to the tnt source code from the server
 		means that changes to tnt will be reflected on a running server.
 		This makes development significantly easier and faster.
 		mklink is used on windows, ln -s is for linux.
 	-->
-	<target name="link-tnt" depends="unlink-tnt,link-tnt-unix,link-tnt-win" />
+	<target name="link-tnt" depends="unlink-tnt">
+		<taskdef name="x-platform-symlink" classname="tk.tnoodle.tools.ant.XPlatformSymlinkTask" classpath="${lib}/TNoodleTasks.jar" />
+		<x-platform-symlink link="${bin}/www/tnt" resource="${timer}/src"></x-platform-symlink>
+	</target>
 
 	<target name="copy-tnt" depends="unlink-tnt">
 		<copy todir="${bin}/www">
@@ -116,9 +87,9 @@
 		</copy>
 	</target>
 
-	<target name="clean" depends="unlink-tnt">
-		<!-- Note: unlink-tnt MUST occur before deleting ${bin}! -->
-		<delete dir="${bin}" />
-		<delete dir="${dist}" />
+	<target name="clean">
+		<ant antfile="../buildlib.xml" target="clean" inheritAll="false">
+			<propertyset refid="tnoodle" />
+		</ant>
 	</target>
 </project>
