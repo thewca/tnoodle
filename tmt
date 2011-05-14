@@ -1,0 +1,58 @@
+#!/usr/bin/python
+
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from os.path import exists, dirname, join
+import sys, os, imp, re
+
+PLUGIN_NAME = 'tmtplugin'
+
+class Tmt:
+
+	def _cdEntryPoint(self):
+		# TODO - for now we assume we're running at the top of the tnoodle heirarchy
+		assert exists('README.textile')
+		assert exists(PLUGIN_NAME)
+
+	def _loadTmtPlugins(self):
+		self._cdEntryPoint()
+		mainPlugin = imp.load_source(PLUGIN_NAME, PLUGIN_NAME)
+		plugins = ( join(dir, PLUGIN_NAME) for dir in os.listdir('.') )
+		plugins = sorted(filter(exists, plugins))
+		self.pluginMap = {}
+		for plugin in plugins:
+			self.pluginMap[dirname(plugin)] = imp.load_source(plugin, plugin)
+		pluginsLoaded = getattr(mainPlugin, 'pluginsLoaded', None)
+		if pluginsLoaded:
+			pluginsLoaded()
+
+	def __init__(self):
+		self.parser = ArgumentParser(
+			description='tmt, the Tnoodle Make Tools',
+			formatter_class=ArgumentDefaultsHelpFormatter)
+
+		sys.modules['tmt'] = self
+		self._loadTmtPlugins()
+
+	def memoize(self, func):
+		d = {}
+		def memoed(*args):
+			if not args in d:
+				d[args] = func(*args)
+			return d[args]
+		return memoed
+	
+	def main(self):
+		self.args = Tmt.parser.parse_args()
+		self.args.func()
+	
+	def glob(self, folder, pattern):
+		matches = []
+		pattern = re.compile(pattern)
+		for root, dirs, files in os.walk(folder):
+			matches += [ join(root, file) for file in files if pattern.match(file) ]
+		return matches
+
+Tmt = Tmt() # We only want one instance of Tmt
+
+if __name__ == "__main__":
+	Tmt.main()
