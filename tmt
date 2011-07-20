@@ -1,49 +1,161 @@
 #!/usr/bin/python
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from os.path import exists, dirname, join
-import sys, os, imp, re
+from os.path import exists, dirname, join, isdir, getmtime, split, abspath
+import sys, os, imp, re, subprocess, shutil, shlex
 
-PLUGIN_NAME = 'tmtplugin'
+PLUGIN_NAME = 'tmtproject'
+DEFAULT_PROJECT_NAME = 'all'
 
-class Tmt:
+def dfs(node, path=()):
+	assert node not in path, "Not a dag!"
+	visted = [ node, ]
+	path += ( node, )
+	for child in node.getDependencies():
+		visted += dfs(child, path)
+	return visted
+
+def rightPrune(nodes):
+	prunedNodes = []
+	for node in reversed(nodes):
+		if node not in prunedNodes:
+			prunedNodes.insert(0, node)
+	return prunedNodes
+
+def isTopologicalSort(sortedNodes):
+	for i, node in enumerate(sortedNodes):
+		for child in node.getDependencies():
+			childIndex = sortedNodes.index(child)
+			assert childIndex != i
+			if childIndex < i:
+				return False
+	return True
+
+def topologicalSort(rootProject):
+	visitedNodes = dfs(rootProject)
+	visitedNodes = rightPrune(visitedNodes)
+	assert isTopologicalSort(visitedNodes)
+	return visitedNodes
+
+class tmt:
 
 	def _cdEntryPoint(self):
-		# TODO - for now we assume we're running at the top of the tnoodle heirarchy
+		os.chdir(split(abspath(__file__))[0])
 		assert exists('README.textile')
-		assert exists(PLUGIN_NAME)
 
-	def _loadTmtPlugins(self):
+	def _loadTmtProjects(self):
 		self._cdEntryPoint()
-		mainPlugin = imp.load_source(PLUGIN_NAME, PLUGIN_NAME)
-		plugins = ( join(dir, PLUGIN_NAME) for dir in os.listdir('.') )
-		plugins = sorted(filter(exists, plugins))
-		self.pluginMap = {}
-		for plugin in plugins:
-			self.pluginMap[dirname(plugin)] = imp.load_source(plugin, plugin)
-		pluginsLoaded = getattr(mainPlugin, 'pluginsLoaded', None)
-		if pluginsLoaded:
-			pluginsLoaded()
+		projectFiles = ( join(dir, PLUGIN_NAME) for dir in os.listdir('.') )
+		for projectFile in sorted(filter(exists, projectFiles)):
+			projectName = dirname(projectFile)
+			imp.load_source(projectFile, projectFile)
+			assert dirname(projectFile) in tmt.TmtProject.projects
+		
+		assert DEFAULT_PROJECT_NAME in tmt.TmtProject.projects, tmt.TmtProject.projects.keys()
+		defaultProject = tmt.TmtProject.projects[ DEFAULT_PROJECT_NAME ]
+
+		for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
+			project.afterPlugins()
+
+		for project in reversed(topologicalSort(defaultProject)):
+			project.configure()
+
+	def _main(self):
+		self._loadTmtProjects()
+		self.args = tmt.parser.parse_args()
+		self.args.func()
+
+	def _graph(self):
+		if tmt.args.file:
+			# TODO look at tmt.args.file and generate a dotty file or something?
+			assert False, "not yet implemented"
+		else:
+			print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
+
+	def _make(self, projectName=None, command=None):
+		if projectName == None:
+			projectName = tmt.args.project
+		if command == None:
+			command = tmt.args.command
+		project = tmt.TmtProject.projects[projectName]
+		commandFunc = getattr(project, command, None)
+		assert not not commandFunc, 'No %s target in %s' % ( command, project )
+		commandFunc()
 
 	def __init__(self):
 		self.parser = ArgumentParser(
 			description='tmt, the Tnoodle Make Tools',
 			formatter_class=ArgumentDefaultsHelpFormatter)
+		subparsers = self.parser.add_subparsers(help='Available commands')
 
-		sys.modules['tmt'] = self
-		self._loadTmtPlugins()
+		desc = 'Make stuff'
+		parser_make = subparsers.add_parser(
+			'make',
+			help=desc, description=desc,
+			formatter_class=ArgumentDefaultsHelpFormatter)
+		parser_make.add_argument(
+			'--project', '-p',
+			default=DEFAULT_PROJECT_NAME,
+			type=str,
+			help='the project to build')
+		parser_make.add_argument(
+			'command',
+			nargs='?',
+			choices=['compile', 'dist', 'run', 'clean'],
+			default='compile',
+			help='command!')
+		parser_make.add_argument(
+			'--args', '-a',
+			default='',
+			help='Command line arguments (only valid with the "run" command)')
+		parser_make.set_defaults(func=self._make)
 
+		desc = 'Generate dependency graph'
+		parser_graph = subparsers.add_parser(
+			'graph',
+			help=desc, description=desc,
+			formatter_class=ArgumentDefaultsHelpFormatter)
+		parser_graph.add_argument(
+			'--file', '-f', default='', type=str, help='')
+		parser_graph.add_argument(
+			'--project', '-p', default=DEFAULT_PROJECT_NAME, type=str, help='the project to build')
+		parser_graph.add_argument(
+			'--no-prune', '-np', action="store_true", default=False, help='Do not prune duplicate projects')
+		parser_graph.set_defaults(func=self._graph)
+	
 	def memoize(self, func):
 		d = {}
+		evaluating = set()
 		def memoed(*args):
 			if not args in d:
+				assert not args in evaluating, "Memoized functions can't have cycles!"
+				evaluating.add(args)
 				d[args] = func(*args)
+				evaluating.remove(args)
 			return d[args]
 		return memoed
-	
-	def main(self):
-		self.args = Tmt.parser.parse_args()
-		self.args.func()
+
+	def projectName(self):
+		import traceback
+		project, plugin = traceback.extract_stack()[-2][0].split('/')
+		assert isdir(project)
+		assert plugin == PLUGIN_NAME
+		return project
+
+	def timestamp(self, f):
+		"""
+			If f is a directory, returns the timestamp of the newest file 
+			found anywhere under the given directory f.
+			If f is a file, simply returns the timestamp of the given file.
+			Empty directories have timestamp 0.
+		"""
+		if not isdir(f):
+			return getmtime(f)
+
+		m = 0
+		for ff in os.listdir(f):
+			m = max(m, self.timestamp(join(f, ff)))
+		return m
 	
 	def glob(self, folder, pattern):
 		matches = []
@@ -52,7 +164,208 @@ class Tmt:
 			matches += [ join(root, file) for file in files if pattern.match(file) ]
 		return matches
 
-Tmt = Tmt() # We only want one instance of Tmt
+	def java(self, main, classpath='', args=[]):
+		command = [ 'java' ]
+		if classpath:
+			command += [ '-classpath', classpath ]
+		command += [ main ]
+		command += args
+		print " ".join(command)
+		p = subprocess.Popen(command)
+		p.wait()
+
+tmt = tmt() # We only want one instance of Tmt
+sys.modules['tmt'] = tmt
+
+class TmtProject(object):
+	projects = {}
+	def __init__(self, name):
+		self.name = name
+		assert not name in TmtProject.projects, name
+		TmtProject.projects[name] = self
+	def __str__(self):
+		return 'TmtProject: %s' % self.name
+	# The configure method of each plugin gets called in reverse
+	# dependency order. That is, if a project A uses a project B,
+	# B.configure() will be called before A.configure().
+	def configure(self):
+		pass
+	# The afterPlugins method gets called for each plugin after all the plugins
+	# have been loaded, in no particular order.
+	def afterPlugins(self):
+		pass
+	def compile(self):
+		assert False
+	def dist(self):
+		assert False
+	def run(self):
+		assert False
+	def clean(self):
+		assert False
+	def getDependencies(self):
+		assert False
+	def prettyDependencies(self, level=0, printingLevels=None, seen=None):
+		if printingLevels == None:
+			assert level == 0
+			printingLevels = set([0])
+		else:
+			printingLevels = printingLevels.copy()
+		if seen == None:
+			assert level == 0
+			seen = set()
+		indent = ''
+		for i in range(level):
+			if i == level-1:
+				if not i in printingLevels:
+					indent += '`-- '
+				else:
+					indent += '|-- '
+			else:
+				if i in printingLevels:
+					indent += '|   '
+				else:
+					indent += '    '
+
+		if not tmt.args.no_prune and self in seen:
+			# If we're pruning, and we've seen this node before,
+			# then we don't recurse
+			s = indent + self.name + ' (seen)\n'
+		else:
+			s = indent + self.name + '\n'
+			printingLevels.add(level)
+			dependencies = self.getDependencies()
+			for p in dependencies:
+				if p == dependencies[-1]:
+					printingLevels.remove(level)
+				s += p.prettyDependencies(level+1, printingLevels, seen)
+				seen.add(p)
+		return s
+tmt.TmtProject = TmtProject
+
+class JarDependency(TmtProject):
+	def getDependencies(self):
+		return []
+	def compile(self):
+		pass
+	def clean(self):
+		pass
+
+class EclipseProject(TmtProject):
+	from xml.sax import make_parser, saxutils
+
+	class EclipseClasspathHandler(saxutils.handler.ContentHandler):
+		def startDocument(self):
+			self.jarFiles = []
+			self.projects = []
+
+		def startElement(self, name, attrs):
+			if name == 'classpathentry':
+				kind = attrs.get('kind')
+				path = attrs.get('path')
+				if kind == 'output':
+					assert path == 'bin'
+				elif kind == 'src':
+					if path.startswith('/'):
+						self.projects.append(path[1:])
+					else:
+						assert path == 'src'
+				elif kind == 'lib':
+					assert path.startswith('/')
+					self.jarFiles.append(abspath(path[1:]))
+				elif kind == 'con':
+					pass
+				else:
+					assert False, 'Unrecognized kind: %s' % kind
+	classpathParser = make_parser()
+	classpathHandler = EclipseClasspathHandler()
+	classpathParser.setContentHandler(classpathHandler)
+
+	def __init__(self, name, main=None):
+		self.main = main
+		TmtProject.__init__(self, name)
+
+	def getDependencies(self):
+		return self.jars + self.projects
+
+	def getClasspathEntities(self, src=False):
+		classpath = set()
+		classpath |= set(jar.name for jar in self.jars)
+		classpath.add(self.src if src else self.bin)
+		for project in self.projects:
+			classpath |= project.getClasspathEntities(src)
+		return classpath
+
+	def getClasspath(self):
+		# TODO - check if ':' delimeter works on windows
+		return ":".join(self.getClasspathEntities())
+
+	def afterPlugins(self):
+		dependencyFile = join(self.name, '.classpath')
+		assert exists(dependencyFile), dependencyFile
+		EclipseProject.classpathParser.parse(dependencyFile)
+		self.jars = [ JarDependency(jar) for jar in EclipseProject.classpathHandler.jarFiles ]
+		self.projects = [ tmt.TmtProject.projects[p] for p in EclipseProject.classpathHandler.projects ]
+		self.bin = join(self.name, 'bin')
+		self.tempBin = join(self.name, '.bin')
+		self.dist = join(self.name, 'dist')
+		self.src = join(self.name, 'src')
+		if not isdir(self.bin):
+			os.mkdir(self.bin)
+		if not isdir(self.dist):
+			os.mkdir(self.dist)
+
+	def compile(self):
+		assert isdir(self.bin)
+		# first compile projects we depend on
+		for project in self.projects:
+			project.compile()
+
+		depsLastTouched = [ tmt.timestamp(dep) for dep in self.getClasspathEntities(src=True) ]
+		lastCompiled = tmt.timestamp(self.bin)
+		if all( lastCompiled > ts for ts in depsLastTouched ):
+			print "%s is up to date, not recompiling" % self.name
+			return False
+		print 'Compiling: %s' % self.name
+
+		if not isdir(self.tempBin):
+			os.mkdir(self.tempBin)
+
+		javaFiles = tmt.glob(self.src, r'.*\.java$')
+		args = [ 'javac' ]
+		args += [ '-d', self.tempBin ]
+		classpath = self.getClasspath()
+		if classpath:
+			args += [ '-classpath', classpath ]
+		args += javaFiles
+		p = subprocess.Popen(args)
+		print " ".join(args)
+		assert p.wait() == 0, 'javac failed!'
+
+		# TODO - call child func here?
+
+		shutil.rmtree(self.bin)
+		os.rename(self.tempBin, self.bin)
+		return True
+
+	def dist(self):
+		assert False # TODO
+
+	def run(self):
+		assert self.main, 'Main class not defined'
+		assert not tmt.args.args is None # shlex reads from stdin if you pass None, lol
+		self.compile()
+		tmt.java(
+			main=self.main,
+			classpath=self.getClasspath(),
+			args=shlex.split(tmt.args.args))
+
+	def clean(self):
+		assert isdir(self.bin)
+		assert isdir(self.dist)
+		shutil.rmtree(self.bin)
+		shutil.rmtree(self.dist)
+
+tmt.EclipseProject = EclipseProject
 
 if __name__ == "__main__":
-	Tmt.main()
+	tmt._main()
