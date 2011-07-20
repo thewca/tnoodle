@@ -115,6 +115,7 @@ FEATURES
 	+get rid of Main-Class from jars that don't need them
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
 
+-exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
