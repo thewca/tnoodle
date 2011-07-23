@@ -43,6 +43,10 @@ h1 {
   font-weight: bold;
 }
 
+.title {
+  direction: rtl;
+}
+
 div.header {
   height: 96px;
   background: #ACE;
@@ -83,6 +87,7 @@ div.right {
 
 #debug {
   padding: 4px;
+  border-radius: 12px;
 }
 
 /* Debugging and Testing */
@@ -109,6 +114,12 @@ div.right {
   -moz-background-size: 50px 50px;
   background-size: 32px 32px; /* Controls the size of the stripes */
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.err {
+  background-color: #F44;
+  padding: 4px;
+  border-radius: 8px;
 }
 
 .checkered {

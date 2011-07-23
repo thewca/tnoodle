@@ -5,25 +5,32 @@
  * 
  */
 
-/*
- * Convenience Logging
- */
-function log(obj) {
-  
-  console.log(obj);
-
-  var previousHTML = $("#debug").html();
-  previousHTML = obj + "<br/><hr/>" + previousHTML;
-  $("#debug").html(previousHTML);
-  
-}
-
 $(document).ready(function() {
 
   log("Document ready.");
 
-  start_twisty();
+  start_twisty({"type": "plane", "dimension": 4});
 
   animate();
 
 });
+
+/*
+ * Convenience Logging
+ */
+
+var logCounter = 0;
+
+function log(obj) {
+  console.log(obj);
+  var previousHTML = $("#debug").html();
+  previousHTML = (logCounter++) + ". " + obj + "<hr/>" + previousHTML;
+  $("#debug").html(previousHTML);
+}
+
+function err(obj) {
+  console.error(obj);
+  var previousHTML = $("#debug").html();
+  previousHTML = "<div class='err'>" + (logCounter++) + ". " + obj + "</div><hr/>" + previousHTML;
+  $("#debug").html(previousHTML);
+}

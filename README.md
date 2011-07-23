@@ -13,3 +13,13 @@ Started by Lucas Garron, July 2011.
 
 ## Bugs and Features
 - Resize canvas on div resize.
+- LxMxN cube dimensions
+
+
+## WSOH Schedule
+- 22:30 - Twisty abstraction & delegation
+- 23:30 - Cube structure
+- 24:30 - Basic Animation Support
+- 1:30 - Animation Code
+- 3:00 - Keybindings
+- 4:00
