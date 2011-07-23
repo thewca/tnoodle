@@ -1,134 +1,139 @@
 body {
-	margin: 0px;
-	padding: 0px;
-	background: #FFF;
-	font-family: Helvetica, Tahoma, Arial;
+  margin: 0px;
+  padding: 0px;
+  background: #FFF;
+  font-family: Helvetica, Tahoma, Arial;
 }
 
 body,div {
-	margin: 0px;
-	padding: 0px;
+  margin: 0px;
+  padding: 0px;
 }
 
 p {
-	margin: 4px;
-	padding: 0px;
+  margin: 4px;
+  padding: 0px;
 }
 
 .spacey {
-	line-height: 1.5em;
+  line-height: 1.5em;
 }
 
 h1,h2,h3,h4,h5,h6 {
-	font-size: 18px;
-	margin: 0px;
-	padding: 4px;
-	color: #000;
-	font-weight: bold;
-	text-shadow: 2px 2px 1px #ACE;
-	border-bottom: 1px solid rgba(128, 128, 195, 0.5);
+  font-size: 18px;
+  margin: 0px;
+  padding: 8px 12px;
+  color: #000;
+  font-weight: bold;
+  text-shadow: 2px 2px 1px #ACE;
+  border-bottom: 1px solid rgba(128, 128, 195, 0.5);
 }
 
 h2 {
-	font-size: 24px;
+  font-size: 24px;
+  padding: 8px 12px;
 }
 
 h1 {
-	font-size: 32px;
-	color: #FFF;
-	text-align: center;
-	text-shadow: 2px 2px 1px #88A;
-	border-bottom: none;
-	font-weight: bold;
+  font-size: 64px;
+  color: #FFF;
+  text-align: center;
+  text-shadow: 2px 2px 1px #88A;
+  border-bottom: none;
+  font-weight: bold;
 }
 
 div.header {
-	height: 48px;
-	background: #ACE;
-	z-index: 10;
-	box-shadow: 1px 1px 8px rgba(0, 0, 0, 1);
+  height: 96px;
+  background: #ACE;
+  z-index: 10;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 1);
 }
 
 div.content {
-	background: #E0F0FF;
-	box-shadow: 1px 1px 8px rgba(0, 0, 0, 1);
-	margin-top: 48px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+  background: #E0F0FF;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 1);
+  margin-top: 96px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 div.left {
-	width: 33%;
-	height: 100%;
-	left: 0px;
-	position: absolute;
-	overflow-y: auto;
+  width: 33%;
+  height: 100%;
+  left: 0px;
+  position: absolute;
+  overflow-y: auto;
 }
 
 div.right {
-	width: 67%;
-	height: 100%;
-	right: 0px;
-	position: absolute;
+  width: 67%;
+  height: 100%;
+  right: 0px;
+  position: absolute;
 }
 
 /* Convenience Tags */
 .padded {
-	padding: 4px 8px;
+  padding: 4px 8px;
+}
+
+#debug {
+  padding: 4px;
 }
 
 /* Debugging and Testing */
 
 /* From http://leaverou.me/demos/css3-patterns.html */
 .hi {
-	background-color: rgba(255, 128, 0, 0.5);
-	background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2)
-		25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
-		rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
-	background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2)
-		25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
-		rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
-	background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, .2)
-		25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
-		rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
-	background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%,
-		transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
-		rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
-	background-image: linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%,
-		transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
-		rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
-	-webkit-background-size: 50px 50px;
-	-moz-background-size: 50px 50px;
-	background-size: 32px 32px; /* Controls the size of the stripes */
-	box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 127, 0, 0.5);
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2)
+    25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
+    rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2)
+    25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
+    rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, .2)
+    25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
+    rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%,
+    transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
+    rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%,
+    transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%,
+    rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  -webkit-background-size: 50px 50px;
+  -moz-background-size: 50px 50px;
+  background-size: 32px 32px; /* Controls the size of the stripes */
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
 }
 
 .checkered {
-	background-color: #EAEAEA;
-	background-image: -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
-		75%, #DDD 75%, #DDD),
-		-webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
-		75%, #DDD 75%, #DDD);
-	background-image: -moz-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
-		#DDD 75%, #DDD),
-		-webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
-		75%, #DDD 75%, #DDD);
-	background-image: -ms-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
-		#DDD 75%, #DDD),
-		-webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
-		75%, #DDD 75%, #DDD);
-	background-image: -o-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
-		#DDD 75%, #DDD),
-		-webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
-		75%, #DDD 75%, #DDD);
-	background-image: -linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%, #DDD
-		75%, #DDD),
-		-webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
-		75%, #DDD 75%, #DDD);
-	background-size: 32px 32px;
-	background-position: 0 0, 16px 16px;
-	box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5);
+  background-color: #EAEAEA;
+  background-image: -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD),
+    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD);
+  background-image: -moz-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
+    #DDD 75%, #DDD),
+    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD);
+  background-image: -ms-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
+    #DDD 75%, #DDD),
+    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD);
+  background-image: -o-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
+    #DDD 75%, #DDD),
+    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD);
+  background-image: -linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%, #DDD
+    75%, #DDD),
+    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5);
 }
