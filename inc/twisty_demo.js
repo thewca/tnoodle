@@ -13,10 +13,80 @@ $(document).ready(function() {
     "type": "cube",
     "dimension": 3
   });
-  
-  addMoves(superflip);
+
+  $("#cubeDimension").bind("keyup", function() {
+    initializeTwisty({
+      "type": "cube",
+      "dimension": parseInt($("#cubeDimension").val())
+    });
+  });
+
+  $("#alg_ccc").bind("click", function() {
+    addMoves(makeCCC(parseInt($("#cubeDimension").val())));
+  });
+
+  $("#alg_superflip").bind("click", function() {
+    addMoves(superflip);
+  });
+
+  cam(0);
+
+
+  document.getElementById("twistyContainer").addEventListener( 'mousedown', onDocumentMouseDown, false );
+  document.getElementById("twistyContainer").addEventListener( 'touchstart', onDocumentTouchStart, false );
+  document.getElementById("twistyContainer").addEventListener( 'touchmove', onDocumentTouchMove, false );
 
 });
+
+var theta = 0;
+var mouseXLast = 0;
+
+function cam(deltaTheta) {
+  theta += deltaTheta;
+  moveCamera(theta);
+}
+
+function onDocumentMouseDown( event ) {
+  event.preventDefault();
+  document.getElementById("twistyContainer").addEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.getElementById("twistyContainer").addEventListener( 'mouseup', onDocumentMouseUp, false );
+  document.getElementById("twistyContainer").addEventListener( 'mouseout', onDocumentMouseOut, false );
+  mouseXLast = event.clientX;
+}
+
+function onDocumentMouseMove( event ) {
+  mouseX = event.clientX;
+  cam((mouseXLast - mouseX)/256);
+  mouseXLast = mouseX;
+}
+
+function onDocumentMouseUp( event ) {
+  document.getElementById("twistyContainer").removeEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.getElementById("twistyContainer").removeEventListener( 'mouseup', onDocumentMouseUp, false );
+  document.getElementById("twistyContainer").removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
+
+function onDocumentMouseOut( event ) {
+  document.getElementById("twistyContainer").removeEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.getElementById("twistyContainer").removeEventListener( 'mouseup', onDocumentMouseUp, false );
+  document.getElementById("twistyContainer").removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
+
+function onDocumentTouchStart( event ) {
+  if ( event.touches.length == 1 ) {
+    event.preventDefault();
+    mouseXLast = event.touches[0].pageX;
+  }
+}
+
+function onDocumentTouchMove( event ) {
+  if ( event.touches.length == 1 ) {
+    event.preventDefault();
+    mouseX = event.touches[0].pageX;
+    cam((mouseXLast - mouseX)/256);
+    mouseXLast = mouseX;
+  }
+}
 
 /*
  * Convenience Logging
@@ -193,3 +263,35 @@ var superflip = [
 [1, 3, "U", -1],
 [1, 3, "R", -1],
 ];
+
+function makeCCC(n) {
+
+  var cccMoves = [];
+
+  for (var i = 1; i<=n/2; i++) {
+    var moreMoves = [
+[1, i, "L", -1],
+[1, i, "U", 1],
+[1, i, "R", -1],
+[1, i, "F", -1],
+[1, i, "U", 1],
+[1, i, "L", -2],
+[1, i, "U", -2],
+[1, i, "L", -1],
+[1, i, "U", -1],
+[1, i, "L", 1],
+[1, i, "U", -2],
+[1, i, "D", 1],
+[1, i, "R", -1],
+[1, i, "D", -1],
+[1, i, "F", 2],
+[1, i, "R", 2],
+[1, i, "U", -1]
+];
+
+    cccMoves = cccMoves.concat(moreMoves);
+  }
+
+  return cccMoves;
+  
+}

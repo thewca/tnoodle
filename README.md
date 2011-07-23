@@ -37,6 +37,7 @@ Started by Lucas Garron, July 2011.
 - Always fit twisty fully inside canvas
 - Animate based on time, not steps
 - Negative layer indices
+- Proper drag/touch support
 
 
 ## Puzzle description contract

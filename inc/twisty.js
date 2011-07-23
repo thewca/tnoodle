@@ -21,6 +21,9 @@ var animating = false;
 var twistyContainer = null;
 var camera, scene, renderer;
 
+var timing = false;
+var startTime;
+
 var stats = null;
 
 /* http://tauday.com/ ;-) */
@@ -30,16 +33,18 @@ Math.TAU = Math.PI*2;
  * Initialization Methods
  */
 
+$(document).bind("keydown", keydownHandler);
+
 function initializeTwisty(twistyType) {
 
-  twistyContainer = $("#twisty_container").get(0);
+  twistyContainer = $("#twistyContainer").get(0);
   log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
 
   /*
    * Scene Setup
    */
   camera = new THREE.Camera( 30, $(twistyContainer).width() / $(twistyContainer).height(), 0, 1000 );
-  camera.position = new THREE.Vector3(0, 2, 3);
+  moveCameraPure(0);
 
   scene = new THREE.Scene();
 
@@ -55,14 +60,26 @@ function initializeTwisty(twistyType) {
    */
   renderer = new THREE.CanvasRenderer();
   renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
+  $(twistyContainer).html("");
   twistyContainer.appendChild(renderer.domElement);
 
-  $(document).bind("keydown", keydownHandler);
-
   startStats();
-  renderer.render(scene, camera);
+  render()
 
 };
+
+function render() {
+  renderer.render(scene, camera);
+}
+
+function moveCameraPure(theta) {
+  camera.position = new THREE.Vector3(2.5*Math.sin(theta), 2, 2.5*Math.cos(theta));
+}
+
+function moveCamera(theta) {
+  moveCameraPure(theta);
+  render();
+}
 
 function keydownHandler(e) {
   twisty["keydownCallback"](twisty, e);
@@ -115,7 +132,7 @@ function startAnimation() {
 }
 
 function startMove() {
-  
+
   currentMove = moveQueue[0];
   //log(moveToString(currentMove));
   moveQueue.splice(0, 1);
@@ -128,21 +145,32 @@ function addMoves(moves) {
 
   moveQueue = moveQueue.concat(moves);
   startAnimation();
-  
+
 }
 
 function updateSpeed() {
-
   animationStep = Math.min(0.15 + 0.1*moveQueue.length, 0.5);
 }
 
-function queueRandomMove() {
-  var random1 = 1 + Math.floor(Math.random()*6);
-  var random2 = random1 + Math.floor(Math.random()*6);
-  var random3 = Math.floor(Math.random()*6);
-  var random4 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
+function queueRandomCubeMoves(n) {
+  
+  var newMoves = [];
+  
+  for (var i=0; i<n; i++) {
+    
+    var random1 = 1;
+    var random2 = 1;
+    var random3 = Math.floor(Math.random()*6);
+    var random4 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
+    
+    var newMove = [random1, random2, ["U", "L", "F", "R", "B", "D"][random3], random4];
+    
+    newMoves.push(newMove);
+    
+  }
 
-  moveQueue.push([random1, random2, ["U", "L", "F", "R", "B", "D"][random3], random4]);
+  addMoves(newMoves);
+  
 }
 
 var animationStep = 0.1;
@@ -164,8 +192,6 @@ function stepAnimation() {
       startMove();
     }
 
-    //For testing:
-    //queueRandomMove();
   }
 
 }
@@ -182,18 +208,44 @@ function startStats() {
 
 function animate() {
 
-  stepAnimation();
+  if (animating) {
+    stepAnimation();
+    render();
+  }
 
-  renderer.render(scene, camera);
+
   if (stats) {
-    stats.update();
+    stats.update(); 
+  }
+
+  if (timing) {
+    updateTimer();
   }
 
   // If we get here successfully, do it again!
-  if (animating) {
+  if (animating || timing) {
     requestAnimationFrame(animate);
   }
 
+}
+
+function pad(n, minLength) {
+  var str = '' + n;
+  while (str.length < minLength) {
+    str = '0' + str;
+  }
+  return str;
+}
+
+function updateTimer() {
+  cumulative = (new Date).getTime() - startTime;
+  var str = "";
+  str += Math.floor(cumulative/1000/60);
+  str += ":";
+  str += pad(Math.floor(cumulative/1000 % 60), 2);
+  str += ".";
+  str += pad(Math.floor((cumulative % 1000) / 10), 2);
+  $("#timer").html(str);
 }
 
 function createTwisty(twistyType) {
@@ -502,14 +554,30 @@ function createCubeTwisty(twistyParameters) {
       81: [iS, iSi, "F", -1],//y'
   }
   var keydownCallback = function(twisty, e) {
-    
+
     var keyCode = e.keyCode;
     //log(keyCode);
     if (keyCode in cubeKeyMapping) {
       addMoves([cubeKeyMapping[keyCode]]);
       updateSpeed();
     }
-    
+
+    switch (keyCode) {
+
+    case 27:
+      initializeTwisty(twisty["type"]);
+      break;
+
+    case 32:
+      animationStep=0.5;
+      queueRandomCubeMoves(32);
+      animationStep = 0.1;
+      startTime = (new Date).getTime();
+      timing = true;
+      break;
+
+    }
+
   };
 
   return {

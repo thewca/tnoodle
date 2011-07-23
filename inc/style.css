@@ -90,6 +90,19 @@ div.right {
   border-radius: 12px;
 }
 
+#cubeDimension {
+  border-radius: 8px;
+  text-align: center;
+}
+
+#timer {
+  background: #ACE;
+  padding: 4px;
+  font-family: monospace;
+  font-size: 48px;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* Debugging and Testing */
 
 /* From http://leaverou.me/demos/css3-patterns.html */
