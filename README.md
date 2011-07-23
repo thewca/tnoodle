@@ -11,15 +11,6 @@ Started by Lucas Garron, July 2011.
 - [Josef Jelinek](http://rubikscube.info/)'s simple and configurable [AnimCube](http://software.rubikscube.info/AnimCube/) (with some credit to [Karl Hornell](http://www.javaonthebrain.com/java/rubik/) and [Lars Petrus](http://lar5.com/cube/)).
 
 
-## Notes
-
-
-## Bugs and Features
-- Resize canvas on div resize.
-- Always fit twisty fully inside canvas
-- LxMxN cube dimensions
-
-
 ## WSOH Schedule
 
 - 22:30 - Twisty abstraction & delegation
@@ -41,6 +32,12 @@ Started by Lucas Garron, July 2011.
 - Algorithm objects?
 
 
+## Bugs and Features
+- Resize canvas on div resize.
+- Always fit twisty fully inside canvas
+- Animate based on time, not steps
+
+
 ## Puzzle description contract
 
 - parameters per puzzle
@@ -48,6 +45,7 @@ Started by Lucas Garron, July 2011.
   - variable states? (level of slice for big cubes [visual indicator of those?])
 - initmove/revmove stuff?
 - visual options (stickers + cubies, stickers only, etc.)
+- Random move / alg generation?
 
 
 ##Features / Settings (dynamicable?)
