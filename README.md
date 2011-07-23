@@ -36,6 +36,7 @@ Started by Lucas Garron, July 2011.
 - Resize canvas on div resize.
 - Always fit twisty fully inside canvas
 - Animate based on time, not steps
+- Negative layer indices
 
 
 ## Puzzle description contract

@@ -11,12 +11,32 @@ $(document).ready(function() {
 
   initializeTwisty({
     "type": "cube",
-    "dimension": 4
+    "dimension": 3
   });
   
-  addMoves(lucasparity);  
+  addMoves(superflip);
 
 });
+
+/*
+ * Convenience Logging
+ */
+
+var logCounter = 0;
+
+function log(obj) {
+  console.log(obj);
+  var previousHTML = $("#debug").html();
+  previousHTML = (logCounter++) + ". " + obj + "<hr/>" + previousHTML;
+  $("#debug").html(previousHTML);
+}
+
+function err(obj) {
+  console.error(obj);
+  var previousHTML = $("#debug").html();
+  previousHTML = "<div class='err'>" + (logCounter++) + ". " + obj + "</div><hr/>" + previousHTML;
+  $("#debug").html(previousHTML);
+}
 
 /*
  * Algs for testing
@@ -49,6 +69,59 @@ var ccc = [
 [1, 1, "F", 2],
 [1, 1, "R", 2],
 [1, 1, "U", -1]
+];
+var ccc7 = [
+[1, 1, "L", -1],
+[1, 1, "U", 1],
+[1, 1, "R", -1],
+[1, 1, "F", -1],
+[1, 1, "U", 1],
+[1, 1, "L", -2],
+[1, 1, "U", -2],
+[1, 1, "L", -1],
+[1, 1, "U", -1],
+[1, 1, "L", 1],
+[1, 1, "U", -2],
+[1, 1, "D", 1],
+[1, 1, "R", -1],
+[1, 1, "D", -1],
+[1, 1, "F", 2],
+[1, 1, "R", 2],
+[1, 1, "U", -1],
+[1, 2, "L", -1],
+[1, 2, "U", 1],
+[1, 2, "R", -1],
+[1, 2, "F", -1],
+[1, 2, "U", 1],
+[1, 2, "L", -2],
+[1, 2, "U", -2],
+[1, 2, "L", -1],
+[1, 2, "U", -1],
+[1, 2, "L", 1],
+[1, 2, "U", -2],
+[1, 2, "D", 1],
+[1, 2, "R", -1],
+[1, 2, "D", -1],
+[1, 2, "F", 2],
+[1, 2, "R", 2],
+[1, 2, "U", -1],
+[1, 3, "L", -1],
+[1, 3, "U", 1],
+[1, 3, "R", -1],
+[1, 3, "F", -1],
+[1, 3, "U", 1],
+[1, 3, "L", -2],
+[1, 3, "U", -2],
+[1, 3, "L", -1],
+[1, 3, "U", -1],
+[1, 3, "L", 1],
+[1, 3, "U", -2],
+[1, 3, "D", 1],
+[1, 3, "R", -1],
+[1, 3, "D", -1],
+[1, 3, "F", 2],
+[1, 3, "R", 2],
+[1, 3, "U", -1]
 ];
 var layers = [
 [1, 1, "R", 1],
@@ -88,23 +161,35 @@ var lucasparity = [
 [1, 1, "U", 2],
 [1, 2, "R", -1]
 ];
-
-/*
- * Convenience Logging
- */
-
-var logCounter = 0;
-
-function log(obj) {
-  console.log(obj);
-  var previousHTML = $("#debug").html();
-  previousHTML = (logCounter++) + ". " + obj + "<hr/>" + previousHTML;
-  $("#debug").html(previousHTML);
-}
-
-function err(obj) {
-  console.error(obj);
-  var previousHTML = $("#debug").html();
-  previousHTML = "<div class='err'>" + (logCounter++) + ". " + obj + "</div><hr/>" + previousHTML;
-  $("#debug").html(previousHTML);
-}
+var superflip = [
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[1, 3, "U", -1],
+[1, 3, "R", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[1, 3, "U", -1],
+[1, 3, "R", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[2, 2, "R", 1],
+[1, 1, "U", -1],
+[1, 3, "U", -1],
+[1, 3, "R", -1],
+];

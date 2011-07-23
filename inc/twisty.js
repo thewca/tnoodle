@@ -39,7 +39,7 @@ function initializeTwisty(twistyType) {
    * Scene Setup
    */
   camera = new THREE.Camera( 30, $(twistyContainer).width() / $(twistyContainer).height(), 0, 1000 );
-  camera.position = new THREE.Vector3(-2, 2, 3);
+  camera.position = new THREE.Vector3(0, 2, 3);
 
   scene = new THREE.Scene();
 
@@ -57,10 +57,16 @@ function initializeTwisty(twistyType) {
   renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
   twistyContainer.appendChild(renderer.domElement);
 
+  $(document).bind("keydown", keydownHandler);
+
   startStats();
   renderer.render(scene, camera);
 
 };
+
+function keydownHandler(e) {
+  twisty["keydownCallback"](twisty, e);
+}
 
 /*
  * Algorithm Helper Methods
@@ -99,17 +105,19 @@ function movesToString(moves) {
 
 function startAnimation() {
 
-  log("Starting move queue: " + movesToString(moveQueue));
-  startMove();
-  animating = true;
-  animate();
+  if(!animating) {
+    //log("Starting move queue: " + movesToString(moveQueue));
+    startMove();
+    animating = true;
+    animate();
+  }
 
 }
 
 function startMove() {
-
+  
   currentMove = moveQueue[0];
-  log(moveToString(currentMove));
+  //log(moveToString(currentMove));
   moveQueue.splice(0, 1);
   //moveProgress = moveProgress % 1;
   moveProgress = 0;
@@ -120,7 +128,12 @@ function addMoves(moves) {
 
   moveQueue = moveQueue.concat(moves);
   startAnimation();
+  
+}
 
+function updateSpeed() {
+
+  animationStep = Math.min(0.15 + 0.1*moveQueue.length, 0.5);
 }
 
 function queueRandomMove() {
@@ -132,7 +145,7 @@ function queueRandomMove() {
   moveQueue.push([random1, random2, ["U", "L", "F", "R", "B", "D"][random3], random4]);
 }
 
-var animationStep = 0.025;
+var animationStep = 0.1;
 
 function stepAnimation() {
 
@@ -456,7 +469,47 @@ function createCubeTwisty(twistyParameters) {
       }
     }
 
+  };
 
+  var iS = 1;
+  var oS = 1;
+  var iSi = cubeOptions["dimension"];
+  var cubeKeyMapping = {
+      73: [iS, oS, "R", 1],
+      75: [iS, oS, "R", -1],
+      87: [iS, oS, "B", 1],
+      79: [iS, oS, "B", -1],
+      83: [iS, oS, "D", 1],
+      76: [iS, oS, "D", -1],
+      68: [iS, oS, "L", 1],
+      69: [iS, oS, "L", -1],
+      74: [iS, oS, "U", 1],
+      70: [iS, oS, "U", -1],
+      72: [iS, oS, "F", 1],
+      71: [iS, oS, "F", -1],
+      186: [iS, iSi, "U", 1],//y
+      65: [iS, iSi, "U", -1],//y'
+      85: [iS, oS+1, "R", 1],
+      82: [iS, oS+1, "L", -1],
+      77: [iS, oS+1, "R", -1],
+      86: [iS, oS+1, "L", 1],
+      84: [iS, iSi, "L", -1],
+      89: [iS, iSi, "R", 1],
+      78: [iS, iSi, "R", -1],
+      66: [iS, iSi, "L", 1],
+      190: [2, 2, "R", 1],//M'
+      80: [iS, iSi, "F", 1],//y
+      81: [iS, iSi, "F", -1],//y'
+  }
+  var keydownCallback = function(twisty, e) {
+    
+    var keyCode = e.keyCode;
+    //log(keyCode);
+    if (keyCode in cubeKeyMapping) {
+      addMoves([cubeKeyMapping[keyCode]]);
+      updateSpeed();
+    }
+    
   };
 
   return {
@@ -465,7 +518,8 @@ function createCubeTwisty(twistyParameters) {
     "3d": cubeObject,
     "cubePieces": cubePieces,
     "animateMoveCallback": animateMoveCallback,
-    "advanceMoveCallback": advanceMoveCallback
+    "advanceMoveCallback": advanceMoveCallback,
+    "keydownCallback": keydownCallback
   };
 
 }
