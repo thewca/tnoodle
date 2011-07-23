@@ -11,11 +11,41 @@
  * (So that they persist outside of functions.)
  */
 
-var twisty;
-var twistyType;
-var updateTwistyCallback;
+var twisty = null;
 
-var twistyContainer;
+var moveProgress = null;
+var currentMove = null;
+var sune = [
+[1, 1, "R", 1],
+[1, 1, "U", 1],
+[1, 1, "R", -1],
+[1, 1, "U", 1],
+[1, 1, "R", 1],
+[1, 1, "U", 2],
+[1, 1, "R", -1]
+];
+var ccc = [
+[1, 1, "L", -1],
+[1, 1, "U", 1],
+[1, 1, "R", -1],
+[1, 1, "F", -1],
+[1, 1, "U", 1],
+[1, 1, "L", -2],
+[1, 1, "U", -2],
+[1, 1, "L", -1],
+[1, 1, "U", -1],
+[1, 1, "L", 1],
+[1, 1, "U", -2],
+[1, 1, "D", 1],
+[1, 1, "R", -1],
+[1, 1, "D", -1],
+[1, 1, "F", 2],
+[1, 1, "R", 2],
+[1, 1, "U", -1]
+];
+var moveQueue = ccc;
+
+var twistyContainer = null;
 var camera, scene, renderer;
 
 var stats = null;
@@ -27,9 +57,7 @@ Math.TAU = Math.PI*2;
  * Initialization Methods
  */
 
-function start_twisty(twistyTypeIn) {
-
-  twistyType = twistyTypeIn;
+function initializeTwisty(twistyType) {
 
   twistyContainer = $("#twisty_container").get(0);
   log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
@@ -46,12 +74,8 @@ function start_twisty(twistyTypeIn) {
    * 3D Object Creation
    */
 
-  var twistyData = createTwisty(twistyType);
-  twisty = twistyData["twisty"];
-  updateTwistyCallback = twistyData["updateTwistyCallback"];
-
-
-  scene.addObject(twisty);
+  twisty = createTwisty(twistyType);
+  scene.addObject(twisty["3d"]);
 
   /*
    * Go!
@@ -63,7 +87,76 @@ function start_twisty(twistyTypeIn) {
   startStats();
   renderer.render(scene, camera);
 
+  initializeAnimation();
+
 };
+
+/*
+ * Algorithm Helper Methods
+ */
+var moveDelimiter = " ";
+
+function moveToString(move) {
+
+  var prefix = "";
+
+  var midfix = move[2];
+
+  var postfix = Math.abs(move[3]);
+  if (postfix == 1) {
+    postfix = "";
+  }
+  if (move[3] < 0) {
+    postfix += "'";
+  }
+
+  return prefix + midfix + postfix;
+
+}
+
+function movesToString(moves) {
+  str = "";
+  for (move in moves) {
+    str += moveToString(moves[move]) + moveDelimiter;
+  }
+  return str;
+}
+
+function initializeAnimation() {
+
+  log("Starting move queue: " + movesToString(moveQueue));
+
+  moveProgress = 0;
+  currentMove = moveQueue[0];
+  moveQueue.splice(0, 1);
+
+}
+
+var animationStep = 0.05;
+
+function stepAnimation() {
+
+  moveProgress += animationStep;
+
+  if (moveProgress < 1) {
+    twisty["animateMoveCallback"](twisty, currentMove, moveProgress);
+  }
+  else {
+    twisty["advanceMoveCallback"](twisty, currentMove);
+    currentMove = moveQueue[0];
+    log(moveToString(currentMove));
+    moveQueue.splice(0, 1);
+    moveProgress = 0;
+    
+    //TODO Temp (Don't run out of moves.)
+
+    var random1 = Math.floor(Math.random()*6);
+    var random2 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
+    
+    moveQueue.push([1, 1, ["U", "L", "F", "R", "B", "D"][random1], random2]);
+  }
+
+}
 
 function startStats() {
 
@@ -77,7 +170,7 @@ function startStats() {
 
 function animate() {
 
-  updateTwistyCallback(twisty);
+  stepAnimation();
 
   renderer.render(scene, camera);
   if (stats) {
@@ -85,7 +178,7 @@ function animate() {
   }
 
   // If we get here successfully, do it again!
-  requestAnimationFrame( animate );
+  requestAnimationFrame(animate);
 
 }
 
@@ -125,16 +218,18 @@ function createPlaneTwisty(twistyType) {
   var cubePieces = [];
 
   var material = new THREE.MeshLambertMaterial({color: 0xFF8800});
-  var piece = new THREE.Mesh( new THREE.PlaneGeometry(2, 2), material);
-  piece.rotation.x = Math.TAU/4;
-  piece.doubleSided = true;
+  var plane = new THREE.Mesh( new THREE.PlaneGeometry(1, 1), material);
+  plane.rotation.x = Math.TAU/4;
+  plane.doubleSided = true;
 
   var updateTwistyCallback = function(twisty) {
-    twisty.rotation.z += 0.01;
+    twisty["3d"].rotation.z += 0.01;
   };
 
   return {
-    "twisty": piece,
+    "type": twistyType,
+    "3d": plane,
+    "twisty": twisty,
     "updateTwistyCallback": updateTwistyCallback
   };
 
@@ -153,7 +248,8 @@ function createBlankTwisty(twistyType) {
   };
 
   return {
-    "twisty": blankObject,
+    "type": twistyType,
+    "3d": blankObject,
     "updateTwistyCallback": updateTwistyCallback
   };
 
@@ -162,7 +258,7 @@ function createBlankTwisty(twistyType) {
 /*
  * Rubik's Cube NxNxN
  */
-function createCubeTwisty(twistyType) {
+function createCubeTwisty(twistyParameters) {
 
   log("Creating cube twisty.");
 
@@ -172,7 +268,7 @@ function createCubeTwisty(twistyType) {
 
   //Defaults
   var cubeOptions = {
-      "sticker_width": 1.8,
+      "stickerWidth": 1.8,
       "doubleSided": true,
       "opacity": 0.95,
       "dimension": 3,
@@ -182,9 +278,9 @@ function createCubeTwisty(twistyType) {
 
   // Passed Parameters
   for (option in cubeOptions) {
-    if(option in twistyType) {
-      log("Setting option \"" + option + "\" to " + twistyType[option]);
-      cubeOptions[option] = twistyType[option];;
+    if(option in twistyParameters) {
+      log("Setting option \"" + option + "\" to " + twistyParameters[option]);
+      cubeOptions[option] = twistyParameters[option];;
     }
   }
 
@@ -219,21 +315,54 @@ function createCubeTwisty(twistyType) {
   var yyi = new THREE.Vector3(0, -1, 0);
   var zzi = new THREE.Vector3(0, 0, -1);
 
-  var sides_uv = [
-                  axify(xx, zzi, yy),
-                  axify(zz, yy, xxi),
-                  axify(xx, yy, zz),
-                  axify(zzi, yy, xx),
-                  axify(xxi, yy, zzi),
-                  axify(xx, zz, yyi)
-                  ];
+  /*
+  var sidesRotI = {
+      "U": axify(zzi, yy, xx),
+      "L": axify(xx, zzi, yy),
+      "F": axify(yy, xxi, zz),
+      "R": axify(xx, zz, yyi),
+      "B": axify(yyi, xx, zz),
+      "D": axify(zz, yy, xxi)
+  };*/
+  var sidesRot = {
+      "U": axify(zz, yy, xxi),
+      "L": axify(xx, zz, yyi),
+      "F": axify(yyi, xx, zz),
+      "R": axify(xx, zzi, yy),
+      "B": axify(yy, xxi, zz),
+      "D": axify(zzi, yy, xx)
+  };
+  var sidesNorm = {
+      "U": yy,
+      "L": xxi,
+      "F": zz,
+      "R": xx,
+      "B": zzi,
+      "D": yyi
+  };
+  var sidesRotAxis = {
+      "U": yyi,
+      "L": xx,
+      "F": zzi,
+      "R": xxi,
+      "B": zz,
+      "D": yy
+  };
+  var sidesUV = [
+                 axify(xx, zzi, yy),
+                 axify(zz, yy, xxi),
+                 axify(xx, yy, zz),
+                 axify(zzi, yy, xx),
+                 axify(xxi, yy, zzi),
+                 axify(xx, zz, yyi)
+                 ];
 
   //Cube Object Generation
   for (var i = 0; i < numSides; i++) {
     for (var su = 0; su < cubeOptions["dimension"]; su++) {
       for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
-        var sticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["sticker_width"], cubeOptions["sticker_width"]), materials[i]);
+        var sticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), materials[i]);
         sticker.doubleSided = cubeOptions["doubleSided"];
 
         var positionMatrix = new THREE.Matrix4();
@@ -244,7 +373,7 @@ function createCubeTwisty(twistyType) {
         );    
 
         var transformationMatrix = new THREE.Matrix4();
-        transformationMatrix.copy(sides_uv[i]);
+        transformationMatrix.copy(sidesUV[i]);
         transformationMatrix.multiplySelf(positionMatrix);
         sticker.matrix.copy(transformationMatrix); 
 
@@ -257,17 +386,89 @@ function createCubeTwisty(twistyType) {
       }
     }
   }
+  
+  function matrixVector3Dot(m, v) {
+    return m.n14*v.x + m.n24*v.y + m.n34*v.z;
+  }
 
   var actualScale = cubeOptions["scale"] * 0.5 / cubeOptions["dimension"];
   cubeObject.scale = new THREE.Vector3(actualScale, actualScale, actualScale);
 
-  var updateTwistyCallback = function(twisty) {
-    twisty.rotation.y += 0.01;
+  var animateMoveCallback = function(twisty, currentMove, moveProgress) {
+
+    var rott = new THREE.Matrix4();
+    rott.setRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
+
+    var state = twisty["cubePieces"];
+    
+
+    for (entry in state) {
+   
+      if (matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]) > 1) {
+        var roty = new THREE.Matrix4();
+        roty.copy(rott);
+        roty.multiplySelf(state[entry][1]);
+
+        state[entry][2].matrix.copy(roty);
+        state[entry][2].update();
+      }
+    }
+
+  };
+
+  function matrix4Power(inMatrix, power) {
+
+    var matrixIdentity = new THREE.Matrix4();
+    var matrix = new THREE.Matrix4();
+    matrix.copy(inMatrix);
+    if (power < 0) {
+      matrix.copy(THREE.Matrix4.makeInvert(inMatrix, matrixIdentity));
+    }
+    
+    var out = new THREE.Matrix4();
+    for (var i=0; i < Math.abs(power); i++) {
+      out.multiplySelf(matrix);
+    }
+    
+    return out;
+    
+  }
+  
+  /*
+  log(sidesRot["U"]);
+  matrix4Power(sidesRot["U"], 2);
+  log(sidesRot["U"]);
+  */
+
+  var advanceMoveCallback = function(twisty, currentMove) {
+
+    var rott = new THREE.Matrix4();
+    rott.copy(matrix4Power(sidesRot[currentMove[2]], currentMove[3]));
+    
+    var state = twisty["cubePieces"];
+    
+    for (entry in state) {
+   
+      if (matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]) > 1) {
+        var roty = new THREE.Matrix4();
+        roty.copy(rott);
+        roty.multiplySelf(state[entry][1]);
+
+        state[entry][2].matrix.copy(roty);
+        state[entry][1].copy(roty);
+        state[entry][2].update();
+      }
+    }
+
+
   };
 
   return {
-    "twisty": cubeObject,
-    "updateTwistyCallback": updateTwistyCallback
+    "type": twistyParameters,
+    "3d": cubeObject,
+    "cubePieces": cubePieces,
+    "animateMoveCallback": animateMoveCallback,
+    "advanceMoveCallback": advanceMoveCallback
   };
 
 }
