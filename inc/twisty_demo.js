@@ -25,6 +25,10 @@ $(document).ready(function() {
     addMoves(makeCCC(parseInt($("#cubeDimension").val())));
   });
 
+  $("#lucasparity").bind("click", function() {
+    addMoves(lucasparity);
+  });
+
   $("#alg_superflip").bind("click", function() {
     addMoves(superflip);
   });

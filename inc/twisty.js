@@ -213,7 +213,6 @@ function animate() {
     render();
   }
 
-
   if (stats) {
     stats.update(); 
   }
@@ -569,9 +568,7 @@ function createCubeTwisty(twistyParameters) {
       break;
 
     case 32:
-      animationStep=0.5;
       queueRandomCubeMoves(32);
-      animationStep = 0.1;
       startTime = (new Date).getTime();
       timing = true;
       break;
