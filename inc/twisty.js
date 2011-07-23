@@ -182,14 +182,14 @@ function createCubeTwisty(twistyType) {
 
   // Passed Parameters
   for (option in cubeOptions) {
-    if(twistyType[option]) {
-      cubeOptions[option] = twistyType[option];
+    if(option in twistyType) {
+      log("Setting option \"" + option + "\" to " + twistyType[option]);
+      cubeOptions[option] = twistyType[option];;
     }
   }
 
   // Cube Constants
   var numSides = 6;
-  log("Cube dimension: " + cubeOptions["dimension"]);
 
   // Cube Materials
   var materials = [];

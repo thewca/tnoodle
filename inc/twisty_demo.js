@@ -9,7 +9,10 @@ $(document).ready(function() {
 
   log("Document ready.");
 
-  start_twisty({"type": "cube", "dimension": 5});
+  start_twisty({
+    "type": "cube",
+    "dimension": 5
+  });
 
   animate();
 
