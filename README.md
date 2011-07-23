@@ -13,6 +13,7 @@ Started by Lucas Garron, July 2011.
 
 ## Bugs and Features
 - Resize canvas on div resize.
+- Always fit twisty fully inside canvas
 - LxMxN cube dimensions
 
 

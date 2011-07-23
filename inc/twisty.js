@@ -38,7 +38,7 @@ function start_twisty(twistyTypeIn) {
    * Scene Setup
    */
   camera = new THREE.Camera( 30, $(twistyContainer).width() / $(twistyContainer).height(), 0, 1000 );
-  camera.position = new THREE.Vector3(0, 4, 6);
+  camera.position = new THREE.Vector3(0, 2, 3);
 
   scene = new THREE.Scene();
 
@@ -60,6 +60,7 @@ function start_twisty(twistyTypeIn) {
   renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
   twistyContainer.appendChild(renderer.domElement);
 
+  startStats();
   renderer.render(scene, camera);
 
 };
@@ -74,7 +75,19 @@ function startStats() {
 
 }
 
-var twisties = {"plane": createPlaneTwisty, "cube": createCubeTwisty, "blank": createBlankTwisty};
+function animate() {
+
+  updateTwistyCallback(twisty);
+
+  renderer.render(scene, camera);
+  if (stats) {
+    stats.update();
+  }
+
+  // If we get here successfully, do it again!
+  requestAnimationFrame( animate );
+
+}
 
 function createTwisty(twistyType) {
 
@@ -90,11 +103,23 @@ function createTwisty(twistyType) {
 
 }
 
+/****************
+ * 
+ * Twisty Definitions
+ * 
+ */
+
+var twisties = {
+    "plane": createPlaneTwisty,
+    "cube": createCubeTwisty,
+    "blank": createBlankTwisty
+};
+
 /*
  * Something simple for fallback/testing.
  */
 function createPlaneTwisty(twistyType) {
-  
+
   log("Creating plane twisty.");
 
   var cubePieces = [];
@@ -108,7 +133,10 @@ function createPlaneTwisty(twistyType) {
     twisty.rotation.z += 0.01;
   };
 
-  return {"twisty": piece, "updateTwistyCallback": updateTwistyCallback};
+  return {
+    "twisty": piece,
+    "updateTwistyCallback": updateTwistyCallback
+  };
 
 }
 
@@ -116,15 +144,18 @@ function createPlaneTwisty(twistyType) {
  * Blank twisty. More useful as a template.
  */
 function createBlankTwisty(twistyType) {
-  
+
   log("Creating cube twisty.");
 
   var blankObject = new THREE.Object3D();
-  
+
   var updateTwistyCallback = function(twisty) {
   };
 
-  return {"twisty": blankObject, "updateTwistyCallback": updateTwistyCallback};
+  return {
+    "twisty": blankObject,
+    "updateTwistyCallback": updateTwistyCallback
+  };
 
 }
 
@@ -132,29 +163,111 @@ function createBlankTwisty(twistyType) {
  * Rubik's Cube NxNxN
  */
 function createCubeTwisty(twistyType) {
-  
+
   log("Creating cube twisty.");
 
+  // Cube Variables
   var cubeObject = new THREE.Object3D();
   var cubePieces = [];
-  
-  var updateTwistyCallback = function(twisty) {
+
+  //Defaults
+  var cubeOptions = {
+      "sticker_width": 1.8,
+      "doubleSided": true,
+      "opacity": 0.95,
+      "dimension": 3,
+      "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
+      "scale": 1
   };
 
-  return {"twisty": cubeObject, "updateTwistyCallback": updateTwistyCallback};
-
-}
-
-function animate() {
-
-  updateTwistyCallback(twisty);
-
-  renderer.render(scene, camera);
-  if (stats) {
-    stats.update();
+  // Passed Parameters
+  for (option in cubeOptions) {
+    if(twistyType[option]) {
+      cubeOptions[option] = twistyType[option];
+    }
   }
 
-  // If we get here successfully, do it again!
-  requestAnimationFrame( animate );
+  // Cube Constants
+  var numSides = 6;
+  log("Cube dimension: " + cubeOptions["dimension"]);
+
+  // Cube Materials
+  var materials = [];
+
+  for (var i = 0; i < numSides; i++) {
+    var material = new THREE.MeshLambertMaterial( { color: cubeOptions["faceColors"][i]} );
+    material.opacity = cubeOptions["opacity"];
+    materials.push(material);
+  }
+
+  // Cube Helper Linear Algebra
+  function axify(v1, v2, v3) {
+    var ax = new THREE.Matrix4();
+    ax.set(
+        v1.x, v2.x, v3.x, 0,
+        v1.y, v2.y, v3.y, 0,
+        v1.z, v2.z, v3.z, 0,
+        0   , 0   , 0   , 1
+    );
+    return ax;
+  }
+
+  var xx = new THREE.Vector3(1, 0, 0);
+  var yy = new THREE.Vector3(0, 1, 0);
+  var zz = new THREE.Vector3(0, 0, 1);
+  var xxi = new THREE.Vector3(-1, 0, 0);
+  var yyi = new THREE.Vector3(0, -1, 0);
+  var zzi = new THREE.Vector3(0, 0, -1);
+
+  var sides_uv = [
+                  axify(xx, zzi, yy),
+                  axify(zz, yy, xxi),
+                  axify(xx, yy, zz),
+                  axify(zzi, yy, xx),
+                  axify(xxi, yy, zzi),
+                  axify(xx, zz, yyi)
+                  ];
+
+  //Cube Object Generation
+  for (var i = 0; i < numSides; i++) {
+    for (var su = 0; su < cubeOptions["dimension"]; su++) {
+      for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
+
+        var sticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["sticker_width"], cubeOptions["sticker_width"]), materials[i]);
+        sticker.doubleSided = cubeOptions["doubleSided"];
+
+        var positionMatrix = new THREE.Matrix4();
+        positionMatrix.setTranslation(
+            su*2 - cubeOptions["dimension"] + 1,
+            -(sv*2 - cubeOptions["dimension"] + 1),
+            cubeOptions["dimension"]
+        );    
+
+        var transformationMatrix = new THREE.Matrix4();
+        transformationMatrix.copy(sides_uv[i]);
+        transformationMatrix.multiplySelf(positionMatrix);
+        sticker.matrix.copy(transformationMatrix); 
+
+        sticker.matrixAutoUpdate = false;
+        sticker.update();
+
+        cubePieces.push([i, transformationMatrix, sticker]);
+        cubeObject.addChild(sticker);    
+
+      }
+    }
+  }
+
+  var actualScale = cubeOptions["scale"] * 0.5 / cubeOptions["dimension"];
+  cubeObject.scale = new THREE.Vector3(actualScale, actualScale, actualScale);
+
+  var updateTwistyCallback = function(twisty) {
+    twisty.rotation.y += 0.01;
+  };
+
+  return {
+    "twisty": cubeObject,
+    "updateTwistyCallback": updateTwistyCallback
+  };
 
 }
