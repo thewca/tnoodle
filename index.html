@@ -2,41 +2,47 @@
 <head>
 <title>twisty.js</title>
 <link href="inc/style.css" rel="stylesheet" media="screen"
-	type="text/css" />
+  type="text/css" />
 
 <script type="text/javascript" src="inc/jquery-1.6.min.js"></script>
+
+<script type="text/javascript" src="inc/Three.js"></script>
+<script type="text/javascript" src="inc/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="inc/Stats.js"></script>
+
+<script src="inc/twisty.js" type="text/javascript"></script>
 <script src="inc/twisty_demo.js" type="text/javascript"></script>
+
 </head>
 <body>
 
-	<div class="header">
-		<h1>twisty.js</h1>
-	</div>
+  <div class="header">
+    <h1>cubing.net&nbsp;&rarr;&nbsp;twisty.js</h1>
+  </div>
 
-	<div class="content">
+  <div class="content">
 
-		<div class="left">
-			<h2>Info Panel</h2>
-			<div class="padded">
-				<p class="spacey">
-					twisty.js - by <a href="http://www.garron.us/">Lucas Garron</a><br>
-					Notes: <a href="README.md">README.md</a><br> <span
-						style="font-variant: small-caps;">GitHub</span>: <a
-						href="https://github.com/lgarron/wsoh">lgarron/wsoh</a>
-				</p>
-			</div>
+    <div class="left">
+      <h2>Info Panel</h2>
+      <div class="padded">
+        <p class="spacey">
+          twisty.js - by <a href="http://www.garron.us/">Lucas
+            Garron</a><br> Notes: <a href="README.md">README.md</a><br>
+          <span style="font-variant: small-caps;">GitHub</span>: <a
+            href="https://github.com/lgarron/wsoh">lgarron/wsoh</a>
+        </p>
+      </div>
 
-			<h3>Debug</h3>
-			<div class="padded">
-				<div id="debug" class="hi">[debug output goes here and/or to
-					the console]</div>
-			</div>
+      <h3>Debug</h3>
+      <div class="padded">
+        <div id="debug" class="hi">[Debug Panel - newest first]</div>
+      </div>
 
-		</div>
+    </div>
 
-		<div class="right checkered">Render Panel</div>
+    <div class="right checkered" id="twisty_container"></div>
 
-	</div>
+  </div>
 
 </body>
 </html>
