@@ -16,34 +16,52 @@ var twisty = null;
 var moveProgress = null;
 var currentMove = null;
 var sune = [
-[1, 1, "R", 1],
-[1, 1, "U", 1],
-[1, 1, "R", -1],
-[1, 1, "U", 1],
-[1, 1, "R", 1],
-[1, 1, "U", 2],
-[1, 1, "R", -1]
+[0, 1, "R", 1],
+[0, 1, "U", 1],
+[0, 1, "R", -1],
+[0, 1, "U", 1],
+[0, 1, "R", 1],
+[0, 1, "U", 2],
+[0, 1, "R", -1]
 ];
 var ccc = [
-[1, 1, "L", -1],
-[1, 1, "U", 1],
-[1, 1, "R", -1],
-[1, 1, "F", -1],
-[1, 1, "U", 1],
-[1, 1, "L", -2],
-[1, 1, "U", -2],
-[1, 1, "L", -1],
-[1, 1, "U", -1],
-[1, 1, "L", 1],
-[1, 1, "U", -2],
-[1, 1, "D", 1],
-[1, 1, "R", -1],
-[1, 1, "D", -1],
-[1, 1, "F", 2],
-[1, 1, "R", 2],
-[1, 1, "U", -1]
+[0, 1, "L", -1],
+[0, 1, "U", 1],
+[0, 1, "R", -1],
+[0, 1, "F", -1],
+[0, 1, "U", 1],
+[0, 1, "L", -2],
+[0, 1, "U", -2],
+[0, 1, "L", -1],
+[0, 1, "U", -1],
+[0, 1, "L", 1],
+[0, 1, "U", -2],
+[0, 1, "D", 1],
+[0, 1, "R", -1],
+[0, 1, "D", -1],
+[0, 1, "F", 2],
+[0, 1, "R", 2],
+[0, 1, "U", -1]
 ];
-var moveQueue = ccc;
+var layers = [
+[0, 1, "R", 1],
+[0, 1, "U", 1],
+[0, 2, "R", 1],
+[0, 2, "U", 1],
+[0, 3, "R", 1],
+[0, 3, "U", 1],
+[0, 4, "R", 1],
+[0, 4, "U", 1],
+[0, 5, "R", 1],
+[0, 5, "U", 1],
+[2, 5, "R", 1],
+[2, 5, "U", 1],
+[3, 5, "R", 1],
+[3, 5, "U", 1],
+[4, 5, "R", 1],
+[4, 5, "U", 1],
+];
+var moveQueue = layers;
 
 var twistyContainer = null;
 var camera, scene, renderer;
@@ -132,7 +150,7 @@ function initializeAnimation() {
 
 }
 
-var animationStep = 0.05;
+var animationStep = 0.03;
 
 function stepAnimation() {
 
@@ -146,14 +164,16 @@ function stepAnimation() {
     currentMove = moveQueue[0];
     log(moveToString(currentMove));
     moveQueue.splice(0, 1);
+    //moveProgress = moveProgress % 1;
     moveProgress = 0;
-    
+
     //TODO Temp (Don't run out of moves.)
 
-    var random1 = Math.floor(Math.random()*6);
+    /*var random1 = Math.floor(Math.random()*6);
     var random2 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
-    
-    moveQueue.push([1, 1, ["U", "L", "F", "R", "B", "D"][random1], random2]);
+
+    moveQueue.push([0, 1, ["U", "L", "F", "R", "B", "D"][random1], random2]);
+     */
   }
 
 }
@@ -315,15 +335,6 @@ function createCubeTwisty(twistyParameters) {
   var yyi = new THREE.Vector3(0, -1, 0);
   var zzi = new THREE.Vector3(0, 0, -1);
 
-  /*
-  var sidesRotI = {
-      "U": axify(zzi, yy, xx),
-      "L": axify(xx, zzi, yy),
-      "F": axify(yy, xxi, zz),
-      "R": axify(xx, zz, yyi),
-      "B": axify(yyi, xx, zz),
-      "D": axify(zz, yy, xxi)
-  };*/
   var sidesRot = {
       "U": axify(zz, yy, xxi),
       "L": axify(xx, zz, yyi),
@@ -386,7 +397,7 @@ function createCubeTwisty(twistyParameters) {
       }
     }
   }
-  
+
   function matrixVector3Dot(m, v) {
     return m.n14*v.x + m.n24*v.y + m.n34*v.z;
   }
@@ -400,11 +411,16 @@ function createCubeTwisty(twistyParameters) {
     rott.setRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
 
     var state = twisty["cubePieces"];
-    
+
 
     for (entry in state) {
-   
-      if (matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]) > 1) {
+
+      var layer = matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]);
+      if (
+          layer < twisty["options"]["dimension"] - 2*currentMove[0] + 2
+          &&
+          layer > twisty["options"]["dimension"] - 2*currentMove[1]
+      ) {
         var roty = new THREE.Matrix4();
         roty.copy(rott);
         roty.multiplySelf(state[entry][1]);
@@ -424,32 +440,31 @@ function createCubeTwisty(twistyParameters) {
     if (power < 0) {
       matrix.copy(THREE.Matrix4.makeInvert(inMatrix, matrixIdentity));
     }
-    
+
     var out = new THREE.Matrix4();
     for (var i=0; i < Math.abs(power); i++) {
       out.multiplySelf(matrix);
     }
-    
+
     return out;
-    
+
   }
-  
-  /*
-  log(sidesRot["U"]);
-  matrix4Power(sidesRot["U"], 2);
-  log(sidesRot["U"]);
-  */
 
   var advanceMoveCallback = function(twisty, currentMove) {
 
     var rott = new THREE.Matrix4();
     rott.copy(matrix4Power(sidesRot[currentMove[2]], currentMove[3]));
-    
+
     var state = twisty["cubePieces"];
-    
+
     for (entry in state) {
-   
-      if (matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]) > 1) {
+
+      var layer = matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]);
+      if (
+          layer < twisty["options"]["dimension"] - 2*currentMove[0] + 2
+          &&
+          layer > twisty["options"]["dimension"] - 2*currentMove[1]
+      ) {
         var roty = new THREE.Matrix4();
         roty.copy(rott);
         roty.multiplySelf(state[entry][1]);
@@ -465,6 +480,7 @@ function createCubeTwisty(twistyParameters) {
 
   return {
     "type": twistyParameters,
+    "options": cubeOptions,
     "3d": cubeObject,
     "cubePieces": cubePieces,
     "animateMoveCallback": animateMoveCallback,

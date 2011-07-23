@@ -11,7 +11,7 @@ $(document).ready(function() {
 
   initializeTwisty({
     "type": "cube",
-    "dimension": 3
+    "dimension": 7
   });
 
   animate();

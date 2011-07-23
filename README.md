@@ -1,6 +1,6 @@
 # twisty.js
 
-A javascript library for puzzles.
+A javascript library for twistypuzzles.
 
 Started by Lucas Garron, July 2011.
 
