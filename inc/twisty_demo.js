@@ -40,6 +40,11 @@ $(document).ready(function() {
   document.getElementById("twistyContainer").addEventListener( 'touchstart', onDocumentTouchStart, false );
   document.getElementById("twistyContainer").addEventListener( 'touchmove', onDocumentTouchMove, false );
 
+
+  $("#offlineSupport").bind("click", function() {
+    window.location.href = "offline.html";
+  });
+  
 });
 
 var theta = 0;

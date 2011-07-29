@@ -1,6 +1,8 @@
 <html>
 <head>
+
 <title>twisty.js</title>
+
 <link href="inc/style.css" rel="stylesheet" media="screen"
   type="text/css" />
 
@@ -17,23 +19,37 @@
 <body>
 
   <div class="header">
-    <h1 class="title">cubing.net&nbsp;&rarr;&nbsp;twisty.js</h1>
+    <h1 class="title">
+      <a href="http://www.cubing.net/">cubing.net</a> &rarr; <a
+        href="./">twisty.js</a>
+    </h1>
   </div>
 
   <div class="content">
 
     <div class="left">
-      <h2>Control Panel</h2>
+
+      <h2>Controls</h2>
       <div class="padded">
-      <center>
-        <input id="cubeDimension" placeholder="Cube Dimension" value="3" />
-        <button id="alg_ccc">Cube-in-Cube-in-Cube</button>
-        <button id="lucasparity">lucasparity</button>
-        <button id="alg_superflip">Superflip</button>
-        <div id="timer">[Time]</div>
-      </center>
+        <center>
+          <p class="spacey">
+            <input id="cubeDimension" placeholder="Cube Dimension"
+              value="3" /> <br>
+            <button id="alg_ccc">Cube-in-Cube-in-Cube</button>
+            <button id="lucasparity">lucasparity</button>
+            <button id="alg_superflip">Superflip</button>
+            <br>
+          <div id="timer">[Time]</div>
+          </p>
+        </center>
       </div>
-      <h2>Info Panel</h2>
+
+      <h2>Settings</h2>
+      <p class="spacey">
+        <button id="offlineSupport">Enable Offline Support</button>
+      </p>
+
+      <h2>Info</h2>
       <div class="padded">
         <p class="spacey">
           twisty.js - by <a href="http://www.garron.us/">Lucas
@@ -45,7 +61,7 @@
         </p>
       </div>
 
-      <h3>Debug</h3>
+      <h2>Debug</h2>
       <div class="padded">
         <div id="debug" class="hi">[Debug Panel]</div>
       </div>

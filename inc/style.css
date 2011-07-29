@@ -26,7 +26,7 @@ h1,h2,h3,h4,h5,h6 {
   color: #000;
   font-weight: bold;
   text-shadow: 2px 2px 1px #ACE;
-  border-bottom: 1px solid rgba(128, 128, 195, 0.5);
+  border-bottom: 1px solid rgba(128, 160, 195, 0.5);
 }
 
 h2 {
@@ -34,13 +34,19 @@ h2 {
   padding: 8px 12px;
 }
 
-h1 {
+h1,h1 a {
   font-size: 64px;
   color: #FFF;
   text-align: center;
   text-shadow: 2px 2px 1px #88A;
   border-bottom: none;
   font-weight: bold;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+h1 a:hover {
+  text-shadow: 4px 4px 2px #000;
 }
 
 .title {
@@ -63,6 +69,7 @@ div.content {
   left: 0;
   right: 0;
   bottom: 0;
+  overflow-y: auto;
 }
 
 div.left {
@@ -101,6 +108,10 @@ div.right {
   font-family: monospace;
   font-size: 48px;
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+#twistyContainer {
+  cursor: move;
 }
 
 /* Debugging and Testing */

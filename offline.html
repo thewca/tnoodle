@@ -1,0 +1,125 @@
+<html manifest="inc/cache.manifest">
+<head>
+
+<title>twisty.js offline</title>
+
+<link href="inc/style.css" rel="stylesheet" media="screen"
+  type="text/css" />
+
+<script type="text/javascript" src="inc/jquery-1.6.min.js"></script>
+
+<style type="text/css">
+.offline_info {
+  background: #ACE;
+  padding: 4px;
+  margin: 32px 10%;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.offline_storage_example {
+  overflow: hidden;
+  text-align: center;
+}
+
+.offline_storage_example_image {
+  margin: 16px 0px;
+  vertical-align: middle;
+  border-radius: 8px;
+}
+
+#cache_status {
+  margin: 0px 25%;
+  padding: 16px;
+  vertical-align: middle;
+  border-radius: 16px;
+  background: #FF8;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+}
+</style>
+
+<script type="text/javascript">
+  var cache = window.applicationCache;
+  cache.addEventListener('cached', cachedCallback, false);
+  cache.addEventListener('checking', cachedCallback, false);
+  cache.addEventListener('downloading', cachedCallback, false);
+  cache.addEventListener('error', cachedCallback, false);
+  cache.addEventListener('noupdate', cachedCallback, false);
+  cache.addEventListener('obsolete', cachedCallback, false);
+  cache.addEventListener('progress', cachedCallback, false);
+  cache.addEventListener('updateready', cachedCallback, false);
+
+  var progress = "#FF8";
+  var done = "#8F8";
+  var error = "#F88";
+  var other = "#888";
+
+  var eventList = {
+    "cached" : [ "Done caching...", done ],
+    "checking" : [ "Checking cache...", progress ],
+    "downloading" : [ "Downloading...", progress ],
+    "error" : [ "Error! (Are you already offline?)", error ],
+    "noupdate" : [ "Cache is up to date.", done ],
+    "obsolete" : [ "Cache is obsolete.", error ],
+    "progress" : [ "In progress...", progress ],
+    "updateready" : [ "Update ready...", other ]
+  }
+
+  function cachedCallback(e) {
+    console.log("Cache event: " + e.type + "(status is " + cache.status
+        + ", online is " + navigator.onLine + ")");
+    if (navigator.onLine) {
+      $("#cache_status").html(eventList[e.type][0]);
+      $("#cache_status").css('background-color', eventList[e.type][1]);
+    } else {
+      $("#cache_status").html("You're offline!");
+      $("#cache_status").css('background-color', done);
+    }
+  };
+</script>
+
+</head>
+<body>
+
+  <div class="header">
+    <h1 class="title">
+      <a href="./">twisty.js</a> &rarr; <a href="">Offline Support</a>
+    </h1>
+  </div>
+
+  <div class="content">
+
+    <div class="offline_info">
+
+      <center>
+        <!-- Because centering divs is a pain otherwise -->
+        <div id="cache_status">Getting ready to cache...</div>
+      </center>
+
+      <h2>Instructions</h2>
+
+      <ol class="spacey">
+        <li>If your browser asks you whether store offline data,
+          allow it.
+          <ul>
+            <li>Firefox will normally ask (see example), Google
+              Chrome will normally store it without asking.</li>
+          </ul></li>
+        <li>Wait for the indicator above to turn green.
+        <li>Visit <a href="./">twisty.js</a> again once you're
+          offline.</li>
+      </ol>
+
+      <h2>Example (Firefox)</h2>
+      <div class="offline_storage_example">
+        <img src="inc/offline_storage_example.png"
+          alt="Offline storage dialog example in Firefox."
+          class="offline_storage_example_image" />
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
