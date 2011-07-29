@@ -5,7 +5,21 @@
  * 
  */
 
+var cache = window.applicationCache;
+function updateReadyCache() {
+  window.applicationCache.swapCache();
+  location.reload(true); // For now
+}
+
+var currentCubeSize = parseInt($("#cubeDimension").val());
+
 $(document).ready(function() {
+
+  /*
+   * Caching Stuff.
+   */
+
+  cache.addEventListener('updateready', updateReadyCache, false);
 
   log("Document ready.");
 
@@ -14,11 +28,20 @@ $(document).ready(function() {
     "dimension": 3
   });
 
-  $("#cubeDimension").bind("keyup", function() {
-    initializeTwisty({
-      "type": "cube",
-      "dimension": parseInt($("#cubeDimension").val())
-    });
+  $("#cubeDimension").bind("input", function() {
+    var dim = parseInt($("#cubeDimension").val());
+    if (!dim) {
+      dim = 3;
+    }
+    dim = Math.min(Math.max(dim, 1), 16);
+    if (dim != currentCubeSize) {
+      initializeTwisty({
+        "type": "cube",
+        "dimension": dim
+      });
+      currentCubeSize = dim;
+      $("#cubeDimension").blur(); 
+    }
   });
 
   $("#alg_ccc").bind("click", function() {
@@ -44,7 +67,7 @@ $(document).ready(function() {
   $("#offlineSupport").bind("click", function() {
     window.location.href = "offline.html";
   });
-  
+
 });
 
 var theta = 0;
@@ -56,6 +79,7 @@ function cam(deltaTheta) {
 }
 
 function onDocumentMouseDown( event ) {
+  $("#cubeDimension").blur(); 
   event.preventDefault();
   document.getElementById("twistyContainer").addEventListener( 'mousemove', onDocumentMouseMove, false );
   document.getElementById("twistyContainer").addEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -302,5 +326,5 @@ function makeCCC(n) {
   }
 
   return cccMoves;
-  
+
 }

@@ -33,6 +33,8 @@ Started by Lucas Garron, July 2011.
 
 
 ## Bugs and Features
+- Solved Detection / Timer Stop
+- Proper timing and animation handling.
 - Resize canvas on div resize.
 - Always fit twisty fully inside canvas
 - Animate based on time, not steps

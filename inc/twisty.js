@@ -64,7 +64,7 @@ function initializeTwisty(twistyType) {
   twistyContainer.appendChild(renderer.domElement);
 
   startStats();
-  render()
+  render();
 
 };
 
@@ -81,8 +81,28 @@ function moveCamera(theta) {
   render();
 }
 
+var startTimingFlag = false;
 function keydownHandler(e) {
+  if (startTimingFlag) {
+    startTiming();
+    startTimingFlag = false;
+  }
   twisty["keydownCallback"](twisty, e);
+}
+
+function setTimingFlag() {
+  startTimingFlag = true;
+  $("#timer").html("[Ready]");
+}
+
+function stopTimer() {
+  startTimingFlag = false;
+  timing = false;
+}
+
+function resetTimer() {
+  stopTimer();
+  $("#timer").html("[Timer]");
 }
 
 /*
@@ -120,15 +140,29 @@ function movesToString(moves) {
   return str;
 }
 
-function startAnimation() {
+function startAnimation() { 
 
   if(!animating) {
+    animating = true;
     //log("Starting move queue: " + movesToString(moveQueue));
     startMove();
-    animating = true;
-    animate();
+    if (!timing) {
+      animate();
+    }
   }
 
+}
+
+function startTiming() {
+
+  startTime = (new Date).getTime();
+  
+  if(!timing) {
+    timing = true;
+    if (!animating) {
+      animate();
+    }
+  }
 }
 
 function startMove() {
@@ -148,29 +182,43 @@ function addMoves(moves) {
 
 }
 
+
+function applyMoves(moves) {
+  
+  moveQueue = moves;
+  while (moveQueue.length > 0) {
+    startMove();
+    twisty["advanceMoveCallback"](twisty, currentMove);
+  }
+  render();
+
+}
+
+// TODO: Make time-based / framerate-compensating
 function updateSpeed() {
-  animationStep = Math.min(0.15 + 0.1*moveQueue.length, 0.5);
+  //animationStep = Math.min(0.15 + 0.1*moveQueue.length, 0.5);
+  animationStep = Math.min(0.15 + 0.15*moveQueue.length, 0.5);
 }
 
 function queueRandomCubeMoves(n) {
-  
+
   var newMoves = [];
-  
+
   for (var i=0; i<n; i++) {
-    
+
     var random1 = 1;
     var random2 = 1;
     var random3 = Math.floor(Math.random()*6);
     var random4 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
-    
+
     var newMove = [random1, random2, ["U", "L", "F", "R", "B", "D"][random3], random4];
-    
+
     newMoves.push(newMove);
-    
+
   }
 
-  addMoves(newMoves);
-  
+  applyMoves(newMoves);
+
 }
 
 var animationStep = 0.1;
@@ -565,12 +613,13 @@ function createCubeTwisty(twistyParameters) {
 
     case 27:
       initializeTwisty(twisty["type"]);
+      resetTimer();
       break;
 
     case 32:
+      animationStep = 0.1;
       queueRandomCubeMoves(32);
-      startTime = (new Date).getTime();
-      timing = true;
+      setTimingFlag();
       break;
 
     }

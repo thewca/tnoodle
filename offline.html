@@ -49,7 +49,14 @@
   cache.addEventListener('noupdate', cachedCallback, false);
   cache.addEventListener('obsolete', cachedCallback, false);
   cache.addEventListener('progress', cachedCallback, false);
-  cache.addEventListener('updateready', cachedCallback, false);
+  cache.addEventListener('updateready', updateReadyCache, false);
+
+  var cache = window.applicationCache;
+  function updateReadyCache() {
+    window.applicationCache.swapCache();
+    location.reload(true); // For now
+  }
+
 
   var progress = "#FF8";
   var done = "#8F8";
@@ -85,7 +92,7 @@
 
   <div class="header">
     <h1 class="title">
-      <a href="./">twisty.js</a> &rarr; <a href="">Offline Support</a>
+      <a href="./">twisty.js</a> &rarr; <a href="">Offline Access</a>
     </h1>
   </div>
 
@@ -118,6 +125,7 @@
           alt="Offline storage dialog example in Firefox."
           class="offline_storage_example_image" />
       </div>
+
     </div>
   </div>
 
