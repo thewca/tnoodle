@@ -30,24 +30,27 @@
     <div class="left">
 
       <h2>Controls</h2>
-      <div class="padded">
-        <center>
+      <div class="padded center">
           <p class="spacey">
             <input id="cubeDimension" placeholder="Cube Dimension"
               type="number" min="1" max="12" step="1" value="3" /> <br>
             <button id="alg_ccc">Cube-in-Cube-in-Cube</button>
             <button id="lucasparity">lucasparity</button>
             <button id="alg_superflip">Superflip</button>
-            <br>
-          <div id="timer">[Timer]</div>
           </p>
-        </center>
       </div>
-      
-      <h2>Settings</h2>
+
+      <h2>Experimental Features</h2>
+      <div class="padded center">
       <p class="spacey">
-        <button id="offlineSupport">Enable Offline Access</button>
+        <button id="enableOfflineSupport">Enable Offline Access</button>
+        <button id="createCanvasPNG">Generate PNG image from
+          Canvas</button>
+      <div id="canvasPNG"></div>
+      <br>
+      <div id="timer">[Timer]</div>
       </p>
+      </div>
 
       <h2>Info</h2>
       <div class="padded">
@@ -55,9 +58,10 @@
           twisty.js - by <a href="http://www.garron.us/">Lucas
             Garron</a> <br> Notes: <a href="README.md">README.md</a> <br>
           <span style="font-variant: small-caps;">GitHub</span>: <a
-            href="https://github.com/lgarron/wsoh">lgarron/wsoh</a> <br>
-          3D Library: <a href="https://github.com/mrdoob/three.js/">three.js</a>
-          (by mrdoob)
+            href="https://github.com/lgarron/twisty.js">lgarron/twisty.js</a>
+          <br> 3D Library: <a
+            href="https://github.com/mrdoob/three.js/">three.js</a> (by
+          mrdoob)
         </p>
       </div>
 

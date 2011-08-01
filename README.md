@@ -9,16 +9,9 @@ Started by Lucas Garron, July 2011.
 - [Ryan Heise](http://www.ryanheise.com/)'s revolutionary [Rubik's Cube Simulator](http://www.ryanheise.com/cube/speed.html) with keyboard input.
 - [Werner Randelshofer](http://randelshofer.ch/)'s highly configurable [virtual cubes](http://randelshofer.ch/rubik/index.html)
 - [Josef Jelinek](http://rubikscube.info/)'s simple and configurable [AnimCube](http://software.rubikscube.info/AnimCube/) (with some credit to [Karl Hornell](http://www.javaonthebrain.com/java/rubik/) and [Lars Petrus](http://lar5.com/cube/)).
+- [Michiel van der Blonk](http://www.vanderblonk.com/)'s (?) [FMC helper page](http://thearufam.brinkster.net/cube/wrapplet.asp)
 
-
-## WSOH Schedule
-
-- 22:30 - Twisty abstraction & delegation
-- 23:30 - Cube structure
-- 0:30 - Basic Animation Support
-- 3:00 - Animation Code
-- 4:30 - Keybindings
-
+# Miscellaneous Development Notes
 
 ## Puzzle/State representation
 

@@ -114,6 +114,25 @@ div.right {
   cursor: move;
 }
 
+#canvasPNG {
+  text-align: center;
+}
+
+#canvasPNG img {
+  max-height: 200px;
+  max-width: 75%;
+  background: rgba(0, 0, 255, 0.05);
+  border: 1px solid #00F;
+}
+
+#canvasPNG img:hover {
+  background: rgba(0, 0, 255, 0.1);
+}
+
+.center {
+  text-align: center;
+}
+
 /* Debugging and Testing */
 
 /* From http://leaverou.me/demos/css3-patterns.html */

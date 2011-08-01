@@ -64,9 +64,20 @@ $(document).ready(function() {
   document.getElementById("twistyContainer").addEventListener( 'touchmove', onDocumentTouchMove, false );
 
 
-  $("#offlineSupport").bind("click", function() {
+  $("#enableOfflineSupport").bind("click", function() {
     window.location.href = "offline.html";
   });
+
+  $("#createCanvasPNG").bind("click", function() {
+    var canvas = document.getElementById("twistyCanvas");
+    var img = canvas.toDataURL("image/png");
+    log("Generating image...");
+    $("#canvasPNG").fadeTo(0, 0);
+    $("#canvasPNG").html('<a href="' + img + '" target="blank"><img src="'+img+'"/></a>');
+    $("#canvasPNG").fadeTo("slow", 1);
+  });
+  
+  
 
 });
 

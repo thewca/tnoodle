@@ -20,6 +20,7 @@ var animating = false;
 
 var twistyContainer = null;
 var camera, scene, renderer;
+var cameraTheta = 0;
 
 var timing = false;
 var startTime;
@@ -45,6 +46,7 @@ function initializeTwisty(twistyType) {
    */
   camera = new THREE.Camera( 30, $(twistyContainer).width() / $(twistyContainer).height(), 0, 1000 );
   moveCameraPure(0);
+  camera.target.position = new THREE.Vector3(0, -0.075, 0);
 
   scene = new THREE.Scene();
 
@@ -61,6 +63,7 @@ function initializeTwisty(twistyType) {
   renderer = new THREE.CanvasRenderer();
   renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
   $(twistyContainer).html("");
+  renderer.domElement.setAttribute('id',"twistyCanvas");
   twistyContainer.appendChild(renderer.domElement);
 
   startStats();
@@ -73,7 +76,14 @@ function render() {
 }
 
 function moveCameraPure(theta) {
+  cameraTheta = theta;
   camera.position = new THREE.Vector3(2.5*Math.sin(theta), 2, 2.5*Math.cos(theta));
+}
+
+function moveCameraDelta(deltaTheta) {
+  cameraTheta += deltaTheta;
+  moveCameraPure(cameraTheta);
+  render();
 }
 
 function moveCamera(theta) {
@@ -156,7 +166,7 @@ function startAnimation() {
 function startTiming() {
 
   startTime = (new Date).getTime();
-  
+
   if(!timing) {
     timing = true;
     if (!animating) {
@@ -184,7 +194,7 @@ function addMoves(moves) {
 
 
 function applyMoves(moves) {
-  
+
   moveQueue = moves;
   while (moveQueue.length > 0) {
     startMove();
@@ -194,20 +204,19 @@ function applyMoves(moves) {
 
 }
 
-// TODO: Make time-based / framerate-compensating
+//TODO: Make time-based / framerate-compensating
 function updateSpeed() {
-  //animationStep = Math.min(0.15 + 0.1*moveQueue.length, 0.5);
-  animationStep = Math.min(0.15 + 0.15*moveQueue.length, 0.5);
+  animationStep = Math.min(0.15 + 0.1*moveQueue.length, 1);
 }
 
-function queueRandomCubeMoves(n) {
+function queueRandomCubeMoves(dim, n) {
 
   var newMoves = [];
 
   for (var i=0; i<n; i++) {
 
-    var random1 = 1;
-    var random2 = 1;
+    var random1 = 1+ Math.floor(Math.random()*dim/2);
+    var random2 = random1 + Math.floor(Math.random()*dim/2);
     var random3 = Math.floor(Math.random()*6);
     var random4 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
 
@@ -251,6 +260,7 @@ function startStats() {
   stats.domElement.style.top = '0px';
   stats.domElement.style.left = '0px';
   twistyContainer.appendChild( stats.domElement );
+  $(stats.domElement).click();
 
 }
 
@@ -617,9 +627,19 @@ function createCubeTwisty(twistyParameters) {
       break;
 
     case 32:
-      animationStep = 0.1;
-      queueRandomCubeMoves(32);
-      setTimingFlag();
+      if (!timing) {
+        animationStep = 0.1;
+        queueRandomCubeMoves(twisty["options"]["dimension"], 32);
+        setTimingFlag();
+      }
+      break;
+
+    case 37:
+      moveCameraDelta(Math.TAU/48);
+      break;
+
+    case 39:
+      moveCameraDelta(-Math.TAU/48);
       break;
 
     }
