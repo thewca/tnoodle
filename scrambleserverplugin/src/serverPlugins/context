@@ -1,0 +1,3 @@
+/scramble/ serverPlugins.ScrambleHandler()
+/import/ serverPlugins.ScrambleImporterHandler()
+/view/ serverPlugins.ScrambleViewHandler()

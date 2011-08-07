@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from os.path import exists, dirname, join, isdir, getmtime, split, abspath
+from os.path import exists, dirname, join, isdir, getmtime, split, abspath, relpath
 import sys, os, imp, re, subprocess, shutil, shlex
 
 PLUGIN_NAME = 'tmtproject'
@@ -57,7 +57,8 @@ class tmt:
 		for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
 			project.afterPlugins()
 
-		for project in reversed(topologicalSort(defaultProject)):
+		tmt.TmtProject.sortedProjects = topologicalSort(defaultProject)
+		for project in reversed(tmt.TmtProject.sortedProjects):
 			project.configure()
 
 	def _main(self):
@@ -78,9 +79,29 @@ class tmt:
 		if command == None:
 			command = tmt.args.command
 		project = tmt.TmtProject.projects[projectName]
-		commandFunc = getattr(project, command, None)
-		assert not not commandFunc, 'No %s target in %s' % ( command, project )
-		commandFunc()
+		recurse = not tmt.args.no_recursive
+		dist = False
+		if recurse:
+			noRecurseCommands = [ 'run', 'dist' ]
+			if command in noRecurseCommands:
+				print "WARNING: recurse makes no sense with the following commands: %s, so I'm ignoring it" % noRecurseCommands
+				recurse = False
+		if recurse:
+			assert project in tmt.TmtProject.sortedProjects
+			projectIndex = tmt.TmtProject.sortedProjects.index(project)
+			projects = tmt.TmtProject.sortedProjects[projectIndex:]
+		else:
+			projects = [ project ]
+
+		projects.reverse()
+		for project in projects:
+			commandFunc = getattr(project, command, None)
+			assert commandFunc, 'No %s target in %s' % ( command, project )
+			commandFunc()
+
+		if command == 'compile':
+			for project in projects:
+				project.afterCompile()
 
 	def __init__(self):
 		self.parser = ArgumentParser(
@@ -99,6 +120,11 @@ class tmt:
 			type=str,
 			help='the project to build')
 		parser_make.add_argument(
+			'--no-recursive', '-nr',
+			default=False,
+			action='store_true',
+			help='do not apply command recursively to dependencies')
+		parser_make.add_argument(
 			'command',
 			nargs='?',
 			choices=['compile', 'dist', 'run', 'clean'],
@@ -116,11 +142,17 @@ class tmt:
 			help=desc, description=desc,
 			formatter_class=ArgumentDefaultsHelpFormatter)
 		parser_graph.add_argument(
-			'--file', '-f', default='', type=str, help='')
+			'--file', '-f',
+			default='', type=str,
+			help='')
 		parser_graph.add_argument(
-			'--project', '-p', default=DEFAULT_PROJECT_NAME, type=str, help='the project to build')
+			'--project', '-p',
+			default=DEFAULT_PROJECT_NAME, type=str,
+			help='the project to build')
 		parser_graph.add_argument(
-			'--no-prune', '-np', action="store_true", default=False, help='Do not prune duplicate projects')
+			'--no-prune', '-np',
+			action="store_true", default=False,
+			help='Do not prune duplicate projects')
 		parser_graph.set_defaults(func=self._graph)
 	
 	def memoize(self, func):
@@ -128,7 +160,7 @@ class tmt:
 		evaluating = set()
 		def memoed(*args):
 			if not args in d:
-				assert not args in evaluating, "Memoized functions can't have cycles!"
+				assert not args in evaluating, "Memoized functions may not have cycles!"
 				evaluating.add(args)
 				d[args] = func(*args)
 				evaluating.remove(args)
@@ -157,22 +189,25 @@ class tmt:
 			m = max(m, self.timestamp(join(f, ff)))
 		return m
 	
-	def glob(self, folder, pattern):
+	def glob(self, folder, pattern, relativeTo=None):
 		matches = []
 		pattern = re.compile(pattern)
+		if relativeTo is None:
+			relativeTo = '.'
 		for root, dirs, files in os.walk(folder):
-			matches += [ join(root, file) for file in files if pattern.match(file) ]
+			matches += [ relpath(join(root, f), relativeTo) for f in files if pattern.match(f) ]
 		return matches
 
 	def java(self, main, classpath='', args=[]):
 		command = [ 'java' ]
+		command += [ '-ea' ] # TODO - should turn on assertions at runtime
 		if classpath:
 			command += [ '-classpath', classpath ]
 		command += [ main ]
 		command += args
 		print " ".join(command)
 		p = subprocess.Popen(command)
-		p.wait()
+		return p.wait()
 
 tmt = tmt() # We only want one instance of Tmt
 sys.modules['tmt'] = tmt
@@ -196,6 +231,10 @@ class TmtProject(object):
 		pass
 	def compile(self):
 		assert False
+	# The afterCompile method gets called fo reach plugin after all the plugins are
+	# compiled, in no particular order. This is similar to the afterPlugins method.
+	def afterCompile(self):
+		pass
 	def dist(self):
 		assert False
 	def run(self):
@@ -282,6 +321,7 @@ class EclipseProject(TmtProject):
 
 	def __init__(self, name, main=None):
 		self.main = main
+		self.nonJavaSrcDeps = []
 		TmtProject.__init__(self, name)
 
 	def getDependencies(self):
@@ -306,33 +346,33 @@ class EclipseProject(TmtProject):
 		self.jars = [ JarDependency(jar) for jar in EclipseProject.classpathHandler.jarFiles ]
 		self.projects = [ tmt.TmtProject.projects[p] for p in EclipseProject.classpathHandler.projects ]
 		self.bin = join(self.name, 'bin')
-		self.tempBin = join(self.name, '.bin')
-		self.dist = join(self.name, 'dist')
+		self.distDir = join(self.name, 'dist')
 		self.src = join(self.name, 'src')
 		if not isdir(self.bin):
 			os.mkdir(self.bin)
-		if not isdir(self.dist):
-			os.mkdir(self.dist)
+		if not isdir(self.distDir):
+			os.mkdir(self.distDir)
 
 	def compile(self):
+		tempBin = join(self.name, '.bin')
 		assert isdir(self.bin)
-		# first compile projects we depend on
-		for project in self.projects:
-			project.compile()
 
-		depsLastTouched = [ tmt.timestamp(dep) for dep in self.getClasspathEntities(src=True) ]
 		lastCompiled = tmt.timestamp(self.bin)
-		if all( lastCompiled > ts for ts in depsLastTouched ):
+		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities() )
+		changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
+		srcLastTouched = tmt.timestamp(self.src)
+		if lastCompiled > srcLastTouched and len(changedDeps) == 0:
 			print "%s is up to date, not recompiling" % self.name
-			return False
+			return
+
 		print 'Compiling: %s' % self.name
 
-		if not isdir(self.tempBin):
-			os.mkdir(self.tempBin)
+		if not isdir(tempBin):
+			os.mkdir(tempBin)
 
 		javaFiles = tmt.glob(self.src, r'.*\.java$')
 		args = [ 'javac' ]
-		args += [ '-d', self.tempBin ]
+		args += [ '-d', tempBin ]
 		classpath = self.getClasspath()
 		if classpath:
 			args += [ '-classpath', classpath ]
@@ -341,29 +381,34 @@ class EclipseProject(TmtProject):
 		print " ".join(args)
 		assert p.wait() == 0, 'javac failed!'
 
-		# TODO - call child func here?
+		for nonJavaSrcDep in self.nonJavaSrcDeps:
+			srcPath = join(self.src, nonJavaSrcDep)
+			binPath = join(tempBin, nonJavaSrcDep)
+			shutil.copytree(srcPath, binPath)
 
 		shutil.rmtree(self.bin)
-		os.rename(self.tempBin, self.bin)
-		return True
-
+		os.rename(tempBin, self.bin)
+	
 	def dist(self):
+		tmt._make(projectName=self.name, command='compile')
 		assert False # TODO
 
 	def run(self):
 		assert self.main, 'Main class not defined'
-		assert not tmt.args.args is None # shlex reads from stdin if you pass None, lol
-		self.compile()
+		assert tmt.args.args is not None # shlex reads from stdin if you pass None, lol
+		tmt._make(projectName=self.name, command='compile')
+		# TODO propogate return code up
 		tmt.java(
 			main=self.main,
 			classpath=self.getClasspath(),
 			args=shlex.split(tmt.args.args))
 
 	def clean(self):
+		print 'Cleaning: %s' % self.name
 		assert isdir(self.bin)
-		assert isdir(self.dist)
+		assert isdir(self.distDir)
 		shutil.rmtree(self.bin)
-		shutil.rmtree(self.dist)
+		shutil.rmtree(self.distDir)
 
 tmt.EclipseProject = EclipseProject
 

@@ -4,12 +4,16 @@ import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import sun.reflect.Reflection;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -255,5 +259,23 @@ public final class Utils {
 			path.closePath();
 			return path;
 		}
+	}
+	
+	/**
+	 * @return A File representing the directory in which this program resides.
+	 * If this is a jar file, this should be obvious, otherwise it's the directory in which
+	 * our calling class resides.
+	 */
+	public static File getProgramDirectory() {
+		Class<?> callerClass = Reflection.getCallerClass(2);
+		File programDirectory;
+		try {
+			programDirectory = new File(callerClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+		} catch (URISyntaxException e) {
+			return new File(".");
+		}
+		if(programDirectory.isFile()) //this should indicate a jar file
+			programDirectory = programDirectory.getParentFile();
+		return programDirectory;
 	}
 }

@@ -1,4 +1,4 @@
-package net.gnehzr.tnoodle.server;
+package serverPlugins;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.parseExtension;
@@ -17,9 +17,11 @@ import javax.imageio.ImageIO;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.server.SafeHttpHandler;
 
 import com.sun.net.httpserver.HttpExchange;
 
+@SuppressWarnings("restriction")
 public class ScrambleViewHandler extends SafeHttpHandler {
 	private SortedMap<String, Scrambler> scramblers;
 	public ScrambleViewHandler() {

@@ -1,0 +1,57 @@
+/
+serverPlugins.FileHandler("www/")
+
+/tnt
+serverPlugins.FileHandler("www/")
+# blah blah, comments
+/kill
+DeathHandler
+
+# Stateless scramble handlers
+/import/
+net.gnehzr.tnoodle.scrambles.ImporterHandler
+/scramble/
+net.gnehzr.tnoodle.scrambles.ImporterHandler
+/view/
+net.gnehzr.tnoodle.scrambles.ImporterHandler
+
+/login/
+net.gnehzr.tnoodle.scrambles.ImporterHandler
+
+# Stateful account/times management
+# TODO - plan API before trying to implement it, lol
+# What's needed?
+#
+# Account
+#  -login
+#  -get/set settings
+#  -upload background =)
+#
+# Sessions
+#  -get latest session of an event
+#  	-integrate w/ Querying somehow?
+#  -delete
+#  -create
+#  -edit
+#  	-comments
+#  	-change puzzle/event
+#
+# Events
+# 	-create/edit/delete?
+#
+# Times
+# 	-add
+# 	-edit (comment, penalize, tag)
+# 	-delete
+#
+# Querying
+# 	-awesomness! -> be able to open old sessions?
+#
+/settings
+net.gnehzr.tnoodle.scrambles.ImporterHandler
+/times/get/lastSession
+net.gnehzr.tnoodle.scrambles.ImporterHandler
+/times/get/query
+net.gnehzr.tnoodle.scrambles.ImporterHandler
+/times/set
+net.gnehzr.tnoodle.scrambles.ImporterHandler

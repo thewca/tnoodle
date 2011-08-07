@@ -1,4 +1,4 @@
-package net.gnehzr.tnoodle.server;
+package serverPlugins;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.toInt;
@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.server.SafeHttpHandler;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -38,6 +39,7 @@ import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.sun.net.httpserver.HttpExchange;
 
+@SuppressWarnings("restriction")
 public class ScrambleHandler extends SafeHttpHandler {
 	private static final int MAX_COUNT = 100;
 

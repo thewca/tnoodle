@@ -1,4 +1,4 @@
-BUGS
+### BUGS
 +seeding scrambles doesn't work
 +format scramble source better
 +importing scrambles window doesn't fit
@@ -44,7 +44,7 @@ BUGS
 	-bug in mootools-more: //TODO need this to provide a more stable sorting
 	-bug in mootools-more:~5492
 
-FEATURES
+### FEATURES
 +added medians
 +configurable columns
 	+add gui for this!
@@ -134,6 +134,14 @@ FEATURES
 
 -it would be nice if ctrl+c killed ant run on windows in mintty
 	-maybe have child listen to heartbeats from parent? lol...
+	-check if this is fixed on windows with "tmt make run"
 -read times/metronome
 -gmaps style copy scramble
 -pdf page #
+
+
+### TnoodleMakeTools
+-"tmt make dist"
+-actually load scramble plugins
+	-make all this garbage work while doing "tmt make run" & when doing "java -jar"
+-create a *fast* cgi script...

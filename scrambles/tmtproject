@@ -1,0 +1,4 @@
+#!/usr/bin/python
+
+import tmt
+tmt.EclipseProject('scrambles', main='net.gnehzr.tnoodle.scrambles.Main')

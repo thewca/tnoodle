@@ -400,7 +400,7 @@ public class CoordCube {
 	
 	// ++++++++++++++++++++++++++++++[ Code below added by Jeremy Fleischman ]++++++++++++++++++++++++++++
 	// Allows lookup tables to be saved statically
-	private static boolean debug = false;
+	private static boolean debug = true;
 	public static void setDebug(boolean toDebug) {
 		debug = toDebug;
 	}

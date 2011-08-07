@@ -1,0 +1,122 @@
+<html>
+
+<head>
+<title>WCA Scramble Maker</title>
+<script type="text/javascript">
+
+function scrambleLink(link,puzzlename,title) {
+	document.getElementById(link).setAttribute('action',document.location.origin+'/scramble/' + document.getElementById(puzzlename).value + '.' + document.getElementById(title).value + '.pdf');
+}
+
+var cubeType = new Array();
+cubeType['2x2x2'] = 'cuboid';
+cubeType['3x3x3'] = 'cuboid';
+cubeType['4x4x4'] = 'cuboid';
+cubeType['5x5x5'] = 'cuboid';
+cubeType['6x6x6'] = 'cuboid';
+cubeType['7x7x7'] = 'cuboid';
+cubeType['clock'] = 'noncuboid';
+cubeType['pyro'] = 'noncuboid';
+cubeType['mega'] = 'noncuboid';
+cubeType['sq1wca'] = 'noncuboid';
+
+var schemes = new Array();
+schemes['cuboid'] = new Array();
+schemes['cuboid'][0] = new Array('Western','Japanese');
+schemes['cuboid'][1] = new Array('bygorw','ybgorw');
+schemes['noncuboid'] = new Array();
+schemes['noncuboid'][0] = new Array('Default');
+schemes['noncuboid'][1] = new Array('');
+
+function emptyList(box) {
+	while (box.options.length) box.options[0] = null;
+}
+
+function fillList(box,arr) {
+	for(i=0; i<arr[0].length; i++) {
+		option = new Option(arr[0][i], arr[1][i]);
+		box.options[box.length] = option;
+	}
+	box.selectedIndex=0;
+}
+
+function changeList(box) {
+	list = schemes[cubeType[box.options[box.selectedIndex].value]];
+	emptyList(box.form.scheme);
+	fillList(box.form.scheme,list);
+}
+
+</script>
+<style type="text/css">
+body {
+	font-family:Tahoma,Arial,Verdana,sans-serif;
+	font-size:13px;
+}
+div#main {
+	padding:8px;
+	border:1px solid;
+	background-color:#66cc66;
+}
+div.color {
+	width:10px;
+	height:10px;
+	margin-bottom:2px;
+}
+input, select, table {
+	font-family:Tahoma,Arial,Verdana,sans-serif;
+	font-size:13px;
+}
+</style>
+</head>
+
+<body>
+<div id="main">
+<table border=0>
+<tr>
+<td width=95%>
+<form name="scramblepdf" id="scramblepdf" action="" target=_blank>
+Puzzle:
+<select id="puzzlename" onchange="scrambleLink('scramblepdf','puzzlename','title'); changeList(this)">
+<option selected="selected" value="3x3x3">3x3x3</option>
+<option value="2x2x2">2x2x2</option>
+<option value="4x4x4">4x4x4</option>
+<option value="5x5x5">5x5x5</option>
+<option value="6x6x6">6x6x6</option>
+<option value="7x7x7">7x7x7</option>
+<option value="clock">Clock</option>
+<option value="pyro">Pyraminx</option>
+<option value="mega">Megaminx</option>
+<option value="sq1wca">Square-1</option>
+</select>
+Title:
+<input type="text" id="title" title="e.g. Round 1" onchange="scrambleLink('scramblepdf','puzzlename','title');">
+Count:
+<select name="count" id="count">
+<option value=1>1</option>
+<option value=3>3</option>
+<option selected="selected" value=5>5</option>
+</select>
+Color scheme:
+<select name="scheme" id="scheme">
+<option selected="selected" value=bygorw>Western</option>
+<option value=ybgorw>Japanese</option>
+</select>
+<input type="submit" id="submitbutton" value="Get Scrambles">
+</form>
+</td>
+<td>
+<div style="margin-left:98%;">
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#cc6666';"><div class="color" style="background-color:#cc6666;"><!-- --></div></a>
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#66cc66';"><div class="color" style="background-color:#66cc66;"><!-- --></div></a>
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#6666ff';"><div class="color" style="background-color:#6666ff;"><!-- --></div></a>
+</div>
+</td>
+</tr>
+</table>
+</div>
+
+<script type="text/javascript">
+scrambleLink('scramblepdf','puzzlename','title');
+</script>
+</body>
+</html>

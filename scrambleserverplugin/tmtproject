@@ -1,0 +1,10 @@
+#!/usr/bin/python
+
+import tmt
+
+class Project(tmt.EclipseProject):
+	def configure(self):
+		tmt.EclipseProject.configure(self)
+		tmt.Server.addPlugin(self)
+
+Project(tmt.projectName())

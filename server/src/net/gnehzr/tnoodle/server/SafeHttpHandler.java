@@ -15,16 +15,20 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 public abstract class SafeHttpHandler implements HttpHandler {
-
+	
 	@Override
 	public final void handle(HttpExchange t) throws IOException {
 		HashMap<String, String> query = parseQuery(t.getRequestURI().getRawQuery());
+		// substring(1) gets rid of the leading /
+		String[] path = t.getRequestURI().getPath().substring(1).split("/");
 		try {
-			//substring(1) gets rid of the leading /
-			String[] path = t.getRequestURI().getPath().substring(1).split("/");
 			wrappedHandle(t, path, query);
 		} catch(Exception e) {
-			jsonError(t, e, query.get("callback"));
+			if(path[path.length-1].endsWith(".json")) {
+				jsonError(t, e, query.get("callback"));
+			} else {
+				textError(t, e);
+			}
 		}
 	}
 	
@@ -36,14 +40,15 @@ public abstract class SafeHttpHandler implements HttpHandler {
 		String[] pairs = query.split("&");
 		for(String pair : pairs) {
 			String[] key_value = pair.split("=");
-			if(key_value.length == 1)
-				queryMap.put(key_value[0], ""); //this allows for flags such as http://foo/blah?kill&burn
-			else
+			if(key_value.length == 1) {
+				queryMap.put(key_value[0], ""); // this allows for flags such as http://foo/blah?kill&burn
+			} else {
 				try {
 					queryMap.put(key_value[0], URLDecoder.decode(key_value[1], "utf-8"));
 				} catch (UnsupportedEncodingException e) {
 					queryMap.put(key_value[0], key_value[1]); //worst case, just put the undecoded string
 				}
+			}
 		}
 		return queryMap;
 	}
@@ -60,6 +65,10 @@ public abstract class SafeHttpHandler implements HttpHandler {
 		HashMap<String, String> json = new HashMap<String, String>();
 		json.put("error", error);
 		sendJSON(t, GSON.toJson(json), callback);
+	}
+	
+	protected static void textError(HttpExchange t, Throwable error) {
+		sendText(t, throwableToString(error));
 	}
 	
 	protected static void jsonError(HttpExchange t, Throwable error, String callback) {
