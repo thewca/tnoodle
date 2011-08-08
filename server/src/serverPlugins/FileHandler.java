@@ -40,27 +40,27 @@ public class FileHandler extends SafeHttpHandler {
 	
 	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		String fileName = t.getRequestURI().getPath().substring(1);
-		if(fileName.isEmpty() || fileName.endsWith("/")) {
-			fileName += "index.html";
+		String filePath = t.getRequestURI().getPath().substring(1);
+		String resource = "/serverPlugins" + "/" + directory + "/" + filePath;
+		if(filePath.isEmpty() || filePath.endsWith("/")) {
+			filePath += "index.html";
+			resource += "index.html";
 		} else {
 			// It's impossible to check if a URI (what getResource() returns) is a directory,
 			// so we rely upon appending /index.html and checking if that path exists. If it does
 			// we redirect the browser to the given path with a trailing / appended.
-			boolean isDir = getClass().getResource("/" + directory + "/" + fileName + "/index.html") != null;
+			boolean isDir = getClass().getResource(resource + "/index.html") != null;
 			if(isDir) {
 				sendTrailingSlashRedirect(t);
 				return;
 			}
 		}
-		String resource = "/serverPlugins" + "/" + directory + "/" + fileName;
 		InputStream is = getClass().getResourceAsStream(resource);
 		if(is == null) {
-			System.out.println(resource);
-			send404(t, fileName);
+			send404(t, filePath);
 			return;
 		}
 		Utils.fullyReadInputStream(is, bytes);
-		sendBytes(t, bytes, mimes.getContentType(fileName));
+		sendBytes(t, bytes, mimes.getContentType(filePath));
 	}
 }
