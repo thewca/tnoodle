@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from os.path import exists, dirname, join, isdir, getmtime, split, abspath, relpath
+from os.path import exists, dirname, join, isdir, getmtime, split, abspath, relpath, basename
 import sys, os, imp, re, subprocess, shutil, shlex
 
 PLUGIN_NAME = 'tmtproject'
@@ -150,6 +150,10 @@ class tmt:
 			default=DEFAULT_PROJECT_NAME, type=str,
 			help='the project to build')
 		parser_graph.add_argument(
+			'--timestamps', '-t',
+			action="store_true", default=False,
+			help='Show project timestamps for debugging purposes')
+		parser_graph.add_argument(
 			'--no-prune', '-np',
 			action="store_true", default=False,
 			help='Do not prune duplicate projects')
@@ -219,7 +223,7 @@ class TmtProject(object):
 		assert not name in TmtProject.projects, name
 		TmtProject.projects[name] = self
 	def __str__(self):
-		return 'TmtProject: %s' % self.name
+		return self.name
 	# The configure method of each plugin gets called in reverse
 	# dependency order. That is, if a project A uses a project B,
 	# B.configure() will be called before A.configure().
@@ -268,9 +272,9 @@ class TmtProject(object):
 		if not tmt.args.no_prune and self in seen:
 			# If we're pruning, and we've seen this node before,
 			# then we don't recurse
-			s = indent + self.name + ' (seen)\n'
+			s = indent + str(self) + ' (seen)\n'
 		else:
-			s = indent + self.name + '\n'
+			s = indent + str(self) + '\n'
 			printingLevels.add(level)
 			dependencies = self.getDependencies()
 			for p in dependencies:
@@ -282,12 +286,20 @@ class TmtProject(object):
 tmt.TmtProject = TmtProject
 
 class JarDependency(TmtProject):
+	def __init__(self, jarFile):
+		self.jarFile = jarFile
+		TmtProject.__init__(self, basename(jarFile))
 	def getDependencies(self):
 		return []
 	def compile(self):
 		pass
 	def clean(self):
 		pass
+	def __str__(self):
+		s = self.name
+		if tmt.args.timestamps:
+			s += ' %s' % tmt.timestamp(self.jarFile)
+		return s
 
 class EclipseProject(TmtProject):
 	from xml.sax import make_parser, saxutils
@@ -409,6 +421,14 @@ class EclipseProject(TmtProject):
 		assert isdir(self.distDir)
 		shutil.rmtree(self.bin)
 		shutil.rmtree(self.distDir)
+	
+	def __str__(self):
+		s = self.name
+		if tmt.args.timestamps:
+			binTs = tmt.timestamp(self.bin)
+			srcTs = tmt.timestamp(self.src)
+			s += ' bin: %s src: %s' % ( binTs, srcTs )
+		return s
 
 tmt.EclipseProject = EclipseProject
 

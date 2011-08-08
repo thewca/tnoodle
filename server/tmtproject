@@ -76,8 +76,8 @@ class Project(tmt.EclipseProject):
 			raise shutil.Error, errors
 
 	def afterCompile(self):
-		# TODO - it's important that this only be done if any of our plugins
-		# have changed...
+		# Fortunately, the way we're copying files preserves the timestamps,
+		# so it doesn't make the server binaries look any newer than they should.
 		context = ''
 		for project in self.plugins:
 			contextFileName = project.contextFileName
