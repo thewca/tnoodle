@@ -285,6 +285,10 @@ class TmtProject(object):
 		return s
 tmt.TmtProject = TmtProject
 
+@tmt.memoize
+def createJarDependency(jarFile):
+	return JarDependency(jarFile)
+
 class JarDependency(TmtProject):
 	def __init__(self, jarFile):
 		self.jarFile = jarFile
@@ -341,7 +345,7 @@ class EclipseProject(TmtProject):
 
 	def getClasspathEntities(self, src=False):
 		classpath = set()
-		classpath |= set(jar.name for jar in self.jars)
+		classpath |= set(jar.jarFile for jar in self.jars)
 		classpath.add(self.src if src else self.bin)
 		for project in self.projects:
 			classpath |= project.getClasspathEntities(src)
@@ -355,7 +359,7 @@ class EclipseProject(TmtProject):
 		dependencyFile = join(self.name, '.classpath')
 		assert exists(dependencyFile), dependencyFile
 		EclipseProject.classpathParser.parse(dependencyFile)
-		self.jars = [ JarDependency(jar) for jar in EclipseProject.classpathHandler.jarFiles ]
+		self.jars = [ createJarDependency(jar) for jar in EclipseProject.classpathHandler.jarFiles ]
 		self.projects = [ tmt.TmtProject.projects[p] for p in EclipseProject.classpathHandler.projects ]
 		self.bin = join(self.name, 'bin')
 		self.distDir = join(self.name, 'dist')
