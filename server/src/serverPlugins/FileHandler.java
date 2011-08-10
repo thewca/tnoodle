@@ -49,7 +49,7 @@ public class FileHandler extends SafeHttpHandler {
 		String resource;
 		if(isDirectory) {
 			resource = "/serverPlugins" + "/" + path + "/" + filePath;
-			if(filePath.isEmpty() || filePath.endsWith("/")) {
+			if(t.getRequestURI().getPath().endsWith("/")) {
 				filePath += "index.html";
 				resource += "index.html";
 			} else {
