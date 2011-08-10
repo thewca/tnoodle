@@ -1,0 +1,4 @@
+/scramble/ serverPlugins.webscrambles.ScrambleHandler()
+/import/ serverPlugins.webscrambles.ScrambleImporterHandler()
+/view/ serverPlugins.webscrambles.ScrambleViewHandler()
+/scramblegen.html serverPlugins.FileHandler("webscrambles/scramblegen.html", false)

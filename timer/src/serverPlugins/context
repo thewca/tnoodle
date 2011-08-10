@@ -1,2 +1,1 @@
-# TODO - these arguments don't really make sense...
-/tnt/ serverPlugins.FileHandler("/")
+/tnt/ serverPlugins.FileHandler("timer/")

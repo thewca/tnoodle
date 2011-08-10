@@ -30,37 +30,49 @@ public class FileHandler extends SafeHttpHandler {
 		mimes.addMimeTypes("application/octet-stream *");
 	}
 	
-	private String directory;
-	public FileHandler(String directory) {
-		if(directory.endsWith("/")) {
-			directory = directory.substring(0, directory.length() - 1);
-		}
-		this.directory = directory;
+	public FileHandler(String path) {
+		this(path, true);
 	}
 	
-	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IOException {
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		String filePath = t.getRequestURI().getPath().substring(1);
-		String resource = "/serverPlugins" + "/" + directory + "/" + filePath;
-		if(filePath.isEmpty() || filePath.endsWith("/")) {
-			filePath += "index.html";
-			resource += "index.html";
-		} else {
-			// It's impossible to check if a URI (what getResource() returns) is a directory,
-			// so we rely upon appending /index.html and checking if that path exists. If it does
-			// we redirect the browser to the given path with a trailing / appended.
-			boolean isDir = getClass().getResource(resource + "/index.html") != null;
-			if(isDir) {
-				sendTrailingSlashRedirect(t);
-				return;
+	private String path;
+	private boolean isDirectory;
+	public FileHandler(String path, boolean isDirectory) {
+		if(path.endsWith("/")) {
+			path = path.substring(0, path.length() - 1);
+		}
+		this.path = path;
+		this.isDirectory = isDirectory;
+	}
+	
+	protected void wrappedHandle(HttpExchange t, String[] requestPath, HashMap<String, String> query) throws IOException {
+		String filePath = Utils.join(requestPath, "/");
+		String resource;
+		if(isDirectory) {
+			resource = "/serverPlugins" + "/" + path + "/" + filePath;
+			if(filePath.isEmpty() || filePath.endsWith("/")) {
+				filePath += "index.html";
+				resource += "index.html";
+			} else {
+				// It's impossible to check if a URI (what getResource() returns) is a directory,
+				// so we rely upon appending /index.html and checking if that path exists. If it does
+				// we redirect the browser to the given path with a trailing / appended.
+				boolean isDir = getClass().getResource(resource + "/index.html") != null;
+				if(isDir) {
+					sendTrailingSlashRedirect(t);
+					return;
+				}
 			}
+		} else {
+			resource = "/serverPlugins" + "/" + path;
 		}
 		InputStream is = getClass().getResourceAsStream(resource);
 		if(is == null) {
 			send404(t, filePath);
 			return;
 		}
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		Utils.fullyReadInputStream(is, bytes);
-		sendBytes(t, bytes, mimes.getContentType(filePath));
+		String contentType = mimes.getContentType(resource);
+		sendBytes(t, bytes, contentType);
 	}
 }

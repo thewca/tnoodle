@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import tmt
+import os
 from os.path import join, exists, relpath
 import shutil
 
@@ -9,13 +10,18 @@ CONTEXT_FILE = 'context'
 
 class Project(tmt.EclipseProject):
 	def __init__(self, *args, **kwargs):
-		tmt.EclipseProject.__init__(self, *args, **kwargs)
+		tmt.EclipseProject.__init__(
+				self,
+				tmt.projectName(),
+				main='net.gnehzr.tnoodle.server.TNoodleServer')
 		self.plugins = []
 
 	def addPlugin(self, project):
 		project.serverPluginSrcDir = join(project.src, SERVER_PLUGIN_DIR)
 		project.contextFileName = join(project.serverPluginSrcDir, CONTEXT_FILE)
+		assert exists(join(project.serverPluginSrcDir, project.name))
 		project.serverPluginBinDir = join(project.bin, SERVER_PLUGIN_DIR)
+		project.serverPluginPackageBinDir = join(project.serverPluginBinDir, project.name)
 		project.main = self.main
 		assert exists(project.contextFileName)
 		self.plugins.append(project)
@@ -75,21 +81,37 @@ class Project(tmt.EclipseProject):
 		if errors:
 			raise shutil.Error, errors
 
-	def afterCompile(self):
+	def afterCompile(self, compiledProjects):
 		# Fortunately, the way we're copying files preserves the timestamps,
 		# so it doesn't make the server binaries look any newer than they should.
 		context = ''
 		for project in self.plugins:
+			if project not in compiledProjects:
+				# If plugin A uses plugin B (which both, of course, use this
+				# project), and the developer chooses to compile plugin B, we
+				# don't want to load the plugin for A. The compiledProjects
+				# argument helps us avoid that.
+				continue
 			contextFileName = project.contextFileName
 			assert exists(contextFileName)
 
 			if project != self:
+				linkName = join(self.serverPluginBinDir, project.name)
+				dest = relpath(project.serverPluginPackageBinDir, self.serverPluginBinDir)
+				linkUpToDate = False
+				if os.path.islink(linkName):
+					linkTo = os.readlink(linkName)
+					if linkTo == dest:
+						linkUpToDate = True
+				if not linkUpToDate:
+					if exists(linkName):
+						os.unlink(linkName)
+					os.symlink(dest, linkName)
 				# TODO - it would be nice to assert no files get clobbered
-				self.copytreeIgnoreExistingDstDir(project.serverPluginBinDir, self.serverPluginBinDir)
+				#self.copytreeIgnoreExistingDstDir(project.serverPluginBinDir, self.serverPluginBinDir)
 
 			inputContextFile = file(contextFileName, 'r')
-			context += '# Context from project: %s\n' % project.name
-			context += inputContextFile.read()
+			context += inputContextFile.read() + '\n'
 
 		outputContextFileName = join(self.serverPluginBinDir, CONTEXT_FILE)
 		contextFileUpToDate = False
@@ -100,4 +122,4 @@ class Project(tmt.EclipseProject):
 			outputContextFile = file(outputContextFileName, 'w')
 			outputContextFile.write(context)
 
-Project('server', main='net.gnehzr.tnoodle.server.TNoodleServer')
+Project()

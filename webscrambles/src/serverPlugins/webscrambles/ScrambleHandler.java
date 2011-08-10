@@ -1,4 +1,4 @@
-package serverPlugins;
+package serverPlugins.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.toInt;
@@ -42,13 +42,15 @@ import com.sun.net.httpserver.HttpExchange;
 @SuppressWarnings("restriction")
 public class ScrambleHandler extends SafeHttpHandler {
 	private static final int MAX_COUNT = 100;
+	private static final int SCRAMBLES_PER_PAGE = 5;
 
 	private SortedMap<String, Scrambler> scramblers;
 	private String puzzleNamesJSON;
 	public ScrambleHandler() {
+		// TODO - load scrambles lazily!
 		this.scramblers = Scrambler.getScramblers();
 		
-		//listing available scrambles
+		// listing available scrambles
 		String[][] puzzleNames = new String[scramblers.size()][2];
 		int i = 0;
 		for(Entry<String, Scrambler> scrambler : scramblers.entrySet()) {
@@ -69,10 +71,12 @@ public class ScrambleHandler extends SafeHttpHandler {
 	};
 
 	private ByteArrayOutputStream createPdf(Scrambler scrambler, String[] scrambles, String title, Integer width, Integer height, String scheme) {
-		if(width == null)
+		if(width == null) {
 			width = 200;
-		if(height == null)
-			height = (int) (PageSize.LETTER.getHeight()/5); //optimizing for 5 scrambles per page
+		}
+		if(height == null) {
+			height = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
+		}
 			
 		PdfWriter docWriter = null;
 		try {
@@ -168,11 +172,11 @@ public class ScrambleHandler extends SafeHttpHandler {
 	}
 	
 	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) {
-		if(path.length == 1) {
+		if(path.length == 0) {
 			sendJSON(t, puzzleNamesJSON, query.get("callback"));
 		} else {
 			String puzzle, title, ext;
-			String[] puzzle_title_ext = path[1].split("\\.");
+			String[] puzzle_title_ext = path[0].split("\\.");
 			switch(puzzle_title_ext.length) {
 			case 1:
 				puzzle = puzzle_title_ext[0];
@@ -190,7 +194,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 				ext = puzzle_title_ext[2];
 				break;
 			default:
-				sendText(t, "Invalid number of periods: " + path[1]);
+				sendText(t, "Invalid number of periods: " + path[0]);
 				return;
 			}
 			Scrambler scrambler = scramblers.get(puzzle);

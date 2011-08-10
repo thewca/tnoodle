@@ -5,37 +5,55 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.utils.Utils;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 
 public class PluginDelegator extends SafeHttpHandler {
+	private static final Pattern NAMESPACE_PATTERN = Pattern.compile("([^\\s{]+)\\s*\\{\\s*");
 	
 	public PluginDelegator() {
 		
 	}
-	private LongestPrefixMatchMap<String, LazyClassLoader<HttpHandler>> context =
-		new LongestPrefixMatchMap<String, LazyClassLoader<HttpHandler>>();
+	private LongestPrefixMatch<String> lpm = new LongestPrefixMatch<String>();
+	private HashMap<String[], LazyClassLoader<SafeHttpHandler>> handlers = 
+		new HashMap<String[], LazyClassLoader<SafeHttpHandler>>();
 	private long loadedTime = 0;
-	private HttpHandler getHandler(String[] path) throws IOException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, BadClassDescriptionException, SecurityException, NoSuchMethodException, ClassNotFoundException {
+	private String[] getLongestMatch(String[] path) throws IOException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, BadClassDescriptionException, SecurityException, NoSuchMethodException, ClassNotFoundException {
 		File contextFile = new File(Utils.getProgramDirectory(), "serverPlugins/context");
 		assert contextFile.exists(); // TODO - turn on assertions at runtime?
 		long mtime = contextFile.lastModified();
 		if(mtime > loadedTime) {
-			// TODO - reread context file!
 			// If the context file has changed, we force reloading of *all*
 			// scramble plugins by forgetting what we've loaded. 
 			// TODO - verify that this actually cleans up stuff that spawns new threads! i kinda doubt it does... =(
-			context.clear();
+			lpm.clear();
+			handlers.clear();
 			BufferedReader in = new BufferedReader(new FileReader(contextFile));
 			String line;
+			String namespace = null;
 			while((line = in.readLine()) != null) {
-				if(line.startsWith("#")) {
+				line = line.trim();
+				// lines starting with # and empty lines are ignored
+				if(line.startsWith("#") || line.isEmpty()) {
 					continue;
 				}
+				
+				Matcher m = NAMESPACE_PATTERN.matcher(line);
+				if(m.matches()) {
+					assert namespace == null : "Nested namespaces not yet supported";
+					namespace = m.group(1);
+				}
+				if(line.equals("}")) {
+					assert namespace != null : "Closing curly brace found without matching opening brace";
+					namespace = null;
+				}
+				
 				String[] prefix_handlerDef = line.split("\\s+", 2);
 				assert prefix_handlerDef.length == 2;
 				if(prefix_handlerDef[0].startsWith("/")) {
@@ -51,19 +69,25 @@ public class PluginDelegator extends SafeHttpHandler {
 					prefix = prefix_handlerDef[0].split("/");
 				}
 				String handlerDef = prefix_handlerDef[1];
-				LazyClassLoader<HttpHandler> lazyClass = new LazyClassLoader<HttpHandler>(handlerDef, HttpHandler.class);
-				context.put(prefix, lazyClass);
+				LazyClassLoader<SafeHttpHandler> lazyClass = new LazyClassLoader<SafeHttpHandler>(handlerDef, SafeHttpHandler.class);
+				lpm.put(prefix);
+				handlers.put(prefix, lazyClass);
+				lazyClass.cachedInstance();
 			}
 			loadedTime = mtime;
 		}
 		
-		LazyClassLoader<HttpHandler> bestMatch = context.get(path);
-		return bestMatch.cachedInstance();
+		String[] longestMatch = lpm.get(path);
+		return longestMatch;
 	}
 	
 	@Override
 	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception {
-		getHandler(path).handle(t);
+		String[] longestMatch = getLongestMatch(path);
+		LazyClassLoader<SafeHttpHandler> handler = handlers.get(longestMatch);
+		int startIndex = longestMatch.length;
+		String[] truncatedPath = Arrays.copyOfRange(path, startIndex, path.length);
+		handler.cachedInstance().wrappedHandle(t, truncatedPath, query);
 	}
 
 }

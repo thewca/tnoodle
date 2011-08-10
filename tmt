@@ -4,7 +4,7 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from os.path import exists, dirname, join, isdir, getmtime, split, abspath, relpath, basename
 import sys, os, imp, re, subprocess, shutil, shlex
 
-PLUGIN_NAME = 'tmtproject'
+PROJECT_FILE_NAME = 'tmtproject'
 DEFAULT_PROJECT_NAME = 'all'
 
 def dfs(node, path=()):
@@ -45,7 +45,7 @@ class tmt:
 
 	def _loadTmtProjects(self):
 		self._cdEntryPoint()
-		projectFiles = ( join(dir, PLUGIN_NAME) for dir in os.listdir('.') )
+		projectFiles = ( join(dir, PROJECT_FILE_NAME) for dir in os.listdir('.') )
 		for projectFile in sorted(filter(exists, projectFiles)):
 			projectName = dirname(projectFile)
 			imp.load_source(projectFile, projectFile)
@@ -55,7 +55,7 @@ class tmt:
 		defaultProject = tmt.TmtProject.projects[ DEFAULT_PROJECT_NAME ]
 
 		for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
-			project.afterPlugins()
+			project.afterProjects()
 
 		tmt.TmtProject.sortedProjects = topologicalSort(defaultProject)
 		for project in reversed(tmt.TmtProject.sortedProjects):
@@ -101,7 +101,7 @@ class tmt:
 
 		if command == 'compile':
 			for project in projects:
-				project.afterCompile()
+				project.afterCompile(projects)
 
 	def __init__(self):
 		self.parser = ArgumentParser(
@@ -173,10 +173,10 @@ class tmt:
 
 	def projectName(self):
 		import traceback
-		project, plugin = traceback.extract_stack()[-2][0].split('/')
-		assert isdir(project)
-		assert plugin == PLUGIN_NAME
-		return project
+		projectName, projectFileName = traceback.extract_stack()[-2][0].split('/')
+		assert isdir(projectName)
+		assert projectFileName == PROJECT_FILE_NAME
+		return projectName
 
 	def timestamp(self, f):
 		"""
@@ -224,20 +224,23 @@ class TmtProject(object):
 		TmtProject.projects[name] = self
 	def __str__(self):
 		return self.name
-	# The configure method of each plugin gets called in reverse
+	# The configure method of each project gets called in reverse
 	# dependency order. That is, if a project A uses a project B,
 	# B.configure() will be called before A.configure().
 	def configure(self):
 		pass
-	# The afterPlugins method gets called for each plugin after all the plugins
+	# The afterProjects method gets called for each project after all the projects
 	# have been loaded, in no particular order.
-	def afterPlugins(self):
+	def afterProjects(self):
 		pass
 	def compile(self):
 		assert False
-	# The afterCompile method gets called fo reach plugin after all the plugins are
-	# compiled, in no particular order. This is similar to the afterPlugins method.
-	def afterCompile(self):
+	# The afterCompile method gets called for each project after all the projects 
+	# that were compiled are done compiling, in no particular order.
+	# This is similar to the afterProjects method, although it will be called
+	# on fewer projects.
+	# TODO - explain the purpose of the compiledProjects argument
+	def afterCompile(self, compiledProjects):
 		pass
 	def dist(self):
 		assert False
@@ -355,7 +358,7 @@ class EclipseProject(TmtProject):
 		# TODO - check if ':' delimeter works on windows
 		return ":".join(self.getClasspathEntities())
 
-	def afterPlugins(self):
+	def afterProjects(self):
 		dependencyFile = join(self.name, '.classpath')
 		assert exists(dependencyFile), dependencyFile
 		EclipseProject.classpathParser.parse(dependencyFile)
@@ -400,7 +403,11 @@ class EclipseProject(TmtProject):
 		for nonJavaSrcDep in self.nonJavaSrcDeps:
 			srcPath = join(self.src, nonJavaSrcDep)
 			binPath = join(tempBin, nonJavaSrcDep)
-			shutil.copytree(srcPath, binPath)
+			if isdir(srcPath):
+				shutil.copytree(srcPath, binPath)
+			else:
+				assert not isdir(binPath)
+				shutil.copy(srcPath, binPath)
 
 		shutil.rmtree(self.bin)
 		os.rename(tempBin, self.bin)

@@ -162,8 +162,9 @@ public final class Utils {
 			separator = ",";
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < arr.length; i++) {
-			if(i > 0)
-				sb.append(",");
+			if(i > 0) {
+				sb.append(separator);
+			}
 			sb.append(arr[i].toString());
 		}
 		return sb.toString();

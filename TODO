@@ -139,9 +139,10 @@
 -gmaps style copy scramble
 -pdf page #
 
+-infinite seeded scrambles
 
 ### TnoodleMakeTools
 -"tmt make dist"
--actually load scramble plugins
-	-make all this garbage work while doing "tmt make run" & when doing "java -jar"
+-make all this garbage work while doing "tmt make run" & when doing "java -jar"
+	-provide some file api that just works
 -create a *fast* cgi script...

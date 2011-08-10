@@ -1,4 +1,4 @@
-package serverPlugins;
+package serverPlugins.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.parseExtension;
@@ -30,11 +30,11 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 	
 	protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
 		String callback = query.get("callback");
-		if(path.length == 1) {
+		if(path.length == 0) {
 			sendJSONError(t, "Please specify a puzzle.", callback);
 			return;
 		}
-		String[] name_extension = parseExtension(path[1]);
+		String[] name_extension = parseExtension(path[0]);
 		if(name_extension[1] == null) {
 			sendJSONError(t, "Please specify an extension", callback);
 			return;

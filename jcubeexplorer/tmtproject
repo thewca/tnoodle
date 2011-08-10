@@ -10,7 +10,7 @@ class Project(tmt.EclipseProject):
 		self.transition_tables = join(self.bin, 'org/kociemba/twophase/transition_tables')
 		self.pruning_tables = join(self.bin, 'org/kociemba/twophase/pruning_tables')
 
-	def afterCompile(self):
+	def afterCompile(self, compiledProjects):
 		# build the pruning and transition tables for the two phase algorithm
 		# iff they don't already exist
 		if not exists(self.transition_tables) or not exists(self.pruning_tables):

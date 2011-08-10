@@ -4,6 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/stackmat"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/scrambleserverplugin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/webscrambles"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

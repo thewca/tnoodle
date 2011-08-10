@@ -1,4 +1,4 @@
-package serverPlugins;
+package serverPlugins.webscrambles;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -11,9 +11,10 @@ public class LazyClassLoader<H> {
 	// serverPlugins.FileHandler("www/")
 	private static final Pattern INSTANTIATION_PATTERN = Pattern.compile("(\\S+)\\s*\\((.*)\\)");
 	// TODO - this pattern doesn't actually match all strings, and it doesn't match anything *but* strings
-	private static final Pattern ARGUMENTS_PATTERN = Pattern.compile("((\"[^,]*\"),?)*");
+	private static final Pattern ARGUMENT_PATTERN = Pattern.compile("((\"[^,]*\")|(true)|(false)),?\\s*");
 
 	private String className;
+	private String definition;
 	private Class<H> parentClass;
 	public LazyClassLoader(String definition, Class<H> classy) throws BadClassDescriptionException {
 		Matcher m = INSTANTIATION_PATTERN.matcher(definition);
@@ -21,6 +22,7 @@ public class LazyClassLoader<H> {
 			throw new BadClassDescriptionException(definition);
 		}
 		
+		this.definition = definition;
 		this.parentClass = classy;
 		
 		ArrayList<Class<?>> argTypes = new ArrayList<Class<?>>();
@@ -30,21 +32,30 @@ public class LazyClassLoader<H> {
 		// group 2 is the constructor arguments
 		this.className = m.group(1);
 		String arguments = m.group(2);
-		m = ARGUMENTS_PATTERN.matcher(arguments);
-		if(!m.matches()) {
-			throw new BadClassDescriptionException(arguments);
-		}
-		for(int i = 1; i < m.groupCount(); i++) {
-			// TODO - handle arguments other than strings?
-			String str = m.group(i);
-			if(str == null) {
-				continue;
+		m = ARGUMENT_PATTERN.matcher(arguments);
+		int start = 0;
+		while(m.find(start)) {
+			start = m.end();
+			String strExpr = m.group(2);
+			String trueExpr = m.group(3);
+			String falseExpr = m.group(4);
+			if(strExpr != null) {
+				argTypes.add(String.class);
+				assert strExpr.startsWith("\"") && strExpr.endsWith("\"");
+				// TODO - handle escape character (decode string!)
+				String str = strExpr.substring(1, strExpr.length()-1);
+				args.add(str);
+			} else if(trueExpr != null) {
+				argTypes.add(boolean.class);
+				args.add(true);
+			} else if(falseExpr != null) {
+				argTypes.add(boolean.class);
+				args.add(false);
+			} else {
+				assert false;
 			}
-			argTypes.add(String.class);
-			assert str.startsWith("\"") && str.endsWith("\"");
-			str = str.substring(1, str.length()-1);
-			args.add(str);
 		}
+		assert start == arguments.length();
 		this.argTypes = argTypes.toArray(new Class<?>[0]);
 		this.args = args.toArray();
 	}
@@ -71,7 +82,7 @@ public class LazyClassLoader<H> {
 	
 	@Override
 	public String toString() {
-		return super.toString() + " " + this.className;
+		return super.toString() + " " + this.definition;
 	}
 }
 

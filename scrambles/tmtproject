@@ -1,4 +1,16 @@
 #!/usr/bin/python
 
 import tmt
-tmt.EclipseProject('scrambles', main='net.gnehzr.tnoodle.scrambles.Main')
+
+class Project(tmt.EclipseProject):
+	def __init__(self):
+		tmt.EclipseProject.__init__(
+				self,
+				tmt.projectName(),
+				main='net.gnehzr.tnoodle.scrambles.Main')
+
+	def configure(self):
+		tmt.EclipseProject.configure(self)
+		self.nonJavaSrcDeps = tmt.glob(self.src, '.*png$', relativeTo=self.src)
+
+Project()

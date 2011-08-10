@@ -1,18 +1,17 @@
 package net.gnehzr.tnoodle.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class LongestPrefixMatchMap<K, V> {
-	public LongestPrefixMatchMap() {
+public class LongestPrefixMatch<K> {
+	public LongestPrefixMatch() {
 		// TODO - implement something fast!
 	}
 	
 	private ArrayList<K[]> keys = new ArrayList<K[]>();
-	private ArrayList<V> vals = new ArrayList<V>();
-	public void put(K[] key, V val) {
+	public void put(K[] key) {
 		assert !keys.contains(key);
 		keys.add(key);
-		vals.add(val);
 	}
 	
 	private boolean pathMatchesKey(K[] path, K[] key) {
@@ -27,21 +26,28 @@ public class LongestPrefixMatchMap<K, V> {
 		return true;
 	}
 	
-	public V get(K[] path) {
-		V bestMatch = null;
-		int bestMatchKeyLen = -1;
+	public K[] get(K[] path) {
+		K[] longestMatch = null;
 		for(int i = 0; i < keys.size(); i++) {
 			K[] key = keys.get(i);
-			if(key.length > bestMatchKeyLen && pathMatchesKey(path, key)) {
-				bestMatchKeyLen = key.length;
-				bestMatch = vals.get(i);
+			if((longestMatch == null || key.length > longestMatch.length) && pathMatchesKey(path, key)) {
+				longestMatch = key;
 			}
 		}
-		return bestMatch;
+		return longestMatch;
 	}
 	
 	public void clear() {
 		keys.clear();
-		vals.clear();
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(K[] key : keys) {
+			s += Arrays.toString(key) + ", ";
+		}
+		s = "[ " + s + " ]";
+		return super.toString() + " " + s;
 	}
 }
