@@ -31,10 +31,8 @@ class Project(tmt.EclipseProject):
 		tmt.Server = self
 		tmt.EclipseProject.configure(self)
 		self.addPlugin(self)
-		wwwDir = relpath(join(self.serverPluginSrcDir, 'www'), self.src)
-		# TODO - add support for globbed stuff to EclipseProject
-		#self.nonJavaSrcDeps = tmt.glob(wwwDir, '.*', relativeTo=self.src)
-		self.nonJavaSrcDeps = [ wwwDir ]
+		wwwDir = join(self.serverPluginSrcDir, 'www')
+		self.nonJavaSrcDeps += tmt.glob(wwwDir, '.*', relativeTo=self.src)
 
 	def afterCompile(self, compiledProjects):
 		context = ''

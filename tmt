@@ -403,13 +403,18 @@ class EclipseProject(TmtProject):
 		for nonJavaSrcDep in self.nonJavaSrcDeps:
 			srcPath = join(self.src, nonJavaSrcDep)
 			binPath = join(tempBin, nonJavaSrcDep)
+			print "Copying %s -> %s" % ( srcPath, binPath )
 			if isdir(srcPath):
 				shutil.copytree(srcPath, binPath)
 			else:
 				assert not isdir(binPath)
+				parentDir = dirname(binPath)
+				if not isdir(parentDir):
+					os.makedirs(parentDir)
 				shutil.copy(srcPath, binPath)
 
 		shutil.rmtree(self.bin)
+		print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, self.bin )
 		os.rename(tempBin, self.bin)
 	
 	def dist(self):
