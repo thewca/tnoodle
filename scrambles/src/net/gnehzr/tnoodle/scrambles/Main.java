@@ -20,6 +20,5 @@ public class Main {
 		}
 //		Scrambler s = new PyraminxScrambler();
 		System.out.println(s.generateScramble());
-//		System.exit(0); // TODO - why is this is necessary to get the process to exit?
 	}
 }
