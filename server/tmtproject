@@ -14,7 +14,7 @@ class Project(tmt.EclipseProject):
 				self,
 				tmt.projectName(),
 				main='net.gnehzr.tnoodle.server.TNoodleServer')
-		self.plugins = []
+		self.plugins = {}
 
 	def addPlugin(self, project):
 		project.serverPluginSrcDir = join(project.src, SERVER_PLUGIN_DIR)
@@ -24,7 +24,8 @@ class Project(tmt.EclipseProject):
 		project.serverPluginPackageBinDir = join(project.serverPluginBinDir, project.name)
 		project.main = self.main
 		assert exists(project.contextFileName)
-		self.plugins.append(project)
+		assert project.name not in self.plugins
+		self.plugins[project.name] = project
 
 	def configure(self):
 		tmt.Server = self
@@ -35,55 +36,9 @@ class Project(tmt.EclipseProject):
 		#self.nonJavaSrcDeps = tmt.glob(wwwDir, '.*', relativeTo=self.src)
 		self.nonJavaSrcDeps = [ wwwDir ]
 
-	# Copied (and modified) from /usr/lib64/python2.7/shutil.py
-	def copytreeIgnoreExistingDstDir(self, src, dst, symlinks=False, ignore=None):
-		import os
-		names = os.listdir(src)
-		if ignore is not None:
-			ignored_names = ignore(src, names)
-		else:
-			ignored_names = set()
-
-		if not os.path.isdir(dst):
-			os.makedirs(dst)
-		errors = []
-		for name in names:
-			if name in ignored_names:
-				continue
-			srcname = os.path.join(src, name)
-			dstname = os.path.join(dst, name)
-			try:
-				if symlinks and os.path.islink(srcname):
-					linkto = os.readlink(srcname)
-					os.symlink(linkto, dstname)
-				elif os.path.isdir(srcname):
-					self.copytreeIgnoreExistingDstDir(srcname, dstname, symlinks, ignore)
-				else:
-					# Will raise a SpecialFileError for unsupported file types
-					# TODO - what happens if dstname exists?!
-					shutil.copy2(srcname, dstname)
-			# catch the Error from the recursive copytree so that we can
-			# continue with other files
-			except shutil.Error, err:
-				#<<< This is not right, but nor is my fix
-				#errors.extend(err.args[0])
-				errors.extend(err.args)
-			except EnvironmentError, why:
-				errors.append((srcname, dstname, str(why)))
-		try:
-			shutil.copystat(src, dst)
-		except OSError, why:
-			if WindowsError is not None and isinstance(why, WindowsError):
-				# Copying file access times may fail on Windows
-				pass
-			else:
-				errors.extend((src, dst, str(why)))
-		if errors:
-			raise shutil.Error, errors
-
 	def afterCompile(self, compiledProjects):
 		context = ''
-		for project in self.plugins:
+		for project in self.plugins.values():
 			if project not in compiledProjects:
 				# If plugin A uses plugin B (which both, of course, use this
 				# project), and the developer chooses to compile plugin B, we
@@ -105,8 +60,6 @@ class Project(tmt.EclipseProject):
 					if exists(linkName):
 						os.unlink(linkName)
 					os.symlink(dest, linkName)
-				# TODO - it would be nice to assert no files get clobbered
-				#self.copytreeIgnoreExistingDstDir(project.serverPluginBinDir, self.serverPluginBinDir)
 
 			inputContextFile = file(contextFileName, 'r')
 			context += inputContextFile.read() + '\n'
