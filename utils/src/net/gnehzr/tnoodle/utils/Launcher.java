@@ -1,4 +1,4 @@
-package  net.gnehzr.tnoodle.server;
+package  net.gnehzr.tnoodle.utils;
 
 import java.io.BufferedInputStream;
 import java.io.File;

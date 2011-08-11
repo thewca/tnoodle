@@ -36,10 +36,10 @@ import java.util.TreeMap;
 import javax.imageio.ImageIO;
 
 import net.gnehzr.tnoodle.utils.Base64;
+import net.gnehzr.tnoodle.utils.Strings;
 import net.gnehzr.tnoodle.utils.Utils;
 import net.goui.util.MTRandom;
 
-import com.eekboom.utils.Strings;
 
 /**
  * Subclasses of Scrambler must have a method with the following signature

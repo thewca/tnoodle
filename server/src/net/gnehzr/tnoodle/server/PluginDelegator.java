@@ -26,7 +26,7 @@ public class PluginDelegator extends SafeHttpHandler {
 	private long loadedTime = 0;
 	private String[] getLongestMatch(String[] path) throws IOException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, BadClassDescriptionException, SecurityException, NoSuchMethodException, ClassNotFoundException {
 		File contextFile = new File(Utils.getProgramDirectory(), "serverPlugins/context");
-		assert contextFile.exists(); // TODO - turn on assertions at runtime?
+		assert contextFile.exists() : contextFile; // TODO - turn on assertions at runtime?
 		long mtime = contextFile.lastModified();
 		if(mtime > loadedTime) {
 			// If the context file has changed, we force reloading of *all*
@@ -85,6 +85,10 @@ public class PluginDelegator extends SafeHttpHandler {
 	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception {
 		String[] longestMatch = getLongestMatch(path);
 		LazyClassLoader<SafeHttpHandler> handler = handlers.get(longestMatch);
+		if(handler == null) {
+			sendText(t, "No handler found for: " + Arrays.toString(path));
+			return;
+		}
 		int startIndex = longestMatch.length;
 		String[] truncatedPath = Arrays.copyOfRange(path, startIndex, path.length);
 		handler.cachedInstance().wrappedHandle(t, truncatedPath, query);
