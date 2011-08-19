@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.SortedMap;
 
@@ -18,17 +19,19 @@ import javax.imageio.ImageIO;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
+import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyClassLoader;
 
 import com.sun.net.httpserver.HttpExchange;
 
 @SuppressWarnings("restriction")
 public class ScrambleViewHandler extends SafeHttpHandler {
-	private SortedMap<String, Scrambler> scramblers;
-	public ScrambleViewHandler() {
+	private SortedMap<String, LazyClassLoader<Scrambler>> scramblers;
+	public ScrambleViewHandler() throws BadClassDescriptionException, IOException {
 		this.scramblers = Scrambler.getScramblers();
 	}
 	
-	protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
+	protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
 		String callback = query.get("callback");
 		if(path.length == 0) {
 			sendJSONError(t, "Please specify a puzzle.", callback);
@@ -42,7 +45,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 		String puzzle = name_extension[0];
 		String extension = name_extension[1];
 		
-		Scrambler scrambler = scramblers.get(puzzle);
+		Scrambler scrambler = scramblers.get(puzzle).cachedInstance();
 		if(scrambler == null) {
 			sendJSONError(t, "Invalid scrambler: " + puzzle, callback);
 			return;

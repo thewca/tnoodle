@@ -8,34 +8,22 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
+import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.Base64;
+import net.gnehzr.tnoodle.utils.LazyClassLoader;
+import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
 import net.gnehzr.tnoodle.utils.Utils;
 import net.goui.util.MTRandom;
@@ -50,10 +38,6 @@ import net.goui.util.MTRandom;
  * @author Jeremy Fleischman
  */
 public abstract class Scrambler {
-	private static final String SCRAMBLE_PLUGIN_PACKAGE = "scramblers.";
-	private static final String SCRAMBLE_PLUGIN_LIST = "/scramblers/plugins.txt";
-	private static final String PLUGIN_EXTENSION = ".class";
-	
 	/**
 	 * Returns a String describing this Scrambler
 	 * appropriate for use in a url. This shouldn't contain any periods.
@@ -163,173 +147,51 @@ public abstract class Scrambler {
 		return getLongName();
 	}
 
-	/**
-	 * @return A File representing the directory in which this program resides.
-	 * If this is a jar file, this should be obvious, otherwise things are a little ambiguous.
-	 */
-	protected static File getScramblePluginDirectory() {
-		File defaultScrambleFolder;
-		try {
-			defaultScrambleFolder = new File(Scrambler.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-		} catch (URISyntaxException e) {
-			return new File(".");
-		}
-		if(defaultScrambleFolder.isFile()) //this should indicate a jar file
-			defaultScrambleFolder = defaultScrambleFolder.getParentFile();
-		return new File(defaultScrambleFolder, "scramblers");
-	}
-	
-    /**
-     * TODO - comment!
-     */
-	private static HashSet<String> jarredScramblers = null;
-    private static HashSet<String> findJarredScramblers() {
-		if(jarredScramblers == null) {
-    		jarredScramblers = new HashSet<String>();
-    		InputStream is = Scrambler.class.getResourceAsStream(SCRAMBLE_PLUGIN_LIST);
-    		if(is != null) {
-    			BufferedReader in = new BufferedReader(new InputStreamReader(is));
-    			try {
-    				String line = null;
-					while((line = in.readLine()) != null) {
-						jarredScramblers.add(SCRAMBLE_PLUGIN_PACKAGE + line);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return jarredScramblers;
-    }
-    
-	private static HashSet<String> pluginScramblers = null;
-    private static HashSet<String> findPluginScramblers(File folder) {
-		if(pluginScramblers == null) {
-			pluginScramblers = new HashSet<String>();
-			File[] files = folder.listFiles(new FileFilter() {
-				@Override
-				public boolean accept(File f) {
-					return f.isFile() && f.getName().indexOf('$') == -1 && f.getName().endsWith(PLUGIN_EXTENSION);
-				}
-			});
-			if(files != null) {
-				for(File f : files) {
-					pluginScramblers.add(SCRAMBLE_PLUGIN_PACKAGE + f.getName().substring(0, f.getName().length()-PLUGIN_EXTENSION.length()));
-				}
-			}
-		}
-		return pluginScramblers;
-    }
-    
-    private static ArrayList<Class<? extends Scrambler>> loadScramblers(ClassLoader cl, HashSet<String> potentialClassNames) {
-		ArrayList<Class<? extends Scrambler>> found = new ArrayList<Class<? extends Scrambler>>();
-		if(cl == null)
-			return found;
-		for(String className : potentialClassNames) {
-			try {
-				Class<? extends Scrambler> clz = cl.loadClass(className).asSubclass(Scrambler.class);
-				found.add(clz);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-    	return found;
-    }
+	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scramblers", Scrambler.class);
+	// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
+	private static SortedMap<String, LazyClassLoader<Scrambler>> scramblers =
+		new TreeMap<String, LazyClassLoader<Scrambler>>(Strings.getNaturalComparator());
 
-	/**
-	 * TODO - optimize for CGI?
-	 */
-	public static Scrambler getScrambler(String puzzle) {
-		Scrambler s = getScramblers().get(puzzle);
-		//if(s == null) {
-			//TODO
-		//}
-		return s;
-	}
-	
-    /**
-     * TODO comment
-     * @return
-     */
-	public static SortedMap<String, Scrambler> getScramblers() {
-		return getScramblers(null, false);
-	}
-	
-	//sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
-	private static SortedMap<String, Scrambler> scramblers = new TreeMap<String, Scrambler>(Strings.getNaturalComparator());
-	private static boolean loadedAllScrambles = false;
-
-	/**
-	 * TODO - comment on merging w/ curr classpath and caching
-	 * @param folder The folder containing the Scrambler classes.
-	 * If null, looks for a directory named scramblers in the "program's directory", as defined by getScramblePluginDirectory(). 
-	 * @return A HashMap mapping shortNames to valid Scramblers found in folder
-	 *  sorted in a "natural" order (such that 3x3x3 comes before 10x10x10).
-	 *  Returns null if the directory was invalid. 
-	 */
-	public static SortedMap<String, Scrambler> getScramblers(File folder, boolean forceReload) {
-		if(forceReload) {
-			pluginScramblers = null; //this should force a rescan of the plugin folder
-			jarredScramblers = null; //I can't imagine that checking the jar file again will have any effect, but it can't hurt
-			loadedAllScrambles = false;
-			scramblers.clear();
+	public static SortedMap<String, LazyClassLoader<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {
+		if(plugins.dirtyPlugins()) {
+			plugins.reloadPlugins();
+			scramblers.putAll(plugins.getPlugins());
 		}
-		if(loadedAllScrambles) {
-			return scramblers;
-		}
-
-		if(folder == null) {
-			try {
-				folder = getScramblePluginDirectory();
-			} catch(AccessControlException e) {
-				//we must be in an applet
-			}
-		}
-
-		ArrayList<Class<? extends Scrambler>> loadedScramblers = null;
-		HashSet<String> jarredScramblerNames = findJarredScramblers();
-		HashSet<String> pluginScramblerNames = findPluginScramblers(folder);
-		// We prefer plugin Scramblers over jarred Scramblers
-		jarredScramblerNames.removeAll(pluginScramblerNames);
-
-		// load the Scramblers from the jar file (minus the Scramblers in our plugin directory)
-		loadedScramblers = loadScramblers(Scrambler.class.getClassLoader(), jarredScramblerNames);
-
-		// load the Scramblers from the plugin directory
-		URLClassLoader cl = null;
-		try {
-			cl = new URLClassLoader(new URL[] { folder.getParentFile().toURI().toURL() });
-		} catch (MalformedURLException e2) {
-			e2.printStackTrace();
-		}
-		ArrayList<Class<? extends Scrambler>> pluginScramblers = loadScramblers(cl, pluginScramblerNames);
-		loadedScramblers.addAll(pluginScramblers); //now all the classpath scramblers are in loadedScramblers, followed by the plugins
-
-		for(Class<? extends Scrambler> clz : loadedScramblers) {
-			try {
-				Method createScramblers = clz.getMethod("createScramblers");
-				if(!Modifier.isSynchronized(createScramblers.getModifiers())) {
-					throw new NoSuchMethodException("createScramblers() must be synchronized (class " + clz.getCanonicalName() + ")");
-				}
-				Scrambler[] scramblerArray = (Scrambler[]) createScramblers.invoke(null);
-				for(Scrambler scrambler : scramblerArray) {
-					scramblers.put(scrambler.getShortName(), scrambler);
-				}
-			} catch(NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
-		loadedAllScrambles = true;
 		return scramblers;
+//		// load the Scramblers from the plugin directory
+//		URLClassLoader cl = null;
+//		try {
+//			cl = new URLClassLoader(new URL[] { folder.getParentFile().toURI().toURL() });
+//		} catch (MalformedURLException e2) {
+//			e2.printStackTrace();
+//		}
+//		ArrayList<Class<? extends Scrambler>> pluginScramblers = loadScramblers(cl, pluginScramblerNames);
+//		loadedScramblers.addAll(pluginScramblers); //now all the classpath scramblers are in loadedScramblers, followed by the plugins
+//
+//		for(Class<? extends Scrambler> clz : loadedScramblers) {
+//			try {
+//				Method createScramblers = clz.getMethod("createScramblers");
+//				if(!Modifier.isSynchronized(createScramblers.getModifiers())) {
+//					throw new NoSuchMethodException("createScramblers() must be synchronized (class " + clz.getCanonicalName() + ")");
+//				}
+//				Scrambler[] scramblerArray = (Scrambler[]) createScramblers.invoke(null);
+//				for(Scrambler scrambler : scramblerArray) {
+//					scramblers.put(scrambler.getShortName(), scrambler);
+//				}
+//			} catch(NoSuchMethodException e) {
+//				e.printStackTrace();
+//			} catch (IllegalArgumentException e) {
+//				e.printStackTrace();
+//			} catch (InvocationTargetException e) {
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		loadedAllScrambles = true;
+//		return scramblers;
 	}
-
-
+	
 	/**
 	 * TODO - comment
 	 */
@@ -347,12 +209,12 @@ public abstract class Scrambler {
 	 */
 	public final void loadPuzzleIcon(ByteArrayOutputStream bytes) {
 		InputStream in;
-		try {
-			File f = new File(getScramblePluginDirectory(), getShortName() + ".png");
-			in = new FileInputStream(f);
-		} catch(FileNotFoundException e) {
+//		try { TODO
+//			File f = new File(getScramblePluginDirectory(), getShortName() + ".png");
+//			in = new FileInputStream(f);
+//		} catch(FileNotFoundException e) {
 			in = getClass().getResourceAsStream(getShortName() + ".png");
-		} 
+//		} 
 		if(in != null) {
 			try {
 				Utils.fullyReadInputStream(in, bytes);

@@ -38,15 +38,11 @@ public class TNoodleServer {
 		}
 	}
 	
-	// TODO - check that the directories in www don't conflict with
-	// the other root "directories" we're defining here
-	//private static HashMap<String, HttpHandler> pathHandlers = new HashMap<String, HttpHandler>();
-	
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
 	public TNoodleServer(int port, File scrambleFolder, boolean browse) throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
-		server.createContext("/", new PluginDelegator());
+		server.createContext("/", new TnoodleServerPluginDelegator());
 
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
@@ -78,6 +74,7 @@ public class TNoodleServer {
 	}
 
 	public static void main(String[] args) throws IOException {
+		Utils.assertAssertions();
 		Launcher.wrapMain(args);
 
 		OptionParser parser = new OptionParser();

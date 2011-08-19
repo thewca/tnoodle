@@ -146,3 +146,8 @@
 -make all this garbage work while doing "tmt make run" & when doing "java -jar"
 	-provide some file api that just works
 -create a *fast* cgi script...
+-nuke createScramblers() static method in every scramble plugin
+-consolidate context file/short name/long name for scramble plugins
+-test plugins when loaded from file, not jar
+-test plugins when loaded from applet
+-scramble icon won't load from file

@@ -28,6 +28,9 @@ public class MegaminxScrambler extends Scrambler {
 	private final int[][] image;
 	private final boolean pochmann;
 	private final int length;
+	public MegaminxScrambler() {
+		this(true);
+	}
 	public MegaminxScrambler(boolean pochmann) {
 		this.pochmann = pochmann;
 		length = pochmann ? 11*7 : 60;

@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.SortedMap;
 
@@ -30,6 +31,8 @@ import javax.swing.SwingUtilities;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyClassLoader;
 
 @SuppressWarnings("serial")
 public class ScrambleTest {
@@ -39,12 +42,16 @@ public class ScrambleTest {
 	
 	private JLabel imageLabel;
 	
-	private SortedMap<String, Scrambler> scramblers;
+	private SortedMap<String, LazyClassLoader<Scrambler>> scramblers;
 	public ScrambleTest() {
-		scramblers = Scrambler.getScramblers(null, false);
-		if(scramblers == null) {
-			JOptionPane.showMessageDialog(null, "Could not find scramble plugins");
-			return;
+		try {
+			scramblers = Scrambler.getScramblers();
+		} catch (BadClassDescriptionException e2) {
+			e2.printStackTrace();
+			JOptionPane.showMessageDialog(null, e2.getMessage());
+		} catch (IOException e2) {
+			e2.printStackTrace();
+			JOptionPane.showMessageDialog(null, e2.getMessage());
 		}
 		
 		JFrame tester = new JFrame("Scramble Tester");

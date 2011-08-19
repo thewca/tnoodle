@@ -6,7 +6,7 @@ from os.path import join, exists, relpath
 import shutil
 
 SERVER_PLUGIN_DIR = 'serverPlugins'
-CONTEXT_FILE = 'context'
+CONTEXT_FILE = 'pluginDefinitions'
 
 class Project(tmt.EclipseProject):
 	def __init__(self, *args, **kwargs):

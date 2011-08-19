@@ -8,12 +8,15 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
+import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyClassLoader;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -44,18 +47,20 @@ public class ScrambleHandler extends SafeHttpHandler {
 	private static final int MAX_COUNT = 100;
 	private static final int SCRAMBLES_PER_PAGE = 5;
 
-	private SortedMap<String, Scrambler> scramblers;
+	private SortedMap<String, LazyClassLoader<Scrambler>> scramblers;
 	private String puzzleNamesJSON;
-	public ScrambleHandler() {
-		// TODO - load scrambles lazily!
+	public ScrambleHandler() throws BadClassDescriptionException, IOException {
 		this.scramblers = Scrambler.getScramblers();
 		
 		// listing available scrambles
 		String[][] puzzleNames = new String[scramblers.size()][2];
 		int i = 0;
-		for(Entry<String, Scrambler> scrambler : scramblers.entrySet()) {
-			String shortName = scrambler.getValue().getShortName();
-			String longName = scrambler.getValue().getLongName();
+		for(Entry<String, LazyClassLoader<Scrambler>> scrambler : scramblers.entrySet()) {
+//			String shortName = scrambler.getValue().getShortName();
+//			String longName = scrambler.getValue().getLongName();
+			//TODO - figure out some way of deriving both the short & long name without actually loading the class
+			String shortName = scrambler.getKey();
+			String longName = scrambler.getKey();
 			puzzleNames[i][0] = shortName;
 			puzzleNames[i][1] = longName;
 			i++;
@@ -171,7 +176,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 		}
 	}
 	
-	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) {
+	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
 		if(path.length == 0) {
 			sendJSON(t, puzzleNamesJSON, query.get("callback"));
 		} else {
@@ -197,11 +202,12 @@ public class ScrambleHandler extends SafeHttpHandler {
 				sendText(t, "Invalid number of periods: " + path[0]);
 				return;
 			}
-			Scrambler scrambler = scramblers.get(puzzle);
-			if(scrambler == null) {
+			LazyClassLoader<Scrambler> lazyScrambler = scramblers.get(puzzle);
+			if(lazyScrambler == null) {
 				sendText(t, "Invalid scrambler: " + puzzle);
 				return;
 			}
+			Scrambler scrambler = lazyScrambler.cachedInstance();
 
 			String seed = query.get("seed");
 			int count = Math.min(toInt(query.get("count"), 1), MAX_COUNT);

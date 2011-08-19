@@ -268,15 +268,28 @@ public final class Utils {
 	 * our calling class resides.
 	 */
 	public static File getProgramDirectory() {
-		Class<?> callerClass = Reflection.getCallerClass(2);
+		Class<?> callerClass = Utils.class;
+		int i = 2;
+		while(callerClass.getPackage().equals(Utils.class.getPackage())) {
+			callerClass = Reflection.getCallerClass(i++);
+		}
 		File programDirectory;
 		try {
 			programDirectory = new File(callerClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 		} catch (URISyntaxException e) {
 			return new File(".");
 		}
-		if(programDirectory.isFile()) //this should indicate a jar file
+		if(programDirectory.isFile()) { //this should indicate a jar file
 			programDirectory = programDirectory.getParentFile();
+		}
 		return programDirectory;
+	}
+
+	public static void assertAssertions() {
+		try {
+			assert false;
+			System.out.println("Please turn on assertions by passing -ea on the command line.");
+			System.exit(1);
+		} catch(AssertionError e) {}
 	}
 }

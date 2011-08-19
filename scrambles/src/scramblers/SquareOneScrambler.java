@@ -36,6 +36,9 @@ public class SquareOneScrambler extends Scrambler {
 		return new SquareOneScrambler[] { new SquareOneScrambler(false), new SquareOneScrambler(true) };
 	}
 	
+	public SquareOneScrambler() {
+		this(true);
+	}
 	public SquareOneScrambler(boolean slashes) {
 		this.slashes = slashes;
 	}

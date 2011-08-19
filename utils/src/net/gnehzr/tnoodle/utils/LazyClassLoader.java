@@ -1,4 +1,4 @@
-package net.gnehzr.tnoodle.server;
+package net.gnehzr.tnoodle.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 public class LazyClassLoader<H> {
 	// serverPlugins.FileHandler("www/")
 	private static final Pattern INSTANTIATION_PATTERN = Pattern.compile("(\\S+)\\s*\\((.*)\\)");
-	// TODO - this pattern doesn't actually match all strings, and it doesn't match anything *but* strings
-	private static final Pattern ARGUMENT_PATTERN = Pattern.compile("((\"[^,]*\")|(true)|(false)),?\\s*");
+	// TODO - this pattern doesn't actually match all valid strings
+	private static final Pattern ARGUMENT_PATTERN = Pattern.compile("((\"[^,]*\")|(true)|(false)|(-?\\d+)),?\\s*");
 
 	private String className;
 	private String definition;
@@ -39,6 +39,7 @@ public class LazyClassLoader<H> {
 			String strExpr = m.group(2);
 			String trueExpr = m.group(3);
 			String falseExpr = m.group(4);
+			String intExpr = m.group(5);
 			if(strExpr != null) {
 				argTypes.add(String.class);
 				assert strExpr.startsWith("\"") && strExpr.endsWith("\"");
@@ -51,11 +52,16 @@ public class LazyClassLoader<H> {
 			} else if(falseExpr != null) {
 				argTypes.add(boolean.class);
 				args.add(false);
+			} else if(intExpr != null) {
+				argTypes.add(int.class);
+				args.add(Integer.parseInt(intExpr));
 			} else {
 				assert false;
 			}
 		}
-		assert start == arguments.length();
+		if(start != arguments.length()) {
+			throw new BadClassDescriptionException(definition);
+		}
 		this.argTypes = argTypes.toArray(new Class<?>[0]);
 		this.args = args.toArray();
 	}
@@ -83,12 +89,5 @@ public class LazyClassLoader<H> {
 	@Override
 	public String toString() {
 		return super.toString() + " " + this.definition;
-	}
-}
-
-@SuppressWarnings("serial")
-class BadClassDescriptionException extends Exception {
-	public BadClassDescriptionException(String description) {
-		super(description);
 	}
 }
