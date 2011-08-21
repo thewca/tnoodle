@@ -79,7 +79,7 @@ public class LazyClassLoader<H> {
 	}
 	
 	private H cachedInstance = null;
-	public H cachedInstance() throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, ClassNotFoundException, NoSuchMethodException {
+	public synchronized H cachedInstance() throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, ClassNotFoundException, NoSuchMethodException {
 		if(cachedInstance == null) {
 			cachedInstance = newInstance();
 		}

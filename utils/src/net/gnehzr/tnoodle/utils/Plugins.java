@@ -30,7 +30,7 @@ public class Plugins<H> {
 	
 	private HashMap<String, LazyClassLoader<H>> allPlugins = new HashMap<String, LazyClassLoader<H>>();
 	private HashMap<String, LazyClassLoader<H>> jarredPlugins = null;
-	public boolean dirtyPlugins() {
+	public synchronized boolean dirtyPlugins() {
 		if(jarredPlugins == null) {
 			return true;
 		}
@@ -69,7 +69,7 @@ public class Plugins<H> {
 		}
 	}
 	
-	public void reloadPlugins() throws BadClassDescriptionException, IOException {
+	public synchronized void reloadPlugins() throws BadClassDescriptionException, IOException {
 		if(jarredPlugins == null) {
 			jarredPlugins = new HashMap<String, LazyClassLoader<H>>();
 		}
@@ -82,20 +82,21 @@ public class Plugins<H> {
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			readContextFile(in, jarredPlugins);
 		}
-		
+
 		filePlugins.clear();
 		if(contextFile.exists()) {
 			BufferedReader in = new BufferedReader(new FileReader(contextFile));
 			readContextFile(in, filePlugins);
+			loadedTime = contextFile.lastModified();
 		}
-		
+
 		allPlugins.clear();
 		// Note that filePlugins take precedence over jarred plugins
 		allPlugins.putAll(jarredPlugins);
 		allPlugins.putAll(filePlugins);
 	}
 
-	public HashMap<String, LazyClassLoader<H>> getPlugins() throws BadClassDescriptionException, IOException {
+	public synchronized HashMap<String, LazyClassLoader<H>> getPlugins() throws BadClassDescriptionException, IOException {
 		if(dirtyPlugins()) {
 			reloadPlugins();
 		}

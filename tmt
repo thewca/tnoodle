@@ -185,6 +185,8 @@ class tmt:
 			If f is a file, simply returns the timestamp of the given file.
 			Empty directories have timestamp 0.
 		"""
+		if os.path.islink(f):
+			return 0 # TODO - comment!
 		if not isdir(f):
 			return getmtime(f)
 
@@ -395,15 +397,16 @@ class EclipseProject(TmtProject):
 			os.mkdir(tempBin)
 
 		javaFiles = tmt.glob(self.src, r'.*\.java$')
-		args = [ 'javac' ]
-		args += [ '-d', tempBin ]
-		classpath = self.getClasspath()
-		if classpath:
-			args += [ '-classpath', classpath ]
-		args += javaFiles
-		p = subprocess.Popen(args)
-		print " ".join(args)
-		assert p.wait() == 0, 'javac failed!'
+		if len(javaFiles) > 0:
+			args = [ 'javac' ]
+			args += [ '-d', tempBin ]
+			classpath = self.getClasspath()
+			if classpath:
+				args += [ '-classpath', classpath ]
+			args += javaFiles
+			p = subprocess.Popen(args)
+			print " ".join(args)
+			assert p.wait() == 0, 'javac failed!'
 
 		for nonJavaSrcDep in self.nonJavaSrcDeps:
 			srcPath = join(self.src, nonJavaSrcDep)

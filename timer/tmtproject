@@ -7,9 +7,6 @@ class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
 		tmt.Server.addPlugin(self)
-	def compile(self):
-		pass
-	def clean(self):
-		pass
+		self.nonJavaSrcDeps = tmt.glob(self.src, '.*', relativeTo=self.src)
 
 Project('timer')

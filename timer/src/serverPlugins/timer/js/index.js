@@ -94,8 +94,8 @@ window.addEvent('domready', function() {
 	var sessionSelect = tnoodle.tnt.createSelect('Click to open session');
 	sessionSelect.linebreak = new Element('br');
 	sessionSelect.linebreak.setStyle('font-size', 22); // omg, this is disgusting
-	//$('puzzleChooser').adopt(sessionSelect.linebreak);
-	//$('puzzleChooser').adopt(sessionSelect);
+	$('puzzleChooser').adopt(sessionSelect.linebreak);
+	$('puzzleChooser').adopt(sessionSelect);
 	sessionSelect.refresh = function() {
 		var puzzle = scrambleStuff.getSelectedPuzzle();
 		var event = eventSelect.getSelected();
