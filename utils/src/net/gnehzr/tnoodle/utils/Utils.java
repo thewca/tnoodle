@@ -290,7 +290,7 @@ public final class Utils {
 		try {
 			assert false;
 			System.out.println("Please turn on assertions by passing -ea on the command line.");
-			System.exit(1);
+			//System.exit(1); //<<< TODO - create own assertion facility
 		} catch(AssertionError e) {}
 	}
 }

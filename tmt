@@ -6,6 +6,14 @@ import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
 
+if sys.platform == 'win32' or sys.platform == 'cygwin':
+	def windowsSymlink(src, linkName):
+		parentDir, fileName = split(linkName)
+		assert isdir(parentDir)
+		src = src.replace('/', '\\')
+		assert 0 == os.system("cmd /C \"cd %s && mklink /D %s %s\"" % ( parentDir, fileName, src ) )
+	os.symlink = windowsSymlink
+
 PROJECT_FILE_NAME = 'tmtproject'
 DEFAULT_PROJECT_NAME = 'all'
 
@@ -169,7 +177,7 @@ class tmt:
 
 	def projectName(self):
 		import traceback
-		projectName, projectFileName = traceback.extract_stack()[-2][0].split('/')
+		projectName, projectFileName = traceback.extract_stack()[-2][0].split(os.sep)
 		assert isdir(projectName)
 		assert projectFileName == PROJECT_FILE_NAME
 		return projectName
@@ -344,17 +352,21 @@ class EclipseProject(TmtProject):
 	def getDependencies(self):
 		return self.jars + self.projects
 
-	def getClasspathEntities(self, src=False):
+	def getClasspathEntities(self):
 		classpath = set()
-		classpath |= set(jar.jarFile for jar in self.jars)
-		classpath.add(self.src if src else self.bin)
+		classpath |= set(relpath(jar.jarFile) for jar in self.jars)
+		classpath.add(self.bin)
 		for project in self.projects:
-			classpath |= project.getClasspathEntities(src)
+			classpath |= project.getClasspathEntities()
 		return classpath
 
 	def getClasspath(self):
-		# TODO - check if ':' delimeter works on windows
-		return ":".join(self.getClasspathEntities())
+		separator = None
+		if os.name == 'nt':
+			separator = ';'
+		else:
+			separator = ';' # TODO - does ; work in unix?
+		return separator.join(self.getClasspathEntities())
 
 	def afterProjects(self):
 		dependencyFile = join(self.name, '.classpath')
@@ -384,6 +396,7 @@ class EclipseProject(TmtProject):
 
 		print 'Compiling: %s' % self.name
 
+		shutil.rmtree(self.bin)
 		if isdir(tempBin):
 			shutil.rmtree(tempBin)
 		os.mkdir(tempBin)
@@ -422,7 +435,6 @@ class EclipseProject(TmtProject):
 					os.makedirs(parentDir)
 				shutil.copy(srcPath, binPath)
 
-		shutil.rmtree(self.bin)
 		print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, self.bin )
 		os.rename(tempBin, self.bin)
 	

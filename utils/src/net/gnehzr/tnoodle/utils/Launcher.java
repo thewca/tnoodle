@@ -60,6 +60,8 @@ public class Launcher {
 			}
 		}
 		
+		// TODO - any command line arguments that are passed to the jvm won't
+		// pass through to the new jvm we create.
 		String jvm = "\"" + newLauncher.getPath() + "\"";
 		ArrayList<String> jvmArgs = new ArrayList<String>();
 		jvmArgs.add(jvm);
@@ -92,6 +94,8 @@ public class Launcher {
 			e.printStackTrace();
 		}
 	}
+	
+	// TODO - move to Utils?
 	public static void copyFile(File sourceFile, File destFile) throws IOException {
 		if(!destFile.exists()) {
 			destFile.createNewFile();
@@ -114,6 +118,7 @@ public class Launcher {
 		}
 	}
 
+	// TODO - doesn't this belong in Utils?
 	public static File getJarFile() {
 		File jar;
 		try {
