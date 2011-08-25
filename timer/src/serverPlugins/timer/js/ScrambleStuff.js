@@ -380,7 +380,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		if(isChangingColorScheme) {
 			var imgWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
 			var scale = imgWidth / defaultSize.width;
-			var areas = tnoodle.scrambles.createAreas(faceMap, scale);
+			var areas = scrambler.createAreas(faceMap, scale);
 			var updateHeader = function() {
 				deleteChildren(scrambleHeaderText);
 				scrambleHeaderText.appendChild(document.createTextNode(this.faceName));
