@@ -4,8 +4,9 @@
 function wrapFunctionInBlur(func) {
 	return function() {
 		window.fireEvent('blur');
-		func.apply(null, arguments);
+		retVal = func.apply(null, arguments);
 		window.fireEvent('focus');
+		return retVal;
 	};
 };
 alert = wrapFunctionInBlur(alert);
