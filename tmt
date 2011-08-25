@@ -393,8 +393,9 @@ class EclipseProject(TmtProject):
 
 		print 'Compiling: %s' % self.name
 
-		if not isdir(tempBin):
-			os.mkdir(tempBin)
+		if isdir(tempBin):
+			shutil.rmtree(tempBin)
+		os.mkdir(tempBin)
 
 		javaFiles = tmt.glob(self.src, r'.*\.java$')
 		if len(javaFiles) > 0:
@@ -413,7 +414,16 @@ class EclipseProject(TmtProject):
 			binPath = join(tempBin, nonJavaSrcDep)
 			print "Copying %s -> %s" % ( srcPath, binPath )
 			if isdir(srcPath):
-				shutil.copytree(srcPath, binPath)
+				# If this dependency is a directory, we symlink to it
+				# this way, we can get some changes without recompiling.
+				parentDir = dirname(dirname(binPath))
+				if not isdir(parentDir):
+					os.makedirs(parentDir)
+				if binPath.endswith('/'):
+					binPath = binPath[:-1]
+				srcPath = abspath(srcPath)
+				srcPath = relpath(srcPath, parentDir)
+				os.symlink(srcPath, binPath)
 			else:
 				assert not isdir(binPath)
 				parentDir = dirname(binPath)
@@ -454,7 +464,7 @@ class EclipseProject(TmtProject):
 			shutil.rmtree(extractedLibDir)
 
 		for project in javaDeps:
-			for dirpath, dirnames, filenames in os.walk(project.bin):
+			for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
 				for name in filenames:
 					path = os.path.normpath(os.path.join(dirpath, name))
 					arcPath = os.path.relpath(path, project.bin)
@@ -487,6 +497,9 @@ Main-Class: %s
 		assert isdir(self.distDir)
 		shutil.rmtree(self.bin)
 		shutil.rmtree(self.distDir)
+		tempBin = join(self.name, '.bin')
+		if isdir(tempBin):
+			shutil.rmtree(tempBin)
 	
 	def __str__(self, timestamps=False):
 		s = self.name
