@@ -1,0 +1,2 @@
+This file exists to convince git to create its containing directory.
+Git doesn't seem to create directories unless they contain files.
