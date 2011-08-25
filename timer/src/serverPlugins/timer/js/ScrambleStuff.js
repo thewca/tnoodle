@@ -146,11 +146,6 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 					faceMap = null; // scramble images are not supported
 					scrambleDiv.setVisible(false, true);
 				} else {
-					// if the scramble has arrived, we format it into the turns
-					if(currScramble) {
-						formatScramble();
-					}
-
 					faceMap = puzzleImageInfo.faces;
 					colorScheme = configuration.get('scramble.' + puzzle + '.colorScheme', clone(puzzleImageInfo.colorScheme));
 					defaultColorScheme = puzzleImageInfo.colorScheme;
@@ -161,6 +156,11 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 						scrambleDiv.style.height = (puzzleImageInfo.size.height + getScrambleVertPadding()) + "px";
 					}
 					scrambleResized();
+
+					// if the scramble has arrived, we format it into the turns
+					if(currScramble) {
+						formatScramble();
+					}
 				}
 			}, puzzle);
 	}
