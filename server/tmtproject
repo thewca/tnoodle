@@ -34,15 +34,10 @@ class Project(tmt.EclipseProject):
 		wwwDir = join(self.serverPluginSrcDir, 'www')
 		self.nonJavaSrcDeps += tmt.glob(wwwDir, '.*', relativeTo=self.src)
 
-	def afterCompile(self, compiledProjects):
+	def compile(self):
+		tmt.EclipseProject.compile(self)
 		context = ''
 		for project in self.plugins.values():
-			if project not in compiledProjects:
-				# If plugin A uses plugin B (which both, of course, use this
-				# project), and the developer chooses to compile plugin B, we
-				# don't want to load the plugin for A. The compiledProjects
-				# argument helps us avoid that.
-				continue
 			contextFileName = project.contextFileName
 			assert exists(contextFileName)
 

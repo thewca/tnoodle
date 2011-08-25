@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from os.path import exists, dirname, join, isdir, getmtime, split, abspath, relpath, basename
+from os.path import exists, dirname, join, isdir, split, abspath, relpath, basename
 import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
@@ -99,10 +99,6 @@ class tmt:
 			assert commandFunc, 'No %s target in %s' % ( command, project )
 			commandFunc()
 
-		if command == 'compile':
-			for project in projects:
-				project.afterCompile(projects)
-
 	def __init__(self):
 		self.parser = ArgumentParser(
 			description='tmt, the Tnoodle Make Tools',
@@ -186,9 +182,11 @@ class tmt:
 			Empty directories have timestamp 0.
 		"""
 		if os.path.islink(f):
-			return 0 # TODO - comment!
+			# We don't follow symbolic links because we don't want them
+			# to cause a recompile of any project that uses us.
+			return os.lstat(f).st_mtime
 		if not isdir(f):
-			return getmtime(f)
+			return os.lstat(f).st_mtime
 
 		m = 0
 		for ff in os.listdir(f):
@@ -237,13 +235,6 @@ class TmtProject(object):
 		pass
 	def compile(self):
 		assert False
-	# The afterCompile method gets called for each project after all the projects 
-	# that were compiled are done compiling, in no particular order.
-	# This is similar to the afterProjects method, although it will be called
-	# on fewer projects.
-	# TODO - explain the purpose of the compiledProjects argument
-	def afterCompile(self, compiledProjects):
-		pass
 	def dist(self):
 		assert False
 	def run(self):

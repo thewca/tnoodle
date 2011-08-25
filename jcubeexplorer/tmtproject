@@ -10,13 +10,14 @@ class Project(tmt.EclipseProject):
 		self.transition_tables = join(self.bin, 'org/kociemba/twophase/transition_tables')
 		self.pruning_tables = join(self.bin, 'org/kociemba/twophase/pruning_tables')
 
-	def afterCompile(self, compiledProjects):
+	def compile(self):
+		tmt.EclipseProject.compile(self)
 		# build the pruning and transition tables for the two phase algorithm
 		# iff they don't already exist
 		if not exists(self.transition_tables) or not exists(self.pruning_tables):
-			tmt.java(
-					main="org.kociemba.twophase.CoordCube",
-					classpath=self.getClasspath(),
-					args=[ self.transition_tables, self.pruning_tables ])
+			assert 0 == tmt.java(
+							main="org.kociemba.twophase.CoordCube",
+							classpath=self.getClasspath(),
+							args=[ self.transition_tables, self.pruning_tables ])
 
 Project('jcubeexplorer')
