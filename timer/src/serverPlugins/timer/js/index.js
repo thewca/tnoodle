@@ -1,3 +1,17 @@
+// For some reason, alert, prompt, and confirm don't fire the 
+// blur and focus events on the window. This hack ensures that they
+// do.
+function wrapFunctionInBlur(func) {
+	return function() {
+		window.fireEvent('blur');
+		func.apply(null, arguments);
+		window.fireEvent('focus');
+	};
+};
+alert = wrapFunctionInBlur(alert);
+prompt = wrapFunctionInBlur(prompt);
+confirm = wrapFunctionInBlur(confirm);
+
 window.addEvent('domready', function() {
 	var server = new tnoodle.server(location.hostname, location.port);
 	var configuration = server.configuration;

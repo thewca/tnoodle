@@ -15,6 +15,9 @@
 .keysDown {
 	color: green;
 }
+.unfocused {
+	color: gray;
+}
 .fullscreenTimerBg {
 	position: absolute;
 	left: 0;

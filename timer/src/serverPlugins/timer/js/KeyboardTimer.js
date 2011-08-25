@@ -7,6 +7,16 @@ var KeyboardTimer = new Class({
 	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
+		// TODO - the page may be out of focus when it loads!
+		timer.windowFocused = true;
+		window.addEvent('blur', function(e) {
+			timer.windowFocused = false;
+			timer.redraw();
+		});
+		window.addEvent('focus', function(e) {
+			timer.windowFocused = true;
+			timer.redraw();
+		});
 		this.scrambleStuff = scrambleStuff;
 		this.parent = parent;
 		this.server = server;
@@ -271,7 +281,7 @@ var KeyboardTimer = new Class({
 		// if we're in a textarea, textfield, or input field
 		var focusedEl = document.activeElement.nodeName.toLowerCase();
 		var isEditing = focusedEl == 'textarea' || focusedEl == 'input';
-		return !isEditing && !tnoodle.tnt.isSelecting() && !tnoodle.tnt.isGrayedOut();
+		return !isEditing && !tnoodle.tnt.isSelecting() && !tnoodle.tnt.isGrayedOut() && this.windowFocused;
 	},
 	getTimeCentis: function() {
 		if(this.config.get('timer.enableStackmat')) {
@@ -356,13 +366,18 @@ var KeyboardTimer = new Class({
 		var string = this.stringy();
 		var colorClass = this.inspecting ? 'inspecting' : '';
 		var keysDown = this.keysDown();
-		if(this.isFocused() && keysDown && this.hasDelayPassed()) {
-			if(!this.inspecting) {
-				// we still want people to see their inspection time when they're pressing spacebar
-				string = this.server.formatTime(0, this.decimalPlaces);
+		if(this.isFocused()) {
+			if(keysDown && this.hasDelayPassed()) {
+				if(!this.inspecting) {
+					// we still want people to see their inspection time when they're pressing spacebar
+					string = this.server.formatTime(0, this.decimalPlaces);
+				}
+				colorClass = 'keysDown';
 			}
-			colorClass = 'keysDown';
+		} else {
+			colorClass = 'unfocused';
 		}
+
 		this.timer.set('html', string);
 		this.timer.erase('class');
 		this.timer.addClass(colorClass);
