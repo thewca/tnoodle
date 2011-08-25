@@ -6,7 +6,10 @@ import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
 
-if sys.platform == 'win32' or sys.platform == 'cygwin':
+def windowsOrCygwin():
+	return sys.platform == 'win32' or sys.platform == 'cygwin'
+
+if windowsOrCygwin():
 	def windowsSymlink(src, linkName):
 		parentDir, fileName = split(linkName)
 		assert isdir(parentDir)
@@ -362,10 +365,10 @@ class EclipseProject(TmtProject):
 
 	def getClasspath(self):
 		separator = None
-		if os.name == 'nt':
+		if windowsOrCygwin():
 			separator = ';'
 		else:
-			separator = ';' # TODO - does ; work in unix?
+			separator = ':'
 		return separator.join(self.getClasspathEntities())
 
 	def afterProjects(self):
