@@ -132,9 +132,6 @@
 	-add login
 	-implement stuff on scratch paper!!!
 
--it would be nice if ctrl+c killed ant run on windows in mintty
-	-maybe have child listen to heartbeats from parent? lol...
-	-check if this is fixed on windows with "tmt make run"
 -read times/metronome
 -gmaps style copy scramble
 -pdf page #
@@ -142,9 +139,6 @@
 -infinite seeded scrambles
 
 ### TnoodleMakeTools
--"tmt make dist"
--make all this garbage work while doing "tmt make run" & when doing "java -jar"
-	-provide some file api that just works
 -create a *fast* cgi script...
 -nuke createScramblers() static method in every scramble plugin
 -consolidate context file/short name/long name for scramble plugins

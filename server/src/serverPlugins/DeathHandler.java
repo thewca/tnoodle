@@ -10,7 +10,7 @@ import net.gnehzr.tnoodle.server.TNoodleServer;
 
 public class DeathHandler extends SafeHttpHandler {
 	protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
-		if(path.length == 2 && path[1].equals("now")) {
+		if(path.length == 1 && path[0].equals("now")) {
 			// If localhost makes a request to
 			// http://localhost:PORT/kill/now
 			// that's enough for us to commit honorable suicide.
