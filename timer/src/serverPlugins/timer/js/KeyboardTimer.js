@@ -7,16 +7,6 @@ var KeyboardTimer = new Class({
 	initialize: function(parent, server, scrambleStuff) {
 		var timer = this;
 
-		// TODO - the page may be out of focus when it loads!
-		timer.windowFocused = true;
-		window.addEvent('blur', function(e) {
-			timer.windowFocused = false;
-			timer.redraw();
-		});
-		window.addEvent('focus', function(e) {
-			timer.windowFocused = true;
-			timer.redraw();
-		});
 		this.scrambleStuff = scrambleStuff;
 		this.parent = parent;
 		this.server = server;
@@ -95,6 +85,8 @@ var KeyboardTimer = new Class({
 
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
 
+		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.disableContextMenu', 'Disable context menu', true, null));
+
 
 		var keys = new Hash();
 		this.keys = keys;
@@ -114,6 +106,7 @@ var KeyboardTimer = new Class({
         }
 		var keysDown = false;
 		window.addEvent('keydown', function(e) {
+			timer.windowFocused = true;
 			keys.set(e.key, true);
 			if(!timer.isFocused()) {
 				return;
@@ -152,6 +145,7 @@ var KeyboardTimer = new Class({
 			}
 		});
 		window.addEvent('keyup', function(e) {
+			timer.windowFocused = true;
 			keys.erase(e.key);
 			if(!timer.isFocused() || timer.config.get('timer.enableStackmat')) {
 				// A key may have been released which was 
@@ -207,12 +201,27 @@ var KeyboardTimer = new Class({
 			timer.pendingTime = false;
 			timer.redraw();
 		}
-		window.addEvent('click', function(e) {
+		timer.windowFocused = true;
+		document.addEvent('mousedown', function(e) {
+			timer.windowFocused = true;
+			resetKeys();
+		});
+		document.addEvent('mouseup', function(e) {
+			timer.windowFocused = true;
 			resetKeys();
 		});
 		window.addEvent('blur', function(e) {
-			//when the page loses focus, we clear the keyboard state
-			resetKeys();
+			// When the page loses focus, we clear the keyboard state
+			timer.windowFocused = false;
+			resetKeys(); // resetKeys() will cause a redraw
+		});
+		// TODO - the page may be out of focus when it loads!
+		window.addEvent('focus', function(e) {
+			timer.windowFocused = true;
+			timer.redraw();
+		});
+		window.addEvent('contextmenu', function(e) {
+			return !timer.config.get('timer.disableContextMenu');
 		});
 		
 		function stackmatError(error) {
@@ -257,6 +266,7 @@ var KeyboardTimer = new Class({
 		}
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.enableStackmat', 'Enable stackmat', false, stackmatEnabled));
 		//TODO - add remaining stackmat config options!!!
+
 	},
 	lastTime: null,
 	fireNewTime: function() {
