@@ -15,7 +15,44 @@ if windowsOrCygwin():
 		assert isdir(parentDir)
 		src = src.replace('/', '\\')
 		assert 0 == os.system("cmd /C \"cd %s && mklink /D %s %s\"" % ( parentDir, fileName, src ) )
+	def islink(path):
+		return readlink(path) != None
+	def readlink(path):
+		parentDir, fileName = split(path)
+		p = subprocess.Popen([ 'dir', parentDir ], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		stdout, stderr = p.communicate()
+		assert p.returncode == 0
+		files = stdout.split('\n')
+		symlinkRe = re.compile(r'.*SYMLINKD.*%s.*\[(.*)\].*' % fileName) # lol, this is crazy fragile
+		for file in files:
+			match = symlinkRe.match(file)
+			if match:
+				return match.group(1).replace('\\', '/')
+		return None
+	oldUnlink = os.unlink
+	def unlink(path):
+		if islink(path):
+			# For some reason, Windows refuses to delete a symlink when using
+			# the hacked version of islink I've create above.
+			assert 0 == os.system('rmdir %s' % path)
+		else:
+			oldUnlink(path)
+	
+	os.unlink = unlink
 	os.symlink = windowsSymlink
+	os.path.islink = islink
+	os.readlink = readlink
+	
+def rmtree(dir):
+	# This method recursively deletes a directory, but doesn't follow any symlinks
+	def onerror(func, path, excinfo):
+		if func == os.path.islink:
+			os.unlink(path)
+			#<<<assert 0 == os.system('rmdir %s' % path)
+		else:
+			import pdb; pdb.set_trace() #<<< TODO - how to properly reraise the exception?
+			raise excinfo
+	shutil.rmtree(dir, onerror=onerror)
 
 PROJECT_FILE_NAME = 'tmtproject'
 DEFAULT_PROJECT_NAME = 'all'
@@ -197,7 +234,10 @@ class tmt:
 			# to cause a recompile of any project that uses us.
 			return os.lstat(f).st_mtime
 		if not isdir(f):
-			return os.lstat(f).st_mtime
+			try:
+				return os.lstat(f).st_mtime
+			except:
+				import pdb; pdb.set_trace()
 
 		m = 0
 		for ff in os.listdir(f):
@@ -387,7 +427,6 @@ class EclipseProject(TmtProject):
 
 	def compile(self):
 		tempBin = join(self.name, '.bin')
-		assert isdir(self.bin)
 
 		lastCompiled = tmt.timestamp(self.bin)
 		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities() )
@@ -399,9 +438,9 @@ class EclipseProject(TmtProject):
 
 		print 'Compiling: %s' % self.name
 
-		shutil.rmtree(self.bin)
+		rmtree(self.bin)
 		if isdir(tempBin):
-			shutil.rmtree(tempBin)
+			rmtree(tempBin)
 		os.mkdir(tempBin)
 
 		javaFiles = tmt.glob(self.src, r'.*\.java$')
@@ -467,7 +506,7 @@ class EclipseProject(TmtProject):
 					arcPath = os.path.relpath(path, extractedLibDir)
 					if os.path.isfile(path):
 						jar.write(path, arcPath)
-			shutil.rmtree(extractedLibDir)
+			rmtree(extractedLibDir)
 
 		for project in javaDeps:
 			for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
@@ -501,11 +540,11 @@ Main-Class: %s
 		print 'Cleaning: %s' % self.name
 		assert isdir(self.bin)
 		assert isdir(self.distDir)
-		shutil.rmtree(self.bin)
-		shutil.rmtree(self.distDir)
+		rmtree(self.bin)
+		rmtree(self.distDir)
 		tempBin = join(self.name, '.bin')
 		if isdir(tempBin):
-			shutil.rmtree(tempBin)
+			rmtree(tempBin)
 	
 	def __str__(self, timestamps=False):
 		s = self.name
