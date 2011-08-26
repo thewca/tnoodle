@@ -228,7 +228,12 @@ tnoodle.tnt = {
 		return editor;
 	},
 	isSelecting: function() {
-		return $$('.selecting').length > 0; //lol
+		for(var i = 0; i < this.selects_.length; i++) {
+			if(this.selects_[i].selecting) {
+				return true;
+			}
+		}
+		return false;
 	},
 	selects_: [],
 	textSizer_: null,
@@ -255,7 +260,7 @@ tnoodle.tnt = {
 		
 		var optionsDiv = document.createElement('div');
 		optionsDiv.addClass('options');
-		var selecting = false;
+		select.selecting = false;
 		optionsDiv.fade('hide');
 		optionsDiv.inject(select);
 
@@ -384,7 +389,7 @@ tnoodle.tnt = {
 				select.removeClass('disabled');
 			}
 
-			if(!selecting) {
+			if(!select.selecting) {
 				// If we're not selecting, then we remove the arrow highlights
 				if(select.arrow1) {
 					select.arrow1.removeClass('hovered');
@@ -415,7 +420,7 @@ tnoodle.tnt = {
 
 			window.removeEvent('keydown', keyDown);
 			window.removeEvent('click', windowClicked);
-			if(selecting) {
+			if(select.selecting) {
 				window.addEvent('keydown', keyDown);
 				window.addEvent('click', windowClicked);
 				if(optionsHaveChanged) {
@@ -471,7 +476,7 @@ tnoodle.tnt = {
 			if(disabled) {
 				return;
 			}
-			selecting = true;
+			select.selecting = true;
 			select.arrow2.addClass('hovered');
 			hoveredIndex = this.selectedIndex;
 			// If we run refresh() immediately, the current
@@ -481,7 +486,7 @@ tnoodle.tnt = {
 		}.bind(select);
 		select.addEvent('click', select.show);
 		function windowClicked(e) {
-			selecting = false;
+			select.selecting = false;
 			refresh();
 		}
 		function keyDown(e) {
@@ -496,9 +501,9 @@ tnoodle.tnt = {
 				hoveredIndex = options.length-1;
 			}else if(e.key == 'enter') {
 				select.setSelected(options[hoveredIndex].value);
-				selecting = false;
+				select.selecting = false;
 			} else if(e.key == 'esc') {
-				selecting = false;
+				select.selecting = false;
 			} else if(e.key == 'left' || e.key == 'right') {
 				if(select.arrow1) {
 					select.arrow1.toggleClass('hovered');
@@ -507,7 +512,7 @@ tnoodle.tnt = {
 			} else if(e.key == 'tab') {
 				e.stop();
 
-				selecting = false;
+				select.selecting = false;
 				var selects = tnoodle.tnt.selects_;
 				var delta = e.shift ? selects.length-1 : 1; // silly js modulo
 				var index = (selects.indexOf(select) + delta) % selects.length;
@@ -521,7 +526,7 @@ tnoodle.tnt = {
 		var disabled = false;
 		select.setDisabled = function(new_disabled) {
 			disabled = new_disabled;
-			selecting = false;
+			select.selecting = false;
 			refresh();
 		};
 
