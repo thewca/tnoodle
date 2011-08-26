@@ -205,10 +205,16 @@ var KeyboardTimer = new Class({
 		document.addEvent('mousedown', function(e) {
 			timer.windowFocused = true;
 			resetKeys();
+			// We may be in the process of losing focus, this will let any
+			// events in the queue drain out
+			setTimeout(timer.redraw.bind(timer), 0);
 		});
 		document.addEvent('mouseup', function(e) {
 			timer.windowFocused = true;
 			resetKeys();
+			// We may be in the process of losing focus, this will let any
+			// events in the queue drain out
+			setTimeout(timer.redraw.bind(timer), 0);
 		});
 		window.addEvent('blur', function(e) {
 			// When the page loses focus, we clear the keyboard state
