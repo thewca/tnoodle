@@ -47,7 +47,7 @@ class Project(tmt.EclipseProject):
 				linkUpToDate = False
 				if os.path.islink(linkName):
 					linkTo = os.readlink(linkName)
-					if linkTo == dest:
+					if linkTo == dest.replace(os.sep, '/'):
 						linkUpToDate = True
 				if not linkUpToDate:
 					if exists(linkName):
