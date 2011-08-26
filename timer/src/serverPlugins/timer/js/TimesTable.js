@@ -831,7 +831,7 @@ var TimesTable = new Class({
 						this.session.reindex();
 						this.refreshData();
 					} else {
-						var newTime = new tnoodle.Time(this.session, textField.value, this.scrambleStuff.getScramble());
+						var newTime = new tnoodle.Time(textField.value, this.scrambleStuff.getScramble());
 						this.addTime(newTime);
 						this.scrambleStuff.scramble();
 
@@ -846,7 +846,7 @@ var TimesTable = new Class({
 		
 		var timeChanged = function(e) {
 			try {
-				var test = new tnoodle.Time(null, textField.value);
+				var test = new tnoodle.Time(textField.value);
 				this.timeHoverDiv.errorField.set('html', '');
 			} catch(error) {
 				this.timeHoverDiv.errorField.set('html', error);

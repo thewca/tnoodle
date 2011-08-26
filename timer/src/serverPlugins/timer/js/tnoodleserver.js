@@ -543,6 +543,7 @@ tnoodle.Time = function(time, scramble) {
 			valueCentis += 60*60*100*strictToInt(hours);
 		}
 		
+		this.centis = valueCentis;
 		if(penalty == "+2") {
 			valueCentis -= 2*100;
 		}
@@ -554,7 +555,6 @@ tnoodle.Time = function(time, scramble) {
 			throw "Can't have times > 10 years";
 		}
 		this.setPenalty(penalty);
-		server.saveSessions();
 	};
 	//penalty can be "+2" or "DNF"
 	//anything else is assumed to be no penalty
