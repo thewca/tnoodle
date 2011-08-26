@@ -333,18 +333,15 @@ window.addEvent('domready', function() {
 		triLayout.resize();
 	}
 	function scrollTable(delta) {
-		return function(e) {
-			e.stop();
-			var pos;
-			if(delta == Infinity) {
-				pos = timesTable.tbody.scrollHeight;
-			} else if(delta == -Infinity) {
-				pos = 0;
-			} else {
-				pos = timesTable.tbody.scrollTop + delta;
-			}
-			timesTable.tbody.scrollTo(0, pos);
-		};
+		var pos;
+		if(delta == Infinity) {
+			pos = timesTable.tbody.scrollHeight;
+		} else if(delta == -Infinity) {
+			pos = 0;
+		} else {
+			pos = timesTable.tbody.scrollTop + delta;
+		}
+		timesTable.tbody.scrollTo(0, pos);
 	}
 
 	var keyboard = new BlockingKeyboard();
@@ -451,22 +448,22 @@ window.addEvent('domready', function() {
 			{
 				description: 'Scroll up times table',
 				'default': 'pageup',
-				handler: scrollTable(-100)
+				handler: scrollTable.bind(null, -100)
 			},
 			{
 				description: 'Scroll down times table',
 				'default': 'pagedown',
-				handler: scrollTable(100)
+				handler: scrollTable.bind(null, 100)
 			},
 			{
 				description: 'Scroll to top of times table',
 				'default': 'home',
-				handler: scrollTable(-Infinity)
+				handler: scrollTable.bind(null, -Infinity)
 			},
 			{
 				description: 'Scroll to bottom of times table',
 				'default': 'end',
-				handler: scrollTable(Infinity)
+				handler: scrollTable.bind(null, Infinity)
 			}
 		],
 		'Miscellaneous': [
