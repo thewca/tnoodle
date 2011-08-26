@@ -21,6 +21,7 @@ http://upload.wikimedia.org/wikipedia/commons/f/ff/Square-1_half-turn.jpg
 	Note: some of these have been modified, so don't upgrade blindly
 mootools-1.2.4-core.js: http://mootools.net
 mootools-1.2.4.4-more.js: http://mootools.net
+stacktrace.js: ttps://github.com/eriwen/javascript-stacktrace
 
 **** Ant/development libaries *****
 yui-compressor-ant-task-0.5.jar & yuicompressor-2.4.2.jar: https://github.com/jfly/yui-compressor-ant-task
