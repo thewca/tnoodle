@@ -708,7 +708,7 @@ window.addEvent('domready', function() {
 		bgImg.setStyle('top', (available.y - height) / 2);
 	}
 	$('bgLink').addEvent('click', function() {
-		var url = prompt("Url?", configuration.get('gui.backgroundImage')); 
+		var url = prompt("Url? (this will be pretty someday, I promise)", configuration.get('gui.backgroundImage')); 
 		if(url !== null) {
 			setBgUrl(url);
 		}
