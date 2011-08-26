@@ -145,3 +145,4 @@
 -test plugins when loaded from file, not jar
 -test plugins when loaded from applet
 -scramble icon won't load from file
+-symlink crap on windows is *increadibly* slow
