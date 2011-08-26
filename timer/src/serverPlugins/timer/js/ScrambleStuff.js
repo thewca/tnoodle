@@ -605,7 +605,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	function show() {
 		if(currImportLink === null) {
 			//initialization
-			promptImportUrl.call(importUrlLink);
+			promptSeed.call(seedLink);
 		}
 	}
 	function hide() {
@@ -624,6 +624,13 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	var importDivTabs = document.createElement('span');
 	importDiv.appendChild(importDivTabs);
 	
+	var seedLink = document.createElement('span');
+	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
+	seedLink.className = 'link';
+	xAddListener(seedLink, 'click', promptSeed, false);
+	seedLink.appendChild(document.createTextNode('Seed'));
+	importDivTabs.appendChild(seedLink);
+
 	var importUrlLink = document.createElement('span');
 	importUrlLink.title = "Import scrambles from url";
 	importUrlLink.className = 'link';
@@ -639,13 +646,6 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	importFileLink.appendChild(document.createTextNode('From File'));
 	importDivTabs.appendChild(importFileLink);
 	importDivTabs.appendChild(document.createTextNode(' '));
-
-	var seedLink = document.createElement('span');
-	seedLink.title = "Generate scrambles from a seed, perfect for racing!";
-	seedLink.className = 'link';
-	xAddListener(seedLink, 'click', promptSeed, false);
-	seedLink.appendChild(document.createTextNode('Seed'));
-	importDivTabs.appendChild(seedLink);
 
 	var tempDiv = document.createElement('div');
 	tempDiv.style.overflow = 'hidden'; // need this for ie
