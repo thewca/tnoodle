@@ -975,7 +975,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			if(countingTimes && !countingTimes.contains(time)) {
 				timeStr = "(" + timeStr + ")";
 			}
-			simpleTimes += (i>0?', ':'') + timeStr;
+			simpleTimes += (offset>0?', ':'') + timeStr;
 			detailedTimes += (offset+1) + ". " + timeStr + " " + time.scramble + "\n";
 		}
 
