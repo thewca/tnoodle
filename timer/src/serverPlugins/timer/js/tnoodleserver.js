@@ -687,13 +687,13 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			return this.puzzle + ":" + this.event;
 		}
 	};
-	this.solveCount = function(lastTime, size) {
-		if(!$chk(lastTime) || !$chk(size)) {
-			lastTime = this.times.length-1;
+	this.solveCount = function(lastTimeIndex, size) {
+		if(!$chk(lastTimeIndex) || !$chk(size)) {
+			lastTimeIndex = this.times.length-1;
 			size = this.times.length;
 		}
 		var count = 0;
-		for(var i = 0; i < this.times.length; i++) {
+		for(var i = lastTimeIndex; i >= 0 && count < size; i--) {
 			if(this.times[i].getPenalty() != "DNF") {
 				count++;
 			}
