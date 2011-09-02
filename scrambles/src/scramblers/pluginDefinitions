@@ -1,6 +1,7 @@
 2x2x2 scramblers.CubeScrambler(2)
 3x3x3 scramblers.CubeScrambler(3)
 4x4x4 scramblers.CubeScrambler(4)
+5x5x5 scramblers.CubeScrambler(5)
 
 sq1 scramblers.SquareOneScrambler()
 pyram scramblers.PyraminxScrambler()
