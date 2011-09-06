@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# Revision 23
+# Revision 27
 jquery-1.6.min.js
 RequestAnimationFrame.js
 Stats.js
@@ -7,6 +7,7 @@ style.css
 Three.js
 twisty_demo.js
 twisty.js
+twisty_alg.js
 offline_storage_example.png
 ../offline.html
 ../

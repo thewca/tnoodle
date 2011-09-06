@@ -3,6 +3,9 @@
  * 
  * Demonstration and testing harness for WSOH.
  * 
+ * TOOD
+ * - Fix document.getElementById(...) calls.
+ * 
  */
 
 var cache = window.applicationCache;
@@ -28,6 +31,7 @@ $(document).ready(function() {
     "dimension": 3
   });
 
+
   $("#cubeDimension").bind("input", function() {
     var dim = parseInt($("#cubeDimension").val());
     if (!dim) {
@@ -42,6 +46,7 @@ $(document).ready(function() {
       currentCubeSize = dim;
       $("#cubeDimension").blur(); 
     }
+    return false;
   });
 
   $("#alg_ccc").bind("click", function() {
@@ -56,13 +61,11 @@ $(document).ready(function() {
     addMoves(superflip);
   });
 
+  $("#parsed_alg1").bind("click", function() {
+    addMoves(stringToAlg($("#parse_alg").val()));
+  });
+
   cam(0);
-
-
-  document.getElementById("twistyContainer").addEventListener( 'mousedown', onDocumentMouseDown, false );
-  document.getElementById("twistyContainer").addEventListener( 'touchstart', onDocumentTouchStart, false );
-  document.getElementById("twistyContainer").addEventListener( 'touchmove', onDocumentTouchMove, false );
-
 
   $("#enableOfflineSupport").bind("click", function() {
     window.location.href = "offline.html";
@@ -76,61 +79,12 @@ $(document).ready(function() {
     $("#canvasPNG").html('<a href="' + img + '" target="blank"><img src="'+img+'"/></a>');
     $("#canvasPNG").fadeTo("slow", 1);
   });
-  
-  
+
+
+  //$("#canvas_input").bind("focus", function (e) { $("#twistyCanvas").css("border", "2px solid #F00") });
+  //$("#canvas_input").bind("focus", function (e) { $("#twistyCanvas").css("background", "#F00") });
 
 });
-
-var theta = 0;
-var mouseXLast = 0;
-
-function cam(deltaTheta) {
-  theta += deltaTheta;
-  moveCamera(theta);
-}
-
-function onDocumentMouseDown( event ) {
-  $("#cubeDimension").blur(); 
-  event.preventDefault();
-  document.getElementById("twistyContainer").addEventListener( 'mousemove', onDocumentMouseMove, false );
-  document.getElementById("twistyContainer").addEventListener( 'mouseup', onDocumentMouseUp, false );
-  document.getElementById("twistyContainer").addEventListener( 'mouseout', onDocumentMouseOut, false );
-  mouseXLast = event.clientX;
-}
-
-function onDocumentMouseMove( event ) {
-  mouseX = event.clientX;
-  cam((mouseXLast - mouseX)/256);
-  mouseXLast = mouseX;
-}
-
-function onDocumentMouseUp( event ) {
-  document.getElementById("twistyContainer").removeEventListener( 'mousemove', onDocumentMouseMove, false );
-  document.getElementById("twistyContainer").removeEventListener( 'mouseup', onDocumentMouseUp, false );
-  document.getElementById("twistyContainer").removeEventListener( 'mouseout', onDocumentMouseOut, false );
-}
-
-function onDocumentMouseOut( event ) {
-  document.getElementById("twistyContainer").removeEventListener( 'mousemove', onDocumentMouseMove, false );
-  document.getElementById("twistyContainer").removeEventListener( 'mouseup', onDocumentMouseUp, false );
-  document.getElementById("twistyContainer").removeEventListener( 'mouseout', onDocumentMouseOut, false );
-}
-
-function onDocumentTouchStart( event ) {
-  if ( event.touches.length == 1 ) {
-    event.preventDefault();
-    mouseXLast = event.touches[0].pageX;
-  }
-}
-
-function onDocumentTouchMove( event ) {
-  if ( event.touches.length == 1 ) {
-    event.preventDefault();
-    mouseX = event.touches[0].pageX;
-    cam((mouseXLast - mouseX)/256);
-    mouseXLast = mouseX;
-  }
-}
 
 /*
  * Convenience Logging

@@ -218,7 +218,7 @@ var Stats = function () {
 
 	}
 	
-	swapMode();
+	//swapMode();
 
 	return {
 

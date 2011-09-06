@@ -111,7 +111,31 @@ div.right {
 }
 
 #twistyContainer {
+}
+
+#twistyCanvas {
+  /*width: 100%;*/
+  /*height: 100%;*/
   cursor: move;
+}
+
+#canvas_input {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: none;
+  border: none;
+  color: none;
+  width: 1em;
+  font-size: 100px;
+  text-transform: uppercase;
+  text-align: center;
+  z-index: 1000;
+  opacity: 0.2;
+}
+
+.checkered {
+  background-color: #DDD;
 }
 
 #canvasPNG {
@@ -165,7 +189,7 @@ div.right {
   border-radius: 8px;
 }
 
-.checkered {
+.canvasFocused {
   background-color: #EAEAEA;
   background-image: -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
     75%, #DDD 75%, #DDD),

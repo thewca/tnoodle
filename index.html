@@ -12,6 +12,7 @@
 <script type="text/javascript" src="inc/RequestAnimationFrame.js"></script>
 <script type="text/javascript" src="inc/Stats.js"></script>
 
+<script src="inc/twisty_alg.js" type="text/javascript"></script>
 <script src="inc/twisty.js" type="text/javascript"></script>
 <script src="inc/twisty_demo.js" type="text/javascript"></script>
 
@@ -37,6 +38,12 @@
             <button id="alg_ccc">Cube-in-Cube-in-Cube</button>
             <button id="lucasparity">lucasparity</button>
             <button id="alg_superflip">Superflip</button>
+            
+            <br><br>
+            <input id="parse_alg" placeholder="Alg to parse."
+              type="text" value = "R U R' U R U2 R'"/>
+            <button id="parsed_alg1">Animate Alg (no slice moves)</button>
+            
           </p>
       </div>
 
@@ -49,6 +56,7 @@
       <div id="canvasPNG"></div>
       <br>
       <div id="timer">[Timer]</div>
+      [Doesn't recognize solved state yet.]
       </p>
       </div>
 
@@ -71,8 +79,8 @@
       </div>
 
     </div>
-
-    <div class="right checkered" id="twistyContainer"></div>
+    <div class="right checkered" id="twistyContainer">
+    </div>
 
   </div>
 

@@ -34,8 +34,6 @@ Math.TAU = Math.PI*2;
  * Initialization Methods
  */
 
-$(document).bind("keydown", keydownHandler);
-
 function initializeTwisty(twistyType) {
 
   twistyContainer = $("#twistyContainer").get(0);
@@ -60,16 +58,108 @@ function initializeTwisty(twistyType) {
   /*
    * Go!
    */
+  $(twistyContainer).empty();//.html("<input id='canvas_input'>");
+
+  var input = document.createElement('input');
+  input.setAttribute('id',"canvas_input");
+  twistyContainer.appendChild(input);
+  
   renderer = new THREE.CanvasRenderer();
   renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
-  $(twistyContainer).html("");
   renderer.domElement.setAttribute('id',"twistyCanvas");
+  
   twistyContainer.appendChild(renderer.domElement);
+
+  
+  //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
+  //TODO: 20110905 bug: after pressing esc, cube dragging doesn't work.
+  
+  $("#canvas_input").unbind('keydown', keydownHandler);
+  $("#canvas_input").bind("keydown", keydownHandler);
+
+  $("#twistyContainer").unbind("mousedown");
+  $("#twistyContainer").bind("mousedown", function() {
+    console.log("h");
+    $("#canvas_input").focus();
+    });
+
+  $("#canvas_input").unbind("focus");
+  $("#canvas_input").bind("focus", function (e) {
+    $("#twistyContainer").removeClass("checkered");
+    $("#twistyContainer").addClass("canvasFocused");
+    });
+  $("#canvas_input").unbind("blur");
+  $("#canvas_input").bind("blur", function (e) {
+    $("#twistyContainer").removeClass("canvasFocused");
+    $("#twistyContainer").addClass("checkered");
+    });
+  $("#canvas_input").focus();
+
+  document.getElementById("twistyCanvas").addEventListener( 'mousedown', onDocumentMouseDown, false );
+  document.getElementById("twistyCanvas").addEventListener( 'touchstart', onDocumentTouchStart, false );
+  document.getElementById("twistyCanvas").addEventListener( 'touchmove', onDocumentTouchMove, false );
+  
 
   startStats();
   render();
 
 };
+
+
+
+
+var theta = 0;
+var mouseXLast = 0;
+
+function cam(deltaTheta) {
+  theta += deltaTheta;
+  moveCamera(theta);
+}
+
+function onDocumentMouseDown( event ) {
+  $("#cubeDimension").blur(); 
+  event.preventDefault();
+  document.getElementById("twistyCanvas").addEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.getElementById("twistyCanvas").addEventListener( 'mouseup', onDocumentMouseUp, false );
+  document.getElementById("twistyCanvas").addEventListener( 'mouseout', onDocumentMouseOut, false );
+  mouseXLast = event.clientX;
+}
+
+function onDocumentMouseMove( event ) {
+  mouseX = event.clientX;
+  cam((mouseXLast - mouseX)/256);
+  mouseXLast = mouseX;
+}
+
+function onDocumentMouseUp( event ) {
+  document.getElementById("twistyCanvas").removeEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.getElementById("twistyCanvas").removeEventListener( 'mouseup', onDocumentMouseUp, false );
+  document.getElementById("twistyCanvas").removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
+
+function onDocumentMouseOut( event ) {
+  document.getElementById("twistyCanvas").removeEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.getElementById("twistyCanvas").removeEventListener( 'mouseup', onDocumentMouseUp, false );
+  document.getElementById("twistyCanvas").removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
+
+function onDocumentTouchStart( event ) {
+  if ( event.touches.length == 1 ) {
+    event.preventDefault();
+    mouseXLast = event.touches[0].pageX;
+  }
+}
+
+function onDocumentTouchMove( event ) {
+  if ( event.touches.length == 1 ) {
+    event.preventDefault();
+    mouseX = event.touches[0].pageX;
+    cam((mouseXLast - mouseX)/256);
+    mouseXLast = mouseX;
+  }
+}
+
+
 
 function render() {
   renderer.render(scene, camera);
@@ -93,6 +183,10 @@ function moveCamera(theta) {
 
 var startTimingFlag = false;
 function keydownHandler(e) {
+  
+  //TODO 20110906: Consider not clearing?
+  $("#canvas_input").val("");
+  
   if (startTimingFlag) {
     startTiming();
     startTimingFlag = false;
@@ -146,7 +240,7 @@ function movesToString(moves) {
   for (move in moves) {
     str += moveToString(moves[move]) + moveDelimiter;
   }
-  // TODO: Use array.join.
+  //TODO: Use array.join.
   return str;
 }
 
@@ -185,10 +279,13 @@ function startMove() {
 
 }
 
+//TODO 20110906: Handle illegal moves robustly.
 function addMoves(moves) {
 
   moveQueue = moveQueue.concat(moves);
-  startAnimation();
+  if (moveQueue.length > 0) {
+    startAnimation();
+  }
 
 }
 
@@ -517,12 +614,20 @@ function createCubeTwisty(twistyParameters) {
 
 
     for (entry in state) {
+      
+      // Support negative layer indices (e.g. for rotations)
+      //TODO: Bug 20110906, if negative index ends up the same as start index, the anmation is iffy. 
+      var layerStart = currentMove[0];
+      var layerEnd = currentMove[1];
+      if (layerEnd < 0) {
+        layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
+      }
 
       var layer = matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]);
       if (
-          layer < twisty["options"]["dimension"] - 2*currentMove[0] + 2.5
+          layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
           &&
-          layer > twisty["options"]["dimension"] - 2*currentMove[1] - 0.5
+          layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
       ) {
         var roty = new THREE.Matrix4();
         roty.copy(rott);
