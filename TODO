@@ -138,6 +138,8 @@
 
 -infinite seeded scrambles
 
+-pressing escape to close tnoodle popup doesn't restore focus
+
 ### TnoodleMakeTools
 -create a *fast* cgi script...
 -nuke createScramblers() static method in every scramble plugin

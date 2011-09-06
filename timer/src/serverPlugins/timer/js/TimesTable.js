@@ -144,7 +144,7 @@ var TimesTable = new Class({
 			resetFormatButton.setStyle('display', 'none');
 			statsPopup.resize();
 
-			statsArea.value = table.session.formatTimes(statsPopup.raSize, getFormat());
+			statsArea.value = table.session.formatTimes(statsPopup.lastTimeIndex, statsPopup.raSize, getFormat());
 			statsArea.focus();
 		}
 		statsTab.addEvent('click', activateStats);
@@ -174,6 +174,7 @@ var TimesTable = new Class({
 			statsArea.focus();
 		}
 		configureTab.addEvent('click', activateConfigure);
+
 		configureTab.appendText('Format');
 		statsTabs.appendChild(statsTab);
 		statsTabs.appendChild(configureTab);
@@ -197,8 +198,11 @@ var TimesTable = new Class({
 		tabArea.appendChild(legend);
 		tabArea.appendChild(statsArea);
 
-		function showStats(raSize) {
-			statsPopup.raSize = raSize;
+		this.raBoxClicked = function(e) {
+			statsPopup.raSize = this.raSize();
+			statsPopup.lastTimeIndex = this.lastTimeIndex();
+			console.log(this.raSize);
+			console.log("*raSize:" + statsPopup.raSize);
 
 			legend.empty();
 			var ul = new Element('ul');
@@ -215,7 +219,7 @@ var TimesTable = new Class({
 			
 			statsPopup.show();
 			activateStats();
-		}
+		};
 
 		var oldRASize = null;
 		var selectedRA_TD = null;
@@ -234,20 +238,13 @@ var TimesTable = new Class({
 			// are set in infoRow.refresh.
 			var key = table.cols[index];
 			if(key.match(/^ra[0-9]+$/)) {
-				var raSize = key.substring(2).toInt();
-				td.addEvent('click', function(e) {
-					if(this.getStyle('cursor') == 'pointer') {
-						// Clicking is only enabled if the cursor is a pointer
-						showStats(raSize);
-					}
-				});
+				td.raSize = function() { return key.substring(2).toInt(); };
+				td.lastTimeIndex = function() { return table.session.bestWorst(key).best.index };
+				td.addEvent('click', table.raBoxClicked);
 			} else if(key == "index") {
-				td.addEvent('click', function(e) {
-					if(this.getStyle('cursor') == 'pointer') {
-						// Clicking is only enabled if the cursor is a pointer
-						showStats(-1);
-					}
-				});
+				td.raSize = function() { return -1; }
+				td.lastTimeIndex = function() { return -1; }
+				td.addEvent('click', table.raBoxClicked);
 			} else if(key == "centis") {
 				td.addEvent('click', function(e) {
 					var bestIndex = table.session.bestWorst(key).best.index;
@@ -899,17 +896,17 @@ var TimesTable = new Class({
 			var cells = tr.getChildren();
 			for(var col = 0; col < table.cols.length; col++) {
 				var key = table.cols[col];
-				try{
+				//try{
 					cells[col].key = key;
-				} catch(err) {
-					console.log(err);
-					//TODO - debugging code to hopefully figure out intermittent failure
-					console.log(tr);
-					console.log(cells);
-					console.log(col);
-					console.log(table.cols);
-					console.log(key);
-				}
+				//} catch(err) {
+					//console.log(err);
+					////TODO - debugging code to hopefully figure out intermittent failure
+					//console.log(tr);
+					//console.log(cells);
+					//console.log(col);
+					//console.log(table.cols);
+					//console.log(key);
+				//}
 				if(time === null) {
 					if(key == 'centis') {
 						if(tr.selected) {
@@ -959,29 +956,38 @@ var TimesTable = new Class({
 							}
 							if(table.sorted.index === 0) {
 								var firstSolve = session.attemptCount()-selectedRASize;
-								var lastSolve = session.attemptCount()-1;
-								if(firstSolve <= time.index && time.index <= lastSolve) {
+								var lastTimeIndex = session.attemptCount()-1;
+								if(firstSolve <= time.index && time.index <= lastTimeIndex) {
 									cells[col].addClass('currentRA');
 								}
 								
 								if(table.sorted.reverse) {
 									//the top/bottom are switched
-									var temp = lastSolve;
-									lastSolve = firstSolve;
+									var temp = lastTimeIndex;
+									lastTimeIndex = firstSolve;
 									firstSolve = temp;
 								}
 								
 								if(time.index == firstSolve) {
 									cells[col].addClass('topCurrentRA');
-								} else if(time.index == lastSolve) {
+								} else if(time.index == lastTimeIndex) {
 									cells[col].addClass('bottomCurrentRA');
 								}
 							}
 						}
 					}
 				} else {
+					var val = time.format(key);
 					cells[col].set('html', time.format(key));
+					var raSize = parseInt(key.substring(2), 10);
+					console.log(key.substring(2));
 					var bestIndex = session.bestWorst(key).best.index;
+					cells[col].raSize = function() { return raSize; };
+					cells[col].lastTimeIndex = function() { return tr.time.index; };
+					if(bestIndex != null && val != "") {
+						cells[col].setStyle('cursor', 'pointer');
+						cells[col].addEvent('click', this.raBoxClicked);
+					}
 					cells[col].removeClass('bestRA');
 					if(bestIndex == time.index) {
 						cells[col].addClass('bestRA');

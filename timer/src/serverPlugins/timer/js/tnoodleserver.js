@@ -714,9 +714,9 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		server.saveSessions();
 	};
 	//TODO - cache!
-	this.bestWorst = function(key, lastSolve, size) {
-		if(!$chk(lastSolve) || !$chk(size)) {
-			lastSolve = this.times.length-1;
+	this.bestWorst = function(key, lastTimeIndex, size) {
+		if(!$chk(lastTimeIndex) || !$chk(size)) {
+			lastTimeIndex = this.times.length-1;
 			size = this.times.length;
 		}
 		if(key == 'sessionAve' || key == 'date' || key == 'tags') {
@@ -731,7 +731,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		}
 		var minKey = Infinity, maxKey = 0;
 		var minIndex = null, maxIndex = null;
-		for(var i = lastSolve-size+1; i <= lastSolve; i++) {
+		for(var i = lastTimeIndex-size+1; i <= lastTimeIndex; i++) {
 			var val = key ? this.times[i][key] : this.times[i].centis;
 			if(val !== null) {
 				//for min, we choose the *first* guy we can find
@@ -757,12 +757,12 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			worst: { centis: maxKey, index: maxIndex }
 		};
 	};
-	this.stdDev = function(lastSolve, count) {
-		if(!lastSolve) {
-			lastSolve = this.times.length-1;
+	this.stdDev = function(lastTimeIndex, count) {
+		if(!lastTimeIndex) {
+			lastTimeIndex = this.times.length-1;
 			count = this.times.length;
 		}
-		var times = trimSolves(lastSolve, count);
+		var times = trimSolves(lastTimeIndex, count);
 		if(times === null || times.length === 0) {
 			return null;
 		}
@@ -783,17 +783,17 @@ tnoodle.Session = function(server, id, puzzle, event) {
 	
 	var THIS = this;
 	
-	function computeMedian(lastSolve, size) {
-		return computeRA(lastSolve, size, 2*Math.floor((size-1)/2));
+	function computeMedian(lastTimeIndex, size) {
+		return computeRA(lastTimeIndex, size, 2*Math.floor((size-1)/2));
 	}
-	function computeRA(lastSolve, size, trimmed) {
-		var times = trimSolves(lastSolve, size, trimmed);
+	function computeRA(lastTimeIndex, size, trimmed) {
+		var times = trimSolves(lastTimeIndex, size, trimmed);
 		if(times === null) {
 			return null;
 		}
 		return times.map(function(a) { return a.centis; }).average();
 	}
-	function trimSolves(lastSolve, size, trimmed) {
+	function trimSolves(lastTimeIndex, size, trimmed) {
 		if(!$chk(trimmed)) {
 			trimmed = tnoodle.TRIMMED(size);
 		}
@@ -802,12 +802,12 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			return null;
 		}
 
-		var firstSolve = lastSolve - size + 1;
+		var firstSolve = lastTimeIndex - size + 1;
 		if(firstSolve < 0 || size === 0) {
 			return null; //not enough solves
 		}
 		
-		var times = THIS.times.slice(firstSolve, lastSolve+1);
+		var times = THIS.times.slice(firstSolve, lastTimeIndex+1);
 		times.sort(function(a, b) { return a.centis - b.centis; });
 		times.splice(0, trimmed/2); //trim the best trimmed/2 solves
 		times.splice(times.length - trimmed/2, times.length); //trim the worst trimmed/2 solves
@@ -937,32 +937,30 @@ tnoodle.Session = function(server, id, puzzle, event) {
 	str += 'Worst time: %w\n\n';
 	str += '%T';
 	this.defaultFormatStr = str;
-	this.formatTimes = function(raSize, formatStr) {
-		var ra = (raSize > 0);
-		var lastSolve;
-		if(!ra) {
-			lastSolve = this.times.length-1;
+	this.formatTimes = function(lastTimeIndex, raSize, formatStr) {
+		if(!$chk(lastTimeIndex) || !$chk(raSize)) {
+			lastTimeIndex = this.times.length-1;
 			raSize = this.times.length;
-		} else {
-			lastSolve = this.bestWorst('ra'+raSize).best.index;
 		}
+		console.log('lastTimeIndex:' + lastTimeIndex);
+		console.log('raSize:' + raSize);
 		var f = server.formatTime;
 
 		var date = this.getDate();
-		var solves = this.solveCount(lastSolve, raSize);
+		var solves = this.solveCount(lastTimeIndex, raSize);
 		var attempts = raSize;
-		var average = f(computeRA(lastSolve, raSize));
-		var stdDev = f(this.stdDev(lastSolve, raSize));
+		var average = f(computeRA(lastTimeIndex, raSize));
+		var stdDev = f(this.stdDev(lastTimeIndex, raSize));
 
-		var best_worst = this.bestWorst('centis', lastSolve, raSize);
+		var best_worst = this.bestWorst('centis', lastTimeIndex, raSize);
 		var best = f(best_worst.best.centis);
 		var worst = f(best_worst.worst.centis);
 
 		var detailedTimes = '';
 		var simpleTimes = '';
 		// NOTE: countingTimes may be null if we try to trim too many solves
-		var countingTimes = trimSolves(lastSolve, raSize);
-		var firstSolve = lastSolve-raSize+1;
+		var countingTimes = trimSolves(lastTimeIndex, raSize);
+		var firstSolve = lastTimeIndex-raSize+1;
 		var tagCounts = {};
 		for(var offset = 0; offset < raSize; offset++) {
 			var i = firstSolve+offset;

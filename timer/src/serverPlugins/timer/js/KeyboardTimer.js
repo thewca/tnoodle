@@ -290,7 +290,9 @@ var KeyboardTimer = new Class({
 		setTimeout(addTime, 0);
 	},
 	hasDelayPassed: function() {
-		return new Date().getTime() - this.timerStop > this.delay;
+		var timeSinceStoppingTimer = new Date().getTime() - this.timerStop;
+		assert(timeSinceStoppingTimer >= 0);
+		return timeSinceStoppingTimer > this.delay;
 	},
 	isFocused: function() {
 		// This is kinda weird, we want to avoid activating the timer 

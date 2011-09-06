@@ -210,6 +210,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 			Scrambler scrambler = lazyScrambler.cachedInstance();
 
 			String seed = query.get("seed");
+			boolean showIndices = query.get("indices") != null;
 			int count = Math.min(toInt(query.get("count"), 1), MAX_COUNT);
 			String[] scrambles;
 			if(seed != null) {
@@ -223,7 +224,11 @@ public class ScrambleHandler extends SafeHttpHandler {
 				for(int i = 0; i < scrambles.length; i++) {
 					String scramble = scrambles[i];
 					// We replace newlines with spaces
-					sb.append(i + ". " + scramble.replaceAll("\n", " ")).append("\r\n");
+					if(showIndices) {
+						sb.append((i+1)).append(". ");
+					}
+					sb.append(scramble.replaceAll("\n", " "));
+					sb.append("\r\n");
 				}
 				sendText(t, sb.toString());
 			} else if(ext.equals("json")) {
