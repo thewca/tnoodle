@@ -114,6 +114,7 @@
 	+ant, ant -> the second call does nothing! =)
 	+get rid of Main-Class from jars that don't need them
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
++pressing escape to close tnoodle popup doesn't restore focus
 
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
@@ -138,7 +139,6 @@
 
 -infinite seeded scrambles
 
--pressing escape to close tnoodle popup doesn't restore focus
 
 ### TnoodleMakeTools
 -create a *fast* cgi script...

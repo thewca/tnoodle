@@ -118,7 +118,17 @@ var TimesTable = new Class({
 			}
 		}.bind(this);
 
-		var statsPopup = tnoodle.tnt.createPopup(null, null, 0.7);
+		var statsArea = document.createElement('textarea');
+		statsArea.setStyle('border', 'none');
+		statsArea.setStyle('resize', 'none');
+		statsArea.setAttribute('wrap', 'off');
+
+		function onHide() {
+			// When closing the the stats popup by pressing escape, the textarea
+			// retains focus. Here we force it to give up focus.
+			statsArea.blur();
+		}
+		var statsPopup = tnoodle.tnt.createPopup(null, onHide, 0.7);
 		statsPopup.resize = function() {
 			var size = statsPopup.getSize();
 			var height = size.y - 5*2 - statsTabs.getSize().y;
@@ -179,11 +189,6 @@ var TimesTable = new Class({
 		statsTabs.appendChild(statsTab);
 		statsTabs.appendChild(configureTab);
 		statsPopup.appendChild(statsTabs);
-
-		var statsArea = document.createElement('textarea');
-		statsArea.setStyle('border', 'none');
-		statsArea.setStyle('resize', 'none');
-		statsArea.setAttribute('wrap', 'off');
 
 		var legend = new Element('div');
 		legend.setStyle('border-bottom', '1px solid black');
