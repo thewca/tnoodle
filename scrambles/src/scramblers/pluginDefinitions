@@ -2,8 +2,11 @@
 3x3x3 scramblers.CubeScrambler(3)
 4x4x4 scramblers.CubeScrambler(4)
 5x5x5 scramblers.CubeScrambler(5)
+6x6x6 scramblers.CubeScrambler(6)
+7x7x7 scramblers.CubeScrambler(7)
 
-sq1 scramblers.SquareOneScrambler()
+sq1 scramblers.SquareOneUniformScrambler()
+#sq1fast scramblers.SquareOneScrambler()
 pyram scramblers.PyraminxScrambler()
 mega scramblers.MegaminxScrambler()
 clock scramblers.ClockScrambler()
