@@ -1,6 +1,7 @@
 package org.squareone.twophase;
 
 import java.io.PrintStream;
+import java.io.ByteArrayOutputStream;
 
 public class MoveList {
 
@@ -52,36 +53,44 @@ public class MoveList {
 	}
 
 	public void printGen(PrintStream os){
+		ByteArrayOutputStream outArr = new ByteArrayOutputStream();
+		PrintStream out = new PrintStream(outArr);
 		int mu = 0, md = 0;
 		int i;
 		for (i = lngth - 1; i >= 0; i--) {
 			if (list[i] == 0) {
-				outputmove(os, mu, md);
+				outputmove(out, mu, md);
 				mu = md = 0;
-				os.print(" /");
+				out.print(" /");
 			} else if (list[i] > 0) {
 				mu = -list[i];
 			} else {
 				md = list[i];
 			}
 		}
-		outputmove(os, mu, md);
+		outputmove(out, mu, md);
+
+		os.print(outArr.toString().trim());
 	}
 
 
 	public void print(PrintStream os){
+		ByteArrayOutputStream outArr = new ByteArrayOutputStream();
+		PrintStream out = new PrintStream(outArr);
 		int b,c;
 		for(int a=0; a<lngth; a++){
 			b=list[a];
-			if(b==0) os.print(" /");
+			if(b==0) out.print(" /");
 			else if(b>0){
 				if(a<lngth-1 && (c=list[a+1])<0){
-					outputmove(os,b,-c); a++;
-				}else outputmove(os,b,0);
-			}else if(b<0) outputmove(os,0,-b);
+					outputmove(out,b,-c); a++;
+				}else outputmove(out,b,0);
+			}else if(b<0) outputmove(out,0,-b);
 				
 		}
 		//os.println("");
 		//os.println("    [" + lngthtwst + '|' + lngth + ']');
+
+		os.print(outArr.toString().trim());
 	}
 }
