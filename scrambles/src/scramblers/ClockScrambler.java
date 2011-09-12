@@ -2,6 +2,7 @@ package scramblers;
 
 import java.util.Random;
 import java.util.HashMap;
+import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.AffineTransform;
 import java.awt.Graphics2D;
@@ -97,7 +98,22 @@ public class ClockScrambler extends Scrambler {
 	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
 		return new HashMap<String, GeneralPath>();
 	}
+	private static final int[][] moves = {{1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0},
+		                 {0,0,0,0,0,0,1,0,1,   0, 0, 0,-1,-1,-1,-1,-1,-1},
+		                 {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0},
+		                 {1,0,0,0,0,0,1,0,0,   0,-1,-1, 0,-1,-1, 0,-1,-1},
+		                 {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},
+		                 {1,0,1,0,0,0,0,0,0,  -1,-1,-1,-1,-1,-1, 0, 0, 0},
+		                 {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},
+		                 {0,0,1,0,0,0,0,0,1,  -1,-1, 0,-1,-1, 0,-1,-1, 0},
+		                 {0,1,1,1,1,1,1,1,1,  -1, 0, 0, 0, 0, 0,-1, 0,-1},
+		                 {1,1,0,1,1,1,1,1,1,   0, 0,-1, 0, 0, 0,-1, 0,-1},
+		                 {1,1,1,1,1,1,1,1,0,  -1, 0,-1, 0, 0, 0, 0, 0,-1},
+		                 {1,1,1,1,1,1,0,1,1,  -1, 0,-1, 0, 0, 0,-1, 0, 0},
+		                 {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},
+		                 {1,0,1,0,0,0,1,0,1,  -1,-1,-1,-1,-1,-1,-1,-1,-1}};
 	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		//Ported from http://www.worldcubeassociation.org/regulations/scrambles/scramble_clock.htm
 		/* Javascript written by Jaap Scherphuis,  jaapsch a t yahoo d o t com */
@@ -106,20 +122,6 @@ public class ClockScrambler extends Scrambler {
 		int[] seq = new int[14];
 		boolean[] pins = new boolean[4];
 		int[] posit = {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
-		int[][] moves = {{1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0}, // TODO: There should be a better place to put this
-		                 {0,0,0,0,0,0,1,0,1,   0, 0, 0,-1,-1,-1,-1,-1,-1},
-		                 {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0}, // Should it be static ?
-		                 {1,0,0,0,0,0,1,0,0,   0,-1,-1, 0,-1,-1, 0,-1,-1},
-		                 {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1}, // Should it be final ?
-		                 {1,0,1,0,0,0,0,0,0,  -1,-1,-1,-1,-1,-1, 0, 0, 0},
-		                 {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1}, // Help !
-		                 {0,0,1,0,0,0,0,0,1,  -1,-1, 0,-1,-1, 0,-1,-1, 0},
-		                 {0,1,1,1,1,1,1,1,1,  -1, 0, 0, 0, 0, 0,-1, 0,-1},
-		                 {1,1,0,1,1,1,1,1,1,   0, 0,-1, 0, 0, 0,-1, 0,-1},
-		                 {1,1,1,1,1,1,1,1,0,  -1, 0,-1, 0, 0, 0, 0, 0,-1},
-		                 {1,1,1,1,1,1,0,1,1,  -1, 0,-1, 0, 0, 0,-1, 0, 0},
-		                 {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},
-		                 {1,0,1,0,0,0,1,0,1,  -1,-1,-1,-1,-1,-1,-1,-1,-1}};
 
 
 		parseScramble( scramble, seq, pins );
@@ -140,6 +142,9 @@ public class ClockScrambler extends Scrambler {
 	}
 
 	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) {
+		if(scramble == null || scramble.length() == 0) {
+			return;
+		}
 
 		int i;
 
@@ -211,7 +216,6 @@ public class ClockScrambler extends Scrambler {
 	}
 
 	protected void drawClock( Graphics2D g, int clock, int position, HashMap<String, Color> colorScheme ) {
-
 		AffineTransform old = g.getTransform();
 
 		if( clock < 9 ){
