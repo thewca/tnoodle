@@ -21,86 +21,93 @@ import java.util.regex.Pattern;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 
-public class SquareOneScrambler extends Scrambler {
-	private static final int length = 40;
+import org.squareone.twophase.Tables;
+import org.squareone.twophase.Position1;
+import org.squareone.twophase.Engine;
+
+
+public class SquareOneUniformScrambler extends Scrambler {
+
+	private static final int depth = 30;
+	private static final long timeOut = 30; //in sec
+	private static final boolean twistablePosition=true; // consider only twistable scramble positions
+
 	private static final int radius = 32;
-	private static final int gap = 5;
 	private boolean turnTop = true, turnBottom = true;
 	
 	//TODO these variables aren't thread safe
 	private int twistCount; //this will tell us the state of the middle pieces
-	private int[] state, turns;
-	private boolean slashes;
+	private int[] state;
 
-	public static synchronized SquareOneScrambler[] createScramblers() {
-		return new SquareOneScrambler[] { new SquareOneScrambler(false), new SquareOneScrambler(true) };
+	public static synchronized SquareOneUniformScrambler[] createScramblers() {
+		return new SquareOneUniformScrambler[] { new SquareOneUniformScrambler() };
+	}
+
+	private Engine eng;
+	private Position1 p1;
+	public SquareOneUniformScrambler() {
+		//initialise pruning and transition tables
+		Tables.initialise();
+
+		//get instance of search engine
+		p1 = new Position1();
+
+		eng = new Engine();
 	}
 	
-	public SquareOneScrambler() {
-		this(true);
+	protected synchronized String generateScramble(Random r) {
+		char posstr[] = new char[25];
+
+		//generate random position
+		randomPosition(posstr, r, twistablePosition);
+
+		//parse position
+		p1.initialise(posstr);
+
+		//search for solution
+		return eng.doSearch(p1,depth,timeOut);
 	}
-	public SquareOneScrambler(boolean slashes) {
-		this.slashes = slashes;
-	}
-	
+
 	//Ported from http://www.worldcubeassociation.org/regulations/scrambles/scramble_square1.htm by Jeremy Fleischman
 	/* Javascript written by Jaap Scherphuis,  jaapsch a t yahoo d o t com */
 	private void initializeImage() {
 		twistCount = 0;
 		state = new int[]{ 0,0,1,2,2,3,4,4,5,6,6,7,8,9,9,10,11,11,12,13,13,14,15,15 }; //piece array
-		turns = new int[length];
 	}
 
-	protected synchronized String generateScramble(Random r) {
-		initializeImage();
-		int i,move,ls;
-		ls=-1;
-		for(i = 0; i < length; i++) {
-			do {
-				if(ls==0) {
-					move=r.nextInt(22)-11;
-					if(move>=0) move++;
-				} else if(ls==1) {
-					move=r.nextInt(12)-11;
-				} else if(ls==2) {
-					move=0;
-				} else {
-					move=r.nextInt(23)-11;
-				}
-				//we don't want to apply to restriction to the bottom if we're not allowed to turn the top
-				//if we did, we might loop forever making scrambles for a bandaged square 1
-			} while( (turnTop && twistCount>1 && move>=-6 && move<0) || domove(i, move));
-			if(move>0) ls=1;
-			else if(move<0) ls=2;
-			else { ls=0; }
+	private void randomPosition(char[] posstr, Random r, boolean twistable){
+
+		int i, j, k;
+		int tmp[] = new int[16];
+
+		do {
+
+		//mix array
+		for (i = 0; i < 16; i++) tmp[i] = i;
+		for (i = 0; i < 16; i++) {
+			j = r.nextInt(16 - i);
+			k = tmp[i];
+			tmp[i] = tmp[i + j];
+			tmp[i + j] = k;
 		}
-		return finalizeScrambleString();
-	}
 
-	private String finalizeScrambleString() {
-		StringBuilder scram = new StringBuilder();
-		int l=-1;
-		for(int i=0; i < turns.length; i++) {
-			int k=turns[i];
-			if(k==0) {
-				if(l==-1) scram.append(" (0,0)");
-				if(l==1) scram.append("0)");
-				if(l==2) scram.append(")");
-				if(l != 0 && slashes)
-					scram.append(" /");
-				l=0;
-			}else if(k>0) {
-				scram.append(" (").append(k > 6 ? k-12 : k).append(",");
-				l=1;
-			}else if(k<0) {
-				if(l<=0) scram.append(" (0,");
-				scram.append(k <= -6 ? k+12 : k);
-				l=2;
+		//store
+		for (i = 0, j = 0; i < 16; i++) {
+			if (tmp[i] > 7){
+				posstr[j++] = (char)(tmp[i] - 8 + (int)'A');
+				posstr[j++] = (char)(tmp[i] - 8 + (int)'A');
+			}
+			else{
+				posstr[j++] = (char)(tmp[i] + (int)'1');
 			}
 		}
-		if(l==1) scram.append("0");
-		if(l!=0) scram.append(")");
-		return scram.toString().trim();
+		// test correctness
+		} while ( posstr[11] == posstr[12] || (twistable && (posstr[17] == posstr[18] || posstr[5] == posstr[6] )));
+
+		posstr[24] = r.nextInt(2) != 0 ? '-' : '/';
+
+		System.out.print( "Generated position : ");
+		System.out.println( posstr );
 	}
 	
 	//returns true if invalid, false if valid
@@ -143,7 +150,6 @@ public class SquareOneScrambler extends Scrambler {
 				if(c==11)c=0; else c++;
 			}
 		}
-		turns[index]=m;
 		return false;
 	}
 	//**********END JAAP's CODE***************
@@ -155,7 +161,6 @@ public class SquareOneScrambler extends Scrambler {
 			return true;
 		int length = 0;
 		String[] trns = scramble.split("(\\(|\\)|\\( *\\))", -1);
-		turns = new int[trns.length*3]; //definitely big enough, no need to trim
 		for(int ch = 0; ch < trns.length; ch++) {
 			Matcher match;
 			if(trns[ch].matches(" *")) {
@@ -171,8 +176,6 @@ public class SquareOneScrambler extends Scrambler {
 					return false;
 				if(bot != 0 && domove(length++, bot-12))
 					return false;
-				if(!slashes)
-					domove(length++, 0);
 			} else
 				return false;
 		}
@@ -180,15 +183,15 @@ public class SquareOneScrambler extends Scrambler {
 		return true;
 	}
 
-	private void drawFace(Graphics2D g, int[] face, double x, double y, int gap, int radius, Color[] colorScheme) {
+	private void drawFace(Graphics2D g, int[] face, double x, double y, int radius, Color[] colorScheme) {
 		for(int ch = 0; ch < 12; ch++) {
 			if(ch < 11 && face[ch] == face[ch+1])
 				ch++;
-			drawPiece(g, face[ch], x, y, gap, radius, colorScheme);
+			drawPiece(g, face[ch], x, y, radius, colorScheme);
 		}
 	}
 
-	private int drawPiece(Graphics2D g, int piece, double x, double y, int gap,	int radius, Color[] colorScheme) {
+	private int drawPiece(Graphics2D g, int piece, double x, double y, int radius, Color[] colorScheme) {
 		boolean corner = isCornerPiece(piece);
 		int degree = 30 * (corner ? 2 : 1);
 		GeneralPath[] p = corner ? getCornerPoly(x, y, radius) : getWedgePoly(x, y, radius);
@@ -282,19 +285,16 @@ public class SquareOneScrambler extends Scrambler {
 		return new GeneralPath[]{ p, side1, side2 };
 	}
 
-	private static Dimension getImageSize(int gap, int radius) {
-		return new Dimension(getWidth(gap, radius), getHeight(gap, radius));
+	private static Dimension getImageSize(int radius) {
+		return new Dimension(getWidth(radius), getHeight(radius));
 	}
 	private static final double RADIUS_MULTIPLIER = Math.sqrt(2) * Math.cos(Math.toRadians(15));
-	private static int getWidth(int gap, int radius) {
+	private static int getWidth(int radius) {
 		return (int) (2 * RADIUS_MULTIPLIER * multiplier * radius);
 	}
-	private static int getHeight(int gap, int radius) {
+	private static int getHeight(int radius) {
 		return (int) (4 * RADIUS_MULTIPLIER * multiplier * radius);
 	}
-//	public static int getNewUnitSize(int width, int height, int gap, String variation) {
-//		return (int) Math.round(Math.min(width / (2 * RADIUS_MULTIPLIER * multiplier), height / (4 * RADIUS_MULTIPLIER * multiplier)));
-//	}
 
 	//x, y are the coordinates of the center of the square
 	private static Area getSquare(double x, double y, double half_width) {
@@ -323,7 +323,7 @@ public class SquareOneScrambler extends Scrambler {
 		for(int i = 0; i < colorScheme.length; i++) {
 			colorScheme[i] = colorSchemeMap.get("LBRFUD".charAt(i)+"");
 		}
-		Dimension dim = getImageSize(gap, radius);
+		Dimension dim = getImageSize(radius);
 		int width = dim.width;
 		int height = dim.height;
 
@@ -350,12 +350,12 @@ public class SquareOneScrambler extends Scrambler {
 		double y = height / 4.0;
 		AffineTransform old = g.getTransform();
 		g.rotate(Math.toRadians(90 + 15), x, y);
-		drawFace(g, state, x, y, gap, radius, colorScheme);
+		drawFace(g, state, x, y, radius, colorScheme);
 		g.setTransform(old);
 
 		y *= 3.0;
 		g.rotate(Math.toRadians(-90 - 15), x, y);
-		drawFace(g, Arrays.copyOfRange(state, 12, state.length), x, y, gap, radius, colorScheme);
+		drawFace(g, Arrays.copyOfRange(state, 12, state.length), x, y, radius, colorScheme);
 	}
 
 	private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
@@ -375,8 +375,8 @@ public class SquareOneScrambler extends Scrambler {
 	@Override
 	//***NOTE*** this works only for the simple case where the puzzle is a cube
 	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-		int width = getWidth(gap, radius);
-		int height = getHeight(gap, radius);
+		int width = getWidth(radius);
+		int height = getHeight(radius);
 		double half_width = (radius * RADIUS_MULTIPLIER) / Math.sqrt(2);
 
 		Area up = getSquare(width / 2.0, height / 4.0, half_width);
@@ -404,22 +404,16 @@ public class SquareOneScrambler extends Scrambler {
 
 	@Override
 	protected Dimension getPreferredSize() {
-		return getImageSize(gap, radius);
+		return getImageSize(radius);
 	}
 
 	@Override
 	public String getLongName() {
-		if(slashes)
-			return "Square-1";
-		else
-			return "Square-1 (wca)";
+		return "Square-1 uniform";
 	}
 
 	@Override
 	public String getShortName() {
-		if(slashes)
-			return "sq1";
-		else
-			return "sq1wca";
+		return "sq1uni";
 	}
 }
