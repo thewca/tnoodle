@@ -3,15 +3,33 @@ package scramblers;
 import java.util.Random;
 import java.util.HashMap;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.AffineTransform;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Color;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+
+import static net.gnehzr.tnoodle.utils.Utils.toColor;
+
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 public class ClockScrambler extends Scrambler {
 //	private boolean verbose = false;
+	private static final int radius = 70;
+	private static final int clockRadius = 14;
+	private static final int clockOuterRadius = 20;
+	private static final int pointRadius = (int)((clockRadius + clockOuterRadius) / 2);
+	private static final int pointSize = 1;
+	private static final int arrowHeight = 10;
+	private static final int arrowRadius = 2;
+	private static final int pinRadius = 5;
+	private static final double arrowAngle = Math.PI / 2 - Math.acos( (double)arrowRadius / (double)arrowHeight );
+
+	private static final int gap = 5;
 	
 	public static synchronized ClockScrambler[] createScramblers() {
 		return new ClockScrambler[] { new ClockScrambler() };
@@ -58,13 +76,212 @@ public class ClockScrambler extends Scrambler {
 	}
 
 	protected Dimension getPreferredSize() {
-		return new Dimension(0, 0);
+		return new Dimension(4*(radius+gap), 2*(radius+gap));
 	}
+
+	private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
+	static {
+		defaultColorScheme.put("Front", toColor("3375b2"));
+		defaultColorScheme.put("Back", toColor("b3c5c7"));
+		defaultColorScheme.put("FrontClock", toColor("94c5ca"));
+		defaultColorScheme.put("BackClock", toColor("1d3770"));
+		defaultColorScheme.put("Hand", Color.YELLOW);
+		defaultColorScheme.put("HandBorder", Color.RED);
+		defaultColorScheme.put("PinUp", Color.YELLOW);
+		defaultColorScheme.put("PinDown", toColor("ffff50"));
+	}
+	@Override
 	public HashMap<String, Color> getDefaultColorScheme() {
-		return new HashMap<String, Color>();
+		return new HashMap<String, Color>(defaultColorScheme);
 	}
 	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
 		return new HashMap<String, GeneralPath>();
 	}
-	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {}
+	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+
+		//Ported from http://www.worldcubeassociation.org/regulations/scrambles/scramble_clock.htm
+		/* Javascript written by Jaap Scherphuis,  jaapsch a t yahoo d o t com */
+
+		int i,j;
+		int[] seq = new int[14];
+		boolean[] pins = new boolean[4];
+		int[] posit = {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
+		int[][] moves = {{1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0}, // TODO: There should be a better place to put this
+		                 {0,0,0,0,0,0,1,0,1,   0, 0, 0,-1,-1,-1,-1,-1,-1},
+		                 {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0}, // Should it be static ?
+		                 {1,0,0,0,0,0,1,0,0,   0,-1,-1, 0,-1,-1, 0,-1,-1},
+		                 {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1}, // Should it be final ?
+		                 {1,0,1,0,0,0,0,0,0,  -1,-1,-1,-1,-1,-1, 0, 0, 0},
+		                 {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1}, // Help !
+		                 {0,0,1,0,0,0,0,0,1,  -1,-1, 0,-1,-1, 0,-1,-1, 0},
+		                 {0,1,1,1,1,1,1,1,1,  -1, 0, 0, 0, 0, 0,-1, 0,-1},
+		                 {1,1,0,1,1,1,1,1,1,   0, 0,-1, 0, 0, 0,-1, 0,-1},
+		                 {1,1,1,1,1,1,1,1,0,  -1, 0,-1, 0, 0, 0, 0, 0,-1},
+		                 {1,1,1,1,1,1,0,1,1,  -1, 0,-1, 0, 0, 0,-1, 0, 0},
+		                 {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},
+		                 {1,0,1,0,0,0,1,0,1,  -1,-1,-1,-1,-1,-1,-1,-1,-1}};
+
+
+		parseScramble( scramble, seq, pins );
+
+		for( i=0; i<14; i++)
+			for( j=0; j<18; j++)
+				posit[j]+=seq[i]*moves[i][j];
+
+		//**********END JAAP's CODE***************
+
+		drawBackground(g, colorScheme);
+
+		for( i=0; i<18; i++ )
+			drawClock( g, i, posit[i], colorScheme );
+
+		drawPins( g, pins, colorScheme );
+
+	}
+
+	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) {
+
+		int i;
+
+		Pattern p = Pattern.compile("=(-?\\d)");
+		Matcher m = p.matcher(scramble);
+
+		for( i=0; i<14; i++ ){
+			m.find();
+			seq[i] = Integer.parseInt(m.group(1));
+		}
+
+		p = Pattern.compile("([Ud]{4})");
+		m = p.matcher(scramble);
+
+		m.find();
+		String pinString = m.group(1);
+
+		for( i=0; i<4; i++ )
+			pins[i] = ( pinString.charAt(i) == 'U' );
+
+	}
+
+
+
+	protected void drawBackground( Graphics2D g, HashMap<String, Color> colorScheme ) {
+
+		int i, j, k, s;
+
+		String[] colorString = {"Front", "Back"};
+
+		for( s=0; s<2; s++ ){
+
+			g.translate( (s*2+1)*(radius + gap), radius + gap );
+
+			// Draw puzzle
+			g.setColor(Color.BLACK);
+			g.drawOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+			g.drawOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+			g.drawOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+			g.drawOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+			g.drawOval(-radius, -radius, 2*radius, 2*radius);
+			g.setColor(colorScheme.get(colorString[s]));
+			g.fillOval(-radius, -radius, 2*radius, 2*radius);
+			g.fillOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+			g.fillOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+			g.fillOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+			g.fillOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+
+			// Draw clocks
+			for( i=-1; i<2; i++ )
+				for( j=-1; j<2; j++ ) {
+					g.translate( 2*i*clockOuterRadius, 2*j*clockOuterRadius );
+					g.setColor(colorScheme.get(colorString[s] + "Clock"));
+					g.fillOval( -clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
+					g.setColor(Color.BLACK);
+					g.drawOval( -clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
+
+					g.setColor(colorScheme.get(colorString[s] + "Clock"));
+					for( k=0; k<12; k++ ) {
+						g.fillOval( -pointSize, -pointRadius-pointSize, 2*pointSize, 2*pointSize);
+						g.rotate( Math.toRadians( 30 ));
+					}
+					g.translate( -2*i*clockOuterRadius, -2*j*clockOuterRadius );
+
+				}
+
+			g.translate( -(s*2+1)*(radius + gap), -(radius + gap) );
+		}
+	}
+
+	protected void drawClock( Graphics2D g, int clock, int position, HashMap<String, Color> colorScheme ) {
+
+		AffineTransform old = g.getTransform();
+
+		if( clock < 9 ){
+			g.translate( radius + gap, radius + gap );
+		}
+		else {
+			g.translate( 3*(radius + gap), radius + gap );
+			clock -= 9;
+		}
+
+		g.translate( 2*((clock%3) - 1)*clockOuterRadius, 2*((clock/3) - 1)*clockOuterRadius );
+		g.rotate( Math.toRadians( position*30 ));
+
+		GeneralPath arrow = new GeneralPath();
+		arrow.moveTo( 0, 0 );
+		arrow.lineTo( arrowRadius*Math.cos( arrowAngle ), -arrowRadius*Math.sin( arrowAngle ) );
+		arrow.lineTo( 0, -arrowHeight );
+		arrow.lineTo( -arrowRadius*Math.cos( arrowAngle ), -arrowRadius*Math.sin( arrowAngle ) );
+		arrow.closePath();
+
+		g.setColor(colorScheme.get("HandBorder"));
+		g.drawOval( -arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
+		g.draw( arrow );
+		g.setColor(colorScheme.get("Hand"));
+		g.fillOval( -arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
+		g.fill( arrow );
+
+		g.setTransform(old);
+	}
+
+	protected void drawPins( Graphics2D g, boolean[] pins, HashMap<String, Color> colorScheme ) {
+
+		int i, j, k = 0;
+
+		g.translate( radius + gap, radius + gap );
+		for( i=-1; i<2; i+=2 )
+			for( j=-1; j<2; j+=2 ) {
+				g.translate( j*clockOuterRadius, i*clockOuterRadius );
+				drawPin( g, pins[k++], colorScheme );
+				g.translate( -j*clockOuterRadius, -i*clockOuterRadius );
+			}
+
+		g.translate( 2*(radius + gap), 0 );
+		k=1;
+		for( i=-1; i<2; i+=2 ) {
+			for( j=-1; j<2; j+=2 ) {
+				g.translate( j*clockOuterRadius, i*clockOuterRadius );
+				drawPin( g, ! pins[k--], colorScheme );
+				g.translate( -j*clockOuterRadius, -i*clockOuterRadius );
+			}
+			k=3;
+		}
+
+		g.translate( -3*(radius + gap), -(radius + gap) );
+
+
+	}
+
+	protected void drawPin( Graphics2D g, boolean pin, HashMap<String, Color> colorScheme ) {
+
+		if( pin ) {
+			g.setColor(Color.BLACK);
+			g.fillOval( -(pinRadius+1), -(pinRadius+1), 2*(pinRadius+1), 2*(pinRadius+1));
+			g.setColor(colorScheme.get("PinUp"));
+			g.fillOval( -(pinRadius-1), -(pinRadius-1), 2*(pinRadius-1), 2*(pinRadius-1));
+		}
+		else {
+			g.setColor(colorScheme.get("PinDown"));
+			g.fillOval( -pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
+		}
+	}
+
 }
