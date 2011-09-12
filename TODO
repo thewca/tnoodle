@@ -124,8 +124,6 @@
 	-provide some system for uploading your own image?
 -cleanup readme.textile & root html (just add name, lol)
 -create website with download (automate releasing?)
--invent some cgi wrapper for lucas's server?
-
 
 -saving times
 	-Add a note about opening multiple instances of tnt
@@ -141,7 +139,7 @@
 
 
 ### TnoodleMakeTools
--create a *fast* cgi script...
+-create a *fast* cgi script...put on lucas's server
 -nuke createScramblers() static method in every scramble plugin
 -nuke build.xml files
 -consolidate context file/short name/long name for scramble plugins

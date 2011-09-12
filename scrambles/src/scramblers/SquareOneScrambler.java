@@ -26,7 +26,7 @@ import org.squareone.twophase.Position1;
 import org.squareone.twophase.Engine;
 
 
-public class SquareOneUniformScrambler extends Scrambler {
+public class SquareOneScrambler extends Scrambler {
 
 	private static final int depth = 30;
 	private static final long timeOut = 30; //in sec
@@ -39,13 +39,9 @@ public class SquareOneUniformScrambler extends Scrambler {
 	private int twistCount; //this will tell us the state of the middle pieces
 	private int[] state;
 
-	public static synchronized SquareOneUniformScrambler[] createScramblers() {
-		return new SquareOneUniformScrambler[] { new SquareOneUniformScrambler() };
-	}
-
 	private Engine eng;
 	private Position1 p1;
-	public SquareOneUniformScrambler() {
+	public SquareOneScrambler() {
 		//initialise pruning and transition tables
 		Tables.initialise();
 
