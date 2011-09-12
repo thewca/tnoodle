@@ -143,6 +143,7 @@
 ### TnoodleMakeTools
 -create a *fast* cgi script...
 -nuke createScramblers() static method in every scramble plugin
+-nuke build.xml files
 -consolidate context file/short name/long name for scramble plugins
 -test plugins when loaded from file, not jar
 -test plugins when loaded from applet

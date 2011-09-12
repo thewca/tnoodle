@@ -131,27 +131,30 @@ public class ScrambleHandler extends SafeHttpHandler {
 				scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
 				table.addCell(scrambleCell);
 				
-				try {
-					PdfContentByte cb = docWriter.getDirectContent();
-					PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-					Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+				if(dim.width > 0 && dim.height > 0) {
+					try {
+						PdfContentByte cb = docWriter.getDirectContent();
+						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+						Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
 
-					scrambler.drawScramble(g2, dim, scramble, colorScheme);
-					g2.dispose();
-					PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
-					imgCell.setBackgroundColor(BaseColor.GRAY);
-					imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-					table.addCell(imgCell);
-				} catch (Exception e) {
-					table.addCell("Error drawing scramble: " + e.getMessage());
-					e.printStackTrace();
+						scrambler.drawScramble(g2, dim, scramble, colorScheme);
+						g2.dispose();
+						PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
+						imgCell.setBackgroundColor(BaseColor.GRAY);
+						imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+						table.addCell(imgCell);
+					} catch (Exception e) {
+						table.addCell("Error drawing scramble: " + e.getMessage());
+						e.printStackTrace();
+					}
+				} else {
+					table.addCell("");
 				}
 			}
 			maxWidth*=2; //TODO - i have no freaking clue why i need to do this
 			table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
 			doc.add(table);
 
-			
 			doc.close();
 			return baosPDF;
 		} catch (DocumentException e) {
@@ -170,6 +173,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 		public void onEndPage(PdfWriter writer, Document document) {
 			Rectangle rect = writer.getBoxSize("art");
 			//TODO - urgh... http://stackoverflow.com/questions/759909/how-to-add-total-page-number-on-every-page-with-itext	            
+			// TODO - why are spaces not showing upu in the title?
 			ColumnText.showTextAligned(writer.getDirectContent(),
 					Element.ALIGN_CENTER, new Phrase(header + " page " + writer.getPageNumber()),
 					(rect.getLeft() + rect.getRight()) / 2, rect.getTop(), 0);
