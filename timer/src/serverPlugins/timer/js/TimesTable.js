@@ -985,10 +985,9 @@ var TimesTable = new Class({
 					var val = time.format(key);
 					cells[col].set('html', time.format(key));
 					var raSize = parseInt(key.substring(2), 10);
-					console.log(key.substring(2));
 					var bestIndex = session.bestWorst(key).best.index;
-					cells[col].raSize = function() { return raSize; };
-					cells[col].lastTimeIndex = function() { return tr.time.index; };
+					cells[col].raSize = (function(raSize) { return raSize; }).bind(null, raSize);
+					cells[col].lastTimeIndex = (function(index) { return index; }).bind(null, tr.time.index);
 					if(bestIndex != null && val != "") {
 						cells[col].setStyle('cursor', 'pointer');
 						cells[col].addEvent('click', this.raBoxClicked);
