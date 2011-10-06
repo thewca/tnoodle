@@ -42,9 +42,6 @@ function initializeTwisty(twistyType) {
   /*
    * Scene Setup
    */
-  camera = new THREE.Camera( 30, $(twistyContainer).width() / $(twistyContainer).height(), 0, 1000 );
-  moveCameraPure(0);
-  camera.target.position = new THREE.Vector3(0, -0.075, 0);
 
   scene = new THREE.Scene();
 
@@ -65,7 +62,6 @@ function initializeTwisty(twistyType) {
   twistyContainer.appendChild(input);
   
   renderer = new THREE.CanvasRenderer();
-  renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
   renderer.domElement.setAttribute('id',"twistyCanvas");
   
   twistyContainer.appendChild(renderer.domElement);
@@ -80,18 +76,18 @@ function initializeTwisty(twistyType) {
   $("#twistyContainer").unbind("mousedown");
   $("#twistyContainer").bind("mousedown", function() {
     $("#canvas_input").focus();
-    });
+  });
 
   $("#canvas_input").unbind("focus");
   $("#canvas_input").bind("focus", function (e) {
     $("#twistyContainer").removeClass("checkered");
     $("#twistyContainer").addClass("canvasFocused");
-    });
+  });
   $("#canvas_input").unbind("blur");
   $("#canvas_input").bind("blur", function (e) {
     $("#twistyContainer").removeClass("canvasFocused");
     $("#twistyContainer").addClass("checkered");
-    });
+  });
   $("#canvas_input").focus();
 
   document.getElementById("twistyCanvas").addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -100,10 +96,19 @@ function initializeTwisty(twistyType) {
   
 
   startStats();
-  render();
-
+  // resizeTwisty creates the camera and calls render()
+  resizeTwisty();
 };
 
+function resizeTwisty() {
+  // This function should be called after setting twistyContainer
+  // to the desired size.
+  camera = new THREE.Camera( 30, $(twistyContainer).width() / $(twistyContainer).height(), 0, 1000 );
+  moveCameraPure(0);
+  camera.target.position = new THREE.Vector3(0, -0.075, 0);
+  renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
+  render();
+}
 
 
 

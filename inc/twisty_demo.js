@@ -83,7 +83,8 @@ $(document).ready(function() {
 
   //$("#canvas_input").bind("focus", function (e) { $("#twistyCanvas").css("border", "2px solid #F00") });
   //$("#canvas_input").bind("focus", function (e) { $("#twistyCanvas").css("background", "#F00") });
-
+  
+  $(window).resize(resizeTwisty);
 });
 
 /*
