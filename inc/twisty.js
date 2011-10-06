@@ -261,16 +261,16 @@ function startTimer() {
 }
 
 function startMove() {
+  moveProgress = 0;
 
   currentMove = moveQueue.shift();
   //log(moveToString(currentMove));
   if (startTimingFlag) {
-    if(!twisty.isInspectionLegalMove(currentMove)) {
+    if (!twisty.isInspectionLegalMove(currentMove)) {
       startTimer();
       startTimingFlag = false;
     }
   }
-  moveProgress = 0;
 
 }
 
