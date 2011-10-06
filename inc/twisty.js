@@ -826,8 +826,6 @@ function createCubeTwisty(twistyParameters) {
         // TODO - sticker isn't really a good name for this --jfly
         var currSticker = state[faceIndex][stickerIndex];
         var currState = currSticker[0];
-        var ogState = new THREE.Matrix4();
-        ogState = ogState.multiply(netCubeRotations, ogCubePiecesCopy[faceIndex][stickerIndex]);
 
         var i = Math.floor(stickerIndex / dimension);
         var j = stickerIndex % dimension;
@@ -837,23 +835,27 @@ function createCubeTwisty(twistyParameters) {
           // We could skip the true centers on odd cubes, but I see no reason to do
           // so.
           var face = index_side[faceIndex];
-
           var rott = matrix4Power(sidesRot[face], 1);
 
-          var rotatedCurrState = currState.clone();
+          var rotatedOgState = ogCubePiecesCopy[faceIndex][stickerIndex].clone();
           var centerMatches = false;
           for(var i = 0; i < 4; i++) {
-            if(areMatricesEqual(rotatedCurrState, ogState)) {
+            var transformedRotatedOgState = new THREE.Matrix4();
+            transformedRotatedOgState = ogState.multiply(netCubeRotations, rotatedOgState);
+            if(areMatricesEqual(currState, transformedRotatedOgState)) {
               centerMatches = true;
               break;
             }
-            rotatedCurrState.multiply(rott, rotatedCurrState);
+
+            rotatedOgState.multiply(rott, rotatedOgState);
           }
           if(!centerMatches) {
             return false;
           }
         } else {
           // Every non-center sticker should return to exactly where it was
+          var ogState = new THREE.Matrix4();
+          ogState = ogState.multiply(netCubeRotations, ogCubePiecesCopy[faceIndex][stickerIndex]);
           if(!areMatricesEqual(currState, ogState)) {
             return false;
           }
