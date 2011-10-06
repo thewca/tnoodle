@@ -79,7 +79,6 @@ function initializeTwisty(twistyType) {
 
   $("#twistyContainer").unbind("mousedown");
   $("#twistyContainer").bind("mousedown", function() {
-    console.log("h");
     $("#canvas_input").focus();
     });
 
@@ -271,10 +270,8 @@ function startTiming() {
 
 function startMove() {
 
-  currentMove = moveQueue[0];
+  currentMove = moveQueue.shift();
   //log(moveToString(currentMove));
-  moveQueue.splice(0, 1);
-  //moveProgress = moveProgress % 1;
   moveProgress = 0;
 
 }
@@ -338,6 +335,10 @@ function stepAnimation() {
   }
   else {
     twisty["advanceMoveCallback"](twisty, currentMove);
+
+    if (twisty.isSolved(twisty)) {
+      stopTimer();
+    }
 
     if (moveQueue.length == 0) {
       animating = false;
@@ -531,6 +532,16 @@ function createCubeTwisty(twistyParameters) {
   var yyi = new THREE.Vector3(0, -1, 0);
   var zzi = new THREE.Vector3(0, 0, -1);
 
+  var side_index = {
+      "U": 0,
+      "L": 1,
+      "F": 2,
+      "R": 3,
+      "B": 4,
+      "D": 5
+  };
+  var index_side = [ "U", "L", "F", "R", "B", "D" ];
+
   var sidesRot = {
       "U": axify(zz, yy, xxi),
       "L": axify(xx, zz, yyi),
@@ -566,6 +577,8 @@ function createCubeTwisty(twistyParameters) {
 
   //Cube Object Generation
   for (var i = 0; i < numSides; i++) {
+    var facePieces = [];
+    cubePieces.push(facePieces);
     for (var su = 0; su < cubeOptions["dimension"]; su++) {
       for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
@@ -587,7 +600,7 @@ function createCubeTwisty(twistyParameters) {
         sticker.matrixAutoUpdate = false;
         sticker.update();
 
-        cubePieces.push([i, transformationMatrix, sticker]);
+        facePieces.push([transformationMatrix, sticker]);
         cubeObject.addChild(sticker);    
 
       }
@@ -609,28 +622,32 @@ function createCubeTwisty(twistyParameters) {
     var state = twisty["cubePieces"];
 
 
-    for (entry in state) {
-      
-      // Support negative layer indices (e.g. for rotations)
-      //TODO: Bug 20110906, if negative index ends up the same as start index, the anmation is iffy. 
-      var layerStart = currentMove[0];
-      var layerEnd = currentMove[1];
-      if (layerEnd < 0) {
-        layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
-      }
+    for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
+      var faceStickers = state[faceIndex];
+      for (var stickerIndex = 0; stickerIndex < faceStickers.length; stickerIndex++) {
+        // TODO - sticker isn't really a good name for this --jfly
+        var sticker = state[faceIndex][stickerIndex];
 
-      var layer = matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]);
-      if (
-          layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
-          &&
-          layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
-      ) {
-        var roty = new THREE.Matrix4();
-        roty.copy(rott);
-        roty.multiplySelf(state[entry][1]);
+        // Support negative layer indices (e.g. for rotations)
+        //TODO: Bug 20110906, if negative index ends up the same as start index, the animation is iffy. 
+        var layerStart = currentMove[0];
+        var layerEnd = currentMove[1];
+        if (layerEnd < 0) {
+          layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
+        }
 
-        state[entry][2].matrix.copy(roty);
-        state[entry][2].update();
+        var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
+        if (
+            layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
+            &&
+            layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
+           ) {
+             var roty = rott.clone();
+             roty.multiplySelf(sticker[0]);
+
+             sticker[1].matrix.copy(roty);
+             sticker[1].update();
+           }
       }
     }
 
@@ -656,26 +673,29 @@ function createCubeTwisty(twistyParameters) {
 
   var advanceMoveCallback = function(twisty, currentMove) {
 
-    var rott = new THREE.Matrix4();
-    rott.copy(matrix4Power(sidesRot[currentMove[2]], currentMove[3]));
+    var rott = matrix4Power(sidesRot[currentMove[2]], currentMove[3]);
 
     var state = twisty["cubePieces"];
 
-    for (entry in state) {
+    for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
+      var faceStickers = state[faceIndex];
+      for (var stickerIndex = 0; stickerIndex < faceStickers.length; stickerIndex++) {
+        // TODO - sticker isn't really a good name for this --jfly
+        var sticker = state[faceIndex][stickerIndex];
 
-      var layer = matrixVector3Dot(state[entry][2].matrix, sidesNorm[currentMove[2]]);
-      if (
-          layer < twisty["options"]["dimension"] - 2*currentMove[0] + 2.5
-          &&
-          layer > twisty["options"]["dimension"] - 2*currentMove[1] - 0.5
-      ) {
-        var roty = new THREE.Matrix4();
-        roty.copy(rott);
-        roty.multiplySelf(state[entry][1]);
+        var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
+        if (
+            layer < twisty["options"]["dimension"] - 2*currentMove[0] + 2.5
+            &&
+            layer > twisty["options"]["dimension"] - 2*currentMove[1] - 0.5
+           ) {
+             var roty = rott.clone();
+             roty.multiplySelf(sticker[0]);
 
-        state[entry][2].matrix.copy(roty);
-        state[entry][1].copy(roty);
-        state[entry][2].update();
+             sticker[1].matrix.copy(roty);
+             sticker[0].copy(roty);
+             sticker[1].update();
+           }
       }
     }
 
@@ -747,6 +767,71 @@ function createCubeTwisty(twistyParameters) {
 
   };
 
+  var ogCubePiecesCopy = [];
+  for(var faceIndex = 0; faceIndex < cubePieces.length; faceIndex++) {
+    var faceStickers = cubePieces[faceIndex];
+    var ogFaceCopy = [];
+    ogCubePiecesCopy.push(ogFaceCopy);
+    for(var i = 0; i < faceStickers.length; i++) {
+      ogFaceCopy.push(cubePieces[faceIndex][i][0].clone());
+    }
+  }
+  function areMatricesEqual(m1, m2) {
+    var flatM1 = m1.flatten();
+    var flatM2 = m2.flatten();
+    for (var i = 0; i < flatM1.length; i++) {
+      if(flatM1[i] != flatM2[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+  var isSolved = function(twisty) {
+    var state = twisty.cubePieces;
+    var dimension = twisty["options"]["dimension"];
+
+    for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
+      var faceStickers = state[faceIndex];
+      for (var stickerIndex = 0; stickerIndex < faceStickers.length; stickerIndex++) {
+        // TODO - sticker isn't really a good name for this --jfly
+        var currSticker = state[faceIndex][stickerIndex];
+        var currState = currSticker[0];
+        var ogState = ogCubePiecesCopy[faceIndex][stickerIndex];
+
+        var i = Math.floor(stickerIndex / dimension);
+        var j = stickerIndex % dimension;
+        if(i > 0 && i < dimension - 1 && j > 0 && j < dimension - 1) {
+          // Center stickers can still be solved even if they didn't make it
+          // back to their original location (unless we're solving a supercube!)
+          // We could skip the true centers on odd cubes, but I see no reason to do
+          // so.
+          var face = index_side[faceIndex];
+
+          var rott = matrix4Power(sidesRot[face], 1);
+
+          var rotatedCurrState = currState.clone();
+          var centerMatches = false;
+          for(var i = 0; i < 4; i++) {
+            if(areMatricesEqual(rotatedCurrState, ogState)) {
+              centerMatches = true;
+              break;
+            }
+            rotatedCurrState.multiply(rott, rotatedCurrState);
+          }
+          if(!centerMatches) {
+            return false;
+          }
+        } else {
+          // Every non-center sticker should return to exactly where it was
+          if(!areMatricesEqual(currState, ogState)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  };
+
   return {
     "type": twistyParameters,
     "options": cubeOptions,
@@ -754,7 +839,8 @@ function createCubeTwisty(twistyParameters) {
     "cubePieces": cubePieces,
     "animateMoveCallback": animateMoveCallback,
     "advanceMoveCallback": advanceMoveCallback,
-    "keydownCallback": keydownCallback
+    "keydownCallback": keydownCallback,
+    "isSolved": isSolved
   };
 
 }
