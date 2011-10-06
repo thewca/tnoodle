@@ -186,10 +186,6 @@ function keydownHandler(e) {
   //TODO 20110906: Consider not clearing?
   $("#canvas_input").val("");
   
-  if (startTimingFlag) {
-    startTiming();
-    startTimingFlag = false;
-  }
   twisty["keydownCallback"](twisty, e);
 }
 
@@ -249,22 +245,18 @@ function startAnimation() {
     animating = true;
     //log("Starting move queue: " + movesToString(moveQueue));
     startMove();
-    if (!timing) {
-      animate();
-    }
+    animate();
   }
 
 }
 
-function startTiming() {
+function startTimer() {
 
   startTime = (new Date).getTime();
 
   if(!timing) {
     timing = true;
-    if (!animating) {
-      animate();
-    }
+    animate();
   }
 }
 
@@ -272,6 +264,12 @@ function startMove() {
 
   currentMove = moveQueue.shift();
   //log(moveToString(currentMove));
+  if (startTimingFlag) {
+    if(!twisty.isInspectionLegalMove(currentMove)) {
+      startTimer();
+      startTimingFlag = false;
+    }
+  }
   moveProgress = 0;
 
 }
@@ -362,7 +360,11 @@ function startStats() {
 
 }
 
-function animate() {
+var animationLooping = false;
+function animate(notUserInvoked) {
+  if(!notUserInvoked && animationLooping) {
+    return;
+  }
 
   if (animating) {
     stepAnimation();
@@ -379,7 +381,10 @@ function animate() {
 
   // If we get here successfully, do it again!
   if (animating || timing) {
-    requestAnimationFrame(animate);
+    animationLooping = true;
+    requestAnimationFrame(animate.bind(null, true));
+  } else {
+    animationLooping = false;
   }
 
 }
@@ -831,6 +836,13 @@ function createCubeTwisty(twistyParameters) {
     return true;
   };
 
+  var isInspectionLegalMove = function(move) {
+    if(move[0] == 1 && move[1] == twisty["options"]["dimension"]) {
+      return true;
+    }
+    return false;
+  };
+
   return {
     "type": twistyParameters,
     "options": cubeOptions,
@@ -839,7 +851,8 @@ function createCubeTwisty(twistyParameters) {
     "animateMoveCallback": animateMoveCallback,
     "advanceMoveCallback": advanceMoveCallback,
     "keydownCallback": keydownCallback,
-    "isSolved": isSolved
+    "isSolved": isSolved,
+    "isInspectionLegalMove": isInspectionLegalMove
   };
 
 }
