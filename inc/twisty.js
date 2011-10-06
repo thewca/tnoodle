@@ -404,15 +404,14 @@ function updateTimer() {
 
 function createTwisty(twistyType) {
 
-  for(var twistyTypeKey in twisties) {
-    if (twistyType["type"] == twistyTypeKey) {
-      twistyCreateFunction = twisties[twistyTypeKey]
-      return twistyCreateFunction(twistyType);
-    }
+  twistyCreateFunction = twisties[twistyType["type"]];
+
+  if (twistyCreateFunction == undefined) {
+    err("Twisty type \"" + twistyType["type"] + "\" is not recognized!");
+    return null;
   }
 
-  err("Twisty type \"" + twistyType["type"] + "\" is not recognized!");
-  return null;
+  return twistyCreateFunction(twistyType);
 
 }
 
