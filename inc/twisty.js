@@ -659,11 +659,12 @@ function createCubeTwisty(twistyParameters) {
 
   function matrix4Power(inMatrix, power) {
 
-    var matrixIdentity = new THREE.Matrix4();
-    var matrix = new THREE.Matrix4();
-    matrix.copy(inMatrix);
+    var matrix = null;
     if (power < 0) {
-      matrix.copy(THREE.Matrix4.makeInvert(inMatrix, matrixIdentity));
+      var matrixIdentity = new THREE.Matrix4();
+      matrix = THREE.Matrix4.makeInvert(inMatrix, matrixIdentity);
+    } else {
+      matrix = inMatrix.clone();
     }
 
     var out = new THREE.Matrix4();
@@ -794,13 +795,39 @@ function createCubeTwisty(twistyParameters) {
     var state = twisty.cubePieces;
     var dimension = twisty["options"]["dimension"];
 
+
+    // This implementation of isSolved simply checks that
+    // all polygons have returned to their original locations.
+    // There are 2 problems with this scheme:
+    //  1. Re-orienting the cube makes every sticker look unsolved.
+    //  2. A center is still solved even if it is rotated in place.
+    //     This isn't a supercube!
+    //
+    // To deal with 1, we pick a sticker, and assume that it is solved.
+    // We then derive what the necessary amount of rotation is to have
+    // taken our solved cube and placed the sticker where it is now.
+    //      netRotation * originalLocation = newLocation
+    //      netRotation = newLocation * (1/originalLocation)
+    // We then proceed to compare every sticker to netRotation*originalLocation.
+    //
+    // We deal with center stickers by apply all 4 rotations to the original location.
+    // If any of them match the new location, then we consider the sticker solved.
+    var faceIndex = 0;
+    var stickerIndex = 0;
+    var stickerState = state[faceIndex][stickerIndex][0];
+    var matrixIdentity = new THREE.Matrix4();
+    var netCubeRotations = THREE.Matrix4.makeInvert(
+        ogCubePiecesCopy[faceIndex][stickerIndex], matrixIdentity);
+    netCubeRotations = netCubeRotations.multiply(stickerState, netCubeRotations);
+
     for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
       var faceStickers = state[faceIndex];
       for (var stickerIndex = 0; stickerIndex < faceStickers.length; stickerIndex++) {
         // TODO - sticker isn't really a good name for this --jfly
         var currSticker = state[faceIndex][stickerIndex];
         var currState = currSticker[0];
-        var ogState = ogCubePiecesCopy[faceIndex][stickerIndex];
+        var ogState = new THREE.Matrix4();
+        ogState = ogState.multiply(netCubeRotations, ogCubePiecesCopy[faceIndex][stickerIndex]);
 
         var i = Math.floor(stickerIndex / dimension);
         var j = stickerIndex % dimension;
