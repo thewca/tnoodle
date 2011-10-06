@@ -404,10 +404,9 @@ function updateTimer() {
 }
 
 function createTwisty(twistyType) {
-
    var twistyCreateFunction = twisties[twistyType.type];
    if(!twistyCreateFunction) {
-     err("Twisty type \"" + twistyType.type + "\" is not recognized!");
+     err('Twisty type "' + twistyType.type + '" is not recognized!');
      return null;
    }
    return twistyCreateFunction(twistyType);

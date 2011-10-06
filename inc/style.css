@@ -78,6 +78,9 @@ div.left {
   left: 0px;
   position: absolute;
   overflow-y: auto;
+  
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 
 div.right {
