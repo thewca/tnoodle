@@ -14,7 +14,7 @@
 
 <script type="text/javascript">
   $(document).ready(function() {
-    var CUBE_COUNT = 1;
+    var CUBE_COUNT = 2;
     var cubeContainers = [];
     for(var i = 0; i < CUBE_COUNT; i++) {
       var cubeContainer = $("<span/>");
@@ -68,11 +68,14 @@
     relayout();
     $(window).resize(relayout);
 
+    var keyPressCount = 0;
     $(window).keydown(function(e) {
-      for(var i = 0; i < cubeContainers.length; i++) {
+      // Wow, this is incredibly difficult to solve.
+      var i = (keyPressCount++) % cubeContainers.length;
+      //for(var i = 0; i < cubeContainers.length; i++) {
         var cubeContainer = cubeContainers[i];
         cubeContainer.twistyScene.keydown(e);
-      }
+      //}
     });
   });
 </script>
