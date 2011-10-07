@@ -5,7 +5,6 @@
  * 
  */
 
-
 /*
  * Global variables
  * (So that they persist outside of functions.)
@@ -20,7 +19,6 @@ var animating = false;
 
 var twistyContainer = null;
 var camera, scene, renderer;
-var canvas_input;
 var twistyCanvas;
 var cameraTheta = 0;
 
@@ -28,6 +26,11 @@ var timing = false;
 var startTime;
 
 var stats = null;
+if(typeof(log) == "undefined") {
+  log = function(s) {
+    console.log(s);
+  };
+}
 
 /* http://tauday.com/ ;-) */
 Math.TAU = Math.PI*2;
@@ -39,12 +42,12 @@ Math.TAU = Math.PI*2;
 function initializeTwisty(twistyType) {
 
   if(twistyContainer) {
-	  $(twistyContainer).empty();
+    $(twistyContainer).empty();
   } else {
-	  twistyContainer = $('<div/>');
-	  twistyContainer.css('width', '100%');
-	  twistyContainer.css('height', '100%');
-	  twistyContainer = twistyContainer[0];
+    twistyContainer = $('<div/>');
+    twistyContainer.css('width', '100%');
+    twistyContainer.css('height', '100%');
+    twistyContainer = twistyContainer[0];
   }
   log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
 
@@ -65,10 +68,6 @@ function initializeTwisty(twistyType) {
    * Go!
    */
 
-  canvas_input = document.createElement('input');
-  canvas_input.setAttribute('id',"canvas_input");
-  twistyContainer.appendChild(canvas_input);
-  
   renderer = new THREE.CanvasRenderer();
   twistyCanvas = renderer.domElement;
   
@@ -78,34 +77,17 @@ function initializeTwisty(twistyType) {
   //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
   //TODO: 20110905 bug: after pressing esc, cube dragging doesn't work.
   
-  $(canvas_input).unbind('keydown', keydownHandler);
-  $(canvas_input).bind("keydown", keydownHandler);
-
-  $("#twistyContainer").unbind("mousedown");
-  $("#twistyContainer").bind("mousedown", function() {
-    $(canvas_input).focus();
-  });
-
-  $(canvas_input).unbind("focus");
-  $(canvas_input).bind("focus", function (e) {
-    $("#twistyContainer").removeClass("checkered");
-    $("#twistyContainer").addClass("canvasFocused");
-  });
-  $(canvas_input).unbind("blur");
-  $(canvas_input).bind("blur", function (e) {
-    $("#twistyContainer").removeClass("canvasFocused");
-    $("#twistyContainer").addClass("checkered");
-  });
-
   twistyCanvas.addEventListener( 'mousedown', onDocumentMouseDown, false );
   twistyCanvas.addEventListener( 'touchstart', onDocumentTouchStart, false );
   twistyCanvas.addEventListener( 'touchmove', onDocumentTouchMove, false );
   
 
-  startStats();
+  if(twistyType.showFps) {
+    startStats();
+  }
   // resizeTwisty creates the camera and calls render()
   resizeTwisty();
-};
+}
 
 function resizeTwisty() {
   // This function should be called after setting twistyContainer
@@ -133,7 +115,6 @@ function cam(deltaTheta) {
 }
 
 function onDocumentMouseDown( event ) {
-  $("#cubeDimension").blur(); 
   event.preventDefault();
   twistyCanvas.addEventListener( 'mousemove', onDocumentMouseMove, false );
   twistyCanvas.addEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -197,14 +178,8 @@ function moveCamera(theta) {
   render();
 }
 
+// TODO - timing stuff doesn't belong in here --jfly
 var startTimingFlag = false;
-function keydownHandler(e) {
-  
-  //TODO 20110906: Consider not clearing?
-  $(canvas_input).val("");
-  
-  twisty["keydownCallback"](twisty, e);
-}
 
 function setTimingFlag() {
   startTimingFlag = true;

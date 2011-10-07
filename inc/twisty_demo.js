@@ -32,7 +32,6 @@ $(document).ready(function() {
   });
   $("#twistyContainer").append($(twistyContainer));
   resizeTwisty();
-  $(canvas_input).focus();
 
 
   $("#cubeDimension").bind("input", function() {
@@ -88,6 +87,27 @@ $(document).ready(function() {
   //$("#canvas_input").bind("focus", function (e) { $("#twistyCanvas").css("background", "#F00") });
   
   $(window).resize(resizeTwisty);
+
+  // TODO add visual indicator of cube focus --jfly
+  // clear up canvasFocused stuff...
+  //$("#twistyContainer").addClass("canvasFocused");
+  //$("#twistyContainer").removeClass("canvasFocused");
+
+  $(window).keydown(function(e) {
+    // This is kinda weird, we want to avoid turning the cube
+    // if we're in a textarea, or input field.
+    var focusedEl = document.activeElement.nodeName.toLowerCase();
+    var isEditing = focusedEl == 'textarea' || focusedEl == 'input';
+    if(isEditing) {
+      return;
+    }
+    if(e.altKey || e.ctrlKey) {
+      return;
+    }
+
+    twisty.keydownCallback(twisty, e);
+    e.preventDefault();
+  });
 });
 
 /*
