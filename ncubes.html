@@ -25,7 +25,7 @@
       twistyScene.initializeTwisty({
         type: "cube",
         dimension: 3,
-        borderThickness: .1,
+        borderThickness: .05,
         stickerWidth: 1.7,
       });
 
@@ -71,11 +71,11 @@
     var keyPressCount = 0;
     $(window).keydown(function(e) {
       // Wow, this is incredibly difficult to solve.
-      var i = (keyPressCount++) % cubeContainers.length;
-      //for(var i = 0; i < cubeContainers.length; i++) {
+      //var i = (keyPressCount++) % cubeContainers.length;
+      for(var i = 0; i < cubeContainers.length; i++) {
         var cubeContainer = cubeContainers[i];
         cubeContainer.twistyScene.keydown(e);
-      //}
+      }
     });
   });
 </script>

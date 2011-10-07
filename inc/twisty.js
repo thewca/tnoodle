@@ -663,15 +663,24 @@ twistyjs.TwistyScene = function() {
           sticker.doubleSided = cubeOptions["doubleSided"];
 
           if(cubeOptions.borderThickness)  {
-            var borderSize = stickerWidth + cubeOptions.borderThickness;
-            var blackBorder = new THREE.Mesh(new THREE.PlaneGeometry(borderSize, borderSize), blackMaterial);
+            // TODO - there has got to be a less expensive way of doing this.
+            // This implementation is quintupling the number of polygons.
+            var borderSize = stickerWidth + cubeOptions.borderThickness*2;
+
             var positionMatrix = new THREE.Matrix4();
-            positionMatrix.setTranslation(0, 0, -1e-10);
-            blackBorder.matrix.copy(positionMatrix);
-            blackBorder.doubleSided = false;
-            blackBorder.matrixAutoUpdate = false;
-            blackBorder.update();
-            sticker.addChild(blackBorder);
+            positionMatrix.setTranslation(-stickerWidth/2-cubeOptions.borderThickness/2, 0, 0);
+            var rotate90 = new THREE.Matrix4();
+            rotate90.setRotationAxis(zz, Math.TAU/4);
+            for(var rotateAmt = 0; rotateAmt < 4; rotateAmt++) {
+              var blackBorder = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions.borderThickness, borderSize), blackMaterial);
+              blackBorder.matrix.copy(positionMatrix);
+              blackBorder.doubleSided = cubeOptions.doubleSided;
+              blackBorder.matrixAutoUpdate = false;
+              blackBorder.update();
+              sticker.addChild(blackBorder);
+
+              positionMatrix.multiply(rotate90, positionMatrix);
+            }
           }
 
           var positionMatrix = new THREE.Matrix4();
@@ -679,7 +688,7 @@ twistyjs.TwistyScene = function() {
               su*2 - cubeOptions["dimension"] + 1,
               -(sv*2 - cubeOptions["dimension"] + 1),
               cubeOptions["dimension"]
-              );
+          );
 
           var transformationMatrix = new THREE.Matrix4();
           transformationMatrix.copy(sidesUV[i]);
