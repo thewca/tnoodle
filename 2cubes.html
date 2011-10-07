@@ -1,0 +1,44 @@
+<html>
+<head>
+
+<title>double twisty.js</title>
+
+<script type="text/javascript" src="inc/jquery-1.6.min.js"></script>
+
+<script type="text/javascript" src="inc/Three.js"></script>
+<script type="text/javascript" src="inc/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="inc/Stats.js"></script>
+
+<script src="inc/twisty_alg.js" type="text/javascript"></script>
+<script src="inc/twisty.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    initializeTwisty({
+      type: "cube",
+      dimension: 3,
+      borderThickness: .1,
+      stickerWidth: 1.7,
+    });
+    $("#cube1").width(500);
+    $("#cube1").height(500);
+
+    $("#cube1").append($(twistyContainer));
+    resizeTwisty();
+
+    $(window).keydown(function(e) {
+      twisty.keydownCallback(twisty, e);
+    });
+  });
+</script>
+
+</head>
+<body>
+
+  <div id="cube1"></div>
+  <div id="cube2"></div>
+
+  </div>
+
+</body>
+</html>

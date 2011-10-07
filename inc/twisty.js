@@ -483,19 +483,20 @@ function createCubeTwisty(twistyParameters) {
 
   //Defaults
   var cubeOptions = {
+      "borderThickness": 0,
       "stickerWidth": 1.8,
       "doubleSided": true,
       "opacity": 1,
       "dimension": 3,
       "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
-      "scale": 1
+      "scale": 1,
   };
 
   // Passed Parameters
   for (option in cubeOptions) {
     if(option in twistyParameters) {
       log("Setting option \"" + option + "\" to " + twistyParameters[option]);
-      cubeOptions[option] = twistyParameters[option];;
+      cubeOptions[option] = twistyParameters[option];
     }
   }
 
@@ -504,6 +505,9 @@ function createCubeTwisty(twistyParameters) {
 
   // Cube Materials
   var materials = [];
+  var blackMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
+  blackMaterial.opacity = cubeOptions["opacity"];
+
 
   for (var i = 0; i < numSides; i++) {
     var material = new THREE.MeshLambertMaterial( { color: cubeOptions["faceColors"][i]} );
@@ -580,15 +584,28 @@ function createCubeTwisty(twistyParameters) {
     for (var su = 0; su < cubeOptions["dimension"]; su++) {
       for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
-        var sticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), materials[i]);
+        var stickerWidth = cubeOptions.stickerWidth;
+        var sticker = new THREE.Mesh(new THREE.PlaneGeometry(stickerWidth, stickerWidth), materials[i]);
         sticker.doubleSided = cubeOptions["doubleSided"];
+
+        if(cubeOptions.borderThickness)  {
+          var borderSize = stickerWidth + cubeOptions.borderThickness;
+          var blackBorder = new THREE.Mesh(new THREE.PlaneGeometry(borderSize, borderSize), blackMaterial);
+          var positionMatrix = new THREE.Matrix4();
+          positionMatrix.setTranslation(0, 0, -1e-10);
+          blackBorder.matrix.copy(positionMatrix);
+          blackBorder.doubleSided = false;
+          blackBorder.matrixAutoUpdate = false;
+          blackBorder.update();
+          sticker.addChild(blackBorder);
+        }
 
         var positionMatrix = new THREE.Matrix4();
         positionMatrix.setTranslation(
             su*2 - cubeOptions["dimension"] + 1,
             -(sv*2 - cubeOptions["dimension"] + 1),
             cubeOptions["dimension"]
-        );    
+        );
 
         var transformationMatrix = new THREE.Matrix4();
         transformationMatrix.copy(sidesUV[i]);
