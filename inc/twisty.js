@@ -110,10 +110,15 @@ function initializeTwisty(twistyType) {
 function resizeTwisty() {
   // This function should be called after setting twistyContainer
   // to the desired size.
-  camera = new THREE.Camera( 30, $(twistyContainer).width() / $(twistyContainer).height(), 0, 1000 );
+  var min = Math.min($(twistyContainer).width(), $(twistyContainer).height());
+  camera = new THREE.Camera( 30, 1, 0, 1000 );
   moveCameraPure(0);
   camera.target.position = new THREE.Vector3(0, -0.075, 0);
-  renderer.setSize($(twistyContainer).width(), $(twistyContainer).height());
+  renderer.setSize(min, min);
+  $(twistyCanvas).css('position', 'absolute');
+  $(twistyCanvas).css('top', ($(twistyContainer).height()-min)/2);
+  $(twistyCanvas).css('left', ($(twistyContainer).width()-min)/2);
+
   render();
 }
 
