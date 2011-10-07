@@ -194,19 +194,33 @@ function keydownHandler(e) {
   twisty["keydownCallback"](twisty, e);
 }
 
-function setTimingFlag() {
-  startTimingFlag = true;
-  $("#timer").html("[Ready]");
-}
-
 function stopTimer() {
   startTimingFlag = false;
   timing = false;
+  $("#timer").removeClass("reset ready runnning stopped").addClass("stopped");
 }
 
 function resetTimer() {
   stopTimer();
   $("#timer").html("[Timer]");
+  $("#timer").removeClass("reset ready runnning stopped").addClass("reset");
+}
+
+function readyTimer() {
+  startTimingFlag = true;
+  $("#timer").html("[Ready]");
+  $("#timer").removeClass("reset ready runnning stopped").addClass("ready");
+}
+
+function startTimer() {
+
+  startTime = (new Date).getTime();
+
+  if(!timing) {
+    timing = true;
+    animate();
+    $("#timer").removeClass("reset ready runnning stopped").addClass("running");
+  }
 }
 
 /*
@@ -253,16 +267,6 @@ function startAnimation() {
     animate();
   }
 
-}
-
-function startTimer() {
-
-  startTime = (new Date).getTime();
-
-  if(!timing) {
-    timing = true;
-    animate();
-  }
 }
 
 function startMove() {
@@ -761,7 +765,7 @@ function createCubeTwisty(twistyParameters) {
       if (!timing) {
         animationStep = 0.1;
         queueRandomCubeMoves(twisty["options"]["dimension"], 32);
-        setTimingFlag();
+        readyTimer();
       }
       break;
 
