@@ -30,6 +30,9 @@ $(document).ready(function() {
     "type": "cube",
     "dimension": 3
   });
+  $("#twistyContainer").append($(twistyContainer));
+  resizeTwisty();
+  $(canvas_input).focus();
 
 
   $("#cubeDimension").bind("input", function() {

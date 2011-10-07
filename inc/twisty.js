@@ -20,6 +20,8 @@ var animating = false;
 
 var twistyContainer = null;
 var camera, scene, renderer;
+var canvas_input;
+var twistyCanvas;
 var cameraTheta = 0;
 
 var timing = false;
@@ -36,7 +38,14 @@ Math.TAU = Math.PI*2;
 
 function initializeTwisty(twistyType) {
 
-  twistyContainer = $("#twistyContainer").get(0);
+  if(twistyContainer) {
+	  $(twistyContainer).empty();
+  } else {
+	  twistyContainer = $('<div/>');
+	  twistyContainer.css('width', '100%');
+	  twistyContainer.css('height', '100%');
+	  twistyContainer = twistyContainer[0];
+  }
   log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
 
   /*
@@ -55,44 +64,42 @@ function initializeTwisty(twistyType) {
   /*
    * Go!
    */
-  $(twistyContainer).empty();//.html("<input id='canvas_input'>");
 
-  var input = document.createElement('input');
-  input.setAttribute('id',"canvas_input");
-  twistyContainer.appendChild(input);
+  canvas_input = document.createElement('input');
+  canvas_input.setAttribute('id',"canvas_input");
+  twistyContainer.appendChild(canvas_input);
   
   renderer = new THREE.CanvasRenderer();
-  renderer.domElement.setAttribute('id',"twistyCanvas");
+  twistyCanvas = renderer.domElement;
   
-  twistyContainer.appendChild(renderer.domElement);
+  twistyContainer.appendChild(twistyCanvas);
 
   
   //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
   //TODO: 20110905 bug: after pressing esc, cube dragging doesn't work.
   
-  $("#canvas_input").unbind('keydown', keydownHandler);
-  $("#canvas_input").bind("keydown", keydownHandler);
+  $(canvas_input).unbind('keydown', keydownHandler);
+  $(canvas_input).bind("keydown", keydownHandler);
 
   $("#twistyContainer").unbind("mousedown");
   $("#twistyContainer").bind("mousedown", function() {
-    $("#canvas_input").focus();
+    $(canvas_input).focus();
   });
 
-  $("#canvas_input").unbind("focus");
-  $("#canvas_input").bind("focus", function (e) {
+  $(canvas_input).unbind("focus");
+  $(canvas_input).bind("focus", function (e) {
     $("#twistyContainer").removeClass("checkered");
     $("#twistyContainer").addClass("canvasFocused");
   });
-  $("#canvas_input").unbind("blur");
-  $("#canvas_input").bind("blur", function (e) {
+  $(canvas_input).unbind("blur");
+  $(canvas_input).bind("blur", function (e) {
     $("#twistyContainer").removeClass("canvasFocused");
     $("#twistyContainer").addClass("checkered");
   });
-  $("#canvas_input").focus();
 
-  document.getElementById("twistyCanvas").addEventListener( 'mousedown', onDocumentMouseDown, false );
-  document.getElementById("twistyCanvas").addEventListener( 'touchstart', onDocumentTouchStart, false );
-  document.getElementById("twistyCanvas").addEventListener( 'touchmove', onDocumentTouchMove, false );
+  twistyCanvas.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  twistyCanvas.addEventListener( 'touchstart', onDocumentTouchStart, false );
+  twistyCanvas.addEventListener( 'touchmove', onDocumentTouchMove, false );
   
 
   startStats();
@@ -123,9 +130,9 @@ function cam(deltaTheta) {
 function onDocumentMouseDown( event ) {
   $("#cubeDimension").blur(); 
   event.preventDefault();
-  document.getElementById("twistyCanvas").addEventListener( 'mousemove', onDocumentMouseMove, false );
-  document.getElementById("twistyCanvas").addEventListener( 'mouseup', onDocumentMouseUp, false );
-  document.getElementById("twistyCanvas").addEventListener( 'mouseout', onDocumentMouseOut, false );
+  twistyCanvas.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  twistyCanvas.addEventListener( 'mouseup', onDocumentMouseUp, false );
+  twistyCanvas.addEventListener( 'mouseout', onDocumentMouseOut, false );
   mouseXLast = event.clientX;
 }
 
@@ -136,15 +143,15 @@ function onDocumentMouseMove( event ) {
 }
 
 function onDocumentMouseUp( event ) {
-  document.getElementById("twistyCanvas").removeEventListener( 'mousemove', onDocumentMouseMove, false );
-  document.getElementById("twistyCanvas").removeEventListener( 'mouseup', onDocumentMouseUp, false );
-  document.getElementById("twistyCanvas").removeEventListener( 'mouseout', onDocumentMouseOut, false );
+  twistyCanvas.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+  twistyCanvas.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+  twistyCanvas.removeEventListener( 'mouseout', onDocumentMouseOut, false );
 }
 
 function onDocumentMouseOut( event ) {
-  document.getElementById("twistyCanvas").removeEventListener( 'mousemove', onDocumentMouseMove, false );
-  document.getElementById("twistyCanvas").removeEventListener( 'mouseup', onDocumentMouseUp, false );
-  document.getElementById("twistyCanvas").removeEventListener( 'mouseout', onDocumentMouseOut, false );
+  twistyCanvas.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+  twistyCanvas.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+  twistyCanvas.removeEventListener( 'mouseout', onDocumentMouseOut, false );
 }
 
 function onDocumentTouchStart( event ) {
@@ -189,7 +196,7 @@ var startTimingFlag = false;
 function keydownHandler(e) {
   
   //TODO 20110906: Consider not clearing?
-  $("#canvas_input").val("");
+  $(canvas_input).val("");
   
   twisty["keydownCallback"](twisty, e);
 }
