@@ -483,7 +483,7 @@ function createCubeTwisty(twistyParameters) {
   var cubeOptions = {
       "stickerWidth": 1.8,
       "doubleSided": true,
-      "opacity": 0.95,
+      "opacity": 1,
       "dimension": 3,
       "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
       "scale": 1
