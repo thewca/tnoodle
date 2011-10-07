@@ -744,6 +744,7 @@ function createCubeTwisty(twistyParameters) {
     case 27:
       initializeTwisty(twisty["type"]);
       resetTimer();
+      e.preventDefault();
       break;
 
     case 32:
@@ -752,14 +753,17 @@ function createCubeTwisty(twistyParameters) {
         queueRandomCubeMoves(twisty["options"]["dimension"], 32);
         setTimingFlag();
       }
+      e.preventDefault();
       break;
 
     case 37:
       moveCameraDelta(Math.TAU/48);
+      e.preventDefault();
       break;
 
     case 39:
       moveCameraDelta(-Math.TAU/48);
+      e.preventDefault();
       break;
 
     }
