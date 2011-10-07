@@ -26,9 +26,12 @@ $(document).ready(function() {
 
   log("Document ready.");
 
+  var twistyScene = new twistyjs.TwistyScene();
+  $("#twistyContainer").append($(twistyScene.getDomElement()));
+
   function setCubeSize(dim) {
     if (dim != currentCubeSize) {
-      initializeTwisty({
+      twistyScene.initializeTwisty({
         "type": "cube",
         "dimension": dim,
         allowDragging: true,
@@ -36,8 +39,7 @@ $(document).ready(function() {
       });
       currentCubeSize = dim;
       $("#cubeDimension").blur(); 
-      $("#twistyContainer").append($(twistyContainer));
-      resizeTwisty();
+      twistyScene.resize();
     }
   }
   setCubeSize(3);
@@ -53,29 +55,29 @@ $(document).ready(function() {
   });
 
   $("#alg_ccc").bind("click", function() {
-    addMoves(makeCCC(parseInt($("#cubeDimension").val())));
+    twistyScene.animateMoves(makeCCC(parseInt($("#cubeDimension").val())));
   });
 
   $("#lucasparity").bind("click", function() {
-    addMoves(lucasparity);
+    twistyScene.animateMoves(lucasparity);
   });
 
   $("#alg_superflip").bind("click", function() {
-    addMoves(superflip);
+    twistyScene.animateMoves(superflip);
   });
 
   $("#parsed_alg1").bind("click", function() {
-    addMoves(stringToAlg($("#parse_alg").val()));
+    twistyScene.animateMoves(stringToAlg($("#parse_alg").val()));
   });
 
-  cam(0);
+  twistyScene.cam(0);
 
   $("#enableOfflineSupport").bind("click", function() {
     window.location.href = "offline.html";
   });
 
   $("#createCanvasPNG").bind("click", function() {
-    var canvas = document.getElementById("twistyCanvas");
+    var canvas = twistyScene.getCanvas();
     var img = canvas.toDataURL("image/png");
     log("Generating image...");
     $("#canvasPNG").fadeTo(0, 0);
@@ -84,10 +86,7 @@ $(document).ready(function() {
   });
 
 
-  //$("#canvas_input").bind("focus", function (e) { $("#twistyCanvas").css("border", "2px solid #F00") });
-  //$("#canvas_input").bind("focus", function (e) { $("#twistyCanvas").css("background", "#F00") });
-  
-  $(window).resize(resizeTwisty);
+  $(window).resize(twistyScene.resize);
 
   // TODO add visual indicator of cube focus --jfly
   // clear up canvasFocused stuff...
@@ -102,11 +101,8 @@ $(document).ready(function() {
     if(isEditing) {
       return;
     }
-    if(e.altKey || e.ctrlKey) {
-      return;
-    }
 
-    twisty.keydownCallback(twisty, e);
+    twistyScene.keydown(e);
   });
 });
 

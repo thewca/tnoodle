@@ -1,0 +1,83 @@
+<html>
+<head>
+
+<title>double twisty.js</title>
+
+<script type="text/javascript" src="inc/jquery-1.6.min.js"></script>
+
+<script type="text/javascript" src="inc/Three.js"></script>
+<script type="text/javascript" src="inc/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="inc/Stats.js"></script>
+
+<script src="inc/twisty_alg.js" type="text/javascript"></script>
+<script src="inc/twisty.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    var CUBE_COUNT = 1;
+    var cubeContainers = [];
+    for(var i = 0; i < CUBE_COUNT; i++) {
+      var cubeContainer = $("<span/>");
+      cubeContainer.css('position', 'absolute');
+      $('body').append(cubeContainer);
+
+      var twistyScene = new twistyjs.TwistyScene();
+      twistyScene.initializeTwisty({
+        type: "cube",
+        dimension: 3,
+        borderThickness: .1,
+        stickerWidth: 1.7,
+      });
+
+      cubeContainers.push(cubeContainer);
+      cubeContainer.append($(twistyScene.getDomElement()));
+      cubeContainer.twistyScene = twistyScene;
+    }
+
+    function relayout() {
+      var width = $(window).width();
+      var height = $(window).height();
+      var cubesWide = 0;
+      var cubesHigh = 0;
+      var cubeSize = null;
+      // TODO - this is not a very good layout engine, but it
+      // doesn't really matter.
+      while(cubesWide*cubesHigh < cubeContainers.length) {
+        cubesWide++;
+        cubeSize = width/cubesWide;
+        cubesHigh = Math.floor(height/cubeSize);
+        cubeSize = Math.min(cubeSize, height/cubesHigh);
+      }
+
+      var i = 0;
+      for(var h = 0; h < cubesHigh; h++) {
+        for(var w = 0; w < cubesWide; w++) {
+          if(i >= cubeContainers.length) {
+            // Gah, freaking language needs a labelled break
+            break;
+          }
+          var cubeContainer = cubeContainers[i++];
+          cubeContainer.width(cubeSize);
+          cubeContainer.height(cubeSize);
+          cubeContainer.css('top', h*cubeSize);
+          cubeContainer.css('left', w*cubeSize);
+          cubeContainer.twistyScene.resize();
+        }
+      }
+    }
+    relayout();
+    $(window).resize(relayout);
+
+    $(window).keydown(function(e) {
+      for(var i = 0; i < cubeContainers.length; i++) {
+        var cubeContainer = cubeContainers[i];
+        cubeContainer.twistyScene.keydown(e);
+      }
+    });
+  });
+</script>
+
+</head>
+<body>
+</body>
+</html>
