@@ -77,9 +77,11 @@ function initializeTwisty(twistyType) {
   //TODO: figure out keybindings, shortcuts, touches, and mouse presses.
   //TODO: 20110905 bug: after pressing esc, cube dragging doesn't work.
   
-  twistyCanvas.addEventListener( 'mousedown', onDocumentMouseDown, false );
-  twistyCanvas.addEventListener( 'touchstart', onDocumentTouchStart, false );
-  twistyCanvas.addEventListener( 'touchmove', onDocumentTouchMove, false );
+  if(twistyType.allowDragging) {
+    twistyCanvas.addEventListener( 'mousedown', onDocumentMouseDown, false );
+    twistyCanvas.addEventListener( 'touchstart', onDocumentTouchStart, false );
+    twistyCanvas.addEventListener( 'touchmove', onDocumentTouchMove, false );
+  }
   
 
   if(twistyType.showFps) {

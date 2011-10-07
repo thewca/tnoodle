@@ -26,13 +26,21 @@ $(document).ready(function() {
 
   log("Document ready.");
 
-  initializeTwisty({
-    "type": "cube",
-    "dimension": 3
-  });
-  $("#twistyContainer").append($(twistyContainer));
-  resizeTwisty();
-
+  function setCubeSize(dim) {
+    if (dim != currentCubeSize) {
+      initializeTwisty({
+        "type": "cube",
+        "dimension": dim,
+        allowDragging: true,
+        showFps: true,
+      });
+      currentCubeSize = dim;
+      $("#cubeDimension").blur(); 
+      $("#twistyContainer").append($(twistyContainer));
+      resizeTwisty();
+    }
+  }
+  setCubeSize(3);
 
   $("#cubeDimension").bind("input", function() {
     var dim = parseInt($("#cubeDimension").val());
@@ -40,14 +48,7 @@ $(document).ready(function() {
       dim = 3;
     }
     dim = Math.min(Math.max(dim, 1), 16);
-    if (dim != currentCubeSize) {
-      initializeTwisty({
-        "type": "cube",
-        "dimension": dim
-      });
-      currentCubeSize = dim;
-      $("#cubeDimension").blur(); 
-    }
+    setCubeSize(dim);
     return false;
   });
 
