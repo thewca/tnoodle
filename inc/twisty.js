@@ -393,7 +393,7 @@ function animate(notUserInvoked) {
   // If we get here successfully, do it again!
   if (animating || timing) {
     animationLooping = true;
-    requestAnimationFrame(animate.bind(null, true));
+    requestAnimationFrame(function() {animate(true)});
   } else {
     animationLooping = false;
   }
@@ -609,7 +609,7 @@ function createCubeTwisty(twistyParameters) {
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
         geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-        var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 1 } ) );
+        var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } ) );
 
         sticker.addChild(border);
 
