@@ -195,9 +195,11 @@ function keydownHandler(e) {
 }
 
 function stopTimer() {
-  startTimingFlag = false;
-  timing = false;
-  $("#timer").removeClass("reset ready runnning stopped").addClass("stopped");
+  if (timing) {
+    startTimingFlag = false;
+    timing = false;
+    $("#timer").removeClass("reset ready runnning stopped").addClass("stopped");
+  }
 }
 
 function resetTimer() {
