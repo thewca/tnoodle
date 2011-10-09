@@ -102,8 +102,94 @@ $(document).ready(function() {
       return;
     }
 
+    var keyCode = e.keyCode;
+    switch(keyCode) {
+      case 27:
+        var twisty = twistyScene.getTwisty();
+        twistyScene.initializeTwisty(twisty["type"]);
+        resetTimer();
+        e.preventDefault();
+        break;
+
+      case 32:
+        if (!timing) {
+          var twisty = twistyScene.getTwisty();
+          var scramble = twisty.generateScramble(twisty);
+          twistyScene.applyMoves(scramble);
+          setTimingFlag();
+        }
+        e.preventDefault();
+        break;
+    }
+
     twistyScene.keydown(e);
   });
+
+  twistyScene.addMoveListener(function(move, started) {
+    if(started) {
+      if(!timing) {
+        // TODO allow inspection legal moves!
+        // TODO somehow be able to cancel a move?
+        // TODO refresh timer
+        // TODO bug with animation stuff, turns don't always show up =(
+        // TODO changing puzzle doesn't seem to reset the timer
+        console.log("STARTING TIMER");
+        startTimer();
+      }
+    } else {
+      var twisty = twistyScene.getTwisty();
+      if(twisty.isSolved(twisty)) {
+        console.log("stopping TIMER");
+        stopTimer();
+      }
+    }
+  });
+
+  var startTimingFlag = false;
+
+  function setTimingFlag() {
+    startTimingFlag = true;
+    $("#timer").html("[Ready]");
+  }
+
+  var timing = false;
+  function startTimer() {
+    startTime = (new Date).getTime();
+
+    if(!timing) {
+      timing = true;
+    }
+  }
+  function stopTimer() {
+    startTimingFlag = false;
+    timing = false;
+    updateTimer();
+  }
+
+  function resetTimer() {
+    stopTimer();
+    $("#timer").html("[Timer]");
+  }
+
+  function pad(n, minLength) {
+    var str = '' + n;
+    while (str.length < minLength) {
+      str = '0' + str;
+    }
+    return str;
+  }
+
+  function updateTimer() {
+    var cumulative = (new Date).getTime() - startTime;
+    var str = "";
+    str += Math.floor(cumulative/1000/60);
+    str += ":";
+    str += pad(Math.floor(cumulative/1000 % 60), 2);
+    str += ".";
+    str += pad(Math.floor((cumulative % 1000) / 10), 2);
+    $("#timer").html(str);
+  }
+
 });
 
 /*

@@ -54,13 +54,11 @@ twistyjs.TwistyScene = function() {
   var moveProgress = null;
   var currentMove = null;
   var moveQueue = [];
-  var animating = false;
 
   var camera, scene, renderer;
   var twistyCanvas;
   var cameraTheta = 0;
 
-  var timing = false;
   var startTime;
 
   var stats = null;
@@ -81,6 +79,9 @@ twistyjs.TwistyScene = function() {
   };
   this.getCanvas = function() {
     return twistyCanvas;
+  };
+  this.getTwisty = function() {
+    return twisty;
   };
 
   this.initializeTwisty = function(twistyType) {
@@ -149,21 +150,6 @@ twistyjs.TwistyScene = function() {
     twisty.keydownCallback(twisty, e);
 
     switch (keyCode) {
-        // TODO - timing code should be elsewhere!
-      case 27:
-        that.initializeTwisty(twisty["type"]);
-        resetTimer();
-        e.preventDefault();
-        break;
-
-      case 32:
-        if (!timing) {
-          var scramble = twisty.generateScramble(twisty);
-          that.applyMoves(scramble);
-          setTimingFlag();
-        }
-        e.preventDefault();
-        break;
 
       case 37:
         moveCameraDelta(Math.TAU/48);
@@ -252,44 +238,23 @@ twistyjs.TwistyScene = function() {
     render();
   }
 
-  // TODO - timing stuff doesn't belong in here --jfly
-  var startTimingFlag = false;
-
-  function setTimingFlag() {
-    startTimingFlag = true;
-    $("#timer").html("[Ready]");
-  }
-
-  function stopTimer() {
-    startTimingFlag = false;
-    timing = false;
-  }
-
-  function resetTimer() {
-    stopTimer();
-    $("#timer").html("[Timer]");
-  }
-  // TODO - move this elsewhere!
-  this.resetTimer = resetTimer;
-
-  function startAnimation() { 
-
-    if(!animating) {
-      animating = true;
-      //log("Starting move queue: " + movesToString(moveQueue));
-      startMove();
-      animate();
+  var moveListeners = [];
+  this.addMoveListener = function(listener) {
+    moveListeners.push(listener);
+  };
+  this.removeMoveListener = function(listener) {
+    var index = moveListeners.indexOf(listener);
+    assert(index >= 0);
+    delete moveListeners[index];
+  };
+  function fireMoveStarted(move) {
+    for(var i = 0; i < moveListeners.length; i++) {
+      moveListeners[i](move, true);
     }
-
   }
-
-  function startTimer() {
-
-    startTime = (new Date).getTime();
-
-    if(!timing) {
-      timing = true;
-      animate();
+  function fireMoveEnded(move) {
+    for(var i = 0; i < moveListeners.length; i++) {
+      moveListeners[i](move, false);
     }
   }
 
@@ -298,13 +263,7 @@ twistyjs.TwistyScene = function() {
 
     currentMove = moveQueue.shift();
     //log(moveToString(currentMove));
-    if (startTimingFlag) {
-      if (!twisty.isInspectionLegalMove(twisty, currentMove)) {
-        startTimer();
-        startTimingFlag = false;
-      }
-    }
-
+    fireMoveStarted(currentMove);
   }
 
   //TODO 20110906: Handle illegal moves robustly.
@@ -326,14 +285,12 @@ twistyjs.TwistyScene = function() {
 
 
   this.applyMoves = function(moves) {
-
     moveQueue = moves;
     while (moveQueue.length > 0) {
       startMove();
       twisty["advanceMoveCallback"](twisty, currentMove);
     }
     render();
-
   };
 
   //TODO: Make time-based / framerate-compensating
@@ -344,7 +301,6 @@ twistyjs.TwistyScene = function() {
   var animationStep = 0.1;
 
   function stepAnimation() {
-
     moveProgress += animationStep;
 
     if (moveProgress < 1) {
@@ -353,9 +309,7 @@ twistyjs.TwistyScene = function() {
     else {
       twisty["advanceMoveCallback"](twisty, currentMove);
 
-      if (twisty.isSolved(twisty)) {
-        stopTimer();
-      }
+      fireMoveEnded(currentMove);
 
       if (moveQueue.length == 0) {
         animating = false;
@@ -365,66 +319,47 @@ twistyjs.TwistyScene = function() {
       }
 
     }
-
   }
 
   function startStats() {
-
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.top = '0px';
     stats.domElement.style.left = '0px';
     twistyContainer.appendChild( stats.domElement );
     $(stats.domElement).click();
-
   }
 
-  var animationLooping = false;
-  function animate(notUserInvoked) {
-    if(!notUserInvoked && animationLooping) {
+
+  var animating = false;
+  var pendingAnimationLoop = false;
+  function stopAnimation() {
+    animating = false;
+  }
+  function startAnimation() {
+    if(!pendingAnimationLoop) {
+      animating = true;
+      //log("Starting move queue: " + movesToString(moveQueue));
+      startMove();
+      animateLoop();
+    }
+  }
+  function animateLoop() {
+    pendingAnimationLoop = false;
+    if(!animating) {
       return;
     }
 
-    if (animating) {
-      stepAnimation();
-      render();
-    }
+    stepAnimation();
+    render();
 
     if (stats) {
       stats.update(); 
     }
 
-    if (timing) {
-      updateTimer();
-    }
-
-    // If we get here successfully, do it again!
-    if (animating || timing) {
-      animationLooping = true;
-      requestAnimationFrame(animate.bind(null, true));
-    } else {
-      animationLooping = false;
-    }
-
-  }
-
-  function pad(n, minLength) {
-    var str = '' + n;
-    while (str.length < minLength) {
-      str = '0' + str;
-    }
-    return str;
-  }
-
-  function updateTimer() {
-    cumulative = (new Date).getTime() - startTime;
-    var str = "";
-    str += Math.floor(cumulative/1000/60);
-    str += ":";
-    str += pad(Math.floor(cumulative/1000 % 60), 2);
-    str += ".";
-    str += pad(Math.floor((cumulative % 1000) / 10), 2);
-    $("#timer").html(str);
+    // That was fun, lets do it again!
+    requestAnimationFrame(animateLoop, twistyCanvas);
+    pendingAnimationLoop = true;
   }
 
   function createTwisty(twistyType) {
