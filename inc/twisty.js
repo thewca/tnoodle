@@ -595,8 +595,21 @@ function createCubeTwisty(twistyParameters) {
     for (var su = 0; su < cubeOptions["dimension"]; su++) {
       for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
-        var sticker = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), materials[i]);
-        sticker.doubleSided = cubeOptions["doubleSided"];
+        var sticker = new THREE.Object3D();
+        
+        var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), materials[i]);
+        stickerInterior.doubleSided = cubeOptions["doubleSided"];
+        sticker.addChild(stickerInterior);
+
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+        var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 1 } ) );
+
+        sticker.addChild(border);
 
         var positionMatrix = new THREE.Matrix4();
         positionMatrix.setTranslation(
