@@ -393,7 +393,7 @@ function animate(notUserInvoked) {
   // If we get here successfully, do it again!
   if (animating || timing) {
     animationLooping = true;
-    requestAnimationFrame(function() {animate(true)});
+    requestAnimationFrame(function() {animate(true);});
   } else {
     animationLooping = false;
   }
@@ -505,14 +505,15 @@ function createCubeTwisty(twistyParameters) {
       "opacity": 0.95,
       "dimension": 3,
       "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
-      "scale": 1
+      "scale": 1,
+      "stickerBorder": true
   };
 
   // Passed Parameters
   for (option in cubeOptions) {
     if(option in twistyParameters) {
       log("Setting option \"" + option + "\" to " + twistyParameters[option]);
-      cubeOptions[option] = twistyParameters[option];;
+      cubeOptions[option] = twistyParameters[option];
     }
   }
 
@@ -603,15 +604,17 @@ function createCubeTwisty(twistyParameters) {
         stickerInterior.doubleSided = cubeOptions["doubleSided"];
         sticker.addChild(stickerInterior);
 
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-        var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } ) );
+        if (cubeOptions["stickerBorder"]) {
+          var geometry = new THREE.Geometry();
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } ) );
 
-        sticker.addChild(border);
+          sticker.addChild(border);
+        }
 
         var positionMatrix = new THREE.Matrix4();
         positionMatrix.setTranslation(

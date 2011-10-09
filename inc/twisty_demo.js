@@ -14,7 +14,30 @@ function updateReadyCache() {
   location.reload(true); // For now
 }
 
-var currentCubeSize = parseInt($("#cubeDimension").val());
+var currentCubeSize;
+
+function reDimensionCube() {
+  var dim = parseInt($("#cubeDimension").val());
+  if (!dim) {
+    dim = 3;
+  }
+  dim = Math.min(Math.max(dim, 1), 16);
+  if (dim != currentCubeSize) {
+    currentCubeSize = dim;
+    reloadCube();
+  }
+  return false;
+}
+
+function reloadCube() {
+  log(currentCubeSize);
+  initializeTwisty({
+    "type": "cube",
+    "dimension": currentCubeSize,
+    "stickerBorder": $("#sticker_border").is(':checked')
+  });
+  $("#cubeDimension").blur(); 
+}
 
 $(document).ready(function() {
 
@@ -24,30 +47,19 @@ $(document).ready(function() {
 
   cache.addEventListener('updateready', updateReadyCache, false);
 
+  currentCubeSize = parseInt($("#cubeDimension").val());
+
   log("Document ready.");
 
   initializeTwisty({
     "type": "cube",
-    "dimension": 3
+    "dimension": 3,
+    "stickerBorder": $("#sticker_border").is(':checked')
   });
 
+  $("#cubeDimension").bind("input", reDimensionCube);
+  $("#sticker_border").bind("change", reloadCube);
 
-  $("#cubeDimension").bind("input", function() {
-    var dim = parseInt($("#cubeDimension").val());
-    if (!dim) {
-      dim = 3;
-    }
-    dim = Math.min(Math.max(dim, 1), 16);
-    if (dim != currentCubeSize) {
-      initializeTwisty({
-        "type": "cube",
-        "dimension": dim
-      });
-      currentCubeSize = dim;
-      $("#cubeDimension").blur(); 
-    }
-    return false;
-  });
 
   $("#alg_ccc").bind("click", function() {
     addMoves(makeCCC(parseInt($("#cubeDimension").val())));

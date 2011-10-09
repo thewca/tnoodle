@@ -211,25 +211,30 @@ div.right {
 
 .canvasFocused {
   background-color: #EAEAEA;
-  background-image: -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+  background-image:
+    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
     75%, #DDD 75%, #DDD),
     -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
     75%, #DDD 75%, #DDD);
-  background-image: -moz-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
-    #DDD 75%, #DDD),
-    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+  background-image:
+    -moz-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD),
+    -moz-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
     75%, #DDD 75%, #DDD);
-  background-image: -ms-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
-    #DDD 75%, #DDD),
-    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+  background-image:
+    -o-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD),
+    -o-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
     75%, #DDD 75%, #DDD);
-  background-image: -o-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%,
-    #DDD 75%, #DDD),
-    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+  background-image:
+    -ms-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD),
+    -ms-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
     75%, #DDD 75%, #DDD);
-  background-image: -linear-gradient(45deg, #DDD 25%, transparent 25%, transparent 75%, #DDD
-    75%, #DDD),
-    -webkit-linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+  background-image:
+    linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
+    75%, #DDD 75%, #DDD),
+    linear-gradient(45deg, #DDD 25%, transparent 25%, transparent
     75%, #DDD 75%, #DDD);
   background-size: 32px 32px;
   background-position: 0 0, 16px 16px;
