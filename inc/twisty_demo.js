@@ -147,9 +147,10 @@ $(document).ready(function() {
 
   var startTimingFlag = false;
 
-  function setTimingFlag() {
+  function readyTimer() {
     startTimingFlag = true;
     $("#timer").html("[Ready]");
+	$("#timer").removeClass("reset ready runnning stopped").addClass("ready");
   }
 
   var timing = false;
@@ -158,17 +159,20 @@ $(document).ready(function() {
 
     if(!timing) {
       timing = true;
+	  $("#timer").removeClass("reset ready runnning stopped").addClass("running");
     }
   }
   function stopTimer() {
     startTimingFlag = false;
     timing = false;
     updateTimer();
+	$("#timer").removeClass("reset ready runnning stopped").addClass("stopped");
   }
 
   function resetTimer() {
     stopTimer();
     $("#timer").html("[Timer]");
+	$("#timer").removeClass("reset ready runnning stopped").addClass("reset");
   }
 
   function pad(n, minLength) {
