@@ -16,6 +16,32 @@ if(typeof(log) == "undefined") {
   };
 }
 
+// This fixes https://github.com/lgarron/twisty.js/issues/3
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function (oThis) {
+    if (typeof this !== "function") {
+      // closest thing possible to the ECMAScript 5 internal IsCallable function
+      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+    }
+
+    var fSlice = Array.prototype.slice,
+        aArgs = fSlice.call(arguments, 1), 
+        fToBind = this, 
+        fNOP = function () {},
+        fBound = function () {
+          return fToBind.apply(this instanceof fNOP
+                                 ? this
+                                 : oThis || window,
+                               aArgs.concat(fSlice.call(arguments)));
+        };
+
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+
+    return fBound;
+  };
+}
+
 if(typeof(assert) == "undefined") {
   // TODO - this is pretty lame, we could use something like stacktrace.js
   // to get some useful information here.

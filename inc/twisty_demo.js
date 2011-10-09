@@ -116,7 +116,7 @@ $(document).ready(function() {
           var twisty = twistyScene.getTwisty();
           var scramble = twisty.generateScramble(twisty);
           twistyScene.applyMoves(scramble);
-          setTimingFlag();
+          readyTimer();
         }
         e.preventDefault();
         break;
@@ -133,13 +133,13 @@ $(document).ready(function() {
         // TODO refresh timer
         // TODO bug with animation stuff, turns don't always show up =(
         // TODO changing puzzle doesn't seem to reset the timer
-        console.log("STARTING TIMER");
+        log("STARTING TIMER");
         startTimer();
       }
     } else {
       var twisty = twistyScene.getTwisty();
       if(twisty.isSolved(twisty)) {
-        console.log("stopping TIMER");
+        log("stopping TIMER");
         stopTimer();
       }
     }
@@ -203,14 +203,18 @@ $(document).ready(function() {
 var logCounter = 0;
 
 function log(obj) {
-  console.log(obj);
+  if(typeof(console) !== "undefined" && console.log) {
+    console.log(obj);
+  }
   var previousHTML = $("#debug").html();
   previousHTML = (logCounter++) + ". " + obj + "<hr/>" + previousHTML;
   $("#debug").html(previousHTML);
 }
 
 function err(obj) {
-  console.error(obj);
+  if(typeof(console) !== "undefined" && console.error) {
+    console.error(obj);
+  }
   var previousHTML = $("#debug").html();
   previousHTML = "<div class='err'>" + (logCounter++) + ". " + obj + "</div><hr/>" + previousHTML;
   $("#debug").html(previousHTML);
