@@ -546,7 +546,7 @@ twistyjs.TwistyScene = function() {
 
     // Cube Materials
     var materials = [];
-    var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 5 } );
+    var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } );
     borderMaterial.opacity = cubeOptions["opacity"];
     for (var i = 0; i < numSides; i++) {
       var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i] });
@@ -562,7 +562,7 @@ twistyjs.TwistyScene = function() {
           v1.y, v2.y, v3.y, 0,
           v1.z, v2.z, v3.z, 0,
           0   , 0   , 0   , 1
-          );
+      );
       return ax;
     }
 
@@ -630,6 +630,19 @@ twistyjs.TwistyScene = function() {
         if (cubeOptions["stickerBorder"]) {
           meshes.push(borderMaterial);
         }
+        /* This is here purely for speed comparison purposes.
+         if (cubeOptions["stickerBorder"]) {
+          var geometry = new THREE.Geometry();
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: cubeOptions.opacity } ) );
+
+          sticker.addChild(border);
+        */
+
         var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes);
         stickerInterior.doubleSided = cubeOptions["doubleSided"];
         sticker.addChild(stickerInterior);
