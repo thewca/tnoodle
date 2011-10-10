@@ -9,7 +9,7 @@ window.cancelRequestAnimFrame = (function() {
   window.mozCancelRequestAnimationFrame ||
   window.oCancelRequestAnimationFrame ||
   window.msCancelRequestAnimationFrame ||
-  clearTimeout
+  clearTimeout;
 })();
 
 window.requestAnimFrame = (function() {
