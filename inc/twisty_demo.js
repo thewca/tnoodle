@@ -5,9 +5,12 @@
  * 
  * TOOD
  * - Fix document.getElementById(...) calls.
-        // TODO somehow be able to cancel/prevent a move?
+        // TODO I can imagine that some users of twisty.js would want to be able to have a Heise-style
+        // inspection, where you are only allowed to do inspection moves during inspection, rather than
+        // just starting the timer when they do a turn. This will require somehow being able to cancel/prevent a move?
         // TODO clicking on canvas doesn't seem to focus window in firefox
         // TODO clicking and dragging is weird when the mouse leaves the window
+        // TODO keydown doesn't repeat on firefox
  * 
  */
 
@@ -20,81 +23,81 @@ function updateReadyCache() {
 var startTime = null;
 var stopTime = null;
 function startTimer() {
-	startTime = new Date().getTime();
-	stopTime = null;
-	refreshTimer();
-	startRefreshTimerLoop();
+  startTime = new Date().getTime();
+  stopTime = null;
+  refreshTimer();
+  startRefreshTimerLoop();
 }
 function isTiming() {
-	return startTime != null && stopTime == null;
+  return startTime != null && stopTime == null;
 }
 function stopTimer() {
-	assert(startTime);
-	stopTime = new Date().getTime();
-	refreshTimer();
-	stopRefreshTimerLoop();
+  assert(startTime);
+  stopTime = new Date().getTime();
+  refreshTimer();
+  stopRefreshTimerLoop();
 }
 
 function resetTimer() {
-	startTime = null;
-	stopTime = null;
-	refreshTimer();
-	stopRefreshTimerLoop();
+  startTime = null;
+  stopTime = null;
+  refreshTimer();
+  stopRefreshTimerLoop();
 }
 
 function refreshTimer() {
-	var timer = $("#timer");
-	timer.removeClass("reset running stopped");
-	if(isTiming()) {
-		timer.addClass("running");
-		timer.text(prettyTime(new Date().getTime()));
-	} else if(startTime == null) {
-		assert(stopTime == null);
-		timer.addClass("reset");
-		timer.text("[Timer]");
-	} else if(stopTime != null) {
-		assert(startTime);
-		timer.addClass("stopped");
-		timer.text(prettyTime(stopTime));
-	}
+  var timer = $("#timer");
+  timer.removeClass("reset running stopped");
+  if(isTiming()) {
+    timer.addClass("running");
+    timer.text(prettyTime(new Date().getTime()));
+  } else if(startTime == null) {
+    assert(stopTime == null);
+    timer.addClass("reset");
+    timer.text("[Timer]");
+  } else if(stopTime != null) {
+    assert(startTime);
+    timer.addClass("stopped");
+    timer.text(prettyTime(stopTime));
+  }
 }
 
 var pendingTimerRefresh = null;
 function startRefreshTimerLoop() {
-	if(pendingTimerRefresh == null) {
-		pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
-	}
+  if(pendingTimerRefresh == null) {
+    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+  }
 }
 function stopRefreshTimerLoop() {
-	if(pendingTimerRefresh != null) {
-		cancelRequestAnimFrame(pendingTimerRefresh);
-		pendingTimerRefresh = null;
-	}
+  if(pendingTimerRefresh != null) {
+    cancelRequestAnimFrame(pendingTimerRefresh);
+    pendingTimerRefresh = null;
+  }
 }
 function refreshTimerLoop() {
-	refreshTimer();
-	if(pendingTimerRefresh != null) {
-		pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
-	}
+  refreshTimer();
+  if(pendingTimerRefresh != null) {
+    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+  }
 }
 
 function pad(n, minLength) {
-	var str = '' + n;
-	while (str.length < minLength) {
-		str = '0' + str;
-	}
-	return str;
+  var str = '' + n;
+  while (str.length < minLength) {
+    str = '0' + str;
+  }
+  return str;
 }
 
 function prettyTime(endTime) {
-	var cumulative = endTime - startTime;
-	var str = "";
-	str += Math.floor(cumulative/1000/60);
-	str += ":";
-	str += pad(Math.floor(cumulative/1000 % 60), 2);
-	str += ".";
-	str += pad(Math.floor((cumulative % 1000) / 10), 2);
-	return str;
+  var cumulative = endTime - startTime;
+  var str = "";
+  str += Math.floor(cumulative/1000/60);
+  str += ":";
+  str += pad(Math.floor(cumulative/1000 % 60), 2);
+  str += ".";
+  str += pad(Math.floor((cumulative % 1000) / 10), 2);
+  return str;
 }
 
 
@@ -158,29 +161,30 @@ $(document).ready(function() {
   });
 
   function reDimensionCube() {
-	  var dim = parseInt($("#cubeDimension").val());
-	  if (!dim) {
-		  dim = 3;
-	  }
-	  dim = Math.min(Math.max(dim, 1), 16);
-	  if (dim != currentCubeSize) {
-		  currentCubeSize = dim;
-		  reloadCube();
-	  }
-	  resetTimer();
+    var dim = parseInt($("#cubeDimension").val());
+    if (!dim) {
+      dim = 3;
+    }
+    dim = Math.min(Math.max(dim, 1), 16);
+    if (dim != currentCubeSize) {
+      currentCubeSize = dim;
+      reloadCube();
+    }
+    resetTimer();
   }
 
   function reloadCube() {
-	  log(currentCubeSize);
-	  twistyScene.initializeTwisty({
-		  "type": "cube",
-		  "dimension": currentCubeSize,
-		  "stickerBorder": $("#sticker_border").is(':checked')
-	  });
-	  $("#cubeDimension").blur(); 
-	  twistyScene.resize();
-	  cubeState = CubeState.solved;
-	  resetTimer();
+    log(currentCubeSize);
+    twistyScene.initializeTwisty({
+      "type": "cube",
+      "dimension": currentCubeSize,
+      "stickerBorder": $("#sticker_border").is(':checked'),
+      showFps: true
+    });
+    $("#cubeDimension").blur(); 
+    twistyScene.resize();
+    cubeState = CubeState.solved;
+    resetTimer();
   }
 
   $(window).resize(twistyScene.resize);
@@ -202,7 +206,7 @@ $(document).ready(function() {
     var keyCode = e.keyCode;
     switch(keyCode) {
       case 27:
-		reloadCube();
+        reloadCube();
         e.preventDefault();
         break;
 

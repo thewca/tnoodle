@@ -85,8 +85,6 @@ twistyjs.TwistyScene = function() {
   var twistyCanvas;
   var cameraTheta = 0;
 
-  var startTime;
-
   var stats = null;
 
   /* http://tauday.com/ ;-) */
@@ -111,6 +109,14 @@ twistyjs.TwistyScene = function() {
   };
 
   this.initializeTwisty = function(twistyType) {
+    moveQueue = [];
+    currentMove = null;
+	moveProgress = 0;
+	// We may have an animation queued up that is tied to the twistyCanvas.
+	// Since we're about to destroy our twistyCanvas, that animation request
+	// will never fire. Thus, we must explicitly stop animating here.
+	stopAnimation();
+
     $(twistyContainer).empty();
     log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
 
@@ -360,9 +366,10 @@ twistyjs.TwistyScene = function() {
 
   var pendingAnimationLoop = null;
   function stopAnimation() {
-    assert(pendingAnimationLoop != null);
-    cancelRequestAnimFrame(pendingAnimationLoop);
-    pendingAnimationLoop = null;
+    if(pendingAnimationLoop != null) {
+		cancelRequestAnimFrame(pendingAnimationLoop);
+		pendingAnimationLoop = null;
+	}
   }
   function startAnimation() {
     if(pendingAnimationLoop == null) {
@@ -438,19 +445,12 @@ twistyjs.TwistyScene = function() {
     var updateTwistyCallback = function(twisty) {
       twisty["3d"].rotation.z += 0.01;
     };
-  // If we get here successfully, do it again!
-  if (animating || timing) {
-    animationLooping = true;
-    requestAnimationFrame(function() {animate(true);});
-  } else {
-    animationLooping = false;
-  }
 
     return {
       "type": twistyType,
-        "3d": plane,
-        "twisty": twisty,
-        "updateTwistyCallback": updateTwistyCallback
+      "3d": plane,
+      "twisty": twisty,
+      "updateTwistyCallback": updateTwistyCallback
     };
 
   }
@@ -798,6 +798,7 @@ twistyjs.TwistyScene = function() {
       72: [iS, oS, "F", 1],
       71: [iS, oS, "F", -1],
       186: [iS, iSi, "U", 1],//y
+      59: [iS, iSi, "U", 1],//y (TODO - why is this needed for firefox?)
       65: [iS, iSi, "U", -1],//y'
       85: [iS, oS+1, "R", 1],
       82: [iS, oS+1, "L", -1],
