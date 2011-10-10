@@ -111,11 +111,11 @@ twistyjs.TwistyScene = function() {
   this.initializeTwisty = function(twistyType) {
     moveQueue = [];
     currentMove = null;
-	moveProgress = 0;
-	// We may have an animation queued up that is tied to the twistyCanvas.
-	// Since we're about to destroy our twistyCanvas, that animation request
-	// will never fire. Thus, we must explicitly stop animating here.
-	stopAnimation();
+    moveProgress = 0;
+    // We may have an animation queued up that is tied to the twistyCanvas.
+    // Since we're about to destroy our twistyCanvas, that animation request
+    // will never fire. Thus, we must explicitly stop animating here.
+    stopAnimation();
 
     $(twistyContainer).empty();
     log("Canvas Size: " + $(twistyContainer).width() + " x " + $(twistyContainer).height());
@@ -367,9 +367,9 @@ twistyjs.TwistyScene = function() {
   var pendingAnimationLoop = null;
   function stopAnimation() {
     if(pendingAnimationLoop != null) {
-		cancelRequestAnimFrame(pendingAnimationLoop);
-		pendingAnimationLoop = null;
-	}
+      cancelRequestAnimFrame(pendingAnimationLoop);
+      pendingAnimationLoop = null;
+    }
   }
   function startAnimation() {
     if(pendingAnimationLoop == null) {
@@ -546,12 +546,10 @@ twistyjs.TwistyScene = function() {
 
     // Cube Materials
     var materials = [];
-    var blackMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
-    blackMaterial.opacity = cubeOptions["opacity"];
-
-
+    var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 5 } );
+    borderMaterial.opacity = cubeOptions["opacity"];
     for (var i = 0; i < numSides; i++) {
-      var material = new THREE.MeshLambertMaterial( { color: cubeOptions["faceColors"][i]} );
+      var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i] });
       material.opacity = cubeOptions["opacity"];
       materials.push(material);
     }
@@ -626,22 +624,15 @@ twistyjs.TwistyScene = function() {
       for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
         var sticker = new THREE.Object3D();
+
         
-        var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), materials[i]);
+        var meshes = [ materials[i] ];
+        if (cubeOptions["stickerBorder"]) {
+          meshes.push(borderMaterial);
+        }
+        var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes);
         stickerInterior.doubleSided = cubeOptions["doubleSided"];
         sticker.addChild(stickerInterior);
-
-        if (cubeOptions["stickerBorder"]) {
-          var geometry = new THREE.Geometry();
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-          var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: cubeOptions.opacity } ) );
-
-          sticker.addChild(border);
-        }
 
         var positionMatrix = new THREE.Matrix4();
         positionMatrix.setTranslation(
