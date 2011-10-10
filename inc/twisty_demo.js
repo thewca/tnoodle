@@ -17,7 +17,86 @@ function updateReadyCache() {
   location.reload(true); // For now
 }
 
-var currentCubeSize = parseInt($("#cubeDimension").val());
+var startTime = null;
+var stopTime = null;
+function startTimer() {
+	startTime = new Date().getTime();
+	stopTime = null;
+	refreshTimer();
+	startRefreshTimerLoop();
+}
+function isTiming() {
+	return startTime != null && stopTime == null;
+}
+function stopTimer() {
+	assert(startTime);
+	stopTime = new Date().getTime();
+	refreshTimer();
+	stopRefreshTimerLoop();
+}
+
+function resetTimer() {
+	startTime = null;
+	stopTime = null;
+	refreshTimer();
+	stopRefreshTimerLoop();
+}
+
+function refreshTimer() {
+	var timer = $("#timer");
+	timer.removeClass("reset running stopped");
+	if(isTiming()) {
+		timer.addClass("running");
+		timer.text(prettyTime(new Date().getTime()));
+	} else if(startTime == null) {
+		assert(stopTime == null);
+		timer.addClass("reset");
+		timer.text("[Timer]");
+	} else if(stopTime != null) {
+		assert(startTime);
+		timer.addClass("stopped");
+		timer.text(prettyTime(stopTime));
+	}
+}
+
+var pendingTimerRefresh = null;
+function startRefreshTimerLoop() {
+	if(pendingTimerRefresh == null) {
+		pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+	}
+}
+function stopRefreshTimerLoop() {
+	if(pendingTimerRefresh != null) {
+		cancelRequestAnimFrame(pendingTimerRefresh);
+		pendingTimerRefresh = null;
+	}
+}
+function refreshTimerLoop() {
+	refreshTimer();
+	if(pendingTimerRefresh != null) {
+		pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+	}
+}
+
+function pad(n, minLength) {
+	var str = '' + n;
+	while (str.length < minLength) {
+		str = '0' + str;
+	}
+	return str;
+}
+
+function prettyTime(endTime) {
+	var cumulative = endTime - startTime;
+	var str = "";
+	str += Math.floor(cumulative/1000/60);
+	str += ":";
+	str += pad(Math.floor(cumulative/1000 % 60), 2);
+	str += ".";
+	str += pad(Math.floor((cumulative % 1000) / 10), 2);
+	return str;
+}
+
 
 var CubeState = {
   solved: 0,
@@ -33,6 +112,7 @@ $(document).ready(function() {
    * Caching Stuff.
    */
 
+
   cache.addEventListener('updateready', updateReadyCache, false);
 
   log("Document ready.");
@@ -40,32 +120,11 @@ $(document).ready(function() {
   var twistyScene = new twistyjs.TwistyScene();
   $("#twistyContainer").append($(twistyScene.getDomElement()));
 
-  function setCubeSize(dim) {
-    if (dim != currentCubeSize) {
-      twistyScene.initializeTwisty({
-        "type": "cube",
-        "dimension": dim,
-        allowDragging: true,
-        showFps: true,
-      });
-      cubeState = CubeState.solved;
-      resetTimer();
-      currentCubeSize = dim;
-      $("#cubeDimension").blur(); 
-      twistyScene.resize();
-    }
-  }
-  setCubeSize(3);
+  var currentCubeSize = parseInt($("#cubeDimension").val());
+  reloadCube();
 
-  $("#cubeDimension").bind("input", function() {
-    var dim = parseInt($("#cubeDimension").val());
-    if (!dim) {
-      dim = 3;
-    }
-    dim = Math.min(Math.max(dim, 1), 16);
-    setCubeSize(dim);
-    return false;
-  });
+  $("#cubeDimension").bind("input", reDimensionCube);
+  $("#sticker_border").bind("change", reloadCube);
 
   $("#alg_ccc").bind("click", function() {
     twistyScene.animateMoves(makeCCC(parseInt($("#cubeDimension").val())));
@@ -98,6 +157,31 @@ $(document).ready(function() {
     $("#canvasPNG").fadeTo("slow", 1);
   });
 
+  function reDimensionCube() {
+	  var dim = parseInt($("#cubeDimension").val());
+	  if (!dim) {
+		  dim = 3;
+	  }
+	  dim = Math.min(Math.max(dim, 1), 16);
+	  if (dim != currentCubeSize) {
+		  currentCubeSize = dim;
+		  reloadCube();
+	  }
+	  resetTimer();
+  }
+
+  function reloadCube() {
+	  log(currentCubeSize);
+	  twistyScene.initializeTwisty({
+		  "type": "cube",
+		  "dimension": currentCubeSize,
+		  "stickerBorder": $("#sticker_border").is(':checked')
+	  });
+	  $("#cubeDimension").blur(); 
+	  twistyScene.resize();
+	  cubeState = CubeState.solved;
+	  resetTimer();
+  }
 
   $(window).resize(twistyScene.resize);
 
@@ -118,10 +202,7 @@ $(document).ready(function() {
     var keyCode = e.keyCode;
     switch(keyCode) {
       case 27:
-        var twisty = twistyScene.getTwisty();
-        twistyScene.initializeTwisty(twisty["type"]);
-        cubeState = CubeState.solved;
-        resetTimer();
+		reloadCube();
         e.preventDefault();
         break;
 
@@ -164,86 +245,6 @@ $(document).ready(function() {
       }
     }
   });
-
-  var startTime = null;
-  var stopTime = null;
-  function startTimer() {
-    startTime = new Date().getTime();
-    stopTime = null;
-    refreshTimer();
-    startRefreshTimerLoop();
-  }
-  function isTiming() {
-    return startTime != null && stopTime == null;
-  }
-  function stopTimer() {
-    assert(startTime);
-    stopTime = new Date().getTime();
-    refreshTimer();
-    stopRefreshTimerLoop();
-  }
-
-  function resetTimer() {
-    startTime = null;
-    stopTime = null;
-    refreshTimer();
-    stopRefreshTimerLoop();
-  }
-
-  function refreshTimer() {
-    var timer = $("#timer");
-    timer.removeClass("reset running stopped");
-    if(isTiming()) {
-      timer.addClass("running");
-      timer.text(prettyTime(new Date().getTime()));
-    } else if(startTime == null) {
-      assert(stopTime == null);
-      timer.addClass("reset");
-      timer.text("[Timer]");
-    } else if(stopTime != null) {
-      assert(startTime);
-      timer.addClass("stopped");
-      timer.text(prettyTime(stopTime));
-    }
-  }
-
-  var pendingTimerRefresh = null;
-  function startRefreshTimerLoop() {
-    if(pendingTimerRefresh == null) {
-      pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
-    }
-  }
-  function stopRefreshTimerLoop() {
-    if(pendingTimerRefresh != null) {
-      cancelRequestAnimFrame(pendingTimerRefresh);
-      pendingTimerRefresh = null;
-    }
-  }
-  function refreshTimerLoop() {
-    refreshTimer();
-    if(pendingTimerRefresh != null) {
-      pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
-    }
-  }
-
-  function pad(n, minLength) {
-    var str = '' + n;
-    while (str.length < minLength) {
-      str = '0' + str;
-    }
-    return str;
-  }
-
-  function prettyTime(endTime) {
-    var cumulative = endTime - startTime;
-    var str = "";
-    str += Math.floor(cumulative/1000/60);
-    str += ":";
-    str += pad(Math.floor(cumulative/1000 % 60), 2);
-    str += ".";
-    str += pad(Math.floor((cumulative % 1000) / 10), 2);
-    return str;
-  }
 
 });
 

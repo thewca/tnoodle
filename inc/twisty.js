@@ -438,6 +438,13 @@ twistyjs.TwistyScene = function() {
     var updateTwistyCallback = function(twisty) {
       twisty["3d"].rotation.z += 0.01;
     };
+  // If we get here successfully, do it again!
+  if (animating || timing) {
+    animationLooping = true;
+    requestAnimationFrame(function() {animate(true);});
+  } else {
+    animationLooping = false;
+  }
 
     return {
       "type": twistyType,
@@ -517,7 +524,7 @@ twistyjs.TwistyScene = function() {
 
     //Defaults
     var cubeOptions = {
-      "borderThickness": 0,
+      "stickerBorder": true,
       "stickerWidth": 1.8,
       "doubleSided": true,
       "opacity": 1,
@@ -532,7 +539,7 @@ twistyjs.TwistyScene = function() {
         log("Setting option \"" + option + "\" to " + twistyParameters[option]);
         cubeOptions[option] = twistyParameters[option];
       }
-    }
+  };
 
     // Cube Constants
     var numSides = 6;
@@ -602,64 +609,57 @@ twistyjs.TwistyScene = function() {
       "B": zz,
       "D": yy
     };
-    var sidesUV = [
-      axify(xx, zzi, yy),
-      axify(zz, yy, xxi),
-      axify(xx, yy, zz),
-      axify(zzi, yy, xx),
-      axify(xxi, yy, zzi),
-      axify(xx, zz, yyi)
-        ];
+  var sidesUV = [
+                 axify(xx, zzi, yy),
+                 axify(zz, yy, xxi),
+                 axify(xx, yy, zz),
+                 axify(zzi, yy, xx),
+                 axify(xxi, yy, zzi),
+                 axify(xx, zz, yyi)
+                 ];
 
-    //Cube Object Generation
-    for (var i = 0; i < numSides; i++) {
-      var facePieces = [];
-      cubePieces.push(facePieces);
-      for (var su = 0; su < cubeOptions["dimension"]; su++) {
-        for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
+  //Cube Object Generation
+  for (var i = 0; i < numSides; i++) {
+    var facePieces = [];
+    cubePieces.push(facePieces);
+    for (var su = 0; su < cubeOptions["dimension"]; su++) {
+      for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
 
-          var stickerWidth = cubeOptions.stickerWidth;
-          var sticker = new THREE.Mesh(new THREE.PlaneGeometry(stickerWidth, stickerWidth), materials[i]);
-          sticker.doubleSided = cubeOptions["doubleSided"];
+        var sticker = new THREE.Object3D();
+        
+        var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), materials[i]);
+        stickerInterior.doubleSided = cubeOptions["doubleSided"];
+        sticker.addChild(stickerInterior);
 
-          if(cubeOptions.borderThickness)  {
-            // TODO - there has got to be a less expensive way of doing this.
-            // This implementation is quintupling the number of polygons.
-            var borderSize = stickerWidth + cubeOptions.borderThickness*2;
+        if (cubeOptions["stickerBorder"]) {
+          var geometry = new THREE.Geometry();
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } ) );
 
-            var positionMatrix = new THREE.Matrix4();
-            positionMatrix.setTranslation(-stickerWidth/2-cubeOptions.borderThickness/2, 0, 0);
-            var rotate90 = new THREE.Matrix4();
-            rotate90.setRotationAxis(zz, Math.TAU/4);
-            for(var rotateAmt = 0; rotateAmt < 4; rotateAmt++) {
-              var blackBorder = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions.borderThickness, borderSize), blackMaterial);
-              blackBorder.matrix.copy(positionMatrix);
-              blackBorder.doubleSided = cubeOptions.doubleSided;
-              blackBorder.matrixAutoUpdate = false;
-              blackBorder.update();
-              sticker.addChild(blackBorder);
+          sticker.addChild(border);
+        }
 
-              positionMatrix.multiply(rotate90, positionMatrix);
-            }
-          }
+        var positionMatrix = new THREE.Matrix4();
+        positionMatrix.setTranslation(
+            su*2 - cubeOptions["dimension"] + 1,
+            -(sv*2 - cubeOptions["dimension"] + 1),
+            cubeOptions["dimension"]
+        );    
 
-          var positionMatrix = new THREE.Matrix4();
-          positionMatrix.setTranslation(
-              su*2 - cubeOptions["dimension"] + 1,
-              -(sv*2 - cubeOptions["dimension"] + 1),
-              cubeOptions["dimension"]
-          );
+        var transformationMatrix = new THREE.Matrix4();
+        transformationMatrix.copy(sidesUV[i]);
+        transformationMatrix.multiplySelf(positionMatrix);
+        sticker.matrix.copy(transformationMatrix); 
 
-          var transformationMatrix = new THREE.Matrix4();
-          transformationMatrix.copy(sidesUV[i]);
-          transformationMatrix.multiplySelf(positionMatrix);
-          sticker.matrix.copy(transformationMatrix); 
+        sticker.matrixAutoUpdate = false;
+        sticker.update();
 
-          sticker.matrixAutoUpdate = false;
-          sticker.update();
-
-          facePieces.push([transformationMatrix, sticker]);
-          cubeObject.addChild(sticker);    
+        facePieces.push([transformationMatrix, sticker]);
+        cubeObject.addChild(sticker);    
 
         }
       }
