@@ -336,9 +336,10 @@ twistyjs.TwistyScene = function() {
       twisty["advanceMoveCallback"](twisty, currentMove);
 
       fireMoveEnded(currentMove);
+      currentMove = null;
 
       if (moveQueue.length == 0) {
-        animating = false;
+        stopAnimation();
       }
       else {
         startMove();
@@ -357,25 +358,20 @@ twistyjs.TwistyScene = function() {
   }
 
 
-  var animating = false;
-  var pendingAnimationLoop = false;
+  var pendingAnimationLoop = null;
   function stopAnimation() {
-    animating = false;
+    assert(pendingAnimationLoop != null);
+    cancelRequestAnimFrame(pendingAnimationLoop);
+    pendingAnimationLoop = null;
   }
   function startAnimation() {
-    if(!pendingAnimationLoop) {
-      animating = true;
+    if(pendingAnimationLoop == null) {
       //log("Starting move queue: " + movesToString(moveQueue));
       startMove();
-      animateLoop();
+      pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
     }
   }
   function animateLoop() {
-    pendingAnimationLoop = false;
-    if(!animating) {
-      return;
-    }
-
     stepAnimation();
     render();
 
@@ -384,8 +380,11 @@ twistyjs.TwistyScene = function() {
     }
 
     // That was fun, lets do it again!
-    requestAnimationFrame(animateLoop, twistyCanvas);
-    pendingAnimationLoop = true;
+    // We check pendingAnimationLoop first, because the loop
+    // may have been cancelled during stepAnimation().
+    if(pendingAnimationLoop != null) {
+      pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
+    }
   }
 
   function createTwisty(twistyType) {

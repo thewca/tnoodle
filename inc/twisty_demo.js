@@ -5,6 +5,9 @@
  * 
  * TOOD
  * - Fix document.getElementById(...) calls.
+        // TODO somehow be able to cancel/prevent a move?
+        // TODO clicking on canvas doesn't seem to focus window in firefox
+        // TODO clicking and dragging is weird when the mouse leaves the window
  * 
  */
 
@@ -15,6 +18,14 @@ function updateReadyCache() {
 }
 
 var currentCubeSize = parseInt($("#cubeDimension").val());
+
+var CubeState = {
+  solved: 0,
+  scrambling: 1,
+  scrambled: 2,
+  solving: 3,
+};
+var cubeState = null;
 
 $(document).ready(function() {
 
@@ -37,6 +48,8 @@ $(document).ready(function() {
         allowDragging: true,
         showFps: true,
       });
+      cubeState = CubeState.solved;
+      resetTimer();
       currentCubeSize = dim;
       $("#cubeDimension").blur(); 
       twistyScene.resize();
@@ -107,16 +120,22 @@ $(document).ready(function() {
       case 27:
         var twisty = twistyScene.getTwisty();
         twistyScene.initializeTwisty(twisty["type"]);
+        cubeState = CubeState.solved;
         resetTimer();
         e.preventDefault();
         break;
 
       case 32:
-        if (!timing) {
+        if (!isTiming()) {
           var twisty = twistyScene.getTwisty();
           var scramble = twisty.generateScramble(twisty);
+          // We're going to get notified of the scrambling, and we don't
+          // want to start the timer when that's happening, so we keep track
+          // of the fact that we're scrambling.
+          cubeState = CubeState.scrambling;
           twistyScene.applyMoves(scramble);
-          readyTimer();
+          cubeState = CubeState.scrambled;
+          resetTimer();
         }
         e.preventDefault();
         break;
@@ -127,52 +146,84 @@ $(document).ready(function() {
 
   twistyScene.addMoveListener(function(move, started) {
     if(started) {
-      if(!timing) {
-        // TODO allow inspection legal moves!
-        // TODO somehow be able to cancel a move?
-        // TODO refresh timer
-        // TODO bug with animation stuff, turns don't always show up =(
-        // TODO changing puzzle doesn't seem to reset the timer
-        log("STARTING TIMER");
+      if(cubeState == CubeState.scrambling) {
+        // We don't want to start the timer if we're scrambling the cube.
+      } else if(cubeState == CubeState.scrambled) {
+        var twisty = twistyScene.getTwisty();
+        if(twisty.isInspectionLegalMove(twisty, move)) {
+          return;
+        }
         startTimer();
+        cubeState = CubeState.solving;
       }
     } else {
       var twisty = twistyScene.getTwisty();
-      if(twisty.isSolved(twisty)) {
-        log("stopping TIMER");
+      if(cubeState == CubeState.solving && twisty.isSolved(twisty)) {
+        cubeState = CubeState.solved;
         stopTimer();
       }
     }
   });
 
-  var startTimingFlag = false;
-
-  function readyTimer() {
-    startTimingFlag = true;
-    $("#timer").html("[Ready]");
-	$("#timer").removeClass("reset ready runnning stopped").addClass("ready");
-  }
-
-  var timing = false;
+  var startTime = null;
+  var stopTime = null;
   function startTimer() {
-    startTime = (new Date).getTime();
-
-    if(!timing) {
-      timing = true;
-	  $("#timer").removeClass("reset ready runnning stopped").addClass("running");
-    }
+    startTime = new Date().getTime();
+    stopTime = null;
+    refreshTimer();
+    startRefreshTimerLoop();
+  }
+  function isTiming() {
+    return startTime != null && stopTime == null;
   }
   function stopTimer() {
-    startTimingFlag = false;
-    timing = false;
-    updateTimer();
-	$("#timer").removeClass("reset ready runnning stopped").addClass("stopped");
+    assert(startTime);
+    stopTime = new Date().getTime();
+    refreshTimer();
+    stopRefreshTimerLoop();
   }
 
   function resetTimer() {
-    stopTimer();
-    $("#timer").html("[Timer]");
-	$("#timer").removeClass("reset ready runnning stopped").addClass("reset");
+    startTime = null;
+    stopTime = null;
+    refreshTimer();
+    stopRefreshTimerLoop();
+  }
+
+  function refreshTimer() {
+    var timer = $("#timer");
+    timer.removeClass("reset running stopped");
+    if(isTiming()) {
+      timer.addClass("running");
+      timer.text(prettyTime(new Date().getTime()));
+    } else if(startTime == null) {
+      assert(stopTime == null);
+      timer.addClass("reset");
+      timer.text("[Timer]");
+    } else if(stopTime != null) {
+      assert(startTime);
+      timer.addClass("stopped");
+      timer.text(prettyTime(stopTime));
+    }
+  }
+
+  var pendingTimerRefresh = null;
+  function startRefreshTimerLoop() {
+    if(pendingTimerRefresh == null) {
+      pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+    }
+  }
+  function stopRefreshTimerLoop() {
+    if(pendingTimerRefresh != null) {
+      cancelRequestAnimFrame(pendingTimerRefresh);
+      pendingTimerRefresh = null;
+    }
+  }
+  function refreshTimerLoop() {
+    refreshTimer();
+    if(pendingTimerRefresh != null) {
+      pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+    }
   }
 
   function pad(n, minLength) {
@@ -183,15 +234,15 @@ $(document).ready(function() {
     return str;
   }
 
-  function updateTimer() {
-    var cumulative = (new Date).getTime() - startTime;
+  function prettyTime(endTime) {
+    var cumulative = endTime - startTime;
     var str = "";
     str += Math.floor(cumulative/1000/60);
     str += ":";
     str += pad(Math.floor(cumulative/1000 % 60), 2);
     str += ".";
     str += pad(Math.floor((cumulative % 1000) / 10), 2);
-    $("#timer").html(str);
+    return str;
   }
 
 });

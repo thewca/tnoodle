@@ -1,22 +1,24 @@
 /**
- * Provides requestAnimationFrame in a cross browser way.
- * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ * Cancellable version of requestAnimationFrame.
+ * http://notes.jetienne.com/2011/05/18/cancelRequestAnimFrame-for-paul-irish-requestAnimFrame.html
+ * (found on http://paulirish.com/2011/requestanimationframe-for-smart-animating/)
  */
+window.cancelRequestAnimFrame = (function() {
+  return window.cancelAnimationFrame ||
+  window.webkitCancelRequestAnimationFrame ||
+  window.mozCancelRequestAnimationFrame ||
+  window.oCancelRequestAnimationFrame ||
+  window.msCancelRequestAnimationFrame ||
+  clearTimeout
+})();
 
-if ( !window.requestAnimationFrame ) {
-
-	window.requestAnimationFrame = ( function() {
-
-		return window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame ||
-		window.oRequestAnimationFrame ||
-		window.msRequestAnimationFrame ||
-		function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
-
-			window.setTimeout( callback, 1000 / 60 );
-
-		};
-
-	} )();
-
-}
+window.requestAnimFrame = (function() {
+  return window.requestAnimationFrame || 
+  window.webkitRequestAnimationFrame || 
+  window.mozRequestAnimationFrame || 
+  window.oRequestAnimationFrame || 
+  window.msRequestAnimationFrame || 
+  function(/* function */ callback, /* DOMElement */ element) {
+    return window.setTimeout(callback, 1000 / 60);
+  };
+})();

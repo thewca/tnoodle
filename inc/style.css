@@ -114,10 +114,6 @@ div.right {
 }
 
 #timer.reset { 
-    background: #ACE;
-}
-
-#timer.ready { 
     background: #F80;
 }
 
