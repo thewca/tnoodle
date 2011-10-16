@@ -293,6 +293,7 @@ twistyjs.TwistyScene = function() {
   function startMove() {
     moveProgress = 0;
 
+	assert(moveQueue.length > 0);
     currentMove = moveQueue.shift();
     //log(moveToString(currentMove));
     fireMoveStarted(currentMove);
@@ -317,12 +318,18 @@ twistyjs.TwistyScene = function() {
 
 
   this.applyMoves = function(moves) {
+	that.addMoves(moves);
+/* TODO - this is leaving the twisty in a weird state, the next turn gets doubled?
+    // TODO - what if moveQueue is not empty?
+    assert(moveQueue.length == 0);
+
     moveQueue = moves;
     while (moveQueue.length > 0) {
       startMove();
       twisty["advanceMoveCallback"](twisty, currentMove);
     }
     render();
+*/
   };
 
   //TODO: Make time-based / framerate-compensating
@@ -770,8 +777,7 @@ twistyjs.TwistyScene = function() {
       var newMoves = [];
 
       for (var i=0; i<n; i++) {
-
-        var random1 = 1+ Math.floor(Math.random()*dim/2);
+        var random1 = 1 + Math.floor(Math.random()*dim/2);
         var random2 = random1 + Math.floor(Math.random()*dim/2);
         var random3 = Math.floor(Math.random()*6);
         var random4 = [-2, -1, 1, 2][Math.floor(Math.random()*4)];
@@ -779,7 +785,6 @@ twistyjs.TwistyScene = function() {
         var newMove = [random1, random2, ["U", "L", "F", "R", "B", "D"][random3], random4];
 
         newMoves.push(newMove);
-
       }
 
       return newMoves;
@@ -816,15 +821,19 @@ twistyjs.TwistyScene = function() {
       80: [iS, iSi, "F", 1],//y
       81: [iS, iSi, "F", -1],//y'
     }
-    var keydownCallback = function(twisty, e) {
+	var moveForKey = function(twisty, e) {
       if(e.altKey || e.ctrlKey) {
-        return;
+        return null;
       }
 
       var keyCode = e.keyCode;
       if (keyCode in cubeKeyMapping) {
-        twistyScene.addMoves([cubeKeyMapping[keyCode]]);
+		return cubeKeyMapping[keyCode];
       }
+	  return null;
+	}
+    var keydownCallback = function(twisty, e) {
+	  twistyScene.addMoves([moveForKey(twisty, e)]);
     };
 
     var ogCubePiecesCopy = [];
@@ -937,7 +946,8 @@ twistyjs.TwistyScene = function() {
       "keydownCallback": keydownCallback,
       "isSolved": isSolved,
       "isInspectionLegalMove": isInspectionLegalMove,
-      "generateScramble": generateScramble
+      "generateScramble": generateScramble,
+	  "moveForKey": moveForKey,
     };
 
   }
