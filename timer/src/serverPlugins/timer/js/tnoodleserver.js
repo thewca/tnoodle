@@ -75,7 +75,15 @@ tnoodle.server = function(host, port) {
 	};
 	
 	this.loadScramble = function(callback, puzzle, seed) {
-		return this.loadScrambles(function(scrambles) { callback(scrambles[0]); }, puzzle, seed, 1);
+		return this.loadScrambles(function(scrambles) {
+			if(scrambles.error) {
+				// TODO - should we do this clever little thing, or
+				// just assert that there was no error?
+				callback(scrambles.error);
+			} else {
+				callback(scrambles[0]);
+			}
+		}, puzzle, seed, 1);
 	};
 	this.loadScrambles = function(callback, puzzle, seed, count) {
 		var query = {};

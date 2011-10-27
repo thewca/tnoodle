@@ -178,6 +178,11 @@ class tmt:
 			'--args', '-a',
 			default='',
 			help='Command line arguments (only valid with the "run" command)')
+		parser_make.add_argument(
+			'--debug', '-d',
+			choices=['jdb', 'attach'],
+			default=None,
+			help='Run with jdb or as an attacheable vm (only valid with the "run" command)')
 		parser_make.set_defaults(func=self._make)
 
 		desc = 'Generate dependency graph'
@@ -253,12 +258,21 @@ class tmt:
 			matches += [ relpath(join(root, f), relativeTo) for f in files if pattern.match(f) ]
 		return matches
 
-	def java(self, main, classpath='', args=[]):
-		command = [ 'java' ]
-		command += [ '-ea' ] # TODO - should turn on assertions at runtime
+	def java(self, main, classpath='', args=[], debug=False):
+		command = []
+		assert debug in [ None, 'jdb', 'attach' ]
+		if debug == 'jdb':
+			command.append('jdb')
+			# TODO - passing -ea to jdb doesn't work! I HATE JAVA
+		else:
+			command.append('java')
+			if debug == 'attach':
+				command.append('-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n') # TODO - configurable port?
+			command.append('-ea') # TODO - should turn on assertions at runtime
 		if classpath:
-			command += [ '-classpath', classpath ]
-		command += [ main ]
+			command.append('-classpath')
+			command.append(classpath)
+		command.append(main)
 		command += args
 		print " ".join(command)
 		p = subprocess.Popen(command)
@@ -399,6 +413,13 @@ class EclipseProject(TmtProject):
 		classpath = set()
 		classpath |= set(relpath(jar.jarFile) for jar in self.jars)
 		classpath.add(self.bin)
+
+		# TODO - the src folder only needs to be in the classpath so
+		# jdb can discover the source code
+		classpath.add(self.src)
+		# TODO - i hate the world
+		classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
+
 		for project in self.projects:
 			classpath |= project.getClasspathEntities()
 		return classpath
@@ -534,7 +555,8 @@ Main-Class: %s
 		tmt.java(
 			main=self.main,
 			classpath=self.getClasspath(),
-			args=shlex.split(tmt.args.args))
+			args=shlex.split(tmt.args.args),
+			debug=tmt.args.debug)
 
 	def clean(self):
 		print 'Cleaning: %s' % self.name

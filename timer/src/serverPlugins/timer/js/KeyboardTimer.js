@@ -296,7 +296,7 @@ var KeyboardTimer = new Class({
 	},
 	isFocused: function() {
 		// This is kinda weird, we want to avoid activating the timer 
-		// if we're in a textarea, textfield, or input field
+		// if we're in a textarea or input field.
 		var focusedEl = document.activeElement.nodeName.toLowerCase();
 		var isEditing = focusedEl == 'textarea' || focusedEl == 'input';
 		return !isEditing && !tnoodle.tnt.isSelecting() && !tnoodle.tnt.isGrayedOut() && this.windowFocused;
