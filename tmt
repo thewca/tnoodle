@@ -242,6 +242,8 @@ class tmt:
 			try:
 				return os.lstat(f).st_mtime
 			except:
+				import traceback
+				traceback.print_exc()
 				import pdb; pdb.set_trace()
 
 		m = 0
@@ -417,8 +419,10 @@ class EclipseProject(TmtProject):
 		# TODO - the src folder only needs to be in the classpath so
 		# jdb can discover the source code
 		classpath.add(self.src)
-		# TODO - i hate the world
-		classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
+		# TODO - I hate the world
+		# Uncomment & replace the following with the path to your jre
+		# if you're trying to use jbd inside of a java library method.
+		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
 
 		for project in self.projects:
 			classpath |= project.getClasspathEntities()
