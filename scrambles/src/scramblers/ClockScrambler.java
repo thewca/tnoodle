@@ -172,9 +172,9 @@ public class ClockScrambler extends Scrambler {
 			word = word.replace('U', '1');
 			word = word.replace('d', '0');
 			move = Integer.parseInt(word, 2);
-			if( move == 0 )
+			if( move == 0 ) // all pins down
 				seq[0] = Integer.parseInt(m.group(2));
-			else if( move == 15 )
+			else if( move == 15 ) // all pins up
 				seq[31] = Integer.parseInt(m.group(2));
 			else {
 				System.out.println(Integer.parseInt(m.group(2)));
