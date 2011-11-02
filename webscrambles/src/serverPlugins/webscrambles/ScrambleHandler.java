@@ -8,10 +8,18 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
@@ -35,9 +43,11 @@ import com.itextpdf.text.pdf.DefaultFontMapper;
 import com.itextpdf.text.pdf.DefaultSplitCharacter;
 import com.itextpdf.text.pdf.PdfChunk;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.sun.net.httpserver.HttpExchange;
@@ -45,7 +55,9 @@ import com.sun.net.httpserver.HttpExchange;
 @SuppressWarnings("restriction")
 public class ScrambleHandler extends SafeHttpHandler {
 	private static final int MAX_COUNT = 100;
+	private static final int MAX_COPIES = 100;
 	private static final int SCRAMBLES_PER_PAGE = 5;
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
 
 	private SortedMap<String, LazyClassLoader<Scrambler>> scramblers;
 	private String puzzleNamesJSON;
@@ -75,173 +87,315 @@ public class ScrambleHandler extends SafeHttpHandler {
 		}
 	};
 
-	private ByteArrayOutputStream createPdf(Scrambler scrambler, String[] scrambles, String title, Integer width, Integer height, String scheme) {
-		if(width == null) {
-			width = 200;
+
+	private PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
+		ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
+		Document doc = new Document(PageSize.LETTER, 0, 0, 75, 75);
+		PdfWriter docWriter = PdfWriter.getInstance(doc, pdfOut);
+
+		docWriter.setBoxSize("art", new Rectangle(36, 54, PageSize.LETTER.getWidth()-36, PageSize.LETTER.getHeight()-54));
+		
+		doc.addAuthor(this.getClass().getName());
+		doc.addCreationDate();
+		doc.addProducer();
+		doc.addCreator(this.getClass().getName());
+		if(globalTitle != null) {
+			doc.addTitle(globalTitle);
 		}
-		if(height == null) {
-			height = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
-		}
+		
+		doc.open();
+		// Note that we ignore scrambleRequest.copies here.
+		addScrambles(docWriter, doc, scrambleRequest);
+		doc.close();
+		
+		// TODO - is there a better way to convert from a PdfWriter to a PdfReader?
+		PdfReader pr = new PdfReader(pdfOut.toByteArray());
+		
+		pdfOut = new ByteArrayOutputStream();
+		doc = new Document(PageSize.LETTER, 0, 0, 75, 75);
+		docWriter = PdfWriter.getInstance(doc, pdfOut);
+		doc.open();
+		
+		PdfContentByte cb = docWriter.getDirectContent();
+
+		for(int pageN = 1; pageN <= pr.getNumberOfPages(); pageN++) {
+			PdfImportedPage page = docWriter.getImportedPage(pr, pageN);
 			
-		PdfWriter docWriter = null;
-		try {
-			Document doc = new Document(PageSize.LETTER, 0, 0, 75, 75);
-			ByteArrayOutputStream baosPDF = new ByteArrayOutputStream();
-			docWriter = PdfWriter.getInstance(doc, baosPDF);
+			doc.newPage();
+			cb.addTemplate(page, 0, 0);
+
+			Rectangle rect = pr.getBoxSize(pageN, "art");
+
+			ColumnText.showTextAligned(cb,
+					Element.ALIGN_LEFT, new Phrase(SDF.format(creationDate)),
+					rect.getLeft(), rect.getTop(), 0);
 			
-			doc.addAuthor(this.getClass().getName());
-			doc.addCreationDate();
-			doc.addProducer();
-			doc.addCreator(this.getClass().getName());
-			if(title != null)
-				doc.addTitle(title);
+			ColumnText.showTextAligned(cb,
+					Element.ALIGN_CENTER, new Phrase(globalTitle),
+					(rect.getLeft() + rect.getRight()) / 2, rect.getTop() + 5, 0);
 			
-			docWriter.setBoxSize("art", new Rectangle(36, 54, PageSize.LETTER.getWidth()-36, PageSize.LETTER.getHeight()-54));
-			docWriter.setPageEvent(new HeaderFooter(scrambler.getLongName(), title));
+			ColumnText.showTextAligned(cb,
+					Element.ALIGN_CENTER, new Phrase(scrambleRequest.title),
+					(rect.getLeft() + rect.getRight()) / 2, rect.getTop() - 10, 0);
 
-			doc.setPageSize(PageSize.LETTER);
-
-			doc.open();
-
-			Dimension dim = new Dimension(0, 0);
-			HashMap<String, Color> colorScheme = null;
-			dim = scrambler.getPreferredSize(width, height);
-			colorScheme = scrambler.parseColorScheme(scheme);
-			
-			PdfPTable table = new PdfPTable(3);
-
-			float maxWidth = 0;
-			for(int i = 0; i < scrambles.length; i++) {
-				String scramble = scrambles[i];
-				Chunk ch = new Chunk((i+1)+".");
-				maxWidth = Math.max(maxWidth, ch.getWidthPoint());
-				PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
-				nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-				table.addCell(nthscramble);
-				
-				Chunk scrambleChunk = new Chunk(scramble);
-				scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
-				try {
-					BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-					scrambleChunk.setFont(new Font(courier, 12, Font.NORMAL));
-				} catch(IOException e1) {
-					e1.printStackTrace();
-				}
-				PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
-				scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-				table.addCell(scrambleCell);
-				
-				if(dim.width > 0 && dim.height > 0) {
-					try {
-						PdfContentByte cb = docWriter.getDirectContent();
-						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-						Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
-
-						scrambler.drawScramble(g2, dim, scramble, colorScheme);
-						g2.dispose();
-						PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
-						imgCell.setBackgroundColor(BaseColor.GRAY);
-						imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-						table.addCell(imgCell);
-					} catch (Exception e) {
-						table.addCell("Error drawing scramble: " + e.getMessage());
-						e.printStackTrace();
-					}
-				} else {
-					table.addCell("");
-				}
+			if(pr.getNumberOfPages() > 1) {
+				ColumnText.showTextAligned(cb,
+						Element.ALIGN_RIGHT, new Phrase(pageN + "/" + pr.getNumberOfPages()),
+						rect.getRight(), rect.getTop(), 0);
 			}
-			maxWidth*=2; //TODO - i have no freaking clue why i need to do this
-			table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
-			doc.add(table);
+		}
 
-			doc.close();
-			return baosPDF;
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		} finally {
-			docWriter.close();
-		}
-		return null;
+		doc.close();
+
+		// TODO - is there a better way to convert from a PdfWriter to a PdfReader?
+		pr = new PdfReader(pdfOut.toByteArray());
+		return pr;
+
+//		The PdfStamper class doesn't seem to be working.
+//		pdfOut = new ByteArrayOutputStream();
+//		PdfStamper ps = new PdfStamper(pr, pdfOut);
+//		
+//		for(int pageN = 1; pageN <= pr.getNumberOfPages(); pageN++) {
+//			PdfContentByte pb = ps.getUnderContent(pageN);
+//			Rectangle rect = pr.getBoxSize(pageN, "art");
+//			System.out.println(rect.getLeft());
+//			System.out.println(rect.getWidth());
+//	        ColumnText.showTextAligned(pb,
+//	                Element.ALIGN_LEFT, new Phrase("Hello people!"), 36, 540, 0);
+////			ColumnText.showTextAligned(pb,
+////					Element.ALIGN_CENTER, new Phrase("HELLO WORLD"),
+////					(rect.getLeft() + rect.getRight()) / 2, rect.getTop(), 0);
+//		}
+//		ps.close();
+//		return ps.getReader();
 	}
 	
-	class HeaderFooter extends PdfPageEventHelper {
-		private String header;
-		public HeaderFooter(String puzzle, String title) {
-			header = puzzle + (title == null ? "" : " " + title);
+	private void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest) throws DocumentException {
+		int width = 200;
+		int height = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
+
+		Dimension dim = scrambleRequest.scrambler.getPreferredSize(width, height);
+		
+		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
+
+		PdfPTable table = new PdfPTable(3);
+
+		float maxWidth = 0;
+		for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
+			String scramble = scrambleRequest.scrambles[i];
+			Chunk ch = new Chunk((i+1)+".");
+			maxWidth = Math.max(maxWidth, ch.getWidthPoint());
+			PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
+			nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+			table.addCell(nthscramble);
+
+			Chunk scrambleChunk = new Chunk(scramble);
+			scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
+			try {
+				BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
+				scrambleChunk.setFont(new Font(courier, 12, Font.NORMAL));
+			} catch(IOException e) {
+				e.printStackTrace();
+			} catch(DocumentException e) {
+				e.printStackTrace();
+			}
+			PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
+			scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+			table.addCell(scrambleCell);
+
+			if(dim.width > 0 && dim.height > 0) {
+				try {
+					PdfContentByte cb = docWriter.getDirectContent();
+					PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+					Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+
+					scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
+					g2.dispose();
+					PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
+					imgCell.setBackgroundColor(BaseColor.GRAY);
+					imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+					table.addCell(imgCell);
+				} catch (Exception e) {
+					table.addCell("Error drawing scramble: " + e.getMessage());
+					e.printStackTrace();
+				}
+			} else {
+				table.addCell("");
+			}
 		}
-		public void onEndPage(PdfWriter writer, Document document) {
-			Rectangle rect = writer.getBoxSize("art");
-			//TODO - urgh... http://stackoverflow.com/questions/759909/how-to-add-total-page-number-on-every-page-with-itext	            
-			// TODO - why are spaces not showing upu in the title?
-			ColumnText.showTextAligned(writer.getDirectContent(),
-					Element.ALIGN_CENTER, new Phrase(header + " page " + writer.getPageNumber()),
-					(rect.getLeft() + rect.getRight()) / 2, rect.getTop(), 0);
+		maxWidth*=2; //TODO - I have no freaking clue why I need to do this.
+		table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
+		doc.add(table);
+		doc.newPage();
+	}
+	
+	@SuppressWarnings("serial")
+	class InvalidScrambleRequestException extends Exception {
+
+		public InvalidScrambleRequestException(String string) {
+			super(string);
+		}
+
+		public InvalidScrambleRequestException(Throwable cause) {
+			super(cause);
+		}
+		
+	}
+	class ScrambleRequest {
+		public String[] scrambles;
+		public Scrambler scrambler;
+		private int count;
+		private int copies;
+		private String title;
+		private HashMap<String, Color> colorScheme;
+		public ScrambleRequest(String title, String scrambleRequestUrl, String seed) throws InvalidScrambleRequestException, UnsupportedEncodingException {
+			String[] puzzle_count_copies_scheme = scrambleRequestUrl.split("\\*");
+			title = URLDecoder.decode(title, "utf-8");
+			for(int i = 0; i < puzzle_count_copies_scheme.length; i++) {
+				puzzle_count_copies_scheme[i] = URLDecoder.decode(puzzle_count_copies_scheme[i], "utf-8");
+			}
+			String scramblerStr;
+			String countStr = "";
+			String copiesStr = "";
+			String scheme = "";
+			switch(puzzle_count_copies_scheme.length) {
+			case 4:
+				scheme = puzzle_count_copies_scheme[3];
+			case 3:
+				copiesStr = puzzle_count_copies_scheme[2];
+			case 2:
+				countStr = puzzle_count_copies_scheme[1];
+			case 1:
+				scramblerStr = puzzle_count_copies_scheme[0];
+				break;
+			default:
+				throw new InvalidScrambleRequestException("Invalid puzzle request " + scrambleRequestUrl);
+			}
+			
+			LazyClassLoader<Scrambler> lazyScrambler = scramblers.get(scramblerStr);
+			if(lazyScrambler == null) {
+				throw new InvalidScrambleRequestException("Invalid scrambler: " + scramblerStr);
+			}
+			
+			try {
+				this.scrambler = lazyScrambler.cachedInstance();
+			} catch (Exception e) {
+				throw new InvalidScrambleRequestException(e);
+			}
+
+			this.title = title;
+			this.count = Math.min(toInt(countStr, 1), MAX_COUNT);
+			this.copies = Math.min(toInt(copiesStr, 1), MAX_COPIES);
+			if(seed != null) {
+				this.scrambles = scrambler.generateSeededScrambles(seed, count);
+			} else {
+				this.scrambles = scrambler.generateScrambles(count);
+			}
+			
+			this.colorScheme = scrambler.parseColorScheme(scheme);
 		}
 	}
 	
-	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+	protected void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, DocumentException, InvalidScrambleRequestException, IOException {
 		if(path.length == 0) {
 			sendJSON(t, puzzleNamesJSON, query.get("callback"));
 		} else {
-			String puzzle, title, ext;
-			String[] puzzle_title_ext = path[0].split("\\.");
-			switch(puzzle_title_ext.length) {
+			Date generationDate = new Date();
+
+			String seed = query.remove("seed");
+			boolean showIndices = query.remove("showIndices") != null;
+			String[] globalTitle_ext = path[0].split("\\.");
+			
+			String globalTitle, ext;
+			switch(globalTitle_ext.length) {
 			case 1:
-				puzzle = puzzle_title_ext[0];
-				title = null;
-				ext = null;
+				globalTitle = globalTitle_ext[0];
+				ext = "";
 				break;
 			case 2:
-				puzzle = puzzle_title_ext[0];
-				title = null;
-				ext = puzzle_title_ext[1];
-				break;
-			case 3:
-				puzzle = puzzle_title_ext[0];
-				title = puzzle_title_ext[1];
-				ext = puzzle_title_ext[2];
+				globalTitle = globalTitle_ext[0];
+				ext = globalTitle_ext[1];
 				break;
 			default:
-				sendText(t, "Invalid number of periods: " + path[0]);
+				sendText(t, "Invalid filename.extension: " + Arrays.toString(globalTitle_ext));
 				return;
 			}
-			LazyClassLoader<Scrambler> lazyScrambler = scramblers.get(puzzle);
-			if(lazyScrambler == null) {
-				sendText(t, "Invalid scrambler: " + puzzle);
-				return;
+			
+			ScrambleRequest[] scrambleRequests;
+			if(query.size() == 0) {
+				scrambleRequests = new ScrambleRequest[]{ new ScrambleRequest(null, "3x3x3", null) };
+			} else {
+				scrambleRequests = new ScrambleRequest[query.size()];
+				int i = 0;
+				for(String title : query.keySet()) {
+					scrambleRequests[i++] = new ScrambleRequest(title, query.get(title), seed);
+				}
 			}
-			Scrambler scrambler = lazyScrambler.cachedInstance();
-
-			String seed = query.get("seed");
-			boolean showIndices = query.get("indices") != null;
-			int count = Math.min(toInt(query.get("count"), 1), MAX_COUNT);
-			String[] scrambles;
-			if(seed != null) {
-				int offset = Math.min(toInt(query.get("offset"), 0), MAX_COUNT);
-				scrambles = scrambler.generateSeededScrambles(seed, count, offset);
-			} else
-				scrambles = scrambler.generateScrambles(count);
-
+			
 			if(ext == null || ext.equals("txt")) {
 				StringBuilder sb = new StringBuilder();
-				for(int i = 0; i < scrambles.length; i++) {
-					String scramble = scrambles[i];
-					// We replace newlines with spaces
-					if(showIndices) {
-						sb.append((i+1)).append(". ");
+				for(ScrambleRequest scrambleRequest : scrambleRequests) {
+					for(int j = 0; j < scrambleRequest.copies; j++) {
+						for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
+							String scramble = scrambleRequest.scrambles[i];
+							if(showIndices) {
+								sb.append((i+1)).append(". ");
+							}
+							// We replace newlines with spaces
+							sb.append(scramble.replaceAll("\n", " "));
+							sb.append("\r\n");
+						}
 					}
-					sb.append(scramble.replaceAll("\n", " "));
-					sb.append("\r\n");
 				}
 				sendText(t, sb.toString());
 			} else if(ext.equals("json")) {
-				sendJSON(t, GSON.toJson(scrambles), query.get("callback"));
+				if(scrambleRequests.length == 1) {
+					sendJSON(t, GSON.toJson(scrambleRequests[0].scrambles), query.get("callback"));
+				} else {
+					assert false; // TODO - do we want to change the format of the json?
+				}
 			} else if(ext.equals("pdf")) {
-				ByteArrayOutputStream pdf = createPdf(scrambler, scrambles, title, toInt(query.get("width"), null), toInt(query.get("height"), null), query.get("scheme"));
+				Document doc = new Document();
+				ByteArrayOutputStream totalPdfOutput = new ByteArrayOutputStream();
+				PdfSmartCopy totalPdfWriter = new PdfSmartCopy(doc, totalPdfOutput);
+				doc.open();
+				
+				for(int i = 0; i < scrambleRequests.length; i++) {
+					ScrambleRequest scrambleRequest = scrambleRequests[i];
+					PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
+					for(int j = 0; j < scrambleRequest.copies; j++) {
+						for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
+							PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
+							totalPdfWriter.addPage(page);
+						}
+					}
+				}
+				doc.close();
+				// TODO - close stuffs!
 				t.getResponseHeaders().set("Content-Disposition", "inline");
 				//TODO - what's the right way to do caching?
-				sendBytes(t, pdf, "application/pdf");
+				sendBytes(t, totalPdfOutput, "application/pdf");
+			} else if(ext.equals("zip")) {
+				ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
+				ZipOutputStream zipOut = new ZipOutputStream(baosZip);
+				zipOut.setComment(globalTitle + " zip created on " + SDF.format(generationDate));
+
+				for(ScrambleRequest scrambleRequest : scrambleRequests) {
+					String fileName = scrambleRequest.title + ".pdf";
+					ZipEntry entry = new ZipEntry(fileName);
+					zipOut.putNextEntry(entry);
+
+					PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
+					byte[] b = new byte[pdfReader.getFileLength()];
+					pdfReader.getSafeFile().readFully(b);
+					zipOut.write(b);
+					
+					zipOut.closeEntry();
+				
+				}
+				zipOut.close();
+				
+				sendBytes(t, baosZip, "application/zip"); // TODO - is this the correct content type?
 			} else {
 				sendText(t, "Invalid extension: " + ext);
 			}

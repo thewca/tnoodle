@@ -1,15 +1,15 @@
 package serverPlugins;
 
 import java.io.IOException;
-import java.util.HashMap;
-
-import com.sun.net.httpserver.HttpExchange;
+import java.util.LinkedHashMap;
 
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
 import net.gnehzr.tnoodle.server.TNoodleServer;
 
+import com.sun.net.httpserver.HttpExchange;
+
 public class DeathHandler extends SafeHttpHandler {
-	protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException {
+	protected void wrappedHandle(HttpExchange t, String path[], LinkedHashMap<String, String> query) throws IOException {
 		if(path.length == 1 && path[0].equals("now")) {
 			// If localhost makes a request to
 			// http://localhost:PORT/kill/now

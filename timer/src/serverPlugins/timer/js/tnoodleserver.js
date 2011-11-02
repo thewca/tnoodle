@@ -88,8 +88,9 @@ tnoodle.server = function(host, port) {
 	this.loadScrambles = function(callback, puzzle, seed, count) {
 		var query = {};
 		if(seed) { query.seed = seed; }
-		if(count) { query.count = count; }
-		return tnoodle.ajax(callback, this.scrambleUrl + encodeURIComponent(puzzle) + ".json", query);
+		if(!count) { count = 1; }
+		query[''] = encodeURIComponent(puzzle) + "*" + count;
+		return tnoodle.ajax(callback, this.scrambleUrl + ".json", query);
 	};
 	this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
 		var query = { "scramble": scramble };

@@ -3,7 +3,7 @@ package serverPlugins;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -44,7 +44,7 @@ public class FileHandler extends SafeHttpHandler {
 		this.isDirectory = isDirectory;
 	}
 	
-	protected void wrappedHandle(HttpExchange t, String[] requestPath, HashMap<String, String> query) throws IOException {
+	protected void wrappedHandle(HttpExchange t, String[] requestPath, LinkedHashMap<String, String> query) throws IOException {
 		String filePath = Utils.join(requestPath, "/");
 		String resource;
 		if(isDirectory) {

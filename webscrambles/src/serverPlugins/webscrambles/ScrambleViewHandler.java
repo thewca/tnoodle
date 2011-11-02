@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.SortedMap;
 
 import javax.imageio.ImageIO;
@@ -31,7 +32,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 		this.scramblers = Scrambler.getScramblers();
 	}
 	
-	protected void wrappedHandle(HttpExchange t, String path[], HashMap<String, String> query) throws IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+	protected void wrappedHandle(HttpExchange t, String path[], LinkedHashMap<String, String> query) throws IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
 		String callback = query.get("callback");
 		if(path.length == 0) {
 			sendJSONError(t, "Please specify a puzzle.", callback);

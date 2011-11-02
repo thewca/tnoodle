@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyClassLoader;
@@ -50,7 +51,7 @@ public class TnoodleServerPluginDelegator extends SafeHttpHandler {
 	}
 	
 	@Override
-	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception {
+	protected void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws Exception {
 		String[] longestMatch = getLongestMatch(path);
 		LazyClassLoader<SafeHttpHandler> handler = handlers.get(longestMatch);
 		if(handler == null) {
