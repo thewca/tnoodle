@@ -51,27 +51,24 @@ public class ClockScrambler extends Scrambler {
 		StringBuffer scramble = new StringBuffer();
 		
 		String[] peg={"U","d"};
-//		String[] pegs={"UUdd ","dUdU ","ddUU ","UdUd "};
-//		String[] upegs={"dUUU ","UdUU ","UUUd ","UUdU ","UUUU "};
+		String[] pegs={"UUdd","dUdU","ddUU","UdUd"};
+		String[] upegs={"dUUU","UdUU","UUUd","UUdU"};
 		for(int x=0; x<4; x++) {
-//			if (verbose) {
-//				scram.append(pegs[x]);
-//			}
-			scramble.append("u=" + (r.nextInt(12)-5) + ",d=" + (r.nextInt(12)-5) + " /");
+			scramble.append( "(" + pegs[x] );
+			scramble.append("," + (r.nextInt(12)-5) + "," + (r.nextInt(12)-5) + ") ");
 		}
-		for(int x=0;x<5; x++) {
-//			if (verbose) {	
-//				scram.append(upegs[x]);
-//			}
-			scramble.append("u=" + (r.nextInt(12)-5) + " /");
+		for(int x=0;x<4; x++) {
+			scramble.append( "(" + upegs[x]);
+			scramble.append("," + (r.nextInt(12)-5) + ",0) ");
 		}
-//		if (verbose) {
-//			scram.append("dddd ");
-//		}
-		scramble.append("d=" + (r.nextInt(12)-5) + " /");
+		scramble.append("(UUUU," + (r.nextInt(12)-5) + ") ");
+		scramble.append("(dddd," + (r.nextInt(12)-5) + ") ");
+
+		scramble.append("(");
 		for(int x=0;x<4;x++) {
 			scramble.append(peg[r.nextInt(2)]);
 		}
+		scramble.append(")");
 		
 		return scramble.toString();
 	}
@@ -98,39 +95,55 @@ public class ClockScrambler extends Scrambler {
 	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
 		return new HashMap<String, GeneralPath>();
 	}
-	private static final int[][] moves = {{1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0},
-		                 {0,0,0,0,0,0,1,0,1,   0, 0, 0,-1,-1,-1,-1,-1,-1},
-		                 {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0},
-		                 {1,0,0,0,0,0,1,0,0,   0,-1,-1, 0,-1,-1, 0,-1,-1},
-		                 {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},
-		                 {1,0,1,0,0,0,0,0,0,  -1,-1,-1,-1,-1,-1, 0, 0, 0},
-		                 {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},
-		                 {0,0,1,0,0,0,0,0,1,  -1,-1, 0,-1,-1, 0,-1,-1, 0},
-		                 {0,1,1,1,1,1,1,1,1,  -1, 0, 0, 0, 0, 0,-1, 0,-1},
-		                 {1,1,0,1,1,1,1,1,1,   0, 0,-1, 0, 0, 0,-1, 0,-1},
-		                 {1,1,1,1,1,1,1,1,0,  -1, 0,-1, 0, 0, 0, 0, 0,-1},
-		                 {1,1,1,1,1,1,0,1,1,  -1, 0,-1, 0, 0, 0,-1, 0, 0},
-		                 {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},
-		                 {1,0,1,0,0,0,1,0,1,  -1,-1,-1,-1,-1,-1,-1,-1,-1}};
+	private static final int[][] moves = { 
+		                 {1,0,1,0,0,0,1,0,1,  -1,-1,-1,-1,-1,-1,-1,-1,-1},// dddd-d
+		                 {1,0,1,0,0,0,0,0,1,  -1,-1,-1,-1,-1,-1,-1,-1, 0},// dddU-d
+		                 {1,0,1,0,0,0,1,0,0,  -1,-1,-1,-1,-1,-1, 0,-1,-1},// ddUd-d
+		                 {1,0,1,0,0,0,0,0,0,  -1,-1,-1,-1,-1,-1, 0, 0, 0},// ddUU-d
+		                 {0,0,1,0,0,0,1,0,1,  -1,-1, 0,-1,-1,-1,-1,-1,-1},// dUdd-d
+		                 {1,0,0,0,0,0,1,0,0,   0,-1,-1, 0,-1,-1, 0,-1,-1},// dUdU-d
+		                 {0,0,1,0,0,0,1,0,0,  -1,-1, 0,-1,-1,-1, 0,-1,-1},// dUUd-d
+		                 {0,0,1,0,0,0,0,0,0,  -1,-1, 0,-1,-1, 0, 0, 0, 0},// dUUU-d
+		                 {1,0,0,0,0,0,1,0,1,   0,-1,-1,-1,-1,-1,-1,-1,-1},// Uddd-d
+		                 {1,0,0,0,0,0,0,0,1,   0,-1,-1,-1,-1,-1,-1,-1, 0},// UddU-d
+		                 {0,0,1,0,0,0,0,0,1,  -1,-1, 0,-1,-1, 0,-1,-1, 0},// UdUd-d
+		                 {1,0,0,0,0,0,0,0,0,   0,-1,-1, 0,-1,-1, 0, 0, 0},// UdUU-d
+		                 {0,0,0,0,0,0,1,0,1,   0, 0, 0,-1,-1,-1,-1,-1,-1},// UUdd-d
+		                 {0,0,0,0,0,0,0,0,1,   0, 0, 0,-1,-1, 0,-1,-1, 0},// UUdU-d
+		                 {0,0,0,0,0,0,1,0,0,   0, 0, 0, 0,-1,-1, 0,-1,-1},// UUUd-d
+		                 {0,0,0,0,0,0,0,0,0,   0, 0, 0, 0, 0, 0, 0, 0, 0},// UUUU-d - not possible
+
+		                 {0,0,0,0,0,0,0,0,0,   0, 0, 0, 0, 0, 0, 0, 0, 0},// dddd-U - not possible
+		                 {0,0,0,0,1,1,0,1,1,   0, 0, 0, 0, 0, 0,-1, 0, 0},// dddU-U
+		                 {0,0,0,1,1,0,1,1,0,   0, 0, 0, 0, 0, 0, 0, 0,-1},// ddUd-U
+		                 {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},// ddUU-U
+		                 {0,1,1,0,1,1,0,0,0,  -1, 0, 0, 0, 0, 0, 0, 0, 0},// dUdd-U
+		                 {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0},// dUdU-U
+		                 {0,1,1,1,1,1,1,1,0,  -1, 0, 0, 0, 0, 0, 0, 0,-1},// dUUd-U
+		                 {0,1,1,1,1,1,1,1,1,  -1, 0, 0, 0, 0, 0,-1, 0,-1},// dUUU-U
+		                 {1,1,0,1,1,0,0,0,0,   0, 0,-1, 0, 0, 0, 0, 0, 0},// Uddd-U
+		                 {1,1,0,1,1,1,0,1,1,   0, 0,-1, 0, 0, 0,-1, 0, 0},// UddU-U
+		                 {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},// UdUd-U
+		                 {1,1,0,1,1,1,1,1,1,   0, 0,-1, 0, 0, 0,-1, 0,-1},// UdUU-U
+		                 {1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0},// UUdd-U
+		                 {1,1,1,1,1,1,0,1,1,  -1, 0,-1, 0, 0, 0,-1, 0, 0},// UUdU-U
+		                 {1,1,1,1,1,1,1,1,0,  -1, 0,-1, 0, 0, 0, 0, 0,-1},// UUUd-U
+		                 {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// UUUU-U
+
+		                 };
 	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		//Ported from http://www.worldcubeassociation.org/regulations/scrambles/scramble_clock.htm
-		/* Javascript written by Jaap Scherphuis,  jaapsch a t yahoo d o t com */
-
 		int i,j;
-		int[] seq = new int[14];
+		int[] seq = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		boolean[] pins = new boolean[4];
 		int[] posit = {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
 
-
 		parseScramble( scramble, seq, pins );
 
-		for( i=0; i<14; i++)
+		for( i=0; i<32; i++)
 			for( j=0; j<18; j++)
 				posit[j]+=seq[i]*moves[i][j];
-
-		//**********END JAAP's CODE***************
 
 		drawBackground(g, colorScheme);
 
@@ -142,21 +155,36 @@ public class ClockScrambler extends Scrambler {
 	}
 
 	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) {
+		String word;
+		int move;
+
 		if(scramble == null || scramble.length() == 0) {
 			return;
 		}
 
 		int i;
 
-		Pattern p = Pattern.compile("=(-?\\d)");
+		Pattern p = Pattern.compile("\\(([Ud]{4}),(-?\\d)(,(-?\\d))?\\)");
 		Matcher m = p.matcher(scramble);
 
-		for( i=0; i<14; i++ ){
-			m.find();
-			seq[i] = Integer.parseInt(m.group(1));
+		while( m.find() ){
+			word = m.group(1);
+			word = word.replace('U', '1');
+			word = word.replace('d', '0');
+			move = Integer.parseInt(word, 2);
+			if( move == 0 )
+				seq[0] = Integer.parseInt(m.group(2));
+			else if( move == 15 )
+				seq[31] = Integer.parseInt(m.group(2));
+			else {
+				System.out.println(Integer.parseInt(m.group(2)));
+				System.out.println(Integer.parseInt(m.group(4)));
+				seq[move+16] = Integer.parseInt(m.group(2));
+				seq[move] = Integer.parseInt(m.group(4));
+			}
 		}
 
-		p = Pattern.compile("([Ud]{4})");
+		p = Pattern.compile("\\(([Ud]{4})\\)");
 		m = p.matcher(scramble);
 
 		m.find();
