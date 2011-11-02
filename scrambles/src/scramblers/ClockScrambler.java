@@ -177,8 +177,6 @@ public class ClockScrambler extends Scrambler {
 			else if( move == 15 ) // all pins up
 				seq[31] = Integer.parseInt(m.group(2));
 			else {
-				System.out.println(Integer.parseInt(m.group(2)));
-				System.out.println(Integer.parseInt(m.group(4)));
 				seq[move+16] = Integer.parseInt(m.group(2));
 				seq[move] = Integer.parseInt(m.group(4));
 			}
