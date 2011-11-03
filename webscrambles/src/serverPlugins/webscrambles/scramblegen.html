@@ -77,11 +77,21 @@ function roundRequestToString(roundRequest) {
 	if(roundRequest.scheme) {
 		str = "*" + roundRequest.scheme + str;
 	}
-	if(str.length > 0 || roundRequest.copies != 1) {
-		str = "*" + roundRequest.copies + str;
+	var nonDefaultCopies = roundRequest.copies != 1;
+	if(str.length > 0 || nonDefaultCopies) {
+		var temp = "*";
+		if(nonDefaultCopies) {
+			temp += roundRequest.copies;
+		}
+		str = temp + str;
 	}
-	if(str.length > 0 || roundRequest.count != 1) {
-		str = "*" + roundRequest.count + str;		
+	var nonDefaultCount = roundRequest.count != 1;
+	if(str.length > 0 || nonDefaultCount) {
+		var temp = "*";
+		if(nonDefaultCount) {
+			temp += roundRequest.count;
+		}
+		str = temp + str;
 	}
 	str = roundRequest.puzzle + str;
 	return encodeURIComponent(str);
