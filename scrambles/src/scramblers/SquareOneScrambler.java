@@ -39,11 +39,16 @@ public class SquareOneScrambler extends Scrambler {
 	private int twistCount; //this will tell us the state of the middle pieces
 	private int[] state;
 
+	public static synchronized SquareOneScrambler[] createScramblers() {
+		return new SquareOneScrambler[] { new SquareOneScrambler() };
+	}
+
 	private Engine eng;
 	private Position1 p1;
 	public SquareOneScrambler() {
 		//initialise pruning and transition tables
-		Tables.initialise();
+		Tables.init();
+		Tables.initLayers();
 
 		//get instance of search engine
 		p1 = new Position1();
@@ -101,9 +106,6 @@ public class SquareOneScrambler extends Scrambler {
 		} while ( posstr[11] == posstr[12] || (twistable && (posstr[17] == posstr[18] || posstr[5] == posstr[6] )));
 
 		posstr[24] = r.nextInt(2) != 0 ? '-' : '/';
-
-		System.out.print( "Generated position : ");
-		System.out.println( posstr );
 	}
 	
 	//returns true if invalid, false if valid
@@ -405,11 +407,11 @@ public class SquareOneScrambler extends Scrambler {
 
 	@Override
 	public String getLongName() {
-		return "Square-1 uniform";
+		return "Square-1";
 	}
 
 	@Override
 	public String getShortName() {
-		return "sq1uni";
+		return "sq1";
 	}
 }
