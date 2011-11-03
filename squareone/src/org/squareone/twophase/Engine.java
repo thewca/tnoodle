@@ -9,7 +9,7 @@ public class Engine {
 	protected int maxDepth;				//Maximum depth; given at start, or length of last soln found
 	protected MoveList moves = new MoveList();	//List of moves done so far
 	protected int length1, length2;			//Current max length of search
-	protected long nodes1, nodes1Low, nodes2;	//Number of nodes visited in latest search
+	protected long nodes1Low;			//Number of nodes visited in latest search
 	protected long tStart;				//Time for the start of the search
 	protected long timeOut;				//Time out
 	protected String solution;			//Solution
@@ -23,7 +23,6 @@ public class Engine {
 		//first extract the starting shape
 		Position1 p1=initPos;
 		//Perform phase 1 search, for increasing depths
-		nodes2=nodes1=0;
 		nodes1Low=0;
 
 		// Treat empty phase1 separately; phase1 is empty or ends in a twist.
@@ -46,15 +45,8 @@ public class Engine {
 		if( l > l1) return 0;
 
 		nodes1Low++;
-		if( nodes1Low>=100000 ){
+		if( nodes1Low>=100000 )
 			if (System.currentTimeMillis() - tStart > timeOut << 10) return 0;
-			nodes1Low=0;
-			nodes1++;
-			System.out.print("Len1: " + (int)length1 + "  Nodes1:" + nodes1);
-			if(nodes1 != 0) System.out.print("00000");
-			System.out.print("  Len2: " + (int)(maxDepth-length1) + "  Nodes2:" + nodes2 + "    \r");
-			System.out.flush();
-		}
 
 		if(l==0){
 			if(l1==0){
@@ -135,14 +127,6 @@ public class Engine {
 		int l =ps2.depth();
 		if( l > l2) return 0;
 
-		nodes2++;
-		if( (nodes2&65535)==0 ){
-			System.out.print("Len1: " + (int)length1 + "  Nodes1:" + nodes1);
-			if(( nodes1 != 0 )) System.out.print("00000");
-			System.out.print("  Len2: " + (int)(maxDepth-length1) + "  Nodes2:" + nodes2 + "    \r");
-			System.out.flush();
-		}
-
 		if(l2==0 && l==0){
 			//Found a solution to phase 2;
 			if( ps2.isSolved() ){
@@ -213,19 +197,7 @@ public class Engine {
 	***************************************************/
 
 	protected void foundSol(int l, boolean large){
-		//clear line
-		System.out.print("                                                                               \r");
-		System.out.println("Length:" + l);
-
 		maxDepth=large? l-2: l-1;
-
-		System.out.print("Solution: ");
-		moves.print(System.out);
-		System.out.println("");
-		
-		System.out.print("Scramble: ");
-		moves.printGen(System.out);
-		System.out.println("");
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		moves.printGen(new PrintStream(out));
