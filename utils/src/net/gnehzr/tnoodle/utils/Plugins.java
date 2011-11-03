@@ -65,6 +65,7 @@ public class Plugins<H> {
 			String name = name_def[0];
 			String definition = name_def[1];
 			LazyClassLoader<H> lazyClass = new LazyClassLoader<H>(definition, pluginClass);
+			assert !loadMe.containsKey(name);
 			loadMe.put(name, lazyClass);
 		}
 	}

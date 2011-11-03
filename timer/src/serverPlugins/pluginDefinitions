@@ -1,1 +1,1 @@
-/tnt/ serverPlugins.FileHandler("timer/")
+/tnt/ serverPlugins.DirectoryHandler("timer/")

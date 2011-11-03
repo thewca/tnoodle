@@ -12,11 +12,9 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -25,6 +23,7 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyClassLoader;
+import serverPlugins.FileHandler;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -58,26 +57,12 @@ public class ScrambleHandler extends SafeHttpHandler {
 	private static final int MAX_COPIES = 100;
 	private static final int SCRAMBLES_PER_PAGE = 5;
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
+	
+	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/scramblegen.html");
 
 	private SortedMap<String, LazyClassLoader<Scrambler>> scramblers;
-	private String puzzleNamesJSON;
 	public ScrambleHandler() throws BadClassDescriptionException, IOException {
 		this.scramblers = Scrambler.getScramblers();
-		
-		// listing available scrambles
-		String[][] puzzleNames = new String[scramblers.size()][2];
-		int i = 0;
-		for(Entry<String, LazyClassLoader<Scrambler>> scrambler : scramblers.entrySet()) {
-//			String shortName = scrambler.getValue().getShortName();
-//			String longName = scrambler.getValue().getLongName();
-			//TODO - figure out some way of deriving both the short & long name without actually loading the class
-			String shortName = scrambler.getKey();
-			String longName = scrambler.getKey();
-			puzzleNames[i][0] = shortName;
-			puzzleNames[i][1] = longName;
-			i++;
-		}
-		puzzleNamesJSON = GSON.toJson(puzzleNames);
 	}
 	
 	private final DefaultSplitCharacter SPLIT_ON_SPACES = new DefaultSplitCharacter() {
@@ -296,43 +281,44 @@ public class ScrambleHandler extends SafeHttpHandler {
 		}
 	}
 	
+	private ScrambleRequest[] parseScrambleRequests(LinkedHashMap<String, String> query, String seed) throws UnsupportedEncodingException, InvalidScrambleRequestException {
+		ScrambleRequest[] scrambleRequests;
+		if(query.size() == 0) {
+			throw new InvalidScrambleRequestException("Must specify at least one scramble request");
+		} else {
+			scrambleRequests = new ScrambleRequest[query.size()];
+			int i = 0;
+			for(String title : query.keySet()) {
+				scrambleRequests[i++] = new ScrambleRequest(title, query.get(title), seed);
+			}
+		}
+		return scrambleRequests;
+	}
+	
+	
 	protected void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, DocumentException, InvalidScrambleRequestException, IOException {
 		if(path.length == 0) {
-			sendJSON(t, puzzleNamesJSON, query.get("callback"));
+			wcaScramblerHandler.handle(t);
 		} else {
 			Date generationDate = new Date();
 
 			String seed = query.remove("seed");
 			boolean showIndices = query.remove("showIndices") != null;
-			String[] globalTitle_ext = path[0].split("\\.");
 			
 			String globalTitle, ext;
-			switch(globalTitle_ext.length) {
-			case 1:
-				globalTitle = globalTitle_ext[0];
-				ext = "";
-				break;
-			case 2:
-				globalTitle = globalTitle_ext[0];
-				ext = globalTitle_ext[1];
-				break;
-			default:
-				sendText(t, "Invalid filename.extension: " + Arrays.toString(globalTitle_ext));
-				return;
+			int lastDot = path[0].lastIndexOf(".");
+			if(lastDot < 0) {
+				throw new InvalidScrambleRequestException("No extension specified");
 			}
-			
-			ScrambleRequest[] scrambleRequests;
-			if(query.size() == 0) {
-				scrambleRequests = new ScrambleRequest[]{ new ScrambleRequest(null, "3x3x3", null) };
-			} else {
-				scrambleRequests = new ScrambleRequest[query.size()];
-				int i = 0;
-				for(String title : query.keySet()) {
-					scrambleRequests[i++] = new ScrambleRequest(title, query.get(title), seed);
-				}
-			}
+			globalTitle = path[0].substring(0, lastDot);
+			ext = path[0].substring(lastDot+1);
 			
 			if(ext == null || ext.equals("txt")) {
+				// Note that we parse the scramble requests *after* checking the extension.
+				// This way, someone who makes a request for "/scramble/foo.bar" will get a warning about 
+				// the ".bar" extension, rather than incorrect scramble requests.
+				ScrambleRequest[] scrambleRequests = parseScrambleRequests(query, seed);
+				
 				StringBuilder sb = new StringBuilder();
 				for(ScrambleRequest scrambleRequest : scrambleRequests) {
 					for(int j = 0; j < scrambleRequest.copies; j++) {
@@ -349,6 +335,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 				}
 				sendText(t, sb.toString());
 			} else if(ext.equals("json")) {
+				ScrambleRequest[] scrambleRequests = parseScrambleRequests(query, seed);
 				if(scrambleRequests.length == 1) {
 					sendJSON(t, GSON.toJson(scrambleRequests[0].scrambles), query.get("callback"));
 				} else {
@@ -360,6 +347,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 				PdfSmartCopy totalPdfWriter = new PdfSmartCopy(doc, totalPdfOutput);
 				doc.open();
 				
+				ScrambleRequest[] scrambleRequests = parseScrambleRequests(query, seed);
 				for(int i = 0; i < scrambleRequests.length; i++) {
 					ScrambleRequest scrambleRequest = scrambleRequests[i];
 					PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
@@ -371,7 +359,6 @@ public class ScrambleHandler extends SafeHttpHandler {
 					}
 				}
 				doc.close();
-				// TODO - close stuffs!
 				t.getResponseHeaders().set("Content-Disposition", "inline");
 				//TODO - what's the right way to do caching?
 				sendBytes(t, totalPdfOutput, "application/pdf");
@@ -379,7 +366,8 @@ public class ScrambleHandler extends SafeHttpHandler {
 				ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 				ZipOutputStream zipOut = new ZipOutputStream(baosZip);
 				zipOut.setComment(globalTitle + " zip created on " + SDF.format(generationDate));
-
+				
+				ScrambleRequest[] scrambleRequests = parseScrambleRequests(query, seed);
 				for(ScrambleRequest scrambleRequest : scrambleRequests) {
 					String fileName = scrambleRequest.title + ".pdf";
 					ZipEntry entry = new ZipEntry(fileName);
@@ -396,8 +384,10 @@ public class ScrambleHandler extends SafeHttpHandler {
 				zipOut.close();
 				
 				sendBytes(t, baosZip, "application/zip"); // TODO - is this the correct content type?
+			} else if(ext.equals("html")) {
+				wcaScramblerHandler.handle(t);
 			} else {
-				sendText(t, "Invalid extension: " + ext);
+				throw new InvalidScrambleRequestException("Invalid extension: " + ext);
 			}
 		}
 	}

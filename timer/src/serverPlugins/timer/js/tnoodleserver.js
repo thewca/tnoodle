@@ -28,6 +28,7 @@ tnoodle.server = function(host, port) {
 	this.serverUrl = "http://" + host + ":" + port;
 
 	/**** Scramble server stuff ***/
+	this.puzzlesUrl = this.serverUrl + "/puzzles/";
 	this.scrambleUrl = this.serverUrl + "/scramble/";
 	this.viewUrl = this.serverUrl + "/view/";
 	this.importUrl = this.serverUrl + "/import/";
@@ -71,7 +72,7 @@ tnoodle.server = function(host, port) {
 	};
 	
 	this.loadPuzzles = function(callback) {
-		return tnoodle.ajax(callback, this.scrambleUrl, null);
+		return tnoodle.ajax(callback, this.puzzlesUrl, null);
 	};
 	
 	this.loadScramble = function(callback, puzzle, seed) {
