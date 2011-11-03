@@ -262,7 +262,8 @@ class tmt:
 
 	def java(self, main, classpath='', args=[], debug=False):
 		command = []
-		assert debug in [ None, 'jdb', 'attach' ]
+		print debug
+		assert debug in [ False, 'jdb', 'attach' ]
 		if debug == 'jdb':
 			command.append('jdb')
 			# TODO - passing -ea to jdb doesn't work! I HATE JAVA
