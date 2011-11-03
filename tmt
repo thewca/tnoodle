@@ -565,10 +565,12 @@ Main-Class: %s
 
 	def clean(self):
 		print 'Cleaning: %s' % self.name
-		assert isdir(self.bin)
-		assert isdir(self.distDir)
-		rmtree(self.bin)
-		rmtree(self.distDir)
+		if exists(self.bin):
+			assert isdir(self.bin)
+			rmtree(self.bin)
+		if exists(self.distDir):
+			assert isdir(self.distDir)
+			rmtree(self.distDir)
 		tempBin = join(self.name, '.bin')
 		if isdir(tempBin):
 			rmtree(tempBin)
