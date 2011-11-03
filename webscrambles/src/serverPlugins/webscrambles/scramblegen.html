@@ -17,6 +17,8 @@ function assert(bool, str) {
 }
 
 var round2RoundRequest = null;
+var seed = null;
+var showIndices = null;
 function parseUrl() {
 	var uri = new URI(History.getPath());
 	var pathname = uri.get('directory') + uri.get('file');
@@ -30,6 +32,14 @@ function parseUrl() {
 	document.title = title + " - WCA Scrambler";
 	
 	round2RoundRequest = uri.getData();
+	
+	seed = round2RoundRequest.seed;
+	delete round2RoundRequest.seed;
+	
+	// showIndices makes no sense for pdfs, so we just read it and ignore it.
+	showIndices = round2RoundRequest.showIndices;
+	delete round2RoundRequest.showIndices;
+	
 	for(var round in round2RoundRequest) {
 		if(round2RoundRequest[round] instanceof Array) {
 			alert("Multiple rounds with the same name (" + round + ") not allowed. I'm choosing one of them at random.");
@@ -94,29 +104,34 @@ function roundRequestToString(roundRequest) {
 		str = temp + str;
 	}
 	str = roundRequest.puzzle + str;
-	return encodeURIComponent(str);
+	return str;
 }
 
 function getUrl(ext) {
-	var scrambleRequests = "";
+	var baseUrl = "/scramble/";
+	var data = {};
+	if(seed) {
+		data.seed = seed;
+	}
+	
 	for(var roundTitle in round2RoundRequest) {
 		var roundRequest = round2RoundRequest[roundTitle];
-		scrambleRequests += "&" + encodeURIComponent(roundTitle) + "=" + roundRequestToString(roundRequest);
+		data[roundTitle] = roundRequestToString(roundRequest);
 	}
-	if(scrambleRequests.length == 0) {
-		if(ext == "html") {
+	if(Object.keys(round2RoundRequest).length == 0) {
+		if(ext != "html") {
 			// A url without scramble requests is only valid if it's an html url
-			if(globalTitle.value) {
-				return "/scramble/" + encodeURIComponent(globalTitle.value) + ".html";
-			} else {
-				return "/scramble/";
-			}
+			return null;
 		}
-		return null;
 	}
-	scrambleRequests = "?" + scrambleRequests.substring(1);
+
+	if(globalTitle.value) {
+		baseUrl += encodeURIComponent(globalTitle.value) + "." + encodeURIComponent(ext);
+	}
 	
-	return "/scramble/" + encodeURIComponent(globalTitle.value) + "." + encodeURIComponent(ext) + scrambleRequests;
+	var url = new URI(baseUrl);
+	url.setData(data);
+	return url.toString();
 }
 
 function somethingChanged() {
