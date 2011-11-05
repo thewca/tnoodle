@@ -260,10 +260,9 @@ class tmt:
 			matches += [ relpath(join(root, f), relativeTo) for f in files if pattern.match(f) ]
 		return matches
 
-	def java(self, main, classpath='', args=[], debug=False):
+	def java(self, main, classpath='', args=[], debug=None):
 		command = []
-		print debug
-		assert debug in [ False, 'jdb', 'attach' ]
+		assert debug in [ None, 'jdb', 'attach' ]
 		if debug == 'jdb':
 			command.append('jdb')
 			# TODO - passing -ea to jdb doesn't work! I HATE JAVA
