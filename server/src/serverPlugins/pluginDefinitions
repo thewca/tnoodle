@@ -1,2 +1,2 @@
-/ serverPlugins.FileHandler("www/")
+/ serverPlugins.DirectoryHandler("www/")
 /kill/ serverPlugins.DeathHandler()

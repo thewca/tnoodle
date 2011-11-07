@@ -112,31 +112,22 @@ public abstract class Scrambler {
 	
 	/** seeded scrambles, these can't be cached, so they'll be a little slower **/
 	public final String generateSeededScramble(String seed) {
-		return generateSeededScramble(seed, 0);
+		return generateSeededScramble(seed.hashCode()); //TODO - do something that will get us a long?
 	}
 	public final String[] generateSeededScrambles(String seed, int count) {
-		return generateSeededScrambles(seed, count, 0);
+		return generateSeededScrambles(seed.hashCode(), count); //TODO - do something that will get us a long?
 	}
 	
-	/** seeded scrambles with offset **/
-	public final String generateSeededScramble(String seed, int offset) {
-		return generateSeededScramble(seed.hashCode(), offset); //TODO - do something that will get us a long?
-	}
-	public final String[] generateSeededScrambles(String seed, int count, int offset) {
-		return generateSeededScrambles(seed.hashCode(), count, offset); //TODO - do something that will get us a long?
-	}
-	
-	private final String generateSeededScramble(long seed, int offset) {
+	private final String generateSeededScramble(long seed) {
 		// we must create our own MTRandom because other threads can access the static one
 		Random r = new MTRandom(seed);
 		r.setSeed(seed);
-		generateScrambles(r, offset); //burn up scrambles we don't care about
 		return generateScramble(r);
 	}
-	private final String[] generateSeededScrambles(long seed, int count, int offset) {
+	private final String[] generateSeededScrambles(long seed, int count) {
+		// we must create our own MTRandom because other threads can access the static one
 		Random r = new MTRandom(seed);
 		r.setSeed(seed);
-		generateScrambles(r, offset); //burn up scrambles we don't care about
 		return generateScrambles(r, count);
 	}
 	

@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -18,13 +19,16 @@ public abstract class SafeHttpHandler implements HttpHandler {
 	
 	@Override
 	public final void handle(HttpExchange t) throws IOException {
-		HashMap<String, String> query = parseQuery(t.getRequestURI().getRawQuery());
-		// substring(1) gets rid of the leading /
-		String[] path = t.getRequestURI().getPath().substring(1).split("/");
+		LinkedHashMap<String, String> query = null;
+		String[] path = null;
 		try {
+			query = parseQuery(t.getRequestURI().getRawQuery());
+			// substring(1) gets rid of the leading /
+			path = t.getRequestURI().getPath().substring(1).split("/");
 			wrappedHandle(t, path, query);
 		} catch(Exception e) {
-			if(path[path.length-1].endsWith(".json")) {
+			if(path != null && path[path.length-1].endsWith(".json")) {
+				assert query != null;
 				jsonError(t, e, query.get("callback"));
 			} else {
 				textError(t, e);
@@ -32,10 +36,10 @@ public abstract class SafeHttpHandler implements HttpHandler {
 		}
 	}
 	
-	protected abstract void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception;
+	protected abstract void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws Exception;
 
-	private static HashMap<String, String> parseQuery(String query) {
-		HashMap<String, String> queryMap = new HashMap<String, String>();
+	public static LinkedHashMap<String, String> parseQuery(String query) {
+		LinkedHashMap<String, String> queryMap = new LinkedHashMap<String, String>();
 		if(query == null) return queryMap;
 		String[] pairs = query.split("&");
 		for(String pair : pairs) {

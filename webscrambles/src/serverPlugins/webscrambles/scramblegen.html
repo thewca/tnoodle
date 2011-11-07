@@ -1,4 +1,197 @@
 <html>
+<head>
+
+<script type="text/javascript" src="/moo/mootools-core-1.4.1.js"></script>
+<script type="text/javascript" src="/moo/mootools-more-1.4.0.1.js"></script>
+<script type="text/javascript" src="/moo/powertools-1.1.1.js"></script>
+
+<script type="text/javascript">
+(function() {
+
+History.handleInitialState('/scramble/');
+	
+function assert(bool, str) {
+	if(!bool) {
+		alert("Assertion error: " + str);
+	}
+}
+
+var round2RoundRequest = null;
+var seed = null;
+var showIndices = null;
+function parseUrl() {
+	var uri = new URI(History.getPath());
+	var pathname = uri.get('directory') + uri.get('file');
+	var PATH_RE = /^\/?scramble\/?(.*?)(\.html)?$/;
+	var match = PATH_RE.exec(pathname);
+	assert(match, pathname + " doesn't match " + PATH_RE);
+
+	var title = decodeURIComponent(match[1]);
+	globalTitle.value = title;
+	
+	document.title = title + " - WCA Scrambler";
+	
+	round2RoundRequest = uri.getData();
+	
+	seed = round2RoundRequest.seed;
+	delete round2RoundRequest.seed;
+	
+	// showIndices makes no sense for pdfs, so we just read it and ignore it.
+	showIndices = round2RoundRequest.showIndices;
+	delete round2RoundRequest.showIndices;
+	
+	for(var round in round2RoundRequest) {
+		if(round2RoundRequest[round] instanceof Array) {
+			alert("Multiple rounds with the same name (" + round + ") not allowed. I'm choosing one of them at random.");
+			round2RoundRequest[round] = round2RoundRequest[round][0];
+		}
+		
+		var puzzle_count_copies_scheme = round2RoundRequest[round].split("*");
+		var puzzle;
+		var countStr = "";
+		var copiesStr = "";
+		var scheme = "";
+		switch(puzzle_count_copies_scheme.length) {
+		case 4:
+			scheme = puzzle_count_copies_scheme[3];
+		case 3:
+			copiesStr = puzzle_count_copies_scheme[2];
+		case 2:
+			countStr = puzzle_count_copies_scheme[1];
+		case 1:
+			puzzle = puzzle_count_copies_scheme[0];
+			break;
+		default:
+			alert("Invalid scramble request: " + round2RoundRequest[round]);
+		}
+		
+		if(!(puzzle in puzzle2LongName)) {
+			alert("Invalid puzzle: " + puzzle + ". Ignoring scramble request");
+			delete round2RoundRequest[round]; 
+		} else {
+			round2RoundRequest[round] = { puzzle: puzzle, count: countStr.toInt() || 1, copies: copiesStr.toInt() || 1, scheme: scheme };
+		}
+	}
+	
+	var pdfUrl = getUrl('pdf');
+	pdfLink.set('href', pdfUrl);
+	pdfLink.set('text', pdfUrl);
+	var zipUrl = getUrl('zip');
+	zipLink.set('href', zipUrl);
+	zipLink.set('text', zipUrl);
+}
+
+// This is a pointless attempt to keep the urls human readable.
+function roundRequestToString(roundRequest) {
+	var str = "";
+	if(roundRequest.scheme) {
+		str = "*" + roundRequest.scheme + str;
+	}
+	var nonDefaultCopies = roundRequest.copies != 1;
+	if(str.length > 0 || nonDefaultCopies) {
+		var temp = "*";
+		if(nonDefaultCopies) {
+			temp += roundRequest.copies;
+		}
+		str = temp + str;
+	}
+	var nonDefaultCount = roundRequest.count != 1;
+	if(str.length > 0 || nonDefaultCount) {
+		var temp = "*";
+		if(nonDefaultCount) {
+			temp += roundRequest.count;
+		}
+		str = temp + str;
+	}
+	str = roundRequest.puzzle + str;
+	return str;
+}
+
+function getUrl(ext) {
+	var baseUrl = "/scramble/";
+	var data = {};
+	if(seed) {
+		data.seed = seed;
+	}
+	
+	for(var roundTitle in round2RoundRequest) {
+		var roundRequest = round2RoundRequest[roundTitle];
+		data[roundTitle] = roundRequestToString(roundRequest);
+	}
+	if(Object.keys(round2RoundRequest).length == 0) {
+		if(ext != "html") {
+			// A url without scramble requests is only valid if it's an html url
+			return null;
+		}
+	}
+
+	if(globalTitle.value) {
+		baseUrl += encodeURIComponent(globalTitle.value) + "." + encodeURIComponent(ext);
+	}
+	
+	var url = new URI(baseUrl);
+	url.setData(data);
+	return url.toString();
+}
+
+function somethingChanged() {
+	// Calling History.push will cause parseUrl() to get called.
+	var htmlUrl = getUrl("html");
+	if(htmlUrl != History.getPath()) {
+		History.push(htmlUrl);
+	}
+}
+
+function globalTitleChanged() {
+	somethingChanged();
+}
+
+var globalTitle = null;
+var pdfLink = null;
+var zipLink;
+var puzzle2LongName = {};
+
+window.addEvent('domready', function() {
+	globalTitle = $('globalTitle');
+	pdfLink = $('pdfLink');
+	zipLink = $('zipLink');
+
+	
+	var puzzleRequest = new Request.JSON({
+		url: "/puzzles/",
+		onSuccess: function(responseJSON, responseText) {
+			for(var i = 0; i < responseJSON.length; i++) {
+				var shortName = responseJSON[i][0];
+				var longName = responseJSON[i][1];
+				assert(!(shortName in puzzle2LongName));
+				puzzle2LongName[shortName] = longName;
+			}
+			parseUrl();
+			History.addEvent('change', parseUrl);
+			
+			globalTitle.addEvent('input', globalTitleChanged);
+		},
+		onFailure: function() {
+			// TODO
+			alert("Failure loading scrambles");
+		}
+	});
+	puzzleRequest.send();
+});
+
+})();
+</script>
+
+</head>
+<body>
+<input type="text" id="globalTitle"></input>
+<a id="pdfLink" href="" target="_blank"></a>
+<a id="zipLink" href="" target="_blank"></a>
+</body>
+</html>
+
+<!-- 
+<html>
 
 <head>
 <title>WCA Scramble Maker</title>
@@ -106,9 +299,9 @@ Color scheme:
 </td>
 <td>
 <div style="margin-left:98%;">
-<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#cc6666';"><div class="color" style="background-color:#cc6666;"><!-- --></div></a>
-<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#66cc66';"><div class="color" style="background-color:#66cc66;"><!-- --></div></a>
-<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#6666ff';"><div class="color" style="background-color:#6666ff;"><!-- --></div></a>
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#cc6666';"><div class="color" style="background-color:#cc6666;"></div></a>
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#66cc66';"><div class="color" style="background-color:#66cc66;"></div></a>
+<a href=# onclick="javascript:document.getElementById('main').style.backgroundColor = '#6666ff';"><div class="color" style="background-color:#6666ff;"></div></a>
 </div>
 </td>
 </tr>
@@ -120,3 +313,4 @@ scrambleLink('scramblepdf','puzzlename','title');
 </script>
 </body>
 </html>
+ -->

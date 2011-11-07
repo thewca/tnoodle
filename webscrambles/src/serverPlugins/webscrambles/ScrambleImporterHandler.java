@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +21,7 @@ import com.sun.net.httpserver.HttpExchange;
 public class ScrambleImporterHandler extends SafeHttpHandler {
 	private final Pattern BOUNDARY_PATTERN = Pattern.compile("^.+boundary\\=(.+)$");
 	@Override
-	protected void wrappedHandle(HttpExchange t, String[] path, HashMap<String, String> query) throws Exception {
+	protected void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws Exception {
 		if(t.getRequestMethod().equals("POST")) {
 			// we assume this means we're uploading a file
 			// the following isn't terribly robust, but it should work for us

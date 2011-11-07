@@ -55,20 +55,20 @@
 			<h1>TNoodleServer</h1>
 			A many purpose http server for twisty puzzles.
 			Or check out <a href="/tnt/">TNT</a>, a new timer.
-			Or try out Shelley's <a href="scramblegen.html">wca scramble generator</a>.
+			Or try out the new <a href="/scramble/">wca scramble generator</a>.
 			<br/><br/>
 		</div> 
 		<div id="content_v"> 
 			<h2>Instructions</h2> 
-			Simply point your browser to <a href="/scramble/">/scramble/</a> to get a list of available puzzles in JSON format.<br/> 
+			Simply point your browser to <a href="/puzzles/">/puzzles/</a> to get a list of available puzzles in JSON format.<br/> 
 			Choose one of these to get a scramble:
-			<a href="/scramble/3x3x3">/scramble/3x3x3</a>
+			<a href="/scramble/.txt?=3x3x3">/scramble/.txt?=3x3x3</a>
 			<br/><br/><br/> 
 			<h2>Examples</h2> 
 			<div id="examples"> 
-				<a href="/scramble/3x3x3?seed=cubing&count=12">/scramble/3x3x3?seed=cubing&count=12</a>
-				<a href="/scramble/3x3x3.json">/scramble/3x3x3.json</a>
-				<a href="/scramble/3x3x3.OH Round 1.pdf?count=5">/scramble/3x3x3.OH Round 1.pdf?count=5</a>
+				<a href="/scramble/.txt?=3x3x3*12&seed=cubing">/scramble/.txt?=3x3x3*12&seed=cubing</a>
+				<a href="/scramble/.json?=3x3x3">/scramble/.json?=3x3x3</a>
+				<a href="/scramble/My Comp.pdf?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5">/scramble/My Comp.pdf?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5</a>
 				<a href="/view/sq1.png?scramble=(3, 3) /"><img src="/view/sq1.png?scramble=(3, 3) /" /></a>
 			</div> 
 			<br/><br/><br/>
@@ -81,39 +81,34 @@
 			<div>
 				Stuff that needs to be done
 				<ul>
-					<li>Clock scramble images</li>
 					<li>The scramble plugin code is a *mess*</li>
 					<li>Mod <a href="http://koii.cubingusa.com/lib/scrambles/competition_scrambles.html">this</a> to use the TNoodleServer as a backend</li>
 				</ul>
 				<br/><br/>
 			</div>
-			<h2>/scramble/[puzzlename[[.title].ext]?seed=SEED&count=COUNT&callback=CALLBACK&scheme=SCHEME</h2>
-			<table>
-				<tr><th>Variable</th><th>Description</th><th>Value Range</th><th>Default</th><th>Comment</th></tr>
-				<tr><td><em>.ext</em></td><td>script extension</td><td> .txt | .json | .pdf </td><td>.txt</td>
-					<td>The extension will determine if the scrambles are generated as plaintext, json, or in a pdf with images.</td></tr>
-				<tr><td><em>.title</em></td><td>title</td><td>Any string</td><td></td>
-					<td>This parameter only applies if .ext is .pdf, in which case the title will appear on top of the generated pdf.</td></tr>
-				<tr><td><em>indices</em></td><td>indices</td><td>Anything</td><td></td>
-					<td>This parameter only applies if .ext is .txt or empty, in which case indices will be printed in the generated newline separated list of scrambles.</td></tr>
-				<tr><td><em>seed</em></td><td>seed</td><td>Any string</td><td>Some (hopefully) secure random number.</td>
-					<td>This is extremely useful for racing people, as two people can now simply agree upon a seed and then independently go to the
-					TNoodleServer to get THE SAME scrambles!</td></tr>
-				<tr><td><em>count</em></td><td>scramble count</td><td>integer</td><td>1 (max 100)</td><td> 
-					The number of desired scrambles.</td></tr>
-				<tr><td><em>offset</em></td><td>hashed scrambles offset</td><td>integer</td><td>0 (max 100)</td><td> 
-					An offset into the list of scrambles from which to start generating scrambles (this is only used if using seeded scrambles).</td></tr>
-				<tr><td><em>callback</em></td><td>jsonp callback</td><td>The name of a javascript function</td><td></td>
-					<td>This parameter only applies if the extension is .json, if so, the resulting json will be padded accordingly.</td></tr>
-				<tr><td><em>scheme</em></td><td>color scheme</td><td>A comma separated list of html colors or one of [ybrwgop0] for short. Or [ybrwgop0]*(number of faces)</td><td></td>
-					<td>The colors are ordered by the faces in alphabetical order. This only applies if .ext is .pdf.</td></tr>
-				<tr><td><em>width</em></td><td>width</td><td>integer</td><td></td>
-					<td>This is the maximum allowed width for the resulting image (only applies to pdfs). It will not screw up the image's aspect ratio.
-					If <= 0, an image will not be displayed. If not specified, the image will be optimized for 5 scrambles per page.</td></tr>
-				<tr><td><em>height</em></td><td>height</td><td>integer</td><td></td>
-					<td>This is the maximum allowed height for the resulting image (only applies to pdfs). It will not screw up the image's aspect ratio.
-					If <= 0, an image will not be displayed. If not specified, the image will be optimized for 5 scrambles per page.</td></tr>
-			</table>
+
+			<pre>
+			http://localhost:8080/scramble/[TITLE].[txt|json|pdf|zip]?OPTIONS
+			
+			OPTIONS include "seed", "showIndices" and most importantly, an arbitrary number of PUZZLE_REQUEST's.
+			
+			PUZZLE_REQUEST's look like this:
+			
+			TITLE=3x3x3*COUNT*COPIES*SCHEME
+			
+			Puzzle request titles must be unique.
+			
+			Here are some examples:
+			
+			scramble/My Comp.pdf?3x3 Round 1=3x3x3*5 - A single 3x3 sheet of 5 scrambles.
+			scramble/My Comp.pdf?3x3 Round 1=3x3x3*5*2 - 2 identical copies of a 3x3 sheet of 5 scrambles. This will produce a 2 page PDF.
+			scramble/My Comp.pdf?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5 - 2 identical copies of a 3x3 sheet of 5 scrambles (titled "3x3 Round 1") 
+			followed by 1 page of 5 3x3 scrambles (titled "3x3 Round 2"). This will produce a 3 page PDF.
+			
+			scramble/My Comp.zip?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5 - This will produce a zip file containing 2 pdfs, one named "3x3 Round 1.pdf" and 
+			the other named "3x3 Round 2.pdf". Note that when the file extension is "zip", we ignore the COPIES option. I think this is a good decision.
+			</pre>
+			
 			<h2>/view/puzzlename.ext?scramble=SCRAMBLE&width=WIDTH&height=HEIGHT&callback=CALLBACK</h2>
 			<table>
 				<tr><th>Variable</th><th>Description</th><th>Value Range</th><th>Default</th><th>Comment</th></tr>

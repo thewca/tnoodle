@@ -28,6 +28,7 @@ tnoodle.server = function(host, port) {
 	this.serverUrl = "http://" + host + ":" + port;
 
 	/**** Scramble server stuff ***/
+	this.puzzlesUrl = this.serverUrl + "/puzzles/";
 	this.scrambleUrl = this.serverUrl + "/scramble/";
 	this.viewUrl = this.serverUrl + "/view/";
 	this.importUrl = this.serverUrl + "/import/";
@@ -71,17 +72,26 @@ tnoodle.server = function(host, port) {
 	};
 	
 	this.loadPuzzles = function(callback) {
-		return tnoodle.ajax(callback, this.scrambleUrl, null);
+		return tnoodle.ajax(callback, this.puzzlesUrl, null);
 	};
 	
 	this.loadScramble = function(callback, puzzle, seed) {
-		return this.loadScrambles(function(scrambles) { callback(scrambles[0]); }, puzzle, seed, 1);
+		return this.loadScrambles(function(scrambles) {
+			if(scrambles.error) {
+				// TODO - should we do this clever little thing, or
+				// just assert that there was no error?
+				callback(scrambles.error);
+			} else {
+				callback(scrambles[0]);
+			}
+		}, puzzle, seed, 1);
 	};
 	this.loadScrambles = function(callback, puzzle, seed, count) {
 		var query = {};
 		if(seed) { query.seed = seed; }
-		if(count) { query.count = count; }
-		return tnoodle.ajax(callback, this.scrambleUrl + encodeURIComponent(puzzle) + ".json", query);
+		if(!count) { count = 1; }
+		query[''] = encodeURIComponent(puzzle) + "*" + count;
+		return tnoodle.ajax(callback, this.scrambleUrl + ".json", query);
 	};
 	this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
 		var query = { "scramble": scramble };

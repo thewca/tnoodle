@@ -436,7 +436,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	var waitingIcon = document.createElement('img');
 	waitingIcon.src = WAITING_ICON;
 	waitingIcon.style.display = 'none';
-	waitingIcon.style.marginTop = (18 - 11) / 2 + 'px';
+	waitingIcon.style.marginTop = '8px';
 	waitingIcon.style.cssFloat = waitingIcon.style.styleFloat = 'right';
 	
 	var scrambleIndex = 0;
@@ -556,7 +556,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			scrambleCount.setAttribute('type', 'number');
 			scrambleCount.setAttribute('step', '1');
 			scrambleCount.setAttribute('min', '1');
-			scrambleCount.setAttribute('size', '4'); // adding 1 for opera
+			scrambleCount.style.width = '80px';
 			scrambleCount.value = 12;
 
 			var loadScramblesButton = document.createElement('input');
