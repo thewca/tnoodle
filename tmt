@@ -171,7 +171,7 @@ class tmt:
 		parser_make.add_argument(
 			'command',
 			nargs='?',
-			choices=['compile', 'dist', 'run', 'clean'],
+			choices=['compile', 'dist', 'run', 'check', 'clean'],
 			default='compile',
 			help='command!')
 		parser_make.add_argument(
@@ -361,6 +361,8 @@ class JarDependency(TmtProject):
 	def __init__(self, jarFile):
 		self.jarFile = jarFile
 		TmtProject.__init__(self, basename(jarFile))
+	def check(self):
+		return
 	def getDependencies(self):
 		return []
 	def compile(self):
@@ -403,9 +405,10 @@ class EclipseProject(TmtProject):
 	classpathHandler = EclipseClasspathHandler()
 	classpathParser.setContentHandler(classpathHandler)
 
-	def __init__(self, name, main=None):
+	def __init__(self, name, main=None, tests=None):
 		self.main = main
 		self.nonJavaSrcDeps = []
+		self.tests = tests
 		TmtProject.__init__(self, name)
 
 	def getDependencies(self):
@@ -561,6 +564,16 @@ Main-Class: %s
 			classpath=self.getClasspath(),
 			args=shlex.split(tmt.args.args),
 			debug=tmt.args.debug)
+	
+	def check(self):
+		if not self.tests:
+			return
+
+		tmt._make(projectName=self.name, command='compile')
+
+		for testClass in self.tests:
+			assert 0 == tmt.java(main=testClass,
+								 classpath=self.getClasspath())
 
 	def clean(self):
 		print 'Cleaning: %s' % self.name
