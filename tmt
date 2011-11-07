@@ -50,8 +50,7 @@ def rmtree(dir):
 			os.unlink(path)
 			#<<<assert 0 == os.system('rmdir %s' % path)
 		else:
-			import pdb; pdb.set_trace() #<<< TODO - how to properly reraise the exception?
-			raise excinfo
+			raise excinfo[1]
 	shutil.rmtree(dir, onerror=onerror)
 
 PROJECT_FILE_NAME = 'tmtproject'

@@ -61,8 +61,8 @@ public class ClockScrambler extends Scrambler {
 			scramble.append( "(" + upegs[x]);
 			scramble.append("," + (r.nextInt(12)-5) + ",0) ");
 		}
-		scramble.append("(UUUU," + (r.nextInt(12)-5) + ") ");
-		scramble.append("(dddd," + (r.nextInt(12)-5) + ") ");
+		scramble.append("(UUUU," + (r.nextInt(12)-5) + ",0) ");
+		scramble.append("(dddd,0," + (r.nextInt(12)-5) + ") ");
 
 		scramble.append("(");
 		for(int x=0;x<4;x++) {
@@ -164,7 +164,7 @@ public class ClockScrambler extends Scrambler {
 
 		int i;
 
-		Pattern p = Pattern.compile("\\(([Ud]{4}),(-?\\d)(,(-?\\d))?\\)");
+		Pattern p = Pattern.compile("\\(([Ud]{4}),(-?\\d),(-?\\d)?\\)");
 		Matcher m = p.matcher(scramble);
 
 		while( m.find() ){
@@ -172,25 +172,19 @@ public class ClockScrambler extends Scrambler {
 			word = word.replace('U', '1');
 			word = word.replace('d', '0');
 			move = Integer.parseInt(word, 2);
-			if( move == 0 ) // all pins down
-				seq[0] = Integer.parseInt(m.group(2));
-			else if( move == 15 ) // all pins up
-				seq[31] = Integer.parseInt(m.group(2));
-			else {
-				seq[move+16] = Integer.parseInt(m.group(2));
-				seq[move] = Integer.parseInt(m.group(4));
-			}
+			seq[move+16] = Integer.parseInt(m.group(2));
+			seq[move] = Integer.parseInt(m.group(3));
 		}
 
 		p = Pattern.compile("\\(([Ud]{4})\\)");
 		m = p.matcher(scramble);
 
-		m.find();
-		String pinString = m.group(1);
+		if( m.find() ){
+			String pinString = m.group(1);
 
-		for( i=0; i<4; i++ )
-			pins[i] = ( pinString.charAt(i) == 'U' );
-
+			for( i=0; i<4; i++ )
+				pins[i] = ( pinString.charAt(i) == 'U' );
+		}
 	}
 
 
