@@ -11,6 +11,9 @@ class Project(tmt.TmtProject):
 	
 	def getDependencies(self):
 		return [ tmt.TmtProject.projects['timer'] ]
+
+	def check(self):
+		return
 	
 	def clean(self):
 		for project in tmt.TmtProject.projects.values():

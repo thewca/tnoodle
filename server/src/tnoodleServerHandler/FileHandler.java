@@ -1,4 +1,4 @@
-package serverPlugins;
+package tnoodleServerHandler;
 
 public class FileHandler extends DirectoryHandler {
 

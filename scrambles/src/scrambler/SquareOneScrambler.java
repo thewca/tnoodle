@@ -1,4 +1,4 @@
-package scramblers;
+package scrambler;
 
 import static net.gnehzr.tnoodle.utils.Utils.modulo;
 import static net.gnehzr.tnoodle.utils.Utils.toColor;
@@ -39,10 +39,6 @@ public class SquareOneScrambler extends Scrambler {
 	private int twistCount; //this will tell us the state of the middle pieces
 	private int[] state;
 
-	public static synchronized SquareOneScrambler[] createScramblers() {
-		return new SquareOneScrambler[] { new SquareOneScrambler() };
-	}
-
 	private Engine eng;
 	private Position1 p1;
 	public SquareOneScrambler() {
@@ -56,7 +52,7 @@ public class SquareOneScrambler extends Scrambler {
 		eng = new Engine();
 	}
 	
-	protected synchronized String generateScramble(Random r) {
+	protected String generateScramble(Random r) {
 		char posstr[] = new char[25];
 
 		//generate random position
@@ -310,7 +306,7 @@ public class SquareOneScrambler extends Scrambler {
 	}
 
 	@Override
-	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorSchemeMap) throws InvalidScrambleException {
+	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorSchemeMap) throws InvalidScrambleException {
 		if(!validateScramble(scramble))
 			throw new InvalidScrambleException(scramble);
 		

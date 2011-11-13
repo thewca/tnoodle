@@ -138,7 +138,7 @@ public abstract class Scrambler {
 		return getLongName();
 	}
 
-	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scramblers", Scrambler.class);
+	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class);
 	// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
 	private static SortedMap<String, LazyClassLoader<Scrambler>> scramblers =
 		new TreeMap<String, LazyClassLoader<Scrambler>>(Strings.getNaturalComparator());

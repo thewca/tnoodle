@@ -1,7 +1,6 @@
 package net.gnehzr.tnoodle.server;
 
 import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
@@ -14,12 +13,12 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 
-import net.gnehzr.tnoodle.utils.Launcher;
-import net.gnehzr.tnoodle.utils.Utils;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import net.gnehzr.tnoodle.utils.Launcher;
+import net.gnehzr.tnoodle.utils.TNoodleLogging;
+import net.gnehzr.tnoodle.utils.Utils;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -39,10 +38,10 @@ public class TNoodleServer {
 	}
 	
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
-	public TNoodleServer(int port, File scrambleFolder, boolean browse) throws IOException {
+	public TNoodleServer(int port, boolean browse) throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
-		server.createContext("/", new TnoodleServerPluginDelegator());
+		server.createContext("/", new TNoodleServerPluginDelegator());
 
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
@@ -74,6 +73,7 @@ public class TNoodleServer {
 	}
 
 	public static void main(String[] args) throws IOException {
+		TNoodleLogging.initializeLogging();
 		Utils.assertAssertions();
 		Launcher.wrapMain(args);
 
@@ -84,11 +84,6 @@ public class TNoodleServer {
 				withOptionalArg().
 					ofType(Integer.class).
 					defaultsTo(8080);
-		OptionSpec<File> scrambleFolderOpt = parser.
-			accepts("scramblers", "The directory of the scramble plugins").
-				withOptionalArg().
-					ofType(File.class).
-					defaultsTo(new File(Utils.getProgramDirectory(), "scramblers"));
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, do not attempt to kill it and start up");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
@@ -114,10 +109,9 @@ public class TNoodleServer {
 					return;
 				}*/
 				int port = options.valueOf(portOpt);
-				File scrambleFolder = options.valueOf(scrambleFolderOpt);
 				boolean openBrowser = !options.has(noBrowserOpt);
 				try {
-					new TNoodleServer(port, scrambleFolder, openBrowser);
+					new TNoodleServer(port, openBrowser);
 				} catch(BindException e) {
 					// If this port is in use, we assume it's an instance of
 					// TNoodleServer, and ask it to commit honorable suicide.
@@ -141,7 +135,7 @@ public class TNoodleServer {
 						try {
 							Thread.sleep(1000);
 							System.out.println("Attempt " + i + "/" + MAX_TRIES + " to start up");
-							new TNoodleServer(port, scrambleFolder, openBrowser);
+							new TNoodleServer(port, openBrowser);
 							break;
 						} catch(Exception ee) {
 							ee.printStackTrace();

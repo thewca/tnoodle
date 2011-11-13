@@ -1,4 +1,4 @@
-package scramblers;
+package scrambler;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,10 +18,6 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 //TODO - cleanup this mess! so much vestigal code...
 //TODO - convert to better naming scheme from sims
 public class MegaminxScrambler extends Scrambler {
-	public static synchronized MegaminxScrambler[] createScramblers() {
-		return new MegaminxScrambler[] { new MegaminxScrambler(true) };
-	}
-	
 	private static final String FACE_NAMES = "ABCDEFabcdef";
 	private static final int gap = 2;
 	private static final int minxRad = 30;
@@ -53,7 +49,7 @@ public class MegaminxScrambler extends Scrambler {
 	}
 	
 	@Override
-	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		if(scramble == null) scramble = "";
 		if(!validateScramble(scramble))
 			throw new InvalidScrambleException(scramble);
@@ -128,7 +124,7 @@ public class MegaminxScrambler extends Scrambler {
 		{0,0,0,0,0,0, 0,0,0,0,1,0},
 		{0,0,0,0,0,0, 0,0,0,0,0,1}};
 
-	public synchronized String generateScramble(Random r) {
+	public String generateScramble(Random r) {
 		StringBuffer scramble = new StringBuffer(length*3);
 		if(!pochmann){
 			int last = -1;

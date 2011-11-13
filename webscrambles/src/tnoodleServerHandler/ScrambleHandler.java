@@ -1,4 +1,4 @@
-package serverPlugins.webscrambles;
+package tnoodleServerHandler;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.toInt;
@@ -19,11 +19,12 @@ import java.util.SortedMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyClassLoader;
-import serverPlugins.FileHandler;
+import tnoodleServerHandler.FileHandler;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -226,6 +227,8 @@ public class ScrambleHandler extends SafeHttpHandler {
 		}
 		
 	}
+	
+	private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
 	class ScrambleRequest {
 		public String[] scrambles;
 		public Scrambler scrambler;
@@ -267,6 +270,12 @@ public class ScrambleHandler extends SafeHttpHandler {
 			} catch (Exception e) {
 				throw new InvalidScrambleRequestException(e);
 			}
+			
+			ScrambleCacher scrambleCacher = scrambleCachers.get(scramblerStr);
+			if(scrambleCacher == null) {
+				scrambleCacher = new ScrambleCacher(scrambler);
+				scrambleCachers.put(scramblerStr, scrambleCacher);
+			}
 
 			this.title = title;
 			this.count = Math.min(toInt(countStr, 1), MAX_COUNT);
@@ -274,7 +283,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 			if(seed != null) {
 				this.scrambles = scrambler.generateSeededScrambles(seed, count);
 			} else {
-				this.scrambles = scrambler.generateScrambles(count);
+				this.scrambles = scrambleCacher.newScrambles(count);
 			}
 			
 			this.colorScheme = scrambler.parseColorScheme(scheme);
@@ -379,7 +388,6 @@ public class ScrambleHandler extends SafeHttpHandler {
 					zipOut.write(b);
 					
 					zipOut.closeEntry();
-				
 				}
 				zipOut.close();
 				

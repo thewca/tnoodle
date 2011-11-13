@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Plugins<H> {
-	private static final String PLUGIN_DEFINITIONS_FILENAME = "pluginDefinitions";
 	private static final Pattern NAMESPACE_PATTERN = Pattern.compile("([^\\s{]+)\\s*\\{\\s*");
 	
 	private String packageName;
@@ -19,10 +18,12 @@ public class Plugins<H> {
 	private long loadedTime = 0;
 	private Class<H> pluginClass;
 	
+	private String PLUGIN_DEFINITIONS_FILENAME;
 	private String contextResourcePath;
 	private File contextFile;
 	public Plugins(String packageName, Class<H> pluginClass) {
 		this.packageName = packageName;
+		this.PLUGIN_DEFINITIONS_FILENAME = packageName + "s";
 		this.pluginClass = pluginClass;
 		this.contextResourcePath = "/" + this.packageName + "/" + PLUGIN_DEFINITIONS_FILENAME;
 		contextFile = new File(Utils.getProgramDirectory(), this.packageName + "/" + PLUGIN_DEFINITIONS_FILENAME);

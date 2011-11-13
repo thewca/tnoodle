@@ -20,7 +20,7 @@ public class ScrambleCacher {
 	private static final Random r;
 	static {
 		byte[] seed = null;
-		try{
+		try {
 			seed = SecureRandom.getInstance("SHA1PRNG").generateSeed(9);
 		} catch(NoSuchAlgorithmException e) {
 			seed = new SecureRandom().generateSeed(9);
@@ -36,25 +36,29 @@ public class ScrambleCacher {
 		this(scrambler, DEFAULT_CACHE_SIZE);
 	}
 	
+	private boolean running = false;
 	public ScrambleCacher(final Scrambler scrambler, int cacheSize) {
 		scrambles = new String[cacheSize];
 
-		new Thread() {
+		Thread t = new Thread() {
 			public void run() {
 				synchronized(scrambler.getClass()) {
-					//this thread starts running while scrambler
-					//is still initializing, we must wait until
-					//it has finished before we attempt to generate
-					//any scrambles
+					// This thread starts running while scrambler
+					// is still initializing, we must wait until
+					// it has finished before we attempt to generate
+					// any scrambles.
 				}
 				for(;;) {
 					String scramble = scrambler.generateScramble(r);
-
+					
 					synchronized(scrambles) {
-						while(available == scrambles.length) {
+						while(running && available == scrambles.length) {
 							try {
 								scrambles.wait();
 							} catch(InterruptedException e) {}
+						}
+						if(!running) {
+							return;
 						}
 						scrambles[(startBuf + available) % scrambles.length] = scramble;
 						available++;
@@ -63,8 +67,22 @@ public class ScrambleCacher {
 					fireScrambleCacheUpdated();
 				}
 			}
-		}.start();
+		};
+		running = true;
+		t.start();
 	}
+	
+	public void stop() {
+		synchronized(scrambles) {
+			running = false;
+			scrambles.notifyAll();
+		}
+	}
+	
+	public boolean isRunning() {
+		return running;
+	}
+	
 	private LinkedList<ScrambleCacherListener> ls = new LinkedList<ScrambleCacherListener>();
 	public void addScrambleCacherListener(ScrambleCacherListener l) {
 		ls.add(l);
@@ -80,6 +98,10 @@ public class ScrambleCacher {
 	
 	public int getAvailableCount() {
 		return available;
+	}
+	
+	public int getCacheSize() {
+		return scrambles.length;
 	}
 
 	/**
@@ -109,8 +131,4 @@ public class ScrambleCacher {
 			scrambles[i] = newScramble();
 		return scrambles;
 	}
-}
-
-interface ScrambleCacherListener {
-	public void scrambleCacheUpdated(ScrambleCacher src);
 }

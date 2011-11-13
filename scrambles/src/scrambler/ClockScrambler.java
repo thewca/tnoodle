@@ -1,4 +1,4 @@
-package scramblers;
+package scrambler;
 
 import java.util.Random;
 import java.util.HashMap;
@@ -32,10 +32,6 @@ public class ClockScrambler extends Scrambler {
 
 	private static final int gap = 5;
 	
-	public static synchronized ClockScrambler[] createScramblers() {
-		return new ClockScrambler[] { new ClockScrambler() };
-	}
-	
 	@Override
 	public String getLongName() {
 		return "Clock";
@@ -47,7 +43,7 @@ public class ClockScrambler extends Scrambler {
 	}
 	
 	@Override
-	public synchronized String generateScramble(Random r) {
+	public String generateScramble(Random r) {
 		StringBuffer scramble = new StringBuffer();
 		
 		String[] peg={"U","d"};

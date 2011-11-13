@@ -1,4 +1,4 @@
-package serverPlugins.webscrambles;
+package tnoodleServerHandler;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.parseExtension;

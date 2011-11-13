@@ -3,7 +3,9 @@ package org.kociemba.twophase;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.text.DecimalFormat;
+import java.util.logging.Logger;
+
+import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Representation of the cube on the coordinate level
@@ -399,23 +401,18 @@ public class CoordCube {
 	
 	
 	// ++++++++++++++++++++++++++++++[ Code below added by Jeremy Fleischman ]++++++++++++++++++++++++++++
-	// Allows lookup tables to be saved statically
-	private static boolean debug = true;
-	public static void setDebug(boolean toDebug) {
-		debug = toDebug;
-	}
-	private static void println(String s) {
-		if(debug)
-			System.out.println(Thread.currentThread() + ": " + s);
-	}
+
+	private static final Logger l = Logger.getLogger(CoordCube.class.getName());
 	
+	// Allows lookup tables to be saved statically
 	private static boolean inited = false;
-	private static final DecimalFormat df = new DecimalFormat("#.###");
 	public static void init() {
 		if(inited)
 			return;
 		
-		long s = System.nanoTime();
+		TimedLogRecordStart start = new TimedLogRecordStart("initing tables");
+		l.log(start);
+		
 		if(!loadTransitionTables(CoordCube.class.getResourceAsStream("transition_tables"))) {
 			initTransitionTables();
 		}
@@ -424,15 +421,15 @@ public class CoordCube {
 		}
 		
 		inited = true;
-		println("Done initing tables (took " + df.format((System.nanoTime()-s)/1e9) + " seconds)");
+		l.log(start.finishedNow());
 	}
 
 	private static boolean loadTransitionTables(InputStream in) {
 		if(in == null)
 			return false;
 		try {
-			long start = System.nanoTime();
-			println("Loading transition tables");
+			TimedLogRecordStart start = new TimedLogRecordStart("loading transition tables");
+			l.log(start);
 
 			byte[] buff = new byte[transition_tables_bytes];
 			int read = 0;
@@ -449,7 +446,7 @@ public class CoordCube {
 				}
 			}
 
-			println("Done loading transition tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			l.log(start.finishedNow());
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -462,8 +459,8 @@ public class CoordCube {
 			return false;
 		
 		try {
-			long start = System.nanoTime();
-			println("Loading pruning tables");
+			TimedLogRecordStart start = new TimedLogRecordStart("loading pruning tables");
+			l.log(start);
 
 			for(byte[] table : pruning_tables) {
 				int read = 0;
@@ -472,7 +469,7 @@ public class CoordCube {
 			}
 			in.close();
 
-			println("Done loading pruning tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			l.log(start.finishedNow());
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -486,7 +483,6 @@ public class CoordCube {
 			System.out.println("Please provide 2 arguments: the transition tables file and the pruning tables file");
 			return;
 		}
-		setDebug(true);
 		initTransitionTables();
 		dumpTransitionTables(args[0]);
 		initPruningTables();
@@ -495,8 +491,9 @@ public class CoordCube {
 	
 	private static void dumpTransitionTables(String file) {
 		try {
-			println("Dumping transition tables to " + file);
-			long start = System.nanoTime();
+			TimedLogRecordStart start = new TimedLogRecordStart("dumping transition tables to " + file);
+			l.log(start);
+			
 			byte[] buff = new byte[transition_tables_bytes];
 			int index = 0;
 			for(short[][] table : transition_tables) {
@@ -510,7 +507,8 @@ public class CoordCube {
 			FileOutputStream out = new FileOutputStream(file);
 			out.write(buff);
 			out.close();
-			println("Done dumping transition tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			
+			l.log(start.finishedNow());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -518,54 +516,58 @@ public class CoordCube {
 	
 	private static void dumpPruningTables(String file) {
 		try {
-			println("Dumping pruning tables to " + file);
-			long start = System.nanoTime();
+			TimedLogRecordStart start = new TimedLogRecordStart("dumping pruning tables to " + file);
+			l.log(start);
+			
 			FileOutputStream out = new FileOutputStream(file);
 			for(byte[] table : pruning_tables)
 				out.write(table);
 			out.close();
-			println("Done dumping pruning tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			
+			l.log(start.finishedNow());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	private static void initTransitionTables() {
-		println("Generating transition tables");
+		TimedLogRecordStart start = new TimedLogRecordStart("generating transition tables");
+		l.log(start);
 		
-		println("0% - initTwistMove"); // 2187 = 3.3% = 1.023%
+//		l.info("0% - initTwistMove"); // 2187 = 3.3% = 1.023%
 		CoordCube.initTwistMove();
-		println("1% - initFlipMove"); // 2048 = 3.1% = 0.961%
+//		l.info("1% - initFlipMove"); // 2048 = 3.1% = 0.961%
 		CoordCube.initFlipMove();
-		println("2% - initFRtoBR_Move"); // 11880 = 18.2% = 5.642%
+//		l.info("2% - initFRtoBR_Move"); // 11880 = 18.2% = 5.642%
 		CoordCube.initFRtoBR_Move();
-		println("8% - initURFtoDLF_Move"); // 20160 = 30.9% = 9.579%
+//		l.info("8% - initURFtoDLF_Move"); // 20160 = 30.9% = 9.579%
 		CoordCube.initURFtoDLF_Move();
-		println("17% - initURtoDF_Move"); // 20160 = 30.9% = 9.579%
+//		l.info("17% - initURtoDF_Move"); // 20160 = 30.9% = 9.579%
 		CoordCube.initURtoDF_Move();
-		println("27% - initURtoUL_Move"); // 1320 = 2.0% = 0.62%
+//		l.info("27% - initURtoUL_Move"); // 1320 = 2.0% = 0.62%
 		CoordCube.initURtoUL_Move();
-		println("27% - initUBtoDF_Move"); // 1320 = 2.0% = 0.62%
+//		l.info("27% - initUBtoDF_Move"); // 1320 = 2.0% = 0.62%
 		CoordCube.initUBtoDF_Move();
-		println("28% - initMergeURtoULandUBtoDF"); // 336 * 336 / 18 = 6272 = 9.6% = 2.976%
+//		l.info("28% - initMergeURtoULandUBtoDF"); // 336 * 336 / 18 = 6272 = 9.6% = 2.976%
 		CoordCube.initMergeURtoULandUBtoDF();
 
-		println("Done generating transition tables");
+		l.log(start.finishedNow());
 	}
 	
 	private static void initPruningTables() {
-		println("Generating pruning tables");
+		TimedLogRecordStart start = new TimedLogRecordStart("generating pruning tables");
+		l.log(start);
 		
-		println("31% - initSlice_URFtoDLF_Parity_Prun"); // 27% = 18.63%
+//		l.info("31% - initSlice_URFtoDLF_Parity_Prun"); // 27% = 18.63%
 		CoordCube.initSlice_URFtoDLF_Parity_Prun();
-		println("50% - initSlice_URtoDF_Parity_Prun"); // 22% = 15.18%
+//		l.info("50% - initSlice_URtoDF_Parity_Prun"); // 22% = 15.18%
 		CoordCube.initSlice_URtoDF_Parity_Prun();
-		println("65% - initSlice_Twist_Prun"); // 26% = 17.94%
+//		l.info("65% - initSlice_Twist_Prun"); // 26% = 17.94%
 		CoordCube.initSlice_Twist_Prun();
-		println("82% - initSlice_Flip_Prun"); // 25% = 17.25%
+//		l.info("82% - initSlice_Flip_Prun"); // 25% = 17.25%
 		CoordCube.initSlice_Flip_Prun();
 		
-		println("100% - Done Generating pruning tables");
+		l.log(start.finishedNow());
 	}
 
 	private static final byte[][] pruning_tables = new byte[][] {

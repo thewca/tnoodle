@@ -11,11 +11,14 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 public abstract class SafeHttpHandler implements HttpHandler {
+	private static final Logger l = Logger.getLogger(SafeHttpHandler.class.getName());
 	
 	@Override
 	public final void handle(HttpExchange t) throws IOException {
@@ -85,12 +88,12 @@ public abstract class SafeHttpHandler implements HttpHandler {
 			t.sendResponseHeaders(200, bytes.size());
 			bytes.writeTo(t.getResponseBody());
 		} catch (IOException e) {
-			e.printStackTrace();
+			l.log(Level.WARNING, "", e);
 		} finally {
 			try {
 				t.getResponseBody().close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				l.log(Level.WARNING, "", e);
 			}
 		}
 	}
@@ -101,12 +104,12 @@ public abstract class SafeHttpHandler implements HttpHandler {
 			t.sendResponseHeaders(200, bytes.length);
 			t.getResponseBody().write(bytes);
 		} catch (IOException e) {
-			e.printStackTrace();
+			l.log(Level.WARNING, "", e);
 		} finally {
 			try {
 				t.getResponseBody().close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				l.log(Level.WARNING, "", e);
 			}
 		}
 	}

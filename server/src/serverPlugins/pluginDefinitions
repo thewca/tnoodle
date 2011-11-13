@@ -1,2 +1,0 @@
-/ serverPlugins.DirectoryHandler("www/")
-/kill/ serverPlugins.DeathHandler()

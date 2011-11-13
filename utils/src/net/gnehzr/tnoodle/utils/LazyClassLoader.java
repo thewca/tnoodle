@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 
 public class LazyClassLoader<H> {
-	// serverPlugins.FileHandler("www/")
+	// package.FileHandler("www/")
 	private static final Pattern INSTANTIATION_PATTERN = Pattern.compile("(\\S+)\\s*\\((.*)\\)");
 	// TODO - this pattern doesn't actually match all valid strings
 	private static final Pattern ARGUMENT_PATTERN = Pattern.compile("((\"[^,]*\")|(true)|(false)|(-?\\d+)),?\\s*");

@@ -1,4 +1,4 @@
-package scramblers;
+package scrambler;
 
 import static net.gnehzr.tnoodle.utils.Utils.toColor;
 
@@ -19,10 +19,6 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 public class PyraminxScrambler extends Scrambler {
 	private static final int pieceSize = 30;
 	private static final int gap = 5;
-	
-	public static synchronized PyraminxScrambler[] createScramblers() {
-		return new PyraminxScrambler[] { new PyraminxScrambler() };
-	}
 	
 	private int[][] image;
 
@@ -115,7 +111,7 @@ public class PyraminxScrambler extends Scrambler {
 	private static final String TIPS = "lrbu";
 	private static final String SIDES = "ULRB";
 	private static final String[] DIR_TO_STR = new String[] { "", "'" };
-	protected synchronized String generateScramble(Random r) {
+	protected String generateScramble(Random r) {
 		turns = new int[20];
 		turnIndex = turns.length - 1;
 		int t = 0, s = 0, q = 0, m, l, p;
@@ -479,7 +475,7 @@ public class PyraminxScrambler extends Scrambler {
 	}
 
 	@Override
-	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		if(!validateScramble(scramble))
 			throw new InvalidScrambleException(scramble);
 		

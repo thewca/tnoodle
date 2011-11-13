@@ -1,4 +1,4 @@
-package serverPlugins;
+package tnoodleServerHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import net.gnehzr.tnoodle.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
 
 public class DirectoryHandler extends SafeHttpHandler {
+	private static final String PLUGIN_DIRECTORY = DirectoryHandler.class.getPackage().getName();
+	
 	private static MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
 	static {
 		mimes.addMimeTypes("text/css css");
@@ -49,7 +51,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		String filePath = Utils.join(requestPath, "/");
 		String resource;
 		if(isDirectory) {
-			resource = "/serverPlugins" + "/" + path + "/" + filePath;
+			resource =  "/" + PLUGIN_DIRECTORY +"/" + path + "/" + filePath;
 			if(t.getRequestURI().getPath().endsWith("/")) {
 				filePath += "index.html";
 				resource += "index.html";
@@ -70,7 +72,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 				}
 			}
 		} else {
-			resource = "/serverPlugins" + "/" + path;
+			resource = "/" + PLUGIN_DIRECTORY + "/" + path;
 		}
 		InputStream is = getClass().getResourceAsStream(resource);
 		if(is == null) {

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import Tac # TODO - replace this or get fired
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from os.path import exists, dirname, join, isdir, split, abspath, relpath, basename
 import sys, os, imp, re, subprocess, shutil, shlex
@@ -424,7 +425,7 @@ class EclipseProject(TmtProject):
 		# TODO - I hate the world
 		# Uncomment & replace the following with the path to your jre
 		# if you're trying to use jbd inside of a java library method.
-		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
+		classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
 
 		for project in self.projects:
 			classpath |= project.getClasspathEntities()

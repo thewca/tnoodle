@@ -1,4 +1,4 @@
-package serverPlugins.webscrambles;
+package tnoodleServerHandler;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

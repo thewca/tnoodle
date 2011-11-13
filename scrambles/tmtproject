@@ -7,11 +7,12 @@ class Project(tmt.EclipseProject):
 		tmt.EclipseProject.__init__(
 				self,
 				tmt.projectName(),
-				main='net.gnehzr.tnoodle.scrambles.Main')
+				main='net.gnehzr.tnoodle.scrambles.Main',
+				tests=['net.gnehzr.tnoodle.test.ScrambleTest'])
 
 	def configure(self):
 		tmt.EclipseProject.configure(self)
 		self.nonJavaSrcDeps += tmt.glob(self.src, '.*png$', relativeTo=self.src)
-		self.nonJavaSrcDeps.append('scramblers/pluginDefinitions')
+		self.nonJavaSrcDeps.append('scrambler/scramblers')
 
 Project()

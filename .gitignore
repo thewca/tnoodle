@@ -6,3 +6,4 @@ bin/
 .metadata
 tmtprojectc
 *.pyc
+*.log.*

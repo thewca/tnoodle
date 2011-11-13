@@ -1,4 +1,4 @@
-package serverPlugins;
+package tnoodleServerHandler;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;

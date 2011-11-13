@@ -5,8 +5,8 @@ import os
 from os.path import join, exists, relpath
 import shutil
 
-SERVER_PLUGIN_DIR = 'serverPlugins'
-CONTEXT_FILE = 'pluginDefinitions'
+SERVER_PLUGIN_DIR = 'tnoodleServerHandler'
+CONTEXT_FILE = 'tnoodleServerHandlers'
 
 class Project(tmt.EclipseProject):
 	def __init__(self, *args, **kwargs):

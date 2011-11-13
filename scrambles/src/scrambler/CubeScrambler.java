@@ -1,4 +1,4 @@
-package scramblers;
+package scrambler;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,13 +24,6 @@ public class CubeScrambler extends Scrambler {
     private static final int MAX_SCRAMBLE_LENGTH = 25;
     private static final int TIMEOUT = 60; //seconds
     
-	public static synchronized CubeScrambler[] createScramblers() {
-		CubeScrambler[] scramblers = new CubeScrambler[10];
-		for(int i = 0; i < scramblers.length; i++)
-			scramblers[i] = new CubeScrambler(i+2);
-		return scramblers;
-	}
-	
 	private static final String FACES = "LDBRUFldbruf";
 	private static final int gap = 2;
 	private static final int cubieSize = 10;
@@ -39,14 +32,12 @@ public class CubeScrambler extends Scrambler {
 	private boolean multislice = true;
 	private boolean wideNotation = false;
 	
-	private int[][][] image;
 	private final int size;
 	private int length;
 	public CubeScrambler(int size) {
 		if(size <= 0 || size >= DEFAULT_LENGTHS.length)
 			throw new IllegalArgumentException("Invalid cube size");
 		this.size = size;
-		this.image = new int[6][size][size];
 
 		if(size == 2)
 			calcperm();
@@ -67,10 +58,13 @@ public class CubeScrambler extends Scrambler {
 	}
 
 	@Override
-	public synchronized String generateScramble(Random r) {
+	public String generateScramble(Random r) {
 		if(size == 2) {
-			mix(r);
-			return solve();
+//			synchronized(this) {
+				// TODO - the 2x2x2 code is definitely not thread safe
+				mix(r);
+				return solve();
+//			}
 		} else if(size == 3) {
 			return Search.solution(Tools.randomCube(r), MAX_SCRAMBLE_LENGTH, TIMEOUT, false).trim();
 		} else {
@@ -159,7 +153,7 @@ public class CubeScrambler extends Scrambler {
 	private final static String regexp345 = "^(\\s*(?:[LDBRUF]w?|[ldbruf])2?'?)*\\s*$";
 	private final static String regexp = "^(\\s*(\\d+)?([LDBRUF])2?'?)*\\s*$";
 	private final static Pattern shortPattern = Pattern.compile(regexp);
-	private boolean validateScramble(String scramble) {
+	private boolean validateScramble(String scramble, int[][][] image) {
 		if(size < 2) return false;
 		else if(size == 2 && !scramble.matches(regexp2))
 			return false;
@@ -199,7 +193,7 @@ public class CubeScrambler extends Scrambler {
 				newScram.append(moveString(n));
 
 				do{
-					slice(face, slice, dir);
+					slice(face, slice, dir, image);
 					slice--;
 				} while(multislice && slice >= 0);
 			}
@@ -213,17 +207,8 @@ public class CubeScrambler extends Scrambler {
 		else scramble = newScram.toString();
 		return true;
 	}
-	private void initializeImage() {
-		for(int i = 0; i < 6; i++){
-			for(int j = 0; j < size; j++){
-				for(int k = 0; k < size; k++){
-					image[i][j][k] = i;
-				}
-			}
-		}
-	}
 
-	private void slice(int face, int slice, int dir){
+	private void slice(int face, int slice, int dir, int[][][] image) {
 		face %= 6;
 		int sface = face;
 		int sslice = slice;
@@ -313,11 +298,21 @@ public class CubeScrambler extends Scrambler {
 	}
 	
 	@Override
-	protected synchronized void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		if(scramble == null) scramble = "";
-		initializeImage();
-		if(!validateScramble(scramble))
+		
+		int[][][] image = new int[6][size][size];
+		for(int i = 0; i < 6; i++) {
+			for(int j = 0; j < size; j++) {
+				for(int k = 0; k < size; k++) {
+					image[i][j][k] = i;
+				}
+			}
+		}
+		
+		if(!validateScramble(scramble, image))
 			throw new InvalidScrambleException(scramble);
+	
 		drawCube(g, image, gap, cubieSize, colorScheme);
 	}
 

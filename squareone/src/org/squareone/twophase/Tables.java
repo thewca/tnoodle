@@ -3,9 +3,12 @@ package org.squareone.twophase;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.text.DecimalFormat;
+import java.util.logging.Logger;
+
+import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
 public class Tables {
+	private static final Logger l = Logger.getLogger(Tables.class.getName());
 
 	public static HalfLayer hl[] = new HalfLayer[13];			//the 13 possible half layers
 	public static Layer layers[][] = new Layer[13][13];			//the 13^2 theoretically possible layers made of two halves
@@ -25,8 +28,8 @@ public class Tables {
 	public static void initialise() { initLayers(); initShapeTable(); initPermTable(); }
 
 	public static void initLayers(){
-
-		println("Initializing Layers...");
+		TimedLogRecordStart start = new TimedLogRecordStart("initializing layers");
+		l.log(start);
 
 		int a,b,c,d,t;
 
@@ -79,15 +82,17 @@ public class Tables {
 				}
 			}
 		}
+		
+		l.log(start.finishedNow());
 	}
 
 
 	public static void initShapeTable(){
-
-		println("Initializing Shape Table...");
+		TimedLogRecordStart start = new TimedLogRecordStart("initializing shape table");
+		l.log(start);
 
 		int a,b,c,d,e, i, a2,b2,c2,d2,e2, t;
-		int l;
+		int lInt;
 
 		// set twist parity changes
 		for(a=0;a<13;a++)for(b=0;b<13;b++)for(c=0;c<13;c++)for(d=0;d<13;d++){
@@ -111,16 +116,16 @@ public class Tables {
 		Tables.shapeTable[7 ][7 ][7 ][7 ][1] = 1;
 		Tables.shapeTable[10][10][10][10][1] = 1;
 
-		l=0;
+		lInt=0;
 		do{
-			l++; i=0;
+			lInt++; i=0;
 			for(a=0;a<13;a++)for(b=0;b<13;b++)for(c=0;c<13;c++)for(d=0;d<13;d++)for(e=0;e<2;e++){
-				if((Tables.shapeTable[a][b][c][d][e]&127)==l){
+				if((Tables.shapeTable[a][b][c][d][e]&127)==lInt){
 					//try twist
 					e2= ((Tables.shapeTable[a][b][c][d][e]&128) != 0) ? 1-e : e ;
 					if( (Tables.shapeTable[a][c][b][d][e2]&127) == 0){
 						i++;
-						Tables.shapeTable[a][c][b][d][e2]+=l+1;
+						Tables.shapeTable[a][c][b][d][e2]+=lInt+1;
 					}
 
 					//try turning top layer
@@ -133,7 +138,7 @@ public class Tables {
 
 						if( (Tables.shapeTable[a2][b2][c][d][e2]&127) == 0){
 							i++;
-							Tables.shapeTable[a2][b2][c][d][e2]+=l+1;
+							Tables.shapeTable[a2][b2][c][d][e2]+=lInt+1;
 						}
 					}while((a2!=a) || (b2!=b));
 
@@ -148,21 +153,23 @@ public class Tables {
 
 						if( (Tables.shapeTable[a][b][c2][d2][e2]&127) == 0){
 							i++;
-							Tables.shapeTable[a][b][c2][d2][e2]+=l+1;
+							Tables.shapeTable[a][b][c2][d2][e2]+=lInt+1;
 						}
 					}while(c2!=c || d2!=d);
 				}
 			}
 		} while(i != 0);
+		
+		l.log(start.finishedNow());
 	}
 
 
 	public static void initPermTable(){
-
-		println("Initializing PermTable...");
+		TimedLogRecordStart start = new TimedLogRecordStart("initializing PermTable");
+		l.log(start);
 
 		int a,b,i;
-		int t,c,l;
+		int t,c,lInt;
 		char t2;
 		char pos[] = new char[9];
 
@@ -195,16 +202,16 @@ public class Tables {
 
 		//build perm table
 		Tables.permTable[0][0]=1;
-		l=0;
+		lInt=0;
 		do{
-			l++; i=0;
+			lInt++; i=0;
 			for(a=0;a<40320;a++) for(t=0;t<2;t++){
-				if(Tables.permTable[t][a]==l){
+				if(Tables.permTable[t][a]==lInt){
 					//try twist
 					b= Tables.permTwistTable[a];
 					if( Tables.permTable[1-t][b] == 0 ){
 						i++;
-						Tables.permTable[1-t][b]=(byte)(l+1);
+						Tables.permTable[1-t][b]=(byte)(lInt+1);
 					}
 
 					//try turning top layer
@@ -213,7 +220,7 @@ public class Tables {
 						b= Tables.permTopTable[b];
 						if( Tables.permTable[t][b] == 0 ){
 							i++;
-							Tables.permTable[t][b]=(byte)(l+1);
+							Tables.permTable[t][b]=(byte)(lInt+1);
 						}
 					}
 
@@ -223,12 +230,14 @@ public class Tables {
 						b= Tables.permBotTable[b];
 						if( Tables.permTable[t][b] == 0 ){
 							i++;
-							Tables.permTable[t][b]=(byte)(l+1);
+							Tables.permTable[t][b]=(byte)(lInt+1);
 						}
 					}
 				}
 			}
 		}while(i != 0);
+		
+		l.log(start.finishedNow());
 	}
 
 
@@ -236,39 +245,31 @@ public class Tables {
 	*     Save lookup tables (based on jcubeexplorer code)   *
 	**********************************************************/
 
-
-	private static boolean debug = true;
-	public static void setDebug(boolean toDebug) {
-		debug = toDebug;
-	}
-	private static void println(String s) {
-		if(debug)
-			System.out.println(Thread.currentThread() + ": " + s);
-	}
-	
 	private static boolean inited = false;
-	private static final DecimalFormat df = new DecimalFormat("#.###");
 	public static void init() {
 		if(inited)
 			return;
 		
-		long s = System.nanoTime();
+		TimedLogRecordStart start = new TimedLogRecordStart("initing tables");
+		l.log(start);
+		
 		if(!loadTransitionTables(Tables.class.getResourceAsStream("transition_tables")))
 			initialise();
 		loadShapeTable(Tables.class.getResourceAsStream("shape_table"));
 		loadPermTable(Tables.class.getResourceAsStream("perm_table"));
 		
 		inited = true;
-		println("Done initing tables (took " + df.format((System.nanoTime()-s)/1e9) + " seconds)");
+		
+		l.log(start.finishedNow());
 	}
 
 	private static boolean loadTransitionTables(InputStream in) {
 		if(in == null)
 			return false;
 		try {
-			long start = System.nanoTime();
-			println("Loading transition tables");
-
+			TimedLogRecordStart start = new TimedLogRecordStart("loading transition tables");
+			l.log(start);
+			
 			byte[] buff = new byte[transition_tables_bytes];
 			int read = 0;
 			while(read < buff.length)
@@ -281,8 +282,8 @@ public class Tables {
 					table[i] = (int)(((buff[index++]&0xFF) << 24) | ((buff[index++]&0xFF) << 16) | ((buff[index++]&0xFF) << 8) | ((buff[index++]&0xFF)));
 				}
 			}
-
-			println("Done loading transition tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			
+			l.log(start.finishedNow());
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -295,8 +296,8 @@ public class Tables {
 			return false;
 		
 		try {
-			long start = System.nanoTime();
-			println("Loading shape table");
+			TimedLogRecordStart start = new TimedLogRecordStart("loading shape table");
+			l.log(start);
 
 			for(int i=0;i<13;i++)
 				for(int j=0;j<13;j++)
@@ -305,7 +306,7 @@ public class Tables {
 							in.read(shapeTable[i][j][k][l], 0, 2);
 			in.close();
 
-			println("Done loading shape table (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			l.log(start.finishedNow());
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -318,8 +319,8 @@ public class Tables {
 			return false;
 		
 		try {
-			long start = System.nanoTime();
-			println("Loading perm table");
+			TimedLogRecordStart start = new TimedLogRecordStart("loading perm table");
+			l.log(start);
 
 			for(int i=0;i<2;i++) {
 				int read = 0;
@@ -328,7 +329,7 @@ public class Tables {
 			}
 			in.close();
 
-			println("Done loading perm table (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			l.log(start.finishedNow());
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -344,7 +345,6 @@ public class Tables {
 			System.out.println("Please provide 3 arguments: the transition tables file, the shape table file and the perm table file");
 			return;
 		}
-		setDebug(true);
 		initialise();
 		dumpTransitionTables(args[0]);
 		dumpShapeTable(args[1]);
@@ -353,8 +353,9 @@ public class Tables {
 	
 	private static void dumpTransitionTables(String file) {
 		try {
-			println("Dumping transition tables to " + file);
-			long start = System.nanoTime();
+			TimedLogRecordStart start = new TimedLogRecordStart("dumping transition tables to " + file);
+			l.log(start);
+			
 			byte[] buff = new byte[transition_tables_bytes];
 			int index = 0;
 			for(int[] table : transition_tables) {
@@ -368,7 +369,8 @@ public class Tables {
 			FileOutputStream out = new FileOutputStream(file);
 			out.write(buff);
 			out.close();
-			println("Done dumping transition tables (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			
+			l.log(start.finishedNow());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -376,8 +378,9 @@ public class Tables {
 	
 	private static void dumpShapeTable(String file) {
 		try {
-			println("Dumping shape table to " + file);
-			long start = System.nanoTime();
+			TimedLogRecordStart start = new TimedLogRecordStart("dumping shape table to " + file);
+			l.log(start);
+			
 			FileOutputStream out = new FileOutputStream(file);
 			for(int i=0;i<13;i++)
 				for(int j=0;j<13;j++)
@@ -385,7 +388,8 @@ public class Tables {
 						for(int l=0;l<13;l++)
 							out.write(shapeTable[i][j][k][l]);
 			out.close();
-			println("Done dumping shape table (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			
+			l.log(start.finishedNow());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -393,13 +397,15 @@ public class Tables {
 
 	private static void dumpPermTable(String file) {
 		try {
-			println("Dumping perm table to " + file);
-			long start = System.nanoTime();
+			TimedLogRecordStart start = new TimedLogRecordStart("dumping perm table to " + file);
+			l.log(start);
+			
 			FileOutputStream out = new FileOutputStream(file);
 			out.write(permTable[0]);
 			out.write(permTable[1]);
 			out.close();
-			println("Done dumping perm table (took " + df.format((System.nanoTime()-start)/1e9) + " seconds)");
+			
+			l.log(start.finishedNow());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

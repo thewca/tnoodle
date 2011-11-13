@@ -1,0 +1,2 @@
+/ tnoodleServerHandler.DirectoryHandler("www/")
+/kill/ tnoodleServerHandler.DeathHandler()
