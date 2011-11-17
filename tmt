@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import Tac # TODO - replace this or get fired
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from os.path import exists, dirname, join, isdir, split, abspath, relpath, basename
 import sys, os, imp, re, subprocess, shutil, shlex

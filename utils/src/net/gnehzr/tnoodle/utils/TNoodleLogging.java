@@ -13,6 +13,10 @@ public class TNoodleLogging {
 	private static final int FILE_COUNT = 5;
 
 	public static void initializeLogging() {
+		initializeLogging(Level.WARNING);
+	}
+	
+	public static void initializeLogging(Level consoleLogLevel) {
 		Logger rootLogger = Logger.getLogger("");
 		rootLogger.setLevel(Level.FINEST);
 		
@@ -25,7 +29,7 @@ public class TNoodleLogging {
 		// Everything below INFO is lost forever =(.
 		OneLineLogFormatter formatter = new OneLineLogFormatter();
 		ConsoleHandler ch = new ConsoleHandler();
-		ch.setLevel(Level.WARNING);
+		ch.setLevel(consoleLogLevel);
 		ch.setFormatter(formatter);
 		rootLogger.addHandler(ch);
 		
