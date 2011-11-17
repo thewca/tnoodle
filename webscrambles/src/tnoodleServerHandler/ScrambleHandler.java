@@ -301,7 +301,11 @@ public class ScrambleHandler extends SafeHttpHandler {
 				// Note that we prefix the seed with the title of the round! This ensures that we get unique
 				// scrambles in different rounds. Thanks to Ravi Fernando for noticing this at Stanford Fall 2011. 
 				// (http://www.worldcubeassociation.org/results/c.php?i=StanfordFall2011).
-				scrambleRequests[i++] = new ScrambleRequest(title, query.get(title), title+seed);
+				String uniqueSeed = null;
+				if(seed != null) {
+					uniqueSeed = title + seed;
+				}
+				scrambleRequests[i++] = new ScrambleRequest(title, query.get(title), uniqueSeed);
 			}
 		}
 		return scrambleRequests;
