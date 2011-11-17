@@ -298,7 +298,10 @@ public class ScrambleHandler extends SafeHttpHandler {
 			scrambleRequests = new ScrambleRequest[query.size()];
 			int i = 0;
 			for(String title : query.keySet()) {
-				scrambleRequests[i++] = new ScrambleRequest(title, query.get(title), seed);
+				// Note that we prefix the seed with the title of the round! This ensures that we get unique
+				// scrambles in different rounds. Thanks to Ravi Fernando for noticing this at Stanford Fall 2011. 
+				// (http://www.worldcubeassociation.org/results/c.php?i=StanfordFall2011).
+				scrambleRequests[i++] = new ScrambleRequest(title, query.get(title), title+seed);
 			}
 		}
 		return scrambleRequests;
@@ -391,7 +394,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 				}
 				zipOut.close();
 				
-				sendBytes(t, baosZip, "application/zip"); // TODO - is this the correct content type?
+				sendBytes(t, baosZip, "application/zip");
 			} else if(ext.equals("html")) {
 				wcaScramblerHandler.handle(t);
 			} else {
