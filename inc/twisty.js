@@ -536,7 +536,7 @@ twistyjs.TwistyScene = function() {
       "doubleSided": true,
       "opacity": 1,
       "dimension": 3,
-      "faceColors": [0xffffff, 0xff8800, 0x00ff00, 0xff0000, 0x0000ff, 0xffff00],
+      "faceColors": [0xffffff, 0xff8800, 0x009900, 0xff0000, 0x0000ff, 0xffff00],
       "scale": 1,
     };
 
