@@ -76,6 +76,8 @@ twistyjs.TwistyScene = function() {
   var that = this;
 
   var twisty = null;
+  var twistyType = null;
+  var state = null;
 
   var moveProgress = null;
   var currentMove = null;
@@ -110,6 +112,7 @@ twistyjs.TwistyScene = function() {
 
   this.initializeTwisty = function(twistyType) {
     moveQueue = [];
+	state = [];
     currentMove = null;
     moveProgress = 0;
     // We may have an animation queued up that is tied to the twistyCanvas.
@@ -292,6 +295,10 @@ twistyjs.TwistyScene = function() {
 
   function startMove() {
     moveProgress = 0;
+	if(moveQueue.length == 0) {
+		currentMove = null;
+		return;
+	}
 
 	assert(moveQueue.length > 0);
     currentMove = moveQueue.shift();
@@ -316,20 +323,30 @@ twistyjs.TwistyScene = function() {
     updateSpeed();
   };
 
-
   this.applyMoves = function(moves) {
-	that.addMoves(moves);
-/* TODO - this is leaving the twisty in a weird state, the next turn gets doubled?
-    // TODO - what if moveQueue is not empty?
+    // TODO - what to do if there are moves in the queue?
     assert(moveQueue.length == 0);
+	moveQueue = moves.slice();
+	animationStep = 1;
+	startMove();
+	while(currentMove != null) {
+		stepAnimation();
+	}
+	render();
+  };
 
-    moveQueue = moves;
-    while (moveQueue.length > 0) {
-      startMove();
-      twisty["advanceMoveCallback"](twisty, currentMove);
-    }
-    render();
-*/
+  // TODO "state" means some json-able object which fully represents
+  // the current state of the puzzle. For now, this is just the
+  // moves applied to the puzzle so far. This has the problem of growing
+  // infinitely. Ideally, twisties should specify their own
+  // getState() and setState() methods.
+  this.getState = function() {
+	  return state.slice();
+  };
+  this.setState = function(state) {
+	  that.initializeTwisty(twistyType);
+	  // TODO - don't notify the moveListeners while inside applyMoves!
+	  that.applyMoves(state);
   };
 
   //TODO: Make time-based / framerate-compensating
@@ -347,8 +364,9 @@ twistyjs.TwistyScene = function() {
     }
     else {
       twisty["advanceMoveCallback"](twisty, currentMove);
-
+	  state.push(currentMove);
       fireMoveEnded(currentMove);
+
       currentMove = null;
 
       if (moveQueue.length == 0) {
