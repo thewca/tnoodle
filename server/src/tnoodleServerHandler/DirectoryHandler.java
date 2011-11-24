@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
+import java.util.logging.Logger;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -13,6 +14,7 @@ import net.gnehzr.tnoodle.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
 
 public class DirectoryHandler extends SafeHttpHandler {
+	private static final Logger l = Logger.getLogger(DirectoryHandler.class.getName());
 	private static final String PLUGIN_DIRECTORY = DirectoryHandler.class.getPackage().getName();
 	
 	private static MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
@@ -74,6 +76,8 @@ public class DirectoryHandler extends SafeHttpHandler {
 		} else {
 			resource = "/" + PLUGIN_DIRECTORY + "/" + path;
 		}
+
+		l.info("Handling request for " + filePath + " as " + resource);
 		InputStream is = getClass().getResourceAsStream(resource);
 		if(is == null) {
 			send404(t, filePath + " as " + resource);

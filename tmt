@@ -420,7 +420,15 @@ class EclipseProject(TmtProject):
 
 		# TODO - the src folder only needs to be in the classpath so
 		# jdb can discover the source code
-		classpath.add(self.src)
+		# TODO - i thought this was harmless, but it's making "tmt make run"
+		# behave differently than "tmt make dist". DirectoryHandler
+		# searches for dependencies using 
+		#  getClass().getResourceAsStream()
+		# If the src directory is in the classpath, dependencies that should be
+		# copied to the bin directory are being found in src directory.
+		# Bugs like this wouldn't show up until someone does a "tmt make dist",
+		# and who wants to do that?
+		#classpath.add(self.src)
 		# TODO - I hate the world
 		# Uncomment & replace the following with the path to your jre
 		# if you're trying to use jbd inside of a java library method.

@@ -8,5 +8,6 @@ class Project(tmt.EclipseProject):
 		tmt.EclipseProject.configure(self)
 		tmt.Server.addPlugin(self)
 		self.nonJavaSrcDeps += tmt.glob(self.src, '.*html$', relativeTo=self.src)
+		self.nonJavaSrcDeps += tmt.glob(self.src, '.*js$', relativeTo=self.src)
 
 Project(tmt.projectName())
