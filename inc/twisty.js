@@ -110,9 +110,10 @@ twistyjs.TwistyScene = function() {
     return twisty;
   };
 
-  this.initializeTwisty = function(twistyType) {
+  this.initializeTwisty = function(twistyType_) {
+    twistyType = twistyType_;
     moveQueue = [];
-	state = [];
+    state = [];
     currentMove = null;
     moveProgress = 0;
     // We may have an animation queued up that is tied to the twistyCanvas.
@@ -298,27 +299,19 @@ twistyjs.TwistyScene = function() {
 
   function startMove() {
     moveProgress = 0;
-	if(moveQueue.length == 0) {
-		currentMove = null;
-		return;
-	}
+    if(moveQueue.length == 0) {
+        currentMove = null;
+        return;
+    }
 
-	assert(moveQueue.length > 0);
+    assert(moveQueue.length > 0);
     currentMove = moveQueue.shift();
-    //log(moveToString(currentMove));
-    fireMoveStarted(currentMove);
+    fireMoveStarted(twisty.algToString([currentMove]));
   }
 
   //TODO 20110906: Handle illegal moves robustly.
   function queueMoves(moveStr) {
-    // TODO - this assumes that turns are separated by spaces,
-    // which isn't necessarily true
-    var moves = moveStr.split(" ");
-    for(var i = 0; i < moves.length; i++) {
-        if(moves[i] != "") {
-            moveQueue.push(moves[i]);
-        }
-    }
+    moveQueue = moveQueue.concat(twisty.stringToAlg(moveStr));
   }
   this.animateMoves = function(moveStr) {
     queueMoves(moveStr);
@@ -332,16 +325,19 @@ twistyjs.TwistyScene = function() {
     startAnimationIfNecessary();
   };
 
+  this.flushMoveQueue = function() {
+    animationStep = 1;
+    startMove();
+    while(currentMove != null) {
+        stepAnimation();
+    }
+    render();
+  };
   this.applyMoves = function(moveStr) {
     // TODO - what to do if there are moves in the queue?
     assert(moveQueue.length == 0);
     queueMoves(moveStr);
-	animationStep = 1;
-	startMove();
-	while(currentMove != null) {
-		stepAnimation();
-	}
-	render();
+    that.flushMoveQueue();
   };
 
   // TODO "state" means some json-able object which fully represents
@@ -350,12 +346,26 @@ twistyjs.TwistyScene = function() {
   // infinitely. Ideally, twisties should specify their own
   // getState() and setState() methods.
   this.getState = function() {
-	  return state.slice();
+    return state.slice();
+  };
+  this.getFinalState = function() {
+    var finalState = state.slice();
+    if(currentMove) {
+        finalState.push(currentMove);
+    }
+    for(var i = 0; i < moveQueue.length; i++) {
+        finalState.push(moveQueue[i]);
+    }
+    return finalState;
   };
   this.setState = function(state) {
-	  that.initializeTwisty(twistyType);
-	  // TODO - don't notify the moveListeners while inside applyMoves!
-	  that.applyMoves(state);
+    that.initializeTwisty(twistyType);
+    // TODO - don't notify the moveListeners while inside applyMoves!
+    assert(moveQueue.length == 0);
+    if(state) {
+        moveQueue = moveQueue.concat(state);
+        that.flushMoveQueue();
+    }
   };
 
   //TODO: Make time-based / framerate-compensating
@@ -374,7 +384,7 @@ twistyjs.TwistyScene = function() {
     else {
       twisty["advanceMoveCallback"](twisty, currentMove);
       state.push(currentMove);
-      fireMoveEnded(currentMove);
+      fireMoveEnded(twisty.algToString([currentMove]));
 
       currentMove = null;
 

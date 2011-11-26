@@ -8,6 +8,8 @@
   var pattern = /((\d*)-)?(\d*)([UFRBLDufrbldxyz])([\d]*)('?)/g;
   var pattern_move = /^((\d*)-)?(\d*)([UFRBLDufrbldxyz])([\d]*)('?)$/;
 
+  var sliceMap = {"x": "R", "y": "U", "z": "F"};
+  var reverseSliceMap = {"R": "x", "U": "y", "F": "z"};
   function stringToMoveSiGN(moveString) {
     var parts = pattern_move.exec(moveString);
 
@@ -45,7 +47,6 @@
       outStartSlice = 1;
       outEndSlice = -1;
       
-      var sliceMap = {"x": "R", "y": "U", "z": "F"};
       
       baseMove = sliceMap[baseMove];
       
@@ -87,13 +88,15 @@
   var moveDelimiter = " ";
 
   function moveToString(move) {
-
     var prefix = "";
-    //<<< if (!(move[0] == move[1] == 1)) {
-      //prefix = "" + move[0] + "-" + move[1];
-    //}
 
     var midfix = move[2];
+    if(move[1] == -1) {
+        // This is a rotation
+        midfix = reverseSliceMap[midfix];
+    } else if(move[0] != 1 && move[1] != 1) {
+      prefix = "" + move[0] + "-" + move[1];
+    }
 
     var postfix = Math.abs(move[3]);
     if (postfix == 1) {
@@ -104,15 +107,10 @@
     }
 
     return prefix + midfix + postfix;
-
   }
 
-  function movesToString(moves) {
-    var strdMoves = [];
-    for(var i = 0; i < moves.length; i++) {
-        strdMoves.push(moveToString(moves[i]));
-    }
-    return strdMoves.join(" ");
+  function algToString(moves) {
+    return moves.map(moveToString).join(" ");
   }
 
   /*
@@ -281,7 +279,6 @@
     cubeObject.scale = new THREE.Vector3(actualScale, actualScale, actualScale);
 
     var animateMoveCallback = function(twisty, currentMove, moveProgress) {
-      currentMove = stringToMoveSiGN(currentMove);
       var rott = new THREE.Matrix4();
       rott.setRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
 
@@ -339,8 +336,6 @@
     }
 
     var advanceMoveCallback = function(twisty, currentMove) {
-      currentMove = stringToMoveSiGN(currentMove);
-
       var rott = matrix4Power(sidesRot[currentMove[2]], currentMove[3]);
       //var rott = matrix4Power(sidesRot[currentMove[2]], 1);
 
@@ -379,11 +374,10 @@
 
     };
 
-    function generateScramble(twisty) {
+    function generateRandomState(twisty) {
       var dim = twisty["options"]["dimension"];
       var n = 32;
       var newMoves = [];
-
       for (var i=0; i<n; i++) {
         var random1 = 1 + Math.floor(Math.random()*dim/2);
         var random2 = random1 + Math.floor(Math.random()*dim/2);
@@ -395,7 +389,7 @@
         newMoves.push(newMove);
       }
 
-      return movesToString(newMoves);
+      return newMoves;
     }
 
     var iS = 1;
@@ -425,21 +419,21 @@
       89: "x",
       78: "x'",
       66: "x'",
-      // 190: "M'", stringToMoveSiGN doesn't support slice turns
+      // 190: "M'", TODO - stringToMoveSiGN doesn't support slice turns
       80: "z",
       81: "z'"
     }
-	var moveForKey = function(twisty, e) {
+    var moveForKey = function(twisty, e) {
       if(e.altKey || e.ctrlKey) {
         return null;
       }
 
       var keyCode = e.keyCode;
       if (keyCode in cubeKeyMapping) {
-		return cubeKeyMapping[keyCode];
+        return cubeKeyMapping[keyCode];
       }
-	  return null;
-	}
+      return null;
+    }
 
     var ogCubePiecesCopy = [];
     for(var faceIndex = 0; faceIndex < cubePieces.length; faceIndex++) {
@@ -535,10 +529,7 @@
     };
 
     var isInspectionLegalMove = function(twisty, move) {
-      if(move[0] == 1 && move[1] == twisty["options"]["dimension"]) {
-        return true;
-      }
-      return false;
+      return "xyz".indexOf(move.substring(0, 1)) >= 0;
     };
 
     return {
@@ -550,8 +541,10 @@
       "advanceMoveCallback": advanceMoveCallback,
       "isSolved": isSolved,
       "isInspectionLegalMove": isInspectionLegalMove,
-      "generateScramble": generateScramble,
-	  "moveForKey": moveForKey,
+      "generateRandomState": generateRandomState,
+      "moveForKey": moveForKey,
+      "algToString": algToString,
+      "stringToAlg": stringToAlg,
     };
 
   }
