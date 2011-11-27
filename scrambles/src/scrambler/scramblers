@@ -8,4 +8,4 @@
 sq1 scrambler.SquareOneScrambler()
 pyram scrambler.PyraminxScrambler()
 mega scrambler.MegaminxScrambler()
-clock scramblers.ClockScrambler()
+clock scrambler.ClockScrambler()

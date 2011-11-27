@@ -4,7 +4,15 @@ import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
 
 public class Engine {
-
+	// TODO - Note that this engine is not thread safe.
+	// Be sure to use this class inside of something safe, like a ThreadLocal instance.
+	// For example:
+	//	private ThreadLocal<Engine> eng = new ThreadLocal<Engine>() {
+	//		protected Engine initialValue() {
+	//			return new Engine();
+	//		}
+	//	};
+	
 	protected Position1 initPos;			//Position that engine is to solve.
 	protected int maxDepth;				//Maximum depth; given at start, or length of last soln found
 	protected MoveList moves = new MoveList();	//List of moves done so far

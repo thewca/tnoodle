@@ -10,6 +10,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -20,51 +22,40 @@ public class PyraminxScrambler extends Scrambler {
 	private static final int pieceSize = 30;
 	private static final int gap = 5;
 	
-	private int[][] image;
-
-	private void initializeImage() {
-		image = new int[4][9];
+	private static String regexp = "^[ULRBulrb]'?$";
+	private int[][] validateScramble(String scramble) {
+		int[][] image = new int[4][9];
 		for(int i = 0; i < image.length; i++){
 			for(int j = 0; j < image[0].length; j++){
 				image[i][j] = i;
 			}
 		}
-	}
-
-	private static String regexp = "^[ULRBulrb]'?$";
-	private boolean validateScramble(String scramble) {
-		initializeImage();
 		if(scramble == null || scramble.isEmpty())
-			return true;
+			return image;
 		String[] strs = scramble.split("\\s+");
 
 		for(int i = 0; i < strs.length; i++){
-			if(!strs[i].matches(regexp)) return false;
+			if(!strs[i].matches(regexp)) return null;
 		}
 
 		try{
 			for(int i = 0; i < strs.length; i++){
 				int face = "ULRBulrb".indexOf(strs[i].charAt(0));
-				if(face == -1) return false;
+				if(face == -1) return null;
 				int dir = (strs[i].length() == 1 ? 1 : 2);
-				if(face >= 4) turnTip(face - 4, dir);
-				else turn(face, dir);
+				if(face >= 4) turnTip(face - 4, dir, image);
+				else turn(face, dir, image);
 			}
 		} catch(Exception e){
 			e.printStackTrace();
-			return false;
+			return null;
 		}
 
-		return true;
+		return image;
 	}
 
-	String[] b = new String[1];
 	static int[] g = new int[720];
 	static int[] f = new int[2592];
-	static int[] turns;
-	static int turnIndex;
-	static int[] h = new int[1];
-	static int[] i = new int[1];
 	static int[][] d = new int[720][];
 	static int[][] e = new int[2592][];
 
@@ -112,10 +103,9 @@ public class PyraminxScrambler extends Scrambler {
 	private static final String SIDES = "ULRB";
 	private static final String[] DIR_TO_STR = new String[] { "", "'" };
 	protected String generateScramble(Random r) {
-		turns = new int[20];
-		turnIndex = turns.length - 1;
+		ArrayList<Integer> turns = new ArrayList<Integer>();
 		int t = 0, s = 0, q = 0, m, l, p;
-		h = new int[] { 0, 1, 2, 3, 4, 5 };
+		int[] h = new int[] { 0, 1, 2, 3, 4, 5 };
 		for (m = 0; m < 4; m++) {
 			p = m + r.nextInt(6 - m);
 			l = h[m];
@@ -130,7 +120,7 @@ public class PyraminxScrambler extends Scrambler {
 			h[5] = l;
 		}
 		s = 0;
-		i = new int[10];
+		int[] i = new int[10];
 		for (m = 0; m < 5; m++) {
 			i[m] = r.nextInt(2);
 			s += i[m];
@@ -155,12 +145,14 @@ public class PyraminxScrambler extends Scrambler {
 			t = t * 2 + i[m];
 		if (q != 0 || t != 0)
 			for (m = 0; m < 12; m++)
-				if (v(q, t, m, -1))
+				if (v(q, t, m, -1, turns))
 					break;
 
-		StringBuffer scramble = new StringBuffer(2*(turns.length+4));
-		for (p = turnIndex + 1; p < turns.length; p++)
-			scramble.append(" " + SIDES.charAt(turns[p] & 7) + DIR_TO_STR[(turns[p] & 8) / 8]);
+		Collections.reverse(turns);
+		StringBuffer scramble = new StringBuffer(2*(turns.size()+4));
+		for (p = 0; p < turns.size(); p++) {
+			scramble.append(" " + SIDES.charAt(turns.get(p) & 7) + DIR_TO_STR[(turns.get(p) & 8) / 8]);
+		}
 		for (p = 0; p < 4; p++) {
 			q = r.nextInt(3);
 			if (q < 2)
@@ -169,7 +161,7 @@ public class PyraminxScrambler extends Scrambler {
 		return scramble.substring(1);
 	}
 
-	private boolean v(int q, int t, int l, int c) {
+	private boolean v(int q, int t, int l, int c, ArrayList<Integer> turns) {
 		if (l == 0) {
 			if (q == 0 && t == 0)
 				return true;
@@ -184,8 +176,8 @@ public class PyraminxScrambler extends Scrambler {
 					for (a = 0; a < 2; a++) {
 						p = d[p][m];
 						s = e[s][m];
-						if (v(p, s, l - 1, m)) {
-							turns[turnIndex--] = m + 8 * a;
+						if (v(p, s, l - 1, m, turns)) {
+							turns.add(m + 8 * a);
 							return true;
 						}
 					}
@@ -285,68 +277,68 @@ public class PyraminxScrambler extends Scrambler {
 	}
 	 
 	private static void y(int[] p, int a, int c, int t) {
-	 int s = p[a];
-	 p[a] = p[c];
-	 p[c] = p[t];
-	 p[t] = s;
+		int s = p[a];
+		p[a] = p[c];
+		p[c] = p[t];
+		p[t] = s;
 	}
 
-	private void turn(int side, int dir){
+	private void turn(int side, int dir, int[][] image){
 		for(int i = 0; i < dir; i++){
-			turn(side);
+			turn(side, image);
 		}
 	}
 
-	private void turnTip(int side, int dir){
+	private void turnTip(int side, int dir, int[][] image){
 		for(int i = 0; i < dir; i++){
-			turnTip(side);
+			turnTip(side, image);
 		}
 	}
 
-	private void turn(int s){
+	private void turn(int s, int[][] image){
 		switch(s){
 			case 0:
-				swap(0, 8, 3, 8, 2, 2);
-				swap(0, 1, 3, 1, 2, 4);
-				swap(0, 2, 3, 2, 2, 5);
+				swap(0, 8, 3, 8, 2, 2, image);
+				swap(0, 1, 3, 1, 2, 4, image);
+				swap(0, 2, 3, 2, 2, 5, image);
 				break;
 			case 1:
-				swap(2, 8, 1, 2, 0, 8);
-				swap(2, 7, 1, 1, 0, 7);
-				swap(2, 5, 1, 8, 0, 5);
+				swap(2, 8, 1, 2, 0, 8, image);
+				swap(2, 7, 1, 1, 0, 7, image);
+				swap(2, 5, 1, 8, 0, 5, image);
 				break;
 			case 2:
-				swap(3, 8, 0, 5, 1, 5);
-				swap(3, 7, 0, 4, 1, 4);
-				swap(3, 5, 0, 2, 1, 2);
+				swap(3, 8, 0, 5, 1, 5, image);
+				swap(3, 7, 0, 4, 1, 4, image);
+				swap(3, 5, 0, 2, 1, 2, image);
 				break;
 			case 3:
-				swap(1, 8, 2, 2, 3, 5);
-				swap(1, 7, 2, 1, 3, 4);
-				swap(1, 5, 2, 8, 3, 2);
+				swap(1, 8, 2, 2, 3, 5, image);
+				swap(1, 7, 2, 1, 3, 4, image);
+				swap(1, 5, 2, 8, 3, 2, image);
 				break;
 		}
-		turnTip(s);
+		turnTip(s, image);
 	}
 
-	private void turnTip(int s){
+	private void turnTip(int s, int[][] image){
 		switch(s){
 			case 0:
-				swap(0, 0, 3, 0, 2, 3);
+				swap(0, 0, 3, 0, 2, 3, image);
 				break;
 			case 1:
-				swap(0, 6, 2, 6, 1, 0);
+				swap(0, 6, 2, 6, 1, 0, image);
 				break;
 			case 2:
-				swap(0, 3, 1, 3, 3, 6);
+				swap(0, 3, 1, 3, 3, 6, image);
 				break;
 			case 3:
-				swap(1, 6, 2, 0, 3, 3);
+				swap(1, 6, 2, 0, 3, 3, image);
 				break;
 		}
 	}
 
-	private void swap(int f1, int s1, int f2, int s2, int f3, int s3){
+	private void swap(int f1, int s1, int f2, int s2, int f3, int s3, int[][] image){
 		int temp = image[f1][s1];
 		image[f1][s1] = image[f2][s2];
 		image[f2][s2] = image[f3][s3];
@@ -357,7 +349,7 @@ public class PyraminxScrambler extends Scrambler {
 		return new Dimension(getPyraminxViewWidth(gap, pieceSize), getPyraminxViewHeight(gap, pieceSize));
 	}
 
-	private void drawMinx(Graphics2D g, int gap, int pieceSize, Color[] colorScheme){
+	private void drawMinx(Graphics2D g, int gap, int pieceSize, Color[] colorScheme, int[][] image){
 		drawTriangle(g, 2*gap+3*pieceSize, gap+Math.sqrt(3)*pieceSize, true, image[0], pieceSize, colorScheme);
 		drawTriangle(g, 2*gap+3*pieceSize, 2*gap+2*Math.sqrt(3)*pieceSize, false, image[1], pieceSize, colorScheme);
 		drawTriangle(g, gap+1.5*pieceSize, gap+Math.sqrt(3)/2*pieceSize, false, image[2], pieceSize, colorScheme);
@@ -476,14 +468,16 @@ public class PyraminxScrambler extends Scrambler {
 
 	@Override
 	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
-		if(!validateScramble(scramble))
+		int[][] image = validateScramble(scramble);
+		if(image == null) {
 			throw new InvalidScrambleException(scramble);
+		}
 		
 		Color[] scheme = new Color[4];
 		for(int i = 0; i < scheme.length; i++) {
 			scheme[i] = colorScheme.get("FDLR".charAt(i)+"");
 		}
-		drawMinx(g, gap, pieceSize, scheme);
+		drawMinx(g, gap, pieceSize, scheme, image);
 	}
 
 	private static final HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();

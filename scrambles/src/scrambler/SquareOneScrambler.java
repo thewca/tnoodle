@@ -21,9 +21,9 @@ import java.util.regex.Pattern;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 
-import org.squareone.twophase.Tables;
-import org.squareone.twophase.Position1;
 import org.squareone.twophase.Engine;
+import org.squareone.twophase.Position1;
+import org.squareone.twophase.Tables;
 
 
 public class SquareOneScrambler extends Scrambler {
@@ -35,21 +35,21 @@ public class SquareOneScrambler extends Scrambler {
 	private static final int radius = 32;
 	private boolean turnTop = true, turnBottom = true;
 	
-	//TODO these variables aren't thread safe
-	private int twistCount; //this will tell us the state of the middle pieces
-	private int[] state;
-
-	private Engine eng;
-	private Position1 p1;
+	// TODO - Engine and Position1 should become thread safe?
+	private ThreadLocal<Engine> eng = new ThreadLocal<Engine>() {
+		protected Engine initialValue() {
+			return new Engine();
+		}
+	};
+	private ThreadLocal<Position1> p1 = new ThreadLocal<Position1>() {
+		protected Position1 initialValue() {
+			return new Position1();
+		}
+	};;
 	public SquareOneScrambler() {
 		//initialise pruning and transition tables
 		Tables.init();
 		Tables.initLayers();
-
-		//get instance of search engine
-		p1 = new Position1();
-
-		eng = new Engine();
 	}
 	
 	protected String generateScramble(Random r) {
@@ -59,18 +59,14 @@ public class SquareOneScrambler extends Scrambler {
 		randomPosition(posstr, r, twistablePosition);
 
 		//parse position
-		p1.initialise(posstr);
+		p1.get().initialise(posstr);
 
 		//search for solution
-		return eng.doSearch(p1,depth,timeOut);
+		return eng.get().doSearch(p1.get(), depth, timeOut);
 	}
 
 	//Ported from http://www.worldcubeassociation.org/regulations/scrambles/scramble_square1.htm by Jeremy Fleischman
 	/* Javascript written by Jaap Scherphuis,  jaapsch a t yahoo d o t com */
-	private void initializeImage() {
-		twistCount = 0;
-		state = new int[]{ 0,0,1,2,2,3,4,4,5,6,6,7,8,9,9,10,11,11,12,13,13,14,15,15 }; //piece array
-	}
 
 	private void randomPosition(char[] posstr, Random r, boolean twistable){
 
@@ -105,7 +101,9 @@ public class SquareOneScrambler extends Scrambler {
 	}
 	
 	//returns true if invalid, false if valid
-	private boolean domove(int index, int m) {
+	private boolean domove(int index, int m, Sq1State sq1State) {
+		int[] state = sq1State.state;
+		
 		int i,c,f=m;
 		//do move f
 		if(f == 0) { //slash
@@ -114,7 +112,7 @@ public class SquareOneScrambler extends Scrambler {
 				state[i+12]=state[i+6];
 				state[i+6]=c;
 			}
-			twistCount++;
+			sq1State.twistCount++;
 		} else if(f > 0) { //turn the top
 			if(!turnTop) return true;
 			f=modulo(12-f, 12);
@@ -147,12 +145,15 @@ public class SquareOneScrambler extends Scrambler {
 		return false;
 	}
 	//**********END JAAP's CODE***************
+	
+	private static class Sq1State {
+		int twistCount = 0;
+		int[] state = new int[]{ 0,0,1,2,2,3,4,4,5,6,6,7,8,9,9,10,11,11,12,13,13,14,15,15, 0 }; //piece array
+	}
 
 	private static final Pattern regexp = Pattern.compile("^ *(-?\\d+) *, *(-?\\d+) *$");
-	private boolean validateScramble(String scramble) {
-		initializeImage();
-		if(scramble == null || scramble.isEmpty())
-			return true;
+	private Sq1State validateScramble(String scramble) {
+		Sq1State sq1State = new Sq1State();
 		int length = 0;
 		String[] trns = scramble.split("(\\(|\\)|\\( *\\))", -1);
 		for(int ch = 0; ch < trns.length; ch++) {
@@ -160,21 +161,20 @@ public class SquareOneScrambler extends Scrambler {
 			if(trns[ch].matches(" *")) {
 
 			} else if(trns[ch].matches(" */ *")) {
-				domove(length++, 0);
+				domove(length++, 0, sq1State);
 			} else if((match = regexp.matcher(trns[ch])).matches()) {
 				int top = Integer.parseInt(match.group(1));
 				int bot = Integer.parseInt(match.group(2));
 				top = modulo(top, 12);
 				bot = modulo(bot, 12);
-				if(top != 0 && domove(length++, top))
-					return false;
-				if(bot != 0 && domove(length++, bot-12))
-					return false;
+				if(top != 0 && domove(length++, top, sq1State))
+					return null;
+				if(bot != 0 && domove(length++, bot-12, sq1State))
+					return null;
 			} else
-				return false;
+				return null;
 		}
-//		finalizeScrambleString();
-		return true;
+		return sq1State;
 	}
 
 	private void drawFace(Graphics2D g, int[] face, double x, double y, int radius, Color[] colorScheme) {
@@ -307,8 +307,10 @@ public class SquareOneScrambler extends Scrambler {
 
 	@Override
 	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorSchemeMap) throws InvalidScrambleException {
-		if(!validateScramble(scramble))
+		Sq1State sq1State = validateScramble(scramble);
+		if(sq1State == null) {
 			throw new InvalidScrambleException(scramble);
+		}
 		
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
@@ -326,7 +328,7 @@ public class SquareOneScrambler extends Scrambler {
 		double corner_width = half_square_width - edge_width / 2.;
 		Rectangle2D.Double left_mid = new Rectangle2D.Double(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width, radius * (multiplier - 1));
 		Rectangle2D.Double right_mid;
-		if(twistCount % 2 == 0) {
+		if(sq1State.twistCount % 2 == 0) {
 			right_mid = new Rectangle2D.Double(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., 2*corner_width + edge_width, radius * (multiplier - 1));
 			g.setColor(colorScheme[3]); //front
 		} else {
@@ -344,12 +346,12 @@ public class SquareOneScrambler extends Scrambler {
 		double y = height / 4.0;
 		AffineTransform old = g.getTransform();
 		g.rotate(Math.toRadians(90 + 15), x, y);
-		drawFace(g, state, x, y, radius, colorScheme);
+		drawFace(g, sq1State.state, x, y, radius, colorScheme);
 		g.setTransform(old);
 
 		y *= 3.0;
 		g.rotate(Math.toRadians(-90 - 15), x, y);
-		drawFace(g, Arrays.copyOfRange(state, 12, state.length), x, y, radius, colorScheme);
+		drawFace(g, Arrays.copyOfRange(sq1State.state, 12, sq1State.state.length), x, y, radius, colorScheme);
 	}
 
 	private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();

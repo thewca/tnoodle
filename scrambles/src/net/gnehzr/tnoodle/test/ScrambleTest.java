@@ -51,10 +51,10 @@ public class ScrambleTest {
 	public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException {
 		LockHolder lh = new LockHolder();
 
-		int SCRAMBLE_COUNT = 1000;
+		int SCRAMBLE_COUNT = 100;
+		boolean drawScramble = true;
 		SortedMap<String, LazyClassLoader<Scrambler>> lazyScramblers = Scrambler.getScramblers();
-//		for(String puzzle : lazyScramblers.keySet()) {
-		for(String puzzle : new String[]{"2x2x2"}) {
+		for(String puzzle : lazyScramblers.keySet()) {
 			LazyClassLoader<Scrambler> lazyScrambler = lazyScramblers.get(puzzle);
 			final Scrambler scrambler = lazyScrambler.cachedInstance();
 			
@@ -70,14 +70,14 @@ public class ScrambleTest {
 			Dimension size = new Dimension(image.getWidth(), image.getHeight());
 			scrambler.drawScramble(image.createGraphics(), size, scramble, null);
 			
-			// TODO - actually draw the scramble as well!
 			System.out.println("Generating & drawing 2 sets of " + SCRAMBLE_COUNT + " scrambles simultaneously." +
-								" This is meant to shake out threading problems in scramblers");
-			final ScrambleCacher c1 = new ScrambleCacher(scrambler, 1000);
-			final ScrambleCacher c2 = new ScrambleCacher(scrambler, 1000);
+								" This is meant to shake out threading problems in scramblers.");
+			final ScrambleCacher c1 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble);
+			final ScrambleCacher c2 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble);
 			ScrambleCacherListener cacherStopper = new ScrambleCacherListener() {
 				@Override
 				public void scrambleCacheUpdated(ScrambleCacher src) {
+//					System.out.println(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize());
 					if(src.getAvailableCount() == src.getCacheSize()) {
 						src.stop();
 						synchronized(c1) {
@@ -100,6 +100,6 @@ public class ScrambleTest {
 		
 		}
 		lh.setObjectToLock(null);
-		System.out.println("DONE");
+		System.out.println("Test passed!");
 	}
 }

@@ -6,26 +6,56 @@ package org.kociemba.twophase;
  */
 public class Search {
 
-	static int[] ax = new int[31]; // The axis of the move
-	static int[] po = new int[31]; // The power of the move
-
-	static int[] flip = new int[31]; // phase1 coordinates
-	static int[] twist = new int[31];
-	static int[] slice = new int[31];
-
-	static int[] parity = new int[31]; // phase2 coordinates
-	static int[] URFtoDLF = new int[31];
-	static int[] FRtoBR = new int[31];
-	static int[] URtoUL = new int[31];
-	static int[] UBtoDF = new int[31];
-	static int[] URtoDF = new int[31];
-
-	static int[] minDistPhase1 = new int[31]; // IDA* distance do goal estimations
-	static int[] minDistPhase2 = new int[31];
+	private static class ThreadLocalArray extends ThreadLocal<int[]> {
+		private int size;
+		public ThreadLocalArray(int size) {
+			this.size = size;
+		}
+		@Override
+		protected int[] initialValue() {
+			return new int[size];
+		}
+	}
+	static ThreadLocal<int[]> ax_ = new ThreadLocalArray(31); // The axis of the move
+	static ThreadLocal<int[]> po_ = new ThreadLocalArray(31); // The power of the move
+	
+	static ThreadLocal<int[]> flip_ = new ThreadLocalArray(31); // phase1 coordinates
+	static ThreadLocal<int[]> twist_ = new ThreadLocalArray(31);
+	static ThreadLocal<int[]> slice_ = new ThreadLocalArray(31);
+	
+	static ThreadLocal<int[]> parity_ = new ThreadLocalArray(31); // phase2 coordinates
+	static ThreadLocal<int[]> URFtoDLF_ = new ThreadLocalArray(31);
+	static ThreadLocal<int[]> FRtoBR_ = new ThreadLocalArray(31);
+	static ThreadLocal<int[]> URtoUL_ = new ThreadLocalArray(31);
+	static ThreadLocal<int[]> UBtoDF_ = new ThreadLocalArray(31);
+	static ThreadLocal<int[]> URtoDF_ = new ThreadLocalArray(31);
+	
+	static ThreadLocal<int[]> minDistPhase1_ = new ThreadLocalArray(31); // IDA* distance do goal estimations
+	static ThreadLocal<int[]> minDistPhase2_ = new ThreadLocalArray(31);
+	
+//	static int[] ax = new int[31]; // The axis of the move
+//	static int[] po = new int[31]; // The power of the move
+//
+//	static int[] flip = new int[31]; // phase1 coordinates
+//	static int[] twist = new int[31];
+//	static int[] slice = new int[31];
+//
+//	static int[] parity = new int[31]; // phase2 coordinates
+//	static int[] URFtoDLF = new int[31];
+//	static int[] FRtoBR = new int[31];
+//	static int[] URtoUL = new int[31];
+//	static int[] UBtoDF = new int[31];
+//	static int[] URtoDF = new int[31];
+//
+//	static int[] minDistPhase1 = new [31]; // IDA* distance do goal estimations
+//	static int[] minDistPhase2 = new int[31];
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// generate the solution string from the array data
 	static String solutionToString(int length) {
+		int[] ax = ax_.get();
+		int[] po = po_.get();
+		
 		String s = "";
 		for (int i = 0; i < length; i++) {
 			switch (ax[i]) {
@@ -67,6 +97,9 @@ public class Search {
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// generate the solution string from the array data including a separator between phase1 and phase2 moves
 	static String solutionToString(int length, int depthPhase1) {
+		int[] ax = ax_.get();
+		int[] po = po_.get();
+		
 		String s = "";
 		for (int i = 0; i < length; i++) {
 			switch (ax[i]) {
@@ -160,6 +193,18 @@ public class Search {
 		// +++++++++++++++++++++++ initialization +++++++++++++++++++++++++++++++++
 		CoordCube c = new CoordCube(cc);
 
+		int[] ax = ax_.get();
+		int[] po = po_.get();
+		int[] flip = flip_.get();
+		int[] twist = twist_.get();
+		int[] parity = parity_.get();
+		int[] slice = slice_.get();
+		int[] URFtoDLF = URFtoDLF_.get();
+		int[] FRtoBR = FRtoBR_.get();
+		int[] URtoUL = URtoUL_.get();
+		int[] UBtoDF = UBtoDF_.get();
+		int[] minDistPhase1 = minDistPhase1_.get();
+		
 		po[0] = 0;
 		ax[0] = 0;
 		flip[0] = c.flip;
@@ -247,6 +292,16 @@ public class Search {
 	// Apply phase2 of algorithm and return the combined phase1 and phase2 depth. In phase2, only the moves
 	// U,D,R2,F2,L2 and B2 are allowed.
 	static int totalDepth(int depthPhase1, int maxDepth) {
+		int[] ax = ax_.get();
+		int[] po = po_.get();
+		int[] parity = parity_.get();
+		int[] URFtoDLF = URFtoDLF_.get();
+		int[] FRtoBR = FRtoBR_.get();
+		int[] URtoUL = URtoUL_.get();
+		int[] URtoDF = URtoDF_.get();
+		int[] UBtoDF = UBtoDF_.get();
+		int[] minDistPhase2 = minDistPhase2_.get();
+		
 		int mv = 0, d1 = 0, d2 = 0;
 		int maxDepthPhase2 = Math.min(10, maxDepth - depthPhase1);// Allow only max 10 moves in phase2
 		for (int i = 0; i < depthPhase1; i++) {

@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.scrambles;
 
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.LinkedList;
@@ -33,13 +35,12 @@ public class ScrambleCacher {
 	private volatile int available = 0;
 
 	public ScrambleCacher(final Scrambler scrambler) {
-		this(scrambler, DEFAULT_CACHE_SIZE);
+		this(scrambler, DEFAULT_CACHE_SIZE, false);
 	}
 	
 	private boolean running = false;
-	public ScrambleCacher(final Scrambler scrambler, int cacheSize) {
+	public ScrambleCacher(final Scrambler scrambler, int cacheSize, final boolean drawScramble) {
 		scrambles = new String[cacheSize];
-
 		Thread t = new Thread() {
 			public void run() {
 				synchronized(scrambler.getClass()) {
@@ -50,6 +51,18 @@ public class ScrambleCacher {
 				}
 				for(;;) {
 					String scramble = scrambler.generateScramble(r);
+
+					if(drawScramble) {
+						// The drawScramble option exists so we can test out generating and drawing
+						// a bunch of scrambles in 2 threads at the same time. See ScrambleTest.
+						BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+						Dimension size = new Dimension(image.getWidth(), image.getHeight());
+						try {
+							scrambler.drawScramble(image.createGraphics(), size, scramble, null);
+						} catch (InvalidScrambleException e1) {
+							e1.printStackTrace();
+						}
+					}
 					
 					synchronized(scrambles) {
 						while(running && available == scrambles.length) {
