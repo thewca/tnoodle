@@ -150,8 +150,9 @@ function roundRequestToString(roundRequest) {
 function getViewUrl(ext) {
 	var baseUrl = "/view/";
 	if(globalTitle.value) {
-		baseUrl += encodeURIComponent(globalTitle.value) + "." + encodeURIComponent(ext);
+		baseUrl += encodeURIComponent(globalTitle.value);
 	}
+	baseUrl += "." + encodeURIComponent(ext);
 	
 	var url = new URI(baseUrl);
 	return url;
@@ -176,7 +177,10 @@ function getScrambleUrl(ext) {
 	}
 
 	if(globalTitle.value) {
-		baseUrl += encodeURIComponent(globalTitle.value) + "." + encodeURIComponent(ext);
+		baseUrl += encodeURIComponent(globalTitle.value);
+	}
+	if(globalTitle.value || ext != "html") {
+		baseUrl += "." + encodeURIComponent(ext);
 	}
 	
 	var url = new URI(baseUrl);
