@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -28,6 +29,8 @@ import com.google.gson.JsonSerializer;
 
 public final class Utils {
 	private Utils() {}
+
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
 	
 	private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
 	static {
@@ -187,10 +190,16 @@ public final class Utils {
 
 
 
-	public static final Gson GSON = new GsonBuilder()
-									.registerTypeAdapter(Color.class, new Colorizer())
-									.registerTypeAdapter(GeneralPath.class, new Pather())
-									.create();
+	private static GsonBuilder gsonBuilder = new GsonBuilder();
+	public static Gson GSON;
+	public static synchronized void registerTypeAdapter(Class<?> clz, Object typeAdapter) {
+		gsonBuilder = gsonBuilder.registerTypeAdapter(clz, typeAdapter);
+		GSON = gsonBuilder.create();
+	}
+	static {
+		registerTypeAdapter(Color.class, new Colorizer());
+		registerTypeAdapter(GeneralPath.class, new Pather());
+	}
 	
 	private static class Colorizer implements JsonSerializer<Color>, JsonDeserializer<Color> {
 

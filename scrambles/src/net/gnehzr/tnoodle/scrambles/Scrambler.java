@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +20,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.Base64;
@@ -348,5 +357,25 @@ public abstract class Scrambler {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+
+	static {
+		Utils.registerTypeAdapter(Scrambler.class, new Scramblerizer());
+	}
+	private static class Scramblerizer implements JsonSerializer<Scrambler>, JsonDeserializer<Scrambler> {
+		@Override
+		public Scrambler deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			try {
+				return scramblers.get(json.getAsString()).cachedInstance();
+			} catch (Exception e) {
+				throw new JsonParseException(e);
+			}
+		}
+
+		@Override
+		public JsonElement serialize(Scrambler scrambler, Type typeOfT, JsonSerializationContext context) {
+			return new JsonPrimitive(scrambler.getShortName());
+		}
 	}
 }

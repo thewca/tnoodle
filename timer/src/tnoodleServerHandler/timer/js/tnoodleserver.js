@@ -77,13 +77,7 @@ tnoodle.server = function(host, port) {
 	
 	this.loadScramble = function(callback, puzzle, seed) {
 		return this.loadScrambles(function(scrambles) {
-			if(scrambles.error) {
-				// TODO - should we do this clever little thing, or
-				// just assert that there was no error?
-				callback(scrambles.error);
-			} else {
-				callback(scrambles[0]);
-			}
+			callback(scrambles[0]);
 		}, puzzle, seed, 1);
 	};
 	this.loadScrambles = function(callback, puzzle, seed, count) {
@@ -91,7 +85,18 @@ tnoodle.server = function(host, port) {
 		if(seed) { query.seed = seed; }
 		if(!count) { count = 1; }
 		query[''] = encodeURIComponent(puzzle) + "*" + count;
-		return tnoodle.ajax(callback, this.scrambleUrl + ".json", query);
+		return tnoodle.ajax(function(scrambleRequests) {
+			if(scrambleRequests.error) {
+				assert(!scrambleRequests.error, scrambleRequests.error);
+				return;
+			}
+
+		   	var scrambles = [];
+			for(var i = 0; i < scrambleRequests.length; i++) {
+				scrambles = scrambles.concat(scrambleRequests[i].scrambles);
+			}
+			callback(scrambles);
+		}, this.scrambleUrl + ".json", query);
 	};
 	this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
 		var query = { "scramble": scramble };

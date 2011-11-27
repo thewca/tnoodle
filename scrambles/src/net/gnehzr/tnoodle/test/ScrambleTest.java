@@ -70,6 +70,9 @@ public class ScrambleTest {
 			Dimension size = new Dimension(image.getWidth(), image.getHeight());
 			scrambler.drawScramble(image.createGraphics(), size, scramble, null);
 			
+			// Scramblers should support "null" as the empty scramble
+			scrambler.drawScramble(image.createGraphics(), size, null, null);
+			
 			System.out.println("Generating & drawing 2 sets of " + SCRAMBLE_COUNT + " scrambles simultaneously." +
 								" This is meant to shake out threading problems in scramblers.");
 			final ScrambleCacher c1 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble);

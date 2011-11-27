@@ -153,6 +153,9 @@ public class SquareOneScrambler extends Scrambler {
 
 	private static final Pattern regexp = Pattern.compile("^ *(-?\\d+) *, *(-?\\d+) *$");
 	private Sq1State validateScramble(String scramble) {
+		if(scramble == null) {
+			scramble = "";
+		}
 		Sq1State sq1State = new Sq1State();
 		int length = 0;
 		String[] trns = scramble.split("(\\(|\\)|\\( *\\))", -1);
