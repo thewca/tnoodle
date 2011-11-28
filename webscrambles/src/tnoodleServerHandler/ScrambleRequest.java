@@ -185,7 +185,7 @@ class ScrambleRequest {
 		
 		doc.open();
 		// Note that we ignore scrambleRequest.copies here.
-		addScrambles(docWriter, doc, scrambleRequest);
+		addScrambles(docWriter, doc, scrambleRequest, globalTitle);
 		doc.close();
 		
 		// TODO - is there a better way to convert from a PdfWriter to a PdfReader?
@@ -255,12 +255,11 @@ class ScrambleRequest {
 //		return ps.getReader();
 	}
 	
-	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
+	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle) throws DocumentException, IOException {
 		assert scrambleRequest.count == scrambleRequest.scrambles.length;
 		
 		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
 		
-
 		if(scrambleRequest.fmc) {
 			assert scrambleRequest.count == 1;
 			String scramble = scrambleRequest.scrambles[0];
@@ -372,14 +371,20 @@ class ScrambleRequest {
 			
 			ColumnText ct = new ColumnText(cb);
 			
-			int offsetTop = 25;
+			int offsetTop = 20;
 			int marginBottom = 10;
 			
 			cb.beginText();
-			int fontSize = 16;
+			int fontSize = 15;
+			cb.setFontAndSize(bf, fontSize);
+			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, globalTitle, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+			offsetTop += fontSize + 2;
+			cb.endText();
+			
+			cb.beginText();
 			cb.setFontAndSize(bf, fontSize);
 			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
-			offsetTop += fontSize + marginBottom*2;
+			offsetTop += fontSize + marginBottom;
 			cb.endText();
 			
 			cb.beginText();

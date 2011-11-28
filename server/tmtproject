@@ -31,8 +31,7 @@ class Project(tmt.EclipseProject):
 		tmt.Server = self
 		tmt.EclipseProject.configure(self)
 		self.addPlugin(self)
-		wwwDir = join(self.serverPluginSrcDir, 'www')
-		self.nonJavaSrcDeps += tmt.glob(wwwDir, '.*', relativeTo=self.src)
+		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/server/' ]
 
 	def compile(self):
 		tmt.EclipseProject.compile(self)

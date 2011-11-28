@@ -1,2 +1,3 @@
-/ tnoodleServerHandler.DirectoryHandler("www/")
+/ tnoodleServerHandler.FileHandler("server/index.md")
+/favicon.ico tnoodleServerHandler.FileHandler("server/favicon.ico")
 /kill/ tnoodleServerHandler.DeathHandler()

@@ -11,11 +11,13 @@ import javax.activation.MimetypesFileTypeMap;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
 import net.gnehzr.tnoodle.utils.Utils;
 
+import com.petebevin.markdown.MarkdownProcessor;
 import com.sun.net.httpserver.HttpExchange;
 
 public class DirectoryHandler extends SafeHttpHandler {
 	private static final Logger l = Logger.getLogger(DirectoryHandler.class.getName());
 	private static final String PLUGIN_DIRECTORY = DirectoryHandler.class.getPackage().getName();
+	private static final MarkdownProcessor mp = new MarkdownProcessor();
 	
 	private static MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
 	static {
@@ -85,7 +87,12 @@ public class DirectoryHandler extends SafeHttpHandler {
 		}
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		Utils.fullyReadInputStream(is, bytes);
-		String contentType = mimes.getContentType(resource);
-		sendBytes(t, bytes, contentType);
+		if(resource.endsWith(".md")) {
+			String html = mp.markdown(bytes.toString());
+			sendHtml(t, html.getBytes());
+		} else {
+			String contentType = mimes.getContentType(resource);
+			sendBytes(t, bytes, contentType);
+		}
 	}
 }
