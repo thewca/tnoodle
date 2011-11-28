@@ -214,14 +214,6 @@ class ScrambleRequest {
 			ColumnText.showTextAligned(cb,
 					Element.ALIGN_LEFT, new Phrase(Utils.SDF.format(creationDate)),
 					rect.getLeft(), rect.getTop(), 0);
-			
-			ColumnText.showTextAligned(cb,
-					Element.ALIGN_CENTER, new Phrase(globalTitle),
-					(rect.getLeft() + rect.getRight()) / 2, rect.getTop() + 5, 0);
-			
-			ColumnText.showTextAligned(cb,
-					Element.ALIGN_CENTER, new Phrase(scrambleRequest.title),
-					(rect.getLeft() + rect.getRight()) / 2, rect.getTop() - 10, 0);
 
 			if(pr.getNumberOfPages() > 1) {
 				ColumnText.showTextAligned(cb,
@@ -259,6 +251,7 @@ class ScrambleRequest {
 		assert scrambleRequest.count == scrambleRequest.scrambles.length;
 		
 		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
+		Rectangle pageSize = PageSize.LETTER;
 		
 		if(scrambleRequest.fmc) {
 			assert scrambleRequest.count == 1;
@@ -267,13 +260,10 @@ class ScrambleRequest {
 			PdfContentByte cb = docWriter.getDirectContent();
 			BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 			
-			int totalWidth = 611;
-			int totalHeight = 791;
-			
 			int bottom = 50;
 			int left = 35;
-			int right = totalWidth-left;
-			int top = totalHeight-bottom;
+			int right = (int) (pageSize.getWidth()-left);
+			int top = (int) (pageSize.getHeight()-bottom);
 			
 			int height = top - bottom;
 			int width = right - left;
@@ -457,9 +447,10 @@ class ScrambleRequest {
 			ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
 			ct.go();
 		} else {
-			int width = 200;
-			int height = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
-			Dimension dim = scrambleRequest.scrambler.getPreferredSize(width, height);
+			int scrambleWidth = 200;
+			int scrambleHeight = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
+			Dimension dim = scrambleRequest.scrambler.getPreferredSize(scrambleWidth, scrambleHeight);
+			PdfContentByte cb = docWriter.getDirectContent();
 			
 			float maxWidth = 0;
 			PdfPTable table = new PdfPTable(3);
@@ -487,7 +478,6 @@ class ScrambleRequest {
 
 				if(dim.width > 0 && dim.height > 0) {
 					try {
-						PdfContentByte cb = docWriter.getDirectContent();
 						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
 						Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
 
@@ -507,6 +497,14 @@ class ScrambleRequest {
 			}
 			maxWidth*=2; //TODO - I have no freaking clue why I need to do this.
 			table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
+			
+			ColumnText.showTextAligned(cb,
+					Element.ALIGN_CENTER, new Phrase(globalTitle),
+					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 60, 0);
+			
+			ColumnText.showTextAligned(cb,
+					Element.ALIGN_CENTER, new Phrase(scrambleRequest.title),
+					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 45, 0);
 			doc.add(table);
 		}
 		doc.newPage();
