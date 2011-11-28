@@ -17,6 +17,7 @@ import java.util.SortedMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
@@ -30,6 +31,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.List;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -76,6 +78,7 @@ class ScrambleRequest {
 	public int count;
 	public int copies;
 	public String title;
+	public boolean fmc;
 	public HashMap<String, Color> colorScheme;
 	public ScrambleRequest(String title, String scrambleRequestUrl, String seed) throws InvalidScrambleRequestException, UnsupportedEncodingException {
 		String[] puzzle_count_copies_scheme = scrambleRequestUrl.split("\\*");
@@ -119,7 +122,12 @@ class ScrambleRequest {
 		}
 
 		this.title = title;
-		this.count = Math.min(toInt(countStr, 1), MAX_COUNT);
+		fmc = countStr.equals("fmc");
+		if(fmc) {
+			this.count = 1;
+		} else {
+			this.count = Math.min(toInt(countStr, 1), MAX_COUNT);
+		}
 		this.copies = Math.min(toInt(copiesStr, 1), MAX_COPIES);
 		if(seed != null) {
 			this.scrambles = scrambler.generateSeededScrambles(seed, count);
@@ -182,6 +190,11 @@ class ScrambleRequest {
 		
 		// TODO - is there a better way to convert from a PdfWriter to a PdfReader?
 		PdfReader pr = new PdfReader(pdfOut.toByteArray());
+		if(scrambleRequest.fmc) {
+			// We don't watermark the FMC sheets because they already have
+			// the competition name on them.
+			return pr;
+		}
 		
 		pdfOut = new ByteArrayOutputStream();
 		doc = new Document(PageSize.LETTER, 0, 0, 75, 75);
@@ -242,62 +255,248 @@ class ScrambleRequest {
 //		return ps.getReader();
 	}
 	
-	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest) throws DocumentException {
-		int width = 200;
-		int height = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
-
-		Dimension dim = scrambleRequest.scrambler.getPreferredSize(width, height);
+	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
+		assert scrambleRequest.count == scrambleRequest.scrambles.length;
 		
 		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
+		
 
-		PdfPTable table = new PdfPTable(3);
+		if(scrambleRequest.fmc) {
+			assert scrambleRequest.count == 1;
+			String scramble = scrambleRequest.scrambles[0];
+			
+			// TODO <<<
+//			doc.setMargins(10f, 10f, 10f, 10f);
+			PdfContentByte cb = docWriter.getDirectContent();
+//			cb.saveState();
+			BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+//			cb.beginText();
+//			cb.moveText(50, 50);
+//			cb.showText("Hell world");
+//			cb.endText();
+//			cb.restoreState();
+			
+			int totalWidth = 611;
+			int totalHeight = 791;
+//			// we need to switch to text mode
+//			cb.beginText();
+//			// write text centered at 155 mm from left side and 270 mm from bottom
+//			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Our headline", 439, 765, 0);
+//			// leave text mode
+//			cb.endText();
+//			 
+			
+			int bottom = 50;
+			int left = 35;
+			int right = totalWidth-left;
+			int top = totalHeight-bottom;
+			
+			int height = top - bottom;
+			int width = right - left;
+			
+			int solutionBorderTop = bottom + (int) (height*.5);
+			int scrambleBorderTop = solutionBorderTop + 40;
+			
+			int rulesRight = left + (int) (width*.7);
+			
+			int competitorInfoBottom = top - (int) (height*.2);
+			int gradeBottom = competitorInfoBottom - 40;
+			int competitorInfoLeft = right - (int) (width*.45);
+			
+			int padding = 5;
+			
+			// Outer border
+			cb.setLineWidth(2f); 
+			cb.moveTo(left, top);
+			cb.lineTo(left, bottom);
+			cb.lineTo(right, bottom);
+			cb.lineTo(right, top);
+			
+			// Solution border
+			cb.moveTo(left, solutionBorderTop);
+			cb.lineTo(right, solutionBorderTop);
+			
+			// Rules bottom border
+			cb.moveTo(left, scrambleBorderTop);
+			cb.lineTo(rulesRight, scrambleBorderTop);
 
-		float maxWidth = 0;
-		for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
-			String scramble = scrambleRequest.scrambles[i];
-			Chunk ch = new Chunk((i+1)+".");
-			maxWidth = Math.max(maxWidth, ch.getWidthPoint());
-			PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
-			nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-			table.addCell(nthscramble);
+			// Rules right border
+			cb.lineTo(rulesRight, gradeBottom);
+			
+			// Grade bottom border
+			cb.moveTo(competitorInfoLeft, gradeBottom);
+			cb.lineTo(right, gradeBottom);
+			
+			// Competitor info bottom border
+			cb.moveTo(competitorInfoLeft, competitorInfoBottom);
+			cb.lineTo(right, competitorInfoBottom);
+			
+			// Competitor info left border
+			cb.moveTo(competitorInfoLeft, gradeBottom);
+			cb.lineTo(competitorInfoLeft, top);
+			
+			cb.stroke();
+			
+			cb.beginText();
+			int scrambleFontSize = 15; // TODO - pick a font size that will fit!
+			cb.setFontAndSize(bf, scrambleFontSize);
+			int scrambleY = solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
 
-			Chunk scrambleChunk = new Chunk(scramble);
-			scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
+			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Scramble: " + scramble, left+padding, scrambleY, 0);
+			cb.endText();
+			
+			int availableScrambleWidth = right-rulesRight;
+			int availableScrambleHeight = gradeBottom-scrambleBorderTop;
+			Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
+			PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+			Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+
 			try {
-				BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-				scrambleChunk.setFont(new Font(courier, 12, Font.NORMAL));
-			} catch(IOException e) {
-				e.printStackTrace();
-			} catch(DocumentException e) {
+				scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
+			} catch (InvalidScrambleException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
-			scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-			table.addCell(scrambleCell);
+			g2.dispose();
+			cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
+			
+			// first define a standard font for our text
+//			Font helvetica8BoldBlue = FontFactory.getFont(FontFactory.HELVETICA, 8, Font.BOLD, Color.blue);
+			 
+			// create a column object
+			ColumnText ct = new ColumnText(cb);
+			 
+			// define the text to print in the column
+//			Phrase myText = new Phrase("Fewest Moves Challenge");
+//			ct.setSimpleColumn(myText, 150, 600, 355, 317, 10, Element.ALIGN_LEFT);
+////			ct.setSimpleColumn(myText, left+padding, scrambleBorderTop, competitorInfoLeft-padding, top, 0, Element.ALIGN_LEFT, Element.ALIGN_LEFT);
+//			ct.go();
+			
+			int offsetTop = 25;
+			int marginBottom = 10;
+			
+			cb.beginText();
+			int fontSize = 16;
+			cb.setFontAndSize(bf, fontSize);
+			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+			offsetTop += fontSize + marginBottom*2;
+			cb.endText();
+			
+			cb.beginText();
+			fontSize = 15;
+			cb.setFontAndSize(bf, fontSize);
+			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Competitor: __________________", competitorInfoLeft+padding, top-offsetTop, 0);
+			offsetTop += fontSize + marginBottom;
+			cb.endText();
+			
+			cb.beginText();
+			
+			fontSize = 15;
+			cb.setFontAndSize(bf, fontSize);
+			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
+			
+			cb.setFontAndSize(bf, 19);
+			int wcaIdLength = 63;
+			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
+			
+			offsetTop += fontSize + marginBottom;
+			cb.endText();
+			
+			
+			cb.beginText();
+			fontSize = 15;
+			cb.setFontAndSize(bf, fontSize);
+			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Signature: ___________________", competitorInfoLeft+padding, top-offsetTop, 0);
+			offsetTop += fontSize + marginBottom;
+			cb.endText();
+			
+			
+			cb.beginText();
+			cb.setFontAndSize(bf, 25f);
+			int MAGIC_NUMBER = 40; // kill me now
+			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves Challenge", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
+			cb.endText();
+			
+			List rules = new List(List.UNORDERED);
+			rules.setListSymbol("•");
+			rules.add("Notate your solution by writing one move per bar.");
+			rules.add("To delete moves, clearly erase/blacken them.");
+			rules.add("Face moves are clockwise.");
+			rules.add("Rotations x, y, and z follow R, U, and F.");
+			rules.add("Slice moves M, E, and S follow L, D, and F.");
+			rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
+			
+			ct.addElement(rules);
+			int rulesTop = competitorInfoBottom+80;
+			ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
+			ct.go();
+			
+			rules = new List(List.UNORDERED);
+			rules.setListSymbol("•");
+			rules.add("You have 1 hour to find a solution. Your solution length will be counted in HTM.");
+			rules.add("There are 72 spaces on this page. Therefore, your solution must be at most 72 moves, including rotations.");
+			rules.add("Your solution must not be related to the scrambling algorithm in any way.");
+			ct.addElement(rules);
+			MAGIC_NUMBER = 125; // kill me now
+			ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
+			ct.go();
+			
+//			HTMLWorker hw = new HTMLWorker(doc);
+//			InputStreamReader br = new InputStreamReader(new ByteArrayInputStream("<html><body>HELLO WORLD!</body></html>".getBytes()));
+//			hw.parse(br);
+		} else {
+			int width = 200;
+			int height = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
+			Dimension dim = scrambleRequest.scrambler.getPreferredSize(width, height);
+			
+			float maxWidth = 0;
+			PdfPTable table = new PdfPTable(3);
+			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
+				String scramble = scrambleRequest.scrambles[i];
+				Chunk ch = new Chunk((i+1)+".");
+				maxWidth = Math.max(maxWidth, ch.getWidthPoint());
+				PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
+				nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+				table.addCell(nthscramble);
 
-			if(dim.width > 0 && dim.height > 0) {
+				Chunk scrambleChunk = new Chunk(scramble);
+				scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
 				try {
-					PdfContentByte cb = docWriter.getDirectContent();
-					PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-					Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
-
-					scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
-					g2.dispose();
-					PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
-					imgCell.setBackgroundColor(BaseColor.GRAY);
-					imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-					table.addCell(imgCell);
-				} catch (Exception e) {
-					table.addCell("Error drawing scramble: " + e.getMessage());
+					BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
+					scrambleChunk.setFont(new Font(courier, 12, Font.NORMAL));
+				} catch(IOException e) {
+					e.printStackTrace();
+				} catch(DocumentException e) {
 					e.printStackTrace();
 				}
-			} else {
-				table.addCell("");
+				PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
+				scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+				table.addCell(scrambleCell);
+
+				if(dim.width > 0 && dim.height > 0) {
+					try {
+						PdfContentByte cb = docWriter.getDirectContent();
+						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+						Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+
+						scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
+						g2.dispose();
+						PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
+						imgCell.setBackgroundColor(BaseColor.GRAY);
+						imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+						table.addCell(imgCell);
+					} catch (Exception e) {
+						table.addCell("Error drawing scramble: " + e.getMessage());
+						e.printStackTrace();
+					}
+				} else {
+					table.addCell("");
+				}
 			}
+			maxWidth*=2; //TODO - I have no freaking clue why I need to do this.
+			table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
+			doc.add(table);
 		}
-		maxWidth*=2; //TODO - I have no freaking clue why I need to do this.
-		table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
-		doc.add(table);
 		doc.newPage();
 	}
 	

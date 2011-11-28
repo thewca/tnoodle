@@ -48,7 +48,6 @@ def rmtree(dir):
 	def onerror(func, path, excinfo):
 		if func == os.path.islink:
 			os.unlink(path)
-			#<<<assert 0 == os.system('rmdir %s' % path)
 		else:
 			raise excinfo[1]
 	shutil.rmtree(dir, onerror=onerror)

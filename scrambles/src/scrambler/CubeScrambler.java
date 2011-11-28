@@ -28,7 +28,7 @@ public class CubeScrambler extends Scrambler {
 	private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
 	
 	private boolean multislice = true;
-	private boolean wideNotation = false;
+	private boolean wideNotation = true;
 	
 	private final int size;
 	private int length;

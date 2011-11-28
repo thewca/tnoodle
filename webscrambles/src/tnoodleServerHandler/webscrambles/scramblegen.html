@@ -83,7 +83,14 @@ function parseUrl() {
 			alert("Invalid puzzle: " + puzzle + ". Ignoring scramble request");
 			delete round2RoundRequest[round]; 
 		} else {
-			round2RoundRequest[round] = { puzzle: puzzle, count: countStr.toInt() || 1, copies: copiesStr.toInt() || 1, scheme: scheme };
+			var count;
+			var fmc = (countStr == "fmc");
+			if(fmc) {
+				count = 1;
+			} else {
+				count = countStr.toInt() || 1;
+			}
+			round2RoundRequest[round] = { puzzle: puzzle, count: count, fmc: fmc, copies: copiesStr.toInt() || 1, scheme: scheme };
 		}
 	}
 
@@ -135,11 +142,16 @@ function roundRequestToString(roundRequest) {
 		}
 		str = temp + str;
 	}
-	var nonDefaultCount = roundRequest.count != 1;
+	var nonDefaultCount = roundRequest.count != 1 || roundRequest.fmc;
 	if(str.length > 0 || nonDefaultCount) {
 		var temp = "*";
 		if(nonDefaultCount) {
-			temp += roundRequest.count;
+			if(roundRequest.fmc) {
+				assert(roundRequest.count == 1);
+				temp += "fmc";
+			} else {
+				temp += roundRequest.count;
+			}
 		}
 		str = temp + str;
 	}
