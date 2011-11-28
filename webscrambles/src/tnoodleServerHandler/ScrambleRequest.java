@@ -265,26 +265,11 @@ class ScrambleRequest {
 			assert scrambleRequest.count == 1;
 			String scramble = scrambleRequest.scrambles[0];
 			
-			// TODO <<<
-//			doc.setMargins(10f, 10f, 10f, 10f);
 			PdfContentByte cb = docWriter.getDirectContent();
-//			cb.saveState();
 			BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-//			cb.beginText();
-//			cb.moveText(50, 50);
-//			cb.showText("Hell world");
-//			cb.endText();
-//			cb.restoreState();
 			
 			int totalWidth = 611;
 			int totalHeight = 791;
-//			// we need to switch to text mode
-//			cb.beginText();
-//			// write text centered at 155 mm from left side and 270 mm from bottom
-//			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Our headline", 439, 765, 0);
-//			// leave text mode
-//			cb.endText();
-//			 
 			
 			int bottom = 50;
 			int left = 35;
@@ -299,7 +284,7 @@ class ScrambleRequest {
 			
 			int rulesRight = left + (int) (width*.7);
 			
-			int competitorInfoBottom = top - (int) (height*.2);
+			int competitorInfoBottom = top - (int) (height*.18);
 			int gradeBottom = competitorInfoBottom - 40;
 			int competitorInfoLeft = right - (int) (width*.45);
 			
@@ -335,14 +320,39 @@ class ScrambleRequest {
 			cb.moveTo(competitorInfoLeft, gradeBottom);
 			cb.lineTo(competitorInfoLeft, top);
 			
+			// Solution lines
+			int availableSolutionWidth = right - left;
+			int availableSolutionHeight = scrambleBorderTop - bottom;
+			int lineWidth = 25;
+			int lineHeight = 40;
+			int linesX = (availableSolutionWidth/lineWidth + 1)/2;
+			int allocatedX = (2*linesX-1)*lineWidth;
+			int offsetX = (availableSolutionWidth-allocatedX)/2;
+			int linesY = (availableSolutionHeight / lineHeight) - 1;
+			for(int y = 0; y < linesY; y++) {
+				for(int x = 0; x < linesX; x++) {
+					int xPos = left + offsetX + 2*x*lineWidth;
+					int yPos = solutionBorderTop - (y+1)*lineHeight;
+					cb.moveTo(xPos, yPos);
+					cb.lineTo(xPos+lineWidth, yPos);
+				}
+			}
+			
 			cb.stroke();
 			
 			cb.beginText();
-			int scrambleFontSize = 15; // TODO - pick a font size that will fit!
+			int availableScrambleSpace = right-left - 2*padding;
+			int scrambleFontSize = 20;
+			String scrambleStr = "Scramble: " + scramble;
+			float scrambleWidth;
+			do {
+				scrambleFontSize--;
+				scrambleWidth = bf.getWidthPoint(scrambleStr, scrambleFontSize);
+			} while(scrambleWidth > availableScrambleSpace);
+			
 			cb.setFontAndSize(bf, scrambleFontSize);
-			int scrambleY = solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
-
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Scramble: " + scramble, left+padding, scrambleY, 0);
+			int scrambleY = 3 + solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
+			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scrambleStr, left+padding, scrambleY, 0);
 			cb.endText();
 			
 			int availableScrambleWidth = right-rulesRight;
@@ -360,17 +370,7 @@ class ScrambleRequest {
 			g2.dispose();
 			cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
 			
-			// first define a standard font for our text
-//			Font helvetica8BoldBlue = FontFactory.getFont(FontFactory.HELVETICA, 8, Font.BOLD, Color.blue);
-			 
-			// create a column object
 			ColumnText ct = new ColumnText(cb);
-			 
-			// define the text to print in the column
-//			Phrase myText = new Phrase("Fewest Moves Challenge");
-//			ct.setSimpleColumn(myText, 150, 600, 355, 317, 10, Element.ALIGN_LEFT);
-////			ct.setSimpleColumn(myText, left+padding, scrambleBorderTop, competitorInfoLeft-padding, top, 0, Element.ALIGN_LEFT, Element.ALIGN_LEFT);
-//			ct.go();
 			
 			int offsetTop = 25;
 			int marginBottom = 10;
@@ -402,7 +402,6 @@ class ScrambleRequest {
 			offsetTop += fontSize + marginBottom;
 			cb.endText();
 			
-			
 			cb.beginText();
 			fontSize = 15;
 			cb.setFontAndSize(bf, fontSize);
@@ -410,6 +409,19 @@ class ScrambleRequest {
 			offsetTop += fontSize + marginBottom;
 			cb.endText();
 			
+			cb.beginText();
+			fontSize = 11;
+			cb.setFontAndSize(bf, fontSize);
+			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "DO NOT FILL IF YOU ARE THE COMPETITOR", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+			offsetTop += fontSize + marginBottom;
+			cb.endText();
+			
+			cb.beginText();
+			fontSize = 11;
+			cb.setFontAndSize(bf, fontSize);
+			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Graded by: _______________ Result: ______", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+			offsetTop += fontSize + marginBottom;
+			cb.endText();
 			
 			cb.beginText();
 			cb.setFontAndSize(bf, 25f);
@@ -418,7 +430,6 @@ class ScrambleRequest {
 			cb.endText();
 			
 			List rules = new List(List.UNORDERED);
-			rules.setListSymbol("•");
 			rules.add("Notate your solution by writing one move per bar.");
 			rules.add("To delete moves, clearly erase/blacken them.");
 			rules.add("Face moves are clockwise.");
@@ -427,23 +438,19 @@ class ScrambleRequest {
 			rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
 			
 			ct.addElement(rules);
-			int rulesTop = competitorInfoBottom+80;
+			int rulesTop = competitorInfoBottom+70;
 			ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
 			ct.go();
 			
 			rules = new List(List.UNORDERED);
-			rules.setListSymbol("•");
 			rules.add("You have 1 hour to find a solution. Your solution length will be counted in HTM.");
-			rules.add("There are 72 spaces on this page. Therefore, your solution must be at most 72 moves, including rotations.");
+			int spaces = linesX*linesY;
+			rules.add("There are " + spaces + " spaces on this page. Therefore, your solution must be at most " + spaces + " moves, including rotations.");
 			rules.add("Your solution must not be related to the scrambling algorithm in any way.");
 			ct.addElement(rules);
 			MAGIC_NUMBER = 125; // kill me now
 			ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
 			ct.go();
-			
-//			HTMLWorker hw = new HTMLWorker(doc);
-//			InputStreamReader br = new InputStreamReader(new ByteArrayInputStream("<html><body>HELLO WORLD!</body></html>".getBytes()));
-//			hw.parse(br);
 		} else {
 			int width = 200;
 			int height = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
