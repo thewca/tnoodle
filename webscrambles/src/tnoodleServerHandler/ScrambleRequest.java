@@ -447,7 +447,14 @@ class ScrambleRequest {
 			ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
 			ct.go();
 		} else {
-			int scrambleWidth = 200;
+			int scrambleWidth = 0;
+			if(scrambleRequest.scrambler.getShortName().equals("mega")) {
+				// TODO - If we allow the megaminx image to be too wide, the
+				// megaminx scrambles wrap when they don't have to. This is
+				// a quick hack to make it just look pretty. I'm not sure what
+				// a better solution would be.
+				scrambleWidth = 200;
+			}
 			int scrambleHeight = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
 			Dimension dim = scrambleRequest.scrambler.getPreferredSize(scrambleWidth, scrambleHeight);
 			PdfContentByte cb = docWriter.getDirectContent();
