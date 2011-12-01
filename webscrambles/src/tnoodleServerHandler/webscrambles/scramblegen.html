@@ -1,269 +1,325 @@
+<!DOCTYPE html>
 <html>
 <head>
-
-<style type="text/css">
-form {
-	display: inline;
-}
-</style>
-
+<title>WCA WebScrambler</title>
 <script type="text/javascript" src="/moo/mootools-core-1.4.1.js"></script>
 <script type="text/javascript" src="/moo/mootools-more-1.4.0.1.js"></script>
 <script type="text/javascript" src="/moo/powertools-1.1.1.js"></script>
+<script language="javascript">
 
-<script type="text/javascript">
-(function() {
+var scrambleArray = [];
 
-History.handleInitialState('/scramble/');
-	
-function assert(bool, str) {
-	if(!bool) {
-		alert("Assertion error: " + str);
+var eventHash = {};
+eventHash['3x3']=['3x3','3x3x3',5];
+eventHash['2x2']=['2x2','2x2x2',5];
+eventHash['4x4']=['4x4','4x4x4',5];
+eventHash['5x5']=['5x5','5x5x5',5];
+eventHash['3x3oh']=['3x3 OH','3x3x3',5];
+eventHash['3bld']=['3x3 BLD','3x3x3',3];
+eventHash['6x6']=['6x6','6x6x6',3];
+eventHash['7x7']=['7x7','7x7x7',3];
+eventHash['pyra']=['Pyraminx','pyram',5];
+eventHash['mega']=['Megaminx','mega',3];
+eventHash['sq1']=['Square-1','sq1',5];
+eventHash['clk']=['Rubiks Clock','clock',5];
+eventHash['feet']=['3x3 with feet','3x3x3',3];
+eventHash['fmc']=['Fewest Moves','3x3x3','fmc'];
+eventHash['4bld']=['4x4 BLD','4x4x4',3];
+eventHash['5bld']=['5x5 BLD','5x5x5',3];
+eventHash['multi']=['3x3 Multi-BLD','3x3x3',20];
+
+var cuboid = {};
+cuboid['2x2x2']=1;
+cuboid['3x3x3']=1;
+cuboid['4x4x4']=1;
+cuboid['5x5x5']=1;
+cuboid['6x6x6']=1;
+cuboid['7x7x7']=1;
+
+function showEventOptions(events) {
+	if (document.getElementById('eventOptions')) {
+		var d = document.getElementById('eventOptions');
+		document.getElementById('topPanel').removeChild(d);
 	}
+	
+	var eventOptionsDiv = document.createElement('div');
+	eventOptionsDiv.setAttribute('id','eventOptions');
+	eventOptionsDiv.setAttribute('style','position:absolute;top:1px;right:5px;margin:5px;width:250px;padding:5px;background-color:#eeeeee');
+	document.getElementById('topPanel').appendChild(eventOptionsDiv);
+	
+	var eventNameDiv = document.createElement('div');
+	eventNameDiv.setAttribute('id','eventNameDiv');
+	eventNameDiv.setAttribute('style','padding:3px;font-weight:bold');
+	document.getElementById('eventOptions').appendChild(eventNameDiv);
+
+	var eventName = eventHash[events][0];
+	var printEventName = document.createTextNode(eventName);
+	document.getElementById('eventNameDiv').appendChild(printEventName);
+	
+	var text1 = document.createTextNode(" Rounds ");
+	var text2 = document.createTextNode(" Scrambles ");
+	var roundInput = document.createElement('input');
+	roundInput.setAttribute('id','rounds');
+	roundInput.setAttribute('type','number');
+	roundInput.setAttribute('min','1');
+	roundInput.setAttribute('max','5');
+	roundInput.setAttribute('value','1');
+	roundInput.setAttribute('size','1');
+
+	document.getElementById('eventOptions').appendChild(text1);
+	document.getElementById('eventOptions').appendChild(roundInput);
+		
+	if (events != 'fmc') {
+		var scrambleInput = document.createElement('input');
+		scrambleInput.setAttribute('id','scrambles');
+		scrambleInput.setAttribute('type','number');
+		scrambleInput.setAttribute('min','1');
+		scrambleInput.setAttribute('max','40');
+		scrambleInput.setAttribute('value',eventHash[events][2]);
+		scrambleInput.setAttribute('size','1');
+		document.getElementById('eventOptions').appendChild(text2);
+		document.getElementById('eventOptions').appendChild(scrambleInput);
+	}
+		
+	var submitButton = document.createElement('input');
+	submitButton.setAttribute('type','submit');
+	submitButton.setAttribute('value','Add');
+	submitButton.setAttribute('style','margin:3px;')
+	var clickfunction = "javascript:showRoundOptions('"+events+"');";
+	submitButton.setAttribute('onclick',clickfunction);
+	document.getElementById('eventOptions').appendChild(submitButton);
+	
 }
 
-var pendingScrambleRequest = null;
+function showRoundOptions(events) {
+	if (document.getElementById('roundOptions')) {
+		var d = document.getElementById('roundOptions');
+		document.getElementById('eventOptions').removeChild(d);
+	}
 
-var round2RoundRequest = null;
-var seed = null;
-var showIndices = null;
+	var numRounds = document.getElementById('rounds').value;
+	if (events == 'fmc') var numScrambles = 'fmc';
+	else var numScrambles = document.getElementById('scrambles').value;
 
-function parseUrl() {
-	if(pendingScrambleRequest) {
-		pendingScrambleRequest.cancel();
-		pendingScrambleRequest = null;
+	var roundOptionsDiv = document.createElement('div');
+	roundOptionsDiv.setAttribute('id','roundOptions');
+	roundOptionsDiv.setAttribute('style','margin:2px;padding:3px;background-color:#dddddd');
+	document.getElementById('eventOptions').appendChild(roundOptionsDiv);
+	
+	for (i=1;i<=numRounds;i++) {
+		var roundText = document.createTextNode(" Round "+i+" groups ");
+		document.getElementById('roundOptions').appendChild(roundText);
+		var groupsInput = document.createElement('input');
+		groupsInput.setAttribute('id','groups_'+i);
+		groupsInput.setAttribute('type','number');
+		groupsInput.setAttribute('min','1');
+		groupsInput.setAttribute('max','20');
+		groupsInput.setAttribute('value','1');
+		groupsInput.setAttribute('size','2');
+		document.getElementById('roundOptions').appendChild(groupsInput);
+		
+		var copiesText = document.createTextNode(" Copies ");
+		document.getElementById('roundOptions').appendChild(copiesText);
+		var copiesInput = document.createElement('input');
+		copiesInput.setAttribute('id','copies_'+i);
+		copiesInput.setAttribute('type','number');
+		copiesInput.setAttribute('min','1');
+		copiesInput.setAttribute('max','10');
+		copiesInput.setAttribute('value','1');
+		copiesInput.setAttribute('size','2');
+		document.getElementById('roundOptions').appendChild(copiesInput);
+		var linebreak = document.createElement('br');
+		document.getElementById('roundOptions').appendChild(linebreak);
 	}
 	
-	var uri = new URI(History.getPath());
-	var pathname = uri.get('directory') + uri.get('file');
-	var PATH_RE = /^\/?scramble\/?(.*?)(\.html)?$/;
-	var match = PATH_RE.exec(pathname);
-	assert(match, pathname + " doesn't match " + PATH_RE);
+	var submitButton = document.createElement('input');
+	submitButton.setAttribute('type','submit');
+	submitButton.setAttribute('value','Add Scrambles');
+	submitButton.setAttribute('style','margin:3px;')
+	var clickfunction = "javascript:addScrambles('"+events+"','"+numRounds+"','"+numScrambles+"');";
+	submitButton.setAttribute('onclick',clickfunction);
+	document.getElementById('roundOptions').appendChild(submitButton);
+	
+	var resetButton = document.createElement('input');
+	resetButton.setAttribute('type','submit');
+	resetButton.setAttribute('value','Reset');
+	resetButton.setAttribute('style','margin:3px;')
+	var clickfunction = "javascript:resetEvent();";
+	resetButton.setAttribute('onclick',clickfunction);
+	document.getElementById('roundOptions').appendChild(resetButton);
 
-	var title = decodeURIComponent(match[1]);
-	globalTitle.value = title;
+}
+
+function addScrambles(events,rounds,scrambles) {
+	var eventName = eventHash[events][0];
+	var scrambleType = eventHash[events][1];
 	
-	document.title = title + " - WCA Scrambler";
+	if (cuboid[scrambleType]) var scheme = document.getElementById('colorScheme').value;
 	
-	round2RoundRequest = uri.getData();
-	
-	seed = round2RoundRequest.seed;
-	delete round2RoundRequest.seed;
-	
-	// showIndices makes no sense for pdfs, so we just read it and ignore it.
-	showIndices = round2RoundRequest.showIndices;
-	delete round2RoundRequest.showIndices;
-	
-	for(var round in round2RoundRequest) {
-		if(round2RoundRequest[round] instanceof Array) {
-			alert("Multiple rounds with the same name (" + round + ") not allowed. I'm choosing one of them at random.");
-			round2RoundRequest[round] = round2RoundRequest[round][0];
-		}
-		
-		var puzzle_count_copies_scheme = round2RoundRequest[round].split("*");
-		var puzzle;
-		var countStr = "";
-		var copiesStr = "";
-		var scheme = "";
-		switch(puzzle_count_copies_scheme.length) {
-		case 4:
-			scheme = puzzle_count_copies_scheme[3];
-		case 3:
-			copiesStr = puzzle_count_copies_scheme[2];
-		case 2:
-			countStr = puzzle_count_copies_scheme[1];
-		case 1:
-			puzzle = puzzle_count_copies_scheme[0];
-			break;
-		default:
-			alert("Invalid scramble request: " + round2RoundRequest[round]);
-		}
-		
-		if(!(puzzle in puzzle2LongName)) {
-			alert("Invalid puzzle: " + puzzle + ". Ignoring scramble request");
-			delete round2RoundRequest[round]; 
-		} else {
-			var count;
-			var fmc = (countStr == "fmc");
-			if(fmc) {
-				count = 1;
-			} else {
-				count = countStr.toInt() || 1;
+	for (i=1;i<=rounds;i++) {
+		groupId = 'groups_'+i;
+		copiesId = 'copies_'+i;
+		var roundGroups = document.getElementById(groupId).value;
+		var copies = document.getElementById(copiesId).value;
+		if (roundGroups == 1) {
+			if (!scrambleArray[eventName+' Round '+i]) {
+				if (cuboid[scrambleType]) scrambleArray[eventName+' Round '+i]=[scrambleType,scrambles,copies,scheme];
+				else scrambleArray[eventName+' Round '+i]=[scrambleType,scrambles,copies];
 			}
-			round2RoundRequest[round] = { puzzle: puzzle, count: count, fmc: fmc, copies: copiesStr.toInt() || 1, scheme: scheme };
+			else alert(eventName+' Round '+i+' already exists; skipping');
 		}
-	}
-
-	setFormsDisabled(true);
-	var scrambleUrl = getScrambleUrl("json");
-	if(scrambleUrl) {
-		pendingScrambleRequest = new Request.JSON({
-			url: scrambleUrl.toString(),
-			onSuccess: function(responseJSON, responseText) {
-				if(responseJSON.error) {
-					alert(responseText);
-					return;
+		
+		else {
+			for (j=1;j<=roundGroups;j++) {
+				if (!scrambleArray[eventName+' Round '+i+' Group '+j]) {
+					if (cuboid[scrambleType]) scrambleArray[eventName+' Round '+i+' Group '+j]=[scrambleType,scrambles,copies,scheme];
+					else scrambleArray[eventName+' Round '+i+' Group '+j]=[scrambleType,scrambles,copies];
 				}
-				
-				pdfForm.scrambles.value = responseText;
-				var pdfUrl = getViewUrl("pdf");
-				pdfForm.action = pdfUrl.toString();
-				
-				zipForm.scrambles.value = responseText;
-				var zipUrl = getViewUrl("zip");
-				zipForm.action = zipUrl.toString();
-				
-				
-				setFormsDisabled(false);
-			},
-			onFailure: function() {
-				// TODO
-				alert("Failure loading scrambles");
-			}
-		});
-		// TODO - the way this is currently implemented will result in a lot of wasted scramble requests.
-		// Is that ok? Note that we want some to ensure that a fresh server loads some scramblers and
-		// starts generating scrambles.
-		pendingScrambleRequest.send();
-	}
-}
-
-// This is a pointless attempt to keep the urls human readable.
-function roundRequestToString(roundRequest) {
-	var str = "";
-	if(roundRequest.scheme) {
-		str = "*" + roundRequest.scheme + str;
-	}
-	var nonDefaultCopies = roundRequest.copies != 1;
-	if(str.length > 0 || nonDefaultCopies) {
-		var temp = "*";
-		if(nonDefaultCopies) {
-			temp += roundRequest.copies;
-		}
-		str = temp + str;
-	}
-	var nonDefaultCount = roundRequest.count != 1 || roundRequest.fmc;
-	if(str.length > 0 || nonDefaultCount) {
-		var temp = "*";
-		if(nonDefaultCount) {
-			if(roundRequest.fmc) {
-				assert(roundRequest.count == 1);
-				temp += "fmc";
-			} else {
-				temp += roundRequest.count;
+				else alert(eventName+' Round '+i+' Group '+j+' already exists; skipping');
 			}
 		}
-		str = temp + str;
 	}
-	str = roundRequest.puzzle + str;
-	return str;
+
+	updateScrambleArray();
+	
+	var d = document.getElementById('eventOptions');
+	document.getElementById('topPanel').removeChild(d);
 }
 
-function getViewUrl(ext) {
-	var baseUrl = "/view/";
-	if(globalTitle.value) {
-		baseUrl += encodeURIComponent(globalTitle.value);
-	}
-	baseUrl += "." + encodeURIComponent(ext);
-	
-	var url = new URI(baseUrl);
-	return url;
+function resetEvent() {
+	var d = document.getElementById('eventOptions');
+	document.getElementById('topPanel').removeChild(d);
 }
 
-function getScrambleUrl(ext) {
-	var baseUrl = "/scramble/";
-	var data = {};
-	if(seed) {
-		data.seed = seed;
-	}
-	
-	for(var roundTitle in round2RoundRequest) {
-		var roundRequest = round2RoundRequest[roundTitle];
-		data[roundTitle] = roundRequestToString(roundRequest);
-	}
-	if(Object.keys(round2RoundRequest).length == 0) {
-		if(ext != "html") {
-			// A url without scramble requests is only valid if it's an html url
-			return null;
+function resetAllTheThings() {
+	if (confirm("Reset all scrambles?")) {
+		for (var i in scrambleArray) {
+			delete scrambleArray[i];
 		}
+		updateScrambleArray();
+		document.getElementById('formContainer').style.display = "none";
 	}
+}
 
-	if(globalTitle.value) {
-		baseUrl += encodeURIComponent(globalTitle.value);
+function updateScrambleArray() {
+	var rows = "<tr style='background-color:#999999'><th width=200>Event Title</th><th width=90>Scrambles</th><th width=90>Copies</th><th>&nbsp;</th></tr>"
+	var j = 0;
+	for (var i in scrambleArray) {
+		if (!scrambleArray[i][0]) break;
+		if (j % 2 == 0) var rowColor="#cccccc";
+		else var rowColor="#eeeeee";
+		rows = rows+"<tr style='background-color:"+rowColor+"'><td>"+i+"</td><td align='center'>"+scrambleArray[i][1]+"</td><td align='center'>"+scrambleArray[i][2]+"</td><td><a href=\"javascript:deleteScramble('"+i+"')\">x</a></td></tr>";
+		j++;
 	}
-	if(globalTitle.value || ext != "html") {
-		baseUrl += "." + encodeURIComponent(ext);
+	document.getElementById('scrambleTable').innerHTML=rows;
+}
+
+function deleteScramble(index) {
+	delete scrambleArray[index];
+	updateScrambleArray();
+}
+
+function scrambleAllTheThings() {
+	var compName = document.getElementById('competitionName').value;
+
+	var jsonUrl = compName+'.json?';
+	var variableString = '';
+	
+	for (var i in scrambleArray) {
+		if (!scrambleArray[i][0]) break;
+		var puzzleRequest = scrambleArray[i].join('*');
+		variableString = variableString+i+'='+puzzleRequest+'&';
 	}
 	
-	var url = new URI(baseUrl);
-	url.setData(data);
-	return url;
-}
+	jsonUrl = jsonUrl+variableString;
 
-function somethingChanged() {
-	// Calling History.push will cause parseUrl() to get called.
-	var htmlUrl = getScrambleUrl("html").toString();
-	if(htmlUrl != History.getPath()) {
-		History.push(htmlUrl);
-	}
-}
-
-function globalTitleChanged() {
-	somethingChanged();
-}
-
-var globalTitle = null;
-var pdfForm = null;
-var zipForm = null;
-
-var puzzle2LongName = {};
-
-function setFormsDisabled(disabled) {
-	pdfForm.children[1].disabled = disabled;
-	zipForm.children[1].disabled = disabled;
-}
-
-window.addEvent('domready', function() {
-	globalTitle = $('globalTitle');
-	pdfForm = $("pdfForm");
-	zipForm = $("zipForm");
-	setFormsDisabled(true);
-	
-	var puzzleRequest = new Request.JSON({
-		url: "/puzzles/",
+	var pendingScrambleRequest = new Request.JSON({
+		url: jsonUrl,
+		onRequest: function() {
+			document.getElementById('scrambleButton').value = "loading...";
+		},
 		onSuccess: function(responseJSON, responseText) {
-			for(var i = 0; i < responseJSON.length; i++) {
-				var shortName = responseJSON[i][0];
-				var longName = responseJSON[i][1];
-				assert(!(shortName in puzzle2LongName));
-				puzzle2LongName[shortName] = longName;
+			document.getElementById('scrambleButton').value = "Get Scrambles";
+			if(responseJSON.error) {
+				alert(responseText);
+				return;
 			}
-			parseUrl();
-			History.addEvent('change', parseUrl);
-			
-			globalTitle.addEvent('input', globalTitleChanged);
+			document.getElementById('pdfScrambles').value = responseText;
+			document.getElementById('pdfForm').action = '../view/'+compName+'.pdf';
+
+			document.getElementById('zipScrambles').value = responseText;
+			document.getElementById('zipForm').action = '../view/'+compName+'.zip';
+
+			document.getElementById('formContainer').style.display = "block";
 		},
 		onFailure: function() {
-			// TODO
-			alert("Failure loading puzzles");
+			alert("Failure loading scrambles");
 		}
 	});
-	puzzleRequest.send();
-});
+	pendingScrambleRequest.send();
 
-})();
+}
+
 </script>
-
 </head>
-<body>
-<input type="text" id="globalTitle"></input>
+
+<body style="font-family:arial,sans-serif;font-size:12px">
+<div style="padding:5px">
+Competition Name: <input type="text" name="competitionName" id="competitionName" size="24" /> 
+Color Scheme: <select name="colorScheme" id="colorScheme"> <option selected="selected" value="bygorw">Western</option><option value="ybgorw">Japanese</option></select>
+
+</div>
+
+<div id="topPanel" style="position:relative;width:400px;padding:5px">
+
+<div style="margin-left:10px;margin-right:10px">
+<select id="eventName" size="17">
+	<option value="3x3" onclick="javascript:showEventOptions('3x3');">Rubik's cube</option>
+	<option value="2x2" onclick="javascript:showEventOptions('2x2');">2x2</option>
+	<option value="4x4" onclick="javascript:showEventOptions('4x4');">4x4</option>
+	<option value="5x5" onclick="javascript:showEventOptions('5x5');">5x5</option>
+	<option value="3x3oh" onclick="javascript:showEventOptions('3x3oh');">3x3 one-handed</option>
+	<option value="3bld" onclick="javascript:showEventOptions('3bld');">3x3 blindfolded</option>
+	<option value="6x6" onclick="javascript:showEventOptions('6x6');">6x6</option>
+	<option value="7x7" onclick="javascript:showEventOptions('7x7');">7x7</option>
+	<option value="pyra" onclick="javascript:showEventOptions('pyra');">Pyraminx</option>
+	<option value="mega" onclick="javascript:showEventOptions('mega');">Megaminx</option>
+	<option value="sq1" onclick="javascript:showEventOptions('sq1');">Square-1</option>
+	<option value="clk" onclick="javascript:showEventOptions('clk');">Clock</option>
+	<option value="feet" onclick="javascript:showEventOptions('feet');">3x3 with feet</option>
+	<option value="fmc" onclick="javascript:showEventOptions('fmc');">Fewest Moves</option>
+	<option value="4bld" onclick="javascript:showEventOptions('4bld');">4x4 blindfolded</option>
+	<option value="5bld" onclick="javascript:showEventOptions('5bld');">5x5 blindfolded</option>
+	<option value="multi" onclick="javascript:showEventOptions('multi');">Multi BLD</option>
+</select>
+</div>
+
+</div>
+
+<div id="bottomPanel" style="position:relative;width:400px;padding:5px;">
+<table id="scrambleTable" cellspacing=0>
+<tr style="background-color:#999999"><th width=200>Event Title</th><th width=90>Scrambles</th><th width=90>Copies</th><th>&nbsp;</th></tr>
+</table>
+<div id="scrambleContainer" style="float:left;">
+<input id="scrambleButton" type="submit" onclick="javascript:scrambleAllTheThings();" value="Get Scrambles">
+
+<div id="formContainer" style="display:none">
 <form id="pdfForm" action="" method="POST" target="_blank">
-<input type="hidden" name="scrambles" value="" />
-<input type="submit" value="Generate pdf" />
+<input id="pdfScrambles" type="hidden" name="scrambles" value='' />
+<input type="submit" value=".pdf" />
 </form>
 <form id="zipForm" action="" method="POST" target="_blank">
-<input type="hidden" name="scrambles" value="" />
-<input type="submit" value="Generate zip" />
+<input id="zipScrambles" type="hidden" name="scrambles" value='' />
+<input type="submit" value=".zip" />
 </form>
+</div>
+
+</div>
+<div id="resetButton" style="float:right;">
+<input type="submit" onclick="javascript:resetAllTheThings();" value="Reset All">
+</div>
+</div>
+
+
 </body>
 </html>
