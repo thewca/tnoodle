@@ -122,6 +122,9 @@
 	-create an editable table superclass for the editable list & times table
 +background image/opacity
 	-provide some system for uploading your own image?
++thread safety! this must be done before giving to the WCA
++fmc generation
+
 -cleanup readme.textile & root html (just add name, lol)
 
 -saving times
@@ -138,8 +141,6 @@
 
 -shelley's gui
 -logging! I wanna see who's using this
--thread safety! this must be done before giving to the WCA
--fmc generation
 -VERSIONING/RELEASE CYCLE
 	-create website with download (automate releasing?)
 -create own assertions facility
