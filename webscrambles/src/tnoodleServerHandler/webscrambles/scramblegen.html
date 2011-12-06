@@ -2,6 +2,57 @@
 <html>
 <head>
 <title>WCA WebScrambler</title>
+
+<style type="text/css">
+#eventOptions {
+position:absolute;
+top:1px;
+left:130px;
+margin:5px;
+padding:5px;
+background-color:#eeeeee;
+}
+
+#eventNameDiv {
+padding:3px;
+font-weight:bold;
+}
+
+#roundOptions {
+margin:2px;
+padding:3px;
+background-color:#dddddd;
+}
+
+table {
+border-collapse:collapse;
+}
+tr.head {
+background-color:#999999;
+}
+tr.even {
+background-color:#cccccc;
+}
+tr.odd {
+background-color:#eeeeee;
+}
+
+#head, #bottomPanel, #topPanel {
+position:relative;
+padding:5px;
+}
+
+#selector {
+margin-left:0px;
+margin-right:10px
+}
+
+body {
+font-family:arial,sans-serif;
+font-size:12px;
+}
+</style>
+
 <script type="text/javascript" src="/moo/mootools-core-1.4.1.js"></script>
 <script type="text/javascript" src="/moo/mootools-more-1.4.0.1.js"></script>
 <script type="text/javascript" src="/moo/powertools-1.1.1.js"></script>
@@ -37,19 +88,17 @@ cuboid['6x6x6']=1;
 cuboid['7x7x7']=1;
 
 function showEventOptions(events) {
-	if (document.getElementById('eventOptions')) {
-		var d = document.getElementById('eventOptions');
-		document.getElementById('topPanel').removeChild(d);
-	}
+	var d = document.getElementById('eventOptions');
+	if (d) document.getElementById('topPanel').removeChild(d);
 	
 	var eventOptionsDiv = document.createElement('div');
 	eventOptionsDiv.setAttribute('id','eventOptions');
-	eventOptionsDiv.setAttribute('style','position:absolute;top:1px;right:5px;margin:5px;width:250px;padding:5px;background-color:#eeeeee');
+	// eventOptionsDiv.setAttribute('style','position:absolute;top:1px;left:150px;margin:5px;padding:5px;background-color:#eeeeee');
 	document.getElementById('topPanel').appendChild(eventOptionsDiv);
 	
 	var eventNameDiv = document.createElement('div');
 	eventNameDiv.setAttribute('id','eventNameDiv');
-	eventNameDiv.setAttribute('style','padding:3px;font-weight:bold');
+	// eventNameDiv.setAttribute('style','padding:3px;font-weight:bold');
 	document.getElementById('eventOptions').appendChild(eventNameDiv);
 
 	var eventName = eventHash[events][0];
@@ -84,18 +133,16 @@ function showEventOptions(events) {
 	var submitButton = document.createElement('input');
 	submitButton.setAttribute('type','submit');
 	submitButton.setAttribute('value','Add');
-	submitButton.setAttribute('style','margin:3px;')
-	var clickfunction = "javascript:showRoundOptions('"+events+"');";
-	submitButton.setAttribute('onclick',clickfunction);
+	submitButton.setAttribute('style','margin:3px;');
+	var clickFunction = function(){ showRoundOptions(events); };
+	submitButton.onclick = clickFunction;
 	document.getElementById('eventOptions').appendChild(submitButton);
 	
 }
 
 function showRoundOptions(events) {
-	if (document.getElementById('roundOptions')) {
-		var d = document.getElementById('roundOptions');
-		document.getElementById('eventOptions').removeChild(d);
-	}
+	var d = document.getElementById('roundOptions');
+	if (d) document.getElementById('eventOptions').removeChild(d);
 
 	var numRounds = document.getElementById('rounds').value;
 	if (events == 'fmc') var numScrambles = 'fmc';
@@ -103,7 +150,7 @@ function showRoundOptions(events) {
 
 	var roundOptionsDiv = document.createElement('div');
 	roundOptionsDiv.setAttribute('id','roundOptions');
-	roundOptionsDiv.setAttribute('style','margin:2px;padding:3px;background-color:#dddddd');
+	// roundOptionsDiv.setAttribute('style','margin:2px;padding:3px;background-color:#dddddd');
 	document.getElementById('eventOptions').appendChild(roundOptionsDiv);
 	
 	for (i=1;i<=numRounds;i++) {
@@ -135,17 +182,17 @@ function showRoundOptions(events) {
 	var submitButton = document.createElement('input');
 	submitButton.setAttribute('type','submit');
 	submitButton.setAttribute('value','Add Scrambles');
-	submitButton.setAttribute('style','margin:3px;')
-	var clickfunction = "javascript:addScrambles('"+events+"','"+numRounds+"','"+numScrambles+"');";
-	submitButton.setAttribute('onclick',clickfunction);
+	submitButton.setAttribute('style','margin:3px;');
+	var clickFunction = function(){ addScrambles(events,numRounds,numScrambles) };
+	submitButton.onclick = clickFunction;
 	document.getElementById('roundOptions').appendChild(submitButton);
 	
 	var resetButton = document.createElement('input');
 	resetButton.setAttribute('type','submit');
 	resetButton.setAttribute('value','Reset');
-	resetButton.setAttribute('style','margin:3px;')
-	var clickfunction = "javascript:resetEvent();";
-	resetButton.setAttribute('onclick',clickfunction);
+	resetButton.setAttribute('style','margin:3px;');
+	var clickFunction = function(){ resetEvent(); };
+	resetButton.onclick = clickFunction;
 	document.getElementById('roundOptions').appendChild(resetButton);
 
 }
@@ -202,16 +249,20 @@ function resetAllTheThings() {
 }
 
 function updateScrambleArray() {
-	var rows = "<tr style='background-color:#999999'><th width=200>Event Title</th><th width=90>Scrambles</th><th width=90>Copies</th><th>&nbsp;</th></tr>"
+	var headerRow = "<tr class='head'><th width=200>Event Title</th><th width=90>Scrambles</th><th width=90>Copies</th><th width=10>&nbsp;</th></tr>";
+	var rows = '';
 	var j = 0;
 	for (var i in scrambleArray) {
 		if (!scrambleArray[i][0]) break;
-		if (j % 2 == 0) var rowColor="#cccccc";
-		else var rowColor="#eeeeee";
-		rows = rows+"<tr style='background-color:"+rowColor+"'><td>"+i+"</td><td align='center'>"+scrambleArray[i][1]+"</td><td align='center'>"+scrambleArray[i][2]+"</td><td><a href=\"javascript:deleteScramble('"+i+"')\">x</a></td></tr>";
+		if (j % 2 == 0) var rowColor="even";
+		else var rowColor="odd";
+		rows = rows+"<tr class='"+rowColor+"'><td>"+i+"</td><td align='center'>"+scrambleArray[i][1]+"</td><td align='center'>"+scrambleArray[i][2]+"</td><td align='center'><a href=\"javascript:deleteScramble('"+i+"')\">x</a></td></tr>";
 		j++;
 	}
-	document.getElementById('scrambleTable').innerHTML=rows;
+	document.getElementById('scrambleTable').innerHTML=headerRow+rows;
+	if (rows == '') document.getElementById('scrambleButton').disabled = "disabled";
+	else document.getElementById('scrambleButton').removeAttribute('disabled');
+	document.getElementById('formContainer').style.display = "none";
 }
 
 function deleteScramble(index) {
@@ -221,6 +272,7 @@ function deleteScramble(index) {
 
 function scrambleAllTheThings() {
 	var compName = document.getElementById('competitionName').value;
+	if (compName == '') compName = 'scramble';
 
 	var jsonUrl = compName+'.json?';
 	var variableString = '';
@@ -237,6 +289,7 @@ function scrambleAllTheThings() {
 		url: jsonUrl,
 		onRequest: function() {
 			document.getElementById('scrambleButton').value = "loading...";
+			document.getElementById('scrambleButton').disabled = "disabled";
 		},
 		onSuccess: function(responseJSON, responseText) {
 			document.getElementById('scrambleButton').value = "Get Scrambles";
@@ -244,6 +297,7 @@ function scrambleAllTheThings() {
 				alert(responseText);
 				return;
 			}
+			document.getElementById('scrambleButton').removeAttribute('disabled');
 			document.getElementById('pdfScrambles').value = responseText;
 			document.getElementById('pdfForm').action = '../view/'+compName+'.pdf';
 
@@ -253,26 +307,27 @@ function scrambleAllTheThings() {
 			document.getElementById('formContainer').style.display = "block";
 		},
 		onFailure: function() {
-			alert("Failure loading scrambles");
+		alert("Failure loading scrambles");
+		document.getElementById('scrambleButton').value = "Get Scrambles";
+		document.getElementById('scrambleButton').removeAttribute('disabled');
 		}
 	});
-	pendingScrambleRequest.send();
-
+		pendingScrambleRequest.send();
 }
 
 </script>
 </head>
 
-<body style="font-family:arial,sans-serif;font-size:12px">
-<div style="padding:5px">
+<body>
+<div id="head">
 Competition Name: <input type="text" name="competitionName" id="competitionName" size="24" /> 
 Color Scheme: <select name="colorScheme" id="colorScheme"> <option selected="selected" value="bygorw">Western</option><option value="ybgorw">Japanese</option></select>
 
 </div>
 
-<div id="topPanel" style="position:relative;width:400px;padding:5px">
+<div id="topPanel">
 
-<div style="margin-left:10px;margin-right:10px">
+<div id="selector">
 <select id="eventName" size="17">
 	<option value="3x3" onclick="javascript:showEventOptions('3x3');">Rubik's cube</option>
 	<option value="2x2" onclick="javascript:showEventOptions('2x2');">2x2</option>
@@ -296,12 +351,13 @@ Color Scheme: <select name="colorScheme" id="colorScheme"> <option selected="sel
 
 </div>
 
-<div id="bottomPanel" style="position:relative;width:400px;padding:5px;">
+<div id="bottomPanel">
 <table id="scrambleTable" cellspacing=0>
-<tr style="background-color:#999999"><th width=200>Event Title</th><th width=90>Scrambles</th><th width=90>Copies</th><th>&nbsp;</th></tr>
+<tr class="head"><th width=200>Event Title</th><th width=90>Scrambles</th><th width=90>Copies</th><th width=10>&nbsp;</th></tr>
 </table>
 <div id="scrambleContainer" style="float:left;">
-<input id="scrambleButton" type="submit" onclick="javascript:scrambleAllTheThings();" value="Get Scrambles">
+<input id="scrambleButton" type="submit" onclick="javascript:scrambleAllTheThings();" disabled="disabled" value="Get Scrambles">
+<input type="submit" onclick="javascript:resetAllTheThings();" value="Reset All">
 
 <div id="formContainer" style="display:none">
 <form id="pdfForm" action="" method="POST" target="_blank">
@@ -314,9 +370,6 @@ Color Scheme: <select name="colorScheme" id="colorScheme"> <option selected="sel
 </form>
 </div>
 
-</div>
-<div id="resetButton" style="float:right;">
-<input type="submit" onclick="javascript:resetAllTheThings();" value="Reset All">
 </div>
 </div>
 
