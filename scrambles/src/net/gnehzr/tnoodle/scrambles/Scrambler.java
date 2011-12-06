@@ -21,14 +21,6 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.Base64;
 import net.gnehzr.tnoodle.utils.LazyClassLoader;
@@ -36,6 +28,14 @@ import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
 import net.gnehzr.tnoodle.utils.Utils;
 import net.goui.util.MTRandom;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 
 /**
@@ -366,9 +366,14 @@ public abstract class Scrambler {
 	private static class Scramblerizer implements JsonSerializer<Scrambler>, JsonDeserializer<Scrambler> {
 		@Override
 		public Scrambler deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			String scramblerName = json.getAsString();
+			LazyClassLoader<Scrambler> lazyScrambler = scramblers.get(scramblerName);
+			if(lazyScrambler == null) {
+				throw new JsonParseException(scramblerName + " not found in: " + scramblers.keySet());
+			}
 			try {
-				return scramblers.get(json.getAsString()).cachedInstance();
-			} catch (Exception e) {
+				return lazyScrambler.cachedInstance();
+			} catch(Exception e) {
 				throw new JsonParseException(e);
 			}
 		}
