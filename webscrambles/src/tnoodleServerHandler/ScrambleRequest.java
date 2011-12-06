@@ -494,7 +494,7 @@ class ScrambleRequest {
 						imgCell.setBackgroundColor(BaseColor.GRAY);
 						imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
 						table.addCell(imgCell);
-					} catch (Exception e) {
+					} catch (Throwable e) {
 						table.addCell("Error drawing scramble: " + e.getMessage());
 						e.printStackTrace();
 					}
