@@ -29,7 +29,7 @@ public abstract class SafeHttpHandler implements HttpHandler {
 			// substring(1) gets rid of the leading /
 			path = t.getRequestURI().getPath().substring(1).split("/");
 			wrappedHandle(t, path, query);
-		} catch(Exception e) {
+		} catch(Throwable e) {
 			if(path != null && path[path.length-1].endsWith(".json")) {
 				assert query != null;
 				jsonError(t, e, query.get("callback"));
