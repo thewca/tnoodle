@@ -58,26 +58,28 @@ font-size:12px;
 <script type="text/javascript" src="/moo/powertools-1.1.1.js"></script>
 <script language="javascript">
 
-var scrambleArray = [];
+
+var scrambleArray = {};
+var pendingScrambleRequest = null;
 
 var eventHash = {};
-eventHash['3x3']=['3x3','3x3x3',5];
-eventHash['2x2']=['2x2','2x2x2',5];
-eventHash['4x4']=['4x4','4x4x4',5];
-eventHash['5x5']=['5x5','5x5x5',5];
-eventHash['3x3oh']=['3x3 OH','3x3x3',5];
-eventHash['3bld']=['3x3 BLD','3x3x3',3];
-eventHash['6x6']=['6x6','6x6x6',3];
-eventHash['7x7']=['7x7','7x7x7',3];
-eventHash['pyra']=['Pyraminx','pyram',5];
-eventHash['mega']=['Megaminx','mega',3];
-eventHash['sq1']=['Square-1','sq1',5];
-eventHash['clk']=['Rubiks Clock','clock',5];
-eventHash['feet']=['3x3 with feet','3x3x3',3];
-eventHash['fmc']=['Fewest Moves','3x3x3','fmc'];
-eventHash['4bld']=['4x4 BLD','4x4x4',3];
-eventHash['5bld']=['5x5 BLD','5x5x5',3];
-eventHash['multi']=['3x3 Multi-BLD','3x3x3',20];
+eventHash['3x3']={ eventName: '3x3', scrambleType: '3x3x3', defaultScrambles: 5};
+eventHash['2x2']={ eventName: '2x2', scrambleType: '2x2x2', defaultScrambles: 5};
+eventHash['4x4']={ eventName: '4x4', scrambleType: '4x4x4', defaultScrambles: 5};
+eventHash['5x5']={ eventName: '5x5', scrambleType: '5x5x5', defaultScrambles: 5};
+eventHash['3x3oh']={ eventName: '3x3 OH', scrambleType: '3x3x3', defaultScrambles: 5};
+eventHash['3bld']={ eventName: '3x3 BLD', scrambleType: '3x3x3', defaultScrambles: 3};
+eventHash['6x6']={ eventName: '6x6', scrambleType: '6x6x6', defaultScrambles: 3};
+eventHash['7x7']={ eventName: '7x7', scrambleType: '7x7x7', defaultScrambles: 3};
+eventHash['pyra']={ eventName: 'Pyraminx', scrambleType: 'pyram', defaultScrambles: 5};
+eventHash['mega']={ eventName: 'Megaminx', scrambleType: 'mega', defaultScrambles: 3};
+eventHash['sq1']={ eventName: 'Square-1', scrambleType: 'sq1', defaultScrambles: 5};
+eventHash['clk']={ eventName: 'Rubiks Clock', scrambleType: 'clock', defaultScrambles: 5};
+eventHash['feet']={ eventName: '3x3 with feet', scrambleType: '3x3x3', defaultScrambles: 3};
+eventHash['fmc']={ eventName: 'Fewest Moves', scrambleType: '3x3x3', defaultScrambles: 'fmc'};
+eventHash['4bld']={ eventName: '4x4 BLD', scrambleType: '4x4x4', defaultScrambles: 3};
+eventHash['5bld']={ eventName: '5x5 BLD', scrambleType: '5x5x5', defaultScrambles: 3};
+eventHash['multi']={ eventName: '3x3 Multi-BLD', scrambleType: '3x3x3', defaultScrambles: 20};
 
 var cuboid = {};
 cuboid['2x2x2']=1;
@@ -93,15 +95,13 @@ function showEventOptions(events) {
 	
 	var eventOptionsDiv = document.createElement('div');
 	eventOptionsDiv.setAttribute('id','eventOptions');
-	// eventOptionsDiv.setAttribute('style','position:absolute;top:1px;left:150px;margin:5px;padding:5px;background-color:#eeeeee');
 	document.getElementById('topPanel').appendChild(eventOptionsDiv);
 	
 	var eventNameDiv = document.createElement('div');
 	eventNameDiv.setAttribute('id','eventNameDiv');
-	// eventNameDiv.setAttribute('style','padding:3px;font-weight:bold');
 	document.getElementById('eventOptions').appendChild(eventNameDiv);
 
-	var eventName = eventHash[events][0];
+	var eventName = eventHash[events].eventName;
 	var printEventName = document.createTextNode(eventName);
 	document.getElementById('eventNameDiv').appendChild(printEventName);
 	
@@ -114,6 +114,11 @@ function showEventOptions(events) {
 	roundInput.setAttribute('max','5');
 	roundInput.setAttribute('value','1');
 	roundInput.setAttribute('size','1');
+	var clickFunction = function(){ showRoundOptions(events); };
+	roundInput.onclick = clickFunction;
+	roundInput.onblur = clickFunction;
+	roundInput.onkeypress = clickFunction;
+	roundInput.onchange = clickFunction;
 
 	document.getElementById('eventOptions').appendChild(text1);
 	document.getElementById('eventOptions').appendChild(roundInput);
@@ -124,20 +129,15 @@ function showEventOptions(events) {
 		scrambleInput.setAttribute('type','number');
 		scrambleInput.setAttribute('min','1');
 		scrambleInput.setAttribute('max','40');
-		scrambleInput.setAttribute('value',eventHash[events][2]);
+		scrambleInput.setAttribute('value',eventHash[events].defaultScrambles);
 		scrambleInput.setAttribute('size','1');
+		scrambleInput.onclick = clickFunction;
+		scrambleInput.onblur = clickFunction;
+		scrambleInput.onkeypress = clickFunction;
+		scrambleInput.onchange = clickFunction;
 		document.getElementById('eventOptions').appendChild(text2);
 		document.getElementById('eventOptions').appendChild(scrambleInput);
 	}
-		
-	var submitButton = document.createElement('input');
-	submitButton.setAttribute('type','submit');
-	submitButton.setAttribute('value','Add');
-	submitButton.setAttribute('style','margin:3px;');
-	var clickFunction = function(){ showRoundOptions(events); };
-	submitButton.onclick = clickFunction;
-	document.getElementById('eventOptions').appendChild(submitButton);
-	
 }
 
 function showRoundOptions(events) {
@@ -150,7 +150,6 @@ function showRoundOptions(events) {
 
 	var roundOptionsDiv = document.createElement('div');
 	roundOptionsDiv.setAttribute('id','roundOptions');
-	// roundOptionsDiv.setAttribute('style','margin:2px;padding:3px;background-color:#dddddd');
 	document.getElementById('eventOptions').appendChild(roundOptionsDiv);
 	
 	for (i=1;i<=numRounds;i++) {
@@ -198,39 +197,40 @@ function showRoundOptions(events) {
 }
 
 function addScrambles(events,rounds,scrambles) {
-	var eventName = eventHash[events][0];
-	var scrambleType = eventHash[events][1];
+	var eventName = eventHash[events].eventName;
+	var scrambleType = eventHash[events].scrambleType;
 	
 	if (cuboid[scrambleType]) var scheme = document.getElementById('colorScheme').value;
 	
-	for (i=1;i<=rounds;i++) {
-		groupId = 'groups_'+i;
-		copiesId = 'copies_'+i;
+	for (var i=1;i<=rounds;i++) {
+		var groupId = 'groups_'+i;
+		var copiesId = 'copies_'+i;
 		var roundGroups = document.getElementById(groupId).value;
 		var copies = document.getElementById(copiesId).value;
-		if (roundGroups == 1) {
-			if (!scrambleArray[eventName+' Round '+i]) {
-				if (cuboid[scrambleType]) scrambleArray[eventName+' Round '+i]=[scrambleType,scrambles,copies,scheme];
-				else scrambleArray[eventName+' Round '+i]=[scrambleType,scrambles,copies];
-			}
-			else alert(eventName+' Round '+i+' already exists; skipping');
-		}
-		
-		else {
-			for (j=1;j<=roundGroups;j++) {
-				if (!scrambleArray[eventName+' Round '+i+' Group '+j]) {
-					if (cuboid[scrambleType]) scrambleArray[eventName+' Round '+i+' Group '+j]=[scrambleType,scrambles,copies,scheme];
-					else scrambleArray[eventName+' Round '+i+' Group '+j]=[scrambleType,scrambles,copies];
-				}
-				else alert(eventName+' Round '+i+' Group '+j+' already exists; skipping');
-			}
+		for (var j=1;j<=roundGroups;j++) {
+			if (rounds > 1) var roundTitle = eventName+' Round '+i;
+			else var roundTitle = eventName;
+			if (roundGroups > 1) roundTitle += ' Group '+j;
+ 			if (!scrambleArray[roundTitle]) {
+  				if (cuboid[scrambleType]) scrambleArray[roundTitle]={ scrambleType: scrambleType, scrambleCount: scrambles, copies: copies, scheme: scheme };
+ 				else scrambleArray[roundTitle]={ scrambleType: scrambleType, scrambleCount: scrambles, copies: copies };
+ 			}
+ 			else alert(roundTitle + ' already exists; skipping');
 		}
 	}
 
-	updateScrambleArray();
+	updateScrambleTable();
 	
 	var d = document.getElementById('eventOptions');
 	document.getElementById('topPanel').removeChild(d);
+}
+
+function editScrambles() {
+	// TODO
+}
+
+function updateScrambles() {
+	// TODO
 }
 
 function resetEvent() {
@@ -243,49 +243,124 @@ function resetAllTheThings() {
 		for (var i in scrambleArray) {
 			delete scrambleArray[i];
 		}
-		updateScrambleArray();
+		if (pendingScrambleRequest) {
+			pendingScrambleRequest.cancel();
+			pendingScrambleRequest = null;
+			document.getElementById('scrambleButton').value = "Get Scrambles";
+			document.getElementById('scrambleButton').removeAttribute('disabled');
+		}
+		updateScrambleTable();
 		document.getElementById('formContainer').style.display = "none";
 	}
 }
 
-function updateScrambleArray() {
-	var headerRow = "<tr class='head'><th width=200>Event Title</th><th width=90>Scrambles</th><th width=90>Copies</th><th width=10>&nbsp;</th></tr>";
-	var rows = '';
+function updateScrambleTable() {
+	var headerRow = document.createElement('tr');
+	headerRow.setAttribute('class','head');
+	headerRow.setAttribute('id','headerRow');
+
+	var headerCellTitle = document.createElement('th');
+	headerCellTitle.setAttribute('width','200');
+	headerCellTitle.innerHTML = 'Event Title';
+
+	var headerCellScrambles = document.createElement('th');
+	headerCellScrambles.setAttribute('width','90');
+	headerCellScrambles.innerHTML = 'Scrambles';
+
+	var headerCellCopies = document.createElement('th');
+	headerCellCopies.setAttribute('width','90');
+	headerCellCopies.innerHTML = 'Copies';
+
+	var headerCellBlank = document.createElement('th');
+	headerCellBlank.setAttribute('width','10');
+	headerCellBlank.innerHTML = '&nbsp\x3B';
+
+	document.getElementById('scrambleTable').innerHTML='';
+	document.getElementById('scrambleTable').appendChild(headerRow);
+	document.getElementById('headerRow').appendChild(headerCellTitle);
+	document.getElementById('headerRow').appendChild(headerCellScrambles);
+	document.getElementById('headerRow').appendChild(headerCellCopies);
+	document.getElementById('headerRow').appendChild(headerCellBlank);
+
 	var j = 0;
 	for (var i in scrambleArray) {
-		if (!scrambleArray[i][0]) break;
 		if (j % 2 == 0) var rowColor="even";
 		else var rowColor="odd";
-		rows = rows+"<tr class='"+rowColor+"'><td>"+i+"</td><td align='center'>"+scrambleArray[i][1]+"</td><td align='center'>"+scrambleArray[i][2]+"</td><td align='center'><a href=\"javascript:deleteScramble('"+i+"')\">x</a></td></tr>";
+
+		var newRow = document.createElement('tr');
+		newRow.setAttribute('class',rowColor);
+		var rowId = 'row'+j;
+		newRow.setAttribute('id',rowId);
+
+		var titleCell = document.createElement('td');
+		var titleId = 'title'+j;
+		titleCell.setAttribute('id',titleId);
+		titleCell.innerHTML = i;
+
+		var scramblesCell = document.createElement('td');
+		var scramblesId = 'scrambles'+j;
+		scramblesCell.setAttribute('id',scramblesId);
+		scramblesCell.setAttribute('align','center');
+		scramblesCell.innerHTML = scrambleArray[i].scrambleCount;
+
+		var copiesCell = document.createElement('td');
+		var copiesId = 'copies'+j;
+		copiesCell.setAttribute('id',copiesId);
+		copiesCell.setAttribute('align','center');
+		copiesCell.innerHTML = scrambleArray[i].copies;
+
+		var deleteCell = document.createElement('td');
+		var deleteId = 'delete'+j;
+		deleteCell.setAttribute('id',deleteId);
+		deleteCell.innerHTML = "<a href=\"javascript:deleteScramble('"+i+"')\">x</a>";
+
+		document.getElementById('scrambleTable').appendChild(newRow);
+		document.getElementById(rowId).appendChild(titleCell);
+		document.getElementById(rowId).appendChild(scramblesCell);
+		document.getElementById(rowId).appendChild(copiesCell);
+		document.getElementById(rowId).appendChild(deleteCell);
+
 		j++;
 	}
-	document.getElementById('scrambleTable').innerHTML=headerRow+rows;
-	if (rows == '') document.getElementById('scrambleButton').disabled = "disabled";
+	if (j == 0) document.getElementById('scrambleButton').disabled = "disabled";
 	else document.getElementById('scrambleButton').removeAttribute('disabled');
 	document.getElementById('formContainer').style.display = "none";
 }
 
 function deleteScramble(index) {
 	delete scrambleArray[index];
-	updateScrambleArray();
+	updateScrambleTable();
+}
+
+function request2String(i) {
+	var str = scrambleArray[i].scrambleType+'*'+scrambleArray[i].scrambleCount+'*'+scrambleArray[i].copies;
+	var scrambleType = scrambleArray[i].scrambleType;
+	if (cuboid[scrambleType]) {
+		str = str+'*'+scrambleArray[i].scheme;
+	}
+	return str;
+}
+function request2Uri(scrambleArray) {
+	var uri = ''
+	for (var roundTitle in scrambleArray) {
+		var str = request2String(roundTitle);
+		if (uri != '') uri += '&';
+		uri += roundTitle+'='+str;
+	}
+	return uri;	
 }
 
 function scrambleAllTheThings() {
-	var compName = document.getElementById('competitionName').value;
+	var compName = document.getElementById('globalTitle').value;
+	compName = encodeURIComponent(compName);
 	if (compName == '') compName = 'scramble';
 
 	var jsonUrl = compName+'.json?';
-	var variableString = '';
+	var variableString = request2Uri(scrambleArray);
 	
-	for (var i in scrambleArray) {
-		if (!scrambleArray[i][0]) break;
-		var puzzleRequest = scrambleArray[i].join('*');
-		variableString = variableString+i+'='+puzzleRequest+'&';
-	}
-	
-	jsonUrl = jsonUrl+variableString;
+	jsonUrl += variableString;
 
-	var pendingScrambleRequest = new Request.JSON({
+	pendingScrambleRequest = new Request.JSON({
 		url: jsonUrl,
 		onRequest: function() {
 			document.getElementById('scrambleButton').value = "loading...";
@@ -320,7 +395,7 @@ function scrambleAllTheThings() {
 
 <body>
 <div id="head">
-Competition Name: <input type="text" name="competitionName" id="competitionName" size="24" /> 
+Competition Name: <input type="text" id="globalTitle" size="24" /> 
 Color Scheme: <select name="colorScheme" id="colorScheme"> <option selected="selected" value="bygorw">Western</option><option value="ybgorw">Japanese</option></select>
 
 </div>
@@ -328,7 +403,8 @@ Color Scheme: <select name="colorScheme" id="colorScheme"> <option selected="sel
 <div id="topPanel">
 
 <div id="selector">
-<select id="eventName" size="17">
+
+<select id="eventSelector" size="17">
 	<option value="3x3" onclick="javascript:showEventOptions('3x3');">Rubik's cube</option>
 	<option value="2x2" onclick="javascript:showEventOptions('2x2');">2x2</option>
 	<option value="4x4" onclick="javascript:showEventOptions('4x4');">4x4</option>
@@ -347,6 +423,7 @@ Color Scheme: <select name="colorScheme" id="colorScheme"> <option selected="sel
 	<option value="5bld" onclick="javascript:showEventOptions('5bld');">5x5 blindfolded</option>
 	<option value="multi" onclick="javascript:showEventOptions('multi');">Multi BLD</option>
 </select>
+
 </div>
 
 </div>
