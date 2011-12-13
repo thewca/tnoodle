@@ -571,7 +571,7 @@ class EclipseProject(TmtProject):
 			tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
 			print tagCommand
 			assert 0 == os.system(tagCommand)
-			print "Successfully created tag %s"
+			print "Successfully created tag %s" % tag
 
 			githubUpload.githubConnect()
 			if not githubUpload.githubUpload(self.distJarFile):
