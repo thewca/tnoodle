@@ -484,10 +484,14 @@ class EclipseProject(TmtProject):
 		if not isdir(self.distDir):
 			os.mkdir(self.distDir)
 	
-	def distJarFile(self):
+	def distJarFile(self, includeVersion=True):
 		# This is a function rather than a static attribute because
 		# tmt.VERSION can change (see release target).
-		return join(self.distDir, '%s-%s.jar' % ( self.fullName, tmt.VERSION ) )
+		if includeVersion:
+			fileName = '%s-%s.jar' % ( self.fullName, tmt.VERSION )
+		else:
+			fileName = '%s.jar' % self.fullName
+		return join(self.distDir, fileName)
 
 	def compile(self):
 		tempBin = join(self.name, '.bin')
@@ -643,6 +647,10 @@ Implementation-Version: %s
 		jar.writestr('META-INF/MANIFEST.MF', manifest)
 
 		jar.close()
+
+		noVersionPath = self.distJarFile(includeVersion=False)
+		os.unlink(noVersionPath)
+		os.symlink(basename(self.distJarFile()), noVersionPath)
 
 		print 'Successfully created %s with main class %s' % ( self.distJarFile(), self.main )
 
