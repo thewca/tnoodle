@@ -747,8 +747,8 @@ var TimesTable = new Class({
 		var scrollTop = this.tbody.scrollTop;
 		var scrollBottom = scrollTop + this.tbody.getSize().y;
 		
-		var elTop = tr.getPosition(tr.getParent()).y;
-		var elBottom = tr.getSize().y + elTop;
+		var elTop = this.tbody.scrollHeight + tr.getPosition(tr.getParent()).y;
+		var elBottom = this.tbody.scrollHeight + tr.getSize().y + elTop;
 		
 		if(elTop < scrollTop) {
 			//we scroll up just until the top of the row is visible
@@ -1180,4 +1180,3 @@ var TimesTable = new Class({
 		return this.preferredWidth + 2; //i have no idea what this 2 is for...
 	}
 });
-TimesTable.implement(new Events());

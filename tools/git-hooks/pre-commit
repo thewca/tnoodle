@@ -6,9 +6,13 @@ import imp
 
 tmt = imp.load_source("tmt", sys.path[0]+"/../../tmt")
 
+JSLINT_ENABLED = True
+
 JSLINT_IGNORED_FILES = {
 	'timer/src/tnoodleServerHandler/timer/js/mootools-1.2.4-core.js',
 	'timer/src/tnoodleServerHandler/timer/js/mootools-1.2.4.4-more.js',
+	'timer/src/tnoodleServerHandler/timer/js/mootools-core-1.4.2.js',
+	'timer/src/tnoodleServerHandler/timer/js/mootools-more-1.4.0.1.js',
 	'timer/src/tnoodleServerHandler/timer/js/stacktrace.js',
 	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-core-1.4.1-full-nocompat.js',
 	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-more-1.4.0.1.js',
@@ -22,8 +26,11 @@ UNCOMMITABLE_PHRASES = {
 	'<'+'<'+'<',
 }
 
+def fail(msg):
+	sys.exit(msg + " Use git commit --no-verify if you really know what you're doing.")
+
 # Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
-# This shoudl jive with git's definition of binary.
+# This should jive with git's definition of binary.
 def is_binary(filename):
     """Return true if the given filename is binary.
     @raise EnvironmentError: if the file does not exist or cannot be accessed.
@@ -49,7 +56,7 @@ lsFilesCmd = None
 if len(sys.argv) == 1:
 	# We we're called as a result of a commit, we only check the files that
 	# have been edited.
-	lsFilesCmd = "git diff --name-only"
+	lsFilesCmd = "git diff --cached --name-only"
 else:
 	# If any command line arguments are given, we'll check every file under
 	# version control.
@@ -62,30 +69,30 @@ for f in files:
 		# This file must have been deleted as part of this commit.
 		continue
 	fileName, ext = os.path.splitext(f)
-	if ext == '.js' or ext == '.html':
+	if JSLINT_ENABLED and ( ext == '.js' or ext == '.html' ):
 		if f in JSLINT_IGNORED_FILES:
 			print "Not jslinting %s" % f
-			continue
-		print "jslinting %s" % f
-		argv = [ 'java', '-jar', 'lib/jslint4java-1.4.6.jar', f ]
-		retVal, stdout, stderr = tmt.runCmd(argv)
-		failedJsLint = False
-		for line in stdout.split('\n'):
-			parsedError = line.split(":")
-			if len(parsedError) != 5:
-				if line != '':
-					assert False, line + " doesn't contain expected number of :'s"
-				continue
-			_, fileName, lineNumber, col, error = parsedError
-			if error in JSLINT_IGNORED_ERRORS:
-				print "Ignoring error %s" % line
-			else:
-				print "FATAL ERROR %s" % line
-				failedJsLint = True
+		else:
+			print "jslinting %s" % f
+			argv = [ 'java', '-jar', 'lib/jslint4java-1.4.6.jar', f ]
+			retVal, stdout, stderr = tmt.runCmd(argv)
+			failedJsLint = False
+			for line in stdout.split('\n'):
+				parsedError = line.split(":")
+				if len(parsedError) != 5:
+					if line != '':
+						assert False, line + " doesn't contain expected number of :'s"
+					continue
+				_, fileName, lineNumber, col, error = parsedError
+				if error in JSLINT_IGNORED_ERRORS:
+					print "Ignoring error %s" % line
+				else:
+					print "FATAL ERROR %s" % line
+					failedJsLint = True
 
-		# TODO - returning 256 is treated as success by git?
-		if failedJsLint:
-			sys.exit("Failed jslint. Use git commit --no-verify if you really know what you're doing.")
+			# TODO - returning 256 is treated as success by git?
+			if failedJsLint:
+				fail("Failed jslint.")
 	
 	if is_binary(f):
 		#print "Skipping binary file %s" % f
@@ -96,8 +103,8 @@ for f in files:
 		for lineNumber, line in enumerate(lines):
 			for uncommitablePhrase in UNCOMMITABLE_PHRASES:
 				if uncommitablePhrase in line:
-					print "%s:%s:%s" % ( f, lineNumber, line )
+					print "%s:%s:%s" % ( f, lineNumber+1, line )
 					uncommitableCharacterFound = True
 
 		if uncommitableCharacterFound:
-			sys.exit("Found characters that may not be committed to revision control")
+			fail("Found characters that may not be committed to revision control.")

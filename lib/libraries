@@ -9,6 +9,11 @@ Strings.java http://weblogs.java.net/blog/176/2006/01/13/natural-string-order
 MTRandom.java http://goui.net/doc/net/goui/util/MTRandom.html
 Base64.java http://www.wikihow.com/Encode-a-String-to-Base64-With-Java
 
+**** Java libraries not used at runtime ****
+jslint4java-1.3.3.jar: http://jslint4java.googlecode.com/svn/docs/1.3.3/ant.html
+plugin.jar: Needed to compile code using the JSObject object. This applies only to applets. The library isn't included in the dist jar becuase browsers seem to provide it.
+yui-compressor-ant-task-0.5.jar & yuicompressor-2.4.2.jar: https://github.com/jfly/yui-compressor-ant-task
+
 **** Media ****
 http://www.iconspedia.com/icon/rubik-cube-1165-.html
 http://www.famfamfam.com/lab/icons/silk/
@@ -19,11 +24,10 @@ http://upload.wikimedia.org/wikipedia/commons/f/ff/Square-1_half-turn.jpg
 
 **** Javascript libraries *****
 	Note: some of these have been modified, so don't upgrade blindly
+mootools-core-1.4.2.js: http://mootools.net/core/91d7f00356dcd42b2ce8e56d17714518
+mootools-more-1.4.0.1.js: http://mootools.net/more/99f9dc2eb198e61569abc9839529ea00
+
+
 mootools-1.2.4-core.js: http://mootools.net
 mootools-1.2.4.4-more.js: http://mootools.net
 stacktrace.js: ttps://github.com/eriwen/javascript-stacktrace
-
-**** Ant/development libaries *****
-yui-compressor-ant-task-0.5.jar & yuicompressor-2.4.2.jar: https://github.com/jfly/yui-compressor-ant-task
-jslint4java-1.3.3.jar: http://jslint4java.googlecode.com/svn/docs/1.3.3/ant.html
-plugin.jar: Needed to compile code using the JSObject object. This applies only to applets. The library isn't included in the dist jar becuase browsers seem to provide it.

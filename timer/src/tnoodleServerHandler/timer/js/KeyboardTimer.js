@@ -359,7 +359,7 @@ var KeyboardTimer = new Class({
 		}
 	},
 	stopRender: function() {
-		$clear(this.timerId);
+		clearInterval(this.timerId);
 		this.timerId = null;
 		this.redraw();
 	},

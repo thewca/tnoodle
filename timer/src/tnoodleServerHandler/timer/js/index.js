@@ -296,7 +296,7 @@ window.addEvent('domready', function() {
 	var editingShortcutField = null;
 	var BlockingKeyboard = new Class({
 		Extends: Keyboard,
-		handle: function(event, type) {
+		_handle: function(event, type) {
 			if(document.activeElement == editingShortcutField) {
 				var type_keys = type.split(":");
 				if(type_keys[1].contains('tab')) {
@@ -312,7 +312,7 @@ window.addEvent('domready', function() {
 				if(type_keys[0] == "keydown") {
                     setTimeout(function() {
                         // For some reason, calling event.stop() isn't
-                        // enough to stpo opera from adding the key to the textfield
+                        // enough to stop opera from adding the key to the textfield
                         // This little hack seems to work, however
                         editingShortcutField.value = type_keys[1];
                     }, 0);
@@ -345,6 +345,7 @@ window.addEvent('domready', function() {
 	}
 
 	var keyboard = new BlockingKeyboard();
+	keyboard.activate();
 	tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT = 'Start timer (try "a+;")';
 	var shortcuts = new Hash({
 		'Times': [

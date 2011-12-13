@@ -16,6 +16,10 @@ function xAddListener(obj, event, func, useCapture) {
 	}
 }
 
+var $chk = function(obj){
+    return !!(obj || obj === 0);
+};
+
 /*** END STUPID IE ***/
 var tnoodle = tnoodle || {};
 
@@ -338,10 +342,10 @@ tnoodle.server = function(host, port) {
 	};
 	this.getSessions = function(puzzle, event) {
 		var sessions = this.sessions.slice();
-		if($defined(puzzle)) {
+		if(puzzle !== undefined) {
 			sessions = sessions.filter(function(session) { return session.getPuzzle() == puzzle; });
 		}
-		if($defined(event)) {
+		if(event !== undefined) {
 			sessions = sessions.filter(function(session) { return session.getEvent() == event; });
 		}
 		sessions.sort(function(a, b) {

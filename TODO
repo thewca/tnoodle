@@ -134,6 +134,7 @@
 
 -read times/metronome
 -gmaps style copy scramble
+	-fix bug with copy pasting current scramble
 -pdf page #
 
 -infinite seeded scrambles
@@ -141,16 +142,16 @@
 -shelley's gui
 -create own assertions facility (java & js (look into js exceptions...))
 -Tac style error catching + pdb
+-push mootools fixes upstream
 
 ### TNoodleMakeTools
--nuke build.xml files
--VERSIONING/RELEASE CYCLE
-	-create website with download (automate releasing?)
++nuke build.xml files
++VERSIONING/RELEASE CYCLE
+	+create website with download (automate releasing?)
 -new build system? again?! seriously considering gradle...
-	-symlink crap on windows is *increadibly* slow
+	-symlink crap on windows is *incredibly* slow
 -winstone! java servlets!
 	-injectable analytics js?
 	-consolidate context file/short name/long name for scramble plugins
-	-test plugins when loaded from file, not jar
-	-test plugins when loaded from applet
-	-scramble icon won't load from file
+	-load everything from file! extract all to a folder on first startup
+		-plugins/scramble icons
