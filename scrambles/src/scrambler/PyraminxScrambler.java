@@ -515,6 +515,6 @@ public class PyraminxScrambler extends Scrambler {
 
 	@Override
 	public String getShortName() {
-		return "pyro";
+		return "pyram";
 	}
 }
