@@ -590,7 +590,9 @@ class EclipseProject(TmtProject):
 				print "Deleting tag %s" % tag
 				return
 
-			assert 0 == os.system('git push --tags')
+			pushTagsCommand = 'git push --tags'
+			print pushTagsCommand
+			assert 0 == os.system(pushTagsCommand)
 	
 	def dist(self):
 		tmt._make(projectName=self.name, command='compile')
