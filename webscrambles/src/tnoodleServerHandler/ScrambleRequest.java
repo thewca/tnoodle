@@ -522,8 +522,8 @@ class ScrambleRequest {
 		ZipOutputStream zipOut = new ZipOutputStream(baosZip);
 		zipOut.setComment(globalTitle + " zip created on " + Utils.SDF.format(generationDate));
 		for(ScrambleRequest scrambleRequest : scrambleRequests) {
-			String fileName = scrambleRequest.title + ".pdf";
-			ZipEntry entry = new ZipEntry(fileName);
+			String pdfFileName = "pdf/" + scrambleRequest.title + ".pdf";
+			ZipEntry entry = new ZipEntry(pdfFileName);
 			zipOut.putNextEntry(entry);
 
 			PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
@@ -532,7 +532,19 @@ class ScrambleRequest {
 			zipOut.write(b);
 
 			zipOut.closeEntry();
+			
+			String txtFileName = "txt/" + scrambleRequest.title + ".txt";
+			entry = new ZipEntry(txtFileName);
+			zipOut.putNextEntry(entry);
+			zipOut.write(Utils.join(scrambleRequest.scrambles, "\r\n").getBytes());
+			zipOut.closeEntry();
 		}
+		
+		ZipEntry entry = new ZipEntry(globalTitle + ".json");
+		zipOut.putNextEntry(entry);
+		zipOut.write(GSON.toJson(scrambleRequests).getBytes());
+		zipOut.closeEntry();
+		
 		zipOut.close();
 		
 		return baosZip;
