@@ -97,8 +97,14 @@ class tmt:
 	def _cdEntryPoint(self):
 		os.chdir(entryPoint())
 		assert exists('README.textile')
-		assert exists('VERSION')
-		self.VERSION = file('VERSION').read().strip()
+
+		p = subprocess.Popen([ 'git', 'describe' ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		stdout, stderr = p.communicate()
+		assert p.returncode == 0
+		self.VERSION = stdout.strip()
+		versionPrefix = "v"
+		assert self.VERSION.startswith(versionPrefix)
+		self.VERSION = self.VERSION[len(versionPrefix):]
 
 	def _loadTmtProjects(self):
 		self._cdEntryPoint()
@@ -534,8 +540,10 @@ class EclipseProject(TmtProject):
 			print "RELEASING", self.name
 			self.dist()
 
-			tag = "v%s" % tmt.VERSION
-			tagMessage = "version %s" % tmt.VERSION
+			assert exists('VERSION')
+			newVersion = file('VERSION').read().strip()
+			tag = "v%s" % newVersion
+			tagMessage = "version %s" % newVersion
 			assert 0 == os.system("git tag -a %s -m '%s'" % (tag, tagMessage) )
 			print "Successfully created tag %s, be sure to commit your code and do a 'git push --tags' after this." % tag
 
