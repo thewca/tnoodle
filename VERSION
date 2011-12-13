@@ -1,1 +1,2 @@
-0.2
+# After editing this file, be sure to run "tmt make release -p timer"!
+0.1.3

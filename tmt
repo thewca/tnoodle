@@ -541,18 +541,25 @@ class EclipseProject(TmtProject):
 			self.dist()
 
 			assert exists('VERSION')
-			newVersion = file('VERSION').read().strip()
+			versionFileContents = file('VERSION').read().split('\n')
+			newVersion = None
+			for line in versionFileContents:
+				if not line.startswith("#"):
+					newVersion = line
+					break
+			assert newVersion
 			tag = "v%s" % newVersion
 			tagMessage = "version %s" % newVersion
-			assert 0 == os.system("git tag -a %s -m '%s'" % (tag, tagMessage) )
+			tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
+			print tagCommand
+			assert 0 == os.system(tagCommand)
 			print "Successfully created tag %s, be sure to commit your code and do a 'git push --tags' after this." % tag
 
 			githubUpload.githubConnect()
 			if not githubUpload.githubUpload(self.distJarFile):
 				print "Failed to upload %s, see above for details" % self.distJarFile
+				print "Deleting tag %s" % tag
 				return
-
-
 	
 	def dist(self):
 		# TODO - check if existing archive is up to date
