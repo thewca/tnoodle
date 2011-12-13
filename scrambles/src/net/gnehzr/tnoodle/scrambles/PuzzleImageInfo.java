@@ -9,11 +9,11 @@ import java.awt.geom.GeneralPath;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
-import net.gnehzr.tnoodle.utils.Utils;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import net.gnehzr.tnoodle.utils.Utils;
 
 public class PuzzleImageInfo {
 	public HashMap<String, GeneralPath> faces;

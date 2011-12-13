@@ -134,7 +134,7 @@ def githubUpload(filePath):
 		#print uploadData
 		#print data
 		#urllib2.urlopen(uploadUrl, data=data)
-		retVal = os.system(curl)#<<< TODO - this is so awful, shoot me now
+		retVal = os.system(curl)#<<<TODO - this is so awful, shoot me now
 		print
 		return retVal == 0
 	except urllib2.HTTPError, e:

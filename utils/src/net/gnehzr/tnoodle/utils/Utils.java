@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -195,6 +196,25 @@ public final class Utils {
 	public static synchronized void registerTypeAdapter(Class<?> clz, Object typeAdapter) {
 		gsonBuilder = gsonBuilder.registerTypeAdapter(clz, typeAdapter);
 		GSON = gsonBuilder.create();
+
+		Class<?> c = GSON.getClass();
+		try {
+			// GSON encodes the string "'" as "\u0027" by default.
+			// This behavior is controlled by the htmlSafe attribute, but
+			// htmlSafe is not publicly accessible ... until you use a
+			// little bit of reflection =).
+			Field f = c.getDeclaredField("htmlSafe");
+			f.setAccessible(true);
+			f.setBoolean(GSON, false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
 	}
 	static {
 		registerTypeAdapter(Color.class, new Colorizer());
@@ -301,5 +321,15 @@ public final class Utils {
 			System.out.println("Please turn on assertions by passing -ea on the command line.");
 			//System.exit(1); //<<< TODO - create own assertion facility
 		} catch(AssertionError e) {}
+	}
+	
+	public static void main(String[] args) {
+		
+		System.out.println(GSON.toJson("'"));
+//		StringWriter out = new StringWriter();
+//	    JsonWriter jsonWriter = new JsonWriter(out);
+//	    jsonWriter.setHtmlSafe(true);
+//	    GSON.toJson("'", "'".getClass(), jsonWriter);
+//	    System.out.println(out.toString());
 	}
 }
