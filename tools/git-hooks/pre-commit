@@ -13,11 +13,37 @@ JSLINT_IGNORED_FILES = {
 	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-core-1.4.1-full-nocompat.js',
 	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-more-1.4.0.1.js',
 	'webscrambles/src/tnoodleServerHandler/webscrambles/powertools-1.1.1.js',
-	'webscrambles/src/tnoodleServerHandler/webscrambles/scramblegen.html',#<<<
 }
 JSLINT_IGNORED_ERRORS = {
 	'type is unnecessary.',
 }
+
+UNCOMMITABLE_PHRASES = {
+	'<'+'<'+'<',
+}
+
+# Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
+# This shoudl jive with git's definition of binary.
+def is_binary(filename):
+    """Return true if the given filename is binary.
+    @raise EnvironmentError: if the file does not exist or cannot be accessed.
+    @attention: found @ http://bytes.com/topic/python/answers/21222-determine-file-type-binary-text on 6/08/2010
+    @author: Trent Mick <TrentM@ActiveState.com>
+    @author: Jorge Orpinel <jorge@orpinel.com>"""
+    fin = open(filename, 'rb')
+    try:
+        CHUNKSIZE = 1024
+        while 1:
+            chunk = fin.read(CHUNKSIZE)
+            if '\0' in chunk: # found null byte
+                return True
+            if len(chunk) < CHUNKSIZE:
+                break # done
+    # A-wooo! Mira, python no necesita el "except:". Achis... Que listo es.
+    finally:
+        fin.close()
+
+    return False
 
 lsFilesCmd = None
 if len(sys.argv) == 1:
@@ -30,11 +56,11 @@ else:
 	lsFilesCmd = "git ls-files"
 files = os.popen(lsFilesCmd).read().split('\n')
 
+
 for f in files:
 	if not os.path.exists(f):
 		# This file must have been deleted as part of this commit.
 		continue
-	#success = os.system("ant -f timer/build.xml jslint")
 	fileName, ext = os.path.splitext(f)
 	if ext == '.js' or ext == '.html':
 		if f in JSLINT_IGNORED_FILES:
@@ -50,7 +76,7 @@ for f in files:
 				if line != '':
 					assert False, line + " doesn't contain expected number of :'s"
 				continue
-			_, file, lineNumber, col, error = parsedError
+			_, fileName, lineNumber, col, error = parsedError
 			if error in JSLINT_IGNORED_ERRORS:
 				print "Ignoring error %s" % line
 			else:
@@ -60,3 +86,18 @@ for f in files:
 		# TODO - returning 256 is treated as success by git?
 		if failedJsLint:
 			sys.exit("Failed jslint. Use git commit --no-verify if you really know what you're doing.")
+	
+	if is_binary(f):
+		#print "Skipping binary file %s" % f
+		pass
+	else:
+		uncommitableCharacterFound = False
+		lines = file(f).read().split("\n")
+		for lineNumber, line in enumerate(lines):
+			for uncommitablePhrase in UNCOMMITABLE_PHRASES:
+				if uncommitablePhrase in line:
+					print "%s:%s:%s" % ( f, lineNumber, line )
+					uncommitableCharacterFound = True
+
+		if uncommitableCharacterFound:
+			sys.exit("Found characters that may not be committed to revision control")
