@@ -65,11 +65,7 @@ def checkGitHooks():
 	if ( not os.path.exists(gitHooksFolder) or
 		 not os.path.islink(gitHooksFolder) or
 		 not os.readlink(gitHooksFolder) == target ):
-		try:
-			os.lstat(gitHooksFolder)
-			os.unlink(gitHooksFolder)
-		except:
-			pass
+		rmtree(gitHooksFolder)
 		print "Setting up git hooks %s -> %s" % ( gitHooksFolder, target )
 		os.symlink(target, gitHooksFolder)
 checkGitHooks()
