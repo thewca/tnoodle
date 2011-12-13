@@ -5,5 +5,6 @@ bin/
 .externalToolBuilders
 .metadata
 tmtprojectc
+tmtc
 *.pyc
 *.log.*

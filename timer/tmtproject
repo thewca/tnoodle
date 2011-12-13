@@ -9,4 +9,7 @@ class Project(tmt.EclipseProject):
 		tmt.Server.addPlugin(self)
 		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/timer/' ]
 
+	def compile(self):
+		tmt.EclipseProject.compile(self)
+
 Project('timer')

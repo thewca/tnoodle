@@ -6,6 +6,13 @@ import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
 
+def entryPoint():
+	return split(abspath(__file__))[0]
+sys.path.append(entryPoint()+'/tools')
+import githubUpload
+
+TXT_FILE_EXTENSIONS = [ '.js' ]
+
 def windowsOrCygwin():
 	return sys.platform == 'win32' or sys.platform == 'cygwin'
 
@@ -88,8 +95,10 @@ def topologicalSort(rootProject):
 class tmt:
 
 	def _cdEntryPoint(self):
-		os.chdir(split(abspath(__file__))[0])
+		os.chdir(entryPoint())
 		assert exists('README.textile')
+		assert exists('VERSION')
+		self.VERSION = file('VERSION').read().strip()
 
 	def _loadTmtProjects(self):
 		self._cdEntryPoint()
@@ -169,7 +178,7 @@ class tmt:
 		parser_make.add_argument(
 			'command',
 			nargs='?',
-			choices=['compile', 'dist', 'run', 'check', 'clean'],
+			choices=['compile', 'dist', 'release', 'run', 'check', 'clean'],
 			default='compile',
 			help='command!')
 		parser_make.add_argument(
@@ -302,6 +311,8 @@ class TmtProject(object):
 		assert False
 	def dist(self):
 		assert False
+	def release(self):
+		pass
 	def run(self):
 		assert False
 	def clean(self):
@@ -454,6 +465,9 @@ class EclipseProject(TmtProject):
 		self.bin = join(self.name, 'bin')
 		self.distDir = join(self.name, 'dist')
 		self.src = join(self.name, 'src')
+		self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
+	
+		self.distJarFile = join(self.distDir, '%s-%s.jar' % ( self.fullName, tmt.VERSION ) )
 		if not isdir(self.bin):
 			os.mkdir(self.bin)
 		if not isdir(self.distDir):
@@ -513,14 +527,30 @@ class EclipseProject(TmtProject):
 
 		print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, self.bin )
 		os.rename(tempBin, self.bin)
+
+	def release(self):
+		# TODO - this method is getting called for every project in the dependency heirarchy
+		if tmt.args.project == self.name:
+			print "RELEASING", self.name
+			self.dist()
+
+			tag = "v%s" % tmt.VERSION
+			tagMessage = "version %s" % tmt.VERSION
+			assert 0 == os.system("git tag -a %s -m '%s'" % (tag, tagMessage) )
+			print "Successfully created tag %s, be sure to commit your code and do a 'git push --tags' after this." % tag
+
+			githubUpload.githubConnect()
+			if not githubUpload.githubUpload(self.distJarFile):
+				print "Failed to upload %s, see above for details" % self.distJarFile
+				return
+
+
 	
 	def dist(self):
 		# TODO - check if existing archive is up to date
 		# TODO - support for version numbers?
 		tmt._make(projectName=self.name, command='compile')
-		capName = self.name[0].upper() + self.name[1:]
-		jarName = join(self.distDir, 'TNoodle%s.jar' % capName)
-		jar = zipfile.ZipFile(jarName, "w", compression=zipfile.ZIP_DEFLATED)
+		jar = zipfile.ZipFile(self.distJarFile, "w", compression=zipfile.ZIP_DEFLATED)
 
 		jarDeps = []
 		javaDeps = []
@@ -548,17 +578,27 @@ class EclipseProject(TmtProject):
 					path = os.path.normpath(os.path.join(dirpath, name))
 					arcPath = os.path.relpath(path, project.bin)
 					if os.path.isfile(path):
-						jar.write(path, arcPath)
+						if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
+							txt = file(path).read()
+							# This might be a pretty heavy hammer, but who in the world
+							# would legitimately want to use the string "%%VERSION%%"?
+							# Famous last words?
+							txt = txt.replace("%%VERSION%%", tmt.VERSION)
+							jar.writestr(arcPath, txt)
+						else:
+							jar.write(path, arcPath)
 
 		manifest = """\
 Manifest-Version: 1.0
 Main-Class: %s
-""" % ( self.main )
+Implementation-Title: %s
+Implementation-Version: %s
+""" % ( self.main, self.fullName, tmt.VERSION )
 		jar.writestr('META-INF/MANIFEST.MF', manifest)
 
 		jar.close()
 
-		print 'Successfully created %s with main class %s' % ( jarName, self.main )
+		print 'Successfully created %s with main class %s' % ( self.distJarFile, self.main )
 
 	def run(self):
 		assert self.main, 'Main class not defined'

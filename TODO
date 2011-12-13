@@ -115,17 +115,16 @@
 	+get rid of Main-Class from jars that don't need them
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
 +pressing escape to close tnoodle popup doesn't restore focus
++background image/opacity
+	-provide some system for uploading your own image?
++thread safety! this must be done before giving to the WCA
++fmc generation
++cleanup readme.textile & root html (just add name, lol)
 
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
-+background image/opacity
-	-provide some system for uploading your own image?
-+thread safety! this must be done before giving to the WCA
-+fmc generation
-
--cleanup readme.textile & root html (just add name, lol)
 
 -saving times
 	-Add a note about opening multiple instances of tnt
@@ -140,39 +139,18 @@
 -infinite seeded scrambles
 
 -shelley's gui
--logging! I wanna see who's using this
--VERSIONING/RELEASE CYCLE
-	-create website with download (automate releasing?)
--create own assertions facility
+-create own assertions facility (java & js (look into js exceptions...))
 -Tac style error catching + pdb
 
 ### TNoodleMakeTools
--create a *fast* cgi script...put on lucas's server
--nuke createScramblers() static method in every scramble plugin
 -nuke build.xml files
--consolidate context file/short name/long name for scramble plugins
--test plugins when loaded from file, not jar
--test plugins when loaded from applet
--scramble icon won't load from file
--symlink crap on windows is *increadibly* slow
-
-
-### Analytics software
--2 big choices
--Log file analyzers (prob want the Extended Log File Format)
-	-getstats -> analog / reportmagic (written in c... urgh)
-	-webalyzer
-	-w3perl looks pretty good!
--Cookies/JS tracking
-	-Google analytics
-	-Yahoo analytics
-	-piwik
-
-???
-	-owa
-	-clicky (prob coockies/js)
-	-firestats
-	-bbclone.de
-	http://www.w3.org/TR/WD-logfile.html
-OWA - http://www.openwebanalytics.com/
-
+-VERSIONING/RELEASE CYCLE
+	-create website with download (automate releasing?)
+-new build system? again?! seriously considering gradle...
+	-symlink crap on windows is *increadibly* slow
+-winstone! java servlets!
+	-injectable analytics js?
+	-consolidate context file/short name/long name for scramble plugins
+	-test plugins when loaded from file, not jar
+	-test plugins when loaded from applet
+	-scramble icon won't load from file

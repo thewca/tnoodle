@@ -1,11 +1,15 @@
 #!/usr/bin/python
 
-import os, sys
+import os
+import sys
+import imp
+
+imp.load_source("tmt", sys.path[0]+"/../../tmt")
 
 files = os.popen("git diff --name-only").read().split('\n')
 files = filter(lambda f: f.endswith('.js'), files)
-if files:
-	success = os.system("ant -f timer/build.xml jslint")
+for f in files:
+	#success = os.system("ant -f timer/build.xml jslint")
 
 	# TODO - returning 256 is treated as success?
 	if success != 0:

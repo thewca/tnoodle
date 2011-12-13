@@ -39,10 +39,6 @@ import com.google.gson.JsonSerializer;
 
 
 /**
- * Subclasses of Scrambler must have a method with the following signature
- * <p><code>public static synchronized Scrambler[] createScramblers();</code></p>
- * Note the synchronized keyword! This method should return an array of Scramblers.
- * This is useful for CubeScrambler, so one class can deal with 2x2 through NxN cube scrambles.<br>
 	//TODO - optimal cross solver? lol
  * @author Jeremy Fleischman
  */
@@ -158,49 +154,17 @@ public abstract class Scrambler {
 			scramblers.putAll(plugins.getPlugins());
 		}
 		return scramblers;
-//		// load the Scramblers from the plugin directory
-//		URLClassLoader cl = null;
-//		try {
-//			cl = new URLClassLoader(new URL[] { folder.getParentFile().toURI().toURL() });
-//		} catch (MalformedURLException e2) {
-//			e2.printStackTrace();
-//		}
-//		ArrayList<Class<? extends Scrambler>> pluginScramblers = loadScramblers(cl, pluginScramblerNames);
-//		loadedScramblers.addAll(pluginScramblers); //now all the classpath scramblers are in loadedScramblers, followed by the plugins
-//
-//		for(Class<? extends Scrambler> clz : loadedScramblers) {
-//			try {
-//				Method createScramblers = clz.getMethod("createScramblers");
-//				if(!Modifier.isSynchronized(createScramblers.getModifiers())) {
-//					throw new NoSuchMethodException("createScramblers() must be synchronized (class " + clz.getCanonicalName() + ")");
-//				}
-//				Scrambler[] scramblerArray = (Scrambler[]) createScramblers.invoke(null);
-//				for(Scrambler scrambler : scramblerArray) {
-//					scramblers.put(scrambler.getShortName(), scrambler);
-//				}
-//			} catch(NoSuchMethodException e) {
-//				e.printStackTrace();
-//			} catch (IllegalArgumentException e) {
-//				e.printStackTrace();
-//			} catch (InvocationTargetException e) {
-//				e.printStackTrace();
-//			} catch (IllegalAccessException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		loadedAllScrambles = true;
-//		return scramblers;
 	}
 	
 	/**
 	 * TODO - comment
 	 */
 	protected void drawPuzzleIcon(Graphics2D g, Dimension size) {
-		//try {
-			//drawScramble(g, size, "", null);
-		//} catch(InvalidScrambleException e) {
-			//e.printStackTrace();
-		//}
+		try {
+			drawScramble(g, size, "", null);
+		} catch(InvalidScrambleException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -214,7 +178,7 @@ public abstract class Scrambler {
 //			in = new FileInputStream(f);
 //		} catch(FileNotFoundException e) {
 			in = getClass().getResourceAsStream(getShortName() + ".png");
-//		} 
+//		}
 		if(in != null) {
 			try {
 				Utils.fullyReadInputStream(in, bytes);
