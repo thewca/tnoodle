@@ -201,7 +201,7 @@ public final class Utils {
 		try {
 			// GSON encodes the string "'" as "\u0027" by default.
 			// This behavior is controlled by the htmlSafe attribute, but
-			// htmlSafe is not publicly accessible ... until you use a
+			// htmlSafe is not publicly accessible ... unless you use a
 			// little bit of reflection =).
 			Field f = c.getDeclaredField("htmlSafe");
 			f.setAccessible(true);
@@ -323,13 +323,4 @@ public final class Utils {
 		} catch(AssertionError e) {}
 	}
 	
-	public static void main(String[] args) {
-		
-		System.out.println(GSON.toJson("'"));
-//		StringWriter out = new StringWriter();
-//	    JsonWriter jsonWriter = new JsonWriter(out);
-//	    jsonWriter.setHtmlSafe(true);
-//	    GSON.toJson("'", "'".getClass(), jsonWriter);
-//	    System.out.println(out.toString());
-	}
 }
