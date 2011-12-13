@@ -565,7 +565,7 @@ function getSourceContext(file, line) {
 window.onerror = function(msg, file, line, stackTrace) {
 	var context = getSourceContext(file, line);
 	if(!stackTrace) {
-		var stackTrace = printStackTrace();
+		stackTrace = printStackTrace();
 		// This cuts out the backtrace in stacktrace.js
 		stackTrace = stackTrace.slice(3);
 	}
@@ -583,14 +583,16 @@ function assert(condition, message) {
 		var reAssertion = /.* \((.*):([0-9]+):([0-9]+)\)/;
 		var m = reAssertion.exec(assertionFrame);
 		var assertion = null;
+		var file = "?";
+		var lineNumber = "?";
 		if(m) {
-			var file = m[1];
-			var line = parseInt(m[2], 10);
-			assertion = p.getSource(file)[line - 1]; // ahh, indexing from 1
+			file = m[1];
+			lineNumber = parseInt(m[2], 10);
+			assertion = p.getSource(file)[lineNumber - 1]; // ahh, indexing from 1
 		} else {
 			assertion = 'Could not retrieve line of code at ' + assertionFrame;
 		}
-		window.onerror("Assertion failure!", file, line, stackTrace);
+		window.onerror("Assertion failure!", file, lineNumber, stackTrace);
 	}
 }
 

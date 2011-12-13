@@ -4,13 +4,59 @@ import os
 import sys
 import imp
 
-imp.load_source("tmt", sys.path[0]+"/../../tmt")
+tmt = imp.load_source("tmt", sys.path[0]+"/../../tmt")
 
-files = os.popen("git diff --name-only").read().split('\n')
-files = filter(lambda f: f.endswith('.js'), files)
+JSLINT_IGNORED_FILES = {
+	'timer/src/tnoodleServerHandler/timer/js/mootools-1.2.4-core.js',
+	'timer/src/tnoodleServerHandler/timer/js/mootools-1.2.4.4-more.js',
+	'timer/src/tnoodleServerHandler/timer/js/stacktrace.js',
+	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-core-1.4.1-full-nocompat.js',
+	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-more-1.4.0.1.js',
+	'webscrambles/src/tnoodleServerHandler/webscrambles/powertools-1.1.1.js',
+	'webscrambles/src/tnoodleServerHandler/webscrambles/scramblegen.html',#<<<
+}
+JSLINT_IGNORED_ERRORS = {
+	'type is unnecessary.',
+}
+
+lsFilesCmd = None
+if len(sys.argv) == 1:
+	# We we're called as a result of a commit, we only check the files that
+	# have been edited.
+	lsFilesCmd = "git diff --name-only"
+else:
+	# If any command line arguments are given, we'll check every file under
+	# version control.
+	lsFilesCmd = "git ls-files"
+files = os.popen(lsFilesCmd).read().split('\n')
+
 for f in files:
+	if not os.path.exists(f):
+		# This file must have been deleted as part of this commit.
+		continue
 	#success = os.system("ant -f timer/build.xml jslint")
+	fileName, ext = os.path.splitext(f)
+	if ext == '.js' or ext == '.html':
+		if f in JSLINT_IGNORED_FILES:
+			print "Not jslinting %s" % f
+			continue
+		print "jslinting %s" % f
+		argv = [ 'java', '-jar', 'lib/jslint4java-1.4.6.jar', f ]
+		retVal, stdout, stderr = tmt.runCmd(argv)
+		failedJsLint = False
+		for line in stdout.split('\n'):
+			parsedError = line.split(":")
+			if len(parsedError) != 5:
+				if line != '':
+					assert False, line + " doesn't contain expected number of :'s"
+				continue
+			_, file, lineNumber, col, error = parsedError
+			if error in JSLINT_IGNORED_ERRORS:
+				print "Ignoring error %s" % line
+			else:
+				print "FATAL ERROR %s" % line
+				failedJsLint = True
 
-	# TODO - returning 256 is treated as success?
-	if success != 0:
-		sys.exit("Failed jslint. Use git commit --no-verify if you really know what you're doing.")
+		# TODO - returning 256 is treated as success by git?
+		if failedJsLint:
+			sys.exit("Failed jslint. Use git commit --no-verify if you really know what you're doing.")

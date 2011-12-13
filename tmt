@@ -13,12 +13,6 @@ import githubUpload
 
 TXT_FILE_EXTENSIONS = [ '.js' ]
 
-def run(argv):
-	p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	stdout, stderr = p.communicate()
-	assert p.returncode == 0
-	return stdout, stderr
-
 def windowsOrCygwin():
 	return sys.platform == 'win32' or sys.platform == 'cygwin'
 
@@ -64,6 +58,21 @@ def rmtree(dir):
 		else:
 			raise excinfo[1]
 	shutil.rmtree(dir, onerror=onerror)
+
+def checkGitHooks():
+	gitHooksFolder = '.git/hooks'
+	target = relpath(abspath('tools/git-hooks'), split(gitHooksFolder)[0])
+	if ( not os.path.exists(gitHooksFolder) or
+		 not os.path.islink(gitHooksFolder) or
+		 not os.readlink(gitHooksFolder) == target ):
+		try:
+			os.lstat(gitHooksFolder)
+			os.unlink(gitHooksFolder)
+		except:
+			pass
+		print "Setting up git hooks %s -> %s" % ( gitHooksFolder, target )
+		os.symlink(target, gitHooksFolder)
+checkGitHooks()
 
 PROJECT_FILE_NAME = 'tmtproject'
 DEFAULT_PROJECT_NAME = 'all'
@@ -245,6 +254,11 @@ class tmt:
 		assert isdir(projectName)
 		assert projectFileName == PROJECT_FILE_NAME
 		return projectName
+
+	def runCmd(self, argv):
+		p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		stdout, stderr = p.communicate()
+		return p.returncode, stdout, stderr
 
 	def timestamp(self, f):
 		"""
@@ -551,13 +565,15 @@ class EclipseProject(TmtProject):
 	def release(self):
 		# TODO - this method is getting called for every project in the dependency heirarchy
 		if tmt.args.project == self.name:
-			stdout, stderr = run(['git', 'ls-files', '--other', '--exclude-standard'])
+			retVal, stdout, stderr = tmt.runCmd(['git', 'ls-files', '--other', '--exclude-standard'])
+			assert retVal == 0
 			if stdout != '':
 				print "Untracked files found, please deal with them before releasing:"
 				print stdout
 				return
 
-			stdout, stderr = run(['git', 'diff', '--name-only'])
+			retVal, stdout, stderr = tmt.runCmd(['git', 'diff', '--name-only'])
+			assert retVal == 0
 			if stdout != '':
 				print "Edited files found, please commit them before releasing:"
 				print stdout

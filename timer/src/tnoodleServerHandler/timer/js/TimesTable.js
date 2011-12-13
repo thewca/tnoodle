@@ -244,11 +244,11 @@ var TimesTable = new Class({
 			var key = table.cols[index];
 			if(key.match(/^ra[0-9]+$/)) {
 				td.raSize = function() { return key.substring(2).toInt(); };
-				td.lastTimeIndex = function() { return table.session.bestWorst(key).best.index };
+				td.lastTimeIndex = function() { return table.session.bestWorst(key).best.index; };
 				td.addEvent('click', table.raBoxClicked);
 			} else if(key == "index") {
-				td.raSize = function() { return -1; }
-				td.lastTimeIndex = function() { return -1; }
+				td.raSize = function() { return -1; };
+				td.lastTimeIndex = function() { return -1; };
 				td.addEvent('click', table.raBoxClicked);
 			} else if(key == "centis") {
 				td.addEvent('click', function(e) {
@@ -986,9 +986,9 @@ var TimesTable = new Class({
 					cells[col].set('html', time.format(key));
 					var raSize = parseInt(key.substring(2), 10);
 					var bestIndex = session.bestWorst(key).best.index;
-					cells[col].raSize = (function(raSize) { return raSize; }).bind(null, raSize);
-					cells[col].lastTimeIndex = (function(index) { return index; }).bind(null, tr.time.index);
-					if(bestIndex != null && val != "") {
+					cells[col].raSize = Function.from(raSize);
+					cells[col].lastTimeIndex = Function.from(tr.time.index);
+					if(bestIndex !== null && val !== "") {
 						cells[col].setStyle('cursor', 'pointer');
 						cells[col].addEvent('click', this.raBoxClicked);
 					}

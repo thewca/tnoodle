@@ -2,20 +2,20 @@
 <html>
 <head>
 <title>StackApplet Test</title>
-<script type="text/javascript" src="StackApplet.js">
-</script>
+<script type="text/javascript" src="StackApplet.js"></script>
 <script type="text/javascript">
 function onUpdate(state) {
 	var timerSpan = document.getElementById("timer");
 	var leftHand = document.getElementById("leftHand");
 	var rightHand = document.getElementById("rightHand");
-	if(state != null) {
+	if(state !== null) {
 		timerSpan.innerHTML = state.centis;
 		leftHand.style.display = state.leftHand ? "inline" : "none";
 		rightHand.style.display = state.rightHand ? "inline" : "none";
 	}
-	if(!tnoodle.stackmat.isOn())
+	if(!tnoodle.stackmat.isOn()) {
 		timerSpan.innerHTML = "OFF";
+	}
 }
 function onError(error) {
 	var timerSpan = document.getElementById("timer");

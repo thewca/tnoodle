@@ -8,7 +8,7 @@ function wrapFunctionInBlur(func) {
 		window.fireEvent('focus');
 		return retVal;
 	};
-};
+}
 alert = wrapFunctionInBlur(alert);
 prompt = wrapFunctionInBlur(prompt);
 confirm = wrapFunctionInBlur(confirm);

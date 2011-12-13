@@ -91,7 +91,7 @@ tnoodle.server = function(host, port) {
 				return;
 			}
 
-		   	var scrambles = [];
+			var scrambles = [];
 			for(var i = 0; i < scrambleRequests.length; i++) {
 				scrambles = scrambles.concat(scrambleRequests[i].scrambles);
 			}
@@ -1080,8 +1080,15 @@ tnoodle.ajax = function(callback, url, data) {
 	}
 	return xhr;
 };
-tnoodle.jsonpcount = 1;
 tnoodle.jsonp = function(callback, url, data) {
+	var request = new Request.JSONP({
+		url: url,
+		callbackKey: "callback",
+		data: data,
+		onComplete: callback
+	});
+	request.send();
+	/*
 	var callbackname = "tnoodle.jsonp.callback" + this.jsonpcount++;
 	eval(callbackname + "=callback");
 	if (url.indexOf("?") > -1) {
@@ -1097,6 +1104,7 @@ tnoodle.jsonp = function(callback, url, data) {
 	script.setAttribute("src",url);
 	script.setAttribute("type","text/javascript");                
 	document.body.appendChild(script); //TODO - doesn't work until body is loaded
+	*/
 };
 tnoodle.toQueryString = function(data) {
 	var url = "";
