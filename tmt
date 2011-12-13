@@ -13,6 +13,12 @@ import githubUpload
 
 TXT_FILE_EXTENSIONS = [ '.js' ]
 
+def run(argv):
+	p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	stdout, stderr = p.communicate()
+	assert p.returncode == 0
+	return stdout, stderr
+
 def windowsOrCygwin():
 	return sys.platform == 'win32' or sys.platform == 'cygwin'
 
@@ -537,6 +543,19 @@ class EclipseProject(TmtProject):
 	def release(self):
 		# TODO - this method is getting called for every project in the dependency heirarchy
 		if tmt.args.project == self.name:
+			stdout, stderr = run(['git', 'ls-files', '--other', '--exclude-standard'])
+			if stdout != '':
+				print "Untracked files found, please deal with them before releasing:"
+				print stdout
+				return
+
+			stdout, stderr = run(['git', 'diff', '--name-only'])
+			if stdout != '':
+				print "Edited files found, please commit them before releasing:"
+				print stdout
+				return
+
+
 			print "RELEASING", self.name
 			self.dist()
 
