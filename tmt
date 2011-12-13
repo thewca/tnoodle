@@ -479,11 +479,15 @@ class EclipseProject(TmtProject):
 		self.src = join(self.name, 'src')
 		self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
 	
-		self.distJarFile = join(self.distDir, '%s-%s.jar' % ( self.fullName, tmt.VERSION ) )
 		if not isdir(self.bin):
 			os.mkdir(self.bin)
 		if not isdir(self.distDir):
 			os.mkdir(self.distDir)
+	
+	def distJarFile(self):
+		# This is a function rather than a static attribute because
+		# tmt.VERSION can change (see release target).
+		return join(self.distDir, '%s-%s.jar' % ( self.fullName, tmt.VERSION ) )
 
 	def compile(self):
 		tempBin = join(self.name, '.bin')
@@ -555,37 +559,42 @@ class EclipseProject(TmtProject):
 				print stdout
 				return
 
+			# We do a compile here even though we're going to do dist later
+			# in order to catch compile errors before we make a tag.
+			tmt._make(projectName=self.name, command='compile')
+
 			print "Releasing", self.name
-			self.dist()
 
 			assert exists('VERSION')
 			versionFileContents = file('VERSION').read().split('\n')
-			newVersion = None
+			tmt.VERSION = None
 			for line in versionFileContents:
 				if not line.startswith("#"):
-					newVersion = line
+					tmt.VERSION = line
 					break
-			assert newVersion
-			tag = "v%s" % newVersion
-			tagMessage = "version %s" % newVersion
+			assert tmt.VERSION
+			tag = "v%s" % tmt.VERSION
+			tagMessage = "version %s" % tmt.VERSION
 			tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
 			print tagCommand
 			assert 0 == os.system(tagCommand)
 			print "Successfully created tag %s" % tag
 
+			# We can't run a dist until after we create the tag. This way
+			# the version number of the resulting file will be correct.
+			self.dist()
+
 			githubUpload.githubConnect()
-			if not githubUpload.githubUpload(self.distJarFile):
-				print "Failed to upload %s, see above for details" % self.distJarFile
+			if not githubUpload.githubUpload(self.distJarFile()):
+				print "Failed to upload %s, see above for details" % self.distJarFile()
 				print "Deleting tag %s" % tag
 				return
 
 			assert 0 == os.system('git push --tags')
 	
 	def dist(self):
-		# TODO - check if existing archive is up to date
-		# TODO - support for version numbers?
 		tmt._make(projectName=self.name, command='compile')
-		jar = zipfile.ZipFile(self.distJarFile, "w", compression=zipfile.ZIP_DEFLATED)
+		jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
 
 		jarDeps = []
 		javaDeps = []
@@ -633,7 +642,7 @@ Implementation-Version: %s
 
 		jar.close()
 
-		print 'Successfully created %s with main class %s' % ( self.distJarFile, self.main )
+		print 'Successfully created %s with main class %s' % ( self.distJarFile(), self.main )
 
 	def run(self):
 		assert self.main, 'Main class not defined'
