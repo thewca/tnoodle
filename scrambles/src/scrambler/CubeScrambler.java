@@ -12,15 +12,13 @@ import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
-
-import org.kociemba.twophase.CoordCube;
-import org.kociemba.twophase.Search;
-import org.kociemba.twophase.Tools;
+import cs.min2phase.Search;
+import cs.min2phase.Tools;
 
 //TODO - massive cleanup! so much vestigial code
 public class CubeScrambler extends Scrambler {
-    private static final int MAX_SCRAMBLE_LENGTH = 25;
-    private static final int TIMEOUT = 60; //seconds
+    private static final int MAX_SCRAMBLE_LENGTH = 21;
+    private static final int TIMEOUT = 5*1000; //milliseconds
     
 	private static final String FACES = "LDBRUFldbruf";
 	private static final int gap = 2;
@@ -33,6 +31,7 @@ public class CubeScrambler extends Scrambler {
 	private final int size;
 	private int length;
 	private TwoByTwoSolver twoSolver = null;
+	private ThreadLocal<Search> twoPhaseSearcher = null;
 	public CubeScrambler(int size) {
 		if(size <= 0 || size >= DEFAULT_LENGTHS.length)
 			throw new IllegalArgumentException("Invalid cube size");
@@ -41,9 +40,14 @@ public class CubeScrambler extends Scrambler {
 		if(size == 2) {
 			twoSolver = new TwoByTwoSolver();
 		} else if(size == 3) {
-			CoordCube.init();
-		} else
+			twoPhaseSearcher = new ThreadLocal<Search>() {
+				protected Search initialValue() {
+					return new Search();
+				};
+			};
+		} else {
 			length = DEFAULT_LENGTHS[size];
+		}
 	}
 	
 	@Override
@@ -62,7 +66,7 @@ public class CubeScrambler extends Scrambler {
 			int[] posit = twoSolver.mix(r);
 			return twoSolver.solve(posit);
 		} else if(size == 3) {
-			return Search.solution(Tools.randomCube(r), MAX_SCRAMBLE_LENGTH, TIMEOUT, false).trim();
+			return twoPhaseSearcher.get().solution(Tools.randomCube(r), MAX_SCRAMBLE_LENGTH, TIMEOUT, false, true).trim();
 		} else {
 			StringBuffer scramble = new StringBuffer(length*3);
 			int lastAxis = -1;

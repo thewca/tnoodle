@@ -6,6 +6,17 @@ import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
 
+# Terribly useful debugging tweaks
+import cgitb
+import traceback
+import pdb
+
+cgitb.enable(display=True, format='text')
+def excepthook(etype, value, tb):
+	print ''.join(traceback.format_exception( etype, value, tb))
+	pdb.post_mortem(tb)
+sys.excepthook = excepthook
+
 def entryPoint():
 	return split(abspath(__file__))[0]
 sys.path.append(entryPoint()+'/tools')
@@ -52,6 +63,10 @@ if windowsOrCygwin():
 	
 def rmtree(dir):
 	# This method recursively deletes a directory, but doesn't follow any symlinks
+	if not os.path.exists(dir) and not os.path.islink(dir):
+		# If this path doesn't exist and is not a broken symlink,
+		# then we're done!
+		return
 	def onerror(func, path, excinfo):
 		if func == os.path.islink:
 			os.unlink(path)
@@ -59,15 +74,18 @@ def rmtree(dir):
 			raise excinfo[1]
 	shutil.rmtree(dir, onerror=onerror)
 
+def createSymlinkIfNotExistsOrStale(target, name):
+	if ( not os.path.exists(name) or
+		 not os.path.islink(name) or
+		 not os.readlink(name) == target ):
+		rmtree(name)
+		print "Setting up git hooks %s -> %s" % ( name, target )
+		os.symlink(target, name)
+
 def checkGitHooks():
 	gitHooksFolder = '.git/hooks'
 	target = relpath(abspath('tools/git-hooks'), split(gitHooksFolder)[0])
-	if ( not os.path.exists(gitHooksFolder) or
-		 not os.path.islink(gitHooksFolder) or
-		 not os.readlink(gitHooksFolder) == target ):
-		rmtree(gitHooksFolder)
-		print "Setting up git hooks %s -> %s" % ( gitHooksFolder, target )
-		os.symlink(target, gitHooksFolder)
+	createSymlinkIfNotExistsOrStale(target, gitHooksFolder)
 checkGitHooks()
 
 PROJECT_FILE_NAME = 'tmtproject'
@@ -661,8 +679,8 @@ Implementation-Version: %s
 		jar.close()
 
 		noVersionPath = self.distJarFile(includeVersion=False)
-		os.unlink(noVersionPath)
-		os.symlink(basename(self.distJarFile()), noVersionPath)
+
+		createSymlinkIfNotExistsOrStale(basename(self.distJarFile()), noVersionPath)
 
 		print 'Successfully created %s with main class %s' % ( self.distJarFile(), self.main )
 

@@ -120,6 +120,9 @@
 +thread safety! this must be done before giving to the WCA
 +fmc generation
 +cleanup readme.textile & root html (just add name, lol)
++Tac style error catching + pdb
++save twophase tables to file & load on startup
++ensure twophase code is both thread safe and thread fast, perhaps keep a ThreadLocal<Search> inside of CubeScrambler?
 
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
@@ -139,15 +142,16 @@
 
 -infinite seeded scrambles
 
+-importing a tnt scramble DOES NOT freaking work!, reimporting scramble with a lot of spaces...?
 -shelley's gui
 -create own assertions facility (java & js (look into js exceptions...))
--Tac style error catching + pdb
 -push mootools fixes upstream
 
 ### TNoodleMakeTools
 +nuke build.xml files
 +VERSIONING/RELEASE CYCLE
 	+create website with download (automate releasing?)
+
 -new build system? again?! seriously considering gradle...
 	-symlink crap on windows is *incredibly* slow
 -winstone! java servlets!

@@ -1,4 +1,4 @@
 #!/usr/bin/python
 
 import tmt
-tmt.EclipseProject('stackmat')
+tmt.EclipseProject(tmt.projectName())

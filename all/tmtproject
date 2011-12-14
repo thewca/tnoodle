@@ -4,10 +4,7 @@ import tmt
 
 class Project(tmt.TmtProject):
 	def compile(self):
-		for project in tmt.TmtProject.projects.values():
-			if project == self:
-				continue
-			project.compile()
+		tmt.TmtProject.projects['timer'].compile();
 	
 	def getDependencies(self):
 		return [ tmt.TmtProject.projects['timer'] ]
@@ -16,8 +13,6 @@ class Project(tmt.TmtProject):
 		return
 	
 	def clean(self):
-		for project in tmt.TmtProject.projects.values():
-			if project == self:
-				continue
-			project.clean()
-Project('all')
+		tmt.TmtProject.projects['timer'].clean()
+
+Project(tmt.projectName())

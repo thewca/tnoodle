@@ -7,17 +7,18 @@ from os.path import join, exists
 class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
-		self.transition_tables = join(self.bin, 'org/kociemba/twophase/transition_tables')
-		self.pruning_tables = join(self.bin, 'org/kociemba/twophase/pruning_tables')
+		self.twophase_tables = join(self.bin, 'cs/min2phase/twophase_tables')
 
 	def compile(self):
 		tmt.EclipseProject.compile(self)
 		# build the pruning and transition tables for the two phase algorithm
 		# iff they don't already exist
-		if not exists(self.transition_tables) or not exists(self.pruning_tables):
+		if not exists(self.twophase_tables):
+			print "Generating %s" % self.twophase_tables
 			assert 0 == tmt.java(
-							main="org.kociemba.twophase.CoordCube",
+							main="cs.min2phase.Tools",
 							classpath=self.getClasspath(),
-							args=[ self.transition_tables, self.pruning_tables ])
+							args=[ self.twophase_tables ])
+			print "Successfully generated %s!" % self.twophase_tables
 
-Project('jcubeexplorer')
+Project(tmt.projectName())
