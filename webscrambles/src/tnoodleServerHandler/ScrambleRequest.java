@@ -62,11 +62,22 @@ class ScrambleRequest {
 		try {
 			scramblers = Scrambler.getScramblers();
 		} catch (BadClassDescriptionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		// This is an awful workaround for https://github.com/jfly/tnoodle/issues/1.
+		// Hopefully someday this problem will go away, and this code can simply be deleted.
+		try {
+			ScrambleRequest r = new ScrambleRequest("title", "3x3x3", null);
+			requestsToPdf("", new Date(), new ScrambleRequest[] { r });
+		} catch (Throwable e) {
+			e.printStackTrace();
+			System.out.println("Yikes! Did you just see a warning similar to this " +
+					"\"java.lang.Error: Probable fatal error:No fonts found.\"? " +
+					"This exception may have been expected. See " +
+					"https://github.com/jfly/tnoodle/issues/1 for more details.");
 		}
 	}
 	
@@ -569,16 +580,6 @@ class ScrambleRequest {
 		}
 		doc.close();
 		return totalPdfOutput;
-	}
-	
-	static {
-		try {//TODO - comment
-			ScrambleRequest r = new ScrambleRequest("title", "3x3x3", null);
-			requestsToPdf("", new Date(), new ScrambleRequest[] { r });
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public static void main(String[] args) throws UnsupportedEncodingException, InvalidScrambleRequestException {
