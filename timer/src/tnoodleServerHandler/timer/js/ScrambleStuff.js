@@ -279,7 +279,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			return;
 		}
 		deleteChildren(scramblePre);
-		var turns = currScramble.split(' ');
+		var turns = currScramble.split(/ +/);
 		var incrementalScramble = "";
 		var maxLength = 0;
 		var i, j, turn, newLines;

@@ -123,6 +123,7 @@
 +Tac style error catching + pdb
 +save twophase tables to file & load on startup
 +ensure twophase code is both thread safe and thread fast, perhaps keep a ThreadLocal<Search> inside of CubeScrambler?
++importing a tnt scramble DOES NOT freaking work!, reimporting scramble with a lot of spaces...?
 
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
@@ -142,7 +143,6 @@
 
 -infinite seeded scrambles
 
--importing a tnt scramble DOES NOT freaking work!, reimporting scramble with a lot of spaces...?
 -shelley's gui
 -create own assertions facility (java & js (look into js exceptions...))
 -push mootools fixes upstream
