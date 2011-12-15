@@ -3,4 +3,4 @@
 # From http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
-../../tmt lint
+../../tmt lint || ( echo "Failed pre-commit check. Use git commit --no-verify if you really know what you're doing."; exit 1 )

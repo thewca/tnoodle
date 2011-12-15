@@ -23,9 +23,6 @@ UNCOMMITABLE_PHRASES = {
 	'<'+'<'+'<',
 }
 
-def fail(msg):
-	sys.exit(msg + " Use git commit --no-verify if you really know what you're doing.")
-
 # Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 # This should jive with git's definition of binary.
 def is_binary(filename):
