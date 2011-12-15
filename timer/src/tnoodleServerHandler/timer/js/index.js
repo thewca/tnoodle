@@ -296,32 +296,34 @@ window.addEvent('domready', function() {
 	var editingShortcutField = null;
 	var BlockingKeyboard = new Class({
 		Extends: Keyboard,
-		_handle: function(event, type) {
+		_handle: function(event, typeStr) {
 			if(document.activeElement == editingShortcutField) {
-				var type_keys = type.split(":");
-				if(type_keys[1].contains('tab')) {
+				var type_keys = /(.+):keys\((.*)\)/.exec(typeStr);
+				var type = type_keys[1];
+				var keys = type_keys[2];
+				if(keys.contains('tab')) {
 					return;
 				}
-				if(type_keys[1] === "") {
+				if(keys === "") {
 					return;
 				}
 				event.stop();
-				if(type_keys[1].contains('backspace')) {
-					type_keys[1] = "";
+				if(keys.contains('backspace')) {
+					keys = "";
 				}
-				if(type_keys[0] == "keydown") {
-                    setTimeout(function() {
-                        // For some reason, calling event.stop() isn't
-                        // enough to stop opera from adding the key to the textfield
-                        // This little hack seems to work, however
-                        editingShortcutField.value = type_keys[1];
-                    }, 0);
-					editingShortcutField.shortcut.keys = type_keys[1];
+				if(type == "keydown") {
+					setTimeout(function() {
+						// For some reason, calling event.stop() isn't
+						// enough to stop opera from adding the key to the textfield
+						// This little hack seems to work, however
+						editingShortcutField.value = keys;
+					}, 0);
+					editingShortcutField.shortcut.keys = keys;
 					highlightDuplicates();
 				}
 			}
 			if(!timer.timing && timer.isFocused() && !timer.keysDown() && !timer.pendingTime) {
-				this.parent(event, type);
+				this.parent(event, typeStr);
 			}
 		}
 	});

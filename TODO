@@ -124,6 +124,7 @@
 +save twophase tables to file & load on startup
 +ensure twophase code is both thread safe and thread fast, perhaps keep a ThreadLocal<Search> inside of CubeScrambler?
 +importing a tnt scramble DOES NOT freaking work!, reimporting scramble with a lot of spaces...?
++keyboard shortcuts now say keys(c) when configured? this must have changed with the new mootools
 
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
@@ -143,6 +144,8 @@
 
 -infinite seeded scrambles
 
+-pressing r to reset is causing the reset dialog to pop up repeatedly
+
 -shelley's gui
 -create own assertions facility (java & js (look into js exceptions...))
 -push mootools fixes upstream
@@ -157,5 +160,5 @@
 -winstone! java servlets!
 	-injectable analytics js?
 	-consolidate context file/short name/long name for scramble plugins
-	-load everything from file! extract all to a folder on first startup
+	-load everything from file! extract all to a folder on first startup, note that this does break java applets, but that's ok, nobody cares =(
 		-plugins/scramble icons
