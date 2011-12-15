@@ -145,6 +145,8 @@
 
 -infinite seeded scrambles
 
+-sorting with DNFs interleaves with "add time" row
+
 -shelley's gui
 -create own assertions facility (java & js (look into js exceptions...))
 -push mootools fixes upstream

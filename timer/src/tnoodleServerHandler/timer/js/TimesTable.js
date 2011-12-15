@@ -579,7 +579,7 @@ var TimesTable = new Class({
 		scrambledCube.style.height=24+'px';
 		importScramble.adopt(scrambledCube);
 		importScramble.addEvent('click', function() {
-			var src = document.createTextNode(timeHoverDiv.time.format() + 's solve');
+			var src = timeHoverDiv.time.format() + 's solve';
 			table.scrambleStuff.importScrambles([ timeHoverDiv.time.scramble ], src);
 		});
 		fieldSet.adopt(importScramble);
