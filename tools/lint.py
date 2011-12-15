@@ -62,6 +62,7 @@ def lint(files):
 					print "jslinting %s" % f
 					argv = [ 'java', '-jar', 'lib/jslint4java-1.4.6.jar', f ]
 					p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					fileLines = file(f).read().split("\n")
 					stdout, stderr = p.communicate()
 					failedJsLint = False
 					for line in stdout.split('\n'):
@@ -71,11 +72,16 @@ def lint(files):
 								assert False, line + " doesn't contain expected number of :'s"
 							continue
 						_, fileName, lineNumber, col, error = parsedError
+						lineNumber = int(lineNumber)
 						if error in JSLINT_IGNORED_ERRORS:
 							print "Ignoring error %s" % line
 						else:
-							error = "FATAL ERROR %s" % line
+							error = "%s:%s:%s:%s" % ( f, lineNumber, error, fileLines[lineNumber-1] )
 							failures.append(error)
+					for lineNumber, line in enumerate(fileLines):
+						if "console.log" in line:
+							failures.append("%s:%s:Call to console.log.:%s" % (
+								f, lineNumber+1, line ))
 		
 		if CHECK_ILLEGAL_CHAR:
 			if is_binary(f):
@@ -86,6 +92,6 @@ def lint(files):
 				for lineNumber, line in enumerate(lines):
 					for uncommitablePhrase in UNCOMMITABLE_PHRASES:
 						if uncommitablePhrase in line:
-							error = "Illegal character found on %s:%s:%s" % ( f, lineNumber+1, line )
+							error = "%s:%s:Illegal character.:%s" % ( f, lineNumber+1, line )
 							failures.append(error)
 	return failures

@@ -206,8 +206,6 @@ var TimesTable = new Class({
 		this.raBoxClicked = function(e) {
 			statsPopup.raSize = this.raSize();
 			statsPopup.lastTimeIndex = this.lastTimeIndex();
-			console.log(this.raSize);
-			console.log("*raSize:" + statsPopup.raSize);
 
 			legend.empty();
 			var ul = new Element('ul');
@@ -901,17 +899,7 @@ var TimesTable = new Class({
 			var cells = tr.getChildren();
 			for(var col = 0; col < table.cols.length; col++) {
 				var key = table.cols[col];
-				//try{
-					cells[col].key = key;
-				//} catch(err) {
-					//console.log(err);
-					////TODO - debugging code to hopefully figure out intermittent failure
-					//console.log(tr);
-					//console.log(cells);
-					//console.log(col);
-					//console.log(table.cols);
-					//console.log(key);
-				//}
+				cells[col].key = key;
 				if(time === null) {
 					if(key == 'centis') {
 						if(tr.selected) {

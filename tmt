@@ -180,6 +180,9 @@ class tmt:
 
 		failures = lint.lint(files)
 		if failures:
+			print
+			print "*********%s errors found**********" % len(failures)
+			print
 			sys.exit('\n'.join(failures))
 
 	def _make(self, projectName=None, command=None):

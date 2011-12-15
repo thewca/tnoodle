@@ -735,16 +735,6 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	}, false);
 	scrambleHeader.appendChild(newScrambleLink);
 
-	/*
-	 * TODO use something like zero copy here? or do what google maps does and
-	 * popup a selected text box? var copyLink = document.createElement('span');
-	 * copyLink.className = 'link'; xAddListener(copyLink, 'click', function() {
-	 * console.log(this); }, false);
-	 * copyLink.appendChild(document.createTextNode('Copy'));
-	 * scrambleHeader.appendChild(copyLink);
-	 * scrambleHeader.appendChild(document.createTextNode(' '));
-	 */
-
 	var scrambleInfo = document.createElement('span');
 	scrambleHeader.appendChild(scrambleInfo);
 

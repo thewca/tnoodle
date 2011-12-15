@@ -436,7 +436,7 @@ tnoodle.server = function(host, port) {
 		}
 		sessions = newSessions;
 	} catch(error) {
-		console.log(error);
+		alertException(error);
 		//bummer
 		sessions = [];
 	}
@@ -961,8 +961,6 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			lastTimeIndex = this.times.length-1;
 			raSize = this.times.length;
 		}
-		console.log('lastTimeIndex:' + lastTimeIndex);
-		console.log('raSize:' + raSize);
 		var f = server.formatTime;
 
 		var date = this.getDate();
