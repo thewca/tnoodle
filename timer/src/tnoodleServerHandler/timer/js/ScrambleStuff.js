@@ -233,7 +233,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			scrambleInfo.appendChild(document.createTextNode("/" + importedScrambles.length + ")"));
 			if(scrambleSrc) {
 				scrambleInfo.appendChild(document.createTextNode(" from "));
-				scrambleInfo.appendChild(scrambleSrc);
+				scrambleInfo.appendChild(new Element('span', {html: scrambleSrc}));
 			}
 
 			scrambleLoaded(importedScrambles[scrambleIndex]);
@@ -492,10 +492,12 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			loadScramblesButton.value = 'Load Scrambles';
 			urlForm.onsubmit = function() {
 				var url = urlText.value;
-				scrambleSrc = document.createElement('a');
-				scrambleSrc.href = url;
-				scrambleSrc.target = '_blank';
-				scrambleSrc.appendChild(document.createTextNode(url));
+				var linkEl = document.createElement('a');
+				linkEl.href = url;
+				linkEl.target = '_blank';
+				linkEl.appendChild(document.createTextNode(url));
+				scrambleSrc = linkEl.innerHTML;
+				
 
 				waitingIcon.style.display = 'inline';
 				activeImportRequest = scrambler.importScrambles(scramblesImported, url);
@@ -520,10 +522,11 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		}
 		if(uploadForm === null) {
 			uploadForm = scrambler.getUploadForm(function(fileName, submitButton, request) {
-				scrambleSrc = document.createElement('span');
+				var el = document.createElement('span');
 				var em = document.createElement('em');
 				em.appendChild(document.createTextNode(fileName));
-				scrambleSrc.appendChild(em);
+				el.appendChild(em);
+				scrambleSrc = el.innerHTML;
 
 				waitingIcon.style.display = 'inline';
 				activeImportRequest = request;
@@ -573,11 +576,12 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 				if(!count) {
 					return false;
 				}
-				scrambleSrc = document.createElement('span');
-				scrambleSrc.appendChild(document.createTextNode("seed "));
+				var el = document.createElement('span');
+				el.appendChild(document.createTextNode("seed "));
 				var linky = document.createElement('em');
 				linky.appendChild(document.createTextNode(seed));
-				scrambleSrc.appendChild(linky);
+				el.appendChild(linky);
+				scrambleSrc = el.innerHTML;
 
 				waitingIcon.style.display = 'inline';
 				activeImportRequest = scrambler.loadScrambles(scramblesImported, puzzle, seed, count);
