@@ -297,7 +297,7 @@ window.addEvent('domready', function() {
 	var BlockingKeyboard = new Class({
 		Extends: Keyboard,
 		_handle: function(event, typeStr) {
-			if(document.activeElement == editingShortcutField) {
+			if(isEditingShortcutField()) {
 				var type_keys = /(.+):keys\((.*)\)/.exec(typeStr);
 				var type = type_keys[1];
 				var keys = type_keys[2];
@@ -565,11 +565,22 @@ window.addEvent('domready', function() {
 			}
 		});
 	}
+
+	function isEditingShortcutField() {
+		return helpPopup.isVisible() && document.activeElement == editingShortcutField;
+	}
+	function isNotEditingShortcutField() {
+		return !isEditingShortcutField();
+	}
 	function onHide() {
 		addShortcutListeners();
+		window.removeEvent('contextmenu', isNotEditingShortcutField);
+	}
+	function onShow() {
+		window.addEvent('contextmenu', isNotEditingShortcutField);
 	}
 
-	var helpPopup = tnoodle.tnt.createPopup(null, onHide);
+	var helpPopup = tnoodle.tnt.createPopup(onShow, onHide);
 
 	helpPopup.refresh = function() {
 		helpPopup.empty();
@@ -616,18 +627,12 @@ window.addEvent('domready', function() {
 						this.blur();
 					}
 				});
-				//TODO - check for copy paste, does keyup really work?
-				//textField.addEvent('keyup', function(e) {
-					//this.shortcut.keys = this.value;
-					//highlightDuplicates();
-				//});
+				textField.addEvent('click', function(e) {
+					e.stop();
+				});
 				textField.addEvent('focus', function() {
 					editingShortcutField = this;
 				});
-				//textField.addEvent('change', function() {
-					//this.shortcut.keys = this.value;
-					//highlightDuplicates();
-				//});
 				shortcutDiv.appendChild(textField);
 				shortcut.editor = textField;
 

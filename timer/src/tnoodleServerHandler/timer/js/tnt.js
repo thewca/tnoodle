@@ -114,6 +114,7 @@ tnoodle.tnt = {
 		document.body.appendChild(popup);
 
 		popup.show = function() {
+			visible = true;
 			document.addEvent('keydown', keydown);
 			window.addEvent('resize', popup.center);
 			document.addEvent('mouseup', mouseup);
@@ -170,7 +171,9 @@ tnoodle.tnt = {
 			this.style.top = (windowHeight - height)/2 + 'px';
 			this.style.left = (windowWidth - width)/2 + 'px';
 		}.bind(popup);
+		var visible = false;
 		popup.hide = function() {
+			visible = false;
 			document.removeEvent('keydown', keydown);
 			window.removeEvent('resize', popup.center);
 			document.removeEvent('mouseup', mouseup);
@@ -183,6 +186,9 @@ tnoodle.tnt = {
 			if(onHide) {
 				onHide();
 			}
+		}.bind(popup);
+		popup.isVisible = function() {
+			return visible;
 		}.bind(popup);
 		popup.hide();
 
