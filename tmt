@@ -13,7 +13,7 @@ import pdb
 
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
-	print ''.join(traceback.format_exception( etype, value, tb))
+	traceback.print_tb(tb)
 	pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
