@@ -70,6 +70,7 @@ class ScrambleRequest {
 		}
 	}
 	
+	// This is here just to make GSON work.
 	public ScrambleRequest(){}
 	
 	
@@ -568,6 +569,16 @@ class ScrambleRequest {
 		}
 		doc.close();
 		return totalPdfOutput;
+	}
+	
+	static {
+		try {//TODO - comment
+			ScrambleRequest r = new ScrambleRequest("title", "3x3x3", null);
+			requestsToPdf("", new Date(), new ScrambleRequest[] { r });
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) throws UnsupportedEncodingException, InvalidScrambleRequestException {
