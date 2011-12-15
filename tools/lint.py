@@ -47,11 +47,13 @@ def is_binary(filename):
     return False
 
 def lint(files):
+	failures = []
 	for f in files:
 		if not os.path.exists(f):
 			# This file must have been deleted as part of this commit.
 			continue
 		fileName, ext = os.path.splitext(f)
+
 		if JSLINT_ENABLED:
 			if ext == '.js' or ext == '.html':
 				if f in JSLINT_IGNORED_FILES:
@@ -72,26 +74,18 @@ def lint(files):
 						if error in JSLINT_IGNORED_ERRORS:
 							print "Ignoring error %s" % line
 						else:
-							print "FATAL ERROR %s" % line
-							failedJsLint = True
-
-					# TODO - returning 256 is treated as success by git?
-					if failedJsLint:
-						return ( False, "Failed jslint." )
+							error = "FATAL ERROR %s" % line
+							failures.append(error)
 		
 		if CHECK_ILLEGAL_CHAR:
 			if is_binary(f):
 				#print "Skipping binary file %s" % f
 				pass
 			else:
-				uncommitableCharacterFound = False
 				lines = file(f).read().split("\n")
 				for lineNumber, line in enumerate(lines):
 					for uncommitablePhrase in UNCOMMITABLE_PHRASES:
 						if uncommitablePhrase in line:
-							print "%s:%s:%s" % ( f, lineNumber+1, line )
-							uncommitableCharacterFound = True
-
-				if uncommitableCharacterFound:
-					return ( False, "Found characters that may not be committed to revision control." )
-	return ( True, "" )
+							error = "Illegal character found on %s:%s:%s" % ( f, lineNumber+1, line )
+							failures.append(error)
+	return failures

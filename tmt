@@ -178,9 +178,9 @@ class tmt:
 			lsFilesCmd = "git diff --cached --name-only"
 		files = os.popen(lsFilesCmd).read().split('\n')
 
-		success, failreason = lint.lint(files)
-		if not success:
-			sys.exit(failreason)
+		failures = lint.lint(files)
+		if failures:
+			sys.exit('\n'.join(failures))
 
 	def _make(self, projectName=None, command=None):
 		if projectName == None:
