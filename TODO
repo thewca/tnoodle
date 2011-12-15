@@ -125,6 +125,7 @@
 +ensure twophase code is both thread safe and thread fast, perhaps keep a ThreadLocal<Search> inside of CubeScrambler?
 +importing a tnt scramble DOES NOT freaking work!, reimporting scramble with a lot of spaces...?
 +keyboard shortcuts now say keys(c) when configured? this must have changed with the new mootools
++pressing r to reset is causing the reset dialog to pop up repeatedly
 
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
@@ -143,8 +144,6 @@
 -pdf page #
 
 -infinite seeded scrambles
-
--pressing r to reset is causing the reset dialog to pop up repeatedly
 
 -shelley's gui
 -create own assertions facility (java & js (look into js exceptions...))

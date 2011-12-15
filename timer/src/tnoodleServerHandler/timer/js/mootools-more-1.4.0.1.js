@@ -4716,7 +4716,9 @@ provides: [Keyboard]
 		},
 
 		removeEvent: function(type, fn){
-			return this.parent(Keyboard.parse(type, this.options.defaultEventType, this.options.nonParsedEvents), fn);
+			// TODO - parent's "remove all events function" is pasing in an already parsed event type. -jfly
+			//return this.parent(Keyboard.parse(type, this.options.defaultEventType, this.options.nonParsedEvents), fn);
+			return this.parent(type, fn);
 		},
 
 		toggleActive: function(){
