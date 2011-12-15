@@ -13,7 +13,8 @@ import pdb
 
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
-	traceback.print_tb(tb)
+	if tb:
+		traceback.print_exception(etype, value, tb)
 	pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
@@ -21,7 +22,10 @@ def entryPoint():
 	return split(abspath(__file__))[0]
 sys.path.append(entryPoint()+'/tools')
 import githubUpload
+import lint
 
+# These are the kinds of files we replace all instances of "%%VERSION%%" with
+# the current version.
 TXT_FILE_EXTENSIONS = [ '.js' ]
 
 def windowsOrCygwin():
@@ -82,12 +86,6 @@ def createSymlinkIfNotExistsOrStale(target, name):
 		print "Setting up git hooks %s -> %s" % ( name, target )
 		os.symlink(target, name)
 
-def checkGitHooks():
-	gitHooksFolder = '.git/hooks'
-	target = relpath(abspath('tools/git-hooks'), split(gitHooksFolder)[0])
-	createSymlinkIfNotExistsOrStale(target, gitHooksFolder)
-checkGitHooks()
-
 PROJECT_FILE_NAME = 'tmtproject'
 DEFAULT_PROJECT_NAME = 'all'
 
@@ -135,6 +133,11 @@ class tmt:
 		assert self.VERSION.startswith(versionPrefix)
 		self.VERSION = self.VERSION[len(versionPrefix):]
 
+		# Check that the git hooks folder is all set up
+		gitHooksFolder = '.git/hooks'
+		target = relpath(abspath('tools/git-hooks'), split(gitHooksFolder)[0])
+		createSymlinkIfNotExistsOrStale(target, gitHooksFolder)
+
 	def _loadTmtProjects(self):
 		self._cdEntryPoint()
 		projectFiles = ( join(dir, PROJECT_FILE_NAME) for dir in os.listdir('.') )
@@ -164,6 +167,20 @@ class tmt:
 			assert False, "not yet implemented"
 		else:
 			print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
+	
+	def _lint(self):
+		lsFilesCmd = None
+		if tmt.args.all:
+			# Check check every file under version control.
+			lsFilesCmd = "git ls-files"
+		else:
+			# Check the files that git believes have been edited.
+			lsFilesCmd = "git diff --cached --name-only"
+		files = os.popen(lsFilesCmd).read().split('\n')
+
+		success, failreason = lint.lint(files)
+		if not success:
+			sys.exit(failreason)
 
 	def _make(self, projectName=None, command=None):
 		if projectName == None:
@@ -249,6 +266,18 @@ class tmt:
 			action="store_true", default=False,
 			help='Do not prune duplicate projects')
 		parser_graph.set_defaults(func=self._graph)
+
+		desc = "Run JSLint on some (or all) js and html files. Also checks " +\
+			   "for appearances of characters we don't allow in the repository"
+		parser_graph = subparsers.add_parser(
+			'lint',
+			help=desc, description=desc,
+			formatter_class=ArgumentDefaultsHelpFormatter)
+		parser_graph.add_argument(
+			'--all', '-a',
+			action="store_true", default=False,
+			help='Lint all files, even if they have been edited')
+		parser_graph.set_defaults(func=self._lint)
 	
 	def memoize(self, func):
 		d = {}
