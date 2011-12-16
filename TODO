@@ -126,6 +126,7 @@
 +importing a tnt scramble DOES NOT freaking work!, reimporting scramble with a lot of spaces...?
 +keyboard shortcuts now say keys(c) when configured? this must have changed with the new mootools
 +pressing r to reset is causing the reset dialog to pop up repeatedly
++storing DNFs doesn't work! darn JSON doesn't like Infinity times
 
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
@@ -150,6 +151,9 @@
 -shelley's gui
 -create own assertions facility (java & js (look into js exceptions...))
 -push mootools fixes upstream
+
+-incremental clock scrambles don't show pin positions
+-configurable clock colorscheme
 
 ### TNoodleMakeTools
 +nuke build.xml files

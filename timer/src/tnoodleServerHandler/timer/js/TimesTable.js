@@ -853,8 +853,7 @@ var TimesTable = new Class({
 			}
 			this.timeHoverDiv.show();
 		}.bind(this);
-		//TODO - how do you listen for input in mootools?
-		xAddListener(textField, 'input', timeChanged, false);
+		textField.addEvent('input', timeChanged);
 		timeChanged();
 
 		cell.empty();
