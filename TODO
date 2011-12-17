@@ -121,7 +121,7 @@
 
 #### TNT
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
-	-change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
+	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
 -pretty gui for editing

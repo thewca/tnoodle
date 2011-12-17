@@ -4926,6 +4926,11 @@ provides: [Keyboard]
         }
 		Keyboard.manager._handle(event, event.type + ':keys(' + keys.getKeys().join('+') + ')');
 	};
+	document.addEvent('click', function() {
+		// For some reason, certain keys were getting "stuck"
+		// in the keys Hash. This gives us a chance of resetting.
+		keys.empty();
+	});
 
 	document.addEvents({
 		'keyup': handler,
