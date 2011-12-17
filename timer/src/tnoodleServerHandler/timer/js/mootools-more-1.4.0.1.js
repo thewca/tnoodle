@@ -4926,9 +4926,13 @@ provides: [Keyboard]
         }
 		Keyboard.manager._handle(event, event.type + ':keys(' + keys.getKeys().join('+') + ')');
 	};
-	document.addEvent('click', function() {
+	document.addEvent('click', function(e) {
 		// For some reason, certain keys were getting "stuck"
 		// in the keys Hash. This gives us a chance of resetting.
+		keys.empty();
+	});
+	window.addEvent('blur', function(e) {
+		// When the page loses focus, we clear the keyboard state
 		keys.empty();
 	});
 
