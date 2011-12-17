@@ -4443,10 +4443,20 @@ HtmlTable = Class.refactor(HtmlTable, {
 			this.body.dispose();
 		}
 
-		var data = this.parseData(parser).sort(function(a, b){
-			if (a.value === b.value) return 0;
-			return a.value > b.value ? 1 : -1;
+		// TODO - need some way of providing a stable sort...
+		// it appears that multisort is broken? https://github.com/mootools/mootools-more/pull/1011
+		//var data = this.parseData(parser).sort(function(a, b){
+			//if (a.value === b.value) return 0;
+			//return a.value > b.value ? 1 : -1;
+		//});
+		var data = this.parseData(parser);
+		data = data.sort(function(a, b){
+			if(a.value === b.value) {
+				return a.value0 - b.value0;
+			}
+			return a.value - b.value;
 		});
+
 
 		if (this.sorted.reverse == (parser == HtmlTable.Parsers['input-checked'])) data.reverse(true);
 		this.setRowSort(data, pre);
@@ -4459,9 +4469,11 @@ HtmlTable = Class.refactor(HtmlTable, {
 	parseData: function(parser){
 		return Array.map(this.body.rows, function(row, i){
 			var value = parser.convert.call(document.id(row.cells[this.sorted.index]));
+			var value0 = parser.convert.call(document.id(row.cells[0]));//TODO - jfly
 			return {
 				position: i,
-				value: value
+				value: value,//TODO - jfly
+				value0: value0//TODO - jfly
 			};
 		}, this);
 	},
@@ -4885,7 +4897,8 @@ provides: [Keyboard]
 		});
 	};
 
-	var handler = function(event){
+	/*TODO push upstream?
+	    var handler = function(event){
 		var keys = [];
 		modifiers.each(function(mod){
 			if (event[mod]) keys.push(mod);
@@ -4893,6 +4906,25 @@ provides: [Keyboard]
 
 		if (!regex.test(event.key)) keys.push(event.key);
 		Keyboard.manager._handle(event, event.type + ':keys(' + keys.join('+') + ')');
+	};*/
+	var keys = new Hash();
+	var handler = function(event){
+		modifiers.each(function(mod){
+			if(event[mod]) {
+				keys[mod] = true;
+			}
+		});
+		if(event.type == 'keyup') {
+			delete keys[event.key];
+		} else if(event.type == 'keydown') {
+			keys[event.key] = true;
+		} else {
+			alert("fooo"); //TODO - proper error handling
+		}
+        if(event.key == 'esc') {
+            keys.empty();
+        }
+		Keyboard.manager._handle(event, event.type + ':keys(' + keys.getKeys().join('+') + ')');
 	};
 
 	document.addEvents({
@@ -5176,11 +5208,9 @@ HtmlTable = Class.refactor(HtmlTable, {
 		if (!this.options.allowMultiSelect && !_deselect) return;
 		var method = _deselect ? 'deselectRow' : 'selectRow',
 			rows = Array.clone(this.body.rows);
-		if (rows.length == 0) return; //TODO - jfly
 
 		if (typeOf(startRow) == 'element') startRow = rows.indexOf(startRow);
 		if (typeOf(endRow) == 'element') endRow = rows.indexOf(endRow);
-		endRow = endRow < rows.length - 1 ? endRow : rows.length - 1;
 
 		if (endRow < startRow){
 			var tmp = startRow;
@@ -5188,7 +5218,10 @@ HtmlTable = Class.refactor(HtmlTable, {
 			endRow = tmp;
 		}
 
-		for (var i = startRow; i <= endRow; i++){
+		var rowAfterEndRow = Math.min(endRow + 1, rows.length);
+		startRow = Math.max(startRow, 0);
+
+		for (var i = startRow; i < rowAfterEndRow; i++){
 			if (this.options.selectHiddenRows || rows[i].isDisplayed()) this[method](rows[i], true);
 		}
 

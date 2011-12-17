@@ -1,4 +1,4 @@
-### BUGS
+### Fixed
 +seeding scrambles doesn't work
 +format scramble source better
 +importing scrambles window doesn't fit
@@ -29,22 +29,12 @@
 +fix file permissions
 +tagging doesn't default correctly
 +!!!comments aren't being positioned nicely in chrome on os X
-
--Xbrowser stuff
++Xbrowser stuff
 	+keyDown only gets called once on ff, makes sense
 	+select dropdown styling...
     +scramble doesn't wrap on opera
-        -wrapping fixed, but now spacing is broken
     +opera keyboard shortcuts are iffy, fixed as best as possible
         +apparently opera binds all sorts of crap, like ctrl+z, ctrl+y, but they're blocked when in a text field. This means that a user can configure ctrl+z as a shortcut, but when they try to use it, they won't be focused on a text box, so opera goes and does its thing. Maybe there's a solution here that involves focusing the user on an invisible text box and listening to events there, lol
-	-FF lags when the scramble loads
-	-dan cohen: safari 5 + chrome for mac don't work with stackmat
--mootools stuff
-	-bug in mootools-more:~1913
-	-bug in mootools-more: //TODO need this to provide a more stable sorting
-	-bug in mootools-more:~5492
-
-### FEATURES
 +added medians
 +configurable columns
 	+add gui for this!
@@ -105,8 +95,6 @@
 +shortcuts menu on gerty doesn't work
 +configurable length wca style inspection? apparently some people use this
 +build problems
-	-check out google's ClosureCompiler
-	-ant's javac task doesn't work with empty .java files, it thinks they've always been modified, since there's no corresponding .class file
 	+A uses B, A & B are built, B changes (A doesn't), now we compile A and nothing happens (silly optimization of the ant java task)!
 	+FIX MINIFICATION (by reverting to old jslint, lol)
 	+optimize git commit hook to only jslint when a .js file has been modified
@@ -116,7 +104,6 @@
 	+uncompiled jcubeexplorer doesn't work, tables don't get saved?
 +pressing escape to close tnoodle popup doesn't restore focus
 +background image/opacity
-	-provide some system for uploading your own image?
 +thread safety! this must be done before giving to the WCA
 +fmc generation
 +cleanup readme.textile & root html (just add name, lol)
@@ -127,41 +114,40 @@
 +keyboard shortcuts now say keys(c) when configured? this must have changed with the new mootools
 +pressing r to reset is causing the reset dialog to pop up repeatedly
 +storing DNFs doesn't work! darn JSON doesn't like Infinity times
++pdf page #
++nuke build.xml files
++VERSIONING/RELEASE CYCLE
+	+create website with download (automate releasing?)
 
+#### TNT
+-push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
+	-change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
+-read times/metronome
+-gmaps style copy scramble
+	-fix bug with copy pasting current scramble
+-provide some system for uploading your own image?
 
+### webscrambles
+-infinite seeded scrambles
+-#5 incremental clock scrambles don't show pin positions
+-#6 configurable clock colorscheme
+
+### server/utils
+-create own java assertions facility, as java assertions cannot be enabled at runtime
 -saving times
 	-Add a note about opening multiple instances of tnt
 		-screw this, just store everything in the db, and make it easy to create an account
 	-add login
 	-implement stuff on scratch paper!!!
 
--read times/metronome
--gmaps style copy scramble
-	-fix bug with copy pasting current scramble
--pdf page #
-
--infinite seeded scrambles
-
--sorting with DNFs interleaves with "add time" row
-
--shelley's gui
--create own assertions facility (java & js (look into js exceptions...))
--push mootools fixes upstream
-
--incremental clock scrambles don't show pin positions
--configurable clock colorscheme
+### webscrambles-ui
+-shelley's gui (https://github.com/jfly/tnoodle/issues?labels=webscrambles-ui)
 
 ### TNoodleMakeTools
-+nuke build.xml files
-+VERSIONING/RELEASE CYCLE
-	+create website with download (automate releasing?)
-
--new build system? again?! seriously considering gradle...
-	-symlink crap on windows is *incredibly* slow
 -winstone! java servlets!
 	-injectable analytics js?
 	-consolidate context file/short name/long name for scramble plugins
