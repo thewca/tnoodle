@@ -427,6 +427,11 @@ tnoodle.server = function(host, port) {
 			for(var j = 0; j < sesh.times.length; j++) {
 				var newTime = new tnoodle.Time(0);
 				copyTo(sesh.times[j], newTime);
+				// JSON doesn't treat Infinity like a number, so we
+				// have to cons it up ourselves.
+				if(newTime.centis === null && newTime.penalty == "DNF") {
+					newTime.centis = Infinity;
+				}
 				sesh.times[j] = newTime;
 				newTime.setSession(sesh);
 			}
@@ -596,7 +601,10 @@ tnoodle.Time = function(time, scramble) {
 			this.centis = this.rawCentis;
 		}
 
-		server.saveSessions();
+		//TODO - server is null in the event that we're trying to add a new time
+		if(server) {
+			server.saveSessions();
+		}
 		//TODO - optimize
 		//session.solvePenalized(this);
 	};
