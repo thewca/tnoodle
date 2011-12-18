@@ -86,10 +86,6 @@ var KeyboardTimer = new Class({
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
 
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.disableContextMenu', 'Disable context menu', true, null));
-
-
-		var keys = new Hash();
-		this.keys = keys;
 		
 		this.reset(); //this will update the display
 		
@@ -105,9 +101,8 @@ var KeyboardTimer = new Class({
             timer.fireNewTime();
         }
 		var keysDown = false;
-		window.addEvent('keydown', function(e) {
+		KeyboardState.addEvent('keydown', function(e, manager) {
 			timer.windowFocused = true;
-			keys.set(e.key, true);
 			if(!timer.isFocused()) {
 				return;
 			}
@@ -144,9 +139,8 @@ var KeyboardTimer = new Class({
 				timer.redraw();
 			}
 		});
-		window.addEvent('keyup', function(e) {
+		KeyboardState.addEvent('keyup', function(e, manager) {
 			timer.windowFocused = true;
-			keys.erase(e.key);
 			if(!timer.isFocused() || timer.config.get('timer.enableStackmat')) {
 				// A key may have been released which was 
 				// being held down when the timer lost focus
@@ -155,8 +149,16 @@ var KeyboardTimer = new Class({
 			}
 			
 			if(timer.pendingTime) {
-				timer.pendingTime = (keys.getLength() > 0);
+				if(KeyboardState.keys.getLength() === 0) {
+					timer.pendingTime = false;
+				}
 			} else if(keysDown && !timer.keysDown()) {
+				if(!e) {
+					// e is null when tabs change, 
+					// we don't want to start or stop the timer when that happens,
+					// so we simply do nothing.
+					return;
+				}
 				keysDown = false;
 				if(timer.hasDelayPassed()) {
 					if(timer.INSPECTION > 0 && !timer.inspecting) {
@@ -187,31 +189,18 @@ var KeyboardTimer = new Class({
 					timer.startRender();
 				}
 			}
-			//even thought this may be odd behavior, it's better to do this
-			//then have the timer freeze up on a user
-			if(e.key == 'space' || e.key == 'esc') { //releasing space or esc resets the keyboard state
-				resetKeys();
-			}
 			
 			timer.redraw();
 		});
-		function resetKeys() {
-			keys.empty();
-			keysDown = false;
-			timer.pendingTime = false;
-			timer.redraw();
-		}
 		timer.windowFocused = true;
 		document.addEvent('mousedown', function(e) {
 			timer.windowFocused = true;
-			resetKeys();
 			// We may be in the process of losing focus, this will let any
 			// events in the queue drain out
 			setTimeout(timer.redraw.bind(timer), 0);
 		});
 		document.addEvent('mouseup', function(e) {
 			timer.windowFocused = true;
-			resetKeys();
 			// We may be in the process of losing focus, this will let any
 			// events in the queue drain out
 			setTimeout(timer.redraw.bind(timer), 0);
@@ -219,7 +208,6 @@ var KeyboardTimer = new Class({
 		window.addEvent('blur', function(e) {
 			// When the page loses focus, we clear the keyboard state
 			timer.windowFocused = false;
-			resetKeys(); // resetKeys() will cause a redraw
 		});
 		// TODO - the page may be out of focus when it loads!
 		window.addEvent('focus', function(e) {
@@ -378,7 +366,16 @@ var KeyboardTimer = new Class({
 		return startKey.split("+");
     },
 	keysDown: function() {
-		return !this.pendingTime && this.keys.getKeys().containsAll(this.startKeys());
+		if(this.pendingTime) {
+			return false;
+		}
+		var startKeys = this.startKeys();
+		if(startKeys.length === 1 && startKeys[0] === "") {
+			// TODO <<< - any non-hotkey should start the timer
+			return KeyboardState.keys.getLength() > 0;
+		} else {
+			return KeyboardState.keys.getKeys().containsAll(startKeys);
+		}
 	},
 	redraw: function() {
 		var string = this.stringy();

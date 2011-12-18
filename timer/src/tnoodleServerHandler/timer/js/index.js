@@ -25,7 +25,6 @@ window.addEvent('domready', function() {
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 
-	var timer = new KeyboardTimer($('timer'), server, scrambleStuff);
 	var session = null;
 	
 	var updatingSession = false;
@@ -213,120 +212,6 @@ window.addEvent('domready', function() {
 		session = server.createSession(puzzle, event);
 		sessionSelect.refresh();
 	}
-	
-	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
-	timer.addEvent('newTime', function(time) {
-		//TODO - this may need to wait for the sessions to load...
-		timesTable.addTime(time);
-	});
-	timesTable.addEvent('tableChanged', function() {
-		//timer.setStringy(timesTable.lastAddedRow.time.format());
-		timer.redraw();
-	});
-	
-	$('newSession').addEvent('click', newSession);
-	$('resetSession').addEvent('click', resetSession);
-	$('deleteSession').addEvent('click', deleteSession);
-	$('downloadCSV').addEvent('click', downloadCSV);
-	$('downloadCSV').addEvent('mousedown', downloadCSV);
-
-	$('timer').resize = function() {
-		timer.redraw();
-	};
-	$('scrambles').resize = scrambleStuff.resize;
-	function getMaxWidth(el) {
-		// Returns the maximum size the element can take up without falling
-		// off the right side of the screen.
-		return document.body.getSize().x - el.getPosition().x - 20;
-	}
-	$('times').resize = function() {
-		var available = $('times').getSize();
-		var remainingHeight = available.y - $('timesArea').getStyle('border-top').toInt() - $('timesArea').getStyle('border-bottom').toInt();
-		$('timesArea').setStyle('height', remainingHeight);
-		var seshCommentWidth = available.x - 30;
-		$('sessionComment').setStyle('width', Math.max(50, seshCommentWidth));
-
-		var selects = [ scrambleStuff.puzzleSelect, eventSelect, sessionSelect ];
-		selects.each(function(select) {
-			if(select.linebreak) {
-				select.linebreak.setStyle('display', 'none');
-			}
-			select.setMaxWidth(null);
-		});
-		selects.each(function(select) {
-			var maxWidth = getMaxWidth(select);
-			if(select.linebreak && select.getSize().x > maxWidth) {
-				select.linebreak.setStyle('display', '');
-				// Adding a newline gives us more space
-				maxWidth = getMaxWidth(select);
-			}
-			select.setMaxWidth(maxWidth);
-		});
-		
-		timesTable.resize();
-	};
-	$('times').getPreferredWidth = function() {
-		return timesTable.getPreferredWidth();
-	};
-
-	
-	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
-	timesTable.manager = triLayout;
-	
-	//TODO - yeah...
-	aboutText = '<h2 style="margin: 0;">TNoodle Timer (TNT) v' + tnoodle.tnt.version + '</h2><br/>' +
-				'Created by Jeremy Fleischman from the ashes of CCT.<br/>' +
-				'Thanks to Leyan Lo for ideas/couch';
-	var aboutPopup = tnoodle.tnt.createPopup();
-	aboutPopup.innerHTML = aboutText;
-	$('aboutLink').addEvent('click', function() {
-		aboutPopup.show();
-	});
-	
-	$('helpLink').doClick = function() {
-		helpPopup.refresh();
-		helpPopup.show();
-	};
-	$('helpLink').addEvent('click', $('helpLink').doClick);
-	
-	// This subclass of Keyboard ensures that
-	// shortcuts only work when we're not timing,
-	// editing a text box, or doing something else
-	// we care about.
-	var editingShortcutField = null;
-	var BlockingKeyboard = new Class({
-		Extends: Keyboard,
-		_handle: function(event, typeStr) {
-			if(isEditingShortcutField()) {
-				var type_keys = /(.+):keys\((.*)\)/.exec(typeStr);
-				var type = type_keys[1];
-				var keys = type_keys[2];
-				if(keys.contains('tab')) {
-					return;
-				}
-				if(keys === "") {
-					return;
-				}
-				event.stop();
-				if(keys.contains('backspace')) {
-					keys = "";
-				}
-				if(type == "keydown") {
-					setTimeout(function() {
-						// For some reason, calling event.stop() isn't
-						// enough to stop opera from adding the key to the textfield
-						// This little hack seems to work, however
-						editingShortcutField.value = keys;
-					}, 0);
-					editingShortcutField.shortcut.keys = keys;
-					highlightDuplicates();
-				}
-			}
-			if(!timer.timing && timer.isFocused() && !timer.keysDown() && !timer.pendingTime) {
-				this.parent(event, typeStr);
-			}
-		}
-	});
 
 	function resizeScrambleArea(delta) {
 		var scrambleSpace = configuration.get('layout.sizerHeight');
@@ -346,9 +231,15 @@ window.addEvent('domready', function() {
 		timesTable.tbody.scrollTo(0, pos);
 	}
 
-	var keyboard = new BlockingKeyboard();
-	keyboard.activate();
-	tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT = 'Start timer (try "a+;")';
+	$('helpLink').doClick = function() {
+		shortcutManager.helpPopup.refresh();
+		shortcutManager.helpPopup.show();
+	};
+	$('helpLink').addEvent('click', $('helpLink').doClick);
+	
+	var timesTable = new TimesTable($('timesTable'), server, scrambleStuff);
+
+	tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT = 'Start timer (try "a+;" or nothing)';
 	var shortcuts = new Hash({
 		'Times': [
 			{
@@ -492,170 +383,79 @@ window.addEvent('domready', function() {
 			}
 		]
 	});
-	function getShortcutKeys(shortcut) {
-		var keys = shortcut.keys;
-		if(keys === null || keys === undefined) {
-			keys = shortcut['default'] || '';
-		}
-		return keys;
-	}
-	function getShortcutMap() {
-		var shortcutMap = {};
-		shortcuts.getValues().each(function(category) {
-			category.each(function(shortcut) {
-				var keys = getShortcutKeys(shortcut);
-				var shortArr = shortcutMap[keys];
-				if(!shortArr) {
-					shortArr = [];
-					shortcutMap[keys] = shortArr;
-				}
-				shortArr.push(shortcut);
-			});
-		});
-		return new Hash(shortcutMap);
-	}
 
-	shortcuts.getValues().each(function(category) {
-		category.each(function(shortcut) {
-			var keys = configuration.get('shortcuts.' + shortcut.description, null);
-			shortcut.keys = keys;
-		});
+	var timer = new KeyboardTimer($('timer'), server, scrambleStuff);
+	timer.addEvent('newTime', function(time) {
+		//TODO - this may need to wait for the sessions to load...
+		timesTable.addTime(time);
+	});
+	timesTable.addEvent('tableChanged', function() {
+		//timer.setStringy(timesTable.lastAddedRow.time.format());
+		timer.redraw();
 	});
 
+	var shortcutManager = new ShortcutManager(shortcuts, configuration, timer);
+	
+	$('newSession').addEvent('click', newSession);
+	$('resetSession').addEvent('click', resetSession);
+	$('deleteSession').addEvent('click', deleteSession);
+	$('downloadCSV').addEvent('click', downloadCSV);
+	$('downloadCSV').addEvent('mousedown', downloadCSV);
 
-    function keyStopper(func) {
-        return function(e) {
-            e.stop();
-            // Silly hack for opera. Apparently calling stop() isn't enough
-            // to stop keypress events from entering text into a textfield.
-            setTimeout(func, 0);
-        };
-    }
-	// NOTE: We don't need to explicitly call this function in
-	//       order to initialize stuff, because the onHide() method
-	//       calls it, and onHide() is called by createPopup().
-	function addShortcutListeners() {
-		keyboard.removeEvents();
-		getShortcutMap().getValues().each(function(shortcuts) {
-			for(var i = 0; i < shortcuts.length; i++) {
-				var shortcut = shortcuts[0];
-				var keys = shortcut.keys;
-				configuration.set('shortcuts.' + shortcut.description, keys);
-				keys = getShortcutKeys(shortcut);
-				if(keys !== '' && shortcuts.length == 1 && shortcut.handler) {
-					// If we have duplicate shortcuts, don't program any of them
-					// Note that we still save all the settings to configuration
-					keyboard.addEvent(keys, keyStopper(shortcut.handler));
-				}
-			}
-		});
-	}
-	function highlightDuplicates() {
-		//TODO - do something more clever to detect n & n+m
-		getShortcutMap().getValues().each(function(shortcuts) {
-			var duplicates = shortcuts.length > 1;
-			for(var i = 0; i < shortcuts.length; i++) {
-				var shortcut = shortcuts[i];
-				shortcut.editor.setStyle('color', '');
-				shortcut.editor.setStyle('border-color', '');
-				if(getShortcutKeys(shortcut) !== '' && duplicates) {
-					shortcut.editor.setStyle('color', 'red');
-					shortcut.editor.setStyle('border-color', 'red');
-				}
-			}
-		});
-	}
-
-	function isEditingShortcutField() {
-		return helpPopup.isVisible() && document.activeElement == editingShortcutField;
-	}
-	function isNotEditingShortcutField() {
-		return !isEditingShortcutField();
-	}
-	function onHide() {
-		addShortcutListeners();
-		window.removeEvent('contextmenu', isNotEditingShortcutField);
-	}
-	function onShow() {
-		window.addEvent('contextmenu', isNotEditingShortcutField);
-	}
-
-	var helpPopup = tnoodle.tnt.createPopup(onShow, onHide);
-
-	helpPopup.refresh = function() {
-		helpPopup.empty();
-		var shortcutsDiv = document.createElement('div');
-		shortcutsDiv.setStyle("overflow", 'auto');
-		helpPopup.overflow = function() {
-			var size = helpPopup.getParent().getSize();
-			shortcutsDiv.setStyle("height", size.y-40);
-			shortcutsDiv.setStyle("margin-right", '');
-		};
-		helpPopup.reset = function() {
-			//TODO - wow this is nasty
-			shortcutsDiv.setStyle("height", '');
-			shortcutsDiv.setStyle("width", '');
-			shortcutsDiv.setStyle("margin-right", 21);
-		};
-		helpPopup.appendChild(shortcutsDiv);
-		shortcuts.getKeys().each(function(category) {
-			var categorySpan = document.createElement('span');
-			categorySpan.appendText(category);
-			categorySpan.setStyle('font-weight', 'bold');
-			shortcutsDiv.appendChild(categorySpan);
-			shortcuts[category].each(function(shortcut) {
-				var shortcutDiv = document.createElement('div');
-				shortcutDiv.setStyle('margin-left', 10);
-
-				var label = document.createElement('label');
-				label.setStyle('font-size', '12px');
-				label.setStyle('float', 'left');
-				//label.setStyle('margin-left', 10);
-				label.setStyle('width', 200);
-				label.appendText(shortcut.description + ':');
-				shortcutDiv.appendChild(label);
-
-				var textField = document.createElement('input');
-				textField.setStyle('width', 60);
-				textField.type = 'text';
-				textField.value = getShortcutKeys(shortcut);
-				textField.shortcut = shortcut;
-				textField.addEvent('keydown', function(e) {
-					if(e.key == 'esc') {
-						// If we don't stop the event, then the popup will disappear
-						e.stop();
-						this.blur();
-					}
-				});
-				textField.addEvent('click', function(e) {
-					e.stop();
-				});
-				textField.addEvent('focus', function() {
-					editingShortcutField = this;
-				});
-				shortcutDiv.appendChild(textField);
-				shortcut.editor = textField;
-
-				shortcutsDiv.appendChild(shortcutDiv);
-			});
-		});
-		highlightDuplicates();
-		var reset = document.createElement('input');
-		reset.type = 'button';
-		reset.value = 'Reset';
-		reset.addEvent('click', function() {
-			if(!confirm('This will reset all shortcuts! Are you sure you wish to continue?')) {
-				return;
-			}
-			shortcuts.getValues().each(function(category) {
-				category.each(function(shortcut) {
-					shortcut.keys = shortcut['default'] || '';
-				});
-			});
-			helpPopup.refresh();
-		});
-		helpPopup.appendChild(reset);
+	$('timer').resize = function() {
+		timer.redraw();
 	};
+	$('scrambles').resize = scrambleStuff.resize;
+	function getMaxWidth(el) {
+		// Returns the maximum size the element can take up without falling
+		// off the right side of the screen.
+		return document.body.getSize().x - el.getPosition().x - 20;
+	}
+	$('times').resize = function() {
+		var available = $('times').getSize();
+		var remainingHeight = available.y - $('timesArea').getStyle('border-top').toInt() - $('timesArea').getStyle('border-bottom').toInt();
+		$('timesArea').setStyle('height', remainingHeight);
+		var seshCommentWidth = available.x - 30;
+		$('sessionComment').setStyle('width', Math.max(50, seshCommentWidth));
+
+		var selects = [ scrambleStuff.puzzleSelect, eventSelect, sessionSelect ];
+		selects.each(function(select) {
+			if(select.linebreak) {
+				select.linebreak.setStyle('display', 'none');
+			}
+			select.setMaxWidth(null);
+		});
+		selects.each(function(select) {
+			var maxWidth = getMaxWidth(select);
+			if(select.linebreak && select.getSize().x > maxWidth) {
+				select.linebreak.setStyle('display', '');
+				// Adding a newline gives us more space
+				maxWidth = getMaxWidth(select);
+			}
+			select.setMaxWidth(maxWidth);
+		});
+		
+		timesTable.resize();
+	};
+	$('times').getPreferredWidth = function() {
+		return timesTable.getPreferredWidth();
+	};
+
+	
+	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
+	timesTable.manager = triLayout;
+	
+	//TODO - yeah...
+	aboutText = '<h2 style="margin: 0;">TNoodle Timer (TNT) v' + tnoodle.tnt.version + '</h2><br/>' +
+				'Created by Jeremy Fleischman from the ashes of CCT.<br/>' +
+				'Thanks to Leyan Lo for ideas/couch';
+	var aboutPopup = tnoodle.tnt.createPopup();
+	aboutPopup.innerHTML = aboutText;
+	$('aboutLink').addEvent('click', function() {
+		aboutPopup.show();
+	});
+	
+
 
 	$('bgLink').reset = function() {
 		$('bgLink').empty();
