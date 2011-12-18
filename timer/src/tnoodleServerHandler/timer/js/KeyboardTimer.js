@@ -174,7 +174,7 @@ var KeyboardTimer = new Class({
                         // we treat this is a request to stop the timer.
                         // Huge thanks to Dan Dzoan for pointing this out!
                         stopTimer();
-                    } else{
+                    } else {
 						// starting timer
 						timer.lastTime = null;
 						timer.inspecting = false;
@@ -383,8 +383,8 @@ var KeyboardTimer = new Class({
 	redraw: function() {
 		var string = this.stringy();
 		var colorClass = this.inspecting ? 'inspecting' : '';
-		var keysDown = this.keysDown();
 		if(this.isFocused()) {
+			var keysDown = this.keysDown();
 			if(keysDown && this.hasDelayPassed()) {
 				if(!this.inspecting) {
 					// we still want people to see their inspection time when they're pressing spacebar
