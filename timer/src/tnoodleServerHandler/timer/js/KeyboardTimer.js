@@ -4,12 +4,14 @@ var KeyboardTimer = new Class({
 	frequency: 0.01,
 	CHAR_AR: 1/2, 
 	INSPECTION: 0,
-	initialize: function(parent, server, scrambleStuff) {
+	initialize: function(parent, server, scrambleStuff, shortcutManager) {
 		var timer = this;
 
-		this.scrambleStuff = scrambleStuff;
 		this.parent = parent;
 		this.server = server;
+		this.scrambleStuff = scrambleStuff;
+		this.shortcutManager = shortcutManager;
+
 		this.config = server.configuration;
 		
 		this.timer = new Element('div');
@@ -100,11 +102,17 @@ var KeyboardTimer = new Class({
             timer.stopRender(); // this will cause a redraw()
             timer.fireNewTime();
         }
-		var keysDown = false;
-		KeyboardState.addEvent('keydown', function(e, manager) {
+		timer.keysAreDown = false;
+		var fireFirst = true;
+		KeyboardManager.addEvent('keydown', function(e, manager) {
 			timer.windowFocused = true;
-			if(!timer.isFocused()) {
+			if(timer.shortcutManager.isEditingShortcutField()) {
+				// We're actually configuring shortcuts, so we must
+				// pass through to the ShortcutManager.
 				return;
+			}
+			if(!timer.isFocused()) {
+				return false;
 			}
 			if(e.key == 'tab') {
 				// This is a fun little hack:
@@ -124,42 +132,55 @@ var KeyboardTimer = new Class({
 			if(timer.config.get('timer.enableStackmat')) {
 				return;
 			}
-			keysDown = timer.keysDown();
+			timer.keysAreDown = timer.keysDown();
 			if(timer.timing) {
-				if(timer.startKeys().length > 1 && !keysDown) {
+				if(timer.startKeys().length > 1 && !timer.keysAreDown) {
 					// If the user has specified more than one key
-					// to start the timer, then it is likely that they
-					// want to emulate the functionality of a stackmat,
+					// to start the timer, then they want to emulate the
+					// behavior of a stackmat,
 					// so we only stop the timer if they're holding down
 					// all the keys they specified.
 					return;
 				}
                 stopTimer();
+				e.stop();
+				return false;
 			} else {
 				timer.redraw();
 			}
-		});
-		KeyboardState.addEvent('keyup', function(e, manager) {
+		}, fireFirst);
+		KeyboardManager.addEvent('keyup', function(e, manager) {
 			timer.windowFocused = true;
-			if(!timer.isFocused() || timer.config.get('timer.enableStackmat')) {
-				// A key may have been released which was 
-				// being held down when the timer lost focus
+			if(timer.shortcutManager.isEditingShortcutField()) {
+				// We're actually configuring shortcuts, so we must
+				// pass through to the ShortcutManager.
+				return;
+			}
+			if(timer.config.get('timer.enableStackmat')) {
+				// TODO - what is this all about?
 				timer.redraw();
 				return;
 			}
+			if(!timer.isFocused()) {
+				// A key may have been released which was 
+				// being held down when the timer lost focus.
+				timer.redraw();
+				return false;
+			}
 			
+			if(!e) {
+				// e is null when tabs change, 
+				// we don't want to start or stop the timer when that happens,
+				// so we simply do nothing.
+				timer.keysAreDown = false;
+				return;
+			}
 			if(timer.pendingTime) {
-				if(KeyboardState.keys.getLength() === 0) {
+				if(KeyboardManager.keys.getLength() === 0) {
 					timer.pendingTime = false;
 				}
-			} else if(keysDown && !timer.keysDown()) {
-				if(!e) {
-					// e is null when tabs change, 
-					// we don't want to start or stop the timer when that happens,
-					// so we simply do nothing.
-					return;
-				}
-				keysDown = false;
+			} else if(timer.keysAreDown && !timer.keysDown()) {
+				timer.keysAreDown = false;
 				if(timer.hasDelayPassed()) {
 					if(timer.INSPECTION > 0 && !timer.inspecting) {
 						// if inspection's on and we're not inspecting, let's start!
@@ -187,11 +208,13 @@ var KeyboardTimer = new Class({
 						scrambleStuff.scramble();
 					}
 					timer.startRender();
+					e.stop();
+					return false;
 				}
 			}
 			
 			timer.redraw();
-		});
+		}, fireFirst);
 		timer.windowFocused = true;
 		document.addEvent('mousedown', function(e) {
 			timer.windowFocused = true;
@@ -371,10 +394,17 @@ var KeyboardTimer = new Class({
 		}
 		var startKeys = this.startKeys();
 		if(startKeys.length === 1 && startKeys[0] === "") {
-			// TODO <<< - any non-hotkey should start the timer
-			return KeyboardState.keys.getLength() > 0;
+			var keys = KeyboardManager.keys.getKeys();
+			if(keys.length === 0) {
+				return false;
+			}
+			if(keys.contains('esc') || keys.contains('alt') || keys.contains('tab')) {
+				return false;
+			}
+			var handler = this.shortcutManager.getHandler(keys);
+			return !handler;
 		} else {
-			return KeyboardState.keys.getKeys().containsAll(startKeys);
+			return KeyboardManager.keys.getKeys().containsAll(startKeys);
 		}
 	},
 	redraw: function() {
@@ -382,7 +412,7 @@ var KeyboardTimer = new Class({
 		var colorClass = this.inspecting ? 'inspecting' : '';
 		if(this.isFocused()) {
 			var keysDown = this.keysDown();
-			if(keysDown && this.hasDelayPassed()) {
+			if(this.keysAreDown && keysDown && this.hasDelayPassed()) {
 				if(!this.inspecting) {
 					// we still want people to see their inspection time when they're pressing spacebar
 					string = this.server.formatTime(0, this.decimalPlaces);

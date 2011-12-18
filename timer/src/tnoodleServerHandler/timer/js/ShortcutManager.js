@@ -1,8 +1,7 @@
 var ShortcutManager = null;
 (function() {
 
-	ShortcutManager = function(shortcuts, configuration, timer) {
-
+	ShortcutManager = function(shortcuts, configuration) {
 		// This subclass of Keyboard ensures that
 		// shortcuts only work when we're not timing,
 		// editing a text box, or doing something else
@@ -24,34 +23,8 @@ var ShortcutManager = null;
 			});
 		});
 
-// TODO <<< alt+tab starts timer!
-// TODO <<< releasing a hotkey starts the timer...
-// TODO <<< escape shouldn't start the timer...
-//                      if(!timer.timing && timer.isFocused() && !timer.keysDown() && !timer.pendingTime) {
-//                               this.parent(event, typeStr);
-//                       }
-
-		function timerWaitingToStart() {
-			return !timer.timing && timer.isFocused() && !timer.keysDown() && !timer.pendingTime;
-		}
-
 		// TODO - test this out on opera!
-		var fireFirst = true;
-		KeyboardState.addEvent('keyup', function(e, manager) {
-			if(!timer.isFocused()) {
-				return false;
-			}
-			if(e) {
-				var keys = [ e.key ];
-				var shortcutMap = getShortcutMap();
-				var handler = getHandler(keys);
-				if(handler) {
-					e.stop();
-					return false;
-				}
-			}
-		}, fireFirst);
-		KeyboardState.addEvent('keydown', function(e, manager) {
+		KeyboardManager.addEvent('keydown', function(e, manager) {
 			var keys = manager.keys.getKeys();
 
 			if(isEditingShortcutField()) {
@@ -78,24 +51,13 @@ var ShortcutManager = null;
 				return false;
 			}
 
-			if(timer.timing) {
-				// If the timer is running, we don't want to do any hotkey stuff,
-				// we just let this even percolate down to the timer so the
-				// timer can stop.
-				return;
-			}
-			if(!timer.isFocused()) {
-				// If the timer does not have focus, then we don't want to fire any
-				// hotkeys. This happens when someone is editing a text field.
-				return false;
-			}
 			var handler = getHandler(keys);
 			if(handler) {
 				handler();
 				e.stop();
 				return false;
 			}
-		}, fireFirst);
+		});
 
 		function getHandler(keys) {
 			var shortcutMap = getShortcutMap();
@@ -108,6 +70,9 @@ var ShortcutManager = null;
 				}
 			}
 		}
+		// KeyboardTimer uses getHandler to determine if a key is ok to
+		// use to start the timer.
+		this.getHandler = getHandler;
 
 		function getShortcutMap() {
 			var shortcutMap = {};
@@ -158,6 +123,8 @@ var ShortcutManager = null;
 		function isEditingShortcutField() {
 			return helpPopup.isVisible() && document.activeElement == editingShortcutField;
 		}
+		// KeyboardTimer uses this method to know to pass keypresses to us.
+		this.isEditingShortcutField = isEditingShortcutField;
 		function isNotEditingShortcutField() {
 			return !isEditingShortcutField();
 		}

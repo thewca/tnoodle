@@ -131,6 +131,12 @@
 -gmaps style copy scramble
 	-fix bug with copy pasting current scramble
 -provide some system for uploading your own image?
+-reset timer shortcut
+
+-stats for all times is broken
+-clicking to view the RA of an already selected time makes it editable
+-holding down keys w/ inspection on shows 0.00, which doesn't really make sense
+	-also noticed a flicker while holding down spacebar...
 
 ### webscrambles
 -infinite seeded scrambles

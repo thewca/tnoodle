@@ -1,7 +1,7 @@
-var KeyboardState = null;
+var KeyboardManager = null;
 (function() {
 
-var KeyboardStateManager = function() {
+var KeyboardManagerClass = function() {
 	var that = this;
 	
 	that.keys = new Hash();
@@ -59,6 +59,6 @@ var KeyboardStateManager = function() {
 	window.addEvent('blur', that._resetKeys);
 };
 
-KeyboardState = new KeyboardStateManager();
+KeyboardManager = new KeyboardManagerClass();
 
 })();

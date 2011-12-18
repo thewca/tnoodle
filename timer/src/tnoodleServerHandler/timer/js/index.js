@@ -244,7 +244,7 @@ window.addEvent('domready', function() {
 		'Times': [
 			{
 				description: tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT,
-				'default': 'space',
+				'default': '',
 				handler: null
 			},
 			{
@@ -383,8 +383,9 @@ window.addEvent('domready', function() {
 			}
 		]
 	});
+	var shortcutManager = new ShortcutManager(shortcuts, configuration);
 
-	var timer = new KeyboardTimer($('timer'), server, scrambleStuff);
+	var timer = new KeyboardTimer($('timer'), server, scrambleStuff, shortcutManager);
 	timer.addEvent('newTime', function(time) {
 		//TODO - this may need to wait for the sessions to load...
 		timesTable.addTime(time);
@@ -393,8 +394,6 @@ window.addEvent('domready', function() {
 		//timer.setStringy(timesTable.lastAddedRow.time.format());
 		timer.redraw();
 	});
-
-	var shortcutManager = new ShortcutManager(shortcuts, configuration, timer);
 	
 	$('newSession').addEvent('click', newSession);
 	$('resetSession').addEvent('click', resetSession);
