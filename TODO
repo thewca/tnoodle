@@ -136,10 +136,14 @@
 	-fix bug with copy pasting current scramble
 -provide some system for uploading your own image?
 -reset timer shortcut
+-true fullscreen?
 
 -clicking to view the RA of an already selected time makes it editable
 -holding down keys w/ inspection on shows 0.00, which doesn't really make sense
 	-also noticed a flicker while holding down spacebar...
+-adjusting brightness rapidly starts and stops the timer
+-puzzle icon flickers while resizing scramble area
+-resetting with time hover visible leaves time hover visible
 
 ### webscrambles
 -infinite seeded scrambles

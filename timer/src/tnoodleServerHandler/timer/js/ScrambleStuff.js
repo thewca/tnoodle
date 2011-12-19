@@ -262,6 +262,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 
 	var currScramble = null;
 	function scrambleLoaded(scramble) {
+		setScrambleCopyVisible(false);
 		currScramble = scramble;
 
 		if(!faceMap) {
@@ -742,6 +743,43 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	scramblePre.className = 'scrambleText';
 	scrambleArea.appendChild(scramblePre);
 
+	var scrambleCopyArea = new Element('textarea', { readonly: 'readonly' });
+	scrambleCopyArea.setStyle('padding', 0);
+	scrambleCopyArea.setStyle('border', 0);
+	scrambleCopyArea.setStyle('resize', 'none');
+
+	var scrambleCopyVisible = false;
+	function setScrambleCopyVisible(visible) {
+		if(scrambleCopyVisible == visible) {
+			return;
+		}
+		scrambleCopyVisible = visible;
+		if(scrambleCopyVisible) {
+			var size = scrambleArea.getSize();
+			// TODO - magic numbers wtf
+			scrambleCopyArea.setStyle('height', size.y-32);
+			scrambleCopyArea.setStyle('width', size.x-2);
+			scrambleCopyArea.setStyle('font-size', scramblePre.getStyle('font-size'));
+			scrambleCopyArea.value = currScramble;
+
+			scrambleCopyArea.replaces(scramblePre);
+			scrambleCopyArea.focus();
+			scrambleCopyArea.select();
+
+		} else {
+			scramblePre.replaces(scrambleCopyArea);
+		}
+	}
+	scramblePre.addEvent('dblclick', function(e) {
+		setScrambleCopyVisible(true);
+	});
+	scrambleCopyArea.addEvent('blur', setScrambleCopyVisible.bind(null, false));
+	scrambleCopyArea.addEvent('keydown', function(e) {
+		if(e.key == 'esc') {
+			setScrambleCopyVisible(false);
+		}
+	});
+
 	var scrambleDiv = document.createElement('div');
 	scrambleDiv.style.display = 'none';
 	scrambleDiv.className = 'window';
@@ -986,13 +1024,14 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	}
 	
 	this.resize = function() {
+		setScrambleCopyVisible(false);
+
 		var space = $('scrambles').getSize();
 		space.y -= $('scrambleBorder').getSize().y + 2; //add 2 for border
 		$$('.scrambleArea')[0].setStyle('height', space.y);
 		space.y -= $$('.scrambleHeader')[0].getSize().y;
-		var scrambleText = $$('.scrambleText')[0];
-		var paddingVert = scrambleText.getStyle('padding-top').toInt() + scrambleText.getStyle('padding-bottom').toInt();
-		var paddingHorz = scrambleText.getStyle('padding-left').toInt() + scrambleText.getStyle('padding-right').toInt();
+		var paddingVert = scramblePre.getStyle('padding-top').toInt() + scramblePre.getStyle('padding-bottom').toInt();
+		var paddingHorz = scramblePre.getStyle('padding-left').toInt() + scramblePre.getStyle('padding-right').toInt();
 		space.y -= paddingVert;
 		if(space.y < 0) {
 			space.y = 0;
