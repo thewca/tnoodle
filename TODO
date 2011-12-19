@@ -122,6 +122,7 @@
 #### TNT
 +resetting keyboard shortcut configuration breaks vertical scrollbar if present
 +time stats tabs should have a pointer, not a text selector when hovering
++stats for all times is broken
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -136,7 +137,6 @@
 -provide some system for uploading your own image?
 -reset timer shortcut
 
--stats for all times is broken
 -clicking to view the RA of an already selected time makes it editable
 -holding down keys w/ inspection on shows 0.00, which doesn't really make sense
 	-also noticed a flicker while holding down spacebar...

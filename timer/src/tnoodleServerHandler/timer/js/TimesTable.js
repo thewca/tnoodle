@@ -245,8 +245,8 @@ var TimesTable = new Class({
 				td.lastTimeIndex = function() { return table.session.bestWorst(key).best.index; };
 				td.addEvent('click', table.raBoxClicked);
 			} else if(key == "index") {
-				td.raSize = function() { return -1; };
-				td.lastTimeIndex = function() { return -1; };
+				td.raSize = function() { return null; };
+				td.lastTimeIndex = function() { return null; };
 				td.addEvent('click', table.raBoxClicked);
 			} else if(key == "centis") {
 				td.addEvent('click', function(e) {
