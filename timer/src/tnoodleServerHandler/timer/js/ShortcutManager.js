@@ -212,6 +212,12 @@ var ShortcutManager = null;
 				helpPopup.refresh();
 			});
 			helpPopup.appendChild(reset);
+
+			// TODO - this is pretty awful. tnt.createPopup doesn't
+			// know that we just mutated its contents, so we have to poke
+			// it to resize stuff. The tnt.createPopup api seriously
+			// needs to be rethought.
+			helpPopup.getParent().center();
 		};
 	};
 
