@@ -121,6 +121,7 @@
 
 #### TNT
 +resetting keyboard shortcut configuration breaks vertical scrollbar if present
++time stats tabs should have a pointer, not a text selector when hovering
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration

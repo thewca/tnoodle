@@ -18,6 +18,7 @@ ul.tabs li {
 	display: inline;
 	border: 1px solid black;
 	padding: 4px;
+	cursor: default;
 }
 ul.tabs li:hover {
 	background-color: black;
