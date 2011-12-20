@@ -170,6 +170,8 @@ public class ClockScrambler extends Scrambler {
 			move = Integer.parseInt(word, 2);
 			seq[move+16] = Integer.parseInt(m.group(2));
 			seq[move] = Integer.parseInt(m.group(3));
+			for( i=0; i<4; i++ )
+				pins[i] = ( word.charAt(i) == '1' );
 		}
 
 		p = Pattern.compile("\\(([Ud]{4})\\)");
