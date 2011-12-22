@@ -22,12 +22,20 @@ var ShortcutManager = null;
 				shortcut.keys = keys;
 			});
 		});
-
-		// TODO - test this out on opera!
-		KeyboardManager.addEvent('keydown', function(e, manager) {
-			var keys = manager.keys.getKeys();
+		function keydown(e, manager) {
+			var keys;
+			if(manager) {
+				keys = manager.keys.getKeys();
+			} else {
+				keys = [ e.key ];
+			}
 
 			if(isEditingShortcutField()) {
+				if(editingShortcutField.shortcut.unikey) {
+					// Some shortcuts just don't work if you can specify
+					// multiple keys (ie: timer reset).
+					keys = [ e.key ];
+				}
 				if(keys.length === 0) {
 					return;
 				}
@@ -57,7 +65,9 @@ var ShortcutManager = null;
 				e.stop();
 				return false;
 			}
-		});
+		}
+		// TODO - test this out on opera!
+		KeyboardManager.addEvent('keydown', keydown);
 
 		function getHandler(keys) {
 			var shortcutMap = getShortcutMap();
@@ -181,7 +191,7 @@ var ShortcutManager = null;
 						if(e.key == 'esc') {
 							// If we don't stop the event, then the popup will disappear
 							e.stop();
-							this.blur();
+							keydown(e);
 						}
 					});
 					textField.addEvent('click', function(e) {

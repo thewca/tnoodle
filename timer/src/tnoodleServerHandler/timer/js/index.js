@@ -255,6 +255,12 @@ window.addEvent('domready', function() {
 				handler: null
 			},
 			{
+				description: 'Reset timer',
+				'default': 'esc',
+				handler: null,
+				unikey: true
+			},
+			{
 				description: 'Comment on last solve',
 				'default': 'c',
 				handler: timesTable.comment.bind(timesTable)

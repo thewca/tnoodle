@@ -131,6 +131,9 @@ var KeyboardTimer = new Class({
 			if(timer.config.get('timer.enableStackmat')) {
 				return;
 			}
+			if(e.key == timer.resetKey()) {
+				timer.reset();
+			}
 			timer.keysAreDown = timer.keysDown();
 			if(timer.timing) {
 				if(timer.startKeys().length > 1 && !timer.keysAreDown) {
@@ -379,6 +382,7 @@ var KeyboardTimer = new Class({
 		this.timerStop = 0;
 		this.inspecting = false;
 		this.inspectionStart = null;
+		this.lastTime = null;
 		
 		this.stopRender();
 	},
@@ -386,6 +390,11 @@ var KeyboardTimer = new Class({
 		var startKey = this.config.get("shortcuts."+tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT, 'space');
 		return startKey.split("+");
     },
+	resetKey: function() {
+		var resetKey = this.config.get("shortcuts.Reset timer", 'space');
+		assert(resetKey.indexOf("+") == -1);
+		return resetKey;
+	},
 	keysDown: function() {
 		if(this.pendingTime) {
 			return false;
@@ -394,6 +403,9 @@ var KeyboardTimer = new Class({
 		if(startKeys.length === 1 && startKeys[0] === "") {
 			var keys = KeyboardManager.keys.getKeys();
 			if(keys.length === 0) {
+				return false;
+			}
+			if(keys.contains(this.resetKey())) {
 				return false;
 			}
 			if(keys.contains('esc') || keys.contains('alt') || keys.contains('tab')) {
