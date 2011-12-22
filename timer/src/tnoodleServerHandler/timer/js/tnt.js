@@ -1,6 +1,10 @@
 var tnoodle = tnoodle || {};
 tnoodle.tnt = {
 	version: '%%VERSION%%',
+	isTextEditing: function() {
+		var focusedEl = document.activeElement.nodeName.toLowerCase();
+		return ( focusedEl == 'textarea' || focusedEl == 'input' );
+	},
 	createOptionBox: function(config, optionKey, description, def, changeListener) {
 		var checkbox = new Element('input', { id: optionKey, type: 'checkbox' });
 		checkbox.checked = config.get(optionKey, def);

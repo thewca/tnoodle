@@ -238,7 +238,8 @@ var KeyboardTimer = new Class({
 			timer.redraw();
 		});
 		window.addEvent('contextmenu', function(e) {
-			return !timer.config.get('timer.disableContextMenu');
+			var allowContextMenu = !timer.config.get('timer.disableContextMenu') || !timer.isFocused();
+			return allowContextMenu;
 		});
 		
 		function stackmatError(error) {
@@ -308,9 +309,7 @@ var KeyboardTimer = new Class({
 	isFocused: function() {
 		// This is kinda weird, we want to avoid activating the timer 
 		// if we're in a textarea or input field.
-		var focusedEl = document.activeElement.nodeName.toLowerCase();
-		var isEditing = focusedEl == 'textarea' || focusedEl == 'input';
-		return !isEditing && !tnoodle.tnt.isSelecting() && !tnoodle.tnt.isGrayedOut() && this.windowFocused;
+		return !tnoodle.tnt.isTextEditing() && !tnoodle.tnt.isSelecting() && !tnoodle.tnt.isGrayedOut() && this.windowFocused;
 	},
 	getTimeCentis: function() {
 		if(this.config.get('timer.enableStackmat')) {

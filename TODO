@@ -127,6 +127,7 @@
 	+fix bug with copy pasting current scramble
 +puzzle icon flickers while resizing scramble area
 +resetting with time hover visible leaves time hover visible
++right click doesn't work inside of stats field
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -144,8 +145,8 @@
 -clicking to view the RA of an already selected time makes it editable
 -holding down keys w/ inspection on shows 0.00, which doesn't really make sense
 -adjusting brightness rapidly starts and stops the timer
--right click doesn't work inside of stats field
--ctrl+a doesn't work inside of stats field
+	-opening laptop lid also starts the timer
+-ctrl+a/select all doesn't work inside of stats field
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
