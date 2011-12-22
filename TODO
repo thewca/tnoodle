@@ -131,6 +131,8 @@
 +adjusting brightness rapidly starts and stops the timer
 	+opening laptop lid also starts the timer
 +ctrl+a/select all doesn't work inside of stats field
++holding down keys w/ inspection on shows 0.00, which doesn't really make sense
++clicking to view the RA of an already selected time makes it editable
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -142,11 +144,7 @@
 -read times/metronome
 -provide some system for uploading your own image?
 -true fullscreen?
--add autoupdating to server
 -reset timer shortcut
-
--clicking to view the RA of an already selected time makes it editable
--holding down keys w/ inspection on shows 0.00, which doesn't really make sense
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
@@ -161,6 +159,7 @@
 		-screw this, just store everything in the db, and make it easy to create an account
 	-add login
 	-implement stuff on scratch paper!!!
+-add autoupdating to server
 
 ### webscrambles-ui
 -shelley's gui (https://github.com/jfly/tnoodle/issues?labels=webscrambles-ui)

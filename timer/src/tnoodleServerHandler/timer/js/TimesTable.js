@@ -452,10 +452,10 @@ var TimesTable = new Class({
 					});
 					selectRow(row);
 				} else {
-					var edit = selectedRows.contains(row);
+					var edit = selectedRows.contains(row) && e.target.key == 'centis';
 					deselectRows(row);
-					if(edit) {
-						row.editing = true;
+					if(edit != row.editing) {
+						row.editing = edit;
 						row.refresh();
 					}
 					if(row === table.addRow) {

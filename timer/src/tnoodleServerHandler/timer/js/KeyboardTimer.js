@@ -77,7 +77,6 @@ var KeyboardTimer = new Class({
         inspectionSeconds.setProperties({'type': 'number', 'name': 'timer.inspectionSeconds', 'min': "0"});
         inspectionSeconds.setStyle('width', 52);
         inspectionSeconds.setStyle('margin-left', 2);
-        //TODO - for some crazy reason, chrome is not displaying the spinners
 		inspectionDiv.adopt(inspectionSeconds);
 		inspectionDiv.adopt(new Element('label', { 'for': 'timer.inspectionSeconds', html: 'second WCA inspection' }));
 		inspectionSeconds.addEvent('change', inspectionChanged);
@@ -421,7 +420,11 @@ var KeyboardTimer = new Class({
 			if(this.keysAreDown && keysDown && this.hasDelayPassed()) {
 				if(!this.inspecting) {
 					// we still want people to see their inspection time when they're pressing spacebar
-					string = this.server.formatTime(0, this.decimalPlaces);
+					if(this.INSPECTION) {
+						string = ""+this.INSPECTION;
+					} else {
+						string = this.server.formatTime(0, this.decimalPlaces);
+					}
 				}
 				colorClass = 'keysDown';
 			}
