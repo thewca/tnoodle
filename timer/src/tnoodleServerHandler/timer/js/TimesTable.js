@@ -723,6 +723,10 @@ var TimesTable = new Class({
 	reset: function() {
 		this.session.reset();
 		this.setSession(this.session);
+
+		// Reseting the table with a time hovered would leave the time hover visible.
+		// This fixes that problem.
+		this.timeHoverDiv.hide(true);
 	},
 	addTime: function(time) {
 		this.session.addTime(time, this.scrambleStuff.scramble, this.scrambleStuff.unscramble);
