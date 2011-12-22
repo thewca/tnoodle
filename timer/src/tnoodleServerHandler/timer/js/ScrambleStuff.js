@@ -743,7 +743,10 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	scramblePre.className = 'scrambleText';
 	scrambleArea.appendChild(scramblePre);
 
-	var scrambleCopyArea = new Element('textarea', { readonly: 'readonly' });
+	// While we could mark this text area as readonly, I don't think there's
+	// much benefit to it, and it screws up text selection (the box doesn't seem
+	// to stay focused).
+	var scrambleCopyArea = new Element('textarea');
 	scrambleCopyArea.setStyle('padding', 0);
 	scrambleCopyArea.setStyle('border', 0);
 	scrambleCopyArea.setStyle('resize', 'none');

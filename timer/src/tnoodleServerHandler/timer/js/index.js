@@ -28,7 +28,8 @@ window.addEvent('domready', function() {
 	document.addEvent('selectstart', function(e) {
 		// We allow no text selection whatsoever. There's special code for copying
 		// scrambles, and I can't think of anything else a user would want to select.
-		return false;
+		var allowTextSelection = tnoodle.tnt.isTextEditing();
+		return allowTextSelection;
 	});
 
 	var session = null;
