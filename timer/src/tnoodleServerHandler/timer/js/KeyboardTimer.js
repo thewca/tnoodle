@@ -400,6 +400,13 @@ var KeyboardTimer = new Class({
 			if(keys.contains('esc') || keys.contains('alt') || keys.contains('tab')) {
 				return false;
 			}
+			var nullStr = String.fromCharCode(0);
+			if(keys.contains(nullStr)) {
+				// We don't allow using unknown keys to start the timer.
+				// This solves all sorts of weird issues with IBM's fn key, and
+				// opening the lid of a laptop.
+				return false;
+			}
 			var handler = this.shortcutManager.getHandler(keys);
 			return !handler;
 		} else {
