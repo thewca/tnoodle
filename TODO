@@ -123,6 +123,8 @@
 +resetting keyboard shortcut configuration breaks vertical scrollbar if present
 +time stats tabs should have a pointer, not a text selector when hovering
 +stats for all times is broken
++gmaps style copy scramble
+	+fix bug with copy pasting current scramble
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -132,15 +134,13 @@
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
 -read times/metronome
--gmaps style copy scramble
-	-fix bug with copy pasting current scramble
 -provide some system for uploading your own image?
--reset timer shortcut
 -true fullscreen?
+-add autoupdating to server
+-reset timer shortcut
 
 -clicking to view the RA of an already selected time makes it editable
 -holding down keys w/ inspection on shows 0.00, which doesn't really make sense
-	-also noticed a flicker while holding down spacebar...
 -adjusting brightness rapidly starts and stops the timer
 -puzzle icon flickers while resizing scramble area
 -resetting with time hover visible leaves time hover visible

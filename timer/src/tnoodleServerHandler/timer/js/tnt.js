@@ -250,7 +250,52 @@ tnoodle.tnt = {
 		select.addClass('select');
 		select.selectedIndex = 0;
 
-		var selected = document.createElement('span');
+		function createOptionSpan() {
+			var span = document.createElement('span');
+			var img = document.createElement('img');
+			img.setStyle('vertical-align', 'middle');
+			img.setStyle('width', '32px');
+			img.setStyle('height', '32px');
+			img.setStyle('padding', '0px 2px 2px 0px');
+			img.setStyle('display', 'none');
+			span.appendChild(img);
+			var optionTextSpan = document.createElement('span');
+			span.appendChild(optionTextSpan);
+
+			span.img = img;
+			span.textSpan = optionTextSpan;
+			return span;
+		}
+		function fillWithOption(el, option, maxWidth) {
+			if(!maxWidth) {
+				maxWidth = Infinity;
+			}
+
+			el.setStyle('height', '');
+			el.img.setStyle('display', 'none');
+			if(option.icon) {
+				el.img.setStyle('display', 'inline');
+				if(el.img.src != option.icon) {
+					el.img.src = option.icon;
+				}
+				maxWidth -= 32 + 2;
+			}
+			maxWidth -= select.arrow2.getSize().x;
+			if(select.arrow1) {
+				maxWidth -= select.arrow1.getSize().x;
+			}
+			el.setStyle('font-weight', '');
+			if(option.value === null) {
+				el.setStyle('font-weight', 'bold');
+			}
+			el.textSpan.empty();
+			el.textSpan.appendText(resizeStr(option.text, maxWidth));
+			if(option.text === "" && !option.icon) {
+				// Nasty little hack to deal with empty options
+				el.setStyle('height', '19px');
+			}
+		}
+		var selected = createOptionSpan();
 		// Add a nice little upside down triangle
 		var arrow = document.createElement('span');
 		arrow.appendText('\u25BC');
@@ -303,35 +348,6 @@ tnoodle.tnt = {
 			THIS.textSizer_.setStyle('display', 'none');
 			return str.substring(0, i) + '...';
 		}
-		function fillWithOption(el, option, maxWidth) {
-			if(!maxWidth) {
-				maxWidth = Infinity;
-			}
-			el.empty();
-			if(option.icon) {
-				var img = document.createElement('img');
-				img.setStyle('vertical-align', 'middle');
-				img.setStyle('width', '32px');
-				img.setStyle('height', '32px');
-				img.setStyle('padding', '0px 2px 2px 0px');
-				img.src = option.icon;
-				el.appendChild(img);
-				maxWidth -= 32 + 2;
-			}
-			maxWidth -= select.arrow2.getSize().x;
-			if(select.arrow1) {
-				maxWidth -= select.arrow1.getSize().x;
-			}
-			el.setStyle('font-weight', '');
-			if(option.value === null) {
-				el.setStyle('font-weight', 'bold');
-			}
-			el.appendText(resizeStr(option.text, maxWidth));
-			if(option.text === "" && !option.icon) {
-				// Nasty little hack to deal with empty options
-				el.setStyle('height', '19px');
-			}
-		}
 		var maxWidth = null;
 		select.setMaxWidth = function(width) {
 			maxWidth = width;
@@ -372,7 +388,7 @@ tnoodle.tnt = {
 		var currOptions = null;
 		var hoveredIndex = null;
 		function clearOptions() {
-			optionsDiv.getChildren('div').each(function(div) {
+			optionsDiv.getChildren('span').each(function(div) {
 				div.removeClass('hovered');
 			});
 		}
@@ -431,7 +447,8 @@ tnoodle.tnt = {
 					optionsHaveChanged = false;
 					optionsDiv.empty();
 					for(var i = 0; i < options.length; i++) {
-						var option = document.createElement('div');
+						var option = createOptionSpan();
+						option.setStyle('display', 'block');
 						option.addClass('option');
 						fillWithOption(option, options[i]);
 						option.value = options[i].value;
