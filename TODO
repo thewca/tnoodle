@@ -144,6 +144,8 @@
 -adjusting brightness rapidly starts and stops the timer
 -puzzle icon flickers while resizing scramble area
 -resetting with time hover visible leaves time hover visible
+-right click doesn't work inside of stats field
+-ctrl+a doesn't work inside of stats field
 
 ### webscrambles
 -infinite seeded scrambles
