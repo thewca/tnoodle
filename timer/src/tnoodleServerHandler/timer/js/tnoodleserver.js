@@ -999,7 +999,8 @@ tnoodle.Session = function(server, id, puzzle, event) {
 				timeStr = "(" + timeStr + ")";
 			}
 			simpleTimes += (offset>0?', ':'') + timeStr;
-			detailedTimes += (offset+1) + ". " + timeStr + " " + time.scramble + "\n";
+			var scramble = time.scramble.replace(/\n/g, ' ');
+			detailedTimes += (offset+1) + ". " + timeStr + " " + scramble + "\n";
 		}
 
 		// TODO - this thing is duplicated, GAH!!! find something better
