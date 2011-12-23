@@ -391,7 +391,7 @@ var KeyboardTimer = new Class({
 		return startKey.split("+");
     },
 	resetKey: function() {
-		var resetKey = this.config.get("shortcuts.Reset timer", 'space');
+		var resetKey = this.config.get("shortcuts.Reset timer", 'esc');
 		assert(resetKey.indexOf("+") == -1);
 		return resetKey;
 	},
