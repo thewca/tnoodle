@@ -365,15 +365,28 @@ var KeyboardTimer = new Class({
 		}
 	},
 	timerId: null,
+	fireRedraw: function() {
+		this.redraw();
+		setTimeout(function() {
+			if(this.timerId === null) {
+				// This means stopRender was called,
+				// so we don't want to continue the animation.
+				return;
+			}
+			this.timerId = requestAnimFrame(this.fireRedraw.bind(this), this.timer);
+		}.bind(this), this.frequency*1000);
+	},
 	startRender: function() {
 		if(this.timerId === null) {
-			this.timerId = this.redraw.periodical(this.frequency*1000, this);
+			this.timerId = requestAnimFrame(this.fireRedraw.bind(this), this.timer);
 		}
 	},
 	stopRender: function() {
-		clearInterval(this.timerId);
-		this.timerId = null;
-		this.redraw();
+		if(this.timerId !== null) {
+			cancelRequestAnimFrame(this.timerId);
+			this.timerId = null;
+			this.redraw();
+		}
 	},
 	reset: function() {
 		this.stackCentis = 0;
