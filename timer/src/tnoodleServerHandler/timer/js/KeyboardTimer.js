@@ -4,8 +4,10 @@ var KeyboardTimer = new Class({
 	frequency: 0.01,
 	CHAR_AR: 1/2, 
 	INSPECTION: 0,
+	HTML5_FULLSCREEN: true,
 	initialize: function(parent, server, scrambleStuff, shortcutManager) {
-		var timer = this;
+		var timer = this;// TODO - get rid of this
+		var that = this;
 
 		this.parent = parent;
 		this.server = server;
@@ -20,7 +22,7 @@ var KeyboardTimer = new Class({
 		this.timer.setStyle('position', 'relative'); //this lets us manually center the text with js
 		
 		this.fullscreenBG = new Element('div', { 'class': 'fullscreenTimerBg' });
-		this.fullscreenBG.setStyle('display', 'none');
+		this.fullscreenBG.hide();
 		this.fullscreenBG.inject(document.body);
 		
 		function shownCallback() { }
@@ -91,16 +93,42 @@ var KeyboardTimer = new Class({
 		this.reset(); //this will update the display
 		
         function stopTimer() {
-            if(!timer.timing) {
-                alert('We should be timing if this is being called!'); //TODO - proper error message solution...
-            }
+			assert(timer.timing);
             timer.timing = false;
             timer.timerStop = new Date().getTime();
 
             timer.pendingTime = true;
-            timer.stopRender(); // this will cause a redraw()
-            timer.fireNewTime();
+			function fireNewTime() {
+				timer.stopRender(); // this will cause a redraw()
+				timer.fireNewTime();
+			}
+			if(that.HTML5_FULLSCREEN && that.isFullscreenWhileTiming()) {
+				document.cancelFullScreen();
+				// Apparently the page is still resizing when we fire the new time
+				// right after cancelling fullscreen. This screws up scrollling to the
+				// bottom of the times table, unless we wait for a moment first.
+				setTimeout(fireNewTime, 100);
+			} else {
+				fireNewTime();
+			}
         }
+
+		function fullscreenChanged(fullscreen) {
+			if(!fullscreen) {
+				// Pressing esc while in fullscreen mode will exit fullscreen mode
+				// without firing a keypress. We treat this as a reset timer request,
+				// even if esc isn't programmed to be the reset key. Note that this
+				// behavior also applies to the fullscreen key (f11 on chrome).
+				that.reset();
+			}
+		}
+		document.addEventListener("webkitfullscreenchange",function(e) {
+			fullscreenChanged(document.webkitIsFullScreen);
+		}, false);
+		document.addEventListener("mozfullscreenchange",function(e) {
+			fullscreenChanged(document.mozFullScreenElement !== null);
+		}, false);
+
 		timer.keysAreDown = false;
 		var fireFirst = true;
 		KeyboardManager.addEvent('keydown', function(e, manager) {
@@ -188,9 +216,6 @@ var KeyboardTimer = new Class({
 						// if inspection's on and we're not inspecting, let's start!
 						timer.inspectionStart = new Date().getTime();
 						timer.inspecting = true;
-						//TODO - it's likely that we could use lastTime to hold our
-						//penalties, and thereby clean up a good bit of code
-						//UPDATE -  I think i thought through this and decided it was a bad idea...
 						timer.lastTime = null;
 					} else if(timer.timing) {
                         // It is possible to witness keyup events without a
@@ -209,8 +234,17 @@ var KeyboardTimer = new Class({
 						timer.importInfo = scrambleStuff.getImportInfo();
 						scrambleStuff.scramble();
 					}
-					timer.startRender();
+					that.startRender();
 					e.stop();
+					if(that.HTML5_FULLSCREEN) {
+						if(that.isFullscreenWhileTiming() && that.timing) {
+							// Note that we don't enable fullscreen for inspection.
+							// We request full screen here rather than in redraw because
+							// the call will only work if it is in response to a user action,
+							// such as releasing a key.
+							that.fullscreenBG.reqFullScreen();
+						}
+					}
 					return false;
 				}
 			}
@@ -424,6 +458,12 @@ var KeyboardTimer = new Class({
 			if(keys.contains('esc') || keys.contains('alt') || keys.contains('tab')) {
 				return false;
 			}
+			for(var i = 0; i < keys.length; i++) {
+				if(/f\d\d?/.exec(keys[i])) {
+					// f* keys aren't allowed to start the timer
+					return false;
+				}
+			}
 			var nullStr = String.fromCharCode(0);
 			if(keys.contains(nullStr)) {
 				// We don't allow using unknown keys to start the timer.
@@ -436,6 +476,9 @@ var KeyboardTimer = new Class({
 		} else {
 			return KeyboardManager.keys.getKeys().containsAll(startKeys);
 		}
+	},
+	isFullscreenWhileTiming: function() {
+		return this.config.get('timer.fullscreenWhileTiming');
 	},
 	redraw: function() {
 		var string = this.stringy();
@@ -464,13 +507,19 @@ var KeyboardTimer = new Class({
 		this.timer.setStyle('height', '');
 		
 		var parent;
-		if(this.config.get('timer.fullscreenWhileTiming') && this.timing) {
-			parent = window;
+		if(this.isFullscreenWhileTiming() && this.timing) {
+			parent = this.fullscreenBG;
 			this.timer.addClass('fullscreenTimer');
-			this.fullscreenBG.setStyle('display', '');
+			this.fullscreenBG.show();
 		} else {
 			parent = this.parent;
-			this.fullscreenBG.setStyle('display', 'none');
+			this.fullscreenBG.hide();
+		}
+
+		if(this.timer.getParent() != parent) {
+			// We inject the timer as the first child of the new parent,
+			// this way the options drop down doesn't get covered by the timer.
+			this.timer.inject(parent, 'top');
 		}
 		
 		var maxSize = parent.getSize();
@@ -485,3 +534,19 @@ var KeyboardTimer = new Class({
 	}
 });
 KeyboardTimer.implement(new Events());
+
+
+Element.implement({
+	reqFullScreen: function(){
+		if(this.requestFullScreen) {
+			this.requestFullScreen();
+		} else if(this.mozRequestFullScreen) {
+			this.mozRequestFullScreen();
+		} else if(this.webkitRequestFullScreen) {
+			this.webkitRequestFullScreen();
+		}
+	}
+});
+
+document.cancelFullScreen = document.cancelFullScreen || document.mozCancelFullScreen || document.webkitCancelFullScreen;
+
