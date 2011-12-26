@@ -141,6 +141,7 @@
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
 	-mootools-core DOMEvent if(keydown) statement? (https://github.com/GCheung55/mootools-core/commit/ef7e091874c80efe9aa5a039fe75798398e19e46)
+	-Chrome Element vs mootools Element for fullscreen api
 -exponential backoff for "Loading Scramble..."
 -add remaining stackmat options
 -pretty gui for editing

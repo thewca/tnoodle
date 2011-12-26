@@ -554,7 +554,7 @@ Element.implement({
 		} else if(this.mozRequestFullScreen) {
 			this.mozRequestFullScreen();
 		} else if(this.webkitRequestFullScreen) {
-			this.webkitRequestFullScreen();
+			this.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
 		}
 	}
 });

@@ -2704,6 +2704,7 @@ provides: [Element, Elements, $, $$, Iframe, Selectors]
 ...
 */
 
+var ChromeElement = Element;// TODO - jfly
 var Element = function(tag, props){
 	var konstructor = Element.Constructors[tag];
 	if (konstructor) return konstructor(props);
@@ -2730,6 +2731,10 @@ var Element = function(tag, props){
 
 	return document.newElement(tag, props);
 };
+
+if(ChromeElement) {
+	Element.ALLOW_KEYBOARD_INPUT = ChromeElement.ALLOW_KEYBOARD_INPUT;// TODO - jfly
+}
 
 
 if (Browser.Element){
