@@ -119,7 +119,9 @@ var KeyboardTimer = new Class({
 				// without firing a keypress. We treat this as a reset timer request,
 				// even if esc isn't programmed to be the reset key. Note that this
 				// behavior also applies to the fullscreen key (f11 on chrome).
-				that.reset();
+				if(that.timing) {
+					that.reset();
+				}
 			}
 		}
 		document.addEventListener("webkitfullscreenchange",function(e) {
