@@ -120,7 +120,7 @@ var KeyboardTimer = new Class({
 				// even if esc isn't programmed to be the reset key. Note that this
 				// behavior also applies to the fullscreen key (f11 on chrome).
 				if(that.timing) {
-					that.reset();
+					that.resetTimerAndScramble();
 				}
 			}
 		}
@@ -162,7 +162,7 @@ var KeyboardTimer = new Class({
 				return;
 			}
 			if(e.key == timer.resetKey()) {
-				timer.reset();
+				timer.resetTimerAndScramble();
 			}
 			timer.keysAreDown = timer.keysDown();
 			if(timer.timing) {
@@ -324,15 +324,19 @@ var KeyboardTimer = new Class({
 		//TODO - add remaining stackmat config options!!!
 
 	},
-	lastTime: null,
-	fireNewTime: function() {
+	createNewTime: function() {
 		var time = new tnoodle.Time(this.getTimeCentis(), this.scramble);
-		this.lastTime = time;
 		var penalty = this.getPenalty();
 		if(penalty) {
 			time.setPenalty(penalty);
 		}
 		time.importInfo = this.importInfo;
+		return time;
+	},
+	lastTime: null,
+	fireNewTime: function() {
+		var time = this.createNewTime();
+		this.lastTime = time;
 		var addTime = function() {
 			this.fireEvent('newTime', [ time ]);
 		}.bind(this);
@@ -434,6 +438,11 @@ var KeyboardTimer = new Class({
 		this.lastTime = null;
 		
 		this.stopRender();
+	},
+	resetTimerAndScramble: function() {
+		var cancelledTime = this.createNewTime();
+		this.reset();
+		this.scrambleStuff.unscramble(cancelledTime);
 	},
 	startKeys: function() {
 		var startKey = this.config.get("shortcuts."+tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT, 'space');
