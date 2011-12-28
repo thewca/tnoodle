@@ -492,8 +492,9 @@ class EclipseProject(TmtProject):
 	classpathHandler = EclipseClasspathHandler()
 	classpathParser.setContentHandler(classpathHandler)
 
-	def __init__(self, name, main=None, tests=None):
+	def __init__(self, name, main=None, argv=None, tests=None):
 		self.main = main
+		self.argv = argv
 		self.nonJavaSrcDeps = []
 		self.tests = tests
 		TmtProject.__init__(self, name)
@@ -743,10 +744,13 @@ Implementation-Version: %s
 		assert tmt.args.args is not None # shlex reads from stdin if you pass None, lol
 		tmt._make(projectName=self.name, command='compile')
 		# TODO propogate return code up
+		args = shlex.split(tmt.args.args)
+		if self.argv:
+			args += self.argv
 		tmt.java(
 			main=self.main,
 			classpath=self.getClasspath(includeResources=False),
-			args=shlex.split(tmt.args.args),
+			args=args,
 			debug=tmt.args.debug)
 	
 	def check(self):

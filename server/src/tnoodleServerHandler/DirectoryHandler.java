@@ -44,6 +44,27 @@ public class DirectoryHandler extends SafeHttpHandler {
 		headInjectCode = code;
 	}
 	
+	private static class CachedFileInfo {
+		byte[] data;
+		String contentType;
+	}
+
+	private static Map<String, CachedFileInfo> cachedFiles;
+	public static void setCachingEnabled(boolean enabled) {
+		boolean caching = (cachedFiles != null);
+		if(enabled == caching) {
+			return;
+		}
+		if(enabled) {
+			cachedFiles = new HashMap<String, CachedFileInfo>();
+		} else {
+			cachedFiles = null;
+		}
+	}
+	static {
+		setCachingEnabled(true);
+	}
+	
 	private String path;
 	public DirectoryHandler(String path) {
 		if(path.endsWith("/")) {
@@ -52,16 +73,14 @@ public class DirectoryHandler extends SafeHttpHandler {
 		this.path = path;
 	}
 	
-	// TODO - provide some way to clear the cache? perhaps via url a-la DeathHandler?
-	private static Map<String, byte[]> cachedFiles = new HashMap<String, byte[]>();
-	private static Map<String, String> cachedContentTypes = new HashMap<String, String>();
 	protected void wrappedHandle(HttpExchange t, String[] requestPath, LinkedHashMap<String, String> query) throws IOException {
 		String fullPath = Utils.getResourceDirectory() + "/" + PLUGIN_DIRECTORY + "/" + path + "/" + Utils.join(requestPath, "/");
-		if(cachedFiles.containsKey(fullPath)) {
-			String contentType = cachedContentTypes.get(fullPath);
+		if(cachedFiles != null && cachedFiles.containsKey(fullPath)) {
+			CachedFileInfo cached = cachedFiles.get(fullPath);
+			String contentType = cached.contentType;
 			azzert(contentType != null);
-			byte[] bytes = cachedFiles.get(fullPath);
-			sendBytes(t, bytes, contentType);
+			byte[] data = cached.data;
+			sendBytes(t, data, contentType);
 			return;
 		}
 		File f = new File(fullPath);
@@ -114,8 +133,12 @@ public class DirectoryHandler extends SafeHttpHandler {
 			azzert(contentType != null);
 		}
 		
-		cachedFiles.put(fullPath, data);
-		cachedContentTypes.put(fullPath, contentType);
+		if(cachedFiles != null) {
+			CachedFileInfo cached = new CachedFileInfo();
+			cached.contentType = contentType;
+			cached.data = data;
+			cachedFiles.put(fullPath, cached);
+		}
 		sendBytes(t, data, contentType);
 	}
 }

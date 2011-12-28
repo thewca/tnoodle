@@ -13,7 +13,8 @@ class Project(tmt.EclipseProject):
 		tmt.EclipseProject.__init__(
 				self,
 				tmt.projectName(),
-				main='net.gnehzr.tnoodle.server.TNoodleServer')
+				main='net.gnehzr.tnoodle.server.TNoodleServer',
+				argv=[ '--nobrowser', '--disable-caching' ])
 		self.plugins = {}
 
 	def addPlugin(self, project):
@@ -23,6 +24,7 @@ class Project(tmt.EclipseProject):
 		project.serverPluginBinDir = join(project.binResource, SERVER_PLUGIN_DIR)
 		project.serverPluginPackageBinDir = join(project.serverPluginBinDir, project.name)
 		project.main = self.main
+		project.argv = self.argv
 		assert exists(project.contextFileName)
 		assert project.name not in self.plugins
 		self.plugins[project.name] = project

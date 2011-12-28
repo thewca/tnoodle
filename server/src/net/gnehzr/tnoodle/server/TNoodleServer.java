@@ -90,6 +90,7 @@ public class TNoodleServer {
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, do not attempt to kill it and start up");
 		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"), "File containing code to inject into the bottom of the <head>...</head> section of all html served").withOptionalArg().ofType(File.class);
+		OptionSpec<?> noCachingOpt = parser.acceptsAll(Arrays.asList("d", "disable-caching"), "Disable file caching. This is useful for development, but is way slower.");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
@@ -105,6 +106,8 @@ public class TNoodleServer {
 					in.readFully(b);
 					DirectoryHandler.setHeadInjectCode(new String(b));
 				}
+				boolean enableCaching = !options.has(noCachingOpt);
+				DirectoryHandler.setCachingEnabled(enableCaching);
 				int port = options.valueOf(portOpt);
 				boolean openBrowser = !options.has(noBrowserOpt);
 				try {
