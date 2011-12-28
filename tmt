@@ -314,8 +314,11 @@ class tmt:
 			If f is a directory, returns the timestamp of the newest file 
 			found anywhere under the given directory f.
 			If f is a file, simply returns the timestamp of the given file.
-			Empty directories have timestamp 0.
+			Empty/non existent directories have timestamp 0.
 		"""
+		if not exists(f):
+			return 0
+
 		if os.path.islink(f):
 			# We don't follow symbolic links because we don't want them
 			# to cause a recompile of any project that uses us.
