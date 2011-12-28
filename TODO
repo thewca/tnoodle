@@ -172,8 +172,8 @@
 -shelley's gui (https://github.com/jfly/tnoodle/issues?labels=webscrambles-ui)
 
 ### TNoodleMakeTools
--winstone! java servlets!
-	-injectable analytics js?
-	-consolidate context file/short name/long name for scramble plugins
-	-load everything from file! extract all to a folder on first startup, note that this does break java applets, but that's ok, nobody cares =(
-		-plugins/scramble icons
++load everything from file! extract all to a folder on first startup, note that this does break java applets, but that's ok, nobody cares =(
+	+plugins/scramble icons
++consolidate context file/short name/long name for scramble plugins
+
+-injectable analytics js?

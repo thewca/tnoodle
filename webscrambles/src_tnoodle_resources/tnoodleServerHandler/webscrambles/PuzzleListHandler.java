@@ -10,7 +10,7 @@ import java.util.SortedMap;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstance;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -18,17 +18,14 @@ import com.sun.net.httpserver.HttpExchange;
 public class PuzzleListHandler extends SafeHttpHandler {
 	private String puzzleNamesJSON;
 	public PuzzleListHandler() throws BadClassDescriptionException, IOException {
-		SortedMap<String, LazyInstance<Scrambler>>  scramblers = Scrambler.getScramblers();
+		SortedMap<String, LazyInstantiator<Scrambler>> scramblers = Scrambler.getScramblers();
 		
 		// listing available scrambles
 		String[][] puzzleNames = new String[scramblers.size()][2];
 		int i = 0;
-		for(Entry<String, LazyInstance<Scrambler>> scrambler : scramblers.entrySet()) {
-//			String shortName = scrambler.getValue().getShortName();
-//			String longName = scrambler.getValue().getLongName();
-			//TODO - figure out some way of deriving both the short & long name without actually loading the class
+		for(Entry<String, LazyInstantiator<Scrambler>> scrambler : scramblers.entrySet()) {
 			String shortName = scrambler.getKey();
-			String longName = scrambler.getKey();
+			String longName = Scrambler.getScramblerLongName(shortName);
 			puzzleNames[i][0] = shortName;
 			puzzleNames[i][1] = longName;
 			i++;

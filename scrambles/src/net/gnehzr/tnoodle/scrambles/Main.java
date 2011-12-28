@@ -12,7 +12,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstance;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
@@ -32,9 +32,9 @@ public class Main {
 			TNoodleLogging.initializeLogging();
 		}
 		
-		SortedMap<String, LazyInstance<Scrambler>> scramblers = Scrambler.getScramblers();
+		SortedMap<String, LazyInstantiator<Scrambler>> scramblers = Scrambler.getScramblers();
 		for(String puzzle : puzzles) {
-			LazyInstance<Scrambler> lazyScrambler = scramblers.get(puzzle);
+			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
 			if(lazyScrambler == null) {
 				System.err.println("couldn't find puzzle " + puzzle + ", try one of " + scramblers.keySet());
 				System.exit(1);

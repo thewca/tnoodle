@@ -26,7 +26,7 @@ import javax.imageio.ImageIO;
 
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.Base64;
-import net.gnehzr.tnoodle.utils.LazyInstance;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -148,15 +148,22 @@ public abstract class Scrambler {
 
 	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class);
 	// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
-	private static SortedMap<String, LazyInstance<Scrambler>> scramblers =
-		new TreeMap<String, LazyInstance<Scrambler>>(Strings.getNaturalComparator());
+	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers =
+		new TreeMap<String, LazyInstantiator<Scrambler>>(Strings.getNaturalComparator());
 
-	public static SortedMap<String, LazyInstance<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {
+	public static SortedMap<String, LazyInstantiator<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {
 		if(plugins.dirtyPlugins()) {
 			plugins.reloadPlugins();
 			scramblers.putAll(plugins.getPlugins());
 		}
 		return scramblers;
+	}
+	public static String getScramblerLongName(String shortName) throws BadClassDescriptionException, IOException {
+		if(plugins.dirtyPlugins()) {
+			plugins.reloadPlugins();
+			scramblers.putAll(plugins.getPlugins());
+		}
+		return plugins.getPluginComment(shortName);
 	}
 	
 	/**
@@ -329,7 +336,7 @@ public abstract class Scrambler {
 		@Override
 		public Scrambler deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 			String scramblerName = json.getAsString();
-			LazyInstance<Scrambler> lazyScrambler = scramblers.get(scramblerName);
+			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(scramblerName);
 			if(lazyScrambler == null) {
 				throw new JsonParseException(scramblerName + " not found in: " + scramblers.keySet());
 			}

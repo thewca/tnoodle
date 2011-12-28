@@ -5,10 +5,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstance;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
@@ -23,14 +24,14 @@ public class TNoodleServerPluginDelegator extends SafeHttpHandler {
 	}
 	
 	private LongestPrefixMatch<String> lpm = new LongestPrefixMatch<String>();
-	private HashMap<String[], LazyInstance<SafeHttpHandler>> handlers = 
-		new HashMap<String[], LazyInstance<SafeHttpHandler>>();
+	private Map<String[], LazyInstantiator<SafeHttpHandler>> handlers = 
+		new HashMap<String[], LazyInstantiator<SafeHttpHandler>>();
 	private String[] getLongestMatch(String[] path) throws IOException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, ClassNotFoundException, BadClassDescriptionException {
 		if(plugins.dirtyPlugins()) {
 			plugins.reloadPlugins();
-			HashMap<String, LazyInstance<SafeHttpHandler>> pluginMap = plugins.getPlugins();
+			Map<String, LazyInstantiator<SafeHttpHandler>> pluginMap = plugins.getPlugins();
 			for(String prefix : pluginMap.keySet()) {
-				LazyInstance<SafeHttpHandler> lazyClass = pluginMap.get(prefix);
+				LazyInstantiator<SafeHttpHandler> lazyClass = pluginMap.get(prefix);
 				
 				if(prefix.startsWith("/")) {
 					prefix = prefix.substring(1);
@@ -58,7 +59,7 @@ public class TNoodleServerPluginDelegator extends SafeHttpHandler {
 		l.info("GET " + t.getRequestURI() + " " + t.getRemoteAddress()); // TODO - create a special logger for this!
 		
 		String[] longestMatch = getLongestMatch(path);
-		LazyInstance<SafeHttpHandler> handler = handlers.get(longestMatch);
+		LazyInstantiator<SafeHttpHandler> handler = handlers.get(longestMatch);
 		if(handler == null) {
 			String failMessage = "No handler found for: " + Arrays.toString(path);
 			l.info(failMessage);

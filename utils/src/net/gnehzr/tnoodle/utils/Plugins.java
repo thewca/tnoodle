@@ -1,20 +1,19 @@
 package net.gnehzr.tnoodle.utils;
 
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import java.util.Map;
 
 public class Plugins<H> {
-	private static final Pattern NAMESPACE_PATTERN = Pattern.compile("([^\\s{]+)\\s*\\{\\s*");
-	
 	private String packageName;
-	private HashMap<String, LazyInstance<H>> filePlugins = new HashMap<String, LazyInstance<H>>();
+	private HashMap<String, LazyInstantiator<H>> filePlugins = new HashMap<String, LazyInstantiator<H>>();
+	private HashMap<String, String> pluginComment = new HashMap<String, String>();
 	private long loadedTime = 0;
 	private Class<H> pluginClass;
 	
@@ -31,7 +30,6 @@ public class Plugins<H> {
 		azzert(contextFile.exists());
 	}
 	
-	private HashMap<String, LazyInstance<H>> allPlugins = new HashMap<String, LazyInstance<H>>();
 	public synchronized boolean dirtyPlugins() {
 		azzert(contextFile.exists());
 		long mtime = contextFile.lastModified();
@@ -42,53 +40,49 @@ public class Plugins<H> {
 		return pluginDirectory;
 	}
 	
-	private void readContextFile(BufferedReader in, HashMap<String, LazyInstance<H>> loadMe) throws BadClassDescriptionException, IOException {
+	public synchronized void reloadPlugins() throws BadClassDescriptionException, IOException {
+		azzert(contextFile.exists());
+		BufferedReader in = new BufferedReader(new FileReader(contextFile));
+		filePlugins.clear();
+		pluginComment.clear();
+		
 		String line;
-		String namespace = null;
+		String lastComment = null;
 		while((line = in.readLine()) != null) {
 			line = line.trim();
 			// lines starting with # and empty lines are ignored
-			if(line.startsWith("#") || line.isEmpty()) {
+			if(line.startsWith("#")) {
+				lastComment = line.substring(1);
 				continue;
 			}
-
-			Matcher m = NAMESPACE_PATTERN.matcher(line);
-			if(m.matches()) {
-				// We don't support nested namespaces yet
-				azzert(namespace == null);
-				namespace = m.group(1);
-			}
-			if(line.equals("}")) {
-				// Closing curly brace found without matching opening brace
-				azzert(namespace != null);
-				namespace = null;
+			if(line.isEmpty()) {
+				lastComment = null;
+				continue;
 			}
 
 			String[] name_def = line.split("\\s+", 2);
 			String name = name_def[0];
 			String definition = name_def[1];
-			LazyInstance<H> lazyClass = new LazyInstance<H>(definition, pluginClass, Utils.getResourceDirectory());
-			azzert(!loadMe.containsKey(name));
-			loadMe.put(name, lazyClass);
+			LazyInstantiator<H> lazyClass = new LazyInstantiator<H>(definition, pluginClass, Utils.getResourceDirectory());
+			azzert(!filePlugins.containsKey(name));
+			filePlugins.put(name, lazyClass);
+			pluginComment.put(name, lastComment != null ? lastComment : name);
+			lastComment = null;
 		}
+		
+		loadedTime = contextFile.lastModified();
 	}
 	
-	public synchronized void reloadPlugins() throws BadClassDescriptionException, IOException {
-		azzert(contextFile.exists());
-		filePlugins.clear();
-		BufferedReader in = new BufferedReader(new FileReader(contextFile));
-		readContextFile(in, filePlugins);
-		loadedTime = contextFile.lastModified();
-
-		allPlugins.clear();
-		allPlugins.putAll(filePlugins);
+	public String getPluginComment(String key) {
+		return pluginComment.get(key);
 	}
 
-	public synchronized HashMap<String, LazyInstance<H>> getPlugins() throws BadClassDescriptionException, IOException {
+	public synchronized Map<String, LazyInstantiator<H>> getPlugins() throws BadClassDescriptionException, IOException {
 		if(dirtyPlugins()) {
 			reloadPlugins();
 		}
-		return new HashMap<String, LazyInstance<H>>(allPlugins);
+		
+		return Collections.unmodifiableMap(filePlugins);
 	}
 
 }

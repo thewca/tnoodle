@@ -21,7 +21,7 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstance;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
 
 import com.itextpdf.text.BaseColor;
@@ -58,7 +58,7 @@ class ScrambleRequest {
 	private static final int MAX_COPIES = 100;
 	
 	private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
-	private static SortedMap<String, LazyInstance<Scrambler>> scramblers;
+	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
 	static {
 		try {
 			scramblers = Scrambler.getScramblers();
@@ -117,7 +117,7 @@ class ScrambleRequest {
 			throw new InvalidScrambleRequestException("Invalid puzzle request " + scrambleRequestUrl);
 		}
 		
-		LazyInstance<Scrambler> lazyScrambler = scramblers.get(puzzle);
+		LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
 		if(lazyScrambler == null) {
 			throw new InvalidScrambleRequestException("Invalid scrambler: " + puzzle);
 		}

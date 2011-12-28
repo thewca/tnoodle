@@ -24,7 +24,7 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstance;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
 import com.itextpdf.text.DocumentException;
 import com.sun.net.httpserver.HttpExchange;
@@ -32,7 +32,7 @@ import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 @SuppressWarnings("restriction")
 public class ScrambleViewHandler extends SafeHttpHandler {
-	private SortedMap<String, LazyInstance<Scrambler>> scramblers;
+	private SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
 
 	public ScrambleViewHandler() throws BadClassDescriptionException,
 			IOException {
@@ -61,7 +61,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 
 		if (extension.equals("png") || extension.equals("json")) {
 			String puzzle = name;
-			LazyInstance<Scrambler> lazyScrambler = scramblers.get(puzzle);
+			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
 			if (lazyScrambler == null) {
 				sendJSONError(t, "Invalid scrambler: " + puzzle, callback);
 				return;

@@ -32,7 +32,7 @@ import javax.swing.SwingUtilities;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstance;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
 @SuppressWarnings("serial")
 public class ScrambleTestGui {
@@ -42,7 +42,7 @@ public class ScrambleTestGui {
 	
 	private JLabel imageLabel;
 	
-	private SortedMap<String, LazyInstance<Scrambler>> scramblers;
+	private SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
 	public ScrambleTestGui() {
 		try {
 			scramblers = Scrambler.getScramblers();
@@ -123,7 +123,7 @@ public class ScrambleTestGui {
 		requestScramble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				LazyInstance<Scrambler> lazyScrambler = (LazyInstance<Scrambler>) puzzleBox.getSelectedItem();
+				LazyInstantiator<Scrambler> lazyScrambler = (LazyInstantiator<Scrambler>) puzzleBox.getSelectedItem();
 				Scrambler scrambler;
 				try {
 					scrambler = lazyScrambler.cachedInstance();

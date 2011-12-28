@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LazyInstance<H> {
+public class LazyInstantiator<H> {
 	// package.FileHandler("www/")
 	private static final Pattern INSTANTIATION_PATTERN = Pattern.compile("(\\S+)\\s*\\((.*)\\)");
 	// TODO - this pattern doesn't actually match all valid strings
@@ -20,7 +20,7 @@ public class LazyInstance<H> {
 	private String definition;
 	private Class<H> parentClass;
 	private File classDirectory;
-	public LazyInstance(String definition, Class<H> classy, File classDirectory) throws BadClassDescriptionException {
+	public LazyInstantiator(String definition, Class<H> classy, File classDirectory) throws BadClassDescriptionException {
 		Matcher m = INSTANTIATION_PATTERN.matcher(definition);
 		if(!m.matches()) {
 			throw new BadClassDescriptionException(definition);
