@@ -1,11 +1,14 @@
 package tnoodleServerHandler;
 
-import java.io.ByteArrayOutputStream;
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -36,6 +39,11 @@ public class DirectoryHandler extends SafeHttpHandler {
 		mimes.addMimeTypes("application/octet-stream *");
 	}
 	
+	private static String headInjectCode;
+	public static void setHeadInjectCode(String code) {
+		headInjectCode = code;
+	}
+	
 	private String path;
 	public DirectoryHandler(String path) {
 		if(path.endsWith("/")) {
@@ -44,9 +52,19 @@ public class DirectoryHandler extends SafeHttpHandler {
 		this.path = path;
 	}
 	
-	// TODO - this would probably benefit from caching 
+	// TODO - provide some way to clear the cache? perhaps via url a-la DeathHandler?
+	private static Map<String, byte[]> cachedFiles = new HashMap<String, byte[]>();
+	private static Map<String, String> cachedContentTypes = new HashMap<String, String>();
 	protected void wrappedHandle(HttpExchange t, String[] requestPath, LinkedHashMap<String, String> query) throws IOException {
-		File f = new File(Utils.getResourceDirectory(), PLUGIN_DIRECTORY + "/" + path + "/" + Utils.join(requestPath, "/"));
+		String fullPath = Utils.getResourceDirectory() + "/" + PLUGIN_DIRECTORY + "/" + path + "/" + Utils.join(requestPath, "/");
+		if(cachedFiles.containsKey(fullPath)) {
+			String contentType = cachedContentTypes.get(fullPath);
+			azzert(contentType != null);
+			byte[] bytes = cachedFiles.get(fullPath);
+			sendBytes(t, bytes, contentType);
+			return;
+		}
+		File f = new File(fullPath);
 		if(!f.exists()) {
 			send404(t, f.getAbsolutePath());
 		}
@@ -64,16 +82,40 @@ public class DirectoryHandler extends SafeHttpHandler {
 			}
 		}
 
-		InputStream is = new FileInputStream(f);
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		Utils.fullyReadInputStream(is, bytes);
+		DataInputStream in = new DataInputStream(new FileInputStream(f));
+		byte[] data = new byte[(int) f.length()];
+		in.readFully(data);
+		
 		String fileName = f.getName();
+		String contentType = null;
+		String html = null;
 		if(fileName.endsWith(".md")) {
-			String html = mp.markdown(bytes.toString());
-			sendHtml(t, html.getBytes());
+			html = "<html>\n<body>\n" + mp.markdown(new String(data)) + "</body>\n</html>\n";
 		} else {
-			String contentType = mimes.getContentType(fileName);
-			sendBytes(t, bytes, contentType);
+			contentType = mimes.getContentType(fileName);
+			if(contentType.equals("text/html")) {
+				html = new String(data);
+			}
 		}
+		if(html != null) {
+			if(headInjectCode != null) {
+				int closingHeadIndex = html.indexOf("</head>");
+				if(closingHeadIndex < 0) {
+					// If there is no <head>...</head> tag, we conjure up one of our own.
+					int closingHtmlIndex = html.indexOf("</html>");
+					html = html.substring(0, closingHtmlIndex) + "<head>\n</head>\n" + html.substring(closingHtmlIndex);
+					closingHeadIndex = html.indexOf("</head>");
+				}
+				html = html.substring(0, closingHeadIndex) + "\n" + headInjectCode + "\n" + html.substring(closingHeadIndex);
+			}
+			contentType = "text/html";
+			data = html.getBytes();
+		} else {
+			azzert(contentType != null);
+		}
+		
+		cachedFiles.put(fullPath, data);
+		cachedContentTypes.put(fullPath, contentType);
+		sendBytes(t, data, contentType);
 	}
 }

@@ -1,6 +1,9 @@
 package net.gnehzr.tnoodle.server;
 
 import java.awt.Desktop;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
@@ -19,6 +22,7 @@ import joptsimple.OptionSpec;
 import net.gnehzr.tnoodle.utils.Launcher;
 import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.Utils;
+import tnoodleServerHandler.DirectoryHandler;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -78,7 +82,6 @@ public class TNoodleServer {
 		Launcher.wrapMain(args);
 
 		OptionParser parser = new OptionParser();
-		// TODO - optional url prefix?
 		OptionSpec<Integer> portOpt = parser.
 			acceptsAll(Arrays.asList("p", "port"), "The port to run the http server on").
 				withOptionalArg().
@@ -86,10 +89,22 @@ public class TNoodleServer {
 					defaultsTo(8080);
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, do not attempt to kill it and start up");
+		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"), "File containing code to inject into the bottom of the <head>...</head> section of all html served").withOptionalArg().ofType(File.class);
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
+				if(options.has(injectJsOpt)) {
+					File injectCodeFile = options.valueOf(injectJsOpt);
+					if(!injectCodeFile.exists() || !injectCodeFile.canRead()) {
+						System.err.println("Cannot find or read " + injectCodeFile);
+						System.exit(1);
+					}
+					DataInputStream in = new DataInputStream(new FileInputStream(injectCodeFile));
+					byte[] b = new byte[(int) injectCodeFile.length()];
+					in.readFully(b);
+					DirectoryHandler.setHeadInjectCode(new String(b));
+				}
 				int port = options.valueOf(portOpt);
 				boolean openBrowser = !options.has(noBrowserOpt);
 				try {
