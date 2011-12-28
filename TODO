@@ -144,10 +144,11 @@
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
 	-mootools-core DOMEvent if(keydown) statement? (https://github.com/GCheung55/mootools-core/commit/ef7e091874c80efe9aa5a039fe75798398e19e46)
 	-Chrome Element vs mootools Element for fullscreen api
--exponential backoff for "Loading Scramble..."
--add remaining stackmat options
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
+
+-exponential backoff for "Loading Scramble..."
+-add remaining stackmat options
 -read times/metronome
 -provide some system for uploading your own image?
 
