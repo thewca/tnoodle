@@ -325,6 +325,9 @@ var KeyboardTimer = new Class({
 
 	},
 	createNewTime: function() {
+		if(this.getTimeCentis() === 0) {
+			return null;
+		}
 		var time = new tnoodle.Time(this.getTimeCentis(), this.scramble);
 		var penalty = this.getPenalty();
 		if(penalty) {
@@ -441,6 +444,9 @@ var KeyboardTimer = new Class({
 	},
 	resetTimerAndScramble: function() {
 		var cancelledTime = this.createNewTime();
+		if(!cancelledTime) {
+			return;
+		}
 		this.reset();
 		this.scrambleStuff.unscramble(cancelledTime);
 	},

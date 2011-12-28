@@ -199,6 +199,7 @@ tnoodle.tnt = {
 		function keydown(e) {
 			if(e.key == 'esc') {
 				popup.hide();
+				e.stop();
 			}
 		}
 		var mouseDown = false;
