@@ -151,6 +151,9 @@
 -add remaining stackmat options
 -read times/metronome
 -provide some system for uploading your own image?
+-top row of times table shouldn't wrap
+-get rid of multiple drop down arrows?
+-scrambles for arbitrary relays?
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
@@ -158,15 +161,20 @@
 -infinite seeded scrambles
 -#6 configurable clock colorscheme
 
+-richer heirarchy of scrambles (2gen, LL, reese, whatever...)
+-scramble hints? such as cross...
+
 ### server/utils
 -create own java assertions facility, as java assertions cannot be enabled at runtime
 	-check at commit time that everything uses azzert instead of assert
 	-find some way of printing out the contents of the assertion that blew up
+
 -saving times
 	-Add a note about opening multiple instances of tnt
 		-screw this, just store everything in the db, and make it easy to create an account
 	-add login
 	-implement stuff on scratch paper!!!
+	-graphs (save for Hackathon2011?)
 -add autoupdating to server
 
 ### webscrambles-ui
