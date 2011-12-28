@@ -1,6 +1,7 @@
 *.swp
 dist/
 bin/
+bin_tnoodle_resources/
 .settings
 .externalToolBuilders
 .metadata

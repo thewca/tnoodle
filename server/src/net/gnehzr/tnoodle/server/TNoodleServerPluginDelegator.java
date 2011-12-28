@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyClassLoader;
+import net.gnehzr.tnoodle.utils.LazyInstance;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
@@ -23,14 +23,14 @@ public class TNoodleServerPluginDelegator extends SafeHttpHandler {
 	}
 	
 	private LongestPrefixMatch<String> lpm = new LongestPrefixMatch<String>();
-	private HashMap<String[], LazyClassLoader<SafeHttpHandler>> handlers = 
-		new HashMap<String[], LazyClassLoader<SafeHttpHandler>>();
+	private HashMap<String[], LazyInstance<SafeHttpHandler>> handlers = 
+		new HashMap<String[], LazyInstance<SafeHttpHandler>>();
 	private String[] getLongestMatch(String[] path) throws IOException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, ClassNotFoundException, BadClassDescriptionException {
 		if(plugins.dirtyPlugins()) {
 			plugins.reloadPlugins();
-			HashMap<String, LazyClassLoader<SafeHttpHandler>> pluginMap = plugins.getPlugins();
+			HashMap<String, LazyInstance<SafeHttpHandler>> pluginMap = plugins.getPlugins();
 			for(String prefix : pluginMap.keySet()) {
-				LazyClassLoader<SafeHttpHandler> lazyClass = pluginMap.get(prefix);
+				LazyInstance<SafeHttpHandler> lazyClass = pluginMap.get(prefix);
 				
 				if(prefix.startsWith("/")) {
 					prefix = prefix.substring(1);
@@ -46,7 +46,6 @@ public class TNoodleServerPluginDelegator extends SafeHttpHandler {
 				}
 				lpm.put(prefixArray);
 				handlers.put(prefixArray, lazyClass);
-				lazyClass.cachedInstance();
 			}
 		}
 		
@@ -59,7 +58,7 @@ public class TNoodleServerPluginDelegator extends SafeHttpHandler {
 		l.info("GET " + t.getRequestURI() + " " + t.getRemoteAddress()); // TODO - create a special logger for this!
 		
 		String[] longestMatch = getLongestMatch(path);
-		LazyClassLoader<SafeHttpHandler> handler = handlers.get(longestMatch);
+		LazyInstance<SafeHttpHandler> handler = handlers.get(longestMatch);
 		if(handler == null) {
 			String failMessage = "No handler found for: " + Arrays.toString(path);
 			l.info(failMessage);

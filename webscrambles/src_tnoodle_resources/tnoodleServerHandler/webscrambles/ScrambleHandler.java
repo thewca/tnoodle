@@ -1,4 +1,4 @@
-package tnoodleServerHandler;
+package tnoodleServerHandler.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 
@@ -9,13 +9,19 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
+import tnoodleServerHandler.FileHandler;
 
 import com.itextpdf.text.DocumentException;
 import com.sun.net.httpserver.HttpExchange;
 
 @SuppressWarnings("restriction")
 public class ScrambleHandler extends SafeHttpHandler {
-	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/scramblegen.html");
+	// TODO - there has to be a better way of getting the benefit of a FileHandler...
+	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/scramblegen.html") {
+		protected void wrappedHandle(HttpExchange t, String[] requestPath, java.util.LinkedHashMap<String,String> query) throws IOException {
+			super.wrappedHandle(t, new String[0], query);
+		};
+	};
 
 	public ScrambleHandler() {}
 	

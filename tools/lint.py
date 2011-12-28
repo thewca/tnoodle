@@ -6,14 +6,12 @@ JSLINT_ENABLED = True
 CHECK_ILLEGAL_CHAR = True
 
 JSLINT_IGNORED_FILES = {
-	'timer/src/tnoodleServerHandler/timer/js/mootools-1.2.4-core.js',
-	'timer/src/tnoodleServerHandler/timer/js/mootools-1.2.4.4-more.js',
-	'timer/src/tnoodleServerHandler/timer/js/mootools-core-1.4.2.js',
-	'timer/src/tnoodleServerHandler/timer/js/mootools-more-1.4.0.1.js',
-	'timer/src/tnoodleServerHandler/timer/js/stacktrace.js',
-	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-core-1.4.1-full-nocompat.js',
-	'webscrambles/src/tnoodleServerHandler/webscrambles/mootools-more-1.4.0.1.js',
-	'webscrambles/src/tnoodleServerHandler/webscrambles/powertools-1.1.1.js',
+	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/mootools-core-1.4.2.js',
+	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/mootools-more-1.4.0.1.js',
+	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/stacktrace.js',
+	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/mootools-core-1.4.1-full-nocompat.js',
+	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/mootools-more-1.4.0.1.js',
+	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/powertools-1.1.1.js',
 }
 JSLINT_IGNORED_ERRORS = {
 	'type is unnecessary.',

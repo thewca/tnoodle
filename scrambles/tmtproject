@@ -12,7 +12,7 @@ class Project(tmt.EclipseProject):
 
 	def configure(self):
 		tmt.EclipseProject.configure(self)
-		self.nonJavaSrcDeps += tmt.glob(self.src, '.*png$', relativeTo=self.src)
+		self.nonJavaSrcDeps += tmt.glob(self.srcResource, '.*png$', relativeTo=self.srcResource)
 		self.nonJavaSrcDeps.append('scrambler/scramblers')
 
 Project()

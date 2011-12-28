@@ -1,11 +1,18 @@
 package org.squareone.twophase;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
+import net.gnehzr.tnoodle.utils.Utils;
 
 public class Tables {
 	private static final Logger l = Logger.getLogger(Tables.class.getName());
@@ -253,19 +260,31 @@ public class Tables {
 		TimedLogRecordStart start = new TimedLogRecordStart("initing tables");
 		l.log(start);
 		
-		if(!loadTransitionTables(Tables.class.getResourceAsStream("transition_tables")))
+		try {
+			FileInputStream is = new FileInputStream(new File(Utils.getResourceDirectory(), "squareone_tables"));
+			inited = loadTables(new DataInputStream(is));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		if(!inited) {
 			initialise();
-		loadShapeTable(Tables.class.getResourceAsStream("shape_table"));
-		loadPermTable(Tables.class.getResourceAsStream("perm_table"));
-		
+		}
 		inited = true;
 		
 		l.log(start.finishedNow());
 	}
 
+	private static boolean loadTables(InputStream in) {
+		boolean success = loadTransitionTables(in) && loadShapeTable(in) && loadPermTable(in);
+		try {
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return success;
+	}
+	
 	private static boolean loadTransitionTables(InputStream in) {
-		if(in == null)
-			return false;
 		try {
 			TimedLogRecordStart start = new TimedLogRecordStart("loading transition tables");
 			l.log(start);
@@ -274,7 +293,6 @@ public class Tables {
 			int read = 0;
 			while(read < buff.length)
 				read += in.read(buff, read, buff.length-read);
-			in.close();
 
 			int index = 0;
 			for(int[] table : transition_tables) {
@@ -292,9 +310,6 @@ public class Tables {
 	}
 
 	private static boolean loadShapeTable(InputStream in) {
-		if(in == null)
-			return false;
-		
 		try {
 			TimedLogRecordStart start = new TimedLogRecordStart("loading shape table");
 			l.log(start);
@@ -304,7 +319,6 @@ public class Tables {
 					for(int k=0;k<13;k++)
 						for(int l=0;l<13;l++)
 							in.read(shapeTable[i][j][k][l], 0, 2);
-			in.close();
 
 			l.log(start.finishedNow());
 			return true;
@@ -315,9 +329,6 @@ public class Tables {
 	}
 
 	private static boolean loadPermTable(InputStream in) {
-		if(in == null)
-			return false;
-		
 		try {
 			TimedLogRecordStart start = new TimedLogRecordStart("loading perm table");
 			l.log(start);
@@ -327,7 +338,6 @@ public class Tables {
 				while(read < 40320)
 					read += in.read(permTable[i], read, 40320-read);
 			}
-			in.close();
 
 			l.log(start.finishedNow());
 			return true;
@@ -339,76 +349,60 @@ public class Tables {
 
 	
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		System.out.println(Arrays.toString(args));
-		if(args.length != 3) {
-			System.out.println("Please provide 3 arguments: the transition tables file, the shape table file and the perm table file");
-			return;
+		if(args.length != 1) {
+			System.out.println("Please provide 1 argument: the file to store the tables in");
+			System.exit(1);
 		}
 		initialise();
-		dumpTransitionTables(args[0]);
-		dumpShapeTable(args[1]);
-		dumpPermTable(args[2]);
+		FileOutputStream out = new FileOutputStream(args[0]);
+		dumpTransitionTables(out);
+		dumpShapeTable(out);
+		dumpPermTable(out);
+		out.close();
 	}
 	
-	private static void dumpTransitionTables(String file) {
-		try {
-			TimedLogRecordStart start = new TimedLogRecordStart("dumping transition tables to " + file);
-			l.log(start);
-			
-			byte[] buff = new byte[transition_tables_bytes];
-			int index = 0;
-			for(int[] table : transition_tables) {
-				for(int i=0; i<table.length; i++) {
-					buff[index++] = (byte) ((table[i] >> 24) & 0xFF);
-					buff[index++] = (byte) ((table[i] >> 16) & 0xFF);
-					buff[index++] = (byte) ((table[i] >> 8) & 0xFF);
-					buff[index++] = (byte) (table[i] & 0xFF);
-				}
+	private static void dumpTransitionTables(OutputStream out) throws IOException {
+		TimedLogRecordStart start = new TimedLogRecordStart("dumping transition tables");
+		l.log(start);
+
+		byte[] buff = new byte[transition_tables_bytes];
+		int index = 0;
+		for(int[] table : transition_tables) {
+			for(int i=0; i<table.length; i++) {
+				buff[index++] = (byte) ((table[i] >> 24) & 0xFF);
+				buff[index++] = (byte) ((table[i] >> 16) & 0xFF);
+				buff[index++] = (byte) ((table[i] >> 8) & 0xFF);
+				buff[index++] = (byte) (table[i] & 0xFF);
 			}
-			FileOutputStream out = new FileOutputStream(file);
-			out.write(buff);
-			out.close();
-			
-			l.log(start.finishedNow());
-		} catch(Exception e) {
-			e.printStackTrace();
 		}
+		out.write(buff);
+
+		l.log(start.finishedNow());
 	}
 	
-	private static void dumpShapeTable(String file) {
-		try {
-			TimedLogRecordStart start = new TimedLogRecordStart("dumping shape table to " + file);
-			l.log(start);
-			
-			FileOutputStream out = new FileOutputStream(file);
-			for(int i=0;i<13;i++)
-				for(int j=0;j<13;j++)
-					for(int k=0;k<13;k++)
-						for(int l=0;l<13;l++)
-							out.write(shapeTable[i][j][k][l]);
-			out.close();
-			
-			l.log(start.finishedNow());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+	private static void dumpShapeTable(OutputStream out) throws IOException {
+		TimedLogRecordStart start = new TimedLogRecordStart("dumping shape table");
+		l.log(start);
+
+		for(int i=0;i<13;i++)
+			for(int j=0;j<13;j++)
+				for(int k=0;k<13;k++)
+					for(int l=0;l<13;l++)
+						out.write(shapeTable[i][j][k][l]);
+
+		l.log(start.finishedNow());
 	}
 
-	private static void dumpPermTable(String file) {
-		try {
-			TimedLogRecordStart start = new TimedLogRecordStart("dumping perm table to " + file);
-			l.log(start);
-			
-			FileOutputStream out = new FileOutputStream(file);
-			out.write(permTable[0]);
-			out.write(permTable[1]);
-			out.close();
-			
-			l.log(start.finishedNow());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+	private static void dumpPermTable(OutputStream out) throws IOException {
+		TimedLogRecordStart start = new TimedLogRecordStart("dumping perm table");
+		l.log(start);
+
+		out.write(permTable[0]);
+		out.write(permTable[1]);
+
+		l.log(start.finishedNow());
 	}
 
 	private static final int[][] transition_tables = new int[][] {

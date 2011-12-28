@@ -1,7 +1,7 @@
-package tnoodleServerHandler;
+package tnoodleServerHandler.webscrambles;
 
 @SuppressWarnings("serial")
-class InvalidScrambleRequestException extends Exception {
+public class InvalidScrambleRequestException extends Exception {
 
 	public InvalidScrambleRequestException(String string) {
 		super(string);

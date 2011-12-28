@@ -1,4 +1,4 @@
-package tnoodleServerHandler;
+package tnoodleServerHandler.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.toInt;
@@ -21,7 +21,7 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyClassLoader;
+import net.gnehzr.tnoodle.utils.LazyInstance;
 import net.gnehzr.tnoodle.utils.Utils;
 
 import com.itextpdf.text.BaseColor;
@@ -49,6 +49,7 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 class ScrambleRequest {
 	private static final int SCRAMBLES_PER_PAGE = 5;
@@ -57,7 +58,7 @@ class ScrambleRequest {
 	private static final int MAX_COPIES = 100;
 	
 	private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
-	private static SortedMap<String, LazyClassLoader<Scrambler>> scramblers;
+	private static SortedMap<String, LazyInstance<Scrambler>> scramblers;
 	static {
 		try {
 			scramblers = Scrambler.getScramblers();
@@ -116,7 +117,7 @@ class ScrambleRequest {
 			throw new InvalidScrambleRequestException("Invalid puzzle request " + scrambleRequestUrl);
 		}
 		
-		LazyClassLoader<Scrambler> lazyScrambler = scramblers.get(puzzle);
+		LazyInstance<Scrambler> lazyScrambler = scramblers.get(puzzle);
 		if(lazyScrambler == null) {
 			throw new InvalidScrambleRequestException("Invalid scrambler: " + puzzle);
 		}
@@ -260,13 +261,13 @@ class ScrambleRequest {
 	}
 	
 	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle) throws DocumentException, IOException {
-		assert scrambleRequest.count == scrambleRequest.scrambles.length;
+		azzert(scrambleRequest.count == scrambleRequest.scrambles.length);
 		
 		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
 		Rectangle pageSize = PageSize.LETTER;
 		
 		if(scrambleRequest.fmc) {
-			assert scrambleRequest.count == 1;
+			azzert(scrambleRequest.count == 1);
 			String scramble = scrambleRequest.scrambles[0];
 			
 			PdfContentByte cb = docWriter.getDirectContent();

@@ -17,10 +17,10 @@ class Project(tmt.EclipseProject):
 		self.plugins = {}
 
 	def addPlugin(self, project):
-		project.serverPluginSrcDir = join(project.src, SERVER_PLUGIN_DIR)
+		project.serverPluginSrcDir = join(project.srcResource, SERVER_PLUGIN_DIR)
 		project.contextFileName = join(project.serverPluginSrcDir, CONTEXT_FILE)
 		assert exists(join(project.serverPluginSrcDir, project.name))
-		project.serverPluginBinDir = join(project.bin, SERVER_PLUGIN_DIR)
+		project.serverPluginBinDir = join(project.binResource, SERVER_PLUGIN_DIR)
 		project.serverPluginPackageBinDir = join(project.serverPluginBinDir, project.name)
 		project.main = self.main
 		assert exists(project.contextFileName)

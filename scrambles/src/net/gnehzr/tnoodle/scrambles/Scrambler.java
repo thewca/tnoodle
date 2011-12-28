@@ -9,6 +9,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -23,7 +26,7 @@ import javax.imageio.ImageIO;
 
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.Base64;
-import net.gnehzr.tnoodle.utils.LazyClassLoader;
+import net.gnehzr.tnoodle.utils.LazyInstance;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -145,10 +148,10 @@ public abstract class Scrambler {
 
 	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class);
 	// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
-	private static SortedMap<String, LazyClassLoader<Scrambler>> scramblers =
-		new TreeMap<String, LazyClassLoader<Scrambler>>(Strings.getNaturalComparator());
+	private static SortedMap<String, LazyInstance<Scrambler>> scramblers =
+		new TreeMap<String, LazyInstance<Scrambler>>(Strings.getNaturalComparator());
 
-	public static SortedMap<String, LazyClassLoader<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {
+	public static SortedMap<String, LazyInstance<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {
 		if(plugins.dirtyPlugins()) {
 			plugins.reloadPlugins();
 			scramblers.putAll(plugins.getPlugins());
@@ -172,29 +175,24 @@ public abstract class Scrambler {
 	 * We should probably assert that the icons are of a particular size.
 	 */
 	public final void loadPuzzleIcon(ByteArrayOutputStream bytes) {
-		InputStream in;
-//		try { TODO
-//			File f = new File(getScramblePluginDirectory(), getShortName() + ".png");
-//			in = new FileInputStream(f);
-//		} catch(FileNotFoundException e) {
-			in = getClass().getResourceAsStream(getShortName() + ".png");
-//		}
-		if(in != null) {
-			try {
-				Utils.fullyReadInputStream(in, bytes);
-			} catch(IOException e) {
-				return;
-			}
-		} else {
-			Dimension dim = new Dimension(32, 32);
-			BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g = (Graphics2D) img.getGraphics();
-			drawPuzzleIcon(g, dim);
-			try {
-				ImageIO.write(img, "png", bytes);
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
+		try {
+			File f = new File(plugins.getPluginDirectory(), getShortName() + ".png");
+			InputStream in = new FileInputStream(f);
+			Utils.fullyReadInputStream(in, bytes);
+		} catch(FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Dimension dim = new Dimension(32, 32);
+		BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = (Graphics2D) img.getGraphics();
+		drawPuzzleIcon(g, dim);
+		try {
+			ImageIO.write(img, "png", bytes);
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -331,7 +329,7 @@ public abstract class Scrambler {
 		@Override
 		public Scrambler deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 			String scramblerName = json.getAsString();
-			LazyClassLoader<Scrambler> lazyScrambler = scramblers.get(scramblerName);
+			LazyInstance<Scrambler> lazyScrambler = scramblers.get(scramblerName);
 			if(lazyScrambler == null) {
 				throw new JsonParseException(scramblerName + " not found in: " + scramblers.keySet());
 			}

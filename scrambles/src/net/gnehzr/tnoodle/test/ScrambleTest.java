@@ -11,7 +11,7 @@ import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacherListener;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyClassLoader;
+import net.gnehzr.tnoodle.utils.LazyInstance;
 
 public class ScrambleTest {
 	
@@ -53,9 +53,9 @@ public class ScrambleTest {
 
 		int SCRAMBLE_COUNT = 100;
 		boolean drawScramble = true;
-		SortedMap<String, LazyClassLoader<Scrambler>> lazyScramblers = Scrambler.getScramblers();
+		SortedMap<String, LazyInstance<Scrambler>> lazyScramblers = Scrambler.getScramblers();
 		for(String puzzle : lazyScramblers.keySet()) {
-			LazyClassLoader<Scrambler> lazyScrambler = lazyScramblers.get(puzzle);
+			LazyInstance<Scrambler> lazyScrambler = lazyScramblers.get(puzzle);
 			final Scrambler scrambler = lazyScrambler.cachedInstance();
 			
 			// Generating a scramble

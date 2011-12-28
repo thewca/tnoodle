@@ -28,6 +28,10 @@ import lint
 # the current version.
 TXT_FILE_EXTENSIONS = [ '.js' ]
 
+RESOURCE_FOLDER = 'tnoodle_resources'
+RESOURCE_FOLDER_SRC = 'src_%s' % RESOURCE_FOLDER
+RESOURCE_FOLDER_BIN = 'bin_%s' % RESOURCE_FOLDER
+
 def windowsOrCygwin():
 	return sys.platform == 'win32' or sys.platform == 'cygwin'
 
@@ -82,8 +86,8 @@ def createSymlinkIfNotExistsOrStale(target, name):
 	if ( not os.path.exists(name) or
 		 not os.path.islink(name) or
 		 not os.readlink(name) == target ):
+		print "Setting up symlink %s -> %s" % ( name, target )
 		rmtree(name)
-		print "Setting up git hooks %s -> %s" % ( name, target )
 		os.symlink(target, name)
 
 PROJECT_FILE_NAME = 'tmtproject'
@@ -120,7 +124,6 @@ def topologicalSort(rootProject):
 	return visitedNodes
 
 class tmt:
-
 	def _cdEntryPoint(self):
 		os.chdir(entryPoint())
 		assert exists('README.textile')
@@ -171,7 +174,7 @@ class tmt:
 	def _lint(self):
 		lsFilesCmd = None
 		if tmt.args.all:
-			# Check check every file under version control.
+			# Check every file under version control.
 			lsFilesCmd = "git ls-files"
 		else:
 			# Check the files that git believes have been edited.
@@ -474,7 +477,7 @@ class EclipseProject(TmtProject):
 					if path.startswith('/'):
 						self.projects.append(path[1:])
 					else:
-						assert path == 'src'
+						assert path == 'src' or path == RESOURCE_FOLDER_SRC
 				elif kind == 'lib':
 					assert path.startswith('/')
 					self.jarFiles.append(abspath(path[1:]))
@@ -495,10 +498,12 @@ class EclipseProject(TmtProject):
 	def getDependencies(self):
 		return self.jars + self.projects
 
-	def getClasspathEntities(self):
+	def getClasspathEntities(self, includeResources=True):
 		classpath = set()
 		classpath |= set(relpath(jar.jarFile) for jar in self.jars)
 		classpath.add(self.bin)
+		if includeResources:
+			classpath.add(self.binResource)
 
 		# TODO - the src folder only needs to be in the classpath so
 		# jdb can discover the source code
@@ -517,16 +522,16 @@ class EclipseProject(TmtProject):
 		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
 
 		for project in self.projects:
-			classpath |= project.getClasspathEntities()
+			classpath |= project.getClasspathEntities(includeResources=includeResources)
 		return classpath
 
-	def getClasspath(self):
+	def getClasspath(self, includeResources=True):
 		separator = None
 		if windowsOrCygwin():
 			separator = ';'
 		else:
 			separator = ':'
-		return separator.join(self.getClasspathEntities())
+		return separator.join(self.getClasspathEntities(includeResources=includeResources))
 
 	def afterProjects(self):
 		dependencyFile = join(self.name, '.classpath')
@@ -537,10 +542,14 @@ class EclipseProject(TmtProject):
 		self.bin = join(self.name, 'bin')
 		self.distDir = join(self.name, 'dist')
 		self.src = join(self.name, 'src')
+		self.srcResource = join(self.name, RESOURCE_FOLDER_SRC)
+		self.binResource = join(self.name, RESOURCE_FOLDER_BIN)
 		self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
 	
 		if not isdir(self.bin):
 			os.mkdir(self.bin)
+		if not isdir(self.binResource):
+			os.mkdir(self.binResource)
 		if not isdir(self.distDir):
 			os.mkdir(self.distDir)
 	
@@ -554,38 +563,22 @@ class EclipseProject(TmtProject):
 		return join(self.distDir, fileName)
 
 	def compile(self):
-		tempBin = join(self.name, '.bin')
-
+		# Note that we assume that if the resources of a project we depend on change,
+		# we don't need to recompile. This is the way resources should behave.
 		lastCompiled = tmt.timestamp(self.bin)
-		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities() )
+		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False) )
 		changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
-		srcLastTouched = tmt.timestamp(self.src)
+		srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
 		if lastCompiled > srcLastTouched and len(changedDeps) == 0:
 			print "%s is up to date, not recompiling" % self.name
 			return
 
-		print 'Compiling: %s' % self.name
-
-		rmtree(self.bin)
-		if isdir(tempBin):
-			rmtree(tempBin)
-		os.mkdir(tempBin)
-
-		javaFiles = tmt.glob(self.src, r'.*\.java$')
-		if len(javaFiles) > 0:
-			args = [ 'javac' ]
-			args += [ '-d', tempBin ]
-			classpath = self.getClasspath()
-			if classpath:
-				args += [ '-classpath', classpath ]
-			args += javaFiles
-			p = subprocess.Popen(args)
-			print " ".join(args)
-			assert p.wait() == 0, 'javac failed!'
+		self._compile(self.src, self.bin)
+		self._compile(self.srcResource, self.binResource)
 
 		for nonJavaSrcDep in self.nonJavaSrcDeps:
-			srcPath = join(self.src, nonJavaSrcDep)
-			binPath = join(tempBin, nonJavaSrcDep)
+			srcPath = join(self.srcResource, nonJavaSrcDep)
+			binPath = join(self.binResource, nonJavaSrcDep)
 			print "Copying %s -> %s" % ( srcPath, binPath )
 			if isdir(srcPath):
 				# If this dependency is a directory, we symlink to it
@@ -605,8 +598,34 @@ class EclipseProject(TmtProject):
 					os.makedirs(parentDir)
 				shutil.copy(srcPath, binPath)
 
-		print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, self.bin )
-		os.rename(tempBin, self.bin)
+		os.symlink(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
+
+
+	def _compile(self, src, bin):
+		head, tail = os.path.split(bin)
+		tempBin = join(head, "." + tail)
+
+		print 'Compiling: %s' % src
+
+		rmtree(bin)
+		if isdir(tempBin):
+			rmtree(tempBin)
+		os.mkdir(tempBin)
+
+		javaFiles = tmt.glob(src, r'.*\.java$')
+		if len(javaFiles) > 0:
+			args = [ 'javac' ]
+			args += [ '-d', tempBin ]
+			classpath = self.getClasspath()
+			if classpath:
+				args += [ '-classpath', classpath ]
+			args += javaFiles
+			p = subprocess.Popen(args)
+			print " ".join(args)
+			assert p.wait() == 0, 'javac failed!'
+
+		print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, bin )
+		os.rename(tempBin, bin)
 
 	def release(self):
 		# TODO - this method is getting called for every project in the dependency heirarchy
@@ -723,7 +742,7 @@ Implementation-Version: %s
 		# TODO propogate return code up
 		tmt.java(
 			main=self.main,
-			classpath=self.getClasspath(),
+			classpath=self.getClasspath(includeResources=False),
 			args=shlex.split(tmt.args.args),
 			debug=tmt.args.debug)
 	

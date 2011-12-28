@@ -1,7 +1,7 @@
-/puzzles/ tnoodleServerHandler.PuzzleListHandler()
-/scramble/ tnoodleServerHandler.ScrambleHandler()
-/import/ tnoodleServerHandler.ScrambleImporterHandler()
-/view/ tnoodleServerHandler.ScrambleViewHandler()
+/puzzles/ tnoodleServerHandler.webscrambles.PuzzleListHandler()
+/scramble/ tnoodleServerHandler.webscrambles.ScrambleHandler()
+/import/ tnoodleServerHandler.webscrambles.ScrambleImporterHandler()
+/view/ tnoodleServerHandler.webscrambles.ScrambleViewHandler()
 
 /moo/mootools-core-1.4.1.js tnoodleServerHandler.FileHandler("webscrambles/mootools-core-1.4.1-full-nocompat.js")
 

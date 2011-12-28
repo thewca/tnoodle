@@ -34,7 +34,8 @@ public class TNoodleLogging {
 		rootLogger.addHandler(ch);
 		
 		try {
-			File logFile = new File(Utils.getProgramDirectory(), "tnoodle.log");
+			File logFile = new File(Utils.getResourceDirectory(), "log/tnoodle.log");
+			logFile.getParentFile().mkdirs();
 			FileHandler fh = new FileHandler(logFile.getAbsolutePath(), MAX_BYTES, FILE_COUNT, true);
 			fh.setLevel(Level.INFO);
 			fh.setFormatter(formatter);

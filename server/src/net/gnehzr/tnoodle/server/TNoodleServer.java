@@ -73,8 +73,8 @@ public class TNoodleServer {
 	}
 
 	public static void main(String[] args) throws IOException {
+		Utils.doFirstRunStuff();
 		TNoodleLogging.initializeLogging();
-		Utils.assertAssertions();
 		Launcher.wrapMain(args);
 
 		OptionParser parser = new OptionParser();
@@ -90,24 +90,6 @@ public class TNoodleServer {
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
-				/*if(options.has(cgiOpt)) {
-					CgiHttpExchange cgiExchange = new CgiHttpExchange();
-					HttpHandler handler = null;
-					String path = cgiExchange.getRequestURI().getPath();
-					for(int i = path.length(); i > 0; i--) {
-						handler = pathHandlers.get(path.substring(0, i));
-						if(handler != null) {
-							break;
-						}
-					}
-					if(handler == null) {
-						System.out.print("Content-type: text/plain\n\n");
-						System.out.println("No handler found for: " + cgiExchange.getRequestURI().getPath());
-						return;
-					}
-					handler.handle(cgiExchange);
-					return;
-				}*/
 				int port = options.valueOf(portOpt);
 				boolean openBrowser = !options.has(noBrowserOpt);
 				try {

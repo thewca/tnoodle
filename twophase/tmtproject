@@ -7,7 +7,7 @@ from os.path import join, exists
 class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
-		self.twophase_tables = join(self.bin, 'cs/min2phase/twophase_tables')
+		self.twophase_tables = join(self.binResource, 'twophase_tables')
 
 	def compile(self):
 		tmt.EclipseProject.compile(self)
