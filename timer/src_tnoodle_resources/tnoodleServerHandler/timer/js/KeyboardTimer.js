@@ -269,6 +269,7 @@ var KeyboardTimer = new Class({
 		window.addEvent('blur', function(e) {
 			// When the page loses focus, we clear the keyboard state
 			timer.windowFocused = false;
+			timer.redraw();
 		});
 		// TODO - the page may be out of focus when it loads!
 		window.addEvent('focus', function(e) {
