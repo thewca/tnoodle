@@ -161,7 +161,10 @@ window.addEvent('domready', function() {
 		}
 		setTimeout(this.select.bind(this), 0);
 	});
-	$('sessionComment').addEvent('keydown', function(e) {
+	$('sessionComment').addEvent('keyup', function(e) {
+		// Note that we wait for the keyup event, rather than the keydown event.
+		// If we waited for keydown, then the subsequent keyup could reset
+		// or start the timer.
 		if(e.key == "enter" || e.key == "esc") {
 			this.blur();
 		}

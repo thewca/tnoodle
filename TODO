@@ -139,6 +139,7 @@
 	+leaving fullscreen screws up the scrolling of the times table
 +pressing escape right after loading TNT causes an exception
 +pressing escape to close a dialog causes the reset shortcut to fire
++pressing esc while commenting on a session doesn't stop propagation of the event
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -155,7 +156,6 @@
 -get rid of multiple drop down arrows?
 -scrambles for arbitrary relays?
 
--pressing esc while commenting on a session doesn't stop propagation of the event
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
