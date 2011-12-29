@@ -6,9 +6,8 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -49,14 +48,16 @@ public class DirectoryHandler extends SafeHttpHandler {
 		String contentType;
 	}
 
-	private static Map<String, CachedFileInfo> cachedFiles;
+	// TODO - this is thread safe, but not thread smart. That is, we could potentiall have
+	// multiple threads opening up the same file at the same time.
+	private static ConcurrentHashMap<String, CachedFileInfo> cachedFiles;
 	public static void setCachingEnabled(boolean enabled) {
 		boolean caching = (cachedFiles != null);
 		if(enabled == caching) {
 			return;
 		}
 		if(enabled) {
-			cachedFiles = new HashMap<String, CachedFileInfo>();
+			cachedFiles = new ConcurrentHashMap<String, CachedFileInfo>();
 		} else {
 			cachedFiles = null;
 		}
