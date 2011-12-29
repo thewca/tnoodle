@@ -75,22 +75,26 @@ public class DirectoryHandler extends SafeHttpHandler {
 	}
 	
 	protected void wrappedHandle(HttpExchange t, String[] requestPath, LinkedHashMap<String, String> query) throws IOException {
-		String fullPath = Utils.getResourceDirectory() + "/" + PLUGIN_DIRECTORY + "/" + path + "/" + Utils.join(requestPath, "/");
-		if(cachedFiles != null && cachedFiles.containsKey(fullPath)) {
-			CachedFileInfo cached = cachedFiles.get(fullPath);
+		String fullRequestPath = t.getRequestURI().getPath();
+		
+		if(cachedFiles != null && cachedFiles.containsKey(fullRequestPath)) {
+			// This is a little subtle. We must key on the exact path the user queried for, rather than the requestPath,
+			// because the requestPath is the same with and without a trailing slash. However, if a trailing slash is missing,
+			// we want to fall through and send a redirect.
+			CachedFileInfo cached = cachedFiles.get(fullRequestPath);
 			String contentType = cached.contentType;
 			azzert(contentType != null);
 			byte[] data = cached.data;
 			sendBytes(t, data, contentType);
 			return;
 		}
-		File f = new File(fullPath);
+		File f = new File(Utils.getResourceDirectory() + "/" + PLUGIN_DIRECTORY + "/" + path + "/" + Utils.join(requestPath, "/"));
 		if(!f.exists()) {
 			send404(t, f.getAbsolutePath());
 		}
 		if(f.isDirectory()) {
 			File directory = f;
-			if(!t.getRequestURI().getPath().endsWith("/")) {
+			if(!fullRequestPath.endsWith("/")) {
 				sendTrailingSlashRedirect(t);
 				return;
 			}
@@ -138,7 +142,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 			CachedFileInfo cached = new CachedFileInfo();
 			cached.contentType = contentType;
 			cached.data = data;
-			cachedFiles.put(fullPath, cached);
+			cachedFiles.put(fullRequestPath, cached);
 		}
 		sendBytes(t, data, contentType);
 	}

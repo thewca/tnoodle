@@ -155,6 +155,8 @@
 -get rid of multiple drop down arrows?
 -scrambles for arbitrary relays?
 
+-pressing esc while commenting on a session doesn't stop propagation of the event
+
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
 
