@@ -14,6 +14,22 @@ img {
     border: none;
 }
 
+/* 
+ * TODO - Firefox doesn't seem to propogate the -moz-user-select: none attribute,
+ * so we apply it to everything, and specifically allow selection in text
+ * fields
+ * */
+* {
+	-moz-user-select: -moz-none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+textarea, input {
+	-moz-user-select: text;
+	-webkit-user-select: text;
+	-ms-user-select: text;
+}
+
 .link, .imglink {
 	white-space: nowrap;
 	color: brown;

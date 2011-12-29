@@ -25,13 +25,6 @@ window.addEvent('domready', function() {
 	document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
 	document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 
-	document.addEvent('selectstart', function(e) {
-		// We allow no text selection whatsoever. There's special code for copying
-		// scrambles, and I can't think of anything else a user would want to select.
-		var allowTextSelection = tnoodle.tnt.isTextEditing();
-		return allowTextSelection;
-	});
-
 	var session = null;
 	
 	var updatingSession = false;
