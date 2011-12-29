@@ -368,8 +368,8 @@ var TimesTable = new Class({
 			if(ignoreRow) {
 				if(!ignorePresent) {
 					selectRow(ignoreRow);
+					selectedRows = [ ignoreRow ];
 				}
-				selectedRows = [ ignoreRow ];
 			} else {
 				selectedRows = [];
 			}
@@ -452,7 +452,14 @@ var TimesTable = new Class({
 					});
 					selectRow(row);
 				} else {
-					var edit = selectedRows.contains(row) && e.target.key == 'centis';
+					// This is a little tricky. The table cell has a key attribute
+					// that we use to ensure that times are only edited by clicking on
+					// the 'centis' column. However, if the row is already being edited,
+					// then the target is a text field that does not have a "key"
+					// attribute.
+					var edit = selectedRows.contains(row) && (row.editing || e.target.key == 'centis');
+					// This poorly named function ensures that row gets selected,
+					// which enables it for editing the next time it is clicked on.
 					deselectRows(row);
 					if(edit != row.editing) {
 						row.editing = edit;
@@ -476,9 +483,7 @@ var TimesTable = new Class({
 			}
 		});
 		window.addEvent('keydown', function(e) {
-			if(e.key == 'esc') {
-				deselectRows();
-			} else if(e.key == 'delete') {
+			if(e.key == 'delete') {
 				var times = "";
 				for(var i = 0; i < selectedRows.length; i++) {
 					var row = selectedRows[i];
@@ -827,7 +832,10 @@ var TimesTable = new Class({
 		textField.setStyle('padding', 0);
 
 		textField.addEvent('keydown', function(e) {
-			if(e.key == 'enter') {
+			if(e.key == 'esc') {
+				this.deselectRows();
+				e.stop(); // Without this, the timer will reset
+			} else if(e.key == 'enter') {
 				try {
 					this.deselectRows();
 					if(time) {
@@ -845,6 +853,7 @@ var TimesTable = new Class({
 					// No need for an alert
 					alert("Error entering time " + textField.value + "\n" + error);
 				}
+				e.stop(); // Without this, the timer will start
 			}
 		}.bind(this));
 		
