@@ -107,16 +107,19 @@ var TimesTable = new Class({
 						cell.addClass('bestRA');
 
 						cell.setStyle('cursor', 'pointer');
-						if(key == 'centis') {
-							cell.title = 'Click to select best time';
-						} else {
+						if(key != 'centis') {
 							cell.title = 'Click to show stats for best ' + key;
+							cell.addEvent('click', table.raBoxClicked);
+						} else {
+							cell.title = 'Click to select best time';
 						}
-						cell.addEvent('click', table.raBoxClicked);
 					} else {
 						cell.setStyle('cursor', '');
 						cell.title = '';
-						cell.removeEvent('click', table.raBoxClicked);
+						if(key != 'centis') {
+							// We only set the popup event for RAs
+							cell.removeEvent('click', table.raBoxClicked);
+						}
 					}
 				}
 			}
