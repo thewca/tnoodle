@@ -89,9 +89,11 @@ var TimesTable = new Class({
 					if(this.session.attemptCount() > 0) {
 						cell.setStyle('cursor', 'pointer');
 						cell.title = 'Click to show stats for session';
+						cell.addEvent('click', table.raBoxClicked);
 					} else {
 						cell.setStyle('cursor', '');
 						cell.title = '';
+						cell.removeEvent('click', table.raBoxClicked);
 					}
 				} else if(key == 'sessionAve') {
 					cell.set('html', '&sigma; = ' + format(this.session.stdDev()));	
@@ -110,9 +112,11 @@ var TimesTable = new Class({
 						} else {
 							cell.title = 'Click to show stats for best ' + key;
 						}
+						cell.addEvent('click', table.raBoxClicked);
 					} else {
 						cell.setStyle('cursor', '');
 						cell.title = '';
+						cell.removeEvent('click', table.raBoxClicked);
 					}
 				}
 			}
@@ -243,11 +247,15 @@ var TimesTable = new Class({
 			if(key.match(/^ra[0-9]+$/)) {
 				td.raSize = function() { return key.substring(2).toInt(); };
 				td.lastTimeIndex = function() { return table.session.bestWorst(key).best.index; };
-				td.addEvent('click', table.raBoxClicked);
+				// The click listener will get set/unset whenever
+				// we refresh the info row. This is because we don't
+				// always want to enable clicking.
 			} else if(key == "index") {
 				td.raSize = function() { return null; };
 				td.lastTimeIndex = function() { return null; };
-				td.addEvent('click', table.raBoxClicked);
+				// The click listener will get set/unset whenever
+				// we refresh the info row. This is because we don't
+				// always want to enable clicking.
 			} else if(key == "centis") {
 				td.addEvent('click', function(e) {
 					var bestIndex = table.session.bestWorst(key).best.index;
