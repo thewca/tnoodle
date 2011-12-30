@@ -1161,6 +1161,17 @@ var DOMEvent = this.DOMEvent = new Type('DOMEvent', function(event, win){
 		if (code == WINL || code == WINR || (code >= MUTE && code <= PLAY_PAUSE)) {
 			code = 0;
 		}
+		var specialKeys = {
+			106: '*',
+			107: '+',
+			109: '-',
+			110: '.',
+			111: '/',
+		};
+		if (code in specialKeys) {
+			this.key = specialKeys[code];
+		}
+
 		if (this.key == null) this.key = String.fromCharCode(code).toLowerCase();
 	} else if (type == 'click' || type == 'dblclick' || type == 'contextmenu' || type == 'DOMMouseScroll' || type.indexOf('mouse') == 0){
 		var doc = win.document;
