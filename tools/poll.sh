@@ -2,8 +2,11 @@
 
 while true; do
 	PULL=`git pull`
+	RETVAL=$?
 	echo 'Checking for update...'
-	if [ "$PULL" != "Already up-to-date." ]
+	# Note that this if statment returns true if we have local
+	# changes.
+	if [[ $RETVAL -eq 0 && "$PULL" != "Already up-to-date." ]]
 	then
 		git submodule update
 		# We've just pulled in some changes from our remote repo,
