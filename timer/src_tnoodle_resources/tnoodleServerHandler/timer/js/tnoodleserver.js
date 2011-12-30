@@ -622,7 +622,10 @@ tnoodle.Time = function(time, scramble) {
 			this.tags.push(this.penalty);
 		}
 
-		server.saveSessions();
+		//TODO - server is null in the event that we're trying to add a new time
+		if(server) {
+			server.saveSessions();
+		}
 		//TODO - optimize
 		//session.solveCommented(this);
 	};

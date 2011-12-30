@@ -141,6 +141,7 @@
 +pressing escape to close a dialog causes the reset shortcut to fire
 +pressing esc while commenting on a session doesn't stop propagation of the event
 +clicking on ave100 does something even when there is no ave100
++add time "dnf" -> cannot call savesessions of 
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -161,7 +162,6 @@
 -esc doesn't close time comment
 -resetting format str doesn't seem to work
 -replace all issue with time stats?
--add time "dnf" -> cannot call savesessions of 
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
