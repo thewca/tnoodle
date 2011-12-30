@@ -219,9 +219,9 @@ var TimesTable = new Class({
 			ul.setStyle('padding-left', '30px');
 			ul.setStyle('margin', '0px');
 			legend.adopt(ul);
-			for(var key in table.session.formatLegend) {
-				if(table.session.formatLegend.hasOwnProperty(key)) {
-					var desc = table.session.formatLegend[key][0];
+			for(var key in tnoodle.Session.formatLegend) {
+				if(tnoodle.Session.formatLegend.hasOwnProperty(key)) {
+					var desc = tnoodle.Session.formatLegend[key][0];
 					ul.adopt(new Element('li', {html: "<b>" + key + "</b>: " + desc}));
 				}
 			}

@@ -1009,7 +1009,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 				timeStr = "(" + timeStr + ")";
 			}
 			simpleTimes += (offset>0?', ':'') + timeStr;
-			var scramble = time.scramble.replace(/\n/g, ' ');
+			var scramble = (time.scramble || "").replace(/\n/g, ' ');
 			detailedTimes += (offset+1) + ". " + timeStr + " " + scramble + "\n";
 		}
 
