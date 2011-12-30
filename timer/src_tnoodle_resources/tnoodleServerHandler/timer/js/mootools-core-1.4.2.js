@@ -1153,6 +1153,14 @@ var DOMEvent = this.DOMEvent = new Type('DOMEvent', function(event, win){
 			if (code > 111 && code < 124) this.key = 'f' + (code - 111);
 			else if (code > 95 && code < 106) this.key = code - 96;
 		//}
+		// TODO - what's the right solution for the win keys?
+		var WINL = 91;
+		var WINR = 92;
+		var MUTE = 172;
+		var PLAY_PAUSE = 179;
+		if (code == WINL || code == WINR || (code >= MUTE && code <= PLAY_PAUSE)) {
+			code = 0;
+		}
 		if (this.key == null) this.key = String.fromCharCode(code).toLowerCase();
 	} else if (type == 'click' || type == 'dblclick' || type == 'contextmenu' || type == 'DOMMouseScroll' || type.indexOf('mouse') == 0){
 		var doc = win.document;
