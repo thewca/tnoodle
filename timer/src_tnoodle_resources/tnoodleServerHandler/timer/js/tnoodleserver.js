@@ -601,6 +601,9 @@ tnoodle.Time = function(time, scramble) {
 			this.centis = this.rawCentis;
 		}
 
+		// Calling setComment updates this.tags
+		this.setComment(this.comment);
+
 		//TODO - server is null in the event that we're trying to add a new time
 		if(server) {
 			server.saveSessions();
@@ -615,6 +618,9 @@ tnoodle.Time = function(time, scramble) {
 	this.setComment = function(comment) {
 		this.comment = (comment === null) ? "" : comment;
 		this.tags = this.comment.match(/#\S+/g) || [];
+		if(this.penalty) {
+			this.tags.push(this.penalty);
+		}
 
 		server.saveSessions();
 		//TODO - optimize
@@ -962,6 +968,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 	str += 'Number of DNFs: %#dnf\n';
 	str += 'Best time: %b\n';
 	str += 'Worst time: %w\n\n';
+	str += '%t = %a ave%N\n\n';
 	str += '%T';
 	this.defaultFormatStr = str;
 	this.formatTimes = function(lastTimeIndex, raSize, formatStr) {
@@ -1003,48 +1010,45 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			detailedTimes += (offset+1) + ". " + timeStr + " " + scramble + "\n";
 		}
 
-		// TODO - this thing is duplicated, GAH!!! find something better
-		this.formatLegend = {
-			'%d': [ 'Date', date ],
-			'%n': [ 'Solves', solves ],
-			'%N': [ 'Attempts', attempts ],
-			'%s': [ 'Stdev', stdDev ],
-			'%#TAG': [ '# of solves with #TAG (TAG is case-insensitve and can be +2/dnf)', 42 ],
-			'%b': [ 'Best time', best ],
-			'%w': [ 'Worst time', worst ],
-			'%t': [ 'Times list', simpleTimes ],
-			'%T': [ 'Times+scrambles list', detailedTimes ],
-			'%a': [ 'Average', average ],
-			'%%': [ '%', '%']
+		var stats = {
+			'date': date,
+			'attempts': attempts,
+			'solves': solves,
+			'stdDev': stdDev,
+			'best': best,
+			'worst': worst,
+			'simpleTimes': simpleTimes,
+			'detailedTimes': detailedTimes,
+			'average': average
 		};
 
 		formatStr = formatStr.replace(/%#\S+/g, function(match) {
 			return tagCounts[match.substring(2).toLowerCase()] || 0;
 		});
-		//TODO - switch to replaceall?
-		// this doesn't work quite right... %%T
-		for(var key in this.formatLegend) {
-			if(this.formatLegend.hasOwnProperty(key)) {
-				formatStr = formatStr.replace(key, this.formatLegend[key][1]);
+		// TODO this doesn't work quite right... %%T
+		for(var key in tnoodle.Session.formatLegend) {
+			if(tnoodle.Session.formatLegend.hasOwnProperty(key)) {
+				var statsKey = tnoodle.Session.formatLegend[key][1];
+				formatStr = formatStr.replace(new RegExp(key, 'g'), stats[statsKey]);
 			}
 		}
 		return formatStr;
 	};
-	this.formatLegend = {
-		'%d': [ 'Date' ],
-		'%n': [ 'Solves' ],
-		'%N': [ 'Attempts' ],
-		'%s': [ 'Stdev' ],
-		'%#TAG': [ '# of solves with #TAG (TAG is case-insensitve and can be +2/dnf)' ],
-		'%b': [ 'Best time' ],
-		'%w': [ 'Worst time' ],
-		'%t': [ 'Times list' ],
-		'%T': [ 'Times+scrambles list' ],
-		'%a': [ 'Average' ],
-		'%%': [ '%', '%']
-	};
 };
 
+tnoodle.Session.formatLegend = {
+	'%d': [ 'Date', 'date' ],
+	'%n': [ 'Solves', 'solves' ],
+	'%N': [ 'Attempts', 'attempts' ],
+	'%s': [ 'Stdev', 'stdDev' ],
+	'%#TAG': [ '# of solves with #TAG (TAG is case-insensitve and can be +2/dnf)', null ],
+	'%b': [ 'Best time', 'best' ],
+	'%w': [ 'Worst time', 'worst' ],
+	'%t': [ 'Times list', 'simpleTimes' ],
+	'%T': [ 'Times+scrambles list', 'detailedTimes' ],
+	'%a': [ 'Average', 'average' ],
+	'%%': [ '%', '%']
+};
 
 /*** Utility functions ***/
 
