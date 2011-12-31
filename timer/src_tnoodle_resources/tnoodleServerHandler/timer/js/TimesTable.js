@@ -863,8 +863,7 @@ var TimesTable = new Class({
 					// We only deselect the row if we successfully added the new time
 					this.deselectRows();
 				} catch(error) {
-					// No need for an alert
-					//alert("Error entering time " + textField.value + "\n" + error);
+					// No need for an alert, we've already informed them of the problem.
 				}
 				e.stop(); // Without this, the timer will start
 			}
