@@ -168,7 +168,7 @@ var TimesTable = new Class({
 
 		var configureTab = document.createElement('li');
 		function getFormat() {
-			return table.configuration.get('times.statsFormat', table.session.defaultFormatStr);
+			return table.configuration.get('times.statsFormat', tnoodle.Session.defaultFormatStr);
 		}
 		function saveFormat() {
 			table.configuration.set('times.statsFormat', statsArea.value);
@@ -583,6 +583,12 @@ var TimesTable = new Class({
 				commentArea.select();
 			}, 0);
 		});
+		commentArea.addEvent('keydown', function(e) {
+			if(e.key == 'esc') {
+				this.deselectRows();
+				e.stop(); // without this, the timer will reset
+			}
+		}.bind(this));
 
 		form.setStyle('border', '2px solid black');
 		form.adopt(fieldSet);

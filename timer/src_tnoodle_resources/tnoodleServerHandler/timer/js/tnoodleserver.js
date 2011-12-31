@@ -964,16 +964,6 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		// we remove everything after what we just added
 		history.splice(histIndex+1, history.length-1);
 	};
-	var str = '';
-	str += 'Statistics for %d\n\n';
-	str += 'Average of %n/%N: %a\n';
-	str += 'Standard deviation: %s\n';
-	str += 'Number of DNFs: %#dnf\n';
-	str += 'Best time: %b\n';
-	str += 'Worst time: %w\n\n';
-	str += '%t = %a ave%N\n\n';
-	str += '%T';
-	this.defaultFormatStr = str;
 	this.formatTimes = function(lastTimeIndex, raSize, formatStr) {
 		if(!$chk(lastTimeIndex) || !$chk(raSize)) {
 			lastTimeIndex = this.times.length-1;
@@ -1038,6 +1028,16 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		return formatStr;
 	};
 };
+
+tnoodle.Session.defaultFormatStr = "";
+tnoodle.Session.defaultFormatStr += 'Statistics for %d\n\n';
+tnoodle.Session.defaultFormatStr += 'Average of %n/%N: %a\n';
+tnoodle.Session.defaultFormatStr += 'Standard deviation: %s\n';
+tnoodle.Session.defaultFormatStr += 'Number of DNFs: %#dnf\n';
+tnoodle.Session.defaultFormatStr += 'Best time: %b\n';
+tnoodle.Session.defaultFormatStr += 'Worst time: %w\n\n';
+tnoodle.Session.defaultFormatStr += '%t = %a ave%N\n\n';
+tnoodle.Session.defaultFormatStr += '%T';
 
 tnoodle.Session.formatLegend = {
 	'%d': [ 'Date', 'date' ],
