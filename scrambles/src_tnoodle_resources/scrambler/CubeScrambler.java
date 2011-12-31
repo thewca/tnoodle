@@ -52,12 +52,12 @@ public class CubeScrambler extends Scrambler {
 	
 	@Override
 	public String getLongName() {
-		return getShortName();
+		return size + "x" + size + "x" + size;
 	}
 
 	@Override
 	public String getShortName() {
-		return size + "x" + size + "x" + size;
+		return size + "" + size + "" + size;
 	}
 
 	@Override

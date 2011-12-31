@@ -71,7 +71,7 @@ class ScrambleRequest {
 		// This is an awful workaround for https://github.com/jfly/tnoodle/issues/1.
 		// Hopefully someday this problem will go away, and this code can simply be deleted.
 		try {
-			ScrambleRequest r = new ScrambleRequest("title", "3x3x3", null);
+			ScrambleRequest r = new ScrambleRequest("title", "333", null);
 			requestsToPdf("", new Date(), new ScrambleRequest[] { r });
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -583,10 +583,4 @@ class ScrambleRequest {
 		return totalPdfOutput;
 	}
 	
-	public static void main(String[] args) throws UnsupportedEncodingException, InvalidScrambleRequestException {
-		ScrambleRequest[] requests = new ScrambleRequest[] { new ScrambleRequest("title", "3x3x3", "seeding") };
-		String json = GSON.toJson(requests);
-		ScrambleRequest[] sr = GSON.fromJson(json, ScrambleRequest[].class);
-		System.out.println(sr[0].scrambler);
-	}
 }

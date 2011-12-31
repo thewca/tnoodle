@@ -27,7 +27,7 @@ PUZZLE_REQUEST's look like this:
 
 PUZZLE can be any scrambler from [puzzles/](puzzles/).
 
-COUNT can be an integer, or "fmc". "fmc" means generate one scramble, and is specially handled by the PDF generator. See [scramble/Big Competition.pdf?FMC Round 1=3x3x3*fmc](scramble/Big Competition.pdf?FMC Round 1=3x3x3*fmc) for an example.
+COUNT can be an integer, or "fmc". "fmc" means generate one scramble, and is specially handled by the PDF generator. See [scramble/Big Competition.pdf?FMC Round 1=333*fmc](scramble/Big Competition.pdf?FMC Round 1=333*fmc) for an example.
 
 If SCHEME contains a comma, then it is assumed to be a comma separated list of COLORs. If it does not contain a comma, then each character is treated as a COLOR. COLORs must be specified in alphabetical order of the names of the puzzle's faces. To see the faces for a puzzle, visit [view/PUZZLE.json](view/PUZZLE.json)
 
@@ -45,24 +45,24 @@ If SCHEME does not conform to the above definition, then the puzzle's default co
 
 Puzzle request titles must be unique.
 
-* [scramble/.txt?=3x3x3](scramble/.txt?=3x3x3) - A text file containing 1 3x3 scramble. Revisiting this url will generate different scrambles.
-* [scramble/.txt?=3x3x3*12&seed=cubing](scramble/.txt?=3x3x3*12&seed=cubing) - A text file with 12 3x3 scrambles generated from the seed "cubing". Revisiting this url will always generate the same 12 scrambles.
-* [scramble/My Comp.pdf?3x3 Round 1=3x3x3*5](scramble/My Comp.pdf?3x3 Round 1=3x3x3*5) - A single 3x3 sheet of 5 scrambles.
-* [scramble/My Comp.pdf?3x3 Round 1=3x3x3\*5\*2](scramble/My Comp.pdf?3x3 Round 1=3x3x3*5*2) - 2 identical copies of a 3x3 sheet of 5 scrambles. This will produce a 2 page PDF.
-* [scramble/My Comp.pdf?3x3 Round 1=3x3x3\*5\*2&3x3 Round 2=3x3x3\*5](scramble/My Comp.pdf?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5) - 2 identical copies of a 3x3 sheet of 5 scrambles (titled "3x3 Round 1") 
+* [scramble/.txt?=333](scramble/.txt?=333) - A text file containing 1 3x3 scramble. Revisiting this url will generate different scrambles.
+* [scramble/.txt?=333*12&seed=cubing](scramble/.txt?=333*12&seed=cubing) - A text file with 12 3x3 scrambles generated from the seed "cubing". Revisiting this url will always generate the same 12 scrambles.
+* [scramble/My Comp.pdf?3x3 Round 1=333*5](scramble/My Comp.pdf?3x3 Round 1=333*5) - A single 3x3 sheet of 5 scrambles.
+* [scramble/My Comp.pdf?3x3 Round 1=333\*5\*2](scramble/My Comp.pdf?3x3 Round 1=333*5*2) - 2 identical copies of a 3x3 sheet of 5 scrambles. This will produce a 2 page PDF.
+* [scramble/My Comp.pdf?3x3 Round 1=333\*5\*2&3x3 Round 2=333\*5](scramble/My Comp.pdf?3x3 Round 1=333*5*2&3x3 Round 2=333*5) - 2 identical copies of a 3x3 sheet of 5 scrambles (titled "3x3 Round 1") 
 followed by 1 page of 5 3x3 scrambles (titled "3x3 Round 2"). This will produce a 3 page PDF.
-* [scramble/My Comp.zip?3x3 Round 1=3x3x3\*5\*2&3x3 Round 2=3x3x3\*5](scramble/My Comp.zip?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5) - This will produce a zip file containing 2 pdfs, one named "3x3 Round 1.pdf" and the other named "3x3 Round 2.pdf". Note that when the file extension is zip, we ignore the COPIES option. I think this is a good decision.
-* [scramble/.json?=3x3x3](scramble/.json?=3x3x3) - One 3x3 scramble in JSON.
+* [scramble/My Comp.zip?3x3 Round 1=333\*5\*2&3x3 Round 2=333\*5](scramble/My Comp.zip?3x3 Round 1=333*5*2&3x3 Round 2=333*5) - This will produce a zip file containing 2 pdfs, one named "3x3 Round 1.pdf" and the other named "3x3 Round 2.pdf". Note that when the file extension is zip, we ignore the COPIES option. I think this is a good decision.
+* [scramble/.json?=333](scramble/.json?=333) - One 3x3 scramble in JSON.
 
 
 #### A fullfilled scramble request ####
-Request: [scramble/.json?3x3 Round 1=3x3x3\*1\*2&3x3 Round 2=3x3x3\*1\*1](scramble/.json?3x3 Round 1=3x3x3\*1\*2&3x3 Round 2=3x3x3\*1\*1) - TODO
+Request: [scramble/.json?3x3 Round 1=333\*1\*2&3x3 Round 2=333\*1\*1](scramble/.json?3x3 Round 1=333\*1\*2&3x3 Round 2=333\*1\*1) - TODO
 
 Response:
 
 	[{
 	    "scrambles": ["D2 U2 L2 B R2 B' D2 L2 F2 L2 F2 R D2 U F2 R D' B L D' U2"],
-	    "scrambler": "3x3x3",
+	    "scrambler": "333",
 	    "count": 1,
 	    "copies": 2,
 	    "title": "3x3 Round 1",
@@ -77,7 +77,7 @@ Response:
 	    }
 	}, {
 	    "scrambles": ["D F2 D' B2 D2 L2 U L2 U2 L2 U' R' D2 L2 B U2 R B2 U2 B'"],
-	    "scrambler": "3x3x3",
+	    "scrambler": "333",
 	    "count": 1,
 	    "copies": 1,
 	    "title": "3x3 Round 2",
@@ -105,7 +105,7 @@ width/height is the maximum allowed width/height for the resulting image. It wil
 
 SCRAMBLES should be a JSON string that was retrieved from scramble/.json (see "A fullfilled scramble request"). Since SCRAMBLES could potentially be very long, it is possible to do an HTML POST instead.
 
-* [view/.pdf?scrambles=%5B%7B%22scrambles%22:%5B%22R2%20L2%20U2%20D2%20B2%20F2%22%5D,%22scrambler%22:%223x3x3%22,%22count%22:1,%22copies%22:1,%22title%22:%22%22,%22fmc%22:false%7D%5D](view/.pdf?scrambles=%5B%7B%22scrambles%22:%5B%22R2%20L2%20U2%20D2%20B2%20F2%22%5D,%22scrambler%22:%223x3x3%22,%22count%22:1,%22copies%22:1,%22title%22:%22%22,%22fmc%22:false%7D%5D)
+* [view/.pdf?scrambles=%5B%7B%22scrambles%22:%5B%22R2%20L2%20U2%20D2%20B2%20F2%22%5D,%22scrambler%22:%22333%22,%22count%22:1,%22copies%22:1,%22title%22:%22%22,%22fmc%22:false%7D%5D](view/.pdf?scrambles=%5B%7B%22scrambles%22:%5B%22R2%20L2%20U2%20D2%20B2%20F2%22%5D,%22scrambler%22:%22333%22,%22count%22:1,%22copies%22:1,%22title%22:%22%22,%22fmc%22:false%7D%5D)
 
 ### import/?url=URL ###
 url is a url pointing to a text file with newline separated scrambles.

@@ -18,7 +18,7 @@ window.addEvent('domready', function() {
 	var configuration = server.configuration;
 	
 	function onPuzzlesLoaded(puzzles) {
-		var puzzle = configuration.get('scramble.puzzle', '3x3x3');
+		var puzzle = configuration.get('scramble.puzzle', '333');
 		scrambleStuff.setSelectedPuzzle(puzzle);
 	}
 	var scrambleStuff = new ScrambleStuff(server, onPuzzlesLoaded);

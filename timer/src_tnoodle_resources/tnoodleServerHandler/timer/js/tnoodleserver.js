@@ -463,7 +463,7 @@ tnoodle.server = function(host, port) {
 	};
 	
 	if(sessions.length === 0) {
-		this.createSession("3x3x3", "");
+		this.createSession("333", "");
 	}
 };
 

@@ -163,6 +163,9 @@
 -sign in link needs to do something, or go away
 -behave nicely when the server goes down
 	-exponential backoff for "Loading Scramble..."
+-rewrite config stuff
+	-separate defaults from running code
+	-don't store defaults to localStorage, this way if defaults change, people get the new version
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
@@ -195,3 +198,5 @@
 	+plugins/scramble icons
 +consolidate context file/short name/long name for scramble plugins
 +injectable analytics js?
+
+-Need some way of running "tmt make check" after every change. I think it's too painful to run it before every commit. Perhaps it would be best to have the server run make check before starting up, and fail to start (or start up an old version?) if make check fails? This would certainly force people to fix their test failures.
