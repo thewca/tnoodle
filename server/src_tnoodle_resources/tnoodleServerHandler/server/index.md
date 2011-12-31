@@ -19,13 +19,29 @@ Simply returns a list of available puzzles in JSON format.
 
 ### scramble/[TITLE].[txt|json|pdf|zip]?[PARAMS] ###
 
-PARAMS include "seed", "showIndices" and most importantly, an arbitrary number of PUZZLE_REQUEST's.
+PARAMS include "seed", "showIndices" and most importantly, an arbitrary number of PUZZLE_REQUEST's. Note that this means you can't have a round titled "seed" or "showIndices"!
 
 PUZZLE_REQUEST's look like this:
 
-	TITLE=3x3x3*COUNT*COPIES*SCHEME
+	TITLE=PUZZLE*COUNT*COPIES*SCHEME
+
+PUZZLE can be any scrambler from [puzzles/](puzzles/).
 
 COUNT can be an integer, or "fmc". "fmc" means generate one scramble, and is specially handled by the PDF generator. See [scramble/Big Competition.pdf?FMC Round 1=3x3x3*fmc](scramble/Big Competition.pdf?FMC Round 1=3x3x3*fmc) for an example.
+
+If SCHEME contains a comma, then it is assumed to be a comma separated list of COLORs. If it does not contain a comma, then each character is treated as a COLOR. COLORs must be specified in alphabetical order of the names of the puzzle's faces. To see the faces for a puzzle, visit [view/PUZZLE.json](view/PUZZLE.json)
+
+A COLOR either an HTML style hexadecimal color definition starting with #, such as #FFFFFF for white. If COLOR does not begin with #, then is must be one of the following color definitions:
+
+* y, yellow
+* b, blue
+* r, red
+* g, green
+* o, orange
+* p, purple
+* 0, gray, grey
+
+If SCHEME does not conform to the above definition, then the puzzle's default color scheme will be used.
 
 Puzzle request titles must be unique.
 
@@ -36,30 +52,47 @@ Puzzle request titles must be unique.
 * [scramble/My Comp.pdf?3x3 Round 1=3x3x3\*5\*2&3x3 Round 2=3x3x3\*5](scramble/My Comp.pdf?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5) - 2 identical copies of a 3x3 sheet of 5 scrambles (titled "3x3 Round 1") 
 followed by 1 page of 5 3x3 scrambles (titled "3x3 Round 2"). This will produce a 3 page PDF.
 * [scramble/My Comp.zip?3x3 Round 1=3x3x3\*5\*2&3x3 Round 2=3x3x3\*5](scramble/My Comp.zip?3x3 Round 1=3x3x3*5*2&3x3 Round 2=3x3x3*5) - This will produce a zip file containing 2 pdfs, one named "3x3 Round 1.pdf" and the other named "3x3 Round 2.pdf". Note that when the file extension is zip, we ignore the COPIES option. I think this is a good decision.
-* [scramble/.json?=3x3x3](scramble/.json?=3x3x3) - One 3x3 scramble in JSON. See "A fullfilled scramble request" for details.
+* [scramble/.json?=3x3x3](scramble/.json?=3x3x3) - One 3x3 scramble in JSON.
+
 
 #### A fullfilled scramble request ####
+Request: [scramble/.json?3x3 Round 1=3x3x3\*1\*2&3x3 Round 2=3x3x3\*1\*1](scramble/.json?3x3 Round 1=3x3x3\*1\*2&3x3 Round 2=3x3x3\*1\*1) - TODO
 
-	[
-		{
-			"scrambles": 
-				["D\u0027 R\u0027 L B D2 F2 D2 L F2 D\u0027 L D\u0027 R2 F2 R2 L2 U\u0027 F2 B2 R2 B2"],
-			"scrambler": "3x3x3",
-			"count": 1,
-			"copies": 2,
-			"title": "3x3 Round 1",
-			"fmc": false
-		},
-		{
-			"scrambles":
-				["U\u0027 R2 F2 U\u0027 F\u0027 U\u0027 R\u0027 F2 U\u0027 B R\u0027 F2 D\u0027 R2 U\u0027 R2 D2 L2 F2 U"],
-			"scrambler": "3x3x3",
-			"count": 1,
-			"copies": 1,
-			"title": "3x3 Round2",
-			"fmc": false
-		}
-	]
+Response:
+
+	[{
+	    "scrambles": ["D2 U2 L2 B R2 B' D2 L2 F2 L2 F2 R D2 U F2 R D' B L D' U2"],
+	    "scrambler": "3x3x3",
+	    "count": 1,
+	    "copies": 2,
+	    "title": "3x3 Round 1",
+	    "fmc": false,
+	    "colorScheme": {
+	        "U": "ffffff",
+	        "D": "ffff00",
+	        "F": "00ff00",
+	        "B": "0000ff",
+	        "R": "ff0000",
+	        "L": "ff8000"
+	    }
+	}, {
+	    "scrambles": ["D F2 D' B2 D2 L2 U L2 U2 L2 U' R' D2 L2 B U2 R B2 U2 B'"],
+	    "scrambler": "3x3x3",
+	    "count": 1,
+	    "copies": 1,
+	    "title": "3x3 Round 2",
+	    "fmc": false,
+	    "colorScheme": {
+	        "U": "ffffff",
+	        "D": "ffff00",
+	        "F": "00ff00",
+	        "B": "0000ff",
+	        "R": "ff0000",
+	        "L": "ff8000"
+	    }
+	}]
+
+
 ### view/PUZZLE.[png|json]?scramble=SCRAMBLE&width=WIDTH&height=HEIGHT ###
 
 If JSON, then boundaries of the puzzles faces will be returned in json format. This is necessary information for creating a color scheme chooser.

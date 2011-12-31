@@ -31,6 +31,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 		} else {
 			Date generationDate = new Date();
 
+			// TODO - this means you can't have a round named "seed" or "showIndices"!
 			String seed = query.remove("seed");
 			boolean showIndices = query.remove("showIndices") != null;
 			

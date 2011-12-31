@@ -153,18 +153,21 @@
 	-Chrome Element vs mootools Element for fullscreen api
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
-
--exponential backoff for "Loading Scramble..."
--add remaining stackmat options
 -read times/metronome
+
+-add remaining stackmat options
 -provide some system for uploading your own image?
 -top row of times table shouldn't wrap
 -get rid of multiple drop down arrows?
 -scrambles for arbitrary relays?
+-sign in link needs to do something, or go away
+-behave nicely when the server goes down
+	-exponential backoff for "Loading Scramble..."
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
 
+-rounds named "seed" or "showIndices"
 -infinite seeded scrambles
 -#6 configurable clock colorscheme
 
