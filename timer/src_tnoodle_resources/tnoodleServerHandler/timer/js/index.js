@@ -453,17 +453,20 @@ window.addEvent('domready', function() {
 	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
 	timesTable.manager = triLayout;
 	
-	//TODO - yeah...
-	aboutText = '<h2 style="margin: 0;">TNoodle Timer (TNT) v' + tnoodle.tnt.version + '</h2><br/>' +
-				'Created by Jeremy Fleischman from the ashes of CCT.<br/>' +
-				'Thanks to Leyan Lo for ideas/couch';
 	var aboutPopup = tnoodle.tnt.createPopup();
-	aboutPopup.innerHTML = aboutText;
+	var aboutPopupDiv = document.createElement('div');
+	var aboutPopupH2 = document.createElement('h2');
+	aboutPopupH2.appendText('TNoodle Timer (TNT) v' + tnoodle.tnt.version);
+	aboutPopupH2.setStyle('margin', '0');
+	aboutPopupDiv.appendChild(aboutPopupH2);
+	aboutPopupDiv.appendText('Created by Jeremy Fleischman from the ashes of CCT.');
+	aboutPopupDiv.appendChild(document.createElement('br'));
+	aboutPopupDiv.appendText('Thanks to Leyan Lo for ideas/couch');
+	aboutPopup.appendChild(aboutPopupDiv);
 	$('aboutLink').addEvent('click', function() {
 		aboutPopup.show();
 	});
 	
-
 
 	$('bgLink').reset = function() {
 		$('bgLink').empty();
@@ -525,21 +528,33 @@ window.addEvent('domready', function() {
 	}
 	
 	var bgPopup = tnoodle.tnt.createPopup();
-	var bgPopupText = "Enter URL:<br /> <input type='text' id='bgUrl' /> <input type='submit' id='bgUrlBtn' value='Set' /> <input type='submit' id='bgUrlCancel' value='Cancel' />";
-	bgPopup.innerHTML = bgPopupText;
+	var bgPopupDiv = document.createElement('div');
+	var bgPopupUrl = document.createElement('input');
+	bgPopupUrl.type = 'text';
+	var bgPopupSet = document.createElement('input');
+	bgPopupSet.type = 'submit';
+	bgPopupSet.value = 'set';
+	var bgPopupCancel = document.createElement('input');
+	bgPopupCancel.type = 'submit';
+	bgPopupCancel.value = 'cancel';
+	bgPopupDiv.appendText("URL:");
+	bgPopupDiv.appendChild(bgPopupUrl);
+	bgPopupDiv.appendChild(bgPopupSet);
+	bgPopupDiv.appendChild(bgPopupCancel);
+	bgPopup.appendChild(bgPopupDiv);
 
-	$('bgUrlBtn').addEvent('click', function() {
-		var url = $('bgUrl').value;
+	bgPopupSet.addEvent('click', function() {
+		var url = bgPopupUrl.value;
 		if(url !== '') { setBgUrl(url); }
 		bgPopup.hide();
 	});
 
-	$('bgUrlCancel').addEvent('click', function() {
+	bgPopupCancel.addEvent('click', function() {
 		bgPopup.hide();
 	});
 
 	$('bgLink').addEvent('click', function() {
-		$('bgUrl').value = configuration.get('gui.backgroundImage');
+		bgPopupUrl.value = configuration.get('gui.backgroundImage');
 		bgPopup.show(); 
 	});
 	setBgUrl(configuration.get('gui.backgroundImage', ''));
