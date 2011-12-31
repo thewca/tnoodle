@@ -523,11 +523,24 @@ window.addEvent('domready', function() {
 		bgImg.setStyle('left', (available.x - width) / 2);
 		bgImg.setStyle('top', (available.y - height) / 2);
 	}
+	
+	var bgPopup = tnoodle.tnt.createPopup();
+	var bgPopupText = "Enter URL:<br /> <input type='text' id='bgUrl' /> <input type='submit' id='bgUrlBtn' value='Set' /> <input type='submit' id='bgUrlCancel' value='Cancel' />";
+	bgPopup.innerHTML = bgPopupText;
+
+	$('bgUrlBtn').addEvent('click', function() {
+		var url = $('bgUrl').value;
+		if(url !== '') { setBgUrl(url); }
+		bgPopup.hide();
+	});
+
+	$('bgUrlCancel').addEvent('click', function() {
+		bgPopup.hide();
+	});
+
 	$('bgLink').addEvent('click', function() {
-		var url = prompt("Url? (this will be pretty someday, I promise)", configuration.get('gui.backgroundImage')); 
-		if(url !== null) {
-			setBgUrl(url);
-		}
+		$('bgUrl').value = configuration.get('gui.backgroundImage');
+		bgPopup.show(); 
 	});
 	setBgUrl(configuration.get('gui.backgroundImage', ''));
 });
