@@ -848,7 +848,6 @@ var TimesTable = new Class({
 				e.stop(); // Without this, the timer will reset
 			} else if(e.key == 'enter') {
 				try {
-					this.deselectRows();
 					if(time) {
 						time.parse(textField.value);
 						this.session.reindex();
@@ -860,9 +859,12 @@ var TimesTable = new Class({
 
 						this.promptTime();
 					}
+
+					// We only deselect the row if we successfully added the new time
+					this.deselectRows();
 				} catch(error) {
 					// No need for an alert
-					alert("Error entering time " + textField.value + "\n" + error);
+					//alert("Error entering time " + textField.value + "\n" + error);
 				}
 				e.stop(); // Without this, the timer will start
 			}

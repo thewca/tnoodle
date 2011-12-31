@@ -159,7 +159,7 @@
 -get rid of multiple drop down arrows?
 -scrambles for arbitrary relays?
 
--shift/ctrl select times starts timer
+-shift/ctrl select times starts timer on windows because ctrl and shift keyrepeat
 -esc doesn't close time comment
 -resetting format str doesn't seem to work
 
