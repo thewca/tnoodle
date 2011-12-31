@@ -452,7 +452,7 @@ var KeyboardTimer = new Class({
 		this.scrambleStuff.unscramble(cancelledTime);
 	},
 	startKeys: function() {
-		var startKey = this.config.get("shortcuts."+tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT, 'space');
+		var startKey = this.config.get("shortcuts."+tnoodle.tnt.KEYBOARD_TIMER_SHORTCUT);
 		return startKey.split("+");
     },
 	resetKey: function() {

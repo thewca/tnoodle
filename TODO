@@ -145,6 +145,7 @@
 +replace all issue with time stats?
 +esc doesn't close time comment
 +resetting format str doesn't seem to work
++shift/ctrl select times starts timer on windows because ctrl and shift keyrepeat
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -160,8 +161,6 @@
 -top row of times table shouldn't wrap
 -get rid of multiple drop down arrows?
 -scrambles for arbitrary relays?
-
--shift/ctrl select times starts timer on windows because ctrl and shift keyrepeat
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
