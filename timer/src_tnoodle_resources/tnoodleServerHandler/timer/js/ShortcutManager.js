@@ -18,7 +18,7 @@ var ShortcutManager = null;
 
 		shortcuts.getValues().each(function(category) {
 			category.each(function(shortcut) {
-				var keys = configuration.get('shortcuts.' + shortcut.description, shortcut.default);
+				var keys = configuration.get('shortcuts.' + shortcut.description, shortcut['default']);
 				shortcut.keys = keys;
 			});
 		});
