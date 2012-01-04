@@ -187,6 +187,11 @@ tnoodle.tnt = {
 				tnoodle.tnt.grayOut(false);
 			}
 			this.style.display = 'none';
+
+			// There's no reason for an element in the popup to keep focus now
+			// that the popup is gone.
+			document.activeElement.blur();
+
 			if(onHide) {
 				onHide();
 			}
