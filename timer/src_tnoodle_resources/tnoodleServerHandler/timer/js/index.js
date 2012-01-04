@@ -178,8 +178,8 @@ window.addEvent('domready', function() {
 	//this should save us the bother of generating the csv over and over again
 	//TODO - this is probably getting called twice when clicking, due to the mousedown event, and then the click event
 	function downloadCSV() {
-		var keys = server.timeKeys;
-		var data = server.timeKeyNames.join(',')+"\n";
+		var keys = tnoodle.Time.timeKeys;
+		var data = tnoodle.Time.timeKeyNames.join(',')+"\n";
 		
 		var times = session.times;
 		for(var i = 0; i < session.times.length; i++) {
