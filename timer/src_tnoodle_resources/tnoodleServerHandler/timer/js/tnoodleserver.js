@@ -84,23 +84,35 @@ tnoodle.server = function(host, port) {
 			callback(scrambles[0]);
 		}, puzzle, seed, 1);
 	};
+	var pendingLoadScrambles = null;
 	this.loadScrambles = function(callback, puzzle, seed, count) {
+		if(pendingLoadScrambles) {
+			pendingLoadScrambles.abort();
+			pendingLoadScrambles = null;
+		}
 		var query = {};
 		if(seed) { query.seed = seed; }
 		if(!count) { count = 1; }
 		query[''] = encodeURIComponent(puzzle) + "*" + count;
-		return tnoodle.ajax(function(scrambleRequests) {
+		pendingLoadScrambles = tnoodle.retryAjax(function(scrambleRequests) {
 			if(scrambleRequests.error) {
-				assert(!scrambleRequests.error, scrambleRequests.error);
+				// If there's any kind of error, retryAjax will back off and try again
+				//log(scrambleRequests.error);
+				//f(scrambleRequests.error == tnoodle.BACKING_OFF) {
+				//	log(scrambleRequests.secondsRemaining + ' seconds remaining');
+				//}
+				// TODO use global status stuff from hackathon2011
 				return;
 			}
 
+			pendingLoadScrambles = null;
 			var scrambles = [];
 			for(var i = 0; i < scrambleRequests.length; i++) {
 				scrambles = scrambles.concat(scrambleRequests[i].scrambles);
 			}
 			callback(scrambles);
 		}, this.scrambleUrl + ".json", query);
+		return pendingLoadScrambles;
 	};
 	this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
 		var query = { "scramble": scramble };
@@ -1097,6 +1109,63 @@ tnoodle.ajax = function(callback, url, data) {
 		callback({error: err});
 	}
 	return xhr;
+};
+tnoodle.AJAX_TIMEOUT = 10000;
+tnoodle.BACKING_OFF = 'backing off';
+tnoodle.retryAjax = function(callback, url, data, nthTry) {
+	nthTry = nthTry || 0;
+	function timeout() {
+		xhr.abort();
+		callback({error: "Timed out"});
+		retry();
+	}
+	var pendingTimeout = setTimeout(timeout, tnoodle.AJAX_TIMEOUT);
+
+	var retryAttempt = null;
+	var retryTime = null;
+	var lastSecondsRemaining = null;
+	var retryTimer = null;
+	function retry() {
+		xhr = null;
+		clearTimeout(pendingTimeout);
+		if(!retryTime) {
+			retryTime = new Date().getTime() + 1000*Math.pow(2, nthTry);
+		}
+
+		var secondsRemaining = Math.round((retryTime - new Date().getTime())/1000, 0);
+		if(secondsRemaining <= 0) {
+			retryAttempt = tnoodle.retryAjax(callback, url, data, nthTry+1);
+		} else {
+			if(secondsRemaining != lastSecondsRemaining) {
+				lastSecondsRemaining = secondsRemaining;
+				callback({error: tnoodle.BACKING_OFF, secondsRemaining: secondsRemaining});
+			}
+			retryTimer = setTimeout(retry, 100);
+		}
+
+	}
+	var xhr = tnoodle.ajax(function(json) {
+		xhr = null;
+		clearTimeout(pendingTimeout);
+		if(json.error) {
+			callback(json);
+			retry();
+			return;
+		}
+		callback(json);
+	}, url, data);
+	function abort() {
+		if(xhr) {
+			xhr.abort();
+			xhr = null;
+		}
+		clearTimeout(pendingTimeout);
+		clearTimeout(retryTimer);
+		if(retryAttempt) {
+			retryAttempt.abort();
+		}
+	}
+	return { abort: abort };
 };
 tnoodle.jsonp = function(callback, url, data) {
 	var request = new Request.JSONP({

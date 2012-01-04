@@ -2,9 +2,13 @@ function getSourceContext(file, line) {
 	var PADDING = 2;
 
 	var context = 'File: ' + file + ':' + line + '\n';
-	var p = new printStackTrace.implementation();
-	for(var curLine = line-PADDING; curLine <= line+PADDING; curLine++) {
-		context += ( line == curLine ? '>' : '   ' ) + curLine + ":    " + p.getSource(file)[curLine-1] + '\n';
+	try {
+		var p = new printStackTrace.implementation();
+		for(var curLine = line-PADDING; curLine <= line+PADDING; curLine++) {
+			context += ( line == curLine ? '>' : '   ' ) + curLine + ":    " + p.getSource(file)[curLine-1] + '\n';
+		}
+	} catch(e) {
+		context += e;
 	}
 	return context;
 }
@@ -30,7 +34,11 @@ function alertBacktrace(message, stackTrace) {
 	if(m) {
 		file = m[1];
 		lineNumber = parseInt(m[2], 10);
-		lineOfCode = stacker.getSource(file)[lineNumber - 1]; // ahh, indexing from 1
+		try {
+			lineOfCode = stacker.getSource(file)[lineNumber - 1]; // ahh, indexing from 1
+		} catch(e) {
+			lineOfCode = e;
+		}
 	} else {
 		lineOfCode = 'Could not retrieve line of code at ' + lastFrame;
 	}

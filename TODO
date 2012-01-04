@@ -163,9 +163,14 @@
 -sign in link needs to do something, or go away
 -behave nicely when the server goes down
 	-exponential backoff for "Loading Scramble..."
+	-make import scramble offline safe
+	-look at all ajax calls!
+	-be good about cancelling pending ajax calls
+	-use global status bar to indicate pending ajax requests
 -rewrite config stuff
 	-separate defaults from running code
 	-don't store defaults to localStorage, this way if defaults change, people get the new version
+-tmt.createPopup hide() should give the timer focus
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
