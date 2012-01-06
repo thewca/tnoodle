@@ -171,6 +171,7 @@
 -rewrite config stuff
 	-separate defaults from running code
 	-don't store defaults to localStorage, this way if defaults change, people get the new version
+-clean up font stuff, there's no need to distribute the fontforge file...
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
