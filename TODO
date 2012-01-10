@@ -147,6 +147,7 @@
 +resetting format str doesn't seem to work
 +shift/ctrl select times starts timer on windows because ctrl and shift keyrepeat
 +tmt.createPopup hide() should give the timer focus
++clean up font stuff, there's no need to distribute the fontforge file...
 
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
 	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
@@ -171,7 +172,6 @@
 -rewrite config stuff
 	-separate defaults from running code
 	-don't store defaults to localStorage, this way if defaults change, people get the new version
--clean up font stuff, there's no need to distribute the fontforge file...
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions

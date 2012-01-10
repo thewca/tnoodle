@@ -1,6 +1,5 @@
 @font-face {  
 	font-family: lcd;
-	src: url("../media/Digiface Regular.eot");
 	src: 	local('Digiface Regular'), 
 			url("../media/Digiface Regular.ttf") format("truetype");  
 }
