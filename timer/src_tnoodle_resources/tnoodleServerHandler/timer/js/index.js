@@ -413,7 +413,11 @@ window.addEvent('domready', function() {
 	$('timer').resize = function() {
 		timer.redraw();
 	};
+	$('timer').getMinimumSize = function() {
+		return 50;
+	};
 	$('scrambles').resize = scrambleStuff.resize;
+	$('scrambles').getMinimumSize = scrambleStuff.getMinimumSize;
 	function getMaxWidth(el) {
 		// Returns the maximum size the element can take up without falling
 		// off the right side of the screen.
@@ -452,6 +456,7 @@ window.addEvent('domready', function() {
 	
 	var triLayout = new TriLayout($('timer'), $('scrambles'), $('times'), configuration);
 	timesTable.manager = triLayout;
+	scrambleStuff.manager = triLayout;
 	
 	var aboutPopup = tnoodle.tnt.createPopup();
 	var aboutPopupDiv = document.createElement('div');

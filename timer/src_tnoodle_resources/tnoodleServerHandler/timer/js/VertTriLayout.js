@@ -73,12 +73,12 @@ var TriLayout = new Class( {
 	},
 	resize: function() {
 		var top = window.getSize().y - this.config.get('layout.sizerHeight');
-		var MIN_TIMER_HEIGHT = 50;
-		var MIN_SCRAMBLE_HEIGHT = 70;
-		if(top < MIN_TIMER_HEIGHT) {
-			top = MIN_TIMER_HEIGHT;
-		} else if(top > window.getSize().y - MIN_SCRAMBLE_HEIGHT) {
-			top = window.getSize().y - MIN_SCRAMBLE_HEIGHT;
+		var minTopLeftHeight = this.topLeft.getMinimumSize() + this.margin;
+		var minBottomLeftHeight = this.bottomLeft.getMinimumSize() + this.margin;
+		if(top < minTopLeftHeight) {
+			top = minTopLeftHeight;
+		} else if(top > window.getSize().y - minBottomLeftHeight) {
+			top = window.getSize().y - minBottomLeftHeight;
 		}
 		this.resizeDiv.setStyle('top', top);
 		this.saveSize();
@@ -100,7 +100,7 @@ var TriLayout = new Class( {
 
 		var pos = this.resizeDiv.getPosition();
 		var size = this.resizeDiv.getSize();
-		var centerY = pos.y + size.y;
+		var centerY = pos.y;
 		var space = window.getSize();
 		
 		this.resizeDiv.setStyle('width', space.x - right.getPreferredWidth() - this.margin);

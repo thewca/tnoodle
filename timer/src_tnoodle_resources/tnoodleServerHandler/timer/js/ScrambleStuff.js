@@ -165,6 +165,11 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 					}
 
 					refreshColorSchemeChooser();
+
+					// The minimum size of the scramble area may have changed
+					// because we enforce that it is at least as tall as the scramble
+					// image.
+					that.manager.resize();
 				}
 			}, puzzle);
 	}
@@ -844,7 +849,6 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	scrambleImg.setStyle('float', 'right');
 	that.invisiblePuzzles = configuration.get('scramble.invisiblePuzzles', {});
 	scrambleImg.setVisible = function(visible, automated) {
-
 		if(automated) {
 			if(that.invisiblePuzzles[puzzle]) {
 				visible = false;
@@ -872,8 +876,11 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		showHideScrambleLink.empty();
 		showHideScrambleLink.appendText(showHideScrambleText);
 
-		//we must wait for the scramble to become visible before we make it fit on the page
-		setTimeout(adjustFontSize, 0);
+		adjustFontSize();
+
+		// If we just made the scramble visible, we may need to increase the
+		// scramble area size.
+		that.manager.resize();
 	};
 	
 	scrambleImg.redraw = function() {
@@ -974,19 +981,13 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		// scramblePre grows to accomodate the increasing font
 		// size. We hold onto the original height to prevent this.
 		var f = scramblePre.getStyle('font-size').toInt();
-		while(scrambleFits()) {
+		while(scrambleFits() && f < height) {
 			scramblePre.setStyle('font-size', ++f);
-			if(f > height) {
-				break;
-			}
 		}
 		
 		// Decrease font size until the scramble fits
-		while(!scrambleFits()) {
+		while(!scrambleFits() && f > 10) {
 			scramblePre.setStyle('font-size', --f);
-			if(f <= 10) {
-				break;
-			}
 		}
 
 		if(paddingSpans.length > 0) {
@@ -1000,11 +1001,20 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		}
 	}
 	
+	this.getMinimumSize = function() {
+		if(defaultSize && scrambleImg.style.display === '') {
+			var paddingVert = scramblePre.getStyle('padding-top').toInt() + scramblePre.getStyle('padding-bottom').toInt();
+			var borderVert = scrambleArea.getStyle('border-top').toInt() + scrambleArea.getStyle('border-bottom').toInt();
+			return defaultSize.height + scrambleHeader.getSize().y + paddingVert + borderVert;
+		}
+		return 70;
+	};
 	this.resize = function() {
 		setScrambleCopyVisible(false);
 
 		var space = $('scrambles').getSize();
-		space.y -= $('scrambleBorder').getSize().y + 2; //add 2 for border
+		var borderVert = scrambleArea.getStyle('border-top').toInt() + scrambleArea.getStyle('border-bottom').toInt();
+		space.y -= $('scrambleBorder').getSize().y + borderVert;
 		scrambleArea.setStyle('height', space.y);
 		space.y -= scrambleHeader.getSize().y;
 		var paddingVert = scramblePre.getStyle('padding-top').toInt() + scramblePre.getStyle('padding-bottom').toInt();
