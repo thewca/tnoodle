@@ -41,3 +41,11 @@ all
         `-- utils (seen)
 </code>
 </pre>
+
+MAKE
+
+* Should work & is easy for testing:
+<pre><code>./tmt make run -p timer</code></pre>
+
+* Should make a runnable jar under the "timer/dist" directory:
+<pre><code>./tmt make dist -p timer</code></pre>
