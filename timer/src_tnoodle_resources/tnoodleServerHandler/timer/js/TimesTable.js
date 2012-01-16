@@ -1174,6 +1174,7 @@ var TimesTable = new Class({
 		var space = this.parent.getSize();
 		var offset = $(this).getPosition($(this).getParent());
 		space.y -= offset.y;
+		space.y -= 1; // This solves the 2px border at the bottom of the table problem
 		return space;
 	},
 	resize: function(forceScrollToLatest) {
