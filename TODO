@@ -172,6 +172,16 @@
 -rewrite config stuff
 	-separate defaults from running code
 	-don't store defaults to localStorage, this way if defaults change, people get the new version
+-graphs (save for Hackathon2011?)
+-keyboard shortcuts
+	-columns if there's space
+	-reset individual shortcuts
+	-help vs description
+	-opt in to key repeat
+		-for example: resizing the scramble
+	-show keyboard layout
+
+-should scramble image be resizable?
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions
@@ -193,7 +203,6 @@
 		-screw this, just store everything in the db, and make it easy to create an account
 	-add login
 	-implement stuff on scratch paper!!!
-	-graphs (save for Hackathon2011?)
 -add autoupdating to server
 
 ### webscrambles-ui

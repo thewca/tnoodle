@@ -2,9 +2,12 @@
 var WAITING_ICON_HEIGHT = 11;
 var WAITING_ICON = 'media/ajax-loader.gif';
 
+var COLOR_WHEEL_IMAGE = 'media/color_wheel.png';
+
 // LOADING_IMAGE = WAITING_ICON;
 // from http://en.wikipedia.org/wiki/Data_URI_scheme
 var LOADING_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
+
 
 /*** START IE hacks ***/
 // from http://snipplr.com/view.php?codeview&id=13523
@@ -42,9 +45,6 @@ function xAddListener(obj, event, func, useCapture) {
 }
 /*** END IE HACKS ***/
 
-function setUnfocusable(el) {
-	xAddListener(el, 'focus', el.blur, false);
-}
 function randomString(length) {
 	var MIN = 'a'.charCodeAt(0);
 	var MAX = 'z'.charCodeAt(0);
@@ -93,6 +93,8 @@ function clone(obj) {
 }
 
 function ScrambleStuff(scrambler, loadedCallback, applet) {
+	var that = this;
+
 	var configuration = scrambler.configuration;
 	var puzzle = null;
 	var colorScheme = null;
@@ -133,8 +135,8 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		var width = configuration.get('scramble.' + puzzle + '.size.width', null);
 		var height = configuration.get('scramble.' + puzzle + '.size.height', null);
 		if(width && height) {
-			scrambleDiv.style.height = height;
-			scrambleDiv.style.width = width;
+			scrambleImg.style.height = height;
+			scrambleImg.style.width = width;
 		} else {
 			//we'll have to wait for the scramble info to load to know how big to make the scramble
 			width = height = null;
@@ -144,7 +146,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			function(puzzleImageInfo) {
 				if(puzzleImageInfo.error) {
 					faceMap = null; // scramble images are not supported
-					scrambleDiv.setVisible(false, true);
+					scrambleImg.setVisible(false, true);
 				} else {
 					faceMap = puzzleImageInfo.faces;
 					colorScheme = configuration.get('scramble.' + puzzle + '.colorScheme', clone(puzzleImageInfo.colorScheme));
@@ -152,8 +154,8 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 
 					defaultSize = puzzleImageInfo.size;
 					if(!width || !height) {
-						scrambleDiv.style.width = puzzleImageInfo.size.width + getScrambleHorzPadding() + "px";
-						scrambleDiv.style.height = (puzzleImageInfo.size.height + getScrambleVertPadding()) + "px";
+						scrambleImg.style.width = puzzleImageInfo.size.width + "px";
+						scrambleImg.style.height = puzzleImageInfo.size.height + "px";
 					}
 					scrambleResized();
 
@@ -161,8 +163,56 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 					if(currScramble) {
 						formatScramble();
 					}
+
+					refreshColorSchemeChooser();
 				}
 			}, puzzle);
+	}
+
+	function refreshColorSchemeChooserImage() {
+		configureColorSchemeImg.src = scrambler.getScrambleImageUrl(puzzle, null, colorScheme, defaultSize.width, defaultSize.height);
+		configureColorSchemeImg.setStyle('width', defaultSize.width);
+		configureColorSchemeImg.setStyle('height', defaultSize.height);
+	}
+	function refreshColorSchemeChooser() {
+		refreshColorSchemeChooserImage();
+		colorChooser.element.setStyle('visibility', 'hidden');
+
+		deleteChildren(scrambleImgMap);
+		var scale = 1;
+		var areas = scrambler.createAreas(faceMap, scale);
+		var refreshHeader = function() {
+			deleteChildren(scrambleHeaderText);
+			var msg = null;
+			if(hoveredFace) {
+				msg = 'Click to edit: ' + hoveredFace;
+			} else if(currFaceName) {
+				msg = 'Editing: ' + currFaceName;
+			} else {
+				msg = 'Click a face';
+			}
+			scrambleHeaderText.appendChild(document.createTextNode(msg));
+		};
+		var setHoveredFace = function() {
+			hoveredFace = this.faceName;
+			refreshHeader();
+		};
+		var clearHoveredFace = function() {
+			hoveredFace = null;
+			refreshHeader();
+		};
+		var hoveredFace = null;
+		currFaceName = null;
+		refreshHeader();
+		for(var i = 0; i < areas.length; i++) {
+			var area = areas[i];
+			area.setAttribute('alt', area.faceName);
+			xAddListener(area, 'click', faceClicked, false);
+
+			xAddListener(area, 'mouseover', setHoveredFace, false);
+			xAddListener(area, 'mouseout', clearHoveredFace, false);
+			scrambleImgMap.appendChild(area);
+		}
 	}
 
 	var scrambleChooser = document.createElement('input');
@@ -244,16 +294,12 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		scrambling = false;
 	}
 	function turnClicked(automated) {
-		if(isChangingColorScheme) {
-			// first, we cancel editing of the colorscheme
-			changeColorsClicked.call(changeColors);
-		}
 		if(currTurn) {
 			currTurn.className = 'turn';
 		}
 		currTurn = this;
 		currTurn.className = 'currTurn';
-		scrambleDiv.setVisible(true, automated);
+		scrambleImg.setVisible(true, automated);
 		scrambleImg.drawScramble(currTurn.incrementalScramble);
 	}
 	function userClickedTurn() {
@@ -299,7 +345,6 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 				}
 				turn = newLines[j];
 				incrementalScramble += turn;
-				//TODO - disable if the scramble fits on one line!
 				var padding = "";
 				if(maxLength - turn.length <= 3) {
 					// We only pad if it can be done in <= 3 spaces.
@@ -307,7 +352,12 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 					// This is basically a hack so the "/" turns in sq1
 					// don't get padded.
 					for(var k = turn.length; k < maxLength; k++) {
-						padding += " "; //padding so all turns take up the same amount of space
+						// Padding so all turns take up the same amount of space.
+						// Note that a simple space character isn't good enough,
+						// as it will not force the string "R " to wrap when the string
+						// "R'" would. \u00a0 is the same as &nbsp; and it
+						// prevents this behavior
+						padding += "\u00a0";
 					}
 				}
 				var turnPadding = document.createElement('span');
@@ -319,8 +369,12 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 				turnLink.incrementalScramble = incrementalScramble;
 				turnLink.className = 'turn';
 				xAddListener(turnLink, 'click', userClickedTurn, false);
-				scramblePre.appendChild(turnLink);
-				scramblePre.appendChild(turnPadding);
+
+				var turnSpan = document.createElement('span');
+				turnSpan.appendChild(turnLink);
+				turnSpan.appendChild(turnPadding);
+
+				scramblePre.appendChild(turnSpan);
 				if(i == turns.length - 1) {
 					turnClicked.call(turnLink, true);
 				} else {
@@ -335,90 +389,31 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	var currFaceName = null;
 	function faceClicked() {
 		currFaceName = this.faceName;
-		colorChooserDiv.style.display = 'inline';
 		colorChooser.setDefaultColor(colorScheme[currFaceName]);
-		deleteChildren(colorChooserHeaderText);
-		colorChooserHeaderText.appendChild(document.createTextNode('Editing face ' + currFaceName));
-	}
-
-	function getScrambleVertPadding() {
-		// var headerStyle = window.getComputedStyle(scrambleDivHeader, null);
-		// var scrambleHeader = parsePx(headerStyle.getPropertyValue("height"))
-		// + parsePx(headerStyle.getPropertyValue("border-bottom-width"));
-		var scrambleHeader = 20 + 1 + 2; // apparently dynamically computing
-		// this doesn't work on opera
-		var scrambleStyle = window.getComputedStyle(scrambleImg, null);
-		return parsePx(scrambleStyle.getPropertyValue("padding-top")) + parsePx(scrambleStyle.getPropertyValue("padding-bottom")) + scrambleHeader;
-	}
-	function getScrambleHorzPadding() {
-		var scrambleStyle = window.getComputedStyle(scrambleImg, null);
-		return parsePx(scrambleStyle.getPropertyValue("padding-left")) + parsePx(scrambleStyle.getPropertyValue("padding-right"));
-	}
-
-	function scrambleMoved() {
-		configuration.set('scramble.location.top', scrambleDiv.style.top);
-		configuration.set('scramble.location.left', scrambleDiv.style.left);
+		colorChooser.element.setStyle('visibility', '');
 	}
 
 	function scrambleResized() {
-		var desiredWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
+		var desiredWidth = parsePx(scrambleImg.style.width);
 		var desiredWidthHeight = desiredWidth * defaultSize.height / defaultSize.width;
-		var desiredHeight = parsePx(scrambleDiv.style.height) - getScrambleVertPadding();
+
+		var desiredHeight = parsePx(scrambleImg.style.height);
 		var desiredHeightWidth = desiredHeight * defaultSize.width / defaultSize.height;
+
 		var imgWidth = Math.max(desiredWidth, desiredHeightWidth, defaultSize.width);
 		var imgHeight = Math.max(desiredHeight, desiredWidthHeight, defaultSize.height);
+
+		// TODO - do we want to support resizing the scramble image?
+		imgWidth = defaultSize.width;
+		imgHeight = defaultSize.height;
+
 		scrambleImg.style.width = imgWidth + "px";
 		scrambleImg.style.height = imgHeight + "px";
-		scrambleDiv.style.width = (imgWidth + getScrambleHorzPadding()) + "px";
-		scrambleDiv.style.height = (imgHeight + getScrambleVertPadding()) + "px";
-		positionWindows();
 	}
 	function saveScrambleSize() {
-		configuration.set('scramble.' + puzzle + '.size.width', scrambleDiv.style.width);
-		configuration.set('scramble.' + puzzle + '.size.height', scrambleDiv.style.height);
+		configuration.set('scramble.' + puzzle + '.size.width', scrambleImg.style.width);
+		configuration.set('scramble.' + puzzle + '.size.height', scrambleImg.style.height);
 		scrambleImg.redraw();
-		deleteChildren(scrambleImgMap);
-		if(isChangingColorScheme) {
-			var imgWidth = parsePx(scrambleDiv.style.width) - getScrambleHorzPadding();
-			var scale = imgWidth / defaultSize.width;
-			var areas = scrambler.createAreas(faceMap, scale);
-			var updateHeader = function() {
-				deleteChildren(scrambleHeaderText);
-				scrambleHeaderText.appendChild(document.createTextNode(this.faceName));
-			};
-			var emptyHeader = function() {
-				deleteChildren(scrambleHeaderText);
-			};
-			for(var i = 0; i < areas.length; i++) {
-				var area = areas[i];
-				area.setAttribute('alt', area.faceName);
-				xAddListener(area, 'click', faceClicked, false);
-
-				xAddListener(area, 'mouseover', updateHeader, false);
-				xAddListener(area, 'mouseout', emptyHeader, false);
-				scrambleImgMap.appendChild(area);
-			}
-		}
-	}
-
-	function changeColorsClicked() {
-		isChangingColorScheme = !isChangingColorScheme;
-		if(isChangingColorScheme) {
-			if(currTurn) {
-				currTurn.className = "turn";
-			}
-			this.className += " buttondown";
-			resetColorScheme.style.display = 'inline';
-			scrambleImg.redraw();
-		} else {
-			if(currTurn) { // curr turn will not be defined if we just changed puzzles
-				turnClicked.call(currTurn, true);
-			}
-			this.className = this.className.replace(/\bbuttondown\b/, "");
-			colorChooserDiv.style.display = 'none'; // close cholor chooser window
-			resetColorScheme.style.display = 'none';
-		}
-		saveScrambleSize(); // force image area map to be created
 	}
 
 	function puzzlesLoaded(puzzles) {
@@ -602,8 +597,6 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		seedText.select();
 	}
 
-	var isChangingColorScheme = false;
-
 	var scrambleArea = document.createElement('div');
 	scrambleArea.className = 'scrambleArea';
 
@@ -736,10 +729,74 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	}, false);
 	scrambleHeader.appendChild(newScrambleLink);
 
+	var showHideScrambleLink = document.createElement('span');
+	showHideScrambleLink.className = 'link';
+	showHideScrambleLink.addEvent('click', function(e) {
+		that.toggleScrambleView();
+	});
+	scrambleHeader.appendChild(showHideScrambleLink);
+
+	var setColorSchemeLink = document.createElement('span');
+	setColorSchemeLink.className = 'link';
+	var colorWheelImage = document.createElement('img');
+	colorWheelImage.src = COLOR_WHEEL_IMAGE;
+	setColorSchemeLink.appendChild(colorWheelImage);
+	setColorSchemeLink.title = 'Configure puzzle color scheme';
+	colorWheelImage.setStyle('vertical-align', '-3px');
+
+	function onColorConfigureShow() {
+		currFaceName = null;
+		refreshColorSchemeChooser();
+	}
+	var configureColorSchemePopup = tnoodle.tnt.createPopup(onColorConfigureShow);
+	configureColorSchemePopup.setStyle('text-align', 'center');
+
+	var scrambleHeaderText = document.createElement('div');
+	configureColorSchemePopup.appendChild(scrambleHeaderText);
+
+	var scrambleImgMap = document.createElement('map');
+	scrambleImgMap.setAttribute('name', 'scrambleImgMap');
+	configureColorSchemePopup.appendChild(scrambleImgMap);
+
+	var configureColorSchemeImg = document.createElement('img');
+	configureColorSchemeImg.setAttribute('usemap', '#scrambleImgMap');
+	configureColorSchemePopup.appendChild(configureColorSchemeImg);
+
+	var resetColorScheme = document.createElement('input');
+	resetColorScheme.type = 'button';
+	resetColorScheme.value = 'Reset';
+	resetColorScheme.addEvent('click', function(e) {
+		if(confirm("Reset the color scheme?")) {
+			colorScheme = clone(defaultColorScheme);
+			configuration.set('scramble.' + puzzle + '.colorScheme', colorScheme);
+			scrambleImg.redraw();
+			refreshColorSchemeChooser();
+		}
+	});
+	tempDiv = document.createElement('div');
+	tempDiv.setStyle('text-align', 'right');
+	tempDiv.appendChild(resetColorScheme);
+	configureColorSchemePopup.appendChild(tempDiv);
+
+	var colorChooser = new ColorChooser(function(newColor) {
+		colorScheme[currFaceName] = newColor;
+		configuration.set('scramble.' + puzzle + '.colorScheme', colorScheme);
+		scrambleImg.redraw();
+		refreshColorSchemeChooserImage();
+	});
+	colorChooser.element.setStyle('border', '1px solid black');
+	configureColorSchemePopup.appendChild(colorChooser.element);
+
+
+	setColorSchemeLink.addEvent('click', function(e) {
+		configureColorSchemePopup.show();
+	});
+	scrambleHeader.appendChild(setColorSchemeLink);
+
 	var scrambleInfo = document.createElement('span');
 	scrambleHeader.appendChild(scrambleInfo);
 
-	var scramblePre = document.createElement('pre');
+	var scramblePre = document.createElement('p');
 	scramblePre.className = 'scrambleText';
 	scrambleArea.appendChild(scramblePre);
 
@@ -768,9 +825,9 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			scrambleCopyArea.replaces(scramblePre);
 			scrambleCopyArea.focus();
 			scrambleCopyArea.select();
-
 		} else {
 			scramblePre.replaces(scrambleCopyArea);
+			adjustFontSize();
 		}
 	}
 	scramblePre.addEvent('dblclick', function(e) {
@@ -783,94 +840,49 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		}
 	});
 
-	var scrambleDiv = document.createElement('div');
-	scrambleDiv.style.display = 'none';
-	scrambleDiv.className = 'window';
-	document.body.appendChild(scrambleDiv);
+	var scrambleImg = document.createElement('img');
+	scrambleImg.setStyle('float', 'right');
+	that.invisiblePuzzles = configuration.get('scramble.invisiblePuzzles', {});
+	scrambleImg.setVisible = function(visible, automated) {
 
-	var scrambleDivHeader = document.createElement("div");
-	scrambleDivHeader.className = 'titlebar';
-	scrambleDiv.appendChild(scrambleDivHeader);
-	scrambleDiv.setStyle('z-index', 4);
-	scrambleDiv.id = 'scrambleDiv'; // have to have an id to make it draggable
-	scrambleDiv.invisiblePuzzles = configuration.get('scramble.invisiblePuzzles', {});
-	scrambleDiv.setVisible = function(visible, automated) {
 		if(automated) {
-			visible &= !this.invisiblePuzzles[puzzle];
+			if(that.invisiblePuzzles[puzzle]) {
+				visible = false;
+			}
 		} else {
-			this.invisiblePuzzles[puzzle] = !visible;
+			that.invisiblePuzzles[puzzle] = !visible;
 			configuration.set('scramble.invisiblePuzzles', this.invisiblePuzzles);
 		}
+
+		var showHideScrambleText = null;
 		if(visible) {
-			scrambleDiv.style.display = 'inline';
-			//we must wait for the scramble to become visible before we make it fit on the page
-			setTimeout(positionWindows, 0);
+			showHideScrambleText = 'Hide scramble';
+			scrambleImg.inject(scramblePre, 'top');
+			scrambleImg.style.display = '';
+			setColorSchemeLink.show();
 		} else {
+			showHideScrambleText = 'Show scramble';
 			if(currTurn) {
 				currTurn.className = 'turn';
 			}
-			scrambleDiv.style.display = 'none';
-			colorChooserDiv.style.display = 'none';
+			scrambleImg.style.display = 'none';
+			setColorSchemeLink.hide();
 		}
+
+		showHideScrambleLink.empty();
+		showHideScrambleLink.appendText(showHideScrambleText);
+
+		//we must wait for the scramble to become visible before we make it fit on the page
+		setTimeout(adjustFontSize, 0);
 	};
-
-	var scrambleHeaderText = document.createElement("span");
-	scrambleHeaderText.className = 'titletext';
-	scrambleDivHeader.appendChild(scrambleHeaderText);
-
-	var closeScramble = document.createElement('span');
-	closeScramble.appendChild(document.createTextNode('X'));
-	closeScramble.className = 'button close';
-	closeScramble.title = 'Close';
-	xAddListener(closeScramble, 'click', function() {
-		scrambleDiv.setVisible(false, false);
-	}, false);
-	scrambleDivHeader.appendChild(closeScramble);
-
-	var minimizeScramble = document.createElement('span');
-	minimizeScramble.appendChild(document.createTextNode('*'));
-	minimizeScramble.className = 'button close';
-	minimizeScramble.title = 'Reset size';
-	xAddListener(minimizeScramble, 'click', function() {
-		scrambleDiv.style.width = defaultSize.width + getScrambleHorzPadding() + "px";
-		scrambleDiv.style.height = defaultSize.height	+ getScrambleVertPadding() + "px";
-		scrambleResized();
-		saveScrambleSize();
-	}, false);
-	scrambleDivHeader.appendChild(minimizeScramble);
-
-	var changeColors = document.createElement('span');
-	changeColors.className = 'button changeColors';
-	changeColors.setAttribute('title', 'Change color scheme');
-	xAddListener(changeColors, 'click', changeColorsClicked, false);
-	scrambleDivHeader.appendChild(changeColors);
-
-	var resetColorScheme = document.createElement('span');
-	// resetColorScheme.appendChild(document.createTextNode('*'));
-	resetColorScheme.setAttribute('title', 'Reset color scheme');
-	resetColorScheme.className = 'button reset';
-	resetColorScheme.style.display = 'none';
-	xAddListener(resetColorScheme, 'click', function() {
-		if(confirm("Reset the color scheme?")) {
-			colorScheme = clone(defaultColorScheme);
-			configuration.set('scramble.' + puzzle + '.colorScheme', colorScheme);
-			scrambleImg.drawScramble("");
-		}
-	}, false);
-	scrambleDivHeader.appendChild(resetColorScheme);
-	// end scrambleDivHeader
-
-	var scrambleImg = document.createElement('img');
-	scrambleImg.setAttribute('usemap', '#scrambleImgMap');
-	scrambleDiv.appendChild(scrambleImg);
-
+	
 	scrambleImg.redraw = function() {
-		this.drawScramble(isChangingColorScheme ? "" : currScramble);
+		this.drawScramble(currScramble);
 	};
 	scrambleImg.drawScramble = function(scramble) {
 		// no need to waste bandwidth unless we're
 		// actually displaying images
-		if(scrambleDiv.style.display != 'none') {
+		if(scrambleImg.style.display != 'none') {
 			if(scramble != currScramble) {
 				// since the next image may take a while to load, we place a holder
 				this.clear();
@@ -880,8 +892,8 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			if(!width || !height) {
 				width = height = null;
 			} else {
-				width = width.toInt() - getScrambleHorzPadding();
-				height = height.toInt() - getScrambleVertPadding();
+				width = width.toInt();
+				height = height.toInt();
 			}
 			this.src = scrambler.getScrambleImageUrl(puzzle, scramble, colorScheme, width, height);
 		}
@@ -890,70 +902,9 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		this.src = LOADING_IMAGE;
 	};
 
-	var scrambleImgMap = document.createElement('map');
-	scrambleImgMap.setAttribute('name', 'scrambleImgMap');
-	scrambleDiv.appendChild(scrambleImgMap);
-
-	var resizeDiv = document.createElement('div');
-	resizeDiv.className = "dragresize dragresize-br";
-	scrambleDiv.appendChild(resizeDiv);
-	// end scrambleDiv
-
-	// Defaulting to 30px to make room for "Sign In" and "Help" links
-	scrambleDiv.style.top = configuration.get('scramble.location.top', '30px');
-	scrambleDiv.style.left = configuration.get('scramble.location.left', '0px');
-
-	var scrambleDrag = new Drag(scrambleDiv, {
-		handle : scrambleDivHeader
-	});
-	scrambleDrag.addEvent('complete', scrambleMoved);
-
-	var scrambleResize = scrambleDiv.makeResizable( {
-		handle : resizeDiv,
-		snap : 0
-	});
-	scrambleResize.addEvent('drag', scrambleResized);
-	scrambleResize.addEvent('complete', saveScrambleSize);
-
 	var puzzleSelect = tnoodle.tnt.createSelect('Click to open last session of puzzle', 'Click to change session puzzle');
 	puzzleSelect.onchange = puzzleChanged;
 	puzzleSelect.setDisabled(true);
-
-	var colorChooserDiv = document.createElement('div');
-	colorChooserDiv.id = 'colorChooserDiv'; // need an id to make it draggable
-	colorChooserDiv.className = 'window';
-	colorChooserDiv.style.zIndex = 5;
-	document.body.appendChild(colorChooserDiv);
-	var titlebar = document.createElement('div');
-	titlebar.className = 'titlebar';
-	colorChooserDiv.appendChild(titlebar);
-	var colorChooserHeaderText = document.createElement('span');
-	colorChooserHeaderText.className = 'titletext';
-	titlebar.appendChild(colorChooserHeaderText);
-
-	var closeColorChooser = document.createElement('span');
-	closeColorChooser.className = "button";
-	closeColorChooser.appendChild(document.createTextNode('X'));
-	xAddListener(closeColorChooser, 'click', function() {
-		colorChooserDiv.style.display = 'none';
-	}, false);
-	titlebar.appendChild(closeColorChooser);
-	// end titlebar
-	var colorChooser = new ColorChooser(function(newColor) {
-		colorScheme[currFaceName] = newColor;
-		configuration.set('scramble.' + puzzle + '.colorScheme', colorScheme);
-		colorChooserDiv.style.display = 'none';
-		scrambleImg.redraw();
-	});
-	colorChooserDiv.appendChild(colorChooser.element);
-	// end colorChooserDiv
-
-	colorChooserDiv.style.width = colorChooser.preferredWidth + 'px';
-	colorChooserDiv.style.height = colorChooser.preferredHeight + 'px';
-	colorChooserDiv.style.display = 'none';
-	var colorChooserDrag = new Drag(colorChooserDiv, {
-		handle : titlebar
-	});
 
 	scramblePre.appendChild(document.createTextNode('Connecting to ' + scrambler.toString() + "..."));
 	scrambler.loadPuzzles(puzzlesLoaded);
@@ -994,13 +945,36 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		paddingSpans.each(function(el) {
 			el.setStyle('display', '');
 		});
+		
+		function scrambleFits() {
+			var turns = scramblePre.getChildren();
+			var lastTurn = turns[turns.length-1];
+			var textBottom = null;
+			var textRight = null;
+			if(!lastTurn) {
+				textBottom = scramblePre.scrollHeight;
+				textRight = scramblePre.scrollWidth;
+			} else {
+				// TODO - for some reason, scramblePre.scrollWidth is
+				// ending up larger than it should. Since all scrambles so far
+				// wrap, this hasn't been an issue.
+				textRight = 0;
+
+				// We don't want the scramble image to force us to think the
+				// scramble doesn't fit, so we manually figure out how low the
+				// text goes here.
+				var bottomPadding = scramblePre.getStyle('padding-bottom').toInt();
+				textBottom = lastTurn.getPosition(scramblePre).y + lastTurn.getSize().y + bottomPadding;
+			}
+			return textBottom <= scramblePre.clientHeight && textRight <= scramblePre.clientWidth;
+		}
 		var height = scramblePre.getStyle("height").toInt();
 		// Increase font size until the scramble doesn't fit.
 		// Sometimes, this can get stuck in an inf loop where
 		// scramblePre grows to accomodate the increasing font
 		// size. We hold onto the original height to prevent this.
 		var f = scramblePre.getStyle('font-size').toInt();
-		while(scramblePre.clientHeight >= scramblePre.scrollHeight) {
+		while(scrambleFits()) {
 			scramblePre.setStyle('font-size', ++f);
 			if(f > height) {
 				break;
@@ -1008,12 +982,12 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		}
 		
 		// Decrease font size until the scramble fits
-		do {
-			scramblePre.setStyle('font-size', f--);
+		while(!scrambleFits()) {
+			scramblePre.setStyle('font-size', --f);
 			if(f <= 10) {
 				break;
 			}
-		} while(scramblePre.clientHeight < scramblePre.scrollHeight);
+		}
 
 		if(paddingSpans.length > 0) {
 			if(paddingSpans[0].getPosition().y == paddingSpans[paddingSpans.length-1].getPosition().y) {
@@ -1031,8 +1005,8 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 
 		var space = $('scrambles').getSize();
 		space.y -= $('scrambleBorder').getSize().y + 2; //add 2 for border
-		$$('.scrambleArea')[0].setStyle('height', space.y);
-		space.y -= $$('.scrambleHeader')[0].getSize().y;
+		scrambleArea.setStyle('height', space.y);
+		space.y -= scrambleHeader.getSize().y;
 		var paddingVert = scramblePre.getStyle('padding-top').toInt() + scramblePre.getStyle('padding-bottom').toInt();
 		var paddingHorz = scramblePre.getStyle('padding-left').toInt() + scramblePre.getStyle('padding-right').toInt();
 		space.y -= paddingVert;
@@ -1057,11 +1031,11 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 	}
 
 	this.toggleScrambleView = function() {
-		if(scrambleDiv.style.display == 'none') {
+		if(scrambleImg.style.display == 'none') {
 			var turns = $$('.turn'); //fun with css!
 			turnClicked.call(turns[turns.length-1], false);
 		} else {
-			scrambleDiv.setVisible(false);
+			scrambleImg.setVisible(false);
 		}
 	};
 
@@ -1074,33 +1048,4 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 			puzzleListeners[i](puzzle, altArrow);
 		}
 	}
-	
-	function ensureVisible(el) {
-		var pos = el.getPosition();
-		pos.x--; pos.y--; //assuming the border is 1px
-		var size = el.getSize();
-		var avail = window.getSize();
-		// NOTE: the order of the min, max is important here!
-		// We can never let windows be clipped on the right hand size, else we lose
-		// ability to resize them!
-		pos.x = Math.min(Math.max(0, pos.x), avail.x-size.x-2);
-		pos.y = Math.min(Math.max(0, pos.y), avail.y-size.y-1);
-		el.getParent().setPosition(pos); //must position the parent, not the titlebar
-	}
-	var positioning = false;
-	function positionWindows() {
-		// We don't want this method to get called while it's getting called,
-		// and we also don't want it to be called when the scramble isn't even visible
-		if(positioning || scrambleDiv.style.display != 'inline') {
-			return;
-		}
-		positioning = true;
-		ensureVisible(scrambleDivHeader);
-		ensureVisible(titlebar);
-		scrambleMoved();
-		positioning = false;
-	}
-	scrambleDrag.addEvent('complete', positionWindows);
-	colorChooserDrag.addEvent('complete', positionWindows);
-	window.addEvent('resize', positionWindows);
 }

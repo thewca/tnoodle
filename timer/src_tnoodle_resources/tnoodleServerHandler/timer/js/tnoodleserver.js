@@ -115,6 +115,7 @@ tnoodle.server = function(host, port) {
 		return pendingLoadScrambles;
 	};
 	this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
+		scramble = scramble || "";
 		var query = { "scramble": scramble };
 		if(width) { query.width = width; }
 		if(height) { query.height = height; }

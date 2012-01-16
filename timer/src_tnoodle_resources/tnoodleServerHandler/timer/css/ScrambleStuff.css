@@ -34,10 +34,11 @@ span.turn:hover {
 }
 .scrambleText {
     white-space: normal;
+	font-family: monospace;
 
 	background: rgba(250, 250, 250, .8);
-    margin: 0px;
     padding: 5px 10px;
+    margin: 0px;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
@@ -61,7 +62,4 @@ div.scrambleHeader {
 }
 .button.reset {
 	background: transparent url('../media/arrow_undo.png') no-repeat scroll center center;
-}
-.button.close {
-	/* TODO - pretty close image? */
 }

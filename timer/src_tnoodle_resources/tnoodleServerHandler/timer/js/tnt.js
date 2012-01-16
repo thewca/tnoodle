@@ -151,6 +151,8 @@ tnoodle.tnt = {
 					innerDiv.resize();
 				}
 			} else {
+				this.setStyle('width', '');
+				this.setStyle('height', '');
 				innerDiv.setStyle('height', '');
 				innerDiv.setStyle('width', '');
 				if(innerDiv.reset) {

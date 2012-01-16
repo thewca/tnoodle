@@ -406,10 +406,6 @@ function ColorChooser(callback) {
 	buttons.appendChild(green);
 	buttons.appendChild(document.createElement('br'));
 	buttons.appendChild(blue);
-	buttons.appendChild(document.createElement('br'));
-	buttons.appendChild(reset);
-	buttons.appendChild(document.createElement('br'));
-	buttons.appendChild(accept);
 
 	// TODO - the 15 and 26 were found via trial and error, and probably aren't
 	// too solid
@@ -428,6 +424,8 @@ function ColorChooser(callback) {
 	var element = this.element = document.createElement('div');
 	element.style.width = this.preferredWidth + 'px';
 	element.style.height = this.preferredHeight + 'px';
+	element.style.position = 'relative';
+	element.style.textAlign = 'left';
 
 	// buttons.style.cssFloat = 'right';
 	buttons.style.position = 'absolute';
@@ -451,6 +449,7 @@ function ColorChooser(callback) {
 		blueBox.value = selectedRGB.b;
 		element.style.backgroundColor = '#' + rgb2hex(selectedRGB);
 		redraw();
+		callback(rgb2hex(selectedRGB));
 	}
 	function setSelectedHSL(hsl) {
 		selectedHSL = hsl;
@@ -460,6 +459,7 @@ function ColorChooser(callback) {
 		blueBox.value = selectedRGB.b;
 		element.style.backgroundColor = '#' + rgb2hex(selectedRGB);
 		redraw();
+		callback(rgb2hex(selectedRGB));
 	}
 	this.setDefaultColor = function(color) {
 		defaultRGB = hex2rgb(color);
