@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import tmt
 import os
 from os.path import join, exists, relpath

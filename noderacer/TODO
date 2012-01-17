@@ -1,0 +1,82 @@
+**** Client side ****
++deterministic ordering of channel members? age or nick?
+	+sizing of boards
+		+visually indicate self, and always place it on top?
++add control messages to chat
+	+joined channel
+	+user joined/parted/admined
+	-stop sending clientId_user list when it isn't necessary!
++add chat support
+	+gray out our messages until we know they hit the server
+	+reorder messages on client side if necessary
+	+store last 100 messages on the server and feed them to the client upon connect
+	+add gchat style timestamps
+	+resizing smaller is losing fully scrolledness
+	+focus indicator for chat bar
++BUG: on startup one of the state bars doesn't go away
++make chat area hideable
+	+clicking on the chat area should focus the chat bar
+	+pressing tab unconditionally focuses the chat area
+	+pressing twiddle ~ (or tab?) when chat bar is minimized
+		+esc minimizes chat bar?
+	+pgup, pgdown while focused on chatbox
++BUG: "sent at" message doesn't scroll?
++misc chat improvments
+	+consecutive chats from the same person shouldn't cause a new "Nick:" prefix
+	+add some spacing between chat messages
+	+"me: " instead of "Nick: " for your own chats
++add a ready, set, go?
+	+show timer on each board
++fix innacurrate timing bug
++change protocol to send human readable turns rather than json
+
+-save game configuration
+	-cookies for now, accounts later?
+-better mechanics for minimizing in Split.js
+	-why can't you drag when minimized?
+-make info div pretty
+	-if the user types in empty nick or channelname, nothing happens
+
+-editing name while server info gets set is really annoying
+
+-RAs and shit, graphs!
+-strip HTML tags from chats
+
+**** Server side ****
+
+-analytics! STORE EVERYTHING!
+	-smarter server, keep track of what is going on, send all state to clients
+		-besides simplifying some stuff, this also solves the problem where the game "changes" (users joining while solving gets screwy)
+		 while inspecting (because the admin sends out gratuitous gameinfos when people connect)
+
+
+**** Assertions ****
+
+* This is probably just a nowjs reconnecting issue.
+Assertion failure!
+16745030801217288281 doesn't appear in 
+
+File: http://tnoodle.tk:8001/GameMasterGui.js:370
+   368:    		this.handleMoveState = function(user, moveState, timestamp, startstamp) {
+   369:    			var gameBoard = gameBoards[user.clientId];
+>370:    			assert(gameBoard, user.clientId + " doesn't appear in " + Object.keys(gameBoards));
+   371:    			var gameInstance = gameBoard.gameInstance;
+   372:    			assert(gameInstance);
+
+[object Object].handleMoveState (http://tnoodle.tk:8001/GameMasterGui.js:370:4)
+handleMoveState()@http://tnoodle.tk:8001/GameMaster.js:117:7
+Object.remoteCall (http://tnoodle.tk:8001/nowjs/now.js:340:14)
+SocketNamespace.<anonymous> (http://tnoodle.tk:8001/nowjs/now.js:378:15)
+{anonymous}()@SocketNamespace.$emit (http://tnoodle.tk:8001/socket.io/socket.io.js:632:15)
+SocketNamespace.onPacket (http://tnoodle.tk:8001/socket.io/socket.io.js:2170:20)
+Socket.onPacket (http://tnoodle.tk:8001/socket.io/socket.io.js:1860:30)
+
+
+**** twisty.js ****
++allow rotations during inspection
++detect solved even if the cube is in a different orientation
++resize appropriately
++restrict size of cube based on horizontal space as well
++black cartoony borders
++multiple cube instances
+-get/set state

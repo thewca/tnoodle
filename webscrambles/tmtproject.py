@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import tmt
 from os.path import join
 

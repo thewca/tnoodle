@@ -90,7 +90,7 @@ def createSymlinkIfNotExistsOrStale(target, name):
 		rmtree(name)
 		os.symlink(target, name)
 
-PROJECT_FILE_NAME = 'tmtproject'
+PROJECT_FILE_NAME = 'tmtproject.py'
 DEFAULT_PROJECT_NAME = 'all'
 
 def dfs(node, path=()):
@@ -146,7 +146,7 @@ class tmt:
 		projectFiles = ( join(dir, PROJECT_FILE_NAME) for dir in os.listdir('.') )
 		for projectFile in sorted(filter(exists, projectFiles)):
 			projectName = dirname(projectFile)
-			imp.load_source(projectFile, projectFile)
+			imp.load_source('', projectFile)
 			assert dirname(projectFile) in tmt.TmtProject.projects
 		
 		assert DEFAULT_PROJECT_NAME in tmt.TmtProject.projects, tmt.TmtProject.projects.keys()

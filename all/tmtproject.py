@@ -1,18 +1,17 @@
-#!/usr/bin/python
-
 import tmt
 
 class Project(tmt.TmtProject):
 	def compile(self):
-		tmt.TmtProject.projects['timer'].compile();
+		pass
 	
 	def getDependencies(self):
-		return [ tmt.TmtProject.projects['timer'] ]
+		return [ tmt.TmtProject.projects['timer'], tmt.TmtProject.projects['noderacer'] ]
 
 	def check(self):
 		return
 	
 	def clean(self):
-		tmt.TmtProject.projects['timer'].clean()
+		for dep in self.getDependencies():
+			dep.clean()
 
 Project(tmt.projectName(), description="")

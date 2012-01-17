@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import tmt
 import subprocess
 from os.path import join, exists

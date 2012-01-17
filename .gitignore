@@ -5,7 +5,6 @@ bin_tnoodle_resources/
 .settings
 .externalToolBuilders
 .metadata
-tmtprojectc
 tmtc
 *.pyc
 *.log.*

@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import tmt
 
 DESCRIPTION = "A Java scrambling suite. Java applications can use this project as a library. A perfect example of this is the webscrambles package."

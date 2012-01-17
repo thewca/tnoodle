@@ -1,0 +1,16 @@
+.verticalResizeBarVisible {
+	z-index: 5;
+	position: absolute;
+	height: 100%; /* TODO this ain't quite right */
+	width: 5px;
+	background: black;
+	left: 7px;
+}
+.verticalResizeBar {
+	z-index: 5;
+	position: absolute;
+	height: 100%; /* TODO neither is this */
+	width: 20px;
+	left: -11px;
+	cursor: w-resize;
+}

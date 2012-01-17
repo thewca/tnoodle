@@ -12,6 +12,16 @@ JSLINT_IGNORED_FILES = {
 	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/mootools-core-1.4.1-full-nocompat.js',
 	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/mootools-more-1.4.0.1.js',
 	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/powertools-1.1.1.js',
+
+	# TODO - the following really ought to get cleaned up at some point
+	'jsracer/ButtonGame.js',
+	'jsracer/GameMasterGui.js',
+	'jsracer/jquery-1.6.4.js',
+	'jsracer/jquery.dateFormat-1.0.js',
+	'jsracer/stacktrace.js',
+	'jsracer/assert.js',
+	'noderacer/mongeesing.js',
+	'noderacer/noderacer.js'
 }
 JSLINT_IGNORED_ERRORS = {
 	'type is unnecessary.',
@@ -57,6 +67,8 @@ def lint(files):
 				if f in JSLINT_IGNORED_FILES:
 					print "Not jslinting %s" % f
 				else:
+					if os.path.isdir(f):
+						continue
 					print "jslinting %s" % f
 					argv = [ 'java', '-jar', 'lib/jslint4java-1.4.6.jar', f ]
 					p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
