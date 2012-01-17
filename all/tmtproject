@@ -15,4 +15,4 @@ class Project(tmt.TmtProject):
 	def clean(self):
 		tmt.TmtProject.projects['timer'].clean()
 
-Project(tmt.projectName())
+Project(tmt.projectName(), description="")

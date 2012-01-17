@@ -126,7 +126,7 @@ def topologicalSort(rootProject):
 class tmt:
 	def _cdEntryPoint(self):
 		os.chdir(entryPoint())
-		assert exists('README.textile')
+		assert exists('README.md')
 
 		p = subprocess.Popen([ 'git', 'describe' ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout, stderr = p.communicate()
@@ -268,6 +268,10 @@ class tmt:
 			action="store_true", default=False,
 			help='Show project timestamps for debugging purposes')
 		parser_graph.add_argument(
+			'--descriptions', '-d',
+			action="store_true", default=False,
+			help='Show project descriptions')
+		parser_graph.add_argument(
 			'--no-prune', '-np',
 			action="store_true", default=False,
 			help='Do not prune duplicate projects')
@@ -370,8 +374,9 @@ sys.modules['tmt'] = tmt
 
 class TmtProject(object):
 	projects = {}
-	def __init__(self, name):
+	def __init__(self, name, description):
 		self.name = name
+		self.description = description
 		assert not name in TmtProject.projects, name
 		TmtProject.projects[name] = self
 	def __str__(self, timestamps=False):
@@ -429,7 +434,10 @@ class TmtProject(object):
 			# then we don't recurse
 			s = indent + self.__str__(timestamps=tmt.args.timestamps) + ' (seen)\n'
 		else:
-			s = indent + self.__str__(timestamps=tmt.args.timestamps) + '\n'
+			s = indent + self.__str__(timestamps=tmt.args.timestamps)
+			if tmt.args.descriptions and self.description:
+				s += ' - ' + self.description
+			s += '\n'
 			printingLevels.add(level)
 			dependencies = self.getDependencies()
 			for p in dependencies:
@@ -447,7 +455,9 @@ def createJarDependency(jarFile):
 class JarDependency(TmtProject):
 	def __init__(self, jarFile):
 		self.jarFile = jarFile
-		TmtProject.__init__(self, basename(jarFile))
+		TmtProject.__init__(self,
+				basename(jarFile),
+				description="")
 	def check(self):
 		return
 	def getDependencies(self):
@@ -492,12 +502,12 @@ class EclipseProject(TmtProject):
 	classpathHandler = EclipseClasspathHandler()
 	classpathParser.setContentHandler(classpathHandler)
 
-	def __init__(self, name, main=None, argv=None, tests=None):
+	def __init__(self, name, description, main=None, argv=None, tests=None):
 		self.main = main
 		self.argv = argv
 		self.nonJavaSrcDeps = []
 		self.tests = tests
-		TmtProject.__init__(self, name)
+		TmtProject.__init__(self, name, description)
 
 	def getDependencies(self):
 		return self.jars + self.projects

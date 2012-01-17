@@ -13,6 +13,7 @@ class Project(tmt.EclipseProject):
 		tmt.EclipseProject.__init__(
 				self,
 				tmt.projectName(),
+				description="A basic, extensible webserver",
 				main='net.gnehzr.tnoodle.server.TNoodleServer',
 				argv=[ '--nobrowser', '--disable-caching' ])
 		self.plugins = {}

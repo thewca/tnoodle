@@ -12,4 +12,4 @@ class Project(tmt.EclipseProject):
 	def compile(self):
 		tmt.EclipseProject.compile(self)
 
-Project(tmt.projectName())
+Project(tmt.projectName(), description="A Rubik's Cube timer.")

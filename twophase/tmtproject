@@ -21,4 +21,4 @@ class Project(tmt.EclipseProject):
 							args=[ self.twophase_tables ])
 			print "Successfully generated %s!" % self.twophase_tables
 
-Project(tmt.projectName())
+Project(tmt.projectName(), description="A copy of Chen Shuang's (https://github.com/ChenShuang) awesome 3x3 scrambler built on top of Herbert Kociemba's Java library.")

@@ -19,4 +19,4 @@ class Project(tmt.EclipseProject):
 							classpath=self.getClasspath(),
 							args=[ self.squareone_tables ])
 
-Project('squareone')
+Project('squareone', description="A square one solver written in Java")
