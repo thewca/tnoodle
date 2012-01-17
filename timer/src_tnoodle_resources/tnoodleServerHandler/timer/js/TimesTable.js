@@ -854,20 +854,24 @@ var TimesTable = new Class({
 				e.stop(); // Without this, the timer will reset
 			} else if(e.key == 'enter') {
 				try {
+
 					if(time) {
 						time.parse(textField.value);
 						this.session.reindex();
 						this.refreshData();
+						// We only deselect the row if we successfully added the new time
+						this.deselectRows();
 					} else {
 						var newTime = new tnoodle.Time(textField.value, this.scrambleStuff.getScramble());
+						// We want to deslect the row *before* calling addTime,
+						// other the table gets sized weirdly.
+						this.deselectRows();
 						this.addTime(newTime);
 						this.scrambleStuff.scramble();
 
 						this.promptTime();
 					}
 
-					// We only deselect the row if we successfully added the new time
-					this.deselectRows();
 				} catch(error) {
 					// No need for an alert, we've already informed them of the problem.
 				}
