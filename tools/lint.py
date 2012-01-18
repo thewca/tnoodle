@@ -39,6 +39,8 @@ def is_binary(filename):
     @attention: found @ http://bytes.com/topic/python/answers/21222-determine-file-type-binary-text on 6/08/2010
     @author: Trent Mick <TrentM@ActiveState.com>
     @author: Jorge Orpinel <jorge@orpinel.com>"""
+    if os.path.islink(filename):
+        return False
     fin = open(filename, 'rb')
     try:
         CHUNKSIZE = 1024
@@ -98,6 +100,8 @@ def lint(files):
 				#print "Skipping binary file %s" % f
 				pass
 			else:
+				if os.path.islink(f):
+					continue
 				lines = file(f).read().split("\n")
 				for lineNumber, line in enumerate(lines):
 					for uncommitablePhrase in UNCOMMITABLE_PHRASES:

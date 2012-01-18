@@ -306,7 +306,7 @@ function getChannel(channelName) {
 	return channel;
 }
 
-GM = require('./webroot/GMConstants').GM;
+GM = require('./webroot/jsracer/GMConstants').GM;
 
 everyone.now.joinChannel = function(nick, channelName, callback) {
 	var clientId = this.user.clientId;

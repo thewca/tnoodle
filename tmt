@@ -155,8 +155,8 @@ class tmt:
 		for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
 			project.afterProjects()
 
-		tmt.TmtProject.sortedProjects = topologicalSort(defaultProject)
-		for project in reversed(tmt.TmtProject.sortedProjects):
+		sortedProjects = topologicalSort(defaultProject)
+		for project in reversed(sortedProjects):
 			project.configure()
 
 	def _main(self):
@@ -308,9 +308,19 @@ class tmt:
 		assert projectFileName == PROJECT_FILE_NAME
 		return projectName
 
-	def runCmd(self, argv):
+	def runCmd(self, argv, showStatus=False):
 		p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		stdout, stderr = p.communicate()
+		stdout = ''
+		stderr = ''
+		while p.poll() is None:
+			newStdout = p.stdout.read()
+			if newStdout:
+				stdout += newStdout
+				print newStdout
+			newStderr = p.stderr.read()
+			if newStderr:
+				stderr += newStderr
+				print newStderr
 		return p.returncode, stdout, stderr
 
 	def timestamp(self, f):
@@ -403,10 +413,7 @@ class TmtProject(object):
 	def getDependencies(self):
 		assert False
 	def getRecursiveDependenciesTopoSorted(self):
-		assert self in tmt.TmtProject.sortedProjects
-		projectIndex = tmt.TmtProject.sortedProjects.index(self)
-		projects = tmt.TmtProject.sortedProjects[projectIndex:]
-		return projects
+		return topologicalSort(self)
 	def prettyDependencies(self, level=0, printingLevels=None, seen=None):
 		if printingLevels == None:
 			assert level == 0

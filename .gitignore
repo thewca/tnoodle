@@ -8,3 +8,4 @@ bin_tnoodle_resources/
 tmtc
 *.pyc
 *.log.*
+node_modules/

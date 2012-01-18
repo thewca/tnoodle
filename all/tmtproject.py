@@ -5,7 +5,9 @@ class Project(tmt.TmtProject):
 		pass
 	
 	def getDependencies(self):
-		return [ tmt.TmtProject.projects['timer'], tmt.TmtProject.projects['noderacer'] ]
+		return [ tmt.TmtProject.projects['timer'],
+			 	 tmt.TmtProject.projects['noderacer'],
+				 tmt.TmtProject.projects['jracer'] ]
 
 	def check(self):
 		return

@@ -44,6 +44,8 @@
 
 **** Server side ****
 
+-add root page
+-trailing slash redirect?
 -analytics! STORE EVERYTHING!
 	-smarter server, keep track of what is going on, send all state to clients
 		-besides simplifying some stuff, this also solves the problem where the game "changes" (users joining while solving gets screwy)

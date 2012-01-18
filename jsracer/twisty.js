@@ -1,1 +1,1 @@
-../twisty.js/
+../twisty.js/twisty.js/
