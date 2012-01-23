@@ -23,7 +23,12 @@ package {
 		}
 		protected function fireStateChanged():void {
 			for each(var func:Function in listeners) {
-				func(this);
+				try {
+					func(this);
+				} catch(e:Error) {
+					StackApplet.log("Error calling " + func);
+					StackApplet.log(e.message);
+				}
 			}
 		}
 

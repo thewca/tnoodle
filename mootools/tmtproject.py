@@ -7,4 +7,4 @@ class Project(tmt.EclipseProject):
 		tmt.Server.addPlugin(self)
 		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/mootools/' ]
 
-Project(tmt.projectName(), description="<<<")
+Project(tmt.projectName(), description="mootools-more, mootools-core, and powertools")

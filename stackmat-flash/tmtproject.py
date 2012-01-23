@@ -44,9 +44,12 @@ class Project(tmt.EclipseProject):
 		if os.path.exists(asFile):
 			assert self.mxmlcInstalled
 			outSwf = join(tempBin, 'StackApplet.swf')
-			#<<<retVal, stdOut, stdErr = tmt.runCmd([ 'mxmlc', '--version' ])
 			retVal, stdout, stderr = tmt.runCmd([ 'mxmlc', '-benchmark=True', '-creator=tnoodle', '-static-link-runtime-shared-libraries=true', '-output=%s' % outSwf, asFile ], showStatus=True)
 			assert retVal == 0
+
+			# Yikes. mxmlc doesn't seem to have any command line args to treat
+			# warnings as erros. Look what they've made me do!
+			assert len(stderr) == 0
 
 	def clean(self):
 		# Gah, this is copied from tmt.EclipseProject. Kill me now

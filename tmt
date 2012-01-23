@@ -318,6 +318,7 @@ class tmt:
 	def runCmd(self, argv, showStatus=False):
 		if showStatus:
 			print argv
+			print " ".join(argv)
 		p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout = ''
 		stderr = ''

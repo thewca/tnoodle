@@ -27,8 +27,7 @@ package {
 		private var errorCallback:String;
 		private var settingsHiddenCallback:String;
 
-		//<<<private var interpreter:StackmatInterpreter;
-		private var interpreter:LineInStackmatInterpreter;
+		private var interpreter:StackmatInterpreter;
 		public function StackApplet() {
 			try {
 				var params:Object = LoaderInfo(this.root.loaderInfo).parameters;
@@ -38,7 +37,7 @@ package {
 				var simulateStackmat:Boolean = !!(params.simulateStackmat);
 
 				if(simulateStackmat) {
-					//<<<interpreter = new ModelBasedStackmatInterpreter();
+					interpreter = new ModelBasedStackmatInterpreter();
 				} else {
 					interpreter = new LineInStackmatInterpreter();
 				}
@@ -74,10 +73,6 @@ package {
 					stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseOrKeyboardEvent);
 					stage.addEventListener(MouseEvent.MOUSE_UP, onMouseOrKeyboardEvent);
 					settingsShowing = true;
-				});
-
-				ExternalInterface.addCallback("enableSampling", function(enabled:Boolean):void {
-					interpreter.enableSampling(enabled);//<<<
 				});
 
 			} catch(e:Error) {

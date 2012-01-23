@@ -32,7 +32,7 @@ package {
 				appendNTimes(actions, stopTimer, 5);
 			} else {
 				appendNTimes(actions, noop, 5);
-				if(realState.reset) {
+				if(realState.centis === 0 && !realState.running) {
 					appendNTimes(actions, startTimer, 5);
 				}
 			}
@@ -52,7 +52,6 @@ package {
 		}
 		private function resetTimer():void {
 			realState.centis = 0;
-			realState.reset = true;
 			realState.running = false;
 		}
 		private function advanceTimer():void {
@@ -63,7 +62,6 @@ package {
 		}
 		private function startTimer():void {
 			realState.running = true;
-			realState.reset = false;
 		}
 
 		private function tick():void {

@@ -5,6 +5,9 @@
 <script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
 <script type="text/javascript" src="StackApplet.js"></script>
 <script type="text/javascript">
+var enableStackmat;
+var chooseMicrophone;
+
 function onUpdate(state) {
 	var timerSpan = document.getElementById("timer");
 	var leftHand = document.getElementById("leftHand");
@@ -39,8 +42,6 @@ function onCloseSettings() {
 	chooseMicrophone.checked = false;
 }
 
-var enableStackmat;
-var chooseMicrophone;
 window.addEventListener('load', function() {
 	enableStackmat = document.getElementById('enableStackmat');
 	chooseMicrophone = document.getElementById('chooseMicrophone');

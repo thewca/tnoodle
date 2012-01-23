@@ -9,11 +9,12 @@ JSLINT_IGNORED_FILES = {
 	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/mootools-core-1.4.2.js',
 	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/mootools-more-1.4.0.1.js',
 	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/stacktrace.js',
-	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/mootools-core-1.4.1-full-nocompat.js',
-	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/mootools-more-1.4.0.1.js',
-	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/powertools-1.1.1.js',
+	'mootools/src_tnoodle_resources/tnoodleServerHandler/mootools/mootools-core-1.4.2.js',
+	'mootools/src_tnoodle_resources/tnoodleServerHandler/mootools/mootools-more-1.4.0.1.js',
+	'mootools/src_tnoodle_resources/tnoodleServerHandler/mootools/powertools-1.1.1.js',
 
 	# TODO - the following really ought to get cleaned up at some point
+	'webscrambles/src_tnoodle_resources/tnoodleServerHandler/webscrambles/scramblegen.html',
 	'jsracer/ButtonGame.js',
 	'jsracer/GameMasterGui.js',
 	'jsracer/jquery-1.6.4.js',
