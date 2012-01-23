@@ -8,6 +8,6 @@ class Project(tmt.EclipseProject):
 		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/timer/' ]
 
 	def compile(self):
-		tmt.EclipseProject.compile(self)
+		recompiled = tmt.EclipseProject.compile(self)
 
 Project(tmt.projectName(), description="A Rubik's Cube timer.")

@@ -2,11 +2,3 @@
 /scramble/ tnoodleServerHandler.webscrambles.ScrambleHandler()
 /import/ tnoodleServerHandler.webscrambles.ScrambleImporterHandler()
 /view/ tnoodleServerHandler.webscrambles.ScrambleViewHandler()
-
-/moo/mootools-core-1.4.1.js tnoodleServerHandler.FileHandler("webscrambles/mootools-core-1.4.1-full-nocompat.js")
-
-# from http://mootools.net/more/58ae9e98bcae80c36b08f216134bf575
-/moo/mootools-more-1.4.0.1.js tnoodleServerHandler.FileHandler("webscrambles/mootools-more-1.4.0.1.js")
-
-# from http://cpojer.net/PowerTools/#select=Class-Extras/*;History/*
-/moo/powertools-1.1.1.js tnoodleServerHandler.FileHandler("webscrambles/powertools-1.1.1.js")

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>StackApplet Test</title>
+<script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
+<script type="text/javascript" src="StackApplet.js"></script>
+<script type="text/javascript">
+function onUpdate(state) {
+	var timerSpan = document.getElementById("timer");
+	var leftHand = document.getElementById("leftHand");
+	var rightHand = document.getElementById("rightHand");
+
+	var micOption = document.getElementById("micOption");
+
+	if(!state) {
+		micOption.style.display = "none";
+
+		timerSpan.innerHTML = "";
+		leftHand.style.display = "none";
+		rightHand.style.display = "none";
+	} else {
+		micOption.style.display = "inline";
+
+		if(state.on) {
+			timerSpan.innerHTML = state.centis;
+		} else {
+			timerSpan.innerHTML = "OFF";
+		}
+		leftHand.style.display = state.leftHand ? "inline" : "none";
+		rightHand.style.display = state.rightHand ? "inline" : "none";
+	}
+}
+function onError(error) {
+	var timerSpan = document.getElementById("timer");
+	timerSpan.innerHTML = error;
+}
+function onCloseSettings() {
+	tnoodle.stackmat.hideApplet();
+	chooseMicrophone.checked = false;
+}
+
+var enableStackmat;
+var chooseMicrophone;
+window.addEventListener('load', function() {
+	enableStackmat = document.getElementById('enableStackmat');
+	chooseMicrophone = document.getElementById('chooseMicrophone');
+
+	enableStackmat.addEvent('change', function() {
+		if(enableStackmat.checked) {
+			tnoodle.stackmat.enable(onUpdate, onError, onCloseSettings);
+		} else {
+			chooseMicrophone.checked = false;
+			tnoodle.stackmat.disable();
+		}
+	});
+
+	chooseMicrophone.addEvent('change', function() {
+		if(chooseMicrophone.checked) {
+			tnoodle.stackmat.showMicrophoneSettings();
+		} else {
+			tnoodle.stackmat.hideApplet();
+		}
+	});
+
+	onUpdate();
+}, false);
+</script>
+</head>
+<body>
+<input type="checkbox" id="enableStackmat" />
+<label for="enableStackmat">Enable stackmat</label>
+<span id="micOption">
+	<input type="checkbox" id="chooseMicrophone" />
+	<label for="chooseMicrophone">Choose microphone</label>
+</span>
+<div>
+<span id="leftHand">\</span>
+<span id="rightHand">/</span>
+<span id="timer"></span>
+</div>
+</body>
+</html>

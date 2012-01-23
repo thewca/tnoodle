@@ -3,8 +3,10 @@
 	<classpathentry excluding="tnoodleServerHandler/|tnoodle_resources/tnoodleServerHandler/|tnoodle_resources/tnoodleServerHandler/timer/|tnoodle_resources/tnoodleServerHandler/timer/css/|tnoodle_resources/tnoodleServerHandler/timer/js/|tnoodle_resources/tnoodleServerHandler/timer/media/|tnoodle_resources/" kind="src" path="src"/>
 	<classpathentry kind="src" output="bin_tnoodle_resources" path="src_tnoodle_resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/stackmat-flash"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/stackmat"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/webscrambles"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mootools"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

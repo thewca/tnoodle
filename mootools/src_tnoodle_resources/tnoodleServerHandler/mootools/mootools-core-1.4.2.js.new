@@ -3,10 +3,13 @@
 MooTools: the javascript framework
 
 web build:
- - http://mootools.net/core/91d7f00356dcd42b2ce8e56d17714518
+ - http://mootools.net/core/76bf47062d6c1983d66ce47ad66aa0e0
 
 packager build:
- - packager build Core/Core Core/Array Core/String Core/Number Core/Function Core/Object Core/Event Core/Browser Core/Class Core/Class.Extras Core/Slick.Parser Core/Slick.Finder Core/Element Core/Element.Style Core/Element.Event Core/Element.Delegation Core/Element.Dimensions Core/Fx Core/Fx.CSS Core/Fx.Tween Core/Fx.Morph Core/Fx.Transitions Core/Request Core/Request.HTML Core/Request.JSON Core/Cookie Core/JSON Core/DOMReady
+ - packager build Core/Core Core/Array Core/String Core/Number Core/Function Core/Object Core/Event Core/Browser Core/Class Core/Class.Extras Core/Slick.Parser Core/Slick.Finder Core/Element Core/Element.Style Core/Element.Event Core/Element.Delegation Core/Element.Dimensions Core/Fx Core/Fx.CSS Core/Fx.Tween Core/Fx.Morph Core/Fx.Transitions Core/Request Core/Request.HTML Core/Request.JSON Core/Cookie Core/JSON Core/DOMReady Core/Swiff
+
+...
+*/
 
 /*
 ---
@@ -1148,30 +1151,10 @@ var DOMEvent = this.DOMEvent = new Type('DOMEvent', function(event, win){
 	if (type.indexOf('key') == 0){
 		var code = this.code = (event.which || event.keyCode);
 		this.key = _keys[code];
-		// TODO - why is this if statement here?
-		//if (type == 'keydown'){
+		if (type == 'keydown'){
 			if (code > 111 && code < 124) this.key = 'f' + (code - 111);
 			else if (code > 95 && code < 106) this.key = code - 96;
-		//}
-		// TODO - what's the right solution for the win keys?
-		var WINL = 91;
-		var WINR = 92;
-		var MUTE = 172;
-		var PLAY_PAUSE = 179;
-		if (code == WINL || code == WINR || (code >= MUTE && code <= PLAY_PAUSE)) {
-			code = 0;
 		}
-		var specialKeys = {
-			106: '*',
-			107: '+',
-			109: '-',
-			110: '.',
-			111: '/',
-		};
-		if (code in specialKeys) {
-			this.key = specialKeys[code];
-		}
-
 		if (this.key == null) this.key = String.fromCharCode(code).toLowerCase();
 	} else if (type == 'click' || type == 'dblclick' || type == 'contextmenu' || type == 'DOMMouseScroll' || type.indexOf('mouse') == 0){
 		var doc = win.document;
@@ -1462,10 +1445,8 @@ this.Events = new Class({
 		for (type in this.$events){
 			if (events && events != type) continue;
 			var fns = this.$events[type];
-			for (var i = fns.length; i--;) {
-				if (i in fns) {
-					this.removeEvent(type, fns[i]);
-				}
+			for (var i = fns.length; i--;) if (i in fns){
+				this.removeEvent(type, fns[i]);
 			}
 		}
 		return this;
@@ -2723,7 +2704,6 @@ provides: [Element, Elements, $, $$, Iframe, Selectors]
 ...
 */
 
-var ChromeElement = Element;// TODO - jfly
 var Element = function(tag, props){
 	var konstructor = Element.Constructors[tag];
 	if (konstructor) return konstructor(props);
@@ -2750,10 +2730,6 @@ var Element = function(tag, props){
 
 	return document.newElement(tag, props);
 };
-
-if(ChromeElement) {
-	Element.ALLOW_KEYBOARD_INPUT = ChromeElement.ALLOW_KEYBOARD_INPUT;// TODO - jfly
-}
 
 
 if (Browser.Element){
@@ -5768,4 +5744,119 @@ window.addEvent('load', function(){
 });
 
 })(window, document);
+
+
+/*
+---
+
+name: Swiff
+
+description: Wrapper for embedding SWF movies. Supports External Interface Communication.
+
+license: MIT-style license.
+
+credits:
+  - Flash detection & Internet Explorer + Flash Player 9 fix inspired by SWFObject.
+
+requires: [Options, Object, Element]
+
+provides: Swiff
+
+...
+*/
+
+(function(){
+
+var Swiff = this.Swiff = new Class({
+
+	Implements: Options,
+
+	options: {
+		id: null,
+		height: 1,
+		width: 1,
+		container: null,
+		properties: {},
+		params: {
+			quality: 'high',
+			allowScriptAccess: 'always',
+			wMode: 'window',
+			swLiveConnect: true
+		},
+		callBacks: {},
+		vars: {}
+	},
+
+	toElement: function(){
+		return this.object;
+	},
+
+	initialize: function(path, options){
+		this.instance = 'Swiff_' + String.uniqueID();
+
+		this.setOptions(options);
+		options = this.options;
+		var id = this.id = options.id || this.instance;
+		var container = document.id(options.container);
+
+		Swiff.CallBacks[this.instance] = {};
+
+		var params = options.params, vars = options.vars, callBacks = options.callBacks;
+		var properties = Object.append({height: options.height, width: options.width}, options.properties);
+
+		var self = this;
+
+		for (var callBack in callBacks){
+			Swiff.CallBacks[this.instance][callBack] = (function(option){
+				return function(){
+					return option.apply(self.object, arguments);
+				};
+			})(callBacks[callBack]);
+			vars[callBack] = 'Swiff.CallBacks.' + this.instance + '.' + callBack;
+		}
+
+		params.flashVars = Object.toQueryString(vars);
+		if (Browser.ie){
+			properties.classid = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
+			params.movie = path;
+		} else {
+			properties.type = 'application/x-shockwave-flash';
+		}
+		properties.data = path;
+
+		var build = '<object id="' + id + '"';
+		for (var property in properties) build += ' ' + property + '="' + properties[property] + '"';
+		build += '>';
+		for (var param in params){
+			if (params[param]) build += '<param name="' + param + '" value="' + params[param] + '" />';
+		}
+		build += '</object>';
+		this.object = ((container) ? container.empty() : new Element('div')).set('html', build).firstChild;
+	},
+
+	replaces: function(element){
+		element = document.id(element, true);
+		element.parentNode.replaceChild(this.toElement(), element);
+		return this;
+	},
+
+	inject: function(element){
+		document.id(element, true).appendChild(this.toElement());
+		return this;
+	},
+
+	remote: function(){
+		return Swiff.remote.apply(Swiff, [this.toElement()].append(arguments));
+	}
+
+});
+
+Swiff.CallBacks = {};
+
+Swiff.remote = function(obj, fn){
+	var rs = obj.CallFunction('<invoke name="' + fn + '" returntype="javascript">' + __flash__argumentsToXML(arguments, 2) + '</invoke>');
+	return eval(rs);
+};
+
+})();
 

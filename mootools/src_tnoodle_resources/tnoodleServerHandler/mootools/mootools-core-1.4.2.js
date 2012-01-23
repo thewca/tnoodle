@@ -3,7 +3,7 @@
 MooTools: the javascript framework
 
 web build:
- - http://mootools.net/core/76bf47062d6c1983d66ce47ad66aa0e0
+ - http://mootools.net/core/91d7f00356dcd42b2ce8e56d17714518
 
 packager build:
  - packager build Core/Core Core/Array Core/String Core/Number Core/Function Core/Object Core/Event Core/Browser Core/Class Core/Class.Extras Core/Slick.Parser Core/Slick.Finder Core/Element Core/Element.Style Core/Element.Event Core/Element.Delegation Core/Element.Dimensions Core/Fx Core/Fx.CSS Core/Fx.Tween Core/Fx.Morph Core/Fx.Transitions Core/Request Core/Request.HTML Core/Request.JSON Core/Cookie Core/JSON Core/DOMReady Core/Swiff
@@ -33,15 +33,15 @@ provides: [Core, MooTools, Type, typeOf, instanceOf, Native]
 (function(){
 
 this.MooTools = {
-	version: '1.4.1',
-	build: 'd1fb25710e3c5482a219ab9dc675a4e0ad2176b6'
+	version: '1.4.2',
+	build: '552dfd4704fccffed444e0211c50831a2bfe209f'
 };
 
 // typeOf, instanceOf
 
 var typeOf = this.typeOf = function(item){
 	if (item == null) return 'null';
-	if (item.$family) return item.$family();
+	if (item.$family != null) return item.$family();
 
 	if (item.nodeName){
 		if (item.nodeType == 1) return 'element';
@@ -936,17 +936,6 @@ provides: [Browser, Window, Document]
 var document = this.document;
 var window = document.window = this;
 
-var UID = 1;
-
-this.$uid = (window.ActiveXObject) ? function(item){
-	return (item.uid || (item.uid = [UID++]))[0];
-} : function(item){
-	return item.uid || (item.uid = UID++);
-};
-
-$uid(window);
-$uid(document);
-
 var ua = navigator.userAgent.toLowerCase(),
 	platform = navigator.platform.toLowerCase(),
 	UA = ua.match(/(opera|ie|firefox|chrome|version)[\s\/:]([\w\d\.]+)?.*?(safari|version[\s\/:]([\w\d\.]+)|$)/) || [null, 'unknown', 0],
@@ -1159,10 +1148,30 @@ var DOMEvent = this.DOMEvent = new Type('DOMEvent', function(event, win){
 	if (type.indexOf('key') == 0){
 		var code = this.code = (event.which || event.keyCode);
 		this.key = _keys[code];
-		if (type == 'keydown'){
+		// TODO - why is this if statement here?
+		//if (type == 'keydown'){
 			if (code > 111 && code < 124) this.key = 'f' + (code - 111);
 			else if (code > 95 && code < 106) this.key = code - 96;
+		//}
+		// TODO - what's the right solution for the win keys?
+		var WINL = 91;
+		var WINR = 92;
+		var MUTE = 172;
+		var PLAY_PAUSE = 179;
+		if (code == WINL || code == WINR || (code >= MUTE && code <= PLAY_PAUSE)) {
+			code = 0;
 		}
+		var specialKeys = {
+			106: '*',
+			107: '+',
+			109: '-',
+			110: '.',
+			111: '/',
+		};
+		if (code in specialKeys) {
+			this.key = specialKeys[code];
+		}
+
 		if (this.key == null) this.key = String.fromCharCode(code).toLowerCase();
 	} else if (type == 'click' || type == 'dblclick' || type == 'contextmenu' || type == 'DOMMouseScroll' || type.indexOf('mouse') == 0){
 		var doc = win.document;
@@ -1453,8 +1462,10 @@ this.Events = new Class({
 		for (type in this.$events){
 			if (events && events != type) continue;
 			var fns = this.$events[type];
-			for (var i = fns.length; i--;) if (i in fns){
-				this.removeEvent(type, fns[i]);
+			for (var i = fns.length; i--;) {
+				if (i in fns) {
+					this.removeEvent(type, fns[i]);
+				}
 			}
 		}
 		return this;
@@ -2712,6 +2723,7 @@ provides: [Element, Elements, $, $$, Iframe, Selectors]
 ...
 */
 
+var ChromeElement = Element;// TODO - jfly
 var Element = function(tag, props){
 	var konstructor = Element.Constructors[tag];
 	if (konstructor) return konstructor(props);
@@ -2739,7 +2751,20 @@ var Element = function(tag, props){
 	return document.newElement(tag, props);
 };
 
-if (Browser.Element) Element.prototype = Browser.Element.prototype;
+if(ChromeElement) {
+	Element.ALLOW_KEYBOARD_INPUT = ChromeElement.ALLOW_KEYBOARD_INPUT;// TODO - jfly
+}
+
+
+if (Browser.Element){
+	Element.prototype = Browser.Element.prototype;
+	// IE8 and IE9 require the wrapping.
+	Element.prototype._fireEvent = (function(fireEvent){
+		return function(type, event){
+			return fireEvent.call(this, type, event);
+		};
+	})(Element.prototype.fireEvent);
+}
 
 new Type('Element', Element).mirror(function(name){
 	if (Array.prototype[name]) return;
@@ -2912,6 +2937,11 @@ Document.implement({
 
 })();
 
+(function(){
+
+Slick.uidOf(window);
+Slick.uidOf(document);
+
 Document.implement({
 
 	newTextNode: function(text){
@@ -2936,8 +2966,9 @@ Document.implement({
 			},
 
 			element: function(el, nocash){
-				$uid(el);
+				Slick.uidOf(el);
 				if (!nocash && !el.$family && !(/^(?:object|embed)$/i).test(el.tagName)){
+					el._fireEvent = el.fireEvent;
 					Object.append(el, Element.Prototype);
 				}
 				return el;
@@ -2955,7 +2986,7 @@ Document.implement({
 		};
 
 		return function(el, nocash, doc){
-			if (el && el.$family && el.uid) return el;
+			if (el && el.$family && el.uniqueNumber) return el;
 			var type = typeOf(el);
 			return (types[type]) ? types[type](el, nocash, doc || document) : null;
 		};
@@ -3075,8 +3106,6 @@ if (window.$$ == null) Window.implement('$$', function(selector){
 	return new Elements(arguments);
 });
 
-(function(){
-
 // Inserters
 
 var inserters = {
@@ -3114,7 +3143,7 @@ var propertyGetters = {}, propertySetters = {};
 var properties = {};
 Array.forEach([
 	'type', 'value', 'defaultValue', 'accessKey', 'cellPadding', 'cellSpacing', 'colSpan',
-	'frameBorder', 'readOnly', 'rowSpan', 'tabIndex', 'useMap'
+	'frameBorder', 'rowSpan', 'tabIndex', 'useMap'
 ], function(property){
 	properties[property.toLowerCase()] = property;
 });
@@ -3162,7 +3191,7 @@ Array.forEach(bools, function(bool){
 Object.append(propertySetters, {
 
 	'class': function(node, value){
-		('className' in node) ? node.className = value : node.setAttribute('class', value);
+		('className' in node) ? node.className = (value || '') : node.setAttribute('class', value);
 	},
 
 	'for': function(node, value){
@@ -3171,26 +3200,39 @@ Object.append(propertySetters, {
 
 	'style': function(node, value){
 		(node.style) ? node.style.cssText = value : node.setAttribute('style', value);
+	},
+
+	'value': function(node, value){
+		node.value = value || '';
 	}
 
 });
+
+propertyGetters['class'] = function(node){
+	return ('className' in node) ? node.className || null : node.getAttribute('class');
+};
+
+/* <webkit> */
+var el = document.createElement('button');
+// IE sets type as readonly and throws
+try { el.type = 'button'; } catch(e){}
+if (el.type != 'button') propertySetters.type = function(node, value){
+	node.setAttribute('type', value);
+};
+/* </webkit> */
 
 /* getProperty, setProperty */
 
 Element.implement({
 
 	setProperty: function(name, value){
-		var lower = name.toLowerCase();
-		if (value == null){
-			if (!booleans[lower]){
-				this.removeAttribute(name);
-				return this;
-			}
-			value = false;
+		var setter = propertySetters[name.toLowerCase()];
+		if (setter){
+			setter(this, value);
+		} else {
+			if (value == null) this.removeAttribute(name);
+			else this.setAttribute(name, value);
 		}
-		var setter = propertySetters[lower];
-		if (setter) setter(this, value);
-		else this.setAttribute(name, value);
 		return this;
 	},
 
@@ -3406,7 +3448,7 @@ Element.implement({
 				old();
 			};
 		} else {
-			collected[$uid(this)] = this;
+			collected[Slick.uidOf(this)] = this;
 		}
 		if (this.addEventListener) this.addEventListener(type, fn, !!arguments[2]);
 		else this.attachEvent('on' + type, fn);
@@ -3420,19 +3462,19 @@ Element.implement({
 	},
 
 	retrieve: function(property, dflt){
-		var storage = get($uid(this)), prop = storage[property];
+		var storage = get(Slick.uidOf(this)), prop = storage[property];
 		if (dflt != null && prop == null) prop = storage[property] = dflt;
 		return prop != null ? prop : null;
 	},
 
 	store: function(property, value){
-		var storage = get($uid(this));
+		var storage = get(Slick.uidOf(this));
 		storage[property] = value;
 		return this;
 	},
 
 	eliminate: function(property){
-		var storage = get($uid(this));
+		var storage = get(Slick.uidOf(this));
 		delete storage[property];
 		return this;
 	}
@@ -3560,6 +3602,21 @@ if (testForm.firstChild.value != 's') Element.Properties.value = {
 
 };
 /*</ltIE9>*/
+
+/*<IE>*/
+var el = document.createElement('div');
+if (el.getAttributeNode('id')) Element.Properties.id = {
+	set: function(id){
+		this.id = this.getAttributeNode('id').value = id;
+	},
+	get: function(){
+		return this.id || null;
+	},
+	erase: function(){
+		this.id = this.getAttributeNode('id').value = '';
+	}
+};
+/*</IE>*/
 
 })();
 
@@ -3738,7 +3795,7 @@ Element.ShortStyles = {margin: {}, padding: {}, border: {}, borderWidth: {}, bor
 
 name: Element.Event
 
-description: Contains Element methods for dealing with events. This file also includes mouseenter and mouseleave custom Element Events.
+description: Contains Element methods for dealing with events. This file also includes mouseenter and mouseleave custom Element Events, if necessary.
 
 license: MIT-style license.
 
@@ -3876,30 +3933,30 @@ Element.NativeEvents = {
 	error: 1, abort: 1, scroll: 1 //misc
 };
 
-var check = function(event){
-	var related = event.relatedTarget;
-	if (related == null) return true;
-	if (!related) return false;
-	return (related != this && related.prefix != 'xul' && typeOf(this) != 'document' && !this.contains(related));
-};
+Element.Events = {mousewheel: {
+	base: (Browser.firefox) ? 'DOMMouseScroll' : 'mousewheel'
+}};
 
-Element.Events = {
+if ('onmouseenter' in document.documentElement){
+	Element.NativeEvents.mouseenter = Element.NativeEvents.mouseleave = 2;
+} else {
+	var check = function(event){
+		var related = event.relatedTarget;
+		if (related == null) return true;
+		if (!related) return false;
+		return (related != this && related.prefix != 'xul' && typeOf(this) != 'document' && !this.contains(related));
+	};
 
-	mouseenter: {
+	Element.Events.mouseenter = {
 		base: 'mouseover',
 		condition: check
-	},
+	};
 
-	mouseleave: {
+	Element.Events.mouseleave = {
 		base: 'mouseout',
 		condition: check
-	},
-
-	mousewheel: {
-		base: (Browser.firefox) ? 'DOMMouseScroll' : 'mousewheel'
-	}
-
-};
+	};
+}
 
 /*<ltIE9>*/
 if (!window.addEventListener){
@@ -4825,6 +4882,7 @@ Element.implement({
 		if (method == 'set' || to != 0) this.setStyle('visibility', to == 0 ? 'hidden' : 'visible');
 		else fade.chain(function(){
 			this.element.setStyle('visibility', 'hidden');
+			this.callChain();
 		});
 		return this;
 	},
@@ -5249,7 +5307,7 @@ var Request = this.Request = new Class({
 		this.fireEvent('request');
 		xhr.send(data);
 		if (!this.options.async) this.onStateChange();
-		if (this.options.timeout) this.timer = this.timeout.delay(this.options.timeout, this);
+		else if (this.options.timeout) this.timer = this.timeout.delay(this.options.timeout, this);
 		return this;
 	},
 
@@ -5313,6 +5371,7 @@ Element.implement({
 });
 
 })();
+
 
 /*
 ---
@@ -5607,6 +5666,116 @@ Cookie.dispose = function(key, options){
 /*
 ---
 
+name: Swiff
+
+description: Wrapper for embedding SWF movies. Supports External Interface Communication.
+
+license: MIT-style license.
+
+credits:
+  - Flash detection & Internet Explorer + Flash Player 9 fix inspired by SWFObject.
+
+requires: [Options, Object, Element]
+
+provides: Swiff
+
+...
+*/
+
+var Swiff = new Class({
+
+    Implements: Options,
+
+    options: {
+        id: null,
+        height: 1,
+        width: 1,
+        container: null,
+        properties: {},
+        params: {
+            quality: 'high',
+            allowScriptAccess: 'always',
+            wMode: 'window',
+            swLiveConnect: true
+        },
+        callBacks: {},
+        vars: {}
+    },
+
+    toElement: function(){
+        return this.object;
+    },
+
+    initialize: function(path, options){
+        this.instance = 'Swiff_' + String.uniqueID();
+        this.setOptions(options);
+        options = this.options;
+        var id = this.id = options.id || this.instance;
+        var container = document.id(options.container);
+
+        Swiff.CallBacks[this.instance] = {};
+
+        var params = options.params, vars = options.vars, callBacks = options.callBacks;
+        var properties = Object.append({height: options.height, width: options.width}, options.properties);
+
+        var self = this;
+
+        for (var callBack in callBacks){
+            Swiff.CallBacks[this.instance][callBack] = (function(option){
+                return function(){
+                    return option.apply(self.object, arguments);
+                };
+            })(callBacks[callBack]);
+            vars[callBack] = 'Swiff.CallBacks.' + this.instance + '.' + callBack;
+        }
+
+        params.flashVars = Object.toQueryString(vars);
+        if (Browser.ie){
+            properties.classid = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
+            params.movie = path;
+        } else {
+            properties.type = 'application/x-shockwave-flash';
+        }
+        properties.data = path;
+
+        var build = '<object id="' + id + '"';
+        for (var property in properties) build += ' ' + property + '="' + properties[property] + '"';
+        build += '>';
+        for (var param in params){
+            if (params[param]) build += '<param name="' + param + '" value="' + params[param] + '" />';
+        }
+        build += '</object>';
+        this.object = ((container) ? container.empty() : new Element('div')).set('html', build).firstChild;
+    },
+
+    replaces: function(element){
+        element = document.id(element, true);
+        element.parentNode.replaceChild(this.toElement(), element);
+        return this;
+    },
+
+
+    inject: function(element){
+        document.id(element, true).appendChild(this.toElement());
+        return this;
+    },
+
+    remote: function(){
+        return Swiff.remote.apply(Swiff, [this.toElement()].append(arguments));
+    }
+
+});
+
+Swiff.CallBacks = {};
+
+Swiff.remote = function(obj, fn){
+    var rs = obj.CallFunction('<invoke name="' + fn + '" returntype="javascript">' + __flash__argumentsToXML(arguments, 2) + '</invoke>');
+    return eval(rs);
+};
+
+/*
+---
+
 name: DOMReady
 
 description: Contains the custom event domready.
@@ -5709,119 +5878,4 @@ window.addEvent('load', function(){
 });
 
 })(window, document);
-
-
-/*
----
-
-name: Swiff
-
-description: Wrapper for embedding SWF movies. Supports External Interface Communication.
-
-license: MIT-style license.
-
-credits:
-  - Flash detection & Internet Explorer + Flash Player 9 fix inspired by SWFObject.
-
-requires: [Options, Object, Element]
-
-provides: Swiff
-
-...
-*/
-
-(function(){
-
-var Swiff = this.Swiff = new Class({
-
-	Implements: Options,
-
-	options: {
-		id: null,
-		height: 1,
-		width: 1,
-		container: null,
-		properties: {},
-		params: {
-			quality: 'high',
-			allowScriptAccess: 'always',
-			wMode: 'window',
-			swLiveConnect: true
-		},
-		callBacks: {},
-		vars: {}
-	},
-
-	toElement: function(){
-		return this.object;
-	},
-
-	initialize: function(path, options){
-		this.instance = 'Swiff_' + String.uniqueID();
-
-		this.setOptions(options);
-		options = this.options;
-		var id = this.id = options.id || this.instance;
-		var container = document.id(options.container);
-
-		Swiff.CallBacks[this.instance] = {};
-
-		var params = options.params, vars = options.vars, callBacks = options.callBacks;
-		var properties = Object.append({height: options.height, width: options.width}, options.properties);
-
-		var self = this;
-
-		for (var callBack in callBacks){
-			Swiff.CallBacks[this.instance][callBack] = (function(option){
-				return function(){
-					return option.apply(self.object, arguments);
-				};
-			})(callBacks[callBack]);
-			vars[callBack] = 'Swiff.CallBacks.' + this.instance + '.' + callBack;
-		}
-
-		params.flashVars = Object.toQueryString(vars);
-		if (Browser.ie){
-			properties.classid = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
-			params.movie = path;
-		} else {
-			properties.type = 'application/x-shockwave-flash';
-		}
-		properties.data = path;
-
-		var build = '<object id="' + id + '"';
-		for (var property in properties) build += ' ' + property + '="' + properties[property] + '"';
-		build += '>';
-		for (var param in params){
-			if (params[param]) build += '<param name="' + param + '" value="' + params[param] + '" />';
-		}
-		build += '</object>';
-		this.object = ((container) ? container.empty() : new Element('div')).set('html', build).firstChild;
-	},
-
-	replaces: function(element){
-		element = document.id(element, true);
-		element.parentNode.replaceChild(this.toElement(), element);
-		return this;
-	},
-
-	inject: function(element){
-		document.id(element, true).appendChild(this.toElement());
-		return this;
-	},
-
-	remote: function(){
-		return Swiff.remote.apply(Swiff, [this.toElement()].append(arguments));
-	}
-
-});
-
-Swiff.CallBacks = {};
-
-Swiff.remote = function(obj, fn){
-	var rs = obj.CallFunction('<invoke name="' + fn + '" returntype="javascript">' + __flash__argumentsToXML(arguments, 2) + '</invoke>');
-	return eval(rs);
-};
-
-})();
 

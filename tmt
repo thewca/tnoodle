@@ -308,7 +308,16 @@ class tmt:
 		assert projectFileName == PROJECT_FILE_NAME
 		return projectName
 
+	def rmtree(self, dir):
+		rmtree(dir)
+
+	def createSymlinkIfNotExistsOrStale(self, target, name):
+		createSymlinkIfNotExistsOrStale(target, name)
+
+
 	def runCmd(self, argv, showStatus=False):
+		if showStatus:
+			print argv
 		p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout = ''
 		stderr = ''
@@ -322,6 +331,9 @@ class tmt:
 				stderr += newStderr
 				print newStderr
 		return p.returncode, stdout, stderr
+
+	def showCmd(self, argv):
+		return self.runCmd(argv, showStatus=True)
 
 	def timestamp(self, f):
 		"""
@@ -592,7 +604,7 @@ class EclipseProject(TmtProject):
 		srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
 		if lastCompiled > srcLastTouched and len(changedDeps) == 0:
 			print "%s is up to date, not recompiling" % self.name
-			return
+			return False
 
 		self._compile(self.src, self.bin)
 		self._compile(self.srcResource, self.binResource)
@@ -619,8 +631,13 @@ class EclipseProject(TmtProject):
 					os.makedirs(parentDir)
 				shutil.copy(srcPath, binPath)
 
-		os.symlink(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
+		createSymlinkIfNotExistsOrStale(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
 
+		return True
+
+	def innerCompile(self, src, tempBin, bin):
+		# omg shoot me now
+		pass
 
 	def _compile(self, src, bin):
 		head, tail = os.path.split(bin)
@@ -632,6 +649,8 @@ class EclipseProject(TmtProject):
 		if isdir(tempBin):
 			rmtree(tempBin)
 		os.mkdir(tempBin)
+
+		self.innerCompile(src, tempBin, bin)
 
 		javaFiles = tmt.glob(src, r'.*\.java$')
 		if len(javaFiles) > 0:
