@@ -26,8 +26,7 @@ package {
 				try {
 					func(this);
 				} catch(e:Error) {
-					StackApplet.log("Error calling " + func);
-					StackApplet.log(e.message);
+					StackApplet.handleError(this, e);
 				}
 			}
 		}

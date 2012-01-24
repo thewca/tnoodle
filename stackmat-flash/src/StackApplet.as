@@ -1,11 +1,11 @@
 package {
-	import flash.text.TextField;
+	import flash.text.*;
 	import flash.external.*;
-	import flash.text.TextFieldAutoSize;
 	import mx.core.*;
 	import mx.utils.*;
 	import mx.events.*;
 	import flash.utils.Timer;
+	import flash.ui.*;
 	import flash.events.*;
 	import flash.display.Sprite;
 	import flash.display.LoaderInfo;
@@ -23,61 +23,81 @@ package {
 			}
 		}
 
-		private var updateCallback:String;
-		private var errorCallback:String;
-		private var settingsHiddenCallback:String;
+		private static var updateCallback:String;
+		private static var errorCallback:String;
+		private static var settingsHiddenCallback:String;
 
-		private var interpreter:StackmatInterpreter;
+		private var interpreter:LineInStackmatInterpreter;
 		public function StackApplet() {
 			try {
+				var font:TextFormat = new TextFormat();
+				font.font = "Arial";
+				font.size = 40;
+
+				var micState:UITextField = new UITextField();
+				micState.y += 20;
+				micState.width = 500; // TODO - magic number
+				micState.wordWrap = true;
+				micState.autoSize = TextFieldAutoSize.LEFT;
+				micState.setTextFormat(font);
+				addChild(micState);
+
 				var params:Object = LoaderInfo(this.root.loaderInfo).parameters;
 				updateCallback = params.updateCallback;
 				errorCallback = params.errorCallback;
 				settingsHiddenCallback = params.settingsHiddenCallback;
-				var simulateStackmat:Boolean = !!(params.simulateStackmat);
 
-				if(simulateStackmat) {
-					interpreter = new ModelBasedStackmatInterpreter();
-				} else {
-					interpreter = new LineInStackmatInterpreter();
-				}
-				interpreter.addListener(function(interpreter:StackmatInterpreter):void {
+				ExternalInterface.addCallback("getState", function():StackmatState {
+					if(!interpreter) {
+						return null;
+					}
+					return interpreter.getState();
+				});
+				ExternalInterface.addCallback("ping", function():Boolean {
+					return true;
+				});
+
+				stage.addEventListener(MouseEvent.CLICK, function():void {
+					if(interpreter.isMicMuted()) {
+						Security.showSettings(SecurityPanel.PRIVACY);
+					} else {
+						Security.showSettings(SecurityPanel.MICROPHONE);
+					}
+				});
+
+				interpreter = new LineInStackmatInterpreter();
+				interpreter.addListener(function(interpreter:LineInStackmatInterpreter):void {
+					// For some reason, trying to set micState.text is giving
+					// me a #1009 error (something about rereferencing a null pointer).
+					// This weirdness works, so whatever.
+					micState.replaceText(0, micState.text.length, "");
+					if(interpreter.isMicMuted()) {
+						micState.appendText("Click to grant mic access");
+					} else {
+						micState.appendText("Mixer: " + interpreter.getSelectedLine());
+						micState.appendText("\n\nClick to change mixer");
+					}
+					micState.setTextFormat(font);
+
 					ExternalInterface.call(updateCallback, interpreter.getState());
 				});
-
-				ExternalInterface.addCallback("getState", interpreter.getState);
-
-
-				var settingsShowing:Boolean = false;
-				function onMouseOrKeyboardEvent(e:Event):void { 
-					if(!settingsShowing) { return; }
-					
-					// It appears that keyboard and mouse events are hidden from us
-					// when the security dialog box is opened. So if we get any keyboard
-					// or mouse events, we know the security dialog box is gone.
-					// Unfortunately, clicking the close button on the security dialog
-					// doesn't fire any events we can detect. We will however notice that the
-					// dialog is gone just as soon as the mouse moves.
-					// Apparently we are notified of key events while the security dialog
-					// is showing, so we can't use them to detect that the security dialog
-					// is gone.
-					ExternalInterface.call(settingsHiddenCallback, interpreter.getState());
-					stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseOrKeyboardEvent);
-					stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseOrKeyboardEvent);
-					stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseOrKeyboardEvent);
-					settingsShowing = false;
-				}
-				ExternalInterface.addCallback("showMicrophoneSettings", function():void {
-					Security.showSettings(SecurityPanel.MICROPHONE);
-					stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseOrKeyboardEvent);
-					stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseOrKeyboardEvent);
-					stage.addEventListener(MouseEvent.MOUSE_UP, onMouseOrKeyboardEvent);
-					settingsShowing = true;
-				});
-
 			} catch(e:Error) {
-				log("Unhandled exception: " + e.message);
-				ExternalInterface.call(errorCallback, e.message);
+				handleError(this, e);
+			}
+		}
+
+		public static function handleError(source:Object, e:Error):void {
+			try {
+				var objError:Object = {};
+				objError.message = e.message;
+				objError.stackTrace = e.getStackTrace();
+				objError.source = source.toString();
+				ExternalInterface.call(errorCallback, objError);
+			} catch(ee:Error) {
+				var msg:String = "Error calling " + errorCallback + ".";
+				msg += " " + e.message;
+				log(msg);
+				log('    ' + ee.message);
 			}
 		}
 	}

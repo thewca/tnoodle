@@ -289,7 +289,7 @@ var KeyboardTimer = new Class({
 		var acceptedTime = false;
 		function stackmatUpdated(state) {
 			if(state) {
-				if(!time.timing && state.running) {
+				if(!timer.timing && state.running) {
 					//this mean that the timer just started running,
 					//so we want to update the scramble
 					timer.scramble = scrambleStuff.getScramble();

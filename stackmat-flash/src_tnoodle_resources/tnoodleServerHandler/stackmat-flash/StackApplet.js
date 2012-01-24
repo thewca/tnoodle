@@ -5,50 +5,96 @@ tnoodle.stackmat = {
 	//TODO - auto detect stackmat value?
 	//TODO - auto detect inverted
 	//TODO - auto detect gen2/gen3
-	applet: null,
-	enable: function(updateCallback, errorCallback, settingsHiddenCallback, stackmatValue, mixerIndex) {
-		if(tnoodle.stackmat.applet !== null) {
+	_applet: null,
+	_appletLoadTimeout: null,
+	_appletWatchdogTimer: null,
+	enable: function(updateCallback, errorCallback, parentElement) {
+		if(tnoodle.stackmat._applet !== null) {
 			tnoodle.stackmat.disable();
 		}
 		
-		window.stackmatUpdateCallback = updateCallback;
-		window.stackmatErrorCallback = errorCallback;
-		window.stackmatSettingsHiddenCallback = settingsHiddenCallback;
+		window.stackmatUpdateCallback = function(state) {
+			if(state && tnoodle.stackmat._appletWatchdogTimer === null) {
+				// This may be the first indicator we have that the applet is alive.
+				// We cancel the pending load timeout timer, and start up the
+				// health monitor.
+				tnoodle.stackmat._checkApplet();
+				tnoodle.stackmat._cancelLoadTimeout();
+			}
+			updateCallback(state);
+		};
+		window.stackmatErrorCallback = function(error) {
+			if(tnoodle.stackmat._appletWatchdogTimer === null) {
+				// This may be the first indicator we have that the applet is alive.
+				// We cancel the pending load timeout timer, and start up the
+				// health monitor.
+				tnoodle.stackmat._checkApplet();
+				tnoodle.stackmat._cancelLoadTimeout();
+			}
+			errorCallback(error);
+		};
 
 		var vars = {
 			updateCallback: 'stackmatUpdateCallback',
-			errorCallback: 'stackmatErrorCallback',
-			settingsHiddenCallback: 'stackmatSettingsHiddenCallback'
+			errorCallback: 'stackmatErrorCallback'
 		};
 		var swfFile = '/stackmat-flash/StackApplet.swf';
-		swfFile += "?" + (new Date().getTime());
+		swfFile += "?" + (new Date().getTime());// TODO
 
-		var applet = new Swiff(swfFile, { width: 0, height: 0, vars: vars, wMode: 'opaque' }).toElement();
-		document.body.appendChild(applet);
-		tnoodle.stackmat.applet = applet;
-		this.hideApplet();
-	},
-	showMicrophoneSettings: function() {
-		if(tnoodle.stackmat.applet === null) { return; }
-		
+		var applet = new Swiff(swfFile, {
+			width: 0,
+			height: 0,
+			vars: vars,
+			params: {
+				wMode: 'transparent'
+			}
+		}).toElement();
+		parentElement.appendChild(applet);
+		tnoodle.stackmat._applet = applet;
 		// If the applet is not at least 214x137, the settings dialog option
 		// will be grayed out.
-		tnoodle.stackmat.applet.setStyle('width', 214);
-		tnoodle.stackmat.applet.setStyle('height', 137);
-		tnoodle.stackmat.applet.setStyle('border', '1px solid black');
-		tnoodle.stackmat.applet.showMicrophoneSettings();
+		tnoodle.stackmat._applet.setStyle('width', 214);
+		tnoodle.stackmat._applet.setStyle('height', 137);
+		tnoodle.stackmat._applet.setStyle('border', '1px solid black');
+
+		tnoodle.stackmat._appletLoadTimeout = setTimeout(tnoodle.stackmat._appletFailedToLoad, 1000);
 	},
-	hideApplet: function() {
-		if(tnoodle.stackmat.applet === null) { return; }
-		
-		tnoodle.stackmat.applet.setStyle('width', 0);
-		tnoodle.stackmat.applet.setStyle('height', 0);
-		tnoodle.stackmat.applet.setStyle('border', '');
+	_checkApplet: function() {
+		var alive = false;
+		var msg = "";
+		try {
+			alive = tnoodle.stackmat._applet.ping();
+		} catch(e) {
+			msg = e.msg;
+		}
+		if(!alive) {
+			window.stackmatErrorCallback({
+				message: "Stackmat flash plugin is not responding to ping. Try disabling and renabling stackmat support, or just refreshing the page.\n" + msg
+			});
+		} else {
+			tnoodle.stackmat._appletWatchdogTimer = setTimeout(tnoodle.stackmat._checkApplet, 1000);
+		}
+	},
+	_cancelLoadTimeout: function() {
+		clearTimeout(tnoodle.stackmat._appletLoadTimeout);
+		tnoodle.stackmat._appletLoadTimeout = null;
+	},
+	_appletFailedToLoad: function() {
+		window.stackmatErrorCallback({
+			message: "Applet is taking a while to load. This is probably not a good thing."
+		});
 	},
 	disable: function() {
-		if(tnoodle.stackmat.applet === null) { return; }
-		document.body.removeChild(tnoodle.stackmat.applet);
-		tnoodle.stackmat.applet = null;
+		if(tnoodle.stackmat._applet === null) { return; }
+		if(tnoodle.stackmat._appletLoadTimeout !== null) {
+			tnoodle.stackmat._cancelLoadTimeout();
+		}
+		if(tnoodle.stackmat._appletWatchdogTimer !== null) {
+			clearTimeout(tnoodle.stackmat._appletWatchdogTimer);
+			tnoodle.stackmat._appletWatchdogTimer = null;
+		}
+		tnoodle.stackmat._applet.dispose();
+		tnoodle.stackmat._applet = null;
 		window.stackmatUpdateCallback(); // we want them to be notified that the timer is OFF
 	}
 };

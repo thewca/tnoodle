@@ -3,27 +3,23 @@
 <head>
 <title>StackApplet Test</title>
 <script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
+<script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
 <script type="text/javascript" src="StackApplet.js"></script>
 <script type="text/javascript">
 var enableStackmat;
-var chooseMicrophone;
+var configureStackmat;
+var appletDiv;
 
 function onUpdate(state) {
 	var timerSpan = document.getElementById("timer");
 	var leftHand = document.getElementById("leftHand");
 	var rightHand = document.getElementById("rightHand");
 
-	var micOption = document.getElementById("micOption");
-
 	if(!state) {
-		micOption.style.display = "none";
-
 		timerSpan.innerHTML = "";
 		leftHand.style.display = "none";
 		rightHand.style.display = "none";
 	} else {
-		micOption.style.display = "inline";
-
 		if(state.on) {
 			timerSpan.innerHTML = state.centis;
 		} else {
@@ -33,34 +29,47 @@ function onUpdate(state) {
 		rightHand.style.display = state.rightHand ? "inline" : "none";
 	}
 }
-function onError(error) {
-	var timerSpan = document.getElementById("timer");
-	timerSpan.innerHTML = error;
+function showApplet(visible) {
+	configureStackmat.checked = visible;
+
+	if(visible) {
+		appletDiv.setStyle('width', '');
+		appletDiv.setStyle('height', '');
+	} else {
+		appletDiv.setStyle('width', 0);
+		appletDiv.setStyle('height', 0);
+	}
 }
-function onCloseSettings() {
-	tnoodle.stackmat.hideApplet();
-	chooseMicrophone.checked = false;
+function onError(error) {
+	if(error.message == 'muted') {
+		error.message = 'Please grant flash microphone access.';
+	}
+	alert(error.message);
+	showApplet(true);
 }
 
 window.addEventListener('load', function() {
 	enableStackmat = document.getElementById('enableStackmat');
-	chooseMicrophone = document.getElementById('chooseMicrophone');
+	configureStackmat = document.getElementById('configureStackmat');
+	configureSpan = document.getElementById('configureSpan');
+	configureSpan.hide();
 
+	appletDiv = document.getElementById('appletDiv');
+	appletDiv.setStyle('overflow', 'hidden');
+
+	showApplet(false);
 	enableStackmat.addEvent('change', function() {
 		if(enableStackmat.checked) {
-			tnoodle.stackmat.enable(onUpdate, onError, onCloseSettings);
+			configureSpan.show();
+			tnoodle.stackmat.enable(onUpdate, onError, appletDiv);
 		} else {
-			chooseMicrophone.checked = false;
+			configureSpan.hide();
 			tnoodle.stackmat.disable();
 		}
 	});
 
-	chooseMicrophone.addEvent('change', function() {
-		if(chooseMicrophone.checked) {
-			tnoodle.stackmat.showMicrophoneSettings();
-		} else {
-			tnoodle.stackmat.hideApplet();
-		}
+	configureStackmat.addEvent('change', function() {
+		showApplet(configureStackmat.checked);
 	});
 
 	onUpdate();
@@ -68,16 +77,24 @@ window.addEventListener('load', function() {
 </script>
 </head>
 <body>
-<input type="checkbox" id="enableStackmat" />
-<label for="enableStackmat">Enable stackmat</label>
-<span id="micOption">
-	<input type="checkbox" id="chooseMicrophone" />
-	<label for="chooseMicrophone">Choose microphone</label>
-</span>
+
 <div>
-<span id="leftHand">\</span>
-<span id="rightHand">/</span>
-<span id="timer"></span>
+	<input type="checkbox" id="enableStackmat" />
+	<label for="enableStackmat">Enable stackmat</label>
+
+	<span id="configureSpan">
+		<input type="checkbox" id="configureStackmat" />
+		<label for="configureStackmat">Configure stackmat</label>
+	</span>
 </div>
+
+<div id="appletDiv"></div>
+
+<div>
+	<span id="leftHand">\</span>
+	<span id="rightHand">/</span>
+	<span id="timer"></span>
+</div>
+
 </body>
 </html>

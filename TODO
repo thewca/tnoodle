@@ -157,7 +157,16 @@
 	-create an editable table superclass for the editable list & times table
 -read times/metronome
 
--add remaining stackmat options
+-flex stackmat library
+	-autodetect
+		-stackmat level? this might just work
+		-invertedness
+		-gen2 vs gen3
+	-changing default line in doesn't take effect until after refreshing
+	-MUST have a good debug page
+	-smoothing of the stackmat times?
+	-tnt doesn't even support thousandths place...
+
 -provide some system for uploading your own image?
 -top row of times area shouldn't wrap
 -get rid of multiple drop down arrows?

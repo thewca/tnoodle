@@ -1,4 +1,7 @@
 package {
+	import flash.system.Security;
+	import flash.system.SecurityPanel;
+
 	import flash.events.StatusEvent;
 	import flash.events.SampleDataEvent;
 	import flash.external.*;
@@ -46,29 +49,37 @@ package {
 		private var currentPeriod:Array = [];
 
 		private var mic:Microphone;
+		public function isMicMuted():Boolean {
+			return mic.muted;
+		}
+		public function getSelectedLine():String {
+			return mic.name;
+		}
 
 		public function LineInStackmatInterpreter() {
 			super(this);
 			
 			mic = Microphone.getMicrophone();
-			//mic.setUseEchoSuppression(true);
-
-			//var mic:Microphone = Microphone.getEnhancedMicrophone();
-
-			//mic.setLoopBack();
 			mic.gain = 100;
 			mic.rate = 44;
 			mic.addEventListener(SampleDataEvent.SAMPLE_DATA, micSampleDataHandler);
+			mic.addEventListener(StatusEvent.STATUS, function(event:StatusEvent):void {
+				fireStateChanged();
+			});
+			// TODO - STATUS events don't fire when the default microphone is changed
+			// need to do some polling or something instead =(
 
-			for(var i:int = 0; i < Microphone.names.length; i++) {
-				StackApplet.log("\n" + i + ": " + Microphone.names[i]);
-			}
+
+			//for(var i:int = 0; i < Microphone.names.length; i++) {
+				//StackApplet.log("\n" + i + ": " + Microphone.names[i]);
+			//}
 
 			if(mic.muted) {
-				StackApplet.log("User denied access to microphone! =(");// TODO
+				StackApplet.handleError(this, new Error("muted"));
+				Security.showSettings(SecurityPanel.PRIVACY);
+				fireStateChanged();
 			} else {
 				state = new StackmatState();
-				state.centis = 4031;
 				fireStateChanged();
 			}
 		}
@@ -136,7 +147,7 @@ package {
 			}
 
 			} catch(e:Error) {
-				StackApplet.log("Unhandled exception: " + e.message);//TODO - consistent exception handling...
+				StackApplet.handleError(this, e);
 			}
 		}
 
