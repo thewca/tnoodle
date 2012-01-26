@@ -6,27 +6,26 @@
 <script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
 <script type="text/javascript" src="StackApplet.js"></script>
 <script type="text/javascript">
+
+/* How many samples to capture when the user click the "debug" button */
+var SAMPLE_CAPTURE_COUNT = 50000;
+
 var enableStackmat;
 var configureStackmat;
 var appletDiv;
+var timerSpan;
+
+var oldState = null;
 
 function onUpdate(state) {
-	var timerSpan = document.getElementById("timer");
-	var leftHand = document.getElementById("leftHand");
-	var rightHand = document.getElementById("rightHand");
-
 	if(!state) {
-		timerSpan.innerHTML = "";
-		leftHand.style.display = "none";
-		rightHand.style.display = "none";
+		timerSpan.value = "Applet disabled\n" + timerSpan.value;
 	} else {
-		if(state.on) {
-			timerSpan.innerHTML = state.centis;
-		} else {
-			timerSpan.innerHTML = "OFF";
+		if(tnoodle.stackmat.statesEqual(oldState, state)) {
+			return;
 		}
-		leftHand.style.display = state.leftHand ? "inline" : "none";
-		rightHand.style.display = state.rightHand ? "inline" : "none";
+		oldState = state;
+		timerSpan.value = state.centis + " " + JSON.encode(state) + "\n" + timerSpan.value;
 	}
 }
 function showApplet(visible) {
@@ -51,25 +50,68 @@ function onError(error) {
 window.addEventListener('load', function() {
 	enableStackmat = document.getElementById('enableStackmat');
 	configureStackmat = document.getElementById('configureStackmat');
-	configureSpan = document.getElementById('configureSpan');
-	configureSpan.hide();
+	var configureSpan = document.getElementById('configureSpan');
+	var parseSamplesDiv = document.getElementById('parseSamplesDiv');
+	timerSpan = document.getElementById("timer");
 
 	appletDiv = document.getElementById('appletDiv');
 	appletDiv.setStyle('overflow', 'hidden');
 
-	showApplet(false);
-	enableStackmat.addEvent('change', function() {
+	function enableStackmatClicked() {
 		if(enableStackmat.checked) {
 			configureSpan.show();
+			parseSamplesDiv.show();
 			tnoodle.stackmat.enable(onUpdate, onError, appletDiv);
 		} else {
 			configureSpan.hide();
+			parseSamplesDiv.hide();
 			tnoodle.stackmat.disable();
+		}
+	}
+	enableStackmat.addEvent('change', enableStackmatClicked);
+	enableStackmatClicked();
+
+	function configureStackmatClicked() {
+		showApplet(configureStackmat.checked);
+	}
+	configureStackmat.addEvent('change', configureStackmatClicked);
+	configureStackmatClicked();
+
+	var debugArea = document.getElementById('debugArea');
+	debugArea.hide();
+
+	var captureButton = document.getElementById('capture');
+	var DEFAULT_CAPTURE_VALUE = 'Capture';
+	captureButton.value = DEFAULT_CAPTURE_VALUE;
+	captureButton.addEvent('click', function() {
+		if(confirm("This will capture " + SAMPLE_CAPTURE_COUNT + " samples of data from your line in and dump it to a textbox.\nMake sure your stackmat is on and plugged in before clicking ok.\nThis may freeze your browser for a few moments.\nDo you wish to continue?" )) {
+			captureButton.disabled = true;
+			captureButton.value = '';
+			var totalSamples = 0;
+			tnoodle.stackmat.captureNSamples(SAMPLE_CAPTURE_COUNT, function(samples, period) {
+				totalSamples += samples.length;
+				var done = (totalSamples >= SAMPLE_CAPTURE_COUNT);
+				debugArea.show();
+				debugArea.value += samples.join("\n");
+				debugArea.value += "\n\n*****************\n" + period + "\n\n\n";
+
+				if(done) {
+					captureButton.disabled = false;
+					captureButton.value = DEFAULT_CAPTURE_VALUE;
+				}
+			});
 		}
 	});
 
-	configureStackmat.addEvent('change', function() {
-		showApplet(configureStackmat.checked);
+	var parseSamples = document.getElementById('parseSamples');
+	var inputSamples = document.getElementById('inputSamples');
+	parseSamples.addEvent('click', function(e) {
+		timerSpan.value = '';
+		// We clear old state just so that clicking "Parse Samples" twice actually
+		// does something on the second click.
+		oldState = null;
+		var samples = inputSamples.value.split('\n');
+		tnoodle.stackmat.parseSamples(samples);
 	});
 
 	onUpdate();
@@ -78,6 +120,18 @@ window.addEventListener('load', function() {
 </head>
 <body>
 
+<p>
+	I've had some issues where flash seems to get confused when you change
+	the mixer type. If you have trouble, try disabling and reenabling the stackmat,
+	your selected mixer will be remembered.
+</p>
+
+<p>
+	If you still have issues, and you've been able to get your stackmat to work with <a href="http://cct.cubing.net/" target="_blank">CCT</a> and or <a href="http://prismapuzzletimer.com" target="_blank">PPT</a>, then click the "Capture" button, and email <a href="mailto:tnoodle@jflei.com">tnoodle@jflei.com</a> with the data.
+
+	In fact, if you haven't been able to get your stackmat to work with CCT or PPT, go ahead and email me anyways =).
+</p>
+
 <div>
 	<input type="checkbox" id="enableStackmat" />
 	<label for="enableStackmat">Enable stackmat</label>
@@ -85,15 +139,23 @@ window.addEventListener('load', function() {
 	<span id="configureSpan">
 		<input type="checkbox" id="configureStackmat" />
 		<label for="configureStackmat">Configure stackmat</label>
+
+		<input type="button" id="capture" value="Capture" />
 	</span>
 </div>
+
+<!-- If the textarea is editable, my browser crashes =( -->
+<textarea readonly id="debugArea" rows="20" cols="25"></textarea>
 
 <div id="appletDiv"></div>
 
 <div>
-	<span id="leftHand">\</span>
-	<span id="rightHand">/</span>
-	<span id="timer"></span>
+	<textarea id="timer" rows="10" cols="125"></textarea>
+</div>
+
+<div id="parseSamplesDiv">
+	<textarea id="inputSamples" rows="10" cols="25"></textarea>
+	<input type="button" id="parseSamples" value="Parse Samples (note that clicking this disables microphone reading until you disable and reenable the stackmat)" />
 </div>
 
 </body>

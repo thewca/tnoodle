@@ -121,3 +121,8 @@ span.select {
 	border-color: black;
 	color: white;
 }
+
+fieldset {
+	border: none;
+	padding: 0px;
+}

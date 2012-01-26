@@ -60,6 +60,10 @@ tnoodle.stackmat = {
 		tnoodle.stackmat._appletLoadTimeout = setTimeout(tnoodle.stackmat._appletFailedToLoad, 1000);
 	},
 	_checkApplet: function() {
+		// We're not ready to schedule the watchdog quite yet, but this is the only
+		// way we have of notifying people that the watchdog has been started.
+		tnoodle.stackmat._appletWatchdogTimer = true;
+
 		var alive = false;
 		var msg = "";
 		try {
@@ -83,6 +87,18 @@ tnoodle.stackmat = {
 		window.stackmatErrorCallback({
 			message: "Applet is taking a while to load. This is probably not a good thing."
 		});
+	},
+	captureNSamples: function(n, callback) {
+		window.stackmatCaptureSamplesCallback = callback;
+		tnoodle.stackmat._applet.captureNSamples(n, 'stackmatCaptureSamplesCallback');
+	},
+	parseSamples: function(samples) {
+		tnoodle.stackmat._applet.parseSamples(samples);
+	},
+	statesEqual: function(s1, s2) {
+		s1 = s1 || {};
+		s2 = s2 || {};
+		return s1.centis === s2.centis && s1.on === s2.on && s1.greenLight === s2.greenLight && s1.leftHand === s2.leftHand && s1.rightHand === s2.rightHand && s1.running === s2.running && s1.corrupted === s2.corrupted;
 	},
 	disable: function() {
 		if(tnoodle.stackmat._applet === null) { return; }

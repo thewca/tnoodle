@@ -245,7 +245,7 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		scramble();
 	}, false);
 	function unscramble(time) {
-		if(time.hasOwnProperty("importInfo") && time.importInfo.importedScrambles) {
+		if(time.importInfo && time.importInfo.importedScrambles) {
 			var info = time.importInfo;
 			scrambleIndex = info.scrambleIndex;
 			scrambleSrc = info.scrambleSrc;

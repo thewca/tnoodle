@@ -15,9 +15,17 @@ package {
 	public class StackApplet extends Sprite {
 
 		public static function log(msg:String):void {
+			// TODO - come up with something that works on firefox...
+			//ExternalInterface.call("function(msg) { if(typeof(console) != 'undefined' && console.log) { console.log(msg); } else { alert(msg); } }", msg);
 			ExternalInterface.call("console.log", msg);
 		}
-		public function assert(expression:Boolean):void {
+		public static function callJs(functionName:String, ...args):void {
+			// Debugging js is easier if our js code doesn't have to run in the context
+			// of the flash applet. I imagine things will also be a bit faster.
+			// Since this is nonblocking, we can't read a return value from js.
+			ExternalInterface.call("function(args) { setTimeout(function() { " + functionName + ".apply(null, args); }, 0); }", args);
+		}
+		public static function assert(expression:Boolean):void {
 			if(!expression) {
 				throw new Error("Assertion failed!");
 			}
@@ -56,6 +64,19 @@ package {
 				ExternalInterface.addCallback("ping", function():Boolean {
 					return true;
 				});
+				ExternalInterface.addCallback("captureNSamples", function(samples:int, callback:String):void {
+					assert(!!interpreter);
+					interpreter.captureNSamples(samples, function(capturedSamples:Array, capturedPeriod:String):void {
+						try {
+							callJs(callback, capturedSamples, capturedPeriod);
+						} catch(e:Error) {
+							handleError(this, e);
+						}
+					});
+				});
+				ExternalInterface.addCallback("parseSamples", function(samples:Array):void {
+					interpreter.parseSamples(samples);
+				});
 
 				stage.addEventListener(MouseEvent.CLICK, function():void {
 					if(interpreter.isMicMuted()) {
@@ -79,7 +100,7 @@ package {
 					}
 					micState.setTextFormat(font);
 
-					ExternalInterface.call(updateCallback, interpreter.getState());
+					callJs(updateCallback, interpreter.getState());
 				});
 			} catch(e:Error) {
 				handleError(this, e);
@@ -92,7 +113,7 @@ package {
 				objError.message = e.message;
 				objError.stackTrace = e.getStackTrace();
 				objError.source = source.toString();
-				ExternalInterface.call(errorCallback, objError);
+				callJs(errorCallback, objError);
 			} catch(ee:Error) {
 				var msg:String = "Error calling " + errorCallback + ".";
 				msg += " " + e.message;

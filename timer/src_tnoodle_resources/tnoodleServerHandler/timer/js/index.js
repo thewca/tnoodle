@@ -394,7 +394,7 @@ window.addEvent('domready', function() {
 	});
 	var shortcutManager = new ShortcutManager(shortcuts, configuration);
 
-	var timer = new KeyboardTimer($('timer'), server, scrambleStuff, shortcutManager);
+	var timer = new TimerDisplay($('timer'), server, scrambleStuff, shortcutManager);
 	timer.addEvent('newTime', function(time) {
 		//TODO - this may need to wait for the sessions to load...
 		timesTable.addTime(time);

@@ -7,6 +7,16 @@ package {
 		public var rightHand:Boolean;
 		public var running:Boolean;
 
-		public var corrupted:Boolean;
+		public function StackmatState(state:StackmatState=null) {
+			if(!state) {
+				return;
+			}
+			this.centis = state.centis;
+			this.on = state.on;
+			this.greenLight = state.greenLight;
+			this.leftHand = state.leftHand;
+			this.rightHand = state.rightHand;
+			this.running = state.running;
+		}
 	}
 }

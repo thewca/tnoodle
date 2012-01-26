@@ -127,7 +127,7 @@ tnoodle.tnt = {
 			if(!noGrayBg) {
 				tnoodle.tnt.grayOut(true);
 			}
-			this.style.display = 'inline';
+			this.style.visibility = '';
 			if(onShow) {
 				onShow();
 			}
@@ -188,7 +188,9 @@ tnoodle.tnt = {
 			if(!noGrayBg) {
 				tnoodle.tnt.grayOut(false);
 			}
-			this.style.display = 'none';
+			// Note that we hide the popup using visiblity, rather than display none,
+			// because this allows hidden flash applets to continue to run.
+			this.style.visibility = 'hidden';
 
 			// There's no reason for an element in the popup to keep focus now
 			// that the popup is gone.

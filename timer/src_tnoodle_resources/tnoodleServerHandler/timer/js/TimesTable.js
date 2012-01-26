@@ -613,7 +613,7 @@ var TimesTable = new Class({
 			} else if(plusTwo.checked) {
 				timeHoverDiv.time.setPenalty("+2");
 			} else {
-				alert("ERROR"); //TODO - proper error system
+				assert(false);
 			}
 			table.session.reindex();
 			table.refreshData();
