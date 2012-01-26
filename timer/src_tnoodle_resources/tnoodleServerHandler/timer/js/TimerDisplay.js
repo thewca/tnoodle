@@ -205,9 +205,16 @@ var TimerDisplay = new Class({
 
 		this.startRender();
 	},
-	startTimer: function(elapsedCentis) {
-		if(!elapsedCentis) {
-			elapsedCentis = 0;
+	cancelInspectionIfInspecting: function() {
+		if(this.inspecting) {
+			this.inspecting = false;
+			this.inspectionStart = null;
+		}
+	},
+	startTimer: function(elapsedUnits, unitsPerSecond) {
+			// TODO - update tnt to support arbitrary precision!
+		if(!elapsedUnits) {
+			elapsedUnits = 0;
 		}
 		if(!this.timing) {
 			// The stackmat will call startTimer repeatedly without stopping the timer.
@@ -227,14 +234,16 @@ var TimerDisplay = new Class({
 			}
 		}
 
-		var elapsedMillis = elapsedCentis*10;
+		var unitsPerMillisecond = (state.unitsPerSecond * (1.0 / 1000));
+		var elapsedMillis = Math.floor(elapsedUnits / unitsPerMillisecond);
 		this.timerStart = new Date().getTime() - elapsedMillis;
 	},
-	stopTimer: function(elapsedCentis) {
-		if(!elapsedCentis) {
+	stopTimer: function(elapsedUnits, unitsPerSecond) {
+		if(!elapsedUnits) {
 			this.timerStop = new Date().getTime();
 		} else {
-			var elapsedMillis = elapsedCentis*10;
+			var unitsPerMillisecond = (state.unitsPerSecond * (1.0 / 1000));
+			var elapsedMillis = Math.floor(elapsedUnits / unitsPerMillisecond);
 			this.timerStop = this.timerStart + elapsedMillis;
 		}
 		// Note that we don't assert this.timing. This is because we want to pick
@@ -283,7 +292,7 @@ var TimerDisplay = new Class({
 		return ((time - this.inspectionStart)/1000).toInt();
 	},
 	getPenalty: function() {
-		if(this.INSPECTION === 0) {
+		if(this.INSPECTION === 0 || this.inspectionStart === null) {
 			return null;
 		}
 		var secondsLeft = this.INSPECTION-this.getInspectionElapsedSeconds();
@@ -303,7 +312,9 @@ var TimerDisplay = new Class({
 			// We want people to see the amount of time they will have for
 			// inspection when the timer is armed, rather than a silly
 			// 0:00.00.
-			if(this.INSPECTION) {
+			if(this.INSPECTION && this.enabledTimer.stringy() != 'Stackmat') {
+				// We don't show the amount of inspection time if using a stackmat,
+				// because inspection isn't started by the stackmat pads.
 				return ""+this.INSPECTION;
 			} else {
 				return this.server.formatTime(0, this.decimalPlaces);
@@ -368,6 +379,9 @@ var TimerDisplay = new Class({
 		this.lastTime = null;
 		
 		this.stopRender();
+	},
+	isReset: function() {
+		return !this.timing && this.timerStart === 0 && this.timerStop === 0;
 	},
 	isFocused: function() {
 		// This is kinda weird, we want to avoid activating the timer 

@@ -15,9 +15,7 @@ package {
 
 		private var samplingRate:int = 44100;
 		private var stackmatValue:Number = 0.7;
-		private var invertedMinutes:Boolean = true;//<<<
-		private var invertedSeconds:Boolean = true;//<<<
-		private var invertedCentis:Boolean = true;//<<<
+		private var inverted:Boolean = true;// TODO - autodetect inverted!<<<
 
 		// The stackmat signal is basically a series of repeated sawtooth
 		// periods with some silence between them.
@@ -41,7 +39,8 @@ package {
 
 		// This is the number of processed 1's and 0's (stackmat bits) that
 		// comprise 1 period.
-		private var bitsPerPeriod:int = 89;
+		private var bitsPerGen2Period:int = 89;
+		private var bitsPerGen3Period:int = 99;
 
 		/*** END MAGIC NUMBERS ***/
 
@@ -91,7 +90,6 @@ package {
 		private function pollDefaultMicrophone():void {
 			if(oldMicIndex != mic.index) {
 				oldMicIndex = mic.index;
-				//<<<state = new StackmatState();
 				fireStateChanged();
 			}
 
@@ -178,17 +176,24 @@ package {
 						if(currentPeriod.length == 0) {
 							// Still waiting for our next period to start.
 						} else {
-							if(currentPeriod.length == bitsPerPeriod) {
+							if(currentPeriod.length == bitsPerGen2Period ||
+							   currentPeriod.length == bitsPerGen3Period) {
 								// All data present
 								var newState:StackmatState = parseTime(currentPeriod);
 
 								if(state.on) {
 									// We can only mark the state as running if the
 									// previous state was actually on.
-									newState.running = newState.centis > state.centis;
+									// We want to check if:
+									// newState.units / newState.unitsPerSecond > state.units / state.unitsPerSecond
+									// which is the same as checking if
+									// newState.units * state.unitsPerSecond > state.units * newState.unitsPerSecond
+									newState.running = newState.units * state.unitsPerSecond > state.units * newState.unitsPerSecond;
 								}
 
 								if(newState.running) {
+									// TODO - this is a hack for the gen3
+									// i really need metadata info for all the timers...
 									newState.greenLight = false;
 									newState.leftHand = false;
 									newState.rightHand = false;
@@ -198,7 +203,7 @@ package {
 								state = newState;
 								state.on = true;
 
-								sendDebugInfo('' + state.centis);
+								sendDebugInfo('' + state.units*(1.0/state.unitsPerSecond));
 								if(!oldState.on) {
 									// We can't fire the first signal we read from the
 									// previously off timer, because we don't know if
@@ -231,10 +236,19 @@ package {
 		private function parseTime(periodData:Array):StackmatState {
 			var state:StackmatState = new StackmatState();
 			parseHeader(state, periodData);
-			var minutes:int = parseDigit(periodData, 1, invertedMinutes);
-			var seconds:int = parseDigit(periodData, 2, invertedSeconds) * 10 + parseDigit(periodData, 3, invertedSeconds);
-			var hundredths:int = parseDigit(periodData, 4, invertedCentis) * 10 + parseDigit(periodData, 5, invertedCentis);
-			state.centis = 6000 * minutes + 100 * seconds + hundredths;
+			var minutes:int = parseDigit(periodData, 1, inverted);
+			var seconds:int = parseDigit(periodData, 2, inverted) * 10 + parseDigit(periodData, 3, inverted);
+			if(periodData.length == bitsPerGen2Period) {
+				var centis:int = parseDigit(periodData, 4, inverted) * 10 + parseDigit(periodData, 5, inverted);
+				state.units = 6000 * minutes + 100 * seconds + centis;
+				state.unitsPerSecond = 100;
+			} else if(periodData.length == bitsPerGen3Period) {
+				var millis:int = parseDigit(periodData, 4, inverted) * 100 + parseDigit(periodData, 5, inverted) * 10 + parseDigit(periodData, 6, inverted);
+				state.units = 60000 * minutes + 1000 * seconds + millis;
+				state.unitsPerSecond = 1000;
+			} else {
+				StackApplet.assert(false);
+			}
 			return state;
 		}
 
@@ -247,7 +261,7 @@ package {
 			// TODO - detecting left/right hands is broken with gen3 timers?!!
 			state.leftHand = (temp == 6);
 			state.rightHand = (temp == 9);
-			//<<<state.greenLight = (temp == 16);//gen2
+			//state.greenLight = (temp == 16);//gen2
 			state.greenLight = (temp == 15);//gen3
 			if(temp == 24 || state.greenLight) {
 				state.rightHand = true;

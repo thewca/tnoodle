@@ -21,38 +21,56 @@ var StackmatTimer = new Class({
 	getOptions: function() {
 		return this.options_;
 	},
-	acceptedTime_: null,
+
+	// This is to prevent redetecting the same time over and over.
+	acceptedTimeUnits_: null,
+	acceptedTimeUnitsPerSecond_: null,
+
 	stackmatState_: null,
 	_stackmatUpdated: function(state) {
 		if(state) {
 			if(tnoodle.stackmat.statesEqual(state, this.stackmatState_)) {
 				return;
 			}
+			var oldState = this.stackmatState_;
 			this.stackmatState_ = state;
 			if(!state.on) {
+				this.timerDisplay.cancelInspectionIfInspecting();
 				this.timerDisplay.redraw();
 				return;
 			}
+			if(tnoodle.stackmat.statesEqualIgnoreHands(state, oldState)) {
+				this.timerDisplay.redraw();
+				return;
+			}
+
 			if(state.running) {
-				this.timerDisplay.startTimer(state.centis);
+				this.timerDisplay.startTimer(state.units, state.unitsPerSecond);
 				this.acceptedTime_ = null;
 			} else {
-				if(state.centis === 0) {
+				if(state.units === 0) {
 					if(this.timerDisplay.timing) {
 						// If we wanted to do something special when the user
 						// presses restart on a running timer, this would be the
 						// place.
 						var nop;
+					} else {
+						if(!this.timerDisplay.isReset() && this.timerDisplay.INSPECTION > 0) {
+							this.timerDisplay.resetTimerAndScramble();
+							this.timerDisplay.startInspection();
+							return;
+						}
 					}
 					this.timerDisplay.resetTimerAndScramble();
-				} else if(this.acceptedTime_ != state.centis) {
-					// new time!
-					this.timerDisplay.stopTimer(state.centis);
-					this.acceptedTime_ = state.centis; //this is to prevent redetecting the same time over and over
+				} else if(this.acceptedTimeUnits_ != state.units || this.acceptedTimeUnitsPerSecond_ != state.unitsPerSecond) {
+					// New time!
+					// Note that this does mean we treat 1.298 in gen3 form, and then
+					// 1.29 in gen2 form as a new time.
+					this.timerDisplay.stopTimer(state.units, state.unitsPerSecond);
+					this.acceptedTimeUnits_ = state.units;
+					this.acceptedTimeUnitsPerSecond_ = state.unitsPerSecond;
 				}
 			}
-
-			// TODO - stackmat inspection?
 		} else {
 			this.stackmatState_ = null;
 		}

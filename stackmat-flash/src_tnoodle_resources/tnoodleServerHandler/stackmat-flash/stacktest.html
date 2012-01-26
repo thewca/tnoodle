@@ -25,7 +25,14 @@ function onUpdate(state) {
 			return;
 		}
 		oldState = state;
-		timerSpan.value = state.centis + " " + JSON.encode(state) + "\n" + timerSpan.value;
+		var prettyTime = null;
+		if(state.unitsPerSecond > 0) {
+			prettyTime = state.units*(1.0/state.unitsPerSecond);
+			prettyTime = prettyTime.toFixed(Math.round(Math.log(state.unitsPerSecond)/Math.log(10)));
+		} else {
+			prettyTime = "";
+		}
+		timerSpan.value = prettyTime + " " + JSON.encode(state) + "\n" + timerSpan.value;
 	}
 }
 function showApplet(visible) {
