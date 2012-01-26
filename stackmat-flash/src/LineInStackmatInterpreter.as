@@ -80,11 +80,9 @@ package {
 			if(mic.muted) {
 				StackApplet.handleError(this, new Error("muted"));
 				Security.showSettings(SecurityPanel.PRIVACY);
-				fireStateChanged();
-			} else {
-				state = new StackmatState();
-				fireStateChanged();
 			}
+			state = new StackmatState();
+			fireStateChanged();
 
 			pollDefaultMicrophone();
 		}
