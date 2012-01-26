@@ -263,21 +263,24 @@ tnoodle.server = function(host, port) {
 	this.configuration = new Configuration();
 
 	var server = this;
-	this.formatTime = function(timeCentis, decimalPlaces) {
-		if(timeCentis === null) {
+	this.formatTime = function(units, unitsPerSecond, decimalPlaces) {
+		if(Math.pow(10, decimalPlaces) > unitsPerSecond) {
+			decimalPlaces = unitsPerSecond;
+		}
+		if(units === null) {
 			return "";
 		}
-		timeCentis = Math.round(timeCentis);
+		units = Math.round(units);
 		if(decimalPlaces !== 0) {
 			decimalPlaces = decimalPlaces || 2;
 		}
 		
-		if(timeCentis == Infinity) {
+		if(units == Infinity) {
 			return "DNF";
 		} else if(server.configuration.get('clockFormat', true)) {
-			return server.clockFormat(timeCentis, decimalPlaces);
+			return server.clockFormat(units, decimalPlaces);
 		} else {
-			return (timeCentis/100).toFixed(decimalPlaces);
+			return (units*(1.0/unitsPerSecond)).toFixed(decimalPlaces);
 		}
 	};
 	this.clockFormat = function(timeCentis, decimalPlaces) {
