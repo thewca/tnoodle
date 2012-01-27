@@ -52,6 +52,12 @@ class Project(tmt.EclipseProject):
 			assert len(stderr) == 0
 
 	def clean(self):
+		if self.mxmlcInstalled:
+			# If mxmlc is installed, then we are fine with deleting the bin directory,
+			# because we can recreate it.
+			tmt.EclipseProject.clean(self)
+			return
+
 		# Gah, this is copied from tmt.EclipseProject. Kill me now
 		print 'Cleaning: %s' % self.name
 		if exists(self.distDir):

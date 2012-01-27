@@ -98,12 +98,12 @@ tnoodle.stackmat = {
 	statesEqual: function(s1, s2) {
 		s1 = s1 || {};
 		s2 = s2 || {};
-		return s1.units === s2.units && s1.unitsPerSecond == s2.unitsPerSecond && s1.on === s2.on && s1.greenLight === s2.greenLight && s1.leftHand === s2.leftHand && s1.rightHand === s2.rightHand && s1.running === s2.running;
+		return s1.units === s2.units && s1.unitsPerSecond == s2.unitsPerSecond && s1.on === s2.on && s1.greenLight === s2.greenLight && s1.leftHand === s2.leftHand && s1.rightHand === s2.rightHand && s1.running === s2.running && s1.unknownRunning === s2.unknownRunning;
 	},
 	statesEqualIgnoreHands: function(s1, s2) {
 		s1 = s1 || {};
 		s2 = s2 || {};
-		return s1.units === s2.units && s1.unitsPerSecond == s2.unitsPerSecond && s1.on === s2.on && s1.running === s2.running;
+		return s1.units === s2.units && s1.unitsPerSecond == s2.unitsPerSecond && s1.on === s2.on && s1.running === s2.running && s1.unknownRunning === s2.unknownRunning;
 	},
 	disable: function() {
 		if(tnoodle.stackmat._applet === null) { return; }

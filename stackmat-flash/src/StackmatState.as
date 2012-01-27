@@ -7,6 +7,7 @@ package {
 		public var leftHand:Boolean;
 		public var rightHand:Boolean;
 		public var running:Boolean;
+		public var unknownRunning:Boolean;
 
 		public function StackmatState(state:StackmatState=null) {
 			if(!state) {

@@ -283,9 +283,12 @@ var TimerDisplay = new Class({
 		//the timer lags if we don't queue up the addition of the time like this
 		setTimeout(addTime, 0);
 	},
-	getTimeCentis: function() {
+	getTimeUnits: function() {
 		var end = (this.timing ? new Date().getTime() : this.timerStop);
-		return Math.round((end - this.timerStart)/10);
+		return end - this.timerStart;
+	},
+	getTimeUnitsPerSecond: function() {
+		return 1000;
 	},
 	getInspectionElapsedSeconds: function() {
 		var time = this.inspecting ? new Date().getTime() : this.timerStart;
@@ -334,16 +337,17 @@ var TimerDisplay = new Class({
 				}
 			}
 
-			var decimalPlaces = 2;
-			var centis = this.getTimeCentis();
-			if(this.timing) {
+			var units = this.getTimeUnits();
+			var decimalPlaces = Math.log(this.getTimeUnitsPerSecond(), 10);
+			/*<<< TODO - do something with this.frequency!
+			   if(this.timing) {
 				if(this.frequency === 0) {
 					return "...";
 				}
 				centis = (this.frequency*100)*(Math.round(centis / (this.frequency*100)));
 				decimalPlaces = this.decimalPlaces;
-			}
-			return this.server.formatTime(centis, decimalPlaces);
+			}*/
+			return this.server.formatTime(units, unitsPerSecond, decimalPlaces);
 		}
 	},
 	timerId: null,
