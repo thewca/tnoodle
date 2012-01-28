@@ -43,7 +43,7 @@ tnoodle.tnt = {
 		div.adopt(intInput);
 		div.adopt(new Element('label', { 'for': optionKey, html: ' ' + description }));
 		intInput.addEvent('change', inspectionChanged);
-		intInput.value = "" + config.get(optionKey, '');
+		intInput.value = "" + config.get(optionKey, def);
 		inspectionChanged();
 
 		return div;

@@ -1,5 +1,5 @@
 var TimerDisplay = new Class({
-	displayDecimalPlaces: 3,
+	displayDecimalPlaces: 2,
 	statsDecimalPlaces: 3,
 	CHAR_AR: 1/2, 
 	INSPECTION: 0,
