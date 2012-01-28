@@ -263,38 +263,42 @@ tnoodle.server = function(host, port) {
 	this.configuration = new Configuration();
 
 	var server = this;
-	this.formatTime = function(units, unitsPerSecond, decimalPlaces) {
-		if(Math.pow(10, decimalPlaces) > unitsPerSecond) {
-			decimalPlaces = unitsPerSecond;
-		}
-		if(units === null) {
+	this.formatTime = function(millis, decimalPlaces) {
+		if(millis === null) {
 			return "";
 		}
-		units = Math.round(units);
+		millis = Math.round(millis);
 		if(decimalPlaces !== 0) {
-			decimalPlaces = decimalPlaces || 2;
+			decimalPlaces = decimalPlaces || server.configuration.get('timer.statsDecimalPlaces');
 		}
 		
-		if(units == Infinity) {
+		if(millis == Infinity) {
 			return "DNF";
 		} else if(server.configuration.get('clockFormat', true)) {
-			return server.clockFormat(units, decimalPlaces);
+			return server.clockFormat(millis, decimalPlaces);
 		} else {
-			return (units*(1.0/unitsPerSecond)).toFixed(decimalPlaces);
+			return (millis*(1.0/unitsPerSecond)).toFixed(decimalPlaces);
 		}
 	};
-	this.clockFormat = function(timeCentis, decimalPlaces) {
-		timeCentis = Math.round(timeCentis);
+	this.clockFormat = function(timeMillis, decimalPlaces) {
+		timeMillis = Math.round(timeMillis);
 		if(decimalPlaces !== 0) {
-			decimalPlaces = decimalPlaces || 2;
+			decimalPlaces = decimalPlaces || server.configuration.get('timer.statsDecimalPlaces');
 		}
 		
-		var hours = (timeCentis / (100*60*60)).toInt();
-		timeCentis = timeCentis % (100*60*60);
-		var minutes = (timeCentis / (100*60)).toInt();
-		timeCentis = timeCentis % (100*60);
-		var seconds = (timeCentis / 100).toInt();
-		var centis = timeCentis % 100;
+		// Javascript behaves *retardedly* with small numbers (< 1e-6)
+		// > parseInt(1/(1000*60*60)+"")
+		//   2
+		// The guys at mootools opted not to change this behavior.
+		//  http://mootools.lighthouseapp.com/projects/2706/tickets/936
+		// Se we're very careful to use Math.floor instead of parseInt
+		// or mootool's .toInt().
+		var hours = Math.floor(timeMillis / (1000*60*60));
+		timeMillis = timeMillis % (1000*60*60);
+		var minutes = Math.floor(timeMillis / (1000*60));
+		timeMillis = timeMillis % (1000*60);
+		var seconds = Math.floor(timeMillis / 1000);
+		var millis = timeMillis % 1000;
 	
 		var clocked = "";
 		if(hours > 0) {
@@ -314,15 +318,18 @@ tnoodle.server = function(host, port) {
 		clocked += seconds;
 		if(decimalPlaces > 0) {
 			var decimals = "";
-			if(centis < 10) {
+			if(millis < 100) {
 				decimals += "0";
+				if(millis < 10) {
+					decimals += "0";
+				}
 			}
-			decimals += centis;
-			if(decimalPlaces <= 2) {
+			decimals += millis;
+			if(decimalPlaces <= 3) {
 				decimals = decimals.substring(0, decimalPlaces);
 			} else {
 				//just for completeness
-				for(var i = 2; i < decimalPlaces; i++) {
+				for(var i = 3; i < decimalPlaces; i++) {
 					decimals += "0";
 				}
 			}
@@ -445,8 +452,8 @@ tnoodle.server = function(host, port) {
 				copyTo(sesh.times[j], newTime);
 				// JSON doesn't treat Infinity like a number, so we
 				// have to cons it up ourselves.
-				if(newTime.centis === null && newTime.penalty == "DNF") {
-					newTime.centis = Infinity;
+				if(newTime.millis === null && newTime.penalty == "DNF") {
+					newTime.millis = Infinity;
 				}
 				sesh.times[j] = newTime;
 				newTime.setSession(sesh);
@@ -494,13 +501,28 @@ tnoodle.Time = function(time, scramble) {
 	this.getSession = function() {
 		return session;
 	};
+	this.decimalsAccurate = null;
+	this.setDecimalsAccurate = function(newDecimalsAccurate) {
+		this.decimalsAccurate = newDecimalsAccurate;
+	};
+	this.getDecimalsAccurate = function(newDecimalsAccurate) {
+		if(this.decimalsAccurate !== null) {
+			return this.decimalsAccurate;
+		}
+		return Infinity;
+	};
 	/* time can be either a number or a string */
 	this.format = function(key) {
-		key = key || 'centis';
+		key = key || 'millis';
 		var type = tnoodle.Time.timeKeyTypeMap[key];
 		if(type == tnoodle.Time) {
-			var time = server.formatTime(this[key]);
-			if(key == 'centis') {
+			var decimalPlaces = server.configuration.get('timer.statsDecimalPlaces');
+			var decimalPlacesAccurate = this.getDecimalsAccurate();
+			decimalPlaces = Math.min(decimalPlaces, decimalPlacesAccurate);
+			// TODO - go through all calls to formatTime and consider making decimal
+			// places a required argument?
+			var time = server.formatTime(this[key], decimalPlaces);
+			if(key == 'millis') {
 				if(this.penalty == "+2") {
 					time += "+";
 				}
@@ -566,32 +588,32 @@ tnoodle.Time = function(time, scramble) {
 			throw "Invalid seconds value";
 		}
 		
-		var valueCentis = 0;
-		var seconds_centis = seconds.split('.');
-		if(seconds_centis.length == 2 && seconds_centis[1].length > 0) {
-			valueCentis += Math.round(100*strictToInt(seconds_centis[1])*Math.pow(10, -seconds_centis[1].length));
-		} else if(seconds_centis.length > 2) {
+		var valueMillis = 0;
+		var seconds_millis = seconds.split('.');
+		if(seconds_millis.length == 2 && seconds_millis[1].length > 0) {
+			valueMillis += Math.round(1000*strictToInt(seconds_millis[1])*Math.pow(10, -seconds_millis[1].length));
+		} else if(seconds_millis.length > 2) {
 			throw "Too many decimal points";
 		}
-		if(seconds_centis[0].length > 0) {
-			valueCentis += 100*strictToInt(seconds_centis[0]);
+		if(seconds_millis[0].length > 0) {
+			valueMillis += 1000*strictToInt(seconds_millis[0]);
 		}
 		if(minutes) {
-			valueCentis += 60*100*strictToInt(minutes);
+			valueMillis += 60*1000*strictToInt(minutes);
 		}
 		if(hours) {
-			valueCentis += 60*60*100*strictToInt(hours);
+			valueMillis += 60*60*1000*strictToInt(hours);
 		}
 		
-		this.centis = valueCentis;
+		this.millis = valueMentis;
 		if(penalty == "+2") {
-			valueCentis -= 2*100;
+			valueMillis -= 2*1000;
 		}
-		if(valueCentis <= 0) {
+		if(valueMillis <= 0) {
 			throw "Can't have times &leq; 0";
 		}
-		this.rawCentis = valueCentis;
-		if(this.rawCentis > 10*365*24*60*100) {
+		this.rawMillis = valueMillis;
+		if(this.rawMillis > 10*365*24*60*1000) {
 			throw "Can't have times > 10 years";
 		}
 		this.setPenalty(penalty);
@@ -607,14 +629,14 @@ tnoodle.Time = function(time, scramble) {
 		}
 		this.penalty = penalty;
 		if(this.penalty == "+2") {
-			this.centis = this.rawCentis + 2*100; 
+			this.millis = this.rawMillis + 2*1000; 
 		} else if(this.penalty == "DNF") {
-			this.centis = Infinity;
-			if(this.rawCentis === undefined) {
-				this.rawCentis = Infinity;
+			this.millis = Infinity;
+			if(this.rawMillis === undefined) {
+				this.rawMillis = Infinity;
 			}
 		} else {
-			this.centis = this.rawCentis;
+			this.millis = this.rawMillis;
 		}
 
 		// Calling setComment updates this.tags
@@ -658,11 +680,10 @@ tnoodle.Time = function(time, scramble) {
 	this.comment = null;
 	
 	if(typeof(time) === "number") {
-		this.centis = this.rawCentis = time;
+		this.millis = this.rawMillis = time;
 	} else {
 		this.parse(time.toString());
 	}
-	
 };
 (function() { //neat trick to avoid cloverring our namespace with the nthEl function
 function nthEl(n) {
@@ -673,7 +694,7 @@ function nthEl(n) {
 var Time = tnoodle.Time;
 var keyInfo = [
 	[ 'index', '', null, Number ],
-	[ 'centis', 'Time', null, Time ],
+	[ 'millis', 'Time', null, Time ],
 	[ 'ra5', 'Ra 5', 'Trimmed average of 5', Time ],
 	[ 'ra12', 'Ra 12', 'Trimmed average of 12', Time ],
 	[ 'ra100', 'Ra 100', 'Trimmed average of 100', Time ],
@@ -777,14 +798,14 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			// We don't want to return a valid index,
 			// else some cells will get marked as the "best" date, tags, etc.
 			return {
-				best: { centis: null, index: null },
-				worst: { centis: null, index: null }
+				best: { millis: null, index: null },
+				worst: { millis: null, index: null }
 			};
 		}
 		var minKey = Infinity, maxKey = 0;
 		var minIndex = null, maxIndex = null;
 		for(var i = lastTimeIndex-size+1; i <= lastTimeIndex; i++) {
-			var val = key ? this.times[i][key] : this.times[i].centis;
+			var val = key ? this.times[i][key] : this.times[i].millis;
 			if(val !== null) {
 				//for min, we choose the *first* guy we can find
 				if(val < minKey || (minIndex === null && val == minKey)) {
@@ -805,8 +826,8 @@ tnoodle.Session = function(server, id, puzzle, event) {
 			maxKey = null;
 		}
 		return {
-			best: { centis: minKey, index: minIndex },
-			worst: { centis: maxKey, index: maxIndex }
+			best: { millis: minKey, index: minIndex },
+			worst: { millis: maxKey, index: maxIndex }
 		};
 	};
 	this.stdDev = function(lastTimeIndex, count) {
@@ -818,7 +839,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		if(times === null || times.length === 0) {
 			return null;
 		}
-		times = times.map(function(a) { return a.centis; });
+		times = times.map(function(a) { return a.millis; });
 		var ave = times.average();
 		if(ave === Infinity) {
 			return ave;
@@ -843,7 +864,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		if(times === null) {
 			return null;
 		}
-		return times.map(function(a) { return a.centis; }).average();
+		return times.map(function(a) { return a.millis; }).average();
 	}
 	function trimSolves(lastTimeIndex, size, trimmed) {
 		if(!$chk(trimmed)) {
@@ -860,7 +881,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		}
 		
 		var times = THIS.times.slice(firstSolve, lastTimeIndex+1);
-		times.sort(function(a, b) { return a.centis - b.centis; });
+		times.sort(function(a, b) { return a.millis - b.millis; });
 		times.splice(0, trimmed/2); //trim the best trimmed/2 solves
 		times.splice(times.length - trimmed/2, times.length); //trim the worst trimmed/2 solves
 		times.sort(function(a, b) { return a.index - b.index; });
@@ -993,9 +1014,9 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		var average = f(computeRA(lastTimeIndex, raSize));
 		var stdDev = f(this.stdDev(lastTimeIndex, raSize));
 
-		var best_worst = this.bestWorst('centis', lastTimeIndex, raSize);
-		var best = f(best_worst.best.centis);
-		var worst = f(best_worst.worst.centis);
+		var best_worst = this.bestWorst('millis', lastTimeIndex, raSize);
+		var best = f(best_worst.best.millis);
+		var worst = f(best_worst.worst.millis);
 
 		var detailedTimes = '';
 		var simpleTimes = '';

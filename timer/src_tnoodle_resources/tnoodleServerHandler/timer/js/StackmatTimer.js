@@ -44,8 +44,10 @@ var StackmatTimer = new Class({
 				return;
 			}
 
+			var millis = state.units*(1000.0/state.unitsPerSecond);
+			var decimalsAccurate = Math.round(Math.log(state.unitsPerSecond)/Math.log(10));
 			if(state.running) {
-				this.timerDisplay.startTimer(state.units, state.unitsPerSecond);
+				this.timerDisplay.startTimer(millis, decimalsAccurate);
 				this.acceptedTime_ = null;
 			} else {
 				if(state.units === 0) {
@@ -66,7 +68,7 @@ var StackmatTimer = new Class({
 					// New time!
 					// Note that this does mean we treat 1.298 in gen3 form, and then
 					// 1.29 in gen2 form as a new time.
-					this.timerDisplay.stopTimer(state.units, state.unitsPerSecond);
+					this.timerDisplay.stopTimer(millis, decimalsAccurate);
 					this.acceptedTimeUnits_ = state.units;
 					this.acceptedTimeUnitsPerSecond_ = state.unitsPerSecond;
 				}

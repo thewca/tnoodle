@@ -157,22 +157,6 @@
 	-create an editable table superclass for the editable list & times table
 -read times/metronome
 
--flex stackmat library
-	-autodetect
-		-stackmat level? this might just work
-		-invertedness
-		-gen2 vs gen3
-	-changing default line in doesn't take effect until after refreshing
-	-does stackmat config popup when there are errors?
-	+MUST have a good debug page
-	-interpolate stackmat times?
-	-on load, applet sometimes takes a little while to start...have some way of recovering from ping!
-	-on page load, timer sometimes is defocused until i click on it...
-	-unplugging/turning off stackmat doesn't unfocus timer?
-	-tnt doesn't even support thousandths place...
-		-configure # decimal points on timer display and in times table
-	-test on firefox! and safari!
-
 -provide some system for uploading your own image?
 -top row of times area shouldn't wrap
 -get rid of multiple drop down arrows?
@@ -195,12 +179,26 @@
 	-opt in to key repeat
 		-for example: resizing the scramble
 	-show keyboard layout
-
 -should scramble image be resizable?
 
 ### stackmat-flash
++autodetect
+	+stackmat level? this might just work
+	+invertedness
+	+gen2 vs gen3
++does stackmat config popup when there are errors?
++MUST have a good debug page
++interpolate stackmat times?
++unplugging/turning off stackmat doesn't unfocus timer?
+
 -create pretty tutorial on stacktest.html
 	-pictures! videos! screenshots! links to equipment!
+-changing default line in doesn't take effect until after refreshing
+-on load, applet sometimes takes a little while to start...have some way of recovering from ping!
+-on page load, timer sometimes is defocused until i click on it...
+-tnt doesn't even support thousandths place...
+	-configure # decimal points on timer display and in times table
+-test on firefox! and safari!
 
 ### webscrambles
 +#5 incremental clock scrambles don't show pin positions

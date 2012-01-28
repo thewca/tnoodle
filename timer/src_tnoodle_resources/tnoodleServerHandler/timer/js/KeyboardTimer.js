@@ -1,5 +1,6 @@
 var KeyboardTimer = new Class({
 	delay: 500, //mandatory delay in ms to wait between stopping the timer and starting the timer again
+	_hasDelayPassed: true,
 	options_: [],
 	initialize: function(timerDisplay, configuration, shortcutManager) {
 		this.timerDisplay = timerDisplay;
@@ -62,6 +63,11 @@ var KeyboardTimer = new Class({
 			}
 			this.pendingTime = true;
 			this.timerDisplay.stopTimer();
+			this._hasDelayPassed = false;
+			setTimeout(function() {
+				this._hasDelayPassed = true;
+				this.timerDisplay.redraw();
+			}.bind(this), this.delay);
 			e.stop();
 			return false;
 		} else {
@@ -100,7 +106,7 @@ var KeyboardTimer = new Class({
 			}
 		} else if(this.keysAreDown && !this.keysDown()) {
 			this.keysAreDown = false;
-			if(this._hasDelayPassed()) {
+			if(this._hasDelayPassed) {
 				if(this.timerDisplay.INSPECTION > 0 && !this.timerDisplay.inspecting) {
 					// if inspection's on and we're not inspecting, let's start!
 					this.timerDisplay.startInspection();
@@ -167,18 +173,12 @@ var KeyboardTimer = new Class({
 			return KeyboardManager.keys.getKeys().containsAll(startKeys);
 		}
 	},
-	_hasDelayPassed: function() {
-		var timeSinceStoppingTimer = new Date().getTime() - this.timerDisplay.timerStop;
-		assert(timeSinceStoppingTimer >= 0);
-		return timeSinceStoppingTimer > this.delay;
-	},
-
 	isOn: function() {
 		return true;
 	},
 	isArmed: function() {
 		var keysDown = this.keysDown();
-		return this.keysAreDown && keysDown && this._hasDelayPassed();
+		return this.keysAreDown && keysDown && this._hasDelayPassed;
 	},
 	getOptions: function() {
 		return this.options_;

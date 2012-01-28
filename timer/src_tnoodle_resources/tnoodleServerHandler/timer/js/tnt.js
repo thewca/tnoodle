@@ -20,6 +20,34 @@ tnoodle.tnt = {
 		});
 		return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': description, 'for': optionKey }));
 	},
+	createIntOptionBox: function(config, optionKey, description, def, changeListener, min, max) {
+		
+		var div = new Element('div');
+		var inspectionChanged = function(e) {
+			var str = intInput.value;
+			if(!str.match(/^\d+$/)) {
+				str = '0'; //TODO so sleepy...
+				intInput.value = str;
+			}
+			var val = str.toInt(10);
+			config.set(optionKey, val);
+			if(changeListener) {
+				changeListener(val);
+			}
+		}.bind(this);
+		var intInput = document.createElement('input');
+        intInput.setAttribute('type', 'number');
+        intInput.setProperties({'type': 'number', 'name': optionKey, 'min': "0"});
+        intInput.setStyle('width', 52);
+        intInput.setStyle('margin-left', 2);
+		div.adopt(intInput);
+		div.adopt(new Element('label', { 'for': optionKey, html: ' ' + description }));
+		intInput.addEvent('change', inspectionChanged);
+		intInput.value = "" + config.get(optionKey, '');
+		inspectionChanged();
+
+		return div;
+	},
 	createOptions: function(showCallback, hiddenCallback, canHide) {
 		var optionsButton = new Element('div', { html: 'v', 'class': 'optionsButton' });
 		optionsButton.setStyles({

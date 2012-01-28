@@ -1,6 +1,6 @@
 var TimerDisplay = new Class({
-	decimalPlaces: 2,//TODO need an option for times table digits!
-	frequency: 0.01,
+	displayDecimalPlaces: 3,
+	statsDecimalPlaces: 3,
 	CHAR_AR: 1/2, 
 	INSPECTION: 0,
 	HTML5_FULLSCREEN: true,
@@ -30,7 +30,7 @@ var TimerDisplay = new Class({
 		function shownCallback() { }
 		function hiddenCallback() { }
 		function canHide() {
-			return document.activeElement != updateFrequency && document.activeElement != inspectionSeconds;
+			return !document.activeElement.isOrIsChild(optionsDiv);
 		}
 		var options = tnoodle.tnt.createOptions(shownCallback, hiddenCallback, canHide);
 		var optionsDiv = options.div;
@@ -42,52 +42,20 @@ var TimerDisplay = new Class({
 		});
 		optionsButton.inject(parent);
 		
-		var updateFrequency = new Element('input', {type: 'text', 'name': 'timer.frequency', size: 3});
-		var frequencyChanged = function(e) {
-			if(!updateFrequency.value.match(/^\d+(\.\d*)?|\.\d+$/)) {
-				updateFrequency.value = "0.01";
-			}
-			
-			if(updateFrequency.value.indexOf('.') < 0) {
-				this.decimalPlaces = 0;
-			} else {
-				this.decimalPlaces = updateFrequency.value.length - updateFrequency.value.indexOf('.') - 1;
-			}
-			
-			server.configuration.set('timer.frequency', updateFrequency.value);
-			this.frequency = updateFrequency.value.toFloat();
+		var displayDecimalPlacesChanged = function(val) {
+			this.displayDecimalPlaces = val;
+			this.redraw();
 		}.bind(this);
-		updateFrequency.addEvent('change', frequencyChanged);
-		updateFrequency.value = this.config.get('timer.frequency', "0.01");
-		frequencyChanged();
-		
-		var frequencyDiv = new Element('div');
-		frequencyDiv.adopt(updateFrequency);
-		frequencyDiv.adopt(new Element('label', { 'for': 'timer.frequency', html: 'Update frequency (seconds)' }));
-		optionsDiv.adopt(frequencyDiv);
-		
-		var inspectionDiv = new Element('div');
-		var inspectionChanged = function(e) {
-			var str = inspectionSeconds.value;
-			if(!str.match(/^\d+$/)) {
-				str = '0'; //TODO so sleepy...
-				inspectionSeconds.value = str;
-			}
-			this.INSPECTION = str.toInt(10);
-			server.configuration.set('timer.inspectionSeconds', this.INSPECTION);
+		optionsDiv.adopt(tnoodle.tnt.createIntOptionBox(server.configuration, 'timer.displayDecimalPlaces', 'decimals to display', this.displayDecimalPlaces, displayDecimalPlacesChanged, Infinity));
+		var statsDecimalPlacesChanged = function(val) {
+			this.statsDecimalPlaces = val;
 		}.bind(this);
-		var inspectionSeconds = document.createElement('input');
-        inspectionSeconds.setAttribute('type', 'number');
-        inspectionSeconds.setProperties({'type': 'number', 'name': 'timer.inspectionSeconds', 'min': "0"});
-        inspectionSeconds.setStyle('width', 52);
-        inspectionSeconds.setStyle('margin-left', 2);
-		inspectionDiv.adopt(inspectionSeconds);
-		inspectionDiv.adopt(new Element('label', { 'for': 'timer.inspectionSeconds', html: 'second WCA inspection' }));
-		inspectionSeconds.addEvent('change', inspectionChanged);
-		optionsDiv.adopt(inspectionDiv);
-		inspectionSeconds.value = "" + this.config.get('timer.inspectionSeconds', '');
-		inspectionChanged();
+		optionsDiv.adopt(tnoodle.tnt.createIntOptionBox(server.configuration, 'timer.statsDecimalPlaces', 'decimals to use in stats', this.statsDecimalPlaces, statsDecimalPlacesChanged, Infinity));
 
+		var inspectionChanged = function(val) {
+			this.INSPECTION = val;
+		}.bind(this);
+		optionsDiv.adopt(tnoodle.tnt.createIntOptionBox(server.configuration, 'timer.inspectionSeconds', 'second WCA inspection', this.INSPECTION, inspectionChanged, Infinity));
 		optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
 		
 		var availTimersFieldset = document.createElement('fieldset');
@@ -211,10 +179,12 @@ var TimerDisplay = new Class({
 			this.inspectionStart = null;
 		}
 	},
-	startTimer: function(elapsedUnits, unitsPerSecond) {
-			// TODO - update tnt to support arbitrary precision!
-		if(!elapsedUnits) {
-			elapsedUnits = 0;
+	startTimer: function(elapsedMillis, decimalsAccurate) {
+		if(!elapsedMillis) {
+			elapsedMillis = 0;
+			this.decimalsAccurate = null;
+		} else {
+			this.decimalsAccurate = decimalsAccurate;
 		}
 		if(!this.timing) {
 			// The stackmat will call startTimer repeatedly without stopping the timer.
@@ -234,17 +204,15 @@ var TimerDisplay = new Class({
 			}
 		}
 
-		var unitsPerMillisecond = (state.unitsPerSecond * (1.0 / 1000));
-		var elapsedMillis = Math.floor(elapsedUnits / unitsPerMillisecond);
 		this.timerStart = new Date().getTime() - elapsedMillis;
 	},
-	stopTimer: function(elapsedUnits, unitsPerSecond) {
-		if(!elapsedUnits) {
+	stopTimer: function(elapsedMillis, decimalsAccurate) {
+		if(!elapsedMillis) {
 			this.timerStop = new Date().getTime();
+			this.decimalsAccurate = null;
 		} else {
-			var unitsPerMillisecond = (state.unitsPerSecond * (1.0 / 1000));
-			var elapsedMillis = Math.floor(elapsedUnits / unitsPerMillisecond);
 			this.timerStop = this.timerStart + elapsedMillis;
+			this.decimalsAccurate = decimalsAccurate;
 		}
 		// Note that we don't assert this.timing. This is because we want to pick
 		// up a new time when a stopped stackmat is plugged in.
@@ -265,7 +233,8 @@ var TimerDisplay = new Class({
 		}
 	},
 	createNewTime: function() {
-		var time = new tnoodle.Time(this.getTimeCentis(), this.scramble);
+		var time = new tnoodle.Time(this.getTimeMillis(), this.scramble);
+		time.setDecimalsAccurate(this.decimalsAccurate);
 		var penalty = this.getPenalty();
 		if(penalty) {
 			time.setPenalty(penalty);
@@ -283,12 +252,9 @@ var TimerDisplay = new Class({
 		//the timer lags if we don't queue up the addition of the time like this
 		setTimeout(addTime, 0);
 	},
-	getTimeUnits: function() {
+	getTimeMillis: function() {
 		var end = (this.timing ? new Date().getTime() : this.timerStop);
 		return end - this.timerStart;
-	},
-	getTimeUnitsPerSecond: function() {
-		return 1000;
 	},
 	getInspectionElapsedSeconds: function() {
 		var time = this.inspecting ? new Date().getTime() : this.timerStart;
@@ -308,19 +274,21 @@ var TimerDisplay = new Class({
 	},
 	//mootools doesn't like having a toString method? wtf?!
 	stringy: function() {
+		if(!this.enabledTimer) {
+			return "";
+		}
 		if(!this.enabledTimer.isOn()) {
 			return "Timer off";
 		}
 		if(this.enabledTimer.isArmed() && !this.inspecting) {
 			// We want people to see the amount of time they will have for
-			// inspection when the timer is armed, rather than a silly
-			// 0:00.00.
+			// inspection when the timer is armed, rather than a silly 0.
 			if(this.INSPECTION && this.enabledTimer.stringy() != 'Stackmat') {
 				// We don't show the amount of inspection time if using a stackmat,
 				// because inspection isn't started by the stackmat pads.
 				return ""+this.INSPECTION;
 			} else {
-				return this.server.formatTime(0, this.decimalPlaces);
+				return this.server.formatTime(0, this.displayDecimalPlaces);
 			}
 		}
 
@@ -337,22 +305,15 @@ var TimerDisplay = new Class({
 				}
 			}
 
-			var units = this.getTimeUnits();
-			var decimalPlaces = Math.log(this.getTimeUnitsPerSecond(), 10);
-			/*<<< TODO - do something with this.frequency!
-			   if(this.timing) {
-				if(this.frequency === 0) {
-					return "...";
-				}
-				centis = (this.frequency*100)*(Math.round(centis / (this.frequency*100)));
-				decimalPlaces = this.decimalPlaces;
-			}*/
-			return this.server.formatTime(units, unitsPerSecond, decimalPlaces);
+			var millis = this.getTimeMillis();
+			return this.server.formatTime(millis, this.displayDecimalPlaces);
 		}
 	},
 	timerId: null,
 	fireRedraw: function() {
 		this.redraw();
+
+		var updatesPerSecond = Math.pow(10, this.displayDecimalPlaces);
 		setTimeout(function() {
 			if(this.timerId === null) {
 				// This means stopRender was called,
@@ -360,7 +321,7 @@ var TimerDisplay = new Class({
 				return;
 			}
 			this.timerId = requestAnimFrame(this.fireRedraw.bind(this), this.display);
-		}.bind(this), this.frequency*1000);
+		}.bind(this), 1000/updatesPerSecond);
 	},
 	startRender: function() {
 		if(this.timerId === null) {

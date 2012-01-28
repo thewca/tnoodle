@@ -100,14 +100,14 @@ var TimesTable = new Class({
 					cell.title = 'This is the standard deviation of all times that count toward your average';
 				} else {
 					var best = this.session.bestWorst(key).best;
-					cell.set('html', format(best.centis));
+					cell.set('html', format(best.millis));
 					cell.removeClass('bestRA');
 					if(best.index !== null) {
 						cell.addClass('bestTime');
 						cell.addClass('bestRA');
 
 						cell.setStyle('cursor', 'pointer');
-						if(key != 'centis') {
+						if(key != 'millis') {
 							cell.title = 'Click to show stats for best ' + key;
 							cell.addEvent('click', table.raBoxClicked);
 						} else {
@@ -116,7 +116,7 @@ var TimesTable = new Class({
 					} else {
 						cell.setStyle('cursor', '');
 						cell.title = '';
-						if(key != 'centis') {
+						if(key != 'millis') {
 							// We only set the popup event for RAs
 							cell.removeEvent('click', table.raBoxClicked);
 						}
@@ -259,7 +259,7 @@ var TimesTable = new Class({
 				// The click listener will get set/unset whenever
 				// we refresh the info row. This is because we don't
 				// always want to enable clicking.
-			} else if(key == "centis") {
+			} else if(key == "millis") {
 				td.addEvent('click', function(e) {
 					var bestIndex = table.session.bestWorst(key).best.index;
 					var rows = table.tbody.getChildren();
@@ -334,7 +334,7 @@ var TimesTable = new Class({
 		});
 		columnOptions.button.setStyle('width', SCROLLBAR_WIDTH);
 		
-		var defaultCols = [ 'index', 'centis', 'ra5', 'ra12', 'ra100', 'sessionAve' ];
+		var defaultCols = [ 'index', 'millis', 'ra5', 'ra12', 'ra100', 'sessionAve' ];
 		var initing = true;
 		var refreshCols = function() {
 			if(initing) {
@@ -346,7 +346,7 @@ var TimesTable = new Class({
 			var col = this.cols[i];
 			// We need at least these three columns to always be present
 			// in order to impose a minimum size on the times table.
-			if(col == 'centis') {// || col == 'index' || col == 'sessionAve') {
+			if(col == 'millis') {// || col == 'index' || col == 'sessionAve') {
 				// We set these columns to be visible, just in case they weren't
 				// This can happen in an old version of tnt.
 				server.configuration.set('table.' + col, true);
@@ -465,10 +465,10 @@ var TimesTable = new Class({
 				} else {
 					// This is a little tricky. The table cell has a key attribute
 					// that we use to ensure that times are only edited by clicking on
-					// the 'centis' column. However, if the row is already being edited,
+					// the 'millis' column. However, if the row is already being edited,
 					// then the target is a text field that does not have a "key"
 					// attribute.
-					var edit = selectedRows.contains(row) && (row.editing || e.target.key == 'centis');
+					var edit = selectedRows.contains(row) && (row.editing || e.target.key == 'millis');
 					// This poorly named function ensures that row gets selected,
 					// which enables it for editing the next time it is clicked on.
 					deselectRows(row);
@@ -652,9 +652,9 @@ var TimesTable = new Class({
 				} else if(timeHoverDiv.time !== null) {
 					timeHoverDiv.commentArea.setText(time.getComment());
 					timeHoverDiv.adopt(timeHoverDiv.form);
-					noPenalty.setText(server.formatTime(time.rawCentis));
+					noPenalty.setText(server.formatTime(time.rawMillis));
 					dnf.setText("DNF");
-					plusTwo.setText(server.formatTime(time.rawCentis+2*100)+"+");
+					plusTwo.setText(server.formatTime(time.rawMillis+2*100)+"+");
 
 					// Select the correct penalty
 					var penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };
@@ -935,7 +935,7 @@ var TimesTable = new Class({
 				var key = table.cols[col];
 				cells[col].key = key;
 				if(time === null) {
-					if(key == 'centis') {
+					if(key == 'millis') {
 						if(tr.selected) {
 							tr.editing = true;
 							this.editCell(cells[col], null);
@@ -956,7 +956,7 @@ var TimesTable = new Class({
 						cells[col].set('html', time.index + 1);
 						cells[col].removeClass('deleteTime');
 					}
-				} else if(key == 'centis') {
+				} else if(key == 'millis') {
 					if(tr.editing) {
 						this.editCell(cells[col], time);
 					} else {
