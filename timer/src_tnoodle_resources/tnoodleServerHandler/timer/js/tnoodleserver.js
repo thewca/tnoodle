@@ -605,7 +605,7 @@ tnoodle.Time = function(time, scramble) {
 			valueMillis += 60*60*1000*strictToInt(hours);
 		}
 		
-		this.millis = valueMentis;
+		this.millis = valueMillis;
 		if(penalty == "+2") {
 			valueMillis -= 2*1000;
 		}
