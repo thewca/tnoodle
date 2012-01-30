@@ -9,6 +9,8 @@ package {
 		public var running:Boolean;
 		public var unknownRunning:Boolean;
 
+		public var signalHeader:int;
+
 		public function StackmatState(state:StackmatState=null) {
 			if(!state) {
 				return;
@@ -20,6 +22,8 @@ package {
 			this.leftHand = state.leftHand;
 			this.rightHand = state.rightHand;
 			this.running = state.running;
+
+			this.signalHeader = state.signalHeader;
 		}
 
 	}

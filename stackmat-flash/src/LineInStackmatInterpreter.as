@@ -268,7 +268,8 @@ package {
 			function byteToInt(b:int):int {
 				return b - 48;
 			}
-			var byteN:int = 1;
+			var byteN:int = 0;
+			state.signalHeader = bytes[byteN++];
 			var seconds:int = byteToInt(bytes[byteN++])*60 + byteToInt(bytes[byteN++])*10 + byteToInt(bytes[byteN++]);
 			if(bytes.length == bytesPerGen2Period) {
 				var centis:int = seconds*100 + byteToInt(bytes[byteN++])*10 + byteToInt(bytes[byteN++]);
