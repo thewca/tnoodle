@@ -654,7 +654,7 @@ var TimesTable = new Class({
 					timeHoverDiv.adopt(timeHoverDiv.form);
 					noPenalty.setText(server.formatTime(time.rawMillis));
 					dnf.setText("DNF");
-					plusTwo.setText(server.formatTime(time.rawMillis+2*100)+"+");
+					plusTwo.setText(server.formatTime(time.rawMillis+2*1000)+"+");
 
 					// Select the correct penalty
 					var penalties = { "null": noPenalty, "DNF": dnf, "+2": plusTwo };

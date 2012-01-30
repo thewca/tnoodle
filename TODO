@@ -196,8 +196,6 @@
 -changing default line in doesn't take effect until after refreshing
 -on load, applet sometimes takes a little while to start...have some way of recovering from ping!
 -on page load, timer sometimes is defocused until i click on it...
--tnt doesn't even support thousandths place...
-	-configure # decimal points on timer display and in times table
 -test on firefox! and safari!
 
 ### webscrambles
