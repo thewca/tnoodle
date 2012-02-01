@@ -326,11 +326,13 @@ class tmt:
 			newStdout = p.stdout.read()
 			if newStdout:
 				stdout += newStdout
-				print newStdout
+				if showStatus:
+					print newStdout
 			newStderr = p.stderr.read()
 			if newStderr:
 				stderr += newStderr
-				print newStderr
+				if showStatus:
+					print newStderr
 		return p.returncode, stdout, stderr
 
 	def showCmd(self, argv):
