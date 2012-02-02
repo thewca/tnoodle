@@ -170,8 +170,8 @@ class tmt:
 			assert False, "not yet implemented"
 		else:
 			print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
-	
-	def _lint(self):
+
+	def _getFilesList(self):
 		lsFilesCmd = None
 		if tmt.args.all:
 			# Check every file under version control.
@@ -180,13 +180,45 @@ class tmt:
 			# Check the files that git believes have been edited.
 			lsFilesCmd = "git diff --cached --name-only"
 		files = os.popen(lsFilesCmd).read().split('\n')
-
+		return files
+	
+	def _lint(self):
+		files = self._getFilesList()
 		failures = lint.lint(files)
 		if failures:
 			print
 			print "*********%s errors found**********" % len(failures)
 			print
 			sys.exit('\n'.join(failures))
+
+	def _strings(self):
+		files = self._getFilesList()
+		commentOrStringRe = re.compile(r"(\"(\\.|[^\\\"])*\"|'(\\.|[^\\'])*'|//[^\n]*|/(\\.|[^\\\/\n])*/|/\*.*?\*/)", re.DOTALL)
+		externalizeableFileExts = set((".js", ".java"))
+		for f in files:
+			if not os.path.exists(f):
+				# This file must have been deleted as part of this commit.
+				continue
+			if os.path.isdir(f):
+				continue
+			fileName, ext = os.path.splitext(f)
+			if ext not in externalizeableFileExts:
+				continue
+
+			contents = file(f).read()
+
+			offsetToLineNumber = []
+			lineNumber = 1
+			for ch in contents:
+				if ch == '\n':
+					lineNumber += 1
+				offsetToLineNumber.append(lineNumber)
+
+			for match in commentOrStringRe.finditer(contents):
+				start, end = match.span()
+				s = match.group(0)
+				if s.startswith('"') or s.startswith("'"):
+					print "Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s)
 
 	def _make(self, projectName=None, command=None):
 		if projectName == None:
@@ -279,15 +311,26 @@ class tmt:
 
 		desc = "Run JSLint on some (or all) js and html files. Also checks " +\
 			   "for appearances of characters we don't allow in the repository"
-		parser_graph = subparsers.add_parser(
+		parser_lint = subparsers.add_parser(
 			'lint',
 			help=desc, description=desc,
 			formatter_class=ArgumentDefaultsHelpFormatter)
-		parser_graph.add_argument(
+		parser_lint.add_argument(
 			'--all', '-a',
 			action="store_true", default=False,
-			help='Lint all files, even if they have been edited')
-		parser_graph.set_defaults(func=self._lint)
+			help="Lint all files, even if they haven't been edited")
+		parser_lint.set_defaults(func=self._lint)
+
+		desc = "Scan files for strings ripe for i18n."
+		parser_strings = subparsers.add_parser(
+			'strings',
+			help=desc, description=desc,
+			formatter_class=ArgumentDefaultsHelpFormatter)
+		parser_strings.add_argument(
+			'--all', '-a',
+			action="store_true", default=False,
+			help="Check all files, even if they haven't been edited")
+		parser_strings.set_defaults(func=self._strings)
 	
 	def memoize(self, func):
 		d = {}

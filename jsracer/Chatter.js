@@ -96,7 +96,7 @@ Chatter.Chatter = function(gameMaster) {
 		if(key in unconfirmedMessages) {
 			message = unconfirmedMessages[key];
 			messageDiv = message.div;
-			// To keep the ordering of the messages correct, we must remove and then re-add this messageDiv;
+			// To keep the ordering of the messages correct, we must remove and then re-add this messageDiv
 			// We could also move all other unconfirmedMessages to the bottom, I'm not sure what makes
 			// the most sense.
 			messageDiv.remove();

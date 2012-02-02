@@ -100,9 +100,9 @@ def lint(files):
 			if is_binary(f):
 				#print "Skipping binary file %s" % f
 				pass
+			elif os.path.islink(f):
+				pass
 			else:
-				if os.path.islink(f):
-					continue
 				lines = file(f).read().split("\n")
 				for lineNumber, line in enumerate(lines):
 					for uncommitablePhrase in UNCOMMITABLE_PHRASES:
