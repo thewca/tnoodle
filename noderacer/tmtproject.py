@@ -6,15 +6,19 @@ class Project(tmt.TmtProject):
 		return [ tmt.TmtProject.projects['jsracer'] ]
 
 	def compile(self):
-		oldDir = os.path.abspath('.')
-		os.chdir(tmt.projectName())
+		oldDir = self._chdir()
 		retVal, stdout, stderr = tmt.runCmd([ 'npm', 'install', '-d' ], showStatus=True)
 		assert retVal == 0
 		os.chdir(oldDir)
 
-	def run(self):
+	def _chdir( self ):
 		oldDir = os.path.abspath('.')
+		os.chdir(tmt.projectName())
+		return oldDir
+
+	def run(self):
 		self.compile()
+		oldDir = self._chdir()
 		tmt.runCmd([ 'node', 'noderacer.js' ], showStatus=True)
 		os.chdir(oldDir)
 

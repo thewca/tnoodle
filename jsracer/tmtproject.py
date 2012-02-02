@@ -4,6 +4,10 @@ class Project(tmt.TmtProject):
 	def getDependencies(self):
 		return [ tmt.TmtProject.projects['twisty.js'] ]
 
+	def getClasspathEntities(self, *args, **keyargs):
+		# This is here just to make jracer's getClasspathEntities happy
+		return set()
+
 	def compile(self):
 		pass
 
