@@ -196,10 +196,10 @@ function User(nick_, clientId_) {
         solveMillis: solveMillis 
       };
       var solveInstance = new Solve(storeObject);
-      console.log(moves);//<<<
+      console.log(moves);
       console.log(randomState);
       console.log(that.channel.gameInfo);
-      console.log(solveMillis);//<<<
+      console.log(solveMillis);
       // TODO - store inspection time!!!
 	  // We clear randomState because we have now solved the puzzle.
 	  randomState = null;
@@ -213,7 +213,7 @@ function User(nick_, clientId_) {
     }
   };
 
-	var that = this;
+  var that = this;
 }
 
 var channels = {};
@@ -370,13 +370,13 @@ function auth_admin(func) {
 everyone.now.sendGameInfo = auth_admin(function(user, gameInfo, callback) {
 	var channel = user.channel;
 	channel.getGroup().now.handleGameInfo(gameInfo);
-  channel.gameInfo = gameInfo;
+	channel.gameInfo = gameInfo;
 });
 
 everyone.now.sendRandomState = auth_admin(function(user, randomState, callback) {
 	var channel = user.channel;
 	channel.getGroup().now.handleRandomState(randomState);
-  channel.setRandomState(randomState);
+	channel.setRandomState(randomState);
 });
 
 everyone.now.sendMoveState = auth(function(user, moveState, callback) {

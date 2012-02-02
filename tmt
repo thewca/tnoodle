@@ -775,7 +775,16 @@ class EclipseProject(TmtProject):
 			if hasattr(project, 'jarFile'):
 				jarDeps.append(project)
 			else:
-				javaDeps.append(project)
+				if isinstance(project, tmt.EclipseProject):
+					# If we depend on a project that isn't an eclipse project,
+					# we're probably symlinking into that project, so there's
+					# no need to slurp in any of its resources manually.
+					# One example of where we do this is for js projects.
+					# In face, we don't even need these projects to show up in the
+					# dependency graph, but it's nice to keep "tmt graph" up to date.
+					# TODO - symlinking into other projects isn't a great idea,
+					# what if a -> c, a -> b, and b -> c ?
+					javaDeps.append(project)
 		if jarDeps:
 			extractedLibDir = tempfile.mkdtemp()
 			for jarDep in jarDeps:

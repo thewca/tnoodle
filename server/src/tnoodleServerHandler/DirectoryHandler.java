@@ -101,7 +101,11 @@ public class DirectoryHandler extends SafeHttpHandler {
 			f = new File(f, "index.html");
 			if(!f.exists()) {
 				String[] fileNames = directory.list();
-				sendText(t, Utils.join(fileNames, "\n"));
+				if(fileNames.length == 0) {
+					sendText(t, "[empty directory]");
+				} else {
+					sendText(t, Utils.join(fileNames, "\n"));
+				}
 				return;
 			}
 		}
