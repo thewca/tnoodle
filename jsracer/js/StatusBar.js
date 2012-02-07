@@ -35,12 +35,14 @@ var StatusBar = {};
 		if(errors.length > 0) {
 			connectionStatus.empty();
 			for(var i = 0; i < errors.length; i++) {
-				connectionStatus.append($('<div />').text(errors[i]));
+				var div = document.createElement('div');
+				div.appendText(errors[i]);
+				connectionStatus.append(div);
 			}
 
 			// We wait a moment before showing the status bar to prevent flickering
 			// (when an error gets added and the almost immediately removed)
-			if(!pendingShow && !$(connectionStatus).is(":visible")) {
+			if(!pendingShow && !connectionStatus.isDisplayed()) {
 				pendingShow = setTimeout(function() {
 					pendingShow = null;
 					assert(errors.length > 0);
@@ -56,10 +58,10 @@ var StatusBar = {};
 			}
 		}
 	};
-	$(document).ready(function() {
-		connectionStatus = $(document.createElement('div'));
+	$(document).addEvent('ready', function() {
+		connectionStatus = document.createElement('div');
 		connectionStatus.addClass('statusBar');
-		$('body').append(connectionStatus);
+		document.body.appendChild(connectionStatus);
 		StatusBar.refresh();
 	});
 })();

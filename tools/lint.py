@@ -19,7 +19,7 @@ JSLINT_IGNORED_FILES = {
 	'jsracer/GameMasterGui.js',
 	'jsracer/jquery-1.6.4.js',
 	'jsracer/jquery.dateFormat-1.0.js',
-	'jsracer/stacktrace.js',
+	'jsracer/js/stacktrace.js',
 	'jsracer/assert.js',
 	'noderacer/mongeesing.js',
 	'noderacer/noderacer.js'

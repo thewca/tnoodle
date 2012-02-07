@@ -17,7 +17,7 @@ GameMaster.GameMaster = function() {
 	this.gui = gui; // debugging
 	var chatter = new Chatter.Chatter(this);
 	var vertSplit = new Split.VerticalSplit(gui.element, chatter.element);
-	$('body').append(vertSplit.element);
+	document.body.appendChild(vertSplit.element);
 
 	var gameInfo = null;
 	this.getGameInfo = function() {

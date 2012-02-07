@@ -6,41 +6,43 @@ var SHOW_TIMESTAMP_DELAY_SECONDS = 60;
 var SCROLL_AMOUNT = 40;
 
 Chatter.Chatter = function(gameMaster) {
-	var messageArea = $('<div/>');
+	var messageArea = document.createElement('div');
 	messageArea.addClass('messageArea');
-	var chatBox = $('<textarea/>');
+	var chatBox = document.createElement('textarea');
 	chatBox.addClass('chatBox');
-	chatBox.keydown(function(e) {
-		if(e.which == 27) { //escape
+	chatBox.addEvent('keydown', function(e) {
+		var keycode = e.code;
+		if(keycode == 27) { //escape
 			that.element.parent.setRightElementVisible(false);
-		} else if(e.which == 33) {
+		} else if(keycode == 33) {
 			messageArea.scrollTop(messageArea.scrollTop() - SCROLL_AMOUNT);
 			e.preventDefault();
-		} else if(e.which == 34) {
+		} else if(keycode == 34) {
 			messageArea.scrollTop(messageArea.scrollTop() + SCROLL_AMOUNT);
 			e.preventDefault();
 		}
 	});
-	chatBox.focus(function(e) {
+	chatBox.addEvent('focus', function(e) {
 		if(!visible) {
 			e.preventDefault();
 			that.element.parent.setRightElementVisible(true);
 		}
 	});
-	var chatArea = $('<div/>');
+	var chatArea = document.createElement('div');
 	chatArea.addClass('chatArea');
 
-	chatArea.click(function(e) {
+	chatArea.addEvent('click', function(e) {
 		that.element.parent.setRightElementVisible(true);
 	});
 	
-	chatArea.append(messageArea);
-	chatArea.append(chatBox);
+	chatArea.appendChild(messageArea);
+	chatArea.appendChild(chatBox);
 	var messageId = 0;
-	chatBox.keypress(function(e) {
-		if(e.which == 13 && !e.shiftKey) {
+	chatBox.addEvent('keypress', function(e) {
+		var keycode = e.code;
+		if(keycode == 13 && !e.shiftKey) {
 			e.preventDefault();
-			var text = chatBox.val();
+			var text = chatBox.value;
 			if(text.match(/^\s*$/)) {
 				return;
 			}
@@ -52,7 +54,7 @@ Chatter.Chatter = function(gameMaster) {
 			};
 			gameMaster.sendMessage(message);
 			addUnconfirmedMessage(message);
-			chatBox.val("");
+			chatBox.value = "";
 		}
 	});
 
@@ -64,16 +66,16 @@ Chatter.Chatter = function(gameMaster) {
 		unconfirmedMessages[key] = message;
 	}
 	function appendMessageDiv(messageDiv) {
-		messageArea.append(messageDiv);
+		messageArea.appendChild(messageDiv);
 		maybeFullyScroll();
 	}
 	var isFullyScrolled = true;
-	messageArea.scroll(function(e) {
+	messageArea.addEvent('scroll', function(e) {
 		isFullyScrolled = ( 2 + messageArea.scrollTop() + messageArea.outerHeight() >= messageArea[0].scrollHeight );
 	});
 	function maybeFullyScroll() {
 		if(isFullyScrolled) {
-			messageArea.scrollTop(messageArea[0].scrollHeight);
+			messageArea.scrollTop = messageArea.scrollHeight;
 		}
 	}
 
@@ -118,14 +120,14 @@ Chatter.Chatter = function(gameMaster) {
 		assert(lastConfirmedMessage.timestamp);
 	}
 	function createMessageDiv(message) {
-		var messageDiv = $('<div/>');
-		var newlinedMessageDiv = $('<div/>');
-		var nickSpan = $('<span/>').addClass('nick');
-		newlinedMessageDiv.append(nickSpan);
-		var dateDiv = $('<div/>').addClass('messageTimestamp');
+		var messageDiv = document.createElement('div');
+		var newlinedMessageDiv = document.createElement('div');
+		var nickSpan = document.createElement('span').addClass('nick');
+		newlinedMessageDiv.appendChild(nickSpan);
+		var dateDiv = document.createElement('div').addClass('messageTimestamp');
 
-		messageDiv.append(newlinedMessageDiv);
-		messageDiv.append(dateDiv);
+		messageDiv.appendChild(newlinedMessageDiv);
+		messageDiv.appendChild(dateDiv);
 
 		var controlMessage = true;
 		if(message.nick) {
@@ -134,23 +136,24 @@ Chatter.Chatter = function(gameMaster) {
 				nick = 'me';
 			}
 			controlMessage = false;
-			nickSpan.text(nick + ": ");
+			nickSpan.empty();
+			nickSpan.appendText(nick + ": ");
 		}
 		if(controlMessage) {
 			newlinedMessageDiv.addClass('controlMessage');
 		}
 		var messageByLine = message.text.split('\n');
 		for(var i = 0; i < messageByLine.length; i++) {
-			newlinedMessageDiv.append(messageByLine[i]);
-			newlinedMessageDiv.append($('<br>'));
+			newlinedMessageDiv.appendChild(document.createTextNode(messageByLine[i]));
+			newlinedMessageDiv.appendChild(document.createElement('br'));
 		}
 
 		messageDiv.setNickVisible = function(visible) {
 			if(visible) {
-				newlinedMessageDiv.css('text-indent', '');
+				newlinedMessageDiv.setStyle('text-indent', '');
 				nickSpan.show();
 			} else {
-				newlinedMessageDiv.css('text-indent', '0px');
+				newlinedMessageDiv.setStyle('text-indent', '0px');
 				nickSpan.hide();
 			}
 		};
@@ -166,7 +169,9 @@ Chatter.Chatter = function(gameMaster) {
 		messageDiv.setConfirmed(false);
 		messageDiv.setTimestampVisible = function(visible) {
 			if(visible) {
-				dateDiv.text('Sent at ' + $.format.date(new Date(message.timestamp).toString(), 'hh:mm a on ddd'));
+				//TODO - prettier date dateDiv.text('Sent at ' + $.format.date(new Date(message.timestamp).toString(), 'hh:mm a on ddd'));
+				dateDiv.empty();
+				dateDiv.appendText('Sent at ' + new Date(message.timestamp).toString());
 				dateDiv.show();
 			} else {
 				dateDiv.hide();
@@ -186,7 +191,7 @@ Chatter.Chatter = function(gameMaster) {
 		unconfirmedMessages = {};
 	};
 
-	$('body').keydown(function(e) {
+	document.body.addEvent('keydown', function(e) {
 		if(e.which == 192 || e.which == 9) { // twiddle (~) or tab key
 			e.preventDefault();
 			if(chatBox.is(":focus")) {
@@ -197,8 +202,8 @@ Chatter.Chatter = function(gameMaster) {
 	});
 
 	chatArea.setSize = function(width, height) {
-		chatArea.width(width);
-		chatArea.height(height);
+		chatArea.setStyle('width', width);
+		chatArea.setStyle('height', height);
 		maybeFullyScroll();
 	};
 	var visible = true;

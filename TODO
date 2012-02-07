@@ -181,6 +181,10 @@
 	-show keyboard layout
 -should scramble image be resizable?
 
+### jsracer
+-pretty Chatter date
+-add support for CubeGame
+
 ### stackmat-flash
 +autodetect
 	+stackmat level? this might just work

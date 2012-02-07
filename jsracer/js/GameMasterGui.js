@@ -22,40 +22,42 @@ var GameMasterGui = {};
 		var scrambleButton;
 		var inspectionSecondsField;
 		gamesDiv = document.createElement('div');
-		$(gamesDiv).css('position', 'relative');
-		$(gamesDiv).addClass('gamesDiv');
+		gamesDiv.setStyle('position', 'relative');
+		gamesDiv.addClass('gamesDiv');
 		infoDiv = document.createElement('div');
-		$(infoDiv).addClass('info');
+		infoDiv.addClass('info');
 
-		var nickField = $('<input />');
-		nickField.appendTo(infoDiv);
+		var nickField = document.createElement('input');
+		infoDiv.appendChild(nickField);
 		infoDiv.appendChild(document.createTextNode('#'));
-		var channelField = $('<input />');
-		channelField.appendTo(infoDiv);
-		$('<br />').appendTo(infoDiv);
+		var channelField = document.createElement('input');
+		infoDiv.appendChild(channelField);
+		infoDiv.appendChild(document.createElement('br'));
 
 		function joinChannel() {
-			var nick = nickField.val();
-			var channel = channelField.val();
+			var nick = nickField.value;
+			var channel = channelField.value;
 			gameMaster.joinChannel(nick, channel);
 		}
-		nickField.change(joinChannel);
-		channelField.change(joinChannel);
+		nickField.addEvent('change', joinChannel);
+		channelField.addEvent('change', joinChannel);
 
 		gameDropdown = document.createElement('select');
 		var games = GameMaster.getGames();
 		for(var gameName in games) {
-			var option = document.createElement('option');
-			option.value = gameName;
-			option.appendChild(document.createTextNode(gameName));
-			gameDropdown.appendChild(option);
+			if(games.hasOwnProperty(gameName)) {
+				var option = document.createElement('option');
+				option.value = gameName;
+				option.appendChild(document.createTextNode(gameName));
+				gameDropdown.appendChild(option);
+			}
 		}
 		if(DEFAULT_GAME) {
 			// TODO - this is really just a hack for development
 			gameDropdown.value = DEFAULT_GAME;
 		}
 
-		$(gameDropdown).change(function(e) {
+		gameDropdown.addEvent('change', function(e) {
 			gameMaster.sendGameInfo();
 		});
 		infoDiv.appendChild(gameDropdown);
@@ -64,7 +66,7 @@ var GameMasterGui = {};
 		inspectionSecondsField.type = 'number';
 		inspectionSecondsField.min = 0;
 		inspectionSecondsField.value = '' + DEFAULT_INSPECTION;
-		$(inspectionSecondsField).change(function() {
+		inspectionSecondsField.addEvent('change', function() {
 			gameMaster.sendGameInfo();
 		});
 		infoDiv.appendChild(inspectionSecondsField);
@@ -72,7 +74,7 @@ var GameMasterGui = {};
 		scrambleButton = document.createElement('input');
 		scrambleButton.value = 'Scramble!';
 		scrambleButton.type = 'button';
-		$(scrambleButton).click(function(e) {
+		scrambleButton.addEvent('click', function(e) {
 			// TODO - what if they click scramble before we've generated boards?
 			var myClientId = gameMaster.getMyself().clientId;
 			var myBoard = gameBoards[myClientId];
@@ -82,12 +84,104 @@ var GameMasterGui = {};
 		});
 		infoDiv.appendChild(scrambleButton);
 
-		var disabledDiv = $(document.createElement('div'));
+		var disabledDiv = document.createElement('div');
 		disabledDiv.addClass("grayOut");
 		disabledDiv.hide();
 
 		var gameBoards = {};
 		this.gameBoards = gameBoards; // This is just for debugging
+		function pruneOldBoards() {
+			// cleaning up old games
+			gameInfo = gameMaster.getGameInfo();
+			var game = gameMaster.getGame();
+			var clientId_user = gameMaster.getChannelMembers();
+			for(var clientId in gameBoards) {
+				if(gameBoards.hasOwnProperty(clientId)) {
+					var gameBoard = gameBoards[clientId];
+					if(!(clientId in clientId_user)) {
+						// This game board is for a user
+						// who has left, so we can delete it.
+						gamesDiv.removeChild(gameBoard.div);
+						delete gameBoards[clientId];
+					} else if(gameBoard.gameInstance.constructor.getGameName() != gameInfo.gameName) {
+						// This game instance is the wrong type of game
+						gameBoards[clientId].gameDiv.dispose();
+
+						// TODO - this is worthy of a big comment
+						gameBoards[clientId].gameInstance.setPlayable(false);
+						delete gameBoards[clientId].gameInstance;
+					}
+				}
+			}
+		}
+		function createNewBoards() {
+			// creating new games
+			var myMoveCallback = function(game, move, oldState) {
+				var moveState = {
+					move: move,
+					oldState: oldState,
+					finished: game.isFinished(),
+					timestamp: new Date().getTime(),
+					startstamp: startstamp
+				};
+				gameMaster.sendMoveState(moveState);
+				that.moveApplied(moveState, myClientId);
+			};
+			var game = gameMaster.getGame();
+			var clientId_user = gameMaster.getChannelMembers();
+			for(var clientId in clientId_user) {
+				if(clientId_user.hasOwnProperty(clientId)) {
+					var user = clientId_user[clientId];
+					var gameBoard = null;
+					var nameDiv;
+					if(clientId in gameBoards) {
+						gameBoard = gameBoards[clientId];
+						if(gameBoards[clientId].gameInstance) {
+							assert(gameBoards[clientId].gameInstance.constructor.getGameName() == gameInfo.gameName);
+						}
+					} else {
+						var containerDiv = document.createElement('span');
+						containerDiv.setStyle('position', 'absolute');
+						nameDiv = document.createElement('span');
+						var timeDiv = document.createElement('span');
+						timeDiv.setStyle('margin-left', 5);
+						containerDiv.appendChild(nameDiv);
+						containerDiv.appendChild(timeDiv);
+						gameBoard = { div: containerDiv, nameDiv: nameDiv, timeDiv: timeDiv };
+						gameBoards[clientId] = gameBoard;
+						gamesDiv.appendChild(containerDiv);
+					}
+					if(!gameBoard.gameInstance) {
+						var myClientId = gameMaster.getMyself().clientId;
+						var gameInstance = null;
+						if(clientId == myClientId) {
+							gameInstance = new game(myMoveCallback);
+						} else {
+							gameInstance = new game();
+						}
+						if(clientId == myClientId) {
+							// TODO - it should be possible to set a moveCallback
+							// *after* the game has been constructed
+							gameInstance.setPlayable(true);
+						}
+
+						gameBoard.gameInstance = gameInstance;
+						gameBoard.gameDiv = gameInstance.getDiv();
+						gameBoard.div.appendChild(gameBoard.gameDiv);
+					}
+					nameDiv = gameBoards[clientId].nameDiv;
+					nameDiv.empty();
+					nameDiv.appendText(user.nick);
+					if(clientId_user[clientId].admin) {
+						nameDiv.removeClass('nonAdminname');
+						nameDiv.addClass('adminName');
+					} else {
+						nameDiv.addClass('nonAdminname');
+						nameDiv.removeClass('adminName');
+					}
+				}
+			}
+		}
 		function refresh() {
 			var myself = gameMaster.getMyself();
 			if(!gameMaster.isConnected()) {
@@ -96,101 +190,24 @@ var GameMasterGui = {};
 			}
 			disabledDiv.hide();
 
-			nickField.val(myself.nick);
-			channelField.val(myself.channel.channelName);
+			nickField.value = myself.nick;
+			channelField.value = myself.channel.channelName;
 			document.location.hash = myself.channel.channelName;
 			if(myself.admin) {
 				gameDropdown.disabled = false;	
 				inspectionSecondsField.disabled = false;	
-				$(scrambleButton).show();
+				scrambleButton.show();
 			} else {
 				gameDropdown.disabled = true;	
 				inspectionSecondsField.disabled = true;	
-				$(scrambleButton).hide();
+				scrambleButton.hide();
 			}
 			var gameInfo = gameMaster.getGameInfo();
 			gameDropdown.value = gameInfo.gameName;
 			inspectionSecondsField.value = gameInfo.inspectionSeconds;
 
-			// cleaning up old games
-			var gameInfo = gameMaster.getGameInfo();
-			var game = gameMaster.getGame();
-			var clientId_user = gameMaster.getChannelMembers();
-			for(var clientId in gameBoards) {
-				var gameBoard = gameBoards[clientId];
-				if(!(clientId in clientId_user)) {
-					// This game board is for a user
-					// who has left, so we can delete it.
-					gamesDiv.removeChild(gameBoard.div);
-					delete gameBoards[clientId];
-				} else if(gameBoard.gameInstance.constructor.getGameName() != gameInfo.gameName) {
-					// This game instance is the wrong type of game
-					$(gameBoards[clientId].gameDiv).remove();
-					
-					// TODO - this is worthy of a big comment
-					gameBoards[clientId].gameInstance.setPlayable(false);
-					delete gameBoards[clientId].gameInstance;
-				}
-			}
-			// creating new games
-			for(var clientId in clientId_user) {
-				var user = clientId_user[clientId];
-				var gameBoard = null;
-				if(clientId in gameBoards) {
-					gameBoard = gameBoards[clientId];
-					if(gameBoards[clientId].gameInstance) {
-						assert(gameBoards[clientId].gameInstance.constructor.getGameName() == gameInfo.gameName);
-					}
-				} else {
-					var containerDiv = document.createElement('span');
-					$(containerDiv).css('position', 'absolute');
-					var nameDiv = document.createElement('span');
-					var timeDiv = document.createElement('span');
-					$(timeDiv).css('margin-left', 5);
-					containerDiv.appendChild(nameDiv);
-					containerDiv.appendChild(timeDiv);
-					gameBoard = { div: containerDiv, nameDiv: nameDiv, timeDiv: timeDiv };
-					gameBoards[clientId] = gameBoard;
-					gamesDiv.appendChild(containerDiv);
-				}
-				if(!gameBoard.gameInstance) {
-					var myClientId = gameMaster.getMyself().clientId;
-					var moveCallback = null;
-					if(clientId == myClientId) {
-						moveCallback = function(game, move, oldState) {
-							var moveState = {
-								move: move,
-								oldState: oldState,
-								finished: game.isFinished(),
-								timestamp: new Date().getTime(),
-								startstamp: startstamp
-							};
-							gameMaster.sendMoveState(moveState);
-							that.moveApplied(moveState, myClientId);
-						};
-					}
-
-					var gameInstance = new game(moveCallback);
-					if(clientId == myClientId) {
-						// TODO - it should be possible to set a moveCallback
-						// *after* the game has been constructed
-						gameInstance.setPlayable(true);
-					}
-
-					gameBoard.gameInstance = gameInstance;
-					gameBoard.gameDiv = gameInstance.getDiv();
-					gameBoard.div.appendChild(gameBoard.gameDiv);
-				}
-				var nameDiv = $(gameBoards[clientId].nameDiv);
-				nameDiv.text(user.nick);
-				if(clientId_user[clientId].admin) {
-					nameDiv.removeClass('nonAdminname');
-					nameDiv.addClass('adminName');
-				} else {
-					nameDiv.addClass('nonAdminname');
-					nameDiv.removeClass('adminName');
-				}
-			}
+			pruneOldBoards();
+			createNewBoards();
 			pageResized();
 		}
 		function pageResized() {
@@ -201,7 +218,7 @@ var GameMasterGui = {};
 			var myClientId = gameMaster.getMyself().clientId;
 			var myBoard = gameBoards[myClientId];
 			assert(myBoard);
-			var nickHeight = $(myBoard.nameDiv).height();
+			var nickHeight = myBoard.nameDiv.getSize().y;
 
 			var THEM_ME_SCALE = 0.75;
 
@@ -214,7 +231,7 @@ var GameMasterGui = {};
 
 
 			// TODO - don't let nicks/times overflow? turn into marquee? lolol
- 			// TODO - To layout stuff optimally, I think we need to take the
+			// TODO - To layout stuff optimally, I think we need to take the
 			// aspect ratio of our available area into account.
 			var preferredSize = game.getPreferredSize();
 			var minSize = game.getMinimumSize();
@@ -256,25 +273,25 @@ var GameMasterGui = {};
 			}
 			var boardHeightToWidth = preferredSize.height / preferredSize.width;
 
-			var availableSpace = { 'width': $(gamesDiv).width(), 'height': $(gamesDiv).height() };
+			var availableSpace = { 'width': gamesDiv.getSize().x, 'height': gamesDiv.getSize().y };
 			var howManyBoards = { 'width': -1, 'height': -1 };
 			var growDimension = (boardHeightToWidth >= 1) ? 'width' : 'height';
 			var otherDimension = (growDimension == 'width') ? 'height' : 'width';
 
 			if(growDimension == 'width') {
-				$(gamesDiv).css('overflow-x', 'auto');
-				$(gamesDiv).css('overflow-y', 'hidden');
+				gamesDiv.setStyle('overflow-x', 'auto');
+				gamesDiv.setStyle('overflow-y', 'hidden');
 			} else {
-				$(gamesDiv).css('overflow-x', 'hidden');
-				$(gamesDiv).css('overflow-y', 'auto');
+				gamesDiv.setStyle('overflow-x', 'hidden');
+				gamesDiv.setStyle('overflow-y', 'auto');
 			}
 
 			var myBoardSize = null;
 			var myActualBoardSize = null;
 			var theirBoardSize = null;
 			var theirActualBoardSize = null;
-			var padding = { width: 0, height: nickHeight };
-			while(myBoardSize == null || howManyBoards.width*howManyBoards.height < clientIds.length) {
+			var padding = { 'width': 0, 'height': nickHeight };
+			while(myBoardSize === null || howManyBoards.width*howManyBoards.height < clientIds.length) {
 				howManyBoards[growDimension]++;
 				myBoardSize = {};
 				myBoardSize[growDimension] = (availableSpace[growDimension]-(1+howManyBoards[growDimension])*padding[growDimension])/(1+THEM_ME_SCALE*howManyBoards[growDimension]);
@@ -287,7 +304,7 @@ var GameMasterGui = {};
 				theirActualBoardSize = addSizes(theirActualBoardSize, padding);
 				// How many boards can we fit in the other dimension?
 				howManyBoards[otherDimension] = Math.floor(availableSpace[otherDimension] / theirActualBoardSize[otherDimension]);
-				if(howManyBoards[otherDimension] == 0) {
+				if(howManyBoards[otherDimension] === 0) {
 					// We must ensure that at least one board is allowed in the other
 					// dimension, otherwise we'll never be able to fit any boards.
 					howManyBoards[otherDimension] = 1;
@@ -324,8 +341,8 @@ var GameMasterGui = {};
 			var centerMyBoard = {};
 			centerMyBoard[toCss[otherDimension]] = (availableSpace[otherDimension]-myActualBoardSize[otherDimension])/2;
 			centerMyBoard[toCss[growDimension]] = Math.max(0, availableSpace[growDimension]-(myActualBoardSize[growDimension]+howManyBoards[growDimension]*theirActualBoardSize[growDimension]))/2;
-			$(myBoard.div).css('top', centerMyBoard.top);
-			$(myBoard.div).css('left', centerMyBoard.left);
+			myBoard.div.setStyle('top', centerMyBoard.top);
+			myBoard.div.setStyle('left', centerMyBoard.left);
 			var offset = {};
 			offset[growDimension] = myActualBoardSize[growDimension] + centerMyBoard[toCss[growDimension]];
 			offset[otherDimension] = 0;
@@ -338,13 +355,13 @@ var GameMasterGui = {};
 					break;
 				}
 				for(var j = 0; j < howManyBoards[growDimension]; j++) {
-					var clientId = clientIds[boardIndex];
+					clientId = clientIds[boardIndex];
 					var gameBoard = gameBoards[clientId];
 					gameBoard.gameInstance.setSize(theirBoardSize);
 					var heightIndex = (otherDimension == 'height') ? i : j;
-					$(gameBoard.div).css('top', offset.height + heightIndex*theirActualBoardSize.height + centerTheirBoard.top);
+					gameBoard.div.setStyle('top', offset.height + heightIndex*theirActualBoardSize.height + centerTheirBoard.top);
 					var widthIndex = (otherDimension == 'width') ? i : j;
-					$(gameBoard.div).css('left', offset.width + widthIndex*theirActualBoardSize.width + centerTheirBoard.left);
+					gameBoard.div.setStyle('left', offset.width + widthIndex*theirActualBoardSize.width + centerTheirBoard.left);
 					boardIndex++;
 					if(boardIndex >= clientIds.length) {
 						// Gah, why doesn't every language have labelled breaks?
@@ -355,10 +372,10 @@ var GameMasterGui = {};
 			assert(boardIndex == clientIds.length);
 		}
 
-		var readySetGoDiv = $(document.createElement('div'));
+		var readySetGoDiv = document.createElement('div');
 		readySetGoDiv.addClass("readySetGo");
 		readySetGoDiv.hide();
-		$(gamesDiv).append(readySetGoDiv);
+		gamesDiv.appendChild(readySetGoDiv);
 
 		var readySetGoStart = null;
 		function startReadySetGo() {
@@ -382,18 +399,19 @@ var GameMasterGui = {};
 				return;
 			}
 			var gameInfo = gameMaster.getGameInfo();
-			if(gameInfo.inspectionSeconds == 0) {
+			if(gameInfo.inspectionSeconds === 0) {
 				readySetGo[1] = 'Go!';
 			} else {
 				readySetGo[1] = 'Inspect';
 			}
 			var phrase = readySetGo[timeRemaining];
 			var phraseHeightToWidth = 1.5 / phrase.length;
-			var fontSizeContrainedByWidth = $(readySetGoDiv).width() * phraseHeightToWidth;
-			var fontSize = Math.min(fontSizeContrainedByWidth, readySetGoDiv.height());
-			readySetGoDiv.text(phrase);
-			readySetGoDiv.css('font-size', fontSize);
-			readySetGoDiv.css('padding-top', ($(readySetGoDiv).height() - fontSize)/2);
+			var fontSizeContrainedByWidth = readySetGoDiv.getSize().x * phraseHeightToWidth;
+			var fontSize = Math.min(fontSizeContrainedByWidth, readySetGoDiv.getSize().y);
+			readySetGoDiv.empty();
+			readySetGoDiv.appendText(phrase);
+			readySetGoDiv.setStyle('font-size', fontSize);
+			readySetGoDiv.setStyle('padding-top', (gamesDiv.getSize().y - fontSize)/2);
 			readySetGoDiv.show();
 			
 			setTimeout(refreshReadySetGo, 100);
@@ -404,8 +422,10 @@ var GameMasterGui = {};
 			startstamp = null;
 			inspectionStart = new Date().getTime();
 			for(var clientId in gameBoards) {
-				var gameBoard = gameBoards[clientId];
-				gameBoard.solveTime = null;
+				if(gameBoards.hasOwnProperty(clientId)) {
+					var gameBoard = gameBoards[clientId];
+					gameBoard.solveTime = null;
+				}
 			}
 			// TODO - is this actually the right place to call startInspection(),
 			// we don't want them to do any moves while we're saying "ready, set, go".
@@ -442,16 +462,19 @@ var GameMasterGui = {};
 			}
 
 			for(var clientId in gameBoards) {
-				var gameBoard = gameBoards[clientId];
-				if(!gameBoard.solveTime && !delayUntilNextRefresh) {
-					delayUntilNextRefresh = 10;
-				}
-				var text = gameBoard.solveTime ? gameBoard.solveTime.toFixed(2) + " seconds" : timerText;
-				$(gameBoard.timeDiv).text(text);
-				if(inspecting) {
-					$(gameBoard.timeDiv).css('color', 'red');
-				} else {
-					$(gameBoard.timeDiv).css('color', '');
+				if(gameBoards.hasOwnProperty(clientId)) {
+					var gameBoard = gameBoards[clientId];
+					if(!gameBoard.solveTime && !delayUntilNextRefresh) {
+						delayUntilNextRefresh = 10;
+					}
+					var text = gameBoard.solveTime ? gameBoard.solveTime.toFixed(2) + " seconds" : timerText;
+					gameBoard.timeDiv.empty();
+					gameBoard.timeDiv.appendText(text);
+					if(inspecting) {
+						gameBoard.timeDiv.setStyle('color', 'red');
+					} else {
+						gameBoard.timeDiv.setStyle('color', '');
+					}
 				}
 			}
 			if(delayUntilNextRefresh) {
@@ -464,9 +487,11 @@ var GameMasterGui = {};
 			inspectionStart = null;
 			startstamp = null;
 			for(var clientId in gameBoards) {
-				var gameBoard = gameBoards[clientId];
-				gameBoard.solveTime = null;
-				$(gameBoard.timeDiv).text('');
+				if(gameBoards.hasOwnProperty(clientId)) {
+					var gameBoard = gameBoards[clientId];
+					gameBoard.solveTime = null;
+					gameBoard.timeDiv.empty();
+				}
 			}
 
 			refresh();
@@ -487,7 +512,9 @@ var GameMasterGui = {};
 		this.handleRandomState = function() {
 			var randomState = gameMaster.getRandomState();
 			for(var clientId in gameBoards) {
-				gameBoards[clientId].gameInstance.setState(randomState);
+				if(gameBoards.hasOwnProperty(clientId)) {
+					gameBoards[clientId].gameInstance.setState(randomState);
+				}
 			}
 			startReadySetGo();
 		};
@@ -501,7 +528,7 @@ var GameMasterGui = {};
 				return ar1 == ar2;
 			}
 			// TODO typeof(null) == "object", but Object.keys(null) blows up
-			if(ar1 == null || ar2 == null) {
+			if(ar1 === null || ar2 === null) {
 				return ar1 == ar2;
 			}
 			var k1 = Object.keys(ar1);
@@ -549,16 +576,16 @@ var GameMasterGui = {};
 			}
 		};
 
-		var boardAndInfoDiv = $('<div/>');
-		boardAndInfoDiv.append($(infoDiv));
-		boardAndInfoDiv.append($(gamesDiv));
-		boardAndInfoDiv.append(disabledDiv);
+		var boardAndInfoDiv = document.createElement('div');
+		boardAndInfoDiv.appendChild(infoDiv);
+		boardAndInfoDiv.appendChild(gamesDiv);
+		boardAndInfoDiv.appendChild(disabledDiv);
 		boardAndInfoDiv.setSize = function(width, height) {
-			$(infoDiv).width(width);
-			var infoDivHeight = $(infoDiv).height();
+			infoDiv.setStyle('width', width);
+			var infoDivHeight = infoDiv.getSize().y;
 
-			$(gamesDiv).width(width);
-			$(gamesDiv).height(height - infoDivHeight);
+			gamesDiv.setStyle('width', width);
+			gamesDiv.setStyle('height', height - infoDivHeight);
 			pageResized();
 		};
 

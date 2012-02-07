@@ -13,72 +13,78 @@ Split.VerticalSplit = function(leftElement, rightElement) {
 	leftElement.parent = this;
 	rightElement.parent = this;
 
-	leftElement.css('top', 0);
-	leftElement.css('left', 0);
-	leftElement.css('position', 'absolute');
+	leftElement.setStyle('top', 0);
+	leftElement.setStyle('left', 0);
+	leftElement.setStyle('position', 'absolute');
 
-	rightElement.css('top', 0);
-	rightElement.css('right', 0);
-	rightElement.css('position', 'absolute');
+	rightElement.setStyle('top', 0);
+	rightElement.setStyle('right', 0);
+	rightElement.setStyle('position', 'absolute');
 	
 
-	var resizeBar = $('<div/>');
+	var resizeBar = document.createElement('div');
 	resizeBar.addClass('verticalResizeBar');
-	var resizeBarVisible = $('<div/>');
+	var resizeBarVisible = document.createElement('div');
 	resizeBarVisible.addClass('verticalResizeBarVisible');
-	resizeBar.append(resizeBarVisible);
-	rightElement.append(resizeBar);
-	resizeBarVisible.css('opacity', 0);
-	resizeBar.hover(
-		function() {
-			resizeBarVisible.stop();
-			resizeBarVisible.animate({opacity: 1});
-		},
-		function() {
-			resizeBarVisible.stop();
-			resizeBarVisible.animate({opacity: 0});
-		}
-	);
+	resizeBar.appendChild(resizeBarVisible);
+	rightElement.appendChild(resizeBar);
+	resizeBarVisible.fade('hide');
+	resizeBar.addEvent('mouseover', function() {
+		resizeBarVisible.fade('in');
+	});
+	resizeBar.addEvent('mouseout', function() {
+		resizeBarVisible.fade('out');
+	});
 
-	resizeBar.css('top', 0);
-	rightElement.append(resizeBar);
+	resizeBar.setStyle('top', 0);
+	rightElement.appendChild(resizeBar);
 
 	var rightElementVisible = true;
 	function setRightElementVisible(visible) {
+		return;// TODO - the pretty slide animation is jquery, not mootools
+
+		/*
 		if(rightElementVisible == visible) {
 			rightElement.setVisible(visible);
 			return;
 		}
 		if(!rightElementVisible) {
 			rightElementVisible = true;
+
 			rightElement.animate({right: 0}, 200, function() {
 				rightElement.setVisible(rightElementVisible);
 				resize();
 			});
 		} else {
 			rightElementVisible = false;
+
 			rightElement.animate({right: MINIMIZED_SHOWING-rightElement.outerWidth()}, 200, function() {
 				rightElement.setVisible(rightElementVisible);
 				resize();
 			});
 		}
+		*/
 	}
 
-	resizeBar.dblclick(setRightElementVisible);
+	resizeBar.addEvent('dblclick', setRightElementVisible);
 
 	function resize(rightElementWidth) {
-		var height = $(window).height();
+		var size = window.getSize();
+		var width = size.x;
+		var height = size.y;
 		if(!rightElementWidth) {
-			rightElementWidth = $(rightElement).width();
+			rightElementWidth = rightElement.getSize().x;
 		}
 		var effectiveRightElementWidth = rightElementVisible ? rightElementWidth : MINIMIZED_SHOWING;
-		var leftElementWidth = $(window).width() - effectiveRightElementWidth;
+		var leftElementWidth = width - effectiveRightElementWidth;
 		leftElement.setSize(leftElementWidth, height);
 		rightElement.setSize(rightElementWidth, height);
 	}
 	function onDrag(e) {
-		var height = $(window).height();
-		var rightElementWidth = $(window).width() - e.pageX;
+		var size = window.getSize();
+		var width = size.x;
+		var height = size.y;
+		var rightElementWidth = width - e.page.x;
 		if(rightElementWidth < MINIMIZED_SHOWING) {
 			return;
 		}
@@ -89,13 +95,13 @@ Split.VerticalSplit = function(leftElement, rightElement) {
 	var dragging = false;
 	function stopDragging() {
 		dragging = false;
-		$('body').unbind('mousemove', onDrag);
+		document.body.removeEvent('mousemove', onDrag);
 	}
 	function startDragging() {
 		dragging = true;
-		$('body').mousemove(onDrag);
+		document.body.addEvent('mousemove', onDrag);
 	}
-	resizeBar.mousedown(function(e) {
+	resizeBar.addEvent('mousedown', function(e) {
 		e.preventDefault(); // This prevents text selection
 		if(!rightElementVisible) {
 			return;
@@ -106,17 +112,17 @@ Split.VerticalSplit = function(leftElement, rightElement) {
 			startDragging();
 		}
 	});
-	$('body').mouseup(function() {
+	document.body.addEvent('mouseup', function() {
 		stopDragging();
 	});
 
-	$(window).resize(function(e) {
+	window.addEvent('resize', function(e) {
 		resize();
 	});
 
-	this.element = $('<div/>');
-	this.element.append(leftElement);
-	this.element.append(rightElement);
+	this.element = document.createElement('div');
+	this.element.appendChild(leftElement);
+	this.element.appendChild(rightElement);
 
 	this.setRightElementVisible = setRightElementVisible;
 

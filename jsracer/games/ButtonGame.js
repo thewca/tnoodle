@@ -1,12 +1,10 @@
 (function() {
 
-	var css = $('<link/>');
-	css.attr({
-		rel: "stylesheet",
-		type: "text/css",
-		href: "ButtonGame.css"
-	});
-	$('head').append(css);
+	var css = document.createElement('link');
+	css.setAttribute('rel', 'stylesheet');
+	css.setAttribute('type', 'text/css');
+	css.setAttribute('href', 'games/ButtonGame.css');
+	document.head.appendChild(css);
 	function ButtonGameMaker(WIDTH, HEIGHT) {
 
 		var PADDING = 5;
@@ -21,9 +19,9 @@
 				lastButtonValue = -1;
 				var gameTable = document.createElement('table');
 				// Crazy ass firefox defaults to 'hide' for empty-cells
-				$(gameTable).css('empty-cells', 'show');
+				gameTable.setStyle('empty-cells', 'show');
 				gameDiv.empty();
-				gameDiv.append($(gameTable));
+				gameDiv.appendChild(gameTable);
 				buttons = [];
 				lastButtonValue = WIDTH*HEIGHT;
 				for(var i = 0; i < HEIGHT; i++) {
@@ -31,7 +29,9 @@
 					var buttonRow = [];
 					buttons.push(buttonRow);
 					for(var j = 0; j < WIDTH; j++) {
-						var button = $(row.insertCell(-1));
+						var button = row.insertCell(-1);
+						button.i = i;
+						button.j = j;
 						buttonRow.push(button);
 						button.addClass("ButtonGameButton");
 						var index = WIDTH*i+j;
@@ -45,32 +45,26 @@
 							}
 							button.addClass("ButtonGameUnsolvedButton");
 							button.buttonValue = buttonValue;
-							button.text(buttonValue);
+							button.empty();
+							button.appendText(buttonValue);
 						}
-						var mousedown = (function(i, j) {
-							return function(e) {
-								// Cancel selecting text
-								e.preventDefault();
-								buttonClicked(i, j);
-							};
-						})(i, j);
-						button.mousedown(mousedown);
+						button.addEvent('mousedown', buttonClicked);
 					}
 				}
 				lastButtonValue--;
 				resize();
 			};
 			function resize() {
-				gameDiv.width(size.width);
-				gameDiv.height(size.height);
+				gameDiv.setStyle('width', size.width);
+				gameDiv.setStyle('height', size.height);
 				var cellWidth = (size.width - PADDING*WIDTH/2) / WIDTH;
 				var cellHeight = (size.height - PADDING*HEIGHT/2) / HEIGHT;
 				for(var i = 0; i < buttons.length; i++) {
 					for(var j = 0; j < buttons[i].length; j++) {
 						var button = buttons[i][j];
-						button.css('font-size', cellHeight/2 + 'px');
-						button.width(cellWidth-4);
-						button.height(cellHeight);
+						button.setStyle('font-size', cellHeight/2 + 'px');
+						button.setStyle('width', cellWidth-4);
+						button.setStyle('height', cellHeight);
 					}
 				}
 			}
@@ -117,8 +111,9 @@
 				var button = buttons[move[0]][move[1]];
 				lastButtonValue = button.buttonValue;
 				button.buttonValue = null;
-				button.text('');
-				button.css('cursor', '');
+				button.empty();
+				button.appendText('');
+				button.setStyle('cursor', '');
 				button.removeClass('ButtonGameUnsolvedButton');
 			};
 			this.isFinished = function() {
@@ -141,18 +136,21 @@
 				for(var i = 0; i < buttons.length; i++) {
 					for(var j = 0; j < buttons[i].length; j++) {
 						var button = buttons[i][j];
-						button.css('cursor', 'pointer');
+						button.setStyle('cursor', 'pointer');
 					}
 				}
 			};
 			this.getDiv = function() {
-				return gameDiv[0];
+				return gameDiv;
 			};
 
-			var gameDiv = $(document.createElement('div'));
+			var gameDiv = document.createElement('div');
 			gameDiv.addClass('ButtonGame');
 			var that = this;
-			function buttonClicked(i, j) {
+			function buttonClicked(e) {
+				e.stop(); // cancel selecting text
+				var i = this.i;
+				var j = this.j;
 				if(!playable || inspecting) {
 					// TODO - a more efficient way of doing this would be to
 					// actually remove the listener, but I'm lazy and in a rush
