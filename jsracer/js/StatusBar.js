@@ -37,7 +37,7 @@ var StatusBar = {};
 			for(var i = 0; i < errors.length; i++) {
 				var div = document.createElement('div');
 				div.appendText(errors[i]);
-				connectionStatus.append(div);
+				connectionStatus.appendChild(div);
 			}
 
 			// We wait a moment before showing the status bar to prevent flickering
@@ -58,7 +58,7 @@ var StatusBar = {};
 			}
 		}
 	};
-	$(document).addEvent('ready', function() {
+	window.addEvent('load', function() {
 		connectionStatus = document.createElement('div');
 		connectionStatus.addClass('statusBar');
 		document.body.appendChild(connectionStatus);

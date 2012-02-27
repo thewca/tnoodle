@@ -184,6 +184,7 @@
 ### jsracer
 -pretty Chatter date
 -add support for CubeGame
+-symlink to twisty.js and mootools should really go
 
 ### stackmat-flash
 +autodetect
