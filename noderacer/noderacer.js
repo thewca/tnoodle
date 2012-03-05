@@ -1,7 +1,6 @@
 var paperboy = require('paperboy');
 var nowjs = require('now');
 var url = require("url");
-var sys = require('sys');
 var assert = require('assert');
 var conf = require('./conf.js');
 var mongoose = require('mongoose');
@@ -306,7 +305,7 @@ function getChannel(channelName) {
 	return channel;
 }
 
-GM = require('./webroot/jsracer/GMConstants').GM;
+GM = require('./webroot/jsracer/js/GMConstants').GM;
 
 everyone.now.joinChannel = function(nick, channelName, callback) {
 	var clientId = this.user.clientId;

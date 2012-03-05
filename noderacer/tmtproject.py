@@ -19,7 +19,7 @@ class Project(tmt.TmtProject):
 	def run(self):
 		self.compile()
 		oldDir = self._chdir()
-		tmt.runCmd([ 'node', 'noderacer.js' ], showStatus=True)
+		tmt.runCmd([ 'node', 'noderacer.js' ], interactive=True)
 		os.chdir(oldDir)
 
 	def clean(self):

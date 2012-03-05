@@ -358,24 +358,29 @@ class tmt:
 		createSymlinkIfNotExistsOrStale(target, name)
 
 
-	def runCmd(self, argv, showStatus=False):
+	def runCmd(self, argv, showStatus=False, interactive=False):
 		if showStatus:
 			print argv
 			print " ".join(argv)
+                if interactive:
+                   p = subprocess.Popen(argv)
+                   p.wait()
+                   return p.returncode
+
 		p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout = ''
 		stderr = ''
 		while p.poll() is None:
-			newStdout = p.stdout.read()
-			if newStdout:
-				stdout += newStdout
-				if showStatus:
-					print newStdout
 			newStderr = p.stderr.read()
 			if newStderr:
 				stderr += newStderr
 				if showStatus:
 					print newStderr
+			newStdout = p.stdout.read()
+			if newStdout:
+				stdout += newStdout
+				if showStatus:
+					print newStdout
 		return p.returncode, stdout, stderr
 
 	def showCmd(self, argv):
