@@ -71,7 +71,7 @@
     var moveStrings = algString.match(pattern);
     var alg = [];
     
-    for (i in moveStrings) {
+    for(var i = 0; i < moveStrings.length; i++) {
       var move = stringToMoveSiGN(moveStrings[i]);
       alg.push(move);
     }
