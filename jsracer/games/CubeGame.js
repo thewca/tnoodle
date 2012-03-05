@@ -1,4 +1,4 @@
-(function() {
+(function($) {
 
 	// This is a really stupid game where a button is filled with
 	// a random number. Each click decrements the number by 1.
@@ -192,4 +192,4 @@
 	scriptElement.text("finishedLoadingScripts();");
 	$('head').append(scriptElement);
 
-})();
+})(jQuery);

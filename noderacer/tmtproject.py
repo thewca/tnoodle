@@ -25,4 +25,4 @@ class Project(tmt.TmtProject):
 	def clean(self):
 		pass
 
-Project(tmt.projectName(), description="A nodejs server that multicasts turns to its clients")
+Project(tmt.projectName(), description="A nodejs game server that multicasts turns to its clients")

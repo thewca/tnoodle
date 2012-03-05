@@ -7,24 +7,13 @@
 	// The point of this game is to demonstrate the basic api for creating
 	// a game.
 
-	// Neat trick for loading game specific css
-	/*
-	var css = $('<link/>');
-	css.attr({
-		rel: "stylesheet",
-		type: "text/css",
-		href: "YOUR CSS FILENAME HERE"
-	});
-	$('head').append(css);
-	*/
-
 	var MAX_SCRAMBLE = 100;
 
 	var ClickGame = function(moveCallback) {
 		var buttonValue = null;
 		this.setState = function(scramble) {
 			buttonValue = scramble;
-			gameButton.val(buttonValue);
+			gameButton.value = buttonValue;
 		};
 		var inspecting = false;
 		this.startInspection = function() {
@@ -41,7 +30,7 @@
 			// Note that we don't call moveCallback from inside of applyMove.
 			assert(that.isLegalMove(move));
 			buttonValue = move - 1;
-			gameButton.val(buttonValue);
+			gameButton.value = buttonValue;
 		};
 		this.getState = function() {
 			return buttonValue;
@@ -53,10 +42,10 @@
 		var size = null;
 		this.setSize = function(size_) {
 			size = size_;
-			gameDiv.width(size.width);
-			gameDiv.height(size.height);
+			gameDiv.setStyle('width', size.width);
+			gameDiv.setStyle('height', size.height);
 			// TODO - this doesn't take the horizontal width of the text into account
-			gameButton.css('font-size', 0.75*size.height);
+			gameButton.setStyle('font-size', 0.75*size.height);
 		};
 		this.generateRandomState = function() {
 			return Math.floor(Math.random()*MAX_SCRAMBLE);
@@ -69,15 +58,16 @@
 			return move == buttonValue;
 		};
 		this.getDiv = function() {
-			return gameDiv[0];
+			return gameDiv;
 		};
 
-		var gameDiv = $(document.createElement('div'));
-		var gameButton = $("<input type='button' />");
-		gameButton.css('width', '100%');
-		gameButton.css('height', '100%');
-		gameDiv.append(gameButton);
-		gameButton.click(function() {
+		var gameDiv = document.createElement('div');
+		var gameButton = document.createElement('input');
+                gameButton.type= 'button';
+		gameButton.setStyle('width', '100%');
+		gameButton.setStyle('height', '100%');
+		gameDiv.appendChild(gameButton);
+		gameButton.addEvent('click', function() {
 			if(!playable || inspecting) {
 				return;
 			}
