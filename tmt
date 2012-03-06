@@ -279,7 +279,12 @@ class tmt:
 			'--debug', '-d',
 			choices=['jdb', 'attach'],
 			default=None,
-			help='Run with jdb or as an attacheable vm (only valid with the "run" command)')
+			help='Run with jdb or as an attachable vm (only valid with the "run" command)')
+		parser_make.add_argument(
+			'--skip-noflex-warning',
+			default=False,
+			action='store_true',
+			help="Don't bother telling me I don't have flex installed, I already know.")
 		parser_make.set_defaults(func=self._make)
 
 		desc = 'Generate dependency graph'
