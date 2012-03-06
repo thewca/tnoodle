@@ -26,8 +26,10 @@ class Project(tmt.EclipseProject):
 				# Fortunately, we don't follow symlinks when evaluating whether
 				# a project needs to be rebuilt, so this symlink hack doesn't
 				# force infinite rebuilds if mxmlc is installed.
+				if tmt.args.skip_noflex_warning:
+					return
 				realOutSwf = join(bin, 'StackApplet.swf')
-				print """\n\nIt appears you do not have the flex sdk installed (specifically the mxmlc binary), which is needed to build stackmat-flash. Perhaps a git checkout stackmat-flash/bin would get you running again."""
+				print """\n\nIt appears you do not have the flex sdk installed (specifically the mxmlc binary), which is needed to build stackmat-flash. Perhaps a git checkout stackmat-flash/bin would get you running again. If you're well aware of this, and don't want to be bothered about this again, try passing --skip-noflex-warning to tmt make."""
 				if not os.path.exists(realOutSwf):
 					print "Since %s doesn't exist, we cannot proceed." % realOutSwf
 					sys.exit(1)
