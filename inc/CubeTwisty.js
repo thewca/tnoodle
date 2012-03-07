@@ -428,7 +428,8 @@
         return null;
       }
 
-      var keyCode = e.keyCode;
+      // The "or e.code" is a hack to make mootools KeyEvents work.
+      var keyCode = e.keyCode || e.code;
       if (keyCode in cubeKeyMapping) {
         return cubeKeyMapping[keyCode];
       }
