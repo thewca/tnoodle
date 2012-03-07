@@ -27,21 +27,6 @@ var GameMasterGui = {};
 		infoDiv = document.createElement('div');
 		infoDiv.addClass('info');
 
-		var nickField = document.createElement('input');
-		infoDiv.appendChild(nickField);
-		infoDiv.appendChild(document.createTextNode('#'));
-		var channelField = document.createElement('input');
-		infoDiv.appendChild(channelField);
-		infoDiv.appendChild(document.createElement('br'));
-
-		function joinChannel() {
-			var nick = nickField.value;
-			var channel = channelField.value;
-			gameMaster.joinChannel(nick, channel);
-		}
-		nickField.addEvent('change', joinChannel);
-		channelField.addEvent('change', joinChannel);
-
 		gameDropdown = document.createElement('select');
 		var games = GameMaster.getGames();
 		for(var gameName in games) {
@@ -186,8 +171,6 @@ var GameMasterGui = {};
 			}
 			disabledDiv.hide();
 
-			nickField.value = myself.nick;
-			channelField.value = myself.channel.channelName;
 			document.location.hash = myself.channel.channelName;
 			if(myself.admin) {
 				gameDropdown.disabled = false;	

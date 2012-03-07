@@ -35,27 +35,104 @@ Chatter.Chatter = function(gameMaster) {
 		that.element.parent.setRightElementVisible(true);
 	});
 	
+        var cliCommands = {};
+        function addCliCommand(cmdKey, func, help) {
+           func.help = help;
+           cliCommands[cmdKey] = func;
+        }
+        addCliCommand('help', function(argv) {
+              var text;
+              if(argv.length === 0) {
+                 text = "Available commands: " + Object.keys(cliCommands).join(", ");
+              } else {
+                 var command = argv[0];
+                 if(cliCommands.hasOwnProperty(command)) {
+                    var func = cliCommands[argv[0]];
+                    text = "Usage: /" + command + " " + func.help;
+                 } else {
+                    text = "Unrecognized command: " + command;
+                 }
+              }
+              that.addClientSideMessage({text: text});
+              return true;
+        }, '[command]');
+        addCliCommand('nick', function(argv) {
+           if(argv.length != 1) {
+              return false;
+           }
+
+           gameMaster.changeNick(argv);
+           return true;
+        }, 'nick');
+        addCliCommand('join', function(argv) {
+           if(argv.length != 1) {
+              return false;
+           }
+           var channel = argv[0];
+           if(channel[0] == '#') {
+              channel = channel.substring(1);
+           }
+           gameMaster.changeChannel(channel);
+           return true;
+        }, '[#]channel');
+
+        var history = [];
+        var historyIndex = 0;
+
 	chatArea.appendChild(messageArea);
 	chatArea.appendChild(chatBox);
 	var messageId = 0;
-	chatBox.addEvent('keypress', function(e) {
+	chatBox.addEvent('keydown', function(e) {
 		var keycode = e.code;
-		if(keycode == 13 && !e.shiftKey) {
+		if(keycode == 13 && !e.shift) {
 			e.preventDefault();
 			var text = chatBox.value;
 			if(text.match(/^\s*$/)) {
 				return;
 			}
-			var message = {
-				text: text,
-				timestamp: new Date().getTime(),
-				id: messageId++,
-				nick: gameMaster.getMyNick()
-			};
-			gameMaster.sendMessage(message);
-			addUnconfirmedMessage(message);
-			chatBox.value = "";
-		}
+                        if(text[0] == '/') {
+                           var argv = text.substring(1).split(/ +/);
+                           var command = argv[0];
+                           if(!cliCommands.hasOwnProperty(command)) {
+                              that.addClientSideMessage({text: "Unrecognized command: " + text + ". Try /help"});
+                           } else {
+                              commandFunc = cliCommands[command];
+                              argv = argv.slice(1);
+                              var parsedCommand = commandFunc(argv);
+                              if(!parsedCommand) {
+                                 // If we couldn't parse the command, we try to
+                                 // give the user some help.
+                                 that.addClientSideMessage({text: "Couldn't parse command: " + text});
+                                 cliCommands.help([command]);
+                              }
+                           }
+                        } else {
+                           var message = {
+                              text: text,
+                              timestamp: new Date().getTime(),
+                              id: messageId++,
+                              nick: gameMaster.getMyNick()
+                           };
+                           gameMaster.sendMessage(message);
+                           addUnconfirmedMessage(message);
+                        }
+                        history.push(text);
+                        historyIndex = history.length;
+                        chatBox.value = "";
+                        return;
+		} else if(keycode == 38) { // keyup
+                   e.preventDefault();
+                   historyIndex = Math.max(0, historyIndex-1);
+                   if(historyIndex < history.length) {
+                      chatBox.value = history[historyIndex];
+                   }
+                } else if(keycode == 40) { // keydown
+                   e.preventDefault();
+                   historyIndex = Math.min(history.length, historyIndex+1);
+                   if(historyIndex < history.length) {
+                      chatBox.value = history[historyIndex];
+                   }
+                }
 	});
 
 	var unconfirmedMessages = {};
@@ -98,9 +175,10 @@ Chatter.Chatter = function(gameMaster) {
 		if(key in unconfirmedMessages) {
 			message = unconfirmedMessages[key];
 			messageDiv = message.div;
-			// To keep the ordering of the messages correct, we must remove and then re-add this messageDiv
-			// We could also move all other unconfirmedMessages to the bottom, I'm not sure what makes
-			// the most sense.
+                        // To keep the ordering of the messages correct, we
+                        // must remove and then re-add this messageDiv.
+                        // We could also move all other unconfirmedMessages to
+                        // the bottom, I'm not sure what makes the most sense.
 			messageDiv.dispose();
 		} else {
 			message.div = createMessageDiv(message);
@@ -129,19 +207,17 @@ Chatter.Chatter = function(gameMaster) {
 		messageDiv.appendChild(newlinedMessageDiv);
 		messageDiv.appendChild(dateDiv);
 
-		var controlMessage = true;
 		if(message.nick) {
 			var nick = message.nick;
 			if(message.nick == gameMaster.getMyNick()) {
 				nick = 'me';
 			}
-			controlMessage = false;
 			nickSpan.empty();
 			nickSpan.appendText(nick + ": ");
-		}
-		if(controlMessage) {
-			newlinedMessageDiv.addClass('controlMessage');
-		}
+		} else {
+                   assert(message['class']);
+                   newlinedMessageDiv.addClass(message['class']);
+                }
 		var messageByLine = message.text.split('\n');
 		for(var i = 0; i < messageByLine.length; i++) {
 			newlinedMessageDiv.appendChild(document.createTextNode(messageByLine[i]));
@@ -184,6 +260,14 @@ Chatter.Chatter = function(gameMaster) {
 	this.addMessage = function(message) {
 		confirmMessage(message);
 	};
+        this.addServerMessage = function(message) {
+           message['class'] = 'serverSideMessage';
+           confirmMessage(message);
+        };
+        this.addClientSideMessage = function(message) {
+           message['class'] = 'clientSideMessage';
+           confirmMessage(message);
+        };
 
 	this.clear = function() {
 		lastConfirmedMessage = null;
