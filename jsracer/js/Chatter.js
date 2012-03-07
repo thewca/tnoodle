@@ -12,13 +12,13 @@ Chatter.Chatter = function(gameMaster) {
 	chatBox.addClass('chatBox');
 	chatBox.addEvent('keydown', function(e) {
 		var keycode = e.code;
-		if(keycode == 27) { //escape
+		if(keycode == 27) { // escape
 			that.element.parent.setRightElementVisible(false);
-		} else if(keycode == 33) {
-			messageArea.scrollTop(messageArea.scrollTop() - SCROLL_AMOUNT);
+		} else if(keycode == 33) { // pgup
+			messageArea.scrollTop = messageArea.scrollTop - SCROLL_AMOUNT;
 			e.preventDefault();
-		} else if(keycode == 34) {
-			messageArea.scrollTop(messageArea.scrollTop() + SCROLL_AMOUNT);
+		} else if(keycode == 34) { // pgdown
+			messageArea.scrollTop = messageArea.scrollTop + SCROLL_AMOUNT;
 			e.preventDefault();
 		}
 	});
@@ -71,7 +71,7 @@ Chatter.Chatter = function(gameMaster) {
 	}
 	var isFullyScrolled = true;
 	messageArea.addEvent('scroll', function(e) {
-		isFullyScrolled = ( 2 + messageArea.scrollTop() + messageArea.outerHeight() >= messageArea[0].scrollHeight );
+		isFullyScrolled = ( 2 + messageArea.scrollTop + messageArea.getSize().y >= messageArea.scrollHeight );
 	});
 	function maybeFullyScroll() {
 		if(isFullyScrolled) {
@@ -101,7 +101,7 @@ Chatter.Chatter = function(gameMaster) {
 			// To keep the ordering of the messages correct, we must remove and then re-add this messageDiv
 			// We could also move all other unconfirmedMessages to the bottom, I'm not sure what makes
 			// the most sense.
-			messageDiv.remove();
+			messageDiv.dispose();
 		} else {
 			message.div = createMessageDiv(message);
 			messageDiv = message.div;

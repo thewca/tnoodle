@@ -61,6 +61,10 @@
 			return gameDiv;
 		};
 
+                this.dispose = function() {
+                   gameDiv.dispose();
+                };
+
 		var gameDiv = document.createElement('div');
 		var gameButton = document.createElement('input');
                 gameButton.type= 'button';

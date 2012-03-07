@@ -105,11 +105,7 @@ var GameMasterGui = {};
 						delete gameBoards[clientId];
 					} else if(gameBoard.gameInstance.constructor.getGameName() != gameInfo.gameName) {
 						// This game instance is the wrong type of game
-						gameBoards[clientId].gameDiv.dispose();
-
-						// TODO - this is worthy of a big comment
-						gameBoards[clientId].gameInstance.setPlayable(false);
-						delete gameBoards[clientId].gameInstance;
+                                                gameBoards[clientId].dispose();
 					}
 				}
 			}

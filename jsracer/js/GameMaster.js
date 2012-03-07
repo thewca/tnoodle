@@ -32,8 +32,12 @@ GameMaster.GameMaster = function() {
 	now.handleGameInfo = function(gameInfo_) {
 		StatusBar.setError('handleGameInfo', null);
 		// gameInfo should have a gameName attribute and an inspectionSeconds attribute
+                assert(gameInfo_.hasOwnProperty('inspectionSeconds'));
+		assert(gameInfo_.gameName in games, gameInfo_.gameName + " not found in " + Object.keys(games));
+                if(gameInfo !== null && gameInfo_.gameName == gameInfo.gameName && gameInfo_.inspectionSeconds == gameInfo.inspectionSeconds) {
+                   return;
+                }
 		gameInfo = gameInfo_;
-		assert(gameInfo.gameName in games, gameInfo.gameName + " not found in " + Object.keys(games));
 		gui.handleGameInfo();
 	};
 

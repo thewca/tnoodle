@@ -182,8 +182,9 @@
 -should scramble image be resizable?
 
 ### jsracer
++add support for CubeGame
+
 -pretty Chatter date
--add support for CubeGame
 -symlink to twisty.js and mootools should really go
 
 ### stackmat-flash

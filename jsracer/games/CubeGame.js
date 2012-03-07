@@ -1,47 +1,4 @@
-(function($) {
-
-	// This is a really stupid game where a button is filled with
-	// a random number. Each click decrements the number by 1.
-	// You are supposed to click the button until its value is 0.
-	//
-	// The point of this game is to demonstrate the basic api for creating
-	// a game.
-
-	// Neat trick for loading game specific css and js
-	/*
-	var css = $('<link/>');
-	css.attr({
-		rel: "stylesheet",
-		type: "text/css",
-		href: "YOUR CSS FILENAME HERE"
-	});
-	$('head').append(css);
-	*/
-
-	/* TODO - it's hard to debug with this
-	var scripts = [
-		'twisty.js/inc/Three.js',
-		'twisty.js/inc/RequestAnimationFrame.js',
-		'twisty.js/inc/Stats.js',
-		'twisty.js/inc/twisty_alg.js',
-		'twisty.js/inc/twisty.js',
-	];
-	for(var i = 0; i < scripts.length; i++) {
-		var script = scripts[i];
-		var scriptElement = $('<script/>');
-		scriptElement.attr({
-			type: "text/javascript",
-			src: script,
-		});
-		$('head').append(scriptElement);
-	}
-	*/
-	// TODO - this stomps on other finishedLoadingScripts() functions
-	window.finishedLoadingScripts = function() {
-		for(var i = 2; i <= 5; i++) {
-			GameMaster.addGame(CubeGameCreator(i));
-		}
-	};
+(function() {
 
 	function CubeGameCreator(DIMENSION) {
 
@@ -85,9 +42,9 @@
 			if(playable != playable_) {
 				playable = playable_;
 				if(playable) {
-					$(window).bind('keydown', keydown);
+					window.addEvent('keydown', keydown);
 				} else {
-					$(window).unbind('keydown', keydown);
+					window.removeEvent('keydown', keydown);
 				}
 			}
 		};
@@ -124,10 +81,8 @@
 		var size = null;
 		this.setSize = function(size_) {
 			size = size_;
-			gameDiv.width(size.width);
-			gameDiv.height(size.height);
-			// TODO - this doesn't take the horizontal width of the text into account
-			//gameButton.css('font-size', .75*size.height);
+			gameDiv.setStyle('width', size.width);
+			gameDiv.setStyle('height', size.height);
 			twistyScene.resize();
 		};
 
@@ -136,11 +91,15 @@
 			return true;
 		};
 		this.getDiv = function() {
-			return gameDiv[0];
+			return gameDiv;
 		};
+                this.dispose = function() {
+                   gameDiv.dispose();
+                   window.removeEvent('keydown', keydown);
+                };
 
-		var gameDiv = $(document.createElement('div'));
-		gameDiv.css('position', 'relative');
+		var gameDiv = document.createElement('div');
+		gameDiv.setStyle('position', 'relative');
 		// TODO - actually wait for twistyjs to load?
 		var twistyScene = new twistyjs.TwistyScene();
 		twistyScene.initializeTwisty({
@@ -167,7 +126,7 @@
 			}
 		});
 
-		gameDiv.append($(twistyScene.getDomElement()));
+		gameDiv.appendChild(twistyScene.getDomElement());
 		var that = this;
 
 		this.setState(null);
@@ -185,11 +144,8 @@
 	return CubeGame;
 	}
 
-	var scriptElement = $('<script/>');
-	scriptElement.attr({
-		type: "text/javascript"
-	});
-	scriptElement.text("finishedLoadingScripts();");
-	$('head').append(scriptElement);
+        for(var i = 2; i <= 5; i++) {
+           GameMaster.addGame(CubeGameCreator(i));
+        }
 
-})(jQuery);
+})();

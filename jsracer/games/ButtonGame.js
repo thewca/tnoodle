@@ -143,6 +143,9 @@
 			this.getDiv = function() {
 				return gameDiv;
 			};
+                        this.dispose = function() {
+                           gameDiv.dispose();
+                        };
 
 			var gameDiv = document.createElement('div');
 			gameDiv.addClass('ButtonGame');
