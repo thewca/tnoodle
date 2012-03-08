@@ -12,7 +12,9 @@ var twistyjs = {};
 
 if(typeof(log) == "undefined") {
   log = function(s) {
-    console.log(s);
+     if(typeof(console) != "undefined" && console.log) {
+        console.log(s);
+     }
   };
 }
 
