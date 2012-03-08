@@ -38,8 +38,8 @@ var KeyboardTimer = new Class({
 			//   We must return to the dispatch thread and *then* call
 			//   redraw, which will clear the keysDown css of our timer display.
 			setTimeout(function() {
-				this.redraw();
-			}, 0);
+				this.timerDisplay.redraw();
+			}.bind(this), 0);
 		}
 		if(e.key == 'space') {
 			// This is needed to stop space from scrolling on ff
