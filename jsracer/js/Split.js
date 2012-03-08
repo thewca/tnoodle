@@ -41,9 +41,6 @@ Split.VerticalSplit = function(leftElement, rightElement) {
 
 	var rightElementVisible = true;
 	function setRightElementVisible(visible) {
-		return;// TODO - the pretty slide animation is jquery, not mootools
-
-		/*
 		if(rightElementVisible == visible) {
 			rightElement.setVisible(visible);
 			return;
@@ -51,19 +48,16 @@ Split.VerticalSplit = function(leftElement, rightElement) {
 		if(!rightElementVisible) {
 			rightElementVisible = true;
 
-			rightElement.animate({right: 0}, 200, function() {
-				rightElement.setVisible(rightElementVisible);
-				resize();
-			});
+                        rightElement.setStyle('right', 0);
+                        rightElement.setVisible(rightElementVisible);
+                        resize();
 		} else {
 			rightElementVisible = false;
 
-			rightElement.animate({right: MINIMIZED_SHOWING-rightElement.outerWidth()}, 200, function() {
-				rightElement.setVisible(rightElementVisible);
-				resize();
-			});
+                        rightElement.setStyle('right', MINIMIZED_SHOWING-rightElement.getSize().x);
+                        rightElement.setVisible(rightElementVisible);
+                        resize();
 		}
-		*/
 	}
 
 	resizeBar.addEvent('dblclick', setRightElementVisible);
