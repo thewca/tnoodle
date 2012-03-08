@@ -275,10 +275,10 @@ Chatter.Chatter = function(gameMaster) {
 		unconfirmedMessages = {};
 	};
 
-	document.body.addEvent('keydown', function(e) {
-		if(e.which == 192 || e.which == 9) { // twiddle (~) or tab key
+        window.addEvent('keydown', function(e) {
+		if(e.code == 192 || e.code == 9) { // twiddle (~) or tab key
 			e.preventDefault();
-			if(chatBox.is(":focus")) {
+			if(document.activeElement == chatBox) {
 				return;
 			}
 			chatBox.focus();
