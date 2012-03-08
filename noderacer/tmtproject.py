@@ -7,7 +7,7 @@ class Project(tmt.TmtProject):
 
 	def compile(self):
 		oldDir = self._chdir()
-		retVal, stdout, stderr = tmt.runCmd([ 'npm', 'install', '-d' ], showStatus=True)
+		retVal = tmt.runCmd([ 'npm', 'install' ], interactive=True)
 		assert retVal == 0
 		os.chdir(oldDir)
 
