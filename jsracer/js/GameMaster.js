@@ -19,6 +19,18 @@ GameMaster.GameMaster = function() {
 	var vertSplit = new Split.VerticalSplit(gui.element, chatter.element);
 	document.body.appendChild(vertSplit.element);
 
+
+        window.addEvent('keydown', function(e) {
+           if(e.code == 192 || e.code == 9) { // twiddle (~) or tab key
+              e.preventDefault();
+              chatter.setVisible(true);
+           } else if(e.code == 32) { // space
+              // TODO - prevent undesired scrolling on FF (firebug!)
+              // TODO - admin can press spacebar to scramble?
+              var nop;
+           }
+        });
+
 	var gameInfo = null;
 	this.getGameInfo = function() {
 		return gameInfo;

@@ -275,16 +275,6 @@ Chatter.Chatter = function(gameMaster) {
 		unconfirmedMessages = {};
 	};
 
-        window.addEvent('keydown', function(e) {
-		if(e.code == 192 || e.code == 9) { // twiddle (~) or tab key
-			e.preventDefault();
-			if(document.activeElement == chatBox) {
-				return;
-			}
-			chatBox.focus();
-		}
-	});
-
 	chatArea.setSize = function(width, height) {
 		chatArea.setStyle('width', width);
 		chatArea.setStyle('height', height);
