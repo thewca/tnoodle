@@ -7,11 +7,11 @@ import subprocess
 JSLINT_ENABLED = True
 CHECK_ILLEGAL_CHAR = True
 
-JSLINT_IGNORED_FILES = {
-}
 JSLINT_IGNORED_ERRORS = {
 	'type is unnecessary.',
 }
+
+NO_JSLINT_KEYWORD = 'BLW-DUCPHAM'
 
 UNCOMMITABLE_PHRASES = {
 	'<'+'<'+'<',
@@ -65,8 +65,8 @@ def lint(files):
 
 		if JSLINT_ENABLED:
 			if ext == '.js' or ext == '.html':
-				if f in JSLINT_IGNORED_FILES:
-					print "Not jslinting %s" % f
+				if NO_JSLINT_KEYWORD in file(f).readline():
+					print "Not jslinting %s (because we found %s)" % (f, NO_JSLINT_KEYWORD)
 				else:
 					if os.path.isdir(f):
 						continue
