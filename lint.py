@@ -59,6 +59,8 @@ def lint(files):
 		if not os.path.exists(f):
 			# This file must have been deleted as part of this commit.
 			continue
+		if os.path.isdir(f):
+			continue
 		fileName, ext = os.path.splitext(f)
 
 		if JSLINT_ENABLED:

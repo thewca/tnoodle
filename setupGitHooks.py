@@ -29,7 +29,7 @@ def setupGitHooksIfNotSetup():
   # Check that the git hooks folder is all set up, and set it up if it isn't
   gitHooksFolder = '.git/hooks'
 
-  customHooksFolder = 'tools/git-hooks'
+  customHooksFolder = 'git-tools/git-hooks'
   assert exists(customHooksFolder)
   target = relpath(abspath(customHooksFolder), split(gitHooksFolder)[0])
   createSymlinkIfNotExistsOrStale(target, gitHooksFolder)
