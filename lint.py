@@ -71,14 +71,16 @@ def lint(files):
 					if os.path.isdir(f):
 						continue
 					print "jslinting %s" % f
-					argv = [ 'java', '-jar', 'git-tools/lib/jslint4java-1.4.6.jar', f ]
+					jsLintJar = 'git-tools/lib/jslint4java-1.4.6.jar'
+					assert os.path.exists(jsLintJar)
+					subprocess.check_call(['java', '-version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					argv = [ 'java', '-jar', jsLintJar, f ]
 					p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					fileLines = file(f).read().split("\n")
 					stdout, stderr = p.communicate()    
-					if p.returncode != 0:
-						print stdout
-						print stderr
-						assert p.returncode == 0
+					# Note that we don't check the returncode of p, because jslint returns a nonzero
+					# error code when jslinting fails, and we want to ignore whatever errors are in
+					# JSLINT_IGNORED_ERRORS.
 					failedJsLint = False
 					for line in stdout.split('\n'):
 						parsedError = line.split(":")
