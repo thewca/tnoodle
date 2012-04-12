@@ -90,8 +90,8 @@ var GameMasterGui = {};
 						delete gameBoards[clientId];
 					} else if(gameBoard.gameInstance.constructor.getGameName() != gameInfo.gameName) {
 						// This game instance is the wrong type of game
-                                                gameBoard.gameInstance.dispose();
-                                                delete gameBoards[clientId];
+            gameBoard.gameInstance.dispose();
+            delete gameBoard.gameInstance;
 					}
 				}
 			}
