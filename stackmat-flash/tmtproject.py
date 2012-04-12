@@ -54,19 +54,12 @@ class Project(tmt.EclipseProject):
 			assert len(stderr) == 0
 
 	def clean(self):
-		if self.mxmlcInstalled:
-			# If mxmlc is installed, then we are fine with deleting the bin directory,
-			# because we can recreate it.
-			tmt.EclipseProject.clean(self)
-			return
+		tmt.EclipseProject.clean(self)
+		if not self.mxmlcInstalled:
+			# If mxmlc is not installed, then we must restore our
+			# bin directory, because we can't recreate it.
+			retVal, stdout, stderr = tmt.runCmd([ 'git', 'checkout', self.bin ], showStatus=True)
+			assert retVal == 0
 
-		# Gah, this is copied from tmt.EclipseProject. Kill me now
-		print 'Cleaning: %s' % self.name
-		if exists(self.distDir):
-			assert os.path.isdir(self.distDir)
-			tmt.rmtree(self.distDir)
-		tempBin = join(self.name, '.bin')
-		if os.path.isdir(tempBin):
-			tmt.rmtree(tempBin)
 
 Project(tmt.projectName(), description="A flash applet that can interpret the sound of a stackmat plugged into your computer.")

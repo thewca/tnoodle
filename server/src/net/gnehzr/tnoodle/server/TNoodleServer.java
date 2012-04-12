@@ -7,14 +7,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
+import java.net.NetworkInterface;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
+import java.net.UnknownHostException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
+import java.util.Enumeration;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -50,30 +55,52 @@ public class TNoodleServer {
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		
-		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
-		System.out.println(NAME + "-" + VERSION + " started on " + addr);
-		String url = "http://" + addr;
-		//TODO - maybe it would make sense to open this url asap, that
-		//       way the user's browser starts parsing tnt even as scramble
-		//       plugins are being loaded
-		if(browse) {
-			if(Desktop.isDesktopSupported()) {
-				Desktop d = Desktop.getDesktop();
-				if(d.isSupported(Desktop.Action.BROWSE)) {
-					try {
-						URI uri = new URI(url);
-						System.out.println("Opening " + uri + " in browser. Pass -n to disable this!");
-						d.browse(uri);
-						return;
-					} catch(URISyntaxException e) {
-						e.printStackTrace();
-					}
+		System.out.println(NAME + "-" + VERSION + " started");
+		
+		ArrayList<String> hostnames = new ArrayList<String>();
+		try {
+			hostnames.add(InetAddress.getLocalHost().getHostAddress());
+		} catch(UnknownHostException e) {
+			for(Enumeration<NetworkInterface> intfs = NetworkInterface.getNetworkInterfaces(); intfs.hasMoreElements();) {
+				NetworkInterface intf = intfs.nextElement();
+				for(InterfaceAddress addr : intf.getInterfaceAddresses()) {
+					hostnames.add(addr.getAddress().getHostAddress());
 				}
 			}
-			System.out.println("Sorry, it appears the Desktop api is not supported on your platform");
 		}
-		
-		System.out.println("Visit " + url + " for a readme and demo.");
+
+		if(hostnames.isEmpty()) {
+			System.out.println("Couldn't find any hostnames for this machine");
+		} else {
+			if(hostnames.size() > 1 && browse) {
+				browse = false;
+				System.out.println("Couldn't determine which url to browse to");
+			}
+			for(String hostname : hostnames) {
+				String addr = hostname + ":" + port;
+				String url = "http://" + addr;
+				//TODO - maybe it would make sense to open this url asap, that
+				//       way the user's browser starts parsing tnt even as scramble
+				//       plugins are being loaded
+				if(browse) {
+					if(Desktop.isDesktopSupported()) {
+						Desktop d = Desktop.getDesktop();
+						if(d.isSupported(Desktop.Action.BROWSE)) {
+							try {
+								URI uri = new URI(url);
+								System.out.println("Opening " + uri + " in browser. Pass -n to disable this!");
+								d.browse(uri);
+								return;
+							} catch(URISyntaxException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					System.out.println("Sorry, it appears the Desktop api is not supported on your platform");
+				}
+				System.out.println("Visit " + url + " for a readme and demo.");
+			}
+		}
 	}
 
 	public static void main(String[] args) throws IOException {

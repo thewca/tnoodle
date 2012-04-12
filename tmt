@@ -869,6 +869,9 @@ Implementation-Version: %s
 		if exists(self.bin):
 			assert isdir(self.bin)
 			rmtree(self.bin)
+		if exists(self.binResource):
+			assert isdir(self.binResource)
+			rmtree(self.binResource)
 		if exists(self.distDir):
 			assert isdir(self.distDir)
 			rmtree(self.distDir)
