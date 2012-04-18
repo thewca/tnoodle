@@ -94,7 +94,9 @@
     if(move[1] == -1) {
         // This is a rotation
         midfix = reverseSliceMap[midfix];
-    } else if(move[0] != 1 && move[1] != 1) {
+    } else if(move[0] == 1 && move[1] == 2) {
+      midfix = midfix.toLowerCase();
+    } else if(move[0] != 1 || move[1] != 1) {
       prefix = "" + move[0] + "-" + move[1];
     }
 
