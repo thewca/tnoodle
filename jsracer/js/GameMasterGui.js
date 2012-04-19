@@ -176,20 +176,22 @@ var GameMasterGui = {};
 
 						gameBoard.gameInstance = gameInstance;
 						gameBoard.gameDiv = gameInstance.getDiv();
-						gameBoard.div.appendChild(gameBoard.gameDiv);
+            var gameDivWrapper = document.createElement('div');
+						gameBoard.div.appendChild(gameDivWrapper);
+            gameDivWrapper.appendChild(gameBoard.gameDiv);
 
             // We are going to add the cursor indicator as a child
             // of the gameDiv, and we want to position it absolutely.
             // We set the gameDiv to have a relative position so that the
             // cursor indicator is positioned relative to the gameDiv, rather
             // than the gameDiv's parent.
-            gameBoard.gameDiv.setStyle('position', 'relative');
+            gameDivWrapper.setStyle('position', 'relative');
 
             var cursorPosition = document.createElement('div');
             cursorPosition.hide();
             cursorPosition.addClass('cursorPosition');
             gameBoard.cursorPosition = cursorPosition;
-            gameBoard.gameDiv.appendChild(cursorPosition);
+            gameDivWrapper.appendChild(cursorPosition);
 					}
 					nameDiv = gameBoards[clientId].nameDiv;
 					nameDiv.empty();
