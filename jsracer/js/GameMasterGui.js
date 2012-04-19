@@ -109,6 +109,31 @@ var GameMasterGui = {};
 				gameMaster.sendMoveState(moveState);
 				that.moveApplied(moveState, myClientId);
 			};
+      var mouseMoveCallback = function(e) {
+        var upperLeftBoard = this.getPosition();
+        var boardSize = this.getSize();
+        var relativePosition = {};
+        relativePosition.x = (e.page.x - upperLeftBoard.x)/boardSize.x;
+        relativePosition.y = (e.page.y - upperLeftBoard.y)/boardSize.y;
+        if(relativePosition.x < 0 || relativePosition.x > 1 ||
+           relativePosition.y < 0 || relativePosition.y > 1) {
+          // The div we use to show the cursor position is a child of the board,
+          // so so long as the cursor stays on top of its indicator, the mouseleave
+          // event will never fire.
+          mouseOutCallback();
+          return;
+        }
+        var moveState = {
+          cursor: relativePosition
+        };
+				gameMaster.sendMoveState(moveState);
+      };
+      var mouseOutCallback = function(e) {
+        var moveState = {
+          cursor: null
+        };
+				gameMaster.sendMoveState(moveState);
+      };
 			var game = gameMaster.getGame();
 			var clientId_user = gameMaster.getChannelMembers();
 			for(var clientId in clientId_user) {
@@ -138,6 +163,8 @@ var GameMasterGui = {};
 						var gameInstance = null;
 						if(clientId == myClientId) {
 							gameInstance = new game(myMoveCallback);
+              gameInstance.getDiv().addEvent('mousemove', mouseMoveCallback);
+              gameInstance.getDiv().addEvent('mouseleave', mouseOutCallback);
 						} else {
 							gameInstance = new game();
 						}
@@ -150,6 +177,19 @@ var GameMasterGui = {};
 						gameBoard.gameInstance = gameInstance;
 						gameBoard.gameDiv = gameInstance.getDiv();
 						gameBoard.div.appendChild(gameBoard.gameDiv);
+
+            // We are going to add the cursor indicator as a child
+            // of the gameDiv, and we want to position it absolutely.
+            // We set the gameDiv to have a relative position so that the
+            // cursor indicator is positioned relative to the gameDiv, rather
+            // than the gameDiv's parent.
+            gameBoard.gameDiv.setStyle('position', 'relative');
+
+            var cursorPosition = document.createElement('div');
+            cursorPosition.hide();
+            cursorPosition.addClass('cursorPosition');
+            gameBoard.cursorPosition = cursorPosition;
+            gameBoard.gameDiv.appendChild(cursorPosition);
 					}
 					nameDiv = gameBoards[clientId].nameDiv;
 					nameDiv.empty();
@@ -259,11 +299,17 @@ var GameMasterGui = {};
 			var otherDimension = (growDimension == 'width') ? 'height' : 'width';
 
 			if(growDimension == 'width') {
-				gamesDiv.setStyle('overflow-x', 'auto');
+        // TODO - the cursor position induces overflow, and the scrollbar is annoying
+				//gamesDiv.setStyle('overflow-x', 'auto');
+				gamesDiv.setStyle('overflow-x', 'hidden');
+
 				gamesDiv.setStyle('overflow-y', 'hidden');
 			} else {
 				gamesDiv.setStyle('overflow-x', 'hidden');
-				gamesDiv.setStyle('overflow-y', 'auto');
+
+        // TODO - the cursor position induces overflow, and the scrollbar is annoying
+				//gamesDiv.setStyle('overflow-y', 'auto');
+				gamesDiv.setStyle('overflow-y', 'hidden');
 			}
 
 			var myBoardSize = null;
@@ -529,6 +575,21 @@ var GameMasterGui = {};
 			var gameInstance = gameBoard.gameInstance;
 			assert(gameInstance);
 			if(user.clientId != gameMaster.getMyself().clientId) {
+        if(moveState.hasOwnProperty('cursor')) {
+          var cursorPosition = gameBoard.cursorPosition;
+          if(!moveState.cursor) {
+            cursorPosition.hide();
+          } else {
+            cursorPosition.show();
+            var boardSize = gameBoard.gameDiv.getSize();
+            var x = moveState.cursor.x * boardSize.x;
+            var y = moveState.cursor.y * boardSize.y;
+            var cursorSize = cursorPosition.getSize();
+            cursorPosition.setStyle('top', y - cursorSize.y/2);
+            cursorPosition.setStyle('left', x - cursorSize.x/2);
+          }
+          return;
+        }
 				if(!deepEquals(gameInstance.getState(), moveState.oldState)) {
 					// This is a tricky assertion here. Assuming no turns are 
 					// dropped by nowjs, we should have a perfect image
