@@ -114,6 +114,11 @@ Split.VerticalSplit = function(leftElement, rightElement) {
 		resize();
 	});
 
+  // support for smartphones/tablets...
+	window.addEvent('orientationchange', function(e) {
+		resize();
+	});
+
 	this.element = document.createElement('div');
 	this.element.appendChild(leftElement);
 	this.element.appendChild(rightElement);

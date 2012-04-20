@@ -49,6 +49,7 @@
 							button.appendText(buttonValue);
 						}
 						button.addEvent('mousedown', buttonClicked);
+						button.addEvent('touchstart', buttonClicked);
 					}
 				}
 				lastButtonValue--;
