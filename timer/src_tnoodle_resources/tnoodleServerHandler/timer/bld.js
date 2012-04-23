@@ -556,6 +556,7 @@ function drawCube() {
             stickerRowDiv.appendChild(center);
           } else {
             var input = document.createElement('input');
+            input.addEvent('click', input.select);
             input.addEvent('change', inputsChanged);
             input.addClass("sticker");
             var stickerIndex, sing;
