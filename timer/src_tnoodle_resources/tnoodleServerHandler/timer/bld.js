@@ -421,11 +421,7 @@ var colorScheme = null;
 function urlChanged() {
   var params = location.hash.substring(1).parseQueryString();
 
-	var scramble = params.scramble;
-  if(!scramble) {
-    generateScramble();
-    return;
-  }
+	var scramble = params.scramble || "";
   scrambleInput.value = scramble;
   
   var cornerBuffer = params.cornerBuffer;
