@@ -20,7 +20,7 @@ function isPermutation(perm) {
 	for(var i = 0; i < perm.length; i++) {
 		found[perm[i]] = true;
 	}
-	for(var i = 0; i < perm.length; i++) {
+	for(i = 0; i < perm.length; i++) {
 		if(!found[i]) {
 			return false;
 		}
@@ -239,10 +239,6 @@ function nameToIndex(name) {
 	return -1;
 }
 
-function singmasterToCustom(sing) {
-	return sing + "?";//<<< TODO
-}
-
 function newCube() {
 	var corners = [];
 	var edges = [];
@@ -254,21 +250,21 @@ function newCube() {
 }
 
 var faceToEdgeCycle = {
-	"U": [ 0, 2, 4, 6 ],
+	"U": [ 4, 6, 0, 2 ],
 	"F": [ 1, 8, 17, 10 ],
-	"L": [ 11, 19, 13, 3 ],
+	"L": [ 3, 11, 19, 13 ],
 	"B": [ 5, 12, 21, 14 ],
 	"R": [ 7, 15, 23, 9 ],
-	"D": [ 16, 22, 20, 18 ],
+	"D": [ 16, 22, 20, 18 ]
 };
 
 var faceToCornerCycle = {
 	"U": [ 0, 3, 6, 9 ],
-	"F": [ 10, 8, 14, 16 ],
+	"F": [ 10, 8, 16, 14 ],
 	"L": [ 1, 11, 13, 23 ],
 	"B": [ 4, 2, 22, 20 ],
 	"R": [ 7, 5, 19, 17 ],
-	"D": [ 12, 15, 18, 21 ],
+	"D": [ 12, 15, 18, 21 ]
 };
 
 function parseScramble(scramble) {
@@ -279,7 +275,7 @@ function parseScramble(scramble) {
 	var turns = scramble.split(/[ \n]+/);
 	for(var i = 0; i < turns.length; i++) {
 		var turn = turns[i];
-		if(turn == "") {
+		if(turn === "") {
 			continue;
 		}
 		var face = turn[0];
@@ -304,37 +300,99 @@ function parseScramble(scramble) {
 }
 
 function generateScramble() {
-	// TODO - actually generate a scramble!
-	return "R U R' U R U2 R'";
+	tnoodleServer.loadScramble(function(scramble) {
+    scrambleInput.value = scramble;
+    inputsChanged();
+  }, '333');
 }
 
 var cornerCycleSingmasterDiv, edgeCycleSingmasterDiv;
 var cornerCycleDiv, edgeCycleDiv;
+var customSchemeDiv;
 var scrambleInput, cornerBufferInput, edgeBufferInput;
 var generateScrambleButton;
+var tnoodleServer;
 function load() {
+	tnoodleServer = new tnoodle.server(location.hostname, location.port);
+
 	cornerCycleSingmasterDiv = document.getElementById('cornerCycleSingmaster');
 	edgeCycleSingmasterDiv = document.getElementById('edgeCycleSingmaster');
 	cornerCycleDiv = document.getElementById('cornerCycle');
 	edgeCycleDiv = document.getElementById('edgeCycle');
+	customSchemeDiv = document.getElementById('customScheme');
 
 	scrambleInput = document.getElementById('scramble');
 	cornerBufferInput = document.getElementById('cornerBuffer');
 	edgeBufferInput = document.getElementById('edgeBuffer');
 	generateScrambleButton = document.getElementById('generateScramble');
 	generateScrambleButton.addEventListener('click', function() {
-		scrambleInput.value = generateScramble();
-		scrambleChanged();
+		generateScramble();
 	}, false);
 
-	scrambleInput.addEventListener('change', scrambleChanged, false);
-	cornerBufferInput.addEventListener('change', scrambleChanged, false);
-	edgeBufferInput.addEventListener('change', scrambleChanged, false);
-	document.addEvent('hashchange', function(e) {
-	});
+	scrambleInput.addEventListener('change', inputsChanged, false);
+	cornerBufferInput.addEventListener('change', inputsChanged, false);
+	edgeBufferInput.addEventListener('change', inputsChanged, false);
+	window.addEventListener('hashchange', function(e) {
+    urlChanged();
+	}, false);
 
-	scrambleInput.value = generateScramble();
-	scrambleChanged();
+  drawCube();
+
+	urlChanged();
+}
+
+function toQueryString(o) {
+  var str = "";
+  var keys = Object.keys(o);
+  for(var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    str += "&" + encodeURIComponent(key) + "=" + o[key];
+  }
+  if(str.length > 0) {
+    // Remove beginning "&", if it exists.
+    str = str.substring(1);
+  }
+  return str;
+}
+
+function inputsChanged() {
+  var params = {};
+  params.scramble = scrambleInput.value;
+  params.cornerBuffer = cornerBufferInput.value;
+  params.edgeBuffer = edgeBufferInput.value;
+  var customScheme = {};
+  var singLocation, singSticker;
+  for(var i = 0; i < 4*6; i++) {
+    singLocation = cornerIndexToSingmaster(i);
+    singSticker = stickerInputs[singLocation].sticker;
+    customScheme[singSticker] = stickerInputs[singLocation].value;
+  }
+  for(i = 0; i < 4*6; i++) {
+    singLocation = edgeIndexToSingmaster(i);
+    singSticker = stickerInputs[singLocation].sticker;
+    customScheme[singSticker] = stickerInputs[singLocation].value;
+  }
+  params.customScheme = JSON.stringify(customScheme);
+
+  var colorScheme = {};
+  for(var face in centerButtons) {
+    if(centerButtons.hasOwnProperty(face)) {
+      colorScheme[face] = centerButtons[face].color;
+    }
+  }
+  params.colorScheme = JSON.stringify(colorScheme);
+
+  var hash = "#" + toQueryString(params);
+  if(location.hash == hash) {
+    // We need to explicitly call urlChanged here, even though the url
+    // didn't change, because someone may have cleared a text box that we
+    // want to fill in with a default value.
+    urlChanged();
+  } else {
+    // If location.hash != hash, then setting location.hash conviniently fires
+    // hashchange for us, so there's no need to explicitly call urlChanged.
+    location.hash = hash;
+  }
 }
 
 function printCycles(stickersPerCorner, pieces, indexToSing, bufferInput, singDiv, cycleDiv) {
@@ -358,8 +416,30 @@ function printCycles(stickersPerCorner, pieces, indexToSing, bufferInput, singDi
 	cycleDiv.appendText(cycleCustom.join(" "));
 }
 
-function scrambleChanged() {
-	var scramble = scrambleInput.value;
+var defaultColorScheme = { "U": "white", "F": "green", "L": "orange", "B": "blue", "R": "red", "D": "yellow" };
+var colorScheme = null;
+function urlChanged() {
+  var params = location.hash.substring(1).parseQueryString();
+
+	var scramble = params.scramble;
+  if(!scramble) {
+    generateScramble();
+    return;
+  }
+  scrambleInput.value = scramble;
+  
+  var cornerBuffer = params.cornerBuffer;
+  if(!cornerBuffer) {
+    cornerBuffer = "";
+  }
+  cornerBufferInput.value = cornerBuffer;
+
+  var edgeBuffer = params.edgeBuffer;
+  if(!edgeBuffer) {
+    edgeBuffer = "";
+  }
+  edgeBufferInput.value = edgeBuffer;
+
 	var success_corners_edges = parseScramble(scramble);
 	var success = success_corners_edges[0];
 	if(!success) {
@@ -370,8 +450,138 @@ function scrambleChanged() {
 	var corners = corners_edges[0];
 	var edges = corners_edges[1];
 
+  colorScheme = {};
+  if(params.colorScheme) {
+    try {
+      colorScheme = JSON.parse(params.colorScheme);
+    } catch(err) {
+      alert(err);
+    }
+  }
+  for(var face in defaultColorScheme) {
+    if(defaultColorScheme.hasOwnProperty(face)) {
+      colorScheme[face] = colorScheme[face] || defaultColorScheme[face];
+    }
+  }
+
+  customScheme = {};
+  if(params.customScheme) {
+    try {
+      customScheme = JSON.parse(params.customScheme);
+    } catch(err2) {
+      alert(err2);
+    }
+  }
+  var singLocation, stickerInput, singSticker;
+  for(var i = 0; i < corners.length; i++) {
+    singLocation = cornerIndexToSingmaster(i);
+    stickerInput = stickerInputs[singLocation];
+    singSticker = cornerIndexToSingmaster(corners[i]);
+    stickerInput.sticker = singSticker;
+    stickerInput.value = singmasterToCustom(singSticker);
+
+    face = singSticker[0];
+    stickerInput.setStyle('background-color', colorScheme[face]);
+  }
+  for(i = 0; i < edges.length; i++) {
+    singLocation = edgeIndexToSingmaster(i);
+    stickerInput = stickerInputs[singLocation];
+    singSticker = edgeIndexToSingmaster(edges[i]);
+    stickerInput.sticker = singSticker;
+    stickerInput.value = singmasterToCustom(singSticker);
+
+    face = singSticker[0];
+    stickerInput.setStyle('background-color', colorScheme[face]);
+  }
+  for(face in colorScheme) {
+    if(colorScheme.hasOwnProperty(face)) {
+      centerButtons[face].color = colorScheme[face];
+      centerButtons[face].setStyle('background-color', colorScheme[face]);
+    }
+  }
+
+
 	printCycles(3, corners, cornerIndexToSingmaster, cornerBufferInput, cornerCycleSingmasterDiv, cornerCycleDiv);
 	printCycles(2, edges, edgeIndexToSingmaster, edgeBufferInput, edgeCycleSingmasterDiv, edgeCycleDiv);
+}
+
+var customScheme = null;
+function singmasterToCustom(sing) {
+  return customScheme[sing] || sing;
+}
+
+function centerClicked() {
+  var newColor = prompt("Enter new color for face " + this.face +
+    ".\nClear for default (" + defaultColorScheme[this.face] + ")", colorScheme[this.face]);
+  if(newColor || newColor === "") {
+    if(newColor === "") {
+      newColor = defaultColorScheme[this.face];
+    }
+    this.color = newColor;
+    inputsChanged();
+  }
+}
+
+var stickerInputs = {};
+var centerButtons = {};
+function drawCube() {
+  var faceRows = [ "U", "LFRB", "D" ];
+  for(var row = 0; row < faceRows.length; row++) {
+    var faceRow = faceRows[row];
+    var faceRowDiv = document.createElement('div');
+    faceRowDiv.addClass("faceRow");
+    if(faceRow.length == 1) {
+      // If there's only one face in this row,
+      // we'll need a little css to align things.
+      faceRowDiv.addClass("singleFaceRow");
+    }
+    customSchemeDiv.appendChild(faceRowDiv);
+    for(var i = 0; i < faceRow.length; i++) {
+      var faceDiv = document.createElement('div');
+      faceDiv.addClass("face");
+      faceRowDiv.appendChild(faceDiv);
+      var face = faceRow[i];
+      for(var j = 0; j < 3; j++) {
+        var stickerRowDiv = document.createElement('div');
+        stickerRowDiv.addClass("stickerRow");
+        faceDiv.appendChild(stickerRowDiv);
+        for(var k = 0; k < 3; k++) {
+          var index = j*3 + k;
+          if(index == 4) {
+            var center = document.createElement('div');
+            center.face = face;
+
+            center.disabled = true;
+            center.addClass("sticker");
+            center.addClass("center");
+            center.addEvent('click', centerClicked);
+            center.appendText(face);
+            centerButtons[face] = center;
+            stickerRowDiv.appendChild(center);
+          } else {
+            var input = document.createElement('input');
+            input.addEvent('change', inputsChanged);
+            input.addClass("sticker");
+            var stickerIndex, sing;
+            if(index % 2 === 0) {
+              // corner
+              index = { 0: 0, 2: 1, 8: 2, 6: 3 }[index];
+              stickerIndex = faceToCornerCycle[face][index];
+              sing = cornerIndexToSingmaster(stickerIndex);
+              stickerInputs[sing] = input;
+            } else {
+              // edge
+              index = { 1: 0, 5: 1, 7: 2, 3: 3 }[index];
+              stickerIndex = faceToEdgeCycle[face][index];
+              sing = edgeIndexToSingmaster(stickerIndex);
+              stickerInputs[sing] = input;
+            }
+            stickerRowDiv.appendChild(input);
+          }
+        }
+      }
+    }
+  }
 }
 
 window.addEventListener('load', load, false);

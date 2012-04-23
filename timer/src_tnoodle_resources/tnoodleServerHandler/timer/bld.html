@@ -1,14 +1,59 @@
 <html>
 <head>
-<script type="text/javascript" src="BldCycles.js"></script>
+
+<style type="text/css">
+.faceRow {
+  display: block;
+  white-space: nowrap;
+}
+.singleFaceRow {
+  position: relative;
+  left: 170px;
+  width: 170px;
+}
+.face {
+  display: inline-block;
+  margin: 10px;
+}
+.stickerRow {
+  display: block;
+}
+.sticker {
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  border: 1px solid black;
+}
+
+.center {
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  display: inline-block;
+  font-family: sans-serif;
+  vertical-align: bottom;
+  line-height: 50px;
+}
+
+#scramble {
+  width: 500px;
+  height: 20px;
+}
+</style>
+
+<script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
+<script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
+<script type="text/javascript" src="js/tnoodleserver.js"></script>
+<script type="text/javascript" src="bld.js"></script>
+
 </head>
 <body>
 
 <textarea id="scramble"></textarea>
-<input type="button" id="generateScramble" value="Generate scramble"></input>
+<input type="button" id="generateScramble" value="Generate scramble" />
 
 <div>
-Corner buffer: <input type="text" id="cornerBuffer" size="3"></input>
+Corner buffer: <input type="text" id="cornerBuffer" size="3" />
 </div>
 <div>
 Corner cycle (Singmaster): <span id="cornerCycleSingmaster"></span>
@@ -18,13 +63,16 @@ Corner cycle: <span id="cornerCycle"></span>
 </div>
 
 <div>
-Edge buffer: <input type="text" id="edgeBuffer" size="3"></input>
+Edge buffer: <input type="text" id="edgeBuffer" size="3" />
 </div>
 <div>
 Edge cycle (Singmaster): <span id="edgeCycleSingmaster"></span>
 </div>
 <div>
 Edge cycle: <span id="edgeCycle"></span>
+</div>
+
+<div id="customScheme">
 </div>
 
 </body>
