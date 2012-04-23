@@ -5,7 +5,7 @@ import subprocess
 JSLINT_ENABLED = True
 CHECK_ILLEGAL_CHAR = True
 
-JSLINT_IGNORED_FILES = {
+JSLINT_IGNORED_FILES = set((
 	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/mootools-core-1.4.2.js',
 	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/mootools-more-1.4.0.1.js',
 	'timer/src_tnoodle_resources/tnoodleServerHandler/timer/js/stacktrace.js',
@@ -23,14 +23,14 @@ JSLINT_IGNORED_FILES = {
 	'jsracer/assert.js',
 	'noderacer/mongeesing.js',
 	'noderacer/noderacer.js'
-}
-JSLINT_IGNORED_ERRORS = {
+))
+JSLINT_IGNORED_ERRORS = set((
 	'type is unnecessary.',
-}
+))
 
-UNCOMMITABLE_PHRASES = {
+UNCOMMITABLE_PHRASES = set((
 	'<'+'<'+'<',
-}
+))
 
 # Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 # This should jive with git's definition of binary.
