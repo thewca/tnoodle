@@ -338,6 +338,9 @@ function load() {
 
   drawCube();
 
+  window.addEvent('resize', resizeCube);
+  resizeCube();
+
 	urlChanged();
 }
 
@@ -579,6 +582,41 @@ function drawCube() {
       }
     }
   }
+}
+
+function resizeCube() {
+  var size = window.getSize();
+  var vertMargin = document.body.getStyle('margin-top').toInt() + document.body.getStyle('margin-bottom').toInt();
+  var horzMargin = document.body.getStyle('margin-left').toInt() + document.body.getStyle('margin-right').toInt();
+  // Gah. Isn't there some css magic to accomplish this?
+  document.body.setStyle('width', size.x - horzMargin);
+  document.body.setStyle('height', size.y - vertMargin);
+  // And this?
+  customSchemeDiv.setStyle('height', document.body.getSize().y - customSchemeDiv.getPosition().y - vertMargin);
+
+  var faceMargin = 5;
+  var faces = $$('.face');
+  faces.setStyle('margin', faceMargin);
+
+  var availableSpace = customSchemeDiv.getSize();
+  var stickerWidth = Math.floor((availableSpace.x - 4*2*faceMargin) / 12);
+  var stickerHeight = Math.floor((availableSpace.y - 3*2*faceMargin) / 9);
+  stickerWidth = Math.max(20, Math.min(stickerHeight, stickerWidth));
+  stickerHeight = stickerWidth;
+
+  var stickers = $$('.sticker');
+  stickers.setStyle('height', stickerHeight);
+  stickers.setStyle('width', stickerWidth);
+
+  var centers = $$('.center');
+  centers.setStyle('height', stickerHeight - 2);
+  centers.setStyle('width', stickerWidth - 2);
+  centers.setStyle('line-height', stickerHeight);
+
+  var singleFaceRows = $$('.singleFaceRow');
+  var faceWidth = stickerWidth*3;
+  singleFaceRows.setStyle('left', faceWidth + 2*faceMargin);
+  singleFaceRows.setStyle('width', faceWidth + 2*faceMargin);
 }
 
 window.addEventListener('load', load, false);
