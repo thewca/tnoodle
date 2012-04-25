@@ -20,8 +20,9 @@ sys.excepthook = excepthook
 
 def entryPoint():
 	return split(abspath(__file__))[0]
-sys.path.append(entryPoint()+'/tools')
+sys.path.append(entryPoint()+'/git-tools')
 import githubUpload
+import setupGitHooks
 import lint
 
 # These are the kinds of files we replace all instances of "%%VERSION%%" with
@@ -137,9 +138,7 @@ class tmt:
 		self.VERSION = self.VERSION[len(versionPrefix):]
 
 		# Check that the git hooks folder is all set up
-		gitHooksFolder = '.git/hooks'
-		target = relpath(abspath('tools/git-hooks'), split(gitHooksFolder)[0])
-		createSymlinkIfNotExistsOrStale(target, gitHooksFolder)
+		setupGitHooks.setupGitHooksIfNotSetup()
 
 	def _loadTmtProjects(self):
 		self._cdEntryPoint()

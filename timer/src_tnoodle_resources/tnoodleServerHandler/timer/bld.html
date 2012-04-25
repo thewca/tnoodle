@@ -1,6 +1,8 @@
 <html>
 <head>
 
+<title>bld.js</title>
+
 <style type="text/css">
 
 .faceRow {
@@ -39,18 +41,24 @@
 #scramble {
   width: 500px;
   height: 20px;
+  font-family: monospace;
 }
 </style>
 
+<link rel="stylesheet" type="text/css" href="/mootools/Assets/default_mooRainbow.css" />
+
 <script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
 <script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
+<script type="text/javascript" src="/mootools/mooRainbow.js"></script>
+<!-- included for isOrIsChild -->
+<script type="text/javascript" src="js/tnt.js"></script>
 <script type="text/javascript" src="js/tnoodleserver.js"></script>
 <script type="text/javascript" src="bld.js"></script>
 
 </head>
 <body>
 
-<textarea id="scramble"></textarea>
+<input type="text" id="scramble" />
 <input type="button" id="generateScramble" value="Generate scramble" />
 
 <div>

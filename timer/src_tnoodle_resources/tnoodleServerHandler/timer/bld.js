@@ -1,5 +1,14 @@
 (function() {
 
+var defaultColorScheme = {
+  "U": new Color("#fff"), // white
+  "F": new Color("#009000"), // green
+  "L": new Color("#FF8C00"), // orange
+  "B": new Color("#00f"), // blue
+  "R": new Color("#f00"), // red
+  "D": new Color("#FFFF00") // yellow
+};
+
 // Why doesn't javascript have a freaking assert?
 function assert(bool) {
 	if(!bool) {
@@ -63,31 +72,38 @@ function cycleStickers(permutation, stickersPerPiece, cycle) {
 function toCycle(permutation, stickersPerPiece, buffer) {
 	assert(isPermutation(permutation));
 
-	// copy permutation array so as not to mutate it
-	permutation = permutation.slice();
+  if(isSolved(permutation)) {
+    return [];
+  }
 
 	var bufferStickers = getStickerIndices(buffer, stickersPerPiece);
 
-	var cycle = [];
-	while(!isSolved(permutation)) {
-		var dest = permutation[buffer];
-		if(bufferStickers.indexOf(dest) != -1) {
-			// Our buffer is solved (perhaps misoriented), but the
-			// whole cube isn't. We've got to break into a
-			// new cycle, which means finding an unsolved sticker
-			// that isn't our buffer.
-			for(var i = 0; i < permutation.length; i++) {
-				if(bufferStickers.indexOf(i) == -1 && permutation[i] != i) {
-					dest = i;
-					break;
-				}
-			}
-		}
-		cycle.push(dest);
-		// Actually perform the 2 swap.
-		cycleStickers(permutation, stickersPerPiece, [buffer, dest]);
-	}
-	return cycle;
+  var cycles = [];
+  var dest = permutation[buffer];
+
+  function shootTo(dest) {
+    var permutationCopy = permutation.slice();
+    cycleStickers(permutationCopy, stickersPerPiece, [buffer, dest]);
+    var nextCycles = toCycle(permutationCopy, stickersPerPiece, buffer);
+    var node = { dest: dest, children: nextCycles };
+    cycles.push(node);
+  }
+
+  if(bufferStickers.indexOf(dest) != -1) {
+    // Our buffer is solved (perhaps misoriented), but the
+    // whole cube isn't. We've got to break into a
+    // new cycle, which means finding an unsolved sticker
+    // that isn't our buffer.
+    for(var i = 0; i < permutation.length; i++) {
+      if(bufferStickers.indexOf(i) == -1 && permutation[i] != i) {
+        // Found an unsolved sticker that isn't our buffer!
+        shootTo(i);
+      }
+    }
+  } else {
+    shootTo(dest);
+  }
+  return cycles;
 }
 
 /*
@@ -372,7 +388,7 @@ function inputsChanged() {
   var colorScheme = {};
   for(var face in centerButtons) {
     if(centerButtons.hasOwnProperty(face)) {
-      colorScheme[face] = centerButtons[face].color;
+      colorScheme[face] = centerButtons[face].color.hex;
     }
   }
   params.colorScheme = JSON.stringify(colorScheme);
@@ -390,28 +406,58 @@ function inputsChanged() {
   }
 }
 
-function printCycles(stickersPerCorner, pieces, indexToSing, bufferInput, singDiv, cycleDiv) {
+function printCycles(stickersPerPiece, pieces, bufferInput, indexToStr, cycleDiv, breakIns) {
+  breakIns = breakIns || {};
 	var buffer = bufferInput.value;
 	var bufferIndex = -1;
-	if(buffer.length == stickersPerCorner) {
+	if(buffer.length == stickersPerPiece) {
 		bufferIndex = nameToIndex(buffer);
 	}
 	if(bufferIndex == -1) {
 		bufferIndex = 0;
 	}
-	buffer = indexToSing(bufferIndex);
+  if(stickersPerPiece == 2) {
+    buffer = edgeIndexToSingmaster(bufferIndex);
+  } else if(stickersPerPiece == 3) {
+    buffer = cornerIndexToSingmaster(bufferIndex);
+  } else {
+    // TODO - do this outside of printCycles, and only call toCycle once!
+    assert(false);
+  }
 	bufferInput.value = buffer;
 
-	var cycle = toCycle(pieces, stickersPerCorner, bufferIndex);
-	var cycleSing = cycle.map(indexToSing);
-	var cycleCustom = cycleSing.map(singmasterToCustom);
-	singDiv.empty();
-	singDiv.appendText(cycleSing.join(" "));
 	cycleDiv.empty();
-	cycleDiv.appendText(cycleCustom.join(" "));
+
+  function breakInChanged() {
+    breakIns[this.breakIndex] = this.selectedIndex;
+    printCycles(stickersPerPiece, pieces, bufferInput, indexToStr, cycleDiv, breakIns);
+  }
+	var cycles = toCycle(pieces, stickersPerPiece, bufferIndex);
+  var breakIndex = 0;
+  var str;
+  while(cycles.length > 0) {
+    var index = 0;
+    if(cycles.length > 1) {
+      index = breakIns[breakIndex] || 0;
+
+      var breakInSelect = document.createElement('select');
+      breakInSelect.breakIndex = breakIndex++;
+      for(var i = 0; i < cycles.length; i++) {
+        str = indexToStr(cycles[i].dest);
+        breakInSelect.options[i] = new Option(str, str);
+      }
+      breakInSelect.selectedIndex = index;
+      breakInSelect.addEvent('change', breakInChanged);
+      cycleDiv.appendChild(breakInSelect);
+      cycleDiv.appendText(" ");
+    } else {
+      str = indexToStr(cycles[index].dest);
+      cycleDiv.appendText(str + " ");
+    }
+    cycles = cycles[index].children;
+  }
 }
 
-var defaultColorScheme = { "U": "white", "F": "green", "L": "orange", "B": "blue", "R": "red", "D": "yellow" };
 var colorScheme = null;
 function urlChanged() {
   var params = location.hash.substring(1).parseQueryString();
@@ -451,7 +497,17 @@ function urlChanged() {
   }
   for(var face in defaultColorScheme) {
     if(defaultColorScheme.hasOwnProperty(face)) {
-      colorScheme[face] = colorScheme[face] || defaultColorScheme[face];
+      if(colorScheme[face]) {
+        colorScheme[face] = new Color(colorScheme[face]);
+        if(isNaN(colorScheme[face][0]) ||
+           isNaN(colorScheme[face][1]) ||
+           isNaN(colorScheme[face][2])) {
+          colorScheme[face] = null;
+        }
+      }
+      if(!colorScheme[face]) {
+        colorScheme[face] = new Color(defaultColorScheme[face]);
+      }
     }
   }
 
@@ -463,54 +519,63 @@ function urlChanged() {
       alert(err2);
     }
   }
+
+  function setStickerColor(sticker, face) {
+    sticker.setStyle('background-color', colorScheme[face]);
+    sticker.setStyle('color', new Color(colorScheme[face]).invert());
+  }
   var singLocation, stickerInput, singSticker;
   for(var i = 0; i < corners.length; i++) {
     singLocation = cornerIndexToSingmaster(i);
     stickerInput = stickerInputs[singLocation];
     singSticker = cornerIndexToSingmaster(corners[i]);
     stickerInput.sticker = singSticker;
-    stickerInput.value = singmasterToCustom(singSticker);
+    stickerInput.value = cornerIndexToCustom(corners[i]);
 
     face = singSticker[0];
-    stickerInput.setStyle('background-color', colorScheme[face]);
+    setStickerColor(stickerInput, face);
   }
   for(i = 0; i < edges.length; i++) {
     singLocation = edgeIndexToSingmaster(i);
     stickerInput = stickerInputs[singLocation];
     singSticker = edgeIndexToSingmaster(edges[i]);
     stickerInput.sticker = singSticker;
-    stickerInput.value = singmasterToCustom(singSticker);
+    stickerInput.value = edgeIndexToCustom(edges[i]);
 
     face = singSticker[0];
-    stickerInput.setStyle('background-color', colorScheme[face]);
+    setStickerColor(stickerInput, face);
   }
   for(face in colorScheme) {
     if(colorScheme.hasOwnProperty(face)) {
-      centerButtons[face].color = colorScheme[face];
-      centerButtons[face].setStyle('background-color', colorScheme[face]);
+      var center = centerButtons[face];
+      center.color = colorScheme[face];
+      center.colorPicker.manualSet(center.color);
+      center.colorPicker.setBackupColor(center.color);
+      setStickerColor(center, face);
     }
   }
 
 
-	printCycles(3, corners, cornerIndexToSingmaster, cornerBufferInput, cornerCycleSingmasterDiv, cornerCycleDiv);
-	printCycles(2, edges, edgeIndexToSingmaster, edgeBufferInput, edgeCycleSingmasterDiv, edgeCycleDiv);
+	printCycles(3, corners, cornerBufferInput, cornerIndexToSingmaster, cornerCycleSingmasterDiv);
+	printCycles(3, corners, cornerBufferInput, cornerIndexToCustom, cornerCycleDiv);
+	printCycles(2, edges, edgeBufferInput, edgeIndexToSingmaster, edgeCycleSingmasterDiv);
+	printCycles(2, edges, edgeBufferInput, edgeIndexToCustom, edgeCycleDiv);
 }
 
 var customScheme = null;
-function singmasterToCustom(sing) {
+function edgeIndexToCustom(index) {
+  var sing = edgeIndexToSingmaster(index);
+  return customScheme[sing] || sing;
+}
+function cornerIndexToCustom(index) {
+  var sing = cornerIndexToSingmaster(index);
   return customScheme[sing] || sing;
 }
 
-function centerClicked() {
-  var newColor = prompt("Enter new color for face " + this.face +
-    ".\nClear for default (" + defaultColorScheme[this.face] + ")", colorScheme[this.face]);
-  if(newColor || newColor === "") {
-    if(newColor === "") {
-      newColor = defaultColorScheme[this.face];
-    }
-    this.color = newColor;
-    inputsChanged();
-  }
+function colorChanged(color) {
+  color = new Color(color.rgb);
+  this.color = color;
+  inputsChanged();
 }
 
 var stickerInputs = {};
@@ -545,7 +610,12 @@ function drawCube() {
             center.disabled = true;
             center.addClass("sticker");
             center.addClass("center");
-            center.addEvent('click', centerClicked);
+            // MooRainbow allows for multiple simultaneous pickers to be visible,
+            // but they'll only work if they have unique ids.
+            center.colorPicker = new MooRainbow(center, {
+              id: face + 'Picker',
+              onComplete: colorChanged.bind(center)
+            });
             center.appendText(face);
             centerButtons[face] = center;
             stickerRowDiv.appendChild(center);
