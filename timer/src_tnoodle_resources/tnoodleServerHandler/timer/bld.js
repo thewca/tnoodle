@@ -1,14 +1,6 @@
 (function() {
 
-// Hackiness because we don't have mootools =( 
-Element.prototype.empty = function() {
-	this.innerHTML = "";
-};
-
-Element.prototype.appendText = function(txt) {
-	this.appendChild(document.createTextNode(txt));
-};
-
+// Why doesn't javascript have a freaking assert?
 function assert(bool) {
 	if(!bool) {
 		alert("Uh oh");
