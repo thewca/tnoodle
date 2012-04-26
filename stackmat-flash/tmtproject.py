@@ -16,6 +16,12 @@ class Project(tmt.EclipseProject):
 
 		self.mxmlcInstalled = (retVal == 0)
 
+	def checkoutSwf( self ):
+		# If mxmlc is not installed, then we may need to restore our
+		# bin directory, because we can't recreate it.
+		retVal, stdout, stderr = tmt.runCmd([ 'git', 'checkout', self.bin ], showStatus=True)
+		assert retVal == 0
+
 	def _compile(self, src, bin):
 		if src == self.src:
 			if not self.mxmlcInstalled:
@@ -26,16 +32,10 @@ class Project(tmt.EclipseProject):
 				# Fortunately, we don't follow symlinks when evaluating whether
 				# a project needs to be rebuilt, so this symlink hack doesn't
 				# force infinite rebuilds if mxmlc is installed.
-				if tmt.args.skip_noflex_warning:
-					return
-				realOutSwf = join(bin, 'StackApplet.swf')
-				print """\n\nIt appears you do not have the flex sdk installed (specifically the mxmlc binary), which is needed to build stackmat-flash. Perhaps a git checkout stackmat-flash/bin would get you running again. If you're well aware of this, and don't want to be bothered about this again, try passing --skip-noflex-warning to tmt make."""
-				if not os.path.exists(realOutSwf):
-					print "Since %s doesn't exist, we cannot proceed." % realOutSwf
-					sys.exit(1)
-				print "%s exists, but appears to be stale. I'm going to go ahead and use it anyways." % realOutSwf
-				print "Press any key to continue...",
-				sys.stdin.readline()
+				if not tmt.args.skip_noflex_warning:
+					realOutSwf = join(bin, 'StackApplet.swf')
+					print """\n\nWARNING: It appears you do not have the flex sdk installed (specifically the mxmlc binary), which is needed to build stackmat-flash. I'm going to go ahead and use the version of %s from the git repository.""" % ( realOutSwf )
+				self.checkoutSwf()
 				return
 		
 		tmt.EclipseProject._compile(self, src, bin)
@@ -55,11 +55,5 @@ class Project(tmt.EclipseProject):
 
 	def clean(self):
 		tmt.EclipseProject.clean(self)
-		if not self.mxmlcInstalled:
-			# If mxmlc is not installed, then we must restore our
-			# bin directory, because we can't recreate it.
-			retVal, stdout, stderr = tmt.runCmd([ 'git', 'checkout', self.bin ], showStatus=True)
-			assert retVal == 0
-
 
 Project(tmt.projectName(), description="A flash applet that can interpret the sound of a stackmat plugged into your computer.")
