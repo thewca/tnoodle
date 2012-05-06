@@ -509,6 +509,8 @@ class ScrambleRequest {
 						table.addCell(imgCell);
 					} catch (Exception e) {
 						table.addCell("Error drawing scramble: " + e.getMessage());
+
+						System.err.println("Error drawing scramble, if you're having font issues, try installing ttf-dejavu.");
 						e.printStackTrace();
 					}
 				} else {
