@@ -18,9 +18,37 @@ def excepthook(etype, value, tb):
 	pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
+def runCmd(argv, showStatus=False, interactive=False):
+    if showStatus:
+            print argv
+            print " ".join(argv)
+    if interactive:
+       p = subprocess.Popen(argv)
+       p.wait()
+       return p.returncode
+
+    p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout = ''
+    stderr = ''
+    while p.poll() is None:
+            newStderr = p.stderr.read()
+            if newStderr:
+                    stderr += newStderr
+                    if showStatus:
+                            print newStderr
+            newStdout = p.stdout.read()
+            if newStdout:
+                    stdout += newStdout
+                    if showStatus:
+                            print newStdout
+    return p.returncode, stdout, stderr
+
 def entryPoint():
 	return split(abspath(__file__))[0]
 sys.path.append(entryPoint()+'/git-tools')
+if len(os.listdir('git-tools')) == 0:
+        print "The git-tools directory is empty. Perhaps you haven't checked out the submodules? I'm going to try to check them out now. In the future, pass --recursive to git clone"
+	runCmd([ 'git', 'submodule', 'update', '--init', '--recursive' ], showStatus=True, interactive=True)
 import githubUpload
 import setupGitHooks
 import lint
@@ -363,29 +391,7 @@ class tmt:
 
 
 	def runCmd(self, argv, showStatus=False, interactive=False):
-		if showStatus:
-			print argv
-			print " ".join(argv)
-                if interactive:
-                   p = subprocess.Popen(argv)
-                   p.wait()
-                   return p.returncode
-
-		p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		stdout = ''
-		stderr = ''
-		while p.poll() is None:
-			newStderr = p.stderr.read()
-			if newStderr:
-				stderr += newStderr
-				if showStatus:
-					print newStderr
-			newStdout = p.stdout.read()
-			if newStdout:
-				stdout += newStdout
-				if showStatus:
-					print newStdout
-		return p.returncode, stdout, stderr
+        	return runCmd(argv, showStatus, interactive)
 
 	def showCmd(self, argv):
 		return self.runCmd(argv, showStatus=True)
