@@ -1,11 +1,25 @@
 import tmt
 import os
+import sys
 
 class Project(tmt.TmtProject):
 	def getDependencies(self):
 		return [ tmt.TmtProject.projects['jsracer'] ]
 
+        def assertNodeInstallation(self):
+                retVal = 1
+                try:
+                    retVal = tmt.runCmd([ 'npm', '-version' ], interactive=True)
+                except:
+                    pass
+                if retVal != 0:
+                    print
+                    print "It appears you do not have npm (node's package manager) installed."
+                    print "Install node (http://nodejs.org/, it should provide npm) and try again."
+                    sys.exit(1)
+
 	def compile(self):
+        	self.assertNodeInstallation()
 		oldDir = self._chdir()
 		retVal = tmt.runCmd([ 'npm', 'install' ], interactive=True)
 		assert retVal == 0
