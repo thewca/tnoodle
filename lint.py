@@ -9,6 +9,8 @@ CHECK_ILLEGAL_CHAR = True
 
 JSLINT_IGNORED_ERRORS = {
 	'type is unnecessary.',
+  "Unexpected token 'ew-resize'.",
+  "Bad input type.",
 }
 
 NO_JSLINT_KEYWORD = 'BLW-DUCPHAM'
