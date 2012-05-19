@@ -9,6 +9,7 @@ public class Search {
 	FullCube d = new FullCube("");
 	int length1;
 	int maxlen2;
+	String sol_string;
 
 	static int getNParity(int idx, int n) {
 		int p = 0;
@@ -43,10 +44,8 @@ public class Search {
 		}
 
 	}
-
-
 	
-	String solution(FullCube c) {
+	public String solution(FullCube c) {
 		this.c = c;
 		int shape = c.getShapeIdx();
 		for (length1=Shape.ShapePrun[shape]; length1<100; length1++) {
@@ -55,7 +54,7 @@ public class Search {
 				break;
 			}
 		}
-		return "";
+		return sol_string;
 	}
 	
 	boolean phase1(int shape, int prunvalue, int maxl, int depth, int lm) {
@@ -163,12 +162,40 @@ public class Search {
 //				System.out.println(Integer.toHexString(d.ur));
 //				System.out.println(Integer.toHexString(d.dl));
 //				System.out.println(Integer.toHexString(d.dr));
+				sol_string = move2string(i + length1);
 				return true;
 			}
 		}
 
 
 		return false;
+	}
+	
+	String move2string(int len) {
+		String s = "";
+		int top = 0, bottom = 0;
+		for (int i=len-1; i>=0; i--) {
+			int val = move[i];
+			if (val > 0) {
+				val = 12 - val;
+				top = (val > 6) ? (val-12) : val;
+			} else if (val < 0) {
+				val = 12 + val;
+				bottom = (val > 6) ? (val-12) : val;
+			} else {
+				if (top == 0 && bottom == 0) {
+					s += "/";
+				} else {
+					s += "(" + top + ", " + bottom + ")/";
+				}
+				top = bottom = 0;
+			}
+		}
+		if (top == 0 && bottom == 0) {
+		} else {
+			s += "(" + top + ", " + bottom + ")";
+		}
+		return s;// + " (" + len + "t)";
 	}
 	
 	int pruncomb[] = new int[100];
