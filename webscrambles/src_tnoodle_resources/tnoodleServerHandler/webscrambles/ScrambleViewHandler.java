@@ -30,7 +30,6 @@ import com.itextpdf.text.DocumentException;
 import com.sun.net.httpserver.HttpExchange;
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
-@SuppressWarnings("restriction")
 public class ScrambleViewHandler extends SafeHttpHandler {
 	private SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
 
