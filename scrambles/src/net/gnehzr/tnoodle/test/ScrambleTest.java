@@ -52,7 +52,7 @@ public class ScrambleTest {
 	public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException {
 		LockHolder lh = new LockHolder();
 
-		int SCRAMBLE_COUNT;
+		int SCRAMBLE_COUNT = 100;
 		boolean drawScramble = true;
 		SortedMap<String, LazyInstantiator<Scrambler>> lazyScramblers = Scrambler.getScramblers();
 		
@@ -71,12 +71,6 @@ public class ScrambleTest {
 		}
 		
 		for(String puzzle : lazyScramblers.keySet()) {
-			if(puzzle.equals("sq1")) {
-				// sq1 scrambles take a very long time to generate. This keeps the test from taking too long.
-				SCRAMBLE_COUNT = 10;
-			} else {
-				SCRAMBLE_COUNT = 100;
-			}
 			LazyInstantiator<Scrambler> lazyScrambler = lazyScramblers.get(puzzle);
 			final Scrambler scrambler = lazyScrambler.cachedInstance();
 			

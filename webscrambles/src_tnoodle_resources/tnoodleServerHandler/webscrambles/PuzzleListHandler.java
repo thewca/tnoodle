@@ -14,7 +14,6 @@ import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
 import com.sun.net.httpserver.HttpExchange;
 
-@SuppressWarnings("restriction")
 public class PuzzleListHandler extends SafeHttpHandler {
 	private String puzzleNamesJSON;
 	public PuzzleListHandler() throws BadClassDescriptionException, IOException {

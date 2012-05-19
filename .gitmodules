@@ -4,3 +4,6 @@
 [submodule "git-tools"]
 	path = git-tools
 	url = git@github.com:jfly/git-tools.git
+[submodule "sq12phase/src/cs/sq12phase"]
+	path = sq12phase/src/cs/sq12phase
+	url = git@github.com:jfly/sq12phase.git

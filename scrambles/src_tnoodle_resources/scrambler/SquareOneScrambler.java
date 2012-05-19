@@ -18,88 +18,24 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cs.sq12phase.FullCube;
+import cs.sq12phase.Search;
+
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 
-import org.squareone.twophase.Engine;
-import org.squareone.twophase.Position1;
-import org.squareone.twophase.Tables;
-
-
 public class SquareOneScrambler extends Scrambler {
-
-	private static final int depth = 30;
-	private static final long timeOut = 30; //in sec
-	private static final boolean twistablePosition=true; // consider only twistable scramble positions
 
 	private static final int radius = 32;
 	private boolean turnTop = true, turnBottom = true;
 	
-	// TODO - Engine and Position1 should become thread safe?
-	private ThreadLocal<Engine> eng = new ThreadLocal<Engine>() {
-		protected Engine initialValue() {
-			return new Engine();
-		}
-	};
-	private ThreadLocal<Position1> p1 = new ThreadLocal<Position1>() {
-		protected Position1 initialValue() {
-			return new Position1();
-		}
-	};;
-	public SquareOneScrambler() {
-		//initialise pruning and transition tables
-		Tables.init();
-		Tables.initLayers();
-	}
+	public SquareOneScrambler() {}
 	
 	protected String generateScramble(Random r) {
-		char posstr[] = new char[25];
-
-		//generate random position
-		randomPosition(posstr, r, twistablePosition);
-
-		//parse position
-		p1.get().initialise(posstr);
-
-		//search for solution
-		return eng.get().doSearch(p1.get(), depth, timeOut);
+		Search s = new Search();
+		return s.solution(FullCube.randomCube());
 	}
 
-	//Ported from http://www.worldcubeassociation.org/regulations/scrambles/scramble_square1.htm by Jeremy Fleischman
-	/* Javascript written by Jaap Scherphuis,  jaapsch a t yahoo d o t com */
-
-	private void randomPosition(char[] posstr, Random r, boolean twistable){
-
-		int i, j, k;
-		int tmp[] = new int[16];
-
-		do {
-
-		//mix array
-		for (i = 0; i < 16; i++) tmp[i] = i;
-		for (i = 0; i < 16; i++) {
-			j = r.nextInt(16 - i);
-			k = tmp[i];
-			tmp[i] = tmp[i + j];
-			tmp[i + j] = k;
-		}
-
-		//store
-		for (i = 0, j = 0; i < 16; i++) {
-			if (tmp[i] > 7){
-				posstr[j++] = (char)(tmp[i] - 8 + (int)'A');
-				posstr[j++] = (char)(tmp[i] - 8 + (int)'A');
-			}
-			else{
-				posstr[j++] = (char)(tmp[i] + (int)'1');
-			}
-		}
-		// test correctness
-		} while ( posstr[11] == posstr[12] || (twistable && (posstr[17] == posstr[18] || posstr[5] == posstr[6] )));
-
-		posstr[24] = r.nextInt(2) != 0 ? '-' : '/';
-	}
-	
 	//returns true if invalid, false if valid
 	private boolean domove(int index, int m, Sq1State sq1State) {
 		int[] state = sq1State.state;

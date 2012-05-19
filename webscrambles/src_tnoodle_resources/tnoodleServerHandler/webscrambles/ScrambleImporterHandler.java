@@ -17,7 +17,6 @@ import net.gnehzr.tnoodle.utils.Utils;
 
 import com.sun.net.httpserver.HttpExchange;
 
-@SuppressWarnings("restriction")
 public class ScrambleImporterHandler extends SafeHttpHandler {
 	private final Pattern BOUNDARY_PATTERN = Pattern.compile("^.+boundary\\=(.+)$");
 	@Override

@@ -14,7 +14,6 @@ import tnoodleServerHandler.FileHandler;
 import com.itextpdf.text.DocumentException;
 import com.sun.net.httpserver.HttpExchange;
 
-@SuppressWarnings("restriction")
 public class ScrambleHandler extends SafeHttpHandler {
 	// TODO - there has to be a better way of getting the benefit of a FileHandler...
 	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/scramblegen.html") {
