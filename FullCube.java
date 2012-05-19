@@ -25,76 +25,43 @@ public class FullCube implements Comparable<FullCube> {
 		}
 		return ml - f.ml;
 	}
-	
-	public static void main(String[] args) {
-		TreeSet<FullCube> treeA = new TreeSet<FullCube>();
-		TreeSet<FullCube> treeB = new TreeSet<FullCube>();
-		FullCube f0 = new FullCube("");
-		f0.doMove(1);
-		for (int i=0; i<12; i+=3) {
-			f0.doMove(3);
-			FullCube fx = new FullCube("");
-			fx.copy(f0);
-			treeA.add(fx);
-		}
-		while (true) {
-			for (FullCube f : treeA) {
-				for (int i=0; i<4; i++) {
-					f.doMove(3);
-					FullCube fx = new FullCube("");
-					fx.copy(f);
-					treeB.add(fx);
-					assert fx.getShapeIdx() == f.getShapeIdx();
-				}
-				for (int i=0; i<4; i++) {
-					f.doMove(-3);
-					FullCube fx = new FullCube("");
-					fx.copy(f);
-					treeB.add(fx);
-					assert fx.getShapeIdx() == f.getShapeIdx();
-				}
-				f.doMove(0);
-				FullCube fx = new FullCube("");
-				fx.copy(f);
-				treeB.add(fx);
-				f.doMove(0);
-				assert fx.getShapeIdx() == f.getShapeIdx();
-			}
-			treeA.addAll(treeB);
-			treeB.clear();
-			System.out.println(treeA.size());
-		}
-	}
 
 	FullCube(String s) {
 		//TODO
 	}
 	
+	FullCube() {
+	
+	}
+	
 	static Random gen = new Random();
 	
 	public static FullCube randomCube() {
-		//TODO
-			FullCube f = new FullCube("");
-			int shape = 2074;
-			int m=0;
-			for (int i=0; i<1000; i++) {
-				switch (m=gen.nextInt(3)) {
-					case 0 :
-						shape = Shape.TopMove[shape];
-						f.doMove(shape & 0x0f);
-						shape >>= 4;
-						break;
-					case 1 :
-						shape = Shape.TwistMove[shape];
-						f.doMove(0);
-						break;
-					case 2 :
-						shape = Shape.BottomMove[shape];
-						f.doMove(-(shape & 0x0f));
-						shape >>= 4;
-						break;
-				}
+		int test;
+		int shape = Shape.ShapeIdx[test = gen.nextInt(3678)];
+		FullCube f = new FullCube();
+		int corner = 0x01234567 << 1 | 0x11111111;
+		int edge = 0x01234567 << 1;
+		int n_corner = 8, n_edge = 8;
+		int rnd, m;
+		for (int i=0; i<24; i++) {
+			if (((shape >> i) & 1) == 0) {//edge
+				rnd = gen.nextInt(n_edge) << 2;
+				f.setPiece(23-i, (edge >> rnd) & 0xf);
+				m = (1 << rnd) - 1;
+				edge = (edge & m) + ((edge >> 4) & ~m);
+				--n_edge;
+			} else {//corner
+				rnd = gen.nextInt(n_corner) << 2;
+				f.setPiece(23-i, (corner >> rnd) & 0xf);
+				f.setPiece(22-i, (corner >> rnd) & 0xf);
+				m = (1 << rnd) - 1;
+				corner = (corner & m) + ((corner >> 4) & ~m);
+				--n_corner;
+				++i;				
 			}
+		}
+		f.ml = gen.nextInt(2);
 		return f;
 	}
 
@@ -154,6 +121,22 @@ public class FullCube implements Comparable<FullCube> {
 			ret = dr >> ((23-idx) << 2);
 		}
 		return (byte) (ret & 0x0f);
+	}
+	
+	private void setPiece(int idx, int value) {
+		if (idx < 6) {
+			ul &= ~(0xf << ((5-idx) << 2));
+			ul |= value << ((5-idx) << 2);
+		} else if (idx < 12) {
+			ur &= ~(0xf << ((11-idx) << 2));
+			ur |= value << ((11-idx) << 2);
+		} else if (idx < 18) {
+			dl &= ~(0xf << ((17-idx) << 2));
+			dl |= value << ((17-idx) << 2);
+		} else {
+			dr &= ~(0xf << ((23-idx) << 2));
+			dr |= value << ((23-idx) << 2);
+		}	
 	}
 	
 	int[] arr = new int[16];
