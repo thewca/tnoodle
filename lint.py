@@ -7,17 +7,17 @@ import subprocess
 JSLINT_ENABLED = True
 CHECK_ILLEGAL_CHAR = True
 
-JSLINT_IGNORED_ERRORS = {
-	'type is unnecessary.',
+JSLINT_IGNORED_ERRORS = set([
+  'type is unnecessary.',
   "Unexpected token 'ew-resize'.",
   "Bad input type.",
-}
+])
 
 NO_JSLINT_KEYWORD = 'BLW-DUCPHAM'
 
-UNCOMMITABLE_PHRASES = {
+UNCOMMITABLE_PHRASES = set([
 	'<'+'<'+'<',
-}
+])
 
 # Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 # This should jive with git's definition of binary.
