@@ -184,16 +184,16 @@ public class Search {
 				bottom = (val > 6) ? (val-12) : val;
 			} else {
 				if (top == 0 && bottom == 0) {
-					s += "/";
+					s += " / ";
 				} else {
-					s += "(" + top + ", " + bottom + ")/";
+					s += "(" + top + "," + bottom + ") / ";
 				}
 				top = bottom = 0;
 			}
 		}
 		if (top == 0 && bottom == 0) {
 		} else {
-			s += "(" + top + ", " + bottom + ")";
+			s += "(" + top + "," + bottom + ")";
 		}
 		return s;// + " (" + len + "t)";
 	}
