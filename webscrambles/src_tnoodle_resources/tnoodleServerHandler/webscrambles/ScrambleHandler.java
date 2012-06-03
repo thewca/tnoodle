@@ -16,7 +16,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 public class ScrambleHandler extends SafeHttpHandler {
 	// TODO - there has to be a better way of getting the benefit of a FileHandler...
-	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/scramblegen.html") {
+	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/interface/scramblegen.html") {
 		protected void wrappedHandle(HttpExchange t, String[] requestPath, java.util.LinkedHashMap<String,String> query) throws IOException {
 			super.wrappedHandle(t, new String[0], query);
 		};

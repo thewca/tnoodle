@@ -7,3 +7,6 @@
 [submodule "sq12phase/src/cs/sq12phase"]
 	path = sq12phase/src/cs/sq12phase
 	url = git@github.com:jfly/sq12phase.git
+[submodule "scrambler-interface/src_tnoodle_resources/tnoodleServerHandler/scrambler-interface"]
+	path = scrambler-interface/src_tnoodle_resources/tnoodleServerHandler/scrambler-interface
+	url = git@github.com:cubing/scrambler-interface.git
