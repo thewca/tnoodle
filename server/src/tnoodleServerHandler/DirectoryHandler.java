@@ -20,7 +20,7 @@ import com.sun.net.httpserver.HttpExchange;
 public class DirectoryHandler extends SafeHttpHandler {
 	private static final String PLUGIN_DIRECTORY = DirectoryHandler.class.getPackage().getName();
 	private static final MarkdownProcessor mp = new MarkdownProcessor();
-	
+
 	private static MimetypesFileTypeMap mimes = new MimetypesFileTypeMap();
 	static {
 		mimes.addMimeTypes("text/css css");
@@ -48,7 +48,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		String contentType;
 	}
 
-	// TODO - this is thread safe, but not thread smart. That is, we could potentiall have
+	// TODO - this is thread safe, but not thread smart. That is, we could potentially have
 	// multiple threads opening up the same file at the same time.
 	private static ConcurrentHashMap<String, CachedFileInfo> cachedFiles;
 	public static void setCachingEnabled(boolean enabled) {
@@ -73,7 +73,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		}
 		this.path = path;
 	}
-	
+
 	protected void wrappedHandle(HttpExchange t, String[] requestPath, LinkedHashMap<String, String> query) throws IOException {
 		String fullRequestPath = t.getRequestURI().getPath();
 		
