@@ -1,0 +1,200 @@
+body, div, p {
+  margin: 0px auto;
+  padding: 0px;
+}
+
+body {
+  max-width: 800px;
+  font-family: Helvetica, Tahoma, Arial;
+
+  background: #DEE;
+}
+
+body.busy {
+  background: #EED;
+}
+
+body.done {
+  background: #DEE;
+}
+
+
+
+h1 {
+  margin: 0px;
+  margin-bottom: 10px;
+  font-size: 200%;
+  color: #FFF;
+  font-variant: small-caps;
+  text-shadow: 2px 2px 5px #888;
+}
+
+
+
+.interface {
+  padding: 1em;
+  margin: 1em;
+  font-family: Helvetica;
+  border-radius: 1em;
+  background: #00c0c0;
+  text-align: center;
+}
+
+#top_interface h1#title {
+  font-size: 400%;
+}
+
+#top_interface .wca_logo_top {
+  width: 80px;
+  height: 80px;
+  vertical-align: middle;
+  margin-top: -15px;
+}
+
+#top_interface span.beta {
+  vertical-align: top;
+  font-size: 30%;
+  color: #00c0c0;
+  text-shadow: 0px 0px 5px #FFF, 0px 0px 10px #FFF, 0px 0px 15px #FFF, 0px 0px 20px #FFF;
+}
+
+
+
+#about {
+  display: none; /* To simplify the interface when it loads. */
+}
+
+@media print {
+    .interface, #about, .unsupported {
+        display: none !important;
+    }
+
+    body {
+      background: none;
+    }    
+}
+
+
+#top_interface {
+  position: relative;
+}
+
+#top_interface progress {
+  font-size: 200%;
+
+  position: absolute;
+  bottom: 20px;
+  left: 10%;
+  width: 80%;
+}
+
+#top_interface .scrambleButton {
+  font-size: 200%;
+  padding: 0.1em 1em;
+}
+
+#top_interface #competitionName {
+  font-size: 150%;
+  width: 20em;
+  text-align: center;
+}
+
+
+
+#events_rounds_interface #events_table {
+  border-collapse: collapse;
+  background: #CCC;
+  box-shadow: 2px 2px 5px #888;
+  margin: 12px;
+  font-size: 1.2em;
+}
+
+#events_rounds_interface #events_table tr {
+  padding: 0px;
+  margin: 0px;
+}
+
+#events_rounds_interface #events_table td {
+  padding: 0px;
+  margin: 0px;
+}
+
+#events_rounds_interface #events_table td {
+  border-top: 1px solid #888;w
+  border-bottom: 1px solid #888;
+}
+
+#events_rounds_interface #events_table td.event_amount_label {
+  border-left: 1px solid #888;
+  text-align: right;
+  padding: 4px;
+  padding-left: 8px;
+}
+
+#events_rounds_interface #events_table td.event_amount_value_td {
+  border-right: 1px solid #888;
+  padding-right: 4px;
+}
+
+#events_rounds_interface #events_table input.event_amount_value {
+  font-size: 20px;
+  width: 50px;
+}
+
+
+
+#events_rounds_interface #rounds_table {
+  border-collapse: collapse;
+  background: #CCC;
+  box-shadow: 2px 2px 5px #888;
+
+  clear: both;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#events_rounds_interface #rounds_table tr {
+  border: 1px solid #888;
+}
+
+#events_rounds_interface #rounds_table thead td {
+  height: 2em;
+  padding: 0px 8px;
+  font-weight: bold;
+}
+
+#events_rounds_interface #rounds_table td {
+  padding: 0px 4px;
+  height: 1.5em;
+  text-align: center;
+}
+
+#events_rounds_interface #rounds_table tbody td:nth-child(even) {
+  background: #DDD;
+}
+
+#events_rounds_interface #rounds_table td.event_name {
+  font-weight: bold;
+  text-align: right;
+  padding: 4px 8px;
+}
+
+#events_rounds_interface #rounds_table td input {
+  font-size: 1em;
+}
+
+#events_rounds_interface #rounds_table td input.round_name {
+  width: 10em;
+}
+
+#events_rounds_interface #rounds_table td.round_remove button {
+  height: 100%;
+}
+
+#events_rounds_interface #rounds_table td input.num_groups {
+  width: 3em;
+}
+
+#events_rounds_interface #rounds_table td input.num_solves {
+  width: 3em;
+}
