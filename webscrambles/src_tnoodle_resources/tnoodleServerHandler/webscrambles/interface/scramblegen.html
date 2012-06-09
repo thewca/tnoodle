@@ -1,12 +1,138 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>WCA WebScrambler</title>
+<title>tnoodle scrambler</title>
 
-<script type="text/javascript" src="/scrambler-interface/js/ScramblerInterface.js"></script>
-<script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
-<script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
-<script type="text/javascript" src="/mootools/powertools-1.1.1.js"></script>
+<script type="text/javascript" src="/scrambler-interface/js/ui.js"></script>
+<link type="text/css" href="/scrambler-interface/css/ui.css" rel="stylesheet" />
+
+<script type="text/javascript" src="/js/scramble.js"></script>
+
+<script type="text/javascript">
+(function() {
+	// TODO - seeds
+	// TODO - zip password
+	// TODO - configurable color schemes?
+	// TODO - n-copies selector
+	// TODO - test in multiple browsers
+	
+	var scrambleServer = new tnoodle.ScrambleServer();
+
+	function toScrambleRequest(sheets) {
+		// Neat trick for copying an object in js
+		var scramblesByPuzzleCopy = JSON.parse(JSON.stringify(scramblesByPuzzle));
+		var scrambleRequest = [];
+		for(var i = 0; i < sheets.length; i++) {
+			var sheet = sheets[i];
+			var allScrambles = scramblesByPuzzleCopy[sheet.puzzle];
+			var scrambles = allScrambles.splice(0, sheet.scrambleCount);
+			assert(scrambles.length == sheet.scrambleCount);
+			var request = {
+				scrambles: scrambles,
+				copies: 1, //TODO - add support for this to ui.js
+				scrambler: sheet.puzzle,
+				count: sheet.scrambleCount,
+				title: sheet.title,
+				fmc: sheet.fmc
+			};
+			scrambleRequest.push(request);
+		}
+		return scrambleRequest;
+	}
+	function showZip() {
+		var title = mark2.ui.getTitle();
+		var sheets = mark2.ui.getScrambleSheets();
+		var request = toScrambleRequest(sheets);
+		scrambleServer.showZip(title, request, "");
+	}
+	function showScrambles() {
+		var title = mark2.ui.getTitle();
+		var sheets = mark2.ui.getScrambleSheets();
+		var request = toScrambleRequest(sheets);
+		scrambleServer.showPdf(title, request, "_blank");
+	}
+
+	var scramblesByPuzzle, title;
+	function clear() {
+		scramblesByPuzzle = {};
+		title = "";
+	}
+	clear();
+
+	function countNonNull(arr) {
+		var n = 0;
+		for(var i = 0; i < arr.length; i++) {
+			if(arr[i] !== null) {
+				n++;
+			}
+		}
+		return n;
+	}
+	function getScrambleCountByPuzzle() {
+		var scrambleCountByPuzzle = {};
+		for(var puzzle in scramblesByPuzzle) {
+			if(scramblesByPuzzle.hasOwnProperty(puzzle)) {
+				var scrambles = scramblesByPuzzle[puzzle] || [];
+				scramblesByPuzzle[puzzle] = scrambles;
+
+				scrambleCountByPuzzle[puzzle] = countNonNull(scrambles);
+			}
+		}
+		return scrambleCountByPuzzle;
+	}
+
+	function scramblesLoaded(puzzle, newScrambles) {
+		var scrambles = scramblesByPuzzle[puzzle];
+		var firstNullIndex = scrambles.indexOf(null);
+		for(var i = 0; i < newScrambles.length; i++) {
+			scrambles[firstNullIndex + i] = newScrambles[i];
+		}
+		mark2.ui.scramblesGenerated(getScrambleCountByPuzzle());
+
+		// Perhaps there's more work to be done
+		competitionChanged();
+	}
+
+	function competitionChanged() {
+		var required = mark2.ui.getRequiredScrambleCountByPuzzle();
+		for(var puzzle in required) {
+			if(required.hasOwnProperty(puzzle)) {
+				var scrambles = scramblesByPuzzle[puzzle] || [];
+				scramblesByPuzzle[puzzle] = scrambles;
+
+				if(scrambles.length >= required[puzzle]) {
+					// We could truncate the scrambles array here, but that's work, and
+					// we might be able to use the scrambles later anyways.
+					continue;
+				}
+
+				var neededScrambles = required[puzzle] - scrambles.length;
+				var MAX_SCRAMBLES_PER_REQUEST = 20;
+				neededScrambles = Math.min(neededScrambles, MAX_SCRAMBLES_PER_REQUEST);
+				for(var i = 0; i < neededScrambles; i++) {
+					scrambles.push(null);
+				}
+
+				var seed = null;
+				scrambleServer.loadScrambles(scramblesLoaded.bind(null, puzzle), puzzle, seed, neededScrambles);
+			}
+		}
+	}
+
+	var callbacks = {
+		showZip: showZip,
+		showScrambles: showScrambles,
+		competitionChanged: competitionChanged
+	};
+	
+	window.addEventListener('load', function() {
+		var canZip = true;
+		var div = mark2.ui.initialize('TNoodle', canZip, callbacks);
+		document.body.appendChild(div);
+	}, false);
+
+})();
+</script>
 
 </head>
 <body>

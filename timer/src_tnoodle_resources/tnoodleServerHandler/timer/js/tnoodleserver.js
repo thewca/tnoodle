@@ -28,6 +28,9 @@ tnoodle.TRIMMED = function(n) {
 	return 2*Math.ceil( (n/10)/2 );
 };
 
+// TODO - this has been obsoleted by /js/scramble.js, and should really get nuked
+// I see no benifit in doing so until we've actually come up with a system for storing
+// times somewhere, though.
 tnoodle.server = function(host, port) {
 	this.serverUrl = "http://" + host + ":" + port;
 
@@ -1091,6 +1094,7 @@ tnoodle.Session.formatLegend = {
 };
 
 /*** Utility functions ***/
+// TODO - this has also been copied to scramble.js, and should get removed
 
 tnoodle.ajax = function(callback, url, data) {
 	var dataUrl = url; //this is to avoid clobbering our original url

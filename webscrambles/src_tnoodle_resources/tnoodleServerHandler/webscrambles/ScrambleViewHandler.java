@@ -129,6 +129,8 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 				ByteArrayOutputStream zipOutput = ScrambleRequest
 						.requestsToZip(globalTitle, generationDate,
 								scrambleRequests);
+				String safeTitle = globalTitle.replaceAll("\"", "'");
+				t.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
 				sendBytes(t, zipOutput, "application/zip");
 			} else {
 				azzert(false);
