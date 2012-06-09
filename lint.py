@@ -11,6 +11,7 @@ JSLINT_IGNORED_ERRORS = set([
   'type is unnecessary.',
   "Unexpected token 'ew-resize'.",
   "Bad input type.",
+  "is better written in dot notation",
 ])
 
 NO_JSLINT_KEYWORD = 'BLW-DUCPHAM'
@@ -92,7 +93,7 @@ def lint(files):
 							continue
 						_, fileName, lineNumber, col, error = parsedError
 						lineNumber = int(lineNumber)
-						if error in JSLINT_IGNORED_ERRORS:
+						if any(ignored in error for ignored in JSLINT_IGNORED_ERRORS):
 							print "Ignoring error %s" % line
 						else:
 							error = "%s:%s:%s:%s" % ( f, lineNumber, error, fileLines[lineNumber-1] )
