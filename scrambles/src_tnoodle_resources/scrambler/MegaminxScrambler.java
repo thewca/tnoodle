@@ -40,7 +40,7 @@ public class MegaminxScrambler extends Scrambler {
 
 	@Override
 	public String getShortName() {
-		return pochmann ? "mega" : "oldmega";
+		return pochmann ? "minx" : "oldminx";
 	}
 
 	@Override
