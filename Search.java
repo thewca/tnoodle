@@ -9,8 +9,7 @@ public class Search {
 	FullCube d = new FullCube("");
 	int length1;
 	int maxlen2;
-	
-	String sol_string = null;
+	String sol_string;
 
 	static int getNParity(int idx, int n) {
 		int p = 0;
@@ -23,6 +22,8 @@ public class Search {
 
 	
 	public static void main(String[] args) {
+		long t = System.nanoTime();
+
 		FullCube f;// = new FullCube("");
 //		System.out.println(f.getParity());
 //		System.out.println(f.getShapeIdx());
@@ -30,7 +31,10 @@ public class Search {
 		int a = Square.SquarePrun[0];
 		Random gen = new Random(1000L);
 		new Search().solution(new FullCube(""));
-		long t = System.nanoTime();
+		System.out.println((System.nanoTime()-t)/1e9 + " seconds to initialize");
+
+
+		t = System.nanoTime();
 		for (int x=0; x<1000; x++) {
 		
 	//		System.out.println(m);
@@ -41,15 +45,13 @@ public class Search {
 			Search s = new Search();
 //			s.solution(FullCube.randomCube());
 			System.out.println(s.solution(FullCube.randomCube()));
-			System.out.println((System.nanoTime()-t)/1000000.0/x);
+			System.out.println((System.nanoTime()-t)/1e9/(x+1));
 //			t = System.nanoTime();
 		}
 
 	}
-
-
 	
-	String solution(FullCube c) {
+	public String solution(FullCube c) {
 		this.c = c;
 		sol_string = null;
 		int shape = c.getShapeIdx();
@@ -171,6 +173,7 @@ public class Search {
 //				System.out.println(Integer.toHexString(d.ur));
 //				System.out.println(Integer.toHexString(d.dl));
 //				System.out.println(Integer.toHexString(d.dr));
+				sol_string = move2string(i + length1);
 				return true;
 			}
 		}
@@ -194,16 +197,16 @@ public class Search {
 					bottom = (val > 6) ? (val-12) : val;
 				} else {
 					if (top == 0 && bottom == 0) {
-						s.append('/');
+						s.append(" / ");
 					} else {
-						s.append('(').append(top).append(", ").append(bottom).append(")/");
+						s.append('(').append(top).append(",").append(bottom).append(") / ");
 					}
 					top = bottom = 0;
 				}
 		}
 		if (top == 0 && bottom == 0) {
 		} else {
-			s.append('(').append(top).append(", ").append(bottom).append(")");
+			s.append('(').append(top).append(",").append(bottom).append(")");
 		}
 		return s.toString();// + " (" + len + "t)";
 	}
