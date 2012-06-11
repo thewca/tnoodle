@@ -98,7 +98,11 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 				//	log(scrambleRequests.secondsRemaining + ' seconds remaining');
 				//}
 				// TODO use global status stuff from hackathon2011
-				alert(scrambleRequests.error);
+				if(scrambleRequests.error instanceof XMLHttpRequestProgressEvent) {
+					alert("Can't connect to server");
+				} else {
+					alert("Error loading scrambles\n" + scrambleRequests.error);
+				}
 				return;
 			}
 
