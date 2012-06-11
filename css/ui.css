@@ -88,7 +88,7 @@ h1 {
   border-collapse: collapse;
   background: #CCC;
   box-shadow: 2px 2px 5px #888;
-  margin: 12px;
+  margin: 12px auto;
   font-size: 1.2em;
 }
 
