@@ -13,12 +13,6 @@ class Square {
 	static char TopMove[] = new char[40320];			//transition table for top layer turns
 	static char BottomMove[] = new char[40320];			//transition table for bottom layer turns
 
-//	static int Perm2Comb[] = new int[40320];
-//	static int Comb2Perm[] = new int[70];
-	
-//	static int PermCombPrunEdge[] = new int[40320 * 70 * 4 * 2];
-//	static int PermCombPrunCorner[] = new int[40320 * 70 * 4 * 2];
-
 	private static int[] fact = {1, 1, 2, 6, 24, 120, 720, 5040};
 
 	static void set8Perm(byte[] arr, int idx) {
@@ -58,11 +52,12 @@ class Square {
 		return idx;
 	}	
 	
-	static {
-		init();
-	}
+	static boolean inited = false;
 	
 	static void init() {
+		if (inited) {
+			return;
+		}
 		for (int i=0; i<12; i++) {
 			Cnk[i][0] = 1;
 			Cnk[i][i] = 1;
@@ -73,19 +68,9 @@ class Square {
 		byte[] pos = new byte[8];
 		byte temp;
 		
-//		for (int i=0; i<70; i++) {
-//			Comb2Perm[i] = -1;
-//		}
-		
 		for(int i=0;i<40320;i++){
 			//twist
 			set8Perm(pos, i);
-//			int comb = get8Comb(pos);
-//			if (Comb2Perm[comb] == -1) {
-//				Comb2Perm[comb] = i;
-//			}
-//			assert comb<70;
-//			Perm2Comb[i] = comb;
 			
 			temp=pos[2];pos[2]=pos[4];pos[4]=temp;
 			temp=pos[3];pos[3]=pos[5];pos[5]=temp;
@@ -150,169 +135,11 @@ class Square {
 					
 				}
 			}
-//			++depth;
 			System.out.print(depth);
 			System.out.print('\t');
 			System.out.println(done);
 		}
-/*
-		for (int i=0; i<40320*4*70*2; i++) {
-			PermCombPrunEdge[i] = -1;
-		}
-		PermCombPrunEdge[4] = 0;
-		depth = 0;
-		done = 1;
-		boolean inv;
-		int select, check;
-		while (done < 40320 * 4 * 70 * 2) {
-			inv = depth > 11;
-			select = inv ? -1 : depth;
-			check = inv ? depth : -1;
-			depth++;
-
-			OUT:
-			for (int i=0; i<40320 * 4 * 70 * 2; i++) {
-				if (PermCombPrunEdge[i] == select) {
-					int corner = (i>>3)/70;
-					int edge = Comb2Perm[(i>>3)%70];
-					boolean topEdgeFirst = (i & 2) == 2;
-					boolean botEdgeFirst = (i & 4) == 4;
-					int ml = i & 1;
-					
-					//try twist
-					int idxx = (TwistMove[corner] * 70 + Perm2Comb[TwistMove[edge]]) << 3 | (topEdgeFirst?2:0) | (botEdgeFirst?4:0) | (1-ml);
-					if(PermCombPrunEdge[idxx] == check) {
-						++done;
-						PermCombPrunEdge[inv ? i : idxx] = depth;
-						if (inv) continue OUT;
-					}
-					assert PermCombPrunEdge[idxx]==depth 
-						|| PermCombPrunEdge[idxx]==depth-1 
-						|| PermCombPrunEdge[idxx]==depth-2
-						|| PermCombPrunEdge[idxx]==-1;
-
-					//try turning top layer
-					int edge0 = edge;
-					int m = 0;
-					while (m < 12) {
-						topEdgeFirst = !topEdgeFirst;
-						if (topEdgeFirst) {
-							edge = TopMove[edge];
-							m += 1;
-						} else {
-							corner = TopMove[corner];
-							m += 2;
-						}
-						assert edge < 40320;
-						idxx = (corner * 70 + Perm2Comb[edge]) << 3 | (topEdgeFirst?2:0) | (botEdgeFirst?4:0) | ml;
-						if(PermCombPrunEdge[idxx] == check) {
-							++done;
-							PermCombPrunEdge[inv ? i : idxx] = depth;
-							if (inv) continue OUT;
-						}
-					}
-					assert m==12;
-					assert edge0==edge;
-					
-					m=0;
-					while (m < 12) {
-						botEdgeFirst = !botEdgeFirst;
-						if (botEdgeFirst) {
-							edge = BottomMove[edge];
-							m += 1;
-						} else {
-							corner = BottomMove[corner];
-							m += 2;
-						}
-						idxx = (corner * 70 + Perm2Comb[edge]) << 3 | (topEdgeFirst?2:0) | (botEdgeFirst?4:0) | ml;
-						if(PermCombPrunEdge[idxx] == check) {
-							++done;
-							PermCombPrunEdge[inv ? i : idxx] = depth;
-							if (inv) continue OUT;
-						}
-					}
-
-					
-				}
-			}
-//			++depth;
-			System.out.print(depth);
-			System.out.print('\t');
-			System.out.println(done);
-		}
-
-		for (int i=0; i<40320*4*70*2; i++) {
-			PermCombPrunCorner[i] = -1;
-		}
-		PermCombPrunCorner[4] = 0;
-		depth = 0;
-		done = 1;
-		while (done < 40320 * 4 * 70 * 2) {
-			for (int i=0; i<40320 * 4 * 70 * 2; i++) {
-				if (PermCombPrunCorner[i] == depth) {
-					int edge = (i>>3)/70;
-					int corner = Comb2Perm[(i>>3)%70];
-					boolean topEdgeFirst = (i & 2) == 2;
-					boolean botEdgeFirst = (i & 4) == 4;
-					int ml = i & 1;
-					
-					//try twist
-					int idxx = (TwistMove[edge] * 70 + Perm2Comb[TwistMove[corner]]) << 3 | (topEdgeFirst?2:0) | (botEdgeFirst?4:0) | (1-ml);
-					if(PermCombPrunCorner[idxx] == -1) {
-						++done;
-						PermCombPrunCorner[idxx] = depth+1;
-					}
-
-					//try turning top layer
-					int edge0 = edge;
-					int m = 0;
-					while (m < 12) {
-						topEdgeFirst = !topEdgeFirst;
-						if (topEdgeFirst) {
-							edge = TopMove[edge];
-							m += 1;
-						} else {
-							corner = TopMove[corner];
-							m += 2;
-						}
-						assert edge < 40320;
-						idxx = (edge * 70 + Perm2Comb[corner]) << 3 | (topEdgeFirst?2:0) | (botEdgeFirst?4:0) | ml;
-						if(PermCombPrunCorner[idxx] == -1) {
-							++done;
-							PermCombPrunCorner[idxx] = depth+1;
-						}
-					}
-					assert m==12;
-					assert edge0==edge;
-					
-					m=0;
-					while (m < 12) {
-						botEdgeFirst = !botEdgeFirst;
-						if (botEdgeFirst) {
-							edge = BottomMove[edge];
-							m += 1;
-						} else {
-							corner = BottomMove[corner];
-							m += 2;
-						}
-						idxx = (edge * 70 + Perm2Comb[corner]) << 3 | (topEdgeFirst?2:0) | (botEdgeFirst?4:0) | ml;
-						if(PermCombPrunCorner[idxx] == -1) {
-							++done;
-							PermCombPrunCorner[idxx] = depth+1;
-						}
-					}
-
-					
-				}
-			}
-			++depth;
-			System.out.print(depth);
-			System.out.print('\t');
-			System.out.println(done);
-		}*/
+		inited = true;
 	}
 	
-//	public static void main(String[] args) {
-//		init();
-//	}
 }

@@ -23,7 +23,10 @@ public class Search {
 	
 	public static void main(String[] args) {
 		long t = System.nanoTime();
-
+		
+		Shape.init();
+		Square.init();
+		
 		FullCube f;// = new FullCube("");
 //		System.out.println(f.getParity());
 //		System.out.println(f.getShapeIdx());
