@@ -65,7 +65,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 
 	this.showExt = function(title, scrambleRequest, ext, target) {
 		var params = { scrambles: JSON.stringify(scrambleRequest) };
-		tnoodle.postToUrl(that.viewUrl + title + '.' + ext, params, "POST", target);
+		tnoodle.postToUrl(that.viewUrl + encodeURIComponent(title) + '.' + ext, params, "POST", target);
 	};
 	this.showPdf = function(title, scrambleRequest, target) {
 		that.showExt(title, scrambleRequest, 'pdf', target);
