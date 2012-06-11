@@ -1,5 +1,8 @@
 var tnoodle = tnoodle || {};
 
+// This is a useful option for simulating a slow server (milliseconds).
+tnoodle.FAKE_SCRAMBLE_DELAY = 0;
+
 tnoodle.ScrambleServer = function(hostname, port, protocol) {
 	var that = this;
 
@@ -110,7 +113,11 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 			for(var i = 0; i < scrambleRequests.length; i++) {
 				scrambles = scrambles.concat(scrambleRequests[i].scrambles);
 			}
-			callback(scrambles);
+			if(tnoodle.FAKE_SCRAMBLE_DELAY) {
+				setTimeout(callback.bind(null, scrambles), tnoodle.FAKE_SCRAMBLE_DELAY);
+			} else {
+				callback(scrambles);
+			}
 		}, this.scrambleUrl + ".json", query);
 		return pendingLoadScrambles;
 	};
