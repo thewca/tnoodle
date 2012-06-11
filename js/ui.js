@@ -502,7 +502,8 @@ mark2.ui = (function() {
 		betaText.appendChild(document.createTextNode('BETA 0.1b'));
 
 		if(name) {
-			mark2Title.appendChild(document.createTextNode(' / ' + name));
+			mark2Title.appendChild(document.createTextNode(' / '));
+			mark2Title.appendChild(name);
 		}
 
 
