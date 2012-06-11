@@ -92,12 +92,12 @@ if windowsOrCygwin():
 			assert 0 == os.system('rmdir %s' % path)
 		else:
 			oldUnlink(path)
-	
+
 	os.unlink = unlink
 	os.symlink = windowsSymlink
 	os.path.islink = islink
 	os.readlink = readlink
-	
+
 def rmtree(dir):
 	# This method recursively deletes a directory, but doesn't follow any symlinks
 	if not os.path.exists(dir) and not os.path.islink(dir):
@@ -175,7 +175,7 @@ class tmt:
 			projectName = dirname(projectFile)
 			imp.load_source('', projectFile)
 			assert dirname(projectFile) in tmt.TmtProject.projects
-		
+
 		assert DEFAULT_PROJECT_NAME in tmt.TmtProject.projects, tmt.TmtProject.projects.keys()
 		defaultProject = tmt.TmtProject.projects[ DEFAULT_PROJECT_NAME ]
 
@@ -208,7 +208,7 @@ class tmt:
 			lsFilesCmd = "git diff --cached --name-only"
 		files = os.popen(lsFilesCmd).read().split('\n')
 		return files
-	
+
 	def _lint(self):
 		files = self._getFilesList()
 		failures = lint.lint(files)
@@ -363,7 +363,7 @@ class tmt:
 			action="store_true", default=False,
 			help="Check all files, even if they haven't been edited")
 		parser_strings.set_defaults(func=self._strings)
-	
+
 	def memoize(self, func):
 		d = {}
 		evaluating = set()
@@ -422,7 +422,7 @@ class tmt:
 		for ff in os.listdir(f):
 			m = max(m, self.timestamp(join(f, ff)))
 		return m
-	
+
 	def glob(self, folder, pattern, relativeTo=None):
 		matches = []
 		pattern = re.compile(pattern)
@@ -473,6 +473,8 @@ class TmtProject(object):
 	# have been loaded, in no particular order.
 	def afterProjects(self):
 		pass
+	def needsCompiling(self):
+		return False
 	def compile(self):
 		assert False
 	def dist(self):
@@ -509,12 +511,15 @@ class TmtProject(object):
 				else:
 					indent += '    '
 
+		s = indent
+		if self.needsCompiling():
+			s += '* '
+		s += self.__str__(timestamps=tmt.args.timestamps)
 		if not tmt.args.no_prune and self in seen:
 			# If we're pruning, and we've seen this node before,
 			# then we don't recurse
-			s = indent + self.__str__(timestamps=tmt.args.timestamps) + ' (seen)\n'
+			s += ' (seen)\n'
 		else:
-			s = indent + self.__str__(timestamps=tmt.args.timestamps)
 			if tmt.args.descriptions and self.description:
 				s += ' - ' + self.description
 			s += '\n'
@@ -639,14 +644,14 @@ class EclipseProject(TmtProject):
 		self.srcResource = join(self.name, RESOURCE_FOLDER_SRC)
 		self.binResource = join(self.name, RESOURCE_FOLDER_BIN)
 		self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
-	
+
 		if not isdir(self.bin):
 			os.mkdir(self.bin)
 		if not isdir(self.binResource):
 			os.mkdir(self.binResource)
 		if not isdir(self.distDir):
 			os.mkdir(self.distDir)
-	
+
 	def distJarFile(self, includeVersion=True):
 		# This is a function rather than a static attribute because
 		# tmt.VERSION can change (see release target).
@@ -656,14 +661,20 @@ class EclipseProject(TmtProject):
 			fileName = '%s.jar' % self.fullName
 		return join(self.distDir, fileName)
 
-	def compile(self):
+	def needsCompiling(self):
 		# Note that we assume that if the resources of a project we depend on change,
 		# we don't need to recompile. This is the way resources should behave.
+
+		if any( dep.needsCompiling() for dep in self.getDependencies() ):
+			return True
 		lastCompiled = tmt.timestamp(self.bin)
 		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False) )
 		changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
 		srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
-		if lastCompiled > srcLastTouched and len(changedDeps) == 0:
+		return lastCompiled <= srcLastTouched or len(changedDeps) > 0
+
+	def compile(self):
+		if not self.needsCompiling():
 			print "%s is up to date, not recompiling" % self.name
 			return False
 
@@ -779,7 +790,7 @@ class EclipseProject(TmtProject):
 			pushTagsCommand = 'git push --tags'
 			print pushTagsCommand
 			assert 0 == os.system(pushTagsCommand)
-	
+
 	def dist(self):
 		tmt._make(projectName=self.name, command='compile')
 		jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
@@ -858,7 +869,7 @@ Implementation-Version: %s
 			classpath=self.getClasspath(includeResources=False),
 			args=args,
 			debug=tmt.args.debug)
-	
+
 	def check(self):
 		if not self.tests:
 			return
@@ -867,7 +878,7 @@ Implementation-Version: %s
 
 		for testClass in self.tests:
 			assert 0 == tmt.java(main=testClass,
-								 classpath=self.getClasspath())
+                                 classpath=self.getClasspath())
 
 	def clean(self):
 		print 'Cleaning: %s' % self.name
@@ -883,7 +894,7 @@ Implementation-Version: %s
 		tempBin = join(self.name, '.bin')
 		if isdir(tempBin):
 			rmtree(tempBin)
-	
+
 	def __str__(self, timestamps=False):
 		s = self.name
 		if timestamps:
