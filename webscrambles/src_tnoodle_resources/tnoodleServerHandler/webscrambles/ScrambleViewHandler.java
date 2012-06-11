@@ -101,16 +101,19 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 				azzert(false);
 			}
 		} else if (extension.equals("pdf") || extension.equals("zip")) {
-			if (t.getRequestMethod().equals("POST")) {
-				BufferedReader in = new BufferedReader(new InputStreamReader(
-						t.getRequestBody()));
-				StringBuilder body = new StringBuilder();
-				String line;
-				while ((line = in.readLine()) != null) {
-					body.append(line);
-				}
-				query = parseQuery(body.toString());
+			if (!t.getRequestMethod().equals("POST")) {
+				sendText(t, "You must POST to this url. Copying and pasting the url won't work.");
+				return;
 			}
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					t.getRequestBody()));
+			StringBuilder body = new StringBuilder();
+			String line;
+			while ((line = in.readLine()) != null) {
+				body.append(line);
+			}
+			query = parseQuery(body.toString());
 
 			String json = query.get("scrambles");
 			ScrambleRequest[] scrambleRequests = GSON.fromJson(json,
