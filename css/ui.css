@@ -58,28 +58,11 @@ h1 {
   text-shadow: 0px 0px 5px #FFF, 0px 0px 10px #FFF, 0px 0px 15px #FFF, 0px 0px 20px #FFF;
 }
 
-
-
-#about {
-  display: none; /* To simplify the interface when it loads. */
-}
-
-@media print {
-    .interface, #about, .unsupported {
-        display: none !important;
-    }
-
-    body {
-      background: none;
-    }    
-}
-
-
 #top_interface {
   position: relative;
 }
 
-#top_interface progress {
+#scrambleProgress {
   font-size: 200%;
 
   position: absolute;
@@ -197,4 +180,118 @@ h1 {
 
 #events_rounds_interface #rounds_table td input.num_solves {
   width: 3em;
+}
+
+/* 
+This can go once https://code.google.com/p/chromium/issues/detail?id=132014
+is resolved.
+*/	
+.progressDiv {
+	border: 1px solid #00C0C0;
+	background-color:#d3d3d3;
+
+	background-image:
+		-webkit-linear-gradient(
+		-45deg,
+		#00C0C0 25%,
+		transparent 25%,
+		transparent 50%,
+		#00C0C0 50%,
+		#00C0C0 75%,
+		transparent 75%,
+		transparent
+	);
+	background-image:
+		-moz-linear-gradient(
+		-45deg,
+		#00C0C0 25%,
+		transparent 25%,
+		transparent 50%,
+		#00C0C0 50%,
+		#00C0C0 75%,
+		transparent 75%,
+		transparent
+	);
+	background-image:
+		-ms-linear-gradient(
+		-45deg,
+		#00C0C0 25%,
+		transparent 25%,
+		transparent 50%,
+		#00C0C0 50%,
+		#00C0C0 75%,
+		transparent 75%,
+		transparent
+	);
+	background-image:
+		linear-gradient(
+		-45deg,
+		#00C0C0 25%,
+		transparent 25%,
+		transparent 50%,
+		#00C0C0 50%,
+		#00C0C0 75%,
+		transparent 75%,
+		transparent
+	);
+
+	-webkit-background-size:50px 50px;
+	-moz-background-size:50px 50px;
+	-ms-background-size:50px 50px;
+	background-size:50px 50px;
+
+	-webkit-animation:move 2s linear infinite;
+	-moz-animation:move 2s linear infinite;
+	-ms-animation:move 2s linear infinite;
+	animation:move 2s linear infinite;
+
+	-webkit-border-radius:15px;
+	-moz-border-radius:15px;
+	-ms-border-radius:15px;
+	border-radius:15px;
+
+	overflow: hidden;
+
+	-webkit-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+	-moz-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+	-ms-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+	box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+}
+.bar > span:after {
+	display: none;
+}
+/*
+Animate the stripes
+*/	
+@-webkit-keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
+}	
+@-moz-keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
+}	
+@-ms-keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
+}	
+@keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
 }
