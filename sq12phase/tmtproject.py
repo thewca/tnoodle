@@ -5,7 +5,7 @@ from os.path import join, exists
 class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
-                self.main = 'cs.sq12phase.FullCube'
+                self.main = 'cs.sq12phase.Search'
 
 	def compile(self):
 		tmt.EclipseProject.compile(self)
