@@ -11,7 +11,8 @@ import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacherListener;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyClassLoader;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
+import net.gnehzr.tnoodle.utils.Utils;
 
 public class ScrambleTest {
 	
@@ -53,9 +54,24 @@ public class ScrambleTest {
 
 		int SCRAMBLE_COUNT = 100;
 		boolean drawScramble = true;
-		SortedMap<String, LazyClassLoader<Scrambler>> lazyScramblers = Scrambler.getScramblers();
+		SortedMap<String, LazyInstantiator<Scrambler>> lazyScramblers = Scrambler.getScramblers();
+		
+		// Check that the names by which the scramblers refer to themselves
+		// is the same as the names by which we refer to them in the plugin definitions file.
+		for(String shortName : lazyScramblers.keySet()) {
+			String longName = Scrambler.getScramblerLongName(shortName);
+			LazyInstantiator<Scrambler> lazyScrambler = lazyScramblers.get(shortName);
+			Scrambler scrambler = lazyScrambler.cachedInstance();
+			
+			System.out.println(shortName + " ==? " + scrambler.getShortName());
+			Utils.azzert(shortName.equals(scrambler.getShortName()));
+			
+			System.out.println(longName + " ==? " + scrambler.getLongName());
+			Utils.azzert(longName.equals(scrambler.getLongName()));
+		}
+		
 		for(String puzzle : lazyScramblers.keySet()) {
-			LazyClassLoader<Scrambler> lazyScrambler = lazyScramblers.get(puzzle);
+			LazyInstantiator<Scrambler> lazyScrambler = lazyScramblers.get(puzzle);
 			final Scrambler scrambler = lazyScrambler.cachedInstance();
 			
 			// Generating a scramble
@@ -80,7 +96,7 @@ public class ScrambleTest {
 			ScrambleCacherListener cacherStopper = new ScrambleCacherListener() {
 				@Override
 				public void scrambleCacheUpdated(ScrambleCacher src) {
-//					System.out.println(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize());
+					System.out.println(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize());
 					if(src.getAvailableCount() == src.getCacheSize()) {
 						src.stop();
 						synchronized(c1) {

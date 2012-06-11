@@ -24,10 +24,8 @@ http://upload.wikimedia.org/wikipedia/commons/f/ff/Square-1_half-turn.jpg
 
 **** Javascript libraries *****
 	Note: some of these have been modified, so don't upgrade blindly
-mootools-core-1.4.2.js: http://mootools.net/core/91d7f00356dcd42b2ce8e56d17714518
+mootools-core-1.4.2.js: http://mootools.net/core/76bf47062d6c1983d66ce47ad66aa0e0
 mootools-more-1.4.0.1.js: http://mootools.net/more/99f9dc2eb198e61569abc9839529ea00
+powertools-1.1.1.js: http://cpojer.net/PowerTools/#select=Class-Extras/*;History/*
 
-
-mootools-1.2.4-core.js: http://mootools.net
-mootools-1.2.4.4-more.js: http://mootools.net
 stacktrace.js: ttps://github.com/eriwen/javascript-stacktrace

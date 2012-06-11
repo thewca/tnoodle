@@ -3,6 +3,8 @@ package net.gnehzr.tnoodle.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+
 public class LongestPrefixMatch<K> {
 	public LongestPrefixMatch() {
 		// TODO - implement something fast!
@@ -10,7 +12,7 @@ public class LongestPrefixMatch<K> {
 	
 	private ArrayList<K[]> keys = new ArrayList<K[]>();
 	public void put(K[] key) {
-		assert !keys.contains(key);
+		azzert(!keys.contains(key));
 		keys.add(key);
 	}
 	

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 public abstract class SafeHttpHandler implements HttpHandler {
 	private static final Logger l = Logger.getLogger(SafeHttpHandler.class.getName());
@@ -31,7 +32,7 @@ public abstract class SafeHttpHandler implements HttpHandler {
 			wrappedHandle(t, path, query);
 		} catch(Throwable e) {
 			if(path != null && path[path.length-1].endsWith(".json")) {
-				assert query != null;
+				azzert(query != null);
 				jsonError(t, e, query.get("callback"));
 			} else {
 				textError(t, e);

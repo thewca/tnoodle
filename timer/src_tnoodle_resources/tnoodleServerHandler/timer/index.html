@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TNT</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+
+<!--
+	All of the css files and js files will get concatenated (and minified)
+	into tnt.css and tnt.js by the ant dist task. All of the js/css includes
+	below will get converted into something like:
+	
+	<link type="text/css" rel="stylesheet" href="css/tnt.css" media="screen" />
+	<script type="text/javascript" src="js/tnt.js"></script>
+	
+	The ant task that does this relies upon a pretty fragile regex to do this,
+	so keep your css and js includes on one line, and formatted *exactly* as you see
+	below.
+ -->
+
+<link type="text/css" rel="stylesheet" href="css/tnt.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="css/TimerDisplay.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="css/ScrambleStuff.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="css/TimesTable.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="css/index.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="css/Window.css" media="screen" />
+
+<script type="text/javascript">
+// Workaround for dev version of chromium
+// See: http://code.google.com/p/v8/source/detail?r=5135
+window.print = function() { };
+</script>
+<script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
+<script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
+<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="js/KeyboardManager.js"></script>
+<script type="text/javascript" src="js/stacktrace.js"></script>
+<script type="text/javascript" src="js/stacktrace-more.js"></script>
+<script type="text/javascript" src="js/tnt.js"></script>
+<script type="text/javascript" src="js/VertTriLayout.js"></script>
+<script type="text/javascript" src="js/tnoodleserver.js"></script>
+<script type="text/javascript" src="js/ColorChooser.js"></script>
+<script type="text/javascript" src="js/ScrambleStuff.js"></script>
+<script type="text/javascript" src="js/TimerDisplay.js"></script>
+<script type="text/javascript" src="js/KeyboardTimer.js"></script>
+<script type="text/javascript" src="js/StackmatTimer.js"></script>
+<script type="text/javascript" src="js/TimesTable.js"></script>
+<script type="text/javascript" src="/stackmat-flash/StackApplet.js"></script>
+<script type="text/javascript" src="js/ShortcutManager.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+
+</head>
+<body>
+<img class="background" />
+<div id="signIn">
+	<span class="link">Sign in</span>
+	<span id="helpLink" class="link">Shortcuts</span>
+	<span id="bgLink" class="link"></span>
+	<span id="aboutLink" class="link">About</span>
+</div>
+<div id="timer"></div>
+<div id="scrambles">
+	<div id="scrambleBorder"></div>
+	<div id="scrambleArea"></div>
+</div>
+<div id="times">
+	<div id="timesArea">
+		<div id="puzzleChooser">
+			<img id="newSession" src="media/page_add.png" class="imglink" title="New session" />
+			<img id="resetSession" src="media/page_refresh.png" class="imglink" title="Reset session" />
+			<img id="deleteSession" src="media/page_delete.png" class="imglink" title="Delete session" />
+			<a id="downloadCSV" href="" target="_blank" title="In Chrome, you have to right click and select save as to download. Don't forget to specify a .csv extension!"><img class="imglink" src="media/csv_icon_sm.gif" /></a>
+		</div>
+		<div id="sessionInfoBar">
+			<span id="sessionInfo"></span>
+				<input id="sessionComment" type="text" />
+		</div>
+		<table id="timesTable"></table>
+	</div>
+</div>
+</body>
+</html>

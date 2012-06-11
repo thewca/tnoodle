@@ -1,0 +1,11 @@
+{
+    "name": "Hackathon2011"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+    "mongoose": ">= 2.0.4"
+    , "mongoose-auth": ">= 0.0.11"
+    , "now":">=0.7.6"
+    , "paperboy":">=0.0.2"
+  }
+}

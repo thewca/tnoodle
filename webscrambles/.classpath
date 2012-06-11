@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry excluding="webscrambles/" kind="src" output="bin_tnoodle_resources" path="src_tnoodle_resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scrambles"/>
-	<classpathentry kind="lib" path="/lib/iText-5.0.2.jar" sourcepath="/home/jeremy/misc/main/itext/src/main"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mootools"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scrambler-interface"/>
+	<classpathentry exported="true" kind="lib" path="/lib/iText-5.0.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
