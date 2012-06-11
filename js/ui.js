@@ -687,6 +687,11 @@ mark2.ui = (function() {
 		for(var i = 0; i < eventInputs.length; i++) {
 			var eventID = eventInputs[i].id.split("_")[3];
 			eventInputs[i].value = numCurrentRounds(eventID);
+			if(eventInputs[i] == document.activeElement) {
+				// Setting the value of a focused input clears it's selection.
+				// We'd rather it stay (or become) selected.
+				eventInputs[i].select();
+			}
 		}
 	}
 
