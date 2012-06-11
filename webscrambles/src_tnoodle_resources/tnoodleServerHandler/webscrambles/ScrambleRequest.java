@@ -267,198 +267,213 @@ class ScrambleRequest {
 		Rectangle pageSize = PageSize.LETTER;
 		
 		if(scrambleRequest.fmc) {
-			azzert(scrambleRequest.count == 1);
-			String scramble = scrambleRequest.scrambles[0];
-			
-			PdfContentByte cb = docWriter.getDirectContent();
-			BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-			
-			int bottom = 50;
-			int left = 35;
-			int right = (int) (pageSize.getWidth()-left);
-			int top = (int) (pageSize.getHeight()-bottom);
-			
-			int height = top - bottom;
-			int width = right - left;
-			
-			int solutionBorderTop = bottom + (int) (height*.5);
-			int scrambleBorderTop = solutionBorderTop + 40;
-			
-			int rulesRight = left + (int) (width*.7);
-			
-			int competitorInfoBottom = top - (int) (height*.18);
-			int gradeBottom = competitorInfoBottom - 40;
-			int competitorInfoLeft = right - (int) (width*.45);
-			
-			int padding = 5;
-			
-			// Outer border
-			cb.setLineWidth(2f); 
-			cb.moveTo(left, top);
-			cb.lineTo(left, bottom);
-			cb.lineTo(right, bottom);
-			cb.lineTo(right, top);
-			
-			// Solution border
-			cb.moveTo(left, solutionBorderTop);
-			cb.lineTo(right, solutionBorderTop);
-			
-			// Rules bottom border
-			cb.moveTo(left, scrambleBorderTop);
-			cb.lineTo(rulesRight, scrambleBorderTop);
+			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
+				String scramble = scrambleRequest.scrambles[i];
+				PdfContentByte cb = docWriter.getDirectContent();
+				BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+				
+				int bottom = 30;
+				int left = 35;
+				int right = (int) (pageSize.getWidth()-left);
+				int top = (int) (pageSize.getHeight()-bottom);
+				
+				int height = top - bottom;
+				int width = right - left;
+				
+				int solutionBorderTop = bottom + (int) (height*.5);
+				int scrambleBorderTop = solutionBorderTop + 40;
+				
+				int rulesRight = left + (int) (width*.7);
+				
+				int competitorInfoBottom = top - (int) (height*.18);
+				int gradeBottom = competitorInfoBottom - 40;
+				int competitorInfoLeft = right - (int) (width*.45);
+				
+				int padding = 5;
+				
+				// Outer border
+				cb.setLineWidth(2f); 
+				cb.moveTo(left, top);
+				cb.lineTo(left, bottom);
+				cb.lineTo(right, bottom);
+				cb.lineTo(right, top);
+				
+				// Solution border
+				cb.moveTo(left, solutionBorderTop);
+				cb.lineTo(right, solutionBorderTop);
+				
+				// Rules bottom border
+				cb.moveTo(left, scrambleBorderTop);
+				cb.lineTo(rulesRight, scrambleBorderTop);
 
-			// Rules right border
-			cb.lineTo(rulesRight, gradeBottom);
-			
-			// Grade bottom border
-			cb.moveTo(competitorInfoLeft, gradeBottom);
-			cb.lineTo(right, gradeBottom);
-			
-			// Competitor info bottom border
-			cb.moveTo(competitorInfoLeft, competitorInfoBottom);
-			cb.lineTo(right, competitorInfoBottom);
-			
-			// Competitor info left border
-			cb.moveTo(competitorInfoLeft, gradeBottom);
-			cb.lineTo(competitorInfoLeft, top);
-			
-			// Solution lines
-			int availableSolutionWidth = right - left;
-			int availableSolutionHeight = scrambleBorderTop - bottom;
-			int lineWidth = 25;
-			int lineHeight = 40;
-			int linesX = (availableSolutionWidth/lineWidth + 1)/2;
-			int allocatedX = (2*linesX-1)*lineWidth;
-			int offsetX = (availableSolutionWidth-allocatedX)/2;
-			int linesY = (availableSolutionHeight / lineHeight) - 1;
-			for(int y = 0; y < linesY; y++) {
-				for(int x = 0; x < linesX; x++) {
-					int xPos = left + offsetX + 2*x*lineWidth;
-					int yPos = solutionBorderTop - (y+1)*lineHeight;
-					cb.moveTo(xPos, yPos);
-					cb.lineTo(xPos+lineWidth, yPos);
+				// Rules right border
+				cb.lineTo(rulesRight, gradeBottom);
+				
+				// Grade bottom border
+				cb.moveTo(competitorInfoLeft, gradeBottom);
+				cb.lineTo(right, gradeBottom);
+				
+				// Competitor info bottom border
+				cb.moveTo(competitorInfoLeft, competitorInfoBottom);
+				cb.lineTo(right, competitorInfoBottom);
+				
+				// Competitor info left border
+				cb.moveTo(competitorInfoLeft, gradeBottom);
+				cb.lineTo(competitorInfoLeft, top);
+				
+				// Solution lines
+				int availableSolutionWidth = right - left;
+				int availableSolutionHeight = scrambleBorderTop - bottom;
+				int lineWidth = 25;
+				int lineHeight = 40;
+				int linesX = (availableSolutionWidth/lineWidth + 1)/2;
+				int allocatedX = (2*linesX-1)*lineWidth;
+				int offsetX = (availableSolutionWidth-allocatedX)/2;
+				int linesY = (availableSolutionHeight / lineHeight) - 1;
+				for(int y = 0; y < linesY; y++) {
+					for(int x = 0; x < linesX; x++) {
+						int xPos = left + offsetX + 2*x*lineWidth;
+						int yPos = solutionBorderTop - (y+1)*lineHeight;
+						cb.moveTo(xPos, yPos);
+						cb.lineTo(xPos+lineWidth, yPos);
+					}
 				}
-			}
-			
-			cb.stroke();
-			
-			cb.beginText();
-			int availableScrambleSpace = right-left - 2*padding;
-			int scrambleFontSize = 20;
-			String scrambleStr = "Scramble: " + scramble;
-			float scrambleWidth;
-			do {
-				scrambleFontSize--;
-				scrambleWidth = bf.getWidthPoint(scrambleStr, scrambleFontSize);
-			} while(scrambleWidth > availableScrambleSpace);
-			
-			cb.setFontAndSize(bf, scrambleFontSize);
-			int scrambleY = 3 + solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scrambleStr, left+padding, scrambleY, 0);
-			cb.endText();
-			
-			int availableScrambleWidth = right-rulesRight;
-			int availableScrambleHeight = gradeBottom-scrambleBorderTop;
-			Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
-			PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-			Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+				
+				cb.stroke();
+				
+				cb.beginText();
+				int availableScrambleSpace = right-left - 2*padding;
+				int scrambleFontSize = 20;
+				String scrambleStr = "Scramble: " + scramble;
+				float scrambleWidth;
+				do {
+					scrambleFontSize--;
+					scrambleWidth = bf.getWidthPoint(scrambleStr, scrambleFontSize);
+				} while(scrambleWidth > availableScrambleSpace);
+				
+				cb.setFontAndSize(bf, scrambleFontSize);
+				int scrambleY = 3 + solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
+				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scrambleStr, left+padding, scrambleY, 0);
+				cb.endText();
+				
+				int availableScrambleWidth = right-rulesRight;
+				int availableScrambleHeight = gradeBottom-scrambleBorderTop;
+				Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
+				PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+				Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
 
-			try {
-				scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
-			} catch (InvalidScrambleException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				try {
+					scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
+				} catch (InvalidScrambleException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				g2.dispose();
+				cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
+				
+				ColumnText ct = new ColumnText(cb);
+				
+				int fontSize = 15;
+				int marginBottom = 10;
+				int offsetTop = 27;
+				boolean showScrambleCount = scrambleRequest.scrambles.length > 1;
+				if(showScrambleCount) {
+					offsetTop -= fontSize + 2;
+				}
+				
+				cb.beginText();
+				cb.setFontAndSize(bf, fontSize);
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, globalTitle, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+				offsetTop += fontSize + 2;
+				cb.endText();
+				
+				cb.beginText();
+				cb.setFontAndSize(bf, fontSize);
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+				cb.endText();
+
+				if(showScrambleCount) {
+					cb.beginText();
+					offsetTop += fontSize + 2;
+					cb.setFontAndSize(bf, fontSize);
+					cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Scramble " + (i+1) + " of " + scrambleRequest.scrambles.length, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+					cb.endText();
+				}
+
+				offsetTop += fontSize + marginBottom;
+				
+				cb.beginText();
+				fontSize = 15;
+				cb.setFontAndSize(bf, fontSize);
+				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Competitor: __________________", competitorInfoLeft+padding, top-offsetTop, 0);
+				offsetTop += fontSize + marginBottom;
+				cb.endText();
+				
+				cb.beginText();
+				
+				fontSize = 15;
+				cb.setFontAndSize(bf, fontSize);
+				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
+				
+				cb.setFontAndSize(bf, 19);
+				int wcaIdLength = 63;
+				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
+				
+				offsetTop += fontSize + marginBottom;
+				cb.endText();
+				
+				cb.beginText();
+				fontSize = 15;
+				cb.setFontAndSize(bf, fontSize);
+				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Signature: ___________________", competitorInfoLeft+padding, top-offsetTop, 0);
+				offsetTop += fontSize + marginBottom;
+				cb.endText();
+				
+				cb.beginText();
+				fontSize = 11;
+				cb.setFontAndSize(bf, fontSize);
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "DO NOT FILL IF YOU ARE THE COMPETITOR", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+				offsetTop += fontSize + marginBottom;
+				cb.endText();
+				
+				cb.beginText();
+				fontSize = 11;
+				cb.setFontAndSize(bf, fontSize);
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Graded by: _______________ Result: ______", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+				offsetTop += fontSize + marginBottom;
+				cb.endText();
+				
+				cb.beginText();
+				cb.setFontAndSize(bf, 25f);
+				int MAGIC_NUMBER = 40; // kill me now
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves Challenge", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
+				cb.endText();
+				
+				List rules = new List(List.UNORDERED);
+				rules.add("Notate your solution by writing one move per bar.");
+				rules.add("To delete moves, clearly erase/blacken them.");
+				rules.add("Face moves are clockwise.");
+				rules.add("Rotations x, y, and z follow R, U, and F.");
+				rules.add("Slice moves M, E, and S follow L, D, and F.");
+				rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
+				
+				ct.addElement(rules);
+				int rulesTop = competitorInfoBottom+70;
+				ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
+				ct.go();
+				
+				rules = new List(List.UNORDERED);
+				rules.add("You have 1 hour to find a solution. Your solution length will be counted in HTM.");
+				int spaces = linesX*linesY;
+				rules.add("There are " + spaces + " spaces on this page. Therefore, your solution must be at most " + spaces + " moves, including rotations.");
+				rules.add("Your solution must not be related to the scrambling algorithm in any way.");
+				ct.addElement(rules);
+				MAGIC_NUMBER = 125; // kill me now
+				ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
+				ct.go();
+
+				doc.newPage();
 			}
-			g2.dispose();
-			cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
-			
-			ColumnText ct = new ColumnText(cb);
-			
-			int offsetTop = 20;
-			int marginBottom = 10;
-			
-			cb.beginText();
-			int fontSize = 15;
-			cb.setFontAndSize(bf, fontSize);
-			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, globalTitle, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
-			offsetTop += fontSize + 2;
-			cb.endText();
-			
-			cb.beginText();
-			cb.setFontAndSize(bf, fontSize);
-			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
-			offsetTop += fontSize + marginBottom;
-			cb.endText();
-			
-			cb.beginText();
-			fontSize = 15;
-			cb.setFontAndSize(bf, fontSize);
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Competitor: __________________", competitorInfoLeft+padding, top-offsetTop, 0);
-			offsetTop += fontSize + marginBottom;
-			cb.endText();
-			
-			cb.beginText();
-			
-			fontSize = 15;
-			cb.setFontAndSize(bf, fontSize);
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
-			
-			cb.setFontAndSize(bf, 19);
-			int wcaIdLength = 63;
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
-			
-			offsetTop += fontSize + marginBottom;
-			cb.endText();
-			
-			cb.beginText();
-			fontSize = 15;
-			cb.setFontAndSize(bf, fontSize);
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Signature: ___________________", competitorInfoLeft+padding, top-offsetTop, 0);
-			offsetTop += fontSize + marginBottom;
-			cb.endText();
-			
-			cb.beginText();
-			fontSize = 11;
-			cb.setFontAndSize(bf, fontSize);
-			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "DO NOT FILL IF YOU ARE THE COMPETITOR", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
-			offsetTop += fontSize + marginBottom;
-			cb.endText();
-			
-			cb.beginText();
-			fontSize = 11;
-			cb.setFontAndSize(bf, fontSize);
-			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Graded by: _______________ Result: ______", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
-			offsetTop += fontSize + marginBottom;
-			cb.endText();
-			
-			cb.beginText();
-			cb.setFontAndSize(bf, 25f);
-			int MAGIC_NUMBER = 40; // kill me now
-			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves Challenge", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
-			cb.endText();
-			
-			List rules = new List(List.UNORDERED);
-			rules.add("Notate your solution by writing one move per bar.");
-			rules.add("To delete moves, clearly erase/blacken them.");
-			rules.add("Face moves are clockwise.");
-			rules.add("Rotations x, y, and z follow R, U, and F.");
-			rules.add("Slice moves M, E, and S follow L, D, and F.");
-			rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
-			
-			ct.addElement(rules);
-			int rulesTop = competitorInfoBottom+70;
-			ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
-			ct.go();
-			
-			rules = new List(List.UNORDERED);
-			rules.add("You have 1 hour to find a solution. Your solution length will be counted in HTM.");
-			int spaces = linesX*linesY;
-			rules.add("There are " + spaces + " spaces on this page. Therefore, your solution must be at most " + spaces + " moves, including rotations.");
-			rules.add("Your solution must not be related to the scrambling algorithm in any way.");
-			ct.addElement(rules);
-			MAGIC_NUMBER = 125; // kill me now
-			ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
-			ct.go();
 		} else {
 			int scrambleWidth = 0;
 			if(scrambleRequest.scrambler.getShortName().equals("mega")) {
