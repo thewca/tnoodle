@@ -1,0 +1,6 @@
+/puzzles/ tnoodleServerHandler.webscrambles.PuzzleListHandler()
+/scramble/ tnoodleServerHandler.webscrambles.ScrambleHandler()
+/import/ tnoodleServerHandler.webscrambles.ScrambleImporterHandler()
+/view/ tnoodleServerHandler.webscrambles.ScrambleViewHandler()
+
+/js/scramble.js tnoodleServerHandler.DirectoryHandler("webscrambles/interface/scramble.js")

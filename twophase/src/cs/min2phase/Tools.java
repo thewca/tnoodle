@@ -4,12 +4,15 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Random;
+
+import net.gnehzr.tnoodle.utils.Utils;
 
 public class Tools {
 	static boolean inited = false;
@@ -73,8 +76,14 @@ public class Tools {
 	public static synchronized void init() {
 		if (inited)
 			return;
-		InputStream is = Tools.class.getResourceAsStream("twophase_tables");
-		if(!initFrom(new DataInputStream(is))) {
+		
+		try {
+			FileInputStream is = new FileInputStream(new File(Utils.getResourceDirectory(), "twophase_tables"));
+			inited = initFrom(new DataInputStream(is));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		if(!inited) {
 			CubieCube.init();
 			CoordCube.init();
 		}
@@ -112,71 +121,63 @@ public class Tools {
 		}
 	}
 
-	public static boolean initTo(DataOutput out) {
+	public static void initTo(DataOutput out) throws IOException {
 		init();
-		try {
-			write(CubieCube.FlipS2R, out);
-				//336 * 2 = 672 Bytes
-			write(CubieCube.TwistS2R, out);
-				//324 * 2 = 648 Bytes
-			write(CubieCube.CPermS2R, out);
-				//2768 * 2 = 5536 Bytes
-			write(CubieCube.MtoEPerm, out);
-				//40320 * 2 = 80640 Bytes
-			write(CubieCube.merge, out);
-				//56 * 56 = 3136 Bytes
-			write(CoordCube.UDSliceMove, out);
-				//495 * 18 * 2 = 17820 Bytes
-			write(CoordCube.TwistMove, out);
-				//324 * 18 * 2 = 11664 Bytes
-			write(CoordCube.FlipMove, out);
-				//336 * 18 * 2 = 12096 Bytes
-			write(CoordCube.UDSliceConj, out);
-				//495 * 8 * 2 = 7920 Bytes
-			write(CoordCube.UDSliceTwistPrun, out);
-				//495 * 324 = 160380 Bytes
-			write(CoordCube.UDSliceFlipPrun, out);
-				//495 * 336 = 166320 Bytes
-			write(CoordCube.Mid3Move, out);
-				//1320 * 18 * 2 = 47520 Bytes
-			write(CoordCube.Mid32MPerm, out);
-				//24 Bytes
-			write(CoordCube.CParity, out);
-				//2768 / 8 = 346 Bytes
-			write(CoordCube.CPermMove, out);
-				//2788 * 18 * 2 = 99648 Bytes
-			write(CoordCube.EPermMove, out);
-				//2788 * 10 * 2 = 55360 Bytes
-			write(CoordCube.MPermMove, out);
-				//24 * 10 = 240 Bytes
-			write(CoordCube.MPermConj, out);
-				//24 * 16 = 384 Bytes
-			write(CoordCube.MCPermPrun, out);
-				//24 * 2768 = 66432 Bytes
-			write(CoordCube.MEPermPrun, out);
-				//24 * 2768 = 66432 Bytes
-			write(CoordCube.TwistFlipPrun, out);
-				//336 * 324 * 8 = 870912 Bytes
-				//Total : 1674130 Bytes
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+		write(CubieCube.FlipS2R, out);
+		//336 * 2 = 672 Bytes
+		write(CubieCube.TwistS2R, out);
+		//324 * 2 = 648 Bytes
+		write(CubieCube.CPermS2R, out);
+		//2768 * 2 = 5536 Bytes
+		write(CubieCube.MtoEPerm, out);
+		//40320 * 2 = 80640 Bytes
+		write(CubieCube.merge, out);
+		//56 * 56 = 3136 Bytes
+		write(CoordCube.UDSliceMove, out);
+		//495 * 18 * 2 = 17820 Bytes
+		write(CoordCube.TwistMove, out);
+		//324 * 18 * 2 = 11664 Bytes
+		write(CoordCube.FlipMove, out);
+		//336 * 18 * 2 = 12096 Bytes
+		write(CoordCube.UDSliceConj, out);
+		//495 * 8 * 2 = 7920 Bytes
+		write(CoordCube.UDSliceTwistPrun, out);
+		//495 * 324 = 160380 Bytes
+		write(CoordCube.UDSliceFlipPrun, out);
+		//495 * 336 = 166320 Bytes
+		write(CoordCube.Mid3Move, out);
+		//1320 * 18 * 2 = 47520 Bytes
+		write(CoordCube.Mid32MPerm, out);
+		//24 Bytes
+		write(CoordCube.CParity, out);
+		//2768 / 8 = 346 Bytes
+		write(CoordCube.CPermMove, out);
+		//2788 * 18 * 2 = 99648 Bytes
+		write(CoordCube.EPermMove, out);
+		//2788 * 10 * 2 = 55360 Bytes
+		write(CoordCube.MPermMove, out);
+		//24 * 10 = 240 Bytes
+		write(CoordCube.MPermConj, out);
+		//24 * 16 = 384 Bytes
+		write(CoordCube.MCPermPrun, out);
+		//24 * 2768 = 66432 Bytes
+		write(CoordCube.MEPermPrun, out);
+		//24 * 2768 = 66432 Bytes
+		write(CoordCube.TwistFlipPrun, out);
+		//336 * 324 * 8 = 870912 Bytes
+		//Total : 1674130 Bytes
 	}
 	
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 		System.out.println(Arrays.toString(args));
 		if(args.length != 1) {
 			System.out.println("Please provide 1 argument: the file to store the tables in");
-			return;
+			System.exit(1);
 		}
 		FileOutputStream out = new FileOutputStream(args[0]);
 		DataOutputStream dataOut = new DataOutputStream(out);
-		if(!initTo(dataOut)) {
-			System.out.println("IHAAAAAA FAILUREEEEE");
-			System.exit(1);
-		}
+		initTo(dataOut);
+		dataOut.close();
 	}
 
 	/**

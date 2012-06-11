@@ -120,36 +120,119 @@
 	+create website with download (automate releasing?)
 
 #### TNT
++resetting keyboard shortcut configuration breaks vertical scrollbar if present
++time stats tabs should have a pointer, not a text selector when hovering
++stats for all times is broken
++gmaps style copy scramble
+	+fix bug with copy pasting current scramble
++puzzle icon flickers while resizing scramble area
++resetting with time hover visible leaves time hover visible
++right click doesn't work inside of stats field
++adjusting brightness rapidly starts and stops the timer
+	+opening laptop lid also starts the timer
++ctrl+a/select all doesn't work inside of stats field
++holding down keys w/ inspection on shows 0.00, which doesn't really make sense
++clicking to view the RA of an already selected time makes it editable
++reset timer shortcut
++true fullscreen?
+	-esc-ing out of fullscreen in firefox screws up timer font
+	+leaving fullscreen screws up the scrolling of the times table
++pressing escape right after loading TNT causes an exception
++pressing escape to close a dialog causes the reset shortcut to fire
++pressing esc while commenting on a session doesn't stop propagation of the event
++clicking on ave100 does something even when there is no ave100
++add time "dnf" -> cannot call savesessions of 
++replace all issue with time stats?
++esc doesn't close time comment
++resetting format str doesn't seem to work
++shift/ctrl select times starts timer on windows because ctrl and shift keyrepeat
++tmt.createPopup hide() should give the timer focus
++clean up font stuff, there's no need to distribute the fontforge file...
+
 -push mootools fixes upstream (https://github.com/mootools/mootools-more/pull/1082 & https://github.com/mootools/mootools-more/pull/1083)
-	-change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
--exponential backoff for "Loading Scramble..."
--add remaining stackmat options
+	+change to keyboard to support stuff like "a+;" this is needed for stackmat keyboard emulation configuration
+	-mootools-core DOMEvent if(keydown) statement? (https://github.com/GCheung55/mootools-core/commit/ef7e091874c80efe9aa5a039fe75798398e19e46)
+	-Chrome Element vs mootools Element for fullscreen api
 -pretty gui for editing
 	-create an editable table superclass for the editable list & times table
 -read times/metronome
--gmaps style copy scramble
-	-fix bug with copy pasting current scramble
+
 -provide some system for uploading your own image?
+-top row of times area shouldn't wrap
+-get rid of multiple drop down arrows?
+-scrambles for arbitrary relays?
+-sign in link needs to do something, or go away
+-behave nicely when the server goes down
+	-exponential backoff for "Loading Scramble..."
+	-make import scramble offline safe
+	-look at all ajax calls!
+	-be good about cancelling pending ajax calls
+	-use global status bar to indicate pending ajax requests
+-rewrite config stuff
+	-separate defaults from running code
+	-don't store defaults to localStorage, this way if defaults change, people get the new version
+-graphs (save for Hackathon2011?)
+-keyboard shortcuts
+	-columns if there's space
+	-reset individual shortcuts
+	-help vs description
+	-opt in to key repeat
+		-for example: resizing the scramble
+	-show keyboard layout
+-should scramble image be resizable?
+
+### jsracer
++add support for CubeGame
+
+-pretty Chatter date
+-symlink to twisty.js and mootools should really go
+
+### stackmat-flash
++autodetect
+	+stackmat level? this might just work
+	+invertedness
+	+gen2 vs gen3
++does stackmat config popup when there are errors?
++MUST have a good debug page
++interpolate stackmat times?
++unplugging/turning off stackmat doesn't unfocus timer?
+
+-create pretty tutorial on stacktest.html
+	-pictures! videos! screenshots! links to equipment!
+-changing default line in doesn't take effect until after refreshing
+-on load, applet sometimes takes a little while to start...have some way of recovering from ping!
+-on page load, timer sometimes is defocused until i click on it...
+-test on firefox! and safari!
 
 ### webscrambles
++#5 incremental clock scrambles don't show pin positions
+
+-rounds named "seed" or "showIndices"
 -infinite seeded scrambles
--#5 incremental clock scrambles don't show pin positions
 -#6 configurable clock colorscheme
+
+-richer heirarchy of scrambles (2gen, LL, reese, whatever...)
+-scramble hints? such as cross...
 
 ### server/utils
 -create own java assertions facility, as java assertions cannot be enabled at runtime
+	-check at commit time that everything uses azzert instead of assert
+	-find some way of printing out the contents of the assertion that blew up
+
 -saving times
 	-Add a note about opening multiple instances of tnt
 		-screw this, just store everything in the db, and make it easy to create an account
 	-add login
 	-implement stuff on scratch paper!!!
+-add autoupdating to server
 
 ### webscrambles-ui
 -shelley's gui (https://github.com/jfly/tnoodle/issues?labels=webscrambles-ui)
 
 ### TNoodleMakeTools
--winstone! java servlets!
-	-injectable analytics js?
-	-consolidate context file/short name/long name for scramble plugins
-	-load everything from file! extract all to a folder on first startup, note that this does break java applets, but that's ok, nobody cares =(
-		-plugins/scramble icons
++load everything from file! extract all to a folder on first startup, note that this does break java applets, but that's ok, nobody cares =(
+	+plugins/scramble icons
++consolidate context file/short name/long name for scramble plugins
++injectable analytics js?
+
+-Need some way of running "tmt make check" after every change. I think it's too painful to run it before every commit. Perhaps it would be best to have the server run make check before starting up, and fail to start (or start up an old version?) if make check fails? This would certainly force people to fix their test failures.

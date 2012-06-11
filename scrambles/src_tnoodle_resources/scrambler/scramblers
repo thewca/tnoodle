@@ -1,0 +1,24 @@
+# Comments immediately preceding a plugin definition are a detailed description
+# of that plugin.
+
+#2x2x2
+222 scrambler.CubeScrambler(2)
+#3x3x3
+333 scrambler.CubeScrambler(3)
+#4x4x4
+444 scrambler.CubeScrambler(4)
+#5x5x5
+555 scrambler.CubeScrambler(5)
+#6x6x6
+666 scrambler.CubeScrambler(6)
+#7x7x7
+777 scrambler.CubeScrambler(7)
+
+#Square-1
+sq1 scrambler.SquareOneScrambler()
+#Pyraminx
+pyram scrambler.PyraminxScrambler()
+#Megaminx
+minx scrambler.MegaminxScrambler()
+#Clock
+clock scrambler.ClockScrambler()

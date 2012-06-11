@@ -1,16 +1,24 @@
 package net.gnehzr.tnoodle.server;
 
 import java.awt.Desktop;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.concurrent.Executors;
 
 import joptsimple.OptionParser;
@@ -19,6 +27,7 @@ import joptsimple.OptionSpec;
 import net.gnehzr.tnoodle.utils.Launcher;
 import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.Utils;
+import tnoodleServerHandler.DirectoryHandler;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -46,39 +55,60 @@ public class TNoodleServer {
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		
-		String addr = InetAddress.getLocalHost().getHostAddress() + ":" + port;
-		System.out.println(NAME + "-" + VERSION + " started on " + addr);
-		String url = "http://" + addr;
-		//TODO - maybe it would make sense to open this url asap, that
-		//       way the user's browser starts parsing tnt even as scramble
-		//       plugins are being loaded
-		if(browse) {
-			if(Desktop.isDesktopSupported()) {
-				Desktop d = Desktop.getDesktop();
-				if(d.isSupported(Desktop.Action.BROWSE)) {
-					try {
-						URI uri = new URI(url);
-						System.out.println("Opening " + uri + " in browser. Pass -n to disable this!");
-						d.browse(uri);
-						return;
-					} catch(URISyntaxException e) {
-						e.printStackTrace();
-					}
+		System.out.println(NAME + "-" + VERSION + " started");
+		
+		ArrayList<String> hostnames = new ArrayList<String>();
+		try {
+			hostnames.add(InetAddress.getLocalHost().getHostAddress());
+		} catch(UnknownHostException e) {
+			for(Enumeration<NetworkInterface> intfs = NetworkInterface.getNetworkInterfaces(); intfs.hasMoreElements();) {
+				NetworkInterface intf = intfs.nextElement();
+				for(InterfaceAddress addr : intf.getInterfaceAddresses()) {
+					hostnames.add(addr.getAddress().getHostAddress());
 				}
 			}
-			System.out.println("Sorry, it appears the Desktop api is not supported on your platform");
 		}
-		
-		System.out.println("Visit " + url + " for a readme and demo.");
+
+		if(hostnames.isEmpty()) {
+			System.out.println("Couldn't find any hostnames for this machine");
+		} else {
+			if(hostnames.size() > 1 && browse) {
+				browse = false;
+				System.out.println("Couldn't determine which url to browse to");
+			}
+			for(String hostname : hostnames) {
+				String addr = hostname + ":" + port;
+				String url = "http://" + addr;
+				//TODO - maybe it would make sense to open this url asap, that
+				//       way the user's browser starts parsing tnt even as scramble
+				//       plugins are being loaded
+				if(browse) {
+					if(Desktop.isDesktopSupported()) {
+						Desktop d = Desktop.getDesktop();
+						if(d.isSupported(Desktop.Action.BROWSE)) {
+							try {
+								URI uri = new URI(url);
+								System.out.println("Opening " + uri + " in browser. Pass -n to disable this!");
+								d.browse(uri);
+								return;
+							} catch(URISyntaxException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					System.out.println("Sorry, it appears the Desktop api is not supported on your platform");
+				}
+				System.out.println("Visit " + url + " for a readme and demo.");
+			}
+		}
 	}
 
 	public static void main(String[] args) throws IOException {
+		Utils.doFirstRunStuff();
 		TNoodleLogging.initializeLogging();
-		Utils.assertAssertions();
 		Launcher.wrapMain(args);
 
 		OptionParser parser = new OptionParser();
-		// TODO - optional url prefix?
 		OptionSpec<Integer> portOpt = parser.
 			acceptsAll(Arrays.asList("p", "port"), "The port to run the http server on").
 				withOptionalArg().
@@ -86,28 +116,25 @@ public class TNoodleServer {
 					defaultsTo(8080);
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
 		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, do not attempt to kill it and start up");
+		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"), "File containing code to inject into the bottom of the <head>...</head> section of all html served").withOptionalArg().ofType(File.class);
+		OptionSpec<?> noCachingOpt = parser.acceptsAll(Arrays.asList("d", "disable-caching"), "Disable file caching. This is useful for development, but is way slower.");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
-				/*if(options.has(cgiOpt)) {
-					CgiHttpExchange cgiExchange = new CgiHttpExchange();
-					HttpHandler handler = null;
-					String path = cgiExchange.getRequestURI().getPath();
-					for(int i = path.length(); i > 0; i--) {
-						handler = pathHandlers.get(path.substring(0, i));
-						if(handler != null) {
-							break;
-						}
+				if(options.has(injectJsOpt)) {
+					File injectCodeFile = options.valueOf(injectJsOpt);
+					if(!injectCodeFile.exists() || !injectCodeFile.canRead()) {
+						System.err.println("Cannot find or read " + injectCodeFile);
+						System.exit(1);
 					}
-					if(handler == null) {
-						System.out.print("Content-type: text/plain\n\n");
-						System.out.println("No handler found for: " + cgiExchange.getRequestURI().getPath());
-						return;
-					}
-					handler.handle(cgiExchange);
-					return;
-				}*/
+					DataInputStream in = new DataInputStream(new FileInputStream(injectCodeFile));
+					byte[] b = new byte[(int) injectCodeFile.length()];
+					in.readFully(b);
+					DirectoryHandler.setHeadInjectCode(new String(b));
+				}
+				boolean enableCaching = !options.has(noCachingOpt);
+				DirectoryHandler.setCachingEnabled(enableCaching);
 				int port = options.valueOf(portOpt);
 				boolean openBrowser = !options.has(noBrowserOpt);
 				try {

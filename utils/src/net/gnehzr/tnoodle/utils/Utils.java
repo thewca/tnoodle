@@ -5,6 +5,9 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -14,6 +17,8 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 import sun.reflect.Reflection;
 
@@ -29,9 +34,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 public final class Utils {
-	private Utils() {}
-
+	private static final String RESOURCE_FOLDER = "tnoodle_resources";
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
+	
+	private Utils() {}
 	
 	private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
 	static {
@@ -292,35 +298,97 @@ public final class Utils {
 		}
 	}
 	
+	public static File getResourceDirectory() {
+		File f = getProgramDirectory();
+		if(getCallerClass().getClassLoader() instanceof LazyClassLoader) {
+			// Plugins are loaded from the resource folder, so we've already got the right folder.
+			azzert(f.getName().equals(RESOURCE_FOLDER));
+		} else {
+			f = new File(f, RESOURCE_FOLDER);
+		}
+		azzert(f.isDirectory());
+		return f;
+	}
 	/**
 	 * @return A File representing the directory in which this program resides.
 	 * If this is a jar file, this should be obvious, otherwise it's the directory in which
 	 * our calling class resides.
 	 */
 	public static File getProgramDirectory() {
+		File programDirectory = getJarFileOrDirectory();
+		if(programDirectory.isFile()) { //this should indicate a jar file
+			programDirectory = programDirectory.getParentFile();
+		}
+		return programDirectory;
+	}
+	
+	private static Class<?> getCallerClass() {
 		Class<?> callerClass = Utils.class;
 		int i = 2;
 		while(callerClass.getPackage().equals(Utils.class.getPackage())) {
 			callerClass = Reflection.getCallerClass(i++);
 		}
+		return callerClass;
+	}
+	
+	private static File getJarFileOrDirectory() {
+		Class<?> callerClass = getCallerClass();
 		File programDirectory;
 		try {
 			programDirectory = new File(callerClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 		} catch (URISyntaxException e) {
 			return new File(".");
 		}
-		if(programDirectory.isFile()) { //this should indicate a jar file
-			programDirectory = programDirectory.getParentFile();
-		}
 		return programDirectory;
 	}
+	
+	private static File getJarFile() {
+		File potentialJarFile = getJarFileOrDirectory();
+		if(potentialJarFile.isFile()) {
+			return potentialJarFile;
+		}
+		return null;
+	}
+	
+	public static void doFirstRunStuff() throws FileNotFoundException, IOException {
+		File jarFile = getJarFile();
+		
+		if(jarFile != null) {
+			File destDirectory = jarFile.getParentFile();
+			if(new File(destDirectory, RESOURCE_FOLDER).isDirectory()) {
+				// If the resource folder already exists, we don't bother re-extracting the
+				// files.
+				return;
+			}
+			
+			JarInputStream jarIs = new JarInputStream(new FileInputStream(jarFile));
+			JarEntry entry;
+			byte[] buf = new byte[1024];
+			while((entry = jarIs.getNextJarEntry()) != null) {
+				if(entry.isDirectory()) {
+					continue;
+				}
+				
+				if(entry.getName().startsWith(RESOURCE_FOLDER)) {
+					File destFile = new File(destDirectory, entry.getName());
+					destFile.getParentFile().mkdirs();
+					FileOutputStream out = new FileOutputStream(destFile);
 
-	public static void assertAssertions() {
-		try {
-			assert false;
-			System.out.println("Please turn on assertions by passing -ea on the command line.");
-			//System.exit(1); //<<< TODO - create own assertion facility
-		} catch(AssertionError e) {}
+					int n;
+					while ((n = jarIs.read(buf, 0, buf.length)) > -1) {
+						out.write(buf, 0, n);
+					}
+					out.close();
+				}
+				jarIs.closeEntry();
+			}
+		}
+	}
+
+	public static void azzert(boolean expr) {
+		if(!expr) {
+			throw new AssertionError();
+		}
 	}
 	
 }
