@@ -38,7 +38,8 @@ public class Search {
 //			assert f.getShapeIdx() == shape;
 //			f.print();
 			Search s = new Search();
-			s.solution(FullCube.randomCube());
+//			s.solution(FullCube.randomCube());
+			System.out.println(s.solution(FullCube.randomCube()));
 			System.out.println((System.nanoTime()-t)/1000000.0/x);
 //			t = System.nanoTime();
 		}
@@ -47,6 +48,7 @@ public class Search {
 	
 	public String solution(FullCube c) {
 		this.c = c;
+		sol_string = null;
 		int shape = c.getShapeIdx();
 		for (length1=Shape.ShapePrun[shape]; length1<100; length1++) {
 			maxlen2 = Math.min(31 - length1, 17);
@@ -152,10 +154,14 @@ public class Search {
 		for (int i=prun; i<maxlen2; i++) {
 //			System.out.println(i);
 			if (phase2(edge, corner, sq.topEdgeFirst, sq.botEdgeFirst, ml, i, length1, 0)) {
-				for (int j=0; j<i; j++) {
-					d.doMove(move[length1+j]);
+
+				sol_string = move2string(i + length1);
+
+//Unnecessary Code. Just for checking whether the solution is correct.
+//				for (int j=0; j<i; j++) {
+//					d.doMove(move[length1+j]);
 //					System.out.println(pruncomb[length1+j]);
-				}
+//				}
 //				System.out.println();
 //				System.out.println(d.getShapeIdx());
 //				System.out.println(Integer.toHexString(d.ul));
@@ -167,39 +173,39 @@ public class Search {
 			}
 		}
 
-
 		return false;
-	}
-	
-	String move2string(int len) {
-		String s = "";
-		int top = 0, bottom = 0;
-		for (int i=len-1; i>=0; i--) {
-			int val = move[i];
-			if (val > 0) {
-				val = 12 - val;
-				top = (val > 6) ? (val-12) : val;
-			} else if (val < 0) {
-				val = 12 + val;
-				bottom = (val > 6) ? (val-12) : val;
-			} else {
-				if (top == 0 && bottom == 0) {
-					s += " / ";
-				} else {
-					s += "(" + top + "," + bottom + ") / ";
-				}
-				top = bottom = 0;
-			}
-		}
-		if (top == 0 && bottom == 0) {
-		} else {
-			s += "(" + top + "," + bottom + ")";
-		}
-		return s;// + " (" + len + "t)";
 	}
 	
 	int pruncomb[] = new int[100];
 	
+	String move2string(int len) {
+		//TODO whether to invert the solution or not should be set by params.
+		StringBuffer s = new StringBuffer();
+		int top = 0, bottom = 0;
+		for (int i=len-1; i>=0; i--) {
+				int val = move[i];
+				if (val > 0) {
+					val = 12 - val;
+					top = (val > 6) ? (val-12) : val;
+				} else if (val < 0) {
+					val = 12 + val;
+					bottom = (val > 6) ? (val-12) : val;
+				} else {
+					if (top == 0 && bottom == 0) {
+						s.append(" / ");
+					} else {
+						s.append('(').append(top).append(",").append(bottom).append(") / ");
+					}
+					top = bottom = 0;
+				}
+		}
+		if (top == 0 && bottom == 0) {
+		} else {
+			s.append('(').append(top).append(",").append(bottom).append(")");
+		}
+		return s.toString();// + " (" + len + "t)";
+	}
+
 	boolean phase2(int edge, int corner, boolean topEdgeFirst, boolean botEdgeFirst, int ml, int maxl, int depth, int lm) {
 		if (maxl == 0 && !topEdgeFirst && botEdgeFirst/*edge==0 && corner==0 && !topEdgeFirst && botEdgeFirst && ml==0*/) {
 			assert edge==0 && corner==0 && ml==0;
@@ -254,7 +260,7 @@ public class Search {
 			int m = botEdgeFirstx ? 1 : 2;
 			int prun1 = Square.SquarePrun[edgex<<1|ml];
 			int prun2 = Square.SquarePrun[cornerx<<1|ml];
-			while (m < (maxl > 3 ? 6 : 12) && prun1 <= maxl && prun1 <= maxl) {
+			while (m < (maxl > 6 ? 6 : 12) && prun1 <= maxl && prun1 <= maxl) {
 				if (prun1 < maxl && prun2 < maxl) {
 					move[depth] = -m;
 					if (phase2(edgex, cornerx, topEdgeFirst, botEdgeFirstx, ml, maxl-1, depth+1, 2)) {
