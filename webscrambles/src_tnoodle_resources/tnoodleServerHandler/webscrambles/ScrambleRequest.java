@@ -13,6 +13,7 @@ import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
 import java.util.SortedMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -556,12 +557,28 @@ class ScrambleRequest {
 		return newStrings;
 	}
 	
+	private static final String INVALID_CHARS = "\\/:*?\"<>|";
 	public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests) throws IOException, DocumentException {
 		ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 		ZipOutputStream zipOut = new ZipOutputStream(baosZip);
 		zipOut.setComment(globalTitle + " zip created on " + Utils.SDF.format(generationDate));
+		HashMap<String, Boolean> seenTitles = new HashMap<String, Boolean>();
 		for(ScrambleRequest scrambleRequest : scrambleRequests) {
-			String pdfFileName = "pdf/" + scrambleRequest.title + ".pdf";
+
+			String safeTitle = scrambleRequest.title;
+			for(int i = 0; i < INVALID_CHARS.length(); i++) {
+				String invalidChar = Pattern.quote("" + INVALID_CHARS.charAt(i));
+				safeTitle = safeTitle.replaceAll(invalidChar, "");
+			}
+			int salt = 0;
+			String tempNewSafeTitle = safeTitle;
+			while(seenTitles.get(tempNewSafeTitle) != null) {
+				tempNewSafeTitle = safeTitle + " (" + (++salt) + ")";
+			}
+			safeTitle = tempNewSafeTitle;
+			seenTitles.put(safeTitle, true);
+
+			String pdfFileName = "pdf/" + safeTitle + ".pdf";
 			ZipEntry entry = new ZipEntry(pdfFileName);
 			zipOut.putNextEntry(entry);
 
@@ -572,7 +589,7 @@ class ScrambleRequest {
 
 			zipOut.closeEntry();
 			
-			String txtFileName = "txt/" + scrambleRequest.title + ".txt";
+			String txtFileName = "txt/" + safeTitle + ".txt";
 			entry = new ZipEntry(txtFileName);
 			zipOut.putNextEntry(entry);
 			zipOut.write(Utils.join(stripNewlines(scrambleRequest.scrambles), "\r\n").getBytes());

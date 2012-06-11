@@ -295,6 +295,7 @@ tnoodle.retryAjax = function(callback, url, data, nthTry) {
 	return { abort: abort };
 };
 tnoodle.jsonp = function(callback, url, data) {
+	// TODO - we don't have access to mootools anymore...
 	var request = new Request.JSONP({
 		url: url,
 		callbackKey: "callback",
