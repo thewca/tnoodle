@@ -1,3 +1,4 @@
-/ tnoodleServerHandler.FileHandler("server/index.md")
+/readme tnoodleServerHandler.FileHandler("server/index.md")
+/ tnoodleServerHandler.RedirectHandler("/readme")
 /favicon.ico tnoodleServerHandler.FileHandler("server/favicon.ico")
 /kill/ tnoodleServerHandler.DeathHandler()

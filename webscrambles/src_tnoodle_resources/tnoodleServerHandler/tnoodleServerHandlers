@@ -4,3 +4,6 @@
 /view/ tnoodleServerHandler.webscrambles.ScrambleViewHandler()
 
 /js/scramble.js tnoodleServerHandler.DirectoryHandler("webscrambles/interface/scramble.js")
+
+# This clobbers the default webserver root
+/ tnoodleServerHandler.RedirectHandler("/scramble/")

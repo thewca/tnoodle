@@ -464,9 +464,9 @@ class TmtProject(object):
 		TmtProject.projects[name] = self
 	def __str__(self, timestamps=False):
 		return self.name
-	# The configure method of each project gets called in reverse
-	# dependency order. That is, if a project A uses a project B,
-	# B.configure() will be called before A.configure().
+	# The configure method of each project gets called in dependency order.
+    # That is, if a project B uses a project A,
+	# A.configure() will be called before B.configure().
 	def configure(self):
 		pass
 	# The afterProjects method gets called for each project after all the projects

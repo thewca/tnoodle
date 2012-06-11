@@ -5,6 +5,7 @@ import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
@@ -17,7 +18,7 @@ import com.sun.net.httpserver.HttpExchange;
 public class ScrambleHandler extends SafeHttpHandler {
 	// TODO - there has to be a better way of getting the benefit of a FileHandler...
 	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/interface/scramblegen.html") {
-		protected void wrappedHandle(HttpExchange t, String[] requestPath, java.util.LinkedHashMap<String,String> query) throws IOException {
+		protected void wrappedHandle(HttpExchange t, String[] requestPath, java.util.LinkedHashMap<String,String> query) throws IOException, URISyntaxException {
 			super.wrappedHandle(t, new String[0], query);
 		};
 	};
