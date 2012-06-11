@@ -19,6 +19,6 @@ sq1 scrambler.SquareOneScrambler()
 #Pyraminx
 pyram scrambler.PyraminxScrambler()
 #Megaminx
-mega scrambler.MegaminxScrambler()
+minx scrambler.MegaminxScrambler()
 #Clock
 clock scrambler.ClockScrambler()

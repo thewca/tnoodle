@@ -461,7 +461,7 @@ class ScrambleRequest {
 			ct.go();
 		} else {
 			int scrambleWidth = 0;
-			if(scrambleRequest.scrambler.getShortName().equals("mega")) {
+			if(scrambleRequest.scrambler.getShortName().equals("minx")) {
 				// TODO - If we allow the megaminx image to be too wide, the
 				// megaminx scrambles wrap when they don't have to. This is
 				// a quick hack to make it just look pretty. I'm not sure what
