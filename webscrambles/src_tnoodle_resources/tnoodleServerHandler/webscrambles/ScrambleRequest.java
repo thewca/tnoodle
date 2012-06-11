@@ -531,6 +531,15 @@ class ScrambleRequest {
 		}
 		doc.newPage();
 	}
+
+	private static String[] stripNewlines(String[] strings) {
+		String[] newStrings = new String[strings.length];
+		for(int i = 0; i < strings.length; i++) {
+			String newString = strings[i].replaceAll("\n", " ");
+			newStrings[i] = newString;
+		}
+		return newStrings;
+	}
 	
 	public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests) throws IOException, DocumentException {
 		ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
@@ -551,7 +560,7 @@ class ScrambleRequest {
 			String txtFileName = "txt/" + scrambleRequest.title + ".txt";
 			entry = new ZipEntry(txtFileName);
 			zipOut.putNextEntry(entry);
-			zipOut.write(Utils.join(scrambleRequest.scrambles, "\r\n").getBytes());
+			zipOut.write(Utils.join(stripNewlines(scrambleRequest.scrambles), "\r\n").getBytes());
 			zipOut.closeEntry();
 		}
 		
