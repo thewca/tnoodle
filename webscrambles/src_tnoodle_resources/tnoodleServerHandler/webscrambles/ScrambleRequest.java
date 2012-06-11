@@ -184,10 +184,11 @@ class ScrambleRequest {
 
 	private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
 		ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
-		Document doc = new Document(PageSize.LETTER, 0, 0, 75, 75);
+		Rectangle pageSize = PageSize.LETTER;
+		Document doc = new Document(pageSize, 0, 0, 75, 75);
 		PdfWriter docWriter = PdfWriter.getInstance(doc, pdfOut);
 
-		docWriter.setBoxSize("art", new Rectangle(36, 54, PageSize.LETTER.getWidth()-36, PageSize.LETTER.getHeight()-54));
+		docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
 		
 		doc.addCreationDate();
 		doc.addProducer();
@@ -211,7 +212,7 @@ class ScrambleRequest {
 		}
 		
 		pdfOut = new ByteArrayOutputStream();
-		doc = new Document(PageSize.LETTER, 0, 0, 75, 75);
+		doc = new Document(pageSize, 0, 0, 75, 75);
 		docWriter = PdfWriter.getInstance(doc, pdfOut);
 		doc.open();
 		
@@ -228,6 +229,14 @@ class ScrambleRequest {
 			ColumnText.showTextAligned(cb,
 					Element.ALIGN_LEFT, new Phrase(Utils.SDF.format(creationDate)),
 					rect.getLeft(), rect.getTop(), 0);
+
+			ColumnText.showTextAligned(cb,
+					Element.ALIGN_CENTER, new Phrase(globalTitle),
+					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 60, 0);
+			
+			ColumnText.showTextAligned(cb,
+					Element.ALIGN_CENTER, new Phrase(scrambleRequest.title),
+					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 45, 0);
 
 			if(pr.getNumberOfPages() > 1) {
 				ColumnText.showTextAligned(cb,
@@ -265,7 +274,7 @@ class ScrambleRequest {
 		azzert(scrambleRequest.count == scrambleRequest.scrambles.length);
 		
 		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
-		Rectangle pageSize = PageSize.LETTER;
+		Rectangle pageSize = doc.getPageSize();
 		
 		if(scrambleRequest.fmc) {
 			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
@@ -536,13 +545,6 @@ class ScrambleRequest {
 			maxWidth*=2; //TODO - I have no freaking clue why I need to do this.
 			table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
 			
-			ColumnText.showTextAligned(cb,
-					Element.ALIGN_CENTER, new Phrase(globalTitle),
-					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 60, 0);
-			
-			ColumnText.showTextAligned(cb,
-					Element.ALIGN_CENTER, new Phrase(scrambleRequest.title),
-					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 45, 0);
 			doc.add(table);
 		}
 		doc.newPage();
