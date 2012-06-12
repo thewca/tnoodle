@@ -294,11 +294,10 @@ tnoodle.retryAjax = function(callback, url, data, nthTry) {
 	}
 	return { abort: abort };
 };
-tnoodle.jsonpcount = 0;
+tnoodle.jsonpCallbacks = [];
 tnoodle.jsonp = function(callback, url, data) {
-	var callbackname = "tnoodle.jsonp.callback" + tnoodle.jsonpcount++;
-	var JSLINT_HAPPY_EVAL = eval; // I *totally* know what I'm doing, yep
-	JSLINT_HAPPY_EVAL(callbackname + "=callback");
+	var callbackname = "tnoodle.jsonpCallbacks[" + tnoodle.jsonpCallbacks.length + "]";
+	tnoodle.jsonpCallbacks.push(callback);
 	if (url.indexOf("?") > -1) {
 		url += "&callback="; 
 	} else {
