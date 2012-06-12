@@ -216,8 +216,8 @@ tnoodle.ajax = function(callback, url, data) {
 			}
 		}
 		if(xhr === null) {
-			// freaking opera & ie, man
-			// we'll make an attempt to use jsonp here
+			// Opera 11 doesn't have XDomainRequest, so
+			// we'll make an attempt to use jsonp here.
 			tnoodle.jsonp(callback, url, data);
 			return null;
 		}
@@ -294,18 +294,11 @@ tnoodle.retryAjax = function(callback, url, data, nthTry) {
 	}
 	return { abort: abort };
 };
+tnoodle.jsonpcount = 0;
 tnoodle.jsonp = function(callback, url, data) {
-	// TODO - we don't have access to mootools anymore...
-	var request = new Request.JSONP({
-		url: url,
-		callbackKey: "callback",
-		data: data,
-		onComplete: callback
-	});
-	request.send();
-	/*
-	var callbackname = "tnoodle.jsonp.callback" + this.jsonpcount++;
-	eval(callbackname + "=callback");
+	var callbackname = "tnoodle.jsonp.callback" + tnoodle.jsonpcount++;
+	var JSLINT_HAPPY_EVAL = eval; // I *totally* know what I'm doing, yep
+	JSLINT_HAPPY_EVAL(callbackname + "=callback");
 	if (url.indexOf("?") > -1) {
 		url += "&callback="; 
 	} else {
@@ -313,13 +306,16 @@ tnoodle.jsonp = function(callback, url, data) {
 	}
 
 	url += callbackname + "&" + tnoodle.toQueryString(data);
-	url += "&" + new Date().getTime().toString(); // prevent caching
+
+	// TODO - is this needed? We can't do it now, because of the super
+	// strict parsing of url parameters. See
+	// https://github.com/jfly/tnoodle/issues/22
+	//url += "&" + new Date().getTime().toString(); // prevent caching
 
 	var script = document.createElement("script");        
-	script.setAttribute("src",url);
-	script.setAttribute("type","text/javascript");                
+	script.setAttribute("src", url);
+	script.setAttribute("type", "text/javascript");
 	document.body.appendChild(script); //TODO - doesn't work until body is loaded
-	*/
 };
 tnoodle.toQueryString = function(data) {
 	var url = "";
