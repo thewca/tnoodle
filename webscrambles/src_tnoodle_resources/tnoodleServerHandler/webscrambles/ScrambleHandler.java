@@ -31,9 +31,10 @@ public class ScrambleHandler extends SafeHttpHandler {
 		} else {
 			Date generationDate = new Date();
 
-			// TODO - this means you can't have a round named "seed" or "showIndices"!
+			// TODO - this means you can't have a round named "seed" or "showIndices" or "callback"!
 			String seed = query.remove("seed");
 			boolean showIndices = query.remove("showIndices") != null;
+			String callback = query.remove("callback");
 			
 			String globalTitle, ext;
 			int lastDot = path[0].lastIndexOf(".");
@@ -66,7 +67,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 				sendText(t, sb.toString());
 			} else if(ext.equals("json")) {
 				ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-				sendJSON(t, GSON.toJson(scrambleRequests), query.get("callback"));
+				sendJSON(t, GSON.toJson(scrambleRequests), callback);
 			} else if(ext.equals("pdf")) {
 				ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
 				ByteArrayOutputStream totalPdfOutput = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests);
