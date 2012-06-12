@@ -9,12 +9,12 @@ class Project(tmt.EclipseProject):
 
 	def compile(self):
 		tmt.EclipseProject.compile(self)
-		# build the pruning and transition tables for the five phase algorithm
+		# build the pruning and transition tables for the two phase algorithm
 		# iff they don't already exist
 		if not exists(self.fivephase_tables):
 			print "Generating %s" % self.fivephase_tables
 			assert 0 == tmt.java(
-							main="cg.fivephase.Tools",
+							main="cg.fivestage444.Tools",
 							classpath=self.getClasspath(),
 							args=[ self.fivephase_tables ])
 			print "Successfully generated %s!" % self.fivephase_tables
