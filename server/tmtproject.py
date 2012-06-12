@@ -2,6 +2,7 @@ import tmt
 import os
 from os.path import join, exists, relpath
 import shutil
+from collections import OrderedDict
 
 SERVER_PLUGIN_DIR = 'tnoodleServerHandler'
 CONTEXT_FILE = 'tnoodleServerHandlers'
@@ -14,7 +15,10 @@ class Project(tmt.EclipseProject):
 				description="A basic, extensible webserver",
 				main='net.gnehzr.tnoodle.server.TNoodleServer',
 				argv=[ '--nobrowser', '--disable-caching' ])
-		self.plugins = {}
+        # It is important that when we iterate through the plugins
+        # in topological sorted order. This way if B uses A, B can clobber
+        # A's settings.
+		self.plugins = OrderedDict()
 
 	def addPlugin(self, project):
 		project.serverPluginSrcDir = join(project.srcResource, SERVER_PLUGIN_DIR)
