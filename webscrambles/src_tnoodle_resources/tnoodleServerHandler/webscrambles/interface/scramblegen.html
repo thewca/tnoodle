@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>tnoodle scrambler</title>
+<title>WCA Scrambler</title>
 
 <script type="text/javascript" src="/scrambler-interface/js/ui.js"></script>
 <link type="text/css" href="/scrambler-interface/css/ui.css" rel="stylesheet" />
@@ -121,7 +121,10 @@
 	
 	window.addEventListener('load', function() {
 		var canZip = true;
-		var div = mark2.ui.initialize('TNoodle', canZip, callbacks);
+		var tnoodleLink = document.createElement('a');
+		tnoodleLink.href = '/readme';
+		tnoodleLink.appendChild(document.createTextNode("TNoodle"));
+		var div = mark2.ui.initialize(tnoodleLink, canZip, callbacks);
 		document.body.appendChild(div);
 	}, false);
 

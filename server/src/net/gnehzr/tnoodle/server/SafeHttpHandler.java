@@ -115,32 +115,28 @@ public abstract class SafeHttpHandler implements HttpHandler {
 		}
 	}
 	
-	protected static void sendTrailingSlashRedirect(HttpExchange t) {
+	protected static void sendTrailingSlashRedirect(HttpExchange t) throws URISyntaxException {
 		URI request = t.getRequestURI();
 		//URI(String scheme, String userInfo, String host, int port, String path, String query, String fragment) 
-
-		URI dest = null;
-		try {
-			dest = new URI(request.getScheme(), 
-				request.getUserInfo(), 
-				request.getHost(), 
-				request.getPort(), 
-				request.getPath()+"/", 
-				request.getQuery(),
-				request.getFragment());
-		} catch(URISyntaxException e) {
-			e.printStackTrace();
-		}
+		URI dest = new URI(request.getScheme(), 
+			request.getUserInfo(), 
+			request.getHost(), 
+			request.getPort(), 
+			request.getPath()+"/", 
+			request.getQuery(),
+			request.getFragment());
 		send302(t, dest);
 	}
 	
-	protected static void send302(HttpExchange t, URI destination) {
+	protected static void send30N(int n, HttpExchange t, URI destination) {
+		azzert(n >= 0);
+		azzert(n < 10);
 		try {
 			String dest = destination == null ? dest = "" : destination.toString();
 			byte[] bytes = ("Sorry, try going here instead " + dest).getBytes();
 			t.getResponseHeaders().set("Content-Type", "text/plain");
 			t.getResponseHeaders().set("Location", destination.toString());
-			t.sendResponseHeaders(302, bytes.length);
+			t.sendResponseHeaders(300 + n, bytes.length);
 			t.getResponseBody().write(bytes);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -151,6 +147,9 @@ public abstract class SafeHttpHandler implements HttpHandler {
 				e.printStackTrace();
 			}
 		}
+	}
+	protected static void send302(HttpExchange t, URI destination) {
+		send30N(2, t, destination);
 	}
 	protected static void send404(HttpExchange t, String fileName) {
 		try {

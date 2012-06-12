@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,7 +75,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		this.path = path;
 	}
 
-	protected void wrappedHandle(HttpExchange t, String[] requestPath, LinkedHashMap<String, String> query) throws IOException {
+	protected void wrappedHandle(HttpExchange t, String[] requestPath, LinkedHashMap<String, String> query) throws IOException, URISyntaxException {
 		String fullRequestPath = t.getRequestURI().getPath();
 		
 		if(cachedFiles != null && cachedFiles.containsKey(fullRequestPath)) {
@@ -91,6 +92,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		File f = new File(Utils.getResourceDirectory() + "/" + PLUGIN_DIRECTORY + "/" + path + "/" + Utils.join(requestPath, "/"));
 		if(!f.exists()) {
 			send404(t, f.getAbsolutePath());
+			return;
 		}
 		if(f.isDirectory()) {
 			File directory = f;

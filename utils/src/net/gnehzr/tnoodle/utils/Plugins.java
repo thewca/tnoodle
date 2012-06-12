@@ -64,7 +64,9 @@ public class Plugins<H> {
 			String name = name_def[0];
 			String definition = name_def[1];
 			LazyInstantiator<H> lazyClass = new LazyInstantiator<H>(definition, pluginClass, Utils.getResourceDirectory());
-			azzert(!filePlugins.containsKey(name));
+			// Note that we may be clobbering something already in filePlugins,
+			// this is ok. Consider a project B that uses project A,
+			// this way, project B can clobber project A's settings.
 			filePlugins.put(name, lazyClass);
 			pluginComment.put(name, lastComment != null ? lastComment : name);
 			lastComment = null;

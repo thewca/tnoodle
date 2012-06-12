@@ -102,11 +102,9 @@ width/height is the maximum allowed width/height for the resulting image. It wil
 
 <a href="view/sq1.png?scramble=(3, 3) /"><img src="view/sq1.png?scramble=(3, 3) /" /></a>
 
-### view/TITLE.[pdf|zip]?scrambles=SCRAMBLES ###
+### POST to view/TITLE.[pdf|zip] ###
 
-SCRAMBLES should be a JSON string that was retrieved from scramble/.json (see "A fullfilled scramble request"). Since SCRAMBLES could potentially be very long, it is possible to do an HTML POST instead.
-
-* [view/.pdf?scrambles=%5B%7B%22scrambles%22:%5B%22R2%20L2%20U2%20D2%20B2%20F2%22%5D,%22scrambler%22:%22333%22,%22count%22:1,%22copies%22:1,%22title%22:%22%22,%22fmc%22:false%7D%5D](view/.pdf?scrambles=%5B%7B%22scrambles%22:%5B%22R2%20L2%20U2%20D2%20B2%20F2%22%5D,%22scrambler%22:%22333%22,%22count%22:1,%22copies%22:1,%22title%22:%22%22,%22fmc%22:false%7D%5D)
+The body should be scrambles=SCRAMBLES, where SCRAMBLES is a JSON string that was retrieved from scramble/.json (see "A fullfilled scramble request").
 
 ### import/?url=URL ###
 url is a url pointing to a text file with newline separated scrambles.
