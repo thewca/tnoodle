@@ -392,7 +392,7 @@ mark2.ui = (function() {
 	// https://code.google.com/p/chromium/issues/detail?id=132014
 	function newProgressBar() {
 		var div = document.createElement('div');
-		div.style.border = '1px solid black';
+		div.style.border = 'border: 1px solid #00C0C0;';
 		div.style.borderRadius = '15px';
 
 		// We must add some text so the height of this div is
@@ -401,7 +401,7 @@ mark2.ui = (function() {
 		div.style.color = 'transparent';
 		div.appendChild(document.createTextNode('.'));
 
-		div.style.backgroundImage = '-webkit-gradient(linear, left bottom, left top, color-stop(0, #b6bcc6), color-stop(1, #9da5b0))';
+		div.style.background = '#DEE';
 		div.style.boxShadow = 'inset 0px 1px 2px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px 0px #FFF';
 
 		var progress = document.createElement('div');
@@ -494,16 +494,16 @@ mark2.ui = (function() {
 		title.appendChild(mark2Title);
 		mark2Title.classList.add('mark2_title');
 
-		mark2Title.appendChild(document.createTextNode('Mark 2'));
-
-		var betaText = document.createElement('span');
-		mark2Title.appendChild(betaText);
-		betaText.classList.add('beta');
-		betaText.appendChild(document.createTextNode('BETA 0.1b'));
-
 		if(name) {
-			mark2Title.appendChild(document.createTextNode(' / '));
 			mark2Title.appendChild(name);
+		}
+		else {
+			mark2Title.appendChild(document.createTextNode('Mark 2'));
+
+			var betaText = document.createElement('span');
+			mark2Title.appendChild(betaText);
+			betaText.classList.add('beta');
+			betaText.appendChild(document.createTextNode('BETA 0.1b'));
 		}
 
 
