@@ -57,6 +57,8 @@ class ScrambleRequest {
 	
 	private static final int MAX_COUNT = 100;
 	private static final int MAX_COPIES = 100;
+
+	private static final int WCA_MAX_MOVES_FMC = 80;
 	
 	private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
 	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
@@ -293,11 +295,11 @@ class ScrambleRequest {
 				int solutionBorderTop = bottom + (int) (height*.5);
 				int scrambleBorderTop = solutionBorderTop + 40;
 				
-				int rulesRight = left + (int) (width*.7);
-				
-				int competitorInfoBottom = top - (int) (height*.18);
-				int gradeBottom = competitorInfoBottom - 40;
+				int competitorInfoBottom = top - (int) (height*.15);
+				int gradeBottom = competitorInfoBottom - 50;
 				int competitorInfoLeft = right - (int) (width*.45);
+
+				int rulesRight = competitorInfoLeft;
 				
 				int padding = 5;
 				
@@ -429,15 +431,9 @@ class ScrambleRequest {
 				int wcaIdLength = 63;
 				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
 				
-				offsetTop += fontSize + marginBottom;
+				offsetTop += fontSize + (int) (marginBottom*1.8);
 				cb.endText();
 				
-				cb.beginText();
-				fontSize = 15;
-				cb.setFontAndSize(bf, fontSize);
-				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Signature: ___________________", competitorInfoLeft+padding, top-offsetTop, 0);
-				offsetTop += fontSize + marginBottom;
-				cb.endText();
 				
 				cb.beginText();
 				fontSize = 11;
@@ -462,20 +458,21 @@ class ScrambleRequest {
 				List rules = new List(List.UNORDERED);
 				rules.add("Notate your solution by writing one move per bar.");
 				rules.add("To delete moves, clearly erase/blacken them.");
-				rules.add("Face moves are clockwise.");
-				rules.add("Rotations x, y, and z follow R, U, and F.");
+				rules.add("Face moves F, B, R, L, U, and D are clockwise.");
+				rules.add("Rotations x, y, and z follow Rotations, U, and F.");
 				rules.add("Slice moves M, E, and S follow L, D, and F.");
 				rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
 				
 				ct.addElement(rules);
-				int rulesTop = competitorInfoBottom+70;
+				int rulesTop = competitorInfoBottom+55;
 				ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
 				ct.go();
 				
 				rules = new List(List.UNORDERED);
-				rules.add("You have 1 hour to find a solution. Your solution length will be counted in HTM.");
-				int spaces = linesX*linesY;
-				rules.add("There are " + spaces + " spaces on this page. Therefore, your solution must be at most " + spaces + " moves, including rotations.");
+				rules.add("You have 1 hour to find a solution.");
+				rules.add("Your solution length will be counted in HTM. (Slice moves count as two turns.)");
+				int maxMoves = WCA_MAX_MOVES_FMC;
+				rules.add("Your solution must be at most " + maxMoves + " moves, including rotations.");
 				rules.add("Your solution must not be related to the scrambling algorithm in any way.");
 				ct.addElement(rules);
 				MAGIC_NUMBER = 125; // kill me now
