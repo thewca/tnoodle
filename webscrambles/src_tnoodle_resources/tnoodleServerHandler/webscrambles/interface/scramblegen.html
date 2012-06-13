@@ -113,6 +113,11 @@
 		}
 	}
 
+	var removeTempDiv = function() {
+		var tempDiv = document.getElementById("temp_div");
+		document.body.removeChild(tempDiv);
+	};
+
 	var callbacks = {
 		showZip: showZip,
 		showScrambles: showScrambles,
@@ -121,10 +126,14 @@
 	
 	window.addEventListener('load', function() {
 		var canZip = true;
+		var tnoodleLinkSpan = document.createElement('span');
 		var tnoodleLink = document.createElement('a');
 		tnoodleLink.href = '/readme';
 		tnoodleLink.appendChild(document.createTextNode("TNoodle"));
-		var div = mark2.ui.initialize(tnoodleLink, canZip, callbacks);
+		tnoodleLinkSpan.appendChild(tnoodleLink);
+		tnoodleLinkSpan.appendChild(document.createTextNode(" WCA Scrambler"));
+		var div = mark2.ui.initialize(tnoodleLinkSpan, canZip, callbacks);
+		removeTempDiv();
 		document.body.appendChild(div);
 	}, false);
 
@@ -133,5 +142,10 @@
 
 </head>
 <body>
+
+<div id="temp_div" style="text-align: center; margin: 2em; font-family: sans-serif; font-size: 20px;">
+	Loading scramble interface...
+</div>
+
 </body>
 </html>
