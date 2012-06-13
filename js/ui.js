@@ -346,7 +346,7 @@ mark2.settings = (function() {
 			"333fm" : "333",
 			"333ft" : "333",
 			"444bf" : "444",
-			"555bf" : "444",
+			"555bf" : "555",
 			"333mbf" : "333"
 		};
 		return puzzByEvent[eventID] || eventID;
