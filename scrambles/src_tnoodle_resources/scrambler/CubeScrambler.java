@@ -32,7 +32,7 @@ public class CubeScrambler extends Scrambler {
 	private int length;
 	private TwoByTwoSolver twoSolver = null;
 	private ThreadLocal<Search> twoPhaseSearcher = null;
-	private ThreadLocal<cg.fivephase.Search> fivePhaseSearcher = null;
+	private ThreadLocal<cg.fivestage444.Search> fivePhaseSearcher = null;
 	public CubeScrambler(int size) {
 		if(size <= 0 || size >= DEFAULT_LENGTHS.length)
 			throw new IllegalArgumentException("Invalid cube size");
@@ -47,9 +47,9 @@ public class CubeScrambler extends Scrambler {
 				};
 			};
 		} else if(size == 4) {
-			fivePhaseSearcher = new ThreadLocal<cg.fivephase.Search>() {
-				protected cg.fivephase.Search initialValue() {
-					return new cg.fivephase.Search();
+			fivePhaseSearcher = new ThreadLocal<cg.fivestage444.Search>() {
+				protected cg.fivestage444.Search initialValue() {
+					return new cg.fivestage444.Search();
 				};
 			};
 		} else {
@@ -75,7 +75,7 @@ public class CubeScrambler extends Scrambler {
 		} else if(size == 3) {
 			return twoPhaseSearcher.get().solution(Tools.randomCube(r), MAX_SCRAMBLE_LENGTH, TIMEOUT, false, true).trim();
 		} else if(size == 4) {
-			return fivePhaseSearcher.get().solve(cg.fivephase.Tools.randomCube(r), 500, true).trim();
+			return fivePhaseSearcher.get().solve(cg.fivestage444.Tools.randomCube(r), 500, true).trim();
 		} else {
 			StringBuffer scramble = new StringBuffer(length*3);
 			int lastAxis = -1;
