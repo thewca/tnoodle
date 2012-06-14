@@ -350,6 +350,63 @@ function load() {
   resizeCube();
 
 	urlChanged();
+
+	//runSimulation();
+}
+
+function runSimulation() {
+ function simulateSolves(n) {
+    var cornerCycleLengths = [];
+    var edgeCycleLengths = [];
+    function printStats(arr, name) {
+      if(arr.length === 0) {
+        return;
+      }
+      var ave = arr.reduce(function(a, b) { return a+b; })/arr.length;
+      var CON = console;//jslint
+      CON.log(arr.length + " " + name + ' ave: ' + ave);
+      CON.log(arr.length + " " + name + ' max: ' + Math.max.apply(null, arr));
+      CON.log(arr.length + " " + name + ' min: ' + Math.min.apply(null, arr));
+    }
+    
+    function analyzeScrambles(scrambles) {
+      function getLengthOfCycle(cycles) {
+        var length = 0;
+        while(cycles.length > 0) {
+          length++;
+          cycles = cycles[0].children;
+        }
+        return length;
+      }
+      for(var i = 0; i < scrambles.length; i++) {
+        var scramble = scrambles[i];
+        var success_corners_edges = parseScramble(scramble);
+        var success = success_corners_edges[0];
+        if(!success) {
+          alert(success_corners_edges[1]);
+          return;
+        }
+        var corners_edges = success_corners_edges[1];
+        var corners = corners_edges[0];
+        var edges = corners_edges[1];
+        var cornerCycles = toCycle(corners, 3, 0);
+        var edgeCycles = toCycle(edges, 2, 0);
+		if(getLengthOfCycle(cornerCycles) > 10) {
+            var CON = console;//jslint
+			CON.log(scramble);
+		}
+        cornerCycleLengths.push(getLengthOfCycle(cornerCycles));
+        edgeCycleLengths.push(getLengthOfCycle(edgeCycles));
+      }
+      printStats(cornerCycleLengths, "corners");
+      printStats(edgeCycleLengths, "edges");
+      if(cornerCycleLengths.length < n) {
+        tnoodleServer.loadScrambles(analyzeScrambles, '333', null, 100);
+      }
+    }
+    analyzeScrambles([]);
+  }
+  //simulateSolves(1000);
 }
 
 function toQueryString(o) {
