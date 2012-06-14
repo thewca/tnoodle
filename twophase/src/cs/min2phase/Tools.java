@@ -74,21 +74,15 @@ public class Tools {
 	}
 	
 	public static synchronized void init() {
-        init(true);
-    }
-
-	private static synchronized void init(boolean tryToReadFromDisk) {
 		if (inited)
 			return;
 		
-        if(tryToReadFromDisk) {
-            try {
-                FileInputStream is = new FileInputStream(new File(Utils.getResourceDirectory(), "twophase_tables"));
-                inited = initFrom(new DataInputStream(is));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+		try {
+			FileInputStream is = new FileInputStream(new File(Utils.getResourceDirectory(), "twophase_tables"));
+			inited = initFrom(new DataInputStream(is));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		if(!inited) {
 			CubieCube.init();
 			CoordCube.init();
@@ -128,7 +122,7 @@ public class Tools {
 	}
 
 	public static void initTo(DataOutput out) throws IOException {
-		init(false);
+		init();
 		write(CubieCube.FlipS2R, out);
 		//336 * 2 = 672 Bytes
 		write(CubieCube.TwistS2R, out);
