@@ -12,4 +12,4 @@
 	url = git@github.com:cubing/scrambler-interface.git
 [submodule "fivephase/src/cg/fivestage444"]
 	path = fivephase/src/cg/fivestage444
-	url = git://github.com/clementgallet/FiveStage444.git
+	url = git://github.com/jfly/FiveStage444.git

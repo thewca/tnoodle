@@ -153,7 +153,7 @@ class ScrambleRequest {
 		
 		this.colorScheme = scrambler.parseColorScheme(scheme);
 	}
-	
+
 	public static ScrambleRequest[] parseScrambleRequests(LinkedHashMap<String, String> query, String seed) throws UnsupportedEncodingException, InvalidScrambleRequestException {
 		ScrambleRequest[] scrambleRequests;
 		if(query.size() == 0) {
