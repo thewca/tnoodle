@@ -8,6 +8,6 @@ tmt (TnoodleMakeTools) is a python script used to develop TNoodle.
 
 * `./tmt make dist -p timer` should make a runnable jar under the "timer/dist" directory.
 
-* Note: tmt is designed to be lazy about recompiling stuff. It relies upon timestamps of files to only recompile something when it's strictly necessary. If you use an editor like Vim writes to .swp files at potentially anytime alongside your source code, this will trick tmt into thinking something needs to be recompiled when it really doesn't. My recommendation is to configure your editor to store all these files in a unified directory that is *not* part of the tnoodle source tree.
+* Note: tmt is designed to be lazy about recompiling stuff. It relies upon timestamps of files to only recompile something when it's strictly necessary. If you use an editor like Vim that writes to .swp files at potentially anytime alongside your source code, this will trick tmt into thinking something needs to be recompiled when it really doesn't. My recommendation is to configure your editor to store all these files in a unified directory that is *not* part of your tnoodle source tree.
 
 I prefer to do Java development in Eclipse, so I made sure that each project is a full fledged Eclipse project (they each have a .classpath and .project file). Furthermore, the whole tnoodle directory can be opened as an Eclipse workspace. Simply go to File > Import > Existing Projects into Workspace, and enter your tnoodle directory under "Select root directory". Eclipse should automagically detect all the tnoodle projects.
