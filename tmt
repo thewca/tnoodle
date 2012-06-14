@@ -624,13 +624,13 @@ class EclipseProject(TmtProject):
 			classpath |= project.getClasspathEntities(includeResources=includeResources)
 		return classpath
 
-	def getClasspath(self, includeResources=True):
+	def toClasspath(self, entities):
 		separator = None
 		if windowsOrCygwin():
 			separator = ';'
 		else:
 			separator = ':'
-		return separator.join(self.getClasspathEntities(includeResources=includeResources))
+		return separator.join(entities)
 
 	def afterProjects(self):
 		dependencyFile = join(self.name, '.classpath')
@@ -722,19 +722,20 @@ class EclipseProject(TmtProject):
 			rmtree(tempBin)
 		os.mkdir(tempBin)
 
-		self.innerCompile(src, tempBin, bin)
-
 		javaFiles = tmt.glob(src, r'.*\.java$')
 		if len(javaFiles) > 0:
 			args = [ 'javac' ]
 			args += [ '-d', tempBin ]
-			classpath = self.getClasspath()
+			entities = self.getClasspathEntities()
+			classpath = self.toClasspath(entities)
 			if classpath:
 				args += [ '-classpath', classpath ]
 			args += javaFiles
 			p = subprocess.Popen(args)
 			print " ".join(args)
 			assert p.wait() == 0, 'javac failed!'
+
+		self.innerCompile(src, tempBin, bin)
 
 		print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, bin )
 		os.rename(tempBin, bin)
@@ -866,7 +867,7 @@ Implementation-Version: %s
 			args += self.argv
 		tmt.java(
 			main=self.main,
-			classpath=self.getClasspath(includeResources=False),
+			classpath=self.toClasspath(self.getClasspathEntities(includeResources=False)),
 			args=args,
 			debug=tmt.args.debug)
 
@@ -878,7 +879,7 @@ Implementation-Version: %s
 
 		for testClass in self.tests:
 			assert 0 == tmt.java(main=testClass,
-                                 classpath=self.getClasspath())
+                                 classpath=self.toClasspath(self.getClasspathEntities()))
 
 	def clean(self):
 		print 'Cleaning: %s' % self.name
