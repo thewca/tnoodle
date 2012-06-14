@@ -900,7 +900,8 @@ Implementation-Version: %s
 		if timestamps:
 			binTs = tmt.timestamp(self.bin)
 			srcTs = tmt.timestamp(self.src)
-			s += ' bin: %s src: %s' % ( binTs, srcTs )
+			srcResourceTs = tmt.timestamp(self.srcResource)
+			s += ' bin: %s src: %s src_resource: %s' % ( binTs, srcTs, srcResourceTs )
 		return s
 
 tmt.EclipseProject = EclipseProject
