@@ -8,7 +8,7 @@ class Project(tmt.EclipseProject):
 		self.twophase_tables = 'twophase_tables'
 
 	def innerCompile(self, src, tempBin, bin):
-		if src == self.src:
+		if src == self.srcResource:
 			# build the pruning and transition tables for the two phase algorithm
 			tablesPath = join(tempBin, self.twophase_tables)
 			print "Generating %s" % tablesPath
