@@ -39,12 +39,6 @@
 		var request = toScrambleRequest(sheets);
 		scrambleServer.showZip(title, request, "");
 	}
-	function showScrambles() {
-		var title = mark2.ui.getTitle();
-		var sheets = mark2.ui.getScrambleSheets();
-		var request = toScrambleRequest(sheets);
-		scrambleServer.showPdf(title, request, "_blank");
-	}
 
 	var scramblesByPuzzle, title;
 	function clear() {
@@ -119,20 +113,18 @@
 	};
 
 	var callbacks = {
-		showZip: showZip,
-		showScrambles: showScrambles,
+		showScrambles: showZip,
 		competitionChanged: competitionChanged
 	};
 	
 	window.addEventListener('load', function() {
-		var canZip = true;
 		var tnoodleLinkSpan = document.createElement('span');
 		var tnoodleLink = document.createElement('a');
 		tnoodleLink.href = '/readme';
 		tnoodleLink.appendChild(document.createTextNode("TNoodle"));
 		tnoodleLinkSpan.appendChild(tnoodleLink);
 		tnoodleLinkSpan.appendChild(document.createTextNode(" WCA Scrambler"));
-		var div = mark2.ui.initialize(tnoodleLinkSpan, canZip, callbacks);
+		var div = mark2.ui.initialize(tnoodleLinkSpan, callbacks);
 		removeTempDiv();
 		document.body.appendChild(div);
 	}, false);
