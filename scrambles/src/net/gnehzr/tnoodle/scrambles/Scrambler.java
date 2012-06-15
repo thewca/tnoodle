@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +31,6 @@ import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
 import net.gnehzr.tnoodle.utils.Utils;
-import net.goui.util.MTRandom;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -110,7 +110,7 @@ public abstract class Scrambler {
 		return scrambles;
 	}
 
-	private static Random r = new MTRandom();
+	private static Random r = new SecureRandom();
 	public final String generateScramble() {
 		return generateScramble(r);
 	}
@@ -120,22 +120,20 @@ public abstract class Scrambler {
 	
 	/** seeded scrambles, these can't be cached, so they'll be a little slower **/
 	public final String generateSeededScramble(String seed) {
-		return generateSeededScramble(seed.hashCode()); //TODO - do something that will get us a long?
+		return generateSeededScramble(seed.getBytes());
 	}
 	public final String[] generateSeededScrambles(String seed, int count) {
-		return generateSeededScrambles(seed.hashCode(), count); //TODO - do something that will get us a long?
+		return generateSeededScrambles(seed.getBytes(), count);
 	}
 	
-	private final String generateSeededScramble(long seed) {
-		// we must create our own MTRandom because other threads can access the static one
-		Random r = new MTRandom(seed);
-		r.setSeed(seed);
+	private final String generateSeededScramble(byte[] seed) {
+		// we must create our own Random because other threads can access the static one
+		Random r = new SecureRandom(seed);
 		return generateScramble(r);
 	}
-	private final String[] generateSeededScrambles(long seed, int count) {
-		// we must create our own MTRandom because other threads can access the static one
-		Random r = new MTRandom(seed);
-		r.setSeed(seed);
+	private final String[] generateSeededScrambles(byte[] seed, int count) {
+		// we must create our own Random because other threads can access the static one
+		Random r = new SecureRandom(seed);
 		return generateScrambles(r, count);
 	}
 	

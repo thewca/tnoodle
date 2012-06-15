@@ -7,8 +7,6 @@ import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.Random;
 
-import net.goui.util.MTRandom;
-
 /*
  * In addition to speeding things up, this class provides thread safety.
  */
@@ -19,16 +17,7 @@ public class ScrambleCacher {
 	 * Scramblers will get passed this instance of Random
 	 * in order to have nice, as-secure-as-can-be scrambles.
 	 */
-	private static final Random r;
-	static {
-		byte[] seed = null;
-		try {
-			seed = SecureRandom.getInstance("SHA1PRNG").generateSeed(9);
-		} catch(NoSuchAlgorithmException e) {
-			seed = new SecureRandom().generateSeed(9);
-		}
-		r = new MTRandom(seed);
-	}
+	private static final Random r = new SecureRandom();
 
 	private String[] scrambles;
 	private volatile int startBuf = 0;

@@ -6,7 +6,6 @@ jopt-simple.jar: http://jopt-simple.sourceforge.net/ - Java command line options
 iText-5.0.2.jar: http://itextpdf.com/ - PDF creator for Java.
 h2-1.2.147.jar: http://www.h2database.com/html/main.html - Embeddable Java SQL db
 Strings.java http://weblogs.java.net/blog/176/2006/01/13/natural-string-order
-MTRandom.java http://goui.net/doc/net/goui/util/MTRandom.html
 Base64.java http://www.wikihow.com/Encode-a-String-to-Base64-With-Java
 
 **** Java libraries not used at runtime ****
