@@ -539,6 +539,11 @@ mark2.ui = (function() {
 		eventsRoundsInterface.id = "events_rounds_interface";
 		eventsRoundsInterface.classList.add('interface');
 
+		var resetButton = document.createElement('button');
+		eventsRoundsInterface.appendChild(resetButton);
+		resetButton.appendChild(document.createTextNode("Reset"));
+		resetButton.classList.add('resetButton');
+
 		spacerDiv = document.createElement('div');
 		eventsRoundsInterface.appendChild(spacerDiv);
 
@@ -584,6 +589,10 @@ mark2.ui = (function() {
 		roundsTbody = document.createElement('tbody');
 		roundsTable.appendChild(roundsTbody);
 		
+		resetButton.addEventListener('click', function() {
+			location.hash = "";
+		}, false);
+
 		competitionNameInput.addEventListener('change', updateHash, false);
 
 		scrambleButton.addEventListener('click', callbacks.showScrambles, false);
@@ -718,6 +727,7 @@ mark2.ui = (function() {
 		var roundsHash = getHashParameter("rounds", null);
 
 		if (roundsHash === null) {
+			resetRounds();
 			addRounds(settings.default_rounds);
 		}
 		else if(roundsHash != JSON.stringify(getRoundsJSON())) {

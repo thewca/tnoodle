@@ -89,7 +89,14 @@ h1 {
   text-align: center;
 }
 
+#events_rounds_interface {
+  position: relative;
+}
 
+#events_rounds_interface .resetButton {
+  position: absolute;
+  left: 30px;
+}
 
 #events_rounds_interface #events_table {
   border-collapse: collapse;
