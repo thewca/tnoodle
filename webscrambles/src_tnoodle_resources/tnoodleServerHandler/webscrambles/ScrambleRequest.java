@@ -599,6 +599,12 @@ class ScrambleRequest {
 		zipOut.putNextEntry(entry);
 		zipOut.write(GSON.toJson(scrambleRequests).getBytes());
 		zipOut.closeEntry();
+
+		entry = new ZipEntry(globalTitle + ".pdf");
+		zipOut.putNextEntry(entry);
+		ByteArrayOutputStream baos = requestsToPdf(globalTitle, generationDate, scrambleRequests);
+		zipOut.write(baos.toByteArray());
+		zipOut.closeEntry();
 		
 		zipOut.close();
 		
