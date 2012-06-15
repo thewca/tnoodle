@@ -462,15 +462,12 @@ mark2.ui = (function() {
 
 	var div;
 	var eventsTable, competitionNameInput, roundsTbody;
-	var scrambleButton, zipButton, progress;
+	var scrambleButton, progress;
 	var callbacks;
-	var initialize = function(name, canZip, callbacks_) {
+	var initialize = function(name, callbacks_) {
 		settings = mark2.settings;
 		callbacks = callbacks_;
 
-		if(canZip) {
-			assert(callbacks.showZip);
-		}
 		assert(callbacks.showScrambles);
 		assert(callbacks.competitionChanged);
 		
@@ -519,13 +516,6 @@ mark2.ui = (function() {
 		topInterface.appendChild(scrambleButton);
 		scrambleButton.classList.add('scrambleButton');
 		scrambleButton.appendChild(document.createTextNode("Scramble!"));
-
-		zipButton = document.createElement('button');
-		if(canZip) {
-			topInterface.appendChild(zipButton);
-		}
-		zipButton.classList.add('scrambleButton');
-		zipButton.appendChild(document.createTextNode("Zip!"));
 
 		// TODO - revert to progress bar once
 		// https://code.google.com/p/chromium/issues/detail?id=132014 is resolved.
@@ -596,9 +586,6 @@ mark2.ui = (function() {
 		competitionNameInput.addEventListener('change', updateHash, false);
 
 		scrambleButton.addEventListener('click', callbacks.showScrambles, false);
-		if(canZip) {
-			zipButton.addEventListener('click', callbacks.showZip, false);
-		}
 
 		initializeEvents();
 		initializeEventsTable();
@@ -931,15 +918,12 @@ mark2.ui = (function() {
 		progress.max = requiredCount;
 		if(disableScrambleButton && requiredCount > 0) {
 			scrambleButton.style.visibility = 'hidden';
-			zipButton.style.visibility = 'hidden';
 			progress.style.display = '';
 		} else {
 			scrambleButton.style.visibility = '';
-			zipButton.style.visibility = '';
 			progress.style.display = 'none';
 		}
 		scrambleButton.disabled = disableScrambleButton;
-		zipButton.disabled = disableScrambleButton;
 	}
 
 	/*
