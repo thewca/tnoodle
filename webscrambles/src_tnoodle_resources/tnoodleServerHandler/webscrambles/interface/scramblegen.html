@@ -33,11 +33,15 @@
 		}
 		return scrambleRequest;
 	}
-	function showZip() {
+	function showZip(e) {
 		var title = mark2.ui.getTitle();
 		var sheets = mark2.ui.getScrambleSheets();
 		var request = toScrambleRequest(sheets);
-		scrambleServer.showZip(title, request, "");
+		if(e.shiftKey) {
+			scrambleServer.showPdf(title, request, "_blank");
+		} else {
+			scrambleServer.showZip(title, request, "");
+		}
 	}
 
 	var scramblesByPuzzle, title;
