@@ -10,11 +10,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Random;
 
 import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
 public class Tools {
+	private static final Logger l = Logger.getLogger(Tools.class.getName());
+
 	static boolean inited = false;
 	
 	static void read(byte[] arr, DataInput in) throws IOException {
@@ -74,18 +79,40 @@ public class Tools {
 	}
 	
 	public static synchronized void init() {
+        init(true, null);
+    }
+
+	private static synchronized void init(boolean tryToReadFromFile, File twophase_tables) {
 		if (inited)
 			return;
 		
-		try {
-			FileInputStream is = new FileInputStream(new File(Utils.getResourceDirectory(), "twophase_tables"));
-			inited = initFrom(new DataInputStream(is));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+		if(twophase_tables == null) {
+			twophase_tables = new File(Utils.getResourceDirectory(), "twophase_tables");
 		}
+        if(tryToReadFromFile) {
+            try {
+                FileInputStream is = new FileInputStream(twophase_tables);
+                inited = initFrom(new DataInputStream(is));
+            } catch (FileNotFoundException e) {
+				l.log(Level.INFO, "Failed to load " + twophase_tables, e);
+            }
+        }
 		if(!inited) {
+			TimedLogRecordStart start = new TimedLogRecordStart("Generating twophase tables");
+			l.log(start);
+
 			CubieCube.init();
 			CoordCube.init();
+			try {
+				l.info("Writing to " + twophase_tables);
+				FileOutputStream out = new FileOutputStream(twophase_tables);
+				DataOutputStream dataOut = new DataOutputStream(out);
+				initTo(dataOut);
+			} catch(IOException e) {
+				l.log(Level.INFO, "Failed to write to " + twophase_tables, e);
+			}
+
+			l.log(start.finishedNow());
 		}
 		inited = true;
 	}
@@ -122,7 +149,6 @@ public class Tools {
 	}
 
 	public static void initTo(DataOutput out) throws IOException {
-		init();
 		write(CubieCube.FlipS2R, out);
 		//336 * 2 = 672 Bytes
 		write(CubieCube.TwistS2R, out);
@@ -174,10 +200,7 @@ public class Tools {
 			System.out.println("Please provide 1 argument: the file to store the tables in");
 			System.exit(1);
 		}
-		FileOutputStream out = new FileOutputStream(args[0]);
-		DataOutputStream dataOut = new DataOutputStream(out);
-		initTo(dataOut);
-		dataOut.close();
+		init(false, new File(args[0]));
 	}
 
 	/**
@@ -190,7 +213,6 @@ public class Tools {
 	}
 	
 	public static String randomCube(Random r) {
-//		CubieCube cc = new CubieCube();
 		int eperm;
 		char cperm;
 		do {

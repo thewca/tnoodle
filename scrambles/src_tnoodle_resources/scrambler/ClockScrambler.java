@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Color;
@@ -87,9 +89,6 @@ public class ClockScrambler extends Scrambler {
 	@Override
 	public HashMap<String, Color> getDefaultColorScheme() {
 		return new HashMap<String, Color>(defaultColorScheme);
-	}
-	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-		return new HashMap<String, GeneralPath>();
 	}
 	private static final int[][] moves = { 
 		                 {1,0,1,0,0,0,1,0,1,  -1,-1,-1,-1,-1,-1,-1,-1,-1},// dddd-d
@@ -306,4 +305,51 @@ public class ClockScrambler extends Scrambler {
 		}
 	}
 
+	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
+		int i, j;
+
+		// Background
+		Area backgroundFront = new Area();
+		Area backgroundBack = new Area();
+		backgroundFront.add(new Area(new Ellipse2D.Double(gap,gap, 2*radius, 2*radius)));
+		backgroundBack.add(new Area(new Ellipse2D.Double(2*radius+3*gap,2*radius+3*gap, 2*radius, 2*radius)));
+		for( i=-1; i<2; i+=2 )
+			for( j=-1; j<2; j+=2 ) {
+				backgroundFront.add(new Area(new Ellipse2D.Double(radius+gap+2*i*clockOuterRadius-clockOuterRadius,radius+gap+2*j*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius)));
+				backgroundBack.add(new Area(new Ellipse2D.Double(3*radius+3*gap+2*i*clockOuterRadius-clockOuterRadius,radius+gap+2*j*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius)));
+			}
+
+		// Clocks
+		Area clocksFront = new Area();
+		Area clocksBack = new Area();
+		for( i=-1; i<2; i++ )
+			for( j=-1; j<2; j++ ) {
+				clocksFront.add(new Area(new Ellipse2D.Double(radius+gap+2*i*clockOuterRadius-clockRadius,radius+gap+2*j*clockOuterRadius-clockRadius, 2*clockRadius, 2*clockRadius)));
+				clocksBack.add(new Area(new Ellipse2D.Double(3*radius+3*gap+2*i*clockOuterRadius-clockRadius,radius+gap+2*j*clockOuterRadius-clockRadius, 2*clockRadius, 2*clockRadius)));
+			}
+
+		// Pins
+		Area pinsUp = new Area();
+		Area pinsDown = new Area();
+		for( i=-1; i<2; i+=2 )
+			for( j=-1; j<2; j+=2 ) {
+				pinsUp.add(new Area(new Ellipse2D.Double(radius+gap+j*clockOuterRadius-pinRadius-1, radius+gap+i*clockOuterRadius-pinRadius+1, 2*pinRadius+2, 2*pinRadius+2)));
+				pinsDown.add(new Area(new Ellipse2D.Double(3*radius+3*gap+j*clockOuterRadius-pinRadius-1, radius+gap+i*clockOuterRadius-pinRadius+1, 2*pinRadius+2, 2*pinRadius+2)));
+			}
+
+		backgroundFront.subtract(clocksFront);
+		backgroundFront.subtract(pinsUp);
+		backgroundBack.subtract(clocksBack);
+		backgroundBack.subtract(pinsDown);
+
+		HashMap<String, GeneralPath> facesMap = new HashMap<String, GeneralPath>();
+		facesMap.put("Front", new GeneralPath(backgroundFront));
+		facesMap.put("Back", new GeneralPath(backgroundBack));
+		facesMap.put("FrontClock", new GeneralPath(clocksFront));
+		facesMap.put("BackClock", new GeneralPath(clocksBack));
+		facesMap.put("PinUp", new GeneralPath(pinsUp));
+		facesMap.put("PinDown", new GeneralPath(pinsDown));
+
+		return facesMap;
+	}
 }

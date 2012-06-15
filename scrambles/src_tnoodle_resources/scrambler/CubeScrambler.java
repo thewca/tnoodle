@@ -25,7 +25,6 @@ public class CubeScrambler extends Scrambler {
 	private static final int cubieSize = 10;
 	private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
 	
-	private boolean multislice = true;
 	private boolean wideNotation = true;
 	
 	private final int size;
@@ -80,7 +79,7 @@ public class CubeScrambler extends Scrambler {
 			StringBuffer scramble = new StringBuffer(length*3);
 			int lastAxis = -1;
 			int axis = 0;
-			int slices = size - ((multislice || size % 2 != 0) ? 1 : 0);
+			int slices = size - ((size % 2 != 0) ? 1 : 0);
 			int[] slicesMoved = new int[slices];
 			int[] directionsMoved = new int[3];
 			int moved = 0;
@@ -99,14 +98,11 @@ public class CubeScrambler extends Scrambler {
 					do {
 						slice = r.nextInt(slices);
 					} while(slicesMoved[slice] != 0);
+
 					int direction = r.nextInt(3);
-	
-					if(multislice || slices != size || (directionsMoved[direction] + 1) * 2 < slices ||
-							(directionsMoved[direction] + 1) * 2 == slices && directionsMoved[0] + directionsMoved[1] + directionsMoved[2] == directionsMoved[direction]) {
-						directionsMoved[direction]++;
-						moved++;
-						slicesMoved[slice] = direction + 1;
-					}
+					directionsMoved[direction]++;
+					moved++;
+					slicesMoved[slice] = direction + 1;
 				} while(r.nextInt(3) == 0 && moved < slices && moved + i < length);
 	
 				for(int j = 0; j < slices; j++) {
@@ -188,11 +184,20 @@ public class CubeScrambler extends Scrambler {
 					face = FACES.indexOf(strs[i].charAt(0) + "");
 				}
 
+				boolean thickTurn = true;
 				int slice = face / 6;
+				if(slice > 0) {
+					// this is a lower case letter -> slice turn
+					thickTurn = false;
+				}
 				face %= 6;
-				if(strs[i].indexOf("w") >= 0) slice++;
-				else if(slice1 != null)
+				if(strs[i].indexOf("w") >= 0) {
+					slice++;
+					thickTurn = true;
+				} else if(slice1 != null) {
 					slice = Integer.parseInt(slice1) - 1;
+					thickTurn = true;
+				}
 
 				int dir = " 2'".indexOf(strs[i].charAt(strs[i].length() - 1) + "");
 				if(dir < 0) dir = 0;
@@ -201,10 +206,10 @@ public class CubeScrambler extends Scrambler {
 				newScram.append(" ");
 				newScram.append(moveString(n));
 
-				do{
+				do {
 					slice(face, slice, dir, image);
 					slice--;
-				} while(multislice && slice >= 0);
+				} while(thickTurn && slice >= 0);
 			}
 		} catch(Exception e){
 			e.printStackTrace();

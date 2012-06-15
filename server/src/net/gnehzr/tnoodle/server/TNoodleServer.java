@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -105,7 +106,7 @@ public class TNoodleServer {
 
 	public static void main(String[] args) throws IOException {
 		Utils.doFirstRunStuff();
-		TNoodleLogging.initializeLogging();
+		TNoodleLogging.initializeLogging(Level.INFO);
 		Launcher.wrapMain(args);
 
 		OptionParser parser = new OptionParser();
