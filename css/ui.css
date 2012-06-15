@@ -83,7 +83,7 @@ h1 {
   margin-top: 15px;
 }
 
-#top_interface #competitionName {
+#top_interface #competitionName,#seedInput {
   font-size: 150%;
   width: 24em;
   text-align: center;

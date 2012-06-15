@@ -461,7 +461,7 @@ mark2.ui = (function() {
 	 */
 
 	var div;
-	var eventsTable, competitionNameInput, roundsTbody;
+	var eventsTable, competitionNameInput, seedInput, roundsTbody;
 	var scrambleButton, progress;
 	var callbacks;
 	var initialize = function(name, callbacks_) {
@@ -511,6 +511,11 @@ mark2.ui = (function() {
 		spacerDiv.appendChild(competitionNameInput);
 		competitionNameInput.id = 'competitionName';
 		competitionNameInput.placeholder = "Competition Name";
+
+		seedInput = document.createElement('input');
+		spacerDiv.appendChild(seedInput);
+		seedInput.id = 'seedInput';
+		seedInput.placeholder = "Seed/password";
 
 		scrambleButton = document.createElement('button');
 		topInterface.appendChild(scrambleButton);
@@ -728,6 +733,10 @@ mark2.ui = (function() {
 		return competitionNameInput.value;
 	};
 
+	var getSeed = function() {
+		return seedInput.value;
+	};
+
 	var updateHash = function() {
 		var competitionName = encodeURIComponent(getCompetitionName());
 		var roundsHash = encodeURIComponent(JSON.stringify(getRoundsJSON()));
@@ -936,6 +945,7 @@ mark2.ui = (function() {
 		getScrambleSheets: getScrambleSheets,
 		getRequiredScrambleCountByPuzzle: getRequiredScrambleCountByPuzzle,
 		getTitle: getCompetitionName,
+		getSeed: getSeed,
 		scramblesGenerated: scramblesGenerated
 	};
 })();
