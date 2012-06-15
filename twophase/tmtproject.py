@@ -7,6 +7,9 @@ class Project(tmt.EclipseProject):
 		tmt.EclipseProject.configure(self)
 		self.twophase_tables = 'twophase_tables'
 
+	"""
+    Commented out because we don't bother generating the tables at compile time anymore.
+    They're generated the first time you run tnoodle, and are saved to disk.
 	def innerCompile(self, src, tempBin, bin):
 		if src == self.srcResource:
 			# build the pruning and transition tables for the two phase algorithm
@@ -19,5 +22,6 @@ class Project(tmt.EclipseProject):
 							classpath=self.toClasspath(cp),
 							args=[ tablesPath ])
 			print "Successfully generated %s!" % tablesPath
+	"""
 
 Project(tmt.projectName(), description="A copy of Chen Shuang's (https://github.com/ChenShuang) awesome 3x3 scrambler built on top of Herbert Kociemba's Java library.")

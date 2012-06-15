@@ -23,7 +23,12 @@ public class Main {
 
 		OptionParser parser = new OptionParser();
 		OptionSpec<?> benchmark = parser.acceptsAll(Arrays.asList("b", "benchmark"), "Benchmark scramble generation");
+		OptionSpec<?> help = parser.acceptsAll( Arrays.asList( "h", "help" ), "show help" );
 		OptionSet options = parser.parse(args);
+		if(options.has(help)) {
+			parser.printHelpOn(System.out);
+			return;
+		}
 		List<String> puzzles = options.nonOptionArguments();
 
 		if(options.has(benchmark)) {

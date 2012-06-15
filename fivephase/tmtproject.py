@@ -10,6 +10,9 @@ class Project(tmt.EclipseProject):
 		self.fivephase_tables = 'fivephase_tables'
 		self.CACHED_FIVEPHASE_TABLES = join(self.name, 'CACHED_FIVEPHASE_TABLES_DELETE_TO_RECREATE')
 
+	"""
+    Commented out because we don't bother generating the tables at compile time anymore.
+    They're generated the first time you run tnoodle, and are saved to disk.
 	def innerCompile(self, src, tempBin, bin):
 		if src == self.srcResource:
 			tablesPath = join(tempBin, self.fivephase_tables)
@@ -29,5 +32,6 @@ class Project(tmt.EclipseProject):
 				print "******************************************************"
 			print "Copying %s -> %s" % (self.CACHED_FIVEPHASE_TABLES, tablesPath)
 			shutil.copy(self.CACHED_FIVEPHASE_TABLES, tablesPath)
+	"""
 
 Project(tmt.projectName(), description="A copy of Clement Gallet's (https://github.com/clementgallet) 4x4 scrambler.")
