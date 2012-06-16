@@ -13,14 +13,13 @@
 	var scrambleServer = new tnoodle.ScrambleServer();
 
 	function toScrambleRequest(sheets) {
-		// Neat trick for copying an object in js
-		var scramblesByPuzzleCopy = JSON.parse(JSON.stringify(scramblesByPuzzle));
 		var scrambleRequest = [];
 		for(var i = 0; i < sheets.length; i++) {
 			var sheet = sheets[i];
-			var allScrambles = scramblesByPuzzleCopy[sheet.puzzle];
-			var scrambles = allScrambles.splice(0, sheet.scrambleCount);
-			assert(scrambles.length == sheet.scrambleCount);
+			var scrambles = scramblesByGuid[sheet.guid];
+			assert(scrambles.length >= sheet.scrambleCount);
+			// It's possible we generated more scrambles than we actually need.
+			scrambles = scrambles.slice(0, sheet.scrambleCount);
 			var request = {
 				scrambles: scrambles,
 				copies: 1, //TODO - add support for this to ui.js
@@ -33,77 +32,78 @@
 		}
 		return scrambleRequest;
 	}
-	function showZip() {
+	function showZip(e) {
 		var title = mark2.ui.getTitle();
 		var sheets = mark2.ui.getScrambleSheets();
 		var request = toScrambleRequest(sheets);
-		scrambleServer.showZip(title, request, "");
+		var password = mark2.ui.getPassword();
+		if(e.shiftKey) {
+			scrambleServer.showPdf(title, request, password, "_blank");
+		} else {
+			scrambleServer.showZip(title, request, password, "");
+		}
 	}
 
-	var scramblesByPuzzle, title;
+	var scramblesByGuid, title;
 	function clear() {
-		scramblesByPuzzle = {};
+		scramblesByGuid = {};
 		title = "";
 	}
 	clear();
 
-	function countNonNull(arr) {
-		var n = 0;
-		for(var i = 0; i < arr.length; i++) {
-			if(arr[i] !== null) {
-				n++;
-			}
-		}
-		return n;
-	}
-	function getScrambleCountByPuzzle() {
-		var scrambleCountByPuzzle = {};
-		for(var puzzle in scramblesByPuzzle) {
-			if(scramblesByPuzzle.hasOwnProperty(puzzle)) {
-				var scrambles = scramblesByPuzzle[puzzle] || [];
-				scramblesByPuzzle[puzzle] = scrambles;
-
-				scrambleCountByPuzzle[puzzle] = countNonNull(scrambles);
-			}
-		}
-		return scrambleCountByPuzzle;
-	}
-
-	function scramblesLoaded(puzzle, newScrambles) {
-		var scrambles = scramblesByPuzzle[puzzle];
-		var firstNullIndex = scrambles.indexOf(null);
-		for(var i = 0; i < newScrambles.length; i++) {
-			scrambles[firstNullIndex + i] = newScrambles[i];
-		}
-		mark2.ui.scramblesGenerated(getScrambleCountByPuzzle());
+	function scramblesLoaded(sheet, newScrambles) {
+		scramblesByGuid[sheet.guid] = newScrambles;
+		mark2.ui.scramblesGenerated(scramblesByGuid);
 
 		// Perhaps there's more work to be done
 		competitionChanged();
 	}
 
+	var oldPassword = null;
 	function competitionChanged() {
-		var required = mark2.ui.getRequiredScrambleCountByPuzzle();
-		for(var puzzle in required) {
-			if(required.hasOwnProperty(puzzle)) {
-				var scrambles = scramblesByPuzzle[puzzle] || [];
-				scramblesByPuzzle[puzzle] = scrambles;
+		if(oldPassword != mark2.ui.getPassword()) {
+			// All the scrambles we've generated were seeded based on
+			// the old password. Since that password has changed, we must
+			// throw out all our scrambles and try again.
+			scramblesByGuid = {};
+			oldPassword = mark2.ui.getPassword();
+			mark2.ui.scramblesGenerated(scramblesByGuid);
+		}
+		var sheets = mark2.ui.getScrambleSheets();
+		for(var i = 0; i < sheets.length; i++) {
+			var sheet = sheets[i];
+			var scrambles = scramblesByGuid[sheet.guid] || [];
+			scramblesByGuid[sheet.guid] = scrambles;
 
-				if(scrambles.length >= required[puzzle]) {
-					// We could truncate the scrambles array here, but that's work, and
-					// we might be able to use the scrambles later anyways.
-					continue;
-				}
-
-				var neededScrambles = required[puzzle] - scrambles.length;
-				var MAX_SCRAMBLES_PER_REQUEST = 20;
-				neededScrambles = Math.min(neededScrambles, MAX_SCRAMBLES_PER_REQUEST);
-				for(var i = 0; i < neededScrambles; i++) {
-					scrambles.push(null);
-				}
-
-				var seed = null;
-				scrambleServer.loadScrambles(scramblesLoaded.bind(null, puzzle), puzzle, seed, neededScrambles);
+			if(scrambles.length >= sheet.scrambleCount) {
+				// We could truncate the scrambles array here, but that's work, and
+				// we might be able to use the scrambles later anyways.
+				continue;
 			}
+
+			// We don't have enough scrambles for this guid.
+			// Since we're seeding, we nuke the existing scrambles and generate
+			// the correct number.
+			var neededScrambles = sheet.scrambleCount;
+			var MAX_SCRAMBLES_PER_ROUND = 100;
+			if(neededScrambles > MAX_SCRAMBLES_PER_ROUND) {
+				alert("We don't currently support more than " + MAX_SCRAMBLES_PER_ROUND + " scrambles in a round, sorry!");
+				return;
+			}
+			scrambles = [];
+			for(var j = 0; j < neededScrambles; j++) {
+				scrambles.push(null);
+			}
+
+			var seed = null;
+			if(mark2.ui.getPassword()) {
+				// We could see with the GUID, but then anyone could recreate these scrambles
+				// if they know the name of the competition. Instead, we only seed the scrambles
+				// if we were given a password, as this gives us something unguessable in the
+				// seed.
+				seed = sheet.guid + mark2.ui.getPassword();
+			}
+			scrambleServer.loadScrambles(scramblesLoaded.bind(null, sheet), sheet.puzzle, seed, neededScrambles);
 		}
 	}
 

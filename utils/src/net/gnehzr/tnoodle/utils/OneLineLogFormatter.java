@@ -17,6 +17,7 @@ public class OneLineLogFormatter extends Formatter {
 		buf.append(record.getSourceClassName()).append(':').append(record.getSourceMethodName());
 		buf.append(' ');
 		buf.append(formatMessage(record));
+		buf.append(' ');
 		if(record.getThrown() != null) {
 			buf.append(Utils.throwableToString(record.getThrown()));
 		}

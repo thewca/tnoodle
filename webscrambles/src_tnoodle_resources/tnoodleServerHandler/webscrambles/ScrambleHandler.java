@@ -15,6 +15,8 @@ import tnoodleServerHandler.FileHandler;
 import com.itextpdf.text.DocumentException;
 import com.sun.net.httpserver.HttpExchange;
 
+import net.lingala.zip4j.exception.ZipException;
+
 public class ScrambleHandler extends SafeHttpHandler {
 	// TODO - there has to be a better way of getting the benefit of a FileHandler...
 	private FileHandler wcaScramblerHandler = new FileHandler("webscrambles/interface/scramblegen.html") {
@@ -25,7 +27,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 
 	public ScrambleHandler() {}
 	
-	protected void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, DocumentException, InvalidScrambleRequestException, IOException {
+	protected void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, DocumentException, InvalidScrambleRequestException, IOException, ZipException {
 		if(path.length == 0) {
 			wcaScramblerHandler.handle(t);
 		} else {
@@ -70,12 +72,12 @@ public class ScrambleHandler extends SafeHttpHandler {
 				sendJSON(t, GSON.toJson(scrambleRequests), callback);
 			} else if(ext.equals("pdf")) {
 				ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-				ByteArrayOutputStream totalPdfOutput = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests);
+				ByteArrayOutputStream totalPdfOutput = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
 				t.getResponseHeaders().set("Content-Disposition", "inline");
 				sendBytes(t, totalPdfOutput, "application/pdf");
 			} else if(ext.equals("zip")) {
 				ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-				ByteArrayOutputStream baosZip = ScrambleRequest.requestsToZip(globalTitle, generationDate, scrambleRequests);
+				ByteArrayOutputStream baosZip = ScrambleRequest.requestsToZip(globalTitle, generationDate, scrambleRequests, seed);
 				sendBytes(t, baosZip, "application/zip");
 			} else if(ext.equals("html")) {
 				wcaScramblerHandler.handle(t);
