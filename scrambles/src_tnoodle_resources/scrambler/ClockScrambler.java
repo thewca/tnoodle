@@ -312,7 +312,7 @@ public class ClockScrambler extends Scrambler {
 		Area backgroundFront = new Area();
 		Area backgroundBack = new Area();
 		backgroundFront.add(new Area(new Ellipse2D.Double(gap,gap, 2*radius, 2*radius)));
-		backgroundBack.add(new Area(new Ellipse2D.Double(2*radius+3*gap,2*radius+3*gap, 2*radius, 2*radius)));
+		backgroundBack.add(new Area(new Ellipse2D.Double(2*radius+3*gap,gap, 2*radius, 2*radius)));
 		for( i=-1; i<2; i+=2 )
 			for( j=-1; j<2; j+=2 ) {
 				backgroundFront.add(new Area(new Ellipse2D.Double(radius+gap+2*i*clockOuterRadius-clockOuterRadius,radius+gap+2*j*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius)));
@@ -333,14 +333,17 @@ public class ClockScrambler extends Scrambler {
 		Area pinsDown = new Area();
 		for( i=-1; i<2; i+=2 )
 			for( j=-1; j<2; j+=2 ) {
-				pinsUp.add(new Area(new Ellipse2D.Double(radius+gap+j*clockOuterRadius-pinRadius-1, radius+gap+i*clockOuterRadius-pinRadius+1, 2*pinRadius+2, 2*pinRadius+2)));
-				pinsDown.add(new Area(new Ellipse2D.Double(3*radius+3*gap+j*clockOuterRadius-pinRadius-1, radius+gap+i*clockOuterRadius-pinRadius+1, 2*pinRadius+2, 2*pinRadius+2)));
+				pinsDown.add(new Area(new Ellipse2D.Double(radius+gap+j*clockOuterRadius-pinRadius, radius+gap+i*clockOuterRadius-pinRadius, 2*pinRadius, 2*pinRadius)));
+				pinsUp.add(new Area(new Ellipse2D.Double(3*radius+3*gap+j*clockOuterRadius-pinRadius-1, radius+gap+i*clockOuterRadius-pinRadius+1, 2*pinRadius+2, 2*pinRadius+2)));
 			}
 
+		// Does not work !
+		/*
 		backgroundFront.subtract(clocksFront);
-		backgroundFront.subtract(pinsUp);
+		backgroundFront.subtract(pinsDown);
 		backgroundBack.subtract(clocksBack);
-		backgroundBack.subtract(pinsDown);
+		backgroundBack.subtract(pinsUp);
+		*/
 
 		HashMap<String, GeneralPath> facesMap = new HashMap<String, GeneralPath>();
 		facesMap.put("Front", new GeneralPath(backgroundFront));
