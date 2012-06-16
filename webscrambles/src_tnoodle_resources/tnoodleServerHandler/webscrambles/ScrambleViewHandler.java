@@ -28,6 +28,7 @@ import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
 import com.itextpdf.text.DocumentException;
 import com.sun.net.httpserver.HttpExchange;
+import net.lingala.zip4j.exception.ZipException;
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 public class ScrambleViewHandler extends SafeHttpHandler {
@@ -44,7 +45,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 			InstantiationException, IllegalAccessException,
 			InvocationTargetException, ClassNotFoundException,
 			NoSuchMethodException, InvalidScrambleRequestException,
-			DocumentException {
+			DocumentException, ZipException {
 		String callback = query.get("callback");
 		if (path.length == 0) {
 			sendJSONError(t, "Please specify a puzzle.", callback);
@@ -116,22 +117,21 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 			query = parseQuery(body.toString());
 
 			String json = query.get("scrambles");
-			ScrambleRequest[] scrambleRequests = GSON.fromJson(json,
-					ScrambleRequest[].class);
+			ScrambleRequest[] scrambleRequests = GSON.fromJson(json, ScrambleRequest[].class);
+
+			String password = query.get("password");
 
 			Date generationDate = new Date();
 			String globalTitle = name;
 
 			if (extension.equals("pdf")) {
 				ByteArrayOutputStream totalPdfOutput = ScrambleRequest
-						.requestsToPdf(globalTitle, generationDate,
-								scrambleRequests);
+						.requestsToPdf(globalTitle, generationDate, scrambleRequests, password);
 				t.getResponseHeaders().set("Content-Disposition", "inline");
 				sendBytes(t, totalPdfOutput, "application/pdf");
 			} else if (extension.equals("zip")) {
 				ByteArrayOutputStream zipOutput = ScrambleRequest
-						.requestsToZip(globalTitle, generationDate,
-								scrambleRequests);
+						.requestsToZip(globalTitle, generationDate, scrambleRequests, password);
 				String safeTitle = globalTitle.replaceAll("\"", "'");
 				t.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
 				sendBytes(t, zipOutput, "application/zip");

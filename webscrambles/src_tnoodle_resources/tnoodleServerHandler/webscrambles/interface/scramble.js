@@ -63,15 +63,18 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 		return scheme;
 	};
 
-	this.showExt = function(title, scrambleRequest, ext, target) {
+	this.showExt = function(title, scrambleRequest, password, ext, target) {
 		var params = { scrambles: JSON.stringify(scrambleRequest) };
+		if(password) {
+			params.password = password;
+		}
 		tnoodle.postToUrl(that.viewUrl + encodeURIComponent(title) + '.' + ext, params, "POST", target);
 	};
-	this.showPdf = function(title, scrambleRequest, target) {
-		that.showExt(title, scrambleRequest, 'pdf', target);
+	this.showPdf = function(title, scrambleRequest, password, target) {
+		that.showExt(title, scrambleRequest, password, 'pdf', target);
 	};
-	this.showZip = function(title, scrambleRequest, target) {
-		that.showExt(title, scrambleRequest, 'zip', target);
+	this.showZip = function(title, scrambleRequest, password, target) {
+		that.showExt(title, scrambleRequest, password, 'zip', target);
 	};
 	
 	this.loadPuzzles = function(callback) {

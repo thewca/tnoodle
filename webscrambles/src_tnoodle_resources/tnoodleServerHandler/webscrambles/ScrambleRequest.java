@@ -14,9 +14,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.SortedMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
@@ -39,7 +39,6 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
-import com.itextpdf.text.pdf.DefaultFontMapper;
 import com.itextpdf.text.pdf.DefaultSplitCharacter;
 import com.itextpdf.text.pdf.PdfChunk;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -50,9 +49,17 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.ZipOutputStream;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
+
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 class ScrambleRequest {
+	private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
+
 	private static final int SCRAMBLES_PER_PAGE = 5;
 	
 	private static final int MAX_COUNT = 100;
@@ -75,7 +82,7 @@ class ScrambleRequest {
 		// Hopefully someday this problem will go away, and this code can simply be deleted.
 		try {
 			ScrambleRequest r = new ScrambleRequest("title", "333", null);
-			requestsToPdf("", new Date(), new ScrambleRequest[] { r });
+			requestsToPdf("", new Date(), new ScrambleRequest[] { r }, null);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			System.out.println("Yikes! Did you just see a warning similar to this " +
@@ -194,8 +201,6 @@ class ScrambleRequest {
 		
 		doc.addCreationDate();
 		doc.addProducer();
-//		doc.addAuthor(this.getClass().getName());
-//		doc.addCreator(this.getClass().getName());
 		if(globalTitle != null) {
 			doc.addTitle(globalTitle);
 		}
@@ -372,13 +377,12 @@ class ScrambleRequest {
 				int availableScrambleHeight = gradeBottom-scrambleBorderTop;
 				Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
 				PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-				Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+				Graphics2D g2 = tp.createGraphics(dim.width, dim.height);
 
 				try {
 					scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
 				} catch (InvalidScrambleException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					l.log(Level.INFO, "", e);
 				}
 				g2.dispose();
 				cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
@@ -521,7 +525,7 @@ class ScrambleRequest {
 				if(dim.width > 0 && dim.height > 0) {
 					try {
 						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-						Graphics2D g2 = tp.createGraphics(dim.width, dim.height, new DefaultFontMapper());
+						Graphics2D g2 = tp.createGraphics(dim.width, dim.height);
 
 						scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
 						g2.dispose();
@@ -557,10 +561,20 @@ class ScrambleRequest {
 	}
 	
 	private static final String INVALID_CHARS = "\\/:*?\"<>|";
-	public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests) throws IOException, DocumentException {
+	public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password) throws IOException, DocumentException, ZipException {
 		ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
+
+		ZipParameters parameters = new ZipParameters();
+		parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+		parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+		if(password != null) {
+			parameters.setEncryptFiles(true);
+			parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+			parameters.setPassword(password);
+		}
+		parameters.setSourceExternalStream(true);
+
 		ZipOutputStream zipOut = new ZipOutputStream(baosZip);
-		zipOut.setComment(globalTitle + " zip created on " + Utils.SDF.format(generationDate));
 		HashMap<String, Boolean> seenTitles = new HashMap<String, Boolean>();
 		for(ScrambleRequest scrambleRequest : scrambleRequests) {
 
@@ -578,43 +592,50 @@ class ScrambleRequest {
 			seenTitles.put(safeTitle, true);
 
 			String pdfFileName = "pdf/" + safeTitle + ".pdf";
-			ZipEntry entry = new ZipEntry(pdfFileName);
-			zipOut.putNextEntry(entry);
+			parameters.setFileNameInZip(pdfFileName);
+			zipOut.putNextEntry(null, parameters);
 
 			PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
-			byte[] b = new byte[pdfReader.getFileLength()];
+			byte[] b = new byte[(int) pdfReader.getFileLength()];
 			pdfReader.getSafeFile().readFully(b);
 			zipOut.write(b);
 
 			zipOut.closeEntry();
 			
 			String txtFileName = "txt/" + safeTitle + ".txt";
-			entry = new ZipEntry(txtFileName);
-			zipOut.putNextEntry(entry);
+			parameters.setFileNameInZip(txtFileName);
+			zipOut.putNextEntry(null, parameters);
 			zipOut.write(Utils.join(stripNewlines(scrambleRequest.scrambles), "\r\n").getBytes());
 			zipOut.closeEntry();
 		}
 		
-		ZipEntry entry = new ZipEntry(globalTitle + ".json");
-		zipOut.putNextEntry(entry);
+		parameters.setFileNameInZip(globalTitle + ".json");
+		zipOut.putNextEntry(null, parameters);
 		zipOut.write(GSON.toJson(scrambleRequests).getBytes());
 		zipOut.closeEntry();
 
-		entry = new ZipEntry(globalTitle + ".pdf");
-		zipOut.putNextEntry(entry);
-		ByteArrayOutputStream baos = requestsToPdf(globalTitle, generationDate, scrambleRequests);
+		parameters.setFileNameInZip(globalTitle + ".pdf");
+		zipOut.putNextEntry(null, parameters);
+		// Note that we're not passing the password into this function. It seems pretty silly
+		// to put a password protected pdf inside of a password protected zip file.
+		ByteArrayOutputStream baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
 		zipOut.write(baos.toByteArray());
 		zipOut.closeEntry();
 		
+		zipOut.finish();
 		zipOut.close();
 		
 		return baosZip;
 	}
 
-	public static ByteArrayOutputStream requestsToPdf(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests) throws DocumentException, IOException {
+	public static ByteArrayOutputStream requestsToPdf(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password) throws DocumentException, IOException {
 		Document doc = new Document();
 		ByteArrayOutputStream totalPdfOutput = new ByteArrayOutputStream();
 		PdfSmartCopy totalPdfWriter = new PdfSmartCopy(doc, totalPdfOutput);
+		if(password != null) {
+			totalPdfWriter.setEncryption(password.getBytes(), password.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
+		}
+
 		doc.open();
 
 		for(int i = 0; i < scrambleRequests.length; i++) {

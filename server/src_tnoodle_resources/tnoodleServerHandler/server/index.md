@@ -6,7 +6,7 @@ An http server built to generate scrambles and images for twisty puzzles. Suppor
 * [WCA Scrambler](scramble/) - An (unofficial!) WCA-style scrambler. Hopefully someday soon it will be official.
 * [bld.js](tnt/bld.html) - A bld cycle generator for Pochmann-style combine orient+permute methods.
 
-Looking for something that's missing? Want to contribute? Check out the latest version of the code on [github](http://github.com/jfly/tnoodle)!
+Looking for something that's missing? Want to contribute? Check out the latest version of the code on [github](http://github.com/cubing/tnoodle)!
 
 ## API ##
 

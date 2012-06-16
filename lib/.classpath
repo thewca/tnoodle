@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="iText-5.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="itextpdf-5.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="bctsp-jdk16-1.46.jar"/>
+	<classpathentry exported="true" kind="lib" path="bcprov-jdk16-1.46.jar"/>
+	<classpathentry exported="true" kind="lib" path="bcmail-jdk16-1.46.jar"/>
 	<classpathentry exported="true" kind="lib" path="jopt-simple-3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugin.jar"/>
 	<classpathentry exported="true" kind="lib" path="h2-1.2.147.jar"/>
