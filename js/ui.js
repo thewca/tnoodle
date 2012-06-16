@@ -601,15 +601,20 @@ mark2.ui = (function() {
 
 		scrambleButton.addEventListener('click', callbacks.showScrambles, false);
 
-		initializeEvents();
 		initializeEventsTable();
 
-		window.addEventListener('hashchange', function() {
+		function urlChanged() {
 			initializeEvents();
 			updateEventAmountValues();
-		}, false);
+			maybeEnableScrambleButton();
+		}
+		urlChanged();
 
+		// Must populate the gui before updating the hash
 		updateHash();
+
+		window.addEventListener('hashchange', urlChanged, false);
+
 		return div;
 	};
 
@@ -701,7 +706,6 @@ mark2.ui = (function() {
 
 			valInput.addEventListener("change", changeNumRoundsListener, false);
 		}
-		updateEventAmountValues();
 	};
 
 	function updateEventAmountValues() {
