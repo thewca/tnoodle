@@ -33,7 +33,7 @@ public class SquareOneScrambler extends Scrambler {
 	
 	protected String generateScramble(Random r) {
 		Search s = new Search();
-		return s.solution(FullCube.randomCube());
+		return s.solution(FullCube.randomCube(r));
 	}
 
 	//returns true if invalid, false if valid
