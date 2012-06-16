@@ -7,22 +7,6 @@
 
 "use strict";
 
-// Offline Caching
-if (typeof window.applicationCache !== "undefined") {
-	window.applicationCache.addEventListener('updateready', function() {
-		window.applicationCache.swapCache();
-		setTimeout(function() {location.reload(true)}, 1000); // Function.prototype.bind doesn't work for this, anyhow... :-(
-	}, false);
-
-	window.applicationCache.addEventListener('downloading', function() {
-		document.body.innerHTML="<br><br><h1>Updating cache...<br><br>Page will reload in a moment.</h1>";
-		document.body.style.setProperty("background", "#00C0C0");
-		scramble.terminateWebWorkers(); // Call this last in case it's not defined yet.
-	}, false);
-}
-
-
-
 // Implementation of bind() for Safari.
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (oThis) {
@@ -198,6 +182,7 @@ if (typeof console.log === "undefined") {
 if(typeof assert === "undefined") {
 	var assert = function(bool) {
 		if(!bool) {
+			debugger;
 			throw "Assertion!";
 		}
 	};
@@ -461,7 +446,7 @@ mark2.ui = (function() {
 	 */
 
 	var div;
-	var eventsTable, competitionNameInput, seedInput, roundsTbody;
+	var eventsTable, competitionNameInput, passwordInput, roundsTbody;
 	var scrambleButton, progress;
 	var callbacks;
 	var initialize = function(name, callbacks_) {
@@ -512,10 +497,23 @@ mark2.ui = (function() {
 		competitionNameInput.id = 'competitionName';
 		competitionNameInput.placeholder = "Competition Name";
 
-		seedInput = document.createElement('input');
-		spacerDiv.appendChild(seedInput);
-		seedInput.id = 'seedInput';
-		seedInput.placeholder = "Seed/password";
+		var newLineDiv = document.createElement('div');
+		spacerDiv.appendChild(newLineDiv);
+
+		passwordInput = document.createElement('input');
+		newLineDiv.appendChild(passwordInput);
+		passwordInput.id = 'passwordInput';
+		passwordInput.placeholder = "Password";
+
+		var showPasswordCheckbox = document.createElement("input");
+		spacerDiv.appendChild(showPasswordCheckbox);
+		showPasswordCheckbox.type = "checkbox";
+		showPasswordCheckbox.id = "showPassword";
+		
+		var showPasswordCheckboxLabel = document.createElement("label");
+		spacerDiv.appendChild(showPasswordCheckboxLabel);
+		showPasswordCheckboxLabel.setAttribute("for", showPasswordCheckbox.id);
+		showPasswordCheckboxLabel.appendChild(document.createTextNode('Show password'));
 
 		scrambleButton = document.createElement('button');
 		topInterface.appendChild(scrambleButton);
@@ -587,6 +585,17 @@ mark2.ui = (function() {
 		resetButton.addEventListener('click', function() {
 			location.hash = "";
 		}, false);
+		
+		passwordInput.addEventListener('change', callbacks.competitionChanged, false);
+		function showPasswordChanged() {
+			if(showPasswordCheckbox.checked) {
+				passwordInput.type = "";			
+			} else {
+				passwordInput.type = "password";
+			}
+		}
+		showPasswordChanged();
+		showPasswordCheckbox.addEventListener('change', showPasswordChanged, false);
 
 		competitionNameInput.addEventListener('change', updateHash, false);
 
@@ -630,6 +639,7 @@ mark2.ui = (function() {
 	var getScrambleSheets = function() {
 		var rounds = getRoundsJSON();
 		var sheets = [];
+		var sheetByGuid = {};
 		for(var i = 0; i < rounds.length; i++) {
 			var round = rounds[i];
 			for(var groupN = 0; groupN < round.groupCount; groupN++) {
@@ -644,6 +654,18 @@ mark2.ui = (function() {
 					title: eventName + " " + title,
 					scrambleCount: round.scrambleCount
 				};
+
+				// Unfortunately, there's no guarantee that rounds in a
+				// competition have unique names, so we suffix with a
+				// unique number.
+				var baseGuid = getCompetitionName() + sheet.title;
+				var guid = baseGuid;
+				var uniqueId = 0;
+				while(sheetByGuid[guid]) {
+					guid = baseGuid + (++uniqueId);
+				}
+				sheet.guid = guid;
+
 				sheets.push(sheet);
 			}
 		}
@@ -655,9 +677,7 @@ mark2.ui = (function() {
 	 */
 
 	var initializeEventsTable = function() {
-
 		var currentEventsTR;
-
 		for (var i = 0; i < settings.event_order.length; i++) {
 			var eventID = settings.event_order[i]
 
@@ -733,8 +753,8 @@ mark2.ui = (function() {
 		return competitionNameInput.value;
 	};
 
-	var getSeed = function() {
-		return seedInput.value;
+	var getPassword = function() {
+		return passwordInput.value;
 	};
 
 	var updateHash = function() {
@@ -742,8 +762,8 @@ mark2.ui = (function() {
 		var roundsHash = encodeURIComponent(JSON.stringify(getRoundsJSON()));
 		location.hash = "#competition_name=" + competitionName + "&rounds=" + roundsHash;
 
-		maybeEnableScrambleButton();
 		callbacks.competitionChanged();
+		maybeEnableScrambleButton();
 	};
 
 
@@ -877,9 +897,24 @@ mark2.ui = (function() {
 		return rounds;
     };
 
-	var scrambleCountByPuzzle = {};
-	var scramblesGenerated = function(scrambleCountByPuzzle_) {
-		scrambleCountByPuzzle = scrambleCountByPuzzle_;
+	function countNonNull(arr) {
+		var n = 0;
+		for(var i = 0; i < arr.length; i++) {
+			if(arr[i] !== null) {
+				n++;
+			}
+		}
+		return n;
+	}
+
+	var generatedScrambleCountByGuid = {};
+	var scramblesGenerated = function(scramblesByGuid) {
+		generatedScrambleCountByGuid = {};
+		for(var guid in scramblesByGuid) {
+			if(scramblesByGuid.hasOwnProperty(guid)) {
+				generatedScrambleCountByGuid[guid] = countNonNull(scramblesByGuid[guid]);
+			}
+		}
 		maybeEnableScrambleButton();
 	};
 
@@ -894,23 +929,23 @@ mark2.ui = (function() {
 	}
 	function getRequiredScrambleCount() {
 		var requiredCount = 0;
-		var required = getRequiredScrambleCountByPuzzle();
-		for(var puzzle in required) {
-			requiredCount += required[puzzle];
+		var sheets = getScrambleSheets();
+		for(var i = 0; i < sheets.length; i++) {
+			requiredCount += sheets[i].scrambleCount;
 		}
 		return requiredCount;
 	}
 
 	function getGeneratedScrambleCount() {
-		var required = getRequiredScrambleCountByPuzzle();
-		var count = 0;
-		for(var puzzle in required) {
-			if(required.hasOwnProperty(puzzle)) {
-				// There may be more scrambles generated for this puzzle than we need.
-				count += Math.min(required[puzzle], scrambleCountByPuzzle[puzzle] || 0);
-			}
+		var generatedCount = 0;
+
+		var sheets = getScrambleSheets();
+		for(var i = 0; i < sheets.length; i++) {
+			var sheet = sheets[i];
+			// There may be more scrambles generated for this puzzle than we need.
+			generatedCount += Math.min(sheet.scrambleCount, generatedScrambleCountByGuid[sheet.guid] || 0);
 		}
-		return count;
+		return generatedCount;
 	}
 	
 	function maybeEnableScrambleButton() {
@@ -943,9 +978,8 @@ mark2.ui = (function() {
 		initialize: initialize,
 		updateHash: updateHash,
 		getScrambleSheets: getScrambleSheets,
-		getRequiredScrambleCountByPuzzle: getRequiredScrambleCountByPuzzle,
 		getTitle: getCompetitionName,
-		getSeed: getSeed,
+		getPassword: getPassword,
 		scramblesGenerated: scramblesGenerated
 	};
 })();
