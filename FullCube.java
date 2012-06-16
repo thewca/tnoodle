@@ -34,11 +34,14 @@ public class FullCube implements Comparable<FullCube> {
 	
 	}
 	
-	static Random gen = new Random();
-	
+	static Random r = new Random();
 	public static FullCube randomCube() {
+		return randomCube(r);
+	}
+
+	public static FullCube randomCube(Random r) {
 		int test;
-		int shape = Shape.ShapeIdx[test = gen.nextInt(3678)];
+		int shape = Shape.ShapeIdx[test = r.nextInt(3678)];
 		FullCube f = new FullCube();
 		int corner = 0x01234567 << 1 | 0x11111111;
 		int edge = 0x01234567 << 1;
@@ -46,13 +49,13 @@ public class FullCube implements Comparable<FullCube> {
 		int rnd, m;
 		for (int i=0; i<24; i++) {
 			if (((shape >> i) & 1) == 0) {//edge
-				rnd = gen.nextInt(n_edge) << 2;
+				rnd = r.nextInt(n_edge) << 2;
 				f.setPiece(23-i, (edge >> rnd) & 0xf);
 				m = (1 << rnd) - 1;
 				edge = (edge & m) + ((edge >> 4) & ~m);
 				--n_edge;
 			} else {//corner
-				rnd = gen.nextInt(n_corner) << 2;
+				rnd = r.nextInt(n_corner) << 2;
 				f.setPiece(23-i, (corner >> rnd) & 0xf);
 				f.setPiece(22-i, (corner >> rnd) & 0xf);
 				m = (1 << rnd) - 1;
@@ -61,7 +64,7 @@ public class FullCube implements Comparable<FullCube> {
 				++i;				
 			}
 		}
-		f.ml = gen.nextInt(2);
+		f.ml = r.nextInt(2);
 		return f;
 	}
 
