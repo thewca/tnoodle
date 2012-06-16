@@ -126,7 +126,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 
 			if (extension.equals("pdf")) {
 				ByteArrayOutputStream totalPdfOutput = ScrambleRequest
-						.requestsToPdf(globalTitle, generationDate, scrambleRequests);
+						.requestsToPdf(globalTitle, generationDate, scrambleRequests, password);
 				t.getResponseHeaders().set("Content-Disposition", "inline");
 				sendBytes(t, totalPdfOutput, "application/pdf");
 			} else if (extension.equals("zip")) {
