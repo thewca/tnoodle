@@ -661,9 +661,9 @@ mark2.ui = (function() {
 				};
 
 				// Unfortunately, there's no guarantee that rounds in a
-				// competition have unique names, so we suffix with a
+				// competition have unique names, so we must suffix with a
 				// unique number.
-				var baseGuid = getCompetitionName() + sheet.title;
+				var baseGuid = getCompetitionName() + sheet.puzzle + sheet.title;
 				var guid = baseGuid;
 				var uniqueId = 0;
 				while(sheetByGuid[guid]) {
