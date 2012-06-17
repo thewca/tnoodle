@@ -807,7 +807,7 @@ class EclipseProject(TmtProject):
 					# we're probably symlinking into that project, so there's
 					# no need to slurp in any of its resources manually.
 					# One example of where we do this is for js projects.
-					# In face, we don't even need these projects to show up in the
+					# In fact, we don't even need these projects to show up in the
 					# dependency graph, but it's nice to keep "tmt graph" up to date.
 					# TODO - symlinking into other projects isn't a great idea,
 					# what if a -> c, a -> b, and b -> c ?
@@ -819,6 +819,10 @@ class EclipseProject(TmtProject):
 				jarLib.extractall(path=extractedLibDir)
 			for dirpath, dirnames, filenames in os.walk(extractedLibDir):
 				for name in filenames:
+					if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
+						# We don't want to include signatures in our monolithic jar file, see
+						# http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+						continue
 					path = os.path.normpath(os.path.join(dirpath, name))
 					arcPath = os.path.relpath(path, extractedLibDir)
 					if os.path.isfile(path):
