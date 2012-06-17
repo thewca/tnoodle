@@ -20,12 +20,13 @@ public class Search {
 		return p & 1;
 	}
 
+	static {
+		Shape.init();
+		Square.init();
+	}
 	
 	public static void main(String[] args) {
 		long t = System.nanoTime();
-		
-		Shape.init();
-		Square.init();
 		
 		FullCube f;// = new FullCube("");
 //		System.out.println(f.getParity());
