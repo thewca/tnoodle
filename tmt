@@ -303,6 +303,10 @@ class tmt:
 			default='',
 			help='Command line arguments (only valid with the "run" command)')
 		parser_make.add_argument(
+			'--main', '-m',
+			default='',
+			help='Main class to run')
+		parser_make.add_argument(
 			'--debug', '-d',
 			choices=['jdb', 'attach'],
 			default=None,
@@ -875,7 +879,8 @@ Implementation-Version: %s
 		print 'Successfully created %s with main class %s' % ( self.distJarFile(), self.main )
 
 	def run(self):
-		assert self.main, 'Main class not defined'
+		main = tmt.args.main or self.main
+		assert main, 'Main class not defined'
 		assert tmt.args.args is not None # shlex reads from stdin if you pass None, lol
 		tmt._make(projectName=self.name, command='compile')
 		# TODO propogate return code up
@@ -883,7 +888,7 @@ Implementation-Version: %s
 		if self.argv:
 			args += self.argv
 		tmt.java(
-			main=self.main,
+			main=main,
 			classpath=self.toClasspath(self.getClasspathEntities(includeResources=False)),
 			args=args,
 			debug=tmt.args.debug)
