@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import java.nio.channels.FileChannel;
+
 import sun.reflect.Reflection;
 
 import com.google.gson.Gson;
@@ -195,6 +197,27 @@ public final class Utils {
 		}
 	}
 
+	public static void copyFile(File sourceFile, File destFile) throws IOException {
+		if(!destFile.exists()) {
+			destFile.createNewFile();
+		}
+
+		FileChannel source = null;
+		FileChannel destination = null;
+		try {
+			source = new FileInputStream(sourceFile).getChannel();
+			destination = new FileOutputStream(destFile).getChannel();
+			destination.transferFrom(source, 0, source.size());
+		}
+		finally {
+			if(source != null) {
+				source.close();
+			}
+			if(destination != null) {
+				destination.close();
+			}
+		}
+	}
 
 
 	private static GsonBuilder gsonBuilder = new GsonBuilder();
@@ -342,7 +365,7 @@ public final class Utils {
 		return programDirectory;
 	}
 	
-	private static File getJarFile() {
+	public static File getJarFile() {
 		File potentialJarFile = getJarFileOrDirectory();
 		if(potentialJarFile.isFile()) {
 			return potentialJarFile;

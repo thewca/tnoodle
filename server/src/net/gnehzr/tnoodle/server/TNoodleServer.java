@@ -33,6 +33,8 @@ import tnoodleServerHandler.DirectoryHandler;
 import com.sun.net.httpserver.HttpServer;
 
 public class TNoodleServer {
+	private static final int MIN_HEAP_SIZE_MEGS = 512;
+
 	public static String NAME, VERSION;
 	static {
 		Package p = TNoodleServer.class.getPackage();
@@ -107,7 +109,7 @@ public class TNoodleServer {
 	public static void main(String[] args) throws IOException {
 		Utils.doFirstRunStuff();
 		TNoodleLogging.initializeLogging(Level.INFO);
-		Launcher.wrapMain(args);
+		Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
 
 		OptionParser parser = new OptionParser();
 		OptionSpec<Integer> portOpt = parser.
