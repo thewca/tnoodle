@@ -46,6 +46,11 @@ public class ScrambleHandler extends SafeHttpHandler {
 			globalTitle = path[0].substring(0, lastDot);
 			ext = path[0].substring(lastDot+1);
 			
+			// Chrome seems to be caching scramble requests. These headers unfortauntely
+			// don't seem to prevent that behavior.
+			t.getResponseHeaders().set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+			t.getResponseHeaders().set("Pragma", "no-cache");
+
 			if(ext == null || ext.equals("txt")) {
 				// Note that we parse the scramble requests *after* checking the extension.
 				// This way, someone who makes a request for "/scramble/foo.bar" will get a warning about 

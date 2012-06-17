@@ -86,6 +86,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 			callback(scrambles[0]);
 		}, puzzle, seed, 1);
 	};
+	var requestCount = 0;
 	this.loadScrambles = function(callback, puzzle, seed, count) {
 		var query = {};
 		if(seed) { query.seed = seed; }
@@ -96,6 +97,9 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 		assert(count <= 100);
 
 		query[''] = encodeURIComponent(puzzle) + "*" + count;
+		// Freaking Chrome seems to cache scramble requests if they're close enough
+		// together, even if we POST. This forces it to not.
+		query['showIndices'] = (requestCount++);
 		var pendingLoadScrambles = tnoodle.ajax(function(scrambleRequests) {
 			if(scrambleRequests.error) {
 				// If there's any kind of error, retryAjax will back off and try again
@@ -211,7 +215,7 @@ tnoodle.ajax = function(callback, url, data) {
 		if(typeof(XDomainRequest) != "undefined") {
 			xhr = new XDomainRequest();
 			try {
-				xhr.open('get', dataUrl);
+				xhr.open('GET', dataUrl);
 			} catch(error) {
 				//this throws an exception when running locally on ie
 				xhr = null;
@@ -223,7 +227,7 @@ tnoodle.ajax = function(callback, url, data) {
 			return tnoodle.jsonp(callback, url, data);
 		}
 	} else {
-		xhr.open('get', dataUrl, true);
+		xhr.open('GET', dataUrl, true);
 	}
 	xhr.onload = function() {
 		callback(JSON.parse(this.responseText));

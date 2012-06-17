@@ -56,7 +56,7 @@ public class TNoodleServerPluginDelegator extends SafeHttpHandler {
 	
 	@Override
 	protected void wrappedHandle(HttpExchange t, String[] path, LinkedHashMap<String, String> query) throws Exception {
-		l.info("GET " + t.getRequestURI() + " " + t.getRemoteAddress()); // TODO - create a special logger for this!
+		l.info(t.getRequestMethod() + " " + t.getRequestURI() + " " + t.getRemoteAddress()); // TODO - create a special logger for this!
 		
 		String[] longestMatch = getLongestMatch(path);
 		LazyInstantiator<SafeHttpHandler> handler = handlers.get(longestMatch);
