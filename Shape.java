@@ -86,11 +86,12 @@ class Shape {
 		bottom = (bottom & 0x3f) | temp << 6;
 	}
 	
-	static {
-		init();
-	}
+	static boolean inited = false;
 	
 	static void init() {
+		if (inited) {
+			return;
+		}
 		int count = 0;
 		for (int i=0; i<13*13*13*13; i++) {
 			int dr = halflayer[i % 13];
@@ -171,9 +172,7 @@ class Shape {
 				}
 			}
 		}
+		inited = true;
 	}
 
-	public static void main(String[] args) {
-		init();
-	}
 }
