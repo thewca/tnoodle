@@ -196,7 +196,6 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 };
 
 /*** Utility functions ***/
-
 tnoodle.ajax = function(callback, url, data) {
 	var dataUrl = url; //this is to avoid clobbering our original url
 	if(data) {
@@ -221,8 +220,7 @@ tnoodle.ajax = function(callback, url, data) {
 		if(xhr === null) {
 			// Opera 11 doesn't have XDomainRequest, so
 			// we'll make an attempt to use jsonp here.
-			tnoodle.jsonp(callback, url, data);
-			return null;
+			return tnoodle.jsonp(callback, url, data);
 		}
 	} else {
 		xhr.open('get', dataUrl, true);
@@ -299,7 +297,8 @@ tnoodle.retryAjax = function(callback, url, data, nthTry) {
 };
 tnoodle.jsonpCallbacks = [];
 tnoodle.jsonp = function(callback, url, data) {
-	var callbackname = "tnoodle.jsonpCallbacks[" + tnoodle.jsonpCallbacks.length + "]";
+	var callbackIndex = tnoodle.jsonpCallbacks.length;
+	var callbackname = "tnoodle.jsonpCallbacks[" + callbackIndex + "]";
 	tnoodle.jsonpCallbacks.push(callback);
 	if (url.indexOf("?") > -1) {
 		url += "&callback="; 
@@ -318,6 +317,14 @@ tnoodle.jsonp = function(callback, url, data) {
 	script.setAttribute("src", url);
 	script.setAttribute("type", "text/javascript");
 	document.body.appendChild(script); //TODO - doesn't work until body is loaded
+	return {
+		abort: function() {
+			// Unfortunately, deleting the <script> tag we just created doesn't seem
+			// to cancel the pending request. I don't think it's possible to cancel it,
+			// but we can ignore it when it does complete.
+			tnoodle.jsonpCallbacks[callbackIndex] = function() {};
+		}
+	};
 };
 tnoodle.toQueryString = function(data) {
 	var url = "";

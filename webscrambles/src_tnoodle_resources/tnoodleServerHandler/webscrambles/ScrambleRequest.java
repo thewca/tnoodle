@@ -192,6 +192,7 @@ class ScrambleRequest {
 
 
 	private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
+		azzert(scrambleRequest.scrambles.length > 0);
 		ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
 		Rectangle pageSize = PageSize.LETTER;
 		Document doc = new Document(pageSize, 0, 0, 75, 75);

@@ -16,7 +16,7 @@
 		var scrambleRequest = [];
 		for(var i = 0; i < sheets.length; i++) {
 			var sheet = sheets[i];
-			var scrambles = scramblesByGuid[sheet.guid];
+			var scrambles = requestsByGuid[sheet.guid].scrambles;
 			assert(scrambles.length >= sheet.scrambleCount);
 			// It's possible we generated more scrambles than we actually need.
 			scrambles = scrambles.slice(0, sheet.scrambleCount);
@@ -44,66 +44,75 @@
 		}
 	}
 
-	var scramblesByGuid, title;
-	function clear() {
-		scramblesByGuid = {};
-		title = "";
+	var requestsByGuid = {};
+	var title = "";
+	function toScramblesByGuid(requestsByGuid) {
+		var scramblesByGuid = {};
+		for(var guid in requestsByGuid) {
+			if(requestsByGuid.hasOwnProperty(guid)) {
+				scramblesByGuid[guid] = requestsByGuid[guid].scrambles;
+			}
+		}
+		return scramblesByGuid;
 	}
-	clear();
 
-	function scramblesLoaded(sheet, newScrambles) {
-		scramblesByGuid[sheet.guid] = newScrambles;
-		mark2.ui.scramblesGenerated(scramblesByGuid);
+	function scramblesLoaded(sheet, requestIndex, newScrambles) {
+		var scrambles = requestsByGuid[sheet.guid].scrambles;
+		var firstNullIndex = Math.max(0, scrambles.indexOf(null));
+		for(var i = 0; i < newScrambles.length; i++) {
+			scrambles[firstNullIndex + i] = newScrambles[i];
+		}
+		requestsByGuid[sheet.guid].pendingRequests[requestIndex] = null;
+		mark2.ui.scramblesGenerated(toScramblesByGuid(requestsByGuid));
 
 		// Perhaps there's more work to be done
 		competitionChanged();
 	}
 
-	var oldPassword = null;
 	function competitionChanged() {
-		if(oldPassword != mark2.ui.getPassword()) {
-			// All the scrambles we've generated were seeded based on
-			// the old password. Since that password has changed, we must
-			// throw out all our scrambles and try again.
-			scramblesByGuid = {};
-			oldPassword = mark2.ui.getPassword();
-			mark2.ui.scramblesGenerated(scramblesByGuid);
-		}
+		var requestedGuids = {};
 		var sheets = mark2.ui.getScrambleSheets();
-		for(var i = 0; i < sheets.length; i++) {
+		var request, i;
+		for(i = 0; i < sheets.length; i++) {
 			var sheet = sheets[i];
-			var scrambles = scramblesByGuid[sheet.guid] || [];
-			scramblesByGuid[sheet.guid] = scrambles;
+			request = requestsByGuid[sheet.guid];
+			requestedGuids[sheet.guid] = true;
 
-			if(scrambles.length >= sheet.scrambleCount) {
-				// We could truncate the scrambles array here, but that's work, and
-				// we might be able to use the scrambles later anyways.
-				continue;
-			}
-
-			// We don't have enough scrambles for this guid.
-			// Since we're seeding, we nuke the existing scrambles and generate
-			// the correct number.
-			var neededScrambles = sheet.scrambleCount;
-			var MAX_SCRAMBLES_PER_ROUND = 100;
-			if(neededScrambles > MAX_SCRAMBLES_PER_ROUND) {
-				alert("We don't currently support more than " + MAX_SCRAMBLES_PER_ROUND + " scrambles in a round, sorry!");
-				return;
-			}
-			scrambles = [];
-			for(var j = 0; j < neededScrambles; j++) {
-				scrambles.push(null);
+			if(!request) {
+				request = {
+					scrambles: [],
+					pendingRequests: []
+				};
+				requestsByGuid[sheet.guid] = request;
 			}
 
-			var seed = null;
-			if(mark2.ui.getPassword()) {
-				// We could see with the GUID, but then anyone could recreate these scrambles
-				// if they know the name of the competition. Instead, we only seed the scrambles
-				// if we were given a password, as this gives us something unguessable in the
-				// seed.
-				seed = sheet.guid + mark2.ui.getPassword();
+			if(request.scrambles.length < sheet.scrambleCount) {
+				var seed = null;
+				var MAX_SCRAMBLES_PER_REQUEST = 10;
+				var unrequestedScrambleCount = sheet.scrambleCount - request.scrambles.length;
+				var scramblesToRequest = Math.min(unrequestedScrambleCount, MAX_SCRAMBLES_PER_REQUEST);
+				request.scrambles.length += scramblesToRequest;
+
+				var requestIndex = request.pendingRequests.length;
+				var pendingRequest = scrambleServer.loadScrambles(scramblesLoaded.bind(null, sheet, requestIndex), sheet.puzzle, seed, scramblesToRequest);
+				request.pendingRequests.push(pendingRequest);
 			}
-			scrambleServer.loadScrambles(scramblesLoaded.bind(null, sheet), sheet.puzzle, seed, neededScrambles);
+		}
+
+		for(var guid in requestsByGuid) {
+			if(requestsByGuid.hasOwnProperty(guid)) {
+				if(!requestedGuids[guid]) {
+					// This request is no longer needed, so we abort it if
+					// it's still running, and then delete it.
+					request = requestsByGuid[guid];
+					for(i = 0; i < request.pendingRequests.length; i++) {
+						if(request.pendingRequests[i]) {
+							request.pendingRequests[i].abort();
+						}
+					}
+					delete requestsByGuid[guid];
+				}
+			}
 		}
 	}
 
