@@ -450,7 +450,7 @@ public class PyraminxScrambler extends Scrambler {
 	}
 
 	private static int getPyraminxViewWidth(int gap, int pieceSize) {
-		return (int)(2 * 3 * pieceSize + 4 * gap);
+		return (2 * 3 * pieceSize + 4 * gap);
 	}
 	private static int getPyraminxViewHeight(int gap, int pieceSize) {
 		return (int)(2 * 1.5 * Math.sqrt(3) * pieceSize + 3 * gap);

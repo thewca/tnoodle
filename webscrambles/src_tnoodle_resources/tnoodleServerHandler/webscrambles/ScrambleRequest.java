@@ -49,6 +49,8 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.awt.PdfGraphics2D;
+import com.itextpdf.awt.DefaultFontMapper;
 
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipOutputStream;
@@ -378,7 +380,7 @@ class ScrambleRequest {
 				int availableScrambleHeight = gradeBottom-scrambleBorderTop;
 				Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
 				PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-				Graphics2D g2 = tp.createGraphics(dim.width, dim.height);
+				Graphics2D g2 = new PdfGraphics2D(cb, width, height, new DefaultFontMapper());
 
 				try {
 					scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
@@ -526,7 +528,7 @@ class ScrambleRequest {
 				if(dim.width > 0 && dim.height > 0) {
 					try {
 						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-						Graphics2D g2 = tp.createGraphics(dim.width, dim.height);
+						Graphics2D g2 = new PdfGraphics2D(cb, dim.width, dim.height, new DefaultFontMapper());
 
 						scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
 						g2.dispose();

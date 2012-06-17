@@ -604,17 +604,11 @@ class EclipseProject(TmtProject):
 		if includeResources:
 			classpath.add(self.binResource)
 
-		# TODO - the src folder only needs to be in the classpath so
-		# jdb can discover the source code
-		# TODO - i thought this was harmless, but it's making "tmt make run"
-		# behave differently than "tmt make dist". DirectoryHandler
-		# searches for dependencies using 
-		#  getClass().getResourceAsStream()
-		# If the src directory is in the classpath, dependencies that should be
-		# copied to the bin directory are being found in src directory.
-		# Bugs like this wouldn't show up until someone does a "tmt make dist",
-		# and who wants to do that?
-		#classpath.add(self.src)
+		# The src folder only needs to be in the classpath so
+		# jdb can discover the source code, and so compilation of stuff in
+		# src_tnoodle_resources/ can find things defined in src/
+		classpath.add(self.src)
+
 		# TODO - I hate the world
 		# Uncomment & replace the following with the path to your jre
 		# if you're trying to use jbd inside of a java library method.
@@ -726,7 +720,26 @@ class EclipseProject(TmtProject):
 		if len(javaFiles) > 0:
 			args = [ 'javac' ]
 			args += [ '-d', tempBin ]
+
+            # Enable all warnings
+			args += [ '-Xlint' ]
+            # Treat warnings as errors
+			args += [ '-Werror' ]
+
+            # Ignored warnings
+            # We don't need to be warned about possible fallthroughs in switch statements
+			args += [ '-Xlint:-fallthrough' ]
+            # Yes, I know I'm using the reflecation api, and no, there isn't another choice
+			args += [ '-XDignore.symbol.file' ]
+
 			entities = self.getClasspathEntities()
+
+			# At the time we're compiling, bin/ and bin_tnoodle_resource/ don't
+			# actually exist. This is becuse we compile to temp directory, and
+			# move the folders only if we're successful.
+			entities.remove(self.bin)
+			entities.remove(self.binResource)
+
 			classpath = self.toClasspath(entities)
 			if classpath:
 				args += [ '-classpath', classpath ]

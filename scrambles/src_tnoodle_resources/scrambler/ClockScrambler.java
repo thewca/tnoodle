@@ -25,7 +25,7 @@ public class ClockScrambler extends Scrambler {
 	private static final int radius = 70;
 	private static final int clockRadius = 14;
 	private static final int clockOuterRadius = 20;
-	private static final int pointRadius = (int)((clockRadius + clockOuterRadius) / 2);
+	private static final int pointRadius = (clockRadius + clockOuterRadius) / 2;
 	private static final int pointSize = 1;
 	private static final int arrowHeight = 10;
 	private static final int arrowRadius = 2;

@@ -123,6 +123,7 @@ public class ScrambleTestGui {
 		requestScramble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				@SuppressWarnings("unchecked")
 				LazyInstantiator<Scrambler> lazyScrambler = (LazyInstantiator<Scrambler>) puzzleBox.getSelectedItem();
 				Scrambler scrambler;
 				try {
