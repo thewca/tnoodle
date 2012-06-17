@@ -901,10 +901,10 @@ mark2.ui = (function() {
 		return rounds;
     };
 
-	function countNonNull(arr) {
+	function countNonNullAndNonUndefined(arr) {
 		var n = 0;
 		for(var i = 0; i < arr.length; i++) {
-			if(arr[i] !== null) {
+			if(arr[i] !== null && arr[i] != undefined) {
 				n++;
 			}
 		}
@@ -916,7 +916,7 @@ mark2.ui = (function() {
 		generatedScrambleCountByGuid = {};
 		for(var guid in scramblesByGuid) {
 			if(scramblesByGuid.hasOwnProperty(guid)) {
-				generatedScrambleCountByGuid[guid] = countNonNull(scramblesByGuid[guid]);
+				generatedScrambleCountByGuid[guid] = countNonNullAndNonUndefined(scramblesByGuid[guid]);
 			}
 		}
 		maybeEnableScrambleButton();
