@@ -93,6 +93,9 @@ public class Launcher {
 				}
 			}
 		}
+		if(!needsReExecing) {
+			return;
+		}
 		
 		String classpath = System.getProperty("java.class.path");
 		// Fortunately, classpath contains our jar file if we were run
@@ -112,7 +115,7 @@ public class Launcher {
 		jvmArgs.addAll(Arrays.asList(args));
 
 		try {
-			l.info("Rexecing with " + jvmArgs);
+			l.info("Re-execing with " + jvmArgs);
 			ProcessBuilder pb = new ProcessBuilder(jvmArgs);
 			pb.redirectErrorStream(true);
 			final Process p = pb.start();
