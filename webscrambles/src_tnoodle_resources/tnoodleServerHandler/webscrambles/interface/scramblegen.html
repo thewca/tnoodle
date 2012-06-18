@@ -10,6 +10,13 @@
 
 <script type="text/javascript">
 (function() {
+	// If a puzzle takes a really long time to scramble, we can specify
+	// a custom "max # of scrambles" to request all at once.
+	// This means a round of 5 scrambles that take 10 seconds to generate will
+	// take 10 seconds 5 times, rather than 50 seconds 1 time.
+	var DEFAULT_MAX_SCRAMBLES_PER_REQUEST = 10;
+	var maxScramblesPerRequestByPuzzle = { '444': 1 };
+
 	var scrambleServer = new tnoodle.ScrambleServer();
 
 	function toScrambleRequest(sheets) {
@@ -58,7 +65,10 @@
 
 	function scramblesLoaded(sheet, requestIndex, newScrambles) {
 		var scrambles = requestsByGuid[sheet.guid].scrambles;
-		var firstNullIndex = Math.max(0, scrambles.indexOf(null));
+		var firstNullIndex = 0;
+		while(scrambles[firstNullIndex] !== null && scrambles[firstNullIndex] !== undefined) {
+			firstNullIndex++;
+		}
 		for(var i = 0; i < newScrambles.length; i++) {
 			scrambles[firstNullIndex + i] = newScrambles[i];
 		}
@@ -88,9 +98,9 @@
 
 			if(request.scrambles.length < sheet.scrambleCount) {
 				var seed = null;
-				var MAX_SCRAMBLES_PER_REQUEST = 10;
+				var maxScramblesPerRequest = maxScramblesPerRequestByPuzzle[sheet.puzzle] || DEFAULT_MAX_SCRAMBLES_PER_REQUEST;
 				var unrequestedScrambleCount = sheet.scrambleCount - request.scrambles.length;
-				var scramblesToRequest = Math.min(unrequestedScrambleCount, MAX_SCRAMBLES_PER_REQUEST);
+				var scramblesToRequest = Math.min(unrequestedScrambleCount, maxScramblesPerRequest);
 				request.scrambles.length += scramblesToRequest;
 
 				var requestIndex = request.pendingRequests.length;
