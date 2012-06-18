@@ -10,6 +10,8 @@ CHECK_ILLEGAL_CHAR = True
 JSLINT_IGNORED_ERRORS = set([
   'type is unnecessary.',
   "Unexpected token 'ew-resize'.",
+  "Unrecognized style attribute 'border-bottom-right-radius'.",
+  "Unrecognized style attribute 'border-bottom-left-radius'.",
   "Bad input type.",
   "is better written in dot notation",
 ])
