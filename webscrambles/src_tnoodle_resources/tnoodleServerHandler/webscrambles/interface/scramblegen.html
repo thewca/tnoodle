@@ -7,10 +7,29 @@
 <link type="text/css" href="/scrambler-interface/css/ui.css" rel="stylesheet" />
 
 <script type="text/javascript" src="/js/scramble.js"></script>
+<style type="text/css">
+#ajaxStatus {
+	border-bottom: 1px solid black;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	border-bottom-right-radius: 25px;
+	border-bottom-left-radius: 25px;
+	position: absolute;
+	z-index: 1;
+	background: red;
+	top: 0;
+	left: 5%;
+	right: 5%;
+	text-align: center;
+}
+#ajaxStatus .error {
+	padding: 5px;
+}
+</style>
 
 <script type="text/javascript">
 (function() {
-	// If a puzzle takes a really long time to scramble, we can specify
+	// To deal with puzzles that take a really long time to scramble, we specify
 	// a custom "max # of scrambles" to request all at once.
 	// This means a round of 5 scrambles that take 10 seconds to generate will
 	// take 10 seconds 5 times, rather than 50 seconds 1 time.
@@ -18,6 +37,74 @@
 	var maxScramblesPerRequestByPuzzle = { '444': 1 };
 
 	var scrambleServer = new tnoodle.ScrambleServer();
+
+
+	var ajaxStateDiv = document.createElement('div');
+	ajaxStateDiv.id = 'ajaxStatus';
+
+	var errorDivByAjaxId = {};
+	tnoodle.ajaxStateListeners.push(function(ajaxState) {
+		var showErrors = false;
+
+		var seenIds = {};
+		for(var ajaxId in ajaxState) {
+			if(ajaxState.hasOwnProperty(ajaxId)) {
+				var state = ajaxState[ajaxId];
+				if(state.lastError) {
+					seenIds[ajaxId] = true;
+					showErrors = true;
+					var error = errorDivByAjaxId[ajaxId];
+					if(!error) {
+						error = document.createElement('div');
+						error.classList.add('error');
+						ajaxStateDiv.appendChild(error);
+						errorDivByAjaxId[ajaxId] = error;
+
+						error.urlSpan = document.createElement('div');
+						error.appendChild(error.urlSpan);
+						error.urlSpan.classList.add('url');
+
+						error.lastErrorSpan = document.createElement('div');
+						error.appendChild(error.lastErrorSpan);
+						error.lastErrorSpan.classList.add('lastError');
+
+						error.retryStateSpan = document.createElement('div');
+						error.appendChild(error.retryStateSpan);
+						error.urlSpan.classList.add('retryState');
+					}
+
+					error.urlSpan.innerHTML = "";
+					error.urlSpan.appendChild(document.createTextNode(state.url));
+
+					error.lastErrorSpan.innerHTML = "";
+					error.lastErrorSpan.appendChild(document.createTextNode(state.lastError));
+
+					var retryStateStr;
+					if(state.secondsUntilRetry !== null) {
+						retryStateStr = "Retrying in " + state.secondsUntilRetry + " seconds";
+					} else {
+						assert(state.retryAttempt);
+						retryStateStr = "Trying again...";
+					}
+					error.retryStateSpan.innerHTML = "";
+					error.retryStateSpan.appendChild(document.createTextNode(retryStateStr));
+				}
+			}
+		}
+		for(ajaxId in errorDivByAjaxId) {
+			if(errorDivByAjaxId.hasOwnProperty(ajaxId)) {
+				if(!seenIds[ajaxId]) {
+					ajaxStateDiv.removeChild(errorDivByAjaxId[ajaxId]);
+					delete errorDivByAjaxId[ajaxId];
+				}
+			}
+		}
+		if(showErrors) {
+			ajaxStateDiv.style.display = "";
+		} else {
+			ajaxStateDiv.style.display = "none";
+		}
+	});
 
 	function toScrambleRequest(sheets) {
 		var scrambleRequest = [];
@@ -145,6 +232,7 @@
 		tnoodleLinkSpan.appendChild(document.createTextNode(" WCA Scrambler"));
 		var div = mark2.ui.initialize(tnoodleLinkSpan, callbacks);
 		removeTempDiv();
+		document.body.appendChild(ajaxStateDiv);
 		document.body.appendChild(div);
 	}, false);
 

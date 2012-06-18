@@ -78,7 +78,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 	};
 	
 	this.loadPuzzles = function(callback) {
-		return tnoodle.ajax(callback, this.puzzlesUrl, null);
+		return tnoodle.retryAjax(callback, this.puzzlesUrl, null);
 	};
 	
 	this.loadScramble = function(callback, puzzle, seed) {
@@ -100,15 +100,8 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 		// Freaking Chrome seems to cache scramble requests if they're close enough
 		// together, even if we POST. This forces it to not.
 		query['showIndices'] = (requestCount++);
-		var pendingLoadScrambles = tnoodle.ajax(function(scrambleRequests) {
-			if(scrambleRequests.error) {
-				if(scrambleRequests.error instanceof XMLHttpRequestProgressEvent) {
-					alert("Can't connect to server");
-				} else {
-					alert("Error loading scrambles\n" + scrambleRequests.error);
-				}
-				return;
-			}
+		var pendingLoadScrambles = tnoodle.retryAjax(function(scrambleRequests) {
+			assert(!scrambleRequests.error);
 
 			var scrambles = [];
 			for(var i = 0; i < scrambleRequests.length; i++) {
@@ -140,10 +133,10 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 		// where defaultPuzzleInfo.faces is a {} mapping face names to arrays of points
 		// defaultPuzzleInfo.size is the size of the scramble image
 		// defaultPuzzleInfo.colorScheme is a {} mapping facenames to hex color strings
-		return tnoodle.ajax(callback, this.viewUrl + encodeURIComponent(puzzle) + ".json", null);
+		return tnoodle.retryAjax(callback, this.viewUrl + encodeURIComponent(puzzle) + ".json", null);
 	};
 	this.importScrambles = function(callback, url) {
-		return tnoodle.ajax(callback, this.importUrl, { url: url });
+		return tnoodle.retryAjax(callback, this.importUrl, { url: url });
 	};
 	
 	var uploadForm = null;
@@ -193,15 +186,20 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 	};
 };
 
+tnoodle.appendParams = function(url, params) {
+	if(params) {
+		if(url.indexOf("?") < 0) {
+			url += "?";
+		}
+		url += tnoodle.toQueryString(params);
+	}
+	return url;
+};
+
 /*** Utility functions ***/
 tnoodle.ajax = function(callback, url, data) {
-	var dataUrl = url; //this is to avoid clobbering our original url
-	if(data) {
-		if(dataUrl.indexOf("?") < 0) {
-			dataUrl += "?";
-		}
-		dataUrl += tnoodle.toQueryString(data);
-	}
+	// Don't clobber the original url, we might need it to jsonp later.
+	var dataUrl = tnoodle.appendParams(url, data);
 	
 	var xhr = new XMLHttpRequest();
 	if(xhr.withCredentials === undefined) {
@@ -236,60 +234,107 @@ tnoodle.ajax = function(callback, url, data) {
 	}
 	return xhr;
 };
-tnoodle.AJAX_TIMEOUT = 10000;
-tnoodle.BACKING_OFF = 'backing off';
-tnoodle.retryAjax = function(callback, url, data, nthTry) {
-	nthTry = nthTry || 0;
+
+// 5 minute timeout
+tnoodle.AJAX_TIMEOUT = 5*60*1000;
+
+// We never wait more than this long before trying again
+tnoodle.MAX_BACKOFF = 30*1000;
+
+tnoodle.ajaxState = {};
+tnoodle.ajaxId = 0;
+
+tnoodle.ajaxStateListeners = [];
+tnoodle.fireAjaxStateChanged = function() {
+	for(var i = 0; i < tnoodle.ajaxStateListeners.length; i++) {
+		tnoodle.ajaxStateListeners[i](tnoodle.ajaxState);
+	}
+};
+tnoodle.retryAjax = function(callback, url, data) {
+	var ajaxId = tnoodle.ajaxId++;
+	tnoodle.ajaxState[ajaxId] = {
+		lastError: null,
+		pendingRequest: null,
+		secondsUntilRetry: null,
+		url: tnoodle.appendParams(url, data)
+	};
+
+	var nthTry = 0;
 	function timeout() {
-		xhr.abort();
-		callback({error: "Timed out"});
+		tnoodle.ajaxState[ajaxId].retryAttempt.abort();
+		tnoodle.ajaxState[ajaxId].retryAttempt = null;
+		tnoodle.ajaxState[ajaxId].lastError = "Timed out waiting for response from server";
+		retryTime = null;
 		retry();
 	}
-	var pendingTimeout = setTimeout(timeout, tnoodle.AJAX_TIMEOUT);
 
-	var retryAttempt = null;
 	var retryTime = null;
 	var lastSecondsRemaining = null;
 	var retryTimer = null;
+	var pendingTimeout = null;
 	function retry() {
-		xhr = null;
-		clearTimeout(pendingTimeout);
+		tnoodle.ajaxState[ajaxId].retryAttempt = null;
+		if(pendingTimeout) {
+			clearTimeout(pendingTimeout);
+			pendingTimeout = null;
+		}
 		if(!retryTime) {
-			retryTime = new Date().getTime() + 1000*Math.pow(2, nthTry);
+			retryTime = new Date().getTime();
+			if(nthTry > 0) {
+				retryTime += Math.min(tnoodle.MAX_BACKOFF, 1000*Math.pow(2, nthTry));
+			}
 		}
 
 		var secondsRemaining = Math.round((retryTime - new Date().getTime())/1000, 0);
 		if(secondsRemaining <= 0) {
-			retryAttempt = tnoodle.retryAjax(callback, url, data, nthTry+1);
+			nthTry++;
+			tnoodle.ajaxState[ajaxId].secondsUntilRetry = null;
+			tnoodle.ajaxState[ajaxId].retryAttempt = tnoodle.ajax(function(json) {
+				tnoodle.ajaxState[ajaxId].retryAttempt = null;
+				retryTime = null;
+				clearTimeout(pendingTimeout);
+				pendingTimeout = null;
+				if(json.error) {
+					if(json.error instanceof XMLHttpRequestProgressEvent) {
+						tnoodle.ajaxState[ajaxId].lastError = "Can't connect to server";
+					} else {
+						tnoodle.ajaxState[ajaxId].lastError = json.error;
+					}
+					retry();
+				} else {
+					delete tnoodle.ajaxState[ajaxId];
+					callback(json);
+				}
+				tnoodle.fireAjaxStateChanged();
+			}, url, data);
+			pendingTimeout = setTimeout(timeout, tnoodle.AJAX_TIMEOUT);
+			tnoodle.fireAjaxStateChanged();
 		} else {
 			if(secondsRemaining != lastSecondsRemaining) {
 				lastSecondsRemaining = secondsRemaining;
-				callback({error: tnoodle.BACKING_OFF, secondsRemaining: secondsRemaining});
+				tnoodle.ajaxState[ajaxId].secondsUntilRetry = secondsRemaining;
+				tnoodle.fireAjaxStateChanged();
 			}
 			retryTimer = setTimeout(retry, 100);
 		}
-
 	}
-	var xhr = tnoodle.ajax(function(json) {
-		xhr = null;
-		clearTimeout(pendingTimeout);
-		if(json.error) {
-			callback(json);
-			retry();
-			return;
-		}
-		callback(json);
-	}, url, data);
+	retry();
+
 	function abort() {
-		if(xhr) {
-			xhr.abort();
-			xhr = null;
+		if(tnoodle.ajaxState[ajaxId].retryAttempt) {
+			tnoodle.ajaxState[ajaxId].retryAttempt.abort();
+			tnoodle.ajaxState[ajaxId].retryAttempt = null;
 		}
-		clearTimeout(pendingTimeout);
-		clearTimeout(retryTimer);
-		if(retryAttempt) {
-			retryAttempt.abort();
+		if(pendingTimeout) {
+			clearTimeout(pendingTimeout);
+			pendingTimeout = null;
 		}
+		if(retryTimer) {
+			clearTimeout(retryTimer);
+			retryTimer = null;
+		}
+		delete tnoodle.ajaxState[ajaxId];
+		tnoodle.fireAjaxStateChanged();
 	}
 	return { abort: abort };
 };

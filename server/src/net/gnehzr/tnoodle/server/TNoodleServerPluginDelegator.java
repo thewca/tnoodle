@@ -27,28 +27,32 @@ public class TNoodleServerPluginDelegator extends SafeHttpHandler {
 	private Map<String[], LazyInstantiator<SafeHttpHandler>> handlers = 
 		new HashMap<String[], LazyInstantiator<SafeHttpHandler>>();
 	private String[] getLongestMatch(String[] path) throws IOException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, ClassNotFoundException, BadClassDescriptionException {
-		if(plugins.dirtyPlugins()) {
-			plugins.reloadPlugins();
-			Map<String, LazyInstantiator<SafeHttpHandler>> pluginMap = plugins.getPlugins();
-			for(String prefix : pluginMap.keySet()) {
-				LazyInstantiator<SafeHttpHandler> lazyClass = pluginMap.get(prefix);
-				
-				if(prefix.startsWith("/")) {
-					prefix = prefix.substring(1);
-				}
-				if(prefix.endsWith("/")) {
-					prefix = prefix.substring(0, prefix.length()-1);
-				}
-				String[] prefixArray;
-				if(prefix.isEmpty()) {
-					prefixArray = new String[0];
-				} else {
-					prefixArray = prefix.split("/");
-				}
-				lpm.put(prefixArray);
-				handlers.put(prefixArray, lazyClass);
-			}
-		}
+        if(plugins.dirtyPlugins()) {
+            synchronized(plugins) {
+                if(plugins.dirtyPlugins()) {
+                    plugins.reloadPlugins();
+                    Map<String, LazyInstantiator<SafeHttpHandler>> pluginMap = plugins.getPlugins();
+                    for(String prefix : pluginMap.keySet()) {
+                        LazyInstantiator<SafeHttpHandler> lazyClass = pluginMap.get(prefix);
+                        
+                        if(prefix.startsWith("/")) {
+                            prefix = prefix.substring(1);
+                        }
+                        if(prefix.endsWith("/")) {
+                            prefix = prefix.substring(0, prefix.length()-1);
+                        }
+                        String[] prefixArray;
+                        if(prefix.isEmpty()) {
+                            prefixArray = new String[0];
+                        } else {
+                            prefixArray = prefix.split("/");
+                        }
+                        lpm.put(prefixArray);
+                        handlers.put(prefixArray, lazyClass);
+                    }
+                }
+            }
+        }
 		
 		String[] longestMatch = lpm.get(path);
 		return longestMatch;
