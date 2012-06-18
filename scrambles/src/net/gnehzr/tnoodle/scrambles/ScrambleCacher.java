@@ -6,11 +6,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * In addition to speeding things up, this class provides thread safety.
  */
 public class ScrambleCacher {
+	private static final Logger l = Logger.getLogger(ScrambleCacher.class.getName());
 	private static final int DEFAULT_CACHE_SIZE = 100;
 	
 	/**
@@ -27,6 +30,7 @@ public class ScrambleCacher {
 		this(scrambler, DEFAULT_CACHE_SIZE, false);
 	}
 	
+	private volatile Throwable exception;
 	private boolean running = false;
 	public ScrambleCacher(final Scrambler scrambler, int cacheSize, final boolean drawScramble) {
 		scrambles = new String[cacheSize];
@@ -70,6 +74,17 @@ public class ScrambleCacher {
 				}
 			}
 		};
+		t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+			public void uncaughtException(Thread t, Throwable e) {
+				l.log(Level.SEVERE, "", e);
+
+				// Let everyone waiting for a scramble know that we have crashed
+				exception = e;
+				synchronized(scrambles) {
+					scrambles.notifyAll();
+				}
+			}
+		});
 		running = true;
 		t.start();
 	}
@@ -94,8 +109,9 @@ public class ScrambleCacher {
 	 * NOTE: Do NOT call this method while holding any monitors!
 	 */
 	private void fireScrambleCacheUpdated() {
-		for(ScrambleCacherListener l : ls)
+		for(ScrambleCacherListener l : ls) {
 			l.scrambleCacheUpdated(this);
+		}
 	}
 	
 	public int getAvailableCount() {
@@ -111,12 +127,20 @@ public class ScrambleCacher {
 	 * @return A new scramble from the cache.
 	 */
 	public String newScramble() {
+		if(exception != null) {
+			throw new RuntimeException(exception);
+		}
+
 		String scramble;
 		synchronized(scrambles) {
 			while(available == 0) {
 				try {
 					scrambles.wait();
 				} catch(InterruptedException e) {}
+
+				if(exception != null) {
+					throw new RuntimeException(exception);
+				}
 			}
 			scramble = scrambles[startBuf];
 			startBuf = (startBuf + 1) % scrambles.length;
@@ -129,8 +153,9 @@ public class ScrambleCacher {
 
 	public String[] newScrambles(int count) {
 		String[] scrambles = new String[count];
-		for(int i = 0; i < count; i++)
+		for(int i = 0; i < count; i++) {
 			scrambles[i] = newScramble();
+		}
 		return scrambles;
 	}
 }

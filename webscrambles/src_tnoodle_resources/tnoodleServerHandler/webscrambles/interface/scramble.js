@@ -102,12 +102,6 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 		query['showIndices'] = (requestCount++);
 		var pendingLoadScrambles = tnoodle.ajax(function(scrambleRequests) {
 			if(scrambleRequests.error) {
-				// If there's any kind of error, retryAjax will back off and try again
-				//log(scrambleRequests.error);
-				//f(scrambleRequests.error == tnoodle.BACKING_OFF) {
-				//	log(scrambleRequests.secondsRemaining + ' seconds remaining');
-				//}
-				// TODO use global status stuff from hackathon2011
 				if(scrambleRequests.error instanceof XMLHttpRequestProgressEvent) {
 					alert("Can't connect to server");
 				} else {
