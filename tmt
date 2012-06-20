@@ -803,7 +803,7 @@ class EclipseProject(TmtProject):
 			# the version number of the resulting file will be correct.
 			self.dist()
 
-			githubUpload.githubConnect(organization="cubing")
+			githubUpload.githubConnect(organization="cubing", repo="tnoodle")
 			if not githubUpload.githubUpload(self.distJarFile()):
 				print "Failed to upload %s, see above for details" % self.distJarFile()
 				print "Deleting tag %s" % tag
