@@ -6,7 +6,7 @@ tmt (TnoodleMakeTools) is a python script used to develop TNoodle.
 
 * When you're ready to develop, run `./tmt make run -p timer` and then try visiting http://localhost:8080/tnt.
 
-* `./tmt make dist -p timer` should make a runnable jar under the "timer/dist" directory. You can run it using `java -jar timer/dist/TNoodleTimer.jar` (You might want to provide a parameter like `-Xmx4192m` to give it more memory for the 4x4x4 solver.)
+* `./tmt make dist -p timer` should make a runnable jar under the "timer/dist" directory. You can run it using `java -jar timer/dist/TNoodle.jar`
 
 * Note: tmt is designed to be lazy about recompiling stuff. It relies upon timestamps of files to only recompile something when it's strictly necessary. If you use an editor like Vim that writes to .swp files at potentially anytime alongside your source code, this will trick tmt into thinking something needs to be recompiled when it really doesn't. My recommendation is to configure your editor to store all these files in a unified directory that is *not* part of your tnoodle source tree.
 
