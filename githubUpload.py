@@ -54,9 +54,10 @@ def githubDeleteFileById(fileId):
 	print responseText
 
 
-def githubConnect( organization ):
+def githubConnect( organization_ ):
 	# TODO - oopify library!
 	global username, password, organization, baseUrl
+    organization = organization_
 	baseUrl = 'https://api.github.com/repos/jfly/tnoodle' % organization
 	username = raw_input('Username')
 	username = raw_input('Organization')
