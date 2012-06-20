@@ -54,7 +54,7 @@ def githubDeleteFileById(fileId):
 	print responseText
 
 
-def githubConnect( organization ):
+def githubConnect( organization, repo ):
 	# TODO - oopify library!
 	global username, password, baseUrl
 	baseUrl = 'https://api.github.com/repos/%s/%s' % ( organization, repo )
