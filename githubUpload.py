@@ -18,11 +18,11 @@ def httpRequest(url, data=None, method=None, username=None, password=None):
 	# the github api gives a 404 if you don't have credentials, so urllib2
 	# doesn't work. The following is a horrible hack. I intend to push
 	# something upstream to the python library...
-	password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-	top_level_url = "https://api.github.com"
-	password_mgr.add_password(None, top_level_url, username, password)
+	passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+	topLevelUrl = "https://api.github.com"
+	passwordMgr.add_password(None, topLevelUrl, username, password)
 
-	handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+	handler = urllib2.HTTPBasicAuthHandler(passwordMgr)
 	opener = urllib2.build_opener(handler)
 
 	req = urllib2.Request(url, data)
@@ -41,23 +41,25 @@ def httpRequest(url, data=None, method=None, username=None, password=None):
 		return e.read()
 
 def githubListFiles():
-	listUrl = 'https://api.github.com/repos/jfly/tnoodle/downloads'
+	deleteUrl = '%s/downloads' % ( baseUrl )
 	responseText = httpRequest(listUrl, username=username, password=password)
 	responseJson = json.loads(responseText)
 	return responseJson
 
 
 def githubDeleteFileById(fileId):
-	deleteUrl = 'https://api.github.com/repos/jfly/tnoodle/downloads/%d' % fileId
+	deleteUrl = '%s/downloads/%d' % ( baseUrl, fileId )
 	responseText = httpRequest(deleteUrl, method="DELETE", username=username, password=password)
 	# TODO - check for errors!
 	print responseText
 
 
-def githubConnect():
+def githubConnect( organization ):
 	# TODO - oopify library!
-	global username, password
+	global username, password, organization, baseUrl
+	baseUrl = 'https://api.github.com/repos/jfly/tnoodle' % organization
 	username = raw_input('Username')
+	username = raw_input('Organization')
 	print "Attempting to connect to github as %s" % username
 	password = getpass.getpass()
 
@@ -87,7 +89,7 @@ def githubUpload(filePath):
 	# We're just doing what they tell us to do.
 	# See http://developer.github.com/v3/repos/downloads/
 
-	uploadUrl = 'https://api.github.com/repos/jfly/tnoodle/downloads'
+	uploadUrl = "%s/downloads" % ( baseUrl )
 	data = { "name": fileName, "size": sizeBytes }
 	dataJson = json.dumps(data)
 
@@ -143,6 +145,6 @@ def githubUpload(filePath):
 		r = e.read()
 		print r
 		return False
-	
+
 if __name__ == "__main__":
 	githubUpload('TODO')
