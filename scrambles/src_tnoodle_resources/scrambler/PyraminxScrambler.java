@@ -19,6 +19,7 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 public class PyraminxScrambler extends Scrambler {
+	private static final int MIN_SCRAMBLE_LENGTH = 11;
 	private static final int pieceSize = 30;
 	private static final int gap = 5;
 	
@@ -144,7 +145,7 @@ public class PyraminxScrambler extends Scrambler {
 		for (m = 4; m >= 0; m--)
 			t = t * 2 + i[m];
 		if (q != 0 || t != 0)
-			for (m = 0; m < 12; m++)
+			for (m = MIN_SCRAMBLE_LENGTH; m < 12; m++)
 				if (v(q, t, m, -1, turns))
 					break;
 

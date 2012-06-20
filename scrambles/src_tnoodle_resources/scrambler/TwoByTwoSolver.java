@@ -108,7 +108,7 @@ public class TwoByTwoSolver {
 	}
 	
 	static final String[] DIR_TO_STR = new String[] { "'", "2", ""};
-	public String solve(int[] posit) {
+	public String solve(int[] posit, int min_length) {
 	    //count all adjacent pairs (clockwise around corners)
 		int[][] adj = new int[6][6];
 	    for(int a=0;a<adj.length;a++)for(int b=0;b<adj[a].length;b++) adj[a][b] = 0;
@@ -157,7 +157,7 @@ public class TwoByTwoSolver {
 
 		int[] sol=new int[100];
 	    Arrays.fill(sol, -1);
-	    for(int l=0;l<100;l++)
+	    for(int l=min_length;l<100;l++)
 	    	if(search(0,q,t,l,-1, sol))
 	    		break;
 	    int turnCount = 0;

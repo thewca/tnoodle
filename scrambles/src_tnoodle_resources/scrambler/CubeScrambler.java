@@ -21,6 +21,7 @@ import static net.gnehzr.tnoodle.utils.Utils.azzert;
 //TODO - massive cleanup! so much vestigial code
 public class CubeScrambler extends Scrambler {
     private static final int MAX_SCRAMBLE_LENGTH = 21;
+    private static final int TWO_BY_TWO_MIN_SCRAMBLE_LENGTH = 11;
     private static final int TIMEOUT = 5*1000; //milliseconds
     
 	private static final String FACES = "LDBRUFldbruf";
@@ -159,7 +160,7 @@ public class CubeScrambler extends Scrambler {
 	public String generateScramble(Random r) {
 		if(size == 2) {
 			int[] posit = twoSolver.mix(r);
-			return twoSolver.solve(posit);
+			return twoSolver.solve(posit, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
 		} else if(size == 3) {
 			return twoPhaseSearcher.get().solution(Tools.randomCube(r), MAX_SCRAMBLE_LENGTH, TIMEOUT, false, true).trim();
 		} else if(size == 4) {
