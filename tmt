@@ -458,6 +458,10 @@ class tmt:
 
 tmt = tmt() # We only want one instance of Tmt
 sys.modules['tmt'] = tmt
+# Hack for Python 2.6
+import collections
+from OrderedDict import OrderedDict
+collections.OrderedDict = OrderedDict
 
 class TmtProject(object):
 	projects = {}
