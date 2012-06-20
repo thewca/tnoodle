@@ -41,7 +41,7 @@ def httpRequest(url, data=None, method=None, username=None, password=None):
 		return e.read()
 
 def githubListFiles():
-	deleteUrl = '%s/downloads' % ( baseUrl )
+	listUrl = '%s/downloads' % ( baseUrl )
 	responseText = httpRequest(listUrl, username=username, password=password)
 	responseJson = json.loads(responseText)
 	return responseJson
@@ -59,7 +59,6 @@ def githubConnect( organization, repo ):
 	global username, password, baseUrl
 	baseUrl = 'https://api.github.com/repos/%s/%s' % ( organization, repo )
 	username = raw_input('Username: ')
-	username = raw_input('Organization: ')
 	print "Attempting to connect to github as %s" % ( username )
 	password = getpass.getpass()
 
