@@ -625,6 +625,7 @@ class ScrambleRequest {
 		jsonObj.put("rounds", scrambleRequests);
 		jsonObj.put("competitionName", globalTitle);
 		jsonObj.put("version", Utils.getProjectName() + "-" + Utils.getVersion());
+		jsonObj.put("generationDate", generationDate);
 		zipOut.write(GSON.toJson(jsonObj).getBytes());
 		zipOut.closeEntry();
 
