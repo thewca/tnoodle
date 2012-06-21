@@ -414,4 +414,21 @@ public final class Utils {
 		}
 	}
 	
+	public static String getProjectName() {
+		Package p = Utils.class.getPackage();
+		String name = p.getImplementationTitle();
+		if(name == null) {
+			name = getCallerClass().getName();
+		}
+		return name;
+	}
+
+	public static String getVersion() {
+		Package p = Utils.class.getPackage();
+		String version = p.getImplementationVersion();
+		if(version == null) {
+			version = "devel";
+		}
+		return version;
+	}
 }

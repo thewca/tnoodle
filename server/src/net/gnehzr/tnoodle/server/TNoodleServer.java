@@ -35,19 +35,8 @@ import com.sun.net.httpserver.HttpServer;
 public class TNoodleServer {
 	private static final int MIN_HEAP_SIZE_MEGS = 512;
 
-	public static String NAME, VERSION;
-	static {
-		Package p = TNoodleServer.class.getPackage();
-
-		NAME = p.getImplementationTitle();
-		if(NAME == null) {
-			NAME = TNoodleServer.class.getName();
-		}
-		VERSION = p.getImplementationVersion();
-		if(VERSION == null) {
-			VERSION = "devel";
-		}
-	}
+	public static String NAME = Utils.getProjectName();
+	public static String VERSION = Utils.getVersion();
 	
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
 	public TNoodleServer(int port, boolean browse) throws IOException {
