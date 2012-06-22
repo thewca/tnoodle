@@ -1,6 +1,8 @@
 package net.gnehzr.tnoodle.server;
 
 import java.awt.Desktop;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +24,8 @@ import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
+import javax.swing.ImageIcon;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -33,7 +37,12 @@ import tnoodleServerHandler.DirectoryHandler;
 import com.sun.net.httpserver.HttpServer;
 
 public class TNoodleServer {
+	
 	private static final int MIN_HEAP_SIZE_MEGS = 512;
+
+	private static final String ICONS_FOLDER = "icons";
+	private static final String ICON_WRAPPER = "WCA_logo_1024_gray.png";
+	private static final String ICON_WORKER = "WCA_logo_1024.png";
 
 	public static String NAME = Utils.getProjectName();
 	public static String VERSION = Utils.getVersion();
@@ -94,12 +103,59 @@ public class TNoodleServer {
 			}
 		}
 	}
+	
+	// Preferred way to detect OSX according to https://developer.apple.com/library/mac/#technotes/tn2002/tn2110.html
+	public static boolean isOSX() {
+    String osName = System.getProperty("os.name");
+    return osName.contains("OS X");
+	}
+	
+	/*
+	 * Sets the dock icon in OSX. Could be made to have uses in other operating systems.
+	 */
+	private static void setApplicationIcon() {
+		// Let's wrap everything in a big try-catch, just in case OS-specific stuff goes wonky. 
+		try {
+			
+			// Find out which icon to use.
+			
+			final Launcher.PROCESS_TYPE processType = Launcher.getProcessType();
+			
+			final String iconFileName;
+			switch (processType) {
+				case WORKER:
+					iconFileName = ICON_WORKER;
+					break;
+				default:
+					iconFileName = ICON_WRAPPER;
+					break;	
+			}
+			
+			// Get the file name of the icon.
+			final String fullFileName = Utils.getResourceDirectory() + "/" + ICONS_FOLDER + "/" + iconFileName;
+			final Image image = new ImageIcon(fullFileName).getImage();
+
+			// OSX-specific code to set the dock icon.
+			if (isOSX()) {
+				final com.apple.eawt.Application application = com.apple.eawt.Application.getApplication();
+				application.setDockIconImage(image);
+			}
+		}
+		catch (Exception e) {
+		}
+	}
 
 	public static void main(String[] args) throws IOException {
+	
 		Utils.doFirstRunStuff();
+		
+		setApplicationIcon();
+		
 		TNoodleLogging.initializeLogging(Level.INFO);
 		Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
 
+		setApplicationIcon();
+		
 		OptionParser parser = new OptionParser();
 		OptionSpec<Integer> portOpt = parser.
 			acceptsAll(Arrays.asList("p", "port"), "The port to run the http server on").

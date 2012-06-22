@@ -21,6 +21,18 @@ public class Launcher {
 		wrapMain(null, args, minHeapSizeMegs);
 	}
 
+	public static enum PROCESS_TYPE {
+		UNKNOWN,
+		WRAPPER,
+		WORKER
+	}
+	
+	private static PROCESS_TYPE processType = PROCESS_TYPE.UNKNOWN;
+	
+	public static PROCESS_TYPE getProcessType() {
+		return processType;
+	}
+	
 	/*
 	 * Windows doesn't give good names for java programs in the task manager,
 	 * they all just show up as intances of java.exe.
@@ -34,6 +46,7 @@ public class Launcher {
 	public static void wrapMain(String name, String[] args, final int minHeapSizeMegs) {
 		if(args.length > 0 && args[0].equals(NO_REEXEC)) {
 			args[0] = "";
+			processType = PROCESS_TYPE.WORKER;
 			return;
 		}
 		
@@ -94,7 +107,11 @@ public class Launcher {
 			}
 		}
 		if(!needsReExecing) {
+			processType = PROCESS_TYPE.WORKER;
 			return;
+		}
+		else {
+			processType = PROCESS_TYPE.WRAPPER;
 		}
 		
 		String classpath = System.getProperty("java.class.path");

@@ -37,6 +37,7 @@ class Project(tmt.EclipseProject):
 		tmt.EclipseProject.configure(self)
 		self.addPlugin(self)
 		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/server/' ]
+		self.nonJavaSrcDeps += [ 'icons/' ]
 
 	def compile(self):
 		tmt.EclipseProject.compile(self)

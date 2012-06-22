@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="lib" path="/lib/markdownj-1.0.2b4-0.3.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/lib/AppleJavaExtensions.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
