@@ -37,6 +37,6 @@ TNoodle implements the highest-quality scramble generation available at this tim
 
 TNoodle builds on the effort of many people.
 
-- The TNoodle scrambler supersedes and builds on the previous WCA scramblers, written by Jaap Scherphuis, Syoji Takamatsu, Lucas Garron, Michael Gottlieb, Tom van der Zanden, Conrad Rider, Clément Gallet, and Herbert Kociemba.
+- The TNoodle scrambler supersedes and builds on the previous WCA scramblers, written by Jaap Scherphuis, Syoji Takamatsu, Lucas Garron, Michael Gottlieb, Tom van der Zanden, Conrad Rider, Cl&eacute;ment Gallet, and Herbert Kociemba.
 - The design decisions are based on numerous discussions by cubers on the online forums.
-- TNoodle uses code developed or adapted by Jeremy Fleischman, Clément Gallet, Shuang Chen, Bruce Norskog, and Lucas Garron.
+- TNoodle uses code developed or adapted by Jeremy Fleischman, Ryan Zheng, Cl&eacute;ment Gallet, Shuang Chen, Bruce Norskog, and Lucas Garron.
