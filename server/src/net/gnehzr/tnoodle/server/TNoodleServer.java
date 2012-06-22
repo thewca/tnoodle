@@ -2,7 +2,6 @@ package net.gnehzr.tnoodle.server;
 
 import java.awt.Desktop;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
