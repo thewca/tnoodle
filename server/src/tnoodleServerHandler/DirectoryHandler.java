@@ -29,6 +29,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		mimes.addMimeTypes("text/html html htm");
 		mimes.addMimeTypes("text/plain txt");
 		
+		mimes.addMimeTypes("image/svg+xml svg");
 		mimes.addMimeTypes("image/png png");
 		mimes.addMimeTypes("image/gif gif");
 		mimes.addMimeTypes("image/vnd.microsoft.icon ico");

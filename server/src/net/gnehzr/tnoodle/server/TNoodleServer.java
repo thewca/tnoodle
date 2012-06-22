@@ -40,8 +40,8 @@ public class TNoodleServer {
 	private static final int MIN_HEAP_SIZE_MEGS = 512;
 
 	private static final String ICONS_FOLDER = "icons";
-	private static final String ICON_WRAPPER = "WCA_logo_1024_gray.png";
-	private static final String ICON_WORKER = "WCA_logo_1024.png";
+	private static final String ICON_WRAPPER = "tnoodle_logo_1024_gray.png";
+	private static final String ICON_WORKER = "tnoodle_logo_1024.png";
 
 	public static String NAME = Utils.getProjectName();
 	public static String VERSION = Utils.getVersion();
