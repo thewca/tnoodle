@@ -803,6 +803,10 @@ class EclipseProject(TmtProject):
 			assert 0 == os.system(tagCommand)
 			print "Successfully created tag %s" % tag
 
+            # We explicitly clean here, because stuff may have ended up in our
+            # resources folders that we don't want to include in the generated jar file.
+			self.clean()
+
 			# We can't run a dist until after we create the tag. This way
 			# the version number of the resulting file will be correct.
 			self.dist()
