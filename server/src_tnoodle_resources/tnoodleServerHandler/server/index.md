@@ -3,7 +3,7 @@
 An http server built to generate scrambles and images for twisty puzzles. Supports json, png, pdf and zip formats.  It is currently being used by the following programs.
 
 * [TNT](/tnt/) - A new timer aiming to replace CCT.
-* [WCA Scrambler](/scramble) - A WCA-style scrambler. See [its readme](/readme-scramble).
+* [WCA Scrambler](/scramble) - A WCA-style scrambler. See [its readme](/readme/scramble).
 * [bld.js](/tnt/bld.html) - A bld cycle generator for Pochmann-style combine orient+permute methods.
 
 Looking for something that's missing? Want to contribute? Check out the latest version of the code on [github](http://github.com/cubing/tnoodle)!
