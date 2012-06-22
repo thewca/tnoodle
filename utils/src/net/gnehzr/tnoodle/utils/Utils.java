@@ -37,6 +37,7 @@ import com.google.gson.JsonSerializer;
 
 public final class Utils {
 	private static final String RESOURCE_FOLDER = "tnoodle_resources";
+	private static final String DEVEL_VERSION = "devel";
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
 	
 	private Utils() {}
@@ -322,14 +323,26 @@ public final class Utils {
 	}
 	
 	public static File getResourceDirectory() {
+		return getResourceDirectory(true);
+	}
+
+	private static File getResourceDirectory(boolean assertExists) {
 		File f = getProgramDirectory();
 		if(getCallerClass().getClassLoader() instanceof LazyClassLoader) {
 			// Plugins are loaded from the resource folder, so we've already got the right folder.
 			azzert(f.getName().equals(RESOURCE_FOLDER));
 		} else {
 			f = new File(f, RESOURCE_FOLDER);
+			String version = getVersion();
+			if(!version.equals(DEVEL_VERSION)) {
+				// Each version of tnoodle extracts its resources
+				// to its own subdirectory of RESOURCE_FOLDER
+				f = new File(f, version);
+			}
 		}
-		azzert(f.isDirectory());
+		if(assertExists) {
+			azzert(f.isDirectory());
+		}
 		return f;
 	}
 	/**
@@ -377,8 +390,8 @@ public final class Utils {
 		File jarFile = getJarFile();
 		
 		if(jarFile != null) {
-			File destDirectory = jarFile.getParentFile();
-			if(new File(destDirectory, RESOURCE_FOLDER).isDirectory()) {
+			File resourceDirectory = getResourceDirectory(false);
+			if(resourceDirectory.isDirectory()) {
 				// If the resource folder already exists, we don't bother re-extracting the
 				// files.
 				return;
@@ -393,7 +406,10 @@ public final class Utils {
 				}
 				
 				if(entry.getName().startsWith(RESOURCE_FOLDER)) {
-					File destFile = new File(destDirectory, entry.getName());
+					// Remove the leading RESOURCE_FOLDER from the filename,
+					// so we can put it in resourceDirectory directly.
+					String destName = entry.getName().substring(RESOURCE_FOLDER.length());
+					File destFile = new File(resourceDirectory, destName);
 					destFile.getParentFile().mkdirs();
 					FileOutputStream out = new FileOutputStream(destFile);
 
@@ -427,7 +443,7 @@ public final class Utils {
 		Package p = Utils.class.getPackage();
 		String version = p.getImplementationVersion();
 		if(version == null) {
-			version = "devel";
+			version = DEVEL_VERSION;
 		}
 		return version;
 	}
