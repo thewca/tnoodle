@@ -5,6 +5,7 @@ from os.path import exists, dirname, join, isdir, split, abspath, relpath, basen
 import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
+import time
 
 # Terribly useful debugging tweaks
 import cgitb
@@ -157,13 +158,16 @@ class tmt:
 		os.chdir(entryPoint())
 		assert exists('README.md')
 
-		p = subprocess.Popen([ 'git', 'describe' ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		stdout, stderr = p.communicate()
-		assert p.returncode == 0
+		retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
+		assert retVal == 0
 		self.VERSION = stdout.strip()
 		versionPrefix = "v"
 		assert self.VERSION.startswith(versionPrefix)
 		self.VERSION = self.VERSION[len(versionPrefix):]
+
+		retVal, stdout, stderr = self.runCmd([ "git", "ls-files", "-m", "-o", "-d", "--exclude-standard" ])
+		if stdout:
+			self.VERSION += "-%s" % int(time.time())
 
 		# Check that the git hooks folder is all set up
 		setupGitHooks.setupGitHooksIfNotSetup()
