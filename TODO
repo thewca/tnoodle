@@ -209,13 +209,12 @@
 
 -rounds named "seed" or "showIndices"
 -infinite seeded scrambles
--#6 configurable clock colorscheme
 
 -richer heirarchy of scrambles (2gen, LL, reese, whatever...)
 -scramble hints? such as cross...
 
 ### server/utils
--create own java assertions facility, as java assertions cannot be enabled at runtime
++create own java assertions facility, as java assertions cannot be enabled at runtime
 	-check at commit time that everything uses azzert instead of assert
 	-find some way of printing out the contents of the assertion that blew up
 
@@ -225,9 +224,6 @@
 	-add login
 	-implement stuff on scratch paper!!!
 -add autoupdating to server
-
-### webscrambles-ui
--shelley's gui (https://github.com/jfly/tnoodle/issues?labels=webscrambles-ui)
 
 ### TNoodleMakeTools
 +load everything from file! extract all to a folder on first startup, note that this does break java applets, but that's ok, nobody cares =(
