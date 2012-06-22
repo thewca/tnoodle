@@ -471,7 +471,7 @@ mark2.ui = (function() {
 
 		var logo = document.createElement('img');
 		title.appendChild(logo);
-		logo.classList.add('wca_logo_top');
+		logo.id = 'logo_top';
 		logo.src = mark2.logo;
 
 		var mark2Title = document.createElement('span');
