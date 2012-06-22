@@ -82,7 +82,7 @@ h1  {
   font-size: 30px;
 }
 h2  {
-  margin-top: 1em;
+  margin-top: 2.5em;
   font-size: 24px;
   color: #000;
   padding-bottom: 2px;
@@ -218,4 +218,18 @@ select {
 textarea {
   margin: 0 0 10px 0;
   width: 100%;
+}
+
+
+
+/* Changes and overrides for tnoodle */
+
+
+
+body {
+  background-color: #DEE;
+}
+
+h2 {
+  margin-top: 1em;
 }
