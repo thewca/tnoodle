@@ -1,3 +1,4 @@
+
 package tnoodleServerHandler;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
@@ -120,7 +121,9 @@ public class DirectoryHandler extends SafeHttpHandler {
 		String contentType = null;
 		String html = null;
 		if(fileName.endsWith(".md")) {
-			html = "<html>\n<body>\n" + mp.markdown(new String(data)) + "</body>\n</html>\n";
+			html = "<html>" +
+				"<link href=\"/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />" +
+				"\n<body>\n" + mp.markdown(new String(data)) + "</body>\n</html>\n";
 		} else {
 			contentType = mimes.getContentType(fileName);
 			if(contentType.equals("text/html")) {
