@@ -94,7 +94,7 @@ public class Tools {
                 FileInputStream is = new FileInputStream(twophase_tables);
                 inited = initFrom(new DataInputStream(is));
             } catch (FileNotFoundException e) {
-				l.log(Level.INFO, "Failed to load " + twophase_tables, e);
+				l.info("Couldn't find " + twophase_tables + ", going to create it.");
             }
         }
 		if(!inited) {
