@@ -748,7 +748,7 @@ mark2.ui = (function() {
 
 
 	var initializeEvents = function() {
-		var competitionNameHash = getHashParameter("competition_name", null);
+		var competitionNameHash = getHashParameter("competitionName", null);
 
 		if (competitionNameHash !== null) {
 			competitionNameInput.value = competitionNameHash;
