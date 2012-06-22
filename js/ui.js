@@ -778,7 +778,7 @@ mark2.ui = (function() {
 	var updateHash = function() {
 		var competitionName = encodeURIComponent(getCompetitionName());
 		var roundsHash = encodeURIComponent(toURLPretty(getRounds()));
-		location.hash = "#competition_name=" + competitionName + "&rounds=" + roundsHash + "&version=" + mark2.VERSION;
+		location.hash = "#competitionName=" + competitionName + "&rounds=" + roundsHash + "&version=" + mark2.VERSION;
 
 		callbacks.competitionChanged();
 		maybeEnableScrambleButton();
