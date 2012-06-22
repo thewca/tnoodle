@@ -87,10 +87,14 @@ h1 {
   margin-top: 15px;
 }
 
-#top_interface .helpButton {
+#top_interface #helpLinkDiv {
   position: absolute;
   right: 30px;
   top: 30px;
+}
+
+#top_interface #helpLinkDiv a {
+  color: #FFF;
 }
 
 #top_interface #competitionName,#passwordInput {

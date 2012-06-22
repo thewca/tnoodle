@@ -620,16 +620,18 @@ mark2.ui = (function() {
 		return div;
 	};
 
-	function addHelpButton(callback) {
+	function addHelpLink(url) {
 
 		var topInterface = document.getElementById("top_interface");
 
-		var helpButton = document.createElement('button');
-		topInterface.appendChild(helpButton);
-		helpButton.appendChild(document.createTextNode("?"));
-		helpButton.classList.add('helpButton');
-		
-		helpButton.addEventListener('click', callback, false);
+		var helpLinkDiv = document.createElement('div');
+		topInterface.appendChild(helpLinkDiv);
+		helpLinkDiv.id = 'helpLinkDiv';
+
+		var helpLink = document.createElement('a');
+		helpLink.innerHTML = "?";
+		helpLink.href = url;
+		helpLinkDiv.appendChild(helpLink);
 	}
 
     // Converts 1, 2, ... to A, B, ..., Z, AA, AB, ..., ZZ, AAA, AAB, ...
@@ -1081,7 +1083,7 @@ mark2.ui = (function() {
 
 	return {
 		initialize: initialize,
-		addHelpButton: addHelpButton,
+		addHelpLink: addHelpLink,
 		updateHash: updateHash,
 		getScrambleSheets: getScrambleSheets,
 		getTitle: getCompetitionName,
