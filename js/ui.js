@@ -620,6 +620,18 @@ mark2.ui = (function() {
 		return div;
 	};
 
+	function addHelpButton(callback) {
+
+		var topInterface = document.getElementById("top_interface");
+
+		var helpButton = document.createElement('button');
+		topInterface.appendChild(helpButton);
+		helpButton.appendChild(document.createTextNode("?"));
+		helpButton.classList.add('helpButton');
+		
+		helpButton.addEventListener('click', callback, false);
+	}
+
     // Converts 1, 2, ... to A, B, ..., Z, AA, AB, ..., ZZ, AAA, AAB, ...
     // A bit complicated right now, but should work fine.
 	function intToLetters(int) {
@@ -1069,6 +1081,7 @@ mark2.ui = (function() {
 
 	return {
 		initialize: initialize,
+		addHelpButton: addHelpButton,
 		updateHash: updateHash,
 		getScrambleSheets: getScrambleSheets,
 		getTitle: getCompetitionName,

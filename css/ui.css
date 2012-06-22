@@ -87,6 +87,12 @@ h1 {
   margin-top: 15px;
 }
 
+#top_interface .helpButton {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}
+
 #top_interface #competitionName,#passwordInput {
   font-size: 150%;
   width: 24em;
@@ -99,7 +105,7 @@ h1 {
 
 #events_rounds_interface .resetButton {
   position: absolute;
-  left: 30px;
+  right: 30px;
 }
 
 #events_rounds_interface #events_table {
