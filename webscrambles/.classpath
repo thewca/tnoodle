@@ -8,9 +8,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/mootools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scrambler-interface"/>
 	<classpathentry exported="true" kind="lib" path="/lib/itextpdf-5.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="/lib/bctsp-jdk16-1.46.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/bcprov-jdk16-1.46.jar"/>
-	<classpathentry exported="true" kind="lib" path="/lib/bcmail-jdk16-1.46.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/zip4j_1.3.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="output" path="bin"/>
