@@ -385,6 +385,48 @@ public final class Utils {
 		}
 		return null;
 	}
+
+	/**
+	 * Copied from http://code.google.com/p/guava-libraries/source/browse/guava/src/com/google/common/io/Files.java from http://stackoverflow.com/questions/617414/create-a-temporary-directory-in-java
+	 * Atomically creates a new directory somewhere beneath the system's
+	 * temporary directory (as defined by the {@code java.io.tmpdir} system
+	 * property), and returns its name.
+	 *
+	 * <p>Use this method instead of {@link File#createTempFile(String, String)}
+	 * when you wish to create a directory, not a regular file.  A common pitfall
+	 * is to call {@code createTempFile}, delete the file and create a
+	 * directory in its place, but this leads a race condition which can be
+	 * exploited to create security vulnerabilities, especially when executable
+	 * files are to be written into the directory.
+	 *
+	 * <p>This method assumes that the temporary volume is writable, has free
+	 * inodes and free blocks, and that it will not be called thousands of times
+	 * per second.
+	 *
+	 * @return the newly-created directory
+	 * @throws IllegalStateException if the directory could not be created
+	 */
+	/** Maximum loop count when creating temp directories. */
+	private static final int TEMP_DIR_ATTEMPTS = 10000;
+
+	public static File createTempDir() {
+		// Calling renameTo() on something in java.io.tmpdir to something in
+		// tnoodle_resources doesn't seem to work. We opt to just put temp folders
+		// in the same directory as the jar file.
+		//File baseDir = new File(System.getProperty("java.io.tmpdir"));
+		File baseDir = getProgramDirectory();
+		String baseName = System.currentTimeMillis() + "-";
+
+		for (int counter = 0; counter < TEMP_DIR_ATTEMPTS; counter++) {
+			File tempDir = new File(baseDir, baseName + counter);
+			if (tempDir.mkdir()) {
+				return tempDir;
+			}
+		}
+		throw new IllegalStateException("Failed to create directory within "
+				+ TEMP_DIR_ATTEMPTS + " attempts (tried "
+				+ baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
+	}
 	
 	public static void doFirstRunStuff() throws FileNotFoundException, IOException {
 		File jarFile = getJarFile();
@@ -396,7 +438,9 @@ public final class Utils {
 				// files.
 				return;
 			}
+
 			
+			File tempResourceDirectory = createTempDir();
 			JarInputStream jarIs = new JarInputStream(new FileInputStream(jarFile));
 			JarEntry entry;
 			byte[] buf = new byte[1024];
@@ -409,7 +453,7 @@ public final class Utils {
 					// Remove the leading RESOURCE_FOLDER from the filename,
 					// so we can put it in resourceDirectory directly.
 					String destName = entry.getName().substring(RESOURCE_FOLDER.length());
-					File destFile = new File(resourceDirectory, destName);
+					File destFile = new File(tempResourceDirectory, destName);
 					destFile.getParentFile().mkdirs();
 					FileOutputStream out = new FileOutputStream(destFile);
 
@@ -421,6 +465,8 @@ public final class Utils {
 				}
 				jarIs.closeEntry();
 			}
+			resourceDirectory.getParentFile().mkdirs();
+			azzert(tempResourceDirectory.renameTo(resourceDirectory));
 		}
 	}
 
