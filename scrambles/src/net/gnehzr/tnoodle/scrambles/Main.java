@@ -31,10 +31,9 @@ public class Main {
 		}
 		List<String> puzzles = options.nonOptionArguments();
 
+		TNoodleLogging.initializeLogging();
 		if(options.has(benchmark)) {
-			TNoodleLogging.initializeLogging(Level.ALL);
-		} else {
-			TNoodleLogging.initializeLogging();
+			TNoodleLogging.setConsoleLogLevel(Level.ALL);
 		}
 		
 		SortedMap<String, LazyInstantiator<Scrambler>> scramblers = Scrambler.getScramblers();

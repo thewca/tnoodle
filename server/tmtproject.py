@@ -14,7 +14,7 @@ class Project(tmt.EclipseProject):
 				tmt.projectName(),
 				description="A basic, extensible webserver",
 				main='net.gnehzr.tnoodle.server.TNoodleServer',
-				argv=[ '--nobrowser', '--disable-caching' ])
+				argv=[ '--nobrowser', '--disable-caching', '--consoleLevel=INFO' ])
         # It is important that when we iterate through the plugins
         # in topological sorted order. This way if B uses A, B can clobber
         # A's settings.

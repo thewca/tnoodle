@@ -89,12 +89,14 @@ public abstract class SafeHttpHandler implements HttpHandler {
 			t.sendResponseHeaders(200, bytes.size());
 			bytes.writeTo(t.getResponseBody());
 		} catch (IOException e) {
-			l.log(Level.WARNING, "", e);
+			// This happens whenever the client closes the connection before we
+			// got a chance to respond. No reason to freak out.
+			l.log(Level.INFO, "", e);
 		} finally {
 			try {
 				t.getResponseBody().close();
 			} catch (IOException e) {
-				l.log(Level.WARNING, "", e);
+				l.log(Level.INFO, "", e);
 			}
 		}
 	}
@@ -105,12 +107,14 @@ public abstract class SafeHttpHandler implements HttpHandler {
 			t.sendResponseHeaders(200, bytes.length);
 			t.getResponseBody().write(bytes);
 		} catch (IOException e) {
-			l.log(Level.WARNING, "", e);
+			// This happens whenever the client closes the connection before we
+			// got a chance to respond. No reason to freak out.
+			l.log(Level.INFO, "", e);
 		} finally {
 			try {
 				t.getResponseBody().close();
 			} catch (IOException e) {
-				l.log(Level.WARNING, "", e);
+				l.log(Level.INFO, "", e);
 			}
 		}
 	}

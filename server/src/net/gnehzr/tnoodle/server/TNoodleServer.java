@@ -145,14 +145,11 @@ public class TNoodleServer {
 	}
 
 	public static void main(String[] args) throws IOException {
-	
 		Utils.doFirstRunStuff();
-		
-		setApplicationIcon();
-		
-		TNoodleLogging.initializeLogging(Level.INFO);
-		Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
+		TNoodleLogging.initializeLogging();
 
+		setApplicationIcon();
+		Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
 		setApplicationIcon();
 		
 		OptionParser parser = new OptionParser();
@@ -166,9 +163,25 @@ public class TNoodleServer {
 		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"), "File containing code to inject into the bottom of the <head>...</head> section of all html served").withOptionalArg().ofType(File.class);
 		OptionSpec<?> noCachingOpt = parser.acceptsAll(Arrays.asList("d", "disable-caching"), "Disable file caching. This is useful for development, but is way slower.");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
+		String levels = Utils.join(TNoodleLogging.getLevels(), ",");
+		OptionSpec<String> consoleLogLevel = parser.
+			acceptsAll(Arrays.asList("cl", "consoleLevel"), "The minimum level a log must be to be printed to the console. Options: " + levels).
+				withOptionalArg().
+					ofType(String.class).
+					defaultsTo(Level.WARNING.getName());
+		OptionSpec<String> fileLogLevel = parser.
+			acceptsAll(Arrays.asList("fl", "fileLevel"), "The minimum level a log must be to be printed to " + TNoodleLogging.getLogFile() + ". Options: " + levels).
+				withOptionalArg().
+					ofType(String.class).
+					defaultsTo(Level.INFO.getName());
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
+				Level cl = Level.parse(options.valueOf(consoleLogLevel));
+				TNoodleLogging.setConsoleLogLevel(cl);
+				Level fl = Level.parse(options.valueOf(fileLogLevel));
+				TNoodleLogging.setFileLogLevel(fl);
+
 				if(options.has(injectJsOpt)) {
 					File injectCodeFile = options.valueOf(injectJsOpt);
 					if(!injectCodeFile.exists() || !injectCodeFile.canRead()) {
