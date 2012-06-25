@@ -1,6 +1,6 @@
 TNoodle is just a collection of cube related projects.
 
-tmt (TnoodleMakeTools) is a python script used to develop TNoodle.
+tmt (TNoodleMakeTools) is a python script used to develop TNoodle.
 
 * I highly recommend first getting a high level view of all the projects that comprise tnoodle by running `./tmt graph --descriptions`.
 
