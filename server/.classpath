@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="server/|tnoodleServerHandler/server/" kind="src" output="bin_tnoodle_resources" path="src_tnoodle_resources"/>
-	<classpathentry kind="lib" path="/lib/h2-1.2.147.jar"/>
 	<classpathentry kind="lib" path="/lib/jopt-simple-3.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="lib" path="/lib/markdownj-1.0.2b4-0.3.0.jar"/>
