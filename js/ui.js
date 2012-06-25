@@ -54,7 +54,7 @@ if (!Function.prototype.bind) {
   };
 }
 
-// TODO - comment <<<
+// IE <9 doesn't have an addEventListener method, so we simulate one here.
 if(!document.createElement('a').addEventListener) {
   var addEventListener = function(type, listener, useCapture) {
     this.attachEvent('on' + type, listener);
@@ -63,7 +63,7 @@ if(!document.createElement('a').addEventListener) {
   window.addEventListener = addEventListener;
 }
 
-// IE <<<
+// IE <9 doesn't have a getElementsByClassName method, so we simulate one here.
 // http://code.google.com/p/getelementsbyclassname/
 /*
 	Developed by Robert Nyman, http://www.robertnyman.com
@@ -690,7 +690,9 @@ mark2.ui = (function() {
 		}, false);
 		
 		function showPasswordChanged() {
-			// TODO comment <<<
+			// IE <9 doesn't let you change an input's type after it has
+			// been added to the dom, so we simply create a new one here
+			// and clobber the old one.
 			var oldPass = null;
 			if(passwordInput) {
 				oldPass = passwordInput.value;
