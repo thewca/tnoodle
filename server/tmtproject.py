@@ -42,7 +42,15 @@ class Project(tmt.EclipseProject):
 	def compile(self):
 		tmt.EclipseProject.compile(self)
 		context = ''
+
+		# We don't necessarily want all the plugins in self.plugins to load here,
+		# we only want the ones that the project we're currently building somehow
+		# depends on.
+		deps = tmt.TmtProject.projects[tmt.args.project].getRecursiveDependenciesTopoSorted()
+
 		for project in self.plugins.values():
+			if project not in deps:
+				continue
 			contextFileName = project.contextFileName
 			assert exists(contextFileName)
 
