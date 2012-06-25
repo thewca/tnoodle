@@ -15,6 +15,7 @@ import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
+import net.gnehzr.tnoodle.utils.Utils;
 
 public class Main {
 	private static final Logger l = Logger.getLogger(Main.class.getName());
@@ -31,6 +32,7 @@ public class Main {
 		}
 		List<String> puzzles = options.nonOptionArguments();
 
+		Utils.doFirstRunStuff();
 		TNoodleLogging.initializeLogging();
 		if(options.has(benchmark)) {
 			TNoodleLogging.setConsoleLogLevel(Level.ALL);
