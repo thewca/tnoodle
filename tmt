@@ -810,10 +810,6 @@ class EclipseProject(TmtProject):
 			assert 0 == os.system(tagCommand)
 			print "Successfully created tag %s" % tag
 
-            # We explicitly clean here, because stuff may have ended up in our
-            # resources folders that we don't want to include in the generated jar file.
-			tmt._make(projectName=self.name, command='clean')
-
 			# We can't run a dist until after we create the tag. This way
 			# the version number of the resulting file will be correct.
 			self.dist()
@@ -829,8 +825,13 @@ class EclipseProject(TmtProject):
 			assert 0 == os.system(pushTagsCommand)
 
 	def dist(self):
-		if not isdir(self.distDir):
-			os.mkdir(self.distDir)
+		# We explicitly clean here, because stuff may have ended up in our
+		# resources folders that we don't want to include in the generated jar file.
+		tmt._make(projectName=self.name, command='clean')
+
+		# The clean we just did should have nuked our dist directory.
+		assert not isdir(self.distDir)
+		os.mkdir(self.distDir)
 
 		tmt._make(projectName=self.name, command='compile')
 		jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
