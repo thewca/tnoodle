@@ -879,6 +879,12 @@ class EclipseProject(TmtProject):
 						continue
 					path = os.path.normpath(os.path.join(dirpath, name))
 					arcPath = os.path.relpath(path, extractedLibDir)
+					if jar.NameToInfo.get(arcPath):
+						# Since we symlink a lot, it's possible that we scan over the same
+						# file twice. Interestingly enough, the zip format
+						# allows for us to add the same file twice, but we don't want
+						# to do that, as it will result in a larger jar.
+						continue
 					if os.path.isfile(path):
 						jar.write(path, arcPath)
 			rmtree(extractedLibDir)
@@ -892,6 +898,12 @@ class EclipseProject(TmtProject):
 						continue
 					path = os.path.normpath(os.path.join(dirpath, name))
 					arcPath = os.path.relpath(path, project.bin)
+					if jar.NameToInfo.get(arcPath):
+						# Since we symlink a lot, it's possible that we scan over the same
+						# file twice. Interestingly enough, the zip format
+						# allows for us to add the same file twice, but we don't want
+						# to do that, as it will result in a larger jar.
+						continue
 					if os.path.isfile(path):
 						if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
 							txt = file(path).read()
