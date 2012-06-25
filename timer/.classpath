@@ -5,7 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/stackmat-flash"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/stackmat"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/webscrambles"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mootools"/>
 	<classpathentry kind="output" path="bin"/>
