@@ -329,6 +329,11 @@ class tmt:
 			default=False,
 			action='store_true',
 			help="Don't bother telling me I don't have flex installed, I already know.")
+		parser_make.add_argument(
+			'--no-clean',
+			default=False,
+			action='store_true',
+			help="Don't cleaning before dist-ing.")
 		parser_make.set_defaults(func=self._make)
 
 		desc = 'Generate dependency graph'
@@ -825,13 +830,13 @@ class EclipseProject(TmtProject):
 			assert 0 == os.system(pushTagsCommand)
 
 	def dist(self):
-		# We explicitly clean here, because stuff may have ended up in our
-		# resources folders that we don't want to include in the generated jar file.
-		tmt._make(projectName=self.name, command='clean')
+		if not tmt.args.no_clean:
+			# We explicitly clean here, because stuff may have ended up in our
+			# resources folders that we don't want to include in the generated jar file.
+			tmt._make(projectName=self.name, command='clean')
 
-		# The clean we just did should have nuked our dist directory.
-		assert not isdir(self.distDir)
-		os.mkdir(self.distDir)
+		if not isdir(self.distDir):
+			os.mkdir(self.distDir)
 
 		tmt._make(projectName=self.name, command='compile')
 		jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
