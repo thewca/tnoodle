@@ -865,6 +865,8 @@ class EclipseProject(TmtProject):
 				dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
 
 				for name in filenames:
+					if not notDotfile(name):
+						continue
 					if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
 						# We don't want to include signatures in our monolithic jar file, see
 						# http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
@@ -880,6 +882,8 @@ class EclipseProject(TmtProject):
 				dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
 
 				for name in filenames:
+					if not notDotfile(name):
+						continue
 					path = os.path.normpath(os.path.join(dirpath, name))
 					arcPath = os.path.relpath(path, project.bin)
 					if os.path.isfile(path):
