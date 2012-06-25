@@ -851,12 +851,19 @@ class EclipseProject(TmtProject):
 					# TODO - symlinking into other projects isn't a great idea,
 					# what if a -> c, a -> b, and b -> c ?
 					javaDeps.append(project)
+
+		# We don't want to include dotfiles in our jar file. This solves the problem of
+		# accidentally including submodules's .git folder.
+		notDotfile = lambda dirname: not dirname.startswith(".")
+
 		if jarDeps:
 			extractedLibDir = tempfile.mkdtemp()
 			for jarDep in jarDeps:
 				jarLib = zipfile.ZipFile(jarDep.jarFile)
 				jarLib.extractall(path=extractedLibDir)
 			for dirpath, dirnames, filenames in os.walk(extractedLibDir):
+				dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+
 				for name in filenames:
 					if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
 						# We don't want to include signatures in our monolithic jar file, see
@@ -870,6 +877,8 @@ class EclipseProject(TmtProject):
 
 		for project in javaDeps:
 			for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
+				dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+
 				for name in filenames:
 					path = os.path.normpath(os.path.join(dirpath, name))
 					arcPath = os.path.relpath(path, project.bin)
