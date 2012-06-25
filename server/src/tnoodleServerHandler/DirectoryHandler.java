@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -122,9 +123,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		String contentType = null;
 		String html = null;
 		if(fileName.endsWith(".md")) {
-			html = "<html>" +
-				"<link href=\"/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />" +
-				"\n<body>\n" + mp.markdown(new String(data)) + "</body>\n</html>\n";
+			html = markdownToHTML(data);
 		} else {
 			contentType = mimes.getContentType(fileName);
 			if(contentType.equals("text/html")) {
@@ -155,5 +154,27 @@ public class DirectoryHandler extends SafeHttpHandler {
 			cachedFiles.put(fullRequestPath, cached);
 		}
 		sendBytes(t, data, contentType);
+	}
+
+	private String markdownToHTML(byte[] data) {
+		
+		final String dataString = new String(data);
+		
+		String titleCode = "";
+		// We assume that a title line is the first line, starts with one #, and possibly ends with one #
+		if (dataString.startsWith("#")) {
+			String title = new Scanner(dataString).nextLine();
+			title = title.substring(1);
+			if (title.endsWith("#")) {
+				title = title.substring(0, title.length()-1);
+			}
+			title = title.trim();
+			titleCode = "<title>" + title + "</title>\n";
+		}
+		
+		return "<html><head>\n" +
+			titleCode +
+			"<link href=\"/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />\n" +
+			"</head>\n<body>\n" + mp.markdown(dataString) + "</body>\n</html>\n";
 	}
 }

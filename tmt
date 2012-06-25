@@ -159,6 +159,13 @@ class tmt:
 		assert exists('README.md')
 
 		retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
+
+		# On Lucas's computer, git describe sometimes returns a blank string. Try again a few times if this is the case.
+		for i in range(8):
+			if stdout != "":
+				break;
+			retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
+		
 		assert retVal == 0
 		self.VERSION = stdout.strip()
 		versionPrefix = "v"
@@ -168,6 +175,8 @@ class tmt:
 		retVal, stdout, stderr = self.runCmd([ "git", "ls-files", "-m", "-o", "-d", "--exclude-standard" ])
 		if stdout:
 			self.VERSION += "-%s" % int(time.time())
+
+		print "Version: ", self.VERSION
 
 		# Check that the git hooks folder is all set up
 		setupGitHooks.setupGitHooksIfNotSetup()

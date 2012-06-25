@@ -78,13 +78,13 @@ public class ClockScrambler extends Scrambler {
 	private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
 	static {
 		defaultColorScheme.put("Front", toColor("3375b2"));
-		defaultColorScheme.put("Back", toColor("b3c5c7"));
-		defaultColorScheme.put("FrontClock", toColor("94c5ca"));
-		defaultColorScheme.put("BackClock", toColor("1d3770"));
+		defaultColorScheme.put("Back", toColor("55ccff"));
+		defaultColorScheme.put("FrontClock", toColor("55ccff"));
+		defaultColorScheme.put("BackClock", toColor("3375b2"));
 		defaultColorScheme.put("Hand", Color.YELLOW);
 		defaultColorScheme.put("HandBorder", Color.RED);
 		defaultColorScheme.put("PinUp", Color.YELLOW);
-		defaultColorScheme.put("PinDown", toColor("ffff50"));
+		defaultColorScheme.put("PinDown", toColor("885500"));
 	}
 	@Override
 	public HashMap<String, Color> getDefaultColorScheme() {
@@ -293,11 +293,12 @@ public class ClockScrambler extends Scrambler {
 
 	protected void drawPin( Graphics2D g, boolean pin, HashMap<String, Color> colorScheme ) {
 
+		g.setColor(Color.BLACK);
+		g.drawOval( -pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
+
 		if( pin ) {
-			g.setColor(Color.BLACK);
-			g.fillOval( -(pinRadius+1), -(pinRadius+1), 2*(pinRadius+1), 2*(pinRadius+1));
 			g.setColor(colorScheme.get("PinUp"));
-			g.fillOval( -(pinRadius-1), -(pinRadius-1), 2*(pinRadius-1), 2*(pinRadius-1));
+			g.fillOval( -pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
 		}
 		else {
 			g.setColor(colorScheme.get("PinDown"));
@@ -334,7 +335,7 @@ public class ClockScrambler extends Scrambler {
 		for( i=-1; i<2; i+=2 )
 			for( j=-1; j<2; j+=2 ) {
 				pinsDown.add(new Area(new Ellipse2D.Double(radius+gap+j*clockOuterRadius-pinRadius, radius+gap+i*clockOuterRadius-pinRadius, 2*pinRadius, 2*pinRadius)));
-				pinsUp.add(new Area(new Ellipse2D.Double(3*radius+3*gap+j*clockOuterRadius-pinRadius-1, radius+gap+i*clockOuterRadius-pinRadius+1, 2*pinRadius+2, 2*pinRadius+2)));
+				pinsUp.add(new Area(new Ellipse2D.Double(3*radius+3*gap+j*clockOuterRadius-pinRadius, radius+gap+i*clockOuterRadius-pinRadius, 2*pinRadius, 2*pinRadius)));
 			}
 
 		// Does not work !
