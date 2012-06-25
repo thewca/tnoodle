@@ -7,6 +7,28 @@
 
 "use strict";
 
+var mark2 = {};
+
+// Prevent errors if console.log doesn't exist (e.g. in IE when the console is not open).
+if (typeof console === "undefined") {
+	console = {};
+}
+if (typeof console.log === "undefined") {
+	console.log = function() {};
+}
+
+if(typeof assert === "undefined") {
+	var assert = function(bool) {
+		if(!bool) {
+			debugger;
+			throw "Assertion!";
+		}
+	};
+}
+
+
+(function() {
+
 // Implementation of bind() for Safari.
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (oThis) {
@@ -30,6 +52,102 @@ if (!Function.prototype.bind) {
 
     return fBound;
   };
+}
+
+// TODO - comment <<<
+if(!document.createElement('a').addEventListener) {
+  var addEventListener = function(type, listener, useCapture) {
+    this.attachEvent('on' + type, listener);
+  };
+  Element.prototype.addEventListener = addEventListener;
+  window.addEventListener = addEventListener;
+}
+
+// IE <<<
+// http://code.google.com/p/getelementsbyclassname/
+/*
+	Developed by Robert Nyman, http://www.robertnyman.com
+	Code/licensing: http://code.google.com/p/getelementsbyclassname/
+*/
+if(!document.createElement('a').getElementsByClassName) {
+	var getElementsByClassName = function (className, tag, elm){
+		if (document.getElementsByClassName) {
+			getElementsByClassName = function (className, tag, elm) {
+				elm = elm || document;
+				var elements = elm.getElementsByClassName(className),
+					nodeName = (tag)? new RegExp("\\b" + tag + "\\b", "i") : null,
+					returnElements = [],
+					current;
+				for(var i=0, il=elements.length; i<il; i+=1){
+					current = elements[i];
+					if(!nodeName || nodeName.test(current.nodeName)) {
+						returnElements.push(current);
+					}
+				}
+				return returnElements;
+			};
+		}
+		else if (document.evaluate) {
+			getElementsByClassName = function (className, tag, elm) {
+				tag = tag || "*";
+				elm = elm || document;
+				var classes = className.split(" "),
+					classesToCheck = "",
+					xhtmlNamespace = "http://www.w3.org/1999/xhtml",
+					namespaceResolver = (document.documentElement.namespaceURI === xhtmlNamespace)? xhtmlNamespace : null,
+					returnElements = [],
+					elements,
+					node;
+				for(var j=0, jl=classes.length; j<jl; j+=1){
+					classesToCheck += "[contains(concat(' ', @class, ' '), ' " + classes[j] + " ')]";
+				}
+				try	{
+					elements = document.evaluate(".//" + tag + classesToCheck, elm, namespaceResolver, 0, null);
+				}
+				catch (e) {
+					elements = document.evaluate(".//" + tag + classesToCheck, elm, null, 0, null);
+				}
+				while ((node = elements.iterateNext())) {
+					returnElements.push(node);
+				}
+				return returnElements;
+			};
+		}
+		else {
+			getElementsByClassName = function (className, tag, elm) {
+				tag = tag || "*";
+				elm = elm || document;
+				var classes = className.split(" "),
+					classesToCheck = [],
+					elements = (tag === "*" && elm.all)? elm.all : elm.getElementsByTagName(tag),
+					current,
+					returnElements = [],
+					match;
+				for(var k=0, kl=classes.length; k<kl; k+=1){
+					classesToCheck.push(new RegExp("(^|\\s)" + classes[k] + "(\\s|$)"));
+				}
+				for(var l=0, ll=elements.length; l<ll; l+=1){
+					current = elements[l];
+					match = false;
+					for(var m=0, ml=classesToCheck.length; m<ml; m+=1){
+						match = classesToCheck[m].test(current.className);
+						if (!match) {
+							break;
+						}
+					}
+					if (match) {
+						returnElements.push(current);
+					}
+				}
+				return returnElements;
+			};
+		}
+		return getElementsByClassName(className, tag, elm);
+	};
+
+	Element.prototype.getElementsByClassName = function(className) {
+		return getElementsByClassName(className, null, this);
+	};
 }
 
 // Copied from https://developer.mozilla.org/en/DOM/element.classList
@@ -171,27 +289,6 @@ if (objCtr.defineProperty) {
 
 }
 
-// Prevent errors if console.log doesn't exist (e.g. in IE when the console is not open).
-if (typeof console === "undefined") {
-	console = {};
-}
-if (typeof console.log === "undefined") {
-	console.log = function() {};
-}
-
-if(typeof assert === "undefined") {
-	var assert = function(bool) {
-		if(!bool) {
-			debugger;
-			throw "Assertion!";
-		}
-	};
-}
-
-
-
-var mark2 = {};
-
 
 /*
 
@@ -214,7 +311,7 @@ mark2.dom = (function() {
 			newElement.setAttribute("class", className);
 		}
 		if (content) {
-			newElement.innerHTML = content
+			newElement.innerHTML = content;
 		}
 		if (id) {
 			newElement.setAttribute("id", id);
@@ -229,29 +326,34 @@ mark2.dom = (function() {
 
 	var nextAutoID = function() {
 		return "auto_id_" + (currentAutoID++);
-	}
+	};
 
 	var addClass = function(el, className) {
 		if (typeof el.classList !== "undefined") {
 			el.classList.add(className);
 		}
-	}
+	};
 
 	var removeClass = function(el, className) {
 		if (typeof el.classList !== "undefined") {
 			el.classList.remove(className);
 		}
 		
-	}
+	};
 
 	var showElement = function(el) {
 		el.style.display = "block";
-	}
+	};
 
 	var hideElement = function(el) {
 		el.style.display = "none";
-	}
-
+	};
+	
+	var emptyElement = function(el) {
+		while(el.hasChildNodes()) {
+			el.removeChild(el.firstChild);
+		}
+	};
 
 
 	/*
@@ -264,7 +366,8 @@ mark2.dom = (function() {
 		addClass: addClass,
 		removeClass: removeClass,
 		showElement: showElement,
-		hideElement: hideElement
+		hideElement: hideElement,
+		emptyElement: emptyElement
 	};
 })();
 
@@ -364,7 +467,7 @@ mark2.settings = (function() {
 		event_order: eventOrder,
 		default_rounds: defaultRounds,
 		
-		default_num_groups: defaultNumGroups,
+		default_num_groups: defaultNumGroups
 	};
 })();
 
@@ -379,7 +482,7 @@ mark2.ui = (function() {
 	// https://code.google.com/p/chromium/issues/detail?id=132014
 	function newProgressBar() {
 		var div = document.createElement('div');
-		div.style.border = 'border: 1px solid #00C0C0;';
+		div.style.border = '1px solid #00C0C0';
 		div.style.borderRadius = '15px';
 
 		// We must add some text so the height of this div is
@@ -406,13 +509,13 @@ mark2.ui = (function() {
 		function refresh() {
 			var percent = 100*(div.value / div.max);
 
-			progress.innerHTML = "";
+			mark2.dom.emptyElement(progress);
 			progress.appendChild(document.createTextNode(percent.toFixed(0) + "%"));
 
 			progress.style.right = (100 - percent) + "%";
 		}
 
-		var value_;
+		var value_ = 0;
 		Object.defineProperty(div, 'value', {
 			get: function() {
 				return value_;
@@ -422,7 +525,7 @@ mark2.ui = (function() {
 				refresh();
 			}
 		});
-		var max_;
+		var max_ = 10;
 		Object.defineProperty(div, 'max', {
 			get: function() {
 				return max_;
@@ -499,17 +602,15 @@ mark2.ui = (function() {
 		competitionNameInput.id = 'competitionName';
 		competitionNameInput.placeholder = "Competition Name";
 
-		var newLineDiv = document.createElement('div');
-		spacerDiv.appendChild(newLineDiv);
-
-		passwordInput = document.createElement('input');
-		newLineDiv.appendChild(passwordInput);
-		passwordInput.id = 'passwordInput';
-		passwordInput.placeholder = "Password";
+		var passwordDiv = document.createElement('div');
+		spacerDiv.appendChild(passwordDiv);
 
 		var showPasswordCheckbox = document.createElement("input");
+		// IE <9 doesn't let you change the type attribute of an input element
+		// after you've added it to the dom.
+		showPasswordCheckbox.setAttribute('type', 'checkbox');
+
 		spacerDiv.appendChild(showPasswordCheckbox);
-		showPasswordCheckbox.type = "checkbox";
 		showPasswordCheckbox.id = "showPassword";
 		
 		var showPasswordCheckboxLabel = document.createElement("label");
@@ -588,16 +689,32 @@ mark2.ui = (function() {
 			location.hash = "";
 		}, false);
 		
-		passwordInput.addEventListener('change', callbacks.competitionChanged, false);
 		function showPasswordChanged() {
-			if(showPasswordCheckbox.checked) {
-				passwordInput.type = "";			
-			} else {
-				passwordInput.type = "password";
+			// TODO comment <<<
+			var oldPass = null;
+			if(passwordInput) {
+				oldPass = passwordInput.value;
 			}
+			passwordInput = document.createElement('input');
+			if(oldPass) {
+				passwordInput.value = oldPass;
+			}
+			if(showPasswordCheckbox.checked) {
+				passwordInput.setAttribute('type', '');
+			} else {
+				passwordInput.setAttribute('type', 'password');
+			}
+			mark2.dom.emptyElement(passwordDiv);
+			passwordDiv.appendChild(passwordInput);
+			passwordInput.id = 'passwordInput';
+			passwordInput.placeholder = "Password";
+			passwordInput.addEventListener('change', callbacks.competitionChanged, false);
 		}
 		showPasswordChanged();
 		showPasswordCheckbox.addEventListener('change', showPasswordChanged, false);
+		// IE doesn't fire the event until the checkbox loses focus, this just makes it
+		// behave nicer.
+		showPasswordCheckbox.addEventListener('click', showPasswordChanged, false);
 
 		competitionNameInput.addEventListener('change', updateHash, false);
 
@@ -621,7 +738,6 @@ mark2.ui = (function() {
 	};
 
 	function addHelpLink(url) {
-
 		var topInterface = document.getElementById("top_interface");
 
 		var helpLinkDiv = document.createElement('div');
@@ -629,7 +745,7 @@ mark2.ui = (function() {
 		helpLinkDiv.id = 'helpLinkDiv';
 
 		var helpLink = document.createElement('a');
-		helpLink.innerHTML = "?";
+		helpLink.appendChild(document.createTextNode("?"));
 		helpLink.href = url;
 		helpLinkDiv.appendChild(helpLink);
 	}
@@ -780,7 +896,14 @@ mark2.ui = (function() {
 	var updateHash = function() {
 		var competitionName = encodeURIComponent(getCompetitionName());
 		var roundsHash = encodeURIComponent(toURLPretty(getRounds()));
-		location.hash = "#competitionName=" + competitionName + "&rounds=" + roundsHash + "&version=" + mark2.VERSION;
+		try {
+			location.hash = "#competitionName=" + competitionName + "&rounds=" + roundsHash + "&version=" + mark2.VERSION;
+		} catch(e) {
+			// Ideally, we'd only catch "Access is Denied" errors, but I don't know how to do that in js.
+			alert("Error setting url hash: " + e + "\n" +
+			      'An "Access is Denied" error occurs on Internet Explorer when you add more than ~25 rounds.' +
+			      ' If you need support for more rounds, consider using a different browser.');
+		}
 
 		callbacks.competitionChanged();
 		maybeEnableScrambleButton();
@@ -889,7 +1012,7 @@ mark2.ui = (function() {
 	};
 
 	var resetRounds = function() {
-		roundsTbody.innerHTML = "";
+		mark2.dom.emptyElement(roundsTbody);
 	};
 
 	function findStringsAndSurroundWith(str, encapsulator, newEncapsulator) {
@@ -1090,4 +1213,6 @@ mark2.ui = (function() {
 		getPassword: getPassword,
 		scramblesGenerated: scramblesGenerated
 	};
+})();
+
 })();
