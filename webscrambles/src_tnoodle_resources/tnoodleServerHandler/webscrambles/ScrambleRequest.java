@@ -540,7 +540,7 @@ class ScrambleRequest {
 						scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
 						g2.dispose();
 						PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
-						imgCell.setBackgroundColor(BaseColor.GRAY);
+						imgCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
 						imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
 						table.addCell(imgCell);
 					} catch (Exception e) {
