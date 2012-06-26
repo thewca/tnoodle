@@ -18,7 +18,7 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 //TODO - cleanup this mess! so much vestigal code...
 //TODO - convert to better naming scheme from sims
 public class MegaminxScrambler extends Scrambler {
-	private static final String FACE_NAMES = "ABCDEFabcdef";
+	private static final String FACE_NAMES = "ABCDEFabfedc";
 	private static final int gap = 2;
 	private static final int minxRad = 30;
 	private final int[][] image;
@@ -282,23 +282,36 @@ public class MegaminxScrambler extends Scrambler {
 		double d = x*Math.sin(.1*Math.PI);
 		double e = x*Math.sin(.3*Math.PI);
 
-		drawPentagon(g, gap+a+b, gap+x+minxRad, false, image[0], minxRad, colorScheme);
-		drawPentagon(g, gap+a+b, gap+minxRad, true, image[1], minxRad, colorScheme);
-		drawPentagon(g, gap+a+2*b, gap+x-d+minxRad, true, image[2], minxRad, colorScheme);
-		drawPentagon(g, gap+a+b+c, gap+x+e+minxRad, true, image[3], minxRad, colorScheme);
-		drawPentagon(g, gap+a+b-c, gap+x+e+minxRad, true, image[4], minxRad, colorScheme);
-		drawPentagon(g, gap+a, gap+x-d+minxRad, true, image[5], minxRad, colorScheme);
+		double leftCenterX = gap + a + b +d/2;
+		double leftCenterY = gap + x + minxRad - d;
+		drawPentagon(g, leftCenterX  , leftCenterY  , true, image[0], 0, minxRad, colorScheme);
+		drawPentagon(g, leftCenterX-c, leftCenterY-e, false, image[1], 1, minxRad, colorScheme);
+		drawPentagon(g, leftCenterX+c, leftCenterY-e, false, image[2], 1, minxRad, colorScheme);
+		drawPentagon(g, leftCenterX+b, leftCenterY+d, false, image[3], 1, minxRad, colorScheme);
+		drawPentagon(g, leftCenterX  , leftCenterY+x, false, image[4], 1, minxRad, colorScheme);
+		drawPentagon(g, leftCenterX-b, leftCenterY+d, false, image[5], 1, minxRad, colorScheme);
 
-		double shift = gap+2*a+2*b;
-		drawPentagon(g, shift+gap+a+b, gap+x+minxRad, false, image[6], minxRad, colorScheme);
-		drawPentagon(g, shift+gap+a+b, gap+minxRad, true, image[7], minxRad, colorScheme);
-		drawPentagon(g, shift+gap+a+2*b, gap+x-d+minxRad, true, image[8], minxRad, colorScheme);
-		drawPentagon(g, shift+gap+a+b+c, gap+x+e+minxRad, true, image[9], minxRad, colorScheme);
-		drawPentagon(g, shift+gap+a+b-c, gap+x+e+minxRad, true, image[10], minxRad, colorScheme);
-		drawPentagon(g, shift+gap+a, gap+x-d+minxRad, true, image[11], minxRad, colorScheme);
+		double uWidth = (minxRad*0.3);
+		double uHeight = (minxRad*0.3);
+		g.drawString("U", (float) (leftCenterX - uWidth*0.5), (float) (leftCenterY + uHeight/2));
+		
+		double fWidth = (minxRad*0.25);
+		double magicFOffset = c*1.7;
+		g.drawString("F", (float) (leftCenterX - fWidth*0.5), (float) (leftCenterY + magicFOffset + uHeight/2));
+
+		double f = Math.cos(.1*Math.PI);
+		double gg = Math.cos(.2*Math.PI);
+		double magicShiftNumber = d*0.6+minxRad*(f+gg);
+		double shift = leftCenterX+magicShiftNumber;
+		drawPentagon(g, shift+gap+a+b, gap+x+minxRad, false, image[6], 2, minxRad, colorScheme);
+		drawPentagon(g, shift+gap+a+b-c, gap+x+e+minxRad, true, image[7], 2, minxRad, colorScheme);
+		drawPentagon(g, shift+gap+a, gap+x-d+minxRad, true, image[8], 2, minxRad, colorScheme);
+		drawPentagon(g, shift+gap+a+b, gap+minxRad, true, image[9], 2, minxRad, colorScheme);
+		drawPentagon(g, shift+gap+a+2*b, gap+x-d+minxRad, true, image[10], 2, minxRad, colorScheme);
+		drawPentagon(g, shift+gap+a+b+c, gap+x+e+minxRad, true, image[11], 2, minxRad, colorScheme);
 	}
 
-	private void drawPentagon(Graphics2D g, double x, double y, boolean up, int[] state, int minxRad, HashMap<String, Color> colorScheme){
+	private void drawPentagon(Graphics2D g, double x, double y, boolean up, int[] state, int rotateCounterClockwise, int minxRad, HashMap<String, Color> colorScheme){
 		GeneralPath p = pentagon(up, minxRad);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		p.transform(AffineTransform.getTranslateInstance(x, y));
@@ -354,7 +367,12 @@ public class MegaminxScrambler extends Scrambler {
 		}
 
 		for(int i = 0; i < ps.length; i++){
-			g.setColor(colorScheme.get(""+FACE_NAMES.charAt(state[i])));
+			int j = i;
+			if (j < 10) {
+				// This is a bit convoluted, but tries to keep the intuitive derivation clear.
+				j = (j + 2*rotateCounterClockwise) % 10;
+			}
+			g.setColor(colorScheme.get(""+FACE_NAMES.charAt(state[j])));
 			g.fill(ps[i]);
 			g.setColor(Color.BLACK);
 			g.draw(ps[i]);
@@ -415,19 +433,19 @@ public class MegaminxScrambler extends Scrambler {
 	@Override
 	public HashMap<String, Color> getDefaultColorScheme() {
 		HashMap<String, Color> colors = new HashMap<String, Color>();
-		colors.put("A", new Color(0xffffff));
-		colors.put("B", new Color(0x336633));
-		colors.put("C", new Color(0x66ffff));
-		colors.put("D", new Color(0x996633));
-		colors.put("E", new Color(0x3333ff));
-		colors.put("F", new Color(0x993366));
-		colors.put("a", new Color(0xffff00));
-		colors.put("b", new Color(0x66ff66));
-		colors.put("c", new Color(0xff9933));
-		colors.put("d", new Color(0xff0000));
-		colors.put("e", new Color(0x000099));
-		colors.put("f", new Color(0xff66ff));
-		return colors;
+    colors.put("A", new Color(0xFFFFFF));
+    colors.put("B", new Color(0x882222));
+    colors.put("C", new Color(0x0000FF));
+    colors.put("D", new Color(0x880088));
+    colors.put("E", new Color(0x008800));
+    colors.put("F", new Color(0x88DDFF));
+    colors.put("a", new Color(0xFFFF00));
+    colors.put("b", new Color(0xFF0000));
+    colors.put("c", new Color(0x000088));
+    colors.put("d", new Color(0xFF44FF));
+    colors.put("e", new Color(0x00FF00));
+    colors.put("f", new Color(0xFF8800));
+    return colors;
 	}
 
 	@Override
