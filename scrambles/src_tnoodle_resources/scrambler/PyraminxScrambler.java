@@ -483,10 +483,10 @@ public class PyraminxScrambler extends Scrambler {
 
 	private static final HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
 	static {
-		defaultColorScheme.put("F", toColor("ff0000"));
-		defaultColorScheme.put("D", toColor("0000ff"));
-		defaultColorScheme.put("L", toColor("00ff00"));
-		defaultColorScheme.put("R", toColor("ffff00"));
+		defaultColorScheme.put("F", toColor("00FF00"));
+		defaultColorScheme.put("D", toColor("FFFF00"));
+		defaultColorScheme.put("L", toColor("FF0000"));
+		defaultColorScheme.put("R", toColor("0000FF"));
 	}
 	
 	@Override
