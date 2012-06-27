@@ -321,7 +321,7 @@ var scrambleInput, cornerBufferInput, edgeBufferInput;
 var generateScrambleButton;
 var tnoodleServer;
 function load() {
-	tnoodleServer = new tnoodle.server(location.hostname, location.port);
+	tnoodleServer = new tnoodle.server();
 
 	cornerCycleSingmasterDiv = document.getElementById('cornerCycleSingmaster');
 	edgeCycleSingmasterDiv = document.getElementById('edgeCycleSingmaster');

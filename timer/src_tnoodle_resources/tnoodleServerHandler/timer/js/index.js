@@ -14,7 +14,7 @@ prompt = wrapFunctionInBlur(prompt);
 confirm = wrapFunctionInBlur(confirm);
 
 window.addEvent('domready', function() {
-	var server = new tnoodle.server(location.hostname, location.port);
+	var server = new tnoodle.server();
 	var configuration = server.configuration;
 	
 	function onPuzzlesLoaded(puzzles) {

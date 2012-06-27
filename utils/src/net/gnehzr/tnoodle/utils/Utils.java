@@ -475,6 +475,12 @@ public final class Utils {
 			throw new AssertionError();
 		}
 	}
+
+	public static void azzert(boolean expr, String message) {
+		if(!expr) {
+			throw new AssertionError(message);
+		}
+	}
 	
 	public static String getProjectName() {
 		Package p = Utils.class.getPackage();

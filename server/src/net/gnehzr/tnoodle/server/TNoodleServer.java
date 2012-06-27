@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.server;
 
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+
 import java.awt.Desktop;
 import java.awt.Image;
 import java.io.DataInputStream;
@@ -17,13 +19,26 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.UnrecoverableKeyException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.KeyManagerFactory;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -34,10 +49,14 @@ import net.gnehzr.tnoodle.utils.Utils;
 import tnoodleServerHandler.DirectoryHandler;
 
 import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsServer;
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsParameters;
 
 public class TNoodleServer {
 	
 	private static final int MIN_HEAP_SIZE_MEGS = 512;
+	private static final int TCP_BACKLOG = 0;
 
 	private static final String ICONS_FOLDER = "icons";
 	private static final String ICON_WRAPPER = "tnoodle_logo_1024_gray.png";
@@ -45,15 +64,65 @@ public class TNoodleServer {
 
 	public static String NAME = Utils.getProjectName();
 	public static String VERSION = Utils.getVersion();
+
+	private static class HttpsConfig {
+		int port;
+		File keystoreFile;
+		char[] keystorePassphrase;
+	}
 	
 	//TODO - it would be nice to kill threads when the tcp connection is killed, not sure if this is possible, though
-	public TNoodleServer(int port, boolean browse) throws IOException {
-		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+	public TNoodleServer(int httpPort, HttpsConfig httpsConfig, boolean bindAggressively, boolean browse) throws IOException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, KeyManagementException, CertificateException {
+		int httpsPort = httpsConfig == null ? -1 : httpsConfig.port;
+		azzert((httpPort > 0) || (httpsPort > 0), "Must start at least one server (http and/or https)");
+		azzert(httpPort != httpsPort, "Can't run http and https server on same port");
 
-		server.createContext("/", new TNoodleServerPluginDelegator());
+		TNoodleServerPluginDelegator context = new TNoodleServerPluginDelegator();
+		ExecutorService executor = Executors.newCachedThreadPool();
 
-		server.setExecutor(Executors.newCachedThreadPool());
-		server.start();
+		if(httpsPort > 0) {
+			String keystoreGenerationHelp = "You can generate a keystore by running the keytool command that comes with the JDK. For example:\n    keytool -genkey -dname \"CN=Jeremy Fleischman, OU=TNoodle, O=WCA, L=San Francisco, ST=California, C=US\" -keystore KEYSTORE_FILENAME";
+			File keystoreFile = httpsConfig.keystoreFile;
+			if(keystoreFile == null) {
+				System.out.println("Must specify a keystore. " + keystoreGenerationHelp);
+				return;
+			}
+			char[] passphrase = httpsConfig.keystorePassphrase;
+			if(passphrase == null) {
+				System.out.println("Must specify a keystore password. " + keystoreGenerationHelp);
+				return;
+			}
+			KeyStore ks = KeyStore.getInstance("JKS");
+
+			ks.load(new FileInputStream(httpsConfig.keystoreFile), passphrase);
+
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+			kmf.init(ks, passphrase);
+
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+			tmf.init(ks);
+
+			SSLContext ssl = SSLContext.getInstance("TLS");
+			ssl.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+			AggressiveHttpServerCreator<HttpsServer> creator = new AggressiveHttpServerCreator<HttpsServer>();
+			HttpsServer httpsServer = creator.aggressivelyBindSocket(httpsConfig.port, bindAggressively);
+			httpsServer.setHttpsConfigurator(new HttpsConfigurator(ssl));
+
+			httpsServer.createContext("/", context);
+			httpsServer.setExecutor(executor);
+			httpsServer.start();
+		}
+
+		if(httpPort > 0) {
+			AggressiveHttpServerCreator<HttpServer> creator = new AggressiveHttpServerCreator<HttpServer>();
+			HttpServer httpServer = creator.aggressivelyBindSocket(httpPort, bindAggressively);
+
+
+			httpServer.createContext("/", context);
+			httpServer.setExecutor(executor);
+			httpServer.start();
+		}
 		
 		System.out.println(NAME + "-" + VERSION + " started");
 		
@@ -77,8 +146,20 @@ public class TNoodleServer {
 				System.out.println("Couldn't determine which url to browse to");
 			}
 			for(String hostname : hostnames) {
-				String addr = hostname + ":" + port;
-				String url = "http://" + addr;
+				String url = null;
+				String httpUrl = null;
+				if(httpPort > 0) {
+					httpUrl = "http://" + hostname + ":" + httpPort;
+					url = httpUrl;
+				}
+				String httpsUrl = null;
+				if(httpsPort > 0) {
+					httpsUrl = "https://" + hostname + ":" + httpsPort;
+					// We'd rather navigate our user to the https server if we have one
+					url = httpsUrl;
+				}
+				azzert(url != null);
+
 				//TODO - maybe it would make sense to open this url asap, that
 				//       way the user's browser starts parsing tnt even as scramble
 				//       plugins are being loaded
@@ -100,6 +181,56 @@ public class TNoodleServer {
 				}
 				System.out.println("Visit " + url + " for a readme and demo.");
 			}
+		}
+	}
+
+	// I don't know how to do the call to H.create in a typesafe manner. Oh well.
+	@SuppressWarnings("unchecked")
+	private static class AggressiveHttpServerCreator<H extends HttpServer> {
+		private H aggressivelyBindSocket(int port, boolean bindAggressively) throws IOException {
+			H server = null;
+
+			final int MAX_TRIES = 10;
+			for(int i = 0; i < MAX_TRIES && server == null; i++) {
+				if(i > 0) {
+					System.out.println("Attempt " + (i+1) + "/" + MAX_TRIES + " to bind to port " + port);
+				}
+				try {
+					InetSocketAddress s = new InetSocketAddress(port);
+					server = (H) H.create(s, TCP_BACKLOG);
+				} catch(BindException e) {
+					// If this port is in use, we assume it's an instance of
+					// TNoodleServer, and ask it to commit honorable suicide.
+					// After that, we can start up. If it was a TNoodleServer,
+					// it hopefully will have freed up the port we want.
+					System.out.println("Detected server running on port " + port + ", maybe it's an old " + NAME + "?");
+					if(!bindAggressively) {
+						System.out.println("noupgrade option set. You'll have to free up port " + port + " manually, or clear this option.");
+						break;
+					}
+					try {
+						URL url = new URL("http://localhost:" + port + "/kill/now");
+						System.out.println("Sending request to " + url + " to hopefully kill it.");
+						URLConnection conn = url.openConnection();
+						InputStream in = conn.getInputStream();
+						in.close();
+						Thread.sleep(1000);
+					} catch(MalformedURLException ee) {
+						ee.printStackTrace();
+					} catch(IOException ee) {
+						ee.printStackTrace();
+					} catch(InterruptedException ee) {
+						ee.printStackTrace();
+					}
+				}
+			}
+
+			if(server == null) {
+				System.out.println("Failed to bind to port " + port + ". Giving up");
+				System.exit(1);
+			}
+
+			return server;
 		}
 	}
 	
@@ -153,30 +284,44 @@ public class TNoodleServer {
 		setApplicationIcon();
 		
 		OptionParser parser = new OptionParser();
-		OptionSpec<Integer> portOpt = parser.
-			acceptsAll(Arrays.asList("p", "port"), "The port to run the http server on").
-				withOptionalArg().
+		OptionSpec<Integer> httpPortOpt = parser.
+			acceptsAll(Arrays.asList("p", "http"), "The port to run the http server on").
+				withRequiredArg().
 					ofType(Integer.class).
 					defaultsTo(8080);
+		OptionSpec<Integer> httpsPortOpt = parser.
+			acceptsAll(Arrays.asList("https"), "The port to run the https server on").
+				withRequiredArg().
+					ofType(Integer.class).
+					defaultsTo(-1);
+		OptionSpec<File> keystoreOpt = parser.
+			acceptsAll(Arrays.asList("keystore"), "A keystore file containing ssl certificates.").
+				withRequiredArg().
+					ofType(File.class);
+		OptionSpec<String> keypasswdOpt = parser.
+			acceptsAll(Arrays.asList("keypasswd"), "The password for the keystore.").
+				withRequiredArg().
+					ofType(String.class);
 		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
-		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port, do not attempt to kill it and start up");
-		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"), "File containing code to inject into the bottom of the <head>...</head> section of all html served").withOptionalArg().ofType(File.class);
+		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port(s), do not attempt to kill it and start up");
+		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"), "File containing code to inject into the bottom of the <head>...</head> section of all html served").withRequiredArg().ofType(File.class);
 		OptionSpec<?> noCachingOpt = parser.acceptsAll(Arrays.asList("d", "disable-caching"), "Disable file caching. This is useful for development, but is way slower.");
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		String levels = Utils.join(TNoodleLogging.getLevels(), ",");
 		OptionSpec<String> consoleLogLevel = parser.
 			acceptsAll(Arrays.asList("cl", "consoleLevel"), "The minimum level a log must be to be printed to the console. Options: " + levels).
-				withOptionalArg().
+				withRequiredArg().
 					ofType(String.class).
 					defaultsTo(Level.WARNING.getName());
 		OptionSpec<String> fileLogLevel = parser.
 			acceptsAll(Arrays.asList("fl", "fileLevel"), "The minimum level a log must be to be printed to " + TNoodleLogging.getLogFile() + ". Options: " + levels).
-				withOptionalArg().
+				withRequiredArg().
 					ofType(String.class).
 					defaultsTo(Level.INFO.getName());
 		try {
 			OptionSet options = parser.parse(args);
 			if(!options.has(help)) {
+				boolean bindAggressively = !options.has(noUpgradeOpt);
 				Level cl = Level.parse(options.valueOf(consoleLogLevel));
 				TNoodleLogging.setConsoleLogLevel(cl);
 				Level fl = Level.parse(options.valueOf(fileLogLevel));
@@ -195,40 +340,18 @@ public class TNoodleServer {
 				}
 				boolean enableCaching = !options.has(noCachingOpt);
 				DirectoryHandler.setCachingEnabled(enableCaching);
-				int port = options.valueOf(portOpt);
-				boolean openBrowser = !options.has(noBrowserOpt);
-				try {
-					new TNoodleServer(port, openBrowser);
-				} catch(BindException e) {
-					// If this port is in use, we assume it's an instance of
-					// TNoodleServer, and ask it to commit honorable suicide.
-					// After that, we can start up. If it was a TNoodleServer,
-					// it hopefully will have freed up the port we want.
-					URL url = new URL("http://localhost:" + port + "/kill/now");
-					System.out.println("Detected server running on port " + port + ", maybe it's an old " + NAME + "?");
-					if(options.has(noUpgradeOpt)) {
-						System.out.println("noupgrade option set. You'll have to free up port " + port + " manually, or clear this option.");
-						return;
-					}
-					System.out.println("Sending request to " + url + " to hopefully kill it.");
-					URLConnection conn = url.openConnection();
-					InputStream in = conn.getInputStream();
-					in.close();
-					// If we've gotten here, then the previous server may be dead,
-					// lets try to start up.
-					System.out.println("Hopefully the old server is now dead, trying to start up.");
-					final int MAX_TRIES = 10;
-					for(int i = 1; i <= MAX_TRIES; i++) {
-						try {
-							Thread.sleep(1000);
-							System.out.println("Attempt " + i + "/" + MAX_TRIES + " to start up");
-							new TNoodleServer(port, openBrowser);
-							break;
-						} catch(Exception ee) {
-							ee.printStackTrace();
-						}
-					}
+				int httpPort = options.valueOf(httpPortOpt);
+				int httpsPort = options.valueOf(httpsPortOpt);
+				HttpsConfig httpsConfig = new HttpsConfig();
+				httpsConfig.port = httpsPort;
+				httpsConfig.keystoreFile = options.valueOf(keystoreOpt);
+				String keystorePassphrase = options.valueOf(keypasswdOpt);
+				if(keystorePassphrase != null) {
+					httpsConfig.keystorePassphrase = keystorePassphrase.toCharArray();
 				}
+
+				boolean openBrowser = !options.has(noBrowserOpt);
+				new TNoodleServer(httpPort, httpsConfig, bindAggressively, openBrowser);
 				return;
 			}
 		} catch(Exception e) {

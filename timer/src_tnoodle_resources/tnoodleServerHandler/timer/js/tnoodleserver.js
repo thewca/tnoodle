@@ -31,8 +31,11 @@ tnoodle.TRIMMED = function(n) {
 // TODO - this has been obsoleted by /js/scramble.js, and should really get nuked
 // I see no benifit in doing so until we've actually come up with a system for storing
 // times somewhere, though.
-tnoodle.server = function(host, port) {
-	this.serverUrl = "http://" + host + ":" + port;
+tnoodle.server = function(protocol, hostname, port) {
+	protocol = protocol || location.protocol;
+	hostname = hostname || location.hostname;
+	port = port || location.port;
+	this.serverUrl = protocol + "//" + hostname + ":" + port;
 
 	/**** Scramble server stuff ***/
 	this.puzzlesUrl = this.serverUrl + "/puzzles/";
