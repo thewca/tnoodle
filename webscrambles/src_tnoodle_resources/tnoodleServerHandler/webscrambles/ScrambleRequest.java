@@ -75,9 +75,9 @@ class ScrambleRequest {
 		try {
 			scramblers = Scrambler.getScramblers();
 		} catch (BadClassDescriptionException e) {
-			e.printStackTrace();
+			l.log(Level.INFO, "", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			l.log(Level.INFO, "", e);
 		}
 		
 		// This is an awful workaround for https://github.com/jfly/tnoodle/issues/1.
@@ -86,11 +86,10 @@ class ScrambleRequest {
 			ScrambleRequest r = new ScrambleRequest("title", "333", null);
 			requestsToPdf("", new Date(), new ScrambleRequest[] { r }, null);
 		} catch (Throwable e) {
-			e.printStackTrace();
-			System.out.println("Yikes! Did you just see a warning similar to this " +
+			l.log(Level.WARNING, "Yikes! Did you just see a warning similar to this " +
 					"\"java.lang.Error: Probable fatal error:No fonts found.\"? " +
 					"This exception may have been expected. See " +
-					"https://github.com/jfly/tnoodle/issues/1 for more details.");
+					"https://github.com/jfly/tnoodle/issues/1 for more details.", e);
 		}
 	}
 	
@@ -504,16 +503,35 @@ class ScrambleRequest {
 				// a better solution would be.
 				scrambleWidth = 200;
 			}
-			int scrambleHeight = (int) (PageSize.LETTER.getHeight()/SCRAMBLES_PER_PAGE);
+			
+			float sideMargins = 100 + doc.leftMargin() + doc.rightMargin();
+			float vertMargins = doc.topMargin() + doc.bottomMargin();
+			float availableWidth = pageSize.getWidth()-sideMargins;
+			float availableHeight = pageSize.getHeight()-vertMargins;
+			int scrambleHeight = (int) (availableHeight/SCRAMBLES_PER_PAGE);
 			Dimension dim = scrambleRequest.scrambler.getPreferredSize(scrambleWidth, scrambleHeight);
 			PdfContentByte cb = docWriter.getDirectContent();
 			
-			float maxWidth = 0;
+			int charsWide = (int) Math.ceil(Math.log(scrambleRequest.scrambles.length)/Math.log(10));
+			String wideString = "";
+			for(int i = 0; i < charsWide; i++) {
+				// M has got to be as wide or wider than the widest digit in our font
+				wideString += "M";
+			}
+			wideString += ".";
+			float col1Width = new Chunk(wideString).getWidthPoint();
+			// I don't know why we need this, perhaps there's some padding?
+			col1Width += 5;
+
+			float availableScrambleWidth = availableWidth - col1Width - dim.width;
+
 			PdfPTable table = new PdfPTable(3);
+			table.setTotalWidth(new float[] { col1Width, availableScrambleWidth, dim.width });
+			table.setLockedWidth(true);
+
 			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
 				String scramble = scrambleRequest.scrambles[i];
 				Chunk ch = new Chunk((i+1)+".");
-				maxWidth = Math.max(maxWidth, ch.getWidthPoint());
 				PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
 				nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
 				table.addCell(nthscramble);
@@ -522,11 +540,15 @@ class ScrambleRequest {
 				scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
 				try {
 					BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-					scrambleChunk.setFont(new Font(courier, 12, Font.NORMAL));
+					int availableScrambleHeight = dim.height;
+					Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight);
+					float maxFontSize = 25;
+					float perfectFontSize = ColumnText.fitText(new Font(courier), scramble, availableArea, maxFontSize, PdfWriter.RUN_DIRECTION_LTR);
+					scrambleChunk.setFont(new Font(courier, perfectFontSize, Font.NORMAL));
 				} catch(IOException e) {
-					e.printStackTrace();
+					l.log(Level.INFO, "", e);
 				} catch(DocumentException e) {
-					e.printStackTrace();
+					l.log(Level.INFO, "", e);
 				}
 				PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
 				scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
@@ -535,7 +557,7 @@ class ScrambleRequest {
 				if(dim.width > 0 && dim.height > 0) {
 					try {
 						PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-						Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
+						Graphics2D g2 = new PdfGraphics2D(tp, tp.getWidth(), tp.getHeight(), new DefaultFontMapper());
 
 						scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
 						g2.dispose();
@@ -545,16 +567,12 @@ class ScrambleRequest {
 						table.addCell(imgCell);
 					} catch (Exception e) {
 						table.addCell("Error drawing scramble: " + e.getMessage());
-
-						System.err.println("Error drawing scramble, if you're having font issues, try installing ttf-dejavu.");
-						e.printStackTrace();
+						l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e);
 					}
 				} else {
 					table.addCell("");
 				}
 			}
-			maxWidth*=2; //TODO - I have no freaking clue why I need to do this.
-			table.setTotalWidth(new float[] { maxWidth, doc.getPageSize().getWidth()-maxWidth-dim.width, dim.width });
 			
 			doc.add(table);
 		}
