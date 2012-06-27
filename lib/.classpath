@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="itextpdf-5.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="bcprov-jdk16-1.46.jar"/>
-	<classpathentry exported="true" kind="lib" path="jopt-simple-3.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="plugin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="gson-2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
