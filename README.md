@@ -5,7 +5,7 @@
 - See Kociemba's [page](http://kociemba.org/cube.htm)
 
 # Feature
-- Memory: ~1M with twist-flip-pruning table, ~0.5M without twist-flip-pruning table. See [Tools.java line 13]https://github.com/ChenShuang/min2phase/blob/master/Tools.js#L13
+- Memory: ~1M with twist-flip-pruning table, ~0.5M without twist-flip-pruning table. See [Tools.java line 13](https://github.com/ChenShuang/min2phase/blob/master/Tools.java#L13)
 - Average Solving Time @21 moves: ~10ms without T-F-P table, ~7ms with T-F-P table.
 - Initialization Time: ~160ms without T-F-P table, ~240ms with T-F-P table.
 
