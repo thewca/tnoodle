@@ -1,6 +1,6 @@
 # TNoodleServer #
 
-An http server built to generate scrambles and images for twisty puzzles. Supports json, png, pdf and zip formats.  It is currently being used by the following programs.
+An http server built to generate scrambles and images for twisty puzzles. Supports json, png, svg, pdf, and zip formats.  It is currently being used by the following programs.
 
 * [TNT](/tnt/) - A new timer aiming to replace CCT.
 * [WCA Scrambler](/scramble) - A WCA-style scrambler. See [its readme](/readme/scramble).
@@ -94,13 +94,14 @@ Response:
 	}]
 
 
-### view/PUZZLE.[png|json]?scramble=SCRAMBLE&width=WIDTH&height=HEIGHT ###
+### view/PUZZLE.[png|svg|json]?scramble=SCRAMBLE&width=WIDTH&height=HEIGHT ###
 
 If JSON, then boundaries of the puzzles faces will be returned in json format. This is necessary information for creating a color scheme chooser.
 
 width/height is the maximum allowed width/height for the resulting image. It will not screw up the image's aspect ratio. If 0, it will attempt to use the preferred width/height.
 
 <a href="view/sq1.png?scramble=(3, 3) /"><img src="view/sq1.png?scramble=(3, 3) /" /></a>
+<a href="view/sq1.svg?scramble=(3, 3) /"><img src="view/sq1.svg?scramble=(3, 3) /" /></a>
 
 ### POST to view/TITLE.[pdf|zip] ###
 

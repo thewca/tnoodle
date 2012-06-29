@@ -1,4 +1,4 @@
-/readme tnoodleServerHandler.FileHandler("server/index.md")
+/readme tnoodleServerHandler.FileHandler("server/readme-tnoodle.md")
 /readme/scramble tnoodleServerHandler.FileHandler("server/readme-scramble.md")
 /markdown.css tnoodleServerHandler.FileHandler("server/markdown.css")
 / tnoodleServerHandler.RedirectHandler("/readme")
