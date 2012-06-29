@@ -27,6 +27,7 @@ import net.gnehzr.tnoodle.utils.Utils;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Chapter;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -755,6 +756,12 @@ class ScrambleRequest {
 
 		for(int i = 0; i < scrambleRequests.length; i++) {
 			ScrambleRequest scrambleRequest = scrambleRequests[i];
+
+			// Man, if we structured requests by puzzle, we could totally do subsections,
+			// which would be *awesome*.
+			Chapter chapterN = new Chapter(new Paragraph(scrambleRequest.title), i+1);
+			doc.add(chapterN);
+
 			PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
 			for(int j = 0; j < scrambleRequest.copies; j++) {
 				for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
@@ -763,6 +770,7 @@ class ScrambleRequest {
 				}
 			}
 		}
+
 		doc.close();
 		return totalPdfOutput;
 	}
