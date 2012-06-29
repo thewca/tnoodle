@@ -5,7 +5,11 @@ import static net.gnehzr.tnoodle.utils.Utils.parseExtension;
 import static net.gnehzr.tnoodle.utils.Utils.throwableToString;
 import static net.gnehzr.tnoodle.utils.Utils.toInt;
 
+import java.io.Writer;
+import java.io.OutputStreamWriter;
+
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -17,6 +21,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.SortedMap;
+
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.dom.GenericDOMImplementation;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
 
 import javax.imageio.ImageIO;
 
@@ -59,7 +69,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 		String name = name_extension[0];
 		String extension = name_extension[1];
 
-		if (extension.equals("png") || extension.equals("json")) {
+		if (extension.equals("png") || extension.equals("json") || extension.equals("svg")) {
 			String puzzle = name;
 			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
 			if (lazyScrambler == null) {
@@ -95,6 +105,42 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 					e.printStackTrace();
 					sendText(t, throwableToString(e));
 				}
+			} else if(extension.equals("svg")) {
+				// Get a DOMImplementation.
+				DOMImplementation domImpl =
+					GenericDOMImplementation.getDOMImplementation();
+
+				// Create an instance of org.w3c.dom.Document.
+				String svgNS = "http://www.w3.org/2000/svg";
+				Document document = domImpl.createDocument(svgNS, "svg", null);
+
+				// Create an instance of the SVG Generator.
+				SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+				svgGenerator.setSVGCanvasSize(dimension);
+
+				// This is a hack I don't fully understand that prevents aliasing of
+				// vertical and horizontal lines.
+				// See http://stackoverflow.com/questions/7589650/drawing-grid-with-jquery-svg-produces-2px-lines-instead-of-1px
+				svgGenerator.translate(0.5, 0.5);
+
+				try {
+					scrambler.drawScramble(svgGenerator, dimension, scramble, colorScheme);
+				} catch(InvalidScrambleException e) {
+					sendText(t, throwableToString(e));
+					return;
+				}
+
+				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+				boolean useCSS = true; // we want to use CSS style attributes
+				Writer out = new OutputStreamWriter(bytes, "UTF-8");
+				svgGenerator.stream(out, useCSS);
+				out.close();
+
+				t.getResponseHeaders().set("Content-Type", "image/svg+xml");
+				t.sendResponseHeaders(200, bytes.size());
+				t.getResponseBody().write(bytes.toByteArray());
+				t.getResponseBody().close();
+
 			} else if (extension.equals("json")) {
 				sendJSON(t, GSON.toJson(scrambler.getDefaultPuzzleImageInfo()),
 						callback);

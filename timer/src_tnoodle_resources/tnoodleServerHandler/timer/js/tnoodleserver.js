@@ -128,7 +128,7 @@ tnoodle.server = function(protocol, hostname, port) {
 		if(colorScheme) {
 			query.scheme = this.flattenColorScheme(colorScheme);
 		}
-		return this.viewUrl + encodeURIComponent(puzzle) + ".png?" + tnoodle.toQueryString(query);
+		return this.viewUrl + encodeURIComponent(puzzle) + ".svg?" + tnoodle.toQueryString(query);
 	};
 	this.getPuzzleIconUrl = function(puzzle) {
 		return this.viewUrl + encodeURIComponent(puzzle) + ".png?icon=true";
