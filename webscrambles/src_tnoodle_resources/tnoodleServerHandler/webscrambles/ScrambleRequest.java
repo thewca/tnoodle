@@ -25,6 +25,9 @@ import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
 
+import com.itextpdf.text.pdf.PdfDestination;
+import com.itextpdf.text.pdf.PdfAction;
+import com.itextpdf.text.pdf.PdfOutline;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Chapter;
@@ -752,21 +755,39 @@ class ScrambleRequest {
 			totalPdfWriter.setEncryption(password.getBytes(), password.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
 		}
 
+
 		doc.open();
 
+		PdfContentByte cb = totalPdfWriter.getDirectContent();
+		PdfOutline root = cb.getRootOutline();
+
+		HashMap<String, PdfOutline> outlineByPuzzle = new HashMap<String, PdfOutline>();
+		boolean expandPuzzleLinks = false;
+
+		int pages = 1;
 		for(int i = 0; i < scrambleRequests.length; i++) {
 			ScrambleRequest scrambleRequest = scrambleRequests[i];
 
-			// Man, if we structured requests by puzzle, we could totally do subsections,
-			// which would be *awesome*.
-			Chapter chapterN = new Chapter(new Paragraph(scrambleRequest.title), i+1);
-			doc.add(chapterN);
+			String shortName = scrambleRequest.scrambler.getShortName();
+
+			PdfOutline puzzleLink = outlineByPuzzle.get(shortName);
+			if(puzzleLink == null) {
+				PdfDestination d = new PdfDestination(PdfDestination.FIT);
+				puzzleLink = new PdfOutline(root,
+						PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.scrambler.getLongName(), expandPuzzleLinks);
+				outlineByPuzzle.put(shortName, puzzleLink);
+			}
+
+			PdfDestination d = new PdfDestination(PdfDestination.FIT);
+			PdfOutline sheetLink = new PdfOutline(puzzleLink,
+					PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.title);
 
 			PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
 			for(int j = 0; j < scrambleRequest.copies; j++) {
 				for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
 					PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
 					totalPdfWriter.addPage(page);
+					pages++;
 				}
 			}
 		}
