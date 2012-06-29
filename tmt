@@ -6,6 +6,7 @@ import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
 import time
+import math
 
 # Terribly useful debugging tweaks
 import cgitb
@@ -929,7 +930,11 @@ Implementation-Version: %s
 
 		createSymlinkIfNotExistsOrStale(basename(self.distJarFile()), noVersionPath)
 
-		print 'Successfully created %s with main class %s' % ( self.distJarFile(), self.main )
+		sizeMB = 1.0 * os.path.getsize(self.distJarFile()) / 2**20
+		# ls -h ciels fractions, so we do the same thing here
+		sizeMB = math.ceil(sizeMB*10)/10
+
+		print 'Successfully created %s (size %sM) with main class %s' % ( self.distJarFile(), sizeMB, self.main )
 
 	def run(self):
 		main = tmt.args.main or self.main
