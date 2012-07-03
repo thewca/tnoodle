@@ -14,8 +14,6 @@ public class Tools implements Runnable {
 
 	private static boolean inited = false;
 	
-	private static Random gen = new Random();
-
 	private static void read(char[] arr, DataInput in) throws IOException {
 		for (int i=0, len=arr.length; i<len; i++) {
 			arr[i] = in.readChar();
@@ -232,13 +230,10 @@ public class Tools implements Runnable {
 			write(CoordCube.TwistFlipPrun, out);// + 435, 456 Bytes
 		}										// = 958, 492 Bytes
 	}
-	
-	/**
-	 * Set Random Source.
-	 * @param gen new random source.
-	 */
-	public static void setRandomSource(Random gen) {
-		Tools.gen = gen;
+
+	private static final Random r = new Random();
+	public static String randomCube() {
+		return randomCube(r);
 	}
 
 	/**
@@ -251,11 +246,11 @@ public class Tools implements Runnable {
 	 * @see cs.min2phase.Tools#setRandomSource(java.util.Random)
 	 * @see cs.min2phase.Search#solution(java.lang.String facelets, int maxDepth, long timeOut, long timeMin, int verbose)
 	 */
-	public static String randomCube() {
-		return randomState(STATE_RANDOM, STATE_RANDOM, STATE_RANDOM, STATE_RANDOM);
+	public static String randomCube(Random gen) {
+		return randomState(STATE_RANDOM, STATE_RANDOM, STATE_RANDOM, STATE_RANDOM, gen);
 	}
 	
-	private static int resolveOri(byte[] arr, int base) {
+	private static int resolveOri(byte[] arr, int base, Random gen) {
 		int sum = 0, idx = 0, lastUnknown = -1;
 		for (int i=0; i<arr.length; i++) {
 			if (arr[i] == -1) {
@@ -287,7 +282,7 @@ public class Tools implements Runnable {
 		return cnt;
 	}
 	
-	private static int resolvePerm(byte[] arr, int cntU, int parity) {
+	private static int resolvePerm(byte[] arr, int cntU, int parity, Random gen) {
 		if (arr == STATE_SOLVED) {
 			return 0;
 		} else if (arr == STATE_RANDOM) {
@@ -329,7 +324,7 @@ public class Tools implements Runnable {
 	public static final byte[] STATE_RANDOM = null;
 	public static final byte[] STATE_SOLVED = new byte[0];	
 	
-	protected static String randomState(byte[] cp, byte[] co, byte[] ep, byte[] eo) {
+	protected static String randomState(byte[] cp, byte[] co, byte[] ep, byte[] eo, Random gen) {
 		int parity;
 		int cntUE = ep == STATE_RANDOM ? 12 : countUnknown(ep);
 		int cntUC = cp == STATE_RANDOM ? 8 : countUnknown(cp);
@@ -338,7 +333,7 @@ public class Tools implements Runnable {
 			if (ep == STATE_SOLVED) {
 				epVal = parity = 0;
 			} else {
-				parity = resolvePerm(ep, cntUE, -1);
+				parity = resolvePerm(ep, cntUE, -1, gen);
 				epVal = Util.getNPerm(ep, 12);
 			}
 			if (cp == STATE_SOLVED) {
@@ -348,7 +343,7 @@ public class Tools implements Runnable {
 					cpVal = gen.nextInt(40320);
 				} while (Util.getNParity(cpVal, 8) != parity);
 			} else {
-				resolvePerm(cp, cntUC, parity);
+				resolvePerm(cp, cntUC, parity, gen);
 				cpVal = Util.getNPerm(cp, 8);			
 			}
 		} else {	//ep != STATE_SOLVED
@@ -358,7 +353,7 @@ public class Tools implements Runnable {
 				cpVal = gen.nextInt(40320);
 				parity = Util.getNParity(cpVal, 8);
 			} else {
-				parity = resolvePerm(cp, cntUC, -1);
+				parity = resolvePerm(cp, cntUC, -1, gen);
 				cpVal = Util.getNPerm(cp, 8);
 			}
 			if (ep == STATE_RANDOM) {
@@ -366,80 +361,104 @@ public class Tools implements Runnable {
 					epVal = gen.nextInt(479001600);
 				} while (Util.getNParity(epVal, 12) != parity);
 			} else {
-				resolvePerm(ep, cntUE, parity);		
+				resolvePerm(ep, cntUE, parity, gen);
 				epVal = Util.getNPerm(ep, 12);
 			}
 		}
 		return Util.toFaceCube(new CubieCube(
 			cpVal, 
-			co == STATE_RANDOM ? gen.nextInt(2187) : (co == STATE_SOLVED ? 0 : resolveOri(co, 3)), 
+			co == STATE_RANDOM ? gen.nextInt(2187) : (co == STATE_SOLVED ? 0 : resolveOri(co, 3, gen)), 
 			epVal, 
-			eo == STATE_RANDOM ? gen.nextInt(2048) : (eo == STATE_SOLVED ? 0 : resolveOri(eo, 2))));
+			eo == STATE_RANDOM ? gen.nextInt(2048) : (eo == STATE_SOLVED ? 0 : resolveOri(eo, 2, gen))));
 	}
 	
 
-	public static String randomLastLayer() {
+	public static String randomLastLayer(Random gen) {
+		return randomLastLayer(r);
+	}
+	public static String randomLastLayer(Random gen) {
 		return randomState(
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7}, 
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0}, 
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11}, 
-			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0});
+			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0}, gen);
 	}
 	
-	public static String randomLastSlot() {
+	public static String randomLastSlot(Random gen) {
+		return randomLastSlot(r);
+	}
+	public static String randomLastSlot(Random gen) {
 		return randomState(
 			new byte[]{-1, -1, -1, -1, -1, 5, 6, 7}, 
 			new byte[]{-1, -1, -1, -1, -1, 0, 0, 0}, 
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, -1, 9, 10, 11}, 
-			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, 0, 0, 0});
+			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, 0, 0, 0}, gen);
 	}
 
-	public static String randomZBLastLayer() {
+	public static String randomZBLastLayer(Random gen) {
+		return randomZBLastLayer(r);
+	}
+	public static String randomZBLastLayer(Random gen) {
 		return randomState(
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7}, 
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0}, 
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11}, 
-			STATE_SOLVED);
+			STATE_SOLVED, gen);
 	}
 
-	public static String randomCornerOfLastLayer() {
+	public static String randomCornerOfLastLayer(Random gen) {
+		return randomCornerOfLastLayer(r);
+	}
+	public static String randomCornerOfLastLayer(Random gen) {
 		return randomState(
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7}, 
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0}, 
 			STATE_SOLVED, 
-			STATE_SOLVED);
+			STATE_SOLVED, gen);
 	}
 
-	public static String randomEdgeOfLastLayer() {
+	public static String randomEdgeOfLastLayer(Random gen) {
+		return randomEdgeOfLastLayer(r);
+	}
+	public static String randomEdgeOfLastLayer(Random gen) {
 		return randomState(
 			STATE_SOLVED, 
 			STATE_SOLVED, 
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11}, 
-			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0});
+			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0}, gen);
 	}
 
-	public static String randomCrossSolved() {
+	public static String randomCrossSolved(Random gen) {
+		return randomCrossSolved(r);
+	}
+	public static String randomCrossSolved(Random gen) {
 		return randomState(
 			STATE_RANDOM, 
 			STATE_RANDOM, 
 			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, -1, -1, -1, -1}, 
-			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1});
+			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1}, gen);
 	}
 	
-	public static String randomEdgeSolved() {
+	public static String randomEdgeSolved(Random gen) {
+		return randomEdgeSolved(r);
+	}
+	public static String randomEdgeSolved(Random gen) {
 		return randomState(
 			STATE_RANDOM, 
 			STATE_RANDOM, 
 			STATE_SOLVED, 
-			STATE_SOLVED);
+			STATE_SOLVED, gen);
 	}
 	
 	public static String randomCornerSolved() {
+		return randomCornerSolved(r);
+	}
+	public static String randomCornerSolved(Random gen) {
 		return randomState(
 			STATE_SOLVED,
 			STATE_SOLVED,
 			STATE_RANDOM, 
-			STATE_RANDOM);
+			STATE_RANDOM, gen);
 	}
 	
 	public static String superFlip() {
