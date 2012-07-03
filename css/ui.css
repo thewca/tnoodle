@@ -232,6 +232,7 @@ is resolved.
 .progressDiv {
 	border: 1px solid #00C0C0;
 	background-color: #DEE;
+  padding-right: 10px;
 
 	background-image:
 		-webkit-linear-gradient(
