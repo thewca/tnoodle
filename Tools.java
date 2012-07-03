@@ -373,7 +373,7 @@ public class Tools implements Runnable {
 	}
 	
 
-	public static String randomLastLayer(Random gen) {
+	public static String randomLastLayer() {
 		return randomLastLayer(r);
 	}
 	public static String randomLastLayer(Random gen) {
@@ -384,7 +384,7 @@ public class Tools implements Runnable {
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0}, gen);
 	}
 	
-	public static String randomLastSlot(Random gen) {
+	public static String randomLastSlot() {
 		return randomLastSlot(r);
 	}
 	public static String randomLastSlot(Random gen) {
@@ -395,7 +395,7 @@ public class Tools implements Runnable {
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, 0, 0, 0}, gen);
 	}
 
-	public static String randomZBLastLayer(Random gen) {
+	public static String randomZBLastLayer() {
 		return randomZBLastLayer(r);
 	}
 	public static String randomZBLastLayer(Random gen) {
@@ -406,7 +406,7 @@ public class Tools implements Runnable {
 			STATE_SOLVED, gen);
 	}
 
-	public static String randomCornerOfLastLayer(Random gen) {
+	public static String randomCornerOfLastLayer() {
 		return randomCornerOfLastLayer(r);
 	}
 	public static String randomCornerOfLastLayer(Random gen) {
@@ -417,7 +417,7 @@ public class Tools implements Runnable {
 			STATE_SOLVED, gen);
 	}
 
-	public static String randomEdgeOfLastLayer(Random gen) {
+	public static String randomEdgeOfLastLayer() {
 		return randomEdgeOfLastLayer(r);
 	}
 	public static String randomEdgeOfLastLayer(Random gen) {
@@ -428,7 +428,7 @@ public class Tools implements Runnable {
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0}, gen);
 	}
 
-	public static String randomCrossSolved(Random gen) {
+	public static String randomCrossSolved() {
 		return randomCrossSolved(r);
 	}
 	public static String randomCrossSolved(Random gen) {
@@ -439,7 +439,7 @@ public class Tools implements Runnable {
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1}, gen);
 	}
 	
-	public static String randomEdgeSolved(Random gen) {
+	public static String randomEdgeSolved() {
 		return randomEdgeSolved(r);
 	}
 	public static String randomEdgeSolved(Random gen) {
