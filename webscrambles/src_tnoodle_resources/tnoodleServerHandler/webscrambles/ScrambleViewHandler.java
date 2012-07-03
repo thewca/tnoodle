@@ -49,31 +49,30 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 		this.scramblers = Scrambler.getScramblers();
 	}
 
-	protected void wrappedHandle(HttpExchange t, String path[],
+	protected void wrappedHandle(HttpExchange t, String[] path,
 			LinkedHashMap<String, String> query) throws IOException,
 			IllegalArgumentException, SecurityException,
 			InstantiationException, IllegalAccessException,
 			InvocationTargetException, ClassNotFoundException,
 			NoSuchMethodException, InvalidScrambleRequestException,
 			DocumentException, ZipException {
-		String callback = query.get("callback");
 		if (path.length == 0) {
-			sendJSONError(t, "Please specify a puzzle.", callback);
+			sendError(t, "Please specify a puzzle.");
 			return;
 		}
 		String[] name_extension = parseExtension(path[0]);
-		if (name_extension[1] == null) {
-			sendJSONError(t, "Please specify an extension", callback);
-			return;
-		}
 		String name = name_extension[0];
 		String extension = name_extension[1];
+		if (extension == null) {
+			sendError(t, "Please specify an extension");
+			return;
+		}
 
 		if (extension.equals("png") || extension.equals("json") || extension.equals("svg")) {
 			String puzzle = name;
 			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
 			if (lazyScrambler == null) {
-				sendJSONError(t, "Invalid scrambler: " + puzzle, callback);
+				sendError(t, "Invalid scrambler: " + puzzle);
 				return;
 			}
 			Scrambler scrambler = lazyScrambler.cachedInstance();
@@ -142,8 +141,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 				t.getResponseBody().close();
 
 			} else if (extension.equals("json")) {
-				sendJSON(t, GSON.toJson(scrambler.getDefaultPuzzleImageInfo()),
-						callback);
+				sendJSON(t, GSON.toJson(scrambler.getDefaultPuzzleImageInfo()));
 			} else {
 				azzert(false);
 			}
@@ -185,7 +183,7 @@ public class ScrambleViewHandler extends SafeHttpHandler {
 				azzert(false);
 			}
 		} else {
-			sendJSONError(t, "Invalid extension: " + extension, callback);
+			sendError(t, "Invalid extension: " + extension);
 		}
 	}
 }

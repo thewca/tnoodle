@@ -2,6 +2,7 @@ package net.gnehzr.tnoodle.server;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.throwableToString;
+import static net.gnehzr.tnoodle.utils.Utils.parseExtension;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,12 +32,7 @@ public abstract class SafeHttpHandler implements HttpHandler {
 			path = t.getRequestURI().getPath().substring(1).split("/");
 			wrappedHandle(t, path, query);
 		} catch(Throwable e) {
-			if(path != null && path[path.length-1].endsWith(".json")) {
-				azzert(query != null);
-				jsonError(t, e, query.get("callback"));
-			} else {
-				textError(t, e);
-			}
+			sendError(t, e);
 		}
 	}
 	
@@ -61,26 +57,34 @@ public abstract class SafeHttpHandler implements HttpHandler {
 		return queryMap;
 	}
 
-	protected static void sendJSON(HttpExchange t, String json, String callback) {
+	protected static void sendJSON(HttpExchange t, String json) {
+		String callback = parseQuery(t.getRequestURI().getRawQuery()).get("callback");
+		String[] filename_ext = parseExtension(t.getRequestURI().getPath());
+
+		// Here we enforce that JSON is only sent in response to URLs ending in .json.
+		// This is important, because if clients expect to get JSON from urls not ending in
+		// .json, our catch(Throwable e) {...} in handle() above will wrap up exceptions
+		// as text, and we'll respond to a request that expects JSON with plaintext.
+		azzert("json".equals(filename_ext[1]), "Attempted to respond with JSON to a url not ending in .json.");
 		t.getResponseHeaders().set("Access-Control-Allow-Origin", "*"); //this allows x-domain ajax
 		if(callback != null) {
 			json = callback + "(" + json + ")";
 		}
 		sendBytes(t, json.getBytes(), "application/json"); //TODO - charset?
 	}
-	
-	protected static void sendJSONError(HttpExchange t, String error, String callback) {
-		HashMap<String, String> json = new HashMap<String, String>();
-		json.put("error", error);
-		sendJSON(t, GSON.toJson(json), callback);
+
+	protected static void sendError(HttpExchange t, Throwable error) {
+		sendError(t, throwableToString(error));
 	}
-	
-	protected static void textError(HttpExchange t, Throwable error) {
-		sendText(t, throwableToString(error));
-	}
-	
-	protected static void jsonError(HttpExchange t, Throwable error, String callback) {
-		sendJSONError(t, throwableToString(error), callback);
+	protected static void sendError(HttpExchange t, String error) {
+		String[] name_ext = parseExtension(t.getRequestURI().getPath());
+		if("json".equals(name_ext[1])) {
+			HashMap<String, String> json = new HashMap<String, String>();
+			json.put("error", error);
+			sendJSON(t, GSON.toJson(json));
+		} else {
+			sendText(t, error);
+		}
 	}
 	
 	protected static void sendBytes(HttpExchange t, ByteArrayOutputStream bytes, String contentType) {

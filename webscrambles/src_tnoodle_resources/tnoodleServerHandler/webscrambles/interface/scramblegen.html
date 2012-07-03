@@ -211,6 +211,34 @@
 				}
 			}
 		}
+		// We may have deleted some scrambles in the previous for loop, so we must inform
+		// the ui.
+		mark2.ui.scramblesGenerated(toScramblesByGuid(requestsByGuid));
+		queueLoadScrambles();
+	}
+
+	var pendingLoadScramblesRequest;
+	function queueLoadScrambles() {
+		if(!pendingLoadScramblesRequest) {
+			pendingLoadScramblesRequest = scrambleServer.loadPuzzles(puzzlesLoaded, true);
+		}
+	}
+
+	function puzzlesLoaded(puzzles) {
+		pendingLoadScramblesRequest = null;
+
+		var puzzleToStatus = {};
+		for(var i = 0; i < puzzles.length; i++) {
+			var puzzle = puzzles[i];
+			puzzleToStatus[puzzle.shortName] = puzzle.initializationStatus;
+		}
+		if(!mark2.ui.puzzlesInitializing(puzzleToStatus)) {
+			// Not done initializing all the puzzles we care about yet,
+			// so we schedule ourself to check again.
+			pendingLoadScramblesRequest = setTimeout(function() {
+				scrambleServer.loadPuzzles(puzzlesLoaded, true);
+			}, 1000);
+		}
 	}
 
 	var removeTempDiv = function() {

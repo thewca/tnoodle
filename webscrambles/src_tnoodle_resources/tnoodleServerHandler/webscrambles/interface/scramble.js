@@ -20,7 +20,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 	this.serverUrl = protocol + "//" + hostname + ":" + port;
 
 	/**** Scramble server stuff ***/
-	this.puzzlesUrl = this.serverUrl + "/puzzles/";
+	this.puzzlesUrl = this.serverUrl + "/puzzles/.json";
 	this.scrambleUrl = this.serverUrl + "/scramble/";
 	this.viewUrl = this.serverUrl + "/view/";
 	this.importUrl = this.serverUrl + "/import/";
@@ -77,8 +77,12 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 		that.showExt(title, scrambleRequest, password, 'zip', target);
 	};
 	
-	this.loadPuzzles = function(callback) {
-		return tnoodle.retryAjax(callback, this.puzzlesUrl, null);
+	this.loadPuzzles = function(callback, includeStatus) {
+		var query = {};
+		if(includeStatus) {
+			query.includeStatus = 'true';
+		}
+		return tnoodle.retryAjax(callback, this.puzzlesUrl, query);
 	};
 	
 	this.loadScramble = function(callback, puzzle, seed) {
@@ -222,7 +226,11 @@ tnoodle.ajax = function(callback, url, data) {
 		xhr.open('GET', dataUrl, true);
 	}
 	xhr.onload = function() {
-		callback(JSON.parse(this.responseText));
+		try {
+			callback(JSON.parse(this.responseText));
+		} catch(error) {
+			callback({error: error + " (" + this.responseText + ")" });
+		}
 	};
 	xhr.onerror = function(error) {
 		callback({error: error});

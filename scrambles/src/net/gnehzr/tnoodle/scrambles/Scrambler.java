@@ -67,6 +67,17 @@ public abstract class Scrambler {
 	 * @return a String
 	 */
 	public abstract String getLongName();
+
+	/**
+	 * Returns a number between 0 and 1 representing how "initialized" this
+	 * Scrambler is. 0 means nothing has been accomplished, and 1 means
+	 * we're done, and are generating scrambles.
+	 * @return A double between 0 and 1, inclusive.
+	 */
+
+	public double getInitializationStatus() {
+		return 1;
+	}
 	
 	/**
 	 * Generates a scramble appropriate for this Scrambler. It's important to note that
@@ -168,22 +179,21 @@ public abstract class Scrambler {
 	}
 
 	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class);
-	// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
-	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers =
-		new TreeMap<String, LazyInstantiator<Scrambler>>(Strings.getNaturalComparator());
 
-	public static SortedMap<String, LazyInstantiator<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {
-		if(plugins.dirtyPlugins()) {
-			plugins.reloadPlugins();
-			scramblers.putAll(plugins.getPlugins());
+	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
+	public static synchronized SortedMap<String, LazyInstantiator<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {
+		if(scramblers == null || plugins.reloadIfNeeded()) {
+			// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
+			SortedMap<String, LazyInstantiator<Scrambler>> newScramblers =
+				new TreeMap<String, LazyInstantiator<Scrambler>>(Strings.getNaturalComparator());
+			newScramblers.putAll(plugins.getPlugins());
+			scramblers = newScramblers;
 		}
-		return scramblers;
+		return Collections.unmodifiableSortedMap(scramblers);
 	}
+
 	public static String getScramblerLongName(String shortName) throws BadClassDescriptionException, IOException {
-		if(plugins.dirtyPlugins()) {
-			plugins.reloadPlugins();
-			scramblers.putAll(plugins.getPlugins());
-		}
+		getScramblers(); // force reloading the plugins, if necessary
 		return plugins.getPluginComment(shortName);
 	}
 	
@@ -356,12 +366,13 @@ public abstract class Scrambler {
 	private static class Scramblerizer implements JsonSerializer<Scrambler>, JsonDeserializer<Scrambler> {
 		@Override
 		public Scrambler deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-			String scramblerName = json.getAsString();
-			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(scramblerName);
-			if(lazyScrambler == null) {
-				throw new JsonParseException(scramblerName + " not found in: " + scramblers.keySet());
-			}
 			try {
+				String scramblerName = json.getAsString();
+				SortedMap<String, LazyInstantiator<Scrambler>> scramblers = getScramblers();
+				LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(scramblerName);
+				if(lazyScrambler == null) {
+					throw new JsonParseException(scramblerName + " not found in: " + scramblers.keySet());
+				}
 				return lazyScrambler.cachedInstance();
 			} catch(Exception e) {
 				throw new JsonParseException(e);

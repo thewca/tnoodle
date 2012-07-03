@@ -165,7 +165,7 @@ public final class Utils {
 			extension = null;
 		} else {
 			name = filename.substring(0, lastDot);
-			extension = filename.substring(lastDot+1);
+			extension = filename.substring(lastDot+1).toLowerCase();
 		}
 		return new String[] { name, extension };
 	}

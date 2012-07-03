@@ -62,7 +62,7 @@ public class ScrambleImporterHandler extends SafeHttpHandler {
 			while((line = in.readLine()) != null) {
 				scrambles.add(line);
 			}
-			sendJSON(t, Utils.GSON.toJson(scrambles), query.get("callback"));
+			sendJSON(t, Utils.GSON.toJson(scrambles));
 		}
 	}
 }

@@ -426,8 +426,8 @@ function ScrambleStuff(scrambler, loadedCallback, applet) {
 		puzzleSelect.setDisabled(false);
 		var options = [];
 		for(var i = 0; i < puzzles.length; i++) {
-			var iconUrl = scrambler.getPuzzleIconUrl(puzzles[i][0]);
-			options.push({ value: puzzles[i][0], text: puzzles[i][1], icon: iconUrl });
+			var iconUrl = scrambler.getPuzzleIconUrl(puzzles[i].shortName);
+			options.push({ value: puzzles[i].shortName, text: puzzles[i].longName, icon: iconUrl });
 		}
 		puzzleSelect.setOptions(options);
 		loadedCallback(puzzles);

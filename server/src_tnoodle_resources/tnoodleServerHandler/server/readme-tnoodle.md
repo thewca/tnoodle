@@ -10,19 +10,34 @@ Looking for something that's missing? Want to contribute? Check out the latest v
 
 ## API ##
 
-Note: All pages that serve up JSON also support JSONP via a callback parameter. For simplicity of the documentation, that optional callback parameter has been omitted.
+Note: All pages that serve up json also support jsonp via a callback parameter. For simplicity of the documentation, that optional callback parameter has been omitted.
 
-### puzzles/ ###
+### puzzles/[PUZZLE_NAME].json?[includeStatus] ###
 
-Simply returns a list of available puzzles in JSON format.
+If `PUZZLE_NAME` is not specified, returns a list of `PUZZLE_STATUS`'s in json format. 
 
-* [puzzles/](/puzzles/)
+A `PUZZLE_STATUS` looks like this:
+
+	{
+		longName: LONG_NAME,
+		shortName: SHORT_NAME,
+		initializationStatus: INITIALIZATION_STATUS
+	}
+
+`INITIALIZATION_STATUS` is a double between 0 and 1 inclusive, and should increase monotonically to 1. Most programs can happily ignore this, but some scramblers take a very long time to initialize (4x4x4 can take several minutes), so this allows programs to let the user know that things are actually happening. `initializationStatus` is only included if the includeStatus parameter is specified.
+
+If `PUZZLE_NAME` is specified, returns just the `PUZZLE_STATUS` for the specified puzzle.
+
+* [puzzles/.json](/puzzles/.json)
+* [puzzles/333.json](/puzzles/333.json)
+* [puzzles/.json?includeStatus](/puzzles/.json?includeStatus)
+* [puzzles/333.json?includeStatus](/puzzles/333.json?includeStatus)
 
 ### scramble/[TITLE].[txt|json|pdf|zip]?[PARAMS] ###
 
-PARAMS include "seed", "showIndices" and most importantly, an arbitrary number of PUZZLE_REQUEST's. Note that this means you can't have a round titled "seed" or "showIndices"!
+`PARAMS` include "seed", "showIndices" and most importantly, an arbitrary number of `PUZZLE_REQUEST`'s. Note that this means you can't have a round titled "seed" or "showIndices"!
 
-PUZZLE_REQUEST's look like this:
+`PUZZLE_REQUEST`'s look like this:
 
 	TITLE=PUZZLE*COUNT*COPIES*SCHEME
 
@@ -32,7 +47,7 @@ COUNT can be an integer, or "fmc". "fmc" means generate one scramble, and is spe
 
 If SCHEME contains a comma, then it is assumed to be a comma separated list of COLORs. If it does not contain a comma, then each character is treated as a COLOR. COLORs must be specified in alphabetical order of the names of the puzzle's faces. To see the faces for a puzzle, visit [view/PUZZLE.json](/view/PUZZLE.json)
 
-A COLOR either an HTML style hexadecimal color definition starting with #, such as #FFFFFF for white. If COLOR does not begin with #, then is must be one of the following color definitions:
+A `COLOR` either an HTML style hexadecimal color definition starting with #, such as #FFFFFF for white. If `COLOR` does not begin with #, then is must be one of the following color definitions:
 
 * y, yellow
 * b, blue
@@ -42,7 +57,7 @@ A COLOR either an HTML style hexadecimal color definition starting with #, such 
 * p, purple
 * 0, gray, grey
 
-If SCHEME does not conform to the above definition, then the puzzle's default color scheme will be used.
+If `SCHEME` does not conform to the above definition, then the puzzle's default color scheme will be used.
 
 Puzzle request titles must be unique.
 
@@ -53,11 +68,11 @@ Puzzle request titles must be unique.
 * [scramble/My Comp.pdf?3x3 Round 1=333\*5\*2&3x3 Round 2=333\*5](/scramble/My Comp.pdf?3x3 Round 1=333*5*2&3x3 Round 2=333*5) - 2 identical copies of a 3x3 sheet of 5 scrambles (titled "3x3 Round 1") 
 followed by 1 page of 5 3x3 scrambles (titled "3x3 Round 2"). This will produce a 3 page PDF.
 * [scramble/My Comp.zip?3x3 Round 1=333\*5\*2&3x3 Round 2=333\*5](/scramble/My Comp.zip?3x3 Round 1=333*5*2&3x3 Round 2=333*5) - This will produce a zip file containing 2 pdfs, one named "3x3 Round 1.pdf" and the other named "3x3 Round 2.pdf". Note that when the file extension is zip, we ignore the COPIES option. I think this is a good decision.
-* [scramble/.json?=333](/scramble/.json?=333) - One 3x3 scramble in JSON.
+* [scramble/.json?=333](/scramble/.json?=333) - One 3x3 scramble in json.
 
 
 #### A fullfilled scramble request ####
-Request: [scramble/.json?3x3 Round 1=333\*1\*2&3x3 Round 2=333\*1\*1](/scramble/.json?3x3 Round 1=333\*1\*2&3x3 Round 2=333\*1\*1) - TODO
+Request: [scramble/.json?3x3 Round 1=333\*1\*2&3x3 Round 2=333\*1\*1](/scramble/.json?3x3 Round 1=333\*1\*2&3x3 Round 2=333\*1\*1)
 
 Response:
 
@@ -96,7 +111,7 @@ Response:
 
 ### view/PUZZLE.[png|svg|json]?scramble=SCRAMBLE&width=WIDTH&height=HEIGHT ###
 
-If JSON, then boundaries of the puzzles faces will be returned in json format. This is necessary information for creating a color scheme chooser.
+If json, then boundaries of the puzzles faces will be returned in json format. This is necessary information for creating a color scheme chooser.
 
 width/height is the maximum allowed width/height for the resulting image. It will not screw up the image's aspect ratio. If 0, it will attempt to use the preferred width/height.
 
@@ -105,7 +120,7 @@ width/height is the maximum allowed width/height for the resulting image. It wil
 
 ### POST to view/TITLE.[pdf|zip] ###
 
-The body should be scrambles=SCRAMBLES, where SCRAMBLES is a JSON string that was retrieved from scramble/.json (see "A fullfilled scramble request").
+The body should be `scrambles=SCRAMBLES`, where `SCRAMBLES` is a json string that was retrieved from scramble/.json (see "A fullfilled scramble request").
 
 ### import/?url=URL ###
 url is a url pointing to a text file with newline separated scrambles.

@@ -74,7 +74,7 @@ public class ScrambleHandler extends SafeHttpHandler {
 				sendText(t, sb.toString());
 			} else if(ext.equals("json")) {
 				ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-				sendJSON(t, GSON.toJson(scrambleRequests), callback);
+				sendJSON(t, GSON.toJson(scrambleRequests));
 			} else if(ext.equals("pdf")) {
 				ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
 				ByteArrayOutputStream totalPdfOutput = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);

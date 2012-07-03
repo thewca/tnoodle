@@ -38,7 +38,7 @@ tnoodle.server = function(protocol, hostname, port) {
 	this.serverUrl = protocol + "//" + hostname + ":" + port;
 
 	/**** Scramble server stuff ***/
-	this.puzzlesUrl = this.serverUrl + "/puzzles/";
+	this.puzzlesUrl = this.serverUrl + "/puzzles/.json";
 	this.scrambleUrl = this.serverUrl + "/scramble/";
 	this.viewUrl = this.serverUrl + "/view/";
 	this.importUrl = this.serverUrl + "/import/";

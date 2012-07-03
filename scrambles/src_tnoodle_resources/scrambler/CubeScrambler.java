@@ -57,6 +57,16 @@ public class CubeScrambler extends Scrambler {
 			length = DEFAULT_LENGTHS[size];
 		}
 	}
+
+	public double getInitializationStatus() {
+		if(size != 4) {
+			return 1;
+		}
+		cg.fivestage444.Tools.InitializationState state = cg.fivestage444.Tools.getInitializationState();
+		cg.fivestage444.Tools.InitializationState maxState = cg.fivestage444.Tools.InitializationState.INITIALIZED;
+
+		return 1.0 * state.ordinal() / maxState.ordinal();
+	}
 	
 	@Override
 	public String getLongName() {

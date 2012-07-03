@@ -30,7 +30,7 @@ public class Plugins<H> {
 		azzert(contextFile.exists());
 	}
 	
-	public synchronized boolean dirtyPlugins() {
+	private boolean dirtyPlugins() {
 		azzert(contextFile.exists());
 		long mtime = contextFile.lastModified();
 		return mtime > loadedTime;
@@ -40,11 +40,11 @@ public class Plugins<H> {
 		return pluginDirectory;
 	}
 	
-	public synchronized void reloadPlugins() throws BadClassDescriptionException, IOException {
+	private void reloadPlugins() throws BadClassDescriptionException, IOException {
 		azzert(contextFile.exists());
 		BufferedReader in = new BufferedReader(new FileReader(contextFile));
-		filePlugins.clear();
-		pluginComment.clear();
+		HashMap<String, LazyInstantiator<H>> newFilePlugins = new HashMap<String, LazyInstantiator<H>>();
+		HashMap<String, String> newPluginComment = new HashMap<String, String>();
 		
 		String line;
 		String lastComment = null;
@@ -64,14 +64,16 @@ public class Plugins<H> {
 			String name = name_def[0];
 			String definition = name_def[1];
 			LazyInstantiator<H> lazyClass = new LazyInstantiator<H>(definition, pluginClass, Utils.getResourceDirectory());
-			// Note that we may be clobbering something already in filePlugins,
+			// Note that we may be clobbering something already in newFilePlugins,
 			// this is ok. Consider a project B that uses project A,
 			// this way, project B can clobber project A's settings.
-			filePlugins.put(name, lazyClass);
-			pluginComment.put(name, lastComment != null ? lastComment : name);
+			newFilePlugins.put(name, lazyClass);
+			newPluginComment.put(name, lastComment != null ? lastComment : name);
 			lastComment = null;
 		}
-		
+
+		filePlugins = newFilePlugins;
+		pluginComment = newPluginComment;
 		loadedTime = contextFile.lastModified();
 	}
 	
@@ -79,11 +81,20 @@ public class Plugins<H> {
 		return pluginComment.get(key);
 	}
 
-	public synchronized Map<String, LazyInstantiator<H>> getPlugins() throws BadClassDescriptionException, IOException {
+	public boolean reloadIfNeeded() throws BadClassDescriptionException, IOException {
 		if(dirtyPlugins()) {
-			reloadPlugins();
+			synchronized(this) {
+				if(dirtyPlugins()) {
+					reloadPlugins();
+					return true;
+				}
+			}
 		}
-		
+		return false;
+	}
+
+	public Map<String, LazyInstantiator<H>> getPlugins() throws BadClassDescriptionException, IOException {
+		reloadIfNeeded();
 		return Collections.unmodifiableMap(filePlugins);
 	}
 
