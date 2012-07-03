@@ -37,7 +37,7 @@ h1 {
   margin: 1em;
   font-family: Helvetica;
   border-radius: 1em;
-  background: #00c0c0;
+  background: #00C0C0;
   text-align: center;
 }
 
@@ -64,7 +64,7 @@ h1 {
 #top_interface span.beta {
   vertical-align: top;
   font-size: 30%;
-  color: #00c0c0;
+  color: #00C0C0;
   text-shadow: 0px 0px 5px #FFF, 0px 0px 10px #FFF, 0px 0px 15px #FFF, 0px 0px 20px #FFF;
 }
 
@@ -73,8 +73,13 @@ h1 {
 }
 
 #scrambleProgress {
-  font-size: 200%;
+  position: absolute;
+  bottom: 20px;
+  left: 10%;
+  width: 80%;
+}
 
+#initializationProgress {
   position: absolute;
   bottom: 20px;
   left: 10%;
@@ -215,7 +220,9 @@ h1 {
 This can go once https://code.google.com/p/chromium/issues/detail?id=132014
 is resolved.
 */
-#scrambleProgress {
+.progressBar {
+  font-size: 200%;
+
   border: 1px solid #;
   background: #DEE;
   overflow: hidden;

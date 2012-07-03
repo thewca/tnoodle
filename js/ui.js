@@ -480,16 +480,29 @@ mark2.ui = (function() {
 
 	// This is a workaround for a Chrome bug:
 	// https://code.google.com/p/chromium/issues/detail?id=132014
-	function newProgressBar() {
+	function newProgressBar(jobDescription) {
 		var div = document.createElement('div');
+		div.classList.add('progressBar');
 		div.style.border = '1px solid #00C0C0';
 		div.style.borderRadius = '15px';
+		div.style.textAlign = 'right';
 
 		// We must add some text so the height of this div is
 		// computed correctly, but we set it's opacity to 0 so
 		// it cannot be seen.
 		div.style.color = 'transparent';
 		div.appendChild(document.createTextNode('.'));
+
+		var jobDescriptionSpan = null;
+		if(jobDescription) {
+			jobDescriptionSpan = document.createElement('span');
+			jobDescriptionSpan.style.marginRight = '5px';
+			jobDescriptionSpan.style.color = 'black';
+			jobDescriptionSpan.style.position = 'relative';
+			jobDescriptionSpan.style.bottom = '5px';
+			div.appendChild(jobDescriptionSpan);
+			jobDescriptionSpan.appendChild(document.createTextNode(jobDescription));
+		}
 
 		div.style.background = '#DEE';
 		div.style.boxShadow = 'inset 0px 1px 2px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px 0px #FFF';
@@ -513,6 +526,10 @@ mark2.ui = (function() {
 			progress.appendChild(document.createTextNode(percent.toFixed(0) + "%"));
 
 			progress.style.right = (100 - percent) + "%";
+
+			// TODO - it would be pretty sexy to compute fontSize as a function
+			// of the available space.
+			jobDescriptionSpan.style.fontSize = '12px';
 		}
 
 		var value_ = 0;
@@ -552,7 +569,7 @@ mark2.ui = (function() {
 
 	var div;
 	var eventsTable, competitionNameInput, passwordInput, roundsTbody;
-	var scrambleButton, progress;
+	var scrambleButton, scrambleProgress, initializationProgress;
 	var callbacks;
 	var initialize = function(name, callbacks_) {
 		settings = mark2.settings;
@@ -625,10 +642,14 @@ mark2.ui = (function() {
 
 		// TODO - revert to progress bar once
 		// https://code.google.com/p/chromium/issues/detail?id=132014 is resolved.
-		//progress = document.createElement('progress');
-		progress = newProgressBar();
-		progress.id = 'scrambleProgress';
-		topInterface.appendChild(progress);
+		//scrambleProgress = document.createElement('progress');
+		scrambleProgress = newProgressBar("Generating scrambles");
+		scrambleProgress.id = 'scrambleProgress';
+		topInterface.appendChild(scrambleProgress);
+
+		initializationProgress = newProgressBar("Puzzles initializing");
+		initializationProgress.id = 'initializationProgress';
+		topInterface.appendChild(initializationProgress);
 
 		var eventsRoundsInterface = document.createElement('div');
 		div.appendChild(eventsRoundsInterface);
@@ -755,7 +776,6 @@ mark2.ui = (function() {
     // Converts 1, 2, ... to A, B, ..., Z, AA, AB, ..., ZZ, AAA, AAB, ...
     // A bit complicated right now, but should work fine.
 	function intToLetters(int) {
-
       var numDigits;
       var maxForDigits = 1;
       var numWithThisManyDigits = 1;
@@ -1150,6 +1170,16 @@ mark2.ui = (function() {
 		maybeEnableScrambleButton();
 	};
 
+	var initializationByPuzzle = {};
+	var puzzlesInitializing = function(initializationByPuzzle_) {
+		initializationByPuzzle = initializationByPuzzle_;
+		maybeEnableScrambleButton();
+		var initializationAndPuzzleCount = getInitializationAndPuzzleCount();
+		var initializationCount = initializationAndPuzzleCount[0];
+		var puzzleCount = initializationAndPuzzleCount[1];
+		return initializationCount >= puzzleCount;
+	};
+
 	function getRequiredScrambleCountByPuzzle() {
 		var requiredScrambleCountByPuzzle = {};
 		var sheets = getScrambleSheets();
@@ -1159,6 +1189,29 @@ mark2.ui = (function() {
 		}
 		return requiredScrambleCountByPuzzle;
 	}
+
+	function getGeneratedScrambleCountByPuzzle() {
+		var generatedScrambleCountByPuzzle = {};
+		var sheets = getScrambleSheets();
+		for(var i = 0; i < sheets.length; i++) {
+			var sheet = sheets[i];
+			generatedScrambleCountByPuzzle[sheet.puzzle] = (generatedScrambleCountByPuzzle[sheet.puzzle] || 0) + (generatedScrambleCountByGuid[sheet.guid] || 0);
+		}
+		return generatedScrambleCountByPuzzle;
+	}
+
+	function getMissingScrambleCountByPuzzle() {
+		var requiredScrambleCountByPuzzle = getRequiredScrambleCountByPuzzle();
+		var generatedScrambleCountByPuzzle = getGeneratedScrambleCountByPuzzle();
+
+		for(var puzzle in requiredScrambleCountByPuzzle) {
+			if(requiredScrambleCountByPuzzle.hasOwnProperty(puzzle)) {
+				requiredScrambleCountByPuzzle[puzzle] -= generatedScrambleCountByPuzzle[puzzle];
+			}
+		}
+		return requiredScrambleCountByPuzzle;
+	}
+
 	function getRequiredScrambleCount() {
 		var requiredCount = 0;
 		var sheets = getScrambleSheets();
@@ -1179,8 +1232,34 @@ mark2.ui = (function() {
 		}
 		return generatedCount;
 	}
+
+	function getInitializationAndPuzzleCount() {
+		var puzzleCount = 0;
+		var initializationCount = 0;
+	
+		var missingScrambleCountByPuzzle = getMissingScrambleCountByPuzzle();
+		for(var puzzle in missingScrambleCountByPuzzle) {
+			if(missingScrambleCountByPuzzle.hasOwnProperty(puzzle)) {
+				if(missingScrambleCountByPuzzle[puzzle] === 0 && (initializationByPuzzle[puzzle] || 0) === 0) {
+					// Note that if the server restarts, we may end up in a state where we have
+					// all the 4x4 scrambles we care about, but the 4x4 scrambler is not yet
+					// initialized. However, while we're waiting for two puzzles to initialize,
+					// we don't want to stop reporting one's status just because it's
+					// scrambles have been generated.
+					continue;
+				}
+				initializationCount += initializationByPuzzle[puzzle] || 0;
+				puzzleCount++;
+			}
+		}
+		return [ initializationCount, puzzleCount ];
+	}
 	
 	function maybeEnableScrambleButton() {
+		var initializationAndPuzzleCount = getInitializationAndPuzzleCount();
+		var initializationCount = initializationAndPuzzleCount[0];
+		var puzzleCount = initializationAndPuzzleCount[1];
+
 		var generatedCount = getGeneratedScrambleCount();
 		var requiredCount = getRequiredScrambleCount();
 
@@ -1190,16 +1269,27 @@ mark2.ui = (function() {
 		} else {
 			disableScrambleButton = generatedCount < requiredCount;
 		}
-		progress.value = generatedCount;
-		progress.max = requiredCount;
-		if(disableScrambleButton && requiredCount > 0) {
-			scrambleButton.style.visibility = 'hidden';
-			progress.style.display = '';
+		scrambleButton.disabled = disableScrambleButton;
+
+		initializationProgress.max = puzzleCount;
+		initializationProgress.value = initializationCount;
+		scrambleProgress.max = requiredCount;
+		scrambleProgress.value = generatedCount;
+
+		var initializing = initializationCount < puzzleCount;
+		var scrambling = ( generatedCount < requiredCount ) && requiredCount > 0;
+
+		initializationProgress.style.display = 'none';
+		scrambleProgress.style.display = 'none';
+		scrambleButton.style.visibility = 'hidden';
+		if(initializing) {
+			initializationProgress.style.display = '';
+		} else if(scrambling) {
+			scrambleProgress.style.display = '';
 		} else {
 			scrambleButton.style.visibility = '';
-			progress.style.display = 'none';
 		}
-		scrambleButton.disabled = disableScrambleButton;
+
 	}
 
 	/*
@@ -1213,7 +1303,8 @@ mark2.ui = (function() {
 		getScrambleSheets: getScrambleSheets,
 		getTitle: getCompetitionName,
 		getPassword: getPassword,
-		scramblesGenerated: scramblesGenerated
+		scramblesGenerated: scramblesGenerated,
+		puzzlesInitializing: puzzlesInitializing
 	};
 })();
 
