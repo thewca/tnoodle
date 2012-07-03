@@ -304,17 +304,18 @@ mark2.dom = (function() {
 	 * DOM Manipulation
 	 */
 
-	var appendElement = function(elementToAppendTo, type, className, id, content) {
+	var appendElement = function(elementToAppendTo, tag, attrs, content) {
 
-		var newElement = document.createElement(type);
-		if (className) {
-			newElement.setAttribute("class", className);
-		}
+		var newElement = document.createElement(tag);
 		if (content) {
 			newElement.innerHTML = content;
 		}
-		if (id) {
-			newElement.setAttribute("id", id);
+		if(attrs) {
+			for(var attr in attrs) {
+				if(attrs.hasOwnProperty(attr)) {
+					newElement.setAttribute(attr, attrs[attr]);
+				}
+			}
 		}
 		if (elementToAppendTo) {
 			elementToAppendTo.appendChild(newElement);
@@ -846,13 +847,17 @@ mark2.ui = (function() {
 				currentEventsTR = mark2.dom.appendElement(eventsTable, "tr");
 			}
 
-			var eventTD = mark2.dom.appendElement(currentEventsTR, "td", "event_amount_label", null, "" + eventID + ":");
+			var eventTD = mark2.dom.appendElement(currentEventsTR, "td", {}, "" + eventID + ":");
+			eventTD.classList.add("event_amount_label");
 
-			var val = mark2.dom.appendElement(currentEventsTR, "td", "event_amount_value_td", "");
-			var valInput = mark2.dom.appendElement(val, "input", "event_amount_value");
-			valInput.setAttribute("id", "event_amount_value_" + eventID);
-			valInput.setAttribute("type", "number");
-			valInput.setAttribute("min", "0");
+			var val = mark2.dom.appendElement(currentEventsTR, "td");
+			val.classList.add("event_amount_value_td");
+			var valInput = mark2.dom.appendElement(
+				val,
+				"input",
+				{ id: "event_amount_value_" + eventID, type: "number", min: 0 }
+			);
+			valInput.classList.add("event_amount_value");
 
 			var changeNumRoundsListener = function(eventID, el) {
 				changeNumRounds(eventID, parseInt(el.value));
@@ -955,30 +960,48 @@ mark2.ui = (function() {
 		}
 
 		var newEventTR_ID = mark2.dom.nextAutoID();
-		var newEventTR = mark2.dom.appendElement(roundsTbody, "tr", "event_tr_" + eventID, newEventTR_ID);
-			newEventTR.setAttribute("data-event-id", eventID);
+		var newEventTR = mark2.dom.appendElement(
+			roundsTbody,
+			"tr",
+			{ id: newEventTR_ID, "data-event-id": eventID }
+		);
+		newEventTR.classList.add("event_tr_" + eventID);
 
-		var nameTD = mark2.dom.appendElement(newEventTR, "td", "event_name", null, settings.events[eventID].name);
+		var nameTD = mark2.dom.appendElement(
+			newEventTR,
+			"td",
+			{},
+			settings.events[eventID].name);
+		nameTD.classList.add("event_name");
 		
 		var roundNameTD = mark2.dom.appendElement(newEventTR, "td");
-		var roundNameInput = mark2.dom.appendElement(roundNameTD, "input", "round_name");
-			roundNameInput.setAttribute("value", roundName);
+		var roundNameInput = mark2.dom.appendElement(
+			roundNameTD,
+			"input",
+			{ value: roundName }
+		);
+		roundNameInput.classList.add("round_name");
 
-		var numGroupsTD = mark2.dom.appendElement(newEventTR, "td", null);
-		var numGroupsInput = mark2.dom.appendElement(numGroupsTD, "input", "num_groups");
-			numGroupsInput.setAttribute("type", "number");
-			numGroupsInput.setAttribute("value", numGroups);
-			numGroupsInput.setAttribute("min", "1");
+		var numGroupsTD = mark2.dom.appendElement(newEventTR, "td");
+		var numGroupsInput = mark2.dom.appendElement(
+			numGroupsTD,
+			"input",
+			{ type: "number", value: numGroups, min: 1 }
+		);
+		numGroupsInput.classList.add("num_groups");
 
-		var numSolvesTD = mark2.dom.appendElement(newEventTR, "td", null);
-		var numSolvesInput = mark2.dom.appendElement(numSolvesTD, "input", "num_solves");
-			numSolvesInput.setAttribute("type", "number");
-			numSolvesInput.setAttribute("value", numSolves);
-			numSolvesInput.setAttribute("min", "1");
+		var numSolvesTD = mark2.dom.appendElement(newEventTR, "td");
+		var numSolvesInput = mark2.dom.appendElement(
+			numSolvesTD,
+			"input",
+			{ type: "number", value: numSolves, min: 1 }
+		);
+		numSolvesInput.classList.add("num_solves");
 
-		var removeTD = mark2.dom.appendElement(newEventTR, "td", "round_remove");
-		var removeButton = mark2.dom.appendElement(removeTD, "button", null, null, "&nbsp;&nbsp;X&nbsp;&nbsp;");
-			removeButton.addEventListener("click", removeRound.bind(null, eventID, newEventTR_ID), false);
+		var removeTD = mark2.dom.appendElement(newEventTR, "td");
+		removeTD.classList.add("round_remove");
+		var removeButton = mark2.dom.appendElement(removeTD, "button", {}, "X");
+		removeButton.addEventListener("click", removeRound.bind(null, eventID, newEventTR_ID), false);
 
 		roundNameInput.addEventListener("change", updateHash, false);
 		numSolvesInput.addEventListener("change", updateHash, false);

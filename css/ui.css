@@ -206,6 +206,7 @@ h1 {
 
 #events_rounds_interface #rounds_table td.round_remove button {
   height: 100%;
+  width: 3em;
 }
 
 #events_rounds_interface #rounds_table td input.num_groups {
