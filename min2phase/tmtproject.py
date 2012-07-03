@@ -24,4 +24,4 @@ class Project(tmt.EclipseProject):
 			print "Successfully generated %s!" % tablesPath
 	"""
 
-Project(tmt.projectName(), description="A copy of Chen Shuang's (https://github.com/ChenShuang) awesome 3x3 scrambler built on top of Herbert Kociemba's Java library.")
+Project(tmt.projectName(), description="Chen Shuang's (https://github.com/ChenShuang) awesome 3x3 scrambler built on top of Herbert Kociemba's Java library.")

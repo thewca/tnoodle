@@ -21,8 +21,10 @@ import static net.gnehzr.tnoodle.utils.Utils.azzert;
 //TODO - massive cleanup! so much vestigial code
 public class CubeScrambler extends Scrambler {
     private static final int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
+    private static final int THREE_BY_THREE_TIMEMIN = 0*1000; //milliseconds
+    private static final int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
+
     private static final int TWO_BY_TWO_MIN_SCRAMBLE_LENGTH = 11;
-    private static final int TIMEOUT = 5*1000; //milliseconds
     
 	private static final String FACES = "LDBRUFldbruf";
 	private static final int gap = 2;
@@ -172,7 +174,7 @@ public class CubeScrambler extends Scrambler {
 			int[] posit = twoSolver.mix(r);
 			return twoSolver.solve(posit, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
 		} else if(size == 3) {
-			return twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, TIMEOUT, false, true).trim();
+			return twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 		} else if(size == 4) {
 			String scramble = fivePhaseSearcher.get().solve(cg.fivestage444.Tools.randomCube(r), 50, true);
 			scramble = removeSliceTurns(scramble);

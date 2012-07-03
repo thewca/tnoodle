@@ -642,7 +642,7 @@ class ScrambleRequest {
 			if(i > 0) {
 				s.append("\n");
 			}
-			turns = line.split(" ");
+			turns = line.split("\\s+");
 			for(int j = 0; j < turns.length; j++) {
 				String turn = turns[j];
 				if(j > 0) {
