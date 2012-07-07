@@ -1,6 +1,6 @@
 [submodule "twisty.js/twisty.js"]
 	path = twisty.js/twisty.js
-	url = https://github.com/jfly/twisty.js
+	url = git@github.com:jfly/twisty.js.git
 [submodule "git-tools"]
 	path = git-tools
 	url = git@github.com:jfly/git-tools.git
