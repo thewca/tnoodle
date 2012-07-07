@@ -305,7 +305,6 @@ mark2.dom = (function() {
 	 */
 
 	var appendElement = function(elementToAppendTo, tag, attrs, content) {
-
 		var newElement = document.createElement(tag);
 		if (content) {
 			newElement.innerHTML = content;
@@ -951,7 +950,6 @@ mark2.ui = (function() {
 	 */
 
 	var addRound = function(eventID, roundNameOpt, numGroupsOpt, numSolvesOpt) {
-
 		var roundName = roundNameOpt;
 		if (roundNameOpt === undefined) {
 			roundName = "Round " + (numCurrentRounds(eventID)+1);
@@ -969,10 +967,22 @@ mark2.ui = (function() {
 
 		var newEventTR_ID = mark2.dom.nextAutoID();
 		var newEventTR = mark2.dom.appendElement(
-			roundsTbody,
+			null,
 			"tr",
 			{ id: newEventTR_ID, "data-event-id": eventID }
 		);
+		var rounds = getRounds(true);
+		var lastRoundOfEvent = null;
+		for(var i = 0; i < rounds.length; i++) {
+			var round = rounds[i];
+			if(round.eventID == eventID) {
+				lastRoundOfEvent = round.element;
+			}
+		}
+		if(lastRoundOfEvent) {
+			lastRoundOfEvent = lastRoundOfEvent.nextSibling;
+		}
+		roundsTbody.insertBefore(newEventTR, lastRoundOfEvent);
 		newEventTR.classList.add("event_tr_" + eventID);
 
 		var nameTD = mark2.dom.appendElement(
@@ -1157,7 +1167,7 @@ mark2.ui = (function() {
 
 		return urlPretty;
 	};
-    var getRounds = function() {
+    var getRounds = function(includeElement) {
 		var rounds = [];
 		var eventsTBody = roundsTbody.children;
 
@@ -1171,12 +1181,16 @@ mark2.ui = (function() {
 
 			var numGroups = parseInt(tr.getElementsByClassName("num_groups")[0].value);
 
-			rounds.push({
+			var round = {
 				eventID: eventID,
 				roundName: roundName,
 				groupCount: numGroups,
 				scrambleCount: numSolves
-			});
+			};
+			if(includeElement) {
+				round.element = tr;
+			}
+			rounds.push(round);
 		}
 
 		return rounds;
