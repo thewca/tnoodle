@@ -186,6 +186,10 @@ h1 {
   text-align: center;
 }
 
+#events_rounds_interface #rounds_table tbody tr {
+  cursor: move;
+}
+
 #events_rounds_interface #rounds_table tbody td:nth-child(even) {
   background: #DDD;
 }

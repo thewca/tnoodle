@@ -568,7 +568,7 @@ mark2.ui = (function() {
 	 */
 
 	var div;
-	var tableDnD = new TableDnD();
+	var sortables;
 	var roundsTable, eventsTable, competitionNameInput, passwordInput, roundsTbody;
 	var scrambleButton, scrambleProgress, initializationProgress;
 	var callbacks;
@@ -707,13 +707,18 @@ mark2.ui = (function() {
 
 		roundsTbody = document.createElement('tbody');
 		roundsTable.appendChild(roundsTbody);
-
-		tableDnD.onDrop = function(table, droppedRow) {
+		sortables = new Sortables(roundsTbody, {
+			//<<<clone: true,
+			opacity: 0.7,
+			//<<<revert: true
+		});
+		console.log(roundsTbody);//<<<
+		sortables.addEvent('complete', function(e) {
 			// A row has just been dropped somewhere, so we
 			// update our url hash.
 			updateHash();
-		};
-		
+		});
+
 		resetButton.addEventListener('click', function() {
 			location.hash = "";
 		}, false);
@@ -1025,7 +1030,7 @@ mark2.ui = (function() {
 		numSolvesInput.addEventListener("change", updateHash, false);
 		numGroupsInput.addEventListener("change", updateHash, false);
 
-		tableDnD.init(roundsTable);
+		sortables.addItems(newEventTR);
 	};
 
     var addRounds = function(rounds) {
