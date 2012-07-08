@@ -1,3 +1,4 @@
+// BLW-DUCPHAM
 // MooTools: the javascript framework.
 // Load this file's selection again by visiting: http://mootools.net/more/99f9dc2eb198e61569abc9839529ea00 
 // Or build this file again with packager using: packager build More/More More/Class.Occlude More/Chain.Wait More/Array.Extras More/Date More/Date.Extras More/Number.Format More/String.Extras More/String.QueryString More/URI More/URI.Relative More/Hash More/Hash.Extras More/OverText More/Drag More/Drag.Move More/Sortables More/Request.JSONP More/Color More/HtmlTable More/HtmlTable.Zebra More/HtmlTable.Sort More/HtmlTable.Select More/Tips More/Spinner
@@ -3389,6 +3390,23 @@ var Sortables = new Class({
 			});
 		}
 
+		var clonedTds = clone.getElementsByTagName('td');
+		var ogTds = element.getElementsByTagName('td');
+		for(var i = 0; i < ogTds.length; i++) {
+			var clonedTd = clonedTds[i];
+			var ogTd = ogTds[i];
+
+			var computedSize = ogTd.getComputedSize();
+			var padding = computedSize['padding-left'] + computedSize['padding-right'];
+			if(i==0) {
+				clonedTd.setStyle('width', ogTd.getSize().x - padding + 2);
+			} else {
+				clonedTd.setStyle('width', ogTd.getSize().x - padding);
+			}
+		};
+
+		// TODO - there's no guarantee that this element's parent is positioned
+		// relative or absolute... -jfly
 		return clone.inject(this.list).setPosition(element.getPosition(element.getOffsetParent()));
 	},
 
@@ -3438,7 +3456,9 @@ var Sortables = new Class({
 			onComplete: this.end.bind(this)
 		});
 
-		this.clone.inject(this.element, 'before');
+		// TODO - pushing around this extra pixel that ends up somewhere in the table -jfly
+		//this.clone.inject(this.element, 'before');
+		this.clone.inject(this.element.getParent(), 'bottom');
 		this.drag.start(event);
 	},
 
@@ -4443,7 +4463,7 @@ HtmlTable = Class.refactor(HtmlTable, {
 			this.body.dispose();
 		}
 
-		// TODO - need some way of providing a stable sort...
+		// TODO - need some way of providing a stable sort... -jfly
 		// it appears that multisort is broken? https://github.com/mootools/mootools-more/pull/1011
 		//var data = this.parseData(parser).sort(function(a, b){
 			//if (a.value === b.value) return 0;
@@ -4897,7 +4917,7 @@ provides: [Keyboard]
 		});
 	};
 
-	/*TODO push upstream?
+	/*TODO push upstream? -jfly
 	    var handler = function(event){
 		var keys = [];
 		modifiers.each(function(mod){
@@ -4919,7 +4939,7 @@ provides: [Keyboard]
 		} else if(event.type == 'keydown') {
 			keys[event.key] = true;
 		} else {
-			alert("fooo"); //TODO - proper error handling
+			alert("fooo"); //TODO - proper error handling -jfly
 		}
         if(event.key == 'esc') {
             keys.empty();
