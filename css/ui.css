@@ -161,17 +161,18 @@ h1 {
 
 #events_rounds_interface #rounds_table {
   border-collapse: collapse;
-  background: #CCC;
   box-shadow: 2px 2px 5px #888;
 
   clear: both;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 10px;
+  position: relative;
 }
 
 #events_rounds_interface #rounds_table tr {
   border: 1px solid #888;
+  background: #CCC;
 }
 
 #events_rounds_interface #rounds_table thead td {
