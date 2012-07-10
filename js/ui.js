@@ -708,7 +708,7 @@ mark2.ui = (function() {
 		roundsTbody = document.createElement('tbody');
 		roundsTable.appendChild(roundsTbody);
 
-		// TODO<<<
+		// TODO
 		//  - dragging doesn't work when cursor is outside of the table
 		//  	- do we actually want to support that?
 		//
@@ -1196,7 +1196,6 @@ mark2.ui = (function() {
 
 		for (var i = 0; i < eventsTBody.length; i++) {
 			var tr = eventsTBody[i];
-			console.log(tr.style.position);//<<<
 			if(tr.style.position == 'absolute') {
 				// This row is a clone of another row, and exists purely to make
 				// clicking and dragging look pretty.
@@ -1221,7 +1220,6 @@ mark2.ui = (function() {
 			}
 			rounds.push(round);
 		}
-		console.log(rounds);//<<<
 
 		return rounds;
     };
