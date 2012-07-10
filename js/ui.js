@@ -708,8 +708,7 @@ mark2.ui = (function() {
 		roundsTbody = document.createElement('tbody');
 		roundsTable.appendChild(roundsTbody);
 
-		// TODO
-		//  - extra pixel when clicking down
+		// TODO<<<
 		//  - dragging doesn't work when cursor is outside of the table
 		//  	- do we actually want to support that?
 		//
@@ -996,7 +995,6 @@ mark2.ui = (function() {
 			lastRoundOfEvent = lastRoundOfEvent.nextSibling;
 		}
 		roundsTbody.insertBefore(newEventTR, lastRoundOfEvent);
-		newEventTR.classList.add("event_tr_" + eventID);
 
 		var nameTD = mark2.dom.appendElement(
 			newEventTR,
@@ -1055,13 +1053,25 @@ mark2.ui = (function() {
 	};
 
 	var removeLastRound = function(eventID) {
-		var rounds = roundsTbody.getElementsByClassName("event_tr_" + eventID);
-		var lastRound = rounds[rounds.length - 1];
-		roundsTbody.removeChild(lastRound);
+		var rounds = getRounds(true);
+		var lastRoundOfEvent = null;
+		for(var i = 0; i < rounds.length; i++) {
+			if(rounds[i].eventID == eventID) {
+				lastRoundOfEvent = rounds[i];
+			}
+		}
+		roundsTbody.removeChild(lastRoundOfEvent.element);
 	};
 
 	var numCurrentRounds = function(eventID) {
-		return roundsTbody.getElementsByClassName("event_tr_" + eventID).length;
+		var rounds = getRounds();
+		var count = 0;
+		for(var i = 0; i < rounds.length; i++) {
+			if(rounds[i].eventID == eventID) {
+				count++;
+			}
+		}
+		return count;
 	};
 
 	var changeNumRounds = function(eventID, newNum) {
@@ -1186,6 +1196,7 @@ mark2.ui = (function() {
 
 		for (var i = 0; i < eventsTBody.length; i++) {
 			var tr = eventsTBody[i];
+			console.log(tr.style.position);//<<<
 			if(tr.style.position == 'absolute') {
 				// This row is a clone of another row, and exists purely to make
 				// clicking and dragging look pretty.
@@ -1210,6 +1221,7 @@ mark2.ui = (function() {
 			}
 			rounds.push(round);
 		}
+		console.log(rounds);//<<<
 
 		return rounds;
     };
