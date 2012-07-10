@@ -3456,6 +3456,9 @@ var Sortables = new Class({
 			onComplete: this.end.bind(this)
 		});
 
+		// TODO - adding an absolutely positioned element to a table screws up the border collapsing
+		this.element.setStyle('border-bottom', '0px');
+
 		// TODO - pushing around this extra pixel that ends up somewhere in the table -jfly
 		//this.clone.inject(this.element, 'before');
 		this.clone.inject(this.element.getParent(), 'bottom');
