@@ -71,9 +71,8 @@ def githubUpload(filePath):
 	foundDownload = None
 	downloads = githubListFiles()
 	if 'message' in downloads:
-		if downloads['message'] == 'Max number of login attempt exceeded':
-			print "Incorrect username/password"
-			return False
+		print downloads['message']
+		return False
 
 	for download in downloads:
 		if download['name'] == fileName:
