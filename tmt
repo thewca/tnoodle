@@ -739,6 +739,14 @@ class EclipseProject(TmtProject):
 				print stdout
 				return
 
+			pullCommand = 'git pull'
+			print pullCommand
+			assert 0 == os.system(pullCommand)
+
+			pullCommand = 'git push git@github.com:cubing/tnoodle.git'
+			print pullCommand
+			assert 0 == os.system(pullCommand)
+
 			# We do a compile here even though we're going to do dist later
 			# in order to catch compile errors before we make a tag.
 			tmt._make(projectName=self.name, command='compile')
@@ -771,6 +779,10 @@ class EclipseProject(TmtProject):
 				return
 
 			pushTagsCommand = 'git push --tags'
+			print pushTagsCommand
+			assert 0 == os.system(pushTagsCommand)
+
+			pushTagsCommand = 'git push --tags git@github.com:cubing/tnoodle.git'
 			print pushTagsCommand
 			assert 0 == os.system(pushTagsCommand)
 
