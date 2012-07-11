@@ -778,13 +778,18 @@ class EclipseProject(TmtProject):
 				print "Deleting tag %s" % tag
 				return
 
-			pushTagsCommand = 'git push --tags'
-			print pushTagsCommand
-			assert 0 == os.system(pushTagsCommand)
+            for pushTags in [ False, True ]:
+                # git push --tags seems to not do everything git push does
 
-			pushTagsCommand = 'git push --tags git@github.com:cubing/tnoodle.git'
-			print pushTagsCommand
-			assert 0 == os.system(pushTagsCommand)
+                pushCommand = 'git push'
+                if pushTags:
+                    pushCommand += ' --tags'
+                print pushCommand
+                assert 0 == os.system(pushCommand)
+
+                pushCommand += ' git@github.com:cubing/tnoodle.git'
+                print pushCommand
+                assert 0 == os.system(pushCommand)
 
 	def dist(self):
 		if not tmt.args.no_clean:
