@@ -776,6 +776,8 @@ class EclipseProject(TmtProject):
 			if not githubUpload.githubUpload(self.distJarFile()):
 				print "Failed to upload %s, see above for details" % self.distJarFile()
 				print "Deleting tag %s" % tag
+				deleteTagCommand = "git tag -d %s" % (tag)
+				assert 0 == os.system(deleteTagCommand)
 				return
 
 			for pushTags in [ False, True ]:
