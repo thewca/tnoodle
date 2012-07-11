@@ -743,7 +743,7 @@ class EclipseProject(TmtProject):
 			print pullCommand
 			assert 0 == os.system(pullCommand)
 
-			pullCommand = 'git push git@github.com:cubing/tnoodle.git'
+			pullCommand = 'git pull git@github.com:cubing/tnoodle.git'
 			print pullCommand
 			assert 0 == os.system(pullCommand)
 
