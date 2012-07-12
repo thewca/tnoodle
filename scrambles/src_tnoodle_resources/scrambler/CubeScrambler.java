@@ -21,7 +21,7 @@ import static net.gnehzr.tnoodle.utils.Utils.azzert;
 //TODO - massive cleanup! so much vestigial code
 public class CubeScrambler extends Scrambler {
     private static final int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
-    private static final int THREE_BY_THREE_TIMEMIN = 0*1000; //milliseconds
+    private static final int THREE_BY_THREE_TIMEMIN = 200; //milliseconds
     private static final int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
 
     private static final int TWO_BY_TWO_MIN_SCRAMBLE_LENGTH = 11;

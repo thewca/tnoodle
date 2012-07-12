@@ -739,6 +739,14 @@ class EclipseProject(TmtProject):
 				print stdout
 				return
 
+			pullCommand = 'git pull'
+			print pullCommand
+			assert 0 == os.system(pullCommand)
+
+			pullCommand = 'git pull git@github.com:cubing/tnoodle.git'
+			print pullCommand
+			assert 0 == os.system(pullCommand)
+
 			# We do a compile here even though we're going to do dist later
 			# in order to catch compile errors before we make a tag.
 			tmt._make(projectName=self.name, command='compile')
@@ -768,11 +776,22 @@ class EclipseProject(TmtProject):
 			if not githubUpload.githubUpload(self.distJarFile()):
 				print "Failed to upload %s, see above for details" % self.distJarFile()
 				print "Deleting tag %s" % tag
+				deleteTagCommand = "git tag -d %s" % (tag)
+				assert 0 == os.system(deleteTagCommand)
 				return
 
-			pushTagsCommand = 'git push --tags'
-			print pushTagsCommand
-			assert 0 == os.system(pushTagsCommand)
+			for pushTags in [ False, True ]:
+				# git push --tags seems to not do everything git push does
+
+				pushCommand = 'git push'
+				if pushTags:
+					pushCommand += ' --tags'
+				print pushCommand
+				assert 0 == os.system(pushCommand)
+
+				pushCommand += ' git@github.com:cubing/tnoodle.git'
+				print pushCommand
+				assert 0 == os.system(pushCommand)
 
 	def dist(self):
 		if not tmt.args.no_clean:

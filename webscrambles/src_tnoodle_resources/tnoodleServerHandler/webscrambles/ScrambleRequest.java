@@ -366,17 +366,23 @@ class ScrambleRequest {
 				int availableSolutionWidth = right - left;
 				int availableSolutionHeight = scrambleBorderTop - bottom;
 				int lineWidth = 25;
-				int lineHeight = 40;
-				int linesX = (availableSolutionWidth/lineWidth + 1)/2;
+				//int linesX = (availableSolutionWidth/lineWidth + 1)/2;
+				int linesX = 10;
+				int linesY = (int) Math.ceil(1.0*WCA_MAX_MOVES_FMC / linesX);
+
 				int allocatedX = (2*linesX-1)*lineWidth;
-				int offsetX = (availableSolutionWidth-allocatedX)/2;
-				int linesY = (availableSolutionHeight / lineHeight) - 1;
-				for(int y = 0; y < linesY; y++) {
+				int excessX = availableSolutionWidth-linesX*lineWidth;
+				int moveCount = 0;
+				solutionLines: for(int y = 0; y < linesY; y++) {
 					for(int x = 0; x < linesX; x++) {
-						int xPos = left + offsetX + 2*x*lineWidth;
-						int yPos = solutionBorderTop - (y+1)*lineHeight;
+						if(moveCount >= WCA_MAX_MOVES_FMC) {
+							break solutionLines;
+						}
+						int xPos = left + x*lineWidth + (x+1)*excessX/(linesX+1);
+						int yPos = solutionBorderTop - (y+1)*availableSolutionHeight/(linesY+1);
 						cb.moveTo(xPos, yPos);
 						cb.lineTo(xPos+lineWidth, yPos);
+						moveCount++;
 					}
 				}
 				
