@@ -520,7 +520,12 @@ mark2.ui = (function() {
 		progress.style.color = 'black';
 
 		function refresh() {
-			var percent = 100*(div.value / div.max);
+			var percent;
+			if(div.max != 0) {
+				percent = 100*(div.value / div.max);
+			} else {
+				percent = 0;
+			}
 
 			mark2.dom.emptyElement(progress);
 			progress.appendChild(document.createTextNode(percent.toFixed(0) + "%"));
