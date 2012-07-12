@@ -3335,6 +3335,7 @@ var Sortables = new Class({
 
 	addItems: function(){
 		Array.flatten(arguments).each(function(element){
+			element = $(element); // fix for ie8, because element does not have a retrieve() method --jfly
 			this.elements.push(element);
 			var start = element.retrieve('sortables:start', function(event){
 				this.start.call(this, event, element);
