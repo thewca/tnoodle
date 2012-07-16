@@ -176,7 +176,8 @@ public class CubeScrambler extends Scrambler {
 		} else if(size == 3) {
 			return twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 		} else if(size == 4) {
-			String scramble = fivePhaseSearcher.get().solve(cg.fivestage444.Tools.randomCube(r), 50, true);
+			int MAX_TURNS_444 = 47;
+			String scramble = fivePhaseSearcher.get().solve(cg.fivestage444.Tools.randomCube(r), MAX_TURNS_444, true);
 			scramble = removeSliceTurns(scramble);
 			return scramble;
 		} else {
