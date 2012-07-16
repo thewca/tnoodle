@@ -22,6 +22,7 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 public class ClockScrambler extends Scrambler {
 //	private boolean verbose = false;
+	private static final String[] turns={"UR","DR","DL","UL","U","R","D","L","A"};
 	private static final int radius = 70;
 	private static final int clockRadius = 14;
 	private static final int clockOuterRadius = 20;
@@ -49,25 +50,30 @@ public class ClockScrambler extends Scrambler {
 		StringBuffer scramble = new StringBuffer();
 		
 		String[] peg={"U","d"};
-		String[] pegs={"UUdd","dUdU","ddUU","UdUd"};
-		String[] upegs={"dUUU","UdUU","UUUd","UUdU"};
-		for(int x=0; x<4; x++) {
-			scramble.append( "(" + pegs[x] );
-			scramble.append("," + (r.nextInt(12)-5) + "," + (r.nextInt(12)-5) + ") ");
+		for(int x=0; x<9; x++) {
+			int turn = r.nextInt(12)-5;
+			boolean clockwise = ( turn >= 0 );
+			turn = Math.abs(turn);
+			scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
 		}
-		for(int x=0;x<4; x++) {
-			scramble.append( "(" + upegs[x]);
-			scramble.append("," + (r.nextInt(12)-5) + ",0) ");
+		scramble.append( "y2 ");
+		for(int x=4; x<9; x++) {
+			int turn = r.nextInt(12)-5;
+			boolean clockwise = ( turn >= 0 );
+			turn = Math.abs(turn);
+			scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
 		}
-		scramble.append("(UUUU," + (r.nextInt(12)-5) + ",0) ");
-		scramble.append("(dddd,0," + (r.nextInt(12)-5) + ") ");
-
-		scramble.append("(");
+	
+		scramble.append( "[" );
+		boolean isFirst = true;
 		for(int x=0;x<4;x++) {
-			scramble.append(peg[r.nextInt(2)]);
+			if (r.nextInt(2) == 1){
+				scramble.append((isFirst?"":",")+turns[x]);
+				isFirst = false;
+			}
 		}
-		scramble.append(")");
-		
+		scramble.append( "]" );
+	
 		return scramble.toString();
 	}
 
@@ -91,52 +97,38 @@ public class ClockScrambler extends Scrambler {
 		return new HashMap<String, Color>(defaultColorScheme);
 	}
 	private static final int[][] moves = { 
-		                 {1,0,1,0,0,0,1,0,1,  -1,-1,-1,-1,-1,-1,-1,-1,-1},// dddd-d
-		                 {1,0,1,0,0,0,0,0,1,  -1,-1,-1,-1,-1,-1,-1,-1, 0},// dddU-d
-		                 {1,0,1,0,0,0,1,0,0,  -1,-1,-1,-1,-1,-1, 0,-1,-1},// ddUd-d
-		                 {1,0,1,0,0,0,0,0,0,  -1,-1,-1,-1,-1,-1, 0, 0, 0},// ddUU-d
-		                 {0,0,1,0,0,0,1,0,1,  -1,-1, 0,-1,-1,-1,-1,-1,-1},// dUdd-d
-		                 {1,0,0,0,0,0,1,0,0,   0,-1,-1, 0,-1,-1, 0,-1,-1},// dUdU-d
-		                 {0,0,1,0,0,0,1,0,0,  -1,-1, 0,-1,-1,-1, 0,-1,-1},// dUUd-d
-		                 {0,0,1,0,0,0,0,0,0,  -1,-1, 0,-1,-1, 0, 0, 0, 0},// dUUU-d
-		                 {1,0,0,0,0,0,1,0,1,   0,-1,-1,-1,-1,-1,-1,-1,-1},// Uddd-d
-		                 {1,0,0,0,0,0,0,0,1,   0,-1,-1,-1,-1,-1,-1,-1, 0},// UddU-d
-		                 {0,0,1,0,0,0,0,0,1,  -1,-1, 0,-1,-1, 0,-1,-1, 0},// UdUd-d
-		                 {1,0,0,0,0,0,0,0,0,   0,-1,-1, 0,-1,-1, 0, 0, 0},// UdUU-d
-		                 {0,0,0,0,0,0,1,0,1,   0, 0, 0,-1,-1,-1,-1,-1,-1},// UUdd-d
-		                 {0,0,0,0,0,0,0,0,1,   0, 0, 0,-1,-1, 0,-1,-1, 0},// UUdU-d
-		                 {0,0,0,0,0,0,1,0,0,   0, 0, 0, 0,-1,-1, 0,-1,-1},// UUUd-d
-		                 {0,0,0,0,0,0,0,0,0,   0, 0, 0, 0, 0, 0, 0, 0, 0},// UUUU-d - not possible
+		                 {0,1,1,0,1,1,0,0,0,  -1, 0, 0, 0, 0, 0, 0, 0, 0},// UR
+		                 {0,0,0,0,1,1,0,1,1,   0, 0, 0, 0, 0, 0,-1, 0, 0},// DR
+		                 {0,0,0,1,1,0,1,1,0,   0, 0, 0, 0, 0, 0, 0, 0,-1},// DL
+		                 {1,1,0,1,1,0,0,0,0,   0, 0,-1, 0, 0, 0, 0, 0, 0},// UL
+		                 {1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0},// U
+		                 {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0},// R
+		                 {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},// D
+		                 {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},// L
+		                 {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// A
 
-		                 {0,0,0,0,0,0,0,0,0,   0, 0, 0, 0, 0, 0, 0, 0, 0},// dddd-U - not possible
-		                 {0,0,0,0,1,1,0,1,1,   0, 0, 0, 0, 0, 0,-1, 0, 0},// dddU-U
-		                 {0,0,0,1,1,0,1,1,0,   0, 0, 0, 0, 0, 0, 0, 0,-1},// ddUd-U
-		                 {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},// ddUU-U
-		                 {0,1,1,0,1,1,0,0,0,  -1, 0, 0, 0, 0, 0, 0, 0, 0},// dUdd-U
-		                 {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0},// dUdU-U
-		                 {0,1,1,1,1,1,1,1,0,  -1, 0, 0, 0, 0, 0, 0, 0,-1},// dUUd-U
-		                 {0,1,1,1,1,1,1,1,1,  -1, 0, 0, 0, 0, 0,-1, 0,-1},// dUUU-U
-		                 {1,1,0,1,1,0,0,0,0,   0, 0,-1, 0, 0, 0, 0, 0, 0},// Uddd-U
-		                 {1,1,0,1,1,1,0,1,1,   0, 0,-1, 0, 0, 0,-1, 0, 0},// UddU-U
-		                 {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},// UdUd-U
-		                 {1,1,0,1,1,1,1,1,1,   0, 0,-1, 0, 0, 0,-1, 0,-1},// UdUU-U
-		                 {1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0},// UUdd-U
-		                 {1,1,1,1,1,1,0,1,1,  -1, 0,-1, 0, 0, 0,-1, 0, 0},// UUdU-U
-		                 {1,1,1,1,1,1,1,1,0,  -1, 0,-1, 0, 0, 0, 0, 0,-1},// UUUd-U
-		                 {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// UUUU-U
+		                 {-1,0, 0, 0, 0, 0, 0, 0, 0,  0,1,1,0,1,1,0,0,0},// y2 UR
+		                 {0, 0, 0, 0, 0, 0,-1, 0, 0,  0,0,0,0,1,1,0,1,1},// y2 DR
+		                 {0, 0, 0, 0, 0, 0, 0, 0,-1,  0,0,0,1,1,0,1,1,0},// y2 DL
+		                 {0, 0,-1, 0, 0, 0, 0, 0, 0,  1,1,0,1,1,0,0,0,0},// y2 UL
+		                 {-1,0,-1, 0, 0, 0, 0, 0, 0,  1,1,1,1,1,1,0,0,0},// y2 U
+		                 {-1,0, 0, 0, 0, 0,-1, 0, 0,  0,1,1,0,1,1,0,1,1},// y2 R
+		                 {0, 0, 0, 0, 0, 0,-1, 0,-1,  0,0,0,1,1,1,1,1,1},// y2 D
+		                 {0, 0,-1, 0, 0, 0, 0, 0,-1,  1,1,0,1,1,0,1,1,0},// y2 L
+		                 {-1,0,-1, 0, 0, 0,-1, 0,-1,  1,1,1,1,1,1,1,1,1},// y2 A
 
 		                 };
 	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		int i,j;
-		int[] seq = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		int[] seq = {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
 		boolean[] pins = new boolean[4];
 		int[] posit = {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
 
 		parseScramble( scramble, seq, pins );
 
-		for( i=0; i<32; i++)
+		for( i=0; i<18; i++)
 			for( j=0; j<18; j++)
 				posit[j]+=seq[i]*moves[i][j];
 
@@ -159,32 +151,44 @@ public class ClockScrambler extends Scrambler {
 
 		int i;
 
-		Pattern p = Pattern.compile("\\(([Ud]{4}),(-?\\d),(-?\\d)?\\)");
+		StringBuffer sb = new StringBuffer();
+		sb.append(turns[0]);
+		for (i=1; i<turns.length; i++)
+			sb.append("|"+turns[i]);
+		sb.append("|y");
+
+		Pattern p = Pattern.compile("("+sb.toString()+")(\\d)(\\+|-)?");
 		Matcher m = p.matcher(scramble);
 
+		int side = 1;
+
 		while( m.find() ){
-			word = m.group(1);
-			word = word.replace('U', '1');
-			word = word.replace('d', '0');
-			move = Integer.parseInt(word, 2);
-			seq[move+16] = Integer.parseInt(m.group(2));
-			seq[move] = Integer.parseInt(m.group(3));
-			for( i=0; i<4; i++ )
-				pins[i] = ( word.charAt(i) == '1' );
+			if( m.group(1).equals("y") ){
+				side = 1 - side;
+				continue;
+			}
+			int pin;
+			for (pin = 0; pin < turns.length; pin++)
+				if(turns[pin].equals(m.group(1)))
+					break;
+			System.out.println(m.group(1)+" - "+pin);
+			int rot = Integer.parseInt(m.group(2));
+			rot = ( m.group(3).equals("+") ) ? rot : 12 - rot;
+			seq[pin+9*side] = rot;
+
+			/* TODO: set the intermediate pins position (pins array) */
 		}
 
-		p = Pattern.compile("\\(([Ud]{4})\\)");
-		m = p.matcher(scramble);
+		for (i=0; i<4; i++){
+			p = Pattern.compile("\\[(.*)"+turns[i]+"(.*)\\]");
+			m = p.matcher(scramble);
 
-		if( m.find() ){
-			String pinString = m.group(1);
-
-			for( i=0; i<4; i++ )
-				pins[i] = ( pinString.charAt(i) == 'U' );
+			if( m.find() ){
+				int i2r = (i==0?1:(i==1?3:(i==2?2:0)));
+				pins[i2r] = true;
+			}
 		}
 	}
-
-
 
 	protected void drawBackground( Graphics2D g, HashMap<String, Color> colorScheme ) {
 
