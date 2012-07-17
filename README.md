@@ -11,16 +11,17 @@ TPR-4x4x4-Solver
  - Average solution length: 44.60 moves(face turn metric).
  - Average solving time: 200 ms.
  - Memory: 80M with generated table.
- - Lengthth Distribution (Average 44.626 moves):
-	40	1
-	41	19
-	42	75
-	43	232
-	44	526
-	45	672
-	46	404
-	47	69
-	48	2
+ - Length Distribution (Average 44.626 moves):
+
+    40	1
+    41	19
+    42	75
+    43	232
+    44	526
+    45	672
+    46	404
+    47	69
+    48	2
 
 # Note:
  - At its first executing, about 50M's tables will be generated and written to disk. The generation spends several minutes, and it will speed up with multiple processors.
