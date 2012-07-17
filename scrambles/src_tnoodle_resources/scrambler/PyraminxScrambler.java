@@ -55,47 +55,47 @@ public class PyraminxScrambler extends Scrambler {
 		return image;
 	}
 
-	static int[] g = new int[720];
-	static int[] f = new int[2592];
-	static int[][] d = new int[720][];
-	static int[][] e = new int[2592][];
+	static int[] edgePermPrun = new int[720];
+	static int[] oriPrun = new int[2592];
+	static int[][] edgePermMove = new int[720][];
+	static int[][] oriMove = new int[2592][];
 
 	static {
-		int c, p, q, l, m;
+		int c, p, q, depth, m;
 		for (p = 0; p < 720; p++) {
-			g[p] = -1;
-			d[p] = new int[4];
+			edgePermPrun[p] = -1;
+			edgePermMove[p] = new int[4];
 			for (m = 0; m < 4; m++)
-				d[p][m] = w(p, m);
+				edgePermMove[p][m] = getEdgePermMove(p, m);
 		}
-		g[0] = 0;
-		for (l = 0; l <= 6; l++)
+		edgePermPrun[0] = 0;
+		for (depth = 0; depth <= 6; depth++)
 			for (p = 0; p < 720; p++)
-				if (g[p] == l)
+				if (edgePermPrun[p] == depth)
 					for (m = 0; m < 4; m++) {
 						q = p;
 						for (c = 0; c < 2; c++) {
-							q = d[q][m];
-							if (g[q] == -1)
-								g[q] = l + 1;
+							q = edgePermMove[q][m];
+							if (edgePermPrun[q] == -1)
+								edgePermPrun[q] = depth + 1;
 						}
 					}
 		for (p = 0; p < 2592; p++) {
-			f[p] = -1;
-			e[p] = new int[4];
+			oriPrun[p] = -1;
+			oriMove[p] = new int[4];
 			for (m = 0; m < 4; m++)
-				e[p][m] = x(p, m);
+				oriMove[p][m] = getOriMove(p, m);
 		}
-		f[0] = 0;
-		for (l = 0; l <= 5; l++)
+		oriPrun[0] = 0;
+		for (depth = 0; depth <= 5; depth++)
 			for (p = 0; p < 2592; p++)
-				if (f[p] == l)
+				if (oriPrun[p] == depth)
 					for (m = 0; m < 4; m++) {
 						q = p;
 						for (c = 0; c < 2; c++) {
-							q = e[q][m];
-							if (f[q] == -1)
-								f[q] = l + 1;
+							q = oriMove[q][m];
+							if (oriPrun[q] == -1)
+								oriPrun[q] = depth + 1;
 						}
 					}
 	}
@@ -146,7 +146,7 @@ public class PyraminxScrambler extends Scrambler {
 			t = t * 2 + i[m];
 		if (q != 0 || t != 0)
 			for (m = MIN_SCRAMBLE_LENGTH; m < 12; m++)
-				if (v(q, t, m, -1, turns))
+				if (idaSearch(q, t, m, -1, turns))
 					break;
 
 		Collections.reverse(turns);
@@ -162,12 +162,12 @@ public class PyraminxScrambler extends Scrambler {
 		return scramble.substring(1);
 	}
 
-	private boolean v(int q, int t, int l, int c, ArrayList<Integer> turns) {
+	private boolean idaSearch(int q, int t, int l, int c, ArrayList<Integer> turns) {
 		if (l == 0) {
 			if (q == 0 && t == 0)
 				return true;
 		} else {
-			if (g[q] > l || f[t] > l)
+			if (edgePermPrun[q] > l || oriPrun[t] > l)
 				return false;
 			int p, s, a, m;
 			for (m = 0; m < 4; m++)
@@ -175,9 +175,9 @@ public class PyraminxScrambler extends Scrambler {
 					p = q;
 					s = t;
 					for (a = 0; a < 2; a++) {
-						p = d[p][m];
-						s = e[s][m];
-						if (v(p, s, l - 1, m, turns)) {
+						p = edgePermMove[p][m];
+						s = oriMove[s][m];
+						if (idaSearch(p, s, l - 1, m, turns)) {
 							turns.add(m + 8 * a);
 							return true;
 						}
@@ -187,7 +187,7 @@ public class PyraminxScrambler extends Scrambler {
 		return false;
 	}
 
-	private static int w(int p, int m) {
+	private static int getEdgePermMove(int p, int m) {
 		int a, l, c, q = p;
 		int[] s = new int[7];
 		for (a = 1; a <= 6; a++) {
@@ -201,13 +201,13 @@ public class PyraminxScrambler extends Scrambler {
 			s[l] = 6 - a;
 		}
 		if (m == 0)
-			y(s, 0, 3, 1);
+			cycle3(s, 0, 3, 1);
 		if (m == 1)
-			y(s, 1, 5, 2);
+			cycle3(s, 1, 5, 2);
 		if (m == 2)
-			y(s, 0, 2, 4);
+			cycle3(s, 0, 2, 4);
 		if (m == 3)
-			y(s, 3, 4, 5);
+			cycle3(s, 3, 4, 5);
 		q = 0;
 		for (a = 0; a < 6; a++) {
 			l = 0;
@@ -222,7 +222,7 @@ public class PyraminxScrambler extends Scrambler {
 		return q;
 	}
 
-	private static int x(int p, int m) {
+	private static int getOriMove(int p, int m) {
 		int a, l, c, t = 0, q = p;
 		int[] s = new int[10];
 		for (a = 0; a <= 4; a++) {
@@ -241,7 +241,7 @@ public class PyraminxScrambler extends Scrambler {
 			s[6] = s[6] + 1;
 			if (s[6] == 3)
 				s[6] = 0;
-			y(s, 0, 3, 1);
+			cycle3(s, 0, 3, 1);
 			s[1] ^= 1;
 			s[3] ^= 1;
 		}
@@ -249,7 +249,7 @@ public class PyraminxScrambler extends Scrambler {
 			s[7]++;
 			if (s[7] == 3)
 				s[7] = 0;
-			y(s, 1, 5, 2);
+			cycle3(s, 1, 5, 2);
 			s[2] ^= 1;
 			s[5] ^= 1;
 		}
@@ -257,7 +257,7 @@ public class PyraminxScrambler extends Scrambler {
 			s[8]++;
 			if (s[8] == 3)
 				s[8] = 0;
-			y(s, 0, 2, 4);
+			cycle3(s, 0, 2, 4);
 			s[0] ^= 1;
 			s[2] ^= 1;
 		}
@@ -265,7 +265,7 @@ public class PyraminxScrambler extends Scrambler {
 			s[9]++;
 			if (s[9] == 3)
 				s[9] = 0;
-			y(s, 3, 4, 5);
+			cycle3(s, 3, 4, 5);
 			s[3] ^= 1;
 			s[4] ^= 1;
 		}
@@ -277,7 +277,7 @@ public class PyraminxScrambler extends Scrambler {
 		return q;
 	}
 	 
-	private static void y(int[] p, int a, int c, int t) {
+	private static void cycle3(int[] p, int a, int c, int t) {
 		int s = p[a];
 		p[a] = p[c];
 		p[c] = p[t];
