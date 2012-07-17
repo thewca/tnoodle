@@ -3,9 +3,9 @@ TPR-4x4x4-Solver
 
 4x4x4 Solver = Three-Phase-Reduction Solver + 3x3x3 Solver
 
-# Useage:
-   sh make.sh -> threephase.jar
-   java -jar threephase.jar N -> solving N random cube with 40 random moves' scramble.
+# Usage:
+ - sh make.sh -> threephase.jar
+ - java -jar threephase.jar N -> solving N random cube with 40 random moves' scramble.
 
 # Test (java -jar threephase.jar 100 / 2.2GHz):
  - Average solution length: 44.60 moves(ftm).
