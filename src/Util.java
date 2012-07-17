@@ -94,12 +94,6 @@ class Util {
 			return false;
 		}
 	}
-	
-	static int bitCount(int i) {
-		i = i - ((i >>> 1) & 0x55555555);
-		i = (i & 0x33333333) + ((i >>> 2) & 0x33333333);
-		return (i + (i >>> 8) + (i >>> 4)) & 0x0f;
-	}
 
 	public static void swap(int[] arr, int a, int b, int c, int d, int key) {
 		int temp;
@@ -128,7 +122,6 @@ class Util {
 			return;
 		}
 	}
-
 	
 	static void set8Perm(byte[] arr, int idx) {
 		int val = 0x76543210;
@@ -143,17 +136,4 @@ class Util {
 		}
 		arr[7] = (byte)val;
 	}
-
-	static void setNPerm(byte[] arr, int idx, int n) {
-		arr[n-1] = 0;
-		for (int i=n-2; i>=0; i--) {
-			arr[i] = (byte) (idx % (n-i));
-			idx /= (n-i);
-			for (int j=i+1; j<n; j++) {
-				if (arr[j] >= arr[i])
-					arr[j]++;
-			}
-		}
-	}
-
 }

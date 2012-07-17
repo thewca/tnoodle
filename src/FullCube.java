@@ -97,29 +97,10 @@ public final class FullCube implements Comparable {
 			ep[i] = i;
 			ct[i] = i / 4;
 		}
-//		move(0);
-//		CornerCube c = new CornerCube();
-//		c.doMove(0);
-//		System.out.println(Arrays.toString(to333Facelet(c)));
 	}
 
 	public FullCube(FullCube c) {
-		for (int i=0; i<24; i++) {
-			this.ep[i] = c.ep[i];
-			this.ct[i] = c.ct[i];
-		}
-		this.cparity = c.cparity;
-		this.eparity = c.eparity;
-		
-		this.add1 = c.add1;
-		this.length1 = c.length1;
-		this.length2 = c.length2;
-		this.length3 = c.length3;
-		for (int i=0; i<20; i++) {
-			this.moveseq1[i] = c.moveseq1[i];
-			this.moveseq2[i] = c.moveseq2[i];
-			this.moveseq3[i] = c.moveseq3[i];
-		}
+		set(c);
 	}
 	
 	public FullCube(long seed) {
@@ -253,8 +234,9 @@ Center Cubies:
 	 */
 	 
 	final static int[] map = {0, 3, 2, 5, 1, 4};
+	final static int[] Edge2Edge = {F2, L2, B2, R2, B8, L8, F8, R8, F4, B6, B4, F6, U8, U4, U2, U6, D8, D4, D2, D6, L6, L4, R6, R4};
 
-	int[] to333Facelet(CornerCube c) {
+	String to333Facelet(CornerCube c) {
 		int[] ret = new int[54];
 		ret[U5] = map[ct[0]];
 		ret[R5] = map[ct[16]];
@@ -262,54 +244,34 @@ Center Cubies:
 		ret[D5] = map[ct[4]];
 		ret[L5] = map[ct[20]];
 		ret[B5] = map[ct[12]];
-		ret[F2] = map[EdgeColor[ep[0] % 12][ep[0] / 12]];
-		ret[L2] = map[EdgeColor[ep[1] % 12][ep[1] / 12]];
-		ret[B2] = map[EdgeColor[ep[2] % 12][ep[2] / 12]];
-		ret[R2] = map[EdgeColor[ep[3] % 12][ep[3] / 12]];
-		ret[B8] = map[EdgeColor[ep[4] % 12][ep[4] / 12]];
-		ret[L8] = map[EdgeColor[ep[5] % 12][ep[5] / 12]];
-		ret[F8] = map[EdgeColor[ep[6] % 12][ep[6] / 12]];
-		ret[R8] = map[EdgeColor[ep[7] % 12][ep[7] / 12]];
-		ret[F4] = map[EdgeColor[ep[8] % 12][ep[8] / 12]];
-		ret[B6] = map[EdgeColor[ep[9] % 12][ep[9] / 12]];
-		ret[B4] = map[EdgeColor[ep[10] % 12][ep[10] / 12]];
-		ret[F6] = map[EdgeColor[ep[11] % 12][ep[11] / 12]];
-
-		ret[U8] = map[EdgeColor[ep[0] % 12][1 - ep[0] / 12]];
-		ret[U4] = map[EdgeColor[ep[1] % 12][1 - ep[1] / 12]];
-		ret[U2] = map[EdgeColor[ep[2] % 12][1 - ep[2] / 12]];
-		ret[U6] = map[EdgeColor[ep[3] % 12][1 - ep[3] / 12]];
-		ret[D8] = map[EdgeColor[ep[4] % 12][1 - ep[4] / 12]];
-		ret[D4] = map[EdgeColor[ep[5] % 12][1 - ep[5] / 12]];
-		ret[D2] = map[EdgeColor[ep[6] % 12][1 - ep[6] / 12]];
-		ret[D6] = map[EdgeColor[ep[7] % 12][1 - ep[7] / 12]];
-		ret[L6] = map[EdgeColor[ep[8] % 12][1 - ep[8] / 12]];
-		ret[L4] = map[EdgeColor[ep[9] % 12][1 - ep[9] / 12]];
-		ret[R6] = map[EdgeColor[ep[10] % 12][1 - ep[10] / 12]];
-		ret[R4] = map[EdgeColor[ep[11] % 12][1 - ep[11] / 12]];
-		int[] ret2 = toFaceCube(c);
-//		System.out.println(Arrays.toString(ret2));
-		for (int i=0; i<54; i++) {
-			ret[i] += ret2[i];
+		for (int i=0; i<24; i++) {
+			ret[Edge2Edge[i]] = map[EdgeColor[ep[i] % 12][ep[i] / 12]];
 		}
-		return ret;
+
+		for (int corn=0; corn<8; corn++) {
+			byte j = c.cp[corn];
+			byte ori = c.co[corn];
+			for (int n=0; n<3; n++) {
+				ret[cornerFacelet[corn][(n + ori) % 3]] = cornerFacelet[j][n]/9;
+			}
+		}
+
+		char[] facemap = new char[6];
+		facemap[ret[4]] = 'U';
+		facemap[ret[13]] = 'R';
+		facemap[ret[22]] = 'F';
+		facemap[ret[31]] = 'D';
+		facemap[ret[40]] = 'L';
+		facemap[ret[49]] = 'B';
+		StringBuffer sb = new StringBuffer();
+		for (int i=0; i<54; i++) {
+			sb.append(facemap[ret[i]]);
+		}
+		return sb.toString();
 	}
 
 	static final byte[][] cornerFacelet = { { U9, R1, F3 }, { U7, F1, L3 }, { U1, L1, B3 }, { U3, B1, R3 },
 			{ D3, F9, R7 }, { D1, L9, F7 }, { D7, B9, L7 }, { D9, R9, B7 } };
-
-	static int[] toFaceCube(CornerCube cc) {
-		int[] f = new int[54];
-//		char[] ts = {'U', 'R', 'F', 'D', 'L', 'B'};
-		for (byte c=0; c<8; c++) {
-			byte j = cc.cp[c];// cornercubie with index j is at
-			// cornerposition with index c
-			byte ori = cc.co[c];// Orientation of this cubie
-			for (byte n=0; n<3; n++)
-				f[cornerFacelet[c][(n + ori) % 3]] = cornerFacelet[j][n]/9;
-		}
-		return f;
-	}
 	
 	void move(int m) {
 		cparity ^= cpmv[m];
@@ -396,6 +358,5 @@ Center Cubies:
 				swap(ep, 7, 15, 1, 17, key);
 				break;		
 		}
-	}	
-	
+	}
 }
