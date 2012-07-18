@@ -61,39 +61,38 @@ public class PyraminxScrambler extends Scrambler {
 	static int[][] oriMove = new int[2592][];
 
 	static {
-		int c, p, q, depth, m;
-		for (p = 0; p < 720; p++) {
-			edgePermPrun[p] = -1;
-			edgePermMove[p] = new int[4];
-			for (m = 0; m < 4; m++)
-				edgePermMove[p][m] = getEdgePermMove(p, m);
+		for (int idx = 0; idx < 720; idx++) {
+			edgePermPrun[idx] = -1;
+			edgePermMove[idx] = new int[4];
+			for (int axis = 0; axis < 4; axis++)
+				edgePermMove[idx][axis] = getEdgePermMove(idx, axis);
 		}
 		edgePermPrun[0] = 0;
-		for (depth = 0; depth <= 6; depth++)
-			for (p = 0; p < 720; p++)
-				if (edgePermPrun[p] == depth)
-					for (m = 0; m < 4; m++) {
-						q = p;
-						for (c = 0; c < 2; c++) {
-							q = edgePermMove[q][m];
+		for (int depth = 0; depth <= 6; depth++)
+			for (int idx = 0; idx < 720; idx++)
+				if (edgePermPrun[idx] == depth)
+					for (int axis = 0; axis < 4; axis++) {
+						int q = idx;
+						for (int power = 0; power < 2; power++) {
+							q = edgePermMove[q][axis];
 							if (edgePermPrun[q] == -1)
 								edgePermPrun[q] = depth + 1;
 						}
 					}
-		for (p = 0; p < 2592; p++) {
-			oriPrun[p] = -1;
-			oriMove[p] = new int[4];
-			for (m = 0; m < 4; m++)
-				oriMove[p][m] = getOriMove(p, m);
+		for (int idx = 0; idx < 2592; idx++) {
+			oriPrun[idx] = -1;
+			oriMove[idx] = new int[4];
+			for (int axis = 0; axis < 4; axis++)
+				oriMove[idx][axis] = getOriMove(idx, axis);
 		}
 		oriPrun[0] = 0;
-		for (depth = 0; depth <= 5; depth++)
-			for (p = 0; p < 2592; p++)
-				if (oriPrun[p] == depth)
-					for (m = 0; m < 4; m++) {
-						q = p;
-						for (c = 0; c < 2; c++) {
-							q = oriMove[q][m];
+		for (int depth = 0; depth <= 5; depth++)
+			for (int idx = 0; idx < 2592; idx++)
+				if (oriPrun[idx] == depth)
+					for (int axis = 0; axis < 4; axis++) {
+						int q = idx;
+						for (int power = 0; power < 2; power++) {
+							q = oriMove[q][axis];
 							if (oriPrun[q] == -1)
 								oriPrun[q] = depth + 1;
 						}
@@ -162,23 +161,22 @@ public class PyraminxScrambler extends Scrambler {
 		return scramble.substring(1);
 	}
 
-	private boolean idaSearch(int q, int t, int l, int c, ArrayList<Integer> turns) {
-		if (l == 0) {
-			if (q == 0 && t == 0)
+	private boolean idaSearch(int edge, int ori, int maxl, int lastAxis, ArrayList<Integer> turns) {
+		if (maxl == 0) {
+			if (edge == 0 && ori == 0)
 				return true;
 		} else {
-			if (edgePermPrun[q] > l || oriPrun[t] > l)
+			if (edgePermPrun[edge] > maxl || oriPrun[ori] > maxl)
 				return false;
-			int p, s, a, m;
-			for (m = 0; m < 4; m++)
-				if (m != c) {
-					p = q;
-					s = t;
-					for (a = 0; a < 2; a++) {
-						p = edgePermMove[p][m];
-						s = oriMove[s][m];
-						if (idaSearch(p, s, l - 1, m, turns)) {
-							turns.add(m + 8 * a);
+			for (int axis = 0; axis < 4; axis++)
+				if (axis != lastAxis) {
+					int edgex = edge;
+					int orix = ori;
+					for (int power = 0; power < 2; power++) {
+						edgex = edgePermMove[edgex][axis];
+						orix = oriMove[orix][axis];
+						if (idaSearch(edgex, orix, maxl - 1, axis, turns)) {
+							turns.add(axis + 8 * power);
 							return true;
 						}
 					}
