@@ -123,7 +123,7 @@ final class Center1 {
 		}
 	}
 	
-	Center1(FullCube c, int urf) {
+	Center1(CenterCube c, int urf) {
 		for (int i=0; i<24; i++) {
 			this.ct[i] = (c.ct[i]/2 == urf) ? 1 : 0;
 		}

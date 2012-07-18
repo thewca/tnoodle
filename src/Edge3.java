@@ -240,7 +240,7 @@ final class Edge3 implements Runnable {
 		return depth;
 	}
 
-	int set(FullCube c) {
+	int set(EdgeCube c) {
 		if (temp == null) {
 			temp = new int[12];
 		}

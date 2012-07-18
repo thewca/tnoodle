@@ -97,7 +97,7 @@ class Center2 {
 	
 	}
 	
-	Center2(FullCube c) {
+	Center2(CenterCube c) {
 		this();
 		for (int i=0; i<16; i++) {
 			ct[i] = c.ct[i] / 2;
@@ -107,14 +107,14 @@ class Center2 {
 		}
 	}
 	
-	void set(FullCube c) {
+	void set(CenterCube c, int edgeParity) {
 		for (int i=0; i<16; i++) {
 			ct[i] = c.ct[i] / 2;
 		}
 		for (int i=0; i<8; i++) {
 			rl[i] = c.ct[i+16];
 		}
-		parity = c.eparity;
+		parity = edgeParity;
 	}
 
 	int getrl() {

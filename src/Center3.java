@@ -64,14 +64,14 @@ final class Center3 {
 		}
 	}
 	
-	void set(FullCube c, int edgeparity) {
+	void set(CenterCube c, int eXc_parity) {
 		int parity = (c.ct[0]>c.ct[8] ^ c.ct[8]>c.ct[16] ^ c.ct[0]>c.ct[16]) ? 1 : 0;
 		for (int i=0; i<8; i++) {
 			ud[i] = (c.ct[i] & 1) ^ 1;
 			fb[i] = (c.ct[i+8] & 1) ^ 1;
 			rl[i] = (c.ct[i+16] & 1) ^ 1 ^ parity;
 		}
-		this.parity = parity ^ edgeparity ^ c.cparity;
+		this.parity = parity ^ eXc_parity;
 	}
 	
 	int getct() {

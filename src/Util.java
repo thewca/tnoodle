@@ -6,7 +6,8 @@ class Util {
 
 	static int[][] Cnk = new int[25][25];
 	static int[] fact = new int[13];
-	
+	static char[] colorMap4to3 = {'U', 'D', 'F', 'B', 'R', 'L'};
+
 	static {
 		for (int i=0; i<25; i++) {
 			Cnk[i][i] = 1;
@@ -123,17 +124,29 @@ class Util {
 		}
 	}
 	
-	static void set8Perm(byte[] arr, int idx) {
+	static void set8Perm(int[] arr, int idx) {
 		int val = 0x76543210;
 		for (int i=0; i<7; i++) {
 			int p = fact[7-i];
 			int v = idx / p;
 			idx -= v*p;
 			v <<= 2;
-			arr[i] = (byte) ((val >> v) & 07);
+			arr[i] = (val >> v) & 0xf;
 			int m = (1 << v) - 1;
 			val = (val & m) + ((val >> 4) & ~m);
 		}
-		arr[7] = (byte)val;
+		arr[7] = val;
+	}
+	
+	static int parity(int[] arr) {
+		int parity = 0;
+		for (int i=0, len=arr.length; i<len; i++) {
+			for (int j=i; j<len; j++) {
+				if (arr[i] > arr[j]) {
+					parity ^= 1;
+				}
+			}
+		}
+		return parity;
 	}
 }

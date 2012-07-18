@@ -1,19 +1,3 @@
-/**
-	Copyright (C) 2012  Shuang Chen
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package cs.threephase;
 
 import static cs.threephase.Moves.*;
@@ -28,6 +12,7 @@ import static cs.threephase.Center1.csprun;
 import static cs.threephase.Center1.symmove;
 
 import java.util.*;
+import java.io.*;
 
 public final class Search implements Runnable {
 	final static int PHASE1_SOLUTIONS = 10000;
@@ -131,36 +116,64 @@ public final class Search implements Runnable {
 			inf = Integer.parseInt(args[0]);
 		}
 		Search first = new Search();
+		int[] dis = new int[60];
+		int lasttot = 0;
 		for (int i=inf; i!=0; --i) {
-//			first.randomMove();
-			System.out.println(first.randomMove());
+			first.randomMove();
+//			System.out.println(first.randomMove());
+			int curlen = first.totlen - lasttot;
+			lasttot = first.totlen;
+			dis[curlen]++;
+			for (int j=0; j<60; j++) {
+				if (dis[j] != 0) {
+					System.out.println(String.format("%d\t%d\t%d", (inf-i+1), j, dis[j]));
+				}
+			}
 			System.out.println(String.format("%5.2f\t%f", first.totlen / 1.0 / (inf-i+1), first.tottime / (inf-i+1) / 1000000.0));
 		}
 	}
 	
 	static {
 		System.out.println("Initialization...");
+		DataInputStream dis = null;
+		try {
+			dis = new DataInputStream(new BufferedInputStream(new FileInputStream("twophase.data")));
+			cs.min2phase.Tools.initFrom(dis);
+		} catch (IOException e) {
+			dis = null;
+//			e.printStackTrace();
+		}
+		cs.min2phase.Tools.init();
+		if (dis == null) {
+			DataOutputStream dos = null;
+			try {
+				dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("twophase.data")));
+				cs.min2phase.Tools.saveTo(dos);
+				dos.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		Center1.init();
 		Center2.init();
 		Center3.init();
 		Edge3.init();
-		cs.min2phase.Tools.init();
 		System.out.println("OK");	
 	}
 	
-	static Random r = new Random(42);
+	static Random r = new Random();
 	
 	public String randomMove() {
-		int[] moveseq = new int[40];
+		int[] moveseq = new int[100];
 		int lm = 36;
-		for (int i=0; i<40;) {
+		for (int i=0; i<moveseq.length;) {
 			int m = r.nextInt(27);
 			if (!ckmv[lm][m]) {
 				moveseq[i++] = m;
 				lm = m;
 			}
 		}
-		System.out.println(tostr(moveseq));
+//		System.out.println(tostr(moveseq));
 		return solve(moveseq);
 	}
 	
@@ -174,15 +187,15 @@ public final class Search implements Runnable {
 		return solution;	
 	}
 	
-	public String getScramble() {
-		calc(System.currentTimeMillis());
-		return solution;
-	}
+//	public String getScramble() {
+//		calc(System.currentTimeMillis());
+//		return solution;
+//	}
 	
-	public void calc(long seed) {
-	    c = new FullCube(seed);
-	    run();
-	}
+//	public void calc(long seed) {
+//	    c = new FullCube(seed);
+//	    run();
+//	}
 	
 	public void calc(int[] moveseq) {
 		c = new FullCube(moveseq);
@@ -198,9 +211,9 @@ public final class Search implements Runnable {
 	
 	public void run() {
 		solution = "";
-		int ud = new Center1(c, 0).getsym();
-		int fb = new Center1(c, 1).getsym();
-		int rl = new Center1(c, 2).getsym();
+		int ud = new Center1(c.center, 0).getsym();
+		int fb = new Center1(c.center, 1).getsym();
+		int rl = new Center1(c.center, 2).getsym();
 
 		arridx = 0;
 		arr2idx = 0;
@@ -226,16 +239,18 @@ public final class Search implements Runnable {
 				if (arr[i].value > length12) {
 					break;
 				}
-				if (length12 - arr[i].length1 >= 9) {
+				if (length12 - arr[i].length1 > 9) {
 					continue;
 				}
-				c1.set(arr[i]);
-				ct2.set(c1);
+				c1.copy(arr[i]);
+				ct2.set(c1.center, c1.eparity);
 				int s2ct = ct2.getct();
 				int s2rl = ct2.getrl();
 				length1 = arr[i].length1;
 				length2 = length12 - arr[i].length1;
-				if (search2(s2ct, s2rl, length2, 28, 0)) {
+				
+				int lm = 28;//std2move[arr[i].moveseq1[arr[i].length1-1]/3*3+1];
+				if (search2(s2ct, s2rl, length2, lm, 0)) {
 					break OUT;
 				}
 			}
@@ -244,36 +259,44 @@ public final class Search implements Runnable {
 		Arrays.sort(arr2, 0, arr2idx);
 		int length123, index = 0;
 		int solcnt = 0;
-//		System.out.println(arr2idx);
 
 //		System.out.println(System.nanoTime() - time);
 
-		OUT2:
-		for (length123=arr2[0].value; length123<100; length123++) {
-//			System.out.println(length123);
-			for (int i=0; i<Math.min(arr2idx, PHASE3_ATTEMPS); i++) {
-				if (arr2[i].value > length123) {
-					break;
-				}
-				if (length123 - arr2[i].length1 - arr2[i].length2 > 13) {
-					continue;
-				}
-				int eparity = e12.set(arr2[i]);
-				ct3.set(arr2[i], eparity);
-				int ct = ct3.getct();
-				int edge = e12.get();
-				int prun = e12.getprun(edge);
-				if (prun <= length123 - arr2[i].length1 - arr2[i].length2 
-						&& search3(edge, ct, prun, length123 - arr2[i].length1 - arr2[i].length2, 20, 0)) {
-					solcnt++;
-//					System.out.println(length123 + " " + solcnt);
-//					if (solcnt == 5) {
-						index = i;
-						break OUT2;
-//					}
+
+		int MAX_LENGTH3 = 13;
+		do {
+			OUT2:
+			for (length123=arr2[0].value; length123<100; length123++) {
+	//			System.out.println(length123);
+				for (int i=0; i<Math.min(arr2idx, PHASE3_ATTEMPS); i++) {
+					if (arr2[i].value > length123) {
+						break;
+					}
+					if (length123 - arr2[i].length1 - arr2[i].length2 > MAX_LENGTH3) {
+						continue;
+					}
+					int eparity = e12.set(arr2[i].edge);
+					ct3.set(arr2[i].center, eparity ^ arr2[i].cparity);
+					int ct = ct3.getct();
+					int edge = e12.get();
+					int prun = e12.getprun(edge);
+	//				System.out.println(move2str[arr2[i].moveseq2[arr2[i].length2 - 1]]);
+				
+					int lm = 20;//std3move[arr2[i].moveseq2[arr2[i].length2-1]/3*3+1];
+				
+					if (prun <= length123 - arr2[i].length1 - arr2[i].length2 
+							&& search3(edge, ct, prun, length123 - arr2[i].length1 - arr2[i].length2, lm, 0)) {
+						solcnt++;
+	//					System.out.println(length123 + " " + solcnt);
+	//					if (solcnt == 5) {
+							index = i;
+							break OUT2;
+	//					}
+					}
 				}
 			}
-		}
+			MAX_LENGTH3++;
+		} while (length123 == 100);
 //		System.out.println(length123);
 		
 //		System.out.println(System.nanoTime() - time);
@@ -327,7 +350,7 @@ public final class Search implements Runnable {
 //		System.out.println(length1 + length2 + length);
 
 		String facelet = cube4.to333Facelet(cube3);
-		String sol = search333.solution(facelet, 20, 100, 30, 0);
+		String sol = search333.solution(facelet, 20, 100, 50, 0);
 		if (sol.startsWith("Error 8")) {
 			sol = search333.solution(facelet, 21, 1000000, 30, 0);
 		}
@@ -337,7 +360,7 @@ public final class Search implements Runnable {
 			System.out.println(sol);
 			throw new RuntimeException();
 		}
-		System.out.println(System.nanoTime() - time);
+//		System.out.println(System.nanoTime() - time);
 
 		str.append("3x3x3  : ");
 		str.append(sol.replaceAll(" +", " "));
@@ -383,7 +406,7 @@ public final class Search implements Runnable {
 	}
 	
 	final boolean init2(int sym, int lm) {
-		c1.set(c);
+		c1.copy(c);
 		for (int i=0; i<length1; i++) {
 			c1.move(move1[i]);
 		}
@@ -408,7 +431,7 @@ public final class Search implements Runnable {
 		case 735470 : 
 			add1 = false;
 		}
-		ct2.set(c1);
+		ct2.set(c1.center, c1.eparity);
 		int s2ct = ct2.getct();
 		int s2rl = ct2.getrl();
 		int ctp = ctprun[s2ct*70+s2rl];
@@ -416,7 +439,7 @@ public final class Search implements Runnable {
 		if (arr[arridx] == null) {
 			arr[arridx] = new FullCube(c1);
 		} else {
-			arr[arridx].set(c1);
+			arr[arridx].copy(c1);
 		}
 		arr[arridx].value = ctp + length1;
 		arr[arridx].length1 = length1;
@@ -461,7 +484,7 @@ public final class Search implements Runnable {
 	}	
 
 	final boolean init3() {
-		c2.set(c1);
+		c2.copy(c1);
 		for (int i=0; i<length2; i++) {
 			c2.move(move2[i]);
 		}
@@ -469,15 +492,15 @@ public final class Search implements Runnable {
 			return false;
 		}
 //		System.out.println(c2.checkEdge() + " " + length2);
-		int eparity = e12.set(c2);
-		ct3.set(c2, eparity);
+		int eparity = e12.set(c2.edge);
+		ct3.set(c2.center, eparity ^ c2.cparity);
 		int ct = ct3.getct();
 		int edge = e12.get();
 		int prun = e12.getprun(edge);
 		if (arr2[arr2idx] == null) {
 			arr2[arr2idx] = new FullCube(c2);
 		} else {
-			arr2[arr2idx].set(c2);
+			arr2[arr2idx].copy(c2);
 		}
 		arr2[arr2idx].value = length1 + length2 + Math.max(prun, Center3.prun[ct]);
 		arr2[arr2idx].length2 = length2;
