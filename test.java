@@ -159,9 +159,10 @@ public class test {
 				totalTime += curTime;
 				maxT = Math.max(maxT, curTime);
 				minT = Math.min(minT, curTime);
-				
+//				System.out.println(s);
+				x++;
 				System.out.print(String.format("AvgTime: %8.3f ms, MaxTime: %8.3f ms, MinTime: %8.3f ms\r", 
-					(totalTime/1000000d)/++x, maxT/1000000d, minT/1000000d));
+					(totalTime/1000000d)/x, maxT/1000000d, minT/1000000d));
 			}
 			System.out.println();
 			System.out.println(x + " Random Cube(s) Solved");
