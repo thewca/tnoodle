@@ -1,98 +1,3 @@
-package cs.threephase;
-
-import java.util.*;
-import static cs.threephase.Moves.*;
-import static cs.threephase.Util.*;
-
-public class FullCube implements Comparable {
-//TODO: split to CenterCube, EdgeCube, CornerCube.
-
-//	int[] ep = new int[24];
-//	int[] ct = new int[24];
-	int cparity = 0;
-	int eparity = 0;
-	
-	EdgeCube edge;
-	CenterCube center;
-	
-	int value = 0;
-	boolean add1 = false;
-	int length1 = 0;
-	int length2 = 0;
-	int length3 = 0;
-	
-	int[] moveseq1 = new int[20];
-	int[] moveseq2 = new int[20];
-	int[] moveseq3 = new int[20];
-	
-
-
-	@Override
-	public int compareTo(Object c) {
-		if (c instanceof FullCube) {
-			return this.value - ((FullCube)c).value;
-		} else {
-			return 0;
-		}
-	}
-	
-	private static final int[] cpmv = {1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 
-										1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1};
-	private static final int[] epmv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-										1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1};
-	
-	public FullCube() {
-		edge = new EdgeCube();
-		center = new CenterCube();
-	}
-
-	public FullCube(FullCube c) {
-		this();
-		copy(c);
-	}
-	
-	public FullCube(long seed) {
-		Random r = new Random(seed);
-		edge = new EdgeCube(r);
-		center = new CenterCube(r);
-		eparity = edge.getParity();
-		
-//TODO	cparity = r.nextInt(2);
-	}
-	
-	public FullCube(int[] moveseq) {
-		this();
-		for (int m : moveseq) {
-			move(m);
-		}
-	}
-	
-	public void copy(FullCube c) {
-		edge.copy(c.edge);
-		center.copy(c.center);
-		this.cparity = c.cparity;
-		this.eparity = c.eparity;
-		
-		this.add1 = c.add1;
-		this.length1 = c.length1;
-		this.length2 = c.length2;
-		this.length3 = c.length3;
-		for (int i=0; i<20; i++) {
-			this.moveseq1[i] = c.moveseq1[i];
-			this.moveseq2[i] = c.moveseq2[i];
-			this.moveseq3[i] = c.moveseq3[i];
-		}
-	}
-	
-	public void print() {	
-		center.print();
-		edge.print();
-	}
-
-	public boolean checkEdge() {
-		return edge.checkEdge();
-	}
-
 /*
 Edge Cubies: 
 					14	2	
@@ -140,19 +45,157 @@ Center Cubies:
 	 *             |*D7**D8**D9*|
 	 *             |************|
 	 */
+
+
+package cs.threephase;
+
+import java.util.*;
+import static cs.threephase.Moves.*;
+import static cs.threephase.Util.*;
+import static cs.threephase.Center1.symmove;
+
+public class FullCube implements Comparable {
+	
+	private EdgeCube edge;
+	private CenterCube center;
+	private CornerCube corner;
+	
+	int value = 0;
+	boolean add1 = false;
+	int length1 = 0;
+	int length2 = 0;
+	int length3 = 0;
+
+	@Override
+	public int compareTo(Object c) {
+		if (c instanceof FullCube) {
+			return this.value - ((FullCube)c).value;
+		} else {
+			return 0;
+		}
+	}
+	
+	public FullCube() {
+		edge = new EdgeCube();
+		center = new CenterCube();
+		corner = new CornerCube();
+	}
+
+	public FullCube(FullCube c) {
+		this();
+		copy(c);
+	}
+	
+	public FullCube(long seed) {
+		Random r = new Random(seed);
+		edge = new EdgeCube(r);
+		center = new CenterCube(r);
+		corner = new CornerCube(r);
+	}
+	
+	public FullCube(int[] moveseq) {
+		this();
+		for (int m : moveseq) {
+			doMove(m);
+		}
+	}
+	
+	public void copy(FullCube c) {
+		edge.copy(c.edge);
+		center.copy(c.center);
+		corner.copy(c.corner);
+		
+		this.value = c.value;
+		this.add1 = c.add1;
+		this.length1 = c.length1;
+		this.length2 = c.length2;
+		this.length3 = c.length3;
+		
+		this.sym = c.sym;
+		
+		for (int i=0; i<60; i++) {
+			this.moveBuffer[i] = c.moveBuffer[i];
+		}
+		this.moveLength = c.moveLength;
+		this.edgeAvail = c.edgeAvail;
+		this.centerAvail = c.centerAvail;
+		this.cornerAvail = c.cornerAvail;
+	}
+	
+//	public void print() {	
+//		getCenter().print();
+//		getEdge().print();
+//	}
+
+	public boolean checkEdge() {
+		return getEdge().checkEdge();
+	}
+
+	public String getMoveString(boolean inverse) {
+		StringBuffer sb = new StringBuffer();
+		if (inverse) {
+			for (int i=moveLength-1; i>=length1 + (add1 ? 2 : 0); i--) {
+				sb.append(moveIstr[symmove[sym][moveBuffer[i]]]).append(' ');
+			}
+			for (int i=length1-1; i>=0; i--) {
+				sb.append(moveIstr[moveBuffer[i]]).append(' ');
+			}
+		} else {
+			for (int i=0; i<length1; i++) {
+				sb.append(move2str[moveBuffer[i]]).append(' ');
+			}
+			for (int i=length1 + (add1 ? 2 : 0); i<moveLength; i++) {
+				sb.append(move2str[symmove[sym][moveBuffer[i]]]).append(' ');
+			}
+		}
+		return sb.toString();
+	}
 	 
-	String to333Facelet(CornerCube c) {
+	String to333Facelet() {
 		char[] ret = new char[54];
-		edge.fill333Facelet(ret);
-		center.fill333Facelet(ret);
-		c.fill333Facelet(ret);
+		getEdge().fill333Facelet(ret);
+		getCenter().fill333Facelet(ret);
+		getCorner().fill333Facelet(ret);
 		return new String(ret);
 	}
 	
+	byte[] moveBuffer = new byte[60];
+	private int moveLength = 0;
+	private int edgeAvail = 0;
+	private int centerAvail = 0;
+	private int cornerAvail = 0;
+	
+	int sym = 0;
+
 	void move(int m) {
-		cparity ^= cpmv[m];
-		eparity ^= epmv[m];
-		edge.move(m);
-		center.move(m);
+		moveBuffer[moveLength++] = (byte)m;
+		return;
+	}
+	
+	void doMove(int m) {
+		getEdge().move(m);
+		getCenter().move(m);
+		getCorner().move(m % 18);	
+	}
+	
+	EdgeCube getEdge() {
+		while (edgeAvail < moveLength) {
+			edge.move(moveBuffer[edgeAvail++]);
+		}
+		return edge;
+	}
+	
+	CenterCube getCenter() {
+		while (centerAvail < moveLength) {
+			center.move(moveBuffer[centerAvail++]);
+		}
+		return center;
+	}
+	
+	CornerCube getCorner() {
+		while (cornerAvail < moveLength) {
+			corner.move(moveBuffer[cornerAvail++] % 18);
+		}
+		return corner;
 	}
 }

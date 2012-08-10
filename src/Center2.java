@@ -77,7 +77,7 @@ class Center2 {
 				if (ctprun[i]==depth) {
 					int ct = i / 70;
 					int rl = i % 70;
-					for (int m=0; m<28; m++) {
+					for (int m=0; m<23; m++) {
 						int ctx = ctmv[ct][m];
 						int rlx = rlmv[rl][m];
 						int idx = ctx * 70 + rlx;

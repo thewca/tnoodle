@@ -73,25 +73,8 @@ final class Edge3 implements Runnable {
 				ptb[i*4+j] = i + (j - i + 18 + 1) % 3 - 1;
 			}
 		}
-		
-/*		
-		final int fx = 9580032;
-		read(prunP, 0, fx, "edge12.prun0");
-		read(prunP, fx, fx, "edge12.prun1");
-		read(prunP, fx*2, fx, "edge12.prun2");
-		read(prunP, fx*3, fx, "edge12.prun3");
-		read(prunP, fx*4, fx, "edge12.prun4");
-*/
-
 
 		initPrun();
-
-//		write(prunP, 0, fx, "edge12.prun0");
-//		write(prunP, fx, fx, "edge12.prun1");
-//		write(prunP, fx*2, fx, "edge12.prun2");
-//		write(prunP, fx*3, fx, "edge12.prun3");
-//		write(prunP, fx*4, fx, "edge12.prun4");
-		
 	}
 	
 	static void initPrun() {
@@ -101,17 +84,16 @@ final class Edge3 implements Runnable {
 		}	
 	}
 	
+	static int depm3;// = depth % 3;
+	static int depp3;// = 3 ^ ((depth+1) % 3);
+	static boolean inv;// = depth > 10;
+	static int check;// = inv ? 3 : depm3;
+	static int found;// = inv ? depm3 : 3;	
+	
 	public void run() {
-//		System.out.println(idx);
-		int depm3 = depth % 3;
-//		System.out.println(idx);
-		int depp3 = 3 ^ ((depth+1) % 3);
-		boolean inv = depth > 9;
-		int check = inv ? 3 : depm3;
-		int found = inv ? depm3 : 3;
 		int offset = 239500800 / SPLIT * idx;
+		int[] mvarr = new int[17];
 		for (int i=0; i<239500800 / SPLIT;) {
-//			System.out.println(i);
 			int cx=prun[(i + offset)>>4];
 			if (cx == -1 && !inv) {
 				i+=16;
@@ -120,24 +102,40 @@ final class Edge3 implements Runnable {
 			for (int j=i+16; i<j; i++, cx>>=2) {
 				if ((cx & 3) == check) {
 					this.set(i + offset);
-					for (int m=0; m<17; m++) {
-						int idx = getmv(this.edge, m);
-						if (getpruning2(idx) == found) {
-							if (inv) {
+					if (inv) {
+						for (int m=0; m<17; m++) {
+							if (getpruning2(getmv(this.edge, m)) == found) {
 								setpruning2(i + offset, depp3);
 								break;
-							} else {
-								setpruning2(idx, depp3);
+							}
+						}					
+					} else {
+						for (int m=0; m<17; m++) {
+							mvarr[m] = getmv(this.edge, m);
+						}
+						synchronized (prun) {
+							for (int m=0; m<17; m++) {
+								getAndSet(mvarr[m], depp3);
 							}
 						}
 					}
 				}
-				
 			}
 		}
 	}
 	
-	final static int SPLIT = 4;
+	static void getAndSet(int index, int value) {
+		int shift = (index & 0x0f) << 1, idx = index >> 4;
+		if (((prun[idx] >> shift) & 3) == 3) {
+			prun[idx] ^= value << shift;
+			++done;
+			if ((done & 0x3ffff) == 0) {
+				System.out.print(String.format("%5.2f%%\r", done / 2395008.0));
+			}								
+		}
+	}
+	
+	final static int SPLIT = 2;
 	
 	int idx = 0;
 	
@@ -151,7 +149,11 @@ final class Edge3 implements Runnable {
 		setpruning2(0, 3);
 		
 		for (depth=0; depth<13; depth++) {
-			System.out.println(String.format("%2d%10d", depth, done));
+			depm3 = depth % 3;
+			depp3 = 3 ^ ((depth+1) % 3);
+			inv = depth > 10;
+			check = inv ? 3 : depm3;
+			found = inv ? depm3 : 3;
 			Edge3[] ts = new Edge3[SPLIT];
 			for (int i=0; i<SPLIT; i++) {
 				ts[i] = new Edge3();
@@ -164,11 +166,12 @@ final class Edge3 implements Runnable {
 			}
 			for (int i=0; i<SPLIT; i++) {
 				try {
-				r[i].join();
+					r[i].join();
 				} catch (Exception ea) {
 					ea.printStackTrace();
 				}
 			}
+			System.out.println(String.format("%2d%10d", depth+1, done));
 		}
 
 		for (int i=0; i<12*11*10*9*8*7*6*5*4*3/5; i++) {
@@ -292,7 +295,7 @@ final class Edge3 implements Runnable {
 		return idx;	
 	}
 
-	final void set(int idx) {
+	void set(int idx) {
 		long val = 0xba9876543210L;
 		int parity = 0;
 		for (int i=0; i<11; i++) {

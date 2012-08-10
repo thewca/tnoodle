@@ -8,20 +8,28 @@ class CornerCube {
 	/**
 	 * 18 move cubes
 	 */
-	static CornerCube[] moveCube = new CornerCube[18];
-	
+	private static CornerCube[] moveCube = new CornerCube[18];
 
-	int[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
-	int[] co = {0, 0, 0, 0, 0, 0, 0, 0};
+	private static final int[] cpmv = {1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 
+										1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1};
+
+	private int[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
+	private int[] co = {0, 0, 0, 0, 0, 0, 0, 0};
+	private int cparity = 0;
 	
 	CornerCube temps = null;//new CornerCube();
 
 	CornerCube() {
 	}
 
+	CornerCube(Random r) {
+		this(r.nextInt(40320), r.nextInt(2187));
+	}
+
 	CornerCube(int cperm, int twist) {
 		this.setCPerm(cperm);
 		this.setTwist(twist);
+		cparity = getParity();
 	}
 
 	CornerCube(CornerCube c) {
@@ -33,6 +41,7 @@ class CornerCube {
 			this.cp[i] = c.cp[i];
 			this.co[i] = c.co[i];
 		}
+		this.cparity = c.cparity;
 	}
 	
 	int getParity() {
@@ -83,11 +92,12 @@ class CornerCube {
 		Util.set8Perm(cp, idx);
 	}
 	
-	void doMove(int idx) {
+	void move(int idx) {
 		if (temps == null) {
 			temps = new CornerCube();
 		}
 		CornMult(this, moveCube[idx], temps);
+		cparity ^= cpmv[idx];
 		copy(temps);
 	}
 
