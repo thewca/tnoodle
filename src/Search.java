@@ -19,6 +19,8 @@ public final class Search implements Runnable {
 	final static int PHASE2_ATTEMPS = 500;
 	final static int PHASE2_SOLUTIONS = 100;
 	final static int PHASE3_ATTEMPS = 50;
+	
+	PriorityQueue<FullCube> p1sols = new PriorityQueue<FullCube>(PHASE2_ATTEMPS, new FullCube.ValueComparator());
 
 	static int[] count = new int[1];
 
@@ -45,8 +47,8 @@ public final class Search implements Runnable {
 	public String solution = "";
 	public long endtime;
 
-	FullCube[] arr = new FullCube[PHASE1_SOLUTIONS];
-	int arridx = 0;
+//	FullCube[] arr = new FullCube[PHASE1_SOLUTIONS];
+	int p1SolsCnt = 0;
 	FullCube[] arr2 = new FullCube[PHASE2_SOLUTIONS];
 	int arr2idx = 0;
 		
@@ -63,7 +65,7 @@ public final class Search implements Runnable {
 			s.append(move2str[m]).append(' ');
 		}
 		
-		s.append(String.format(" (%d moves)", moves.length));
+//		s.append(String.format(" (%d moves)", moves.length));
 		return s.toString();
 	}
 	
@@ -118,16 +120,16 @@ public final class Search implements Runnable {
 		int lasttot = 0;
 		for (int i=inf; i!=0; --i) {
 //			first.randomMove();
-			System.out.println(first.randomState());
+			System.out.println(first.randomMove());
 			int curlen = first.totlen - lasttot;
 			lasttot = first.totlen;
 			dis[curlen]++;
-			for (int j=0; j<60; j++) {
-				if (dis[j] != 0) {
-					System.out.println(String.format("%d\t%d\t%d", (inf-i+1), j, dis[j]));
-				}
-			}
-			System.out.println(String.format("%5.2f\t%f", first.totlen / 1.0 / (inf-i+1), first.tottime / (inf-i+1) / 1000000.0));
+//			for (int j=0; j<60; j++) {
+//				if (dis[j] != 0) {
+//					System.out.println(String.format("%d\t%d\t%d", (inf-i+1), j, dis[j]));
+//				}
+//			}
+//			System.out.println(String.format("%5.2f\t%f", first.totlen / 1.0 / (inf-i+1), first.tottime / (inf-i+1) / 1000000.0));
 		}
 	}
 	
@@ -171,7 +173,7 @@ public final class Search implements Runnable {
 				lm = m;
 			}
 		}
-		System.out.println(tostr(moveseq));
+		System.out.print(tostr(moveseq));
 		return solve(moveseq);
 	}
 	
@@ -217,8 +219,9 @@ public final class Search implements Runnable {
 		int fbprun = csprun[fb >> 6];
 		int rlprun = csprun[rl >> 6];
 		
-		arridx = 0;
+		p1SolsCnt = 0;
 		arr2idx = 0;
+		p1sols.clear();
 		
 		long time = System.nanoTime();
 
@@ -230,29 +233,29 @@ public final class Search implements Runnable {
 			}
 		}
 
-		Arrays.sort(arr, 0, arridx);
+		FullCube[] p1SolsArr = p1sols.toArray(new FullCube[0]);
+		Arrays.sort(p1SolsArr, 0, p1SolsArr.length);
 
 		int MAX_LENGTH2 = 9;
 		int length12;
 		do {
 			OUT:
-			for (length12=arr[0].value; length12<100; length12++) {
-				for (int i=0; i<Math.min(arridx, PHASE2_ATTEMPS); i++) {
-					if (arr[i].value > length12) {
+			for (length12=p1SolsArr[0].value; length12<100; length12++) {
+				for (int i=0; i<p1SolsArr.length; i++) {
+					if (p1SolsArr[i].value > length12) {
 						break;
 					}
-					if (length12 - arr[i].length1 > MAX_LENGTH2) {
+					if (length12 - p1SolsArr[i].length1 > MAX_LENGTH2) {
 						continue;
 					}
-					c1.copy(arr[i]);
+					c1.copy(p1SolsArr[i]);
 					ct2.set(c1.getCenter(), c1.getEdge().getParity());
 					int s2ct = ct2.getct();
 					int s2rl = ct2.getrl();
-					length1 = arr[i].length1;
-					length2 = length12 - arr[i].length1;
-				
-					int lm = 28;//std2move[arr[i].moveseq1[arr[i].length1-1]/3*3+1];
-					if (search2(s2ct, s2rl, length2, lm, 0)) {
+					length1 = p1SolsArr[i].length1;
+					length2 = length12 - p1SolsArr[i].length1;
+
+					if (search2(s2ct, s2rl, length2, 28, 0)) {
 						break OUT;
 					}
 				}
@@ -263,9 +266,6 @@ public final class Search implements Runnable {
 		Arrays.sort(arr2, 0, arr2idx);
 		int length123, index = 0;
 		int solcnt = 0;
-
-//		System.out.println(System.nanoTime() - time);
-
 
 		int MAX_LENGTH3 = 13;
 		do {
@@ -282,7 +282,7 @@ public final class Search implements Runnable {
 					ct3.set(arr2[i].getCenter(), eparity ^ arr2[i].getCorner().getParity());
 					int ct = ct3.getct();
 					int edge = e12.get();
-					int prun = e12.getprun(edge);
+					int prun = Math.max(e12.getprunmod(edge), e12.getprunmod(e12.getmv_x()));
 					int lm = 20;//std3move[arr2[i].moveseq2[arr2[i].length2-1]/3*3+1];
 				
 					if (prun <= length123 - arr2[i].length1 - arr2[i].length2 
@@ -415,7 +415,7 @@ public final class Search implements Runnable {
 			move1[length1] = fx1;
 			move1[length1+1] = bx3;
 			add1 = true;
-			sym = 22;
+			sym = 19;
 			break;
 		case 12869 :
 			c1.move(ux1);
@@ -434,17 +434,29 @@ public final class Search implements Runnable {
 		int s2rl = ct2.getrl();
 		int ctp = ctprun[s2ct*70+s2rl];
 		
-		if (arr[arridx] == null) {
+		c1.value = ctp + length1;
+		c1.length1 = length1;
+		c1.add1 = add1;
+		c1.sym = sym;
+/*		if (arr[arridx] == null) {
 			arr[arridx] = new FullCube(c1);
 		} else {
 			arr[arridx].copy(c1);
 		}
-		arr[arridx].value = ctp + length1;
-		arr[arridx].length1 = length1;
-		arr[arridx].add1 = add1;
-		arr[arridx].sym = sym;
-		arridx++;
-		return arridx == arr.length;
+*/		p1SolsCnt++;
+	
+		FullCube next;
+		if (p1sols.size() < PHASE2_ATTEMPS) {
+			next = new FullCube(c1);
+		} else {
+			next = p1sols.poll();
+			if (next.value > c1.value) {
+				next.copy(c1);
+			}
+		}
+		p1sols.add(next);
+		
+		return p1SolsCnt == PHASE1_SOLUTIONS;
 	}
 
 	public final boolean search2(int ct, int rl, int maxl, int lm, int depth) {
@@ -487,7 +499,8 @@ public final class Search implements Runnable {
 		ct3.set(c2.getCenter(), eparity ^ c2.getCorner().getParity());
 		int ct = ct3.getct();
 		int edge = e12.get();
-		int prun = e12.getprun(edge);
+		int prun = Math.max(e12.getprunmod(edge), e12.getprunmod(e12.getmv_x()));
+		
 		if (arr2[arr2idx] == null) {
 			arr2[arr2idx] = new FullCube(c2);
 		} else {
@@ -500,11 +513,16 @@ public final class Search implements Runnable {
 		return arr2idx == arr2.length;
 	}
 	
-	public final boolean search3(int edge, int ct, int prun, int maxl, int lm, int depth) {
+	boolean search3(int edge, int ct, int prun, int maxl, int lm, int depth) {
 		if (maxl == 0) {
 			return edge==0 && ct==0;
 		}
 		tempe[depth].set(edge);
+		
+		if (Edge3.getprunmod(tempe[depth].getmv_x()) > maxl) {
+			return false;
+		}
+		
 		for (int m=0; m<17; m++) {
 			if (ckmv3[lm][m]) {
 				m = skipAxis3[m];
@@ -520,7 +538,7 @@ public final class Search implements Runnable {
 				continue;
 			}
 			int edgex = Edge3.getmv(tempe[depth].edge, m);
-			int prunx = Edge3.getprun(edgex, prun);
+			int prunx = Edge3.getprunmod(edgex/*, prun*/);
 			if (prunx >= maxl) {
 				if (prunx > maxl && m < 14) {
 					m = skipAxis3[m];

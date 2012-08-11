@@ -9,8 +9,8 @@ TPR-4x4x4-Solver
 
 # Test (java -jar threephase.jar 100 / 2.2GHz):
  - Average solution length: 44.60 moves(face turn metric).
- - Average solving time: 200 ms.
- - Memory: 80M with generated table.
+ - Average solving time: 300 ms.
+ - Memory: 20M with generated tables and min2phase package, 100M without any table.
  - Length Distribution (2000 solves, average 44.626 moves):
 
  - 40	1
@@ -24,7 +24,7 @@ TPR-4x4x4-Solver
  - 48	2
 
 # Note:
- - At its first executing, about 50M's tables will be generated and written to disk. The generation spends several minutes, and it will speed up with multiple processors.
+ - At its first executing, about 10M's tables will be generated and written to disk. The generation spends several minutes and need at least 100M memory(4~5 times larger than execute it with generated tables), and it will speed up with multiple processors.
 
 # Algorithm:
  - [Tsai's 8-step 4x4x4 algorithm](http://cubezzz.dyndns.org/drupal/?q=node/view/73#comment-2588)

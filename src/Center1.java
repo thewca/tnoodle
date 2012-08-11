@@ -257,7 +257,33 @@ final class Center1 {
 			break;			
 		}	
 	}
-	
+/*
+0	I
+1	y2
+2	x
+3	xy2
+4	x2
+5	z2
+6	x'
+7	x'y2
+16	yz
+17	y'z'
+18	y2z
+19	z'
+20	y'z
+21	yz'
+22	z
+23	zy2
+32	y'x'
+33	yx
+34	y'
+35	y
+36	y'x
+37	yx'
+38	yz2
+39	y'z2
+ */
+
 	void rotate(int r) {
 		for (int j=0; j<r; j++) {
 			rot(0);

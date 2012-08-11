@@ -13,9 +13,9 @@ class CornerCube {
 	private static final int[] cpmv = {1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 
 										1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1};
 
-	private int[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
-	private int[] co = {0, 0, 0, 0, 0, 0, 0, 0};
-	private int cparity = 0;
+	private byte[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
+	private byte[] co = {0, 0, 0, 0, 0, 0, 0, 0};
+//	private int cparity = 0;
 	
 	CornerCube temps = null;//new CornerCube();
 
@@ -29,7 +29,7 @@ class CornerCube {
 	CornerCube(int cperm, int twist) {
 		this.setCPerm(cperm);
 		this.setTwist(twist);
-		cparity = getParity();
+//		cparity = getParity();
 	}
 
 	CornerCube(CornerCube c) {
@@ -41,7 +41,7 @@ class CornerCube {
 			this.cp[i] = c.cp[i];
 			this.co[i] = c.co[i];
 		}
-		this.cparity = c.cparity;
+//		this.cparity = c.cparity;
 	}
 	
 	int getParity() {
@@ -67,9 +67,9 @@ class CornerCube {
 	static void CornMult(CornerCube a, CornerCube b, CornerCube prod) {
 		for (int corn=0; corn<8; corn++) {
 			prod.cp[corn] = a.cp[b.cp[corn]];
-			int oriA = a.co[b.cp[corn]];
-			int oriB = b.co[corn];
-			int ori = oriA;
+			byte oriA = a.co[b.cp[corn]];
+			byte oriB = b.co[corn];
+			byte ori = oriA;
 			ori += (oriA<3) ? oriB : 6-oriB;
 			ori %= 3;
 			if ((oriA >= 3) ^ (oriB >= 3)) {
@@ -82,10 +82,10 @@ class CornerCube {
 	void setTwist(int idx) {
 		int twst = 0;
 		for (int i=6; i>=0; i--) {
-			twst += co[i] = idx % 3;
+			twst += co[i] = (byte) (idx % 3);
 			idx /= 3;
 		}
-		co[7] = (15 - twst) % 3;
+		co[7] = (byte) ((15 - twst) % 3);
 	}
 	
 	void setCPerm(int idx) {
@@ -97,7 +97,7 @@ class CornerCube {
 			temps = new CornerCube();
 		}
 		CornMult(this, moveCube[idx], temps);
-		cparity ^= cpmv[idx];
+//		cparity ^= cpmv[idx];
 		copy(temps);
 	}
 

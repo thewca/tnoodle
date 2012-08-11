@@ -22,7 +22,7 @@ final class Center3 {
 	int[] fb = new int[8];
 	int parity = 0;
 	
-	static int[][] ctmove = new int[35*35*12*2][20];
+	static char[][] ctmove = new char[35*35*12*2][20];
 	static int[] pmove = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1};
 	
 	static byte[] prun = new byte[35*35*12*2];
@@ -40,7 +40,7 @@ final class Center3 {
 			for (int m=0; m<20; m++) {
 				c.setct(i);
 				c.move(m);
-				ctmove[i][m] = c.getct();
+				ctmove[i][m] = (char)c.getct();
 			}
 		}
 

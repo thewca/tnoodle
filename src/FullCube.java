@@ -53,8 +53,15 @@ import java.util.*;
 import static cs.threephase.Moves.*;
 import static cs.threephase.Util.*;
 import static cs.threephase.Center1.symmove;
+import static cs.threephase.Center1.symmult;
 
 public class FullCube implements Comparable {
+	
+	public static class ValueComparator implements Comparator<FullCube> {
+		public int compare(FullCube c1, FullCube c2) {
+			return c2.value - c1.value;
+		}
+	}
 	
 	private EdgeCube edge;
 	private CenterCube center;
@@ -133,6 +140,7 @@ public class FullCube implements Comparable {
 
 	public String getMoveString(boolean inverse) {
 		StringBuffer sb = new StringBuffer();
+		int sym = this.sym;
 		if (inverse) {
 			for (int i=moveLength-1; i>=length1 + (add1 ? 2 : 0); i--) {
 				sb.append(moveIstr[symmove[sym][moveBuffer[i]]]).append(' ');
@@ -145,11 +153,19 @@ public class FullCube implements Comparable {
 				sb.append(move2str[moveBuffer[i]]).append(' ');
 			}
 			for (int i=length1 + (add1 ? 2 : 0); i<moveLength; i++) {
-				sb.append(move2str[symmove[sym][moveBuffer[i]]]).append(' ');
+				if (symmove[sym][moveBuffer[i]] >= dx1) {
+					sb.append(move2str[symmove[sym][moveBuffer[i]]-9]).append(' ');
+					int rot = move2rot[symmove[sym][moveBuffer[i]] - dx1];
+					sym = symmult[sym][rot];
+				} else {
+					sb.append(move2str[symmove[sym][moveBuffer[i]]]).append(' ');
+				}
 			}
 		}
 		return sb.toString();
 	}
+	
+	private static int[] move2rot = {35, 1, 34, 2, 4, 6, 22, 5, 19};
 	 
 	String to333Facelet() {
 		char[] ret = new char[54];

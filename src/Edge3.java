@@ -9,7 +9,6 @@ final class Edge3 implements Runnable {
 	int[] temp;
 
 	static int[] prun;
-	static byte[] prunP = new byte[12*11*10*9*8*7*6*5*4*3/5];
 	
 	final static int[][] edgex = {	{ 3, 0, 1, 2, 4, 5, 6, 7, 8, 9,10,11},
 									{ 2, 3, 0, 1, 4, 5, 6, 7, 8, 9,10,11},
@@ -31,7 +30,7 @@ final class Edge3 implements Runnable {
 									{ 0, 1, 2, 3, 6, 7, 4, 5,10, 9, 8,11},
 									{ 4, 5, 2, 3, 0, 1, 6, 7, 9, 8,10,11},
 									{ 0, 7, 4, 3, 2, 5, 6, 1, 8,10, 9,11}};
-							
+
 	final static int[][] edgeox = {	{ 1, 2, 3, 0, 4, 5, 6, 7, 8, 9,10,11},
 									{ 2, 3, 0, 1, 4, 5, 6, 7, 8, 9,10,11},
 									{ 3, 0, 1, 2, 4, 5, 6, 7, 8, 9,10,11},
@@ -53,37 +52,27 @@ final class Edge3 implements Runnable {
 									{ 0, 5, 6, 3, 4, 1, 2, 7, 9, 8,10,11},
 									{ 0, 1, 4, 5, 2, 3, 6, 7, 8,10, 9,11}};
 	
-	private static int[] ptb = new int[16 * 4];
-	private static byte[] GetPacked = new byte[243*8];
 	private static int[] fact = {19958400, 1814400, 181440, 20160, 2520, 360, 60, 12, 3, 1};
 	static int[] factX = {1, 1, 2/2, 6/2, 24/2, 120/2, 720/2, 5040/2, 40320/2, 362880/2, 3628800/2, 39916800/2, 479001600/2};
 	
 	static void init() {
-	
-		for (int i=0; i<243; i++) {
-			for (int j=0; j<5; j++) {
-				int l = i;
-				for (int k=1; k<=j; k++)
-					l /= 3;
-				GetPacked[i*8+j] = (byte)(l % 3);
-			}
-		}
-		for (int i=0; i<16; i++) {
-			for (int j=0; j<3; j++) {
-				ptb[i*4+j] = i + (j - i + 18 + 1) % 3 - 1;
-			}
-		}
-
-		initPrun();
-	}
-	
-	static void initPrun() {
-		if (!read(prunP, 0, prunP.length, "Edge3.prunP")) {
+		if (!read(modedTable, 0, modedTable.length, "Edge3.prunPmod")) {
 			createPrun();
-			write(prunP, 0, prunP.length, "Edge3.prunP");
-		}	
+			write(modedTable, 0, modedTable.length, "Edge3.prunPmod");
+		}
 	}
 	
+	int idx = 0;
+	
+	final static int MOD = 12;
+	
+	static int doneMod = 1;
+	static byte[] modedTable = new byte[12*11*10*9*8*7*6*5*4*3/MOD/2];
+
+	final static int SPLIT = 4;
+	
+	static int done = 0;
+	static int depth = 0;
 	static int depm3;// = depth % 3;
 	static int depp3;// = 3 ^ ((depth+1) % 3);
 	static boolean inv;// = depth > 10;
@@ -102,21 +91,12 @@ final class Edge3 implements Runnable {
 			for (int j=i+16; i<j; i++, cx>>=2) {
 				if ((cx & 3) == check) {
 					this.set(i + offset);
-					if (inv) {
+					for (int m=0; m<17; m++) {
+						mvarr[m] = getmv(this.edge, m);
+					}
+					synchronized (prun) {
 						for (int m=0; m<17; m++) {
-							if (getpruning2(getmv(this.edge, m)) == found) {
-								setpruning2(i + offset, depp3);
-								break;
-							}
-						}					
-					} else {
-						for (int m=0; m<17; m++) {
-							mvarr[m] = getmv(this.edge, m);
-						}
-						synchronized (prun) {
-							for (int m=0; m<17; m++) {
-								getAndSet(mvarr[m], depp3);
-							}
+							getAndSet(mvarr[m], depp3);
 						}
 					}
 				}
@@ -129,26 +109,27 @@ final class Edge3 implements Runnable {
 		if (((prun[idx] >> shift) & 3) == 3) {
 			prun[idx] ^= value << shift;
 			++done;
+			
+			if (getPruning(modedTable, index/MOD) == 0xb) {
+				setPruning(modedTable, index/MOD, depth+1);
+				++doneMod;
+			}
+
 			if ((done & 0x3ffff) == 0) {
-				System.out.print(String.format("%5.2f%%\r", done / 2395008.0));
-			}								
+				System.out.print(String.format("%5.2f%%\t%d\r", done / 897632.96, doneMod));
+			}
 		}
 	}
-	
-	final static int SPLIT = 2;
-	
-	int idx = 0;
-	
-	static int done = 0;
-	static int depth = 0;
 	
 	static void createPrun() {
 		System.out.println("Create Phase3 Edge Pruning Table...");
 		prun = new int[12*11*10*9*8*7*6*5*4*3/16];
 		Arrays.fill(prun, (int)-1);
-		setpruning2(0, 3);
+		Arrays.fill(modedTable, (byte)0xbb);
+		setPruning(modedTable, 0, 0);
+		prun[0] = 0xfffffffc;
 		
-		for (depth=0; depth<13; depth++) {
+		for (depth=0; depth<10; depth++) {
 			depm3 = depth % 3;
 			depp3 = 3 ^ ((depth+1) % 3);
 			inv = depth > 10;
@@ -171,76 +152,22 @@ final class Edge3 implements Runnable {
 					ea.printStackTrace();
 				}
 			}
-			System.out.println(String.format("%2d%10d", depth+1, done));
-		}
-
-		for (int i=0; i<12*11*10*9*8*7*6*5*4*3/5; i++) {
-			int n = 1;
-			int value = 0;
-			for (int j=0; j<4; j++) {
-				value += n * getpruning2(4*i+j);
-				n *= 3;
-			}
-			value += n * getpruning2(12*11*10*9*8*7*6*5*4*3/5*4+i);
-			prunP[i] = (byte)value;
+			System.out.println(String.format("%2d%10d%10d", depth+1, done, doneMod));
 		}
 		prun = null;
 		System.gc();
 	}
-	
-	final static void setpruning2(int index, int value) {
-		int xorv = value << ((index & 0x0f) << 1);
-		index >>= 4;
-		
-		synchronized(prun) {
-			prun[index] ^= xorv;
-			done++;
-		}
-	
-//		prun[index >>> 4] ^= value << ((index & 0x0f) << 1);
-		if ((done & 0x3ffff) == 0) {
-			System.out.print(String.format("%5.2f%%\r", done / 2395008.0));
-		}								
+
+	static void setPruning(byte[] table, int index, int value) {
+		table[index >> 1] ^= (0x0b ^ value) << ((index & 1) << 2);
 	}
-	
-	final static int getpruning2(int index) {
-		return ((prun[index >>> 4] >>> (((index & 0x0f) << 1))) & 3);
+
+	static int getPruning(byte[] table, int index) {
+		return (table[index >> 1] >> ((index & 1) << 2)) & 0x0f;
 	}
-	
-	final static int getpruningP(int index) {
-		if (index < 12*11*10*9*8*7*6*5*4*3/5*4) {
-			int data = prunP[index >>> 2]&0x0ff;
-			return GetPacked[(data<<3) | (index & 3)];
-		} else {
-			int data = prunP[index-12*11*10*9*8*7*6*5*4*3/5*4]&0x0ff;
-			return GetPacked[(data<<3) | 4];
-		}
-	}
-	
-	final static int getprun(int edge, int prun) {
-		return ptb[(prun << 2) | getpruningP(edge)];
-	}
-	
-	final int getprun(int edge) {
-		int depth = 0;
-		int depm3 = getpruningP(edge);
-		while (edge!=0) {
-			if (depm3 == 0) {
-				depm3 = 2;
-			} else {
-				depm3--;
-			}
-			set(edge);
-			for (int m=0; m<17; m++) {
-				int edgex = getmv(this.edge, m);
-				if (getpruningP(edgex)==depm3) {
-					depth++;
-					edge = edgex;
-					break;
-				}
-			}
-		}
-		return depth;
+
+	static int getprunmod(int edge) {
+		return getPruning(modedTable, edge/MOD);
 	}
 
 	int set(EdgeCube c) {
@@ -276,6 +203,21 @@ final class Edge3 implements Runnable {
 		long val = 0xba9876543210L;
 		for (int i=0; i<10; i++) {
 			int v = movo[ep[mov[i]]] << 2;
+			idx *= 12-i;
+			idx += (val >> v) & 0xf;
+			val -= 0x111111111110L << v;
+		}
+		return idx;	
+	}
+	
+	static int[] movX = { 6,11, 0, 8, 2,10, 4, 9, 7, 3, 1, 5};
+	static int[] movoX ={ 2,10, 4, 9, 6,11, 0, 8, 3, 7, 5, 1};
+
+	int getmv_x() {
+		int idx = 0;
+		long val = 0xba9876543210L;
+		for (int i=0; i<10; i++) {
+			int v = movoX[edge[movX[i]]] << 2;
 			idx *= 12-i;
 			idx += (val >> v) & 0xf;
 			val -= 0x111111111110L << v;

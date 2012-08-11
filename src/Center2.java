@@ -21,7 +21,7 @@ class Center2 {
 	int parity = 0;
 	
 	static int[][] rlmv = new int[70][28];
-	static int[][] ctmv = new int[6435][28];
+	static char[][] ctmv = new char[6435][28];
 	static int[][] rlrot = new int[70][16];
 	static int[][] ctrot = new int[6435][16];
 	static byte[] ctprun = new byte[6435*35*2];
@@ -64,7 +64,7 @@ class Center2 {
 			for (int m=0; m<28; m++) {
 				c.setct(i);
 				c.move(move2std[m]);
-				ctmv[i][m] = c.getct();
+				ctmv[i][m] = (char)c.getct();
 			}
 		}
 		Arrays.fill(ctprun, (byte)-1);

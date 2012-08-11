@@ -6,11 +6,11 @@ import static cs.threephase.Util.*;
 
 class CenterCube {
 
-	int[] ct = new int[24];
+	byte[] ct = new byte[24];
 
 	CenterCube() {
 		for (int i=0; i<24; i++) {
-			ct[i] = i / 4;
+			ct[i] = (byte) (i / 4);
 		}
 	}
 
@@ -23,7 +23,7 @@ class CenterCube {
 		for (int i=0; i<23; i++) {
 			int t = i + r.nextInt(24-i);
 			if (ct[t] != ct[i]) {
-				int m = ct[i];
+				byte m = ct[i];
 				ct[i] = ct[t];
 				ct[t] = m;
 			}

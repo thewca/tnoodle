@@ -124,6 +124,34 @@ class Util {
 		}
 	}
 	
+	public static void swap(byte[] arr, int a, int b, int c, int d, int key) {
+		byte temp;
+		switch (key) {
+		case 0:
+			temp = arr[d];
+			arr[d] = arr[c];
+			arr[c] = arr[b];
+			arr[b] = arr[a];
+			arr[a] = temp;
+			return;
+		case 1:
+			temp = arr[a];
+			arr[a] = arr[c];
+			arr[c] = temp;
+			temp = arr[b];
+			arr[b] = arr[d];
+			arr[d] = temp;
+			return;
+		case 2:
+			temp = arr[a];
+			arr[a] = arr[b];
+			arr[b] = arr[c];
+			arr[c] = arr[d];
+			arr[d] = temp;
+			return;
+		}
+	}
+	
 	static void set8Perm(int[] arr, int idx) {
 		int val = 0x76543210;
 		for (int i=0; i<7; i++) {
@@ -138,6 +166,20 @@ class Util {
 		arr[7] = val;
 	}
 	
+	static void set8Perm(byte[] arr, int idx) {
+		int val = 0x76543210;
+		for (int i=0; i<7; i++) {
+			int p = fact[7-i];
+			int v = idx / p;
+			idx -= v*p;
+			v <<= 2;
+			arr[i] = (byte) ((val >> v) & 0xf);
+			int m = (1 << v) - 1;
+			val = (val & m) + ((val >> 4) & ~m);
+		}
+		arr[7] = (byte)val;
+	}
+	
 	static int parity(int[] arr) {
 		int parity = 0;
 		for (int i=0, len=arr.length; i<len; i++) {
@@ -149,4 +191,17 @@ class Util {
 		}
 		return parity;
 	}
+	
+	static int parity(byte[] arr) {
+		int parity = 0;
+		for (int i=0, len=arr.length; i<len; i++) {
+			for (int j=i; j<len; j++) {
+				if (arr[i] > arr[j]) {
+					parity ^= 1;
+				}
+			}
+		}
+		return parity;
+	}
+
 }
