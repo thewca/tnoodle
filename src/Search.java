@@ -173,7 +173,7 @@ public final class Search implements Runnable {
 				lm = m;
 			}
 		}
-		System.out.print(tostr(moveseq));
+		System.out.println(tostr(moveseq));
 		return solve(moveseq);
 	}
 	
@@ -307,34 +307,9 @@ public final class Search implements Runnable {
 		length2 = solcube.length2;
 		int length = length123 - length1 - length2;
 
-		StringBuffer str = new StringBuffer();
-		
-/*		str.append("Step 1 : ");
-		for (int i=0; i<length1; i++) {
-			str.append(move2str[solcube.moveBuffer[i]]);
-			str.append(' ');
-		}
-		if (solcube.add1) {
-			str.append('[');
-			str.append(move2str[solcube.moveBuffer[length1]]);
-			str.append(' ');
-			str.append(move2str[solcube.moveBuffer[length1+1]]);
-			str.append(']');
-		}
-		str.append(String.format(" (%d moves) \n", length1));
-		str.append("Step 2 : ");
-		for (int i=0; i<length2; i++) {
-			str.append(move2str[solcube.moveBuffer[i + length1 + (solcube.add1 ? 2 : 0)]]);
-			str.append(' ');
-		}
-		str.append(String.format(" (%d moves) \n", length2));
-		str.append("Step 3 : ");
-*/		for (int i=0; i<length; i++) {
+		for (int i=0; i<length; i++) {
 			solcube.move(move3std[move3[i]]);
-//			str.append(move2str[move3std[move3[i]]]);
-//			str.append(' ');
 		}
-//		str.append(String.format(" (%d moves) \n", length));
 
 		String facelet = solcube.to333Facelet();
 		String sol = search333.solution(facelet, 20, 100, 50, 0);
@@ -343,7 +318,6 @@ public final class Search implements Runnable {
 		}
 		int len333 = sol.length() / 3;
 		if (len333 < 15) {
-			System.out.println(str);
 			System.out.println(sol);
 			throw new RuntimeException();
 		}
@@ -351,13 +325,9 @@ public final class Search implements Runnable {
 		for (int i=0; i<sol333.length; i++) {
 			solcube.move(sol333[i]);
 		}
-/*		str.append("3x3x3  : ");
-		str.append(sol.replaceAll(" +", " "));
-		str.append(String.format(" (%d moves) \n", len333));
-		str.append(String.format("Total  : %d moves\n", length1 + length2 + length + len333));
-*/		
 
-		str.append(solcube.getMoveString(false));
+		StringBuffer str = new StringBuffer();
+		str.append(solcube.getMoveString(false, true));
 		
 		synchronized (solution) {
 			solution = str.toString();

@@ -106,7 +106,7 @@ final class Center1 {
 		}
 	}
 	
-	int[] ct = new int[24];
+	byte[] ct = new byte[24];
 	
 	Center1() {
 		for (int i=0; i<8; i++) {
@@ -117,7 +117,7 @@ final class Center1 {
 		}		
 	}
 	
-	Center1(int[] ct) {
+	Center1(byte[] ct) {
 		for (int i=0; i<24; i++) {
 			this.ct[i] = ct[i];
 		}
@@ -125,7 +125,7 @@ final class Center1 {
 	
 	Center1(CenterCube c, int urf) {
 		for (int i=0; i<24; i++) {
-			this.ct[i] = (c.ct[i]/2 == urf) ? 1 : 0;
+			this.ct[i] = (byte) ((c.ct[i]/2 == urf) ? 1 : 0);
 		}
 	}
 	
@@ -283,6 +283,10 @@ final class Center1 {
 38	yz2
 39	y'z2
  */
+	static String[] rot2str = {"", "y2", "x", "x y2", "x2", "z2", "x'", "x' y2", "", "", "", "", "", "", "", "", 
+		"y z", "y' z'", "y2 z", "z'", "y' z", "y z'", "z", "z y2", "", "", "", "", "", "", "", "", 
+		"y' x'", "y x", "y'", "y", "y' x", "y x'", "y z2", "y' z2",  "", "", "", "", "", "", "", ""};
+
 
 	void rotate(int r) {
 		for (int j=0; j<r; j++) {
@@ -291,6 +295,27 @@ final class Center1 {
 			if (j%8==7) rot(2);
 			if (j%16==15) rot(3);
 		}
+	}
+	
+	static int getSolvedSym(CenterCube cube) {
+		Center1 c = new Center1(cube.ct);
+		for (int j=0; j<48; j++) {
+			boolean check = true;
+			for (int i=0; i<24; i++) {
+				if (c.ct[i] != i/4) {
+					check = false;
+					break;
+				}
+			}
+			if (check) {
+				return j;
+			}
+			c.rot(0);
+			if (j%2==1) c.rot(1);
+			if (j%8==7) c.rot(2);
+			if (j%16==15) c.rot(3);
+		}
+		return -1;
 	}
 	
 	public boolean equals(Object obj) {
@@ -308,21 +333,12 @@ final class Center1 {
 	
 	static void initSym() {
 		Center1 c = new Center1();
-		for (int i=0; i<24; i++) {
+		for (byte i=0; i<24; i++) {
 			c.ct[i] = i;
 		}
-		Center1 d = new Center1();
-		for (int i=0; i<24; i++) {
-			d.ct[i] = i;
-		}
-		Center1 e = new Center1();
-		for (int i=0; i<24; i++) {
-			e.ct[i] = i;
-		}
-		Center1 f = new Center1();
-		for (int i=0; i<24; i++) {
-			f.ct[i] = i;
-		}
+		Center1 d = new Center1(c.ct);
+		Center1 e = new Center1(c.ct);
+		Center1 f = new Center1(c.ct);
 		
 		for (int i=0; i<48; i++) {
 			for (int j=0; j<48; j++) {

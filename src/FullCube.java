@@ -54,6 +54,7 @@ import static cs.threephase.Moves.*;
 import static cs.threephase.Util.*;
 import static cs.threephase.Center1.symmove;
 import static cs.threephase.Center1.symmult;
+import static cs.threephase.Center1.syminv;
 
 public class FullCube implements Comparable {
 	
@@ -138,28 +139,48 @@ public class FullCube implements Comparable {
 		return getEdge().checkEdge();
 	}
 
-	public String getMoveString(boolean inverse) {
-		StringBuffer sb = new StringBuffer();
+	public String getMoveString(boolean inverse, boolean rotation) {
+		int[] fixedMoves = new int[moveLength - (add1 ? 2 : 0)];
+		int idx = 0;
+		for (int i=0; i<length1; i++) {
+			fixedMoves[idx++] = moveBuffer[i];
+		}
 		int sym = this.sym;
+		for (int i=length1 + (add1 ? 2 : 0); i<moveLength; i++) {
+			if (symmove[sym][moveBuffer[i]] >= dx1) {
+				fixedMoves[idx++] = symmove[sym][moveBuffer[i]] - 9;
+				int rot = move2rot[symmove[sym][moveBuffer[i]] - dx1];
+				sym = symmult[sym][rot];
+			} else {
+				fixedMoves[idx++] = symmove[sym][moveBuffer[i]];
+			}
+		}
+		int finishSym = symmult[syminv[sym]][Center1.getSolvedSym(getCenter())];
+		
+		StringBuffer sb = new StringBuffer();
+		inverse = true;
+		sym = finishSym;
 		if (inverse) {
-			for (int i=moveLength-1; i>=length1 + (add1 ? 2 : 0); i--) {
-				sb.append(moveIstr[symmove[sym][moveBuffer[i]]]).append(' ');
-			}
-			for (int i=length1-1; i>=0; i--) {
-				sb.append(moveIstr[moveBuffer[i]]).append(' ');
-			}
-		} else {
-			for (int i=0; i<length1; i++) {
-				sb.append(move2str[moveBuffer[i]]).append(' ');
-			}
-			for (int i=length1 + (add1 ? 2 : 0); i<moveLength; i++) {
-				if (symmove[sym][moveBuffer[i]] >= dx1) {
-					sb.append(move2str[symmove[sym][moveBuffer[i]]-9]).append(' ');
-					int rot = move2rot[symmove[sym][moveBuffer[i]] - dx1];
+			for (int i=idx-1; i>=0; i--) {
+				int move = fixedMoves[i];
+				move = move / 3 * 3 + (2 - move % 3);
+				if (symmove[sym][move] >= dx1) {
+					sb.append(move2str[symmove[sym][move] - 9]).append(' ');
+					int rot = move2rot[symmove[sym][move] - dx1];
 					sym = symmult[sym][rot];
 				} else {
-					sb.append(move2str[symmove[sym][moveBuffer[i]]]).append(' ');
+					sb.append(move2str[symmove[sym][move]]).append(' ');
 				}
+			}
+			if (rotation) {
+				sb.append(Center1.rot2str[syminv[sym]] + " ");//cube rotation after solution. for wca scramble, it should be omitted.
+			}
+		} else {
+			for (int i=0; i<idx; i++) {
+				sb.append(move2str[fixedMoves[i]]).append(' ');
+			}
+			if (rotation) {
+				sb.append(Center1.rot2str[finishSym]);//cube rotation after solution.
 			}
 		}
 		return sb.toString();
