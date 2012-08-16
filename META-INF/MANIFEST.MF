@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Created-By: 1.7.0_147-icedtea (Oracle Corporation)
-Main-Class: cs.threephase.Search
-Class-Path: twophase.jar

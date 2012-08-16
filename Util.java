@@ -5,6 +5,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Arrays;
 
+import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
+
 class Util {
         private static final Logger l = Logger.getLogger(Util.class.getName());
 
@@ -83,8 +86,8 @@ class Util {
 		}
 
 		if(tpr_tables == null) {
-			//fivephase_tables = new File(Utils.getResourceDirectory(), "tpr_tables");
-			tpr_tables = new File("tpr_tables");
+			tpr_tables = new File(Utils.getResourceDirectory(), "tpr_tables");
+			//tpr_tables = new File("tpr_tables");
 		}
 
 		prepareTables();
@@ -99,8 +102,8 @@ class Util {
 			}
 		}
 		if(inited == InitializationState.UNINITIALIZED) {
-			//TimedLogRecordStart start = new TimedLogRecordStart("Generating fivephase tables");
-			//l.log(start);
+			TimedLogRecordStart start = new TimedLogRecordStart("Generating threephase tables");
+			l.log(start);
 
 			inited = InitializationState.INITING_CENTER1;
 			Center1.createMoveTable();
@@ -116,7 +119,7 @@ class Util {
 				l.log(Level.INFO, "Failed to write to " + tpr_tables, e);
 			}
 			
-			//l.log(start.finishedNow());
+			l.log(start.finishedNow());
 		}
 		inited = InitializationState.INITIALIZED;
 	}
