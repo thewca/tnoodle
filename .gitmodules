@@ -16,3 +16,6 @@
 [submodule "min2phase/src/cs/min2phase"]
 	path = min2phase/src/cs/min2phase
 	url = git@github.com:cubing/min2phase.git
+[submodule "threephase/src/cs/threephase"]
+	path = threephase/src/cs/threephase
+	url = git@github.com:cubing/TPR-4x4x4-Solver.git
