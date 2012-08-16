@@ -135,25 +135,7 @@ public final class Search implements Runnable {
 	}
 	
 	static {
-		DataInputStream dis = null;
-		try {
-			dis = new DataInputStream(new BufferedInputStream(new FileInputStream("twophase.data")));
-			cs.min2phase.Tools.initFrom(dis);
-		} catch (IOException e) {
-			dis = null;
-//			e.printStackTrace();
-		}
 		cs.min2phase.Tools.init();
-		if (dis == null) {
-			DataOutputStream dos = null;
-			try {
-				dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("twophase.data")));
-				cs.min2phase.Tools.saveTo(dos);
-				dos.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 		Util.init();
 		Center1.init();
 		Center2.init();
