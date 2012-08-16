@@ -117,7 +117,7 @@ final class Edge3 implements Runnable {
 	static void createPrun() {
 		System.out.println("Create Phase3 Edge Pruning Table...");
 		prun = new int[12*11*10*9*8*7*6*5*4*3/16];
-		Arrays.fill(prun, (int)-1);
+		Arrays.fill(prun, -1);
 		Arrays.fill(modedTable, (byte)0xbb);
 		setPruning(modedTable, 0, 0);
 		prun[0] = 0xfffffffc;
