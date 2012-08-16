@@ -25,7 +25,7 @@ final class Center1 {
 	static int[] syminv = new int[48];
 	static int[] finish = new int[48];
 	
-	static void init() {
+	static void initSym2Raw() {
 		initSym();
 		Center1 c = new Center1();
 		c.set(0);
@@ -56,12 +56,11 @@ final class Center1 {
 		}
 		occ = null;
 		System.gc();
+	}
+
+	static void init() {
 		
-		if (!read(ctsmv, 0, 15582, 36, "Center1.move")) {
-			createMoveTable();
-			write(ctsmv, 0, 15582, 36, "Center1.move");
-		}		
-		
+		initSym2Raw();
 		Arrays.fill(csprun, (byte)-1);
 		csprun[0] = 0;
 		int depth = 0;

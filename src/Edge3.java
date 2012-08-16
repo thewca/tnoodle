@@ -55,13 +55,6 @@ final class Edge3 implements Runnable {
 	private static int[] fact = {19958400, 1814400, 181440, 20160, 2520, 360, 60, 12, 3, 1};
 	static int[] factX = {1, 1, 2/2, 6/2, 24/2, 120/2, 720/2, 5040/2, 40320/2, 362880/2, 3628800/2, 39916800/2, 479001600/2};
 	
-	static void init() {
-		if (!read(modedTable, 0, modedTable.length, "Edge3.prunPmod")) {
-			createPrun();
-			write(modedTable, 0, modedTable.length, "Edge3.prunPmod");
-		}
-	}
-	
 	int idx = 0;
 	
 	final static int MOD = 12;

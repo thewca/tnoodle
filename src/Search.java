@@ -110,6 +110,7 @@ public final class Search implements Runnable {
 
 	public static void main(String[] args) {
 		int inf;
+		Random r = new Random();
 		if (args.length == 0) {
 			inf = 0;
 		} else {
@@ -119,8 +120,8 @@ public final class Search implements Runnable {
 		int[] dis = new int[60];
 		int lasttot = 0;
 		for (int i=inf; i!=0; --i) {
-//			first.randomMove();
-			System.out.println(first.randomMove());
+//			first.randomState();
+			System.out.println(first.randomState(r));
 			int curlen = first.totlen - lasttot;
 			lasttot = first.totlen;
 			dis[curlen]++;
@@ -134,7 +135,6 @@ public final class Search implements Runnable {
 	}
 	
 	static {
-		System.out.println("Initialization...");
 		DataInputStream dis = null;
 		try {
 			dis = new DataInputStream(new BufferedInputStream(new FileInputStream("twophase.data")));
@@ -154,57 +154,20 @@ public final class Search implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		Util.init();
 		Center1.init();
 		Center2.init();
 		Center3.init();
-		Edge3.init();
-		System.out.println("OK");	
 	}
 	
-	static Random r = new Random(42);
-	
-	public String randomMove() {
-		int[] moveseq = new int[40];
-		int lm = 36;
-		for (int i=0; i<moveseq.length;) {
-			int m = r.nextInt(27);
-			if (!ckmv[lm][m]) {
-				moveseq[i++] = m;
-				lm = m;
-			}
-		}
-		System.out.println(tostr(moveseq));
-		return solve(moveseq);
-	}
-	
-	public String randomState() {
-		calc(System.currentTimeMillis());
+	public String randomState(Random r) {
+		calc(r);
 		return solution;
 	}
 	
-	public String solve(String scramble) {
-		int[] moveseq = tomove(scramble);
-		return solve(moveseq);
-	}
-	
-	public String solve(int[] moveseq) {
-		calc(moveseq);
-		return solution;	
-	}
-	
-//	public String getScramble() {
-//		calc(System.currentTimeMillis());
-//		return solution;
-//	}
-	
-	public void calc(long seed) {
-	    c = new FullCube(seed);
+	public void calc(Random r) {
+	    c = new FullCube(r);
 	    run();
-	}
-	
-	public void calc(int[] moveseq) {
-		c = new FullCube(moveseq);
-		run();
 	}
 	
 	int totlen = 0;
@@ -327,7 +290,7 @@ public final class Search implements Runnable {
 		}
 
 		StringBuffer str = new StringBuffer();
-		str.append(solcube.getMoveString(false, true));
+		str.append(solcube.getMoveString(true, false));
 		
 		synchronized (solution) {
 			solution = str.toString();

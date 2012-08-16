@@ -95,7 +95,10 @@ public class FullCube implements Comparable {
 	}
 	
 	public FullCube(long seed) {
-		Random r = new Random(seed);
+		this(new Random(seed));
+	}
+	
+	public FullCube(Random r) {
 		edge = new EdgeCube(r);
 		center = new CenterCube(r);
 		corner = new CornerCube(r);
