@@ -145,15 +145,18 @@ public class Search {
 	int verify(String facelets) {
 		int count = 0x000000;
 		try {
+			String center = new String(new char[] {
+				facelets.charAt(4), 
+				facelets.charAt(13), 
+				facelets.charAt(22), 
+				facelets.charAt(31), 
+				facelets.charAt(40), 
+				facelets.charAt(49)
+			});
 			for (int i=0; i<54; i++) {
-				switch (facelets.charAt(i)) {
-					case 'U':f[i] = 0; break;
-					case 'R':f[i] = 1; break;
-					case 'F':f[i] = 2; break;
-					case 'D':f[i] = 3; break;
-					case 'L':f[i] = 4; break;
-					case 'B':f[i] = 5; break;
-					default: return -1;
+				f[i] = (byte) center.indexOf(facelets.charAt(i));
+				if (f[i] == -1) {
+					return -1;
 				}
 				count += 1 << (f[i] << 2);
 			}
@@ -282,7 +285,7 @@ public class Search {
 	 * 		2: Try Next Axis
 	 */
 	private int initPhase2() {
-		if (System.currentTimeMillis() > (solution == null ? timeOut : timeMin)) {
+		if (System.currentTimeMillis() >= (solution == null ? timeOut : timeMin)) {
 			return 0;
 		}
 		valid2 = Math.min(valid2, valid1);
@@ -335,7 +338,7 @@ public class Search {
 				sol = depth1 + depth2;
 				maxDep2 = Math.min(12, sol-depth1);
 				solution = solutionToString();
-				return System.currentTimeMillis() > timeMin ? 0 : 1;
+				return System.currentTimeMillis() >= timeMin ? 0 : 1;
 			}
 		}
 		return 1;
