@@ -10,7 +10,7 @@ import java.io.IOException;
  */
 public class Tools implements Runnable {
 	
-	static final boolean USE_TWIST_FLIP_PRUN = false;
+	static final boolean USE_TWIST_FLIP_PRUN = true;
 
 	private static boolean inited = false;
 	
