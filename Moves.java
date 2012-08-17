@@ -102,15 +102,15 @@ class Moves {
 	public static final int bx3 = 35;
 	public static final int eom = 36;//End Of Moves
 	
-	public static final String[] move2str = {"U  ", "U2 ", "U' ", "R  ", "R2 ", "R' ", "F  ", "F2 ", "F' ", 
-											 "D  ", "D2 ", "D' ", "L  ", "L2 ", "L' ", "B  ", "B2 ", "B' ", 
-											 "Uw ", "Uw2", "Uw'", "Rw ", "Rw2", "Rw'", "Fw ", "Fw2", "Fw'", 
-											 "Dw ", "Dw2", "Dw'", "Lw ", "Lw2", "Lw'", "Bw ", "Bw2", "Bw'"};
+	public static final String[] move2str = {"U", "U2", "U'", "R", "R2", "R'", "F", "F2", "F'", 
+	                                         "D", "D2", "D'", "L", "L2", "L'", "B", "B2", "B'", 
+	                                         "Uw", "Uw2", "Uw'", "Rw", "Rw2", "Rw'", "Fw", "Fw2", "Fw'", 
+	                                         "Dw", "Dw2", "Dw'", "Lw", "Lw2", "Lw'", "Bw", "Bw2", "Bw'"};
 	
-	public static final String[] moveIstr = {"U' ", "U2 ", "U  ", "R' ", "R2 ", "R  ", "F' ", "F2 ", "F  ", 
-											 "D' ", "D2 ", "D  ", "L' ", "L2 ", "L  ", "B' ", "B2 ", "B  ", 
-											 "Uw'", "Uw2", "Uw ", "Rw'", "Rw2", "Rw ", "Fw'", "Fw2", "Fw ", 
-											 "Dw'", "Dw2", "Dw ", "Lw'", "Lw2", "Lw ", "Bw'", "Bw2", "Bw "};
+	public static final String[] moveIstr = {"U'", "U2", "U", "R'", "R2", "R", "F'", "F2", "F", 
+	                                         "D'", "D2", "D", "L'", "L2", "L", "B'", "B2", "B", 
+	                                         "Uw'", "Uw2", "Uw", "Rw'", "Rw2", "Rw", "Fw'", "Fw2", "Fw", 
+	                                         "Dw'", "Dw2", "Dw", "Lw'", "Lw2", "Lw", "Bw'", "Bw2", "Bw"};
 	
 	static int[] move2std = {Ux1, Ux2, Ux3, Rx1, Rx2, Rx3, Fx1, Fx2, Fx3, 
 							 Dx1, Dx2, Dx3, Lx1, Lx2, Lx3, Bx1, Bx2, Bx3, 
