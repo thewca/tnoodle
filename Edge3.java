@@ -4,7 +4,7 @@ import java.io.*;
 import static cs.threephase.Util.*;
 import static cs.threephase.Moves.*;
 
-final class Edge3 implements Runnable {
+public final class Edge3 implements Runnable {
 	int[] edge = new int[12];
 	int[] temp;
 
