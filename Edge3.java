@@ -64,7 +64,7 @@ final class Edge3 implements Runnable {
 
 	final static int SPLIT = 4;
 	
-	public static int done = 0;
+	static int done = 0;
 	static int depth = 0;
 	static int depm3;// = depth % 3;
 	static int depp3;// = 3 ^ ((depth+1) % 3);
@@ -113,7 +113,11 @@ final class Edge3 implements Runnable {
 			}
 		}
 	}
-	
+
+	public static double initStatus() {
+		return done / 89763296.0;
+	}
+
 	static void createPrun() {
 		System.out.println("Create Phase3 Edge Pruning Table...");
 		prun = new int[12*11*10*9*8*7*6*5*4*3/16];
