@@ -8,7 +8,7 @@ import java.util.Arrays;
 import net.gnehzr.tnoodle.utils.Utils;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
-class Util {
+public class Util {
         private static final Logger l = Logger.getLogger(Util.class.getName());
 
 	static int[][] Cnk = new int[25][25];
