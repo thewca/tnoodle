@@ -93,7 +93,7 @@ public class CubeScrambler extends Scrambler {
 			StringBuffer scramble = new StringBuffer(length*3);
 			int lastAxis = -1;
 			int axis = 0;
-			int slices = size - ((size % 2 != 0) ? 1 : 0);
+			int slices = size - 1;
 			int[] slicesMoved = new int[slices];
 			int moved = 0;
 	
