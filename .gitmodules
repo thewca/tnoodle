@@ -10,9 +10,6 @@
 [submodule "scrambler-interface/src_tnoodle_resources/tnoodleServerHandler/scrambler-interface"]
 	path = scrambler-interface/src_tnoodle_resources/tnoodleServerHandler/scrambler-interface
 	url = git@github.com:cubing/scrambler-interface.git
-[submodule "fivephase/src/cg/fivestage444"]
-	path = fivephase/src/cg/fivestage444
-	url = git://github.com/cubing/FiveStage444.git
 [submodule "min2phase/src/cs/min2phase"]
 	path = min2phase/src/cs/min2phase
 	url = git@github.com:cubing/min2phase.git

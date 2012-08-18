@@ -64,8 +64,8 @@ public class CubeScrambler extends Scrambler {
 		if(size != 4) {
 			return 1;
 		}
-		cg.fivestage444.Tools.InitializationState state = cg.fivestage444.Tools.getInitializationState();
-		cg.fivestage444.Tools.InitializationState maxState = cg.fivestage444.Tools.InitializationState.INITIALIZED;
+		cs.threephase.Tools.InitializationState state = cs.threephase.Tools.getInitializationState();
+		cs.threephase.Tools.InitializationState maxState = cs.threephase.Tools.InitializationState.INITIALIZED;
 
 		return 1.0 * state.ordinal() / maxState.ordinal();
 	}

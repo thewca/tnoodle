@@ -4,7 +4,6 @@
 	<classpathentry kind="src" output="bin_tnoodle_resources" path="src_tnoodle_resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/min2phase"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/fivephase"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/threephase"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/sq12phase"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/utils"/>
