@@ -115,7 +115,7 @@ public final class Edge3 implements Runnable {
 	}
 
 	public static double initStatus() {
-		return done / 89763296.0;
+		return done / 89763295.0;
 	}
 
 	static void createPrun() {
