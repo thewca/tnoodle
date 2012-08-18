@@ -64,7 +64,7 @@ final class Edge3 implements Runnable {
 
 	final static int SPLIT = 4;
 	
-	static int done = 0;
+	public static int done = 0;
 	static int depth = 0;
 	static int depm3;// = depth % 3;
 	static int depp3;// = 3 ^ ((depth+1) % 3);
