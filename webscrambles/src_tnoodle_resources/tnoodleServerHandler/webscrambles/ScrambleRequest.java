@@ -486,15 +486,13 @@ class ScrambleRequest {
 				cb.beginText();
 				cb.setFontAndSize(bf, 25f);
 				int MAGIC_NUMBER = 40; // kill me now
-				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves Challenge", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
 				cb.endText();
 				
 				List rules = new List(List.UNORDERED);
 				rules.add("Notate your solution by writing one move per bar.");
 				rules.add("To delete moves, clearly erase/blacken them.");
 				rules.add("Face moves F, B, R, L, U, and D are clockwise.");
-				rules.add("Rotations x, y, and z follow R, U, and F.");
-				rules.add("Slice moves M, S, and E follow L, F, and D.");
 				rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
 				
 				ct.addElement(rules);
@@ -504,7 +502,7 @@ class ScrambleRequest {
 				
 				rules = new List(List.UNORDERED);
 				rules.add("You have 1 hour to find a solution.");
-				rules.add("Your solution length will be counted in HTM. (Slice moves count as two turns.)");
+				rules.add("Your solution length will be counted in BTM. (Slice moves count as two turns.)");
 				int maxMoves = WCA_MAX_MOVES_FMC;
 				rules.add("Your solution must be at most " + maxMoves + " moves, including rotations.");
 				rules.add("Your solution must not be related to the scrambling algorithm in any way.");
