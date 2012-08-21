@@ -227,7 +227,7 @@ public final class Search implements Runnable {
 					ct3.set(arr2[i].getCenter(), eparity ^ arr2[i].getCorner().getParity());
 					int ct = ct3.getct();
 					int edge = e12.get();
-					int prun = Math.max(e12.getprunmod(edge), e12.getprunmod(e12.getmv_x()));
+					int prun = Math.max(Edge3.getprunmod(edge), Edge3.getprunmod(e12.getmv_x()));
 					int lm = 20;//std3move[arr2[i].moveseq2[arr2[i].length2-1]/3*3+1];
 				
 					if (prun <= length123 - arr2[i].length1 - arr2[i].length2 
@@ -414,7 +414,7 @@ public final class Search implements Runnable {
 		ct3.set(c2.getCenter(), eparity ^ c2.getCorner().getParity());
 		int ct = ct3.getct();
 		int edge = e12.get();
-		int prun = Math.max(e12.getprunmod(edge), e12.getprunmod(e12.getmv_x()));
+		int prun = Math.max(Edge3.getprunmod(edge), Edge3.getprunmod(e12.getmv_x()));
 		
 		if (arr2[arr2idx] == null) {
 			arr2[arr2idx] = new FullCube(c2);

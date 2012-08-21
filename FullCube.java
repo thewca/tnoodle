@@ -56,7 +56,7 @@ import static cs.threephase.Center1.symmove;
 import static cs.threephase.Center1.symmult;
 import static cs.threephase.Center1.syminv;
 
-public class FullCube implements Comparable {
+public class FullCube implements Comparable<FullCube> {
 	
 	public static class ValueComparator implements Comparator<FullCube> {
 		public int compare(FullCube c1, FullCube c2) {
@@ -75,12 +75,8 @@ public class FullCube implements Comparable {
 	int length3 = 0;
 
 	@Override
-	public int compareTo(Object c) {
-		if (c instanceof FullCube) {
-			return this.value - ((FullCube)c).value;
-		} else {
-			return 0;
-		}
+	public int compareTo(FullCube c) {
+		return this.value - c.value;
 	}
 	
 	public FullCube() {
