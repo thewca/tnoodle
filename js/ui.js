@@ -381,7 +381,7 @@ mark2.settings = (function() {
 		"222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5 } },
 		"333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3 } },
 		"333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5 } },
-		"333fm":  {name: "3x3 fewest moves", default_round: {type: "best", num_scrambles: 2 } },
+		"333fm":  {name: "3x3 fewest moves", default_round: {type: "best", num_scrambles: 1 } },
 		"333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3 } },
 		"minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5 } },
 		"pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5 } },
