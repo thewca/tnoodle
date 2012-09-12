@@ -311,6 +311,7 @@ class ScrambleRequest {
 			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
 				String scramble = scrambleRequest.scrambles[i];
 				PdfContentByte cb = docWriter.getDirectContent();
+				float LINE_THICKNESS = 0.5f;
 				BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 				
 				int bottom = 30;
@@ -370,6 +371,9 @@ class ScrambleRequest {
 				int linesX = 10;
 				int linesY = (int) Math.ceil(1.0*WCA_MAX_MOVES_FMC / linesX);
 
+				cb.setLineWidth(LINE_THICKNESS);
+				cb.stroke();
+
 				int allocatedX = (2*linesX-1)*lineWidth;
 				int excessX = availableSolutionWidth-linesX*lineWidth;
 				int moveCount = 0;
@@ -386,6 +390,8 @@ class ScrambleRequest {
 					}
 				}
 				
+				float UNDERLINE_THICKNESS = 0.2f;
+				cb.setLineWidth(UNDERLINE_THICKNESS);
 				cb.stroke();
 				
 				cb.beginText();
