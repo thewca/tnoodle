@@ -49,12 +49,14 @@ Center Cubies:
 
 package cs.threephase;
 
-import java.util.*;
-import static cs.threephase.Moves.*;
-import static cs.threephase.Util.*;
+import static cs.threephase.Center1.syminv;
 import static cs.threephase.Center1.symmove;
 import static cs.threephase.Center1.symmult;
-import static cs.threephase.Center1.syminv;
+import static cs.threephase.Moves.dx1;
+import static cs.threephase.Moves.move2str;
+
+import java.util.Comparator;
+import java.util.Random;
 
 public class FullCube implements Comparable<FullCube> {
 	

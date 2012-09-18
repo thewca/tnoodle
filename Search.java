@@ -1,18 +1,27 @@
 package cs.threephase;
 
-import static cs.threephase.Moves.*;
-import static cs.threephase.Util.*;
-import static cs.threephase.Center2.rlmv;
+import static cs.threephase.Center1.csprun;
+import static cs.threephase.Center1.ctsmv;
+import static cs.threephase.Center1.symmove;
+import static cs.threephase.Center1.symmult;
 import static cs.threephase.Center2.ctmv;
 import static cs.threephase.Center2.ctprun;
-import static cs.threephase.Center2.rlrot;
-import static cs.threephase.Center1.symmult;
-import static cs.threephase.Center1.ctsmv;
-import static cs.threephase.Center1.csprun;
-import static cs.threephase.Center1.symmove;
+import static cs.threephase.Center2.rlmv;
+import static cs.threephase.Moves.bx3;
+import static cs.threephase.Moves.ckmv2;
+import static cs.threephase.Moves.ckmv3;
+import static cs.threephase.Moves.dx3;
+import static cs.threephase.Moves.fx1;
+import static cs.threephase.Moves.move2std;
+import static cs.threephase.Moves.move2str;
+import static cs.threephase.Moves.move3std;
+import static cs.threephase.Moves.skipAxis2;
+import static cs.threephase.Moves.skipAxis3;
+import static cs.threephase.Moves.ux1;
 
-import java.util.*;
-import java.io.*;
+import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.Random;
 
 public final class Search implements Runnable {
 	final static int PHASE1_SOLUTIONS = 10000;

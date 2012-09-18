@@ -1,8 +1,9 @@
 package cs.threephase;
 
-import static cs.threephase.Util.*;
-import static cs.threephase.Moves.*;
-import java.util.*;
+import static cs.threephase.Util.Cnk;
+import static cs.threephase.Util.swap;
+
+import java.util.Arrays;
 
 
 /*

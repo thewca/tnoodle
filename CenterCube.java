@@ -1,8 +1,8 @@
 package cs.threephase;
 
-import java.util.*;
-import static cs.threephase.Moves.*;
-import static cs.threephase.Util.*;
+import static cs.threephase.Util.swap;
+
+import java.util.Random;
 
 class CenterCube {
 

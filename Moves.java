@@ -1,5 +1,4 @@
 package cs.threephase;
-import java.util.*;
 
 class Moves {
 	static final byte U1 = 0;

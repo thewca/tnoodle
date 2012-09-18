@@ -1,8 +1,5 @@
 package cs.threephase;
-import java.util.*;
-import java.io.*;
-import static cs.threephase.Util.*;
-import static cs.threephase.Moves.*;
+import java.util.Arrays;
 
 public final class Edge3 implements Runnable {
 	int[] edge = new int[12];

@@ -1,6 +1,30 @@
 package cs.threephase;
 
-import static cs.threephase.Moves.*;
+import static cs.threephase.Moves.B1;
+import static cs.threephase.Moves.B3;
+import static cs.threephase.Moves.B7;
+import static cs.threephase.Moves.B9;
+import static cs.threephase.Moves.D1;
+import static cs.threephase.Moves.D3;
+import static cs.threephase.Moves.D7;
+import static cs.threephase.Moves.D9;
+import static cs.threephase.Moves.F1;
+import static cs.threephase.Moves.F3;
+import static cs.threephase.Moves.F7;
+import static cs.threephase.Moves.F9;
+import static cs.threephase.Moves.L1;
+import static cs.threephase.Moves.L3;
+import static cs.threephase.Moves.L7;
+import static cs.threephase.Moves.L9;
+import static cs.threephase.Moves.R1;
+import static cs.threephase.Moves.R3;
+import static cs.threephase.Moves.R7;
+import static cs.threephase.Moves.R9;
+import static cs.threephase.Moves.U1;
+import static cs.threephase.Moves.U3;
+import static cs.threephase.Moves.U7;
+import static cs.threephase.Moves.U9;
+
 import java.util.Random;
 
 class CornerCube {
