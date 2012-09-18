@@ -33,16 +33,17 @@ def runCmd(argv, showStatus=False, interactive=False):
     stdout = ''
     stderr = ''
     while p.poll() is None:
-            newStderr = p.stderr.read()
-            if newStderr:
-                    stderr += newStderr
-                    if showStatus:
-                            print newStderr
             newStdout = p.stdout.read()
             if newStdout:
                     stdout += newStdout
                     if showStatus:
                             print newStdout
+            # TODO - i've noticed that the call to stderr.read() hangs, swapping the order seems to help...
+            newStderr = p.stderr.read()
+            if newStderr:
+                    stderr += newStderr
+                    if showStatus:
+                            print newStderr
     return p.returncode, stdout, stderr
 
 def entryPoint():
@@ -92,8 +93,22 @@ def isTopologicalSort(sortedNodes):
 				return False
 	return True
 
-def topologicalSort(rootProject):
-	visitedNodes = dfs(rootProject)
+def topologicalSort(projects):
+	potentialRoots = projects[:]
+	for project in projects:
+		for dep in project.getDependencies():
+			if dep in potentialRoots:
+				potentialRoots.remove(dep)
+	assert len(potentialRoots) > 0
+
+	class FakeNode:
+		def getDependencies(self):
+			return potentialRoots
+	ultimateRoot = FakeNode()
+
+	visitedNodes = dfs(ultimateRoot)
+	assert visitedNodes[0] == ultimateRoot
+	visitedNodes = visitedNodes[1:]
 	visitedNodes = rightPrune(visitedNodes)
 	assert isTopologicalSort(visitedNodes)
 	return visitedNodes
@@ -110,7 +125,7 @@ class tmt:
 			if stdout != "":
 				break;
 			retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
-		
+
 		assert retVal == 0
 		self.VERSION = stdout.strip()
 		versionPrefix = "v"
@@ -120,8 +135,6 @@ class tmt:
 		retVal, stdout, stderr = self.runCmd([ "git", "ls-files", "-m", "-o", "-d", "--exclude-standard" ])
 		if stdout:
 			self.VERSION += "-%s" % int(time.time())
-
-		print "Version: ", self.VERSION
 
 		# Check that the git hooks folder is all set up
 		setupGitHooks.setupGitHooksIfNotSetup()
@@ -140,7 +153,7 @@ class tmt:
 		for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
 			project.afterProjects()
 
-		sortedProjects = topologicalSort(defaultProject)
+		sortedProjects = topologicalSort(tmt.TmtProject.projects.values())
 		for project in reversed(sortedProjects):
 			project.configure()
 
@@ -459,7 +472,7 @@ class TmtProject(object):
 	def getDependencies(self):
 		assert False
 	def getRecursiveDependenciesTopoSorted(self):
-		return topologicalSort(self)
+		return topologicalSort([self])
 	def prettyDependencies(self, level=0, printingLevels=None, seen=None):
 		if printingLevels == None:
 			assert level == 0
@@ -563,6 +576,7 @@ class EclipseProject(TmtProject):
 		self.argv = argv
 		self.nonJavaSrcDeps = []
 		self.tests = tests
+		self.strictCompile = True
 		TmtProject.__init__(self, name, description)
 
 	def getDependencies(self):
@@ -595,7 +609,7 @@ class EclipseProject(TmtProject):
 			separator = ';'
 		else:
 			separator = ':'
-		return separator.join(entities)
+		return separator.join(sorted(entities))
 
 	def afterProjects(self):
 		dependencyFile = join(self.name, '.classpath')
@@ -690,16 +704,17 @@ class EclipseProject(TmtProject):
 			args = [ 'javac' ]
 			args += [ '-d', tempBin ]
 
-            # Enable all warnings
-			args += [ '-Xlint' ]
-            # Treat warnings as errors
-			args += [ '-Werror' ]
+			if self.strictCompile:
+				# Enable all warnings
+				args += [ '-Xlint' ]
+				# Treat warnings as errors
+				args += [ '-Werror' ]
 
-            # Ignored warnings
-            # We don't need to be warned about possible fallthroughs in switch statements
-			args += [ '-Xlint:-fallthrough' ]
-            # Yes, I know I'm using the reflecation api, and no, there isn't another choice
-			args += [ '-XDignore.symbol.file' ]
+				# Ignored warnings
+				# We don't need to be warned about possible fallthroughs in switch statements
+				args += [ '-Xlint:-fallthrough' ]
+				# Yes, I know I'm using the reflecation api, and no, there isn't another choice
+				args += [ '-XDignore.symbol.file' ]
 
 			entities = self.getClasspathEntities()
 
