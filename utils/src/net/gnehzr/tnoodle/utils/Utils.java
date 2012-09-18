@@ -465,6 +465,7 @@ public final class Utils {
 				}
 				jarIs.closeEntry();
 			}
+			jarIs.close();
 			resourceDirectory.getParentFile().mkdirs();
 			azzert(tempResourceDirectory.renameTo(resourceDirectory));
 		}

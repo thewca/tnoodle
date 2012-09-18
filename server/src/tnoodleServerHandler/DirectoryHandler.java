@@ -118,6 +118,7 @@ public class DirectoryHandler extends SafeHttpHandler {
 		DataInputStream in = new DataInputStream(new FileInputStream(f));
 		byte[] data = new byte[(int) f.length()];
 		in.readFully(data);
+		in.close();
 		
 		String fileName = f.getName();
 		String contentType = null;

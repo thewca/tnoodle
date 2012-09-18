@@ -13,32 +13,30 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
-import java.net.MalformedURLException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
-import javax.swing.ImageIcon;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
-import java.security.NoSuchAlgorithmException;
-import java.security.KeyStore;
-import java.security.cert.CertificateException;
-import java.security.UnrecoverableKeyException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import javax.swing.ImageIcon;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -49,9 +47,8 @@ import net.gnehzr.tnoodle.utils.Utils;
 import tnoodleServerHandler.DirectoryHandler;
 
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpsServer;
 import com.sun.net.httpserver.HttpsConfigurator;
-import com.sun.net.httpserver.HttpsParameters;
+import com.sun.net.httpserver.HttpsServer;
 
 public class TNoodleServer {
 	
@@ -336,6 +333,7 @@ public class TNoodleServer {
 					DataInputStream in = new DataInputStream(new FileInputStream(injectCodeFile));
 					byte[] b = new byte[(int) injectCodeFile.length()];
 					in.readFully(b);
+					in.close();
 					DirectoryHandler.setHeadInjectCode(new String(b));
 				}
 				boolean enableCaching = !options.has(noCachingOpt);

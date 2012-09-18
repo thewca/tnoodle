@@ -71,6 +71,7 @@ public class Plugins<H> {
 			newPluginComment.put(name, lastComment != null ? lastComment : name);
 			lastComment = null;
 		}
+		in.close();
 
 		filePlugins = newFilePlugins;
 		pluginComment = newPluginComment;
