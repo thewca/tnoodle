@@ -1,4 +1,4 @@
-package ui;
+package cs.min2phase;
 
 import cs.min2phase.Tools;
 import cs.min2phase.Search;

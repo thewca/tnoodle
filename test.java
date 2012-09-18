@@ -1,4 +1,5 @@
-import java.util.Random;
+package cs.min2phase;
+
 import java.io.*;
 import cs.min2phase.Tools;
 import cs.min2phase.Search;
