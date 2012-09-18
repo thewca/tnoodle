@@ -1,21 +1,19 @@
 package scrambler;
 
-import java.util.Random;
-import java.util.HashMap;
+import static net.gnehzr.tnoodle.utils.Utils.toColor;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
-import java.awt.Graphics2D;
-import java.awt.Dimension;
-import java.awt.Color;
-import java.util.regex.Pattern;
+import java.awt.geom.GeneralPath;
+import java.util.HashMap;
+import java.util.Random;
 import java.util.regex.Matcher;
-
-
-import static net.gnehzr.tnoodle.utils.Utils.toColor;
-
+import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Scrambler;
@@ -49,7 +47,6 @@ public class ClockScrambler extends Scrambler {
 	public String generateScramble(Random r) {
 		StringBuffer scramble = new StringBuffer();
 		
-		String[] peg={"U","d"};
 		for(int x=0; x<9; x++) {
 			int turn = r.nextInt(12)-5;
 			boolean clockwise = ( turn >= 0 );
@@ -142,9 +139,6 @@ public class ClockScrambler extends Scrambler {
 	}
 
 	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) {
-		String word;
-		int move;
-
 		if(scramble == null || scramble.length() == 0) {
 			return;
 		}

@@ -160,9 +160,9 @@ public class TwoByTwoSolver {
 	    for(int l=min_length;l<100;l++)
 	    	if(search(0,q,t,l,-1, sol))
 	    		break;
-	    int turnCount = 0;
-	    for(q=0;q<sol.length && sol[q] != -1;q++)
-	    	turnCount++;
+//	    int turnCount = 0;
+//	    for(q=0;q<sol.length && sol[q] != -1;q++)
+//	    	turnCount++;
 	    StringBuffer turns = new StringBuffer();
 	    for(q=q-1; q>=0; q--) {
 	    	turns.append(" " + "URF".charAt(sol[q]/10) + DIR_TO_STR[sol[q]%10]);

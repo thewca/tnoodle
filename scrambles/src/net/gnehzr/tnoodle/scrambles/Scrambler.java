@@ -123,8 +123,9 @@ public abstract class Scrambler {
 
 	private String[] generateScrambles(Random r, int count) {
 		String[] scrambles = new String[count];
-		for(int i = 0; i < count; i++)
+		for(int i = 0; i < count; i++) {
 			scrambles[i] = generateScramble(r);
+		}
 		return scrambles;
 	}
 
