@@ -1,32 +1,25 @@
 package tnoodleServerHandler.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
 import static net.gnehzr.tnoodle.utils.Utils.parseExtension;
 import static net.gnehzr.tnoodle.utils.Utils.throwableToString;
 import static net.gnehzr.tnoodle.utils.Utils.toInt;
 
-import java.io.Writer;
-import java.io.OutputStreamWriter;
-
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.SortedMap;
-
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.dom.GenericDOMImplementation;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.DOMImplementation;
 
 import javax.imageio.ImageIO;
 
@@ -35,11 +28,15 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.server.SafeHttpHandler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
+import net.lingala.zip4j.exception.ZipException;
+
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 import com.itextpdf.text.DocumentException;
 import com.sun.net.httpserver.HttpExchange;
-import net.lingala.zip4j.exception.ZipException;
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 public class ScrambleViewHandler extends SafeHttpHandler {
 	private SortedMap<String, LazyInstantiator<Scrambler>> scramblers;

@@ -1,6 +1,7 @@
 package tnoodleServerHandler.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
 import static net.gnehzr.tnoodle.utils.Utils.toInt;
 
 import java.awt.Color;
@@ -13,10 +14,10 @@ import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.regex.Pattern;
+import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.SortedMap;
+import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
@@ -24,13 +25,15 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.ZipOutputStream;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
-import com.itextpdf.text.pdf.PdfDestination;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfOutline;
+import com.itextpdf.awt.DefaultFontMapper;
+import com.itextpdf.awt.PdfGraphics2D;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Chapter;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -44,24 +47,18 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.DefaultSplitCharacter;
+import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfChunk;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfDestination;
 import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfOutline;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.awt.PdfGraphics2D;
-import com.itextpdf.awt.DefaultFontMapper;
-
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.ZipOutputStream;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
-
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 class ScrambleRequest {
 	private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
