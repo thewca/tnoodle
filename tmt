@@ -68,7 +68,6 @@ RESOURCE_FOLDER_SRC = 'src_%s' % RESOURCE_FOLDER
 RESOURCE_FOLDER_BIN = 'bin_%s' % RESOURCE_FOLDER
 
 PROJECT_FILE_NAME = 'tmtproject.py'
-DEFAULT_PROJECT_NAME = 'all'
 
 def dfs(node, path=()):
 	assert node not in path, "Not a dag!"
@@ -102,17 +101,33 @@ def topologicalSort(projects):
 				potentialRoots.remove(dep)
 	assert len(potentialRoots) > 0
 
-	class FakeNode:
+	class UltimateRoot(tmt.TmtProject):
+		def __init__(self, name, description):
+			# Note that we do *not* call our parent's constructer here,
+			# as we do not want to be added to the global list of projects
+			self.name = name
+			self.description = description
+
+		def compile(self):
+			pass
+
 		def getDependencies(self):
 			return potentialRoots
-	ultimateRoot = FakeNode()
+
+		def check(self):
+			return
+
+		def clean(self):
+			for dep in self.getDependencies():
+				dep.clean()
+	ultimateRoot = UltimateRoot(name="all", description="")
 
 	visitedNodes = dfs(ultimateRoot)
 	assert visitedNodes[0] == ultimateRoot
 	visitedNodes = visitedNodes[1:]
 	visitedNodes = rightPrune(visitedNodes)
 	assert isTopologicalSort(visitedNodes)
-	return visitedNodes
+	return visitedNodes, ultimateRoot
 
 class tmt:
 	def _cdEntryPoint(self):
@@ -148,13 +163,12 @@ class tmt:
 			imp.load_source('', projectFile)
 			assert dirname(projectFile) in tmt.TmtProject.projects
 
-		assert DEFAULT_PROJECT_NAME in tmt.TmtProject.projects, tmt.TmtProject.projects.keys()
-		defaultProject = tmt.TmtProject.projects[ DEFAULT_PROJECT_NAME ]
-
 		for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
 			project.afterProjects()
 
-		sortedProjects = topologicalSort(tmt.TmtProject.projects.values())
+		sortedProjects, fakeRoot = topologicalSort(tmt.TmtProject.projects.values())
+		# The key None maps to a fake project that (indirectly) depends on everything
+		tmt.TmtProject.projects[None] = fakeRoot
 		for project in reversed(sortedProjects):
 			project.configure()
 
@@ -256,7 +270,7 @@ class tmt:
 			formatter_class=ArgumentDefaultsHelpFormatter)
 		parser_make.add_argument(
 			'--project', '-p',
-			default=DEFAULT_PROJECT_NAME,
+			default=None,
 			type=str,
 			help='the project to build')
 		parser_make.add_argument(
@@ -306,7 +320,7 @@ class tmt:
 			help='')
 		parser_graph.add_argument(
 			'--project', '-p',
-			default=DEFAULT_PROJECT_NAME, type=str,
+			default=None, type=str,
 			help='the project to build')
 		parser_graph.add_argument(
 			'--timestamps', '-t',
@@ -473,7 +487,7 @@ class TmtProject(object):
 	def getDependencies(self):
 		assert False
 	def getRecursiveDependenciesTopoSorted(self):
-		return topologicalSort([self])
+		return topologicalSort([self])[0]
 	def prettyDependencies(self, level=0, printingLevels=None, seen=None):
 		if printingLevels == None:
 			assert level == 0
