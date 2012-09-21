@@ -361,7 +361,7 @@ public final class Utils {
 	private static Class<?> getCallerClass() {
 		Class<?> callerClass = Utils.class;
 		int i = 2;
-		while(callerClass.getPackage().equals(Utils.class.getPackage())) {
+		while(Utils.class.getPackage().equals(callerClass.getPackage())) {
 			callerClass = Reflection.getCallerClass(i++);
 		}
 		return callerClass;
