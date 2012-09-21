@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from os.path import exists, dirname, join, isdir, split, abspath, relpath, basename
 import sys, os, imp, re, subprocess, shutil, shlex
 import zipfile
@@ -19,19 +18,6 @@ def excepthook(etype, value, tb):
 		traceback.print_exception(etype, value, tb)
 	pdb.post_mortem(tb)
 sys.excepthook = excepthook
-
-def entryPoint():
-	return split(abspath(__file__))[0]
-gitToolsDir = join(entryPoint(), 'git-tools')
-sys.path.append(gitToolsDir)
-if len(os.listdir(gitToolsDir)) == 0:
-        print "The git-tools directory is empty. Perhaps you haven't checked out the submodules? I'm going to try to check them out now. In the future, pass --recursive to git clone"
-	runCmd([ 'git', 'submodule', 'update', '--init', '--recursive' ], showStatus=True, interactive=True)
-import githubUpload
-import setupGitHooks
-import setupWindowsCygwinSymlinking
-from setupWindowsCygwinSymlinking import createSymlinkIfNotExistsOrStale, rmtree
-import lint
 
 def runCmd(argv, showStatus=False, interactive=False):
     if showStatus:
@@ -58,6 +44,21 @@ def runCmd(argv, showStatus=False, interactive=False):
                     if showStatus:
                             print newStderr
     return p.returncode, stdout, stderr
+
+def entryPoint():
+	return split(abspath(__file__))[0]
+gitToolsDir = join(entryPoint(), 'git-tools')
+sys.path.append(gitToolsDir)
+if len(os.listdir(gitToolsDir)) == 0:
+        print "The git-tools directory is empty. Perhaps you haven't checked out the submodules? I'm going to try to check them out now. In the future, pass --recursive to git clone"
+	runCmd([ 'git', 'submodule', 'update', '--init', '--recursive' ], showStatus=True, interactive=True)
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+import githubUpload
+import setupGitHooks
+import setupWindowsCygwinSymlinking
+from setupWindowsCygwinSymlinking import createSymlinkIfNotExistsOrStale, rmtree
+import lint
 
 # These are the kinds of files we replace all instances of "%%VERSION%%" with
 # the current version.
