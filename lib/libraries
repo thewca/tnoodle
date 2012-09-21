@@ -7,6 +7,7 @@ itextpdf-5.3.0.jar: http://itextpdf.com/ - PDF creator for Java.
 bcprov-jdk15on-147.jar: http://www.bouncycastle.org/latest_releases.html (Provider) - Encryption routines used by itextpdf.
 AppleJavaExtensions.jar: https://developer.apple.com/library/mac/#samplecode/AppleJavaExtensions/Introduction/Intro.html - Java library to interact with Mac OSX features. We use it to set the dock icons.
 batik-*.jar: http://xmlgraphics.apache.org/batik/ - Java library to create svgs.
+winstone-lite-0.9.10.jar: http://winstone.sourceforge.net - Tiny implementation of java servlet standard.
 
 Strings.java http://weblogs.java.net/blog/176/2006/01/13/natural-string-order
 Base64.java http://www.wikihow.com/Encode-a-String-to-Base64-With-Java

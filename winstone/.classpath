@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="webscrambles/" kind="src" output="bin_tnoodle_resources" path="src_tnoodle_resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="/lib/winstone-lite-0.9.10.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
