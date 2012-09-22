@@ -1,7 +1,7 @@
 cubecomps.com
 =============
 
-Website to manage WCA (World Cube Association) official competitions.
+Website to manage WCA (World Cube Association) official competitions. http://cubecomps.com
 
 Coded in PHP and MySQL in the server side, and the usual HTML - JS - CSS in the client side.
 
