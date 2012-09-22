@@ -499,6 +499,7 @@ class ScrambleRequest {
 				rules.add("Notate your solution by writing one move per bar.");
 				rules.add("To delete moves, clearly erase/blacken them.");
 				rules.add("Face moves F, B, R, L, U, and D are clockwise.");
+				rules.add("Rotations x, y, and z follow R, U, and F.");
 				rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
 				
 				ct.addElement(rules);
