@@ -11,7 +11,7 @@ License
 -------
 
 There is no limitation in the use of this software other than the following:  If you're using my code, original or modificated, 
-you are obliged to show somewhere "based on an idea and code of Luis J. Iáñez".  If your page shows credits, I must appear 
+you are obliged to show somewhere "based on an idea and code by Luis J. Iáñez".  If your page shows credits, I must appear 
 on them.
 
 I estimate that only 60-70% of my original idea is already implemented.  If you're considering to derivate my code, maybe
