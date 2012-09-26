@@ -70,12 +70,14 @@ RESOURCE_FOLDER_BIN = 'bin_%s' % RESOURCE_FOLDER
 
 PROJECT_FILE_NAME = 'tmtproject.py'
 
-def dfs(node, path=()):
+def dfs(node, path=(), exclude=set()):
 	assert node not in path, "Not a dag!"
 	visted = [ node, ]
 	path += ( node, )
 	for child in node.getDependencies():
-		visted += dfs(child, path)
+		if child in exclude:
+			continue
+		visted += dfs(child, path, exclude=exclude)
 	return visted
 
 def rightPrune(nodes):
@@ -85,17 +87,22 @@ def rightPrune(nodes):
 			prunedNodes.insert(0, node)
 	return prunedNodes
 
-def isTopologicalSort(sortedNodes):
+def isTopologicalSort(sortedNodes, exclude=set()):
 	for i, node in enumerate(sortedNodes):
 		for child in node.getDependencies():
+			if child in exclude:
+				continue
 			childIndex = sortedNodes.index(child)
 			assert childIndex != i
 			if childIndex < i:
 				return False
 	return True
 
-def topologicalSort(projects):
+def topologicalSort(projects, exclude=set()):
 	potentialRoots = projects[:]
+	for excluded in exclude:
+		if excluded in potentialRoots:
+			potentialRoots.remove(excluded)
 	for project in projects:
 		for dep in project.getDependencies():
 			if dep in potentialRoots:
@@ -123,11 +130,11 @@ def topologicalSort(projects):
 				dep.clean()
 	ultimateRoot = UltimateRoot(name="all", description="")
 
-	visitedNodes = dfs(ultimateRoot)
+	visitedNodes = dfs(ultimateRoot, exclude=exclude)
 	assert visitedNodes[0] == ultimateRoot
 	visitedNodes = visitedNodes[1:]
 	visitedNodes = rightPrune(visitedNodes)
-	assert isTopologicalSort(visitedNodes)
+	assert isTopologicalSort(visitedNodes, exclude=exclude)
 	return visitedNodes, ultimateRoot
 
 class tmt:
@@ -487,8 +494,8 @@ class TmtProject(object):
 		assert False
 	def getDependencies(self):
 		assert False
-	def getRecursiveDependenciesTopoSorted(self):
-		return topologicalSort([self])[0]
+	def getRecursiveDependenciesTopoSorted(self, exclude=set()):
+		return topologicalSort([self], exclude=exclude)[0]
 	def prettyDependencies(self, level=0, printingLevels=None, seen=None):
 		if printingLevels == None:
 			assert level == 0
@@ -561,6 +568,7 @@ class EclipseProject(TmtProject):
 	from xml.sax import make_parser, saxutils
 
 	class EclipseClasspathHandler(saxutils.handler.ContentHandler):
+
 		def startDocument(self):
 			self.jarFiles = []
 			self.projects = []
@@ -570,7 +578,7 @@ class EclipseProject(TmtProject):
 				kind = attrs.get('kind')
 				path = attrs.get('path')
 				if kind == 'output':
-					assert path == 'bin'
+					self.project.bin = join(self.project.name, path)
 				elif kind == 'src':
 					if path.startswith('/'):
 						self.projects.append(path[1:])
@@ -598,7 +606,7 @@ class EclipseProject(TmtProject):
 	def getDependencies(self):
 		return self.jars + self.projects
 
-	def getClasspathEntities(self, includeResources=True):
+	def getClasspathEntities(self, includeResources=True, includeCompileTimeOnlyDependencies=False):
 		classpath = set()
 		classpath |= set(relpath(jar.jarFile) for jar in self.jars)
 		classpath.add(self.bin)
@@ -615,6 +623,13 @@ class EclipseProject(TmtProject):
 		# if you're trying to use jbd inside of a java library method.
 		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
 
+		if includeCompileTimeOnlyDependencies and self.webContent:
+			# We only need this jar in order to compile web projects.
+			# Including it in our runtime classpath is bad, because it doesn't provide
+			# actual implmementations for the api it defines. A servlet
+			# container (such as winstone) provides the actual implementation.
+			classpath.add("lib/javaee-api-6.0.jar")
+
 		for project in self.projects:
 			classpath |= project.getClasspathEntities(includeResources=includeResources)
 		return classpath
@@ -630,28 +645,37 @@ class EclipseProject(TmtProject):
 	def afterProjects(self):
 		dependencyFile = join(self.name, '.classpath')
 		assert exists(dependencyFile), dependencyFile
+
+		# TODO - this only works if we're single threaded
+		EclipseProject.classpathHandler.project = self
 		EclipseProject.classpathParser.parse(dependencyFile)
+
 		self.jars = [ createJarDependency(jar) for jar in EclipseProject.classpathHandler.jarFiles ]
 		self.projects = [ tmt.TmtProject.projects[p] for p in EclipseProject.classpathHandler.projects ]
-		self.bin = join(self.name, 'bin')
 		self.distDir = join(self.name, 'dist')
 		self.src = join(self.name, 'src')
 		self.srcResource = join(self.name, RESOURCE_FOLDER_SRC)
 		self.binResource = join(self.name, RESOURCE_FOLDER_BIN)
 		self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
 
+		webContent = join(self.name, "WebContent")
+		if isdir(webContent):
+			self.webContent = webContent
+		else:
+			self.webContent = None
+
 		if not isdir(self.bin):
 			os.mkdir(self.bin)
 		if not isdir(self.binResource):
 			os.mkdir(self.binResource)
 
-	def distJarFile(self, includeVersion=True):
+	def distJarFile(self, includeVersion=True, extension='jar'):
 		# This is a function rather than a static attribute because
 		# tmt.VERSION can change (see release target).
 		if includeVersion:
-			fileName = '%s-%s.jar' % ( self.fullName, tmt.VERSION )
+			fileName = '%s-%s.%s' % ( self.fullName, tmt.VERSION, extension )
 		else:
-			fileName = '%s.jar' % self.fullName
+			fileName = '%s.%s' % ( self.fullName, extension )
 		return join(self.distDir, fileName)
 
 	def needsCompiling(self):
@@ -679,22 +703,16 @@ class EclipseProject(TmtProject):
 			binPath = join(self.binResource, nonJavaSrcDep)
 			print "Copying %s -> %s" % ( srcPath, binPath )
 			if isdir(srcPath):
-				# If this dependency is a directory, we symlink to it
-				# this way, we can get some changes without recompiling.
 				parentDir = dirname(dirname(binPath))
-				if not isdir(parentDir):
-					os.makedirs(parentDir)
-				if binPath.endswith('/'):
-					binPath = binPath[:-1]
-				srcPath = abspath(srcPath)
-				srcPath = relpath(srcPath, parentDir)
-				os.symlink(srcPath, binPath)
 			else:
-				assert not isdir(binPath)
 				parentDir = dirname(binPath)
-				if not isdir(parentDir):
-					os.makedirs(parentDir)
-				shutil.copy(srcPath, binPath)
+			if not isdir(parentDir):
+				os.makedirs(parentDir)
+			if binPath.endswith('/'):
+				binPath = binPath[:-1]
+			srcPath = abspath(srcPath)
+			srcPath = relpath(srcPath, parentDir)
+			os.symlink(srcPath, binPath)
 
 		createSymlinkIfNotExistsOrStale(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
 
@@ -723,16 +741,22 @@ class EclipseProject(TmtProject):
 			if self.strictCompile:
 				# Enable all warnings
 				args += [ '-Xlint' ]
+
 				# Treat warnings as errors
 				args += [ '-Werror' ]
 
 				# Ignored warnings
 				# We don't need to be warned about possible fallthroughs in switch statements
 				args += [ '-Xlint:-fallthrough' ]
+
+				# TODO - some of our library jars may include a Class-path
+				# For now, I want to just manually edit those jars, but if we
+				# ever change our mind, we could add -Xlint:-path to the ignored warnings.
+
 				# Yes, I know I'm using the reflecation api, and no, there isn't another choice
 				args += [ '-XDignore.symbol.file' ]
 
-			entities = self.getClasspathEntities()
+			entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
 
 			# At the time we're compiling, bin/ and bin_tnoodle_resource/ don't
 			# actually exist. This is becuse we compile to temp directory, and
@@ -823,9 +847,12 @@ class EclipseProject(TmtProject):
 				pushCommand += ' git@github.com:cubing/tnoodle.git'
 				print pushCommand
 				assert 0 == os.system(pushCommand)
+	
+	def tweakJarFile(self, jar):
+		pass
 
-	def dist(self):
-		if not tmt.args.no_clean:
+	def dist(self, noRemake=False):
+		if not tmt.args.no_clean and not noRemake:
 			# We explicitly clean here, because stuff may have ended up in our
 			# resources folders that we don't want to include in the generated jar file.
 			tmt._make(projectName=self.name, command='clean')
@@ -833,92 +860,100 @@ class EclipseProject(TmtProject):
 		if not isdir(self.distDir):
 			os.mkdir(self.distDir)
 
-		tmt._make(projectName=self.name, command='compile')
-		jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
+		if not noRemake:
+			tmt._make(projectName=self.name, command='compile')
 
-		jarDeps = []
-		javaDeps = []
-		for project in self.getRecursiveDependenciesTopoSorted():
-			if hasattr(project, 'jarFile'):
-				jarDeps.append(project)
-			else:
-				if isinstance(project, tmt.EclipseProject):
-					# If we depend on a project that isn't an eclipse project,
-					# we're probably symlinking into that project, so there's
-					# no need to slurp in any of its resources manually.
-					# One example of where we do this is for js projects.
-					# In fact, we don't even need these projects to show up in the
-					# dependency graph, but it's nice to keep "tmt graph" up to date.
-					# TODO - symlinking into other projects isn't a great idea,
-					# what if a -> c, a -> b, and b -> c ?
-					javaDeps.append(project)
+		if self.webContent:
+			# Webcontent projects must populate the jar file themselves
+			self.webContentDist()
+		else:
+			jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
 
-		# We don't want to include dotfiles in our jar file. This solves the problem of
-		# accidentally including submodules's .git folder.
-		notDotfile = lambda dirname: not dirname.startswith(".")
+			jarDeps = []
+			javaDeps = []
+			for project in self.getRecursiveDependenciesTopoSorted():
+				if hasattr(project, 'jarFile'):
+					jarDeps.append(project)
+				else:
+					if isinstance(project, tmt.EclipseProject):
+						# If we depend on a project that isn't an eclipse project,
+						# we're probably symlinking into that project, so there's
+						# no need to slurp in any of its resources manually.
+						# One example of where we do this is for js projects.
+						# In fact, we don't even need these projects to show up in the
+						# dependency graph, but it's nice to keep "tmt graph" up to date.
+						# TODO - symlinking into other projects isn't a great idea,
+						# what if a -> c, a -> b, and b -> c ?
+						javaDeps.append(project)
 
-		if jarDeps:
-			extractedLibDir = tempfile.mkdtemp()
-			for jarDep in jarDeps:
-				jarLib = zipfile.ZipFile(jarDep.jarFile)
-				jarLib.extractall(path=extractedLibDir)
-			for dirpath, dirnames, filenames in os.walk(extractedLibDir):
-				dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+			# We don't want to include dotfiles in our jar file. This solves the problem of
+			# accidentally including submodules's .git folder.
+			notDotfile = lambda dirname: not dirname.startswith(".")
 
-				for name in filenames:
-					if not notDotfile(name):
-						continue
-					if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
-						# We don't want to include signatures in our monolithic jar file, see
-						# http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
-						continue
-					path = os.path.normpath(os.path.join(dirpath, name))
-					arcPath = os.path.relpath(path, extractedLibDir)
-					if jar.NameToInfo.get(arcPath):
-						# Since we symlink a lot, it's possible that we scan over the same
-						# file twice. Interestingly enough, the zip format
-						# allows for us to add the same file twice, but we don't want
-						# to do that, as it will result in a larger jar.
-						continue
-					if os.path.isfile(path):
-						jar.write(path, arcPath)
-			rmtree(extractedLibDir)
+			if jarDeps:
+				extractedLibDir = tempfile.mkdtemp()
+				for jarDep in jarDeps:
+					jarLib = zipfile.ZipFile(jarDep.jarFile)
+					jarLib.extractall(path=extractedLibDir)
+				for dirpath, dirnames, filenames in os.walk(extractedLibDir):
+					dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
 
-		for project in javaDeps:
-			for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
-				dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
-
-				for name in filenames:
-					if not notDotfile(name):
-						continue
-					path = os.path.normpath(os.path.join(dirpath, name))
-					arcPath = os.path.relpath(path, project.bin)
-					if jar.NameToInfo.get(arcPath):
-						# Since we symlink a lot, it's possible that we scan over the same
-						# file twice. Interestingly enough, the zip format
-						# allows for us to add the same file twice, but we don't want
-						# to do that, as it will result in a larger jar.
-						continue
-					if os.path.isfile(path):
-						if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
-							txt = file(path).read()
-							# This might be a pretty heavy hammer, but who in the world
-							# would legitimately want to use the string "%%VERSION%%"?
-							# Famous last words?
-							txt = txt.replace("%%VERSION%%", tmt.VERSION)
-							jar.writestr(arcPath, txt)
-						else:
+					for name in filenames:
+						if not notDotfile(name):
+							continue
+						if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
+							# We don't want to include signatures in our monolithic jar file, see
+							# http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+							continue
+						path = os.path.normpath(os.path.join(dirpath, name))
+						arcPath = os.path.relpath(path, extractedLibDir)
+						if jar.NameToInfo.get(arcPath):
+							# Since we symlink a lot, it's possible that we scan over the same
+							# file twice. Interestingly enough, the zip format
+							# allows for us to add the same file twice, but we don't want
+							# to do that, as it will result in a larger jar.
+							continue
+						if os.path.isfile(path):
 							jar.write(path, arcPath)
+				rmtree(extractedLibDir)
 
-		manifest = """\
+			for project in javaDeps:
+				for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
+					dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+
+					for name in filter(notDotfile, filenames):
+						path = os.path.normpath(os.path.join(dirpath, name))
+						arcPath = os.path.relpath(path, project.bin)
+						if jar.NameToInfo.get(arcPath):
+							# Since we symlink a lot, it's possible that we scan over the same
+							# file twice. Interestingly enough, the zip format
+							# allows for us to add the same file twice, but we don't want
+							# to do that, as it will result in a larger jar.
+							continue
+						if os.path.isfile(path):
+							if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
+								txt = file(path).read()
+								# This might be a pretty heavy hammer, but who in the world
+								# would legitimately want to use the string "%%VERSION%%"?
+								# Famous last words?
+								txt = txt.replace("%%VERSION%%", tmt.VERSION)
+								jar.writestr(arcPath, txt)
+							else:
+								jar.write(path, arcPath)
+
+			if not project.webContent:
+				manifest = """\
 Manifest-Version: 1.0
 Main-Class: %s
 Implementation-Title: %s
 Implementation-Version: %s
-""" % ( self.main, self.fullName, tmt.VERSION )
-		jar.writestr('META-INF/MANIFEST.MF', manifest)
+	""" % ( self.main, self.fullName, tmt.VERSION )
+				jar.writestr('META-INF/MANIFEST.MF', manifest)
 
-		jar.close()
+			# Give subclasses the opportunity to make some last minute tweaks to the jar file
+			self.tweakJarFile(jar)
+
+			jar.close()
 
 		noVersionPath = self.distJarFile(includeVersion=False)
 
@@ -939,9 +974,12 @@ Implementation-Version: %s
 		args = shlex.split(tmt.args.args)
 		if self.argv:
 			args += self.argv
+
+		classpath = self.getClasspathEntities(includeResources=False)
+
 		tmt.java(
 			main=main,
-			classpath=self.toClasspath(self.getClasspathEntities(includeResources=False)),
+			classpath=self.toClasspath(classpath),
 			args=args,
 			debug=tmt.args.debug)
 

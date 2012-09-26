@@ -1,5 +1,6 @@
 *.swp
 dist/
+build/
 bin/
 bin_tnoodle_resources/
 .settings

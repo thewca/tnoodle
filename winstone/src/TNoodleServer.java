@@ -21,14 +21,19 @@ public class TNoodleServer {
 	public TNoodleServer(int httpPort, boolean bindAggressively, boolean openBrowser) throws IOException {
 		 // at startup
 		Map<String, String> serverArgs = new HashMap<String, String>();
-		serverArgs.put("webappsDir", "testing");
+		serverArgs.put("webappsDir", Utils.getResourceDirectory() + "/webapps/");
 		serverArgs.put("httpPort", "8080");
 		serverArgs.put("ajp13Port", "-1");
-		serverArgs.put("commonLibFolder", "C:\\cygwin\\home\\jeremy\\tnoodle\\lib");
+
+		// By default, winstone looks in ./lib, which I don't like, as it means
+		// we'll behave differently when run from different directories.
+		serverArgs.put("commonLibFolder", "");
+
 		Launcher.initLogger(serverArgs);
 		Launcher winstone = new Launcher(serverArgs); // spawns threads, so your application doesn't block
 
 		// before shutdown
+		// TODO
 //		winstone.shutdown();
 	}
 
