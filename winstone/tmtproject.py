@@ -26,14 +26,17 @@ class Project(tmt.EclipseProject):
 
 		self.plugins[project.name] = project
 
+		notDotfile = lambda dirname: not dirname.startswith(".")
 		def wrapCompile(ogCompile):
 			def newCompile(self):
 				if ogCompile(self):
 					assert self.webContent
 					for dirpath, dirnames, filenames in os.walk(self.webContent):
+						dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+
 						if "WEB-INF" in dirnames:
 							dirnames.remove("WEB-INF")
-						for filename in filenames:
+						for filename in filter(notDotfile, filenames):
 							path = os.path.normpath(os.path.join(dirpath, filename))
 							pathRelToWebContent = relpath(path, self.webContent)
 							name = join(tmt.WinstoneServer.binResource, "webapps", "ROOT", pathRelToWebContent)
@@ -43,6 +46,7 @@ class Project(tmt.EclipseProject):
 							else:
 								assert os.path.isdir(linkParent)
 							tmt.createSymlinkIfNotExistsOrStale(relpath(path, linkParent), name)
+					tmt.WinstoneServer.createWebXml(topLevelWebProject=self)
 			return newCompile
 		project.__class__.compile = wrapCompile(project.__class__.compile)
 
@@ -56,19 +60,14 @@ class Project(tmt.EclipseProject):
 			shutil.copy(tmt.WinstoneServer.distJarFile(), self.distJarFile())
 		project.__class__.webContentDist = webContentDist
 
-	def innerCompile(self, src, tempBin, bin):
-		if src != self.srcResource:
-			return
+	def createWebXml(self, topLevelWebProject):
+		deps = topLevelWebProject.getRecursiveDependenciesTopoSorted()
 
-		# We don't necessarily want all the plugins in self.plugins to load here,
-		# we only want the ones that the project we're currently building somehow
-		# depends on.
-		deps = tmt.TmtProject.projects[tmt.args.project].getRecursiveDependenciesTopoSorted()
-
-		webappsDir = join(tempBin, "webapps")
+		webappsDir = join(self.binResource, "webapps")
 		webappDir = join(webappsDir, "ROOT")
 		webappWebInfDir = join(webappDir, "WEB-INF")
-		os.makedirs(webappWebInfDir)
+		if not os.path.isdir(webappWebInfDir):
+			os.makedirs(webappWebInfDir)
 
 		webXmlRoot = ET.fromstring("""
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
