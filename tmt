@@ -688,6 +688,8 @@ class EclipseProject(TmtProject):
 		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False) )
 		changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
 		srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
+		if self.webContent:
+			srcLastTouched = max(srcLastTouched, tmt.timestamp(self.webContent))
 		return lastCompiled <= srcLastTouched or len(changedDeps) > 0
 
 	def compile(self):
