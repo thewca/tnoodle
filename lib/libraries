@@ -9,6 +9,7 @@ AppleJavaExtensions.jar: https://developer.apple.com/library/mac/#samplecode/App
 batik-*.jar: http://xmlgraphics.apache.org/batik/ - Java library to create svgs.
 winstone-lite-0.9.10.jar: http://winstone.sourceforge.net - Tiny implementation of java servlet standard.
 javaee-api-6.0.jar: http://stackoverflow.com/questions/3358220/where-can-i-download-j2ee-jar-from
+urlrewritefilter-4.0.4.jar: http://www.tuckey.org/urlrewrite/ - Java servlet filter that provides mod_rewrite abilities for servlet containers.
 
 The following are extracted from quercus-4.0.25.war from http://quercus.caucho.com/. Quercus is a pure java implemnetation of php.
     cdi-16.jar: Not included

@@ -1,14 +1,14 @@
 import tmt
-
+import subprocess
+from os.path import join, exists
+import shutil
 import sys
-import os.path
 import time
 
 class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
-		tmt.Server.addPlugin(self)
-		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/stackmat-flash/' ]
+		tmt.WinstoneServer.addPlugin(self)
 
 		self.APPLET_FILENAME = join(self.name, 'StackApplet.swf')
 		try:
@@ -41,7 +41,7 @@ class Project(tmt.EclipseProject):
 			else:
 				# Wowow, you've gotta love it when you have such great tools
 				asFile = join(src, 'StackApplet.as')
-				if os.path.exists(asFile):
+				if exists(asFile):
 					assert self.mxmlcInstalled
 					outSwf = self.APPLET_FILENAME
 					retVal, stdout, stderr = tmt.runCmd([ 'mxmlc', '-benchmark=True', '-creator=tnoodle', '-static-link-runtime-shared-libraries=true', '-output=%s' % outSwf, asFile ], showStatus=True)

@@ -8,8 +8,8 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="output" path="build/classes"/>
-
 	<classpathentry combineaccessrules="false" kind="src" path="/winstone"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/quercus"/>
+	<classpathentry kind="lib" path="/lib/javaee-api-6.0.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>

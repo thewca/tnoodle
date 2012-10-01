@@ -4,17 +4,27 @@ import os.path
 from os.path import join, basename, relpath
 import shutil
 import xml.etree.ElementTree as ET
+from OrderedDict import OrderedDict
 
+xmlFileTypes = [ 'web.xml', 'urlrewrite.xml' ]
 class Project(tmt.EclipseProject):
-	def configure(self):
-		tmt.EclipseProject.configure(self)
-		self.main = "TNoodleServer"
+	def __init__(self, *args, **kwargs):
+		tmt.EclipseProject.__init__(self, *args, **kwargs)
 		tmt.WinstoneServer = self
+		self.main = "net.gnehzr.tnoodle.server.TNoodleServer"
+		self.argv = [ '--nobrowser', '--consoleLevel=INFO' ]
 
         # It is important that when we iterate through the plugins
         # in topological sorted order. This way if B uses A, B can clobber
         # A's settings.
 		self.plugins = OrderedDict()
+
+	def configure(self):
+		tmt.EclipseProject.configure(self)
+
+		self.nonJavaSrcDeps |= tmt.glob(self.srcResource, '.*$', relativeTo=self.srcResource)
+		for f in xmlFileTypes:
+			self.nonJavaSrcDeps -= tmt.glob(self.srcResource, "%s$" % f, relativeTo=self.srcResource)
 
 	def addPlugin(self, project):
 		# Note that this may be called multiple times.
@@ -22,7 +32,6 @@ class Project(tmt.EclipseProject):
 		# as it will be highest up in the dependency graph.
 		project.main = self.main
 		project.argv = self.argv
-		project.winstonePlugin = True
 
 		self.plugins[project.name] = project
 
@@ -46,7 +55,7 @@ class Project(tmt.EclipseProject):
 							else:
 								assert os.path.isdir(linkParent)
 							tmt.createSymlinkIfNotExistsOrStale(relpath(path, linkParent), name)
-					tmt.WinstoneServer.createWebXml(topLevelWebProject=self)
+					tmt.WinstoneServer.mungeXmlFiles(topLevelWebProject=self)
 			return newCompile
 		project.__class__.compile = wrapCompile(project.__class__.compile)
 
@@ -60,37 +69,41 @@ class Project(tmt.EclipseProject):
 			shutil.copy(tmt.WinstoneServer.distJarFile(), self.distJarFile())
 		project.__class__.webContentDist = webContentDist
 
-	def createWebXml(self, topLevelWebProject):
-		deps = topLevelWebProject.getRecursiveDependenciesTopoSorted()
+	def compile(self):
+		if tmt.EclipseProject.compile(self):
+			if tmt.TmtProject.projects[tmt.args.project] == self:
+				self.mungeXmlFiles(topLevelWebProject=self)
 
-		webappsDir = join(self.binResource, "webapps")
-		webappDir = join(webappsDir, "ROOT")
-		webappWebInfDir = join(webappDir, "WEB-INF")
-		if not os.path.isdir(webappWebInfDir):
-			os.makedirs(webappWebInfDir)
+	def mungeXmlFiles(self, topLevelWebProject):
+		for f in xmlFileTypes:
+			deps = topLevelWebProject.getRecursiveDependenciesTopoSorted()
 
-		webXmlRoot = ET.fromstring("""
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-</web-app>
-""")
-		for project in deps:
-			if hasattr(project, 'winstonePlugin'):
-				assert project.webContent
-				pluginWebXmlFile = join(project.webContent, "WEB-INF", "web.xml")
-				tree = ET.parse(pluginWebXmlFile)
-				root = tree.getroot()
-				for child in root:
-					webXmlRoot.append(child)
+			webappsDir = join(self.binResource, "webapps")
+			webappDir = join(webappsDir, "ROOT")
+			webappWebInfDir = join(webappDir, "WEB-INF")
+			if not os.path.isdir(webappWebInfDir):
+				os.makedirs(webappWebInfDir)
 
-		webXmlFile = join(webappWebInfDir, "web.xml")
-		webXmlFileOut = open(webXmlFile, 'w')
+			srcWebInfDir = join(self.srcResource, "webapps", "ROOT", "WEB-INF")
+			xmlRoot = ET.parse(join(srcWebInfDir, f)).getroot()
+			for project in deps:
+				if project in self.plugins.values():
+					assert project.webContent
+					pluginXmlFile = join(project.webContent, "WEB-INF", f)
+					if not os.path.exists(pluginXmlFile):
+						continue
+					tree = ET.parse(pluginXmlFile)
+					root = tree.getroot()
+					for child in reversed(root):
+						xmlRoot.insert(0, child)
 
-		ET.register_namespace("", "http://java.sun.com/xml/ns/javaee")
+			xmlFile = join(webappWebInfDir, f)
+			xmlFileOut = open(xmlFile, 'w')
 
-		webXmlFileOut.write(ET.tostring(webXmlRoot))
-		webXmlFileOut.close()
+			ET.register_namespace("", "http://java.sun.com/xml/ns/javaee")
+
+			xmlFileOut.write(ET.tostring(xmlRoot))
+			xmlFileOut.close()
 
 	def tweakJarFile(self, jar):
         # We don't necessarily want all the plugins in self.plugins to load here,

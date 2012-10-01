@@ -1,0 +1,57 @@
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<filter>
+		<filter-name>UrlRewriteFilter</filter-name>
+		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>UrlRewriteFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+	
+	<filter>
+	    <filter-name>HtmlInjectFilter</filter-name>
+	    <filter-class>net.gnehzr.tnoodle.server.HtmlInjectFilter</filter-class>
+	</filter>
+	<filter-mapping>
+	    <filter-name>HtmlInjectFilter</filter-name>
+	  	<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+	
+
+	<mime-mapping>
+		<extension>svg</extension>
+		<mime-type>image/svg+xml</mime-type> 
+	</mime-mapping>
+
+	<mime-mapping>
+		<extension>ico</extension>
+		<mime-type>image/x-icon</mime-type> 
+	</mime-mapping>
+	
+	
+	<servlet>
+		<servlet-name>DeathServlet</servlet-name>
+		<servlet-class>net.gnehzr.tnoodle.server.DeathServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DeathServlet</servlet-name>
+		<url-pattern>/kill/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>MarkdownServlet</servlet-name>
+		<servlet-class>net.gnehzr.tnoodle.server.MarkdownServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>MarkdownServlet</servlet-name>
+		<url-pattern>*.md</url-pattern>
+	</servlet-mapping>
+	
+</web-app>

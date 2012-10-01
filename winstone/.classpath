@@ -5,6 +5,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="lib" path="/lib/jopt-simple-3.2.jar"/>
+	<classpathentry kind="lib" path="/lib/urlrewritefilter-4.0.4.jar"/>
 	<classpathentry kind="lib" path="/lib/winstone-0.9.10.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/web-utils"/>
+	<classpathentry kind="lib" path="/lib/AppleJavaExtensions.jar"/>
+	<classpathentry kind="lib" path="/lib/markdownj-1.0.2b4-0.3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

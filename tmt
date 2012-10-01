@@ -12,6 +12,8 @@ import cgitb
 import traceback
 import pdb
 
+javaEEJar = "lib/javaee-api-6.0.jar"
+
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
 	if tb:
@@ -427,12 +429,12 @@ class tmt:
 		return m
 
 	def glob(self, folder, pattern, relativeTo=None):
-		matches = []
+		matches = set()
 		pattern = re.compile(pattern)
 		if relativeTo is None:
 			relativeTo = '.'
 		for root, dirs, files in os.walk(folder):
-			matches += [ relpath(join(root, f), relativeTo) for f in files if pattern.match(f) ]
+			matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
 		return matches
 
 	def java(self, main, classpath='', args=[], debug=None):
@@ -598,13 +600,24 @@ class EclipseProject(TmtProject):
 	def __init__(self, name, description, main=None, argv=None, tests=None):
 		self.main = main
 		self.argv = argv
-		self.nonJavaSrcDeps = []
+		self.nonJavaSrcDeps = set()
 		self.tests = tests
 		self.strictCompile = True
 		TmtProject.__init__(self, name, description)
 
-	def getDependencies(self):
-		return self.jars + self.projects
+	def getDependencies(self, includeCompileTimeOnlyDependencies=False):
+		jars = self.jars[:]
+		if includeCompileTimeOnlyDependencies:
+			if self.webContent:
+				# We only need this jar in order to compile web projects.
+				# Including it in our runtime classpath is bad, because it doesn't provide
+				# actual implmementations for the api it defines. A servlet
+				# container (such as winstone) provides the actual implementation.
+				jars.add(javaEEJar)
+		else:
+			if javaEEJar in jars:
+				jars.remove(javaEEJar)
+		return jars + self.projects
 
 	def getClasspathEntities(self, includeResources=True, includeCompileTimeOnlyDependencies=False):
 		classpath = set()
@@ -623,12 +636,15 @@ class EclipseProject(TmtProject):
 		# if you're trying to use jbd inside of a java library method.
 		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
 
-		if includeCompileTimeOnlyDependencies and self.webContent:
-			# We only need this jar in order to compile web projects.
-			# Including it in our runtime classpath is bad, because it doesn't provide
-			# actual implmementations for the api it defines. A servlet
-			# container (such as winstone) provides the actual implementation.
-			classpath.add("lib/javaee-api-6.0.jar")
+		if includeCompileTimeOnlyDependencies:
+			if self.webContent:
+				# We only need this jar in order to compile web projects.
+				# Including it in our runtime classpath is bad, because it doesn't provide
+				# actual implmementations for the api it defines. A servlet
+				# container (such as winstone) provides the actual implementation.
+				classpath.add(javaEEJar)
+		else:
+			classpath.discard(javaEEJar)
 
 		for project in self.projects:
 			classpath |= project.getClasspathEntities(includeResources=includeResources)
@@ -900,9 +916,7 @@ class EclipseProject(TmtProject):
 				for dirpath, dirnames, filenames in os.walk(extractedLibDir):
 					dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
 
-					for name in filenames:
-						if not notDotfile(name):
-							continue
+					for name in filter(notDotfile, filenames):
 						if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
 							# We don't want to include signatures in our monolithic jar file, see
 							# http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar

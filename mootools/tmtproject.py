@@ -1,10 +1,11 @@
 import tmt
-from os.path import join
+import subprocess
+from os.path import join, exists
+import shutil
 
 class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
-		tmt.Server.addPlugin(self)
-		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/mootools/' ]
+		tmt.WinstoneServer.addPlugin(self)
 
-Project(tmt.projectName(), description="mootools-more, mootools-core, and powertools")
+Project(tmt.projectName(), description="mootools js library")

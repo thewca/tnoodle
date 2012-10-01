@@ -11,14 +11,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.LinkedHashMap;
 
 import java.nio.channels.FileChannel;
 
@@ -499,5 +502,25 @@ public final class Utils {
 			version = DEVEL_VERSION;
 		}
 		return version;
+	}
+
+
+	public static LinkedHashMap<String, String> parseQuery(String query) {
+		LinkedHashMap<String, String> queryMap = new LinkedHashMap<String, String>();
+		if(query == null) return queryMap;
+		String[] pairs = query.split("&");
+		for(String pair : pairs) {
+			String[] key_value = pair.split("=");
+			if(key_value.length == 1) {
+				queryMap.put(key_value[0], ""); // this allows for flags such as http://foo/blah?kill&burn
+			} else {
+				try {
+					queryMap.put(key_value[0], URLDecoder.decode(key_value[1], "utf-8"));
+				} catch (UnsupportedEncodingException e) {
+					queryMap.put(key_value[0], key_value[1]); //worst case, just put the undecoded string
+				}
+			}
+		}
+		return queryMap;
 	}
 }

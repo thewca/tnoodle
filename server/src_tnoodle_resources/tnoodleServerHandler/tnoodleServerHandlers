@@ -1,7 +1,0 @@
-/readme tnoodleServerHandler.FileHandler("server/readme-tnoodle.md")
-/readme/scramble tnoodleServerHandler.FileHandler("server/readme-scramble.md")
-/markdown.css tnoodleServerHandler.FileHandler("server/markdown.css")
-/ tnoodleServerHandler.RedirectHandler("/readme")
-/favicon.ico tnoodleServerHandler.FileHandler("server/favicon.ico")
-/tnoodle_logo.svg tnoodleServerHandler.FileHandler("server/tnoodle_logo.svg")
-/kill/ tnoodleServerHandler.DeathHandler()
