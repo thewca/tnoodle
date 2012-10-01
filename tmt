@@ -1014,6 +1014,8 @@ Implementation-Version: %s
 		if exists(self.bin):
 			assert isdir(self.bin)
 			rmtree(self.bin)
+			if self.webContent:
+				rmtree(dirname(self.bin))
 		if exists(self.binResource):
 			assert isdir(self.binResource)
 			rmtree(self.binResource)
