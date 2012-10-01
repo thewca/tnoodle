@@ -170,22 +170,15 @@ public class CubeScrambler extends Scrambler {
 
 			azzert(innerSlice >= outerSlice);
 
+			String f = "" + FACES.charAt(face);
 			String move = "";
+			if(innerSlice == 0)
+				move += f;
+			else if (innerSlice == 1)
+				move += f + "w";
+			else
+				move += (innerSlice+1) + f + "w";
 
-			if(size <= 5) {
-				move += FACES.charAt(face);
-				if(innerSlice > 0) {
-					move += "w";
-				}
-			}
-			else {
-				String f = "" + FACES.charAt(face);
-				if(innerSlice == 0) {
-					move += f;
-				} else {
-					move += (innerSlice+1) + f;
-				}
-			}
 			if(dir > 1) {
 				move += "  2'".charAt(dir);
 			}

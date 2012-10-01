@@ -20,7 +20,7 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 
 public class ClockScrambler extends Scrambler {
 //	private boolean verbose = false;
-	private static final String[] turns={"UR","DR","DL","UL","U","R","D","L","A"};
+	private static final String[] turns={"UR","DR","DL","UL","U","R","D","L","ALL"};
 	private static final int radius = 70;
 	private static final int clockRadius = 14;
 	private static final int clockOuterRadius = 20;
@@ -61,15 +61,13 @@ public class ClockScrambler extends Scrambler {
 			scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
 		}
 	
-		scramble.append( "[" );
 		boolean isFirst = true;
 		for(int x=0;x<4;x++) {
 			if (r.nextInt(2) == 1){
-				scramble.append((isFirst?"":",")+turns[x]);
+				scramble.append((isFirst?"":" ")+turns[x]);
 				isFirst = false;
 			}
 		}
-		scramble.append( "]" );
 	
 		return scramble.toString();
 	}
@@ -165,7 +163,6 @@ public class ClockScrambler extends Scrambler {
 			for (pin = 0; pin < turns.length; pin++)
 				if(turns[pin].equals(m.group(1)))
 					break;
-			System.out.println(m.group(1)+" - "+pin);
 			int rot = Integer.parseInt(m.group(2));
 			rot = ( m.group(3).equals("+") ) ? rot : 12 - rot;
 			seq[pin+9*side] = rot;
@@ -173,8 +170,9 @@ public class ClockScrambler extends Scrambler {
 			/* TODO: set the intermediate pins position (pins array) */
 		}
 
+		scramble += " "; // Hack for the next pattern to work.
 		for (i=0; i<4; i++){
-			p = Pattern.compile("\\[(.*)"+turns[i]+"(.*)\\]");
+			p = Pattern.compile(turns[i]+"(\\D)");
 			m = p.matcher(scramble);
 
 			if( m.find() ){
