@@ -675,9 +675,9 @@ class EclipseProject(TmtProject):
 			self.webContent = None
 
 		if not isdir(self.bin):
-			os.mkdir(self.bin)
+			os.makedirs(self.bin)
 		if not isdir(self.binResource):
-			os.mkdir(self.binResource)
+			os.makedirs(self.binResource)
 
 	def distJarFile(self, includeVersion=True, extension='jar'):
 		# This is a function rather than a static attribute because
@@ -743,7 +743,7 @@ class EclipseProject(TmtProject):
 		rmtree(bin)
 		if isdir(tempBin):
 			rmtree(tempBin)
-		os.mkdir(tempBin)
+		os.makedirs(tempBin)
 
 		javaFiles = tmt.glob(src, r'.*\.java$')
 		if len(javaFiles) > 0:
@@ -870,7 +870,7 @@ class EclipseProject(TmtProject):
 			tmt._make(projectName=self.name, command='clean')
 
 		if not isdir(self.distDir):
-			os.mkdir(self.distDir)
+			os.makedirs(self.distDir)
 
 		if not noRemake:
 			tmt._make(projectName=self.name, command='compile')
@@ -1008,6 +1008,8 @@ Implementation-Version: %s
 		if exists(self.bin):
 			assert isdir(self.bin)
 			rmtree(self.bin)
+			if self.webContent:
+				rmtree(dirname(self.bin))
 		if exists(self.binResource):
 			assert isdir(self.binResource)
 			rmtree(self.binResource)
