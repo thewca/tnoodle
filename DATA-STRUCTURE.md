@@ -3,6 +3,7 @@ Database Structure
 
 Apart from the databases created in INC_INITDB.PHP, several databases must exist for the system to work:
 
+<pre><code>
 -- 
 -- Table structure for table `competitions`
 -- 
@@ -348,3 +349,4 @@ INSERT INTO `formats` VALUES (2, 'mean of 3', 3, 1);
 INSERT INTO `formats` VALUES (3, 'best of 3', 3, 2);
 INSERT INTO `formats` VALUES (4, 'best of 2', 2, 2);
 INSERT INTO `formats` VALUES (5, 'best of 1', 1, 2);
+</code></pre>
