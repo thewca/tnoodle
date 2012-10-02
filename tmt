@@ -7,12 +7,12 @@ import tempfile
 import time
 import math
 
+javaEEProjectName = "javaee-api-6.0.jar"
+
 # Terribly useful debugging tweaks
 import cgitb
 import traceback
 import pdb
-
-javaEEJar = "lib/javaee-api-6.0.jar"
 
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
@@ -74,13 +74,13 @@ PROJECT_FILE_NAME = 'tmtproject.py'
 
 def dfs(node, path=(), exclude=set()):
 	assert node not in path, "Not a dag!"
-	visted = [ node, ]
+	visited = [ node, ]
 	path += ( node, )
 	for child in node.getDependencies():
 		if child in exclude:
 			continue
-		visted += dfs(child, path, exclude=exclude)
-	return visted
+		visited += dfs(child, path, exclude=exclude)
+	return visited
 
 def rightPrune(nodes):
 	prunedNodes = []
@@ -183,8 +183,8 @@ class tmt:
 			project.configure()
 
 	def _main(self):
-		self._loadTmtProjects()
 		self.args = tmt.parser.parse_args()
+		self._loadTmtProjects()
 		self.args.func()
 
 	def _graph(self):
@@ -606,22 +606,26 @@ class EclipseProject(TmtProject):
 		TmtProject.__init__(self, name, description)
 
 	def getDependencies(self, includeCompileTimeOnlyDependencies=False):
+		return self.getJars(includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies) + self.projects
+
+	def getJars(self, includeCompileTimeOnlyDependencies=False):
 		jars = self.jars[:]
+		javaEEProject = TmtProject.projects[javaEEProjectName]
 		if includeCompileTimeOnlyDependencies:
 			if self.webContent:
 				# We only need this jar in order to compile web projects.
 				# Including it in our runtime classpath is bad, because it doesn't provide
 				# actual implmementations for the api it defines. A servlet
 				# container (such as winstone) provides the actual implementation.
-				jars.add(javaEEJar)
+				jars.append(javaEEProject)
 		else:
-			if javaEEJar in jars:
-				jars.remove(javaEEJar)
-		return jars + self.projects
+			if javaEEProject in jars:
+				jars.remove(javaEEProject)
+		return jars
 
 	def getClasspathEntities(self, includeResources=True, includeCompileTimeOnlyDependencies=False):
 		classpath = set()
-		classpath |= set(relpath(jar.jarFile) for jar in self.jars)
+		classpath |= set(relpath(jar.jarFile) for jar in self.getJars(includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies))
 		classpath.add(self.bin)
 		if includeResources:
 			classpath.add(self.binResource)
@@ -635,16 +639,6 @@ class EclipseProject(TmtProject):
 		# Uncomment & replace the following with the path to your jre
 		# if you're trying to use jbd inside of a java library method.
 		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
-
-		if includeCompileTimeOnlyDependencies:
-			if self.webContent:
-				# We only need this jar in order to compile web projects.
-				# Including it in our runtime classpath is bad, because it doesn't provide
-				# actual implmementations for the api it defines. A servlet
-				# container (such as winstone) provides the actual implementation.
-				classpath.add(javaEEJar)
-		else:
-			classpath.discard(javaEEJar)
 
 		for project in self.projects:
 			classpath |= project.getClasspathEntities(includeResources=includeResources)

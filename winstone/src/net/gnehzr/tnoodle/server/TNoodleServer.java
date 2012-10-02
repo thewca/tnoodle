@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -48,12 +49,24 @@ public class TNoodleServer {
 	private static final String ICON_WRAPPER = "tnoodle_logo_1024_gray.png";
 	private static final String ICON_WORKER = "tnoodle_logo_1024.png";
 	
-	public TNoodleServer(int httpPort, boolean bindAggressively, boolean browse) throws IOException {
+	private static final String DB_NAME = "tnoodledb";
+	private static final String DB_USERNAME = "root";
+	private static final String DB_PASSWORD = "password";
+	
+	public TNoodleServer(int httpPort, boolean bindAggressively, boolean browse) throws IOException, ClassNotFoundException, SQLException {
 		 // at startup
 		Map<String, String> serverArgs = new HashMap<String, String>();
 		serverArgs.put("webappsDir", Utils.getResourceDirectory() + "/webapps/");
 		serverArgs.put("httpPort", "" + httpPort);
 		serverArgs.put("ajp13Port", "-1");
+		
+		File db = new File(Utils.getResourceDirectory(), DB_NAME);
+		serverArgs.put("useJNDI", "true");
+        serverArgs.put("jndi.resource.jdbc/connPool", "javax.sql.DataSource");
+        serverArgs.put("jndi.param.jdbc/connPool.url", String.format("jdbc:h2:%s;MODE=MySQL;USER=%s;PASSWORD=%s", db.getAbsoluteFile(), DB_USERNAME, DB_PASSWORD));
+        serverArgs.put("jndi.param.jdbc/connPool.driverClassName", "org.h2.Driver");
+        serverArgs.put("jndi.param.jdbc/connPool.username", DB_USERNAME);
+        serverArgs.put("jndi.param.jdbc/connPool.password", DB_PASSWORD);
 
 		// By default, winstone looks in ./lib, which I don't like, as it means
 		// we'll behave differently when run from different directories.

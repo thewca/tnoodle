@@ -26,14 +26,12 @@ class Project(tmt.EclipseProject):
 		for f in xmlFileTypes:
 			self.nonJavaSrcDeps -= tmt.glob(self.srcResource, "%s$" % f, relativeTo=self.srcResource)
 
-	def addPlugin(self, project):
-		# Note that this may be called multiple times.
-		# We only care about the last project to call this,
-		# as it will be highest up in the dependency graph.
+	def addPlugin(self, project, needsDb=False):
 		project.main = self.main
 		project.argv = self.argv
 
 		self.plugins[project.name] = project
+		project.needsDb = needsDb
 
 		notDotfile = lambda dirname: not dirname.startswith(".")
 		def wrapCompile(ogCompile):
@@ -104,6 +102,28 @@ class Project(tmt.EclipseProject):
 
 			xmlFileOut.write(ET.tostring(xmlRoot))
 			xmlFileOut.close()
+
+	def needsDb(self):
+		if tmt.args.project == None:
+			# None may not yet be a key in tmt.TmtProject.projects,
+			# we just hack around this by unconditionally returning True here.
+			return True
+		webProject = tmt.TmtProject.projects[tmt.args.project]
+		deps = webProject.getRecursiveDependenciesTopoSorted(exclude=set([self]))
+
+		for project in deps:
+			if project in self.plugins.values():
+				if project.needsDb:
+					return True
+
+		return False
+
+	def getJars(self, includeCompileTimeOnlyDependencies=False):
+		jars = tmt.EclipseProject.getJars(self, includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies)
+		if self.needsDb():
+			jars.append(tmt.TmtProject.projects['h2-1.3.169.jar'])
+
+		return jars
 
 	def tweakJarFile(self, jar):
         # We don't necessarily want all the plugins in self.plugins to load here,
