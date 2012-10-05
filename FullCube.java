@@ -40,8 +40,7 @@ public class FullCube implements Comparable<FullCube> {
 	}
 
 	public static FullCube randomCube(Random r) {
-		int test;
-		int shape = Shape.ShapeIdx[test = r.nextInt(3678)];
+		int shape = Shape.ShapeIdx[r.nextInt(3678)];
 		FullCube f = new FullCube();
 		int corner = 0x01234567 << 1 | 0x11111111;
 		int edge = 0x01234567 << 1;

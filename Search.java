@@ -1,6 +1,5 @@
 package cs.sq12phase;
 
-import java.util.Random;
 
 public class Search {
 	
@@ -28,12 +27,12 @@ public class Search {
 	public static void main(String[] args) {
 		long t = System.nanoTime();
 		
-		FullCube f;// = new FullCube("");
+//		FullCube f;// = new FullCube("");
 //		System.out.println(f.getParity());
 //		System.out.println(f.getShapeIdx());
 //		System.out.println(Shape.ShapePrun[f.getShapeIdx()]);
-		int a = Square.SquarePrun[0];
-		Random gen = new Random(1000L);
+//		int a = Square.SquarePrun[0];
+//		Random gen = new Random(1000L);
 		new Search().solution(new FullCube(""));
 		System.out.println((System.nanoTime()-t)/1e9 + " seconds to initialize");
 
