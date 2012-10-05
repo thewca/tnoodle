@@ -760,6 +760,8 @@ class EclipseProject(TmtProject):
 				# Ignored warnings
 				# We don't need to be warned about possible fallthroughs in switch statements
 				args += [ '-Xlint:-fallthrough' ]
+                # WinstoneSession.java has an unsurpressable deprecation warning.
+				args += [ '-Xlint:-deprecation' ]
 
 				# TODO - some of our library jars may include a Class-path
 				# For now, I want to just manually edit those jars, but if we
@@ -987,11 +989,12 @@ Implementation-Version: %s
 
 		classpath = self.getClasspathEntities(includeResources=False)
 
-		tmt.java(
-			main=main,
-			classpath=self.toClasspath(classpath),
-			args=args,
-			debug=tmt.args.debug)
+		retVal = tmt.java(
+				main=main,
+				classpath=self.toClasspath(classpath),
+				args=args,
+				debug=tmt.args.debug)
+		sys.exit(retVal)
 
 	def check(self):
 		if not self.tests:
