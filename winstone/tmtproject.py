@@ -22,9 +22,13 @@ class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
 
-		self.nonJavaSrcDeps |= tmt.glob(self.srcResource, '.*$', relativeTo=self.srcResource)
+		self.nonJavaResourceDeps |= tmt.glob(self.srcResource, '.*$', relativeTo=self.srcResource)
 		for f in xmlFileTypes:
-			self.nonJavaSrcDeps -= tmt.glob(self.srcResource, "%s$" % f, relativeTo=self.srcResource)
+			self.nonJavaResourceDeps -= tmt.glob(self.srcResource, "%s$" % f, relativeTo=self.srcResource)
+
+		self.nonJavaSrcDeps |= tmt.glob(self.src, '.*\\.properties$', relativeTo=self.src)
+		self.nonJavaSrcDeps |= tmt.glob(self.src, '.*\\.xsd$', relativeTo=self.src)
+		self.nonJavaSrcDeps |= tmt.glob(self.src, '.*\\.dtd$', relativeTo=self.src)
 
 	def addPlugin(self, project, needsDb=False):
 		project.main = self.main
@@ -109,6 +113,8 @@ class Project(tmt.EclipseProject):
 			# we just hack around this by unconditionally returning True here.
 			return True
 		webProject = tmt.TmtProject.projects[tmt.args.project]
+		if webProject == self:
+			return True
 		deps = webProject.getRecursiveDependenciesTopoSorted(exclude=set([self]))
 
 		for project in deps:
@@ -151,7 +157,10 @@ class Project(tmt.EclipseProject):
 				for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
 					for name in filenames:
 						path = join(dirpath, name)
-						arcPath = join(classesDir, basename(path))
+						prefixLen = len(project.bin)
+						if project.bin.endswith("/"):
+							prefixLen += 1
+						arcPath = join(classesDir, path[prefixLen:])
 						jar.write(path, arcPath)
 
 
