@@ -371,7 +371,7 @@ class ScrambleRequest {
 				cb.setLineWidth(LINE_THICKNESS);
 				cb.stroke();
 
-				int allocatedX = (2*linesX-1)*lineWidth;
+//				int allocatedX = (2*linesX-1)*lineWidth;
 				int excessX = availableSolutionWidth-linesX*lineWidth;
 				int moveCount = 0;
 				solutionLines: for(int y = 0; y < linesY; y++) {
@@ -787,7 +787,7 @@ class ScrambleRequest {
 			}
 
 			PdfDestination d = new PdfDestination(PdfDestination.FIT);
-			PdfOutline sheetLink = new PdfOutline(puzzleLink,
+			new PdfOutline(puzzleLink,
 					PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.title);
 
 			PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);

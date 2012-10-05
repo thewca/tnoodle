@@ -29,7 +29,7 @@ public class ScrambleHandler extends SafeHttpServlet {
 			// TODO - this means you can't have a round named "seed" or "showIndices" or "callback"!
 			String seed = query.remove("seed");
 			boolean showIndices = query.remove("showIndices") != null;
-			String callback = query.remove("callback");
+			query.remove("callback");
 			
 			String globalTitle, ext;
 			int lastDot = path[0].lastIndexOf(".");

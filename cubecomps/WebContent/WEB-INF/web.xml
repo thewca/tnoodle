@@ -9,4 +9,11 @@
 	<welcome-file-list>
 		<welcome-file>index.php</welcome-file>
 	</welcome-file-list>
+	
+	<servlet>
+		<servlet-name>InitializeCubecompsDbServlet</servlet-name>
+		<servlet-class>net.gnehzr.tnoodle.cubecomps.InitializeCubecompsDbServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet> 
+	
 </web-app>

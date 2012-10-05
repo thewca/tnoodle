@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winstone"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/quercus"/>
 	<classpathentry kind="lib" path="/lib/javaee-api-6.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

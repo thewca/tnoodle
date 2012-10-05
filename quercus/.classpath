@@ -8,8 +8,9 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="/lib/resin.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winstone"/>
 	<classpathentry kind="lib" path="/lib/h2-1.3.169.jar"/>
+	<classpathentry kind="lib" path="/lib/javaee-api-6.0.jar"/>
+	<classpathentry kind="lib" path="/lib/resin.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

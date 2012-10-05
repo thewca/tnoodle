@@ -523,4 +523,15 @@ public final class Utils {
 		}
 		return queryMap;
 	}
+
+	public static File getWebappsDir() {
+		return new File(getResourceDirectory(), "/webapps/");
+	}
+	
+	public static File getWebappDir(String webappName) {
+		if(webappName == null) {
+			webappName = "ROOT";
+		}
+		return new File(getWebappsDir(), webappName);
+	}
 }

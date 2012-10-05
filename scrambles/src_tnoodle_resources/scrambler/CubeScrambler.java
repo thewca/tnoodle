@@ -150,18 +150,7 @@ public class CubeScrambler extends Scrambler {
 		int innerSlice, outerSlice;
 		int dir;
 
-		public Turn() {
-		}
-		public Turn(Turn t) {
-			this.face = t.face;
-			this.innerSlice = t.innerSlice;
-			this.outerSlice = t.outerSlice;
-			this.dir = t.dir;
-		}
-
-		public int getAxis() {
-			return face % 3;
-		}
+		public Turn() {}
 
 		public String toString() {
 			if(dir == 0) {
