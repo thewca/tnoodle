@@ -22,6 +22,14 @@ public class HttpServletResponseWrapper extends
         this.httpResponse = response;
     }
 
+    public void setResponse(javax.servlet.ServletResponse response) {
+        if (response instanceof HttpServletResponse) {
+            super.setResponse(response);
+            this.httpResponse = (HttpServletResponse) response;
+        } else
+            throw new IllegalArgumentException("Not an HttpServletResponse");
+    }
+
     public void addCookie(Cookie cookie) {
         this.httpResponse.addCookie(cookie);
     }
