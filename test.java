@@ -146,7 +146,7 @@ public class test {
 		
 		if ((testValue & 0x20) != 0) {
 			tm = System.nanoTime();
-			int total = 0;
+//			int total = 0;
 			int x = 0;
 //			System.out.print("Average Solving Time: - nanoSecond(s)\r");
 			long minT = 1L << 62;
@@ -154,8 +154,8 @@ public class test {
 			long totalTime = 0;
 			while (System.nanoTime() - tm < 60000000000L && x < nSolves) {
 				long curTime = System.nanoTime();
-				String cube = Tools.randomCube();
-				String s = search.solution(cube, maxLength, maxTime, minTime, verbose);
+//				String cube = Tools.randomCube();
+//				String s = search.solution(cube, maxLength, maxTime, minTime, verbose);
 				curTime = System.nanoTime() - curTime;
 				totalTime += curTime;
 				maxT = Math.max(maxT, curTime);
