@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 require_once "db.php";
 if (substr($_SERVER["REQUEST_URI"],0,6)=="/beta/")
 	require_once "../".DIR_PHPEXCEL;
@@ -64,15 +65,15 @@ function createSheetComps($sheet)
 		$ssC,$ssB,$ssBC,
 		$compstable, $timestable;
 	//
-	$result = mysql_query(
+	$result = strict_mysql_query(
 		"SELECT $compstable.*, countries.name AS country ".
 		"FROM $compstable ".
 		"JOIN (SELECT DISTINCT comp_id FROM $timestable) AS tmp ON tmp.comp_id=$compstable.id ".
 		"JOIN countries ON countries.id=$compstable.country_id ".
 		"ORDER BY $compstable.name");
-	$categories = mysql_query("SELECT id, abbr FROM categories ORDER BY id");
+	$categories = strict_mysql_query("SELECT id, abbr FROM categories ORDER BY id");
 	$abbrs = array();
-	while ($row=mysql_fetch_array($categories))
+	while ($row=cased_mysql_fetch_array($categories))
 		$abbrs[$row["id"]] = $row["abbr"];
 	//
 	$sheet
@@ -89,7 +90,7 @@ function createSheetComps($sheet)
 	{
 		$sheet
 			->setCellValue(chr(72+$x)."2", "=SUM(".chr(72+$x)."4:".chr(72+$x).(mysql_num_rows($result)+3).")")
-			->setCellValue(chr(72+$x)."3", $abbrs[mysql_result($events,$x,"id")]);
+			->setCellValue(chr(72+$x)."3", $abbrs[cased_mysql_result($events,$x,"id")]);
 	}
 	$sheet
 		->setSharedStyle($ssB, "A1")
@@ -97,7 +98,7 @@ function createSheetComps($sheet)
 		->setSharedStyle($ssBC, "G3:Z3");
 	//
 	$count = 0;
-	while ($row=mysql_fetch_array($result))
+	while ($row=cased_mysql_fetch_array($result))
 	{
 		$count++;
 		$sheet
@@ -108,7 +109,7 @@ function createSheetComps($sheet)
 			->setCellValue("E".($count+3), $row["gender"])
 			->setCellValue("F".($count+3), $row["birthday"]);
 		for ($x=0;$x<mysql_num_rows($events);$x++)
-			$sheet->setCellValue(chr(72+$x).($count+3), ($row["cat".mysql_result($events,$x,"id")]?"1":"0"));
+			$sheet->setCellValue(chr(72+$x).($count+3), ($row["cat".cased_mysql_result($events,$x,"id")]?"1":"0"));
 		$sheet
 			->setSharedStyle($ssC, "G".($count+3).":Z".($count+3));
 	}
@@ -126,12 +127,12 @@ function createSheetEvtRnd($sheet,$cat_id,$round,$lround,$timelimit)
 		$events,$evt, 
 		$f_header,$f_headerc,$f_time;
 	//
-	$category = mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
-	$timetype = mysql_result($category,0,"timetype");
-	$inseconds = mysql_result($category,0,"inseconds");
-	$format = mysql_query("SELECT * FROM formats WHERE id=".mysql_result($events,$evt,"r".$round."_format"));
-	$times = mysql_result($format,0,"times");
-	$avgtype = mysql_result($format,0,"avgtype");
+	$category = strict_mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
+	$timetype = cased_mysql_result($category,0,"timetype");
+	$inseconds = cased_mysql_result($category,0,"inseconds");
+	$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($events,$evt,"r".$round."_format"));
+	$times = cased_mysql_result($format,0,"times");
+	$avgtype = cased_mysql_result($format,0,"avgtype");
 
 	$query =
 		"SELECT $regstable.*, $compstable.name, $compstable.WCAid, $timestable.t1, $timestable.t2, $timestable.t3, $timestable.t4, $timestable.t5, $timestable.average, $timestable.best, countries.name AS country FROM $regstable ".
@@ -139,16 +140,16 @@ function createSheetEvtRnd($sheet,$cat_id,$round,$lround,$timelimit)
 		"JOIN $compstable ON ($regstable.comp_id=$compstable.id) ".
 		"JOIN countries ON ($compstable.country_id=countries.id) ".
 		"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .$round." ORDER BY $timestable.t1 IS NULL, $timestable.average=\"\", $timestable.average, $timestable.best, $regstable.comp_id";
-	$result = mysql_query($query);
+	$result = strict_mysql_query($query);
 	if (!mysql_num_rows($result)) // trick to generate 32 empty lines with formulas
-		$result = mysql_query("SELECT NULL as name, NULL as country, NULL as WCAid, NULL as t1, NULL as t2, NULL as t3, NULL as t4, NULL as t5 FROM countries LIMIT 32");
+		$result = strict_mysql_query("SELECT NULL as name, NULL as country, NULL as WCAid, NULL as t1, NULL as t2, NULL as t3, NULL as t4, NULL as t5 FROM countries LIMIT 32");
 	//
 	$sheet
-		->setTitle(mysql_result($category,0,"abbr")."-".$round);
+		->setTitle(cased_mysql_result($category,0,"abbr")."-".$round);
 	$sheet
-		//->setCellValue("A1", mysql_result($category,0,"name")." - round $round")
-		->setCellValue("A1", mysql_result($category,0,"name")." - ".roundString($round,$lround,$timelimit))
-		->setCellValue("A2", "Format: ".mysql_result($format,0,"name"))
+		//->setCellValue("A1", cased_mysql_result($category,0,"name")." - round $round")
+		->setCellValue("A1", cased_mysql_result($category,0,"name")." - ".roundString($round,$lround,$timelimit))
+		->setCellValue("A2", "Format: ".cased_mysql_result($format,0,"name"))
 		->setCellValue("A3", ($timetype==2?"number of moves":($inseconds?"time in seconds (ss.hh)":"time in minutes (m:ss.hh)")))
 		->setCellValue("A4", "Position")
 		->setCellValue("B4", "Name")
@@ -208,7 +209,7 @@ function createSheetEvtRnd($sheet,$cat_id,$round,$lround,$timelimit)
 	}
 	$line = 5;
 	$lineb = 4;
-	while ($row=mysql_fetch_array($result))
+	while ($row=cased_mysql_fetch_array($result))
 	{
 		$sheet
 			->setCellValue("B$line", $row["name"])
@@ -299,7 +300,7 @@ function createSheetEvtRnd($sheet,$cat_id,$round,$lround,$timelimit)
 
 // =========================== MAIN =====================================
 
-$events = mysql_query("SELECT * FROM $eventstable ORDER BY id");
+$events = strict_mysql_query("SELECT * FROM $eventstable ORDER BY id");
 $xlsx = new PHPExcel();
 //-------- styles ----------
 $ssC = new PHPExcel_Style();
@@ -395,13 +396,13 @@ $l = mysql_num_rows($events);
 for ($evt=0;$evt<$l;$evt++)
 {
 	$lrnd = 4;
-	while($lrnd>1 && !mysql_result($events,$evt,"r$lrnd")) $lrnd--;
+	while($lrnd>1 && !cased_mysql_result($events,$evt,"r$lrnd")) $lrnd--;
 	$rnd = 1;
-	//while($rnd <= 4 && mysql_result($events,$evt,"r".$rnd."_open"))
+	//while($rnd <= 4 && cased_mysql_result($events,$evt,"r".$rnd."_open"))
 	while($rnd <= $lrnd)
 	{
-		createSheetEvtRnd($xlsx->createSheet(),mysql_result($events,$evt,"id"),
-		$rnd,$lrnd,mysql_result($events,$evt,"timelimit"));
+		createSheetEvtRnd($xlsx->createSheet(),cased_mysql_result($events,$evt,"id"),
+		$rnd,$lrnd,cased_mysql_result($events,$evt,"timelimit"));
 		$rnd++;
 	}
 }

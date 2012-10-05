@@ -1,5 +1,9 @@
 <?
-session_start();
+require_once "lib.php";
+
+if(!isset($_SESSION)) {
+	session_start();
+}
 if (!$_SESSION["c_id"])
 {
 ?>
@@ -24,7 +28,7 @@ else
 	mysql_connect(SQL_SERVER, SQL_USER, SQL_PASSWORD);
 	mysql_select_db(SQL_DBNAME);
 }
-$result = mysql_query("SELECT * FROM competitions WHERE id=".$_SESSION['c_id']);
+$result = strict_mysql_query("SELECT * FROM competitions WHERE id=".$_SESSION['c_id']);
 if (!mysql_num_rows($result)) die ("You're not allowed to edit that competition any more (".$_SESSION['c_id'].")");
 //
 $eventstable = "events".$_SESSION["c_id"];

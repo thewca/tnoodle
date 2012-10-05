@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 include "lib_ref.php";
 include "db.php";
 
@@ -70,11 +71,11 @@ function roundString($r,$nr,$c)
 	return $st;
 }
 
-$openevents = mysql_query("SELECT * FROM $eventstable WHERE r1_open=TRUE ORDER BY id");
+$openevents = strict_mysql_query("SELECT * FROM $eventstable WHERE r1_open=TRUE ORDER BY id");
 $lastopenrounds = array();
 $lastrounds = array();
 $timelimited = array();
-while ($row=mysql_fetch_array($openevents))
+while ($row=cased_mysql_fetch_array($openevents))
 {
 	$timelimited[$row["id"]] = $row["timelimit"];
 	$x = 4;
@@ -88,7 +89,7 @@ $cat_id = $_GET["cat_id"];
 $round = $_GET["round"];
 if ((!$cat_id || !$round) && count($lastopenrounds))
 {
-	if (!$cat_id) $cat_id = mysql_result($openevents,0,"id");
+	if (!$cat_id) $cat_id = cased_mysql_result($openevents,0,"id");
 	$round = $lastopenrounds[$cat_id];
 }
 
@@ -140,10 +141,10 @@ if (!isset($lastopenrounds[$cat_id]) || $lastopenrounds[$cat_id]<$round)
 }
 else
 {
-	$event = mysql_query("SELECT * FROM $eventstable WHERE id=".$cat_id);
-	//if (!mysql_num_rows($event) || !mysql_result($event,0,"r".$round."_open")) die("Round not open!");
-	$category = mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
-	$timetype = mysql_result($category,0,"timetype");
+	$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$cat_id);
+	//if (!mysql_num_rows($event) || !cased_mysql_result($event,0,"r".$round."_open")) die("Round not open!");
+	$category = strict_mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
+	$timetype = cased_mysql_result($category,0,"timetype");
 	if ($timetype==1)
 		$coltimewidth = 60;
 	elseif ($timetype==2)
@@ -151,12 +152,12 @@ else
 	else
 		$coltimewidth = 100;
 	//
-	$format = mysql_query("SELECT * FROM formats WHERE id=".mysql_result($event,0,"r".$round."_format"));
-	$times = mysql_result($format,0,"times");
-	$avgtype = mysql_result($format,0,"avgtype");
-	if (mysql_result($category,0,"canhavetimelimit") && $round==1)
+	$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".$round."_format"));
+	$times = cased_mysql_result($format,0,"times");
+	$avgtype = cased_mysql_result($format,0,"avgtype");
+	if (cased_mysql_result($category,0,"canhavetimelimit") && $round==1)
 	{
-		$timelimit = mysql_result($event,0,"timelimit");
+		$timelimit = cased_mysql_result($event,0,"timelimit");
 		if($timelimit) $timelimit = substr("000:00.00",0,9-strlen($timelimit)).$timelimit;
 		if (!timelimitNum($timelimit)) $timelimit = "";
 	}
@@ -173,7 +174,7 @@ else
 		$tries = $times;
 	//
 	$nrounds = 4;
-	while ($nrounds>1 && !mysql_result($event,0,"r$nrounds")) $nrounds--;
+	while ($nrounds>1 && !cased_mysql_result($event,0,"r$nrounds")) $nrounds--;
 	//
 	$print = (isset($_GET["print"]) && $_SESSION["c_admin"]);
 	IF (!$print)
@@ -217,8 +218,8 @@ else
 		echo "<body onload='doResize();";
 		if ($round!=$lastopenrounds[$cat_id])
 			echo "alert(\"WARNING: this round is not the last one open in this event!\\r\\nChange existing results on your own risk.\");";
-		// echo "' onresize='docResize();' onunload='if(I.changed) alert(\"Warning!\\r\\n\\nYour last changes are going to be discarded because you navigated off this page prior to submit them.\")'>\r\n<table class=t_tabs><tr><td style='font-size:20px;'>".mysql_result($category,0,"name")." - round ".$round;
-		echo "' onresize='docResize();' onunload='if(I.changed) alert(\"Warning!\\r\\n\\nYour last changes are going to be discarded because you navigated off this page prior to submit them.\")'>\r\n<table class=t_tabs><tr><td style='font-size:20px;'>".mysql_result($category,0,"name")." - ".roundString($round,$nrounds,$timelimit);
+		// echo "' onresize='docResize();' onunload='if(I.changed) alert(\"Warning!\\r\\n\\nYour last changes are going to be discarded because you navigated off this page prior to submit them.\")'>\r\n<table class=t_tabs><tr><td style='font-size:20px;'>".cased_mysql_result($category,0,"name")." - round ".$round;
+		echo "' onresize='docResize();' onunload='if(I.changed) alert(\"Warning!\\r\\n\\nYour last changes are going to be discarded because you navigated off this page prior to submit them.\")'>\r\n<table class=t_tabs><tr><td style='font-size:20px;'>".cased_mysql_result($category,0,"name")." - ".roundString($round,$nrounds,$timelimit);
 		if ($timelimit) 
 			if ($_SESSION["c_admin"])
 				echo "<br><center>cutoff ".formatTime($timelimit,1)."</center>";
@@ -419,10 +420,10 @@ var ISTop;
 var ISLine;
 var ISIdx;
 <?
-		$comp = mysql_query("SELECT id, name FROM $regstable JOIN $compstable ON $regstable.comp_id=$compstable.id WHERE cat_id=$cat_id AND round=$round ORDER BY name");
-		$row = mysql_fetch_array($comp);
+		$comp = strict_mysql_query("SELECT id, name FROM $regstable JOIN $compstable ON $regstable.comp_id=$compstable.id WHERE cat_id=$cat_id AND round=$round ORDER BY name");
+		$row = cased_mysql_fetch_array($comp);
 		echo "var sList = [[". $row["id"]. ",'". htmlspecialchars($row["name"],ENT_QUOTES). "']";
-		while ($row = mysql_fetch_array($comp))
+		while ($row = cased_mysql_fetch_array($comp))
 			echo ",[". $row["id"]. ",'". htmlspecialchars($row["name"],ENT_QUOTES). "']";
 		echo "];\r\n";
 ?>
@@ -1285,11 +1286,11 @@ Inputs.prototype.clear = function()
 <?
 		if (count($lastopenrounds)>1)
 		{
-			$categories = mysql_query("SELECT id, name FROM categories");
+			$categories = strict_mysql_query("SELECT id, name FROM categories");
 			echo "<P><form name=frm action='results.php' method=get>";
 			echo "<select name=cat_id style='width:170px;' onclick='submitFrm(this.value);'>";
 			echo "<option value=''>Other rounds open...</option>";
-			while ($rcat=mysql_fetch_array($categories))
+			while ($rcat=cased_mysql_fetch_array($categories))
 				if (isset($lastopenrounds[$rcat["id"]]) && ($rcat["id"]!=$cat_id || $lastopenrounds[$rcat["id"]]!=$round))
 					// echo "<option value=".$rcat["id"].">".$rcat["name"]." - round ".$lastopenrounds[$rcat["id"]]."</option>";
 					echo "<option value=".$rcat["id"].">".$rcat["name"]." - ". roundString($lastopenrounds[$rcat["id"]],$lastrounds[$rcat["id"]],$timelimited[$rcat["id"]]). "</option>";
@@ -1346,11 +1347,11 @@ function openWLeft()
 		"SELECT $regstable.*, $compstable.name, $timestable.t1, $timestable.t2, $timestable.t3, $timestable.t4, $timestable.t5, $timestable.average, $timestable.best FROM $regstable ".
 		"LEFT OUTER JOIN $timestable ON ($regstable.cat_id=$timestable.cat_id AND $regstable.round=$timestable.round AND $regstable.comp_id=$timestable.comp_id) ".
 		"JOIN $compstable ON ($regstable.comp_id=$compstable.id) ".
-		"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .$round." ORDER BY $timestable.t1 IS NULL, $timestable.average=\"\", $timestable.average, $timestable.best, $compstable.name";
-	$list = mysql_query($query);
+		"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .$round." ORDER BY $timestable.t1 IS NULL, $timestable.average='', $timestable.average, $timestable.best, $compstable.name";
+	$list = strict_mysql_query($query);
 	$qualified = (
-		$round<4 && mysql_result($event,0,"r".($round+1)) ?
-		mysql_result($event,0,"r".($round+1)."_groupsize") :
+		$round<4 && cased_mysql_result($event,0,"r".($round+1)) ?
+		cased_mysql_result($event,0,"r".($round+1)."_groupsize") :
 		3
 		);
 	$classification = 0;
@@ -1359,7 +1360,7 @@ function openWLeft()
 	$lastb = "";
 	IF (!$print)
 	{
-		while ($row=mysql_fetch_array($list))
+		while ($row=cased_mysql_fetch_array($list))
 		{
 			echo ($count++ % 2)?"<tr class=row_even>":"<tr class=row_odd>";
 			if (!$row["t1"])
@@ -1442,8 +1443,8 @@ function openWLeft()
 		$pdf->Write(5,$_SESSION["c_name"]);
 		$pdf->Ln();
 		$pdf->SetFont('','',14);
-		$pdf->Write(5,mysql_result($category,0,"name")." - round ".$round);
-		//if (mysql_result($event,0,"r".$round."_combined")) $pdf->Write(5," - combined");
+		$pdf->Write(5,cased_mysql_result($category,0,"name")." - round ".$round);
+		//if (cased_mysql_result($event,0,"r".$round."_combined")) $pdf->Write(5," - combined");
 		if ($timelimit) $pdf->Write(5," - cutoff (".formatTime($timelimit,1).")");
 		$pdf->Line(11,21,286.5,21);
 		$pdf->Ln(10);
@@ -1463,7 +1464,7 @@ function openWLeft()
 		$pdf->Cell($coltimewidth,5,"best",0,0,"R");
 		$pdf->Ln(7);
 		//
-		while ($row=mysql_fetch_array($list))
+		while ($row=cased_mysql_fetch_array($list))
 		{
 			$count++;
 			//echo ($count++ % 2)?"<tr class=row_even>":"<tr class=row_odd>";

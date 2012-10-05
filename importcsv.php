@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 session_start();
 
 $color = "#6b7b71";
@@ -126,9 +127,9 @@ IF (!$isCSV)
 	else
 		require_once DIR_PHPEXCEL;
 	//
-	$categories = mysql_query("SELECT id, cusa_abbr FROM categories");
+	$categories = strict_mysql_query("SELECT id, cusa_abbr FROM categories");
 	$cats = array();
-	while ($rcat=mysql_fetch_array($categories))
+	while ($rcat=cased_mysql_fetch_array($categories))
 		$cats[$rcat["cusa_abbr"]] = $rcat["id"];
 	//
 	$objReader = PHPExcel_IOFactory::createReader('Excel5');  
@@ -157,7 +158,7 @@ IF (!$isCSV)
 	{
 		$ncomp++;
 		//
-		$country = mysql_query("SELECT id FROM countries WHERE name=\"" .($sheet->getCellByColumnAndRow(2,$row)->getValue()). "\"");
+		$country = strict_mysql_query("SELECT id FROM countries WHERE name=\"" .($sheet->getCellByColumnAndRow(2,$row)->getValue()). "\"");
 		if (!mysql_num_rows($country))
 			$errors .= "Country name \"".$line[$headers["country"]]."\" not found in database<br>";
 		else
@@ -168,7 +169,7 @@ IF (!$isCSV)
 				$sheet->getCellByColumnAndRow(3,$row)->getValue(), 
 				$name, 
 				$birthday, 
-				mysql_result($country,0,"id"), 
+				cased_mysql_result($country,0,"id"), 
 				$sheet->getCellByColumnAndRow(4,$row)->getValue(), 
 				true);
 			if (is_int($err))
@@ -189,9 +190,9 @@ ELSE // ------------------------------------------------------------------------
 {
 	fseek($h,0);
 	//
-	$categories = mysql_query("SELECT id, abbr FROM categories");
+	$categories = strict_mysql_query("SELECT id, abbr FROM categories");
 	$cats = array();
-	while ($rcat=mysql_fetch_array($categories))
+	while ($rcat=cased_mysql_fetch_array($categories))
 		$cats[$rcat["abbr"]] = $rcat["id"];
 	//
 	$ncomp = 0;
@@ -221,7 +222,7 @@ ELSE // ------------------------------------------------------------------------
 		{
 			$ncomp++;
 			//
-			$country = mysql_query("SELECT id FROM countries WHERE name=\"".$line[$headers["country"]]."\"");
+			$country = strict_mysql_query("SELECT id FROM countries WHERE name=\"".$line[$headers["country"]]."\"");
 			if (!mysql_num_rows($country))
 				$errors .= "Country name \"".$line[$headers["country"]]."\" not found in database<br>";
 			else
@@ -238,7 +239,7 @@ ELSE // ------------------------------------------------------------------------
 					$line[$headers["wca id"]], 
 					$line[$headers["name"]], 
 					$birthday, 
-					mysql_result($country,0,"id"), 
+					cased_mysql_result($country,0,"id"), 
 					$line[$headers["gender"]], 
 					true);
 				if (is_int($err))

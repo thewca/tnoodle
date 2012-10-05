@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 include "lib_admin.php";
 include "db.php";
 
@@ -221,15 +222,15 @@ function callPage(url)
 <?
 echo "<table class=tcats width=100% cellspacing=10 border=0>";
 $nevents = 0;
-$result = mysql_query("SELECT $eventstable.*, categories.name, categories.canhavetimelimit, categories.abbr FROM $eventstable JOIN categories WHERE $eventstable.id=categories.id ORDER BY categories.id");
+$result = strict_mysql_query("SELECT $eventstable.*, categories.name, categories.canhavetimelimit, categories.abbr FROM $eventstable JOIN categories WHERE $eventstable.id=categories.id ORDER BY categories.id");
 if (!$result) echo mysql_error();
-$formats = mysql_query("SELECT * FROM formats ORDER BY id");
-while($row=mysql_fetch_array($formats)) $fmts[] = $row["name"];
-while($event=mysql_fetch_array($result))
+$formats = strict_mysql_query("SELECT * FROM formats ORDER BY id");
+while($row=cased_mysql_fetch_array($formats)) $fmts[] = $row["name"];
+while($event=cased_mysql_fetch_array($result))
 {
-	$lrwt = mysql_query("SELECT round FROM $timestable WHERE cat_id=".$event["id"]." ORDER BY round DESC LIMIT 1");
+	$lrwt = strict_mysql_query("SELECT round FROM $timestable WHERE cat_id=".$event["id"]." ORDER BY round DESC LIMIT 1");
 	if (mysql_num_rows($lrwt))
-		$last_rwt = mysql_result($lrwt,0,"round");
+		$last_rwt = cased_mysql_result($lrwt,0,"round");
 	else
 		$last_rwt = 0;
 	//
@@ -275,12 +276,12 @@ while($event=mysql_fetch_array($result))
 		// groupsize
 		if ($event[$rnd."_open"])
 		{
-			$in = mysql_result(mysql_query("SELECT COUNT(*) AS count FROM $regstable WHERE cat_id=".$event["id"]." AND round=".$round),0,"count");
+			$in = cased_mysql_result(strict_mysql_query("SELECT COUNT(*) AS count FROM $regstable WHERE cat_id=".$event["id"]." AND round=".$round),0,"count");
 			if ($round==1) $r1in = $in;
 			if ($round>1 || $event[$rnd."_groupsize"] > $in)
 				$out = 0;
 			else
-				$out = mysql_result(mysql_query("SELECT COUNT(*) AS count FROM $compstable WHERE cat".$event["id"]."=\"-\""),0,"count");
+				$out = cased_mysql_result(strict_mysql_query("SELECT COUNT(*) AS count FROM $compstable WHERE cat".$event["id"]."=\"-\""),0,"count");
 			$out = ($out?", $out out":"");
 			echo "- $in people in$out ";
 		}
@@ -332,6 +333,8 @@ while($event=mysql_fetch_array($result))
 		$maxrounds = 3;
 	else
 		$maxrounds = 4;
+
+	$b = NULL;
 	if ($round <= $maxrounds && (($event[$prevrnd."_open"] && $in > 2) || (!$event[$prevrnd."_open"] && $event[$prevrnd."_groupsize"] > 2))) 
 	{
 		echo "<a style='cursor:pointer;' onclick='callPage(\"addround.php?id=".$event["id"]."\");'>[add round]</a> ";
@@ -348,11 +351,11 @@ while($event=mysql_fetch_array($result))
 if ($nevents) echo "</tr>";
 echo "<tr valign=top>";
 
-$result = mysql_query("SELECT categories.* FROM categories LEFT OUTER JOIN $eventstable ON categories.id=$eventstable.id WHERE $eventstable.id IS NULL ORDER BY categories.id");
+$result = strict_mysql_query("SELECT categories.* FROM categories LEFT OUTER JOIN $eventstable ON categories.id=$eventstable.id WHERE $eventstable.id IS NULL ORDER BY categories.id");
 if (mysql_num_rows($result))
 {
 	echo "<td><table cellspacing=0 border=0 class=nested><tr valign=top><td style='width:58px;'><img border=0 src='img/corneradd.jpg'></td><td style='width:100%;'><div class=header>Add event</div><DIV style='margin-left:75px;'><form method=get action=\"addevent.php\"><select name=id>";
-	while($row=mysql_fetch_array($result)) 
+	while($row=cased_mysql_fetch_array($result)) 
 		echo "<option value=".$row["id"].">".$row["name"]."</option>";
 	echo "<input type=submit value=\"add\"></form></DIV></td></tr></table></td>";
 }

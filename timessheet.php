@@ -1,4 +1,5 @@
 <?      
+require_once "lib.php"
 include "lib_ref_admin.php";
 include "db.php";
 
@@ -132,7 +133,7 @@ $sebastien = 55; // Auroux
 if (($_GET["cat_id"] && $_GET["round"]) || $_GET["comp_id"])
 {
 	if ($_GET["comp_id"])
-		$result = mysql_query("SELECT $regstable.comp_id AS compid, $regstable.cat_id AS catid, $regstable.round AS round, categories.name AS catname, $compstable.name AS compname FROM $regstable JOIN categories ON $regstable.cat_id=categories.id JOIN $compstable ON $regstable.comp_id=$compstable.id WHERE $regstable.comp_id=".$_GET["comp_id"]." AND $regstable.round=1 ORDER BY categories.id");
+		$result = strict_mysql_query("SELECT $regstable.comp_id AS compid, $regstable.cat_id AS catid, $regstable.round AS round, categories.name AS catname, $compstable.name AS compname FROM $regstable JOIN categories ON $regstable.cat_id=categories.id JOIN $compstable ON $regstable.comp_id=$compstable.id WHERE $regstable.comp_id=".$_GET["comp_id"]." AND $regstable.round=1 ORDER BY categories.id");
 	else
 	{
 		$query = "SELECT $regstable.comp_id AS compid, categories.name AS catname, $compstable.name AS compname FROM $regstable JOIN categories ON $regstable.cat_id=categories.id JOIN $compstable ON $regstable.comp_id=$compstable.id";
@@ -145,25 +146,25 @@ if (($_GET["cat_id"] && $_GET["round"]) || $_GET["comp_id"])
 			$query .= " ORDER BY compid";
 		else
 			$query .= " ORDER BY compname";
-		$result = mysql_query($query);
+		$result = strict_mysql_query($query);
 	}
 	if (mysql_num_rows($result))
 	{
 		if (!$_GET["comp_id"])
 		{
-			$t = mysql_query("SELECT times FROM $eventstable JOIN formats ON $eventstable.r" .$_GET["round"]. "_format=formats.id WHERE $eventstable.id=".$_GET["cat_id"]);
-			$t = mysql_result($t,0,"times");
+			$t = strict_mysql_query("SELECT times FROM $eventstable JOIN formats ON $eventstable.r" .$_GET["round"]. "_format=formats.id WHERE $eventstable.id=".$_GET["cat_id"]);
+			$t = cased_mysql_result($t,0,"times");
 		}
 		//
 		$ts = new TS();
 		/* new */ $ts->AddFont('DejaVu','','DejaVuSans.ttf',true);
 		$count = 0;
-		while ($row=mysql_fetch_array($result))
+		while ($row=cased_mysql_fetch_array($result))
 		{
 			if ($_GET["comp_id"])
 			{
-				$t = mysql_query("SELECT times FROM $eventstable JOIN formats ON $eventstable.r1_format=formats.id WHERE $eventstable.id=".$row["catid"]);
-				$t = mysql_result($t,0,"times");
+				$t = strict_mysql_query("SELECT times FROM $eventstable JOIN formats ON $eventstable.r1_format=formats.id WHERE $eventstable.id=".$row["catid"]);
+				$t = cased_mysql_result($t,0,"times");
 			}
 			// $ts->Timesheet($row["compid"], $row["compname"], $row["catname"], ($_GET["comp_id"]?$row["round"]:$_GET["round"]), $t);
 			$compname = preg_replace("/\(.*\)/","",$row["compname"]);
@@ -180,17 +181,17 @@ elseif ($_GET["aofr"])
 {
 	$ts = new TS();
 	/* new */ $ts->AddFont('DejaVu','','DejaVuSans.ttf',true);
-	$ofr = mysql_query("SELECT $eventstable.id, categories.name, times FROM $eventstable JOIN categories ON (categories.id=$eventstable.id) JOIN formats ON (formats.id=$eventstable.r1_format) WHERE r1_open=1 ORDER BY $eventstable.id");
-	while ($rowe=mysql_fetch_array($ofr))
+	$ofr = strict_mysql_query("SELECT $eventstable.id, categories.name, times FROM $eventstable JOIN categories ON (categories.id=$eventstable.id) JOIN formats ON (formats.id=$eventstable.r1_format) WHERE r1_open=1 ORDER BY $eventstable.id");
+	while ($rowe=cased_mysql_fetch_array($ofr))
 	{
 		$query = "SELECT id, name FROM $compstable WHERE cat".$rowe["id"]."=\"X\"";
 		if ($_SESSION["c_id"]==$sebastien)
 			$query .= " ORDER BY id";
 		else
 			$query .= " ORDER BY name";
-		$comps = mysql_query($query);
+		$comps = strict_mysql_query($query);
 		$count = 0;
-		while ($row=mysql_fetch_array($comps))
+		while ($row=cased_mysql_fetch_array($comps))
 		{
 			$compname = preg_replace("/\(.*\)/","",$row["name"]);
 			$count++;

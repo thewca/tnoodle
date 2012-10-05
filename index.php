@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 session_start();
 $IE = (preg_match("/msie/i",$_SERVER["HTTP_USER_AGENT"]) || preg_match("/internet explorer/i",$_SERVER["HTTP_USER_AGENT"]));
 $live = preg_match("~live\056cubecomps\056com~i",$_SERVER["HTTP_HOST"]);
@@ -98,7 +99,7 @@ function listComps($txt)
 	echo "<DIV class=list>";
 	//echo "<P style='width:".$twidth."px;'>";
 	echo "<table cellpadding=0 cellspacing=0 width=".$twidth."><tr valign=top>";
-	while ($row=mysql_fetch_array($result)) 
+	while ($row=cased_mysql_fetch_array($result))
 	{
 		$count++;
 		//echo "<SPAN style='width:".$width."px;'>";
@@ -157,13 +158,13 @@ else
 }
 //
 $count = 0;
-$result = mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE DATE(NOW())>=DATE(date_b) AND DATE(NOW())<=DATE(date_e) ORDER BY date_b");
+$result = strict_mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>=date_b AND NOW()<=date_e ORDER BY date_b");
 if (mysql_num_rows($result)) listComps("Competitions in progress");
 //
-$result = mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE DATE(NOW())>DATE(date_e) ORDER BY date_b DESC");
+$result = strict_mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>date_e ORDER BY date_b DESC");
 if (mysql_num_rows($result)) listComps("Past competitions");
 //
-$result = mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE DATE(NOW())<DATE(date_b) ORDER BY date_b");
+$result = strict_mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()<date_b ORDER BY date_b");
 if (mysql_num_rows($result)) listComps("Upcoming competitions");
 //
 mysql_close();

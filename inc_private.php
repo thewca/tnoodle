@@ -9,6 +9,10 @@ define("SQL_USER",___);
 define("SQL_PASSWORD",___);
 define("SQL_DBNAME",___);
 
+// MySQL or h2, see lib.php for details.
+define("SQL_DBTYPE","MySQL");
+//define("SQL_DBTYPE","h2");
+
 define("SQL_TEST_USER",___);
 define("SQL_TEST_PASSWORD",___);
 define("SQL_TEST_DBNAME",___);

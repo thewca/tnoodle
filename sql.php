@@ -1,4 +1,5 @@
 <?
+require_once "lib.php;
 /*
  * Ron asked me for this to be done, although it was never used.  It's an exportation of all the competition data in SQL.
  * The idea is skipping the XLSX file and go straight forward to the SQL text file that the Results Team is extracting currently
@@ -93,14 +94,14 @@ function createComps()
 	global
 		$compstable, $timestable;
 	//
-	$result = mysql_query(
+	$result = strict_mysql_query(
 		"SELECT $compstable.*, countries.name AS country ".
 		"FROM $compstable ".
 		"JOIN (SELECT DISTINCT comp_id FROM $timestable) AS tmp ON tmp.comp_id=$compstable.id ".
 		"JOIN countries ON countries.id=$compstable.country_id ".
 		"ORDER BY $compstable.name");
 	echo "-- Competitors\r\n";
-	while ($row=mysql_fetch_array($result))
+	while ($row=cased_mysql_fetch_array($result))
 	{
 		$thisyear = date("Y");
 		$d = getdate(strtotime($row["birthday"]));
@@ -120,13 +121,13 @@ function createEvtRnd($cat_id,$round,$lround,$timelimit)
 	//
 	$formats = array(1=>"a",2=>"m",3=>"3",4=>"2",5=>"1");
 	//
-	$category = mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
-	$timetype = mysql_result($category,0,"timetype");
-	$inseconds = mysql_result($category,0,"inseconds");
-	$format = mysql_query("SELECT * FROM formats WHERE id=".mysql_result($events,$evt,"r".$round."_format"));
-	$times = mysql_result($format,0,"times");
-	$avgtype = mysql_result($format,0,"avgtype");
-	$formatId = $formats[mysql_result($format,0,"id")];
+	$category = strict_mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
+	$timetype = cased_mysql_result($category,0,"timetype");
+	$inseconds = cased_mysql_result($category,0,"inseconds");
+	$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($events,$evt,"r".$round."_format"));
+	$times = cased_mysql_result($format,0,"times");
+	$avgtype = cased_mysql_result($format,0,"avgtype");
+	$formatId = $formats[cased_mysql_result($format,0,"id")];
 
 	$query =
 		"SELECT $regstable.*, $compstable.name, $compstable.WCAid, $timestable.t1, $timestable.t2, $timestable.t3, $timestable.t4, $timestable.t5, $timestable.average, $timestable.best, countries.name AS country FROM $regstable ".
@@ -135,14 +136,14 @@ function createEvtRnd($cat_id,$round,$lround,$timelimit)
 		"JOIN $compstable ON ($regstable.comp_id=$compstable.id) ".
 		"JOIN countries ON ($compstable.country_id=countries.id) ".
 		"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .$round." ORDER BY $timestable.t1 IS NULL, $timestable.average=\"\", $timestable.average, $timestable.best, $regstable.comp_id";
-	$result = mysql_query($query);
+	$result = strict_mysql_query($query);
 	//
 
-	echo "-- ".mysql_result($category,0,"name")." - ".roundString($round,$lround,$timelimit, $rId)."\r\n";
+	echo "-- ".cased_mysql_result($category,0,"name")." - ".roundString($round,$lround,$timelimit, $rId)."\r\n";
 	$lastA = "***";
 	$lastB = "***";
 	$count = 0;
-	while ($row=mysql_fetch_array($result))
+	while ($row=cased_mysql_fetch_array($result))
 	{
 		$count++;
 		echo "insert into Results (pos, personName, personId, countryId, competitionId, eventId, roundId, formatId, value1, value2, value3, value4, value5, best, average, regionalSingleRecord, regionalAverageRecord) values (";
@@ -160,7 +161,7 @@ function createEvtRnd($cat_id,$round,$lround,$timelimit)
 		echo "\"".$row["country"]."\",";
 		echo "\"$fname\",";
 
-		echo "\"".mysql_result($category,0,"abbr")."\",";
+		echo "\"".cased_mysql_result($category,0,"abbr")."\",";
 		echo "\"$rId\",";
 		echo "\"$formatId\",";
 
@@ -191,16 +192,16 @@ header("Content-Disposition: attachment;filename=\"$fname.sql\"");
 createComps();
 
 //----------- events ------------
-$events = mysql_query("SELECT * FROM $eventstable ORDER BY id");
+$events = strict_mysql_query("SELECT * FROM $eventstable ORDER BY id");
 $l = mysql_num_rows($events);
 for ($evt=0;$evt<$l;$evt++)
 {
 	$lrnd = 4;
-	while($lrnd>1 && !mysql_result($events,$evt,"r$lrnd")) $lrnd--;
+	while($lrnd>1 && !cased_mysql_result($events,$evt,"r$lrnd")) $lrnd--;
 	$rnd = 1;
-	while($rnd <= 4 && mysql_result($events,$evt,"r".$rnd."_open"))
+	while($rnd <= 4 && cased_mysql_result($events,$evt,"r".$rnd."_open"))
 	{
-		createEvtRnd(mysql_result($events,$evt,"id"), $rnd,$lrnd,mysql_result($events,$evt,"timelimit"));
+		createEvtRnd(cased_mysql_result($events,$evt,"id"), $rnd,$lrnd,cased_mysql_result($events,$evt,"timelimit"));
 		$rnd++;
 	}
 }

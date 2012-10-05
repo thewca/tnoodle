@@ -1,6 +1,14 @@
 Database Structure
 ==================
 
+
+TODO - document how to create a competition/create a page for it
+
+    http://localhost:8080/database-console
+
+    insert into competitions (admin_pw, country, date_b, date_e, intro_pw, name, place, website) values('pass', 'AF', now(), now()+100, 'pass', 'Foo comp', 'Place', 'foo.bar.com');
+
+
 Apart from the databases created in INC_INITDB.PHP, several databases must exist for the system to work:
 
 <pre><code>
@@ -81,7 +89,7 @@ CREATE TABLE `countries` (
 -- 
 
 INSERT INTO `countries` VALUES ('AF', 'Afghanistan');
-INSERT INTO `countries` VALUES ('AX', 'Åland Islands');
+INSERT INTO `countries` VALUES ('AX', 'ï¿½land Islands');
 INSERT INTO `countries` VALUES ('AL', 'Albania');
 INSERT INTO `countries` VALUES ('DZ', 'Algeria');
 INSERT INTO `countries` VALUES ('AS', 'American Samoa');
@@ -262,7 +270,7 @@ INSERT INTO `countries` VALUES ('RE', 'Reunion');
 INSERT INTO `countries` VALUES ('RO', 'Romania');
 INSERT INTO `countries` VALUES ('RU', 'Russia');
 INSERT INTO `countries` VALUES ('RW', 'Rwanda');
-INSERT INTO `countries` VALUES ('BL', 'Saint Barthélemy');
+INSERT INTO `countries` VALUES ('BL', 'Saint Barthï¿½lemy');
 INSERT INTO `countries` VALUES ('SH', 'Saint Helena');
 INSERT INTO `countries` VALUES ('KN', 'Saint Kitts and Nevis');
 INSERT INTO `countries` VALUES ('LC', 'Saint Lucia');
@@ -349,4 +357,5 @@ INSERT INTO `formats` VALUES (2, 'mean of 3', 3, 1);
 INSERT INTO `formats` VALUES (3, 'best of 3', 3, 2);
 INSERT INTO `formats` VALUES (4, 'best of 2', 2, 2);
 INSERT INTO `formats` VALUES (5, 'best of 1', 1, 2);
+
 </code></pre>

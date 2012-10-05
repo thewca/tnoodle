@@ -1,11 +1,12 @@
 <?
+require_once "lib.php";
 include "lib_ref_admin.php";
 include "db.php";
 
 if (!$_GET["id"]) die("Invalid calling params!");
-$comp = mysql_query("SELECT * FROM $compstable WHERE id=".$_GET["id"]);
+$comp = strict_mysql_query("SELECT * FROM $compstable WHERE id=".$_GET["id"]);
 if (!mysql_num_rows($comp)) die("Competitor not found!");
-$comp = mysql_fetch_array($comp);
+$comp = cased_mysql_fetch_array($comp);
 
 $color = "#6b7b71";
 $light_color = "#b0c7b4";
@@ -165,8 +166,8 @@ function submitForm()
 <tr><td class=caption>country</td><td><select id=country name=country style="width:200px;">
 <option value=""></option>
 <?
-$result = mysql_query("SELECT * FROM countries");
-while ($row=mysql_fetch_array($result))
+$result = strict_mysql_query("SELECT * FROM countries");
+while ($row=cased_mysql_fetch_array($result))
 {
 	echo "<option value=\"" . $row["id"] . "\"";
 	if ($row["id"]==$comp["country_id"]) echo " selected";

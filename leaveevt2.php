@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 include "lib_ref_admin.php";
 include "db.php";
 
@@ -35,8 +36,8 @@ $color = "#4b5b51";
 $light_color = "#b0c7b4";
 $dark_color = "#0a1414";
 
-$result = mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
-if (mysql_result($result,0,"admin_pw")!=$_POST["pw"])
+$result = strict_mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
+if (cased_mysql_result($result,0,"admin_pw")!=$_POST["pw"])
 {
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -66,24 +67,24 @@ $comp_id = $_POST["comp_id"];
 $ncmp_id = $_POST["ncmp_id"];
 if (!$cat_id || !$round || $round<=1 || !$comp_id) error(0);
 
-$qualified = mysql_query("SELECT * FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
+$qualified = strict_mysql_query("SELECT * FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
 $qualified = ($qualified && mysql_num_rows($qualified)==1);
 if (!$qualified) error(1);
 
-$noscore = mysql_query("SELECT * FROM $timestable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
+$noscore = strict_mysql_query("SELECT * FROM $timestable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
 $noscore = ($noscore && mysql_num_rows($noscore)==0);
 if (!$noscore) error(2);
 
 if ($ncmp_id)
 {
-	$qualified = mysql_query("SELECT * FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$ncmp_id");
+	$qualified = strict_mysql_query("SELECT * FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$ncmp_id");
 	$qualified = ($qualified && !mysql_num_rows($qualified));
 	if (!$qualified) error(3);
 
-	mysql_query("UPDATE $regstable SET comp_id=$ncmp_id WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id LIMIT 1");
+	strict_mysql_query("UPDATE $regstable SET comp_id=$ncmp_id WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id LIMIT 1");
 }
 else
-	mysql_query("DELETE FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id LIMIT 1");
+	strict_mysql_query("DELETE FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id LIMIT 1");
 
 mysql_close();
 ?>

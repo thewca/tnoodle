@@ -38,7 +38,7 @@ if ($_GET["id"] && $_GET["fld"] && isset($_GET["value"]))
 		}
 	}
 	//
-	mysql_query("UPDATE $eventstable SET " . $_GET["fld"] . "=\"$value\" WHERE id=" . $_GET["id"]);
+	$result = strict_mysql_query("UPDATE $eventstable SET " . $_GET["fld"] . "='$value' WHERE id=" . $_GET["id"]);
 	//
 	if ($_GET["fld"]=="timelimit")
 		if ($value)

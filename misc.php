@@ -106,7 +106,7 @@ else
 Click&nbsp;&nbsp;<input type=button value=clear onclick='clearBackground();'>&nbsp;&nbsp;to use a default white background.<p>
 
 <?
-$ofr = mysql_query("SELECT id FROM $eventstable WHERE r1_open=1");
+$ofr = strict_mysql_query("SELECT id FROM $eventstable WHERE r1_open=1");
 if (mysql_num_rows($ofr))
 {
 ?>

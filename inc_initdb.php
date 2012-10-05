@@ -1,6 +1,7 @@
 <?
+require_once "lib.php";
 
-$query = <<< CREATE
+$query = <<<EOT
 CREATE TABLE IF NOT EXISTS $eventstable (
   `id` tinyint(2) NOT NULL,
   `timelimit` varchar(9) default NULL,
@@ -21,11 +22,14 @@ CREATE TABLE IF NOT EXISTS $eventstable (
   `r4_groupsize` smallint(3) NOT NULL,
   `r4_open` tinyint(1) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=utf8
-CREATE;
-mysql_query($query);
+)
+EOT;
+//<<< ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=utf8
 
-$query = <<< CREATE
+$result = strict_mysql_query($query);
+
+/*<<<
+$query = <<<EOT
 CREATE TABLE IF NOT EXISTS $compstable (
   `id` SMALLINT( 3 ) NOT NULL AUTO_INCREMENT ,
   `WCAid` VARCHAR( 10 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
@@ -36,20 +40,35 @@ CREATE TABLE IF NOT EXISTS $compstable (
   PRIMARY KEY ( `id` ) ,
   INDEX ( `WCAid` , `name` )
 ) TYPE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci
-CREATE;
-mysql_query($query);
+EOT;
+*/
+$query = <<<EOT
+CREATE TABLE IF NOT EXISTS $compstable (
+  `id` SMALLINT( 3 ) NOT NULL AUTO_INCREMENT ,
+  `WCAid` VARCHAR( 10 ) ,
+  `name` VARCHAR( 80 ) ,
+  `country_id` VARCHAR( 2 ) ,
+  `birthday` DATE NOT NULL ,
+  `gender` VARCHAR( 1 ) ,
+  PRIMARY KEY ( `id` ) ,
+  INDEX ( `WCAid` , `name` )
+)
+EOT;
 
-$query = <<< CREATE
+$result = strict_mysql_query($query);
+
+$query = <<<EOT
 CREATE TABLE IF NOT EXISTS $regstable (
   `cat_id` tinyint(2) NOT NULL,
   `round` tinyint(1) NOT NULL,
   `comp_id` smallint(3) NOT NULL,
   PRIMARY KEY  (`cat_id`,`round`,`comp_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-CREATE;
-mysql_query($query);
+)
+EOT;
+//<<< ENGINE=MyISAM DEFAULT CHARSET=utf8;
+$result = strict_mysql_query($query);
 
-$query = <<< CREATE
+$query = <<<EOT
 CREATE TABLE IF NOT EXISTS $timestable (
   `cat_id` tinyint(2) NOT NULL,
   `round` tinyint(1) NOT NULL,
@@ -62,8 +81,9 @@ CREATE TABLE IF NOT EXISTS $timestable (
   `average` varchar(15) default NULL,
   `best` varchar(15) NOT NULL,
   PRIMARY KEY  (`cat_id`,`round`,`comp_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
-CREATE;
-mysql_query($query);
+)
+EOT;
+//<<< ENGINE=MyISAM DEFAULT CHARSET=utf8
+$result = strict_mysql_query($query);
 
 ?>
