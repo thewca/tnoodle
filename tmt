@@ -601,6 +601,7 @@ class EclipseProject(TmtProject):
 		self.main = main
 		self.argv = argv
 		self.nonJavaSrcDeps = set()
+		self.nonJavaResourceDeps = set()
 		self.tests = tests
 		self.strictCompile = True
 		TmtProject.__init__(self, name, description)
@@ -710,21 +711,23 @@ class EclipseProject(TmtProject):
 		self._compile(self.src, self.bin)
 		self._compile(self.srcResource, self.binResource)
 
-		for nonJavaSrcDep in self.nonJavaSrcDeps:
-			srcPath = join(self.srcResource, nonJavaSrcDep)
-			binPath = join(self.binResource, nonJavaSrcDep)
-			print "Copying %s -> %s" % ( srcPath, binPath )
-			if isdir(srcPath):
-				parentDir = dirname(dirname(binPath))
-			else:
-				parentDir = dirname(binPath)
-			if not isdir(parentDir):
-				os.makedirs(parentDir)
-			if binPath.endswith('/'):
-				binPath = binPath[:-1]
-			srcPath = abspath(srcPath)
-			srcPath = relpath(srcPath, parentDir)
-			os.symlink(srcPath, binPath)
+
+		for src, bin, nonJavaDeps in ( ( self.srcResource, self.binResource, self.nonJavaResourceDeps ), ( self.src, self.bin, self.nonJavaSrcDeps ) ):
+			for nonJavaDep in nonJavaDeps:
+				srcPath = join(src, nonJavaDep)
+				binPath = join(bin, nonJavaDep)
+				print "Copying %s -> %s" % ( srcPath, binPath )
+				if isdir(srcPath):
+					parentDir = dirname(dirname(binPath))
+				else:
+					parentDir = dirname(binPath)
+				if not isdir(parentDir):
+					os.makedirs(parentDir)
+				if binPath.endswith('/'):
+					binPath = binPath[:-1]
+				srcPath = abspath(srcPath)
+				srcPath = relpath(srcPath, parentDir)
+				os.symlink(srcPath, binPath)
 
 		createSymlinkIfNotExistsOrStale(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
 
@@ -762,6 +765,9 @@ class EclipseProject(TmtProject):
 				args += [ '-Xlint:-fallthrough' ]
                 # WinstoneSession.java has an unsurpressable deprecation warning.
 				args += [ '-Xlint:-deprecation' ]
+                # This check is dumb, it doesn't realize casting is sometimes
+                # done to force a different method to be called.
+				args += [ '-Xlint:-cast' ]
 
 				# TODO - some of our library jars may include a Class-path
 				# For now, I want to just manually edit those jars, but if we
