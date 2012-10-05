@@ -34,7 +34,7 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
-@SuppressWarnings({"serial","unchecked"})
+@SuppressWarnings({"serial","unchecked","rawtypes"})
 public class ScrambleTestGui {
 	private HashMap<String, Color> colorScheme = null;
 	private HashMap<String, GeneralPath> faceBoundaries = null;
