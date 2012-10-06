@@ -14,6 +14,6 @@
 		<servlet-name>InitializeCubecompsDbServlet</servlet-name>
 		<servlet-class>net.gnehzr.tnoodle.cubecomps.InitializeCubecompsDbServlet</servlet-class>
 		<load-on-startup>0</load-on-startup>
-	</servlet> 
+	</servlet>
 	
 </web-app>

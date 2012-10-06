@@ -68,7 +68,7 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
 			
 			Statement stmt = conn.createStatement();
 			stmt.execute(sanitizedSchema.toString());
-			stmt.execute("insert into competitions (admin_pw, country, date_b, date_e, intro_pw, name, place, website) values('pass', 'AF', now(), now(), 'pass', 'Foo comp', 'Place', 'foo.bar.com');");
+			stmt.execute("MERGE INTO competitions (id, admin_pw, country, date_b, date_e, intro_pw, name, place, website) VALUES(1, 'pass', 'AF', now(), now(), 'pass', 'Foo comp', 'Place', 'foo.bar.com');");
 		} catch (SQLException e) {
 			l.log(Level.SEVERE, "", e);
 		} catch (NamingException e) {
