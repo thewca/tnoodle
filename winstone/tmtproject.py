@@ -19,6 +19,7 @@ class Project(tmt.EclipseProject):
 		self.ignoredWarnings += [ 'deprecation' ]
 		self.ignoredWarnings += [ 'serial' ]
 		self.ignoredWarnings += [ 'dep-ann' ]
+		self.ignoredWarnings += [ 'rawtypes' ]
 
 
         # It is important that when we iterate through the plugins
