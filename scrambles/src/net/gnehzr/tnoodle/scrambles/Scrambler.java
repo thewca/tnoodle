@@ -179,7 +179,7 @@ public abstract class Scrambler {
 		return getLongName();
 	}
 
-	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class);
+	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class, Scrambler.class.getClassLoader());
 
 	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
 	public static synchronized SortedMap<String, LazyInstantiator<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {

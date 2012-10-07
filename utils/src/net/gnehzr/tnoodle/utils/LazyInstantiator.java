@@ -20,7 +20,12 @@ public class LazyInstantiator<H> {
 	private String definition;
 	private Class<H> parentClass;
 	private File classDirectory;
-	public LazyInstantiator(String definition, Class<H> classy, File classDirectory) throws BadClassDescriptionException {
+	private ClassLoader classLoader;
+	public LazyInstantiator(String definition, Class<H> classy, File classDirectory, ClassLoader classLoader) throws BadClassDescriptionException {
+		if(classLoader == null) {
+			classLoader = getClass().getClassLoader();
+		}
+		this.classLoader = classLoader;
 		Matcher m = INSTANTIATION_PATTERN.matcher(definition);
 		if(!m.matches()) {
 			throw new BadClassDescriptionException(definition);
@@ -79,9 +84,9 @@ public class LazyInstantiator<H> {
 		if(constructor == null) {
 			ClassLoader cl;
 			if(classDirectory != null) {
-				cl = new LazyClassLoader(classDirectory);
+				cl = new LazyClassLoader(classDirectory, classLoader);
 			} else {
-				cl = getClass().getClassLoader();
+				cl = classLoader;
 			}
 
 			thisClass = cl.loadClass(className).asSubclass(this.parentClass);

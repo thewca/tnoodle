@@ -164,11 +164,15 @@ class Project(tmt.EclipseProject):
 			elif isinstance(project, tmt.EclipseProject):
 				for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
 					for name in filenames:
+						if dirpath.startswith(join(project.bin, "tnoodle_resources")):
+							destDir = ""
+						else:
+							destDir = classesDir
 						path = join(dirpath, name)
 						prefixLen = len(project.bin)
 						if project.bin.endswith("/"):
 							prefixLen += 1
-						arcPath = join(classesDir, path[prefixLen:])
+						arcPath = join(destDir, path[prefixLen+1:])
 						jar.write(path, arcPath)
 
 
