@@ -29,7 +29,6 @@ import winstone.WinstoneResponse;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SimpleAccessLogger.java,v 1.5 2006/03/24 17:24:19 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class SimpleAccessLogger implements AccessLogger {
 
     public static final WinstoneResourceBundle ACCESSLOG_RESOURCES = 

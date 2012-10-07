@@ -14,7 +14,6 @@ import java.security.Principal;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes" })
 public class HttpServletRequestWrapper extends
         javax.servlet.ServletRequestWrapper implements HttpServletRequest {
     private HttpServletRequest httpRequest;
@@ -131,7 +130,6 @@ public class HttpServletRequestWrapper extends
     /**
      * @deprecated
      */
-    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         return this.httpRequest.isRequestedSessionIdFromUrl();
     }

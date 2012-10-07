@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
  * @version $Id: WinstoneResponse.java,v 1.28 2005/04/19 07:33:41 rickknowles
  *          Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WinstoneResponse implements HttpServletResponse {
     private static final DateFormat HTTP_DF = new SimpleDateFormat(
             "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
@@ -811,19 +810,24 @@ public class WinstoneResponse implements HttpServletResponse {
         out.flush();
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public String encodeRedirectUrl(String url) {
         return encodeRedirectURL(url);
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public String encodeUrl(String url) {
         return encodeURL(url);
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public void setStatus(int sc, String sm) {
         setStatus(sc);
     }
-
 }

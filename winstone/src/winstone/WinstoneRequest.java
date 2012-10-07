@@ -51,7 +51,6 @@ import javax.servlet.http.HttpSession;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneRequest.java,v 1.38 2007/10/28 16:29:02 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WinstoneRequest implements HttpServletRequest {
     protected static DateFormat headerDF = new SimpleDateFormat(
             "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
@@ -1340,12 +1339,16 @@ public class WinstoneRequest implements HttpServletRequest {
         this.usedSessions.clear();
     }
     
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public String getRealPath(String path) {
         return this.webappConfig.getRealPath(path);
     }
 
-   @Deprecated
+    /**
+     * @deprecated
+     */
     public boolean isRequestedSessionIdFromUrl() {
         return isRequestedSessionIdFromURL();
     }

@@ -33,7 +33,6 @@ import winstone.WinstoneResourceBundle;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ReloadingClassLoader.java,v 1.11 2007/02/17 01:55:12 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ReloadingClassLoader extends WebappClassLoader implements ServletContextListener, Runnable {
     private static final int RELOAD_SEARCH_SLEEP = 10;
     private static final WinstoneResourceBundle CL_RESOURCES = new WinstoneResourceBundle("winstone.classLoader.LocalStrings");

@@ -23,7 +23,6 @@ import winstone.jndi.WinstoneContext;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: javaURLContextFactory.java,v 1.5 2007/04/23 02:55:35 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class javaURLContextFactory implements InitialContextFactory, ObjectFactory {
 
     private static WinstoneContext rootContext;

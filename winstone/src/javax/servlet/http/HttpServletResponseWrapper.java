@@ -89,7 +89,6 @@ public class HttpServletResponseWrapper extends
     /**
      * @deprecated
      */
-    @Deprecated
     public String encodeRedirectUrl(String url) {
         return this.httpResponse.encodeRedirectUrl(url);
     }
@@ -97,7 +96,6 @@ public class HttpServletResponseWrapper extends
     /**
      * @deprecated
      */
-    @Deprecated
     public String encodeUrl(String url) {
         return this.httpResponse.encodeUrl(url);
     }
@@ -105,7 +103,6 @@ public class HttpServletResponseWrapper extends
     /**
      * @deprecated
      */
-    @Deprecated
     public void setStatus(int sc, String sm) {
         this.httpResponse.setStatus(sc, sm);
     }

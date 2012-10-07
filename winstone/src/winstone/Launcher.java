@@ -33,7 +33,6 @@ import java.util.Properties;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Launcher.java,v 1.29 2007/04/23 02:55:35 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
 public class Launcher implements Runnable {
     
     static final String HTTP_LISTENER_CLASS = "winstone.HttpListener";
@@ -138,6 +137,7 @@ public class Launcher implements Runnable {
         }
         ClassLoader commonLibCL = new URLClassLoader((URL[]) jars.toArray(new URL[jars.size()]), 
                 getClass().getClassLoader());
+        
         Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
                 commonLibCL.toString());
         Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
@@ -170,6 +170,7 @@ public class Launcher implements Runnable {
                 }
             }
         }
+        
         // If jndi is enabled, run the container wide jndi populator
         if (useJNDI) {
             String jndiMgrClassName = WebAppConfiguration.stringArg(args, "containerJndiClassName",
@@ -206,12 +207,14 @@ public class Launcher implements Runnable {
             Logger.log(Logger.DEBUG, RESOURCES, 
                     "Launcher.NeedsJDK14", HTTPS_LISTENER_CLASS);
         }
+
         this.controlThread = new Thread(this, RESOURCES.getString(
                 "Launcher.ThreadName", "" + this.controlPort));
         this.controlThread.setDaemon(false);
         this.controlThread.start();
 
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+
     }
 
     /**

@@ -11,7 +11,6 @@ package javax.servlet.http;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings("serial")
 public class HttpSessionBindingEvent extends HttpSessionEvent {
     private String name;
 

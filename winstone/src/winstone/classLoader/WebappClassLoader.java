@@ -26,7 +26,6 @@ import winstone.WinstoneResourceBundle;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WebappClassLoader.java,v 1.3 2007/12/29 03:32:54 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WebappClassLoader extends URLClassLoader {
     private static final WinstoneResourceBundle CL_RESOURCES = new WinstoneResourceBundle("winstone.classLoader.LocalStrings");
     

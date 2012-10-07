@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServlet;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ErrorServlet.java,v 1.3 2006/02/28 07:32:47 rickknowles Exp $
  */
-@SuppressWarnings({ "serial" })
 public class ErrorServlet extends HttpServlet {
     
     public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {

@@ -26,7 +26,6 @@ import winstone.WinstoneRequest;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ClientcertAuthenticationHandler.java,v 1.3 2006/02/28 07:32:47 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class ClientcertAuthenticationHandler extends BaseAuthenticationHandler {
     public ClientcertAuthenticationHandler(Node loginConfigNode,
             List constraintNodes, Set rolesAllowed,

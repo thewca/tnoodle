@@ -12,7 +12,6 @@ package javax.servlet;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: UnavailableException.java,v 1.2 2006/02/28 07:32:47 rickknowles Exp $
  */
-@SuppressWarnings("serial")
 public class UnavailableException extends ServletException {
     private int seconds;
 
@@ -22,7 +21,6 @@ public class UnavailableException extends ServletException {
      * @deprecated As of Java Servlet API 2.2, use UnavailableException(String,
      *             int) instead.
      */
-    @Deprecated
     public UnavailableException(int seconds, Servlet servlet, String msg) {
         this(servlet, msg);
         this.seconds = (seconds <= 0 ? 0 : seconds);
@@ -32,7 +30,6 @@ public class UnavailableException extends ServletException {
      * @deprecated As of Java Servlet API 2.2, use UnavailableException(String)
      *             instead.
      */
-    @Deprecated
     public UnavailableException(Servlet servlet, String msg) {
         this(msg);
         this.servlet = servlet;
@@ -60,7 +57,6 @@ public class UnavailableException extends ServletException {
      * @deprecated As of Java Servlet API 2.2, with no replacement. Returns the
      *             servlet that is reporting its unavailability.
      */
-    @Deprecated
     public Servlet getServlet() {
         return this.servlet;
     }

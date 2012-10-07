@@ -34,7 +34,6 @@ import winstone.WinstoneRequest;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: FormAuthenticationHandler.java,v 1.7 2006/12/13 14:07:43 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class FormAuthenticationHandler extends BaseAuthenticationHandler {
     private static final String ELEM_FORM_LOGIN_CONFIG = "form-login-config";
     private static final String ELEM_FORM_LOGIN_PAGE = "form-login-page";

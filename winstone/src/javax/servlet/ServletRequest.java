@@ -18,7 +18,6 @@ import java.util.Map;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes" })
 public interface ServletRequest {
     public Object getAttribute(String name);
 
@@ -80,6 +79,5 @@ public interface ServletRequest {
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             ServletContext.getRealPath(String) instead.
      */
-    @Deprecated
     public String getRealPath(String path);
 }

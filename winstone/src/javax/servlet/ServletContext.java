@@ -16,7 +16,6 @@ import java.util.Set;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes" })
 public interface ServletContext {
     public Object getAttribute(String name);
 
@@ -55,26 +54,22 @@ public interface ServletContext {
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
-    @Deprecated
     public Servlet getServlet(String name) throws ServletException;
 
     /**
      * @deprecated As of Java Servlet API 2.1, with no replacement.
      */
-    @Deprecated
     public Enumeration getServletNames();
 
     /**
      * @deprecated As of Java Servlet API 2.0, with no replacement.
      */
-    @Deprecated
     public Enumeration getServlets();
 
     /**
      * @deprecated As of Java Servlet API 2.1, use log(String message, Throwable
      *             throwable) instead.
      */
-    @Deprecated
     public void log(Exception exception, String msg);
 
     public void log(String msg);

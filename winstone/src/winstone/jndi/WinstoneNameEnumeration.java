@@ -22,7 +22,6 @@ import javax.naming.NamingException;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneNameEnumeration.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WinstoneNameEnumeration implements NamingEnumeration {
     private Enumeration nameEnumeration;
     

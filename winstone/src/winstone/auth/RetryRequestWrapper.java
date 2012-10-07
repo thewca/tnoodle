@@ -40,7 +40,6 @@ import winstone.WinstoneRequest;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: RetryRequestWrapper.java,v 1.3 2007/02/26 00:28:05 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class RetryRequestWrapper extends HttpServletRequestWrapper {
     protected static final DateFormat headerDF = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
 

@@ -90,18 +90,15 @@ public interface HttpServletResponse extends javax.servlet.ServletResponse {
      *             an error with a description use sendError(int, String). Sets
      *             the status code and message for this response.
      */
-    @Deprecated
     public void setStatus(int sc, String sm);
 
     /**
      * @deprecated As of version 2.1, use encodeRedirectURL(String url) instead
      */
-    @Deprecated
     public String encodeRedirectUrl(String url);
 
     /**
      * @deprecated As of version 2.1, use encodeURL(String url) instead
      */
-    @Deprecated
     public String encodeUrl(String url);
 }

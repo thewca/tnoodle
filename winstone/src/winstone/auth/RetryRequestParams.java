@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: RetryRequestParams.java,v 1.2 2007/06/01 15:59:53 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class RetryRequestParams implements java.io.Serializable {
 
     private String method;

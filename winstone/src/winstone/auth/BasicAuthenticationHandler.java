@@ -27,7 +27,6 @@ import winstone.WinstoneRequest;
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: BasicAuthenticationHandler.java,v 1.5 2007/04/11 13:14:26 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class BasicAuthenticationHandler extends BaseAuthenticationHandler {
     public BasicAuthenticationHandler(Node loginConfigNode,
             List constraintNodes, Set rolesAllowed,

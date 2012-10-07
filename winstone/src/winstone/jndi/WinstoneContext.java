@@ -31,7 +31,6 @@ import winstone.Logger;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneContext.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WinstoneContext implements Context {
     static final String PREFIX = "java:";
     static final String FIRST_CHILD = "comp";
@@ -340,9 +339,9 @@ public class WinstoneContext implements Context {
                 throw new NotContextException(ContainerJNDIManager.JNDI_RESOURCES.getString(
                         "WinstoneContext.NotContext", new String[] {
                                 bindName.get(0), ctx.getClass().getName() }));
-//            else if (ctx == null) JFLY
-//                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
-//                        "WinstoneContext.NameNotFound", bindName.get(0)));
+            else if (ctx == null)
+                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
+                        "WinstoneContext.NameNotFound", bindName.get(0)));
             else
                 try {
                     if (allowOverwrites)
@@ -393,9 +392,9 @@ public class WinstoneContext implements Context {
                 throw new NotContextException(ContainerJNDIManager.JNDI_RESOURCES.getString(
                         "WinstoneContext.NotContext", new String[] {
                                 unbindName.get(0), ctx.getClass().getName() }));
-// JFLY           else if (ctx == null)
-//                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
-//                        "WinstoneContext.NameNotFound", unbindName.get(0)));
+            else if (ctx == null)
+                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
+                        "WinstoneContext.NameNotFound", unbindName.get(0)));
             else
                 try {
                     ((Context) ctx).unbind(unbindName.getSuffix(1));
@@ -443,9 +442,9 @@ public class WinstoneContext implements Context {
                 throw new NotContextException(ContainerJNDIManager.JNDI_RESOURCES.getString(
                         "WinstoneContext.NotContext", new String[] {
                                 childName.get(0), ctx.getClass().getName() }));
-//   JFLY         else if (ctx == null)
-//                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
-//                        "WinstoneContext.NameNotFound", childName.get(0)));
+            else if (ctx == null)
+                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
+                        "WinstoneContext.NameNotFound", childName.get(0)));
             else
                 try {
                     ((Context) ctx).createSubcontext(childName.getSuffix(1));
@@ -492,9 +491,9 @@ public class WinstoneContext implements Context {
                 throw new NotContextException(ContainerJNDIManager.JNDI_RESOURCES.getString(
                         "WinstoneContext.NotContext", new String[] {
                                 childName.get(0), ctx.getClass().getName() }));
-//            else if (ctx == null) JFLY
-//                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
-//                        "WinstoneContext.NameNotFound", childName.get(0)));
+            else if (ctx == null)
+                throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
+                        "WinstoneContext.NameNotFound", childName.get(0)));
             else
                 try {
                     ((Context) ctx).destroySubcontext(childName.getSuffix(1));

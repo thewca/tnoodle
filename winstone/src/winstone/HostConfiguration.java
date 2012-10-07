@@ -32,7 +32,6 @@ import org.w3c.dom.Node;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HostConfiguration.java,v 1.8 2007/08/02 06:16:00 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class HostConfiguration implements Runnable {
     
     private static final long FLUSH_PERIOD = 60000L;
@@ -288,7 +287,6 @@ public class HostConfiguration implements Runnable {
         } else {
             File children[] = webappsDir.listFiles();
             for (int n = 0; n < children.length; n++) {
-
                 String childName = children[n].getName();
                 
                 // Check any directories for warfiles that match, and skip: only deploy the war file

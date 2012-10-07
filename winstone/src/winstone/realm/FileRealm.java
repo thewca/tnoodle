@@ -33,7 +33,6 @@ import winstone.WinstoneResourceBundle;
  * @author rickk
  * @version $Id: FileRealm.java,v 1.4 2006/08/30 04:07:52 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class FileRealm implements AuthenticationRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
     

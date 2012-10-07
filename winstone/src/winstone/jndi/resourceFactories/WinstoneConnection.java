@@ -7,23 +7,22 @@
 package winstone.jndi.resourceFactories;
 
 import java.sql.Array;
+import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
-import java.sql.NClob;
-import java.sql.Clob;
-import java.sql.Blob;
-import java.sql.SQLXML;
 import java.util.Map;
 import java.util.Properties;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import winstone.Logger;
 
@@ -34,64 +33,9 @@ import winstone.Logger;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneConnection.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WinstoneConnection implements Connection {
     private Connection realConnection;
     private WinstoneDataSource datasource;
-
-	public Struct createStruct(String typeName, Object[] attributes) {
-		throw new NotImplementedException();
-	}
-
-	public Array createArrayOf(String typeName, Object[] elements) {
-		throw new NotImplementedException();
-	}
-
-	public String getClientInfo(String name) {
-		throw new NotImplementedException();
-	}
-
-	public Properties getClientInfo() {
-		throw new NotImplementedException();
-	}
-
-	public void setClientInfo(String a, String b) {
-		throw new NotImplementedException();
-	}
-
-	public void setClientInfo(Properties prop) {
-		throw new NotImplementedException();
-	}
-
-	public boolean isValid(int timeout) {
-		throw new NotImplementedException();
-	}
-
-	public SQLXML createSQLXML() {
-		throw new NotImplementedException();
-	}
-
-	public NClob createNClob() {
-		throw new NotImplementedException();
-	}
-
-	public Blob createBlob() {
-		throw new NotImplementedException();
-	}
-
-	public Clob createClob() {
-		throw new NotImplementedException();
-	}
-
-	public boolean isWrapperFor(Class iface) {
-		throw new NotImplementedException();
-	}
-
-	public Object unwrap(Class iface) {
-		throw new NotImplementedException();
-	}
-
-
 
     /**
      * Constructor - this sets the real connection and the link back to the pool
@@ -286,4 +230,86 @@ public class WinstoneConnection implements Connection {
             throws SQLException {
         return this.realConnection.prepareStatement(sql, columnNames);
     }
+
+	@Override
+	public <T> T unwrap(Class<T> iface) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Clob createClob() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Blob createBlob() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public NClob createNClob() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SQLXML createSQLXML() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isValid(int timeout) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setClientInfo(String name, String value)
+			throws SQLClientInfoException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setClientInfo(Properties properties)
+			throws SQLClientInfoException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getClientInfo(String name) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Properties getClientInfo() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Array createArrayOf(String typeName, Object[] elements)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Struct createStruct(String typeName, Object[] attributes)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

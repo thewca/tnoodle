@@ -44,7 +44,6 @@ import winstone.WinstoneResponse;
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Ajp13Listener.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class Ajp13Listener implements Listener, Runnable {
     public final static WinstoneResourceBundle AJP_RESOURCES = new WinstoneResourceBundle("winstone.ajp13.LocalStrings");
     
@@ -52,7 +51,7 @@ public class Ajp13Listener implements Listener, Runnable {
     private final static int DEFAULT_PORT = 8009;
     private final static int CONNECTION_TIMEOUT = 60000;
     private final static int BACKLOG_COUNT = 1000;
-//    private final static int KEEP_ALIVE_TIMEOUT = -1;
+    private final static int KEEP_ALIVE_TIMEOUT = -1;
 //    private final static int KEEP_ALIVE_SLEEP = 50;
 //    private final static int KEEP_ALIVE_SLEEP_MAX = 500;
     private final static String TEMPORARY_URL_STASH = "winstone.ajp13.TemporaryURLAttribute";
@@ -156,10 +155,10 @@ public class Ajp13Listener implements Listener, Runnable {
         req.setHostGroup(this.hostGroup);
         // rsp.updateContentTypeHeader("text/html");
 
-//        if (iAmFirst || (KEEP_ALIVE_TIMEOUT == -1)) JFLY
+        if (iAmFirst || (KEEP_ALIVE_TIMEOUT == -1))
             socket.setSoTimeout(CONNECTION_TIMEOUT);
-//        else JFLY
-//            socket.setSoTimeout(KEEP_ALIVE_TIMEOUT);
+        else
+            socket.setSoTimeout(KEEP_ALIVE_TIMEOUT);
         Ajp13IncomingPacket headers = null;
         try {
             headers = new Ajp13IncomingPacket(inSocket, handler);

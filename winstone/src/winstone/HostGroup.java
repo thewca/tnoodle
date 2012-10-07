@@ -22,7 +22,6 @@ import java.util.Set;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HostGroup.java,v 1.4 2006/03/24 17:24:21 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class HostGroup {
     
     private final static String DEFAULT_HOSTNAME = "default";

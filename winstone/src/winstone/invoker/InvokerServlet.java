@@ -31,7 +31,6 @@ import winstone.WinstoneResourceBundle;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: InvokerServlet.java,v 1.6 2006/03/24 17:24:24 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class InvokerServlet extends HttpServlet {
 //    private static final String FORWARD_PATH_INFO = "javax.servlet.forward.path_info";
     private static final String INCLUDE_PATH_INFO = "javax.servlet.include.path_info";

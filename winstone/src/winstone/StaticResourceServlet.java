@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
  * @version $Id: StaticResourceServlet.java,v 1.17 2004/12/31 07:21:00
  *          rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class StaticResourceServlet extends HttpServlet {
     // final String JSP_FILE = "org.apache.catalina.jsp_file";
     final static String FORWARD_SERVLET_PATH = "javax.servlet.forward.servlet_path";

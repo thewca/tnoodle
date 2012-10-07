@@ -26,7 +26,6 @@ import java.util.Map;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Logger.java,v 1.8 2006/11/09 06:01:43 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class Logger {
     private static final String LINE_SEPARATOR = System.getProperty("line.separator"); 
     

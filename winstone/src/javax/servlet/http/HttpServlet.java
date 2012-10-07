@@ -22,7 +22,6 @@ import javax.servlet.ServletResponse;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings("serial")
 public abstract class HttpServlet extends javax.servlet.GenericServlet
         implements Serializable {
     static final String METHOD_DELETE = "DELETE";

@@ -42,7 +42,6 @@ import winstone.WinstoneResourceBundle;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HttpsListener.java,v 1.10 2007/06/13 15:27:35 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class HttpsListener extends HttpListener {
     private static final WinstoneResourceBundle SSL_RESOURCES = new WinstoneResourceBundle("winstone.ssl.LocalStrings");
     private String keystore;

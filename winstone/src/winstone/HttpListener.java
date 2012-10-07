@@ -26,7 +26,6 @@ import java.util.Map;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HttpListener.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class HttpListener implements Listener, Runnable {
     protected static int LISTENER_TIMEOUT = 5000; // every 5s reset the
                                                     // listener socket

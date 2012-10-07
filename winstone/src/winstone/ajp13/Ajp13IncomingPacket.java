@@ -24,7 +24,6 @@ import winstone.WinstoneException;
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Ajp13IncomingPacket.java,v 1.6 2007/04/03 01:23:19 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class Ajp13IncomingPacket {
     // Server originated packet types
     byte SERVER_FORWARD_REQUEST = 0x02;

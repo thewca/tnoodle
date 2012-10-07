@@ -32,7 +32,6 @@ import winstone.WinstoneResourceBundle;
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: BaseAuthenticationHandler.java,v 1.6 2006/02/28 07:32:47 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public abstract class BaseAuthenticationHandler implements
         AuthenticationHandler {
     static final String ELEM_REALM_NAME = "realm-name";

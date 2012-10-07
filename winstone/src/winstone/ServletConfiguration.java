@@ -29,7 +29,6 @@ import org.w3c.dom.Node;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ServletConfiguration.java,v 1.16 2007/04/23 02:55:35 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ServletConfiguration implements javax.servlet.ServletConfig,
         Comparable {
     

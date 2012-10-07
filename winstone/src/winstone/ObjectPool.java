@@ -21,7 +21,6 @@ import java.util.Map;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ObjectPool.java,v 1.9 2006/11/18 14:56:59 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ObjectPool implements Runnable {
     private static final long FLUSH_PERIOD = 60000L;
     

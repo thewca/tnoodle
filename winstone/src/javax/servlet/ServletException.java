@@ -14,7 +14,6 @@ import java.io.PrintStream;
  * 
  * @author Rick Knowles
  */
-@SuppressWarnings("serial")
 public class ServletException extends java.lang.Exception {
     private Throwable rootCause;
 

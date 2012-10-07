@@ -27,7 +27,6 @@ import org.w3c.dom.Node;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class FilterConfiguration implements javax.servlet.FilterConfig {
     final String ELEM_NAME = "filter-name";
     final String ELEM_DISPLAY_NAME = "display-name";

@@ -38,7 +38,6 @@ import winstone.WinstoneSession;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SimpleCluster.java,v 1.8 2006/08/10 06:38:31 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SimpleCluster implements Runnable, Cluster {
     final int SESSION_CHECK_TIMEOUT = 100;
     final int HEARTBEAT_PERIOD = 5000;

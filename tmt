@@ -604,6 +604,14 @@ class EclipseProject(TmtProject):
 		self.nonJavaResourceDeps = set()
 		self.tests = tests
 		self.strictCompile = True
+
+		self.ignoredWarnings = []
+		# We don't need to be warned about possible fallthroughs in switch statements
+		self.ignoredWarnings += [ 'fallthrough' ]
+		# This check is dumb, it doesn't realize casting is sometimes
+		# done to force a different method to be called.
+		self.ignoredWarnings += [ 'cast' ]
+
 		TmtProject.__init__(self, name, description)
 
 	def getDependencies(self, includeCompileTimeOnlyDependencies=False):
@@ -760,14 +768,8 @@ class EclipseProject(TmtProject):
 				# Treat warnings as errors
 				args += [ '-Werror' ]
 
-				# Ignored warnings
-				# We don't need to be warned about possible fallthroughs in switch statements
-				args += [ '-Xlint:-fallthrough' ]
-                # WinstoneSession.java has an unsurpressable deprecation warning.
-				args += [ '-Xlint:-deprecation' ]
-                # This check is dumb, it doesn't realize casting is sometimes
-                # done to force a different method to be called.
-				args += [ '-Xlint:-cast' ]
+				for ignoredWarning in self.ignoredWarnings:
+					args += [ '-Xlint:-%s' % ignoredWarning ]
 
 				# TODO - some of our library jars may include a Class-path
 				# For now, I want to just manually edit those jars, but if we

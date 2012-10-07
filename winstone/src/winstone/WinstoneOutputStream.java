@@ -20,7 +20,6 @@ import javax.servlet.http.Cookie;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneOutputStream.java,v 1.19 2007/10/14 14:48:14 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private static final byte[] CR_LF = "\r\n".getBytes();

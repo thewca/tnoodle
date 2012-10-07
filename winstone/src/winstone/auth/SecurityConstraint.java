@@ -23,7 +23,6 @@ import winstone.WebAppConfiguration;
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SecurityConstraint.java,v 1.7 2006/08/10 06:38:30 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SecurityConstraint {
     final String ELEM_DISPLAY_NAME = "display-name";
     final String ELEM_WEB_RESOURCES = "web-resource-collection";

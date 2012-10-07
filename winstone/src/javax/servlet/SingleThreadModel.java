@@ -13,6 +13,5 @@ package javax.servlet;
  * @deprecated
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@Deprecated
 public interface SingleThreadModel {
 }

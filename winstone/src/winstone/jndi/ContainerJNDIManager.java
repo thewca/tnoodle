@@ -33,7 +33,6 @@ import winstone.jndi.resourceFactories.WinstoneDataSource;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ContainerJNDIManager.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ContainerJNDIManager implements JNDIManager {
     public static final WinstoneResourceBundle JNDI_RESOURCES = new WinstoneResourceBundle("winstone.jndi.LocalStrings");
     

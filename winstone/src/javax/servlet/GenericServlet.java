@@ -15,7 +15,6 @@ import java.util.Enumeration;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes", "serial" })
 public abstract class GenericServlet implements Servlet, ServletConfig,
         Serializable {
     private ServletConfig config;

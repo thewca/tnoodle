@@ -12,19 +12,15 @@ package javax.servlet.http;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @deprecated
  */
-@Deprecated
-@SuppressWarnings({ "rawtypes" })
 public abstract interface HttpSessionContext {
     /**
      * @deprecated
      */
-    @Deprecated
     public abstract java.util.Enumeration getIds();
 
     /**
      * @deprecated
      */
-    @Deprecated
     public abstract HttpSession getSession(String sessionId);
 
 }

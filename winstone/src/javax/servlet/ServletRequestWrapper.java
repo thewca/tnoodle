@@ -18,7 +18,6 @@ import java.io.UnsupportedEncodingException;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes" })
 public class ServletRequestWrapper implements ServletRequest {
     private ServletRequest request;
 
@@ -153,7 +152,6 @@ public class ServletRequestWrapper implements ServletRequest {
     /**
      * @deprecated
      */
-    @Deprecated
     public String getRealPath(String path) {
         return this.request.getRealPath(path);
     }

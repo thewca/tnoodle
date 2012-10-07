@@ -18,7 +18,6 @@ import java.io.PrintWriter;
  * @version $Id: WinstoneException.java,v 1.1 2004/03/08 15:27:21 rickknowles
  *          Exp $
  */
-@SuppressWarnings("serial")
 public class WinstoneException extends RuntimeException {
     private Throwable nestedError = null;
 

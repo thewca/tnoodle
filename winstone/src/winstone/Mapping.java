@@ -13,7 +13,6 @@ package winstone;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Mapping.java,v 1.9 2007/04/23 02:55:35 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class Mapping implements java.util.Comparator {
     public static final int EXACT_PATTERN = 1;
     public static final int FOLDER_PATTERN = 2;

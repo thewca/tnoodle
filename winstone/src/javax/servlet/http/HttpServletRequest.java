@@ -14,7 +14,6 @@ import java.security.Principal;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes" })
 public interface HttpServletRequest extends javax.servlet.ServletRequest {
     public static final String BASIC_AUTH = "BASIC";
     public static final String CLIENT_CERT_AUTH = "CLIENT_CERT";
@@ -73,7 +72,6 @@ public interface HttpServletRequest extends javax.servlet.ServletRequest {
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             isRequestedSessionIdFromURL() instead.
      */
-    @Deprecated
     public boolean isRequestedSessionIdFromUrl();
 
 }

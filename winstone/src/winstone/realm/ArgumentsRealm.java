@@ -29,7 +29,6 @@ import winstone.WinstoneResourceBundle;
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ArgumentsRealm.java,v 1.4 2007/06/01 15:55:41 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ArgumentsRealm implements AuthenticationRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
     

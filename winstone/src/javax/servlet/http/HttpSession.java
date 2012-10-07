@@ -15,7 +15,6 @@ import javax.servlet.ServletContext;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes" })
 public interface HttpSession {
     public Object getAttribute(String name);
 
@@ -46,34 +45,29 @@ public interface HttpSession {
      *             replacement. It will be removed in a future version of the
      *             Java Servlet API.
      */
-    @Deprecated
     public HttpSessionContext getSessionContext();
 
     /**
      * @deprecated As of Version 2.2, this method is replaced by
      *             getAttribute(java.lang.String).
      */
-    @Deprecated
     public Object getValue(String name);
 
     /**
      * @deprecated As of Version 2.2, this method is replaced by
      *             getAttributeNames()
      */
-    @Deprecated
     public String[] getValueNames();
 
     /**
      * @deprecated As of Version 2.2, this method is replaced by
      *             setAttribute(java.lang.String, java.lang.Object)
      */
-    @Deprecated
     public void putValue(String name, Object value);
 
     /**
      * @deprecated As of Version 2.2, this method is replaced by
      *             removeAttribute(java.lang.String)
      */
-    @Deprecated
     public void removeValue(String name);
 }

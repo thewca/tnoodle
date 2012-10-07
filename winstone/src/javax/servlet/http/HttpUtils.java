@@ -15,13 +15,11 @@ import java.util.StringTokenizer;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class HttpUtils {
     /**
      * @deprecated Reconstructs the URL the client used to make the request,
      *             using information in the HttpServletRequest object.
      */
-    @Deprecated
     public static StringBuffer getRequestURL(HttpServletRequest req) {
         return req.getRequestURL();
     }
@@ -31,7 +29,6 @@ public class HttpUtils {
      *             server using the HTTP POST method and the
      *             application/x-www-form-urlencoded MIME type.
      */
-    @Deprecated
     public static Hashtable parsePostData(int len, ServletInputStream in) {
         try {
             byte body[] = new byte[len];
@@ -57,7 +54,6 @@ public class HttpUtils {
      * @deprecated Parses a query string passed from the client to the server
      *             and builds a HashTable object with key-value pairs.
      */
-    @Deprecated
     public static Hashtable parseQueryString(String urlEncodedParams) {
         Hashtable params = new Hashtable();
         StringTokenizer st = new StringTokenizer(urlEncodedParams, "&", false);

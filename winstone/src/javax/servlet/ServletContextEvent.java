@@ -11,7 +11,6 @@ package javax.servlet;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-@SuppressWarnings("serial")
 public class ServletContextEvent extends java.util.EventObject {
     /**
      * Constructor

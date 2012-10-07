@@ -53,7 +53,6 @@ import org.w3c.dom.NodeList;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WebAppConfiguration.java,v 1.55 2007/11/13 01:42:47 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
 public class WebAppConfiguration implements ServletContext, Comparator {
 //    private static final String ELEM_DESCRIPTION = "description";
     private static final String ELEM_DISPLAY_NAME = "display-name";
@@ -1878,22 +1877,30 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         }
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public javax.servlet.Servlet getServlet(String name) {
         return null;
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public Enumeration getServletNames() {
         return Collections.enumeration(new ArrayList());
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public Enumeration getServlets() {
         return Collections.enumeration(new ArrayList());
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public void log(Exception exception, String msg) {
         this.log(msg, exception);
     }

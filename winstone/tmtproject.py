@@ -14,6 +14,13 @@ class Project(tmt.EclipseProject):
 		self.main = "net.gnehzr.tnoodle.server.TNoodleServer"
 		self.argv = [ '--nobrowser', '--consoleLevel=INFO' ]
 
+		# Winstone does all of these things =(.
+		self.ignoredWarnings += [ 'unchecked' ]
+		self.ignoredWarnings += [ 'deprecation' ]
+		self.ignoredWarnings += [ 'serial' ]
+		self.ignoredWarnings += [ 'dep-ann' ]
+
+
         # It is important that when we iterate through the plugins
         # in topological sorted order. This way if B uses A, B can clobber
         # A's settings.

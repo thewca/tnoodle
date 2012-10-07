@@ -26,7 +26,6 @@ import javax.servlet.ServletResponseWrapper;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: RequestDispatcher.java,v 1.18 2007/04/23 02:55:35 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class RequestDispatcher implements javax.servlet.RequestDispatcher,
         javax.servlet.FilterChain {
     

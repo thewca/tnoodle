@@ -41,7 +41,6 @@ import javax.servlet.http.HttpSessionListener;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneSession.java,v 1.10 2006/08/27 07:19:47 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class WinstoneSession implements HttpSession, Serializable {
     public static final String SESSION_COOKIE_NAME = "JSESSIONID";
 
@@ -484,30 +483,38 @@ public class WinstoneSession implements HttpSession, Serializable {
         this.sessionMonitor = new Boolean(true);
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public Object getValue(String name) {
         return getAttribute(name);
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public void putValue(String name, Object value) {
         setAttribute(name, value);
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public void removeValue(String name) {
         removeAttribute(name);
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     */
     public String[] getValueNames() {
         return (String[]) this.sessionData.keySet().toArray(new String[0]);
     }
 
-    @Deprecated
-	public javax.servlet.http.HttpSessionContext getSessionContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+    /**
+     * @deprecated
+     */
+    public javax.servlet.http.HttpSessionContext getSessionContext() {
+        return null;
+    } // deprecated
 }

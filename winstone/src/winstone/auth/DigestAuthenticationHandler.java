@@ -34,7 +34,6 @@ import winstone.WinstoneResourceBundle;
  * @version $Id: DigestAuthenticationHandler.java,v 1.3 2004/05/22 06:53:45
  *          rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes" })
 public class DigestAuthenticationHandler extends BaseAuthenticationHandler {
     private MessageDigest md5Digester;
 

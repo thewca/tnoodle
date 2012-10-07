@@ -6,7 +6,6 @@
  */
 package winstone.jndi.resourceFactories;
 
-
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -19,8 +18,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import winstone.Logger;
 import winstone.WebAppConfiguration;
@@ -42,7 +39,6 @@ import winstone.WinstoneResourceBundle;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneDataSource.java,v 1.8 2006/11/07 01:30:39 rickknowles Exp $
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class WinstoneDataSource implements DataSource, Runnable {
     
     public static final WinstoneResourceBundle DS_RESOURCES = 
@@ -72,13 +68,6 @@ public class WinstoneDataSource implements DataSource, Runnable {
 
     private int loginTimeout;
     private PrintWriter logWriter;
-
-	public boolean isWrapperFor(Class iface) {
-		throw new NotImplementedException();
-	}
-	public Object unwrap(Class iface) {
-		throw new NotImplementedException();
-	}
     
     /**
      * Main constructor. Basically just calls the init method
@@ -240,8 +229,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 throw err;
             }
         }
-        //JFLYrealConnection.setAutoCommit(false);
-        realConnection.setAutoCommit(true);//JFLY
+        realConnection.setAutoCommit(false);
         WinstoneConnection wrapper = new WinstoneConnection(realConnection, this);
         this.usedWrappers.add(wrapper);
         return wrapper;
@@ -479,4 +467,16 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 "" + this.usedRealConnections.size(), 
                 "" + this.unusedRealConnections.size()});
     }
+
+	@Override
+	public <T> T unwrap(Class<T> iface) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
