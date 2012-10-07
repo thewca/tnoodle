@@ -40,6 +40,8 @@ import winstone.TNoodleWinstoneLauncher;
 
 
 public class TNoodleServer {
+	private static final Logger l = Logger.getLogger(TNoodleServer.class.getName());
+	
 	public static String NAME = Utils.getProjectName();
 	public static String VERSION = Utils.getVersion();
 	
@@ -60,13 +62,24 @@ public class TNoodleServer {
 		serverArgs.put("httpPort", "" + httpPort);
 		serverArgs.put("ajp13Port", "-1");
 		
-		File db = new File(Utils.getResourceDirectory(), DB_NAME);
-		serverArgs.put("useJNDI", "true");
-        serverArgs.put("jndi.resource.jdbc/connPool", "javax.sql.DataSource");
-        serverArgs.put("jndi.param.jdbc/connPool.url", String.format("jdbc:h2:%s;MODE=MySQL;USER=%s;PASSWORD=%s;MVCC=TRUE", db.getAbsoluteFile(), DB_USERNAME, DB_PASSWORD));
-        serverArgs.put("jndi.param.jdbc/connPool.driverClassName", "org.h2.Driver");
-        serverArgs.put("jndi.param.jdbc/connPool.username", DB_USERNAME);
-        serverArgs.put("jndi.param.jdbc/connPool.password", DB_PASSWORD);
+		String dbDriver = "org.h2.Driver";
+		boolean initializeDb;
+		try {
+			Class.forName(dbDriver);
+			initializeDb = true;
+		} catch(ClassNotFoundException e) {
+			initializeDb = false;
+			l.info("Could not find class " + dbDriver + ", so we're not creating an entry in JNDI for a db.");
+		}
+		if(initializeDb) {
+			File db = new File(Utils.getResourceDirectory(), DB_NAME);
+			serverArgs.put("useJNDI", "true");
+			serverArgs.put("jndi.resource.jdbc/connPool", "javax.sql.DataSource");
+			serverArgs.put("jndi.param.jdbc/connPool.url", String.format("jdbc:h2:%s;MODE=MySQL;USER=%s;PASSWORD=%s;MVCC=TRUE", db.getAbsoluteFile(), DB_USERNAME, DB_PASSWORD));
+			serverArgs.put("jndi.param.jdbc/connPool.driverClassName", dbDriver);
+			serverArgs.put("jndi.param.jdbc/connPool.username", DB_USERNAME);
+			serverArgs.put("jndi.param.jdbc/connPool.password", DB_PASSWORD);
+		}
 		
 		// By default, winstone looks in ./lib, which I don't like, as it means
 		// we'll behave differently when run from different directories.
