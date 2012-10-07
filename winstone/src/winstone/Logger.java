@@ -9,14 +9,12 @@ package winstone;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * A utility class for logging event and status messages. It maintains a
@@ -27,6 +25,8 @@ import java.util.Map;
  * @version $Id: Logger.java,v 1.8 2006/11/09 06:01:43 rickknowles Exp $
  */
 public class Logger {
+	private static final java.util.logging.Logger l = java.util.logging.Logger.getLogger(Logger.class.getName());
+	
     private static final String LINE_SEPARATOR = System.getProperty("line.separator"); 
     
     public final static String DEFAULT_STREAM = "Winstone";
@@ -38,6 +38,17 @@ public class Logger {
     public static int DEBUG = 7;
     public static int FULL_DEBUG = 8;
     public static int MAX = 9;
+    private static final HashMap<Integer, Level> INT_TO_LEVEL = new HashMap<Integer, Level>();
+    static {
+    	INT_TO_LEVEL.put(MIN, Level.SEVERE);
+    	INT_TO_LEVEL.put(ERROR, Level.SEVERE);
+    	INT_TO_LEVEL.put(WARNING, Level.WARNING);
+    	INT_TO_LEVEL.put(INFO, Level.INFO);
+    	INT_TO_LEVEL.put(SPEED, Level.FINE);
+    	INT_TO_LEVEL.put(DEBUG, Level.FINER);
+    	INT_TO_LEVEL.put(FULL_DEBUG, Level.FINEST);
+    	INT_TO_LEVEL.put(MAX, Level.FINEST);
+    }
 
     protected static Boolean semaphore = new Boolean(true);
     protected static boolean initialised = false;
@@ -139,50 +150,54 @@ public class Logger {
         }
     }
 
-    /**
-     * Writes a log message to the requested stream, and immediately flushes
-     * the contents of the stream.
-     */
-    private static void logInternal(String streamName, String message, Throwable error) {
-        
-        if (!initialised) {
-            init(INFO);
-        }
-        
-        Writer stream = getStreamByName(streamName);
-        if (stream != null) {
-            Writer fullMessage = new StringWriter();
-            String date = null;
-            synchronized (sdfLog) {
-                date = sdfLog.format(new Date());
-            }
-            try {
-                fullMessage.write("[");
-                fullMessage.write(streamName);
-                fullMessage.write(" ");
-                fullMessage.write(date);
-                fullMessage.write("] - ");
-                if (showThrowingThread) {
-                    fullMessage.write("[");
-                    fullMessage.write(Thread.currentThread().getName());
-                    fullMessage.write("] - ");
-                }
-                fullMessage.write(message);
-                if (error != null) {
-                    fullMessage.write(LINE_SEPARATOR);
-                    PrintWriter pw = new PrintWriter(fullMessage);
-                    error.printStackTrace(pw);
-                    pw.flush();
-                }
-                fullMessage.write(LINE_SEPARATOR);
-                
-                stream.write(fullMessage.toString());
-                stream.flush();
-            } catch (IOException err) {
-                System.err.println(Launcher.RESOURCES.getString("Logger.StreamWriteError", message));
-                err.printStackTrace(System.err);
-            }
-        }
+//    /**
+//     * Writes a log message to the requested stream, and immediately flushes
+//     * the contents of the stream.
+//     */
+//    private static void logInternal(String streamName, String message, Throwable error) {
+//        
+//        if (!initialised) {
+//            init(INFO);
+//        }
+//        
+//        Writer stream = getStreamByName(streamName);
+//        if (stream != null) {
+//            Writer fullMessage = new StringWriter();
+//            String date = null;
+//            synchronized (sdfLog) {
+//                date = sdfLog.format(new Date());
+//            }
+//            try {
+//                fullMessage.write("[");
+//                fullMessage.write(streamName);
+//                fullMessage.write(" ");
+//                fullMessage.write(date);
+//                fullMessage.write("] - ");
+//                if (showThrowingThread) {
+//                    fullMessage.write("[");
+//                    fullMessage.write(Thread.currentThread().getName());
+//                    fullMessage.write("] - ");
+//                }
+//                fullMessage.write(message);
+//                if (error != null) {
+//                    fullMessage.write(LINE_SEPARATOR);
+//                    PrintWriter pw = new PrintWriter(fullMessage);
+//                    error.printStackTrace(pw);
+//                    pw.flush();
+//                }
+//                fullMessage.write(LINE_SEPARATOR);
+//                
+//                stream.write(fullMessage.toString());
+//                stream.flush();
+//            } catch (IOException err) {
+//                System.err.println(Launcher.RESOURCES.getString("Logger.StreamWriteError", message));
+//                err.printStackTrace(System.err);
+//            }
+//        }
+//    }
+    
+    private static void logInternal(String streamName, String message, Throwable error, int level) {
+    	l.log(INT_TO_LEVEL.get(level), message, error);
     }
 
     public static void log(int level, WinstoneResourceBundle resources,
@@ -190,7 +205,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey), null);
+            logInternal(DEFAULT_STREAM, resources.getString(messageKey), null, level);
         }
     }
 
@@ -199,7 +214,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey), error);
+            logInternal(DEFAULT_STREAM, resources.getString(messageKey), error, level);
         }
     }
 
@@ -208,7 +223,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, param), null);
+            logInternal(DEFAULT_STREAM, resources.getString(messageKey, param), null, level);
         }
     }
 
@@ -217,7 +232,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, params), null);
+            logInternal(DEFAULT_STREAM, resources.getString(messageKey, params), null, level);
         }
     }
 
@@ -226,7 +241,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, param), error);
+            logInternal(DEFAULT_STREAM, resources.getString(messageKey, param), error, level);
         }
     }
 
@@ -235,7 +250,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, params), error);
+            logInternal(DEFAULT_STREAM, resources.getString(messageKey, params), error, level);
         }
     }
 
@@ -244,7 +259,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(streamName, resources.getString(messageKey, params), error);
+            logInternal(streamName, resources.getString(messageKey, params), error, level);
         }
     }
 
@@ -253,7 +268,7 @@ public class Logger {
         if (currentDebugLevel < level) {
             return;
         } else {
-            logInternal(streamName, message, error);
+            logInternal(streamName, message, error, level);
         }
     }
 }
