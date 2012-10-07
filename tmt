@@ -760,6 +760,11 @@ class EclipseProject(TmtProject):
 		javaFiles = tmt.glob(src, r'.*\.java$')
 		if len(javaFiles) > 0:
 			args = [ 'javac' ]
+
+            # Generate all debugging information,
+            # it doesn't seem to be *that* much stuff.
+			args += [ '-g' ]
+
 			args += [ '-d', tempBin ]
 
 			if self.strictCompile:
