@@ -780,16 +780,16 @@ class EclipseProject(TmtProject):
 				args += [ '-XDignore.symbol.file' ]
 
 			entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
-			if src == self.srcResource:
-				# We can't include all our children's src directories,
-				# as they may not satisfy our allowed warnings.
-				entities.add(self.src)
 
 			# At the time we're compiling, bin/ and bin_tnoodle_resource/ don't
-			# actually exist. This is becuse we compile to temp directory, and
-			# move the folders only if we're successful.
+            # actually exist (well, bin/ might). This is becuse we compile to
+            # temp directory, and move the folders only if we're successful.
 			entities.remove(self.bin)
+
 			entities.remove(self.binResource)
+			if src == self.srcResource:
+                # bin was just built, so it actually does exist
+				entities.add(self.bin)
 
 			classpath = self.toClasspath(entities)
 			if classpath:
@@ -874,7 +874,7 @@ class EclipseProject(TmtProject):
 				pushCommand += ' git@github.com:cubing/tnoodle.git'
 				print pushCommand
 				assert 0 == os.system(pushCommand)
-	
+
 	def tweakJarFile(self, jar):
 		pass
 
