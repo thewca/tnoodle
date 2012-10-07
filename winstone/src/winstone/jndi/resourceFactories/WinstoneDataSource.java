@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import winstone.Logger;
 import winstone.WebAppConfiguration;
@@ -470,13 +473,16 @@ public class WinstoneDataSource implements DataSource, Runnable {
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new NotImplementedException();
 	}
+	
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		throw new NotImplementedException();
+	}
+
 }
