@@ -481,7 +481,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
 		throw new NotImplementedException();
 	}
 	
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+	public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		throw new NotImplementedException();
 	}
 
