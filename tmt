@@ -632,7 +632,7 @@ class EclipseProject(TmtProject):
 				jars.remove(javaEEProject)
 		return jars
 
-	def getClasspathEntities(self, includeResources=True, includeCompileTimeOnlyDependencies=False):
+	def getClasspathEntities(self, includeResources=True, includeCompileTimeOnlyDependencies=False, includeSrc=False):
 		classpath = set()
 		classpath |= set(relpath(jar.jarFile) for jar in self.getJars(includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies))
 		classpath.add(self.bin)
@@ -642,7 +642,8 @@ class EclipseProject(TmtProject):
 		# The src folder only needs to be in the classpath so
 		# jdb can discover the source code, and so compilation of stuff in
 		# src_tnoodle_resources/ can find things defined in src/
-		classpath.add(self.src)
+		if includeSrc:
+			classpath.add(self.src)
 
 		# TODO - I hate the world
 		# Uncomment & replace the following with the path to your jre
@@ -650,7 +651,7 @@ class EclipseProject(TmtProject):
 		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
 
 		for project in self.projects:
-			classpath |= project.getClasspathEntities(includeResources=includeResources)
+			classpath |= project.getClasspathEntities(includeResources=includeResources, includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies, includeSrc=includeSrc)
 		return classpath
 
 	def toClasspath(self, entities):
@@ -704,7 +705,7 @@ class EclipseProject(TmtProject):
 		if any( dep.needsCompiling() for dep in self.getDependencies() ):
 			return True
 		lastCompiled = tmt.timestamp(self.bin)
-		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False) )
+		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False, includeSrc=True) )
 		changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
 		srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
 		if self.webContent:
@@ -779,6 +780,10 @@ class EclipseProject(TmtProject):
 				args += [ '-XDignore.symbol.file' ]
 
 			entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
+			if src == self.srcResource:
+				# We can't include all our children's src directories,
+				# as they may not satisfy our allowed warnings.
+				entities.add(self.src)
 
 			# At the time we're compiling, bin/ and bin_tnoodle_resource/ don't
 			# actually exist. This is becuse we compile to temp directory, and
@@ -995,7 +1000,7 @@ Implementation-Version: %s
 		if self.argv:
 			args += self.argv
 
-		classpath = self.getClasspathEntities(includeResources=False)
+		classpath = self.getClasspathEntities(includeResources=False, includeSrc=True)
 
 		retVal = tmt.java(
 				main=main,
