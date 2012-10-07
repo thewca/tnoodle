@@ -22,7 +22,16 @@ public class MarkdownServlet extends SafeHttpServlet {
 
 		GenericResponseWrapper wrapper = new GenericResponseWrapper(response);
 		rd.include(request, wrapper);
-		byte[] markdown = markdownToHTML(wrapper.getData()).getBytes();
+		byte[] data = wrapper.getData();
+		if(data.length == 0) {
+			// We can't distinguish between an empty file, and a 404. This is
+			// because WinstonseResponse only actually sets an error code if
+			// isIncluding == false.
+			
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "File " + request.getRequestURI() + " not found");
+			return;
+		}
+		byte[] markdown = markdownToHTML(data).getBytes();
 		response.setContentType("text/html");
 		response.setContentLength(markdown.length);
 		OutputStream out = response.getOutputStream();

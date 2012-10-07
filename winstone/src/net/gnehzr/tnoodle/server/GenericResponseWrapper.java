@@ -1,6 +1,7 @@
 package net.gnehzr.tnoodle.server;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletOutputStream;
@@ -11,9 +12,11 @@ public class GenericResponseWrapper extends HttpServletResponseWrapper {
 	private ByteArrayOutputStream output;
 	private int contentLength;
 	private String contentType;
-
+	private HttpServletResponse response;
+	
 	public GenericResponseWrapper(HttpServletResponse response) {
 		super(response);
+		this.response = response;
 		output = new ByteArrayOutputStream();
 	}
 
@@ -45,5 +48,10 @@ public class GenericResponseWrapper extends HttpServletResponseWrapper {
 
 	public String getContentType() {
 		return contentType;
+	}
+	
+	@Override
+	public void sendError(int sc, String msg) throws IOException {
+		response.sendError(sc, msg);
 	}
 }
