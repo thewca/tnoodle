@@ -79,17 +79,31 @@ class Project(tmt.EclipseProject):
 			shutil.copy(tmt.WinstoneServer.distJarFile(), self.distJarFile())
 		project.__class__.webContentDist = webContentDist
 
+	def getWebappDir(self):
+		webappsDir = join(self.binResource, "webapps")
+		webappDir = join(webappsDir, "ROOT")
+		return webappDir
+
 	def compile(self):
 		if tmt.EclipseProject.compile(self):
 			if tmt.TmtProject.projects[tmt.args.project] == self:
+                # No wrapped compile to call this for us
 				self.mungeXmlFiles(topLevelWebProject=self)
+
+			webappDir = self.getWebappDir()
+			webappWebInfDir = join(webappDir, "WEB-INF")
+			libDir = join(webappWebInfDir, 'lib')
+			if not os.path.exists(libDir):
+				os.makedirs(libDir)
+			classesDir = join(webappWebInfDir, 'classes')
+			if not os.path.exists(classesDir):
+				os.makedirs(classesDir)
 
 	def mungeXmlFiles(self, topLevelWebProject):
 		for f in xmlFileTypes:
 			deps = topLevelWebProject.getRecursiveDependenciesTopoSorted()
 
-			webappsDir = join(self.binResource, "webapps")
-			webappDir = join(webappsDir, "ROOT")
+			webappDir = self.getWebappDir()
 			webappWebInfDir = join(webappDir, "WEB-INF")
 			if not os.path.isdir(webappWebInfDir):
 				os.makedirs(webappWebInfDir)
