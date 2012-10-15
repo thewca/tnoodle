@@ -287,7 +287,8 @@ public class TNoodleServer {
 					byte[] b = new byte[(int) injectCodeFile.length()];
 					in.readFully(b);
 					in.close();
-					HtmlInjectFilter.setHeadInjectCode(new String(b));
+					String injectCode = new String(b);
+					HtmlInjectFilter.setHeadInjectCode(injectCode);
 				}
 				int httpPort = options.valueOf(httpPortOpt);
 

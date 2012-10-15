@@ -22,10 +22,12 @@ public class HtmlInjectFilter implements Filter {
 		return headInjectCode;
 	}
 	
+
 	@Override
-	public void destroy() {
-		
-	}
+	public void init(FilterConfig filterConfig) throws ServletException {}
+
+	@Override
+	public void destroy() {}
 	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -61,11 +63,6 @@ public class HtmlInjectFilter implements Filter {
 		}
 		response.setContentLength(data.length);
 		out.write(data);
-	}
-
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		headInjectCode = filterConfig.getInitParameter("head");
 	}
 
 }
