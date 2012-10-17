@@ -168,7 +168,7 @@ public class PyraminxScrambler extends Scrambler {
 		} else {
 			if (edgePermPrun[edge] > maxl || oriPrun[ori] > maxl)
 				return false;
-			for (int axis = 0; axis < 4; axis++)
+			for (int axis = 0; axis < 4; axis++) {
 				if (axis != lastAxis) {
 					int edgex = edge;
 					int orix = ori;
@@ -181,6 +181,7 @@ public class PyraminxScrambler extends Scrambler {
 						}
 					}
 				}
+			}
 		}
 		return false;
 	}

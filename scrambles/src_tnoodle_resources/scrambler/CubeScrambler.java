@@ -82,7 +82,7 @@ public class CubeScrambler extends Scrambler {
 	public String generateScramble(Random r) {
 		if(size == 2) {
 			int[] posit = twoSolver.mix(r);
-			return twoSolver.solve(posit, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
+			return twoSolver.solve(posit, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH, true);
 		} else if(size == 3) {
 			return twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 		} else if(size == 4) {

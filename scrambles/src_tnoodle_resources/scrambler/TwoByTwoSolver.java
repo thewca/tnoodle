@@ -108,7 +108,7 @@ public class TwoByTwoSolver {
 	}
 	
 	static final String[] DIR_TO_STR = new String[] { "'", "2", ""};
-	public String solve(int[] posit, int min_length) {
+	public String solve(int[] posit, int min_length, boolean reverse) {
 	    //count all adjacent pairs (clockwise around corners)
 		int[][] adj = new int[6][6];
 	    for(int a=0;a<adj.length;a++)for(int b=0;b<adj[a].length;b++) adj[a][b] = 0;
@@ -160,16 +160,37 @@ public class TwoByTwoSolver {
 	    for(int l=min_length;l<100;l++)
 	    	if(search(0,q,t,l,-1, sol))
 	    		break;
-//	    int turnCount = 0;
-//	    for(q=0;q<sol.length && sol[q] != -1;q++)
-//	    	turnCount++;
+
+	    
 	    StringBuffer turns = new StringBuffer();
-	    for(q=q-1; q>=0; q--) {
-	    	turns.append(" " + "URF".charAt(sol[q]/10) + DIR_TO_STR[sol[q]%10]);
+	    
+	    int scrambleLength;
+	    for(scrambleLength=0;scrambleLength<sol.length && sol[scrambleLength] != -1;scrambleLength++) {}
+	    
+	    int startIndex;
+	    int delta;
+	    if(reverse) {
+	    	startIndex = scrambleLength - 1;
+	    	delta = -1;
+	    } else {
+	    	startIndex = 0;
+	    	delta = 1;
 	    }
-	    if(turns.length() == 0)
-	    	return "";
-	    return turns.substring(1);
+	    for(int turnIndex = startIndex; turnIndex >= 0 && turnIndex < scrambleLength; turnIndex += delta) {
+	    	char axis = "URF".charAt(sol[turnIndex]/10);
+	    	int dir = (sol[turnIndex]%10);
+	    	if(reverse) {
+	    		dir = 2 - dir;
+	    	}
+		    String dirStr = DIR_TO_STR[dir];
+		    turns.append(" " + axis + dirStr);
+	    }
+	    
+	    // Remove beginning space, if there is one
+	    if(turns.length() > 0) {
+	    	turns.replace(0, 1, "");
+	    }
+	    return turns.toString();
 	}
 	private boolean search(int d, int q, int t, int l, int lm, int[] sol) {
 	    //searches for solution, from position q|t, in l moves exactly. last move was lm, current depth=d
@@ -325,4 +346,5 @@ public class TwoByTwoSolver {
 	    }
 	    return q;
 	}
+	
 }
