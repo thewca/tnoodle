@@ -9,6 +9,72 @@ public class TwoByTwoSolver {
 	public TwoByTwoSolver() {
 		calcperm();
 	}
+
+	private int[] fact = {1, 1, 2, 6, 24, 120, 720}; // fact[x] = x!
+
+	/**
+	 * Converts the list of cubies into a number representing the permutation of the cubies.
+	 * @param cubies   cubies representation (ori << 3 + perm)
+	 * @return         an integer between 0 and 5039 representing the permutation of 7 elements
+	 */
+	private int packPerm( int[] cubies){
+		int idx = 0;
+		int val = 0x6543210;
+		for (int i=0; i<6; i++) {
+			int v = ( cubies[i] & 0x7 ) << 2;
+			idx = (7 - i) * idx + ((val >> v) & 0x7);
+			val -= 0x1111110 << v;
+		}
+		return idx;
+	}
+
+	/**
+	 * Converts an integer representing a permutation of 7 elements into a list of cubies.
+	 * @param perm     an integer between 0 and 5039 representing the permutation of 7 elements
+	 * @param cubies   cubies representation (ori << 3 + perm)
+	 */
+	private void unpackPerm( int perm, int[] cubies){
+		int val = 0x6543210;
+		for (int i=0; i<6; i++) {
+			int p = fact[6-i];
+			int v = perm / p;
+			perm -= v*p;
+			v <<= 2;
+			cubies[i] = (val >> v) & 0x7;
+			int m = (1 << v) - 1;
+			val = (val & m) + ((val >> 4) & ~m);
+		}
+		cubies[7] = val;
+	}
+
+	/**
+	 * Converts the list of cubies into a number representing the orientation of the cubies.
+	 * @param cubies   cubies representation (ori << 3 + perm)
+	 * @return         an integer between 0 and 729 representing the orientation of 6 elements (the 7th is fixed)
+	 */
+	private int packOrient( int[] cubies ){
+		int ori = 0;
+		for (int i=0; i<6; i++){
+			ori = 3 * ori + ( cubies[i] >> 3 );
+		}
+		return ori;
+	}
+
+	/**
+	 * Converts an integer representing a permutation of 7 elements into a list of cubies.
+	 * @param ori      an integer between 0 and 729 representing the orientation of 6 elements (the 7th is fixed)
+	 * @param cubies   cubies representation (ori << 3 + perm)
+	 */
+	private void unpackOrient( int ori, int[] cubies ){
+		int sum_ori = 0;
+		for (int i=5; i>=0; i--){
+			cubies[i] = ( ori % 3 ) << 3;
+			sum_ori += ori % 3;
+			ori /= 3;
+		}
+		cubies[6] = (( 42424242 - sum_ori ) % 3 ) << 3; // Any number multiple of 3 greater than 15 works :)
+	}
+
 //	int[] seq = new int[1000];
 //	private boolean solved(){
 //	    for (int i=0;i<24; i+=4){
