@@ -48,7 +48,7 @@ public class TwoByTwoSolver {
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 * @return         an integer between 0 and 5039 representing the permutation of 7 elements
 	 */
-	private int packPerm( int[] cubies){
+	private int packPerm(int[] cubies){
 		int idx = 0;
 		int val = 0x6543210;
 		for (int i=0; i<6; i++) {
@@ -64,7 +64,7 @@ public class TwoByTwoSolver {
 	 * @param perm     an integer between 0 and 5039 representing the permutation of 7 elements
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 */
-	private void unpackPerm( int perm, int[] cubies){
+	private void unpackPerm(int perm, int[] cubies){
 		int val = 0x6543210;
 		for (int i=0; i<6; i++) {
 			int p = fact[6-i];
@@ -83,7 +83,7 @@ public class TwoByTwoSolver {
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 * @return         an integer between 0 and 728 representing the orientation of 6 elements (the 7th is fixed)
 	 */
-	private int packOrient( int[] cubies ){
+	private int packOrient(int[] cubies){
 		int ori = 0;
 		for (int i=0; i<6; i++){
 			ori = 3 * ori + ( cubies[i] >> 3 );
@@ -96,7 +96,7 @@ public class TwoByTwoSolver {
 	 * @param ori      an integer between 0 and 728 representing the orientation of 6 elements (the 7th is fixed)
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 */
-	private void unpackOrient( int ori, int[] cubies ){
+	private void unpackOrient(int ori, int[] cubies){
 		int sum_ori = 0;
 		for (int i=5; i>=0; i--){
 			cubies[i] = ( ori % 3 ) << 3;
@@ -107,41 +107,41 @@ public class TwoByTwoSolver {
 	}
 
 	/**
-	 * Swap four elements of an array.
+	 * Cycle four elements of an array.
 	 * @param cubies   cubies representation (ori << 3 + perm)
-	 * @param a        first element to swap
-	 * @param b        second element to swap
-	 * @param c        third element to swap
-	 * @param d        fourth element to swap
-	 * @param times    number of times to swap
+	 * @param a        first element to cycle
+	 * @param b        second element to cycle
+	 * @param c        third element to cycle
+	 * @param d        fourth element to cycle
+	 * @param times    number of times to cycle
 	 */
-	private void swap( int[] cubies, int a, int b, int c, int d, int times){
+	private void cycle(int[] cubies, int a, int b, int c, int d, int times){
 		int temp = cubies[d];
 		cubies[d] = cubies[c];
 		cubies[c] = cubies[b];
 		cubies[b] = cubies[a];
 		cubies[a] = temp;
-		if( times > 0 )
-			swap(cubies, a, b, c, d, times-1);
+		if( times > 1 )
+			cycle(cubies, a, b, c, d, times - 1);
 	}
 
 	/**
-	 * Swap four elements of an array. Also orient clockwise second and fourth elements and clockwise the other ones.
+	 * Cycle four elements of an array. Also orient clockwise first and third elements and counter-clockwise the other ones.
 	 * @param cubies   cubies representation (ori << 3 + perm)
-	 * @param a        first element to swap
-	 * @param b        second element to swap
-	 * @param c        third element to swap
-	 * @param d        fourth element to swap
-	 * @param times    number of times to swap
+	 * @param a        first element to cycle
+	 * @param b        second element to cycle
+	 * @param c        third element to cycle
+	 * @param d        fourth element to cycle
+	 * @param times    number of times to cycle
 	 */
-	private void swapAndOrient( int[] cubies, int a, int b, int c, int d, int times){
+	private void cycleAndOrient(int[] cubies, int a, int b, int c, int d, int times){
 		int temp = cubies[d];
 		cubies[d] = (cubies[c] + 8) % 24;
 		cubies[c] = (cubies[b] + 16) % 24;
 		cubies[b] = (cubies[a] + 8) % 24;
 		cubies[a] = (temp + 16) % 24;
-		if( times > 0 )
-			swapAndOrient(cubies, a, b, c, d, times-1);
+		if( times > 1 )
+			cycleAndOrient(cubies, a, b, c, d, times - 1);
 	}
 
 	/**
@@ -149,18 +149,18 @@ public class TwoByTwoSolver {
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 * @param move     move to apply to the cubies
 	 */
-	private void moveCubies( int[] cubies, int move){
+	private void moveCubies(int[] cubies, int move){
 		int face = move / 3;
-		int times = move % 3;
+		int times = ( move % 3 ) + 1;
 		switch (face){
 			case 0: // U face
-				swap(cubies, 0, 1, 2, 3, times);
+				cycle(cubies, 0, 1, 2, 3, times);
 				break;
 			case 1: // R face
-				swapAndOrient(cubies, 3, 2, 6, 5, times);
+				cycleAndOrient(cubies, 3, 2, 6, 5, times);
 				break;
 			case 2: // F face
-				swapAndOrient(cubies, 0, 3, 5, 4, times);
+				cycleAndOrient(cubies, 0, 3, 5, 4, times);
 				break;
 		}
 	}
@@ -246,29 +246,44 @@ public class TwoByTwoSolver {
 	 * @param perm       permutation coordinate to solve
 	 * @param orient     orientation coordinate to solve
 	 * @param depth      current depth of the search (first called with 0)
-	 * @param length     the length of the solution we want
+	 * @param length     the remaining number of moves we can apply
 	 * @param last_move  what was the last move done (first called with an int >= 9)
 	 * @param solution   the array containing the current moves done.
 	 * @return           true if a solution was found (stored in the solution array)
 	 *                   false if no solution was found
 	 */
 	private boolean search(int perm, int orient, int depth, int length, int last_move, int solution[]){
+
+		/* If there are no moves left to try (length=0), returns if the current position is solved */
 		if( length == 0 ) {
-			if(( perm == 0 ) && ( orient == 0 )) {
-				return true;
-			}
-			return false;
+			return ( perm == 0 ) && ( orient == 0 );
 		}
+
+		/* Check if we might be able to solve the permutation or the orientation of the position
+		 * given the remaining number of moves ('length' parameter), using the pruning tables.
+		 * If not, there is no point keeping searching for a solution, just stop.
+		 */
 		if(( prunPerm[perm] > length ) || ( prunOrient[orient] > length ))
 			return false;
+
+		/* The recursive part of the search function.
+		 * Try every move from the current position, and call the search function with the new position
+		 * and the updated parameters (depth -> depth+1; length -> length-1; last_move -> move)
+		 * We don't need to try a move of the same face as the last move.
+		 */
 		for( int move=0; move<N_MOVES; move++){
-			if(( move / 3 ) == ( last_move / 3 )) // same face
+			// Check if the tested move is of the same face as the previous move (last_move).
+			if(( move / 3 ) == ( last_move / 3 ))
 				continue;
+			// Apply the move
 			int newPerm = movePerm[perm][move];
 			int newOrient = moveOrient[orient][move];
-			solution[depth] = move;
-			if( search( newPerm, newOrient, depth+1, length-1, move, solution ))
+			// Call the recursive function
+			if( search( newPerm, newOrient, depth+1, length-1, move, solution )){
+				// Store the move
+				solution[depth] = move;
 				return true;
+			}
 		}
 		return false;
 	}
@@ -281,14 +296,13 @@ public class TwoByTwoSolver {
 	 * @return          a string representing the solution or the scramble of a random position
 	 */
 	public String randomScramble(Random r, int length, boolean inverse){
-		int perm = r.nextInt(N_PERM);
-		int orient = r.nextInt(N_ORIENT);
+		int randomPerm = r.nextInt(N_PERM);
+		int randomOrient = r.nextInt(N_ORIENT);
 		int[] solution = new int[MAX_LENGTH];
-		StringBuffer scramble = new StringBuffer(MAX_LENGTH*3);
-		//if( ! search(perm, orient, 0, length, 42, solution )) // No solution was found
-		if( ! search(perm, orient, 0, length, 42, solution )) // No solution was found
-				return "Nope";
+		if( ! search(randomPerm, randomOrient, 0, length, 42, solution )) // No solution was found
+				return "";
 
+		StringBuffer scramble = new StringBuffer(MAX_LENGTH*3);
 		if( inverse ){
 			scramble.append(inverseMoveToString[solution[length-1]]);
 			for (int l=length-2; l>=0; l--){
