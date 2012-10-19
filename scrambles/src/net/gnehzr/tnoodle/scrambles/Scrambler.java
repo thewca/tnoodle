@@ -123,8 +123,9 @@ public abstract class Scrambler {
 
 	private String[] generateScrambles(Random r, int count) {
 		String[] scrambles = new String[count];
-		for(int i = 0; i < count; i++)
+		for(int i = 0; i < count; i++) {
 			scrambles[i] = generateScramble(r);
+		}
 		return scrambles;
 	}
 
@@ -178,7 +179,7 @@ public abstract class Scrambler {
 		return getLongName();
 	}
 
-	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class);
+	private static Plugins<Scrambler> plugins = new Plugins<Scrambler>("scrambler", Scrambler.class, Scrambler.class.getClassLoader());
 
 	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
 	public static synchronized SortedMap<String, LazyInstantiator<Scrambler>> getScramblers() throws BadClassDescriptionException, IOException {

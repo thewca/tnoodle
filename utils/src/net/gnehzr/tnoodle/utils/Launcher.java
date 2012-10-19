@@ -32,7 +32,7 @@ public class Launcher {
 	
 	/*
 	 * Windows doesn't give good names for java programs in the task manager,
-	 * they all just show up as intances of java.exe.
+	 * they all just show up as instances of java.exe.
 	 * On Windows this wrapper function attempts to
 	 * create a copy of java.exe called name.exe and reexecs itself.
 	 * If name == null, name is derived from the jar filename or the main classname.

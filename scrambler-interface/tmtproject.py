@@ -1,10 +1,11 @@
 import tmt
-from os.path import join
+import subprocess
+from os.path import join, exists
+import shutil
 
 class Project(tmt.EclipseProject):
 	def configure(self):
 		tmt.EclipseProject.configure(self)
-		tmt.Server.addPlugin(self)
-		self.nonJavaSrcDeps += [ 'tnoodleServerHandler/scrambler-interface/' ]
+		tmt.WinstoneServer.addPlugin(self)
 
 Project(tmt.projectName(), description="A generic competition scramble generator interface.")

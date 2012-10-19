@@ -11,16 +11,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-
-import java.nio.channels.FileChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import sun.reflect.Reflection;
 
@@ -36,6 +40,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 public final class Utils {
+	private static final Logger l = Logger.getLogger(Utils.class.getName());
+	
 	private static final String RESOURCE_FOLDER = "tnoodle_resources";
 	private static final String DEVEL_VERSION = "devel";
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
@@ -341,7 +347,10 @@ public final class Utils {
 			}
 		}
 		if(assertExists) {
-			azzert(f.isDirectory());
+			if(!f.isDirectory()) {
+				l.log(Level.SEVERE, f.getAbsolutePath() + " does not exist, or is not a directory!");
+				azzert(f.isDirectory());
+			}
 		}
 		return f;
 	}
@@ -361,7 +370,7 @@ public final class Utils {
 	private static Class<?> getCallerClass() {
 		Class<?> callerClass = Utils.class;
 		int i = 2;
-		while(callerClass.getPackage().equals(Utils.class.getPackage())) {
+		while(Utils.class.getPackage().equals(callerClass.getPackage())) {
 			callerClass = Reflection.getCallerClass(i++);
 		}
 		return callerClass;
@@ -369,9 +378,20 @@ public final class Utils {
 	
 	private static File getJarFileOrDirectory() {
 		Class<?> callerClass = getCallerClass();
+		
+		Class<?> referenceClass;
+		if(callerClass.getClassLoader() == Utils.class.getClassLoader()) {
+			referenceClass = callerClass;
+		} else {
+			// If our caller class's classloader was not Utils's classloader, then we
+			// use Utils as a reference. This is to deal with classes that are part of a
+			// web app, and were loaded with the servlet container's classloader.
+			referenceClass = Utils.class;
+		}
+		
 		File programDirectory;
 		try {
-			programDirectory = new File(callerClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			programDirectory = new File(referenceClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 		} catch (URISyntaxException e) {
 			return new File(".");
 		}
@@ -465,6 +485,7 @@ public final class Utils {
 				}
 				jarIs.closeEntry();
 			}
+			jarIs.close();
 			resourceDirectory.getParentFile().mkdirs();
 			azzert(tempResourceDirectory.renameTo(resourceDirectory));
 		}
@@ -498,5 +519,36 @@ public final class Utils {
 			version = DEVEL_VERSION;
 		}
 		return version;
+	}
+
+
+	public static LinkedHashMap<String, String> parseQuery(String query) {
+		LinkedHashMap<String, String> queryMap = new LinkedHashMap<String, String>();
+		if(query == null) return queryMap;
+		String[] pairs = query.split("&");
+		for(String pair : pairs) {
+			String[] key_value = pair.split("=");
+			if(key_value.length == 1) {
+				queryMap.put(key_value[0], ""); // this allows for flags such as http://foo/blah?kill&burn
+			} else {
+				try {
+					queryMap.put(key_value[0], URLDecoder.decode(key_value[1], "utf-8"));
+				} catch (UnsupportedEncodingException e) {
+					queryMap.put(key_value[0], key_value[1]); //worst case, just put the undecoded string
+				}
+			}
+		}
+		return queryMap;
+	}
+
+	public static File getWebappsDir() {
+		return new File(getResourceDirectory(), "/webapps/");
+	}
+	
+	public static File getWebappDir(String webappName) {
+		if(webappName == null) {
+			webappName = "ROOT";
+		}
+		return new File(getWebappsDir(), webappName);
 	}
 }

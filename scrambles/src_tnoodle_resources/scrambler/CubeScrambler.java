@@ -81,8 +81,7 @@ public class CubeScrambler extends Scrambler {
 	@Override
 	public String generateScramble(Random r) {
 		if(size == 2) {
-			int[] posit = twoSolver.mix(r);
-			return twoSolver.solve(posit, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
+			return twoSolver.randomScramble(r, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH, true);
 		} else if(size == 3) {
 			return twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 		} else if(size == 4) {
@@ -150,18 +149,7 @@ public class CubeScrambler extends Scrambler {
 		int innerSlice, outerSlice;
 		int dir;
 
-		public Turn() {
-		}
-		public Turn(Turn t) {
-			this.face = t.face;
-			this.innerSlice = t.innerSlice;
-			this.outerSlice = t.outerSlice;
-			this.dir = t.dir;
-		}
-
-		public int getAxis() {
-			return face % 3;
-		}
+		public Turn() {}
 
 		public String toString() {
 			if(dir == 0) {
@@ -170,22 +158,15 @@ public class CubeScrambler extends Scrambler {
 
 			azzert(innerSlice >= outerSlice);
 
+			String f = "" + FACES.charAt(face);
 			String move = "";
+			if(innerSlice == 0)
+				move += f;
+			else if (innerSlice == 1)
+				move += f + "w";
+			else
+				move += (innerSlice+1) + f + "w";
 
-			if(size <= 5) {
-				move += FACES.charAt(face);
-				if(innerSlice > 0) {
-					move += "w";
-				}
-			}
-			else {
-				String f = "" + FACES.charAt(face);
-				if(innerSlice == 0) {
-					move += f;
-				} else {
-					move += (innerSlice+1) + f;
-				}
-			}
 			if(dir > 1) {
 				move += "  2'".charAt(dir);
 			}

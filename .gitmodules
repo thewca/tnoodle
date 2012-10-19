@@ -7,8 +7,8 @@
 [submodule "sq12phase/src/cs/sq12phase"]
 	path = sq12phase/src/cs/sq12phase
 	url = git@github.com:cubing/sq12phase.git
-[submodule "scrambler-interface/src_tnoodle_resources/tnoodleServerHandler/scrambler-interface"]
-	path = scrambler-interface/src_tnoodle_resources/tnoodleServerHandler/scrambler-interface
+[submodule "scrambler-interface/WebContent/scrambler-interface"]
+	path = scrambler-interface/WebContent/scrambler-interface
 	url = git@github.com:cubing/scrambler-interface.git
 [submodule "min2phase/src/cs/min2phase"]
 	path = min2phase/src/cs/min2phase
@@ -16,3 +16,6 @@
 [submodule "threephase/src/cs/threephase"]
 	path = threephase/src/cs/threephase
 	url = git@github.com:cubing/TPR-4x4x4-Solver.git
+[submodule "cubecomps/WebContent/cubecomps"]
+	path = cubecomps/WebContent/cubecomps
+	url = https://github.com/cubing/cubecomps.com

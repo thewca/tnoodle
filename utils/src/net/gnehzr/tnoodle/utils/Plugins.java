@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class Plugins<H> {
+	private static final Logger l = Logger.getLogger(Plugins.class.getName());
+	
 	private String packageName;
 	private HashMap<String, LazyInstantiator<H>> filePlugins = new HashMap<String, LazyInstantiator<H>>();
 	private HashMap<String, String> pluginComment = new HashMap<String, String>();
@@ -20,14 +23,25 @@ public class Plugins<H> {
 	private String PLUGIN_DEFINITIONS_FILENAME;
 	private File contextFile;
 	private File pluginDirectory;
-	public Plugins(String packageName, Class<H> pluginClass) {
+	private ClassLoader classLoader;
+	public Plugins(String packageName, Class<H> pluginClass, ClassLoader classLoader) {
+		if(classLoader == null) {
+			classLoader = getClass().getClassLoader();
+		}
+		this.classLoader = classLoader;
 		this.packageName = packageName;
 		this.PLUGIN_DEFINITIONS_FILENAME = packageName + "s";
 		this.pluginClass = pluginClass;
 		pluginDirectory = new File(Utils.getResourceDirectory(), this.packageName);
-		azzert(pluginDirectory.exists());
+		if(!pluginDirectory.exists()) {
+			l.severe("Cannot find " + pluginDirectory.getAbsolutePath());
+			azzert(pluginDirectory.exists());
+		}
 		contextFile = new File(pluginDirectory, PLUGIN_DEFINITIONS_FILENAME);
-		azzert(contextFile.exists());
+		if(!contextFile.exists()) {
+			l.severe("Cannot find " + contextFile.getAbsolutePath());
+			azzert(contextFile.exists());
+		}
 	}
 	
 	private boolean dirtyPlugins() {
@@ -63,7 +77,7 @@ public class Plugins<H> {
 			String[] name_def = line.split("\\s+", 2);
 			String name = name_def[0];
 			String definition = name_def[1];
-			LazyInstantiator<H> lazyClass = new LazyInstantiator<H>(definition, pluginClass, Utils.getResourceDirectory());
+			LazyInstantiator<H> lazyClass = new LazyInstantiator<H>(definition, pluginClass, Utils.getResourceDirectory(), classLoader);
 			// Note that we may be clobbering something already in newFilePlugins,
 			// this is ok. Consider a project B that uses project A,
 			// this way, project B can clobber project A's settings.
@@ -71,6 +85,7 @@ public class Plugins<H> {
 			newPluginComment.put(name, lastComment != null ? lastComment : name);
 			lastComment = null;
 		}
+		in.close();
 
 		filePlugins = newFilePlugins;
 		pluginComment = newPluginComment;

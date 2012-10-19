@@ -34,7 +34,7 @@ import net.gnehzr.tnoodle.scrambles.Scrambler;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
-@SuppressWarnings({"serial","rawtypes","unchecked"})
+@SuppressWarnings({"serial","unchecked","rawtypes"})
 public class ScrambleTestGui {
 	private HashMap<String, Color> colorScheme = null;
 	private HashMap<String, GeneralPath> faceBoundaries = null;
@@ -123,7 +123,6 @@ public class ScrambleTestGui {
 		requestScramble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				@SuppressWarnings("unchecked")
 				LazyInstantiator<Scrambler> lazyScrambler = (LazyInstantiator<Scrambler>) puzzleBox.getSelectedItem();
 				Scrambler scrambler;
 				try {

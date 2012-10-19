@@ -3,7 +3,6 @@
 	<classpathentry excluding="tnoodleServerHandler/|tnoodle_resources/tnoodleServerHandler/|tnoodle_resources/tnoodleServerHandler/jracer/|tnoodle_resources/tnoodleServerHandler/jracer/css/|tnoodle_resources/tnoodleServerHandler/jracer/js/|tnoodle_resources/tnoodleServerHandler/jracer/media/|tnoodle_resources/" kind="src" path="src"/>
 	<classpathentry kind="src" output="bin_tnoodle_resources" path="src_tnoodle_resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/webscrambles"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsracer"/>
 	<classpathentry kind="output" path="bin"/>

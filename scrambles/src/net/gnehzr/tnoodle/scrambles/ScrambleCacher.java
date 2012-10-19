@@ -2,7 +2,6 @@ package net.gnehzr.tnoodle.scrambles;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.Random;
