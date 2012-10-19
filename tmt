@@ -121,6 +121,12 @@ def topologicalSort(projects, exclude=set()):
 		def compile(self):
 			pass
 
+		def dist(self):
+			assert False, "make dist without a -p PROJECTNAME makes no sense"
+
+		def run(self):
+			assert False, "make run without a -p PROJECTNAME makes no sense"
+
 		def getDependencies(self):
 			return potentialRoots
 
