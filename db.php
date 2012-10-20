@@ -1,4 +1,5 @@
 <?
+
 require_once "lib.php";
 
 if(!isset($_SESSION)) {
