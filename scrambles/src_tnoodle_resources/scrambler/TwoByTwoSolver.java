@@ -42,6 +42,12 @@ public class TwoByTwoSolver {
 	static final String[] inverseMoveToString = {"U'", "U2", "U", "R'", "R2", "R", "F'", "F2", "F"};
 
 	static final int[] fact = {1, 1, 2, 6, 24, 120, 720}; // fact[x] = x!
+	
+	/**
+	 * To avoid that 2x2 scrambles always end with R' U', we should randomly select 
+	 * the order of the moves to try. And the simplest way is to add a random offset.
+	 */
+	Random r_offset = new Random();
 
 	/**
 	 * Converts the list of cubies into a number representing the permutation of the cubies.
@@ -266,12 +272,17 @@ public class TwoByTwoSolver {
 		if(( prunPerm[perm] > length ) || ( prunOrient[orient] > length ))
 			return false;
 
+		int RANDOM_OFFSET = r_offset.nextInt(N_MOVES);
+
 		/* The recursive part of the search function.
 		 * Try every move from the current position, and call the search function with the new position
 		 * and the updated parameters (depth -> depth+1; length -> length-1; last_move -> move)
 		 * We don't need to try a move of the same face as the last move.
 		 */
-		for( int move=0; move<N_MOVES; move++){
+		for( int _move=0; _move<N_MOVES; _move++){
+
+			int move = (_move + RANDOM_OFFSET) % N_MOVES;
+
 			// Check if the tested move is of the same face as the previous move (last_move).
 			if(( move / 3 ) == ( last_move / 3 ))
 				continue;
