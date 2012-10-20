@@ -110,6 +110,36 @@ class Project(tmt.EclipseProject):
 
 			srcWebInfDir = join(self.srcResource, "webapps", "ROOT", "WEB-INF")
 			xmlRoot = ET.parse(join(srcWebInfDir, f)).getroot()
+
+			if self.needsDb():
+				h2ConsoleServlet = """<?xml version="1.0" encoding="UTF-8"?>
+<junk>
+	<!-- H2 web console -->
+	<servlet>
+		<servlet-name>H2Console</servlet-name>
+		<servlet-class>org.h2.server.web.WebServlet</servlet-class>
+		<!--
+		<init-param>
+			<param-name>webAllowOthers</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>trace</param-name>
+			<param-value></param-value>
+		</init-param>
+		-->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>H2Console</servlet-name>
+		<url-pattern>/database-console/*</url-pattern>
+	</servlet-mapping>
+</junk>
+"""
+				root = ET.fromstring(h2ConsoleServlet)
+				for child in reversed(root):
+					xmlRoot.insert(0, child)
+
 			for project in deps:
 				if project in self.plugins.values():
 					assert project.webContent

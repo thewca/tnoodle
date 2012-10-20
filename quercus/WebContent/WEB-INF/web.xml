@@ -5,27 +5,6 @@
 	id="WebApp_ID" version="3.0">
 	
 	<display-name>quercus</display-name>
-
-	<!-- H2 web console -->
-	<servlet>
-		<servlet-name>H2Console</servlet-name>
-		<servlet-class>org.h2.server.web.WebServlet</servlet-class>
-		<!--
-		<init-param>
-			<param-name>webAllowOthers</param-name>
-			<param-value></param-value>
-		</init-param>
-		<init-param>
-			<param-name>trace</param-name>
-			<param-value></param-value>
-		</init-param>
-		-->
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>H2Console</servlet-name>
-		<url-pattern>/database-console/*</url-pattern>
-	</servlet-mapping>
 	
 	<servlet>
 		<servlet-name>Quercus Servlet</servlet-name>
