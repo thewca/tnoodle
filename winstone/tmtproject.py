@@ -118,6 +118,10 @@ class Project(tmt.EclipseProject):
 	<servlet>
 		<servlet-name>H2Console</servlet-name>
 		<servlet-class>org.h2.server.web.WebServlet</servlet-class>
+		<init-param>
+			<param-name>properties</param-name>
+			<param-value>null</param-value>
+		</init-param>
 		<!--
 		<init-param>
 			<param-name>webAllowOthers</param-name>
@@ -128,6 +132,11 @@ class Project(tmt.EclipseProject):
 			<param-value></param-value>
 		</init-param>
 		-->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>InitializeH2Console</servlet-name>
+		<servlet-class>net.gnehzr.tnoodle.server.InitializeH2Console</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
