@@ -4,7 +4,7 @@ require_once "lib.php";
 if(!isset($_SESSION)) {
 	session_start();
 }
-if (!$_SESSION["c_id"])
+if (!array_key_exists("c_id", $_SESSION))
 {
 ?>
 <html>

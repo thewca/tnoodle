@@ -4,9 +4,9 @@ Database Structure
 
 TODO - document how to create a competition/create a page for it
 
-    http://localhost:8080/database-console
+    http://localhost:8080/h2
 
-    MERGE into competitions (admin_pw, country, date_b, date_e, intro_pw, name, place, website) values('pass', 'AF', now(), now()+100, 'pass', 'Foo comp', 'Place', 'foo.bar.com');
+    MERGE INTO competitions (id, admin_pw, intro_pw, country, date_b, date_e, name, place, website) VALUES(0, 'pass', 'pass', 'AF', now(), now()+100, 'Foo comp', 'Place', 'foo.bar.com');
 
 
 Apart from the databases created in INC_INITDB.PHP, several databases must exist for the system to work:

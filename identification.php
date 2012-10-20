@@ -27,7 +27,8 @@ function _error($msg)
 	die();
 }
 
-if ($_POST["id"])
+$_POSTid = NULL;
+if (array_key_exists('id', $_POST))
 	$_POSTid = $_POST["id"];
 else
 	$_POSTid = $_SESSION["c_id"];
@@ -38,7 +39,7 @@ else
 unset($_SESSION["c_pw"]);
 
 
-if (!$_POSTid) _error("Invalid calling params");
+if (is_null($_POSTid)) _error("Invalid calling params");
 if (!$_POSTpw) _error("Blank password");
 $result = strict_mysql_query("SELECT * FROM competitions WHERE id=".$_POSTid);
 if (!$result || !mysql_num_rows($result)) _error("Competition not available");
