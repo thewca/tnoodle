@@ -249,14 +249,21 @@ public class TwoByTwoSolver {
 	 * @param length     the remaining number of moves we can apply
 	 * @param last_move  what was the last move done (first called with an int >= 9)
 	 * @param solution   the array containing the current moves done.
-	 * @return           true if a solution was found (stored in the solution array)
-	 *                   false if no solution was found
 	 */
-	private boolean search(int perm, int orient, int depth, int length, int last_move, int solution[]){
+	private void search(int perm, int orient, int depth, int length, int last_move, int[] solution, int[] best_solution){
 
-		/* If there are no moves left to try (length=0), returns if the current position is solved */
+		/* If there are no moves left to try (length=0), check if the current position is solved */
 		if( length == 0 ) {
-			return ( perm == 0 ) && ( orient == 0 );
+			if (( perm == 0 ) && ( orient == 0 )){
+				// Solution found! Compute the cost of applying the reverse solution.
+				int cost = computeCost(solution, depth, 0, 0);
+				// We found a better solution, storing it.
+			    if( cost < best_solution[depth]){
+					System.arraycopy(solution, 0, best_solution, 0, depth);
+					best_solution[depth] = cost;
+				}
+			}
+			return;
 		}
 
 		/* Check if we might be able to solve the permutation or the orientation of the position
@@ -264,7 +271,7 @@ public class TwoByTwoSolver {
 		 * If not, there is no point keeping searching for a solution, just stop.
 		 */
 		if(( prunPerm[perm] > length ) || ( prunOrient[orient] > length ))
-			return false;
+			return;
 
 		/* The recursive part of the search function.
 		 * Try every move from the current position, and call the search function with the new position
@@ -278,14 +285,11 @@ public class TwoByTwoSolver {
 			// Apply the move
 			int newPerm = movePerm[perm][move];
 			int newOrient = moveOrient[orient][move];
+			// Store the move
+			solution[depth] = move;
 			// Call the recursive function
-			if( search( newPerm, newOrient, depth+1, length-1, move, solution )){
-				// Store the move
-				solution[depth] = move;
-				return true;
-			}
+			search( newPerm, newOrient, depth+1, length-1, move, solution, best_solution );
 		}
-		return false;
 	}
 
 	/**
@@ -299,23 +303,103 @@ public class TwoByTwoSolver {
 		int randomPerm = r.nextInt(N_PERM);
 		int randomOrient = r.nextInt(N_ORIENT);
 		int[] solution = new int[MAX_LENGTH];
-		if( ! search(randomPerm, randomOrient, 0, length, 42, solution )) // No solution was found
-				return "";
+		int[] best_solution = new int[MAX_LENGTH+1];
+		best_solution[length] = 42424242;
+		search(randomPerm, randomOrient, 0, length, 42, solution, best_solution);
+		if( best_solution[length] == 42424242 ) // No solution was found
+			return "";
 
-		StringBuffer scramble = new StringBuffer(MAX_LENGTH*3);
+		StringBuilder scramble = new StringBuilder(MAX_LENGTH*3);
 		if( inverse ){
-			scramble.append(inverseMoveToString[solution[length-1]]);
+			scramble.append(inverseMoveToString[best_solution[length-1]]);
 			for (int l=length-2; l>=0; l--){
-				scramble.append(" " + inverseMoveToString[solution[l]]);
+				scramble.append(" ").append(inverseMoveToString[best_solution[l]]);
 			}
 		} else {
-			scramble.append(moveToString[solution[0]]);
+			scramble.append(moveToString[best_solution[0]]);
 			for (int l=1; l<length; l++){
-				scramble.append(" " + moveToString[solution[l]]);
+				scramble.append(" ").append(moveToString[best_solution[l]]);
 			}
 		}
 
 		return scramble.toString();
 	}
-	
+
+	static final int cost_U = 8;
+	static final int cost_U_low = 20; // when grip = -1
+	static final int cost_U2 = 15;
+	static final int cost_U3 = 7;
+	static final int cost_R = 6;
+	static final int cost_R2 = 12;
+	static final int cost_R3 = 6;
+	static final int cost_F = 10;
+	static final int cost_F2 = 30;
+	static final int cost_F3 = 19;
+	static final int cost_regrip = 20;
+
+	/**
+	 * Try to evaluate the cost of applying a scramble
+	 * @param solution      the solution found by the solver, we need to read it backward and inverting the moves
+	 * @param index         current position of reading. Starts at the length-1 of the solution, and decrease by 1 every call
+	 * @param current_cost  current cost of the sequence that has been already read
+	 * @param grip          state of the grip of the right hand. -1: thumb on D, 0: thumb on F, 1: thumb on U
+	 * @return              returns the cost of the whole sequence
+	 */
+	private int computeCost(int[] solution, int index, int current_cost, int grip){
+		// If we are finished, just output the cost.
+		if( index < 0 )
+			return current_cost;
+
+		switch (solution[index]){
+			case 0: // U'
+				return computeCost(solution, index - 1, current_cost + cost_U3, grip);
+			case 1: // U2
+				return computeCost(solution, index - 1, current_cost + cost_U2, grip);
+			case 2: // U
+				if( grip == 0)
+					return computeCost(solution, index - 1, current_cost + cost_U, 0);
+				else if( grip == -1 ){
+					return Math.min( computeCost(solution, index - 1, current_cost + cost_regrip + cost_U, 0),
+				                     computeCost(solution, index - 1, current_cost + cost_U_low, grip));
+				}
+				else
+					return computeCost(solution, index - 1, current_cost + cost_regrip + cost_U, 0);
+			case 3: // R'
+				if( grip > -1){
+					return computeCost(solution, index - 1, current_cost + cost_R3, grip - 1);
+				} else {
+					return computeCost(solution, index - 1, current_cost + cost_regrip + cost_R3, -1);
+				}
+			case 4: // R2
+				if( grip != 0){
+					return computeCost(solution, index - 1, current_cost + cost_R2, -grip);
+				} else {
+					return Math.min( computeCost(solution, index - 1, current_cost + cost_regrip + cost_R2, -1),
+					                 computeCost(solution, index - 1, current_cost + cost_regrip + cost_R2, 1));
+				}
+			case 5: // R
+				if( grip < 1){
+					return computeCost(solution, index - 1, current_cost + cost_R, grip + 1);
+				} else {
+					return computeCost(solution, index - 1, current_cost + cost_regrip + cost_R, 1);
+				}
+			case 6: // F'
+				if (grip != 0)
+					return computeCost(solution, index - 1, current_cost + cost_F3, grip);
+				else
+					return Math.min( computeCost(solution, index - 1, current_cost + cost_regrip + cost_F3, -1),
+					                 computeCost(solution, index - 1, current_cost + cost_regrip + cost_F3, 1));
+			case 7: // F2
+				if (grip == -1)
+					return computeCost(solution, index - 1, current_cost + cost_F2, -1);
+				else
+					return computeCost(solution, index - 1, current_cost + cost_regrip + cost_F2, -1);
+			case 8: // F
+				if (grip == -1)
+					return computeCost(solution, index - 1, current_cost + cost_F, -1);
+				else
+					return computeCost(solution, index - 1, current_cost + cost_regrip + cost_F, -1);
+		}
+		return -1;
+	}
 }
