@@ -141,7 +141,7 @@ public class CubeScrambler extends Scrambler {
 	//TODO - change to not rely upon whitespace
 	private final static String regexp2 = "^(\\s*[LDBRUF]2?'?)*\\s*$";
 	private final static String regexp345 = "^(\\s*(?:[LDBRUF]w?|[ldbruf])2?'?)*\\s*$";
-	private final static String regexp = "^(\\s*(\\d+)?([LDBRUF])2?'?)*\\s*$";
+	private final static String regexp = "^(\\s*(\\d+)?([LDBRUF])w?2?'?)*\\s*$";
 	private final static Pattern shortPattern = Pattern.compile(regexp);
 
 	private class Turn {
@@ -205,9 +205,10 @@ public class CubeScrambler extends Scrambler {
 			face %= 6;
 			if(strs[i].indexOf("w") >= 0) {
 				innerSlice++;
-			} else if(slice1 != null) {
-				innerSlice = Integer.parseInt(slice1) - 1;
-				outerSlice = 0;
+				if(slice1 != null) {
+					innerSlice = Integer.parseInt(slice1) - 1;
+					outerSlice = 0;
+				}
 			}
 
 			int dir = "  2'".indexOf(strs[i].substring(strs[i].length() - 1));
