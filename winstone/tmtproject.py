@@ -141,7 +141,7 @@ class Project(tmt.EclipseProject):
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>H2Console</servlet-name>
-		<url-pattern>/database-console/*</url-pattern>
+		<url-pattern>/h2/*</url-pattern>
 	</servlet-mapping>
 </junk>
 """
