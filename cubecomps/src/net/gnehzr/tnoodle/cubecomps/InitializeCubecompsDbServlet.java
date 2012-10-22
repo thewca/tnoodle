@@ -65,6 +65,7 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
 			DataSource ds = (DataSource) jdniContext.lookup("java:comp/env/jdbc/connPool");
 			
 			conn = ds.getConnection();
+			conn.setAutoCommit(false);
 			Statement stmt = conn.createStatement();
 			stmt.execute(sanitizedSchema.toString());
 			conn.commit();
