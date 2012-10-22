@@ -1,7 +1,4 @@
 import tmt
-import subprocess
-from os.path import join, exists
-import shutil
 
 class Project(tmt.EclipseProject):
 	def configure(self):
