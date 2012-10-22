@@ -65,10 +65,9 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
 			DataSource ds = (DataSource) jdniContext.lookup("java:comp/env/jdbc/connPool");
 			
 			conn = ds.getConnection();
-			
 			Statement stmt = conn.createStatement();
 			stmt.execute(sanitizedSchema.toString());
-			stmt.execute("MERGE INTO competitions (id, admin_pw, country, date_b, date_e, intro_pw, name, place, website) VALUES(1, 'pass', 'AF', now(), now(), 'pass', 'Foo comp', 'Place', 'foo.bar.com');");
+			conn.commit();
 		} catch (SQLException e) {
 			l.log(Level.SEVERE, "", e);
 		} catch (NamingException e) {
