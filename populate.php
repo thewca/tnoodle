@@ -51,7 +51,7 @@ if ($_GET["cat_id"] && $_GET["round"])
 			if (!$maxtoproceed) die("Cannot open this round: not enough competitors");
 			if ($maxtoproceed < $qualified)
 			{
-				$_SESSION["c_error"] = "WARNING!\\n\\nThere were $ncomps competitors in the previous round. $qualified were set to proceed, but according to regulations, only $maxtoproceed will proceed. Following rounds could also be affected by this change.";
+				$_SESSION["c_error"] = "WARNING!\\n\\nThere were $ncomps competitors in the previous round. $qualified were set to proceed, but according to regulations, only $maxtoproceed at most can proceed. Following rounds could also be affected by this change.";
 				$qualified = $maxtoproceed;
 			}
 			$classification = 0;
