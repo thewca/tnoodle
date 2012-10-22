@@ -32,7 +32,19 @@ if ($_GET["cat_id"] && $_GET["round"])
 				"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .($round-1)." AND $timestable.t1 IS NOT NULL AND $timestable.best<'A' ".
 				"ORDER BY $timestable.average='', $timestable.average, $timestable.best";
 			$list = strict_mysql_query($query);
-			$ncomps = mysql_num_rows($list);
+
+			// bug - the following line is excluding competitors with all DNF from the total number of competitors
+			// $ncomps = mysql_num_rows($list);
+			// fix
+
+			$query =
+				  "SELECT COUNT(*) AS count FROM $timestable ".
+				  "WHERE cat_id=" .$cat_id. " AND round=" .($round-1);
+
+			$ncomps = mysql_result(mysql_query($query),0,"count");
+				// fix end
+  43	
+
 			if (!$ncomps) die("Cannot open this round: no one qualified");
 			$qualified = cased_mysql_result($event,0,"r".$round."_groupsize");
 			$maxtoproceed = floor($ncomps*.75);
