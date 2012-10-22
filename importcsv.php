@@ -198,6 +198,7 @@ ELSE // ------------------------------------------------------------------------
 	$ncomp = 0;
 	$nimp = 0;
 	$errors = "";
+	$headersdone = FALSE;
 	while (($line = fgets($h))!==FALSE)
 	{
 		$line = csvstring_to_array(trim($line));
@@ -222,7 +223,7 @@ ELSE // ------------------------------------------------------------------------
 		{
 			$ncomp++;
 			//
-			$country = strict_mysql_query("SELECT id FROM countries WHERE name=\"".$line[$headers["country"]]."\"");
+			$country = strict_mysql_query("SELECT id FROM countries WHERE name='".$line[$headers["country"]]."'");
 			if (!mysql_num_rows($country))
 				$errors .= "Country name \"".$line[$headers["country"]]."\" not found in database<br>";
 			else

@@ -225,7 +225,10 @@ $nevents = 0;
 $result = strict_mysql_query("SELECT $eventstable.*, categories.name, categories.canhavetimelimit, categories.abbr FROM $eventstable JOIN categories WHERE $eventstable.id=categories.id ORDER BY categories.id");
 if (!$result) echo mysql_error();
 $formats = strict_mysql_query("SELECT * FROM formats ORDER BY id");
-while($row=cased_mysql_fetch_array($formats)) $fmts[] = $row["name"];
+$fmts = array();
+while($row=cased_mysql_fetch_array($formats)) {
+	$fmts[] = $row["name"];
+}
 while($event=cased_mysql_fetch_array($result))
 {
 	$lrwt = strict_mysql_query("SELECT round FROM $timestable WHERE cat_id=".$event["id"]." ORDER BY round DESC LIMIT 1");

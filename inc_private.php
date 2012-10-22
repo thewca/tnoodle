@@ -3,15 +3,17 @@ define("DOMAIN","localhost"); // "cubecomps.com"
 // It's supposed that "live.".DOMAIN is the live domain
 // and "test.".DOMAIN is the test domain
 
+// MySQL or h2, see lib.php for details.
+//define("SQL_DBTYPE","MySQL");
+define("SQL_DBTYPE","h2");
+
+// None of these need to be set for tnoodle, as it has configured quercus
+// to ignore the paramters in calls to mysql_connect, and use h2.
 define("SQL_SERVER",___);
 
 define("SQL_USER",___);
 define("SQL_PASSWORD",___);
-define("SQL_DBNAME","cubecomps");
-
-// MySQL or h2, see lib.php for details.
-//define("SQL_DBTYPE","MySQL");
-define("SQL_DBTYPE","h2");
+define("SQL_DBNAME",___);
 
 define("SQL_TEST_USER",___);
 define("SQL_TEST_PASSWORD",___);

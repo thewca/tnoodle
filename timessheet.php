@@ -1,5 +1,5 @@
 <?      
-require_once "lib.php"
+require_once "lib.php";
 include "lib_ref_admin.php";
 include "db.php";
 

@@ -400,8 +400,10 @@ function print_txt_sch($fn)
 
 //=========================================================================================================================
 
-if (!$_GET["cid"])
+if (!array_key_exists("cid", $_GET))
+{
 	header("Location: http://live.".DOMAIN."\r\n");
+}
 else
 {
 	session_start();
