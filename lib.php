@@ -43,4 +43,16 @@ function strict_mysql_query($query) {
 	return $result;
 }
 
+function refererMatchesHost()
+{
+    $referer    = $_SERVER['HTTP_REFERER'];
+    $host       = $_SERVER['HTTP_HOST'];
+
+    if (preg_match("/^$host/", $referer)) {
+        return true;
+    }
+
+    return false;
+}
+
 ?>
