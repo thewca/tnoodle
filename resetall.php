@@ -3,12 +3,12 @@ session_start();
 include "lib_ref_admin.php";
 include "db.php";
 
-$result = mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
+$result = strict_mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
 if ($result && mysql_num_rows($result)==1)
 {
-	if (mysql_result($result,0,"admin_pw")==$_POST["pw"])
+	if (cased_mysql_result($result,0,"admin_pw")==$_POST["pw"])
 	{
-		mysql_query("DROP TABLE $eventstable, $compstable, $regstable, $timestable");
+		strict_mysql_query("DROP TABLE $eventstable, $compstable, $regstable, $timestable");
 		mysql_close();
 		$_SESSION["c_pw"]=$_POST["pw"];
 		header("Location: identification.php\r\n");

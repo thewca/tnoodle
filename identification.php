@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 include "lib_ref.php";
 session_start();
 
@@ -26,7 +27,8 @@ function _error($msg)
 	die();
 }
 
-if ($_POST["id"])
+$_POSTid = NULL;
+if (array_key_exists('id', $_POST))
 	$_POSTid = $_POST["id"];
 else
 	$_POSTid = $_SESSION["c_id"];
@@ -37,23 +39,23 @@ else
 unset($_SESSION["c_pw"]);
 
 
-if (!$_POSTid) _error("Invalid calling params");
+if (is_null($_POSTid)) _error("Invalid calling params");
 if (!$_POSTpw) _error("Blank password");
-$result = mysql_query("SELECT * FROM competitions WHERE id=".$_POSTid);
+$result = strict_mysql_query("SELECT * FROM competitions WHERE id=".$_POSTid);
 if (!$result || !mysql_num_rows($result)) _error("Competition not available");
-if (mysql_result($result,0,"admin_pw")==$_POSTpw)
+if (cased_mysql_result($result,0,"admin_pw")==$_POSTpw)
 {
 	$_SESSION["c_id"] = $_POSTid;
 	$_SESSION["c_admin"] = true;
-	$_SESSION["c_country"] = mysql_result($result,0,"country");
-	$_SESSION["c_name"] = mysql_result($result,0,"name");
+	$_SESSION["c_country"] = cased_mysql_result($result,0,"country");
+	$_SESSION["c_name"] = cased_mysql_result($result,0,"name");
 }
-elseif (mysql_result($result,0,"intro_pw")==$_POSTpw)
+elseif (cased_mysql_result($result,0,"intro_pw")==$_POSTpw)
 {
 	$_SESSION["c_id"] = $_POSTid;
 	unset($_SESSION["c_admin"]);
-	$_SESSION["c_country"] = mysql_result($result,0,"country");
-	$_SESSION["c_name"] = mysql_result($result,0,"name");
+	$_SESSION["c_country"] = cased_mysql_result($result,0,"country");
+	$_SESSION["c_name"] = cased_mysql_result($result,0,"name");
 }
 else
 	_error("Erroneous password");

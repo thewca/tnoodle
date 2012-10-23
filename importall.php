@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 session_start();
 include "lib_ref_admin.php";
 include "db.php";
@@ -7,8 +8,8 @@ $color = "#6b7b71";
 $light_color = "#b0c7b4";
 $dark_color = "#0a1414";
 
-$result = mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
-if (!$result || mysql_num_rows($result)!=1 || mysql_result($result,0,"admin_pw")!=$_POST["pw"])
+$result = strict_mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
+if (!$result || mysql_num_rows($result)!=1 || cased_mysql_result($result,0,"admin_pw")!=$_POST["pw"])
 {
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -224,14 +225,14 @@ $xlsx->setActiveSheetIndex(0);
 $sheet = $xlsx->getActiveSheet();
 if ($sheet->getTitle()!="Registration") error("'Registration' sheet missing.");
 
-mysql_query("DROP TABLE $eventstable, $compstable, $regstable, $timestable");
+strict_mysql_query("DROP TABLE $eventstable, $compstable, $regstable, $timestable");
 require_once "inc_initdb.php"; 
 echo "Database reset.<p>";
 
-$qc = mysql_query("SELECT * FROM countries");
+$qc = strict_mysql_query("SELECT * FROM countries");
 $countries = array();
 for ($i=0;$i<mysql_num_rows($qc);$i++) 
-	$countries[mysql_result($qc,$i,"name")] = mysql_result($qc,$i,"id");
+	$countries[cased_mysql_result($qc,$i,"name")] = cased_mysql_result($qc,$i,"id");
 
 echo "Processing <b>Registration</b> sheet...";
 //echo "<table>";
@@ -296,24 +297,24 @@ for ($sn=1;$sn<$tsn;$sn++)
 	if ($abbr!=$lastabbr)
 	{
 		$lastabbr = $abbr;
-		$category = mysql_query("SELECT * FROM categories WHERE abbr=\"$abbr\"");
+		$category = strict_mysql_query("SELECT * FROM categories WHERE abbr='$abbr'");
 		if (mysql_num_rows($category)!=1) error ("Sheet title doesn't match any event abbreviation ('$abbr')");
-		$evtid = mysql_result($category,0,"id");
-		$timetype = mysql_result($category,0,"timetype");
-		$inseconds = mysql_result($category,0,"inseconds");
+		$evtid = cased_mysql_result($category,0,"id");
+		$timetype = cased_mysql_result($category,0,"timetype");
+		$inseconds = cased_mysql_result($category,0,"inseconds");
 		$round = 1;
 		addEve($evtid);
 	}
 	else
 		$round++;
-	echo "Processing <b>".mysql_result($category,0,"name")." - round $round</b> sheet...";
+	echo "Processing <b>".cased_mysql_result($category,0,"name")." - round $round</b> sheet...";
 
 	$fmtst = substr($sheet->getCell("A2")->getValue(), 8);
-	$format = mysql_query("SELECT * FROM formats WHERE name=\"$fmtst\"");
+	$format = strict_mysql_query("SELECT * FROM formats WHERE name='$fmtst'");
 	if (mysql_num_rows($format)!=1) error ("Invalid format ('$fmtst') at cell A2");
-	$formatid = mysql_result($format,0,"id");
-	$times = mysql_result($format,0,"times");
-	$avgtype = mysql_result($format,0,"avgtype");
+	$formatid = cased_mysql_result($format,0,"id");
+	$times = cased_mysql_result($format,0,"times");
+	$avgtype = cased_mysql_result($format,0,"avgtype");
 
 	$i = 5;
 	while ($sheet->getCell("B$i")->getValue())
@@ -323,12 +324,12 @@ for ($sn=1;$sn<$tsn;$sn++)
 		if (!isset($countries[$country])) error ("Unknown country ('$country') at cell C$i");
 		$countryid = $countries[$country];
 		$wcaid = $sheet->getCell("D$i")->getValue();
-		$competitor = mysql_query("SELECT id FROM $compstable WHERE name=\"$name\" AND country_id=\"$countryid\" AND WCAid=\"$wcaid\"");
+		$competitor = strict_mysql_query("SELECT id FROM $compstable WHERE name='$name' AND country_id='$countryid' AND WCAid='$wcaid'");
 		if (mysql_num_rows($competitor)!=1) error ("Unregistered competitor at line $i");
-		$competitorid = mysql_result($competitor,0,"id");
+		$competitorid = cased_mysql_result($competitor,0,"id");
 
-		if ($round==1) mysql_query("UPDATE $compstable SET cat$evtid=\"X\" WHERE id=$competitorid");
-		mysql_query("INSERT INTO $regstable SET cat_id=$evtid, round=$round, comp_id=$competitorid");
+		if ($round==1) strict_mysql_query("UPDATE $compstable SET cat$evtid='X' WHERE id=$competitorid");
+		strict_mysql_query("INSERT INTO $regstable SET cat_id=$evtid, round=$round, comp_id=$competitorid");
 
 		if ($sheet->getCell("E$i")->getValue())
 		{
@@ -385,11 +386,11 @@ for ($sn=1;$sn<$tsn;$sn++)
 			$insertst = "INSERT INTO $timestable SET cat_id=$evtid, round=$round, comp_id=$competitorid";
 			for ($t=1;$t<=$scoresread;$t++) 
 				if ($timetype!=3)
-					$insertst .= ", t$t=\"".numTime($scores[$t])."\"";
+					$insertst .= ", t$t='".numTime($scores[$t])."'";
 				else
-					$insertst .= ", t$t=\"".$scores[$t]."\"";
-			$insertst .= ", average=\"$average\", best=\"$best\"";
-			mysql_query($insertst);
+					$insertst .= ", t$t='".$scores[$t]."'";
+			$insertst .= ", average='$average', best='$best'";
+			strict_mysql_query($insertst);
 		}
 
 		$i++;
@@ -397,7 +398,7 @@ for ($sn=1;$sn<$tsn;$sn++)
 
 	$i = $i - 5;
 	$open = $i ? 1 : 0;
-	mysql_query("UPDATE $eventstable SET r".$round."=1, r".$round."_format=$formatid, r".$round."_groupsize=$i, r".$round."_open=$open WHERE id=\"$evtid\"");
+	strict_mysql_query("UPDATE $eventstable SET r".$round."=1, r".$round."_format=$formatid, r".$round."_groupsize=$i, r".$round."_open=$open WHERE id='$evtid'");
 
 	echo " Done! <b>$i scorecards</b> imported.<br>";
 }

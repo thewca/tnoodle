@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 function timeNum($t,$type=NULL)
 {
 	if (!$t) die("ERROR: blank result");
@@ -151,21 +152,21 @@ if ($_GET["comp_id"] && $_GET["cat_id"] && $_GET["round"])
 {
 	include "db.php";
 	//
-	$event = mysql_query("SELECT * FROM $eventstable WHERE id=".$_GET["cat_id"]);
-	if (!mysql_num_rows($event) || !mysql_result($event,0,"r".$_GET["round"]."_open")) die("Round not open!");
-	$qualified = mysql_query("SELECT round FROM $regstable WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]);
+	$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$_GET["cat_id"]);
+	if (!mysql_num_rows($event) || !cased_mysql_result($event,0,"r".$_GET["round"]."_open")) die("Round not open!");
+	$qualified = strict_mysql_query("SELECT round FROM $regstable WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]);
 	if (mysql_num_rows($qualified))
 	{
-		$category = mysql_query("SELECT * FROM categories WHERE id=".$_GET["cat_id"]);
-		$timetype = mysql_result($category,0,"timetype");
-		$format = mysql_query("SELECT * FROM formats WHERE id=".mysql_result($event,0,"r".$_GET["round"]."_format"));
-		$times = mysql_result($format,0,"times");
-		$avgtype = mysql_result($format,0,"avgtype");
-		$alreadyhastimes = mysql_num_rows(mysql_query("SELECT round FROM $timestable WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]));
+		$category = strict_mysql_query("SELECT * FROM categories WHERE id=".$_GET["cat_id"]);
+		$timetype = cased_mysql_result($category,0,"timetype");
+		$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".$_GET["round"]."_format"));
+		$times = cased_mysql_result($format,0,"times");
+		$avgtype = cased_mysql_result($format,0,"avgtype");
+		$alreadyhastimes = mysql_num_rows(strict_mysql_query("SELECT round FROM $timestable WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]));
 		//
-		if (mysql_result($category,0,"canhavetimelimit") && $_GET["round"]==1)
+		if (cased_mysql_result($category,0,"canhavetimelimit") && $_GET["round"]==1)
 		{
-			$timelimit = mysql_result($event,0,"timelimit");
+			$timelimit = cased_mysql_result($event,0,"timelimit");
 			if($timelimit)
 			{
 				$timelimit = substr("000:00.00",0,9-strlen($timelimit)).$timelimit;
@@ -186,19 +187,20 @@ if ($_GET["comp_id"] && $_GET["cat_id"] && $_GET["round"])
 		$cutpassed = ($timetype!=1 || $tries==$times);
 		//
 		getAverageAndBest($average,$best);
+		$query = "";
 		for ($x=1;$x<=5;$x++)
 		{
 			if ($query) $query .= ", ";
 			if ($x>$times || (!$cutpassed && $x>$tries))
-				$query .= "t".$x."=\"\"";
+				$query .= "t".$x."=''";
 			else
-				$query .= "t".$x."=\"".$_GET["t".$x]."\"";
+				$query .= "t".$x."='".$_GET["t".$x]."'";
 		}
-		if (mysql_query(
+		if (strict_mysql_query(
 			$alreadyhastimes ? 
-			"UPDATE $timestable SET $query, average=\"$average\", best=\"$best\" WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]
+			"UPDATE $timestable SET $query, average='$average', best='$best' WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]
 			:
-			"INSERT INTO $timestable SET cat_id=" .$_GET["cat_id"]. ", round=" .$_GET["round"]. ", comp_id=" .$_GET["comp_id"].", $query, average=\"$average\", best=\"$best\""
+			"INSERT INTO $timestable SET cat_id=" .$_GET["cat_id"]. ", round=" .$_GET["round"]. ", comp_id=" .$_GET["comp_id"].", $query, average='$average', best='$best'"
 			))
 			echo "OK";
 		else

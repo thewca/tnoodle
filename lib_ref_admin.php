@@ -3,11 +3,13 @@
  * This is because some pages take actions over the database (or where else), and if entered in error, they could cause
  * unexpected or even harmful results.
  */
-session_start();
+if(!isset($_SESSION)) {
+	session_start();
+}
 include "inc_private.php";
 if (!$_SESSION["c_admin"] || !preg_match("~//(www.|test.)?".DOMAIN."~i",$_SERVER["HTTP_REFERER"]))
 {
-	$txt = <<< TEXT
+	$txt = <<<TEXT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">

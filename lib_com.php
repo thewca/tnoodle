@@ -25,26 +25,29 @@ function addCom($wcaid,$name,$birthday,$country,$gender,$importing=false,$id=0)
 	//
 	if ($wcaid && !$id)
 	{
-		$result = mysql_query("SELECT * FROM $compstable WHERE WCAid=\"$wcaid\"");
+		$result = strict_mysql_query("SELECT * FROM $compstable WHERE WCAid='$wcaid'");
 		if (mysql_num_rows($result))
 			return addCom_err("WCA id already exists",$wcaid,$name,$importing);
 	}
-	$result = mysql_query("SELECT * FROM countries WHERE id=\"$country\"");
+	$result = strict_mysql_query("SELECT * FROM countries WHERE id='$country'");
 	if (!mysql_num_rows($result))
-		return addCom_err("Invalid country",$wcaid,$name,$importing);
+		return addCom_err("Invalid country: ".$country,$wcaid,$name,$importing);
 	if (!$id)
 	{
-		$result = mysql_query("SELECT * FROM $compstable WHERE name=\"$name\" AND country_id=\"$country\" AND birthday=\"$birthday\"");
+		$result = strict_mysql_query("SELECT * FROM $compstable WHERE name='$name' AND country_id='$country' AND birthday='$birthday'");
 		if (mysql_num_rows($result))
 			return addCom_err("Competitor already inserted",$wcaid,$name,$importing);
 	}
 	//
-	if ($id)
-		$query = mysql_query("UPDATE $compstable SET WCAid=\"$wcaid\", name=\"$name\", country_id=\"$country\", birthday=\"$birthday\", gender=\"$gender\" WHERE id=$id");
-	else
-		$query = mysql_query("INSERT INTO $compstable SET WCAid=\"$wcaid\", name=\"$name\", country_id=\"$country\", birthday=\"$birthday\", gender=\"$gender\"");
-	if (!$query)
-		return addCom_err(mysql_error(),$wcaid,$name,$importing);
+	if ($id) {
+		$result = strict_mysql_query("UPDATE $compstable SET WCAid='$wcaid', name='$name', country_id='$country', birthday='$birthday', gender='$gender' WHERE id=$id");
+	} else {
+		$result = strict_mysql_query("INSERT INTO $compstable SET WCAid='$wcaid', name='$name', country_id='$country', birthday='$birthday', gender='$gender'");
+		if (!$result) {
+			return addCom_err(mysql_error(),$wcaid,$name,$importing);
+		}
+
+	}
 	//
 	return ($id?(int)$id:mysql_insert_id());
 }

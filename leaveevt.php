@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 include "lib_ref_admin.php";
 include "db.php";
 
@@ -97,26 +98,26 @@ $round = $_GET["round"];
 $comp_id = $_GET["comp_id"];
 if (!$cat_id || !$round || $round<=1 || !$comp_id) error(0);
 
-$qualified = mysql_query("SELECT * FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
+$qualified = strict_mysql_query("SELECT * FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
 $qualified = ($qualified && mysql_num_rows($qualified)==1);
 if (!$qualified) error(1);
 
-$noscore = mysql_query("SELECT * FROM $timestable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
+$noscore = strict_mysql_query("SELECT * FROM $timestable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
 $noscore = ($noscore && mysql_num_rows($noscore)==0);
 if (!$noscore) error(2);
 
-$event = mysql_query("SELECT * FROM $eventstable WHERE id=".$cat_id);
+$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$cat_id);
 $lastopenround = 4;
-while ($lastopenround>1 && !mysql_result($event,0,"r".$lastopenround."_open")) $lastopenround--;
+while ($lastopenround>1 && !cased_mysql_result($event,0,"r".$lastopenround."_open")) $lastopenround--;
 if ($lastopenround==1 || $round!=$lastopenround) error(3);
 
 $lastround = 4;
-while ($lastround>1 && !mysql_result($event,0,"r$lastround")) $lastround--;
+while ($lastround>1 && !cased_mysql_result($event,0,"r$lastround")) $lastround--;
 
-$category = mysql_query("SELECT name, timetype FROM categories WHERE id=".$cat_id);
-$timetype = mysql_result($category,0,"timetype");
-$format = mysql_query("SELECT * FROM formats WHERE id=".mysql_result($event,0,"r".($round-1)."_format"));
-$avgtype = mysql_result($format,0,"avgtype");
+$category = strict_mysql_query("SELECT name, timetype FROM categories WHERE id=".$cat_id);
+$timetype = cased_mysql_result($category,0,"timetype");
+$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".($round-1)."_format"));
+$avgtype = cased_mysql_result($format,0,"avgtype");
 $query =
 	"SELECT $regstable.comp_id, $timestable.average, $timestable.best, reg2.cat_id AS flag, $compstable.name, countries.name AS cname, $compstable.gender FROM $regstable ".
 	"JOIN $timestable ON ($regstable.cat_id=$timestable.cat_id AND $regstable.round=$timestable.round AND $regstable.comp_id=$timestable.comp_id) ".
@@ -125,8 +126,8 @@ $query =
 	"JOIN countries ON (countries.id=$compstable.country_id) ".
 	"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .($round-1)." AND $timestable.t1 IS NOT NULL AND $timestable.best<\"A\" ".
 	"ORDER BY $timestable.average=\"\", $timestable.average, $timestable.best";
-$list = mysql_query($query);
-$groupsize = mysql_result($event,0,"r".$round."_groupsize");
+$list = strict_mysql_query($query);
+$groupsize = cased_mysql_result($event,0,"r".$round."_groupsize");
 
 $top = mysql_num_rows($list);
 $line = 0;
@@ -134,15 +135,15 @@ $old = null;
 $in = 0;
 while ($line<$top)
 {
-	if (!$old && mysql_result($list,$line,"comp_id")==$comp_id) $old=$line;
-	if (mysql_result($list,$line,"flag")) $in++;
+	if (!$old && cased_mysql_result($list,$line,"comp_id")==$comp_id) $old=$line;
+	if (cased_mysql_result($list,$line,"flag")) $in++;
 	$line++;
 }
 if ($old===null) error(4);
 if ($in==$groupsize)
 {
 	$new = $top-1;
-	while (!mysql_result($list,$new,"flag")) $new--;
+	while (!cased_mysql_result($list,$new,"flag")) $new--;
 	$new++;
 	if ($new==$top) $new=0;
 }
@@ -160,29 +161,29 @@ if ($in==$groupsize)
 </style>
 <body onload='document.getElementById("pw").focus();'>
 <div class=header>Competitor misses the round</div>
-Competitor <b><?=mysql_result($list,$old,"name")?></b> from <b><?=mysql_result($list,$old,"cname")?></b> misses the <b><?=roundString($round,$lastround,false)?></b> of <b><?=mysql_result($category,0,"name")?></b>.
+Competitor <b><?=cased_mysql_result($list,$old,"name")?></b> from <b><?=cased_mysql_result($list,$old,"cname")?></b> misses the <b><?=roundString($round,$lastround,false)?></b> of <b><?=cased_mysql_result($category,0,"name")?></b>.
 <P>
 <?
 if ($in>$groupsize)
 {
 ?>
-However, <?=(mysql_result($list,$old,"gender")=="f"?"she":"he")?> won't be replaced because <b>the round was for <?=$groupsize?> people and currently there are <?=$in?> competitors qualified</b>.
+However, <?=(cased_mysql_result($list,$old,"gender")=="f"?"she":"he")?> won't be replaced because <b>the round was for <?=$groupsize?> people and currently there are <?=$in?> competitors qualified</b>.
 <?
 }
 elseif (!$new)
 {
 ?>
-However, <?=(mysql_result($list,$old,"gender")=="f"?"she":"he")?> won't be replaced because <b>no one else qualified</b>.
+However, <?=(cased_mysql_result($list,$old,"gender")=="f"?"she":"he")?> won't be replaced because <b>no one else qualified</b>.
 <?
 }
 else
 {
-	echo (mysql_result($list,$old,"gender")=="f"?"She":"He") . " will be replaced by <b>" . mysql_result($list,$new,"name") . "</b>, with ";
+	echo (cased_mysql_result($list,$old,"gender")=="f"?"She":"He") . " will be replaced by <b>" . cased_mysql_result($list,$new,"name") . "</b>, with ";
 	if ($avgtype==2)
-		echo "a best score of <b>" . formatTime(mysql_result($list,$new,"best"));
+		echo "a best score of <b>" . formatTime(cased_mysql_result($list,$new,"best"));
 	else
 	{
-		$avg = mysql_result($list,$new,"average");
+		$avg = cased_mysql_result($list,$new,"average");
 		if ($avg)
 			$avg = formatTime($avg);
 		else
@@ -199,7 +200,7 @@ Confirm this operation with your administrative password:
 <input type=hidden name=comp_id value=<?=$comp_id?>>
 <input type=hidden name=cat_id value=<?=$cat_id?>>
 <input type=hidden name=round value=<?=$round?>>
-<input type=hidden name=ncmp_id value=<?=($new?mysql_result($list,$new,"comp_id"):0)?>>
+<input type=hidden name=ncmp_id value=<?=($new?cased_mysql_result($list,$new,"comp_id"):0)?>>
 <P>
 <input type=submit value=proceed>
 <input type=button value=cancel onclick='window.close();'>

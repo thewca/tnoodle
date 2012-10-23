@@ -1,12 +1,14 @@
 <?
+require_once "lib.php";
+require_once "inc_private.php";
 // handhelds don't use to implement overflow:auto
 include "lib_mob_det.php";
-include "inc_private.php";
 $detect = new Mobile_Detect();
 $handheld = $detect->isMobile();
 $detect = null;
 $IE = (preg_match("/msie/i",$_SERVER["HTTP_USER_AGENT"]) || preg_match("/internet explorer/i",$_SERVER["HTTP_USER_AGENT"]));
 
+$cat_id = NULL;
 
 function earlyError($msg)
 {
@@ -90,11 +92,11 @@ function printEvent($event, &$coltimewidth, $print_headers=true,$_cat_id=NULL,$_
 	{
 		$cat_id = $_cat_id;
 		$round = $_round;
-		$event = mysql_fetch_array(mysql_query("SELECT * FROM $eventstable WHERE id=$cat_id"));
+		$event = cased_mysql_fetch_array(strict_mysql_query("SELECT * FROM $eventstable WHERE id=$cat_id"));
 	}
 	//
-	$category = mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
-	$timetype = mysql_result($category,0,"timetype");
+	$category = strict_mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
+	$timetype = cased_mysql_result($category,0,"timetype");
 	if ($timetype==1)
 		$coltimewidth = 60;
 	elseif ($timetype==2)
@@ -102,10 +104,10 @@ function printEvent($event, &$coltimewidth, $print_headers=true,$_cat_id=NULL,$_
 	else
 		$coltimewidth = 100;
 	//
-	$format = mysql_query("SELECT * FROM formats WHERE id=".$event["r".$round."_format"]);
-	$times = mysql_result($format,0,"times");
-	$avgtype = mysql_result($format,0,"avgtype");
-	if (mysql_result($category,0,"canhavetimelimit") && $round==1)
+	$format = strict_mysql_query("SELECT * FROM formats WHERE id=".$event["r".$round."_format"]);
+	$times = cased_mysql_result($format,0,"times");
+	$avgtype = cased_mysql_result($format,0,"avgtype");
+	if (cased_mysql_result($category,0,"canhavetimelimit") && $round==1)
 	{
 		$timelimit = $event["timelimit"];
 		if($timelimit) $timelimit = substr("000:00.00",0,9-strlen($timelimit)).$timelimit;
@@ -117,8 +119,8 @@ function printEvent($event, &$coltimewidth, $print_headers=true,$_cat_id=NULL,$_
 	$nrounds = 4;
 	while ($nrounds>1 && !$event["r$nrounds"]) $nrounds--;
 	//
-	// $cat_st = mysql_result($category,0,"name")." - round ".$round;
-	$cat_st = mysql_result($category,0,"name")." - ".roundString($round,$nrounds,(mysql_result($category,0,"canhavetimelimit") && $round==1 && $timelimit));
+	// $cat_st = cased_mysql_result($category,0,"name")." - round ".$round;
+	$cat_st = cased_mysql_result($category,0,"name")." - ".roundString($round,$nrounds,(cased_mysql_result($category,0,"canhavetimelimit") && $round==1 && $timelimit));
 	if ($timelimit) $cat_st .= " - cutoff ".formatTime($timelimit,1);
 	if (!$comp_id && !$showmode)
 		echo "<div style='margin:0 0 6px 0;'>$cat_st</div>";
@@ -155,8 +157,8 @@ function printEvent($event, &$coltimewidth, $print_headers=true,$_cat_id=NULL,$_
 		"LEFT OUTER JOIN $timestable ON ($regstable.cat_id=$timestable.cat_id AND $regstable.round=$timestable.round AND $regstable.comp_id=$timestable.comp_id) ".
 		"JOIN $compstable ON ($regstable.comp_id=$compstable.id) ".
 		"JOIN countries ON (countries.id=$compstable.country_id) ".
-		"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .$round." ORDER BY $timestable.t1 IS NULL, $timestable.average=\"\", $timestable.average, $timestable.best, $compstable.name";
-	$list = mysql_query($query);
+		"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .$round." ORDER BY $timestable.t1 IS NULL, $timestable.average='', $timestable.average, $timestable.best, $compstable.name";
+	$list = strict_mysql_query($query);
 	$qualified = (
 		$round<4 && $event["r".($round+1)] ?
 		$event["r".($round+1)."_groupsize"] :
@@ -166,7 +168,7 @@ function printEvent($event, &$coltimewidth, $print_headers=true,$_cat_id=NULL,$_
 	$count = 0;
 	$lasta = "";
 	$lastb = "";
-	while ($row=mysql_fetch_array($list))
+	while ($row=cased_mysql_fetch_array($list))
 	{
 		$count++;
 		if (!$row["t1"])
@@ -211,25 +213,25 @@ function printCompetitor($comp_id)
 	global
 		$compstable, $timestable;
 	//
-	$competitor = mysql_query("SELECT $compstable.id, $compstable.name, $compstable.WCAid, $compstable.gender, countries.name AS cname FROM $compstable JOIN countries ON countries.id=$compstable.country_id WHERE $compstable.id=$comp_id");
+	$competitor = strict_mysql_query("SELECT $compstable.id, $compstable.name, $compstable.WCAid, $compstable.gender, countries.name AS cname FROM $compstable JOIN countries ON countries.id=$compstable.country_id WHERE $compstable.id=$comp_id");
 	if (!mysql_num_rows($competitor))
 	{
 		echo "No such competitor in this competition!";
 		return;
 	}
-	echo "<font size=+1>".mysql_result($competitor,0,"name")."</font> &nbsp;&nbsp;Â·&nbsp;&nbsp; ".mysql_result($competitor,0,"cname");
-	$wcaid = mysql_result($competitor,0,"WCAid");
+	echo "<font size=+1>".cased_mysql_result($competitor,0,"name")."</font> &nbsp;&nbsp;Â·&nbsp;&nbsp; ".cased_mysql_result($competitor,0,"cname");
+	$wcaid = cased_mysql_result($competitor,0,"WCAid");
 	if ($wcaid) 
-		echo " &nbsp;&nbsp;Â·&nbsp;&nbsp; see ".(mysql_result($competitor,0,"gender")=="m"?"his":"her")." <a href='http://worldcubeassociation.org/results/p.php?i=".$wcaid."' target=_blank class=a_white>WCA's official results</a>";
+		echo " &nbsp;&nbsp;Â·&nbsp;&nbsp; see ".(cased_mysql_result($competitor,0,"gender")=="m"?"his":"her")." <a href='http://worldcubeassociation.org/results/p.php?i=".$wcaid."' target=_blank class=a_white>WCA's official results</a>";
 	echo "<br>";
 	//
-	$scores = mysql_query("SELECT * FROM $timestable WHERE comp_id=$comp_id ORDER BY cat_id, round");
+	$scores = strict_mysql_query("SELECT * FROM $timestable WHERE comp_id=$comp_id ORDER BY cat_id, round");
 	if (!mysql_num_rows($scores))
 		echo "No scores available for this competitor yet.";
 	else
 	{
 		$last_cat = 0;
-		while ($row=mysql_fetch_array($scores))
+		while ($row=cased_mysql_fetch_array($scores))
 		{
 			if ($row["cat_id"]!=$last_cat)
 			{
@@ -272,7 +274,7 @@ function print_txt01_sch($fh,&$categories,&$events)
 {
 	global $competition, $IE, $timestable;
 	//
-	// de reponerlo, no iría aquí - echo "\r\n<h2>".mysql_result($competition,0,"name")." Schedule</h2><p></p>\r\n";
+	// de reponerlo, no iría aquí - echo "\r\n<h2>".cased_mysql_result($competition,0,"name")." Schedule</h2><p></p>\r\n";
 	echo "\r\n<DIV id=SCH_container style='position:relative;height:95%;overflow-y:auto;font-weight:normal;'>\r\n";
 	$timezone = trim(fgets($fh));
 	$gmt = substr(trim(fgets($fh)),3);
@@ -300,9 +302,9 @@ function print_txt01_sch($fh,&$categories,&$events)
 			$line = trim(fgets($fh));
 		}
 		//
-		$openr = mysql_query("SELECT DISTINCT CONCAT(abbr,\"_\",round) AS code FROM $timestable JOIN categories ON id=cat_id");
+		$openr = strict_mysql_query("SELECT DISTINCT CONCAT(abbr,'_',round) AS code FROM $timestable JOIN categories ON id=cat_id");
 		$resultRnds = array();
-		while ($rowor=mysql_fetch_array($openr)) $resultRnds[$rowor["code"]] = true;
+		while ($rowor=cased_mysql_fetch_array($openr)) $resultRnds[$rowor["code"]] = true;
 		//
 		$a1 = getdate($timethere);
 		$a2 = getdate($day);
@@ -331,11 +333,11 @@ function print_txt_sch($fn)
 {
 	global $competition, $eventstable;
 	//
-	$r = mysql_query("SELECT name, abbr FROM categories");
-	while ($row=mysql_fetch_array($r))
+	$r = strict_mysql_query("SELECT name, abbr FROM categories");
+	while ($row=cased_mysql_fetch_array($r))
 		$categories[$row["abbr"]] = $row["name"]; 
-	$r = mysql_query("SELECT * FROM $eventstable JOIN categories ON $eventstable.id=categories.id");
-	while ($row=mysql_fetch_array($r))
+	$r = strict_mysql_query("SELECT * FROM $eventstable JOIN categories ON $eventstable.id=categories.id");
+	while ($row=cased_mysql_fetch_array($r))
 	{
 		$events[_RX][$row["abbr"]] = 0;
 		$events[_ID][$row["abbr"]] = $row["id"];
@@ -352,7 +354,7 @@ function print_txt_sch($fn)
 		return;
 	}
 	//
-	echo "<h2>".mysql_result($competition,0,"name")." Schedule</h2><p>";
+	echo "<h2>".cased_mysql_result($competition,0,"name")." Schedule</h2><p>";
 	$timezone = fgets($fh);
 	$line = fgets($fh);
 	while ($line)
@@ -398,8 +400,10 @@ function print_txt_sch($fn)
 
 //=========================================================================================================================
 
-if (!$_GET["cid"])
+if (!array_key_exists("cid", $_GET))
+{
 	header("Location: http://live.".DOMAIN."\r\n");
+}
 else
 {
 	session_start();
@@ -408,8 +412,6 @@ else
 	$comp_id = $_GET["compid"];
 	$schedule = $_GET["schedule"];
 	$showmode = ($_GET["cat"] && $_GET["rnd"] && !$comp_id ? $_GET["sm"] : false);
-
-	include "inc_private.php";
 
 	$html_sch = DIR_UPLOADS.($test?"test_":"")."sch_$cid.html";
 	if (!file_exists($html_sch)) $html_sch = "";
@@ -422,8 +424,6 @@ else
 	elseif (!$_GET["cat"] && !$comp_id && !$schedule)
 		$schedule = true;
 
-	require_once "inc_private.php";
-
 	if ($test)
 	{
 		mysql_connect(SQL_SERVER, SQL_TEST_USER, SQL_TEST_PASSWORD);
@@ -434,7 +434,7 @@ else
 		mysql_connect(SQL_SERVER, SQL_USER, SQL_PASSWORD);
 		mysql_select_db(SQL_DBNAME);
 	}
-	$competition = mysql_query("SELECT competitions.*, countries.name AS cname FROM competitions JOIN countries ON competitions.country=countries.id WHERE competitions.id=$cid");
+	$competition = strict_mysql_query("SELECT competitions.*, countries.name AS cname FROM competitions JOIN countries ON competitions.country=countries.id WHERE competitions.id=$cid");
 	if (!mysql_num_rows($competition)) earlyError ("That competition is not available any more.");
 	//
 	$eventstable = "events$cid";
@@ -448,7 +448,7 @@ else
 ?>
 <html>
 <head>
-<TITLE><?=mysql_result($competition,0,"name")?></TITLE>
+<TITLE><?=cased_mysql_result($competition,0,"name")?></TITLE>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
 	body {font-family:arial,sans-serif;background-color:<?=$color?>;color:white;margin:0;}
@@ -574,7 +574,7 @@ function expand(id,immediate)
 }
 </script>
 <?
-		$events = mysql_query("SELECT * FROM $eventstable JOIN categories ON $eventstable.id=categories.id ORDER BY categories.id");
+		$events = strict_mysql_query("SELECT * FROM $eventstable JOIN categories ON $eventstable.id=categories.id ORDER BY categories.id");
 	} // if
 
 	echo "<TABLE width=100% height=100% cellspacing=0 cellpadding=0><TR valign=top><TD colspan=2>";
@@ -582,11 +582,11 @@ function expand(id,immediate)
 	{
 		$cat_id = $_GET["cat"];
 		$round = $_GET["rnd"];
-		$sevent = mysql_fetch_array(mysql_query("SELECT * FROM $eventstable WHERE id=$cat_id"));
+		$sevent = cased_mysql_fetch_array(strict_mysql_query("SELECT * FROM $eventstable WHERE id=$cat_id"));
 		echo "<div class=top><br><table style='font:inherit;color:inherit;'><tr valign=top><td><a href='live.php?cid=$cid&cat=$cat_id&rnd=$round' title='exit show mode'>[x]</a></td><td>";
 
-		$category = mysql_query("SELECT * FROM categories WHERE id=$cat_id");
-		if (mysql_result($category,0,"canhavetimelimit") && $round==1)
+		$category = strict_mysql_query("SELECT * FROM categories WHERE id=$cat_id");
+		if (cased_mysql_result($category,0,"canhavetimelimit") && $round==1)
 		{
 			$timelimit = $sevent["timelimit"];
 			if($timelimit) $timelimit = substr("000:00.00",0,9-strlen($timelimit)).$timelimit;
@@ -598,23 +598,23 @@ function expand(id,immediate)
 		$nrounds = 4;
 		while ($nrounds>1 && !$sevent["r$nrounds"]) $nrounds--;
 		//
-		echo mysql_result($category,0,"name")."<br>";
+		echo cased_mysql_result($category,0,"name")."<br>";
 		// echo "round $round<br>";
-		echo roundString($round,$nrounds,(mysql_result($category,0,"canhavetimelimit") && $round==1 && $timelimit))."<br>";		
+		echo roundString($round,$nrounds,(cased_mysql_result($category,0,"canhavetimelimit") && $round==1 && $timelimit))."<br>";		
 		if ($timelimit) echo "cutoff ".formatTime($timelimit,1);
 
 		echo "</td></tr></table></div></TD></TR><TR valign=top><TD colspan=2 width=100% height=100% align=center>";
 	}
 	else
 	{
-		echo "<div class=top><br>".mysql_result($competition,0,"name")."<br>".iconv("ISO-8859-1", "UTF-8", mysql_result($competition,0,"place"))."<br>".mysql_result($competition,0,"cname")."</div>";
+		echo "<div class=top><br>".cased_mysql_result($competition,0,"name")."<br>".iconv("ISO-8859-1", "UTF-8", cased_mysql_result($competition,0,"place"))."<br>".cased_mysql_result($competition,0,"cname")."</div>";
 		echo "</TD></TR><TR valign=top><TD>";
 		
 		// evts table - begin
 		echo "<table height=100% cellspacing=0 cellpadding=0>";
 		echo "<tr><td><div class=event_top>&nbsp;</div></td></tr>";
 		$count = 1;
-		while ($event=mysql_fetch_array($events))
+		while ($event=cased_mysql_fetch_array($events))
 		{
 			echo "<tr valign=top><td><div class=".($event["r1_open"]?"event":"c_event")." onclick='expand($count,false);'>".$event["name"]."</div><div id=cll$count class=collapser>";
 			//
@@ -648,13 +648,14 @@ function expand(id,immediate)
 			echo "</div></td></tr>";
 			$count++;
 		}
-		$competitors = mysql_query("SELECT id, name FROM $compstable ORDER BY name");
+		$competitors = strict_mysql_query("SELECT id, name FROM $compstable ORDER BY name");
 		if (mysql_num_rows($competitors))
 		{
 			echo "<tr><td><div class=blank>&nbsp;</div></td></tr>";
 			echo "<tr valign=top><td><div class=event onclick='expand($count,false);'>Competitors</div><div id=cll$count class=collapser_c>";
 			$c = 0;
-			while ($row=mysql_fetch_array($competitors))
+			$compPos = NULL;
+			while ($row=cased_mysql_fetch_array($competitors))
 			{
 				echo "<div class=round onclick='window.location=\"live.php?cid=$cid&compid=".$row["id"]."\"'>".$row["name"]."</div>";
 				if ($row["id"]==$comp_id) $compPos = $c;
@@ -755,6 +756,7 @@ function expand(id,immediate)
 	mysql_close();
 ?>
 </body>
+</html>
 <?
 }
 ?>

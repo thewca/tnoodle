@@ -1,4 +1,5 @@
 <?
+require_once "lib.php";
 include "lib_admin.php";
 
 function abbr($t)
@@ -25,7 +26,7 @@ function columnHeader($caption,$o)
 
 include "db.php";
 
-$categories = mysql_query("SELECT * FROM categories JOIN $eventstable ON categories.id=$eventstable.id ORDER BY categories.id");
+$categories = strict_mysql_query("SELECT * FROM categories JOIN $eventstable ON categories.id=$eventstable.id ORDER BY categories.id");
 $ncats = mysql_num_rows($categories);
 $catwidth = 30;
 
@@ -331,6 +332,7 @@ function openWDetails()
 </script>
 
 <?
+$order = NULL;
 if ($_GET["order"])
 {
 	$order = $_GET["order"];
@@ -356,7 +358,7 @@ switch($order)
 	default:
 		$query .= "$compstable.name"; 
 }
-$result = mysql_query($query);
+$result = strict_mysql_query($query);
 $ncomps = mysql_num_rows($result);
 ?>
 
@@ -372,28 +374,28 @@ if (!$ncomps)
 	echo "<th><div class=col_ot>&nbsp;</div></th></tr></table><SPAN id=container><table id=T_TD class=TD cellspacing=0><tr>";
 else
 {
-	$closedevents = mysql_query("SELECT id FROM $eventstable WHERE r2_open=TRUE");
+	$closedevents = strict_mysql_query("SELECT id FROM $eventstable WHERE r2_open=TRUE");
 	$closed = array();
-	while ($row=mysql_fetch_array($closedevents)) $closed[(int)$row["id"]] = true;
+	while ($row=cased_mysql_fetch_array($closedevents)) $closed[(int)$row["id"]] = true;
 	//
-	while ($rcat=mysql_fetch_array($categories))
+	while ($rcat=cased_mysql_fetch_array($categories))
 		echo "<th><div title=\"".$rcat["name"]."\" style='width:".$catwidth."px;'>".abbr($rcat["abbr"])."</div></th>";
 	echo "<th><div class=col_ot>&nbsp;</div></th></tr></table><DIV><SPAN id=container><table id=T_TD class=TD cellspacing=0>";
 	//
-	$compHasTimesR1 = mysql_query("SELECT DISTINCT CONCAT(cat_id,\"_\",comp_id) AS id FROM $timestable WHERE round=1");
+	$compHasTimesR1 = strict_mysql_query("SELECT DISTINCT CONCAT(cat_id,'_',comp_id) AS id FROM $timestable WHERE round=1");
 	$compHTR1 = array();
-	while ($row=mysql_fetch_array($compHasTimesR1))
+	while ($row=cased_mysql_fetch_array($compHasTimesR1))
 		$compHTR1[$row["id"]] = true;
 	unset($compHasTimesR1);
 	//
-	while ($row=mysql_fetch_array($result))
+	while ($row=cased_mysql_fetch_array($result))
 	{
 		echo "<tr class=comprow_".(($count++) % 2?"odd":"even")."><td><div class=col_cl>" .$row["id"]. "</div></td><td><div class=col_wi>" .$row["WCAid"]. "</div></td><td><div class=col_nm><a href='editcomp.php?id=".$row["id"]."' target='w_details' title='click to edit details' onclick='openWDetails();'>" .$row["name"]. "</a></div></td><td><div class=col_bd>" .$row["birthday"]. "</div></td><td><div class=col_ct>" .$row["country"]. "</div></td><td><div class=col_gd align=center>" .$row["gender"]. "</div></td>";
 		$candelete = true;
 		if ($ncats)
 		{
 			mysql_data_seek($categories,0);
-			while ($rcat=mysql_fetch_array($categories))
+			while ($rcat=cased_mysql_fetch_array($categories))
 			{
 				if ($row["cat".$rcat["id"]]=="X" && isset($compHTR1[$rcat["id"]."_".$row["id"]]))
 				{
@@ -422,8 +424,8 @@ else
 <td><select id=country name=country style="width:100px;">
 <option value=""></option>
 <?
-$result = mysql_query("SELECT * FROM countries");
-while ($row=mysql_fetch_array($result))
+$result = strict_mysql_query("SELECT * FROM countries");
+while ($row=cased_mysql_fetch_array($result))
 {
 	echo "<option value=\"" . $row["id"] . "\"";
 	if ($row["id"]==$_SESSION["c_country"]) echo " selected";
