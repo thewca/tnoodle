@@ -78,6 +78,94 @@ public class CubeScrambler extends Scrambler {
 		return size + "" + size + "" + size;
 	}
 
+	private class TurnsBuilder {
+		private ArrayList<Turn> turns = new ArrayList<Turn>();
+
+		public TurnsBuilder() {}
+
+		public void add(Turn turn) {
+			if(turn.outerSlice != 0) {
+				// This isn't a thick turn, so we turn it into a
+				// thick turn and a less thick turn.
+				Turn thick = new Turn(turn);
+				thick.outerSlice = 0;
+				add(thick);
+
+				Turn lessThick = new Turn(turn);
+				lessThick.innerSlice--;
+				lessThick.outerSlice = 0;
+				lessThick.dir = 4 - lessThick.dir; // invert direction
+				add(lessThick);
+				return;
+			}
+
+			if(turns.isEmpty()) {
+				turns.add(turn);
+				return;
+			}
+
+			Turn lastTurn = turns.get(turns.size() - 1);
+
+			int lastAxis = lastTurn.getAxis();
+			int axis = turn.getAxis();
+			if(lastAxis != axis) {
+				// No chance of cancelling, so we just append the turn
+				turns.add(turn);
+			} else {
+				// Same axis as the previous turn(s), lets try to cancel something!
+
+				// First, we search backwards for a turn of this axis that
+				// has the same inner slice
+				int indexOfInnerSlice = -1;
+				for(int i = turns.size() - 1; i >= 0 && turns.get(i).getAxis() == axis; i--) {
+					if(turns.get(i).innerSlice == turn.innerSlice &&
+							turns.get(i).face == turn.face) {
+						indexOfInnerSlice = i;
+						break;
+					}
+				}
+				if(indexOfInnerSlice < 0) {
+					// There's nothing to cancel with, so we just append the turn and return
+					turns.add(turn);
+					return;
+				}
+
+				Turn cancelTurn = turns.get(indexOfInnerSlice);
+				cancelTurn.dir = (cancelTurn.dir + turn.dir) % 4;
+				if(cancelTurn.dir == 0) {
+					// This turn has cancelled into nothingness, so we remove it
+					turns.remove(indexOfInnerSlice);
+				}
+			}
+		}
+
+		public void addAll(Turn[] turns) {
+			for(Turn t : turns) {
+				add(t);
+			}
+		}
+
+		public String toString() {
+			StringBuilder str = new StringBuilder();
+			for(int i = 0; i < turns.size(); i++) {
+				if(i != 0) {
+					str.append(" ");
+				}
+				str.append(turns.get(i).toString());
+			}
+			return str.toString();
+		}
+	}
+
+	private String removeSliceTurns(String scramble) {
+		Turn[] turnArr = parseScramble(scramble);
+		azzert(turnArr != null);
+
+		TurnsBuilder turns = new TurnsBuilder();
+		turns.addAll(turnArr);
+		return turns.toString();
+	}
+
 	@Override
 	public String generateScramble(Random r) {
 		if(size == 2) {
@@ -85,7 +173,8 @@ public class CubeScrambler extends Scrambler {
 		} else if(size == 3) {
 			return twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 		} else if(size == 4) {
-			return threePhaseSearcher.get().randomState(r);
+			String scramble = threePhaseSearcher.get().randomState(r);
+			return removeSliceTurns(scramble);
 		} else {
 			StringBuffer scramble = new StringBuffer(length*3);
 			int lastAxis = -1;
@@ -150,6 +239,17 @@ public class CubeScrambler extends Scrambler {
 		int dir;
 
 		public Turn() {}
+
+		public Turn(Turn t) {
+			this.face = t.face;
+			this.innerSlice = t.innerSlice;
+			this.outerSlice = t.outerSlice;
+			this.dir = t.dir;
+		}
+
+		public int getAxis() {
+			return face % 3;
+		}
 
 		public String toString() {
 			if(dir == 0) {
