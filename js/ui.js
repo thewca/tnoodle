@@ -921,6 +921,11 @@ mark2.ui = (function() {
 
 		if (competitionNameHash !== null) {
 			competitionNameInput.value = competitionNameHash;
+		} else {
+			// TODO - this also uses mootools, even though we don't explicitly
+			// depend on mootools.
+			var prettyDate = new Date().format("%Y-%m-%d");
+			competitionNameInput.value = "Scrambles for " + prettyDate;
 		}
 
 		var roundsHash = getHashParameter("rounds", null);
@@ -1345,9 +1350,14 @@ mark2.ui = (function() {
 
 		var disableScrambleButton = false;
 		if(requiredCount === 0) {
+			// If the user hasn't asked for any scrambles, then there's no
+			// use letting them click the scramble button.
 			disableScrambleButton = true;
 		} else {
 			disableScrambleButton = generatedCount < requiredCount;
+		}
+		if(getCompetitionName().length === 0) {
+			disableScrambleButton = true;
 		}
 		scrambleButton.disabled = disableScrambleButton;
 
