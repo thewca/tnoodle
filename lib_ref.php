@@ -4,7 +4,7 @@
  * unexpected or even harmful results.
  */
 include "inc_private.php";
-if (!preg_match("~//(www.|test.)?".DOMAIN."~i",$_SERVER["HTTP_REFERER"]))
+if (!preg_match("~//(www\\.|test\\.)?".DOMAIN."~i",$_SERVER["HTTP_REFERER"]))
 {
 	$txt = <<<TEXT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

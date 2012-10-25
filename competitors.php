@@ -131,7 +131,7 @@ function callPage(url)
 	var req = createXMLHttpRequest();
 	req.open ("GET", url, false);
 	req.send (null);
-	if (!req.responseText)
+	if (!req.responseText.replace(/^[\s\r\n]+/,""))
 		window.location.reload();
 	else
 		alert(req.responseText);
@@ -288,7 +288,7 @@ function submitForm()
 										"&gender="+document.frm.gender.value, 
 										false);
 		req.send (null);
-		if (req.responseText != "")
+		if (req.responseText.replace(/^[\s\r\n]+/,"") != "")
 			alert(req.responseText);
 		else
 			window.location.reload();
@@ -302,7 +302,7 @@ function updateData(spanId,url)
 	req.open ("GET", url, false);
 	req.send (null);
 	//
-	var txt = req.responseText;
+	var txt = req.responseText.replace(/[\s\r\n]+$/,"");
 	var i = txt.indexOf("/");
 	if (i >= 0)
 	{
@@ -333,12 +333,12 @@ function openWDetails()
 
 <?
 $order = NULL;
-if ($_GET["order"])
+if (array_key_exists("order",$_GET))
 {
 	$order = $_GET["order"];
 	$_SESSION["order"] = $order;
 }
-if (!$order) $order = $_SESSION["order"];
+if (array_key_exists("order",$_SESSION) && !$order) $order = $_SESSION["order"];
 if (!$order) $order = "n";
 $query = "SELECT $compstable.*, countries.name AS country FROM $compstable JOIN countries ON countries.id=$compstable.country_id ORDER BY ";
 switch($order)
@@ -388,6 +388,7 @@ else
 		$compHTR1[$row["id"]] = true;
 	unset($compHasTimesR1);
 	//
+	$count = 0;
 	while ($row=cased_mysql_fetch_array($result))
 	{
 		echo "<tr class=comprow_".(($count++) % 2?"odd":"even")."><td><div class=col_cl>" .$row["id"]. "</div></td><td><div class=col_wi>" .$row["WCAid"]. "</div></td><td><div class=col_nm><a href='editcomp.php?id=".$row["id"]."' target='w_details' title='click to edit details' onclick='openWDetails();'>" .$row["name"]. "</a></div></td><td><div class=col_bd>" .$row["birthday"]. "</div></td><td><div class=col_ct>" .$row["country"]. "</div></td><td><div class=col_gd align=center>" .$row["gender"]. "</div></td>";
@@ -402,7 +403,7 @@ else
 					$candelete = false;
 					echo "<td align=center><div style='width:".$catwidth."px;background-color:#9e9dba;'";
 				}
-				elseif ($closed[(int)$rcat["id"]]) 
+				elseif (array_key_exists((int)$rcat["id"],$closed) && $closed[(int)$rcat["id"]]) 
 					echo "<td align=center><div style='width:".$catwidth."px;background-color:#9e9dba;'";
 				else
 					echo "<td align=center><div style='cursor:pointer;width:".$catwidth."px;' id=td" .$row["id"]."_".$rcat["id"]. " onclick='toggleRegistration(\"" .$row["id"]. "\", \"" .$rcat["id"]. "\");'";

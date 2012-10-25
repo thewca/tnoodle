@@ -2,7 +2,7 @@
 require_once "lib.php";
 session_start();
 $IE = (preg_match("/msie/i",$_SERVER["HTTP_USER_AGENT"]) || preg_match("/internet explorer/i",$_SERVER["HTTP_USER_AGENT"]));
-$live = preg_match("~live\\.cubecomps\\.com~i",$_SERVER["HTTP_HOST"]);
+$live = preg_match("~^live\\.~i",$_SERVER["HTTP_HOST"]);
 //echo "IE=$IE, live=$live<br>";
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -26,7 +26,7 @@ $live = preg_match("~live\\.cubecomps\\.com~i",$_SERVER["HTTP_HOST"]);
 </style>
 </HEAD>
 <?
-if ($_SESSION["c_error"])
+if (array_key_exists("c_error", $_SESSION))
 {
 	echo "<BODY onload='alert(\"".$_SESSION["c_error"]."\")'>\r\n";
 	unset($_SESSION["c_error"]);
@@ -136,7 +136,7 @@ echo "<tr valign=top><td width=40%>";
 
 echo "<table cellspacing=0 cellpadding=0 height=100%>";
 echo "<tr valign=top><td><img src='img/home-top.gif'></td></tr>";
-$test = preg_match("~(^test\056|//test\056)~i",$_SERVER["HTTP_HOST"]);
+$test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
 if ($test)
 	echo "<tr height=100%><td align=right><div style='font-size:80px;font-weight:bold;'>TEST</div><div style='font-size:34px;font-weight:bold;'>environment</div></td></tr></table>";
 else
