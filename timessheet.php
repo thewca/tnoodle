@@ -19,7 +19,7 @@ class TS extends tFPDF
 		parent::__construct();
 		$this->column = false;
 		$this->row = false;
-		$test = preg_match("~(^test\056|//test\056)~i",$_SERVER["HTTP_HOST"]);
+		$test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
 		$this->fname = DIR_UPLOADS.($test?"test_":"")."bg_".$_SESSION["c_id"].".jpg";
 	}
 

@@ -19,7 +19,7 @@ Session timed out!
 
 require_once "inc_private.php";
 
-if (preg_match("~(^test\056|//test\056)~i",$_SERVER["HTTP_HOST"]))
+if (preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]))
 {
 	mysql_connect(SQL_SERVER, SQL_TEST_USER, SQL_TEST_PASSWORD);
 	mysql_select_db(SQL_TEST_DBNAME);

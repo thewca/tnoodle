@@ -19,7 +19,7 @@ function _error($msg)
 	die();
 }
 
-$test = preg_match("~(^test\056|//test\056)~i",$_SERVER["HTTP_HOST"]);
+$test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
 
 if ($_FILES["file"]["error"] > 0) _error ("Error: " . $_FILES["file"]["error"]);
 $size = $_FILES["file"]["size"] / 1024;

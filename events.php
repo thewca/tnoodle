@@ -165,7 +165,7 @@ function updateData(spanId,url,outTxt)
 	//
 	if (spanId)
 	{
-		document.getElementById(spanId).innerHTML = outTxt.replace("%",req.responseText);
+		document.getElementById(spanId).innerHTML = outTxt.replace("%",req.responseText.replace(/[\s\r\n]+$/,""));
 		highlight(spanId);
 	}
 	else
@@ -207,7 +207,7 @@ function callPage(url)
 	var req = createXMLHttpRequest();
 	req.open ("GET", url, false);
 	req.send (null);
-	if (!req.responseText)
+	if (!req.responseText.replace(/^[\s\r\n]+/,""))
 		window.location.reload();
 	else
 		alert(req.responseText);
@@ -266,7 +266,9 @@ while($event=cased_mysql_fetch_array($result))
 				echo "-<span onclick='alert(\"Change not allowed: this round already has results\");'> $st </span>";
 			else
 			{
-				echo "-<span id=" . $rnd."_".$event["id"] . "_1 style='cursor:pointer;' onclick='setTimeLimit(\"" . $rnd."_".$event["id"] . "_1\",\"" . $event["id"] . "\", \"".substr($events["timelimit"],1)."\");' title='click to change'> $st </span>";
+				echo "-<span id=" . $rnd."_".$event["id"] . "_1 style='cursor:pointer;' onclick='setTimeLimit(\"" . $rnd."_".$event["id"] . "_1\",\"" . $event["id"] . "\", \"";
+				if (isset($events)) echo substr($events["timelimit"],1);
+				echo "\");' title='click to change'> $st </span>";
 			}
 		}
 		// format
@@ -375,7 +377,7 @@ mysql_close();
 if (preg_match("/msie/i",$_SERVER["HTTP_USER_AGENT"]) || preg_match("/internet explorer/i",$_SERVER["HTTP_USER_AGENT"]))
 	echo "<br><center><b>so you're using IE...&nbsp;&nbsp;&nbsp;:'(</b></center>";
 
-if ($_SESSION["c_error"])
+if (array_key_exists("c_error",$_SESSION))
 {
 	echo "<script>alert(\"".$_SESSION["c_error"]."\");</script>\r\n";
 	unset($_SESSION["c_error"]);

@@ -85,8 +85,8 @@ while ($row=cased_mysql_fetch_array($openevents))
 	$lastopenrounds[$row["id"]] = $x;
 }
 
-$cat_id = $_GET["cat_id"];
-$round = $_GET["round"];
+$cat_id = (array_key_exists("cat_id",$_GET) ? $_GET["cat_id"] : null);
+$round = (array_key_exists("round",$_GET) ? $_GET["round"] : null);
 if ((!$cat_id || !$round) && count($lastopenrounds))
 {
 	if (!$cat_id) $cat_id = cased_mysql_result($openevents,0,"id");
@@ -303,7 +303,7 @@ function quitEvent(cat_id,comp_id)
 	var req = createXMLHttpRequest();
 	req.open ("GET", "toggleregistration.php?cat_id="+cat_id+"&comp_id="+comp_id, false);
 	req.send (null);
-	var txt = req.responseText;
+	var txt = req.responseText.replace(/[\s\r\n]+$/,"");
 	if (txt && txt.substring(0,3)!="/td")
 		alert ("Error found trying to remove this competitor from this event.\n("+txt+")");
 	else
@@ -1198,7 +1198,7 @@ Inputs.prototype.submit = function()
 		var req = createXMLHttpRequest();
 		req.open ("GET", url, false);
 		req.send (null);
-		if (req.responseText=="OK")
+		if (req.responseText.replace(/[\s\r\n]+$/,"")=="OK")
 		{
 			this.changed = false;
 			window.location.reload();

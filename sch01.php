@@ -42,7 +42,7 @@ class ScheduleClass
 		do {
 			$c++;
 			$r = $start;
-			while ($r < $end && !$this->sectors[$c][$r]) $r++;
+			while ($r < $end && @!$this->sectors[$c][$r]) $r++;
 		} while ($r < $end);
 		for ($r=$start;$r<$end;$r++) $this->sectors[$c][$r] = $this->nrounds;
         $this->rounds[$this->nrounds]["c"] = $c;
@@ -66,7 +66,7 @@ class ScheduleClass
 				do {
 					$c++;
 					$r = $start;
-					while ($r < $end && !$this->sectors[$c][$r]) $r++;
+					while ($r < $end && @!$this->sectors[$c][$r]) $r++;
 					if ($r==$end) $this->rounds[$l]["sp"] = $this->rounds[$l]["sp"] + 1;
 				} while ($r==$end && $c < $this->ncolumns);
 			}
@@ -74,7 +74,7 @@ class ScheduleClass
 		//
 		$x = 0;
 		$y = 0;
-		while ($y < 288 && !$this->sectors[$x][$y])
+		while ($y < 288 && @!$this->sectors[$x][$y])
 		{
 			if ($x==$this->ncolumns)
 			{
@@ -97,7 +97,8 @@ class ScheduleClass
 		$tr = false;
 		while ($y < 288)
 		{
-			if (isset($this->sectors[$x][$y]) && $current[$x]!=$this->sectors[$x][$y])
+			if (isset($this->sectors[$x][$y]) && 
+				(!isset($current) || !array_key_exists($x,$current) || $current[$x]!=$this->sectors[$x][$y]))
 			{
 				$idx = $this->sectors[$x][$y];
 				$evt = $this->rounds[$idx]["ev"];
@@ -109,7 +110,7 @@ class ScheduleClass
 				if ($position!==null && $this->rounds[$idx]["st"] <= $position) $position_px = $npy;
 				if ($npy+$height_px > $bottom_py) $bottom_py = $npy+$height_px;
 				$echo .= "<span class=SCH style='background-color:";
-				if (!$this->categories[$evt])
+				if (!array_key_exists($evt,$this->categories))
 					$echo .= "#888;";
 				else
 				{
@@ -117,11 +118,11 @@ class ScheduleClass
 					$ncolor = (($ncolor+1) % 6);
 				}
 				if (!$this->ncolumns) $this->rounds[$idx]["sp"] = 2;
-				$echo .= "width:" .(max($this->rounds[$idx]["sp"],1)*200-($IE?10:20)). "px;".
+				$echo .= "width:" .(max(@$this->rounds[$idx]["sp"],1)*200-($IE?10:20)). "px;".
 					"height:" .$height_px. "px;".
 					"left:".(5+$this->rounds[$idx]["c"]*200). "px;".
 					"top:".$npy."px;'>";
-				if ($this->categories[$evt] || $evt=="reg" || $evt=="tro" || $evt=="lun")
+				if (array_key_exists($evt,$this->categories) || $evt=="reg" || $evt=="tro" || $evt=="lun")
 					$echo .= "<img border=0 src='img/".$evt.".gif' style='position:absolute;top:".$img_y."px;left:-5px;'>";
 				//
 				$echo .= "<span class=HR style='top:".($img_y+($height<=3?10:($height<=5?20:35)))."px;'><center>";
@@ -145,7 +146,7 @@ class ScheduleClass
 					{
 						$events[_RX][$evt] = $events[_RX][$evt] + 1;
 						if ($events[_RX][$evt] <= $events[_RTOP][$evt])
-							$echo .= "<a href='live.php?cid=" .$_GET["cid"]. "&cat=" .$events[_ID][$evt]. "&rnd=" .$events[_RX][$evt]. "'><img border=0 src='img/" .($resultRnds[$evt."_".$events[_RX][$evt]]?"g":"r"). "-arrow.gif'>&nbsp;" .$this->rounds[$idx]["rn"]. "</a>";
+							$echo .= "<a href='live.php?cid=" .$_GET["cid"]. "&cat=" .$events[_ID][$evt]. "&rnd=" .$events[_RX][$evt]. "'><img border=0 src='img/" .(@$resultRnds[$evt."_".$events[_RX][$evt]]?"g":"r"). "-arrow.gif'>&nbsp;" .$this->rounds[$idx]["rn"]. "</a>";
 						else
 							$echo .= $this->rounds[$idx]["rn"];
 					}

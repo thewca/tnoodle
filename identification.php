@@ -5,7 +5,7 @@ session_start();
 
 require_once "inc_private.php";
 
-if (preg_match("~(^test\056|//test\056)~i",$_SERVER["HTTP_HOST"]))
+if (preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]))
 {
 	mysql_connect(SQL_SERVER, SQL_TEST_USER, SQL_TEST_PASSWORD);
 	mysql_select_db(SQL_TEST_DBNAME);
@@ -32,7 +32,7 @@ if (array_key_exists('id', $_POST))
 	$_POSTid = $_POST["id"];
 else
 	$_POSTid = $_SESSION["c_id"];
-if ($_POST["pw"])
+if (array_key_exists("pw",$_POST))
 	$_POSTpw = $_POST["pw"];
 else
 	$_POSTpw = $_SESSION["c_pw"];

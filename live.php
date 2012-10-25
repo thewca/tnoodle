@@ -282,6 +282,7 @@ function print_txt01_sch($fh,&$categories,&$events)
 	$pm = intval(trim(fgets($fh)),10);
 	$line = trim(fgets($fh));
 	$ox = 0;
+	$position = 0;
 	while ($line)
 	{
 		$day = strtotime($line);
@@ -398,6 +399,11 @@ function print_txt_sch($fn)
 	echo "All times are $timezone";
 }
 
+function _GET_key($key)
+{
+	return (array_key_exists($key,$_GET) ? $_GET[$key] : null);
+}
+
 //=========================================================================================================================
 
 if (!array_key_exists("cid", $_GET))
@@ -407,11 +413,14 @@ if (!array_key_exists("cid", $_GET))
 else
 {
 	session_start();
-	$test = preg_match("~(^test\056|//test\056)~i",$_SERVER["HTTP_HOST"]);
+	$test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
 	$cid = $_GET["cid"];
-	$comp_id = $_GET["compid"];
-	$schedule = $_GET["schedule"];
-	$showmode = ($_GET["cat"] && $_GET["rnd"] && !$comp_id ? $_GET["sm"] : false);
+	$comp_id = _GET_key("compid");
+	$schedule = _GET_key("schedule");
+	$_GETcat = _GET_key("cat");
+	$_GETrnd = _GET_key("rnd");
+	$_GETsm = _GET_key("sm");
+	$showmode = ($_GETcat && $_GETrnd && !$comp_id ? $_GETsm : false);
 
 	$html_sch = DIR_UPLOADS.($test?"test_":"")."sch_$cid.html";
 	if (!file_exists($html_sch)) $html_sch = "";
@@ -421,7 +430,7 @@ else
 		$txt_sch = "";
 		if (!$html_sch) $schedule = false;
 	}
-	elseif (!$_GET["cat"] && !$comp_id && !$schedule)
+	elseif (!$_GETcat && !$comp_id && !$schedule)
 		$schedule = true;
 
 	if ($test)
@@ -580,8 +589,8 @@ function expand(id,immediate)
 	echo "<TABLE width=100% height=100% cellspacing=0 cellpadding=0><TR valign=top><TD colspan=2>";
 	if ($showmode)
 	{
-		$cat_id = $_GET["cat"];
-		$round = $_GET["rnd"];
+		$cat_id = $_GETcat;
+		$round = $_GETrnd;
 		$sevent = cased_mysql_fetch_array(strict_mysql_query("SELECT * FROM $eventstable WHERE id=$cat_id"));
 		echo "<div class=top><br><table style='font:inherit;color:inherit;'><tr valign=top><td><a href='live.php?cid=$cid&cat=$cat_id&rnd=$round' title='exit show mode'>[x]</a></td><td>";
 
@@ -632,7 +641,7 @@ function expand(id,immediate)
 					echo "<div class=round onclick='window.location=\"live.php?cid=$cid&cat=".$event["id"]."&rnd=$x\"'>$roundName</div>";
 					//
 					if (!$comp_id && !$schedule)
-						if (($_GET["cat"]==$event["id"] && $_GET["rnd"]==$x) || !$cat_id || (!$_GET["cat"] && $cat_id==$event["id"]))
+						if (($_GETcat==$event["id"] && $_GETrnd==$x) || !$cat_id || (!$_GETcat && $cat_id==$event["id"]))
 						{
 							$cat_id = $event["id"];
 							$round = $x;
@@ -720,6 +729,7 @@ function expand(id,immediate)
 		}
 		else
 		{
+			$coltimewidth = 0;
 			if ($comp_id)
 				printCompetitor($comp_id);
 			else
@@ -746,11 +756,18 @@ function expand(id,immediate)
 	echo "</div>";
 	echo "</TD></TR>";
 	echo "</TABLE>";
-	echo "<script>cllsNoR = new Array(0";
-	foreach ($cllsNoR as $val) echo ",$val";
-	echo ");";
-	if ($cllId) echo "expand($cllId,true);";
-	if ($compPos) echo "document.getElementById('cll$cllId').scrollTop = ".($compPos*18).";";
+	echo "<script>";
+	if (isset($cllsNoR))
+	{
+		echo "cllsNoR = new Array(0";
+		foreach ($cllsNoR as $val) echo ",$val";
+		echo ");";
+	}
+	if (isset($cllId))
+	{
+		if ($cllId) echo "expand($cllId,true);";
+		if (isset($compPos) && $compPos) echo "document.getElementById('cll$cllId').scrollTop = ".($compPos*18).";";
+	}
 	echo "</script>";
 	//
 	mysql_close();

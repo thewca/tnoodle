@@ -7,7 +7,7 @@ if(!isset($_SESSION)) {
 	session_start();
 }
 include "inc_private.php";
-if (!$_SESSION["c_admin"] || !preg_match("~//(www.|test.)?".DOMAIN."~i",$_SERVER["HTTP_REFERER"]))
+if (!$_SESSION["c_admin"] || !preg_match("~//(www\\.|test\\.)?".DOMAIN."~i",$_SERVER["HTTP_REFERER"]))
 {
 	$txt = <<<TEXT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

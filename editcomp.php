@@ -143,7 +143,7 @@ function submitForm()
 										"&gender="+document.frm.gender.value, 
 										false);
 		req.send (null);
-		if (req.responseText != "")
+		if (req.responseText.replace(/^[\s\r\n]+/,"") != "")
 			alert(req.responseText);
 		else
 		{

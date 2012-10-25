@@ -7,7 +7,7 @@ $color = "#6b7b71";
 $light_color = "#b0c7b4";
 $dark_color = "#0a1414";
 
-$test = preg_match("~(^test\056|//test\056)~i",$_SERVER["HTTP_HOST"]);
+$test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
@@ -61,7 +61,7 @@ function callPage(url)
 	var req = createXMLHttpRequest();
 	req.open ("GET", url, false);
 	req.send (null);
-	if (!req.responseText)
+	if (!req.responseText.replace(/^[\s\r\n]+/,""))
 		window.location.reload();
 	else
 		alert(req.responseText);

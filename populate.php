@@ -36,14 +36,11 @@ if ($_GET["cat_id"] && $_GET["round"])
 			// bug - the following line is excluding competitors with all DNF from the total number of competitors
 			// $ncomps = mysql_num_rows($list);
 			// fix
-
 			$query =
 				  "SELECT COUNT(*) AS count FROM $timestable ".
 				  "WHERE cat_id=" .$cat_id. " AND round=" .($round-1);
-
 			$ncomps = mysql_result(mysql_query($query),0,"count");
-				// fix end
-  43	
+			// fix end
 
 			if (!$ncomps) die("Cannot open this round: no one qualified");
 			$qualified = cased_mysql_result($event,0,"r".$round."_groupsize");
@@ -115,3 +112,4 @@ if ($_GET["cat_id"] && $_GET["round"])
 	mysql_close();
 }
 ?>
+	
