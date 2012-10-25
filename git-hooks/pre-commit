@@ -3,13 +3,12 @@
 # Basic idea stolen from http://tech.yipit.com/2011/11/16/183772396/
 
 function cleanup() {
-    git reset --hard
-    git stash pop --quiet --index
+    git stash pop --quiet
 }
 trap cleanup 0
 
 # We want to check our stage (the stuff we're about to commit!),
 # not the current contents of our directory.
-git stash --keep-index
+git stash -q --keep-index
 
 python git-tools/lint.py || ( echo "Failed pre-commit check. Use git commit --no-verify if you really know what you're doing."; exit 1 )
