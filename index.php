@@ -2,7 +2,7 @@
 require_once "lib.php";
 session_start();
 $IE = (preg_match("/msie/i",$_SERVER["HTTP_USER_AGENT"]) || preg_match("/internet explorer/i",$_SERVER["HTTP_USER_AGENT"]));
-$live = preg_match("~live\056cubecomps\056com~i",$_SERVER["HTTP_HOST"]);
+$live = preg_match("~live\\.cubecomps\\.com~i",$_SERVER["HTTP_HOST"]);
 //echo "IE=$IE, live=$live<br>";
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
