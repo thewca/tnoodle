@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Basic idea stolen from http://tech.yipit.com/2011/11/16/183772396/
+# git commands for looking at the stage come from
+# http://codeinthehole.com/writing/tips-for-using-a-git-pre-commit-hook/
 
 function cleanup() {
     git stash pop --quiet
