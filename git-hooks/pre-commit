@@ -1,6 +1,15 @@
 #!/bin/sh
 
-# From http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR
-( cd ../../; python git-tools/lint.py ) || ( echo "Failed pre-commit check. Use git commit --no-verify if you really know what you're doing."; exit 1 )
+# Basic idea stolen from http://tech.yipit.com/2011/11/16/183772396/
+
+function cleanup() {
+    git reset --hard
+    git stash pop --quiet --index
+}
+trap cleanup 0
+
+# We want to check our stage (the stuff we're about to commit!),
+# not the current contents of our directory.
+git stash --keep-index
+
+python git-tools/lint.py || ( echo "Failed pre-commit check. Use git commit --no-verify if you really know what you're doing."; exit 1 )
