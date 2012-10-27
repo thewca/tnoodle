@@ -136,42 +136,53 @@ public class ClockScrambler extends Scrambler {
 
 	}
 
-	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) {
+	/**
+	 * Parse a clock scramble and fill the seq array.
+	 * @param scramble  clock scramble as a String
+	 * @param seq       array representing the number of rotations for each position
+	 * @param pins      the position of the pins after the last move
+	 */
+	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) throws InvalidScrambleException {
+
+		int[] temp = new int[9];
+
 		if(scramble == null || scramble.length() == 0) {
 			return;
 		}
 
-		int i;
-
 		StringBuffer sb = new StringBuffer();
 		sb.append(turns[0]);
-		for (i=1; i<turns.length; i++)
+		for (int i=1; i<turns.length; i++)
 			sb.append("|"+turns[i]);
 		sb.append("|y");
 
 		Pattern p = Pattern.compile("("+sb.toString()+")(\\d)(\\+|-)?");
 		Matcher m = p.matcher(scramble);
 
-		int side = 1;
-
 		while( m.find() ){
 			if( m.group(1).equals("y") ){
-				side = 1 - side;
+				System.arraycopy(seq, 0, temp, 0, 9);
+				System.arraycopy(seq, 9, seq, 0, 9);
+				System.arraycopy(temp, 0, seq, 9, 9);
 				continue;
 			}
-			int pin;
-			for (pin = 0; pin < turns.length; pin++)
-				if(turns[pin].equals(m.group(1)))
+
+			int turn;
+			for (turn = 0; turn < turns.length; turn++)
+				if(turns[turn].equals(m.group(1)))
 					break;
+			if (turn == turns.length)
+				throw new InvalidScrambleException("Unknown turn");
+
 			int rot = Integer.parseInt(m.group(2));
 			rot = ( m.group(3).equals("+") ) ? rot : 12 - rot;
-			seq[pin+9*side] = rot;
+			seq[turn] = rot;
 
 			/* TODO: set the intermediate pins position (pins array) */
 		}
 
 		scramble += " "; // Hack for the next pattern to work.
-		for (i=0; i<4; i++){
+		for (int i=0; i<4; i++){
 			p = Pattern.compile(turns[i]+"(\\D)");
 			m = p.matcher(scramble);
 
