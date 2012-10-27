@@ -164,6 +164,8 @@ public class ClockScrambler extends Scrambler {
 				System.arraycopy(seq, 0, temp, 0, 9);
 				System.arraycopy(seq, 9, seq, 0, 9);
 				System.arraycopy(temp, 0, seq, 9, 9);
+				for (int i=0; i<4; i++)
+					pins[i] = false;
 				continue;
 			}
 
@@ -177,20 +179,36 @@ public class ClockScrambler extends Scrambler {
 			int rot = Integer.parseInt(m.group(2));
 			rot = ( m.group(3).equals("+") ) ? rot : 12 - rot;
 			seq[turn] = rot;
-
-			/* TODO: set the intermediate pins position (pins array) */
+			guessPinsAfterTurn(pins, turn);
 		}
 
+		boolean[] lastPins = new boolean[4];
+		boolean pinsPosition = false;
 		scramble += " "; // Hack for the next pattern to work.
 		for (int i=0; i<4; i++){
 			p = Pattern.compile(turns[i]+"(\\D)");
 			m = p.matcher(scramble);
-
-			if( m.find() ){
-				int i2r = (i==0?1:(i==1?3:(i==2?2:0)));
-				pins[i2r] = true;
-			}
+			int pinI = (i==0?1:(i==1?3:(i==2?2:0)));
+			lastPins[pinI] = m.find();
+			pinsPosition |= lastPins[pinI];
 		}
+		if( pinsPosition )
+			System.arraycopy(lastPins, 0, pins, 0, 4);
+	}
+
+	/**
+	 * We guess the pins position after a move, for incremental scrambling.
+	 * We use the moves array for that. More precisely, we use look if two consecutive 'edges' are moved by a turn.
+	 * If so, then the pin around them is up.
+	 * I'm glad I found that trick :)
+	 * @param pins   position of pins
+	 * @param turn   turn that just has been done
+	 */
+	private void guessPinsAfterTurn(boolean[] pins, int turn){
+		int[] edges1 = {3, 1, 3, 5};
+		int[] edges2 = {1, 5, 7, 7};
+		for (int p=0; p<4; p++)
+			pins[p] = ( moves[turn][edges1[p]] * moves[turn][edges2[p]] ) != 0;
 	}
 
 	protected void drawBackground( Graphics2D g, HashMap<String, Color> colorScheme ) {
