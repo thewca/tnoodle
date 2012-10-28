@@ -197,28 +197,8 @@ class tmt:
 		else:
 			print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
 
-	def _getFilesList(self):
-		lsFilesCmd = None
-		if tmt.args.all:
-			# Check every file under version control.
-			lsFilesCmd = "git ls-files"
-		else:
-			# Check the files that git believes have been edited.
-			lsFilesCmd = "git diff --cached --name-only"
-		files = os.popen(lsFilesCmd).read().split('\n')
-		return files
-
-	def _lint(self):
-		files = self._getFilesList()
-		failures = lint.lint(files)
-		if failures:
-			print
-			print "*********%s errors found**********" % len(failures)
-			print
-			sys.exit('\n'.join(failures))
-
 	def _strings(self):
-		files = self._getFilesList()
+		files = lint.gitFilesList(tmt.args.all)
 		commentOrStringRe = re.compile(r"(\"(\\.|[^\\\"])*\"|'(\\.|[^\\'])*'|//[^\n]*|/(\\.|[^\\\/\n])*/|/\*.*?\*/)", re.DOTALL)
 		externalizeableFileExts = set((".js", ".java"))
 		for f in files:
@@ -349,17 +329,15 @@ class tmt:
 			help='Do not prune duplicate projects')
 		parser_graph.set_defaults(func=self._graph)
 
-		desc = "Run JSLint on some (or all) js and html files. Also checks " +\
-			   "for appearances of characters we don't allow in the repository"
+		desc = lint.desc()
 		parser_lint = subparsers.add_parser(
 			'lint',
 			help=desc, description=desc,
 			formatter_class=ArgumentDefaultsHelpFormatter)
-		parser_lint.add_argument(
-			'--all', '-a',
-			action="store_true", default=False,
-			help="Lint all files, even if they haven't been edited")
-		parser_lint.set_defaults(func=self._lint)
+		lint.setupArgparser(parser_lint)
+		def lintIt():
+			lint.main(tmt.args)
+		parser_lint.set_defaults(func=lintIt)
 
 		desc = "Scan files for strings ripe for i18n."
 		parser_strings = subparsers.add_parser(

@@ -41,23 +41,6 @@
 </style>
 
 <script type="text/javascript">
-  var cache = window.applicationCache;
-  cache.addEventListener('cached', cachedCallback, false);
-  cache.addEventListener('checking', cachedCallback, false);
-  cache.addEventListener('downloading', cachedCallback, false);
-  cache.addEventListener('error', cachedCallback, false);
-  cache.addEventListener('noupdate', cachedCallback, false);
-  cache.addEventListener('obsolete', cachedCallback, false);
-  cache.addEventListener('progress', cachedCallback, false);
-  cache.addEventListener('updateready', updateReadyCache, false);
-
-  var cache = window.applicationCache;
-  function updateReadyCache() {
-    window.applicationCache.swapCache();
-    location.reload(true); // For now
-  }
-
-
   var progress = "#FF8";
   var done = "#8F8";
   var error = "#F88";
@@ -72,11 +55,15 @@
     "obsolete" : [ "Cache is obsolete.", error ],
     "progress" : [ "In progress...", progress ],
     "updateready" : [ "Update ready...", other ]
-  }
+  };
 
+  function updateReadyCache() {
+    window.applicationCache.swapCache();
+    location.reload(true); // For now
+  }
   function cachedCallback(e) {
-    console.log("Cache event: " + e.type + "(status is " + cache.status
-        + ", online is " + navigator.onLine + ")");
+    //console. log("Cache event: " + e.type + "(status is " + cache.status
+        //+ ", online is " + navigator.onLine + ")");
     if (navigator.onLine) {
       $("#cache_status").html(eventList[e.type][0]);
       $("#cache_status").css('background-color', eventList[e.type][1]);
@@ -84,7 +71,18 @@
       $("#cache_status").html("You're offline!");
       $("#cache_status").css('background-color', done);
     }
-  };
+  }
+
+  var cache = window.applicationCache;
+  cache.addEventListener('cached', cachedCallback, false);
+  cache.addEventListener('checking', cachedCallback, false);
+  cache.addEventListener('downloading', cachedCallback, false);
+  cache.addEventListener('error', cachedCallback, false);
+  cache.addEventListener('noupdate', cachedCallback, false);
+  cache.addEventListener('obsolete', cachedCallback, false);
+  cache.addEventListener('progress', cachedCallback, false);
+  cache.addEventListener('updateready', updateReadyCache, false);
+
 </script>
 
 </head>
@@ -113,8 +111,9 @@
           <ul>
             <li>Firefox will normally ask (see example), Google
               Chrome will normally store it without asking.</li>
-          </ul></li>
-        <li>Wait for the indicator above to turn green.
+          </ul>
+        </li>
+        <li>Wait for the indicator above to turn green.</li>
         <li>Visit <a href="./">twisty.js</a> again once you're
           offline.</li>
       </ol>

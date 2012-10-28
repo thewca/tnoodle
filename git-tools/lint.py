@@ -7,20 +7,29 @@ import subprocess
 JSLINT_ENABLED = True
 CHECK_ILLEGAL_CHAR = True
 
-JSLINT_IGNORED_ERRORS = set([
+JSLINT_IGNORED_ERRORS = {
+  # html/css errors
   'type is unnecessary.',
   "Unexpected token 'ew-resize'.",
   "Unrecognized style attribute 'border-bottom-right-radius'.",
   "Unrecognized style attribute 'border-bottom-left-radius'.",
+  "Unrecognized style attribute 'border-radius'.",
+  "Unrecognized style attribute 'box-shadow'.",
   "Bad input type.",
+
+  # javascript errors
   "is better written in dot notation",
-])
+  "A constructor name should start with an uppercase letter.",
+  "All 'debugger' statements should be removed.",
+  'Unnecessary "use strict".',
+  "Empty block.",
+}
 
 NO_JSLINT_KEYWORD = 'BLW-DUCPHAM'
 
-UNCOMMITABLE_PHRASES = set([
-	'<'+'<'+'<',
-])
+UNCOMMITABLE_PHRASES = {
+    '<'+'<'+'<'
+}
 
 # Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 # This should jive with git's definition of binary.
@@ -120,22 +129,42 @@ def lint(files):
 							failures.append(error)
 	return failures
 
-if __name__ == "__main__":
-  from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-  parser = ArgumentParser(
-      description='lint git repo',
-      formatter_class=ArgumentDefaultsHelpFormatter)
+def setupArgparser(parser):
   parser.add_argument(
     '--all', '-a',
     default=False,
     action='store_true',
     help='Lint all files, rather than just the ones git believes have been modified')
-  args = parser.parse_args()
+  parser.add_argument('files', nargs="*")
 
-  files = gitFilesList(args.all)
+def desc():
+    return "Run JSLint on some (or all) js and html files. Also checks " +\
+            "for appearances of characters we don't allow in the repository"
+
+def main(args):
+  if args.files:
+    files = args.files
+    failed = False
+    for f in files:
+      if not os.path.exists(f):
+        sys.stderr.write("Cannot find %s\n" % f)
+        failed = True
+    if failed:
+        sys.exit(1)
+  else:
+    files = gitFilesList(args.all)
   failures = lint(files)
   if failures:
     print
     print "*********%s errors found**********" % len(failures)
     print
     sys.exit('\n'.join(failures))
+
+if __name__ == "__main__":
+  from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+  parser = ArgumentParser(
+      description=desc(),
+      formatter_class=ArgumentDefaultsHelpFormatter)
+  setupArgparser(parser)
+  args = parser.parse_args()
+  main(args)

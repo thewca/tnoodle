@@ -14,22 +14,123 @@
  * 
  */
 
+/*
+ * Convenience Logging
+ */
+
+var logCounter = 0;
+
+function log(obj) {
+  if(typeof(console) !== "undefined") {
+    var con = console;
+    con.log(obj);
+  }
+  var previousHTML = $("#debug").html();
+  previousHTML = (logCounter++) + ". " + obj + "<hr/>" + previousHTML;
+  $("#debug").html(previousHTML);
+}
+
+function err(obj) {
+  if(typeof(console) !== "undefined") {
+    var con = console;
+    con.error(obj);
+  }
+  var previousHTML = $("#debug").html();
+  previousHTML = "<div class='err'>" + (logCounter++) + ". " + obj + "</div><hr/>" + previousHTML;
+  $("#debug").html(previousHTML);
+}
+
+/*
+ * Algs for testing
+ */
+
+var lucasparity = "r U2 x r U2 r U2 r' U2 l U2 r' U2 r U2 r' U2 r'";
+var superflip = "U R2 F B R B2 R U2 L B2 R U' D' R2 F R' L B2 U2 F2";
+
+function makeCCC(n) {
+  var moves = [];
+  var base = "L' U R' F' U L2 U2 L' U' L U2 D R' D' F2 R2 U'".split(" ");
+  for(var i = 1; i<=n/2; i++) {
+	  for(var j = 0; j < base.length; j++) {
+		  moves.push(i + base[j]);
+	  }
+  }
+  return moves.join(" ");
+}
+
 var cache = window.applicationCache;
 function updateReadyCache() {
   window.applicationCache.swapCache();
   location.reload(true); // For now
 }
 
+
+function pad(n, minLength) {
+  var str = '' + n;
+  while (str.length < minLength) {
+    str = '0' + str;
+  }
+  return str;
+}
+
 var startTime = null;
 var stopTime = null;
+function isTiming() {
+  return startTime !== null && stopTime === null;
+}
+
+function prettyTime(endTime) {
+  var cumulative = endTime - startTime;
+  var str = "";
+  str += Math.floor(cumulative/1000/60);
+  str += ":";
+  str += pad(Math.floor(cumulative/1000 % 60), 2);
+  str += ".";
+  str += pad(Math.floor((cumulative % 1000) / 10), 2);
+  return str;
+}
+
+function refreshTimer() {
+  var timer = $("#timer");
+  timer.removeClass("reset running stopped");
+  if(isTiming()) {
+    timer.addClass("running");
+    timer.text(prettyTime(new Date().getTime()));
+  } else if(startTime === null) {
+    assert(stopTime === null);
+    timer.addClass("reset");
+    timer.text("[Timer]");
+  } else if(stopTime !== null) {
+    assert(startTime);
+    timer.addClass("stopped");
+    timer.text(prettyTime(stopTime));
+  }
+}
+
+var pendingTimerRefresh = null;
+function refreshTimerLoop() {
+  refreshTimer();
+  if(pendingTimerRefresh !== null) {
+    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+  }
+}
+function startRefreshTimerLoop() {
+  if(pendingTimerRefresh === null) {
+    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
+  }
+}
+function stopRefreshTimerLoop() {
+  if(pendingTimerRefresh !== null) {
+    cancelRequestAnimFrame(pendingTimerRefresh);
+    pendingTimerRefresh = null;
+  }
+}
+
 function startTimer() {
   startTime = new Date().getTime();
   stopTime = null;
   refreshTimer();
   startRefreshTimerLoop();
-}
-function isTiming() {
-  return startTime != null && stopTime == null;
 }
 function stopTimer() {
   assert(startTime);
@@ -45,67 +146,11 @@ function resetTimer() {
   stopRefreshTimerLoop();
 }
 
-function refreshTimer() {
-  var timer = $("#timer");
-  timer.removeClass("reset running stopped");
-  if(isTiming()) {
-    timer.addClass("running");
-    timer.text(prettyTime(new Date().getTime()));
-  } else if(startTime == null) {
-    assert(stopTime == null);
-    timer.addClass("reset");
-    timer.text("[Timer]");
-  } else if(stopTime != null) {
-    assert(startTime);
-    timer.addClass("stopped");
-    timer.text(prettyTime(stopTime));
-  }
-}
-
-var pendingTimerRefresh = null;
-function startRefreshTimerLoop() {
-  if(pendingTimerRefresh == null) {
-    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
-  }
-}
-function stopRefreshTimerLoop() {
-  if(pendingTimerRefresh != null) {
-    cancelRequestAnimFrame(pendingTimerRefresh);
-    pendingTimerRefresh = null;
-  }
-}
-function refreshTimerLoop() {
-  refreshTimer();
-  if(pendingTimerRefresh != null) {
-    pendingTimerRefresh = requestAnimFrame(refreshTimerLoop, $('#timer')[0]);
-  }
-}
-
-function pad(n, minLength) {
-  var str = '' + n;
-  while (str.length < minLength) {
-    str = '0' + str;
-  }
-  return str;
-}
-
-function prettyTime(endTime) {
-  var cumulative = endTime - startTime;
-  var str = "";
-  str += Math.floor(cumulative/1000/60);
-  str += ":";
-  str += pad(Math.floor(cumulative/1000 % 60), 2);
-  str += ".";
-  str += pad(Math.floor((cumulative % 1000) / 10), 2);
-  return str;
-}
-
-
 var CubeState = {
   solved: 0,
   scrambling: 1,
   scrambled: 2,
-  solving: 3,
+  solving: 3
 };
 var cubeState = null;
 
@@ -115,6 +160,33 @@ $(document).ready(function() {
    * Caching Stuff.
    */
 
+  function reDimensionCube() {
+    var dim = parseInt($("#cubeDimension").val(), 10);
+    if (!dim) {
+      dim = 3;
+    }
+    dim = Math.min(Math.max(dim, 1), 16);
+    if (dim != currentCubeSize) {
+      currentCubeSize = dim;
+      reloadCube();
+    }
+    resetTimer();
+  }
+
+  function reloadCube() {
+    log(currentCubeSize);
+    twistyScene.initializeTwisty({
+      "type": "cube",
+      "dimension": currentCubeSize,
+      "stickerBorder": $("#sticker_border").is(':checked'),
+      showFps: true
+    });
+    $("#cubeDimension").blur(); 
+    twistyScene.resize();
+    cubeState = CubeState.solved;
+    resetTimer();
+  }
+
 
   cache.addEventListener('updateready', updateReadyCache, false);
 
@@ -123,7 +195,7 @@ $(document).ready(function() {
   var twistyScene = new twistyjs.TwistyScene();
   $("#twistyContainer").append($(twistyScene.getDomElement()));
 
-  var currentCubeSize = parseInt($("#cubeDimension").val());
+  var currentCubeSize = parseInt($("#cubeDimension").val(), 10);
   reloadCube();
 
   $("#cubeDimension").bind("input", reDimensionCube);
@@ -159,33 +231,6 @@ $(document).ready(function() {
     $("#canvasPNG").html('<a href="' + img + '" target="blank"><img src="'+img+'"/></a>');
     $("#canvasPNG").fadeTo("slow", 1);
   });
-
-  function reDimensionCube() {
-    var dim = parseInt($("#cubeDimension").val());
-    if (!dim) {
-      dim = 3;
-    }
-    dim = Math.min(Math.max(dim, 1), 16);
-    if (dim != currentCubeSize) {
-      currentCubeSize = dim;
-      reloadCube();
-    }
-    resetTimer();
-  }
-
-  function reloadCube() {
-    log(currentCubeSize);
-    twistyScene.initializeTwisty({
-      "type": "cube",
-      "dimension": currentCubeSize,
-      "stickerBorder": $("#sticker_border").is(':checked'),
-      showFps: true
-    });
-    $("#cubeDimension").blur(); 
-    twistyScene.resize();
-    cubeState = CubeState.solved;
-    resetTimer();
-  }
 
   $(window).resize(twistyScene.resize);
 
@@ -230,11 +275,12 @@ $(document).ready(function() {
   });
 
   twistyScene.addMoveListener(function(move, started) {
+    var twisty;
     if(started) {
       if(cubeState == CubeState.scrambling) {
         // We don't want to start the timer if we're scrambling the cube.
       } else if(cubeState == CubeState.scrambled) {
-        var twisty = twistyScene.getTwisty();
+        twisty = twistyScene.getTwisty();
         if(twisty.isInspectionLegalMove(twisty, move)) {
           return;
         }
@@ -242,7 +288,7 @@ $(document).ready(function() {
         cubeState = CubeState.solving;
       }
     } else {
-      var twisty = twistyScene.getTwisty();
+      twisty = twistyScene.getTwisty();
       if(cubeState == CubeState.solving && twisty.isSolved(twisty)) {
         cubeState = CubeState.solved;
         stopTimer();
@@ -251,45 +297,3 @@ $(document).ready(function() {
   });
 
 });
-
-/*
- * Convenience Logging
- */
-
-var logCounter = 0;
-
-function log(obj) {
-  if(typeof(console) !== "undefined" && console.log) {
-    console.log(obj);
-  }
-  var previousHTML = $("#debug").html();
-  previousHTML = (logCounter++) + ". " + obj + "<hr/>" + previousHTML;
-  $("#debug").html(previousHTML);
-}
-
-function err(obj) {
-  if(typeof(console) !== "undefined" && console.error) {
-    console.error(obj);
-  }
-  var previousHTML = $("#debug").html();
-  previousHTML = "<div class='err'>" + (logCounter++) + ". " + obj + "</div><hr/>" + previousHTML;
-  $("#debug").html(previousHTML);
-}
-
-/*
- * Algs for testing
- */
-
-var lucasparity = "r U2 x r U2 r U2 r' U2 l U2 r' U2 r U2 r' U2 r'";
-var superflip = "U R2 F B R B2 R U2 L B2 R U' D' R2 F R' L B2 U2 F2";
-
-function makeCCC(n) {
-  var moves = [];
-  var base = "L' U R' F' U L2 U2 L' U' L U2 D R' D' F2 R2 U'".split(" ");
-  for(var i = 1; i<=n/2; i++) {
-	  for(var j = 0; j < base.length; j++) {
-		  moves.push(i + base[j]);
-	  }
-  }
-  return moves.join(" ");
-}

@@ -12,13 +12,14 @@ var twistyjs = {};
 
 if(typeof(log) == "undefined") {
   log = function(s) {
-     if(typeof(console) != "undefined" && console.log) {
-        console.log(s);
+     if(typeof(console) != "undefined") {
+        var con = console;
+        con.log(s);
      }
   };
 }
 
-// This fixes https://github.com/lgarron/twisty.js/issues/3
+// Safari doesn't have bind
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (oThis) {
     if (typeof this !== "function") {
@@ -31,9 +32,7 @@ if (!Function.prototype.bind) {
         fToBind = this, 
         fNOP = function () {},
         fBound = function () {
-          return fToBind.apply(this instanceof fNOP
-                                 ? this
-                                 : oThis || window,
+          return fToBind.apply(this instanceof fNOP ? this : oThis || window,
                                aArgs.concat(fSlice.call(arguments)));
         };
 
@@ -165,7 +164,7 @@ twistyjs.TwistyScene = function() {
     }
     // resize creates the camera and calls render()
     that.resize();
-  }
+  };
 
   this.resize = function() {
     // This function should be called after setting twistyContainer
@@ -213,7 +212,7 @@ twistyjs.TwistyScene = function() {
   this.cam = function(deltaTheta) {
     theta += deltaTheta;
     moveCamera(theta);
-  }
+  };
 
   function onDocumentMouseDown( event ) {
     event.preventDefault();
@@ -301,7 +300,7 @@ twistyjs.TwistyScene = function() {
 
   function startMove() {
     moveProgress = 0;
-    if(moveQueue.length == 0) {
+    if(moveQueue.length === 0) {
         currentMove = null;
         return;
     }
@@ -330,14 +329,14 @@ twistyjs.TwistyScene = function() {
   this.flushMoveQueue = function() {
     animationStep = 1;
     startMove();
-    while(currentMove != null) {
+    while(currentMove !== null) {
         stepAnimation();
     }
     render();
   };
   this.applyMoves = function(moveStr) {
     // TODO - what to do if there are moves in the queue?
-    assert(moveQueue.length == 0);
+    assert(moveQueue.length === 0);
     queueMoves(moveStr);
     that.flushMoveQueue();
   };
@@ -363,7 +362,7 @@ twistyjs.TwistyScene = function() {
   this.setState = function(state) {
     that.initializeTwisty(twistyType);
     // TODO - don't notify the moveListeners while inside applyMoves!
-    assert(moveQueue.length == 0);
+    assert(moveQueue.length === 0);
     if(state) {
         moveQueue = moveQueue.concat(state);
         that.flushMoveQueue();
@@ -390,7 +389,7 @@ twistyjs.TwistyScene = function() {
 
       currentMove = null;
 
-      if (moveQueue.length == 0) {
+      if (moveQueue.length === 0) {
         stopAnimation();
       }
       else {
@@ -412,13 +411,13 @@ twistyjs.TwistyScene = function() {
 
   var pendingAnimationLoop = null;
   function stopAnimation() {
-    if(pendingAnimationLoop != null) {
+    if(pendingAnimationLoop !== null) {
       cancelRequestAnimFrame(pendingAnimationLoop);
       pendingAnimationLoop = null;
     }
   }
   function startAnimationIfNecessary() {
-    if(pendingAnimationLoop == null && moveQueue.length > 0) {
+    if(pendingAnimationLoop === null && moveQueue.length > 0) {
       //log("Starting move queue: " + movesToString(moveQueue));
       startMove();
       pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
@@ -435,7 +434,7 @@ twistyjs.TwistyScene = function() {
     // That was fun, lets do it again!
     // We check pendingAnimationLoop first, because the loop
     // may have been cancelled during stepAnimation().
-    if(pendingAnimationLoop != null) {
+    if(pendingAnimationLoop !== null) {
       pendingAnimationLoop = requestAnimFrame(animateLoop, twistyCanvas);
     }
   }
@@ -465,9 +464,6 @@ twistyjs.TwistyScene = function() {
   }
 
 };
-
-  twistyjs.registerTwisty("plane", createPlaneTwisty);
-  twistyjs.registerTwisty("blank", createBlankTwisty);
 
   /*
    * Something simple for fallback/testing.
@@ -515,5 +511,8 @@ twistyjs.TwistyScene = function() {
     };
 
   }
+
+  twistyjs.registerTwisty("plane", createPlaneTwisty);
+  twistyjs.registerTwisty("blank", createBlankTwisty);
 
 })();

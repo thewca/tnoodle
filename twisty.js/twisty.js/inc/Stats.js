@@ -1,3 +1,4 @@
+//BLW-DUCPHAM
 /*
  * stats.js r6
  * http://github.com/mrdoob/stats.js

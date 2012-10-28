@@ -1,5 +1,6 @@
 var conf = require('./conf.js');
 var mongoose = require('mongoose');
+var util = require('util');
 mongoose.connect(conf.mongo.uri);
 
 //mongodb stuff
@@ -31,16 +32,16 @@ var storeObject = {
 	solveMillis: solveMillis 
 };
 var solveInstance = new Solve(storeObject);
-console.log(moves);//<<<
+util.puts(moves);
 var randomState = null;
-console.log(randomState);
-console.log(solveMillis);//<<<
+util.puts(randomState);
+util.puts(solveMillis);
 // TODO - store inspection time!!!
 // We clear randomState because we have now solved the puzzle.
 solveInstance.save(function(err){
-  console.log("SAVED SOME SHIT SOMEWHERE");
+  util.puts("SAVED SOME SHIT SOMEWHERE");
 
   if(err){
-	  console.log("db error : " + err);
+	  util.puts("db error : " + err);
   }
 });
