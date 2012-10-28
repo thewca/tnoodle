@@ -8,8 +8,7 @@ while true; do
 	# changes.
 	if [[ $RETVAL -eq 0 && "$PULL" != "Already up-to-date." ]]
 	then
-		git submodule init
-		git submodule update
+		git submodule update --init
 		# We've just pulled in some changes from our remote repo,
 		# so we evaluate the command line args given to us
 		eval "$@"
