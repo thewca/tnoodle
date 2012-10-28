@@ -51,9 +51,6 @@ def entryPoint():
 	return split(abspath(__file__))[0]
 gitToolsDir = join(entryPoint(), 'git-tools')
 sys.path.append(gitToolsDir)
-if len(os.listdir(gitToolsDir)) == 0:
-        print "The git-tools directory is empty. Perhaps you haven't checked out the submodules? I'm going to try to check them out now. In the future, pass --recursive to git clone"
-	runCmd([ 'git', 'submodule', 'update', '--init', '--recursive' ], showStatus=True, interactive=True)
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 import githubUpload
