@@ -1,5 +1,4 @@
 (function() {
-  twistyjs.registerTwisty("cube", createCubeTwisty);
   /*
    * Algorithm Helper Methods
    */
@@ -18,8 +17,9 @@
     var baseMove = parts[4]; 
     var amount = 1;
 
+    var outEndSliceParsed;
     if (/[UFRBLD]/g.test(baseMove)) {
-      var outEndSliceParsed = parseInt(parts[3]);
+      outEndSliceParsed = parseInt(parts[3], 10);
       if (!isNaN(outEndSliceParsed )) {
         outStartSlice = 1;
         outEndSlice = outEndSliceParsed;
@@ -31,12 +31,12 @@
       baseMove = baseMove.toUpperCase();
       outEndSlice = 2;
 
-      var outEndSliceParsed = parseInt(parts[3]);
+      outEndSliceParsed = parseInt(parts[3], 10);
       if (!isNaN(outEndSliceParsed )) {
         outEndSlice = outEndSliceParsed;
       }
 
-      var outStartSliceParsed = parseInt(parts[2]);
+      var outStartSliceParsed = parseInt(parts[2], 10);
       if (!isNaN(outStartSliceParsed )) {
         outStartSlice = outStartSliceParsed ;
       }
@@ -54,7 +54,7 @@
     
     /* Amount */
     
-    var amountParsed = parseInt(parts[5]);
+    var amountParsed = parseInt(parts[5], 10);
     if (!isNaN(amountParsed)) {
       amount = amountParsed;
     }
@@ -134,16 +134,18 @@
       "opacity": 1,
       "dimension": 3,
       "faceColors": [0xffffff, 0xff8800, 0x009900, 0xff0000, 0x0000ff, 0xffff00],
-      "scale": 1,
+      "scale": 1
     };
 
     // Passed Parameters
-    for (option in cubeOptions) {
-      if(option in twistyParameters) {
-        log("Setting option \"" + option + "\" to " + twistyParameters[option]);
-        cubeOptions[option] = twistyParameters[option];
+    for (var option in cubeOptions) {
+      if(cubeOptions.hasOwnProperty(option)) {
+        if(option in twistyParameters) {
+          log("Setting option \"" + option + "\" to " + twistyParameters[option]);
+          cubeOptions[option] = twistyParameters[option];
+        }
       }
-  };
+    }
 
     // Cube Constants
     var numSides = 6;
@@ -151,10 +153,12 @@
     // Cube Materials
     var materials = [];
     var borderMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } );
-    borderMaterial.opacity = cubeOptions["opacity"];
-    for (var i = 0; i < numSides; i++) {
-      var material = new THREE.MeshBasicMaterial( { color: cubeOptions["faceColors"][i] });
-      material.opacity = cubeOptions["opacity"];
+    borderMaterial.opacity = cubeOptions.opacity;
+
+    var i;
+    for (i = 0; i < numSides; i++) {
+      var material = new THREE.MeshBasicMaterial( { color: cubeOptions.faceColors[i] });
+      material.opacity = cubeOptions.opacity;
       materials.push(material);
     }
 
@@ -221,41 +225,41 @@
                  ];
 
   //Cube Object Generation
-  for (var i = 0; i < numSides; i++) {
+  for (i = 0; i < numSides; i++) {
     var facePieces = [];
     cubePieces.push(facePieces);
-    for (var su = 0; su < cubeOptions["dimension"]; su++) {
-      for (var sv = 0; sv < cubeOptions["dimension"]; sv++) {
+    for (var su = 0; su < cubeOptions.dimension; su++) {
+      for (var sv = 0; sv < cubeOptions.dimension; sv++) {
 
         var sticker = new THREE.Object3D();
 
         
         var meshes = [ materials[i] ];
-        if (cubeOptions["stickerBorder"]) {
+        if (cubeOptions.stickerBorder) {
           meshes.push(borderMaterial);
         }
         /* This is here purely for speed comparison purposes.
-         if (cubeOptions["stickerBorder"]) {
+         if (cubeOptions.stickerBorder) {
           var geometry = new THREE.Geometry();
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, +cubeOptions["stickerWidth"]/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions["stickerWidth"]/2, -cubeOptions["stickerWidth"]/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions.stickerWidth/2, +cubeOptions.stickerWidth/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, +cubeOptions.stickerWidth/2, 0) ) );
+          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
           var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: cubeOptions.opacity } ) );
 
           sticker.addChild(border);
         */
 
-        var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions["stickerWidth"], cubeOptions["stickerWidth"]), meshes);
-        stickerInterior.doubleSided = cubeOptions["doubleSided"];
+        var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions.stickerWidth, cubeOptions.stickerWidth), meshes);
+        stickerInterior.doubleSided = cubeOptions.doubleSided;
         sticker.addChild(stickerInterior);
 
         var positionMatrix = new THREE.Matrix4();
         positionMatrix.setTranslation(
-            su*2 - cubeOptions["dimension"] + 1,
-            -(sv*2 - cubeOptions["dimension"] + 1),
-            cubeOptions["dimension"]
+            su*2 - cubeOptions.dimension + 1,
+            -(sv*2 - cubeOptions.dimension + 1),
+            cubeOptions.dimension
         );    
 
         var transformationMatrix = new THREE.Matrix4();
@@ -277,15 +281,14 @@
       return m.n14*v.x + m.n24*v.y + m.n34*v.z;
     }
 
-    var actualScale = cubeOptions["scale"] * 0.5 / cubeOptions["dimension"];
+    var actualScale = cubeOptions.scale * 0.5 / cubeOptions.dimension;
     cubeObject.scale = new THREE.Vector3(actualScale, actualScale, actualScale);
 
     var animateMoveCallback = function(twisty, currentMove, moveProgress) {
       var rott = new THREE.Matrix4();
       rott.setRotationAxis(sidesRotAxis[currentMove[2]], moveProgress * currentMove[3] * Math.TAU/4);
 
-      var state = twisty["cubePieces"];
-
+      var state = twisty.cubePieces;
 
       for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
         var faceStickers = state[faceIndex];
@@ -298,15 +301,12 @@
           var layerStart = currentMove[0];
           var layerEnd = currentMove[1];
           if (layerEnd < 0) {
-            layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
+            layerEnd = twisty.options.dimension + 1 + layerEnd;
           }
 
           var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
-          if (
-              layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
-              &&
-              layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
-             ) {
+          if ( layer < twisty.options.dimension - 2*layerStart + 2.5 &&
+               layer > twisty.options.dimension - 2*layerEnd - 0.5 ) {
                var roty = rott.clone();
                roty.multiplySelf(sticker[0]);
 
@@ -341,7 +341,7 @@
       var rott = matrix4Power(sidesRot[currentMove[2]], currentMove[3]);
       //var rott = matrix4Power(sidesRot[currentMove[2]], 1);
 
-      var state = twisty["cubePieces"];
+      var state = twisty.cubePieces;
 
       for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
         var faceStickers = state[faceIndex];
@@ -355,29 +355,26 @@
           var layerStart = currentMove[0];
           var layerEnd = currentMove[1];
           if (layerEnd < 0) {
-            layerEnd = twisty["options"]["dimension"] + 1 + layerEnd;
+            layerEnd = twisty.options.dimension + 1 + layerEnd;
           }
 
           var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
-          if (
-              layer < twisty["options"]["dimension"] - 2*layerStart + 2.5
-              &&
-              layer > twisty["options"]["dimension"] - 2*layerEnd - 0.5
-             ) {
+          if ( layer < twisty.options.dimension - 2*layerStart + 2.5 &&
+               layer > twisty.options.dimension - 2*layerEnd - 0.5 ) {
                var roty = rott.clone();
                roty.multiplySelf(sticker[0]);
 
                sticker[1].matrix.copy(roty);
                sticker[0].copy(roty);
                sticker[1].update();
-             }
+          }
         }
       }
 
     };
 
     function generateRandomState(twisty) {
-      var dim = twisty["options"]["dimension"];
+      var dim = twisty.options.dimension;
       var n = 32;
       var newMoves = [];
       for (var i=0; i<n; i++) {
@@ -396,7 +393,7 @@
 
     var iS = 1;
     var oS = 1;
-    var iSi = cubeOptions["dimension"];
+    var iSi = cubeOptions.dimension;
     var cubeKeyMapping = {
       73: "R",
       75: "R'",
@@ -424,7 +421,7 @@
       // 190: "M'", TODO - stringToMoveSiGN doesn't support slice turns
       80: "z",
       81: "z'"
-    }
+    };
     var moveForKey = function(twisty, e) {
       if(e.altKey || e.ctrlKey) {
         return null;
@@ -436,14 +433,14 @@
         return cubeKeyMapping[keyCode];
       }
       return null;
-    }
+    };
 
     var ogCubePiecesCopy = [];
     for(var faceIndex = 0; faceIndex < cubePieces.length; faceIndex++) {
       var faceStickers = cubePieces[faceIndex];
       var ogFaceCopy = [];
       ogCubePiecesCopy.push(ogFaceCopy);
-      for(var i = 0; i < faceStickers.length; i++) {
+      for(i = 0; i < faceStickers.length; i++) {
         ogFaceCopy.push(cubePieces[faceIndex][i][0].clone());
       }
     }
@@ -459,7 +456,7 @@
     }
     var isSolved = function(twisty) {
       var state = twisty.cubePieces;
-      var dimension = twisty["options"]["dimension"];
+      var dimension = twisty.options.dimension;
 
 
       // This implementation of isSolved simply checks that
@@ -476,7 +473,7 @@
       //      netRotation = newLocation * (1/originalLocation)
       // We then proceed to compare every sticker to netRotation*originalLocation.
       //
-      // We deal with center stickers by apply all 4 rotations to the original location.
+      // We deal with center stickers by applying all 4 rotations to the original location.
       // If any of them match the new location, then we consider the sticker solved.
       var faceIndex = 0;
       var stickerIndex = 0;
@@ -486,9 +483,10 @@
           ogCubePiecesCopy[faceIndex][stickerIndex], matrixIdentity);
       netCubeRotations = netCubeRotations.multiply(stickerState, netCubeRotations);
 
-      for (var faceIndex = 0; faceIndex < state.length; faceIndex++) {
+      var ogState;
+      for (faceIndex = 0; faceIndex < state.length; faceIndex++) {
         var faceStickers = state[faceIndex];
-        for (var stickerIndex = 0; stickerIndex < faceStickers.length; stickerIndex++) {
+        for (stickerIndex = 0; stickerIndex < faceStickers.length; stickerIndex++) {
           // TODO - sticker isn't really a good name for this --jfly
           var currSticker = state[faceIndex][stickerIndex];
           var currState = currSticker[0];
@@ -505,7 +503,7 @@
 
             var rotatedOgState = ogCubePiecesCopy[faceIndex][stickerIndex].clone();
             var centerMatches = false;
-            for(var i = 0; i < 4; i++) {
+            for(i = 0; i < 4; i++) {
               var transformedRotatedOgState = new THREE.Matrix4();
               transformedRotatedOgState = ogState.multiply(netCubeRotations, rotatedOgState);
               if(areMatricesEqual(currState, transformedRotatedOgState)) {
@@ -520,7 +518,7 @@
             }
           } else {
             // Every non-center sticker should return to exactly where it was
-            var ogState = new THREE.Matrix4();
+            ogState = new THREE.Matrix4();
             ogState = ogState.multiply(netCubeRotations, ogCubePiecesCopy[faceIndex][stickerIndex]);
             if(!areMatricesEqual(currState, ogState)) {
               return false;
@@ -547,9 +545,10 @@
       "generateRandomState": generateRandomState,
       "moveForKey": moveForKey,
       "algToString": algToString,
-      "stringToAlg": stringToAlg,
+      "stringToAlg": stringToAlg
     };
 
   }
 
+  twistyjs.registerTwisty("cube", createCubeTwisty);
 })();

@@ -1,3 +1,4 @@
+// BLW-DUCPHAM
 // Three.js r41/ROME - http://github.com/mrdoob/three.js
 var THREE=THREE||{};if(!window.Int32Array)window.Int32Array=Array,window.Float32Array=Array;THREE.Color=function(b){this.setHex(b)};
 THREE.Color.prototype={copy:function(b){this.r=b.r;this.g=b.g;this.b=b.b;this.hex=b.hex},setHex:function(b){this.hex=~~b&16777215;this.updateRGB()},setRGB:function(b,c,d){this.r=b;this.g=c;this.b=d;this.updateHex()},setHSV:function(b,c,d){var e,f,g,j,k,m;if(d==0)e=f=g=0;else switch(j=Math.floor(b*6),k=b*6-j,b=d*(1-c),m=d*(1-c*k),c=d*(1-c*(1-k)),j){case 1:e=m;f=d;g=b;break;case 2:e=b;f=d;g=c;break;case 3:e=b;f=m;g=d;break;case 4:e=c;f=b;g=d;break;case 5:e=d;f=b;g=m;break;case 6:case 0:e=d,f=c,g=b}this.setRGB(e,
