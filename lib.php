@@ -45,10 +45,10 @@ function strict_mysql_query($query) {
 
 function refererMatchesHost()
 {
-    $referer    = $_SERVER['HTTP_REFERER'];
-    $host       = $_SERVER['HTTP_HOST'];
+    $referer = $_SERVER['HTTP_REFERER'];
+    $host = preg_quote($_SERVER['HTTP_HOST']);
 
-    if (preg_match("/^$host/", $referer)) {
+    if (preg_match("/^(http://)?$host/", $referer)) {
         return true;
     }
 
