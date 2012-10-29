@@ -201,7 +201,7 @@ class tmt:
 			sys.exit(1)
 
 	def assertCommitsPushed(self):
-		retVal, stdout, stderr = tmt.runCmd(['git', 'logt', '@{u}..'])
+		retVal, stdout, stderr = tmt.runCmd(['git', 'log', '@{u}..'], showStatus=True)
 		assert retVal == 0
 		assert stdout == ''
 		assert stderr == ''
