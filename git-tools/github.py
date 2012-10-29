@@ -10,6 +10,9 @@ import collections
 
 import getpass
 
+import requests
+
+
 def httpRequest(url, data=None, method=None, username=None, password=None):
 	#assert not (username ^ password)
 	assert username and password # TODO for now, we require credentials...
@@ -54,16 +57,30 @@ def githubDeleteFileById(fileId):
 	print responseText
 
 
-def githubConnect( organization, repo ):
+def connect(organization, repo):
 	# TODO - oopify library!
 	global username, password, baseUrl
 	baseUrl = 'https://api.github.com/repos/%s/%s' % ( organization, repo )
 	username = raw_input('Username: ')
 	print "Attempting to connect to github as %s" % ( username )
 	password = getpass.getpass()
+	r = requests.get('https://api.github.com/user', auth=(username, password))
+	assert r.status_code == requests.codes.ok
 
+def pullRequest(title, body):
+	pullUrl = '%s/pulls' % baseUrl
+	data = json.dumps({
+		"title": title,
+		"body": body,
+		"base": "master",
+		"head": "%s:master" % username
+	})
+	r = requests.post(pullUrl, auth=(username, password), data=data)
+	if r.status_code != requests.codes.ok:
+		print r.json
+		assert r.status_code == requests.codes.ok
 
-def githubUpload(filePath):
+def upload(filePath):
 	fileName = os.path.basename(filePath)
 	sizeBytes = os.stat(filePath).st_size
 
@@ -145,4 +162,4 @@ def githubUpload(filePath):
 		return False
 
 if __name__ == "__main__":
-	githubUpload('TODO')
+	upload('TODO')
