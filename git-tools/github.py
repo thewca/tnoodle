@@ -76,9 +76,9 @@ def pullRequest(title, body):
 		"head": "%s:master" % username
 	})
 	r = requests.post(pullUrl, auth=(username, password), data=data)
-	if r.status_code != requests.codes.ok:
+	if r.status_code != requests.codes.created:
 		print r.json
-		assert r.status_code == requests.codes.ok
+		assert r.status_code == requests.codes.created
 
 def upload(filePath):
 	fileName = os.path.basename(filePath)
