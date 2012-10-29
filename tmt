@@ -200,6 +200,12 @@ class tmt:
 			sys.stderr.write(stdout)
 			sys.exit(1)
 
+	def assertCommitsPushed(self):
+		retVal, stdout, stderr = tmt.runCmd(['git', 'logt', '@{u}..'])
+		assert retVal == 0
+		assert stdout == ''
+		assert stderr == ''
+
 	def _main(self):
 		self.args = tmt.parser.parse_args()
 		self._loadTmtProjects()
