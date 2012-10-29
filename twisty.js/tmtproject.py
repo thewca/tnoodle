@@ -10,4 +10,7 @@ class Project(tmt.TmtProject):
 	def clean(self):
 		pass
 
+	def check(self):
+		pass
+
 Project(tmt.projectName(), description="Lucas Garron's Javascript puzzle simulator.")
