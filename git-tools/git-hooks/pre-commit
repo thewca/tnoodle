@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# git commands for looking at the stage come from
+# http://codeinthehole.com/writing/tips-for-using-a-git-pre-commit-hook/
+
+function cleanup() {
+    git stash pop --quiet
+}
+trap cleanup 0
+
+# We want to check our stage (the stuff we're about to commit!),
+# not the current contents of our directory.
+git stash -q --keep-index
+
+python git-tools/lint.py || ( echo "Failed pre-commit check. Use git commit --no-verify if you really know what you're doing."; exit 1 )

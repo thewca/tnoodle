@@ -3,18 +3,26 @@ var nowjs = require('now');
 var url = require("url");
 var assert = require('assert');
 var conf = require('./conf.js');
+var util = require('util');
 var mongoose = require('mongoose');
 mongoose.connect(conf.mongo.uri);
 
 /*mongoose.addListener('error',function(errObj,scope_of_error) {
-	console.log(errObj);
-	console.log(scope_of_error);
+	util.puts(errObj);
+	util.puts(scope_of_error);
 });*/
 
 
-WEBROOT = 'webroot'
+WEBROOT = 'webroot';
 MESSAGE_RING_SIZE = 100;
 
+function log(statCode, url, ip, err) {
+  var logStr = statCode + ' - ' + url + ' - ' + ip;
+  if (err) {
+    logStr += ' - ' + err;
+  }
+  util.puts(logStr);
+}
 var httpServer = require('http').createServer(function(req, res) {
   var ip = req.connection.remoteAddress;
   paperboy
@@ -22,7 +30,7 @@ var httpServer = require('http').createServer(function(req, res) {
     .addHeader('Expires', 300)
     .addHeader('X-PaperRoute', 'Node')
     .before(function() {
-      console.log('Received Request');
+      util.puts('Received Request');
     })
     .after(function(statCode) {
       log(statCode, req.url, ip);
@@ -38,12 +46,6 @@ var httpServer = require('http').createServer(function(req, res) {
       log(404, req.url, ip, err);
     });
 });
-function log(statCode, url, ip, err) {
-  var logStr = statCode + ' - ' + url + ' - ' + ip;
-  if (err)
-    logStr += ' - ' + err;
-  console.log(logStr);
-}
 //mongodb stuff
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
@@ -172,15 +174,15 @@ function User(nick_, clientId_) {
   };
 
   this.addMove = function(moveState) {
-    console.log("game info " + JSON.stringify(that.channel.gameInfo));
+    util.puts("game info " + JSON.stringify(that.channel.gameInfo));
     if(!randomState) {
       // We don't keep track of turns for puzzles that
       // aren't being solved.
       return;
     }
     var lastTime;
-    if(moves.length == 0) {
-      assert.ok(lastMoveTimestamp == null);
+    if(moves.length === 0) {
+      assert.ok(lastMoveTimestamp === null);
       lastMoveTimestamp = moveState.timestamp;
     }
     var turn = new Turn({ move: moveState.move, delta: moveState.timestamp-lastMoveTimestamp});
@@ -195,18 +197,18 @@ function User(nick_, clientId_) {
         solveMillis: solveMillis 
       };
       var solveInstance = new Solve(storeObject);
-      console.log(moves);
-      console.log(randomState);
-      console.log(that.channel.gameInfo);
-      console.log(solveMillis);
+      util.puts(moves);
+      util.puts(randomState);
+      util.puts(that.channel.gameInfo);
+      util.puts(solveMillis);
       // TODO - store inspection time!!!
 	  // We clear randomState because we have now solved the puzzle.
 	  randomState = null;
       solveInstance.save(function(err){
-		  console.log("SAVED SOME SHIT SOMEWHERE");
+		  util.puts("SAVED SOME SHIT SOMEWHERE");
 
 		  if(err){
-			  console.log("db error : " + err);
+			  util.puts("db error : " + err);
 		  }
       });
     }
@@ -250,7 +252,7 @@ function Channel(channelName) {
 			adminUser = null;
 		}
 
-		if(userNames.length == 0) {
+		if(userNames.length === 0) {
 			// This channel is now empty, so we can delete it
 			delete channels[channelName];
 		} else {
@@ -300,7 +302,7 @@ function getChannel(channelName) {
 	var channel = channels[channelName];
 	if(!channel) {
 		channel = new Channel(channelName);
-		channels[channelName] = channel
+		channels[channelName] = channel;
 	}
 	return channel;
 }
@@ -391,15 +393,15 @@ everyone.now.sendMessage = auth(function(user, msg) {
 
 everyone.now.ping = function(callback) {
 	callback();
-}
+};
 
 nowjs.on('connect', function() {
-  console.log("Joined: " + this.user.clientId);
+  util.puts("Joined: " + this.user.clientId);
 });
 
 
 nowjs.on('disconnect', function(){
-  console.log("Left: " + this.user.clientId);
+  util.puts("Left: " + this.user.clientId);
   var user = users.getUserByClientId(this.user.clientId);
   if(user) {
 	  var channel = user.channel;

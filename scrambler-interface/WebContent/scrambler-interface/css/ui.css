@@ -1,0 +1,346 @@
+body, div, p {
+  margin: 0px auto;
+  padding: 0px;
+}
+
+body {
+  max-width: 800px;
+  min-width: 800px;
+  font-family: Helvetica, Tahoma, Arial;
+
+  background: #DEE;
+}
+
+body.busy {
+  background: #EED;
+}
+
+body.done {
+  background: #DEE;
+}
+
+
+
+h1 {
+  margin: 0px;
+  margin-bottom: 10px;
+  font-size: 200%;
+  color: #FFF;
+  font-variant: small-caps;
+  text-shadow: 2px 2px 5px #888;
+}
+
+
+
+.interface {
+  padding: 1em;
+  margin: 1em;
+  font-family: Helvetica;
+  border-radius: 1em;
+  background: #00C0C0;
+  text-align: center;
+}
+
+#top_interface h1#title {
+  font-size: 40px;
+}
+
+#top_interface h1#title a {
+  color: #FFF;
+}
+
+#top_interface h1#title a:hover {
+  color: #ADE;
+}
+
+#top_interface #logo_top {
+  width: 50px;
+  height: 50px;
+  vertical-align: middle;
+  margin-top: -5px;
+  margin-right: 20px;
+}
+
+#top_interface span.beta {
+  vertical-align: top;
+  font-size: 30%;
+  color: #00C0C0;
+  text-shadow: 0px 0px 5px #FFF, 0px 0px 10px #FFF, 0px 0px 15px #FFF, 0px 0px 20px #FFF;
+}
+
+#top_interface {
+  position: relative;
+}
+
+#scrambleProgress {
+  position: absolute;
+  bottom: 20px;
+  left: 10%;
+  width: 80%;
+}
+
+#initializationProgress {
+  position: absolute;
+  bottom: 20px;
+  left: 10%;
+  width: 80%;
+}
+
+#top_interface .scrambleButton {
+  font-size: 200%;
+  padding: 0.1em 1em;
+  margin-top: 15px;
+}
+
+#top_interface #helpLinkDiv {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}
+
+#top_interface #helpLinkDiv a {
+  color: #FFF;
+}
+
+#top_interface #competitionName,#passwordInput {
+  font-size: 150%;
+  width: 24em;
+  text-align: center;
+}
+
+#events_rounds_interface {
+  position: relative;
+}
+
+#events_rounds_interface .resetButton {
+  position: absolute;
+  right: 30px;
+}
+
+#events_rounds_interface #events_table {
+  border-collapse: collapse;
+  background: #CCC;
+  box-shadow: 2px 2px 5px #888;
+  margin: 12px auto;
+  font-size: 1.2em;
+}
+
+#events_rounds_interface #events_table tr {
+  padding: 0px;
+  margin: 0px;
+}
+
+#events_rounds_interface #events_table td {
+  padding: 0px;
+  margin: 0px;
+}
+
+#events_rounds_interface #events_table td {
+  border-top: 1px solid #888;w
+  border-bottom: 1px solid #888;
+}
+
+#events_rounds_interface #events_table td.event_amount_label {
+  border-left: 1px solid #888;
+  text-align: right;
+  padding: 4px;
+  padding-left: 8px;
+}
+
+#events_rounds_interface #events_table td.event_amount_value_td {
+  border-right: 1px solid #888;
+  padding-right: 4px;
+}
+
+#events_rounds_interface #events_table input.event_amount_value {
+  font-size: 20px;
+  width: 50px;
+}
+
+
+
+#events_rounds_interface #rounds_table {
+  border-collapse: collapse;
+  box-shadow: 2px 2px 5px #888;
+
+  clear: both;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+#events_rounds_interface #rounds_table tr {
+  border: 1px solid #888;
+  background: #CCC;
+}
+
+#events_rounds_interface #rounds_table thead td {
+  height: 2em;
+  padding: 0px 8px;
+  font-weight: bold;
+}
+
+#events_rounds_interface #rounds_table td {
+  padding: 0px 4px;
+  height: 1.5em;
+  text-align: center;
+}
+
+#events_rounds_interface #rounds_table tbody tr {
+  cursor: move;
+}
+
+#events_rounds_interface #rounds_table tbody td:nth-child(even) {
+  background: #DDD;
+}
+
+#events_rounds_interface #rounds_table td.event_name {
+  font-weight: bold;
+  text-align: right;
+  padding: 4px 8px;
+}
+
+#events_rounds_interface #rounds_table td input {
+  font-size: 1em;
+}
+
+#events_rounds_interface #rounds_table td input.round_name {
+  width: 10em;
+}
+
+#events_rounds_interface #rounds_table td.round_remove button {
+  height: 100%;
+  width: 3em;
+}
+
+#events_rounds_interface #rounds_table td input.num_groups {
+  width: 3em;
+}
+
+#events_rounds_interface #rounds_table td input.num_solves {
+  width: 3em;
+}
+
+/* 
+This can go once https://code.google.com/p/chromium/issues/detail?id=132014
+is resolved.
+*/
+.progressBar {
+  font-size: 200%;
+
+  border: 1px solid #;
+  background: #DEE;
+  overflow: hidden;
+}
+
+.progressDiv {
+	border: 1px solid #00C0C0;
+	background-color: #DEE;
+  padding-right: 10px;
+
+	background-image:
+		-webkit-linear-gradient(
+		-45deg,
+		rgba(0, 192, 192, 0.35) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(0, 192, 192, 0.35) 50%,
+		rgba(0, 192, 192, 0.35) 75%,
+		transparent 75%,
+		transparent
+	);
+	background-image:
+		-moz-linear-gradient(
+		-45deg,
+		rgba(0, 192, 192, 0.35) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(0, 192, 192, 0.35) 50%,
+		rgba(0, 192, 192, 0.35) 75%,
+		transparent 75%,
+		transparent
+	);
+	background-image:
+		-ms-linear-gradient(
+		-45deg,
+		rgba(0, 192, 192, 0.35) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(0, 192, 192, 0.35) 50%,
+		rgba(0, 192, 192, 0.35) 75%,
+		transparent 75%,
+		transparent
+	);
+	background-image:
+		linear-gradient(
+		-45deg,
+		rgba(0, 192, 192, 0.35) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(0, 192, 192, 0.35) 50%,
+		rgba(0, 192, 192, 0.35) 75%,
+		transparent 75%,
+		transparent
+	);
+
+	-webkit-background-size:50px 50px;
+	-moz-background-size:50px 50px;
+	-ms-background-size:50px 50px;
+	background-size:50px 50px;
+
+	-webkit-animation:move 2s linear infinite;
+	-moz-animation:move 2s linear infinite;
+	-ms-animation:move 2s linear infinite;
+	animation:move 2s linear infinite;
+
+	-webkit-border-radius:15px;
+	-moz-border-radius:15px;
+	-ms-border-radius:15px;
+	border-radius:15px;
+
+	overflow: hidden;
+
+	-webkit-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+	-moz-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+	-ms-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+	box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+}
+.bar > span:after {
+	display: none;
+}
+/*
+Animate the stripes
+*/	
+@-webkit-keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
+}	
+@-moz-keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
+}	
+@-ms-keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
+}	
+@keyframes move{
+  0% {
+  	background-position: 0 0;
+  }
+  100% {
+  	background-position: 50px 50px;
+  }
+}

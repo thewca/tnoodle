@@ -169,7 +169,7 @@ class Project(tmt.EclipseProject):
 			xmlFileOut.close()
 
 	def needsDb(self):
-		if tmt.args.project == None:
+		if getattr(tmt.args, "project", None) is None:
 			# None may not yet be a key in tmt.TmtProject.projects,
 			# we just hack around this by unconditionally returning True here.
 			return True

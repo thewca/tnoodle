@@ -18,7 +18,6 @@
 	<servlet-mapping>
 		<servlet-name>Quercus Servlet</servlet-name>
 		<url-pattern>*.php</url-pattern>
-		
 	</servlet-mapping>
 
 </web-app>
