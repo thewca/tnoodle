@@ -277,7 +277,7 @@ public class PyraminxScrambler extends Scrambler {
 	 * @return               true if a solution was found (stored in the solution array)
 	 *                       false if no solution was found
 	 */
-	private boolean search(int edgePerm, int edgeOrient, int cornerOrient, int depth, int length, int last_move, int solution[]){
+	private boolean search(int edgePerm, int edgeOrient, int cornerOrient, int depth, int length, int last_move, int solution[], Random randomiseMoves){
 
 		/* If there are no moves left to try (length=0), returns if the current position is solved */
 		if( length == 0 ) {
@@ -295,19 +295,22 @@ public class PyraminxScrambler extends Scrambler {
 		 * Try every move from the current position, and call the search function with the new position
 		 * and the updated parameters (depth -> depth+1; length -> length-1; last_move -> move)
 		 * We don't need to try a move of the same face as the last move.
+		 * We randomise the move order by generating a random offset.
 		 */
+		int randomOffset = randomiseMoves.nextInt(N_MOVES);
 		for( int move=0; move<N_MOVES; move++){
+			int randomMove = ( move + randomOffset ) % N_MOVES;
 			// Check if the tested move is of the same face as the previous move (last_move).
-			if(( move / 2 ) == ( last_move / 2 ))
+			if(( randomMove / 2 ) == ( last_move / 2 ))
 				continue;
 			// Apply the move
-			int newEdgePerm = moveEdgePerm[edgePerm][move];
-			int newEdgeOrient = moveEdgeOrient[edgeOrient][move];
-			int newCornerOrient = moveCornerOrient[cornerOrient][move];
+			int newEdgePerm = moveEdgePerm[edgePerm][randomMove];
+			int newEdgeOrient = moveEdgeOrient[edgeOrient][randomMove];
+			int newCornerOrient = moveCornerOrient[cornerOrient][randomMove];
 			// Call the recursive function
-			if( search( newEdgePerm, newEdgeOrient, newCornerOrient, depth+1, length-1, move, solution )){
+			if( search( newEdgePerm, newEdgeOrient, newCornerOrient, depth+1, length-1, randomMove, solution, randomiseMoves )){
 				// Store the move
-				solution[depth] = move;
+				solution[depth] = randomMove;
 				return true;
 			}
 		}
@@ -329,7 +332,7 @@ public class PyraminxScrambler extends Scrambler {
 
 		// Solve that position
 		int[] solution = new int[SCRAMBLE_LENGTH];
-		if( ! search(randomEdgePerm, randomEdgeOrient, randomCornerOrient, 0, SCRAMBLE_LENGTH, 42, solution )) // No solution was found
+		if( ! search(randomEdgePerm, randomEdgeOrient, randomCornerOrient, 0, SCRAMBLE_LENGTH, 42, solution, r )) // No solution was found
 			return "";
 
 		StringBuffer scramble = new StringBuffer((SCRAMBLE_LENGTH+4)*3);

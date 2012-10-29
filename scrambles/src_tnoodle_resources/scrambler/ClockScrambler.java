@@ -136,50 +136,79 @@ public class ClockScrambler extends Scrambler {
 
 	}
 
-	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) {
+	/**
+	 * Parse a clock scramble and fill the seq array.
+	 * @param scramble  clock scramble as a String
+	 * @param seq       array representing the number of rotations for each position
+	 * @param pins      the position of the pins after the last move
+	 */
+	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) throws InvalidScrambleException {
+
+		int[] temp = new int[9];
+
 		if(scramble == null || scramble.length() == 0) {
 			return;
 		}
 
-		int i;
-
 		StringBuffer sb = new StringBuffer();
 		sb.append(turns[0]);
-		for (i=1; i<turns.length; i++)
+		for (int i=1; i<turns.length; i++)
 			sb.append("|"+turns[i]);
 		sb.append("|y");
 
 		Pattern p = Pattern.compile("("+sb.toString()+")(\\d)(\\+|-)?");
 		Matcher m = p.matcher(scramble);
 
-		int side = 1;
-
 		while( m.find() ){
 			if( m.group(1).equals("y") ){
-				side = 1 - side;
+				System.arraycopy(seq, 0, temp, 0, 9);
+				System.arraycopy(seq, 9, seq, 0, 9);
+				System.arraycopy(temp, 0, seq, 9, 9);
+				for (int i=0; i<4; i++)
+					pins[i] = false;
 				continue;
 			}
-			int pin;
-			for (pin = 0; pin < turns.length; pin++)
-				if(turns[pin].equals(m.group(1)))
+
+			int turn;
+			for (turn = 0; turn < turns.length; turn++)
+				if(turns[turn].equals(m.group(1)))
 					break;
+			if (turn == turns.length)
+				throw new InvalidScrambleException("Unknown turn");
+
 			int rot = Integer.parseInt(m.group(2));
 			rot = ( m.group(3).equals("+") ) ? rot : 12 - rot;
-			seq[pin+9*side] = rot;
-
-			/* TODO: set the intermediate pins position (pins array) */
+			seq[turn] = rot;
+			guessPinsAfterTurn(pins, turn);
 		}
 
+		boolean[] lastPins = new boolean[4];
+		boolean pinsPosition = false;
 		scramble += " "; // Hack for the next pattern to work.
-		for (i=0; i<4; i++){
+		for (int i=0; i<4; i++){
 			p = Pattern.compile(turns[i]+"(\\D)");
 			m = p.matcher(scramble);
-
-			if( m.find() ){
-				int i2r = (i==0?1:(i==1?3:(i==2?2:0)));
-				pins[i2r] = true;
-			}
+			int pinI = (i==0?1:(i==1?3:(i==2?2:0)));
+			lastPins[pinI] = m.find();
+			pinsPosition |= lastPins[pinI];
 		}
+		if( pinsPosition )
+			System.arraycopy(lastPins, 0, pins, 0, 4);
+	}
+
+	/**
+	 * We guess the pins position after a move, for incremental scrambling.
+	 * We use the moves array for that. More precisely, we use look if two consecutive 'edges' are moved by a turn.
+	 * If so, then the pin around them is up.
+	 * I'm glad I found that trick :)
+	 * @param pins   position of pins
+	 * @param turn   turn that just has been done
+	 */
+	private void guessPinsAfterTurn(boolean[] pins, int turn){
+		int[] edges1 = {3, 1, 3, 5};
+		int[] edges2 = {1, 5, 7, 7};
+		for (int p=0; p<4; p++)
+			pins[p] = ( moves[turn][edges1[p]] * moves[turn][edges2[p]] ) != 0;
 	}
 
 	protected void drawBackground( Graphics2D g, HashMap<String, Color> colorScheme ) {

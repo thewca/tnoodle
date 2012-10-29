@@ -10,6 +10,9 @@ import collections
 
 import getpass
 
+import requests
+
+
 def httpRequest(url, data=None, method=None, username=None, password=None):
 	#assert not (username ^ password)
 	assert username and password # TODO for now, we require credentials...
@@ -41,29 +44,47 @@ def httpRequest(url, data=None, method=None, username=None, password=None):
 		return e.read()
 
 def githubListFiles():
-	listUrl = '%s/downloads' % ( baseUrl )
+	listUrl = '%s/downloads' % ( baseApiUrl )
 	responseText = httpRequest(listUrl, username=username, password=password)
 	responseJson = json.loads(responseText)
 	return responseJson
 
 
 def githubDeleteFileById(fileId):
-	deleteUrl = '%s/downloads/%d' % ( baseUrl, fileId )
+	deleteUrl = '%s/downloads/%d' % ( baseApiUrl, fileId )
 	responseText = httpRequest(deleteUrl, method="DELETE", username=username, password=password)
 	# TODO - check for errors!
 	print responseText
 
 
-def githubConnect( organization, repo ):
+def connect(organization, repo):
 	# TODO - oopify library!
-	global username, password, baseUrl
-	baseUrl = 'https://api.github.com/repos/%s/%s' % ( organization, repo )
+	global username, password, baseApiUrl, baseUrl
+	baseApiUrl = 'https://api.github.com/repos/%s/%s' % ( organization, repo )
+	baseUrl = 'https://github.com/%s/%s' % ( organization, repo )
 	username = raw_input('Username: ')
 	print "Attempting to connect to github as %s" % ( username )
 	password = getpass.getpass()
+	r = requests.get('https://api.github.com/user', auth=(username, password))
+	assert r.status_code == requests.codes.ok
 
+def pullRequest(title, body):
+	pullUrl = '%s/pulls' % baseApiUrl
+	data = json.dumps({
+		"title": title,
+		"body": body,
+		"base": "master",
+		"head": "%s:master" % username
+	})
+	r = requests.post(pullUrl, auth=(username, password), data=data)
+	if r.status_code != requests.codes.created:
+		print r.json
+		assert r.status_code == requests.codes.created
+	else:
+		pullRequestUrl = '%s/pull/%s' % (baseUrl, r.json['number'])
+		print "Pull request created at %s" % pullRequestUrl
 
-def githubUpload(filePath):
+def upload(filePath):
 	fileName = os.path.basename(filePath)
 	sizeBytes = os.stat(filePath).st_size
 
@@ -87,7 +108,7 @@ def githubUpload(filePath):
 	# We're just doing what they tell us to do.
 	# See http://developer.github.com/v3/repos/downloads/
 
-	uploadUrl = "%s/downloads" % ( baseUrl )
+	uploadUrl = "%s/downloads" % ( baseApiUrl )
 	data = { "name": fileName, "size": sizeBytes }
 	dataJson = json.dumps(data)
 
@@ -145,4 +166,4 @@ def githubUpload(filePath):
 		return False
 
 if __name__ == "__main__":
-	githubUpload('TODO')
+	upload('TODO')

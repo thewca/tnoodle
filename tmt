@@ -53,7 +53,7 @@ gitToolsDir = join(entryPoint(), 'git-tools')
 sys.path.append(gitToolsDir)
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
-import githubUpload
+import github
 import setupGitHooks
 import setupWindowsCygwinSymlinking
 from setupWindowsCygwinSymlinking import createSymlinkIfNotExistsOrStale, rmtree
@@ -185,6 +185,27 @@ class tmt:
 		for project in reversed(sortedProjects):
 			project.configure()
 
+	def assertWorkspaceClean(self):
+		retVal, stdout, stderr = tmt.runCmd(['git', 'ls-files', '--other', '--exclude-standard'])
+		assert retVal == 0
+		if stdout != '':
+			sys.stderr.write("Untracked files found, please deal with them before releasing:\n")
+			sys.stderr.write(stdout)
+			sys.exit(1)
+
+		retVal, stdout, stderr = tmt.runCmd(['git', 'diff', '--name-only'])
+		assert retVal == 0
+		if stdout != '':
+			sys.stderr.write("Edited files found, please commit them before releasing:\n")
+			sys.stderr.write(stdout)
+			sys.exit(1)
+
+	def assertCommitsPushed(self):
+		retVal, stdout, stderr = tmt.runCmd(['git', 'log', '@{u}..'], showStatus=True)
+		assert retVal == 0
+		assert stdout == ''
+		assert stderr == ''
+
 	def _main(self):
 		self.args = tmt.parser.parse_args()
 		self._loadTmtProjects()
@@ -196,6 +217,20 @@ class tmt:
 			assert False, "not yet implemented"
 		else:
 			print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
+
+	def _pullRequest(self):
+		self.assertWorkspaceClean()
+		self.assertCommitsPushed()
+		github.connect(organization="cubing", repo="tnoodle")
+
+		tmt.args.project = None
+		tmt.args.no_recursive = False
+		self._make(command='check')
+
+		body = tmt.args.body
+		body += "\n\n*************\nPull request automatically opened by " + \
+				"./tmt pull-request\n./tmt make check passed\n"
+		github.pullRequest(title=tmt.args.title, body=body)
 
 	def _strings(self):
 		files = lint.gitFilesList(tmt.args.all)
@@ -227,9 +262,9 @@ class tmt:
 					print "Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s)
 
 	def _make(self, projectName=None, command=None):
-		if projectName == None:
+		if projectName is None:
 			projectName = tmt.args.project
-		if command == None:
+		if command is None:
 			command = tmt.args.command
 		project = tmt.TmtProject.projects[projectName]
 		recurse = not tmt.args.no_recursive
@@ -349,6 +384,21 @@ class tmt:
 			action="store_true", default=False,
 			help="Check all files, even if they haven't been edited")
 		parser_strings.set_defaults(func=self._strings)
+
+		desc = "Run tests & submit pull request if successful"
+		pull_request = subparsers.add_parser(
+			'pull-request',
+			help=desc, description=desc,
+			formatter_class=ArgumentDefaultsHelpFormatter)
+		pull_request.add_argument(
+			'title',
+			default=None, type=str,
+			help="Title for this pull request")
+		pull_request.add_argument(
+			'body',
+			default=None, type=str,
+			help="Body for this pull request")
+		pull_request.set_defaults(func=self._pullRequest)
 
 	def memoize(self, func):
 		d = {}
@@ -793,19 +843,7 @@ class EclipseProject(TmtProject):
 	def release(self):
 		# TODO - this method is getting called for every project in the dependency heirarchy
 		if tmt.args.project == self.name:
-			retVal, stdout, stderr = tmt.runCmd(['git', 'ls-files', '--other', '--exclude-standard'])
-			assert retVal == 0
-			if stdout != '':
-				print "Untracked files found, please deal with them before releasing:"
-				print stdout
-				return
-
-			retVal, stdout, stderr = tmt.runCmd(['git', 'diff', '--name-only'])
-			assert retVal == 0
-			if stdout != '':
-				print "Edited files found, please commit them before releasing:"
-				print stdout
-				return
+			tmt.assertWorkspaceClean()
 
 			pullCommand = 'git pull'
 			print pullCommand
@@ -840,8 +878,8 @@ class EclipseProject(TmtProject):
 			# the version number of the resulting file will be correct.
 			self.dist()
 
-			githubUpload.githubConnect(organization="cubing", repo="tnoodle")
-			if not githubUpload.githubUpload(self.distJarFile()):
+			github.connect(organization="cubing", repo="tnoodle")
+			if not github.upload(self.distJarFile()):
 				print "Failed to upload %s, see above for details" % self.distJarFile()
 				print "Deleting tag %s" % tag
 				deleteTagCommand = "git tag -d %s" % (tag)
