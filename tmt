@@ -793,6 +793,7 @@ class EclipseProject(TmtProject):
 	def release(self):
 		# TODO - this method is getting called for every project in the dependency heirarchy
 		if tmt.args.project == self.name:
+            # TODO - consolidate with subtrees module instead
 			retVal, stdout, stderr = tmt.runCmd(['git', 'ls-files', '--other', '--exclude-standard'])
 			assert retVal == 0
 			if stdout != '':
