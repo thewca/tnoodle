@@ -220,6 +220,7 @@ class tmt:
 
 	def _pullRequest(self):
 		self.assertWorkspaceClean()
+		self.assertCommitsPushed()
 		github.connect(organization="cubing", repo="tnoodle")
 
 		tmt.args.project = None
