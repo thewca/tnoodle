@@ -226,7 +226,11 @@ class tmt:
 		tmt.args.project = None
 		tmt.args.no_recursive = False
 		self._make(command='check')
-		github.pullRequest(title=tmt.args.title, body=tmt.args.body)
+
+		body = tmt.args.body
+		body += "\n\n*************\nPull request automatically opened by " + \
+				"./tmt pull-request\n./tmt make check passed\n"
+		github.pullRequest(title=tmt.args.title, body=body)
 
 	def _strings(self):
 		files = lint.gitFilesList(tmt.args.all)
