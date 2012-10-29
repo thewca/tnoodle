@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # git commands for looking at the stage come from
 # http://codeinthehole.com/writing/tips-for-using-a-git-pre-commit-hook/
