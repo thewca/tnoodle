@@ -56,7 +56,7 @@ def setupSubtreeBranches():
         git(['log', '..@{u}'])
         git(['checkout', 'master'])
 
-        git(['stash', 'pop'])
+        git(['stash', 'pop'], assertSuccess=False)
 
 if __name__ == "__main__":
     setupSubtreeBranches()
