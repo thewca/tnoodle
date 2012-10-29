@@ -14,4 +14,7 @@ class Project(tmt.TmtProject):
 	def clean(self):
 		pass
 
+	def check(self):
+		pass
+
 Project(tmt.projectName(), description="A javascript game framework created with multiplayer racing in mind")
