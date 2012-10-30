@@ -5,6 +5,7 @@
  */
 include "inc_private.php";
 require_once "lib.php";
+
 if (!refererMatchesHost()) : 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -21,5 +22,5 @@ if (!refererMatchesHost()) :
    </body>
   </html>
 <?php
-exit;
-endif; ?>
+    exit;
+endif;
