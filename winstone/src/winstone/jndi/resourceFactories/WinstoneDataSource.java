@@ -159,11 +159,14 @@ public class WinstoneDataSource implements DataSource, Runnable {
             wrapper = new WinstoneConnection(conn, this);
             this.usedWrappers.add(wrapper);
         }
+        wrapper.setAutoCommit(true); // JFLY - quercus doesn't handle autoCommit=false
         return wrapper;
     }
 
     public Connection getConnection() throws SQLException {
-        return getConnection(this.retryCount);
+		Connection conn = getConnection(this.retryCount);
+        conn.setAutoCommit(true); // JFLY - quercus doesn't handle autoCommit=false
+        return conn;
     }
     
     /**
@@ -232,7 +235,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 throw err;
             }
         }
-        realConnection.setAutoCommit(false);
+        realConnection.setAutoCommit(true); // JFLY - quercus doesn't handle autoCommit=false
         WinstoneConnection wrapper = new WinstoneConnection(realConnection, this);
         this.usedWrappers.add(wrapper);
         return wrapper;
