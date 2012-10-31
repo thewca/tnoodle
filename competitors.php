@@ -1,6 +1,6 @@
 <?
 require_once "lib.php";
-include "lib_admin.php";
+require_once "lib_admin.php";
 
 function abbr($t)
 {
@@ -24,7 +24,7 @@ function columnHeader($caption,$o)
 	return $st;
 }
 
-include "db.php";
+require_once "db.php";
 
 $categories = strict_mysql_query("SELECT * FROM categories JOIN $eventstable ON categories.id=$eventstable.id ORDER BY categories.id");
 $ncats = mysql_num_rows($categories);

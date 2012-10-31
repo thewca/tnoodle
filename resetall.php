@@ -1,7 +1,7 @@
 <?
 session_start();
-include "lib_ref_admin.php";
-include "db.php";
+require_once "lib_ref_admin.php";
+require_once "db.php";
 
 $result = strict_mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
 if ($result && mysql_num_rows($result)==1)
