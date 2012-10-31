@@ -19,7 +19,7 @@ import java.util.SortedMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.server.SafeHttpServlet;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
@@ -31,13 +31,13 @@ public class PuzzleListHandler extends SafeHttpServlet {
 	private final List<Map<String, Object>> puzzleInfos;
 	private final String puzzleInfosJSON;
 	public PuzzleListHandler() throws BadClassDescriptionException, IOException {
-		SortedMap<String, LazyInstantiator<Scrambler>> scramblers = Scrambler.getScramblers();
+		SortedMap<String, LazyInstantiator<Puzzle>> scramblers = Puzzle.getScramblers();
 		
 		ArrayList<Map<String, Object>> puzzleInfos_ = new ArrayList<Map<String, Object>>(scramblers.size());
 		HashMap<String, Map<String, Object>> puzzleInfoByShortName_ = new HashMap<String, Map<String, Object>>(scramblers.size());
-		for(Entry<String, LazyInstantiator<Scrambler>> scrambler : scramblers.entrySet()) {
+		for(Entry<String, LazyInstantiator<Puzzle>> scrambler : scramblers.entrySet()) {
 			String shortName = scrambler.getKey();
-			String longName = Scrambler.getScramblerLongName(shortName);
+			String longName = Puzzle.getScramblerLongName(shortName);
 
 			Map<String, Object> puzzleInfo = new HashMap<String, Object>();
 			puzzleInfo.put("shortName", shortName);
@@ -51,8 +51,8 @@ public class PuzzleListHandler extends SafeHttpServlet {
 		puzzleInfosJSON = GSON.toJson(puzzleInfos);
 	}
 
-	private Map<String, Object> getPuzzleInfo(LazyInstantiator<Scrambler> lazyScrambler, boolean includeStatus) throws InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, MalformedURLException {
-		Scrambler scrambler = lazyScrambler.cachedInstance();
+	private Map<String, Object> getPuzzleInfo(LazyInstantiator<Puzzle> lazyScrambler, boolean includeStatus) throws InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, MalformedURLException {
+		Puzzle scrambler = lazyScrambler.cachedInstance();
 		Map<String, Object> info = puzzleInfoByShortName.get(scrambler.getShortName());
 		azzert(info != null);
 		// info is unmodifiable, so we copy it
@@ -76,13 +76,13 @@ public class PuzzleListHandler extends SafeHttpServlet {
 				sendError(request, response, "Please specify an extension");
 				return;
 			}
-			SortedMap<String, LazyInstantiator<Scrambler>> scramblers = Scrambler.getScramblers();
+			SortedMap<String, LazyInstantiator<Puzzle>> scramblers = Puzzle.getScramblers();
 			if(extension.equals("json")) {
 				if(puzzle.equals("")) {
 					if(includeStatus) {
 						ArrayList<Map<String, Object>> puzzleInfosWithStatus = new ArrayList<Map<String, Object>>();
 						for(Map<String, Object> puzzleInfo : puzzleInfos) {
-							LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzleInfo.get("shortName"));
+							LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzleInfo.get("shortName"));
 							azzert(lazyScrambler != null);
 							puzzleInfosWithStatus.add(getPuzzleInfo(lazyScrambler, includeStatus));
 						}
@@ -91,7 +91,7 @@ public class PuzzleListHandler extends SafeHttpServlet {
 						sendJSON(request, response, puzzleInfosJSON);
 					}
 				} else {
-					LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
+					LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzle);
 					if (lazyScrambler == null) {
 						sendError(request, response, "Invalid scrambler: " + puzzle);
 						return;

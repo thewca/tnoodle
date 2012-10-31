@@ -1,0 +1,5 @@
+# Comments immediately preceding a plugin definition are a detailed description
+# of that plugin.
+
+#Pyraminx
+pyram puzzle.PyraminxPuzzle()

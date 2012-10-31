@@ -1,0 +1,545 @@
+package net.gnehzr.tnoodle.scrambles;
+
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.Utils.ceil;
+import static net.gnehzr.tnoodle.utils.Utils.toColor;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.geom.GeneralPath;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
+import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
+import net.gnehzr.tnoodle.utils.Plugins;
+import net.gnehzr.tnoodle.utils.Strings;
+import net.gnehzr.tnoodle.utils.Utils;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
+/**
+ * Puzzle and TwistyPuzzle encapsulate all the information to filter out
+ * scrambles <= 1 move away from solved (see generateWCAScramble),
+ * and to generate random turn scrambles generically (see generateRandomMoves).
+ * 
+ * The original proposal for these classes is accessible here:
+ * https://docs.google.com/document/d/11ZfQPxAw0EhNNwE1yn5lZUO383qvAH6kJa2s3O9_6Zg/edit
+ * 
+ * @author jeremy
+ *
+ */
+public abstract class Puzzle {
+	private static final Logger l = Logger.getLogger(Puzzle.class.getName());
+	private static final int WCA_MIN_SCRAMBLE_DISTANCE = 1;
+
+	/**
+	 * Returns a String describing this Scrambler
+	 * appropriate for use in a url. This shouldn't contain any periods.
+	 * @return a url appropriate String unique to this Scrambler
+	 */
+	public abstract String getShortName();
+	
+	/**
+	 * Returns a String fully describing this Scrambler.
+	 * Unlike shortName(), may contain spaces and other url-inappropriate characters.
+	 * This will also be used for the toString method of this Scrambler.
+	 * @return a String
+	 */
+	public abstract String getLongName();
+
+	/**
+	 * Returns a number between 0 and 1 representing how "initialized" this
+	 * Scrambler is. 0 means nothing has been accomplished, and 1 means
+	 * we're done, and are generating scrambles.
+	 * @return A double between 0 and 1, inclusive.
+	 */
+
+	public double getInitializationStatus() {
+		return 1;
+	}
+	
+	/**
+	 * Generates a scramble appropriate for this Scrambler. It's important to note that
+	 * it's ok if this method takes some time to run, as it's going to be called many times and get queued up
+	 * by ScrambleCacher.
+	 * NOTE:  If a puzzle wants to provide custom scrambles
+	 * (for example: Pochmann style megaminx or MRSS), it should override generateRandomMoves.
+	 * @param r The instance of Random you must use as your source of randomness when generating scrambles.
+	 * @return A String containing the scramble, where turns are assumed to be separated by whitespace.
+	 */
+	public final String generateWCAScramble(Random r) {
+		PuzzleStateAndGenerator psag;
+		do {
+			psag = generateRandomMoves(r);
+		} while(psag.state.solvableIn(WCA_MIN_SCRAMBLE_DISTANCE));
+		return psag.generator;
+	}
+
+	/**
+	 * Subclasses of Scrambler are expected to produce scrambles of one size,
+	 * this abstract class will resize appropriately.
+	 * @return The size of the images this Scrambler will produce.
+	 */
+	protected abstract Dimension getPreferredSize();
+	
+	/**
+	 * @return A *new* HashMap mapping face names to Colors.
+	 */
+	public abstract HashMap<String, Color> getDefaultColorScheme();
+	
+	/**
+	 * @return A HashMap mapping face names to GeneralPaths.
+	 */
+	public abstract HashMap<String, GeneralPath> getDefaultFaceBoundaries();
+
+	private String[] generateScrambles(Random r, int count) {
+		String[] scrambles = new String[count];
+		for(int i = 0; i < count; i++) {
+			scrambles[i] = generateWCAScramble(r);
+		}
+		return scrambles;
+	}
+
+    private SecureRandom r = getSecureRandom();
+	private static final SecureRandom getSecureRandom() {
+		try {
+			return SecureRandom.getInstance("SHA1PRNG", "SUN");
+		} catch(NoSuchAlgorithmException e) {
+			l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
+			azzert(false);
+			return null;
+		} catch(NoSuchProviderException e) {
+			l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
+			azzert(false);
+			return null;
+		}
+	}
+
+	public final String generateScramble() {
+		return generateWCAScramble(r);
+	}
+	public final String[] generateScrambles(int count) {
+		return generateScrambles(r, count);
+	}
+	
+	/** seeded scrambles, these can't be cached, so they'll be a little slower **/
+	public final String generateSeededScramble(String seed) {
+		return generateSeededScramble(seed.getBytes());
+	}
+	public final String[] generateSeededScrambles(String seed, int count) {
+		return generateSeededScrambles(seed.getBytes(), count);
+	}
+	
+	private final String generateSeededScramble(byte[] seed) {
+		// we must create our own Random because other threads can access the static one
+		SecureRandom r = getSecureRandom();
+		r.setSeed(seed);
+		return generateWCAScramble(r);
+	}
+	private final String[] generateSeededScrambles(byte[] seed, int count) {
+		// we must create our own Random because other threads can access the static one
+		SecureRandom r = getSecureRandom();
+		r.setSeed(seed);
+		return generateScrambles(r, count);
+	}
+	
+	/**
+	 * @return Simply returns getLongName()
+	 */
+	public String toString() {
+		return getLongName();
+	}
+
+	private static Plugins<Puzzle> plugins = new Plugins<Puzzle>("puzzle", Puzzle.class, Puzzle.class.getClassLoader());
+
+	private static SortedMap<String, LazyInstantiator<Puzzle>> scramblers;
+	public static synchronized SortedMap<String, LazyInstantiator<Puzzle>> getScramblers() throws BadClassDescriptionException, IOException {
+		if(scramblers == null || plugins.reloadIfNeeded()) {
+			// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
+			SortedMap<String, LazyInstantiator<Puzzle>> newScramblers =
+				new TreeMap<String, LazyInstantiator<Puzzle>>(Strings.getNaturalComparator());
+			newScramblers.putAll(plugins.getPlugins());
+			scramblers = newScramblers;
+		}
+		return Collections.unmodifiableSortedMap(scramblers);
+	}
+
+	public static String getScramblerLongName(String shortName) throws BadClassDescriptionException, IOException {
+		getScramblers(); // force reloading the plugins, if necessary
+		return plugins.getPluginComment(shortName);
+	}
+	
+	/**
+	 * TODO - comment
+	 */
+	protected void drawPuzzleIcon(Graphics2D g, Dimension size) {
+		try {
+			drawScramble(g, size, "", null);
+		} catch(InvalidScrambleException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * TODO - comment
+	 * We should probably assert that the icons are of a particular size.
+	 */
+	public final void loadPuzzleIcon(ByteArrayOutputStream bytes) {
+		try {
+			File f = new File(plugins.getPluginDirectory(), getShortName() + ".png");
+			InputStream in = new FileInputStream(f);
+			Utils.fullyReadInputStream(in, bytes);
+		} catch(FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Dimension dim = new Dimension(32, 32);
+		BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = (Graphics2D) img.getGraphics();
+		drawPuzzleIcon(g, dim);
+		try {
+			ImageIO.write(img, "png", bytes);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Computes the best size to draw the scramble image.
+	 * @param maxWidth The maximum allowed width of the resulting image, 0 or null if it doesn't matter.
+	 * @param maxHeight The maximum allowed height of the resulting image, 0 or null if it doesn't matter.
+	 * @return The best size of the resulting image, constrained to maxWidth and maxHeight.
+	 */
+	public Dimension getPreferredSize(Integer maxWidth, Integer maxHeight) {
+		if(maxWidth == null) maxWidth = 0;
+		if(maxHeight == null) maxHeight = 0;
+		if(maxWidth == 0 && maxHeight == 0)
+			return getPreferredSize();
+		if(maxWidth == 0)
+			maxWidth = Integer.MAX_VALUE;
+		else if(maxHeight == 0)
+			maxHeight = Integer.MAX_VALUE;
+		double ratio = 1.0 * getPreferredSize().width / getPreferredSize().height;
+		int resultWidth = Math.min(maxWidth, ceil(maxHeight*ratio));
+		int resultHeight = Math.min(maxHeight, ceil(maxWidth/ratio));
+		return new Dimension(resultWidth, resultHeight);
+	}
+	
+	/**
+	 * TODO - document! alphabetical
+	 * @return
+	 */
+	public String[] getFaceNames() {
+		ArrayList<String> faces = new ArrayList<String>(getDefaultColorScheme().keySet());
+		Collections.sort(faces);
+		return faces.toArray(new String[faces.size()]);
+	}
+	
+	
+	/**
+	 * TODO - document!
+	 * @param colorScheme
+	 * @return
+	 */
+	public HashMap<String, Color> parseColorScheme(String scheme) {
+		HashMap<String, Color> colorScheme = getDefaultColorScheme();
+		if(scheme != null && !scheme.isEmpty()) {
+			String[] faces = getFaceNames();
+			String[] colors;
+			if(scheme.indexOf(',') > 0)
+				colors = scheme.split(",");
+			else {
+				char[] cols = scheme.toCharArray();
+				colors = new String[cols.length];
+				for(int i = 0; i < cols.length; i++) {
+					colors[i] = cols[i] + "";
+				}
+			}
+			if(colors.length != faces.length) {
+//				sendText(t, String.format("Incorrect number of colors specified (expecting %d, got %d)", faces.length, colors.length));
+				//TODO - exception
+				return null;
+			}
+			for(int i = 0; i < colors.length; i++) {
+				Color c = toColor(colors[i]);
+				if(c == null) {
+//					sendText(t, "Invalid color: " + colors[i]);
+					//TODO - exception
+					return null;
+				}
+				colorScheme.put(faces[i], c);
+			}
+		}
+		return colorScheme;
+	}
+	
+	public PuzzleImageInfo getDefaultPuzzleImageInfo() {
+		PuzzleImageInfo sii = new PuzzleImageInfo();
+		sii.faces = getDefaultFaceBoundaries();
+		sii.colorScheme = getDefaultColorScheme();
+		sii.size = getPreferredSize();
+		return sii;
+	}
+	
+	/**
+	 * Draws scramble onto g.
+	 * @param g The Graphics2D object to draw upon (of size size)
+	 * @param size The Dimension of the resulting image.
+	 * @param scramble The scramble to validate and apply to the puzzle. NOTE: May be null!
+	 * @param colorScheme A HashMap mapping face names to Colors.
+	 * 			Any missing entries will be merged with the defaults from getDefaultColorScheme().
+	 * 			If null, just the defaults are used.
+	 * @throws InvalidScrambleException If scramble is invalid.
+	 */
+	public void drawScramble(Graphics2D g, Dimension size, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+		HashMap<String, Color> defaults = getDefaultColorScheme();
+		if(colorScheme != null) {
+			defaults.putAll(colorScheme);
+		}
+		g.scale(1.0*size.width/getPreferredSize().width, 1.0*size.height/getPreferredSize().height);
+		PuzzleState state = getSolvedState();
+		for(String move : scramble.split("\\s+")) {
+			try {
+				state = state.apply(move);
+			} catch(InvalidMoveException e) {
+				throw new InvalidScrambleException(scramble, e);
+			}
+		}
+		state.drawScramble(g, defaults);
+	}
+
+	static {
+		Utils.registerTypeAdapter(Puzzle.class, new Puzzlerizer());
+	}
+	private static class Puzzlerizer implements JsonSerializer<Puzzle>, JsonDeserializer<Puzzle> {
+		@Override
+		public Puzzle deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			try {
+				String scramblerName = json.getAsString();
+				SortedMap<String, LazyInstantiator<Puzzle>> scramblers = getScramblers();
+				LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(scramblerName);
+				if(lazyScrambler == null) {
+					throw new JsonParseException(scramblerName + " not found in: " + scramblers.keySet());
+				}
+				return lazyScrambler.cachedInstance();
+			} catch(Exception e) {
+				throw new JsonParseException(e);
+			}
+		}
+
+		@Override
+		public JsonElement serialize(Puzzle scrambler, Type typeOfT, JsonSerializationContext context) {
+			return new JsonPrimitive(scrambler.getShortName());
+		}
+	}
+	
+	
+	
+	public abstract class PuzzleState {
+		public PuzzleState() {}
+		
+		/**
+		 * @return A HashMap mapping move Strings to resulting PuzzleStates.
+		 * 	       The move Strings may not contain spaces.
+		 */
+		public abstract HashMap<String, PuzzleState> getSuccessors();
+
+		/**
+		 * Returns true if this state is equal to other.
+		 * Note that a puzzle like 4x4 must compare all orientations of the puzzle, otherwise
+		 * generateRandomMoves() will allow for trivial sequences of turns like Lw Rw'. 
+		 * @param other
+		 * @return true if this is equal to other
+		 */
+		public abstract boolean equals(Object other);
+		public abstract int hashCode();
+		
+
+		/**
+		 * Draws the state of the puzzle.
+		 * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing, 
+		 * use the synchronized keyword when implementing this method:<br>
+		 * <code>protected synchronized void drawScramble();</code>
+		 * @param g The Graphics2D object to draw upon (guaranteed to be big enough for getScrambleSize())
+		 * @param colorScheme A HashMap mapping face names to Colors, must have an entry for every face!
+		 */
+		protected abstract void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme);
+		
+
+		public Puzzle getPuzzle() {
+			return Puzzle.this;
+		}
+		
+		public boolean isSolved() {
+			return getPuzzle().getSolvedState().equals(this);
+		}
+
+		/**
+		 * Applies the given move to this PuzzleState. This method is non destructive,
+		 * that is, it does not mutate the current state, instead it returns a new state.
+		 * @param move The move to apply
+		 * @return The PuzzleState achieved after applying move
+		 * @throws InvalidMoveRuntimeException if the move is unrecognized.
+		 */
+		public PuzzleState apply(String move) throws InvalidMoveException {
+			HashMap<String, PuzzleState> successors = getSuccessors();
+			if(!successors.containsKey(move)) {
+				throw new InvalidMoveException("Unrecognized turn " + move);
+			}
+			return successors.get(move);
+		}
+		
+		public boolean solvableIn(int n) {
+			if(isSolved()) {
+				return true;
+			} else if(n <= 0) {
+				return false;
+			}
+			
+			for(PuzzleState next : getSuccessors().values()) {
+				if(next.solvableIn(n - 1)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Two moves A and B commute on a puzzle if regardless of
+		 * the order you apply A and B, you end up in the same state.
+		 * Interestingly enough, the set of moves that commute can change
+		 * with the state a puzzle is in. That's why this is a method of
+		 * PuzzleState instead of Puzzle.
+		 * @param move1
+		 * @param move2
+		 * @return True iff move1 and move2 commute.
+		 */
+		boolean movesCommute(String move1, String move2) {
+			try {
+				PuzzleState state1 = apply(move1).apply(move2);
+				PuzzleState state2 = apply(move2).apply(move1);
+				return state1.equals(state2);
+			} catch (InvalidMoveException e) {
+				l.log(Level.SEVERE, "", e);
+				azzert(false);
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * @return A PuzzleState representing the solved state of our puzzle
+	 * from where we will begin scrambling.
+	 */
+	public abstract PuzzleState getSolvedState();
+
+	/**
+	 * @return The number of random moves we must apply to call a puzzle
+	 * sufficiently scrambled.
+	 */
+	protected abstract int getRandomMoveCount();
+	
+	
+	public static class PuzzleStateAndGenerator {
+		PuzzleState state;
+		String generator;
+		public PuzzleStateAndGenerator(PuzzleState state, String generator) {
+			this.state = state;
+			this.generator = generator;
+		}
+	}
+
+	/**
+	 * This function will generate getRandomTurnCount() number of non cancelling,
+	 * random turns. If a puzzle wants to provide custom scrambles
+	 * (for example: Pochmann style megaminx or MRSS), it should override this method.
+	 * 
+	 * NOTE: It is assumed that this method is thread safe! That means that if you're
+	 * overriding this method and you don't know what you're doing,
+	 * use the synchronized keyword when implementing this method:<br>
+	 * <code>protected synchronized String generateScramble(Random r);</code>
+	 * @param r An instance of Random
+	 * @return A PuzzleStateAndGenerator that contains a scramble string, and the
+	 *         state achieved by applying that scramble.
+	 */
+	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
+		ArrayList<String> moves = new ArrayList<String>();
+		// states.get(i) = state achieved by applying moves[0]...moves[i-1]
+		ArrayList<PuzzleState> states = new ArrayList<PuzzleState>();
+		PuzzleState previousState = getSolvedState();
+		states.add(getSolvedState());
+		for(int i = 0; i < getRandomMoveCount(); i++) {
+			String move;
+			PuzzleState newState;
+			HashMap<String, PuzzleState> successors = previousState.getSuccessors();
+			do {
+				move = Utils.choose(r, successors.keySet());
+				newState = successors.get(move);
+			} while(isRedundant(move, newState, moves, states));
+			states.add(newState);
+			previousState = newState;
+			moves.add(move);
+		}
+
+		String scrambleStr = Utils.join(moves, " ");
+		return new PuzzleStateAndGenerator(previousState, scrambleStr); 
+	}
+	
+	boolean isRedundant(String newMove, PuzzleState newState, ArrayList<String> moves, ArrayList<PuzzleState> states) {
+		for(int lastMoveIndex = moves.size() - 1; lastMoveIndex >= 0; lastMoveIndex--) {
+			PuzzleState stateBeforeLastMove = states.get(lastMoveIndex);
+			PuzzleState stateAfterLastMove = states.get(lastMoveIndex+1);
+			String lastMove = moves.get(lastMoveIndex);
+			if(!stateBeforeLastMove.movesCommute(lastMove, newMove)) {
+				break;
+			}
+			PuzzleState stateAfterNewMove = null;
+			try {
+				stateAfterNewMove = stateAfterLastMove.apply(newMove);
+			} catch (InvalidMoveException e) {
+				l.log(Level.SEVERE, "", e);
+				azzert(false);
+			}
+			// Does newMove cancel with lastMove? If so, it’s redundant. 
+			if(stateBeforeLastMove.equals(stateAfterNewMove)) {
+				return true;
+			}
+			// Does newMove merge with lastMove? If so, it’s redundant.
+			if(stateBeforeLastMove.getSuccessors().values().contains(stateAfterNewMove)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+}

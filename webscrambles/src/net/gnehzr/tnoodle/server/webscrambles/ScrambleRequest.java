@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
-import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -71,10 +71,10 @@ class ScrambleRequest {
 	private static final int WCA_MAX_MOVES_FMC = 80;
 	
 	private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
-	private static SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
+	private static SortedMap<String, LazyInstantiator<Puzzle>> puzzles;
 	static {
 		try {
-			scramblers = Scrambler.getScramblers();
+			puzzles = Puzzle.getScramblers();
 		} catch (BadClassDescriptionException e) {
 			l.log(Level.INFO, "", e);
 		} catch (IOException e) {
@@ -99,7 +99,7 @@ class ScrambleRequest {
 	
 	
 	public String[] scrambles;
-	public Scrambler scrambler;
+	public Puzzle scrambler;
 	public int count;
 	public int copies;
 	public String title;
@@ -129,7 +129,7 @@ class ScrambleRequest {
 			throw new InvalidScrambleRequestException("Invalid puzzle request " + scrambleRequestUrl);
 		}
 		
-		LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
+		LazyInstantiator<Puzzle> lazyScrambler = puzzles.get(puzzle);
 		if(lazyScrambler == null) {
 			throw new InvalidScrambleRequestException("Invalid scrambler: " + puzzle);
 		}

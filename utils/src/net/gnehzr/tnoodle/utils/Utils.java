@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
@@ -186,6 +187,20 @@ public final class Utils {
 				sb.append(separator);
 			}
 			sb.append(arr[i].toString());
+		}
+		return sb.toString();
+	}
+	
+	public static <H> String join(ArrayList<H> arr, String separator) {
+		if(separator == null) {
+			separator = ",";
+		}
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < arr.size(); i++) {
+			if(i > 0) {
+				sb.append(separator);
+			}
+			sb.append(arr.get(i).toString());
 		}
 		return sb.toString();
 	}
@@ -550,5 +565,28 @@ public final class Utils {
 			webappName = "ROOT";
 		}
 		return new File(getWebappsDir(), webappName);
+	}
+
+	public static <H> H choose(Random r, Iterable<H> keySet) {
+		H chosen = null;
+		int count = 0;
+		for(H element : keySet) {
+			if(r.nextInt(++count) == 0) {
+				chosen = element;
+			}
+		}
+		return chosen;
+	}
+	
+	public static void deepCopy(int[][] src, int[][] dest) {
+		for(int i = 0; i < src.length; i++) {
+			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+		}
+	}
+	
+	public static <T> void deepCopy(T[][] src, T[][] dest) {
+		for(int i = 0; i < src.length; i++) {
+			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+		}
 	}
 }

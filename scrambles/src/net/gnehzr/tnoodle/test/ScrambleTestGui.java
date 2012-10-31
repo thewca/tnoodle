@@ -30,7 +30,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 
@@ -42,10 +42,10 @@ public class ScrambleTestGui {
 	
 	private JLabel imageLabel;
 	
-	private SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
+	private SortedMap<String, LazyInstantiator<Puzzle>> scramblers;
 	public ScrambleTestGui() {
 		try {
-			scramblers = Scrambler.getScramblers();
+			scramblers = Puzzle.getScramblers();
 		} catch (BadClassDescriptionException e2) {
 			e2.printStackTrace();
 			JOptionPane.showMessageDialog(null, e2.getMessage());
@@ -123,8 +123,8 @@ public class ScrambleTestGui {
 		requestScramble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				LazyInstantiator<Scrambler> lazyScrambler = (LazyInstantiator<Scrambler>) puzzleBox.getSelectedItem();
-				Scrambler scrambler;
+				LazyInstantiator<Puzzle> lazyScrambler = (LazyInstantiator<Puzzle>) puzzleBox.getSelectedItem();
+				Puzzle scrambler;
 				try {
 					scrambler = lazyScrambler.cachedInstance();
 				} catch (Exception e2) {
