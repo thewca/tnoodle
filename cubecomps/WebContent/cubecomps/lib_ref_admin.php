@@ -7,7 +7,7 @@ if(!isset($_SESSION)) {
 	session_start();
 }
 
-include "inc_private.php";
+require_once "inc_private.php";
 require_once "lib.php";
 
 if (!isset($_SESSION["c_admin"]) || !refererMatchesHost()) :
