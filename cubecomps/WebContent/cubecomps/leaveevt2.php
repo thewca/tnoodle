@@ -1,7 +1,7 @@
 <?
 require_once "lib.php";
-include "lib_ref_admin.php";
-include "db.php";
+require_once "lib_ref_admin.php";
+require_once "db.php";
 
 function error($err)
 {

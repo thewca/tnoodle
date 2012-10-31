@@ -1,10 +1,10 @@
 <?
-include "lib.php";
-include "lib_ref.php";
+require_once "lib.php";
+require_once "lib_ref.php";
 
 if ($_GET["comp_id"] && $_GET["cat_id"] && $_GET["round"])
 {
-	include "db.php";
+	require_once "db.php";
 	//
 	$qualified = mysql_num_rows(strict_mysql_query("SELECT round FROM $regstable WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]));
 	if ($qualified)

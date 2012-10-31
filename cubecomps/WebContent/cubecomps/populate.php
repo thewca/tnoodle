@@ -1,9 +1,9 @@
-<?include "lib_ref_admin.php";
+<?require_once "lib_ref_admin.php";
 require_once "lib.php";
 
 if ($_GET["cat_id"] && $_GET["round"])
 {
-	include "db.php";
+	require_once "db.php";
 	$cat_id = $_GET["cat_id"];
 	$round = $_GET["round"];
 	//

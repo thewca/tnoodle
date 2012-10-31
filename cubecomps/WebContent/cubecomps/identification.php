@@ -1,6 +1,6 @@
 <?
 require_once "lib.php";
-include "lib_ref.php";
+require_once "lib_ref.php";
 session_start();
 
 require_once "inc_private.php";
