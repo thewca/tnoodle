@@ -1,7 +1,7 @@
 <?
 require_once "lib.php";
-include "lib_admin.php";
-include "db.php";
+require_once "lib_admin.php";
+require_once "db.php";
 
 function timelimitNum($t)
 {

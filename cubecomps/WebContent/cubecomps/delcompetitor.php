@@ -1,11 +1,11 @@
 <?
 require_once "lib.php";
-include "lib_reg.php";
-include "lib_ref_admin.php";
+require_once "lib_reg.php";
+require_once "lib_ref_admin.php";
 
 if ($_GET["id"])
 {
-	include "db.php";
+	require_once "db.php";
 	//
 	if (mysql_num_rows(strict_mysql_query("SELECT * FROM $timestable WHERE comp_id=".$_GET["id"]))) 
 		die("Can't delete a competitor who already has results in the competition");

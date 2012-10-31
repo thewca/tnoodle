@@ -23,9 +23,9 @@ $dark_color = "#0a1414";
 </HEAD>
 <BODY>
 <?
-include "lib_eve.php";
-include "lib_com.php";
-include "lib_reg.php";
+require_once "lib_eve.php";
+require_once "lib_com.php";
+require_once "lib_reg.php";
 
 function error ($msg)
 {
@@ -90,7 +90,7 @@ function csvstring_to_array(&$string, $CSV_SEPARATOR = ',', $CSV_ENCLOSURE = '"'
   return $o;
 } 
 
-include "lib_ref_admin.php";
+require_once "lib_ref_admin.php";
 
 if ($_FILES["file"]["error"] > 0)
 	error("no filename selected to upload");
@@ -117,7 +117,7 @@ foreach ($headers as $key => $value)
 	if (stripos($line,$key) === false) $isCSV = false;
 
 //
-include "db.php";
+require_once "db.php";
 //
 IF (!$isCSV)
 {

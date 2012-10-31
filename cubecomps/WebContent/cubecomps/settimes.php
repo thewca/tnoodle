@@ -146,11 +146,11 @@ function getAverageAndBest(&$average,&$best)
 	}
 }
 
-include "lib_ref.php";
+require_once "lib_ref.php";
 
 if ($_GET["comp_id"] && $_GET["cat_id"] && $_GET["round"])
 {
-	include "db.php";
+	require_once "db.php";
 	//
 	$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$_GET["cat_id"]);
 	if (!mysql_num_rows($event) || !cased_mysql_result($event,0,"r".$_GET["round"]."_open")) die("Round not open!");

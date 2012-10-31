@@ -1,10 +1,10 @@
 <?
-include "lib_eve.php";
-include "lib_ref_admin.php";
+require_once "lib_eve.php";
+require_once "lib_ref_admin.php";
 
 if ($_GET["id"])
 {
-	include "db.php";
+	require_once "db.php";
 	addEve($_GET["id"]);
 	mysql_close();
 	header("Location: events.php\r\n");

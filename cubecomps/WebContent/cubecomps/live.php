@@ -2,7 +2,7 @@
 require_once "lib.php";
 require_once "inc_private.php";
 // handhelds don't use to implement overflow:auto
-include "lib_mob_det.php";
+require_once "lib_mob_det.php";
 $detect = new Mobile_Detect();
 $handheld = $detect->isMobile();
 $detect = null;

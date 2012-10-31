@@ -1,7 +1,7 @@
 <?
 require_once "lib.php";
-include "lib_ref.php";
-include "db.php";
+require_once "lib_ref.php";
+require_once "db.php";
 
 function timelimitNum($t)
 {
@@ -1397,9 +1397,9 @@ function openWLeft()
 	ELSE
 	{
 		if (substr($_SERVER["REQUEST_URI"],0,6)=="/beta/")
-			include "../".DIR_FPDF;
+			require_once "../".DIR_FPDF;
 		else
-			include DIR_FPDF;
+			require_once DIR_FPDF;
 		//
 		// class PDF extends FPDF
 		class PDF extends tFPDF

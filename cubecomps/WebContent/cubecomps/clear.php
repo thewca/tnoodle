@@ -1,10 +1,10 @@
 <?
 require_once "lib.php";
-include "lib_ref_admin.php";
+require_once "lib_ref_admin.php";
 
 if ($_GET["cat_id"] && $_GET["round"])
 {
-	include "db.php";
+	require_once "db.php";
 	//
 	$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$_GET["cat_id"]);
 	if (mysql_num_rows($event) && cased_mysql_result($event,0,"r".$_GET["round"]) && cased_mysql_result($event,0,"r".$_GET["round"]."_open") && ($_GET["round"]==4 || !cased_mysql_result($event,0,"r".($_GET["round"]+1)) || !cased_mysql_result($event,0,"r".($_GET["round"]+1)."_open")))
