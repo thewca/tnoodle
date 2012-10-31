@@ -1,10 +1,10 @@
 <?
 require_once "lib.php";
-include "lib_ref_admin.php";
+require_once "lib_ref_admin.php";
 
 if ($_GET["id"] && $_GET["fld"]) 
 {
-	include "db.php";
+	require_once "db.php";
 	//
 	$result = strict_mysql_query("SELECT * FROM $eventstable WHERE id=" . $_GET["id"]);
 	if (mysql_num_rows($result)==1)

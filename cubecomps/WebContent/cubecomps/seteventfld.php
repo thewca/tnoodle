@@ -1,5 +1,5 @@
 <?
-include "lib_ref_admin.php";
+require_once "lib_ref_admin.php";
 
 function timelimitNum00($t)
 {
@@ -24,7 +24,7 @@ function formatTimelimit00($t)
 
 if ($_GET["id"] && $_GET["fld"] && isset($_GET["value"])) 
 {
-	include "db.php";
+	require_once "db.php";
 	//
 	$value = $_GET["value"];
 	if ($_GET["fld"]=="timelimit")

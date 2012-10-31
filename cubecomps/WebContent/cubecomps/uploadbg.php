@@ -1,6 +1,6 @@
 <?
 session_start();
-include "lib_ref_admin.php";
+require_once "lib_ref_admin.php";
 ?>
 <HTML>
 <HEAD>

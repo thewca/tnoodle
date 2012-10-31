@@ -1,7 +1,7 @@
 <?
 session_start();
-include "lib_admin.php";
-include "db.php";
+require_once "lib_admin.php";
+require_once "db.php";
 
 $color = "#6b7b71";
 $light_color = "#b0c7b4";

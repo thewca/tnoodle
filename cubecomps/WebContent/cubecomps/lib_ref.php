@@ -3,7 +3,7 @@
  * This is because some pages take actions over the database (or where else), and if entered in error, they could cause
  * unexpected or even harmful results.
  */
-include "inc_private.php";
+require_once "inc_private.php";
 require_once "lib.php";
 
 if (!refererMatchesHost()) : 
