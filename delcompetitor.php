@@ -1,35 +1,30 @@
 <?
 require_once "lib.php";
-include "lib_reg.php";
-include "lib_ref_admin.php";
+require_once "lib_reg.php";
+require_once "lib_ref_admin.php";
+require_once "lib_get.php";
 
-if ($_GET["id"])
+$_GETid = _GET_num("id");
+
+if ($_GETid)
 {
-	include "db.php";
+	require_once "db.php";
 	//
-	if (mysql_num_rows(strict_mysql_query("SELECT * FROM $timestable WHERE comp_id=".$_GET["id"]))) 
+	if (sql_num_rows(strict_query("SELECT * FROM $timestable WHERE comp_id=?", array($_GETid)))) 
 		die("Can't delete a competitor who already has results in the competition");
-	$competitor = strict_mysql_query("SELECT * FROM $compstable WHERE id=".$_GET["id"]);
-	if (!mysql_num_rows($competitor))
+	$competitor = strict_query("SELECT * FROM $compstable WHERE id=?", array($_GETid));
+	if (!sql_num_rows($competitor))
 	{
-		mysql_close();
+		sql_close();
 		die("Competitor id not found!");
 	}
-	$categories = strict_mysql_query("SELECT id FROM $eventstable");
-	if(!$categories) {
-		die('Invalid query: ' . mysql_error());
-	}
+	$categories = strict_query("SELECT id FROM $eventstable");
 	while ($rcat=cased_mysql_fetch_array($categories)) {
 		if (cased_mysql_result($competitor,0,"cat".$rcat["id"])=="X") {
-			toggleReg($_GET["id"],$rcat["id"]);
+			toggleReg($_GETid,$rcat["id"]);
 		}
 	}
-	if (!strict_mysql_query ("DELETE FROM $compstable WHERE id=" . $_GET["id"]))
-	{
-		echo mysql_error();
-		mysql_close();
-		die();
-	}
-	mysql_close();
+	strict_query ("DELETE FROM $compstable WHERE id=?", array($_GETid));
+	sql_close();
 }
 ?>

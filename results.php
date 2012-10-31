@@ -1,7 +1,8 @@
 <?
 require_once "lib.php";
-include "lib_ref.php";
-include "db.php";
+require_once "lib_ref.php";
+require_once "db.php";
+require_once "lib_get.php";
 
 function timelimitNum($t)
 {
@@ -71,7 +72,7 @@ function roundString($r,$nr,$c)
 	return $st;
 }
 
-$openevents = strict_mysql_query("SELECT * FROM $eventstable WHERE r1_open=TRUE ORDER BY id");
+$openevents = strict_query("SELECT * FROM $eventstable WHERE r1_open=TRUE ORDER BY id");
 $lastopenrounds = array();
 $lastrounds = array();
 $timelimited = array();
@@ -85,15 +86,15 @@ while ($row=cased_mysql_fetch_array($openevents))
 	$lastopenrounds[$row["id"]] = $x;
 }
 
-$cat_id = (array_key_exists("cat_id",$_GET) ? $_GET["cat_id"] : null);
-$round = (array_key_exists("round",$_GET) ? $_GET["round"] : null);
+$cat_id = _GET_num("cat_id");
+$round = _GET_num("round");
 if ((!$cat_id || !$round) && count($lastopenrounds))
 {
 	if (!$cat_id) $cat_id = cased_mysql_result($openevents,0,"id");
 	$round = $lastopenrounds[$cat_id];
 }
 
-if ($_SESSION["c_admin"])
+if (@$_SESSION["c_admin"])
 {
 	$color = "#6b7b71";
 	$light_color = "#b0c7b4";
@@ -125,7 +126,7 @@ if (!isset($lastopenrounds[$cat_id]) || $lastopenrounds[$cat_id]<$round)
 </head>
 <body>
 <?
-	if ($_SESSION["c_admin"])
+	if (@$_SESSION["c_admin"])
 	{
 ?>
 <table class=t_tabs><tr><td class=t_sel><a href='events.php'>EVENTS</a></td><td class=t_sel><a href='competitors.php'>COMPETITORS</a></td><td>RESULTS</td><td class=t_sel><a href='misc.php'>MISC</a></td></tr></table>
@@ -141,9 +142,8 @@ if (!isset($lastopenrounds[$cat_id]) || $lastopenrounds[$cat_id]<$round)
 }
 else
 {
-	$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$cat_id);
-	//if (!mysql_num_rows($event) || !cased_mysql_result($event,0,"r".$round."_open")) die("Round not open!");
-	$category = strict_mysql_query("SELECT * FROM categories WHERE id=".$cat_id);
+	$event = strict_query("SELECT * FROM $eventstable WHERE id=?", array($cat_id));
+	$category = strict_query("SELECT * FROM categories WHERE id=?", array($cat_id));
 	$timetype = cased_mysql_result($category,0,"timetype");
 	if ($timetype==1)
 		$coltimewidth = 60;
@@ -152,7 +152,7 @@ else
 	else
 		$coltimewidth = 100;
 	//
-	$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".$round."_format"));
+	$format = strict_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".$round."_format"));
 	$times = cased_mysql_result($format,0,"times");
 	$avgtype = cased_mysql_result($format,0,"avgtype");
 	if (cased_mysql_result($category,0,"canhavetimelimit") && $round==1)
@@ -176,7 +176,7 @@ else
 	$nrounds = 4;
 	while ($nrounds>1 && !cased_mysql_result($event,0,"r$nrounds")) $nrounds--;
 	//
-	$print = (isset($_GET["print"]) && $_SESSION["c_admin"]);
+	$print = (isset($_GET["print"]) && @$_SESSION["c_admin"]);
 	IF (!$print)
 	{
 ?>
@@ -221,12 +221,12 @@ else
 		// echo "' onresize='docResize();' onunload='if(I.changed) alert(\"Warning!\\r\\n\\nYour last changes are going to be discarded because you navigated off this page prior to submit them.\")'>\r\n<table class=t_tabs><tr><td style='font-size:20px;'>".cased_mysql_result($category,0,"name")." - round ".$round;
 		echo "' onresize='docResize();' onunload='if(I.changed) alert(\"Warning!\\r\\n\\nYour last changes are going to be discarded because you navigated off this page prior to submit them.\")'>\r\n<table class=t_tabs><tr><td style='font-size:20px;'>".cased_mysql_result($category,0,"name")." - ".roundString($round,$nrounds,$timelimit);
 		if ($timelimit) 
-			if ($_SESSION["c_admin"])
+			if (@$_SESSION["c_admin"])
 				echo "<br><center>cutoff ".formatTime($timelimit,1)."</center>";
 			else
 				echo " - cutoff ".formatTime($timelimit,1);
 		echo "</td>";
-		if ($_SESSION["c_admin"])
+		if (@$_SESSION["c_admin"])
 			echo "<td class=t_sel><a style='cursor:pointer;' onclick='gotoPage(\"events.php\");'>EVENTS</a></td><td class=t_sel><a style='cursor:pointer;' onclick='gotoPage(\"competitors.php\");'>COMPETITORS</a></td><td>RESULTS</td><td class=t_sel><a style='cursor:pointer;' onclick='gotoPage(\"misc.php\");'>MISC</a></td>";
 		echo "</tr></table>";
 ?>
@@ -420,7 +420,7 @@ var ISTop;
 var ISLine;
 var ISIdx;
 <?
-		$comp = strict_mysql_query("SELECT id, name FROM $regstable JOIN $compstable ON $regstable.comp_id=$compstable.id WHERE cat_id=$cat_id AND round=$round ORDER BY name");
+		$comp = strict_query("SELECT id, name FROM $regstable JOIN $compstable ON $regstable.comp_id=$compstable.id WHERE cat_id=? AND round=? ORDER BY name", array($cat_id,$round));
 		$row = cased_mysql_fetch_array($comp);
 		echo "var sList = [[". $row["id"]. ",'". htmlspecialchars($row["name"],ENT_QUOTES). "']";
 		while ($row = cased_mysql_fetch_array($comp))
@@ -1270,7 +1270,7 @@ Inputs.prototype.clear = function()
 </table>
 
 <?
-		if ($_SESSION["c_admin"])
+		if (@$_SESSION["c_admin"])
 		{
 ?>
 <br><div style='text-align:left;font-size:14px;'><a href='<?="results.php?cat_id=".$cat_id."&round=".$round."&print=1"?>' target=_blank'>[print]</a><div>
@@ -1286,7 +1286,7 @@ Inputs.prototype.clear = function()
 <?
 		if (count($lastopenrounds)>1)
 		{
-			$categories = strict_mysql_query("SELECT id, name FROM categories");
+			$categories = strict_query("SELECT id, name FROM categories");
 			echo "<P><form name=frm action='results.php' method=get>";
 			echo "<select name=cat_id style='width:170px;' onclick='submitFrm(this.value);'>";
 			echo "<option value=''>Other rounds open...</option>";
@@ -1298,7 +1298,7 @@ Inputs.prototype.clear = function()
 			echo "</form>";
 		}
 		
-		if (!$_SESSION["c_admin"])
+		if (!@$_SESSION["c_admin"])
 		{
 			echo "<br><br><br><a href='logout.php'>[logout]</a>";
 		}
@@ -1311,7 +1311,7 @@ Inputs.prototype.clear = function()
 
 	IF (!$print)
 	{
-		if ($_SESSION["c_admin"] && $round>1)
+		if (@$_SESSION["c_admin"] && $round>1)
 		{
 ?>
 <script>
@@ -1347,8 +1347,8 @@ function openWLeft()
 		"SELECT $regstable.*, $compstable.name, $timestable.t1, $timestable.t2, $timestable.t3, $timestable.t4, $timestable.t5, $timestable.average, $timestable.best FROM $regstable ".
 		"LEFT OUTER JOIN $timestable ON ($regstable.cat_id=$timestable.cat_id AND $regstable.round=$timestable.round AND $regstable.comp_id=$timestable.comp_id) ".
 		"JOIN $compstable ON ($regstable.comp_id=$compstable.id) ".
-		"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .$round." ORDER BY $timestable.t1 IS NULL, $timestable.average='', $timestable.average, $timestable.best, $compstable.name";
-	$list = strict_mysql_query($query);
+		"WHERE $regstable.cat_id=? AND $regstable.round=? ORDER BY $timestable.t1 IS NULL, $timestable.average='', $timestable.average, $timestable.best, $compstable.name";
+	$list = strict_query($query, array($cat_id,$round));
 	$qualified = (
 		$round<4 && cased_mysql_result($event,0,"r".($round+1)) ?
 		cased_mysql_result($event,0,"r".($round+1)."_groupsize") :
@@ -1384,9 +1384,9 @@ function openWLeft()
 			echo "<td><div style='width:".$coltimewidth."px;'>".($avgtype==2?"<b>":"").formatTime($row["best"]).($avgtype==2?"</b>":"")."</div></td>";
 			if ($row["t1"]) 
 				echo "<td><div class=col_ot><a onclick='if (confirm(\"Clear " .htmlspecialchars($row["name"],ENT_QUOTES). "&#39;s scores?\")) deleteTimes(" .$cat_id. "," .$round. "," .$row["comp_id"]. ");' style='cursor:pointer;'>[clear]</a></div></td>";
-			elseif ($_SESSION["c_admin"] && $round==1 && $round==$lastopenrounds[$cat_id])
+			elseif (@$_SESSION["c_admin"] && $round==1 && $round==$lastopenrounds[$cat_id])
 				echo "<td><div class=col_ot><a onclick='if (confirm(\"Remove " .htmlspecialchars($row["name"],ENT_QUOTES). " from this event?\")) quitEvent(" .$cat_id. "," .$row["comp_id"]. ");' style='cursor:pointer;'>[quit]</a></div></td>";
-			elseif ($_SESSION["c_admin"] && $round>1 && $round==$lastopenrounds[$cat_id])
+			elseif (@$_SESSION["c_admin"] && $round>1 && $round==$lastopenrounds[$cat_id])
 				echo "<td><div class=col_ot><a href='leaveevt.php?cat_id=$cat_id&round=$round&comp_id=". $row["comp_id"]. "' target='w_left' onclick='openWLeft();'>[miss]</a></div></td>";
 			else
 				echo "<td><div class=col_ot></div></td>";
@@ -1397,9 +1397,9 @@ function openWLeft()
 	ELSE
 	{
 		if (substr($_SERVER["REQUEST_URI"],0,6)=="/beta/")
-			include "../".DIR_FPDF;
+			require_once "../".DIR_FPDF;
 		else
-			include DIR_FPDF;
+			require_once DIR_FPDF;
 		//
 		// class PDF extends FPDF
 		class PDF extends tFPDF
@@ -1527,5 +1527,5 @@ var oIS = document.getElementById("ISdiv");
 <?
 	} // end IF
 }
-mysql_close();
+sql_close();
 ?>

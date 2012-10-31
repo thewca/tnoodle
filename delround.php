@@ -1,13 +1,16 @@
 <?
 require_once "lib.php";
-include "lib_ref_admin.php";
+require_once "lib_ref_admin.php";
+require_once "lib_get.php";
 
-if ($_GET["id"]) 
+$_GETid = _GET_num("id");
+
+if ($_GETid) 
 {
-	include "db.php";
+	require_once "db.php";
 	//
-	$result = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$_GET["id"]);
-	if (mysql_num_rows($result))
+	$result = strict_query("SELECT * FROM $eventstable WHERE id=?", array($_GETid));
+	if (sql_num_rows($result))
 	{
 		$event = cased_mysql_fetch_array($result);
 		$round = 5;
@@ -17,9 +20,9 @@ if ($_GET["id"])
 		if ($round==1) die("Can't remove the first round");
 		$rnd = "r".$round;
 		if ($event[$rnd."_open"]) die("Can't remove an open round");
-		strict_mysql_query("UPDATE $eventstable SET ". $rnd."=0, ". $rnd."_format=0, " .$rnd."_groupsize=0, " .$rnd."_open=0 WHERE id=" . $_GET["id"]);
+		strict_query("UPDATE $eventstable SET ". $rnd."=0, ". $rnd."_format=0, " .$rnd."_groupsize=0, " .$rnd."_open=0 WHERE id=?", array($_GETid));
 	}
 	//
-	mysql_close();
+	sql_close();
 }
 ?>

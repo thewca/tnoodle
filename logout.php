@@ -1,5 +1,5 @@
 <?
-include "lib_ref.php";
+require_once "lib_ref.php";
 session_start();
 unset($_SESSION["c_id"]);
 unset($_SESSION["c_admin"]);

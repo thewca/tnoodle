@@ -1,11 +1,14 @@
 <?
 require_once "lib.php";
-include "lib_ref_admin.php";
-include "db.php";
+require_once "lib_ref_admin.php";
+require_once "db.php";
+require_once "lib_get.php";
 
-if (!$_GET["id"]) die("Invalid calling params!");
-$comp = strict_mysql_query("SELECT * FROM $compstable WHERE id=".$_GET["id"]);
-if (!mysql_num_rows($comp)) die("Competitor not found!");
+$_GETid = _GET_num("id");
+
+if (!$_GETid) die("Invalid calling params!");
+$comp = strict_query("SELECT * FROM $compstable WHERE id=?",array($_GETid));
+if (!sql_num_rows($comp)) die("Competitor not found!");
 $comp = cased_mysql_fetch_array($comp);
 
 $color = "#6b7b71";
@@ -135,7 +138,7 @@ function submitForm()
 		!empty (document.frm.gender,"gender"))
 	{
 		var req = createXMLHttpRequest();
-		req.open ("GET", "updcompetitor.php?id=<?=$_GET["id"]?>"+
+		req.open ("GET", "updcompetitor.php?id=<?=$_GETid?>"+
 										"&wcaid="+document.frm.WCAid.value+
 										"&name="+document.frm.competitor.value+
 										"&birthday="+document.frm.birth.value+ 
@@ -166,7 +169,7 @@ function submitForm()
 <tr><td class=caption>country</td><td><select id=country name=country style="width:200px;">
 <option value=""></option>
 <?
-$result = strict_mysql_query("SELECT * FROM countries");
+$result = strict_query("SELECT * FROM countries");
 while ($row=cased_mysql_fetch_array($result))
 {
 	echo "<option value=\"" . $row["id"] . "\"";
@@ -190,5 +193,5 @@ while ($row=cased_mysql_fetch_array($result))
 </body>
 </html>
 <?
-mysql_close();
+sql_close();
 ?>
