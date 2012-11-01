@@ -3,3 +3,6 @@
 
 #Pyraminx
 pyram puzzle.PyraminxPuzzle()
+
+#Square-1
+sq1 puzzle.SquareOnePuzzle()

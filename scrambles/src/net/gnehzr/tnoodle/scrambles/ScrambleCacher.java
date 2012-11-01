@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.scrambles;
 
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.security.SecureRandom;
@@ -16,7 +18,7 @@ public class ScrambleCacher {
 	private static final int DEFAULT_CACHE_SIZE = 100;
 	
 	/**
-	 * Scramblers will get passed this instance of Random
+	 * Puzzles will get passed this instance of Random
 	 * in order to have nice, as-secure-as-can-be scrambles.
 	 */
 	private static final Random r = new SecureRandom();
@@ -32,6 +34,7 @@ public class ScrambleCacher {
 	private volatile Throwable exception;
 	private boolean running = false;
 	public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble) {
+		azzert(cacheSize > 0);
 		scrambles = new String[cacheSize];
 		Thread t = new Thread() {
 			public void run() {

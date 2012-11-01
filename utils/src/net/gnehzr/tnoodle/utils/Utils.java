@@ -128,14 +128,13 @@ public final class Utils {
 		return areasArray;
 	}
 
-	//requires that m > 0
 	public static final int modulo(int x, int m) {
-		if(m < 0) {
-			throw new RuntimeException("m must be > 0");
-		}
+		azzert(m > 0, "m must be > 0");
 		int y = x % m;
-		if(y >= 0) return y;
-		return y + m;
+		if(y < 0) {
+			y += m;
+		}
+		return y;
 	}
 
 	public static Integer toInt(String string, Integer def) {
@@ -518,6 +517,12 @@ public final class Utils {
 		}
 	}
 	
+	public static void azzert(boolean expr, Throwable t) {
+		if(!expr) {
+			throw new AssertionError(t);
+		}
+	}
+	
 	public static String getProjectName() {
 		Package p = Utils.class.getPackage();
 		String name = p.getImplementationTitle();
@@ -575,6 +580,7 @@ public final class Utils {
 				chosen = element;
 			}
 		}
+		azzert(count > 0);
 		return chosen;
 	}
 	

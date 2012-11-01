@@ -133,11 +133,11 @@ public abstract class Puzzle {
 			return SecureRandom.getInstance("SHA1PRNG", "SUN");
 		} catch(NoSuchAlgorithmException e) {
 			l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
-			azzert(false);
+			azzert(false, e);
 			return null;
 		} catch(NoSuchProviderException e) {
 			l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
-			azzert(false);
+			azzert(false, e);
 			return null;
 		}
 	}
@@ -321,19 +321,16 @@ public abstract class Puzzle {
 	 * @throws InvalidScrambleException If scramble is invalid.
 	 */
 	public void drawScramble(Graphics2D g, Dimension size, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+		if(scramble == null) {
+			scramble = "";
+		}
 		HashMap<String, Color> defaults = getDefaultColorScheme();
 		if(colorScheme != null) {
 			defaults.putAll(colorScheme);
 		}
 		g.scale(1.0*size.width/getPreferredSize().width, 1.0*size.height/getPreferredSize().height);
 		PuzzleState state = getSolvedState();
-		for(String move : scramble.split("\\s+")) {
-			try {
-				state = state.apply(move);
-			} catch(InvalidMoveException e) {
-				throw new InvalidScrambleException(scramble, e);
-			}
-		}
+		state = state.applyAlgorithm(scramble);
 		state.drawScramble(g, defaults);
 	}
 
@@ -367,11 +364,59 @@ public abstract class Puzzle {
 	public abstract class PuzzleState {
 		public PuzzleState() {}
 		
+		
+		/**
+		 * 
+		 * @param algorithm A space separated String of moves to apply to state
+		 * @return
+		 * @throws InvalidScrambleException 
+		 */
+		public PuzzleState applyAlgorithm(String algorithm) throws InvalidScrambleException {
+			PuzzleState state = this;
+			if(!algorithm.trim().isEmpty()) {
+				for(String move : algorithm.split("\\s+")) {
+					try {
+						state = state.apply(move);
+					} catch(InvalidMoveException e) {
+						throw new InvalidScrambleException(algorithm, e);
+					}
+				}
+			}
+			return state;
+		}
+
 		/**
 		 * @return A HashMap mapping move Strings to resulting PuzzleStates.
 		 * 	       The move Strings may not contain spaces.
 		 */
-		public abstract HashMap<String, PuzzleState> getSuccessors();
+		public abstract HashMap<String, ? extends PuzzleState> getSuccessors();
+		
+		/**
+		 * By default, this method returns getSuccessors(). Some puzzles may wish to override
+		 * this method to provide a reduced set of moves to be used for scrambling.
+		 * <br><br>
+		 * One example of where this is useful is a puzzle like the square one.
+		 * Someone extending Puzzle to implement SquareOnePuzzle is left with the question of
+		 * whether to allow turns that leave the puzzle incapable of doing a /.
+		 * <br><br>
+		 * If getSuccessors() returns states that cannot do a /, then generateRandomMoves() will
+		 * hang because any move that can be applied to one of those states is redundant.
+		 * <br><br>
+		 * Alternatively, if getSuccessors() only returns states that can do a /, isRedundant()
+		 * breaks. Here's why:<br>
+		 * Imagine a solved square one. Lets say we pick the turn (1,0) to apply to it, and now we're
+		 * considering applying (2,0) to it. Obviously this is the exact same state you would have achieved by
+		 * just applying (3,0) to the solved puzzle, but isRedundant only checks for this against
+		 * the previous moves that commute with (2,0). movesCommute("(1,0)", "(2,0)") will only return
+		 * true if (2,0) can be applied to a solved square one, even though it results in a state that cannot
+		 * be slashed.
+
+		 * @return A HashMap mapping move Strings to resulting PuzzleStates.
+		 * 	       The move Strings may not contain spaces.
+		 */
+		public HashMap<String, ? extends PuzzleState> getScrambleSuccessors() {
+			return getSuccessors();
+		}
 
 		/**
 		 * Returns true if this state is equal to other.
@@ -411,7 +456,7 @@ public abstract class Puzzle {
 		 * @throws InvalidMoveRuntimeException if the move is unrecognized.
 		 */
 		public PuzzleState apply(String move) throws InvalidMoveException {
-			HashMap<String, PuzzleState> successors = getSuccessors();
+			HashMap<String, ? extends PuzzleState> successors = getSuccessors();
 			if(!successors.containsKey(move)) {
 				throw new InvalidMoveException("Unrecognized turn " + move);
 			}
@@ -449,8 +494,6 @@ public abstract class Puzzle {
 				PuzzleState state2 = apply(move2).apply(move1);
 				return state1.equals(state2);
 			} catch (InvalidMoveException e) {
-				l.log(Level.SEVERE, "", e);
-				azzert(false);
 				return false;
 			}
 		}
@@ -467,7 +510,6 @@ public abstract class Puzzle {
 	 * sufficiently scrambled.
 	 */
 	protected abstract int getRandomMoveCount();
-	
 	
 	public static class PuzzleStateAndGenerator {
 		PuzzleState state;
@@ -500,7 +542,7 @@ public abstract class Puzzle {
 		for(int i = 0; i < getRandomMoveCount(); i++) {
 			String move;
 			PuzzleState newState;
-			HashMap<String, PuzzleState> successors = previousState.getSuccessors();
+			HashMap<String, ? extends PuzzleState> successors = previousState.getScrambleSuccessors();
 			do {
 				move = Utils.choose(r, successors.keySet());
 				newState = successors.get(move);
@@ -526,8 +568,7 @@ public abstract class Puzzle {
 			try {
 				stateAfterNewMove = stateAfterLastMove.apply(newMove);
 			} catch (InvalidMoveException e) {
-				l.log(Level.SEVERE, "", e);
-				azzert(false);
+				azzert(false, e);
 			}
 			// Does newMove cancel with lastMove? If so, it’s redundant. 
 			if(stateBeforeLastMove.equals(stateAfterNewMove)) {

@@ -18,7 +18,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
+import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.utils.Utils;
 
@@ -349,28 +349,30 @@ public class PyraminxPuzzle extends Puzzle {
 		}
 
 		ArrayList<String> scramble = new ArrayList<String>();
-		PuzzleState state = getSolvedState();
 		scramble.add(inverseMoveToString[solution[SCRAMBLE_LENGTH-1]]);
 		for(int i = SCRAMBLE_LENGTH - 2; i >= 0; i--) {
 			String turn = inverseMoveToString[solution[i]];
-			try {
-				state = state.apply(turn);
-			} catch(InvalidMoveException e) {
-				l.log(Level.SEVERE, "", e);
-				azzert(false);
-			}
 			scramble.add(turn);
 		}
 
 		// Scramble the tips
 		for(int tip = 0; tip < 4; tip++) {
 			int dir = r.nextInt(3);
-			if( dir < 2 ) {
+			if(dir < 2) {
 				scramble.add(tipToString[tip*2+dir]);
 			}
 		}
 		
-		return new PuzzleStateAndGenerator(state, Utils.join(scramble, " "));
+		String scrambleString = Utils.join(scramble, " ");
+		PuzzleState state;
+		try {
+			state = getSolvedState().applyAlgorithm(scrambleString);
+		} catch (InvalidScrambleException e) {
+			azzert(false, e);
+			return null;
+		}
+		
+		return new PuzzleStateAndGenerator(state, scrambleString);
 	}
 
 	/*************************************************************
