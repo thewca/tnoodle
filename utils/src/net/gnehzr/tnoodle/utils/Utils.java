@@ -595,4 +595,13 @@ public final class Utils {
 			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
 		}
 	}
+	
+	public static int indexOf(Object o, Object[] arr) {
+		for(int i = 0; i < arr.length; i++) {
+			if(arr[i].equals(o)) {
+				return i;
+			}
+		}
+		return -1;
+	}
 }

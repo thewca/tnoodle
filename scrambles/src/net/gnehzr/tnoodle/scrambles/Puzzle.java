@@ -546,6 +546,8 @@ public abstract class Puzzle {
 			do {
 				move = Utils.choose(r, successors.keySet());
 				newState = successors.get(move);
+				// If this move is redundant, there is no reason to select that move again in vain.
+				successors.remove(move);
 			} while(isRedundant(move, newState, moves, states));
 			states.add(newState);
 			previousState = newState;

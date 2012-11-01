@@ -257,7 +257,7 @@ public class SquareOnePuzzle extends Puzzle {
 		
 		private int[] doSlash() {
 			int[] newPieces = Arrays.copyOf(pieces, pieces.length);
-			for(int i = 0; i < 6; i++){
+			for(int i = 0; i < 6; i++) {
 				int c = newPieces[i+12];
 				newPieces[i+12] = newPieces[i+6];
 				newPieces[i+6] = c;

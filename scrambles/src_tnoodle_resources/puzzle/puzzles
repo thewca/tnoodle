@@ -6,3 +6,6 @@ pyram puzzle.PyraminxPuzzle()
 
 #Square-1
 sq1 puzzle.SquareOnePuzzle()
+
+#Megaminx
+minx puzzle.MegaminxPuzzle()
