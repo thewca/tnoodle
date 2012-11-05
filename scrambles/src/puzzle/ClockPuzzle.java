@@ -1,5 +1,6 @@
 package puzzle;
 
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
 import static net.gnehzr.tnoodle.utils.Utils.toColor;
 
 import java.awt.Color;
@@ -12,11 +13,13 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 
 public class ClockPuzzle extends Puzzle {
 	private static final String[] turns={"UR","DR","DL","UL","U","R","D","L","ALL"};
@@ -41,35 +44,6 @@ public class ClockPuzzle extends Puzzle {
 	public String getShortName() {
 		return "clock";
 	}
-	
-//	@Override
-//	public String generateScramble(Random r) {
-//		StringBuffer scramble = new StringBuffer();
-//		
-//		for(int x=0; x<9; x++) {
-//			int turn = r.nextInt(12)-5;
-//			boolean clockwise = ( turn >= 0 );
-//			turn = Math.abs(turn);
-//			scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
-//		}
-//		scramble.append( "y2 ");
-//		for(int x=4; x<9; x++) {
-//			int turn = r.nextInt(12)-5;
-//			boolean clockwise = ( turn >= 0 );
-//			turn = Math.abs(turn);
-//			scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
-//		}
-//	
-//		boolean isFirst = true;
-//		for(int x=0;x<4;x++) {
-//			if (r.nextInt(2) == 1) {
-//				scramble.append((isFirst?"":" ")+turns[x]);
-//				isFirst = false;
-//			}
-//		}
-//	
-//		return scramble.toString();
-//	}
 
 	protected Dimension getPreferredSize() {
 		return new Dimension(4*(radius+gap), 2*(radius+gap));
@@ -100,228 +74,7 @@ public class ClockPuzzle extends Puzzle {
 		{0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},// D
 		{1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},// L
 		{1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// A
-
-		{-1,0, 0, 0, 0, 0, 0, 0, 0,  0,1,1,0,1,1,0,0,0},// y2 UR
-		{0, 0, 0, 0, 0, 0,-1, 0, 0,  0,0,0,0,1,1,0,1,1},// y2 DR
-		{0, 0, 0, 0, 0, 0, 0, 0,-1,  0,0,0,1,1,0,1,1,0},// y2 DL
-		{0, 0,-1, 0, 0, 0, 0, 0, 0,  1,1,0,1,1,0,0,0,0},// y2 UL
-		{-1,0,-1, 0, 0, 0, 0, 0, 0,  1,1,1,1,1,1,0,0,0},// y2 U
-		{-1,0, 0, 0, 0, 0,-1, 0, 0,  0,1,1,0,1,1,0,1,1},// y2 R
-		{0, 0, 0, 0, 0, 0,-1, 0,-1,  0,0,0,1,1,1,1,1,1},// y2 D
-		{0, 0,-1, 0, 0, 0, 0, 0,-1,  1,1,0,1,1,0,1,1,0},// y2 L
-		{-1,0,-1, 0, 0, 0,-1, 0,-1,  1,1,1,1,1,1,1,1,1},// y2 A
-
 	};
-//	protected void drawScramble(Graphics2D g, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
-//		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//
-//		int i,j;
-//		int[] seq = {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
-//		boolean[] pins = new boolean[4];
-//		int[] posit = {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
-//
-//		parseScramble( scramble, seq, pins );
-//
-//		for( i=0; i<18; i++)
-//			for( j=0; j<18; j++)
-//				posit[j]+=seq[i]*moves[i][j];
-//
-//		drawBackground(g, colorScheme);
-//
-//		for( i=0; i<18; i++ )
-//			drawClock( g, i, posit[i], colorScheme );
-//
-//		drawPins( g, pins, colorScheme );
-//
-//	}
-
-	/**
-	 * Parse a clock scramble and fill the seq array.
-	 * @param scramble  clock scramble as a String
-	 * @param seq       array representing the number of rotations for each position
-	 * @param pins      the position of the pins after the last move
-	 */
-	protected void parseScramble( String scramble, int[] seq, boolean[] pins ) throws InvalidScrambleException {
-
-		int[] temp = new int[9];
-
-		if(scramble == null || scramble.length() == 0) {
-			return;
-		}
-
-		StringBuffer sb = new StringBuffer();
-		sb.append(turns[0]);
-		for (int i=1; i<turns.length; i++)
-			sb.append("|"+turns[i]);
-		sb.append("|y");
-
-		Pattern p = Pattern.compile("("+sb.toString()+")(\\d)(\\+|-)?");
-		Matcher m = p.matcher(scramble);
-
-		while( m.find() ) {
-			if( m.group(1).equals("y") ) {
-				System.arraycopy(seq, 0, temp, 0, 9);
-				System.arraycopy(seq, 9, seq, 0, 9);
-				System.arraycopy(temp, 0, seq, 9, 9);
-				for (int i=0; i<4; i++)
-					pins[i] = !pins[i];
-				continue;
-			}
-
-			int turn;
-			for (turn = 0; turn < turns.length; turn++)
-				if(turns[turn].equals(m.group(1)))
-					break;
-			if (turn == turns.length)
-				throw new InvalidScrambleException("Unknown turn");
-
-			int rot = Integer.parseInt(m.group(2));
-			rot = ( m.group(3).equals("+") ) ? rot : 12 - rot;
-			seq[turn] = rot;
-			guessPinsAfterTurn(pins, turn);
-		}
-
-		boolean[] lastPins = new boolean[4];
-		boolean pinsPosition = false;
-		scramble += " "; // Hack for the next pattern to work.
-		for (int i=0; i<4; i++) {
-			p = Pattern.compile(turns[i]+"(\\D)");
-			m = p.matcher(scramble);
-			int pinI = (i==0?1:(i==1?3:(i==2?2:0)));
-			lastPins[pinI] = m.find();
-			pinsPosition |= lastPins[pinI];
-		}
-		if( pinsPosition )
-			System.arraycopy(lastPins, 0, pins, 0, 4);
-	}
-
-	/**
-	 * We guess the pins position after a move, for incremental scrambling.
-	 * We use the moves array for that. More precisely, we use look if two consecutive 'edges' are moved by a turn.
-	 * If so, then the pin around them is up.
-	 * I'm glad I found that trick :)
-	 * @param pins   position of pins
-	 * @param turn   turn that just has been done
-	 */
-	private void guessPinsAfterTurn(boolean[] pins, int turn) {
-		int[] edges1 = {3, 1, 3, 5};
-		int[] edges2 = {1, 5, 7, 7};
-		for (int p = 0; p < 4; p++) {
-			pins[p] = ( moves[turn][edges1[p]] * moves[turn][edges2[p]] ) != 0;
-		}
-	}
-
-	protected void drawBackground(Graphics2D g, HashMap<String, Color> colorScheme) {
-		String[] colorString = {"Front", "Back"};
-
-		for(int s = 0; s <2 ; s++) {
-
-			g.translate((s*2+1)*(radius + gap), radius + gap);
-
-			// Draw puzzle
-			g.setColor(Color.BLACK);
-			g.drawOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-			g.drawOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-			g.drawOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-			g.drawOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-			g.drawOval(-radius, -radius, 2*radius, 2*radius);
-			g.setColor(colorScheme.get(colorString[s]));
-			g.fillOval(-radius, -radius, 2*radius, 2*radius);
-			g.fillOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-			g.fillOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-			g.fillOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-			g.fillOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-
-			// Draw clocks
-			for(int i = -1; i < 2; i++ )
-				for(int j = -1; j < 2; j++ ) {
-					g.translate(2*i*clockOuterRadius, 2*j*clockOuterRadius);
-					g.setColor(colorScheme.get(colorString[s] + "Clock"));
-					g.fillOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
-					g.setColor(Color.BLACK);
-					g.drawOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
-
-					g.setColor(colorScheme.get(colorString[s] + "Clock"));
-					for(int k = 0; k < 12; k++) {
-						g.fillOval(-pointSize, -pointRadius-pointSize, 2*pointSize, 2*pointSize);
-						g.rotate(Math.toRadians(30));
-					}
-					g.translate(-2*i*clockOuterRadius, -2*j*clockOuterRadius);
-
-				}
-
-			g.translate(-(s*2+1)*(radius + gap), -(radius + gap));
-		}
-	}
-
-	protected void drawClock(Graphics2D g, int clock, int position, HashMap<String, Color> colorScheme) {
-		AffineTransform old = g.getTransform();
-
-		if(clock < 9) {
-			g.translate(radius + gap, radius + gap);
-		}
-		else {
-			g.translate(3*(radius + gap), radius + gap);
-			clock -= 9;
-		}
-
-		g.translate(2*((clock%3) - 1)*clockOuterRadius, 2*((clock/3) - 1)*clockOuterRadius);
-		g.rotate(Math.toRadians(position*30));
-
-		GeneralPath arrow = new GeneralPath();
-		arrow.moveTo(0, 0);
-		arrow.lineTo(arrowRadius*Math.cos(arrowAngle), -arrowRadius*Math.sin(arrowAngle));
-		arrow.lineTo(0, -arrowHeight);
-		arrow.lineTo(-arrowRadius*Math.cos( arrowAngle ), -arrowRadius*Math.sin(arrowAngle));
-		arrow.closePath();
-
-		g.setColor(colorScheme.get("HandBorder"));
-		g.drawOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
-		g.draw(arrow);
-		g.setColor(colorScheme.get("Hand"));
-		g.fillOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
-		g.fill(arrow);
-
-		g.setTransform(old);
-	}
-
-	protected void drawPins(Graphics2D g, boolean[] pins, HashMap<String, Color> colorScheme) {
-		g.translate(radius + gap, radius + gap);
-		int k = 0;
-		for(int i = -1; i < 2; i += 2) {
-			for(int j = -1; j<2; j += 2) {
-				g.translate(j*clockOuterRadius, i*clockOuterRadius);
-				drawPin(g, pins[k++], colorScheme);
-				g.translate(-j*clockOuterRadius, -i*clockOuterRadius);
-			}
-		}
-
-		g.translate(2*(radius + gap), 0);
-		k=1;
-		for(int i = -1; i < 2; i += 2) {
-			for(int j = -1; j < 2; j += 2) {
-				g.translate(j*clockOuterRadius, i*clockOuterRadius);
-				drawPin(g, !pins[k--], colorScheme);
-				g.translate(-j*clockOuterRadius, -i*clockOuterRadius);
-			}
-			k=3;
-		}
-
-		g.translate(-3*(radius + gap), -(radius + gap));
-	}
-
-	protected void drawPin(Graphics2D g, boolean pin, HashMap<String, Color> colorScheme) {
-		g.setColor(Color.BLACK);
-		g.drawOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
-
-		if(pin) {
-			g.setColor(colorScheme.get("PinUp"));
-			g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
-		} else {
-			g.setColor(colorScheme.get("PinDown"));
-			g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
-		}
-	}
 
 	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
 		// Background
@@ -374,56 +127,102 @@ public class ClockPuzzle extends Puzzle {
 
 	@Override
 	protected int getRandomMoveCount() {
-		// TODO Auto-generated method stub
-		return 10;
+		return 19;
 	}
-	
+
+	@Override
+	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
+		StringBuilder scramble = new StringBuilder();
+
+		for(int x=0; x<9; x++) {
+			int turn = r.nextInt(12)-5;
+			boolean clockwise = ( turn >= 0 );
+			turn = Math.abs(turn);
+			scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
+		}
+		scramble.append( "y2 ");
+		for(int x=4; x<9; x++) {
+			int turn = r.nextInt(12)-5;
+			boolean clockwise = ( turn >= 0 );
+			turn = Math.abs(turn);
+			scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
+		}
+
+		boolean isFirst = true;
+		for(int x=0;x<4;x++) {
+			if (r.nextInt(2) == 1) {
+				scramble.append((isFirst?"":" ")+turns[x]);
+				isFirst = false;
+			}
+		}
+
+		String scrambleStr = scramble.toString();
+
+		PuzzleState state = getSolvedState();
+		try {
+			state = state.applyAlgorithm(scrambleStr);
+		} catch(InvalidScrambleException e) {
+			azzert(false, e);
+			return null;
+		}
+		return new PuzzleStateAndGenerator(state, scrambleStr);
+	}
+
 	private class ClockState extends PuzzleState {
 		
 		private boolean[] pins;
 		private int[] posit;
 		public ClockState() {
-			pins = new boolean[4];
+			pins = new boolean[] {false, false, false, false};
 			posit = new int[] {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
+		}
+
+		public ClockState(boolean[] pins, int[] posit) {
+			this.pins = pins;
+			this.posit = posit;
 		}
 
 		@Override
 		public HashMap<String, PuzzleState> getSuccessors() {
-			// TODO Auto-generated method stub
 			HashMap<String, PuzzleState> successors = new HashMap<String, PuzzleState>();
 			
-			for(int x = 0; x < 9; x++) {
-				for(int turn = -5; turn <= 6; turn++) {
-					boolean clockwise = ( turn >= 0 );
-					turn = Math.abs(turn);
-					successors.put(turns[x] + turn + (clockwise?"+":"-"), new ClockState());
-//					scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
+			for(int turn = 0; turn < turns.length; turn++) {
+				for(int rot = 0; rot < 12; rot++) {
+					// Apply the move
+					int[] positCopy = new int[18];
+					boolean[] pinsCopy = new boolean[4];
+					for( int p=0; p<18; p++)
+						positCopy[p] = posit[p] + rot*moves[turn][p];
+					System.arraycopy(pins, 0, pinsCopy, 0, 4);
+
+					// Build the move string
+					boolean clockwise = ( rot < 7 );
+					String move = turns[turn] + (clockwise?(rot+"+"):((12-rot)+"-"));
+
+					successors.put(move, new ClockState(pinsCopy, positCopy));
 				}
 			}
-//			scramble.append( "y2 ");
-//			for(int x=4; x<9; x++) {
-//				int turn = r.nextInt(12)-5;
-//				boolean clockwise = ( turn >= 0 );
-//				turn = Math.abs(turn);
-//				scramble.append( turns[x] + turn + (clockwise?"+":"-") + " ");
-//			}
-	//	
-//			boolean isFirst = true;
-//			for(int x=0;x<4;x++) {
-//				if (r.nextInt(2) == 1) {
-//					scramble.append((isFirst?"":" ")+turns[x]);
-//					isFirst = false;
-//				}
-//			}
-	//	
-//			return scramble.toString();
 
-////			parseScramble( scramble, seq, pins );
-//
-//			for(int i = 0; i < 18; i++)
-//				for(int j = 0; j < 18; j++)
-//					posit[j]+=seq[i]*moves[i][j];
-			
+			// Still y2 to implement
+			int[] positCopy = new int[18];
+			boolean[] pinsCopy = new boolean[4];
+			System.arraycopy(posit, 0, positCopy, 9, 9);
+			System.arraycopy(posit, 9, positCopy, 0, 9);
+			System.arraycopy(pins, 0, pinsCopy, 0, 4);
+			successors.put("y2", new ClockState(pinsCopy, positCopy));
+
+			// Pins position moves
+			for(int pin = 0; pin < 4; pin++) {
+				int[] positC = new int[18];
+				boolean[] pinsC = new boolean[4];
+				System.arraycopy(posit, 0, positC, 0, 18);
+				System.arraycopy(pins, 0, pinsC, 0, 4);
+				int pinI = (pin==0?1:(pin==1?3:(pin==2?2:0)));
+				pinsC[pinI] = true;
+
+				successors.put(turns[pin], new ClockState(pinsC, positC));
+			}
+
 			return successors;
 		}
 
@@ -450,6 +249,117 @@ public class ClockPuzzle extends Puzzle {
 
 			drawPins(g, pins, colorScheme);
 		}
-		
+
+		protected void drawBackground(Graphics2D g, HashMap<String, Color> colorScheme) {
+			String[] colorString = {"Front", "Back"};
+
+			for(int s = 0; s <2 ; s++) {
+
+				g.translate((s*2+1)*(radius + gap), radius + gap);
+
+				// Draw puzzle
+				g.setColor(Color.BLACK);
+				g.drawOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+				g.drawOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+				g.drawOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+				g.drawOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+				g.drawOval(-radius, -radius, 2*radius, 2*radius);
+				g.setColor(colorScheme.get(colorString[s]));
+				g.fillOval(-radius, -radius, 2*radius, 2*radius);
+				g.fillOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+				g.fillOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+				g.fillOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+				g.fillOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
+
+				// Draw clocks
+				for(int i = -1; i < 2; i++ )
+					for(int j = -1; j < 2; j++ ) {
+						g.translate(2*i*clockOuterRadius, 2*j*clockOuterRadius);
+						g.setColor(colorScheme.get(colorString[s] + "Clock"));
+						g.fillOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
+						g.setColor(Color.BLACK);
+						g.drawOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
+
+						g.setColor(colorScheme.get(colorString[s] + "Clock"));
+						for(int k = 0; k < 12; k++) {
+							g.fillOval(-pointSize, -pointRadius-pointSize, 2*pointSize, 2*pointSize);
+							g.rotate(Math.toRadians(30));
+						}
+						g.translate(-2*i*clockOuterRadius, -2*j*clockOuterRadius);
+
+					}
+
+				g.translate(-(s*2+1)*(radius + gap), -(radius + gap));
+			}
+		}
+
+		protected void drawClock(Graphics2D g, int clock, int position, HashMap<String, Color> colorScheme) {
+			AffineTransform old = g.getTransform();
+
+			if(clock < 9) {
+				g.translate(radius + gap, radius + gap);
+			}
+			else {
+				g.translate(3*(radius + gap), radius + gap);
+				clock -= 9;
+			}
+
+			g.translate(2*((clock%3) - 1)*clockOuterRadius, 2*((clock/3) - 1)*clockOuterRadius);
+			g.rotate(Math.toRadians(position*30));
+
+			GeneralPath arrow = new GeneralPath();
+			arrow.moveTo(0, 0);
+			arrow.lineTo(arrowRadius*Math.cos(arrowAngle), -arrowRadius*Math.sin(arrowAngle));
+			arrow.lineTo(0, -arrowHeight);
+			arrow.lineTo(-arrowRadius*Math.cos( arrowAngle ), -arrowRadius*Math.sin(arrowAngle));
+			arrow.closePath();
+
+			g.setColor(colorScheme.get("HandBorder"));
+			g.drawOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
+			g.draw(arrow);
+			g.setColor(colorScheme.get("Hand"));
+			g.fillOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
+			g.fill(arrow);
+
+			g.setTransform(old);
+		}
+
+		protected void drawPins(Graphics2D g, boolean[] pins, HashMap<String, Color> colorScheme) {
+			g.translate(radius + gap, radius + gap);
+			int k = 0;
+			for(int i = -1; i < 2; i += 2) {
+				for(int j = -1; j<2; j += 2) {
+					g.translate(j*clockOuterRadius, i*clockOuterRadius);
+					drawPin(g, pins[k++], colorScheme);
+					g.translate(-j*clockOuterRadius, -i*clockOuterRadius);
+				}
+			}
+
+			g.translate(2*(radius + gap), 0);
+			k=1;
+			for(int i = -1; i < 2; i += 2) {
+				for(int j = -1; j < 2; j += 2) {
+					g.translate(j*clockOuterRadius, i*clockOuterRadius);
+					drawPin(g, !pins[k--], colorScheme);
+					g.translate(-j*clockOuterRadius, -i*clockOuterRadius);
+				}
+				k=3;
+			}
+
+			g.translate(-3*(radius + gap), -(radius + gap));
+		}
+
+		protected void drawPin(Graphics2D g, boolean pin, HashMap<String, Color> colorScheme) {
+			g.setColor(Color.BLACK);
+			g.drawOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
+
+			if(pin) {
+				g.setColor(colorScheme.get("PinUp"));
+				g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
+			} else {
+				g.setColor(colorScheme.get("PinDown"));
+				g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
+			}
+		}
 	}
 }
