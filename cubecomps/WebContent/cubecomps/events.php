@@ -222,17 +222,17 @@ function callPage(url)
 <?
 echo "<table class=tcats width=100% cellspacing=10 border=0>";
 $nevents = 0;
-$result = strict_mysql_query("SELECT $eventstable.*, categories.name, categories.canhavetimelimit, categories.abbr FROM $eventstable JOIN categories WHERE $eventstable.id=categories.id ORDER BY categories.id");
+$result = strict_query("SELECT $eventstable.*, categories.name, categories.canhavetimelimit, categories.abbr FROM $eventstable JOIN categories WHERE $eventstable.id=categories.id ORDER BY categories.id");
 if (!$result) echo mysql_error();
-$formats = strict_mysql_query("SELECT * FROM formats ORDER BY id");
+$formats = strict_query("SELECT * FROM formats ORDER BY id");
 $fmts = array();
 while($row=cased_mysql_fetch_array($formats)) {
 	$fmts[] = $row["name"];
 }
 while($event=cased_mysql_fetch_array($result))
 {
-	$lrwt = strict_mysql_query("SELECT round FROM $timestable WHERE cat_id=".$event["id"]." ORDER BY round DESC LIMIT 1");
-	if (mysql_num_rows($lrwt))
+	$lrwt = strict_query("SELECT round FROM $timestable WHERE cat_id=".$event["id"]." ORDER BY round DESC LIMIT 1");
+	if (sql_num_rows($lrwt))
 		$last_rwt = cased_mysql_result($lrwt,0,"round");
 	else
 		$last_rwt = 0;
@@ -254,7 +254,7 @@ while($event=cased_mysql_fetch_array($result))
 	echo "<DIV style='margin-left:10px;'>";
 	$round = 1;
 	$rnd = "r1";
-	while($event[$rnd])
+	while($round <= 4 && $event[$rnd])
 	{	
 		$nextrnd = "r".($round+1);
 		echo "<b>".roundString($round,$nrounds,($event["canhavetimelimit"] && $round==1 && $event["timelimit"]))."</b> ";
@@ -281,12 +281,12 @@ while($event=cased_mysql_fetch_array($result))
 		// groupsize
 		if ($event[$rnd."_open"])
 		{
-			$in = cased_mysql_result(strict_mysql_query("SELECT COUNT(*) AS count FROM $regstable WHERE cat_id=".$event["id"]." AND round=".$round),0,"count");
+			$in = cased_mysql_result(strict_query("SELECT COUNT(*) AS count FROM $regstable WHERE cat_id=".$event["id"]." AND round=".$round),0,"count");
 			if ($round==1) $r1in = $in;
 			if ($round>1 || $event[$rnd."_groupsize"] > $in)
 				$out = 0;
 			else
-				$out = cased_mysql_result(strict_mysql_query("SELECT COUNT(*) AS count FROM $compstable WHERE cat".$event["id"]."=\"-\""),0,"count");
+				$out = cased_mysql_result(strict_query("SELECT COUNT(*) AS count FROM $compstable WHERE cat".$event["id"]."=\"-\""),0,"count");
 			$out = ($out?", $out out":"");
 			echo "- $in people in$out ";
 		}
@@ -356,8 +356,8 @@ while($event=cased_mysql_fetch_array($result))
 if ($nevents) echo "</tr>";
 echo "<tr valign=top>";
 
-$result = strict_mysql_query("SELECT categories.* FROM categories LEFT OUTER JOIN $eventstable ON categories.id=$eventstable.id WHERE $eventstable.id IS NULL ORDER BY categories.id");
-if (mysql_num_rows($result))
+$result = strict_query("SELECT categories.* FROM categories LEFT OUTER JOIN $eventstable ON categories.id=$eventstable.id WHERE $eventstable.id IS NULL ORDER BY categories.id");
+if (sql_num_rows($result))
 {
 	echo "<td><table cellspacing=0 border=0 class=nested><tr valign=top><td style='width:58px;'><img border=0 src='img/corneradd.jpg'></td><td style='width:100%;'><div class=header>Add event</div><DIV style='margin-left:75px;'><form method=get action=\"addevent.php\"><select name=id>";
 	while($row=cased_mysql_fetch_array($result)) 
@@ -365,7 +365,7 @@ if (mysql_num_rows($result))
 	echo "<input type=submit value=\"add\"></form></DIV></td></tr></table></td>";
 }
 
-mysql_close();
+sql_close();
 ?>
 <td><table cellspacing=0 border=0 class=nested><tr valign=top><td style='width:58px;'><img border=0 src='img/cornerimport.jpg'></td><td style='width:100%;'><div class=header>Import .CSV or .XLS registration file</div><DIV style='margin-left:75px;'><form action="importcsv.php" target="w_csvimport" onsubmit="w=window.open('', 'w_csvimport', 'width=600, height='+screen.availHeight+', top=0, left='+(screen.availWidth-600)+', location=0, scrollbars=1, resizable=1');w.focus();" method="post" enctype="multipart/form-data">
 <label for="file">file:</label>

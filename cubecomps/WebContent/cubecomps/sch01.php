@@ -33,7 +33,7 @@ class ScheduleClass
         $this->rounds[$this->nrounds]["ev"] = $evt;
 		if ($altEvt)
 	        $this->rounds[$this->nrounds]["ae"] = $altEvt;
-		elseif ($this->categories[$evt])
+		elseif (array_key_exists($evt,$this->categories))
 			$this->rounds[$this->nrounds]["ae"] = $this->categories[$evt];
         $this->rounds[$this->nrounds]["rn"] = $rnd;
         $this->rounds[$this->nrounds]["co"] = $comment;
@@ -140,7 +140,7 @@ class ScheduleClass
 					$h = ($IE?5:3);
 					//$echo .= "<div style='margin:0 0 0 32px;'><h$h style='color:#114;margin:".($height<=6 ? 4 : 10)."px 0 0 0;". ($height<=3 ? "display:inline;" : "") ."'>" . $this->rounds[$idx]["ae"]."</h$h><b>";
 					//if ($height<=3) $echo .= "&nbsp;&nbsp;&nbsp;";
-					$echo .= "<div style='margin:0 0 0 32px;".($height<=5?"position:relative;top:". ($height<=3?"-2":"+3"). "px":"")."'><h$h style='color:#114;margin:".($height<=6 ? 4 : 10)."px 0 0 0;". ($height<=5 ? "display:inline;" : "") ."'>" . $this->rounds[$idx]["ae"]."</h$h><b>";
+					$echo .= "<div style='margin:0 0 0 32px;".($height<=5?"position:relative;top:". ($height<=3?"-2":"+3"). "px":"")."'><h$h style='color:#114;margin:".($height<=6 ? 4 : 10)."px 0 0 0;". ($height<=5 ? "display:inline;" : "") ."'>" . @$this->rounds[$idx]["ae"] . "</h$h><b>";
 					if ($height<=5) $echo .= "&nbsp;&nbsp;&nbsp;";
 					if (isset($events[_RX][$evt]))
 					{

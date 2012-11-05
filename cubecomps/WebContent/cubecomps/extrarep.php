@@ -48,12 +48,12 @@ $pdf->Write(5,"Podiums");
 $pdf->Line(11,21,286.5,21);
 $pdf->Ln(10);
 
-$events = strict_mysql_query("SELECT $eventstable.*, name, timetype FROM $eventstable JOIN categories ON categories.id=$eventstable.id ORDER BY $eventstable.id");
+$events = strict_query("SELECT $eventstable.*, name, timetype FROM $eventstable JOIN categories ON categories.id=$eventstable.id ORDER BY $eventstable.id");
 while ($rowEvt=cased_mysql_fetch_array($events))
 {
 	$round = 4;
 	while ($round > 1 && !$rowEvt["r".$round."_open"]) $round--;
-	$format = strict_mysql_query("SELECT name, avgtype FROM formats WHERE id=".$rowEvt["r".$round."_format"]);
+	$format = strict_query("SELECT name, avgtype FROM formats WHERE id=".$rowEvt["r".$round."_format"]);
 	$avgname = cased_mysql_result($format,0,"name");
 	$avgtype = cased_mysql_result($format,0,"avgtype");
 	$cat_id = $rowEvt["id"];
@@ -70,7 +70,7 @@ while ($rowEvt=cased_mysql_fetch_array($events))
 		"JOIN $compstable ON ($timestable.comp_id=$compstable.id) ".
 		"WHERE $timestable.cat_id=$cat_id AND $timestable.round=$round ".
 		"ORDER BY $timestable.average=\"\", $timestable.average, $timestable.best";
-	$result = strict_mysql_query($query);
+	$result = strict_query($query);
 	$classification = 0;
 	$count = 0;
 	$qualified = 3;
@@ -108,8 +108,8 @@ $pdf->Write(5,"Special classifications (for Rubik's Cube only)");
 $pdf->Line(11,21,286.5,21);
 $pdf->Ln(10);
 
-$result = strict_mysql_query("SELECT $compstable.name, $compstable.birthday, countries.name AS country FROM $timestable JOIN $compstable ON $compstable.id=$timestable.comp_id JOIN countries ON $compstable.country_id=countries.id WHERE $timestable.cat_id=1 AND $timestable.best<'A' ORDER BY $compstable.birthday DESC LIMIT 1");
-if (mysql_num_rows($result))
+$result = strict_query("SELECT $compstable.name, $compstable.birthday, countries.name AS country FROM $timestable JOIN $compstable ON $compstable.id=$timestable.comp_id JOIN countries ON $compstable.country_id=countries.id WHERE $timestable.cat_id=1 AND $timestable.best<'A' ORDER BY $compstable.birthday DESC LIMIT 1");
+if (sql_num_rows($result))
 {
 	$pdf->SetFont("","B",12);
 	$pdf->Write(5,"Youngest solver");
@@ -120,8 +120,8 @@ if (mysql_num_rows($result))
 	$pdf->Ln(10);
 }
 
-$result = strict_mysql_query("SELECT $compstable.name, $compstable.birthday, countries.name AS country FROM $timestable JOIN $compstable ON $compstable.id=$timestable.comp_id JOIN countries ON $compstable.country_id=countries.id WHERE $timestable.cat_id=1 AND $timestable.best<'A' ORDER BY $compstable.birthday LIMIT 1");
-if (mysql_num_rows($result))
+$result = strict_query("SELECT $compstable.name, $compstable.birthday, countries.name AS country FROM $timestable JOIN $compstable ON $compstable.id=$timestable.comp_id JOIN countries ON $compstable.country_id=countries.id WHERE $timestable.cat_id=1 AND $timestable.best<'A' ORDER BY $compstable.birthday LIMIT 1");
+if (sql_num_rows($result))
 {
 	$pdf->SetFont("","B",12);
 	$pdf->Write(5,"Oldest solver");
@@ -132,8 +132,8 @@ if (mysql_num_rows($result))
 	$pdf->Ln(10);
 }
 
-$result = strict_mysql_query("SELECT $compstable.name, countries.name AS country, $timestable.best FROM $timestable JOIN $compstable ON $compstable.id=$timestable.comp_id JOIN countries ON $compstable.country_id=countries.id WHERE $timestable.cat_id=1 ORDER BY $timestable.best LIMIT 1");
-if (mysql_num_rows($result))
+$result = strict_query("SELECT $compstable.name, countries.name AS country, $timestable.best FROM $timestable JOIN $compstable ON $compstable.id=$timestable.comp_id JOIN countries ON $compstable.country_id=countries.id WHERE $timestable.cat_id=1 ORDER BY $timestable.best LIMIT 1");
+if (sql_num_rows($result))
 {
 	$pdf->SetFont("","B",12);
 	$pdf->Write(5,"Fastest solve");
@@ -144,11 +144,11 @@ if (mysql_num_rows($result))
 	$pdf->Ln(10);
 }
 
-$result = strict_mysql_query("SELECT $compstable.name, average, countries.name AS country FROM $compstable ".
+$result = strict_query("SELECT $compstable.name, average, countries.name AS country FROM $compstable ".
 	"JOIN (SELECT comp_id, MIN(average) AS average FROM $timestable WHERE cat_id=1 GROUP BY comp_id) avg ON avg.comp_id=$compstable.id ".
 	"JOIN countries ON $compstable.country_id=countries.id ".
 	"WHERE gender=\"f\" AND average!=\"\" ORDER BY average LIMIT 3");
-if (mysql_num_rows($result))
+if (sql_num_rows($result))
 {
 	$pdf->SetFont("","B",12);
 	$pdf->Write(5,"Fastest females");
@@ -166,5 +166,5 @@ if (mysql_num_rows($result))
 $pdf->SetDisplayMode("fullpage","single");
 $pdf->Output();
 
-mysql_close();
+sql_close();
 ?>

@@ -23,7 +23,7 @@ $query = "CREATE TABLE IF NOT EXISTS $eventstable (
   PRIMARY KEY  (`id`)
 )";
 
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 $query = "CREATE TABLE IF NOT EXISTS $compstable (
   `id` SMALLINT( 3 ) NOT NULL AUTO_INCREMENT ,
@@ -36,7 +36,7 @@ $query = "CREATE TABLE IF NOT EXISTS $compstable (
   INDEX ( `WCAid` , `name` )
 )";
 
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 $query = "CREATE TABLE IF NOT EXISTS $regstable (
   `cat_id` tinyint(2) NOT NULL,
@@ -44,7 +44,7 @@ $query = "CREATE TABLE IF NOT EXISTS $regstable (
   `comp_id` smallint(3) NOT NULL,
   PRIMARY KEY  (`cat_id`,`round`,`comp_id`)
 )";
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 $query = "CREATE TABLE IF NOT EXISTS $timestable (
   `cat_id` tinyint(2) NOT NULL,
@@ -59,6 +59,6 @@ $query = "CREATE TABLE IF NOT EXISTS $timestable (
   `best` varchar(15) NOT NULL,
   PRIMARY KEY  (`cat_id`,`round`,`comp_id`)
 )";
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 ?>
