@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS $eventstable (
 EOT;
 //<<< ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=utf8
 
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 /*<<<
 $query = <<<EOT
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS $compstable (
 )
 EOT;
 
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 $query = <<<EOT
 CREATE TABLE IF NOT EXISTS $regstable (
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS $regstable (
 )
 EOT;
 //<<< ENGINE=MyISAM DEFAULT CHARSET=utf8;
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 $query = <<<EOT
 CREATE TABLE IF NOT EXISTS $timestable (
@@ -84,6 +84,6 @@ CREATE TABLE IF NOT EXISTS $timestable (
 )
 EOT;
 //<<< ENGINE=MyISAM DEFAULT CHARSET=utf8
-$result = strict_mysql_query($query);
+$result = strict_query($query);
 
 ?>

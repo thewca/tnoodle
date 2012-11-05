@@ -1,7 +1,8 @@
 <?
 require_once "lib.php";
-include "lib_ref_admin.php";
-include "db.php";
+require_once "lib_ref_admin.php";
+require_once "db.php";
+require_once "lib_get.php";
 
 function formatTime($t,$type=NULL)
 {
@@ -93,20 +94,20 @@ $color = "#4b5b51";
 $light_color = "#b0c7b4";
 $dark_color = "#0a1414";
 
-$cat_id = $_GET["cat_id"];
-$round = $_GET["round"];
-$comp_id = $_GET["comp_id"];
+$cat_id = _GET_num("cat_id");
+$round = _GET_num("round");
+$comp_id = _GET_num("comp_id");
 if (!$cat_id || !$round || $round<=1 || !$comp_id) error(0);
 
-$qualified = strict_mysql_query("SELECT * FROM $regstable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
-$qualified = ($qualified && mysql_num_rows($qualified)==1);
+$qualified = strict_query("SELECT * FROM $regstable WHERE cat_id=? AND round=? AND comp_id=?", array($cat_id,$round,$comp_id));
+$qualified = (sql_num_rows($qualified)==1);
 if (!$qualified) error(1);
 
-$noscore = strict_mysql_query("SELECT * FROM $timestable WHERE cat_id=$cat_id AND round=$round AND comp_id=$comp_id");
-$noscore = ($noscore && mysql_num_rows($noscore)==0);
+$noscore = strict_query("SELECT * FROM $timestable WHERE cat_id=? AND round=? AND comp_id=?", array($cat_id,$round,$comp_id));
+$noscore = (sql_num_rows($noscore)==0);
 if (!$noscore) error(2);
 
-$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$cat_id);
+$event = strict_query("SELECT * FROM $eventstable WHERE id=?", array($cat_id));
 $lastopenround = 4;
 while ($lastopenround>1 && !cased_mysql_result($event,0,"r".$lastopenround."_open")) $lastopenround--;
 if ($lastopenround==1 || $round!=$lastopenround) error(3);
@@ -114,22 +115,22 @@ if ($lastopenround==1 || $round!=$lastopenround) error(3);
 $lastround = 4;
 while ($lastround>1 && !cased_mysql_result($event,0,"r$lastround")) $lastround--;
 
-$category = strict_mysql_query("SELECT name, timetype FROM categories WHERE id=".$cat_id);
+$category = strict_query("SELECT name, timetype FROM categories WHERE id=?", array($cat_id));
 $timetype = cased_mysql_result($category,0,"timetype");
-$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".($round-1)."_format"));
+$format = strict_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".($round-1)."_format"));
 $avgtype = cased_mysql_result($format,0,"avgtype");
 $query =
 	"SELECT $regstable.comp_id, $timestable.average, $timestable.best, reg2.cat_id AS flag, $compstable.name, countries.name AS cname, $compstable.gender FROM $regstable ".
 	"JOIN $timestable ON ($regstable.cat_id=$timestable.cat_id AND $regstable.round=$timestable.round AND $regstable.comp_id=$timestable.comp_id) ".
-	"LEFT OUTER JOIN $regstable AS reg2 ON ($regstable.cat_id=reg2.cat_id AND reg2.round=$round AND $regstable.comp_id=reg2.comp_id) ".
+	"LEFT OUTER JOIN $regstable AS reg2 ON ($regstable.cat_id=reg2.cat_id AND reg2.round=? AND $regstable.comp_id=reg2.comp_id) ".
 	"JOIN $compstable ON ($compstable.id=$regstable.comp_id) ".
 	"JOIN countries ON (countries.id=$compstable.country_id) ".
-	"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .($round-1)." AND $timestable.t1 IS NOT NULL AND $timestable.best<\"A\" ".
+	"WHERE $regstable.cat_id=? AND $regstable.round=? AND $timestable.t1 IS NOT NULL AND $timestable.best<\"A\" ".
 	"ORDER BY $timestable.average=\"\", $timestable.average, $timestable.best";
-$list = strict_mysql_query($query);
+$list = strict_query($query, array($round,$cat_id,$round-1));
 $groupsize = cased_mysql_result($event,0,"r".$round."_groupsize");
 
-$top = mysql_num_rows($list);
+$top = sql_num_rows($list);
 $line = 0;
 $old = null;
 $in = 0;
@@ -211,5 +212,5 @@ Confirm this operation with your administrative password:
 </html>
 
 <?
-mysql_close();
+sql_close();
 ?>

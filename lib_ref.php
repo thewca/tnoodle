@@ -3,8 +3,8 @@
  * This is because some pages take actions over the database (or where else), and if entered in error, they could cause
  * unexpected or even harmful results.
  */
-include "inc_private.php";
-if (!preg_match("~//(www\\.|test\\.)?".DOMAIN."~i",$_SERVER["HTTP_REFERER"]))
+require_once "inc_private.php";
+if (!array_key_exists("HTTP_REFERER", $_SERVER) || !preg_match("~//(www\\.|test\\.)?".DOMAIN."~i",$_SERVER["HTTP_REFERER"]))
 {
 	$txt = <<<TEXT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

@@ -1,11 +1,15 @@
 <?
-include "lib_reg.php";
-include "lib_ref_admin.php";
+require_once "lib_reg.php";
+require_once "lib_ref_admin.php";
+require_once "lib_get.php";
 
-if ($_GET["comp_id"] && $_GET["cat_id"]) 
+$comp_id = _GET_num("comp_id");
+$cat_id = _GET_num("cat_id");
+
+if ($comp_id && $cat_id) 
 {
-	include "db.php";
-	echo toggleReg($_GET["comp_id"],$_GET["cat_id"]);
-	mysql_close();
+	require_once "db.php";
+	echo toggleReg($comp_id,$cat_id);
+	sql_close();
 }
 ?>

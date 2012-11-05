@@ -1,5 +1,7 @@
 <?
 require_once "lib.php";
+require_once "lib_get.php";
+
 function timeNum($t,$type=NULL)
 {
 	if (!$t) die("ERROR: blank result");
@@ -146,25 +148,36 @@ function getAverageAndBest(&$average,&$best)
 	}
 }
 
-include "lib_ref.php";
+require_once "lib_ref.php";
 
-if ($_GET["comp_id"] && $_GET["cat_id"] && $_GET["round"])
+$_GETcomp_id = _GET_num("comp_id"); 
+$_GETcat_id = _GET_num("cat_id"); 
+$_GETround = _GET_num("round");
+
+$x = 1;
+while ($x <= 5 && array_key_exists("t$x",$_GET))
 {
-	include "db.php";
+	$_GET["t$x"] = preg_replace('/[^DNFS0-9\.\:]/','',$_GET["t$x"]);
+	$x++;
+}
+
+if ($_GETcomp_id && $_GETcat_id && $_GETround)
+{
+	require_once "db.php";
 	//
-	$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$_GET["cat_id"]);
-	if (!mysql_num_rows($event) || !cased_mysql_result($event,0,"r".$_GET["round"]."_open")) die("Round not open!");
-	$qualified = strict_mysql_query("SELECT round FROM $regstable WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]);
-	if (mysql_num_rows($qualified))
+	$event = strict_query("SELECT * FROM $eventstable WHERE id=?", array($_GETcat_id));
+	if (!sql_num_rows($event) || !cased_mysql_result($event,0,"r".$_GETround."_open")) die("Round not open!");
+	$qualified = strict_query("SELECT round FROM $regstable WHERE cat_id=? AND round=? AND comp_id=?", array($_GETcat_id,$_GETround,$_GETcomp_id));
+	if (sql_num_rows($qualified))
 	{
-		$category = strict_mysql_query("SELECT * FROM categories WHERE id=".$_GET["cat_id"]);
+		$category = strict_query("SELECT * FROM categories WHERE id=?", array($_GETcat_id));
 		$timetype = cased_mysql_result($category,0,"timetype");
-		$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".$_GET["round"]."_format"));
+		$format = strict_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".$_GETround."_format"));
 		$times = cased_mysql_result($format,0,"times");
 		$avgtype = cased_mysql_result($format,0,"avgtype");
-		$alreadyhastimes = mysql_num_rows(strict_mysql_query("SELECT round FROM $timestable WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]));
+		$alreadyhastimes = sql_num_rows(strict_query("SELECT round FROM $timestable WHERE cat_id=? AND round=? AND comp_id=?", array($_GETcat_id,$_GETround,$_GETcomp_id)));
 		//
-		if (cased_mysql_result($category,0,"canhavetimelimit") && $_GET["round"]==1)
+		if (cased_mysql_result($category,0,"canhavetimelimit") && $_GETround==1)
 		{
 			$timelimit = cased_mysql_result($event,0,"timelimit");
 			if($timelimit)
@@ -177,7 +190,7 @@ if ($_GET["comp_id"] && $_GET["cat_id"] && $_GET["round"])
 			$timelimit = "";
 		if($timelimit)
 		{
-			if ($times==5 || $_GET["cat_id"]==16)
+			if ($times==5 || $_GETcat_id==16)
 				$tries = 2;
 			else
 				$tries = 1;
@@ -188,25 +201,35 @@ if ($_GET["comp_id"] && $_GET["cat_id"] && $_GET["round"])
 		//
 		getAverageAndBest($average,$best);
 		$query = "";
+		$array = array();
 		for ($x=1;$x<=5;$x++)
 		{
 			if ($query) $query .= ", ";
 			if ($x>$times || (!$cutpassed && $x>$tries))
 				$query .= "t".$x."=''";
 			else
-				$query .= "t".$x."='".$_GET["t".$x]."'";
+			{
+				$query .= "t".$x."=?";
+				$array[count($array)] = $_GET["t".$x];
+			}
 		}
-		if (strict_mysql_query(
+		$array[count($array)] = $_GETcat_id;
+		$array[count($array)] = $_GETround;
+		$array[count($array)] = $_GETcomp_id;
+		strict_query(
+			(
 			$alreadyhastimes ? 
-			"UPDATE $timestable SET $query, average='$average', best='$best' WHERE cat_id=" .$_GET["cat_id"]. " AND round=" .$_GET["round"]. " AND comp_id=" .$_GET["comp_id"]
+			"UPDATE $timestable SET $query, average='$average', best='$best' WHERE cat_id=? AND round=? AND comp_id=?"
 			:
-			"INSERT INTO $timestable SET cat_id=" .$_GET["cat_id"]. ", round=" .$_GET["round"]. ", comp_id=" .$_GET["comp_id"].", $query, average='$average', best='$best'"
-			))
-			echo "OK";
-		else
-			echo "ERROR: ".mysql_error();
+			"INSERT INTO $timestable SET $query, average='$average', best='$best', cat_id=?, round=?, comp_id=?"
+			)
+			,
+			$array
+		);
+		//
+		echo "OK";
 	}
 	//
-	mysql_close();
+	sql_close();
 }
 ?>

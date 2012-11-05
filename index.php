@@ -89,7 +89,7 @@ function listComps($txt)
 {
 	global $result, $count, $IE, $live;
 	$width = 300;
-	$twidth = mysql_num_rows($result)*$width;
+	$twidth = sql_num_rows($result)*$width;
 	echo "<div class=header>";
 	if ($IE) 
 		echo "<span style='vertical-align:-6px;margin:12px;'>$txt</span></div>";
@@ -148,26 +148,36 @@ require_once "inc_private.php";
 
 if ($test)
 {
-	mysql_connect(SQL_SERVER, SQL_TEST_USER, SQL_TEST_PASSWORD);
-	mysql_select_db(SQL_TEST_DBNAME);
-}
-else
+	if (SQL_DBTYPE == DBTYPE_MYSQL)
+	{
+		mysql_connect(SQL_SERVER, SQL_TEST_USER, SQL_TEST_PASSWORD);
+		mysql_select_db(SQL_TEST_DBNAME);
+	}
+	else
+		$DBH = new PDO(SQL_TEST_DSN, SQL_TEST_USER, SQL_TEST_PASSWORD);
+} 
+else 
 {
-	mysql_connect(SQL_SERVER, SQL_USER, SQL_PASSWORD);
-	mysql_select_db(SQL_DBNAME);
+	if (SQL_DBTYPE == DBTYPE_MYSQL)
+	{
+		mysql_connect(SQL_SERVER, SQL_USER, SQL_PASSWORD);
+		mysql_select_db(SQL_DBNAME);
+	}
+	else
+		$DBH = new PDO(SQL_DSN, SQL_USER, SQL_PASSWORD);
 }
 //
 $count = 0;
-$result = strict_mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>=date_b AND NOW()<=date_e ORDER BY date_b");
-if (mysql_num_rows($result)) listComps("Competitions in progress");
+$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>=date_b AND NOW()<=date_e ORDER BY date_b");
+if (sql_num_rows($result)) listComps("Competitions in progress");
 //
-$result = strict_mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>date_e ORDER BY date_b DESC");
-if (mysql_num_rows($result)) listComps("Past competitions");
+$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>date_e ORDER BY date_b DESC");
+if (sql_num_rows($result)) listComps("Past competitions");
 //
-$result = strict_mysql_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()<date_b ORDER BY date_b");
-if (mysql_num_rows($result)) listComps("Upcoming competitions");
+$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()<date_b ORDER BY date_b");
+if (sql_num_rows($result)) listComps("Upcoming competitions");
 //
-mysql_close();
+sql_close();
 
 echo "<div style='color:#444;'><br><br>";
 if (!$live) echo "Looking for the <a href='http://live.".DOMAIN."'>live results</a> site?<br><br>";

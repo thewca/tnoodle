@@ -1,6 +1,6 @@
 <?
 require_once "lib.php";
-include "lib_admin.php";
+require_once "lib_admin.php";
 
 function abbr($t)
 {
@@ -24,10 +24,10 @@ function columnHeader($caption,$o)
 	return $st;
 }
 
-include "db.php";
+require_once "db.php";
 
-$categories = strict_mysql_query("SELECT * FROM categories JOIN $eventstable ON categories.id=$eventstable.id ORDER BY categories.id");
-$ncats = mysql_num_rows($categories);
+$categories = strict_query("SELECT * FROM categories JOIN $eventstable ON categories.id=$eventstable.id ORDER BY categories.id");
+$ncats = sql_num_rows($categories);
 $catwidth = 30;
 
 $color = "#6b7b71";
@@ -358,8 +358,8 @@ switch($order)
 	default:
 		$query .= "$compstable.name"; 
 }
-$result = strict_mysql_query($query);
-$ncomps = mysql_num_rows($result);
+$result = strict_query($query);
+$ncomps = sql_num_rows($result);
 ?>
 
 <table class=t_tabs><tr>
@@ -374,7 +374,7 @@ if (!$ncomps)
 	echo "<th><div class=col_ot>&nbsp;</div></th></tr></table><SPAN id=container><table id=T_TD class=TD cellspacing=0><tr>";
 else
 {
-	$closedevents = strict_mysql_query("SELECT id FROM $eventstable WHERE r2_open=TRUE");
+	$closedevents = strict_query("SELECT id FROM $eventstable WHERE r2_open=TRUE");
 	$closed = array();
 	while ($row=cased_mysql_fetch_array($closedevents)) $closed[(int)$row["id"]] = true;
 	//
@@ -382,7 +382,7 @@ else
 		echo "<th><div title=\"".$rcat["name"]."\" style='width:".$catwidth."px;'>".abbr($rcat["abbr"])."</div></th>";
 	echo "<th><div class=col_ot>&nbsp;</div></th></tr></table><DIV><SPAN id=container><table id=T_TD class=TD cellspacing=0>";
 	//
-	$compHasTimesR1 = strict_mysql_query("SELECT DISTINCT CONCAT(cat_id,'_',comp_id) AS id FROM $timestable WHERE round=1");
+	$compHasTimesR1 = strict_query("SELECT DISTINCT CONCAT(cat_id,'_',comp_id) AS id FROM $timestable WHERE round=1");
 	$compHTR1 = array();
 	while ($row=cased_mysql_fetch_array($compHasTimesR1))
 		$compHTR1[$row["id"]] = true;
@@ -391,11 +391,11 @@ else
 	$count = 0;
 	while ($row=cased_mysql_fetch_array($result))
 	{
-		echo "<tr class=comprow_".(($count++) % 2?"odd":"even")."><td><div class=col_cl>" .$row["id"]. "</div></td><td><div class=col_wi>" .$row["WCAid"]. "</div></td><td><div class=col_nm><a href='editcomp.php?id=".$row["id"]."' target='w_details' title='click to edit details' onclick='openWDetails();'>" .$row["name"]. "</a></div></td><td><div class=col_bd>" .$row["birthday"]. "</div></td><td><div class=col_ct>" .$row["country"]. "</div></td><td><div class=col_gd align=center>" .$row["gender"]. "</div></td>";
+		echo "<tr class=comprow_".(($count++) % 2?"odd":"even")."><td><div class=col_cl>" .$row["id"]. "</div></td><td><div class=col_wi>" .$row["WCAid"]. "</div></td><td><div class=col_nm><a href='editcomp.php?id=".$row["id"]."' target='w_details' title='click to edit details' onclick='openWDetails();'>" .htmlspecialchars($row["name"],ENT_QUOTES). "</a></div></td><td><div class=col_bd>" .$row["birthday"]. "</div></td><td><div class=col_ct>" .$row["country"]. "</div></td><td><div class=col_gd align=center>" .$row["gender"]. "</div></td>";
 		$candelete = true;
 		if ($ncats)
 		{
-			mysql_data_seek($categories,0);
+			sql_data_reset($categories,0);
 			while ($rcat=cased_mysql_fetch_array($categories))
 			{
 				if ($row["cat".$rcat["id"]]=="X" && isset($compHTR1[$rcat["id"]."_".$row["id"]]))
@@ -410,7 +410,7 @@ else
 				echo ">".($row["cat".$rcat["id"]]!=""?$row["cat".$rcat["id"]]:"&nbsp;")."</div></td>";
 			}
 		}
-		echo "<td><div class=col_ot><a href='timessheet.php?comp_id=" .$row["id"]. "' target=_blank>[cards]</a>".($candelete ? " <a style='cursor:pointer;' onclick='if (confirm(\"Remove " .$row["name"]. " from the competitors list?\")) callPage(\"delcompetitor.php?id=" .$row["id"]. "\");'>[delete]</a>" : "")."</div></td></tr>";
+		echo "<td><div class=col_ot><a href='timessheet.php?comp_id=" .$row["id"]. "' target=_blank>[cards]</a>".($candelete ? " <a style='cursor:pointer;' onclick='if (confirm(\"Remove " .htmlspecialchars($row["name"],ENT_QUOTES). " from the competitors list?\")) callPage(\"delcompetitor.php?id=" .$row["id"]. "\");'>[delete]</a>" : "")."</div></td></tr>\r\n";
 	}
 }
 ?>
@@ -425,7 +425,7 @@ else
 <td><select id=country name=country style="width:100px;">
 <option value=""></option>
 <?
-$result = strict_mysql_query("SELECT * FROM countries");
+$result = strict_query("SELECT * FROM countries");
 while ($row=cased_mysql_fetch_array($result))
 {
 	echo "<option value=\"" . $row["id"] . "\"";
@@ -464,5 +464,5 @@ else
 </html>
 
 <?
-mysql_close();
+sql_close();
 ?>

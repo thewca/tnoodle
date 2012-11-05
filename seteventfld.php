@@ -1,5 +1,6 @@
 <?
-include "lib_ref_admin.php";
+require_once "lib_ref_admin.php";
+require_once "lib_get.php";
 
 function timelimitNum00($t)
 {
@@ -22,13 +23,16 @@ function formatTimelimit00($t)
 	return $t;
 }
 
-if ($_GET["id"] && $_GET["fld"] && isset($_GET["value"])) 
+$_GETid = _GET_num("id");
+$_GETfld = _GET_fld("fld");
+
+if ($_GETid && $_GETfld && isset($_GET["value"])) 
 {
-	include "db.php";
+	require_once "db.php";
 	//
-	$value = $_GET["value"];
-	if ($_GET["fld"]=="timelimit")
+	if ($_GETfld=="timelimit")
 	{
+		$value = _GET_key("value"); // still secure because of the following lines
 		if ($value && !preg_match("/^([0-9]{1,2}\072[0-5][0-9]\056[0-9]{2}|[0-5]?[0-9]\056[0-9]{2}|[0-9]{1,2}\072[0-5][0-9])$/",$value))
 			$value = "";
 		if ($value)
@@ -37,17 +41,18 @@ if ($_GET["id"] && $_GET["fld"] && isset($_GET["value"]))
 			if (!timelimitNum00($value)) $value = "";
 		}
 	}
+	else
+		$value = _GET_num("value");
 	//
-	$result = strict_mysql_query("UPDATE $eventstable SET " . $_GET["fld"] . "='$value' WHERE id=" . $_GET["id"]);
+	strict_query("UPDATE $eventstable SET $_GETfld=? WHERE id=?", array($value,$_GETid));
 	//
-	if ($_GET["fld"]=="timelimit")
+	if ($_GETfld=="timelimit")
 		if ($value)
 			$value = "cutoff $value";
 		else
 			$value = "no cutoff";
 	echo $value;
 	//
-	mysql_close();
-	//$_SESSION["hl"] = $_GET["hl"];
+	sql_close();
 }
 ?>

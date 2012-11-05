@@ -14,6 +14,7 @@ function addCom($wcaid,$name,$birthday,$country,$gender,$importing=false,$id=0)
 {
 	global $compstable;
 	//
+	$name = preg_replace("~[\\\\\"\;]~","",$name);
 	$wcaid = strtoupper($wcaid);
 	if ($wcaid && !preg_match("/^\d{4}[A-Z]{4}\d{2}$/",$wcaid))
 		return addCom_err("Invalid WCA id format",$wcaid,$name,$importing);
@@ -25,30 +26,25 @@ function addCom($wcaid,$name,$birthday,$country,$gender,$importing=false,$id=0)
 	//
 	if ($wcaid && !$id)
 	{
-		$result = strict_mysql_query("SELECT * FROM $compstable WHERE WCAid='$wcaid'");
-		if (mysql_num_rows($result))
+		$result = strict_query("SELECT * FROM $compstable WHERE WCAid=?", array($wcaid));
+		if (sql_num_rows($result))
 			return addCom_err("WCA id already exists",$wcaid,$name,$importing);
 	}
-	$result = strict_mysql_query("SELECT * FROM countries WHERE id='$country'");
-	if (!mysql_num_rows($result))
+	$result = strict_query("SELECT * FROM countries WHERE id=?", array($country));
+	if (!sql_num_rows($result))
 		return addCom_err("Invalid country: ".$country,$wcaid,$name,$importing);
 	if (!$id)
 	{
-		$result = strict_mysql_query("SELECT * FROM $compstable WHERE name='$name' AND country_id='$country' AND birthday='$birthday'");
-		if (mysql_num_rows($result))
+		$result = strict_query("SELECT * FROM $compstable WHERE name=? AND country_id=? AND birthday=?", array($name,$country,$birthday));
+		if (sql_num_rows($result))
 			return addCom_err("Competitor already inserted",$wcaid,$name,$importing);
 	}
 	//
-	if ($id) {
-		$result = strict_mysql_query("UPDATE $compstable SET WCAid='$wcaid', name='$name', country_id='$country', birthday='$birthday', gender='$gender' WHERE id=$id");
-	} else {
-		$result = strict_mysql_query("INSERT INTO $compstable SET WCAid='$wcaid', name='$name', country_id='$country', birthday='$birthday', gender='$gender'");
-		if (!$result) {
-			return addCom_err(mysql_error(),$wcaid,$name,$importing);
-		}
-
-	}
+	if ($id)
+		strict_query("UPDATE $compstable SET WCAid=?, name=?, country_id=?, birthday=?, gender=? WHERE id=?", array($wcaid,$name,$country,$birthday,$gender,$id));
+	else
+		strict_query("INSERT INTO $compstable SET WCAid=?, name=?, country_id=?, birthday=?, gender=?", array($wcaid,$name,$country,$birthday,$gender));
 	//
-	return ($id?(int)$id:mysql_insert_id());
+	return ($id?(int)$id:sql_insert_id());
 }
 ?>
