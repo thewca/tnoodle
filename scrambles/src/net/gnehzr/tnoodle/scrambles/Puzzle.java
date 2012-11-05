@@ -10,8 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -178,11 +176,20 @@ public abstract class Puzzle {
 		return getLongName();
 	}
 
-	private static Plugins<Puzzle> plugins = new Plugins<Puzzle>("puzzle", Puzzle.class, Puzzle.class.getClassLoader());
+	private static Plugins<Puzzle> plugins = null;
+	static {
+		try {
+			plugins = new Plugins<Puzzle>("puzzle", Puzzle.class, Puzzle.class.getClassLoader());
+		} catch (IOException e) {
+			l.log(Level.SEVERE, "", e);
+		} catch (BadClassDescriptionException e) {
+			l.log(Level.SEVERE, "", e);
+		}
+	}
 
 	private static SortedMap<String, LazyInstantiator<Puzzle>> scramblers;
 	public static synchronized SortedMap<String, LazyInstantiator<Puzzle>> getScramblers() throws BadClassDescriptionException, IOException {
-		if(scramblers == null || plugins.reloadIfNeeded()) {
+		if(scramblers == null) {
 			// Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
 			SortedMap<String, LazyInstantiator<Puzzle>> newScramblers =
 				new TreeMap<String, LazyInstantiator<Puzzle>>(Strings.getNaturalComparator());
@@ -213,14 +220,14 @@ public abstract class Puzzle {
 	 * We should probably assert that the icons are of a particular size.
 	 */
 	public final void loadPuzzleIcon(ByteArrayOutputStream bytes) {
-		try {
-			File f = new File(plugins.getPluginDirectory(), getShortName() + ".png");
-			InputStream in = new FileInputStream(f);
-			Utils.fullyReadInputStream(in, bytes);
-		} catch(FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		InputStream in = getClass().getResourceAsStream(getShortName() + ".png");
+		if(in != null) {
+			try {
+				Utils.fullyReadInputStream(in, bytes);
+				return;
+			} catch (IOException e) {
+				l.log(Level.INFO, "", e);
+			}
 		}
 		
 		Dimension dim = new Dimension(32, 32);
@@ -230,7 +237,7 @@ public abstract class Puzzle {
 		try {
 			ImageIO.write(img, "png", bytes);
 		} catch(IOException e) {
-			e.printStackTrace();
+			l.log(Level.SEVERE, "", e);
 		}
 	}
 	

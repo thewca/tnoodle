@@ -3,60 +3,25 @@ package net.gnehzr.tnoodle.utils;
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class Plugins<H> {
-	private static final Logger l = Logger.getLogger(Plugins.class.getName());
-	
-	private String packageName;
 	private HashMap<String, LazyInstantiator<H>> filePlugins = new HashMap<String, LazyInstantiator<H>>();
 	private HashMap<String, String> pluginComment = new HashMap<String, String>();
-	private long loadedTime = 0;
-	private Class<H> pluginClass;
-	
-	private String PLUGIN_DEFINITIONS_FILENAME;
-	private File contextFile;
-	private File pluginDirectory;
-	private ClassLoader classLoader;
-	public Plugins(String packageName, Class<H> pluginClass, ClassLoader classLoader) {
+	public Plugins(String packageName, Class<H> pluginClass, ClassLoader classLoader) throws IOException, BadClassDescriptionException {
 		if(classLoader == null) {
 			classLoader = getClass().getClassLoader();
 		}
-		this.classLoader = classLoader;
-		this.packageName = packageName;
-		this.PLUGIN_DEFINITIONS_FILENAME = packageName + "s";
-		this.pluginClass = pluginClass;
-		pluginDirectory = new File(Utils.getResourceDirectory(), this.packageName);
-		if(!pluginDirectory.exists()) {
-			l.severe("Cannot find " + pluginDirectory.getAbsolutePath());
-			azzert(pluginDirectory.exists());
-		}
-		contextFile = new File(pluginDirectory, PLUGIN_DEFINITIONS_FILENAME);
-		if(!contextFile.exists()) {
-			l.severe("Cannot find " + contextFile.getAbsolutePath());
-			azzert(contextFile.exists());
-		}
-	}
-	
-	private boolean dirtyPlugins() {
-		azzert(contextFile.exists());
-		long mtime = contextFile.lastModified();
-		return mtime > loadedTime;
-	}
-	
-	public File getPluginDirectory() {
-		return pluginDirectory;
-	}
-	
-	private void reloadPlugins() throws BadClassDescriptionException, IOException {
-		azzert(contextFile.exists());
-		BufferedReader in = new BufferedReader(new FileReader(contextFile));
+		
+		String pluginDefinitionsFilename = packageName + "/" + packageName + "s";
+		InputStream is = classLoader.getResourceAsStream(pluginDefinitionsFilename);
+		azzert(is != null);
+		BufferedReader in = new BufferedReader(new InputStreamReader(is));
 		HashMap<String, LazyInstantiator<H>> newFilePlugins = new HashMap<String, LazyInstantiator<H>>();
 		HashMap<String, String> newPluginComment = new HashMap<String, String>();
 		
@@ -77,7 +42,7 @@ public class Plugins<H> {
 			String[] name_def = line.split("\\s+", 2);
 			String name = name_def[0];
 			String definition = name_def[1];
-			LazyInstantiator<H> lazyClass = new LazyInstantiator<H>(definition, pluginClass, Utils.getResourceDirectory(), classLoader);
+			LazyInstantiator<H> lazyClass = new LazyInstantiator<H>(definition, pluginClass, classLoader);
 			// Note that we may be clobbering something already in newFilePlugins,
 			// this is ok. Consider a project B that uses project A,
 			// this way, project B can clobber project A's settings.
@@ -89,28 +54,13 @@ public class Plugins<H> {
 
 		filePlugins = newFilePlugins;
 		pluginComment = newPluginComment;
-		loadedTime = contextFile.lastModified();
 	}
 	
 	public String getPluginComment(String key) {
 		return pluginComment.get(key);
 	}
 
-	public boolean reloadIfNeeded() throws BadClassDescriptionException, IOException {
-		if(dirtyPlugins()) {
-			synchronized(this) {
-				if(dirtyPlugins()) {
-					reloadPlugins();
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	public Map<String, LazyInstantiator<H>> getPlugins() throws BadClassDescriptionException, IOException {
-		reloadIfNeeded();
 		return Collections.unmodifiableMap(filePlugins);
 	}
-
 }
