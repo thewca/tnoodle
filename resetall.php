@@ -3,13 +3,13 @@ session_start();
 require_once "lib_ref_admin.php";
 require_once "db.php";
 
-$result = strict_mysql_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
-if ($result && mysql_num_rows($result)==1)
+$result = strict_query("SELECT admin_pw FROM competitions WHERE id=".$_SESSION["c_id"]);
+if ($result && sql_num_rows($result)==1)
 {
 	if (cased_mysql_result($result,0,"admin_pw")==$_POST["pw"])
 	{
-		strict_mysql_query("DROP TABLE $eventstable, $compstable, $regstable, $timestable");
-		mysql_close();
+		strict_query("DROP TABLE $eventstable, $compstable, $regstable, $timestable");
+		sql_close();
 		$_SESSION["c_pw"]=$_POST["pw"];
 		header("Location: identification.php\r\n");
 	}
@@ -41,5 +41,5 @@ Your database HASN'T BEEN deleted!<br>
 <?
 	}
 }
-mysql_close();
+sql_close();
 ?>

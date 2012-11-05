@@ -1,6 +1,8 @@
 <?
-require_once "lib.php;
+require_once "lib.php";
 /*
+ * THIS FILE IS NOT UP TO DATE - NEVER USED
+ *
  * Ron asked me for this to be done, although it was never used.  It's an exportation of all the competition data in SQL.
  * The idea is skipping the XLSX file and go straight forward to the SQL text file that the Results Team is extracting currently
  * from the XLSX file (with great pain, I should say... :P ) It was rejected due to security reasons.

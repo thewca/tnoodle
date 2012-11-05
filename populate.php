@@ -1,45 +1,48 @@
-<?require_once "lib_ref_admin.php";
+<?
+require_once "lib_ref_admin.php";
 require_once "lib.php";
+require_once "lib_get.php";
 
-if ($_GET["cat_id"] && $_GET["round"])
+$cat_id = _GET_num("cat_id");
+$round = _GET_num("round");
+
+if ($cat_id && $round)
 {
 	require_once "db.php";
-	$cat_id = $_GET["cat_id"];
-	$round = $_GET["round"];
 	//
-	$event = strict_mysql_query("SELECT * FROM $eventstable WHERE id=".$cat_id);
-	if (mysql_num_rows($event) && cased_mysql_result($event,0,"r".$round) && !cased_mysql_result($event,0,"r".$round."_open"))
+	$event = strict_query("SELECT * FROM $eventstable WHERE id=?", array($cat_id));
+	if (sql_num_rows($event) && cased_mysql_result($event,0,"r".$round) && !cased_mysql_result($event,0,"r".$round."_open"))
 	{
 		if ($round==1)
 		{
-			$comp_in = strict_mysql_query("SELECT id FROM $compstable WHERE cat".$cat_id."!='' ORDER BY id LIMIT " .cased_mysql_result($event,0,"r".$round."_groupsize"));
-			$registered = mysql_num_rows($comp_in);
+			$comp_in = strict_query("SELECT id FROM $compstable WHERE cat?!='' ORDER BY id LIMIT " .cased_mysql_result($event,0,"r".$round."_groupsize"), array($cat_id));
+			$registered = sql_num_rows($comp_in);
 			if (!$registered) die("Cannot open this round: no one registered");
 			for ($x=0;$x<$registered;$x++)
 			{
-				$result = strict_mysql_query("INSERT INTO $regstable VALUES (" .$cat_id. "," .$round. "," .cased_mysql_result($comp_in,$x,"id").")");
-				$result = strict_mysql_query("UPDATE $compstable SET cat".$cat_id."='X' WHERE id=".cased_mysql_result($comp_in,$x,"id"));
+				strict_query("INSERT INTO $regstable VALUES (?,?," .cased_mysql_result($comp_in,$x,"id").")", array($cat_id,$round));
+				strict_query("UPDATE $compstable SET cat?='X' WHERE id=".cased_mysql_result($comp_in,$x,"id"), array($cat_id));
 			}
 		}
 		else
 		{
-			$timetype = cased_mysql_result(strict_mysql_query("SELECT timetype FROM categories WHERE id=".$cat_id),0,"timetype");
-			$format = strict_mysql_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".($round-1)."_format"));
+			$timetype = cased_mysql_result(strict_query("SELECT timetype FROM categories WHERE id=?", array($cat_id)),0,"timetype");
+			$format = strict_query("SELECT * FROM formats WHERE id=".cased_mysql_result($event,0,"r".($round-1)."_format"));
 			$avgtype = cased_mysql_result($format,0,"avgtype");
 			$query =
 				"SELECT $regstable.*, $timestable.average, $timestable.best FROM $regstable ".
 				"JOIN $timestable ON ($regstable.cat_id=$timestable.cat_id AND $regstable.round=$timestable.round AND $regstable.comp_id=$timestable.comp_id) ".
-				"WHERE $regstable.cat_id=" .$cat_id. " AND $regstable.round=" .($round-1)." AND $timestable.t1 IS NOT NULL AND $timestable.best<'A' ".
+				"WHERE $regstable.cat_id=? AND $regstable.round=? AND $timestable.t1 IS NOT NULL AND $timestable.best<'A' ".
 				"ORDER BY $timestable.average='', $timestable.average, $timestable.best";
-			$list = strict_mysql_query($query);
+			$list = strict_query($query, array($cat_id,$round-1));
 
 			// bug - the following line is excluding competitors with all DNF from the total number of competitors
-			// $ncomps = mysql_num_rows($list);
+			// $ncomps = sql_num_rows($list);
 			// fix
 			$query =
-				  "SELECT COUNT(*) AS count FROM $timestable ".
-				  "WHERE cat_id=" .$cat_id. " AND round=" .($round-1);
-			$ncomps = mysql_result(mysql_query($query),0,"count");
+				"SELECT COUNT(*) AS count FROM $timestable ".
+				"WHERE cat_id=? AND round=?";
+			$ncomps = cased_mysql_result(strict_query($query, array($cat_id,$round-1)),0,"count");
 			// fix end
 
 			if (!$ncomps) die("Cannot open this round: no one qualified");
@@ -66,7 +69,7 @@ if ($_GET["cat_id"] && $_GET["round"])
 				}
 				if ($classification<=$qualified)
 				{
-					$result = strict_mysql_query("INSERT INTO $regstable VALUES (" .$cat_id. "," .$round. "," .$row["comp_id"]. ")");
+					strict_query("INSERT INTO $regstable VALUES (?,?," .$row["comp_id"]. ")", array($cat_id,$round));
 				} else
 				{
 					$registered--;
@@ -79,8 +82,7 @@ if ($_GET["cat_id"] && $_GET["round"])
 		if ($round==1)
 			$gsr1 = $registered;
 		else
-			//$gsr1 = cased_mysql_result(strict_mysql_query("SELECT COUNT(*) AS count FROM $regstable WHERE cat_id=".$cat_id." AND round=1"),0,"count");
-			$gsr1 = cased_mysql_result(strict_mysql_query("SELECT COUNT(*) AS count FROM $timestable WHERE cat_id=".$cat_id." AND round=1"),0,"count");
+			$gsr1 = cased_mysql_result(strict_query("SELECT COUNT(*) AS count FROM $timestable WHERE cat_id=? AND round=1", array($cat_id)),0,"count");
 		if ($gsr1 <= 7)
 			$maxrounds = 1;
 		elseif ($gsr1 <= 15)
@@ -106,10 +108,10 @@ if ($_GET["cat_id"] && $_GET["round"])
 					$set .= ", r".$x."_groupsize=$registered";
 			}
 		}
-		$result = strict_mysql_query("UPDATE $eventstable SET $set WHERE id=".$cat_id);
+		strict_query("UPDATE $eventstable SET $set WHERE id=?", array($cat_id));
 	}
 	//
-	mysql_close();
+	sql_close();
 }
 ?>
 	

@@ -1,22 +1,13 @@
 <?
 require_once "lib_ref_admin.php";
 require_once "db.php";
+require_once "lib_get.php";
 
-if ($_GET["id"])
+$_GETid = _GET_num("id");
+if ($_GETid)
 {
-	if (!strict_mysql_query ("DELETE FROM $eventstable WHERE id=" . $_GET["id"]))
-	{
-		echo mysql_error();
-		mysql_close();
-		die();
-	}
-
-	if (!strict_mysql_query ("ALTER TABLE $compstable DROP cat" . $_GET["id"]))
-	{
-		echo mysql_error();
-		mysql_close();
-		die();
-	}
+	strict_query ("DELETE FROM $eventstable WHERE id=?", array($_GETid));
+	strict_query ("ALTER TABLE $compstable DROP cat?", array($_GETid));
 }
-mysql_close();
+sql_close();
 ?>
