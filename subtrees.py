@@ -58,5 +58,22 @@ def setupSubtreeBranches():
 
         git(['stash', 'pop'], assertSuccess=False)
 
+def pullAllSubtrees():
+    for prefix, remote in PREFIX_REMOTE.iteritems():
+        options = { 'prefix': prefix }
+        git(['subtree', 'pull', remote], options)
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Dealing with subtrees')
+    parser.add_argument('cmd', choices=('split', 'pull'))
+
+    args = parser.parse_args()
+    if args.cmd == 'split':
+        setupSubtreeBranches()
+    elif args.cmd == 'pull':
+        pullAllSubtrees()
+
 if __name__ == "__main__":
-    setupSubtreeBranches()
+    main()
