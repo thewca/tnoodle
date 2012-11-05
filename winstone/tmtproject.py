@@ -74,7 +74,7 @@ class Project(tmt.EclipseProject):
 			# of winstone server, so there's no need to recompile it.
 			# In fact, recompiling it would be bad, as it would nuke
 			# our carefully constructed tnoodle_resources.
-			tmt.WinstoneServer.dist(noRemake=True)
+			tmt.WinstoneServer.dist(noRemake=True, implementationTitle=self.fullName)
 			tmt.WinstoneServer.distJarFile()
 			shutil.copy(tmt.WinstoneServer.distJarFile(), self.distJarFile())
 		project.__class__.webContentDist = webContentDist

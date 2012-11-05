@@ -902,7 +902,9 @@ class EclipseProject(TmtProject):
 	def tweakJarFile(self, jar):
 		pass
 
-	def dist(self, noRemake=False):
+	def dist(self, noRemake=False, implementationTitle=None):
+		if implementationTitle is None:
+			implementationTitle = self.fullName
 		if not tmt.args.no_clean and not noRemake:
 			# We explicitly clean here, because stuff may have ended up in our
 			# resources folders that we don't want to include in the generated jar file.
@@ -996,7 +998,7 @@ Manifest-Version: 1.0
 Main-Class: %s
 Implementation-Title: %s
 Implementation-Version: %s
-	""" % ( self.main, self.fullName, tmt.VERSION )
+	""" % ( self.main, implementationTitle, tmt.VERSION )
 				jar.writestr('META-INF/MANIFEST.MF', manifest)
 
 			# Give subclasses the opportunity to make some last minute tweaks to the jar file
