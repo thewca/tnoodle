@@ -23,5 +23,5 @@ sq1 puzzle.SquareOnePuzzle()
 #Megaminx
 minx puzzle.MegaminxPuzzle()
 
-##Clock
-*clock scrambler.ClockScrambler()
+#Clock
+clock puzzle.ClockPuzzle()
