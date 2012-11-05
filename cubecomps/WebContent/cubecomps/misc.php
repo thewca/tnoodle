@@ -106,8 +106,8 @@ else
 Click&nbsp;&nbsp;<input type=button value=clear onclick='clearBackground();'>&nbsp;&nbsp;to use a default white background.<p>
 
 <?
-$ofr = strict_mysql_query("SELECT id FROM $eventstable WHERE r1_open=1");
-if (mysql_num_rows($ofr))
+$ofr = strict_query("SELECT id FROM $eventstable WHERE r1_open=1");
+if (sql_num_rows($ofr))
 {
 ?>
 <div class=header>All opened first round scorecards</div>
@@ -166,3 +166,6 @@ THIS OPERATION IS <U>NOT REVERSIBLE</u>.<p><form action='resetall.php' method='p
 
 </BODY>
 </HTML>
+<?
+sql_close();
+?>

@@ -1,4 +1,4 @@
-package scrambler;
+package puzzle;
 
 import java.util.Random;
 

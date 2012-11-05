@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.scrambles;
 
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.security.SecureRandom;
@@ -16,7 +18,7 @@ public class ScrambleCacher {
 	private static final int DEFAULT_CACHE_SIZE = 100;
 	
 	/**
-	 * Scramblers will get passed this instance of Random
+	 * Puzzles will get passed this instance of Random
 	 * in order to have nice, as-secure-as-can-be scrambles.
 	 */
 	private static final Random r = new SecureRandom();
@@ -25,24 +27,25 @@ public class ScrambleCacher {
 	private volatile int startBuf = 0;
 	private volatile int available = 0;
 
-	public ScrambleCacher(final Scrambler scrambler) {
-		this(scrambler, DEFAULT_CACHE_SIZE, false);
+	public ScrambleCacher(final Puzzle puzzle) {
+		this(puzzle, DEFAULT_CACHE_SIZE, false);
 	}
 	
 	private volatile Throwable exception;
 	private boolean running = false;
-	public ScrambleCacher(final Scrambler scrambler, int cacheSize, final boolean drawScramble) {
+	public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble) {
+		azzert(cacheSize > 0);
 		scrambles = new String[cacheSize];
 		Thread t = new Thread() {
 			public void run() {
-				synchronized(scrambler.getClass()) {
+				synchronized(puzzle.getClass()) {
 					// This thread starts running while scrambler
 					// is still initializing, we must wait until
 					// it has finished before we attempt to generate
 					// any scrambles.
 				}
 				for(;;) {
-					String scramble = scrambler.generateScramble(r);
+					String scramble = puzzle.generateWCAScramble(r);
 
 					if(drawScramble) {
 						// The drawScramble option exists so we can test out generating and drawing
@@ -50,7 +53,7 @@ public class ScrambleCacher {
 						BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 						Dimension size = new Dimension(image.getWidth(), image.getHeight());
 						try {
-							scrambler.drawScramble(image.createGraphics(), size, scramble, null);
+							puzzle.drawScramble(image.createGraphics(), size, scramble, null);
 						} catch (InvalidScrambleException e1) {
 							e1.printStackTrace();
 						}

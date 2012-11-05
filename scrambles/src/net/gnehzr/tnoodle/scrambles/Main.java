@@ -38,9 +38,9 @@ public class Main {
 			TNoodleLogging.setConsoleLogLevel(Level.ALL);
 		}
 		
-		SortedMap<String, LazyInstantiator<Scrambler>> scramblers = Scrambler.getScramblers();
+		SortedMap<String, LazyInstantiator<Puzzle>> scramblers = Puzzle.getScramblers();
 		for(String puzzle : puzzles) {
-			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
+			LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzle);
 			if(lazyScrambler == null) {
 				System.err.println("couldn't find puzzle " + puzzle + ", try one of " + scramblers.keySet());
 				System.exit(1);
@@ -49,7 +49,7 @@ public class Main {
 			TimedLogRecordStart start = new TimedLogRecordStart("Generating " + puzzle + " scramble");
 			l.log(start);
 			
-			Scrambler s = lazyScrambler.cachedInstance();
+			Puzzle s = lazyScrambler.cachedInstance();
 			System.out.println(s.generateScramble());
 			
 			l.log(start.finishedNow());

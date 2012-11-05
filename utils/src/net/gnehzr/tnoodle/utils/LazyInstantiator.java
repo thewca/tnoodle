@@ -2,7 +2,6 @@ package net.gnehzr.tnoodle.utils;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -19,9 +18,8 @@ public class LazyInstantiator<H> {
 	private String className;
 	private String definition;
 	private Class<H> parentClass;
-	private File classDirectory;
 	private ClassLoader classLoader;
-	public LazyInstantiator(String definition, Class<H> classy, File classDirectory, ClassLoader classLoader) throws BadClassDescriptionException {
+	public LazyInstantiator(String definition, Class<H> classy, ClassLoader classLoader) throws BadClassDescriptionException {
 		if(classLoader == null) {
 			classLoader = getClass().getClassLoader();
 		}
@@ -33,7 +31,6 @@ public class LazyInstantiator<H> {
 		
 		this.definition = definition;
 		this.parentClass = classy;
-		this.classDirectory = classDirectory;
 		
 		ArrayList<Class<?>> argTypes = new ArrayList<Class<?>>();
 		ArrayList<Object> args = new ArrayList<Object>();
@@ -82,14 +79,7 @@ public class LazyInstantiator<H> {
 	private Class<? extends H> thisClass;
 	public H newInstance() throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, SecurityException, NoSuchMethodException, MalformedURLException {
 		if(constructor == null) {
-			ClassLoader cl;
-			if(classDirectory != null) {
-				cl = new LazyClassLoader(classDirectory, classLoader);
-			} else {
-				cl = classLoader;
-			}
-
-			thisClass = cl.loadClass(className).asSubclass(this.parentClass);
+			thisClass = classLoader.loadClass(className).asSubclass(this.parentClass);
 			constructor = thisClass.getConstructor(this.argTypes);
 		}
 		return constructor.newInstance(args);

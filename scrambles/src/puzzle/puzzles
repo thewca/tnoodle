@@ -1,0 +1,27 @@
+# Comments immediately preceding a plugin definition are a detailed description
+# of that plugin.
+
+#2x2x2
+222 puzzle.CubePuzzle(2)
+#3x3x3
+333 puzzle.CubePuzzle(3)
+#4x4x4
+444 puzzle.CubePuzzle(4)
+#5x5x5
+555 puzzle.CubePuzzle(5)
+#6x6x6
+666 puzzle.CubePuzzle(6)
+#7x7x7
+777 puzzle.CubePuzzle(7)
+
+#Pyraminx
+pyram puzzle.PyraminxPuzzle()
+
+#Square-1
+sq1 puzzle.SquareOnePuzzle()
+
+#Megaminx
+minx puzzle.MegaminxPuzzle()
+
+#Clock
+clock puzzle.ClockPuzzle()

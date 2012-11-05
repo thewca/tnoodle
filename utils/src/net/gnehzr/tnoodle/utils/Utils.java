@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
@@ -127,14 +128,13 @@ public final class Utils {
 		return areasArray;
 	}
 
-	//requires that m > 0
 	public static final int modulo(int x, int m) {
-		if(m < 0) {
-			throw new RuntimeException("m must be > 0");
-		}
+		azzert(m > 0, "m must be > 0");
 		int y = x % m;
-		if(y >= 0) return y;
-		return y + m;
+		if(y < 0) {
+			y += m;
+		}
+		return y;
 	}
 
 	public static Integer toInt(String string, Integer def) {
@@ -186,6 +186,20 @@ public final class Utils {
 				sb.append(separator);
 			}
 			sb.append(arr[i].toString());
+		}
+		return sb.toString();
+	}
+	
+	public static <H> String join(ArrayList<H> arr, String separator) {
+		if(separator == null) {
+			separator = ",";
+		}
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < arr.size(); i++) {
+			if(i > 0) {
+				sb.append(separator);
+			}
+			sb.append(arr.get(i).toString());
 		}
 		return sb.toString();
 	}
@@ -503,6 +517,12 @@ public final class Utils {
 		}
 	}
 	
+	public static void azzert(boolean expr, Throwable t) {
+		if(!expr) {
+			throw new AssertionError(t);
+		}
+	}
+	
 	public static String getProjectName() {
 		Package p = Utils.class.getPackage();
 		String name = p.getImplementationTitle();
@@ -550,5 +570,44 @@ public final class Utils {
 			webappName = "ROOT";
 		}
 		return new File(getWebappsDir(), webappName);
+	}
+
+	public static <H> H choose(Random r, Iterable<H> keySet) {
+		H chosen = null;
+		int count = 0;
+		for(H element : keySet) {
+			if(r.nextInt(++count) == 0) {
+				chosen = element;
+			}
+		}
+		azzert(count > 0);
+		return chosen;
+	}
+	
+	public static void deepCopy(int[][] src, int[][] dest) {
+		for(int i = 0; i < src.length; i++) {
+			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+		}
+	}
+	
+	public static void deepCopy(int[][][] src, int[][][] dest) {
+		for(int i = 0; i < src.length; i++) {
+			deepCopy(src[i], dest[i]);
+		}
+	}
+	
+	public static <T> void deepCopy(T[][] src, T[][] dest) {
+		for(int i = 0; i < src.length; i++) {
+			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+		}
+	}
+	
+	public static int indexOf(Object o, Object[] arr) {
+		for(int i = 0; i < arr.length; i++) {
+			if(arr[i].equals(o)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

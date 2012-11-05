@@ -127,7 +127,7 @@ IF (!$isCSV)
 	else
 		require_once DIR_PHPEXCEL;
 	//
-	$categories = strict_mysql_query("SELECT id, cusa_abbr FROM categories");
+	$categories = strict_query("SELECT id, cusa_abbr FROM categories");
 	$cats = array();
 	while ($rcat=cased_mysql_fetch_array($categories))
 		$cats[$rcat["cusa_abbr"]] = $rcat["id"];
@@ -158,8 +158,8 @@ IF (!$isCSV)
 	{
 		$ncomp++;
 		//
-		$country = strict_mysql_query("SELECT id FROM countries WHERE name=\"" .($sheet->getCellByColumnAndRow(2,$row)->getValue()). "\"");
-		if (!mysql_num_rows($country))
+		$country = strict_query("SELECT id FROM countries WHERE name=?", array(($sheet->getCellByColumnAndRow(2,$row)->getValue())));
+		if (!sql_num_rows($country))
 			$errors .= "Country name \"".$line[$headers["country"]]."\" not found in database<br>";
 		else
 		{
@@ -190,7 +190,7 @@ ELSE // ------------------------------------------------------------------------
 {
 	fseek($h,0);
 	//
-	$categories = strict_mysql_query("SELECT id, abbr FROM categories");
+	$categories = strict_query("SELECT id, abbr FROM categories");
 	$cats = array();
 	while ($rcat=cased_mysql_fetch_array($categories))
 		$cats[$rcat["abbr"]] = $rcat["id"];
@@ -223,8 +223,8 @@ ELSE // ------------------------------------------------------------------------
 		{
 			$ncomp++;
 			//
-			$country = strict_mysql_query("SELECT id FROM countries WHERE name='".$line[$headers["country"]]."'");
-			if (!mysql_num_rows($country))
+			$country = strict_query("SELECT id FROM countries WHERE name=?", array($line[$headers["country"]]));
+			if (!sql_num_rows($country))
 				$errors .= "Country name \"".$line[$headers["country"]]."\" not found in database<br>";
 			else
 			{
@@ -269,7 +269,7 @@ if ($errors) echo "<b>".($ncomp-$nimp)."</b> lines ignored<br><p>";
 echo "<center><input type=button value=close onclick='window.close();'></center><br></div>";
 echo "</body></html>";
 //
-mysql_close();
+sql_close();
 
 ?> 
 </BODY>

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.Scrambler;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.server.SafeHttpServlet;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
@@ -42,11 +42,11 @@ import com.itextpdf.text.DocumentException;
 
 @SuppressWarnings("serial")
 public class ScrambleViewHandler extends SafeHttpServlet {
-	private SortedMap<String, LazyInstantiator<Scrambler>> scramblers;
+	private SortedMap<String, LazyInstantiator<Puzzle>> scramblers;
 
 	public ScrambleViewHandler() throws BadClassDescriptionException,
 			IOException {
-		this.scramblers = Scrambler.getScramblers();
+		this.scramblers = Puzzle.getScramblers();
 	}
 
 	@Override
@@ -66,12 +66,12 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
 		if (extension.equals("png") || extension.equals("json") || extension.equals("svg")) {
 			String puzzle = name;
-			LazyInstantiator<Scrambler> lazyScrambler = scramblers.get(puzzle);
+			LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzle);
 			if (lazyScrambler == null) {
 				sendError(request, response, "Invalid scrambler: " + puzzle);
 				return;
 			}
-			Scrambler scrambler = lazyScrambler.cachedInstance();
+			Puzzle scrambler = lazyScrambler.cachedInstance();
 			HashMap<String, Color> colorScheme = scrambler
 					.parseColorScheme(query.get("scheme"));
 			String scramble = query.get("scramble");
