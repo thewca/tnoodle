@@ -17,10 +17,46 @@ import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.utils.Utils;
 
 public class MegaminxPuzzle extends Puzzle {
-	private static final String[] FACE_NAMES = new String[] { "U", "BL", "BR", "R", "F", "L", "D", "DR", "DBR", "B", "DBL", "DL" };
+	private static enum Face {
+		U, BL, BR, R, F, L, D, DR, DBR, B, DBL, DL;
+
+		// TODO We could rename faces so we can just do +6 mod 12 here instead.
+		public Face oppositeFace() {
+			switch(this) {
+			case U:
+				return D;
+			case BL:
+				return DR;
+			case BR:
+				return DL;
+			case R:
+				return DBL;
+			case F:
+				return B;
+			case L:
+				return DBR;
+			case D:
+				return U;
+			case DR:
+				return BL;
+			case DBR:
+				return L;
+			case B:
+				return F;
+			case DBL:
+				return R;
+			case DL:
+				return BR;
+			default:
+				azzert(false);
+				return null;
+			}
+		}
+	}
 	private static final int gap = 2;
 	private static final int minxRad = 30;
 	
@@ -44,19 +80,15 @@ public class MegaminxPuzzle extends Puzzle {
 	private static final double UNFOLDHEIGHT = 2 + 3 * Math.sin(.3 * Math.PI) + Math.sin(.1 * Math.PI);
 	private static final double UNFOLDWIDTH = 4 * Math.cos(.1 * Math.PI) + 2 * Math.cos(.3 * Math.PI);
 	
-	private static void turn(int[][] image, int side, int dir) {
+	private static void turn(int[][] image, Face side, int dir) {
+		dir = Utils.modulo(dir, 5);
 		for(int i = 0; i < dir; i++) {
 			turn(image, side);
 		}
 	}
 
-	private static void bigTurn(int[][] image, int side, int dir) {
-		for(int i = 0; i < dir; i++) {
-			bigTurn(image, side);
-		}
-	}
-
-	private static void turn(int[][] image, int s) {
+	private static void turn(int[][] image, Face face) {
+		int s = face.ordinal();
 		int b = (s >= 6 ? 6 : 0);
 		switch(s % 6) {
 			case 0: swapOnSide(image, b, 1, 6, 5, 4, 4, 2, 3, 0, 2, 8); break;
@@ -67,7 +99,7 @@ public class MegaminxPuzzle extends Puzzle {
 			case 5: swapOnSide(image, b, 0, 8, 1, 8, 10, 8, 11, 8, 4, 0); break;
 		}
 
-		rotateFace(image, s);
+		rotateFace(image, face);
 	}
 
 	private static void swapOnSide(int[][] image, int b, int f1, int s1, int f2, int s2, int f3, int s3, int f4, int s4, int f5, int s5) {
@@ -81,7 +113,8 @@ public class MegaminxPuzzle extends Puzzle {
 		}
 	}
 
-	private static void swapOnFace(int[][] image, int f, int s1, int s2, int s3, int s4, int s5) {
+	private static void swapOnFace(int[][] image, Face face, int s1, int s2, int s3, int s4, int s5) {
+		int f = face.ordinal();
 		int temp = image[f][s1];
 		image[f][s1] = image[f][s2];
 		image[f][s2] = image[f][s3];
@@ -90,13 +123,20 @@ public class MegaminxPuzzle extends Puzzle {
 		image[f][s5] = temp;
 	}
 
-	private static void rotateFace(int[][] image, int f) {
+	private static void rotateFace(int[][] image, Face f) {
 		swapOnFace(image, f, 0, 8, 6, 4, 2);
 		swapOnFace(image, f, 1, 9, 7, 5, 3);
 	}
 
-	private static void bigTurn(int[][] image, int s) {
-		if(s == 0) {
+	private static void bigTurn(int[][] image, Face side, int dir) {
+		dir = Utils.modulo(dir, 5);
+		for(int i = 0; i < dir; i++) {
+			bigTurn(image, side);
+		}
+	}
+	
+	private static void bigTurn(int[][] image, Face f) {
+		if(f == Face.DBR) {
 			for(int i = 0; i < 7; i++) {
 				swap(image, 0, (1+i)%10, 4, (3+i)%10, 11, (1+i)%10, 10, (1+i)%10, 1, (1+i)%10);
 			}
@@ -104,8 +144,9 @@ public class MegaminxPuzzle extends Puzzle {
 
 			swapWholeFace(image, 2, 0, 3, 0, 7, 0, 6, 8, 9, 8);
 
-			rotateFace(image, 8);
+			rotateFace(image, Face.DBR);
 		} else {
+			azzert(f == Face.D);
 			for(int i = 0; i < 7; i++) {
 				swap(image, 1, (9+i)%10, 2, (1+i)%10, 3, (3+i)%10, 4, (5+i)%10, 5, (7+i)%10);
 			}
@@ -113,7 +154,7 @@ public class MegaminxPuzzle extends Puzzle {
 
 			swapWholeFace(image, 11, 0, 10, 8, 9, 6, 8, 4, 7, 2);
 
-			rotateFace(image, 6);
+			rotateFace(image, Face.D);
 		}
 	}
 
@@ -161,7 +202,7 @@ public class MegaminxPuzzle extends Puzzle {
 		for(int ch = 1; ch < x.length; ch++) {
 			p.lineTo(x[ch], y[ch]);
 		}
-		p.lineTo(x[0], y[0]); //TODO - this is retarded, why do i need to do this? it would appear that closePath() isn't doing it's job
+		p.lineTo(x[0], y[0]); // TODO - this is retarded, why do i need to do this? it would appear that closePath() isn't doing it's job
 		p.closePath();
 		return p;
 	}
@@ -230,23 +271,32 @@ public class MegaminxPuzzle extends Puzzle {
 	double magicShiftNumber = d*0.6+minxRad*(f+gg);
 	double shift = leftCenterX+magicShiftNumber;
 	
+	public HashMap<Face, GeneralPath> getFaceBoundaries() {
+		HashMap<Face, GeneralPath> faces = new HashMap<Face, GeneralPath>();
+		faces.put(Face.U,   getPentagon(leftCenterX  , leftCenterY  , true , minxRad));
+		faces.put(Face.BL,  getPentagon(leftCenterX-c, leftCenterY-e, false, minxRad));
+		faces.put(Face.BR,  getPentagon(leftCenterX+c, leftCenterY-e, false, minxRad));
+		faces.put(Face.R,   getPentagon(leftCenterX+b, leftCenterY+d, false, minxRad));
+		faces.put(Face.F,   getPentagon(leftCenterX  , leftCenterY+x, false, minxRad));
+		faces.put(Face.L,   getPentagon(leftCenterX-b, leftCenterY+d, false, minxRad));
+		
+		faces.put(Face.D,   getPentagon(shift+gap+a+b  , gap+x+minxRad  , false, minxRad));
+		faces.put(Face.DR,  getPentagon(shift+gap+a+b-c, gap+x+e+minxRad, true , minxRad));
+		faces.put(Face.DBR, getPentagon(shift+gap+a    , gap+x-d+minxRad, true , minxRad));
+		faces.put(Face.B,   getPentagon(shift+gap+a+b  , gap+minxRad    , true , minxRad));
+		faces.put(Face.DBL, getPentagon(shift+gap+a+2*b, gap+x-d+minxRad, true , minxRad));
+		faces.put(Face.DL,  getPentagon(shift+gap+a+b+c, gap+x+e+minxRad, true , minxRad));
+		return faces;
+	}
+	
 	@Override
 	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-		HashMap<String, GeneralPath> faces = new HashMap<String, GeneralPath>();
-		faces.put("U",   getPentagon(leftCenterX  , leftCenterY  , true , minxRad));
-		faces.put("BL",  getPentagon(leftCenterX-c, leftCenterY-e, false, minxRad));
-		faces.put("BR",  getPentagon(leftCenterX+c, leftCenterY-e, false, minxRad));
-		faces.put("R",   getPentagon(leftCenterX+b, leftCenterY+d, false, minxRad));
-		faces.put("F",   getPentagon(leftCenterX  , leftCenterY+x, false, minxRad));
-		faces.put("L",   getPentagon(leftCenterX-b, leftCenterY+d, false, minxRad));
-
-		faces.put("D",   getPentagon(shift+gap+a+b  , gap+x+minxRad  , false, minxRad));
-		faces.put("DR",  getPentagon(shift+gap+a+b-c, gap+x+e+minxRad, true , minxRad));
-		faces.put("DBR", getPentagon(shift+gap+a    , gap+x-d+minxRad, true , minxRad));
-		faces.put("B",   getPentagon(shift+gap+a+b  , gap+minxRad    , true , minxRad));
-		faces.put("DBL", getPentagon(shift+gap+a+2*b, gap+x-d+minxRad, true , minxRad));
-		faces.put("DL",  getPentagon(shift+gap+a+b+c, gap+x+e+minxRad, true , minxRad));
-		return faces;
+		HashMap<String, GeneralPath> stringy = new HashMap<String, GeneralPath>();
+		HashMap<Face, GeneralPath> faces = getFaceBoundaries();
+		for(Face f : faces.keySet()) {
+			stringy.put(f.toString(), faces.get(f));
+		}
+		return stringy;
 	}
 	
 	@Override
@@ -295,8 +345,97 @@ public class MegaminxPuzzle extends Puzzle {
 		return new PuzzleStateAndGenerator(state, scrambleStr);
 	}
 	
+	private int centerIndex = 10;
+	private boolean isNormalized(int[][] image) {
+		return image[Face.U.ordinal()][centerIndex] == Face.U.ordinal() && image[Face.F.ordinal()][centerIndex] == Face.F.ordinal();
+	}
+
+	private int[][] cloneImage(int[][] image) {
+		int[][] imageCopy = new int[image.length][image[0].length];
+		Utils.deepCopy(image, imageCopy);
+		return imageCopy;
+	}
+	
+	private void spinMinx(int[][] image, Face face, int dir) {
+		turn(image, face, dir);
+		bigTurn(image, face.oppositeFace(), 5 - dir);
+	}
+	
+	private void spinToTop(int[][] image, Face face) {
+		switch(face) {
+		case U:
+			break;
+		case BL:
+			spinMinx(image, Face.L, 1);
+			break;
+		case BR:
+			spinMinx(image, Face.U, 1);
+			spinToTop(image, Face.R);
+			break;
+		case R:
+			spinMinx(image, Face.U, 1);
+			spinToTop(image, Face.F);
+			break;
+		case F:
+			spinMinx(image, Face.L, -1);
+			break;
+		case L:
+			spinMinx(image, Face.U, 1);
+			spinToTop(image, Face.BL);
+			break;
+		case D:
+			spinMinx(image, Face.L, -2);
+			spinToTop(image, Face.R);
+			break;
+		case DR:
+			spinMinx(image, Face.L, -1);
+			spinToTop(image, Face.R);
+			break;
+		case DBR:
+			spinMinx(image, Face.U, 1);
+			spinMinx(image, Face.L, -1);
+			spinToTop(image, Face.R);
+			break;
+		case B:
+			spinMinx(image, Face.L, -3);
+			spinToTop(image, Face.R);
+			break;
+		case DBL:
+			spinMinx(image, Face.L, 2);
+			break;
+		case DL:
+			spinMinx(image, Face.L, -2);
+			break;		
+		default:
+			azzert(false);
+		}
+	}
+	
+	private int[][] normalize(int[][] image) {
+		if(isNormalized(image)) {
+			return image;
+		}
+
+		image = cloneImage(image);
+		for(Face face : Face.values()) {
+			if(image[face.ordinal()][centerIndex] == Face.U.ordinal()) {
+				spinToTop(image, face);
+				azzert(image[Face.U.ordinal()][centerIndex] == Face.U.ordinal());
+				for(int chooseF = 0; chooseF < 5; chooseF++) {
+					spinMinx(image, Face.U, 1);
+					if(isNormalized(image)) {
+						return image;
+					}
+				}
+				azzert(false);
+			}
+		}
+		azzert(false);
+		return null;
+	}
+	
 	class MegaminxState extends PuzzleState {
-		private final int[][] image;
+		private final int[][] image, normalizedImage;
 		public MegaminxState() {
 			image = new int[12][11];
 			for(int i = 0; i < image.length; i++) {
@@ -304,10 +443,13 @@ public class MegaminxPuzzle extends Puzzle {
 					image[i][j] = i;
 				}
 			}
+			azzert(isNormalized(image));
+			normalizedImage = image;
 		}
 		
 		public MegaminxState(int[][] image) {
 			this.image = image;
+			normalizedImage = normalize(image);
 		}
 		
 		@Override
@@ -315,27 +457,28 @@ public class MegaminxPuzzle extends Puzzle {
 			HashMap<String, MegaminxState> successors = new HashMap<String, MegaminxState>();
 			
 			String[] prettyDir = new String[] { null, "", "2", "2'", "'" }; 
-			for(int face = 0; face < FACE_NAMES.length; face++) {
+			for(Face face : Face.values()) {
 				for(int dir = 1; dir <= 4; dir++) {
-					String move = FACE_NAMES[face];
+					String move = face.toString();
 					move += prettyDir[dir];
 					
-					int[][] imageCopy = new int[image.length][image[0].length];
-					Utils.deepCopy(image, imageCopy);
+					int[][] imageCopy = cloneImage(image);
 					turn(imageCopy, face, dir);
+					
 					successors.put(move, new MegaminxState(imageCopy));
 				}
 			}
 			
-			String[] pochmannFaceNames = new String[] { "R", "D" };
+			HashMap<String, Face> pochmannFaceNames = new HashMap<String, Face>();
+			pochmannFaceNames.put("R", Face.DBR);
+			pochmannFaceNames.put("D", Face.D);
 			String[] prettyPochmannDir = new String[] { null, null, "++", "--" };
-			for(int face : new int[] { 0, 1 }) {
+			for(String pochmannFaceName : pochmannFaceNames.keySet()) {
 				for(int dir : new int[] { 2, 3 }) {
-					String move = pochmannFaceNames[face] + prettyPochmannDir[dir];
+					String move = pochmannFaceName + prettyPochmannDir[dir];
 					
-					int[][] imageCopy = new int[image.length][image[0].length];
-					Utils.deepCopy(image, imageCopy);
-					bigTurn(imageCopy, face, dir);
+					int[][] imageCopy = cloneImage(image);
+					bigTurn(imageCopy, pochmannFaceNames.get(pochmannFaceName), dir);
 					
 					successors.put(move, new MegaminxState(imageCopy));
 				}
@@ -355,47 +498,13 @@ public class MegaminxPuzzle extends Puzzle {
 
 		@Override
 		public boolean equals(Object other) {
-			try {
-				// We want to test for equality without care for the orientation of the puzzle
-				// This is pretty inefficient (it tests some orientations multiple times), but it's
-				// simple, and speed is way less important than readability here.
-				MegaminxState o = ((MegaminxState) other);
-				String spinL = "R++ L2'";
-				String spinU = "D++ U2'";
-				for(int ring = 0; ring < 5; ring++) {
-					for(int chooseU = 0; chooseU < 5; chooseU++) {
-						for(int chooseF = 0; chooseF < 5; chooseF++) {
-							if(Arrays.deepEquals(image, o.image)) {
-								return true;
-							}
-							o = (MegaminxState) o.applyAlgorithm(spinU);
-						}
-						o = (MegaminxState) o.applyAlgorithm(spinL);
-					}
-					o = (MegaminxState) o.applyAlgorithm(spinU);
-				}
-				
-				// We've tested every orientation except for the ones with the bottom on top
-				
-				// Put the bottom on top
-				o = (MegaminxState) o.applyAlgorithm(spinL).applyAlgorithm(spinU).applyAlgorithm(spinU).applyAlgorithm(spinL).applyAlgorithm(spinL).applyAlgorithm(spinL);
-				// Test out every orientation with the bottom on top
-				for(int chooseF = 0; chooseF < 5; chooseF++) {
-					if(Arrays.deepEquals(image, o.image)) {
-						return true;
-					}
-					o = (MegaminxState) o.applyAlgorithm(spinU);
-				}
-			} catch (InvalidScrambleException e) {
-				azzert(false, e);
-				return false;
-			}
-			return false;
+			MegaminxState o = ((MegaminxState) other);
+			return Arrays.deepEquals(normalizedImage, o.normalizedImage);
 		}
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(image);
+			return Arrays.hashCode(normalizedImage);
 		}
 
 		@Override
@@ -404,33 +513,29 @@ public class MegaminxPuzzle extends Puzzle {
 		}
 		
 		private void drawMinx(Graphics2D g, int gap, int minxRad, HashMap<String, Color> colorScheme) {
-			HashMap<String, GeneralPath> pentagons = getDefaultFaceBoundaries();
-			for(String faceName : pentagons.keySet()) {
-				int face = Utils.indexOf(faceName, FACE_NAMES);
+			HashMap<Face, GeneralPath> pentagons = getFaceBoundaries();
+			for(Face face : pentagons.keySet()) {
+				int f = face.ordinal();
 				int rotateCounterClockwise;
-				if(face == 0) {
+				if(face == Face.U) {
 					rotateCounterClockwise = 0;
-				} else if(face >= 1 && face <= 5) {
+				} else if(f >= 1 && f <= 5) {
 					rotateCounterClockwise = 1;
-				} else if(face >= 6 && face <= 11) {
+				} else if(f >= 6 && f <= 11) {
 					rotateCounterClockwise = 2;
 				} else {
 					azzert(false);
 					return;
 				}
-				drawPentagon(g, pentagons.get(faceName), image[face], rotateCounterClockwise, colorScheme);
+				String label = null;
+				if(face == Face.U || face == Face.F) {
+					label = face.toString();
+				}
+				drawPentagon(g, pentagons.get(face), image[f], rotateCounterClockwise, label, colorScheme);
 			}
-
-			double uWidth = (minxRad*0.3);
-			double uHeight = (minxRad*0.3);
-			g.drawString("U", (float) (leftCenterX - uWidth*0.5), (float) (leftCenterY + uHeight/2));
-			
-			double fWidth = (minxRad*0.25);
-			double magicFOffset = c*1.7;
-			g.drawString("F", (float) (leftCenterX - fWidth*0.5), (float) (leftCenterY + magicFOffset + uHeight/2));
 		}
 
-		private void drawPentagon(Graphics2D g, GeneralPath p, int[] state, int rotateCounterClockwise, HashMap<String, Color> colorScheme) {
+		private void drawPentagon(Graphics2D g, GeneralPath p, int[] state, int rotateCounterClockwise, String label, HashMap<String, Color> colorScheme) {
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
 			double[] xpoints = new double[5];
@@ -483,16 +588,32 @@ public class MegaminxPuzzle extends Puzzle {
 				ps[2*i+1].closePath();
 			}
 
+
 			for(int i = 0; i < ps.length; i++) {
 				int j = i;
 				if(j < 10) {
 					// This is a bit convoluted, but tries to keep the intuitive derivation clear.
 					j = (j + 2*rotateCounterClockwise) % 10;
 				}
-				g.setColor(colorScheme.get(""+FACE_NAMES[state[j]]));
+				g.setColor(colorScheme.get("" + Face.values()[state[j]]));
 				g.fill(ps[i]);
 				g.setColor(Color.BLACK);
 				g.draw(ps[i]);
+			}
+			
+			if(label != null) {
+				double centerX = 0;
+				double centerY = 0;
+				for(Point2D.Double pt : intpent) {
+					centerX += pt.x;
+					centerY += pt.y;
+				}
+				centerX /= intpent.length;
+				centerY /= intpent.length;
+				int width = g.getFontMetrics().stringWidth(label);
+				int ascent = g.getFontMetrics().getAscent();
+				int magicPushUpNumber = 2;
+				g.drawString(label, (float) (centerX - width/2.0), (float) (centerY + .5*(ascent) - magicPushUpNumber));
 			}
 		}
 	}

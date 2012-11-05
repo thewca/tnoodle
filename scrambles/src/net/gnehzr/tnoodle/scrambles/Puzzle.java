@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Plugins;
@@ -373,13 +374,11 @@ public abstract class Puzzle {
 		 */
 		public PuzzleState applyAlgorithm(String algorithm) throws InvalidScrambleException {
 			PuzzleState state = this;
-			if(!algorithm.trim().isEmpty()) {
-				for(String move : algorithm.split("\\s+")) {
-					try {
-						state = state.apply(move);
-					} catch(InvalidMoveException e) {
-						throw new InvalidScrambleException(algorithm, e);
-					}
+			for(String move : AlgorithmBuilder.splitAlgorithm(algorithm)) {
+				try {
+					state = state.apply(move);
+				} catch(InvalidMoveException e) {
+					throw new InvalidScrambleException(algorithm, e);
 				}
 			}
 			return state;
@@ -511,15 +510,6 @@ public abstract class Puzzle {
 	 */
 	protected abstract int getRandomMoveCount();
 	
-	public static class PuzzleStateAndGenerator {
-		PuzzleState state;
-		String generator;
-		public PuzzleStateAndGenerator(PuzzleState state, String generator) {
-			this.state = state;
-			this.generator = generator;
-		}
-	}
-
 	/**
 	 * This function will generate getRandomTurnCount() number of non cancelling,
 	 * random turns. If a puzzle wants to provide custom scrambles
@@ -534,55 +524,22 @@ public abstract class Puzzle {
 	 *         state achieved by applying that scramble.
 	 */
 	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
-		ArrayList<String> moves = new ArrayList<String>();
-		// states.get(i) = state achieved by applying moves[0]...moves[i-1]
-		ArrayList<PuzzleState> states = new ArrayList<PuzzleState>();
-		PuzzleState previousState = getSolvedState();
-		states.add(getSolvedState());
+		AlgorithmBuilder ab = new AlgorithmBuilder(this, MungingMode.IGNORE_REDUNDANT_MOVES);
 		for(int i = 0; i < getRandomMoveCount(); i++) {
-			String move;
-			PuzzleState newState;
-			HashMap<String, ? extends PuzzleState> successors = previousState.getScrambleSuccessors();
-			do {
-				move = Utils.choose(r, successors.keySet());
-				newState = successors.get(move);
+			HashMap<String, ? extends PuzzleState> successors = ab.getState().getScrambleSuccessors();
+			int length = ab.length();
+			while(ab.length() == length) {
+				String move = Utils.choose(r, successors.keySet());
+				try {
+					ab.appendMove(move);
+				} catch(InvalidMoveException e) {
+					azzert(false, e);
+				}
 				// If this move is redundant, there is no reason to select that move again in vain.
 				successors.remove(move);
-			} while(isRedundant(move, newState, moves, states));
-			states.add(newState);
-			previousState = newState;
-			moves.add(move);
+			}
 		}
-
-		String scrambleStr = Utils.join(moves, " ");
-		return new PuzzleStateAndGenerator(previousState, scrambleStr); 
+		return ab.getStateAndGenerator();
 	}
 	
-	boolean isRedundant(String newMove, PuzzleState newState, ArrayList<String> moves, ArrayList<PuzzleState> states) {
-		for(int lastMoveIndex = moves.size() - 1; lastMoveIndex >= 0; lastMoveIndex--) {
-			PuzzleState stateBeforeLastMove = states.get(lastMoveIndex);
-			PuzzleState stateAfterLastMove = states.get(lastMoveIndex+1);
-			String lastMove = moves.get(lastMoveIndex);
-			if(!stateBeforeLastMove.movesCommute(lastMove, newMove)) {
-				break;
-			}
-			PuzzleState stateAfterNewMove = null;
-			try {
-				stateAfterNewMove = stateAfterLastMove.apply(newMove);
-			} catch (InvalidMoveException e) {
-				azzert(false, e);
-			}
-			// Does newMove cancel with lastMove? If so, it’s redundant. 
-			if(stateBeforeLastMove.equals(stateAfterNewMove)) {
-				return true;
-			}
-			// Does newMove merge with lastMove? If so, it’s redundant.
-			if(stateBeforeLastMove.getSuccessors().values().contains(stateAfterNewMove)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 }

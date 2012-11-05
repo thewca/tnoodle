@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.utils.Utils;
 
 public class PyraminxPuzzle extends Puzzle {

@@ -590,6 +590,12 @@ public final class Utils {
 		}
 	}
 	
+	public static void deepCopy(int[][][] src, int[][][] dest) {
+		for(int i = 0; i < src.length; i++) {
+			deepCopy(src[i], dest[i]);
+		}
+	}
+	
 	public static <T> void deepCopy(T[][] src, T[][] dest) {
 		for(int i = 0; i < src.length; i++) {
 			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);

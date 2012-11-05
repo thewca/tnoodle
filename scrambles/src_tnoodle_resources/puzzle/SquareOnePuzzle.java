@@ -20,6 +20,7 @@ import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import cs.sq12phase.FullCube;
 import cs.sq12phase.Search;
 
