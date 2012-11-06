@@ -430,23 +430,11 @@ else
 
 	if ($test)
 	{
-		if (SQL_DBTYPE == DBTYPE_MYSQL)
-		{
-			mysql_connect(SQL_SERVER, SQL_TEST_USER, SQL_TEST_PASSWORD);
-			mysql_select_db(SQL_TEST_DBNAME);
-		}
-		else
-			$DBH = new PDO(SQL_TEST_DSN, SQL_TEST_USER, SQL_TEST_PASSWORD);
+		$DBH = new PDO(SQL_TEST_DSN, SQL_TEST_USER, SQL_TEST_PASSWORD);
 	} 
 	else 
 	{
-		if (SQL_DBTYPE == DBTYPE_MYSQL)
-		{
-			mysql_connect(SQL_SERVER, SQL_USER, SQL_PASSWORD);
-			mysql_select_db(SQL_DBNAME);
-		}
-		else
-			$DBH = new PDO(SQL_DSN, SQL_USER, SQL_PASSWORD);
+		$DBH = new PDO(SQL_DSN, SQL_USER, SQL_PASSWORD);
 	}
 	$competition = strict_query(
 		"SELECT competitions.*, countries.name AS cname FROM competitions JOIN countries ON competitions.country=countries.id WHERE competitions.id=?",
