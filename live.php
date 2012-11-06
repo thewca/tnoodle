@@ -13,7 +13,7 @@ $cat_id = NULL;
 
 function earlyError($msg)
 {
-	exit("<html><body onload=\"setTimeout('window.location = \'http://live.".DOMAIN."\';',2500)\">$msg</body></html>");
+	exit("<html><body onload=\"setTimeout('window.location = \'http://".DOMAIN."\';',2500)\">$msg</body></html>");
 }
 
 function timelimitNum($t)
@@ -403,7 +403,7 @@ function print_txt_sch($fn)
 
 if (!array_key_exists("cid", $_GET))
 {
-	header("Location: http://live.".DOMAIN."\r\n");
+	header("Location: http://".DOMAIN."\r\n");
 }
 else
 {
@@ -503,11 +503,11 @@ else
 	{
 ?>
 <script>
-var smTimer = setTimeout("refreshPage();",120000);
+var smTimer = setTimeout("refreshPage();",30000);
 function refreshPage()
 {
 	window.location.reload();
-	smTimer = setTimeout("refreshPage();",120000);
+	smTimer = setTimeout("refreshPage();",30000);
 }
 </script>
 <?
@@ -691,14 +691,14 @@ function expand(id,immediate)
 		}
 		//
 		echo "<tr><td><div class=blank>&nbsp;</div></td></tr>";
-		echo "<tr><td><div class=blank><a class=a_white href='live.php?cid=$cid";
+		echo "<tr><td><div class=blank>";
 		if ($schedule)
-			echo "&schedule=1'>[refresh]</a>";
+			echo "<a class=a_white href='live.php?cid=$cid&schedule=1'>[refresh]</a>";
 		elseif ($comp_id)
-			echo "&compid=$comp_id'>[refresh]</a>";
-		else
+			echo "<a class=a_white href='live.php?cid=$cid&compid=$comp_id'>[refresh]</a>";
+		elseif (isset($round) && isset($cat_id))
 		{
-			echo "&cat=$cat_id&rnd=$round'>[refresh]</a> ";
+			echo "<a class=a_white href='live.php?cid=$cid&cat=$cat_id&rnd=$round'>[refresh]</a> ";
 			echo "<a class=a_white href='live.php?cid=$cid&cat=$cat_id&rnd=$round&sm=1' title='enter show mode (auto-refresh)'>[show]</a>";
 		}
 		echo "</div></td></tr>";

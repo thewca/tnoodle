@@ -9,7 +9,7 @@ if (!array_key_exists("c_id", $_SESSION))
 {
 ?>
 <html>
-<body onload="setTimeout('window.location = \'index.php\';',2500)">
+<body onload="setTimeout('window.location = \'<?=(preg_match("~^admin\\.~i",$_SERVER["HTTP_HOST"])?"index.php":"admin.php")?>\';',2500)">
 Session timed out!
 </body>
 </html>

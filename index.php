@@ -2,7 +2,8 @@
 require_once "lib.php";
 session_start();
 $IE = (preg_match("/msie/i",$_SERVER["HTTP_USER_AGENT"]) || preg_match("/internet explorer/i",$_SERVER["HTTP_USER_AGENT"]));
-$live = preg_match("~^live\\.~i",$_SERVER["HTTP_HOST"]); // a more flexible detection of the live results page
+if (!isset($live))
+	$live = !preg_match("~^admin\\.~i",$_SERVER["HTTP_HOST"]);
 //echo "IE=$IE, live=$live<br>";
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -168,19 +169,21 @@ else
 }
 //
 $count = 0;
-$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>=date_b AND NOW()<=date_e ORDER BY date_b");
+$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE CURDATE()>=date_b AND CURDATE()<=date_e ORDER BY date_b, competitions.id");
 if (sql_num_rows($result)) listComps("Competitions in progress");
 //
-$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()>date_e ORDER BY date_b DESC");
+$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE CURDATE()>date_e ORDER BY date_b DESC, competitions.id DESC");
 if (sql_num_rows($result)) listComps("Past competitions");
 //
-$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE NOW()<date_b ORDER BY date_b");
+$result = strict_query("SELECT competitions.*, countries.name AS countryname FROM competitions JOIN countries ON countries.id=competitions.country WHERE CURDATE()<date_b ORDER BY date_b, competitions.id");
 if (sql_num_rows($result)) listComps("Upcoming competitions");
+
+$result = strict_query("SELECT CURDATE() AS now");
 //
 sql_close();
 
 echo "<div style='color:#444;'><br><br>";
-if (!$live) echo "Looking for the <a href='http://live.".DOMAIN."'>live results</a> site?<br><br>";
+if (!$live) echo "Looking for the <a href='http://".DOMAIN."'>live results</a> site?<br><br>";
 echo "WCA delegates and competitions organizers, please <a href='http://www.facebook.com/cubecomps' target=_blank>contact here</a><br><br>";
 if (!$live) echo "<iframe src='//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.facebook.com%2Fcubecomps&amp;send=false&amp;layout=button_count&amp;width=450&amp;show_faces=false&amp;action=like&amp;colorscheme=light&amp;font&amp;height=21&amp;appId=234783519900971' scrolling='no' frameborder='0' style='border:none; overflow:hidden; width:450px; height:21px;' allowTransparency='true'></iframe><br><br>";
 echo "by <a href='http://www.binarema.es' target=_blank>Binarema</a>";
