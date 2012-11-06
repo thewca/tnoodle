@@ -8,6 +8,7 @@ if(!isset($_SESSION)) {
 }
 
 require_once "inc_private.php";
+<<<<<<< HEAD
 require_once "lib.php";
 
 if (!isset($_SESSION["c_admin"]) || !refererMatchesHost()) :
