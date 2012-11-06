@@ -161,7 +161,7 @@ class ScheduleClass
 				else
 				{
 					//$h = ($height<=3? 3 : ($this->rounds[$idx]["sp"] <= 1 ? 2 : 1) );
-					$h = ($height<=4? 3 : ($this->rounds[$idx]["sp"] <= 1 ? 2 : 1) );
+					$h = ($height<=4? 3 : (@$this->rounds[$idx]["sp"] <= 1 ? 2 : 1) );
 					if ($IE)
 					{
 						$h++;

@@ -148,7 +148,7 @@ echo "Use the following link to give direct access to your live results: ";
 if ($test)
 	echo "<a href='http://test.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."' target=_blank>test.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."</a>";
 else
-	echo "<a href='http://live.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."' target=_blank>live.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."</a>";
+	echo "<a href='http://".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."' target=_blank>".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."</a>";
 ?>
 </td>
 </tr><tr><td>
