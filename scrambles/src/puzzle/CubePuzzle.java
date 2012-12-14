@@ -102,7 +102,7 @@ public class CubePuzzle extends Puzzle {
 			try {
 				ab.appendAlgorithm(scramble);
 			} catch (InvalidMoveException e) {
-				azzert(false, e);
+				azzert(false, new InvalidScrambleException(scramble, e));
 			}
 			return ab.getStateAndGenerator();
 		} else {
