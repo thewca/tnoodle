@@ -8,10 +8,6 @@ import java.util.logging.LogRecord;
 public class TimedLogRecordEnd extends LogRecord {
 	private static final DecimalFormat df = new DecimalFormat("#.###");
 	
-	public TimedLogRecordEnd(String msg, String extraMsg, long startNanos, long endNanos) {
-		this(Level.INFO, msg, extraMsg, startNanos, endNanos);
-	}
-
 	public TimedLogRecordEnd(Level level, String msg, String extraMsg, long startNanos, long endNanos) {
 		super(level, format(msg, extraMsg, startNanos, endNanos));
 	}

@@ -31,6 +31,6 @@ public class TimedLogRecordStart extends LogRecord {
 	}
 	
 	public TimedLogRecordEnd finishedAt(long endNanos, String extraMsg) {
-		return new TimedLogRecordEnd(msg, extraMsg, this.startNanos, endNanos);
+		return new TimedLogRecordEnd(getLevel(), msg, extraMsg, this.startNanos, endNanos);
 	}
 }
