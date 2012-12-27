@@ -27,6 +27,7 @@ public class PyraminxPuzzle extends Puzzle {
 	private static final Logger l = Logger.getLogger(PyraminxPuzzle.class.getName());
 	
 	public PyraminxPuzzle() {
+		wcaMinScrambleDistance = 7;
 		initMoves();
 		initPrun();
 	}
@@ -331,7 +332,7 @@ public class PyraminxPuzzle extends Puzzle {
 	 * @return a string representing a sequence of turns to get to that random position
 	 */
 	@Override
-	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
+	public PuzzleStateAndGenerator generateRandomMoves(Random r) {		
 		// Generate a random position
 		int randomEdgePerm;
 		do {

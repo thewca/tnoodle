@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.utils.Utils;
 import cs.min2phase.Search;
 import cs.min2phase.Tools;
@@ -49,6 +49,7 @@ public class CubePuzzle extends Puzzle {
 		this.size = size;
 
 		if(size == 2) {
+			wcaMinScrambleDistance = 4;
 			twoSolver = new TwoByTwoSolver();
 		} else if(size == 3) {
 			twoPhaseSearcher = new ThreadLocal<Search>() {
@@ -393,5 +394,16 @@ public class CubePuzzle extends Puzzle {
 		AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MungingMode.MUNGE_REDUNDANT_MOVES);
 		ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
 		System.out.println(ab3.toString());
+		
+		CubePuzzle twos = new CubePuzzle(2);
+		state = (CubeState) twos.getSolvedState();
+		azzert(state.solvableIn(0));
+		String scrambleString = "R2 B2 F2";
+		try {
+			state = (CubeState) state.applyAlgorithm(scrambleString);
+		} catch (InvalidScrambleException e) {
+			azzert(false, e);
+		}
+		azzert(state.solvableIn(3));
 	}
 }

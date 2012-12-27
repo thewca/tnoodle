@@ -10,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -20,6 +19,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -33,6 +34,7 @@ import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
+import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 import net.gnehzr.tnoodle.utils.Utils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -56,7 +58,7 @@ import com.google.gson.JsonSerializer;
  */
 public abstract class Puzzle {
 	private static final Logger l = Logger.getLogger(Puzzle.class.getName());
-	private static final int WCA_MIN_SCRAMBLE_DISTANCE = 1;
+	protected int wcaMinScrambleDistance = 1;
 
 	/**
 	 * Returns a String describing this Scrambler
@@ -97,7 +99,7 @@ public abstract class Puzzle {
 		PuzzleStateAndGenerator psag;
 		do {
 			psag = generateRandomMoves(r);
-		} while(psag.state.solvableIn(WCA_MIN_SCRAMBLE_DISTANCE));
+		} while(psag.state.solvableIn(wcaMinScrambleDistance));
 		return psag.generator;
 	}
 
@@ -470,18 +472,44 @@ public abstract class Puzzle {
 		}
 		
 		public boolean solvableIn(int n) {
-			if(isSolved()) {
-				return true;
-			} else if(n <= 0) {
-				return false;
-			}
+			HashMap<PuzzleState, Integer> seen = new HashMap<PuzzleState, Integer>();
+			Queue<PuzzleState> fringe = new LinkedList<PuzzleState>();
+			PuzzleState solved = getSolvedState();
+			fringe.add(solved);
+			seen.put(solved, 0);
 			
-			for(PuzzleState next : getSuccessors().values()) {
-				if(next.solvableIn(n - 1)) {
-					return true;
+			TimedLogRecordStart start = new TimedLogRecordStart("Searching for solution in " + n + " moves.");
+			l.log(start);
+			
+			boolean found = false;
+			while(!fringe.isEmpty()) {
+				PuzzleState node = fringe.poll();
+				int distance = seen.get(node);
+				if(node.equals(this)) {
+					found = true;
+					break;
+				}
+				if(distance == n) {
+					// It's useless to look at the children of this node, if
+					// they're any closer to solved, we've already seen them,
+					// and if they're further, we don't care about them.
+					continue;
+				} else if(distance > n) {
+					azzert(false);
+				}
+
+				for(PuzzleState next : node.getSuccessors().values()) {
+					if(seen.containsKey(next)) {
+						continue;
+					}
+					seen.put(next, distance+1);
+					fringe.add(next);
 				}
 			}
-			return false;
+			
+			l.log(start.finishedNow("expanded " + seen.size() + " nodes"));
+			
+			return found;
 		}
 
 		/**
