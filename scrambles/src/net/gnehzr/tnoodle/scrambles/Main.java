@@ -46,7 +46,7 @@ public class Main {
 				System.exit(1);
 			}
 			
-			TimedLogRecordStart start = new TimedLogRecordStart("Generating " + puzzle + " scramble");
+			TimedLogRecordStart start = new TimedLogRecordStart(Level.INFO, "Generating " + puzzle + " scramble");
 			l.log(start);
 			
 			Puzzle s = lazyScrambler.cachedInstance();

@@ -478,7 +478,7 @@ public abstract class Puzzle {
 			fringe.add(solved);
 			seen.put(solved, 0);
 			
-			TimedLogRecordStart start = new TimedLogRecordStart("Searching for solution in " + n + " moves.");
+			TimedLogRecordStart start = new TimedLogRecordStart(Level.FINER, "Searching for solution in " + n + " moves.");
 			l.log(start);
 			
 			boolean found = false;

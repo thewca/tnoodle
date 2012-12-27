@@ -7,10 +7,11 @@ import java.util.logging.LogRecord;
 public class TimedLogRecordStart extends LogRecord {
 	private long startNanos;
 	private String msg;
-	public TimedLogRecordStart(String msg) {
-		this(Level.INFO, msg, System.nanoTime());
-	}
 
+	public TimedLogRecordStart(Level level, String msg) {
+		this(level, msg, System.nanoTime());
+	}
+	
 	public TimedLogRecordStart(Level level, String msg, long startNanos) {
 		super(level, "STARTED " + msg);
 		this.startNanos = startNanos;

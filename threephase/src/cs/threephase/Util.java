@@ -102,7 +102,7 @@ public class Util {
 			}
 		}
 		if(inited == InitializationState.UNINITIALIZED) {
-			TimedLogRecordStart start = new TimedLogRecordStart("Generating threephase tables");
+			TimedLogRecordStart start = new TimedLogRecordStart(Level.INFO, "Generating threephase tables");
 			l.log(start);
 
 			inited = InitializationState.INITING_CENTER1;
