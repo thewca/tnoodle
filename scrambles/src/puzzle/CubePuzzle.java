@@ -52,6 +52,10 @@ public class CubePuzzle extends Puzzle {
 			wcaMinScrambleDistance = 4;
 			twoSolver = new TwoByTwoSolver();
 		} else if(size == 3) {
+			String newMinDistance = System.getenv("TNOODLE_333_MIN_DISTANCE");
+			if(newMinDistance != null) {
+				wcaMinScrambleDistance = Integer.parseInt(newMinDistance);
+			}
 			twoPhaseSearcher = new ThreadLocal<Search>() {
 				protected Search initialValue() {
 					return new Search();
