@@ -326,6 +326,11 @@ class tmt:
 			default=None,
 			help='Run with jdb or as an attachable vm (only valid with the "run" command)')
 		parser_make.add_argument(
+			'--profile',
+			choices=['samples', 'times'],
+			default=None,
+			help='Profile program (stats will be written to profile.hprof)')
+		parser_make.add_argument(
 			'--skip-noflex-warning',
 			default=False,
 			action='store_true',
@@ -468,7 +473,7 @@ class tmt:
 			matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
 		return matches
 
-	def java(self, main, classpath='', args=[], debug=None):
+	def java(self, main, classpath='', args=[], debug=None, profile=None):
 		command = []
 		assert debug in [ None, 'jdb', 'attach' ]
 		if debug == 'jdb':
@@ -479,6 +484,9 @@ class tmt:
 			if debug == 'attach':
 				command.append('-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n') # TODO - configurable port?
 			command.append('-ea') # TODO - should turn on assertions at runtime
+
+		if profile:
+			command.append('-Xrunhprof:cpu=%s,depth=30,file=%s' % ( profile, 'profile.hprof' ))
 		if classpath:
 			command.append('-classpath')
 			command.append(classpath)
@@ -1032,7 +1040,8 @@ Implementation-Version: %s
 				main=main,
 				classpath=self.toClasspath(classpath),
 				args=args,
-				debug=tmt.args.debug)
+				debug=tmt.args.debug,
+				profile=tmt.args.profile)
 		sys.exit(retVal)
 
 	def check(self):
