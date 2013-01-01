@@ -267,43 +267,33 @@ public class CubePuzzle extends Puzzle {
 
 	private int[][][] normalize(int[][][] image) {
 		image = cloneImage(image);
-		int[][][] outerImage = cloneImage(image);
 		
 		// (x y)*3 places every face on U, and returns to where we started
 		int dir = 1;
-		int ori;
 		Face[] cubeRotations = new Face[] { Face.R, Face.F, Face.R, Face.F, Face.R, Face.F };
 		
-		// We only have to slice outer layers to test normalization state.
-		for (ori=0; ori<cubeRotations.length * 4; ori++) {
-			if(isNormalized(outerImage)) {
-				break;
+		for (Face face : cubeRotations) {
+			for (int rotU=0; rotU<4; rotU++){
+				if(isNormalized(image)) {
+					// Move the remaining slices we didn't move
+					// while searching for the normalization state (see next).
+					for (int sl=1; sl<size-1; sl++){
+						slice(Face.U, sl, rotU, image);
+					}
+					return image;
+				}
+				// Try all 4 front faces we could have on front
+				// We only have to slice outer layers to test normalization state.
+				slice(Face.U, 0, 1, image);
+				slice(Face.U, size-1, 1, image);
 			}
-			// Try all 4 front faces we could have on front
-			slice(Face.U, 0, 1, outerImage);
-			slice(Face.U, size-1, 1, outerImage);
 
 			// Changing the U face.
-			if(( ori % 4 ) == 3) {
-				Face face = cubeRotations[ori/4];
-				slice(face, 0, dir, outerImage);
-				slice(face, size-1, dir, outerImage);
-			}
+			spinCube(image, face, dir);
 		}
-		azzert(isNormalized(outerImage));
 
-		// Now we have found the right combination of cube rotations to obtain a normalized cube.
-		// We need to apply it on the full cube.
-
-		// First, put the right face on U.
-		for (int i=0; i<ori/4; i++){
-			spinCube(image, cubeRotations[i], dir);
-		}
-		// Then, do the right number of U rotations.
-		spinCube(image, Face.U, ori % 4);
-		
-		azzert(isNormalized(image));
-		return image;
+		azzert(false);
+		return null;
 	}
 
 	public boolean isNormalized(int[][][] image) {
