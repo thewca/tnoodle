@@ -330,11 +330,12 @@ public class CubePuzzle extends Puzzle {
 		
 		public CubeState(int[][][] image) {
 			this.image = image;
-			if(isNormalized(image)) {
-				normalizedImage = cloneImage(image);
-			} else {
+		}
+
+		private int[][][] getNormalized(){
+			if (normalizedImage == null)
 				normalizedImage = normalize(image);
-			}
+			return normalizedImage;
 		}
 
 		@Override
@@ -369,12 +370,12 @@ public class CubePuzzle extends Puzzle {
 
 		@Override
 		public boolean equals(Object other) {
-			return Arrays.deepEquals(normalizedImage, ((CubeState) other).normalizedImage);
+			return Arrays.deepEquals(getNormalized(), ((CubeState) other).getNormalized());
 		}
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(normalizedImage);
+			return Arrays.hashCode(getNormalized());
 		}
 
 		@Override
