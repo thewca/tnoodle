@@ -264,27 +264,46 @@ public class CubePuzzle extends Puzzle {
 			slice(face, slice, dir, image);
 		}
 	}
-	
+
 	private int[][][] normalize(int[][][] image) {
 		image = cloneImage(image);
+		int[][][] outerImage = cloneImage(image);
 		
 		// (x y)*3 places every face on U, and returns to where we started
 		int dir = 1;
+		int ori;
 		Face[] cubeRotations = new Face[] { Face.R, Face.F, Face.R, Face.F, Face.R, Face.F };
 		
-		for(Face face : cubeRotations) {
-			spinCube(image, face, dir);
-			// Now that we've picked something to go on top,
-			// try all 4 front faces we could have on front
-			for(int count = 0; count < 4; count++) {
-				if(isNormalized(image)) {
-					return image;
-				}
-				spinCube(image, Face.U, 1);
+		// We only have to slice outer layers to test normalization state.
+		for (ori=0; ori<cubeRotations.length * 4; ori++) {
+			if(isNormalized(outerImage)) {
+				break;
+			}
+			// Try all 4 front faces we could have on front
+			slice(Face.U, 0, 1, outerImage);
+			slice(Face.U, size-1, 1, outerImage);
+
+			// Changing the U face.
+			if(( ori % 4 ) == 3) {
+				Face face = cubeRotations[ori/4];
+				slice(face, 0, dir, outerImage);
+				slice(face, size-1, dir, outerImage);
 			}
 		}
-		azzert(false);
-		return null;
+		azzert(isNormalized(outerImage));
+
+		// Now we have found the right combination of cube rotations to obtain a normalized cube.
+		// We need to apply it on the full cube.
+
+		// First, put the right face on U.
+		for (int i=0; i<ori/4; i++){
+			spinCube(image, cubeRotations[i], dir);
+		}
+		// Then, do the right number of U rotations.
+		spinCube(image, Face.U, ori % 4);
+		
+		azzert(isNormalized(image));
+		return image;
 	}
 
 	public boolean isNormalized(int[][][] image) {
