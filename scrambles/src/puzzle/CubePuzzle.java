@@ -27,6 +27,7 @@ public class CubePuzzle extends Puzzle {
     private static final int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
 
     private static final int TWO_BY_TWO_MIN_SCRAMBLE_LENGTH = 11;
+    private static final int TWO_BY_TWO_MIN_SCRAMBLE_DISTANCE = 4;
     
     private static enum Face {
     	L, D, B, R, U, F;
@@ -49,7 +50,6 @@ public class CubePuzzle extends Puzzle {
 		this.size = size;
 
 		if(size == 2) {
-			wcaMinScrambleDistance = 4;
 			twoSolver = new TwoByTwoSolver();
 		} else if(size == 3) {
 			String newMinDistance = System.getenv("TNOODLE_333_MIN_DISTANCE");
@@ -93,7 +93,7 @@ public class CubePuzzle extends Puzzle {
 		if(size == 2 || size == 3 || size == 4) {
 			String scramble;
 			if(size == 2) {
-				scramble = twoSolver.randomScramble(r, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH, true);
+				scramble = twoSolver.randomScramble(r, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH, TWO_BY_TWO_MIN_SCRAMBLE_DISTANCE, true);
 			} else if(size == 3) {
 				scramble = twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 			} else if(size == 4) {

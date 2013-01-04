@@ -249,8 +249,9 @@ public class TwoByTwoSolver {
 	 * @param length     the remaining number of moves we can apply
 	 * @param last_move  what was the last move done (first called with an int >= 9)
 	 * @param solution   the array containing the current moves done.
+	 * @return           returns if a solution was found.
 	 */
-	private void search(int perm, int orient, int depth, int length, int last_move, int[] solution, int[] best_solution){
+	private boolean search(int perm, int orient, int depth, int length, int last_move, int[] solution, int[] best_solution){
 
 		/* If there are no moves left to try (length=0), check if the current position is solved */
 		if( length == 0 ) {
@@ -258,12 +259,13 @@ public class TwoByTwoSolver {
 				// Solution found! Compute the cost of applying the reverse solution.
 				int cost = computeCost(solution, depth, 0, 0);
 				// We found a better solution, storing it.
-			    if( cost < best_solution[depth]){
+				if( cost < best_solution[depth]){
 					System.arraycopy(solution, 0, best_solution, 0, depth);
 					best_solution[depth] = cost;
 				}
+				return true;
 			}
-			return;
+			return false;
 		}
 
 		/* Check if we might be able to solve the permutation or the orientation of the position
@@ -271,13 +273,14 @@ public class TwoByTwoSolver {
 		 * If not, there is no point keeping searching for a solution, just stop.
 		 */
 		if(( prunPerm[perm] > length ) || ( prunOrient[orient] > length ))
-			return;
+			return false;
 
 		/* The recursive part of the search function.
 		 * Try every move from the current position, and call the search function with the new position
 		 * and the updated parameters (depth -> depth+1; length -> length-1; last_move -> move)
 		 * We don't need to try a move of the same face as the last move.
 		 */
+		boolean solutionFound = false;
 		for( int move=0; move<N_MOVES; move++){
 			// Check if the tested move is of the same face as the previous move (last_move).
 			if(( move / 3 ) == ( last_move / 3 ))
@@ -288,8 +291,9 @@ public class TwoByTwoSolver {
 			// Store the move
 			solution[depth] = move;
 			// Call the recursive function
-			search( newPerm, newOrient, depth+1, length-1, move, solution, best_solution );
+			solutionFound |= search( newPerm, newOrient, depth+1, length-1, move, solution, best_solution );
 		}
+		return solutionFound;
 	}
 
 	/**
@@ -299,14 +303,18 @@ public class TwoByTwoSolver {
 	 * @param inverse   do we want to return the solution or the scramble
 	 * @return          a string representing the solution or the scramble of a random position
 	 */
-	public String randomScramble(Random r, int length, boolean inverse){
-		int randomPerm = r.nextInt(N_PERM);
-		int randomOrient = r.nextInt(N_ORIENT);
+	public String randomScramble(Random r, int length, int min_distance, boolean inverse){
+		int randomPerm;
+		int randomOrient;
 		int[] solution = new int[MAX_LENGTH];
 		int[] best_solution = new int[MAX_LENGTH+1];
+		do {
+			randomPerm = r.nextInt(N_PERM);
+			randomOrient = r.nextInt(N_ORIENT);
+		} while( search(randomPerm, randomOrient, 0, min_distance-1, 42, solution, best_solution)); // A too short solution was found.
+
 		best_solution[length] = 42424242;
-		search(randomPerm, randomOrient, 0, length, 42, solution, best_solution);
-		if( best_solution[length] == 42424242 ) // No solution was found
+		if( !search(randomPerm, randomOrient, 0, length, 42, solution, best_solution)) // No solution was found
 			return "";
 
 		StringBuilder scramble = new StringBuilder(MAX_LENGTH*3);
@@ -327,10 +335,10 @@ public class TwoByTwoSolver {
 
 	static final int cost_U = 8;
 	static final int cost_U_low = 20; // when grip = -1
-	static final int cost_U2 = 15;
+	static final int cost_U2 = 10;
 	static final int cost_U3 = 7;
 	static final int cost_R = 6;
-	static final int cost_R2 = 12;
+	static final int cost_R2 = 10;
 	static final int cost_R3 = 6;
 	static final int cost_F = 10;
 	static final int cost_F2 = 30;
