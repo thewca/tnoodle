@@ -1,6 +1,7 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.Utils.azzertSame;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,6 +11,8 @@ import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+
+import puzzle.TwoByTwoSolver.TwoByTwoState;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
@@ -27,7 +30,6 @@ public class CubePuzzle extends Puzzle {
     private static final int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
 
     private static final int TWO_BY_TWO_MIN_SCRAMBLE_LENGTH = 11;
-    private static final int TWO_BY_TWO_MIN_SCRAMBLE_DISTANCE = 4;
     
     private static enum Face {
     	L, D, B, R, U, F;
@@ -50,6 +52,7 @@ public class CubePuzzle extends Puzzle {
 		this.size = size;
 
 		if(size == 2) {
+			wcaMinScrambleDistance = 4;
 			twoSolver = new TwoByTwoSolver();
 		} else if(size == 3) {
 			String newMinDistance = System.getenv("TNOODLE_333_MIN_DISTANCE");
@@ -87,13 +90,14 @@ public class CubePuzzle extends Puzzle {
 	public String getShortName() {
 		return size + "" + size + "" + size;
 	}
-
+	
 	@Override
 	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
 		if(size == 2 || size == 3 || size == 4) {
 			String scramble;
 			if(size == 2) {
-				scramble = twoSolver.randomScramble(r, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH, TWO_BY_TWO_MIN_SCRAMBLE_DISTANCE, true);
+				TwoByTwoState state = twoSolver.randomState(r);
+				scramble = twoSolver.solveExactly(state, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH, false);
 			} else if(size == 3) {
 				scramble = twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 			} else if(size == 4) {
@@ -321,11 +325,95 @@ public class CubePuzzle extends Puzzle {
 		public CubeState(int[][][] image) {
 			this.image = image;
 		}
-
+		
 		private int[][][] getNormalized(){
-			if (normalizedImage == null)
+			if (normalizedImage == null) {
 				normalizedImage = normalize(image);
+			}
 			return normalizedImage;
+		}
+		
+		public TwoByTwoState toTwoByTwoState() {
+			TwoByTwoState state = new TwoByTwoState();
+			
+			int[][] stickersByPiece = new int[][] {
+				{ image[Face.U.ordinal()][1][0], image[Face.F.ordinal()][0][0], image[Face.L.ordinal()][0][1] },
+				{ image[Face.U.ordinal()][0][0], image[Face.L.ordinal()][0][0], image[Face.B.ordinal()][0][1] },
+				{ image[Face.U.ordinal()][0][1], image[Face.B.ordinal()][0][0], image[Face.R.ordinal()][0][1] },
+				{ image[Face.U.ordinal()][1][1], image[Face.R.ordinal()][0][0], image[Face.F.ordinal()][0][1] },
+				
+				{ image[Face.D.ordinal()][0][0], image[Face.L.ordinal()][1][1], image[Face.F.ordinal()][1][0] },
+				{ image[Face.D.ordinal()][0][1], image[Face.F.ordinal()][1][1], image[Face.R.ordinal()][1][0] },
+				{ image[Face.D.ordinal()][1][1], image[Face.R.ordinal()][1][1], image[Face.B.ordinal()][1][0] },
+				{ image[Face.D.ordinal()][1][0], image[Face.B.ordinal()][1][1], image[Face.L.ordinal()][1][0] }
+			};
+			
+			// Here's a clever color value assigning system that gives each piece
+			// a unique id just by summing up the values of its stickers.
+			//
+			//            +----------+
+			//            |*1*    *3*|
+			//            |   U (0)  |
+			//            |*0*    *2*|
+			// +----------+----------+----------+----------+
+			// | 1      0 | 0      3 | 3      2 | 2      1 |
+			// |   L (0)  |   F (0)  |   R (2)  |   B (1)  |
+			// | 7      4 | 4      5 | 5      6 | 6      7 |
+			// +----------+----------+----------+----------+
+			//            |*4*    *6*|
+			//            |   D (4)  |
+			//            |*5*    *7*|
+			//            +----------+
+			//
+			// Unfortunately, the scheme described above doesn't match
+			// the ids as defined at the top of TwoByTwoSolver.java.
+			// If we read the piece ids as defined in TwoByTwoSolver.java
+			// in the order defined above, we get this:
+			int[] cleverIdToTwoByTwoSolverId = new int[] { 0, 1, 3, 2, 4, 7, 5, 6 };
+			
+			int dColor = stickersByPiece[7][0];
+			int bColor = stickersByPiece[7][1];
+			int lColor = stickersByPiece[7][2];
+			
+			int uColor = Face.values()[dColor].oppositeFace().ordinal();
+			int fColor = Face.values()[bColor].oppositeFace().ordinal();
+			int rColor = Face.values()[lColor].oppositeFace().ordinal();
+			
+			int[] colorToVal = new int[8];
+			colorToVal[uColor] = 0;
+			colorToVal[fColor] = 0;
+			colorToVal[lColor] = 0;
+			colorToVal[bColor] = 1;
+			colorToVal[rColor] = 2;
+			colorToVal[dColor] = 4;
+			
+			int[] pieces = new int[7];
+			for(int i = 0; i < pieces.length; i++) {
+				int[] stickers = stickersByPiece[i];
+				int pieceVal = cleverIdToTwoByTwoSolverId[colorToVal[stickers[0]] + colorToVal[stickers[1]] + colorToVal[stickers[2]]];
+				
+				int clockwiseTurnsToGetToPrimaryColor = 0;
+				while(stickers[clockwiseTurnsToGetToPrimaryColor] != uColor && stickers[clockwiseTurnsToGetToPrimaryColor] != dColor) {
+					clockwiseTurnsToGetToPrimaryColor++;
+					azzert(clockwiseTurnsToGetToPrimaryColor < 3);
+				}
+				int piece = (clockwiseTurnsToGetToPrimaryColor << 3) + pieceVal;
+				pieces[i] = piece;
+			}
+			
+			state.permutation = TwoByTwoSolver.packPerm(pieces);
+			state.orientation = TwoByTwoSolver.packOrient(pieces);
+			return state;
+		}
+		
+		@Override
+		public String solveIn(int n) {
+			if(size == 2) {
+				String solution = twoSolver.solveIn(toTwoByTwoState(), n, false);
+				return solution;
+			} else {
+				return super.solveIn(n);
+			}
 		}
 
 		@Override
@@ -365,7 +453,7 @@ public class CubePuzzle extends Puzzle {
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(getNormalized());
+			return Arrays.deepHashCode(getNormalized());
 		}
 
 		@Override
@@ -376,6 +464,12 @@ public class CubePuzzle extends Puzzle {
 	}
 	
 	public static void main(String[] args) throws InvalidScrambleException, InvalidMoveException {
+		testMisc();
+		testTwosConverter();
+		testTwosSolver();
+	}
+	
+	private static void testMisc() throws InvalidScrambleException, InvalidMoveException {
 		CubePuzzle fours = new CubePuzzle(4);
 		CubeState solved = fours.getSolvedState();
 		
@@ -407,17 +501,59 @@ public class CubePuzzle extends Puzzle {
 		
 		AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MungingMode.MUNGE_REDUNDANT_MOVES);
 		ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
-		System.out.println(ab3.toString());
+		azzert(ab3.toString().equals("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'"));
+	}
+	
+	private static void testTwosConverter() throws InvalidMoveException {
+		int orient = 0;
+		int permute = 0;
+		
+		int MOVE_R = 3;
+		orient = TwoByTwoSolver.moveOrient[orient][MOVE_R];
+		permute = TwoByTwoSolver.movePerm[permute][MOVE_R];
+		azzert(orient == 46);
+		azzert(permute == 39);
 		
 		CubePuzzle twos = new CubePuzzle(2);
-		state = (CubeState) twos.getSolvedState();
-		azzert(state.solvableIn(0));
+		CubeState state = (CubeState) twos.getSolvedState().apply("R");
+		TwoByTwoState twoByTwoState = state.toTwoByTwoState();
+
+		int[] cubiesO = new int[7];
+		TwoByTwoSolver.unpackOrient(orient, cubiesO);
+		int[] cubiesP = new int[7];
+		TwoByTwoSolver.unpackPerm(permute, cubiesP);
+		
+		azzertSame(twoByTwoState.orientation, orient);
+		azzertSame(twoByTwoState.permutation, permute);
+		
+		TwoByTwoSolver twoByTwoSolver = new TwoByTwoSolver();
+		azzert(twoByTwoSolver.solveExactly(twoByTwoState, 1, false).equals("R'"));
+
+		int MOVE_R_PRIME = 5;
+		orient = TwoByTwoSolver.moveOrient[orient][MOVE_R_PRIME];
+		permute = TwoByTwoSolver.movePerm[permute][MOVE_R_PRIME];
+		azzert(orient == 0);
+		azzert(permute == 0);
+	}
+
+	private static void testTwosSolver() throws InvalidScrambleException {
+		CubePuzzle twos = new CubePuzzle(2);
+		CubeState state = (CubeState) twos.getSolvedState();
+		String solution = state.solveIn(0);
+		System.out.println(solution);
+		azzert(solution.equals(""));
+		
 		String scrambleString = "R2 B2 F2";
 		try {
 			state = (CubeState) state.applyAlgorithm(scrambleString);
 		} catch (InvalidScrambleException e) {
 			azzert(false, e);
 		}
-		azzert(state.solvableIn(3));
+
+		solution = state.solveIn(1);
+		azzert(solution != null);
+		System.out.println("Found a solution! " + solution);
+		state = (CubeState) state.applyAlgorithm(solution);
+		azzert(state.isSolved());
 	}
 }

@@ -504,7 +504,7 @@ public class MegaminxPuzzle extends Puzzle {
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(normalizedImage);
+			return Arrays.deepHashCode(normalizedImage);
 		}
 
 		@Override

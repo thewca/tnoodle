@@ -3,10 +3,7 @@ package puzzle;
 import java.util.Random;
 
 public class TwoByTwoSolver {
-	public TwoByTwoSolver() {
-		initMoves();
-		initPrun();
-	}
+	public TwoByTwoSolver() {}
 
 	/***
 	There are 8 "corner" cubies, numbered 0 to 7.
@@ -48,7 +45,7 @@ public class TwoByTwoSolver {
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 * @return         an integer between 0 and 5039 representing the permutation of 7 elements
 	 */
-	private int packPerm(int[] cubies){
+	public static int packPerm(int[] cubies){
 		int idx = 0;
 		int val = 0x6543210;
 		for (int i=0; i<6; i++) {
@@ -64,7 +61,7 @@ public class TwoByTwoSolver {
 	 * @param perm     an integer between 0 and 5039 representing the permutation of 7 elements
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 */
-	private void unpackPerm(int perm, int[] cubies){
+	public static void unpackPerm(int perm, int[] cubies){
 		int val = 0x6543210;
 		for (int i=0; i<6; i++) {
 			int p = fact[6-i];
@@ -83,7 +80,7 @@ public class TwoByTwoSolver {
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 * @return         an integer between 0 and 728 representing the orientation of 6 elements (the 7th is fixed)
 	 */
-	private int packOrient(int[] cubies){
+	public static int packOrient(int[] cubies){
 		int ori = 0;
 		for (int i=0; i<6; i++){
 			ori = 3 * ori + ( cubies[i] >> 3 );
@@ -96,7 +93,7 @@ public class TwoByTwoSolver {
 	 * @param ori      an integer between 0 and 728 representing the orientation of 6 elements (the 7th is fixed)
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 */
-	private void unpackOrient(int ori, int[] cubies){
+	public static void unpackOrient(int ori, int[] cubies){
 		int sum_ori = 0;
 		for (int i=5; i>=0; i--){
 			cubies[i] = ( ori % 3 ) << 3;
@@ -115,7 +112,7 @@ public class TwoByTwoSolver {
 	 * @param d        fourth element to cycle
 	 * @param times    number of times to cycle
 	 */
-	private void cycle(int[] cubies, int a, int b, int c, int d, int times){
+	private static void cycle(int[] cubies, int a, int b, int c, int d, int times){
 		int temp = cubies[d];
 		cubies[d] = cubies[c];
 		cubies[c] = cubies[b];
@@ -134,7 +131,7 @@ public class TwoByTwoSolver {
 	 * @param d        fourth element to cycle
 	 * @param times    number of times to cycle
 	 */
-	private void cycleAndOrient(int[] cubies, int a, int b, int c, int d, int times){
+	private static void cycleAndOrient(int[] cubies, int a, int b, int c, int d, int times){
 		int temp = cubies[d];
 		cubies[d] = (cubies[c] + 8) % 24;
 		cubies[c] = (cubies[b] + 16) % 24;
@@ -149,7 +146,7 @@ public class TwoByTwoSolver {
 	 * @param cubies   cubies representation (ori << 3 + perm)
 	 * @param move     move to apply to the cubies
 	 */
-	private void moveCubies(int[] cubies, int move){
+	private static void moveCubies(int[] cubies, int move){
 		int face = move / 3;
 		int times = ( move % 3 ) + 1;
 		switch (face){
@@ -165,13 +162,12 @@ public class TwoByTwoSolver {
 		}
 	}
 
-
 	/**
 	 * Fill the arrays to move permutation and orientation coordinates.
 	 */
-	private static int[][] movePerm = new int[N_PERM][N_MOVES];
-	private static int[][] moveOrient = new int[N_ORIENT][N_MOVES];
-	private void initMoves(){
+	protected static int[][] movePerm = new int[N_PERM][N_MOVES];
+	protected static int[][] moveOrient = new int[N_ORIENT][N_MOVES];
+	private static void initMoves(){
 		int[] cubies1 = new int[7];
 		int[] cubies2 = new int[7];
 		for (int perm=0; perm<N_PERM; perm++){
@@ -200,7 +196,7 @@ public class TwoByTwoSolver {
 	 */
 	private static int[] prunPerm = new int[N_PERM];
 	private static int[] prunOrient = new int[N_ORIENT];
-	private void initPrun(){
+	private static void initPrun(){
 
 		for (int perm=0; perm<N_PERM; perm++)
 			prunPerm[perm] = -1;
@@ -240,6 +236,11 @@ public class TwoByTwoSolver {
 			}
 		}
 	}
+	
+	static {
+		initMoves();
+		initPrun();
+	}
 
 	/**
 	 * Search a solution from a position given by permutation and orientation coordinates
@@ -249,21 +250,19 @@ public class TwoByTwoSolver {
 	 * @param length     the remaining number of moves we can apply
 	 * @param last_move  what was the last move done (first called with an int >= 9)
 	 * @param solution   the array containing the current moves done.
-	 * @return           returns if a solution was found.
 	 */
 	private boolean search(int perm, int orient, int depth, int length, int last_move, int[] solution, int[] best_solution){
-
 		/* If there are no moves left to try (length=0), check if the current position is solved */
 		if( length == 0 ) {
 			if (( perm == 0 ) && ( orient == 0 )){
 				// Solution found! Compute the cost of applying the reverse solution.
 				int cost = computeCost(solution, depth, 0, 0);
 				// We found a better solution, storing it.
-				if( cost < best_solution[depth]){
+			    if(cost < best_solution[depth]) {
 					System.arraycopy(solution, 0, best_solution, 0, depth);
 					best_solution[depth] = cost;
 				}
-				return true;
+			    return true;
 			}
 			return false;
 		}
@@ -296,36 +295,78 @@ public class TwoByTwoSolver {
 		return solutionFound;
 	}
 
+	public static class TwoByTwoState {
+		int permutation, orientation;
+	}
+	
 	/**
-	 * Generate a random position and solve it. Returns either the solution or the scramble (inverse solution)
+	 * Generate a random 2x2 position.
 	 * @param r         random int generator
+	 */
+	public TwoByTwoState randomState(Random r) {
+		TwoByTwoState state = new TwoByTwoState();
+		state.permutation = r.nextInt(N_PERM);
+		state.orientation = r.nextInt(N_ORIENT);
+		return state;
+	}
+	
+	/**
+	 * Solve a given position in less than or equal to length number of turns.
+	 * Returns either the solution or the generator (inverse solution)
+	 * @param perm      permutation
+	 * @param orient    random int generator
 	 * @param length    length of the desired solution
-	 * @param inverse   do we want to return the solution or the scramble
+	 * @param inverse   do we want to return the solution or a generator
 	 * @return          a string representing the solution or the scramble of a random position
 	 */
-	public String randomScramble(Random r, int length, int min_distance, boolean inverse){
-		int randomPerm;
-		int randomOrient;
+	public String solveIn(TwoByTwoState state, int length, boolean inverse) {
+		return solve(state, length, false, inverse);
+	}
+	
+	/**
+	 * Solve a given position in exactly length number of turns or not at all.
+	 * Returns either the solution or the generator (inverse solution)
+	 * @param perm      permutation
+	 * @param orient    random int generator
+	 * @param length    length of the desired solution
+	 * @param inverse   do we want to return the solution or a generator
+	 * @return          a string representing the solution or the scramble of a random position
+	 */
+	public String solveExactly(TwoByTwoState state, int length, boolean inverse) {
+		return solve(state, length, true, inverse);
+	}
+	
+	private String solve(TwoByTwoState state, int desiredLength, boolean exactLength, boolean inverse) {
 		int[] solution = new int[MAX_LENGTH];
 		int[] best_solution = new int[MAX_LENGTH+1];
-		do {
-			randomPerm = r.nextInt(N_PERM);
-			randomOrient = r.nextInt(N_ORIENT);
-		} while( search(randomPerm, randomOrient, 0, min_distance-1, 42, solution, best_solution)); // A too short solution was found.
-
-		best_solution[length] = 42424242;
-		if( !search(randomPerm, randomOrient, 0, length, 42, solution, best_solution)) // No solution was found
+		boolean foundSolution = false;
+		int length = exactLength ? desiredLength : 0;
+		while(length <= desiredLength) {
+			best_solution[length] = 42424242;
+			if(search(state.permutation, state.orientation, 0, length, 42, solution, best_solution)) {
+				foundSolution = true;
+				break;
+			}
+			length++;
+		}
+		
+		if(!foundSolution) {
+			return null;
+		}
+		
+		if(length == 0) {
 			return "";
+		}
 
 		StringBuilder scramble = new StringBuilder(MAX_LENGTH*3);
-		if( inverse ){
+		if(inverse) {
 			scramble.append(inverseMoveToString[best_solution[length-1]]);
-			for (int l=length-2; l>=0; l--){
+			for(int l=length-2; l>=0; l--) {
 				scramble.append(" ").append(inverseMoveToString[best_solution[l]]);
 			}
 		} else {
 			scramble.append(moveToString[best_solution[0]]);
-			for (int l=1; l<length; l++){
+			for(int l=1; l<length; l++) {
 				scramble.append(" ").append(moveToString[best_solution[l]]);
 			}
 		}
