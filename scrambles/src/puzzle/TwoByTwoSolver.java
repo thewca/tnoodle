@@ -313,8 +313,7 @@ public class TwoByTwoSolver {
 	/**
 	 * Solve a given position in less than or equal to length number of turns.
 	 * Returns either the solution or the generator (inverse solution)
-	 * @param perm      permutation
-	 * @param orient    random int generator
+	 * @param state     state
 	 * @param length    length of the desired solution
 	 * @param inverse   do we want to return the solution or a generator
 	 * @return          a string representing the solution or the scramble of a random position
