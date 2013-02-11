@@ -27,6 +27,7 @@ public class PyraminxPuzzle extends Puzzle {
 	private static final Logger l = Logger.getLogger(PyraminxPuzzle.class.getName());
 	
 	public PyraminxPuzzle() {
+		wcaMinScrambleDistance = 7;
 		initMoves();
 		initPrun();
 	}
@@ -37,7 +38,6 @@ public class PyraminxPuzzle extends Puzzle {
 	static final int N_ORIENT = N_EDGE_ORIENT * N_CORNER_ORIENT;
 	static final int N_MOVES = 8; // Number of moves
 	static final int SCRAMBLE_LENGTH = 11;
-	static final int MIN_SCRAMBLE_DISTANCE = 4;
 	static final String[] inverseMoveToString = {"U'", "U", "L'", "L", "R'", "R", "B'", "B"};
 	static final String[] tipToString = {"u", "u'", "l", "l'", "r", "r'", "b", "b'"};
 
@@ -335,18 +335,14 @@ public class PyraminxPuzzle extends Puzzle {
 	public PuzzleStateAndGenerator generateRandomMoves(Random r) {		
 		// Generate a random position
 		int randomEdgePerm;
-		int randomEdgeOrient;
-		int randomCornerOrient;
-		int[] solution = new int[SCRAMBLE_LENGTH];
 		do {
-			do {
-				randomEdgePerm = r.nextInt(N_EDGE_PERM);
-			} while(prunPerm[randomEdgePerm] == -1); // incorrect permutation (bad parity)
-			randomEdgeOrient = r.nextInt(N_EDGE_ORIENT);
-			randomCornerOrient = r.nextInt(N_CORNER_ORIENT);
-		} while (search(randomEdgePerm, randomEdgeOrient, randomCornerOrient, 0, MIN_SCRAMBLE_DISTANCE-1, 42, solution, r)); // Too short solution
+			randomEdgePerm = r.nextInt(N_EDGE_PERM);
+		} while(prunPerm[randomEdgePerm] == -1); // incorrect permutation (bad parity)
+		int randomEdgeOrient = r.nextInt(N_EDGE_ORIENT);
+		int randomCornerOrient = r.nextInt(N_CORNER_ORIENT);
 
 		// Solve that position
+		int[] solution = new int[SCRAMBLE_LENGTH];
 		if(!search(randomEdgePerm, randomEdgeOrient, randomCornerOrient, 0, SCRAMBLE_LENGTH, 42, solution, r)) {
 			// No solution was found
 			l.log(Level.SEVERE, "Could not find a solution to state with edgePerm: " + randomEdgePerm +
