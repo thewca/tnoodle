@@ -14,8 +14,6 @@ import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;

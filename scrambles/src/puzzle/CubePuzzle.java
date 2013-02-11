@@ -365,7 +365,7 @@ public class CubePuzzle extends Puzzle {
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(getNormalized());
+			return Arrays.deepHashCode(getNormalized());
 		}
 
 		@Override
@@ -407,17 +407,21 @@ public class CubePuzzle extends Puzzle {
 		
 		AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MungingMode.MUNGE_REDUNDANT_MOVES);
 		ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
-		System.out.println(ab3.toString());
+		azzert(ab3.toString().equals("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'"));
 		
 		CubePuzzle twos = new CubePuzzle(2);
 		state = (CubeState) twos.getSolvedState();
-		azzert(state.solvableIn(0));
+		String solution = state.solveIn(0);
+		azzert(solution.equals(""));
 		String scrambleString = "R2 B2 F2";
 		try {
 			state = (CubeState) state.applyAlgorithm(scrambleString);
 		} catch (InvalidScrambleException e) {
 			azzert(false, e);
 		}
-		azzert(state.solvableIn(3));
+		solution = state.solveIn(3);
+		System.out.println("Found a solution! " + solution);
+		state = (CubeState) state.applyAlgorithm(solution);
+		azzert(state.isSolved());
 	}
 }
