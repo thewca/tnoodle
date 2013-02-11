@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Random;
 import java.util.SortedMap;
@@ -99,7 +100,7 @@ public abstract class Puzzle {
 		PuzzleStateAndGenerator psag;
 		do {
 			psag = generateRandomMoves(r);
-		} while(psag.state.solvableIn(wcaMinScrambleDistance));
+		} while(psag.state.solveIn(wcaMinScrambleDistance) != null);
 		return psag.generator;
 	}
 
@@ -374,7 +375,6 @@ public abstract class Puzzle {
 	public abstract class PuzzleState {
 		public PuzzleState() {}
 		
-		
 		/**
 		 * 
 		 * @param algorithm A space separated String of moves to apply to state
@@ -471,7 +471,7 @@ public abstract class Puzzle {
 			return successors.get(move);
 		}
 		
-		public boolean solvableIn(int n) {
+		public String solveIn(int n) {
 			HashMap<PuzzleState, Integer> seen = new HashMap<PuzzleState, Integer>();
 			Queue<PuzzleState> fringe = new LinkedList<PuzzleState>();
 			PuzzleState solved = getSolvedState();
@@ -509,7 +509,32 @@ public abstract class Puzzle {
 			
 			l.log(start.finishedNow("expanded " + seen.size() + " nodes"));
 			
-			return found;
+			if(!found) {
+				return null;
+			}
+			
+			AlgorithmBuilder solution = new AlgorithmBuilder(this.getPuzzle(), MungingMode.NO_MUNGING);
+			PuzzleState state = this;
+			int distanceFromSolved = seen.get(state);
+			outer: while(distanceFromSolved > 0) {
+				for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
+					if(seen.containsKey(next.getValue())) {
+						int newDistanceFromSolved = seen.get(next.getValue());
+						if(newDistanceFromSolved < distanceFromSolved) {
+							state = next.getValue();
+							distanceFromSolved = newDistanceFromSolved;
+							try {
+								solution.appendMove(next.getKey());
+							} catch(InvalidMoveException e) {
+								azzert(false, e);
+							}
+							continue outer;
+						}
+					}
+				}
+				azzert(false);
+			}
+			return solution.toString();
 		}
 
 		/**

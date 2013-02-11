@@ -7,9 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.SortedMap;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacherListener;
-import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -17,6 +17,10 @@ import net.gnehzr.tnoodle.utils.Utils;
 public class ScrambleTest {
 	
 	static class LockHolder extends Thread {
+		public LockHolder() {
+			setDaemon(true);
+		}
+		
 		private Object o;
 		public void setObjectToLock(Object o) {
 			synchronized(this) {
@@ -69,10 +73,15 @@ public class ScrambleTest {
 			System.out.println(longName + " ==? " + scrambler.getLongName());
 			Utils.azzert(longName.equals(scrambler.getLongName()));
 		}
-		
 		for(String puzzle : lazyScramblers.keySet()) {
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
 			final Puzzle scrambler = lazyScrambler.cachedInstance();
+			
+			System.out.println("Testing " + puzzle);
+			
+			// It's easy to get this wrong (read about Arrays.hashCode vs Arrays.deepHashCode).
+			// This is just a sanity check.
+			Utils.azzert(scrambler.getSolvedState().hashCode() == scrambler.getSolvedState().hashCode());
 			
 			// Generating a scramble
 			System.out.println("Generating a " + puzzle + " scramble");
