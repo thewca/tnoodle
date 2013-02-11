@@ -230,6 +230,34 @@ public class PyraminxPuzzle extends Puzzle {
 	
 	private class PyraminxState extends PuzzleState {
 		private int[][] image;
+		/** Trying to make an ascii art of the pyraminx image...
+		  *
+		  *                                    U
+		  *              ____  ____  ____              ____  ____  ____ 
+		  *             \    /\    /\    /     /\     \    /\    /\    /
+		  *              \0 /1 \2 /4 \3 /     /0 \     \0 /1 \2 /4 \3 /
+		  *               \/____\/____\/     /____\     \/____\/____\/
+		  *                \    /\    /     /\    /\     \    /\    /
+		  *        face 2   \8 /7 \5 /     /8 \1 /2 \     \8 /7 \5 / face 3
+		  *                  \/____\/     /____\/____\     \/____\/
+		  *                   \    /     /\    /\    /\     \    /
+		  *                    \6 /     /6 \7 /5 \4 /3 \     \6 /
+		  *                     \/     /____\/____\/____\     \/
+		  *                                  face 0
+		  *                        L    ____  ____  ____    R
+		  *                            \    /\    /\    /
+		  *                             \0 /1 \2 /4 \3 /
+		  *                              \/____\/____\/
+		  *                               \    /\    /
+		  *                                \8 /7 \5 /
+		  *                         face 1  \/____\/
+		  *                                  \    /
+		  *                                   \6 /
+		  *                                    \/
+		  *
+		  *                                    B
+		  */
+
 		public PyraminxState() {
 			image = new int[4][9];
 			for(int i = 0; i < image.length; i++) {
