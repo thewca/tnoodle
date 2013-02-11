@@ -505,6 +505,10 @@ public final class Utils {
 		}
 	}
 
+	public static void azzertSame(Object a, Object b) {
+		azzert(a == b, a + " doesn't == " + b);
+	}
+	
 	public static void azzert(boolean expr) {
 		if(!expr) {
 			throw new AssertionError();
