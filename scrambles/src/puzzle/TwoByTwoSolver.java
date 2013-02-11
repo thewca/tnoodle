@@ -327,10 +327,10 @@ public class TwoByTwoSolver {
 
 	static final int cost_U = 8;
 	static final int cost_U_low = 20; // when grip = -1
-	static final int cost_U2 = 15;
+	static final int cost_U2 = 10;
 	static final int cost_U3 = 7;
 	static final int cost_R = 6;
-	static final int cost_R2 = 12;
+	static final int cost_R2 = 10;
 	static final int cost_R3 = 6;
 	static final int cost_F = 10;
 	static final int cost_F2 = 30;
