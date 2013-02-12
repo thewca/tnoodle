@@ -216,9 +216,9 @@ public class PyraminxSolver {
 	/**
 	 * Fill the arrays to move permutation and orientation coordinates.
 	 */
-	private static int[][] moveEdgePerm = new int[N_EDGE_PERM][N_MOVES];
-	private static int[][] moveEdgeOrient = new int[N_EDGE_ORIENT][N_MOVES];
-	private static int[][] moveCornerOrient = new int[N_CORNER_ORIENT][N_MOVES];
+	public static int[][] moveEdgePerm = new int[N_EDGE_PERM][N_MOVES];
+	public static int[][] moveEdgeOrient = new int[N_EDGE_ORIENT][N_MOVES];
+	public static int[][] moveCornerOrient = new int[N_CORNER_ORIENT][N_MOVES];
 	private static void initMoves() {
 		int[] edges1 = new int[6];
 		int[] edges2 = new int[6];

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import puzzle.PyraminxSolver.PyraminxSolverState;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
+import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -495,6 +496,42 @@ public class PyraminxPuzzle extends Puzzle {
 			}
 			drawMinx(g, gap, pieceSize, scheme, image);
 		}
+
+	}
+
+	public static void main(String[] args) throws InvalidScrambleException, InvalidMoveException {
+		testPyraConverter();
+	}
+	
+	private static void testPyraConverter() throws InvalidMoveException {
+
+		int edgePerm = 0;
+		int edgeOrient = 0;
+		int cornerOrient = 0;
+		int tips = 0;
+
+		PyraminxPuzzle pyra = new PyraminxPuzzle();
+		PyraminxState state = (PyraminxState) pyra.getSolvedState();
+		PyraminxSolverState sstate = state.toPyraminxSolverState();
+		azzertSame(sstate.edgePerm, edgePerm);
+		azzertSame(sstate.edgeOrient, edgeOrient);
+		azzertSame(sstate.cornerOrient, cornerOrient);
+		azzertSame(sstate.tips, tips);
+
+		int MOVE_R = 4;
+		edgePerm = PyraminxSolver.moveEdgePerm[edgePerm][MOVE_R];
+		edgeOrient = PyraminxSolver.moveEdgeOrient[edgeOrient][MOVE_R];
+		cornerOrient = PyraminxSolver.moveCornerOrient[cornerOrient][MOVE_R];
+
+		state.apply("R");
+		sstate = state.toPyraminxSolverState();
+
+		azzertSame(sstate.edgePerm, edgePerm);
+		azzertSame(sstate.edgeOrient, edgeOrient);
+		azzertSame(sstate.cornerOrient, cornerOrient);
+		
+		PyraminxSolver pyraSolver = new PyraminxSolver();
+		azzert(pyraSolver.solveExactly(sstate, 1, true).equals("R'"));
 
 	}
 }
