@@ -6,6 +6,61 @@ import java.util.Random;
 public class PyraminxSolver {
 	public PyraminxSolver() {}
 
+		/** There are 4 corners on the pyraminx that are in a fixed position.
+		  * There are 3 different orientations for each corner.
+		  *
+		  *                         U
+		  *     ____  ____  ____          ____  ____  ____ 
+		  *    \    /\    /\    /   /\   \    /\    /\    /
+		  *     \  /3 \  /0 \  /   /  \   \  /0 \  /3 \  /
+		  *      \/____\/____\/   /____\   \/____\/____\/
+		  *       \    /\    /   /\    /\   \    /\    /
+		  *        \  /1 \  /   /  \0 /  \   \  /2 \  /
+		  *         \/____\/   /____\/____\   \/____\/
+		  *          \    /   /\    /\    /\   \    /
+		  *           \  /   /  \1 /  \2 /  \   \  /
+		  *            \/   /____\/____\/____\   \/
+		  *               L                    R
+		  *                  ____  ____  ____    
+		  *                 \    /\    /\    /
+		  *                  \  /1 \  /2 \  /
+		  *                   \/____\/____\/
+		  *                    \    /\    /
+		  *                     \  /3 \  /
+		  *                      \/____\/
+		  *                       \    /
+		  *                        \  /
+		  *                         \/
+		  *
+		  *                         B
+		  *
+		  * There are 6 edges, each one having 2 different orientations.
+		  * Dollars mark the primary facelet position.
+		  *                         U
+		  *     ____  ____  ____          ____  ____  ____ 
+		  *    \    /\    /\    /   /\   \    /\    /\    /
+		  *     \  /  \3 /  \  /   /  \   \  /  \3$/  \  /
+		  *      \/____\/____\/   /____\   \/____\/____\/
+		  *       \    /\    /   /\    /\   \    /\    /
+		  *        \5$/  \1 /   /1$\  /0$\   \0 /  \4$/
+		  *         \/____\/   /____\/____\   \/____\/
+		  *          \    /   /\    /\    /\   \    /
+		  *           \  /   /  \  /2$\  /  \   \  /
+		  *            \/   /____\/____\/____\   \/
+		  *               L                    R
+		  *                  ____  ____  ____    
+		  *                 \    /\    /\    /
+		  *                  \  /  \2 /  \  /
+		  *                   \/____\/____\/
+		  *                    \    /\    /
+		  *                     \5 /  \4 /
+		  *                      \/____\/
+		  *                       \    /
+		  *                        \  /
+		  *                         \/
+		  *
+		  *                         B
+		  */
 	static final int N_EDGE_PERM = 720; // Number of permutations of edges
 	static final int N_EDGE_ORIENT = 32; // Number of orientations of edges
 	static final int N_CORNER_ORIENT = 81; // Number of orientations of corners
@@ -133,16 +188,16 @@ public class PyraminxSolver {
 		int times = ( move % 2 ) + 1;
 		switch (face) {
 			case 0: // U face
-				cycleAndOrient(edges, 0, 3, 1, times);
+				cycleAndOrient(edges, 0, 1, 3, times);
 				break;
 			case 1: // L face
-				cycleAndOrient(edges, 1, 5, 2, times);
+				cycleAndOrient(edges, 1, 2, 5, times);
 				break;
 			case 2: // R face
-				cycleAndOrient(edges, 4, 0, 2, times);
+				cycleAndOrient(edges, 4, 2, 0, times);
 				break;
 			case 3: // B face
-				cycleAndOrient(edges, 5, 3, 4, times);
+				cycleAndOrient(edges, 5, 4, 3, times);
 				break;
 		}
 	}
