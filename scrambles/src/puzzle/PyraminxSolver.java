@@ -39,21 +39,21 @@ public class PyraminxSolver {
 		  *                         U
 		  *     ____  ____  ____          ____  ____  ____ 
 		  *    \    /\    /\    /   /\   \    /\    /\    /
-		  *     \  /  \3 /  \  /   /  \   \  /  \3$/  \  /
+		  *     \  /  \5$/  \  /   /  \   \  /  \5 /  \  /
 		  *      \/____\/____\/   /____\   \/____\/____\/
 		  *       \    /\    /   /\    /\   \    /\    /
-		  *        \5$/  \1 /   /1$\  /0$\   \0 /  \4$/
+		  *        \2 /  \1 /   /1$\  /3$\   \3 /  \4 /
 		  *         \/____\/   /____\/____\   \/____\/
 		  *          \    /   /\    /\    /\   \    /
-		  *           \  /   /  \  /2$\  /  \   \  /
+		  *           \  /   /  \  /0$\  /  \   \  /
 		  *            \/   /____\/____\/____\   \/
 		  *               L                    R
 		  *                  ____  ____  ____    
 		  *                 \    /\    /\    /
-		  *                  \  /  \2 /  \  /
+		  *                  \  /  \0 /  \  /
 		  *                   \/____\/____\/
 		  *                    \    /\    /
-		  *                     \5 /  \4 /
+		  *                     \2$/  \4$/
 		  *                      \/____\/
 		  *                       \    /
 		  *                        \  /
@@ -78,7 +78,7 @@ public class PyraminxSolver {
 	 * @param edges   edges representation (ori << 3 + perm)
 	 * @return        an integer between 0 and 719 representing the permutation of 6 elements
 	 */
-	private static int packEdgePerm(int[] edges) {
+	public static int packEdgePerm(int[] edges) {
 		int idx = 0;
 		int val = 0x543210;
 		for (int i = 0; i < 5; i++) {
@@ -113,7 +113,7 @@ public class PyraminxSolver {
 	 * @param edges    edges representation (ori << 3 + perm)
 	 * @return         an integer between 0 and 31 representing the orientation of 5 elements (the 6th is fixed)
 	 */
-	private static int packEdgeOrient(int[] edges) {
+	public static int packEdgeOrient(int[] edges) {
 		int ori = 0;
 		for (int i=0; i<5; i++) {
 			ori = 2 * ori + ( edges[i] >> 3 );
@@ -141,7 +141,7 @@ public class PyraminxSolver {
 	 * @param corners   corner representation
 	 * @return          an integer between 0 and 80 representing the orientation of 4 elements
 	 */
-	private static int packCornerOrient(int[] corners) {
+	public static int packCornerOrient(int[] corners) {
 		int ori = 0;
 		for (int i = 0; i < 4; i++) {
 			ori = 3 * ori + corners[i];
@@ -188,16 +188,16 @@ public class PyraminxSolver {
 		int times = ( move % 2 ) + 1;
 		switch (face) {
 			case 0: // U face
-				cycleAndOrient(edges, 0, 1, 3, times);
+				cycleAndOrient(edges, 5, 3, 1, times);
 				break;
 			case 1: // L face
-				cycleAndOrient(edges, 1, 2, 5, times);
+				cycleAndOrient(edges, 2, 1, 0, times);
 				break;
 			case 2: // R face
-				cycleAndOrient(edges, 4, 2, 0, times);
+				cycleAndOrient(edges, 0, 3, 4, times);
 				break;
 			case 3: // B face
-				cycleAndOrient(edges, 5, 4, 3, times);
+				cycleAndOrient(edges, 2, 4, 5, times);
 				break;
 		}
 	}
