@@ -16,15 +16,15 @@ public class TwoByTwoSolver {
 	Also, we can allow only U, R and F moves without loosing any solution.
 
                +----------+
-               |*1*    *2*|
+               |*3*    *2*|
                |    U     |
-               |*0*    *3*|
+               |*1*    *0*|
     +----------+----------+----------+----------+
-    | 1      0 | 0      3 | 3      2 | 2      1 |
+    | 3      1 | 1      0 | 0      2 | 2      3 |
     |     L    |    F     |    R     |    B     |
-    | 7      4 | 4      5 | 5      6 | 6      7 |
+    | 7      5 | 5      4 | 4      6 | 6      7 |
     +----------+----------+----------+----------+
-               |*4*    *5*|
+               |*5*    *4*|
                |    D     |
                |*7*    *6*|
                +----------+
@@ -151,13 +151,13 @@ public class TwoByTwoSolver {
 		int times = ( move % 3 ) + 1;
 		switch (face){
 			case 0: // U face
-				cycle(cubies, 0, 1, 2, 3, times);
+				cycle(cubies, 1, 3, 2, 0, times);
 				break;
 			case 1: // R face
-				cycleAndOrient(cubies, 3, 2, 6, 5, times);
+				cycleAndOrient(cubies, 0, 2, 6, 4, times);
 				break;
 			case 2: // F face
-				cycleAndOrient(cubies, 0, 3, 5, 4, times);
+				cycleAndOrient(cubies, 1, 0, 4, 5, times);
 				break;
 		}
 	}

@@ -1,7 +1,6 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.azzertSame;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -337,13 +336,13 @@ public class CubePuzzle extends Puzzle {
 			TwoByTwoState state = new TwoByTwoState();
 			
 			int[][] stickersByPiece = new int[][] {
-				{ image[Face.U.ordinal()][1][0], image[Face.F.ordinal()][0][0], image[Face.L.ordinal()][0][1] },
-				{ image[Face.U.ordinal()][0][0], image[Face.L.ordinal()][0][0], image[Face.B.ordinal()][0][1] },
-				{ image[Face.U.ordinal()][0][1], image[Face.B.ordinal()][0][0], image[Face.R.ordinal()][0][1] },
 				{ image[Face.U.ordinal()][1][1], image[Face.R.ordinal()][0][0], image[Face.F.ordinal()][0][1] },
+				{ image[Face.U.ordinal()][1][0], image[Face.F.ordinal()][0][0], image[Face.L.ordinal()][0][1] },
+				{ image[Face.U.ordinal()][0][1], image[Face.B.ordinal()][0][0], image[Face.R.ordinal()][0][1] },
+				{ image[Face.U.ordinal()][0][0], image[Face.L.ordinal()][0][0], image[Face.B.ordinal()][0][1] },
 				
-				{ image[Face.D.ordinal()][0][0], image[Face.L.ordinal()][1][1], image[Face.F.ordinal()][1][0] },
 				{ image[Face.D.ordinal()][0][1], image[Face.F.ordinal()][1][1], image[Face.R.ordinal()][1][0] },
+				{ image[Face.D.ordinal()][0][0], image[Face.L.ordinal()][1][1], image[Face.F.ordinal()][1][0] },
 				{ image[Face.D.ordinal()][1][1], image[Face.R.ordinal()][1][1], image[Face.B.ordinal()][1][0] },
 				{ image[Face.D.ordinal()][1][0], image[Face.B.ordinal()][1][1], image[Face.L.ordinal()][1][0] }
 			};
@@ -352,24 +351,19 @@ public class CubePuzzle extends Puzzle {
 			// a unique id just by summing up the values of its stickers.
 			//
 			//            +----------+
-			//            |*1*    *3*|
+			//            |*3*    *2*|
 			//            |   U (0)  |
-			//            |*0*    *2*|
+			//            |*1*    *0*|
 			// +----------+----------+----------+----------+
-			// | 1      0 | 0      3 | 3      2 | 2      1 |
-			// |   L (0)  |   F (0)  |   R (2)  |   B (1)  |
-			// | 7      4 | 4      5 | 5      6 | 6      7 |
+			// | 3      1 | 1      0 | 0      2 | 2      3 |
+			// |   L (1)  |   F (0)  |   R (0)  |   B (2)  |
+			// | 7      5 | 5      4 | 4      6 | 6      7 |
 			// +----------+----------+----------+----------+
-			//            |*4*    *6*|
+			//            |*5*    *4*|
 			//            |   D (4)  |
-			//            |*5*    *7*|
+			//            |*7*    *6*|
 			//            +----------+
 			//
-			// Unfortunately, the scheme described above doesn't match
-			// the ids as defined at the top of TwoByTwoSolver.java.
-			// If we read the piece ids as defined in TwoByTwoSolver.java
-			// in the order defined above, we get this:
-			int[] cleverIdToTwoByTwoSolverId = new int[] { 0, 1, 3, 2, 4, 7, 5, 6 };
 			
 			int dColor = stickersByPiece[7][0];
 			int bColor = stickersByPiece[7][1];
@@ -382,15 +376,15 @@ public class CubePuzzle extends Puzzle {
 			int[] colorToVal = new int[8];
 			colorToVal[uColor] = 0;
 			colorToVal[fColor] = 0;
-			colorToVal[lColor] = 0;
-			colorToVal[bColor] = 1;
-			colorToVal[rColor] = 2;
+			colorToVal[rColor] = 0;
+			colorToVal[lColor] = 1;
+			colorToVal[bColor] = 2;
 			colorToVal[dColor] = 4;
 			
 			int[] pieces = new int[7];
 			for(int i = 0; i < pieces.length; i++) {
 				int[] stickers = stickersByPiece[i];
-				int pieceVal = cleverIdToTwoByTwoSolverId[colorToVal[stickers[0]] + colorToVal[stickers[1]] + colorToVal[stickers[2]]];
+				int pieceVal = colorToVal[stickers[0]] + colorToVal[stickers[1]] + colorToVal[stickers[2]];
 				
 				int clockwiseTurnsToGetToPrimaryColor = 0;
 				while(stickers[clockwiseTurnsToGetToPrimaryColor] != uColor && stickers[clockwiseTurnsToGetToPrimaryColor] != dColor) {

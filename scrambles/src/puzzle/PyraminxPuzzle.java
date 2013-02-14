@@ -1,7 +1,7 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.azzertSame;
+import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
 import static net.gnehzr.tnoodle.utils.Utils.toColor;
 
 import java.awt.Color;
@@ -403,7 +403,7 @@ public class PyraminxPuzzle extends Puzzle {
 
 			int[] corners = new int[4];
 			for (int i = 0; i < corners.length; i++){
-				azzertSame(stickersToCorners[i][0] + stickersToCorners[i][1] + stickersToCorners[i][2], correctSum[i]);
+				azzertEquals(stickersToCorners[i][0] + stickersToCorners[i][1] + stickersToCorners[i][2], correctSum[i]);
 				// The following code is not pretty, sorry...
 				if(( stickersToCorners[i][0] < stickersToCorners[i][1] ) && ( stickersToCorners[i][0] < stickersToCorners[i][2] ))
 					corners[i] = 0;
@@ -427,7 +427,7 @@ public class PyraminxPuzzle extends Puzzle {
 			for (int i = 0; i < tips.length; i++){
 				int[] stickers = stickersToTips[i];
 				// We can use the same color check as for the corners.
-				azzertSame(stickers[0] + stickers[1] + stickers[2], correctSum[i]);
+				azzertEquals(stickers[0] + stickers[1] + stickers[2], correctSum[i]);
 
 				// For the tips, we don't have to check colors against face, but against the attached corner.
 				int cornerPrimaryColor = stickersToCorners[i][0];

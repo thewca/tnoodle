@@ -1,34 +1,27 @@
 package net.gnehzr.tnoodle.test;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.azzertSame;
-
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.SortedMap;
-import java.util.Arrays;
-
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
+import net.gnehzr.tnoodle.scrambles.*;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
-import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
-import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
-import net.gnehzr.tnoodle.scrambles.ScrambleCacherListener;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
-
 import puzzle.CubePuzzle;
 import puzzle.CubePuzzle.CubeState;
 import puzzle.PyraminxPuzzle;
 import puzzle.PyraminxPuzzle.PyraminxState;
-import puzzle.TwoByTwoSolver;
-import puzzle.TwoByTwoSolver.TwoByTwoState;
 import puzzle.PyraminxSolver;
 import puzzle.PyraminxSolver.PyraminxSolverState;
+import puzzle.TwoByTwoSolver;
+import puzzle.TwoByTwoSolver.TwoByTwoState;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.SortedMap;
+
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
 
 public class ScrambleTest {
 	
@@ -186,20 +179,13 @@ public class ScrambleTest {
 		int MOVE_R = 3;
 		orient = TwoByTwoSolver.moveOrient[orient][MOVE_R];
 		permute = TwoByTwoSolver.movePerm[permute][MOVE_R];
-		azzert(orient == 46);
-		azzert(permute == 39);
 		
 		CubePuzzle twos = new CubePuzzle(2);
 		CubeState state = (CubeState) twos.getSolvedState().apply("R");
 		TwoByTwoState twoByTwoState = state.toTwoByTwoState();
 
-		int[] cubiesO = new int[7];
-		TwoByTwoSolver.unpackOrient(orient, cubiesO);
-		int[] cubiesP = new int[7];
-		TwoByTwoSolver.unpackPerm(permute, cubiesP);
-		
-		azzertSame(twoByTwoState.orientation, orient);
-		azzertSame(twoByTwoState.permutation, permute);
+		azzertEquals(twoByTwoState.orientation, orient);
+		azzertEquals(twoByTwoState.permutation, permute);
 		
 		TwoByTwoSolver twoByTwoSolver = new TwoByTwoSolver();
 		azzert(twoByTwoSolver.solveExactly(twoByTwoState, 1, false).equals("R'"));
@@ -242,10 +228,10 @@ public class ScrambleTest {
 		PyraminxPuzzle pyra = new PyraminxPuzzle();
 		PyraminxState state = (PyraminxState) pyra.getSolvedState();
 		PyraminxSolverState sstate = state.toPyraminxSolverState();
-		azzertSame(sstate.edgePerm, edgePerm);
-		azzertSame(sstate.edgeOrient, edgeOrient);
-		azzertSame(sstate.cornerOrient, cornerOrient);
-		azzertSame(sstate.tips, tips);
+		azzertEquals(sstate.edgePerm, edgePerm);
+		azzertEquals(sstate.edgeOrient, edgeOrient);
+		azzertEquals(sstate.cornerOrient, cornerOrient);
+		azzertEquals(sstate.tips, tips);
 
 		int MOVE_R = 4;
 		edgePerm = PyraminxSolver.moveEdgePerm[edgePerm][MOVE_R];
@@ -255,12 +241,12 @@ public class ScrambleTest {
 		state = (PyraminxState) state.apply("R");
 		sstate = state.toPyraminxSolverState();
 
-		azzertSame(sstate.edgePerm, edgePerm);
-		azzertSame(sstate.edgeOrient, edgeOrient);
-		azzertSame(sstate.cornerOrient, cornerOrient);
+		azzertEquals(sstate.edgePerm, edgePerm);
+		azzertEquals(sstate.edgeOrient, edgeOrient);
+		azzertEquals(sstate.cornerOrient, cornerOrient);
 		
 		PyraminxSolver pyraSolver = new PyraminxSolver();
-		azzert(pyraSolver.solveExactly(sstate, 1, true).equals("R'"));
+		azzert(pyraSolver.solveExactly(sstate, 1, true).equals("R"));
 
 	}
 }
