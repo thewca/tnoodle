@@ -165,8 +165,8 @@ public class TwoByTwoSolver {
 	/**
 	 * Fill the arrays to move permutation and orientation coordinates.
 	 */
-	protected static int[][] movePerm = new int[N_PERM][N_MOVES];
-	protected static int[][] moveOrient = new int[N_ORIENT][N_MOVES];
+	public static int[][] movePerm = new int[N_PERM][N_MOVES];
+	public static int[][] moveOrient = new int[N_ORIENT][N_MOVES];
 	private static void initMoves(){
 		int[] cubies1 = new int[7];
 		int[] cubies2 = new int[7];
@@ -296,7 +296,7 @@ public class TwoByTwoSolver {
 	}
 
 	public static class TwoByTwoState {
-		int permutation, orientation;
+		public int permutation, orientation;
 	}
 	
 	/**

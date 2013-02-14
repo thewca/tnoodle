@@ -362,7 +362,7 @@ public class PyraminxSolver {
 	}
 
 	public static class PyraminxSolverState {
-		int edgePerm, edgeOrient, cornerOrient, tips;
+		public int edgePerm, edgeOrient, cornerOrient, tips;
 
 		public int unsolvedTips() {
 			int numberUnsolved = 0;

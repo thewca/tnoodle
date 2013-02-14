@@ -307,7 +307,7 @@ public class CubePuzzle extends Puzzle {
 				image[Face.D.ordinal()][size-1][0] == Face.D.ordinal();
 	}
 	
-	private class CubeState extends PuzzleState {
+	public class CubeState extends PuzzleState {
 		int[][][] image, normalizedImage;
 		
 		public CubeState() {
@@ -461,99 +461,5 @@ public class CubePuzzle extends Puzzle {
 			drawCube(g, image, gap, cubieSize, colorScheme);
 		}
 		
-	}
-	
-	public static void main(String[] args) throws InvalidScrambleException, InvalidMoveException {
-		testMisc();
-		testTwosConverter();
-		testTwosSolver();
-	}
-	
-	private static void testMisc() throws InvalidScrambleException, InvalidMoveException {
-		CubePuzzle fours = new CubePuzzle(4);
-		CubeState solved = fours.getSolvedState();
-		
-		CubeState state = (CubeState) solved.applyAlgorithm("Rw Lw'");
-		azzert(state.equals(solved));
-		
-		state = (CubeState) solved.applyAlgorithm("Uw Dw'");
-		azzert(state.equals(solved));
-		
-		AlgorithmBuilder ab = new AlgorithmBuilder(fours, MungingMode.MUNGE_REDUNDANT_MOVES);
-		ab.appendMove("Uw");
-		ab.appendMove("Dw'");
-		ab.appendMove("L");
-		ab.appendMove("Uw");
-		ab.appendMove("Dw");
-		ab.appendMove("L");
-		System.out.println(ab.toString());
-		
-		CubePuzzle threes = new CubePuzzle(3);
-		
-		CubeState state1 = (CubeState) threes.getSolvedState().applyAlgorithm("D2 U'");
-		CubeState state2 = (CubeState) threes.getSolvedState().applyAlgorithm("D");
-		System.out.println(state1.equals(state2));
-		System.out.println(Arrays.deepToString(state1.image));
-		System.out.println(Arrays.deepToString(state2.image));
-		System.out.println();
-		System.out.println(Arrays.deepToString(state1.normalizedImage));
-		System.out.println(Arrays.deepToString(state2.normalizedImage));
-		
-		AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MungingMode.MUNGE_REDUNDANT_MOVES);
-		ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
-		azzert(ab3.toString().equals("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'"));
-	}
-	
-	private static void testTwosConverter() throws InvalidMoveException {
-		int orient = 0;
-		int permute = 0;
-		
-		int MOVE_R = 3;
-		orient = TwoByTwoSolver.moveOrient[orient][MOVE_R];
-		permute = TwoByTwoSolver.movePerm[permute][MOVE_R];
-		azzert(orient == 46);
-		azzert(permute == 39);
-		
-		CubePuzzle twos = new CubePuzzle(2);
-		CubeState state = (CubeState) twos.getSolvedState().apply("R");
-		TwoByTwoState twoByTwoState = state.toTwoByTwoState();
-
-		int[] cubiesO = new int[7];
-		TwoByTwoSolver.unpackOrient(orient, cubiesO);
-		int[] cubiesP = new int[7];
-		TwoByTwoSolver.unpackPerm(permute, cubiesP);
-		
-		azzertSame(twoByTwoState.orientation, orient);
-		azzertSame(twoByTwoState.permutation, permute);
-		
-		TwoByTwoSolver twoByTwoSolver = new TwoByTwoSolver();
-		azzert(twoByTwoSolver.solveExactly(twoByTwoState, 1, false).equals("R'"));
-
-		int MOVE_R_PRIME = 5;
-		orient = TwoByTwoSolver.moveOrient[orient][MOVE_R_PRIME];
-		permute = TwoByTwoSolver.movePerm[permute][MOVE_R_PRIME];
-		azzert(orient == 0);
-		azzert(permute == 0);
-	}
-
-	private static void testTwosSolver() throws InvalidScrambleException {
-		CubePuzzle twos = new CubePuzzle(2);
-		CubeState state = (CubeState) twos.getSolvedState();
-		String solution = state.solveIn(0);
-		System.out.println(solution);
-		azzert(solution.equals(""));
-		
-		String scrambleString = "R2 B2 F2";
-		try {
-			state = (CubeState) state.applyAlgorithm(scrambleString);
-		} catch (InvalidScrambleException e) {
-			azzert(false, e);
-		}
-
-		solution = state.solveIn(1);
-		azzert(solution != null);
-		System.out.println("Found a solution! " + solution);
-		state = (CubeState) state.applyAlgorithm(solution);
-		azzert(state.isSolved());
 	}
 }
