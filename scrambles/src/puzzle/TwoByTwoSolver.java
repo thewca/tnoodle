@@ -315,24 +315,22 @@ public class TwoByTwoSolver {
 	 * Returns either the solution or the generator (inverse solution)
 	 * @param state     state
 	 * @param length    length of the desired solution
-	 * @param inverse   do we want to return the solution or a generator
 	 * @return          a string representing the solution or the scramble of a random position
 	 */
-	public String solveIn(TwoByTwoState state, int length, boolean inverse) {
-		return solve(state, length, false, inverse);
+	public String solveIn(TwoByTwoState state, int length) {
+		return solve(state, length, false, false);
 	}
 	
 	/**
-	 * Solve a given position in exactly length number of turns or not at all.
+	 * Return a generator of a given position in exactly length number of turns or not at all.
 	 * Returns either the solution or the generator (inverse solution)
 	 * @param perm      permutation
 	 * @param orient    random int generator
 	 * @param length    length of the desired solution
-	 * @param inverse   do we want to return the solution or a generator
 	 * @return          a string representing the solution or the scramble of a random position
 	 */
-	public String solveExactly(TwoByTwoState state, int length, boolean inverse) {
-		return solve(state, length, true, inverse);
+	public String generateExactly(TwoByTwoState state, int length) {
+		return solve(state, length, true, true);
 	}
 	
 	private String solve(TwoByTwoState state, int desiredLength, boolean exactLength, boolean inverse) {

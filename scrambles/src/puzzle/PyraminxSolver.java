@@ -68,6 +68,7 @@ public class PyraminxSolver {
 	static final int N_TIPS = 81; // Number of tips positions
 	static final int N_MOVES = 8; // Number of moves
 	static final int MAX_LENGTH = 20;
+	static final String[] moveToString = {"U", "U'", "L", "L'", "R", "R'", "B", "B'"};
 	static final String[] inverseMoveToString = {"U'", "U", "L'", "L", "R'", "R", "B'", "B"};
 	static final String[] tipToString = {"u", "u'", "l", "l'", "r", "r'", "b", "b'"};
 
@@ -401,22 +402,22 @@ public class PyraminxSolver {
 	 * @return              a string representing the solution or the scramble of a random position
 	 */
 	public String solveIn(PyraminxSolverState state, int length, boolean includingTips) {
-		return solve(state, length, false, includingTips);
+		return solve(state, length, false, false, includingTips);
 	}
 	
 	/**
-	 * Solve a given position in exactly length number of turns or not at all.
+	 * Return a generator of a given position in exactly length number of turns or not at all.
 	 * Returns either the solution or the generator (inverse solution)
 	 * @param state         state
 	 * @param length        length of the desired solution
 	 * @param includingTips do we want to include tips in the solution lenght ?
 	 * @return              a string representing the solution or the scramble of a random position
 	 */
-	public String solveExactly(PyraminxSolverState state, int length, boolean includingTips) {
-		return solve(state, length, true, includingTips);
+	public String generateExactly(PyraminxSolverState state, int length, boolean includingTips) {
+		return solve(state, length, true, true, includingTips);
 	}
 	
-	private String solve(PyraminxSolverState state, int desiredLength, boolean exactLength, boolean includingTips) {
+	private String solve(PyraminxSolverState state, int desiredLength, boolean exactLength, boolean inverse, boolean includingTips) {
 		Random r = new Random();
 		int[] solution = new int[MAX_LENGTH];
 		boolean foundSolution = false;
@@ -439,8 +440,15 @@ public class PyraminxSolver {
 		}
 		
 		StringBuilder scramble = new StringBuilder((MAX_LENGTH+4)*3);
-		for(int i = length - 1; i >= 0; i--) {
-			scramble.append(" ").append(inverseMoveToString[solution[i]]);
+		if(inverse){
+			for(int i = length - 1; i >= 0; i--) {
+				scramble.append(" ").append(inverseMoveToString[solution[i]]);
+			}
+		}
+		else {
+			for(int i = 0; i < length; i++) {
+				scramble.append(" ").append(moveToString[solution[i]]);
+			}
 		}
 
 		// Scramble the tips

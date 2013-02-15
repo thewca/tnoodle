@@ -40,7 +40,7 @@ public class PyraminxPuzzle extends Puzzle {
 	@Override
 	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
 		PyraminxSolverState state = pyraminxSolver.randomState(r);
-		String scramble = pyraminxSolver.solveExactly(state, MIN_SCRAMBLE_LENGTH, false);
+		String scramble = pyraminxSolver.generateExactly(state, MIN_SCRAMBLE_LENGTH, false);
 
 		PuzzleState pState;
 		try {
@@ -442,6 +442,11 @@ public class PyraminxPuzzle extends Puzzle {
 			state.tips = PyraminxSolver.packCornerOrient(tips); // Same function as for corners.
 
 			return state;
+		}
+
+		@Override
+		public String solveIn(int n) {
+			return pyraminxSolver.solveIn(toPyraminxSolverState(), n, SCRAMBLE_LENGTH_INCLUDES_TIPS);
 		}
 
 		@Override

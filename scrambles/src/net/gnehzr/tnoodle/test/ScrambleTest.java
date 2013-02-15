@@ -235,7 +235,7 @@ public class ScrambleTest {
 		azzertEquals(twoByTwoState.permutation, permute);
 		
 		TwoByTwoSolver twoByTwoSolver = new TwoByTwoSolver();
-		azzert(twoByTwoSolver.solveExactly(twoByTwoState, 1, false).equals("R'"));
+		azzert(twoByTwoSolver.solveIn(twoByTwoState, 1).equals("R'"));
 
 		int MOVE_R_PRIME = 5;
 		orient = TwoByTwoSolver.moveOrient[orient][MOVE_R_PRIME];

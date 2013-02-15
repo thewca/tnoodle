@@ -96,7 +96,7 @@ public class CubePuzzle extends Puzzle {
 			String scramble;
 			if(size == 2) {
 				TwoByTwoState state = twoSolver.randomState(r);
-				scramble = twoSolver.solveExactly(state, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH, false);
+				scramble = twoSolver.generateExactly(state, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
 			} else if(size == 3) {
 				scramble = twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 			} else if(size == 4) {
@@ -403,7 +403,7 @@ public class CubePuzzle extends Puzzle {
 		@Override
 		public String solveIn(int n) {
 			if(size == 2) {
-				String solution = twoSolver.solveIn(toTwoByTwoState(), n, false);
+				String solution = twoSolver.solveIn(toTwoByTwoState(), n);
 				return solution;
 			} else {
 				return super.solveIn(n);
