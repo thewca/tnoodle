@@ -1,6 +1,7 @@
 package net.gnehzr.tnoodle.test;
 
 import net.gnehzr.tnoodle.scrambles.*;
+import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
@@ -19,6 +20,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.SortedMap;
+import java.util.HashMap;
+import java.util.Random;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
@@ -64,6 +67,12 @@ public class ScrambleTest {
 	
 	public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 
+		System.out.println("Testing names.");
+		testNames();
+
+		System.out.println("Testing solveIn method");
+		testSolveIn();
+
 		System.out.println("Testing specific CubePuzzle issues.");
 		testCubePuzzle();
 		System.out.println("CubePuzzle tests passed!");
@@ -72,25 +81,45 @@ public class ScrambleTest {
 		testPyraConverter();
 		System.out.println("PyraminxPuzzle tests passed!");
 
+		testThreads();
+	}
+
+	private static void testSolveIn() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+		int SCRAMBLE_COUNT = 10;
+		int SCRAMBLE_LENGTH = 2;
+		Random r = new Random();
+
+		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+		
+		for(String puzzle : lazyScramblers.keySet()) {
+			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+			final Puzzle scrambler = lazyScrambler.cachedInstance();
+			
+			System.out.println("Testing " + puzzle);
+		
+			for(int count = 0; count < SCRAMBLE_COUNT; count++){
+				System.out.print("Scramble with:");
+				PuzzleState state = scrambler.getSolvedState();
+				for(int i = 0; i < SCRAMBLE_LENGTH; i++){
+					HashMap<String, ? extends PuzzleState> successors = state.getSuccessors();
+					String move = Utils.choose(r, successors.keySet());
+					System.out.print(" "+move);
+					state = successors.get(move);
+				}
+				azzert(state.solveIn(SCRAMBLE_LENGTH) != null, "Puzzle "+scrambler.getShortName()+" solveIn method failed!");
+				System.out.println(". Found.");
+			}
+		}
+	}
+
+	private static void testThreads() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 		LockHolder lh = new LockHolder();
 
 		int SCRAMBLE_COUNT = 10;
 		boolean drawScramble = true;
+
 		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
 		
-		// Check that the names by which the scramblers refer to themselves
-		// is the same as the names by which we refer to them in the plugin definitions file.
-		for(String shortName : lazyScramblers.keySet()) {
-			String longName = Puzzle.getScramblerLongName(shortName);
-			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
-			Puzzle scrambler = lazyScrambler.cachedInstance();
-			
-			System.out.println(shortName + " ==? " + scrambler.getShortName());
-			Utils.azzert(shortName.equals(scrambler.getShortName()));
-			
-			System.out.println(longName + " ==? " + scrambler.getLongName());
-			Utils.azzert(longName.equals(scrambler.getLongName()));
-		}
 		for(String puzzle : lazyScramblers.keySet()) {
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
 			final Puzzle scrambler = lazyScrambler.cachedInstance();
@@ -147,6 +176,24 @@ public class ScrambleTest {
 		}
 		lh.setObjectToLock(null);
 		System.out.println("Test passed!");
+	}
+
+	private static void testNames() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+		
+		// Check that the names by which the scramblers refer to themselves
+		// is the same as the names by which we refer to them in the plugin definitions file.
+		for(String shortName : lazyScramblers.keySet()) {
+			String longName = Puzzle.getScramblerLongName(shortName);
+			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
+			Puzzle scrambler = lazyScrambler.cachedInstance();
+			
+			System.out.println(shortName + " ==? " + scrambler.getShortName());
+			Utils.azzert(shortName.equals(scrambler.getShortName()));
+			
+			System.out.println(longName + " ==? " + scrambler.getLongName());
+			Utils.azzert(longName.equals(scrambler.getLongName()));
+		}
 	}
 
 	private static void testCubePuzzle() throws InvalidScrambleException, InvalidMoveException {
@@ -224,6 +271,7 @@ public class ScrambleTest {
 		int edgeOrient = 0;
 		int cornerOrient = 0;
 		int tips = 0;
+		final String[] moveToString = {"U", "U'", "L", "L'", "R", "R'", "B", "B'"};
 
 		PyraminxPuzzle pyra = new PyraminxPuzzle();
 		PyraminxState state = (PyraminxState) pyra.getSolvedState();
