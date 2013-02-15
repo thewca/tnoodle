@@ -70,9 +70,6 @@ public class ScrambleTest {
 		System.out.println("Testing names.");
 		testNames();
 
-		System.out.println("Testing solveIn method");
-		testSolveIn();
-
 		System.out.println("Testing specific CubePuzzle issues.");
 		testCubePuzzle();
 		System.out.println("CubePuzzle tests passed!");
@@ -80,6 +77,9 @@ public class ScrambleTest {
 		System.out.println("Testing specific PyraminxPuzzle issues.");
 		testPyraConverter();
 		System.out.println("PyraminxPuzzle tests passed!");
+
+		System.out.println("Testing solveIn method");
+		testSolveIn();
 
 		testThreads();
 	}
@@ -267,6 +267,10 @@ public class ScrambleTest {
 
 	private static void testPyraConverter() throws InvalidMoveException {
 
+		int SCRAMBLE_COUNT = 1000;
+		int SCRAMBLE_LENGTH = 20;
+		Random r = new Random();
+
 		int edgePerm = 0;
 		int edgeOrient = 0;
 		int cornerOrient = 0;
@@ -281,20 +285,25 @@ public class ScrambleTest {
 		azzertEquals(sstate.cornerOrient, cornerOrient);
 		azzertEquals(sstate.tips, tips);
 
-		int MOVE_R = 4;
-		edgePerm = PyraminxSolver.moveEdgePerm[edgePerm][MOVE_R];
-		edgeOrient = PyraminxSolver.moveEdgeOrient[edgeOrient][MOVE_R];
-		cornerOrient = PyraminxSolver.moveCornerOrient[cornerOrient][MOVE_R];
+		for (int i = 0; i < SCRAMBLE_COUNT; i++){
+			System.out.print(" Scramble ["+i+"/"+SCRAMBLE_COUNT+"]\r");
+			edgePerm = 0;
+			edgeOrient = 0;
+			cornerOrient = 0;
+			state = (PyraminxState) pyra.getSolvedState();
+			for (int j = 0; j < SCRAMBLE_LENGTH; j++){
+				int move = r.nextInt(moveToString.length);
+				edgePerm = PyraminxSolver.moveEdgePerm[edgePerm][move];
+				edgeOrient = PyraminxSolver.moveEdgeOrient[edgeOrient][move];
+				cornerOrient = PyraminxSolver.moveCornerOrient[cornerOrient][move];
+				state = (PyraminxState) state.apply(moveToString[move]);
+			}
+			sstate = state.toPyraminxSolverState();
 
-		state = (PyraminxState) state.apply("R");
-		sstate = state.toPyraminxSolverState();
-
-		azzertEquals(sstate.edgePerm, edgePerm);
-		azzertEquals(sstate.edgeOrient, edgeOrient);
-		azzertEquals(sstate.cornerOrient, cornerOrient);
-		
-		PyraminxSolver pyraSolver = new PyraminxSolver();
-		azzert(pyraSolver.solveExactly(sstate, 1, true).equals("R"));
-
+			azzertEquals(sstate.edgePerm, edgePerm);
+			azzertEquals(sstate.edgeOrient, edgeOrient);
+			azzertEquals(sstate.cornerOrient, cornerOrient);
+		}
+		System.out.println("");
 	}
 }
