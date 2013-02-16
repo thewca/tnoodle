@@ -16,15 +16,15 @@ public class TwoByTwoSolver {
 	Also, we can allow only U, R and F moves without loosing any solution.
 
                +----------+
-               |*1*    *2*|
+               |*3*    *2*|
                |    U     |
-               |*0*    *3*|
+               |*1*    *0*|
     +----------+----------+----------+----------+
-    | 1      0 | 0      3 | 3      2 | 2      1 |
+    | 3      1 | 1      0 | 0      2 | 2      3 |
     |     L    |    F     |    R     |    B     |
-    | 7      4 | 4      5 | 5      6 | 6      7 |
+    | 7      5 | 5      4 | 4      6 | 6      7 |
     +----------+----------+----------+----------+
-               |*4*    *5*|
+               |*5*    *4*|
                |    D     |
                |*7*    *6*|
                +----------+
@@ -151,13 +151,13 @@ public class TwoByTwoSolver {
 		int times = ( move % 3 ) + 1;
 		switch (face){
 			case 0: // U face
-				cycle(cubies, 0, 1, 2, 3, times);
+				cycle(cubies, 1, 3, 2, 0, times);
 				break;
 			case 1: // R face
-				cycleAndOrient(cubies, 3, 2, 6, 5, times);
+				cycleAndOrient(cubies, 0, 2, 6, 4, times);
 				break;
 			case 2: // F face
-				cycleAndOrient(cubies, 0, 3, 5, 4, times);
+				cycleAndOrient(cubies, 1, 0, 4, 5, times);
 				break;
 		}
 	}
@@ -165,8 +165,8 @@ public class TwoByTwoSolver {
 	/**
 	 * Fill the arrays to move permutation and orientation coordinates.
 	 */
-	protected static int[][] movePerm = new int[N_PERM][N_MOVES];
-	protected static int[][] moveOrient = new int[N_ORIENT][N_MOVES];
+	public static int[][] movePerm = new int[N_PERM][N_MOVES];
+	public static int[][] moveOrient = new int[N_ORIENT][N_MOVES];
 	private static void initMoves(){
 		int[] cubies1 = new int[7];
 		int[] cubies2 = new int[7];
@@ -296,7 +296,7 @@ public class TwoByTwoSolver {
 	}
 
 	public static class TwoByTwoState {
-		int permutation, orientation;
+		public int permutation, orientation;
 	}
 	
 	/**
@@ -313,27 +313,24 @@ public class TwoByTwoSolver {
 	/**
 	 * Solve a given position in less than or equal to length number of turns.
 	 * Returns either the solution or the generator (inverse solution)
-	 * @param perm      permutation
-	 * @param orient    random int generator
+	 * @param state     state
 	 * @param length    length of the desired solution
-	 * @param inverse   do we want to return the solution or a generator
 	 * @return          a string representing the solution or the scramble of a random position
 	 */
-	public String solveIn(TwoByTwoState state, int length, boolean inverse) {
-		return solve(state, length, false, inverse);
+	public String solveIn(TwoByTwoState state, int length) {
+		return solve(state, length, false, false);
 	}
 	
 	/**
-	 * Solve a given position in exactly length number of turns or not at all.
+	 * Return a generator of a given position in exactly length number of turns or not at all.
 	 * Returns either the solution or the generator (inverse solution)
 	 * @param perm      permutation
 	 * @param orient    random int generator
 	 * @param length    length of the desired solution
-	 * @param inverse   do we want to return the solution or a generator
 	 * @return          a string representing the solution or the scramble of a random position
 	 */
-	public String solveExactly(TwoByTwoState state, int length, boolean inverse) {
-		return solve(state, length, true, inverse);
+	public String generateExactly(TwoByTwoState state, int length) {
+		return solve(state, length, true, true);
 	}
 	
 	private String solve(TwoByTwoState state, int desiredLength, boolean exactLength, boolean inverse) {
