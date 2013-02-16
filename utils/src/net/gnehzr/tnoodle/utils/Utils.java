@@ -505,8 +505,8 @@ public final class Utils {
 		}
 	}
 
-	public static void azzertSame(Object a, Object b) {
-		azzert(a == b, a + " doesn't == " + b);
+	public static void azzertEquals(Object a, Object b) {
+		azzert(a.equals(b), a + " is not equal to " + b);
 	}
 	
 	public static void azzert(boolean expr) {
