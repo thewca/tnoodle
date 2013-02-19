@@ -190,7 +190,7 @@ public class ClockPuzzle extends Puzzle {
 					int[] positCopy = new int[18];
 					boolean[] pinsCopy = new boolean[4];
 					for( int p=0; p<18; p++)
-						positCopy[p] = posit[p] + rot*moves[turn][p];
+						positCopy[p] = (posit[p] + rot*moves[turn][p])%12;
 					System.arraycopy(pins, 0, pinsCopy, 0, 4);
 
 					// Build the move string
@@ -216,7 +216,7 @@ public class ClockPuzzle extends Puzzle {
 				System.arraycopy(posit, 0, positC, 0, 18);
 				System.arraycopy(pins, 0, pinsC, 0, 4);
 				int pinI = (pin==0?1:(pin==1?3:(pin==2?2:0)));
-				pinsC[pinI] = true;
+				pinsC[pinI] ^= true;
 
 				successors.put(turns[pin], new ClockState(pinsC, positC));
 			}

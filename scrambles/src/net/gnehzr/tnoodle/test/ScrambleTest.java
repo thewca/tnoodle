@@ -106,8 +106,12 @@ public class ScrambleTest {
 					System.out.print(" "+move);
 					state = successors.get(move);
 				}
-				azzert(state.solveIn(SCRAMBLE_LENGTH) != null, "Puzzle "+scrambler.getShortName()+" solveIn method failed!");
-				System.out.println(". Found.");
+				String solution = state.solveIn(SCRAMBLE_LENGTH);
+				azzert(solution != null, "Puzzle "+scrambler.getShortName()+" solveIn method failed!");
+				System.out.print(". Found: "+solution);
+				state = state.applyAlgorithm(solution);
+				azzert(state.isSolved(), "Solution was not correct");
+				System.out.println(". Checked.");
 			}
 		}
 	}
