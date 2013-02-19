@@ -86,7 +86,7 @@ public class ScrambleTest {
 
 	private static void testSolveIn() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 		int SCRAMBLE_COUNT = 10;
-		int SCRAMBLE_LENGTH = 2;
+		int SCRAMBLE_LENGTH = 3;
 		Random r = new Random();
 
 		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();

@@ -71,6 +71,7 @@ public class PyraminxSolver {
 	static final String[] moveToString = {"U", "U'", "L", "L'", "R", "R'", "B", "B'"};
 	static final String[] inverseMoveToString = {"U'", "U", "L'", "L", "R'", "R", "B'", "B"};
 	static final String[] tipToString = {"u", "u'", "l", "l'", "r", "r'", "b", "b'"};
+	static final String[] inverseTipToString = {"u'", "u", "l'", "l", "r'", "r", "b'", "b"};
 
 	static final int[] fact = {1, 1, 2, 6, 24, 120, 720}; // fact[x] = x!
 
@@ -452,13 +453,18 @@ public class PyraminxSolver {
 		}
 
 		// Scramble the tips
-		int tempTip = state.tips;
+		int[] arrayTips = new int[4];
+		unpackCornerOrient(state.tips, arrayTips);
 		for(int tip = 0; tip < 4; tip++) {
-			int dir = tempTip % 3;
+			int dir = arrayTips[tip];
 			if(dir > 0) {
-				scramble.append(" ").append(tipToString[tip*2+dir-1]);
+				if(inverse) {
+					scramble.append(" ").append(tipToString[tip*2+dir-1]);
+				}
+				else {
+					scramble.append(" ").append(inverseTipToString[tip*2+dir-1]);
+				}
 			}
-			tempTip /= 3;
 		}
 		
 		return scramble.toString().trim();
