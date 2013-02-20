@@ -29,7 +29,7 @@ public class CubePuzzle extends Puzzle {
     private static final int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
 
     private static final int TWO_BY_TWO_MIN_SCRAMBLE_LENGTH = 11;
-    
+
     private static enum Face {
     	L, D, B, R, U, F;
 
@@ -37,11 +37,11 @@ public class CubePuzzle extends Puzzle {
 			return values()[(ordinal() + 3) % 6];
 		}
     }
-    
+
 	private static final int gap = 2;
 	private static final int cubieSize = 10;
 	private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
-	
+
 	private final int size;
 	private TwoByTwoSolver twoSolver = null;
 	private ThreadLocal<Search> twoPhaseSearcher = null;
@@ -79,7 +79,7 @@ public class CubePuzzle extends Puzzle {
 
 		return 1;
 	}
-	
+
 	@Override
 	public String getLongName() {
 		return size + "x" + size + "x" + size;
@@ -89,7 +89,7 @@ public class CubePuzzle extends Puzzle {
 	public String getShortName() {
 		return size + "" + size + "" + size;
 	}
-	
+
 	@Override
 	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
 		if(size == 2 || size == 3 || size == 4) {
@@ -105,7 +105,7 @@ public class CubePuzzle extends Puzzle {
 				azzert(false);
 				return null;
 			}
-			
+
 			AlgorithmBuilder ab = new AlgorithmBuilder(this, MungingMode.MUNGE_REDUNDANT_MOVES);
 			try {
 				ab.appendAlgorithm(scramble);
@@ -120,7 +120,7 @@ public class CubePuzzle extends Puzzle {
 
 	private void slice(Face face, int slice, int dir, int[][][] image) {
 		azzert(slice >= 0 && slice < size);
-		
+
 		Face sface = face;
 		int sslice = slice;
 		int sdir = dir;
@@ -187,7 +187,7 @@ public class CubePuzzle extends Puzzle {
 	private static int getCubeViewHeight(int cubie, int gap, int size) {
 		return (size*cubie + gap)*3 + gap;
 	}
-	
+
 	private static Dimension getImageSize(int gap, int unitSize, int size) {
 		return new Dimension(getCubeViewWidth(unitSize, gap, size), getCubeViewHeight(unitSize, gap, size));
 	}
@@ -207,7 +207,7 @@ public class CubePuzzle extends Puzzle {
 				int tempy = y + row*cubieSize;
 				g.setColor(colorScheme.get(Face.values()[faceColors[row][col]].toString()));
 				g.fillRect(tempx, tempy, cubieSize, cubieSize);
-				
+
 				g.setColor(Color.BLACK);
 				g.drawRect(tempx, tempy, cubieSize, cubieSize);
 			}
@@ -261,7 +261,7 @@ public class CubePuzzle extends Puzzle {
 		Utils.deepCopy(image, imageCopy);
 		return imageCopy;
 	}
-	
+
 	private void spinCube(int[][][] image, Face face, int dir) {
 		for(int slice = 0; slice < size; slice++) {
 			slice(face, slice, dir, image);
@@ -269,12 +269,15 @@ public class CubePuzzle extends Puzzle {
 	}
 
 	private int[][][] normalize(int[][][] image) {
+		if (size % 2 == 1) {
+			return image;
+		}
 		image = cloneImage(image);
-		
+
 		// (x y)*3 places every face on U, and returns to where we started
 		int dir = 1;
 		Face[] cubeRotations = new Face[] { Face.R, Face.F, Face.R, Face.F, Face.R, Face.F };
-		
+
 		for (Face face : cubeRotations) {
 			for (int rotU=0; rotU<4; rotU++){
 				if(isNormalized(image)) {
@@ -299,16 +302,17 @@ public class CubePuzzle extends Puzzle {
 		return null;
 	}
 
-	public boolean isNormalized(int[][][] image) {
+	private boolean isNormalized(int[][][] image) {
 		// A CubeState is normalized if the BLD piece is solved
 		return image[Face.B.ordinal()][size-1][size-1] == Face.B.ordinal() &&
 				image[Face.L.ordinal()][size-1][0] == Face.L.ordinal() &&
 				image[Face.D.ordinal()][size-1][0] == Face.D.ordinal();
 	}
-	
-	public class CubeState extends PuzzleState {
-		int[][][] image, normalizedImage;
-		
+
+	public static CubeState extends PuzzleState {
+		private final int[][][] image;
+		private int[][][] normalizedImage = null;
+
 		public CubeState() {
 			image = new int[6][size][size];
 			for(int face = 0; face < image.length; face++) {
@@ -320,33 +324,33 @@ public class CubePuzzle extends Puzzle {
 			}
 			normalizedImage = cloneImage(image);
 		}
-		
+
 		public CubeState(int[][][] image) {
 			this.image = image;
 		}
-		
+
 		private int[][][] getNormalized(){
 			if (normalizedImage == null) {
 				normalizedImage = normalize(image);
 			}
 			return normalizedImage;
 		}
-		
+
 		public TwoByTwoState toTwoByTwoState() {
 			TwoByTwoState state = new TwoByTwoState();
-			
+
 			int[][] stickersByPiece = new int[][] {
 				{ image[Face.U.ordinal()][1][1], image[Face.R.ordinal()][0][0], image[Face.F.ordinal()][0][1] },
 				{ image[Face.U.ordinal()][1][0], image[Face.F.ordinal()][0][0], image[Face.L.ordinal()][0][1] },
 				{ image[Face.U.ordinal()][0][1], image[Face.B.ordinal()][0][0], image[Face.R.ordinal()][0][1] },
 				{ image[Face.U.ordinal()][0][0], image[Face.L.ordinal()][0][0], image[Face.B.ordinal()][0][1] },
-				
+
 				{ image[Face.D.ordinal()][0][1], image[Face.F.ordinal()][1][1], image[Face.R.ordinal()][1][0] },
 				{ image[Face.D.ordinal()][0][0], image[Face.L.ordinal()][1][1], image[Face.F.ordinal()][1][0] },
 				{ image[Face.D.ordinal()][1][1], image[Face.R.ordinal()][1][1], image[Face.B.ordinal()][1][0] },
 				{ image[Face.D.ordinal()][1][0], image[Face.B.ordinal()][1][1], image[Face.L.ordinal()][1][0] }
 			};
-			
+
 			// Here's a clever color value assigning system that gives each piece
 			// a unique id just by summing up the values of its stickers.
 			//
@@ -364,15 +368,15 @@ public class CubePuzzle extends Puzzle {
 			//            |*7*    *6*|
 			//            +----------+
 			//
-			
+
 			int dColor = stickersByPiece[7][0];
 			int bColor = stickersByPiece[7][1];
 			int lColor = stickersByPiece[7][2];
-			
+
 			int uColor = Face.values()[dColor].oppositeFace().ordinal();
 			int fColor = Face.values()[bColor].oppositeFace().ordinal();
 			int rColor = Face.values()[lColor].oppositeFace().ordinal();
-			
+
 			int[] colorToVal = new int[8];
 			colorToVal[uColor] = 0;
 			colorToVal[fColor] = 0;
@@ -380,12 +384,12 @@ public class CubePuzzle extends Puzzle {
 			colorToVal[lColor] = 1;
 			colorToVal[bColor] = 2;
 			colorToVal[dColor] = 4;
-			
+
 			int[] pieces = new int[7];
 			for(int i = 0; i < pieces.length; i++) {
 				int[] stickers = stickersByPiece[i];
 				int pieceVal = colorToVal[stickers[0]] + colorToVal[stickers[1]] + colorToVal[stickers[2]];
-				
+
 				int clockwiseTurnsToGetToPrimaryColor = 0;
 				while(stickers[clockwiseTurnsToGetToPrimaryColor] != uColor && stickers[clockwiseTurnsToGetToPrimaryColor] != dColor) {
 					clockwiseTurnsToGetToPrimaryColor++;
@@ -394,12 +398,12 @@ public class CubePuzzle extends Puzzle {
 				int piece = (clockwiseTurnsToGetToPrimaryColor << 3) + pieceVal;
 				pieces[i] = piece;
 			}
-			
+
 			state.permutation = TwoByTwoSolver.packPerm(pieces);
 			state.orientation = TwoByTwoSolver.packOrient(pieces);
 			return state;
 		}
-		
+
 		@Override
 		public String solveIn(int n) {
 			if(size == 2) {
@@ -427,7 +431,7 @@ public class CubePuzzle extends Puzzle {
 							move += (innerSlice+1) + f + "w";
 						}
 						move += new String[] { null, "", "2", "'" }[dir];
-						
+
 						int[][][] imageCopy = cloneImage(image);
 						for(int slice = outerSlice; slice <= innerSlice; slice++) {
 							slice(face, slice, dir, imageCopy);
@@ -436,7 +440,7 @@ public class CubePuzzle extends Puzzle {
 					}
 				}
 			}
-			
+
 			return successors;
 		}
 
@@ -447,13 +451,28 @@ public class CubePuzzle extends Puzzle {
 
 		@Override
 		public int hashCode() {
-			return Arrays.deepHashCode(getNormalized());
+			int hash = 0;
+			for(int f = 0; f < 6; f++) {
+				List<Integer> list = new ArrayList<Integer>();
+				for(int j = 0; j < (size+1)/2; j++) {
+					for(int k = 0; k < size/2; k++) {
+						int t = 0;
+						t += image[f][j][k];
+						t += image[f][k][size-1-j];
+						t += image[f][size-1-j][size-1-k];
+						t += image[f][size-1-k][j];
+						list.add(t);
+					}
+				}
+				hash += list.hashCode();
+			}
+			return hash;
 		}
 
 		@Override
 		protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
 			drawCube(g, image, gap, cubieSize, colorScheme);
 		}
-		
+
 	}
 }
