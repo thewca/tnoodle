@@ -78,13 +78,13 @@ public class ScrambleTest {
 		testPyraConverter();
 		System.out.println("PyraminxPuzzle tests passed!");
 
-		System.out.println("Testing solveIn method");
-		testSolveIn();
+		System.out.println("Testing generic PuzzleState methods");
+		testPuzzles();
 
 		testThreads();
 	}
 
-	private static void testSolveIn() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+	private static void testPuzzles() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 		int SCRAMBLE_COUNT = 10;
 		int SCRAMBLE_LENGTH = 3;
 		Random r = new Random();
@@ -98,14 +98,26 @@ public class ScrambleTest {
 			System.out.println("Testing " + puzzle);
 		
 			for(int count = 0; count < SCRAMBLE_COUNT; count++){
+				// We are scrambling using SCRAMBLE_LENGTH random moves.
 				System.out.print("Scramble with:");
 				PuzzleState state = scrambler.getSolvedState();
+				String scramble = "";
 				for(int i = 0; i < SCRAMBLE_LENGTH; i++){
 					HashMap<String, ? extends PuzzleState> successors = state.getSuccessors();
 					String move = Utils.choose(r, successors.keySet());
 					System.out.print(" "+move);
+					scramble += " "+move;
 					state = successors.get(move);
 				}
+				scramble = scramble.trim();
+
+				String inverseScramble = scrambler.getInverseAlgorithm(scramble);
+				System.out.print(". Inverse: "+inverseScramble);
+				azzert(state.applyAlgorithm(inverseScramble).isSolved(), "Inverse scramble doesn't solve it");
+				System.out.print(". Checked");
+
+				azzert(scrambler.getSolvedState().applyAlgorithm(inverseScramble).applyAlgorithm(scramble).isSolved(), "S S^-1 = id but S^-1 S != id...");
+
 				String solution = state.solveIn(SCRAMBLE_LENGTH);
 				azzert(solution != null, "Puzzle "+scrambler.getShortName()+" solveIn method failed!");
 				System.out.print(". Found: "+solution);

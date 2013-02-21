@@ -503,6 +503,12 @@ public class MegaminxPuzzle extends Puzzle {
 		}
 
 		@Override
+		public boolean identical(PuzzleState other) {
+			MegaminxState o = ((MegaminxState) other);
+			return Arrays.deepEquals(image, o.image);
+		}
+
+		@Override
 		public int hashCode() {
 			return Arrays.deepHashCode(normalizedImage);
 		}

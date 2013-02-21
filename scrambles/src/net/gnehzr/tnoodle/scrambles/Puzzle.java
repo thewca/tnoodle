@@ -434,6 +434,18 @@ public abstract class Puzzle {
 		 * @return true if this is equal to other
 		 */
 		public abstract boolean equals(Object other);
+
+		/**
+		 * Returns true if this state is identical to other.
+		 * It must be overriden for CubePuzzle and MegaminxPuzzle,
+		 * because puzzles can be different but still equal (different orientation).
+		 * @param other
+		 * @return true if this is identical to other
+		 */
+		public boolean identical(PuzzleState other){
+			return other.equals(this);
+		}
+
 		public abstract int hashCode();
 		
 
@@ -563,6 +575,45 @@ public abstract class Puzzle {
 	 * from where we will begin scrambling.
 	 */
 	public abstract PuzzleState getSolvedState();
+
+	/**
+	 * @param move a move string
+	 * @return the inverse move found as applying the move then the inverse move
+	 * on the solved state lead to the solved state.
+	 * Warning! This is where we must not used the equals function, because for the 2x2 for exemple:
+	 * U D'.equals(solved)!
+	 * This is why we are using the identical function and not the equals function.
+	 * @throws InvalidMoveException
+	 */
+	public String getInverseMove(String move) throws InvalidMoveException {
+		// We consider here that all moves can be applied to the solved state.
+		PuzzleState state = getSolvedState().apply(move);
+		for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
+			if(next.getValue().identical(getSolvedState())) {
+				return next.getKey();
+			}
+		}
+		azzert(false, "No inverse move found for move "+move);
+		return "";
+	}
+
+	/**
+	 * @param algorithm A space separated String of moves
+	 * @return the inverse algorithm consisted on the reversed list of inverse moves.
+	 * @throws InvalidScrambleException
+	 */
+	public String getInverseAlgorithm(String algorithm) throws InvalidScrambleException {
+		String[] moves = AlgorithmBuilder.splitAlgorithm(algorithm);
+		String inverse = "";
+		for (int i = moves.length - 1; i >= 0; i--){
+			try {
+				inverse += " " + getInverseMove(moves[i]);
+			} catch(InvalidMoveException e) {
+				throw new InvalidScrambleException(algorithm, e);
+			}
+		}
+		return inverse.trim();
+	}
 
 	/**
 	 * @return The number of random moves we must apply to call a puzzle
