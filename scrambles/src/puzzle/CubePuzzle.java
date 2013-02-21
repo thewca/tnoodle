@@ -446,6 +446,11 @@ public class CubePuzzle extends Puzzle {
 		}
 
 		@Override
+		public boolean identical(PuzzleState other) {
+			return Arrays.deepEquals(image, ((CubeState) other).image);
+		}
+
+		@Override
 		public int hashCode() {
 			return Arrays.deepHashCode(getNormalized());
 		}
@@ -454,6 +459,5 @@ public class CubePuzzle extends Puzzle {
 		protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
 			drawCube(g, image, gap, cubieSize, colorScheme);
 		}
-		
 	}
 }
