@@ -584,7 +584,7 @@ public abstract class Puzzle {
 
 			/* Step 2: node <----- scrambled */
 
-			AlgorithmBuilder solution = new AlgorithmBuilder(this.getPuzzle(), MungingMode.NO_MUNGING);
+			AlgorithmBuilder solution = new AlgorithmBuilder(this.getPuzzle(), MungingMode.NO_MUNGING, this);
 			state = this;
 			distanceFromScrambled = 0;
 
