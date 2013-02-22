@@ -472,54 +472,145 @@ public abstract class Puzzle {
 		}
 		
 		public String solveIn(int n) {
-			HashMap<PuzzleState, Integer> seen = new HashMap<PuzzleState, Integer>();
-			Queue<PuzzleState> fringe = new LinkedList<PuzzleState>();
+			HashMap<PuzzleState, Integer> seenSolved = new HashMap<PuzzleState, Integer>();
+			Queue<PuzzleState> fringeSolved = new LinkedList<PuzzleState>();
+			HashMap<PuzzleState, Integer> seenScrambled = new HashMap<PuzzleState, Integer>();
+			Queue<PuzzleState> fringeScrambled = new LinkedList<PuzzleState>();
+
+			// We are using references for a more concise code.
+			HashMap<PuzzleState, Integer> seenExtending;
+			Queue<PuzzleState> fringeExtending;
+			HashMap<PuzzleState, Integer> seenComparing;
+			Queue<PuzzleState> fringeComparing;
+
+			PuzzleState node = getSolvedState();
 			PuzzleState solved = getSolvedState();
-			fringe.add(solved);
-			seen.put(solved, 0);
-			
+			fringeSolved.add(solved);
+			seenSolved.put(solved, 0);
+			fringeScrambled.add(this);
+			seenScrambled.put(this, 0);
+
 			TimedLogRecordStart start = new TimedLogRecordStart(Level.FINER, "Searching for solution in " + n + " moves.");
 			l.log(start);
-			
+
 			boolean found = false;
-			while(!fringe.isEmpty()) {
-				PuzzleState node = fringe.poll();
-				int distance = seen.get(node);
-				if(node.equals(this)) {
+
+			// The task here is to do a breadth-first search starting from both the solved state and the scrambled state.
+			// When we got an intersection from the two hash maps, we are done!
+			while(!(fringeSolved.isEmpty() && fringeScrambled.isEmpty())) {
+				// We have to choose on which side we are extending our search.
+				// I'm choosing to take the side where the hash map is the smaller.
+				// I just have to take care that the queue is not empty.
+				if(((seenSolved.size() < seenScrambled.size()) && !fringeSolved.isEmpty()) || fringeScrambled.isEmpty()) {
+					seenExtending = seenSolved;
+					fringeExtending = fringeSolved;
+					seenComparing = seenScrambled;
+					fringeComparing = fringeScrambled;
+				}
+				else {
+					seenExtending = seenScrambled;
+					fringeExtending = fringeScrambled;
+					seenComparing = seenSolved;
+					fringeComparing = fringeSolved;
+					// Yes, I'm copying references only.
+				}
+				
+				node = fringeExtending.poll();
+				int distance = seenExtending.get(node);
+				if(seenComparing.containsKey(node)) {
 					found = true;
 					break;
 				}
-				if(distance == n) {
-					// It's useless to look at the children of this node, if
-					// they're any closer to solved, we've already seen them,
-					// and if they're further, we don't care about them.
+				if(distance == ((n+1)/2)) {
+					// It's useless to look at the children of this node.
+					// Either their distance is smaller so we've already seen them,
+					// or we don't care about them.
+					// the +1 is because if n is odd, we would have to search from one side
+					// with distance n/2 and from the other side distance n/2 + 1
+					// Because we don't know which is which, let's take (n+1)/2 for both.
 					continue;
-				} else if(distance > n) {
+				} else if(distance > ((n+1)/2)) {
 					azzert(false);
 				}
 
 				for(PuzzleState next : node.getSuccessors().values()) {
-					if(seen.containsKey(next)) {
+					if(seenExtending.containsKey(next)) {
 						continue;
 					}
-					seen.put(next, distance+1);
-					fringe.add(next);
+					seenExtending.put(next, distance+1);
+					fringeExtending.add(next);
 				}
 			}
-			
-			l.log(start.finishedNow("expanded " + seen.size() + " nodes"));
-			
+
+			l.log(start.finishedNow("expanded " + ( seenSolved.size() + seenScrambled.size() ) + " nodes"));
+
 			if(!found) {
 				return null;
 			}
-			
+
+			/* We have found a solution, but we still have to recover the move sequence.
+			 * the `node` is the bound between the solved and the scrambled states.
+			 * We can travel from `node` to either states, like that:
+			 * solved <----- node -----> scrambled
+			 * However, to build a solution, we need to travel like that:
+			 * solved <----- node <----- scrambled
+			 * So we have to travel backward for the scrambled side.
+			 */
+
+			/* Step 1: node -----> scrambled */
+
+
+			PuzzleState state = node;
+			int distanceFromScrambled = seenScrambled.get(state);
+
+			/* We have to keep track of all states we are visited */
+			PuzzleState[] linkedStates = new PuzzleState[1 + (n+1)/2];
+			linkedStates[distanceFromScrambled] = state;
+
+			outer: while(distanceFromScrambled > 0) {
+				for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
+					if(seenScrambled.containsKey(next.getValue())) {
+						int newDistanceFromScrambled = seenScrambled.get(next.getValue());
+						if(newDistanceFromScrambled < distanceFromScrambled) {
+							state = next.getValue();
+							distanceFromScrambled = newDistanceFromScrambled;
+							linkedStates[distanceFromScrambled] = state;
+							continue outer;
+						}
+					}
+				}
+				azzert(false);
+			}
+
+			/* Step 2: node <----- scrambled */
+
 			AlgorithmBuilder solution = new AlgorithmBuilder(this.getPuzzle(), MungingMode.NO_MUNGING);
-			PuzzleState state = this;
-			int distanceFromSolved = seen.get(state);
+			state = this;
+			distanceFromScrambled = 0;
+
+			outer: while(!state.equals(node)) {
+				for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
+					if(next.getValue().equals(linkedStates[distanceFromScrambled+1])) {
+						state = next.getValue();
+						try {
+							solution.appendMove(next.getKey());
+						} catch(InvalidMoveException e) {
+							azzert(false, e);
+						}
+						distanceFromScrambled = seenScrambled.get(state);
+						continue outer;
+					}
+				}
+				azzert(false);
+			}
+
+			/* Step 3: solved <----- node */
+			
+			int distanceFromSolved = seenSolved.get(state);
 			outer: while(distanceFromSolved > 0) {
 				for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
-					if(seen.containsKey(next.getValue())) {
-						int newDistanceFromSolved = seen.get(next.getValue());
+					if(seenSolved.containsKey(next.getValue())) {
+						int newDistanceFromSolved = seenSolved.get(next.getValue());
 						if(newDistanceFromSolved < distanceFromSolved) {
 							state = next.getValue();
 							distanceFromSolved = newDistanceFromSolved;
@@ -534,6 +625,7 @@ public abstract class Puzzle {
 				}
 				azzert(false);
 			}
+
 			return solution.toString();
 		}
 
