@@ -472,6 +472,7 @@ public abstract class Puzzle {
 		}
 		
 		public String solveIn(int n) {
+			boolean enableSpeedup = false;
 			HashMap<PuzzleState, Integer> seenSolved = new HashMap<PuzzleState, Integer>();
 			Queue<PuzzleState> fringeSolved = new LinkedList<PuzzleState>();
 			HashMap<PuzzleState, Integer> seenScrambled = new HashMap<PuzzleState, Integer>();
@@ -494,25 +495,34 @@ public abstract class Puzzle {
 			l.log(start);
 
 			boolean found = false;
+			int max_distance = enableSpeedup ? (n+1)/2 : n;
 
 			// The task here is to do a breadth-first search starting from both the solved state and the scrambled state.
 			// When we got an intersection from the two hash maps, we are done!
 			while(!(fringeSolved.isEmpty() && fringeScrambled.isEmpty())) {
-				// We have to choose on which side we are extending our search.
-				// I'm choosing to take the side where the hash map is the smaller.
-				// I just have to take care that the queue is not empty.
-				if(((seenSolved.size() < seenScrambled.size()) && !fringeSolved.isEmpty()) || fringeScrambled.isEmpty()) {
+				if(enableSpeedup) {
+					// We have to choose on which side we are extending our search.
+					// I'm choosing to take the side where the hash map is the smaller.
+					// I just have to take care that the queue is not empty.
+					if(((seenSolved.size() < seenScrambled.size()) && !fringeSolved.isEmpty()) || fringeScrambled.isEmpty()) {
+						seenExtending = seenSolved;
+						fringeExtending = fringeSolved;
+						seenComparing = seenScrambled;
+						fringeComparing = fringeScrambled;
+					}
+					else {
+						seenExtending = seenScrambled;
+						fringeExtending = fringeScrambled;
+						seenComparing = seenSolved;
+						fringeComparing = fringeSolved;
+						// Yes, I'm copying references only.
+					}
+				}
+				else {
 					seenExtending = seenSolved;
 					fringeExtending = fringeSolved;
 					seenComparing = seenScrambled;
 					fringeComparing = fringeScrambled;
-				}
-				else {
-					seenExtending = seenScrambled;
-					fringeExtending = fringeScrambled;
-					seenComparing = seenSolved;
-					fringeComparing = fringeSolved;
-					// Yes, I'm copying references only.
 				}
 				
 				node = fringeExtending.poll();
@@ -521,7 +531,7 @@ public abstract class Puzzle {
 					found = true;
 					break;
 				}
-				if(distance == ((n+1)/2)) {
+				if(distance == max_distance) {
 					// It's useless to look at the children of this node.
 					// Either their distance is smaller so we've already seen them,
 					// or we don't care about them.
@@ -529,7 +539,7 @@ public abstract class Puzzle {
 					// with distance n/2 and from the other side distance n/2 + 1
 					// Because we don't know which is which, let's take (n+1)/2 for both.
 					continue;
-				} else if(distance > ((n+1)/2)) {
+				} else if(distance > max_distance) {
 					azzert(false);
 				}
 
