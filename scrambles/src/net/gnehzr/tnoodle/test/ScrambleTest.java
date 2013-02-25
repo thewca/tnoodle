@@ -6,6 +6,7 @@ import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 import puzzle.CubePuzzle;
 import puzzle.CubePuzzle.CubeState;
 import puzzle.PyraminxPuzzle;
@@ -22,11 +23,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.SortedMap;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
 
 public class ScrambleTest {
+	private static final Logger l = Logger.getLogger(Puzzle.class.getName());
 	
 	static class LockHolder extends Thread {
 		public LockHolder() {
@@ -67,6 +71,8 @@ public class ScrambleTest {
 	
 	public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 
+		benchmarking();
+
 		System.out.println("Testing names.");
 		testNames();
 
@@ -98,7 +104,7 @@ public class ScrambleTest {
 			System.out.println("Testing " + puzzle);
 		
 			for(int count = 0; count < SCRAMBLE_COUNT; count++){
-				System.out.print("Scramble with:");
+				System.out.print("Scramble ["+(count+1)+"/"+SCRAMBLE_COUNT+"]: ");
 				PuzzleState state = scrambler.getSolvedState();
 				for(int i = 0; i < SCRAMBLE_LENGTH; i++){
 					HashMap<String, ? extends PuzzleState> successors = state.getSuccessors();
@@ -111,7 +117,9 @@ public class ScrambleTest {
 				System.out.print(". Found: "+solution);
 				state = state.applyAlgorithm(solution);
 				azzert(state.isSolved(), "Solution was not correct");
-				System.out.println(". Checked.");
+				System.out.print(". Checked.\r");
+				System.out.print("                                                                          \r");
+
 			}
 		}
 	}
@@ -156,7 +164,8 @@ public class ScrambleTest {
 			ScrambleCacherListener cacherStopper = new ScrambleCacherListener() {
 				@Override
 				public void scrambleCacheUpdated(ScrambleCacher src) {
-					System.out.println(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize());
+					System.out.print("                                                     \r");
+					System.out.print(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize() + "\r");
 					if(src.getAvailableCount() == src.getCacheSize()) {
 						src.stop();
 						synchronized(c1) {
@@ -179,7 +188,7 @@ public class ScrambleTest {
 		
 		}
 		lh.setObjectToLock(null);
-		System.out.println("Test passed!");
+		System.out.println("\nTest passed!");
 	}
 
 	private static void testNames() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
@@ -192,10 +201,7 @@ public class ScrambleTest {
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
 			Puzzle scrambler = lazyScrambler.cachedInstance();
 			
-			System.out.println(shortName + " ==? " + scrambler.getShortName());
 			Utils.azzert(shortName.equals(scrambler.getShortName()));
-			
-			System.out.println(longName + " ==? " + scrambler.getLongName());
 			Utils.azzert(longName.equals(scrambler.getLongName()));
 		}
 	}
@@ -252,7 +258,6 @@ public class ScrambleTest {
 		CubePuzzle twos = new CubePuzzle(2);
 		CubeState state = (CubeState) twos.getSolvedState();
 		String solution = state.solveIn(0);
-		System.out.println(solution);
 		azzert(solution.equals(""));
 		
 		String scrambleString = "R2 B2 F2";
@@ -264,7 +269,6 @@ public class ScrambleTest {
 
 		solution = state.solveIn(1);
 		azzert(solution != null);
-		System.out.println("Found a solution! " + solution);
 		state = (CubeState) state.applyAlgorithm(solution);
 		azzert(state.isSolved());
 	}
@@ -309,5 +313,23 @@ public class ScrambleTest {
 			azzertEquals(sstate.cornerOrient, cornerOrient);
 		}
 		System.out.println("");
+	}
+
+	private static void benchmarking() throws InvalidMoveException {	
+		int THREE_BY_THREE_SCRAMBLE_COUNT = 100;
+    		int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
+    		int THREE_BY_THREE_TIMEMIN = 0; //milliseconds
+    		int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
+
+		Random r = new Random();
+
+		cs.min2phase.Search threeSolver = new cs.min2phase.Search();
+		cs.min2phase.Tools.init();
+		TimedLogRecordStart start = new TimedLogRecordStart(Level.INFO, "Searching for " + THREE_BY_THREE_SCRAMBLE_COUNT + " random 3x3x3 cubes in less that " + THREE_BY_THREE_MAX_SCRAMBLE_LENGTH + " moves");
+		l.log(start);
+		for(int i = 0; i < THREE_BY_THREE_SCRAMBLE_COUNT; i++){
+			threeSolver.solution(cs.min2phase.Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, cs.min2phase.Search.INVERSE_SOLUTION);
+		}
+		l.log(start.finishedNow());
 	}
 }
