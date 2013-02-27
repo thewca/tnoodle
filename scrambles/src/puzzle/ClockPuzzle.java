@@ -166,7 +166,7 @@ public class ClockPuzzle extends Puzzle {
 		return new PuzzleStateAndGenerator(state, scrambleStr);
 	}
 
-	private class ClockState extends PuzzleState {
+	public class ClockState extends PuzzleState {
 		
 		private boolean[] pins;
 		private int[] posit;

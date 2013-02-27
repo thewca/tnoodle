@@ -7,6 +7,8 @@ import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
+import puzzle.ClockPuzzle;
+import puzzle.ClockPuzzle.ClockState;
 import puzzle.CubePuzzle;
 import puzzle.CubePuzzle.CubeState;
 import puzzle.PyraminxPuzzle;
@@ -76,13 +78,10 @@ public class ScrambleTest {
 		System.out.println("Testing names.");
 		testNames();
 
-		System.out.println("Testing specific CubePuzzle issues.");
+		System.out.println("Testing specific Puzzle issues.");
+		testClockPuzzle();
 		testCubePuzzle();
-		System.out.println("CubePuzzle tests passed!");
-
-		System.out.println("Testing specific PyraminxPuzzle issues.");
 		testPyraConverter();
-		System.out.println("PyraminxPuzzle tests passed!");
 
 		System.out.println("Testing solveIn method");
 		testSolveIn();
@@ -206,6 +205,17 @@ public class ScrambleTest {
 		}
 	}
 
+	private static void testClockPuzzle() throws InvalidScrambleException, InvalidMoveException {
+		ClockPuzzle clock = new ClockPuzzle();
+		ClockState state = (ClockState)clock.getSolvedState();
+		state = (ClockState)state.applyAlgorithm("ALL2+ y2 ALL1-"); // This scramble is breaking the solveIn method...
+		String solution = state.solveIn(3);
+		if(solution == null)
+			System.out.println("No solution");
+		else
+			System.out.println(solution);
+	}
+	
 	private static void testCubePuzzle() throws InvalidScrambleException, InvalidMoveException {
 		testMisc();
 		testTwosConverter();
