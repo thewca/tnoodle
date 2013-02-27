@@ -325,7 +325,9 @@ public class ScrambleTest {
 		System.out.println("");
 	}
 
-	private static void benchmarking() throws InvalidMoveException {	
+	private static void benchmarking() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+
+		// Analyse the 3x3x3 solver.
 		int THREE_BY_THREE_SCRAMBLE_COUNT = 100;
     		int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
     		int THREE_BY_THREE_TIMEMIN = 0; //milliseconds
@@ -341,5 +343,23 @@ public class ScrambleTest {
 			threeSolver.solution(cs.min2phase.Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, cs.min2phase.Search.INVERSE_SOLUTION);
 		}
 		l.log(start.finishedNow());
+
+
+		// How long does it takes to test if a puzzle is at more one move from solved?
+		int SCRAMBLE_COUNT = 100;
+		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+		
+		for(String puzzle : lazyScramblers.keySet()) {
+			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+			final Puzzle scrambler = lazyScrambler.cachedInstance();
+			
+			start = new TimedLogRecordStart(Level.INFO, "Are " + THREE_BY_THREE_SCRAMBLE_COUNT + " " + puzzle + " one move away from solved?");
+			l.log(start);
+			for(int count = 0; count < SCRAMBLE_COUNT; count++){
+				PuzzleState state = scrambler.getSolvedState().applyAlgorithm(scrambler.generateWCAScramble(r));
+				String solution = state.solveIn(1);
+			}
+			l.log(start.finishedNow());
+		}
 	}
 }

@@ -497,9 +497,12 @@ public abstract class Puzzle {
 			boolean found = false;
 			int max_distance = enableSpeedup ? (n+1)/2 : n;
 
+			if(this.isSolved())
+				return "";
+
 			// The task here is to do a breadth-first search starting from both the solved state and the scrambled state.
 			// When we got an intersection from the two hash maps, we are done!
-			while(!(fringeSolved.isEmpty() && fringeScrambled.isEmpty())) {
+			outer: while(!(fringeSolved.isEmpty() && fringeScrambled.isEmpty())) {
 				if(enableSpeedup) {
 					// We have to choose on which side we are extending our search.
 					// I'm choosing to take the side where the hash map is the smaller.
@@ -527,10 +530,6 @@ public abstract class Puzzle {
 				
 				node = fringeExtending.poll();
 				int distance = seenExtending.get(node);
-				if(seenComparing.containsKey(node)) {
-					found = true;
-					break;
-				}
 				if(distance == max_distance) {
 					// It's useless to look at the children of this node.
 					// Either their distance is smaller so we've already seen them,
@@ -549,6 +548,11 @@ public abstract class Puzzle {
 					}
 					seenExtending.put(next, distance+1);
 					fringeExtending.add(next);
+					if(seenComparing.containsKey(next)) {
+						found = true;
+						node = next;
+						break outer;
+					}
 				}
 			}
 
