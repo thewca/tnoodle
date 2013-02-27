@@ -472,7 +472,7 @@ public abstract class Puzzle {
 		}
 		
 		public String solveIn(int n) {
-			boolean enableSpeedup = false;
+			boolean enableSpeedup = true;
 			HashMap<PuzzleState, Integer> seenSolved = new HashMap<PuzzleState, Integer>();
 			Queue<PuzzleState> fringeSolved = new LinkedList<PuzzleState>();
 			HashMap<PuzzleState, Integer> seenScrambled = new HashMap<PuzzleState, Integer>();

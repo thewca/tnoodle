@@ -168,8 +168,8 @@ public class ClockPuzzle extends Puzzle {
 
 	public class ClockState extends PuzzleState {
 		
-		private boolean[] pins;
-		private int[] posit;
+		public boolean[] pins;
+		public int[] posit;
 		public ClockState() {
 			pins = new boolean[] {false, false, false, false};
 			posit = new int[] {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
@@ -189,7 +189,7 @@ public class ClockPuzzle extends Puzzle {
 					// Apply the move
 					int[] positCopy = new int[18];
 					for( int p=0; p<18; p++)
-						positCopy[p] = (posit[p] + rot*moves[turn][p])%12;
+						positCopy[p] = (posit[p] + rot*moves[turn][p] + 12)%12;
 
 					// Build the move string
 					boolean clockwise = ( rot < 7 );
