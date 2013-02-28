@@ -1,16 +1,16 @@
 /**
 	Copyright (C) 2012  Shuang Chen
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
-	
+
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,7 +34,7 @@ public class Search {
 	private int[] twist = new int[6];
 	private int[] flip = new int[6];
 	private int[] slice = new int[6];
-	
+
 	private int[] corn0 = new int[6];
 	private int[] ud8e0 = new int[6];
 	private int[] prun = new int[6];
@@ -52,7 +52,7 @@ public class Search {
 	private long timeMin;
 	private int verbose;
 	private CubieCube cc = new CubieCube();
-	
+
 	/**
 	 *     Verbose_Mask determines if a " . " separates the phase1 and phase2 parts of the solver string like in F' R B R L2 F .
 	 *     U2 U D for example.<br>
@@ -118,7 +118,7 @@ public class Search {
 	 *
 	 * @param verbose
 	 * 		determins the format of the solution(s). see USE_SEPARATOR, INVERSE_SOLUTION, APPEND_LENGTH
-	 * 
+	 *
 	 * @return The solution string or an error code:<br>
 	 * 		Error 1: There is not exactly one facelet of each colour<br>
 	 * 		Error 2: Not all 12 edges exist exactly once<br>
@@ -141,16 +141,16 @@ public class Search {
 		this.solution = null;
 		return solve(cc);
 	}
-	
+
 	int verify(String facelets) {
 		int count = 0x000000;
 		try {
 			String center = new String(new char[] {
-				facelets.charAt(4), 
-				facelets.charAt(13), 
-				facelets.charAt(22), 
-				facelets.charAt(31), 
-				facelets.charAt(40), 
+				facelets.charAt(4),
+				facelets.charAt(13),
+				facelets.charAt(22),
+				facelets.charAt(31),
+				facelets.charAt(40),
 				facelets.charAt(49)
 			});
 			for (int i=0; i<54; i++) {
@@ -179,8 +179,8 @@ public class Search {
 			slice[i] = c.getUDSlice();
 			corn0[i] = c.getCPermSym();
 			ud8e0[i] = c.getU4Comb() << 16 | c.getD4Comb();
-			
-			for (int j=0; j<i; j++) {	//If S_i^-1 * C * S_i == C, It's unnecessary to compute it again. 
+
+			for (int j=0; j<i; j++) {	//If S_i^-1 * C * S_i == C, It's unnecessary to compute it again.
 				if (twist[i] == twist[j] && flip[i] == flip[j] && slice[i] == slice[j]
 						&& corn0[i] == corn0[j] && ud8e0[i] == ud8e0[j]) {
 					conjMask |= 1 << i;
@@ -189,11 +189,11 @@ public class Search {
 			}
 			if ((conjMask & (1 << i)) == 0) {
 				prun[i] = Math.max(Math.max(
-					CoordCube.getPruning(CoordCube.UDSliceTwistPrun, 
+					CoordCube.getPruning(CoordCube.UDSliceTwistPrun,
 						(twist[i]>>>3) * 495 + CoordCube.UDSliceConj[slice[i]&0x1ff][twist[i]&7]),
-					CoordCube.getPruning(CoordCube.UDSliceFlipPrun, 
+					CoordCube.getPruning(CoordCube.UDSliceFlipPrun,
 						(flip[i]>>>3) * 495 + CoordCube.UDSliceConj[slice[i]&0x1ff][flip[i]&7])),
-					Tools.USE_TWIST_FLIP_PRUN ? CoordCube.getPruning(CoordCube.TwistFlipPrun, 
+					Tools.USE_TWIST_FLIP_PRUN ? CoordCube.getPruning(CoordCube.TwistFlipPrun,
 							(twist[i]>>>3) * 2688 + (flip[i] & 0xfff8 | CubieCube.Sym8MultInv[flip[i]&7][twist[i]&7])) : 0);
 			}
 			c.URFConjugate();
@@ -219,7 +219,7 @@ public class Search {
 		}
 		return "Error 7";
 	}
-	
+
 	/**
 	 * @return
 	 * 		0: Found or Timeout
@@ -236,12 +236,12 @@ public class Search {
 			}
 			for (int power=0; power<3; power++) {
 				int m = axis + power;
-				
+
 				int slicex = CoordCube.UDSliceMove[slice][m] & 0x1ff;
 				int twistx = CoordCube.TwistMove[twist][CubieCube.Sym8Move[tsym][m]];
 				int tsymx = CubieCube.Sym8Mult[twistx & 7][tsym];
 				twistx >>>= 3;
-				int prun = CoordCube.getPruning(CoordCube.UDSliceTwistPrun, 
+				int prun = CoordCube.getPruning(CoordCube.UDSliceTwistPrun,
 					twistx * 495 + CoordCube.UDSliceConj[slicex][tsymx]);
 				if (prun > maxl) {
 					break;
@@ -252,7 +252,7 @@ public class Search {
 				int fsymx = CubieCube.Sym8Mult[flipx & 7][fsym];
 				flipx >>>= 3;
 				if (Tools.USE_TWIST_FLIP_PRUN) {
-					prun = CoordCube.getPruning(CoordCube.TwistFlipPrun, 
+					prun = CoordCube.getPruning(CoordCube.TwistFlipPrun,
 						(twistx * 336 + flipx) << 3 | CubieCube.Sym8MultInv[fsymx][tsymx]);
 					if (prun > maxl) {
 						break;
@@ -260,7 +260,7 @@ public class Search {
 						continue;
 					}
 				}
-				prun = CoordCube.getPruning(CoordCube.UDSliceFlipPrun, 
+				prun = CoordCube.getPruning(CoordCube.UDSliceFlipPrun,
 					flipx * 495 + CoordCube.UDSliceConj[slicex][fsymx]);
 				if (prun > maxl) {
 					break;
@@ -273,11 +273,11 @@ public class Search {
 				if (ret != 1) {
 					return ret >> 1;
 				}
-			}		
+			}
 		}
 		return 1;
 	}
-	
+
 	/**
 	 * @return
 	 * 		0: Found or Timeout
@@ -297,7 +297,7 @@ public class Search {
 			csym = CubieCube.SymMult[cidx & 0xf][csym];
 			cidx >>>= 4;
 			corn[i+1] = cidx << 4 | csym;
-			
+
 			int cx = CoordCube.UDSliceMove[mid4[i] & 0x1ff][m];
 			mid4[i+1] = Util.permMult[mid4[i]>>>9][cx>>>9]<<9|cx&0x1ff;
 		}
@@ -307,18 +307,18 @@ public class Search {
 		if (prun >= maxDep2) {
 			return prun > maxDep2 ? 2 : 1;
 		}
-		
+
 		int u4e = ud8e[valid2] >>> 16;
 		int d4e = ud8e[valid2] & 0xffff;
 		for (int i=valid2; i<depth1; i++) {
 			int m = move[i];
-			
+
 			int cx = CoordCube.UDSliceMove[u4e & 0x1ff][m];
 			u4e = Util.permMult[u4e>>>9][cx>>>9]<<9|cx&0x1ff;
-			
+
 			cx = CoordCube.UDSliceMove[d4e & 0x1ff][m];
 			d4e = Util.permMult[d4e>>>9][cx>>>9]<<9|cx&0x1ff;
-			
+
 			ud8e[i+1] = u4e << 16 | d4e;
 		}
 		valid2 = depth1;
@@ -356,14 +356,14 @@ public class Search {
 			int cidxx = CoordCube.CPermMove[cidx][CubieCube.SymMove[csym][Util.ud2std[m]]];
 			int csymx = CubieCube.SymMult[cidxx & 15][csym];
 			cidxx >>>= 4;
-			if (CoordCube.getPruning(CoordCube.MCPermPrun, 
+			if (CoordCube.getPruning(CoordCube.MCPermPrun,
 					cidxx * 24 + CoordCube.MPermConj[midx][csymx]) >= maxl) {
 				continue;
 			}
 			int eidxx = CoordCube.EPermMove[eidx][CubieCube.SymMoveUD[esym][m]];
 			int esymx = CubieCube.SymMult[eidxx & 15][esym];
 			eidxx >>>= 4;
-			if (CoordCube.getPruning(CoordCube.MEPermPrun, 
+			if (CoordCube.getPruning(CoordCube.MEPermPrun,
 					eidxx * 24 + CoordCube.MPermConj[midx][esymx]) >= maxl) {
 				continue;
 			}
@@ -374,7 +374,7 @@ public class Search {
 		}
 		return false;
 	}
-	
+
 	private String solutionToString() {
 		StringBuffer sb = new StringBuffer();
 		int urf = (verbose & INVERSE_SOLUTION) != 0 ? (urfIdx + 3) % 6 : urfIdx;

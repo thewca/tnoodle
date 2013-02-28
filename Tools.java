@@ -9,17 +9,17 @@ import java.io.IOException;
  * Some useful functions.
  */
 public class Tools implements Runnable {
-	
+
 	static final boolean USE_TWIST_FLIP_PRUN = true;
 
 	private static boolean inited = false;
-	
+
 	private static void read(char[] arr, DataInput in) throws IOException {
 		for (int i=0, len=arr.length; i<len; i++) {
 			arr[i] = in.readChar();
 		}
 	}
-	
+
 	private static void read(int[] arr, DataInput in) throws IOException {
 		for (int i=0, len=arr.length; i<len; i++) {
 			arr[i] = in.readInt();
@@ -31,15 +31,15 @@ public class Tools implements Runnable {
 			for (int j=0, len=arr[i].length; j<len; j++) {
 				arr[i][j] = in.readChar();
 			}
-		}	
+		}
 	}
-	
+
 	private static void write(char[] arr, DataOutput out) throws IOException {
 		for (int i=0, len=arr.length; i<len; i++) {
 			out.writeChar(arr[i]);
 		}
 	}
-	
+
 	private static void write(int[] arr, DataOutput out) throws IOException {
 		for (int i=0, len=arr.length; i<len; i++) {
 			out.writeInt(arr[i]);
@@ -51,38 +51,38 @@ public class Tools implements Runnable {
 			for (int j=0, len=arr[i].length; j<len; j++) {
 				out.writeChar(arr[i][j]);
 			}
-		}	
+		}
 	}
-	
+
 	private static int[] initState = new int[2];
 	private static int[] require = {0x0, 0x1, 0x2, 0x2,  0x2, 0x7, 0xa, 0x3,  0x13, 0x13, 0x3, 0x6e,  0xca, 0xa6, 0x612, 0x512};
-	
+
 	private static void initIdx(int idx) {
 		switch (idx) {
 			case 0 : CubieCube.initMove(); break;//-
 			case 1 : CubieCube.initSym(); break;//0
 			case 2 : CubieCube.initFlipSym2Raw(); break;//1
 			case 3 : CubieCube.initTwistSym2Raw(); break;//1
-			
+
 			case 4 : CubieCube.initPermSym2Raw(); break;//1
 			case 5 : CoordCube.initFlipMove(); break;//0, 1, 2
 			case 6 : CoordCube.initTwistMove(); break;//0, 1, 3
 			case 7 : CoordCube.initUDSliceMoveConj(); break;//0, 1
-			
+
 			case 8 : CoordCube.initCPermMove(); break;//0, 1, 4
 			case 9 : CoordCube.initEPermMove(); break;//0, 1, 4
 			case 10 : CoordCube.initMPermMoveConj(); break;//0, 1
 			case 11 : if (USE_TWIST_FLIP_PRUN) {CoordCube.initTwistFlipPrun();}	break;//1, 2, 3, 5, 6
-			
+
 			case 12 : CoordCube.initSliceTwistPrun(); break;//1, 3, 6, 7
 			case 13 : CoordCube.initSliceFlipPrun(); break;//1, 2, 5, 7
 			case 14 : CoordCube.initMEPermPrun(); break;//1, 4, 9, 10
 			case 15 : CoordCube.initMCPermPrun(); break;//1, 4, 8, 10
 		}
 	}
-	
+
 	protected Tools() {}
-	
+
 	/**
 	 * Main Initialization Function, can be ignored.
 	 */
@@ -117,9 +117,9 @@ public class Tools implements Runnable {
 				initState[1] |= 1 << choice;
 				initState.notifyAll();
 			}
-		}	
+		}
 	}
-	
+
 	private static void initParallel(int N_thread) {
 		Thread[] initThreads = new Thread[N_thread-1];
 		for (int i=0; i<N_thread-1; i++) {
@@ -136,7 +136,7 @@ public class Tools implements Runnable {
 			System.exit(0);
 		}
 	}
-	
+
 	/**
 	 * Initialization of the Solver.<br>
 	 * Always below 0.5 seconds with Multiple-Thread.<br>
@@ -152,17 +152,17 @@ public class Tools implements Runnable {
 		 */
 		//initParallel(Runtime.getRuntime().availableProcessors());
 		initParallel(1);
-		
+
 		inited = true;
 	}
-	
+
 	/**
 	 * @return whether the package is initialized.
 	 */
 	public static boolean isInited() {
 		return inited;
 	}
-	
+
 	/**
 	 * initializing from cached tables(move table, pruning table, etc.)
 	 *
@@ -170,7 +170,7 @@ public class Tools implements Runnable {
 	 *     Where to read tables.
 	 *
 	 * @see cs.min2phase.Tools#saveTo(java.io.DataOutput)
-	 */	
+	 */
 	public static void initFrom(DataInput in) throws IOException {
 		if (inited) {
 			return;
@@ -198,7 +198,7 @@ public class Tools implements Runnable {
 		CubieCube.initSym();
 		inited = true;
 	}
-	
+
 	/**
 	 * cache tables (move tables, pruning table, etc.), and read it while initializing.
 	 *
@@ -249,7 +249,7 @@ public class Tools implements Runnable {
 	public static String randomCube(Random gen) {
 		return randomState(STATE_RANDOM, STATE_RANDOM, STATE_RANDOM, STATE_RANDOM, gen);
 	}
-	
+
 	private static int resolveOri(byte[] arr, int base, Random gen) {
 		int sum = 0, idx = 0, lastUnknown = -1;
 		for (int i=0; i<arr.length; i++) {
@@ -268,7 +268,7 @@ public class Tools implements Runnable {
 		}
 		return idx;
 	}
-	
+
 	private static int countUnknown(byte[] arr) {
 		if (arr == STATE_SOLVED) {
 			return 0;
@@ -281,7 +281,7 @@ public class Tools implements Runnable {
 		}
 		return cnt;
 	}
-	
+
 	private static int resolvePerm(byte[] arr, int cntU, int parity, Random gen) {
 		if (arr == STATE_SOLVED) {
 			return 0;
@@ -320,10 +320,10 @@ public class Tools implements Runnable {
 		}
 		return p;
 	}
-	
+
 	public static final byte[] STATE_RANDOM = null;
-	public static final byte[] STATE_SOLVED = new byte[0];	
-	
+	public static final byte[] STATE_SOLVED = new byte[0];
+
 	protected static String randomState(byte[] cp, byte[] co, byte[] ep, byte[] eo, Random gen) {
 		int parity;
 		int cntUE = ep == STATE_RANDOM ? 12 : countUnknown(ep);
@@ -344,7 +344,7 @@ public class Tools implements Runnable {
 				} while (Util.getNParity(cpVal, 8) != parity);
 			} else {
 				resolvePerm(cp, cntUC, parity, gen);
-				cpVal = Util.getNPerm(cp, 8);			
+				cpVal = Util.getNPerm(cp, 8);
 			}
 		} else {	//ep != STATE_SOLVED
 			if (cp == STATE_SOLVED) {
@@ -366,32 +366,32 @@ public class Tools implements Runnable {
 			}
 		}
 		return Util.toFaceCube(new CubieCube(
-			cpVal, 
-			co == STATE_RANDOM ? gen.nextInt(2187) : (co == STATE_SOLVED ? 0 : resolveOri(co, 3, gen)), 
-			epVal, 
+			cpVal,
+			co == STATE_RANDOM ? gen.nextInt(2187) : (co == STATE_SOLVED ? 0 : resolveOri(co, 3, gen)),
+			epVal,
 			eo == STATE_RANDOM ? gen.nextInt(2048) : (eo == STATE_SOLVED ? 0 : resolveOri(eo, 2, gen))));
 	}
-	
+
 
 	public static String randomLastLayer() {
 		return randomLastLayer(r);
 	}
 	public static String randomLastLayer(Random gen) {
 		return randomState(
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7}, 
-			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0}, 
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11}, 
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7},
+			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0},
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11},
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0}, gen);
 	}
-	
+
 	public static String randomLastSlot() {
 		return randomLastSlot(r);
 	}
 	public static String randomLastSlot(Random gen) {
 		return randomState(
-			new byte[]{-1, -1, -1, -1, -1, 5, 6, 7}, 
-			new byte[]{-1, -1, -1, -1, -1, 0, 0, 0}, 
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, -1, 9, 10, 11}, 
+			new byte[]{-1, -1, -1, -1, -1, 5, 6, 7},
+			new byte[]{-1, -1, -1, -1, -1, 0, 0, 0},
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, -1, 9, 10, 11},
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, 0, 0, 0}, gen);
 	}
 
@@ -400,9 +400,9 @@ public class Tools implements Runnable {
 	}
 	public static String randomZBLastLayer(Random gen) {
 		return randomState(
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7}, 
-			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0}, 
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11}, 
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7},
+			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0},
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11},
 			STATE_SOLVED, gen);
 	}
 
@@ -411,9 +411,9 @@ public class Tools implements Runnable {
 	}
 	public static String randomCornerOfLastLayer(Random gen) {
 		return randomState(
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7}, 
-			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0}, 
-			STATE_SOLVED, 
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7},
+			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0},
+			STATE_SOLVED,
 			STATE_SOLVED, gen);
 	}
 
@@ -422,9 +422,9 @@ public class Tools implements Runnable {
 	}
 	public static String randomEdgeOfLastLayer(Random gen) {
 		return randomState(
-			STATE_SOLVED, 
-			STATE_SOLVED, 
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11}, 
+			STATE_SOLVED,
+			STATE_SOLVED,
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, 8, 9, 10, 11},
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0}, gen);
 	}
 
@@ -433,23 +433,23 @@ public class Tools implements Runnable {
 	}
 	public static String randomCrossSolved(Random gen) {
 		return randomState(
-			STATE_RANDOM, 
-			STATE_RANDOM, 
-			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, -1, -1, -1, -1}, 
+			STATE_RANDOM,
+			STATE_RANDOM,
+			new byte[]{-1, -1, -1, -1, 4, 5, 6, 7, -1, -1, -1, -1},
 			new byte[]{-1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1}, gen);
 	}
-	
+
 	public static String randomEdgeSolved() {
 		return randomEdgeSolved(r);
 	}
 	public static String randomEdgeSolved(Random gen) {
 		return randomState(
-			STATE_RANDOM, 
-			STATE_RANDOM, 
-			STATE_SOLVED, 
+			STATE_RANDOM,
+			STATE_RANDOM,
+			STATE_SOLVED,
 			STATE_SOLVED, gen);
 	}
-	
+
 	public static String randomCornerSolved() {
 		return randomCornerSolved(r);
 	}
@@ -457,17 +457,17 @@ public class Tools implements Runnable {
 		return randomState(
 			STATE_SOLVED,
 			STATE_SOLVED,
-			STATE_RANDOM, 
+			STATE_RANDOM,
 			STATE_RANDOM, gen);
 	}
-	
+
 	public static String superFlip() {
 		return Util.toFaceCube(new CubieCube(0, 0, 0, 2047));
 	}
-	
+
 	/**
 	 * Check whether the cube definition string s represents a solvable cube.
-	 * 
+	 *
 	 * @param facelets is the cube definition string , see {@link cs.min2phase.Search#solution(java.lang.String facelets, int maxDepth, long timeOut, long timeMin, int verbose)}
 	 * @return 0: Cube is solvable<br>
 	 *         -1: There is not exactly one facelet of each colour<br>
@@ -479,5 +479,5 @@ public class Tools implements Runnable {
 	 */
 	public static int verify(String facelets) {
 		return new Search().verify(facelets);
-	}		
+	}
 }
