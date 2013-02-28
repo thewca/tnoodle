@@ -14,7 +14,7 @@ import winstone.WinstoneSession;
 
 /**
  * Contains all the logic for reading in sessions
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ClusterSessionSearch.java,v 1.6 2006/03/24 17:24:18 rickknowles Exp $
  */
@@ -36,7 +36,7 @@ public class ClusterSessionSearch implements Runnable {
     /**
      * Sets up for a threaded search
      */
-    public ClusterSessionSearch(String webAppPrefix, String hostName, String sessionId, 
+    public ClusterSessionSearch(String webAppPrefix, String hostName, String sessionId,
             String ipPort, int controlPort) {
         this.isFinished = false;
         this.searchWebAppHostname = hostName;

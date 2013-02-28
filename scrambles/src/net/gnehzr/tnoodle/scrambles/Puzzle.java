@@ -50,10 +50,10 @@ import com.google.gson.JsonSerializer;
  * Puzzle and TwistyPuzzle encapsulate all the information to filter out
  * scrambles <= 1 move away from solved (see generateWCAScramble),
  * and to generate random turn scrambles generically (see generateRandomMoves).
- * 
+ *
  * The original proposal for these classes is accessible here:
  * https://docs.google.com/document/d/11ZfQPxAw0EhNNwE1yn5lZUO383qvAH6kJa2s3O9_6Zg/edit
- * 
+ *
  * @author jeremy
  *
  */
@@ -67,7 +67,7 @@ public abstract class Puzzle {
 	 * @return a url appropriate String unique to this Scrambler
 	 */
 	public abstract String getShortName();
-	
+
 	/**
 	 * Returns a String fully describing this Scrambler.
 	 * Unlike shortName(), may contain spaces and other url-inappropriate characters.
@@ -86,7 +86,7 @@ public abstract class Puzzle {
 	public double getInitializationStatus() {
 		return 1;
 	}
-	
+
 	/**
 	 * Generates a scramble appropriate for this Scrambler. It's important to note that
 	 * it's ok if this method takes some time to run, as it's going to be called many times and get queued up
@@ -110,12 +110,12 @@ public abstract class Puzzle {
 	 * @return The size of the images this Scrambler will produce.
 	 */
 	protected abstract Dimension getPreferredSize();
-	
+
 	/**
 	 * @return A *new* HashMap mapping face names to Colors.
 	 */
 	public abstract HashMap<String, Color> getDefaultColorScheme();
-	
+
 	/**
 	 * @return A HashMap mapping face names to GeneralPaths.
 	 */
@@ -129,7 +129,7 @@ public abstract class Puzzle {
 		return scrambles;
 	}
 
-    private SecureRandom r = getSecureRandom();
+	private SecureRandom r = getSecureRandom();
 	private static final SecureRandom getSecureRandom() {
 		try {
 			return SecureRandom.getInstance("SHA1PRNG", "SUN");
@@ -150,7 +150,7 @@ public abstract class Puzzle {
 	public final String[] generateScrambles(int count) {
 		return generateScrambles(r, count);
 	}
-	
+
 	/** seeded scrambles, these can't be cached, so they'll be a little slower **/
 	public final String generateSeededScramble(String seed) {
 		return generateSeededScramble(seed.getBytes());
@@ -158,7 +158,7 @@ public abstract class Puzzle {
 	public final String[] generateSeededScrambles(String seed, int count) {
 		return generateSeededScrambles(seed.getBytes(), count);
 	}
-	
+
 	private final String generateSeededScramble(byte[] seed) {
 		// we must create our own Random because other threads can access the static one
 		SecureRandom r = getSecureRandom();
@@ -171,7 +171,7 @@ public abstract class Puzzle {
 		r.setSeed(seed);
 		return generateScrambles(r, count);
 	}
-	
+
 	/**
 	 * @return Simply returns getLongName()
 	 */
@@ -206,7 +206,7 @@ public abstract class Puzzle {
 		getScramblers(); // force reloading the plugins, if necessary
 		return plugins.getPluginComment(shortName);
 	}
-	
+
 	/**
 	 * TODO - comment
 	 */
@@ -232,7 +232,7 @@ public abstract class Puzzle {
 				l.log(Level.INFO, "", e);
 			}
 		}
-		
+
 		Dimension dim = new Dimension(32, 32);
 		BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
@@ -243,7 +243,7 @@ public abstract class Puzzle {
 			l.log(Level.SEVERE, "", e);
 		}
 	}
-	
+
 	/**
 	 * Computes the best size to draw the scramble image.
 	 * @param maxWidth The maximum allowed width of the resulting image, 0 or null if it doesn't matter.
@@ -264,7 +264,7 @@ public abstract class Puzzle {
 		int resultHeight = Math.min(maxHeight, ceil(maxWidth/ratio));
 		return new Dimension(resultWidth, resultHeight);
 	}
-	
+
 	/**
 	 * TODO - document! alphabetical
 	 * @return
@@ -274,8 +274,8 @@ public abstract class Puzzle {
 		Collections.sort(faces);
 		return faces.toArray(new String[faces.size()]);
 	}
-	
-	
+
+
 	/**
 	 * TODO - document!
 	 * @param colorScheme
@@ -312,7 +312,7 @@ public abstract class Puzzle {
 		}
 		return colorScheme;
 	}
-	
+
 	public PuzzleImageInfo getDefaultPuzzleImageInfo() {
 		PuzzleImageInfo sii = new PuzzleImageInfo();
 		sii.faces = getDefaultFaceBoundaries();
@@ -320,7 +320,7 @@ public abstract class Puzzle {
 		sii.size = getPreferredSize();
 		return sii;
 	}
-	
+
 	/**
 	 * Draws scramble onto g.
 	 * @param g The Graphics2D object to draw upon (of size size)
@@ -369,17 +369,17 @@ public abstract class Puzzle {
 			return new JsonPrimitive(scrambler.getShortName());
 		}
 	}
-	
-	
-	
+
+
+
 	public abstract class PuzzleState {
 		public PuzzleState() {}
-		
+
 		/**
-		 * 
+		 *
 		 * @param algorithm A space separated String of moves to apply to state
 		 * @return
-		 * @throws InvalidScrambleException 
+		 * @throws InvalidScrambleException
 		 */
 		public PuzzleState applyAlgorithm(String algorithm) throws InvalidScrambleException {
 			PuzzleState state = this;
@@ -398,7 +398,7 @@ public abstract class Puzzle {
 		 * 	       The move Strings may not contain spaces.
 		 */
 		public abstract HashMap<String, ? extends PuzzleState> getSuccessors();
-		
+
 		/**
 		 * By default, this method returns getSuccessors(). Some puzzles may wish to override
 		 * this method to provide a reduced set of moves to be used for scrambling.
@@ -429,29 +429,29 @@ public abstract class Puzzle {
 		/**
 		 * Returns true if this state is equal to other.
 		 * Note that a puzzle like 4x4 must compare all orientations of the puzzle, otherwise
-		 * generateRandomMoves() will allow for trivial sequences of turns like Lw Rw'. 
+		 * generateRandomMoves() will allow for trivial sequences of turns like Lw Rw'.
 		 * @param other
 		 * @return true if this is equal to other
 		 */
 		public abstract boolean equals(Object other);
 		public abstract int hashCode();
-		
+
 
 		/**
 		 * Draws the state of the puzzle.
-		 * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing, 
+		 * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing,
 		 * use the synchronized keyword when implementing this method:<br>
 		 * <code>protected synchronized void drawScramble();</code>
 		 * @param g The Graphics2D object to draw upon (guaranteed to be big enough for getScrambleSize())
 		 * @param colorScheme A HashMap mapping face names to Colors, must have an entry for every face!
 		 */
 		protected abstract void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme);
-		
+
 
 		public Puzzle getPuzzle() {
 			return Puzzle.this;
 		}
-		
+
 		public boolean isSolved() {
 			return getPuzzle().getSolvedState().equals(this);
 		}
@@ -470,17 +470,17 @@ public abstract class Puzzle {
 			}
 			return successors.get(move);
 		}
-		
+
 		public String solveIn(int n) {
 			HashMap<PuzzleState, Integer> seen = new HashMap<PuzzleState, Integer>();
 			Queue<PuzzleState> fringe = new LinkedList<PuzzleState>();
 			PuzzleState solved = getSolvedState();
 			fringe.add(solved);
 			seen.put(solved, 0);
-			
+
 			TimedLogRecordStart start = new TimedLogRecordStart(Level.FINER, "Searching for solution in " + n + " moves.");
 			l.log(start);
-			
+
 			boolean found = false;
 			while(!fringe.isEmpty()) {
 				PuzzleState node = fringe.poll();
@@ -506,13 +506,13 @@ public abstract class Puzzle {
 					fringe.add(next);
 				}
 			}
-			
+
 			l.log(start.finishedNow("expanded " + seen.size() + " nodes"));
-			
+
 			if(!found) {
 				return null;
 			}
-			
+
 			AlgorithmBuilder solution = new AlgorithmBuilder(this.getPuzzle(), MungingMode.NO_MUNGING);
 			PuzzleState state = this;
 			int distanceFromSolved = seen.get(state);
@@ -569,12 +569,12 @@ public abstract class Puzzle {
 	 * sufficiently scrambled.
 	 */
 	protected abstract int getRandomMoveCount();
-	
+
 	/**
 	 * This function will generate getRandomTurnCount() number of non cancelling,
 	 * random turns. If a puzzle wants to provide custom scrambles
 	 * (for example: Pochmann style megaminx or MRSS), it should override this method.
-	 * 
+	 *
 	 * NOTE: It is assumed that this method is thread safe! That means that if you're
 	 * overriding this method and you don't know what you're doing,
 	 * use the synchronized keyword when implementing this method:<br>
@@ -601,5 +601,5 @@ public abstract class Puzzle {
 		}
 		return ab.getStateAndGenerator();
 	}
-	
+
 }

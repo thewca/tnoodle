@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * Basic servlet configuation interface
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface ServletConfig {

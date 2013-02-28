@@ -23,13 +23,13 @@ public class Launcher {
 		WRAPPER,
 		WORKER
 	}
-	
+
 	private static PROCESS_TYPE processType = PROCESS_TYPE.UNKNOWN;
-	
+
 	public static PROCESS_TYPE getProcessType() {
 		return processType;
 	}
-	
+
 	/*
 	 * Windows doesn't give good names for java programs in the task manager,
 	 * they all just show up as instances of java.exe.
@@ -46,7 +46,7 @@ public class Launcher {
 			processType = PROCESS_TYPE.WORKER;
 			return;
 		}
-		
+
 		Thread t = Thread.currentThread();
 		azzert("main".equals(t.getName()));
 		StackTraceElement[] stack = t.getStackTrace();
@@ -110,7 +110,7 @@ public class Launcher {
 		else {
 			processType = PROCESS_TYPE.WRAPPER;
 		}
-		
+
 		String classpath = System.getProperty("java.class.path");
 		// Fortunately, classpath contains our jar file if we were run
 		// with the -jar command line arg, so classpath and our mainClass

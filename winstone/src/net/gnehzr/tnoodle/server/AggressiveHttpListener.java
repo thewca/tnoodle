@@ -10,7 +10,7 @@ import winstone.ObjectPool;
 
 public class AggressiveHttpListener extends HttpListener {
 	public static ServerSocket ss;
-	
+
     public AggressiveHttpListener(Map<?, ?> args, ObjectPool objectPool, HostGroup hostGroup) throws IOException {
     	super(args, objectPool, hostGroup);
     }
@@ -18,7 +18,7 @@ public class AggressiveHttpListener extends HttpListener {
 	public static int getBacklogCount() {
 		return HttpListener.BACKLOG_COUNT;
 	}
-	
+
 	@Override
 	protected ServerSocket getServerSocket() throws IOException {
 		return ss;

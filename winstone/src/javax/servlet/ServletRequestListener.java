@@ -10,7 +10,7 @@ import java.util.EventListener;
 
 /**
  * Listener for requests going in and out of scope
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ServletRequestListener.java,v 1.2 2006/02/28 07:32:47 rickknowles Exp $
  */

@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class ScrambleCacher {
 	private static final Logger l = Logger.getLogger(ScrambleCacher.class.getName());
 	private static final int DEFAULT_CACHE_SIZE = 100;
-	
+
 	/**
 	 * Puzzles will get passed this instance of Random
 	 * in order to have nice, as-secure-as-can-be scrambles.
@@ -30,7 +30,7 @@ public class ScrambleCacher {
 	public ScrambleCacher(final Puzzle puzzle) {
 		this(puzzle, DEFAULT_CACHE_SIZE, false);
 	}
-	
+
 	private volatile Throwable exception;
 	private boolean running = false;
 	public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble) {
@@ -58,7 +58,7 @@ public class ScrambleCacher {
 							e1.printStackTrace();
 						}
 					}
-					
+
 					synchronized(scrambles) {
 						while(running && available == scrambles.length) {
 							try {
@@ -90,18 +90,18 @@ public class ScrambleCacher {
 		running = true;
 		t.start();
 	}
-	
+
 	public void stop() {
 		synchronized(scrambles) {
 			running = false;
 			scrambles.notifyAll();
 		}
 	}
-	
+
 	public boolean isRunning() {
 		return running;
 	}
-	
+
 	private LinkedList<ScrambleCacherListener> ls = new LinkedList<ScrambleCacherListener>();
 	public void addScrambleCacherListener(ScrambleCacherListener l) {
 		ls.add(l);
@@ -115,11 +115,11 @@ public class ScrambleCacher {
 			l.scrambleCacheUpdated(this);
 		}
 	}
-	
+
 	public int getAvailableCount() {
 		return available;
 	}
-	
+
 	public int getCacheSize() {
 		return scrambles.length;
 	}

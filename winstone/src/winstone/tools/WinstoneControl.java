@@ -20,13 +20,13 @@ import winstone.WinstoneResourceBundle;
 /**
  * Included so that we can control winstone from the command line a little more
  * easily.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneControl.java,v 1.6 2006/03/13 15:37:29 rickknowles Exp $
  */
 public class WinstoneControl {
     private final static WinstoneResourceBundle TOOLS_RESOURCES = new WinstoneResourceBundle("winstone.tools.LocalStrings");
-    
+
     final static String OPERATION_SHUTDOWN = "shutdown";
     final static String OPERATION_RELOAD = "reload:";
     static int TIMEOUT = 10000;

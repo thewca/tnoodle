@@ -7,9 +7,9 @@
 package winstone;
 
 /**
- * Encapsulates the parsing of URL patterns, as well as the mapping of a 
+ * Encapsulates the parsing of URL patterns, as well as the mapping of a
  * url pattern to a servlet instance
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Mapping.java,v 1.9 2007/04/23 02:55:35 rickknowles Exp $
  */
@@ -42,17 +42,17 @@ public class Mapping implements java.util.Comparator {
         if ((pattern == null) || (mappedTo == null))
             throw new WinstoneException(Launcher.RESOURCES.getString(
                     "Mapping.InvalidMount", new String[] { mappedTo, pattern }));
-        
-        // Compatibility hacks - add a leading slash if one is not found and not 
+
+        // Compatibility hacks - add a leading slash if one is not found and not
         // an extension mapping
-        if (!pattern.equals("") && !pattern.startsWith(STAR) && 
+        if (!pattern.equals("") && !pattern.startsWith(STAR) &&
                 !pattern.startsWith(SLASH)) {
             pattern = SLASH + pattern;
         } else if (pattern.equals(STAR)) {
             Logger.log(Logger.WARNING, Launcher.RESOURCES, "Mapping.RewritingStarMount");
             pattern = SLASH + STAR;
         }
-        
+
         Mapping me = new Mapping(mappedTo);
 
         int firstStarPos = pattern.indexOf(STAR);
@@ -81,7 +81,7 @@ public class Mapping implements java.util.Comparator {
                     - (SLASH + STAR).length());
             me.patternType = FOLDER_PATTERN;
         }
-        
+
         // check for non-extension match
         else if (pattern.indexOf(SLASH) != -1)
             throw new WinstoneException(Launcher.RESOURCES.getString(
@@ -138,7 +138,7 @@ public class Mapping implements java.util.Comparator {
 
     /**
      * Try to match this pattern against the incoming url
-     * 
+     *
      * @param inputPattern The URL we want to check for a match
      * @param servletPath An empty stringbuffer for the servletPath of a successful match
      * @param pathInfo An empty stringbuffer for the pathInfo of a successful match
@@ -148,7 +148,7 @@ public class Mapping implements java.util.Comparator {
             StringBuffer pathInfo) {
         switch (this.patternType) {
         case FOLDER_PATTERN:
-            if (inputPattern.startsWith(this.urlPattern + '/') || 
+            if (inputPattern.startsWith(this.urlPattern + '/') ||
                     inputPattern.equals(this.urlPattern)) {
                 if (servletPath != null)
                     servletPath.append(WinstoneRequest.decodeURLToken(this.urlPattern));

@@ -20,11 +20,11 @@ public class TNoodleLogging {
 	public static void initializeLogging() {
 		Logger rootLogger = Logger.getLogger("");
 		rootLogger.setLevel(Level.FINEST);
-		
+
 		for(Handler h : rootLogger.getHandlers()) {
 			rootLogger.removeHandler(h);
 		}
-		
+
 		// We print logs of consoleLogLevel or more important to the screen (and to file).
 		// Everything above INFO gets saved to a file.
 		// Everything below INFO is lost forever =(.
@@ -33,7 +33,7 @@ public class TNoodleLogging {
 		setConsoleLogLevel(DEFAULT_LOG_LEVEL);
 		ch.setFormatter(formatter);
 		rootLogger.addHandler(ch);
-		
+
 		try {
 			File logFile = getLogFile();
 			logFile.getParentFile().mkdirs();

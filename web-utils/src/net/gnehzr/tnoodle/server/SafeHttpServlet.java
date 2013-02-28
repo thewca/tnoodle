@@ -21,7 +21,7 @@ import net.gnehzr.tnoodle.utils.Utils;
 @SuppressWarnings("serial")
 public abstract class SafeHttpServlet extends HttpServlet {
 	private static final Logger l = Logger.getLogger(SafeHttpServlet.class.getName());
-	
+
 	@Override
 	protected final void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -33,14 +33,14 @@ public abstract class SafeHttpServlet extends HttpServlet {
 		} else {
 			path = new String[0];
 		}
-	
+
 		try {
 			wrappedService(request, response, path, query);
 		} catch(Throwable e) {
 			sendError(request, response, e);
 		}
 	}
-	
+
 	protected abstract void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws Exception;
 
 	public static LinkedHashMap<String, String> parseQuery(String query) {
@@ -95,7 +95,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
 			sendText(request, response, error);
 		}
 	}
-	
+
 	protected static void sendBytes(HttpServletRequest request, HttpServletResponse response, ByteArrayOutputStream bytes, String contentType) {
 		try {
 			response.setHeader("Content-Type", contentType);
@@ -107,7 +107,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
 			l.log(Level.INFO, "", e);
 		}
 	}
-	
+
 	protected static void sendBytes(HttpServletRequest request, HttpServletResponse response, byte[] bytes, String contentType) {
 		try {
 			response.setHeader("Content-Type", contentType);
@@ -119,14 +119,14 @@ public abstract class SafeHttpServlet extends HttpServlet {
 			l.log(Level.INFO, "", e);
 		}
 	}
-	
+
 	protected static void sendHtml(HttpServletRequest request, HttpServletResponse response, ByteArrayOutputStream bytes) {
 		sendBytes(request, response, bytes, "text/html");
 	}
 	protected static void sendHtml(HttpServletRequest request, HttpServletResponse response, byte[] bytes) {
 		sendBytes(request, response, bytes, "text/html");
 	}
-	
+
 	protected static void sendText(HttpServletRequest request, HttpServletResponse response, String text) {
 		sendBytes(request, response, text.getBytes(), "text/plain"); //TODO - encoding charset?
 	}

@@ -34,7 +34,7 @@ import winstone.WinstoneSession;
 
 /**
  * Represents a cluster of winstone containers.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SimpleCluster.java,v 1.8 2006/08/10 06:38:31 rickknowles Exp $
  */
@@ -124,7 +124,7 @@ public class SimpleCluster implements Runnable, Cluster {
     /**
      * Check if the other nodes in this cluster have a session for this
      * sessionId.
-     * 
+     *
      * @param sessionId The id of the session to check for
      * @return A valid session instance
      */
@@ -136,7 +136,7 @@ public class SimpleCluster implements Runnable, Cluster {
         for (Iterator i = addresses.iterator(); i.hasNext();) {
             String ipPort = (String) i.next();
             ClusterSessionSearch search = new ClusterSessionSearch(
-                    webAppConfig.getContextPath(), webAppConfig.getOwnerHostname(), 
+                    webAppConfig.getContextPath(), webAppConfig.getOwnerHostname(),
                     sessionId, ipPort, this.controlPort);
             searchThreads.add(search);
         }
@@ -190,7 +190,7 @@ public class SimpleCluster implements Runnable, Cluster {
 
     /**
      * Given an address, retrieve the list of cluster nodes and initialise dates
-     * 
+     *
      * @param address The address to request a node list from
      */
     private void askClusterNodeForNodeList(String address) {
@@ -198,7 +198,7 @@ public class SimpleCluster implements Runnable, Cluster {
             int colonPos = address.indexOf(':');
             String ipAddress = address.substring(0, colonPos);
             String port = address.substring(colonPos + 1);
-            Socket clusterListSocket = new Socket(ipAddress, 
+            Socket clusterListSocket = new Socket(ipAddress,
                     Integer.parseInt(port));
             this.clusterAddresses.put(clusterListSocket.getInetAddress()
                     .getHostAddress() + ":" + port, new Date());
@@ -234,7 +234,7 @@ public class SimpleCluster implements Runnable, Cluster {
 
     /**
      * Given an address, send a heartbeat
-     * 
+     *
      * @param address The address to request a node list from
      */
     private void sendHeartbeat(String address) {
@@ -242,7 +242,7 @@ public class SimpleCluster implements Runnable, Cluster {
             int colonPos = address.indexOf(':');
             String ipAddress = address.substring(0, colonPos);
             String port = address.substring(colonPos + 1);
-            Socket heartbeatSocket = new Socket(ipAddress, 
+            Socket heartbeatSocket = new Socket(ipAddress,
                     Integer.parseInt(port));
             OutputStream out = heartbeatSocket.getOutputStream();
             out.write(NODE_HEARTBEAT_TYPE);
@@ -263,7 +263,7 @@ public class SimpleCluster implements Runnable, Cluster {
     /**
      * Accept a control socket request related to the cluster functions and
      * process the request.
-     * 
+     *
      * @param requestType A byte indicating the request type
      * @param in Socket input stream
      * @param outSocket output stream

@@ -28,7 +28,7 @@ public final class Search implements Runnable {
 	final static int PHASE2_ATTEMPS = 500;
 	final static int PHASE2_SOLUTIONS = 100;
 	final static int PHASE3_ATTEMPS = 50;
-	
+
 	PriorityQueue<FullCube> p1sols = new PriorityQueue<FullCube>(PHASE2_ATTEMPS, new FullCube.ValueComparator());
 
 	static int[] count = new int[1];
@@ -38,7 +38,7 @@ public final class Search implements Runnable {
 	int[] move3 = new int[20];
 	int length1 = 0;
 	int length2 = 0;
-	int maxlength2;	
+	int maxlength2;
 	boolean add1 = false;
 //	int[][] edges = new int[15][];
 //	int[][] syms = new int[15][];
@@ -49,7 +49,7 @@ public final class Search implements Runnable {
 	Center3 ct3 = new Center3();
 	Edge3 e12 = new Edge3();
 	Edge3[] tempe = new Edge3[20];
-	
+
 	cs.min2phase.Search search333 = new cs.min2phase.Search();
 
 	int valid1 = 0;
@@ -60,24 +60,24 @@ public final class Search implements Runnable {
 	int p1SolsCnt = 0;
 	FullCube[] arr2 = new FullCube[PHASE2_SOLUTIONS];
 	int arr2idx = 0;
-		
+
 
 	public Search() {
 		for (int i=0; i<20; i++) {
 			tempe[i] = new Edge3();
 		}
 	}
-	
+
 	public static String tostr(int[] moves) {
 		StringBuilder s = new StringBuilder();
 		for (int m : moves) {
 			s.append(move2str[m]).append(' ');
 		}
-		
+
 //		s.append(String.format(" (%d moves)", moves.length));
 		return s.toString();
 	}
-	
+
 	public static int[] tomove(String s) {
 		s = s.replaceAll("\\s", "");
 		int[] arr = new int[s.length()];
@@ -109,7 +109,7 @@ public final class Search implements Runnable {
 			}
 			arr[j++] = axis;
 		}
-		
+
 		int[] ret = new int[j];
 		while (--j>=0) {
 			ret[j] = arr[j];
@@ -142,7 +142,7 @@ public final class Search implements Runnable {
 //			System.out.println(String.format("%5.2f\t%f", first.totlen / 1.0 / (inf-i+1), first.tottime / (inf-i+1) / 1000000.0));
 		}
 	}
-	
+
 	static {
 		cs.min2phase.Tools.init();
 		Util.init();
@@ -150,20 +150,20 @@ public final class Search implements Runnable {
 		Center2.init();
 		Center3.init();
 	}
-	
+
 	public String randomState(Random r) {
 		calc(r);
 		return solution;
 	}
-	
+
 	public void calc(Random r) {
 	    c = new FullCube(r);
 	    run();
 	}
-	
+
 	int totlen = 0;
 	long tottime = 0;
-	
+
 	public void run() {
 		solution = "";
 		int ud = new Center1(c.getCenter(), 0).getsym();
@@ -172,15 +172,15 @@ public final class Search implements Runnable {
 		int udprun = csprun[ud >> 6];
 		int fbprun = csprun[fb >> 6];
 		int rlprun = csprun[rl >> 6];
-		
+
 		p1SolsCnt = 0;
 		arr2idx = 0;
 		p1sols.clear();
-		
+
 		long time = System.nanoTime();
 
 		for (length1=Math.min(Math.min(udprun, fbprun), rlprun); length1<100; length1++) {
-			if (rlprun <= length1 && search1(rl>>>6, rl&0x3f, length1, -1, 0) 
+			if (rlprun <= length1 && search1(rl>>>6, rl&0x3f, length1, -1, 0)
 					|| udprun <= length1 && search1(ud>>>6, ud&0x3f, length1, -1, 0)
 					|| fbprun <= length1 && search1(fb>>>6, fb&0x3f, length1, -1, 0)) {
 				break;
@@ -216,7 +216,7 @@ public final class Search implements Runnable {
 			}
 			MAX_LENGTH2++;
 		} while (length12 == 100);
-		
+
 		Arrays.sort(arr2, 0, arr2idx);
 		int length123, index = 0;
 		int solcnt = 0;
@@ -238,8 +238,8 @@ public final class Search implements Runnable {
 					int edge = e12.get();
 					int prun = Math.max(Edge3.getprunmod(edge), Edge3.getprunmod(e12.getmv_x()));
 					int lm = 20;//std3move[arr2[i].moveseq2[arr2[i].length2-1]/3*3+1];
-				
-					if (prun <= length123 - arr2[i].length1 - arr2[i].length2 
+
+					if (prun <= length123 - arr2[i].length1 - arr2[i].length2
 							&& search3(edge, ct, prun, length123 - arr2[i].length1 - arr2[i].length2, lm, 0)) {
 						solcnt++;
 	//					System.out.println(length123 + " " + solcnt);
@@ -282,7 +282,7 @@ public final class Search implements Runnable {
 
 		StringBuffer str = new StringBuffer();
 		str.append(solcube.getMoveString(true, false));
-		
+
 		synchronized (solution) {
 			solution = str.toString();
 		}
@@ -325,7 +325,7 @@ public final class Search implements Runnable {
 		}
 		return false;
 	}
-	
+
 	final boolean init2(int sym, int lm) {
 		c1.copy(c);
 		for (int i=0; i<length1; i++) {
@@ -349,7 +349,7 @@ public final class Search implements Runnable {
 			add1 = true;
 			sym = 34;
 			break;
-		case 735470 : 
+		case 735470 :
 			add1 = false;
 			sym = 0;
 		}
@@ -357,7 +357,7 @@ public final class Search implements Runnable {
 		int s2ct = ct2.getct();
 		int s2rl = ct2.getrl();
 		int ctp = ctprun[s2ct*70+s2rl];
-		
+
 		c1.value = ctp + length1;
 		c1.length1 = length1;
 		c1.add1 = add1;
@@ -368,7 +368,7 @@ public final class Search implements Runnable {
 			arr[arridx].copy(c1);
 		}
 */		p1SolsCnt++;
-	
+
 		FullCube next;
 		if (p1sols.size() < PHASE2_ATTEMPS) {
 			next = new FullCube(c1);
@@ -379,7 +379,7 @@ public final class Search implements Runnable {
 			}
 		}
 		p1sols.add(next);
-		
+
 		return p1SolsCnt == PHASE1_SOLUTIONS;
 	}
 
@@ -394,7 +394,7 @@ public final class Search implements Runnable {
 			}
 			int ctx = ctmv[ct][m];
 			int rlx = rlmv[rl][m];
-				
+
 			int prun = ctprun[ctx * 70 + rlx];
 			if (prun >= maxl) {
 				if (prun > maxl) {
@@ -424,7 +424,7 @@ public final class Search implements Runnable {
 		int ct = ct3.getct();
 		int edge = e12.get();
 		int prun = Math.max(Edge3.getprunmod(edge), Edge3.getprunmod(e12.getmv_x()));
-		
+
 		if (arr2[arr2idx] == null) {
 			arr2[arr2idx] = new FullCube(c2);
 		} else {
@@ -436,23 +436,23 @@ public final class Search implements Runnable {
 
 		return arr2idx == arr2.length;
 	}
-	
+
 	boolean search3(int edge, int ct, int prun, int maxl, int lm, int depth) {
 		if (maxl == 0) {
 			return edge==0 && ct==0;
 		}
 		tempe[depth].set(edge);
-		
+
 		if (Edge3.getprunmod(tempe[depth].getmv_x()) > maxl) {
 			return false;
 		}
-		
+
 		for (int m=0; m<17; m++) {
 			if (ckmv3[lm][m]) {
 				m = skipAxis3[m];
 				continue;
 			}
-				
+
 			int ctx = Center3.ctmove[ct][m];
 			int prun1 = Center3.prun[ctx];
 			if (prun1 >= maxl) {

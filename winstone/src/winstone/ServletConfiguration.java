@@ -25,13 +25,13 @@ import org.w3c.dom.Node;
 /**
  * This is the one that keeps a specific servlet instance's config, as well as
  * holding the instance itself.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ServletConfiguration.java,v 1.16 2007/04/23 02:55:35 rickknowles Exp $
  */
 public class ServletConfiguration implements javax.servlet.ServletConfig,
         Comparable {
-    
+
     static final String ELEM_NAME = "servlet-name";
     static final String ELEM_DISPLAY_NAME = "display-name";
     static final String ELEM_CLASS = "servlet-class";
@@ -45,7 +45,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
     static final String ELEM_SECURITY_ROLE_REF = "security-role-ref";
     static final String ELEM_ROLE_NAME = "role-name";
     static final String ELEM_ROLE_LINK = "role-link";
-    
+
     final String JSP_FILE = "org.apache.catalina.jsp_file";
 
     private String servletName;
@@ -61,7 +61,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
     private boolean isSingleThreadModel = false;
     private boolean unavailable = false;
     private Throwable unavailableException = null;
-    
+
     protected ServletConfiguration(WebAppConfiguration webAppConfig) {
         this.webAppConfig = webAppConfig;
         this.initParameters = new Hashtable();
@@ -69,7 +69,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
         this.securityRoleRefs = new Hashtable();
     }
 
-    public ServletConfiguration(WebAppConfiguration webAppConfig, String servletName, 
+    public ServletConfiguration(WebAppConfiguration webAppConfig, String servletName,
             String className, Map initParams, int loadOnStartup) {
         this(webAppConfig);
         if (initParams != null)
@@ -98,7 +98,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
             else if (nodeName.equals(ELEM_JSP_FILE))
                 this.jspFile = WebAppConfiguration.getTextFromNode(child);
             else if (nodeName.equals(ELEM_LOAD_ON_STARTUP)) {
-                String index = child.getFirstChild() == null ? "-1" : 
+                String index = child.getFirstChild() == null ? "-1" :
                     WebAppConfiguration.getTextFromNode(child);
                 this.loadOnStartup = Integer.parseInt(index);
             } else if (nodeName.equals(ELEM_INIT_PARAM)) {
@@ -149,56 +149,56 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
                 "ServletConfiguration.DeployedInstance", new String[] {
                         this.servletName, this.classFile });
     }
-    
+
     public void ensureInitialization() {
-        
+
         if (this.instance != null) {
             return; // already init'd
         }
-        
+
         synchronized (this.servletSemaphore) {
 
             if (this.instance != null) {
                 return; // already init'd
             }
-            
+
             // Check if we were decommissioned while blocking
             if (this.unavailableException != null) {
-                return; 
+                return;
             }
-            
+
             // If no instance, class load, then call init()
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(this.webAppConfig.getLoader());
-            
+
             Servlet newInstance = null;
             Throwable otherError = null;
             try {
                 Class servletClass = Class.forName(classFile, true, this.webAppConfig.getLoader());
                 newInstance = (Servlet) servletClass.newInstance();
                 this.isSingleThreadModel = Class.forName("javax.servlet.SingleThreadModel").isInstance(newInstance);
-                
+
                 // Initialise with the correct classloader
                 Logger.log(Logger.DEBUG, Launcher.RESOURCES, "ServletConfiguration.init", this.servletName);
                 newInstance.init(this);
                 this.instance = newInstance;
             } catch (ClassNotFoundException err) {
-                Logger.log(Logger.WARNING, Launcher.RESOURCES, 
+                Logger.log(Logger.WARNING, Launcher.RESOURCES,
                         "ServletConfiguration.ClassLoadError", this.classFile, err);
                 setUnavailable(newInstance);
                 this.unavailableException = err;
             } catch (IllegalAccessException err) {
-                Logger.log(Logger.WARNING, Launcher.RESOURCES, 
+                Logger.log(Logger.WARNING, Launcher.RESOURCES,
                         "ServletConfiguration.ClassLoadError", this.classFile, err);
                 setUnavailable(newInstance);
                 this.unavailableException = err;
             } catch (InstantiationException err) {
-                Logger.log(Logger.WARNING, Launcher.RESOURCES, 
+                Logger.log(Logger.WARNING, Launcher.RESOURCES,
                         "ServletConfiguration.ClassLoadError", this.classFile, err);
                 setUnavailable(newInstance);
                 this.unavailableException = err;
             } catch (ServletException err) {
-                Logger.log(Logger.WARNING, Launcher.RESOURCES, 
+                Logger.log(Logger.WARNING, Launcher.RESOURCES,
                         "ServletConfiguration.InitError", this.servletName, err);
                 this.instance = null; // so that we don't call the destroy method
                 setUnavailable(newInstance);
@@ -221,19 +221,19 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
 
     public void execute(ServletRequest request, ServletResponse response, String requestURI)
             throws ServletException, IOException {
-        
+
         ensureInitialization();
-        
+
         // If init failed, return 500 error
         if (this.unavailable) {
-//            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+//            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 //                    resources.getString("StaticResourceServlet.PathNotFound", requestURI));
             RequestDispatcher rd = this.webAppConfig.getErrorDispatcherByClass(
                     this.unavailableException);
             rd.forward(request, response);
             return;
         }
-        
+
         if (this.jspFile != null)
             request.setAttribute(JSP_FILE, this.jspFile);
 
@@ -248,10 +248,10 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
             } else
                 this.instance.service(request, response);
         } catch (UnavailableException err) {
-            // catch locally and rethrow as a new ServletException, so 
+            // catch locally and rethrow as a new ServletException, so
             // we only invalidate the throwing servlet
             setUnavailable(this.instance);
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND, 
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND,
                     Launcher.RESOURCES.getString("StaticResourceServlet.PathNotFound", requestURI));
 //            throw new ServletException(resources.getString(
 //                    "RequestDispatcher.ForwardError"), err);
@@ -259,7 +259,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
-    
+
     public int getLoadOnStartup() {
         return this.loadOnStartup;
     }
@@ -304,7 +304,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
     }
 
     protected void setUnavailable(Servlet unavailableServlet) {
-        
+
         this.unavailable = true;
         if (unavailableServlet != null) {
             Logger.log(Logger.DEBUG, Launcher.RESOURCES,
@@ -318,7 +318,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
                 this.instance = null;
             }
         }
-        
+
         // remove from webapp
         this.webAppConfig.removeServletConfigurationAndMappings(this);
     }

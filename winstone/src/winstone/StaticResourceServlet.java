@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet to handle static resources. Simply finds and sends them, or
  * dispatches to the error servlet.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: StaticResourceServlet.java,v 1.17 2004/12/31 07:21:00
  *          rickknowles Exp $
@@ -104,12 +104,12 @@ public class StaticResourceServlet extends HttpServlet {
         }
 
         // Check we are not below the web-inf
-        else if (!isInclude && !isForward && isDescendant(new File(this.webRoot, "WEB-INF"), res, this.webRoot)) 
+        else if (!isInclude && !isForward && isDescendant(new File(this.webRoot, "WEB-INF"), res, this.webRoot))
             response.sendError(HttpServletResponse.SC_NOT_FOUND, Launcher.RESOURCES
                     .getString("StaticResourceServlet.PathInvalid", path));
 
         // Check we are not below the meta-inf
-        else if (!isInclude && !isForward && isDescendant(new File(this.webRoot, "META-INF"), res, this.webRoot)) 
+        else if (!isInclude && !isForward && isDescendant(new File(this.webRoot, "META-INF"), res, this.webRoot))
             response.sendError(HttpServletResponse.SC_NOT_FOUND, Launcher.RESOURCES
                     .getString("StaticResourceServlet.PathInvalid", path));
 
@@ -170,7 +170,7 @@ public class StaticResourceServlet extends HttpServlet {
                 if (out != null) {
                     out.write(buffer, 0, read);
                 } else {
-                    outWriter.write(new String(buffer, 0, read, 
+                    outWriter.write(new String(buffer, 0, read,
                             response.getCharacterEncoding()));
                 }
                 read = resStream.read(buffer);
@@ -273,7 +273,7 @@ public class StaticResourceServlet extends HttpServlet {
 
         // Write the rows for each file
         for (int n = 0; n < children.length; n++) {
-            if (!children[n].getName().equalsIgnoreCase("web-inf") && 
+            if (!children[n].getName().equalsIgnoreCase("web-inf") &&
                     !children[n].getName().equalsIgnoreCase("meta-inf")) {
                 File file = children[n];
                 String date = noDateLabel;
@@ -295,7 +295,7 @@ public class StaticResourceServlet extends HttpServlet {
                 rowCount++;
             }
         }
-        
+
         // Build wrapper body
         String out = Launcher.RESOURCES.getString("StaticResourceServlet.DirectoryList.Body",
                 new String[] {
@@ -314,7 +314,7 @@ public class StaticResourceServlet extends HttpServlet {
         w.write(out);
         w.close();
     }
-    
+
     public static boolean isDescendant(File parent, File child, File commonBase) throws IOException {
         if (child.equals(parent)) {
             return true;
@@ -325,15 +325,15 @@ public class StaticResourceServlet extends HttpServlet {
             if (canonicalChild.startsWith(canonicalParent)) {
                 return true;
             }
-            
+
             // If canonicals don't match, we're dealing with symlinked files, so if we can
-            // build a path from the parent to the child, 
+            // build a path from the parent to the child,
             String childOCValue = constructOurCanonicalVersion(child, commonBase);
             String parentOCValue = constructOurCanonicalVersion(parent, commonBase);
             return childOCValue.startsWith(parentOCValue);
         }
     }
-    
+
     public static String constructOurCanonicalVersion(File current, File stopPoint) {
         int backOnes = 0;
         StringBuffer ourCanonicalVersion = new StringBuffer();

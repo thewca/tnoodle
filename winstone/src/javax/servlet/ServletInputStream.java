@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * Provides the base class for servlet request streams.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public abstract class ServletInputStream extends java.io.InputStream {

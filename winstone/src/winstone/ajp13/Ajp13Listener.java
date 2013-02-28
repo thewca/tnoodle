@@ -40,13 +40,13 @@ import winstone.WinstoneResponse;
 /**
  * Implements the main listener daemon thread. This is the class that gets
  * launched by the command line, and owns the server socket, etc.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Ajp13Listener.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
 public class Ajp13Listener implements Listener, Runnable {
     public final static WinstoneResourceBundle AJP_RESOURCES = new WinstoneResourceBundle("winstone.ajp13.LocalStrings");
-    
+
     private final static int LISTENER_TIMEOUT = 5000; // every 5s reset the listener socket
     private final static int DEFAULT_PORT = 8009;
     private final static int CONNECTION_TIMEOUT = 60000;
@@ -55,7 +55,7 @@ public class Ajp13Listener implements Listener, Runnable {
 //    private final static int KEEP_ALIVE_SLEEP = 50;
 //    private final static int KEEP_ALIVE_SLEEP_MAX = 500;
     private final static String TEMPORARY_URL_STASH = "winstone.ajp13.TemporaryURLAttribute";
-    
+
     private HostGroup hostGroup;
     private ObjectPool objectPool;
     private int listenPort;
@@ -141,7 +141,7 @@ public class Ajp13Listener implements Listener, Runnable {
      * Called by the request handler thread, because it needs specific setup
      * code for this connection's protocol (ie construction of request/response
      * objects, in/out streams, etc).
-     * 
+     *
      * This implementation parses incoming AJP13 packets, and builds an
      * outputstream that is capable of writing back the response in AJP13
      * packets.
@@ -225,7 +225,7 @@ public class Ajp13Listener implements Listener, Runnable {
      */
     public void deallocateRequestResponse(RequestHandlerThread handler,
             WinstoneRequest req, WinstoneResponse rsp,
-            WinstoneInputStream inData, WinstoneOutputStream outData) 
+            WinstoneInputStream inData, WinstoneOutputStream outData)
             throws IOException {
         handler.setInStream(null);
         handler.setOutStream(null);
@@ -253,7 +253,7 @@ public class Ajp13Listener implements Listener, Runnable {
      * Called by the request handler thread, because it needs specific shutdown
      * code for this connection's protocol if the keep-alive period expires (ie
      * closing sockets, etc).
-     * 
+     *
      * This implementation simply shuts down the socket and streams.
      */
     public void releaseSocket(Socket socket, InputStream inSocket,
@@ -439,7 +439,7 @@ public class Ajp13Listener implements Listener, Runnable {
 //            for (int j = 0; j < Math.min(packetLength - n, 16); j++)
 //            line = line + " " + ((packetBytes[n + j] & 0xFF) < 16 ? "0" : "") +
 //            Integer.toHexString(packetBytes[n + j] & 0xFF);
-//       
+//
 //            line = line + "    ";
 //            for (int j = 0; j < Math.min(packetLength - n, 16); j++) {
 //                byte me = (byte) (packetBytes[n + j] & 0xFF);

@@ -6,9 +6,9 @@ class Square {
 	boolean topEdgeFirst;	//true if top layer starts with edge left of seam
 	boolean botEdgeFirst;	//true if bottom layer starts with edge right of seam
 	int ml;			//shape of middle layer (+/-1, or 0 if ignored)
-	
+
 	static byte SquarePrun[] = new byte[40320 * 2];			//pruning table; #twists to solve corner|edge permutation
-	
+
 	static char TwistMove[] = new char[40320];			//transition table for twists
 	static char TopMove[] = new char[40320];			//transition table for top layer turns
 	static char BottomMove[] = new char[40320];			//transition table for bottom layer turns
@@ -50,10 +50,10 @@ class Square {
 			}
 		}
 		return idx;
-	}	
-	
+	}
+
 	static boolean inited = false;
-	
+
 	static void init() {
 		if (inited) {
 			return;
@@ -67,15 +67,15 @@ class Square {
 		}
 		byte[] pos = new byte[8];
 		byte temp;
-		
+
 		for(int i=0;i<40320;i++){
 			//twist
 			set8Perm(pos, i);
-			
+
 			temp=pos[2];pos[2]=pos[4];pos[4]=temp;
 			temp=pos[3];pos[3]=pos[5];pos[5]=temp;
 			TwistMove[i]=get8Perm(pos);
-	
+
 			//top layer turn
 			set8Perm(pos, i);
 			temp=pos[0]; pos[0]=pos[1]; pos[1]=pos[2]; pos[2]=pos[3]; pos[3]=temp;
@@ -85,8 +85,8 @@ class Square {
 			set8Perm(pos, i);
 			temp=pos[4]; pos[4]=pos[5]; pos[5]=pos[6]; pos[6]=pos[7]; pos[7]=temp;
 			BottomMove[i]=get8Perm(pos);
-		}	
-	
+		}
+
 		for (int i=0; i<40320*2; i++) {
 			SquarePrun[i] = -1;
 		}
@@ -97,7 +97,7 @@ class Square {
 			boolean inv = depth >= 11;
 			int find = inv ? -1 : depth;
 			int check = inv ? depth : -1;
-			++depth; 
+			++depth;
 			OUT:
 			for (int i=0; i<40320*2; i++) {
 				if (SquarePrun[i] == find) {
@@ -132,7 +132,7 @@ class Square {
 							if (inv) continue OUT;
 						}
 					}
-					
+
 				}
 			}
 			System.out.print(depth);
@@ -141,5 +141,5 @@ class Square {
 		}
 		inited = true;
 	}
-	
+
 }

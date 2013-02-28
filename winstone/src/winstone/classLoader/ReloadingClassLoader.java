@@ -29,7 +29,7 @@ import winstone.WinstoneResourceBundle;
  * This subclass of WinstoneClassLoader is the reloading version. It runs a
  * monitoring thread in the background that checks for updates to any files in
  * the class path.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ReloadingClassLoader.java,v 1.11 2007/02/17 01:55:12 rickknowles Exp $
  */
@@ -52,7 +52,7 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
             }
         }
     }
-    
+
     protected void addURL(URL url) {
         super.addURL(url);
         synchronized (this.loadedClasses) {
@@ -152,9 +152,9 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
                         classDateTable.put(className, classDate);
                     } else if (oldClassDate.compareTo(classDate) != 0) {
                         // Trigger reset of webAppConfig
-                        Logger.log(Logger.INFO, CL_RESOURCES, 
+                        Logger.log(Logger.INFO, CL_RESOURCES,
                                 "ReloadingClassLoader.ReloadRequired",
-                                new String[] {className, 
+                                new String[] {className,
                                         "" + new Date(classDate.longValue()),
                                         "" + new Date(oldClassDate.longValue()) });
                         this.webAppConfig.resetClassLoader();

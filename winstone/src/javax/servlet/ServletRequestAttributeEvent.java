@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * The event thrown to request attribute listeners
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ServletRequestAttributeEvent.java,v 1.2 2006/02/28 07:32:47 rickknowles Exp $
  */

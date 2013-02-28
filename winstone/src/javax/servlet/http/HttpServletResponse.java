@@ -10,7 +10,7 @@ import java.io.IOException;
 
 /**
  * Interface definition for http response objects.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface HttpServletResponse extends javax.servlet.ServletResponse {

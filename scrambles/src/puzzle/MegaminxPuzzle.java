@@ -59,7 +59,7 @@ public class MegaminxPuzzle extends Puzzle {
 	}
 	private static final int gap = 2;
 	private static final int minxRad = 30;
-	
+
 	public MegaminxPuzzle() {}
 
 	@Override
@@ -76,10 +76,10 @@ public class MegaminxPuzzle extends Puzzle {
 	protected Dimension getPreferredSize() {
 		return getImageSize(gap, minxRad, null);
 	}
-		
+
 	private static final double UNFOLDHEIGHT = 2 + 3 * Math.sin(.3 * Math.PI) + Math.sin(.1 * Math.PI);
 	private static final double UNFOLDWIDTH = 4 * Math.cos(.1 * Math.PI) + 2 * Math.cos(.3 * Math.PI);
-	
+
 	private static void turn(int[][] image, Face side, int dir) {
 		dir = Utils.modulo(dir, 5);
 		for(int i = 0; i < dir; i++) {
@@ -134,7 +134,7 @@ public class MegaminxPuzzle extends Puzzle {
 			bigTurn(image, side);
 		}
 	}
-	
+
 	private static void bigTurn(int[][] image, Face f) {
 		if(f == Face.DBR) {
 			for(int i = 0; i < 7; i++) {
@@ -262,15 +262,15 @@ public class MegaminxPuzzle extends Puzzle {
 	double c = x*Math.cos(.3*Math.PI);
 	double d = x*Math.sin(.1*Math.PI);
 	double e = x*Math.sin(.3*Math.PI);
-	
+
 	double leftCenterX = gap + a + b + d/2;
 	double leftCenterY = gap + x + minxRad - d;
-	
+
 	double f = Math.cos(.1*Math.PI);
 	double gg = Math.cos(.2*Math.PI);
 	double magicShiftNumber = d*0.6+minxRad*(f+gg);
 	double shift = leftCenterX+magicShiftNumber;
-	
+
 	public HashMap<Face, GeneralPath> getFaceBoundaries() {
 		HashMap<Face, GeneralPath> faces = new HashMap<Face, GeneralPath>();
 		faces.put(Face.U,   getPentagon(leftCenterX  , leftCenterY  , true , minxRad));
@@ -279,7 +279,7 @@ public class MegaminxPuzzle extends Puzzle {
 		faces.put(Face.R,   getPentagon(leftCenterX+b, leftCenterY+d, false, minxRad));
 		faces.put(Face.F,   getPentagon(leftCenterX  , leftCenterY+x, false, minxRad));
 		faces.put(Face.L,   getPentagon(leftCenterX-b, leftCenterY+d, false, minxRad));
-		
+
 		faces.put(Face.D,   getPentagon(shift+gap+a+b  , gap+x+minxRad  , false, minxRad));
 		faces.put(Face.DR,  getPentagon(shift+gap+a+b-c, gap+x+e+minxRad, true , minxRad));
 		faces.put(Face.DBR, getPentagon(shift+gap+a    , gap+x-d+minxRad, true , minxRad));
@@ -288,7 +288,7 @@ public class MegaminxPuzzle extends Puzzle {
 		faces.put(Face.DL,  getPentagon(shift+gap+a+b+c, gap+x+e+minxRad, true , minxRad));
 		return faces;
 	}
-	
+
 	@Override
 	public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
 		HashMap<String, GeneralPath> stringy = new HashMap<String, GeneralPath>();
@@ -298,21 +298,21 @@ public class MegaminxPuzzle extends Puzzle {
 		}
 		return stringy;
 	}
-	
+
 	@Override
 	public PuzzleState getSolvedState() {
 		return new MegaminxState();
 	}
-	
+
 	@Override
 	protected int getRandomMoveCount() {
 		return 11*7;
 	}
-	
+
 	@Override
 	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
 		StringBuilder scramble = new StringBuilder();
-		
+
 		int width = 10, height = 7;
 		for(int i = 0; i < height; i++) {
 			if(i > 0) {
@@ -332,9 +332,9 @@ public class MegaminxPuzzle extends Puzzle {
 				scramble.append("'");
 			}
 		}
-		
+
 		String scrambleStr = scramble.toString();
-		
+
 		PuzzleState state = getSolvedState();
 		try {
 			state = state.applyAlgorithm(scrambleStr);
@@ -344,7 +344,7 @@ public class MegaminxPuzzle extends Puzzle {
 		}
 		return new PuzzleStateAndGenerator(state, scrambleStr);
 	}
-	
+
 	private int centerIndex = 10;
 	private boolean isNormalized(int[][] image) {
 		return image[Face.U.ordinal()][centerIndex] == Face.U.ordinal() && image[Face.F.ordinal()][centerIndex] == Face.F.ordinal();
@@ -355,12 +355,12 @@ public class MegaminxPuzzle extends Puzzle {
 		Utils.deepCopy(image, imageCopy);
 		return imageCopy;
 	}
-	
+
 	private void spinMinx(int[][] image, Face face, int dir) {
 		turn(image, face, dir);
 		bigTurn(image, face.oppositeFace(), 5 - dir);
 	}
-	
+
 	private void spinToTop(int[][] image, Face face) {
 		switch(face) {
 		case U:
@@ -405,12 +405,12 @@ public class MegaminxPuzzle extends Puzzle {
 			break;
 		case DL:
 			spinMinx(image, Face.L, -2);
-			break;		
+			break;
 		default:
 			azzert(false);
 		}
 	}
-	
+
 	private int[][] normalize(int[][] image) {
 		if(isNormalized(image)) {
 			return image;
@@ -433,7 +433,7 @@ public class MegaminxPuzzle extends Puzzle {
 		azzert(false);
 		return null;
 	}
-	
+
 	class MegaminxState extends PuzzleState {
 		private final int[][] image, normalizedImage;
 		public MegaminxState() {
@@ -446,29 +446,29 @@ public class MegaminxPuzzle extends Puzzle {
 			azzert(isNormalized(image));
 			normalizedImage = image;
 		}
-		
+
 		public MegaminxState(int[][] image) {
 			this.image = image;
 			normalizedImage = normalize(image);
 		}
-		
+
 		@Override
 		public HashMap<String, MegaminxState> getSuccessors() {
 			HashMap<String, MegaminxState> successors = new HashMap<String, MegaminxState>();
-			
-			String[] prettyDir = new String[] { null, "", "2", "2'", "'" }; 
+
+			String[] prettyDir = new String[] { null, "", "2", "2'", "'" };
 			for(Face face : Face.values()) {
 				for(int dir = 1; dir <= 4; dir++) {
 					String move = face.toString();
 					move += prettyDir[dir];
-					
+
 					int[][] imageCopy = cloneImage(image);
 					turn(imageCopy, face, dir);
-					
+
 					successors.put(move, new MegaminxState(imageCopy));
 				}
 			}
-			
+
 			HashMap<String, Face> pochmannFaceNames = new HashMap<String, Face>();
 			pochmannFaceNames.put("R", Face.DBR);
 			pochmannFaceNames.put("D", Face.D);
@@ -476,16 +476,16 @@ public class MegaminxPuzzle extends Puzzle {
 			for(String pochmannFaceName : pochmannFaceNames.keySet()) {
 				for(int dir : new int[] { 2, 3 }) {
 					String move = pochmannFaceName + prettyPochmannDir[dir];
-					
+
 					int[][] imageCopy = cloneImage(image);
 					bigTurn(imageCopy, pochmannFaceNames.get(pochmannFaceName), dir);
-					
+
 					successors.put(move, new MegaminxState(imageCopy));
 				}
 			}
 			return successors;
 		}
-		
+
 		@Override
 		public HashMap<String, MegaminxState> getScrambleSuccessors() {
 			HashMap<String, MegaminxState> successors = getSuccessors();
@@ -511,7 +511,7 @@ public class MegaminxPuzzle extends Puzzle {
 		protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
 			drawMinx(g, gap, minxRad, colorScheme);
 		}
-		
+
 		private void drawMinx(Graphics2D g, int gap, int minxRad, HashMap<String, Color> colorScheme) {
 			HashMap<Face, GeneralPath> pentagons = getFaceBoundaries();
 			for(Face face : pentagons.keySet()) {
@@ -537,7 +537,7 @@ public class MegaminxPuzzle extends Puzzle {
 
 		private void drawPentagon(Graphics2D g, GeneralPath p, int[] state, int rotateCounterClockwise, String label, HashMap<String, Color> colorScheme) {
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			
+
 			double[] xpoints = new double[5];
 			double[] ypoints = new double[5];
 			PathIterator iter = p.getPathIterator(null);
@@ -600,7 +600,7 @@ public class MegaminxPuzzle extends Puzzle {
 				g.setColor(Color.BLACK);
 				g.draw(ps[i]);
 			}
-			
+
 			if(label != null) {
 				double centerX = 0;
 				double centerY = 0;
@@ -617,11 +617,11 @@ public class MegaminxPuzzle extends Puzzle {
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) throws InvalidMoveException, InvalidScrambleException {
 		MegaminxPuzzle megaminx = new MegaminxPuzzle();
 		PuzzleState solved = megaminx.getSolvedState();
-		
+
 		String spinL = "R++ L2'";
 		String spinU = "D++ U2'";
 		PuzzleState state = solved.applyAlgorithm(spinL).applyAlgorithm(spinU).applyAlgorithm(spinU).applyAlgorithm(spinL).applyAlgorithm(spinL).applyAlgorithm(spinL);

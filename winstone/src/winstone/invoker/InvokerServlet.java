@@ -27,7 +27,7 @@ import winstone.WinstoneResourceBundle;
 /**
  * If a URI matches a servlet class name, mount an instance of that servlet, and
  * try to process the request using that servlet.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: InvokerServlet.java,v 1.6 2006/03/24 17:24:24 rickknowles Exp $
  */
@@ -35,7 +35,7 @@ public class InvokerServlet extends HttpServlet {
 //    private static final String FORWARD_PATH_INFO = "javax.servlet.forward.path_info";
     private static final String INCLUDE_PATH_INFO = "javax.servlet.include.path_info";
 
-    private static final WinstoneResourceBundle INVOKER_RESOURCES = 
+    private static final WinstoneResourceBundle INVOKER_RESOURCES =
         new WinstoneResourceBundle("winstone.invoker.LocalStrings");
     private Map mountedInstances;
 //    private String prefix;
@@ -85,7 +85,7 @@ public class InvokerServlet extends HttpServlet {
             try {
                 // Class servletClass = Class.forName(servletName, true,
                 // Thread.currentThread().getContextClassLoader());
-                sc = new ServletConfiguration((WebAppConfiguration) this.getServletContext(), 
+                sc = new ServletConfiguration((WebAppConfiguration) this.getServletContext(),
                         getServletConfig().getServletName() + ":" + servletName, servletName,
                         new Hashtable(), -1);
                 this.mountedInstances.put(servletName, sc);
@@ -94,7 +94,7 @@ public class InvokerServlet extends HttpServlet {
                                 servletName,
                                 getServletConfig().getServletName() });
                 // just to trigger the servlet.init()
-                sc.ensureInitialization(); 
+                sc.ensureInitialization();
             } catch (Throwable err) {
                 sc = null;
             }
@@ -128,7 +128,7 @@ public class InvokerServlet extends HttpServlet {
                             servletName));
         } else {
             RequestDispatcher rd = new RequestDispatcher(
-                    (WebAppConfiguration) getServletContext(), 
+                    (WebAppConfiguration) getServletContext(),
                     invokedServlet);
             rd.setForNamedDispatcher(new Mapping[0], new Mapping[0]);
             rd.forward(req, rsp);

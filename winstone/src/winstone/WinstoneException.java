@@ -13,7 +13,7 @@ import java.io.PrintWriter;
  * Master exception within the servlet container. This is thrown whenever a
  * non-recoverable error occurs that we want to throw to the top of the
  * application.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneException.java,v 1.1 2004/03/08 15:27:21 rickknowles
  *          Exp $
@@ -23,7 +23,7 @@ public class WinstoneException extends RuntimeException {
 
     /**
      * Create an exception with a useful message for the system administrator.
-     * 
+     *
      * @param pMsg
      *            Error message for to be used for administrative
      *            troubleshooting
@@ -35,7 +35,7 @@ public class WinstoneException extends RuntimeException {
     /**
      * Create an exception with a useful message for the system administrator
      * and a nested throwable object.
-     * 
+     *
      * @param pMsg
      *            Error message for administrative troubleshooting
      * @param pError
@@ -48,7 +48,7 @@ public class WinstoneException extends RuntimeException {
 
     /**
      * Get the nested error or exception
-     * 
+     *
      * @return The nested error or exception
      */
     public Throwable getNestedError() {
@@ -57,7 +57,7 @@ public class WinstoneException extends RuntimeException {
 
     /**
      * Set the nested error or exception
-     * 
+     *
      * @param pError
      *            The nested error or exception
      */

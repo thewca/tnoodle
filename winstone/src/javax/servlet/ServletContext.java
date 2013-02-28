@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * Models the web application concept as an interface.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface ServletContext {
@@ -50,7 +50,7 @@ public interface ServletContext {
     public Set getResourcePaths(String path);
 
     public String getContextPath();
-    
+
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */

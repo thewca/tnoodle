@@ -2,7 +2,7 @@ package cs.sq12phase;
 
 
 public class Search {
-	
+
 	int[] move = new int[100];
 	FullCube c = null;
 	FullCube d = new FullCube("");
@@ -23,10 +23,10 @@ public class Search {
 		Shape.init();
 		Square.init();
 	}
-	
+
 	public static void main(String[] args) {
 		long t = System.nanoTime();
-		
+
 //		FullCube f;// = new FullCube("");
 //		System.out.println(f.getParity());
 //		System.out.println(f.getShapeIdx());
@@ -39,7 +39,7 @@ public class Search {
 
 		t = System.nanoTime();
 		for (int x=0; x<1000; x++) {
-		
+
 	//		System.out.println(m);
 	//		System.out.println(Integer.toBinaryString(Shape.ShapeIdx[shape>>1]));
 	//		System.out.println(Integer.toBinaryString(Shape.ShapeIdx[f.getShapeIdx()>>1]));
@@ -53,7 +53,7 @@ public class Search {
 		}
 
 	}
-	
+
 	public String solution(FullCube c) {
 		this.c = c;
 		sol_string = null;
@@ -66,13 +66,13 @@ public class Search {
 		}
 		return sol_string;
 	}
-	
+
 	boolean phase1(int shape, int prunvalue, int maxl, int depth, int lm) {
 
 		if (prunvalue==0 && maxl<4) {
 			return maxl==0 && init2();
 		}
-		
+
 		//try each possible move. First twist;
 		if (lm != 0) {
 			int shapex = Shape.TwistMove[shape];
@@ -81,7 +81,7 @@ public class Search {
 				move[depth] = 0;
 				if (phase1(shapex, prunx, maxl-1, depth+1, 0)) {
 					return true;
-				}				
+				}
 			}
 		}
 
@@ -107,7 +107,7 @@ public class Search {
 				}
 			}
 		}
-		
+
 		shapex = shape;
 		//Try bottom layer
 		if(lm <= 1){
@@ -133,11 +133,11 @@ public class Search {
 
 		return false;
 	}
-	
+
 	int count = 0;
 	Square sq = new Square();
-	
-	
+
+
 	boolean init2() {
 //		System.out.print(count++);
 //		System.out.print('\r');
@@ -156,7 +156,7 @@ public class Search {
 		int ml = sq.ml;
 //		int shp = sq.topEdgeFirst ? 0 : 1;
 //		shp |= sq.botEdgeFirst ? 0 : 2;
-		
+
 		int prun = Math.max(Square.SquarePrun[sq.edgeperm<<1|ml], Square.SquarePrun[sq.cornperm<<1|ml]);
 
 		for (int i=prun; i<maxlen2; i++) {
@@ -183,9 +183,9 @@ public class Search {
 
 		return false;
 	}
-	
+
 	int pruncomb[] = new int[100];
-	
+
 	String move2string(int len) {
 		//TODO whether to invert the solution or not should be set by params.
 		StringBuffer s = new StringBuffer();
@@ -219,7 +219,7 @@ public class Search {
 			assert edge==0 && corner==0 && ml==0;
 			return true;
 		}
-		
+
 		//try each possible move. First twist;
 		if(lm!=0 && topEdgeFirst == botEdgeFirst) {
 			int edgex = Square.TwistMove[edge];

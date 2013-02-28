@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
 
 /**
  * Generic utility functions for use in the servlet container.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class HttpUtils {

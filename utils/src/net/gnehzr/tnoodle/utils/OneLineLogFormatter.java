@@ -4,7 +4,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 public class OneLineLogFormatter extends Formatter {
-	
+
 	@Override
 	public String format(LogRecord record) {
 		StringBuffer buf = new StringBuffer(1000);

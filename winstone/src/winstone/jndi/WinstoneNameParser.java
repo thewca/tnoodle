@@ -15,7 +15,7 @@ import javax.naming.NamingException;
 
 /**
  * The name parser for winstone jndi names
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneNameParser.java,v 1.2 2006/02/28 07:32:48 rickknowles Exp $
  */

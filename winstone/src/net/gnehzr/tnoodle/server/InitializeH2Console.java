@@ -26,14 +26,14 @@ public class InitializeH2Console extends HttpServlet {
 		//  private static final String[] GENERIC = { ...
 		// field in org.h2.server.web.WebServer
 		// Shamelessly copied from http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection?answertab=votes#tab-top
-		
+
 		Class<?> webServer = Class.forName("org.h2.server.web.WebServer");
-		
+
 		Field genericField = webServer.getDeclaredField("GENERIC");
 		Field modifiersField = Field.class.getDeclaredField("modifiers");
 		modifiersField.setAccessible(true);
 		modifiersField.setInt(genericField, genericField.getModifiers() & ~Modifier.FINAL);
-		
+
 		genericField.setAccessible(true);
 		genericField.set(null, new String[] { "TNoodle H2 Database|javax.naming.InitialContext|java:comp/env/jdbc/connPool|root" });
 	}

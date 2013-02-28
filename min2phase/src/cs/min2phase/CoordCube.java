@@ -13,7 +13,7 @@ class CoordCube {
 	//XMove = Move Table
 	//XPrun = Pruning Table
 	//XConj = Conjugate Table
-	
+
 	//phase1
 	static char[][] UDSliceMove = new char[N_SLICE][N_MOVES];
 	static char[][] TwistMove = new char[N_TWIST_SYM][N_MOVES];
@@ -58,7 +58,7 @@ class CoordCube {
 				int udslice = UDSliceMove[i][j];
 				for (int k=1; k<3; k++) {
 					int cx = UDSliceMove[udslice & 0x1ff][j];
-					udslice = Util.permMult[udslice>>>9][cx>>>9]<<9|cx&0x1ff;	
+					udslice = Util.permMult[udslice>>>9][cx>>>9]<<9|cx&0x1ff;
 					UDSliceMove[i][j+k] = (char)(udslice);
 				}
 			}
@@ -194,10 +194,10 @@ class CoordCube {
 //			System.out.println(String.format("%2d%10d", depth, done));
 		}
 	}
-	
-	static void initRawSymPrun(int[] PrunTable, final int INV_DEPTH, 
+
+	static void initRawSymPrun(int[] PrunTable, final int INV_DEPTH,
 			final char[][] RawMove, final char[][] RawConj,
-			final char[][] SymMove, final char[] SymState, 
+			final char[][] SymMove, final char[] SymState,
 			final byte[] SymSwitch, final int[] moveMap, final int SYM_SHIFT) {
 
 		final int SYM_MASK = (1 << SYM_SHIFT) - 1;
@@ -258,37 +258,37 @@ class CoordCube {
 			}
 //			System.out.println(String.format("%2d%10d", depth, done));
 		}
-	
+
 	}
 
-	static void initSliceTwistPrun() {	
-		initRawSymPrun(UDSliceTwistPrun, 6, 
+	static void initSliceTwistPrun() {
+		initRawSymPrun(UDSliceTwistPrun, 6,
 			UDSliceMove, UDSliceConj,
-			TwistMove, CubieCube.SymStateTwist, 
+			TwistMove, CubieCube.SymStateTwist,
 			null, null, 3
 		);
 	}
 
 	static void initSliceFlipPrun() {
-		initRawSymPrun(UDSliceFlipPrun, 6, 
+		initRawSymPrun(UDSliceFlipPrun, 6,
 			UDSliceMove, UDSliceConj,
-			FlipMove, CubieCube.SymStateFlip, 
+			FlipMove, CubieCube.SymStateFlip,
 			null, null, 3
 		);
 	}
 
 	static void initMEPermPrun() {
-		initRawSymPrun(MEPermPrun, 7, 
+		initRawSymPrun(MEPermPrun, 7,
 			MPermMove, MPermConj,
-			EPermMove, CubieCube.SymStatePerm, 
+			EPermMove, CubieCube.SymStatePerm,
 			null, null, 4
 		);
 	}
 
 	static void initMCPermPrun() {
-		initRawSymPrun(MCPermPrun, 10, 
+		initRawSymPrun(MCPermPrun, 10,
 			MPermMove, MPermConj,
-			CPermMove, CubieCube.SymStatePerm, 
+			CPermMove, CubieCube.SymStatePerm,
 			CubieCube.e2c, Util.ud2std, 4
 		);
 	}

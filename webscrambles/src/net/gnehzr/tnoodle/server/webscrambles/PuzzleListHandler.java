@@ -32,7 +32,7 @@ public class PuzzleListHandler extends SafeHttpServlet {
 	private final String puzzleInfosJSON;
 	public PuzzleListHandler() throws BadClassDescriptionException, IOException {
 		SortedMap<String, LazyInstantiator<Puzzle>> scramblers = Puzzle.getScramblers();
-		
+
 		ArrayList<Map<String, Object>> puzzleInfos_ = new ArrayList<Map<String, Object>>(scramblers.size());
 		HashMap<String, Map<String, Object>> puzzleInfoByShortName_ = new HashMap<String, Map<String, Object>>(scramblers.size());
 		for(Entry<String, LazyInstantiator<Puzzle>> scrambler : scramblers.entrySet()) {
@@ -62,7 +62,7 @@ public class PuzzleListHandler extends SafeHttpServlet {
 		}
 		return info;
 	}
-	
+
 	@Override
 	protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws BadClassDescriptionException, IOException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
 		boolean includeStatus = query.get("includeStatus") != null;

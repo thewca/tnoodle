@@ -11,7 +11,7 @@ import java.io.PrintStream;
 
 /**
  * Generic servlet exception
- * 
+ *
  * @author Rick Knowles
  */
 public class ServletException extends java.lang.Exception {

@@ -24,7 +24,7 @@ import org.w3c.dom.Node;
 
 /**
  * Corresponds to a filter object in the web app. Holds one instance only.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class FilterConfiguration implements javax.servlet.FilterConfig {
@@ -35,7 +35,7 @@ public class FilterConfiguration implements javax.servlet.FilterConfig {
     final String ELEM_INIT_PARAM = "init-param";
     final String ELEM_INIT_PARAM_NAME = "param-name";
     final String ELEM_INIT_PARAM_VALUE = "param-value";
-    
+
     private String filterName;
     private String classFile;
     private Filter instance;
@@ -186,8 +186,8 @@ public class FilterConfiguration implements javax.servlet.FilterConfig {
             this.instance = null;
         }
     }
-    
-    public void execute(ServletRequest request, ServletResponse response, FilterChain chain) 
+
+    public void execute(ServletRequest request, ServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(this.loader);

@@ -15,7 +15,7 @@ import java.net.SocketException;
 /**
  * Interface that defines the necessary methods for being a connection listener
  * within winstone.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface Listener {
@@ -24,7 +24,7 @@ public interface Listener {
      * once the so timeout has passed.
      */
     public void destroy();
-    
+
     /**
      * After the listener is loaded and initialized, this starts the thread
      */
@@ -33,8 +33,8 @@ public interface Listener {
     /**
      * Called by the request handler thread, because it needs specific setup
      * code for this connection's protocol (ie construction of request/response
-     * objects, in/out streams, etc). The iAmFirst variable identifies whether or 
-     * not this is the initial request on on this socket (ie a keep alive or 
+     * objects, in/out streams, etc). The iAmFirst variable identifies whether or
+     * not this is the initial request on on this socket (ie a keep alive or
      * a first-time accept)
      */
     public void allocateRequestResponse(Socket socket, InputStream inSocket,
@@ -54,8 +54,8 @@ public interface Listener {
     /**
      * Called by the request handler thread, because it needs specific shutdown
      * code for this connection's protocol if the keep-alive period expires (ie
-     * closing sockets, etc).The iAmFirst variable identifies whether or 
-     * not this is the initial request on on this socket (ie a keep alive or 
+     * closing sockets, etc).The iAmFirst variable identifies whether or
+     * not this is the initial request on on this socket (ie a keep alive or
      * a first-time accept)
      */
     public String parseURI(RequestHandlerThread handler, WinstoneRequest req,

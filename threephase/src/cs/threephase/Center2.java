@@ -19,19 +19,19 @@ class Center2 {
 	int[] rl = new int[8];
 	int[] ct = new int[16];
 	int parity = 0;
-	
+
 	static int[][] rlmv = new int[70][28];
 	static char[][] ctmv = new char[6435][28];
 	static int[][] rlrot = new int[70][16];
 	static int[][] ctrot = new int[6435][16];
 	static byte[] ctprun = new byte[6435*35*2];
-	
-	private static int[] pmv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 
+
+	private static int[] pmv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
 						0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0};
-		
+
 	static void init() {
 		Center2 c = new Center2();
-		
+
 		for (int i=0; i<35*2; i++) {
 			for (int m=0; m<28; m++) {
 				c.setrl(i);
@@ -39,7 +39,7 @@ class Center2 {
 				rlmv[i][m] = c.getrl();
 			}
 		}
-		
+
 		for (int i=0; i<70; i++) {
 			c.setrl(i);
 			for (int j=0; j<16; j++) {
@@ -49,7 +49,7 @@ class Center2 {
 				if (j%8==7) c.rot(2);
 			}
 		}
-	
+
 		for (int i=0; i<6435; i++) {
 			c.setct(i);
 			for (int j=0; j<16; j++) {
@@ -59,7 +59,7 @@ class Center2 {
 				if (j%8==7) c.rot(2);
 			}
 		}
-	
+
 		for (int i=0; i<6435; i++) {
 			for (int m=0; m<28; m++) {
 				c.setct(i);
@@ -92,11 +92,11 @@ class Center2 {
 //			System.out.println(String.format("%2d%10d", depth, done));
 		}
 	}
-	
+
 	Center2() {
-	
+
 	}
-	
+
 	Center2(CenterCube c) {
 		this();
 		for (int i=0; i<16; i++) {
@@ -106,7 +106,7 @@ class Center2 {
 			rl[i] = c.ct[i+16];
 		}
 	}
-	
+
 	void set(CenterCube c, int edgeParity) {
 		for (int i=0; i<16; i++) {
 			ct[i] = c.ct[i] / 2;
@@ -127,7 +127,7 @@ class Center2 {
 		}
 		return idx * 2 + parity;
 	}
-	
+
 	void setrl(int idx) {
 		parity = idx & 1;
 		idx >>>= 1;
@@ -153,7 +153,7 @@ class Center2 {
 		}
 		return idx;
 	}
-	
+
 	void setct(int idx) {
 		int r = 8;
 		ct[15] = 0;
@@ -165,8 +165,8 @@ class Center2 {
 				ct[i] = 0;
 			}
 		}
-	}	
-	
+	}
+
 	void rot(int r) {
 		switch (r) {
 			case 0:
@@ -185,10 +185,10 @@ class Center2 {
 				swap(rl, 0, 3, 5, 6, 1);
 				swap(rl, 1, 2, 4, 7, 1);
 				break;
-		}	
+		}
 	}
 
-	
+
 	void move(int m) {
 		parity ^= pmv[m];
 		int key = m % 3;
@@ -237,7 +237,7 @@ class Center2 {
 				swap(ct, 0, 8, 4, 14, key);
 				swap(ct, 3, 11, 7, 13, key);
 				break;
-			case 11:	//b		
+			case 11:	//b
 				swap(ct, 12, 13, 14, 15, key);
 				swap(rl, 1, 4, 7, 2, key);
 				swap(ct, 1, 0, 7, 6, key);

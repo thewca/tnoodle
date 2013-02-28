@@ -14,7 +14,7 @@ class Util {
 	static final byte FL = 9;
 	static final byte BL = 10;
 	static final byte BR = 11;
-	
+
 	//Corners
 	static final byte URF = 0;
 	static final byte UFL = 1;
@@ -44,7 +44,7 @@ class Util {
 	static final byte Bx1 = 15;
 	static final byte Bx2 = 16;
 	static final byte Bx3 = 17;
-	
+
 	//Facelets
 	static final byte U1 = 0;
 	static final byte U2 = 1;
@@ -100,7 +100,7 @@ class Util {
 	static final byte B7 = 51;
 	static final byte B8 = 52;
 	static final byte B9 = 53;
-	
+
 	//Colors
 	static final byte U = 0;
 	static final byte R = 1;
@@ -108,7 +108,7 @@ class Util {
 	static final byte D = 3;
 	static final byte L = 4;
 	static final byte B = 5;
-	
+
 	static final byte[][] cornerFacelet = { { U9, R1, F3 }, { U7, F1, L3 }, { U1, L1, B3 }, { U3, B1, R3 },
 			{ D3, F9, R7 }, { D1, L9, F7 }, { D7, B9, L7 }, { D9, R9, B7 } };
 	static final byte[][] edgeFacelet = { { U6, R2 }, { U8, F2 }, { U4, L2 }, { U2, B2 }, { D6, R8 }, { D2, F8 },
@@ -117,11 +117,11 @@ class Util {
 	static int[][] Cnk = new int[12][12];
 	static int[] fact = new int[13];
 	static int[][] permMult = new int[24][24];
-	static String[] move2str = {"U", "U2", "U'", "R", "R2", "R'", "F", "F2", "F'", 
+	static String[] move2str = {"U", "U2", "U'", "R", "R2", "R'", "F", "F2", "F'",
 								"D", "D2", "D'", "L", "L2", "L'", "B", "B2", "B'"};
 	static int[] ud2std = {Ux1, Ux2, Ux3, Rx2, Fx2, Dx1, Dx2, Dx3, Lx2, Bx2};
 	static int[] std2ud = new int[18];
-	
+
 	static boolean[][] ckmv2 = new boolean[11][10];
 
 
@@ -189,7 +189,7 @@ class Util {
 		}
 		return new String(f);
 	}
-	
+
 	static int binarySearch(char[] arr, int key) {
 		int length = arr.length;
 		if (key <= arr[length-1]) {
@@ -209,7 +209,7 @@ class Util {
 		}
 		return 0xffff;
 	}
-	
+
 	static int getNParity(int idx, int n) {
 		int p = 0;
 		for (int i=n-2; i>=0; i--) {
@@ -218,7 +218,7 @@ class Util {
 		}
 		return p & 1;
 	}
-	
+
 	static void set8Perm(byte[] arr, int idx) {
 		int val = 0x76543210;
 		for (int i=0; i<7; i++) {
@@ -268,7 +268,7 @@ class Util {
 		}
 		return idx;
 	}
-	
+
 	static int getComb(byte[] arr, int mask) {
 		int idxC = 0, idxP = 0, r = 4, val = 0x123;
 		for (int i=11; i>=0; i--) {
@@ -303,7 +303,7 @@ class Util {
 			}
 		}
 	}
-	
+
 	static {
 		for (int i=0; i<10; i++) {
 			std2ud[ud2std[i]] = i;

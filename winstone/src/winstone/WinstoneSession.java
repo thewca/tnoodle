@@ -37,7 +37,7 @@ import javax.servlet.http.HttpSessionListener;
 
 /**
  * Http session implementation for Winstone.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneSession.java,v 1.10 2006/08/27 07:19:47 rickknowles Exp $
  */
@@ -75,7 +75,7 @@ public class WinstoneSession implements HttpSession, Serializable {
         this.webAppConfig = webAppConfig;
         this.distributable = webAppConfig.isDistributable();
     }
-    
+
     public void sendCreatedNotifies() {
         // Notify session listeners of new session
         for (int n = 0; n < this.sessionListeners.length; n++) {
@@ -107,19 +107,19 @@ public class WinstoneSession implements HttpSession, Serializable {
     public void setIsNew(boolean isNew) {
         this.isNew = isNew;
     }
-    
+
     public void addUsed(WinstoneRequest request) {
         this.requestsUsingMe.add(request);
     }
-    
+
     public void removeUsed(WinstoneRequest request) {
         this.requestsUsingMe.remove(request);
     }
-    
+
     public boolean isUnusedByRequests() {
         return this.requestsUsingMe.isEmpty();
     }
-    
+
     public boolean isExpired() {
         // check if it's expired yet
         long nowDate = System.currentTimeMillis();
@@ -198,7 +198,7 @@ public class WinstoneSession implements HttpSession, Serializable {
                         new HttpSessionBindingEvent(this, name, oldValue));
                 Thread.currentThread().setContextClassLoader(cl);
             }
-                
+
         else
             for (int n = 0; n < this.sessionAttributeListeners.length; n++) {
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -206,7 +206,7 @@ public class WinstoneSession implements HttpSession, Serializable {
                 this.sessionAttributeListeners[n].attributeAdded(
                         new HttpSessionBindingEvent(this, name, value));
                 Thread.currentThread().setContextClassLoader(cl);
-                
+
             }
     }
 
@@ -337,7 +337,7 @@ public class WinstoneSession implements HttpSession, Serializable {
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
-    
+
     /**
      * Save this session to the temp dir defined for this webapp
      */
@@ -352,7 +352,7 @@ public class WinstoneSession implements HttpSession, Serializable {
                 objOut = new ObjectOutputStream(out);
                 objOut.writeObject(this);
             } catch (IOException err) {
-                Logger.log(Logger.ERROR, Launcher.RESOURCES, 
+                Logger.log(Logger.ERROR, Launcher.RESOURCES,
                         "WinstoneSession.ErrorSavingSession", err);
             } finally {
                 if (objOut != null) {
@@ -364,7 +364,7 @@ public class WinstoneSession implements HttpSession, Serializable {
             }
         }
     }
-    
+
     public static File getSessionTempDir(WebAppConfiguration webAppConfig) {
         File tmpDir = (File) webAppConfig.getAttribute("javax.servlet.context.tempdir");
         File sessionsDir = new File(tmpDir, "WEB-INF" + File.separator + "winstoneSessions");
@@ -373,7 +373,7 @@ public class WinstoneSession implements HttpSession, Serializable {
         }
         return sessionsDir;
     }
-    
+
     public static void loadSessions(WebAppConfiguration webAppConfig) {
         int expiredCount = 0;
         // Iterate through the files in the dir, instantiate and then add to the sessions set
@@ -394,11 +394,11 @@ public class WinstoneSession implements HttpSession, Serializable {
                         expiredCount++;
                     } else {
                         webAppConfig.addSession(session.getId(), session);
-                        Logger.log(Logger.DEBUG, Launcher.RESOURCES, 
+                        Logger.log(Logger.DEBUG, Launcher.RESOURCES,
                                 "WinstoneSession.RestoredSession", session.getId());
                     }
                 } catch (Throwable err) {
-                    Logger.log(Logger.ERROR, Launcher.RESOURCES, 
+                    Logger.log(Logger.ERROR, Launcher.RESOURCES,
                             "WinstoneSession.ErrorLoadingSession", err);
                 } finally {
                     if (objIn != null) {
@@ -420,7 +420,7 @@ public class WinstoneSession implements HttpSession, Serializable {
     /**
      * Serialization implementation. This makes sure to only serialize the parts
      * we want to send to another server.
-     * 
+     *
      * @param out
      *            The stream to write the contents to
      * @throws IOException
@@ -456,7 +456,7 @@ public class WinstoneSession implements HttpSession, Serializable {
 
     /**
      * Deserialization implementation
-     * 
+     *
      * @param in
      *            The source of stream data
      * @throws IOException

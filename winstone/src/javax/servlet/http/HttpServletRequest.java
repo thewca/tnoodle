@@ -11,7 +11,7 @@ import java.security.Principal;
 
 /**
  * Interface definition for http requests.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface HttpServletRequest extends javax.servlet.ServletRequest {

@@ -29,13 +29,13 @@ import winstone.jndi.resourceFactories.WinstoneDataSource;
 
 /**
  * Implements a simple web.xml + command line arguments style jndi manager
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ContainerJNDIManager.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
 public class ContainerJNDIManager implements JNDIManager {
     public static final WinstoneResourceBundle JNDI_RESOURCES = new WinstoneResourceBundle("winstone.jndi.LocalStrings");
-    
+
     protected Map objectsToCreate;
 
     /**
@@ -46,7 +46,7 @@ public class ContainerJNDIManager implements JNDIManager {
     public ContainerJNDIManager(Map args, List webXmlNodes, ClassLoader loader) {
         // Build all the objects we wanted
         this.objectsToCreate = new HashMap();
-        
+
         Collection keys = new ArrayList(args != null ? args.keySet() : (Collection) new ArrayList());
         for (Iterator i = keys.iterator(); i.hasNext();) {
             String key = (String) i.next();
@@ -71,7 +71,7 @@ public class ContainerJNDIManager implements JNDIManager {
      * specified
      */
     public void setup() {
-        
+
         try {
             InitialContext ic = new InitialContext();
             for (Iterator i = this.objectsToCreate.keySet().iterator(); i.hasNext();) {
@@ -99,7 +99,7 @@ public class ContainerJNDIManager implements JNDIManager {
                                     name, err);
                 }
             }
-            Logger.log(Logger.DEBUG, JNDI_RESOURCES, 
+            Logger.log(Logger.DEBUG, JNDI_RESOURCES,
                     "ContainerJNDIManager.SetupComplete", "" + this.objectsToCreate.size());
         } catch (NamingException err) {
             Logger.log(Logger.ERROR, JNDI_RESOURCES,
@@ -130,7 +130,7 @@ public class ContainerJNDIManager implements JNDIManager {
                 Logger.log(Logger.FULL_DEBUG, JNDI_RESOURCES,
                         "ContainerJNDIManager.UnboundResource", name);
             }
-            Logger.log(Logger.DEBUG, JNDI_RESOURCES, 
+            Logger.log(Logger.DEBUG, JNDI_RESOURCES,
                     "ContainerJNDIManager.TeardownComplete", "" + this.objectsToCreate.size());
         } catch (NamingException err) {
             Logger.log(Logger.ERROR, JNDI_RESOURCES,
@@ -143,14 +143,14 @@ public class ContainerJNDIManager implements JNDIManager {
      */
     protected Object createObject(String name, String className, String value,
             Map args, ClassLoader loader) {
-        
+
         if ((className == null) || (name == null))
             return null;
-        
+
         // Set context class loader
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(loader);
-        
+
         try {
             // If we are working with a datasource
             if (className.equals("javax.sql.DataSource")) {
@@ -192,16 +192,16 @@ public class ContainerJNDIManager implements JNDIManager {
                                     name, className }, err);
                 }
             }
-                
+
             return null;
-            
+
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
 
     /**
-     * Rips the parameters relevant to a particular resource from the command args 
+     * Rips the parameters relevant to a particular resource from the command args
      */
     private Properties extractRelevantArgs(Map input, String name) {
         Properties relevantArgs = new Properties();

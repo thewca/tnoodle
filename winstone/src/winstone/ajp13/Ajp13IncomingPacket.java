@@ -18,9 +18,9 @@ import winstone.WinstoneException;
 
 /**
  * Models a single incoming ajp13 packet.
- * 
+ *
  * Fixes by Cory Osborn 2007/4/3 - IIS related. Thanks
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Ajp13IncomingPacket.java,v 1.6 2007/04/03 01:23:19 rickknowles Exp $
  */
@@ -49,7 +49,7 @@ public class Ajp13IncomingPacket {
     /**
      * Constructor
      */
-    public Ajp13IncomingPacket(InputStream in, 
+    public Ajp13IncomingPacket(InputStream in,
             RequestHandlerThread handler) throws IOException {
         // Get the incoming packet flag
         byte headerBuffer[] = new byte[4];
@@ -127,7 +127,7 @@ public class Ajp13IncomingPacket {
         position += 2;
         this.remoteHost = (remoteHostLength > -1)
                 ? readString(position, packetBytes, encoding, remoteHostLength)
-                : null;    
+                : null;
         position += remoteHostLength + 1;
         Logger.log(Logger.FULL_DEBUG, Ajp13Listener.AJP_RESOURCES,
                 "Ajp13IncomingPacket.RemoteHost", remoteHost);
@@ -273,7 +273,7 @@ public class Ajp13IncomingPacket {
      */
     private String readString(int position, byte packet[], String encoding,
             int length) throws UnsupportedEncodingException {
-//        System.out.println("Reading string length: " + length + 
+//        System.out.println("Reading string length: " + length +
 //                " position=" + position + " packetLength=" + packet.length);
         return length == 0 ? ""
                 : new String(packet, position, length, encoding);

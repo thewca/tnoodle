@@ -8,7 +8,7 @@ package javax.servlet.http;
 
 /**
  * Shared session context interface - deprecated
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @deprecated
  */

@@ -31,7 +31,7 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 		mixer = parseInt("mixer", -1);
 		stackmatValue = parseInt("stackmatValue", -1);
 	}
-	
+
 	private String getString(String param, String def) {
 		String val = null;
 		try {
@@ -39,7 +39,7 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 		} catch(Exception e) {}
 		return val;
 	}
-	
+
 	private int parseInt(String param, int def) {
 		try {
 			return Integer.parseInt(getParameter(param));
@@ -47,7 +47,7 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 			return def;
 		}
 	}
-	
+
 	@Override
 	public void start() {
 		try {
@@ -65,13 +65,13 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 			jso.call(errorCallback, new Object[] { "Line unavailable" });
 		}
 	}
-	
+
 	@Override
 	public void stop() {
 		if(stackmat != null)
 			stackmat.cancel(true);
 	}
-	
+
 	//TODO - check for stackmat == null in all of the following methods?
 	public void setStackmatValue(int value) {
 		stackmat.setStackmatValue(value);
@@ -92,7 +92,7 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 	public boolean isOn() {
 		return stackmat.isOn();
 	}
-	
+
 	public void paint(Graphics g) {
 		if(state != null) {
 			g.drawString(""+state.centis + " " + state.running, 10, 20);
@@ -108,14 +108,14 @@ public class StackApplet extends Applet implements PropertyChangeListener {
 		if(evt.getNewValue() instanceof StackmatState)
 			state = (StackmatState) evt.getNewValue();
 		repaint();
-		
+
 		if(jso != null) {
 			try {
 				jso.call(updateCallback, new Object[] { state });
 			} catch(JSException e) {} //this is if the method doesn't exist
 		}
 	}
-	
+
 //	public static void main(String[] args) {
 //		final StackApplet a = new StackApplet();
 //		a.init();

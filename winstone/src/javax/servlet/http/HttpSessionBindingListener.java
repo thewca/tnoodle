@@ -8,7 +8,7 @@ package javax.servlet.http;
 
 /**
  * Listener interface for listeners to the session binding events
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface HttpSessionBindingListener extends java.util.EventListener {

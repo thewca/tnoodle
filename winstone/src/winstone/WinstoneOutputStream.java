@@ -16,7 +16,7 @@ import javax.servlet.http.Cookie;
 
 /**
  * Matches the socket output stream to the servlet output.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneOutputStream.java,v 1.19 2007/10/14 14:48:14 rickknowles Exp $
  */
@@ -34,7 +34,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
     protected boolean disregardMode = false;
     protected boolean closed = false;
     protected Stack includeByteStreams;
-    
+
     /**
      * Constructor
      */
@@ -74,11 +74,11 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
     public int getBytesCommitted() {
         return this.bytesCommitted;
     }
-    
+
     public void setDisregardMode(boolean disregard) {
         this.disregardMode = disregard;
     }
-    
+
     public void setClosed(boolean closed) {
         this.closed = closed;
     }
@@ -88,7 +88,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
             return;
         }
         String contentLengthHeader = this.owner.getHeader(WinstoneResponse.CONTENT_LENGTH_HEADER);
-        if ((contentLengthHeader != null) && 
+        if ((contentLengthHeader != null) &&
                 (this.bytesCommitted >= Integer.parseInt(contentLengthHeader))) {
             return;
         }
@@ -98,8 +98,8 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         // if (this.headersWritten)
         if (this.bufferPosition >= this.bufferSize) {
             commit();
-        } else if ((contentLengthHeader != null) && 
-                ((this.bufferPosition + this.bytesCommitted) 
+        } else if ((contentLengthHeader != null) &&
+                ((this.bufferPosition + this.bytesCommitted)
                         >= Integer.parseInt(contentLengthHeader))) {
             commit();
         }
@@ -114,10 +114,10 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
             this.committed = true;
 
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneOutputStream.CommittingOutputStream");
-            
+
             int statusCode = this.owner.getStatus();
             String reason = Launcher.RESOURCES.getString("WinstoneOutputStream.reasonPhrase." + statusCode);
-            String statusLine = this.owner.getProtocol() + " " + statusCode + " " + 
+            String statusLine = this.owner.getProtocol() + " " + statusCode + " " +
                     (reason == null ? "No reason" : reason);
             this.outStream.write(statusLine.getBytes("8859_1"));
             this.outStream.write(CR_LF);
@@ -163,7 +163,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         this.outStream.flush();
 
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                "WinstoneOutputStream.CommittedBytes", 
+                "WinstoneOutputStream.CommittedBytes",
                 "" + (this.bytesCommitted + commitLength));
 
         this.bytesCommitted += commitLength;
@@ -213,7 +213,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
     public boolean isIncluding() {
         return (this.includeByteStreams != null && !this.includeByteStreams.isEmpty());
     }
-    
+
     public void startIncludeBuffer() {
         synchronized (this.buffer) {
             if (this.includeByteStreams == null) {
@@ -222,7 +222,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         }
         this.includeByteStreams.push(new ByteArrayOutputStream());
     }
-    
+
     public void finishIncludeBuffer() throws IOException {
         if (isIncluding()) {
             ByteArrayOutputStream body = (ByteArrayOutputStream) this.includeByteStreams.pop();
@@ -237,7 +237,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
             body.close();
         }
     }
-    
+
     public void clearIncludeStackForForward() throws IOException {
         if (isIncluding()) {
             for (Iterator i = this.includeByteStreams.iterator(); i.hasNext(); ) {

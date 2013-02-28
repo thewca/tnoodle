@@ -28,14 +28,14 @@ import winstone.WinstoneResourceBundle;
  * Base class for managers of authentication within Winstone. This class also
  * acts as a factory, loading the appropriate subclass for the requested auth
  * type.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: BaseAuthenticationHandler.java,v 1.6 2006/02/28 07:32:47 rickknowles Exp $
  */
 public abstract class BaseAuthenticationHandler implements
         AuthenticationHandler {
     static final String ELEM_REALM_NAME = "realm-name";
-    
+
     protected SecurityConstraint constraints[];
     protected AuthenticationRealm realm;
     protected String realmName;
@@ -69,7 +69,7 @@ public abstract class BaseAuthenticationHandler implements
      * Evaluates any authentication constraints, intercepting if auth is
      * required. The relevant authentication handler subclass's logic is used to
      * actually authenticate.
-     * 
+     *
      * @return A boolean indicating whether to continue after this request
      */
     public boolean processAuthentication(ServletRequest inRequest,
@@ -90,7 +90,7 @@ public abstract class BaseAuthenticationHandler implements
     }
 
     protected boolean doRoleCheck(HttpServletRequest request,
-            HttpServletResponse response, String pathRequested) 
+            HttpServletResponse response, String pathRequested)
             throws IOException, ServletException {
         // Loop through constraints
         boolean foundApplicable = false;
@@ -110,8 +110,8 @@ public abstract class BaseAuthenticationHandler implements
                     Logger.log(Logger.DEBUG, AUTH_RESOURCES,
                             "BaseAuthenticationHandler.ConstraintNeedsSSL",
                             this.constraints[n].getName());
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, 
-                            AUTH_RESOURCES.getString("BaseAuthenticationHandler.ConstraintNeedsSSL", 
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                            AUTH_RESOURCES.getString("BaseAuthenticationHandler.ConstraintNeedsSSL",
                                     this.constraints[n].getName()));
                     return false;
                 }
@@ -127,12 +127,12 @@ public abstract class BaseAuthenticationHandler implements
                 }
             }
         }
-        
+
         // If we made it this far without a check being run, there must be none applicable
         Logger.log(Logger.FULL_DEBUG, AUTH_RESOURCES, "BaseAuthenticationHandler.PassedAuthCheck");
         return true;
     }
-    
+
     protected void setNoCache(HttpServletResponse response) {
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "No-cache");

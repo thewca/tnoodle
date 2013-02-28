@@ -19,16 +19,16 @@ import winstone.WinstoneResourceBundle;
  * is different to the standard JDK model in that it delegates *after* checking
  * local repositories. This has the effect of isolating copies of classes that exist
  * in 2 webapps from each other.
- * 
- * Thanks to James Berry for the changes to use the system classloader to prevent 
- * loading servlet spec or system classpath classes again.  
- * 
+ *
+ * Thanks to James Berry for the changes to use the system classloader to prevent
+ * loading servlet spec or system classpath classes again.
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WebappClassLoader.java,v 1.3 2007/12/29 03:32:54 rickknowles Exp $
  */
 public class WebappClassLoader extends URLClassLoader {
     private static final WinstoneResourceBundle CL_RESOURCES = new WinstoneResourceBundle("winstone.classLoader.LocalStrings");
-    
+
     protected ClassLoader system = getSystemClassLoader();
 
     public WebappClassLoader(URL[] urls) {
@@ -38,7 +38,7 @@ public class WebappClassLoader extends URLClassLoader {
     public WebappClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
     }
-    
+
     public WebappClassLoader(URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
         super(urls, parent, factory);
     }
@@ -46,7 +46,7 @@ public class WebappClassLoader extends URLClassLoader {
     protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
         // First, check if the class has already been loaded
         Class c = findLoadedClass(name);
-        
+
         // Try the system loader first, to ensure that system classes are not
         // overridden by webapps. Note that this includes any classes in winstone,
         // including the javax.servlet classes
@@ -60,7 +60,7 @@ public class WebappClassLoader extends URLClassLoader {
                 c = null;
             }
         }
-        
+
         // If an allowed class, load it locally first
         if (c == null) {
             try {
@@ -73,7 +73,7 @@ public class WebappClassLoader extends URLClassLoader {
                 c = null;
             }
         }
-        
+
         // otherwise, and only if we have a parent, delegate to our parent
         // Note that within winstone, the only difference between this and the system
         // class loader we've already tried is that our parent might include the common/shared lib.
@@ -89,7 +89,7 @@ public class WebappClassLoader extends URLClassLoader {
                 throw new ClassNotFoundException(name);
             }
         }
-        
+
         if (resolve && (c != null)) {
             resolveClass(c);
         }

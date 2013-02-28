@@ -24,12 +24,12 @@ public class TNoodleWinstoneLauncher extends Launcher {
 	private TNoodleWinstoneLauncher(Map<?, ?> args) throws IOException {
 		super(args);
 	}
-	
+
 	public static TNoodleWinstoneLauncher create(Map<?, ?> args, ServerSocket ss) throws IOException {
 		AggressiveHttpListener.ss = ss;
 		return new TNoodleWinstoneLauncher(args);
 	}
-	
+
 	@Override
 	protected void spawnListener(String listenerClassName) {
 		if(listenerClassName == Launcher.HTTP_LISTENER_CLASS) {
@@ -37,5 +37,5 @@ public class TNoodleWinstoneLauncher extends Launcher {
 		}
 		super.spawnListener(listenerClassName);
 	}
-	
+
 }

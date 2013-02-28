@@ -19,7 +19,7 @@ import javax.servlet.ServletResponse;
 
 /**
  * Base class for http servlets
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public abstract class HttpServlet extends javax.servlet.GenericServlet

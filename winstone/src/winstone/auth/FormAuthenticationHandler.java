@@ -30,7 +30,7 @@ import winstone.WinstoneRequest;
  * Handles FORM based authentication configurations. Fairly simple ... it just
  * redirects any unauthorized requests to the login page, and any bad logins to
  * the error page. The auth values are stored in the session in a special slot.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: FormAuthenticationHandler.java,v 1.7 2006/12/13 14:07:43 rickknowles Exp $
  */
@@ -43,13 +43,13 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
     private static final String FORM_PASS = "j_password";
     private static final String AUTHENTICATED_USER = "winstone.auth.FormAuthenticationHandler.AUTHENTICATED_USER";
     private static final String CACHED_REQUEST = "winstone.auth.FormAuthenticationHandler.CACHED_REQUEST";
-    
+
     private String loginPage;
     private String errorPage;
 
     /**
      * Constructor for the FORM authenticator
-     * 
+     *
      * @param realm
      *            The realm against which we are authenticating
      * @param constraints
@@ -86,7 +86,7 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
      * Evaluates any authentication constraints, intercepting if auth is
      * required. The relevant authentication handler subclass's logic is used to
      * actually authenticate.
-     * 
+     *
      * @return A boolean indicating whether to continue after this request
      */
     public boolean processAuthentication(ServletRequest request,
@@ -125,7 +125,7 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
 
     /**
      * Check the response - is it a response to the login page ?
-     * 
+     *
      * @return A boolean indicating whether to continue with the request or not
      */
     protected boolean validatePossibleAuthenticationResponse(
@@ -152,7 +152,7 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
                 while (wrapperCheck instanceof HttpServletRequestWrapper) {
                     wrapperCheck = ((HttpServletRequestWrapper) wrapperCheck).getRequest();
                 }
-                
+
                 // Get the stashed request
                 WinstoneRequest actualRequest = null;
                 if (wrapperCheck instanceof WinstoneRequest) {
@@ -165,19 +165,19 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
                 }
                 HttpSession session = request.getSession(true);
                 String previousLocation = this.loginPage;
-                RetryRequestParams cachedRequest = (RetryRequestParams) 
+                RetryRequestParams cachedRequest = (RetryRequestParams)
                         session.getAttribute(CACHED_REQUEST);
                 if ((cachedRequest != null) && (actualRequest != null)) {
                     // Repopulate this request from the params we saved
                     request = new RetryRequestWrapper(request, cachedRequest);
-                    previousLocation = 
-                        (request.getServletPath() == null ? "" : request.getServletPath()) + 
+                    previousLocation =
+                        (request.getServletPath() == null ? "" : request.getServletPath()) +
                         (request.getPathInfo() == null ? "" : request.getPathInfo());
                 } else {
                     Logger.log(Logger.DEBUG, AUTH_RESOURCES,
                             "FormAuthenticationHandler.NoCachedRequest");
                 }
-                
+
                 // do role check, since we don't know that this user has permission
                 if (doRoleCheck(request, response, previousLocation)) {
                     principal.setAuthType(HttpServletRequest.FORM_AUTH);
@@ -198,7 +198,7 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
             WinstoneRequest actualRequest = null;
             if (request instanceof WinstoneRequest) {
                 actualRequest = (WinstoneRequest) request;
-            } else if (request instanceof HttpServletRequestWrapper) { 
+            } else if (request instanceof HttpServletRequestWrapper) {
                 HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
                 if (wrapper.getRequest() instanceof WinstoneRequest) {
                     actualRequest = (WinstoneRequest) wrapper.getRequest();
@@ -215,8 +215,8 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
 
             HttpSession session = actualRequest.getSession(false);
             if (session != null) {
-                AuthenticationPrincipal authenticatedUser = (AuthenticationPrincipal) 
-                        session.getAttribute(AUTHENTICATED_USER); 
+                AuthenticationPrincipal authenticatedUser = (AuthenticationPrincipal)
+                        session.getAttribute(AUTHENTICATED_USER);
                 if (authenticatedUser != null) {
                     actualRequest.setRemoteUser(authenticatedUser);
                     Logger.log(Logger.FULL_DEBUG, AUTH_RESOURCES,

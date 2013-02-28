@@ -32,7 +32,7 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
 			l.log(Level.SEVERE, "", t);
 		}
 	}
-	
+
 	private void safeInit() throws IOException, SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, NamingException {
 		StringBuilder schema;
 		String dataStructurePath = getServletContext().getRealPath("cubecomps/DATA-STRUCTURE.md");
@@ -40,15 +40,15 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		Utils.fullyReadInputStream(dataStructureInputStream, baos);
 		schema = new StringBuilder(baos.toString());
-		
-		final String SCHEMA_START = "<pre><code>"; 
+
+		final String SCHEMA_START = "<pre><code>";
 		final String SCHEMA_END = "</code></pre>";
-		
+
 		int schemaStartIndex = schema.indexOf(SCHEMA_START) + SCHEMA_START.length();
 		int schemaEndIndex = schema.indexOf(SCHEMA_END, schemaStartIndex);
 		schema.replace(schemaEndIndex, schema.length(), "");
 		schema.replace(0, schemaStartIndex, "");
-		
+
 		// Remove trailing CREATE TABLE options that h2 doesn't support, like:
 		//  ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 AUTO_INCREMENT=6
 		Pattern p = Pattern.compile("\\).*ENGINE=.*");
@@ -63,7 +63,7 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
 		try {
 			InitialContext jdniContext = new InitialContext();
 			DataSource ds = (DataSource) jdniContext.lookup("java:comp/env/jdbc/connPool");
-			
+
 			conn = ds.getConnection();
 			conn.setAutoCommit(false);
 			Statement stmt = conn.createStatement();
@@ -79,5 +79,5 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 }

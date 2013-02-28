@@ -13,7 +13,7 @@ import java.io.InputStream;
 
 /**
  * The request stream management class.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneInputStream.java,v 1.4 2006/02/28 07:32:47 rickknowles Exp $
  */
@@ -23,7 +23,7 @@ public class WinstoneInputStream extends javax.servlet.ServletInputStream {
     private Integer contentLength;
     private int readSoFar;
     private ByteArrayOutputStream dump;
-    
+
     /**
      * Constructor
      */

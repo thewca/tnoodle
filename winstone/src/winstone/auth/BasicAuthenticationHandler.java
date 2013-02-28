@@ -23,7 +23,7 @@ import winstone.WinstoneRequest;
 
 /**
  * Handles HTTP basic authentication.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: BasicAuthenticationHandler.java,v 1.5 2007/04/11 13:14:26 rickknowles Exp $
  */
@@ -58,7 +58,7 @@ public class BasicAuthenticationHandler extends BaseAuthenticationHandler {
         String authorization = request.getHeader("Authorization");
         if ((authorization != null)
                 && authorization.toLowerCase().startsWith("basic")) {
-            
+
             char[] inBytes = authorization.substring(5).trim().toCharArray();
             byte[] outBytes = new byte[(int) (inBytes.length * 0.75f)]; // always mod 4 = 0
             int length = decodeBase64(inBytes, outBytes, 0, inBytes.length, 0);
@@ -96,7 +96,7 @@ public class BasicAuthenticationHandler extends BaseAuthenticationHandler {
     /**
      * Decodes a byte array from base64
      */
-    public static int decodeBase64(char[] input, byte[] output, 
+    public static int decodeBase64(char[] input, byte[] output,
             int inOffset, int inLength, int outOffset) {
         if (inLength == 0) {
             return 0;
@@ -106,7 +106,7 @@ public class BasicAuthenticationHandler extends BaseAuthenticationHandler {
         for (int inIndex = inOffset; inIndex < inLength; ) {
             // Decode four bytes
             int thisPassInBytes = Math.min(inLength - inIndex, 4);
-            while ((thisPassInBytes > 1) && 
+            while ((thisPassInBytes > 1) &&
                     (input[inIndex + thisPassInBytes - 1] == '=')) {
                 thisPassInBytes--;
             }
@@ -137,7 +137,7 @@ public class BasicAuthenticationHandler extends BaseAuthenticationHandler {
         }
         return outIndex;
     }
-    
+
     private static byte B64_DECODE_ARRAY[] = new byte[] { -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,

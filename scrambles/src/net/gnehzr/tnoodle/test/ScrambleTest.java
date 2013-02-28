@@ -27,12 +27,12 @@ import static net.gnehzr.tnoodle.utils.Utils.azzert;
 import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
 
 public class ScrambleTest {
-	
+
 	static class LockHolder extends Thread {
 		public LockHolder() {
 			setDaemon(true);
 		}
-		
+
 		private Object o;
 		public void setObjectToLock(Object o) {
 			synchronized(this) {
@@ -64,7 +64,7 @@ public class ScrambleTest {
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 
 		System.out.println("Testing names.");
@@ -90,13 +90,13 @@ public class ScrambleTest {
 		Random r = new Random();
 
 		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
-		
+
 		for(String puzzle : lazyScramblers.keySet()) {
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
 			final Puzzle scrambler = lazyScrambler.cachedInstance();
-			
+
 			System.out.println("Testing " + puzzle);
-		
+
 			for(int count = 0; count < SCRAMBLE_COUNT; count++){
 				System.out.print("Scramble with:");
 				PuzzleState state = scrambler.getSolvedState();
@@ -123,32 +123,32 @@ public class ScrambleTest {
 		boolean drawScramble = true;
 
 		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
-		
+
 		for(String puzzle : lazyScramblers.keySet()) {
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
 			final Puzzle scrambler = lazyScrambler.cachedInstance();
-			
+
 			System.out.println("Testing " + puzzle);
-			
+
 			// It's easy to get this wrong (read about Arrays.hashCode vs Arrays.deepHashCode).
 			// This is just a sanity check.
 			Utils.azzert(scrambler.getSolvedState().hashCode() == scrambler.getSolvedState().hashCode());
-			
+
 			// Generating a scramble
 			System.out.println("Generating a " + puzzle + " scramble");
 			String scramble;
 			lh.setObjectToLock(scrambler);
 			scramble = scrambler.generateScramble();
-			
+
 			// Drawing that scramble
 			System.out.println("Drawing " + scramble);
 			BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 			Dimension size = new Dimension(image.getWidth(), image.getHeight());
 			scrambler.drawScramble(image.createGraphics(), size, scramble, null);
-			
+
 			// Scramblers should support "null" as the empty scramble
 			scrambler.drawScramble(image.createGraphics(), size, null, null);
-			
+
 			System.out.println("Generating & drawing 2 sets of " + SCRAMBLE_COUNT + " scrambles simultaneously." +
 								" This is meant to shake out threading problems in scramblers.");
 			final ScrambleCacher c1 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble);
@@ -176,7 +176,7 @@ public class ScrambleTest {
 					}
 				}
 			}
-		
+
 		}
 		lh.setObjectToLock(null);
 		System.out.println("Test passed!");
@@ -184,17 +184,17 @@ public class ScrambleTest {
 
 	private static void testNames() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
-		
+
 		// Check that the names by which the scramblers refer to themselves
 		// is the same as the names by which we refer to them in the plugin definitions file.
 		for(String shortName : lazyScramblers.keySet()) {
 			String longName = Puzzle.getScramblerLongName(shortName);
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
 			Puzzle scrambler = lazyScrambler.cachedInstance();
-			
+
 			System.out.println(shortName + " ==? " + scrambler.getShortName());
 			Utils.azzert(shortName.equals(scrambler.getShortName()));
-			
+
 			System.out.println(longName + " ==? " + scrambler.getLongName());
 			Utils.azzert(longName.equals(scrambler.getLongName()));
 		}
@@ -205,39 +205,39 @@ public class ScrambleTest {
 		testTwosConverter();
 		testTwosSolver();
 	}
-	
+
 	private static void testMisc() throws InvalidScrambleException, InvalidMoveException {
 		CubePuzzle fours = new CubePuzzle(4);
 		CubeState solved = fours.getSolvedState();
-		
+
 		CubeState state = (CubeState) solved.applyAlgorithm("Rw Lw'");
 		azzert(state.equals(solved));
-		
+
 		state = (CubeState) solved.applyAlgorithm("Uw Dw'");
 		azzert(state.equals(solved));
-		
+
 		CubePuzzle threes = new CubePuzzle(3);
-		
+
 		AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MungingMode.MUNGE_REDUNDANT_MOVES);
 		ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
 		azzert(ab3.toString().equals("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'"));
 	}
-	
+
 	private static void testTwosConverter() throws InvalidMoveException {
 		int orient = 0;
 		int permute = 0;
-		
+
 		int MOVE_R = 3;
 		orient = TwoByTwoSolver.moveOrient[orient][MOVE_R];
 		permute = TwoByTwoSolver.movePerm[permute][MOVE_R];
-		
+
 		CubePuzzle twos = new CubePuzzle(2);
 		CubeState state = (CubeState) twos.getSolvedState().apply("R");
 		TwoByTwoState twoByTwoState = state.toTwoByTwoState();
 
 		azzertEquals(twoByTwoState.orientation, orient);
 		azzertEquals(twoByTwoState.permutation, permute);
-		
+
 		TwoByTwoSolver twoByTwoSolver = new TwoByTwoSolver();
 		azzert(twoByTwoSolver.solveIn(twoByTwoState, 1).equals("R'"));
 
@@ -254,7 +254,7 @@ public class ScrambleTest {
 		String solution = state.solveIn(0);
 		System.out.println(solution);
 		azzert(solution.equals(""));
-		
+
 		String scrambleString = "R2 B2 F2";
 		try {
 			state = (CubeState) state.applyAlgorithm(scrambleString);

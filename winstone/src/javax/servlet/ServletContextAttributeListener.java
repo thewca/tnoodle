@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * Listens for changes to the context attributes.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface ServletContextAttributeListener extends

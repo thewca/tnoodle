@@ -27,7 +27,7 @@ import winstone.Logger;
 
 /**
  * The main jndi context implementation class.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneContext.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
@@ -35,7 +35,7 @@ public class WinstoneContext implements Context {
     static final String PREFIX = "java:";
     static final String FIRST_CHILD = "comp";
     static final String BODGED_PREFIX = "java:comp";
-    
+
     private Hashtable environment;
     private Hashtable bindings;
     private final static NameParser nameParser = new WinstoneNameParser();
@@ -77,7 +77,7 @@ public class WinstoneContext implements Context {
         this.myAbsoluteName = absoluteName;
         this.contextLock = contextLock;
         this.bindings = bindings;
-        Logger.log(Logger.FULL_DEBUG, ContainerJNDIManager.JNDI_RESOURCES, 
+        Logger.log(Logger.FULL_DEBUG, ContainerJNDIManager.JNDI_RESOURCES,
                 "WinstoneContext.Copied", this.myAbsoluteName);
     }
 

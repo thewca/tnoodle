@@ -236,7 +236,7 @@ public class TwoByTwoSolver {
 			}
 		}
 	}
-	
+
 	static {
 		initMoves();
 		initPrun();
@@ -298,7 +298,7 @@ public class TwoByTwoSolver {
 	public static class TwoByTwoState {
 		public int permutation, orientation;
 	}
-	
+
 	/**
 	 * Generate a random 2x2 position.
 	 * @param r         random int generator
@@ -309,7 +309,7 @@ public class TwoByTwoSolver {
 		state.orientation = r.nextInt(N_ORIENT);
 		return state;
 	}
-	
+
 	/**
 	 * Solve a given position in less than or equal to length number of turns.
 	 * Returns either the solution or the generator (inverse solution)
@@ -320,7 +320,7 @@ public class TwoByTwoSolver {
 	public String solveIn(TwoByTwoState state, int length) {
 		return solve(state, length, false, false);
 	}
-	
+
 	/**
 	 * Return a generator of a given position in exactly length number of turns or not at all.
 	 * Returns either the solution or the generator (inverse solution)
@@ -332,7 +332,7 @@ public class TwoByTwoSolver {
 	public String generateExactly(TwoByTwoState state, int length) {
 		return solve(state, length, true, true);
 	}
-	
+
 	private String solve(TwoByTwoState state, int desiredLength, boolean exactLength, boolean inverse) {
 		int[] solution = new int[MAX_LENGTH];
 		int[] best_solution = new int[MAX_LENGTH+1];
@@ -346,11 +346,11 @@ public class TwoByTwoSolver {
 			}
 			length++;
 		}
-		
+
 		if(!foundSolution) {
 			return null;
 		}
-		
+
 		if(length == 0) {
 			return "";
 		}

@@ -16,43 +16,43 @@ import java.util.Set;
 
 /**
  * Manages the references to individual hosts within the container. This object handles
- * the mapping of ip addresses and hostnames to groups of webapps, and init and 
+ * the mapping of ip addresses and hostnames to groups of webapps, and init and
  * shutdown of any hosts it manages.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HostGroup.java,v 1.4 2006/03/24 17:24:21 rickknowles Exp $
  */
 public class HostGroup {
-    
+
     private final static String DEFAULT_HOSTNAME = "default";
-    
+
 //    private Map args;
     private Map hostConfigs;
     private String defaultHostName;
-    
+
     public HostGroup(Cluster cluster,
-            ObjectPool objectPool, ClassLoader commonLibCL, 
+            ObjectPool objectPool, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args) throws IOException {
 //        this.args = args;
         this.hostConfigs = new Hashtable();
-        
+
         // Is this the single or multiple configuration ? Check args
         String hostDirName = (String) args.get("hostsDir");
         String webappsDirName = (String) args.get("webappsDir");
 
         // If host mode
         if (hostDirName == null) {
-            initHost(webappsDirName, DEFAULT_HOSTNAME, cluster, objectPool, commonLibCL, 
+            initHost(webappsDirName, DEFAULT_HOSTNAME, cluster, objectPool, commonLibCL,
                     commonLibCLPaths, args);
             this.defaultHostName = DEFAULT_HOSTNAME;
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete", 
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
                     new String[] {this.hostConfigs.size() + "", this.hostConfigs.keySet() + ""});
         }
         // Otherwise multi-webapp mode
         else {
-            initMultiHostDir(hostDirName, cluster, objectPool, commonLibCL, 
+            initMultiHostDir(hostDirName, cluster, objectPool, commonLibCL,
                     commonLibCLPaths, args);
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitMultiComplete", 
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitMultiComplete",
                     new String[] {this.hostConfigs.size() + "", this.hostConfigs.keySet() + ""});
         }
     }
@@ -66,7 +66,7 @@ public class HostGroup {
         }
         return (HostConfiguration) this.hostConfigs.get(this.defaultHostName);
     }
-    
+
     public void destroy() {
         Set hostnames = new HashSet(this.hostConfigs.keySet());
         for (Iterator i = hostnames.iterator(); i.hasNext(); ) {
@@ -77,18 +77,18 @@ public class HostGroup {
         }
         this.hostConfigs.clear();
     }
-    
-    protected void initHost(String webappsDirName, String hostname, Cluster cluster, 
-            ObjectPool objectPool, ClassLoader commonLibCL, 
+
+    protected void initHost(String webappsDirName, String hostname, Cluster cluster,
+            ObjectPool objectPool, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
-        HostConfiguration config = new HostConfiguration(hostname, cluster, objectPool, commonLibCL, 
+        HostConfiguration config = new HostConfiguration(hostname, cluster, objectPool, commonLibCL,
                 commonLibCLPaths, args, webappsDirName);
         this.hostConfigs.put(hostname, config);
     }
-    
+
     protected void initMultiHostDir(String hostsDirName, Cluster cluster,
-            ObjectPool objectPool, ClassLoader commonLibCL, 
+            ObjectPool objectPool, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args) throws IOException {
         if (hostsDirName == null) {
             hostsDirName = "hosts";
@@ -109,7 +109,7 @@ public class HostGroup {
                 // Mount directories as host dirs
                 if (children[n].isDirectory()) {
                     if (!this.hostConfigs.containsKey(childName)) {
-                        initHost(children[n].getCanonicalPath(), childName, cluster, 
+                        initHost(children[n].getCanonicalPath(), childName, cluster,
                                 objectPool, commonLibCL, commonLibCLPaths, args);
                     }
                 }

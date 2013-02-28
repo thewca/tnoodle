@@ -41,27 +41,27 @@ import winstone.TNoodleWinstoneLauncher;
 
 public class TNoodleServer {
 	private static final Logger l = Logger.getLogger(TNoodleServer.class.getName());
-	
+
 	public static String NAME = Utils.getProjectName();
 	public static String VERSION = Utils.getVersion();
-	
+
 	private static final int MIN_HEAP_SIZE_MEGS = 512;
 
 	private static final String ICONS_FOLDER = "icons";
 	private static final String ICON_WRAPPER = "tnoodle_logo_1024_gray.png";
 	private static final String ICON_WORKER = "tnoodle_logo_1024.png";
-	
+
 	private static final String DB_NAME = "tnoodledb";
 	private static final String DB_USERNAME = "root";
 	private static final String DB_PASSWORD = "password";
-	
+
 	public TNoodleServer(int httpPort, boolean bindAggressively, boolean browse) throws IOException, ClassNotFoundException, NamingException {
 		 // at startup
 		Map<String, String> serverArgs = new HashMap<String, String>();
 		serverArgs.put("webappsDir", Utils.getWebappsDir().getAbsolutePath());
 		serverArgs.put("httpPort", "" + httpPort);
 		serverArgs.put("ajp13Port", "-1");
-		
+
 		String dbDriver = "org.h2.Driver";
 		boolean initializeDb;
 		try {
@@ -80,18 +80,18 @@ public class TNoodleServer {
 			serverArgs.put("jndi.param.jdbc/connPool.username", DB_USERNAME);
 			serverArgs.put("jndi.param.jdbc/connPool.password", DB_PASSWORD);
 		}
-		
+
 		// By default, winstone looks in ./lib, which I don't like, as it means
 		// we'll behave differently when run from different directories.
 		serverArgs.put("commonLibFolder", "");
-		
+
 		ServerSocket ss = aggressivelyBindSocket(httpPort, bindAggressively);
 		Utils.azzert(ss != null);
-		
+
 		final Logger winstoneLogger = Logger.getLogger(winstone.Logger.class.getName());
         winstone.Logger.init(winstone.Logger.MAX, new OutputStream() {
         	private StringBuilder msg = new StringBuilder();
-        	
+
 			@Override
 			public void write(int b) throws IOException {
 				char ch = (char) b;
@@ -107,7 +107,7 @@ public class TNoodleServer {
 		TNoodleWinstoneLauncher.create(serverArgs, ss);
 
 		System.out.println(NAME + "-" + VERSION + " started");
-		
+
 		ArrayList<String> hostnames = new ArrayList<String>();
 		try {
 			hostnames.add(InetAddress.getLocalHost().getHostAddress());
@@ -132,7 +132,7 @@ public class TNoodleServer {
 
 				// TODO - maybe it would make sense to open this url asap, that
 				//        way the user's browser starts parsing tnt even as the server
-				//        is starting up. The only problem with this is that we'd open 
+				//        is starting up. The only problem with this is that we'd open
 				//	      the browser even if the server fails to start.
 				if(browse) {
 					if(Desktop.isDesktopSupported()) {
@@ -154,10 +154,10 @@ public class TNoodleServer {
 			}
 		}
 	}
-	
+
 	private ServerSocket aggressivelyBindSocket(int port, boolean bindAggressively) throws IOException {
 		ServerSocket server = null;
-		
+
 		final int MAX_TRIES = 10;
 		for(int i = 0; i < MAX_TRIES && server == null; i++) {
 			if(i > 0) {
@@ -200,18 +200,18 @@ public class TNoodleServer {
 		return server;
 	}
 
-	
+
 	// Preferred way to detect OSX according to https://developer.apple.com/library/mac/#technotes/tn2002/tn2110.html
 	public static boolean isOSX() {
 		String osName = System.getProperty("os.name");
 		return osName.contains("OS X");
 	}
-	
+
 	/*
 	 * Sets the dock icon in OSX. Could be made to have uses in other operating systems.
 	 */
 	private static void setApplicationIcon() {
-		// Let's wrap everything in a big try-catch, just in case OS-specific stuff goes wonky. 
+		// Let's wrap everything in a big try-catch, just in case OS-specific stuff goes wonky.
 		try {
 			// Find out which icon to use.
 			final Launcher.PROCESS_TYPE processType = Launcher.getProcessType();
@@ -222,9 +222,9 @@ public class TNoodleServer {
 					break;
 				default:
 					iconFileName = ICON_WRAPPER;
-					break;	
+					break;
 			}
-			
+
 			// Get the file name of the icon.
 			final String fullFileName = Utils.getResourceDirectory() + "/" + ICONS_FOLDER + "/" + iconFileName;
 			final Image image = new ImageIcon(fullFileName).getImage();
@@ -246,7 +246,7 @@ public class TNoodleServer {
 		setApplicationIcon();
 		Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
 		setApplicationIcon();
-		
+
 		OptionParser parser = new OptionParser();
 		OptionSpec<Integer> httpPortOpt = parser.
 			acceptsAll(Arrays.asList("p", "http"), "The port to run the http server on").
@@ -302,5 +302,5 @@ public class TNoodleServer {
 		parser.printHelpOn(System.out);
 		System.exit(1); // non zero exit status
 	}
-	
+
 }

@@ -35,7 +35,7 @@ import winstone.WinstoneResourceBundle;
  */
 public class FileRealm implements AuthenticationRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
-    
+
     final String FILE_NAME_ARGUMENT = "fileRealm.configFile";
     final String DEFAULT_FILE_NAME = "users.xml";
     final String ELEM_USER = "user";

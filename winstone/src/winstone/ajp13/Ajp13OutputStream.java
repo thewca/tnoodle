@@ -23,7 +23,7 @@ import winstone.WinstoneOutputStream;
 /**
  * Extends the winstone output stream, so that the ajp13 protocol requirements
  * can be fulfilled.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Ajp13OutputStream.java,v 1.7 2007/05/05 00:52:50 rickknowles Exp $
  */

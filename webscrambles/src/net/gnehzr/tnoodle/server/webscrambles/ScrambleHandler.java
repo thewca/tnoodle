@@ -19,7 +19,7 @@ import com.itextpdf.text.DocumentException;
 public class ScrambleHandler extends SafeHttpServlet {
 
 	public ScrambleHandler() {}
-	
+
 	protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws IOException, InvalidScrambleRequestException, DocumentException, ZipException {
         if(path.length == 0) {
         	response.sendError(404);
@@ -30,7 +30,7 @@ public class ScrambleHandler extends SafeHttpServlet {
 			String seed = query.remove("seed");
 			boolean showIndices = query.remove("showIndices") != null;
 			query.remove("callback");
-			
+
 			String globalTitle, ext;
 			int lastDot = path[0].lastIndexOf(".");
 			if(lastDot < 0) {
@@ -38,7 +38,7 @@ public class ScrambleHandler extends SafeHttpServlet {
 			}
 			globalTitle = path[0].substring(0, lastDot);
 			ext = path[0].substring(lastDot+1);
-			
+
 			// Chrome seems to be caching scramble requests. These headers unfortunately
 			// don't seem to prevent that behavior.
 			response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
@@ -46,10 +46,10 @@ public class ScrambleHandler extends SafeHttpServlet {
 
 			if(ext == null || ext.equals("txt")) {
 				// Note that we parse the scramble requests *after* checking the extension.
-				// This way, someone who makes a request for "/scramble/foo.bar" will get a warning about 
+				// This way, someone who makes a request for "/scramble/foo.bar" will get a warning about
 				// the ".bar" extension, rather than incorrect scramble requests.
 				ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-				
+
 				StringBuilder sb = new StringBuilder();
 				for(ScrambleRequest scrambleRequest : scrambleRequests) {
 					for(int j = 0; j < scrambleRequest.copies; j++) {

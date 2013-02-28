@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Implements the principal method - basically just a way of identifying an
  * authenticated user.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: AuthenticationPrincipal.java,v 1.2 2006/02/28 07:32:47 rickknowles Exp $
  */

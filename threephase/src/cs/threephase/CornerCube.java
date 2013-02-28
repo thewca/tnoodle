@@ -34,13 +34,13 @@ class CornerCube {
 	 */
 	private static CornerCube[] moveCube = new CornerCube[18];
 
-//	private static final int[] cpmv = {1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 
+//	private static final int[] cpmv = {1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1,
 //										1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1};
 
 	private byte[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
 	private byte[] co = {0, 0, 0, 0, 0, 0, 0, 0};
 //	private int cparity = 0;
-	
+
 	CornerCube temps = null;//new CornerCube();
 
 	CornerCube() {
@@ -67,11 +67,11 @@ class CornerCube {
 		}
 //		this.cparity = c.cparity;
 	}
-	
+
 	int getParity() {
 		return Util.parity(cp);
 	}
-	
+
 	static final byte[][] cornerFacelet = { { U9, R1, F3 }, { U7, F1, L3 }, { U1, L1, B3 }, { U3, B1, R3 },
 			{ D3, F9, R7 }, { D1, L9, F7 }, { D7, B9, L7 }, { D9, R9, B7 } };
 
@@ -83,8 +83,8 @@ class CornerCube {
 				facelet[cornerFacelet[corn][(n + ori) % 3]] = "URFDLB".charAt(cornerFacelet[j][n]/9);
 			}
 		}
-	}	
-	
+	}
+
 	/**
 	 * prod = a * b, Corner Only.
 	 */
@@ -111,11 +111,11 @@ class CornerCube {
 		}
 		co[7] = (byte) ((15 - twst) % 3);
 	}
-	
+
 	void setCPerm(int idx) {
 		Util.set8Perm(cp, idx);
 	}
-	
+
 	void move(int idx) {
 		if (temps == null) {
 			temps = new CornerCube();

@@ -30,7 +30,7 @@ public class Util {
 			fact[i+1] = fact[i] * (i+1);
 		}
 	}
-	
+
 	static void write(byte[] arr, DataOutput out) throws IOException {
 		out.write(arr);
 	}
@@ -46,9 +46,9 @@ public class Util {
 			for (int j=0; j<len; j++) {
 				arr[i][j] = in.readInt();
 			}
-		}	
+		}
 	}
-	
+
 	static void write(int[][] arr, DataOutput out) throws IOException {
 		final int length = arr.length;
 		for (int i=0; i<length; i++) {
@@ -56,7 +56,7 @@ public class Util {
 			for (int j=0; j<len; j++) {
 				out.writeInt(arr[i][j]);
 			}
-		}	
+		}
 	}
 
 	public static synchronized void init() {
@@ -118,12 +118,12 @@ public class Util {
 			} catch(IOException e) {
 				l.log(Level.INFO, "Failed to write to " + tpr_tables, e);
 			}
-			
+
 			l.log(start.finishedNow());
 		}
 		inited = InitializationState.INITIALIZED;
 	}
-	
+
 	public static boolean initFrom(DataInput in) {
 		try {
 			read(Center1.ctsmv, in);
@@ -140,7 +140,7 @@ public class Util {
 		write(Center1.ctsmv, out);
 		write(Edge3.modedTable, out);
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		System.out.println(Arrays.toString(args));
 		if(args.length != 1) {
@@ -177,7 +177,7 @@ public class Util {
 			return;
 		}
 	}
-	
+
 	public static void swap(byte[] arr, int a, int b, int c, int d, int key) {
 		byte temp;
 		switch (key) {
@@ -205,7 +205,7 @@ public class Util {
 			return;
 		}
 	}
-	
+
 	static void set8Perm(int[] arr, int idx) {
 		int val = 0x76543210;
 		for (int i=0; i<7; i++) {
@@ -219,7 +219,7 @@ public class Util {
 		}
 		arr[7] = val;
 	}
-	
+
 	static void set8Perm(byte[] arr, int idx) {
 		int val = 0x76543210;
 		for (int i=0; i<7; i++) {
@@ -233,7 +233,7 @@ public class Util {
 		}
 		arr[7] = (byte)val;
 	}
-	
+
 	static int parity(int[] arr) {
 		int parity = 0;
 		for (int i=0, len=arr.length; i<len; i++) {
@@ -245,7 +245,7 @@ public class Util {
 		}
 		return parity;
 	}
-	
+
 	static int parity(byte[] arr) {
 		int parity = 0;
 		for (int i=0, len=arr.length; i<len; i++) {

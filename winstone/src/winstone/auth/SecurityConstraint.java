@@ -19,7 +19,7 @@ import winstone.WebAppConfiguration;
 
 /**
  * Models a restriction on a particular set of resources in the webapp.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SecurityConstraint.java,v 1.7 2006/08/10 06:38:30 rickknowles Exp $
  */

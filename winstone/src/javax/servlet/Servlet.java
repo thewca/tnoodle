@@ -10,7 +10,7 @@ import java.io.IOException;
 
 /**
  * Basic servlet interface
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface Servlet {

@@ -8,7 +8,7 @@ package winstone;
 
 /**
  * Handles setup and teardown of the JNDI context
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: JNDIManager.java,v 1.2 2006/02/28 07:32:47 rickknowles Exp $
  */

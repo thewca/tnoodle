@@ -8,7 +8,7 @@ package javax.servlet.http;
 
 /**
  * Cookie model value object
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class Cookie implements Cloneable {
@@ -82,7 +82,7 @@ public class Cookie implements Cloneable {
         } else {
             // Check for white space, comma, semicolon
             for (int n = 0; n < name.length(); n++) {
-                char c = name.charAt(n); 
+                char c = name.charAt(n);
                 if (c <= 0x20 || c >= 0x7f) {
                     throw new IllegalArgumentException("Cookie name contains whitespace or " +
                             "non-alphanumeric char: " + name.charAt(n) + " in " + name);
@@ -91,7 +91,7 @@ public class Cookie implements Cloneable {
             this.name = name;
         }
     }
-    
+
     public void setComment(String purpose) {
         this.comment = purpose;
     }
@@ -119,9 +119,9 @@ public class Cookie implements Cloneable {
     public void setVersion(int v) {
         this.version = v;
     }
-    
+
     public String toString() {
-        return "[Cookie: name=" + this.name + " value=" + this.value + " version=" + 
+        return "[Cookie: name=" + this.name + " value=" + this.value + " version=" +
                 this.version + " path=" + this.path + " domain=" + this.domain + " comment=" +
                 this.comment + " maxAge=" + this.maxAge + " secure=" + this.secure + "]";
     }

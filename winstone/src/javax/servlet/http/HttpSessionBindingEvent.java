@@ -8,7 +8,7 @@ package javax.servlet.http;
 
 /**
  * An object addition or removal notification
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class HttpSessionBindingEvent extends HttpSessionEvent {

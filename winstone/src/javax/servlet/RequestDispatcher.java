@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * Interface defining behaviour of servlet container dispatching of requests.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface RequestDispatcher {

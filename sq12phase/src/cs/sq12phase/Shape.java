@@ -5,39 +5,39 @@ import java.util.Arrays;
 class Shape {
 
 	//1 = corner, 0 = edge.
-	static int[] halflayer = {0x00, 0x03, 0x06, 0x0c, 0x0f, 0x18, 0x1b, 0x1e, 
+	static int[] halflayer = {0x00, 0x03, 0x06, 0x0c, 0x0f, 0x18, 0x1b, 0x1e,
 		0x30, 0x33, 0x36, 0x3c, 0x3f};
-	
+
 	static int[] ShapeIdx = new int[3678];
 	static int[] ShapePrun = new int[3768 * 2];
-	
+
 	static int[] TopMove = new int[3678 * 2];
 	static int[] BottomMove = new int[3678 * 2];
 	static int[] TwistMove = new int[3678 * 2];
-		
-	private Shape(){}	
-		
+
+	private Shape(){}
+
 	int top;
 	int bottom;
 	int parity;
-	
+
 	static int getShape2Idx(int shp) {
 		int ret = Arrays.binarySearch(ShapeIdx, shp & 0xffffff)<<1 | shp>>24;
 		return ret;
 	}
-	
+
 	int getIdx() {
 		int ret = Arrays.binarySearch(ShapeIdx, top<<12|bottom)<<1|parity;
 		return ret;
 	}
-	
+
 	void setIdx(int idx) {
 		parity = idx & 1;
 		top = ShapeIdx[idx >> 1];
 		bottom = top & 0xfff;
 		top >>= 12;
 	}
-	
+
 	int topMove() {
 		int move = 0;
 		int moveParity = 0;
@@ -56,7 +56,7 @@ class Shape {
 		}
 		return move;
 	}
-	
+
 	int bottomMove() {
 		int move = 0;
 		int moveParity = 0;
@@ -75,19 +75,19 @@ class Shape {
 		}
 		return move;
 	}
-	
+
 	void twistMove() {
 		int temp = top & 0x3f;
 		int p1 = Integer.bitCount(temp);
 		int p3 = Integer.bitCount(bottom&0xfc0);
 		parity ^= 1 & ((p1&p3)>>1);
-		
+
 		top = (top & 0xfc0) | ((bottom >> 6) & 0x3f);
 		bottom = (bottom & 0x3f) | temp << 6;
 	}
-	
+
 	static boolean inited = false;
-	
+
 	static void init() {
 		if (inited) {
 			return;

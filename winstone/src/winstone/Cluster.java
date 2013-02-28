@@ -14,7 +14,7 @@ import java.net.Socket;
 /**
  * Represents a cluster implementation, which is basically the communication
  * mechanism between a group of winstone containers.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Cluster.java,v 1.5 2006/02/28 07:32:47 rickknowles Exp $
  */
@@ -27,7 +27,7 @@ public interface Cluster {
     /**
      * Check if the other nodes in this cluster have a session for this
      * sessionId.
-     * 
+     *
      * @param sessionId The id of the session to check for
      * @param webAppConfig The web app that owns the session we want
      * @return A valid session instance
@@ -38,7 +38,7 @@ public interface Cluster {
     /**
      * Accept a control socket request related to the cluster functions and
      * process the request.
-     * 
+     *
      * @param requestType A byte indicating the request type
      * @param in Socket input stream
      * @param outSocket output stream

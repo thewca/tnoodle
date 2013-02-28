@@ -63,13 +63,13 @@ public class RetryRequestParams implements java.io.Serializable {
             this.servletPath = httpRequest.getServletPath();
             this.pathInfo = httpRequest.getPathInfo();
             this.queryString = httpRequest.getQueryString();
-            
+
             for (Enumeration names = httpRequest.getHeaderNames(); names.hasMoreElements();) {
                 String name = (String) names.nextElement();
                 headers.put(name.toLowerCase(), new Vector(Collections.list(httpRequest.getHeaders(name))));
             }
         }
-        
+
         if (((this.method == null) || this.method.equalsIgnoreCase("POST")) && (this.contentLength != -1)) {
             InputStream inData = request.getInputStream();
             this.bodyContent = new byte[this.contentLength];

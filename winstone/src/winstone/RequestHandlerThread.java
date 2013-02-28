@@ -19,7 +19,7 @@ import javax.servlet.ServletRequestListener;
 
 /**
  * The threads to which incoming requests get allocated.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: RequestHandlerThread.java,v 1.21 2007/04/23 02:55:35 rickknowles Exp $
  */
@@ -42,7 +42,7 @@ public class RequestHandlerThread implements Runnable {
      * Constructor - this is called by the handler pool, and just sets up for
      * when a real request comes along.
      */
-    public RequestHandlerThread(ObjectPool objectPool, int threadIndex, 
+    public RequestHandlerThread(ObjectPool objectPool, int threadIndex,
             boolean simulateModUniqueId, boolean saveSessions) {
         this.objectPool = objectPool;
         this.simulateModUniqueId = simulateModUniqueId;
@@ -59,7 +59,7 @@ public class RequestHandlerThread implements Runnable {
      * The main thread execution code.
      */
     public void run() {
-        
+
         boolean interrupted = false;
         while (!interrupted) {
             // Start request processing
@@ -90,14 +90,14 @@ public class RequestHandlerThread implements Runnable {
                         if (servletURI == null) {
                             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                                     "RequestHandlerThread.KeepAliveTimedOut", this.threadName);
-                            
+
                             // Keep alive timed out - deallocate and go into wait state
                             this.listener.deallocateRequestResponse(this, req,
                                     rsp, inData, outData);
                             continueFlag = false;
                             continue;
                         }
-                        
+
                         if (this.simulateModUniqueId) {
                             req.setAttribute("UNIQUE_ID", "" + requestId);
                         }
@@ -113,13 +113,13 @@ public class RequestHandlerThread implements Runnable {
                         // match it to a requestDispatcher
                         WebAppConfiguration webAppConfig = hostConfig.getWebAppByURI(servletURI);
                         if (webAppConfig == null) {
-                            webAppConfig = hostConfig.getWebAppByURI("/");    
+                            webAppConfig = hostConfig.getWebAppByURI("/");
                         }
                         if (webAppConfig == null) {
                             Logger.log(Logger.WARNING, Launcher.RESOURCES,
                                     "RequestHandlerThread.UnknownWebapp",
                                     new String[] { servletURI });
-                            rsp.sendError(WinstoneResponse.SC_NOT_FOUND, 
+                            rsp.sendError(WinstoneResponse.SC_NOT_FOUND,
                                     Launcher.RESOURCES.getString("RequestHandlerThread.UnknownWebappPage", servletURI));
                             rsp.flushBuffer();
                             req.discardRequestBody();
@@ -147,7 +147,7 @@ public class RequestHandlerThread implements Runnable {
                         }
 
                         // Lookup a dispatcher, then process with it
-                        processRequest(webAppConfig, req, rsp, 
+                        processRequest(webAppConfig, req, rsp,
                                 webAppConfig.getServletURIFromRequestURI(servletURI));
                         writeToAccessLog(servletURI, req, rsp, webAppConfig);
 
@@ -170,7 +170,7 @@ public class RequestHandlerThread implements Runnable {
                             ClassLoader cl = Thread.currentThread().getContextClassLoader();
                             Thread.currentThread().setContextClassLoader(webAppConfig.getLoader());
                             reqLsnrs[n].requestDestroyed(new ServletRequestEvent(webAppConfig, req));
-                            Thread.currentThread().setContextClassLoader(cl);                            
+                            Thread.currentThread().setContextClassLoader(cl);
                         }
 
                         req.setWebAppConfig(null);
@@ -179,7 +179,7 @@ public class RequestHandlerThread implements Runnable {
 
                         this.listener.deallocateRequestResponse(this, req, rsp, inData, outData);
                         Logger.log(Logger.SPEED, Launcher.RESOURCES, "RequestHandlerThread.RequestTime",
-                                new String[] { servletURI, "" + headerParseTime, 
+                                new String[] { servletURI, "" + headerParseTime,
                                                 "" + getRequestProcessTime() });
                     } catch (InterruptedIOException errIO) {
                         continueFlag = false;
@@ -230,7 +230,7 @@ public class RequestHandlerThread implements Runnable {
      * them to the desired servlet, which then processes them or throws them off to
      * another servlet.
      */
-    private void processRequest(WebAppConfiguration webAppConfig, WinstoneRequest req, 
+    private void processRequest(WebAppConfiguration webAppConfig, WinstoneRequest req,
             WinstoneResponse rsp, String path) throws IOException, ServletException {
         RequestDispatcher rd = null;
         javax.servlet.RequestDispatcher rdError = null;
@@ -315,7 +315,7 @@ public class RequestHandlerThread implements Runnable {
             this.thread.interrupt();
         }
     }
-    
+
     protected void writeToAccessLog(String originalURL, WinstoneRequest request, WinstoneResponse response,
             WebAppConfiguration webAppConfig) {
         if (webAppConfig != null) {

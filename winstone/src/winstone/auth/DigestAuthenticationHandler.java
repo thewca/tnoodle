@@ -29,7 +29,7 @@ import winstone.WinstoneResourceBundle;
 
 /**
  * Implements the MD5 digest version of authentication
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: DigestAuthenticationHandler.java,v 1.3 2004/05/22 06:53:45
  *          rickknowles Exp $
@@ -69,7 +69,7 @@ public class DigestAuthenticationHandler extends BaseAuthenticationHandler {
 
     /**
      * Handling the (possible) response
-     * 
+     *
      * @return True if the request should continue, or false if we have
      *         intercepted it
      */
@@ -177,7 +177,7 @@ public class DigestAuthenticationHandler extends BaseAuthenticationHandler {
      * @return MD5 digested, hex encoded version of the input
      */
     public String md5Encode(String input) throws UnsupportedEncodingException {
-        // Digest 
+        // Digest
         byte digestBytes[] = this.md5Digester.digest(input.getBytes("8859_1"));
 
         // Write out in hex format

@@ -1,19 +1,19 @@
 /*
-Edge Cubies: 
-					14	2	
+Edge Cubies:
+					14	2
 				1			15
 				13			3
-					0	12	
-	1	13			0	12			3	15			2	14	
+					0	12
+	1	13			0	12			3	15			2	14
 9			20	20			11	11			22	22			9
 21			8	8			23	23			10	10			21
-	17	5			18	6			19	7			16	4	
-					18	6	
+	17	5			18	6			19	7			16	4
+					18	6
 				5			19
 				17			7
-					4	16	
+					4	16
 
-Center Cubies: 
+Center Cubies:
 			0	1
 			3	2
 
@@ -59,17 +59,17 @@ import java.util.Comparator;
 import java.util.Random;
 
 public class FullCube implements Comparable<FullCube> {
-	
+
 	public static class ValueComparator implements Comparator<FullCube> {
 		public int compare(FullCube c1, FullCube c2) {
 			return c2.value - c1.value;
 		}
 	}
-	
+
 	private EdgeCube edge;
 	private CenterCube center;
 	private CornerCube corner;
-	
+
 	int value = 0;
 	boolean add1 = false;
 	int length1 = 0;
@@ -80,7 +80,7 @@ public class FullCube implements Comparable<FullCube> {
 	public int compareTo(FullCube c) {
 		return this.value - c.value;
 	}
-	
+
 	public FullCube() {
 		edge = new EdgeCube();
 		center = new CenterCube();
@@ -91,37 +91,37 @@ public class FullCube implements Comparable<FullCube> {
 		this();
 		copy(c);
 	}
-	
+
 	public FullCube(long seed) {
 		this(new Random(seed));
 	}
-	
+
 	public FullCube(Random r) {
 		edge = new EdgeCube(r);
 		center = new CenterCube(r);
 		corner = new CornerCube(r);
 	}
-	
+
 	public FullCube(int[] moveseq) {
 		this();
 		for (int m : moveseq) {
 			doMove(m);
 		}
 	}
-	
+
 	public void copy(FullCube c) {
 		edge.copy(c.edge);
 		center.copy(c.center);
 		corner.copy(c.corner);
-		
+
 		this.value = c.value;
 		this.add1 = c.add1;
 		this.length1 = c.length1;
 		this.length2 = c.length2;
 		this.length3 = c.length3;
-		
+
 		this.sym = c.sym;
-		
+
 		for (int i=0; i<60; i++) {
 			this.moveBuffer[i] = c.moveBuffer[i];
 		}
@@ -130,8 +130,8 @@ public class FullCube implements Comparable<FullCube> {
 		this.centerAvail = c.centerAvail;
 		this.cornerAvail = c.cornerAvail;
 	}
-	
-//	public void print() {	
+
+//	public void print() {
 //		getCenter().print();
 //		getEdge().print();
 //	}
@@ -157,7 +157,7 @@ public class FullCube implements Comparable<FullCube> {
 			}
 		}
 		int finishSym = symmult[syminv[sym]][Center1.getSolvedSym(getCenter())];
-		
+
 		StringBuffer sb = new StringBuffer();
 		inverse = true;
 		sym = finishSym;
@@ -186,9 +186,9 @@ public class FullCube implements Comparable<FullCube> {
 		}
 		return sb.toString();
 	}
-	
+
 	private static int[] move2rot = {35, 1, 34, 2, 4, 6, 22, 5, 19};
-	 
+
 	String to333Facelet() {
 		char[] ret = new char[54];
 		getEdge().fill333Facelet(ret);
@@ -196,40 +196,40 @@ public class FullCube implements Comparable<FullCube> {
 		getCorner().fill333Facelet(ret);
 		return new String(ret);
 	}
-	
+
 	byte[] moveBuffer = new byte[60];
 	private int moveLength = 0;
 	private int edgeAvail = 0;
 	private int centerAvail = 0;
 	private int cornerAvail = 0;
-	
+
 	int sym = 0;
 
 	void move(int m) {
 		moveBuffer[moveLength++] = (byte)m;
 		return;
 	}
-	
+
 	void doMove(int m) {
 		getEdge().move(m);
 		getCenter().move(m);
-		getCorner().move(m % 18);	
+		getCorner().move(m % 18);
 	}
-	
+
 	EdgeCube getEdge() {
 		while (edgeAvail < moveLength) {
 			edge.move(moveBuffer[edgeAvail++]);
 		}
 		return edge;
 	}
-	
+
 	CenterCube getCenter() {
 		while (centerAvail < moveLength) {
 			center.move(moveBuffer[centerAvail++]);
 		}
 		return center;
 	}
-	
+
 	CornerCube getCorner() {
 		while (cornerAvail < moveLength) {
 			corner.move(moveBuffer[cornerAvail++] % 18);

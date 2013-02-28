@@ -8,7 +8,7 @@ package winstone;
 
 /**
  * Interface for authentication realms.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: AuthenticationRealm.java,v 1.3 2006/12/09 03:56:41 rickknowles Exp $
  */

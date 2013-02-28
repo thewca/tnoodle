@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * Interface definition for filter objects
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface Filter {

@@ -28,10 +28,10 @@ public class LazyInstantiator<H> {
 		if(!m.matches()) {
 			throw new BadClassDescriptionException(definition);
 		}
-		
+
 		this.definition = definition;
 		this.parentClass = classy;
-		
+
 		ArrayList<Class<?>> argTypes = new ArrayList<Class<?>>();
 		ArrayList<Object> args = new ArrayList<Object>();
 		// group 0 is the whole string
@@ -72,7 +72,7 @@ public class LazyInstantiator<H> {
 		this.argTypes = argTypes.toArray(new Class<?>[0]);
 		this.args = args.toArray();
 	}
-	
+
 	private Constructor<? extends H> constructor;
 	private Class<?>[] argTypes;
 	private Object[] args;
@@ -84,7 +84,7 @@ public class LazyInstantiator<H> {
 		}
 		return constructor.newInstance(args);
 	}
-	
+
 	private H cachedInstance = null;
 	public synchronized H cachedInstance() throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, ClassNotFoundException, NoSuchMethodException, MalformedURLException {
 		if(cachedInstance == null) {
@@ -92,7 +92,7 @@ public class LazyInstantiator<H> {
 		}
 		return cachedInstance;
 	}
-	
+
 	@Override
 	public String toString() {
 		return super.toString() + " " + this.definition;

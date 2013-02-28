@@ -38,7 +38,7 @@ import winstone.WinstoneResourceBundle;
 /**
  * Implements the main listener daemon thread. This is the class that gets
  * launched by the command line, and owns the server socket, etc.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HttpsListener.java,v 1.10 2007/06/13 15:27:35 rickknowles Exp $
  */
@@ -57,7 +57,7 @@ public class HttpsListener extends HttpListener {
                 + "KeyStore", "winstone.ks");
         this.password = WebAppConfiguration.stringArg(args, getConnectorName()
                 + "KeyStorePassword", null);
-        this.keyManagerType = WebAppConfiguration.stringArg(args, 
+        this.keyManagerType = WebAppConfiguration.stringArg(args,
                 getConnectorName() + "KeyManagerType", "SunX509");
     }
 
@@ -161,7 +161,7 @@ public class HttpsListener extends HttpListener {
         try {
             // Check the key manager factory
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(this.keyManagerType);
-            
+
             File ksFile = new File(keyStoreName);
             if (!ksFile.exists() || !ksFile.isFile())
                 throw new WinstoneException(SSL_RESOURCES.getString(

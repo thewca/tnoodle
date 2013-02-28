@@ -10,5 +10,5 @@ public class InvalidScrambleRequestException extends Exception {
 	public InvalidScrambleRequestException(Throwable cause) {
 		super(cause);
 	}
-	
+
 }

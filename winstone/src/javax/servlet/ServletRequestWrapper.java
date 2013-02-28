@@ -15,7 +15,7 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Wraps a servlet request object using the decorator pattern.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class ServletRequestWrapper implements ServletRequest {

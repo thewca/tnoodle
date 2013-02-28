@@ -27,7 +27,7 @@ public class MarkdownServlet extends SafeHttpServlet {
 			// We can't distinguish between an empty file, and a 404. This is
 			// because WinstonseResponse only actually sets an error code if
 			// isIncluding == false.
-			
+
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "File " + request.getRequestURI() + " not found");
 			return;
 		}
@@ -53,7 +53,7 @@ public class MarkdownServlet extends SafeHttpServlet {
 			title = title.trim();
 			titleCode = "<title>" + title + "</title>\n";
 		}
-		
+
 		return "<html><head>\n" +
 			titleCode +
 			"<link href=\"/css/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />\n" +

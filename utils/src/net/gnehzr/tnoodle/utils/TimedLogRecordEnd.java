@@ -7,7 +7,7 @@ import java.util.logging.LogRecord;
 @SuppressWarnings("serial")
 public class TimedLogRecordEnd extends LogRecord {
 	private static final DecimalFormat df = new DecimalFormat("#.###");
-	
+
 	public TimedLogRecordEnd(Level level, String msg, String extraMsg, long startNanos, long endNanos) {
 		super(level, format(msg, extraMsg, startNanos, endNanos));
 	}

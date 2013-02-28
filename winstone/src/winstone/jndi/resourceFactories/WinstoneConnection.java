@@ -30,9 +30,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import winstone.Logger;
 
 /**
- * JDBC Connection wrapper for use in the pooling datasource. This just suppresses 
+ * JDBC Connection wrapper for use in the pooling datasource. This just suppresses
  * the close() call, and releases the connection.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneConnection.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
@@ -58,13 +58,13 @@ public class WinstoneConnection implements Connection {
             Logger.log(Logger.FULL_DEBUG, WinstoneDataSource.DS_RESOURCES,
                     "WinstoneConnection.ReleaseRollback");
         }
-        
+
         Connection realConnectionHolder = null;
         try {
             if (this.realConnection != null) {
                 realConnectionHolder = this.realConnection;
                 this.realConnection = null;
-                
+
                 if (!realConnectionHolder.getAutoCommit())
                     realConnectionHolder.rollback();
             }
@@ -302,12 +302,12 @@ public class WinstoneConnection implements Connection {
 			throws SQLException {
 		throw new NotImplementedException();
 	}
-	
+
 	public void setSchema(String schema)
     throws SQLException {
 		throw new NotImplementedException();
 	}
-	
+
 	public String getSchema() throws SQLException {
 		throw new NotImplementedException();
 	}

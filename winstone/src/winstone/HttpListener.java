@@ -22,7 +22,7 @@ import java.util.Map;
  * Implements the main listener daemon thread. This is the class that gets
  * launched by the command line, and owns the server socket, etc. Note that this
  * class is also used as the base class for the HTTPS listener.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HttpListener.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
@@ -73,7 +73,7 @@ public class HttpListener implements Listener, Runnable {
             return true;
         }
     }
-    
+
     /**
      * The default port to use - this is just so that we can override for the
      * SSL connector.
@@ -93,7 +93,7 @@ public class HttpListener implements Listener, Runnable {
     protected String getConnectorScheme() {
         return "http";
     }
-    
+
     /**
      * Gets a server socket - this is mostly for the purpose of allowing an
      * override in the SSL connector.
@@ -158,7 +158,7 @@ public class HttpListener implements Listener, Runnable {
      * Called by the request handler thread, because it needs specific setup
      * code for this connection's protocol (ie construction of request/response
      * objects, in/out streams, etc).
-     * 
+     *
      * This implementation parses incoming AJP13 packets, and builds an
      * outputstream that is capable of writing back the response in AJP13
      * packets.
@@ -188,7 +188,7 @@ public class HttpListener implements Listener, Runnable {
         handler.setResponse(rsp);
         handler.setInStream(inData);
         handler.setOutStream(outData);
-        
+
         // If using this listener, we must set the server header now, because it
         // must be the first header. Ajp13 listener can defer to the Apache Server
         // header
@@ -202,7 +202,7 @@ public class HttpListener implements Listener, Runnable {
      */
     public void deallocateRequestResponse(RequestHandlerThread handler,
             WinstoneRequest req, WinstoneResponse rsp,
-            WinstoneInputStream inData, WinstoneOutputStream outData) 
+            WinstoneInputStream inData, WinstoneOutputStream outData)
             throws IOException {
         handler.setInStream(null);
         handler.setOutStream(null);
@@ -224,7 +224,7 @@ public class HttpListener implements Listener, Runnable {
         if (!iAmFirst) {
             socket.setSoTimeout(KEEP_ALIVE_TIMEOUT);
         }
-        
+
         byte uriBuffer[] = null;
         try {
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "HttpListener.WaitingForURILine");
@@ -258,7 +258,7 @@ public class HttpListener implements Listener, Runnable {
      * Called by the request handler thread, because it needs specific shutdown
      * code for this connection's protocol if the keep-alive period expires (ie
      * closing sockets, etc).
-     * 
+     *
      * This implementation simply shuts down the socket and streams.
      */
     public void releaseSocket(Socket socket, InputStream inSocket,
@@ -313,7 +313,7 @@ public class HttpListener implements Listener, Runnable {
     private String parseURILine(String uriLine, WinstoneRequest req,
             WinstoneResponse rsp) {
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "HttpListener.UriLine", uriLine.trim());
-        
+
         // Method
         int spacePos = uriLine.indexOf(' ');
         if (spacePos == -1)

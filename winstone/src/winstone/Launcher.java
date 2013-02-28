@@ -29,12 +29,12 @@ import java.util.Properties;
 /**
  * Implements the main launcher daemon thread. This is the class that gets
  * launched by the command line, and owns the server socket, etc.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Launcher.java,v 1.29 2007/04/23 02:55:35 rickknowles Exp $
  */
 public class Launcher implements Runnable {
-    
+
     static final String HTTP_LISTENER_CLASS = "winstone.HttpListener";
     static final String HTTPS_LISTENER_CLASS = "winstone.ssl.HttpsListener";
     static final String AJP_LISTENER_CLASS = "winstone.ajp13.Ajp13Listener";
@@ -43,10 +43,10 @@ public class Launcher implements Runnable {
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
     public static final byte RELOAD_TYPE = (byte) '4';
-    
+
     private int CONTROL_TIMEOUT = 2000; // wait 2s for control connection
     private int DEFAULT_CONTROL_PORT = -1;
-    
+
     private Thread controlThread;
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
@@ -56,15 +56,15 @@ public class Launcher implements Runnable {
     private Map args;
     private Cluster cluster;
     private JNDIManager globalJndiManager;
-    
+
     /**
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
     public Launcher(Map args) throws IOException {
-        
+
         boolean useJNDI = WebAppConfiguration.booleanArg(args, "useJNDI", false);
-        
+
         // Set jndi resource handler if not set (workaround for JamVM bug)
         if (useJNDI) try {
             Class ctxFactoryClass = Class.forName("winstone.jndi.java.javaURLContextFactory");
@@ -75,9 +75,9 @@ public class Launcher implements Runnable {
                 System.setProperty("java.naming.factory.url.pkgs", "winstone.jndi");
             }
         } catch (ClassNotFoundException err) {}
-        
+
         Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
-        
+
         this.args = args;
         this.controlPort = (args.get("controlPort") == null ? DEFAULT_CONTROL_PORT
                 : Integer.parseInt((String) args.get("controlPort")));
@@ -85,7 +85,7 @@ public class Launcher implements Runnable {
         // Check for java home
         List jars = new ArrayList();
         List commonLibCLPaths = new ArrayList();
-        String defaultJavaHome = System.getProperty("java.home"); 
+        String defaultJavaHome = System.getProperty("java.home");
         String javaHome = WebAppConfiguration.stringArg(args, "javaHome", defaultJavaHome);
         Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome);
         String toolsJarLocation = WebAppConfiguration.stringArg(args, "toolsJar", null);
@@ -93,7 +93,7 @@ public class Launcher implements Runnable {
         if (toolsJarLocation == null) {
             toolsJar = new File(javaHome, "lib/tools.jar");
 
-            // first try - if it doesn't exist, try up one dir since we might have 
+            // first try - if it doesn't exist, try up one dir since we might have
             // the JRE home by mistake
             if (!toolsJar.exists()) {
                 File javaHome2 = new File(javaHome).getParentFile();
@@ -129,20 +129,20 @@ public class Launcher implements Runnable {
                         || children[n].getName().endsWith(".zip")) {
                     jars.add(children[n].toURL());
                     commonLibCLPaths.add(children[n]);
-                    Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar", 
+                    Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
                             children[n].getName());
                 }
         } else {
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
         }
-        ClassLoader commonLibCL = new URLClassLoader((URL[]) jars.toArray(new URL[jars.size()]), 
+        ClassLoader commonLibCL = new URLClassLoader((URL[]) jars.toArray(new URL[jars.size()]),
                 getClass().getClassLoader());
-        
+
         Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
                 commonLibCL.toString());
         Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
                 commonLibCLPaths.toString());
-                                        
+
         this.objectPool = new ObjectPool(args);
 
         // Optionally set up clustering if enabled and libraries are available
@@ -170,7 +170,7 @@ public class Launcher implements Runnable {
                 }
             }
         }
-        
+
         // If jndi is enabled, run the container wide jndi populator
         if (useJNDI) {
             String jndiMgrClassName = WebAppConfiguration.stringArg(args, "containerJndiClassName",
@@ -178,9 +178,9 @@ public class Launcher implements Runnable {
             try {
                 // Build the realm
                 Class jndiMgrClass = Class.forName(jndiMgrClassName, true, commonLibCL);
-                Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] { 
+                Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] {
                         Map.class, List.class, ClassLoader.class });
-                this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(new Object[] { 
+                this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(new Object[] {
                         args, null, commonLibCL });
                 this.globalJndiManager.setup();
             } catch (ClassNotFoundException err) {
@@ -191,9 +191,9 @@ public class Launcher implements Runnable {
                         "Launcher.JNDIError", jndiMgrClassName, err);
             }
         }
-        
+
         // Open the web apps
-        this.hostGroup = new HostGroup(this.cluster, this.objectPool, commonLibCL, 
+        this.hostGroup = new HostGroup(this.cluster, this.objectPool, commonLibCL,
                 (File []) commonLibCLPaths.toArray(new File[0]), args);
 
         // Create connectors (http, https and ajp)
@@ -204,7 +204,7 @@ public class Launcher implements Runnable {
             Class.forName("javax.net.ServerSocketFactory");
             spawnListener(HTTPS_LISTENER_CLASS);
         } catch (ClassNotFoundException err) {
-            Logger.log(Logger.DEBUG, RESOURCES, 
+            Logger.log(Logger.DEBUG, RESOURCES,
                     "Launcher.NeedsJDK14", HTTPS_LISTENER_CLASS);
         }
 
@@ -218,9 +218,9 @@ public class Launcher implements Runnable {
     }
 
     /**
-     * Instantiates listeners. Note that an exception thrown in the 
-     * constructor is interpreted as the listener being disabled, so 
-     * don't do anything too adventurous in the constructor, or if you do, 
+     * Instantiates listeners. Note that an exception thrown in the
+     * constructor is interpreted as the listener being disabled, so
+     * don't do anything too adventurous in the constructor, or if you do,
      * catch and log any errors locally before rethrowing.
      */
     protected void spawnListener(String listenerClassName) {
@@ -230,16 +230,16 @@ public class Launcher implements Runnable {
                     .getConstructor(new Class[] { Map.class,
                             ObjectPool.class, HostGroup.class});
             Listener listener = (Listener) listenerConstructor
-                    .newInstance(new Object[] { args, this.objectPool, 
+                    .newInstance(new Object[] { args, this.objectPool,
                             this.hostGroup });
             if (listener.start()) {
                 this.listeners.add(listener);
             }
         } catch (ClassNotFoundException err) {
-            Logger.log(Logger.INFO, RESOURCES, 
+            Logger.log(Logger.INFO, RESOURCES,
                     "Launcher.ListenerNotFound", listenerClassName);
         } catch (Throwable err) {
-            Logger.log(Logger.ERROR, RESOURCES, 
+            Logger.log(Logger.ERROR, RESOURCES,
                     "Launcher.ListenerStartupError", listenerClassName, err);
         }
     }
@@ -340,7 +340,7 @@ public class Launcher implements Runnable {
             }
         }
     }
-    
+
     public void shutdown() {
         // Release all listeners/pools/webapps
         for (Iterator i = this.listeners.iterator(); i.hasNext();)
@@ -364,14 +364,14 @@ public class Launcher implements Runnable {
     public boolean isRunning() {
         return (this.controlThread != null) && this.controlThread.isAlive();
     }
-    
+
     /**
      * Main method. This basically just accepts a few args, then initialises the
      * listener thread. For now, just shut it down with a control-C.
      */
     public static void main(String argv[]) throws IOException {
         Map args = getArgsFromCommandLine(argv);
-        
+
         if (args.containsKey("usage") || args.containsKey("help")) {
             printUsage();
             return;
@@ -379,9 +379,9 @@ public class Launcher implements Runnable {
 
         // Check for embedded war
         deployEmbeddedWarfile(args);
-        
+
         // Check for embedded warfile
-        if (!args.containsKey("webroot") && !args.containsKey("warfile") 
+        if (!args.containsKey("webroot") && !args.containsKey("warfile")
                 && !args.containsKey("webappsDir")&& !args.containsKey("hostsDir")) {
             printUsage();
             return;
@@ -393,14 +393,14 @@ public class Launcher implements Runnable {
             Logger.log(Logger.ERROR, RESOURCES, "Launcher.ContainerStartupError", err);
         }
     }
-    
+
     public static Map getArgsFromCommandLine(String argv[]) throws IOException {
         Map args = loadArgsFromCommandLineAndConfig(argv, "nonSwitch");
-        
+
         // Small hack to allow re-use of the command line parsing inside the control tool
         String firstNonSwitchArgument = (String) args.get("nonSwitch");
         args.remove("nonSwitch");
-        
+
         // Check if the non-switch arg is a file or folder, and overwrite the config
         if (firstNonSwitchArgument != null) {
             File webapp = new File(firstNonSwitchArgument);
@@ -415,28 +415,28 @@ public class Launcher implements Runnable {
         return args;
     }
 
-    public static Map loadArgsFromCommandLineAndConfig(String argv[], String nonSwitchArgName) 
+    public static Map loadArgsFromCommandLineAndConfig(String argv[], String nonSwitchArgName)
             throws IOException {
         Map args = new HashMap();
-        
-        // Load embedded properties file 
+
+        // Load embedded properties file
         String embeddedPropertiesFilename = RESOURCES.getString(
                 "Launcher.EmbeddedPropertiesFile");
-        
+
         InputStream embeddedPropsStream = Launcher.class.getResourceAsStream(
                 embeddedPropertiesFilename);
         if (embeddedPropsStream != null) {
             loadPropsFromStream(embeddedPropsStream, args);
             embeddedPropsStream.close();
         }
-        
+
         // Get command line args
         String configFilename = RESOURCES.getString("Launcher.DefaultPropertyFile");
         for (int n = 0; n < argv.length; n++) {
             String option = argv[n];
             if (option.startsWith("--")) {
                 int equalPos = option.indexOf('=');
-                String paramName = option.substring(2, 
+                String paramName = option.substring(2,
                         equalPos == -1 ? option.length() : equalPos);
                 if (equalPos != -1) {
                     args.put(paramName, option.substring(equalPos + 1));
@@ -465,7 +465,7 @@ public class Launcher implements Runnable {
         }
         return args;
     }
-    
+
     protected static void deployEmbeddedWarfile(Map args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
@@ -478,7 +478,7 @@ public class Launcher implements Runnable {
             String embeddedWebroot = RESOURCES.getString("Launcher.EmbeddedWebroot");
             File tempWebroot = new File(tempWarfile.getParentFile(), embeddedWebroot);
             tempWebroot.mkdirs();
-            
+
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
                     tempWarfile.getAbsolutePath());
             OutputStream out = new FileOutputStream(tempWarfile, true);
@@ -489,14 +489,14 @@ public class Launcher implements Runnable {
             }
             out.close();
             embeddedWarfile.close();
-            
+
             args.put("warfile", tempWarfile.getAbsolutePath());
             args.put("webroot", tempWebroot.getAbsolutePath());
             args.remove("webappsDir");
             args.remove("hostsDir");
         }
     }
-    
+
     protected static void loadPropsFromStream(InputStream inConfig, Map args) throws IOException {
         Properties props = new Properties();
         props.load(inConfig);
@@ -508,7 +508,7 @@ public class Launcher implements Runnable {
         }
         props.clear();
     }
-    
+
     public static void initLogger(Map args) throws IOException {
         // Reset the log level
         int logLevel = WebAppConfiguration.intArg(args, "debug", Logger.INFO);

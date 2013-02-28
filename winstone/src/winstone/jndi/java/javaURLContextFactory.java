@@ -19,7 +19,7 @@ import winstone.jndi.WinstoneContext;
 /**
  * Creates the initial instance of the Winstone JNDI context (corresponds to
  * java:/ urls)
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: javaURLContextFactory.java,v 1.5 2007/04/23 02:55:35 rickknowles Exp $
  */
@@ -41,7 +41,7 @@ public class javaURLContextFactory implements InitialContextFactory, ObjectFacto
         }
         return (Context) rootContext.lookup("java:/comp/env");
     }
-    
+
     public Object getObjectInstance(Object object, Name name, Context context,
             Hashtable env) {
         return null;

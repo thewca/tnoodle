@@ -72,7 +72,7 @@ public class RetryRequestWrapper extends HttpServletRequestWrapper {
     private boolean hasBeenForwarded() {
         return (super.getAttribute("javax.servlet.forward.request_uri") != null);
     }
-    
+
     public String getScheme() {
         if (hasBeenForwarded()) {
             return super.getScheme();
@@ -202,7 +202,7 @@ public class RetryRequestWrapper extends HttpServletRequestWrapper {
             }
         }
     }
-    
+
     public int getIntHeader(String name) {
         if (hasBeenForwarded()) {
             return super.getIntHeader(name);
@@ -233,7 +233,7 @@ public class RetryRequestWrapper extends HttpServletRequestWrapper {
         if (hasBeenForwarded()) {
             return super.getHeaders(name);
         } else {
-            Vector result = (Vector) this.oldRequest.getHeaders().get(name.toLowerCase()); 
+            Vector result = (Vector) this.oldRequest.getHeaders().get(name.toLowerCase());
             return result == null ? null : result.elements();
         }
     }
@@ -340,19 +340,19 @@ public class RetryRequestWrapper extends HttpServletRequestWrapper {
             Map workingParameters = new HashMap();
             try {
                 // Parse query string from request
-                if ((method.equals(METHOD_GET) || method.equals(METHOD_HEAD) || 
+                if ((method.equals(METHOD_GET) || method.equals(METHOD_HEAD) ||
                         method.equals(METHOD_POST)) && (queryString != null)) {
                     WinstoneRequest.extractParameters(queryString, this.encoding, workingParameters, false);
                 }
-                
+
                 if (method.equals(METHOD_POST) && (contentType != null)
                         && (contentType.equals(POST_PARAMETERS) || contentType.startsWith(POST_PARAMETERS + ";"))) {
                     // Parse params
-                    String paramLine = (this.encoding == null ? new String(this.oldRequest.getBodyContent()) 
+                    String paramLine = (this.encoding == null ? new String(this.oldRequest.getBodyContent())
                             : new String(this.oldRequest.getBodyContent(), this.encoding));
                     WinstoneRequest.extractParameters(paramLine.trim(), this.encoding, workingParameters, false);
-                } 
-                
+                }
+
                 this.parsedParams = workingParameters;
             } catch (UnsupportedEncodingException err) {
                 Logger.log(Logger.ERROR, Launcher.RESOURCES, "WinstoneRequest.ErrorBodyParameters", err);

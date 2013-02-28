@@ -29,7 +29,7 @@ public class SquareOnePuzzle extends Puzzle {
 	private static final int radius = 32;
 
 	public SquareOnePuzzle() {}
-	
+
 	@Override
 	public PuzzleStateAndGenerator generateRandomMoves(Random r) {
 		Search s = new Search();
@@ -209,7 +209,7 @@ public class SquareOnePuzzle extends Puzzle {
 		faces[3].add(front);
 		faces[4] = up;
 		faces[5] = down;
-		
+
 		HashMap<String, GeneralPath> facesMap = new HashMap<String, GeneralPath>();
 		for(int i = 0; i < faces.length; i++) {
 			facesMap.put("LBRFUD".charAt(i)+"", new GeneralPath(faces[i]));
@@ -241,21 +241,21 @@ public class SquareOnePuzzle extends Puzzle {
 	protected int getRandomMoveCount() {
 		return 40;
 	}
-	
+
 	private class SquareOneState extends PuzzleState {
 		boolean sliceSolved;
 		int[] pieces;
-	
+
 		public SquareOneState() {
 			sliceSolved = true;
 			pieces = new int[]{ 0, 0, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 11, 12, 13, 13, 14, 15, 15 }; //piece array
 		}
-		
+
 		public SquareOneState(boolean sliceSolved, int[] pieces) {
 			this.sliceSolved = sliceSolved;
 			this.pieces = pieces;
 		}
-		
+
 		private int[] doSlash() {
 			int[] newPieces = Arrays.copyOf(pieces, pieces.length);
 			for(int i = 0; i < 6; i++) {
@@ -281,9 +281,9 @@ public class SquareOnePuzzle extends Puzzle {
 			}
 			return true;
 		}
-		
+
 		/**
-		 * 
+		 *
 		 * @param top Amount to rotate top
 		 * @param bottom Amount to rotate bottom
 		 * @return null if the move is illegal (doesn't allow for a / afterwards)
@@ -298,7 +298,7 @@ public class SquareOnePuzzle extends Puzzle {
 			for(int i = 0; i < 12; i++) {
 				newPieces[i] = t[(top + i) % 12];
 			}
-			
+
 			bottom = modulo(-bottom, 12);
 
 			for(int i = 0; i < 12; i++) {
@@ -307,10 +307,10 @@ public class SquareOnePuzzle extends Puzzle {
 			for(int i = 0; i < 12; i++) {
 				newPieces[i+12] = t[(bottom + i) % 12];
 			}
-			
+
 			return newPieces;
 		}
-		
+
 		@Override
 		public HashMap<String, SquareOneState> getScrambleSuccessors() {
 			HashMap<String, SquareOneState> successors = getSuccessors();
@@ -324,7 +324,7 @@ public class SquareOnePuzzle extends Puzzle {
 			}
 			return successors;
 		}
-		
+
 		@Override
 		public HashMap<String, SquareOneState> getSuccessors() {
 			HashMap<String, SquareOneState> successors = new HashMap<String, SquareOneState>();
@@ -400,6 +400,6 @@ public class SquareOnePuzzle extends Puzzle {
 			g.rotate(Math.toRadians(-90 - 15), x, y);
 			drawFace(g, Arrays.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
 		}
-		
+
 	}
 }

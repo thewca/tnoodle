@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * Base request object interface definition.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface ServletRequest {

@@ -17,14 +17,14 @@ public class Plugins<H> {
 		if(classLoader == null) {
 			classLoader = getClass().getClassLoader();
 		}
-		
+
 		String pluginDefinitionsFilename = packageName + "/" + packageName + "s";
 		InputStream is = classLoader.getResourceAsStream(pluginDefinitionsFilename);
 		azzert(is != null);
 		BufferedReader in = new BufferedReader(new InputStreamReader(is));
 		HashMap<String, LazyInstantiator<H>> newFilePlugins = new HashMap<String, LazyInstantiator<H>>();
 		HashMap<String, String> newPluginComment = new HashMap<String, String>();
-		
+
 		String line;
 		String lastComment = null;
 		while((line = in.readLine()) != null) {
@@ -55,7 +55,7 @@ public class Plugins<H> {
 		filePlugins = newFilePlugins;
 		pluginComment = newPluginComment;
 	}
-	
+
 	public String getPluginComment(String key) {
 		return pluginComment.get(key);
 	}

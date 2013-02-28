@@ -10,7 +10,7 @@ public class PyraminxSolver {
 		  * There are 3 different orientations for each corner.
 		  *
 		  *                         U
-		  *     ____  ____  ____          ____  ____  ____ 
+		  *     ____  ____  ____          ____  ____  ____
 		  *    \    /\    /\    /   /\   \    /\    /\    /
 		  *     \  /3 \  /0 \  /   /  \   \  /0 \  /3 \  /
 		  *      \/____\/____\/   /____\   \/____\/____\/
@@ -21,7 +21,7 @@ public class PyraminxSolver {
 		  *           \  /   /  \1 /  \2 /  \   \  /
 		  *            \/   /____\/____\/____\   \/
 		  *               L                    R
-		  *                  ____  ____  ____    
+		  *                  ____  ____  ____
 		  *                 \    /\    /\    /
 		  *                  \  /1 \  /2 \  /
 		  *                   \/____\/____\/
@@ -37,7 +37,7 @@ public class PyraminxSolver {
 		  * There are 6 edges, each one having 2 different orientations.
 		  * Dollars mark the primary facelet position.
 		  *                         U
-		  *     ____  ____  ____          ____  ____  ____ 
+		  *     ____  ____  ____          ____  ____  ____
 		  *    \    /\    /\    /   /\   \    /\    /\    /
 		  *     \  /  \5$/  \  /   /  \   \  /  \5 /  \  /
 		  *      \/____\/____\/   /____\   \/____\/____\/
@@ -48,7 +48,7 @@ public class PyraminxSolver {
 		  *           \  /   /  \  /0$\  /  \   \  /
 		  *            \/   /____\/____\/____\   \/
 		  *               L                    R
-		  *                  ____  ____  ____    
+		  *                  ____  ____  ____
 		  *                 \    /\    /\    /
 		  *                  \  /  \0 /  \  /
 		  *                   \/____\/____\/
@@ -405,7 +405,7 @@ public class PyraminxSolver {
 	public String solveIn(PyraminxSolverState state, int length, boolean includingTips) {
 		return solve(state, length, false, false, includingTips);
 	}
-	
+
 	/**
 	 * Return a generator of a given position in exactly length number of turns or not at all.
 	 * Returns either the solution or the generator (inverse solution)
@@ -417,7 +417,7 @@ public class PyraminxSolver {
 	public String generateExactly(PyraminxSolverState state, int length, boolean includingTips) {
 		return solve(state, length, true, true, includingTips);
 	}
-	
+
 	private String solve(PyraminxSolverState state, int desiredLength, boolean exactLength, boolean inverse, boolean includingTips) {
 		Random r = new Random();
 		int[] solution = new int[MAX_LENGTH];
@@ -439,7 +439,7 @@ public class PyraminxSolver {
 		if(!foundSolution) {
 			return null;
 		}
-		
+
 		StringBuilder scramble = new StringBuilder((MAX_LENGTH+4)*3);
 		if(inverse){
 			for(int i = length - 1; i >= 0; i--) {
@@ -466,7 +466,7 @@ public class PyraminxSolver {
 				}
 			}
 		}
-		
+
 		return scramble.toString().trim();
 	}
 }

@@ -8,7 +8,7 @@ package javax.servlet.http;
 
 /**
  * Listener events for session creation and destruction
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface HttpSessionListener extends java.util.EventListener {

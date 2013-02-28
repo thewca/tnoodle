@@ -11,7 +11,7 @@ import java.io.IOException;
 
 /**
  * Wraps a servlet response object using the decorator pattern
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class ServletResponseWrapper implements ServletResponse {

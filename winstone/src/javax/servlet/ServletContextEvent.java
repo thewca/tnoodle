@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * The event object thrown when a servlet context change occurs.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class ServletContextEvent extends java.util.EventObject {

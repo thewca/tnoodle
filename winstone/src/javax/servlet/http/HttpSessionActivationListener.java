@@ -8,7 +8,7 @@ package javax.servlet.http;
 
 /**
  * Interface for listeners interested in the session activation/deactivation
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface HttpSessionActivationListener extends java.util.EventListener {

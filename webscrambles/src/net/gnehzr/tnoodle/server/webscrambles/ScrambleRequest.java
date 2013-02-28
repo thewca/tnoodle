@@ -64,12 +64,12 @@ class ScrambleRequest {
 	private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
 
 	private static final int SCRAMBLES_PER_PAGE = 5;
-	
+
 	private static final int MAX_COUNT = 100;
 	private static final int MAX_COPIES = 100;
 
 	private static final int WCA_MAX_MOVES_FMC = 80;
-	
+
 	private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
 	private static SortedMap<String, LazyInstantiator<Puzzle>> puzzles;
 	static {
@@ -80,7 +80,7 @@ class ScrambleRequest {
 		} catch (IOException e) {
 			l.log(Level.INFO, "", e);
 		}
-		
+
 		// This is an awful workaround for https://github.com/jfly/tnoodle/issues/1.
 		// Hopefully someday this problem will go away, and this code can simply be deleted.
 		try {
@@ -93,11 +93,11 @@ class ScrambleRequest {
 					"https://github.com/jfly/tnoodle/issues/1 for more details.", e);
 		}
 	}
-	
+
 	// This is here just to make GSON work.
 	public ScrambleRequest(){}
-	
-	
+
+
 	public String[] scrambles;
 	public Puzzle scrambler;
 	public int count;
@@ -128,18 +128,18 @@ class ScrambleRequest {
 		default:
 			throw new InvalidScrambleRequestException("Invalid puzzle request " + scrambleRequestUrl);
 		}
-		
+
 		LazyInstantiator<Puzzle> lazyScrambler = puzzles.get(puzzle);
 		if(lazyScrambler == null) {
 			throw new InvalidScrambleRequestException("Invalid scrambler: " + puzzle);
 		}
-		
+
 		try {
 			this.scrambler = lazyScrambler.cachedInstance();
 		} catch (Exception e) {
 			throw new InvalidScrambleRequestException(e);
 		}
-		
+
 		ScrambleCacher scrambleCacher = scrambleCachers.get(puzzle);
 		if(scrambleCacher == null) {
 			scrambleCacher = new ScrambleCacher(scrambler);
@@ -159,7 +159,7 @@ class ScrambleRequest {
 		} else {
 			this.scrambles = scrambleCacher.newScrambles(count);
 		}
-		
+
 		this.colorScheme = scrambler.parseColorScheme(scheme);
 	}
 
@@ -172,7 +172,7 @@ class ScrambleRequest {
 			int i = 0;
 			for(String title : query.keySet()) {
 				// Note that we prefix the seed with the title of the round! This ensures that we get unique
-				// scrambles in different rounds. Thanks to Ravi Fernando for noticing this at Stanford Fall 2011. 
+				// scrambles in different rounds. Thanks to Ravi Fernando for noticing this at Stanford Fall 2011.
 				// (http://www.worldcubeassociation.org/results/c.php?i=StanfordFall2011).
 				String uniqueSeed = null;
 				if(seed != null) {
@@ -183,15 +183,15 @@ class ScrambleRequest {
 		}
 		return scrambleRequests;
 	}
-	
+
 
 	private static final DefaultSplitCharacter SPLIT_ON_SPACES = new DefaultSplitCharacter() {
 		@Override
 		public boolean isSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
 			// We don't allow splitting on spaces that are being used as padding
-			// We know a space isn't being used as padding if it is followed immediately by 
+			// We know a space isn't being used as padding if it is followed immediately by
 			// a non space character.
-			return ( getCurrentCharacter(current, cc, ck) == ' ' && 
+			return ( getCurrentCharacter(current, cc, ck) == ' ' &&
 						( current == end || getCurrentCharacter(current+1, cc, ck) != ' ') );
 		}
 	};
@@ -212,18 +212,18 @@ class ScrambleRequest {
 		PdfWriter docWriter = PdfWriter.getInstance(doc, pdfOut);
 
 		docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
-		
+
 		doc.addCreationDate();
 		doc.addProducer();
 		if(globalTitle != null) {
 			doc.addTitle(globalTitle);
 		}
-		
+
 		doc.open();
 		// Note that we ignore scrambleRequest.copies here.
 		addScrambles(docWriter, doc, scrambleRequest, globalTitle);
 		doc.close();
-		
+
 		// TODO - is there a better way to convert from a PdfWriter to a PdfReader?
 		PdfReader pr = new PdfReader(pdfOut.toByteArray());
 		if(scrambleRequest.fmc) {
@@ -231,17 +231,17 @@ class ScrambleRequest {
 			// the competition name on them.
 			return pr;
 		}
-		
+
 		pdfOut = new ByteArrayOutputStream();
 		doc = new Document(pageSize, 0, 0, 75, 75);
 		docWriter = PdfWriter.getInstance(doc, pdfOut);
 		doc.open();
-		
+
 		PdfContentByte cb = docWriter.getDirectContent();
 
 		for(int pageN = 1; pageN <= pr.getNumberOfPages(); pageN++) {
 			PdfImportedPage page = docWriter.getImportedPage(pr, pageN);
-			
+
 			doc.newPage();
 			cb.addTemplate(page, 0, 0);
 
@@ -255,7 +255,7 @@ class ScrambleRequest {
 			ColumnText.showTextAligned(cb,
 					Element.ALIGN_CENTER, new Phrase(globalTitle),
 					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 60, 0);
-			
+
 			ColumnText.showTextAligned(cb,
 					Element.ALIGN_CENTER, new Phrase(scrambleRequest.title),
 					(pageSize.getLeft() + pageSize.getRight()) / 2, pageSize.getTop() - 45, 0);
@@ -282,7 +282,7 @@ class ScrambleRequest {
 //		The PdfStamper class doesn't seem to be working.
 //		pdfOut = new ByteArrayOutputStream();
 //		PdfStamper ps = new PdfStamper(pr, pdfOut);
-//		
+//
 //		for(int pageN = 1; pageN <= pr.getNumberOfPages(); pageN++) {
 //			PdfContentByte pb = ps.getUnderContent(pageN);
 //			Rectangle rect = pr.getBoxSize(pageN, "art");
@@ -300,66 +300,66 @@ class ScrambleRequest {
 
 	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle) throws DocumentException, IOException {
 		azzert(scrambleRequest.count == scrambleRequest.scrambles.length);
-		
+
 		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
 		Rectangle pageSize = doc.getPageSize();
-		
+
 		if(scrambleRequest.fmc) {
 			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
 				String scramble = scrambleRequest.scrambles[i];
 				PdfContentByte cb = docWriter.getDirectContent();
 				float LINE_THICKNESS = 0.5f;
 				BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-				
+
 				int bottom = 30;
 				int left = 35;
 				int right = (int) (pageSize.getWidth()-left);
 				int top = (int) (pageSize.getHeight()-bottom);
-				
+
 				int height = top - bottom;
 				int width = right - left;
-				
+
 				int solutionBorderTop = bottom + (int) (height*.5);
 				int scrambleBorderTop = solutionBorderTop + 40;
-				
+
 				int competitorInfoBottom = top - (int) (height*.15);
 				int gradeBottom = competitorInfoBottom - 50;
 				int competitorInfoLeft = right - (int) (width*.45);
 
 				int rulesRight = competitorInfoLeft;
-				
+
 				int padding = 5;
-				
+
 				// Outer border
-				cb.setLineWidth(2f); 
+				cb.setLineWidth(2f);
 				cb.moveTo(left, top);
 				cb.lineTo(left, bottom);
 				cb.lineTo(right, bottom);
 				cb.lineTo(right, top);
-				
+
 				// Solution border
 				cb.moveTo(left, solutionBorderTop);
 				cb.lineTo(right, solutionBorderTop);
-				
+
 				// Rules bottom border
 				cb.moveTo(left, scrambleBorderTop);
 				cb.lineTo(rulesRight, scrambleBorderTop);
 
 				// Rules right border
 				cb.lineTo(rulesRight, gradeBottom);
-				
+
 				// Grade bottom border
 				cb.moveTo(competitorInfoLeft, gradeBottom);
 				cb.lineTo(right, gradeBottom);
-				
+
 				// Competitor info bottom border
 				cb.moveTo(competitorInfoLeft, competitorInfoBottom);
 				cb.lineTo(right, competitorInfoBottom);
-				
+
 				// Competitor info left border
 				cb.moveTo(competitorInfoLeft, gradeBottom);
 				cb.lineTo(competitorInfoLeft, top);
-				
+
 				// Solution lines
 				int availableSolutionWidth = right - left;
 				int availableSolutionHeight = scrambleBorderTop - bottom;
@@ -386,11 +386,11 @@ class ScrambleRequest {
 						moveCount++;
 					}
 				}
-				
+
 				float UNDERLINE_THICKNESS = 0.2f;
 				cb.setLineWidth(UNDERLINE_THICKNESS);
 				cb.stroke();
-				
+
 				cb.beginText();
 				int availableScrambleSpace = right-left - 2*padding;
 				int scrambleFontSize = 20;
@@ -400,12 +400,12 @@ class ScrambleRequest {
 					scrambleFontSize--;
 					scrambleWidth = bf.getWidthPoint(scrambleStr, scrambleFontSize);
 				} while(scrambleWidth > availableScrambleSpace);
-				
+
 				cb.setFontAndSize(bf, scrambleFontSize);
 				int scrambleY = 3 + solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
 				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scrambleStr, left+padding, scrambleY, 0);
 				cb.endText();
-				
+
 				int availableScrambleWidth = right-rulesRight;
 				int availableScrambleHeight = gradeBottom-scrambleBorderTop;
 				Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
@@ -419,9 +419,9 @@ class ScrambleRequest {
 				}
 				g2.dispose();
 				cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
-				
+
 				ColumnText ct = new ColumnText(cb);
-				
+
 				int fontSize = 15;
 				int marginBottom = 10;
 				int offsetTop = 27;
@@ -429,13 +429,13 @@ class ScrambleRequest {
 				if(showScrambleCount) {
 					offsetTop -= fontSize + 2;
 				}
-				
+
 				cb.beginText();
 				cb.setFontAndSize(bf, fontSize);
 				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, globalTitle, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
 				offsetTop += fontSize + 2;
 				cb.endText();
-				
+
 				cb.beginText();
 				cb.setFontAndSize(bf, fontSize);
 				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
@@ -450,60 +450,60 @@ class ScrambleRequest {
 				}
 
 				offsetTop += fontSize + marginBottom;
-				
+
 				cb.beginText();
 				fontSize = 15;
 				cb.setFontAndSize(bf, fontSize);
 				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Competitor: __________________", competitorInfoLeft+padding, top-offsetTop, 0);
 				offsetTop += fontSize + marginBottom;
 				cb.endText();
-				
+
 				cb.beginText();
-				
+
 				fontSize = 15;
 				cb.setFontAndSize(bf, fontSize);
 				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
-				
+
 				cb.setFontAndSize(bf, 19);
 				int wcaIdLength = 63;
 				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
-				
+
 				offsetTop += fontSize + (int) (marginBottom*1.8);
 				cb.endText();
-				
-				
+
+
 				cb.beginText();
 				fontSize = 11;
 				cb.setFontAndSize(bf, fontSize);
 				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "DO NOT FILL IF YOU ARE THE COMPETITOR", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
 				offsetTop += fontSize + marginBottom;
 				cb.endText();
-				
+
 				cb.beginText();
 				fontSize = 11;
 				cb.setFontAndSize(bf, fontSize);
 				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Graded by: _______________ Result: ______", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
 				offsetTop += fontSize + marginBottom;
 				cb.endText();
-				
+
 				cb.beginText();
 				cb.setFontAndSize(bf, 25f);
 				int MAGIC_NUMBER = 40; // kill me now
 				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
 				cb.endText();
-				
+
 				List rules = new List(List.UNORDERED);
 				rules.add("Notate your solution by writing one move per bar.");
 				rules.add("To delete moves, clearly erase/blacken them.");
 				rules.add("Face moves F, B, R, L, U, and D are clockwise.");
 				rules.add("Rotations x, y, and z follow R, U, and F.");
 				rules.add("' inverts a move; 2 doubles it. w makes a face turn into double-layer, [ ] into a cube rotation.");
-				
+
 				ct.addElement(rules);
 				int rulesTop = competitorInfoBottom+55;
 				ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
 				ct.go();
-				
+
 				rules = new List(List.UNORDERED);
 				rules.add("You have 1 hour to find a solution.");
 				rules.add("Your solution length will be counted in BTM. (Slice moves count as two turns.)");
@@ -529,7 +529,7 @@ class ScrambleRequest {
 				// because the scrambles are so uniformly sized.
 				scrambleWidth = 190;
 			}
-			
+
 			float sideMargins = 100 + doc.leftMargin() + doc.rightMargin();
 			float vertMargins = doc.topMargin() + doc.bottomMargin();
 			float availableWidth = pageSize.getWidth()-sideMargins;
@@ -537,7 +537,7 @@ class ScrambleRequest {
 			int scrambleHeight = (int) (availableHeight/SCRAMBLES_PER_PAGE - 2*scrambleImagePadding);
 			Dimension dim = scrambleRequest.scrambler.getPreferredSize(scrambleWidth, scrambleHeight);
 			PdfContentByte cb = docWriter.getDirectContent();
-			
+
 			int charsWide = (int) Math.ceil(Math.log(scrambleRequest.scrambles.length)/Math.log(10));
 			String wideString = "";
 			for(int i = 0; i < charsWide; i++) {
@@ -631,7 +631,7 @@ class ScrambleRequest {
 					table.addCell("");
 				}
 			}
-			
+
 			doc.add(table);
 		}
 		doc.newPage();
@@ -683,7 +683,7 @@ class ScrambleRequest {
 		}
 		return newStrings;
 	}
-	
+
 	private static final String INVALID_CHARS = "\\/:*?\"<>|";
 	public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password) throws IOException, DocumentException, ZipException {
 		ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
@@ -725,14 +725,14 @@ class ScrambleRequest {
 			zipOut.write(b);
 
 			zipOut.closeEntry();
-			
+
 			String txtFileName = "txt/" + safeTitle + ".txt";
 			parameters.setFileNameInZip(txtFileName);
 			zipOut.putNextEntry(null, parameters);
 			zipOut.write(Utils.join(stripNewlines(scrambleRequest.scrambles), "\r\n").getBytes());
 			zipOut.closeEntry();
 		}
-		
+
 		parameters.setFileNameInZip(globalTitle + ".json");
 		zipOut.putNextEntry(null, parameters);
 		HashMap<String, Object> jsonObj = new HashMap<String, Object>();
@@ -750,10 +750,10 @@ class ScrambleRequest {
 		ByteArrayOutputStream baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
 		zipOut.write(baos.toByteArray());
 		zipOut.closeEntry();
-		
+
 		zipOut.finish();
 		zipOut.close();
-		
+
 		return baosZip;
 	}
 
@@ -805,5 +805,5 @@ class ScrambleRequest {
 		doc.close();
 		return totalPdfOutput;
 	}
-	
+
 }

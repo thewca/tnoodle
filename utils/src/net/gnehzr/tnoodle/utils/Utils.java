@@ -42,13 +42,13 @@ import com.google.gson.JsonSerializer;
 
 public final class Utils {
 	private static final Logger l = Logger.getLogger(Utils.class.getName());
-	
+
 	private static final String RESOURCE_FOLDER = "tnoodle_resources";
 	private static final String DEVEL_VERSION = "devel";
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
-	
+
 	private Utils() {}
-	
+
 	private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
 	static {
 		Color timPurple = new Color(98, 50, 122);
@@ -84,7 +84,7 @@ public final class Utils {
 			return null;
 		}
 	}
-	
+
 	public static Color invertColor(Color c) {
 		if(c == null)
 			return Color.BLACK;
@@ -96,7 +96,7 @@ public final class Utils {
 			return "";
 		return Integer.toHexString(0x1000000 | (c.getRGB() & 0xffffff)).substring(1);
 	}
-	
+
 	public static double[][][] toPoints(GeneralPath s) {
 		ArrayList<ArrayList<double[]>> areas = new ArrayList<ArrayList<double[]>>();
 		ArrayList<double[]> area = null;
@@ -144,7 +144,7 @@ public final class Utils {
 			return def;
 		}
 	}
-	
+
 	public static Long toLong(String string, Long def) {
 		try {
 			return Long.parseLong(string);
@@ -152,7 +152,7 @@ public final class Utils {
 			return def;
 		}
 	}
-	
+
 	public static int ceil(double d) {
 		return (int) Math.ceil(d);
 	}
@@ -162,7 +162,7 @@ public final class Utils {
 		e.printStackTrace(new PrintStream(bytes));
 		return bytes.toString();
 	}
-	
+
 	public static String[] parseExtension(String filename) {
 		int lastDot = filename.lastIndexOf('.');
 		String name, extension;
@@ -175,7 +175,7 @@ public final class Utils {
 		}
 		return new String[] { name, extension };
 	}
-	
+
 	public static String join(Object[] arr, String separator) {
 		if(separator == null) {
 			separator = ",";
@@ -189,7 +189,7 @@ public final class Utils {
 		}
 		return sb.toString();
 	}
-	
+
 	public static <H> String join(ArrayList<H> arr, String separator) {
 		if(separator == null) {
 			separator = ",";
@@ -270,7 +270,7 @@ public final class Utils {
 		registerTypeAdapter(Color.class, new Colorizer());
 		registerTypeAdapter(GeneralPath.class, new Pather());
 	}
-	
+
 	private static class Colorizer implements JsonSerializer<Color>, JsonDeserializer<Color> {
 
 		@Override
@@ -287,7 +287,7 @@ public final class Utils {
 		}
 
 	}
-	
+
 	private static class Pather implements JsonSerializer<GeneralPath>, JsonDeserializer<GeneralPath> {
 
 		/*
@@ -323,13 +323,13 @@ public final class Utils {
 		@Override
 		public GeneralPath deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
 			GeneralPath path = new GeneralPath();
-			
+
 			JsonArray areas = json.getAsJsonArray();
 			for(int c = 0; c < areas.size(); c++) {
 				JsonArray area = areas.get(c).getAsJsonArray();
 				if(area.size() == 0)
 					continue;
-				
+
 				JsonArray pt = area.get(0).getAsJsonArray();
 				path.moveTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
 				for(int i = 1; i < area.size(); i++) {
@@ -341,7 +341,7 @@ public final class Utils {
 			return path;
 		}
 	}
-	
+
 	public static File getResourceDirectory() {
 		return getResourceDirectory(true);
 	}
@@ -380,7 +380,7 @@ public final class Utils {
 		}
 		return programDirectory;
 	}
-	
+
 	private static Class<?> getCallerClass() {
 		Class<?> callerClass = Utils.class;
 		int i = 2;
@@ -389,10 +389,10 @@ public final class Utils {
 		}
 		return callerClass;
 	}
-	
+
 	private static File getJarFileOrDirectory() {
 		Class<?> callerClass = getCallerClass();
-		
+
 		Class<?> referenceClass;
 		if(callerClass.getClassLoader() == Utils.class.getClassLoader()) {
 			referenceClass = callerClass;
@@ -402,7 +402,7 @@ public final class Utils {
 			// web app, and were loaded with the servlet container's classloader.
 			referenceClass = Utils.class;
 		}
-		
+
 		File programDirectory;
 		try {
 			programDirectory = new File(referenceClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
@@ -411,7 +411,7 @@ public final class Utils {
 		}
 		return programDirectory;
 	}
-	
+
 	public static File getJarFile() {
 		File potentialJarFile = getJarFileOrDirectory();
 		if(potentialJarFile.isFile()) {
@@ -461,10 +461,10 @@ public final class Utils {
 				+ TEMP_DIR_ATTEMPTS + " attempts (tried "
 				+ baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
 	}
-	
+
 	public static void doFirstRunStuff() throws FileNotFoundException, IOException {
 		File jarFile = getJarFile();
-		
+
 		if(jarFile != null) {
 			File resourceDirectory = getResourceDirectory(false);
 			if(resourceDirectory.isDirectory()) {
@@ -473,7 +473,7 @@ public final class Utils {
 				return;
 			}
 
-			
+
 			File tempResourceDirectory = createTempDir();
 			JarInputStream jarIs = new JarInputStream(new FileInputStream(jarFile));
 			JarEntry entry;
@@ -482,7 +482,7 @@ public final class Utils {
 				if(entry.isDirectory()) {
 					continue;
 				}
-				
+
 				if(entry.getName().startsWith(RESOURCE_FOLDER)) {
 					// Remove the leading RESOURCE_FOLDER from the filename,
 					// so we can put it in resourceDirectory directly.
@@ -508,7 +508,7 @@ public final class Utils {
 	public static void azzertEquals(Object a, Object b) {
 		azzert(a.equals(b), a + " is not equal to " + b);
 	}
-	
+
 	public static void azzert(boolean expr) {
 		if(!expr) {
 			throw new AssertionError();
@@ -520,13 +520,13 @@ public final class Utils {
 			throw new AssertionError(message);
 		}
 	}
-	
+
 	public static void azzert(boolean expr, Throwable t) {
 		if(!expr) {
 			throw new AssertionError(t);
 		}
 	}
-	
+
 	public static String getProjectName() {
 		Package p = Utils.class.getPackage();
 		String name = p.getImplementationTitle();
@@ -568,7 +568,7 @@ public final class Utils {
 	public static File getWebappsDir() {
 		return new File(getResourceDirectory(), "/webapps/");
 	}
-	
+
 	public static File getWebappDir(String webappName) {
 		if(webappName == null) {
 			webappName = "ROOT";
@@ -587,25 +587,25 @@ public final class Utils {
 		azzert(count > 0);
 		return chosen;
 	}
-	
+
 	public static void deepCopy(int[][] src, int[][] dest) {
 		for(int i = 0; i < src.length; i++) {
 			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
 		}
 	}
-	
+
 	public static void deepCopy(int[][][] src, int[][][] dest) {
 		for(int i = 0; i < src.length; i++) {
 			deepCopy(src[i], dest[i]);
 		}
 	}
-	
+
 	public static <T> void deepCopy(T[][] src, T[][] dest) {
 		for(int i = 0; i < src.length; i++) {
 			System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
 		}
 	}
-	
+
 	public static int indexOf(Object o, Object[] arr) {
 		for(int i = 0; i < arr.length; i++) {
 			if(arr[i].equals(o)) {

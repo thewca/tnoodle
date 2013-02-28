@@ -33,7 +33,7 @@ public class ScrambleImporterHandler extends SafeHttpServlet {
 			Matcher m = BOUNDARY_PATTERN.matcher(boundary);
 			m.matches();
 			boundary = "--" + m.group(1);
-	
+
 			BufferedReader in = new BufferedReader(new InputStreamReader(request.getInputStream()));
 			ArrayList<String> scrambles = new ArrayList<String>();
 			String line;

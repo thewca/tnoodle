@@ -20,7 +20,7 @@ import javax.naming.spi.NamingManager;
 
 /**
  * Enumeration over the set of bindings for this context.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneBindingEnumeration.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
@@ -33,7 +33,7 @@ public class WinstoneBindingEnumeration implements NamingEnumeration {
     /**
      * Constructor - sets up the enumeration ready for retrieving bindings
      * instead of NameClassPairs.
-     * 
+     *
      * @param bindings
      *            The source binding set
      */

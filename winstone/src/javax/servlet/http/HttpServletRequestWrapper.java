@@ -11,7 +11,7 @@ import java.security.Principal;
 
 /**
  * Wraps HttpServletRequest objects in a decorator pattern
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class HttpServletRequestWrapper extends

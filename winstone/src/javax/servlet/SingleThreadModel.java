@@ -9,7 +9,7 @@ package javax.servlet;
 /**
  * This is just to ensure that a servlet can flag itself as a non-multithreaded
  * instance.
- * 
+ *
  * @deprecated
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */

@@ -29,10 +29,10 @@ import winstone.WinstoneResourceBundle;
 /**
  * Implements a JDBC 2.0 pooling datasource. This is meant to act as a wrapper
  * around a JDBC 1.0 driver, just providing the pool management functions.
- * 
- * Supports keep alives, and check-connection-before-get options, as well 
+ *
+ * Supports keep alives, and check-connection-before-get options, as well
  * as normal reclaimable pool management options like maxIdle, maxConnections and
- * startConnections. Additionally it supports poll-retry on full, which means the 
+ * startConnections. Additionally it supports poll-retry on full, which means the
  * getConnection call will block and retry after a certain period when the pool
  * is maxed out (good for high load conditions).
  *
@@ -43,41 +43,41 @@ import winstone.WinstoneResourceBundle;
  * @version $Id: WinstoneDataSource.java,v 1.8 2006/11/07 01:30:39 rickknowles Exp $
  */
 public class WinstoneDataSource implements DataSource, Runnable {
-    
-    public static final WinstoneResourceBundle DS_RESOURCES = 
+
+    public static final WinstoneResourceBundle DS_RESOURCES =
         new WinstoneResourceBundle("winstone.jndi.resourceFactories.LocalStrings");
-    
+
     private String name;
-    
+
     private String url;
     private Driver driver;
     private Properties connectProps;
-    
+
     private int maxIdleCount;
     private int maxHeldCount;
     private int retryCount;
     private int retryPeriod;
-    
+
     private String keepAliveSQL;
     private int keepAlivePeriod;
     private boolean checkBeforeGet;
     private int killInactivePeriod;
-    
+
     private List usedWrappers;
     private List unusedRealConnections; // sempahore
     private List usedRealConnections;
-    
+
     private Thread managementThread;
 
     private int loginTimeout;
     private PrintWriter logWriter;
-    
+
     /**
      * Main constructor. Basically just calls the init method
      */
     public WinstoneDataSource(String name, Map args, ClassLoader loader) {
         this.name = name;
-        
+
         this.usedWrappers = new ArrayList();
         this.usedRealConnections = new ArrayList();
         this.unusedRealConnections = new ArrayList();
@@ -86,7 +86,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         // Extract pool management properties
         this.keepAliveSQL = WebAppConfiguration.stringArg(args, "keepAliveSQL", "");
         this.keepAlivePeriod = WebAppConfiguration.intArg(args, "keepAlivePeriod", -1);
-        this.checkBeforeGet = WebAppConfiguration.booleanArg(args, "checkBeforeGet", 
+        this.checkBeforeGet = WebAppConfiguration.booleanArg(args, "checkBeforeGet",
                 !this.keepAliveSQL.equals(""));
         this.killInactivePeriod = WebAppConfiguration.intArg(args, "killInactivePeriod", -1);
 
@@ -100,7 +100,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         this.maxHeldCount = WebAppConfiguration.intArg(args, "maxConnections", 20);
         this.maxIdleCount = WebAppConfiguration.intArg(args, "maxIdle", 10);
         int startCount = WebAppConfiguration.intArg(args, "startConnections", 1);
-        
+
         this.retryCount = WebAppConfiguration.intArg(args, "retryCount", 1);
         this.retryPeriod = WebAppConfiguration.intArg(args, "retryPeriod", 1000);
 
@@ -139,7 +139,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
             killPooledConnections(this.unusedRealConnections, 0);
             killPooledConnections(this.usedRealConnections, 0);
         }
-        
+
         this.usedRealConnections.clear();
         this.unusedRealConnections.clear();
         this.usedWrappers.clear();
@@ -168,13 +168,13 @@ public class WinstoneDataSource implements DataSource, Runnable {
         conn.setAutoCommit(true); // JFLY - quercus doesn't handle autoCommit=false
         return conn;
     }
-    
+
     /**
      * Get a read-write connection - preferably from the pool, but fresh if needed
      */
     protected Connection getConnection(int retriesAllowed) throws SQLException {
         Connection realConnection = null;
-        
+
         synchronized (this.unusedRealConnections) {
             // If we have any spare, get it from the unused pool
             if (this.unusedRealConnections.size() > 0) {
@@ -182,7 +182,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 this.unusedRealConnections.remove(realConnection);
                 this.usedRealConnections.add(realConnection);
                 log(Logger.FULL_DEBUG, "WinstoneDataSource.UsingPooled",
-                        new String[] {"" + this.usedRealConnections.size(), 
+                        new String[] {"" + this.usedRealConnections.size(),
                            "" + this.unusedRealConnections.size()}, null);
                 try {
                     return prepareWrapper(realConnection);
@@ -195,7 +195,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
             else if (this.usedRealConnections.size() < maxHeldCount) {
                 realConnection = makeNewRealConnection(this.usedRealConnections);
                 log(Logger.FULL_DEBUG, "WinstoneDataSource.UsingNew",
-                        new String[] {"" + this.usedRealConnections.size(), 
+                        new String[] {"" + this.usedRealConnections.size(),
                            "" + this.unusedRealConnections.size()}, null);
                 try {
                     return prepareWrapper(realConnection);
@@ -204,7 +204,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 }
             }
         }
-        
+
         if (realConnection != null) {
             // prepareWrapper() must have failed, so call this method again
             realConnection = null;
@@ -215,7 +215,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         } else {
             log(Logger.FULL_DEBUG, "WinstoneDataSource.Retrying", new String[] {
                     "" + maxHeldCount, "" + retriesAllowed, "" + retryPeriod}, null);
-            
+
             // If we are here, it's because we need to retry for a connection
             try {
                 Thread.sleep(retryPeriod);
@@ -240,7 +240,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         this.usedWrappers.add(wrapper);
         return wrapper;
     }
-    
+
     /**
      * Releases connections back to the pool
      */
@@ -254,7 +254,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
                     this.usedRealConnections.remove(realConnection);
                     this.unusedRealConnections.add(realConnection);
                     log(Logger.FULL_DEBUG, "WinstoneDataSource.Releasing",
-                            new String[] {"" + this.usedRealConnections.size(), 
+                            new String[] {"" + this.usedRealConnections.size(),
                                "" + this.unusedRealConnections.size()}, null);
                 } else {
                     log(Logger.WARNING, "WinstoneDataSource.ReleasingUnknown", null);
@@ -306,7 +306,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
                         keepAliveCounter = 0;
                     }
                 }
-                
+
                 if (Thread.interrupted()) {
                     threadRunning = false;
                 }
@@ -334,7 +334,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 } else {
                     Thread.sleep(60000); // sleep 1 minute
                 }
-                
+
                 if (Thread.interrupted()) {
                     threadRunning = false;
                 }
@@ -353,7 +353,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
     protected void executeKeepAliveOnUnused() {
         // keep alive all unused roConns now
         List dead = new ArrayList();
-        
+
         for (Iterator i = this.unusedRealConnections.iterator(); i.hasNext();) {
             Connection conn = (Connection) i.next();
 
@@ -363,12 +363,12 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 dead.add(conn);
             }
         }
-        
+
         for (Iterator i = dead.iterator(); i.hasNext(); ) {
             killConnection(this.unusedRealConnections, (Connection) i.next());
         }
-        
-        log(Logger.FULL_DEBUG, "WinstoneDataSource.KeepAliveFinished", "" + 
+
+        log(Logger.FULL_DEBUG, "WinstoneDataSource.KeepAliveFinished", "" +
                 this.unusedRealConnections.size(), null);
     }
 
@@ -400,8 +400,8 @@ public class WinstoneDataSource implements DataSource, Runnable {
 
         Connection realConnection = this.driver.connect(this.url, this.connectProps);
         pool.add(realConnection);
-        log(Logger.FULL_DEBUG, "WinstoneDataSource.AddingNew", 
-                new String[] {"" + this.usedRealConnections.size(), 
+        log(Logger.FULL_DEBUG, "WinstoneDataSource.AddingNew",
+                new String[] {"" + this.usedRealConnections.size(),
                 "" + this.unusedRealConnections.size()}, null);
 
         return realConnection;
@@ -425,7 +425,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
             log(Logger.FULL_DEBUG, "WinstoneDataSource.Killed", "" + killed, null);
         }
     }
-    
+
     private static void killConnection(List pool, Connection conn) {
         pool.remove(conn);
         try {
@@ -433,7 +433,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         } catch (SQLException err) {
         }
     }
-    
+
     private void log(int level, String msgKey, Throwable err) {
         if (getLogWriter() != null) {
             getLogWriter().println(DS_RESOURCES.getString(msgKey));
@@ -444,7 +444,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
             Logger.log(level, DS_RESOURCES, msgKey, err);
         }
     }
-    
+
     private void log(int level, String msgKey, String arg, Throwable err) {
         if (getLogWriter() != null) {
             getLogWriter().println(DS_RESOURCES.getString(msgKey, arg));
@@ -455,7 +455,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
             Logger.log(level, DS_RESOURCES, msgKey, arg, err);
         }
     }
-    
+
     private void log(int level, String msgKey, String arg[], Throwable err) {
         if (getLogWriter() != null) {
             getLogWriter().println(DS_RESOURCES.getString(msgKey, arg));
@@ -468,9 +468,9 @@ public class WinstoneDataSource implements DataSource, Runnable {
     }
 
     public String toString() {
-        return DS_RESOURCES.getString("WinstoneDataSource.StatusMsg", 
+        return DS_RESOURCES.getString("WinstoneDataSource.StatusMsg",
                 new String[] { this.name,
-                "" + this.usedRealConnections.size(), 
+                "" + this.usedRealConnections.size(),
                 "" + this.unusedRealConnections.size()});
     }
 
@@ -483,7 +483,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		throw new NotImplementedException();
 	}
-	
+
 	public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		throw new NotImplementedException();
 	}

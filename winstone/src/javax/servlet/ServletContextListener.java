@@ -8,7 +8,7 @@ package javax.servlet;
 
 /**
  * Thrown when a change to the servletContext occurs.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public interface ServletContextListener extends java.util.EventListener {

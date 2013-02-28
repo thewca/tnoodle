@@ -49,7 +49,7 @@ public class PyraminxPuzzle extends Puzzle {
 			azzert(false, e);
 			return null;
 		}
-		
+
 		return new PuzzleStateAndGenerator(pState, scramble);
 	}
 
@@ -188,7 +188,7 @@ public class PyraminxPuzzle extends Puzzle {
 		defaultColorScheme.put("L", toColor("FF0000"));
 		defaultColorScheme.put("R", toColor("0000FF"));
 	}
-	
+
 	@Override
 	public HashMap<String, Color> getDefaultColorScheme() {
 		return new HashMap<String, Color>(defaultColorScheme);
@@ -228,13 +228,13 @@ public class PyraminxPuzzle extends Puzzle {
 	protected int getRandomMoveCount() {
 		return 15;
 	}
-	
+
 	public class PyraminxState extends PuzzleState {
 		private int[][] image;
 		/** Trying to make an ascii art of the pyraminx stickers position...
 		  *
 		  *                                    U
-		  *              ____  ____  ____              ____  ____  ____ 
+		  *              ____  ____  ____              ____  ____  ____
 		  *             \    /\    /\    /     /\     \    /\    /\    /
 		  *              \0 /1 \2 /4 \3 /     /0 \     \0 /1 \2 /4 \3 /
 		  *               \/____\/____\/     /____\     \/____\/____\/
@@ -267,11 +267,11 @@ public class PyraminxPuzzle extends Puzzle {
 				}
 			}
 		}
-		
+
 		public PyraminxState(int[][] image) {
 			this.image = image;
 		}
-		
+
 		private void turn(int side, int dir, int[][] image) {
 			for(int i = 0; i < dir; i++) {
 				turn(side, image);
@@ -344,7 +344,7 @@ public class PyraminxPuzzle extends Puzzle {
 			/** Each face color is assigned a value so that the sum of the color (minus 1) of each edge gives a unique integer.
 			  * These edge values match the edge numbering in the PyraminxSolver class, making the following code simpler.
 			  *                                    U
-			  *              ____  ____  ____              ____  ____  ____ 
+			  *              ____  ____  ____              ____  ____  ____
 			  *             \    /\    /\    /     /\     \    /\    /\    /
 			  *              \  /  \5 /  \  /     /  \     \  /  \5 /  \  /
 			  *               \/____\/____\/     /____\     \/____\/____\/
@@ -452,7 +452,7 @@ public class PyraminxPuzzle extends Puzzle {
 		@Override
 		public HashMap<String, PuzzleState> getSuccessors() {
 			HashMap<String, PuzzleState> successors = new HashMap<String, PuzzleState>();
-			
+
 			String axes = "ulrb";
 			for(int axis = 0; axis < axes.length(); axis++) {
 				for(boolean tip : new boolean[] { true, false }) {

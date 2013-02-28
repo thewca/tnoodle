@@ -12,13 +12,13 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 /**
- * A hacked print writer that allows us to trigger an automatic flush on 
+ * A hacked print writer that allows us to trigger an automatic flush on
  * println operations that go over the content length or buffer size.
- * 
- * This is only necessary because the spec authors seem intent of having 
+ *
+ * This is only necessary because the spec authors seem intent of having
  * the print writer's flushing behaviour be half auto-flush and half not.
  * Damned if I know why - seems unnecessary and confusing to me.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneResponseWriter.java,v 1.3 2006/02/28 07:32:47 rickknowles Exp $
  */
@@ -27,8 +27,8 @@ public class WinstoneResponseWriter extends PrintWriter {
     private WinstoneOutputStream outputStream;
     private WinstoneResponse response;
     private int bytesBuffered;
-    
-    public WinstoneResponseWriter(WinstoneOutputStream out, 
+
+    public WinstoneResponseWriter(WinstoneOutputStream out,
             WinstoneResponse response) throws UnsupportedEncodingException {
         super(new OutputStreamWriter(out, response.getCharacterEncoding()), false);
         this.outputStream = out;
@@ -40,7 +40,7 @@ public class WinstoneResponseWriter extends PrintWriter {
         super.write(c);
         appendByteCount("" + ((char) c));
     }
-    
+
     public void write(char[] buf, int off, int len) {
         super.write(buf, off, len);
         if (buf != null) {
@@ -61,7 +61,7 @@ public class WinstoneResponseWriter extends PrintWriter {
         } catch (IOException err) {/* impossible */}
 
     }
-    
+
     public void println() {
         super.println();
         simulateAutoFlush();
@@ -74,8 +74,8 @@ public class WinstoneResponseWriter extends PrintWriter {
 
     protected void simulateAutoFlush() {
         String contentLengthHeader = response.getHeader(WinstoneResponse.CONTENT_LENGTH_HEADER);
-        if ((contentLengthHeader != null) && 
-                ((this.outputStream.getOutputStreamLength() + this.bytesBuffered) >= 
+        if ((contentLengthHeader != null) &&
+                ((this.outputStream.getOutputStreamLength() + this.bytesBuffered) >=
                         Integer.parseInt(contentLengthHeader))) {
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "WinstoneResponseWriter.AutoFlush",
                     new String[] {contentLengthHeader,

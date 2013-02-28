@@ -22,8 +22,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * The web.xml parsing logic. This is used by more than one launcher, so it's shared from here. 
- * 
+ * The web.xml parsing logic. This is used by more than one launcher, so it's shared from here.
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WebXmlParser.java,v 1.9 2006/12/08 04:08:44 rickknowles Exp $
  */
@@ -36,9 +36,9 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
         this.commonLoader = commonCL;
         this.rethrowValidationExceptions = true;
     }
-    
-    private final static String SCHEMA_SOURCE_PROPERTY = "http://java.sun.com/xml/jaxp/properties/schemaSource"; 
-    
+
+    private final static String SCHEMA_SOURCE_PROPERTY = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+
     /**
      * Get a parsed XML DOM from the given inputstream. Used to process the
      * web.xml application deployment descriptors. Returns null if the parse fails,
@@ -46,10 +46,10 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
      */
     protected Document parseStreamToXML(File webXmlFile) {
         DocumentBuilderFactory factory = getBaseDBF();
-        
+
         URL localXSD25 = this.commonLoader.getResource(LOCAL_ENTITY_TABLE[3][2]);
         URL localXSD24 = this.commonLoader.getResource(LOCAL_ENTITY_TABLE[2][2]);
-        
+
         // Test for XSD compliance
         try {
             factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
@@ -74,7 +74,7 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
                 return null;
             }
         }
-        
+
         // XSD compliant parser available, so parse as 2.5
         try {
             if (localXSD25 != null) {
@@ -115,8 +115,8 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
             }
         }
     }
-    
-    private Document parseAsV23Webapp(File webXmlFile) throws ParserConfigurationException, 
+
+    private Document parseAsV23Webapp(File webXmlFile) throws ParserConfigurationException,
             SAXException, IOException {
         DocumentBuilderFactory factory = getBaseDBF();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -124,7 +124,7 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
         builder.setErrorHandler(this);
         return builder.parse(webXmlFile);
     }
-    
+
     private DocumentBuilderFactory getBaseDBF() {
         // Use JAXP to create a document builder
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -139,7 +139,7 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
 
     /**
      * Table mapping public doctypes and system ids against local classloader paths. This
-     * is used to resolve local entities where possible. 
+     * is used to resolve local entities where possible.
      * Column 0 = public doctype
      * Column 1 = system id
      * Column 2 = local path
@@ -159,7 +159,7 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
         {null, "http://www.ibm.com/webservices/xsd/j2ee_web_services_client_1_1.xsd", "javax/servlet/resources/j2ee_web_services_client_1_1.xsd"},
         {null, "http://www.ibm.com/webservices/xsd/j2ee_web_services_client_1_2.xsd", "javax/servlet/resources/javaee_web_services_client_1_2.xsd"}
     };
-    
+
     /**
      * Implements the EntityResolver interface. This allows us to redirect any
      * requests by the parser for webapp DTDs to local copies. It's faster and
@@ -170,9 +170,9 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "WebXmlParser.ResolvingEntity",
                 new String[] { publicName, url });
         for (int n = 0; n < LOCAL_ENTITY_TABLE.length; n++) {
-            if (((LOCAL_ENTITY_TABLE[n][0] != null) && (publicName != null) && 
+            if (((LOCAL_ENTITY_TABLE[n][0] != null) && (publicName != null) &&
                         publicName.equals(LOCAL_ENTITY_TABLE[n][0])) ||
-                    ((LOCAL_ENTITY_TABLE[n][1] != null) && (url != null) && 
+                    ((LOCAL_ENTITY_TABLE[n][1] != null) && (url != null) &&
                             url.equals(LOCAL_ENTITY_TABLE[n][1]))) {
                 if (this.commonLoader.getResource(LOCAL_ENTITY_TABLE[n][2]) != null) {
                     return getLocalResource(url, LOCAL_ENTITY_TABLE[n][2]);

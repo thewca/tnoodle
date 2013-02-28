@@ -25,30 +25,30 @@ import winstone.WinstoneResponse;
 
 /**
  * Simulates an apache "combined" style logger, which logs User-Agent, Referer, etc
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SimpleAccessLogger.java,v 1.5 2006/03/24 17:24:19 rickknowles Exp $
  */
 public class SimpleAccessLogger implements AccessLogger {
 
-    public static final WinstoneResourceBundle ACCESSLOG_RESOURCES = 
+    public static final WinstoneResourceBundle ACCESSLOG_RESOURCES =
             new WinstoneResourceBundle("winstone.accesslog.LocalStrings");
-    
+
     private static final DateFormat DF = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
     private static final String COMMON = "###ip### - ###user### ###time### \"###uriLine###\" ###status### ###size###";
     private static final String COMBINED = COMMON + " \"###referer###\" \"###userAgent###\"";
     private static final String RESIN = COMMON + " \"###userAgent###\"";
-    
+
 //    private WebAppConfiguration webAppConfig;
     private OutputStream outStream;
     private PrintWriter outWriter;
     private String pattern;
     private String fileName;
-    
-    public SimpleAccessLogger(WebAppConfiguration webAppConfig, Map startupArgs) 
+
+    public SimpleAccessLogger(WebAppConfiguration webAppConfig, Map startupArgs)
             throws IOException {
 //        this.webAppConfig = webAppConfig;
-        
+
         // Get pattern
         String patternType = WebAppConfiguration.stringArg(startupArgs, "simpleAccessLogger.format", "combined");
         if (patternType.equalsIgnoreCase("combined")) {
@@ -56,30 +56,30 @@ public class SimpleAccessLogger implements AccessLogger {
         } else if (patternType.equalsIgnoreCase("common")) {
             this.pattern = COMMON;
         } else if (patternType.equalsIgnoreCase("resin")) {
-            this.pattern = RESIN; 
+            this.pattern = RESIN;
         } else {
             this.pattern = patternType;
         }
-        
+
         // Get filename
-        String filePattern = WebAppConfiguration.stringArg(startupArgs, "simpleAccessLogger.file", 
+        String filePattern = WebAppConfiguration.stringArg(startupArgs, "simpleAccessLogger.file",
                 "logs/###host###/###webapp###_access.log");
-        this.fileName = WinstoneResourceBundle.globalReplace(filePattern, 
+        this.fileName = WinstoneResourceBundle.globalReplace(filePattern,
                 new String [][] {{"###host###", webAppConfig.getOwnerHostname()},
                     {"###webapp###", webAppConfig.getContextName()}});
-        
+
         File file = new File(this.fileName);
         file.getParentFile().mkdirs();
         this.outStream = new FileOutputStream(file, true);
         this.outWriter = new PrintWriter(this.outStream, true);
-        
-        Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init", 
+
+        Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init",
                 new String[] {this.fileName, patternType});
     }
-    
+
     public void log(String originalURL, WinstoneRequest request, WinstoneResponse response) {
         String uriLine = request.getMethod() + " " + originalURL + " " + request.getProtocol();
-        int status = response.getErrorStatusCode() == null ? response.getStatus() 
+        int status = response.getErrorStatusCode() == null ? response.getStatus()
                 : response.getErrorStatusCode().intValue();
         int size = response.getWinstoneOutputStream().getBytesCommitted();
         String date = null;
@@ -102,7 +102,7 @@ public class SimpleAccessLogger implements AccessLogger {
     private static String nvl(String input) {
         return input == null ? "-" : input;
     }
-    
+
     public void destroy() {
         Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Close", this.fileName);
         if (this.outWriter != null) {

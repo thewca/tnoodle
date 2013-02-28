@@ -9,7 +9,7 @@ public class FullCube implements Comparable<FullCube> {
 	int dl = 0x998bba;
 	int dr = 0xddcffe;
 	int ml = 0;
-	
+
 	public int compareTo(FullCube f) {
 		if (ul != f.ul) {
 			return ul - f.ul;
@@ -29,11 +29,11 @@ public class FullCube implements Comparable<FullCube> {
 	FullCube(String s) {
 		//TODO
 	}
-	
+
 	FullCube() {
-	
+
 	}
-	
+
 	static Random r = new Random();
 	public static FullCube randomCube() {
 		return randomCube(r);
@@ -60,7 +60,7 @@ public class FullCube implements Comparable<FullCube> {
 				m = (1 << rnd) - 1;
 				corner = (corner & m) + ((corner >> 4) & ~m);
 				--n_corner;
-				++i;				
+				++i;
 			}
 		}
 		f.ml = r.nextInt(2);
@@ -74,7 +74,7 @@ public class FullCube implements Comparable<FullCube> {
 		this.dr = c.dr;
 		this.ml = c.ml;
 	}
-	
+
 	/**
 	 * @param move
 	 * 0 = twist
@@ -92,7 +92,7 @@ public class FullCube implements Comparable<FullCube> {
 		} else if (move > 0) {
 			int temp = ul;
 			ul = (ul<<move | ur>>(24-move)) & 0xffffff;
-			ur = (ur<<move | temp>>(24-move)) & 0xffffff;		
+			ur = (ur<<move | temp>>(24-move)) & 0xffffff;
 		} else if (move == 0) {
 			int temp = ur;
 			ur = dl;
@@ -102,21 +102,21 @@ public class FullCube implements Comparable<FullCube> {
 			move = -move;
 			int temp = dl;
 			dl = (dl<<move | dr>>(24-move)) & 0xffffff;
-			dr = (dr<<move | temp>>(24-move)) & 0xffffff;				
+			dr = (dr<<move | temp>>(24-move)) & 0xffffff;
 		} else if (move < -24) {
 			move = 48 + move;
 			int temp = dl;
 			dl = (dl>>move | dr<<(24-move)) & 0xffffff;
-			dr = (dr>>move | temp<<(24-move)) & 0xffffff;		
+			dr = (dr>>move | temp<<(24-move)) & 0xffffff;
 		}
 	}
-	
+
 	private byte pieceAt(int idx) {
 		int ret;
 		if (idx < 6) {
 			ret = ul >> ((5-idx) << 2);
 		} else if (idx < 12) {
-			ret = ur >> ((11-idx) << 2);		
+			ret = ur >> ((11-idx) << 2);
 		} else if (idx < 18) {
 			ret = dl >> ((17-idx) << 2);
 		} else {
@@ -124,7 +124,7 @@ public class FullCube implements Comparable<FullCube> {
 		}
 		return (byte) (ret & 0x0f);
 	}
-	
+
 	private void setPiece(int idx, int value) {
 		if (idx < 6) {
 			ul &= ~(0xf << ((5-idx) << 2));
@@ -138,11 +138,11 @@ public class FullCube implements Comparable<FullCube> {
 		} else {
 			dr &= ~(0xf << ((23-idx) << 2));
 			dr |= value << ((23-idx) << 2);
-		}	
+		}
 	}
-	
+
 	int[] arr = new int[16];
-	
+
 	int getParity() {
 //		int[] arr = new int[16];
 		int cnt = 0;
@@ -160,7 +160,7 @@ public class FullCube implements Comparable<FullCube> {
 		}
 		return p;
 	}
-	
+
 	int getShapeIdx() {
 		int urx = ur & 0x111111;
 		urx |= urx >> 3;
@@ -180,7 +180,7 @@ public class FullCube implements Comparable<FullCube> {
 		dlx = (dlx&0xf) | ((dlx>>12)&0x30);
 		return Shape.getShape2Idx(getParity()<<24 | ulx<<18 | urx<<12 | dlx<<6 | drx);
 	}
-	
+
 	void print() {
 		System.out.println(Integer.toHexString(ul));
 		System.out.println(Integer.toHexString(ur));
@@ -189,7 +189,7 @@ public class FullCube implements Comparable<FullCube> {
 	}
 
 	byte[] prm = new byte[8];
-	
+
 	void getSquare(Square sq) {
 		//TODO
 //		byte[] prm = new byte[8];
@@ -198,13 +198,13 @@ public class FullCube implements Comparable<FullCube> {
 		}
 		//convert to number
 		sq.cornperm = Square.get8Perm(prm);
-		
+
 		int a, b;
 		//Strip top layer edges
 		sq.topEdgeFirst = pieceAt(0)==pieceAt(1);
 		a = sq.topEdgeFirst ? 2 : 0;
 		for(b=0; b<4; a+=3, b++) prm[b]=(byte)(pieceAt(a)>>1);
-		
+
 		sq.botEdgeFirst = pieceAt(12)==pieceAt(13);
 		a = sq.botEdgeFirst ? 14 : 12;
 

@@ -12,7 +12,7 @@ import java.util.Enumeration;
 
 /**
  * The base class from which all servlets extend.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public abstract class GenericServlet implements Servlet, ServletConfig,

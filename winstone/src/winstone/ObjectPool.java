@@ -17,13 +17,13 @@ import java.util.Map;
 /**
  * Holds the object pooling code for Winstone. Presently this is only responses
  * and requests, but may increase.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ObjectPool.java,v 1.9 2006/11/18 14:56:59 rickknowles Exp $
  */
 public class ObjectPool implements Runnable {
     private static final long FLUSH_PERIOD = 60000L;
-    
+
     private int STARTUP_REQUEST_HANDLERS_IN_POOL = 5;
     private int MAX_IDLE_REQUEST_HANDLERS_IN_POOL = 50;
     private int MAX_REQUEST_HANDLERS_IN_POOL = 1000;
@@ -46,7 +46,7 @@ public class ObjectPool implements Runnable {
     private boolean saveSessions;
 
     private Thread thread;
-    
+
     /**
      * Constructs an instance of the object pool, including handlers, requests
      * and responses
@@ -82,7 +82,7 @@ public class ObjectPool implements Runnable {
         // Start the base set of handler threads
         for (int n = 0; n < STARTUP_REQUEST_HANDLERS_IN_POOL; n++) {
             this.unusedRequestHandlerThreads
-                    .add(new RequestHandlerThread(this, 
+                    .add(new RequestHandlerThread(this,
                             this.threadIndex++, this.simulateModUniqueId,
                             this.saveSessions));
         }
@@ -94,7 +94,7 @@ public class ObjectPool implements Runnable {
         for (int n = 0; n < START_RESPONSES_IN_POOL; n++) {
             this.unusedResponsePool.add(new WinstoneResponse());
         }
-        
+
         this.thread = new Thread(this, "WinstoneObjectPoolMgmt");
         this.thread.setDaemon(true);
         this.thread.start();
@@ -112,7 +112,7 @@ public class ObjectPool implements Runnable {
         }
         this.thread = null;
     }
-    
+
     private void removeUnusedRequestHandlers() {
         // Check max idle requestHandler count
         synchronized (this.requestHandlerSemaphore) {
@@ -162,7 +162,7 @@ public class ObjectPool implements Runnable {
 
             // If we are out (and not over our limit), allocate a new one
             else if (this.usedRequestHandlerThreads.size() < MAX_REQUEST_HANDLERS_IN_POOL) {
-                rh = new RequestHandlerThread(this, 
+                rh = new RequestHandlerThread(this,
                         this.threadIndex++, this.simulateModUniqueId,
                         this.saveSessions);
                 this.usedRequestHandlerThreads.add(rh);
@@ -191,7 +191,7 @@ public class ObjectPool implements Runnable {
 
             synchronized (this.requestHandlerSemaphore) {
                 if (this.usedRequestHandlerThreads.size() < MAX_REQUEST_HANDLERS_IN_POOL) {
-                    rh = new RequestHandlerThread(this, 
+                    rh = new RequestHandlerThread(this,
                             this.threadIndex++, this.simulateModUniqueId,
                             this.saveSessions);
                     this.usedRequestHandlerThreads.add(rh);

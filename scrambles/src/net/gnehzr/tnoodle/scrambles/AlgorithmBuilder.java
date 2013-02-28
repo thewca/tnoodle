@@ -20,7 +20,7 @@ public class AlgorithmBuilder {
 	 * cube rotation applied, but the successor states are labelled differently.
 	 * Turns passed into appendMove() are treated as if they apply to unsanitizedState,
 	 * and then we have to search for a successor to getState() that leads to the same
-	 * place. 
+	 * place.
 	 */
 	private PuzzleState unsanitizedState;
 	public AlgorithmBuilder(Puzzle puzzle, MungingMode mungingMode) {
@@ -30,16 +30,16 @@ public class AlgorithmBuilder {
 		unsanitizedState = puzzle.getSolvedState();
 		setMungingMode(mungingMode);
 	}
-	
+
 	private MungingMode mungingMode = MungingMode.NO_MUNGING;
 	public void setMungingMode(MungingMode mungingMode) {
 		this.mungingMode = mungingMode;
 	}
-	
+
 	public static enum MungingMode {
 		NO_MUNGING, IGNORE_REDUNDANT_MOVES, MUNGE_REDUNDANT_MOVES;
 	}
-	
+
 	public void appendMove(String newMove) throws InvalidMoveException {
 		PuzzleState sanitizedState = getState();
 		azzert(unsanitizedState.equals(sanitizedState));
@@ -72,7 +72,7 @@ public class AlgorithmBuilder {
 				}
 				PuzzleState stateAfterNewMove = stateAfterLastMove.apply(newMove);
 
-				// Does newMove cancel with lastMove? If so, it’s redundant. 
+				// Does newMove cancel with lastMove? If so, it’s redundant.
 				if(stateBeforeLastMove.equals(stateAfterNewMove)) {
 					if(mungingMode == MungingMode.IGNORE_REDUNDANT_MOVES) {
 						return;
@@ -107,32 +107,32 @@ public class AlgorithmBuilder {
 				}
 			}
 		}
-		
+
 		// If we got get here, then we know the move is not redundant, and we can
 		// just append it.
 		moves.add(newMove);
 		states.add(sanitizedState.apply(newMove));
-		
+
 		unsanitizedState = newUnsanitizedState;
 		azzert(states.size() == moves.size() + 1);
 		azzert(unsanitizedState.equals(getState()));
 	}
-	
+
 	public void appendAlgorithm(String algorithm) throws InvalidMoveException {
 		for(String move : splitAlgorithm(algorithm)) {
 			appendMove(move);
 		}
 	}
-	
+
 	public PuzzleState getState() {
 		azzert(states.size() == moves.size() + 1);
 		return states.get(states.size() - 1);
 	}
-	
+
 	public int length() {
 		return moves.size();
 	}
-	
+
 	public String toString() {
 		return Utils.join(moves, " ");
 	}
@@ -140,12 +140,12 @@ public class AlgorithmBuilder {
 	public PuzzleStateAndGenerator getStateAndGenerator() {
 		return new PuzzleStateAndGenerator(getState(), toString());
 	}
-	
+
 	public static String[] splitAlgorithm(String algorithm) {
 		if(algorithm.trim().isEmpty()) {
 			return new String[0];
 		}
 		return algorithm.split("\\s+");
 	}
-	
+
 }

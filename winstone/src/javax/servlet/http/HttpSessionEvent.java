@@ -8,7 +8,7 @@ package javax.servlet.http;
 
 /**
  * Base event class for session changed events
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class HttpSessionEvent extends java.util.EventObject {

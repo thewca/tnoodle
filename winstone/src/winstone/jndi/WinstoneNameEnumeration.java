@@ -18,13 +18,13 @@ import javax.naming.NamingException;
 /**
  * Enumeration across the names/classes of the bindings in a particular context.
  * Used by the list() method.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneNameEnumeration.java,v 1.3 2006/02/28 07:32:48 rickknowles Exp $
  */
 public class WinstoneNameEnumeration implements NamingEnumeration {
     private Enumeration nameEnumeration;
-    
+
     /**
      * Constructor
      */

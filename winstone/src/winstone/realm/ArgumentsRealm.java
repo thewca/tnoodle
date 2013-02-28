@@ -25,13 +25,13 @@ import winstone.WinstoneResourceBundle;
  * Base class for authentication realms. Subclasses provide the source of
  * authentication roles, usernames, passwords, etc, and when asked for
  * validation respond with a role if valid, or null otherwise.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ArgumentsRealm.java,v 1.4 2007/06/01 15:55:41 rickknowles Exp $
  */
 public class ArgumentsRealm implements AuthenticationRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
-    
+
     static final String PASSWORD_PREFIX = "argumentsRealm.passwd.";
     static final String ROLES_PREFIX = "argumentsRealm.roles.";
     private Map passwords;
