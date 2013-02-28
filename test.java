@@ -56,14 +56,14 @@ public class test {
 		}
 		return idx;
 	}
-	
+
 	static void other() {
 		for (int ix=0; ix<100; ix++) {
 			byte[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
 			byte[] co = {0, 0, 0, 0, 0, 0, 0, 0};
 			byte[] ep = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11};
 			byte[] eo = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		
+
 //			Tools.randomState(cp, co, ep, eo);
 
 			for (int i=0; i<8; ++i) {
@@ -96,7 +96,7 @@ public class test {
 		int maxTime = args.length < 4 ? 100000 : Integer.parseInt(args[3]);
 		int minTime = args.length < 5 ? 0 : Integer.parseInt(args[4]);
 		int verbose = args.length < 6 ? 0 : Integer.parseInt(args[5]);
-		
+
 		long tm;
 		if ((testValue & 0x01) != 0) {
 			tm = System.nanoTime();
@@ -143,7 +143,7 @@ public class test {
 			System.out.println(search.solution(Tools.superFlip(), 22, 100000, 10, 7));
 			System.out.println(System.nanoTime()-tm);
 		}
-		
+
 		if ((testValue & 0x20) != 0) {
 			tm = System.nanoTime();
 //			int total = 0;
@@ -162,15 +162,15 @@ public class test {
 				minT = Math.min(minT, curTime);
 //				System.out.println(s);
 				x++;
-				System.out.print(String.format("AvgTime: %8.3f ms, MaxTime: %8.3f ms, MinTime: %8.3f ms\r", 
+				System.out.print(String.format("AvgTime: %8.3f ms, MaxTime: %8.3f ms, MinTime: %8.3f ms\r",
 					(totalTime/1000000d)/x, maxT/1000000d, minT/1000000d));
 			}
 			System.out.println();
 			System.out.println(x + " Random Cube(s) Solved");
 			System.out.println(
-				"MaxLength: " + maxLength + "\n" + 
-				"MaxTimeLimited: " + maxTime + "\n" + 
-				"MinTimeLimited: " + minTime + "\n" + 
+				"MaxLength: " + maxLength + "\n" +
+				"MaxTimeLimited: " + maxTime + "\n" +
+				"MinTimeLimited: " + minTime + "\n" +
 				"verbose: " + verbose);
 		}
 	}
