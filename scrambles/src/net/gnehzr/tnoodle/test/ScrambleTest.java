@@ -199,9 +199,9 @@ public class ScrambleTest {
 			String longName = Puzzle.getScramblerLongName(shortName);
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
 			Puzzle scrambler = lazyScrambler.cachedInstance();
-
-			azzertEquals(shortName, scrambler.getShortName());
-			azzertEquals(longName, scrambler.getLongName());
+			
+			Utils.azzert(shortName.equals(scrambler.getShortName()));
+			Utils.azzert(longName.equals(scrambler.getLongName()));
 		}
 	}
 
