@@ -472,7 +472,12 @@ public abstract class Puzzle {
 		}
 		
 		public String solveIn(int n) {
+			if(this.isSolved())
+				return "";
+
+			// For debugging purpose.
 			boolean enableSpeedup = true;
+
 			HashMap<PuzzleState, Integer> seenSolved = new HashMap<PuzzleState, Integer>();
 			Queue<PuzzleState> fringeSolved = new LinkedList<PuzzleState>();
 			HashMap<PuzzleState, Integer> seenScrambled = new HashMap<PuzzleState, Integer>();
@@ -482,13 +487,14 @@ public abstract class Puzzle {
 			HashMap<PuzzleState, Integer> seenExtending;
 			Queue<PuzzleState> fringeExtending;
 			HashMap<PuzzleState, Integer> seenComparing;
-			Queue<PuzzleState> fringeComparing;
 
 			PuzzleState node = getSolvedState();
 			PuzzleState solved = getSolvedState();
 			fringeSolved.add(solved);
 			seenSolved.put(solved, 0);
-			fringeScrambled.add(this);
+			if(enableSpeedup){
+				fringeScrambled.add(this);
+			}
 			seenScrambled.put(this, 0);
 
 			TimedLogRecordStart start = new TimedLogRecordStart(Level.FINER, "Searching for solution in " + n + " moves.");
@@ -497,35 +503,22 @@ public abstract class Puzzle {
 			boolean found = false;
 			int max_distance = enableSpeedup ? (n+1)/2 : n;
 
-			if(this.isSolved())
-				return "";
-
 			// The task here is to do a breadth-first search starting from both the solved state and the scrambled state.
 			// When we got an intersection from the two hash maps, we are done!
 			outer: while(!(fringeSolved.isEmpty() && fringeScrambled.isEmpty())) {
-				if(enableSpeedup) {
-					// We have to choose on which side we are extending our search.
-					// I'm choosing to take the side where the hash map is the smaller.
-					// I just have to take care that the queue is not empty.
-					if(((seenSolved.size() < seenScrambled.size()) && !fringeSolved.isEmpty()) || fringeScrambled.isEmpty()) {
-						seenExtending = seenSolved;
-						fringeExtending = fringeSolved;
-						seenComparing = seenScrambled;
-						fringeComparing = fringeScrambled;
-					}
-					else {
-						seenExtending = seenScrambled;
-						fringeExtending = fringeScrambled;
-						seenComparing = seenSolved;
-						fringeComparing = fringeSolved;
-						// Yes, I'm copying references only.
-					}
-				}
-				else {
+				// We have to choose on which side we are extending our search.
+				// I'm choosing to take the side where the hash map is the smaller.
+				// I just have to take care that the queue is not empty.
+				if(((seenSolved.size() < seenScrambled.size()) && !fringeSolved.isEmpty()) || fringeScrambled.isEmpty()) {
 					seenExtending = seenSolved;
 					fringeExtending = fringeSolved;
 					seenComparing = seenScrambled;
-					fringeComparing = fringeScrambled;
+				}
+				else {
+					seenExtending = seenScrambled;
+					fringeExtending = fringeScrambled;
+					seenComparing = seenSolved;
+					// Yes, I'm copying references only.
 				}
 				
 				node = fringeExtending.poll();
@@ -577,8 +570,8 @@ public abstract class Puzzle {
 			PuzzleState state = node;
 			int distanceFromScrambled = seenScrambled.get(state);
 
-			/* We have to keep track of all states we are visited */
-			PuzzleState[] linkedStates = new PuzzleState[1 + (n+1)/2];
+			/* We have to keep track of all states we have visited */
+			PuzzleState[] linkedStates = new PuzzleState[distanceFromScrambled + 1];
 			linkedStates[distanceFromScrambled] = state;
 
 			outer: while(distanceFromScrambled > 0) {
