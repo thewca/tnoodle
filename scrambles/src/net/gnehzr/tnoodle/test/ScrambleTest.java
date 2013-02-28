@@ -6,6 +6,9 @@ import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
+import puzzle.ClockPuzzle;
+import puzzle.ClockPuzzle.ClockState;
 import puzzle.CubePuzzle;
 import puzzle.CubePuzzle.CubeState;
 import puzzle.PyraminxPuzzle;
@@ -22,12 +25,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.SortedMap;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static net.gnehzr.tnoodle.utils.Utils.azzert;
 import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
 
 public class ScrambleTest {
-
+	private static final Logger l = Logger.getLogger(Puzzle.class.getName());
+	
 	static class LockHolder extends Thread {
 		public LockHolder() {
 			setDaemon(true);
@@ -67,16 +73,15 @@ public class ScrambleTest {
 
 	public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 
+		benchmarking();
+
 		System.out.println("Testing names.");
 		testNames();
 
-		System.out.println("Testing specific CubePuzzle issues.");
+		System.out.println("Testing specific Puzzle issues.");
+		testClockPuzzle();
 		testCubePuzzle();
-		System.out.println("CubePuzzle tests passed!");
-
-		System.out.println("Testing specific PyraminxPuzzle issues.");
 		testPyraConverter();
-		System.out.println("PyraminxPuzzle tests passed!");
 
 		System.out.println("Testing solveIn method");
 		testSolveIn();
@@ -86,7 +91,7 @@ public class ScrambleTest {
 
 	private static void testSolveIn() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 		int SCRAMBLE_COUNT = 10;
-		int SCRAMBLE_LENGTH = 3;
+		int SCRAMBLE_LENGTH = 4;
 		Random r = new Random();
 
 		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
@@ -98,7 +103,7 @@ public class ScrambleTest {
 			System.out.println("Testing " + puzzle);
 
 			for(int count = 0; count < SCRAMBLE_COUNT; count++){
-				System.out.print("Scramble with:");
+				System.out.print("Scramble ["+(count+1)+"/"+SCRAMBLE_COUNT+"]: ");
 				PuzzleState state = scrambler.getSolvedState();
 				for(int i = 0; i < SCRAMBLE_LENGTH; i++){
 					HashMap<String, ? extends PuzzleState> successors = state.getSuccessors();
@@ -111,7 +116,9 @@ public class ScrambleTest {
 				System.out.print(". Found: "+solution);
 				state = state.applyAlgorithm(solution);
 				azzert(state.isSolved(), "Solution was not correct");
-				System.out.println(". Checked.");
+				System.out.print(". Checked.\r");
+				System.out.print("                                                                          \r");
+
 			}
 		}
 	}
@@ -156,7 +163,8 @@ public class ScrambleTest {
 			ScrambleCacherListener cacherStopper = new ScrambleCacherListener() {
 				@Override
 				public void scrambleCacheUpdated(ScrambleCacher src) {
-					System.out.println(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize());
+					System.out.print("                                                     \r");
+					System.out.print(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize() + "\r");
 					if(src.getAvailableCount() == src.getCacheSize()) {
 						src.stop();
 						synchronized(c1) {
@@ -179,7 +187,7 @@ public class ScrambleTest {
 
 		}
 		lh.setObjectToLock(null);
-		System.out.println("Test passed!");
+		System.out.println("\nTest passed!");
 	}
 
 	private static void testNames() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
@@ -192,14 +200,22 @@ public class ScrambleTest {
 			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
 			Puzzle scrambler = lazyScrambler.cachedInstance();
 
-			System.out.println(shortName + " ==? " + scrambler.getShortName());
-			Utils.azzert(shortName.equals(scrambler.getShortName()));
-
-			System.out.println(longName + " ==? " + scrambler.getLongName());
-			Utils.azzert(longName.equals(scrambler.getLongName()));
+			azzertEquals(shortName, scrambler.getShortName());
+			azzertEquals(longName, scrambler.getLongName());
 		}
 	}
 
+	private static void testClockPuzzle() throws InvalidScrambleException, InvalidMoveException {
+		ClockPuzzle clock = new ClockPuzzle();
+		ClockState state = (ClockState)clock.getSolvedState();
+		state = (ClockState)state.applyAlgorithm("ALL2+ y2 ALL1-"); // This scramble is breaking the solveIn method...
+		String solution = state.solveIn(3);
+		if(solution == null)
+			System.out.println("No solution");
+		else
+			System.out.println(solution);
+	}
+	
 	private static void testCubePuzzle() throws InvalidScrambleException, InvalidMoveException {
 		testMisc();
 		testTwosConverter();
@@ -252,7 +268,6 @@ public class ScrambleTest {
 		CubePuzzle twos = new CubePuzzle(2);
 		CubeState state = (CubeState) twos.getSolvedState();
 		String solution = state.solveIn(0);
-		System.out.println(solution);
 		azzert(solution.equals(""));
 
 		String scrambleString = "R2 B2 F2";
@@ -264,7 +279,6 @@ public class ScrambleTest {
 
 		solution = state.solveIn(1);
 		azzert(solution != null);
-		System.out.println("Found a solution! " + solution);
 		state = (CubeState) state.applyAlgorithm(solution);
 		azzert(state.isSolved());
 	}
@@ -309,5 +323,43 @@ public class ScrambleTest {
 			azzertEquals(sstate.cornerOrient, cornerOrient);
 		}
 		System.out.println("");
+	}
+
+	private static void benchmarking() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+
+		// Analyse the 3x3x3 solver.
+		int THREE_BY_THREE_SCRAMBLE_COUNT = 100;
+    		int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
+    		int THREE_BY_THREE_TIMEMIN = 0; //milliseconds
+    		int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
+
+		Random r = new Random();
+
+		cs.min2phase.Search threeSolver = new cs.min2phase.Search();
+		cs.min2phase.Tools.init();
+		TimedLogRecordStart start = new TimedLogRecordStart(Level.INFO, "Searching for " + THREE_BY_THREE_SCRAMBLE_COUNT + " random 3x3x3 cubes in less that " + THREE_BY_THREE_MAX_SCRAMBLE_LENGTH + " moves");
+		l.log(start);
+		for(int i = 0; i < THREE_BY_THREE_SCRAMBLE_COUNT; i++){
+			threeSolver.solution(cs.min2phase.Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, cs.min2phase.Search.INVERSE_SOLUTION);
+		}
+		l.log(start.finishedNow());
+
+
+		// How long does it takes to test if a puzzle is at more one move from solved?
+		int SCRAMBLE_COUNT = 100;
+		SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+		
+		for(String puzzle : lazyScramblers.keySet()) {
+			LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+			final Puzzle scrambler = lazyScrambler.cachedInstance();
+			
+			start = new TimedLogRecordStart(Level.INFO, "Are " + THREE_BY_THREE_SCRAMBLE_COUNT + " " + puzzle + " one move away from solved?");
+			l.log(start);
+			for(int count = 0; count < SCRAMBLE_COUNT; count++){
+				PuzzleState state = scrambler.getSolvedState().applyAlgorithm(scrambler.generateWCAScramble(r));
+				String solution = state.solveIn(1);
+			}
+			l.log(start.finishedNow());
+		}
 	}
 }

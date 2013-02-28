@@ -166,7 +166,7 @@ public class ClockPuzzle extends Puzzle {
 		return new PuzzleStateAndGenerator(state, scrambleStr);
 	}
 
-	private class ClockState extends PuzzleState {
+	public class ClockState extends PuzzleState {
 
 		private boolean[] pins;
 		private int[] posit;
@@ -190,7 +190,7 @@ public class ClockPuzzle extends Puzzle {
 					int[] positCopy = new int[18];
 					boolean[] pinsCopy = new boolean[4];
 					for( int p=0; p<18; p++)
-						positCopy[p] = posit[p] + rot*moves[turn][p];
+						positCopy[p] = (posit[p] + rot*moves[turn][p] + 12)%12;
 					System.arraycopy(pins, 0, pinsCopy, 0, 4);
 
 					// Build the move string
@@ -227,12 +227,12 @@ public class ClockPuzzle extends Puzzle {
 		@Override
 		public boolean equals(Object other) {
 			ClockState o = ((ClockState) other);
-			return Arrays.equals(posit, o.posit) && Arrays.equals(pins, o.pins);
+			return Arrays.equals(posit, o.posit);
 		}
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(posit) ^ Arrays.hashCode(pins);
+			return Arrays.hashCode(posit);
 		}
 
 		@Override

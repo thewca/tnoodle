@@ -24,10 +24,14 @@ public class AlgorithmBuilder {
 	 */
 	private PuzzleState unsanitizedState;
 	public AlgorithmBuilder(Puzzle puzzle, MungingMode mungingMode) {
+		this(puzzle, mungingMode, puzzle.getSolvedState());
+	}
+	
+	public AlgorithmBuilder(Puzzle puzzle, MungingMode mungingMode, PuzzleState state) {
 		moves = new ArrayList<String>();
 		states = new ArrayList<PuzzleState>();
-		states.add(puzzle.getSolvedState());
-		unsanitizedState = puzzle.getSolvedState();
+		states.add(state);
+		unsanitizedState = state;
 		setMungingMode(mungingMode);
 	}
 
