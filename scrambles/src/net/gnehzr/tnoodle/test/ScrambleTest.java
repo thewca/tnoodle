@@ -217,26 +217,32 @@ public class ScrambleTest {
 	}
 	
 	private static void testCubePuzzle() throws InvalidScrambleException, InvalidMoveException {
-		testMisc();
+		testCubeNormalization();
 		testTwosConverter();
 		testTwosSolver();
 	}
-
-	private static void testMisc() throws InvalidScrambleException, InvalidMoveException {
+	private static void testCubeNormalization() throws InvalidScrambleException, InvalidMoveException {
 		CubePuzzle fours = new CubePuzzle(4);
 		CubeState solved = fours.getSolvedState();
 
 		CubeState state = (CubeState) solved.applyAlgorithm("Rw Lw'");
-		azzert(state.equals(solved));
-
+		azzertEquals(state, solved);
+		azzertEquals(state.hashCode(), solved.hashCode());
+		
 		state = (CubeState) solved.applyAlgorithm("Uw Dw'");
-		azzert(state.equals(solved));
-
+		azzertEquals(state, solved);
+		
 		CubePuzzle threes = new CubePuzzle(3);
 
 		AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MungingMode.MUNGE_REDUNDANT_MOVES);
 		ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
-		azzert(ab3.toString().equals("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'"));
+		azzertEquals(ab3.toString(), "D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
+		
+		Random r = new Random();
+		for(int depth = 0; depth < 100; depth++) {
+			state = Utils.choose(r, state.getSuccessors().values());
+			azzertEquals(state, state.applyAlgorithm("Uw Dw'"));
+		}
 	}
 
 	private static void testTwosConverter() throws InvalidMoveException {
