@@ -166,10 +166,10 @@ public class ClockPuzzle extends Puzzle {
 		return new PuzzleStateAndGenerator(state, scrambleStr);
 	}
 
-	private class ClockState extends PuzzleState {
+	public class ClockState extends PuzzleState {
 		
-		private boolean[] pins;
-		private int[] posit;
+		public boolean[] pins;
+		public int[] posit;
 		public ClockState() {
 			pins = new boolean[] {false, false, false, false};
 			posit = new int[] {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
@@ -188,26 +188,22 @@ public class ClockPuzzle extends Puzzle {
 				for(int rot = 0; rot < 12; rot++) {
 					// Apply the move
 					int[] positCopy = new int[18];
-					boolean[] pinsCopy = new boolean[4];
 					for( int p=0; p<18; p++)
-						positCopy[p] = (posit[p] + rot*moves[turn][p])%12;
-					System.arraycopy(pins, 0, pinsCopy, 0, 4);
+						positCopy[p] = (posit[p] + rot*moves[turn][p] + 12)%12;
 
 					// Build the move string
 					boolean clockwise = ( rot < 7 );
 					String move = turns[turn] + (clockwise?(rot+"+"):((12-rot)+"-"));
 
-					successors.put(move, new ClockState(pinsCopy, positCopy));
+					successors.put(move, new ClockState(new boolean[]{false, false, false, false}, positCopy));
 				}
 			}
 
 			// Still y2 to implement
 			int[] positCopy = new int[18];
-			boolean[] pinsCopy = new boolean[4];
 			System.arraycopy(posit, 0, positCopy, 9, 9);
 			System.arraycopy(posit, 9, positCopy, 0, 9);
-			System.arraycopy(pins, 0, pinsCopy, 0, 4);
-			successors.put("y2", new ClockState(pinsCopy, positCopy));
+			successors.put("y2", new ClockState(new boolean[]{false, false, false, false}, positCopy));
 
 			// Pins position moves
 			for(int pin = 0; pin < 4; pin++) {
@@ -216,7 +212,7 @@ public class ClockPuzzle extends Puzzle {
 				System.arraycopy(posit, 0, positC, 0, 18);
 				System.arraycopy(pins, 0, pinsC, 0, 4);
 				int pinI = (pin==0?1:(pin==1?3:(pin==2?2:0)));
-				pinsC[pinI] ^= true;
+				pinsC[pinI] = true;
 
 				successors.put(turns[pin], new ClockState(pinsC, positC));
 			}
@@ -227,12 +223,12 @@ public class ClockPuzzle extends Puzzle {
 		@Override
 		public boolean equals(Object other) {
 			ClockState o = ((ClockState) other);
-			return Arrays.equals(posit, o.posit) && Arrays.equals(pins, o.pins);
+			return Arrays.equals(posit, o.posit);
 		}
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(posit) ^ Arrays.hashCode(pins);
+			return Arrays.hashCode(posit);
 		}
 
 		@Override
