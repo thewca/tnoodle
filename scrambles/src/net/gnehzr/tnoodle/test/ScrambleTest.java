@@ -221,6 +221,7 @@ public class ScrambleTest {
 		testTwosConverter();
 		testTwosSolver();
 	}
+
 	private static void testCubeNormalization() throws InvalidScrambleException, InvalidMoveException {
 		CubePuzzle fours = new CubePuzzle(4);
 		CubeState solved = fours.getSolvedState();
