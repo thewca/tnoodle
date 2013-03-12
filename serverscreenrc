@@ -3,4 +3,6 @@ stuff "while true; do git-tools/savepid git-tools/serverpid ./startserver.sh; do
 
 screen -t "git" 2
 
-stuff "git-tools/poll.sh sudo kill $(cat git-tools/serverpid);\012"
+# Trick to kill whole process tree stolen from
+#  http://stackoverflow.com/a/15139734
+stuff "git-tools/poll.sh sudo kill -- -$(ps opgid= `cat git-tools/serverpid`);\012"
