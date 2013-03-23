@@ -54,4 +54,16 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 		<url-pattern>*.md</url-pattern>
 	</servlet-mapping>
 	
+	<servlet>
+		<servlet-name>JsEnvServlet</servlet-name>
+		<servlet-class>net.gnehzr.tnoodle.server.JsEnvServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>JsEnvServlet</servlet-name>
+                <url-pattern>/env.js</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JsEnvServlet</servlet-name>
+                <url-pattern>/env.json</url-pattern>
+	</servlet-mapping>
 </web-app>

@@ -41,6 +41,19 @@ public abstract class SafeHttpServlet extends HttpServlet {
 		}
 	}
 
+	public static String getCompletePath(HttpServletRequest request) {
+		String path = request.getServletPath();
+		if(request.getPathInfo() != null) {
+			path += request.getPathInfo();
+		}
+		return path;
+	}
+	
+	public static String getExtension(HttpServletRequest request) {
+		String[] filename_ext = Utils.parseExtension(getCompletePath(request));
+		return filename_ext[1];
+	}
+	
 	protected abstract void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws Exception;
 
 	public static LinkedHashMap<String, String> parseQuery(String query) {
@@ -62,15 +75,19 @@ public abstract class SafeHttpServlet extends HttpServlet {
 		return queryMap;
 	}
 
+	protected static void sendJS(HttpServletRequest request, HttpServletResponse response, String js) {
+		sendBytes(request, response, js.getBytes(), "application/javascript"); //TODO - charset?
+	}
+	
 	protected static void sendJSON(HttpServletRequest request, HttpServletResponse response, String json) {
 		String callback = parseQuery(request.getQueryString()).get("callback");
-		String[] filename_ext = Utils.parseExtension(request.getPathInfo());
+		String ext = getExtension(request);
 
 		// Here we enforce that JSON is only sent in response to URLs ending in .json.
-		// This is important, because if clients expect to get JSON from urls not ending in
+		// This is important, because if clients were to expect to get JSON from urls not ending in
 		// .json, our catch(Throwable e) {...} in handle() above will wrap up exceptions
 		// as text, and we'll respond to a request that expects JSON with plaintext.
-		azzert("json".equals(filename_ext[1]), "Attempted to respond with JSON to a url not ending in .json.");
+		azzert("json".equals(ext), "Attempted to respond with JSON to a url not ending in .json.");
 		response.setHeader("Access-Control-Allow-Origin", "*"); //this allows x-domain ajax
 		if(callback != null) {
 			json = callback + "(" + json + ")";
@@ -82,11 +99,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
 		sendError(request, response, Utils.throwableToString(error));
 	}
 	protected static void sendError(HttpServletRequest request, HttpServletResponse response, String error) {
-		String extension = null;
-		if(request.getPathInfo() != null) {
-			String[] name_ext = Utils.parseExtension(request.getPathInfo());
-			extension = name_ext[1];
-		}
+		String extension = getExtension(request);
 		if("json".equals(extension)) {
 			HashMap<String, String> json = new HashMap<String, String>();
 			json.put("error", error);

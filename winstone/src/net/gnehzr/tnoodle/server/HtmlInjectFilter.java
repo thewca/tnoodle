@@ -1,5 +1,8 @@
 package net.gnehzr.tnoodle.server;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -13,15 +16,16 @@ import javax.servlet.http.HttpServletResponse;
 
 public class HtmlInjectFilter implements Filter {
 	private static final String HTML_CONTENT_TYPE = "text/html";
-
-	private static String headInjectCode = null;
-	public static void setHeadInjectCode(String newHeadInjectCode) {
-		headInjectCode = newHeadInjectCode;
+	
+	private static String tailHeadInject = null;
+	private static String headHeadInject = null;
+	public static void setHeadInjectFile(File injectCodeFile) throws IOException {
+		DataInputStream in = new DataInputStream(new FileInputStream(injectCodeFile));
+		byte[] b = new byte[(int) injectCodeFile.length()];
+		in.readFully(b);
+		in.close();
+		tailHeadInject = new String(b);
 	}
-	public static String getHeadInjectCode() {
-		return headInjectCode;
-	}
-
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {}
@@ -32,7 +36,7 @@ public class HtmlInjectFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
-		if(headInjectCode == null) {
+		if(tailHeadInject == null) {
 			chain.doFilter(request, response);
 			return;
 		}
@@ -43,20 +47,32 @@ public class HtmlInjectFilter implements Filter {
 		byte[] data;
 		if(HTML_CONTENT_TYPE.equals(wrapper.getContentType())) {
 			StringBuilder html = new StringBuilder(new String(wrapper.getData()));
+			int openingHeadIndex = html.indexOf("<head>");
 			int closingHeadIndex = html.indexOf("</head>");
-			if(closingHeadIndex < 0) {
+			String openingHead = "<head>\n";
+			String closingHead = "</head>\n";
+			if(openingHeadIndex < 0 || closingHeadIndex < 0) {
 				// If there is no <head>...</head> tag, we conjure up one of our own.
 				int closingHtmlIndex = html.indexOf("</html>");
-				if(closingHtmlIndex == -1) {
+				if(closingHtmlIndex < 0) {
 					closingHtmlIndex = html.length();
 					html.append("</html>\n");
 				}
-				String openingHead = "<head>\n";
-				String closingHead = "</head>\n";
 				html.insert(closingHtmlIndex, openingHead + closingHead);
+				openingHeadIndex = closingHtmlIndex;
 				closingHeadIndex = closingHtmlIndex + openingHead.length();
 			}
-			html.insert(closingHeadIndex, "\n" + headInjectCode + "\n");
+
+			// To avoid screwing up indices, we inject at the bottom first
+			if(tailHeadInject != null) {
+				html.insert(closingHeadIndex, tailHeadInject);
+			}
+			
+			if(headHeadInject != null) {
+				int headStart = openingHeadIndex + openingHead.length();
+				html.insert(headStart, headHeadInject);
+			}
+			
 			data = html.toString().getBytes();
 		} else {
 			data = wrapper.getData();
@@ -64,5 +80,4 @@ public class HtmlInjectFilter implements Filter {
 		response.setContentLength(data.length);
 		out.write(data);
 	}
-
 }

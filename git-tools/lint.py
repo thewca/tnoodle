@@ -15,6 +15,12 @@ JSLINT_IGNORED_ERRORS = {
   "Unrecognized style attribute 'border-bottom-left-radius'.",
   "Unrecognized style attribute 'border-radius'.",
   "Unrecognized style attribute 'box-shadow'.",
+  "Unrecognized style attribute 'pointer-events'.",
+  "Unexpected '-'.",
+  "Expected ':' and instead saw ','.",
+  "Expected ':' and instead saw 'px'.",
+  "Expected a non-standard style attribute and instead saw '1'.",
+  "Expected ';' and instead saw ','.",
   "Bad input type.",
 
   # javascript errors
@@ -97,7 +103,7 @@ def lint(files):
 					# JSLINT_IGNORED_ERRORS.
 					failedJsLint = False
 					for line in stdout.split('\n'):
-						parsedError = line.split(":")
+						parsedError = line.split(":", 4)
 						if len(parsedError) != 5:
 							if line != '':
 								assert False, line + " doesn't contain expected number of :'s"

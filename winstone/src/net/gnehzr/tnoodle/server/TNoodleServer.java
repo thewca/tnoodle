@@ -2,9 +2,7 @@ package net.gnehzr.tnoodle.server;
 
 import java.awt.Desktop;
 import java.awt.Image;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +32,7 @@ import javax.swing.ImageIcon;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import joptsimple.util.KeyValuePair;
 import net.gnehzr.tnoodle.utils.Launcher;
 import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -248,23 +248,35 @@ public class TNoodleServer {
 		setApplicationIcon();
 
 		OptionParser parser = new OptionParser();
-		OptionSpec<Integer> httpPortOpt = parser.
-			acceptsAll(Arrays.asList("p", "http"), "The port to run the http server on").
-				withRequiredArg().
-					ofType(Integer.class).
-					defaultsTo(8080);
-		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"), "Don't open the browser when starting the server");
-		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"), "If an instance of " + NAME + " is running on the desired port(s), do not attempt to kill it and start up");
-		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"), "File containing code to inject into the bottom of the <head>...</head> section of all html served").withRequiredArg().ofType(File.class);
+		OptionSpec<Integer> httpPortOpt = parser.acceptsAll(Arrays.asList("p", "http"),
+				"The port to run the http server on")
+			.withRequiredArg().ofType(Integer.class).defaultsTo(8080);
+		OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"),
+				"Don't open the browser when starting the server");
+		OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"),
+				"If an instance of " + NAME + " is running on the desired port(s), " +
+						"do not attempt to kill it and start up");
+		OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"),
+				"File containing code to inject into the bottom of the " +
+				"<head>...</head> section of all html served")
+			.withRequiredArg().ofType(File.class);
+		OptionSpec<KeyValuePair> jsEnvOpt = parser.accepts("jsenv",
+				"Add entry to global js object TNOODLE_ENV in /env.js. " +
+				"Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
+			.withOptionalArg().ofType(KeyValuePair.class);
 		OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
 		String levels = Utils.join(TNoodleLogging.getLevels(), ",");
 		OptionSpec<String> consoleLogLevel = parser.
-			acceptsAll(Arrays.asList("cl", "consoleLevel"), "The minimum level a log must be to be printed to the console. Options: " + levels).
+			acceptsAll(Arrays.asList("cl", "consoleLevel"),
+					"The minimum level a log must be to be " +
+					"printed to the console. Options: " + levels).
 				withRequiredArg().
 					ofType(String.class).
 					defaultsTo(Level.WARNING.getName());
 		OptionSpec<String> fileLogLevel = parser.
-			acceptsAll(Arrays.asList("fl", "fileLevel"), "The minimum level a log must be to be printed to " + TNoodleLogging.getLogFile() + ". Options: " + levels).
+			acceptsAll(Arrays.asList("fl", "fileLevel"),
+					"The minimum level a log must be to be printed to " +
+					TNoodleLogging.getLogFile() + ". Options: " + levels).
 				withRequiredArg().
 					ofType(String.class).
 					defaultsTo(Level.INFO.getName());
@@ -283,12 +295,13 @@ public class TNoodleServer {
 						System.err.println("Cannot find or read " + injectCodeFile);
 						System.exit(1);
 					}
-					DataInputStream in = new DataInputStream(new FileInputStream(injectCodeFile));
-					byte[] b = new byte[(int) injectCodeFile.length()];
-					in.readFully(b);
-					in.close();
-					String injectCode = new String(b);
-					HtmlInjectFilter.setHeadInjectCode(injectCode);
+					HtmlInjectFilter.setHeadInjectFile(injectCodeFile);
+				}
+				if(options.has(jsEnvOpt)) {
+					List<KeyValuePair> jsEnv = options.valuesOf(jsEnvOpt);
+					for(KeyValuePair key_value : jsEnv) {
+						JsEnvServlet.putJsEnv(key_value.key, key_value.value);
+					}
 				}
 				int httpPort = options.valueOf(httpPortOpt);
 
