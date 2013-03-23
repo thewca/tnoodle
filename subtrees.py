@@ -18,24 +18,7 @@ def git(cmds, options=None, showStatus=True, assertSuccess=True):
     if options:
         args += [ ( '--%s=%s' % (key, val) if val else '--%s' % key ) for key, val in options.iteritems() ]
     print "Running: %s" % " ".join(args)
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout = ''
-    stderr = ''
-    while p.poll() is None:
-            newStdout = p.stdout.read()
-            if newStdout:
-                    stdout += newStdout
-                    if showStatus:
-                            print newStdout
-            # TODO - i've noticed that the call to stderr.read() hangs, swapping the order seems to help...
-            newStderr = p.stderr.read()
-            if newStderr:
-                    stderr += newStderr
-                    if showStatus:
-                            print newStderr
-    if assertSuccess:
-        assert p.returncode == 0
-    return p.returncode, stdout, stderr
+    subprocess.check_call(args)
 
 def setupSubtreeBranches():
     for prefix, remote in PREFIX_REMOTE.iteritems():
