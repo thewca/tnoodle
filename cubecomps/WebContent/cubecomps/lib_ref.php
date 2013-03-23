@@ -18,7 +18,7 @@ if (!refererMatchesHost()) :
       <meta http-equiv="cache-control" content="no-cache" />
    </head>
    <body style="font-family:arial;">
-  	<h1 style="color:#0a328c;font-size:1.0em;">SESSION EXPIRED!!!</h1>
+  	<h1 style="color:#0a328c;font-size:1.0em;">SESSION EXPIRED</h1>
 	<p style="font-size:0.8em;">Please <a href="/">re-login</a>.</p>
    </body>
   </html>
