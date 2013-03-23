@@ -57,6 +57,8 @@ def main():
         setupSubtreeBranches()
     elif args.cmd == 'pull':
         pullAllSubtrees()
+    else:
+        assert False
 
 if __name__ == "__main__":
     main()
