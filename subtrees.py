@@ -18,7 +18,9 @@ def git(cmds, options=None, showStatus=True, assertSuccess=True):
     if options:
         args += [ ( '--%s=%s' % (key, val) if val else '--%s' % key ) for key, val in options.iteritems() ]
     print "Running: %s" % " ".join(args)
-    subprocess.check_call(args)
+    retVal = subprocess.check_call(args)
+    if assertSuccess:
+       assert retVal == 0
 
 def setupSubtreeBranches():
     for prefix, remote in PREFIX_REMOTE.iteritems():
