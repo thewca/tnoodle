@@ -4,6 +4,8 @@ import static net.gnehzr.tnoodle.utils.Utils.azzert;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.Random;
@@ -21,7 +23,21 @@ public class ScrambleCacher {
 	 * Puzzles will get passed this instance of Random
 	 * in order to have nice, as-secure-as-can-be scrambles.
 	 */
-	private static final Random r = new SecureRandom();
+	private static final Random r = getSecureRandom();
+	// TODO: Taken from Puzzle.java. Refactor? 
+	private static final SecureRandom getSecureRandom() {
+		try {
+			return SecureRandom.getInstance("SHA1PRNG", "SUN");
+		} catch(NoSuchAlgorithmException e) {
+			l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
+			azzert(false, e);
+			return null;
+		} catch(NoSuchProviderException e) {
+			l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
+			azzert(false, e);
+			return null;
+		}
+	}
 
 	private String[] scrambles;
 	private volatile int startBuf = 0;
