@@ -46,6 +46,8 @@ if windowsOrCygwin():
 	os.readlink = readlink
 
 def rmtree(dir):
+	if os.path.isfile(dir):
+		os.unlink(dir)
 	# This method recursively deletes a directory, but doesn't follow any symlinks
 	if not os.path.exists(dir) and not os.path.islink(dir):
 		# If this path doesn't exist and is not a broken symlink,
