@@ -506,7 +506,13 @@ public final class Utils {
 	}
 
 	public static void azzertEquals(Object a, Object b) {
-		azzert(a.equals(b), a + " is not equal to " + b);
+		boolean equal;
+		if(a == null) {
+			equal = a == b;
+		} else {
+			equal = a.equals(b);
+		}
+		azzert(equal, a + " is not equal to " + b);
 	}
 
 	public static void azzert(boolean expr) {
