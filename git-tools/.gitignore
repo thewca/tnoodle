@@ -1,2 +1,3 @@
 *.pyc
-serverpid
+pids/*.pid
+pids/screenrc
