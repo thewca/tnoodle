@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 gittools = __import__("git-tools")
+gittools.cdIntoScriptDir()
 import argparse
 
 parser = argparse.ArgumentParser()

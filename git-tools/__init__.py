@@ -1,4 +1,12 @@
 import subprocess
+import os
+import sys
+
+def cdIntoScriptDir():
+   f = sys._current_frames().values()[0].f_back.f_globals['__file__']
+   abspath = os.path.abspath(f)
+   dname = os.path.dirname(abspath)
+   os.chdir(dname)
 
 class GitSensitiveProject(object):
    def __init__(self, name, compileCommand, runCommand):
