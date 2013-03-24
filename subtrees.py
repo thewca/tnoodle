@@ -31,7 +31,7 @@ def setupSubtreeBranches():
 
         git(['stash'])
         git(['branch', '-D', remoteName], assertSuccess=False)
-        options = { 'prefix': prefix, 'annotate': '(tnoodle)', 'branch': remoteName }
+        options = { 'prefix': prefix, 'annotate': '(tnoodle) ', 'branch': remoteName }
         git(['subtree', 'split'], options)
 
         git(['checkout', remoteName])

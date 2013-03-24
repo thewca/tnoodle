@@ -19,4 +19,4 @@ projects = [
       compileCommand='./tmt make -p noderacer',
       runCommand='./tmt make run -p noderacer')
 ]
-gittools.startGitSensitiveScreen("tnoodle", projects)
+gittools.startGitSensitiveScreen("tnoodle", projects, cleanCommand="./tmt make clean")
