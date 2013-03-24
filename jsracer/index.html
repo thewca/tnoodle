@@ -51,9 +51,10 @@
 
 		<script type='text/javascript'>
 			var gm; // debugging
-			(function() {
+			window.addEvent("load", function() {
 
 			StatusBar.setError('init', 'Connecting...');
+
 			now.ready(function() {
 				StatusBar.setError('init', null);
 				// This function can get called multiple times. 
@@ -110,7 +111,7 @@
 			});
 
 
-			})();
+			});
 		</script>
 
 		<link rel="stylesheet" href="css/index.css" type="text/css" />
