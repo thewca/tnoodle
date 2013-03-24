@@ -58,7 +58,7 @@ var StatusBar = {};
 			}
 		}
 	};
-	window.addEvent('load', function() {
+	window.addEventListener('load', function() {
 		connectionStatus = document.createElement('div');
 		connectionStatus.addClass('statusBar');
 		document.body.appendChild(connectionStatus);
