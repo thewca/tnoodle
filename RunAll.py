@@ -6,7 +6,8 @@ gittools = __import__("git-tools")
 gittools.cdIntoScriptDir()
 
 startWcaCommand = 'java -jar wca/dist/TNoodle.jar -n -p 8080'
-startWcaCommand += subprocess.list2cmdline(sys.argv[1:])
+if sys.argv[1:]:
+   startWcaCommand += ' ' + subprocess.list2cmdline(sys.argv[1:])
 projects = [
    gittools.GitSensitiveProject(name='wca',
       compileCommand='./tmt make dist -p wca',
