@@ -320,8 +320,9 @@ function assert(expr) {
                    watermarkP.style.top = (window.innerHeight - watermarkLength)/2 + 'px';
                    watermarkP.style.left = (window.innerWidth - watermarkLength)/2 + 'px';
                    watermarkP.empty();
-                   while(true) {
-                      var el = document.createTextNode(TNOODLE_ENV.WATERMARK);
+                   for(var i = 0; i < 1000; i++) { // NASA style loops, yo
+                      // if there are no spaces, the watermark will never wrap
+                      var el = document.createTextNode(" " + TNOODLE_ENV.WATERMARK);
                       watermarkP.appendChild(el);
                       if(watermarkP.scrollHeight > watermarkP.clientHeight) {
                          // We've filled up the div, we can stop now
