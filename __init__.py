@@ -27,7 +27,7 @@ def startGitSensitiveScreen(screenTitle, projects, cleanCommand=None):
       # savepid does some magic with "set -o monitor" that I don't fully understand,
       # but a side effect of it is that ctrl-c and ctrl-z don't work. We sleep 1 to
       # give people a chance to kill this loop.
-      screenrc += 'stuff "while true; do git-tools/savepid git-tools/pids/%s.pid %s; sleep 1; done\\012"\n' % ( project.name, project.runCommand )
+      screenrc += 'stuff "while true; do git-tools/savepid git-tools/pids/%s.pid %s; sleep 1; done\\012"\n' % ( project.name, project.runCommand.replace('"', '\\"') )
       screenrc += "\n"
 
    screenrc += "\n"
