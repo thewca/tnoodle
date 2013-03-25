@@ -18,6 +18,7 @@ function assert(expr) {
 
 <script type="text/javascript" src="/wca/scramble.js"></script>
 <style type="text/css">
+
 #ajaxStatus {
 	border-bottom: 1px solid black;
 	border-left: 1px solid black;
@@ -38,23 +39,30 @@ function assert(expr) {
 	padding: 5px;
 }
 
-.watermark {
-   color: #d0d0d0;
-   font-size: 50pt;
-   -webkit-transform: rotate(-45deg);
-   -moz-transform: rotate(-45deg);
-   position: absolute;
+.watermarkDiv {
    width: 100%;
    height: 100%;
+   position: fixed;
+   left: 0;
+   top: 0;
+   overflow: hidden;
+   pointer-events: none;
+}
+
+.watermarkP {
+   color: #d0d0d0;
+   font-size: 50pt;
    margin: 0;
    z-index: 1;
-   left: 50%;
-   top: 10%;
+
+   opacity: 0.5;
+
+   position: relative;
+   -webkit-transform: rotate(-45deg);
+   -moz-transform: rotate(-45deg);
 
    font-weight: bold;
    text-shadow: 1px 1px 0 black, -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 3px 3px 5px black;
-
-   pointer-events: none;
 }
 </style>
 
@@ -72,8 +80,10 @@ function assert(expr) {
 	var watermarkDiv = null;
 	if(TNOODLE_ENV.WATERMARK) {
 		watermarkDiv = document.createElement('div');
-		watermarkDiv.classList.add("watermark");
-		watermarkDiv.appendChild(document.createTextNode(TNOODLE_ENV.WATERMARK));
+                watermarkDiv.classList.add("watermarkDiv");
+                var watermarkP = document.createElement('p');
+                watermarkP.classList.add("watermarkP");
+		watermarkDiv.appendChild(watermarkP);
 	}
 
 	var ajaxStateDiv = document.createElement('div');
@@ -302,8 +312,29 @@ function assert(expr) {
 		mark2.ui.addHelpLink("/readme/scramble");
 		document.getElementById("logo_top").src="/tnoodle_logo.svg";
 
+                function redrawWatermark() {
+                   var watermarkLength = Math.sqrt(window.innerHeight*window.innerHeight + window.innerWidth*window.innerWidth);
+                   watermarkLength += 100; // the extra 100 pixels are to prevent words from wrapping so we can get a nice sharp cutoff
+                   watermarkP.style.width = watermarkLength + 'px';
+                   watermarkP.style.height = watermarkLength + 'px';
+                   watermarkP.style.top = (window.innerHeight - watermarkLength)/2 + 'px';
+                   watermarkP.style.left = (window.innerWidth - watermarkLength)/2 + 'px';
+                   watermarkP.empty();
+                   while(true) {
+                      var el = document.createTextNode(TNOODLE_ENV.WATERMARK);
+                      watermarkP.appendChild(el);
+                      if(watermarkP.scrollHeight > watermarkP.clientHeight) {
+                         // We've filled up the div, we can stop now
+                         break;
+                      }
+                   }
+                }
 		if(watermarkDiv) {
-			document.body.appendChild(watermarkDiv);
+                   document.body.appendChild(watermarkDiv);
+                   window.addEventListener('resize', function(e) {
+                      redrawWatermark();
+                   });
+                   redrawWatermark();
 		}
 	}, false);
 
