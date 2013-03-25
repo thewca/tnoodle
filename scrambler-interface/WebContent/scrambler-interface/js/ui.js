@@ -351,27 +351,28 @@ mark2.dom = (function() {
 
 mark2.settings = (function() {
 
+	var extraScrambles = 2;
 	var events = {
 		// Official WCA events as of November 24, 2011
-		"333":    {name: "Rubik's Cube", default_round: {type: "avg",  num_scrambles: 5 } },
-		"444":    {name: "4x4 Cube", default_round: {type: "avg",  num_scrambles: 5 } },
-		"555":    {name: "5x5 Cube", default_round: {type: "avg",  num_scrambles: 5 } },
-		"222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5 } },
-		"333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3 } },
-		"333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5 } },
+		"333":    {name: "Rubik's Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"444":    {name: "4x4 Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"555":    {name: "5x5 Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3+extraScrambles } },
+		"333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
 		"333fm":  {name: "3x3 fewest moves", default_round: {type: "best", num_scrambles: 1 } },
-		"333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3 } },
-		"minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5 } },
-		"pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5 } },
-		"sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5 } },
-		"clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5 } }, 
-		"666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3 } },
-		"777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3 } },
+		"333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3+extraScrambles } },
+		"minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } }, 
+		"666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3+extraScrambles } },
+		"777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3+extraScrambles } },
 		//"magic" 
 		//"mmagic"
-		"444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3 } },
-		"555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3 } },
-		"333mbf": {name: "3x3 multi blind", default_round: {type: "mbf",  num_scrambles: 28} }
+		"444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3+extraScrambles } },
+		"555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3+extraScrambles } },
+		"333mbf": {name: "3x3 multi blind", default_round: {type: "mbf",  num_scrambles: 28 } }
 		
 		// Unofficial events
 		//"skewb"

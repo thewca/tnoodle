@@ -63,7 +63,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 class ScrambleRequest {
 	private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
 
-	private static final int SCRAMBLES_PER_PAGE = 5;
+	private static final int SCRAMBLES_PER_PAGE = 7;
 
 	private static final int MAX_COUNT = 100;
 	private static final int MAX_COPIES = 100;
@@ -577,7 +577,7 @@ class ScrambleRequest {
 			Font scrambleFont = null;
 			try {
 				BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-				Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight);
+				Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight - 8);
 				float perfectFontSize = ColumnText.fitText(new Font(courier), longestScramble, availableArea, maxFontSize, PdfWriter.RUN_DIRECTION_LTR);
 				scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
 			} catch(IOException e) {
@@ -606,6 +606,12 @@ class ScrambleRequest {
 
 				PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
 				scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+				// This shifts everything up a little bit, because I don't like how
+				// ALIGN_MIDDLE works.
+				scrambleCell.setPaddingTop(-3);
+				scrambleCell.setPaddingBottom(3);
+				scrambleCell.setPaddingLeft(3);
+				scrambleCell.setPaddingRight(3);
 				table.addCell(scrambleCell);
 
 				if(dim.width > 0 && dim.height > 0) {
