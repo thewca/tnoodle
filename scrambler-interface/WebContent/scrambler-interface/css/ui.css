@@ -222,6 +222,10 @@ h1 {
   width: 3em;
 }
 
+#events_rounds_interface #rounds_table td input.num_extra_solves {
+  width: 3em;
+}
+
 /* 
 This can go once https://code.google.com/p/chromium/issues/detail?id=132014
 is resolved.

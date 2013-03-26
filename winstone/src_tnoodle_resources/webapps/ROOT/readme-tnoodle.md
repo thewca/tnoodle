@@ -78,8 +78,8 @@ Response:
 
 	[{
 	    "scrambles": ["D2 U2 L2 B R2 B' D2 L2 F2 L2 F2 R D2 U F2 R D' B L D' U2"],
+	    "extraScrambles": [ ... ] // This is optional! (ignored if fmc)
 	    "scrambler": "333",
-	    "count": 1,
 	    "copies": 2,
 	    "title": "3x3 Round 1",
 	    "fmc": false,
@@ -93,8 +93,8 @@ Response:
 	    }
 	}, {
 	    "scrambles": ["D F2 D' B2 D2 L2 U L2 U2 L2 U' R' D2 L2 B U2 R B2 U2 B'"],
+	    "extraScrambles": [ ... ] // This is optional! (ignored if fmc) 
 	    "scrambler": "333",
-	    "count": 1,
 	    "copies": 1,
 	    "title": "3x3 Round 2",
 	    "fmc": false,

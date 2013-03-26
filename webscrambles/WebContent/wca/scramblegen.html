@@ -157,15 +157,16 @@ function assert(expr) {
 		var scrambleRequest = [];
 		for(var i = 0; i < sheets.length; i++) {
 			var sheet = sheets[i];
-			var scrambles = requestsByGuid[sheet.guid].scrambles;
-			assert(scrambles.length >= sheet.scrambleCount);
+			var generatedScrambles = requestsByGuid[sheet.guid].scrambles;
+			assert(generatedScrambles.length >= sheet.scrambleCount + sheet.extraScrambleCount);
 			// It's possible we generated more scrambles than we actually need.
-			scrambles = scrambles.slice(0, sheet.scrambleCount);
+			var scrambles = generatedScrambles.slice(0, sheet.scrambleCount);
+			var extraScrambles = generatedScrambles.slice(sheet.scrambleCount, sheet.scrambleCount+sheet.extraScrambleCount);
 			var request = {
 				scrambles: scrambles,
-				copies: 1, //TODO - add support for this to ui.js
+				extraScrambles: extraScrambles,
+				copies: 1, // TODO - add support for this to ui.js
 				scrambler: sheet.puzzle,
-				count: sheet.scrambleCount,
 				title: sheet.title,
 				fmc: sheet.fmc
 			};
@@ -230,10 +231,10 @@ function assert(expr) {
 				requestsByGuid[sheet.guid] = request;
 			}
 
-			if(request.scrambles.length < sheet.scrambleCount) {
+			if(request.scrambles.length < (sheet.scrambleCount + sheet.extraScrambleCount)) {
 				var seed = null;
 				var maxScramblesPerRequest = maxScramblesPerRequestByPuzzle[sheet.puzzle] || DEFAULT_MAX_SCRAMBLES_PER_REQUEST;
-				var unrequestedScrambleCount = sheet.scrambleCount - request.scrambles.length;
+				var unrequestedScrambleCount = (sheet.scrambleCount + sheet.extraScrambleCount) - request.scrambles.length;
 				var scramblesToRequest = Math.min(unrequestedScrambleCount, maxScramblesPerRequest);
 				request.scrambles.length += scramblesToRequest;
 

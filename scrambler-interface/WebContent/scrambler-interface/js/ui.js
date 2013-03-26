@@ -354,24 +354,24 @@ mark2.settings = (function() {
 	var extraScrambles = 2;
 	var events = {
 		// Official WCA events as of November 24, 2011
-		"333":    {name: "Rubik's Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
-		"444":    {name: "4x4 Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
-		"555":    {name: "5x5 Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
-		"222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
-		"333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3+extraScrambles } },
-		"333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
+		"333":    {name: "Rubik's Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+		"444":    {name: "4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+		"555":    {name: "5x5 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+		"222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+		"333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+		"333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
 		"333fm":  {name: "3x3 fewest moves", default_round: {type: "best", num_scrambles: 1 } },
-		"333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3+extraScrambles } },
-		"minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
-		"pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
-		"sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } },
-		"clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5+extraScrambles } }, 
-		"666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3+extraScrambles } },
-		"777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3+extraScrambles } },
+		"333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+		"minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+		"pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+		"sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+		"clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } }, 
+		"666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+		"777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
 		//"magic" 
 		//"mmagic"
-		"444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3+extraScrambles } },
-		"555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3+extraScrambles } },
+		"444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+		"555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
 		"333mbf": {name: "3x3 multi blind", default_round: {type: "mbf",  num_scrambles: 28 } }
 		
 		// Unofficial events
@@ -420,22 +420,8 @@ mark2.settings = (function() {
 	}
 
 	var defaultRounds = [
-		{ eventID: "333",
-		  roundName: "Round 1",
-		  groupCount: 1,
-		  scrambleCount: events["333"].default_round.num_scrambles }
+		{ eventID: "333", roundName: "Round 1" }
 	];
-
-	// Round types are not currently used.
-	/*
-	var roundTypeNames = {
-		"avg": "Average of",
-		"best": "Best of",
-		"combined": "Combined Round of",
-		"mean": "Mean of",
-		"mbf": "Multi Blind of"
-	}
-	*/
 
 	var defaultNumGroups = 1;
 
@@ -577,6 +563,7 @@ mark2.ui = (function() {
 
 			var roundName = tr.getElementsByClassName("round_name")[0].value;
 			var numSolves = parseInt(tr.getElementsByClassName("num_solves")[0].value, 10);
+			var numExtraSolves = parseInt(tr.getElementsByClassName("num_extra_solves")[0].value, 10);
 
 			var numGroups = parseInt(tr.getElementsByClassName("num_groups")[0].value, 10);
 
@@ -584,7 +571,8 @@ mark2.ui = (function() {
 				eventID: eventID,
 				roundName: roundName,
 				groupCount: numGroups,
-				scrambleCount: numSolves
+				scrambleCount: numSolves,
+				extraScrambleCount: numExtraSolves
 			};
 			if(includeElement) {
 				round.element = tr;
@@ -633,7 +621,8 @@ mark2.ui = (function() {
 					puzzle: settings.eventToPuzzle(round.eventID),
 					fmc: settings.isFmc(round.eventID),
 					title: eventName + " " + title,
-					scrambleCount: round.scrambleCount
+					scrambleCount: round.scrambleCount,
+                                        extraScrambleCount: round.extraScrambleCount
 				};
 
 				// Unfortunately, there's no guarantee that rounds in a
@@ -670,7 +659,7 @@ mark2.ui = (function() {
 		for(var i = 0; i < sheets.length; i++) {
 			var sheet = sheets[i];
 			// There may be more scrambles generated for this puzzle than we need.
-			generatedCount += Math.min(sheet.scrambleCount, generatedScrambleCountByGuid[sheet.guid] || 0);
+			generatedCount += Math.min(sheet.scrambleCount + sheet.extraScrambleCount, generatedScrambleCountByGuid[sheet.guid] || 0);
 		}
 		return generatedCount;
 	}
@@ -680,7 +669,7 @@ mark2.ui = (function() {
 		var sheets = getScrambleSheets();
 		for(var i = 0; i < sheets.length; i++) {
 			var sheet = sheets[i];
-			requiredScrambleCountByPuzzle[sheet.puzzle] = (requiredScrambleCountByPuzzle[sheet.puzzle] || 0) + sheet.scrambleCount;
+			requiredScrambleCountByPuzzle[sheet.puzzle] = (requiredScrambleCountByPuzzle[sheet.puzzle] || 0) + sheet.scrambleCount + sheet.extraScrambleCount;
 		}
 		return requiredScrambleCountByPuzzle;
 	}
@@ -907,7 +896,7 @@ mark2.ui = (function() {
 	};
 
 
-	var addRound = function(eventID, roundNameOpt, numGroupsOpt, numSolvesOpt) {
+	var addRound = function(eventID, roundNameOpt, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt) {
 		var roundName = roundNameOpt;
 		if (roundNameOpt === undefined) {
 			roundName = "Round " + (numCurrentRounds(eventID)+1);
@@ -922,6 +911,11 @@ mark2.ui = (function() {
 		if (numSolvesOpt === undefined) {
 			numSolves = settings.events[eventID].default_round.num_scrambles;
 		}
+
+		var numExtraSolves = numExtraSolvesOpt;
+                if (numExtraSolvesOpt === undefined) {
+			numExtraSolves = settings.events[eventID].default_round.num_extra_scrambles;
+                }
 
 		var newEventTR_ID = mark2.dom.nextAutoID();
 		var newEventTR = mark2.dom.appendElement(
@@ -973,6 +967,14 @@ mark2.ui = (function() {
 		);
 		numSolvesInput.classList.add("num_solves");
 
+		var numExtraSolvesTD = mark2.dom.appendElement(newEventTR, "td");
+		var numExtraSolvesInput = mark2.dom.appendElement(
+			numExtraSolvesTD,
+			"input",
+			{ type: "number", value: numExtraSolves, min: 0 }
+		);
+		numExtraSolvesInput.classList.add("num_extra_solves");
+
 		var removeTD = mark2.dom.appendElement(newEventTR, "td");
 		removeTD.classList.add("round_remove");
 		var removeButton = mark2.dom.appendElement(removeTD, "button", {}, "X");
@@ -980,6 +982,7 @@ mark2.ui = (function() {
 
 		roundNameInput.addEventListener("change", updateHash, false);
 		numSolvesInput.addEventListener("change", updateHash, false);
+		numExtraSolvesInput.addEventListener("change", updateHash, false);
 		numGroupsInput.addEventListener("change", updateHash, false);
 
 		sortables.addItems(newEventTR);
@@ -1071,7 +1074,7 @@ mark2.ui = (function() {
 
 	var addRounds = function(rounds) {
 		for (var i = 0; i < rounds.length; i++) {
-			addRound(rounds[i].eventID, rounds[i].roundName, rounds[i].groupCount, rounds[i].scrambleCount);
+			addRound(rounds[i].eventID, rounds[i].roundName, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount);
 		}
 	};
 
@@ -1230,6 +1233,9 @@ mark2.ui = (function() {
 		td = document.createElement('td');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode('# Scrambles'));
+		td = document.createElement('td');
+		tr.appendChild(td);
+		td.appendChild(document.createTextNode('# Extra Scrambles'));
 		td = document.createElement('td');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode('Remove'));

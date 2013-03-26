@@ -11,9 +11,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +42,6 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.List;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -99,8 +101,8 @@ class ScrambleRequest {
 
 
 	public String[] scrambles;
+	public String[] extraScrambles;
 	public Puzzle scrambler;
-	public int count;
 	public int copies;
 	public String title;
 	public boolean fmc;
@@ -148,10 +150,11 @@ class ScrambleRequest {
 
 		this.title = title;
 		fmc = countStr.equals("fmc");
+		int count;
 		if(fmc) {
-			this.count = 1;
+			count = 1;
 		} else {
-			this.count = Math.min(toInt(countStr, 1), MAX_COUNT);
+			count = Math.min(toInt(countStr, 1), MAX_COUNT);
 		}
 		this.copies = Math.min(toInt(copiesStr, 1), MAX_COPIES);
 		if(seed != null) {
@@ -162,6 +165,16 @@ class ScrambleRequest {
 
 		this.colorScheme = scrambler.parseColorScheme(scheme);
 	}
+	
+
+	public List<String> getAllScrambles() {
+		ArrayList<String> allScrambles = new ArrayList<String>(Arrays.asList(scrambles));
+		if(extraScrambles != null) {
+			allScrambles.addAll(Arrays.asList(extraScrambles));
+		}
+		return allScrambles;
+	}
+	
 
 	public static ScrambleRequest[] parseScrambleRequests(LinkedHashMap<String, String> query, String seed) throws UnsupportedEncodingException, InvalidScrambleRequestException {
 		ScrambleRequest[] scrambleRequests;
@@ -299,8 +312,6 @@ class ScrambleRequest {
 	}
 
 	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle) throws DocumentException, IOException {
-		azzert(scrambleRequest.count == scrambleRequest.scrambles.length);
-
 		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
 		Rectangle pageSize = doc.getPageSize();
 
@@ -492,7 +503,7 @@ class ScrambleRequest {
 				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
 				cb.endText();
 
-				List rules = new List(List.UNORDERED);
+				com.itextpdf.text.List rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
 				rules.add("Notate your solution by writing one move per bar.");
 				rules.add("To delete moves, clearly erase/blacken them.");
 				rules.add("Face moves F, B, R, L, U, and D are clockwise.");
@@ -504,7 +515,7 @@ class ScrambleRequest {
 				ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
 				ct.go();
 
-				rules = new List(List.UNORDERED);
+				rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
 				rules.add("You have 1 hour to find a solution.");
 				rules.add("Your solution length will be counted in BTM. (Slice moves count as two turns.)");
 				int maxMoves = WCA_MAX_MOVES_FMC;
@@ -538,7 +549,8 @@ class ScrambleRequest {
 			Dimension dim = scrambleRequest.scrambler.getPreferredSize(scrambleWidth, scrambleHeight);
 			PdfContentByte cb = docWriter.getDirectContent();
 
-			int charsWide = (int) Math.ceil(Math.log(scrambleRequest.scrambles.length)/Math.log(10));
+			List<String> allScrambles = scrambleRequest.getAllScrambles();
+			int charsWide = (int) Math.ceil(Math.log(allScrambles.size())/Math.log(10));
 			String wideString = "";
 			for(int i = 0; i < charsWide; i++) {
 				// M has got to be as wide or wider than the widest digit in our font
@@ -558,7 +570,7 @@ class ScrambleRequest {
 			table.setLockedWidth(true);
 
 			String longestScramble = "";
-			for(String scramble : scrambleRequest.scrambles) {
+			for(String scramble : allScrambles) {
 				String padded = padTurnsUniformly(scramble, "M");
 				if(padded.length() > longestScramble.length()) {
 					longestScramble = padded;
@@ -586,8 +598,8 @@ class ScrambleRequest {
 				l.log(Level.INFO, "", e);
 			}
 
-			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
-				String scramble = scrambleRequest.scrambles[i];
+			for(int i = 0; i < allScrambles.size(); i++) {
+				String scramble = allScrambles.get(i);
 				Chunk ch = new Chunk((i+1)+".");
 				PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
 				nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
@@ -681,11 +693,10 @@ class ScrambleRequest {
 		return s.toString();
 	}
 
-	private static String[] stripNewlines(String[] strings) {
-		String[] newStrings = new String[strings.length];
-		for(int i = 0; i < strings.length; i++) {
-			String newString = strings[i].replaceAll("\n", " ");
-			newStrings[i] = newString;
+	private static ArrayList<String> stripNewlines(List<String> strings) {
+		ArrayList<String> newStrings = new ArrayList<String>();
+		for(String newString : strings) {
+			newStrings.add(newString.replaceAll("\n", " "));
 		}
 		return newStrings;
 	}
@@ -707,7 +718,6 @@ class ScrambleRequest {
 		ZipOutputStream zipOut = new ZipOutputStream(baosZip);
 		HashMap<String, Boolean> seenTitles = new HashMap<String, Boolean>();
 		for(ScrambleRequest scrambleRequest : scrambleRequests) {
-
 			String safeTitle = scrambleRequest.title;
 			for(int i = 0; i < INVALID_CHARS.length(); i++) {
 				String invalidChar = Pattern.quote("" + INVALID_CHARS.charAt(i));
@@ -735,7 +745,7 @@ class ScrambleRequest {
 			String txtFileName = "txt/" + safeTitle + ".txt";
 			parameters.setFileNameInZip(txtFileName);
 			zipOut.putNextEntry(null, parameters);
-			zipOut.write(Utils.join(stripNewlines(scrambleRequest.scrambles), "\r\n").getBytes());
+			zipOut.write(Utils.join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
 			zipOut.closeEntry();
 		}
 
