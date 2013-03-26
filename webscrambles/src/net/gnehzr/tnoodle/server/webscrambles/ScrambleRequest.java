@@ -627,24 +627,24 @@ class ScrambleRequest {
 				table.addCell(scrambleCell);
 
 				if(dim.width > 0 && dim.height > 0) {
-						PdfTemplate tp = cb.createTemplate(dim.width + 2*scrambleImagePadding, dim.height + 2*scrambleImagePadding);
-						Graphics2D g2 = new PdfGraphics2D(tp, tp.getWidth(), tp.getHeight(), new DefaultFontMapper());
-						g2.translate(scrambleImagePadding, scrambleImagePadding);
+					PdfTemplate tp = cb.createTemplate(dim.width + 2*scrambleImagePadding, dim.height + 2*scrambleImagePadding);
+					Graphics2D g2 = new PdfGraphics2D(tp, tp.getWidth(), tp.getHeight(), new DefaultFontMapper());
+					g2.translate(scrambleImagePadding, scrambleImagePadding);
 
-						try {
-							scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
-						} catch (Exception e) {
-							g2.dispose(); // iTextPdf blows up if we do not dispose of this
-							table.addCell("Error drawing scramble: " + e.getMessage());
-							l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e);
-							continue;
-						}
-						g2.dispose();
-						PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
-						imgCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-						imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-						imgCell.setHorizontalAlignment(PdfPCell.ALIGN_MIDDLE);
-						table.addCell(imgCell);
+					try {
+						scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
+					} catch (Exception e) {
+						g2.dispose(); // iTextPdf blows up if we do not dispose of this
+						table.addCell("Error drawing scramble: " + e.getMessage());
+						l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e);
+						continue;
+					}
+					g2.dispose();
+					PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
+					imgCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+					imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+					imgCell.setHorizontalAlignment(PdfPCell.ALIGN_MIDDLE);
+					table.addCell(imgCell);
 				} else {
 					table.addCell("");
 				}
