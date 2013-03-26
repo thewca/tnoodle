@@ -550,7 +550,7 @@ class ScrambleRequest {
 			PdfContentByte cb = docWriter.getDirectContent();
 
 			List<String> allScrambles = scrambleRequest.getAllScrambles();
-			int charsWide = (int) Math.ceil(Math.log(allScrambles.size())/Math.log(10));
+			int charsWide = 1 + (int) Math.log10(allScrambles.size());
 			String wideString = "";
 			for(int i = 0; i < charsWide; i++) {
 				// M has got to be as wide or wider than the widest digit in our font
