@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -65,7 +65,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 class ScrambleRequest {
 	private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
 
-	private static final int SCRAMBLES_PER_PAGE = 7;
+	private static final int MAX_SCRAMBLES_PER_PAGE = 7;
+	private static final int SCRAMBLE_IMAGE_PADDING = 2;
+	private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
 
 	private static final int MAX_COUNT = 100;
 	private static final int MAX_COPIES = 100;
@@ -101,7 +103,7 @@ class ScrambleRequest {
 
 
 	public String[] scrambles;
-	public String[] extraScrambles;
+	public String[] extraScrambles = new String[0];
 	public Puzzle scrambler;
 	public int copies;
 	public String title;
@@ -312,10 +314,8 @@ class ScrambleRequest {
 	}
 
 	private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle) throws DocumentException, IOException {
-		HashMap<String, Color> colorScheme = scrambleRequest.colorScheme;
-		Rectangle pageSize = doc.getPageSize();
-
 		if(scrambleRequest.fmc) {
+			Rectangle pageSize = doc.getPageSize();
 			for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
 				String scramble = scrambleRequest.scrambles[i];
 				PdfContentByte cb = docWriter.getDirectContent();
@@ -424,7 +424,7 @@ class ScrambleRequest {
 				Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
 
 				try {
-					scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
+					scrambleRequest.scrambler.drawScramble(g2, dim, scramble, scrambleRequest.colorScheme);
 				} catch (InvalidScrambleException e) {
 					l.log(Level.INFO, "", e);
 				}
@@ -529,130 +529,155 @@ class ScrambleRequest {
 				doc.newPage();
 			}
 		} else {
-			final int scrambleImagePadding = 2;
-			final float maxFontSize = 20;
+			Rectangle pageSize = doc.getPageSize();
 
-			int scrambleWidth = 0;
+			float sideMargins = 100 + doc.leftMargin() + doc.rightMargin();
+			float availableWidth = pageSize.getWidth()-sideMargins;
+			float vertMargins = doc.topMargin() + doc.bottomMargin();
+			float availableHeight = pageSize.getHeight() - vertMargins;
+			if(scrambleRequest.extraScrambles.length > 0) {
+				availableHeight -= 20; // Yeee magic numbers. This should make space for the headerTable.
+			}
+			int scramblesPerPage = Math.min(MAX_SCRAMBLES_PER_PAGE, scrambleRequest.getAllScrambles().size());
+			int maxScrambleImageHeight = (int) (availableHeight/scramblesPerPage - 2*SCRAMBLE_IMAGE_PADDING);
+
+			int maxScrambleImageWidth = (int) (availableWidth/2); // We don't let scramble images take up more than half the page
 			if(scrambleRequest.scrambler.getShortName().equals("minx")) {
 				// TODO - If we allow the megaminx image to be too wide, the
 				// megaminx scrambles get really tiny. This tweak allocates
 				// a more optimal amount of space to the scrambles. This is possible
 				// because the scrambles are so uniformly sized.
-				scrambleWidth = 190;
+				maxScrambleImageWidth = 190;
 			}
+			
+			Dimension scrambleImageSize = scrambleRequest.scrambler.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight);
+			
+			PdfPTable scramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme);
+			doc.add(scramblesTable);
 
-			float sideMargins = 100 + doc.leftMargin() + doc.rightMargin();
-			float vertMargins = doc.topMargin() + doc.bottomMargin();
-			float availableWidth = pageSize.getWidth()-sideMargins;
-			float availableHeight = pageSize.getHeight()-vertMargins;
-			int scrambleHeight = (int) (availableHeight/SCRAMBLES_PER_PAGE - 2*scrambleImagePadding);
-			Dimension dim = scrambleRequest.scrambler.getPreferredSize(scrambleWidth, scrambleHeight);
-			PdfContentByte cb = docWriter.getDirectContent();
-
-			List<String> allScrambles = scrambleRequest.getAllScrambles();
-			int charsWide = 1 + (int) Math.log10(allScrambles.size());
-			String wideString = "";
-			for(int i = 0; i < charsWide; i++) {
-				// M has got to be as wide or wider than the widest digit in our font
-				wideString += "M";
+			if(scrambleRequest.extraScrambles.length > 0) {
+				PdfPTable headerTable = new PdfPTable(1);
+				headerTable.setTotalWidth(new float[] { availableWidth });
+				headerTable.setLockedWidth(true);
+				
+				PdfPCell extraScramblesHeader = new PdfPCell(new Paragraph("Extra scrambles"));
+				extraScramblesHeader.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+				extraScramblesHeader.setPaddingBottom(3);
+				headerTable.addCell(extraScramblesHeader);
+				doc.add(headerTable);
+				
+				PdfPTable extraSscramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme);
+				doc.add(extraSscramblesTable);
 			}
-			wideString += ".";
-			float col1Width = new Chunk(wideString).getWidthPoint();
-			// I don't know why we need this, perhaps there's some padding?
-			col1Width += 5;
-
-			float availableScrambleWidth = availableWidth - col1Width - dim.width - 2*scrambleImagePadding;
-			int availableScrambleHeight = dim.height - 2*scrambleImagePadding;
-
-			PdfPTable table = new PdfPTable(3);
-
-			table.setTotalWidth(new float[] { col1Width, availableScrambleWidth, dim.width + 2*scrambleImagePadding });
-			table.setLockedWidth(true);
-
-			String longestScramble = "";
-			for(String scramble : allScrambles) {
-				String padded = padTurnsUniformly(scramble, "M");
-				if(padded.length() > longestScramble.length()) {
-					longestScramble = padded;
-				}
-			}
-			// I don't know how to configure ColumnText.fitText's word wrapping characters,
-			// so instead, I just replace each character I don't want to wrap with M, which
-			// should be the widest character (we're using a monospaced font,
-			// so that doesn't really matter), and won't get wrapped.
-			longestScramble = longestScramble.replaceAll("\\S", "M");
-			if(longestScramble.indexOf("\n") >= 0) {
-				// If the scramble contains newlines, then we *only* allow wrapping at the
-				// newlines.
-				longestScramble = longestScramble.replaceAll(" ", "M");
-			}
-			Font scrambleFont = null;
-			try {
-				BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-				Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight - 8);
-				float perfectFontSize = ColumnText.fitText(new Font(courier), longestScramble, availableArea, maxFontSize, PdfWriter.RUN_DIRECTION_LTR);
-				scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
-			} catch(IOException e) {
-				l.log(Level.INFO, "", e);
-			} catch(DocumentException e) {
-				l.log(Level.INFO, "", e);
-			}
-
-			for(int i = 0; i < allScrambles.size(); i++) {
-				String scramble = allScrambles.get(i);
-				Chunk ch = new Chunk((i+1)+".");
-				PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
-				nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-				table.addCell(nthscramble);
-
-				String paddedScramble = padTurnsUniformly(scramble, " ");
-				Chunk scrambleChunk = new Chunk(paddedScramble);
-				if(paddedScramble.indexOf("\n") >= 0) {
-					// If the scramble contains newlines, then we *only* allow wrapping at the
-					// newlines.
-					scrambleChunk.setSplitCharacter(SPLIT_ON_NEWLINES);
-				} else {
-					scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
-				}
-				scrambleChunk.setFont(scrambleFont);
-
-				PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
-				scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-				// This shifts everything up a little bit, because I don't like how
-				// ALIGN_MIDDLE works.
-				scrambleCell.setPaddingTop(-3);
-				scrambleCell.setPaddingBottom(3);
-				scrambleCell.setPaddingLeft(3);
-				scrambleCell.setPaddingRight(3);
-				table.addCell(scrambleCell);
-
-				if(dim.width > 0 && dim.height > 0) {
-					PdfTemplate tp = cb.createTemplate(dim.width + 2*scrambleImagePadding, dim.height + 2*scrambleImagePadding);
-					Graphics2D g2 = new PdfGraphics2D(tp, tp.getWidth(), tp.getHeight(), new DefaultFontMapper());
-					g2.translate(scrambleImagePadding, scrambleImagePadding);
-
-					try {
-						scrambleRequest.scrambler.drawScramble(g2, dim, scramble, colorScheme);
-					} catch (Exception e) {
-						g2.dispose(); // iTextPdf blows up if we do not dispose of this
-						table.addCell("Error drawing scramble: " + e.getMessage());
-						l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e);
-						continue;
-					}
-					g2.dispose();
-					PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
-					imgCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-					imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-					imgCell.setHorizontalAlignment(PdfPCell.ALIGN_MIDDLE);
-					table.addCell(imgCell);
-				} else {
-					table.addCell("");
-				}
-			}
-
-			doc.add(table);
 		}
 		doc.newPage();
+	}
+
+	private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme) throws DocumentException {
+		PdfContentByte cb = docWriter.getDirectContent();
+
+		PdfPTable table = new PdfPTable(3);
+
+		int charsWide = 1 + (int) Math.log10(scrambles.length);
+		String wideString = "";
+		for(int i = 0; i < charsWide; i++) {
+			// M has got to be as wide or wider than the widest digit in our font
+			wideString += "M";
+		}
+		wideString += ".";
+		float col1Width = new Chunk(wideString).getWidthPoint();
+		// I don't know why we need this, perhaps there's some padding?
+		col1Width += 5;
+
+		float availableWidth = doc.getPageSize().getWidth()-sideMargins;
+		float availableScrambleWidth = availableWidth - col1Width - scrambleImageSize.width - 2*SCRAMBLE_IMAGE_PADDING;
+		int availableScrambleHeight = scrambleImageSize.height - 2*SCRAMBLE_IMAGE_PADDING;
+
+		table.setTotalWidth(new float[] { col1Width, availableScrambleWidth, scrambleImageSize.width + 2*SCRAMBLE_IMAGE_PADDING });
+		table.setLockedWidth(true);
+
+		String longestScramble = "";
+		for(String scramble : scrambles) {
+			String padded = padTurnsUniformly(scramble, "M");
+			if(padded.length() > longestScramble.length()) {
+				longestScramble = padded;
+			}
+		}
+		// I don't know how to configure ColumnText.fitText's word wrapping characters,
+		// so instead, I just replace each character I don't want to wrap with M, which
+		// should be the widest character (we're using a monospaced font,
+		// so that doesn't really matter), and won't get wrapped.
+		longestScramble = longestScramble.replaceAll("\\S", "M");
+		if(longestScramble.indexOf("\n") >= 0) {
+			// If the scramble contains newlines, then we *only* allow wrapping at the
+			// newlines.
+			longestScramble = longestScramble.replaceAll(" ", "M");
+		}
+		Font scrambleFont = null;
+		try {
+			BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
+			Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight - 8);
+			float perfectFontSize = ColumnText.fitText(new Font(courier), longestScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR);
+			scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
+		} catch(IOException e) {
+			l.log(Level.INFO, "", e);
+		} catch(DocumentException e) {
+			l.log(Level.INFO, "", e);
+		}
+
+		for(int i = 0; i < scrambles.length; i++) {
+			String scramble = scrambles[i];
+			Chunk ch = new Chunk((i+1)+".");
+			PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
+			nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+			table.addCell(nthscramble);
+
+			String paddedScramble = padTurnsUniformly(scramble, " ");
+			Chunk scrambleChunk = new Chunk(paddedScramble);
+			if(paddedScramble.indexOf("\n") >= 0) {
+				// If the scramble contains newlines, then we *only* allow wrapping at the
+				// newlines.
+				scrambleChunk.setSplitCharacter(SPLIT_ON_NEWLINES);
+			} else {
+				scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
+			}
+			scrambleChunk.setFont(scrambleFont);
+
+			PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
+			scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+			// This shifts everything up a little bit, because I don't like how
+			// ALIGN_MIDDLE works.
+			scrambleCell.setPaddingTop(-3);
+			scrambleCell.setPaddingBottom(3);
+			scrambleCell.setPaddingLeft(3);
+			scrambleCell.setPaddingRight(3);
+			table.addCell(scrambleCell);
+
+			if(scrambleImageSize.width > 0 && scrambleImageSize.height > 0) {
+				PdfTemplate tp = cb.createTemplate(scrambleImageSize.width + 2*SCRAMBLE_IMAGE_PADDING, scrambleImageSize.height + 2*SCRAMBLE_IMAGE_PADDING);
+				Graphics2D g2 = new PdfGraphics2D(tp, tp.getWidth(), tp.getHeight(), new DefaultFontMapper());
+				g2.translate(SCRAMBLE_IMAGE_PADDING, SCRAMBLE_IMAGE_PADDING);
+
+				try {
+					scrambler.drawScramble(g2, scrambleImageSize, scramble, colorScheme);
+				} catch (Exception e) {
+					g2.dispose(); // iTextPdf blows up if we do not dispose of this
+					table.addCell("Error drawing scramble: " + e.getMessage());
+					l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e);
+					continue;
+				}
+				g2.dispose();
+				PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
+				imgCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+				imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+				imgCell.setHorizontalAlignment(PdfPCell.ALIGN_MIDDLE);
+				table.addCell(imgCell);
+			} else {
+				table.addCell("");
+			}
+		}
+		
+		return table;
 	}
 
 	private static String padTurnsUniformly(String scramble, String padding) {
