@@ -141,7 +141,7 @@
 +pressing escape to close a dialog causes the reset shortcut to fire
 +pressing esc while commenting on a session doesn't stop propagation of the event
 +clicking on ave100 does something even when there is no ave100
-+add time "dnf" -> cannot call savesessions of 
++add time "dnf" -> cannot call savesessions of
 +replace all issue with time stats?
 +esc doesn't close time comment
 +resetting format str doesn't seem to work

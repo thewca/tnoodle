@@ -439,7 +439,7 @@ class tmt:
 
 	def timestamp(self, f):
 		"""
-			If f is a directory, returns the timestamp of the newest file 
+			If f is a directory, returns the timestamp of the newest file
 			found anywhere under the given directory f.
 			If f is a file, simply returns the timestamp of the given file.
 			Empty/non existent directories have timestamp 0.

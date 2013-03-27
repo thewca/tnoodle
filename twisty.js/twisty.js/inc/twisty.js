@@ -1,9 +1,9 @@
 /*
  * twisty.js
- * 
+ *
  * Started by Lucas Garron, July 22, 2011 at WSOH
  * Made classy by Jeremy Fleischman, October 7, 2011 during the flight to worlds
- * 
+ *
  */
 
 var twistyjs = {};
@@ -28,8 +28,8 @@ if (!Function.prototype.bind) {
     }
 
     var fSlice = Array.prototype.slice,
-        aArgs = fSlice.call(arguments, 1), 
-        fToBind = this, 
+        aArgs = fSlice.call(arguments, 1),
+        fToBind = this,
         fNOP = function () {},
         fBound = function () {
           return fToBind.apply(this instanceof fNOP ? this : oThis || window,
@@ -58,12 +58,12 @@ if(typeof(assert) == "undefined") {
 }
 
 /****************
- * 
+ *
  * Twisty Plugins
  *
  * Plugins register themselves by calling twistyjs.registerTwisty.
  * This lets plugins be defined in different files.
- * 
+ *
  */
 
 var twisties = {};
@@ -428,7 +428,7 @@ twistyjs.TwistyScene = function() {
     render();
 
     if (stats) {
-      stats.update(); 
+      stats.update();
     }
 
     // That was fun, lets do it again!
@@ -450,7 +450,7 @@ twistyjs.TwistyScene = function() {
     //  Does it make sense for a TwistyScene to have an addMoves method?
     //  Scene implies (potentially) multiple twisties.
     //   Perhaps rename TwistyScene -> TwistyContainer?
-    //  Alertatively, TwistyScene could become a Twisty base class, 
+    //  Alertatively, TwistyScene could become a Twisty base class,
     //  and twisty instances inherit useful stuff like addMoves.
     //
     //  I personally prefer the first method for a couple of reasons:

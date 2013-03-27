@@ -53,7 +53,7 @@ var TurnSchema = new Schema({
   move: String,
   delta: Number
 });
-  
+
 var SolveSchema = new Schema({
   turns:[TurnSchema],
   gameName: String,
@@ -194,7 +194,7 @@ function User(nick_, clientId_) {
         turns: moves,
         gameName: that.channel.gameInfo.gameName,
         inspectSec: that.channel.gameInfo.inspectSeconds,
-        solveMillis: solveMillis 
+        solveMillis: solveMillis
       };
       var solveInstance = new Solve(storeObject);
       util.puts(moves);

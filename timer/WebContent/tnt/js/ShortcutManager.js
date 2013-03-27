@@ -48,7 +48,7 @@ var ShortcutManager = null;
 				var keyStr = keys.join("+");
 				setTimeout(function() {
 					// For some reason, calling e.stop()
-					// enough to stop opera from adding the 
+					// enough to stop opera from adding the
 					// This little hack seems to work, howev
 					editingShortcutField.value = keyStr;
 				}, 0);

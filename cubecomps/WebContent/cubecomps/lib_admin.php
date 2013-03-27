@@ -1,8 +1,7 @@
 <?
 session_start();
-if (!$_SESSION["c_admin"])
-{
-	$txt = <<<TEXT
+if (!$_SESSION["c_admin"]) :
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -17,7 +16,7 @@ if (!$_SESSION["c_admin"])
 	<p style="font-size:0.8em;">Please <a href="/">re-login</a>.</p>
    </body>
   </html>
-TEXT;
-	exit($txt);
-}
 ?>
+<?php
+	exit;
+endif;

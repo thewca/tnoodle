@@ -36,7 +36,7 @@
 .cursorPosition {
   position: absolute;
 
-  width: 10px; height: 10px; 
+  width: 10px; height: 10px;
   -webkit-border-radius: 10px; -moz-border-radius: 10px;
   background-color: red;
   border: 5px solid black;

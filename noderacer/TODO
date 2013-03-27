@@ -56,7 +56,7 @@
 
 * This is probably just a nowjs reconnecting issue.
 Assertion failure!
-16745030801217288281 doesn't appear in 
+16745030801217288281 doesn't appear in
 
 File: http://tnoodle.tk:8001/GameMasterGui.js:370
    368:    		this.handleMoveState = function(user, moveState, timestamp, startstamp) {

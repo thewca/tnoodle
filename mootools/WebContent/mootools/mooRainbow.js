@@ -41,7 +41,7 @@ var MooRainbow = new Class({
 		this.sets = {
 			rgb: [],
 			hsb: [],
-			hex: []	
+			hex: []
 		};
 		this.pickerClick = this.sliderClick  = false;
 		if (!this.layout) this.doLayout();
@@ -94,7 +94,7 @@ var MooRainbow = new Class({
 		if (!type || (type != 'hsb' && type != 'hex')) type = 'rgb';
 		var rgb, hsb, hex;
 
-		if (type == 'rgb') { rgb = color; hsb = color.rgbToHsb(); hex = color.rgbToHex(); } 
+		if (type == 'rgb') { rgb = color; hsb = color.rgbToHsb(); hex = color.rgbToHex(); }
 		else if (type == 'hsb') { hsb = color; rgb = color.hsbToRgb(); hex = rgb.rgbToHex(); }
 		else { hex = color; rgb = color.hexToRgb(true); hsb = rgb.rgbToHsb(); }
 		
@@ -130,7 +130,7 @@ var MooRainbow = new Class({
 		if (!type || (type != 'hsb' && type != 'hex')) type = 'rgb';
 		var rgb, hsb, hex;
 
-		if (type == 'rgb') { rgb = color; hsb = color.rgbToHsb(); hex = color.rgbToHex(); } 
+		if (type == 'rgb') { rgb = color; hsb = color.rgbToHsb(); hex = color.rgbToHex(); }
 		else if (type == 'hsb') { hsb = color; rgb = color.hsbToRgb(); hex = rgb.rgbToHex(); }
 		else { hex = color; rgb = color.hexToRgb(); hsb = rgb.rgbToHsb(); }
 
@@ -141,7 +141,7 @@ var MooRainbow = new Class({
 		};
 
 		if (!this.pickerPos.x)
-			this.autoSet(hsb);		
+			this.autoSet(hsb);
 
 		this.RedInput.value = rgb[0];
 		this.GreenInput.value = rgb[1];
@@ -178,10 +178,10 @@ var MooRainbow = new Class({
 		curW = this.snippet('curSize', 'int').w;
 		inputs = this.arrRGB.concat(this.arrHSB, this.hexInput);
 
-		document.addEvent('click', function(e) { 
+		document.addEvent('click', function(e) {
       // TODO - modified so only one color picker is visible at a time --jfly
       if(!e.target.isOrIsChild(this.element) && !e.target.isOrIsChild(this.layout) && this.visible) {
-        this.hide(this.layout); 
+        this.hide(this.layout);
       }
 		}.bind(this));
 
@@ -206,7 +206,7 @@ var MooRainbow = new Class({
 			onStart: this.overlayDrag.bind(this),
 			onDrag: this.overlayDrag.bind(this),
 			snap: 0
-		});	
+		});
 		
 		this.layout.overlay2.addEvent('mousedown', function(e){
 			this.layout.cursor.setStyles({
@@ -251,7 +251,7 @@ var MooRainbow = new Class({
 			onStart: this.sliderDrag.bind(this),
 			onDrag: this.sliderDrag.bind(this),
 			snap: 0
-		});	
+		});
 	
 		this.layout.slider.addEvent('mousedown', function(e){
 			this.layout.arrows.setStyle(
@@ -309,7 +309,7 @@ var MooRainbow = new Class({
 	},
 	
 	eventKeys: function(e, el, id) {
-		var wheel, type;		
+		var wheel, type;
 		id = (!id) ? el.id : this.arrHSB[0];
 
 		if (e.type == 'keydown') {
@@ -462,7 +462,7 @@ var MooRainbow = new Class({
 
 		var cr = new Element('div', {
 			'styles': {'overflow': 'hidden', 'position': 'absolute', 'zIndex': 2},
-			'class': prefix + 'cursor'	
+			'class': prefix + 'cursor'
 		}).inject(div);
 		cr.width = cr.getStyle('width').toInt();
 		cr.height = cr.getStyle('height').toInt();
@@ -565,11 +565,11 @@ var MooRainbow = new Class({
 				var t = this.layout.arrows.getStyle('top').toInt();
 				size = t;
 				break;
-			case 'arrSize': 
+			case 'arrSize':
 				var h = this.layout.arrows.height;
 				h = (type == 'int') ? (h/2).toInt() : h;
 				size = h;
-				break;		
+				break;
 			case 'curPos':
 				var l = this.layout.cursor.getStyle('left').toInt();
 				var t = this.layout.cursor.getStyle('top').toInt();

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import re
 import sys
 import subprocess
 
@@ -31,7 +32,7 @@ JSLINT_IGNORED_ERRORS = {
   "Empty block.",
 }
 
-NO_JSLINT_KEYWORD = 'BLW-DUCPHAM'
+NO_LINT_KEYWORD = 'BLW-DUCPHAM'
 
 UNCOMMITABLE_PHRASES = {
     '<'+'<'+'<'
@@ -82,11 +83,16 @@ def lint(files):
 		if os.path.isdir(f):
 			continue
 		fileName, ext = os.path.splitext(f)
+		if ext == ".sfd":
+			continue
+                if f.startswith('git-tools/requests'):
+			# This third party directory is just littered with crap that I don't want to deal with
+			continue
 
 		if JSLINT_ENABLED:
 			if ext == '.js' or ext == '.html':
-				if NO_JSLINT_KEYWORD in file(f).readline():
-					print "Not jslinting %s (because we found %s)" % (f, NO_JSLINT_KEYWORD)
+				if NO_LINT_KEYWORD in file(f).readline():
+					print "Not jslinting %s (because we found %s)" % (f, NO_LINT_KEYWORD)
 				else:
 					if os.path.isdir(f):
 						continue
@@ -97,7 +103,7 @@ def lint(files):
 					argv = [ 'java', '-jar', jsLintJar, f ]
 					p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					fileLines = file(f).read().split("\n")
-					stdout, stderr = p.communicate()    
+					stdout, stderr = p.communicate()
 					# Note that we don't check the returncode of p, because jslint returns a nonzero
 					# error code when jslinting fails, and we want to ignore whatever errors are in
 					# JSLINT_IGNORED_ERRORS.
@@ -122,16 +128,21 @@ def lint(files):
 		
 		if CHECK_ILLEGAL_CHAR:
 			if is_binary(f):
-				#print "Skipping binary file %s" % f
 				pass
 			elif os.path.islink(f):
 				pass
 			else:
+				noLint = NO_LINT_KEYWORD in file(f).readline()
 				lines = file(f).read().split("\n")
 				for lineNumber, line in enumerate(lines):
 					for uncommitablePhrase in UNCOMMITABLE_PHRASES:
+						error = None
+						if not noLint and re.match(r"^.*\S[ \t]+$", line):
+							error = "Trailing whitespace"
 						if uncommitablePhrase in line:
-							error = "%s:%s:Illegal character.:%s" % ( f, lineNumber+1, line )
+							error = "Illegal characters"
+                                                if error:
+							error = "%s:%s:%s:%s" % ( f, lineNumber+1, error, line )
 							failures.append(error)
 	return failures
 

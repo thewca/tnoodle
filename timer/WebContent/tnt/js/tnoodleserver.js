@@ -43,7 +43,7 @@ tnoodle.server = function(protocol, hostname, port) {
 	this.viewUrl = this.serverUrl + "/view/";
 	this.importUrl = this.serverUrl + "/import/";
 
-	//TODO - document!	
+	//TODO - document!
 	this.createAreas = function(faces, scale) {
 		var deepJoin = function(arr, sep) {
 			return arr.map(function(item) { return item.map(function(coord) { return coord*scale; }).join(sep); }).join(sep);
@@ -58,7 +58,7 @@ tnoodle.server = function(protocol, hostname, port) {
 					area.setAttribute('shape', 'poly');
 					var coords = deepJoin(faceAreas[i], ",");
 					area.setAttribute('coords', coords);
-	
+
 					areas.push(area);
 				}
 			}
@@ -80,11 +80,11 @@ tnoodle.server = function(protocol, hostname, port) {
 		}
 		return scheme;
 	};
-	
+
 	this.loadPuzzles = function(callback) {
 		return tnoodle.ajax(callback, this.puzzlesUrl, null);
 	};
-	
+
 	this.loadScramble = function(callback, puzzle, seed) {
 		return this.loadScrambles(function(scrambles) {
 			callback(scrambles[0]);
@@ -143,7 +143,7 @@ tnoodle.server = function(protocol, hostname, port) {
 	this.importScrambles = function(callback, url) {
 		return tnoodle.ajax(callback, this.importUrl, { url: url });
 	};
-	
+
 	var uploadForm = null;
 	this.getUploadForm = function(onsubmit, onload) {
 		//onsubmit and onload are only used the first time this method is called
@@ -162,7 +162,7 @@ tnoodle.server = function(protocol, hostname, port) {
 					onload({error: "Bad origin: " + e.origin + ", expecting " + serveriUrl});
 				}
 			}, false);
-			
+
 			uploadForm = document.createElement('form');
 			uploadForm.setAttribute('method', 'post');
 			uploadForm.setAttribute('action', this.importUrl);
@@ -172,14 +172,14 @@ tnoodle.server = function(protocol, hostname, port) {
 				var abortSubmit = { abort: function() { sendFileIframe.src='about:blank'; } };
 				onsubmit(fileInput.value, submit, abortSubmit);
 			}, false);
-			
+
 			var fileInput = document.createElement('input');
 			fileInput.setAttribute('type', 'file');
 			fileInput.setAttribute('name', 'scrambles');
 			var submit = document.createElement('input');
 			submit.type = 'submit';
 			submit.value = 'Load Scrambles';
-			
+
 			uploadForm.appendChild(fileInput);
 			uploadForm.appendChild(submit);
 		}
@@ -189,9 +189,9 @@ tnoodle.server = function(protocol, hostname, port) {
 		return this.serverUrl;
 	};
 
-	
+
 	/**** Time server stuff ***/
-	
+
 	function Configuration() {
 		//TODO GAH! localStorage doesn't work offline in ff! wtf?
 		//https://bugzilla.mozilla.org/show_bug.cgi?id=507361
@@ -206,9 +206,9 @@ tnoodle.server = function(protocol, hostname, port) {
 				document.cookie=c_name+ "=" +escape(value)+
 				((!expiredays) ? "" : ";expires="+exdate.toUTCString());
 				}
-				
+
 				var data = {};
-				
+
 				var cookies = document.cookie.split(';');
 				this.length = cookies.length;
 				var keys = [];
@@ -244,7 +244,7 @@ tnoodle.server = function(protocol, hostname, port) {
 				//oh well
 			}
 		}
-		
+
 		this.set = function(property, value) {
 			if(value === null || value === undefined) {
 				delete data[property];
@@ -253,7 +253,7 @@ tnoodle.server = function(protocol, hostname, port) {
 				data[property] = value;
 //				cookies.setItem(property, JSON.stringify(value));
 				//it seems that mootools is breaking stringify with arrays?
-				
+
 				//NOTE: JSON.encode is hacked to deal with Infinity
 				cookies.setItem(property, JSON.encode(value));
 			}
@@ -277,7 +277,7 @@ tnoodle.server = function(protocol, hostname, port) {
 		if(decimalPlaces !== 0) {
 			decimalPlaces = decimalPlaces || server.configuration.get('timer.statsDecimalPlaces');
 		}
-		
+
 		if(millis == Infinity) {
 			return "DNF";
 		} else if(server.configuration.get('clockFormat', true)) {
@@ -291,7 +291,7 @@ tnoodle.server = function(protocol, hostname, port) {
 		if(decimalPlaces !== 0) {
 			decimalPlaces = decimalPlaces || server.configuration.get('timer.statsDecimalPlaces');
 		}
-		
+
 		// Javascript behaves *retardedly* with small numbers (< 1e-6)
 		// > parseInt(1/(1000*60*60)+"")
 		//   2
@@ -305,7 +305,7 @@ tnoodle.server = function(protocol, hostname, port) {
 		timeMillis = timeMillis % (1000*60);
 		var seconds = Math.floor(timeMillis / 1000);
 		var millis = timeMillis % 1000;
-	
+
 		var clocked = "";
 		if(hours > 0) {
 			clocked += hours + ":";
@@ -339,13 +339,13 @@ tnoodle.server = function(protocol, hostname, port) {
 					decimals += "0";
 				}
 			}
-			
+
 			clocked += "." + decimals;
 		}
-		
+
 		return clocked;
 	};
-	
+
 
 	this.createSession = function(puzzle, event) {
 		//id is the number of seconds since the epoch encoded in base 36 for readability
@@ -474,9 +474,9 @@ tnoodle.server = function(protocol, hostname, port) {
 		//bummer
 		sessions = [];
 	}
-	
+
 	this.sessions = sessions;
-	
+
 	var config = this.configuration;
 	var pendingSave = false;
 	function bufferedSave() {
@@ -490,7 +490,7 @@ tnoodle.server = function(protocol, hostname, port) {
 		pendingSave = true;
 		setTimeout(bufferedSave, 500);
 	};
-	
+
 	if(sessions.length === 0) {
 		this.createSession("333", "");
 	}
@@ -562,7 +562,7 @@ tnoodle.Time = function(time, scramble) {
 		} else {
 			penalty = null;
 		}
-			
+
 		var hours = null, minutes = null, seconds = null;
 		var coloned = time.split(':');
 		var i = coloned.length;
@@ -582,18 +582,18 @@ tnoodle.Time = function(time, scramble) {
 		default:
 			throw "Too many colons";
 		}
-		
+
 		function strictToInt(str) {
 			if(!str.match(/^\d+$/)) {
 				throw "Not an integer: " + str;
 			}
 			return str.toInt(10);
 		}
-		
+
 		if(coloned[i-1] == ".") {
 			throw "Invalid seconds value";
 		}
-		
+
 		var valueMillis = 0;
 		var seconds_millis = seconds.split('.');
 		if(seconds_millis.length == 2 && seconds_millis[1].length > 0) {
@@ -610,7 +610,7 @@ tnoodle.Time = function(time, scramble) {
 		if(hours) {
 			valueMillis += 60*60*1000*strictToInt(hours);
 		}
-		
+
 		this.millis = valueMillis;
 		if(penalty == "+2") {
 			valueMillis -= 2*1000;
@@ -635,7 +635,7 @@ tnoodle.Time = function(time, scramble) {
 		}
 		this.penalty = penalty;
 		if(this.penalty == "+2") {
-			this.millis = this.rawMillis + 2*1000; 
+			this.millis = this.rawMillis + 2*1000;
 		} else if(this.penalty == "DNF") {
 			this.millis = Infinity;
 			if(this.rawMillis === undefined) {
@@ -676,7 +676,7 @@ tnoodle.Time = function(time, scramble) {
 	this.getComment = function() {
 		return this.comment === null ? "" : this.comment;
 	};
-	
+
 	this.ra5 = this.ra12 = this.ra100 = null;
 	this.penalty = null;
 	this.index = null;
@@ -684,7 +684,7 @@ tnoodle.Time = function(time, scramble) {
 	this.date = new Date().getTime();
 	this.scramble = scramble;
 	this.comment = null;
-	
+
 	if(typeof(time) === "number") {
 		this.millis = this.rawMillis = time;
 	} else {
@@ -734,7 +734,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 	this.event = event || '';
 	//times is an array of Time's
 	this.times = [];
-	
+
 	this.setPuzzle = function(newPuzzle) {
 		this.puzzle = newPuzzle;
 		server.saveSessions();
@@ -859,9 +859,9 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		variance /= times.length;
 		return Math.sqrt(variance);
 	};
-	
+
 	var THIS = this;
-	
+
 	function computeMedian(lastTimeIndex, size) {
 		return computeRA(lastTimeIndex, size, 2*Math.floor((size-1)/2));
 	}
@@ -885,7 +885,7 @@ tnoodle.Session = function(server, id, puzzle, event) {
 		if(firstSolve < 0 || size === 0) {
 			return null; //not enough solves
 		}
-		
+
 		var times = THIS.times.slice(firstSolve, lastTimeIndex+1);
 		times.sort(function(a, b) { return a.millis - b.millis; });
 		times.splice(0, trimmed/2); //trim the best trimmed/2 solves
@@ -1107,7 +1107,7 @@ tnoodle.ajax = function(callback, url, data) {
 		}
 		dataUrl += tnoodle.toQueryString(data);
 	}
-	
+
 	var xhr = new XMLHttpRequest();
 	if(xhr.withCredentials === undefined) {
 		xhr = null;
@@ -1211,7 +1211,7 @@ tnoodle.jsonp = function(callback, url, data) {
 	var callbackname = "tnoodle.jsonp.callback" + this.jsonpcount++;
 	eval(callbackname + "=callback");
 	if (url.indexOf("?") > -1) {
-		url += "&callback="; 
+		url += "&callback=";
 	} else {
 		url += "?callback=";
 	}
@@ -1219,9 +1219,9 @@ tnoodle.jsonp = function(callback, url, data) {
 	url += callbackname + "&" + tnoodle.toQueryString(data);
 	url += "&" + new Date().getTime().toString(); // prevent caching
 
-	var script = document.createElement("script");        
+	var script = document.createElement("script");
 	script.setAttribute("src",url);
-	script.setAttribute("type","text/javascript");                
+	script.setAttribute("type","text/javascript");
 	document.body.appendChild(script); //TODO - doesn't work until body is loaded
 	*/
 };
@@ -1235,6 +1235,6 @@ tnoodle.toQueryString = function(data) {
 	if(url.length === 0) {
 		return url;
 	}
-	
+
 	return url.substring(1);
 };

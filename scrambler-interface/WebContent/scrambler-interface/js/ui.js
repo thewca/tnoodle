@@ -28,8 +28,8 @@ if (!Function.prototype.bind) {
       throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
     }
 
-    var aArgs = Array.prototype.slice.call(arguments, 1), 
-        fToBind = this, 
+    var aArgs = Array.prototype.slice.call(arguments, 1),
+        fToBind = this,
         fNOP = function () {},
         fBound = function () {
           return fToBind.apply(this instanceof fNOP ? this : oThis || window,
@@ -365,10 +365,10 @@ mark2.settings = (function() {
 		"minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
 		"pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
 		"sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } }, 
+		"clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
 		"666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
 		"777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-		//"magic" 
+		//"magic"
 		//"mmagic"
 		"444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
 		"555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
@@ -589,14 +589,14 @@ mark2.ui = (function() {
       var numDigits;
       var maxForDigits = 1;
       var numWithThisManyDigits = 1;
-    
+
       for (numDigits = 0; maxForDigits <= int; numDigits++) {
         numWithThisManyDigits *= 26;
         maxForDigits += numWithThisManyDigits;
       }
-    
+
       var adjustedInt = int - (maxForDigits - numWithThisManyDigits);
-    
+
       var out = "";
       for (var i = 0; i < numDigits; i++) {
         out = String.fromCharCode(65 + (adjustedInt % 26)) + out;

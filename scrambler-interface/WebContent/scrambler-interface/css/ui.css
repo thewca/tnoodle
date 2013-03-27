@@ -226,7 +226,7 @@ h1 {
   width: 3em;
 }
 
-/* 
+/*
 This can go once https://code.google.com/p/chromium/issues/detail?id=132014
 is resolved.
 */
@@ -315,7 +315,7 @@ is resolved.
 }
 /*
 Animate the stripes
-*/	
+*/
 @-webkit-keyframes move{
   0% {
   	background-position: 0 0;
@@ -323,7 +323,7 @@ Animate the stripes
   100% {
   	background-position: 50px 50px;
   }
-}	
+}
 @-moz-keyframes move{
   0% {
   	background-position: 0 0;
@@ -331,7 +331,7 @@ Animate the stripes
   100% {
   	background-position: 50px 50px;
   }
-}	
+}
 @-ms-keyframes move{
   0% {
   	background-position: 0 0;
@@ -339,7 +339,7 @@ Animate the stripes
   100% {
   	background-position: 50px 50px;
   }
-}	
+}
 @keyframes move{
   0% {
   	background-position: 0 0;

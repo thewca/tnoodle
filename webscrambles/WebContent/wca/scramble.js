@@ -25,7 +25,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 	this.viewUrl = this.serverUrl + "/view/";
 	this.importUrl = this.serverUrl + "/import/";
 
-	//TODO - document!	
+	//TODO - document!
 	this.createAreas = function(faces, scale) {
 		var deepJoin = function(arr, sep) {
 			return arr.map(function(item) { return item.map(function(coord) { return coord*scale; }).join(sep); }).join(sep);
@@ -40,7 +40,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 					area.setAttribute('shape', 'poly');
 					var coords = deepJoin(faceAreas[i], ",");
 					area.setAttribute('coords', coords);
-	
+
 					areas.push(area);
 				}
 			}
@@ -76,7 +76,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 	this.showZip = function(title, scrambleRequest, password, target) {
 		that.showExt(title, scrambleRequest, password, 'zip', target);
 	};
-	
+
 	this.loadPuzzles = function(callback, includeStatus) {
 		var query = {};
 		if(includeStatus) {
@@ -84,7 +84,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 		}
 		return tnoodle.retryAjax(callback, this.puzzlesUrl, query);
 	};
-	
+
 	this.loadScramble = function(callback, puzzle, seed) {
 		return this.loadScrambles(function(scrambles) {
 			callback(scrambles[0]);
@@ -142,7 +142,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 	this.importScrambles = function(callback, url) {
 		return tnoodle.retryAjax(callback, this.importUrl, { url: url });
 	};
-	
+
 	var uploadForm = null;
 	this.getUploadForm = function(onsubmit, onload) {
 		// TODO - this can be implemented with HTML5 stuff instead
@@ -162,7 +162,7 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 					onload({error: "Bad origin: " + e.origin + ", expecting " + serveriUrl});
 				}
 			}, false);
-			
+
 			uploadForm = document.createElement('form');
 			uploadForm.setAttribute('method', 'post');
 			uploadForm.setAttribute('action', this.importUrl);
@@ -172,14 +172,14 @@ tnoodle.ScrambleServer = function(hostname, port, protocol) {
 				var abortSubmit = { abort: function() { sendFileIframe.src='about:blank'; } };
 				onsubmit(fileInput.value, submit, abortSubmit);
 			}, false);
-			
+
 			var fileInput = document.createElement('input');
 			fileInput.setAttribute('type', 'file');
 			fileInput.setAttribute('name', 'scrambles');
 			var submit = document.createElement('input');
 			submit.type = 'submit';
 			submit.value = 'Load Scrambles';
-			
+
 			uploadForm.appendChild(fileInput);
 			uploadForm.appendChild(submit);
 		}
@@ -204,7 +204,7 @@ tnoodle.appendParams = function(url, params) {
 tnoodle.ajax = function(callback, url, data) {
 	// Don't clobber the original url, we might need it to jsonp later.
 	var dataUrl = tnoodle.appendParams(url, data);
-	
+
 	var xhr = new XMLHttpRequest();
 	if(xhr.withCredentials === undefined) {
 		xhr = null;
@@ -352,7 +352,7 @@ tnoodle.jsonp = function(callback, url, data) {
 	var callbackname = "tnoodle.jsonpCallbacks[" + callbackIndex + "]";
 	tnoodle.jsonpCallbacks.push(callback);
 	if (url.indexOf("?") > -1) {
-		url += "&callback="; 
+		url += "&callback=";
 	} else {
 		url += "?callback=";
 	}
@@ -364,7 +364,7 @@ tnoodle.jsonp = function(callback, url, data) {
 	// https://github.com/jfly/tnoodle/issues/22
 	//url += "&" + new Date().getTime().toString(); // prevent caching
 
-	var script = document.createElement("script");        
+	var script = document.createElement("script");
 	script.setAttribute("src", url);
 	script.setAttribute("type", "text/javascript");
 	document.body.appendChild(script); //TODO - doesn't work until body is loaded
@@ -387,7 +387,7 @@ tnoodle.toQueryString = function(data) {
 	if(url.length === 0) {
 		return url;
 	}
-	
+
 	return url.substring(1);
 };
 

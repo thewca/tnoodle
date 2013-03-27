@@ -27,12 +27,12 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 
 	<mime-mapping>
 		<extension>svg</extension>
-		<mime-type>image/svg+xml</mime-type> 
+		<mime-type>image/svg+xml</mime-type>
 	</mime-mapping>
 
 	<mime-mapping>
 		<extension>ico</extension>
-		<mime-type>image/x-icon</mime-type> 
+		<mime-type>image/x-icon</mime-type>
 	</mime-mapping>
 	
 	

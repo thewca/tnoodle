@@ -13,8 +13,8 @@
     var parts = pattern_move.exec(moveString);
 
     var outStartSlice = 1;
-    var outEndSlice = 1; 
-    var baseMove = parts[4]; 
+    var outEndSlice = 1;
+    var baseMove = parts[4];
     var amount = 1;
 
     var outEndSliceParsed;
@@ -43,17 +43,17 @@
     }
 
     if (/[xyz]/g.test(baseMove)) {
-   
+
       outStartSlice = 1;
       outEndSlice = -1;
-      
-      
+
+
       baseMove = sliceMap[baseMove];
-      
+
     }
-    
+
     /* Amount */
-    
+
     var amountParsed = parseInt(parts[5], 10);
     if (!isNaN(amountParsed)) {
       amount = amountParsed;
@@ -61,21 +61,21 @@
     if (parts[6] == "'") {
       amount *= -1;
     }
-    
+
     /* Return */
-    
+
     return [outStartSlice, outEndSlice, baseMove, amount];
   }
 
   function stringToAlg(algString) {
     var moveStrings = algString.match(pattern);
     var alg = [];
-    
+
     for(var i = 0; i < moveStrings.length; i++) {
       var move = stringToMoveSiGN(moveStrings[i]);
       alg.push(move);
     }
-    
+
     return alg;
   }
 
@@ -233,7 +233,7 @@
 
         var sticker = new THREE.Object3D();
 
-        
+
         var meshes = [ materials[i] ];
         if (cubeOptions.stickerBorder) {
           meshes.push(borderMaterial);
@@ -260,18 +260,18 @@
             su*2 - cubeOptions.dimension + 1,
             -(sv*2 - cubeOptions.dimension + 1),
             cubeOptions.dimension
-        );    
+        );
 
         var transformationMatrix = new THREE.Matrix4();
         transformationMatrix.copy(sidesUV[i]);
         transformationMatrix.multiplySelf(positionMatrix);
-        sticker.matrix.copy(transformationMatrix); 
+        sticker.matrix.copy(transformationMatrix);
 
         sticker.matrixAutoUpdate = false;
         sticker.update();
 
         facePieces.push([transformationMatrix, sticker]);
-        cubeObject.addChild(sticker);    
+        cubeObject.addChild(sticker);
 
         }
       }
@@ -297,7 +297,7 @@
           var sticker = state[faceIndex][stickerIndex];
 
           // Support negative layer indices (e.g. for rotations)
-          //TODO: Bug 20110906, if negative index ends up the same as start index, the animation is iffy. 
+          //TODO: Bug 20110906, if negative index ends up the same as start index, the animation is iffy.
           var layerStart = currentMove[0];
           var layerEnd = currentMove[1];
           if (layerEnd < 0) {
@@ -351,7 +351,7 @@
 
           // TODO - merge this and animateMoveCallback!
           // Support negative layer indices (e.g. for rotations)
-          //TODO: Bug 20110906, if negative index ends up the same as start index, the animation is iffy. 
+          //TODO: Bug 20110906, if negative index ends up the same as start index, the animation is iffy.
           var layerStart = currentMove[0];
           var layerEnd = currentMove[1];
           if (layerEnd < 0) {

@@ -1,4 +1,4 @@
-// For some reason, alert, prompt, and confirm don't fire the 
+// For some reason, alert, prompt, and confirm don't fire the
 // blur and focus events on the window. This hack ensures that they
 // do.
 function wrapFunctionInBlur(func) {
@@ -560,7 +560,7 @@ window.addEvent('domready', function() {
 
 	$('bgLink').addEvent('click', function() {
 		bgPopupUrl.value = configuration.get('gui.backgroundImage');
-		bgPopup.show(); 
+		bgPopup.show();
 	});
 	setBgUrl(configuration.get('gui.backgroundImage', ''));
 });

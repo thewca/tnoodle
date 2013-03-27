@@ -1,8 +1,8 @@
 /*
  * twisty_demo.js
- * 
+ *
  * Demonstration and testing harness for WSOH.
- * 
+ *
  * TOOD
  * - Fix document.getElementById(...) calls.
         // TODO I can imagine that some users of twisty.js would want to be able to have a Heise-style
@@ -11,7 +11,7 @@
         // TODO clicking on canvas doesn't seem to focus window in firefox
         // TODO clicking and dragging is weird when the mouse leaves the window
         // TODO keydown doesn't repeat on firefox
- * 
+ *
  */
 
 /*
@@ -181,7 +181,7 @@ $(document).ready(function() {
       "stickerBorder": $("#sticker_border").is(':checked'),
       showFps: true
     });
-    $("#cubeDimension").blur(); 
+    $("#cubeDimension").blur();
     twistyScene.resize();
     cubeState = CubeState.solved;
     resetTimer();

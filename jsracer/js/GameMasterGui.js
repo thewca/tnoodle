@@ -216,12 +216,12 @@ var GameMasterGui = {};
 
 			document.location.hash = myself.channel.channelName;
 			if(myself.admin) {
-				gameDropdown.disabled = false;	
-				inspectionSecondsField.disabled = false;	
+				gameDropdown.disabled = false;
+				inspectionSecondsField.disabled = false;
 				scrambleButton.show();
 			} else {
-				gameDropdown.disabled = true;	
-				inspectionSecondsField.disabled = true;	
+				gameDropdown.disabled = true;
+				inspectionSecondsField.disabled = true;
 				scrambleButton.hide();
 			}
 			var gameInfo = gameMaster.getGameInfo();
@@ -593,7 +593,7 @@ var GameMasterGui = {};
           return;
         }
 				if(!deepEquals(gameInstance.getState(), moveState.oldState)) {
-					// This is a tricky assertion here. Assuming no turns are 
+					// This is a tricky assertion here. Assuming no turns are
 					// dropped by nowjs, we should have a perfect image
 					// of what all our fellow cubers are doing. However, Patricia
 					// says she has witnessed this happening, so I'm commenting

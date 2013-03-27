@@ -12,9 +12,9 @@ TODO - document how to create a competition/create a page for it
 Apart from the databases created in INC_INITDB.PHP, several databases must exist for the system to work:
 
 <pre><code>
--- 
+--
 -- Table structure for table `competitions`
--- 
+--
 
 CREATE TABLE IF NOT EXISTS `competitions` (
   `id` int(6) NOT NULL auto_increment,
@@ -32,9 +32,9 @@ CREATE TABLE IF NOT EXISTS `competitions` (
 
 
 
--- 
+--
 -- Table structure for table `categories`
--- 
+--
 
 CREATE TABLE IF NOT EXISTS `categories` (
   `id` tinyint(2) NOT NULL auto_increment,
@@ -48,9 +48,9 @@ CREATE TABLE IF NOT EXISTS `categories` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
 
--- 
+--
 -- Dumping data for table `categories`
--- 
+--
 
 MERGE INTO `categories` VALUES (1, 'Rubik''s Cube', '1345', '333', '3x3', 1, 1, 1);
 MERGE INTO `categories` VALUES (2, '2x2x2 Cube', '1345', '222', '2x2', 1, 1, 1);
@@ -74,9 +74,9 @@ MERGE INTO `categories` VALUES (19, 'Rubik''s Cube: Multiple Blindfolded', '345'
 
 
 
--- 
+--
 -- Table structure for table `countries`
--- 
+--
 
 CREATE TABLE IF NOT EXISTS `countries` (
   `id` varchar(2) NOT NULL default '',
@@ -84,9 +84,9 @@ CREATE TABLE IF NOT EXISTS `countries` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `countries`
--- 
+--
 
 MERGE INTO `countries` VALUES ('AF', 'Afghanistan');
 MERGE INTO `countries` VALUES ('AX', '�land Islands');
@@ -336,9 +336,9 @@ MERGE INTO `countries` VALUES ('ZW', 'Zimbabwe');
 
 
 
--- 
+--
 -- Table structure for table `formats`
--- 
+--
 
 CREATE TABLE IF NOT EXISTS `formats` (
   `id` tinyint(1) NOT NULL auto_increment,
@@ -348,9 +348,9 @@ CREATE TABLE IF NOT EXISTS `formats` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
 
--- 
+--
 -- Dumping data for table `formats`
--- 
+--
 
 MERGE INTO `formats` VALUES (1, 'average of 5', 5, 0);
 MERGE INTO `formats` VALUES (2, 'mean of 3', 3, 1);

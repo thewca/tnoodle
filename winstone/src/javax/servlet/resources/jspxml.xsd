@@ -99,7 +99,7 @@
       <xsd:enumeration value = "false"/>
       <xsd:enumeration value = "yes"/>
       <xsd:enumeration value = "no"/>
-    </xsd:restriction>     
+    </xsd:restriction>
   </xsd:simpleType>
 
   <xsd:simpleType name = "Identifier">
@@ -112,7 +112,7 @@
       <xsd:pattern value = "&Identifier;"/>
     </xsd:restriction>
   </xsd:simpleType>
-  
+
   <xsd:simpleType name = "TypeName">
     <xsd:annotation>
       <xsd:documentation>
@@ -124,7 +124,7 @@
       <xsd:pattern value = "&TypeName;"/>
     </xsd:restriction>
   </xsd:simpleType>
-  
+
   <xsd:simpleType name = "ImportList">
     <xsd:annotation>
       <xsd:documentation>
@@ -136,7 +136,7 @@
       <xsd:pattern value = "&ImportList;"/>
     </xsd:restriction>
   </xsd:simpleType>
-  
+
   <xsd:simpleType name = "SetProp">
     <xsd:annotation>
       <xsd:documentation>
@@ -147,7 +147,7 @@
       <xsd:pattern value = "&SetProp;"/>
     </xsd:restriction>
   </xsd:simpleType>
-  
+
   <xsd:simpleType name = "RelativeURL">
     <xsd:annotation>
       <xsd:documentation>
@@ -174,14 +174,14 @@
       <xsd:pattern value = "&Length;"/>
     </xsd:restriction>
   </xsd:simpleType>
-  
+
 
   <xsd:simpleType name = "ExplicitBufferSize">
     <xsd:annotation>
       <xsd:documentation>
          Buffer Size with an explicit value
       </xsd:documentation>
-    </xsd:annotation> 
+    </xsd:annotation>
     <xsd:restriction base = "xsd:string">
       <xsd:pattern value = "&Buffer;"/>
     </xsd:restriction>
@@ -192,7 +192,7 @@
       <xsd:documentation>
          Buffer Size with a "none" value
       </xsd:documentation>
-    </xsd:annotation> 
+    </xsd:annotation>
        <xsd:restriction base = "xsd:string">
          <xsd:enumeration value = "none"/>
        </xsd:restriction>
@@ -206,7 +206,7 @@
     </xsd:annotation>
     <xsd:union memberTypes = "ExplicitBufferSize NoneBufferSize"/>
   </xsd:simpleType>
-  
+
   <xsd:simpleType name = "ContentType">
     <xsd:annotation>
       <xsd:documentation>
@@ -276,7 +276,7 @@
     <xsd:annotation>
       <xsd:documentation>
         The root element of all JSP documents is named root.
-        
+
         Authors may, if they wish, include schema location information.
         If specified, the information may appear as attributes of
         the root element as follows:
@@ -296,7 +296,7 @@
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name = "directive.page">
     <xsd:annotation>
       <xsd:documentation>
@@ -319,7 +319,7 @@
       <xsd:attribute name = "isELIgnored" type = "Bool"/>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name = "directive.include">
     <xsd:annotation>
       <xsd:documentation>
@@ -339,7 +339,7 @@
       </xsd:documentation>
     </xsd:annotation>
   </xsd:element>
-  
+
   <xsd:element name = "declaration" type = "xsd:string">
     <xsd:annotation>
       <xsd:documentation>
@@ -347,7 +347,7 @@
       </xsd:documentation>
     </xsd:annotation>
   </xsd:element>
-  
+
   <xsd:element name = "expression" type = "xsd:string">
     <xsd:annotation>
       <xsd:documentation>
@@ -355,7 +355,7 @@
       </xsd:documentation>
     </xsd:annotation>
   </xsd:element>
- 
+
   <xsd:element name = "text" type = "xsd:string">
     <xsd:annotation>
       <xsd:documentation>
@@ -368,11 +368,11 @@
     <xsd:annotation>
       <xsd:documentation>
         useBean instantiates or accesses a bean in the specified scope.
-        
+
         Constraint: The allowed combinations of attributes are:
-        
+
           class [type] | type [( class | beanName)]
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
@@ -387,12 +387,12 @@
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name = "setProperty">
     <xsd:annotation>
       <xsd:documentation>
         setProperty changes the value of an object property.
-        
+
         Constraint: The object named by the name must have been
         "introduced" to the JSP processor using either the
         jsp:useBean action or a custom action with an associated
@@ -404,7 +404,7 @@
         name="Identifier" property="*"
         name="Identifier" property="Identfiier" param="string"
         name="Identifier" property="Identifier" value="string"
-                
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
@@ -419,12 +419,12 @@
     <xsd:annotation>
       <xsd:documentation>
         getProperty obtains the value of an object property.
-        
+
         Constraint: The object named by the name must have been
         "introduced" to the JSP processor using either the
         jsp:useBean action or a custom action with an associated
         VariableInfo entry for this name.
-        
+
         ???The spec is interpreted as restricting the values of
         property to Identifier.
       </xsd:documentation>
@@ -434,7 +434,7 @@
       <xsd:attribute name = "property" use = "required" type = "Identifier"/>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name = "include">
     <xsd:complexType>
       <xsd:sequence>
@@ -453,7 +453,7 @@
       <xsd:attribute name = "page" use = "required" type = "RTERelativeURL"/>
      </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name = "plugin">
     <xsd:complexType> <!-- content only! -->
       <xsd:sequence>
@@ -479,7 +479,7 @@
       <xsd:attribute name = "iepluginurl" type = "xsd:anyURI"/>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name = "params">
     <xsd:complexType>
        <xsd:sequence>
@@ -494,5 +494,5 @@
       <xsd:attribute name = "value" use = "required" type = "xsd:string"/>
     </xsd:complexType>
   </xsd:element>
-  
+
 </xsd:schema>

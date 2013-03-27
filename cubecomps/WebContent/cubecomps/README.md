@@ -10,8 +10,8 @@ FPDF (http://www.fpdf.org/) and PHPExcel (http://phpexcel.codeplex.com/) must be
 License
 -------
 
-There is no limitation in the use of this software other than the following:  If you're using my code, original or modificated, 
-you are obliged to show somewhere "based on Cubecomps.com by Luis J. Iáñez".  If your page shows credits, I must appear 
+There is no limitation in the use of this software other than the following:  If you're using my code, original or modificated,
+you are obliged to show somewhere "based on Cubecomps.com by Luis J. Iáñez".  If your page shows credits, I must appear
 on them.
 
 I estimate that only 70-80% of my original idea is already implemented.  If you're considering to derivate my code, maybe

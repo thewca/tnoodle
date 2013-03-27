@@ -10,7 +10,7 @@ var TurnSchema = new Schema({
   move: String,
   delta: Number
 });
-  
+
 var SolveSchema = new Schema({
   turns:[TurnSchema],
   gameName: String,
@@ -29,7 +29,7 @@ var storeObject = {
 	turns: moves,
 	gameName: "3x3x3",
 	inspectSec: 15,
-	solveMillis: solveMillis 
+	solveMillis: solveMillis
 };
 var solveInstance = new Solve(storeObject);
 util.puts(moves);

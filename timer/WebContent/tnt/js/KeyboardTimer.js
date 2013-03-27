@@ -9,11 +9,11 @@ var KeyboardTimer = new Class({
 
 		this.keysAreDown = false;
 		var fireFirst = true;
-		KeyboardManager.addEvent('keydown', this._keydown.bind(this), fireFirst);		
-		KeyboardManager.addEvent('keyup', this._keyup.bind(this), fireFirst);		
+		KeyboardManager.addEvent('keydown', this._keydown.bind(this), fireFirst);
+		KeyboardManager.addEvent('keyup', this._keyup.bind(this), fireFirst);
 
 		this.options_.push(tnoodle.tnt.createOptionBox(configuration, 'timer.disableContextMenu', 'Disable context menu', true, null));
-		
+
 		window.addEvent('contextmenu', function(e) {
 			var allowContextMenu = !this.config.get('timer.disableContextMenu') || !this.timerDisplay.isFocused();
 			return allowContextMenu;
@@ -87,14 +87,14 @@ var KeyboardTimer = new Class({
 			return;
 		}
 		if(!this.timerDisplay.isFocused()) {
-			// A key may have been released which was 
+			// A key may have been released which was
 			// being held down when the timer lost focus.
 			this.timerDisplay.redraw();
 			return false;
 		}
 
 		if(!e) {
-			// e is null when tabs change, 
+			// e is null when tabs change,
 			// we don't want to start or stop the timer when that happens,
 			// so we simply do nothing.
 			this.keysAreDown = false;

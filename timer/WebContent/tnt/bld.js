@@ -118,11 +118,11 @@ legend:
 corners:
         0  3
         9  6
-   
+
  1 11  10  8   7  5   4  2
 23 13  14 16  17 19  20 22
-        
-       12 15  
+
+       12 15
        21 18
 
 edges:
@@ -136,7 +136,7 @@ edges:
 
           16
         18  22
-          20 
+          20
 */
 
 function cornerIndexToSingmaster(index) {
@@ -368,7 +368,7 @@ function runSimulation() {
       CON.log(arr.length + " " + name + ' max: ' + Math.max.apply(null, arr));
       CON.log(arr.length + " " + name + ' min: ' + Math.min.apply(null, arr));
     }
-    
+
     function analyzeScrambles(scrambles) {
       function getLengthOfCycle(cycles) {
         var length = 0;
@@ -521,7 +521,7 @@ function urlChanged() {
 
 	var scramble = params.scramble || "";
   scrambleInput.value = scramble;
-  
+
   var cornerBuffer = params.cornerBuffer;
   if(!cornerBuffer) {
     cornerBuffer = "";
