@@ -914,7 +914,7 @@ mark2.ui = (function() {
 
 		var numExtraSolves = numExtraSolvesOpt;
                 if (numExtraSolvesOpt === undefined) {
-			numExtraSolves = settings.events[eventID].default_round.num_extra_scrambles;
+			numExtraSolves = settings.events[eventID].default_round.num_extra_scrambles || 0;
                 }
 
 		var newEventTR_ID = mark2.dom.nextAutoID();
