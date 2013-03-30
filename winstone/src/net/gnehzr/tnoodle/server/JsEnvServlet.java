@@ -11,25 +11,25 @@ import net.gnehzr.tnoodle.utils.Utils;
 
 @SuppressWarnings("serial")
 public class JsEnvServlet extends SafeHttpServlet {
-	
-	private static HashMap<String, String> jsEnv = new HashMap<String, String>();
-	public static void putJsEnv(String key, String value) {
-		jsEnv.put(key, value);
-	}
+    
+    private static HashMap<String, String> jsEnv = new HashMap<String, String>();
+    public static void putJsEnv(String key, String value) {
+        jsEnv.put(key, value);
+    }
 
-	@Override
-	protected void wrappedService(HttpServletRequest request,
-			HttpServletResponse response, String[] path,
-			LinkedHashMap<String, String> query) throws Exception {
-		String extension = SafeHttpServlet.getExtension(request);
-		if(extension.equals("js")) {
-			String js = "window.TNOODLE_ENV = " + Utils.GSON.toJson(jsEnv) + ";";
-			sendJS(request, response, js);
-		} else if(extension.equals("json")) {
-			sendJSON(request, response, Utils.GSON.toJson(jsEnv));
-		} else {
-			Utils.azzert(false);
-		}
-	}
+    @Override
+    protected void wrappedService(HttpServletRequest request,
+            HttpServletResponse response, String[] path,
+            LinkedHashMap<String, String> query) throws Exception {
+        String extension = SafeHttpServlet.getExtension(request);
+        if(extension.equals("js")) {
+            String js = "window.TNOODLE_ENV = " + Utils.GSON.toJson(jsEnv) + ";";
+            sendJS(request, response, js);
+        } else if(extension.equals("json")) {
+            sendJSON(request, response, Utils.GSON.toJson(jsEnv));
+        } else {
+            Utils.azzert(false);
+        }
+    }
 
 }

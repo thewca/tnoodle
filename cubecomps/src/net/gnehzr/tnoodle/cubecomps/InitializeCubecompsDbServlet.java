@@ -21,63 +21,63 @@ import net.gnehzr.tnoodle.utils.Utils;
 
 @SuppressWarnings("serial")
 public class InitializeCubecompsDbServlet extends HttpServlet {
-	private static final Logger l = Logger.getLogger(InitializeCubecompsDbServlet.class.getName());
+    private static final Logger l = Logger.getLogger(InitializeCubecompsDbServlet.class.getName());
 
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		try {
-			safeInit();
-		} catch(Throwable t) {
-			l.log(Level.SEVERE, "", t);
-		}
-	}
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            safeInit();
+        } catch(Throwable t) {
+            l.log(Level.SEVERE, "", t);
+        }
+    }
 
-	private void safeInit() throws IOException, SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, NamingException {
-		StringBuilder schema;
-		String dataStructurePath = getServletContext().getRealPath("cubecomps/DATA-STRUCTURE.md");
-		FileInputStream dataStructureInputStream = new FileInputStream(dataStructurePath);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		Utils.fullyReadInputStream(dataStructureInputStream, baos);
-		schema = new StringBuilder(baos.toString());
+    private void safeInit() throws IOException, SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, NamingException {
+        StringBuilder schema;
+        String dataStructurePath = getServletContext().getRealPath("cubecomps/DATA-STRUCTURE.md");
+        FileInputStream dataStructureInputStream = new FileInputStream(dataStructurePath);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Utils.fullyReadInputStream(dataStructureInputStream, baos);
+        schema = new StringBuilder(baos.toString());
 
-		final String SCHEMA_START = "<pre><code>";
-		final String SCHEMA_END = "</code></pre>";
+        final String SCHEMA_START = "<pre><code>";
+        final String SCHEMA_END = "</code></pre>";
 
-		int schemaStartIndex = schema.indexOf(SCHEMA_START) + SCHEMA_START.length();
-		int schemaEndIndex = schema.indexOf(SCHEMA_END, schemaStartIndex);
-		schema.replace(schemaEndIndex, schema.length(), "");
-		schema.replace(0, schemaStartIndex, "");
+        int schemaStartIndex = schema.indexOf(SCHEMA_START) + SCHEMA_START.length();
+        int schemaEndIndex = schema.indexOf(SCHEMA_END, schemaStartIndex);
+        schema.replace(schemaEndIndex, schema.length(), "");
+        schema.replace(0, schemaStartIndex, "");
 
-		// Remove trailing CREATE TABLE options that h2 doesn't support, like:
-		//  ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 AUTO_INCREMENT=6
-		Pattern p = Pattern.compile("\\).*ENGINE=.*");
-		Matcher m = p.matcher(schema);
-		StringBuffer sanitizedSchema = new StringBuffer();
-		while(m.find()) {
-			m.appendReplacement(sanitizedSchema, ");");
-		}
-		m.appendTail(sanitizedSchema);
+        // Remove trailing CREATE TABLE options that h2 doesn't support, like:
+        //  ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 AUTO_INCREMENT=6
+        Pattern p = Pattern.compile("\\).*ENGINE=.*");
+        Matcher m = p.matcher(schema);
+        StringBuffer sanitizedSchema = new StringBuffer();
+        while(m.find()) {
+            m.appendReplacement(sanitizedSchema, ");");
+        }
+        m.appendTail(sanitizedSchema);
 
-		Connection conn = null;
-		try {
-			InitialContext jdniContext = new InitialContext();
-			DataSource ds = (DataSource) jdniContext.lookup("java:comp/env/jdbc/connPool");
+        Connection conn = null;
+        try {
+            InitialContext jdniContext = new InitialContext();
+            DataSource ds = (DataSource) jdniContext.lookup("java:comp/env/jdbc/connPool");
 
-			conn = ds.getConnection();
-			conn.setAutoCommit(false);
-			Statement stmt = conn.createStatement();
-			stmt.execute(sanitizedSchema.toString());
-			conn.commit();
-		} catch (SQLException e) {
-			l.log(Level.SEVERE, "", e);
-		} catch (NamingException e) {
-			l.log(Level.SEVERE, "", e);
-		} finally {
-			if(conn != null) {
-				conn.close();
-			}
-		}
-	}
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            Statement stmt = conn.createStatement();
+            stmt.execute(sanitizedSchema.toString());
+            conn.commit();
+        } catch (SQLException e) {
+            l.log(Level.SEVERE, "", e);
+        } catch (NamingException e) {
+            l.log(Level.SEVERE, "", e);
+        } finally {
+            if(conn != null) {
+                conn.close();
+            }
+        }
+    }
 
 }

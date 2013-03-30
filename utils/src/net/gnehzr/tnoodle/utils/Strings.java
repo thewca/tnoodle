@@ -291,8 +291,7 @@ public final class Strings {
                         return 1;
                     }
                 } while(true);
-            }
-            else {
+            } else {
                 // Compare words
                 if(collator != null) {
                     // To use the collator the whole subwords have to be compared - character-by-character comparision
@@ -312,8 +311,7 @@ public final class Strings {
                     if(subwordResult != 0) {
                         return subwordResult;
                     }
-                }
-                else {
+                } else {
                     // No collator specified. All characters should be ascii only. Compare character-by-character.
                     do {
                         if(sChar != tChar) {

@@ -22,7 +22,6 @@ Strings.java http://weblogs.java.net/blog/176/2006/01/13/natural-string-order
 Base64.java http://www.wikihow.com/Encode-a-String-to-Base64-With-Java
 
 **** Java libraries not used at runtime ****
-jslint4java-1.3.3.jar: http://jslint4java.googlecode.com/svn/docs/1.3.3/ant.html
 plugin.jar: Needed to compile code using the JSObject object. This applies only to applets. The library isn't included in the dist jar becuase browsers seem to provide it.
 yui-compressor-ant-task-0.5.jar & yuicompressor-2.4.2.jar: https://github.com/jfly/yui-compressor-ant-task
 
