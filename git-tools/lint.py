@@ -46,7 +46,8 @@ JSLINT_IGNORED_ERRORS = {
 NO_LINT_KEYWORD = 'BLW-DUCPHAM'
 
 UNCOMMITABLE_PHRASES = {
-    '<'+'<'+'<'
+    '<'+'<'+'<',
+    '\t'
 }
 
 # Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
@@ -104,7 +105,7 @@ def lint(files):
             continue
 
         lines = file(f).readlines()
-        for line in lines:
+        for lineNumber, line in enumerate(lines):
             for uncommitablePhrase in UNCOMMITABLE_PHRASES:
                 error = None
                 if uncommitablePhrase in line:
@@ -117,7 +118,7 @@ def lint(files):
         if noLint:
             continue
 
-        for lineNumber, line in enumerate(file(f).readlines()):
+        for lineNumber, line in enumerate(lines):
             if re.match(r"^.*\S[ \t]+$", line):
                 error = "Trailing whitespace"
                 error = "%s:%s:%s:%s" % ( f, lineNumber+1, error, line )
