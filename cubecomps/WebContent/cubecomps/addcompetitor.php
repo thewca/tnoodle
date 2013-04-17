@@ -11,11 +11,11 @@ $gender = _GET_fld("gender");
 
 if (isset($wcaid) && $name && $birthday && $country && $gender)
 {
-	require_once "db.php";
-	$res = addCom ($wcaid,$name,$birthday,$country,$gender);
-	echo (is_int($res) ? "" : $res); 
-	sql_close();
+        require_once "db.php";
+        $res = addCom ($wcaid,$name,$birthday,$country,$gender);
+        echo (is_int($res) ? "" : $res); 
+        sql_close();
 }
 else
-	echo "Incorrect parameters calling \"addcompetitor\"";
+        echo "Incorrect parameters calling \"addcompetitor\"";
 ?>

@@ -4,19 +4,19 @@
 
 <urlrewrite>
 
-	<rule>
-		<from>^/$</from>
-		<to type="redirect" last="true">/scramble/</to>
-	</rule>
+        <rule>
+                <from>^/$</from>
+                <to type="redirect" last="true">/scramble/</to>
+        </rule>
 
-	<rule>
-		<from>^/scramble/$</from>
-		<to type="forward">/wca/scramblegen.html</to>
-	</rule>
+        <rule>
+                <from>^/scramble/$</from>
+                <to type="forward">/wca/scramblegen.html</to>
+        </rule>
 
-	<rule>
-		<from>^/scramble$</from>
-		<to type="redirect">/scramble/</to>
-	</rule>
+        <rule>
+                <from>^/scramble$</from>
+                <to type="redirect">/scramble/</to>
+        </rule>
 
 </urlrewrite>

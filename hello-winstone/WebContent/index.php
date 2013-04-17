@@ -3,14 +3,14 @@
 <?php
  
 function print_rs($recordset) {
-	while ($row = $recordset->fetch_assoc()) {
-		print_r($row);
-	}
+        while ($row = $recordset->fetch_assoc()) {
+                print_r($row);
+        }
 }
 $db = mysql_connect();
 $result = mysql_query('SELECT NOW();');
 if (!$result) {
-	die('Invalid query: ' . mysql_error());
+        die('Invalid query: ' . mysql_error());
 }
 
 echo $db;

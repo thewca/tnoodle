@@ -1,125 +1,125 @@
 <html>
-	<head>
+        <head>
 
     <meta name="viewport" content = "width = device-width, user-scalable = no" />
 
-		<title>Hackathon2011</title>
+                <title>Hackathon2011</title>
 
-		<script type='text/javascript'>
-			if(!Object.keys) {
-				Object.keys = function(o) {
-					var keys = [];
-					for(var key in o) {
-						if(o.hasOwnProperty(key)) {
-							keys.push(key);
-						}
-					}
-					return keys;
-				};
-			}
-		</script>
-		<script type='text/javascript' src='js/stacktrace.js'></script>
-		<script type='text/javascript' src='js/stacktrace-more.js'></script>
-		<script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
-		<script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
-		<script type='text/javascript' src='/nowjs/now.js'></script>
+                <script type='text/javascript'>
+                        if(!Object.keys) {
+                                Object.keys = function(o) {
+                                        var keys = [];
+                                        for(var key in o) {
+                                                if(o.hasOwnProperty(key)) {
+                                                        keys.push(key);
+                                                }
+                                        }
+                                        return keys;
+                                };
+                        }
+                </script>
+                <script type='text/javascript' src='js/stacktrace.js'></script>
+                <script type='text/javascript' src='js/stacktrace-more.js'></script>
+                <script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
+                <script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
+                <script type='text/javascript' src='/nowjs/now.js'></script>
 
-		<script type='text/javascript' src='js/GMConstants.js'></script>
+                <script type='text/javascript' src='js/GMConstants.js'></script>
 
-		<script type='text/javascript' src='js/StatusBar.js'></script>
-		<script type='text/javascript' src='js/Chatter.js'></script>
+                <script type='text/javascript' src='js/StatusBar.js'></script>
+                <script type='text/javascript' src='js/Chatter.js'></script>
 
-		<script type='text/javascript' src='js/Split.js'></script>
-		
-		<script type='text/javascript' src='js/GameMaster.js'></script>
-		<script type='text/javascript' src='js/GameMasterGui.js'></script>
+                <script type='text/javascript' src='js/Split.js'></script>
+                
+                <script type='text/javascript' src='js/GameMaster.js'></script>
+                <script type='text/javascript' src='js/GameMasterGui.js'></script>
 
-		<script type='text/javascript' src='games/ButtonGame.js'></script>
-		<script type='text/javascript' src='games/ClickGame.js'></script>
+                <script type='text/javascript' src='games/ButtonGame.js'></script>
+                <script type='text/javascript' src='games/ClickGame.js'></script>
 
                 <!-- TODO - port twisty.js away from jquery? -->
                 <script type='text/javascript' src='jquery-1.6.4.js'></script>
-		<script type='text/javascript' src='games/CubeGame.js'></script>
-		<!-- TODO - twisty.js should just auto include these files, rather than
+                <script type='text/javascript' src='games/CubeGame.js'></script>
+                <!-- TODO - twisty.js should just auto include these files, rather than
                 making people list its dependencies.-->
-		<script type='text/javascript' src='twisty.js/inc/Three.js'></script>
-		<script type='text/javascript' src='twisty.js/inc/RequestAnimationFrame.js'></script>
-		<script type='text/javascript' src='twisty.js/inc/Stats.js'></script>
-		<script type='text/javascript' src='twisty.js/inc/twisty.js'></script>
-		<script type='text/javascript' src='twisty.js/inc/CubeTwisty.js'></script>
+                <script type='text/javascript' src='twisty.js/inc/Three.js'></script>
+                <script type='text/javascript' src='twisty.js/inc/RequestAnimationFrame.js'></script>
+                <script type='text/javascript' src='twisty.js/inc/Stats.js'></script>
+                <script type='text/javascript' src='twisty.js/inc/twisty.js'></script>
+                <script type='text/javascript' src='twisty.js/inc/CubeTwisty.js'></script>
 
 
-		<script type='text/javascript'>
-			var gm; // debugging
-			window.addEventListener("load", function() {
+                <script type='text/javascript'>
+                        var gm; // debugging
+                        window.addEventListener("load", function() {
 
-			StatusBar.setError('init', 'Connecting...');
+                        StatusBar.setError('init', 'Connecting...');
 
-			now.ready(function() {
-				StatusBar.setError('init', null);
-				// This function can get called multiple times.
-				// This happens is when nowjs
-				// reestablishes a connection with the server.
-				if(!gm) {
-					gm = new GameMaster.GameMaster();
-				}
+                        now.ready(function() {
+                                StatusBar.setError('init', null);
+                                // This function can get called multiple times.
+                                // This happens is when nowjs
+                                // reestablishes a connection with the server.
+                                if(!gm) {
+                                        gm = new GameMaster.GameMaster();
+                                }
 
-				function reconnect() {
-					var channelName = window.location.hash.substring(1);
-					gm.joinChannel(null, channelName);
-				}
+                                function reconnect() {
+                                        var channelName = window.location.hash.substring(1);
+                                        gm.joinChannel(null, channelName);
+                                }
 
-				// TODO - apparently mootools doesn't support the
-				// hashchange event. Pretty lame.
-				window.addEventListener('hashchange', function() {
-					reconnect();
-				}, false);
-				reconnect();
-			});
+                                // TODO - apparently mootools doesn't support the
+                                // hashchange event. Pretty lame.
+                                window.addEventListener('hashchange', function() {
+                                        reconnect();
+                                }, false);
+                                reconnect();
+                        });
 
-			var pingerPollerRunning = false;
-			now.ready(function() {
-				disconnected = false;
+                        var pingerPollerRunning = false;
+                        now.ready(function() {
+                                disconnected = false;
 
-				if(pingerPollerRunning) {
-					return;
-				}
-				pingerPollerRunning = true;
+                                if(pingerPollerRunning) {
+                                        return;
+                                }
+                                pingerPollerRunning = true;
 
-				var HEARTBEAT_PERIOD = 2000;
-				var HEARTBEAT_THRESHOLD = 2*HEARTBEAT_PERIOD;
+                                var HEARTBEAT_PERIOD = 2000;
+                                var HEARTBEAT_THRESHOLD = 2*HEARTBEAT_PERIOD;
 
-				var lastHeartbeat = new Date().getTime();
-				function pinger() {
-					now.ping(function() {
-						lastHeartbeat = new Date().getTime();
-						setTimeout(pinger, HEARTBEAT_PERIOD);
-					});
-				}
-				pinger();
+                                var lastHeartbeat = new Date().getTime();
+                                function pinger() {
+                                        now.ping(function() {
+                                                lastHeartbeat = new Date().getTime();
+                                                setTimeout(pinger, HEARTBEAT_PERIOD);
+                                        });
+                                }
+                                pinger();
 
-				function poller() {
-					var timeSinceLastHeartbeat = new Date().getTime() - lastHeartbeat;
-					if(timeSinceLastHeartbeat > HEARTBEAT_THRESHOLD) {
-						StatusBar.setError('poller', 'Having difficulty talking to server');
-					} else {
-						StatusBar.setError('poller', null);
-					}
-					setTimeout(poller, HEARTBEAT_PERIOD/2);
-				}
-				poller();
-			});
+                                function poller() {
+                                        var timeSinceLastHeartbeat = new Date().getTime() - lastHeartbeat;
+                                        if(timeSinceLastHeartbeat > HEARTBEAT_THRESHOLD) {
+                                                StatusBar.setError('poller', 'Having difficulty talking to server');
+                                        } else {
+                                                StatusBar.setError('poller', null);
+                                        }
+                                        setTimeout(poller, HEARTBEAT_PERIOD/2);
+                                }
+                                poller();
+                        });
 
 
-			});
-		</script>
+                        });
+                </script>
 
-		<link rel="stylesheet" href="css/index.css" type="text/css" />
-		<link rel="stylesheet" href="css/Split.css" type="text/css" />
-		<link rel="stylesheet" href="css/Chatter.css" type="text/css" />
-		<link rel="stylesheet" href="css/GameMasterGui.css" type="text/css" />
-		<link rel="stylesheet" href="css/StatusBar.css" type="text/css" />
-	</head>
-	<body>
-	</body>
+                <link rel="stylesheet" href="css/index.css" type="text/css" />
+                <link rel="stylesheet" href="css/Split.css" type="text/css" />
+                <link rel="stylesheet" href="css/Chatter.css" type="text/css" />
+                <link rel="stylesheet" href="css/GameMasterGui.css" type="text/css" />
+                <link rel="stylesheet" href="css/StatusBar.css" type="text/css" />
+        </head>
+        <body>
+        </body>
 </html>

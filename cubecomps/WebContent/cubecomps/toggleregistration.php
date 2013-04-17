@@ -8,8 +8,8 @@ $cat_id = _GET_num("cat_id");
 
 if ($comp_id && $cat_id) 
 {
-	require_once "db.php";
-	echo toggleReg($comp_id,$cat_id);
-	sql_close();
+        require_once "db.php";
+        echo toggleReg($comp_id,$cat_id);
+        sql_close();
 }
 ?>

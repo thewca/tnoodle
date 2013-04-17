@@ -3,7 +3,7 @@
     background-color: #CCC;
     border-bottom: 1px solid #666;
     cursor: move;
-	overflow: hidden;
+        overflow: hidden;
 }
 .titletext {
     float: left;
@@ -20,11 +20,11 @@
     font-family: sans-serif;
     text-align: center;
     
-	float: right;
+        float: right;
     cursor: pointer;
     padding: 2px 2px 3px;
-	width: 16px;
-	height: 16px;
+        width: 16px;
+        height: 16px;
 }
 .button:hover, .button.buttondown:hover {
     background-color: #888 !important; /* I have no idea why I need the !important */

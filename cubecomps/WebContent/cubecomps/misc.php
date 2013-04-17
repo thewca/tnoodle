@@ -18,15 +18,15 @@ $test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
 <META NAME="Keywords" CONTENT="">
 <META NAME="Description" CONTENT="">
 <style type="text/css">
-	body {background-color:<?=$color?>;}
-	table {font-family:arial,sans-serif;font-size:12px;color:#2a3837;}
-	a {color:black;font-weight:bold;text-decoration:none;}
-	a:hover {color:#CCFF00;}
-	.header {color:white;background-color:<?=$dark_color?>;font-size:14px;font-weight:bold;padding:4px 10px;margin-bottom:4px;}
-	.topts td {background-color:<?=$light_color?>;}
-	table.t_tabs {font-size:30px;border-style:none;color:#CCFF00;}
-	table.t_tabs td {font-weight:bold;padding:0 20px;}
-	td.t_sel:hover {background-color:<?=$light_color?>;}
+        body {background-color:<?=$color?>;}
+        table {font-family:arial,sans-serif;font-size:12px;color:#2a3837;}
+        a {color:black;font-weight:bold;text-decoration:none;}
+        a:hover {color:#CCFF00;}
+        .header {color:white;background-color:<?=$dark_color?>;font-size:14px;font-weight:bold;padding:4px 10px;margin-bottom:4px;}
+        .topts td {background-color:<?=$light_color?>;}
+        table.t_tabs {font-size:30px;border-style:none;color:#CCFF00;}
+        table.t_tabs td {font-weight:bold;padding:0 20px;}
+        td.t_sel:hover {background-color:<?=$light_color?>;}
 </style>
 </HEAD>
 <BODY>
@@ -36,41 +36,41 @@ var timerKA = setTimeout("keepAlive();",600000);
 
 function keepAlive()
 {
-	var req = createXMLHttpRequest();
-	req.open ("GET", "keepalive.php");
-	req.send (null);
-	//
-	timerKA = setTimeout("keepAlive();",600000);
+        var req = createXMLHttpRequest();
+        req.open ("GET", "keepalive.php");
+        req.send (null);
+        //
+        timerKA = setTimeout("keepAlive();",600000);
 }
 
 var wupload = 0;
 
 function createXMLHttpRequest() 
 {
-	var xmlHttp=null;
-	if (window.ActiveXObject) 
-		xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-	else 
-		if (window.XMLHttpRequest) 
-			xmlHttp = new XMLHttpRequest();
-	return xmlHttp;
+        var xmlHttp=null;
+        if (window.ActiveXObject) 
+                xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+        else 
+                if (window.XMLHttpRequest) 
+                        xmlHttp = new XMLHttpRequest();
+        return xmlHttp;
 }
 
 function callPage(url)
 {
-	var req = createXMLHttpRequest();
-	req.open ("GET", url, false);
-	req.send (null);
-	if (!req.responseText.replace(/^[\s\r\n]+/,""))
-		window.location.reload();
-	else
-		alert(req.responseText);
+        var req = createXMLHttpRequest();
+        req.open ("GET", url, false);
+        req.send (null);
+        if (!req.responseText.replace(/^[\s\r\n]+/,""))
+                window.location.reload();
+        else
+                alert(req.responseText);
 }
 
 function clearBackground()
 {
-	callPage("delbg.php");
-	location.reload();
+        callPage("delbg.php");
+        location.reload();
 }
 </script>
 
@@ -88,9 +88,9 @@ function clearBackground()
 <?
 $filename = DIR_UPLOADS.($test?"test_":"")."bg_".$_SESSION["c_id"].".jpg";
 if (file_exists($filename))
-	echo "<img src='$filename' width=200 height=292>";
+        echo "<img src='$filename' width=200 height=292>";
 else
-	echo "<div style='width:200px;height:292px;background-color:#FFFFFF;'></div>";
+        echo "<div style='width:200px;height:292px;background-color:#FFFFFF;'></div>";
 ?>
 </td>
 <td width="100%" valign=top>
@@ -146,9 +146,9 @@ Use the <a href=offline.php target=_blank>offline feature</a> (opens in a separa
 <?
 echo "Use the following link to give direct access to your live results: ";
 if ($test)
-	echo "<a href='http://test.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."' target=_blank>test.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."</a>";
+        echo "<a href='http://test.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."' target=_blank>test.".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."</a>";
 else
-	echo "<a href='http://".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."' target=_blank>".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."</a>";
+        echo "<a href='http://".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."' target=_blank>".DOMAIN."/live.php?cid=".$_SESSION["c_id"]."</a>";
 ?>
 </td>
 </tr><tr><td>

@@ -33,22 +33,22 @@
         <to>/test/status/</to>
     </outbound-rule>
 
-	<rule>
-		<from>^/$</from>
-		<to type="redirect" last="true">/readme</to>
-	</rule>
+        <rule>
+                <from>^/$</from>
+                <to type="redirect" last="true">/readme</to>
+        </rule>
 
-	<rule>
-		<from>^/readme$</from>
-		<to type="forward">/readme-tnoodle.md</to>
-	</rule>
-	<rule>
-		<from>^/readme.md$</from>
-		<to type="forward">/readme-tnoodle.md</to>
-	</rule>
-	<rule>
-		<from>^/readme/scramble$</from>
-		<to type="forward">/readme-scramble.md</to>
-	</rule>
+        <rule>
+                <from>^/readme$</from>
+                <to type="forward">/readme-tnoodle.md</to>
+        </rule>
+        <rule>
+                <from>^/readme.md$</from>
+                <to type="forward">/readme-tnoodle.md</to>
+        </rule>
+        <rule>
+                <from>^/readme/scramble$</from>
+                <to type="forward">/readme-scramble.md</to>
+        </rule>
 
 </urlrewrite>

@@ -15,10 +15,10 @@ $dark_color = "#0a1414";
 <META NAME="Keywords" CONTENT="">
 <META NAME="Description" CONTENT="">
 <style type="text/css">
-	body {background-color:<?=$color?>;font-family:arial,sans-serif;font-size:12px;color:#2a3837;}
-	a {color:black;font-weight:bold;text-decoration:none;}
-	a:hover {color:#CCFF00;}
-	.header {color:white;background-color:<?=$dark_color?>;font-size:14px;font-weight:bold;padding:4px 10px;margin-bottom:4px;}
+        body {background-color:<?=$color?>;font-family:arial,sans-serif;font-size:12px;color:#2a3837;}
+        a {color:black;font-weight:bold;text-decoration:none;}
+        a:hover {color:#CCFF00;}
+        .header {color:white;background-color:<?=$dark_color?>;font-size:14px;font-weight:bold;padding:4px 10px;margin-bottom:4px;}
 </style>
 </HEAD>
 <BODY>
@@ -47,7 +47,7 @@ Another good idea is using the blank XLSX file that you can download from the WC
 <p>
 In any case, in order to get a valid XLSX file, pay attention to the details that cubecomps.com will focus on when importing:
 <center><img src=img/import-1.jpg border=0></center><p>
-In the pictures, the zones highlighted blue should be preserved. For example, in the picture above, the importation process expects a first	sheet called 'Registration'. The zones highlighted green should be filled by you. Logically, if you enter an unknown country or an invalid WCA ID or date of birth, the system will show an error and it will stop. The rest of the sheet will be ignored, so don't waste your time. Specifically, the events in which competitors registered are extracted from real scores in the first round of every event, so entering that information here is irrelevant. 
+In the pictures, the zones highlighted blue should be preserved. For example, in the picture above, the importation process expects a first     sheet called 'Registration'. The zones highlighted green should be filled by you. Logically, if you enter an unknown country or an invalid WCA ID or date of birth, the system will show an error and it will stop. The rest of the sheet will be ignored, so don't waste your time. Specifically, the events in which competitors registered are extracted from real scores in the first round of every event, so entering that information here is irrelevant. 
 <center><img src=img/import-2.jpg border=0></center><p>
 Here again, the information highlighted blue must be preserved because it describes the event, the round, the format,... The green zone must be filled. Besides, the identificated competitor (name / country / wca id) must exist in the first sheet. The rest of the information (best, worst, average...) is ignored because it will be calculated by the system. 
 <p><br>

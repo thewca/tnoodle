@@ -21,10 +21,10 @@ $dark_color = "#0a1414";
 <TITLE>Edit competitor's details</TITLE>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
-	body {font-family:arial,sans-serif;font-size:14px;background-color:<?=$color?>;}
-	table {color:black;font-size:12px;-moz-box-shadow: 6px 6px 5px <?=$dark_color?>;-webkit-box-shadow: 6px 6px 5px <?=$dark_color?>; box-shadow: 6px 6px 5px <?=$dark_color?>;background-color:<?=$light_color?>;}
-	td {padding:0 5px;}
-	td.caption {color:#2a3837;text-align:right;}
+        body {font-family:arial,sans-serif;font-size:14px;background-color:<?=$color?>;}
+        table {color:black;font-size:12px;-moz-box-shadow: 6px 6px 5px <?=$dark_color?>;-webkit-box-shadow: 6px 6px 5px <?=$dark_color?>; box-shadow: 6px 6px 5px <?=$dark_color?>;background-color:<?=$light_color?>;}
+        td {padding:0 5px;}
+        td.caption {color:#2a3837;text-align:right;}
 </style>
 </head>
 <body onload='document.frm.WCAid.focus();'>
@@ -33,128 +33,128 @@ $dark_color = "#0a1414";
 
 function validateWCAid(obj)
 {
-	var id = obj.value;
-	if (id=="") return;
-	id = id.toUpperCase();
-	if (!/^\d{4}[A-Z]{4}\d{2}$/.test(id))
-	{
-		alert("\""+id+"\" is not a valid WCA id!");
-		obj.value = "";
-		obj.focus();
-	}
+        var id = obj.value;
+        if (id=="") return;
+        id = id.toUpperCase();
+        if (!/^\d{4}[A-Z]{4}\d{2}$/.test(id))
+        {
+                alert("\""+id+"\" is not a valid WCA id!");
+                obj.value = "";
+                obj.focus();
+        }
 }
 
 function letter(e)
 {
-	var evt = e ? e : event;
-	var ch, chrCode = 0;
+        var evt = e ? e : event;
+        var ch, chrCode = 0;
 
-	if (evt.charCode!=null)     chrCode = evt.charCode;
-	else if (evt.which!=null)   chrCode = evt.which;
-	else if (evt.keyCode!=null) chrCode = evt.keyCode;
+        if (evt.charCode!=null)     chrCode = evt.charCode;
+        else if (evt.which!=null)   chrCode = evt.which;
+        else if (evt.keyCode!=null) chrCode = evt.keyCode;
 
-	if (chrCode==0) return "";
-	return String.fromCharCode(chrCode);
+        if (chrCode==0) return "";
+        return String.fromCharCode(chrCode);
 }
 
 function birthKeyPress(e)
 {
-	var ch = letter(e);
-	if (((ch >= '0') && (ch <= '9')) || (ch == '-') || (ch == ''))
-		e.returnValue = true;
-	else
-	{
-		e.returnValue = false;
-		if (!window.event) e.preventDefault();
-	}
+        var ch = letter(e);
+        if (((ch >= '0') && (ch <= '9')) || (ch == '-') || (ch == ''))
+                e.returnValue = true;
+        else
+        {
+                e.returnValue = false;
+                if (!window.event) e.preventDefault();
+        }
 }
 
 function validateBirth(obj)
 {
-	var d = obj.value;
-	if (d=="") return "";
-	if (!/^\d{4}-\d{2}-\d{2}$/.test(d))
-	{
-		alert("\""+d+"\" is not a valid date format (yyyy-mm-dd)!");
-		obj.value = "";
-		obj.focus();
-	}
-	else
-	{
-		var month = d.substring(5,7);
-		month = parseInt(month,10);
-		var day = d.substring(8,10);
-		day = parseInt(day,10);
-		var year = parseInt(d.substring(0,4),10);
-		var dt = new Date(Date.UTC(year,month-1,day));
-		if (dt.getUTCDate()!=day || dt.getUTCMonth()!=month-1 || dt.getUTCFullYear()!=year)
-		{
-	        alert("\""+d+"\" is not a valid date!");
-			obj.value = "";
-			obj.focus();
+        var d = obj.value;
+        if (d=="") return "";
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d))
+        {
+                alert("\""+d+"\" is not a valid date format (yyyy-mm-dd)!");
+                obj.value = "";
+                obj.focus();
         }
-		var today = new Date();
-		var age = ((today.getTime()-dt.getTime()) / (1000*60*60*24*365.25));
-		if (age < 1 || age > 130)
-		{
-	        alert("The system doesn't allow ages under 1 or over 130");
-			obj.value = "";
-			obj.focus();
-		}
+        else
+        {
+                var month = d.substring(5,7);
+                month = parseInt(month,10);
+                var day = d.substring(8,10);
+                day = parseInt(day,10);
+                var year = parseInt(d.substring(0,4),10);
+                var dt = new Date(Date.UTC(year,month-1,day));
+                if (dt.getUTCDate()!=day || dt.getUTCMonth()!=month-1 || dt.getUTCFullYear()!=year)
+                {
+                alert("\""+d+"\" is not a valid date!");
+                        obj.value = "";
+                        obj.focus();
+        }
+                var today = new Date();
+                var age = ((today.getTime()-dt.getTime()) / (1000*60*60*24*365.25));
+                if (age < 1 || age > 130)
+                {
+                alert("The system doesn't allow ages under 1 or over 130");
+                        obj.value = "";
+                        obj.focus();
+                }
         return(true);
-	}
+        }
 }
 
 function empty(obj,fldname)
 {
-	var st = obj.value;
-	st.replace(/^\s+|\s+$/g,"");
-	if (st=="")
-	{
-		alert("\""+fldname+"\" can't be blank!");
-		obj.focus();
-		return true;
-	}
-	else
-		return false;
+        var st = obj.value;
+        st.replace(/^\s+|\s+$/g,"");
+        if (st=="")
+        {
+                alert("\""+fldname+"\" can't be blank!");
+                obj.focus();
+                return true;
+        }
+        else
+                return false;
 }
 
 function createXMLHttpRequest() 
 {
-	var xmlHttp=null;
-	if (window.ActiveXObject) 
-		xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-	else 
-		if (window.XMLHttpRequest) 
-			xmlHttp = new XMLHttpRequest();
-	return xmlHttp;
+        var xmlHttp=null;
+        if (window.ActiveXObject) 
+                xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+        else 
+                if (window.XMLHttpRequest) 
+                        xmlHttp = new XMLHttpRequest();
+        return xmlHttp;
 }
 
 function submitForm()
 {
-	if (!empty (document.frm.competitor,"name") &&
-		!empty (document.frm.birth,"birthday") &&
-		!empty (document.frm.country,"country") &&
-		!empty (document.frm.gender,"gender"))
-	{
-		var req = createXMLHttpRequest();
-		req.open ("GET", "updcompetitor.php?id=<?=$_GETid?>"+
-										"&wcaid="+document.frm.WCAid.value+
-										"&name="+document.frm.competitor.value+
-										"&birthday="+document.frm.birth.value+ 
-										"&country="+document.frm.country.value+ 
-										"&gender="+document.frm.gender.value, 
-										false);
-		req.send (null);
-		if (req.responseText.replace(/^[\s\r\n]+/,"") != "")
-			alert(req.responseText);
-		else
-		{
-			opener.location.reload();
-			window.close();
-		}
-	}
-	return false;
+        if (!empty (document.frm.competitor,"name") &&
+                !empty (document.frm.birth,"birthday") &&
+                !empty (document.frm.country,"country") &&
+                !empty (document.frm.gender,"gender"))
+        {
+                var req = createXMLHttpRequest();
+                req.open ("GET", "updcompetitor.php?id=<?=$_GETid?>"+
+                                                                                "&wcaid="+document.frm.WCAid.value+
+                                                                                "&name="+document.frm.competitor.value+
+                                                                                "&birthday="+document.frm.birth.value+ 
+                                                                                "&country="+document.frm.country.value+ 
+                                                                                "&gender="+document.frm.gender.value, 
+                                                                                false);
+                req.send (null);
+                if (req.responseText.replace(/^[\s\r\n]+/,"") != "")
+                        alert(req.responseText);
+                else
+                {
+                        opener.location.reload();
+                        window.close();
+                }
+        }
+        return false;
 }
 
 </script>
@@ -172,9 +172,9 @@ function submitForm()
 $result = strict_query("SELECT * FROM countries");
 while ($row=cased_mysql_fetch_array($result))
 {
-	echo "<option value=\"" . $row["id"] . "\"";
-	if ($row["id"]==$comp["country_id"]) echo " selected";
-	echo ">" . $row["name"] . "</option>\r\n";
+        echo "<option value=\"" . $row["id"] . "\"";
+        if ($row["id"]==$comp["country_id"]) echo " selected";
+        echo ">" . $row["name"] . "</option>\r\n";
 }
 ?>
 </select></td></tr>

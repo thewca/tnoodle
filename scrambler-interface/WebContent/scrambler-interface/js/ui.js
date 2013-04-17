@@ -55,88 +55,88 @@ if(!document.createElement('a').addEventListener) {
 // IE <9 doesn't have a getElementsByClassName method, so we simulate one here.
 // http://code.google.com/p/getelementsbyclassname/
 /*
-	Developed by Robert Nyman, http://www.robertnyman.com
-	Code/licensing: http://code.google.com/p/getelementsbyclassname/
+        Developed by Robert Nyman, http://www.robertnyman.com
+        Code/licensing: http://code.google.com/p/getelementsbyclassname/
 */
 if(!document.createElement('a').getElementsByClassName) {
-	var getElementsByClassName = function (className, tag, elm){
-		if (document.getElementsByClassName) {
-			getElementsByClassName = function (className, tag, elm) {
-				elm = elm || document;
-				var elements = elm.getElementsByClassName(className),
-					nodeName = (tag)? new RegExp("\\b" + tag + "\\b", "i") : null,
-					returnElements = [],
-					current;
-				for(var i=0, il=elements.length; i<il; i+=1){
-					current = elements[i];
-					if(!nodeName || nodeName.test(current.nodeName)) {
-						returnElements.push(current);
-					}
-				}
-				return returnElements;
-			};
-		}
-		else if (document.evaluate) {
-			getElementsByClassName = function (className, tag, elm) {
-				tag = tag || "*";
-				elm = elm || document;
-				var classes = className.split(" "),
-					classesToCheck = "",
-					xhtmlNamespace = "http://www.w3.org/1999/xhtml",
-					namespaceResolver = (document.documentElement.namespaceURI === xhtmlNamespace)? xhtmlNamespace : null,
-					returnElements = [],
-					elements,
-					node;
-				for(var j=0, jl=classes.length; j<jl; j+=1){
-					classesToCheck += "[contains(concat(' ', @class, ' '), ' " + classes[j] + " ')]";
-				}
-				try	{
-					elements = document.evaluate(".//" + tag + classesToCheck, elm, namespaceResolver, 0, null);
-				}
-				catch (e) {
-					elements = document.evaluate(".//" + tag + classesToCheck, elm, null, 0, null);
-				}
-				while ((node = elements.iterateNext())) {
-					returnElements.push(node);
-				}
-				return returnElements;
-			};
-		}
-		else {
-			getElementsByClassName = function (className, tag, elm) {
-				tag = tag || "*";
-				elm = elm || document;
-				var classes = className.split(" "),
-					classesToCheck = [],
-					elements = (tag === "*" && elm.all)? elm.all : elm.getElementsByTagName(tag),
-					current,
-					returnElements = [],
-					match;
-				for(var k=0, kl=classes.length; k<kl; k+=1){
-					classesToCheck.push(new RegExp("(^|\\s)" + classes[k] + "(\\s|$)"));
-				}
-				for(var l=0, ll=elements.length; l<ll; l+=1){
-					current = elements[l];
-					match = false;
-					for(var m=0, ml=classesToCheck.length; m<ml; m+=1){
-						match = classesToCheck[m].test(current.className);
-						if (!match) {
-							break;
-						}
-					}
-					if (match) {
-						returnElements.push(current);
-					}
-				}
-				return returnElements;
-			};
-		}
-		return getElementsByClassName(className, tag, elm);
-	};
+        var getElementsByClassName = function (className, tag, elm){
+                if (document.getElementsByClassName) {
+                        getElementsByClassName = function (className, tag, elm) {
+                                elm = elm || document;
+                                var elements = elm.getElementsByClassName(className),
+                                        nodeName = (tag)? new RegExp("\\b" + tag + "\\b", "i") : null,
+                                        returnElements = [],
+                                        current;
+                                for(var i=0, il=elements.length; i<il; i+=1){
+                                        current = elements[i];
+                                        if(!nodeName || nodeName.test(current.nodeName)) {
+                                                returnElements.push(current);
+                                        }
+                                }
+                                return returnElements;
+                        };
+                }
+                else if (document.evaluate) {
+                        getElementsByClassName = function (className, tag, elm) {
+                                tag = tag || "*";
+                                elm = elm || document;
+                                var classes = className.split(" "),
+                                        classesToCheck = "",
+                                        xhtmlNamespace = "http://www.w3.org/1999/xhtml",
+                                        namespaceResolver = (document.documentElement.namespaceURI === xhtmlNamespace)? xhtmlNamespace : null,
+                                        returnElements = [],
+                                        elements,
+                                        node;
+                                for(var j=0, jl=classes.length; j<jl; j+=1){
+                                        classesToCheck += "[contains(concat(' ', @class, ' '), ' " + classes[j] + " ')]";
+                                }
+                                try     {
+                                        elements = document.evaluate(".//" + tag + classesToCheck, elm, namespaceResolver, 0, null);
+                                }
+                                catch (e) {
+                                        elements = document.evaluate(".//" + tag + classesToCheck, elm, null, 0, null);
+                                }
+                                while ((node = elements.iterateNext())) {
+                                        returnElements.push(node);
+                                }
+                                return returnElements;
+                        };
+                }
+                else {
+                        getElementsByClassName = function (className, tag, elm) {
+                                tag = tag || "*";
+                                elm = elm || document;
+                                var classes = className.split(" "),
+                                        classesToCheck = [],
+                                        elements = (tag === "*" && elm.all)? elm.all : elm.getElementsByTagName(tag),
+                                        current,
+                                        returnElements = [],
+                                        match;
+                                for(var k=0, kl=classes.length; k<kl; k+=1){
+                                        classesToCheck.push(new RegExp("(^|\\s)" + classes[k] + "(\\s|$)"));
+                                }
+                                for(var l=0, ll=elements.length; l<ll; l+=1){
+                                        current = elements[l];
+                                        match = false;
+                                        for(var m=0, ml=classesToCheck.length; m<ml; m+=1){
+                                                match = classesToCheck[m].test(current.className);
+                                                if (!match) {
+                                                        break;
+                                                }
+                                        }
+                                        if (match) {
+                                                returnElements.push(current);
+                                        }
+                                }
+                                return returnElements;
+                        };
+                }
+                return getElementsByClassName(className, tag, elm);
+        };
 
-	Element.prototype.getElementsByClassName = function(className) {
-		return getElementsByClassName(className, null, this);
-	};
+        Element.prototype.getElementsByClassName = function(className) {
+                return getElementsByClassName(className, null, this);
+        };
 }
 
 // Copied from https://developer.mozilla.org/en/DOM/element.classList
@@ -160,107 +160,107 @@ if (typeof document !== "undefined" && !("classList" in document.createElement("
 "use strict";
 
 var
-	classListProp = "classList",
-	protoProp = "prototype",
-	elemCtrProto = (view.HTMLElement || view.Element)[protoProp],
-	objCtr = Object,
-	strTrim = String[protoProp].trim || function () {
-		return this.replace(/^\s+|\s+$/g, "");
-	},
-	arrIndexOf = Array[protoProp].indexOf || function (item) {
-		var i = 0, len = this.length;
-		for (; i < len; i++) {
-			if (i in this && this[i] === item) {
-				return i;
-			}
-		}
-		return -1;
-	},
-	// Vendors: please allow content code to instantiate DOMExceptions
-	DOMEx = function (type, message) {
-		this.name = type;
-		this.code = DOMException[type];
-		this.message = message;
-	},
-	checkTokenAndGetIndex = function (classList, token) {
-		if (token === "") {
-			throw new DOMEx( "SYNTAX_ERR", "An invalid or illegal string was specified");
-		}
-		if (/\s/.test(token)) {
-			throw new DOMEx("INVALID_CHARACTER_ERR", "String contains an invalid character");
-		}
-		return arrIndexOf.call(classList, token);
-	},
-	ClassList = function (elem) {
-		var trimmedClasses = strTrim.call(elem.className);
-		var classes = trimmedClasses ? trimmedClasses.split(/\s+/) : [];
-		var i = 0;
-		var len = classes.length;
-		for (; i < len; i++) {
-			this.push(classes[i]);
-		}
-		this._updateClassName = function () {
-			elem.className = this.toString();
-		};
-	},
-	classListProto = ClassList[protoProp] = [],
-	classListGetter = function () {
-		return new ClassList(this);
-	}
+        classListProp = "classList",
+        protoProp = "prototype",
+        elemCtrProto = (view.HTMLElement || view.Element)[protoProp],
+        objCtr = Object,
+        strTrim = String[protoProp].trim || function () {
+                return this.replace(/^\s+|\s+$/g, "");
+        },
+        arrIndexOf = Array[protoProp].indexOf || function (item) {
+                var i = 0, len = this.length;
+                for (; i < len; i++) {
+                        if (i in this && this[i] === item) {
+                                return i;
+                        }
+                }
+                return -1;
+        },
+        // Vendors: please allow content code to instantiate DOMExceptions
+        DOMEx = function (type, message) {
+                this.name = type;
+                this.code = DOMException[type];
+                this.message = message;
+        },
+        checkTokenAndGetIndex = function (classList, token) {
+                if (token === "") {
+                        throw new DOMEx( "SYNTAX_ERR", "An invalid or illegal string was specified");
+                }
+                if (/\s/.test(token)) {
+                        throw new DOMEx("INVALID_CHARACTER_ERR", "String contains an invalid character");
+                }
+                return arrIndexOf.call(classList, token);
+        },
+        ClassList = function (elem) {
+                var trimmedClasses = strTrim.call(elem.className);
+                var classes = trimmedClasses ? trimmedClasses.split(/\s+/) : [];
+                var i = 0;
+                var len = classes.length;
+                for (; i < len; i++) {
+                        this.push(classes[i]);
+                }
+                this._updateClassName = function () {
+                        elem.className = this.toString();
+                };
+        },
+        classListProto = ClassList[protoProp] = [],
+        classListGetter = function () {
+                return new ClassList(this);
+        }
 ;
 // Most DOMException implementations don't allow calling DOMException's toString()
 // on non-DOMExceptions. Error's toString() is sufficient here.
 DOMEx[protoProp] = Error[protoProp];
 classListProto.item = function (i) {
-	return this[i] || null;
+        return this[i] || null;
 };
 classListProto.contains = function (token) {
-	token += "";
-	return checkTokenAndGetIndex(this, token) !== -1;
+        token += "";
+        return checkTokenAndGetIndex(this, token) !== -1;
 };
 classListProto.add = function (token) {
-	token += "";
-	if (checkTokenAndGetIndex(this, token) === -1) {
-		this.push(token);
-		this._updateClassName();
-	}
+        token += "";
+        if (checkTokenAndGetIndex(this, token) === -1) {
+                this.push(token);
+                this._updateClassName();
+        }
 };
 classListProto.remove = function (token) {
-	token += "";
-	var index = checkTokenAndGetIndex(this, token);
-	if (index !== -1) {
-		this.splice(index, 1);
-		this._updateClassName();
-	}
+        token += "";
+        var index = checkTokenAndGetIndex(this, token);
+        if (index !== -1) {
+                this.splice(index, 1);
+                this._updateClassName();
+        }
 };
 classListProto.toggle = function (token) {
-	token += "";
-	if (checkTokenAndGetIndex(this, token) === -1) {
-		this.add(token);
-	} else {
-		this.remove(token);
-	}
+        token += "";
+        if (checkTokenAndGetIndex(this, token) === -1) {
+                this.add(token);
+        } else {
+                this.remove(token);
+        }
 };
 classListProto.toString = function () {
-	return this.join(" ");
+        return this.join(" ");
 };
 
 if (objCtr.defineProperty) {
-	var classListPropDesc = {
-		  get: classListGetter,
-		  enumerable: true,
-		  configurable: true
-	};
-	try {
-		objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-	} catch (ex) { // IE 8 doesn't support enumerable:true
-		if (ex.number === -0x7FF5EC54) {
-			classListPropDesc.enumerable = false;
-			objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-		}
-	}
+        var classListPropDesc = {
+                  get: classListGetter,
+                  enumerable: true,
+                  configurable: true
+        };
+        try {
+                objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+        } catch (ex) { // IE 8 doesn't support enumerable:true
+                if (ex.number === -0x7FF5EC54) {
+                        classListPropDesc.enumerable = false;
+                        objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+                }
+        }
 } else if (objCtr[protoProp].__defineGetter__) {
-	elemCtrProto.__defineGetter__(classListProp, classListGetter);
+        elemCtrProto.__defineGetter__(classListProp, classListGetter);
 }
 
 }(self));
@@ -278,162 +278,162 @@ These methods are a bit brittle and awkward, but they save us the issues of incl
 
 mark2.dom = (function() {
 
-	/*
-	 * DOM Manipulation
-	 */
+        /*
+         * DOM Manipulation
+         */
 
-	var appendElement = function(elementToAppendTo, tag, attrs, content) {
-		var newElement = document.createElement(tag);
-		if (content) {
-			newElement.innerHTML = content;
-		}
-		if(attrs) {
-			for(var attr in attrs) {
-				if(attrs.hasOwnProperty(attr)) {
-					newElement.setAttribute(attr, attrs[attr]);
-				}
-			}
-		}
-		if (elementToAppendTo) {
-			elementToAppendTo.appendChild(newElement);
-		}
-		return newElement;
-	};
+        var appendElement = function(elementToAppendTo, tag, attrs, content) {
+                var newElement = document.createElement(tag);
+                if (content) {
+                        newElement.innerHTML = content;
+                }
+                if(attrs) {
+                        for(var attr in attrs) {
+                                if(attrs.hasOwnProperty(attr)) {
+                                        newElement.setAttribute(attr, attrs[attr]);
+                                }
+                        }
+                }
+                if (elementToAppendTo) {
+                        elementToAppendTo.appendChild(newElement);
+                }
+                return newElement;
+        };
 
-	var currentAutoID = "0";
+        var currentAutoID = "0";
 
-	var nextAutoID = function() {
-		return "auto_id_" + (currentAutoID++);
-	};
+        var nextAutoID = function() {
+                return "auto_id_" + (currentAutoID++);
+        };
 
-	var addClass = function(el, className) {
-		if (typeof el.classList !== "undefined") {
-			el.classList.add(className);
-		}
-	};
+        var addClass = function(el, className) {
+                if (typeof el.classList !== "undefined") {
+                        el.classList.add(className);
+                }
+        };
 
-	var removeClass = function(el, className) {
-		if (typeof el.classList !== "undefined") {
-			el.classList.remove(className);
-		}
-		
-	};
+        var removeClass = function(el, className) {
+                if (typeof el.classList !== "undefined") {
+                        el.classList.remove(className);
+                }
+                
+        };
 
-	var showElement = function(el) {
-		el.style.display = "block";
-	};
+        var showElement = function(el) {
+                el.style.display = "block";
+        };
 
-	var hideElement = function(el) {
-		el.style.display = "none";
-	};
-	
-	var emptyElement = function(el) {
-		while(el.hasChildNodes()) {
-			el.removeChild(el.firstChild);
-		}
-	};
+        var hideElement = function(el) {
+                el.style.display = "none";
+        };
+        
+        var emptyElement = function(el) {
+                while(el.hasChildNodes()) {
+                        el.removeChild(el.firstChild);
+                }
+        };
 
 
-	/*
-	 * Public Interface
-	 */
+        /*
+         * Public Interface
+         */
 
-	return {
-		appendElement: appendElement,
-		nextAutoID: nextAutoID,
-		addClass: addClass,
-		removeClass: removeClass,
-		showElement: showElement,
-		hideElement: hideElement,
-		emptyElement: emptyElement
-	};
+        return {
+                appendElement: appendElement,
+                nextAutoID: nextAutoID,
+                addClass: addClass,
+                removeClass: removeClass,
+                showElement: showElement,
+                hideElement: hideElement,
+                emptyElement: emptyElement
+        };
 })();
 
 mark2.settings = (function() {
 
-	var extraScrambles = 2;
-	var events = {
-		// Official WCA events as of November 24, 2011
-		"333":    {name: "Rubik's Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"444":    {name: "4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"555":    {name: "5x5 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-		"333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"333fm":  {name: "3x3 fewest moves", default_round: {type: "best", num_scrambles: 1 } },
-		"333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-		"minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-		"666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-		"777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-		//"magic"
-		//"mmagic"
-		"444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-		"555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-		"333mbf": {name: "3x3 multi blind", default_round: {type: "mbf",  num_scrambles: 28 } }
-		
-		// Unofficial events
-		//"skewb"
-	};
+        var extraScrambles = 2;
+        var events = {
+                // Official WCA events as of November 24, 2011
+                "333":    {name: "Rubik's Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "444":    {name: "4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "555":    {name: "5x5 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+                "333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "333fm":  {name: "3x3 fewest moves", default_round: {type: "best", num_scrambles: 1 } },
+                "333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+                "minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+                "666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+                "777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+                //"magic"
+                //"mmagic"
+                "444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+                "555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+                "333mbf": {name: "3x3 multi blind", default_round: {type: "mbf",  num_scrambles: 28 } }
+                
+                // Unofficial events
+                //"skewb"
+        };
 
-	// Javascript objects don't retain key order in all browsers, so we create this list for iteration.
-	var eventOrder = [
-		"222",
-		"333",
-		"444",
-		"555",
-		"666",
-		"777",
-		"333bf",
-		"333oh",
-		"333fm",
-		"333ft",
-		"minx",
-		"pyram",
-		"sq1",
-		"clock",
-		//"magic",
-		//"mmagic",
-		"444bf",
-		"555bf",
-		"333mbf"
-		//"skewb"
-	];
+        // Javascript objects don't retain key order in all browsers, so we create this list for iteration.
+        var eventOrder = [
+                "222",
+                "333",
+                "444",
+                "555",
+                "666",
+                "777",
+                "333bf",
+                "333oh",
+                "333fm",
+                "333ft",
+                "minx",
+                "pyram",
+                "sq1",
+                "clock",
+                //"magic",
+                //"mmagic",
+                "444bf",
+                "555bf",
+                "333mbf"
+                //"skewb"
+        ];
 
-	function isFmc(eventID) {
-		// Does this eventID end in "fm"?
-		return !!eventID.match(/.*fm$/);
-	}
-	function eventToPuzzle(eventID) {
-		var puzzByEvent = {
-			"333bf" : "333",
-			"333oh" : "333",
-			"333fm" : "333",
-			"333ft" : "333",
-			"444bf" : "444",
-			"555bf" : "555",
-			"333mbf" : "333"
-		};
-		return puzzByEvent[eventID] || eventID;
-	}
+        function isFmc(eventID) {
+                // Does this eventID end in "fm"?
+                return !!eventID.match(/.*fm$/);
+        }
+        function eventToPuzzle(eventID) {
+                var puzzByEvent = {
+                        "333bf" : "333",
+                        "333oh" : "333",
+                        "333fm" : "333",
+                        "333ft" : "333",
+                        "444bf" : "444",
+                        "555bf" : "555",
+                        "333mbf" : "333"
+                };
+                return puzzByEvent[eventID] || eventID;
+        }
 
-	var defaultRounds = [
-		{ eventID: "333", roundName: "Round 1" }
-	];
+        var defaultRounds = [
+                { eventID: "333", roundName: "Round 1" }
+        ];
 
-	var defaultNumGroups = 1;
+        var defaultNumGroups = 1;
 
-	return {
-		events: events,
-		eventToPuzzle: eventToPuzzle,
-		isFmc: isFmc,
-		event_order: eventOrder,
-		default_rounds: defaultRounds,
-		
-		default_num_groups: defaultNumGroups
-	};
+        return {
+                events: events,
+                eventToPuzzle: eventToPuzzle,
+                isFmc: isFmc,
+                event_order: eventOrder,
+                default_rounds: defaultRounds,
+                
+                default_num_groups: defaultNumGroups
+        };
 })();
 
 // converted to data uri with http://dataurl.net/#dataurlmaker
@@ -443,149 +443,149 @@ mark2.VERSION = '1.0';
 
 mark2.ui = (function() {
 
-	// This is a workaround for a Chrome bug:
-	// https://code.google.com/p/chromium/issues/detail?id=132014
-	function newProgressBar(jobDescription) {
-		var div = document.createElement('div');
-		div.classList.add('progressBar');
-		div.style.border = '1px solid #00C0C0';
-		div.style.borderRadius = '15px';
-		div.style.textAlign = 'right';
+        // This is a workaround for a Chrome bug:
+        // https://code.google.com/p/chromium/issues/detail?id=132014
+        function newProgressBar(jobDescription) {
+                var div = document.createElement('div');
+                div.classList.add('progressBar');
+                div.style.border = '1px solid #00C0C0';
+                div.style.borderRadius = '15px';
+                div.style.textAlign = 'right';
 
-		// We must add some text so the height of this div is
-		// computed correctly, but we set it's opacity to 0 so
-		// it cannot be seen.
-		div.style.color = 'transparent';
-		div.appendChild(document.createTextNode('.'));
+                // We must add some text so the height of this div is
+                // computed correctly, but we set it's opacity to 0 so
+                // it cannot be seen.
+                div.style.color = 'transparent';
+                div.appendChild(document.createTextNode('.'));
 
-		var jobDescriptionSpan = null;
-		if(jobDescription) {
-			jobDescriptionSpan = document.createElement('span');
-			jobDescriptionSpan.style.marginRight = '5px';
-			jobDescriptionSpan.style.color = 'black';
-			jobDescriptionSpan.style.position = 'relative';
-			jobDescriptionSpan.style.bottom = '5px';
-			div.appendChild(jobDescriptionSpan);
-			jobDescriptionSpan.appendChild(document.createTextNode(jobDescription));
-		}
+                var jobDescriptionSpan = null;
+                if(jobDescription) {
+                        jobDescriptionSpan = document.createElement('span');
+                        jobDescriptionSpan.style.marginRight = '5px';
+                        jobDescriptionSpan.style.color = 'black';
+                        jobDescriptionSpan.style.position = 'relative';
+                        jobDescriptionSpan.style.bottom = '5px';
+                        div.appendChild(jobDescriptionSpan);
+                        jobDescriptionSpan.appendChild(document.createTextNode(jobDescription));
+                }
 
-		div.style.background = '#DEE';
-		div.style.boxShadow = 'inset 0px 1px 2px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px 0px #FFF';
+                div.style.background = '#DEE';
+                div.style.boxShadow = 'inset 0px 1px 2px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px 0px #FFF';
 
-		var progress = document.createElement('div');
-		div.appendChild(progress);
-		progress.style.position = 'absolute';
-		progress.style.top = '0px';
-		progress.style.bottom = '0px';
-		progress.style.left = '0px';
+                var progress = document.createElement('div');
+                div.appendChild(progress);
+                progress.style.position = 'absolute';
+                progress.style.top = '0px';
+                progress.style.bottom = '0px';
+                progress.style.left = '0px';
 
-		progress.classList.add('progressDiv');
-		progress.style.webkitTransitionDuration = '0.5s';
-		progress.style.webkitTransitionProperty = 'right, display';
-		progress.style.color = 'black';
+                progress.classList.add('progressDiv');
+                progress.style.webkitTransitionDuration = '0.5s';
+                progress.style.webkitTransitionProperty = 'right, display';
+                progress.style.color = 'black';
 
-		function refresh() {
-			var percent;
-			if(div.max !== 0) {
-				percent = 100*(div.value / div.max);
-			} else {
-				percent = 0;
-			}
+                function refresh() {
+                        var percent;
+                        if(div.max !== 0) {
+                                percent = 100*(div.value / div.max);
+                        } else {
+                                percent = 0;
+                        }
 
-			mark2.dom.emptyElement(progress);
-			progress.appendChild(document.createTextNode(percent.toFixed(0) + "%"));
+                        mark2.dom.emptyElement(progress);
+                        progress.appendChild(document.createTextNode(percent.toFixed(0) + "%"));
 
-			progress.style.right = (100 - percent) + "%";
+                        progress.style.right = (100 - percent) + "%";
 
-			// TODO - it would be pretty sexy to compute fontSize as a function
-			// of the available space.
-			jobDescriptionSpan.style.fontSize = '12px';
-		}
+                        // TODO - it would be pretty sexy to compute fontSize as a function
+                        // of the available space.
+                        jobDescriptionSpan.style.fontSize = '12px';
+                }
 
-		var value_ = 0;
-		Object.defineProperty(div, 'value', {
-			get: function() {
-				return value_;
-			},
-			set: function(value) {
-				value_ = value;
-				refresh();
-			}
-		});
-		var max_ = 10;
-		Object.defineProperty(div, 'max', {
-			get: function() {
-				return max_;
-			},
-			set: function(max) {
-				max_ = max;
-				refresh();
-			}
-		});
-		return div;
-	}
-		
-	/*
-	 * Configuration Section
-	 */
+                var value_ = 0;
+                Object.defineProperty(div, 'value', {
+                        get: function() {
+                                return value_;
+                        },
+                        set: function(value) {
+                                value_ = value;
+                                refresh();
+                        }
+                });
+                var max_ = 10;
+                Object.defineProperty(div, 'max', {
+                        get: function() {
+                                return max_;
+                        },
+                        set: function(max) {
+                                max_ = max;
+                                refresh();
+                        }
+                });
+                return div;
+        }
+                
+        /*
+         * Configuration Section
+         */
 
-	var settings;
+        var settings;
 
-	var eventsPerRow = 5;
-	
-	/*
-	 * Mark 2 Initialization
-	 */
+        var eventsPerRow = 5;
+        
+        /*
+         * Mark 2 Initialization
+         */
 
-	var div;
-	var sortables;
-	var roundsTable, eventsTable, competitionNameInput, passwordInput, roundsTbody;
-	var scrambleButton, scrambleProgress, initializationProgress;
-	var callbacks;
+        var div;
+        var sortables;
+        var roundsTable, eventsTable, competitionNameInput, passwordInput, roundsTbody;
+        var scrambleButton, scrambleProgress, initializationProgress;
+        var callbacks;
 
-	var getCompetitionName = function() {
-		return competitionNameInput.value;
-	};
+        var getCompetitionName = function() {
+                return competitionNameInput.value;
+        };
 
     var getRounds = function(includeElement) {
-		var rounds = [];
-		var eventsTBody = roundsTbody.children;
+                var rounds = [];
+                var eventsTBody = roundsTbody.children;
 
-		for (var i = 0; i < eventsTBody.length; i++) {
-			var tr = eventsTBody[i];
-			if(tr.style.position == 'absolute') {
-				// This row is a clone of another row, and exists purely to make
-				// clicking and dragging look pretty.
-				continue;
-			}
+                for (var i = 0; i < eventsTBody.length; i++) {
+                        var tr = eventsTBody[i];
+                        if(tr.style.position == 'absolute') {
+                                // This row is a clone of another row, and exists purely to make
+                                // clicking and dragging look pretty.
+                                continue;
+                        }
 
-			var eventID = tr.getAttribute("data-event-id");
+                        var eventID = tr.getAttribute("data-event-id");
 
-			var roundName = tr.getElementsByClassName("round_name")[0].value;
-			var numSolves = parseInt(tr.getElementsByClassName("num_solves")[0].value, 10);
-			var numExtraSolves = parseInt(tr.getElementsByClassName("num_extra_solves")[0].value, 10);
+                        var roundName = tr.getElementsByClassName("round_name")[0].value;
+                        var numSolves = parseInt(tr.getElementsByClassName("num_solves")[0].value, 10);
+                        var numExtraSolves = parseInt(tr.getElementsByClassName("num_extra_solves")[0].value, 10);
 
-			var numGroups = parseInt(tr.getElementsByClassName("num_groups")[0].value, 10);
+                        var numGroups = parseInt(tr.getElementsByClassName("num_groups")[0].value, 10);
 
-			var round = {
-				eventID: eventID,
-				roundName: roundName,
-				groupCount: numGroups,
-				scrambleCount: numSolves,
-				extraScrambleCount: numExtraSolves
-			};
-			if(includeElement) {
-				round.element = tr;
-			}
-			rounds.push(round);
-		}
+                        var round = {
+                                eventID: eventID,
+                                roundName: roundName,
+                                groupCount: numGroups,
+                                scrambleCount: numSolves,
+                                extraScrambleCount: numExtraSolves
+                        };
+                        if(includeElement) {
+                                round.element = tr;
+                        }
+                        rounds.push(round);
+                }
 
-		return rounds;
+                return rounds;
     };
 
     // Converts 1, 2, ... to A, B, ..., Z, AA, AB, ..., ZZ, AAA, AAB, ...
     // A bit complicated right now, but should work fine.
-	function intToLetters(int) {
+        function intToLetters(int) {
       var numDigits;
       var maxForDigits = 1;
       var numWithThisManyDigits = 1;
@@ -605,785 +605,785 @@ mark2.ui = (function() {
       return out;
     }
 
-	var getScrambleSheets = function() {
-		var rounds = getRounds();
-		var sheets = [];
-		var sheetByGuid = {};
-		for(var i = 0; i < rounds.length; i++) {
-			var round = rounds[i];
-			for(var groupN = 0; groupN < round.groupCount; groupN++) {
-				var title = round.roundName;
-				if(round.groupCount > 1) {
-					title += " Group " + intToLetters(groupN + 1);
-				}
-				var eventName = mark2.settings.events[round.eventID].name;
-				var sheet = {
-					puzzle: settings.eventToPuzzle(round.eventID),
-					fmc: settings.isFmc(round.eventID),
-					title: eventName + " " + title,
-					scrambleCount: round.scrambleCount,
+        var getScrambleSheets = function() {
+                var rounds = getRounds();
+                var sheets = [];
+                var sheetByGuid = {};
+                for(var i = 0; i < rounds.length; i++) {
+                        var round = rounds[i];
+                        for(var groupN = 0; groupN < round.groupCount; groupN++) {
+                                var title = round.roundName;
+                                if(round.groupCount > 1) {
+                                        title += " Group " + intToLetters(groupN + 1);
+                                }
+                                var eventName = mark2.settings.events[round.eventID].name;
+                                var sheet = {
+                                        puzzle: settings.eventToPuzzle(round.eventID),
+                                        fmc: settings.isFmc(round.eventID),
+                                        title: eventName + " " + title,
+                                        scrambleCount: round.scrambleCount,
                                         extraScrambleCount: round.extraScrambleCount
-				};
+                                };
 
-				// Unfortunately, there's no guarantee that rounds in a
-				// competition have unique names, so we must suffix with a
-				// unique number.
-				var baseGuid = getCompetitionName() + sheet.puzzle + sheet.title;
-				var guid = baseGuid;
-				var uniqueId = 0;
-				while(sheetByGuid[guid]) {
-					guid = baseGuid + (++uniqueId);
-				}
-				sheet.guid = guid;
+                                // Unfortunately, there's no guarantee that rounds in a
+                                // competition have unique names, so we must suffix with a
+                                // unique number.
+                                var baseGuid = getCompetitionName() + sheet.puzzle + sheet.title;
+                                var guid = baseGuid;
+                                var uniqueId = 0;
+                                while(sheetByGuid[guid]) {
+                                        guid = baseGuid + (++uniqueId);
+                                }
+                                sheet.guid = guid;
 
-				sheets.push(sheet);
-			}
-		}
-		return sheets;
-	};
+                                sheets.push(sheet);
+                        }
+                }
+                return sheets;
+        };
 
-	function getRequiredScrambleCount() {
-		var requiredCount = 0;
-		var sheets = getScrambleSheets();
-		for(var i = 0; i < sheets.length; i++) {
-			requiredCount += sheets[i].scrambleCount;
-		}
-		return requiredCount;
-	}
+        function getRequiredScrambleCount() {
+                var requiredCount = 0;
+                var sheets = getScrambleSheets();
+                for(var i = 0; i < sheets.length; i++) {
+                        requiredCount += sheets[i].scrambleCount;
+                }
+                return requiredCount;
+        }
 
-	var generatedScrambleCountByGuid = {};
-	function getGeneratedScrambleCount() {
-		var generatedCount = 0;
+        var generatedScrambleCountByGuid = {};
+        function getGeneratedScrambleCount() {
+                var generatedCount = 0;
 
-		var sheets = getScrambleSheets();
-		for(var i = 0; i < sheets.length; i++) {
-			var sheet = sheets[i];
-			// There may be more scrambles generated for this puzzle than we need.
-			generatedCount += Math.min(sheet.scrambleCount + sheet.extraScrambleCount, generatedScrambleCountByGuid[sheet.guid] || 0);
-		}
-		return generatedCount;
-	}
+                var sheets = getScrambleSheets();
+                for(var i = 0; i < sheets.length; i++) {
+                        var sheet = sheets[i];
+                        // There may be more scrambles generated for this puzzle than we need.
+                        generatedCount += Math.min(sheet.scrambleCount + sheet.extraScrambleCount, generatedScrambleCountByGuid[sheet.guid] || 0);
+                }
+                return generatedCount;
+        }
 
-	function getRequiredScrambleCountByPuzzle() {
-		var requiredScrambleCountByPuzzle = {};
-		var sheets = getScrambleSheets();
-		for(var i = 0; i < sheets.length; i++) {
-			var sheet = sheets[i];
-			requiredScrambleCountByPuzzle[sheet.puzzle] = (requiredScrambleCountByPuzzle[sheet.puzzle] || 0) + sheet.scrambleCount + sheet.extraScrambleCount;
-		}
-		return requiredScrambleCountByPuzzle;
-	}
+        function getRequiredScrambleCountByPuzzle() {
+                var requiredScrambleCountByPuzzle = {};
+                var sheets = getScrambleSheets();
+                for(var i = 0; i < sheets.length; i++) {
+                        var sheet = sheets[i];
+                        requiredScrambleCountByPuzzle[sheet.puzzle] = (requiredScrambleCountByPuzzle[sheet.puzzle] || 0) + sheet.scrambleCount + sheet.extraScrambleCount;
+                }
+                return requiredScrambleCountByPuzzle;
+        }
 
-	function getGeneratedScrambleCountByPuzzle() {
-		var generatedScrambleCountByPuzzle = {};
-		var sheets = getScrambleSheets();
-		for(var i = 0; i < sheets.length; i++) {
-			var sheet = sheets[i];
-			generatedScrambleCountByPuzzle[sheet.puzzle] = (generatedScrambleCountByPuzzle[sheet.puzzle] || 0) + (generatedScrambleCountByGuid[sheet.guid] || 0);
-		}
-		return generatedScrambleCountByPuzzle;
-	}
-
-
-	function getMissingScrambleCountByPuzzle() {
-		var requiredScrambleCountByPuzzle = getRequiredScrambleCountByPuzzle();
-		var generatedScrambleCountByPuzzle = getGeneratedScrambleCountByPuzzle();
-
-		for(var puzzle in requiredScrambleCountByPuzzle) {
-			if(requiredScrambleCountByPuzzle.hasOwnProperty(puzzle)) {
-				requiredScrambleCountByPuzzle[puzzle] -= generatedScrambleCountByPuzzle[puzzle];
-			}
-		}
-		return requiredScrambleCountByPuzzle;
-	}
-
-	var initializationByPuzzle = {};
-	function getInitializationAndPuzzleCount() {
-		var puzzleCount = 0;
-		var initializationCount = 0;
-	
-		var missingScrambleCountByPuzzle = getMissingScrambleCountByPuzzle();
-		for(var puzzle in missingScrambleCountByPuzzle) {
-			if(missingScrambleCountByPuzzle.hasOwnProperty(puzzle)) {
-				if(missingScrambleCountByPuzzle[puzzle] === 0 && (initializationByPuzzle[puzzle] || 0) === 0) {
-					// Note that if the server restarts, we may end up in a state where we have
-					// all the 4x4 scrambles we care about, but the 4x4 scrambler is not yet
-					// initialized. However, while we're waiting for two puzzles to initialize,
-					// we don't want to stop reporting one's status just because it's
-					// scrambles have been generated.
-					continue;
-				}
-				initializationCount += initializationByPuzzle[puzzle] || 0;
-				puzzleCount++;
-			}
-		}
-		return [ initializationCount, puzzleCount ];
-	}
-
-	function maybeEnableScrambleButton() {
-		var initializationAndPuzzleCount = getInitializationAndPuzzleCount();
-		var initializationCount = initializationAndPuzzleCount[0];
-		var puzzleCount = initializationAndPuzzleCount[1];
-
-		var generatedCount = getGeneratedScrambleCount();
-		var requiredCount = getRequiredScrambleCount();
-
-		var disableScrambleButton = false;
-		if(requiredCount === 0) {
-			// If the user hasn't asked for any scrambles, then there's no
-			// use letting them click the scramble button.
-			disableScrambleButton = true;
-		} else {
-			disableScrambleButton = generatedCount < requiredCount;
-		}
-		if(getCompetitionName().length === 0) {
-			disableScrambleButton = true;
-		}
-		scrambleButton.disabled = disableScrambleButton;
-
-		initializationProgress.max = puzzleCount;
-		initializationProgress.value = initializationCount;
-		scrambleProgress.max = requiredCount;
-		scrambleProgress.value = generatedCount;
-
-		var initializing = initializationCount < puzzleCount;
-		var scrambling = ( generatedCount < requiredCount ) && requiredCount > 0;
-
-		initializationProgress.style.display = 'none';
-		scrambleProgress.style.display = 'none';
-		scrambleButton.style.visibility = 'hidden';
-		if(initializing) {
-			initializationProgress.style.display = '';
-		} else if(scrambling) {
-			scrambleProgress.style.display = '';
-		} else {
-			scrambleButton.style.visibility = '';
-		}
-
-	}
-
-	function findStringsAndSurroundWith(str, encapsulator, newEncapsulator) {
-		assert(encapsulator.length == 1);
-		assert(newEncapsulator.length == 1);
-		// Replace all strings in encapsulator with strings in newEncapsulator
-		var stringRe = new RegExp(encapsulator + "([^" + encapsulator + "\\\\]|\\\\.)*" + encapsulator, "g");
-		str = str.replace(stringRe, function(str) {
-			// Remove beginning and ending encapsulator
-			str = str.substring(1, str.length - 1);
-			// Replace unescaped newEncapsulator with escaped
-			// single quotes
-			var escapedStr = "";
-			for(var i = 0; i < str.length; i++) {
-				if(str[i] == '\\') {
-					// slurp up the escaped character as well
-					i++;
-					escapedStr += "\\" + str[i];
-					continue;
-				}
-				if(str[i] == newEncapsulator) {
-					// escape unescaped newEncapsulator
-					escapedStr += "\\" + newEncapsulator;
-				} else {
-					escapedStr += str[i];
-				}
-			}
-			return newEncapsulator + escapedStr + newEncapsulator;
-		});
-		return str;
-	}
-
-	function findNotInDoubleQuoteAndReplaceWith(str, findStr, replaceStr) {
-		assert(findStr.length == 1);
-		assert(replaceStr.length == 1);
-
-		var inString = false;
-		var newStr = "";
-		for(var i = 0; i < str.length; i++) {
-			if(inString) {
-				if(str[i] == '"') {
-					// this is the end, beautiful friend
-					inString = false;
-				} else if(str[i] == "\\") {
-					// skip over the next character, since it's escaped
-					newStr += "\\" + str[++i];
-					continue;
-				}
-				newStr += str[i];
-			} else {
-				if(str[i] == '"') {
-					inString = true;
-				} else if(str[i] == findStr) {
-					newStr += replaceStr;
-					continue;
-				}
-				newStr += str[i];
-			}
-		}
-
-		return newStr;
-	}
-
-	var parseUrlPretty = function(urlPretty) {
-		// Replace all strings in single quotes with strings in double quotes
-		var json = findStringsAndSurroundWith(urlPretty, "'", '"');
-		json = findNotInDoubleQuoteAndReplaceWith(json, "(", "{");
-		json = findNotInDoubleQuoteAndReplaceWith(json, ")", "}");
-		json = findNotInDoubleQuoteAndReplaceWith(json, "-", ":");
-
-		json = findNotInDoubleQuoteAndReplaceWith(json, "_", ",");
-		json = findNotInDoubleQuoteAndReplaceWith(json, "i", "[");
-		json = findNotInDoubleQuoteAndReplaceWith(json, "!", "]");
-
-		return JSON.parse(json);
-	};
-	var toURLPretty = function(obj) {
-		var json = JSON.stringify(obj);
-		var urlPretty = findStringsAndSurroundWith(json, '"', "'");
-		urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "{", "(");
-		urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "}", ")");
-		urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, ":", "-");
-
-		urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, ",", "_");
-		urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "[", "i");
-		urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "]", "!");
-
-		return urlPretty;
-	};
-
-	var updateHash = function() {
-		var competitionName = encodeURIComponent(getCompetitionName());
-		var roundsHash = encodeURIComponent(toURLPretty(getRounds()));
-		try {
-			location.hash = "#competitionName=" + competitionName + "&rounds=" + roundsHash + "&version=" + mark2.VERSION;
-		} catch(e) {
-			// Ideally, we'd only catch "Access is Denied" errors, but I don't know how to do that in js.
-			alert("Error setting url hash: " + e + "\n" +
-			      'An "Access is Denied" error occurs on Internet Explorer when you add more than ~25 rounds.' +
-			      ' If you need support for more rounds, consider using a different browser.');
-		}
-
-		callbacks.competitionChanged();
-		maybeEnableScrambleButton();
-	};
-
-	var numCurrentRounds = function(eventID) {
-		var rounds = getRounds();
-		var count = 0;
-		for(var i = 0; i < rounds.length; i++) {
-			if(rounds[i].eventID == eventID) {
-				count++;
-			}
-		}
-		return count;
-	};
-
-	var removeRound = function(eventID, scrambleID) {
-		roundsTbody.removeChild(document.getElementById(scrambleID));
-		document.getElementById("event_amount_value_" + eventID).value = numCurrentRounds(eventID);
-
-		updateHash();
-	};
-
-	var removeLastRound = function(eventID) {
-		var rounds = getRounds(true);
-		var lastRoundOfEvent = null;
-		for(var i = 0; i < rounds.length; i++) {
-			if(rounds[i].eventID == eventID) {
-				lastRoundOfEvent = rounds[i];
-			}
-		}
-		roundsTbody.removeChild(lastRoundOfEvent.element);
-	};
+        function getGeneratedScrambleCountByPuzzle() {
+                var generatedScrambleCountByPuzzle = {};
+                var sheets = getScrambleSheets();
+                for(var i = 0; i < sheets.length; i++) {
+                        var sheet = sheets[i];
+                        generatedScrambleCountByPuzzle[sheet.puzzle] = (generatedScrambleCountByPuzzle[sheet.puzzle] || 0) + (generatedScrambleCountByGuid[sheet.guid] || 0);
+                }
+                return generatedScrambleCountByPuzzle;
+        }
 
 
-	var addRound = function(eventID, roundNameOpt, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt) {
-		var roundName = roundNameOpt;
-		if (roundNameOpt === undefined) {
-			roundName = "Round " + (numCurrentRounds(eventID)+1);
-		}
+        function getMissingScrambleCountByPuzzle() {
+                var requiredScrambleCountByPuzzle = getRequiredScrambleCountByPuzzle();
+                var generatedScrambleCountByPuzzle = getGeneratedScrambleCountByPuzzle();
 
-		var numGroups = numGroupsOpt;
-		if (numGroupsOpt === undefined) {
-			numGroups = settings.default_num_groups;
-		}
+                for(var puzzle in requiredScrambleCountByPuzzle) {
+                        if(requiredScrambleCountByPuzzle.hasOwnProperty(puzzle)) {
+                                requiredScrambleCountByPuzzle[puzzle] -= generatedScrambleCountByPuzzle[puzzle];
+                        }
+                }
+                return requiredScrambleCountByPuzzle;
+        }
 
-		var numSolves = numSolvesOpt;
-		if (numSolvesOpt === undefined) {
-			numSolves = settings.events[eventID].default_round.num_scrambles;
-		}
+        var initializationByPuzzle = {};
+        function getInitializationAndPuzzleCount() {
+                var puzzleCount = 0;
+                var initializationCount = 0;
+        
+                var missingScrambleCountByPuzzle = getMissingScrambleCountByPuzzle();
+                for(var puzzle in missingScrambleCountByPuzzle) {
+                        if(missingScrambleCountByPuzzle.hasOwnProperty(puzzle)) {
+                                if(missingScrambleCountByPuzzle[puzzle] === 0 && (initializationByPuzzle[puzzle] || 0) === 0) {
+                                        // Note that if the server restarts, we may end up in a state where we have
+                                        // all the 4x4 scrambles we care about, but the 4x4 scrambler is not yet
+                                        // initialized. However, while we're waiting for two puzzles to initialize,
+                                        // we don't want to stop reporting one's status just because it's
+                                        // scrambles have been generated.
+                                        continue;
+                                }
+                                initializationCount += initializationByPuzzle[puzzle] || 0;
+                                puzzleCount++;
+                        }
+                }
+                return [ initializationCount, puzzleCount ];
+        }
 
-		var numExtraSolves = numExtraSolvesOpt;
-                if (numExtraSolvesOpt === undefined) {
-			numExtraSolves = settings.events[eventID].default_round.num_extra_scrambles || 0;
+        function maybeEnableScrambleButton() {
+                var initializationAndPuzzleCount = getInitializationAndPuzzleCount();
+                var initializationCount = initializationAndPuzzleCount[0];
+                var puzzleCount = initializationAndPuzzleCount[1];
+
+                var generatedCount = getGeneratedScrambleCount();
+                var requiredCount = getRequiredScrambleCount();
+
+                var disableScrambleButton = false;
+                if(requiredCount === 0) {
+                        // If the user hasn't asked for any scrambles, then there's no
+                        // use letting them click the scramble button.
+                        disableScrambleButton = true;
+                } else {
+                        disableScrambleButton = generatedCount < requiredCount;
+                }
+                if(getCompetitionName().length === 0) {
+                        disableScrambleButton = true;
+                }
+                scrambleButton.disabled = disableScrambleButton;
+
+                initializationProgress.max = puzzleCount;
+                initializationProgress.value = initializationCount;
+                scrambleProgress.max = requiredCount;
+                scrambleProgress.value = generatedCount;
+
+                var initializing = initializationCount < puzzleCount;
+                var scrambling = ( generatedCount < requiredCount ) && requiredCount > 0;
+
+                initializationProgress.style.display = 'none';
+                scrambleProgress.style.display = 'none';
+                scrambleButton.style.visibility = 'hidden';
+                if(initializing) {
+                        initializationProgress.style.display = '';
+                } else if(scrambling) {
+                        scrambleProgress.style.display = '';
+                } else {
+                        scrambleButton.style.visibility = '';
                 }
 
-		var newEventTR_ID = mark2.dom.nextAutoID();
-		var newEventTR = mark2.dom.appendElement(
-			null,
-			"tr",
-			{ id: newEventTR_ID, "data-event-id": eventID }
-		);
-		var rounds = getRounds(true);
-		var lastRoundOfEvent = null;
-		for(var i = 0; i < rounds.length; i++) {
-			var round = rounds[i];
-			if(round.eventID == eventID) {
-				lastRoundOfEvent = round.element;
-			}
-		}
-		if(lastRoundOfEvent) {
-			lastRoundOfEvent = lastRoundOfEvent.nextSibling;
-		}
-		roundsTbody.insertBefore(newEventTR, lastRoundOfEvent);
-
-		var nameTD = mark2.dom.appendElement(
-			newEventTR,
-			"td",
-			{},
-			settings.events[eventID].name);
-		nameTD.classList.add("event_name");
-		
-		var roundNameTD = mark2.dom.appendElement(newEventTR, "td");
-		var roundNameInput = mark2.dom.appendElement(
-			roundNameTD,
-			"input",
-			{ value: roundName }
-		);
-		roundNameInput.classList.add("round_name");
-
-		var numGroupsTD = mark2.dom.appendElement(newEventTR, "td");
-		var numGroupsInput = mark2.dom.appendElement(
-			numGroupsTD,
-			"input",
-			{ type: "number", value: numGroups, min: 1 }
-		);
-		numGroupsInput.classList.add("num_groups");
-
-		var numSolvesTD = mark2.dom.appendElement(newEventTR, "td");
-		var numSolvesInput = mark2.dom.appendElement(
-			numSolvesTD,
-			"input",
-			{ type: "number", value: numSolves, min: 1 }
-		);
-		numSolvesInput.classList.add("num_solves");
-
-		var numExtraSolvesTD = mark2.dom.appendElement(newEventTR, "td");
-		var numExtraSolvesInput = mark2.dom.appendElement(
-			numExtraSolvesTD,
-			"input",
-			{ type: "number", value: numExtraSolves, min: 0 }
-		);
-		numExtraSolvesInput.classList.add("num_extra_solves");
-
-		var removeTD = mark2.dom.appendElement(newEventTR, "td");
-		removeTD.classList.add("round_remove");
-		var removeButton = mark2.dom.appendElement(removeTD, "button", {}, "X");
-		removeButton.addEventListener("click", removeRound.bind(null, eventID, newEventTR_ID), false);
-
-		roundNameInput.addEventListener("change", updateHash, false);
-		numSolvesInput.addEventListener("change", updateHash, false);
-		numExtraSolvesInput.addEventListener("change", updateHash, false);
-		numGroupsInput.addEventListener("change", updateHash, false);
-
-		sortables.addItems(newEventTR);
-	};
-
-
-	var changeNumRounds = function(eventID, newNum) {
-		if (isNaN(newNum)) {
-			return;
-		}
-
-		var currentNum = numCurrentRounds(eventID);
-
-		var i;
-		if (currentNum < newNum) {
-			for (i = 0; i < newNum - currentNum; i++) {
-				addRound(eventID);
-			}
-		}
-		else if (newNum < currentNum) {
-			for (i = 0; i < currentNum - newNum; i++) {
-				removeLastRound(eventID);
-			}
-		}
-
-		if (parseInt(document.getElementById("event_amount_value_" + eventID).value, 10) !== newNum) {
-			document.getElementById("event_amount_value_" + eventID).value = newNum;
-		}
-
-		updateHash();
-	};
-
-	var initializeEventsTable = function() {
-		var changeNumRoundsListener = function(eventID, el) {
-			changeNumRounds(eventID, parseInt(el.value, 10));
-		};
-		var currentEventsTR;
-		for (var i = 0; i < settings.event_order.length; i++) {
-			var eventID = settings.event_order[i];
-
-			settings.events[eventID].initialized = false;
-
-			if (i % eventsPerRow === 0) {
-				currentEventsTR = mark2.dom.appendElement(eventsTable, "tr");
-			}
-
-			var eventTD = mark2.dom.appendElement(currentEventsTR, "td", {}, "" + eventID + ":");
-			eventTD.classList.add("event_amount_label");
-
-			var val = mark2.dom.appendElement(currentEventsTR, "td");
-			val.classList.add("event_amount_value_td");
-			var valInput = mark2.dom.appendElement(
-				val,
-				"input",
-				{ id: "event_amount_value_" + eventID, type: "number", min: 0 }
-			);
-			valInput.classList.add("event_amount_value");
-
-			valInput.addEventListener("change", changeNumRoundsListener.bind(null, eventID, valInput, false));
-		}
-	};
-
-	function updateEventAmountValues() {
-		var eventInputs = eventsTable.getElementsByClassName("event_amount_value");
-		for(var i = 0; i < eventInputs.length; i++) {
-			var eventID = eventInputs[i].id.split("_")[3];
-			eventInputs[i].value = numCurrentRounds(eventID);
-			if(eventInputs[i] == document.activeElement) {
-				// Setting the value of a focused input clears it's selection.
-				// We'd rather it stay (or become) selected.
-				eventInputs[i].select();
-			}
-		}
-	}
-
-	function getHashParameter(name, alt) {
-		var results = new RegExp( "[#&]"+name.replace(/[\[]/,"\\\\[").replace(/[\]]/,"\\\\]")+"=([^&#<]*)" ).exec( window.location.href );
-		if (results === null) {
-			return alt;
-		}
-		else {
-			return decodeURIComponent(results[1]);
-		}
-	}
-
-	var resetRounds = function() {
-		mark2.dom.emptyElement(roundsTbody);
-	};
-
-	var addRounds = function(rounds) {
-		for (var i = 0; i < rounds.length; i++) {
-			addRound(rounds[i].eventID, rounds[i].roundName, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount);
-		}
-	};
-
-
-	var initializeEvents = function() {
-		var competitionNameHash = getHashParameter("competitionName", null);
-
-		if (competitionNameHash !== null) {
-			competitionNameInput.value = competitionNameHash;
-		} else {
-			// TODO - this also uses mootools, even though we don't explicitly
-			// depend on mootools.
-			var prettyDate = new Date().format("%Y-%m-%d");
-			competitionNameInput.value = "Scrambles for " + prettyDate;
-		}
-
-		var roundsHash = getHashParameter("rounds", null);
-
-		if (roundsHash === null) {
-			resetRounds();
-			addRounds(settings.default_rounds);
-		}
-		else if(roundsHash != toURLPretty(getRounds())) {
-			var rounds = parseUrlPretty(roundsHash);
-			resetRounds();
-			addRounds(rounds);
-		}
-	};
-
-	var initialize = function(name, callbacks_) {
-		settings = mark2.settings;
-		callbacks = callbacks_;
-
-		assert(callbacks.showScrambles);
-		assert(callbacks.competitionChanged);
-		
-		div = document.createElement('div');
-
-		var topInterface = document.createElement('div');
-		div.appendChild(topInterface);
-		topInterface.id = 'top_interface';
-		topInterface.classList.add('interface');
-
-		var title = document.createElement('h1');
-		topInterface.appendChild(title);
-		title.id = 'title';
-
-		var logo = document.createElement('img');
-		title.appendChild(logo);
-		logo.id = 'logo_top';
-		logo.src = mark2.logo;
-
-		var mark2Title = document.createElement('span');
-		title.appendChild(mark2Title);
-		mark2Title.classList.add('mark2_title');
-
-		if(name) {
-			mark2Title.appendChild(name);
-		}
-		else {
-			mark2Title.appendChild(document.createTextNode('Mark 2'));
-
-			var betaText = document.createElement('span');
-			mark2Title.appendChild(betaText);
-			betaText.classList.add('beta');
-			betaText.appendChild(document.createTextNode('BETA 0.1b'));
-		}
-
-
-		var spacerDiv = document.createElement('div');
-		topInterface.appendChild(spacerDiv);
-		
-		competitionNameInput = document.createElement('input');
-		spacerDiv.appendChild(competitionNameInput);
-		competitionNameInput.id = 'competitionName';
-		competitionNameInput.placeholder = "Competition Name";
-
-		var passwordDiv = document.createElement('div');
-		spacerDiv.appendChild(passwordDiv);
-
-		var showPasswordCheckbox = document.createElement("input");
-		// IE <9 doesn't let you change the type attribute of an input element
-		// after you've added it to the dom.
-		showPasswordCheckbox.setAttribute('type', 'checkbox');
-
-		spacerDiv.appendChild(showPasswordCheckbox);
-		showPasswordCheckbox.id = "showPassword";
-		
-		var showPasswordCheckboxLabel = document.createElement("label");
-		spacerDiv.appendChild(showPasswordCheckboxLabel);
-		showPasswordCheckboxLabel.setAttribute("for", showPasswordCheckbox.id);
-		showPasswordCheckboxLabel.appendChild(document.createTextNode('Show password'));
-
-		scrambleButton = document.createElement('button');
-		topInterface.appendChild(scrambleButton);
-		scrambleButton.classList.add('scrambleButton');
-		scrambleButton.appendChild(document.createTextNode("Scramble!"));
-
-		// TODO - revert to progress bar once
-		// https://code.google.com/p/chromium/issues/detail?id=132014 is resolved.
-		//scrambleProgress = document.createElement('progress');
-		scrambleProgress = newProgressBar("Generating scrambles");
-		scrambleProgress.id = 'scrambleProgress';
-		topInterface.appendChild(scrambleProgress);
-
-		initializationProgress = newProgressBar("Puzzles initializing");
-		initializationProgress.id = 'initializationProgress';
-		topInterface.appendChild(initializationProgress);
-
-		var eventsRoundsInterface = document.createElement('div');
-		div.appendChild(eventsRoundsInterface);
-		eventsRoundsInterface.id = "events_rounds_interface";
-		eventsRoundsInterface.classList.add('interface');
-
-		var resetButton = document.createElement('button');
-		eventsRoundsInterface.appendChild(resetButton);
-		resetButton.appendChild(document.createTextNode("Reset"));
-		resetButton.classList.add('resetButton');
-
-		spacerDiv = document.createElement('div');
-		eventsRoundsInterface.appendChild(spacerDiv);
-
-		var adjustEvents = document.createElement('h1');
-		spacerDiv.appendChild(adjustEvents);
-
-		adjustEvents.appendChild(document.createTextNode('Adjust Events:'));
-
-		eventsTable = document.createElement('table');
-		spacerDiv.appendChild(eventsTable);
-		eventsTable.id = "events_table";
-
-		spacerDiv = document.createElement('div');
-		eventsRoundsInterface.appendChild(spacerDiv);
-
-		var adjustIndividualRounds = document.createElement('h1');
-		adjustIndividualRounds.appendChild(document.createTextNode('Adjust Individual Rounds:'));
-		spacerDiv.appendChild(adjustIndividualRounds);
-		roundsTable = document.createElement('table');
-		spacerDiv.appendChild(roundsTable);
-		roundsTable.id = "rounds_table";
-
-		var thead = document.createElement('thead');
-		roundsTable.appendChild(thead);
-		var tr = document.createElement('tr');
-		thead.appendChild(tr);
-		var td;
-		td = document.createElement('td');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode('Event'));
-		td = document.createElement('td');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode('Round Names'));
-		td = document.createElement('td');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode('# Groups'));
-		td = document.createElement('td');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode('# Scrambles'));
-		td = document.createElement('td');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode('# Extra Scrambles'));
-		td = document.createElement('td');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode('Remove'));
-
-		roundsTbody = document.createElement('tbody');
-		roundsTable.appendChild(roundsTbody);
-
-		// TODO
-		//  - dragging doesn't work when cursor is outside of the table
-		//    - do we actually want to support that?
-		//
-		// This is pretty bad, as scrambler-interface doesn't actually include mootools.
-		// Ideally, we'd either move mootools into scrambler-interface (yuck), or remove the
-		// dependency of on scrambler-interface on mootools (yikes).
-		sortables = new Sortables(roundsTbody, {
-			clone: true,
-			opacity: 0.7,
-			revert: true
-		});
-		sortables.addEvent('complete', function(e) {
-			// A row has just been dropped somewhere, so we
-			// update our url hash.
-			updateHash();
-		});
-
-		resetButton.addEventListener('click', function() {
-			location.hash = "";
-		}, false);
-		
-		function showPasswordChanged() {
-			// IE <9 doesn't let you change an input's type after it has
-			// been added to the dom, so we simply create a new one here
-			// and clobber the old one.
-			var oldPass = null;
-			if(passwordInput) {
-				oldPass = passwordInput.value;
-			}
-			passwordInput = document.createElement('input');
-			if(oldPass) {
-				passwordInput.value = oldPass;
-			}
-			if(showPasswordCheckbox.checked) {
-				passwordInput.setAttribute('type', '');
-			} else {
-				passwordInput.setAttribute('type', 'password');
-			}
-			mark2.dom.emptyElement(passwordDiv);
-			passwordDiv.appendChild(passwordInput);
-			passwordInput.id = 'passwordInput';
-			passwordInput.placeholder = "Password";
-			passwordInput.addEventListener('change', callbacks.competitionChanged, false);
-		}
-		showPasswordChanged();
-		showPasswordCheckbox.addEventListener('change', showPasswordChanged, false);
-		// IE doesn't fire the event until the checkbox loses focus, this just makes it
-		// behave nicer.
-		showPasswordCheckbox.addEventListener('click', showPasswordChanged, false);
-
-		competitionNameInput.addEventListener('change', updateHash, false);
-
-		scrambleButton.addEventListener('click', callbacks.showScrambles, false);
-
-		initializeEventsTable();
-
-		function urlChanged() {
-			initializeEvents();
-			updateEventAmountValues();
-			maybeEnableScrambleButton();
-		}
-		urlChanged();
-
-		// Must populate the gui before updating the hash
-		updateHash();
-
-		window.addEventListener('hashchange', urlChanged, false);
-
-		return div;
-	};
-
-	function addHelpLink(url) {
-		var topInterface = document.getElementById("top_interface");
-
-		var helpLinkDiv = document.createElement('div');
-		topInterface.appendChild(helpLinkDiv);
-		helpLinkDiv.id = 'helpLinkDiv';
-
-		var helpLink = document.createElement('a');
-		helpLink.appendChild(document.createTextNode("?"));
-		helpLink.href = url;
-		helpLinkDiv.appendChild(helpLink);
-	}
-
-	/*
-	 * Events
-	 */
-
-	var getPassword = function() {
-		return passwordInput.value;
-	};
-
-
-	/*
-	 * Rounds
-	 */
-
-	function countNonNullAndNonUndefined(arr) {
-		var n = 0;
-		for(var i = 0; i < arr.length; i++) {
-			if(arr[i] !== null && arr[i] !== undefined) {
-				n++;
-			}
-		}
-		return n;
-	}
-
-	var scramblesGenerated = function(scramblesByGuid) {
-		generatedScrambleCountByGuid = {};
-		for(var guid in scramblesByGuid) {
-			if(scramblesByGuid.hasOwnProperty(guid)) {
-				generatedScrambleCountByGuid[guid] = countNonNullAndNonUndefined(scramblesByGuid[guid]);
-			}
-		}
-		maybeEnableScrambleButton();
-	};
-
-	var puzzlesInitializing = function(initializationByPuzzle_) {
-		initializationByPuzzle = initializationByPuzzle_;
-		maybeEnableScrambleButton();
-		var initializationAndPuzzleCount = getInitializationAndPuzzleCount();
-		var initializationCount = initializationAndPuzzleCount[0];
-		var puzzleCount = initializationAndPuzzleCount[1];
-		return initializationCount >= puzzleCount;
-	};
-
-	/*
-	 * Public Interface
-	 */
-
-	return {
-		initialize: initialize,
-		addHelpLink: addHelpLink,
-		updateHash: updateHash,
-		getScrambleSheets: getScrambleSheets,
-		getTitle: getCompetitionName,
-		getPassword: getPassword,
-		scramblesGenerated: scramblesGenerated,
-		puzzlesInitializing: puzzlesInitializing
-	};
+        }
+
+        function findStringsAndSurroundWith(str, encapsulator, newEncapsulator) {
+                assert(encapsulator.length == 1);
+                assert(newEncapsulator.length == 1);
+                // Replace all strings in encapsulator with strings in newEncapsulator
+                var stringRe = new RegExp(encapsulator + "([^" + encapsulator + "\\\\]|\\\\.)*" + encapsulator, "g");
+                str = str.replace(stringRe, function(str) {
+                        // Remove beginning and ending encapsulator
+                        str = str.substring(1, str.length - 1);
+                        // Replace unescaped newEncapsulator with escaped
+                        // single quotes
+                        var escapedStr = "";
+                        for(var i = 0; i < str.length; i++) {
+                                if(str[i] == '\\') {
+                                        // slurp up the escaped character as well
+                                        i++;
+                                        escapedStr += "\\" + str[i];
+                                        continue;
+                                }
+                                if(str[i] == newEncapsulator) {
+                                        // escape unescaped newEncapsulator
+                                        escapedStr += "\\" + newEncapsulator;
+                                } else {
+                                        escapedStr += str[i];
+                                }
+                        }
+                        return newEncapsulator + escapedStr + newEncapsulator;
+                });
+                return str;
+        }
+
+        function findNotInDoubleQuoteAndReplaceWith(str, findStr, replaceStr) {
+                assert(findStr.length == 1);
+                assert(replaceStr.length == 1);
+
+                var inString = false;
+                var newStr = "";
+                for(var i = 0; i < str.length; i++) {
+                        if(inString) {
+                                if(str[i] == '"') {
+                                        // this is the end, beautiful friend
+                                        inString = false;
+                                } else if(str[i] == "\\") {
+                                        // skip over the next character, since it's escaped
+                                        newStr += "\\" + str[++i];
+                                        continue;
+                                }
+                                newStr += str[i];
+                        } else {
+                                if(str[i] == '"') {
+                                        inString = true;
+                                } else if(str[i] == findStr) {
+                                        newStr += replaceStr;
+                                        continue;
+                                }
+                                newStr += str[i];
+                        }
+                }
+
+                return newStr;
+        }
+
+        var parseUrlPretty = function(urlPretty) {
+                // Replace all strings in single quotes with strings in double quotes
+                var json = findStringsAndSurroundWith(urlPretty, "'", '"');
+                json = findNotInDoubleQuoteAndReplaceWith(json, "(", "{");
+                json = findNotInDoubleQuoteAndReplaceWith(json, ")", "}");
+                json = findNotInDoubleQuoteAndReplaceWith(json, "-", ":");
+
+                json = findNotInDoubleQuoteAndReplaceWith(json, "_", ",");
+                json = findNotInDoubleQuoteAndReplaceWith(json, "i", "[");
+                json = findNotInDoubleQuoteAndReplaceWith(json, "!", "]");
+
+                return JSON.parse(json);
+        };
+        var toURLPretty = function(obj) {
+                var json = JSON.stringify(obj);
+                var urlPretty = findStringsAndSurroundWith(json, '"', "'");
+                urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "{", "(");
+                urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "}", ")");
+                urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, ":", "-");
+
+                urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, ",", "_");
+                urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "[", "i");
+                urlPretty = findNotInDoubleQuoteAndReplaceWith(urlPretty, "]", "!");
+
+                return urlPretty;
+        };
+
+        var updateHash = function() {
+                var competitionName = encodeURIComponent(getCompetitionName());
+                var roundsHash = encodeURIComponent(toURLPretty(getRounds()));
+                try {
+                        location.hash = "#competitionName=" + competitionName + "&rounds=" + roundsHash + "&version=" + mark2.VERSION;
+                } catch(e) {
+                        // Ideally, we'd only catch "Access is Denied" errors, but I don't know how to do that in js.
+                        alert("Error setting url hash: " + e + "\n" +
+                              'An "Access is Denied" error occurs on Internet Explorer when you add more than ~25 rounds.' +
+                              ' If you need support for more rounds, consider using a different browser.');
+                }
+
+                callbacks.competitionChanged();
+                maybeEnableScrambleButton();
+        };
+
+        var numCurrentRounds = function(eventID) {
+                var rounds = getRounds();
+                var count = 0;
+                for(var i = 0; i < rounds.length; i++) {
+                        if(rounds[i].eventID == eventID) {
+                                count++;
+                        }
+                }
+                return count;
+        };
+
+        var removeRound = function(eventID, scrambleID) {
+                roundsTbody.removeChild(document.getElementById(scrambleID));
+                document.getElementById("event_amount_value_" + eventID).value = numCurrentRounds(eventID);
+
+                updateHash();
+        };
+
+        var removeLastRound = function(eventID) {
+                var rounds = getRounds(true);
+                var lastRoundOfEvent = null;
+                for(var i = 0; i < rounds.length; i++) {
+                        if(rounds[i].eventID == eventID) {
+                                lastRoundOfEvent = rounds[i];
+                        }
+                }
+                roundsTbody.removeChild(lastRoundOfEvent.element);
+        };
+
+
+        var addRound = function(eventID, roundNameOpt, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt) {
+                var roundName = roundNameOpt;
+                if (roundNameOpt === undefined) {
+                        roundName = "Round " + (numCurrentRounds(eventID)+1);
+                }
+
+                var numGroups = numGroupsOpt;
+                if (numGroupsOpt === undefined) {
+                        numGroups = settings.default_num_groups;
+                }
+
+                var numSolves = numSolvesOpt;
+                if (numSolvesOpt === undefined) {
+                        numSolves = settings.events[eventID].default_round.num_scrambles;
+                }
+
+                var numExtraSolves = numExtraSolvesOpt;
+                if (numExtraSolvesOpt === undefined) {
+                        numExtraSolves = settings.events[eventID].default_round.num_extra_scrambles || 0;
+                }
+
+                var newEventTR_ID = mark2.dom.nextAutoID();
+                var newEventTR = mark2.dom.appendElement(
+                        null,
+                        "tr",
+                        { id: newEventTR_ID, "data-event-id": eventID }
+                );
+                var rounds = getRounds(true);
+                var lastRoundOfEvent = null;
+                for(var i = 0; i < rounds.length; i++) {
+                        var round = rounds[i];
+                        if(round.eventID == eventID) {
+                                lastRoundOfEvent = round.element;
+                        }
+                }
+                if(lastRoundOfEvent) {
+                        lastRoundOfEvent = lastRoundOfEvent.nextSibling;
+                }
+                roundsTbody.insertBefore(newEventTR, lastRoundOfEvent);
+
+                var nameTD = mark2.dom.appendElement(
+                        newEventTR,
+                        "td",
+                        {},
+                        settings.events[eventID].name);
+                nameTD.classList.add("event_name");
+                
+                var roundNameTD = mark2.dom.appendElement(newEventTR, "td");
+                var roundNameInput = mark2.dom.appendElement(
+                        roundNameTD,
+                        "input",
+                        { value: roundName }
+                );
+                roundNameInput.classList.add("round_name");
+
+                var numGroupsTD = mark2.dom.appendElement(newEventTR, "td");
+                var numGroupsInput = mark2.dom.appendElement(
+                        numGroupsTD,
+                        "input",
+                        { type: "number", value: numGroups, min: 1 }
+                );
+                numGroupsInput.classList.add("num_groups");
+
+                var numSolvesTD = mark2.dom.appendElement(newEventTR, "td");
+                var numSolvesInput = mark2.dom.appendElement(
+                        numSolvesTD,
+                        "input",
+                        { type: "number", value: numSolves, min: 1 }
+                );
+                numSolvesInput.classList.add("num_solves");
+
+                var numExtraSolvesTD = mark2.dom.appendElement(newEventTR, "td");
+                var numExtraSolvesInput = mark2.dom.appendElement(
+                        numExtraSolvesTD,
+                        "input",
+                        { type: "number", value: numExtraSolves, min: 0 }
+                );
+                numExtraSolvesInput.classList.add("num_extra_solves");
+
+                var removeTD = mark2.dom.appendElement(newEventTR, "td");
+                removeTD.classList.add("round_remove");
+                var removeButton = mark2.dom.appendElement(removeTD, "button", {}, "X");
+                removeButton.addEventListener("click", removeRound.bind(null, eventID, newEventTR_ID), false);
+
+                roundNameInput.addEventListener("change", updateHash, false);
+                numSolvesInput.addEventListener("change", updateHash, false);
+                numExtraSolvesInput.addEventListener("change", updateHash, false);
+                numGroupsInput.addEventListener("change", updateHash, false);
+
+                sortables.addItems(newEventTR);
+        };
+
+
+        var changeNumRounds = function(eventID, newNum) {
+                if (isNaN(newNum)) {
+                        return;
+                }
+
+                var currentNum = numCurrentRounds(eventID);
+
+                var i;
+                if (currentNum < newNum) {
+                        for (i = 0; i < newNum - currentNum; i++) {
+                                addRound(eventID);
+                        }
+                }
+                else if (newNum < currentNum) {
+                        for (i = 0; i < currentNum - newNum; i++) {
+                                removeLastRound(eventID);
+                        }
+                }
+
+                if (parseInt(document.getElementById("event_amount_value_" + eventID).value, 10) !== newNum) {
+                        document.getElementById("event_amount_value_" + eventID).value = newNum;
+                }
+
+                updateHash();
+        };
+
+        var initializeEventsTable = function() {
+                var changeNumRoundsListener = function(eventID, el) {
+                        changeNumRounds(eventID, parseInt(el.value, 10));
+                };
+                var currentEventsTR;
+                for (var i = 0; i < settings.event_order.length; i++) {
+                        var eventID = settings.event_order[i];
+
+                        settings.events[eventID].initialized = false;
+
+                        if (i % eventsPerRow === 0) {
+                                currentEventsTR = mark2.dom.appendElement(eventsTable, "tr");
+                        }
+
+                        var eventTD = mark2.dom.appendElement(currentEventsTR, "td", {}, "" + eventID + ":");
+                        eventTD.classList.add("event_amount_label");
+
+                        var val = mark2.dom.appendElement(currentEventsTR, "td");
+                        val.classList.add("event_amount_value_td");
+                        var valInput = mark2.dom.appendElement(
+                                val,
+                                "input",
+                                { id: "event_amount_value_" + eventID, type: "number", min: 0 }
+                        );
+                        valInput.classList.add("event_amount_value");
+
+                        valInput.addEventListener("change", changeNumRoundsListener.bind(null, eventID, valInput, false));
+                }
+        };
+
+        function updateEventAmountValues() {
+                var eventInputs = eventsTable.getElementsByClassName("event_amount_value");
+                for(var i = 0; i < eventInputs.length; i++) {
+                        var eventID = eventInputs[i].id.split("_")[3];
+                        eventInputs[i].value = numCurrentRounds(eventID);
+                        if(eventInputs[i] == document.activeElement) {
+                                // Setting the value of a focused input clears it's selection.
+                                // We'd rather it stay (or become) selected.
+                                eventInputs[i].select();
+                        }
+                }
+        }
+
+        function getHashParameter(name, alt) {
+                var results = new RegExp( "[#&]"+name.replace(/[\[]/,"\\\\[").replace(/[\]]/,"\\\\]")+"=([^&#<]*)" ).exec( window.location.href );
+                if (results === null) {
+                        return alt;
+                }
+                else {
+                        return decodeURIComponent(results[1]);
+                }
+        }
+
+        var resetRounds = function() {
+                mark2.dom.emptyElement(roundsTbody);
+        };
+
+        var addRounds = function(rounds) {
+                for (var i = 0; i < rounds.length; i++) {
+                        addRound(rounds[i].eventID, rounds[i].roundName, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount);
+                }
+        };
+
+
+        var initializeEvents = function() {
+                var competitionNameHash = getHashParameter("competitionName", null);
+
+                if (competitionNameHash !== null) {
+                        competitionNameInput.value = competitionNameHash;
+                } else {
+                        // TODO - this also uses mootools, even though we don't explicitly
+                        // depend on mootools.
+                        var prettyDate = new Date().format("%Y-%m-%d");
+                        competitionNameInput.value = "Scrambles for " + prettyDate;
+                }
+
+                var roundsHash = getHashParameter("rounds", null);
+
+                if (roundsHash === null) {
+                        resetRounds();
+                        addRounds(settings.default_rounds);
+                }
+                else if(roundsHash != toURLPretty(getRounds())) {
+                        var rounds = parseUrlPretty(roundsHash);
+                        resetRounds();
+                        addRounds(rounds);
+                }
+        };
+
+        var initialize = function(name, callbacks_) {
+                settings = mark2.settings;
+                callbacks = callbacks_;
+
+                assert(callbacks.showScrambles);
+                assert(callbacks.competitionChanged);
+                
+                div = document.createElement('div');
+
+                var topInterface = document.createElement('div');
+                div.appendChild(topInterface);
+                topInterface.id = 'top_interface';
+                topInterface.classList.add('interface');
+
+                var title = document.createElement('h1');
+                topInterface.appendChild(title);
+                title.id = 'title';
+
+                var logo = document.createElement('img');
+                title.appendChild(logo);
+                logo.id = 'logo_top';
+                logo.src = mark2.logo;
+
+                var mark2Title = document.createElement('span');
+                title.appendChild(mark2Title);
+                mark2Title.classList.add('mark2_title');
+
+                if(name) {
+                        mark2Title.appendChild(name);
+                }
+                else {
+                        mark2Title.appendChild(document.createTextNode('Mark 2'));
+
+                        var betaText = document.createElement('span');
+                        mark2Title.appendChild(betaText);
+                        betaText.classList.add('beta');
+                        betaText.appendChild(document.createTextNode('BETA 0.1b'));
+                }
+
+
+                var spacerDiv = document.createElement('div');
+                topInterface.appendChild(spacerDiv);
+                
+                competitionNameInput = document.createElement('input');
+                spacerDiv.appendChild(competitionNameInput);
+                competitionNameInput.id = 'competitionName';
+                competitionNameInput.placeholder = "Competition Name";
+
+                var passwordDiv = document.createElement('div');
+                spacerDiv.appendChild(passwordDiv);
+
+                var showPasswordCheckbox = document.createElement("input");
+                // IE <9 doesn't let you change the type attribute of an input element
+                // after you've added it to the dom.
+                showPasswordCheckbox.setAttribute('type', 'checkbox');
+
+                spacerDiv.appendChild(showPasswordCheckbox);
+                showPasswordCheckbox.id = "showPassword";
+                
+                var showPasswordCheckboxLabel = document.createElement("label");
+                spacerDiv.appendChild(showPasswordCheckboxLabel);
+                showPasswordCheckboxLabel.setAttribute("for", showPasswordCheckbox.id);
+                showPasswordCheckboxLabel.appendChild(document.createTextNode('Show password'));
+
+                scrambleButton = document.createElement('button');
+                topInterface.appendChild(scrambleButton);
+                scrambleButton.classList.add('scrambleButton');
+                scrambleButton.appendChild(document.createTextNode("Scramble!"));
+
+                // TODO - revert to progress bar once
+                // https://code.google.com/p/chromium/issues/detail?id=132014 is resolved.
+                //scrambleProgress = document.createElement('progress');
+                scrambleProgress = newProgressBar("Generating scrambles");
+                scrambleProgress.id = 'scrambleProgress';
+                topInterface.appendChild(scrambleProgress);
+
+                initializationProgress = newProgressBar("Puzzles initializing");
+                initializationProgress.id = 'initializationProgress';
+                topInterface.appendChild(initializationProgress);
+
+                var eventsRoundsInterface = document.createElement('div');
+                div.appendChild(eventsRoundsInterface);
+                eventsRoundsInterface.id = "events_rounds_interface";
+                eventsRoundsInterface.classList.add('interface');
+
+                var resetButton = document.createElement('button');
+                eventsRoundsInterface.appendChild(resetButton);
+                resetButton.appendChild(document.createTextNode("Reset"));
+                resetButton.classList.add('resetButton');
+
+                spacerDiv = document.createElement('div');
+                eventsRoundsInterface.appendChild(spacerDiv);
+
+                var adjustEvents = document.createElement('h1');
+                spacerDiv.appendChild(adjustEvents);
+
+                adjustEvents.appendChild(document.createTextNode('Adjust Events:'));
+
+                eventsTable = document.createElement('table');
+                spacerDiv.appendChild(eventsTable);
+                eventsTable.id = "events_table";
+
+                spacerDiv = document.createElement('div');
+                eventsRoundsInterface.appendChild(spacerDiv);
+
+                var adjustIndividualRounds = document.createElement('h1');
+                adjustIndividualRounds.appendChild(document.createTextNode('Adjust Individual Rounds:'));
+                spacerDiv.appendChild(adjustIndividualRounds);
+                roundsTable = document.createElement('table');
+                spacerDiv.appendChild(roundsTable);
+                roundsTable.id = "rounds_table";
+
+                var thead = document.createElement('thead');
+                roundsTable.appendChild(thead);
+                var tr = document.createElement('tr');
+                thead.appendChild(tr);
+                var td;
+                td = document.createElement('td');
+                tr.appendChild(td);
+                td.appendChild(document.createTextNode('Event'));
+                td = document.createElement('td');
+                tr.appendChild(td);
+                td.appendChild(document.createTextNode('Round Names'));
+                td = document.createElement('td');
+                tr.appendChild(td);
+                td.appendChild(document.createTextNode('# Groups'));
+                td = document.createElement('td');
+                tr.appendChild(td);
+                td.appendChild(document.createTextNode('# Scrambles'));
+                td = document.createElement('td');
+                tr.appendChild(td);
+                td.appendChild(document.createTextNode('# Extra Scrambles'));
+                td = document.createElement('td');
+                tr.appendChild(td);
+                td.appendChild(document.createTextNode('Remove'));
+
+                roundsTbody = document.createElement('tbody');
+                roundsTable.appendChild(roundsTbody);
+
+                // TODO
+                //  - dragging doesn't work when cursor is outside of the table
+                //    - do we actually want to support that?
+                //
+                // This is pretty bad, as scrambler-interface doesn't actually include mootools.
+                // Ideally, we'd either move mootools into scrambler-interface (yuck), or remove the
+                // dependency of on scrambler-interface on mootools (yikes).
+                sortables = new Sortables(roundsTbody, {
+                        clone: true,
+                        opacity: 0.7,
+                        revert: true
+                });
+                sortables.addEvent('complete', function(e) {
+                        // A row has just been dropped somewhere, so we
+                        // update our url hash.
+                        updateHash();
+                });
+
+                resetButton.addEventListener('click', function() {
+                        location.hash = "";
+                }, false);
+                
+                function showPasswordChanged() {
+                        // IE <9 doesn't let you change an input's type after it has
+                        // been added to the dom, so we simply create a new one here
+                        // and clobber the old one.
+                        var oldPass = null;
+                        if(passwordInput) {
+                                oldPass = passwordInput.value;
+                        }
+                        passwordInput = document.createElement('input');
+                        if(oldPass) {
+                                passwordInput.value = oldPass;
+                        }
+                        if(showPasswordCheckbox.checked) {
+                                passwordInput.setAttribute('type', '');
+                        } else {
+                                passwordInput.setAttribute('type', 'password');
+                        }
+                        mark2.dom.emptyElement(passwordDiv);
+                        passwordDiv.appendChild(passwordInput);
+                        passwordInput.id = 'passwordInput';
+                        passwordInput.placeholder = "Password";
+                        passwordInput.addEventListener('change', callbacks.competitionChanged, false);
+                }
+                showPasswordChanged();
+                showPasswordCheckbox.addEventListener('change', showPasswordChanged, false);
+                // IE doesn't fire the event until the checkbox loses focus, this just makes it
+                // behave nicer.
+                showPasswordCheckbox.addEventListener('click', showPasswordChanged, false);
+
+                competitionNameInput.addEventListener('change', updateHash, false);
+
+                scrambleButton.addEventListener('click', callbacks.showScrambles, false);
+
+                initializeEventsTable();
+
+                function urlChanged() {
+                        initializeEvents();
+                        updateEventAmountValues();
+                        maybeEnableScrambleButton();
+                }
+                urlChanged();
+
+                // Must populate the gui before updating the hash
+                updateHash();
+
+                window.addEventListener('hashchange', urlChanged, false);
+
+                return div;
+        };
+
+        function addHelpLink(url) {
+                var topInterface = document.getElementById("top_interface");
+
+                var helpLinkDiv = document.createElement('div');
+                topInterface.appendChild(helpLinkDiv);
+                helpLinkDiv.id = 'helpLinkDiv';
+
+                var helpLink = document.createElement('a');
+                helpLink.appendChild(document.createTextNode("?"));
+                helpLink.href = url;
+                helpLinkDiv.appendChild(helpLink);
+        }
+
+        /*
+         * Events
+         */
+
+        var getPassword = function() {
+                return passwordInput.value;
+        };
+
+
+        /*
+         * Rounds
+         */
+
+        function countNonNullAndNonUndefined(arr) {
+                var n = 0;
+                for(var i = 0; i < arr.length; i++) {
+                        if(arr[i] !== null && arr[i] !== undefined) {
+                                n++;
+                        }
+                }
+                return n;
+        }
+
+        var scramblesGenerated = function(scramblesByGuid) {
+                generatedScrambleCountByGuid = {};
+                for(var guid in scramblesByGuid) {
+                        if(scramblesByGuid.hasOwnProperty(guid)) {
+                                generatedScrambleCountByGuid[guid] = countNonNullAndNonUndefined(scramblesByGuid[guid]);
+                        }
+                }
+                maybeEnableScrambleButton();
+        };
+
+        var puzzlesInitializing = function(initializationByPuzzle_) {
+                initializationByPuzzle = initializationByPuzzle_;
+                maybeEnableScrambleButton();
+                var initializationAndPuzzleCount = getInitializationAndPuzzleCount();
+                var initializationCount = initializationAndPuzzleCount[0];
+                var puzzleCount = initializationAndPuzzleCount[1];
+                return initializationCount >= puzzleCount;
+        };
+
+        /*
+         * Public Interface
+         */
+
+        return {
+                initialize: initialize,
+                addHelpLink: addHelpLink,
+                updateHash: updateHash,
+                getScrambleSheets: getScrambleSheets,
+                getTitle: getCompetitionName,
+                getPassword: getPassword,
+                scramblesGenerated: scramblesGenerated,
+                puzzlesInitializing: puzzlesInitializing
+        };
 })();
 
 })();

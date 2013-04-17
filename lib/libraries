@@ -34,7 +34,7 @@ http://www.amazon.com/V-Cube-7-Multicolor/dp/B001PGWDSU
 http://upload.wikimedia.org/wikipedia/commons/f/ff/Square-1_half-turn.jpg
 
 **** Javascript libraries ****
-	Note: some of these have been modified, so don't upgrade blindly
+        Note: some of these have been modified, so don't upgrade blindly
 mootools-core-1.4.2.js: http://mootools.net/core/76bf47062d6c1983d66ce47ad66aa0e0
 mootools-more-1.4.0.1.js: http://mootools.net/more/99f9dc2eb198e61569abc9839529ea00
 powertools-1.1.1.js: http://cpojer.net/PowerTools/#select=Class-Extras/*;History/*

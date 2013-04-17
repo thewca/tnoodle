@@ -4,7 +4,7 @@
  * unexpected or even harmful results.
  */
 if(!isset($_SESSION)) {
-	session_start();
+        session_start();
 }
 
 require_once "inc_private.php";
@@ -26,5 +26,5 @@ if (!isset($_SESSION["c_admin"]) || !refererMatchesHost()) :
     </body>
 </html>
 <?php
-	exit;
+        exit;
 endif;

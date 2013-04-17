@@ -1,12 +1,12 @@
 .ButtonGame {
 }
 .ButtonGameButton {
-	border: 1px solid black;
-	cursor: default;
+        border: 1px solid black;
+        cursor: default;
 }
 .ButtonGameUnsolvedButton {
-	background-color: black;
-	color: white;
-	text-align: center;
-	cursor: default;
+        background-color: black;
+        color: white;
+        text-align: center;
+        cursor: default;
 }

@@ -3,7 +3,7 @@ require_once "lib.php";
 session_start();
 $IE = (preg_match("/msie/i",$_SERVER["HTTP_USER_AGENT"]) || preg_match("/internet explorer/i",$_SERVER["HTTP_USER_AGENT"]));
 if (!isset($live))
-	$live = !preg_match("~^admin\\.~i",$_SERVER["HTTP_HOST"]);
+        $live = !preg_match("~^admin\\.~i",$_SERVER["HTTP_HOST"]);
 //echo "IE=$IE, live=$live<br>";
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -15,25 +15,25 @@ if (!isset($live))
 <META NAME="Description" CONTENT="">
 <!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /-->
 <style type="text/css">
-	body {font-family:arial,sans-serif;font-size:12px;font-weight:bold;background-color:white;color:#004;margin:0;}
-	table {font-size:12px;}
-	img {border:0;}
-	a {color:black;font-weight:bold;text-decoration:none;}
-	a:hover {color:#CC0000;}
-	div.header {height:34px;font-size:20px;font-weight:bold;color:white;background-color:#000022;}
-	b.p {padding:0 0 0 10px;color:#FFA;font-size:14px;}
-	b.pp {padding:0 0 0 35px;}
-	.list {background-color:#FFFFBB;height:120px;width:640px;overflow-x:auto;overflow-y:hidden;padding:10px; margin:0 0 0 20px;}
+        body {font-family:arial,sans-serif;font-size:12px;font-weight:bold;background-color:white;color:#004;margin:0;}
+        table {font-size:12px;}
+        img {border:0;}
+        a {color:black;font-weight:bold;text-decoration:none;}
+        a:hover {color:#CC0000;}
+        div.header {height:34px;font-size:20px;font-weight:bold;color:white;background-color:#000022;}
+        b.p {padding:0 0 0 10px;color:#FFA;font-size:14px;}
+        b.pp {padding:0 0 0 35px;}
+        .list {background-color:#FFFFBB;height:120px;width:640px;overflow-x:auto;overflow-y:hidden;padding:10px; margin:0 0 0 20px;}
 </style>
 </HEAD>
 <?
 if (array_key_exists("c_error", $_SESSION))
 {
-	echo "<BODY onload='alert(\"".$_SESSION["c_error"]."\")'>\r\n";
-	unset($_SESSION["c_error"]);
+        echo "<BODY onload='alert(\"".$_SESSION["c_error"]."\")'>\r\n";
+        unset($_SESSION["c_error"]);
 }
 else
-	echo "<BODY>\r\n";
+        echo "<BODY>\r\n";
 
 if (!$live)
 {
@@ -41,20 +41,20 @@ if (!$live)
 <script>
 function showPWInput(cid,divid)
 {
-	var obj;
-	var x = 1;
-	while (obj = document.getElementById("div"+x))
-	{
-		obj.innerHTML = "";
-		obj.style.display = "none";
-		x++;
-	}
-	with (document.getElementById("div"+divid))
-	{
-		innerHTML = "<form style='margin:6px 0px 6px 50px;' action='identification.php' method=post><input type=hidden name=id value="+cid+">password: <input type=password id=pw name=pw style='width:80px;'> <input type=submit value=enter></form>";
-		style.display = "inline";
-		document.getElementById("pw").focus();
-	}
+        var obj;
+        var x = 1;
+        while (obj = document.getElementById("div"+x))
+        {
+                obj.innerHTML = "";
+                obj.style.display = "none";
+                x++;
+        }
+        with (document.getElementById("div"+divid))
+        {
+                innerHTML = "<form style='margin:6px 0px 6px 50px;' action='identification.php' method=post><input type=hidden name=id value="+cid+">password: <input type=password id=pw name=pw style='width:80px;'> <input type=submit value=enter></form>";
+                style.display = "inline";
+                document.getElementById("pw").focus();
+        }
 }
 </script>
 <?
@@ -62,74 +62,74 @@ function showPWInput(cid,divid)
 
 function datesToStr($date_b,$date_e)
 {
-	$mons = array(1 => "Jan", 2 => "Feb", 3 => "Mar", 4 => "Apr", 5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Aug", 9 => "Sep", 10 => "Oct", 11 => "Nov", 12 => "Dec");
-	//
-	$m_b = (int)substr($date_b,5,2);
-	$d_b = (int)substr($date_b,8,2);
-	$y_b = (int)substr($date_b,0,4);
-	$m_e = (int)substr($date_e,5,2);
-	$d_e = (int)substr($date_e,8,2);
-	$y_e = (int)substr($date_e,0,4);
-	if ($y_b==$y_e)
-	{
-		if ($m_b==$m_e)
-		{
-			if ($d_b==$d_e)
-				return $mons[$m_b]." ".$d_b.", ".$y_b;
-			else
-				return $mons[$m_b]." ".$d_b."-".$d_e.", ".$y_b;
-		}
-		else
-			return $mons[$m_b]." ".$d_b."-".$mons[$m_e]." ".$d_e.", ".$y_b;
-	}
-	else
-		return $mons[$m_b]." ".$d_b.", ".$y_b." - ".$mons[$m_e]." ".$d_e.", ".$y_e;
+        $mons = array(1 => "Jan", 2 => "Feb", 3 => "Mar", 4 => "Apr", 5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Aug", 9 => "Sep", 10 => "Oct", 11 => "Nov", 12 => "Dec");
+        //
+        $m_b = (int)substr($date_b,5,2);
+        $d_b = (int)substr($date_b,8,2);
+        $y_b = (int)substr($date_b,0,4);
+        $m_e = (int)substr($date_e,5,2);
+        $d_e = (int)substr($date_e,8,2);
+        $y_e = (int)substr($date_e,0,4);
+        if ($y_b==$y_e)
+        {
+                if ($m_b==$m_e)
+                {
+                        if ($d_b==$d_e)
+                                return $mons[$m_b]." ".$d_b.", ".$y_b;
+                        else
+                                return $mons[$m_b]." ".$d_b."-".$d_e.", ".$y_b;
+                }
+                else
+                        return $mons[$m_b]." ".$d_b."-".$mons[$m_e]." ".$d_e.", ".$y_b;
+        }
+        else
+                return $mons[$m_b]." ".$d_b.", ".$y_b." - ".$mons[$m_e]." ".$d_e.", ".$y_e;
 }
 
 function listComps($txt)
 {
-	global $result, $count, $IE, $live;
-	$width = 300;
-	$twidth = sql_num_rows($result)*$width;
-	echo "<div class=header>";
-	if ($IE) 
-		echo "<span style='vertical-align:-6px;margin:12px;'>$txt</span></div>";
-	else
-		echo "<img src='img/header-tip.gif'><span style='vertical-align:8px'>$txt</span></div>";
+        global $result, $count, $IE, $live;
+        $width = 300;
+        $twidth = sql_num_rows($result)*$width;
+        echo "<div class=header>";
+        if ($IE) 
+                echo "<span style='vertical-align:-6px;margin:12px;'>$txt</span></div>";
+        else
+                echo "<img src='img/header-tip.gif'><span style='vertical-align:8px'>$txt</span></div>";
 
-	echo "<DIV class=list>";
-	//echo "<P style='width:".$twidth."px;'>";
-	echo "<table cellpadding=0 cellspacing=0 width=".$twidth."><tr valign=top>";
-	while ($row=cased_mysql_fetch_array($result))
-	{
-		$count++;
-		//echo "<SPAN style='width:".$width."px;'>";
-		echo "<td><div style='width:".$width."px;'>";
-		echo "<B class=p>";
-		if ($live)
-			echo "<a href='live.php?cid=".$row["id"]."'>";
-		else
-			echo "<a style='cursor:pointer;' onclick='showPWInput(".$row["id"].",$count);'>";
-		echo "<img src='img/cube-icon.gif' style='vertical-align:-5px;'> ".$row["name"]."</a></B><br>";
-		echo "<span id=div".$count." style='display:none;'></span>";
-		echo "<B class=pp>".datesToStr($row["date_b"],$row["date_e"])."</B><br>";
-		echo "<B class=pp>".$row["place"]." - ".$row["countryname"]."</B><br>";
-		if ($website = $row["website"])
-		{
-			$pos = strpos($website,"/");
-			if (!$pos)
-				$website_host = $website;
-			else
-				$website_host = substr($website,0,$pos);
-			if (substr($website,0,7) != "http://") $website = "http://$website";
-			echo "<B class=pp><a href='$website' target=_blank>$website_host</a></B><br>";
-		}
-		//echo "</SPAN>";
-		echo "</div></td>";
-	}
-	echo "</tr></table>";
-	//echo "</P>";
-	echo "</DIV><p>";
+        echo "<DIV class=list>";
+        //echo "<P style='width:".$twidth."px;'>";
+        echo "<table cellpadding=0 cellspacing=0 width=".$twidth."><tr valign=top>";
+        while ($row=cased_mysql_fetch_array($result))
+        {
+                $count++;
+                //echo "<SPAN style='width:".$width."px;'>";
+                echo "<td><div style='width:".$width."px;'>";
+                echo "<B class=p>";
+                if ($live)
+                        echo "<a href='live.php?cid=".$row["id"]."'>";
+                else
+                        echo "<a style='cursor:pointer;' onclick='showPWInput(".$row["id"].",$count);'>";
+                echo "<img src='img/cube-icon.gif' style='vertical-align:-5px;'> ".$row["name"]."</a></B><br>";
+                echo "<span id=div".$count." style='display:none;'></span>";
+                echo "<B class=pp>".datesToStr($row["date_b"],$row["date_e"])."</B><br>";
+                echo "<B class=pp>".$row["place"]." - ".$row["countryname"]."</B><br>";
+                if ($website = $row["website"])
+                {
+                        $pos = strpos($website,"/");
+                        if (!$pos)
+                                $website_host = $website;
+                        else
+                                $website_host = substr($website,0,$pos);
+                        if (substr($website,0,7) != "http://") $website = "http://$website";
+                        echo "<B class=pp><a href='$website' target=_blank>$website_host</a></B><br>";
+                }
+                //echo "</SPAN>";
+                echo "</div></td>";
+        }
+        echo "</tr></table>";
+        //echo "</P>";
+        echo "</DIV><p>";
 }
 
 echo "<table cellspacing=0 cellpadding=0 width=100% height=100%>";
@@ -139,9 +139,9 @@ echo "<table cellspacing=0 cellpadding=0 height=100%>";
 echo "<tr valign=top><td><img src='img/home-top.gif'></td></tr>";
 $test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
 if ($test)
-	echo "<tr height=100%><td align=right><div style='font-size:80px;font-weight:bold;'>TEST</div><div style='font-size:34px;font-weight:bold;'>environment</div></td></tr></table>";
+        echo "<tr height=100%><td align=right><div style='font-size:80px;font-weight:bold;'>TEST</div><div style='font-size:34px;font-weight:bold;'>environment</div></td></tr></table>";
 else
-	echo "<tr valign=bottom><td><img src='img/home-bottom.gif'></td></tr></table>";
+        echo "<tr valign=bottom><td><img src='img/home-bottom.gif'></td></tr></table>";
 
 echo "<td width=60%><br><br><img src='img/logo.gif'><br><br><br>";
 
@@ -149,11 +149,11 @@ require_once "inc_private.php";
 
 if ($test)
 {
-	$DBH = new PDO(SQL_TEST_DSN, SQL_TEST_USER, SQL_TEST_PASSWORD);
+        $DBH = new PDO(SQL_TEST_DSN, SQL_TEST_USER, SQL_TEST_PASSWORD);
 } 
 else 
 {
-	$DBH = new PDO(SQL_DSN, SQL_USER, SQL_PASSWORD);
+        $DBH = new PDO(SQL_DSN, SQL_USER, SQL_PASSWORD);
 }
 //
 $count = 0;

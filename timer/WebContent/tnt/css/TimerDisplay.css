@@ -1,32 +1,32 @@
 @font-face {  
-	font-family: lcd;
-	src: 	local('Digiface Regular'), 
-			url("../media/Digiface Regular.ttf") format("truetype");  
+        font-family: lcd;
+        src:    local('Digiface Regular'), 
+                        url("../media/Digiface Regular.ttf") format("truetype");  
 }
 #time, #sizer {
-	font-family: lcd;
-	position: relative;
-	text-align: center;
+        font-family: lcd;
+        position: relative;
+        text-align: center;
 }
 .inspecting {
-	color: red;
+        color: red;
 }
 .keysDown {
-	color: green;
+        color: green;
 }
 .unfocused {
-	color: gray;
+        color: gray;
 }
 .fullscreenTimerBg {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	background-color: rgba(0,0,0,1);
-	z-index: 6;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,1);
+        z-index: 6;
 }
 .fullscreenTimer {
-	color: red;
-	z-index: 7;
+        color: red;
+        z-index: 7;
 }

@@ -18,11 +18,11 @@ If `PUZZLE_NAME` is not specified, returns a list of `PUZZLE_STATUS`'s in json f
 
 A `PUZZLE_STATUS` looks like this:
 
-	{
-		longName: LONG_NAME,
-		shortName: SHORT_NAME,
-		initializationStatus: INITIALIZATION_STATUS
-	}
+        {
+                longName: LONG_NAME,
+                shortName: SHORT_NAME,
+                initializationStatus: INITIALIZATION_STATUS
+        }
 
 `INITIALIZATION_STATUS` is a double between 0 and 1 inclusive, and should increase monotonically to 1. Most programs can happily ignore this, but some scramblers take a very long time to initialize (4x4x4 can take several minutes), so this allows programs to let the user know that things are actually happening. `initializationStatus` is only included if the includeStatus parameter is specified.
 
@@ -39,7 +39,7 @@ If `PUZZLE_NAME` is specified, returns just the `PUZZLE_STATUS` for the specifie
 
 `PUZZLE_REQUEST`'s look like this:
 
-	TITLE=PUZZLE*COUNT*COPIES*SCHEME
+        TITLE=PUZZLE*COUNT*COPIES*SCHEME
 
 PUZZLE can be any scrambler from [puzzles/](/puzzles/).
 
@@ -76,37 +76,37 @@ Request: [scramble/.json?3x3 Round 1=333\*1\*2&3x3 Round 2=333\*1\*1](/scramble/
 
 Response:
 
-	[{
-	    "scrambles": ["D2 U2 L2 B R2 B' D2 L2 F2 L2 F2 R D2 U F2 R D' B L D' U2"],
-	    "extraScrambles": [ ... ] // This is optional! (ignored if fmc)
-	    "scrambler": "333",
-	    "copies": 2,
-	    "title": "3x3 Round 1",
-	    "fmc": false,
-	    "colorScheme": {
-	        "U": "ffffff",
-	        "D": "ffff00",
-	        "F": "00ff00",
-	        "B": "0000ff",
-	        "R": "ff0000",
-	        "L": "ff8000"
-	    }
-	}, {
-	    "scrambles": ["D F2 D' B2 D2 L2 U L2 U2 L2 U' R' D2 L2 B U2 R B2 U2 B'"],
-	    "extraScrambles": [ ... ] // This is optional! (ignored if fmc) 
-	    "scrambler": "333",
-	    "copies": 1,
-	    "title": "3x3 Round 2",
-	    "fmc": false,
-	    "colorScheme": {
-	        "U": "ffffff",
-	        "D": "ffff00",
-	        "F": "00ff00",
-	        "B": "0000ff",
-	        "R": "ff0000",
-	        "L": "ff8000"
-	    }
-	}]
+        [{
+            "scrambles": ["D2 U2 L2 B R2 B' D2 L2 F2 L2 F2 R D2 U F2 R D' B L D' U2"],
+            "extraScrambles": [ ... ] // This is optional! (ignored if fmc)
+            "scrambler": "333",
+            "copies": 2,
+            "title": "3x3 Round 1",
+            "fmc": false,
+            "colorScheme": {
+                "U": "ffffff",
+                "D": "ffff00",
+                "F": "00ff00",
+                "B": "0000ff",
+                "R": "ff0000",
+                "L": "ff8000"
+            }
+        }, {
+            "scrambles": ["D F2 D' B2 D2 L2 U L2 U2 L2 U' R' D2 L2 B U2 R B2 U2 B'"],
+            "extraScrambles": [ ... ] // This is optional! (ignored if fmc) 
+            "scrambler": "333",
+            "copies": 1,
+            "title": "3x3 Round 2",
+            "fmc": false,
+            "colorScheme": {
+                "U": "ffffff",
+                "D": "ffff00",
+                "F": "00ff00",
+                "B": "0000ff",
+                "R": "ff0000",
+                "L": "ff8000"
+            }
+        }]
 
 
 ### view/PUZZLE.[png|svg|json]?scramble=SCRAMBLE&width=WIDTH&height=HEIGHT ###

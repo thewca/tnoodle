@@ -51,9 +51,9 @@ function makeCCC(n) {
   var moves = [];
   var base = "L' U R' F' U L2 U2 L' U' L U2 D R' D' F2 R2 U'".split(" ");
   for(var i = 1; i<=n/2; i++) {
-	  for(var j = 0; j < base.length; j++) {
-		  moves.push(i + base[j]);
-	  }
+          for(var j = 0; j < base.length; j++) {
+                  moves.push(i + base[j]);
+          }
   }
   return moves.join(" ");
 }

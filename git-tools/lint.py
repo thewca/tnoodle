@@ -19,6 +19,12 @@ lintIgnoredDirectories = [
    'threephase/src/cs/threephase/',
 ]
 
+ignoredExtensions = {
+    ".sfd",
+    ".classpath",
+    ".project",
+}
+
 JSLINT_IGNORED_ERRORS = {
   # html/css errors
   'type is unnecessary.',
@@ -46,7 +52,12 @@ JSLINT_IGNORED_ERRORS = {
 NO_LINT_KEYWORD = 'BLW-DUCPHAM'
 
 UNCOMMITABLE_PHRASES = {
-    '<'+'<'+'<',
+    '<'+'<'+'<'
+}
+
+# These uncommitable phrases only apply to files that we
+# want to lint (3rd party code is excempt from this)
+LINT_UNCOMMITABLE_PHRASES = {
     '\t'
 }
 
@@ -100,14 +111,16 @@ def lint(files):
             continue
         elif os.path.islink(f):
             continue
-        fileName, ext = os.path.splitext(f)
-        if ext == ".sfd":
+
+        # prefix with a space in order to change the behavior with
+        # dotfiles
+        _, ext = os.path.splitext(" " + os.path.basename(f))
+        if ext in ignoredExtensions:
             continue
 
         lines = file(f).readlines()
         for lineNumber, line in enumerate(lines):
             for uncommitablePhrase in UNCOMMITABLE_PHRASES:
-                error = None
                 if uncommitablePhrase in line:
                     error = "Illegal characters"
                     error = "%s:%s:%s:%s" % ( f, lineNumber+1, error, line )
@@ -123,6 +136,13 @@ def lint(files):
                 error = "Trailing whitespace"
                 error = "%s:%s:%s:%s" % ( f, lineNumber+1, error, line )
                 failures.append(error)
+
+            for uncommitablePhrase in LINT_UNCOMMITABLE_PHRASES:
+                if uncommitablePhrase in line:
+                    error = "Illegal characters"
+                    error = "%s:%s:%s:%s" % ( f, lineNumber+1, error, line )
+                    failures.append(error)
+
 
         if ext == '.js' or ext == '.html':
             subprocess.check_call(['java', '-version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

@@ -4,13 +4,13 @@ import subprocess
 import sys
 
 PREFIX_REMOTE = {
-	'twisty.js/twisty.js': 'git@github.com:jfly/twisty.js.git',
-	'git-tools': 'git@github.com:jfly/git-tools.git',
-	'sq12phase/src/cs/sq12phase': 'git@github.com:cubing/sq12phase.git',
-	'scrambler-interface/WebContent/scrambler-interface': 'git@github.com:cubing/scrambler-interface.git',
-	'min2phase/src/cs/min2phase': 'git@github.com:cubing/min2phase.git',
-	'threephase/src/cs/threephase': 'git@github.com:cubing/TPR-4x4x4-Solver.git',
-	'cubecomps/WebContent/cubecomps': 'git@github.com:cubing/cubecomps.com.git',
+        'twisty.js/twisty.js': 'git@github.com:jfly/twisty.js.git',
+        'git-tools': 'git@github.com:jfly/git-tools.git',
+        'sq12phase/src/cs/sq12phase': 'git@github.com:cubing/sq12phase.git',
+        'scrambler-interface/WebContent/scrambler-interface': 'git@github.com:cubing/scrambler-interface.git',
+        'min2phase/src/cs/min2phase': 'git@github.com:cubing/min2phase.git',
+        'threephase/src/cs/threephase': 'git@github.com:cubing/TPR-4x4x4-Solver.git',
+        'cubecomps/WebContent/cubecomps': 'git@github.com:cubing/cubecomps.com.git',
 }
 
 def git(cmds, options=None, showStatus=True, assertSuccess=True):

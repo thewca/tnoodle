@@ -6,7 +6,7 @@ require_once "lib_post.php";
 
 function error($err)
 {
-	global $color, $light_color, $dark_color;
+        global $color, $light_color, $dark_color;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <HTML>
@@ -14,9 +14,9 @@ function error($err)
 <TITLE>Operation canceled</TITLE>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
-	body {font-family:verdana,sans-serif;font-size:11px;margin:10px 10px;background-color:<?=$color?>;color:#FFFFCC;}
-	.header {font-weight:bold;background-color:<?=$dark_color?>;font-size:12px;padding:4px 6px;margin-bottom:4px;}
-	.errors {margin-left:14px;}
+        body {font-family:verdana,sans-serif;font-size:11px;margin:10px 10px;background-color:<?=$color?>;color:#FFFFCC;}
+        .header {font-weight:bold;background-color:<?=$dark_color?>;font-size:12px;padding:4px 6px;margin-bottom:4px;}
+        .errors {margin-left:14px;}
 </style>
 </HEAD>
 <BODY>
@@ -30,7 +30,7 @@ No action has been taken. (<?=($err+10)?>)<br>
 </BODY>
 </HTML>
 <?
-	die();
+        die();
 }
 
 $color = "#4b5b51";
@@ -47,9 +47,9 @@ if (cased_mysql_result($result,0,"admin_pw")!=$_POST["pw"])
 <TITLE>Erroneous password</TITLE>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
-	body {font-family:verdana,sans-serif;font-size:11px;margin:10px 10px;background-color:<?=$color?>;color:#FFFFCC;}
-	.header {font-weight:bold;background-color:<?=$dark_color?>;font-size:12px;padding:4px 6px;margin-bottom:4px;}
-	.errors {margin-left:14px;}
+        body {font-family:verdana,sans-serif;font-size:11px;margin:10px 10px;background-color:<?=$color?>;color:#FFFFCC;}
+        .header {font-weight:bold;background-color:<?=$dark_color?>;font-size:12px;padding:4px 6px;margin-bottom:4px;}
+        .errors {margin-left:14px;}
 </style>
 </HEAD>
 <BODY>
@@ -59,7 +59,7 @@ if (cased_mysql_result($result,0,"admin_pw")!=$_POST["pw"])
 </BODY>
 </HTML>
 <?
-	die();
+        die();
 }
 
 $cat_id = _POST_num("cat_id");
@@ -78,14 +78,14 @@ if (!$noscore) error(2);
 
 if ($ncmp_id)
 {
-	$qualified = strict_query("SELECT * FROM $regstable WHERE cat_id=? AND round=? AND comp_id=?", array($cat_id,$round,$ncmp_id));
-	$qualified = (!sql_num_rows($qualified));
-	if (!$qualified) error(3);
+        $qualified = strict_query("SELECT * FROM $regstable WHERE cat_id=? AND round=? AND comp_id=?", array($cat_id,$round,$ncmp_id));
+        $qualified = (!sql_num_rows($qualified));
+        if (!$qualified) error(3);
 
-	strict_query("UPDATE $regstable SET comp_id=? WHERE cat_id=? AND round=? AND comp_id=? LIMIT 1", array($ncmp_id,$cat_id,$round,$comp_id));
+        strict_query("UPDATE $regstable SET comp_id=? WHERE cat_id=? AND round=? AND comp_id=? LIMIT 1", array($ncmp_id,$cat_id,$round,$comp_id));
 }
 else
-	strict_query("DELETE FROM $regstable WHERE cat_id=? AND round=? AND comp_id=? LIMIT 1", array($cat_id,$round,$comp_id));
+        strict_query("DELETE FROM $regstable WHERE cat_id=? AND round=? AND comp_id=? LIMIT 1", array($cat_id,$round,$comp_id));
 
 sql_close();
 ?>

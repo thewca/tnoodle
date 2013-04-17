@@ -239,112 +239,112 @@ is resolved.
 }
 
 .progressDiv {
-	border: 1px solid #00C0C0;
-	background-color: #DEE;
+        border: 1px solid #00C0C0;
+        background-color: #DEE;
   padding-right: 10px;
 
-	background-image:
-		-webkit-linear-gradient(
-		-45deg,
-		rgba(0, 192, 192, 0.35) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(0, 192, 192, 0.35) 50%,
-		rgba(0, 192, 192, 0.35) 75%,
-		transparent 75%,
-		transparent
-	);
-	background-image:
-		-moz-linear-gradient(
-		-45deg,
-		rgba(0, 192, 192, 0.35) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(0, 192, 192, 0.35) 50%,
-		rgba(0, 192, 192, 0.35) 75%,
-		transparent 75%,
-		transparent
-	);
-	background-image:
-		-ms-linear-gradient(
-		-45deg,
-		rgba(0, 192, 192, 0.35) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(0, 192, 192, 0.35) 50%,
-		rgba(0, 192, 192, 0.35) 75%,
-		transparent 75%,
-		transparent
-	);
-	background-image:
-		linear-gradient(
-		-45deg,
-		rgba(0, 192, 192, 0.35) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(0, 192, 192, 0.35) 50%,
-		rgba(0, 192, 192, 0.35) 75%,
-		transparent 75%,
-		transparent
-	);
+        background-image:
+                -webkit-linear-gradient(
+                -45deg,
+                rgba(0, 192, 192, 0.35) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(0, 192, 192, 0.35) 50%,
+                rgba(0, 192, 192, 0.35) 75%,
+                transparent 75%,
+                transparent
+        );
+        background-image:
+                -moz-linear-gradient(
+                -45deg,
+                rgba(0, 192, 192, 0.35) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(0, 192, 192, 0.35) 50%,
+                rgba(0, 192, 192, 0.35) 75%,
+                transparent 75%,
+                transparent
+        );
+        background-image:
+                -ms-linear-gradient(
+                -45deg,
+                rgba(0, 192, 192, 0.35) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(0, 192, 192, 0.35) 50%,
+                rgba(0, 192, 192, 0.35) 75%,
+                transparent 75%,
+                transparent
+        );
+        background-image:
+                linear-gradient(
+                -45deg,
+                rgba(0, 192, 192, 0.35) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(0, 192, 192, 0.35) 50%,
+                rgba(0, 192, 192, 0.35) 75%,
+                transparent 75%,
+                transparent
+        );
 
-	-webkit-background-size:50px 50px;
-	-moz-background-size:50px 50px;
-	-ms-background-size:50px 50px;
-	background-size:50px 50px;
+        -webkit-background-size:50px 50px;
+        -moz-background-size:50px 50px;
+        -ms-background-size:50px 50px;
+        background-size:50px 50px;
 
-	-webkit-animation:move 2s linear infinite;
-	-moz-animation:move 2s linear infinite;
-	-ms-animation:move 2s linear infinite;
-	animation:move 2s linear infinite;
+        -webkit-animation:move 2s linear infinite;
+        -moz-animation:move 2s linear infinite;
+        -ms-animation:move 2s linear infinite;
+        animation:move 2s linear infinite;
 
-	-webkit-border-radius:15px;
-	-moz-border-radius:15px;
-	-ms-border-radius:15px;
-	border-radius:15px;
+        -webkit-border-radius:15px;
+        -moz-border-radius:15px;
+        -ms-border-radius:15px;
+        border-radius:15px;
 
-	overflow: hidden;
+        overflow: hidden;
 
-	-webkit-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
-	-moz-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
-	-ms-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
-	box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+        -webkit-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+        -moz-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+        -ms-box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
+        box-shadow:inset 0 10px 0 rgba(255,255,255,.2);
 }
 .bar > span:after {
-	display: none;
+        display: none;
 }
 /*
 Animate the stripes
 */
 @-webkit-keyframes move{
   0% {
-  	background-position: 0 0;
+        background-position: 0 0;
   }
   100% {
-  	background-position: 50px 50px;
+        background-position: 50px 50px;
   }
 }
 @-moz-keyframes move{
   0% {
-  	background-position: 0 0;
+        background-position: 0 0;
   }
   100% {
-  	background-position: 50px 50px;
+        background-position: 50px 50px;
   }
 }
 @-ms-keyframes move{
   0% {
-  	background-position: 0 0;
+        background-position: 0 0;
   }
   100% {
-  	background-position: 50px 50px;
+        background-position: 50px 50px;
   }
 }
 @keyframes move{
   0% {
-  	background-position: 0 0;
+        background-position: 0 0;
   }
   100% {
-  	background-position: 50px 50px;
+        background-position: 50px 50px;
   }
 }

@@ -26,10 +26,10 @@ var Solve = mongoose.model('Solve', SolveSchema);
 var solveMillis = 1000;
 var moves = [];
 var storeObject = {
-	turns: moves,
-	gameName: "3x3x3",
-	inspectSec: 15,
-	solveMillis: solveMillis
+        turns: moves,
+        gameName: "3x3x3",
+        inspectSec: 15,
+        solveMillis: solveMillis
 };
 var solveInstance = new Solve(storeObject);
 util.puts(moves);
@@ -42,6 +42,6 @@ solveInstance.save(function(err){
   util.puts("SAVED SOME SHIT SOMEWHERE");
 
   if(err){
-	  util.puts("db error : " + err);
+          util.puts("db error : " + err);
   }
 });

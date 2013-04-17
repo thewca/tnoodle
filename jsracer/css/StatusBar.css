@@ -1,11 +1,11 @@
 .statusBar {
-	position: absolute;
-	top: 0px;
-	left: 15%; /* 100-70/2 */
-	width: 70%;
-	text-align: center;
-	background: red;
-	border-radius: 0 0 10px 10px;
-	box-shadow: 5px 5px 5px #ccc;
-	z-index: 2
+        position: absolute;
+        top: 0px;
+        left: 15%; /* 100-70/2 */
+        width: 70%;
+        text-align: center;
+        background: red;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 5px 5px 5px #ccc;
+        z-index: 2
 }

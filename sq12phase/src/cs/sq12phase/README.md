@@ -8,5 +8,5 @@ Square One Solver
 I haven't checked whether the solution is correct LOL.
 
 Algorithm:
-	phase1: to square shape and fix parity
-	phase2: solve
+        phase1: to square shape and fix parity
+        phase2: solve

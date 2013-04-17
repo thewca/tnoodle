@@ -5,7 +5,7 @@ require_once "lib_ref_admin.php";
 <HTML>
 <HEAD>
 <style type="text/css">
-	body {background-color:#4E320C;font-family:arial,sans-serif;font-size:12px;color:#FFFFCC;}
+        body {background-color:#4E320C;font-family:arial,sans-serif;font-size:12px;color:#FFFFCC;}
 </style>
 </HEAD>
 <BODY>
@@ -13,10 +13,10 @@ require_once "lib_ref_admin.php";
 
 function _error($msg)
 {
-	echo $msg."\r\n";
-	echo "<script>self.focus();</script>\r\n";
-	echo "</BODY></HTML>";
-	die();
+        echo $msg."\r\n";
+        echo "<script>self.focus();</script>\r\n";
+        echo "</BODY></HTML>";
+        die();
 }
 
 $test = preg_match("~^test\\.~i",$_SERVER["HTTP_HOST"]);
@@ -30,9 +30,9 @@ if (!$img) _error ("Error: not a real JPEG image in its inside!");
 imagedestroy($img);
 //
 if (!move_uploaded_file ($_FILES["file"]["tmp_name"], DIR_UPLOADS_ABS.($test?"test_":"")."bg_" . $_SESSION["c_id"] . ".jpg"))
-	_error("Can't copy file!!!");
+        _error("Can't copy file!!!");
 else
-	{
+        {
 ?>
 
 <script>
@@ -41,7 +41,7 @@ window.close();
 </script>
 
 <?
-	}
+        }
 ?>
 </BODY>
 </HTML>

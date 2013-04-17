@@ -2,11 +2,11 @@
 <!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
         "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
         
-<urlrewrite>	
+<urlrewrite>    
 
-	<rule>
-		<from>^/tnt/$</from>
-		<to type="forward">/tnt/tnt.html</to>
-	</rule>
+        <rule>
+                <from>^/tnt/$</from>
+                <to type="forward">/tnt/tnt.html</to>
+        </rule>
 
 </urlrewrite>

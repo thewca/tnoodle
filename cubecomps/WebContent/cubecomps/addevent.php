@@ -7,9 +7,9 @@ $_GETid = _GET_num("id");
 
 if ($_GETid)
 {
-	require_once "db.php";
-	addEve($_GETid);
-	sql_close();
-	header("Location: events.php\r\n");
+        require_once "db.php";
+        addEve($_GETid);
+        sql_close();
+        header("Location: events.php\r\n");
 }
 ?>

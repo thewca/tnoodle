@@ -16,9 +16,9 @@ import pdb
 
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
-	if tb:
-		traceback.print_exception(etype, value, tb)
-	pdb.post_mortem(tb)
+        if tb:
+                traceback.print_exception(etype, value, tb)
+        pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
 def runCmd(argv, showStatus=False, interactive=False):
@@ -48,7 +48,7 @@ def runCmd(argv, showStatus=False, interactive=False):
     return p.returncode, stdout, stderr
 
 def entryPoint():
-	return split(abspath(__file__))[0]
+        return split(abspath(__file__))[0]
 gitToolsDir = join(entryPoint(), 'git-tools')
 sys.path.append(gitToolsDir)
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
@@ -70,431 +70,431 @@ RESOURCE_FOLDER_BIN = 'bin_%s' % RESOURCE_FOLDER
 PROJECT_FILE_NAME = 'tmtproject.py'
 
 def dfs(node, path=(), exclude=set()):
-	assert node not in path, "Not a dag!"
-	visited = [ node, ]
-	path += ( node, )
-	for child in node.getDependencies():
-		if child in exclude:
-			continue
-		visited += dfs(child, path, exclude=exclude)
-	return visited
+        assert node not in path, "Not a dag!"
+        visited = [ node, ]
+        path += ( node, )
+        for child in node.getDependencies():
+                if child in exclude:
+                        continue
+                visited += dfs(child, path, exclude=exclude)
+        return visited
 
 def rightPrune(nodes):
-	prunedNodes = []
-	for node in reversed(nodes):
-		if node not in prunedNodes:
-			prunedNodes.insert(0, node)
-	return prunedNodes
+        prunedNodes = []
+        for node in reversed(nodes):
+                if node not in prunedNodes:
+                        prunedNodes.insert(0, node)
+        return prunedNodes
 
 def isTopologicalSort(sortedNodes, exclude=set()):
-	for i, node in enumerate(sortedNodes):
-		for child in node.getDependencies():
-			if child in exclude:
-				continue
-			childIndex = sortedNodes.index(child)
-			assert childIndex != i
-			if childIndex < i:
-				return False
-	return True
+        for i, node in enumerate(sortedNodes):
+                for child in node.getDependencies():
+                        if child in exclude:
+                                continue
+                        childIndex = sortedNodes.index(child)
+                        assert childIndex != i
+                        if childIndex < i:
+                                return False
+        return True
 
 def topologicalSort(projects, exclude=set()):
-	potentialRoots = projects[:]
-	for excluded in exclude:
-		if excluded in potentialRoots:
-			potentialRoots.remove(excluded)
-	for project in projects:
-		for dep in project.getDependencies():
-			if dep in potentialRoots:
-				potentialRoots.remove(dep)
-	assert len(potentialRoots) > 0
+        potentialRoots = projects[:]
+        for excluded in exclude:
+                if excluded in potentialRoots:
+                        potentialRoots.remove(excluded)
+        for project in projects:
+                for dep in project.getDependencies():
+                        if dep in potentialRoots:
+                                potentialRoots.remove(dep)
+        assert len(potentialRoots) > 0
 
-	class UltimateRoot(tmt.TmtProject):
-		def __init__(self, name, description):
-			# Note that we do *not* call our parent's constructer here,
-			# as we do not want to be added to the global list of projects
-			self.name = name
-			self.description = description
+        class UltimateRoot(tmt.TmtProject):
+                def __init__(self, name, description):
+                        # Note that we do *not* call our parent's constructer here,
+                        # as we do not want to be added to the global list of projects
+                        self.name = name
+                        self.description = description
 
-		def compile(self):
-			pass
+                def compile(self):
+                        pass
 
-		def dist(self):
-			assert False, "make dist without a -p PROJECTNAME makes no sense"
+                def dist(self):
+                        assert False, "make dist without a -p PROJECTNAME makes no sense"
 
-		def run(self):
-			assert False, "make run without a -p PROJECTNAME makes no sense"
+                def run(self):
+                        assert False, "make run without a -p PROJECTNAME makes no sense"
 
-		def getDependencies(self):
-			return potentialRoots
+                def getDependencies(self):
+                        return potentialRoots
 
-		def check(self):
-			return
+                def check(self):
+                        return
 
-		def clean(self):
-			for dep in self.getDependencies():
-				dep.clean()
-	ultimateRoot = UltimateRoot(name="all", description="")
+                def clean(self):
+                        for dep in self.getDependencies():
+                                dep.clean()
+        ultimateRoot = UltimateRoot(name="all", description="")
 
-	visitedNodes = dfs(ultimateRoot, exclude=exclude)
-	assert visitedNodes[0] == ultimateRoot
-	visitedNodes = visitedNodes[1:]
-	visitedNodes = rightPrune(visitedNodes)
-	assert isTopologicalSort(visitedNodes, exclude=exclude)
-	return visitedNodes, ultimateRoot
+        visitedNodes = dfs(ultimateRoot, exclude=exclude)
+        assert visitedNodes[0] == ultimateRoot
+        visitedNodes = visitedNodes[1:]
+        visitedNodes = rightPrune(visitedNodes)
+        assert isTopologicalSort(visitedNodes, exclude=exclude)
+        return visitedNodes, ultimateRoot
 
 class tmt:
-	def _cdEntryPoint(self):
-		os.chdir(entryPoint())
-		assert exists('README.md')
+        def _cdEntryPoint(self):
+                os.chdir(entryPoint())
+                assert exists('README.md')
 
-		retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
+                retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
 
-		# On Lucas's computer, git describe sometimes returns a blank string. Try again a few times if this is the case.
-		for i in range(8):
-			if stdout != "":
-				break;
-			retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
+                # On Lucas's computer, git describe sometimes returns a blank string. Try again a few times if this is the case.
+                for i in range(8):
+                        if stdout != "":
+                                break;
+                        retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
 
-		assert retVal == 0
-		self.VERSION = stdout.strip()
-		versionPrefix = "v"
-		assert self.VERSION.startswith(versionPrefix)
-		self.VERSION = self.VERSION[len(versionPrefix):]
+                assert retVal == 0
+                self.VERSION = stdout.strip()
+                versionPrefix = "v"
+                assert self.VERSION.startswith(versionPrefix)
+                self.VERSION = self.VERSION[len(versionPrefix):]
 
-		retVal, stdout, stderr = self.runCmd([ "git", "ls-files", "-m", "-o", "-d", "--exclude-standard" ])
-		if stdout:
-			self.VERSION += "-%s" % int(time.time())
+                retVal, stdout, stderr = self.runCmd([ "git", "ls-files", "-m", "-o", "-d", "--exclude-standard" ])
+                if stdout:
+                        self.VERSION += "-%s" % int(time.time())
 
-		# Check that the git hooks folder is all set up
-		setupGitHooks.setupGitHooksIfNotSetup()
+                # Check that the git hooks folder is all set up
+                setupGitHooks.setupGitHooksIfNotSetup()
 
-	def _loadTmtProjects(self):
-		self._cdEntryPoint()
-		projectFiles = ( join(dir, PROJECT_FILE_NAME) for dir in os.listdir('.') )
-		for projectFile in sorted(filter(exists, projectFiles)):
-			projectName = dirname(projectFile)
-			imp.load_source('', projectFile)
-			assert dirname(projectFile) in tmt.TmtProject.projects
+        def _loadTmtProjects(self):
+                self._cdEntryPoint()
+                projectFiles = ( join(dir, PROJECT_FILE_NAME) for dir in os.listdir('.') )
+                for projectFile in sorted(filter(exists, projectFiles)):
+                        projectName = dirname(projectFile)
+                        imp.load_source('', projectFile)
+                        assert dirname(projectFile) in tmt.TmtProject.projects
 
-		for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
-			project.afterProjects()
+                for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
+                        project.afterProjects()
 
-		sortedProjects, fakeRoot = topologicalSort(tmt.TmtProject.projects.values())
-		# The key None maps to a fake project that (indirectly) depends on everything
-		tmt.TmtProject.projects[None] = fakeRoot
-		for project in reversed(sortedProjects):
-			project.configure()
+                sortedProjects, fakeRoot = topologicalSort(tmt.TmtProject.projects.values())
+                # The key None maps to a fake project that (indirectly) depends on everything
+                tmt.TmtProject.projects[None] = fakeRoot
+                for project in reversed(sortedProjects):
+                        project.configure()
 
-	def assertWorkspaceClean(self):
-		retVal, stdout, stderr = tmt.runCmd(['git', 'ls-files', '--other', '--exclude-standard'])
-		assert retVal == 0
-		if stdout != '':
-			sys.stderr.write("Untracked files found, please deal with them before releasing:\n")
-			sys.stderr.write(stdout)
-			sys.exit(1)
+        def assertWorkspaceClean(self):
+                retVal, stdout, stderr = tmt.runCmd(['git', 'ls-files', '--other', '--exclude-standard'])
+                assert retVal == 0
+                if stdout != '':
+                        sys.stderr.write("Untracked files found, please deal with them before releasing:\n")
+                        sys.stderr.write(stdout)
+                        sys.exit(1)
 
-		retVal, stdout, stderr = tmt.runCmd(['git', 'diff', '--name-only'])
-		assert retVal == 0
-		if stdout != '':
-			sys.stderr.write("Edited files found, please commit them before releasing:\n")
-			sys.stderr.write(stdout)
-			sys.exit(1)
+                retVal, stdout, stderr = tmt.runCmd(['git', 'diff', '--name-only'])
+                assert retVal == 0
+                if stdout != '':
+                        sys.stderr.write("Edited files found, please commit them before releasing:\n")
+                        sys.stderr.write(stdout)
+                        sys.exit(1)
 
-	def assertCommitsPushed(self):
-		retVal, stdout, stderr = tmt.runCmd(['git', 'log', '@{u}..'], showStatus=True)
-		assert retVal == 0
-		assert stdout == ''
-		assert stderr == ''
+        def assertCommitsPushed(self):
+                retVal, stdout, stderr = tmt.runCmd(['git', 'log', '@{u}..'], showStatus=True)
+                assert retVal == 0
+                assert stdout == ''
+                assert stderr == ''
 
-	def _main(self):
-		self.args = tmt.parser.parse_args()
-		self._loadTmtProjects()
-		self.args.func()
+        def _main(self):
+                self.args = tmt.parser.parse_args()
+                self._loadTmtProjects()
+                self.args.func()
 
-	def _graph(self):
-		if tmt.args.file:
-			# TODO look at tmt.args.file and generate a dotty file or something?
-			assert False, "not yet implemented"
-		else:
-			print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
+        def _graph(self):
+                if tmt.args.file:
+                        # TODO look at tmt.args.file and generate a dotty file or something?
+                        assert False, "not yet implemented"
+                else:
+                        print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
 
-	def _pullRequest(self):
-		self.assertWorkspaceClean()
-		self.assertCommitsPushed()
-		github.connect(organization="cubing", repo="tnoodle")
+        def _pullRequest(self):
+                self.assertWorkspaceClean()
+                self.assertCommitsPushed()
+                github.connect(organization="cubing", repo="tnoodle")
 
-		tmt.args.project = None
-		tmt.args.no_recursive = False
-		self._make(command='check')
+                tmt.args.project = None
+                tmt.args.no_recursive = False
+                self._make(command='check')
 
-		body = tmt.args.body
-		body += "\n\n*************\nPull request automatically opened by " + \
-				"./tmt pull-request\n./tmt make check passed\n"
-		github.pullRequest(title=tmt.args.title, body=body)
+                body = tmt.args.body
+                body += "\n\n*************\nPull request automatically opened by " + \
+                                "./tmt pull-request\n./tmt make check passed\n"
+                github.pullRequest(title=tmt.args.title, body=body)
 
-	def _strings(self):
-		files = lint.gitFilesList(tmt.args.all)
-		commentOrStringRe = re.compile(r"(\"(\\.|[^\\\"])*\"|'(\\.|[^\\'])*'|//[^\n]*|/(\\.|[^\\\/\n])*/|/\*.*?\*/)", re.DOTALL)
-		externalizeableFileExts = set((".js", ".java"))
-		for f in files:
-			if not os.path.exists(f):
-				# This file must have been deleted as part of this commit.
-				continue
-			if os.path.isdir(f):
-				continue
-			fileName, ext = os.path.splitext(f)
-			if ext not in externalizeableFileExts:
-				continue
+        def _strings(self):
+                files = lint.gitFilesList(tmt.args.all)
+                commentOrStringRe = re.compile(r"(\"(\\.|[^\\\"])*\"|'(\\.|[^\\'])*'|//[^\n]*|/(\\.|[^\\\/\n])*/|/\*.*?\*/)", re.DOTALL)
+                externalizeableFileExts = set((".js", ".java"))
+                for f in files:
+                        if not os.path.exists(f):
+                                # This file must have been deleted as part of this commit.
+                                continue
+                        if os.path.isdir(f):
+                                continue
+                        fileName, ext = os.path.splitext(f)
+                        if ext not in externalizeableFileExts:
+                                continue
 
-			contents = file(f).read()
+                        contents = file(f).read()
 
-			offsetToLineNumber = []
-			lineNumber = 1
-			for ch in contents:
-				if ch == '\n':
-					lineNumber += 1
-				offsetToLineNumber.append(lineNumber)
+                        offsetToLineNumber = []
+                        lineNumber = 1
+                        for ch in contents:
+                                if ch == '\n':
+                                        lineNumber += 1
+                                offsetToLineNumber.append(lineNumber)
 
-			for match in commentOrStringRe.finditer(contents):
-				start, end = match.span()
-				s = match.group(0)
-				if s.startswith('"') or s.startswith("'"):
-					print "Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s)
+                        for match in commentOrStringRe.finditer(contents):
+                                start, end = match.span()
+                                s = match.group(0)
+                                if s.startswith('"') or s.startswith("'"):
+                                        print "Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s)
 
-	def _make(self, projectName=None, command=None):
-		if projectName is None:
-			projectName = tmt.args.project
-		if command is None:
-			command = tmt.args.command
-		project = tmt.TmtProject.projects[projectName]
-		recurse = not tmt.args.no_recursive
-		dist = False
-		if recurse:
-			noRecurseCommands = [ 'run', 'dist' ]
-			if command in noRecurseCommands:
-				print "WARNING: recurse makes no sense with the following commands: %s, so I'm ignoring it" % noRecurseCommands
-				recurse = False
-		if recurse:
-			projects = project.getRecursiveDependenciesTopoSorted()
-		else:
-			projects = [ project ]
+        def _make(self, projectName=None, command=None):
+                if projectName is None:
+                        projectName = tmt.args.project
+                if command is None:
+                        command = tmt.args.command
+                project = tmt.TmtProject.projects[projectName]
+                recurse = not tmt.args.no_recursive
+                dist = False
+                if recurse:
+                        noRecurseCommands = [ 'run', 'dist' ]
+                        if command in noRecurseCommands:
+                                print "WARNING: recurse makes no sense with the following commands: %s, so I'm ignoring it" % noRecurseCommands
+                                recurse = False
+                if recurse:
+                        projects = project.getRecursiveDependenciesTopoSorted()
+                else:
+                        projects = [ project ]
 
-		projects.reverse()
-		for project in projects:
-			commandFunc = getattr(project, command, None)
-			assert commandFunc, 'No %s target in %s' % ( command, project )
-			commandFunc()
+                projects.reverse()
+                for project in projects:
+                        commandFunc = getattr(project, command, None)
+                        assert commandFunc, 'No %s target in %s' % ( command, project )
+                        commandFunc()
 
-	def __init__(self):
-		self.parser = ArgumentParser(
-			description='tmt, the Tnoodle Make Tools',
-			formatter_class=ArgumentDefaultsHelpFormatter)
-		subparsers = self.parser.add_subparsers(help='Available commands')
+        def __init__(self):
+                self.parser = ArgumentParser(
+                        description='tmt, the Tnoodle Make Tools',
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+                subparsers = self.parser.add_subparsers(help='Available commands')
 
-		desc = 'Make stuff'
-		parser_make = subparsers.add_parser(
-			'make',
-			help=desc, description=desc,
-			formatter_class=ArgumentDefaultsHelpFormatter)
-		parser_make.add_argument(
-			'--project', '-p',
-			default=None,
-			type=str,
-			help='the project to build')
-		parser_make.add_argument(
-			'--no-recursive', '-nr',
-			default=False,
-			action='store_true',
-			help='do not apply command recursively to dependencies')
-		parser_make.add_argument(
-			'command',
-			nargs='?',
-			choices=['compile', 'dist', 'release', 'run', 'check', 'clean'],
-			default='compile',
-			help='command!')
-		parser_make.add_argument(
-			'--args', '-a',
-			default='',
-			help='Command line arguments (only valid with the "run" command)')
-		parser_make.add_argument(
-			'--main', '-m',
-			default='',
-			help='Main class to run')
-		parser_make.add_argument(
-			'--debug', '-d',
-			choices=['jdb', 'attach'],
-			default=None,
-			help='Run with jdb or as an attachable vm (only valid with the "run" command)')
-		parser_make.add_argument(
-			'--profile',
-			choices=['samples', 'times'],
-			default=None,
-			help='Profile program (stats will be written to profile.hprof)')
-		parser_make.add_argument(
-			'--skip-noflex-warning',
-			default=False,
-			action='store_true',
-			help="Don't bother telling me I don't have flex installed, I already know.")
-		parser_make.add_argument(
-			'--no-clean',
-			default=False,
-			action='store_true',
-			help="Don't cleaning before dist-ing.")
-		parser_make.set_defaults(func=self._make)
+                desc = 'Make stuff'
+                parser_make = subparsers.add_parser(
+                        'make',
+                        help=desc, description=desc,
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+                parser_make.add_argument(
+                        '--project', '-p',
+                        default=None,
+                        type=str,
+                        help='the project to build')
+                parser_make.add_argument(
+                        '--no-recursive', '-nr',
+                        default=False,
+                        action='store_true',
+                        help='do not apply command recursively to dependencies')
+                parser_make.add_argument(
+                        'command',
+                        nargs='?',
+                        choices=['compile', 'dist', 'release', 'run', 'check', 'clean'],
+                        default='compile',
+                        help='command!')
+                parser_make.add_argument(
+                        '--args', '-a',
+                        default='',
+                        help='Command line arguments (only valid with the "run" command)')
+                parser_make.add_argument(
+                        '--main', '-m',
+                        default='',
+                        help='Main class to run')
+                parser_make.add_argument(
+                        '--debug', '-d',
+                        choices=['jdb', 'attach'],
+                        default=None,
+                        help='Run with jdb or as an attachable vm (only valid with the "run" command)')
+                parser_make.add_argument(
+                        '--profile',
+                        choices=['samples', 'times'],
+                        default=None,
+                        help='Profile program (stats will be written to profile.hprof)')
+                parser_make.add_argument(
+                        '--skip-noflex-warning',
+                        default=False,
+                        action='store_true',
+                        help="Don't bother telling me I don't have flex installed, I already know.")
+                parser_make.add_argument(
+                        '--no-clean',
+                        default=False,
+                        action='store_true',
+                        help="Don't cleaning before dist-ing.")
+                parser_make.set_defaults(func=self._make)
 
-		desc = 'Generate dependency graph'
-		parser_graph = subparsers.add_parser(
-			'graph',
-			help=desc, description=desc,
-			formatter_class=ArgumentDefaultsHelpFormatter)
-		parser_graph.add_argument(
-			'--file', '-f',
-			default='', type=str,
-			help='')
-		parser_graph.add_argument(
-			'--project', '-p',
-			default=None, type=str,
-			help='the project to build')
-		parser_graph.add_argument(
-			'--timestamps', '-t',
-			action="store_true", default=False,
-			help='Show project timestamps for debugging purposes')
-		parser_graph.add_argument(
-			'--descriptions', '-d',
-			action="store_true", default=False,
-			help='Show project descriptions')
-		parser_graph.add_argument(
-			'--no-prune', '-np',
-			action="store_true", default=False,
-			help='Do not prune duplicate projects')
-		parser_graph.set_defaults(func=self._graph)
+                desc = 'Generate dependency graph'
+                parser_graph = subparsers.add_parser(
+                        'graph',
+                        help=desc, description=desc,
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+                parser_graph.add_argument(
+                        '--file', '-f',
+                        default='', type=str,
+                        help='')
+                parser_graph.add_argument(
+                        '--project', '-p',
+                        default=None, type=str,
+                        help='the project to build')
+                parser_graph.add_argument(
+                        '--timestamps', '-t',
+                        action="store_true", default=False,
+                        help='Show project timestamps for debugging purposes')
+                parser_graph.add_argument(
+                        '--descriptions', '-d',
+                        action="store_true", default=False,
+                        help='Show project descriptions')
+                parser_graph.add_argument(
+                        '--no-prune', '-np',
+                        action="store_true", default=False,
+                        help='Do not prune duplicate projects')
+                parser_graph.set_defaults(func=self._graph)
 
-		desc = lint.desc()
-		parser_lint = subparsers.add_parser(
-			'lint',
-			help=desc, description=desc,
-			formatter_class=ArgumentDefaultsHelpFormatter)
-		lint.setupArgparser(parser_lint)
-		def lintIt():
-			lint.main(tmt.args)
-		parser_lint.set_defaults(func=lintIt)
+                desc = lint.desc()
+                parser_lint = subparsers.add_parser(
+                        'lint',
+                        help=desc, description=desc,
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+                lint.setupArgparser(parser_lint)
+                def lintIt():
+                        lint.main(tmt.args)
+                parser_lint.set_defaults(func=lintIt)
 
-		desc = "Scan files for strings ripe for i18n."
-		parser_strings = subparsers.add_parser(
-			'strings',
-			help=desc, description=desc,
-			formatter_class=ArgumentDefaultsHelpFormatter)
-		parser_strings.add_argument(
-			'--all', '-a',
-			action="store_true", default=False,
-			help="Check all files, even if they haven't been edited")
-		parser_strings.set_defaults(func=self._strings)
+                desc = "Scan files for strings ripe for i18n."
+                parser_strings = subparsers.add_parser(
+                        'strings',
+                        help=desc, description=desc,
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+                parser_strings.add_argument(
+                        '--all', '-a',
+                        action="store_true", default=False,
+                        help="Check all files, even if they haven't been edited")
+                parser_strings.set_defaults(func=self._strings)
 
-		desc = "Run tests & submit pull request if successful"
-		pull_request = subparsers.add_parser(
-			'pull-request',
-			help=desc, description=desc,
-			formatter_class=ArgumentDefaultsHelpFormatter)
-		pull_request.add_argument(
-			'title',
-			default=None, type=str,
-			help="Title for this pull request")
-		pull_request.add_argument(
-			'body',
-			default=None, type=str,
-			help="Body for this pull request")
-		pull_request.set_defaults(func=self._pullRequest)
+                desc = "Run tests & submit pull request if successful"
+                pull_request = subparsers.add_parser(
+                        'pull-request',
+                        help=desc, description=desc,
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+                pull_request.add_argument(
+                        'title',
+                        default=None, type=str,
+                        help="Title for this pull request")
+                pull_request.add_argument(
+                        'body',
+                        default=None, type=str,
+                        help="Body for this pull request")
+                pull_request.set_defaults(func=self._pullRequest)
 
-	def memoize(self, func):
-		d = {}
-		evaluating = set()
-		def memoed(*args):
-			if not args in d:
-				assert not args in evaluating, "Memoized functions may not have cycles!"
-				evaluating.add(args)
-				d[args] = func(*args)
-				evaluating.remove(args)
-			return d[args]
-		return memoed
+        def memoize(self, func):
+                d = {}
+                evaluating = set()
+                def memoed(*args):
+                        if not args in d:
+                                assert not args in evaluating, "Memoized functions may not have cycles!"
+                                evaluating.add(args)
+                                d[args] = func(*args)
+                                evaluating.remove(args)
+                        return d[args]
+                return memoed
 
-	def projectName(self):
-		import traceback
-		projectName, projectFileName = traceback.extract_stack()[-2][0].split(os.sep)
-		assert isdir(projectName)
-		assert projectFileName == PROJECT_FILE_NAME
-		return projectName
+        def projectName(self):
+                import traceback
+                projectName, projectFileName = traceback.extract_stack()[-2][0].split(os.sep)
+                assert isdir(projectName)
+                assert projectFileName == PROJECT_FILE_NAME
+                return projectName
 
-	def rmtree(self, dir):
-		rmtree(dir)
+        def rmtree(self, dir):
+                rmtree(dir)
 
-	def createSymlinkIfNotExistsOrStale(self, target, name):
-		createSymlinkIfNotExistsOrStale(target, name)
+        def createSymlinkIfNotExistsOrStale(self, target, name):
+                createSymlinkIfNotExistsOrStale(target, name)
 
 
-	def runCmd(self, argv, showStatus=False, interactive=False):
-        	return runCmd(argv, showStatus, interactive)
+        def runCmd(self, argv, showStatus=False, interactive=False):
+                return runCmd(argv, showStatus, interactive)
 
-	def showCmd(self, argv):
-		return self.runCmd(argv, showStatus=True)
+        def showCmd(self, argv):
+                return self.runCmd(argv, showStatus=True)
 
-	def timestamp(self, f):
-		"""
-			If f is a directory, returns the timestamp of the newest file
-			found anywhere under the given directory f.
-			If f is a file, simply returns the timestamp of the given file.
-			Empty/non existent directories have timestamp 0.
-		"""
-		if not exists(f):
-			return 0
+        def timestamp(self, f):
+                """
+                        If f is a directory, returns the timestamp of the newest file
+                        found anywhere under the given directory f.
+                        If f is a file, simply returns the timestamp of the given file.
+                        Empty/non existent directories have timestamp 0.
+                """
+                if not exists(f):
+                        return 0
 
-		if os.path.islink(f):
-			# We don't follow symbolic links because we don't want them
-			# to cause a recompile of any project that uses us.
-			return os.lstat(f).st_mtime
-		if not isdir(f):
-			try:
-				return os.lstat(f).st_mtime
-			except:
-				import traceback
-				traceback.print_exc()
-				import pdb; pdb.set_trace()
+                if os.path.islink(f):
+                        # We don't follow symbolic links because we don't want them
+                        # to cause a recompile of any project that uses us.
+                        return os.lstat(f).st_mtime
+                if not isdir(f):
+                        try:
+                                return os.lstat(f).st_mtime
+                        except:
+                                import traceback
+                                traceback.print_exc()
+                                import pdb; pdb.set_trace()
 
-		m = 0
-		for ff in os.listdir(f):
-			m = max(m, self.timestamp(join(f, ff)))
-		return m
+                m = 0
+                for ff in os.listdir(f):
+                        m = max(m, self.timestamp(join(f, ff)))
+                return m
 
-	def glob(self, folder, pattern, relativeTo=None):
-		matches = set()
-		pattern = re.compile(pattern)
-		if relativeTo is None:
-			relativeTo = '.'
-		for root, dirs, files in os.walk(folder):
-			matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
-		return matches
+        def glob(self, folder, pattern, relativeTo=None):
+                matches = set()
+                pattern = re.compile(pattern)
+                if relativeTo is None:
+                        relativeTo = '.'
+                for root, dirs, files in os.walk(folder):
+                        matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
+                return matches
 
-	def java(self, main, classpath='', args=[], debug=None, profile=None):
-		command = []
-		assert debug in [ None, 'jdb', 'attach' ]
-		if debug == 'jdb':
-			command.append('jdb')
-			# TODO - passing -ea to jdb doesn't work! I HATE JAVA
-		else:
-			command.append('java')
-			if debug == 'attach':
-				command.append('-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n') # TODO - configurable port?
-			command.append('-ea') # TODO - should turn on assertions at runtime
+        def java(self, main, classpath='', args=[], debug=None, profile=None):
+                command = []
+                assert debug in [ None, 'jdb', 'attach' ]
+                if debug == 'jdb':
+                        command.append('jdb')
+                        # TODO - passing -ea to jdb doesn't work! I HATE JAVA
+                else:
+                        command.append('java')
+                        if debug == 'attach':
+                                command.append('-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n') # TODO - configurable port?
+                        command.append('-ea') # TODO - should turn on assertions at runtime
 
-		if profile:
-			command.append('-Xrunhprof:cpu=%s,depth=30,file=%s' % ( profile, 'profile.hprof' ))
-		if classpath:
-			command.append('-classpath')
-			command.append(classpath)
-		command.append(main)
-		command += args
-		print " ".join(command)
-		p = subprocess.Popen(command)
-		return p.wait()
+                if profile:
+                        command.append('-Xrunhprof:cpu=%s,depth=30,file=%s' % ( profile, 'profile.hprof' ))
+                if classpath:
+                        command.append('-classpath')
+                        command.append(classpath)
+                command.append(main)
+                command += args
+                print " ".join(command)
+                p = subprocess.Popen(command)
+                return p.wait()
 
 tmt = tmt() # We only want one instance of Tmt
 sys.modules['tmt'] = tmt
@@ -504,583 +504,583 @@ from OrderedDict import OrderedDict
 collections.OrderedDict = OrderedDict
 
 class TmtProject(object):
-	projects = {}
-	def __init__(self, name, description):
-		self.name = name
-		self.description = description
-		assert not name in TmtProject.projects, name
-		TmtProject.projects[name] = self
-	def __str__(self, timestamps=False):
-		return self.name
-	# The configure method of each project gets called in dependency order.
+        projects = {}
+        def __init__(self, name, description):
+                self.name = name
+                self.description = description
+                assert not name in TmtProject.projects, name
+                TmtProject.projects[name] = self
+        def __str__(self, timestamps=False):
+                return self.name
+        # The configure method of each project gets called in dependency order.
     # That is, if a project B uses a project A,
-	# A.configure() will be called before B.configure().
-	def configure(self):
-		pass
-	# The afterProjects method gets called for each project after all the projects
-	# have been loaded, in no particular order.
-	def afterProjects(self):
-		pass
-	def needsCompiling(self):
-		return False
-	def compile(self):
-		assert False
-	def dist(self):
-		assert False
-	def release(self):
-		pass
-	def run(self):
-		assert False
-	def clean(self):
-		assert False
-	def getDependencies(self):
-		assert False
-	def getRecursiveDependenciesTopoSorted(self, exclude=set()):
-		return topologicalSort([self], exclude=exclude)[0]
-	def prettyDependencies(self, level=0, printingLevels=None, seen=None):
-		if printingLevels == None:
-			assert level == 0
-			printingLevels = set([0])
-		else:
-			printingLevels = printingLevels.copy()
-		if seen == None:
-			assert level == 0
-			seen = set()
-		indent = ''
-		for i in range(level):
-			if i == level-1:
-				if not i in printingLevels:
-					indent += '`-- '
-				else:
-					indent += '|-- '
-			else:
-				if i in printingLevels:
-					indent += '|   '
-				else:
-					indent += '    '
+        # A.configure() will be called before B.configure().
+        def configure(self):
+                pass
+        # The afterProjects method gets called for each project after all the projects
+        # have been loaded, in no particular order.
+        def afterProjects(self):
+                pass
+        def needsCompiling(self):
+                return False
+        def compile(self):
+                assert False
+        def dist(self):
+                assert False
+        def release(self):
+                pass
+        def run(self):
+                assert False
+        def clean(self):
+                assert False
+        def getDependencies(self):
+                assert False
+        def getRecursiveDependenciesTopoSorted(self, exclude=set()):
+                return topologicalSort([self], exclude=exclude)[0]
+        def prettyDependencies(self, level=0, printingLevels=None, seen=None):
+                if printingLevels == None:
+                        assert level == 0
+                        printingLevels = set([0])
+                else:
+                        printingLevels = printingLevels.copy()
+                if seen == None:
+                        assert level == 0
+                        seen = set()
+                indent = ''
+                for i in range(level):
+                        if i == level-1:
+                                if not i in printingLevels:
+                                        indent += '`-- '
+                                else:
+                                        indent += '|-- '
+                        else:
+                                if i in printingLevels:
+                                        indent += '|   '
+                                else:
+                                        indent += '    '
 
-		s = indent
-		if self.needsCompiling():
-			s += '* '
-		s += self.__str__(timestamps=tmt.args.timestamps)
-		if not tmt.args.no_prune and self in seen:
-			# If we're pruning, and we've seen this node before,
-			# then we don't recurse
-			s += ' (seen)\n'
-		else:
-			if tmt.args.descriptions and self.description:
-				s += ' - ' + self.description
-			s += '\n'
-			printingLevels.add(level)
-			dependencies = self.getDependencies()
-			for p in dependencies:
-				if p == dependencies[-1]:
-					printingLevels.remove(level)
-				s += p.prettyDependencies(level+1, printingLevels, seen)
-				seen.add(p)
-		return s
+                s = indent
+                if self.needsCompiling():
+                        s += '* '
+                s += self.__str__(timestamps=tmt.args.timestamps)
+                if not tmt.args.no_prune and self in seen:
+                        # If we're pruning, and we've seen this node before,
+                        # then we don't recurse
+                        s += ' (seen)\n'
+                else:
+                        if tmt.args.descriptions and self.description:
+                                s += ' - ' + self.description
+                        s += '\n'
+                        printingLevels.add(level)
+                        dependencies = self.getDependencies()
+                        for p in dependencies:
+                                if p == dependencies[-1]:
+                                        printingLevels.remove(level)
+                                s += p.prettyDependencies(level+1, printingLevels, seen)
+                                seen.add(p)
+                return s
 tmt.TmtProject = TmtProject
 
 @tmt.memoize
 def createJarDependency(jarFile):
-	return JarDependency(jarFile)
+        return JarDependency(jarFile)
 
 class JarDependency(TmtProject):
-	def __init__(self, jarFile):
-		self.jarFile = jarFile
-		TmtProject.__init__(self,
-				basename(jarFile),
-				description="")
-	def check(self):
-		return
-	def getDependencies(self):
-		return []
-	def compile(self):
-		pass
-	def clean(self):
-		pass
-	def __str__(self, timestamps=False):
-		s = self.name
-		if timestamps:
-			s += ' %s' % tmt.timestamp(self.jarFile)
-		return s
+        def __init__(self, jarFile):
+                self.jarFile = jarFile
+                TmtProject.__init__(self,
+                                basename(jarFile),
+                                description="")
+        def check(self):
+                return
+        def getDependencies(self):
+                return []
+        def compile(self):
+                pass
+        def clean(self):
+                pass
+        def __str__(self, timestamps=False):
+                s = self.name
+                if timestamps:
+                        s += ' %s' % tmt.timestamp(self.jarFile)
+                return s
 
 class EclipseProject(TmtProject):
-	from xml.sax import make_parser, saxutils
+        from xml.sax import make_parser, saxutils
 
-	class EclipseClasspathHandler(saxutils.handler.ContentHandler):
+        class EclipseClasspathHandler(saxutils.handler.ContentHandler):
 
-		def startDocument(self):
-			self.jarFiles = []
-			self.projects = []
+                def startDocument(self):
+                        self.jarFiles = []
+                        self.projects = []
 
-		def startElement(self, name, attrs):
-			if name == 'classpathentry':
-				kind = attrs.get('kind')
-				path = attrs.get('path')
-				if kind == 'output':
-					self.project.bin = join(self.project.name, path)
-				elif kind == 'src':
-					if path.startswith('/'):
-						self.projects.append(path[1:])
-					else:
-						assert path == 'src' or path == RESOURCE_FOLDER_SRC
-				elif kind == 'lib':
-					assert path.startswith('/')
-					self.jarFiles.append(abspath(path[1:]))
-				elif kind == 'con':
-					pass
-				else:
-					assert False, 'Unrecognized kind: %s' % kind
-	classpathParser = make_parser()
-	classpathHandler = EclipseClasspathHandler()
-	classpathParser.setContentHandler(classpathHandler)
+                def startElement(self, name, attrs):
+                        if name == 'classpathentry':
+                                kind = attrs.get('kind')
+                                path = attrs.get('path')
+                                if kind == 'output':
+                                        self.project.bin = join(self.project.name, path)
+                                elif kind == 'src':
+                                        if path.startswith('/'):
+                                                self.projects.append(path[1:])
+                                        else:
+                                                assert path == 'src' or path == RESOURCE_FOLDER_SRC
+                                elif kind == 'lib':
+                                        assert path.startswith('/')
+                                        self.jarFiles.append(abspath(path[1:]))
+                                elif kind == 'con':
+                                        pass
+                                else:
+                                        assert False, 'Unrecognized kind: %s' % kind
+        classpathParser = make_parser()
+        classpathHandler = EclipseClasspathHandler()
+        classpathParser.setContentHandler(classpathHandler)
 
-	def __init__(self, name, description, main=None, argv=None, tests=None):
-		self.main = main
-		self.argv = argv
-		self.nonJavaSrcDeps = set()
-		self.nonJavaResourceDeps = set()
-		self.tests = tests
-		self.strictCompile = True
+        def __init__(self, name, description, main=None, argv=None, tests=None):
+                self.main = main
+                self.argv = argv
+                self.nonJavaSrcDeps = set()
+                self.nonJavaResourceDeps = set()
+                self.tests = tests
+                self.strictCompile = True
 
-		self.ignoredWarnings = []
-		# We don't need to be warned about possible fallthroughs in switch statements
-		self.ignoredWarnings += [ 'fallthrough' ]
-		# This check is dumb, it doesn't realize casting is sometimes
-		# done to force a different method to be called.
-		self.ignoredWarnings += [ 'cast' ]
+                self.ignoredWarnings = []
+                # We don't need to be warned about possible fallthroughs in switch statements
+                self.ignoredWarnings += [ 'fallthrough' ]
+                # This check is dumb, it doesn't realize casting is sometimes
+                # done to force a different method to be called.
+                self.ignoredWarnings += [ 'cast' ]
 
-		TmtProject.__init__(self, name, description)
+                TmtProject.__init__(self, name, description)
 
-	def getDependencies(self, includeCompileTimeOnlyDependencies=False):
-		return self.getJars(includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies) + self.projects
+        def getDependencies(self, includeCompileTimeOnlyDependencies=False):
+                return self.getJars(includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies) + self.projects
 
-	def getJars(self, includeCompileTimeOnlyDependencies=False):
-		jars = self.jars[:]
-		javaEEProject = TmtProject.projects[javaEEProjectName]
-		if includeCompileTimeOnlyDependencies:
-			if self.webContent:
-				# We only need this jar in order to compile web projects.
-				# Including it in our runtime classpath is bad, because it doesn't provide
-				# actual implmementations for the api it defines. A servlet
-				# container (such as winstone) provides the actual implementation.
-				jars.append(javaEEProject)
-		else:
-			if javaEEProject in jars:
-				jars.remove(javaEEProject)
-		return jars
+        def getJars(self, includeCompileTimeOnlyDependencies=False):
+                jars = self.jars[:]
+                javaEEProject = TmtProject.projects[javaEEProjectName]
+                if includeCompileTimeOnlyDependencies:
+                        if self.webContent:
+                                # We only need this jar in order to compile web projects.
+                                # Including it in our runtime classpath is bad, because it doesn't provide
+                                # actual implmementations for the api it defines. A servlet
+                                # container (such as winstone) provides the actual implementation.
+                                jars.append(javaEEProject)
+                else:
+                        if javaEEProject in jars:
+                                jars.remove(javaEEProject)
+                return jars
 
-	def getClasspathEntities(self, includeResources=True, includeCompileTimeOnlyDependencies=False, includeSrc=False):
-		classpath = set()
-		classpath |= set(relpath(jar.jarFile) for jar in self.getJars(includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies))
-		classpath.add(self.bin)
-		if includeResources:
-			classpath.add(self.binResource)
+        def getClasspathEntities(self, includeResources=True, includeCompileTimeOnlyDependencies=False, includeSrc=False):
+                classpath = set()
+                classpath |= set(relpath(jar.jarFile) for jar in self.getJars(includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies))
+                classpath.add(self.bin)
+                if includeResources:
+                        classpath.add(self.binResource)
 
-		# The src folder only needs to be in the classpath so
-		# jdb can discover the source code, and so compilation of stuff in
-		# src_tnoodle_resources/ can find things defined in src/
-		if includeSrc:
-			classpath.add(self.src)
+                # The src folder only needs to be in the classpath so
+                # jdb can discover the source code, and so compilation of stuff in
+                # src_tnoodle_resources/ can find things defined in src/
+                if includeSrc:
+                        classpath.add(self.src)
 
-		# TODO - I hate the world
-		# Uncomment & replace the following with the path to your jre
-		# if you're trying to use jbd inside of a java library method.
-		#classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
+                # TODO - I hate the world
+                # Uncomment & replace the following with the path to your jre
+                # if you're trying to use jbd inside of a java library method.
+                #classpath.add('/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/src')
 
-		for project in self.projects:
-			classpath |= project.getClasspathEntities(includeResources=includeResources, includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies, includeSrc=includeSrc)
-		return classpath
+                for project in self.projects:
+                        classpath |= project.getClasspathEntities(includeResources=includeResources, includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies, includeSrc=includeSrc)
+                return classpath
 
-	def toClasspath(self, entities):
-		separator = None
-		if setupWindowsCygwinSymlinking.windowsOrCygwin():
-			separator = ';'
-		else:
-			separator = ':'
-		return separator.join(sorted(entities))
+        def toClasspath(self, entities):
+                separator = None
+                if setupWindowsCygwinSymlinking.windowsOrCygwin():
+                        separator = ';'
+                else:
+                        separator = ':'
+                return separator.join(sorted(entities))
 
-	def afterProjects(self):
-		dependencyFile = join(self.name, '.classpath')
-		assert exists(dependencyFile), dependencyFile
+        def afterProjects(self):
+                dependencyFile = join(self.name, '.classpath')
+                assert exists(dependencyFile), dependencyFile
 
-		# TODO - this only works if we're single threaded
-		EclipseProject.classpathHandler.project = self
-		EclipseProject.classpathParser.parse(dependencyFile)
+                # TODO - this only works if we're single threaded
+                EclipseProject.classpathHandler.project = self
+                EclipseProject.classpathParser.parse(dependencyFile)
 
-		self.jars = [ createJarDependency(jar) for jar in EclipseProject.classpathHandler.jarFiles ]
-		self.projects = [ tmt.TmtProject.projects[p] for p in EclipseProject.classpathHandler.projects ]
-		self.distDir = join(self.name, 'dist')
-		self.src = join(self.name, 'src')
-		self.srcResource = join(self.name, RESOURCE_FOLDER_SRC)
-		self.binResource = join(self.name, RESOURCE_FOLDER_BIN)
-		self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
+                self.jars = [ createJarDependency(jar) for jar in EclipseProject.classpathHandler.jarFiles ]
+                self.projects = [ tmt.TmtProject.projects[p] for p in EclipseProject.classpathHandler.projects ]
+                self.distDir = join(self.name, 'dist')
+                self.src = join(self.name, 'src')
+                self.srcResource = join(self.name, RESOURCE_FOLDER_SRC)
+                self.binResource = join(self.name, RESOURCE_FOLDER_BIN)
+                self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
 
-		webContent = join(self.name, "WebContent")
-		if isdir(webContent):
-			self.webContent = webContent
-		else:
-			self.webContent = None
+                webContent = join(self.name, "WebContent")
+                if isdir(webContent):
+                        self.webContent = webContent
+                else:
+                        self.webContent = None
 
-		if not isdir(self.bin):
-			os.makedirs(self.bin)
-		if not isdir(self.binResource):
-			os.makedirs(self.binResource)
+                if not isdir(self.bin):
+                        os.makedirs(self.bin)
+                if not isdir(self.binResource):
+                        os.makedirs(self.binResource)
 
-	def distJarFile(self, includeVersion=True, extension='jar'):
-		# This is a function rather than a static attribute because
-		# tmt.VERSION can change (see release target).
-		if includeVersion:
-			fileName = '%s-%s.%s' % ( self.fullName, tmt.VERSION, extension )
-		else:
-			fileName = '%s.%s' % ( self.fullName, extension )
-		return join(self.distDir, fileName)
+        def distJarFile(self, includeVersion=True, extension='jar'):
+                # This is a function rather than a static attribute because
+                # tmt.VERSION can change (see release target).
+                if includeVersion:
+                        fileName = '%s-%s.%s' % ( self.fullName, tmt.VERSION, extension )
+                else:
+                        fileName = '%s.%s' % ( self.fullName, extension )
+                return join(self.distDir, fileName)
 
-	def needsCompiling(self):
-		# Note that we assume that if the resources of a project we depend on change,
-		# we don't need to recompile. This is the way resources should behave.
+        def needsCompiling(self):
+                # Note that we assume that if the resources of a project we depend on change,
+                # we don't need to recompile. This is the way resources should behave.
 
-		if any( dep.needsCompiling() for dep in self.getDependencies() ):
-			return True
-		lastCompiled = tmt.timestamp(self.bin)
-		depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False, includeSrc=True) )
-		changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
-		srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
-		if self.webContent:
-			srcLastTouched = max(srcLastTouched, tmt.timestamp(self.webContent))
-		return lastCompiled <= srcLastTouched or len(changedDeps) > 0
+                if any( dep.needsCompiling() for dep in self.getDependencies() ):
+                        return True
+                lastCompiled = tmt.timestamp(self.bin)
+                depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False, includeSrc=True) )
+                changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
+                srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
+                if self.webContent:
+                        srcLastTouched = max(srcLastTouched, tmt.timestamp(self.webContent))
+                return lastCompiled <= srcLastTouched or len(changedDeps) > 0
 
-	def compile(self):
-		if not self.needsCompiling():
-			print "%s is up to date, not recompiling" % self.name
-			return False
+        def compile(self):
+                if not self.needsCompiling():
+                        print "%s is up to date, not recompiling" % self.name
+                        return False
 
-		self._compile(self.src, self.bin)
-		self._compile(self.srcResource, self.binResource)
+                self._compile(self.src, self.bin)
+                self._compile(self.srcResource, self.binResource)
 
 
-		for src, bin, nonJavaDeps in ( ( self.srcResource, self.binResource, self.nonJavaResourceDeps ), ( self.src, self.bin, self.nonJavaSrcDeps ) ):
-			for nonJavaDep in nonJavaDeps:
-				srcPath = join(src, nonJavaDep)
-				binPath = join(bin, nonJavaDep)
-				print "Copying %s -> %s" % ( srcPath, binPath )
-				if isdir(srcPath):
-					parentDir = dirname(dirname(binPath))
-				else:
-					parentDir = dirname(binPath)
-				if not isdir(parentDir):
-					os.makedirs(parentDir)
-				if binPath.endswith('/'):
-					binPath = binPath[:-1]
-				srcPath = abspath(srcPath)
-				srcPath = relpath(srcPath, parentDir)
-				os.symlink(srcPath, binPath)
+                for src, bin, nonJavaDeps in ( ( self.srcResource, self.binResource, self.nonJavaResourceDeps ), ( self.src, self.bin, self.nonJavaSrcDeps ) ):
+                        for nonJavaDep in nonJavaDeps:
+                                srcPath = join(src, nonJavaDep)
+                                binPath = join(bin, nonJavaDep)
+                                print "Copying %s -> %s" % ( srcPath, binPath )
+                                if isdir(srcPath):
+                                        parentDir = dirname(dirname(binPath))
+                                else:
+                                        parentDir = dirname(binPath)
+                                if not isdir(parentDir):
+                                        os.makedirs(parentDir)
+                                if binPath.endswith('/'):
+                                        binPath = binPath[:-1]
+                                srcPath = abspath(srcPath)
+                                srcPath = relpath(srcPath, parentDir)
+                                os.symlink(srcPath, binPath)
 
-		createSymlinkIfNotExistsOrStale(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
+                createSymlinkIfNotExistsOrStale(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
 
-		return True
+                return True
 
-	def innerCompile(self, src, tempBin, bin):
-		# omg shoot me now
-		pass
+        def innerCompile(self, src, tempBin, bin):
+                # omg shoot me now
+                pass
 
-	def _compile(self, src, bin):
-		head, tail = os.path.split(bin)
-		tempBin = join(head, "." + tail)
+        def _compile(self, src, bin):
+                head, tail = os.path.split(bin)
+                tempBin = join(head, "." + tail)
 
-		print 'Compiling: %s' % src
+                print 'Compiling: %s' % src
 
-		rmtree(bin)
-		if isdir(tempBin):
-			rmtree(tempBin)
-		os.makedirs(tempBin)
+                rmtree(bin)
+                if isdir(tempBin):
+                        rmtree(tempBin)
+                os.makedirs(tempBin)
 
-		javaFiles = tmt.glob(src, r'.*\.java$')
-		if len(javaFiles) > 0:
-			args = [ 'javac' ]
+                javaFiles = tmt.glob(src, r'.*\.java$')
+                if len(javaFiles) > 0:
+                        args = [ 'javac' ]
 
             # Generate all debugging information,
             # it doesn't seem to be *that* much stuff.
-			args += [ '-g' ]
+                        args += [ '-g' ]
 
-			args += [ '-d', tempBin ]
+                        args += [ '-d', tempBin ]
 
-			if self.strictCompile:
-				# Enable all warnings
-				args += [ '-Xlint' ]
+                        if self.strictCompile:
+                                # Enable all warnings
+                                args += [ '-Xlint' ]
 
-				# Treat warnings as errors
-				args += [ '-Werror' ]
+                                # Treat warnings as errors
+                                args += [ '-Werror' ]
 
-				for ignoredWarning in self.ignoredWarnings:
-					args += [ '-Xlint:-%s' % ignoredWarning ]
+                                for ignoredWarning in self.ignoredWarnings:
+                                        args += [ '-Xlint:-%s' % ignoredWarning ]
 
-				# TODO - some of our library jars may include a Class-path
-				# For now, I want to just manually edit those jars, but if we
-				# ever change our mind, we could add -Xlint:-path to the ignored warnings.
+                                # TODO - some of our library jars may include a Class-path
+                                # For now, I want to just manually edit those jars, but if we
+                                # ever change our mind, we could add -Xlint:-path to the ignored warnings.
 
-				# Yes, I know I'm using the reflecation api, and no, there isn't another choice
-				args += [ '-XDignore.symbol.file' ]
+                                # Yes, I know I'm using the reflecation api, and no, there isn't another choice
+                                args += [ '-XDignore.symbol.file' ]
 
-			entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
+                        entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
 
-			# At the time we're compiling, bin/ and bin_tnoodle_resource/ don't
+                        # At the time we're compiling, bin/ and bin_tnoodle_resource/ don't
             # actually exist (well, bin/ might). This is becuse we compile to
             # temp directory, and move the folders only if we're successful.
-			entities.remove(self.bin)
+                        entities.remove(self.bin)
 
-			entities.remove(self.binResource)
-			if src == self.srcResource:
+                        entities.remove(self.binResource)
+                        if src == self.srcResource:
                 # bin was just built, so it actually does exist
-				entities.add(self.bin)
+                                entities.add(self.bin)
 
-			classpath = self.toClasspath(entities)
-			if classpath:
-				args += [ '-classpath', classpath ]
-			args += javaFiles
-			p = subprocess.Popen(args)
-			print " ".join(args)
-			assert p.wait() == 0, 'javac failed!'
+                        classpath = self.toClasspath(entities)
+                        if classpath:
+                                args += [ '-classpath', classpath ]
+                        args += javaFiles
+                        p = subprocess.Popen(args)
+                        print " ".join(args)
+                        assert p.wait() == 0, 'javac failed!'
 
-		self.innerCompile(src, tempBin, bin)
+                self.innerCompile(src, tempBin, bin)
 
-		print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, bin )
-		os.rename(tempBin, bin)
+                print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, bin )
+                os.rename(tempBin, bin)
 
-	def release(self):
-		# TODO - this method is getting called for every project in the dependency heirarchy
-		if tmt.args.project == self.name:
-			tmt.assertWorkspaceClean()
+        def release(self):
+                # TODO - this method is getting called for every project in the dependency heirarchy
+                if tmt.args.project == self.name:
+                        tmt.assertWorkspaceClean()
 
-			pullCommand = 'git pull'
-			print pullCommand
-			assert 0 == os.system(pullCommand)
+                        pullCommand = 'git pull'
+                        print pullCommand
+                        assert 0 == os.system(pullCommand)
 
-			pullCommand = 'git pull git@github.com:cubing/tnoodle.git'
-			print pullCommand
-			assert 0 == os.system(pullCommand)
+                        pullCommand = 'git pull git@github.com:cubing/tnoodle.git'
+                        print pullCommand
+                        assert 0 == os.system(pullCommand)
 
-			# We do a compile here even though we're going to do dist later
-			# in order to catch compile errors before we make a tag.
-			tmt._make(projectName=self.name, command='compile')
+                        # We do a compile here even though we're going to do dist later
+                        # in order to catch compile errors before we make a tag.
+                        tmt._make(projectName=self.name, command='compile')
 
-			print "Releasing", self.name
+                        print "Releasing", self.name
 
-			assert exists('VERSION')
-			versionFileContents = file('VERSION').read().split('\n')
-			tmt.VERSION = None
-			for line in versionFileContents:
-				if not line.startswith("#"):
-					tmt.VERSION = line
-					break
-			assert tmt.VERSION
-			tag = "v%s" % tmt.VERSION
-			tagMessage = "version %s" % tmt.VERSION
-			tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
-			print tagCommand
-			assert 0 == os.system(tagCommand)
-			print "Successfully created tag %s" % tag
+                        assert exists('VERSION')
+                        versionFileContents = file('VERSION').read().split('\n')
+                        tmt.VERSION = None
+                        for line in versionFileContents:
+                                if not line.startswith("#"):
+                                        tmt.VERSION = line
+                                        break
+                        assert tmt.VERSION
+                        tag = "v%s" % tmt.VERSION
+                        tagMessage = "version %s" % tmt.VERSION
+                        tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
+                        print tagCommand
+                        assert 0 == os.system(tagCommand)
+                        print "Successfully created tag %s" % tag
 
-			# We can't run a dist until after we create the tag. This way
-			# the version number of the resulting file will be correct.
-			self.dist()
+                        # We can't run a dist until after we create the tag. This way
+                        # the version number of the resulting file will be correct.
+                        self.dist()
 
-			github.connect(organization="cubing", repo="tnoodle")
-			if not github.upload(self.distJarFile()):
-				print "Failed to upload %s, see above for details" % self.distJarFile()
-				print "Deleting tag %s" % tag
-				deleteTagCommand = "git tag -d %s" % (tag)
-				assert 0 == os.system(deleteTagCommand)
-				return
+                        github.connect(organization="cubing", repo="tnoodle")
+                        if not github.upload(self.distJarFile()):
+                                print "Failed to upload %s, see above for details" % self.distJarFile()
+                                print "Deleting tag %s" % tag
+                                deleteTagCommand = "git tag -d %s" % (tag)
+                                assert 0 == os.system(deleteTagCommand)
+                                return
 
-			for pushTags in [ False, True ]:
-				# git push --tags seems to not do everything git push does
+                        for pushTags in [ False, True ]:
+                                # git push --tags seems to not do everything git push does
 
-				pushCommand = 'git push'
-				if pushTags:
-					pushCommand += ' --tags'
-				print pushCommand
-				assert 0 == os.system(pushCommand)
+                                pushCommand = 'git push'
+                                if pushTags:
+                                        pushCommand += ' --tags'
+                                print pushCommand
+                                assert 0 == os.system(pushCommand)
 
-				pushCommand += ' git@github.com:cubing/tnoodle.git'
-				print pushCommand
-				assert 0 == os.system(pushCommand)
+                                pushCommand += ' git@github.com:cubing/tnoodle.git'
+                                print pushCommand
+                                assert 0 == os.system(pushCommand)
 
-	def tweakJarFile(self, jar):
-		pass
+        def tweakJarFile(self, jar):
+                pass
 
-	def dist(self, noRemake=False, implementationTitle=None):
-		if implementationTitle is None:
-			implementationTitle = self.fullName
-		if not tmt.args.no_clean and not noRemake:
-			# We explicitly clean here, because stuff may have ended up in our
-			# resources folders that we don't want to include in the generated jar file.
-			tmt._make(projectName=self.name, command='clean')
+        def dist(self, noRemake=False, implementationTitle=None):
+                if implementationTitle is None:
+                        implementationTitle = self.fullName
+                if not tmt.args.no_clean and not noRemake:
+                        # We explicitly clean here, because stuff may have ended up in our
+                        # resources folders that we don't want to include in the generated jar file.
+                        tmt._make(projectName=self.name, command='clean')
 
-		if not isdir(self.distDir):
-			os.makedirs(self.distDir)
+                if not isdir(self.distDir):
+                        os.makedirs(self.distDir)
 
-		if not noRemake:
-			tmt._make(projectName=self.name, command='compile')
+                if not noRemake:
+                        tmt._make(projectName=self.name, command='compile')
 
-		if self.webContent:
-			# Webcontent projects must populate the jar file themselves
-			self.webContentDist()
-		else:
-			jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
+                if self.webContent:
+                        # Webcontent projects must populate the jar file themselves
+                        self.webContentDist()
+                else:
+                        jar = zipfile.ZipFile(self.distJarFile(), "w", compression=zipfile.ZIP_DEFLATED)
 
-			jarDeps = []
-			javaDeps = []
-			for project in self.getRecursiveDependenciesTopoSorted():
-				if hasattr(project, 'jarFile'):
-					jarDeps.append(project)
-				else:
-					if isinstance(project, tmt.EclipseProject):
-						# If we depend on a project that isn't an eclipse project,
-						# we're probably symlinking into that project, so there's
-						# no need to slurp in any of its resources manually.
-						# One example of where we do this is for js projects.
-						# In fact, we don't even need these projects to show up in the
-						# dependency graph, but it's nice to keep "tmt graph" up to date.
-						# TODO - symlinking into other projects isn't a great idea,
-						# what if a -> c, a -> b, and b -> c ?
-						javaDeps.append(project)
+                        jarDeps = []
+                        javaDeps = []
+                        for project in self.getRecursiveDependenciesTopoSorted():
+                                if hasattr(project, 'jarFile'):
+                                        jarDeps.append(project)
+                                else:
+                                        if isinstance(project, tmt.EclipseProject):
+                                                # If we depend on a project that isn't an eclipse project,
+                                                # we're probably symlinking into that project, so there's
+                                                # no need to slurp in any of its resources manually.
+                                                # One example of where we do this is for js projects.
+                                                # In fact, we don't even need these projects to show up in the
+                                                # dependency graph, but it's nice to keep "tmt graph" up to date.
+                                                # TODO - symlinking into other projects isn't a great idea,
+                                                # what if a -> c, a -> b, and b -> c ?
+                                                javaDeps.append(project)
 
-			# We don't want to include dotfiles in our jar file. This solves the problem of
-			# accidentally including submodules's .git folder.
-			notDotfile = lambda dirname: not dirname.startswith(".")
+                        # We don't want to include dotfiles in our jar file. This solves the problem of
+                        # accidentally including submodules's .git folder.
+                        notDotfile = lambda dirname: not dirname.startswith(".")
 
-			if jarDeps:
-				extractedLibDir = tempfile.mkdtemp()
-				for jarDep in jarDeps:
-					jarLib = zipfile.ZipFile(jarDep.jarFile)
-					jarLib.extractall(path=extractedLibDir)
-				for dirpath, dirnames, filenames in os.walk(extractedLibDir):
-					dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+                        if jarDeps:
+                                extractedLibDir = tempfile.mkdtemp()
+                                for jarDep in jarDeps:
+                                        jarLib = zipfile.ZipFile(jarDep.jarFile)
+                                        jarLib.extractall(path=extractedLibDir)
+                                for dirpath, dirnames, filenames in os.walk(extractedLibDir):
+                                        dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
 
-					for name in filter(notDotfile, filenames):
-						if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
-							# We don't want to include signatures in our monolithic jar file, see
-							# http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
-							continue
-						path = os.path.normpath(os.path.join(dirpath, name))
-						arcPath = os.path.relpath(path, extractedLibDir)
-						if jar.NameToInfo.get(arcPath):
-							# Since we symlink a lot, it's possible that we scan over the same
-							# file twice. Interestingly enough, the zip format
-							# allows for us to add the same file twice, but we don't want
-							# to do that, as it will result in a larger jar.
-							continue
-						if os.path.isfile(path):
-							jar.write(path, arcPath)
-				rmtree(extractedLibDir)
+                                        for name in filter(notDotfile, filenames):
+                                                if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
+                                                        # We don't want to include signatures in our monolithic jar file, see
+                                                        # http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                                                        continue
+                                                path = os.path.normpath(os.path.join(dirpath, name))
+                                                arcPath = os.path.relpath(path, extractedLibDir)
+                                                if jar.NameToInfo.get(arcPath):
+                                                        # Since we symlink a lot, it's possible that we scan over the same
+                                                        # file twice. Interestingly enough, the zip format
+                                                        # allows for us to add the same file twice, but we don't want
+                                                        # to do that, as it will result in a larger jar.
+                                                        continue
+                                                if os.path.isfile(path):
+                                                        jar.write(path, arcPath)
+                                rmtree(extractedLibDir)
 
-			for project in javaDeps:
-				for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
-					dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+                        for project in javaDeps:
+                                for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
+                                        dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
 
-					for name in filter(notDotfile, filenames):
-						path = os.path.normpath(os.path.join(dirpath, name))
-						arcPath = os.path.relpath(path, project.bin)
-						if jar.NameToInfo.get(arcPath):
-							# Since we symlink a lot, it's possible that we scan over the same
-							# file twice. Interestingly enough, the zip format
-							# allows for us to add the same file twice, but we don't want
-							# to do that, as it will result in a larger jar.
-							continue
-						if os.path.isfile(path):
-							if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
-								txt = file(path).read()
-								# This might be a pretty heavy hammer, but who in the world
-								# would legitimately want to use the string "%%VERSION%%"?
-								# Famous last words?
-								txt = txt.replace("%%VERSION%%", tmt.VERSION)
-								jar.writestr(arcPath, txt)
-							else:
-								jar.write(path, arcPath)
+                                        for name in filter(notDotfile, filenames):
+                                                path = os.path.normpath(os.path.join(dirpath, name))
+                                                arcPath = os.path.relpath(path, project.bin)
+                                                if jar.NameToInfo.get(arcPath):
+                                                        # Since we symlink a lot, it's possible that we scan over the same
+                                                        # file twice. Interestingly enough, the zip format
+                                                        # allows for us to add the same file twice, but we don't want
+                                                        # to do that, as it will result in a larger jar.
+                                                        continue
+                                                if os.path.isfile(path):
+                                                        if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
+                                                                txt = file(path).read()
+                                                                # This might be a pretty heavy hammer, but who in the world
+                                                                # would legitimately want to use the string "%%VERSION%%"?
+                                                                # Famous last words?
+                                                                txt = txt.replace("%%VERSION%%", tmt.VERSION)
+                                                                jar.writestr(arcPath, txt)
+                                                        else:
+                                                                jar.write(path, arcPath)
 
-			if not project.webContent:
-				manifest = """\
+                        if not project.webContent:
+                                manifest = """\
 Manifest-Version: 1.0
 Main-Class: %s
 Implementation-Title: %s
 Implementation-Version: %s
-	""" % ( self.main, implementationTitle, tmt.VERSION )
-				jar.writestr('META-INF/MANIFEST.MF', manifest)
+        """ % ( self.main, implementationTitle, tmt.VERSION )
+                                jar.writestr('META-INF/MANIFEST.MF', manifest)
 
-			# Give subclasses the opportunity to make some last minute tweaks to the jar file
-			self.tweakJarFile(jar)
+                        # Give subclasses the opportunity to make some last minute tweaks to the jar file
+                        self.tweakJarFile(jar)
 
-			jar.close()
+                        jar.close()
 
-		noVersionPath = self.distJarFile(includeVersion=False)
+                noVersionPath = self.distJarFile(includeVersion=False)
 
-		createSymlinkIfNotExistsOrStale(basename(self.distJarFile()), noVersionPath)
+                createSymlinkIfNotExistsOrStale(basename(self.distJarFile()), noVersionPath)
 
-		sizeMB = 1.0 * os.path.getsize(self.distJarFile()) / 2**20
-		# ls -h ciels fractions, so we do the same thing here
-		sizeMB = math.ceil(sizeMB*10)/10
+                sizeMB = 1.0 * os.path.getsize(self.distJarFile()) / 2**20
+                # ls -h ciels fractions, so we do the same thing here
+                sizeMB = math.ceil(sizeMB*10)/10
 
-		print 'Successfully created %s (size %sM) with main class %s' % ( self.distJarFile(), sizeMB, self.main )
+                print 'Successfully created %s (size %sM) with main class %s' % ( self.distJarFile(), sizeMB, self.main )
 
-	def run(self):
-		main = tmt.args.main or self.main
-		assert main, 'Main class not defined'
-		assert tmt.args.args is not None # shlex reads from stdin if you pass None, lol
-		tmt._make(projectName=self.name, command='compile')
-		# TODO propogate return code up
-		args = shlex.split(tmt.args.args)
-		if self.argv:
-			args += self.argv
+        def run(self):
+                main = tmt.args.main or self.main
+                assert main, 'Main class not defined'
+                assert tmt.args.args is not None # shlex reads from stdin if you pass None, lol
+                tmt._make(projectName=self.name, command='compile')
+                # TODO propogate return code up
+                args = shlex.split(tmt.args.args)
+                if self.argv:
+                        args += self.argv
 
-		classpath = self.getClasspathEntities(includeResources=False, includeSrc=True)
+                classpath = self.getClasspathEntities(includeResources=False, includeSrc=True)
 
-		retVal = tmt.java(
-				main=main,
-				classpath=self.toClasspath(classpath),
-				args=args,
-				debug=tmt.args.debug,
-				profile=tmt.args.profile)
-		sys.exit(retVal)
+                retVal = tmt.java(
+                                main=main,
+                                classpath=self.toClasspath(classpath),
+                                args=args,
+                                debug=tmt.args.debug,
+                                profile=tmt.args.profile)
+                sys.exit(retVal)
 
-	def check(self):
-		if not self.tests:
-			return
+        def check(self):
+                if not self.tests:
+                        return
 
-		tmt._make(projectName=self.name, command='compile')
+                tmt._make(projectName=self.name, command='compile')
 
-		for testClass in self.tests:
-			assert 0 == tmt.java(main=testClass,
+                for testClass in self.tests:
+                        assert 0 == tmt.java(main=testClass,
                                  classpath=self.toClasspath(self.getClasspathEntities()))
 
-	def clean(self):
-		print 'Cleaning: %s' % self.name
-		if exists(self.bin):
-			assert isdir(self.bin)
-			rmtree(self.bin)
-			if self.webContent:
-				rmtree(dirname(self.bin))
-		if exists(self.binResource):
-			assert isdir(self.binResource)
-			rmtree(self.binResource)
-		if exists(self.distDir):
-			assert isdir(self.distDir)
-			rmtree(self.distDir)
-		tempBin = join(self.name, '.bin')
-		if isdir(tempBin):
-			rmtree(tempBin)
+        def clean(self):
+                print 'Cleaning: %s' % self.name
+                if exists(self.bin):
+                        assert isdir(self.bin)
+                        rmtree(self.bin)
+                        if self.webContent:
+                                rmtree(dirname(self.bin))
+                if exists(self.binResource):
+                        assert isdir(self.binResource)
+                        rmtree(self.binResource)
+                if exists(self.distDir):
+                        assert isdir(self.distDir)
+                        rmtree(self.distDir)
+                tempBin = join(self.name, '.bin')
+                if isdir(tempBin):
+                        rmtree(tempBin)
 
-	def __str__(self, timestamps=False):
-		s = self.name
-		if timestamps:
-			binTs = tmt.timestamp(self.bin)
-			srcTs = tmt.timestamp(self.src)
-			srcResourceTs = tmt.timestamp(self.srcResource)
-			s += ' bin: %s src: %s src_resource: %s' % ( binTs, srcTs, srcResourceTs )
-		return s
+        def __str__(self, timestamps=False):
+                s = self.name
+                if timestamps:
+                        binTs = tmt.timestamp(self.bin)
+                        srcTs = tmt.timestamp(self.src)
+                        srcResourceTs = tmt.timestamp(self.srcResource)
+                        s += ' bin: %s src: %s src_resource: %s' % ( binTs, srcTs, srcResourceTs )
+                return s
 
 tmt.EclipseProject = EclipseProject
 
 if __name__ == "__main__":
-	tmt._main()
+        tmt._main()
