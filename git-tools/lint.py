@@ -6,7 +6,6 @@ import sys
 import subprocess
 import xml.etree.ElementTree as ET
 
-jsLintJar = 'git-tools/lib/jslint4java-1.4.6.jar'
 checkstyleJar = 'git-tools/lib/checkstyle-5.6-all.jar'
 checkstyleStyle = 'git-tools/lib/tnoodle-java.xml'
 
@@ -60,6 +59,19 @@ UNCOMMITABLE_PHRASES = {
 LINT_UNCOMMITABLE_PHRASES = {
     '\t'
 }
+
+
+jsHintCommand = None
+def getJsHintCommand():
+    global jsHintCommand
+    if not jsHintCommand:
+        try:
+            gitToolsBinDir = subprocess.check_output("(cd git-tools; npm bin;)", shell=True)
+            gitToolsBinDir = gitToolsBinDir.strip()
+        except subprocess.CalledProcessError:
+            return None
+        jsHintCommand = os.path.join(gitToolsBinDir, "jshint")
+    return jsHintCommand
 
 # Stolen from http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 # This should jive with git's definition of binary.
@@ -145,26 +157,70 @@ def lint(files):
 
 
         if ext == '.js' or ext == '.html':
-            subprocess.check_call(['java', '-version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            argv = [ 'java', '-jar', jsLintJar, f ]
-            p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = p.communicate()
-            # Note that we don't check the returncode of p, because jslint returns a nonzero
-            # error code when jslinting fails, and we want to ignore whatever errors are in
-            # JSLINT_IGNORED_ERRORS.
-            failedJsLint = False
-            for line in stdout.split('\n'):
-                parsedError = line.split(":", 4)
-                if len(parsedError) != 5:
-                    if line != '':
-                        assert False, line + " doesn't contain expected number of :'s"
-                    continue
-                _, fileName, lineNumber, col, error = parsedError
-                lineNumber = int(lineNumber)
-                if any(ignored in error for ignored in JSLINT_IGNORED_ERRORS):
-                    pass
-                else:
-                    error = "%s:%s:%s:%s" % ( f, lineNumber, error, lines[lineNumber-1] )
+            stdin = None
+            if ext == ".html":
+                javascript = []
+                slurping = False
+                indent = None
+                nextLineIsFirstLine = False
+                for i, line in enumerate(lines):
+                    startScript = "<script" in line
+                    endScript = "</script" in line
+                    if startScript and endScript:
+                        assert not slurping
+                        indent = None
+                        javascript.append('\n')
+                        continue
+                    elif startScript:
+                        assert not slurping
+                        slurping = True
+                        nextLineIsFirstLine = True
+                        javascript.append('\n')
+                        continue
+                    elif endScript:
+                        assert slurping
+                        slurping = False
+                        nextLineIsFirstLine = False
+                        javascript.append('\n')
+                        continue
+                    if not slurping:
+                        # this preserves line numbers
+                        line = '\n'
+                    if nextLineIsFirstLine:
+                        assert slurping
+                        # count the number of leading spaces
+                        indent = len(line) - len(line.lstrip(" "))
+                        nextLineIsFirstLine = False
+                    if slurping:
+                        if not line.isspace():
+                            if len(line) - len(line.lstrip(" ")) < indent:
+                                failures.append("%s:%s Negative indentation baad" % (f, i+1) )
+                            else:
+                                line = line[indent:]
+
+                    javascript.append(line)
+                stdin = "".join(javascript)
+            jsHintCommand = getJsHintCommand()
+            if jsHintCommand is None or not os.path.exists(jsHintCommand):
+                failures = [ "Need npm and jshint to lint js files. Try running (cd git-tools; npm install -d)" ]
+                return failures
+
+            cmd = "%s --verbose" % (jsHintCommand)
+            if stdin is not None:
+                cmd += " /dev/stdin"
+            else:
+                cmd += " " + f
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            stdout, stderr = p.communicate(input=stdin)
+            assert p.returncode in [0, 2], "Unrecognized return code %s from %s.\n\n%s\n\n%s" % ( p.returncode, cmd, stdout, stderr )
+            if stdout:
+                errors = stdout.split("\n")
+                errors.pop() # empty line
+                errorCount = errors.pop()
+                errors.pop() # empty line
+                for error in errors:
+                    if stdin is not None:
+                        error = error.replace("/dev/stdin", f)
                     failures.append(error)
             for lineNumber, line in enumerate(lines):
                 if "console.log" in line:

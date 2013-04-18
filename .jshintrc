@@ -1,0 +1,53 @@
+{
+    "browser": true,
+    "jquery": true,
+    "mootools": true,
+    "node": true,
+    "undef": true,
+    "sub": true,
+    "newcap": false,
+    "indent": 4,
+    "globals": {
+        "alert": true,
+        "confirm": true,
+        "prompt": true,
+        "escape": false,
+        "unescape": false,
+        "XDomainRequest": false,
+        "XMLHttpRequestProgressEvent": false,
+
+        "TNOODLE_ENV": true,
+        "printStackTrace": true,
+        "alertException": true,
+        "assert": true,
+        "now": true,
+        "GameMaster": true,
+        "GameMasterGui": true,
+        "Chatter": true,
+        "Split": true,
+        "GM": true,
+        "StatusBar": true,
+        "twistyjs": true,
+        "tnoodle": true,
+        "KeyboardManager": true,
+        "TimerDisplay": true,
+        "ColorChooser": true,
+        "ScrambleStuff": true,
+        "TimesTable": true,
+        "ShortcutManager": true,
+        "TriLayout": true,
+
+        "MooRainbow": true,
+
+        // twisty.js
+        "mark2": true,
+        "twisty": true,
+        "Stats": true,
+        "log": true,
+        "err": true,
+        "THREE": true,
+
+        "requestAnimFrame": true,
+        "cancelRequestAnimFrame": true
+    }
+}

@@ -1,3 +1,4 @@
+/* jshint indent:2 */
 /*
  * twisty_demo.js
  *
@@ -5,12 +6,12 @@
  *
  * TOOD
  * - Fix document.getElementById(...) calls.
-        // TODO I can imagine that some users of twisty.js would want to be able to have a Heise-style
-        // inspection, where you are only allowed to do inspection moves during inspection, rather than
-        // just starting the timer when they do a turn. This will require somehow being able to cancel/prevent a move?
-        // TODO clicking on canvas doesn't seem to focus window in firefox
-        // TODO clicking and dragging is weird when the mouse leaves the window
-        // TODO keydown doesn't repeat on firefox
+// TODO I can imagine that some users of twisty.js would want to be able to have a Heise-style
+// inspection, where you are only allowed to do inspection moves during inspection, rather than
+// just starting the timer when they do a turn. This will require somehow being able to cancel/prevent a move?
+// TODO clicking on canvas doesn't seem to focus window in firefox
+// TODO clicking and dragging is weird when the mouse leaves the window
+// TODO keydown doesn't repeat on firefox
  *
  */
 
@@ -51,9 +52,9 @@ function makeCCC(n) {
   var moves = [];
   var base = "L' U R' F' U L2 U2 L' U' L U2 D R' D' F2 R2 U'".split(" ");
   for(var i = 1; i<=n/2; i++) {
-          for(var j = 0; j < base.length; j++) {
-                  moves.push(i + base[j]);
-          }
+    for(var j = 0; j < base.length; j++) {
+      moves.push(i + base[j]);
+    }
   }
   return moves.join(" ");
 }
@@ -250,25 +251,25 @@ $(document).ready(function() {
 
     var keyCode = e.keyCode;
     switch(keyCode) {
-      case 27:
-        reloadCube();
-        e.preventDefault();
-        break;
+    case 27:
+      reloadCube();
+      e.preventDefault();
+      break;
 
-      case 32:
-        if (!isTiming()) {
-          var twisty = twistyScene.getTwisty();
-          var scramble = twisty.generateScramble(twisty);
-          // We're going to get notified of the scrambling, and we don't
-          // want to start the timer when that's happening, so we keep track
-          // of the fact that we're scrambling.
-          cubeState = CubeState.scrambling;
-          twistyScene.applyMoves(scramble);
-          cubeState = CubeState.scrambled;
-          resetTimer();
-        }
-        e.preventDefault();
-        break;
+    case 32:
+      if (!isTiming()) {
+        var twisty = twistyScene.getTwisty();
+        var scramble = twisty.generateScramble(twisty);
+        // We're going to get notified of the scrambling, and we don't
+        // want to start the timer when that's happening, so we keep track
+        // of the fact that we're scrambling.
+        cubeState = CubeState.scrambling;
+        twistyScene.applyMoves(scramble);
+        cubeState = CubeState.scrambled;
+        resetTimer();
+      }
+      e.preventDefault();
+      break;
     }
 
     twistyScene.keydown(e);

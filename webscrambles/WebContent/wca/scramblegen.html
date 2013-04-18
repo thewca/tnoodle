@@ -4,11 +4,11 @@
 <title>WCA Scrambler</title>
 
 <script type="text/javascript">
-function assert(expr) {
+    function assert(expr) {
         if(!expr) {
-                throw "";
+            throw "";
         }
-}
+    }
 </script>
 <script type="text/javascript" src="/env.js"></script>
 <script type="text/javascript" src="/scrambler-interface/js/ui.js"></script>
@@ -20,23 +20,23 @@ function assert(expr) {
 <style type="text/css">
 
 #ajaxStatus {
-        border-bottom: 1px solid black;
-        border-left: 1px solid black;
-        border-right: 1px solid black;
-        border-bottom-right-radius: 25px;
-        border-bottom-left-radius: 25px;
-        position: absolute;
-        z-index: 1;
-        background: red;
-        top: 0;
-        left: 5%;
-        right: 5%;
-        text-align: center;
-        height: 20%;
-        overflow: auto;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    position: absolute;
+    z-index: 1;
+    background: red;
+    top: 0;
+    left: 5%;
+    right: 5%;
+    text-align: center;
+    height: 20%;
+    overflow: auto;
 }
 #ajaxStatus .error {
-        padding: 5px;
+    padding: 5px;
 }
 
 .watermarkDiv {
@@ -68,277 +68,277 @@ function assert(expr) {
 
 <script type="text/javascript">
 (function() {
-        // To deal with puzzles that take a really long time to scramble, we specify
-        // a custom "max # of scrambles" to request all at once.
-        // This means a round of 5 scrambles that take 10 seconds to generate will
-        // take 10 seconds 5 times, rather than 50 seconds 1 time.
-        var DEFAULT_MAX_SCRAMBLES_PER_REQUEST = 10;
-        var maxScramblesPerRequestByPuzzle = { '444': 1 };
+    // To deal with puzzles that take a really long time to scramble, we specify
+    // a custom "max # of scrambles" to request all at once.
+    // This means a round of 5 scrambles that take 10 seconds to generate will
+    // take 10 seconds 5 times, rather than 50 seconds 1 time.
+    var DEFAULT_MAX_SCRAMBLES_PER_REQUEST = 10;
+    var maxScramblesPerRequestByPuzzle = { '444': 1 };
 
-        var scrambleServer = new tnoodle.ScrambleServer();
+    var scrambleServer = new tnoodle.ScrambleServer();
 
-        var watermarkDiv = null;
-        if(TNOODLE_ENV.WATERMARK) {
-                watermarkDiv = document.createElement('div');
-                watermarkDiv.classList.add("watermarkDiv");
-                var watermarkP = document.createElement('p');
-                watermarkP.classList.add("watermarkP");
-                watermarkDiv.appendChild(watermarkP);
+    var watermarkDiv = null;
+    if(TNOODLE_ENV.WATERMARK) {
+        watermarkDiv = document.createElement('div');
+        watermarkDiv.classList.add("watermarkDiv");
+        var watermarkP = document.createElement('p');
+        watermarkP.classList.add("watermarkP");
+        watermarkDiv.appendChild(watermarkP);
+    }
+
+    var ajaxStateDiv = document.createElement('div');
+    ajaxStateDiv.id = 'ajaxStatus';
+
+    var errorDivByAjaxId = {};
+    tnoodle.ajaxStateListeners.push(function(ajaxState) {
+        var showErrors = false;
+
+        var seenIds = {};
+        for(var ajaxId in ajaxState) {
+            if(ajaxState.hasOwnProperty(ajaxId)) {
+                var state = ajaxState[ajaxId];
+                if(state.lastError) {
+                    seenIds[ajaxId] = true;
+                    showErrors = true;
+                    var error = errorDivByAjaxId[ajaxId];
+                    if(!error) {
+                        error = document.createElement('div');
+                        error.classList.add('error');
+                        ajaxStateDiv.appendChild(error);
+                        errorDivByAjaxId[ajaxId] = error;
+
+                        error.urlSpan = document.createElement('div');
+                        error.appendChild(error.urlSpan);
+                        error.urlSpan.classList.add('url');
+
+                        error.lastErrorSpan = document.createElement('div');
+                        error.appendChild(error.lastErrorSpan);
+                        error.lastErrorSpan.classList.add('lastError');
+
+                        error.retryStateSpan = document.createElement('div');
+                        error.appendChild(error.retryStateSpan);
+                        error.urlSpan.classList.add('retryState');
+                    }
+
+                    error.urlSpan.innerHTML = "";
+                    error.urlSpan.appendChild(document.createTextNode(state.url));
+
+                    error.lastErrorSpan.innerHTML = "";
+                    error.lastErrorSpan.appendChild(document.createTextNode(state.lastError));
+
+                    var retryStateStr;
+                    if(state.secondsUntilRetry !== null) {
+                        retryStateStr = "Retrying in " + state.secondsUntilRetry + " seconds";
+                    } else {
+                        assert(state.retryAttempt);
+                        retryStateStr = "Trying again...";
+                    }
+                    error.retryStateSpan.innerHTML = "";
+                    error.retryStateSpan.appendChild(document.createTextNode(retryStateStr));
+                }
+            }
+        }
+        for(ajaxId in errorDivByAjaxId) {
+            if(errorDivByAjaxId.hasOwnProperty(ajaxId)) {
+                if(!seenIds[ajaxId]) {
+                    ajaxStateDiv.removeChild(errorDivByAjaxId[ajaxId]);
+                    delete errorDivByAjaxId[ajaxId];
+                }
+            }
+        }
+        if(showErrors) {
+            ajaxStateDiv.style.display = "";
+        } else {
+            ajaxStateDiv.style.display = "none";
+        }
+    });
+
+    function toScrambleRequest(sheets) {
+        var scrambleRequest = [];
+        for(var i = 0; i < sheets.length; i++) {
+            var sheet = sheets[i];
+            var generatedScrambles = requestsByGuid[sheet.guid].scrambles;
+            assert(generatedScrambles.length >= sheet.scrambleCount + sheet.extraScrambleCount);
+            // It's possible we generated more scrambles than we actually need.
+            var scrambles = generatedScrambles.slice(0, sheet.scrambleCount);
+            var extraScrambles = generatedScrambles.slice(sheet.scrambleCount, sheet.scrambleCount+sheet.extraScrambleCount);
+            var request = {
+                scrambles: scrambles,
+                extraScrambles: extraScrambles,
+                copies: 1, // TODO - add support for this to ui.js
+                scrambler: sheet.puzzle,
+                title: sheet.title,
+                fmc: sheet.fmc
+            };
+            scrambleRequest.push(request);
+        }
+        return scrambleRequest;
+    }
+    function showZip(e) {
+        var title = mark2.ui.getTitle();
+        var sheets = mark2.ui.getScrambleSheets();
+        var request = toScrambleRequest(sheets);
+        var password = mark2.ui.getPassword();
+        if(e.shiftKey) {
+            scrambleServer.showPdf(title, request, password, "_blank");
+        } else {
+            scrambleServer.showZip(title, request, password, "");
+        }
+    }
+
+    var requestsByGuid = {};
+    var title = "";
+    function toScramblesByGuid(requestsByGuid) {
+        var scramblesByGuid = {};
+        for(var guid in requestsByGuid) {
+            if(requestsByGuid.hasOwnProperty(guid)) {
+                scramblesByGuid[guid] = requestsByGuid[guid].scrambles;
+            }
+        }
+        return scramblesByGuid;
+    }
+
+    function scramblesLoaded(sheet, requestIndex, newScrambles) {
+        var scrambles = requestsByGuid[sheet.guid].scrambles;
+        var firstNullIndex = 0;
+        while(scrambles[firstNullIndex] !== null && scrambles[firstNullIndex] !== undefined) {
+            firstNullIndex++;
+        }
+        for(var i = 0; i < newScrambles.length; i++) {
+            scrambles[firstNullIndex + i] = newScrambles[i];
+        }
+        requestsByGuid[sheet.guid].pendingRequests[requestIndex] = null;
+        mark2.ui.scramblesGenerated(toScramblesByGuid(requestsByGuid));
+
+        // Perhaps there's more work to be done
+        competitionChanged();
+    }
+
+    function competitionChanged() {
+        var requestedGuids = {};
+        var sheets = mark2.ui.getScrambleSheets();
+        var request, i;
+        for(i = 0; i < sheets.length; i++) {
+            var sheet = sheets[i];
+            request = requestsByGuid[sheet.guid];
+            requestedGuids[sheet.guid] = true;
+
+            if(!request) {
+                request = {
+                    scrambles: [],
+                    pendingRequests: []
+                };
+                requestsByGuid[sheet.guid] = request;
+            }
+
+            if(request.scrambles.length < (sheet.scrambleCount + sheet.extraScrambleCount)) {
+                var seed = null;
+                var maxScramblesPerRequest = maxScramblesPerRequestByPuzzle[sheet.puzzle] || DEFAULT_MAX_SCRAMBLES_PER_REQUEST;
+                var unrequestedScrambleCount = (sheet.scrambleCount + sheet.extraScrambleCount) - request.scrambles.length;
+                var scramblesToRequest = Math.min(unrequestedScrambleCount, maxScramblesPerRequest);
+                request.scrambles.length += scramblesToRequest;
+
+                var requestIndex = request.pendingRequests.length;
+                var pendingRequest = scrambleServer.loadScrambles(scramblesLoaded.bind(null, sheet, requestIndex), sheet.puzzle, seed, scramblesToRequest);
+                request.pendingRequests.push(pendingRequest);
+            }
         }
 
-        var ajaxStateDiv = document.createElement('div');
-        ajaxStateDiv.id = 'ajaxStatus';
-
-        var errorDivByAjaxId = {};
-        tnoodle.ajaxStateListeners.push(function(ajaxState) {
-                var showErrors = false;
-
-                var seenIds = {};
-                for(var ajaxId in ajaxState) {
-                        if(ajaxState.hasOwnProperty(ajaxId)) {
-                                var state = ajaxState[ajaxId];
-                                if(state.lastError) {
-                                        seenIds[ajaxId] = true;
-                                        showErrors = true;
-                                        var error = errorDivByAjaxId[ajaxId];
-                                        if(!error) {
-                                                error = document.createElement('div');
-                                                error.classList.add('error');
-                                                ajaxStateDiv.appendChild(error);
-                                                errorDivByAjaxId[ajaxId] = error;
-
-                                                error.urlSpan = document.createElement('div');
-                                                error.appendChild(error.urlSpan);
-                                                error.urlSpan.classList.add('url');
-
-                                                error.lastErrorSpan = document.createElement('div');
-                                                error.appendChild(error.lastErrorSpan);
-                                                error.lastErrorSpan.classList.add('lastError');
-
-                                                error.retryStateSpan = document.createElement('div');
-                                                error.appendChild(error.retryStateSpan);
-                                                error.urlSpan.classList.add('retryState');
-                                        }
-
-                                        error.urlSpan.innerHTML = "";
-                                        error.urlSpan.appendChild(document.createTextNode(state.url));
-
-                                        error.lastErrorSpan.innerHTML = "";
-                                        error.lastErrorSpan.appendChild(document.createTextNode(state.lastError));
-
-                                        var retryStateStr;
-                                        if(state.secondsUntilRetry !== null) {
-                                                retryStateStr = "Retrying in " + state.secondsUntilRetry + " seconds";
-                                        } else {
-                                                assert(state.retryAttempt);
-                                                retryStateStr = "Trying again...";
-                                        }
-                                        error.retryStateSpan.innerHTML = "";
-                                        error.retryStateSpan.appendChild(document.createTextNode(retryStateStr));
-                                }
+        for(var guid in requestsByGuid) {
+            if(requestsByGuid.hasOwnProperty(guid)) {
+                if(!requestedGuids[guid]) {
+                    // This request is no longer needed, so we abort it if
+                    // it's still running, and then delete it.
+                    request = requestsByGuid[guid];
+                    for(i = 0; i < request.pendingRequests.length; i++) {
+                        if(request.pendingRequests[i]) {
+                            request.pendingRequests[i].abort();
                         }
+                    }
+                    delete requestsByGuid[guid];
                 }
-                for(ajaxId in errorDivByAjaxId) {
-                        if(errorDivByAjaxId.hasOwnProperty(ajaxId)) {
-                                if(!seenIds[ajaxId]) {
-                                        ajaxStateDiv.removeChild(errorDivByAjaxId[ajaxId]);
-                                        delete errorDivByAjaxId[ajaxId];
-                                }
-                        }
-                }
-                if(showErrors) {
-                        ajaxStateDiv.style.display = "";
-                } else {
-                        ajaxStateDiv.style.display = "none";
-                }
-        });
-
-        function toScrambleRequest(sheets) {
-                var scrambleRequest = [];
-                for(var i = 0; i < sheets.length; i++) {
-                        var sheet = sheets[i];
-                        var generatedScrambles = requestsByGuid[sheet.guid].scrambles;
-                        assert(generatedScrambles.length >= sheet.scrambleCount + sheet.extraScrambleCount);
-                        // It's possible we generated more scrambles than we actually need.
-                        var scrambles = generatedScrambles.slice(0, sheet.scrambleCount);
-                        var extraScrambles = generatedScrambles.slice(sheet.scrambleCount, sheet.scrambleCount+sheet.extraScrambleCount);
-                        var request = {
-                                scrambles: scrambles,
-                                extraScrambles: extraScrambles,
-                                copies: 1, // TODO - add support for this to ui.js
-                                scrambler: sheet.puzzle,
-                                title: sheet.title,
-                                fmc: sheet.fmc
-                        };
-                        scrambleRequest.push(request);
-                }
-                return scrambleRequest;
+            }
         }
-        function showZip(e) {
-                var title = mark2.ui.getTitle();
-                var sheets = mark2.ui.getScrambleSheets();
-                var request = toScrambleRequest(sheets);
-                var password = mark2.ui.getPassword();
-                if(e.shiftKey) {
-                        scrambleServer.showPdf(title, request, password, "_blank");
-                } else {
-                        scrambleServer.showZip(title, request, password, "");
-                }
+        // We may have deleted some scrambles in the previous for loop, so we must inform
+        // the ui.
+        mark2.ui.scramblesGenerated(toScramblesByGuid(requestsByGuid));
+        queueLoadScrambles();
+    }
+
+    var pendingLoadScramblesRequest;
+    function queueLoadScrambles() {
+        if(!pendingLoadScramblesRequest) {
+            pendingLoadScramblesRequest = scrambleServer.loadPuzzles(puzzlesLoaded, true);
         }
+    }
 
-        var requestsByGuid = {};
-        var title = "";
-        function toScramblesByGuid(requestsByGuid) {
-                var scramblesByGuid = {};
-                for(var guid in requestsByGuid) {
-                        if(requestsByGuid.hasOwnProperty(guid)) {
-                                scramblesByGuid[guid] = requestsByGuid[guid].scrambles;
-                        }
-                }
-                return scramblesByGuid;
+    function puzzlesLoaded(puzzles) {
+        pendingLoadScramblesRequest = null;
+
+        var puzzleToStatus = {};
+        for(var i = 0; i < puzzles.length; i++) {
+            var puzzle = puzzles[i];
+            puzzleToStatus[puzzle.shortName] = puzzle.initializationStatus;
         }
-
-        function scramblesLoaded(sheet, requestIndex, newScrambles) {
-                var scrambles = requestsByGuid[sheet.guid].scrambles;
-                var firstNullIndex = 0;
-                while(scrambles[firstNullIndex] !== null && scrambles[firstNullIndex] !== undefined) {
-                        firstNullIndex++;
-                }
-                for(var i = 0; i < newScrambles.length; i++) {
-                        scrambles[firstNullIndex + i] = newScrambles[i];
-                }
-                requestsByGuid[sheet.guid].pendingRequests[requestIndex] = null;
-                mark2.ui.scramblesGenerated(toScramblesByGuid(requestsByGuid));
-
-                // Perhaps there's more work to be done
-                competitionChanged();
+        if(!mark2.ui.puzzlesInitializing(puzzleToStatus)) {
+            // Not done initializing all the puzzles we care about yet,
+            // so we schedule ourself to check again.
+            pendingLoadScramblesRequest = setTimeout(function() {
+                scrambleServer.loadPuzzles(puzzlesLoaded, true);
+            }, 1000);
         }
+    }
 
-        function competitionChanged() {
-                var requestedGuids = {};
-                var sheets = mark2.ui.getScrambleSheets();
-                var request, i;
-                for(i = 0; i < sheets.length; i++) {
-                        var sheet = sheets[i];
-                        request = requestsByGuid[sheet.guid];
-                        requestedGuids[sheet.guid] = true;
+    var removeTempDiv = function() {
+        var tempDiv = document.getElementById("temp_div");
+        document.body.removeChild(tempDiv);
+    };
 
-                        if(!request) {
-                                request = {
-                                        scrambles: [],
-                                        pendingRequests: []
-                                };
-                                requestsByGuid[sheet.guid] = request;
-                        }
+    var callbacks = {
+        showScrambles: showZip,
+        competitionChanged: competitionChanged
+    };
+    
+    window.addEventListener('load', function() {
+        var tnoodleLinkSpan = document.createElement('span');
+        var tnoodleLink = document.createElement('a');
+        tnoodleLink.href = '/readme';
+        tnoodleLink.appendChild(document.createTextNode("TNoodle"));
+        tnoodleLinkSpan.appendChild(tnoodleLink);
+        tnoodleLinkSpan.appendChild(document.createTextNode(" WCA Scrambler"));
+        var div = mark2.ui.initialize(tnoodleLinkSpan, callbacks);
+        removeTempDiv();
+        document.body.appendChild(ajaxStateDiv);
+        document.body.appendChild(div);
+        mark2.ui.addHelpLink("/readme/scramble");
+        document.getElementById("logo_top").src="/tnoodle_logo.svg";
 
-                        if(request.scrambles.length < (sheet.scrambleCount + sheet.extraScrambleCount)) {
-                                var seed = null;
-                                var maxScramblesPerRequest = maxScramblesPerRequestByPuzzle[sheet.puzzle] || DEFAULT_MAX_SCRAMBLES_PER_REQUEST;
-                                var unrequestedScrambleCount = (sheet.scrambleCount + sheet.extraScrambleCount) - request.scrambles.length;
-                                var scramblesToRequest = Math.min(unrequestedScrambleCount, maxScramblesPerRequest);
-                                request.scrambles.length += scramblesToRequest;
-
-                                var requestIndex = request.pendingRequests.length;
-                                var pendingRequest = scrambleServer.loadScrambles(scramblesLoaded.bind(null, sheet, requestIndex), sheet.puzzle, seed, scramblesToRequest);
-                                request.pendingRequests.push(pendingRequest);
-                        }
+        function redrawWatermark() {
+            var watermarkLength = Math.sqrt(window.innerHeight*window.innerHeight + window.innerWidth*window.innerWidth);
+            watermarkLength += 100; // the extra 100 pixels are to prevent words from wrapping so we can get a nice sharp cutoff
+            watermarkP.style.width = watermarkLength + 'px';
+            watermarkP.style.height = watermarkLength + 'px';
+            watermarkP.style.top = (window.innerHeight - watermarkLength)/2 + 'px';
+            watermarkP.style.left = (window.innerWidth - watermarkLength)/2 + 'px';
+            watermarkP.empty();
+            for(var i = 0; i < 1000; i++) { // NASA style loops, yo
+                // if there are no spaces, the watermark will never wrap
+                var el = document.createTextNode(" " + TNOODLE_ENV.WATERMARK);
+                watermarkP.appendChild(el);
+                if(watermarkP.scrollHeight > watermarkP.clientHeight) {
+                    // We've filled up the div, we can stop now
+                    break;
                 }
-
-                for(var guid in requestsByGuid) {
-                        if(requestsByGuid.hasOwnProperty(guid)) {
-                                if(!requestedGuids[guid]) {
-                                        // This request is no longer needed, so we abort it if
-                                        // it's still running, and then delete it.
-                                        request = requestsByGuid[guid];
-                                        for(i = 0; i < request.pendingRequests.length; i++) {
-                                                if(request.pendingRequests[i]) {
-                                                        request.pendingRequests[i].abort();
-                                                }
-                                        }
-                                        delete requestsByGuid[guid];
-                                }
-                        }
-                }
-                // We may have deleted some scrambles in the previous for loop, so we must inform
-                // the ui.
-                mark2.ui.scramblesGenerated(toScramblesByGuid(requestsByGuid));
-                queueLoadScrambles();
+            }
         }
-
-        var pendingLoadScramblesRequest;
-        function queueLoadScrambles() {
-                if(!pendingLoadScramblesRequest) {
-                        pendingLoadScramblesRequest = scrambleServer.loadPuzzles(puzzlesLoaded, true);
-                }
+        if(watermarkDiv) {
+            document.body.appendChild(watermarkDiv);
+            window.addEventListener('resize', function(e) {
+                redrawWatermark();
+            });
+            redrawWatermark();
         }
-
-        function puzzlesLoaded(puzzles) {
-                pendingLoadScramblesRequest = null;
-
-                var puzzleToStatus = {};
-                for(var i = 0; i < puzzles.length; i++) {
-                        var puzzle = puzzles[i];
-                        puzzleToStatus[puzzle.shortName] = puzzle.initializationStatus;
-                }
-                if(!mark2.ui.puzzlesInitializing(puzzleToStatus)) {
-                        // Not done initializing all the puzzles we care about yet,
-                        // so we schedule ourself to check again.
-                        pendingLoadScramblesRequest = setTimeout(function() {
-                                scrambleServer.loadPuzzles(puzzlesLoaded, true);
-                        }, 1000);
-                }
-        }
-
-        var removeTempDiv = function() {
-                var tempDiv = document.getElementById("temp_div");
-                document.body.removeChild(tempDiv);
-        };
-
-        var callbacks = {
-                showScrambles: showZip,
-                competitionChanged: competitionChanged
-        };
-        
-        window.addEventListener('load', function() {
-                var tnoodleLinkSpan = document.createElement('span');
-                var tnoodleLink = document.createElement('a');
-                tnoodleLink.href = '/readme';
-                tnoodleLink.appendChild(document.createTextNode("TNoodle"));
-                tnoodleLinkSpan.appendChild(tnoodleLink);
-                tnoodleLinkSpan.appendChild(document.createTextNode(" WCA Scrambler"));
-                var div = mark2.ui.initialize(tnoodleLinkSpan, callbacks);
-                removeTempDiv();
-                document.body.appendChild(ajaxStateDiv);
-                document.body.appendChild(div);
-                mark2.ui.addHelpLink("/readme/scramble");
-                document.getElementById("logo_top").src="/tnoodle_logo.svg";
-
-                function redrawWatermark() {
-                   var watermarkLength = Math.sqrt(window.innerHeight*window.innerHeight + window.innerWidth*window.innerWidth);
-                   watermarkLength += 100; // the extra 100 pixels are to prevent words from wrapping so we can get a nice sharp cutoff
-                   watermarkP.style.width = watermarkLength + 'px';
-                   watermarkP.style.height = watermarkLength + 'px';
-                   watermarkP.style.top = (window.innerHeight - watermarkLength)/2 + 'px';
-                   watermarkP.style.left = (window.innerWidth - watermarkLength)/2 + 'px';
-                   watermarkP.empty();
-                   for(var i = 0; i < 1000; i++) { // NASA style loops, yo
-                      // if there are no spaces, the watermark will never wrap
-                      var el = document.createTextNode(" " + TNOODLE_ENV.WATERMARK);
-                      watermarkP.appendChild(el);
-                      if(watermarkP.scrollHeight > watermarkP.clientHeight) {
-                         // We've filled up the div, we can stop now
-                         break;
-                      }
-                   }
-                }
-                if(watermarkDiv) {
-                   document.body.appendChild(watermarkDiv);
-                   window.addEventListener('resize', function(e) {
-                      redrawWatermark();
-                   });
-                   redrawWatermark();
-                }
-        }, false);
+    }, false);
 
 })();
 </script>
@@ -346,7 +346,7 @@ function assert(expr) {
 </head>
 <body>
 <div id="temp_div" style="text-align: center; margin: 2em; font-family: sans-serif; font-size: 20px;">
-        Loading scramble interface...
+    Loading scramble interface...
 </div>
 
 </body>

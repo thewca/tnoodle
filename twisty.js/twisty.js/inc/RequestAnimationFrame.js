@@ -1,3 +1,4 @@
+/* jshint indent:2 */
 /**
  * Cancellable version of requestAnimationFrame.
  * http://notes.jetienne.com/2011/05/18/cancelRequestAnimFrame-for-paul-irish-requestAnimFrame.html

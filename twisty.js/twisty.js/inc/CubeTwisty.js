@@ -1,3 +1,4 @@
+/* jshint indent:2 */
 (function() {
   /*
    * Algorithm Helper Methods
@@ -92,8 +93,8 @@
 
     var midfix = move[2];
     if(move[1] == -1) {
-        // This is a rotation
-        midfix = reverseSliceMap[midfix];
+      // This is a rotation
+      midfix = reverseSliceMap[midfix];
     } else if(move[0] == 1 && move[1] == 2) {
       midfix = midfix.toLowerCase();
     } else if(move[0] != 1 || move[1] != 1) {
@@ -215,63 +216,62 @@
       "B": zz,
       "D": yy
     };
-  var sidesUV = [
-                 axify(xx, zzi, yy),
-                 axify(zz, yy, xxi),
-                 axify(xx, yy, zz),
-                 axify(zzi, yy, xx),
-                 axify(xxi, yy, zzi),
-                 axify(xx, zz, yyi)
-                 ];
+    var sidesUV = [
+      axify(xx, zzi, yy),
+      axify(zz, yy, xxi),
+      axify(xx, yy, zz),
+      axify(zzi, yy, xx),
+      axify(xxi, yy, zzi),
+      axify(xx, zz, yyi)
+    ];
 
-  //Cube Object Generation
-  for (i = 0; i < numSides; i++) {
-    var facePieces = [];
-    cubePieces.push(facePieces);
-    for (var su = 0; su < cubeOptions.dimension; su++) {
-      for (var sv = 0; sv < cubeOptions.dimension; sv++) {
+    //Cube Object Generation
+    for (i = 0; i < numSides; i++) {
+      var facePieces = [];
+      cubePieces.push(facePieces);
+      for (var su = 0; su < cubeOptions.dimension; su++) {
+        for (var sv = 0; sv < cubeOptions.dimension; sv++) {
 
-        var sticker = new THREE.Object3D();
+          var sticker = new THREE.Object3D();
 
 
-        var meshes = [ materials[i] ];
-        if (cubeOptions.stickerBorder) {
-          meshes.push(borderMaterial);
-        }
-        /* This is here purely for speed comparison purposes.
-         if (cubeOptions.stickerBorder) {
-          var geometry = new THREE.Geometry();
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions.stickerWidth/2, +cubeOptions.stickerWidth/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, +cubeOptions.stickerWidth/2, 0) ) );
-          geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
-          var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: cubeOptions.opacity } ) );
+          var meshes = [ materials[i] ];
+          if (cubeOptions.stickerBorder) {
+            meshes.push(borderMaterial);
+            /* This is here purely for speed comparison purposes.
+            var geometry = new THREE.Geometry();
+            geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
+            geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
+            geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(+cubeOptions.stickerWidth/2, +cubeOptions.stickerWidth/2, 0) ) );
+            geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, +cubeOptions.stickerWidth/2, 0) ) );
+            geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(-cubeOptions.stickerWidth/2, -cubeOptions.stickerWidth/2, 0) ) );
+            var border = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: cubeOptions.opacity } ) );
 
-          sticker.addChild(border);
-        */
+            sticker.addChild(border);
+             */
+          }
 
-        var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions.stickerWidth, cubeOptions.stickerWidth), meshes);
-        stickerInterior.doubleSided = cubeOptions.doubleSided;
-        sticker.addChild(stickerInterior);
+          var stickerInterior = new THREE.Mesh(new THREE.PlaneGeometry(cubeOptions.stickerWidth, cubeOptions.stickerWidth), meshes);
+          stickerInterior.doubleSided = cubeOptions.doubleSided;
+          sticker.addChild(stickerInterior);
 
-        var positionMatrix = new THREE.Matrix4();
-        positionMatrix.setTranslation(
+          var positionMatrix = new THREE.Matrix4();
+          positionMatrix.setTranslation(
             su*2 - cubeOptions.dimension + 1,
             -(sv*2 - cubeOptions.dimension + 1),
             cubeOptions.dimension
-        );
+          );
 
-        var transformationMatrix = new THREE.Matrix4();
-        transformationMatrix.copy(sidesUV[i]);
-        transformationMatrix.multiplySelf(positionMatrix);
-        sticker.matrix.copy(transformationMatrix);
+          var transformationMatrix = new THREE.Matrix4();
+          transformationMatrix.copy(sidesUV[i]);
+          transformationMatrix.multiplySelf(positionMatrix);
+          sticker.matrix.copy(transformationMatrix);
 
-        sticker.matrixAutoUpdate = false;
-        sticker.update();
+          sticker.matrixAutoUpdate = false;
+          sticker.update();
 
-        facePieces.push([transformationMatrix, sticker]);
-        cubeObject.addChild(sticker);
+          facePieces.push([transformationMatrix, sticker]);
+          cubeObject.addChild(sticker);
 
         }
       }
@@ -307,12 +307,12 @@
           var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
           if ( layer < twisty.options.dimension - 2*layerStart + 2.5 &&
                layer > twisty.options.dimension - 2*layerEnd - 0.5 ) {
-               var roty = rott.clone();
-               roty.multiplySelf(sticker[0]);
+            var roty = rott.clone();
+            roty.multiplySelf(sticker[0]);
 
-               sticker[1].matrix.copy(roty);
-               sticker[1].update();
-             }
+            sticker[1].matrix.copy(roty);
+            sticker[1].update();
+          }
         }
       }
 
@@ -361,12 +361,12 @@
           var layer = matrixVector3Dot(sticker[1].matrix, sidesNorm[currentMove[2]]);
           if ( layer < twisty.options.dimension - 2*layerStart + 2.5 &&
                layer > twisty.options.dimension - 2*layerEnd - 0.5 ) {
-               var roty = rott.clone();
-               roty.multiplySelf(sticker[0]);
+            var roty = rott.clone();
+            roty.multiplySelf(sticker[0]);
 
-               sticker[1].matrix.copy(roty);
-               sticker[0].copy(roty);
-               sticker[1].update();
+            sticker[1].matrix.copy(roty);
+            sticker[0].copy(roty);
+            sticker[1].update();
           }
         }
       }
