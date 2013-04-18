@@ -27,16 +27,16 @@ def startGitSensitiveScreen(screenTitle, projects, cleanCommand=None):
       # savepid does some magic with "set -o monitor" that I don't fully understand,
       # but a side effect of it is that ctrl-c and ctrl-z don't work. We sleep 1 to
       # give people a chance to kill this loop.
-      screenrc += 'stuff "while true; do git-tools/savepid git-tools/pids/%s.pid %s; sleep 1; done\\012"\n' % ( project.name, project.runCommand.replace('"', '\\"') )
+      screenrc += 'stuff "while true; do git-tools/savepid git-tools/pids/%s.pid %s; sleep 1; done\\012"\n' % ( project.name, project.runCommand.replace('"', '\\"' ) )
       screenrc += "\n"
 
    screenrc += "\n"
    i += 1
    screenrc += 'screen -t "git" %s\n' % (i + 1)
    compileCommands = " && ".join([ project.compileCommand for project in projects ])
-   screenrc += 'stuff "%s\\012"\n' % compileCommands
+   screenrc += 'stuff "%s\\012"\n' % compileCommands.replace('"', '\\"')
    killCommands = " && ".join([ 'sudo git-tools/kill-tree.sh $(ps opgid= `cat git-tools/pids/%s.pid`)' % project.name for project in projects ])
-   screenrc += """
+   killCommands = " && ".join([ 'sudo kill -- -$(ps opgid= `cat git-tools/pids/%s.pid`)' % project.name for project in projects ])
 # Trick to kill whole process tree stolen from
 #  http://stackoverflow.com/a/3211182
 stuff "git-tools/poll.sh \\"%s && %s && %s\\";\\012"
