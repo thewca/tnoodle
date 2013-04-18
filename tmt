@@ -909,7 +909,7 @@ title: %s released
 file: releases/%s
 date: %s
 ---""" % ( tmt.VERSION, tmt.VERSION, baseFileName, now.isoformat() )
-                        postFileName = "_posts/%s" % now.date().isoformat()
+                        postFileName = "_posts/%s-%s.md" % ( now.date().isoformat(), tag )
                         postFile = open(postFileName, "w")
                         postFile.write(postStr)
                         postFile.close()
