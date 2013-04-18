@@ -14,7 +14,9 @@ class GitSensitiveProject(object):
       self.compileCommand = compileCommand
       self.runCommand = runCommand
 
-def startGitSensitiveScreen(screenTitle, projects):
+def startGitSensitiveScreen(screenTitle, projects, cleanCommand=None):
+   if not cleanCommand:
+      cleanCommand = "echo I have no clean command"
    uniqueNames = set([ project.name for project in projects ])
    assert len(uniqueNames) == len(projects), "Project names must be unique"
    assert all([ ' ' not in project.name for project in projects ]), "Project names must not contain spaces"
@@ -33,12 +35,11 @@ def startGitSensitiveScreen(screenTitle, projects):
    screenrc += 'screen -t "git" %s\n' % (i + 1)
    compileCommands = " && ".join([ project.compileCommand for project in projects ])
    screenrc += 'stuff "%s\\012"\n' % compileCommands.replace('"', '\\"')
-   killCommands = " && ".join([ 'sudo kill -- -$(ps opgid= `cat git-tools/pids/%s.pid`)' % project.name for project in projects ])
-   screenrc += """
+   killCommands = " && ".join([ 'sudo git-tools/kill-tree.sh $(ps opgid= `cat git-tools/pids/%s.pid`)' % project.name for project in projects ])
 # Trick to kill whole process tree stolen from
-#  http://stackoverflow.com/a/15139734
-stuff "git-tools/poll.sh \\"%s && %s\\";\\012"
-""" % ( compileCommands, killCommands )
+#  http://stackoverflow.com/a/3211182
+stuff "git-tools/poll.sh \\"%s && %s && %s\\";\\012"
+""" % ( cleanCommand, compileCommands, killCommands )
    
    screenrcFile = open("git-tools/pids/screenrc", "w")
    screenrcFile.write(screenrc)

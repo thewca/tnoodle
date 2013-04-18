@@ -2,8 +2,8 @@
 
 if [ $# -lt 2 ]
 then
-	echo "USAGE: `basename $0` PIDFILE COMMAND [ARGS...]"
-	exit 1
+        echo "USAGE: `basename $0` PIDFILE COMMAND [ARGS...]"
+        exit 1
 fi
 
 # you can't fg inside of a script unless you enable montior mode
