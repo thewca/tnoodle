@@ -21,7 +21,11 @@ def excepthook(etype, value, tb):
         pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
-def runCmd(argv, showStatus=False, interactive=False):
+def checkCmd(*args, **kwargs):
+    kwargs['assertSuccess'] = True
+    return runCmd(*args, **kwargs)
+
+def runCmd(argv, showStatus=False, interactive=False, assertSuccess=False):
     if showStatus:
             print argv
             print " ".join(argv)
@@ -40,11 +44,14 @@ def runCmd(argv, showStatus=False, interactive=False):
                     if showStatus:
                             print newStdout
             # TODO - i've noticed that the call to stderr.read() hangs, swapping the order seems to help...
+            # gah, you're an idiot, this is going to fail if you don't call communicate()
             newStderr = p.stderr.read()
             if newStderr:
                     stderr += newStderr
                     if showStatus:
                             print newStderr
+    if assertSuccess:
+        assert p.returncode == 0
     return p.returncode, stdout, stderr
 
 def entryPoint():
@@ -886,13 +893,35 @@ class EclipseProject(TmtProject):
                         # the version number of the resulting file will be correct.
                         self.dist()
 
-                        github.connect(organization="cubing", repo="tnoodle")
-                        if not github.upload(self.distJarFile()):
-                                print "Failed to upload %s, see above for details" % self.distJarFile()
-                                print "Deleting tag %s" % tag
-                                deleteTagCommand = "git tag -d %s" % (tag)
-                                assert 0 == os.system(deleteTagCommand)
-                                return
+                        # TODO - this won't work if gh-pages hasn't been created yet
+                        checkCmd("git checkout gh-pages", showStatus=True)
+                        baseFileName = os.path.basename(self.distJarFile())
+                        releaseFileName = "releases/%s" % baseFileName
+                        shutil.copy(self.distJarFile(), releaseFileName)
+                        now = datetime.datetime.now()
+                        postStr = """---
+layout: release
+version: %s
+title: %s released
+file: releases/%s
+date: %s
+---""" % ( tmt.VERSION, tmt.VERSION, baseFileName, now.isoformat() )
+                        postFileName = "_posts/%s" % now.date().isoformat()
+                        postFile = open(postFileName, "w")
+                        postFile.write(postStr)
+                        postFile.close()
+
+                        checkCmd("git add %s %s" % ( releaseFileName, postFileName ), showStatus=True)
+                        checkCmd("git commit -m 'adding files for version %s'" % tmt.VERSION, showStatus=True)
+                        retVal, _, _ = runCmd("git push git@github.com:cubing/tnoodle.git gh-pages", showStatus=True)
+                        if retVal != 0:
+                            print "Failed to push"
+                            print "Deleting tag %s" % tag
+                            deleteTagCommand = "git tag -d %s" % (tag)
+                            assert 0 == os.system(deleteTagCommand)
+                            return
+
+                        checkCmd("git checkout master", showStatus=True)
 
                         for pushTags in [ False, True ]:
                                 # git push --tags seems to not do everything git push does
