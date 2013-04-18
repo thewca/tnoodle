@@ -916,7 +916,7 @@ date: %s
 
                         checkShellCmd("git add %s %s" % ( releaseFileName, postFileName ), showStatus=True)
                         checkShellCmd("git commit -m 'adding files for version %s'" % tmt.VERSION, showStatus=True)
-                        retVal, _, _ = runCmd("git push git@github.com:cubing/tnoodle.git gh-pages", showStatus=True, shell=True)
+                        retVal = os.system("git push git@github.com:cubing/tnoodle.git gh-pages", showStatus=True)
                         if retVal != 0:
                             print "Failed to push"
                             print "Deleting tag %s" % tag
