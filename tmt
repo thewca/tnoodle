@@ -21,20 +21,22 @@ def excepthook(etype, value, tb):
         pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
-def checkCmd(*args, **kwargs):
+def checkShellCmd(*args, **kwargs):
     kwargs['assertSuccess'] = True
+    kwargs['shell'] = True
     return runCmd(*args, **kwargs)
 
-def runCmd(argv, showStatus=False, interactive=False, assertSuccess=False):
+def runCmd(argv, showStatus=False, interactive=False, assertSuccess=False, shell=False):
     if showStatus:
             print argv
-            print " ".join(argv)
+            if not shell:
+                print " ".join(argv)
     if interactive:
        p = subprocess.Popen(argv)
        p.wait()
        return p.returncode
 
-    p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(argv, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout = ''
     stderr = ''
     while p.poll() is None:
@@ -894,7 +896,7 @@ class EclipseProject(TmtProject):
                         self.dist()
 
                         # TODO - this won't work if gh-pages hasn't been created yet
-                        checkCmd("git checkout gh-pages", showStatus=True)
+                        checkShellCmd("git checkout gh-pages", showStatus=True)
                         baseFileName = os.path.basename(self.distJarFile())
                         releaseFileName = "releases/%s" % baseFileName
                         shutil.copy(self.distJarFile(), releaseFileName)
@@ -911,8 +913,8 @@ date: %s
                         postFile.write(postStr)
                         postFile.close()
 
-                        checkCmd("git add %s %s" % ( releaseFileName, postFileName ), showStatus=True)
-                        checkCmd("git commit -m 'adding files for version %s'" % tmt.VERSION, showStatus=True)
+                        checkShellCmd("git add %s %s" % ( releaseFileName, postFileName ), showStatus=True)
+                        checkShellCmd("git commit -m 'adding files for version %s'" % tmt.VERSION, showStatus=True)
                         retVal, _, _ = runCmd("git push git@github.com:cubing/tnoodle.git gh-pages", showStatus=True)
                         if retVal != 0:
                             print "Failed to push"
@@ -921,7 +923,7 @@ date: %s
                             assert 0 == os.system(deleteTagCommand)
                             return
 
-                        checkCmd("git checkout master", showStatus=True)
+                        checkShellCmd("git checkout master", showStatus=True)
 
                         for pushTags in [ False, True ]:
                                 # git push --tags seems to not do everything git push does
