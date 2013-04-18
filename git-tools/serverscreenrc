@@ -1,8 +1,0 @@
-screen -t "server" 1
-stuff "while true; do git-tools/savepid git-tools/serverpid ./startserver.sh; done\012"
-
-screen -t "git" 2
-
-# Trick to kill whole process tree stolen from
-#  http://stackoverflow.com/a/15139734
-stuff "git-tools/poll.sh sudo kill -- -$(ps opgid= `cat git-tools/serverpid`);\012"
