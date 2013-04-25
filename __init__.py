@@ -35,7 +35,7 @@ def startGitSensitiveScreen(screenTitle, projects, cleanCommand=None):
    screenrc += 'screen -t "git" %s\n' % (i + 1)
    compileCommands = " && ".join([ project.compileCommand if project.compileCommand else "echo No compile command" for project in projects ])
    screenrc += 'stuff "%s\\012"\n' % compileCommands.replace('"', '\\"')
-   killCommands = " && ".join([ 'sudo git-tools/kill-tree.sh `cat git-tools/pids/%s.pid`' % project.name for project in projects ])
+   killCommands = " && ".join([ "sudo bash -c 'git-tools/kill-tree.sh \\`cat git-tools/pids/%s.pid\\`'" % project.name for project in projects ])
    screenrc += """
 # Trick to kill whole process tree stolen from
 #  http://stackoverflow.com/a/3211182
