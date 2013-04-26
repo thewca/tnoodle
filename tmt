@@ -1038,7 +1038,7 @@ Manifest-Version: 1.0
 Main-Class: %s
 Implementation-Title: %s
 Implementation-Version: %s
-        """ % ( self.main, implementationTitle, tmt.VERSION )
+""" % ( self.main, implementationTitle, tmt.VERSION )
                                 jar.writestr('META-INF/MANIFEST.MF', manifest)
 
                         # Give subclasses the opportunity to make some last minute tweaks to the jar file
