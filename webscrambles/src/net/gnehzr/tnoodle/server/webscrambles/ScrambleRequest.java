@@ -553,7 +553,8 @@ class ScrambleRequest {
             
             Dimension scrambleImageSize = scrambleRequest.scrambler.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight);
             
-            PdfPTable scramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme);
+            String scrambleNumberPrefix = "";
+            PdfPTable scramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
             doc.add(scramblesTable);
 
             if(scrambleRequest.extraScrambles.length > 0) {
@@ -567,19 +568,20 @@ class ScrambleRequest {
                 headerTable.addCell(extraScramblesHeader);
                 doc.add(headerTable);
                 
-                PdfPTable extraSscramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme);
+                scrambleNumberPrefix = "E";
+                PdfPTable extraSscramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
                 doc.add(extraSscramblesTable);
             }
         }
         doc.newPage();
     }
 
-    private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme) throws DocumentException {
+    private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix) throws DocumentException {
         PdfContentByte cb = docWriter.getDirectContent();
 
         PdfPTable table = new PdfPTable(3);
 
-        int charsWide = 1 + (int) Math.log10(scrambles.length);
+        int charsWide = scrambleNumberPrefix.length() + 1 + (int) Math.log10(scrambles.length);
         String wideString = "";
         for(int i = 0; i < charsWide; i++) {
             // M has got to be as wide or wider than the widest digit in our font
@@ -628,7 +630,7 @@ class ScrambleRequest {
 
         for(int i = 0; i < scrambles.length; i++) {
             String scramble = scrambles[i];
-            Chunk ch = new Chunk((i+1)+".");
+            Chunk ch = new Chunk(scrambleNumberPrefix + (i+1) + ".");
             PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
             nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             table.addCell(nthscramble);
