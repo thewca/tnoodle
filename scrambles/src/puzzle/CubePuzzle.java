@@ -304,7 +304,9 @@ public class CubePuzzle extends Puzzle {
         }
         image = cloneImage(image);
 
+        int spins = 0;
         while (!isNormalized(image)) {
+            azzert(spins < 2);
             int[][] stickersByPiece = getStickersByPiece(image);
 
             int goal = 0;
@@ -370,7 +372,8 @@ public class CubePuzzle extends Puzzle {
                         azzert(false);
                 }
             }
-            spinCube(image, f, 1);
+            spinCube(image, f, dir);
+            spins++;
         }
 
         return image;
