@@ -217,7 +217,7 @@ public class Search {
 				}
 			}
 		}
-		return "Error 7";
+		return solution == null ? "Error 7" : solution;
 	}
 
 	/**
