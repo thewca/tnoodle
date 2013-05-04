@@ -1,12 +1,30 @@
 package net.gnehzr.tnoodle.test;
 
-import net.gnehzr.tnoodle.scrambles.*;
-import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
+import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
+
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.SortedMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
+import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
+import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
+import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
+import net.gnehzr.tnoodle.scrambles.ScrambleCacherListener;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
-import net.gnehzr.tnoodle.utils.Utils;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
+import net.gnehzr.tnoodle.utils.Utils;
 import puzzle.ClockPuzzle;
 import puzzle.ClockPuzzle.ClockState;
 import puzzle.CubePuzzle;
@@ -18,21 +36,10 @@ import puzzle.PyraminxSolver.PyraminxSolverState;
 import puzzle.TwoByTwoSolver;
 import puzzle.TwoByTwoSolver.TwoByTwoState;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.SortedMap;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
-
 public class ScrambleTest {
     private static final Logger l = Logger.getLogger(Puzzle.class.getName());
+    
+    private static final Random r = Utils.getSeededRandom();
     
     static class LockHolder extends Thread {
         public LockHolder() {
@@ -72,7 +79,6 @@ public class ScrambleTest {
     }
 
     public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
-
         benchmarking();
 
         System.out.println("Testing names.");
@@ -92,7 +98,6 @@ public class ScrambleTest {
     private static void testSolveIn() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
         int SCRAMBLE_COUNT = 10;
         int SCRAMBLE_LENGTH = 4;
-        Random r = new Random();
 
         SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
 
@@ -101,8 +106,12 @@ public class ScrambleTest {
             final Puzzle scrambler = lazyScrambler.cachedInstance();
 
             System.out.println("Testing " + puzzle);
+            
+            // Test solving the solved state
+            String solution = scrambler.getSolvedState().solveIn(0);
+            azzert("".equals(solution));
 
-            for(int count = 0; count < SCRAMBLE_COUNT; count++){
+            for(int count = 0; count < SCRAMBLE_COUNT; count++) {
                 System.out.print("Scramble ["+(count+1)+"/"+SCRAMBLE_COUNT+"]: ");
                 PuzzleState state = scrambler.getSolvedState();
                 for(int i = 0; i < SCRAMBLE_LENGTH; i++){
@@ -111,14 +120,12 @@ public class ScrambleTest {
                     System.out.print(" "+move);
                     state = successors.get(move);
                 }
-                String solution = state.solveIn(SCRAMBLE_LENGTH);
+                System.out.print("...");
+                solution = state.solveIn(SCRAMBLE_LENGTH);
                 azzert(solution != null, "Puzzle "+scrambler.getShortName()+" solveIn method failed!");
-                System.out.print(". Found: "+solution);
+                System.out.println("Found: "+solution);
                 state = state.applyAlgorithm(solution);
                 azzert(state.isSolved(), "Solution was not correct");
-                System.out.print(". Checked.\r");
-                System.out.print("                                                                          \r");
-
             }
         }
     }
@@ -158,27 +165,27 @@ public class ScrambleTest {
 
             System.out.println("Generating & drawing 2 sets of " + SCRAMBLE_COUNT + " scrambles simultaneously." +
                                 " This is meant to shake out threading problems in scramblers.");
-            final ScrambleCacher c1 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble);
-            final ScrambleCacher c2 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble);
+            final Object[] o = new Object[0];
             ScrambleCacherListener cacherStopper = new ScrambleCacherListener() {
                 @Override
                 public void scrambleCacheUpdated(ScrambleCacher src) {
-                    System.out.print("                                                     \r");
-                    System.out.print(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize() + "\r");
+                    System.out.println(Thread.currentThread() + " " + src.getAvailableCount() + " / " + src.getCacheSize());
                     if(src.getAvailableCount() == src.getCacheSize()) {
                         src.stop();
-                        synchronized(c1) {
-                            c1.notify();
+                        synchronized(o) {
+                            o.notify();
                         }
                     }
                 }
             };
+            ScrambleCacher c1 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble, cacherStopper);
+            ScrambleCacher c2 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble, cacherStopper);
             c1.addScrambleCacherListener(cacherStopper);
             c2.addScrambleCacherListener(cacherStopper);
             while(c1.isRunning() || c2.isRunning()) {
-                synchronized(c1) {
+                synchronized(o) {
                     try {
-                        c1.wait();
+                        o.wait();
                     } catch(InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -240,7 +247,6 @@ public class ScrambleTest {
         ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
         azzertEquals(ab3.toString(), "D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
         
-        Random r = new Random();
         for(int depth = 0; depth < 100; depth++) {
             state = Utils.choose(r, state.getSuccessors().values());
             azzertEquals(state, state.applyAlgorithm("Uw Dw'"));
@@ -292,10 +298,8 @@ public class ScrambleTest {
     }
 
     private static void testPyraConverter() throws InvalidMoveException {
-
         int SCRAMBLE_COUNT = 1000;
         int SCRAMBLE_LENGTH = 20;
-        Random r = new Random();
 
         int edgePerm = 0;
         int edgeOrient = 0;
@@ -312,7 +316,7 @@ public class ScrambleTest {
         azzertEquals(sstate.tips, tips);
 
         for (int i = 0; i < SCRAMBLE_COUNT; i++){
-            System.out.print(" Scramble ["+i+"/"+SCRAMBLE_COUNT+"]\r");
+            System.out.println(" Scramble ["+i+"/"+SCRAMBLE_COUNT+"]");
             edgePerm = 0;
             edgeOrient = 0;
             cornerOrient = 0;
@@ -340,8 +344,6 @@ public class ScrambleTest {
         int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
         int THREE_BY_THREE_TIMEMIN = 0; //milliseconds
         int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
-
-        Random r = new Random();
 
         cs.min2phase.Search threeSolver = new cs.min2phase.Search();
         cs.min2phase.Tools.init();

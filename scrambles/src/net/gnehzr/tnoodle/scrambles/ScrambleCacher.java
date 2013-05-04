@@ -33,6 +33,10 @@ public class ScrambleCacher {
 
     private volatile Throwable exception;
     private boolean running = false;
+    public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble, ScrambleCacherListener l) {
+        this(puzzle, cacheSize, drawScramble);
+        addScrambleCacherListener(l);
+    }
     public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble) {
         azzert(cacheSize > 0);
         scrambles = new String[cacheSize];

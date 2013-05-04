@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
-import puzzle.TwoByTwoSolver.TwoByTwoState;
-
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
@@ -20,6 +18,7 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.utils.Utils;
+import puzzle.TwoByTwoSolver.TwoByTwoState;
 import cs.min2phase.Search;
 import cs.min2phase.Tools;
 
@@ -99,7 +98,8 @@ public class CubePuzzle extends Puzzle {
                 TwoByTwoState state = twoSolver.randomState(r);
                 scramble = twoSolver.generateExactly(state, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
             } else if(size == 3) {
-                scramble = twoPhaseSearcher.get().solution(Tools.randomCube(r), THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
+                String randomState = Tools.randomCube(r);
+                scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
             } else if(size == 4) {
                 scramble = threePhaseSearcher.get().randomState(r);
             } else {
@@ -485,11 +485,44 @@ public class CubePuzzle extends Puzzle {
             state.orientation = TwoByTwoSolver.packOrient(pieces);
             return state;
         }
+        
+        public String toFaceCube() {
+            azzert(size == 3);
+            String state = "";
+            for(char f : "URFDLB".toCharArray()) {
+                Face face = Face.valueOf("" + f);
+                int[][] faceArr = image[face.ordinal()];
+                for(int i = 0; i < faceArr.length; i++) {
+                    for(int j = 0; j < faceArr[i].length; j++) {
+                        state += Face.values()[faceArr[i][j]].toString();
+                    }
+                }
+            }
+            return state;
+        }
 
         @Override
         public String solveIn(int n) {
+            boolean useTwoPhase = System.getenv("NO_TWO_PHASE") == null;
             if(size == 2) {
                 String solution = twoSolver.solveIn(toTwoByTwoState(), n);
+                return solution;
+            } else if(useTwoPhase && size == 3) {
+                if(this.equals(getSolvedState())) {
+                    // TODO - apparently min2phase can't solve the solved cube
+                    return "";
+                }
+                long timeOut = 600*1000; // 60 seconds to find a solution
+                String solution = twoPhaseSearcher.get().solution(toFaceCube(), n, timeOut, 0, 0).trim();
+                if("Error 7".equals(solution)) {
+                    // No solution exists for given depth
+                    return null;
+                } else if(solution.startsWith("Error")) {
+                    // TODO - Not really sure what to do here.
+                    System.out.println(solution + " while searching for solution to " + toFaceCube());
+                    azzert(false);
+                    return null;
+                }
                 return solution;
             } else {
                 return super.solveIn(n);

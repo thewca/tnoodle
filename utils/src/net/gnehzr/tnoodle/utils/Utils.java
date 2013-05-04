@@ -629,4 +629,20 @@ public final class Utils {
         }
         return -1;
     }
+    
+    private static Random r;
+    public static Random getSeededRandom() {
+        if(r != null) {
+            return r;
+        }
+
+        String randSeedEnvVar = "TNOODLE_RANDSEED";
+        String seed = System.getenv(randSeedEnvVar);
+        if(seed == null) {
+            seed = "" + System.currentTimeMillis();
+        }
+        System.out.println("Using TNOODLE_RANDSEED " + seed);
+        r = new Random(seed.hashCode());
+        return r;
+    }
 }
