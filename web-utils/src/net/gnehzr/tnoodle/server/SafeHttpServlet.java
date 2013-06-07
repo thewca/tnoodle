@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.server;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 @SuppressWarnings("serial")
 public abstract class SafeHttpServlet extends HttpServlet {
@@ -49,7 +50,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
     }
     
     public static String getExtension(HttpServletRequest request) {
-        String[] filename_ext = Utils.parseExtension(getCompletePath(request));
+        String[] filename_ext = GwtSafeUtils.parseExtension(getCompletePath(request));
         return filename_ext[1];
     }
     

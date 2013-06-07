@@ -1,58 +1,15 @@
 package cs.min2phase;
 
 import java.util.Random;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 /**
  * Some useful functions.
  */
-public class Tools implements Runnable {
+public class Tools /*implements Runnable*/ {
 
 	static final boolean USE_TWIST_FLIP_PRUN = true;
 
 	private static boolean inited = false;
-
-	private static void read(char[] arr, DataInput in) throws IOException {
-		for (int i=0, len=arr.length; i<len; i++) {
-			arr[i] = in.readChar();
-		}
-	}
-
-	private static void read(int[] arr, DataInput in) throws IOException {
-		for (int i=0, len=arr.length; i<len; i++) {
-			arr[i] = in.readInt();
-		}
-	}
-
-	private static void read(char[][] arr, DataInput in) throws IOException {
-		for (int i=0, leng=arr.length; i<leng; i++) {
-			for (int j=0, len=arr[i].length; j<len; j++) {
-				arr[i][j] = in.readChar();
-			}
-		}
-	}
-
-	private static void write(char[] arr, DataOutput out) throws IOException {
-		for (int i=0, len=arr.length; i<len; i++) {
-			out.writeChar(arr[i]);
-		}
-	}
-
-	private static void write(int[] arr, DataOutput out) throws IOException {
-		for (int i=0, len=arr.length; i<len; i++) {
-			out.writeInt(arr[i]);
-		}
-	}
-
-	private static void write(char[][] arr, DataOutput out) throws IOException {
-		for (int i=0, leng=arr.length; i<leng; i++) {
-			for (int j=0, len=arr[i].length; j<len; j++) {
-				out.writeChar(arr[i][j]);
-			}
-		}
-	}
 
 	private static int[] initState = new int[2];
 	private static int[] require = {0x0, 0x1, 0x2, 0x2,  0x2, 0x7, 0xa, 0x3,  0x13, 0x13, 0x3, 0x6e,  0xca, 0xa6, 0x612, 0x512};
@@ -86,6 +43,7 @@ public class Tools implements Runnable {
 	/**
 	 * Main Initialization Function, can be ignored.
 	 */
+        /*
 	public void run() {
 		while (true) {
 			int choice = -1;
@@ -136,6 +94,7 @@ public class Tools implements Runnable {
 			System.exit(0);
 		}
 	}
+        */
 
 	/**
 	 * Initialization of the Solver.<br>
@@ -151,7 +110,14 @@ public class Tools implements Runnable {
 		 *     new Tools().run();
 		 */
 		//initParallel(Runtime.getRuntime().availableProcessors());
-		initParallel(1);
+		//initParallel(1);
+                
+                // This linear init is something gwt can deal with,
+                // unlike the threading madness above.
+                for(int i = 0; i <= 15; i++) {
+                    initIdx(i);
+                }
+
 
 		inited = true;
 	}
@@ -171,6 +137,7 @@ public class Tools implements Runnable {
 	 *
 	 * @see cs.min2phase.Tools#saveTo(java.io.DataOutput)
 	 */
+        /* Yeee vestigial code, I'm sorry --jfly
 	public static void initFrom(DataInput in) throws IOException {
 		if (inited) {
 			return;
@@ -199,6 +166,47 @@ public class Tools implements Runnable {
 		inited = true;
 	}
 
+	private static void read(char[] arr, DataInput in) throws IOException {
+		for (int i=0, len=arr.length; i<len; i++) {
+			arr[i] = in.readChar();
+		}
+	}
+
+	private static void read(int[] arr, DataInput in) throws IOException {
+		for (int i=0, len=arr.length; i<len; i++) {
+			arr[i] = in.readInt();
+		}
+	}
+
+	private static void read(char[][] arr, DataInput in) throws IOException {
+		for (int i=0, leng=arr.length; i<leng; i++) {
+			for (int j=0, len=arr[i].length; j<len; j++) {
+				arr[i][j] = in.readChar();
+			}
+		}
+	}
+
+	private static void write(char[] arr, DataOutput out) throws IOException {
+		for (int i=0, len=arr.length; i<len; i++) {
+			out.writeChar(arr[i]);
+		}
+	}
+
+	private static void write(int[] arr, DataOutput out) throws IOException {
+		for (int i=0, len=arr.length; i<len; i++) {
+			out.writeInt(arr[i]);
+		}
+	}
+
+	private static void write(char[][] arr, DataOutput out) throws IOException {
+		for (int i=0, leng=arr.length; i<leng; i++) {
+			for (int j=0, len=arr[i].length; j<len; j++) {
+				out.writeChar(arr[i][j]);
+			}
+		}
+	}
+        */
+
 	/**
 	 * cache tables (move tables, pruning table, etc.), and read it while initializing.
 	 *
@@ -207,6 +215,7 @@ public class Tools implements Runnable {
 	 *
 	 * @see cs.min2phase.Tools#initFrom(java.io.DataInput)
 	 */
+        /*
 	public static void saveTo(DataOutput out) throws IOException {
 		init();
 		write(CubieCube.FlipS2R, out);			//       672 Bytes
@@ -230,6 +239,7 @@ public class Tools implements Runnable {
 			write(CoordCube.TwistFlipPrun, out);// + 435, 456 Bytes
 		}										// = 958, 492 Bytes
 	}
+        */
 
 	private static final Random r = new Random();
 	public static String randomCube() {

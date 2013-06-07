@@ -1,8 +1,8 @@
 package puzzle;
 
-import static net.gnehzr.tnoodle.utils.Utils.modulo;
-import static net.gnehzr.tnoodle.utils.Utils.toColor;
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.modulo;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -21,9 +21,12 @@ import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 import cs.sq12phase.FullCube;
 import cs.sq12phase.Search;
+import org.timepedia.exporter.client.Export;
 
+@Export
 public class SquareOnePuzzle extends Puzzle {
 
     private static final int radius = 32;
@@ -33,7 +36,7 @@ public class SquareOnePuzzle extends Puzzle {
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         Search s = new Search();
-        String scramble = s.solution(FullCube.randomCube(r));
+        String scramble = s.solution(FullCube.randomCube(r)).trim();
         PuzzleState state;
         try {
             state = getSolvedState().applyAlgorithm(scramble);
@@ -259,7 +262,7 @@ public class SquareOnePuzzle extends Puzzle {
         }
 
         private int[] doSlash() {
-            int[] newPieces = Arrays.copyOf(pieces, pieces.length);
+            int[] newPieces = GwtSafeUtils.clone(pieces);
             for(int i = 0; i < 6; i++) {
                 int c = newPieces[i+12];
                 newPieces[i+12] = newPieces[i+6];
@@ -292,7 +295,7 @@ public class SquareOnePuzzle extends Puzzle {
          */
         private int[] doRotateTopAndBottom(int top, int bottom) {
             top = modulo(-top, 12);
-            int[] newPieces = Arrays.copyOf(pieces, pieces.length);
+            int[] newPieces = GwtSafeUtils.clone(pieces);
             int[] t = new int[12];
             for(int i = 0; i < 12; i++) {
                 t[i] = newPieces[i];
@@ -337,7 +340,7 @@ public class SquareOnePuzzle extends Puzzle {
                         continue;
                     }
                     int[] newPieces = doRotateTopAndBottom(top, bottom);
-                    String turn = String.format("(%d,%d)", top, bottom);
+                    String turn = "(" + top + "," + bottom + ")";
                     successors.put(turn, new SquareOneState(sliceSolved, newPieces));
                 }
             }
@@ -400,7 +403,7 @@ public class SquareOnePuzzle extends Puzzle {
 
             y *= 3.0;
             g.rotate(Math.toRadians(-90 - 15), x, y);
-            drawFace(g, Arrays.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
+            drawFace(g, GwtSafeUtils.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
         }
 
     }

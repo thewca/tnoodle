@@ -1,6 +1,6 @@
 package puzzle;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,12 +14,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
-import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
+import org.timepedia.exporter.client.Export;
+
+@Export
 public class MegaminxPuzzle extends Puzzle {
     private static enum Face {
         U, BL, BR, R, F, L, D, DR, DBR, B, DBL, DL;
@@ -81,7 +83,7 @@ public class MegaminxPuzzle extends Puzzle {
     private static final double UNFOLDWIDTH = 4 * Math.cos(.1 * Math.PI) + 2 * Math.cos(.3 * Math.PI);
 
     private static void turn(int[][] image, Face side, int dir) {
-        dir = Utils.modulo(dir, 5);
+        dir = GwtSafeUtils.modulo(dir, 5);
         for(int i = 0; i < dir; i++) {
             turn(image, side);
         }
@@ -137,7 +139,7 @@ public class MegaminxPuzzle extends Puzzle {
     }
 
     private static void bigTurn(int[][] image, Face side, int dir) {
-        dir = Utils.modulo(dir, 5);
+        dir = GwtSafeUtils.modulo(dir, 5);
         for(int i = 0; i < dir; i++) {
             bigTurn(image, side);
         }
@@ -191,7 +193,7 @@ public class MegaminxPuzzle extends Puzzle {
         swapCenters(image, f1, f2, f3, f4, f5);
     }
 
-    public static Dimension getImageSize(int gap, int minxRad, String variation) {
+    private static Dimension getImageSize(int gap, int minxRad, String variation) {
         return new Dimension(getMegaminxViewWidth(gap, minxRad), getMegaminxViewHeight(gap, minxRad));
     }
 
@@ -219,7 +221,7 @@ public class MegaminxPuzzle extends Puzzle {
         return p;
     }
 
-    public static Point2D.Double getLineIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    private static Point2D.Double getLineIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
         return new Point2D.Double(
             det(det(x1, y1, x2, y2), x1 - x2,
                     det(x3, y3, x4, y4), x3 - x4)/
@@ -229,7 +231,7 @@ public class MegaminxPuzzle extends Puzzle {
                 det(x1 - x2, y1 - y2, x3 - x4, y3 - y4));
     }
 
-    public static double det(double a, double b, double c, double d) {
+    private static double det(double a, double b, double c, double d) {
         return a * d - b * c;
     }
 
@@ -239,7 +241,7 @@ public class MegaminxPuzzle extends Puzzle {
     private static int getMegaminxViewHeight(int gap, int minxRad) {
         return (int)(UNFOLDHEIGHT * minxRad + 2 * gap);
     }
-    public static int getNewUnitSize(int width, int height, int gap, String variation) {
+    private static int getNewUnitSize(int width, int height, int gap, String variation) {
         return (int) Math.round(Math.min((width - 3*gap) / (UNFOLDWIDTH * 2),
                 (height - 2*gap) / UNFOLDHEIGHT));
     }
@@ -364,7 +366,7 @@ public class MegaminxPuzzle extends Puzzle {
 
     private int[][] cloneImage(int[][] image) {
         int[][] imageCopy = new int[image.length][image[0].length];
-        Utils.deepCopy(image, imageCopy);
+        GwtSafeUtils.deepCopy(image, imageCopy);
         return imageCopy;
     }
 
@@ -629,16 +631,5 @@ public class MegaminxPuzzle extends Puzzle {
                 g.drawString(label, (float) (centerX - width/2.0), (float) (centerY + .5*(ascent) - magicPushUpNumber));
             }
         }
-    }
-
-    public static void main(String[] args) throws InvalidMoveException, InvalidScrambleException {
-        MegaminxPuzzle megaminx = new MegaminxPuzzle();
-        PuzzleState solved = megaminx.getSolvedState();
-
-        String spinL = "R++ L2'";
-        String spinU = "D++ U2'";
-        PuzzleState state = solved.applyAlgorithm(spinL).applyAlgorithm(spinU).applyAlgorithm(spinU).applyAlgorithm(spinL).applyAlgorithm(spinL).applyAlgorithm(spinL);
-        state = state.applyAlgorithm(spinU);
-        azzert(state.equals(solved));
     }
 }

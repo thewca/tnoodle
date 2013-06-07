@@ -1,6 +1,6 @@
 package  net.gnehzr.tnoodle.utils;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.io.BufferedInputStream;
 import java.io.File;

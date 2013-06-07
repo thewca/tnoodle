@@ -1,7 +1,7 @@
 package puzzle;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.toColor;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +19,9 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 
+import org.timepedia.exporter.client.Export;
+
+@Export
 public class ClockPuzzle extends Puzzle {
     private static final String[] turns={"UR","DR","DL","UL","U","R","D","L","ALL"};
     private static final int radius = 70;

@@ -137,8 +137,13 @@ def lint(files):
                     error = "Illegal characters"
                     error = "%s:%s:%s:%s" % ( f, lineNumber+1, error, line )
                     failures.append(error)
-        noLint = False if ( len(lines) == 0 ) else ( NO_LINT_KEYWORD in lines[0] )
+        noLint = False
+        if len(lines) > 0 and NO_LINT_KEYWORD in lines[0]:
+            noLint = True
         if any(f.startswith(prefix) for prefix in lintIgnoredDirectories):
+            noLint = True
+        if os.path.basename(f) == "Makefile":
+            # Makefiles have weird rules with spaces vs tabs, just ignore them.
             noLint = True
         if noLint:
             continue

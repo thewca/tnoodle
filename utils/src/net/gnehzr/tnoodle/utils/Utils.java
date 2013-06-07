@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.utils;
 
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+
 import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -21,11 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Random;
 
 import sun.reflect.Reflection;
 
@@ -133,80 +135,10 @@ public final class Utils {
         return areasArray;
     }
 
-    public static final int modulo(int x, int m) {
-        azzert(m > 0, "m must be > 0");
-        int y = x % m;
-        if(y < 0) {
-            y += m;
-        }
-        return y;
-    }
-
-    public static Integer toInt(String string, Integer def) {
-        try {
-            return Integer.parseInt(string);
-        } catch(Exception e) {
-            return def;
-        }
-    }
-
-    public static Long toLong(String string, Long def) {
-        try {
-            return Long.parseLong(string);
-        } catch(Exception e) {
-            return def;
-        }
-    }
-
-    public static int ceil(double d) {
-        return (int) Math.ceil(d);
-    }
-
     public static String throwableToString(Throwable e) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bytes));
         return bytes.toString();
-    }
-
-    public static String[] parseExtension(String filename) {
-        int lastDot = filename.lastIndexOf('.');
-        String name, extension;
-        if(lastDot == -1) {
-            name = filename;
-            extension = null;
-        } else {
-            name = filename.substring(0, lastDot);
-            extension = filename.substring(lastDot+1).toLowerCase();
-        }
-        return new String[] { name, extension };
-    }
-
-    public static String join(Object[] arr, String separator) {
-        if(separator == null) {
-            separator = ",";
-        }
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < arr.length; i++) {
-            if(i > 0) {
-                sb.append(separator);
-            }
-            sb.append(arr[i].toString());
-        }
-        return sb.toString();
-    }
-
-    public static <H> String join(ArrayList<H> arr, String separator) {
-        if(separator == null) {
-            separator = ",";
-        }
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < arr.size(); i++) {
-            if(i > 0) {
-                sb.append(separator);
-            }
-            sb.append(arr.get(i).toString());
-        }
-        return sb.toString();
     }
 
     public static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
@@ -512,34 +444,6 @@ public final class Utils {
         }
     }
 
-    public static void azzertEquals(Object a, Object b) {
-        boolean equal;
-        if(a == null) {
-            equal = a == b;
-        } else {
-            equal = a.equals(b);
-        }
-        azzert(equal, a + " is not equal to " + b);
-    }
-
-    public static void azzert(boolean expr) {
-        if(!expr) {
-            throw new AssertionError();
-        }
-    }
-
-    public static void azzert(boolean expr, String message) {
-        if(!expr) {
-            throw new AssertionError(message);
-        }
-    }
-
-    public static void azzert(boolean expr, Throwable t) {
-        if(!expr) {
-            throw new AssertionError(t);
-        }
-    }
-
     public static String getProjectName() {
         Package p = Utils.class.getPackage();
         String name = p.getImplementationTitle();
@@ -591,45 +495,6 @@ public final class Utils {
         return new File(getWebappsDir(), webappName);
     }
 
-    public static <H> H choose(Random r, Iterable<H> keySet) {
-        H chosen = null;
-        int count = 0;
-        for(H element : keySet) {
-            if(r.nextInt(++count) == 0) {
-                chosen = element;
-            }
-        }
-        azzert(count > 0);
-        return chosen;
-    }
-
-    public static void deepCopy(int[][] src, int[][] dest) {
-        for(int i = 0; i < src.length; i++) {
-            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
-        }
-    }
-
-    public static void deepCopy(int[][][] src, int[][][] dest) {
-        for(int i = 0; i < src.length; i++) {
-            deepCopy(src[i], dest[i]);
-        }
-    }
-
-    public static <T> void deepCopy(T[][] src, T[][] dest) {
-        for(int i = 0; i < src.length; i++) {
-            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
-        }
-    }
-
-    public static int indexOf(Object o, Object[] arr) {
-        for(int i = 0; i < arr.length; i++) {
-            if(arr[i].equals(o)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
     private static Random r;
     public static Random getSeededRandom() {
         if(r != null) {

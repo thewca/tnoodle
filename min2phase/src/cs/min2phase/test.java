@@ -104,7 +104,7 @@ public class test {
 			System.out.println(System.nanoTime()-tm);
 		}
 
-		DataInputStream dis = null;
+		/*DataInputStream dis = null;
 		if ((testValue & 0x02) != 0) {
 			tm = System.nanoTime();
 			try {
@@ -129,7 +129,7 @@ public class test {
 				}
 			}
 			System.out.println(System.nanoTime()-tm);
-		}
+		}*/
 
 		tm = System.nanoTime();
 		Tools.init();

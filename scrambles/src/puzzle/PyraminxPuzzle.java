@@ -1,8 +1,8 @@
 package puzzle;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
-import static net.gnehzr.tnoodle.utils.Utils.toColor;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,8 +22,11 @@ import puzzle.PyraminxSolver.PyraminxSolverState;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
+import org.timepedia.exporter.client.Export;
+
+@Export
 public class PyraminxPuzzle extends Puzzle {
     private static final int MIN_SCRAMBLE_LENGTH = 11;
     private static final boolean SCRAMBLE_LENGTH_INCLUDES_TIPS = true;
@@ -58,7 +61,7 @@ public class PyraminxPuzzle extends Puzzle {
     private static final int pieceSize = 30;
     private static final int gap = 5;
 
-    public static Dimension getImageSize(int gap, int pieceSize) {
+    private static Dimension getImageSize(int gap, int pieceSize) {
         return new Dimension(getPyraminxViewWidth(gap, pieceSize), getPyraminxViewHeight(gap, pieceSize));
     }
 
@@ -152,7 +155,7 @@ public class PyraminxPuzzle extends Puzzle {
         return p;
     }
 
-    public static Point2D.Double getLineIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    private static Point2D.Double getLineIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
         return new Point2D.Double(
             det(det(x1, y1, x2, y2), x1 - x2,
                     det(x3, y3, x4, y4), x3 - x4)/
@@ -162,7 +165,7 @@ public class PyraminxPuzzle extends Puzzle {
                 det(x1 - x2, y1 - y2, x3 - x4, y3 - y4));
     }
 
-    public static double det(double a, double b, double c, double d) {
+    private static double det(double a, double b, double c, double d) {
         return a * d - b * c;
     }
 
@@ -172,7 +175,7 @@ public class PyraminxPuzzle extends Puzzle {
     private static int getPyraminxViewHeight(int gap, int pieceSize) {
         return (int)(2 * 1.5 * Math.sqrt(3) * pieceSize + 3 * gap);
     }
-    public static int getNewUnitSize(int width, int height, int gap, String variation) {
+    private static int getNewUnitSize(int width, int height, int gap, String variation) {
         return (int) Math.round(Math.min((width - 4*gap) / (3 * 2),
                 (height - 3*gap) / (3 * Math.sqrt(3))));
     }
@@ -471,7 +474,7 @@ public class PyraminxPuzzle extends Puzzle {
                         }
 
                         int[][] imageCopy = new int[image.length][image[0].length];
-                        Utils.deepCopy(image, imageCopy);
+                        GwtSafeUtils.deepCopy(image, imageCopy);
 
                         if(tip) {
                             turnTip(axis, dir, imageCopy);

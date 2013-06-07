@@ -2,11 +2,11 @@
 # of that plugin.
 
 #2x2x2
-222 puzzle.CubePuzzle(2)
+222 puzzle.TwoByTwoCubePuzzle()
 #3x3x3
-333 puzzle.CubePuzzle(3)
+333 puzzle.ThreeByThreeCubePuzzle()
 #4x4x4
-444 puzzle.CubePuzzle(4)
+444 puzzle.FourByFourCubePuzzle()
 #5x5x5
 555 puzzle.CubePuzzle(5)
 #6x6x6

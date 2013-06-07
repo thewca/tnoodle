@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.utils;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,12 +30,12 @@ public class Plugins<H> {
         while((line = in.readLine()) != null) {
             line = line.trim();
             // lines starting with # and empty lines are ignored
-            if(line.startsWith("#")) {
-                lastComment = line.substring(1);
-                continue;
-            }
             if(line.isEmpty()) {
                 lastComment = null;
+                continue;
+            }
+            if(line.startsWith("#")) {
+                lastComment = line.substring(1);
                 continue;
             }
 

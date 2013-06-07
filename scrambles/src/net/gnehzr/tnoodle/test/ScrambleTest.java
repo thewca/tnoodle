@@ -1,12 +1,14 @@
 package net.gnehzr.tnoodle.test;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.azzertEquals;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.choose;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.SortedMap;
@@ -18,6 +20,7 @@ import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacherListener;
@@ -33,8 +36,11 @@ import puzzle.PyraminxPuzzle;
 import puzzle.PyraminxPuzzle.PyraminxState;
 import puzzle.PyraminxSolver;
 import puzzle.PyraminxSolver.PyraminxSolverState;
+import puzzle.MegaminxPuzzle;
 import puzzle.TwoByTwoSolver;
 import puzzle.TwoByTwoSolver.TwoByTwoState;
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.Exportable;
 
 public class ScrambleTest {
     private static final Logger l = Logger.getLogger(Puzzle.class.getName());
@@ -79,15 +85,17 @@ public class ScrambleTest {
     }
 
     public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
-        benchmarking();
 
         System.out.println("Testing names.");
         testNames();
+
+        benchmarking();
 
         System.out.println("Testing specific Puzzle issues.");
         testClockPuzzle();
         testCubePuzzle();
         testPyraConverter();
+        testMega();
 
         System.out.println("Testing solveIn method");
         testSolveIn();
@@ -99,7 +107,7 @@ public class ScrambleTest {
         int SCRAMBLE_COUNT = 10;
         int SCRAMBLE_LENGTH = 4;
 
-        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
 
         for(String puzzle : lazyScramblers.keySet()) {
             LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
@@ -116,7 +124,7 @@ public class ScrambleTest {
                 PuzzleState state = scrambler.getSolvedState();
                 for(int i = 0; i < SCRAMBLE_LENGTH; i++){
                     HashMap<String, ? extends PuzzleState> successors = state.getSuccessors();
-                    String move = Utils.choose(r, successors.keySet());
+                    String move = choose(r, successors.keySet());
                     System.out.print(" "+move);
                     state = successors.get(move);
                 }
@@ -136,7 +144,7 @@ public class ScrambleTest {
         int SCRAMBLE_COUNT = 10;
         boolean drawScramble = true;
 
-        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
 
         for(String puzzle : lazyScramblers.keySet()) {
             LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
@@ -146,7 +154,7 @@ public class ScrambleTest {
 
             // It's easy to get this wrong (read about Arrays.hashCode vs Arrays.deepHashCode).
             // This is just a sanity check.
-            Utils.azzert(scrambler.getSolvedState().hashCode() == scrambler.getSolvedState().hashCode());
+            azzert(scrambler.getSolvedState().hashCode() == scrambler.getSolvedState().hashCode());
 
             // Generating a scramble
             System.out.println("Generating a " + puzzle + " scramble");
@@ -198,17 +206,29 @@ public class ScrambleTest {
     }
 
     private static void testNames() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
-        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
 
         // Check that the names by which the scramblers refer to themselves
         // is the same as the names by which we refer to them in the plugin definitions file.
         for(String shortName : lazyScramblers.keySet()) {
-            String longName = Puzzle.getScramblerLongName(shortName);
+            String longName = PuzzlePlugins.getScramblerLongName(shortName);
             LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
             Puzzle scrambler = lazyScrambler.cachedInstance();
             
-            Utils.azzertEquals(shortName, scrambler.getShortName());
-            Utils.azzertEquals(longName, scrambler.getLongName());
+            azzertEquals(shortName, scrambler.getShortName());
+            azzertEquals(longName, scrambler.getLongName());
+
+            System.out.println(Exportable.class + " isAssignableFrom " + scrambler.getClass());
+            azzert(Exportable.class.isAssignableFrom(scrambler.getClass()));
+            Annotation[] annotations = scrambler.getClass().getAnnotations();
+            boolean foundExport = false;
+            for(Annotation annotation : annotations) {
+                if(Export.class.isAssignableFrom(annotation.annotationType())) {
+                    foundExport = true;
+                    break;
+                }
+            }
+            azzert(foundExport);
         }
     }
 
@@ -248,7 +268,7 @@ public class ScrambleTest {
         azzertEquals(ab3.toString(), "D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
         
         for(int depth = 0; depth < 100; depth++) {
-            state = Utils.choose(r, state.getSuccessors().values());
+            state = choose(r, state.getSuccessors().values());
             azzertEquals(state, state.applyAlgorithm("Uw Dw'"));
         }
     }
@@ -337,6 +357,17 @@ public class ScrambleTest {
         System.out.println("");
     }
 
+    public static void testMega() throws InvalidScrambleException {
+        MegaminxPuzzle megaminx = new MegaminxPuzzle();
+        PuzzleState solved = megaminx.getSolvedState();
+
+        String spinL = "R++ L2'";
+        String spinU = "D++ U2'";
+        PuzzleState state = solved.applyAlgorithm(spinL).applyAlgorithm(spinU).applyAlgorithm(spinU).applyAlgorithm(spinL).applyAlgorithm(spinL).applyAlgorithm(spinL);
+        state = state.applyAlgorithm(spinU);
+        azzertEquals(state, solved);
+    }
+
     private static void benchmarking() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
 
         // Analyse the 3x3x3 solver.
@@ -357,7 +388,7 @@ public class ScrambleTest {
 
         // How long does it takes to test if a puzzle is at more one move from solved?
         int SCRAMBLE_COUNT = 100;
-        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = Puzzle.getScramblers();
+        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
         
         for(String puzzle : lazyScramblers.keySet()) {
             LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);

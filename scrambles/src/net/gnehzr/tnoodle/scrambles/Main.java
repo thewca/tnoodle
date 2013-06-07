@@ -38,7 +38,7 @@ public class Main {
             TNoodleLogging.setConsoleLogLevel(Level.ALL);
         }
 
-        SortedMap<String, LazyInstantiator<Puzzle>> scramblers = Puzzle.getScramblers();
+        SortedMap<String, LazyInstantiator<Puzzle>> scramblers = PuzzlePlugins.getScramblers();
         for(String puzzle : puzzles) {
             LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzle);
             if(lazyScrambler == null) {

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  When updating your version of GWT, you should also update this DTD reference,
+  so that your app can take advantage of the latest GWT module capabilities.
+-->
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.5.1//EN"
+  "http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd">
+<module rename-to='tnoodlejs'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+
+  <!-- Other module inherits                                      -->
+  <inherits name='com.levigo.util.GwtAwt'/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <inherits name='org.timepedia.exporter.Exporter'/>
+  <set-property name="export" value="yes"/>
+  
+  <entry-point class='net.gnehzr.tnoodle.js.ScrambleJsEntryPoint'/>
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path='cs/sq12phase'>
+      <exclude name="SearchTest.java"/>
+  </source>
+  <source path='cs/min2phase'>
+      <exclude name="MainProgram.java"/>
+      <exclude name="test.java"/>
+  </source>
+  <source path='net/gnehzr/tnoodle/utils'>
+      <exclude name="Utils.java"/>
+      <exclude name="Strings.java"/>
+      <exclude name="Launcher.java"/>
+      <exclude name="OneLineLogFormatter.java"/>
+      <exclude name="Plugins.java"/>
+      <exclude name="TimedLogRecordStart.java"/>
+      <exclude name="TimedLogRecordEnd.java"/>
+      <exclude name="TNoodleLogging.java"/>
+      <exclude name="LazyClassLoader.java"/>
+      <exclude name="LazyInstantiator.java"/>
+  </source>
+
+  <source path='puzzle'/>
+  <source path='net/gnehzr/tnoodle/scrambles'>
+      <exclude name="PuzzlePlugins.java"/>
+      <exclude name="PuzzleIcon.java"/>
+      <exclude name="Main.java"/>
+      <exclude name="ScrambleCacher.java"/>
+      <exclude name="ScrambleCacherListener.java"/>
+      <exclude name="PuzzleImageInfo.java"/>
+  </source>
+  <source path='net/gnehzr/tnoodle/js'/>
+
+  <!-- Default warning for non-static, final fields enabled -->
+  <set-property name="gwt.suppressNonStaticFinalFieldWarnings" value="false" />
+  
+  <!-- Create one monolithic js file -->
+  <collapse-all-properties />
+  <add-linker name="sso"/>
+
+
+  <super-source path="net/gnehzr/tnoodle/jre" />
+
+</module>

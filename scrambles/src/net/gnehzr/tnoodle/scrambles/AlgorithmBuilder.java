@@ -1,12 +1,12 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
-import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 public class AlgorithmBuilder {
     private ArrayList<String> moves;
@@ -138,7 +138,7 @@ public class AlgorithmBuilder {
     }
 
     public String toString() {
-        return Utils.join(moves, " ");
+        return GwtSafeUtils.join(moves, " ");
     }
 
     public PuzzleStateAndGenerator getStateAndGenerator() {

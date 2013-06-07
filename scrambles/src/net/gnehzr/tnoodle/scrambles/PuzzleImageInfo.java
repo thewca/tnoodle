@@ -21,6 +21,11 @@ public class PuzzleImageInfo {
     public Dimension size;
 
     public PuzzleImageInfo() {}
+    public PuzzleImageInfo(Puzzle p) {
+        faces = p.getDefaultFaceBoundaries();
+        colorScheme = p.getDefaultColorScheme();
+        size = p.getPreferredSize();
+    }
 
     static {
         Utils.registerTypeAdapter(PuzzleImageInfo.class, new PuzzleImageInfoizer());
@@ -46,4 +51,5 @@ public class PuzzleImageInfo {
             return context.serialize(jsonable);
         }
     }
+
 }

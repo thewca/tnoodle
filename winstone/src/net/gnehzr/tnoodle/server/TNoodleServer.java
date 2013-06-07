@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.server;
 
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+
 import java.awt.Desktop;
 import java.awt.Image;
 import java.io.File;
@@ -36,6 +38,7 @@ import joptsimple.util.KeyValuePair;
 import net.gnehzr.tnoodle.utils.Launcher;
 import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 import winstone.TNoodleWinstoneLauncher;
 
 
@@ -86,7 +89,7 @@ public class TNoodleServer {
         serverArgs.put("commonLibFolder", "");
 
         ServerSocket ss = aggressivelyBindSocket(httpPort, bindAggressively);
-        Utils.azzert(ss != null);
+        azzert(ss != null);
 
         final Logger winstoneLogger = Logger.getLogger(winstone.Logger.class.getName());
         winstone.Logger.init(winstone.Logger.MAX, new OutputStream() {
@@ -265,7 +268,7 @@ public class TNoodleServer {
                 "Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
             .withOptionalArg().ofType(KeyValuePair.class);
         OptionSpec<?> help = parser.acceptsAll(Arrays.asList("h", "help", "?"), "Show this help");
-        String levels = Utils.join(TNoodleLogging.getLevels(), ",");
+        String levels = GwtSafeUtils.join(TNoodleLogging.getLevels(), ",");
         OptionSpec<String> consoleLogLevel = parser.
             acceptsAll(Arrays.asList("cl", "consoleLevel"),
                     "The minimum level a log must be to be " +

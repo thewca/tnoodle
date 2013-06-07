@@ -1,8 +1,9 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.toInt;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toInt;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.join;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
@@ -78,7 +80,7 @@ class ScrambleRequest {
     private static SortedMap<String, LazyInstantiator<Puzzle>> puzzles;
     static {
         try {
-            puzzles = Puzzle.getScramblers();
+            puzzles = PuzzlePlugins.getScramblers();
         } catch (BadClassDescriptionException e) {
             l.log(Level.INFO, "", e);
         } catch (IOException e) {
@@ -773,7 +775,7 @@ class ScrambleRequest {
             String txtFileName = "txt/" + safeTitle + ".txt";
             parameters.setFileNameInZip(txtFileName);
             zipOut.putNextEntry(null, parameters);
-            zipOut.write(Utils.join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
+            zipOut.write(join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
             zipOut.closeEntry();
         }
 

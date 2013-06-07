@@ -52,25 +52,6 @@ public class MainProgram extends javax.swing.JFrame {
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	public static void main(String[] args) {
-		try {
-			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream("data")));
-			Tools.initFrom(dis);
-		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		if (!Tools.isInited()) {
-			try {
-				DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("data")));
-				Tools.saveTo(dos);
-				dos.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-		}
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				MainProgram inst = new MainProgram();

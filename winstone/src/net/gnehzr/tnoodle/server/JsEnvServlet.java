@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.server;
 
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -28,7 +30,7 @@ public class JsEnvServlet extends SafeHttpServlet {
         } else if(extension.equals("json")) {
             sendJSON(request, response, Utils.GSON.toJson(jsEnv));
         } else {
-            Utils.azzert(false);
+            azzert(false);
         }
     }
 

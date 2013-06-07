@@ -1,10 +1,10 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.parseExtension;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toInt;
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.parseExtension;
 import static net.gnehzr.tnoodle.utils.Utils.throwableToString;
-import static net.gnehzr.tnoodle.utils.Utils.toInt;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,6 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzleIcon;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
+import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo;
 import net.gnehzr.tnoodle.server.SafeHttpServlet;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
@@ -46,7 +49,7 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
     public ScrambleViewHandler() throws BadClassDescriptionException,
             IOException {
-        this.scramblers = Puzzle.getScramblers();
+        this.scramblers = PuzzlePlugins.getScramblers();
     }
 
     @Override
@@ -80,10 +83,11 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
             if (extension.equals("png")) {
                 try {
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    ByteArrayOutputStream bytes;
                     if (query.containsKey("icon")) {
-                        scrambler.loadPuzzleIcon(bytes);
+                        bytes = PuzzleIcon.loadPuzzleIcon(scrambler);
                     } else {
+                        bytes = new ByteArrayOutputStream();
                         BufferedImage img = new BufferedImage(dimension.width,
                                 dimension.height, BufferedImage.TYPE_INT_ARGB);
                         scrambler.drawScramble(img.createGraphics(), dimension,
@@ -133,7 +137,7 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                 response.setContentLength(bytes.size());
                 bytes.writeTo(response.getOutputStream());
             } else if (extension.equals("json")) {
-                sendJSON(request, response, GSON.toJson(scrambler.getDefaultPuzzleImageInfo()));
+                sendJSON(request, response, GSON.toJson(new PuzzleImageInfo(scrambler)));
             } else {
                 azzert(false);
             }

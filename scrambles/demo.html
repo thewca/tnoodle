@@ -1,0 +1,18 @@
+<html>
+<head>
+<script>
+    window.TNOODLE_ENV = { "TNOODLE_333_MIN_DISTANCE": "1" };
+</script>
+<script src="war/tnoodlejs/tnoodlejs.nocache.js"></script>
+<script>
+   function puzzlesLoaded(puzzles) {
+      window.puzzles = puzzles;
+      var scram = puzzles['333'].generateScramble();
+      document.body.appendChild(document.createTextNode(scram));
+   }
+</script>
+</head>
+<body>
+<h1>Hello, world!</h1>
+</body>
+</html>

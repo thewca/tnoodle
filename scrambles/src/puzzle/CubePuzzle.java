@@ -1,6 +1,6 @@
 package puzzle;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,27 +9,16 @@ import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Random;
 
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
-import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
-import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 import puzzle.TwoByTwoSolver.TwoByTwoState;
-import cs.min2phase.Search;
-import cs.min2phase.Tools;
+import org.timepedia.exporter.client.Export;
 
+@Export
 public class CubePuzzle extends Puzzle {
-    private static final int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
-    private static final int THREE_BY_THREE_TIMEMIN = 200; //milliseconds
-    private static final int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
 
-    private static final int TWO_BY_TWO_MIN_SCRAMBLE_LENGTH = 11;
-
-    private static enum Face {
+    protected static enum Face {
         L, D, B, R, U, F;
 
         public Face oppositeFace() {
@@ -42,42 +31,9 @@ public class CubePuzzle extends Puzzle {
     private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
 
     private final int size;
-    private TwoByTwoSolver twoSolver = null;
-    private ThreadLocal<Search> twoPhaseSearcher = null;
-    private ThreadLocal<cs.threephase.Search> threePhaseSearcher = null;
-
     public CubePuzzle(int size) {
         azzert(size >= 0 && size < DEFAULT_LENGTHS.length, "Invalid cube size");
         this.size = size;
-
-        if(size == 2) {
-            wcaMinScrambleDistance = 4;
-            twoSolver = new TwoByTwoSolver();
-        } else if(size == 3) {
-            String newMinDistance = System.getenv("TNOODLE_333_MIN_DISTANCE");
-            if(newMinDistance != null) {
-                wcaMinScrambleDistance = Integer.parseInt(newMinDistance);
-            }
-            twoPhaseSearcher = new ThreadLocal<Search>() {
-                protected Search initialValue() {
-                    return new Search();
-                };
-            };
-        } else if(size == 4) {
-            threePhaseSearcher = new ThreadLocal<cs.threephase.Search>() {
-                protected cs.threephase.Search initialValue() {
-                    return new cs.threephase.Search();
-                };
-            };
-        }
-    }
-
-    public double getInitializationStatus() {
-        if(size == 4) {
-            return cs.threephase.Edge3.initStatus();
-        }
-
-        return 1;
     }
 
     @Override
@@ -88,35 +44,6 @@ public class CubePuzzle extends Puzzle {
     @Override
     public String getShortName() {
         return size + "" + size + "" + size;
-    }
-
-    @Override
-    public PuzzleStateAndGenerator generateRandomMoves(Random r) {
-        if(size == 2 || size == 3 || size == 4) {
-            String scramble;
-            if(size == 2) {
-                TwoByTwoState state = twoSolver.randomState(r);
-                scramble = twoSolver.generateExactly(state, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
-            } else if(size == 3) {
-                String randomState = Tools.randomCube(r);
-                scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
-            } else if(size == 4) {
-                scramble = threePhaseSearcher.get().randomState(r);
-            } else {
-                azzert(false);
-                return null;
-            }
-
-            AlgorithmBuilder ab = new AlgorithmBuilder(this, MungingMode.MUNGE_REDUNDANT_MOVES);
-            try {
-                ab.appendAlgorithm(scramble);
-            } catch (InvalidMoveException e) {
-                azzert(false, new InvalidScrambleException(scramble, e));
-            }
-            return ab.getStateAndGenerator();
-        } else {
-            return super.generateRandomMoves(r);
-        }
     }
 
     private static void swap(int[][][] image,
@@ -288,7 +215,7 @@ public class CubePuzzle extends Puzzle {
 
     private int[][][] cloneImage(int[][][] image) {
         int[][][] imageCopy = new int[image.length][image[0].length][image[0][0].length];
-        Utils.deepCopy(image, imageCopy);
+        GwtSafeUtils.deepCopy(image, imageCopy);
         return imageCopy;
     }
 
@@ -386,7 +313,7 @@ public class CubePuzzle extends Puzzle {
                 image[Face.D.ordinal()][size-1][0] == Face.D.ordinal();
     }
 
-    private static int[][] getStickersByPiece(int[][][] img) {
+    protected static int[][] getStickersByPiece(int[][][] img) {
         int s = img[0].length - 1;
         return new int[][] {
             { img[Face.U.ordinal()][s][s], img[Face.R.ordinal()][0][0], img[Face.F.ordinal()][0][s] },
@@ -399,6 +326,15 @@ public class CubePuzzle extends Puzzle {
             { img[Face.D.ordinal()][s][s], img[Face.R.ordinal()][s][s], img[Face.B.ordinal()][s][0] },
             { img[Face.D.ordinal()][s][0], img[Face.B.ordinal()][s][s], img[Face.L.ordinal()][s][0] }
         };
+    }
+
+    /*
+     * Subclasses of CubePuzzle can override this method to speed up
+     * CubeState's solveIn() method.
+     *
+     */
+    protected String puzzleCustomSolveIn(CubeState cs, int n) {
+        return null;
     }
 
     public class CubeState extends PuzzleState {
@@ -503,30 +439,11 @@ public class CubePuzzle extends Puzzle {
 
         @Override
         public String solveIn(int n) {
-            boolean useTwoPhase = System.getenv("NO_TWO_PHASE") == null;
-            if(size == 2) {
-                String solution = twoSolver.solveIn(toTwoByTwoState(), n);
+            String solution = puzzleCustomSolveIn(this, n);
+            if(solution != null) {
                 return solution;
-            } else if(useTwoPhase && size == 3) {
-                if(this.equals(getSolvedState())) {
-                    // TODO - apparently min2phase can't solve the solved cube
-                    return "";
-                }
-                long timeOut = 600*1000; // 60 seconds to find a solution
-                String solution = twoPhaseSearcher.get().solution(toFaceCube(), n, timeOut, 0, 0).trim();
-                if("Error 7".equals(solution)) {
-                    // No solution exists for given depth
-                    return null;
-                } else if(solution.startsWith("Error")) {
-                    // TODO - Not really sure what to do here.
-                    System.out.println(solution + " while searching for solution to " + toFaceCube());
-                    azzert(false);
-                    return null;
-                }
-                return solution;
-            } else {
-                return super.solveIn(n);
             }
+            return super.solveIn(n);
         }
 
         @Override

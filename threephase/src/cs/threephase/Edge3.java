@@ -106,7 +106,7 @@ public final class Edge3 implements Runnable {
 			}
 
 			if ((done & 0x3ffff) == 0) {
-				System.out.print(String.format("%5.2f%%\t%d\r", done / 897632.96, doneMod));
+				System.out.print(initStatus()*100 + "%\t" + doneMod + "\r");
 			}
 		}
 	}
@@ -146,7 +146,7 @@ public final class Edge3 implements Runnable {
 					ea.printStackTrace();
 				}
 			}
-			System.out.println(String.format("%2d%10d%10d", depth+1, done, doneMod));
+			System.out.println((depth+1) + " " + done + " " + doneMod);
 		}
 		prun = null;
 		System.gc();

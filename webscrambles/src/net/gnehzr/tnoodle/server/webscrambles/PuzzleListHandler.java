@@ -1,8 +1,8 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
-import static net.gnehzr.tnoodle.utils.Utils.parseExtension;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.parseExtension;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.server.SafeHttpServlet;
 import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
@@ -31,13 +32,13 @@ public class PuzzleListHandler extends SafeHttpServlet {
     private final List<Map<String, Object>> puzzleInfos;
     private final String puzzleInfosJSON;
     public PuzzleListHandler() throws BadClassDescriptionException, IOException {
-        SortedMap<String, LazyInstantiator<Puzzle>> scramblers = Puzzle.getScramblers();
+        SortedMap<String, LazyInstantiator<Puzzle>> scramblers = PuzzlePlugins.getScramblers();
 
         ArrayList<Map<String, Object>> puzzleInfos_ = new ArrayList<Map<String, Object>>(scramblers.size());
         HashMap<String, Map<String, Object>> puzzleInfoByShortName_ = new HashMap<String, Map<String, Object>>(scramblers.size());
         for(Entry<String, LazyInstantiator<Puzzle>> scrambler : scramblers.entrySet()) {
             String shortName = scrambler.getKey();
-            String longName = Puzzle.getScramblerLongName(shortName);
+            String longName = PuzzlePlugins.getScramblerLongName(shortName);
 
             Map<String, Object> puzzleInfo = new HashMap<String, Object>();
             puzzleInfo.put("shortName", shortName);
@@ -76,7 +77,7 @@ public class PuzzleListHandler extends SafeHttpServlet {
                 sendError(request, response, "Please specify an extension");
                 return;
             }
-            SortedMap<String, LazyInstantiator<Puzzle>> scramblers = Puzzle.getScramblers();
+            SortedMap<String, LazyInstantiator<Puzzle>> scramblers = PuzzlePlugins.getScramblers();
             if(extension.equals("json")) {
                 if(puzzle.equals("")) {
                     if(includeStatus) {

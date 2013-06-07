@@ -1,7 +1,7 @@
 package puzzle;
 
 import java.util.Random;
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 public class TwoByTwoSolver {
     public TwoByTwoSolver() {}

@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.utils.Utils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
