@@ -34,7 +34,9 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
         };
     }
 
-    protected String puzzleCustomSolveIn(CubeState cs, int n) {
+    @Override
+    protected String solveIn(PuzzleState ps, int n) {
+        CubeState cs = (CubeState) ps;
         boolean useTwoPhase = EnvGetter.getenv("NO_TWO_PHASE") == null;
         if(!useTwoPhase) {
             return null;

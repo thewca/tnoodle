@@ -9,6 +9,10 @@ public class ScrambleJsEntryPoint implements EntryPoint {
     public void onModuleLoad() {
         ExporterUtil.exportAll();
         onLoadImpl();
+
+        ConsolePrintStream cps = new ConsolePrintStream();
+        System.setOut(cps);
+        System.setErr(cps);
     }
 
     private native void onLoadImpl() /*-{

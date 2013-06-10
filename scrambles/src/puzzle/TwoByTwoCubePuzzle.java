@@ -37,7 +37,8 @@ public class TwoByTwoCubePuzzle extends CubePuzzle {
         return ab.getStateAndGenerator();
     }
 
-    protected String puzzleCustomSolveIn(CubeState cs, int n) {
+    protected String solveIn(PuzzleState ps, int n) {
+        CubeState cs = (CubeState) ps;
         String solution = twoSolver.solveIn(cs.toTwoByTwoState(), n);
         return solution;
     }

@@ -7,7 +7,13 @@ public class EnvGetter {
     private EnvGetter() {}
 
     public native static final String getenv(String key) /*-{
-        if ($wnd.TNOODLE_ENV) return $wnd.TNOODLE_ENV[key];
-        return null;
+        var val = null;
+        if($wnd.TNOODLE_ENV) {
+            val = $wnd.TNOODLE_ENV[key];
+            if(val === undefined) {
+                val = null;
+            }
+        }
+        return val;
     }-*/;
 }

@@ -328,15 +328,6 @@ public class CubePuzzle extends Puzzle {
         };
     }
 
-    /*
-     * Subclasses of CubePuzzle can override this method to speed up
-     * CubeState's solveIn() method.
-     *
-     */
-    protected String puzzleCustomSolveIn(CubeState cs, int n) {
-        return null;
-    }
-
     public class CubeState extends PuzzleState {
         private final int[][][] image;
         private int[][][] normalizedImage = null;
@@ -435,15 +426,6 @@ public class CubePuzzle extends Puzzle {
                 }
             }
             return state;
-        }
-
-        @Override
-        public String solveIn(int n) {
-            String solution = puzzleCustomSolveIn(this, n);
-            if(solution != null) {
-                return solution;
-            }
-            return super.solveIn(n);
         }
 
         @Override
