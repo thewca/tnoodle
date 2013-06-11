@@ -396,10 +396,10 @@ public class SquareOnePuzzle extends Puzzle {
 
             double x = width / 2.0;
             double y = height / 4.0;
-            AffineTransform old = g.getTransform();
             g.rotate(Math.toRadians(90 + 15), x, y);
             drawFace(g, pieces, x, y, radius, colorScheme);
-            g.setTransform(old);
+            // Undo rotation from before drawFace()
+            g.rotate(Math.toRadians(-(90 + 15)), x, y);
 
             y *= 3.0;
             g.rotate(Math.toRadians(-90 - 15), x, y);

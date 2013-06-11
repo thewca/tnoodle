@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
@@ -297,16 +296,29 @@ public class ClockPuzzle extends Puzzle {
         }
 
         protected void drawClock(Graphics2D g, int clock, int position, HashMap<String, Color> colorScheme) {
-            AffineTransform old = g.getTransform();
-
+            int netX = 0;
+            int netY = 0;
+            int deltaX, deltaY;
             if(clock < 9) {
-                g.translate(radius + gap, radius + gap);
+                deltaX = radius + gap;
+                deltaY = radius + gap;
+                g.translate(deltaX, deltaY);
+                netX += deltaX;
+                netY += deltaY;
             } else {
-                g.translate(3*(radius + gap), radius + gap);
+                deltaX = 3*(radius + gap);
+                deltaY = radius + gap;
+                g.translate(deltaX, deltaY);
+                netX += deltaX;
+                netY += deltaY;
                 clock -= 9;
             }
 
-            g.translate(2*((clock%3) - 1)*clockOuterRadius, 2*((clock/3) - 1)*clockOuterRadius);
+            deltaX = 2*((clock%3) - 1)*clockOuterRadius;
+            deltaY = 2*((clock/3) - 1)*clockOuterRadius;
+            g.translate(deltaX, deltaY);
+            netX += deltaX;
+            netY += deltaY;
             g.rotate(Math.toRadians(position*30));
 
             GeneralPath arrow = new GeneralPath();
@@ -323,7 +335,9 @@ public class ClockPuzzle extends Puzzle {
             g.fillOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
             g.fill(arrow);
 
-            g.setTransform(old);
+            // Undo transformations
+            g.rotate(-Math.toRadians(position*30));
+            g.translate(-netX, -netY);
         }
 
         protected void drawPins(Graphics2D g, boolean[] pins, HashMap<String, Color> colorScheme) {

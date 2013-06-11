@@ -7,23 +7,47 @@
 <script>
     function puzzlesLoaded(puzzles) {
         window.puzzles = puzzles;
+
+        var puzzle_select;
+        window.addEventListener("load", function() {
+            tnoodlejs.setLogLevel("FINEST");
+
+            var gen_scramble_button = document.getElementById("gen_scramble");
+            gen_scramble_button.addEventListener("click", newScramble);
+
+            puzzle_select = document.getElementById("puzzle_select");
+            for(var shortName in puzzles) {
+                var puzzle = puzzles[shortName];
+                var longName = puzzle.getLongName();
+                puzzle_select.options[puzzle_select.options.length] = new Option(longName, shortName);
+            }
+
+            newScramble();
+        });
     }
 
     function newScramble() {
-        var scram = puzzles['333'].generateScramble();
+        var puzzle = puzzles[puzzle_select.selectedOptions[0].value];
+        var scram = puzzle.generateScramble();
         document.body.appendChild(document.createElement("br"));
         document.body.appendChild(document.createTextNode(scram));
+
+        var scramble_image = document.getElementById("scramble_image");
+        var preferredSize = puzzle.getPreferredSize();
+        scramble_image.width = preferredSize.width_0*2;
+        scramble_image.height = preferredSize.height_0*2;
+        puzzle.drawScramble(scramble_image, scram, false);
     }
 
-    window.addEventListener("load", function() {
-        tnoodlejs.setLogLevel("FINEST");
-        var button = document.getElementById("gen_scramble");
-        button.addEventListener("click", newScramble);
-    });
 </script>
 </head>
 <body>
-<h1>Hello, world!</h1>
-<button id="gen_scramble">New Scramble</button>
+<div>
+    <select id="puzzle_select"></select>
+    <button id="gen_scramble">New Scramble</button>
+</div>
+<div>
+    <canvas id="scramble_image"></canvas>
+</div>
 </body>
 </html>

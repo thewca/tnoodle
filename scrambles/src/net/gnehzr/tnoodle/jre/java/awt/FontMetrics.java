@@ -1,15 +1,23 @@
 package java.awt;
 
-/*
- * TODO - actually implement
- */
+import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.canvas.dom.client.TextMetrics;
+
 public class FontMetrics {
+    private Context2d context;
+    public FontMetrics(Context2d context) {
+        this.context = context;
+    }
+
     public int stringWidth(String str) {
-        return 42;
+        TextMetrics metrics = context.measureText(str);
+        return (int) metrics.getWidth();
     }
     
     public int getAscent() {
-        return 42;
+        String font = context.getFont();
+        String size = font.split(" ")[0];
+        return Integer.parseInt(size.substring(0, size.length() - 2));
     }
 
 }
