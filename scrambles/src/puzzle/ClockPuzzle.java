@@ -6,7 +6,6 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
@@ -240,8 +239,6 @@ public class ClockPuzzle extends Puzzle {
 
         @Override
         protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
             drawBackground(g, colorScheme);
 
             for(int i = 0; i < 18; i++) {

@@ -6,6 +6,7 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.RenderingHints;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.security.NoSuchAlgorithmException;
@@ -20,10 +21,6 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.canvas.dom.client.Context2d;
-import com.levigo.util.gwtawt.client.WebGraphics;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
@@ -289,29 +286,12 @@ public abstract class Puzzle implements Exportable {
             defaults.putAll(colorScheme);
         }
         g.scale(1.0*size.width/getPreferredSize().width, 1.0*size.height/getPreferredSize().height);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         PuzzleState state = getSolvedState();
         state = state.applyAlgorithm(scramble);
         state.drawScramble(g, defaults);
     }
 
-
-    @Export
-    public void drawScramble(CanvasElement canvasElement, String scramble, boolean resizeCanvas) throws InvalidScrambleException {
-        Dimension size;
-        if(resizeCanvas) {
-            size = getPreferredSize();
-            canvasElement.setWidth(size.width);
-            canvasElement.setHeight(size.height);
-        } else {
-            size = new Dimension(canvasElement.getWidth(), canvasElement.getHeight());
-        }
-        Context2d ctx = canvasElement.getContext2d();
-        WebGraphics g = new WebGraphics(ctx);
-        Graphics2D g2d = new Graphics2D(g);
-        // TODO - support color scheme
-        HashMap<String, Color> colorScheme = null;
-        drawScramble(g2d, size, scramble, colorScheme);
-    }
 
     protected String solveIn(PuzzleState ps, int n) {
         if(ps.isSolved()) {

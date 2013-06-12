@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.utils.Utils.toHex;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
 import static net.gnehzr.tnoodle.utils.Utils.toPoints;
 
 import java.awt.Color;

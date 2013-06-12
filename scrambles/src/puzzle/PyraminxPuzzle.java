@@ -4,10 +4,10 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -74,7 +74,6 @@ public class PyraminxPuzzle extends Puzzle {
 
     private void drawTriangle(Graphics2D g, double x, double y, boolean up, int[] state, int pieceSize, Color[] colorScheme) {
         GeneralPath p = triangle(up, pieceSize);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         p.transform(AffineTransform.getTranslateInstance(x, y));
 
         double[] xpoints = new double[3];
@@ -503,6 +502,8 @@ public class PyraminxPuzzle extends Puzzle {
 
         @Override
         protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
+            g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+
             Color[] scheme = new Color[4];
             for(int i = 0; i < scheme.length; i++) {
                 scheme[i] = colorScheme.get("FDLR".charAt(i)+"");

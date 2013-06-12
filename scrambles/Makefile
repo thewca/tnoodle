@@ -1,6 +1,6 @@
 GWT_DIR=gwt/
 GWT_EXPORTER_JAR=../lib/gwtexporter-2.5.0-SNAPSHOT.jar
-CLASSPATH=postprocessed:src:../utils/src:../threephase/src:../min2phase/src:../sq12phase/src:../lib/gwt-awt-0.0.3-SNAPSHOT.jar:$(GWT_EXPORTER_JAR):$(GWT_DIR)*
+CLASSPATH=postprocessed:src:../utils/src:../threephase/src:../min2phase/src:../sq12phase/src:../lib/lib-gwt-svg-0.5.7.jar:../lib/gwt-awt-0.0.3-SNAPSHOT.jar:$(GWT_EXPORTER_JAR):$(GWT_DIR)*
 
 GWT_MODULE=scrambles
 GWT_PACKAGES_DOCUMENT=net.gnehzr.tnoodle.js net.gnehzr.tnoodle.scrambles puzzle

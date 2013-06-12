@@ -32,11 +32,14 @@
         document.body.appendChild(document.createElement("br"));
         document.body.appendChild(document.createTextNode(scram));
 
-        var scramble_image = document.getElementById("scramble_image");
-        var preferredSize = puzzle.getPreferredSize();
-        scramble_image.width = preferredSize.width_0*2;
-        scramble_image.height = preferredSize.height_0*2;
-        puzzle.drawScramble(scramble_image, scram, false);
+
+        var maxWidth = 0;
+        var maxHeight = 0;
+        var svgElement = tnoodlejs.scrambleToSvg(scram, puzzle, maxWidth, maxHeight);
+
+        var scramble_area = document.getElementById("scramble_area");
+        scramble_area.innerHTML = "";
+        scramble_area.appendChild(svgElement);
     }
 
 </script>
@@ -46,8 +49,7 @@
     <select id="puzzle_select"></select>
     <button id="gen_scramble">New Scramble</button>
 </div>
-<div>
-    <canvas id="scramble_image"></canvas>
+<div id="scramble_area">
 </div>
 </body>
 </html>

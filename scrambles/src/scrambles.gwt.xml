@@ -10,6 +10,8 @@
   <inherits name='com.google.gwt.user.User'/>
 
   <!-- Other module inherits                                      -->
+  <inherits name='org.vectomatic.libgwtsvg'/>
+
   <inherits name='com.levigo.util.GwtAwt'/>
   <inherits name="com.google.gwt.i18n.I18N"/>
   <inherits name='org.timepedia.exporter.Exporter'/>

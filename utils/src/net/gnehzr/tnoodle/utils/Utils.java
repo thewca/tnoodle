@@ -1,6 +1,8 @@
 package net.gnehzr.tnoodle.utils;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
 
 import java.awt.Color;
 import java.awt.geom.GeneralPath;
@@ -21,7 +23,6 @@ import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -50,59 +51,6 @@ public final class Utils {
     public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
 
     private Utils() {}
-
-    private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
-    static {
-        Color timPurple = new Color(98, 50, 122);
-        Color orangeHeraldicTincture = new Color(255, 128, 0);
-        WCA_COLORS.put("y", Color.YELLOW);
-        WCA_COLORS.put("yellow", Color.YELLOW);
-        WCA_COLORS.put("b", Color.BLUE);
-        WCA_COLORS.put("blue", Color.BLUE);
-        WCA_COLORS.put("r", Color.RED);
-        WCA_COLORS.put("red", Color.RED);
-        WCA_COLORS.put("w", Color.WHITE);
-        WCA_COLORS.put("white", Color.WHITE);
-        WCA_COLORS.put("g", Color.GREEN);
-        WCA_COLORS.put("green", Color.GREEN);
-        WCA_COLORS.put("o", orangeHeraldicTincture);
-        WCA_COLORS.put("orange", orangeHeraldicTincture);
-        WCA_COLORS.put("p", timPurple);
-        WCA_COLORS.put("purple", timPurple);
-        WCA_COLORS.put("0", Color.GRAY);
-        WCA_COLORS.put("grey", Color.GRAY);
-        WCA_COLORS.put("gray", Color.GRAY);
-    }
-    public static Color toColor(String s) {
-        try {
-            if(WCA_COLORS.containsKey(s)) {
-                return WCA_COLORS.get(s);
-            }
-            if(s.startsWith("#")) {
-                s = s.substring(1);
-            }
-            if(s.length() != 6) {
-                return null;
-            }
-            return new Color(Integer.parseInt(s, 16));
-        } catch(Exception e) {
-            return null;
-        }
-    }
-
-    public static Color invertColor(Color c) {
-        if(c == null) {
-            return Color.BLACK;
-        }
-        return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
-    }
-
-    public static String toHex(Color c) {
-        if(c == null) {
-            return "";
-        }
-        return Integer.toHexString(0x1000000 | (c.getRGB() & 0xffffff)).substring(1);
-    }
 
     public static double[][][] toPoints(GeneralPath s) {
         ArrayList<ArrayList<double[]>> areas = new ArrayList<ArrayList<double[]>>();
