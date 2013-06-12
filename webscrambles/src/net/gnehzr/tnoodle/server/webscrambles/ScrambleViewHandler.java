@@ -40,6 +40,7 @@ import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.itextpdf.text.DocumentException;
 
@@ -103,15 +104,12 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                     sendText(request, response, throwableToString(e));
                 }
             } else if(extension.equals("svg")) {
-                // Get a DOMImplementation.
                 DOMImplementation domImpl =
                     GenericDOMImplementation.getDOMImplementation();
 
-                // Create an instance of org.w3c.dom.Document.
                 String svgNS = "http://www.w3.org/2000/svg";
                 Document document = domImpl.createDocument(svgNS, "svg", null);
 
-                // Create an instance of the SVG Generator.
                 SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
                 svgGenerator.setSVGCanvasSize(dimension);
 
@@ -127,10 +125,14 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                     return;
                 }
 
+                Element root = svgGenerator.getRoot();
+                // SVGGraphics2D doesn't generate the viewBox by itself
+                root.setAttributeNS(null, "viewBox", "0 0 " + dimension.width + " " + dimension.height);
+
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 boolean useCSS = true; // we want to use CSS style attributes
                 Writer out = new OutputStreamWriter(bytes, "UTF-8");
-                svgGenerator.stream(out, useCSS);
+                svgGenerator.stream(root, out, useCSS, false);
                 out.close();
 
                 response.setHeader("Content-Type", "image/svg+xml");
