@@ -10,6 +10,8 @@
 
         var puzzle_select;
         window.addEventListener("load", function() {
+            var versionSpan = document.getElementById("version");
+            versionSpan.appendChild(document.createTextNode(tnoodlejs.getVersion()));
             tnoodlejs.setLogLevel("FINEST");
 
             var gen_scramble_button = document.getElementById("gen_scramble");
@@ -45,6 +47,7 @@
 </script>
 </head>
 <body>
+<h1>tnoodlejs <span id="version"></span></h1>
 <div>
     <select id="puzzle_select"></select>
     <button id="gen_scramble">New Scramble</button>

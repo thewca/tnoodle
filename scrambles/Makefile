@@ -9,10 +9,11 @@ JAVA_SOURCES=$(shell find src/ -name '*.java')
 
 all: compile
 
-FOO=$(shell awk 1 ORS='\\\\n' src/puzzle/puzzles)
+PUZZLE_LIST=$(shell awk 1 ORS='\\\\n' src/puzzle/puzzles)
+VERSION=$(shell ../tmt describe)
 postprocessed/net/gnehzr/tnoodle/js/ScrambleJsEntryPoint.java: src/net/gnehzr/tnoodle/js/ScrambleJsEntryPoint.java
 	mkdir -p `dirname $@`
-	sed 's/%%PUZZLES%%/$(FOO)/g' $< > $@
+	cat $< | sed 's/%%PUZZLES%%/$(PUZZLE_LIST)/g' | sed 's/%%VERSION%%/$(VERSION)/g' > $@
 
 war/gwting/gwting.nocache.js: $(JAVA_SOURCES) $(GWT_DIR) postprocessed/net/gnehzr/tnoodle/js/ScrambleJsEntryPoint.java
 	java -cp "$(CLASSPATH)" com.google.gwt.dev.Compiler -strict -style PRETTY $(GWT_MODULE)

@@ -61,4 +61,8 @@ public class TNoodleJsUtils implements Exportable {
         return svg.getElement();
     }
 
+    public static String getVersion() {
+        return ScrambleJsEntryPoint.VERSION;
+    }
+
 }

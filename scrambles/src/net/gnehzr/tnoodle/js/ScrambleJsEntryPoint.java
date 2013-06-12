@@ -5,6 +5,7 @@ import org.timepedia.exporter.client.ExporterUtil;
 import com.google.gwt.core.client.EntryPoint;
 
 public class ScrambleJsEntryPoint implements EntryPoint {
+    public static final String VERSION = "%%VERSION%%";
 
     public void onModuleLoad() {
         ExporterUtil.exportAll();

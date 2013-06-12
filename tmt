@@ -242,6 +242,9 @@ class tmt:
                 "./tmt pull-request\n./tmt make check passed\n"
         github.pullRequest(title=tmt.args.title, body=body)
 
+    def _describe(self):
+        print self.VERSION
+
     def _strings(self):
         files = lint.gitFilesList(tmt.args.all)
         commentOrStringRe = re.compile(r"(\"(\\.|[^\\\"])*\"|'(\\.|[^\\'])*'|//[^\n]*|/(\\.|[^\\\/\n])*/|/\*.*?\*/)", re.DOTALL)
@@ -399,6 +402,13 @@ class tmt:
             action="store_true", default=False,
             help="Check all files, even if they haven't been edited")
         parser_strings.set_defaults(func=self._strings)
+
+        desc = "Print the version"
+        describe = subparsers.add_parser(
+            'describe',
+            help=desc, description=desc,
+            formatter_class=ArgumentDefaultsHelpFormatter)
+        describe.set_defaults(func=self._describe)
 
         desc = "Run tests & submit pull request if successful"
         pull_request = subparsers.add_parser(
