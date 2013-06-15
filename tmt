@@ -822,8 +822,8 @@ class EclipseProject(TmtProject):
         if len(javaFiles) > 0:
             args = [ 'javac' ]
 
-        # Generate all debugging information,
-        # it doesn't seem to be *that* much stuff.
+            # Generate all debugging information,
+            # it doesn't seem to be *that* much stuff.
             args += [ '-g' ]
 
             args += [ '-d', tempBin ]
@@ -848,13 +848,13 @@ class EclipseProject(TmtProject):
             entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
 
             # At the time we're compiling, bin/ and bin_tnoodle_resource/ don't
-        # actually exist (well, bin/ might). This is becuse we compile to
-        # temp directory, and move the folders only if we're successful.
+            # actually exist (well, bin/ might). This is becuse we compile to
+            # temp directory, and move the folders only if we're successful.
             entities.remove(self.bin)
 
             entities.remove(self.binResource)
             if src == self.srcResource:
-        # bin was just built, so it actually does exist
+                # bin was just built, so it actually does exist
                 entities.add(self.bin)
 
             classpath = self.toClasspath(entities)
