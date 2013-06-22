@@ -92,10 +92,10 @@ function clone(obj) {
     return o;
 }
 
-function ScrambleStuff(scrambler, loadedCallback, applet) {
+function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     var that = this;
 
-    var configuration = scrambler.configuration;
+    var configuration = server.configuration;
     var puzzle = null;
     var colorScheme = null;
     var currTurn = null;

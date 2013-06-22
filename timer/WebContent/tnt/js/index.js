@@ -22,7 +22,7 @@ window.addEvent('domready', function() {
         var puzzle = configuration.get('scramble.puzzle', '333');
         scrambleStuff.setSelectedPuzzle(puzzle);
     }
-    var scrambleStuff = new ScrambleStuff(scrambler, onPuzzlesLoaded);
+    var scrambleStuff = new ScrambleStuff(scrambler, server, onPuzzlesLoaded);
     document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
     document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 
