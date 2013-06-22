@@ -11,13 +11,32 @@ function xAddListener(obj, event, func, useCapture) {
 // This is a useful option for simulating a slow server (milliseconds).
 tnoodle.FAKE_SCRAMBLE_DELAY = 0;
 
-tnoodle.Scrambler = function() {
+tnoodle.Scrambler = function(hostname, port, protocol) {
     function assert(expr) {
         if(!expr) {
             throw "";
         }
     }
     var that = this;
+
+    if(!hostname) {
+        hostname = location.hostname;
+        port = location.port;
+        protocol = location.protocol;
+    }
+    if(!port) {
+        port = "80";
+    }
+    if(!protocol) {
+        protocol = "http:";
+    }
+    this.serverUrl = protocol + "//" + hostname + ":" + port;
+
+    /**** Scramble server stuff ***/
+    this.puzzlesUrl = this.serverUrl + "/puzzles/.json";
+    this.scrambleUrl = this.serverUrl + "/scramble/";
+    this.viewUrl = this.serverUrl + "/view/";
+    this.importUrl = this.serverUrl + "/import/";
 
     //TODO - document!
     this.createAreas = function(faces, scale) {

@@ -15,13 +15,14 @@ confirm = wrapFunctionInBlur(confirm);
 
 window.addEvent('domready', function() {
     var server = new tnoodle.server();
+    var scrambler = new tnoodle.Scrambler();
     var configuration = server.configuration;
     
     function onPuzzlesLoaded(puzzles) {
         var puzzle = configuration.get('scramble.puzzle', '333');
         scrambleStuff.setSelectedPuzzle(puzzle);
     }
-    var scrambleStuff = new ScrambleStuff(server, onPuzzlesLoaded);
+    var scrambleStuff = new ScrambleStuff(scrambler, onPuzzlesLoaded);
     document.getElementById('puzzleChooser').appendChild(scrambleStuff.puzzleSelect);
     document.getElementById('scrambleArea').appendChild(scrambleStuff.scrambleArea);
 

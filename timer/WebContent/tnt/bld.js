@@ -109,34 +109,34 @@
     /*
 
        legend:
-       U
+         U
 
        L F R B
 
-       D
+         D
 
        corners:
-       0  3
-       9  6
+               0  3
+               9  6
 
-       1 11  10  8   7  5   4  2
+        1 11  10  8   7  5   4  2
        23 13  14 16  17 19  20 22
 
-       12 15
-       21 18
+              12 15
+              21 18
 
        edges:
-       4
-       2   6
-       0
+                  4
+                2   6
+                  0
 
-       3       1       7       5
+          3       1       7       5
        13  11  10   8   9  15  14  12
-       19      17      23      21
+         19      17      23      21
 
-       16
-       18  22
-       20
+                 16
+               18  22
+                 20
        */
 
     function cornerIndexToSingmaster(index) {
@@ -308,7 +308,7 @@
     }
 
     function generateScramble() {
-        tnoodleServer.loadScramble(function(scramble) {
+        scrambler.loadScramble(function(scramble) {
             scrambleInput.value = scramble;
             inputsChanged();
         }, '333');
@@ -319,9 +319,9 @@
     var customSchemeDiv;
     var scrambleInput, cornerBufferInput, edgeBufferInput;
     var generateScrambleButton;
-    var tnoodleServer;
+    var scrambler;
     function load() {
-        tnoodleServer = new tnoodle.server();
+        scrambler = new tnoodle.Scrambler();
 
         cornerCycleSingmasterDiv = document.getElementById('cornerCycleSingmaster');
         edgeCycleSingmasterDiv = document.getElementById('edgeCycleSingmaster');
@@ -401,7 +401,7 @@
                 printStats(cornerCycleLengths, "corners");
                 printStats(edgeCycleLengths, "edges");
                 if(cornerCycleLengths.length < n) {
-                    tnoodleServer.loadScrambles(analyzeScrambles, '333', null, 100);
+                    scrambler.loadScrambles(analyzeScrambles, '333', null, 100);
                 }
             }
             analyzeScrambles([]);

@@ -16,7 +16,7 @@
 <script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
 <link type="text/css" href="/scrambler-interface/css/ui.css" rel="stylesheet" />
 
-<script type="text/javascript" src="/wca/scramble.js"></script>
+<script type="text/javascript" src="/wca/scrambleserver.js"></script>
 <style type="text/css">
 
 #ajaxStatus {
@@ -75,7 +75,7 @@
     var DEFAULT_MAX_SCRAMBLES_PER_REQUEST = 10;
     var maxScramblesPerRequestByPuzzle = { '444': 1 };
 
-    var scrambleServer = new tnoodle.ScrambleServer();
+    var scrambleServer = new tnoodle.Scrambler();
 
     var watermarkDiv = null;
     if(TNOODLE_ENV.WATERMARK) {

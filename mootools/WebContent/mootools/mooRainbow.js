@@ -19,6 +19,27 @@ provides: [mooRainbow]
 ...
 */
  
+/* Copied from tnt.js in order to make this file more standalone */
+Element.implement({
+    findAncestor: function(cond) {
+        var el = this;
+        while(el !== null && el !== undefined) {
+            if(cond(el)) {
+                return el;
+            }
+            el = el.parentNode;
+        }
+        return null;
+    },
+    isOrIsChild: function(par) {
+        return this.findAncestor(function(e) { return e == par; }) !== null;
+    },
+    containsPoint: function(point, relativeTo) {
+        var tl = this.getPosition(relativeTo);
+        var size = this.getSize();
+        return point.x >= tl.x && point.x < tl.x+size.x && point.y >= tl.y && point.y < tl.y+size.y;
+    }
+});
 var MooRainbow = new Class({
 	options: {
 		id: 'mooRainbow',
