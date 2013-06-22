@@ -12,6 +12,17 @@ function xAddListener(obj, event, func, useCapture) {
 tnoodle.FAKE_SCRAMBLE_DELAY = 0;
 
 tnoodle.Scrambler = function() {
+    var tnoodlejsScript = document.createElement('script');
+    tnoodlejsScript.setAttribute('src', '/wca/tnoodlejs.nocache.js');
+    var puzzles = null;
+    window.puzzlesLoaded = function(puzzles_) {
+        // TODO - we should deal with the case that people
+        // start calling stuff like loadScramble() before
+        // this happens.
+        puzzles = puzzles_;
+    };
+    document.body.appendChild(tnoodlejsScript);
+
     function assert(expr) {
         if(!expr) {
             throw "";
@@ -58,11 +69,8 @@ tnoodle.Scrambler = function() {
     };
 
     this.showExt = function(title, scrambleRequest, password, ext, target) {
-        var params = { scrambles: JSON.stringify(scrambleRequest) };
-        if(password) {
-            params.password = password;
-        }
-        tnoodle.postToUrl(that.viewUrl + encodeURIComponent(title) + '.' + ext, params, "POST", target);
+        // TODO - pdf/zip support in javascript? yikes...
+        assert(false);
     };
     this.showPdf = function(title, scrambleRequest, password, target) {
         that.showExt(title, scrambleRequest, password, 'pdf', target);
@@ -72,11 +80,7 @@ tnoodle.Scrambler = function() {
     };
 
     this.loadPuzzles = function(callback, includeStatus) {
-        var query = {};
-        if(includeStatus) {
-            query.includeStatus = 'true';
-        }
-        return tnoodle.retryAjax(callback, this.puzzlesUrl, query);
+        assert(false);
     };
 
     this.loadScramble = function(callback, puzzle, seed) {
@@ -85,33 +89,19 @@ tnoodle.Scrambler = function() {
         }, puzzle, seed, 1);
     };
     var requestCount = 0;
-    this.loadScrambles = function(callback, puzzle, seed, count) {
-        var query = {};
-        if(seed) { query.seed = seed; }
-        if(!count) { count = 1; }
-
-        // The backend lightly protects itself by not allowing more than 100
-        // scrambles in a single request.
-        assert(count <= 100);
-
-        query[''] = encodeURIComponent(puzzle) + "*" + count;
-        // Freaking Chrome seems to cache scramble requests if they're close enough
-        // together, even if we POST. This forces it to not.
-        query['showIndices'] = (requestCount++);
-        var pendingLoadScrambles = tnoodle.retryAjax(function(scrambleRequests) {
-            assert(!scrambleRequests.error);
-
-            var scrambles = [];
-            for(var i = 0; i < scrambleRequests.length; i++) {
-                scrambles = scrambles.concat(scrambleRequests[i].scrambles);
-            }
-            if(tnoodle.FAKE_SCRAMBLE_DELAY) {
-                setTimeout(callback.bind(null, scrambles), tnoodle.FAKE_SCRAMBLE_DELAY);
-            } else {
-                callback(scrambles);
-            }
-        }, this.scrambleUrl + ".json", query);
-        return pendingLoadScrambles;
+    this.loadScrambles = function(callback, puzzleName, seed, count) {
+        var puzzle = puzzles[puzzleName];
+        var scrambles;
+        if(seed) {
+            scrambles = puzzle.generateSeededScrambles(seed, count);
+        } else {
+            scrambles = puzzle.generateScrambles(count);
+        }
+        if(tnoodle.FAKE_SCRAMBLE_DELAY) {
+            setTimeout(callback.bind(null, scrambles), tnoodle.FAKE_SCRAMBLE_DELAY);
+        } else {
+            callback(scrambles);
+        }
     };
     this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
         scramble = scramble || "";
