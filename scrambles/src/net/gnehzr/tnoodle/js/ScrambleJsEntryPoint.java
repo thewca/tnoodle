@@ -1,11 +1,16 @@
 package net.gnehzr.tnoodle.js;
 
+import java.util.HashMap;
 import org.timepedia.exporter.client.ExporterUtil;
 
 import com.google.gwt.core.client.EntryPoint;
 
 public class ScrambleJsEntryPoint implements EntryPoint {
     public static final String VERSION = "%%VERSION%%";
+    public static HashMap<String, String> resources = new HashMap<String, String>();
+    static {
+        //%%RESOURCES%%
+    }
 
     public void onModuleLoad() {
         ExporterUtil.exportAll();

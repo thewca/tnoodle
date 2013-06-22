@@ -18,6 +18,7 @@ import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.ui.Image;
 
 import org.vectomatic.dom.svg.OMSVGDocument;
 import org.vectomatic.dom.svg.OMSVGLength;
@@ -47,14 +48,19 @@ public class TNoodleJsUtils implements Exportable {
         return level == null ? null : level.getName();
     }
 
-    public static Element scrambleToSvg(String scramble, Puzzle puzzle, int maxWidth, int maxHeight) throws InvalidScrambleException {
-        Dimension size = puzzle.getPreferredSize(maxWidth, maxHeight);
+    private static OMSVGSVGElement createSVG(int width, int height) {
         OMSVGDocument doc = OMSVGParser.currentDocument();
         OMSVGSVGElement svg = doc.createSVGSVGElement();
-        svg.setWidth(OMSVGLength.SVG_LENGTHTYPE_PX, size.width);
-        svg.setHeight(OMSVGLength.SVG_LENGTHTYPE_PX, size.height);
-        svg.setViewBox(0, 0, size.width, size.height);
-        Graphics2D g2d = new Graphics2D(doc, svg);
+        svg.setWidth(OMSVGLength.SVG_LENGTHTYPE_PX, width);
+        svg.setHeight(OMSVGLength.SVG_LENGTHTYPE_PX, height);
+        svg.setViewBox(0, 0, width, height);
+        return svg;
+    }
+
+    public static Element scrambleToSvg(String scramble, Puzzle puzzle, int maxWidth, int maxHeight) throws InvalidScrambleException {
+        Dimension size = puzzle.getPreferredSize(maxWidth, maxHeight);
+        OMSVGSVGElement svg = createSVG(size.width, size.height);
+        Graphics2D g2d = new Graphics2D((OMSVGDocument) svg.getOwnerDocument(), svg);
         // TODO - support color scheme
         HashMap<String, Color> colorScheme = null;
         puzzle.drawScramble(g2d, size, scramble, colorScheme);
@@ -63,6 +69,21 @@ public class TNoodleJsUtils implements Exportable {
 
     public static String getVersion() {
         return ScrambleJsEntryPoint.VERSION;
+    }
+
+    public static Element getPuzzleIcon(Puzzle puzzle) {
+        String filename = "puzzle/" + puzzle.getShortName() + ".png";
+        if(ScrambleJsEntryPoint.resources.containsKey(filename)) {
+            Image image = new Image();
+            image.setUrl("data:image/png;base64," + ScrambleJsEntryPoint.resources.get(filename));
+            return image.getElement();
+        }
+
+        Dimension size = new Dimension(32, 32);
+        OMSVGSVGElement svg = createSVG(size.width, size.height);
+        Graphics2D g2d = new Graphics2D((OMSVGDocument) svg.getOwnerDocument(), svg);
+        puzzle.drawPuzzleIcon(g2d, size);
+        return svg.getElement();
     }
 
 }

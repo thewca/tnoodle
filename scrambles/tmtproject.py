@@ -2,6 +2,7 @@ import tmt
 import sys
 from os.path import join, exists, abspath, dirname, isdir
 import zipfile
+import base64
 
 DESCRIPTION = "A Java scrambling suite. Java applications can use this project as a library. A perfect example of this is the webscrambles package. Using GWT, the java code compiles to javascript (tnoodlejs)."
 
@@ -89,9 +90,22 @@ class Project(tmt.EclipseProject):
             entities.insert(0, join(self.name, 'postprocessed'))
             classpath = self.toClasspath(entities)
 
+            resources = {}
+            for filename in self.nonJavaSrcDeps:
+                with open(join(self.src, filename)) as f:
+                    data = f.read()
+                    data64 = base64.b64encode(data)
+                    resources[filename] = data64
+            javaResources = ""
+            for filename, data64 in resources.iteritems():
+                javaResources += 'resources.put("%s", "%s");\n' % ( filename, data64 )
             puzzles = open(join(src, 'puzzle', 'puzzles')).read()
             puzzles = puzzles.replace("\n", "\\n")
-            defines = { '%%PUZZLES%%': puzzles, '%%VERSION%%': tmt.VERSION }
+            defines = {
+                '%%PUZZLES%%': puzzles,
+                '%%VERSION%%': tmt.VERSION,
+                '//%%RESOURCES%%': javaResources
+            }
             javaFiles = tmt.glob(src, r'.*\.java$')
             for f in javaFiles:
                 with open(f) as opened:

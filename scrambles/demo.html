@@ -1,5 +1,11 @@
 <html>
 <head>
+<style type="text/css">
+    div#scramble_icons > * {
+        cursor: pointer;
+        margin: 10px;
+    }
+</style>
 <script>
     window.TNOODLE_ENV = { "TNOODLE_333_MIN_DISTANCE": "1" };
 </script>
@@ -8,51 +14,76 @@
     function puzzlesLoaded(puzzles) {
         window.puzzles = puzzles;
 
-        var puzzle_select;
         window.addEventListener("load", function() {
             var versionSpan = document.getElementById("version");
             versionSpan.appendChild(document.createTextNode(tnoodlejs.getVersion()));
             tnoodlejs.setLogLevel("FINEST");
 
-            var gen_scramble_button = document.getElementById("gen_scramble");
-            gen_scramble_button.addEventListener("click", newScramble);
-
-            puzzle_select = document.getElementById("puzzle_select");
+            var scramble_info = document.getElementById("scramble_info");
+            var scramble_icons = document.getElementById("scramble_icons");
+            var selectedPuzzle = null;
+            function updateScrambleInfo() {
+                scramble_info.innerHTML = "";
+                var str = null;
+                if(selectedPuzzle) {
+                    str = "Click generate " + selectedPuzzle + " scramble";
+                } else {
+                    str = "Click icon to generate scramble";
+                }
+                scramble_info.appendChild(document.createTextNode(str));
+            }
+            updateScrambleInfo();
+            function onIconClick(e) {
+                var puzzle = puzzles[this.dataset.shortName];
+                newScramble(puzzle);
+            }
+            function onIconMouseover(e) {
+                var puzzle = puzzles[this.dataset.shortName];
+                selectedPuzzle = puzzle.getLongName();
+                updateScrambleInfo();
+            }
+            function onIconMouseout(e) {
+                selectedPuzzle = null;
+                updateScrambleInfo();
+            }
             for(var shortName in puzzles) {
                 var puzzle = puzzles[shortName];
                 var longName = puzzle.getLongName();
-                puzzle_select.options[puzzle_select.options.length] = new Option(longName, shortName);
+
+                var icon = tnoodlejs.getPuzzleIcon(puzzle);
+                icon.dataset.shortName = shortName;
+                scramble_icons.appendChild(icon);
+                icon.addEventListener('click', onIconClick);
+                icon.addEventListener('mouseover', onIconMouseover);
+                icon.addEventListener('mouseout', onIconMouseout);
             }
 
-            newScramble();
         });
     }
 
-    function newScramble() {
-        var puzzle = puzzles[puzzle_select.selectedOptions[0].value];
+    function newScramble(puzzle) {
         var scram = puzzle.generateScramble();
-        document.body.appendChild(document.createElement("br"));
-        document.body.appendChild(document.createTextNode(scram));
+        var scramble_area = document.getElementById("scramble_area");
+        scramble_area.innerHTML = "";
+        scramble_area.appendChild(document.createTextNode(scram));
 
 
         var maxWidth = 0;
         var maxHeight = 0;
         var svgElement = tnoodlejs.scrambleToSvg(scram, puzzle, maxWidth, maxHeight);
 
-        var scramble_area = document.getElementById("scramble_area");
-        scramble_area.innerHTML = "";
-        scramble_area.appendChild(svgElement);
+        var scramble_image = document.getElementById("scramble_image");
+        scramble_image.innerHTML = "";
+        scramble_image.appendChild(svgElement);
     }
 
 </script>
 </head>
 <body>
 <h1>tnoodlejs <span id="version"></span></h1>
-<div>
-    <select id="puzzle_select"></select>
-    <button id="gen_scramble">New Scramble</button>
-</div>
-<div id="scramble_area">
-</div>
+<div id="scramble_icons"></div>
+<div id="scramble_info"></div>
+<div id="scramble_image"></div>
+<div id="scramble_area"></div>
 </body>
 </html>
