@@ -6,6 +6,18 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toInt;
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.throwableToString;
 
+import org.apache.batik.svggen.SVGShape;
+import org.w3c.dom.Element;
+import org.apache.batik.svggen.DOMGroupManager;
+import net.gnehzr.tnoodle.utils.Utils;
+import com.google.gson.JsonElement;
+import java.awt.geom.GeneralPath;
+import com.google.gson.JsonSerializationContext;
+import java.lang.reflect.Type;
+import com.google.gson.JsonSerializer;
+import java.awt.geom.AffineTransform;
+
+import org.apache.batik.util.SVGConstants;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -40,7 +52,6 @@ import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import com.itextpdf.text.DocumentException;
 
@@ -51,6 +62,16 @@ public class ScrambleViewHandler extends SafeHttpServlet {
     public ScrambleViewHandler() throws BadClassDescriptionException,
             IOException {
         this.scramblers = PuzzlePlugins.getScramblers();
+    }
+
+    public class MySVGGraphics2D extends SVGGraphics2D {
+        public MySVGGraphics2D(Document domFactory) {
+            super(domFactory);
+        }
+
+        public final DOMGroupManager myGetDOMGroupManager(){
+            return domGroupManager;
+        }
     }
 
     @Override
@@ -78,7 +99,7 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             HashMap<String, Color> colorScheme = scrambler
                     .parseColorScheme(query.get("scheme"));
             String scramble = query.get("scramble");
-            Dimension dimension = scrambler
+            Dimension size = scrambler
                     .getPreferredSize(toInt(query.get("width"), 0),
                             toInt(query.get("height"), 0));
 
@@ -89,9 +110,9 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                         bytes = PuzzleIcon.loadPuzzleIcon(scrambler);
                     } else {
                         bytes = new ByteArrayOutputStream();
-                        BufferedImage img = new BufferedImage(dimension.width,
-                                dimension.height, BufferedImage.TYPE_INT_ARGB);
-                        scrambler.drawScramble(img.createGraphics(), dimension,
+                        BufferedImage img = new BufferedImage(size.width,
+                                size.height, BufferedImage.TYPE_INT_ARGB);
+                        scrambler.drawScramble(img.createGraphics(), size,
                                 scramble, colorScheme);
                         ImageIO.write(img, "png", bytes);
                     }
@@ -110,8 +131,8 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                 String svgNS = "http://www.w3.org/2000/svg";
                 Document document = domImpl.createDocument(svgNS, "svg", null);
 
-                SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-                svgGenerator.setSVGCanvasSize(dimension);
+                MySVGGraphics2D svgGenerator = new MySVGGraphics2D(document);
+                svgGenerator.setSVGCanvasSize(size);
 
                 // This is a hack I don't fully understand that prevents aliasing of
                 // vertical and horizontal lines.
@@ -119,15 +140,35 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                 svgGenerator.translate(0.5, 0.5);
 
                 try {
-                    scrambler.drawScramble(svgGenerator, dimension, scramble, colorScheme);
+                    scrambler.drawScramble(svgGenerator, size, scramble, colorScheme);
                 } catch(InvalidScrambleException e) {
                     sendText(request, response, throwableToString(e));
                     return;
                 }
 
+                HashMap<String, GeneralPath> faces = scrambler.getDefaultFaceBoundaries();
+                Dimension preferredSize = scrambler.getPreferredSize(0, 0);
+                for(String face : faces.keySet()) {
+                    GeneralPath gp = faces.get(face);
+
+                    // Scale face to appropriate size
+                    gp.transform(AffineTransform.getScaleInstance(
+                        (float) size.width / preferredSize.width,
+                        (float) size.height / preferredSize.height
+                    ));
+
+                    SVGShape shapeConverter = svgGenerator.getShapeConverter();
+                    Element svgShape = shapeConverter.toSVG(gp);
+                    svgShape.setAttributeNS(null, SVGConstants.SVG_OPACITY_ATTRIBUTE, "0");
+                    svgShape.setAttributeNS(null, "class", "puzzleface");
+                    svgShape.setAttributeNS(null, "id", face);
+                    DOMGroupManager dgm = svgGenerator.myGetDOMGroupManager();
+                    dgm.addElement(svgShape, DOMGroupManager.FILL);
+                }
+
                 Element root = svgGenerator.getRoot();
                 // SVGGraphics2D doesn't generate the viewBox by itself
-                root.setAttributeNS(null, "viewBox", "0 0 " + dimension.width + " " + dimension.height);
+                root.setAttributeNS(null, "viewBox", "0 0 " + size.width + " " + size.height);
 
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 boolean useCSS = true; // we want to use CSS style attributes
@@ -183,4 +224,16 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             sendError(request, response, "Invalid extension: " + extension);
         }
     }
+
+    static {
+        Utils.registerTypeAdapter(PuzzleImageInfo.class, new PuzzleImageInfoizer());
+    }
+    private static class PuzzleImageInfoizer implements JsonSerializer<PuzzleImageInfo> {
+        @Override
+        public JsonElement serialize(PuzzleImageInfo pii, Type typeOfT, JsonSerializationContext context) {
+
+            return context.serialize(pii.toJsonable());
+        }
+    }
+
 }

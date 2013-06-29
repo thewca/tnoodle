@@ -165,7 +165,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                         formatScramble();
                     }
 
-                    refreshColorSchemeChooser();
+                    recreateColorSchemeChooserImage();
 
                     // The minimum size of the scramble area may have changed
                     // because we enforce that it is at least as tall as the scramble
@@ -175,18 +175,34 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
             }, puzzle);
     }
 
+    var configureColorSchemeImg, configureColorSchemeImgAreas;
+    function recreateColorSchemeChooserImage() {
+        colorChooser.element.setStyle('visibility', 'hidden');
+        currFaceName = null;
+        refreshColorSchemeChooserImage();
+    }
     function refreshColorSchemeChooserImage() {
-        configureColorSchemeImg.src = scrambler.getScrambleImageUrl(puzzle, null, colorScheme, defaultSize.width, defaultSize.height);
+        configureColorSchemeImg = scrambler.getScrambleImage(puzzle, null, colorScheme, defaultSize.width, defaultSize.height);
         configureColorSchemeImg.setStyle('width', defaultSize.width);
         configureColorSchemeImg.setStyle('height', defaultSize.height);
+        configureColorSchemeImgHolder.empty();
+        configureColorSchemeImgHolder.appendChild(configureColorSchemeImg);
+
+        if(configureColorSchemeImg.tagName == "SVG") {
+            configureColorSchemeImgAreas = configureColorSchemeImg.getElementsByClassName("puzzleface");
+            refreshColorSchemeChooser();
+        } else {
+            // We must wait for configureColorSchemeImg to load before
+            // we can access its configureColorSchemeImg.contentDocument.
+            configureColorSchemeImgAreas = null;
+            configureColorSchemeImg.addEventListener('load', function(e) {
+                configureColorSchemeImgAreas = configureColorSchemeImg.contentDocument.getElementsByClassName("puzzleface");
+                refreshColorSchemeChooser();
+            });
+        }
     }
     function refreshColorSchemeChooser() {
-        refreshColorSchemeChooserImage();
-        colorChooser.element.setStyle('visibility', 'hidden');
-
-        deleteChildren(scrambleImgMap);
         var scale = 1;
-        var areas = scrambler.createAreas(faceMap, scale);
         var refreshHeader = function() {
             deleteChildren(scrambleHeaderText);
             var msg = null;
@@ -200,7 +216,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
             scrambleHeaderText.appendChild(document.createTextNode(msg));
         };
         var setHoveredFace = function() {
-            hoveredFace = this.faceName;
+            hoveredFace = this.id;
             refreshHeader();
         };
         var clearHoveredFace = function() {
@@ -208,16 +224,14 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
             refreshHeader();
         };
         var hoveredFace = null;
-        currFaceName = null;
         refreshHeader();
-        for(var i = 0; i < areas.length; i++) {
-            var area = areas[i];
-            area.setAttribute('alt', area.faceName);
+        for(var i = 0; i < configureColorSchemeImgAreas.length; i++) {
+            var area = configureColorSchemeImgAreas[i];
+            area.setAttribute('alt', area.id);
             xAddListener(area, 'click', faceClicked, false);
 
             xAddListener(area, 'mouseover', setHoveredFace, false);
             xAddListener(area, 'mouseout', clearHoveredFace, false);
-            scrambleImgMap.appendChild(area);
         }
     }
 
@@ -394,7 +408,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
 
     var currFaceName = null;
     function faceClicked() {
-        currFaceName = this.faceName;
+        currFaceName = this.id;
         colorChooser.setDefaultColor(colorScheme[currFaceName]);
         colorChooser.element.setStyle('visibility', '');
     }
@@ -427,8 +441,8 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
         puzzleSelect.setDisabled(false);
         var options = [];
         for(var i = 0; i < puzzles.length; i++) {
-            var iconUrl = scrambler.getPuzzleIconUrl(puzzles[i].shortName);
-            options.push({ value: puzzles[i].shortName, text: puzzles[i].longName, icon: iconUrl });
+            var icon = scrambler.getPuzzleIcon(puzzles[i].shortName);
+            options.push({ value: puzzles[i].shortName, text: puzzles[i].longName, icon: icon });
         }
         puzzleSelect.setOptions(options);
         loadedCallback(puzzles);
@@ -502,8 +516,8 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                 
 
                 waitingIcon.style.display = 'inline';
-                activeImportRequest = scrambler.importScrambles(scramblesImported, url);
                 (activeImportButton = loadScramblesButton).disabled = true;
+                activeImportRequest = scrambler.importScrambles(scramblesImported, url);
                 return false;
             };
 
@@ -586,8 +600,8 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                 scrambleSrc = el.innerHTML;
 
                 waitingIcon.style.display = 'inline';
-                activeImportRequest = scrambler.loadScrambles(scramblesImported, puzzle, seed, count);
                 (activeImportButton = loadScramblesButton).disabled = true;
+                activeImportRequest = scrambler.loadScrambles(scramblesImported, puzzle, seed, count);
                 return false;
             };
 
@@ -635,13 +649,15 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     seedLink.appendChild(document.createTextNode('Seed'));
     importDivTabs.appendChild(seedLink);
 
-    var importUrlLink = document.createElement('span');
-    importUrlLink.title = "Import scrambles from url";
-    importUrlLink.className = 'link';
-    xAddListener(importUrlLink, 'click', promptImportUrl, false);
-    importUrlLink.appendChild(document.createTextNode('From Url'));
-    importDivTabs.appendChild(importUrlLink);
-    importDivTabs.appendChild(document.createTextNode(' '));
+    if(scrambler.importScrambles) {
+        var importUrlLink = document.createElement('span');
+        importUrlLink.title = "Import scrambles from url";
+        importUrlLink.className = 'link';
+        xAddListener(importUrlLink, 'click', promptImportUrl, false);
+        importUrlLink.appendChild(document.createTextNode('From Url'));
+        importDivTabs.appendChild(importUrlLink);
+        importDivTabs.appendChild(document.createTextNode(' '));
+    }
 
     var importFileLink = document.createElement('span');
     importFileLink.title = "Import scrambles from file";
@@ -752,7 +768,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
 
     function onColorConfigureShow() {
         currFaceName = null;
-        refreshColorSchemeChooser();
+        recreateColorSchemeChooserImage();
     }
     var configureColorSchemePopup = tnoodle.tnt.createPopup(onColorConfigureShow);
     configureColorSchemePopup.setStyle('text-align', 'center');
@@ -760,13 +776,8 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     var scrambleHeaderText = document.createElement('div');
     configureColorSchemePopup.appendChild(scrambleHeaderText);
 
-    var scrambleImgMap = document.createElement('map');
-    scrambleImgMap.setAttribute('name', 'scrambleImgMap');
-    configureColorSchemePopup.appendChild(scrambleImgMap);
-
-    var configureColorSchemeImg = document.createElement('img');
-    configureColorSchemeImg.setAttribute('usemap', '#scrambleImgMap');
-    configureColorSchemePopup.appendChild(configureColorSchemeImg);
+    var configureColorSchemeImgHolder = document.createElement('span');
+    configureColorSchemePopup.appendChild(configureColorSchemeImgHolder);
 
     var resetColorScheme = document.createElement('input');
     resetColorScheme.type = 'button';
@@ -776,7 +787,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
             colorScheme = clone(defaultColorScheme);
             configuration.set('scramble.' + puzzle + '.colorScheme', colorScheme);
             scrambleImg.redraw();
-            refreshColorSchemeChooser();
+            refreshColorSchemeChooserImage();
         }
     });
     tempDiv = document.createElement('div');
@@ -785,6 +796,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     configureColorSchemePopup.appendChild(tempDiv);
 
     var colorChooser = new ColorChooser(function(newColor) {
+        assert(currFaceName);
         colorScheme[currFaceName] = newColor;
         configuration.set('scramble.' + puzzle + '.colorScheme', colorScheme);
         scrambleImg.redraw();
@@ -846,7 +858,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
         }
     });
 
-    var scrambleImg = document.createElement('img');
+    var scrambleImg = document.createElement('span');
     scrambleImg.setStyle('float', 'right');
     that.invisiblePuzzles = configuration.get('scramble.invisiblePuzzles', {});
     scrambleImg.setVisible = function(visible, automated) {
@@ -887,6 +899,10 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     scrambleImg.redraw = function() {
         this.drawScramble(currScramble);
     };
+    function clobberScrambleImage(newElement) {
+        scrambleImg.empty();
+        scrambleImg.appendChild(newElement);
+    }
     scrambleImg.drawScramble = function(scramble) {
         // no need to waste bandwidth unless we're
         // actually displaying images
@@ -903,18 +919,21 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                 width = width.toInt();
                 height = height.toInt();
             }
-            this.src = scrambler.getScrambleImageUrl(puzzle, scramble, colorScheme, width, height);
+            var newScrambleImage = scrambler.getScrambleImage(puzzle, scramble, colorScheme, width, height);
+            clobberScrambleImage(newScrambleImage);
         }
     };
+    var loadingImage = document.createElement("img");
+    loadingImage.src = LOADING_IMAGE;
     scrambleImg.clear = function() {
-        this.src = LOADING_IMAGE;
+        clobberScrambleImage(loadingImage);
     };
 
     var puzzleSelect = tnoodle.tnt.createSelect('Click to open last session of puzzle', 'Click to change session puzzle');
     puzzleSelect.onchange = puzzleChanged;
     puzzleSelect.setDisabled(true);
 
-    scramblePre.appendChild(document.createTextNode('Connecting to ' + scrambler.toString() + "..."));
+    scramblePre.appendChild(document.createTextNode('Waiting for ' + scrambler.toString() + "..."));
     scrambler.loadPuzzles(puzzlesLoaded);
 
     // public variables

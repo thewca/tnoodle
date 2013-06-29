@@ -28,7 +28,7 @@ public class Graphics2D {
 
     private OMSVGDocument doc;
     private OMSVGSVGElement svg;
-    private OMSVGGElement g;
+    public OMSVGGElement g;
     private FontMetrics fm;
     public Graphics2D(OMSVGDocument doc, OMSVGSVGElement svg) {
         this.doc = doc;
@@ -98,7 +98,7 @@ public class Graphics2D {
         fill(square);
     }
 
-    private OMSVGPathElement shapeToPathElement(Shape s) {
+    public OMSVGPathElement shapeToPathElement(Shape s) {
         OMSVGPathElement path = doc.createSVGPathElement();
         OMSVGPathSegList segs = path.getPathSegList();
 
@@ -167,7 +167,7 @@ public class Graphics2D {
         }
         transforms.consolidate();
     }
-    private void draw(OMSVGElement s) {
+    public void draw(OMSVGElement s) {
         transform(s);
 
         s.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, hexColor);

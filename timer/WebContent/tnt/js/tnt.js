@@ -299,7 +299,7 @@ tnoodle.tnt = {
 
         function createOptionSpan() {
             var span = document.createElement('span');
-            var img = document.createElement('img');
+            var img = document.createElement('span');
             img.setStyle('vertical-align', 'middle');
             img.setStyle('width', '32px');
             img.setStyle('height', '32px');
@@ -321,10 +321,15 @@ tnoodle.tnt = {
             el.setStyle('height', '');
             el.img.setStyle('display', 'none');
             if(option.icon) {
-                el.img.setStyle('display', 'inline');
-                if(el.img.src != option.icon) {
-                    el.img.src = option.icon;
+                el.img.setStyle('display', 'inline-block');
+                el.img.empty();
+                var icon = option.icon;
+                if(icon.getParent() !== null) {
+                    // If this element has already been placed somewhere,
+                    // we must clone it before we use it.
+                    icon = icon.clone();
                 }
+                el.img.appendChild(icon);
                 maxWidth -= 32 + 2;
             }
             maxWidth -= select.arrow2.getSize().x;

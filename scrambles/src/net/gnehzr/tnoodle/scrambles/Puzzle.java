@@ -192,18 +192,12 @@ public abstract class Puzzle implements Exportable {
 
     /**
      * Computes the best size to draw the scramble image.
-     * @param maxWidth The maximum allowed width of the resulting image, 0 or null if it doesn't matter.
-     * @param maxHeight The maximum allowed height of the resulting image, 0 or null if it doesn't matter.
+     * @param maxWidth The maximum allowed width of the resulting image, 0 if it doesn't matter.
+     * @param maxHeight The maximum allowed height of the resulting image, 0 if it doesn't matter.
      * @return The best size of the resulting image, constrained to maxWidth and maxHeight.
      */
     @Export
-    public Dimension getPreferredSize(Integer maxWidth, Integer maxHeight) {
-        if(maxWidth == null) {
-            maxWidth = 0;
-        }
-        if(maxHeight == null) {
-            maxHeight = 0;
-        }
+    public Dimension getPreferredSize(int maxWidth, int maxHeight) {
         if(maxWidth == 0 && maxHeight == 0) {
             return getPreferredSize();
         }

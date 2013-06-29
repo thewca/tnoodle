@@ -1,5 +1,8 @@
 package net.gnehzr.tnoodle.utils;
 
+import java.awt.geom.FlatteningPathIterator;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -171,6 +174,12 @@ public final class GwtSafeUtils {
         return dest;
     }
 
+    public static double[] clone(double[] src) {
+        double[] dest = new double[src.length];
+        System.arraycopy(src, 0, dest, 0, src.length);
+        return dest;
+    }
+
     public static void deepCopy(int[][] src, int[][] dest) {
         for(int i = 0; i < src.length; i++) {
             System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
@@ -212,5 +221,37 @@ public final class GwtSafeUtils {
         System.arraycopy(src, from, dest, 0, dest.length);
         return dest;
     }
+
+    public static double[][][] toPoints(GeneralPath s) {
+        ArrayList<ArrayList<double[]>> areas = new ArrayList<ArrayList<double[]>>();
+        ArrayList<double[]> area = null;
+        double[] coords = new double[2];
+        PathIterator pi = new FlatteningPathIterator(s.getPathIterator(null), 1.0);
+        while(!pi.isDone()) {
+            int val = pi.currentSegment(coords);
+            switch(val) {
+                case PathIterator.SEG_MOVETO:
+                    area = new ArrayList<double[]>();
+                    areas.add(area);
+                case PathIterator.SEG_LINETO:
+                case PathIterator.SEG_CLOSE:
+                    area.add(clone(coords));
+                    break;
+                default:
+                    return null;
+            }
+            pi.next();
+        }
+        double[][][] areasArray = new double[areas.size()][][];
+        for(int i = 0; i < areasArray.length; i++) {
+            area = areas.get(i);
+            areasArray[i] = new double[area.size()][];
+            for(int j = 0; j < areasArray[i].length; j++) {
+                areasArray[i][j] = area.get(j);
+            }
+        }
+        return areasArray;
+    }
+
     
 }

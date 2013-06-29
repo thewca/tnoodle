@@ -54,7 +54,6 @@
       <exclude name="Main.java"/>
       <exclude name="ScrambleCacher.java"/>
       <exclude name="ScrambleCacherListener.java"/>
-      <exclude name="PuzzleImageInfo.java"/>
   </source>
   <source path='net/gnehzr/tnoodle/js'/>
 

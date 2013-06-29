@@ -132,7 +132,7 @@ tnoodle.Scrambler = function(hostname, port, protocol) {
         }, this.scrambleUrl + ".json", query);
         return pendingLoadScrambles;
     };
-    this.getScrambleImageUrl = function(puzzle, scramble, colorScheme, width, height) {
+    this.getScrambleImage = function(puzzle, scramble, colorScheme, width, height) {
         scramble = scramble || "";
         var query = { "scramble": scramble };
         if(width) { query.width = width; }
@@ -140,10 +140,15 @@ tnoodle.Scrambler = function(hostname, port, protocol) {
         if(colorScheme) {
             query.scheme = this.flattenColorScheme(colorScheme);
         }
-        return this.viewUrl + encodeURIComponent(puzzle) + ".png?" + tnoodle.toQueryString(query);
+        var scrambleUrl = this.viewUrl + encodeURIComponent(puzzle) + ".svg?" + tnoodle.toQueryString(query);
+        var scrambleImage = document.createElement('object');
+        scrambleImage.setAttribute('data', scrambleUrl);
+        return scrambleImage;
     };
-    this.getPuzzleIconUrl = function(puzzle) {
-        return this.viewUrl + encodeURIComponent(puzzle) + ".png?icon=true";
+    this.getPuzzleIcon = function(puzzle) {
+        var img = document.createElement('img');
+        img.src = this.viewUrl + encodeURIComponent(puzzle) + ".png?icon=true";
+        return img;
     };
     this.loadPuzzleImageInfo = function(callback, puzzle) {
         // callback must be a function(defaultPuzzleInfo)
@@ -239,11 +244,13 @@ tnoodle.ajax = function(callback, url, data) {
         xhr.open('GET', dataUrl, true);
     }
     xhr.onload = function() {
+        var json;
         try {
-            callback(JSON.parse(this.responseText));
+            json = JSON.parse(this.responseText);
         } catch(error) {
-            callback({error: error + " (" + this.responseText + ")" });
+            json = {error: error + " (" + this.responseText + ")" };
         }
+        callback(json);
     };
     xhr.onerror = function(error) {
         callback({error: error});

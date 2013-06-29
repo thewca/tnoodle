@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -51,37 +50,6 @@ public final class Utils {
     public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
 
     private Utils() {}
-
-    public static double[][][] toPoints(GeneralPath s) {
-        ArrayList<ArrayList<double[]>> areas = new ArrayList<ArrayList<double[]>>();
-        ArrayList<double[]> area = null;
-        double[] coords = new double[2];
-        PathIterator pi = s.getPathIterator(null, 1.0);
-        while(!pi.isDone()) {
-            int val = pi.currentSegment(coords);
-            switch(val) {
-                case PathIterator.SEG_MOVETO:
-                    area = new ArrayList<double[]>();
-                    areas.add(area);
-                case PathIterator.SEG_LINETO:
-                case PathIterator.SEG_CLOSE:
-                    area.add(coords.clone());
-                    break;
-                default:
-                    return null;
-            }
-            pi.next();
-        }
-        double[][][] areasArray = new double[areas.size()][][];
-        for(int i = 0; i < areasArray.length; i++) {
-            area = areas.get(i);
-            areasArray[i] = new double[area.size()][];
-            for(int j = 0; j < areasArray[i].length; j++) {
-                areasArray[i][j] = area.get(j);
-            }
-        }
-        return areasArray;
-    }
 
     public static String throwableToString(Throwable e) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
