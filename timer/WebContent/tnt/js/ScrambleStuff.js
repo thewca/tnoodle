@@ -920,6 +920,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                 height = height.toInt();
             }
             var newScrambleImage = scrambler.getScrambleImage(puzzle, scramble, colorScheme, width, height);
+            newScrambleImage.setStyle('float', 'right');
             clobberScrambleImage(newScrambleImage);
         }
     };
