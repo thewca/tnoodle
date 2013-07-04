@@ -34,6 +34,11 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
                 <extension>ico</extension>
                 <mime-type>image/x-icon</mime-type>
         </mime-mapping>
+
+        <mime-mapping>
+                <extension>ttf</extension>
+                <mime-type>application/x-font-ttf</mime-type>
+        </mime-mapping>
         
         
         <servlet>
