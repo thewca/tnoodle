@@ -186,6 +186,8 @@ var TimerDisplay = new Class({
         } else {
             this.decimalsAccurate = decimalsAccurate;
         }
+        this.timerStart = new Date().getTime() - elapsedMillis;
+
         if(!this.timing) {
             // The stackmat will call startTimer repeatedly without stopping the timer.
             this.scramble = this.scrambleStuff.getScramble();
@@ -204,7 +206,6 @@ var TimerDisplay = new Class({
             }
         }
 
-        this.timerStart = new Date().getTime() - elapsedMillis;
     },
     stopTimer: function(elapsedMillis, decimalsAccurate) {
         if(!elapsedMillis) {
