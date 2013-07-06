@@ -3,6 +3,7 @@ package net.gnehzr.tnoodle.js;
 import java.util.HashMap;
 import org.timepedia.exporter.client.ExporterUtil;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.EntryPoint;
 
 public class ScrambleJsEntryPoint implements EntryPoint {
@@ -13,6 +14,12 @@ public class ScrambleJsEntryPoint implements EntryPoint {
     }
 
     public void onModuleLoad() {
+        // By default, GWT is setting an UncaughtExceptionHandler,
+        // which prevents exceptions from percolating up into javascriptland.
+        // I think this is a bad default behavior, as it hides real errors,
+        // so here we clobber it.
+        GWT.setUncaughtExceptionHandler(null);
+
         ExporterUtil.exportAll();
         onLoadImpl();
 

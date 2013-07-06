@@ -188,7 +188,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
         configureColorSchemeImgHolder.empty();
         configureColorSchemeImgHolder.appendChild(configureColorSchemeImg);
 
-        if(configureColorSchemeImg.tagName == "SVG") {
+        if(configureColorSchemeImg.tagName.toLowerCase() == "svg") {
             configureColorSchemeImgAreas = configureColorSchemeImg.getElementsByClassName("puzzleface");
             refreshColorSchemeChooser();
         } else {
