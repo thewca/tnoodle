@@ -35,6 +35,7 @@ import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.core.client.JavaScriptObject;
 
 @ExportPackage("")
 @Export("tnoodlejs")
@@ -149,9 +150,10 @@ public class TNoodleJsUtils implements Exportable {
         }
     }
 
-    public static JSONValue getPuzzleImageInfo(Puzzle puzzle) {
+    public static JavaScriptObject getPuzzleImageInfo(Puzzle puzzle) {
         HashMap<String, Object> pii = new PuzzleImageInfo(puzzle).toJsonable();
-        return toJSONValue(pii);
+        JSONObject jso = (JSONObject) toJSONValue(pii);
+        return jso.getJavaScriptObject();
     }
 
 }

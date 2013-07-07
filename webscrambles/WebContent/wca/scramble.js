@@ -35,7 +35,7 @@ if(!is_worker) {
             var shortName = e.data.shortName;
             var puzzle = puzzles[shortName];
             if(e.data.pii) {
-                var pii = tnoodlejs.getPuzzleImageInfo(puzzle).jsObject;
+                var pii = tnoodlejs.getPuzzleImageInfo(puzzle);
                 self.postMessage({ shortName: shortName, pii: pii });
             } else if(e.data.scramble) {
                 var seed = e.data.seed;
