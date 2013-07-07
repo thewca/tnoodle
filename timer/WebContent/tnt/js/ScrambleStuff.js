@@ -183,6 +183,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     }
     function refreshColorSchemeChooserImage() {
         configureColorSchemeImg = scrambler.getScrambleImage(puzzle, null, colorScheme, defaultSize.width, defaultSize.height);
+        configureColorSchemeImg.classList.add("colorchooser");
         configureColorSchemeImg.setStyle('width', defaultSize.width);
         configureColorSchemeImg.setStyle('height', defaultSize.height);
         configureColorSchemeImgHolder.empty();
