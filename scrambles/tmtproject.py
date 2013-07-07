@@ -129,7 +129,11 @@ class Project(tmt.EclipseProject):
             args = []
             args.append('-strict')
             args += [ '-war', join(self.name, 'war') ]
-            args += [ '-style', 'PRETTY' ]
+
+            # "-style PRETTY" makes the gwt code almost readable, but also more
+            # than double the size of the resulting code.
+            #args += [ '-style', 'PRETTY' ]
+
             args.append(GWT_MODULE)
 
             retVal = tmt.java("com.google.gwt.dev.Compiler", classpath=classpath, args=args)
