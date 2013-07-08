@@ -7,7 +7,6 @@
     "sub": true,
     "newcap": false,
     "indent": 4,
-    "evil": true,
     "globals": {
         "alert": true,
         "confirm": true,
@@ -38,6 +37,7 @@
         "ShortcutManager": true,
         "TriLayout": true,
         "tnoodlejs": true,
+        "TNOODLEJS_GWT": true,
 
         // web workers
         "importScripts": true,

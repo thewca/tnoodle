@@ -128,7 +128,8 @@ class Project(tmt.EclipseProject):
 
             args = []
             args.append('-strict')
-            args += [ '-war', join(self.name, 'war') ]
+            war = join(self.name, 'war')
+            args += [ '-war', war ]
 
             # "-style PRETTY" makes the gwt code almost readable, but also more
             # than double the size of the resulting code.
@@ -138,6 +139,16 @@ class Project(tmt.EclipseProject):
 
             retVal = tmt.java("com.google.gwt.dev.Compiler", classpath=classpath, args=args)
             assert retVal == 0
+
+            scramblejs = open(join(self.src, 'scramble.js')).read()
+            tnoodlejs_nocache_js = open(join(war, 'tnoodlejs/tnoodlejs.nocache.js')).read()
+            tnoodlejs_nocache_js = """function TNOODLEJS_GWT() {
+%s
+}
+TNOODLEJS_GWT();""" % tnoodlejs_nocache_js
+            scramblejs = scramblejs.replace('//%%tnoodlejs.nocache.js%%', tnoodlejs_nocache_js)
+            with open(join(war, 'tnoodlejs/scramble.js'), 'w') as out:
+                out.write(scramblejs)
 
     def clean(self):
         tmt.EclipseProject.clean(self)

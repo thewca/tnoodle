@@ -7,6 +7,7 @@ import tempfile
 import time
 import math
 import datetime
+import atexit
 
 javaEEProjectName = "javaee-api-6.0.jar"
 
@@ -177,6 +178,19 @@ class tmt:
 
         # Check that the git hooks folder is all set up
         setupGitHooks.setupGitHooksIfNotSetup()
+
+    def doTextSubstitution(self, txt):
+        # This might be a pretty heavy hammer, but who in the world
+        # would legitimately want to use the string "%%VERSION%%"?
+        # Famous last words?
+        return txt.replace("%%VERSION%%", tmt.VERSION)
+
+    def notifyDist(self, filename):
+        sizeMB = 1.0 * os.path.getsize(filename) / 2**20
+        # ls -h ciels fractions, so we do the same thing here
+        sizeMB = math.ceil(sizeMB*10)/10
+
+        print 'Successfully created %s (size %sM)' % ( os.path.abspath(filename), sizeMB )
 
     def _loadTmtProjects(self):
         self._cdEntryPoint()
@@ -493,7 +507,7 @@ class tmt:
             matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
         return matches
 
-    def java(self, main, classpath='', args=[], debug=None, profile=None):
+    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True):
         command = []
         assert debug in [ None, 'jdb', 'attach' ]
         if debug == 'jdb':
@@ -514,7 +528,15 @@ class tmt:
         command += args
         print " ".join(command)
         p = subprocess.Popen(command)
-        return p.wait()
+        if wait:
+            return p.wait()
+        else:
+            def killProcess():
+                if p.poll() is None:
+                    # Child process is still running, lets kill it!
+                    p.kill()
+            atexit.register(killProcess)
+            return p
 
 tmt = tmt() # We only want one instance of Tmt
 sys.modules['tmt'] = tmt
@@ -1036,10 +1058,7 @@ date: %s
                         if os.path.isfile(path):
                             if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
                                 txt = file(path).read()
-                                # This might be a pretty heavy hammer, but who in the world
-                                # would legitimately want to use the string "%%VERSION%%"?
-                                # Famous last words?
-                                txt = txt.replace("%%VERSION%%", tmt.VERSION)
+                                txt = tmt.doTextSubstitution(txt)
                                 jar.writestr(arcPath, txt)
                             else:
                                 jar.write(path, arcPath)
@@ -1062,13 +1081,10 @@ Implementation-Version: %s
 
         createSymlinkIfNotExistsOrStale(basename(self.distJarFile()), noVersionPath)
 
-        sizeMB = 1.0 * os.path.getsize(self.distJarFile()) / 2**20
-        # ls -h ciels fractions, so we do the same thing here
-        sizeMB = math.ceil(sizeMB*10)/10
+        tmt.notifyDist(self.distJarFile())
+        print "Main class %s" % self.main
 
-        print 'Successfully created %s (size %sM) with main class %s' % ( self.distJarFile(), sizeMB, self.main )
-
-    def run(self):
+    def run(self, wait=True):
         main = tmt.args.main or self.main
         assert main, 'Main class not defined'
         assert tmt.args.args is not None # shlex reads from stdin if you pass None, lol
@@ -1085,8 +1101,11 @@ Implementation-Version: %s
                 classpath=self.toClasspath(classpath),
                 args=args,
                 debug=tmt.args.debug,
-                profile=tmt.args.profile)
-        sys.exit(retVal)
+                profile=tmt.args.profile,
+                wait=wait)
+        if wait:
+            sys.exit(retVal)
+        return retVal
 
     def check(self):
         if not self.tests:
