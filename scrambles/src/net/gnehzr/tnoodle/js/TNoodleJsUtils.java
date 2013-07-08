@@ -4,6 +4,7 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.awt.geom.AffineTransform;
 import org.vectomatic.dom.svg.utils.SVGConstants;
+import org.vectomatic.dom.svg.OMSVGRect;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo;
@@ -60,12 +61,33 @@ public class TNoodleJsUtils implements Exportable {
         return level == null ? null : level.getName();
     }
 
+    private static void setViewBox(OMSVGSVGElement svg, float x, float y, float width, float height) {
+        // Copied https://github.com/laaglu/lib-gwt-svg/commit/f7080a16fd9e0edcb43c01fe69927fe647f73f86 in, because a new version of lib-gwt-svg hasn't been released yet
+        if (!svg.getElement().hasAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE)) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(x);
+            builder.append(" ");
+            builder.append(y);
+            builder.append(" ");
+            builder.append(width);
+            builder.append(" ");
+            builder.append(height);
+            svg.getElement().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, builder.toString());
+            return;
+        }
+        OMSVGRect viewBox = svg.getViewBox().getBaseVal();
+        viewBox.setX(x);
+        viewBox.setY(y);
+        viewBox.setWidth(width);
+        viewBox.setHeight(height);
+    }
+
     private static OMSVGSVGElement createSVG(int width, int height) {
         OMSVGDocument doc = OMSVGParser.currentDocument();
         OMSVGSVGElement svg = doc.createSVGSVGElement();
         svg.setWidth(OMSVGLength.SVG_LENGTHTYPE_PX, width);
         svg.setHeight(OMSVGLength.SVG_LENGTHTYPE_PX, height);
-        svg.setViewBox(0, 0, width, height);
+        setViewBox(svg, 0, 0, width, height);
         return svg;
     }
 

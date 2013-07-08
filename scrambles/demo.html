@@ -34,11 +34,11 @@
             }
             updateScrambleInfo();
             function onIconClick(e) {
-                var puzzle = puzzles[this.dataset.shortName];
+                var puzzle = puzzles[this.shortName];
                 newScramble(puzzle);
             }
             function onIconMouseover(e) {
-                var puzzle = puzzles[this.dataset.shortName];
+                var puzzle = puzzles[this.shortName];
                 selectedPuzzle = puzzle.getLongName();
                 updateScrambleInfo();
             }
@@ -51,7 +51,7 @@
                 var longName = puzzle.getLongName();
 
                 var icon = tnoodlejs.getPuzzleIcon(puzzle);
-                icon.dataset.shortName = shortName;
+                icon.shortName = shortName;
                 scramble_icons.appendChild(icon);
                 icon.addEventListener('click', onIconClick);
                 icon.addEventListener('mouseover', onIconMouseover);
