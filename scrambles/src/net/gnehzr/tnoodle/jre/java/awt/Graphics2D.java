@@ -59,7 +59,7 @@ public class Graphics2D {
     private String hexColor;
     public void setColor(Color c) {
         this.c = c;
-        hexColor = GwtSafeUtils.toHex(c);
+        hexColor = "#" + GwtSafeUtils.toHex(c);
     }
 
     private OMSVGEllipseElement createEllipse(int x, int y, int width, int height) {
