@@ -25,8 +25,13 @@ var tnoodle = tnoodle || {};
         document.getElementById = function() {};
         document.getElementsByTagName = function() {return [];};
         document.readyState = 'loaded';
-        document.location = { href: "", search: "" };
-        window.location = document.location;
+        if(window.location) {
+            // Firefox actually does set self.location for webworkers
+            document.location = window.location;
+        } else {
+            window.location = { href: "", search: "" };
+            document.location = window.location;
+        }
 
         var msg_from_parent = function(e) {
             if(!e.data.shortName) {
