@@ -149,24 +149,24 @@ class Project(tmt.EclipseProject):
                 for child in reversed(root):
                         xmlRoot.insert(0, child)
 
-                for project in deps:
-                    if project in self.plugins.values():
-                        assert project.webContent
-                        pluginXmlFile = join(project.webContent, "WEB-INF", f)
-                        if not os.path.exists(pluginXmlFile):
-                                continue
-                        tree = ET.parse(pluginXmlFile)
-                        root = tree.getroot()
-                        for child in reversed(root):
-                            xmlRoot.insert(0, child)
+            for project in deps:
+                if project in self.plugins.values():
+                    assert project.webContent
+                    pluginXmlFile = join(project.webContent, "WEB-INF", f)
+                    if not os.path.exists(pluginXmlFile):
+                            continue
+                    tree = ET.parse(pluginXmlFile)
+                    root = tree.getroot()
+                    for child in reversed(root):
+                        xmlRoot.insert(0, child)
 
-                xmlFile = join(webappWebInfDir, f)
-                xmlFileOut = open(xmlFile, 'w')
+            xmlFile = join(webappWebInfDir, f)
+            xmlFileOut = open(xmlFile, 'w')
 
-                ET.register_namespace("", "http://java.sun.com/xml/ns/javaee")
+            ET.register_namespace("", "http://java.sun.com/xml/ns/javaee")
 
-                xmlFileOut.write(ET.tostring(xmlRoot))
-                xmlFileOut.close()
+            xmlFileOut.write(ET.tostring(xmlRoot))
+            xmlFileOut.close()
 
     def needsDb(self):
         if getattr(tmt.args, "project", None) is None:
