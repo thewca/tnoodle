@@ -155,7 +155,7 @@ public class ClockPuzzle extends Puzzle {
             }
         }
 
-        String scrambleStr = scramble.toString();
+        String scrambleStr = scramble.toString().trim();
 
         PuzzleState state = getSolvedState();
         try {

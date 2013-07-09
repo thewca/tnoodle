@@ -347,7 +347,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
             return;
         }
         deleteChildren(scramblePre);
-        var turns = currScramble.split(/ +/);
+        var turns = currScramble.trim().split(/ +/);
         var incrementalScramble = "";
         var maxLength = 0;
         var i, j, turn, newLines;
@@ -365,6 +365,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                     scramblePre.appendChild(document.createElement('br'));
                 }
                 turn = newLines[j];
+                assert(turn.length > 0);
                 incrementalScramble += turn;
                 var padding = "";
                 if(maxLength - turn.length <= 3) {
