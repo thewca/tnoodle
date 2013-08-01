@@ -463,7 +463,8 @@
         }
     }
 
-    function printCycles(stickersPerPiece, pieces, bufferInput, indexToStr, cycleDiv, breakIns) {
+    function printCycles(stickersPerPiece, pieces, bufferInput, indexToStrFuncs, cycleDivs, breakIns) {
+        assert(indexToStrFuncs.length == cycleDivs.length);
         breakIns = breakIns || {};
         var buffer = bufferInput.value;
         var bufferIndex = -1;
@@ -482,36 +483,46 @@
             assert(false);
         }
         bufferInput.value = buffer;
-
-        cycleDiv.empty();
+    
+        var cycleDiv;
+        var notationIndex;
+        for(notationIndex = 0; notationIndex < cycleDivs.length; notationIndex++) {
+            cycleDiv = cycleDivs[notationIndex];
+            cycleDiv.empty();
+        }
 
         function breakInChanged() {
             breakIns[this.breakIndex] = this.selectedIndex;
-            printCycles(stickersPerPiece, pieces, bufferInput, indexToStr, cycleDiv, breakIns);
+            printCycles(stickersPerPiece, pieces, bufferInput, indexToStrFuncs, cycleDivs, breakIns);
         }
-        var cycles = toCycle(pieces, stickersPerPiece, bufferIndex);
-        var breakIndex = 0;
-        var str;
-        while(cycles.length > 0) {
-            var index = 0;
-            if(cycles.length > 1) {
-                index = breakIns[breakIndex] || 0;
+        var ogCycles = toCycle(pieces, stickersPerPiece, bufferIndex);
+        for(notationIndex = 0; notationIndex < indexToStrFuncs.length; notationIndex++) {
+            var cycles = ogCycles;
+            cycleDiv = cycleDivs[notationIndex];
+            var indexToStr = indexToStrFuncs[notationIndex];
+            var breakIndex = 0;
+            var str;
+            while(cycles.length > 0) {
+                var index = 0;
+                if(cycles.length > 1) {
+                    index = breakIns[breakIndex] || 0;
 
-                var breakInSelect = document.createElement('select');
-                breakInSelect.breakIndex = breakIndex++;
-                for(var i = 0; i < cycles.length; i++) {
-                    str = indexToStr(cycles[i].dest);
-                    breakInSelect.options[i] = new Option(str, str);
+                    var breakInSelect = document.createElement('select');
+                    breakInSelect.breakIndex = breakIndex++;
+                    for(var i = 0; i < cycles.length; i++) {
+                        str = indexToStr(cycles[i].dest);
+                        breakInSelect.options[i] = new Option(str, str);
+                    }
+                    breakInSelect.selectedIndex = index;
+                    breakInSelect.addEvent('change', breakInChanged);
+                    cycleDiv.appendChild(breakInSelect);
+                    cycleDiv.appendText(" ");
+                } else {
+                    str = indexToStr(cycles[index].dest);
+                    cycleDiv.appendText(str + " ");
                 }
-                breakInSelect.selectedIndex = index;
-                breakInSelect.addEvent('change', breakInChanged);
-                cycleDiv.appendChild(breakInSelect);
-                cycleDiv.appendText(" ");
-            } else {
-                str = indexToStr(cycles[index].dest);
-                cycleDiv.appendText(str + " ");
+                cycles = cycles[index].children;
             }
-            cycles = cycles[index].children;
         }
     }
 
@@ -613,10 +624,8 @@
         }
 
 
-        printCycles(3, corners, cornerBufferInput, cornerIndexToSingmaster, cornerCycleSingmasterDiv);
-        printCycles(3, corners, cornerBufferInput, cornerIndexToCustom, cornerCycleDiv);
-        printCycles(2, edges, edgeBufferInput, edgeIndexToSingmaster, edgeCycleSingmasterDiv);
-        printCycles(2, edges, edgeBufferInput, edgeIndexToCustom, edgeCycleDiv);
+        printCycles(3, corners, cornerBufferInput, [ cornerIndexToSingmaster, cornerIndexToCustom ], [ cornerCycleSingmasterDiv, cornerCycleDiv ]);
+        printCycles(2, edges, edgeBufferInput, [ edgeIndexToSingmaster, edgeIndexToCustom ], [ edgeCycleSingmasterDiv, edgeCycleDiv ]);
     }
 
     var customScheme = null;
