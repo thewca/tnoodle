@@ -31,7 +31,7 @@ TNoodle implements the highest-quality scramble generation available at this tim
 
 ### Scramble Filtering
 
-- Scrambles are *not* filtered in any way by TNoodle. For example, random-state scramblers do not single out any states as "easier", "harder", or "more fair".
+- Scrambles are filtered according to rules set by the WCA Board. Note that these rules are not hardcoded in the [WCA Regulations](http://www.worldcubeassociation.org/regulations/).
 
 ## Credits
 
