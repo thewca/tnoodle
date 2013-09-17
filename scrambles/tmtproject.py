@@ -3,10 +3,13 @@ import sys
 from os.path import join, exists, abspath, dirname, isdir
 import zipfile
 import base64
+import textwrap
 
 DESCRIPTION = "A Java scrambling suite. Java applications can use this project as a library. A perfect example of this is the webscrambles package. Using GWT, the java code compiles to javascript (tnoodlejs)."
 
 GWT_MODULE= 'scrambles'
+
+NO_GWT_ENV_VAR = "TNOODLE_NO_GWT"
 
 
 def yesNoPrompt(promptStr):
@@ -64,91 +67,101 @@ class Project(tmt.EclipseProject):
         self.javaFilesToIgnore |= tmt.glob(join(self.src, 'net/gnehzr/tnoodle/jre/'), r'.*\.java')
 
     def innerCompile(self, src, tempBin, bin):
-        if src == self.src:
-            gwtDir = abspath(join(self.name, 'gwt-2.5.1'))
-            if not exists(gwtDir):
-                print "Could not find GWT at %s" % gwtDir
-                gwtUrl = "https://developers.google.com/web-toolkit/download"
-                print "You could visit %s and install GWT yourself (be sure to set up a symlink from %s to wherever you installed gwt." % ( gwtUrl, gwtDir )
-                if yesNoPrompt("Would you like me to download GWT and extract it to %s for you?" % gwtDir):
-                    gwtZipUrl = "http://google-web-toolkit.googlecode.com/files/gwt-2.5.1.zip"
-                    dledZipFile = dl(gwtZipUrl)
-                    gwtZip = zipfile.ZipFile(dledZipFile)
-                    gwtZip.extractall(path=dirname(gwtDir))
-                    assert isdir(gwtDir)
-                else:
-                    print "Please set up GWT and try again"
-                    sys.exit(1)
+        if src != self.src:
+            return
+        skipGwt = os.environ.get(NO_GWT_ENV_VAR)
+        if skipGwt:
+            print "%s set, so not compiling with GWT" % NO_GWT_ENV_VAR
+            return
+
+        # I hope people see this and don't just hate working on tnoodle.
+        print "*" * 64
+        print "\n".join(textwrap.wrap("Compiling java -> javascript using GWT. This is important to test, as it can break easily, but it's also very slow, and annoying for scrambler development. Set the %s environment variable to skip this" % NO_GWT_ENV_VAR, width=64))
+        print "*" * 64
+        gwtDir = abspath(join(self.name, 'gwt-2.5.1'))
+        if not exists(gwtDir):
+            print "Could not find GWT at %s" % gwtDir
+            gwtUrl = "https://developers.google.com/web-toolkit/download"
+            print "You could visit %s and install GWT yourself (be sure to set up a symlink from %s to wherever you installed gwt." % ( gwtUrl, gwtDir )
+            if yesNoPrompt("Would you like me to download GWT and extract it to %s for you?" % gwtDir):
+                gwtZipUrl = "http://google-web-toolkit.googlecode.com/files/gwt-2.5.1.zip"
+                dledZipFile = dl(gwtZipUrl)
+                gwtZip = zipfile.ZipFile(dledZipFile)
+                gwtZip.extractall(path=dirname(gwtDir))
+                assert isdir(gwtDir)
+            else:
+                print "Please set up GWT and try again"
+                sys.exit(1)
 
 
-            entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True, includeSrc=True)
-            entities.add(join(gwtDir, "*"))
-            entities.add(join('lib', 'lib-gwt-svg-0.5.7.jar'))
-            entities.add(join('lib', 'gwt-awt-0.0.3-SNAPSHOT.jar'))
-            # convert to a list, because order matters
-            entities = list(entities)
-            entities.insert(0, join(self.name, 'postprocessed'))
-            classpath = self.toClasspath(entities)
+        entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True, includeSrc=True)
+        entities.add(join(gwtDir, "*"))
+        entities.add(join('lib', 'lib-gwt-svg-0.5.7.jar'))
+        entities.add(join('lib', 'gwt-awt-0.0.3-SNAPSHOT.jar'))
+        # convert to a list, because order matters
+        entities = list(entities)
+        entities.insert(0, join(self.name, 'postprocessed'))
+        classpath = self.toClasspath(entities)
 
-            resources = {}
-            for filename in self.nonJavaSrcDeps:
-                with open(join(self.src, filename)) as f:
-                    data = f.read()
-                    data64 = base64.b64encode(data)
-                    resources[filename] = data64
-            javaResources = ""
-            for filename, data64 in resources.iteritems():
-                javaResources += 'resources.put("%s", "%s");\n' % ( filename, data64 )
-            puzzles = open(join(src, 'puzzle', 'puzzles')).read()
-            puzzles = puzzles.replace("\n", "\\n")
-            defines = {
-                '%%PUZZLES%%': puzzles,
-                '%%VERSION%%': tmt.VERSION,
-                '//%%RESOURCES%%': javaResources
-            }
-            javaFiles = tmt.glob(src, r'.*\.java$')
-            for f in javaFiles:
-                with open(f) as opened:
-                    contents = opened.read()
-                dirty = False
-                for define, value in defines.iteritems():
-                    if define in contents:
-                        dirty = True
-                        contents = contents.replace(define, value)
-                if dirty:
-                    f = f.replace("/src/", "/postprocessed/", 1)
-                    if not isdir(dirname(f)):
-                        os.makedirs(dirname(f))
-                    with open(f, 'w') as opened:
-                        opened.write(contents)
+        resources = {}
+        for filename in self.nonJavaSrcDeps:
+            with open(join(self.src, filename)) as f:
+                data = f.read()
+                data64 = base64.b64encode(data)
+                resources[filename] = data64
+        javaResources = ""
+        for filename, data64 in resources.iteritems():
+            javaResources += 'resources.put("%s", "%s");\n' % ( filename, data64 )
+        puzzles = open(join(src, 'puzzle', 'puzzles')).read()
+        puzzles = puzzles.replace("\n", "\\n")
+        defines = {
+            '%%PUZZLES%%': puzzles,
+            '%%VERSION%%': tmt.VERSION,
+            '//%%RESOURCES%%': javaResources
+        }
+        javaFiles = tmt.glob(src, r'.*\.java$')
+        for f in javaFiles:
+            with open(f) as opened:
+                contents = opened.read()
+            dirty = False
+            for define, value in defines.iteritems():
+                if define in contents:
+                    dirty = True
+                    contents = contents.replace(define, value)
+            if dirty:
+                f = f.replace("/src/", "/postprocessed/", 1)
+                if not isdir(dirname(f)):
+                    os.makedirs(dirname(f))
+                with open(f, 'w') as opened:
+                    opened.write(contents)
 
-            # TODO - add documentation target
-            # # This seems to blow up with jdk7
-            # javadoc -public -verbose -sourcepath src -classpath "$(CLASSPATH)" -d doc -docletpath $(GWT_EXPORTER_JAR) -doclet org.timepedia.exporter.doclet.JsDoclet $(GWT_PACKAGES_DOCUMENT)
+        # TODO - add documentation target
+        # # This seems to blow up with jdk7
+        # javadoc -public -verbose -sourcepath src -classpath "$(CLASSPATH)" -d doc -docletpath $(GWT_EXPORTER_JAR) -doclet org.timepedia.exporter.doclet.JsDoclet $(GWT_PACKAGES_DOCUMENT)
 
-            args = []
-            args.append('-strict')
-            war = join(self.name, 'war')
-            args += [ '-war', war ]
+        args = []
+        args.append('-strict')
+        war = join(self.name, 'war')
+        args += [ '-war', war ]
 
-            # "-style PRETTY" makes the gwt code almost readable, but also more
-            # than double the size of the resulting code.
-            #args += [ '-style', 'PRETTY' ]
+        # "-style PRETTY" makes the gwt code almost readable, but also more
+        # than double the size of the resulting code.
+        #args += [ '-style', 'PRETTY' ]
 
-            args.append(GWT_MODULE)
+        args.append(GWT_MODULE)
 
-            retVal = tmt.java("com.google.gwt.dev.Compiler", classpath=classpath, args=args)
-            assert retVal == 0
+        retVal = tmt.java("com.google.gwt.dev.Compiler", classpath=classpath, args=args)
+        assert retVal == 0
 
-            scramblejs = open(join(self.src, 'scramble.js')).read()
-            tnoodlejs_nocache_js = open(join(war, 'tnoodlejs/tnoodlejs.nocache.js')).read()
-            tnoodlejs_nocache_js = """function TNOODLEJS_GWT() {
+        scramblejs = open(join(self.src, 'scramble.js')).read()
+        tnoodlejs_nocache_js = open(join(war, 'tnoodlejs/tnoodlejs.nocache.js')).read()
+        tnoodlejs_nocache_js = """function TNOODLEJS_GWT() {
 %s
 }
 TNOODLEJS_GWT();""" % tnoodlejs_nocache_js
-            scramblejs = scramblejs.replace('//%%tnoodlejs.nocache.js%%', tnoodlejs_nocache_js)
-            with open(join(war, 'tnoodlejs/scramble.js'), 'w') as out:
-                out.write(scramblejs)
+        scramblejs = scramblejs.replace('//%%tnoodlejs.nocache.js%%', tnoodlejs_nocache_js)
+        with open(join(war, 'tnoodlejs/scramble.js'), 'w') as out:
+            out.write(scramblejs)
 
     def clean(self):
         tmt.EclipseProject.clean(self)
