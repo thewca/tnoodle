@@ -47,7 +47,7 @@ import org.timepedia.exporter.client.NoExport;
 @ExportClosure
 public abstract class Puzzle implements Exportable {
     private static final Logger l = Logger.getLogger(Puzzle.class.getName());
-    protected int wcaMinScrambleDistance = 1;
+    protected int wcaMinScrambleDistance = 2;
 
     /**
      * Returns a String describing this Scrambler
@@ -98,7 +98,7 @@ public abstract class Puzzle implements Exportable {
         PuzzleStateAndGenerator psag;
         do {
             psag = generateRandomMoves(r);
-        } while(psag.state.solveIn(wcaMinScrambleDistance) != null);
+        } while(psag.state.solveIn(wcaMinScrambleDistance - 1) != null);
         return psag.generator;
     }
 
