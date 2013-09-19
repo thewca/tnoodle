@@ -4,7 +4,6 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,14 +18,14 @@ public class LazyInstantiator<H> {
     private String definition;
     private Class<H> parentClass;
     private ClassLoader classLoader;
-    public LazyInstantiator(String definition, Class<H> classy, ClassLoader classLoader) throws BadClassDescriptionException {
+    public LazyInstantiator(String definition, Class<H> classy, ClassLoader classLoader) throws BadLazyClassDescriptionException {
         if(classLoader == null) {
             classLoader = getClass().getClassLoader();
         }
         this.classLoader = classLoader;
         Matcher m = INSTANTIATION_PATTERN.matcher(definition);
         if(!m.matches()) {
-            throw new BadClassDescriptionException(definition);
+            throw new BadLazyClassDescriptionException(definition);
         }
 
         this.definition = definition;
@@ -67,7 +66,7 @@ public class LazyInstantiator<H> {
             }
         }
         if(start != arguments.length()) {
-            throw new BadClassDescriptionException(definition);
+            throw new BadLazyClassDescriptionException(definition);
         }
         this.argTypes = argTypes.toArray(new Class<?>[0]);
         this.args = args.toArray();
@@ -77,16 +76,30 @@ public class LazyInstantiator<H> {
     private Class<?>[] argTypes;
     private Object[] args;
     private Class<? extends H> thisClass;
-    public H newInstance() throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, SecurityException, NoSuchMethodException, MalformedURLException {
-        if(constructor == null) {
-            thisClass = classLoader.loadClass(className).asSubclass(this.parentClass);
-            constructor = thisClass.getConstructor(this.argTypes);
+    public H newInstance() throws LazyInstantiatorException {
+        try {
+            if(constructor == null) {
+                thisClass = classLoader.loadClass(className).asSubclass(this.parentClass);
+                constructor = thisClass.getConstructor(this.argTypes);
+            }
+            return constructor.newInstance(args);
+        } catch(ClassNotFoundException e) {
+            throw new LazyInstantiatorException(e);
+        } catch(NoSuchMethodException e) {
+            throw new LazyInstantiatorException(e);
+        } catch(InstantiationException e) {
+            throw new LazyInstantiatorException(e);
+        } catch(IllegalArgumentException e) {
+            throw new LazyInstantiatorException(e);
+        } catch(IllegalAccessException e) {
+            throw new LazyInstantiatorException(e);
+        } catch(InvocationTargetException e) {
+            throw new LazyInstantiatorException(e);
         }
-        return constructor.newInstance(args);
     }
 
     private H cachedInstance = null;
-    public synchronized H cachedInstance() throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, ClassNotFoundException, NoSuchMethodException, MalformedURLException {
+    public synchronized H cachedInstance() throws LazyInstantiatorException {
         if(cachedInstance == null) {
             cachedInstance = newInstance();
         }

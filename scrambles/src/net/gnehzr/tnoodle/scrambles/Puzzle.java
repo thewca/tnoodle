@@ -34,7 +34,8 @@ import org.timepedia.exporter.client.NoExport;
 
 /**
  * Puzzle and TwistyPuzzle encapsulate all the information to filter out
- * scrambles <= 1 move away from solved (see generateWCAScramble),
+ * scrambles <= wcaMinScrambleDistance (defaults to 1)
+ * move away from solved (see generateWcaScramble),
  * and to generate random turn scrambles generically (see generateRandomMoves).
  *
  * The original proposal for these classes is accessible here:
@@ -77,6 +78,14 @@ public abstract class Puzzle implements Exportable {
     }
 
     /**
+     * Returns the minimum distance from solved that any scramble this Puzzle
+     * generates will be.
+     */
+    public int getWcaMinScrambleDistance() {
+        return wcaMinScrambleDistance;
+    }
+
+    /**
      * Generates a scramble appropriate for this Scrambler. It's important to note that
      * it's ok if this method takes some time to run, as it's going to be called many times and get queued up
      * by ScrambleCacher.
@@ -85,7 +94,7 @@ public abstract class Puzzle implements Exportable {
      * @param r The instance of Random you must use as your source of randomness when generating scrambles.
      * @return A String containing the scramble, where turns are assumed to be separated by whitespace.
      */
-    public final String generateWCAScramble(Random r) {
+    public final String generateWcaScramble(Random r) {
         PuzzleStateAndGenerator psag;
         do {
             psag = generateRandomMoves(r);
@@ -113,7 +122,7 @@ public abstract class Puzzle implements Exportable {
     private String[] generateScrambles(Random r, int count) {
         String[] scrambles = new String[count];
         for(int i = 0; i < count; i++) {
-            scrambles[i] = generateWCAScramble(r);
+            scrambles[i] = generateWcaScramble(r);
         }
         return scrambles;
     }
@@ -135,7 +144,7 @@ public abstract class Puzzle implements Exportable {
 
     @Export
     public final String generateScramble() {
-        return generateWCAScramble(r);
+        return generateWcaScramble(r);
     }
     @Export
     public final String[] generateScrambles(int count) {
@@ -159,7 +168,7 @@ public abstract class Puzzle implements Exportable {
         // rather than replacing it.
         SecureRandom r = getSecureRandom();
         r.setSeed(seed);
-        return generateWCAScramble(r);
+        return generateWcaScramble(r);
     }
     private final String[] generateSeededScrambles(byte[] seed, int count) {
         // We must create our own Random because

@@ -49,7 +49,7 @@ public class ScrambleCacher {
                     // any scrambles.
                 }
                 for(;;) {
-                    String scramble = puzzle.generateWCAScramble(r);
+                    String scramble = puzzle.generateWcaScramble(r);
 
                     if(drawScramble) {
                         // The drawScramble option exists so we can test out generating and drawing

@@ -1,7 +1,6 @@
 package net.gnehzr.tnoodle.scrambles;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
@@ -11,7 +10,8 @@ import java.util.logging.Logger;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
@@ -20,7 +20,7 @@ import net.gnehzr.tnoodle.utils.Utils;
 public class Main {
     private static final Logger l = Logger.getLogger(Main.class.getName());
 
-    public static void main(String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, BadClassDescriptionException, IOException {
+    public static void main(String[] args) throws IOException, BadLazyClassDescriptionException, LazyInstantiatorException {
 
         OptionParser parser = new OptionParser();
         OptionSpec<?> benchmark = parser.acceptsAll(Arrays.asList("b", "benchmark"), "Benchmark scramble generation");

@@ -13,7 +13,7 @@ import java.util.Map;
 public class Plugins<H> {
     private HashMap<String, LazyInstantiator<H>> filePlugins = new HashMap<String, LazyInstantiator<H>>();
     private HashMap<String, String> pluginComment = new HashMap<String, String>();
-    public Plugins(String packageName, Class<H> pluginClass, ClassLoader classLoader) throws IOException, BadClassDescriptionException {
+    public Plugins(String packageName, Class<H> pluginClass, ClassLoader classLoader) throws IOException, BadLazyClassDescriptionException {
         if(classLoader == null) {
             classLoader = getClass().getClassLoader();
         }
@@ -60,7 +60,7 @@ public class Plugins<H> {
         return pluginComment.get(key);
     }
 
-    public Map<String, LazyInstantiator<H>> getPlugins() throws BadClassDescriptionException, IOException {
+    public Map<String, LazyInstantiator<H>> getPlugins() {
         return Collections.unmodifiableMap(filePlugins);
     }
 }

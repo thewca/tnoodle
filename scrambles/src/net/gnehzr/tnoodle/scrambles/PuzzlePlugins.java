@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.TreeMap;
 
-import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
@@ -31,13 +31,13 @@ public class PuzzlePlugins {
             plugins = new Plugins<Puzzle>("puzzle", Puzzle.class, Puzzle.class.getClassLoader());
         } catch (IOException e) {
             l.log(Level.SEVERE, "", e);
-        } catch (BadClassDescriptionException e) {
+        } catch (BadLazyClassDescriptionException e) {
             l.log(Level.SEVERE, "", e);
         }
     }
 
     private static SortedMap<String, LazyInstantiator<Puzzle>> scramblers;
-    public static synchronized SortedMap<String, LazyInstantiator<Puzzle>> getScramblers() throws BadClassDescriptionException, IOException {
+    public static synchronized SortedMap<String, LazyInstantiator<Puzzle>> getScramblers() throws BadLazyClassDescriptionException, IOException {
         if(scramblers == null) {
             // Sorting in a way that will take into account numbers (so 10x10x10 appears after 3x3x3)
             SortedMap<String, LazyInstantiator<Puzzle>> newScramblers =
@@ -48,7 +48,7 @@ public class PuzzlePlugins {
         return Collections.unmodifiableSortedMap(scramblers);
     }
 
-    public static String getScramblerLongName(String shortName) throws BadClassDescriptionException, IOException {
+    public static String getScramblerLongName(String shortName) throws BadLazyClassDescriptionException, IOException {
         getScramblers(); // force reloading the plugins, if necessary
         return plugins.getPluginComment(shortName);
     }

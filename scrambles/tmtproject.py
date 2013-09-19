@@ -76,7 +76,7 @@ class Project(tmt.EclipseProject):
 
         # I hope people see this and don't just hate working on tnoodle.
         print "*" * 64
-        print "\n".join(textwrap.wrap("Compiling java -> javascript using GWT. This is important to test, as it can break easily, but it's also very slow, and annoying for scrambler development. Set the %s environment variable to skip this" % NO_GWT_ENV_VAR, width=64))
+        print "\n".join(textwrap.wrap("Compiling java -> javascript using GWT. This is important to test, as it can break easily, but it's also very slow, and annoying for scrambler development. Set the %s environment variable to skip this." % NO_GWT_ENV_VAR, width=64))
         print "*" * 64
         gwtDir = abspath(join(self.name, 'gwt-2.5.1'))
         if not exists(gwtDir):

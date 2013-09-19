@@ -2,12 +2,12 @@ package net.gnehzr.tnoodle.test;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertSame;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.choose;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Random;
@@ -24,7 +24,8 @@ import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacherListener;
-import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 import net.gnehzr.tnoodle.utils.Utils;
@@ -84,7 +85,23 @@ public class ScrambleTest {
         }
     }
 
-    public static void main(String[] args) throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+    public static void testScrambleFiltering() throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, IOException {
+        System.out.println("Testing scramble filtering");
+
+        int SCRAMBLE_COUNT = 10;
+
+        SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
+        for(String puzzle : lazyScramblers.keySet()) {
+            LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+            final Puzzle scrambler = lazyScrambler.cachedInstance();
+            for(int count = 0; count < SCRAMBLE_COUNT; count++){
+                PuzzleState state = scrambler.getSolvedState().applyAlgorithm(scrambler.generateWcaScramble(r));
+                azzertSame(state.solveIn(scrambler.getWcaMinScrambleDistance() - 1), null);
+            }
+        }
+    }
+
+    public static void main(String[] args) throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, InvalidMoveException, IOException {
 
         System.out.println("Testing names.");
         testNames();
@@ -100,10 +117,12 @@ public class ScrambleTest {
         System.out.println("Testing solveIn method");
         testSolveIn();
 
+        testScrambleFiltering();
+
         testThreads();
     }
 
-    private static void testSolveIn() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+    private static void testSolveIn() throws InvalidScrambleException, BadLazyClassDescriptionException, LazyInstantiatorException, IOException {
         int SCRAMBLE_COUNT = 10;
         int SCRAMBLE_LENGTH = 4;
 
@@ -138,7 +157,7 @@ public class ScrambleTest {
         }
     }
 
-    private static void testThreads() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+    private static void testThreads() throws LazyInstantiatorException, InvalidScrambleException, BadLazyClassDescriptionException, IOException {
         LockHolder lh = new LockHolder();
 
         int SCRAMBLE_COUNT = 10;
@@ -205,7 +224,7 @@ public class ScrambleTest {
         System.out.println("\nTest passed!");
     }
 
-    private static void testNames() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+    private static void testNames() throws BadLazyClassDescriptionException, LazyInstantiatorException, IOException {
         SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
 
         // Check that the names by which the scramblers refer to themselves
@@ -368,7 +387,7 @@ public class ScrambleTest {
         azzertEquals(state, solved);
     }
 
-    private static void benchmarking() throws BadClassDescriptionException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, InvalidScrambleException, InvalidMoveException {
+    private static void benchmarking() throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, IOException {
 
         // Analyse the 3x3x3 solver.
         int THREE_BY_THREE_SCRAMBLE_COUNT = 100;
@@ -386,7 +405,7 @@ public class ScrambleTest {
         l.log(start.finishedNow());
 
 
-        // How long does it takes to test if a puzzle is at more one move from solved?
+        // How long does it takes to test if a puzzle is solvable in <= 1 move?
         int SCRAMBLE_COUNT = 100;
         SortedMap<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
         
@@ -397,8 +416,8 @@ public class ScrambleTest {
             start = new TimedLogRecordStart(Level.INFO, "Are " + THREE_BY_THREE_SCRAMBLE_COUNT + " " + puzzle + " one move away from solved?");
             l.log(start);
             for(int count = 0; count < SCRAMBLE_COUNT; count++){
-                PuzzleState state = scrambler.getSolvedState().applyAlgorithm(scrambler.generateWCAScramble(r));
-                String solution = state.solveIn(1);
+                PuzzleState state = scrambler.getSolvedState().applyAlgorithm(scrambler.generateWcaScramble(r));
+                state.solveIn(1);
             }
             l.log(start.finishedNow());
         }

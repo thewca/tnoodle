@@ -72,6 +72,9 @@ public final class GwtSafeUtils {
         }
         azzert(equal, a + " is not equal to " + b);
     }
+    public static void azzertSame(Object a, Object b) {
+        azzert(a == b, a + " is not == to " + b);
+    }
 
     public static void azzert(boolean expr) {
         if(!expr) {
