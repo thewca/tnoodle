@@ -376,7 +376,6 @@ class tmt:
         ]
         if not tmt.args.dry_run:
             response, uploadResponses = ghApi.createRelease(tag, files=files)
-            print "Release draft successfully created! Visit %s to complete release" % response['html_url']
 
         for pushTags in [ False, True ]:
             # git push --tags seems to not do everything git push does
@@ -392,6 +391,9 @@ class tmt:
             print pushCommand
             if not tmt.args.dry_run:
                 assert 0 == os.system(pushCommand)
+        if not tmt.args.dry_run:
+            print "*"*80
+            print "Release draft successfully created! Visit %s to complete release." % response['html_url']
 
 
     def __init__(self):
