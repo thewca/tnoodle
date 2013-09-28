@@ -1,25 +1,25 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 import os
 import re
 import sys
 import time
 
 def getRelativeUrl(baseUrl, url):
-    split = urlparse.urlparse(url)
+    split = urllib.parse.urlparse(url)
     if split.scheme:
         pass
     else:
         split = list(split)
-        splitBase = urlparse.urlparse(baseUrl)
+        splitBase = urllib.parse.urlparse(baseUrl)
         split[0] = splitBase[0]
         split[1] = splitBase[1]
         if not split[2].startswith('/'):
             split[2] = splitBase[2] + split[2]
-    return urlparse.urlunparse(split)
+    return urllib.parse.urlunparse(split)
 
 def findAndInline(html, baseUrl, regex, template):
     unifiedHtml = ""
@@ -27,7 +27,7 @@ def findAndInline(html, baseUrl, regex, template):
     for match in regex.finditer(html):
         url = match.group(1)
         fullUrl = getRelativeUrl(baseUrl, url)
-        filename, headers = urllib.urlretrieve(fullUrl)
+        filename, headers = urllib.request.urlretrieve(fullUrl)
         contents = open(filename).read()
         unifiedHtml += html[lastMatch:match.start()]
         unifiedHtml += template % ( url, contents )
@@ -47,13 +47,13 @@ def unify(url, try_count=1):
             time.sleep(1)
 
 def unify_impl(url):
-    filename, headers = urllib.urlretrieve(url)
+    filename, headers = urllib.request.urlretrieve(url)
     ogHtml = open(filename).read()
 
-    pieces = urlparse.urlparse(url)
+    pieces = urllib.parse.urlparse(url)
     pieces = list(pieces)
     pieces[2] = os.path.dirname(pieces[2]) + '/' # path
-    baseUrl = urlparse.urlunparse(pieces)
+    baseUrl = urllib.parse.urlunparse(pieces)
 
     internalCssTemplate = """<style type="text/css">
 /************** %s ***************/
@@ -75,7 +75,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('url', help='Url to unify to a single html file')
     args = parser.parse_args()
-    print unify(args.url)
+    print(unify(args.url))
 
 if __name__ == "__main__":
     main()

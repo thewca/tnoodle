@@ -26,7 +26,7 @@ tnoodle.tnt = {
         return new Element('div').adopt(checkbox).adopt(new Element('label', { 'html': description, 'for': optionKey }));
     },
     createIntOptionBox: function(config, optionKey, description, def, changeListener, min, max) {
-        
+
         var div = new Element('div');
         var inspectionChanged = function(e) {
             var str = intInput.value;
@@ -100,7 +100,7 @@ tnoodle.tnt = {
             optionsButton.morph('.optionsButton');
         };
         optionsDiv.fade('hide');
-        
+
         optionsButton.addEvent('mouseover', optionsDiv.show);
         optionsButton.addEvent('mouseout', optionsDiv.hide);
         optionsDiv.addEvent('mouseover', optionsDiv.show);
@@ -360,7 +360,7 @@ tnoodle.tnt = {
         select.arrow2 = arrow.clone();
         select.arrow2.addClass('rightarrow');
         select.appendChild(select.arrow2);
-        
+
         var optionsDiv = document.createElement('div');
         optionsDiv.addClass('options');
         select.selecting = false;
@@ -403,7 +403,7 @@ tnoodle.tnt = {
         var maxWidth = null;
         select.setMaxWidth = function(width) {
             maxWidth = width;
-            
+
             // Trickyness to get past the dampening in showItem
             var index = selectedIndex;
             selectedIndex = null;
@@ -427,7 +427,7 @@ tnoodle.tnt = {
                 assert(false, "Couldn't find " + value + ' in [' + values.join(",") + ']');
                 index = 0;
             }
-            
+
             showItem(index);
             select.selectedIndex = index;
             if(select.onchange) {
@@ -617,7 +617,7 @@ tnoodle.tnt = {
                 break;
             }
         }
-        agostr = (i < resolutions.length) ? 
+        agostr = (i < resolutions.length) ?
                 agostr + " " + resolutions[i] + "(s)" :
                 "seconds";
         return agostr;
@@ -654,7 +654,7 @@ Array.implement({
             return false;
         }
         for(var i = 0; i < arr.length; i++) {
-            if(this[i].equals) { 
+            if(this[i].equals) {
                 if(!this[i].equals(arr[i])) {
                     return false;
                 }

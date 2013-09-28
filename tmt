@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from os.path import exists, dirname, join, isdir, split, abspath, relpath, basename
 import sys, os, imp, re, subprocess, shutil, shlex
@@ -30,30 +30,26 @@ def checkShellCmd(*args, **kwargs):
 
 def runCmd(argv, showStatus=False, interactive=False, assertSuccess=False, shell=False):
     if showStatus:
-        print argv
+        print(argv)
         if not shell:
-            print " ".join(argv)
+            print(" ".join(argv))
     if interactive:
        p = subprocess.Popen(argv)
        p.wait()
        return p.returncode
 
     p = subprocess.Popen(argv, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout = ''
-    stderr = ''
-    while p.poll() is None:
-        newStdout = p.stdout.read()
-        if newStdout:
-            stdout += newStdout
-            if showStatus:
-                print newStdout
-        # TODO - i've noticed that the call to stderr.read() hangs, swapping the order seems to help...
-        # gah, you're an idiot, this is going to fail if you don't call communicate()
-        newStderr = p.stderr.read()
-        if newStderr:
-            stderr += newStderr
-            if showStatus:
-                print newStderr
+    # This doesn't interleave stdout and stderr like it should, but at least
+    # it won't cause deadlock due to pipes filling up.
+    # The best thing to do would probably be to implement our own communicate
+    # that also dumps to the screen.
+    stdout, stderr = p.communicate()
+    stdout = stdout.decode()
+    stderr = stderr.decode()
+    if showStatus:
+        print(stdout)
+        print(stderr)
+
     if assertSuccess:
         assert p.returncode == 0
     return p.returncode, stdout, stderr
@@ -190,7 +186,7 @@ class tmt:
         # ls -h ciels fractions, so we do the same thing here
         sizeMB = math.ceil(sizeMB*10)/10
 
-        print 'Successfully created %s (size %sM)' % ( os.path.abspath(filename), sizeMB )
+        print('Successfully created %s (size %sM)' % ( os.path.abspath(filename), sizeMB ))
 
     def _loadTmtProjects(self):
         self._cdEntryPoint()
@@ -200,10 +196,10 @@ class tmt:
             imp.load_source('', projectFile)
             assert dirname(projectFile) in tmt.TmtProject.projects
 
-        for projectName, project in sorted(tmt.TmtProject.projects.iteritems()):
+        for projectName, project in sorted(tmt.TmtProject.projects.items()):
             project.afterProjects()
 
-        sortedProjects, fakeRoot = topologicalSort(tmt.TmtProject.projects.values())
+        sortedProjects, fakeRoot = topologicalSort(list(tmt.TmtProject.projects.values()))
         # The key None maps to a fake project that (indirectly) depends on everything
         tmt.TmtProject.projects[None] = fakeRoot
         for project in reversed(sortedProjects):
@@ -240,7 +236,7 @@ class tmt:
             # TODO look at tmt.args.file and generate a dotty file or something?
             assert False, "not yet implemented"
         else:
-            print tmt.TmtProject.projects[tmt.args.project].prettyDependencies()
+            print(tmt.TmtProject.projects[tmt.args.project].prettyDependencies())
 
     def _pullRequest(self):
         self.assertWorkspaceClean()
@@ -257,7 +253,7 @@ class tmt:
         ghApi.pullRequest(title=tmt.args.title, body=body)
 
     def _describe(self):
-        print self.VERSION
+        print(self.VERSION)
 
     def _strings(self):
         files = lint.gitFilesList(tmt.args.all)
@@ -273,7 +269,7 @@ class tmt:
             if ext not in externalizeableFileExts:
                 continue
 
-            contents = file(f).read()
+            contents = open(f).read()
 
             offsetToLineNumber = []
             lineNumber = 1
@@ -286,7 +282,7 @@ class tmt:
                 start, end = match.span()
                 s = match.group(0)
                 if s.startswith('"') or s.startswith("'"):
-                    print "Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s)
+                    print("Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s))
 
     def _make(self, projectName=None, command=None):
         if projectName is None:
@@ -326,15 +322,15 @@ class tmt:
             tmt.assertWorkspaceClean()
 
         pullCommand = 'git pull'
-        print pullCommand
+        print(pullCommand)
         assert 0 == os.system(pullCommand)
 
         pullCommand = 'git pull git@github.com:cubing/tnoodle.git'
-        print pullCommand
+        print(pullCommand)
         assert 0 == os.system(pullCommand)
 
         assert exists('VERSION')
-        versionFileContents = file('VERSION').read().split('\n')
+        versionFileContents = open('VERSION').read().split('\n')
         tmt.VERSION = None
         for line in versionFileContents:
             if not line.startswith("#"):
@@ -353,15 +349,15 @@ class tmt:
         wcaProject = tmt.TmtProject.projects[wcaProjectName]
         wcaProject.dist()
 
-        print "Releasing TNoodle"
+        print("Releasing TNoodle")
 
         tag = "v%s" % tmt.VERSION
         tagMessage = "version %s" % tmt.VERSION
         tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
-        print tagCommand
+        print(tagCommand)
         if not tmt.args.dry_run:
             assert 0 == os.system(tagCommand)
-        print "Successfully created tag %s" % tag
+        print("Successfully created tag %s" % tag)
 
         timerProject = tmt.TmtProject.projects['timer']
         tmt.args.project = timerProject.name # yuck =(
@@ -383,17 +379,17 @@ class tmt:
             pushCommand = 'git push'
             if pushTags:
                 pushCommand += ' --tags'
-            print pushCommand
+            print(pushCommand)
             if not tmt.args.dry_run:
                 assert 0 == os.system(pushCommand)
 
             pushCommand += ' git@github.com:cubing/tnoodle.git'
-            print pushCommand
+            print(pushCommand)
             if not tmt.args.dry_run:
                 assert 0 == os.system(pushCommand)
         if not tmt.args.dry_run:
-            print "*"*80
-            print "Release draft successfully created! Visit %s to complete release." % response['html_url']
+            print("*"*80)
+            print("Release draft successfully created! Visit %s to complete release." % response['html_url'])
 
 
     def __init__(self):
@@ -611,7 +607,7 @@ class tmt:
             command.append(classpath)
         command.append(main)
         command += args
-        print " ".join(command)
+        print(" ".join(command))
         stdout = None
         stderr = None
         if captureOutput:
@@ -635,10 +631,6 @@ class tmt:
 
 tmt = tmt() # We only want one instance of Tmt
 sys.modules['tmt'] = tmt
-# Hack for Python 2.6
-import collections
-from OrderedDict import OrderedDict
-collections.OrderedDict = OrderedDict
 
 class TmtProject(object):
     projects = {}
@@ -881,7 +873,7 @@ class EclipseProject(TmtProject):
             return True
         lastCompiled = tmt.timestamp(self.bin)
         depsLastTouched = ( ( tmt.timestamp(dep), dep ) for dep in self.getClasspathEntities(includeResources=False, includeSrc=True) )
-        changedDeps = filter( lambda ( ts, dep ): ts > lastCompiled, depsLastTouched )
+        changedDeps = [ts_dep for ts_dep in depsLastTouched if ts_dep[0] > lastCompiled]
         srcLastTouched = max(tmt.timestamp(self.src), tmt.timestamp(self.srcResource))
         if self.webContent:
             srcLastTouched = max(srcLastTouched, tmt.timestamp(self.webContent))
@@ -889,7 +881,7 @@ class EclipseProject(TmtProject):
 
     def compile(self):
         if not self.needsCompiling():
-            print "%s is up to date, not recompiling" % self.name
+            print("%s is up to date, not recompiling" % self.name)
             return False
 
         self._compile(self.src, self.bin)
@@ -900,7 +892,7 @@ class EclipseProject(TmtProject):
             for nonJavaDep in nonJavaDeps:
                 srcPath = join(src, nonJavaDep)
                 binPath = join(bin, nonJavaDep)
-                print "Copying %s -> %s" % ( srcPath, binPath )
+                print("Copying %s -> %s" % ( srcPath, binPath ))
                 if isdir(srcPath):
                     parentDir = dirname(dirname(binPath))
                 else:
@@ -925,7 +917,7 @@ class EclipseProject(TmtProject):
         head, tail = os.path.split(bin)
         tempBin = join(head, "." + tail)
 
-        print 'Compiling: %s' % src
+        print('Compiling: %s' % src)
 
         rmtree(bin)
         if isdir(tempBin):
@@ -977,12 +969,12 @@ class EclipseProject(TmtProject):
                 args += [ '-classpath', classpath ]
             args += javaFiles
             p = subprocess.Popen(args)
-            print " ".join(args)
+            print(" ".join(args))
             assert p.wait() == 0, 'javac failed!'
 
         self.innerCompile(src, tempBin, bin)
 
-        print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, bin )
+        print('Compiled successfully! Renaming %s -> %s' % ( tempBin, bin ))
         os.rename(tempBin, bin)
 
     def tweakJarFile(self, jar):
@@ -1035,7 +1027,7 @@ class EclipseProject(TmtProject):
                     jarLib = zipfile.ZipFile(jarDep.jarFile)
                     jarLib.extractall(path=extractedLibDir)
                 for dirpath, dirnames, filenames in os.walk(extractedLibDir):
-                    dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+                    dirnames[:] = list(filter(notDotfile, dirnames)) # Note that we're modifying dirnames in place
 
                     for name in filter(notDotfile, filenames):
                         if dirpath.lower().endswith("meta-inf") and name.lower().endswith(".sf"):
@@ -1056,7 +1048,7 @@ class EclipseProject(TmtProject):
 
             for project in javaDeps:
                 for dirpath, dirnames, filenames in os.walk(project.bin, followlinks=True):
-                    dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+                    dirnames[:] = list(filter(notDotfile, dirnames)) # Note that we're modifying dirnames in place
 
                     for name in filter(notDotfile, filenames):
                         path = os.path.normpath(os.path.join(dirpath, name))
@@ -1069,7 +1061,7 @@ class EclipseProject(TmtProject):
                             continue
                         if os.path.isfile(path):
                             if os.path.splitext(path)[1] in TXT_FILE_EXTENSIONS:
-                                txt = file(path).read()
+                                txt = open(path).read()
                                 txt = tmt.doTextSubstitution(txt)
                                 jar.writestr(arcPath, txt)
                             else:
@@ -1094,7 +1086,7 @@ Implementation-Version: %s
         createSymlinkIfNotExistsOrStale(basename(self.distJarFile()), noVersionPath)
 
         tmt.notifyDist(self.distJarFile())
-        print "Main class %s" % self.main
+        print("Main class %s" % self.main)
 
     def run(self, wait=True):
         main = tmt.args.main or self.main
@@ -1130,7 +1122,7 @@ Implementation-Version: %s
                  classpath=self.toClasspath(self.getClasspathEntities()))
 
     def clean(self):
-        print 'Cleaning: %s' % self.name
+        print('Cleaning: %s' % self.name)
         if exists(self.bin):
             assert isdir(self.bin)
             rmtree(self.bin)

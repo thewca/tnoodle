@@ -10,7 +10,7 @@ var TimesTable = new Class({
         this.scrambleStuff = scrambleStuff;
         this.cols = tnoodle.Time.timeKeys;
         this.headers = tnoodle.Time.timeKeyNames;
-        
+
         var table = this;
         HtmlTable.Parsers.time = {
             match: /^.*$/,
@@ -55,25 +55,25 @@ var TimesTable = new Class({
         });
         this.addEvent('onSort', function(tbody, index) {
             //TODO - this code gets calls when resort() is called, which is kind of inefficient
-            
+
             this.configuration.set('times.sort', this.sorted);
             this.scrollToLastTime();
-            
+
             //sorting can change the box around the best ra
             this.tbody.getChildren('tr').each(function(tr) {
                 tr.refresh();
             });
         });
-        
+
         this.emptyRow = [];
         for(var i = 0; i < this.cols.length; i++) {
             this.emptyRow.push('');
         }
-        
+
         //we create the add time row
         this.addRow = this.createRow(null);
         this.addRow.addClass('addTime');
-        
+
         //there needs to be some dummy content in this row so it gets sized correctly
         //only vertical sizing matters though
         this.infoRow = this.set('footers', this.emptyRow).tr;
@@ -96,7 +96,7 @@ var TimesTable = new Class({
                         cell.removeEvent('click', table.raBoxClicked);
                     }
                 } else if(key == 'sessionAve') {
-                    cell.set('html', '&sigma; = ' + format(this.session.stdDev())); 
+                    cell.set('html', '&sigma; = ' + format(this.session.stdDev()));
                     cell.title = 'This is the standard deviation of all times that count toward your average';
                 } else {
                     var best = this.session.bestWorst(key).best;
@@ -226,7 +226,7 @@ var TimesTable = new Class({
                 }
             }
             legend.appendChild(resetFormatButton);
-            
+
             statsPopup.show();
             activateStats();
         };
@@ -311,7 +311,7 @@ var TimesTable = new Class({
             });
             */
         });
-        
+
         this.thead = $(this).getChildren('thead')[0];
         this.thead.getChildren('tr')[0].getChildren('th').each(function(th, index) {
             var title = tnoodle.Time.timeKeyDescriptions[index];
@@ -322,7 +322,7 @@ var TimesTable = new Class({
         this.tbody = $(this).getChildren('tbody')[0];
         this.tfoot = $(this).getChildren('tfoot')[0];
         this.parent = $(this).getParent();
-        
+
         var columnOptions = tnoodle.tnt.createOptions();
         var columnOptionsHeader = document.createElement('th');
         this.thead.getChildren()[0].adopt(columnOptionsHeader.adopt(columnOptions.button));
@@ -333,7 +333,7 @@ var TimesTable = new Class({
             borderBottom: '1px'
         });
         columnOptions.button.setStyle('width', SCROLLBAR_WIDTH);
-        
+
         var defaultCols = [ 'index', 'millis', 'ra5', 'ra12', 'ra100', 'sessionAve' ];
         var initing = true;
         var refreshCols = function() {
@@ -357,7 +357,7 @@ var TimesTable = new Class({
             columnOptions.div.adopt(opt);
         }
         initing = false;
-        
+
         var selectedRows = [];
         var mostRecentRow = null;
         var addRow = this.addRow;
@@ -514,7 +514,7 @@ var TimesTable = new Class({
             }
         }.bind(this));
 
-        
+
         var timeHoverDiv = new Element('div');
         timeHoverDiv.fade('hide');
         timeHoverDiv.setStyles({
@@ -531,7 +531,7 @@ var TimesTable = new Class({
             };
             return label;
         };
-        
+
         var fieldSet = new Element('fieldset');
         fieldSet.setStyle('display', 'inline');
         fieldSet.setStyle('padding', 0);
@@ -544,7 +544,7 @@ var TimesTable = new Class({
         fieldSet.adopt(makeLabelAndSettable(plusTwo));
         var dnf = new Element('input', { type: 'radio', name: 'penalty', id: 'dnf', value: 'dnf' });
         fieldSet.adopt(makeLabelAndSettable(dnf));
-        
+
         var form = new Element('form');
         var commentArea = new Element('textarea');
         timeHoverDiv.commentArea = commentArea;
@@ -618,7 +618,7 @@ var TimesTable = new Class({
             table.session.reindex();
             table.refreshData();
         });
-        
+
 
         timeHoverDiv.form = form;
         document.body.adopt(timeHoverDiv);
@@ -631,7 +631,7 @@ var TimesTable = new Class({
             if(timeHoverDiv.containsPoint(e.page)) {
                 return;
             }
-            timeHoverDiv.tr.unhover();      
+            timeHoverDiv.tr.unhover();
         });
         var errorField = new Element('div', { 'class': 'errorField' });
         timeHoverDiv.errorField = errorField;
@@ -770,10 +770,10 @@ var TimesTable = new Class({
     scrollToRow: function(tr) {
         var scrollTop = this.tbody.scrollTop;
         var scrollBottom = scrollTop + this.tbody.getSize().y;
-        
+
         var elTop = this.tbody.scrollHeight + tr.getPosition(tr.getParent()).y;
         var elBottom = this.tbody.scrollHeight + tr.getSize().y + elTop;
-        
+
         if(elTop < scrollTop) {
             //we scroll up just until the top of the row is visible
             this.tbody.scrollTo(0, elTop);
@@ -787,13 +787,13 @@ var TimesTable = new Class({
             var nop; //the element's on screen!
         }
     },
-    
+
     //private!
     resort: function(preserveScrollbar) {
         var scrollTop = this.tbody.scrollTop; //save scroll amount
         var sort = this.configuration.get('times.sort', { index: 0, reverse: false });
         this.sort(sort.index, sort.reverse);
-        
+
         if(preserveScrollbar) {
             this.tbody.scrollTo(0, scrollTop); //restore scroll amount
         }
@@ -814,7 +814,7 @@ var TimesTable = new Class({
                 }
             }
         }.bind(this);
-        
+
         // The calls to toggle() seem to screw up scrolling to the edited time
         //$(this).toggle(); //prevent flickering?
         this.tbody.getChildren('tr').each(function(tr) {
@@ -878,7 +878,7 @@ var TimesTable = new Class({
                 e.stop(); // Without this, the timer will start
             }
         }.bind(this));
-        
+
         var timeChanged = function(e) {
             try {
                 var test = new tnoodle.Time(textField.value);
@@ -893,7 +893,7 @@ var TimesTable = new Class({
 
         cell.empty();
         cell.adopt(textField);
-        
+
         textField.focus(); //this has the added benefit of making the row visible
         textField.select();
 
@@ -987,14 +987,14 @@ var TimesTable = new Class({
                                 if(firstSolve <= time.index && time.index <= lastTimeIndex) {
                                     cells[col].addClass('currentRA');
                                 }
-                                
+
                                 if(table.sorted.reverse) {
                                     //the top/bottom are switched
                                     var temp = lastTimeIndex;
                                     lastTimeIndex = firstSolve;
                                     firstSolve = temp;
                                 }
-                                
+
                                 if(time.index == firstSolve) {
                                     cells[col].addClass('topCurrentRA');
                                 } else if(time.index == lastTimeIndex) {
@@ -1086,11 +1086,11 @@ var TimesTable = new Class({
         var headerRow = this.thead.getChildren('tr')[0];
         var headers = headerRow.getChildren('th');
         var tds = [];
-        
+
         // ok, this is way nasty, but it seems to be the only way
         // to free up the space necessary for this table to get sized correctly
         $(this).getParent().getParent().setStyle('width', null);
-        
+
         //clearing all column widths
         this.tfoot.getChildren('tr').each(function(tr) {
             tr.setStyle('width', null);
@@ -1106,9 +1106,9 @@ var TimesTable = new Class({
             td.setStyle('width', null);
         });
         headerRow.setStyle('width', null);
-        
+
         var preferredWidth = 0;
-        
+
         var visibleColCount = 0;
         var resizeme = [headers, infoCells, addTimeCells];
         for(i = 0; i < this.headers.length; i++) {
@@ -1124,7 +1124,7 @@ var TimesTable = new Class({
                     continue;
                 }
                 var newWidth = resizeme[j][i].getSize().x + 1; //add one for border
-                
+
                 if(newWidth >= maxWidth) {
                     maxWidth = newWidth;
                     maxWidthIndex = j;
@@ -1169,7 +1169,7 @@ var TimesTable = new Class({
         this.tbody.setStyle('width', preferredWidth);
         headerRow.setStyle('width', preferredWidth);
         headerRow.setStyle('border-bottom', '1px solid black');
-        
+
         if(this.manager) {
             this.manager.position();
         }

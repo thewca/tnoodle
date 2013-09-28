@@ -915,7 +915,7 @@ Inputs.prototype.letterCapture = function(ch)
                         }
                         this.changed = true;
                 }
-                else if (this.active==0 && ((ch>="A" && ch<="Z") || (ch>"¦")))
+                else if (this.active==0 && ((ch>="A" && ch<="Z") || (ch>json_decode('"\u00a6"'))))
                         incSearch(ch);  
                 }
 }
