@@ -14,6 +14,26 @@ def getApi(organization, repo):
     connectedApis[key] = api
     return api
 
+
+# Copied from http://stackoverflow.com/a/12897375
+from urllib import urlencode
+from urlparse import parse_qs, urlsplit, urlunsplit
+def set_query_parameter(url, param_name, param_value):
+    """Given a URL, set or replace a query parameter and return the
+    modified URL.
+
+    >>> set_query_parameter('http://example.com?foo=bar&biz=baz', 'foo', 'stuff')
+    'http://example.com?foo=stuff&biz=baz'
+
+    """
+    scheme, netloc, path, query_string, fragment = urlsplit(url)
+    query_params = parse_qs(query_string)
+
+    query_params[param_name] = [param_value]
+    new_query_string = urlencode(query_params, doseq=True)
+
+    return urlunsplit((scheme, netloc, path, new_query_string, fragment))
+
 # See "Preview mode" on http://developer.github.com/changes/2013-09-25-releases-api/
 # This should be deletable in 30 days or so.
 previewHeaders = { "Accept": "application/vnd.github.manifold-preview" }
@@ -29,11 +49,23 @@ class GithubApi(object):
         r = requests.get('https://api.github.com/user', auth=self.auth)
         r.raise_for_status()
 
+    def depaginate(self, url):
+        munged = []
+        page = 1
+        while True:
+            pageUrl = set_query_parameter(url, 'page', str(page))
+            r = requests.get(pageUrl, auth=self.auth, headers=previewHeaders)
+            r.raise_for_status()
+            if len(r.json) == 0:
+                # Once the array returned is empty, we've hit the end.
+                break
+            munged += r.json
+            page += 1
+        return munged
+
     def listReleases(self):
         listUrl = '%s/releases' % self.baseApiUrl
-        r = requests.get(listUrl, auth=self.auth, headers=previewHeaders)
-        r.raise_for_status()
-        return r.json
+        return self.depaginate(listUrl)
 
     def createRelease(self, tag, draft=True, files={}):
         createUrl = '%s/releases' % self.baseApiUrl
@@ -44,26 +76,30 @@ class GithubApi(object):
         r = requests.post(createUrl, data=data, auth=self.auth, headers=previewHeaders)
         r.raise_for_status()
 
-        ogUploadUrl = r.json['upload_url']
-        fileRequests = []
+        uploadUrl = r.json['upload_url']
+        uploadResponses = []
         for name, data in files.iteritems():
-            uploadUrl = ogUploadUrl.replace("{?name}", "?name=%s" % name)
-            mime, encoding = mimetypes.guess_type(name)
-            headers = dict(previewHeaders)
-            headers['Content-Type'] = mime
+            uploadResponse = self.uploadAsset(name, data, uploadUrl)
+            uploadResponses.append(uploadResponse)
+        return ( r.json, uploadResponses )
 
-            # Well, this is probably a huge security hole.
-            # I've contacted github about fixing their certificate. --jeremy
-            # Look at the difference between
-            #  openssl s_client -connect api.github.com:443 2>&1 | openssl x509 -text | grep -B 1 DNS
-            # and
-            #  openssl s_client -connect uploads.github.com:443 2>&1 | openssl x509 -text | grep -B 1 DNS
-            verify = False
+    def uploadAsset(self, name, data, uploadUrl):
+        uploadUrl = uploadUrl.replace("{?name}", "?name=%s" % name)
+        mime, encoding = mimetypes.guess_type(name)
+        headers = dict(previewHeaders)
+        headers['Content-Type'] = mime
 
-            fileRequest = requests.post(uploadUrl, auth=self.auth, headers=headers, data=data, verify=verify)
-            fileRequest.raise_for_status()
-            fileRequests.append(fileRequest.json)
-        return ( r.json, fileRequests )
+        # Well, this is probably a huge security hole.
+        # I've contacted github about fixing their certificate. --jeremy
+        # Look at the difference between
+        #  openssl s_client -connect api.github.com:443 2>&1 | openssl x509 -text | grep -B 1 DNS
+        # and
+        #  openssl s_client -connect uploads.github.com:443 2>&1 | openssl x509 -text | grep -B 1 DNS
+        verify = False
+
+        r = requests.post(uploadUrl, auth=self.auth, headers=headers, data=data, verify=verify)
+        r.raise_for_status()
+        return r.json
 
     def deleteRelease(self, id):
         deleteUrl = '%s/releases/%s' % (self.baseApiUrl, id)
@@ -72,9 +108,7 @@ class GithubApi(object):
 
     def listAssets(self, releaseId):
         listUrl = '%s/releases/%s/assets' % (self.baseApiUrl, releaseId)
-        r = requests.get(listUrl, auth=self.auth, headers=previewHeaders)
-        r.raise_for_status()
-        return r.json
+        return depaginate(listUrl)
 
     def pullRequest(self, title, body):
         pullUrl = '%s/pulls' % self.baseApiUrl
