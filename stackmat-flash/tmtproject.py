@@ -36,7 +36,7 @@ class Project(tmt.EclipseProject):
                 # force infinite rebuilds if mxmlc is installed.
                 if not tmt.args.skip_noflex_warning:
                     realOutSwf = self.APPLET_FILENAME
-                    print """\n\nWARNING: It appears you do not have the flex sdk installed (specifically the mxmlc binary), which is needed to build stackmat-flash. I'm going to go ahead and use the version of %s from the git repository.""" % ( realOutSwf )
+                    print("""\n\nWARNING: It appears you do not have the flex sdk installed (specifically the mxmlc binary), which is needed to build stackmat-flash. I'm going to go ahead and use the version of %s from the git repository.""" % ( realOutSwf ))
                 self.checkoutSwf(tempBin)
             else:
                 # Wowow, you've gotta love it when you have such great tools
@@ -54,7 +54,7 @@ class Project(tmt.EclipseProject):
             # Neither of the two operations above update the timestamp of a file in self.bin.
             # We explicitly update timestamp of a file in self.bin so there aren't any issues where we try
             # to recompile this project when we don't need to.
-            f = file(join(tempBin, ".timestamp"), 'w')
+            f = open(join(tempBin, ".timestamp"), 'w')
             f.write("%s" % time.time())
 
 Project(tmt.projectName(), description="A flash applet that can interpret the sound of a stackmat plugged into your computer.")

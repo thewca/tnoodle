@@ -14,7 +14,7 @@ img {
     border: none;
 }
 
-/* 
+/*
  * TODO - Firefox doesn't seem to propogate the -moz-user-select: none attribute,
  * so we apply it to everything, and specifically allow selection in text
  * fields

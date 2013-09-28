@@ -64,7 +64,7 @@ def createSymlinkIfNotExistsOrStale(target, name):
         if ( not os.path.exists(name) or
                  not os.path.islink(name) or
                  not os.readlink(name) == target ):
-                print "Setting up symlink %s -> %s" % ( name, target )
+                print("Setting up symlink %s -> %s" % ( name, target ))
                 rmtree(name)
                 os.symlink(target, name)
 

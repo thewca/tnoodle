@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import os
 import re
@@ -16,12 +16,14 @@ lintIgnoredDirectories = [
    'winstone/src/javax/',
    'min2phase/src/cs/min2phase/',
    'threephase/src/cs/threephase/',
+   'cubecomps/WebContent/cubecomps/',
 ]
 
 ignoredExtensions = {
     ".sfd",
     ".classpath",
     ".project",
+    ".MF",
 }
 
 JSLINT_IGNORED_ERRORS = {
@@ -51,7 +53,8 @@ JSLINT_IGNORED_ERRORS = {
 NO_LINT_KEYWORD = 'BLW-DUCPHAM'
 
 UNCOMMITABLE_PHRASES = {
-    '<'+'<'+'<'
+    '<'+'<'+'<',
+    '\r\n' # no dos style line endings
 }
 
 # These uncommitable phrases only apply to files that we
@@ -67,6 +70,7 @@ def getJsHintCommand():
     if not jsHintCommand:
         try:
             gitToolsBinDir = subprocess.check_output("(cd git-tools; npm bin;)", shell=True)
+            gitToolsBinDir = gitToolsBinDir.decode()
             gitToolsBinDir = gitToolsBinDir.strip()
         except subprocess.CalledProcessError:
             return None
@@ -88,7 +92,7 @@ def is_binary(filename):
         CHUNKSIZE = 1024
         while 1:
             chunk = fin.read(CHUNKSIZE)
-            if '\0' in chunk: # found null byte
+            if 0 in chunk: # found null byte
                 return True
             if len(chunk) < CHUNKSIZE:
                 break # done
@@ -112,7 +116,7 @@ def gitFilesList(allFiles=False):
 def lint(files):
     failures = []
     for i, f in enumerate(files):
-        print "\r%s/%s %.2f%%" % ( i+1, len(files), 100.0*(i+1)/len(files) ),
+        print("\r%s/%s %.2f%%" % ( i+1, len(files), 100.0*(i+1)/len(files) ), end=' ')
         sys.stdout.flush()
         if not os.path.exists(f):
             # This file must have been deleted as part of this commit.
@@ -130,7 +134,7 @@ def lint(files):
         if ext in ignoredExtensions:
             continue
 
-        lines = file(f).readlines()
+        lines = open(f).readlines()
         for lineNumber, line in enumerate(lines):
             for uncommitablePhrase in UNCOMMITABLE_PHRASES:
                 if uncommitablePhrase in line:
@@ -204,7 +208,7 @@ def lint(files):
                                 line = line[indent:]
 
                     javascript.append(line)
-                stdin = "".join(javascript)
+                stdin = "".join(javascript).encode()
             jsHintCommand = getJsHintCommand()
             if jsHintCommand is None or not os.path.exists(jsHintCommand):
                 failures = [ "Need npm and jshint to lint js files. Try running (cd git-tools; npm install -d)" ]
@@ -272,9 +276,9 @@ def main(args):
         files = gitFilesList(args.all)
     failures = lint(files)
     if failures:
-        print
-        print "*********%s error(s) found**********" % len(failures)
-        print
+        print()
+        print("*********%s error(s) found**********" % len(failures))
+        print()
         sys.exit('\n'.join(failures))
 
 if __name__ == "__main__":

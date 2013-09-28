@@ -14,7 +14,7 @@ Note: All pages that serve up json also support jsonp via a callback parameter. 
 
 ### puzzles/[PUZZLE_NAME].json?[includeStatus] ###
 
-If `PUZZLE_NAME` is not specified, returns a list of `PUZZLE_STATUS`'s in json format. 
+If `PUZZLE_NAME` is not specified, returns a list of `PUZZLE_STATUS`'s in json format.
 
 A `PUZZLE_STATUS` looks like this:
 
@@ -65,7 +65,7 @@ Puzzle request titles must be unique.
 * [scramble/.txt?=333*12&seed=cubing](/scramble/.txt?=333*12&seed=cubing) - A text file with 12 3x3 scrambles generated from the seed "cubing". Revisiting this url will always generate the same 12 scrambles.
 * [scramble/My Comp.pdf?3x3 Round 1=333*5](/scramble/My Comp.pdf?3x3 Round 1=333*5) - A single 3x3 sheet of 5 scrambles.
 * [scramble/My Comp.pdf?3x3 Round 1=333\*5\*2](/scramble/My Comp.pdf?3x3 Round 1=333*5*2) - 2 identical copies of a 3x3 sheet of 5 scrambles. This will produce a 2 page PDF.
-* [scramble/My Comp.pdf?3x3 Round 1=333\*5\*2&3x3 Round 2=333\*5](/scramble/My Comp.pdf?3x3 Round 1=333*5*2&3x3 Round 2=333*5) - 2 identical copies of a 3x3 sheet of 5 scrambles (titled "3x3 Round 1") 
+* [scramble/My Comp.pdf?3x3 Round 1=333\*5\*2&3x3 Round 2=333\*5](/scramble/My Comp.pdf?3x3 Round 1=333*5*2&3x3 Round 2=333*5) - 2 identical copies of a 3x3 sheet of 5 scrambles (titled "3x3 Round 1")
 followed by 1 page of 5 3x3 scrambles (titled "3x3 Round 2"). This will produce a 3 page PDF.
 * [scramble/My Comp.zip?3x3 Round 1=333\*5\*2&3x3 Round 2=333\*5](/scramble/My Comp.zip?3x3 Round 1=333*5*2&3x3 Round 2=333*5) - This will produce a zip file containing 2 pdfs, one named "3x3 Round 1.pdf" and the other named "3x3 Round 2.pdf". Note that when the file extension is zip, we ignore the COPIES option. I think this is a good decision.
 * [scramble/.json?=333](/scramble/.json?=333) - One 3x3 scramble in json.
@@ -93,7 +93,7 @@ Response:
             }
         }, {
             "scrambles": ["D F2 D' B2 D2 L2 U L2 U2 L2 U' R' D2 L2 B U2 R B2 U2 B'"],
-            "extraScrambles": [ ... ] // This is optional! (ignored if fmc) 
+            "extraScrambles": [ ... ] // This is optional! (ignored if fmc)
             "scrambler": "333",
             "copies": 1,
             "title": "3x3 Round 2",

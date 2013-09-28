@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import json
 import getpass
 import mimetypes
@@ -16,8 +14,8 @@ def getApi(organization, repo):
 
 
 # Copied from http://stackoverflow.com/a/12897375
-from urllib import urlencode
-from urlparse import parse_qs, urlsplit, urlunsplit
+from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlsplit, urlunsplit
 def set_query_parameter(url, param_name, param_value):
     """Given a URL, set or replace a query parameter and return the
     modified URL.
@@ -42,11 +40,16 @@ class GithubApi(object):
     def __init__(self, organization, repo):
         self.baseApiUrl = 'https://api.github.com/repos/%s/%s' % ( organization, repo )
         self.baseUrl = 'https://github.com/%s/%s' % ( organization, repo )
-        self.username = raw_input('Username (for %s/%s): ' % (organization, repo))
-        print "Attempting to connect to github as %s" % ( self.username )
+        self.username = input('Username (for %s/%s): ' % (organization, repo))
+        print("Attempting to connect to github as %s" % ( self.username ))
         self.password = getpass.getpass()
         self.auth = (self.username, self.password)
         r = requests.get('https://api.github.com/user', auth=self.auth)
+        r.raise_for_status()
+
+        r = requests.get(self.baseApiUrl, auth=self.auth)
+        if r.status_code == requests.codes.not_found:
+            assert False, "Couldn't find %s/%s, is it really a repo?" % (organization, repo)
         r.raise_for_status()
 
     def depaginate(self, url):
@@ -59,7 +62,7 @@ class GithubApi(object):
             if len(r.json) == 0:
                 # Once the array returned is empty, we've hit the end.
                 break
-            munged += r.json
+            munged += r.json()
             page += 1
         return munged
 
@@ -76,12 +79,12 @@ class GithubApi(object):
         r = requests.post(createUrl, data=data, auth=self.auth, headers=previewHeaders)
         r.raise_for_status()
 
-        uploadUrl = r.json['upload_url']
+        uploadUrl = r.json()['upload_url']
         uploadResponses = []
         for name, data in files:
             uploadResponse = self.uploadAsset(name, data, uploadUrl)
             uploadResponses.append(uploadResponse)
-        return ( r.json, uploadResponses )
+        return ( r.json(), uploadResponses )
 
     def uploadAsset(self, name, data, uploadUrl):
         uploadUrl = uploadUrl.replace("{?name}", "?name=%s" % name)
@@ -89,17 +92,9 @@ class GithubApi(object):
         headers = dict(previewHeaders)
         headers['Content-Type'] = mime
 
-        # Well, this is probably a huge security hole.
-        # I've contacted github about fixing their certificate. --jeremy
-        # Look at the difference between
-        #  openssl s_client -connect api.github.com:443 2>&1 | openssl x509 -text | grep -B 1 DNS
-        # and
-        #  openssl s_client -connect uploads.github.com:443 2>&1 | openssl x509 -text | grep -B 1 DNS
-        verify = False
-
-        r = requests.post(uploadUrl, auth=self.auth, headers=headers, data=data, verify=verify)
+        r = requests.post(uploadUrl, auth=self.auth, headers=headers, data=data)
         r.raise_for_status()
-        return r.json
+        return r.json()
 
     def deleteRelease(self, id):
         deleteUrl = '%s/releases/%s' % (self.baseApiUrl, id)
@@ -120,8 +115,8 @@ class GithubApi(object):
         })
         r = requests.post(pullUrl, auth=self.auth, data=data)
         if r.status_code != requests.codes.created:
-            print r.json
+            print(r.json())
             r.raise_for_status()
         else:
-            pullRequestUrl = '%s/pull/%s' % (self.baseUrl, r.json['number'])
-            print "Pull request created at %s" % pullRequestUrl
+            pullRequestUrl = '%s/pull/%s' % (self.baseUrl, r.json()['number'])
+            print("Pull request created at %s" % pullRequestUrl)

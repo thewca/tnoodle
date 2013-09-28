@@ -13,9 +13,9 @@ class Project(tmt.TmtProject):
         except:
             pass
         if retVal != 0:
-            print
-            print "It appears you do not have npm (node's package manager) installed."
-            print "Install node (http://nodejs.org/, it should provide npm) and try again."
+            print()
+            print("It appears you do not have npm (node's package manager) installed.")
+            print("Install node (http://nodejs.org/, it should provide npm) and try again.")
             sys.exit(1)
 
     def compile(self):

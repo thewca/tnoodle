@@ -1,7 +1,7 @@
 var TimerDisplay = new Class({
     displayDecimalPlaces: 2,
     statsDecimalPlaces: 3,
-    CHAR_AR: 1/2, 
+    CHAR_AR: 1/2,
     INSPECTION: 0,
     HTML5_FULLSCREEN: true,
     initialize: function(parent, server, scrambleStuff, shortcutManager) {
@@ -17,16 +17,16 @@ var TimerDisplay = new Class({
         for(var i = 0; i < TimerDisplay.timerClasses.length; i++) {
             this.timers[i] = new TimerDisplay.timerClasses[i](this, this.config, shortcutManager);
         }
-        
+
         this.display = new Element('div');
         this.display.id = 'time';
         this.display.inject(parent);
         this.display.setStyle('position', 'relative'); //this lets us manually center the text with js
-        
+
         this.fullscreenBG = new Element('div', { 'class': 'fullscreenTimerBg' });
         this.fullscreenBG.hide();
         this.fullscreenBG.inject(document.body);
-        
+
         function shownCallback() { }
         function hiddenCallback() { }
         function canHide() {
@@ -41,7 +41,7 @@ var TimerDisplay = new Class({
             right: 5
         });
         optionsButton.inject(parent);
-        
+
         var displayDecimalPlacesChanged = function(val) {
             this.displayDecimalPlaces = val;
             this.redraw();
@@ -57,7 +57,7 @@ var TimerDisplay = new Class({
         }.bind(this);
         optionsDiv.adopt(tnoodle.tnt.createIntOptionBox(server.configuration, 'timer.inspectionSeconds', 'second WCA inspection', this.INSPECTION, inspectionChanged, Infinity));
         optionsDiv.adopt(tnoodle.tnt.createOptionBox(server.configuration, 'timer.fullscreenWhileTiming', 'Fullscreen while timing', false));
-        
+
         var availTimersFieldset = document.createElement('fieldset');
         var availTimersMap = {};
         this.enabledTimer = null;
@@ -90,7 +90,7 @@ var TimerDisplay = new Class({
                 timerRadioSpan.appendChild(timer.timerSpecificConfigSpan);
             }
             availTimersFieldset.appendChild(timerRadioSpan);
-            
+
             var timerOptions = timer.getOptions();
             for(var j = 0; j < timerOptions.length; j++) {
                 var option = timerOptions[j];
@@ -122,7 +122,7 @@ var TimerDisplay = new Class({
         }.bind(this));
 
         this.reset(); //this will update the display
-        
+
         function fullscreenChanged(fullscreen) {
             if(!fullscreen) {
                 // Pressing esc while in fullscreen mode will exit fullscreen mode
@@ -343,14 +343,14 @@ var TimerDisplay = new Class({
         this.inspecting = false;
         this.inspectionStart = null;
         this.lastTime = null;
-        
+
         this.stopRender();
     },
     isReset: function() {
         return !this.timing && this.timerStart === 0 && this.timerStop === 0;
     },
     isFocused: function() {
-        // This is kinda weird, we want to avoid activating the timer 
+        // This is kinda weird, we want to avoid activating the timer
         // if we're in a textarea or input field.
         return !tnoodle.tnt.isTextEditing() && !tnoodle.tnt.isSelecting() && !tnoodle.tnt.isGrayedOut() && this.windowFocused;
     },
@@ -385,7 +385,7 @@ var TimerDisplay = new Class({
         this.display.addClass(colorClass);
         this.display.setStyle('width', '');
         this.display.setStyle('height', '');
-        
+
         var parent;
         if(this.isFullscreenWhileTiming() && this.timing) {
             parent = this.fullscreenBG;
@@ -401,11 +401,11 @@ var TimerDisplay = new Class({
             // this way the options drop down doesn't get covered by the display.
             this.display.inject(parent, 'top');
         }
-        
+
         var maxSize = parent.getSize();
         var fontSize = Math.min(maxSize.y, maxSize.x/(this.CHAR_AR*string.length));
         this.display.setStyle('font-size', fontSize);
-        
+
         //now that we've computed its font size, we center the time vertically
         var offset = (maxSize.y - this.display.getSize().y)/2;
         this.display.setStyle('top', offset);

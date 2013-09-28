@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import subprocess
 import sys
@@ -16,14 +16,14 @@ PREFIX_REMOTE = {
 def git(cmds, options=None, showStatus=True, assertSuccess=True):
     args = ['git'] + cmds
     if options:
-        args += [ ( '--%s=%s' % (key, val) if val else '--%s' % key ) for key, val in options.iteritems() ]
-    print "Running: %s" % " ".join(args)
+        args += [ ( '--%s=%s' % (key, val) if val else '--%s' % key ) for key, val in options.items() ]
+    print("Running: %s" % " ".join(args))
     retVal = subprocess.call(args)
     if assertSuccess:
        assert retVal == 0
 
 def setupSubtreeBranches():
-    for prefix, remote in PREFIX_REMOTE.iteritems():
+    for prefix, remote in PREFIX_REMOTE.items():
         assert remote.endswith('.git')
         splitName = remote.split('/')
         assert len(splitName) == 2
@@ -44,7 +44,7 @@ def setupSubtreeBranches():
         git(['stash', 'pop'], assertSuccess=False)
 
 def pullAllSubtrees():
-    for prefix, remote in PREFIX_REMOTE.iteritems():
+    for prefix, remote in PREFIX_REMOTE.items():
         options = { 'prefix': prefix }
         git(['subtree', 'pull', remote], options)
 

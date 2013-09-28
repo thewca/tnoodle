@@ -12,4 +12,4 @@ trap cleanup 0
 # not the current contents of our directory.
 git stash -q --keep-index
 
-python git-tools/lint.py || ( echo "Failed pre-commit check. Use git commit --no-verify if you really know what you're doing."; exit 1 )
+python3 git-tools/lint.py || ( echo "Failed pre-commit check. Use git commit --no-verify if you really know what you're doing."; exit 1 )
