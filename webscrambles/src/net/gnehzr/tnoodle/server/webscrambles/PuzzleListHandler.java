@@ -22,8 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.server.SafeHttpServlet;
-import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
+import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
 
 @SuppressWarnings("serial")
 public class PuzzleListHandler extends SafeHttpServlet {
@@ -31,7 +32,7 @@ public class PuzzleListHandler extends SafeHttpServlet {
 
     private final List<Map<String, Object>> puzzleInfos;
     private final String puzzleInfosJSON;
-    public PuzzleListHandler() throws BadClassDescriptionException, IOException {
+    public PuzzleListHandler() throws IOException, BadLazyClassDescriptionException {
         SortedMap<String, LazyInstantiator<Puzzle>> scramblers = PuzzlePlugins.getScramblers();
 
         ArrayList<Map<String, Object>> puzzleInfos_ = new ArrayList<Map<String, Object>>(scramblers.size());
@@ -52,7 +53,7 @@ public class PuzzleListHandler extends SafeHttpServlet {
         puzzleInfosJSON = GSON.toJson(puzzleInfos);
     }
 
-    private Map<String, Object> getPuzzleInfo(LazyInstantiator<Puzzle> lazyScrambler, boolean includeStatus) throws InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, MalformedURLException {
+    private Map<String, Object> getPuzzleInfo(LazyInstantiator<Puzzle> lazyScrambler, boolean includeStatus) throws InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, MalformedURLException, BadLazyClassDescriptionException, LazyInstantiatorException {
         Puzzle scrambler = lazyScrambler.cachedInstance();
         Map<String, Object> info = puzzleInfoByShortName.get(scrambler.getShortName());
         azzert(info != null);
@@ -65,7 +66,7 @@ public class PuzzleListHandler extends SafeHttpServlet {
     }
 
     @Override
-    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws BadClassDescriptionException, IOException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, BadLazyClassDescriptionException, LazyInstantiatorException {
         boolean includeStatus = query.get("includeStatus") != null;
         if(path.length == 0) {
             sendError(request, response, "Please specify an extension (and optionally, a puzzle)");

@@ -27,8 +27,8 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
-import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
 import net.gnehzr.tnoodle.utils.Utils;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipOutputStream;
@@ -81,7 +81,7 @@ class ScrambleRequest {
     static {
         try {
             puzzles = PuzzlePlugins.getScramblers();
-        } catch (BadClassDescriptionException e) {
+        } catch (BadLazyClassDescriptionException e) {
             l.log(Level.INFO, "", e);
         } catch (IOException e) {
             l.log(Level.INFO, "", e);

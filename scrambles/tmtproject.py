@@ -4,6 +4,7 @@ from os.path import join, exists, abspath, dirname, isdir
 import zipfile
 import base64
 import textwrap
+import json
 
 DESCRIPTION = "A Java scrambling suite. Java applications can use this project as a library. A perfect example of this is the webscrambles package. Using GWT, the java code compiles to javascript (tnoodlejs)."
 
@@ -69,6 +70,7 @@ class Project(tmt.EclipseProject):
     def innerCompile(self, src, tempBin, bin):
         if src != self.src:
             return
+
         skipGwt = os.environ.get(NO_GWT_ENV_VAR)
         if skipGwt:
             print "%s set, so not compiling with GWT" % NO_GWT_ENV_VAR

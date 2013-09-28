@@ -1,7 +1,7 @@
 ***NOTE: To build, you must set your PATH (and ANT_HOME?) ***
 
 **** Java libraries ****
-gson-1.4.jar: http://code.google.com/p/google-gson/ - Java JSON library that works with generics!
+gson-2.2.4.jar: http://code.google.com/p/google-gson/ - Java JSON library that works with generics!
 jopt-simple.jar: http://jopt-simple.sourceforge.net/ - Java command line options parser (really cool syntax).
 itextpdf-5.3.0.jar: http://itextpdf.com/ - PDF creator for Java.
 bcprov-jdk15on-147.jar: http://www.bouncycastle.org/latest_releases.html (Provider) - Encryption routines used by itextpdf.

@@ -507,7 +507,7 @@ class tmt:
             matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
         return matches
 
-    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True):
+    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False):
         command = []
         assert debug in [ None, 'jdb', 'attach' ]
         if debug == 'jdb':
@@ -527,9 +527,19 @@ class tmt:
         command.append(main)
         command += args
         print " ".join(command)
-        p = subprocess.Popen(command)
+        stdout = None
+        stderr = None
+        if captureOutput:
+            assert wait
+            stdout = subprocess.PIPE
+            stderr = subprocess.PIPE
+        p = subprocess.Popen(command, stdout=stdout, stderr=stderr)
         if wait:
-            return p.wait()
+            if captureOutput:
+                stdoutdata, stderrdata = p.communicate()
+                return ( p.returncode, stdoutdata, stderrdata )
+            else:
+                return p.wait()
         else:
             def killProcess():
                 if p.poll() is None:
@@ -822,10 +832,16 @@ class EclipseProject(TmtProject):
 
         createSymlinkIfNotExistsOrStale(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
 
+        self.postCompile()
+
         return True
 
     def innerCompile(self, src, tempBin, bin):
         # omg shoot me now
+        pass
+
+    def postCompile(self):
+        # and then shoot me again
         pass
 
     def _compile(self, src, bin):

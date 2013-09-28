@@ -10,6 +10,8 @@ import org.apache.batik.svggen.SVGShape;
 import org.w3c.dom.Element;
 import org.apache.batik.svggen.DOMGroupManager;
 import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
 import com.google.gson.JsonElement;
 import java.awt.geom.GeneralPath;
 import com.google.gson.JsonSerializationContext;
@@ -44,7 +46,6 @@ import net.gnehzr.tnoodle.scrambles.PuzzleIcon;
 import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo;
 import net.gnehzr.tnoodle.server.SafeHttpServlet;
-import net.gnehzr.tnoodle.utils.BadClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.lingala.zip4j.exception.ZipException;
 
@@ -59,8 +60,7 @@ import com.itextpdf.text.DocumentException;
 public class ScrambleViewHandler extends SafeHttpServlet {
     private SortedMap<String, LazyInstantiator<Puzzle>> scramblers;
 
-    public ScrambleViewHandler() throws BadClassDescriptionException,
-            IOException {
+    public ScrambleViewHandler() throws IOException, BadLazyClassDescriptionException {
         this.scramblers = PuzzlePlugins.getScramblers();
     }
 
@@ -75,7 +75,7 @@ public class ScrambleViewHandler extends SafeHttpServlet {
     }
 
     @Override
-    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws ServletException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, DocumentException, ZipException {
+    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws ServletException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, DocumentException, ZipException, BadLazyClassDescriptionException, LazyInstantiatorException {
         if (path.length == 0) {
             sendError(request, response, "Please specify a puzzle.");
             return;
