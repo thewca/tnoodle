@@ -163,7 +163,7 @@ class tmt:
         # On Lucas's computer, git describe sometimes returns a blank string. Try again a few times if this is the case.
         for i in range(8):
             if stdout != "":
-                break;
+                break
             retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
 
         assert retVal == 0
@@ -294,13 +294,12 @@ class tmt:
         if command is None:
             command = tmt.args.command
         project = tmt.TmtProject.projects[projectName]
-        recurse = not tmt.args.no_recursive
+        recurse = True
+        if command in [ 'run', 'dist' ]:
+            # It doesn't make sense to recurse with these commands
+            recurse = False
         dist = False
-        if recurse:
-            noRecurseCommands = [ 'run', 'dist' ]
-            if command in noRecurseCommands:
-                print "WARNING: recurse makes no sense with the following commands: %s, so I'm ignoring it" % noRecurseCommands
-                recurse = False
+
         if recurse:
             projects = project.getRecursiveDependenciesTopoSorted()
         else:
@@ -311,6 +310,89 @@ class tmt:
             commandFunc = getattr(project, command, None)
             assert commandFunc, 'No %s target in %s' % ( command, project )
             commandFunc()
+
+    def _release(self):
+        # Urg, we have to set some arguments explicitly because
+        # we're not picking up the defaults from the parser_make.
+        tmt.args.skip_noflex_warning = False
+        tmt.args.main = None
+        tmt.args.args = ""
+        tmt.args.debug = None
+        tmt.args.profile = None
+
+        if not tmt.args.dry_run:
+            ghApi = github.getApi(organization="cubing", repo="tnoodle")
+
+            tmt.assertWorkspaceClean()
+
+        pullCommand = 'git pull'
+        print pullCommand
+        assert 0 == os.system(pullCommand)
+
+        pullCommand = 'git pull git@github.com:cubing/tnoodle.git'
+        print pullCommand
+        assert 0 == os.system(pullCommand)
+
+        assert exists('VERSION')
+        versionFileContents = file('VERSION').read().split('\n')
+        tmt.VERSION = None
+        for line in versionFileContents:
+            if not line.startswith("#"):
+                tmt.VERSION = line
+                break
+        assert tmt.VERSION
+
+        # We want to compile before we tag, that way we don't have to
+        # clean up if the code won't compile. We also want to set
+        # tmt.VERSION before we compile, so that we generate the correct
+        # files.
+        wcaProjectName = 'wca'
+        tmt.args.project = wcaProjectName # yuck =(
+        # We can't run a dist until after we create the tag. This way
+        # the version number of the resulting file will be correct.
+        wcaProject = tmt.TmtProject.projects[wcaProjectName]
+        wcaProject.dist()
+
+        print "Releasing TNoodle"
+
+        tag = "v%s" % tmt.VERSION
+        tagMessage = "version %s" % tmt.VERSION
+        tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
+        print tagCommand
+        if not tmt.args.dry_run:
+            assert 0 == os.system(tagCommand)
+        print "Successfully created tag %s" % tag
+
+        timerProject = tmt.TmtProject.projects['timer']
+        tmt.args.project = timerProject.name # yuck =(
+        # I think noRemake is ok for generating a single unified html file...
+        timerProject.dist(noRemake=True)
+
+        baseWcaFileName = os.path.basename(wcaProject.distJarFile())
+        baseTimerFileName = os.path.basename(timerProject.distUnifiedHtmlFile())
+        files = [
+            ( baseWcaFileName, open(wcaProject.distJarFile()).read() ),
+            ( baseTimerFileName, open(timerProject.distUnifiedHtmlFile()).read() )
+        ]
+        if not tmt.args.dry_run:
+            response, uploadResponses = ghApi.createRelease(tag, files=files)
+            print "Release draft successfully created! Visit %s to complete release" % response['html_url']
+
+        for pushTags in [ False, True ]:
+            # git push --tags seems to not do everything git push does
+
+            pushCommand = 'git push'
+            if pushTags:
+                pushCommand += ' --tags'
+            print pushCommand
+            if not tmt.args.dry_run:
+                assert 0 == os.system(pushCommand)
+
+            pushCommand += ' git@github.com:cubing/tnoodle.git'
+            print pushCommand
+            if not tmt.args.dry_run:
+                assert 0 == os.system(pushCommand)
+
 
     def __init__(self):
         self.parser = ArgumentParser(
@@ -329,14 +411,9 @@ class tmt:
             type=str,
             help='the project to build')
         parser_make.add_argument(
-            '--no-recursive', '-nr',
-            default=False,
-            action='store_true',
-            help='do not apply command recursively to dependencies')
-        parser_make.add_argument(
             'command',
             nargs='?',
-            choices=['compile', 'dist', 'release', 'run', 'check', 'clean'],
+            choices=['compile', 'dist', 'run', 'check', 'clean'],
             default='compile',
             help='command!')
         parser_make.add_argument(
@@ -362,12 +439,18 @@ class tmt:
             default=False,
             action='store_true',
             help="Don't bother telling me I don't have flex installed, I already know.")
-        parser_make.add_argument(
-            '--no-clean',
-            default=False,
-            action='store_true',
-            help="Don't cleaning before dist-ing.")
         parser_make.set_defaults(func=self._make)
+
+        desc = 'Publish TNoodle to github'
+        parser_release = subparsers.add_parser(
+            'release',
+            help=desc, description=desc,
+            formatter_class=ArgumentDefaultsHelpFormatter)
+        parser_release.add_argument(
+            '--dry-run', '-d',
+            default=False, action='store_true',
+            help="Generate the release targets, but don't actually tag anything or upload anything. Good for debugging releasing.")
+        parser_release.set_defaults(func=self._release)
 
         desc = 'Generate dependency graph'
         parser_graph = subparsers.add_parser(
@@ -579,8 +662,6 @@ class TmtProject(object):
         assert False
     def dist(self):
         assert False
-    def release(self):
-        pass
     def run(self):
         assert False
     def clean(self):
@@ -902,94 +983,13 @@ class EclipseProject(TmtProject):
         print 'Compiled successfully! Renaming %s -> %s' % ( tempBin, bin )
         os.rename(tempBin, bin)
 
-    def release(self):
-        # TODO - this method is getting called for every project in the dependency heirarchy
-        if tmt.args.project == self.name:
-            tmt.assertWorkspaceClean()
-
-            pullCommand = 'git pull'
-            print pullCommand
-            assert 0 == os.system(pullCommand)
-
-            pullCommand = 'git pull git@github.com:cubing/tnoodle.git'
-            print pullCommand
-            assert 0 == os.system(pullCommand)
-
-            # We do a compile here even though we're going to do dist later
-            # in order to catch compile errors before we make a tag.
-            tmt._make(projectName=self.name, command='compile')
-
-            print "Releasing", self.name
-
-            assert exists('VERSION')
-            versionFileContents = file('VERSION').read().split('\n')
-            tmt.VERSION = None
-            for line in versionFileContents:
-                if not line.startswith("#"):
-                    tmt.VERSION = line
-                    break
-            assert tmt.VERSION
-            tag = "v%s" % tmt.VERSION
-            tagMessage = "version %s" % tmt.VERSION
-            tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
-            print tagCommand
-            assert 0 == os.system(tagCommand)
-            print "Successfully created tag %s" % tag
-
-            # We can't run a dist until after we create the tag. This way
-            # the version number of the resulting file will be correct.
-            self.dist()
-
-            # TODO - this won't work if gh-pages hasn't been created yet
-            checkShellCmd("git checkout gh-pages", showStatus=True)
-            baseFileName = os.path.basename(self.distJarFile())
-            releaseFileName = "releases/%s" % baseFileName
-            shutil.copy(self.distJarFile(), releaseFileName)
-            now = datetime.datetime.now()
-            postStr = """---
-layout: release
-version: %s
-title: %s released
-file: releases/%s
-date: %s
----""" % ( tmt.VERSION, tmt.VERSION, baseFileName, now.isoformat() )
-            postFileName = "_posts/%s-%s.md" % ( now.date().isoformat(), tag )
-            postFile = open(postFileName, "w")
-            postFile.write(postStr)
-            postFile.close()
-
-            checkShellCmd("git add %s %s" % ( releaseFileName, postFileName ), showStatus=True)
-            checkShellCmd("git commit -m 'adding files for version %s'" % tmt.VERSION, showStatus=True)
-            retVal, _, _ = runCmd("git push git@github.com:cubing/tnoodle.git gh-pages", showStatus=True, shell=True)
-            if retVal != 0:
-                print "Failed to push"
-                print "Deleting tag %s" % tag
-                deleteTagCommand = "git tag -d %s" % (tag)
-                assert 0 == os.system(deleteTagCommand)
-                return
-
-            checkShellCmd("git checkout master", showStatus=True)
-
-            for pushTags in [ False, True ]:
-                # git push --tags seems to not do everything git push does
-
-                pushCommand = 'git push'
-                if pushTags:
-                    pushCommand += ' --tags'
-                print pushCommand
-                assert 0 == os.system(pushCommand)
-
-                pushCommand += ' git@github.com:cubing/tnoodle.git'
-                print pushCommand
-                assert 0 == os.system(pushCommand)
-
     def tweakJarFile(self, jar):
         pass
 
     def dist(self, noRemake=False, implementationTitle=None):
         if implementationTitle is None:
             implementationTitle = self.fullName
-        if not tmt.args.no_clean and not noRemake:
+        if not noRemake:
             # We explicitly clean here, because stuff may have ended up in our
             # resources folders that we don't want to include in the generated jar file.
             tmt._make(projectName=self.name, command='clean')

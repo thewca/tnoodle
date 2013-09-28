@@ -67,7 +67,7 @@ class GithubApi(object):
         listUrl = '%s/releases' % self.baseApiUrl
         return self.depaginate(listUrl)
 
-    def createRelease(self, tag, draft=True, files={}):
+    def createRelease(self, tag, draft=True, files=[]):
         createUrl = '%s/releases' % self.baseApiUrl
         data = json.dumps({
             'tag_name': tag,
@@ -78,7 +78,7 @@ class GithubApi(object):
 
         uploadUrl = r.json['upload_url']
         uploadResponses = []
-        for name, data in files.iteritems():
+        for name, data in files:
             uploadResponse = self.uploadAsset(name, data, uploadUrl)
             uploadResponses.append(uploadResponse)
         return ( r.json, uploadResponses )

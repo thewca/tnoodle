@@ -7,6 +7,9 @@ class Project(tmt.EclipseProject):
         tmt.EclipseProject.configure(self)
         tmt.WinstoneServer.addPlugin(self)
 
+    def distUnifiedHtmlFile(self):
+        return os.path.join(self.distDir, 'tnt.html')
+
     def dist(self, noRemake=False, implementationTitle=None):
         tmt.EclipseProject.dist(self, noRemake=noRemake, implementationTitle=implementationTitle)
 
@@ -19,7 +22,7 @@ class Project(tmt.EclipseProject):
         unifiedHtml = unifyhtml.unify('http://localhost:8080/tnt/', try_count=5)
         unifiedHtml = tmt.doTextSubstitution(unifiedHtml)
 
-        unifiedHtmlFile = os.path.join(self.distDir, 'tnt.html')
+        unifiedHtmlFile = self.distUnifiedHtmlFile()
         with open(unifiedHtmlFile, 'w') as out:
             out.write(unifiedHtml)
 
