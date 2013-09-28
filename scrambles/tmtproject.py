@@ -16,23 +16,23 @@ NO_GWT_ENV_VAR = "TNOODLE_NO_GWT"
 def yesNoPrompt(promptStr):
     inStr = None
     while inStr not in [ 'y', 'n' ]:
-        inStr = raw_input("%s [y/n] " % promptStr)
+        inStr = input("%s [y/n] " % promptStr)
 
     return inStr == 'y'
 
 # Copied from http://blog.radevic.com/2012/07/python-download-url-to-file-with.html
 def dl(url):
     import sys
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
     import tempfile
 
     tempDir = tempfile.mkdtemp()
     file_name = join(tempDir, url.split('/')[-1])
-    u = urllib2.urlopen(url)
+    u = urllib.request.urlopen(url)
     f = open(file_name, 'wb')
     meta = u.info()
     file_size = int(meta.getheaders("Content-Length")[0])
-    print("Downloading: {0} Bytes: {1} to {2}".format(url, file_size, file_name))
+    print(("Downloading: {0} Bytes: {1} to {2}".format(url, file_size, file_name)))
 
     file_size_dl = 0
     block_sz = 8192
@@ -73,18 +73,18 @@ class Project(tmt.EclipseProject):
 
         skipGwt = os.environ.get(NO_GWT_ENV_VAR)
         if skipGwt:
-            print "%s set, so not compiling with GWT" % NO_GWT_ENV_VAR
+            print("%s set, so not compiling with GWT" % NO_GWT_ENV_VAR)
             return
 
         # I hope people see this and don't just hate working on tnoodle.
-        print "*" * 64
-        print "\n".join(textwrap.wrap("Compiling java -> javascript using GWT. This is important to test, as it can break easily, but it's also very slow, and annoying for scrambler development. Set the %s environment variable to skip this." % NO_GWT_ENV_VAR, width=64))
-        print "*" * 64
+        print("*" * 64)
+        print("\n".join(textwrap.wrap("Compiling java -> javascript using GWT. This is important to test, as it can break easily, but it's also very slow, and annoying for scrambler development. Set the %s environment variable to skip this." % NO_GWT_ENV_VAR, width=64)))
+        print("*" * 64)
         gwtDir = abspath(join(self.name, 'gwt-2.5.1'))
         if not exists(gwtDir):
-            print "Could not find GWT at %s" % gwtDir
+            print("Could not find GWT at %s" % gwtDir)
             gwtUrl = "https://developers.google.com/web-toolkit/download"
-            print "You could visit %s and install GWT yourself (be sure to set up a symlink from %s to wherever you installed gwt." % ( gwtUrl, gwtDir )
+            print("You could visit %s and install GWT yourself (be sure to set up a symlink from %s to wherever you installed gwt." % ( gwtUrl, gwtDir ))
             if yesNoPrompt("Would you like me to download GWT and extract it to %s for you?" % gwtDir):
                 gwtZipUrl = "http://google-web-toolkit.googlecode.com/files/gwt-2.5.1.zip"
                 dledZipFile = dl(gwtZipUrl)
@@ -92,7 +92,7 @@ class Project(tmt.EclipseProject):
                 gwtZip.extractall(path=dirname(gwtDir))
                 assert isdir(gwtDir)
             else:
-                print "Please set up GWT and try again"
+                print("Please set up GWT and try again")
                 sys.exit(1)
 
 
@@ -107,12 +107,12 @@ class Project(tmt.EclipseProject):
 
         resources = {}
         for filename in self.nonJavaSrcDeps:
-            with open(join(self.src, filename)) as f:
+            with open(join(self.src, filename), 'rb') as f:
                 data = f.read()
                 data64 = base64.b64encode(data)
                 resources[filename] = data64
         javaResources = ""
-        for filename, data64 in resources.iteritems():
+        for filename, data64 in resources.items():
             javaResources += 'resources.put("%s", "%s");\n' % ( filename, data64 )
         puzzles = open(join(src, 'puzzle', 'puzzles')).read()
         puzzles = puzzles.replace("\n", "\\n")
@@ -126,7 +126,7 @@ class Project(tmt.EclipseProject):
             with open(f) as opened:
                 contents = opened.read()
             dirty = False
-            for define, value in defines.iteritems():
+            for define, value in defines.items():
                 if define in contents:
                     dirty = True
                     contents = contents.replace(define, value)

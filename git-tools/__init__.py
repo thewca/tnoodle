@@ -3,7 +3,7 @@ import os
 import sys
 
 def cdIntoScriptDir():
-   f = sys._current_frames().values()[0].f_back.f_globals['__file__']
+   f = list(sys._current_frames().values())[0].f_back.f_globals['__file__']
    abspath = os.path.abspath(f)
    dname = os.path.dirname(abspath)
    os.chdir(dname)
@@ -52,5 +52,5 @@ stuff "git-tools/poll.sh \\"%s && %s && %s\\";\\012"
       # TODO if there's more than one session named screenTitle, this doesn't work
       subprocess.check_call("screen -S %s -X quit" % screenTitle, shell=True)
 
-   print "Starting screen named %s" % screenTitle
+   print("Starting screen named %s" % screenTitle)
    subprocess.check_call("screen -d -m -S %s -c git-tools/pids/screenrc" % screenTitle, shell=True)

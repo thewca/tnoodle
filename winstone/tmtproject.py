@@ -4,7 +4,7 @@ import os.path
 from os.path import join, basename, relpath
 import shutil
 import xml.etree.ElementTree as ET
-from OrderedDict import OrderedDict
+from collections import OrderedDict
 
 xmlFileTypes = [ 'web.xml', 'urlrewrite.xml' ]
 class Project(tmt.EclipseProject):
@@ -51,7 +51,7 @@ class Project(tmt.EclipseProject):
                 if ogCompile(self):
                     assert self.webContent
                     for dirpath, dirnames, filenames in os.walk(self.webContent):
-                        dirnames[:] = filter(notDotfile, dirnames) # Note that we're modifying dirnames in place
+                        dirnames[:] = list(filter(notDotfile, dirnames)) # Note that we're modifying dirnames in place
 
                         if "WEB-INF" in dirnames:
                             dirnames.remove("WEB-INF")
@@ -150,7 +150,7 @@ class Project(tmt.EclipseProject):
                         xmlRoot.insert(0, child)
 
             for project in deps:
-                if project in self.plugins.values():
+                if project in list(self.plugins.values()):
                     assert project.webContent
                     pluginXmlFile = join(project.webContent, "WEB-INF", f)
                     if not os.path.exists(pluginXmlFile):
@@ -165,7 +165,7 @@ class Project(tmt.EclipseProject):
 
             ET.register_namespace("", "http://java.sun.com/xml/ns/javaee")
 
-            xmlFileOut.write(ET.tostring(xmlRoot))
+            xmlFileOut.write(ET.tostring(xmlRoot).decode())
             xmlFileOut.close()
 
     def needsDb(self):
@@ -179,7 +179,7 @@ class Project(tmt.EclipseProject):
         deps = webProject.getRecursiveDependenciesTopoSorted(exclude=set([self]))
 
         for project in deps:
-            if project in self.plugins.values():
+            if project in list(self.plugins.values()):
                 if project.needsDb:
                     return True
 
