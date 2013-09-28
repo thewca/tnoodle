@@ -10,7 +10,7 @@ TNoodle is a Java project started by Jeremy Fleischman. It provides a single pro
 2. Enter the details for your competition (competition name, number of rounds for each event, details for each round). If you would like to password protect the file, enter a password.
 3. Wait for the loading bar to finish and click the "Scramble!" button that appears. A `.zip` file will download in your browser.
 
-NOTE: 4x4x4 scrambles may take up several minutes to initialise and generate. If you are generating 4x4x4 scrambles, a loading bar will show the progression of the initialisation.
+NOTE: 4x4x4 scrambles may take up several minutes to initialize and generate. If you are generating 4x4x4 scrambles, a loading bar will show the progression of the initialisation.
 
 Also note that tnoodle creates a `tnoodle_resources` folder with about 10MB of files (mostly cached tables for the 4x4x4 solver) in the same folder it is run. Keep this folder if want to generate more 4x4x4 scrambles more quickly in the future, but feel free to delete it if you need to reclaim disk space.
 
@@ -32,6 +32,9 @@ TNoodle implements the highest-quality scramble generation available at this tim
 ### Scramble Filtering
 
 - Scrambles are filtered according to rules set by the WCA Board. Note that these rules are not hardcoded in the [WCA Regulations](http://www.worldcubeassociation.org/regulations/).
+- This version of TNoodle generates scrambles obeying the following rules:
+
+%SCRAMBLE_FILTERING_THRESHOLDS%
 
 ## Credits
 

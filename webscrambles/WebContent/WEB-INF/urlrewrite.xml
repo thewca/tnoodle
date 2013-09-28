@@ -32,11 +32,5 @@
         <from>^/readme.md$</from>
         <to type="forward">/wca/readme-tnoodle.md</to>
     </rule>
-    <rule>
-        <from>^/readme/scramble$</from>
-        <to type="forward">/wca/readme-scramble.md</to>
-    </rule>
-
-
 
 </urlrewrite>

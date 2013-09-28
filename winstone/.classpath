@@ -8,7 +8,6 @@
 	<classpathentry kind="lib" path="/lib/urlrewritefilter-4.0.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/web-utils"/>
 	<classpathentry kind="lib" path="/lib/AppleJavaExtensions.jar"/>
-	<classpathentry kind="lib" path="/lib/markdownj-1.0.2b4-0.3.0.jar"/>
 	<classpathentry kind="lib" path="/lib/javaee-api-6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

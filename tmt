@@ -832,16 +832,10 @@ class EclipseProject(TmtProject):
 
         createSymlinkIfNotExistsOrStale(os.path.relpath(self.binResource, self.bin), join(self.bin, RESOURCE_FOLDER))
 
-        self.postCompile()
-
         return True
 
     def innerCompile(self, src, tempBin, bin):
         # omg shoot me now
-        pass
-
-    def postCompile(self):
-        # and then shoot me again
         pass
 
     def _compile(self, src, bin):

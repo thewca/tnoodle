@@ -1,45 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-        id="WebApp_ID" version="3.0">
-        
-        <display-name>webscrambles</display-name>
+    xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    id="WebApp_ID" version="3.0">
 
-        <servlet>
-                <servlet-name>PuzzleListHandler</servlet-name>
-                <servlet-class>net.gnehzr.tnoodle.server.webscrambles.PuzzleListHandler</servlet-class>
-        </servlet>
-        <servlet-mapping>
-                <servlet-name>PuzzleListHandler</servlet-name>
-                <url-pattern>/puzzles/*</url-pattern>
-        </servlet-mapping>
+    <display-name>webscrambles</display-name>
 
-        <servlet>
-                <servlet-name>ScrambleHandler</servlet-name>
-                <servlet-class>net.gnehzr.tnoodle.server.webscrambles.ScrambleHandler</servlet-class>
-        </servlet>
-        <servlet-mapping>
-                <servlet-name>ScrambleHandler</servlet-name>
-                <url-pattern>/scramble/*</url-pattern>
-        </servlet-mapping>
+    <servlet>
+        <servlet-name>ScrambleReadmeHandler</servlet-name>
+        <servlet-class>net.gnehzr.tnoodle.server.webscrambles.ScrambleReadmeHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ScrambleReadmeHandler</servlet-name>
+        <url-pattern>/readme/scramble</url-pattern>
+    </servlet-mapping>
 
-        <servlet>
-                <servlet-name>ScrambleImporterHandler</servlet-name>
-                <servlet-class>net.gnehzr.tnoodle.server.webscrambles.ScrambleImporterHandler</servlet-class>
-        </servlet>
-        <servlet-mapping>
-                <servlet-name>ScrambleImporterHandler</servlet-name>
-                <url-pattern>/import/*</url-pattern>
-        </servlet-mapping>
+    <servlet>
+        <servlet-name>PuzzleListHandler</servlet-name>
+        <servlet-class>net.gnehzr.tnoodle.server.webscrambles.PuzzleListHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PuzzleListHandler</servlet-name>
+        <url-pattern>/puzzles/*</url-pattern>
+    </servlet-mapping>
 
-        <servlet>
-                <servlet-name>ScrambleViewHandler</servlet-name>
-                <servlet-class>net.gnehzr.tnoodle.server.webscrambles.ScrambleViewHandler</servlet-class>
-        </servlet>
-        <servlet-mapping>
-                <servlet-name>ScrambleViewHandler</servlet-name>
-                <url-pattern>/view/*</url-pattern>
-        </servlet-mapping>
-        
+    <servlet>
+        <servlet-name>ScrambleHandler</servlet-name>
+        <servlet-class>net.gnehzr.tnoodle.server.webscrambles.ScrambleHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ScrambleHandler</servlet-name>
+        <url-pattern>/scramble/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ScrambleImporterHandler</servlet-name>
+        <servlet-class>net.gnehzr.tnoodle.server.webscrambles.ScrambleImporterHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ScrambleImporterHandler</servlet-name>
+        <url-pattern>/import/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ScrambleViewHandler</servlet-name>
+        <servlet-class>net.gnehzr.tnoodle.server.webscrambles.ScrambleViewHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ScrambleViewHandler</servlet-name>
+        <url-pattern>/view/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>
