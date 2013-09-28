@@ -16,7 +16,7 @@ Also note that tnoodle creates a `tnoodle_resources` folder with about 10MB of f
 
 ## Details
 
-TNoodle implements the highest-quality scramble generation available at this time. Except for 5x5x5-7x7x7 and Megaminx, every puzzle is scrambler by generating a random permutation/state using Java's SecureRandom class and computing a scrambling algorithm for it.
+TNoodle implements the highest-quality scramble generation available at this time. Except for 5x5x5-7x7x7 and Megaminx, every puzzle is scrambled by generating a random permutation/state using Java's SecureRandom class and computing a scrambling algorithm for it.
 
 ### Random-State Scrambles
 
