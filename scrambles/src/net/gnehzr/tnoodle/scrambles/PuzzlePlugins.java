@@ -54,7 +54,7 @@ public class PuzzlePlugins {
     }
 
     static {
-        Utils.registerTypeAdapter(Puzzle.class, new Puzzlerizer());
+        Utils.registerTypeHierarchyAdapter(Puzzle.class, new Puzzlerizer());
     }
     private static class Puzzlerizer implements JsonSerializer<Puzzle>, JsonDeserializer<Puzzle> {
         @Override

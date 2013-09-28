@@ -87,7 +87,7 @@ class Project(tmt.EclipseProject):
     def compile(self):
         if tmt.EclipseProject.compile(self):
             if tmt.TmtProject.projects[tmt.args.project] == self:
-    # No wrapped compile to call this for us
+                # No wrapped compile to call this for us
                 self.mungeXmlFiles(topLevelWebProject=self)
 
             webappDir = self.getWebappDir()

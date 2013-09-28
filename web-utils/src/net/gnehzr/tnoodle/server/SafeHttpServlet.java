@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Scanner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.gnehzr.tnoodle.utils.Utils;
 import net.gnehzr.tnoodle.utils.GwtSafeUtils;
+import com.petebevin.markdown.MarkdownProcessor;
 
 @SuppressWarnings("serial")
 public abstract class SafeHttpServlet extends HttpServlet {
@@ -113,7 +115,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
 
     protected static void sendBytes(HttpServletRequest request, HttpServletResponse response, ByteArrayOutputStream bytes, String contentType) {
         try {
-            response.setHeader("Content-Type", contentType);
+            response.setContentType(contentType);
             response.setContentLength(bytes.size());
             bytes.writeTo(response.getOutputStream());
         } catch (IOException e) {
@@ -125,7 +127,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
 
     protected static void sendBytes(HttpServletRequest request, HttpServletResponse response, byte[] bytes, String contentType) {
         try {
-            response.setHeader("Content-Type", contentType);
+            response.setContentType(contentType);
             response.setContentLength(bytes.length);
             response.getOutputStream().write(bytes);
         } catch (IOException e) {
@@ -144,6 +146,31 @@ public abstract class SafeHttpServlet extends HttpServlet {
 
     protected static void sendText(HttpServletRequest request, HttpServletResponse response, String text) {
         sendBytes(request, response, text.getBytes(), "text/plain"); //TODO - encoding charset?
+    }
+
+    private static final MarkdownProcessor mp = new MarkdownProcessor();
+
+    private static String markdownToHTML(String dataString) {
+        String titleCode = "";
+        // We assume that a title line is the first line, starts with one #, and possibly ends with one #
+        if (dataString.startsWith("#")) {
+            String title = new Scanner(dataString).nextLine();
+            title = title.substring(1);
+            if (title.endsWith("#")) {
+                title = title.substring(0, title.length()-1);
+            }
+            title = title.trim();
+            titleCode = "<title>" + title + "</title>\n";
+        }
+
+        return "<html><head>\n" +
+            titleCode +
+            "<link href=\"/css/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />\n" +
+            "</head>\n<body>\n" + mp.markdown(dataString) + "</body>\n</html>\n";
+    }
+
+    protected static void sendMarkdown(HttpServletRequest request, HttpServletResponse response, String markdown) {
+        sendHtml(request, response, markdownToHTML(markdown).getBytes());
     }
 
 }

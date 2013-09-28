@@ -245,7 +245,7 @@ class tmt:
     def _pullRequest(self):
         self.assertWorkspaceClean()
         self.assertCommitsPushed()
-        github.connect(organization="cubing", repo="tnoodle")
+        ghApi = github.getApi(organization="cubing", repo="tnoodle")
 
         tmt.args.project = None
         tmt.args.no_recursive = False
@@ -254,7 +254,7 @@ class tmt:
         body = tmt.args.body
         body += "\n\n*************\nPull request automatically opened by " + \
                 "./tmt pull-request\n./tmt make check passed\n"
-        github.pullRequest(title=tmt.args.title, body=body)
+        ghApi.pullRequest(title=tmt.args.title, body=body)
 
     def _describe(self):
         print self.VERSION
@@ -507,7 +507,7 @@ class tmt:
             matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
         return matches
 
-    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True):
+    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False):
         command = []
         assert debug in [ None, 'jdb', 'attach' ]
         if debug == 'jdb':
@@ -527,9 +527,19 @@ class tmt:
         command.append(main)
         command += args
         print " ".join(command)
-        p = subprocess.Popen(command)
+        stdout = None
+        stderr = None
+        if captureOutput:
+            assert wait
+            stdout = subprocess.PIPE
+            stderr = subprocess.PIPE
+        p = subprocess.Popen(command, stdout=stdout, stderr=stderr)
         if wait:
-            return p.wait()
+            if captureOutput:
+                stdoutdata, stderrdata = p.communicate()
+                return ( p.returncode, stdoutdata, stderrdata )
+            else:
+                return p.wait()
         else:
             def killProcess():
                 if p.poll() is None:

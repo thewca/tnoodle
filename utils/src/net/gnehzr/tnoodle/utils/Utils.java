@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -94,30 +93,18 @@ public final class Utils {
     }
 
 
-    private static GsonBuilder gsonBuilder = new GsonBuilder();
+    // GSON encodes the string "'" as "\u0027" by default.
+    // This behavior is controlled by the htmlSafe attribute.
+    // We call disableHtmlEscaping to disable this behavior.
+    private static GsonBuilder gsonBuilder = new GsonBuilder().disableHtmlEscaping();
     public static Gson GSON;
     public static synchronized void registerTypeAdapter(Class<?> clz, Object typeAdapter) {
         gsonBuilder = gsonBuilder.registerTypeAdapter(clz, typeAdapter);
         GSON = gsonBuilder.create();
-
-        Class<?> c = GSON.getClass();
-        try {
-            // GSON encodes the string "'" as "\u0027" by default.
-            // This behavior is controlled by the htmlSafe attribute, but
-            // htmlSafe is not publicly accessible ... unless you use a
-            // little bit of reflection =).
-            Field f = c.getDeclaredField("htmlSafe");
-            f.setAccessible(true);
-            f.setBoolean(GSON, false);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+    }
+    public static synchronized void registerTypeHierarchyAdapter(Class<?> clz, Object typeAdapter) {
+        gsonBuilder = gsonBuilder.registerTypeHierarchyAdapter(clz, typeAdapter);
+        GSON = gsonBuilder.create();
     }
     static {
         registerTypeAdapter(Color.class, new Colorizer());
