@@ -4,19 +4,39 @@
 
 <urlrewrite>
 
-        <rule>
-                <from>^/$</from>
-                <to type="redirect" last="true">/scramble/</to>
-        </rule>
+    <rule>
+        <from>^/$</from>
+        <to type="redirect" last="true">/scramble/</to>
+    </rule>
 
-        <rule>
-                <from>^/scramble/$</from>
-                <to type="forward">/wca/scramblegen.html</to>
-        </rule>
+    <rule>
+        <from>^/favicon.ico$</from>
+        <to type="redirect" last="true">/wca/favicon.ico</to>
+    </rule>
 
-        <rule>
-                <from>^/scramble$</from>
-                <to type="redirect">/scramble/</to>
-        </rule>
+    <rule>
+        <from>^/scramble/$</from>
+        <to type="forward">/wca/scramblegen.html</to>
+    </rule>
+
+    <rule>
+        <from>^/scramble$</from>
+        <to type="redirect">/scramble/</to>
+    </rule>
+
+    <rule>
+        <from>^/readme$</from>
+        <to type="forward">/wca/readme-tnoodle.md</to>
+    </rule>
+    <rule>
+        <from>^/readme.md$</from>
+        <to type="forward">/wca/readme-tnoodle.md</to>
+    </rule>
+    <rule>
+        <from>^/readme/scramble$</from>
+        <to type="forward">/wca/readme-scramble.md</to>
+    </rule>
+
+
 
 </urlrewrite>
