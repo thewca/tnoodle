@@ -28,7 +28,7 @@ public class MarkdownServlet extends SafeHttpServlet {
             return;
         }
 
-        sendMarkdown(request, response, new String(data)); // TODO - encoding?
+        sendMarkdown(request, response, new String(data));
     }
 
 }
