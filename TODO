@@ -230,5 +230,4 @@
         +plugins/scramble icons
 +consolidate context file/short name/long name for scramble plugins
 +injectable analytics js?
-
--Need some way of running "tmt make check" after every change. I think it's too painful to run it before every commit. Perhaps it would be best to have the server run make check before starting up, and fail to start (or start up an old version?) if make check fails? This would certainly force people to fix their test failures.
++"./tmt make check" is part of creating a pull request
