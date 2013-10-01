@@ -98,7 +98,7 @@ class GithubApi(object):
         # For now, we'll just skip this check. Hopefully we can add
         # it back soon.
         # r.raise_for_status()
-        return r.json()
+        # return r.json()
 
     def deleteRelease(self, id):
         deleteUrl = '%s/releases/%s' % (self.baseApiUrl, id)
