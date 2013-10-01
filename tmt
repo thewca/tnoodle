@@ -368,7 +368,7 @@ class tmt:
         baseTimerFileName = os.path.basename(timerProject.distUnifiedHtmlFile())
         files = [
             ( baseWcaFileName, open(wcaProject.distJarFile(), 'rb').read() ),
-            ( baseTimerFileName, open(timerProject.distUnifiedHtmlFile()).read() )
+            ( baseTimerFileName, open(timerProject.distUnifiedHtmlFile(), 'rb').read() )
         ]
         if not tmt.args.dry_run:
             response, uploadResponses = ghApi.createRelease(tag, files=files)
