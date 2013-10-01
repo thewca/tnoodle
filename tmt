@@ -183,7 +183,7 @@ class tmt:
 
     def notifyDist(self, filename):
         sizeMB = 1.0 * os.path.getsize(filename) / 2**20
-        # ls -h ciels fractions, so we do the same thing here
+        # ls -h ceils fractions, so we do the same thing here
         sizeMB = math.ceil(sizeMB*10)/10
 
         print('Successfully created %s (size %sM)' % ( os.path.abspath(filename), sizeMB ))
@@ -396,7 +396,8 @@ class tmt:
         self.parser = ArgumentParser(
             description='tmt, the Tnoodle Make Tools',
             formatter_class=ArgumentDefaultsHelpFormatter)
-        subparsers = self.parser.add_subparsers(help='Available commands')
+        subparsers = self.parser.add_subparsers(help='Available commands', dest='subparser_name')
+        subparsers.required = True # Something changed in python 3, so dumb
 
         desc = 'Make stuff'
         parser_make = subparsers.add_parser(
