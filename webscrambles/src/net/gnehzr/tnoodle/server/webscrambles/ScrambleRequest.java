@@ -512,7 +512,7 @@ class ScrambleRequest {
                 rules.add("Face moves F, B, R, L, U, and D are clockwise.");
                 rules.add("Rotations x, y, and z follow R, U, and F.");
                 rules.add("' inverts a move; 2 doubles a move. (e.g.: U', U2)");
-                rules.add("w makes a move into two layers. (e.g.: Uw)");
+                rules.add("w makes a face move into two layers. (e.g.: Uw)");
                 rules.add("A [lowercase] move is a cube rotation. (e.g.: [u])");
 
                 ct.addElement(rules);
@@ -525,7 +525,7 @@ class ScrambleRequest {
                 rules.add("Your solution length will be counted in OBTM.");
                 int maxMoves = WCA_MAX_MOVES_FMC;
                 rules.add("Your solution must be at most " + maxMoves + " moves, including rotations.");
-                rules.add("Your solution must not be related to the scrambling algorithm in any way.");
+                rules.add("Your solution must not be directly derived from any part of the scrambling algorithm.");
                 ct.addElement(rules);
                 MAGIC_NUMBER = 150; // kill me now
                 ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
