@@ -397,7 +397,7 @@ class tmt:
             description='tmt, the Tnoodle Make Tools',
             formatter_class=ArgumentDefaultsHelpFormatter)
         subparsers = self.parser.add_subparsers(help='Available commands', dest='subparser_name')
-        subparsers.required = True # Something changed in python 3, so dumb
+        subparsers.required = True # Something changed in python 3 (see http://hg.python.org/cpython/rev/cab204a79e09), so dumb
 
         desc = 'Make stuff'
         parser_make = subparsers.add_parser(
