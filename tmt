@@ -367,7 +367,7 @@ class tmt:
         baseWcaFileName = os.path.basename(wcaProject.distJarFile())
         baseTimerFileName = os.path.basename(timerProject.distUnifiedHtmlFile())
         files = [
-            ( baseWcaFileName, open(wcaProject.distJarFile()).read() ),
+            ( baseWcaFileName, open(wcaProject.distJarFile(), 'rb').read() ),
             ( baseTimerFileName, open(timerProject.distUnifiedHtmlFile()).read() )
         ]
         if not tmt.args.dry_run:
