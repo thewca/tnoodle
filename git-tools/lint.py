@@ -221,6 +221,8 @@ def lint(files):
                 cmd += " " + f
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             stdout, stderr = p.communicate(input=stdin)
+            stdout = stdout.decode()
+            stderr = stderr.decode()
             assert p.returncode in [0, 2], "Unrecognized return code %s from %s.\n\n%s\n\n%s" % ( p.returncode, cmd, stdout, stderr )
             if stdout:
                 errors = stdout.split("\n")

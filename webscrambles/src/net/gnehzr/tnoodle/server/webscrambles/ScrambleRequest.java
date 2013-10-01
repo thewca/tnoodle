@@ -688,6 +688,7 @@ class ScrambleRequest {
     }
 
     private static String padTurnsUniformly(String scramble, String padding) {
+        azzert(scramble != null, "scramble cannot be null");
         String[] turns = scramble.split("\\s+");
         int maxTurnLength = 0;
         for(String turn : turns) {

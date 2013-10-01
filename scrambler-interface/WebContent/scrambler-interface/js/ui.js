@@ -621,26 +621,33 @@ var mark2 = {};
             return sheets;
         };
 
-        function getRequiredScrambleCount() {
-            var requiredCount = 0;
-            var sheets = getScrambleSheets();
-            for(var i = 0; i < sheets.length; i++) {
-                requiredCount += sheets[i].scrambleCount;
+        function sum(arr) {
+            var total = 0;
+            for(var i = 0; i < arr.length; i++) {
+                total += arr[i];
             }
-            return requiredCount;
+            return total;
+        }
+
+        function values(obj) {
+            var vals = [];
+            for(var key in obj) {
+                if(obj.hasOwnProperty(key)) {
+                    vals.push(obj[key]);
+                }
+            }
+            return vals;
+        }
+
+        function getRequiredScrambleCount() {
+            var requiredCounts = values(getRequiredScrambleCountByPuzzle());
+            return sum(requiredCounts);
         }
 
         var generatedScrambleCountByGuid = {};
         function getGeneratedScrambleCount() {
-            var generatedCount = 0;
-
-            var sheets = getScrambleSheets();
-            for(var i = 0; i < sheets.length; i++) {
-                var sheet = sheets[i];
-                // There may be more scrambles generated for this puzzle than we need.
-                generatedCount += Math.min(sheet.scrambleCount + sheet.extraScrambleCount, generatedScrambleCountByGuid[sheet.guid] || 0);
-            }
-            return generatedCount;
+            var generatedCounts = values(getGeneratedScrambleCountByPuzzle());
+            return sum(generatedCounts);
         }
 
         function getRequiredScrambleCountByPuzzle() {
@@ -658,7 +665,17 @@ var mark2 = {};
             var sheets = getScrambleSheets();
             for(var i = 0; i < sheets.length; i++) {
                 var sheet = sheets[i];
-                generatedScrambleCountByPuzzle[sheet.puzzle] = (generatedScrambleCountByPuzzle[sheet.puzzle] || 0) + (generatedScrambleCountByGuid[sheet.guid] || 0);
+                // There may be more scrambles generated for this sheet than we need.
+                var additionalScramblesCount = Math.min(
+                    sheet.scrambleCount + sheet.extraScrambleCount,
+                    (generatedScrambleCountByGuid[sheet.guid] || 0)
+                );
+
+                generatedScrambleCountByPuzzle[sheet.puzzle] = (
+                    (generatedScrambleCountByPuzzle[sheet.puzzle] || 0) +
+                    additionalScramblesCount
+                );
+                        
             }
             return generatedScrambleCountByPuzzle;
         }
