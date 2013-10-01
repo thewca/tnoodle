@@ -179,6 +179,14 @@
         var sheets = mark2.ui.getScrambleSheets();
         var request = toScrambleRequest(sheets);
         var password = mark2.ui.getPassword();
+
+        // Verifying that we aren't trying to pass in any null scrambles.
+        for(var i = 0; i < request.length; i++) {
+            for(var j = 0; j < request[i].scrambles.length; j++) {
+                assert(request[i].scrambles[j]);
+            }
+        }
+
         if(e.shiftKey) {
             scrambleServer.showPdf(title, request, password, "_blank");
         } else {
