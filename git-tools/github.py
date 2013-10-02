@@ -93,12 +93,8 @@ class GithubApi(object):
         headers['Content-Type'] = mime
 
         r = requests.post(uploadUrl, auth=self.auth, headers=headers, data=data)
-        # Github's api is returning 502 Bad Gateway when uploading files larger than
-        # 3430400 bytes, even though the file does appear to be uploaded correctly.
-        # For now, we'll just skip this check. Hopefully we can add
-        # it back soon.
-        # r.raise_for_status()
-        # return r.json()
+        r.raise_for_status()
+        return r.json()
 
     def deleteRelease(self, id):
         deleteUrl = '%s/releases/%s' % (self.baseApiUrl, id)
