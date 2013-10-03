@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class Launcher {
     private static final Logger l = Logger.getLogger(Launcher.class.getName());
-    private static final String NO_REEXEC = "-noReexec";
+    public static final String NO_REEXEC_OPT = "noReexec";
 
     public static void wrapMain(String[] args, int minHeapSizeMegs) {
         wrapMain(null, args, minHeapSizeMegs);
@@ -41,7 +41,8 @@ public class Launcher {
      * an appropriate -Xmx to the jvm.
      */
     public static void wrapMain(String name, String[] args, final int minHeapSizeMegs) {
-        if(args.length > 0 && args[0].equals(NO_REEXEC)) {
+        l.entering(Launcher.class.toString(), "wrapMain", new Object[] { name, Arrays.toString(args), minHeapSizeMegs });
+        if(args.length > 0 && args[0].equals("--" + NO_REEXEC_OPT)) {
             args[0] = "";
             processType = PROCESS_TYPE.WORKER;
             return;
@@ -64,6 +65,8 @@ public class Launcher {
         }
         File jar = Utils.getJarFile();
         String jvm = "java";
+        String os = System.getProperty("os.name");
+        l.info("Detected os: " + os);
         if(System.getProperty("os.name").startsWith("Windows")) {
             // We only do this java.exe magic if we're on windows
             // Linux and Mac seem to show useful information if you
@@ -97,12 +100,16 @@ public class Launcher {
 
                         // We successfully created a new executable, so lets use it!
                         needsReExecing = true;
+                        l.info("Successfully copied " + java + " -> " + newLauncher);
                     } catch (IOException e) {
                         l.log(Level.WARNING, "Couldn't copy java.exe", e);
                     }
                 }
+            } else {
+                l.log(Level.WARNING, launcherDir + " is not a directory.");
             }
         }
+        l.info("needsReExecing: " + needsReExecing);
         if(!needsReExecing) {
             processType = PROCESS_TYPE.WORKER;
             return;
@@ -124,7 +131,7 @@ public class Launcher {
         jvmArgs.add("-classpath");
         jvmArgs.add(classpath);
         jvmArgs.add(mainClass);
-        jvmArgs.add(NO_REEXEC);
+        jvmArgs.add("--" + NO_REEXEC_OPT);
         jvmArgs.addAll(Arrays.asList(args));
 
         try {

@@ -246,10 +246,6 @@ public class TNoodleServer {
         Utils.doFirstRunStuff();
         TNoodleLogging.initializeLogging();
 
-        setApplicationIcon();
-        Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
-        setApplicationIcon();
-
         OptionParser parser = new OptionParser();
         OptionSpec<Integer> httpPortOpt = parser.acceptsAll(Arrays.asList("p", "http"),
                 "The port to run the http server on")
@@ -259,6 +255,8 @@ public class TNoodleServer {
         OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"),
                 "If an instance of " + NAME + " is running on the desired port(s), " +
                         "do not attempt to kill it and start up");
+        OptionSpec<?> noReexecOpt = parser.acceptsAll(Arrays.asList(Launcher.NO_REEXEC_OPT),
+                "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.");
         OptionSpec<File> injectJsOpt = parser.acceptsAll(Arrays.asList("i", "inject"),
                 "File containing code to inject into the bottom of the " +
                 "<head>...</head> section of all html served")
@@ -291,6 +289,11 @@ public class TNoodleServer {
                 TNoodleLogging.setConsoleLogLevel(cl);
                 Level fl = Level.parse(options.valueOf(fileLogLevel));
                 TNoodleLogging.setFileLogLevel(fl);
+
+                // Note that we set the log level *before* we do any of this.
+                setApplicationIcon();
+                Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
+                setApplicationIcon();
 
                 if(options.has(injectJsOpt)) {
                     File injectCodeFile = options.valueOf(injectJsOpt);
