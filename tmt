@@ -365,10 +365,8 @@ class tmt:
         timerProject.dist(noRemake=True)
 
         baseWcaFileName = os.path.basename(wcaProject.distJarFile())
-        baseTimerFileName = os.path.basename(timerProject.distUnifiedHtmlFile())
         files = [
             ( baseWcaFileName, open(wcaProject.distJarFile(), 'rb').read() ),
-            ( baseTimerFileName, open(timerProject.distUnifiedHtmlFile(), 'rb').read() )
         ]
         for fileName, url in timerProject.unifiedHtmlFiles.items():
             files.append( ( os.path.basename(fileName), open(fileName).read() ) )
