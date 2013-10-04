@@ -9,7 +9,7 @@ class Project(tmt.EclipseProject):
         tmt.WinstoneServer.addPlugin(self)
 
         self.unifiedHtmlFiles = {
-            join(self.distDir, "tmt.html"): "http://localhost:8080/tnt/",
+            join(self.distDir, "tnt.html"): "http://localhost:8080/tnt/",
             join(self.distDir, "bld.html"): "http://localhost:8080/tnt/bld.html"
         }
 
