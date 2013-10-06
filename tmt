@@ -113,7 +113,6 @@ def topologicalSort(projects, exclude=set()):
         for dep in project.getDependencies():
             if dep in potentialRoots:
                 potentialRoots.remove(dep)
-    assert len(potentialRoots) > 0
 
     class UltimateRoot(tmt.TmtProject):
         def __init__(self, name, description):

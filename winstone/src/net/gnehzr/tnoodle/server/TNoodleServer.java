@@ -2,8 +2,19 @@ package net.gnehzr.tnoodle.server;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
+import tray.SystemTrayProvider;
+import tray.SystemTrayAdapter;
+import tray.TrayIconAdapter;
+import tray.java.JavaIconAdapter;
+
 import java.awt.Desktop;
 import java.awt.Image;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.PopupMenu;
+import java.awt.MenuItem;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +69,9 @@ public class TNoodleServer {
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "password";
 
+    private int httpPort;
     public TNoodleServer(int httpPort, boolean bindAggressively, boolean browse) throws IOException, ClassNotFoundException, NamingException {
+        this.httpPort = httpPort;
          // at startup
         Map<String, String> serverArgs = new HashMap<String, String>();
         serverArgs.put("webappsDir", Utils.getWebappsDir().getAbsolutePath());
@@ -111,6 +124,13 @@ public class TNoodleServer {
 
         System.out.println(NAME + "-" + VERSION + " started");
 
+        ArrayList<String> urls = openTabInBrowser(browse);
+        for(String url : urls) {
+            System.out.println("Visit " + url + " for a readme and demo.");
+        }
+    }
+
+    public ArrayList<String> openTabInBrowser(boolean browse) throws IOException {
         ArrayList<String> hostnames = new ArrayList<String>();
         try {
             hostnames.add(InetAddress.getLocalHost().getHostAddress());
@@ -122,40 +142,41 @@ public class TNoodleServer {
                 }
             }
         }
+        ArrayList<String> urls = new ArrayList<String>();
+        for(String hostname : hostnames) {
+            String url = "http://" + hostname + ":" + this.httpPort;
+            urls.add(url);
+        }
 
         if(hostnames.isEmpty()) {
-            System.out.println("Couldn't find any hostnames for this machine");
-        } else {
-            if(hostnames.size() > 1 && browse) {
+            l.warning("Couldn't find any hostnames for this machine.");
+        } else if(hostnames.size() > 1) {
+            if(browse) {
                 browse = false;
-                System.out.println("Couldn't determine which url to browse to");
+                l.warning("Could not decide which of these urls to browse to: " + hostnames);
             }
-            for(String hostname : hostnames) {
-                String url = "http://" + hostname + ":" + httpPort;
-
-                // TODO - maybe it would make sense to open this url asap, that
-                //        way the user's browser starts parsing tnt even as the server
-                //        is starting up. The only problem with this is that we'd open
-                //        the browser even if the server fails to start.
-                if(browse) {
-                    if(Desktop.isDesktopSupported()) {
-                        Desktop d = Desktop.getDesktop();
-                        if(d.isSupported(Desktop.Action.BROWSE)) {
-                            try {
-                                URI uri = new URI(url);
-                                System.out.println("Opening " + uri + " in browser. Pass -n to disable this!");
-                                d.browse(uri);
-                                return;
-                            } catch(URISyntaxException e) {
-                                e.printStackTrace();
-                            }
+        } else {
+            if(browse) {
+                if(Desktop.isDesktopSupported()) {
+                    Desktop d = Desktop.getDesktop();
+                    if(d.isSupported(Desktop.Action.BROWSE)) {
+                        String url = urls.get(0);
+                        try {
+                            URI uri = new URI(url);
+                            l.info("Attempting to open " + uri + " in browser.");
+                            d.browse(uri);
+                        } catch(URISyntaxException e) {
+                            l.log(Level.WARNING, "Could not convert " + url + " to URI", e);
                         }
+                    } else {
+                        l.warning("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.");
                     }
-                    System.out.println("Sorry, it appears the Desktop api is not supported on your platform");
+                } else {
+                    l.warning("Sorry, it appears the Desktop api is not supported on your platform.");
                 }
-                System.out.println("Visit " + url + " for a readme and demo.");
             }
         }
+        return urls;
     }
 
     private ServerSocket aggressivelyBindSocket(int port, boolean bindAggressively) throws IOException {
@@ -214,34 +235,92 @@ public class TNoodleServer {
      * Sets the dock icon in OSX. Could be made to have uses in other operating systems.
      */
     private static void setApplicationIcon() {
-        // Let's wrap everything in a big try-catch, just in case OS-specific stuff goes wonky.
-        try {
-            // Find out which icon to use.
-            final Launcher.PROCESS_TYPE processType = Launcher.getProcessType();
-            final String iconFileName;
-            switch (processType) {
-                case WORKER:
-                    iconFileName = ICON_WORKER;
-                    break;
-                default:
-                    iconFileName = ICON_WRAPPER;
-                    break;
-            }
+        // Find out which icon to use.
+        final Launcher.PROCESS_TYPE processType = Launcher.getProcessType();
+        final String iconFileName;
+        switch (processType) {
+            case WORKER:
+                iconFileName = ICON_WORKER;
+                break;
+            default:
+                iconFileName = ICON_WRAPPER;
+                break;
+        }
 
-            // Get the file name of the icon.
-            final String fullFileName = Utils.getResourceDirectory() + "/" + ICONS_FOLDER + "/" + iconFileName;
-            final Image image = new ImageIcon(fullFileName).getImage();
+        // Get the file name of the icon.
+        final String fullFileName = Utils.getResourceDirectory() + "/" + ICONS_FOLDER + "/" + iconFileName;
+        final Image image = new ImageIcon(fullFileName).getImage();
 
-            // OSX-specific code to set the dock icon.
-            if (isOSX()) {
+        // OSX-specific code to set the dock icon.
+        if(isOSX()) {
+            try {
                 final com.apple.eawt.Application application = com.apple.eawt.Application.getApplication();
                 application.setDockIconImage(image);
+            } catch(Exception e) {
+                l.log(Level.WARNING, "Error setting OSX dock icon", e);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            if(iconFileName != ICON_WORKER) {
+                // Only want to create one tray icon.
+                return;
+            }
+
+            if(!SystemTray.isSupported()) {
+                l.warning("SystemTray is not supported");
+                return;
+            }
+
+            URL imageUrl;
+            try {
+                imageUrl = new File(fullFileName).toURI().toURL();
+            } catch(MalformedURLException e) {
+                l.log(Level.WARNING, "Could not convert " + fullFileName + " to a URL", e);
+                return;
+            }
+            SystemTrayAdapter trayAdapter = new SystemTrayProvider().getSystemTray();
+            final PopupMenu popup = new PopupMenu();
+            MenuItem openItem = new MenuItem("Open");
+            popup.add(openItem);
+            MenuItem exitItem = new MenuItem("Exit");
+            popup.add(exitItem);
+
+            openItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if(tnoodleServer != null) {
+                        try {
+                            tnoodleServer.openTabInBrowser(true);
+                        } catch(IOException error) {
+                            l.log(Level.WARNING, "Error opening tab in browser", error);
+                        }
+                    }
+                }
+            });
+            exitItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    l.info("Exit initiated from tray icon");
+                    System.exit(0);
+                }
+            });
+
+            TrayIconAdapter trayIconAdapter = trayAdapter.createAndAddTrayIcon(
+                imageUrl,
+                NAME + " v" + VERSION,
+                popup);
+            if(trayIconAdapter instanceof JavaIconAdapter) {
+                // Unfortunately, java internally uses some shitty resizing
+                // algorithm for this, so we have to do this ourselves.
+                //trayIconAdapter.setImageAutoSize(true);
+
+                SystemTray st = SystemTray.getSystemTray();
+                JavaIconAdapter jia = (JavaIconAdapter) trayIconAdapter;
+                TrayIcon ti = jia.getTrayIcon();
+                ti.setImage(image.getScaledInstance(st.getTrayIconSize().width, -1, Image.SCALE_SMOOTH));
+                
+            }
         }
     }
 
+    private static TNoodleServer tnoodleServer = null;
     public static void main(String[] args) throws IOException {
         Utils.doFirstRunStuff();
         TNoodleLogging.initializeLogging();
@@ -291,6 +370,9 @@ public class TNoodleServer {
                 TNoodleLogging.setFileLogLevel(fl);
 
                 // Note that we set the log level *before* we do any of this.
+                // These two calls to setApplicationIcon() are intentional.
+                // We want different icons for the parent process and the child
+                // process.
                 setApplicationIcon();
                 Launcher.wrapMain(args, MIN_HEAP_SIZE_MEGS);
                 setApplicationIcon();
@@ -312,7 +394,7 @@ public class TNoodleServer {
                 int httpPort = options.valueOf(httpPortOpt);
 
                 boolean openBrowser = !options.has(noBrowserOpt);
-                new TNoodleServer(httpPort, bindAggressively, openBrowser);
+                tnoodleServer = new TNoodleServer(httpPort, bindAggressively, openBrowser);
                 return;
             }
         } catch(Exception e) {

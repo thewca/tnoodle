@@ -9,5 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/web-utils"/>
 	<classpathentry kind="lib" path="/lib/AppleJavaExtensions.jar"/>
 	<classpathentry kind="lib" path="/lib/javaee-api-6.0.jar"/>
+	<classpathentry kind="lib" path="/lib/native-tray-adapter-1.2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/lib/jni-utils-1.1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
