@@ -573,8 +573,8 @@ class ScrambleRequest {
                 doc.add(headerTable);
                 
                 scrambleNumberPrefix = "E";
-                PdfPTable extraSscramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
-                doc.add(extraSscramblesTable);
+                PdfPTable extraScramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
+                doc.add(extraScramblesTable);
             }
         }
         doc.newPage();
@@ -623,7 +623,11 @@ class ScrambleRequest {
         Font scrambleFont = null;
         try {
             BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-            Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight - 8);
+            // Gah, I have no idea where this number is coming from, see
+            // https://github.com/cubing/tnoodle/issues/124 for why we had to bump
+            // it from 8 to 9.
+            int ARE_THESE_MARGINS = 9;
+            Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight - ARE_THESE_MARGINS);
             float perfectFontSize = ColumnText.fitText(new Font(courier), longestScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR);
             scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
         } catch(IOException e) {
