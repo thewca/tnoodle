@@ -307,6 +307,7 @@ class tmt:
             commandFunc()
 
     def _release(self):
+        tmt.releasing = True
         # Urg, we have to set some arguments explicitly because
         # we're not picking up the defaults from the parser_make.
         tmt.args.skip_noflex_warning = False
@@ -392,6 +393,7 @@ class tmt:
 
 
     def __init__(self):
+        self.releasing = False
         self.parser = ArgumentParser(
             description='tmt, the Tnoodle Make Tools',
             formatter_class=ArgumentDefaultsHelpFormatter)

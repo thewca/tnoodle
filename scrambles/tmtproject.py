@@ -73,6 +73,8 @@ class Project(tmt.EclipseProject):
 
         skipGwt = os.environ.get(NO_GWT_ENV_VAR)
         if skipGwt:
+            # We don't want to skip gwt-ing when we're releasing
+            assert not tmt.releasing
             print("%s set, so not compiling with GWT" % NO_GWT_ENV_VAR)
             return
 
