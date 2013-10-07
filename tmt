@@ -590,7 +590,7 @@ class tmt:
             matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
         return matches
 
-    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False):
+    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False, maxMemory=None):
         command = []
         assert debug in [ None, 'jdb', 'attach' ]
         if debug == 'jdb':
@@ -607,6 +607,8 @@ class tmt:
         if classpath:
             command.append('-classpath')
             command.append(classpath)
+        if maxMemory:
+            command.append('-Xmx' + maxMemory)
         command.append(main)
         command += args
         print(" ".join(command))

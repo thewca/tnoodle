@@ -154,7 +154,7 @@ class Project(tmt.EclipseProject):
 
         args.append(GWT_MODULE)
 
-        retVal = tmt.java("com.google.gwt.dev.Compiler", classpath=classpath, args=args)
+        retVal = tmt.java("com.google.gwt.dev.Compiler", classpath=classpath, args=args, maxMemory='512m')
         assert retVal == 0
 
         scramblejs = open(join(self.src, 'scramble.js')).read()
