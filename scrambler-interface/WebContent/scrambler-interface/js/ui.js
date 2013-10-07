@@ -340,24 +340,26 @@ var mark2 = {};
 
         var extraScrambles = 2;
         var events = {
-            // Official WCA events as of November 24, 2011
-            "333":    {name: "Rubik's Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "444":    {name: "4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "555":    {name: "5x5 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "222":    {name: "2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "333bf":  {name: "3x3 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "333oh":  {name: "3x3 one-handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "333fm":  {name: "3x3 fewest moves", default_round: {type: "best", num_scrambles: 1 } },
-            "333ft":  {name: "3x3 with feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            // Official WCA events as of October 06, 2013
+            // Names match https://www.worldcubeassociation.org/regulations/#article-9-events
+            // - Exception: "Rubik's Cube" is replaced with "3x3x3" for brevity and consistency.
+            "333":    {name: "3x3x3", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            "444":    {name: "4x4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            "555":    {name: "5x5x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            "222":    {name: "2x2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            "333bf":  {name: "3x3x3: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            "333oh":  {name: "3x3x3: One-Handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            "333fm":  {name: "3x3x3: Fewest Moves", default_round: {type: "best", num_scrambles: 1 } },
+            "333ft":  {name: "3x3x3: With Feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             "minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             "pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             "sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             "clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "666":    {name: "6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "777":    {name: "7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "444bf":  {name: "4x4 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "555bf":  {name: "5x5 blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "333mbf": {name: "3x3 multi blind", default_round: {type: "mbf",  num_scrambles: 28 } }
+            "666":    {name: "6x6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            "777":    {name: "7x7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            "444bf":  {name: "4x4x4 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            "555bf":  {name: "5x5x5 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            "333mbf": {name: "3x3x3: Multiple Blindfolded", default_round: {type: "mbf",  num_scrambles: 28 } }
         };
 
         // Javascript objects don't retain key order in all browsers, so we create this list for iteration.
