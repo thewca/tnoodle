@@ -111,7 +111,7 @@ class Project(tmt.EclipseProject):
         for filename in self.nonJavaSrcDeps:
             with open(join(self.src, filename), 'rb') as f:
                 data = f.read()
-                data64 = base64.b64encode(data)
+                data64 = base64.b64encode(data).decode()
                 resources[filename] = data64
         javaResources = ""
         for filename, data64 in resources.items():
