@@ -70,6 +70,7 @@ class ScrambleRequest {
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
+    private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -580,6 +581,71 @@ class ScrambleRequest {
         doc.newPage();
     }
 
+    /**
+     * Copied from ColumnText.java in the itextpdf 5.3.0 source code.
+
+     * Fits the text to some rectangle adjusting the font size as needed.
+     * @param font the font to use
+     * @param text the text
+     * @param rect the rectangle where the text must fit
+     * @param maxFontSize the maximum font size
+     * @param runDirection the run direction
+     * @return the calculated font size that makes the text fit
+     */
+    public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, int runDirection, boolean newlinesAllowed) {
+        try {
+            ColumnText ct = null;
+            int status = 0;
+            if (maxFontSize <= 0) {
+                int cr = 0;
+                int lf = 0;
+                char[] t = text.toCharArray();
+                for (int k = 0; k < t.length; ++k) {
+                    if (t[k] == '\n') {
+                        ++lf;
+                    } else if (t[k] == '\r') {
+                        ++cr;
+                    }
+                }
+                int minLines = Math.max(cr, lf) + 1;
+                maxFontSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
+            }
+            font.setSize(maxFontSize);
+            Phrase ph = new Phrase(text, font);
+            ct = new ColumnText(null);
+            ct.setSimpleColumn(ph, rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), maxFontSize, Element.ALIGN_LEFT);
+            ct.setRunDirection(runDirection);
+            status = ct.go(true);
+            if ((status & ColumnText.NO_MORE_TEXT) != 0 && (newlinesAllowed || ct.getLinesWritten() <= 1)) {
+                return maxFontSize;
+            }
+            float precision = 0.1f;
+            float min = 0;
+            float max = maxFontSize;
+            float size = maxFontSize;
+            for (int k = 0; k < 50; ++k) { //just in case it doesn't converge
+                size = (min + max) / 2;
+                ct = new ColumnText(null);
+                font.setSize(size);
+                ct.setSimpleColumn(new Phrase(text, font), rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), size, Element.ALIGN_LEFT);
+                ct.setRunDirection(runDirection);
+                status = ct.go(true);
+                if ((status & ColumnText.NO_MORE_TEXT) != 0 && (newlinesAllowed || ct.getLinesWritten() <= 1)) {
+                    if (max - min < size * precision) {
+                        return size;
+                    }
+                    min = size;
+                } else {
+                    max = size;
+                }
+            }
+            return size;
+        } catch (Exception e) {
+            throw new com.itextpdf.text.ExceptionConverter(e);
+        }
+    }
+
+
     private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix) throws DocumentException {
         PdfContentByte cb = docWriter.getDirectContent();
 
@@ -596,7 +662,7 @@ class ScrambleRequest {
         // I don't know why we need this, perhaps there's some padding?
         col1Width += 5;
 
-        float availableWidth = doc.getPageSize().getWidth()-sideMargins;
+        float availableWidth = doc.getPageSize().getWidth() - sideMargins;
         float availableScrambleWidth = availableWidth - col1Width - scrambleImageSize.width - 2*SCRAMBLE_IMAGE_PADDING;
         int availableScrambleHeight = scrambleImageSize.height - 2*SCRAMBLE_IMAGE_PADDING;
 
@@ -604,10 +670,12 @@ class ScrambleRequest {
         table.setLockedWidth(true);
 
         String longestScramble = "";
+        String longestScrambleOneLine = "";
         for(String scramble : scrambles) {
             String padded = padTurnsUniformly(scramble, "M");
             if(padded.length() > longestScramble.length()) {
                 longestScramble = padded;
+                longestScrambleOneLine = scramble;
             }
         }
         // I don't know how to configure ColumnText.fitText's word wrapping characters,
@@ -615,20 +683,34 @@ class ScrambleRequest {
         // should be the widest character (we're using a monospaced font,
         // so that doesn't really matter), and won't get wrapped.
         longestScramble = longestScramble.replaceAll("\\S", "M");
+        longestScrambleOneLine = longestScrambleOneLine.replaceAll(".", "M");
         if(longestScramble.indexOf("\n") >= 0) {
             // If the scramble contains newlines, then we *only* allow wrapping at the
             // newlines.
             longestScramble = longestScramble.replaceAll(" ", "M");
+            longestScrambleOneLine = null;
         }
+        boolean oneLine = false;
         Font scrambleFont = null;
         try {
             BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
             // Gah, I have no idea where this number is coming from, see
             // https://github.com/cubing/tnoodle/issues/124 for why we had to bump
             // it from 8 to 9.
-            int ARE_THESE_MARGINS = 9;
-            Rectangle availableArea = new Rectangle(availableScrambleWidth, availableScrambleHeight - ARE_THESE_MARGINS);
-            float perfectFontSize = ColumnText.fitText(new Font(courier), longestScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR);
+            int HEIGHT_MARGINS = 9;
+            // Again, I have no idea where this number is coming from. I'm chalking it up to
+            // unaccounted for margins.
+            int WIDTH_MARGINS = 40;
+            Rectangle availableArea = new Rectangle(availableScrambleWidth - WIDTH_MARGINS,
+                    availableScrambleHeight - HEIGHT_MARGINS);
+            float perfectFontSize = fitText(new Font(courier), longestScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, true);
+            if(longestScrambleOneLine != null) {
+                float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, false);
+                oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
+                if(oneLine) {
+                    perfectFontSize = perfectFontSizeForOneLine;
+                }
+            }
             scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
         } catch(IOException e) {
             l.log(Level.INFO, "", e);
@@ -643,7 +725,12 @@ class ScrambleRequest {
             nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             table.addCell(nthscramble);
 
-            String paddedScramble = padTurnsUniformly(scramble, " ");
+            String paddedScramble;
+            if(oneLine) {
+                paddedScramble = scramble;
+            } else {
+                paddedScramble = padTurnsUniformly(scramble, " ");
+            }
             Chunk scrambleChunk = new Chunk(paddedScramble);
             if(paddedScramble.indexOf("\n") >= 0) {
                 // If the scramble contains newlines, then we *only* allow wrapping at the
