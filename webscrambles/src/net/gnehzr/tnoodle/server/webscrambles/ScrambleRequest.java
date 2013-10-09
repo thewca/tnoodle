@@ -583,6 +583,7 @@ class ScrambleRequest {
 
     /**
      * Copied from ColumnText.java in the itextpdf 5.3.0 source code.
+     * Added the newlinesAllowed argument.
 
      * Fits the text to some rectangle adjusting the font size as needed.
      * @param font the font to use
