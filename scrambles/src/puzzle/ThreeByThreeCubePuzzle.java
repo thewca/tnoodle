@@ -3,6 +3,7 @@ package puzzle;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
@@ -16,9 +17,10 @@ import org.timepedia.exporter.client.Export;
 
 @Export
 public class ThreeByThreeCubePuzzle extends CubePuzzle {
+    private static final Logger l = Logger.getLogger(ThreeByThreeCubePuzzle.class.getName());
     private static final int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
     private static final int THREE_BY_THREE_TIMEMIN = 200; //milliseconds
-    private static final int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
+    private static final int THREE_BY_THREE_TIMEOUT = 60*1000; //milliseconds
 
     private ThreadLocal<Search> twoPhaseSearcher = null;
     public ThreeByThreeCubePuzzle() {
@@ -45,14 +47,13 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
             // TODO - apparently min2phase can't solve the solved cube
             return "";
         }
-        long timeOut = 600*1000; // 60 seconds to find a solution
-        String solution = twoPhaseSearcher.get().solution(cs.toFaceCube(), n, timeOut, 0, 0).trim();
+        String solution = twoPhaseSearcher.get().solution(cs.toFaceCube(), n, THREE_BY_THREE_TIMEOUT, 0, 0).trim();
         if("Error 7".equals(solution)) {
             // No solution exists for given depth
             return null;
         } else if(solution.startsWith("Error")) {
             // TODO - Not really sure what to do here.
-            System.out.println(solution + " while searching for solution to " + cs.toFaceCube());
+            l.severe(solution + " while searching for solution to " + cs.toFaceCube());
             azzert(false);
             return null;
         }
