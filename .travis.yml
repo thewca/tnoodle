@@ -4,4 +4,6 @@ before_install:
   - sudo apt-get install -qq python3
 env:
   - TNOODLE_INSTALL_GWT=1
-script: python3 tmt make dist -p wca
+script:
+  - ./tmt lint -a
+  - ./tmt make dist -p wca
