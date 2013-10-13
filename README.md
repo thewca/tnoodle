@@ -1,5 +1,7 @@
 TNoodle is just a collection of cube related projects.
 
+[![Build Status](https://travis-ci.org/cubing/tnoodle.png?branch=master)](https://travis-ci.org/cubing/tnoodle)
+
 tmt (TNoodleMakeTools) is a python script used to develop TNoodle.
 
 * I highly recommend first getting a high level view of all the projects that comprise tnoodle by running `./tmt graph --descriptions`.

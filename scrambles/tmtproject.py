@@ -11,6 +11,7 @@ DESCRIPTION = "A Java scrambling suite. Java applications can use this project a
 GWT_MODULE= 'scrambles'
 
 NO_GWT_ENV_VAR = "TNOODLE_NO_GWT"
+INSTALL_GWT_ENV_VAR = "TNOODLE_INSTALL_GWT"
 
 
 def yesNoPrompt(promptStr):
@@ -75,6 +76,7 @@ class Project(tmt.EclipseProject):
         if skipGwt:
             # We don't want to skip gwt-ing when we're releasing
             assert not tmt.releasing
+            assert not os.environ.get(INSTALL_GWT_ENV_VAR)
             print("%s set, so not compiling with GWT" % NO_GWT_ENV_VAR)
             return
 
@@ -87,7 +89,7 @@ class Project(tmt.EclipseProject):
             print("Could not find GWT at %s" % gwtDir)
             gwtUrl = "https://developers.google.com/web-toolkit/download"
             print("You could visit %s and install GWT yourself (be sure to set up a symlink from %s to wherever you installed gwt." % ( gwtUrl, gwtDir ))
-            if yesNoPrompt("Would you like me to download GWT and extract it to %s for you?" % gwtDir):
+            if os.environ.get(INSTALL_GWT_ENV_VAR) or yesNoPrompt("Would you like me to download GWT and extract it to %s for you?" % gwtDir):
                 gwtZipUrl = "http://google-web-toolkit.googlecode.com/files/gwt-2.5.1.zip"
                 dledZipFile = dl(gwtZipUrl)
                 gwtZip = zipfile.ZipFile(dledZipFile)
