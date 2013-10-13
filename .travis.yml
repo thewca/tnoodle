@@ -2,6 +2,8 @@ language: java
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq python3
+  - sudo apt-get install npm
+  - (cd git-tools; npm install -d)
 env:
   - TNOODLE_INSTALL_GWT=1
 script:
