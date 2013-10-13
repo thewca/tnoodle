@@ -1,6 +1,7 @@
 import tmt
 import sys
 from os.path import join, exists, abspath, dirname, isdir
+import os
 import zipfile
 import base64
 import textwrap
@@ -148,6 +149,8 @@ class Project(tmt.EclipseProject):
         args = []
         args.append('-strict')
         war = join(self.name, 'war')
+        if not isdir(war):
+            os.mkdir(war)
         args += [ '-war', war ]
 
         # "-style PRETTY" makes the gwt code almost readable, but also more
