@@ -110,7 +110,7 @@ def gitFilesList(allFiles=False):
     else:
         # Check the files that git believes have been edited.
         lsFilesCmd = "git diff --cached --name-only"
-    files = os.popen(lsFilesCmd).read().split('\n')
+    files = [ f for f in os.popen(lsFilesCmd).read().split('\n') if f ]
     return files
 
 def lint(files):
