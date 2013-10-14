@@ -1,22 +1,24 @@
+<img src="./winstone/src_tnoodle_resources/icons/tnoodle_logo_1024.png" alt="Tnoodle Logo" height="128px"/>
+
 # TNoodle
 
-[![Build Status](https://travis-ci.org/cubing/tnoodle.png?branch=master)](https://travis-ci.org/cubing/tnoodle)
+TNoodle is a collection of speedcubing-related projects, primarily written in Java. In particular, it contains the official WCA scramble program.
 
-TNoodle is a collection of speedcubing-related projects, primarily written in Java. In particular, it is the official WCA scramble program
+[![Build Status](https://travis-ci.org/cubing/tnoodle.png?branch=master)](https://travis-ci.org/cubing/tnoodle)
 
 
 ## WCA Scramble Program
 
-TNoodle has been the sole official scramble program for the [World Cube Association](https://www.worldcubeassociation.org/) since January 1, 2013. It will remain the only official scramble program for the foreseeable future.
+The official scramble program for the [World Cube Association](https://www.worldcubeassociation.org/) has been part of the TNoodle project since January 1, 2013. It will contain the sole official scramble program for the foreseeable future.
 
 All WCA official competitions must always use the current version of the official scramble program. This is available from <https://www.worldcubeassociation.org/regulations/scrambles/>
 
-Note that only the scramble program part of TNoodle is "official". TNoodle Timer is part of TNoodle, but it is not an official timer and is not considered to generate official scrambles. Other embedded projects may be convenient for certain uses (including at official competitions), but also do not have any official status.
+Note that only the scramble program part of TNoodle is "official". Other TNoodle projects may be convenient for certain uses (including at official competitions), but do not have any official status.
 
 
 ### "Scramble Program" vs. "Scrambler"
 
-Officially, TNoodle is a [scramble program](https://www.worldcubeassociation.org/regulations/#4f), while a [scrambler](https://www.worldcubeassociation.org/regulations/#A2b) is a human. It is fine to refer to TNoodle as a "scrambler" colloquially, but please try to use the official convention wherever possible.
+Officially, `Tnoodle-WCA` is a [scramble program](https://www.worldcubeassociation.org/regulations/#4f), while a [scrambler](https://www.worldcubeassociation.org/regulations/#A2b) is a human. It is fine to refer to TNoodle as a "scrambler" colloquially, but please try to use the official convention wherever possible.
 
 
 ## Project Details
@@ -26,14 +28,14 @@ Officially, TNoodle is a [scramble program](https://www.worldcubeassociation.org
 
 ### Overview
 
-Get a high level view of all the projects that comprise tnoodle by running
+Get a high level view of all the projects that comprise tnoodle by running:
 
     ./tmt graph --descriptions
 
 
 ### WCA Scramble Program
 
-When you're ready to develop, run the following and then visit <http://localhost:8080>
+When you're ready to develop, run the following and then visit <http://localhost:8080/scramble/>
 
     ./tmt make run -p wca
 
@@ -41,18 +43,31 @@ To build a distributable/executable `.jar` file, run:
 
     ./tmt make dist -p wca
 
-You can run the `.jar` from the commandline using `java -jar timer/dist/TNoodle.jar`.
+You can run the `.jar` from the commandline using:
 
-*Note that you must never use a custom build for any official competitions.*
+    java -jar timer/dist/TNoodle-WCA.jar
 
-[Contact the WCA Board and the WRC](https://www.worldcubeassociation.org/contact) if you have any questions about this.
+*Important note: You must never use a custom build for any official competitions.* [Contact the WCA Board and the WRC](https://www.worldcubeassociation.org/contact) if you have any questions about this.
 
 
-### TNoodle Timer (TNT)
+### TNoodle Timer (TNT) and Other Projects
 
-TNoodle Timer is currently built as part of the `wca` distribution. Run `./tmt graph --descriptions` to check the current relationship between the `wca` and `timer` distributions.
+TNoodle contains other distributions, like TNoodle Timer (TNT) as `timer`.
 
-When TNoodle is running, TNT will be available at <http://localhost:8080/tnt>
+You can build the `timer` distribution similarly to `wca`:
+
+    # Build and run directly.
+    ./tmt make run -p timer
+
+    # Build to .jar file.
+    ./tmt make dist -p timer
+
+    # Run .jar file from commandline
+    java -jar timer/dist/TNoodleTimer.jar
+
+When TNoodle is running, TNT will be available at <http://localhost:8080/tnt>.
+
+Other projects can be run similarly, too. Run `./tmt graph --descriptions` to see the current list.
 
 ### Notes
 
