@@ -63,7 +63,7 @@ You can build the `timer` distribution similarly to `wca`:
     ./tmt make dist -p timer
 
     # Run .jar file from commandline
-    java -jar timer/dist/TNoodleTimer.jar
+    java -jar timer/dist/TNoodle-timer.jar
 
 When TNoodle is running, TNT will be available at <http://localhost:8080/tnt>.
 

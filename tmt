@@ -636,8 +636,32 @@ class tmt:
 tmt = tmt() # We only want one instance of Tmt
 sys.modules['tmt'] = tmt
 
+import collections
+
+class CaseInsensitiveDict(collections.Mapping):
+    def __init__(self, d=None):
+        if d is None:
+            d = {}
+        self._d = d
+        self._s = dict((k.lower(), k) for k in d)
+    def __contains__(self, k):
+        return k.lower() in self._s
+    def __len__(self):
+        return len(self._s)
+    def __iter__(self):
+        return iter(self._s)
+    def __getitem__(self, k):
+        lowerK = None if k is None else k.lower()
+        return self._d[self._s[lowerK]]
+    def __setitem__(self, k, v):
+        lowerK = None if k is None else k.lower()
+        self._d[k] = v
+        self._s[lowerK] = k
+    def actual_key_case(self, k):
+        return self._s.get(k.lower())
+
 class TmtProject(object):
-    projects = {}
+    projects = CaseInsensitiveDict()
     def __init__(self, name, description):
         self.name = name
         self.description = description
@@ -847,7 +871,7 @@ class EclipseProject(TmtProject):
         self.src = join(self.name, 'src')
         self.srcResource = join(self.name, RESOURCE_FOLDER_SRC)
         self.binResource = join(self.name, RESOURCE_FOLDER_BIN)
-        self.fullName = 'TNoodle%s' % ( self.name[0].upper() + self.name[1:] )
+        self.fullName = 'TNoodle-%s' % ( self.name )
 
         webContent = join(self.name, "WebContent")
         if isdir(webContent):
