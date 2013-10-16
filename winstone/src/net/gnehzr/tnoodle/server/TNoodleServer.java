@@ -20,19 +20,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.BindException;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,59 +118,33 @@ public class TNoodleServer {
 
         System.out.println(NAME + "-" + VERSION + " started");
 
-        ArrayList<String> urls = openTabInBrowser(browse);
-        for(String url : urls) {
-            System.out.println("Visit " + url + " for a readme and demo.");
-        }
+        String url = openTabInBrowser(browse);
+        System.out.println("Visit " + url + " for a readme and demo.");
     }
 
-    public ArrayList<String> openTabInBrowser(boolean browse) throws IOException {
-        ArrayList<String> hostnames = new ArrayList<String>();
-        try {
-            hostnames.add(InetAddress.getLocalHost().getHostAddress());
-        } catch(UnknownHostException e) {
-            for(Enumeration<NetworkInterface> intfs = NetworkInterface.getNetworkInterfaces(); intfs.hasMoreElements();) {
-                NetworkInterface intf = intfs.nextElement();
-                for(InterfaceAddress addr : intf.getInterfaceAddresses()) {
-                    hostnames.add(addr.getAddress().getHostAddress());
-                }
-            }
-        }
-        ArrayList<String> urls = new ArrayList<String>();
-        for(String hostname : hostnames) {
-            String url = "http://" + hostname + ":" + this.httpPort;
-            urls.add(url);
-        }
-
-        if(hostnames.isEmpty()) {
-            l.warning("Couldn't find any hostnames for this machine.");
-        } else if(hostnames.size() > 1) {
-            if(browse) {
-                browse = false;
-                l.warning("Could not decide which of these urls to browse to: " + hostnames);
-            }
-        } else {
-            if(browse) {
-                if(Desktop.isDesktopSupported()) {
-                    Desktop d = Desktop.getDesktop();
-                    if(d.isSupported(Desktop.Action.BROWSE)) {
-                        String url = urls.get(0);
-                        try {
-                            URI uri = new URI(url);
-                            l.info("Attempting to open " + uri + " in browser.");
-                            d.browse(uri);
-                        } catch(URISyntaxException e) {
-                            l.log(Level.WARNING, "Could not convert " + url + " to URI", e);
-                        }
-                    } else {
-                        l.warning("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.");
+    public String openTabInBrowser(boolean browse) {
+        String url = "http://localhost" + ":" + this.httpPort;
+        if(browse) {
+            if(Desktop.isDesktopSupported()) {
+                Desktop d = Desktop.getDesktop();
+                if(d.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        URI uri = new URI(url);
+                        l.info("Attempting to open " + uri + " in browser.");
+                        d.browse(uri);
+                    } catch(URISyntaxException e) {
+                        l.log(Level.WARNING, "Could not convert " + url + " to URI", e);
+                    } catch(IOException e) {
+                        l.log(Level.WARNING, "Error opening tab in browser", e);
                     }
                 } else {
-                    l.warning("Sorry, it appears the Desktop api is not supported on your platform.");
+                    l.warning("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.");
                 }
+            } else {
+                l.warning("Sorry, it appears the Desktop api is not supported on your platform.");
             }
         }
-        return urls;
+        return url;
     }
 
     private ServerSocket aggressivelyBindSocket(int port, boolean bindAggressively) throws IOException {
@@ -287,11 +255,7 @@ public class TNoodleServer {
             openItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if(tnoodleServer != null) {
-                        try {
-                            tnoodleServer.openTabInBrowser(true);
-                        } catch(IOException error) {
-                            l.log(Level.WARNING, "Error opening tab in browser", error);
-                        }
+                        tnoodleServer.openTabInBrowser(true);
                     }
                 }
             });
