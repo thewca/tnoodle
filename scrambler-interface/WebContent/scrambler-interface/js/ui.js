@@ -359,7 +359,8 @@ var mark2 = {};
             "777":    {name: "7x7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             "444bf":  {name: "4x4x4 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             "555bf":  {name: "5x5x5 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "333mbf": {name: "3x3x3: Multiple Blindfolded", default_round: {type: "mbf",  num_scrambles: 28 } }
+            "333mbf": {name: "3x3x3: Multiple Blindfolded", default_round: {type: "mbf",  num_scrambles: 28 } },
+            "skewb":  {name: "Skewb", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } }
         };
 
         // Javascript objects don't retain key order in all browsers, so we create this list for iteration.
@@ -380,7 +381,8 @@ var mark2 = {};
             "clock",
             "444bf",
             "555bf",
-            "333mbf"
+            "333mbf",
+            "skewb"
         ];
 
         function isFmc(eventID) {

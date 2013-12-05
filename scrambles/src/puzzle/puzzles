@@ -25,3 +25,6 @@ minx puzzle.MegaminxPuzzle()
 
 #Clock
 clock puzzle.ClockPuzzle()
+
+#Skewb
+skewb puzzle.SkewbPuzzle()

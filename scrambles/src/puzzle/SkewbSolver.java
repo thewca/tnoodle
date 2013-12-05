@@ -218,7 +218,7 @@ public class SkewbSolver {
         state.perm = r.nextInt(4320);
         do {
             state.twst = r.nextInt(2187);
-        } while (state.isSolvable());
+        } while (!state.isSolvable());
         return state;
     }
 
@@ -231,12 +231,29 @@ public class SkewbSolver {
         }
     }
 
+    public String generateExactly(SkewbSolverState state, int length) {
+		search(0, state.perm, state.twst, length, -1);
+        return getSolution();
+    }
+
     int solution_length = -1;
 
     private String getSolution() {
         StringBuffer sb = new StringBuffer();
+    	String[] move2str = { "L", "R", "B", "U" };//RLDB by x2
         for (int i = 0; i < solution_length; i++) {
-            sb.append(move2str[sol[i]]);
+			int axis = sol[i] >> 1;
+			int pow = sol[i] & 1;
+			if (axis == 2) {//B which is F before convertion
+				for (int p=0; i<=pow; i++) {
+					String temp = move2str[0];
+					move2str[0] = move2str[2];
+					move2str[2] = move2str[1];
+					move2str[1] = temp;
+				}
+			}
+            sb.append(move2str[axis] + ((pow == 1) ? "'" : ""));
+			sb.append(" ");
         }
         String scrambleSequence = sb.toString().trim();
         return scrambleSequence;
