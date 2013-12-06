@@ -968,7 +968,6 @@ class EclipseProject(TmtProject):
                 args += [ '-Xlint' ]
 
                 # Treat warnings as errors
-                args += [ '-Werror' ]
 
                 for ignoredWarning in self.ignoredWarnings:
                     args += [ '-Xlint:-%s' % ignoredWarning ]

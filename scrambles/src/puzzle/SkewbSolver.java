@@ -14,7 +14,7 @@ public class SkewbSolver {
     private static final String[] move2str = { "R ", "R' ", "L ", "L' ", "D ",
         "D' ", "B ", "B' " };
 
-    private int[] sol = new int[12];
+    private static final int MAX_SOLUTION_LENGTH = 12;
 
     public SkewbSolver() {}
 
@@ -179,7 +179,7 @@ public class SkewbSolver {
         }
     }
 
-    protected boolean search(int depth, int perm, int twst, int maxl, int lm) {
+    protected boolean search(int depth, int perm, int twst, int maxl, int lm, int[] sol) {
         if (maxl == 0) {
             solution_length = depth;
             return (perm == 0 && twst == 0);
@@ -195,7 +195,7 @@ public class SkewbSolver {
                 for (int a = 0; a < 2; a++) {
                     p = permmv[p][m];
                     s = twstmv[s][m];
-                    if (search(depth + 1, p, s, maxl - 1, m)) {
+                    if (search(depth + 1, p, s, maxl - 1, m, sol)) {
                         sol[depth] = m * 2 + a;
                         return true;
                     }
@@ -223,37 +223,47 @@ public class SkewbSolver {
     }
 
     public String solveIn(SkewbSolverState state, int length) {
-        search(0, state.perm, state.twst, length, -1);
+        int[] sol = new int[MAX_SOLUTION_LENGTH];
+        search(0, state.perm, state.twst, length, -1, sol);
         if (solution_length != -1) {
-            return getSolution();
+            return getSolution(sol);
         } else {
             return null;
         }
     }
 
     public String generateExactly(SkewbSolverState state, int length) {
-		search(0, state.perm, state.twst, length, -1);
-        return getSolution();
+        int[] sol = new int[MAX_SOLUTION_LENGTH];
+        search(0, state.perm, state.twst, length, -1, sol);
+        return getSolution(sol);
     }
 
     int solution_length = -1;
 
-    private String getSolution() {
+    /**
+     * The solver is written in jaap's notation. Now we're going to convert the result to FCN(fixed corner notation):
+     * Step one, the puzzle is rotated by z2, which will bring "R L D B" (in jaap's notation) to "L R F U" (in FCN, F has not
+     *     been defined, now we define it as the opposite corner of B)
+     * Step two, convert F to B by rotation [F' B]. When an F found in the move sequence, it is replaced immediately by B and other 3 moves
+     *     should be swapped. For example, if the next move is R, we should turn U instead. Because the R corner is at U after rotation.
+     *     In another word, "F R" is converted to "B U". The correctness can be easily verified and the procedure is recursable.
+     */
+    private String getSolution(int[] sol) {
         StringBuffer sb = new StringBuffer();
-    	String[] move2str = { "L", "R", "B", "U" };//RLDB by x2
+        String[] move2str = { "L", "R", "B", "U" };//RLDB (in jaap's notation) rotated by z2
         for (int i = 0; i < solution_length; i++) {
-			int axis = sol[i] >> 1;
-			int pow = sol[i] & 1;
-			if (axis == 2) {//B which is F before convertion
-				for (int p=0; i<=pow; i++) {
-					String temp = move2str[0];
-					move2str[0] = move2str[2];
-					move2str[2] = move2str[1];
-					move2str[1] = temp;
-				}
-			}
+            int axis = sol[i] >> 1;
+            int pow = sol[i] & 1;
+            if (axis == 2) {//step two.
+                for (int p=0; p<=pow; p++) {
+                    String temp = move2str[0];
+                    move2str[0] = move2str[1];
+                    move2str[1] = move2str[3];
+                    move2str[3] = temp;
+                }
+            }
             sb.append(move2str[axis] + ((pow == 1) ? "'" : ""));
-			sb.append(" ");
+            sb.append(" ");
         }
         String scrambleSequence = sb.toString().trim();
         return scrambleSequence;
