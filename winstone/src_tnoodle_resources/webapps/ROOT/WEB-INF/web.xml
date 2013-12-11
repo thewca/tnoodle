@@ -71,4 +71,14 @@
         <servlet-name>JsEnvServlet</servlet-name>
         <url-pattern>/env.json</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VersionServlet</servlet-name>
+        <servlet-class>net.gnehzr.tnoodle.server.VersionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VersionServlet</servlet-name>
+        <url-pattern>/version.json</url-pattern>
+    </servlet-mapping>
+
 </web-app>

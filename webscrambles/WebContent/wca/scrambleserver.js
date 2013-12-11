@@ -12,9 +12,10 @@ function xAddListener(obj, event, func, useCapture) {
 tnoodle.FAKE_SCRAMBLE_DELAY = 0;
 
 tnoodle.Scrambler = function(hostname, port, protocol) {
-    function assert(expr) {
+    function assert(expr, msg) {
+        msg = msg || "";
         if(!expr) {
-            throw "";
+            throw msg;
         }
     }
     var that = this;
@@ -37,6 +38,11 @@ tnoodle.Scrambler = function(hostname, port, protocol) {
     this.scrambleUrl = this.serverUrl + "/scramble/";
     this.viewUrl = this.serverUrl + "/view/";
     this.importUrl = this.serverUrl + "/import/";
+    this.versionUrl = this.serverUrl + "/version.json";
+
+    this.checkVersion = function(callback) {
+        return tnoodle.retryAjax(callback, this.versionUrl);
+    };
 
     //TODO - document!
     this.createAreas = function(faces, scale) {
