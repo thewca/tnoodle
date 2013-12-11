@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
 public class VersionServlet extends SafeHttpServlet {
-    private static final String BASE_URL = "https://www.worldcubeassociation.org/regulations/scrambles/official.json";
-    private static final String API_VERSION = "0.0.0-beta";
+    private static final String API_VERSION = "0";
+    private static final String BASE_URL = "https://www.worldcubeassociation.org/api/v" + API_VERSION + "/scramble-program";
 
     @Override
     protected void wrappedService(HttpServletRequest request,
@@ -28,8 +28,7 @@ public class VersionServlet extends SafeHttpServlet {
             LinkedHashMap<String, String> query) throws Exception {
         BufferedReader reader = null;
         try {
-            String urlString = BASE_URL + "?api_version=" + API_VERSION;
-            URL url = new URL(urlString);
+            URL url = new URL(BASE_URL);
             reader = new BufferedReader(new InputStreamReader(url.openStream()));
             HashMap<String, Object> json = GSON.fromJson(reader, HashMap.class);
             String runningVersionKey = "running_version";
