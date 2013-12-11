@@ -125,7 +125,7 @@ public class FullCube implements Comparable<FullCube> {
         return (byte) (ret & 0x0f);
     }
 
-    private void setPiece(int idx, int value) {
+    public void setPiece(int idx, int value) {
         if (idx < 6) {
             ul &= ~(0xf << ((5-idx) << 2));
             ul |= value << ((5-idx) << 2);
@@ -135,9 +135,11 @@ public class FullCube implements Comparable<FullCube> {
         } else if (idx < 18) {
             dl &= ~(0xf << ((17-idx) << 2));
             dl |= value << ((17-idx) << 2);
-        } else {
+        } else if (idx < 24) {
             dr &= ~(0xf << ((23-idx) << 2));
             dr |= value << ((23-idx) << 2);
+        } else {
+            ml = value;
         }
     }
 
