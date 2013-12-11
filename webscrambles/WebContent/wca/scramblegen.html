@@ -4,13 +4,26 @@
 <title>WCA Scrambler</title>
 
 <script type="text/javascript">
-    function assert(expr) {
+    function assert(expr, msg) {
+        msg = msg || "";
         if(!expr) {
-            throw "";
+            throw msg;
         }
     }
+    function log(msg) {
+        var c = null;
+        if((c=window.console) && c.log) {
+            c.log(msg);
+        }
+    }
+    // stolen from http://stackoverflow.com/a/901144
+    function getQueryParameter(name, alt) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? alt : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
 </script>
-<script type="text/javascript" src="/env.js"></script>
 <script type="text/javascript" src="/scrambler-interface/js/ui.js"></script>
 <script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
 <script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
@@ -19,7 +32,7 @@
 <script type="text/javascript" src="/wca/scrambleserver.js"></script>
 <style type="text/css">
 
-#ajaxStatus {
+#status {
     border-bottom: 1px solid black;
     border-left: 1px solid black;
     border-right: 1px solid black;
@@ -32,10 +45,13 @@
     left: 5%;
     right: 5%;
     text-align: center;
-    height: 20%;
+    max-height: 20%;
     overflow: auto;
 }
 #ajaxStatus .error {
+    padding: 5px;
+}
+#otherStatus .msg {
     padding: 5px;
 }
 
@@ -68,6 +84,8 @@
 
 <script type="text/javascript">
 (function() {
+    var CHECK_VERSION_PERIOD = 30*1000;
+
     // To deal with puzzles that take a really long time to scramble, we specify
     // a custom "max # of scrambles" to request all at once.
     // This means a round of 5 scrambles that take 10 seconds to generate will
@@ -77,29 +95,142 @@
 
     var scrambleServer = new tnoodle.Scrambler();
 
+    function checkVersion() {
+        scrambleServer.checkVersion(function(versionJson) {
+            setTimeout(checkVersion, CHECK_VERSION_PERIOD);
+            // For testing purposes, we let people fake the version of
+            // TNoodle they're using.
+            var runningVersion = getQueryParameter("forceVersion", null);
+            if(runningVersion === null) {
+                runningVersion = versionJson.running_version;
+            }
+            
+
+            if(versionJson.ignorableError) {
+                // There was an error connecting to the server or something.
+                // Don't bother the user with this (it probably just means
+                // they're offline), but we do log a message here.
+                log("Ignorable error in checkVersion: " + versionJson.ignorableError);
+                return;
+            }
+            var isAllowed = versionJson.allowed.indexOf(runningVersion) >= 0;
+            var isCurrent = runningVersion == versionJson.current.name;
+            var downloadCurrentStr = "<a href='" + versionJson.current.download + "'>" + versionJson.current.name + "</a> (<a href='" + versionJson.current.information + "' target='_blank'>details</a>)";
+            if(isAllowed && isCurrent) {
+                // There is nothing to do here
+                return;
+            } else if(isAllowed && !isCurrent) {
+                // There is an upgrade available, inform the user
+                addStateMessage("You are running " + runningVersion + ", which is still allowed, but you should upgrade to " + downloadCurrentStr);
+            } else if(!isAllowed && isCurrent) {
+                // This should never happen. We're using the current version,
+                // but the current version isn't allowed?
+                assert(false, "Current version " + versionJson.current.name + " not allowed " + versionJson.allowed + " ???");
+            } else if(!isAllowed && !isCurrent) {
+                // The user must upgrade in order to generate legal scrambles.
+                // Don't disable the UI, but make it very obvious that they're
+                // using an unallowed version of TNoodle.
+                addStateMessage("This version of TNoodle (" + runningVersion + ") may not be used to generate scrambles for a WCA competition. Upgrade to " + downloadCurrentStr);
+                createWatermarkDiv("Scrambles generated with this version of TNoodle may not be used in competition");
+            } else {
+                assert(false);
+            }
+        });
+    }
+    checkVersion();
+
     var watermarkDiv = null;
-    if(TNOODLE_ENV.WATERMARK) {
-        watermarkDiv = document.createElement('div');
-        watermarkDiv.classList.add("watermarkDiv");
-        var watermarkP = document.createElement('p');
+    var watermarkP = null;
+    function redrawWatermark() {
+        var watermarkLength = Math.sqrt(window.innerHeight*window.innerHeight + window.innerWidth*window.innerWidth);
+        watermarkLength += 100; // the extra 100 pixels are to prevent words from wrapping so we can get a nice sharp cutoff
+        watermarkP.style.width = watermarkLength + 'px';
+        watermarkP.style.height = watermarkLength + 'px';
+        watermarkP.style.top = (window.innerHeight - watermarkLength)/2 + 'px';
+        watermarkP.style.left = (window.innerWidth - watermarkLength)/2 + 'px';
+        watermarkP.empty();
+        for(var i = 0; i < 1000; i++) { // NASA style loops, yo
+            // if there are no spaces, the watermark will never wrap
+            var el = document.createTextNode(" " + watermarkP.dataset.watermark);
+            watermarkP.appendChild(el);
+            if(watermarkP.scrollHeight > watermarkP.clientHeight) {
+                // We've filled up the div, we can stop now
+                break;
+            }
+        }
+    }
+    function createWatermarkDiv(watermark) {
+        if(!watermarkDiv) {
+            watermarkDiv = document.createElement('div');
+            watermarkDiv.classList.add("watermarkDiv");
+            document.body.appendChild(watermarkDiv);
+            window.addEventListener('resize', function(e) {
+                redrawWatermark();
+            });
+        }
+
+        watermarkP = document.createElement('p');
+        watermarkP.dataset.watermark = watermark;
+        watermarkP.empty();
         watermarkP.classList.add("watermarkP");
         watermarkDiv.appendChild(watermarkP);
+
+        redrawWatermark();
+    }
+
+    var stateDiv = document.createElement('div');
+    stateDiv.id = 'status';
+
+    var otherStateDiv = document.createElement('div');
+    stateDiv.appendChild(otherStateDiv);
+    otherStateDiv.id = 'otherStatus';
+    var stateMessageDivByMessage = {};
+    function addStateMessage(message) {
+        if(stateMessageDivByMessage.hasOwnProperty(message)) {
+            return;
+        }
+
+        var msg = document.createElement('div');
+        msg.classList.add('msg');
+        otherStateDiv.appendChild(msg);
+        stateMessageDivByMessage[message] = msg;
+
+        msg.msgSpan = document.createElement('div');
+        msg.appendChild(msg.msgSpan);
+        msg.msgSpan.classList.add('lastError');
+
+        msg.msgSpan.innerHTML = message;
+
+        maybeDisplayStateDiv();
+    }
+    function removeStateMessage(message) {
+        if(stateMessageDivByMessage.hasOwnProperty(message)) {
+            otherStateDiv.removeChild(stateMessageDivByMessage[message]);
+            delete stateMessageDivByMessage[message];
+        }
+        maybeDisplayStateDiv();
+    }
+
+    function maybeDisplayStateDiv() {
+        if(Object.keys(errorDivByAjaxId).length + Object.keys(stateMessageDivByMessage).length > 0) {
+            stateDiv.style.display = "";
+        } else {
+            stateDiv.style.display = "none";
+        }
     }
 
     var ajaxStateDiv = document.createElement('div');
+    stateDiv.appendChild(ajaxStateDiv);
     ajaxStateDiv.id = 'ajaxStatus';
-
     var errorDivByAjaxId = {};
+    maybeDisplayStateDiv();
     tnoodle.ajaxStateListeners.push(function(ajaxState) {
-        var showErrors = false;
-
         var seenIds = {};
         for(var ajaxId in ajaxState) {
             if(ajaxState.hasOwnProperty(ajaxId)) {
                 var state = ajaxState[ajaxId];
                 if(state.lastError) {
                     seenIds[ajaxId] = true;
-                    showErrors = true;
                     var error = errorDivByAjaxId[ajaxId];
                     if(!error) {
                         error = document.createElement('div');
@@ -146,11 +277,7 @@
                 }
             }
         }
-        if(showErrors) {
-            ajaxStateDiv.style.display = "";
-        } else {
-            ajaxStateDiv.style.display = "none";
-        }
+        maybeDisplayStateDiv();
     });
 
     function toScrambleRequest(sheets) {
@@ -316,36 +443,10 @@
         tnoodleLinkSpan.appendChild(document.createTextNode(" WCA Scrambler"));
         var div = mark2.ui.initialize(tnoodleLinkSpan, callbacks);
         removeTempDiv();
-        document.body.appendChild(ajaxStateDiv);
+        document.body.appendChild(stateDiv);
         document.body.appendChild(div);
         mark2.ui.addHelpLink("/readme/scramble");
         document.getElementById("logo_top").src="/wca/tnoodle_logo.svg";
-
-        function redrawWatermark() {
-            var watermarkLength = Math.sqrt(window.innerHeight*window.innerHeight + window.innerWidth*window.innerWidth);
-            watermarkLength += 100; // the extra 100 pixels are to prevent words from wrapping so we can get a nice sharp cutoff
-            watermarkP.style.width = watermarkLength + 'px';
-            watermarkP.style.height = watermarkLength + 'px';
-            watermarkP.style.top = (window.innerHeight - watermarkLength)/2 + 'px';
-            watermarkP.style.left = (window.innerWidth - watermarkLength)/2 + 'px';
-            watermarkP.empty();
-            for(var i = 0; i < 1000; i++) { // NASA style loops, yo
-                // if there are no spaces, the watermark will never wrap
-                var el = document.createTextNode(" " + TNOODLE_ENV.WATERMARK);
-                watermarkP.appendChild(el);
-                if(watermarkP.scrollHeight > watermarkP.clientHeight) {
-                    // We've filled up the div, we can stop now
-                    break;
-                }
-            }
-        }
-        if(watermarkDiv) {
-            document.body.appendChild(watermarkDiv);
-            window.addEventListener('resize', function(e) {
-                redrawWatermark();
-            });
-            redrawWatermark();
-        }
     }, false);
 
 })();
