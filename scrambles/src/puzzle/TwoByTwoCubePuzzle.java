@@ -19,7 +19,7 @@ public class TwoByTwoCubePuzzle extends CubePuzzle {
     private TwoByTwoSolver twoSolver = null;
     public TwoByTwoCubePuzzle() {
         super(2);
-        wcaMinScrambleDistance = 5;
+        wcaMinScrambleDistance = 4;
         twoSolver = new TwoByTwoSolver();
     }
 
