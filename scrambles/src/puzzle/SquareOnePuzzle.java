@@ -20,6 +20,7 @@ import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
+import net.gnehzr.tnoodle.utils.EnvGetter;
 import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 import cs.sq12phase.FullCube;
 import cs.sq12phase.Search;
@@ -30,7 +31,12 @@ public class SquareOnePuzzle extends Puzzle {
 
     private static final int radius = 32;
 
-    public SquareOnePuzzle() {}
+    public SquareOnePuzzle() {
+        String newMinDistance = EnvGetter.getenv("TNOODLE_SQ1_MIN_DISTANCE");
+        if(newMinDistance != null) {
+            wcaMinScrambleDistance = Integer.parseInt(newMinDistance);
+        }
+    }
 
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
