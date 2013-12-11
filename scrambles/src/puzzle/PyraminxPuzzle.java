@@ -35,7 +35,7 @@ public class PyraminxPuzzle extends Puzzle {
 
     public PyraminxPuzzle() {
         pyraminxSolver = new PyraminxSolver();
-        wcaMinScrambleDistance = 8;
+        wcaMinScrambleDistance = 7;
     }
 
     @Override
