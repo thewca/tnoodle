@@ -30,7 +30,7 @@ public class FullCube implements Comparable<FullCube> {
         //TODO
     }
 
-    FullCube() {
+    public FullCube() {
 
     }
 
@@ -146,7 +146,6 @@ public class FullCube implements Comparable<FullCube> {
     int[] arr = new int[16];
 
     int getParity() {
-//      int[] arr = new int[16];
         int cnt = 0;
         arr[0] = pieceAt(0);
         for (int i=1; i<24; i++) {
@@ -195,8 +194,6 @@ public class FullCube implements Comparable<FullCube> {
     byte[] prm = new byte[8];
 
     void getSquare(Square sq) {
-        //TODO
-//      byte[] prm = new byte[8];
         for (int a=0;a<8;a++) {
             prm[a] = (byte) (pieceAt(a*3+1)>>1);
         }
@@ -214,14 +211,10 @@ public class FullCube implements Comparable<FullCube> {
         sq.botEdgeFirst = pieceAt(12)==pieceAt(13);
         a = sq.botEdgeFirst ? 14 : 12;
 
-//      if(pieceAt(12)==pieceAt(13)){ a=14; sq.botEdgeFirst=false; }
-//      else{ a=12; sq.botEdgeFirst=true;  }
         for( ; b<8; a+=3, b++) {
             prm[b]=(byte)(pieceAt(a)>>1);
         }
         sq.edgeperm=Square.get8Perm(prm);
-
-
         sq.ml = ml;
     }
 }

@@ -250,12 +250,10 @@ public class SquareOnePuzzle extends Puzzle {
 
     @Override
     protected String solveIn(PuzzleState ps, int n) {
-        System.out.println(n);
         FullCube f = ((SquareOneState)ps).toFullCube();
         Search s = new Search();
         String scramble = s.solutionOpt(f, n);
-        System.out.println(scramble);
-        return scramble == null ? scramble : scramble.trim();
+        return scramble == null ? null : scramble.trim();
     }
 
     private class SquareOneState extends PuzzleState {
