@@ -28,8 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Random;
 
-import sun.reflect.Reflection;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -224,12 +222,20 @@ public final class Utils {
     }
 
     private static Class<?> getCallerClass() {
-        Class<?> callerClass = Utils.class;
-        int i = 2;
-        while(Utils.class.getPackage().equals(callerClass.getPackage())) {
-            callerClass = Reflection.getCallerClass(i++);
+        Class<?> callerClass = null;
+        StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
+        for (int i = 2; i < stElements.length; i++) {
+            StackTraceElement ste = stElements[i];
+            try {
+                callerClass = Class.forName(ste.getClassName());
+            } catch(ClassNotFoundException e) {
+                azzert(false, e);
+            }
+            if(!Utils.class.getPackage().equals(callerClass.getPackage())) {
+                return callerClass;
+            }
         }
-        return callerClass;
+        return null;
     }
 
     private static File getJarFileOrDirectory() {

@@ -18,9 +18,13 @@ import pdb
 
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
-    if tb:
-        traceback.print_exception(etype, value, tb)
-    pdb.post_mortem(tb)
+    if not sys.stderr.isatty() or not sys.stdin.isatty():
+        # stdin or stderr is redirected, so don't enter pdb
+        sys.__excepthook__(etype, value, tb)
+    else:
+        if tb:
+            traceback.print_exception(etype, value, tb)
+        pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
 def checkShellCmd(*args, **kwargs):
@@ -669,6 +673,8 @@ class TmtProject(object):
         TmtProject.projects[name] = self
     def __str__(self, timestamps=False):
         return self.name
+    def __repr__(self):
+        return "<%s name=%s>" % ( type(self), self.name )
     # The configure method of each project gets called in dependency order.
     # That is, if a project B uses a project A,
     # A.configure() will be called before B.configure().
@@ -977,8 +983,10 @@ class EclipseProject(TmtProject):
                 # For now, I want to just manually edit those jars, but if we
                 # ever change our mind, we could add -Xlint:-path to the ignored warnings.
 
-                # Yes, I know I'm using the reflecation api, and no, there isn't another choice
+                # Yes, I know I'm using the reflecation api, and no, there is
                 args += [ '-XDignore.symbol.file' ]
+
+
 
             entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
 
@@ -1154,8 +1162,6 @@ Implementation-Version: %s
         if exists(self.bin):
             assert isdir(self.bin)
             rmtree(self.bin)
-            if self.webContent:
-                rmtree(dirname(self.bin))
         if exists(self.binResource):
             assert isdir(self.binResource)
             rmtree(self.binResource)

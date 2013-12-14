@@ -389,7 +389,7 @@ public class ScrambleTest {
 
     private static void benchmarking() throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, IOException {
 
-        // Analyse the 3x3x3 solver.
+        // Analyze the 3x3x3 solver.
         int THREE_BY_THREE_SCRAMBLE_COUNT = 100;
         int THREE_BY_THREE_MAX_SCRAMBLE_LENGTH = 21;
         int THREE_BY_THREE_TIMEMIN = 0; //milliseconds
