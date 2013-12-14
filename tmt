@@ -18,9 +18,13 @@ import pdb
 
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
-    if tb:
-        traceback.print_exception(etype, value, tb)
-    pdb.post_mortem(tb)
+    if not sys.stderr.isatty() or not sys.stdin.isatty():
+        # stdin or stderr is redirected, so don't enter pdb
+        sys.__excepthook__(etype, value, tb)
+    else:
+        if tb:
+            traceback.print_exception(etype, value, tb)
+        pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
 def checkShellCmd(*args, **kwargs):
