@@ -669,6 +669,8 @@ class TmtProject(object):
         TmtProject.projects[name] = self
     def __str__(self, timestamps=False):
         return self.name
+    def __repr__(self):
+        return "<%s name=%s>" % ( type(self), self.name )
     # The configure method of each project gets called in dependency order.
     # That is, if a project B uses a project A,
     # A.configure() will be called before B.configure().
@@ -1154,8 +1156,6 @@ Implementation-Version: %s
         if exists(self.bin):
             assert isdir(self.bin)
             rmtree(self.bin)
-            if self.webContent:
-                rmtree(dirname(self.bin))
         if exists(self.binResource):
             assert isdir(self.binResource)
             rmtree(self.binResource)
