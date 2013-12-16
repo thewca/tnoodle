@@ -13,7 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -52,21 +51,6 @@ public final class Utils {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bytes));
         return bytes.toString();
-    }
-
-    public static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
-        final byte[] buffer = new byte[0x10000];
-        try {
-            for(;;) {
-                int read = is.read(buffer);
-                if(read < 0) {
-                    break;
-                }
-                bytes.write(buffer, 0, read);
-            }
-        } finally {
-            is.close();
-        }
     }
 
     public static void copyFile(File sourceFile, File destFile) throws IOException {

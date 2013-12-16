@@ -17,7 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.sql.DataSource;
 
-import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 @SuppressWarnings("serial")
 public class InitializeCubecompsDbServlet extends HttpServlet {
@@ -38,7 +38,7 @@ public class InitializeCubecompsDbServlet extends HttpServlet {
         String dataStructurePath = getServletContext().getRealPath("cubecomps/DATA-STRUCTURE.md");
         FileInputStream dataStructureInputStream = new FileInputStream(dataStructurePath);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Utils.fullyReadInputStream(dataStructureInputStream, baos);
+        GwtSafeUtils.fullyReadInputStream(dataStructureInputStream, baos);
         schema = new StringBuilder(baos.toString());
 
         final String SCHEMA_START = "<pre><code>";

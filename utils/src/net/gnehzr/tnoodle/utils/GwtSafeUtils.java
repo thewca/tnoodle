@@ -4,6 +4,9 @@ import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -256,5 +259,19 @@ public final class GwtSafeUtils {
         return areasArray;
     }
 
+    public static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
+        final byte[] buffer = new byte[0x10000];
+        try {
+            for(;;) {
+                int read = is.read(buffer);
+                if(read < 0) {
+                    break;
+                }
+                bytes.write(buffer, 0, read);
+            }
+        } finally {
+            is.close();
+        }
+    }
     
 }

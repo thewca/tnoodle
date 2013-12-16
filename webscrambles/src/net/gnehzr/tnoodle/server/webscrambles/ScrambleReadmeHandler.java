@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
-import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -46,7 +46,7 @@ public class ScrambleReadmeHandler extends SafeHttpServlet {
         String scramblesReadmePath = getServletContext().getRealPath("wca/readme-scramble.md");
         FileInputStream dataStructureInputStream = new FileInputStream(scramblesReadmePath);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Utils.fullyReadInputStream(dataStructureInputStream, baos);
+        GwtSafeUtils.fullyReadInputStream(dataStructureInputStream, baos);
         scramblesReadme = baos.toString();
 
         StringBuilder scrambleFilteringInfo = new StringBuilder();

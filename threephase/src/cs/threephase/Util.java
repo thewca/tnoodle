@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Arrays;
 
-import net.gnehzr.tnoodle.utils.Utils;
+//<<<import net.gnehzr.tnoodle.utils.Utils;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
 public class Util {
@@ -86,7 +86,7 @@ public class Util {
 		}
 
 		if(tpr_tables == null) {
-			tpr_tables = new File(Utils.getResourceDirectory(), "tpr_tables");
+			//<<<tpr_tables = new File(Utils.getResourceDirectory(), "tpr_tables");
 			//tpr_tables = new File("tpr_tables");
 		}
 

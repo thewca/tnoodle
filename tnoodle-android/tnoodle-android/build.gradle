@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.+'
+    }
+}
+apply plugin: 'android-library'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.0"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 19
+    }
+
+    sourceSets {
+        main {
+            java {
+                java.srcDirs '../../utils/src'
+                exclude 'net/gnehzr/tnoodle/utils/Utils.java'
+                exclude 'net/gnehzr/tnoodle/utils/Launcher.java'
+                exclude 'net/gnehzr/tnoodle/utils/TNoodleLogging.java'
+
+                java.srcDirs '../../sq12phase/src', '../../min2phase/src', '../../threephase/src'
+                exclude 'cs/min2phase/MainProgram.java'
+
+                java.srcDirs '../../scrambles/src'
+                exclude 'net/gnehzr/tnoodle/js/**'
+                exclude 'net/gnehzr/tnoodle/jre/**'
+                exclude 'net/gnehzr/tnoodle/test/**'
+                exclude 'net/gnehzr/tnoodle/scrambles/Main.java'
+            }
+        }
+    }
+}
+
+dependencies {
+    compile files('../../lib/gson-2.2.4.jar')
+    compile 'com.android.support:appcompat-v7:+'
+}

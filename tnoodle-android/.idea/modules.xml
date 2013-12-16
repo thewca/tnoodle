@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../scrambles/scrambles.iml" filepath="$PROJECT_DIR$/../scrambles/scrambles.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tnoodle-android.iml" filepath="$PROJECT_DIR$/tnoodle-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tnoodle-android/tnoodle-android-tnoodle-android.iml" filepath="$PROJECT_DIR$/tnoodle-android/tnoodle-android-tnoodle-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../utils/utils.iml" filepath="$PROJECT_DIR$/../utils/utils.iml" />
+    </modules>
+  </component>
+</project>
+
