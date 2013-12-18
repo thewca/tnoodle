@@ -1,12 +1,12 @@
 package net.gnehzr.tnoodle.utils;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
+//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
+//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
 
-import java.awt.Color;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
+//<<<import java.awt.Color;
+//<<<import java.awt.geom.GeneralPath;
+//<<<import java.awt.geom.PathIterator;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -88,6 +88,7 @@ public final class Utils {
         gsonBuilder = gsonBuilder.registerTypeHierarchyAdapter(clz, typeAdapter);
         GSON = gsonBuilder.create();
     }
+    /*<<<
     static {
         registerTypeAdapter(Color.class, new Colorizer());
         registerTypeAdapter(GeneralPath.class, new Pather());
@@ -113,9 +114,7 @@ public final class Utils {
 
     private static class Pather implements JsonSerializer<GeneralPath>, JsonDeserializer<GeneralPath> {
 
-        /*
-         * NOTE: this is ported from Utils.toPoints()
-         */
+        // NOTE: this is ported from GwtSafeUtils.toPoints()
         @Override
         public JsonElement serialize(GeneralPath s, Type t, JsonSerializationContext context) {
             JsonArray areas = new JsonArray();
@@ -165,6 +164,7 @@ public final class Utils {
             return path;
         }
     }
+    */
 
     public static File getResourceDirectory() {
         return getResourceDirectory(true);

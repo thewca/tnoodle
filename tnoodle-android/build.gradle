@@ -1,1 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+// From http://www.flexlabs.org/2013/06/using-local-aar-android-library-packages-in-gradle-builds
+//  mvn install:install-file -Dfile=tnoodle-android/build/libs/tnoodle-android-debug.aar -DgroupId=net.gnehzr -DartifactId=tnoodle-android -Dversion=0.00 -Dpackaging=aar

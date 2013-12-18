@@ -1,14 +1,14 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
+//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
+//<<<import java.awt.Color;
+//<<<import java.awt.Dimension;
+//<<<import java.awt.Graphics2D;
+//<<<import java.awt.geom.Area;
+//<<<import java.awt.geom.Ellipse2D;
+//<<<import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -44,6 +44,18 @@ public class ClockPuzzle extends Puzzle {
         return "clock";
     }
 
+    private static final int[][] moves = {
+        {0,1,1,0,1,1,0,0,0,  -1, 0, 0, 0, 0, 0, 0, 0, 0},// UR
+        {0,0,0,0,1,1,0,1,1,   0, 0, 0, 0, 0, 0,-1, 0, 0},// DR
+        {0,0,0,1,1,0,1,1,0,   0, 0, 0, 0, 0, 0, 0, 0,-1},// DL
+        {1,1,0,1,1,0,0,0,0,   0, 0,-1, 0, 0, 0, 0, 0, 0},// UL
+        {1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0},// U
+        {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0},// R
+        {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},// D
+        {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},// L
+        {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// A
+    };
+    /*<<<
     protected Dimension getPreferredSize() {
         return new Dimension(4*(radius+gap), 2*(radius+gap));
     }
@@ -63,17 +75,6 @@ public class ClockPuzzle extends Puzzle {
     public HashMap<String, Color> getDefaultColorScheme() {
         return new HashMap<String, Color>(defaultColorScheme);
     }
-    private static final int[][] moves = {
-        {0,1,1,0,1,1,0,0,0,  -1, 0, 0, 0, 0, 0, 0, 0, 0},// UR
-        {0,0,0,0,1,1,0,1,1,   0, 0, 0, 0, 0, 0,-1, 0, 0},// DR
-        {0,0,0,1,1,0,1,1,0,   0, 0, 0, 0, 0, 0, 0, 0,-1},// DL
-        {1,1,0,1,1,0,0,0,0,   0, 0,-1, 0, 0, 0, 0, 0, 0},// UL
-        {1,1,1,1,1,1,0,0,0,  -1, 0,-1, 0, 0, 0, 0, 0, 0},// U
-        {0,1,1,0,1,1,0,1,1,  -1, 0, 0, 0, 0, 0,-1, 0, 0},// R
-        {0,0,0,1,1,1,1,1,1,   0, 0, 0, 0, 0, 0,-1, 0,-1},// D
-        {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},// L
-        {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// A
-    };
 
     public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
         // Background
@@ -118,6 +119,7 @@ public class ClockPuzzle extends Puzzle {
 
         return facesMap;
     }
+    */
 
     @Override
     public PuzzleState getSolvedState() {
@@ -237,6 +239,7 @@ public class ClockPuzzle extends Puzzle {
             return Arrays.hashCode(posit);
         }
 
+        /*<<<
         @Override
         protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
             drawBackground(g, colorScheme);
@@ -374,5 +377,6 @@ public class ClockPuzzle extends Puzzle {
                 g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
             }
         }
+        */
     }
 }

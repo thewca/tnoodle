@@ -2,16 +2,16 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
+//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
+//<<<import java.awt.BasicStroke;
+//<<<import java.awt.Color;
+//<<<import java.awt.Dimension;
+//<<<import java.awt.Graphics2D;
+//<<<import java.awt.geom.AffineTransform;
+//<<<import java.awt.geom.GeneralPath;
+//<<<import java.awt.geom.PathIterator;
+//<<<import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -61,6 +61,7 @@ public class PyraminxPuzzle extends Puzzle {
     private static final int pieceSize = 30;
     private static final int gap = 5;
 
+    /*<<<
     private static Dimension getImageSize(int gap, int pieceSize) {
         return new Dimension(getPyraminxViewWidth(gap, pieceSize), getPyraminxViewHeight(gap, pieceSize));
     }
@@ -212,6 +213,7 @@ public class PyraminxPuzzle extends Puzzle {
     protected Dimension getPreferredSize() {
         return getImageSize(gap, pieceSize);
     }
+    */
 
     @Override
     public String getLongName() {
@@ -500,6 +502,7 @@ public class PyraminxPuzzle extends Puzzle {
             return Arrays.deepHashCode(image);
         }
 
+        /*<<<
         @Override
         protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
             g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
@@ -510,6 +513,7 @@ public class PyraminxPuzzle extends Puzzle {
             }
             drawMinx(g, gap, pieceSize, scheme, image);
         }
+        */
 
     }
 }

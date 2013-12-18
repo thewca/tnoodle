@@ -126,18 +126,14 @@ public class TNoodleJsUtils implements Exportable {
     }
 
     public static Element getPuzzleIcon(Puzzle puzzle) {
-        String filename = "puzzle/" + puzzle.getShortName() + ".png";
+        String filename = PuzzlePlugins.PUZZLE_PACKAGE + "/" + puzzle.getShortName() + ".png";
         if(ScrambleJsEntryPoint.resources.containsKey(filename)) {
             Image image = new Image();
             image.setUrl("data:image/png;base64," + ScrambleJsEntryPoint.resources.get(filename));
             return image.getElement();
         }
 
-        Dimension size = new Dimension(32, 32);
-        OMSVGSVGElement svg = createSVG(size.width, size.height);
-        Graphics2D g2d = new Graphics2D((OMSVGDocument) svg.getOwnerDocument(), svg);
-        puzzle.drawPuzzleIcon(g2d, size);
-        return svg.getElement();
+        return null;
     }
 
     private static JSONValue toJSONValue(Object obj) {

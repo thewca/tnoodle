@@ -2,13 +2,13 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
+//<<<import java.awt.Color;
+//<<<import java.awt.Dimension;
+//<<<import java.awt.Graphics2D;
+//<<<import java.awt.geom.AffineTransform;
+//<<<import java.awt.geom.GeneralPath;
+//<<<import java.awt.geom.PathIterator;
+//<<<import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -73,10 +73,12 @@ public class MegaminxPuzzle extends Puzzle {
         return "minx";
     }
 
+    /*<<<
     @Override
     protected Dimension getPreferredSize() {
         return getImageSize(gap, minxRad, null);
     }
+    */
 
     private static final double UNFOLDHEIGHT = 2 + 3 * Math.sin(.3 * Math.PI) + Math.sin(.1 * Math.PI);
     private static final double UNFOLDWIDTH = 4 * Math.cos(.1 * Math.PI) + 2 * Math.cos(.3 * Math.PI);
@@ -192,6 +194,7 @@ public class MegaminxPuzzle extends Puzzle {
         swapCenters(image, f1, f2, f3, f4, f5);
     }
 
+    /*<<<
     private static Dimension getImageSize(int gap, int minxRad, String variation) {
         return new Dimension(getMegaminxViewWidth(gap, minxRad), getMegaminxViewHeight(gap, minxRad));
     }
@@ -311,6 +314,7 @@ public class MegaminxPuzzle extends Puzzle {
         }
         return stringy;
     }
+    */
 
     @Override
     public PuzzleState getSolvedState() {
@@ -520,6 +524,7 @@ public class MegaminxPuzzle extends Puzzle {
             return Arrays.deepHashCode(normalizedImage);
         }
 
+        /*<<<
         @Override
         protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
             drawMinx(g, gap, minxRad, colorScheme);
@@ -628,5 +633,6 @@ public class MegaminxPuzzle extends Puzzle {
                 g.drawString(label, (float) (centerX - width/2.0), (float) (centerY + .5*(ascent) - magicPushUpNumber));
             }
         }
+        */
     }
 }

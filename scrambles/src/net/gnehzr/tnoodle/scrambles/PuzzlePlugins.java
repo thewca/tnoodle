@@ -24,11 +24,12 @@ import com.google.gson.JsonSerializer;
 
 public class PuzzlePlugins {
     private static final Logger l = Logger.getLogger(PuzzlePlugins.class.getName());
+    public static final String PUZZLE_PACKAGE = "puzzle";
 
     private static Plugins<Puzzle> plugins = null;
     static {
         try {
-            plugins = new Plugins<Puzzle>("puzzle", Puzzle.class, Puzzle.class.getClassLoader());
+            plugins = new Plugins<Puzzle>(PUZZLE_PACKAGE, Puzzle.class, Puzzle.class.getClassLoader());
         } catch (IOException e) {
             l.log(Level.SEVERE, "", e);
         } catch (BadLazyClassDescriptionException e) {
@@ -48,8 +49,7 @@ public class PuzzlePlugins {
         return Collections.unmodifiableSortedMap(scramblers);
     }
 
-    public static String getScramblerLongName(String shortName) throws BadLazyClassDescriptionException, IOException {
-        getScramblers(); // force reloading the plugins, if necessary
+    public static String getScramblerLongName(String shortName) {
         return plugins.getPluginComment(shortName);
     }
 

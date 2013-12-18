@@ -1,27 +1,28 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toPoints;
+//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
+//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toPoints;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.geom.GeneralPath;
+//<<<import java.awt.Color;
+//<<<import java.awt.Dimension;
+//<<<import java.awt.geom.GeneralPath;
 import java.util.HashMap;
 
 public class PuzzleImageInfo {
-    public HashMap<String, GeneralPath> faces;
-    public HashMap<String, Color> colorScheme;
-    public Dimension size;
+    //<<<public HashMap<String, GeneralPath> faces;
+    //<<<public HashMap<String, Color> colorScheme;
+    //<<<public Dimension size;
 
     public PuzzleImageInfo() {}
     public PuzzleImageInfo(Puzzle p) {
-        faces = p.getDefaultFaceBoundaries();
-        colorScheme = p.getDefaultColorScheme();
-        size = p.getPreferredSize();
+        //<<<faces = p.getDefaultFaceBoundaries();
+        //<<<colorScheme = p.getDefaultColorScheme();
+        //<<<size = p.getPreferredSize();
     }
 
     public HashMap<String, Object> toJsonable() {
         HashMap<String, Object> jsonable = new HashMap<String, Object>();
+        /*<<< TODO
         HashMap<String, Integer> dim = new HashMap<String, Integer>();
         dim.put("width", size.width);
         dim.put("height", size.height);
@@ -32,12 +33,15 @@ public class PuzzleImageInfo {
             jsonColorScheme.put(key, toHex(this.colorScheme.get(key)));
         }
         jsonable.put("colorScheme", jsonColorScheme);
+        */
 
+        /*<<< this can go, methinks
         HashMap<String, double[][][]> jsonFaces = new HashMap<String, double[][][]>();
         for(String key : this.faces.keySet()) {
             jsonFaces.put(key, toPoints(this.faces.get(key)));
         }
         jsonable.put("faces", jsonFaces);
+        */
         return jsonable;
     }
 }

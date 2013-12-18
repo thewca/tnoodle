@@ -1,17 +1,17 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.modulo;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
+//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
+//<<<import java.awt.BasicStroke;
+//<<<import java.awt.Color;
+//<<<import java.awt.Dimension;
+//<<<import java.awt.Graphics2D;
+//<<<import java.awt.geom.AffineTransform;
+//<<<import java.awt.geom.Area;
+//<<<import java.awt.geom.GeneralPath;
+//<<<import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,6 +52,7 @@ public class SquareOnePuzzle extends Puzzle {
         return new PuzzleStateAndGenerator(state, scramble);
     }
 
+    /*<<<
     private void drawFace(Graphics2D g, int[] face, double x, double y, int radius, Color[] colorScheme) {
         for(int ch = 0; ch < 12; ch++) {
             if(ch < 11 && face[ch] == face[ch+1]) {
@@ -231,6 +232,7 @@ public class SquareOnePuzzle extends Puzzle {
     protected Dimension getPreferredSize() {
         return getImageSize(radius);
     }
+    */
 
     @Override
     public String getLongName() {
@@ -366,6 +368,7 @@ public class SquareOnePuzzle extends Puzzle {
             return Arrays.hashCode(pieces) ^ (sliceSolved ? 1 : 0);
         }
 
+        /*<<<
         @Override
         protected void drawScramble(Graphics2D g, HashMap<String, Color> colorSchemeMap) {
             g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
@@ -409,6 +412,7 @@ public class SquareOnePuzzle extends Puzzle {
             g.rotate(Math.toRadians(-90 - 15), x, y);
             drawFace(g, GwtSafeUtils.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
         }
+        */
 
     }
 }

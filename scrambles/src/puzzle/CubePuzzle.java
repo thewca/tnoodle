@@ -2,11 +2,11 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.geom.GeneralPath;
+//<<<import java.awt.Color;
+//<<<import java.awt.Dimension;
+//<<<import java.awt.Graphics2D;
+//<<<import java.awt.Rectangle;
+//<<<import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -145,6 +145,7 @@ public class CubePuzzle extends Puzzle {
         return (size*cubie + gap)*3 + gap;
     }
 
+    /*<<<
     private static Dimension getImageSize(int gap, int unitSize, int size) {
         return new Dimension(getCubeViewWidth(unitSize, gap, size), getCubeViewHeight(unitSize, gap, size));
     }
@@ -202,6 +203,7 @@ public class CubePuzzle extends Puzzle {
     private static GeneralPath getFace(int leftBound, int topBound, int size, int cubieSize) {
         return new GeneralPath(new Rectangle(leftBound, topBound, size * cubieSize, size * cubieSize));
     }
+    */
 
     @Override
     public CubeState getSolvedState() {
@@ -468,9 +470,9 @@ public class CubePuzzle extends Puzzle {
             return Arrays.deepHashCode(getNormalized());
         }
 
-        @Override
+        /*<<<@Override
         protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
             drawCube(g, image, gap, cubieSize, colorScheme);
-        }
+        }*/
     }
 }

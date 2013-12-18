@@ -1,9 +1,9 @@
 package net.gnehzr.tnoodle.utils;
 
-import java.awt.geom.FlatteningPathIterator;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.Color;
+//<<<import java.awt.geom.FlatteningPathIterator;
+//<<<import java.awt.geom.GeneralPath;
+//<<<import java.awt.geom.PathIterator;
+//<<<import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.Random;
 public final class GwtSafeUtils {
     private GwtSafeUtils() {}
 
-    private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
+    /*<<<private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
     static {
         Color timPurple = new Color(98, 50, 122);
         Color orangeHeraldicTincture = new Color(255, 128, 0);
@@ -66,6 +66,8 @@ public final class GwtSafeUtils {
         }
         return Integer.toHexString(0x1000000 | (c.getRGB() & 0xffffff)).substring(1);
     }
+    */
+
     public static void azzertEquals(Object a, Object b) {
         boolean equal;
         if(a == null) {
@@ -228,8 +230,13 @@ public final class GwtSafeUtils {
         return dest;
     }
 
-    public static double[][][] toPoints(GeneralPath s) {
-        ArrayList<ArrayList<double[]>> areas = new ArrayList<ArrayList<double[]>>();
+    //<<<public static double[][][] toPoints(GeneralPath s) {
+    public static double[][][] toPoints(Object s) {
+        return null;//<<<
+        // TODO - this can be replaced with svg manipulation client side.
+        // This does screw up anyone trying to do cross domain stuff, but
+        // WHO CARES?
+        /*<<<ArrayList<ArrayList<double[]>> areas = new ArrayList<ArrayList<double[]>>();
         ArrayList<double[]> area = null;
         double[] coords = new double[2];
         PathIterator pi = new FlatteningPathIterator(s.getPathIterator(null), 1.0);
@@ -257,6 +264,7 @@ public final class GwtSafeUtils {
             }
         }
         return areasArray;
+        */
     }
 
     public static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {

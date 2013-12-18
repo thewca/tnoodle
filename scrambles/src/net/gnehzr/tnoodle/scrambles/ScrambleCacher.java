@@ -2,8 +2,8 @@ package net.gnehzr.tnoodle.scrambles;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
+//<<<import java.awt.Dimension;
+//<<<import java.awt.image.BufferedImage;
 import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.Random;
@@ -52,7 +52,7 @@ public class ScrambleCacher {
                     String scramble = puzzle.generateWcaScramble(r);
 
                     if(drawScramble) {
-                        // The drawScramble option exists so we can test out generating and drawing
+                        /*<<<// The drawScramble option exists so we can test out generating and drawing
                         // a bunch of scrambles in 2 threads at the same time. See ScrambleTest.
                         BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
                         Dimension size = new Dimension(image.getWidth(), image.getHeight());
@@ -61,6 +61,7 @@ public class ScrambleCacher {
                         } catch (InvalidScrambleException e1) {
                             e1.printStackTrace();
                         }
+                        */
                     }
 
                     synchronized(scrambles) {

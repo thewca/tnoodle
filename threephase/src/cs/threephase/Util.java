@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Arrays;
 
-//<<<import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.Utils;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 
 public class Util {
@@ -86,7 +86,7 @@ public class Util {
 		}
 
 		if(tpr_tables == null) {
-			//<<<tpr_tables = new File(Utils.getResourceDirectory(), "tpr_tables");
+			tpr_tables = new File(Utils.getResourceDirectory(), "tpr_tables");
 			//tpr_tables = new File("tpr_tables");
 		}
 
@@ -111,10 +111,10 @@ public class Util {
 			Edge3.createPrun();
 
 			try {
-				l.info("Writing to " + tpr_tables);
-				FileOutputStream out = new FileOutputStream(tpr_tables);
-				DataOutputStream dataOut = new DataOutputStream(out);
-				initTo(dataOut);
+                            l.info("Writing to " + tpr_tables);
+                            FileOutputStream out = new FileOutputStream(tpr_tables);
+                            DataOutputStream dataOut = new DataOutputStream(out);
+                            initTo(dataOut);
 			} catch(IOException e) {
 				l.log(Level.INFO, "Failed to write to " + tpr_tables, e);
 			}

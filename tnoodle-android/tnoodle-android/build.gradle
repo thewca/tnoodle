@@ -14,7 +14,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19"
 
     defaultConfig {
         minSdkVersion 8
@@ -25,9 +25,9 @@ android {
         main {
             java {
                 java.srcDirs '../../utils/src'
-                exclude 'net/gnehzr/tnoodle/utils/Utils.java'
                 exclude 'net/gnehzr/tnoodle/utils/Launcher.java'
                 exclude 'net/gnehzr/tnoodle/utils/TNoodleLogging.java'
+                exclude 'net/gnehzr/tnoodle/utils/OneLineLogFormatter.java'
 
                 java.srcDirs '../../sq12phase/src', '../../min2phase/src', '../../threephase/src'
                 exclude 'cs/min2phase/MainProgram.java'
@@ -37,7 +37,10 @@ android {
                 exclude 'net/gnehzr/tnoodle/jre/**'
                 exclude 'net/gnehzr/tnoodle/test/**'
                 exclude 'net/gnehzr/tnoodle/scrambles/Main.java'
+                exclude 'net/gnehzr/tnoodle/scrambles/PuzzleImageInfo.java'
             }
+
+            resources.srcDirs = java.srcDirs
         }
     }
 }
