@@ -2,7 +2,8 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-//<<<import java.awt.Color;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Svg;
 //<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
 //<<<import java.awt.geom.AffineTransform;
@@ -194,6 +195,24 @@ public class MegaminxPuzzle extends Puzzle {
         swapCenters(image, f1, f2, f3, f4, f5);
     }
 
+    @Override
+    public HashMap<String, Color> getDefaultColorScheme() {
+        HashMap<String, Color> colors = new HashMap<String, Color>();
+        colors.put("U", new Color(0xFFFFFF));
+        colors.put("BL", new Color(0x882222));
+        colors.put("BR", new Color(0x0000FF));
+        colors.put("R", new Color(0x880088));
+        colors.put("F", new Color(0x008800));
+        colors.put("L", new Color(0x88DDFF));
+        colors.put("D", new Color(0xFFFF00));
+        colors.put("DR", new Color(0xFF0000));
+        colors.put("DBR", new Color(0x000088));
+        colors.put("B", new Color(0xFF44FF));
+        colors.put("DBL", new Color(0x00FF00));
+        colors.put("DL", new Color(0xFF8800));
+        return colors;
+    }
+
     /*<<<
     private static Dimension getImageSize(int gap, int minxRad, String variation) {
         return new Dimension(getMegaminxViewWidth(gap, minxRad), getMegaminxViewHeight(gap, minxRad));
@@ -252,24 +271,6 @@ public class MegaminxPuzzle extends Puzzle {
         GeneralPath p = pentagon(up, minxRad);
         p.transform(AffineTransform.getTranslateInstance(x, y));
         return p;
-    }
-
-    @Override
-    public HashMap<String, Color> getDefaultColorScheme() {
-        HashMap<String, Color> colors = new HashMap<String, Color>();
-        colors.put("U", new Color(0xFFFFFF));
-        colors.put("BL", new Color(0x882222));
-        colors.put("BR", new Color(0x0000FF));
-        colors.put("R", new Color(0x880088));
-        colors.put("F", new Color(0x008800));
-        colors.put("L", new Color(0x88DDFF));
-        colors.put("D", new Color(0xFFFF00));
-        colors.put("DR", new Color(0xFF0000));
-        colors.put("DBR", new Color(0x000088));
-        colors.put("B", new Color(0xFF44FF));
-        colors.put("DBL", new Color(0x00FF00));
-        colors.put("DL", new Color(0xFF8800));
-        return colors;
     }
 
     double x = minxRad*Math.sqrt(2*(1-Math.cos(.6*Math.PI)));
@@ -524,12 +525,13 @@ public class MegaminxPuzzle extends Puzzle {
             return Arrays.deepHashCode(normalizedImage);
         }
 
-        /*<<<
         @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
-            drawMinx(g, gap, minxRad, colorScheme);
+        protected Svg drawScramble() {
+            return null;
+            //<<<drawMinx(g, gap, minxRad, colorScheme);
         }
 
+        /*<<<
         private void drawMinx(Graphics2D g, int gap, int minxRad, HashMap<String, Color> colorScheme) {
             HashMap<Face, GeneralPath> pentagons = getFaceBoundaries();
             for(Face face : pentagons.keySet()) {

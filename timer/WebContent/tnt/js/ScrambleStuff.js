@@ -175,32 +175,22 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
             }, puzzle);
     }
 
-    var configureColorSchemeImg, configureColorSchemeImgAreas;
+    var configureColorSchemeImgAreas;
     function recreateColorSchemeChooserImage() {
         colorChooser.element.setStyle('visibility', 'hidden');
         currFaceName = null;
         refreshColorSchemeChooserImage();
     }
     function refreshColorSchemeChooserImage() {
-        configureColorSchemeImg = scrambler.getScrambleImage(puzzle, null, colorScheme, defaultSize.width, defaultSize.height);
-        configureColorSchemeImg.classList.add("colorchooser");
-        configureColorSchemeImg.setStyle('width', defaultSize.width);
-        configureColorSchemeImg.setStyle('height', defaultSize.height);
-        configureColorSchemeImgHolder.empty();
-        configureColorSchemeImgHolder.appendChild(configureColorSchemeImg);
-
-        if(configureColorSchemeImg.tagName.toLowerCase() == "svg") {
-            configureColorSchemeImgAreas = configureColorSchemeImg.getElementsByClassName("puzzleface");
+        scrambler.loadScrambleSvg(function(svg) {
+            svg.classList.add("colorchooser");
+            svg.setStyle('width', defaultSize.width);
+            svg.setStyle('height', defaultSize.height);
+            configureColorSchemeImgHolder.appendChild(svg);
+            configureColorSchemeImgAreas = svg.getElementsByClassName("puzzleface");
             refreshColorSchemeChooser();
-        } else {
-            // We must wait for configureColorSchemeImg to load before
-            // we can access its configureColorSchemeImg.contentDocument.
-            configureColorSchemeImgAreas = null;
-            configureColorSchemeImg.addEventListener('load', function(e) {
-                configureColorSchemeImgAreas = configureColorSchemeImg.contentDocument.getElementsByClassName("puzzleface");
-                refreshColorSchemeChooser();
-            });
-        }
+        }, puzzle, null, colorScheme);
+        configureColorSchemeImgHolder.empty();
     }
     function refreshColorSchemeChooser() {
         var scale = 1;
@@ -921,9 +911,10 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                 width = width.toInt();
                 height = height.toInt();
             }
-            var newScrambleImage = scrambler.getScrambleImage(puzzle, scramble, colorScheme, width, height);
-            newScrambleImage.setStyle('float', 'right');
-            clobberScrambleImage(newScrambleImage);
+            scrambler.loadScrambleSvg(function(svg) {
+                svg.setStyle('float', 'right');
+                clobberScrambleImage(svg);
+            }, puzzle, scramble, colorScheme);
         }
     };
     var loadingImage = document.createElement("img");

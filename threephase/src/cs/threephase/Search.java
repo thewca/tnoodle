@@ -177,7 +177,7 @@ public final class Search implements Runnable {
 		arr2idx = 0;
 		p1sols.clear();
 
-		long time = System.nanoTime();
+		long time = System.currentTimeMillis();
 
 		for (length1=Math.min(Math.min(udprun, fbprun), rlprun); length1<100; length1++) {
 			if (rlprun <= length1 && search1(rl>>>6, rl&0x3f, length1, -1, 0)
@@ -288,7 +288,7 @@ public final class Search implements Runnable {
 		}
 
 		totlen += length1 + length2 + length + len333;
-		tottime += System.nanoTime() - time;
+		tottime += System.currentTimeMillis() - time;
 
 	}
 

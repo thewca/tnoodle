@@ -2,43 +2,46 @@ package net.gnehzr.tnoodle.server.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.parseExtension;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toInt;
 import static net.gnehzr.tnoodle.utils.Utils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.throwableToString;
 
-import org.apache.batik.svggen.SVGShape;
-import org.w3c.dom.Element;
-import org.apache.batik.svggen.DOMGroupManager;
+import net.gnehzr.tnoodle.svglite.Svg;
 import net.gnehzr.tnoodle.utils.Utils;
 import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
 import com.google.gson.JsonElement;
-import java.awt.geom.GeneralPath;
 import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 import com.google.gson.JsonSerializer;
-import java.awt.geom.AffineTransform;
 
-import org.apache.batik.util.SVGConstants;
-import java.awt.Color;
-import java.awt.Dimension;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.SortedMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.util.SVGConstants;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscodingHints;
+import org.apache.batik.transcoder.image.ImageTranscoder;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
@@ -49,29 +52,38 @@ import net.gnehzr.tnoodle.server.SafeHttpServlet;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.lingala.zip4j.exception.ZipException;
 
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 
 import com.itextpdf.text.DocumentException;
 
 @SuppressWarnings("serial")
 public class ScrambleViewHandler extends SafeHttpServlet {
+    private static final Logger l = Logger.getLogger(ScrambleViewHandler.class.getName());
+
     private SortedMap<String, LazyInstantiator<Puzzle>> scramblers;
 
     public ScrambleViewHandler() throws IOException, BadLazyClassDescriptionException {
         this.scramblers = PuzzlePlugins.getScramblers();
     }
 
-    public class MySVGGraphics2D extends SVGGraphics2D {
-        public MySVGGraphics2D(Document domFactory) {
-            super(domFactory);
+
+    // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
+    class BufferedImageTranscoder extends ImageTranscoder {
+        @Override
+        public BufferedImage createImage(int w, int h) {
+            BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+            return bi;
         }
 
-        public final DOMGroupManager myGetDOMGroupManager(){
-            return domGroupManager;
+        @Override
+        public void writeImage(BufferedImage img, TranscoderOutput output) {
+            this.img = img;
         }
+
+        public BufferedImage getBufferedImage() {
+            return img;
+        }
+        private BufferedImage img = null;
     }
 
     @Override
@@ -99,86 +111,68 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             HashMap<String, Color> colorScheme = scrambler
                     .parseColorScheme(query.get("scheme"));
             String scramble = query.get("scramble");
-            Dimension size = scrambler
-                    .getPreferredSize(toInt(query.get("width"), 0),
-                            toInt(query.get("height"), 0));
 
             if (extension.equals("png")) {
-                try {
-                    ByteArrayOutputStream bytes;
-                    if (query.containsKey("icon")) {
-                        bytes = PuzzleIcon.loadPuzzleIcon(scrambler);
-                    } else {
-                        bytes = new ByteArrayOutputStream();
-                        BufferedImage img = new BufferedImage(size.width,
-                                size.height, BufferedImage.TYPE_INT_ARGB);
-                        scrambler.drawScramble(img.createGraphics(), size,
-                                scramble, colorScheme);
-                        ImageIO.write(img, "png", bytes);
+                ByteArrayOutputStream bytes;
+                if (query.containsKey("icon")) {
+                    bytes = PuzzleIcon.loadPuzzleIconPng(scrambler.getShortName());
+                } else {
+                    Svg svg;
+                    try {
+                        svg = scrambler.drawScramble(scramble, colorScheme);
+                    } catch(InvalidScrambleException e) {
+                        sendText(request, response, throwableToString(e));
+                        return;
+                    }
+                    ByteArrayInputStream svgFile = new ByteArrayInputStream(svg.toString().getBytes());
+
+                    Dimension size = scrambler.getPreferredSize();
+                    BufferedImageTranscoder imageTranscoder = new BufferedImageTranscoder();
+
+                    // Copied from http://stackoverflow.com/a/6634963
+                    // with some tweaks.
+                    DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
+                    TranscodingHints hints = new TranscodingHints();
+                    hints.put(ImageTranscoder.KEY_WIDTH, new Float(size.width));
+                    hints.put(ImageTranscoder.KEY_HEIGHT, new Float(size.height));
+                    hints.put(ImageTranscoder.KEY_DOM_IMPLEMENTATION, impl);
+                    hints.put(ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI,SVGConstants.SVG_NAMESPACE_URI);
+                    hints.put(ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI,SVGConstants.SVG_NAMESPACE_URI);
+                    hints.put(ImageTranscoder.KEY_DOCUMENT_ELEMENT, SVGConstants.SVG_SVG_TAG);
+                    hints.put(ImageTranscoder.KEY_XML_PARSER_VALIDATING, false);
+
+                    imageTranscoder.setTranscodingHints(hints);
+
+                    TranscoderInput input = new TranscoderInput(svgFile);
+                    try {
+                        imageTranscoder.transcode(input, null);
+                    } catch(TranscoderException e) {
+                        l.log(Level.SEVERE, "Failed to rasterize SVG.", e);
+                        sendText(request, response, throwableToString(e));
+                        return;
                     }
 
-                    response.setHeader("Content-Type", "image/png");
-                    response.setContentLength(bytes.size());
-                    bytes.writeTo(response.getOutputStream());
-                } catch (InvalidScrambleException e) {
-                    e.printStackTrace();
-                    sendText(request, response, throwableToString(e));
+                    BufferedImage img = imageTranscoder.getBufferedImage();
+                    bytes = new ByteArrayOutputStream();
+                    ImageIO.write(img, "png", bytes);
                 }
+
+                response.setHeader("Content-Type", "image/png");
+                response.setContentLength(bytes.size());
+                bytes.writeTo(response.getOutputStream());
             } else if(extension.equals("svg")) {
-                DOMImplementation domImpl =
-                    GenericDOMImplementation.getDOMImplementation();
-
-                String svgNS = "http://www.w3.org/2000/svg";
-                Document document = domImpl.createDocument(svgNS, "svg", null);
-
-                MySVGGraphics2D svgGenerator = new MySVGGraphics2D(document);
-                svgGenerator.setSVGCanvasSize(size);
-
-                // This is a hack I don't fully understand that prevents aliasing of
-                // vertical and horizontal lines.
-                // See http://stackoverflow.com/questions/7589650/drawing-grid-with-jquery-svg-produces-2px-lines-instead-of-1px
-                svgGenerator.translate(0.5, 0.5);
-
+                Svg svg;
                 try {
-                    scrambler.drawScramble(svgGenerator, size, scramble, colorScheme);
+                    svg = scrambler.drawScramble(scramble, colorScheme);
                 } catch(InvalidScrambleException e) {
                     sendText(request, response, throwableToString(e));
                     return;
                 }
 
-                HashMap<String, GeneralPath> faces = scrambler.getDefaultFaceBoundaries();
-                Dimension preferredSize = scrambler.getPreferredSize(0, 0);
-                for(String face : faces.keySet()) {
-                    GeneralPath gp = faces.get(face);
-
-                    // Scale face to appropriate size
-                    gp.transform(AffineTransform.getScaleInstance(
-                        (float) size.width / preferredSize.width,
-                        (float) size.height / preferredSize.height
-                    ));
-
-                    SVGShape shapeConverter = svgGenerator.getShapeConverter();
-                    Element svgShape = shapeConverter.toSVG(gp);
-                    svgShape.setAttributeNS(null, SVGConstants.SVG_OPACITY_ATTRIBUTE, "0");
-                    svgShape.setAttributeNS(null, "class", "puzzleface");
-                    svgShape.setAttributeNS(null, "id", face);
-                    DOMGroupManager dgm = svgGenerator.myGetDOMGroupManager();
-                    dgm.addElement(svgShape, DOMGroupManager.FILL);
-                }
-
-                Element root = svgGenerator.getRoot();
-                // SVGGraphics2D doesn't generate the viewBox by itself
-                root.setAttributeNS(null, "viewBox", "0 0 " + size.width + " " + size.height);
-
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                boolean useCSS = true; // we want to use CSS style attributes
-                Writer out = new OutputStreamWriter(bytes, "UTF-8");
-                svgGenerator.stream(root, out, useCSS, false);
-                out.close();
-
                 response.setHeader("Content-Type", "image/svg+xml");
-                response.setContentLength(bytes.size());
-                bytes.writeTo(response.getOutputStream());
+                byte[] bytes = svg.toString().getBytes();
+                response.setContentLength(bytes.length);
+                response.getOutputStream().write(bytes, 0, bytes.length);
             } else if (extension.equals("json")) {
                 sendJSON(request, response, GSON.toJson(new PuzzleImageInfo(scrambler)));
             } else {

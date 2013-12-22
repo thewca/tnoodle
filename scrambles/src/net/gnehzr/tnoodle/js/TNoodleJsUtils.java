@@ -2,18 +2,13 @@ package net.gnehzr.tnoodle.js;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import java.awt.geom.AffineTransform;
-import org.vectomatic.dom.svg.utils.SVGConstants;
-import org.vectomatic.dom.svg.OMSVGRect;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 
-import java.awt.Color;
-import java.awt.geom.GeneralPath;
-import java.awt.Graphics2D;
-import java.awt.Dimension;
-import org.vectomatic.dom.svg.OMSVGPathElement;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Svg;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -25,11 +20,6 @@ import org.timepedia.exporter.client.ExportPackage;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.ui.Image;
-
-import org.vectomatic.dom.svg.OMSVGDocument;
-import org.vectomatic.dom.svg.OMSVGLength;
-import org.vectomatic.dom.svg.OMSVGSVGElement;
-import org.vectomatic.dom.svg.utils.OMSVGParser;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -61,64 +51,10 @@ public class TNoodleJsUtils implements Exportable {
         return level == null ? null : level.getName();
     }
 
-    private static void setViewBox(OMSVGSVGElement svg, float x, float y, float width, float height) {
-        // Copied https://github.com/laaglu/lib-gwt-svg/commit/f7080a16fd9e0edcb43c01fe69927fe647f73f86 in, because a new version of lib-gwt-svg hasn't been released yet
-        if (!svg.getElement().hasAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append(x);
-            builder.append(" ");
-            builder.append(y);
-            builder.append(" ");
-            builder.append(width);
-            builder.append(" ");
-            builder.append(height);
-            svg.getElement().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, builder.toString());
-            return;
-        }
-        OMSVGRect viewBox = svg.getViewBox().getBaseVal();
-        viewBox.setX(x);
-        viewBox.setY(y);
-        viewBox.setWidth(width);
-        viewBox.setHeight(height);
-    }
-
-    private static OMSVGSVGElement createSVG(int width, int height) {
-        OMSVGDocument doc = OMSVGParser.currentDocument();
-        OMSVGSVGElement svg = doc.createSVGSVGElement();
-        svg.setWidth(OMSVGLength.SVG_LENGTHTYPE_PX, width);
-        svg.setHeight(OMSVGLength.SVG_LENGTHTYPE_PX, height);
-        setViewBox(svg, 0, 0, width, height);
-        return svg;
-    }
-
-    public static Element scrambleToSvg(String scramble, Puzzle puzzle, int maxWidth, int maxHeight, String scheme) throws InvalidScrambleException {
-        Dimension size = puzzle.getPreferredSize(maxWidth, maxHeight);
-        OMSVGSVGElement svg = createSVG(size.width, size.height);
-        Graphics2D g2d = new Graphics2D((OMSVGDocument) svg.getOwnerDocument(), svg);
+    public static String scrambleToSvg(String scramble, Puzzle puzzle, String scheme) throws InvalidScrambleException {
         HashMap<String, Color> colorScheme = puzzle.parseColorScheme(scheme);
-        puzzle.drawScramble(g2d, size, scramble, colorScheme);
-
-        HashMap<String, GeneralPath> faces = puzzle.getDefaultFaceBoundaries();
-        Dimension preferredSize = puzzle.getPreferredSize(0, 0);
-        for(String face : faces.keySet()) {
-            GeneralPath gp = faces.get(face);
-
-            // Scale face to appropriate size
-            gp.transform(AffineTransform.getScaleInstance(
-                (float) size.width / preferredSize.width,
-                (float) size.height / preferredSize.height
-            ));
-
-            OMSVGPathElement path = g2d.shapeToPathElement(gp);
-            path.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, "#ffffff");
-            path.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, "#ffffff");
-            path.getStyle().setSVGProperty(SVGConstants.CSS_OPACITY_PROPERTY, "0");
-            path.setId(face);
-            path.addClassNameBaseVal("puzzleface");
-            g2d.g.appendChild(path);
-        }
-
-        return svg.getElement();
+        Svg svg = puzzle.drawScramble(scramble, colorScheme);
+        return svg.toString();
     }
 
     public static String getVersion() {

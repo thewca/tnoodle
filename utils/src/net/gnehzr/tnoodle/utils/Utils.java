@@ -1,12 +1,10 @@
 package net.gnehzr.tnoodle.utils;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
-//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
 
-//<<<import java.awt.Color;
-//<<<import java.awt.geom.GeneralPath;
-//<<<import java.awt.geom.PathIterator;
+import net.gnehzr.tnoodle.svglite.InvalidHexColorException;
+import net.gnehzr.tnoodle.svglite.Color;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +27,6 @@ import java.util.Random;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -79,7 +76,7 @@ public final class Utils {
     // This behavior is controlled by the htmlSafe attribute.
     // We call disableHtmlEscaping to disable this behavior.
     private static GsonBuilder gsonBuilder = new GsonBuilder().disableHtmlEscaping();
-    public static Gson GSON;
+    public static Gson GSON = gsonBuilder.create();
     public static synchronized void registerTypeAdapter(Class<?> clz, Object typeAdapter) {
         gsonBuilder = gsonBuilder.registerTypeAdapter(clz, typeAdapter);
         GSON = gsonBuilder.create();
@@ -88,83 +85,28 @@ public final class Utils {
         gsonBuilder = gsonBuilder.registerTypeHierarchyAdapter(clz, typeAdapter);
         GSON = gsonBuilder.create();
     }
-    /*<<<
+
     static {
         registerTypeAdapter(Color.class, new Colorizer());
-        registerTypeAdapter(GeneralPath.class, new Pather());
     }
 
     private static class Colorizer implements JsonSerializer<Color>, JsonDeserializer<Color> {
 
         @Override
         public JsonElement serialize(Color c, Type t, JsonSerializationContext context) {
-            return new JsonPrimitive(toHex(c));
+            return new JsonPrimitive(c.toHex());
         }
 
         @Override
         public Color deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
-            Color c = toColor(json.getAsString());
-            if(c == null) {
-                throw new JsonParseException("Invalid color");
+            try {
+                return new Color(json.getAsString());
+            } catch(InvalidHexColorException e) {
+                throw new JsonParseException(e);
             }
-            return c;
         }
 
     }
-
-    private static class Pather implements JsonSerializer<GeneralPath>, JsonDeserializer<GeneralPath> {
-
-        // NOTE: this is ported from GwtSafeUtils.toPoints()
-        @Override
-        public JsonElement serialize(GeneralPath s, Type t, JsonSerializationContext context) {
-            JsonArray areas = new JsonArray();
-            JsonArray area = null;
-            double[] coords = new double[2];
-            PathIterator pi = s.getPathIterator(null, 1.0);
-            while(!pi.isDone()) {
-                int val = pi.currentSegment(coords);
-                switch(val) {
-                    case PathIterator.SEG_MOVETO:
-                        area = new JsonArray();
-                        areas.add(area);
-                    case PathIterator.SEG_LINETO:
-                    case PathIterator.SEG_CLOSE:
-                        JsonArray pt = new JsonArray();
-                        pt.add(new JsonPrimitive(coords[0]));
-                        pt.add(new JsonPrimitive(coords[1]));
-                        area.add(pt);
-                        break;
-                    default:
-                        return null;
-                }
-                pi.next();
-            }
-            return areas;
-        }
-
-        @Override
-        public GeneralPath deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
-            GeneralPath path = new GeneralPath();
-
-            JsonArray areas = json.getAsJsonArray();
-            for(int c = 0; c < areas.size(); c++) {
-                JsonArray area = areas.get(c).getAsJsonArray();
-                if(area.size() == 0) {
-                    continue;
-                }
-
-                JsonArray pt = area.get(0).getAsJsonArray();
-                path.moveTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
-                for(int i = 1; i < area.size(); i++) {
-                    pt = area.get(1).getAsJsonArray();
-                    path.lineTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
-                }
-            }
-            path.closePath();
-            return path;
-        }
-    }
-    */
 
     public static File getResourceDirectory() {
         return getResourceDirectory(true);

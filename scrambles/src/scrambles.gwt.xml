@@ -10,9 +10,6 @@
   <inherits name='com.google.gwt.user.User'/>
 
   <!-- Other module inherits                                      -->
-  <inherits name='org.vectomatic.libgwtsvg'/>
-
-  <inherits name='com.levigo.util.GwtAwt'/>
   <inherits name="com.google.gwt.i18n.I18N"/>
   <inherits name='org.timepedia.exporter.Exporter'/>
   <set-property name="export" value="yes"/>
@@ -47,7 +44,11 @@
       <exclude name="LazyInstantiator.java"/>
   </source>
 
-  <source path='puzzle'/>
+  <source path='net/gnehzr/tnoodle/svglite'/>
+
+  <source path='puzzle'>
+      <exclude name="FourByFourCubePuzzle.java"/>
+  </source>
   <source path='net/gnehzr/tnoodle/scrambles'>
       <exclude name="PuzzlePlugins.java"/>
       <exclude name="PuzzleIcon.java"/>

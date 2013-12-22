@@ -10,6 +10,9 @@ public class SecureRandom extends Random {
     public static SecureRandom getInstance(String algorithm, String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
         return new SecureRandom();
     }
+    public static SecureRandom getInstance(String algorithm) throws NoSuchAlgorithmException {
+        return new SecureRandom();
+    }
 
     public void setSeed(byte[] seed) {
         long longSeed = 0;

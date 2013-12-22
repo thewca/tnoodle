@@ -20,7 +20,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-//<<<import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.Utils;
 
 public class PuzzlePlugins {
     private static final Logger l = Logger.getLogger(PuzzlePlugins.class.getName());
@@ -53,7 +53,6 @@ public class PuzzlePlugins {
         return plugins.getPluginComment(shortName);
     }
 
-    /*<<<
     static {
         Utils.registerTypeHierarchyAdapter(Puzzle.class, new Puzzlerizer());
     }
@@ -78,6 +77,5 @@ public class PuzzlePlugins {
             return new JsonPrimitive(scrambler.getShortName());
         }
     }
-    */
 
 }

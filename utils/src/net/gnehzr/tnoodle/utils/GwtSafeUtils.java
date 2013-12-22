@@ -1,9 +1,5 @@
 package net.gnehzr.tnoodle.utils;
 
-//<<<import java.awt.geom.FlatteningPathIterator;
-//<<<import java.awt.geom.GeneralPath;
-//<<<import java.awt.geom.PathIterator;
-//<<<import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -11,10 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import net.gnehzr.tnoodle.svglite.Color;
+
 public final class GwtSafeUtils {
     private GwtSafeUtils() {}
 
-    /*<<<private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
+    private static final HashMap<String, Color> WCA_COLORS = new HashMap<String, Color>();
     static {
         Color timPurple = new Color(98, 50, 122);
         Color orangeHeraldicTincture = new Color(255, 128, 0);
@@ -37,36 +35,15 @@ public final class GwtSafeUtils {
         WCA_COLORS.put("gray", Color.GRAY);
     }
     public static Color toColor(String s) {
+        if(WCA_COLORS.containsKey(s)) {
+            return WCA_COLORS.get(s);
+        }
         try {
-            if(WCA_COLORS.containsKey(s)) {
-                return WCA_COLORS.get(s);
-            }
-            if(s.startsWith("#")) {
-                s = s.substring(1);
-            }
-            if(s.length() != 6) {
-                return null;
-            }
-            return new Color(Integer.parseInt(s, 16));
+            return new Color(s);
         } catch(Exception e) {
             return null;
         }
     }
-
-    public static Color invertColor(Color c) {
-        if(c == null) {
-            return Color.BLACK;
-        }
-        return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
-    }
-
-    public static String toHex(Color c) {
-        if(c == null) {
-            return "";
-        }
-        return Integer.toHexString(0x1000000 | (c.getRGB() & 0xffffff)).substring(1);
-    }
-    */
 
     public static void azzertEquals(Object a, Object b) {
         boolean equal;
@@ -228,43 +205,6 @@ public final class GwtSafeUtils {
         int[] dest = new int[to - from];
         System.arraycopy(src, from, dest, 0, dest.length);
         return dest;
-    }
-
-    //<<<public static double[][][] toPoints(GeneralPath s) {
-    public static double[][][] toPoints(Object s) {
-        return null;//<<<
-        // TODO - this can be replaced with svg manipulation client side.
-        // This does screw up anyone trying to do cross domain stuff, but
-        // WHO CARES?
-        /*<<<ArrayList<ArrayList<double[]>> areas = new ArrayList<ArrayList<double[]>>();
-        ArrayList<double[]> area = null;
-        double[] coords = new double[2];
-        PathIterator pi = new FlatteningPathIterator(s.getPathIterator(null), 1.0);
-        while(!pi.isDone()) {
-            int val = pi.currentSegment(coords);
-            switch(val) {
-                case PathIterator.SEG_MOVETO:
-                    area = new ArrayList<double[]>();
-                    areas.add(area);
-                case PathIterator.SEG_LINETO:
-                case PathIterator.SEG_CLOSE:
-                    area.add(clone(coords));
-                    break;
-                default:
-                    return null;
-            }
-            pi.next();
-        }
-        double[][][] areasArray = new double[areas.size()][][];
-        for(int i = 0; i < areasArray.length; i++) {
-            area = areas.get(i);
-            areasArray[i] = new double[area.size()][];
-            for(int j = 0; j < areasArray[i].length; j++) {
-                areasArray[i][j] = area.get(j);
-            }
-        }
-        return areasArray;
-        */
     }
 
     public static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {

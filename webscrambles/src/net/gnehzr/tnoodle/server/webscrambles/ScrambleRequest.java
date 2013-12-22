@@ -5,12 +5,16 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toInt;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.join;
 
-import java.awt.Color;
-import java.awt.Dimension;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Svg;
+
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +26,16 @@ import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.w3c.dom.svg.SVGDocument;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DocumentLoader;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgent;
+import org.apache.batik.bridge.UserAgentAdapter;
+import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import org.apache.batik.gvt.GraphicsNode;
+import org.apache.batik.util.XMLResourceDescriptor;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
@@ -428,11 +442,15 @@ class ScrambleRequest {
                 Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
 
                 try {
-                    scrambleRequest.scrambler.drawScramble(g2, dim, scramble, scrambleRequest.colorScheme);
+                    Svg svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme);
+                    drawSvgToGraphics2D(svg, g2, dim);
                 } catch (InvalidScrambleException e) {
                     l.log(Level.INFO, "", e);
+                } finally {
+                    g2.dispose();
                 }
-                g2.dispose();
+
+
                 cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
 
                 ColumnText ct = new ColumnText(cb);
@@ -758,14 +776,15 @@ class ScrambleRequest {
                 g2.translate(SCRAMBLE_IMAGE_PADDING, SCRAMBLE_IMAGE_PADDING);
 
                 try {
-                    scrambler.drawScramble(g2, scrambleImageSize, scramble, colorScheme);
-                } catch (Exception e) {
-                    g2.dispose(); // iTextPdf blows up if we do not dispose of this
+                    Svg svg = scrambler.drawScramble(scramble, colorScheme);
+                    drawSvgToGraphics2D(svg, g2, scrambleImageSize);
+                } catch(Exception e) {
                     table.addCell("Error drawing scramble: " + e.getMessage());
                     l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e);
                     continue;
+                } finally {
+                    g2.dispose(); // iTextPdf blows up if we do not dispose of this
                 }
-                g2.dispose();
                 PdfPCell imgCell = new PdfPCell(Image.getInstance(tp), true);
                 imgCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
                 imgCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
@@ -777,6 +796,29 @@ class ScrambleRequest {
         }
         
         return table;
+    }
+
+    private static void drawSvgToGraphics2D(Svg svg, Graphics2D g2, Dimension size) throws IOException {
+        // Copied (and modified) from http://stackoverflow.com/a/12502943
+
+        String parser = XMLResourceDescriptor.getXMLParserClassName();
+        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+        UserAgent userAgent = new UserAgentAdapter();
+        DocumentLoader loader = new DocumentLoader(userAgent);
+        BridgeContext ctx = new BridgeContext(userAgent, loader);
+        ctx.setDynamicState(BridgeContext.DYNAMIC);
+        GVTBuilder builder = new GVTBuilder();
+
+
+        StringReader svgReader = new StringReader(svg.toString());
+        SVGDocument parsedSvgDocument = factory.createSVGDocument(null, svgReader);
+        GraphicsNode chartGfx = builder.build(ctx, parsedSvgDocument);
+        Dimension actualSize = svg.getSize();
+        double scaleWidth = 1.0*size.width / actualSize.width;
+        double scaleHeight = 1.0*size.height / actualSize.height;
+        chartGfx.setTransform(AffineTransform.getScaleInstance(scaleWidth, scaleHeight));
+
+        chartGfx.paint(g2);
     }
 
     private static String padTurnsUniformly(String scramble, String padding) {

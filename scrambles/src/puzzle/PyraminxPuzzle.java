@@ -2,10 +2,10 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
-//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
 //<<<import java.awt.BasicStroke;
-//<<<import java.awt.Color;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Svg;
 //<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
 //<<<import java.awt.geom.AffineTransform;
@@ -15,6 +15,7 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import puzzle.PyraminxSolver.PyraminxSolverState;
@@ -28,9 +29,10 @@ import org.timepedia.exporter.client.Export;
 
 @Export
 public class PyraminxPuzzle extends Puzzle {
+    private static final Logger l = Logger.getLogger(PyraminxPuzzle.class.getName());
+
     private static final int MIN_SCRAMBLE_LENGTH = 11;
     private static final boolean SCRAMBLE_LENGTH_INCLUDES_TIPS = true;
-    private static final Logger l = Logger.getLogger(PyraminxPuzzle.class.getName());
     private PyraminxSolver pyraminxSolver = null;
 
     public PyraminxPuzzle() {
@@ -60,6 +62,18 @@ public class PyraminxPuzzle extends Puzzle {
 
     private static final int pieceSize = 30;
     private static final int gap = 5;
+
+    private static final HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
+    static {
+        defaultColorScheme.put("F", new Color(0x00FF00));
+        defaultColorScheme.put("D", new Color(0xFFFF00));
+        defaultColorScheme.put("L", new Color(0xFF0000));
+        defaultColorScheme.put("R", new Color(0x0000FF));
+    }
+    @Override
+    public HashMap<String, Color> getDefaultColorScheme() {
+        return new HashMap<String, Color>(defaultColorScheme);
+    }
 
     /*<<<
     private static Dimension getImageSize(int gap, int pieceSize) {
@@ -184,19 +198,6 @@ public class PyraminxPuzzle extends Puzzle {
         GeneralPath p = triangle(up, pieceSize);
         p.transform(AffineTransform.getTranslateInstance(x, y));
         return p;
-    }
-
-    private static final HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
-    static {
-        defaultColorScheme.put("F", toColor("00FF00"));
-        defaultColorScheme.put("D", toColor("FFFF00"));
-        defaultColorScheme.put("L", toColor("FF0000"));
-        defaultColorScheme.put("R", toColor("0000FF"));
-    }
-
-    @Override
-    public HashMap<String, Color> getDefaultColorScheme() {
-        return new HashMap<String, Color>(defaultColorScheme);
     }
 
     @Override
@@ -502,9 +503,10 @@ public class PyraminxPuzzle extends Puzzle {
             return Arrays.deepHashCode(image);
         }
 
-        /*<<<
         @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
+        protected Svg drawScramble() {
+            return null;
+        /*<<<
             g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
 
             Color[] scheme = new Color[4];
@@ -512,8 +514,8 @@ public class PyraminxPuzzle extends Puzzle {
                 scheme[i] = colorScheme.get("FDLR".charAt(i)+"");
             }
             drawMinx(g, gap, pieceSize, scheme, image);
-        }
         */
+        }
 
     }
 }

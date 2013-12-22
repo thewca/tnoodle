@@ -1,9 +1,9 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
-//<<<import java.awt.Color;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Svg;
 //<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
 //<<<import java.awt.geom.Area;
@@ -12,6 +12,8 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
@@ -21,6 +23,8 @@ import org.timepedia.exporter.client.Export;
 
 @Export
 public class ClockPuzzle extends Puzzle {
+    private static final Logger l = Logger.getLogger(ClockPuzzle.class.getName());
+
     private static final String[] turns={"UR","DR","DL","UL","U","R","D","L","ALL"};
     private static final int radius = 70;
     private static final int clockRadius = 14;
@@ -55,25 +59,26 @@ public class ClockPuzzle extends Puzzle {
         {1,1,0,1,1,0,1,1,0,   0, 0,-1, 0, 0, 0, 0, 0,-1},// L
         {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// A
     };
-    /*<<<
-    protected Dimension getPreferredSize() {
-        return new Dimension(4*(radius+gap), 2*(radius+gap));
-    }
 
     private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
     static {
-        defaultColorScheme.put("Front", toColor("3375b2"));
-        defaultColorScheme.put("Back", toColor("55ccff"));
-        defaultColorScheme.put("FrontClock", toColor("55ccff"));
-        defaultColorScheme.put("BackClock", toColor("3375b2"));
+        defaultColorScheme.put("Front", new Color(0x3375b2));
+        defaultColorScheme.put("Back", new Color(0x55ccff));
+        defaultColorScheme.put("FrontClock", new Color(0x55ccff));
+        defaultColorScheme.put("BackClock", new Color(0x3375b2));
         defaultColorScheme.put("Hand", Color.YELLOW);
         defaultColorScheme.put("HandBorder", Color.RED);
         defaultColorScheme.put("PinUp", Color.YELLOW);
-        defaultColorScheme.put("PinDown", toColor("885500"));
+        defaultColorScheme.put("PinDown", new Color(0x885500));
     }
     @Override
     public HashMap<String, Color> getDefaultColorScheme() {
         return new HashMap<String, Color>(defaultColorScheme);
+    }
+
+    /*<<<
+    protected Dimension getPreferredSize() {
+        return new Dimension(4*(radius+gap), 2*(radius+gap));
     }
 
     public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
@@ -239,9 +244,10 @@ public class ClockPuzzle extends Puzzle {
             return Arrays.hashCode(posit);
         }
 
-        /*<<<
         @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
+        protected Svg drawScramble() {
+            return null;
+        /*<<<
             drawBackground(g, colorScheme);
 
             for(int i = 0; i < 18; i++) {
@@ -249,8 +255,10 @@ public class ClockPuzzle extends Puzzle {
             }
 
             drawPins(g, pins, colorScheme);
+            */
         }
 
+        /*<<<
         protected void drawBackground(Graphics2D g, HashMap<String, Color> colorScheme) {
             String[] colorString = {"Front", "Back"};
 

@@ -2,7 +2,8 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-//<<<import java.awt.Color;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Svg;
 //<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
 //<<<import java.awt.Rectangle;
@@ -145,6 +146,18 @@ public class CubePuzzle extends Puzzle {
         return (size*cubie + gap)*3 + gap;
     }
 
+    @Override
+    public HashMap<String, Color> getDefaultColorScheme() {
+        HashMap<String, Color> colors = new HashMap<String, Color>();
+        colors.put("B", Color.BLUE);
+        colors.put("D", Color.YELLOW);
+        colors.put("F", Color.GREEN);
+        colors.put("L", new Color(255, 128, 0)); //orange heraldic tincture
+        colors.put("R", Color.RED);
+        colors.put("U", Color.WHITE);
+        return colors;
+    }
+
     /*<<<
     private static Dimension getImageSize(int gap, int unitSize, int size) {
         return new Dimension(getCubeViewWidth(unitSize, gap, size), getCubeViewHeight(unitSize, gap, size));
@@ -175,18 +188,6 @@ public class CubePuzzle extends Puzzle {
     @Override
     protected Dimension getPreferredSize() {
         return getImageSize(gap, cubieSize, size);
-    }
-
-    @Override
-    public HashMap<String, Color> getDefaultColorScheme() {
-        HashMap<String, Color> colors = new HashMap<String, Color>();
-        colors.put("B", Color.BLUE);
-        colors.put("D", Color.YELLOW);
-        colors.put("F", Color.GREEN);
-        colors.put("L", new Color(255, 128, 0)); //orange heraldic tincture
-        colors.put("R", Color.RED);
-        colors.put("U", Color.WHITE);
-        return colors;
     }
 
     @Override
@@ -470,9 +471,11 @@ public class CubePuzzle extends Puzzle {
             return Arrays.deepHashCode(getNormalized());
         }
 
+        protected Svg drawScramble() {
+            return null;
         /*<<<@Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
             drawCube(g, image, gap, cubieSize, colorScheme);
-        }*/
+            */
+        }
     }
 }

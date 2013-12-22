@@ -141,6 +141,7 @@ public class Util {
 		write(Edge3.modedTable, out);
 	}
 
+        /*
 	public static void main(String[] args) throws IOException {
 		System.out.println(Arrays.toString(args));
 		if(args.length != 1) {
@@ -149,6 +150,7 @@ public class Util {
 		}
 		init(false, new File(args[0]));
 	}
+        */
 
 	public static void swap(int[] arr, int a, int b, int c, int d, int key) {
 		int temp;

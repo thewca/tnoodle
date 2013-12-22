@@ -38,6 +38,8 @@ android {
                 exclude 'net/gnehzr/tnoodle/test/**'
                 exclude 'net/gnehzr/tnoodle/scrambles/Main.java'
                 exclude 'net/gnehzr/tnoodle/scrambles/PuzzleImageInfo.java'
+
+                java.srcDirs '../../svglite/src'
             }
 
             resources.srcDirs = java.srcDirs

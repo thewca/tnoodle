@@ -109,31 +109,36 @@ public class NavigationDrawerFragment extends Fragment {
         return mDrawerListView;
     }
 
-    public void setPuzzles(final SortedMap<String, LazyInstantiator<Puzzle>> puzzles) {
-        ArrayAdapter<String> a = new ArrayAdapter<String>(
+    class PuzzleArrayAdapter extends ArrayAdapter<String> {
+        public PuzzleArrayAdapter(Context c, int resource, SortedMap<String, LazyInstantiator<Puzzle>> puzzles) {
+            super(c, resource, new ArrayList<String>(puzzles.keySet()));
+        }
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if(convertView == null) {
+                final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = vi.inflate(R.layout.puzzle_list_item, null);
+            }
+            TextView longNameView = (TextView) convertView.findViewById(R.id.puzzle_long_name);
+            String shortName = getItem(position);
+            String longName = PuzzlePlugins.getScramblerLongName(shortName);
+            longNameView.setText(longName);
+
+            ByteArrayOutputStream puzzleIconPngBaos = PuzzleIcon.loadPuzzleIconPng(shortName);
+            if(puzzleIconPngBaos != null) {
+                ImageView puzzleIconView = (ImageView) convertView.findViewById(R.id.puzzle_icon);
+                byte[] puzzleIconPng = puzzleIconPngBaos.toByteArray();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(puzzleIconPng, 0, puzzleIconPng.length);
+                puzzleIconView.setImageBitmap(bitmap);
+            }
+            return convertView;
+        }
+    }
+
+    public void setPuzzles(SortedMap<String, LazyInstantiator<Puzzle>> puzzles) {
+        ArrayAdapter<String> a = new PuzzleArrayAdapter(
             getActionBar().getThemedContext(),
             R.layout.puzzle_list_item,
-            new ArrayList<String>(puzzles.keySet())) {
-                public View getView(int position, View convertView, ViewGroup parent) {
-                    if(convertView == null) {
-                        final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        convertView = vi.inflate(R.layout.puzzle_list_item, null);
-                    }
-                    TextView longNameView = (TextView) convertView.findViewById(R.id.puzzle_long_name);
-                    String shortName = getItem(position);
-                    String longName = PuzzlePlugins.getScramblerLongName(shortName);
-                    longNameView.setText(longName);
-
-                    ByteArrayOutputStream puzzleIconPngBaos = PuzzleIcon.loadPuzzleIconPng(shortName);
-                    if(puzzleIconPngBaos != null) {
-                        ImageView puzzleIconView = (ImageView) convertView.findViewById(R.id.puzzle_icon);
-                        byte[] puzzleIconPng = puzzleIconPngBaos.toByteArray();
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(puzzleIconPng, 0, puzzleIconPng.length);
-                        puzzleIconView.setImageBitmap(bitmap);
-                    }
-                    return convertView;
-                }
-        };
+            puzzles);
         mDrawerListView.setAdapter(a);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
     }

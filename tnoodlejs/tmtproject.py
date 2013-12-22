@@ -99,8 +99,6 @@ class Project(tmt.EclipseProject):
 
         entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True, includeSrc=True)
         entities.add(join(gwtDir, "*"))
-        entities.add(join('lib', 'lib-gwt-svg-0.5.7.jar'))
-        entities.add(join('lib', 'gwt-awt-0.0.3-SNAPSHOT.jar'))
         # convert to a list, because order matters
         entities = list(entities)
         entities.insert(0, self.postProcessedDir)

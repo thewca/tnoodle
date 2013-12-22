@@ -1,11 +1,11 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.modulo;
-//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 //<<<import java.awt.BasicStroke;
-//<<<import java.awt.Color;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Svg;
 //<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
 //<<<import java.awt.geom.AffineTransform;
@@ -50,6 +50,20 @@ public class SquareOnePuzzle extends Puzzle {
             return null;
         }
         return new PuzzleStateAndGenerator(state, scramble);
+    }
+
+    private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
+    static {
+        defaultColorScheme.put("L", new Color(0xffff00));
+        defaultColorScheme.put("B", new Color(0xff0000));
+        defaultColorScheme.put("R", new Color(0x0000ff));
+        defaultColorScheme.put("F", new Color(0xffc800));
+        defaultColorScheme.put("U", new Color(0xffffff));
+        defaultColorScheme.put("D", new Color(0x00ff00));
+    }
+    @Override
+    public HashMap<String, Color> getDefaultColorScheme() {
+        return new HashMap<String, Color>(defaultColorScheme);
     }
 
     /*<<<
@@ -182,20 +196,6 @@ public class SquareOnePuzzle extends Puzzle {
         tri.closePath();
         tri.transform(AffineTransform.getTranslateInstance(x - width / 2.0, y - width / 2.0));
         return new Area(tri);
-    }
-
-    private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
-    static {
-        defaultColorScheme.put("L", toColor("ffff00"));
-        defaultColorScheme.put("B", toColor("ff0000"));
-        defaultColorScheme.put("R", toColor("0000ff"));
-        defaultColorScheme.put("F", toColor("ffc800"));
-        defaultColorScheme.put("U", toColor("ffffff"));
-        defaultColorScheme.put("D", toColor("00ff00"));
-    }
-    @Override
-    public HashMap<String, Color> getDefaultColorScheme() {
-        return new HashMap<String, Color>(defaultColorScheme);
     }
 
     @Override
@@ -368,9 +368,10 @@ public class SquareOnePuzzle extends Puzzle {
             return Arrays.hashCode(pieces) ^ (sliceSolved ? 1 : 0);
         }
 
-        /*<<<
         @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorSchemeMap) {
+        protected Svg drawScramble() {
+            return null;
+        /*<<<
             g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
 
             String faces = "LBRFUD";
@@ -411,8 +412,8 @@ public class SquareOnePuzzle extends Puzzle {
             y *= 3.0;
             g.rotate(Math.toRadians(-90 - 15), x, y);
             drawFace(g, GwtSafeUtils.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
+            */
         }
-        */
 
     }
 }

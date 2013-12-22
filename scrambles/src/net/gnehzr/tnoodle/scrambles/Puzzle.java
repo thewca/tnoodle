@@ -2,13 +2,11 @@ package net.gnehzr.tnoodle.scrambles;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.ceil;
-//<<<import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
-//<<<import java.awt.Color;
-//<<<import java.awt.Dimension;
-//<<<import java.awt.RenderingHints;
-//<<<import java.awt.Graphics2D;
-//<<<import java.awt.geom.GeneralPath;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.InvalidHexColorException;
+import net.gnehzr.tnoodle.svglite.Svg;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
@@ -103,21 +101,9 @@ public abstract class Puzzle implements Exportable {
     }
 
     /**
-     * Subclasses of Scrambler are expected to produce scrambles of one size,
-     * this abstract class will resize appropriately.
-     * @return The size of the images this Scrambler will produce.
-     */
-    //<<<protected abstract Dimension getPreferredSize();
-
-    /**
      * @return A *new* HashMap mapping face names to Colors.
      */
-    //<<<public abstract HashMap<String, Color> getDefaultColorScheme();
-
-    /**
-     * @return A HashMap mapping face names to GeneralPaths.
-     */
-    //<<<public abstract HashMap<String, GeneralPath> getDefaultFaceBoundaries();
+    public abstract HashMap<String, Color> getDefaultColorScheme();
 
     private String[] generateScrambles(Random r, int count) {
         String[] scrambles = new String[count];
@@ -140,7 +126,7 @@ public abstract class Puzzle implements Exportable {
             l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
             azzert(false, e);
             return null;
-        } 
+        }
     }
 
     @Export
@@ -193,38 +179,15 @@ public abstract class Puzzle implements Exportable {
     }
 
     /**
-     * Computes the best size to draw the scramble image.
-     * @param maxWidth The maximum allowed width of the resulting image, 0 if it doesn't matter.
-     * @param maxHeight The maximum allowed height of the resulting image, 0 if it doesn't matter.
-     * @return The best size of the resulting image, constrained to maxWidth and maxHeight.
-     */
-    /*<<<@Export
-    public Dimension getPreferredSize(int maxWidth, int maxHeight) {
-        if(maxWidth == 0 && maxHeight == 0) {
-            return getPreferredSize();
-        }
-        if(maxWidth == 0) {
-            maxWidth = Integer.MAX_VALUE;
-        } else if(maxHeight == 0) {
-            maxHeight = Integer.MAX_VALUE;
-        }
-        double ratio = 1.0 * getPreferredSize().width / getPreferredSize().height;
-        int resultWidth = Math.min(maxWidth, ceil(maxHeight*ratio));
-        int resultHeight = Math.min(maxHeight, ceil(maxWidth/ratio));
-        return new Dimension(resultWidth, resultHeight);
-    }
-    */
-
-    /**
      * TODO - document! alphabetical
      * @return
      */
-    //<<<@Export
-    //<<<public String[] getFaceNames() {
-        //<<<ArrayList<String> faces = new ArrayList<String>(getDefaultColorScheme().keySet());
-        //<<<Collections.sort(faces);
-        //<<<return faces.toArray(new String[faces.size()]);
-    //<<<}
+    @Export
+    public String[] getFaceNames() {
+        ArrayList<String> faces = new ArrayList<String>(getDefaultColorScheme().keySet());
+        Collections.sort(faces);
+        return faces.toArray(new String[faces.size()]);
+    }
 
 
     /**
@@ -232,7 +195,7 @@ public abstract class Puzzle implements Exportable {
      * @param colorScheme
      * @return
      */
-    /*<<<public HashMap<String, Color> parseColorScheme(String scheme) {
+    public HashMap<String, Color> parseColorScheme(String scheme) {
         HashMap<String, Color> colorScheme = getDefaultColorScheme();
         if(scheme != null && !scheme.isEmpty()) {
             String[] faces = getFaceNames();
@@ -252,20 +215,21 @@ public abstract class Puzzle implements Exportable {
                 return null;
             }
             for(int i = 0; i < colors.length; i++) {
-                Color c = toColor(colors[i]);
-                if(c == null) {
+                try {
+                    Color c = new Color(colors[i]);
+                    colorScheme.put(faces[i], c);
+                } catch(InvalidHexColorException e) {
 //                  sendText(t, "Invalid color: " + colors[i]);
                     //TODO - exception
                     return null;
                 }
-                colorScheme.put(faces[i], c);
             }
         }
         return colorScheme;
-    }*/
+    }
 
     /**
-     * Draws scramble onto g.
+     * Draws scramble onto g.<<<>>>
      * @param g The Graphics2D object to draw upon (of size size)
      * @param size The Dimension of the resulting image.
      * @param scramble The scramble to validate and apply to the puzzle. NOTE: May be null!
@@ -274,7 +238,7 @@ public abstract class Puzzle implements Exportable {
      *          If null, just the defaults are used.
      * @throws InvalidScrambleException If scramble is invalid.
      */
-    /*<<<public void drawScramble(Graphics2D g, Dimension size, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+    public Svg drawScramble(String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
         if(scramble == null) {
             scramble = "";
         }
@@ -282,13 +246,49 @@ public abstract class Puzzle implements Exportable {
         if(colorScheme != null) {
             defaults.putAll(colorScheme);
         }
-        g.scale(1.0*size.width/getPreferredSize().width, 1.0*size.height/getPreferredSize().height);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         PuzzleState state = getSolvedState();
         state = state.applyAlgorithm(scramble);
-        state.drawScramble(g, defaults);
-    }*/
+        Svg svg = state.drawScramble();
+        svg = new Svg();//<<<
+        // TODO - apply color scheme! <<<
+        return svg;
+    }
 
+    private Dimension preferredSize = null;
+    public Dimension getPreferredSize() {
+        if(preferredSize == null) {
+            try {
+                Svg solved = drawScramble(null, null);
+                preferredSize = solved.getSize();
+            } catch(InvalidScrambleException e) {
+                l.log(Level.SEVERE, "Couldn't draw null scramble", e);
+            }
+        }
+        return preferredSize;
+    }
+
+    /**
+     * Computes the best size to draw the scramble image.
+     * @param maxWidth The maximum allowed width of the resulting image, 0 if it doesn't matter.
+     * @param maxHeight The maximum allowed height of the resulting image, 0 if it doesn't matter.
+     * @return The best size of the resulting image, constrained to maxWidth and maxHeight.
+     */
+    @Export
+    public Dimension getPreferredSize(int maxWidth, int maxHeight) {
+        if(maxWidth == 0 && maxHeight == 0) {
+            return getPreferredSize();
+        }
+        if(maxWidth == 0) {
+            maxWidth = Integer.MAX_VALUE;
+        } else if(maxHeight == 0) {
+            maxHeight = Integer.MAX_VALUE;
+        }
+        double ratio = 1.0 * getPreferredSize().width / getPreferredSize().height;
+        int resultWidth = Math.min(maxWidth, ceil(maxHeight*ratio));
+        int resultHeight = Math.min(maxHeight, ceil(maxWidth/ratio));
+        return new Dimension(resultWidth, resultHeight);
+    }
 
     protected String solveIn(PuzzleState ps, int n) {
         if(ps.isSolved()) {
@@ -367,9 +367,9 @@ public abstract class Puzzle implements Exportable {
                     break outer;
                 }
             }
-            if(Thread.interrupted()) {//<<<
-                throw new RuntimeException(new InterruptedException());
-            }
+            //<<<if(Thread.interrupted()) {//<<<
+                //<<<throw new RuntimeException(new InterruptedException());
+            //<<<}
         }
 
         l.log(start.finishedNow("expanded " + ( seenSolved.size() + seenScrambled.size() ) + " nodes"));
@@ -526,17 +526,16 @@ public abstract class Puzzle implements Exportable {
         public abstract boolean equals(Object other);
         public abstract int hashCode();
 
-
         /**
          * Draws the state of the puzzle.
          * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing,
          * use the synchronized keyword when implementing this method:<br>
          * <code>protected synchronized void drawScramble();</code>
+         * <<< >>>
          * @param g The Graphics2D object to draw upon (guaranteed to be big enough for getScrambleSize())
          * @param colorScheme A HashMap mapping face names to Colors, must have an entry for every face!
          */
-        //<<<protected abstract void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme);
-
+        protected abstract Svg drawScramble();
 
         public Puzzle getPuzzle() {
             return Puzzle.this;
@@ -624,9 +623,9 @@ public abstract class Puzzle implements Exportable {
                 } catch(InvalidMoveException e) {
                     azzert(false, e);
                 }
-                if(Thread.interrupted()) {//<<<
-                    throw new RuntimeException(new InterruptedException());
-                }
+                //<<<if(Thread.interrupted()) {//<<<
+                    //<<<throw new RuntimeException(new InterruptedException());
+                //<<<}
                 // If this move is redundant, there is no reason to select that move again in vain.
                 successors.remove(move);
             }
