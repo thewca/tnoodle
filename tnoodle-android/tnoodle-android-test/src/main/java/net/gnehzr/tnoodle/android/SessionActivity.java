@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -205,6 +206,9 @@ public class SessionActivity extends ActionBarActivity
         }
 
         private class ScrambleTask extends AsyncTask<Puzzle, Void, ScrambleAndSvg> {
+
+            public ScrambleTask() { }
+
             private Exception exception;
             protected ScrambleAndSvg doInBackground(Puzzle... puzzles) {
                 try {
@@ -249,8 +253,12 @@ public class SessionActivity extends ActionBarActivity
                     scrambleImageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                     scrambleImageView.setImageDrawable(drawable);
                     LayoutParams params = (LayoutParams) scrambleImageView.getLayoutParams();
-                    params.width = size.width;
-                    params.height = size.height;
+
+                    DisplayMetrics metrics = new DisplayMetrics();
+                    PlaceholderFragment.this.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+                    params.width = (int) (size.width * metrics.density);
+                    params.height = (int) (size.height * metrics.density);
                     scrambleImageView.setLayoutParams(params);
                 } catch(SVGParseException e) {
                     Log.wtf(TAG, e);
