@@ -25,6 +25,8 @@ android {
 dependencies {
     compile 'com.android.support:appcompat-v7:19.0.0'
     compile 'com.android.support:support-v4:19.0.0'
+
+    compile 'com.caverock:androidsvg:1.2.0'
     
     compile project(':tnoodle-android')
 }

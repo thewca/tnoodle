@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.android;
 
+import android.graphics.drawable.PictureDrawable;
+import android.graphics.drawable.Drawable;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.os.AsyncTask;
@@ -15,13 +17,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
+import android.widget.ImageView;
+
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGParseException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
@@ -146,6 +155,7 @@ public class SessionActivity extends ActionBarActivity
         // Views
         private View rootView;
         private TextView scrambleView;
+        private ImageView scrambleImageView;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -171,6 +181,7 @@ public class SessionActivity extends ActionBarActivity
             res = getResources();
             rootView = inflater.inflate(R.layout.fragment_session, container, false);
             scrambleView = (TextView) rootView.findViewById(R.id.scramble);
+            scrambleImageView = (ImageView) rootView.findViewById(R.id.scrambleImageView);
 
             String shortName = getShortName();
             LazyInstantiator<Puzzle> lazyPuzzle = puzzles.get(shortName);
@@ -184,14 +195,24 @@ public class SessionActivity extends ActionBarActivity
             return rootView;
         }
 
-        private class ScrambleTask extends AsyncTask<Puzzle, Void, String> {
+        private class ScrambleAndSvg {
+            String scramble;
+            Svg svg;
+            public ScrambleAndSvg(String scramble, Svg svg) {
+                this.scramble = scramble;
+                this.svg = svg;
+            }
+        }
+
+        private class ScrambleTask extends AsyncTask<Puzzle, Void, ScrambleAndSvg> {
             private Exception exception;
-            protected String doInBackground(Puzzle... puzzles) {
+            protected ScrambleAndSvg doInBackground(Puzzle... puzzles) {
                 try {
                     assert puzzles.length == 1;
                     Puzzle puzzle = puzzles[0];
                     String scramble = puzzle.generateScramble();
-                    return scramble;
+                    Svg svg = puzzle.drawScramble(scramble, null);
+                    return new ScrambleAndSvg(scramble, svg);
                 } catch(Exception e) {
                     this.exception = e;
                     return null;
@@ -202,19 +223,38 @@ public class SessionActivity extends ActionBarActivity
                 Log.w(TAG, exception);
             }
 
-            protected void onCancelled(String scramble) {
+            protected void onCancelled(ScrambleAndSvg scrambleAndSvg) {
                 if(exception != null) {
                     handleException();
                     return;
                 }
             }
 
-            protected void onPostExecute(String scramble) {
+            protected void onPostExecute(ScrambleAndSvg scrambleAndSvg) {
                 if(exception != null) {
                     handleException();
                     return;
                 }
+                String scramble = scrambleAndSvg.scramble;
+                Svg svgLite = scrambleAndSvg.svg;
+                Dimension size = svgLite.getSize();
+
                 scrambleView.setText(scramble);
+
+                try {
+                    SVG svg = SVG.getFromString(svgLite.toString());
+                    Drawable drawable = new PictureDrawable(svg.renderToPicture());
+                    // See https://code.google.com/p/svg-android/wiki/Tutorial
+                    // for why we must disable hw rendering.
+                    scrambleImageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                    scrambleImageView.setImageDrawable(drawable);
+                    LayoutParams params = (LayoutParams) scrambleImageView.getLayoutParams();
+                    params.width = size.width;
+                    params.height = size.height;
+                    scrambleImageView.setLayoutParams(params);
+                } catch(SVGParseException e) {
+                    Log.wtf(TAG, e);
+                }
             }
         }
 
