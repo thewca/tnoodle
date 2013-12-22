@@ -52,6 +52,10 @@ public class Element implements Cloneable {
         return style;
     }
 
+    private String colorToStr(Color c) {
+        return c == null ? "none" : "#" + c.toHex();
+    }
+
     public String toStyleStr() {
         StringBuilder sb = new StringBuilder();
         for(String key : style.keySet()) {
@@ -116,4 +120,13 @@ public class Element implements Cloneable {
             throw new AssertionError(e);
         }
     }
+
+    public void setFillColor(Color c) {
+        setAttribute("fill", colorToStr(c));
+    }
+
+    public void setStrokeColor(Color c) {
+        setAttribute("stroke", colorToStr(c));
+    }
+
 }

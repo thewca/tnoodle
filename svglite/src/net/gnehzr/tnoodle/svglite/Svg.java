@@ -39,8 +39,8 @@ public class Svg extends Element {
     public void fill(Path p) {
         p = (Path) p.clone();
         if(c != null) {
-            p.setAttribute("stroke", "none");
-            p.setAttribute("fill", "#" + c.toHex());
+            p.setStrokeColor(c);
+            p.setFillColor(c);
         }
         appendChild(p);
     }
@@ -48,8 +48,8 @@ public class Svg extends Element {
     public void draw(Path p) {
         p = (Path) p.clone();
         if(c != null) {
-            p.setAttribute("stroke", "#" + c.toHex());
-            p.setAttribute("fill", "none");
+            p.setStrokeColor(c);
+            p.setFillColor(null);
         }
         appendChild(p);
     }

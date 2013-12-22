@@ -7,6 +7,8 @@ import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.InvalidHexColorException;
 import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.svglite.Group;
+import net.gnehzr.tnoodle.svglite.Element;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
@@ -249,6 +251,17 @@ public abstract class Puzzle implements Exportable {
         PuzzleState state = getSolvedState();
         state = state.applyAlgorithm(scramble);
         Svg svg = state.drawScramble(colorScheme);
+
+        // This is a hack I don't fully understand that prevents aliasing of
+        // vertical and horizontal lines.
+        // See http://stackoverflow.com/questions/7589650/drawing-grid-with-jquery-svg-produces-2px-lines-instead-of-1px
+        Group g = new Group();
+        ArrayList<Element> children = svg.getChildren();
+        while(!children.isEmpty()) {
+            g.appendChild(children.remove(0));
+        }
+        g.setAttribute("transform", "translate(0.5 0.5)");
+        svg.appendChild(g);
         return svg;
     }
 
