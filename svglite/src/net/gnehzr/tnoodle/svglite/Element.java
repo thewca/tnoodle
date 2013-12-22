@@ -129,4 +129,41 @@ public class Element implements Cloneable {
         setAttribute("stroke", colorToStr(c));
     }
 
+    public void transform(String type, double... args) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("(");
+        boolean spaceNeeded = false;
+        for(double arg : args) {
+            if(spaceNeeded) {
+                sb.append(" ");
+            }
+            sb.append(arg);
+            spaceNeeded = true;
+        }
+        sb.append(")");
+        String oldTransform = getAttribute("transform");
+        if(oldTransform != null) {
+            // Transforms are applied right to left
+            sb.append(" ").append(oldTransform);
+        }
+        setAttribute("transform", sb.toString());
+    }
+    public void clearTransform() {
+        setAttribute("transform", null);
+    }
+
+    public void translate(double x, double y) {
+        transform("translate", x, y);
+    }
+    public void translate(double x) {
+        transform("translate", x);
+    }
+
+    public void rotate(double a, double x, double y) {
+        transform("rotate", a, x, y);
+    }
+    public void rotate(double a) {
+        transform("rotate", a);
+    }
+
 }

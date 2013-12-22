@@ -260,7 +260,7 @@ public abstract class Puzzle implements Exportable {
         while(!children.isEmpty()) {
             g.appendChild(children.remove(0));
         }
-        g.setAttribute("transform", "translate(0.5 0.5)");
+        g.translate(0.5, 0.5);
         svg.appendChild(g);
         return svg;
     }

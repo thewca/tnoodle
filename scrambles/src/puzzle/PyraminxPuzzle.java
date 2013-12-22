@@ -12,7 +12,6 @@ import net.gnehzr.tnoodle.svglite.Point2D;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import puzzle.PyraminxSolver.PyraminxSolverState;
@@ -139,10 +138,10 @@ public class PyraminxPuzzle extends Puzzle {
         }
 
         for(int i = 0; i < ps.length; i++) {
-            g.setColor(colorScheme[state[i]]);
-            g.fill(ps[i]);
-            g.setColor(Color.BLACK);
-            g.draw(ps[i]);
+            Path sticker = ps[i];
+            sticker.setFillColor(colorScheme[state[i]]);
+            sticker.setStrokeColor(Color.BLACK);
+            g.appendChild(sticker);
         }
     }
 

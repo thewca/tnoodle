@@ -36,8 +36,8 @@ public class Svg extends Element {
         setStyle("stroke-linejoin", lineJoin);
     }
 
-    public void fill(Path p) {
-        p = (Path) p.clone();
+    public void fill(Element p) {
+        p = (Element) p.clone();
         if(c != null) {
             p.setStrokeColor(c);
             p.setFillColor(c);
@@ -45,13 +45,23 @@ public class Svg extends Element {
         appendChild(p);
     }
 
-    public void draw(Path p) {
-        p = (Path) p.clone();
+    public void draw(Element p) {
+        p = (Element) p.clone();
         if(c != null) {
             p.setStrokeColor(c);
             p.setFillColor(null);
         }
         appendChild(p);
+    }
+
+    public void drawOval(double cx, double cy, double rx, double ry) {
+        Ellipse oval = new Ellipse(cx, cy, rx, ry);
+        draw(oval);
+    }
+
+    public void fillOval(double cx, double cy, double rx, double ry) {
+        Ellipse oval = new Ellipse(cx, cy, rx, ry);
+        fill(oval);
     }
 
 }
