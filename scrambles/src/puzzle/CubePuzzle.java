@@ -3,6 +3,7 @@ package puzzle;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
 //<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
@@ -139,13 +140,6 @@ public class CubePuzzle extends Puzzle {
         }
     }
 
-    private static int getCubeViewWidth(int cubie, int gap, int size) {
-        return (size*cubie + gap)*4 + gap;
-    }
-    private static int getCubeViewHeight(int cubie, int gap, int size) {
-        return (size*cubie + gap)*3 + gap;
-    }
-
     @Override
     public HashMap<String, Color> getDefaultColorScheme() {
         HashMap<String, Color> colors = new HashMap<String, Color>();
@@ -158,10 +152,23 @@ public class CubePuzzle extends Puzzle {
         return colors;
     }
 
-    /*<<<
+    @Override
+    public Dimension getPreferredSize() {
+        return getImageSize(gap, cubieSize, size);
+    }
+
+    private static int getCubeViewWidth(int cubie, int gap, int size) {
+        return (size*cubie + gap)*4 + gap;
+    }
+    private static int getCubeViewHeight(int cubie, int gap, int size) {
+        return (size*cubie + gap)*3 + gap;
+    }
+
     private static Dimension getImageSize(int gap, int unitSize, int size) {
         return new Dimension(getCubeViewWidth(unitSize, gap, size), getCubeViewHeight(unitSize, gap, size));
     }
+
+    /*<<<
     private void drawCube(Graphics2D g, int[][][] state, int gap, int cubieSize, HashMap<String, Color> colorScheme) {
         paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[0], colorScheme);
         paintCubeFace(g, 2*gap+size*cubieSize, 3*gap+2*size*cubieSize, size, cubieSize, state[Face.D.ordinal()], colorScheme);
@@ -183,11 +190,6 @@ public class CubePuzzle extends Puzzle {
                 g.drawRect(tempx, tempy, cubieSize, cubieSize);
             }
         }
-    }
-
-    @Override
-    protected Dimension getPreferredSize() {
-        return getImageSize(gap, cubieSize, size);
     }
 
     @Override
@@ -471,8 +473,9 @@ public class CubePuzzle extends Puzzle {
             return Arrays.deepHashCode(getNormalized());
         }
 
-        protected Svg drawScramble() {
-            return null;
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Svg svg = new Svg(getPreferredSize());
+            return svg;
         /*<<<@Override
             drawCube(g, image, gap, cubieSize, colorScheme);
             */

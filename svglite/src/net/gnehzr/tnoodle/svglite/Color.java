@@ -9,12 +9,12 @@ public class Color {
     public static final Color GRAY = new Color(128, 128, 128);
     public final static Color YELLOW = new Color(255, 255, 0);
     
-    private byte r, g, b, a;
+    private int r, g, b, a;
     public Color(int r, int g, int b, int a) {
-        this.r = (byte) r;
-        this.g = (byte) g;
-        this.b = (byte) b;
-        this.a = (byte) a;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
     }
 
     public Color(int r, int g, int b) {
@@ -22,10 +22,10 @@ public class Color {
     }
 
     public Color(int rgba) {
-        this((rgba >> 8*2) & 0xff,
-             (rgba >> 8) & 0xff,
+        this((rgba >>> 8*2) & 0xff,
+             (rgba >>> 8) & 0xff,
              rgba & 0xff,
-             (rgba >> 8*3) & 0xff);
+             (rgba >>> 8*3) & 0xff);
     }
 
     private static int hexToRGB(String htmlHex) throws InvalidHexColorException {
@@ -58,20 +58,24 @@ public class Color {
         return Integer.toHexString(0x1000000 | (getRGB() & 0xffffff)).substring(1);
     }
 
-    public byte getRed() {
+    public int getRed() {
         return r;
     }
 
-    public byte getGreen() {
+    public int getGreen() {
         return g;
     }
 
-    public byte getBlue() {
+    public int getBlue() {
         return b;
     }
 
     public int getRGB() {
         return (a << 8*3) | (r << 8*2) | (g << 8) | b;
+    }
+
+    public String toString() {
+        return "<color #" + toHex() + ">";
     }
 
 }

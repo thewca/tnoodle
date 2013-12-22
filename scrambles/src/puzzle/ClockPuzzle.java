@@ -3,6 +3,7 @@ package puzzle;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
 //<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
@@ -76,10 +77,12 @@ public class ClockPuzzle extends Puzzle {
         return new HashMap<String, Color>(defaultColorScheme);
     }
 
-    /*<<<
-    protected Dimension getPreferredSize() {
+    @Override
+    public Dimension getPreferredSize() {
         return new Dimension(4*(radius+gap), 2*(radius+gap));
     }
+
+    /*<<<
 
     public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
         // Background
@@ -245,8 +248,9 @@ public class ClockPuzzle extends Puzzle {
         }
 
         @Override
-        protected Svg drawScramble() {
-            return null;
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Svg svg = new Svg(getPreferredSize());
+            return svg;
         /*<<<
             drawBackground(g, colorScheme);
 

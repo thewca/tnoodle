@@ -5,8 +5,8 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 //<<<import java.awt.BasicStroke;
 import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
-//<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
 //<<<import java.awt.geom.AffineTransform;
 //<<<import java.awt.geom.Area;
@@ -66,6 +66,22 @@ public class SquareOnePuzzle extends Puzzle {
         return new HashMap<String, Color>(defaultColorScheme);
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        return getImageSize(radius);
+    }
+    private static Dimension getImageSize(int radius) {
+        return new Dimension(getWidth(radius), getHeight(radius));
+    }
+    private static final double RADIUS_MULTIPLIER = Math.sqrt(2) * Math.cos(Math.toRadians(15));
+    private static final double multiplier = 1.4;
+    private static int getWidth(int radius) {
+        return (int) (2 * RADIUS_MULTIPLIER * multiplier * radius);
+    }
+    private static int getHeight(int radius) {
+        return (int) (4 * RADIUS_MULTIPLIER * multiplier * radius);
+    }
+
     /*<<<
     private void drawFace(Graphics2D g, int[] face, double x, double y, int radius, Color[] colorScheme) {
         for(int ch = 0; ch < 12; ch++) {
@@ -119,7 +135,6 @@ public class SquareOnePuzzle extends Puzzle {
         }
     }
 
-    private static final double multiplier = 1.4;
     private GeneralPath[] getWedgePoly(double x, double y, int radius) {
         AffineTransform trans = AffineTransform.getTranslateInstance(x, y);
         GeneralPath p = new GeneralPath();
@@ -172,17 +187,6 @@ public class SquareOnePuzzle extends Puzzle {
         return new GeneralPath[]{ p, side1, side2 };
     }
 
-    private static Dimension getImageSize(int radius) {
-        return new Dimension(getWidth(radius), getHeight(radius));
-    }
-    private static final double RADIUS_MULTIPLIER = Math.sqrt(2) * Math.cos(Math.toRadians(15));
-    private static int getWidth(int radius) {
-        return (int) (2 * RADIUS_MULTIPLIER * multiplier * radius);
-    }
-    private static int getHeight(int radius) {
-        return (int) (4 * RADIUS_MULTIPLIER * multiplier * radius);
-    }
-
     //x, y are the coordinates of the center of the square
     private static Area getSquare(double x, double y, double half_width) {
         return new Area(new Rectangle2D.Double(x - half_width, y - half_width, 2 * half_width, 2 * half_width));
@@ -228,10 +232,6 @@ public class SquareOnePuzzle extends Puzzle {
         return facesMap;
     }
 
-    @Override
-    protected Dimension getPreferredSize() {
-        return getImageSize(radius);
-    }
     */
 
     @Override
@@ -369,8 +369,9 @@ public class SquareOnePuzzle extends Puzzle {
         }
 
         @Override
-        protected Svg drawScramble() {
-            return null;
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Svg svg = new Svg(getPreferredSize());
+            return svg;
         /*<<<
             g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
 

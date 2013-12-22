@@ -3,8 +3,8 @@ package puzzle;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
-//<<<import java.awt.Dimension;
 //<<<import java.awt.Graphics2D;
 //<<<import java.awt.geom.AffineTransform;
 //<<<import java.awt.geom.GeneralPath;
@@ -74,12 +74,10 @@ public class MegaminxPuzzle extends Puzzle {
         return "minx";
     }
 
-    /*<<<
     @Override
-    protected Dimension getPreferredSize() {
+    public Dimension getPreferredSize() {
         return getImageSize(gap, minxRad, null);
     }
-    */
 
     private static final double UNFOLDHEIGHT = 2 + 3 * Math.sin(.3 * Math.PI) + Math.sin(.1 * Math.PI);
     private static final double UNFOLDWIDTH = 4 * Math.cos(.1 * Math.PI) + 2 * Math.cos(.3 * Math.PI);
@@ -213,11 +211,18 @@ public class MegaminxPuzzle extends Puzzle {
         return colors;
     }
 
-    /*<<<
     private static Dimension getImageSize(int gap, int minxRad, String variation) {
         return new Dimension(getMegaminxViewWidth(gap, minxRad), getMegaminxViewHeight(gap, minxRad));
     }
 
+    private static int getMegaminxViewWidth(int gap, int minxRad) {
+        return (int)(UNFOLDWIDTH * 2 * minxRad + 3 * gap);
+    }
+    private static int getMegaminxViewHeight(int gap, int minxRad) {
+        return (int)(UNFOLDHEIGHT * minxRad + 2 * gap);
+    }
+
+    /*<<<
     private static GeneralPath pentagon(boolean pointup, int minxRad) {
         double[] angs = { 1.3, 1.7, .1, .5, .9 };
         for(int i = 0; i < angs.length; i++) {
@@ -254,17 +259,6 @@ public class MegaminxPuzzle extends Puzzle {
 
     private static double det(double a, double b, double c, double d) {
         return a * d - b * c;
-    }
-
-    private static int getMegaminxViewWidth(int gap, int minxRad) {
-        return (int)(UNFOLDWIDTH * 2 * minxRad + 3 * gap);
-    }
-    private static int getMegaminxViewHeight(int gap, int minxRad) {
-        return (int)(UNFOLDHEIGHT * minxRad + 2 * gap);
-    }
-    private static int getNewUnitSize(int width, int height, int gap, String variation) {
-        return (int) Math.round(Math.min((width - 3*gap) / (UNFOLDWIDTH * 2),
-                (height - 2*gap) / UNFOLDHEIGHT));
     }
 
     private static GeneralPath getPentagon(double x, double y, boolean up, int minxRad) {
@@ -526,8 +520,9 @@ public class MegaminxPuzzle extends Puzzle {
         }
 
         @Override
-        protected Svg drawScramble() {
-            return null;
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Svg svg = new Svg(getPreferredSize());
+            return svg;
             //<<<drawMinx(g, gap, minxRad, colorScheme);
         }
 
