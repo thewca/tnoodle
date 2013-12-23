@@ -94,10 +94,11 @@ public class SquareOnePuzzle extends Puzzle {
 
         Color[] cls = getPieceColors(piece, colorScheme);
         for(int ch = cls.length - 1; ch >= 0; ch--) {
-            g.setColor(cls[ch]);
-            g.fill(p[ch]);
-            g.setColor(Color.BLACK);
-            g.draw(p[ch]);
+            p[ch].setFillColor(cls[ch]);
+            p[ch].setStrokeColor(Color.BLACK);
+            // TODO <<< - pass around a transform object instead!
+            p[ch].setAttribute("transform", g.getAttribute("transform"));//<<<
+            g.appendChild(p[ch]);
         }
         g.rotate(Math.toRadians(degree), x, y);
         return degree;
@@ -332,20 +333,23 @@ public class SquareOnePuzzle extends Puzzle {
             double edge_width = 2 * radius * multiplier * Math.sin(Math.toRadians(15));
             double corner_width = half_square_width - edge_width / 2.;
             Rectangle left_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width, radius * (multiplier - 1));
-            Rectangle right_mid;
+            Rectangle left_mid2 = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width, radius * (multiplier - 1));
+            Rectangle right_mid, right_mid2;
             if(sliceSolved) {
                 right_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., 2*corner_width + edge_width, radius * (multiplier - 1));
+                right_mid2 = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., 2*corner_width + edge_width, radius * (multiplier - 1));
                 g.setColor(colorScheme[3]); //front
             } else {
                 right_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width + edge_width, radius * (multiplier - 1));
+                right_mid2 = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width + edge_width, radius * (multiplier - 1));
                 g.setColor(colorScheme[1]); //back
             }
             g.fill(right_mid);
             g.setColor(colorScheme[3]); //front
             g.fill(left_mid); //this will clobber part of the other guy
             g.setColor(Color.BLACK);
-            g.draw(right_mid);
-            g.draw(left_mid);
+            g.draw(right_mid2); // TODO - add some sort of copy/clone <<<
+            g.draw(left_mid2);
 
             double x = width / 2.0;
             double y = height / 4.0;

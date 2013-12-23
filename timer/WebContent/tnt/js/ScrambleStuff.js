@@ -99,7 +99,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     var puzzle = null;
     var colorScheme = null;
     var currTurn = null;
-    var faceMap = null;
+    var scrambleImagesSupported = false;
     var defaultColorScheme = null;
     var defaultSize = null;
 
@@ -120,7 +120,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
 
         colorScheme = null; // reset colorscheme
         currTurn = null;
-        faceMap = null; // this indicates if the current puzzle support images
+        scrambleImagesSupported = null;
         currScramble = null;
         puzzle = newPuzzle;
         scrambleImg.clear();
@@ -146,10 +146,10 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
         scrambler.loadPuzzleImageInfo(
             function(puzzleImageInfo) {
                 if(puzzleImageInfo.error) {
-                    faceMap = null; // scramble images are not supported
+                    scrambleImagesSupported = false;
                     scrambleImg.setVisible(false, true);
                 } else {
-                    faceMap = puzzleImageInfo.faces;
+                    scrambleImagesSupported = true;
                     colorScheme = configuration.get('scramble.' + puzzle + '.colorScheme', clone(puzzleImageInfo.colorScheme));
                     defaultColorScheme = puzzleImageInfo.colorScheme;
 
@@ -322,7 +322,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
         setScrambleCopyVisible(false);
         currScramble = scramble;
 
-        if(!faceMap) {
+        if(!scrambleImagesSupported) {
             // scramble images are not supported, so don't bother with links
             deleteChildren(scramblePre);
             scramblePre.appendChild(document.createTextNode(scramble));

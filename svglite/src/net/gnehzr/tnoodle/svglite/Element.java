@@ -7,16 +7,33 @@ import java.util.HashMap;
 
 public class Element implements Cloneable {
     
-    private String tag;
-    private HashMap<String, String> attributes;
-    private HashMap<String, String> style;
-    private ArrayList<Element> children;
-    private String content;
+    protected String tag;
+    protected HashMap<String, String> attributes;
+    protected HashMap<String, String> style;
+    protected ArrayList<Element> children;
+    protected String content;
     public Element(String tag) {
         this.tag = tag;
         this.children = new ArrayList<Element>();
         this.attributes = new HashMap<String, String>();
         this.style = new HashMap<String, String>();
+        this.content = null;
+    }
+
+    public Element(Element e) {
+        this.tag = e.tag;
+        this.attributes = new HashMap<String, String>(e.attributes);
+        this.style = new HashMap<String, String>(e.style);
+        this.children = e.copyChildren();
+        this.content = content;
+    }
+
+    protected ArrayList<Element> copyChildren() {
+        ArrayList<Element> childrenCopy = new ArrayList<Element>();
+        for(Element child : children) {
+            childrenCopy.add(new Element(child));
+        }
+        return childrenCopy;
     }
 
     public String getContent() {
@@ -113,37 +130,12 @@ public class Element implements Cloneable {
         return sb.toString();
     }
 
-    private ArrayList<Element> cloneChildren() {
-        ArrayList<Element> childrenCopy = new ArrayList<Element>();
-        for(Element child : children) {
-            childrenCopy.add((Element) child.clone());
-        }
-        return childrenCopy;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Element clone() {
-        try {
-            Element copy = (Element) super.clone();
-            copy.attributes = (HashMap<String, String>) attributes.clone();
-            copy.children = cloneChildren();
-            return copy;
-        } catch(java.lang.CloneNotSupportedException e) {
-            throw new AssertionError(e);
-        }
-    }
-
     public void setFillColor(Color c) {
         setAttribute("fill", colorToStr(c));
     }
 
     public void setStrokeColor(Color c) {
         setAttribute("stroke", colorToStr(c));
-    }
-
-    public void setStrokeAndFillColor(Color stroke, Color fill) {
-        setStrokeColor(stroke);
-        setFillColor(fill);
     }
 
     public void transform(String type, double... args) {

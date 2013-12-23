@@ -285,12 +285,21 @@ public class ClockPuzzle extends Puzzle {
             arrow.lineTo(-arrowRadius*Math.cos( arrowAngle ), -arrowRadius*Math.sin(arrowAngle));
             arrow.closePath();
 
+            // TODO <<< add some sort of copy/clone
+            Path arrow2 = new Path();
+            arrow2.moveTo(0, 0);
+            arrow2.lineTo(arrowRadius*Math.cos(arrowAngle), -arrowRadius*Math.sin(arrowAngle));
+            arrow2.lineTo(0, -arrowHeight);
+            arrow2.lineTo(-arrowRadius*Math.cos( arrowAngle ), -arrowRadius*Math.sin(arrowAngle));
+            arrow2.closePath();
+            // <<<
+
             g.setColor(colorScheme.get("HandBorder"));
             g.drawOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
             g.draw(arrow);
             g.setColor(colorScheme.get("Hand"));
             g.fillOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
-            g.fill(arrow);
+            g.fill(arrow2);
 
             // Undo transformations
             g.rotate(-Math.toRadians(position*30));

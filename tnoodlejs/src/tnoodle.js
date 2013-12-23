@@ -174,13 +174,13 @@ var tnoodle = tnoodle || {};
 
                 maybeCallPendingFunctions();
             } else if(e.data.scrambles) {
-                var scramblesCallback = scramblesCallbacks.pop();
+                var scramblesCallback = scramblesCallbacks.shift();
                 scramblesCallback(e.data.scrambles);
             } else if(e.data.pii) {
-                var piiCallback = piiCallbacks.pop();
+                var piiCallback = piiCallbacks.shift();
                 piiCallback(e.data.pii);
             } else if(e.data.scrambleSvg) {
-                var scrambleImageCallback = scrambleImageCallbacks.pop();
+                var scrambleImageCallback = scrambleImageCallbacks.shift();
                 scrambleImageCallback(e.data.scrambleSvg);
             } else {
                 assert(false);

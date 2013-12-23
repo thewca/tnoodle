@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.svglite;
 
+import static net.gnehzr.tnoodle.svglite.Utils.azzert;
+
 public class Svg extends Element {
     
     private double originOffsetX, originOffsetY;
@@ -41,7 +43,8 @@ public class Svg extends Element {
     }
 
     public void fill(Element p) {
-        p = (Element) p.clone();
+        azzert(!getChildren().contains(p));//<<<
+        //<<<p = new Element(p);
         if(c != null) {
             p.setStrokeColor(null);
             p.setFillColor(c);
@@ -54,7 +57,8 @@ public class Svg extends Element {
     }
 
     public void draw(Element p) {
-        p = (Element) p.clone();
+        azzert(!getChildren().contains(p));//<<<
+        //<<<p = new Element(p);
         if(c != null) {
             p.setStrokeColor(c);
             p.setFillColor(null);
