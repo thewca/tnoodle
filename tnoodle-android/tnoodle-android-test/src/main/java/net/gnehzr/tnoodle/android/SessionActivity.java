@@ -13,12 +13,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.ImageView;
 
@@ -255,7 +257,12 @@ public class SessionActivity extends ActionBarActivity
                     LayoutParams params = (LayoutParams) scrambleImageView.getLayoutParams();
 
                     DisplayMetrics metrics = new DisplayMetrics();
-                    PlaceholderFragment.this.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+                    Activity activity = PlaceholderFragment.this.getActivity();
+                    WindowManager wm = activity.getWindowManager();
+                    Display display = wm.getDefaultDisplay();
+
+                    display.getMetrics(metrics);
 
                     params.width = (int) (size.width * metrics.density);
                     params.height = (int) (size.height * metrics.density);
