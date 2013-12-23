@@ -3,15 +3,11 @@ package puzzle;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.modulo;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-//<<<import java.awt.BasicStroke;
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
-//<<<import java.awt.Graphics2D;
-//<<<import java.awt.geom.AffineTransform;
-//<<<import java.awt.geom.Area;
-//<<<import java.awt.geom.GeneralPath;
-//<<<import java.awt.geom.Rectangle2D;
+import net.gnehzr.tnoodle.svglite.Path;
+import net.gnehzr.tnoodle.svglite.Rectangle;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -82,8 +78,7 @@ public class SquareOnePuzzle extends Puzzle {
         return (int) (4 * RADIUS_MULTIPLIER * multiplier * radius);
     }
 
-    /*<<<
-    private void drawFace(Graphics2D g, int[] face, double x, double y, int radius, Color[] colorScheme) {
+    private void drawFace(Svg g, int[] face, double x, double y, int radius, Color[] colorScheme) {
         for(int ch = 0; ch < 12; ch++) {
             if(ch < 11 && face[ch] == face[ch+1]) {
                 ch++;
@@ -92,10 +87,10 @@ public class SquareOnePuzzle extends Puzzle {
         }
     }
 
-    private int drawPiece(Graphics2D g, int piece, double x, double y, int radius, Color[] colorScheme) {
+    private int drawPiece(Svg g, int piece, double x, double y, int radius, Color[] colorScheme) {
         boolean corner = isCornerPiece(piece);
         int degree = 30 * (corner ? 2 : 1);
-        GeneralPath[] p = corner ? getCornerPoly(x, y, radius) : getWedgePoly(x, y, radius);
+        Path[] p = corner ? getCornerPoly(x, y, radius) : getWedgePoly(x, y, radius);
 
         Color[] cls = getPieceColors(piece, colorScheme);
         for(int ch = cls.length - 1; ch >= 0; ch--) {
@@ -135,29 +130,27 @@ public class SquareOnePuzzle extends Puzzle {
         }
     }
 
-    private GeneralPath[] getWedgePoly(double x, double y, int radius) {
-        AffineTransform trans = AffineTransform.getTranslateInstance(x, y);
-        GeneralPath p = new GeneralPath();
+    private Path[] getWedgePoly(double x, double y, int radius) {
+        Path p = new Path();
         p.moveTo(0, 0);
         p.lineTo(radius, 0);
         double tempx = Math.sqrt(3) * radius / 2.0;
         double tempy = radius / 2.0;
         p.lineTo(tempx, tempy);
         p.closePath();
-        p.transform(trans);
+        p.translate(x, y);
 
-        GeneralPath side = new GeneralPath();
+        Path side = new Path();
         side.moveTo(radius, 0);
         side.lineTo(multiplier * radius, 0);
         side.lineTo(multiplier * tempx, multiplier * tempy);
         side.lineTo(tempx, tempy);
         side.closePath();
-        side.transform(trans);
-        return new GeneralPath[]{ p, side };
+        side.translate(x, y);
+        return new Path[]{ p, side };
     }
-    private GeneralPath[] getCornerPoly(double x, double y, int radius) {
-        AffineTransform trans = AffineTransform.getTranslateInstance(x, y);
-        GeneralPath p = new GeneralPath();
+    private Path[] getCornerPoly(double x, double y, int radius) {
+        Path p = new Path();
         p.moveTo(0, 0);
         p.lineTo(radius, 0);
         double tempx = radius*(1 + Math.cos(Math.toRadians(75))/Math.sqrt(2));
@@ -167,72 +160,25 @@ public class SquareOnePuzzle extends Puzzle {
         double tempY = Math.sqrt(3) * radius / 2.0;
         p.lineTo(tempX, tempY);
         p.closePath();
-        p.transform(trans);
+        p.translate(x, y);
 
-        GeneralPath side1 = new GeneralPath();
+        Path side1 = new Path();
         side1.moveTo(radius, 0);
         side1.lineTo(multiplier * radius, 0);
         side1.lineTo(multiplier * tempx, multiplier * tempy);
         side1.lineTo(tempx, tempy);
         side1.closePath();
-        side1.transform(trans);
+        side1.translate(x, y);
 
-        GeneralPath side2 = new GeneralPath();
+        Path side2 = new Path();
         side2.moveTo(multiplier * tempx, multiplier * tempy);
         side2.lineTo(tempx, tempy);
         side2.lineTo(tempX, tempY);
         side2.lineTo(multiplier * tempX, multiplier * tempY);
         side2.closePath();
-        side2.transform(trans);
-        return new GeneralPath[]{ p, side1, side2 };
+        side2.translate(x, y);
+        return new Path[]{ p, side1, side2 };
     }
-
-    //x, y are the coordinates of the center of the square
-    private static Area getSquare(double x, double y, double half_width) {
-        return new Area(new Rectangle2D.Double(x - half_width, y - half_width, 2 * half_width, 2 * half_width));
-    }
-    //type is the orientation of the triangle, in multiples of 90 degrees ccw
-    private static Area getTri(double x, double y, double width, int type) {
-        GeneralPath tri = new GeneralPath();
-        tri.moveTo(width / 2.0, width / 2.0);
-        tri.lineTo((type == 3) ? width : 0, (type < 2) ? 0 : width);
-        tri.lineTo((type == 1) ? 0 : width, (type % 3 == 0) ? 0 : width);
-        tri.closePath();
-        tri.transform(AffineTransform.getTranslateInstance(x - width / 2.0, y - width / 2.0));
-        return new Area(tri);
-    }
-
-    @Override
-    //***NOTE*** this works only for the simple case where the puzzle is a cube
-    public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-        int width = getWidth(radius);
-        int height = getHeight(radius);
-        double half_width = (radius * RADIUS_MULTIPLIER) / Math.sqrt(2);
-
-        Area up = getSquare(width / 2.0, height / 4.0, half_width);
-        Area down = getSquare(width / 2.0, 3 * height / 4.0, half_width);
-        Area front = new Area(new Rectangle2D.Double(width / 2. - half_width * multiplier, height / 2. - radius * (multiplier - 1) / 2., 2 * half_width * multiplier, radius * (multiplier - 1)));
-
-        Area[] faces = new Area[6];
-        for(int ch = 0; ch < 4; ch++) {
-            faces[ch] = new Area();
-            faces[ch].add(getTri(width / 2.0, height / 4.0, 2 * half_width * multiplier, (5-ch) % 4));
-            faces[ch].add(getTri(width / 2.0, 3 * height / 4.0, 2 * half_width * multiplier, (ch+1) % 4));
-            faces[ch].subtract(up);
-            faces[ch].subtract(down);
-        }
-        faces[3].add(front);
-        faces[4] = up;
-        faces[5] = down;
-
-        HashMap<String, GeneralPath> facesMap = new HashMap<String, GeneralPath>();
-        for(int i = 0; i < faces.length; i++) {
-            facesMap.put("LBRFUD".charAt(i)+"", new GeneralPath(faces[i]));
-        }
-        return facesMap;
-    }
-
-    */
 
     @Override
     public String getLongName() {
@@ -369,11 +315,9 @@ public class SquareOnePuzzle extends Puzzle {
         }
 
         @Override
-        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
-            Svg svg = new Svg(getPreferredSize());
-            return svg;
-        /*<<<
-            g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+        protected Svg drawScramble(HashMap<String, Color> colorSchemeMap) {
+            Svg g = new Svg(getPreferredSize());
+            g.setStroke(2, 10, "round");
 
             String faces = "LBRFUD";
             Color[] colorScheme = new Color[faces.length()];
@@ -387,13 +331,13 @@ public class SquareOnePuzzle extends Puzzle {
             double half_square_width = (radius * RADIUS_MULTIPLIER * multiplier) / Math.sqrt(2);
             double edge_width = 2 * radius * multiplier * Math.sin(Math.toRadians(15));
             double corner_width = half_square_width - edge_width / 2.;
-            Rectangle2D.Double left_mid = new Rectangle2D.Double(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width, radius * (multiplier - 1));
-            Rectangle2D.Double right_mid;
+            Rectangle left_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width, radius * (multiplier - 1));
+            Rectangle right_mid;
             if(sliceSolved) {
-                right_mid = new Rectangle2D.Double(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., 2*corner_width + edge_width, radius * (multiplier - 1));
+                right_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., 2*corner_width + edge_width, radius * (multiplier - 1));
                 g.setColor(colorScheme[3]); //front
             } else {
-                right_mid = new Rectangle2D.Double(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width + edge_width, radius * (multiplier - 1));
+                right_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width + edge_width, radius * (multiplier - 1));
                 g.setColor(colorScheme[1]); //back
             }
             g.fill(right_mid);
@@ -413,7 +357,8 @@ public class SquareOnePuzzle extends Puzzle {
             y *= 3.0;
             g.rotate(Math.toRadians(-90 - 15), x, y);
             drawFace(g, GwtSafeUtils.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
-            */
+
+            return g;
         }
 
     }

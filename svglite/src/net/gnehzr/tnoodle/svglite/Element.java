@@ -11,11 +11,20 @@ public class Element implements Cloneable {
     private HashMap<String, String> attributes;
     private HashMap<String, String> style;
     private ArrayList<Element> children;
+    private String content;
     public Element(String tag) {
         this.tag = tag;
         this.children = new ArrayList<Element>();
         this.attributes = new HashMap<String, String>();
         this.style = new HashMap<String, String>();
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public ArrayList<Element> getChildren() {
@@ -86,6 +95,9 @@ public class Element implements Cloneable {
             sb.append(" style=\"").append(toStyleStr()).append('"');
         }
         sb.append(">");
+        if(content != null) {
+            sb.append(content);
+        }
         for(Element child : children) {
             sb.append("\n");
             child.buildString(sb, level + 1);
@@ -129,6 +141,11 @@ public class Element implements Cloneable {
         setAttribute("stroke", colorToStr(c));
     }
 
+    public void setStrokeAndFillColor(Color stroke, Color fill) {
+        setStrokeColor(stroke);
+        setFillColor(fill);
+    }
+
     public void transform(String type, double... args) {
         StringBuilder sb = new StringBuilder();
         sb.append(type).append("(");
@@ -160,9 +177,11 @@ public class Element implements Cloneable {
     }
 
     public void rotate(double a, double x, double y) {
+        a = Math.toDegrees(a);
         transform("rotate", a, x, y);
     }
     public void rotate(double a) {
+        a = Math.toDegrees(a);
         transform("rotate", a);
     }
 

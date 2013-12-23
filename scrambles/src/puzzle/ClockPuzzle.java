@@ -4,16 +4,11 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Path;
 import net.gnehzr.tnoodle.svglite.Svg;
-//<<<import java.awt.Dimension;
-//<<<import java.awt.Graphics2D;
-//<<<import java.awt.geom.Area;
-//<<<import java.awt.geom.Ellipse2D;
-//<<<import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
@@ -81,53 +76,6 @@ public class ClockPuzzle extends Puzzle {
     public Dimension getPreferredSize() {
         return new Dimension(4*(radius+gap), 2*(radius+gap));
     }
-
-    /*<<<
-
-    public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-        // Background
-        Area backgroundFront = new Area();
-        Area backgroundBack = new Area();
-        backgroundFront.add(new Area(new Ellipse2D.Double(gap,gap, 2*radius, 2*radius)));
-        backgroundBack.add(new Area(new Ellipse2D.Double(2*radius+3*gap,gap, 2*radius, 2*radius)));
-        for(int i = -1; i < 2; i += 2) {
-            for(int j = -1; j < 2; j += 2) {
-                backgroundFront.add(new Area(new Ellipse2D.Double(radius+gap+2*i*clockOuterRadius-clockOuterRadius,radius+gap+2*j*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius)));
-                backgroundBack.add(new Area(new Ellipse2D.Double(3*radius+3*gap+2*i*clockOuterRadius-clockOuterRadius,radius+gap+2*j*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius)));
-            }
-        }
-
-        // Clocks
-        Area clocksFront = new Area();
-        Area clocksBack = new Area();
-        for(int i = -1; i < 2; i++) {
-            for(int j = -1; j < 2; j++) {
-                clocksFront.add(new Area(new Ellipse2D.Double(radius+gap+2*i*clockOuterRadius-clockRadius,radius+gap+2*j*clockOuterRadius-clockRadius, 2*clockRadius, 2*clockRadius)));
-                clocksBack.add(new Area(new Ellipse2D.Double(3*radius+3*gap+2*i*clockOuterRadius-clockRadius,radius+gap+2*j*clockOuterRadius-clockRadius, 2*clockRadius, 2*clockRadius)));
-            }
-        }
-
-        // Pins
-        Area pinsUp = new Area();
-        Area pinsDown = new Area();
-        for(int i = -1; i < 2; i += 2) {
-            for(int j = -1; j < 2; j += 2) {
-                pinsDown.add(new Area(new Ellipse2D.Double(radius+gap+j*clockOuterRadius-pinRadius, radius+gap+i*clockOuterRadius-pinRadius, 2*pinRadius, 2*pinRadius)));
-                pinsUp.add(new Area(new Ellipse2D.Double(3*radius+3*gap+j*clockOuterRadius-pinRadius, radius+gap+i*clockOuterRadius-pinRadius, 2*pinRadius, 2*pinRadius)));
-            }
-        }
-
-        HashMap<String, GeneralPath> facesMap = new HashMap<String, GeneralPath>();
-        facesMap.put("Front", new GeneralPath(backgroundFront));
-        facesMap.put("Back", new GeneralPath(backgroundBack));
-        facesMap.put("FrontClock", new GeneralPath(clocksFront));
-        facesMap.put("BackClock", new GeneralPath(clocksBack));
-        facesMap.put("PinUp", new GeneralPath(pinsUp));
-        facesMap.put("PinDown", new GeneralPath(pinsDown));
-
-        return facesMap;
-    }
-    */
 
     @Override
     public PuzzleState getSolvedState() {
@@ -250,23 +198,20 @@ public class ClockPuzzle extends Puzzle {
         @Override
         protected Svg drawScramble(HashMap<String, Color> colorScheme) {
             Svg svg = new Svg(getPreferredSize());
-            return svg;
-        /*<<<
-            drawBackground(g, colorScheme);
+            drawBackground(svg, colorScheme);
 
             for(int i = 0; i < 18; i++) {
-                drawClock(g, i, posit[i], colorScheme);
+                drawClock(svg, i, posit[i], colorScheme);
             }
 
-            drawPins(g, pins, colorScheme);
-            */
+            drawPins(svg, pins, colorScheme);
+            return svg;
         }
 
-        /*<<<
-        protected void drawBackground(Graphics2D g, HashMap<String, Color> colorScheme) {
+        protected void drawBackground(Svg g, HashMap<String, Color> colorScheme) {
             String[] colorString = {"Front", "Back"};
 
-            for(int s = 0; s <2 ; s++) {
+            for(int s = 0; s < 2; s++) {
 
                 g.translate((s*2+1)*(radius + gap), radius + gap);
 
@@ -288,10 +233,10 @@ public class ClockPuzzle extends Puzzle {
                 for(int i = -1; i < 2; i++ ) {
                     for(int j = -1; j < 2; j++ ) {
                         g.translate(2*i*clockOuterRadius, 2*j*clockOuterRadius);
-                        g.setColor(colorScheme.get(colorString[s] + "Clock"));
-                        g.fillOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
                         g.setColor(Color.BLACK);
-                        g.drawOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
+                        g.drawOval(-clockRadius, -clockRadius, clockRadius*2, clockRadius*2);
+                        g.setColor(colorScheme.get(colorString[s]+ "Clock"));
+                        g.fillOval(-clockRadius, -clockRadius, clockRadius*2, clockRadius*2);
 
                         g.setColor(colorScheme.get(colorString[s] + "Clock"));
                         for(int k = 0; k < 12; k++) {
@@ -307,7 +252,7 @@ public class ClockPuzzle extends Puzzle {
             }
         }
 
-        protected void drawClock(Graphics2D g, int clock, int position, HashMap<String, Color> colorScheme) {
+        protected void drawClock(Svg g, int clock, int position, HashMap<String, Color> colorScheme) {
             int netX = 0;
             int netY = 0;
             int deltaX, deltaY;
@@ -333,7 +278,7 @@ public class ClockPuzzle extends Puzzle {
             netY += deltaY;
             g.rotate(Math.toRadians(position*30));
 
-            GeneralPath arrow = new GeneralPath();
+            Path arrow = new Path();
             arrow.moveTo(0, 0);
             arrow.lineTo(arrowRadius*Math.cos(arrowAngle), -arrowRadius*Math.sin(arrowAngle));
             arrow.lineTo(0, -arrowHeight);
@@ -352,7 +297,7 @@ public class ClockPuzzle extends Puzzle {
             g.translate(-netX, -netY);
         }
 
-        protected void drawPins(Graphics2D g, boolean[] pins, HashMap<String, Color> colorScheme) {
+        protected void drawPins(Svg g, boolean[] pins, HashMap<String, Color> colorScheme) {
             g.translate(radius + gap, radius + gap);
             int k = 0;
             for(int i = -1; i < 2; i += 2) {
@@ -377,7 +322,7 @@ public class ClockPuzzle extends Puzzle {
             g.translate(-3*(radius + gap), -(radius + gap));
         }
 
-        protected void drawPin(Graphics2D g, boolean pin, HashMap<String, Color> colorScheme) {
+        protected void drawPin(Svg g, boolean pin, HashMap<String, Color> colorScheme) {
             g.setColor(Color.BLACK);
             g.drawOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
 
@@ -389,6 +334,6 @@ public class ClockPuzzle extends Puzzle {
                 g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
             }
         }
-        */
+
     }
 }

@@ -524,7 +524,6 @@ public abstract class Puzzle implements Exportable {
 
         /**
          * Draws the state of the puzzle.
-         * <<< TODO - explain how faces should be represented >>>
          * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing,
          * use the synchronized keyword when implementing this method:<br>
          * <code>protected synchronized void drawScramble();</code>
