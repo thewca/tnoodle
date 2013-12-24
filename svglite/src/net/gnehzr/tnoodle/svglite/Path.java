@@ -30,6 +30,10 @@ public class Path extends Element {
         super("path");
     }
 
+    public Path(Path p) {
+        super(p);
+    }
+
     public PathIterator getPathIterator() {
         return new PathIterator(this);
     }

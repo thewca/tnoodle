@@ -111,6 +111,9 @@ public class Element {
         if(style.size() > 0) {
             sb.append(" style=\"").append(toStyleStr()).append('"');
         }
+        if(!transform.isIdentity()) {
+            sb.append(" transform=\"").append(transform.toSvgTransform()).append('"');
+        }
         sb.append(">");
         if(content != null) {
             sb.append(content);
@@ -138,36 +141,33 @@ public class Element {
         setAttribute("stroke", colorToStr(c));
     }
 
-    private Transform netTransform = new Transform();
+    private Transform transform = new Transform();
     public void transform(Transform t) {
-        netTransform.concatenate(t);
-        setAttribute("transform", netTransform.toSvgTransform());
-    }
-
-    public Transform getTransform() {
-        return new Transform(netTransform);
+        transform.concatenate(t);
     }
 
     public void setTransform(Transform t) {
         if(t == null) {
-            netTransform.setToIdentity();
-            setAttribute("transform", null);
+            transform.setToIdentity();
         } else {
-            netTransform.setTransform(t);
-            setAttribute("transform", t.toSvgTransform());
+            transform.setTransform(t);
         }
     }
 
+    public Transform getTransform() {
+        return new Transform(transform);
+    }
+
     public void rotate(double radians, double anchorx, double anchory) {
-        transform(Transform.getRotateInstance(radians, anchorx, anchory));
+        transform.rotate(radians, anchorx, anchory);
     }
 
     public void rotate(double radians) {
-        transform(Transform.getRotateInstance(radians));
+        transform.rotate(radians);
     }
 
     public void translate(double x, double y) {
-        transform(Transform.getTranslateInstance(x, y));
+        transform.translate(x, y);
     }
 
 }

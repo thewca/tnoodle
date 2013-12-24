@@ -6,6 +6,7 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.svglite.Transform;
 import net.gnehzr.tnoodle.svglite.Path;
 import net.gnehzr.tnoodle.svglite.Rectangle;
 import java.util.Arrays;
@@ -78,16 +79,16 @@ public class SquareOnePuzzle extends Puzzle {
         return (int) (4 * RADIUS_MULTIPLIER * multiplier * radius);
     }
 
-    private void drawFace(Svg g, int[] face, double x, double y, int radius, Color[] colorScheme) {
+    private void drawFace(Svg g, Transform transform, int[] face, double x, double y, int radius, Color[] colorScheme) {
         for(int ch = 0; ch < 12; ch++) {
             if(ch < 11 && face[ch] == face[ch+1]) {
                 ch++;
             }
-            drawPiece(g, face[ch], x, y, radius, colorScheme);
+            drawPiece(g, transform, face[ch], x, y, radius, colorScheme);
         }
     }
 
-    private int drawPiece(Svg g, int piece, double x, double y, int radius, Color[] colorScheme) {
+    private int drawPiece(Svg g, Transform transform, int piece, double x, double y, int radius, Color[] colorScheme) {
         boolean corner = isCornerPiece(piece);
         int degree = 30 * (corner ? 2 : 1);
         Path[] p = corner ? getCornerPoly(x, y, radius) : getWedgePoly(x, y, radius);
@@ -96,11 +97,10 @@ public class SquareOnePuzzle extends Puzzle {
         for(int ch = cls.length - 1; ch >= 0; ch--) {
             p[ch].setFill(cls[ch]);
             p[ch].setStroke(Color.BLACK);
-            // TODO <<< - pass around a transform object instead!
-            p[ch].setAttribute("transform", g.getAttribute("transform"));//<<<
+            p[ch].setTransform(transform);
             g.appendChild(p[ch]);
         }
-        g.rotate(Math.toRadians(degree), x, y);
+        transform.rotate(Math.toRadians(degree), x, y);
         return degree;
     }
 
@@ -333,34 +333,39 @@ public class SquareOnePuzzle extends Puzzle {
             double edge_width = 2 * radius * multiplier * Math.sin(Math.toRadians(15));
             double corner_width = half_square_width - edge_width / 2.;
             Rectangle left_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width, radius * (multiplier - 1));
-            Rectangle left_mid2 = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width, radius * (multiplier - 1));
-            Rectangle right_mid, right_mid2;
+            left_mid.setFill(colorScheme[3]); //front
+            Rectangle right_mid;
             if(sliceSolved) {
                 right_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., 2*corner_width + edge_width, radius * (multiplier - 1));
-                right_mid2 = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., 2*corner_width + edge_width, radius * (multiplier - 1));
-                g.setColor(colorScheme[3]); //front
+                right_mid.setFill(colorScheme[3]); //front
             } else {
                 right_mid = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width + edge_width, radius * (multiplier - 1));
-                right_mid2 = new Rectangle(width / 2. - half_square_width, height / 2. - radius * (multiplier - 1) / 2., corner_width + edge_width, radius * (multiplier - 1));
-                g.setColor(colorScheme[1]); //back
+                right_mid.setFill(colorScheme[1]); //back
             }
-            g.fill(right_mid);
-            g.setColor(colorScheme[3]); //front
-            g.fill(left_mid); //this will clobber part of the other guy
-            g.setColor(Color.BLACK);
-            g.draw(right_mid2); // TODO - add some sort of copy/clone <<<
-            g.draw(left_mid2);
+            g.appendChild(right_mid);
+            g.appendChild(left_mid); //this will clobber part of the other guy
 
+            right_mid = new Rectangle(right_mid);
+            right_mid.setStroke(Color.BLACK);
+            right_mid.setFill(null);
+            left_mid = new Rectangle(left_mid);
+            left_mid.setStroke(Color.BLACK);
+            left_mid.setFill(null);
+
+            g.appendChild(right_mid);
+            g.appendChild(left_mid);
+
+            Transform transform;
             double x = width / 2.0;
             double y = height / 4.0;
-            g.rotate(Math.toRadians(90 + 15), x, y);
-            drawFace(g, pieces, x, y, radius, colorScheme);
-            // Undo rotation from before drawFace()
-            g.rotate(Math.toRadians(-(90 + 15)), x, y);
+            transform = Transform.getRotateInstance(
+                    Math.toRadians(90 + 15), x, y);
+            drawFace(g, transform, pieces, x, y, radius, colorScheme);
 
             y *= 3.0;
-            g.rotate(Math.toRadians(-90 - 15), x, y);
-            drawFace(g, GwtSafeUtils.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
+            transform = Transform.getRotateInstance(
+                    Math.toRadians(-90 - 15), x, y);
+            drawFace(g, transform, GwtSafeUtils.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
 
             return g;
         }

@@ -10,4 +10,8 @@ public class Rectangle extends Element {
         setAttribute("height", "" + height);
     }
 
+    public Rectangle(Rectangle r) {
+        super(r);
+    }
+
 }

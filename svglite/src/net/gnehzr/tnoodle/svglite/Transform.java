@@ -45,6 +45,18 @@ public class Transform {
         return new Transform("rotate", degrees, anchorx, anchory);
     }
 
+    public void rotate(double radians, double anchorx, double anchory) {
+        concatenate(Transform.getRotateInstance(radians, anchorx, anchory));
+    }
+
+    public void rotate(double radians) {
+        concatenate(Transform.getRotateInstance(radians));
+    }
+
+    public void translate(double x, double y) {
+        concatenate(Transform.getTranslateInstance(x, y));
+    }
+
     public static Transform getRotateInstance(double radians) {
         return getRotateInstance(radians, 0, 0);
     }

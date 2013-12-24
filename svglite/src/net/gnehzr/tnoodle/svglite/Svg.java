@@ -42,31 +42,25 @@ public class Svg extends Element {
         setStyle("stroke-linejoin", lineJoin);
     }
 
-    public void fill(Element p) {
+    private void fill(Element p) {
         azzert(!getChildren().contains(p));//<<<
         //<<<p = new Element(p);
         if(c != null) {
             p.setStroke(null);
             p.setFill(c);
         }
-        String transform = getAttribute("transform");
-        if(transform != null) {
-            p.setAttribute("transform", transform);
-        }
+        p.setTransform(getTransform());
         appendChild(p);
     }
 
-    public void draw(Element p) {
+    private void draw(Element p) {
         azzert(!getChildren().contains(p));//<<<
         //<<<p = new Element(p);
         if(c != null) {
             p.setStroke(c);
             p.setFill(null);
         }
-        String transform = getAttribute("transform");
-        if(transform != null) {
-            p.setAttribute("transform", transform);
-        }
+        p.setTransform(getTransform());
         appendChild(p);
     }
 
