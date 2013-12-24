@@ -24,7 +24,7 @@ public class Path extends Element {
         }
     }
 
-    ArrayList<Command> commands = null;
+    protected ArrayList<Command> commands = null;
 
     public Path() {
         super("path");
@@ -32,6 +32,9 @@ public class Path extends Element {
 
     public Path(Path p) {
         super(p);
+        if(p.commands != null) {
+            this.commands = new ArrayList<Command>(p.commands);
+        }
     }
 
     public PathIterator getPathIterator() {

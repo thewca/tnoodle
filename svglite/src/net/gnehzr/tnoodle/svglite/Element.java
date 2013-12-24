@@ -141,6 +141,12 @@ public class Element {
         setAttribute("stroke", colorToStr(c));
     }
 
+    public void setStroke(int strokeWidth, int miterLimit, String lineJoin) {
+        setStyle("stroke-width", strokeWidth + "px");
+        setStyle("stroke-miterlimit", "" + miterLimit);
+        setStyle("stroke-linejoin", lineJoin);
+    }
+
     private Transform transform = new Transform();
     public void transform(Transform t) {
         transform.concatenate(t);

@@ -11,12 +11,20 @@ public class Transform {
     }
 
     public Transform() {}
+
     public Transform(Transform t) {
         setTransform(t);
     }
 
     public void concatenate(Transform t) {
-        this.preTransform = new Transform(this);
+        t = new Transform(t);
+        Transform firstTransform = t;
+        while(firstTransform.preTransform != null) {
+            firstTransform = firstTransform.preTransform;
+        }
+        firstTransform.preTransform = new Transform(this);
+
+        this.preTransform = t.preTransform;
         this.type = t.type;
         this.args = t.args;
     }
@@ -24,7 +32,9 @@ public class Transform {
     public void setTransform(Transform t) {
         this.type = t.type;
         this.args = t.args;
-        this.preTransform = t.preTransform;
+        if(t.preTransform != null) {
+            this.preTransform = new Transform(t.preTransform);
+        }
     }
 
     public void setToIdentity() {

@@ -10,4 +10,8 @@ public class Ellipse extends Element {
         setAttribute("ry", "" + ry);
     }
 
+    public Ellipse(Ellipse e) {
+        super(e);
+    }
+
 }

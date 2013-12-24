@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.svglite;
 
-import static net.gnehzr.tnoodle.svglite.Utils.azzert;
-
 public class Svg extends Element {
     
     private double originOffsetX, originOffsetY;
@@ -24,72 +22,6 @@ public class Svg extends Element {
         int width = Integer.parseInt(getAttribute("width").replace("px", ""));
         int height = Integer.parseInt(getAttribute("height").replace("px", ""));
         return new Dimension(width, height);
-    }
-
-    // TODO - emulating the old graphics2d way of doing things doesn't
-    // seem ideal, i think we should consider doing the following:
-    //  - get rid of setColor?
-    //  - combine draw and fill?
-
-    private Color c = null;
-    public void setColor(Color c) {
-        this.c = c;
-    }
-
-    public void setStroke(int strokeWidth, int miterLimit, String lineJoin) {
-        setStyle("stroke-width", strokeWidth + "px");
-        setStyle("stroke-miterlimit", "" + miterLimit);
-        setStyle("stroke-linejoin", lineJoin);
-    }
-
-    private void fill(Element p) {
-        azzert(!getChildren().contains(p));//<<<
-        //<<<p = new Element(p);
-        if(c != null) {
-            p.setStroke(null);
-            p.setFill(c);
-        }
-        p.setTransform(getTransform());
-        appendChild(p);
-    }
-
-    private void draw(Element p) {
-        azzert(!getChildren().contains(p));//<<<
-        //<<<p = new Element(p);
-        if(c != null) {
-            p.setStroke(c);
-            p.setFill(null);
-        }
-        p.setTransform(getTransform());
-        appendChild(p);
-    }
-
-    private Ellipse toOval(double x, double y, double width, double height) {
-        double rx = width/2.0;
-        double ry = height/2.0;
-        double cx = x + rx;
-        double cy = y + ry;
-        Ellipse oval = new Ellipse(cx, cy, rx, ry);
-        return oval;
-    }
-
-    public void drawOval(double x, double y, double width, double height) {
-        Ellipse oval = toOval(x, y, width, height);
-        draw(oval);
-    }
-
-    public void fillOval(double x, double y, double width, double height) {
-        Ellipse oval = toOval(x, y, width, height);
-        fill(oval);
-    }
-
-    public void rotate(double a) {
-        super.rotate(a, originOffsetX, originOffsetY);
-    }
-    public void translate(double x, double y) {
-        originOffsetX += x;
-        originOffsetY += y;
-        super.translate(x, y);
     }
 
 }
