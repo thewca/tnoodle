@@ -46,8 +46,8 @@ public class Svg extends Element {
         azzert(!getChildren().contains(p));//<<<
         //<<<p = new Element(p);
         if(c != null) {
-            p.setStrokeColor(null);
-            p.setFillColor(c);
+            p.setStroke(null);
+            p.setFill(c);
         }
         String transform = getAttribute("transform");
         if(transform != null) {
@@ -60,8 +60,8 @@ public class Svg extends Element {
         azzert(!getChildren().contains(p));//<<<
         //<<<p = new Element(p);
         if(c != null) {
-            p.setStrokeColor(c);
-            p.setFillColor(null);
+            p.setStroke(c);
+            p.setFill(null);
         }
         String transform = getAttribute("transform");
         if(transform != null) {

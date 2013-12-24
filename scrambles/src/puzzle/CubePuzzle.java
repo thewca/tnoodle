@@ -180,8 +180,8 @@ public class CubePuzzle extends Puzzle {
                 int tempx = x + col*cubieSize;
                 int tempy = y + row*cubieSize;
                 Rectangle rect = new Rectangle(tempx, tempy, cubieSize, cubieSize);
-                rect.setFillColor(colorScheme.get(Face.values()[faceColors[row][col]].toString()));
-                rect.setStrokeColor(Color.BLACK);
+                rect.setFill(colorScheme.get(Face.values()[faceColors[row][col]].toString()));
+                rect.setStroke(Color.BLACK);
                 g.appendChild(rect);
             }
         }

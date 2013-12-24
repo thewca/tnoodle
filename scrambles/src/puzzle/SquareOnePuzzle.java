@@ -94,8 +94,8 @@ public class SquareOnePuzzle extends Puzzle {
 
         Color[] cls = getPieceColors(piece, colorScheme);
         for(int ch = cls.length - 1; ch >= 0; ch--) {
-            p[ch].setFillColor(cls[ch]);
-            p[ch].setStrokeColor(Color.BLACK);
+            p[ch].setFill(cls[ch]);
+            p[ch].setStroke(Color.BLACK);
             // TODO <<< - pass around a transform object instead!
             p[ch].setAttribute("transform", g.getAttribute("transform"));//<<<
             g.appendChild(p[ch]);

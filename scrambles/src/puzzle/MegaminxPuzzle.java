@@ -595,8 +595,8 @@ public class MegaminxPuzzle extends Puzzle {
                     // This is a bit convoluted, but tries to keep the intuitive derivation clear.
                     j = (j + 2*rotateCounterClockwise) % 10;
                 }
-                ps[i].setStrokeColor(Color.BLACK);
-                ps[i].setFillColor(colorScheme.get("" + Face.values()[state[j]]));
+                ps[i].setStroke(Color.BLACK);
+                ps[i].setFill(colorScheme.get("" + Face.values()[state[j]]));
                 g.appendChild(ps[i]);
             }
 

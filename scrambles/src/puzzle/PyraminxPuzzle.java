@@ -139,8 +139,8 @@ public class PyraminxPuzzle extends Puzzle {
 
         for(int i = 0; i < ps.length; i++) {
             Path sticker = ps[i];
-            sticker.setFillColor(colorScheme[state[i]]);
-            sticker.setStrokeColor(Color.BLACK);
+            sticker.setFill(colorScheme[state[i]]);
+            sticker.setStroke(Color.BLACK);
             g.appendChild(sticker);
         }
     }

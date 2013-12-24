@@ -5,7 +5,7 @@ import static net.gnehzr.tnoodle.svglite.Utils.azzert;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Element implements Cloneable {
+public class Element {
     
     protected String tag;
     protected HashMap<String, String> attributes;
@@ -130,51 +130,44 @@ public class Element implements Cloneable {
         return sb.toString();
     }
 
-    public void setFillColor(Color c) {
+    public void setFill(Color c) {
         setAttribute("fill", colorToStr(c));
     }
 
-    public void setStrokeColor(Color c) {
+    public void setStroke(Color c) {
         setAttribute("stroke", colorToStr(c));
     }
 
-    public void transform(String type, double... args) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(type).append("(");
-        boolean spaceNeeded = false;
-        for(double arg : args) {
-            if(spaceNeeded) {
-                sb.append(" ");
-            }
-            sb.append(arg);
-            spaceNeeded = true;
-        }
-        sb.append(")");
-        String oldTransform = getAttribute("transform");
-        if(oldTransform != null) {
-            // Transforms are applied right to left
-            sb.append(" ").append(oldTransform);
-        }
-        setAttribute("transform", sb.toString());
+    private Transform netTransform = new Transform();
+    public void transform(Transform t) {
+        netTransform.concatenate(t);
+        setAttribute("transform", netTransform.toSvgTransform());
     }
-    public void clearTransform() {
-        setAttribute("transform", null);
+
+    public Transform getTransform() {
+        return new Transform(netTransform);
+    }
+
+    public void setTransform(Transform t) {
+        if(t == null) {
+            netTransform.setToIdentity();
+            setAttribute("transform", null);
+        } else {
+            netTransform.setTransform(t);
+            setAttribute("transform", t.toSvgTransform());
+        }
+    }
+
+    public void rotate(double radians, double anchorx, double anchory) {
+        transform(Transform.getRotateInstance(radians, anchorx, anchory));
+    }
+
+    public void rotate(double radians) {
+        transform(Transform.getRotateInstance(radians));
     }
 
     public void translate(double x, double y) {
-        transform("translate", x, y);
-    }
-    public void translate(double x) {
-        transform("translate", x);
-    }
-
-    public void rotate(double a, double x, double y) {
-        a = Math.toDegrees(a);
-        transform("rotate", a, x, y);
-    }
-    public void rotate(double a) {
-        a = Math.toDegrees(a);
-        transform("rotate", a);
+        transform(Transform.getTranslateInstance(x, y));
     }
 
 }
