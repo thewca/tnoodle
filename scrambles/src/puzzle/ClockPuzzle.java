@@ -273,6 +273,7 @@ public class ClockPuzzle extends Puzzle {
 
         protected void drawClock(Svg g, int clock, int position, HashMap<String, Color> colorScheme) {
             Transform t = new Transform();
+            t.rotate(Math.toRadians(position*30));
             int netX = 0;
             int netY = 0;
             int deltaX, deltaY;
@@ -296,7 +297,6 @@ public class ClockPuzzle extends Puzzle {
             t.translate(deltaX, deltaY);
             netX += deltaX;
             netY += deltaY;
-            t.rotate(Math.toRadians(position*30));
 
             Path arrow = new Path();
             arrow.moveTo(0, 0);
