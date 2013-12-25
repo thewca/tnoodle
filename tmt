@@ -310,6 +310,9 @@ class tmt:
             assert commandFunc, 'No %s target in %s' % ( command, project )
             commandFunc()
 
+    def _printVersion(self):
+        print(self.VERSION)
+
     def _release(self):
         tmt.releasing = True
         # Urg, we have to set some arguments explicitly because
@@ -444,6 +447,13 @@ class tmt:
             action='store_true',
             help="Don't bother telling me I don't have flex installed, I already know.")
         parser_make.set_defaults(func=self._make)
+
+        desc = 'Print version string to use for builds'
+        parser_version = subparsers.add_parser(
+            'version',
+            help=desc, description=desc,
+            formatter_class=ArgumentDefaultsHelpFormatter)
+        parser_version.set_defaults(func=self._printVersion)
 
         desc = 'Publish TNoodle to github'
         parser_release = subparsers.add_parser(

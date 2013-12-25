@@ -1,16 +1,4 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.+'
-    }
-}
 apply plugin: 'android-library'
-
-repositories {
-    mavenCentral()
-}
 
 android {
     compileSdkVersion 19
@@ -48,6 +36,80 @@ android {
 }
 
 dependencies {
-    compile files('../../lib/gson-2.2.4.jar')
     compile 'com.android.support:appcompat-v7:+'
+
+    compile files('../../lib/gson-2.2.4.jar')
+}
+
+// From http://www.vandalsoftware.com/post/52468430435/publishing-an-android-library-aar-to-a-maven
+// Anyone who wants to run ./gradlew uploadArchives will need to create
+// a ~/.gradle/gradle.properties file. They'll also need to log into
+// https://oss.sonatype.org and promote the implicitly created repository
+// by hand. This is automatable for maven or ant, but there appears to be
+// no good gradle solution yet: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide?__utma=246996102.580569544.1387888933.1387950777.1387957045.6&__utmb=246996102.12.10.1387957045&__utmc=246996102&__utmx=-&__utmz=246996102.1387957045.6.6.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided)&__utmv=-&__utmk=249703941#SonatypeOSSMavenRepositoryUsageGuide-8c.AutomatingReleasesinNexus2.4.
+// We could probably write some gradle code to use their REST api
+// https://oss.sonatype.org/nexus-staging-plugin/default/docs/index.html,
+// but I am so not up for doing that right now.
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+def stdout = new ByteArrayOutputStream()
+exec {
+    commandLine "../../tmt", "version"
+    standardOutput = stdout;
+}
+version = stdout.toString()
+group = "com.github.cubing"
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: sonatypeRepo) {
+            authentication(userName: sonatypeUsername,
+                    password: sonatypePassword)
+        }
+
+        pom.project {
+            name 'TNoodle Android Library'
+            packaging 'aar'
+            description 'WCA scrambling library for Android applications'
+            url 'https://github.com/cubing/tnoodle/'
+
+            scm {
+                url 'scm:git@github.com:cubing/tnoodle.git'
+                connection 'scm:git@github.com:cubing/tnoodle.git'
+                developerConnection 'scm:git@github.com:cubing/tnoodle.git'
+            }
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'jfly'
+                    name 'Jeremy Fleischman'
+                    email 'jeremyfleischman@gmail.com'
+                }
+            }
+        }
+    }
 }
