@@ -33,6 +33,7 @@
   </source>
   <source path='net/gnehzr/tnoodle/utils'>
       <exclude name="Utils.java"/>
+      <exclude name="GsonUtils.java"/>
       <exclude name="Strings.java"/>
       <exclude name="Launcher.java"/>
       <exclude name="OneLineLogFormatter.java"/>

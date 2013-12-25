@@ -140,10 +140,13 @@ def topologicalSort(projects, exclude=set()):
         def check(self):
             return
 
+        def __str__(self, timestamps=False):
+            return "all"
+
         def clean(self):
             for dep in self.getDependencies():
                 dep.clean()
-    ultimateRoot = UltimateRoot(name="all", description="")
+    ultimateRoot = UltimateRoot(name=None, description="")
 
     visitedNodes = dfs(ultimateRoot, exclude=exclude)
     assert visitedNodes[0] == ultimateRoot
@@ -303,6 +306,10 @@ class tmt:
             projects = project.getRecursiveDependenciesTopoSorted()
         else:
             projects = [ project ]
+
+        # Build everything we need before testing.
+        if command == "check":
+            tmt._make(projectName=project.name, command='compile')
 
         projects.reverse()
         for project in projects:
@@ -684,7 +691,7 @@ class TmtProject(object):
     def __str__(self, timestamps=False):
         return self.name
     def __repr__(self):
-        return "<%s name=%s>" % ( type(self), self.name )
+        return "<%s name=%s>" % ( type(self), str(self) )
     # The configure method of each project gets called in dependency order.
     # That is, if a project B uses a project A,
     # A.configure() will be called before B.configure().
@@ -1158,10 +1165,9 @@ Implementation-Version: %s
         return retVal
 
     def check(self):
+        # Check assumes that we've already been compiled
         if not self.tests:
             return
-
-        tmt._make(projectName=self.name, command='compile')
 
         for testClass in self.tests:
             assert 0 == tmt.java(main=testClass,
