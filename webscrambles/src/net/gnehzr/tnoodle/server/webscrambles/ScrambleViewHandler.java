@@ -2,17 +2,22 @@ package net.gnehzr.tnoodle.server.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.parseExtension;
-import static net.gnehzr.tnoodle.utils.Utils.GSON;
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.Utils.throwableToString;
 
 import net.gnehzr.tnoodle.svglite.Svg;
-import net.gnehzr.tnoodle.utils.Utils;
+import net.gnehzr.tnoodle.utils.GsonUtils;
 import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
+import java.lang.reflect.Type;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
-import java.lang.reflect.Type;
 import com.google.gson.JsonSerializer;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
@@ -84,6 +89,32 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             return img;
         }
         private BufferedImage img = null;
+    }
+
+    static {
+        GsonUtils.registerTypeHierarchyAdapter(Puzzle.class, new Puzzlerizer());
+    }
+
+    private static class Puzzlerizer implements JsonSerializer<Puzzle>, JsonDeserializer<Puzzle> {
+        @Override
+        public Puzzle deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            try {
+                String scramblerName = json.getAsString();
+                SortedMap<String, LazyInstantiator<Puzzle>> scramblers = PuzzlePlugins.getScramblers();
+                LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(scramblerName);
+                if(lazyScrambler == null) {
+                    throw new JsonParseException(scramblerName + " not found in: " + scramblers.keySet());
+                }
+                return lazyScrambler.cachedInstance();
+            } catch(Exception e) {
+                throw new JsonParseException(e);
+            }
+        }
+
+        @Override
+        public JsonElement serialize(Puzzle scrambler, Type typeOfT, JsonSerializationContext context) {
+            return new JsonPrimitive(scrambler.getShortName());
+        }
     }
 
     @Override
@@ -220,7 +251,7 @@ public class ScrambleViewHandler extends SafeHttpServlet {
     }
 
     static {
-        Utils.registerTypeAdapter(PuzzleImageInfo.class, new PuzzleImageInfoizer());
+        GsonUtils.registerTypeAdapter(PuzzleImageInfo.class, new PuzzleImageInfoizer());
     }
     private static class PuzzleImageInfoizer implements JsonSerializer<PuzzleImageInfo> {
         @Override

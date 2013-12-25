@@ -2,9 +2,6 @@ package net.gnehzr.tnoodle.utils;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import net.gnehzr.tnoodle.svglite.InvalidHexColorException;
-import net.gnehzr.tnoodle.svglite.Color;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
@@ -24,16 +20,6 @@ import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Random;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 public final class Utils {
     private static final Logger l = Logger.getLogger(Utils.class.getName());
@@ -71,42 +57,6 @@ public final class Utils {
         }
     }
 
-
-    // GSON encodes the string "'" as "\u0027" by default.
-    // This behavior is controlled by the htmlSafe attribute.
-    // We call disableHtmlEscaping to disable this behavior.
-    private static GsonBuilder gsonBuilder = new GsonBuilder().disableHtmlEscaping();
-    public static Gson GSON = gsonBuilder.create();
-    public static synchronized void registerTypeAdapter(Class<?> clz, Object typeAdapter) {
-        gsonBuilder = gsonBuilder.registerTypeAdapter(clz, typeAdapter);
-        GSON = gsonBuilder.create();
-    }
-    public static synchronized void registerTypeHierarchyAdapter(Class<?> clz, Object typeAdapter) {
-        gsonBuilder = gsonBuilder.registerTypeHierarchyAdapter(clz, typeAdapter);
-        GSON = gsonBuilder.create();
-    }
-
-    static {
-        registerTypeAdapter(Color.class, new Colorizer());
-    }
-
-    private static class Colorizer implements JsonSerializer<Color>, JsonDeserializer<Color> {
-
-        @Override
-        public JsonElement serialize(Color c, Type t, JsonSerializationContext context) {
-            return new JsonPrimitive(c.toHex());
-        }
-
-        @Override
-        public Color deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
-            try {
-                return new Color(json.getAsString());
-            } catch(InvalidHexColorException e) {
-                throw new JsonParseException(e);
-            }
-        }
-
-    }
 
     public static File getResourceDirectory() {
         return getResourceDirectory(true);

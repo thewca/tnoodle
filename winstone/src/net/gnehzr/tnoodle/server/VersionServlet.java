@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.server;
 
-import static net.gnehzr.tnoodle.utils.Utils.GSON;
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import net.gnehzr.tnoodle.utils.Utils;

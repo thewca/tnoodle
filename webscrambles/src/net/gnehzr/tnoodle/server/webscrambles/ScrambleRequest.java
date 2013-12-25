@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
-import static net.gnehzr.tnoodle.utils.Utils.GSON;
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toInt;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.join;

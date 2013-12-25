@@ -16,6 +16,7 @@ android {
                 exclude 'net/gnehzr/tnoodle/utils/Launcher.java'
                 exclude 'net/gnehzr/tnoodle/utils/TNoodleLogging.java'
                 exclude 'net/gnehzr/tnoodle/utils/OneLineLogFormatter.java'
+                exclude 'net/gnehzr/tnoodle/utils/GsonUtils.java'
 
                 java.srcDirs '../../sq12phase/src', '../../min2phase/src', '../../threephase/src'
                 exclude 'cs/min2phase/MainProgram.java'
@@ -37,8 +38,6 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
-
-    compile files('../../lib/gson-2.2.4.jar')
 }
 
 // From http://www.vandalsoftware.com/post/52468430435/publishing-an-android-library-aar-to-a-maven
