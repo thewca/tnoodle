@@ -2,16 +2,13 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.svglite.Path;
+import net.gnehzr.tnoodle.svglite.PathIterator;
+import net.gnehzr.tnoodle.svglite.Point2D;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -28,9 +25,10 @@ import org.timepedia.exporter.client.Export;
 
 @Export
 public class PyraminxPuzzle extends Puzzle {
+    private static final Logger l = Logger.getLogger(PyraminxPuzzle.class.getName());
+
     private static final int MIN_SCRAMBLE_LENGTH = 11;
     private static final boolean SCRAMBLE_LENGTH_INCLUDES_TIPS = true;
-    private static final Logger l = Logger.getLogger(PyraminxPuzzle.class.getName());
     private PyraminxSolver pyraminxSolver = null;
 
     public PyraminxPuzzle() {
@@ -61,24 +59,41 @@ public class PyraminxPuzzle extends Puzzle {
     private static final int pieceSize = 30;
     private static final int gap = 5;
 
+    private static final HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
+    static {
+        defaultColorScheme.put("F", new Color(0x00FF00));
+        defaultColorScheme.put("D", new Color(0xFFFF00));
+        defaultColorScheme.put("L", new Color(0xFF0000));
+        defaultColorScheme.put("R", new Color(0x0000FF));
+    }
+    @Override
+    public HashMap<String, Color> getDefaultColorScheme() {
+        return new HashMap<String, Color>(defaultColorScheme);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return getImageSize(gap, pieceSize);
+    }
+
     private static Dimension getImageSize(int gap, int pieceSize) {
         return new Dimension(getPyraminxViewWidth(gap, pieceSize), getPyraminxViewHeight(gap, pieceSize));
     }
 
-    private void drawMinx(Graphics2D g, int gap, int pieceSize, Color[] colorScheme, int[][] image) {
+    private void drawMinx(Svg g, int gap, int pieceSize, Color[] colorScheme, int[][] image) {
         drawTriangle(g, 2*gap+3*pieceSize, gap+Math.sqrt(3)*pieceSize, true, image[0], pieceSize, colorScheme);
         drawTriangle(g, 2*gap+3*pieceSize, 2*gap+2*Math.sqrt(3)*pieceSize, false, image[1], pieceSize, colorScheme);
         drawTriangle(g, gap+1.5*pieceSize, gap+Math.sqrt(3)/2*pieceSize, false, image[2], pieceSize, colorScheme);
         drawTriangle(g, 3*gap+4.5*pieceSize, gap+Math.sqrt(3)/2*pieceSize,  false, image[3], pieceSize, colorScheme);
     }
 
-    private void drawTriangle(Graphics2D g, double x, double y, boolean up, int[] state, int pieceSize, Color[] colorScheme) {
-        GeneralPath p = triangle(up, pieceSize);
-        p.transform(AffineTransform.getTranslateInstance(x, y));
+    private void drawTriangle(Svg g, double x, double y, boolean up, int[] state, int pieceSize, Color[] colorScheme) {
+        Path p = triangle(up, pieceSize);
+        p.translate(x, y);
 
         double[] xpoints = new double[3];
         double[] ypoints = new double[3];
-        PathIterator iter = p.getPathIterator(null);
+        PathIterator iter = p.getPathIterator();
         for(int ch = 0; ch < 3; ch++) {
             double[] coords = new double[6];
             int type = iter.currentSegment(coords);
@@ -98,9 +113,9 @@ public class PyraminxPuzzle extends Puzzle {
             ys[i+3]=2/3.*ypoints[(i+1)%3]+1/3.*ypoints[i];
         }
 
-        GeneralPath[] ps = new GeneralPath[9];
+        Path[] ps = new Path[9];
         for(int i = 0; i < ps.length; i++) {
-            ps[i] = new GeneralPath();
+            ps[i] = new Path();
         }
 
         Point2D.Double center = getLineIntersection(xs[0], ys[0], xs[4], ys[4], xs[2], ys[2], xs[3], ys[3]);
@@ -123,14 +138,14 @@ public class PyraminxPuzzle extends Puzzle {
         }
 
         for(int i = 0; i < ps.length; i++) {
-            g.setColor(colorScheme[state[i]]);
-            g.fill(ps[i]);
-            g.setColor(Color.BLACK);
-            g.draw(ps[i]);
+            Path sticker = ps[i];
+            sticker.setFill(colorScheme[state[i]]);
+            sticker.setStroke(Color.BLACK);
+            g.appendChild(sticker);
         }
     }
 
-    private static GeneralPath triangle(boolean pointup, int pieceSize) {
+    private static Path triangle(boolean pointup, int pieceSize) {
         int rad = (int)(Math.sqrt(3) * pieceSize);
         double[] angs = { 7/6., 11/6., .5 };
         for(int i = 0; i < angs.length; i++) {
@@ -145,7 +160,7 @@ public class PyraminxPuzzle extends Puzzle {
             x[i] = rad * Math.cos(angs[i]);
             y[i] = rad * Math.sin(angs[i]);
         }
-        GeneralPath p = new GeneralPath();
+        Path p = new Path();
         p.moveTo(x[0], y[0]);
         for(int ch = 1; ch < x.length; ch++) {
             p.lineTo(x[ch], y[ch]);
@@ -179,38 +194,10 @@ public class PyraminxPuzzle extends Puzzle {
                 (height - 3*gap) / (3 * Math.sqrt(3))));
     }
 
-    private static GeneralPath getTriangle(double x, double y, int pieceSize, boolean up) {
-        GeneralPath p = triangle(up, pieceSize);
-        p.transform(AffineTransform.getTranslateInstance(x, y));
+    private static Path getTriangle(double x, double y, int pieceSize, boolean up) {
+        Path p = triangle(up, pieceSize);
+        p.translate(x, y);
         return p;
-    }
-
-    private static final HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
-    static {
-        defaultColorScheme.put("F", toColor("00FF00"));
-        defaultColorScheme.put("D", toColor("FFFF00"));
-        defaultColorScheme.put("L", toColor("FF0000"));
-        defaultColorScheme.put("R", toColor("0000FF"));
-    }
-
-    @Override
-    public HashMap<String, Color> getDefaultColorScheme() {
-        return new HashMap<String, Color>(defaultColorScheme);
-    }
-
-    @Override
-    public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-        HashMap<String, GeneralPath> faces = new HashMap<String, GeneralPath>();
-        faces.put("F", getTriangle(2*gap+3*pieceSize, gap+Math.sqrt(3)*pieceSize, pieceSize, true));
-        faces.put("D", getTriangle(2*gap+3*pieceSize, 2*gap+2*Math.sqrt(3)*pieceSize, pieceSize, false));
-        faces.put("L", getTriangle(gap+1.5*pieceSize, gap+Math.sqrt(3)/2*pieceSize, pieceSize, false));
-        faces.put("R", getTriangle(3*gap+4.5*pieceSize, gap+Math.sqrt(3)/2*pieceSize, pieceSize, false));
-        return faces;
-    }
-
-    @Override
-    protected Dimension getPreferredSize() {
-        return getImageSize(gap, pieceSize);
     }
 
     @Override
@@ -501,14 +488,18 @@ public class PyraminxPuzzle extends Puzzle {
         }
 
         @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
-            g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Dimension preferredSize = getPreferredSize();
+            Svg svg = new Svg(preferredSize);
+            svg.setStroke(2, 10, "round");
 
             Color[] scheme = new Color[4];
             for(int i = 0; i < scheme.length; i++) {
                 scheme[i] = colorScheme.get("FDLR".charAt(i)+"");
             }
-            drawMinx(g, gap, pieceSize, scheme, image);
+            drawMinx(svg, gap, pieceSize, scheme, image);
+
+            return svg;
         }
 
     }

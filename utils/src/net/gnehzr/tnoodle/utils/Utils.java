@@ -1,22 +1,15 @@
 package net.gnehzr.tnoodle.utils;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toHex;
 
-import java.awt.Color;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
@@ -27,17 +20,6 @@ import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Random;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 public final class Utils {
     private static final Logger l = Logger.getLogger(Utils.class.getName());
@@ -52,21 +34,6 @@ public final class Utils {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bytes));
         return bytes.toString();
-    }
-
-    public static void fullyReadInputStream(InputStream is, ByteArrayOutputStream bytes) throws IOException {
-        final byte[] buffer = new byte[0x10000];
-        try {
-            for(;;) {
-                int read = is.read(buffer);
-                if(read < 0) {
-                    break;
-                }
-                bytes.write(buffer, 0, read);
-            }
-        } finally {
-            is.close();
-        }
     }
 
     public static void copyFile(File sourceFile, File destFile) throws IOException {
@@ -90,97 +57,6 @@ public final class Utils {
         }
     }
 
-
-    // GSON encodes the string "'" as "\u0027" by default.
-    // This behavior is controlled by the htmlSafe attribute.
-    // We call disableHtmlEscaping to disable this behavior.
-    private static GsonBuilder gsonBuilder = new GsonBuilder().disableHtmlEscaping();
-    public static Gson GSON;
-    public static synchronized void registerTypeAdapter(Class<?> clz, Object typeAdapter) {
-        gsonBuilder = gsonBuilder.registerTypeAdapter(clz, typeAdapter);
-        GSON = gsonBuilder.create();
-    }
-    public static synchronized void registerTypeHierarchyAdapter(Class<?> clz, Object typeAdapter) {
-        gsonBuilder = gsonBuilder.registerTypeHierarchyAdapter(clz, typeAdapter);
-        GSON = gsonBuilder.create();
-    }
-    static {
-        registerTypeAdapter(Color.class, new Colorizer());
-        registerTypeAdapter(GeneralPath.class, new Pather());
-    }
-
-    private static class Colorizer implements JsonSerializer<Color>, JsonDeserializer<Color> {
-
-        @Override
-        public JsonElement serialize(Color c, Type t, JsonSerializationContext context) {
-            return new JsonPrimitive(toHex(c));
-        }
-
-        @Override
-        public Color deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
-            Color c = toColor(json.getAsString());
-            if(c == null) {
-                throw new JsonParseException("Invalid color");
-            }
-            return c;
-        }
-
-    }
-
-    private static class Pather implements JsonSerializer<GeneralPath>, JsonDeserializer<GeneralPath> {
-
-        /*
-         * NOTE: this is ported from Utils.toPoints()
-         */
-        @Override
-        public JsonElement serialize(GeneralPath s, Type t, JsonSerializationContext context) {
-            JsonArray areas = new JsonArray();
-            JsonArray area = null;
-            double[] coords = new double[2];
-            PathIterator pi = s.getPathIterator(null, 1.0);
-            while(!pi.isDone()) {
-                int val = pi.currentSegment(coords);
-                switch(val) {
-                    case PathIterator.SEG_MOVETO:
-                        area = new JsonArray();
-                        areas.add(area);
-                    case PathIterator.SEG_LINETO:
-                    case PathIterator.SEG_CLOSE:
-                        JsonArray pt = new JsonArray();
-                        pt.add(new JsonPrimitive(coords[0]));
-                        pt.add(new JsonPrimitive(coords[1]));
-                        area.add(pt);
-                        break;
-                    default:
-                        return null;
-                }
-                pi.next();
-            }
-            return areas;
-        }
-
-        @Override
-        public GeneralPath deserialize(JsonElement json, Type t, JsonDeserializationContext context) throws JsonParseException {
-            GeneralPath path = new GeneralPath();
-
-            JsonArray areas = json.getAsJsonArray();
-            for(int c = 0; c < areas.size(); c++) {
-                JsonArray area = areas.get(c).getAsJsonArray();
-                if(area.size() == 0) {
-                    continue;
-                }
-
-                JsonArray pt = area.get(0).getAsJsonArray();
-                path.moveTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
-                for(int i = 1; i < area.size(); i++) {
-                    pt = area.get(1).getAsJsonArray();
-                    path.lineTo(pt.get(0).getAsDouble(), pt.get(1).getAsDouble());
-                }
-            }
-            path.closePath();
-            return path;
-        }
-    }
 
     public static File getResourceDirectory() {
         return getResourceDirectory(true);

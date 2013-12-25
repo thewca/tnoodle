@@ -99,7 +99,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
     var puzzle = null;
     var colorScheme = null;
     var currTurn = null;
-    var faceMap = null;
+    var scrambleImagesSupported = false;
     var defaultColorScheme = null;
     var defaultSize = null;
 
@@ -120,7 +120,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
 
         colorScheme = null; // reset colorscheme
         currTurn = null;
-        faceMap = null; // this indicates if the current puzzle support images
+        scrambleImagesSupported = null;
         currScramble = null;
         puzzle = newPuzzle;
         scrambleImg.clear();
@@ -146,10 +146,10 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
         scrambler.loadPuzzleImageInfo(
             function(puzzleImageInfo) {
                 if(puzzleImageInfo.error) {
-                    faceMap = null; // scramble images are not supported
+                    scrambleImagesSupported = false;
                     scrambleImg.setVisible(false, true);
                 } else {
-                    faceMap = puzzleImageInfo.faces;
+                    scrambleImagesSupported = true;
                     colorScheme = configuration.get('scramble.' + puzzle + '.colorScheme', clone(puzzleImageInfo.colorScheme));
                     defaultColorScheme = puzzleImageInfo.colorScheme;
 
@@ -175,32 +175,22 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
             }, puzzle);
     }
 
-    var configureColorSchemeImg, configureColorSchemeImgAreas;
+    var configureColorSchemeImgAreas;
     function recreateColorSchemeChooserImage() {
         colorChooser.element.setStyle('visibility', 'hidden');
         currFaceName = null;
         refreshColorSchemeChooserImage();
     }
     function refreshColorSchemeChooserImage() {
-        configureColorSchemeImg = scrambler.getScrambleImage(puzzle, null, colorScheme, defaultSize.width, defaultSize.height);
-        configureColorSchemeImg.classList.add("colorchooser");
-        configureColorSchemeImg.setStyle('width', defaultSize.width);
-        configureColorSchemeImg.setStyle('height', defaultSize.height);
-        configureColorSchemeImgHolder.empty();
-        configureColorSchemeImgHolder.appendChild(configureColorSchemeImg);
-
-        if(configureColorSchemeImg.tagName.toLowerCase() == "svg") {
-            configureColorSchemeImgAreas = configureColorSchemeImg.getElementsByClassName("puzzleface");
+        scrambler.loadScrambleSvg(function(svg) {
+            svg.classList.add("colorchooser");
+            svg.setStyle('width', defaultSize.width);
+            svg.setStyle('height', defaultSize.height);
+            configureColorSchemeImgHolder.appendChild(svg);
+            configureColorSchemeImgAreas = svg.getElementsByClassName("puzzleface");
             refreshColorSchemeChooser();
-        } else {
-            // We must wait for configureColorSchemeImg to load before
-            // we can access its configureColorSchemeImg.contentDocument.
-            configureColorSchemeImgAreas = null;
-            configureColorSchemeImg.addEventListener('load', function(e) {
-                configureColorSchemeImgAreas = configureColorSchemeImg.contentDocument.getElementsByClassName("puzzleface");
-                refreshColorSchemeChooser();
-            });
-        }
+        }, puzzle, null, colorScheme);
+        configureColorSchemeImgHolder.empty();
     }
     function refreshColorSchemeChooser() {
         var scale = 1;
@@ -332,7 +322,7 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
         setScrambleCopyVisible(false);
         currScramble = scramble;
 
-        if(!faceMap) {
+        if(!scrambleImagesSupported) {
             // scramble images are not supported, so don't bother with links
             deleteChildren(scramblePre);
             scramblePre.appendChild(document.createTextNode(scramble));
@@ -921,9 +911,10 @@ function ScrambleStuff(scrambler, server, loadedCallback, applet) {
                 width = width.toInt();
                 height = height.toInt();
             }
-            var newScrambleImage = scrambler.getScrambleImage(puzzle, scramble, colorScheme, width, height);
-            newScrambleImage.setStyle('float', 'right');
-            clobberScrambleImage(newScrambleImage);
+            scrambler.loadScrambleSvg(function(svg) {
+                svg.setStyle('float', 'right');
+                clobberScrambleImage(svg);
+            }, puzzle, scramble, colorScheme);
         }
     };
     var loadingImage = document.createElement("img");

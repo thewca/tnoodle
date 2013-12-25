@@ -111,10 +111,10 @@ public class Util {
 			Edge3.createPrun();
 
 			try {
-				l.info("Writing to " + tpr_tables);
-				FileOutputStream out = new FileOutputStream(tpr_tables);
-				DataOutputStream dataOut = new DataOutputStream(out);
-				initTo(dataOut);
+                            l.info("Writing to " + tpr_tables);
+                            FileOutputStream out = new FileOutputStream(tpr_tables);
+                            DataOutputStream dataOut = new DataOutputStream(out);
+                            initTo(dataOut);
 			} catch(IOException e) {
 				l.log(Level.INFO, "Failed to write to " + tpr_tables, e);
 			}
@@ -141,6 +141,7 @@ public class Util {
 		write(Edge3.modedTable, out);
 	}
 
+        /*
 	public static void main(String[] args) throws IOException {
 		System.out.println(Arrays.toString(args));
 		if(args.length != 1) {
@@ -149,6 +150,7 @@ public class Util {
 		}
 		init(false, new File(args[0]));
 	}
+        */
 
 	public static void swap(int[] arr, int a, int b, int c, int d, int key) {
 		int temp;

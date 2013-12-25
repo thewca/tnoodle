@@ -5,8 +5,6 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertSame;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.choose;
 
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -183,12 +181,10 @@ public class ScrambleTest {
 
             // Drawing that scramble
             System.out.println("Drawing " + scramble);
-            BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
-            Dimension size = new Dimension(image.getWidth(), image.getHeight());
-            scrambler.drawScramble(image.createGraphics(), size, scramble, null);
+            scrambler.drawScramble(scramble, null);
 
             // Scramblers should support "null" as the empty scramble
-            scrambler.drawScramble(image.createGraphics(), size, null, null);
+            scrambler.drawScramble(null, null);
 
             System.out.println("Generating & drawing 2 sets of " + SCRAMBLE_COUNT + " scrambles simultaneously." +
                                 " This is meant to shake out threading problems in scramblers.");

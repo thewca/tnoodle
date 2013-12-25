@@ -2,13 +2,13 @@ package net.gnehzr.tnoodle.scrambles;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.ceil;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.RenderingHints;
-import java.awt.Graphics2D;
-import java.awt.geom.GeneralPath;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.InvalidHexColorException;
+import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.svglite.Group;
+import net.gnehzr.tnoodle.svglite.Element;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
@@ -103,21 +103,9 @@ public abstract class Puzzle implements Exportable {
     }
 
     /**
-     * Subclasses of Scrambler are expected to produce scrambles of one size,
-     * this abstract class will resize appropriately.
-     * @return The size of the images this Scrambler will produce.
-     */
-    protected abstract Dimension getPreferredSize();
-
-    /**
      * @return A *new* HashMap mapping face names to Colors.
      */
     public abstract HashMap<String, Color> getDefaultColorScheme();
-
-    /**
-     * @return A HashMap mapping face names to GeneralPaths.
-     */
-    public abstract HashMap<String, GeneralPath> getDefaultFaceBoundaries();
 
     private String[] generateScrambles(Random r, int count) {
         String[] scrambles = new String[count];
@@ -130,12 +118,13 @@ public abstract class Puzzle implements Exportable {
     private SecureRandom r = getSecureRandom();
     private static final SecureRandom getSecureRandom() {
         try {
-            return SecureRandom.getInstance("SHA1PRNG", "SUN");
+            try {
+                return SecureRandom.getInstance("SHA1PRNG", "SUN");
+            } catch(NoSuchProviderException e) {
+                l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
+                return SecureRandom.getInstance("SHA1PRNG");
+            }
         } catch(NoSuchAlgorithmException e) {
-            l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
-            azzert(false, e);
-            return null;
-        } catch(NoSuchProviderException e) {
             l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
             azzert(false, e);
             return null;
@@ -166,6 +155,9 @@ public abstract class Puzzle implements Exportable {
         // other threads can access the static one.
         // Also, setSeed supplements an existing seed,
         // rather than replacing it.
+        // TODO - consider using something other than SecureRandom for seeded scrambles,
+        // because we really, really want this to be portable across platforms (desktop java, gwt, and android)
+        // https://github.com/cubing/tnoodle/issues/146
         SecureRandom r = getSecureRandom();
         r.setSeed(seed);
         return generateWcaScramble(r);
@@ -186,39 +178,6 @@ public abstract class Puzzle implements Exportable {
     @Export
     public String toString() {
         return getLongName();
-    }
-
-    /**
-     * TODO - comment
-     */
-    public void drawPuzzleIcon(Graphics2D g, Dimension size) {
-        try {
-            drawScramble(g, size, "", null);
-        } catch(InvalidScrambleException e) {
-            l.log(Level.SEVERE, "", e);
-        }
-    }
-
-    /**
-     * Computes the best size to draw the scramble image.
-     * @param maxWidth The maximum allowed width of the resulting image, 0 if it doesn't matter.
-     * @param maxHeight The maximum allowed height of the resulting image, 0 if it doesn't matter.
-     * @return The best size of the resulting image, constrained to maxWidth and maxHeight.
-     */
-    @Export
-    public Dimension getPreferredSize(int maxWidth, int maxHeight) {
-        if(maxWidth == 0 && maxHeight == 0) {
-            return getPreferredSize();
-        }
-        if(maxWidth == 0) {
-            maxWidth = Integer.MAX_VALUE;
-        } else if(maxHeight == 0) {
-            maxHeight = Integer.MAX_VALUE;
-        }
-        double ratio = 1.0 * getPreferredSize().width / getPreferredSize().height;
-        int resultWidth = Math.min(maxWidth, ceil(maxHeight*ratio));
-        int resultHeight = Math.min(maxHeight, ceil(maxWidth/ratio));
-        return new Dimension(resultWidth, resultHeight);
     }
 
     /**
@@ -258,43 +217,77 @@ public abstract class Puzzle implements Exportable {
                 return null;
             }
             for(int i = 0; i < colors.length; i++) {
-                Color c = toColor(colors[i]);
-                if(c == null) {
+                try {
+                    Color c = new Color(colors[i]);
+                    colorScheme.put(faces[i], c);
+                } catch(InvalidHexColorException e) {
 //                  sendText(t, "Invalid color: " + colors[i]);
                     //TODO - exception
                     return null;
                 }
-                colorScheme.put(faces[i], c);
             }
         }
         return colorScheme;
     }
 
     /**
-     * Draws scramble onto g.
-     * @param g The Graphics2D object to draw upon (of size size)
-     * @param size The Dimension of the resulting image.
-     * @param scramble The scramble to validate and apply to the puzzle. NOTE: May be null!
+     * Draws scramble as an Svg.
+     * @param scramble The scramble to validate and apply to the puzzle. NOTE: May be null.
      * @param colorScheme A HashMap mapping face names to Colors.
      *          Any missing entries will be merged with the defaults from getDefaultColorScheme().
      *          If null, just the defaults are used.
      * @throws InvalidScrambleException If scramble is invalid.
      */
-    public void drawScramble(Graphics2D g, Dimension size, String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
+    public Svg drawScramble(String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
         if(scramble == null) {
             scramble = "";
         }
-        HashMap<String, Color> defaults = getDefaultColorScheme();
-        if(colorScheme != null) {
-            defaults.putAll(colorScheme);
+        HashMap<String, Color> colorSchemeCopy = colorScheme;
+        colorScheme = getDefaultColorScheme();
+        if(colorSchemeCopy != null) {
+            colorScheme.putAll(colorSchemeCopy);
         }
-        g.scale(1.0*size.width/getPreferredSize().width, 1.0*size.height/getPreferredSize().height);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         PuzzleState state = getSolvedState();
         state = state.applyAlgorithm(scramble);
-        state.drawScramble(g, defaults);
+        Svg svg = state.drawScramble(colorScheme);
+
+        // This is a hack I don't fully understand that prevents aliasing of
+        // vertical and horizontal lines.
+        // See http://stackoverflow.com/questions/7589650/drawing-grid-with-jquery-svg-produces-2px-lines-instead-of-1px
+        Group g = new Group();
+        ArrayList<Element> children = svg.getChildren();
+        while(!children.isEmpty()) {
+            g.appendChild(children.remove(0));
+        }
+        g.translate(0.5, 0.5);
+        svg.appendChild(g);
+        return svg;
     }
 
+    public abstract Dimension getPreferredSize();
+
+    /**
+     * Computes the best size to draw the scramble image.
+     * @param maxWidth The maximum allowed width of the resulting image, 0 if it doesn't matter.
+     * @param maxHeight The maximum allowed height of the resulting image, 0 if it doesn't matter.
+     * @return The best size of the resulting image, constrained to maxWidth and maxHeight.
+     */
+    @Export
+    public Dimension getPreferredSize(int maxWidth, int maxHeight) {
+        if(maxWidth == 0 && maxHeight == 0) {
+            return getPreferredSize();
+        }
+        if(maxWidth == 0) {
+            maxWidth = Integer.MAX_VALUE;
+        } else if(maxHeight == 0) {
+            maxHeight = Integer.MAX_VALUE;
+        }
+        double ratio = 1.0 * getPreferredSize().width / getPreferredSize().height;
+        int resultWidth = Math.min(maxWidth, ceil(maxHeight*ratio));
+        int resultHeight = Math.min(maxHeight, ceil(maxWidth/ratio));
+        return new Dimension(resultWidth, resultHeight);
+    }
 
     protected String solveIn(PuzzleState ps, int n) {
         if(ps.isSolved()) {
@@ -529,17 +522,14 @@ public abstract class Puzzle implements Exportable {
         public abstract boolean equals(Object other);
         public abstract int hashCode();
 
-
         /**
          * Draws the state of the puzzle.
          * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing,
          * use the synchronized keyword when implementing this method:<br>
          * <code>protected synchronized void drawScramble();</code>
-         * @param g The Graphics2D object to draw upon (guaranteed to be big enough for getScrambleSize())
-         * @param colorScheme A HashMap mapping face names to Colors, must have an entry for every face!
+         * @return An Svg instance representing this scramble.
          */
-        protected abstract void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme);
-
+        protected abstract Svg drawScramble(HashMap<String, Color> colorScheme);
 
         public Puzzle getPuzzle() {
             return Puzzle.this;

@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.scrambles;
 
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +65,7 @@ public class Main {
             puzzleInfos.put(puzzle, puzzleInfo);
         }
 
-        String puzzleInfosJSON = Utils.GSON.toJson(puzzleInfos);
+        String puzzleInfosJSON = GSON.toJson(puzzleInfos);
         System.out.println(puzzleInfosJSON);
     }
 

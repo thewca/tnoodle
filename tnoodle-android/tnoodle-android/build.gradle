@@ -1,0 +1,154 @@
+apply plugin: 'android-library'
+apply plugin: 'nexus-workflow'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 19
+    }
+
+    sourceSets {
+        main {
+            java {
+                java.srcDirs '../../utils/src'
+                exclude 'net/gnehzr/tnoodle/utils/Launcher.java'
+                exclude 'net/gnehzr/tnoodle/utils/TNoodleLogging.java'
+                exclude 'net/gnehzr/tnoodle/utils/OneLineLogFormatter.java'
+                exclude 'net/gnehzr/tnoodle/utils/GsonUtils.java'
+
+                java.srcDirs '../../sq12phase/src', '../../min2phase/src', '../../threephase/src'
+                exclude 'cs/min2phase/MainProgram.java'
+
+                java.srcDirs '../../scrambles/src'
+                exclude 'net/gnehzr/tnoodle/js/**'
+                exclude 'net/gnehzr/tnoodle/jre/**'
+                exclude 'net/gnehzr/tnoodle/test/**'
+                exclude 'net/gnehzr/tnoodle/scrambles/Main.java'
+                exclude 'net/gnehzr/tnoodle/scrambles/PuzzleImageInfo.java'
+
+                java.srcDirs '../../svglite/src'
+            }
+
+            resources.srcDirs = java.srcDirs
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:+'
+}
+
+// From http://www.vandalsoftware.com/post/52468430435/publishing-an-android-library-aar-to-a-maven
+// and http://stackoverflow.com/a/20447052
+// To do a release:
+//  1. Make sure you've created a ~/.gradle/gradle.properties file.
+//  2. ./gradlew uploadArchives nexusStagingRelease
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+def stdout = new ByteArrayOutputStream()
+exec {
+    commandLine "../../tmt", "version"
+    standardOutput = stdout;
+}
+version = stdout.toString()
+group = "com.github.cubing"
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+def sonatypeUsername
+if(hasProperty('oss-releases.username')) {
+    sonatypeUsername = property('oss-releases.username')
+}
+def sonatypePassword
+if(hasProperty('oss-releases.password')) {
+    sonatypePassword = property('oss-releases.password')
+}
+def sonatypeRepo = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+
+
+// Happily stolen (and tweaked) from http://www.gradle.org/docs/current/userguide/signing_plugin.html
+import org.gradle.plugins.signing.Sign
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        // Use Java 6's console to read from the console (no good for a CI environment)
+        Console console = System.console()
+        console.printf "\n\nWe have to sign some things in this build.\n\nPlease enter your signing details.\n\n"
+
+        def keyId = property("signing.keyId")
+        if(keyId == null) {
+            keyId = console.readLine("PGP Key Id: ")
+            allprojects { ext."signing.keyId" = keyId }
+        }
+        console.printf "signing.keyId is $keyId\n"
+
+        def file = property("signing.secretKeyRingFile")
+        if(file == null) {
+            file = console.readLine("PGP Secret Key Ring File (absolute path): ")
+            allprojects { ext."signing.secretKeyRingFile" = file }
+        }
+        console.printf "signing.secretKeyRingFile is $file\n"
+
+        if(!hasProperty("signing.password")) {
+            def password = console.readPassword("PGP Private Key Password: ")
+            allprojects { ext."signing.password" = password }
+        }
+
+        console.printf "\nThanks.\n\n"
+    }
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: sonatypeRepo) {
+            authentication(userName: sonatypeUsername,
+                    password: sonatypePassword)
+        }
+
+        pom.project {
+            name 'TNoodle Android Library'
+            packaging 'aar'
+            description 'WCA scrambling library for Android applications'
+            url 'https://github.com/cubing/tnoodle/'
+
+            scm {
+                url 'scm:git@github.com:cubing/tnoodle.git'
+                connection 'scm:git@github.com:cubing/tnoodle.git'
+                developerConnection 'scm:git@github.com:cubing/tnoodle.git'
+            }
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'jfly'
+                    name 'Jeremy Fleischman'
+                    email 'jeremyfleischman@gmail.com'
+                }
+            }
+        }
+    }
+}

@@ -6,11 +6,75 @@
 var tnoodle = tnoodle || {};
 
 (function() {
+
     function workerCodeFunction() {
         function assert(expr) {
             if(!expr) {
                 throw "";
             }
+        }
+
+        // Natural sort stolen from http://www.davekoelle.com/files/alphanum.js and made lint happy
+        /* alphanum.js (C) Brian Huisman
+         * Based on the Alphanum Algorithm by David Koelle
+         * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
+         *
+         * Distributed under same license as original
+         *
+         * This library is free software; you can redistribute it and/or
+         * modify it under the terms of the GNU Lesser General Public
+         * License as published by the Free Software Foundation; either
+         * version 2.1 of the License, or any later version.
+         *
+         * This library is distributed in the hope that it will be useful,
+         * but WITHOUT ANY WARRANTY; without even the implied warranty of
+         * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+         * Lesser General Public License for more details.
+         *
+         * You should have received a copy of the GNU Lesser General Public
+         * License along with this library; if not, write to the Free Software
+         * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+         */
+
+        /* ********************************************************************
+         * Alphanum sort() function version - case sensitive
+         *  - Slower, but easier to modify for arrays of objects which contain
+         *    string properties
+         *
+         */
+        function alphanum(a, b) {
+            function chunkify(t) {
+                var tz = [];
+                var x = 0, y = -1, n = 0, i, j;
+
+                while (true) {
+                    j = t.charAt(x++);
+                    i = j.charCodeAt(0);
+                    if(!i) {
+                        break;
+                    }
+                    var m = (i == 46 || (i >=48 && i <= 57));
+                    if (m !== n) {
+                        tz[++y] = "";
+                        n = m;
+                    }
+                    tz[y] += j;
+                }
+                return tz;
+            }
+
+            var aa = chunkify(a);
+            var bb = chunkify(b);
+
+            for (var x = 0; aa[x] && bb[x]; x++) {
+                if (aa[x] !== bb[x]) {
+                    var c = Number(aa[x]), d = Number(bb[x]);
+                    if (c == aa[x] && d == bb[x]) {
+                        return c - d;
+                    } else return (aa[x] > bb[x]) ? 1 : -1;
+                }
+            }
+            return aa.length - bb.length;
         }
 
         // Simulating window referring to the global scope.
@@ -43,6 +107,11 @@ var tnoodle = tnoodle || {};
             if(e.data.pii) {
                 var pii = tnoodlejs.getPuzzleImageInfo(puzzle);
                 self.postMessage({ shortName: shortName, pii: pii });
+            } else if(e.data.drawSvg) {
+                var colorScheme = e.data.scheme;
+                var scramble = e.data.scramble;
+                var svg = tnoodlejs.scrambleToSvg(scramble, puzzle, colorScheme);
+                self.postMessage({ scrambleSvg: svg });
             } else if(e.data.scramble) {
                 var seed = e.data.seed;
                 var count = e.data.count || 1;
@@ -57,7 +126,7 @@ var tnoodle = tnoodle || {};
                 scrambles = scrambles.slice();
                 self.postMessage({ shortName: shortName, scrambles: scrambles });
             } else {
-                assert(false);
+                assert(false, "Unrecognized message from parent: " + e.data);
             }
         };
         self.addEventListener('message', msg_from_parent, false);
@@ -67,12 +136,22 @@ var tnoodle = tnoodle || {};
             puzzles = puzzles_;
             var expectedPuzzles = [];
             for(var shortName in puzzles) {
+                if(shortName == "444") {
+                    // 444 is a random state scrambler, and is too resource
+                    // intensive for a browser. People should use 444fast
+                    // (a random turn scrambler) instead.
+                    continue;
+                }
                 var puzzle = puzzles[shortName];
                 expectedPuzzles.push({
                     shortName: shortName,
                     longName: puzzle.getLongName()
                 });
             }
+
+            expectedPuzzles.sort(function(a, b) {
+                return alphanum(a.shortName, b.shortName);
+            });
             self.postMessage({ puzzles: expectedPuzzles });
         };
     }
@@ -81,6 +160,7 @@ var tnoodle = tnoodle || {};
         var puzzles = null;
         var puzzlesCallbacks = [];
         var scramblesCallbacks = [];
+        var scrambleImageCallbacks = [];
         var piiCallbacks = [];
         function msg_from_worker(e) {
             if(e.data.puzzles) {
@@ -94,17 +174,20 @@ var tnoodle = tnoodle || {};
 
                 maybeCallPendingFunctions();
             } else if(e.data.scrambles) {
-                var scramblesCallback = scramblesCallbacks.pop();
+                var scramblesCallback = scramblesCallbacks.shift();
                 scramblesCallback(e.data.scrambles);
             } else if(e.data.pii) {
-                var piiCallback = piiCallbacks.pop();
+                var piiCallback = piiCallbacks.shift();
                 piiCallback(e.data.pii);
+            } else if(e.data.scrambleSvg) {
+                var scrambleImageCallback = scrambleImageCallbacks.shift();
+                scrambleImageCallback(e.data.scrambleSvg);
             } else {
                 assert(false);
             }
         }
         function on_worker_error(e) {
-            assert(false);
+            throw e;
         }
 
         // Inspired by http://blog.garron.us/2013/introducing-magicworker-js/
@@ -161,6 +244,19 @@ var tnoodle = tnoodle || {};
             w.postMessage({ shortName: shortName, pii: true });
             piiCallbacks.push(callback);
         };
+        this.loadScrambleSvg = function(callback, shortName, scramble, colorScheme) {
+            var scheme = null;
+            if(colorScheme) {
+                scheme = this.flattenColorScheme(colorScheme);
+            }
+            w.postMessage({ drawSvg: true, shortName: shortName, scramble: scramble, scheme: scheme });
+            scrambleImageCallbacks.push(function(svgStr) {
+                var tempDiv = document.createElement('div');
+                tempDiv.innerHTML = svgStr;
+                var svg = tempDiv.firstElementChild;
+                callback(svg);
+            });
+        };
 
         var pendingFunctions = [];
         function maybeCallPendingFunctions() {
@@ -194,14 +290,6 @@ var tnoodle = tnoodle || {};
 
         this.toString = function() {
             return "tnoodlejs";
-        };
-        this.getScrambleImage = function(shortName, scramble, colorScheme, width, height) {
-            width = width || 0;
-            height = height || 0;
-            var puzzle = gwtPuzzles[shortName];
-            var scheme = this.flattenColorScheme(colorScheme);
-            var svgElement = tnoodlejs.scrambleToSvg(scramble, puzzle, width, height, scheme);
-            return svgElement;
         };
         this.getPuzzleIcon = function(shortName) {
             var puzzle = gwtPuzzles[shortName];
