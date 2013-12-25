@@ -10,7 +10,9 @@ class Project(tmt.TmtProject):
         return [ tmt.TmtProject.projects['scrambles'] ]
 
     def compile(self):
-        retVal = os.system(self.gradlew % "assemble")
+        # Note that we skip signing here in order to prevent
+        # travis ci issue.
+        retVal = os.system(self.gradlew % "assemble -x signArchives")
         assert retVal == 0
 
     def clean(self):
