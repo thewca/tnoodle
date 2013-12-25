@@ -1,4 +1,5 @@
 apply plugin: 'android-library'
+apply plugin: 'nexus-workflow'
 
 android {
     compileSdkVersion 19
@@ -41,14 +42,10 @@ dependencies {
 }
 
 // From http://www.vandalsoftware.com/post/52468430435/publishing-an-android-library-aar-to-a-maven
-// Anyone who wants to run ./gradlew uploadArchives will need to create
-// a ~/.gradle/gradle.properties file. They'll also need to log into
-// https://oss.sonatype.org and promote the implicitly created repository
-// by hand. This is automatable for maven or ant, but there appears to be
-// no good gradle solution yet: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide?__utma=246996102.580569544.1387888933.1387950777.1387957045.6&__utmb=246996102.12.10.1387957045&__utmc=246996102&__utmx=-&__utmz=246996102.1387957045.6.6.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided)&__utmv=-&__utmk=249703941#SonatypeOSSMavenRepositoryUsageGuide-8c.AutomatingReleasesinNexus2.4.
-// We could probably write some gradle code to use their REST api
-// https://oss.sonatype.org/nexus-staging-plugin/default/docs/index.html,
-// but I am so not up for doing that right now.
+// and http://stackoverflow.com/a/20447052
+// To do a release:
+//  1. Make sure you've created a ~/.gradle/gradle.properties file.
+//  2. ./gradlew uploadArchives nexusStagingRelease
 apply plugin: 'maven'
 apply plugin: 'signing'
 

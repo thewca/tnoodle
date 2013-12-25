@@ -5,6 +5,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.5.+'
+        classpath 'com.adaptc.gradle:nexus-workflow:0.5'
     }
 }
 
