@@ -1007,7 +1007,7 @@ class EclipseProject(TmtProject):
                 # For now, I want to just manually edit those jars, but if we
                 # ever change our mind, we could add -Xlint:-path to the ignored warnings.
 
-                # Yes, I know I'm using the reflecation api, and no, there is
+                # Winstone uses the reflection api =(
                 args += [ '-XDignore.symbol.file' ]
 
 
