@@ -2,13 +2,13 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.svglite.PathIterator;
+import net.gnehzr.tnoodle.svglite.Path;
+import net.gnehzr.tnoodle.svglite.Point2D;
+import net.gnehzr.tnoodle.svglite.Text;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -74,7 +74,7 @@ public class MegaminxPuzzle extends Puzzle {
     }
 
     @Override
-    protected Dimension getPreferredSize() {
+    public Dimension getPreferredSize() {
         return getImageSize(gap, minxRad, null);
     }
 
@@ -192,11 +192,36 @@ public class MegaminxPuzzle extends Puzzle {
         swapCenters(image, f1, f2, f3, f4, f5);
     }
 
+    @Override
+    public HashMap<String, Color> getDefaultColorScheme() {
+        HashMap<String, Color> colors = new HashMap<String, Color>();
+        colors.put("U", new Color(0xFFFFFF));
+        colors.put("BL", new Color(0x882222));
+        colors.put("BR", new Color(0x0000FF));
+        colors.put("R", new Color(0x880088));
+        colors.put("F", new Color(0x008800));
+        colors.put("L", new Color(0x88DDFF));
+        colors.put("D", new Color(0xFFFF00));
+        colors.put("DR", new Color(0xFF0000));
+        colors.put("DBR", new Color(0x000088));
+        colors.put("B", new Color(0xFF44FF));
+        colors.put("DBL", new Color(0x00FF00));
+        colors.put("DL", new Color(0xFF8800));
+        return colors;
+    }
+
     private static Dimension getImageSize(int gap, int minxRad, String variation) {
         return new Dimension(getMegaminxViewWidth(gap, minxRad), getMegaminxViewHeight(gap, minxRad));
     }
 
-    private static GeneralPath pentagon(boolean pointup, int minxRad) {
+    private static int getMegaminxViewWidth(int gap, int minxRad) {
+        return (int)(UNFOLDWIDTH * 2 * minxRad + 3 * gap);
+    }
+    private static int getMegaminxViewHeight(int gap, int minxRad) {
+        return (int)(UNFOLDHEIGHT * minxRad + 2 * gap);
+    }
+
+    private static Path pentagon(boolean pointup, int minxRad) {
         double[] angs = { 1.3, 1.7, .1, .5, .9 };
         for(int i = 0; i < angs.length; i++) {
             if(pointup) {
@@ -210,7 +235,7 @@ public class MegaminxPuzzle extends Puzzle {
             x[i] = minxRad * Math.cos(angs[i]);
             y[i] = minxRad * Math.sin(angs[i]);
         }
-        GeneralPath p = new GeneralPath();
+        Path p = new Path();
         p.moveTo(x[0], y[0]);
         for(int ch = 1; ch < x.length; ch++) {
             p.lineTo(x[ch], y[ch]);
@@ -234,39 +259,10 @@ public class MegaminxPuzzle extends Puzzle {
         return a * d - b * c;
     }
 
-    private static int getMegaminxViewWidth(int gap, int minxRad) {
-        return (int)(UNFOLDWIDTH * 2 * minxRad + 3 * gap);
-    }
-    private static int getMegaminxViewHeight(int gap, int minxRad) {
-        return (int)(UNFOLDHEIGHT * minxRad + 2 * gap);
-    }
-    private static int getNewUnitSize(int width, int height, int gap, String variation) {
-        return (int) Math.round(Math.min((width - 3*gap) / (UNFOLDWIDTH * 2),
-                (height - 2*gap) / UNFOLDHEIGHT));
-    }
-
-    private static GeneralPath getPentagon(double x, double y, boolean up, int minxRad) {
-        GeneralPath p = pentagon(up, minxRad);
-        p.transform(AffineTransform.getTranslateInstance(x, y));
+    private static Path getPentagon(double x, double y, boolean up, int minxRad) {
+        Path p = pentagon(up, minxRad);
+        p.translate(x, y);
         return p;
-    }
-
-    @Override
-    public HashMap<String, Color> getDefaultColorScheme() {
-        HashMap<String, Color> colors = new HashMap<String, Color>();
-        colors.put("U", new Color(0xFFFFFF));
-        colors.put("BL", new Color(0x882222));
-        colors.put("BR", new Color(0x0000FF));
-        colors.put("R", new Color(0x880088));
-        colors.put("F", new Color(0x008800));
-        colors.put("L", new Color(0x88DDFF));
-        colors.put("D", new Color(0xFFFF00));
-        colors.put("DR", new Color(0xFF0000));
-        colors.put("DBR", new Color(0x000088));
-        colors.put("B", new Color(0xFF44FF));
-        colors.put("DBL", new Color(0x00FF00));
-        colors.put("DL", new Color(0xFF8800));
-        return colors;
     }
 
     double x = minxRad*Math.sqrt(2*(1-Math.cos(.6*Math.PI)));
@@ -284,8 +280,8 @@ public class MegaminxPuzzle extends Puzzle {
     double magicShiftNumber = d*0.6+minxRad*(f+gg);
     double shift = leftCenterX+magicShiftNumber;
 
-    public HashMap<Face, GeneralPath> getFaceBoundaries() {
-        HashMap<Face, GeneralPath> faces = new HashMap<Face, GeneralPath>();
+    public HashMap<Face, Path> getFaceBoundaries() {
+        HashMap<Face, Path> faces = new HashMap<Face, Path>();
         faces.put(Face.U,   getPentagon(leftCenterX  , leftCenterY  , true , minxRad));
         faces.put(Face.BL,  getPentagon(leftCenterX-c, leftCenterY-e, false, minxRad));
         faces.put(Face.BR,  getPentagon(leftCenterX+c, leftCenterY-e, false, minxRad));
@@ -300,16 +296,6 @@ public class MegaminxPuzzle extends Puzzle {
         faces.put(Face.DBL, getPentagon(shift+gap+a+2*b, gap+x-d+minxRad, true , minxRad));
         faces.put(Face.DL,  getPentagon(shift+gap+a+b+c, gap+x+e+minxRad, true , minxRad));
         return faces;
-    }
-
-    @Override
-    public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-        HashMap<String, GeneralPath> stringy = new HashMap<String, GeneralPath>();
-        HashMap<Face, GeneralPath> faces = getFaceBoundaries();
-        for(Face f : faces.keySet()) {
-            stringy.put(f.toString(), faces.get(f));
-        }
-        return stringy;
     }
 
     @Override
@@ -521,12 +507,14 @@ public class MegaminxPuzzle extends Puzzle {
         }
 
         @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
-            drawMinx(g, gap, minxRad, colorScheme);
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Svg svg = new Svg(getPreferredSize());
+            drawMinx(svg, gap, minxRad, colorScheme);
+            return svg;
         }
 
-        private void drawMinx(Graphics2D g, int gap, int minxRad, HashMap<String, Color> colorScheme) {
-            HashMap<Face, GeneralPath> pentagons = getFaceBoundaries();
+        private void drawMinx(Svg g, int gap, int minxRad, HashMap<String, Color> colorScheme) {
+            HashMap<Face, Path> pentagons = getFaceBoundaries();
             for(Face face : pentagons.keySet()) {
                 int f = face.ordinal();
                 int rotateCounterClockwise;
@@ -548,10 +536,10 @@ public class MegaminxPuzzle extends Puzzle {
             }
         }
 
-        private void drawPentagon(Graphics2D g, GeneralPath p, int[] state, int rotateCounterClockwise, String label, HashMap<String, Color> colorScheme) {
+        private void drawPentagon(Svg g, Path p, int[] state, int rotateCounterClockwise, String label, HashMap<String, Color> colorScheme) {
             double[] xpoints = new double[5];
             double[] ypoints = new double[5];
-            PathIterator iter = p.getPathIterator(null);
+            PathIterator iter = p.getPathIterator();
             for(int ch = 0; ch < 5; ch++) {
                 double[] coords = new double[6];
                 int type = iter.currentSegment(coords);
@@ -571,9 +559,9 @@ public class MegaminxPuzzle extends Puzzle {
                 ys[i+5]=.6*ypoints[(i+1)%5]+.4*ypoints[i];
             }
 
-            GeneralPath[] ps = new GeneralPath[11];
+            Path[] ps = new Path[11];
             for(int i = 0 ; i < ps.length; i++) {
-                ps[i] = new GeneralPath();
+                ps[i] = new Path();
             }
             Point2D.Double[] intpent = new Point2D.Double[5];
             for(int i = 0; i < intpent.length; i++) {
@@ -607,10 +595,9 @@ public class MegaminxPuzzle extends Puzzle {
                     // This is a bit convoluted, but tries to keep the intuitive derivation clear.
                     j = (j + 2*rotateCounterClockwise) % 10;
                 }
-                g.setColor(colorScheme.get("" + Face.values()[state[j]]));
-                g.fill(ps[i]);
-                g.setColor(Color.BLACK);
-                g.draw(ps[i]);
+                ps[i].setStroke(Color.BLACK);
+                ps[i].setFill(colorScheme.get("" + Face.values()[state[j]]));
+                g.appendChild(ps[i]);
             }
 
             if(label != null) {
@@ -622,10 +609,15 @@ public class MegaminxPuzzle extends Puzzle {
                 }
                 centerX /= intpent.length;
                 centerY /= intpent.length;
-                int width = g.getFontMetrics().stringWidth(label);
-                int ascent = g.getFontMetrics().getAscent();
-                int magicPushUpNumber = 2;
-                g.drawString(label, (float) (centerX - width/2.0), (float) (centerY + .5*(ascent) - magicPushUpNumber));
+                Text labelText = new Text(label, centerX, centerY);
+                // Vertically and horizontally center text
+                labelText.setAttribute("text-anchor", "middle");
+                // dominant-baseline works great on Chrome, but
+                // unfortunately isn't supported by androidsvg.
+                // See http://stackoverflow.com/q/56402 for workaround.
+                //labelText.setStyle("dominant-baseline", "central");
+                labelText.setAttribute("dy", "0.7ex");
+                g.appendChild(labelText);
             }
         }
     }

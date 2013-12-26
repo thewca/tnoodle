@@ -6,8 +6,8 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/threephase"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/sq12phase"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/utils"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/svglite"/>
 	<classpathentry kind="lib" path="/lib/jopt-simple-3.2.jar"/>
 	<classpathentry kind="lib" path="/lib/gson-2.2.4.jar"/>
-	<classpathentry kind="lib" path="/lib/gwtexporter-2.5.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

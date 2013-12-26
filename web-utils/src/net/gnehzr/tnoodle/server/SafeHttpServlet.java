@@ -1,6 +1,7 @@
 package net.gnehzr.tnoodle.server;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -107,7 +108,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
         if("json".equals(extension)) {
             HashMap<String, String> json = new HashMap<String, String>();
             json.put("error", error);
-            sendJSON(request, response, Utils.GSON.toJson(json));
+            sendJSON(request, response, GSON.toJson(json));
         } else {
             sendText(request, response, error);
         }

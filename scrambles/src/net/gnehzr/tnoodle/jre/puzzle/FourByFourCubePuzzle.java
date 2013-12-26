@@ -1,8 +1,7 @@
 package puzzle;
 
 /*
- * Gwt can't seem to handle the 4x4 solver, so we fall back to
- * the vanilla random-turns scrambler here.
+ * Browsers can't really handle the 4x4 solver, so we override it here.
  */
 public class FourByFourCubePuzzle extends CubePuzzle {
     public FourByFourCubePuzzle() {

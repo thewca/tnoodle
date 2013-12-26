@@ -109,11 +109,9 @@ Response:
         }]
 
 
-### view/PUZZLE.[png|svg|json]?scramble=SCRAMBLE&width=WIDTH&height=HEIGHT ###
+### view/PUZZLE.[png|svg|json]?scramble=SCRAMBLE ###
 
 If json, then boundaries of the puzzles faces will be returned in json format. This is necessary information for creating a color scheme chooser.
-
-width/height is the maximum allowed width/height for the resulting image. It will not screw up the image's aspect ratio. If 0, it will attempt to use the preferred width/height.
 
 <a href="view/sq1.png?scramble=(3,3) /"><img src="view/sq1.png?scramble=(3,3) /" /></a>
 <a href="view/sq1.svg?scramble=(3,3) /"><img src="view/sq1.svg?scramble=(3,3) /" /></a>

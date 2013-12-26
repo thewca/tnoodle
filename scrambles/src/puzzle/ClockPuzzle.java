@@ -1,17 +1,17 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toColor;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Circle;
+import net.gnehzr.tnoodle.svglite.Path;
+import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.svglite.Transform;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
@@ -21,15 +21,18 @@ import org.timepedia.exporter.client.Export;
 
 @Export
 public class ClockPuzzle extends Puzzle {
+    private static final Logger l = Logger.getLogger(ClockPuzzle.class.getName());
+
     private static final String[] turns={"UR","DR","DL","UL","U","R","D","L","ALL"};
+    private static final int STROKE_WIDTH = 2;
     private static final int radius = 70;
     private static final int clockRadius = 14;
     private static final int clockOuterRadius = 20;
     private static final int pointRadius = (clockRadius + clockOuterRadius) / 2;
-    private static final int pointSize = 1;
+    private static final int tickMarkRadius = 1;
     private static final int arrowHeight = 10;
     private static final int arrowRadius = 2;
-    private static final int pinRadius = 5;
+    private static final int pinRadius = 4;
     private static final double arrowAngle = Math.PI / 2 - Math.acos( (double)arrowRadius / (double)arrowHeight );
 
     private static final int gap = 5;
@@ -44,25 +47,6 @@ public class ClockPuzzle extends Puzzle {
         return "clock";
     }
 
-    protected Dimension getPreferredSize() {
-        return new Dimension(4*(radius+gap), 2*(radius+gap));
-    }
-
-    private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
-    static {
-        defaultColorScheme.put("Front", toColor("3375b2"));
-        defaultColorScheme.put("Back", toColor("55ccff"));
-        defaultColorScheme.put("FrontClock", toColor("55ccff"));
-        defaultColorScheme.put("BackClock", toColor("3375b2"));
-        defaultColorScheme.put("Hand", Color.YELLOW);
-        defaultColorScheme.put("HandBorder", Color.RED);
-        defaultColorScheme.put("PinUp", Color.YELLOW);
-        defaultColorScheme.put("PinDown", toColor("885500"));
-    }
-    @Override
-    public HashMap<String, Color> getDefaultColorScheme() {
-        return new HashMap<String, Color>(defaultColorScheme);
-    }
     private static final int[][] moves = {
         {0,1,1,0,1,1,0,0,0,  -1, 0, 0, 0, 0, 0, 0, 0, 0},// UR
         {0,0,0,0,1,1,0,1,1,   0, 0, 0, 0, 0, 0,-1, 0, 0},// DR
@@ -75,48 +59,25 @@ public class ClockPuzzle extends Puzzle {
         {1,1,1,1,1,1,1,1,1,  -1, 0,-1, 0, 0, 0,-1, 0,-1},// A
     };
 
-    public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-        // Background
-        Area backgroundFront = new Area();
-        Area backgroundBack = new Area();
-        backgroundFront.add(new Area(new Ellipse2D.Double(gap,gap, 2*radius, 2*radius)));
-        backgroundBack.add(new Area(new Ellipse2D.Double(2*radius+3*gap,gap, 2*radius, 2*radius)));
-        for(int i = -1; i < 2; i += 2) {
-            for(int j = -1; j < 2; j += 2) {
-                backgroundFront.add(new Area(new Ellipse2D.Double(radius+gap+2*i*clockOuterRadius-clockOuterRadius,radius+gap+2*j*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius)));
-                backgroundBack.add(new Area(new Ellipse2D.Double(3*radius+3*gap+2*i*clockOuterRadius-clockOuterRadius,radius+gap+2*j*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius)));
-            }
-        }
+    private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
+    static {
+        defaultColorScheme.put("Front", new Color(0x3375b2));
+        defaultColorScheme.put("Back", new Color(0x55ccff));
+        defaultColorScheme.put("FrontClock", new Color(0x55ccff));
+        defaultColorScheme.put("BackClock", new Color(0x3375b2));
+        defaultColorScheme.put("Hand", Color.YELLOW);
+        defaultColorScheme.put("HandBorder", Color.RED);
+        defaultColorScheme.put("PinUp", Color.YELLOW);
+        defaultColorScheme.put("PinDown", new Color(0x885500));
+    }
+    @Override
+    public HashMap<String, Color> getDefaultColorScheme() {
+        return new HashMap<String, Color>(defaultColorScheme);
+    }
 
-        // Clocks
-        Area clocksFront = new Area();
-        Area clocksBack = new Area();
-        for(int i = -1; i < 2; i++) {
-            for(int j = -1; j < 2; j++) {
-                clocksFront.add(new Area(new Ellipse2D.Double(radius+gap+2*i*clockOuterRadius-clockRadius,radius+gap+2*j*clockOuterRadius-clockRadius, 2*clockRadius, 2*clockRadius)));
-                clocksBack.add(new Area(new Ellipse2D.Double(3*radius+3*gap+2*i*clockOuterRadius-clockRadius,radius+gap+2*j*clockOuterRadius-clockRadius, 2*clockRadius, 2*clockRadius)));
-            }
-        }
-
-        // Pins
-        Area pinsUp = new Area();
-        Area pinsDown = new Area();
-        for(int i = -1; i < 2; i += 2) {
-            for(int j = -1; j < 2; j += 2) {
-                pinsDown.add(new Area(new Ellipse2D.Double(radius+gap+j*clockOuterRadius-pinRadius, radius+gap+i*clockOuterRadius-pinRadius, 2*pinRadius, 2*pinRadius)));
-                pinsUp.add(new Area(new Ellipse2D.Double(3*radius+3*gap+j*clockOuterRadius-pinRadius, radius+gap+i*clockOuterRadius-pinRadius, 2*pinRadius, 2*pinRadius)));
-            }
-        }
-
-        HashMap<String, GeneralPath> facesMap = new HashMap<String, GeneralPath>();
-        facesMap.put("Front", new GeneralPath(backgroundFront));
-        facesMap.put("Back", new GeneralPath(backgroundBack));
-        facesMap.put("FrontClock", new GeneralPath(clocksFront));
-        facesMap.put("BackClock", new GeneralPath(clocksBack));
-        facesMap.put("PinUp", new GeneralPath(pinsUp));
-        facesMap.put("PinDown", new GeneralPath(pinsDown));
-
-        return facesMap;
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(4*(radius+gap), 2*(radius+gap));
     }
 
     @Override
@@ -238,74 +199,94 @@ public class ClockPuzzle extends Puzzle {
         }
 
         @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
-            drawBackground(g, colorScheme);
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Svg svg = new Svg(getPreferredSize());
+            svg.setStroke(STROKE_WIDTH, 10, "round");
+            drawBackground(svg, colorScheme);
 
             for(int i = 0; i < 18; i++) {
-                drawClock(g, i, posit[i], colorScheme);
+                drawClock(svg, i, posit[i], colorScheme);
             }
 
-            drawPins(g, pins, colorScheme);
+            drawPins(svg, pins, colorScheme);
+            return svg;
         }
 
-        protected void drawBackground(Graphics2D g, HashMap<String, Color> colorScheme) {
+        protected void drawBackground(Svg g, HashMap<String, Color> colorScheme) {
             String[] colorString = {"Front", "Back"};
 
-            for(int s = 0; s <2 ; s++) {
-
-                g.translate((s*2+1)*(radius + gap), radius + gap);
+            for(int s = 0; s < 2; s++) {
+                Transform t = Transform.getTranslateInstance((s*2+1)*(radius + gap), radius + gap);
 
                 // Draw puzzle
-                g.setColor(Color.BLACK);
-                g.drawOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-                g.drawOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-                g.drawOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-                g.drawOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-                g.drawOval(-radius, -radius, 2*radius, 2*radius);
-                g.setColor(colorScheme.get(colorString[s]));
-                g.fillOval(-radius, -radius, 2*radius, 2*radius);
-                g.fillOval( 2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-                g.fillOval(-2*clockOuterRadius-clockOuterRadius,  2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-                g.fillOval( 2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-                g.fillOval(-2*clockOuterRadius-clockOuterRadius, -2*clockOuterRadius-clockOuterRadius, 2*clockOuterRadius, 2*clockOuterRadius);
-
-                // Draw clocks
-                for(int i = -1; i < 2; i++ ) {
-                    for(int j = -1; j < 2; j++ ) {
-                        g.translate(2*i*clockOuterRadius, 2*j*clockOuterRadius);
-                        g.setColor(colorScheme.get(colorString[s] + "Clock"));
-                        g.fillOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
-                        g.setColor(Color.BLACK);
-                        g.drawOval(-clockRadius,  -clockRadius, 2*clockRadius, 2*clockRadius);
-
-                        g.setColor(colorScheme.get(colorString[s] + "Clock"));
-                        for(int k = 0; k < 12; k++) {
-                            g.fillOval(-pointSize, -pointRadius-pointSize, 2*pointSize, 2*pointSize);
-                            g.rotate(Math.toRadians(30));
-                        }
-                        g.translate(-2*i*clockOuterRadius, -2*j*clockOuterRadius);
-
+                for(int centerX : new int[] { -2*clockOuterRadius, 2*clockOuterRadius }) {
+                    for(int centerY : new int[] { -2*clockOuterRadius, 2*clockOuterRadius }) {
+                        Circle c = new Circle(centerX, centerY, clockOuterRadius);
+                        c.setTransform(t);
+                        c.setStroke(Color.BLACK);
+                        g.appendChild(c);
                     }
                 }
 
-                g.translate(-(s*2+1)*(radius + gap), -(radius + gap));
+                Circle outerCircle = new Circle(0, 0, radius);
+                outerCircle.setTransform(t);
+                outerCircle.setStroke(Color.BLACK);
+                outerCircle.setFill(colorScheme.get(colorString[s]));
+                g.appendChild(outerCircle);
+
+                for(int centerX : new int[] { -2*clockOuterRadius, 2*clockOuterRadius }) {
+                    for(int centerY : new int[] { -2*clockOuterRadius, 2*clockOuterRadius }) {
+                        // We don't want to clobber part of our nice
+                        // thick outer border.
+                        int innerClockOuterRadius = clockOuterRadius - STROKE_WIDTH/2;
+                        Circle c = new Circle(centerX, centerY, innerClockOuterRadius);
+                        c.setTransform(t);
+                        c.setFill(colorScheme.get(colorString[s]));
+                        g.appendChild(c);
+                    }
+                }
+
+                // Draw clocks
+                for(int i = -1; i <= 1; i++) {
+                    for(int j = -1; j <= 1; j++) {
+                        Transform tCopy = new Transform(t);
+                        tCopy.translate(2*i*clockOuterRadius, 2*j*clockOuterRadius);
+                        
+                        Circle clockFace = new Circle(0, 0, clockRadius);
+                        clockFace.setStroke(Color.BLACK);
+                        clockFace.setFill(colorScheme.get(colorString[s]+ "Clock"));
+                        clockFace.setTransform(tCopy);
+                        g.appendChild(clockFace);
+
+                        for(int k = 0; k < 12; k++) {
+                            Circle tickMark = new Circle(0, -pointRadius, tickMarkRadius);
+                            tickMark.setFill(colorScheme.get(colorString[s] + "Clock"));
+                            tickMark.rotate(Math.toRadians(30*k));
+                            tickMark.transform(tCopy);
+                            g.appendChild(tickMark);
+                        }
+
+                    }
+                }
             }
         }
 
-        protected void drawClock(Graphics2D g, int clock, int position, HashMap<String, Color> colorScheme) {
+        protected void drawClock(Svg g, int clock, int position, HashMap<String, Color> colorScheme) {
+            Transform t = new Transform();
+            t.rotate(Math.toRadians(position*30));
             int netX = 0;
             int netY = 0;
             int deltaX, deltaY;
             if(clock < 9) {
                 deltaX = radius + gap;
                 deltaY = radius + gap;
-                g.translate(deltaX, deltaY);
+                t.translate(deltaX, deltaY);
                 netX += deltaX;
                 netY += deltaY;
             } else {
                 deltaX = 3*(radius + gap);
                 deltaY = radius + gap;
-                g.translate(deltaX, deltaY);
+                t.translate(deltaX, deltaY);
                 netX += deltaX;
                 netY += deltaY;
                 clock -= 9;
@@ -313,66 +294,69 @@ public class ClockPuzzle extends Puzzle {
 
             deltaX = 2*((clock%3) - 1)*clockOuterRadius;
             deltaY = 2*((clock/3) - 1)*clockOuterRadius;
-            g.translate(deltaX, deltaY);
+            t.translate(deltaX, deltaY);
             netX += deltaX;
             netY += deltaY;
-            g.rotate(Math.toRadians(position*30));
 
-            GeneralPath arrow = new GeneralPath();
+            Path arrow = new Path();
             arrow.moveTo(0, 0);
             arrow.lineTo(arrowRadius*Math.cos(arrowAngle), -arrowRadius*Math.sin(arrowAngle));
             arrow.lineTo(0, -arrowHeight);
             arrow.lineTo(-arrowRadius*Math.cos( arrowAngle ), -arrowRadius*Math.sin(arrowAngle));
             arrow.closePath();
+            arrow.setStroke(colorScheme.get("HandBorder"));
+            arrow.setTransform(t);
+            g.appendChild(arrow);
 
-            g.setColor(colorScheme.get("HandBorder"));
-            g.drawOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
-            g.draw(arrow);
-            g.setColor(colorScheme.get("Hand"));
-            g.fillOval(-arrowRadius, -arrowRadius, 2*arrowRadius, 2*arrowRadius);
-            g.fill(arrow);
+            Circle handBase = new Circle(0, 0, arrowRadius);
+            handBase.setStroke(colorScheme.get("HandBorder"));
+            handBase.setTransform(t);
+            g.appendChild(handBase);
 
-            // Undo transformations
-            g.rotate(-Math.toRadians(position*30));
-            g.translate(-netX, -netY);
+            arrow = new Path(arrow);
+            arrow.setFill(colorScheme.get("Hand"));
+            arrow.setStroke(null);
+            arrow.setTransform(t);
+            g.appendChild(arrow);
+
+            handBase = new Circle(handBase);
+            handBase.setFill(colorScheme.get("Hand"));
+            handBase.setStroke(null);
+            handBase.setTransform(t);
+            g.appendChild(handBase);
         }
 
-        protected void drawPins(Graphics2D g, boolean[] pins, HashMap<String, Color> colorScheme) {
-            g.translate(radius + gap, radius + gap);
+        protected void drawPins(Svg g, boolean[] pins, HashMap<String, Color> colorScheme) {
+            Transform t = new Transform();
+            t.translate(radius + gap, radius + gap);
             int k = 0;
-            for(int i = -1; i < 2; i += 2) {
-                for(int j = -1; j<2; j += 2) {
-                    g.translate(j*clockOuterRadius, i*clockOuterRadius);
-                    drawPin(g, pins[k++], colorScheme);
-                    g.translate(-j*clockOuterRadius, -i*clockOuterRadius);
+            for(int i = -1; i <= 1; i += 2) {
+                for(int j = -1; j <= 1; j += 2) {
+                    Transform tt = new Transform(t);
+                    tt.translate(j*clockOuterRadius, i*clockOuterRadius);
+                    drawPin(g, tt, pins[k++], colorScheme);
                 }
             }
 
-            g.translate(2*(radius + gap), 0);
-            k=1;
-            for(int i = -1; i < 2; i += 2) {
-                for(int j = -1; j < 2; j += 2) {
-                    g.translate(j*clockOuterRadius, i*clockOuterRadius);
-                    drawPin(g, !pins[k--], colorScheme);
-                    g.translate(-j*clockOuterRadius, -i*clockOuterRadius);
+            t.translate(2*(radius + gap), 0);
+            k = 1;
+            for(int i = -1; i <= 1; i += 2) {
+                for(int j = -1; j <= 1; j += 2) {
+                    Transform tt = new Transform(t);
+                    tt.translate(j*clockOuterRadius, i*clockOuterRadius);
+                    drawPin(g, tt, !pins[k--], colorScheme);
                 }
-                k=3;
-            }
-
-            g.translate(-3*(radius + gap), -(radius + gap));
-        }
-
-        protected void drawPin(Graphics2D g, boolean pin, HashMap<String, Color> colorScheme) {
-            g.setColor(Color.BLACK);
-            g.drawOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
-
-            if(pin) {
-                g.setColor(colorScheme.get("PinUp"));
-                g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
-            } else {
-                g.setColor(colorScheme.get("PinDown"));
-                g.fillOval(-pinRadius, -pinRadius, 2*pinRadius, 2*pinRadius);
+                k = 3;
             }
         }
+
+        protected void drawPin(Svg g, Transform t, boolean pinUp, HashMap<String, Color> colorScheme) {
+            Circle pin = new Circle(0, 0, pinRadius);
+            pin.setTransform(t);
+            pin.setStroke(Color.BLACK);
+            pin.setFill(colorScheme.get( pinUp ? "PinUp" : "PinDown" ));
+            g.appendChild(pin);
+        }
+
     }
 }

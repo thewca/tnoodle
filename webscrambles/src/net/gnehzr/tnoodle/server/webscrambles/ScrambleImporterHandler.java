@@ -1,5 +1,7 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.gnehzr.tnoodle.server.SafeHttpServlet;
-import net.gnehzr.tnoodle.utils.Utils;
 
 @SuppressWarnings("serial")
 public class ScrambleImporterHandler extends SafeHttpServlet {
@@ -50,7 +51,7 @@ public class ScrambleImporterHandler extends SafeHttpServlet {
                 }
             }
             //we need to escape our backslashes
-            String json = Utils.GSON.toJson(scrambles).replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
+            String json = GSON.toJson(scrambles).replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             BufferedWriter html = new BufferedWriter(new OutputStreamWriter(bytes));
             html.append("<html><body><script>parent.postMessage('");
@@ -71,7 +72,7 @@ public class ScrambleImporterHandler extends SafeHttpServlet {
             while((line = in.readLine()) != null) {
                 scrambles.add(line);
             }
-            sendJSON(request, response, Utils.GSON.toJson(scrambles));
+            sendJSON(request, response, GSON.toJson(scrambles));
         }
     }
 

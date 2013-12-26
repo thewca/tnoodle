@@ -2,11 +2,10 @@ package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.geom.GeneralPath;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Rectangle;
+import net.gnehzr.tnoodle.svglite.Svg;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -138,44 +137,6 @@ public class CubePuzzle extends Puzzle {
         }
     }
 
-    private static int getCubeViewWidth(int cubie, int gap, int size) {
-        return (size*cubie + gap)*4 + gap;
-    }
-    private static int getCubeViewHeight(int cubie, int gap, int size) {
-        return (size*cubie + gap)*3 + gap;
-    }
-
-    private static Dimension getImageSize(int gap, int unitSize, int size) {
-        return new Dimension(getCubeViewWidth(unitSize, gap, size), getCubeViewHeight(unitSize, gap, size));
-    }
-    private void drawCube(Graphics2D g, int[][][] state, int gap, int cubieSize, HashMap<String, Color> colorScheme) {
-        paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[0], colorScheme);
-        paintCubeFace(g, 2*gap+size*cubieSize, 3*gap+2*size*cubieSize, size, cubieSize, state[Face.D.ordinal()], colorScheme);
-        paintCubeFace(g, 4*gap+3*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.B.ordinal()], colorScheme);
-        paintCubeFace(g, 3*gap+2*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.R.ordinal()], colorScheme);
-        paintCubeFace(g, 2*gap+size*cubieSize, gap, size, cubieSize, state[Face.U.ordinal()], colorScheme);
-        paintCubeFace(g, 2*gap+size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.F.ordinal()], colorScheme);
-    }
-
-    private void paintCubeFace(Graphics2D g, int x, int y, int size, int cubieSize, int[][] faceColors, HashMap<String, Color> colorScheme) {
-        for(int row = 0; row < size; row++) {
-            for(int col = 0; col < size; col++) {
-                int tempx = x + col*cubieSize;
-                int tempy = y + row*cubieSize;
-                g.setColor(colorScheme.get(Face.values()[faceColors[row][col]].toString()));
-                g.fillRect(tempx, tempy, cubieSize, cubieSize);
-
-                g.setColor(Color.BLACK);
-                g.drawRect(tempx, tempy, cubieSize, cubieSize);
-            }
-        }
-    }
-
-    @Override
-    protected Dimension getPreferredSize() {
-        return getImageSize(gap, cubieSize, size);
-    }
-
     @Override
     public HashMap<String, Color> getDefaultColorScheme() {
         HashMap<String, Color> colors = new HashMap<String, Color>();
@@ -189,18 +150,41 @@ public class CubePuzzle extends Puzzle {
     }
 
     @Override
-    public HashMap<String, GeneralPath> getDefaultFaceBoundaries() {
-        HashMap<String, GeneralPath> faces = new HashMap<String, GeneralPath>();
-        faces.put("B", getFace(4*gap+3*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize));
-        faces.put("D", getFace(2*gap+size*cubieSize, 3*gap+2*size*cubieSize, size, cubieSize));
-        faces.put("F", getFace(2*gap+size*cubieSize, 2*gap+size*cubieSize, size, cubieSize));
-        faces.put("L", getFace(gap, 2*gap+size*cubieSize, size, cubieSize));
-        faces.put("R", getFace(3*gap+2*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize));
-        faces.put("U", getFace(2*gap+size*cubieSize, gap, size, cubieSize));
-        return faces;
+    public Dimension getPreferredSize() {
+        return getImageSize(gap, cubieSize, size);
     }
-    private static GeneralPath getFace(int leftBound, int topBound, int size, int cubieSize) {
-        return new GeneralPath(new Rectangle(leftBound, topBound, size * cubieSize, size * cubieSize));
+
+    private static int getCubeViewWidth(int cubie, int gap, int size) {
+        return (size*cubie + gap)*4 + gap;
+    }
+    private static int getCubeViewHeight(int cubie, int gap, int size) {
+        return (size*cubie + gap)*3 + gap;
+    }
+
+    private static Dimension getImageSize(int gap, int unitSize, int size) {
+        return new Dimension(getCubeViewWidth(unitSize, gap, size), getCubeViewHeight(unitSize, gap, size));
+    }
+
+    private void drawCube(Svg g, int[][][] state, int gap, int cubieSize, HashMap<String, Color> colorScheme) {
+        paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[0], colorScheme);
+        paintCubeFace(g, 2*gap+size*cubieSize, 3*gap+2*size*cubieSize, size, cubieSize, state[Face.D.ordinal()], colorScheme);
+        paintCubeFace(g, 4*gap+3*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.B.ordinal()], colorScheme);
+        paintCubeFace(g, 3*gap+2*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.R.ordinal()], colorScheme);
+        paintCubeFace(g, 2*gap+size*cubieSize, gap, size, cubieSize, state[Face.U.ordinal()], colorScheme);
+        paintCubeFace(g, 2*gap+size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.F.ordinal()], colorScheme);
+    }
+
+    private void paintCubeFace(Svg g, int x, int y, int size, int cubieSize, int[][] faceColors, HashMap<String, Color> colorScheme) {
+        for(int row = 0; row < size; row++) {
+            for(int col = 0; col < size; col++) {
+                int tempx = x + col*cubieSize;
+                int tempy = y + row*cubieSize;
+                Rectangle rect = new Rectangle(tempx, tempy, cubieSize, cubieSize);
+                rect.setFill(colorScheme.get(Face.values()[faceColors[row][col]].toString()));
+                rect.setStroke(Color.BLACK);
+                g.appendChild(rect);
+            }
+        }
     }
 
     @Override
@@ -468,9 +452,10 @@ public class CubePuzzle extends Puzzle {
             return Arrays.deepHashCode(getNormalized());
         }
 
-        @Override
-        protected void drawScramble(Graphics2D g, HashMap<String, Color> colorScheme) {
-            drawCube(g, image, gap, cubieSize, colorScheme);
+        protected Svg drawScramble(HashMap<String, Color> colorScheme) {
+            Svg svg = new Svg(getPreferredSize());
+            drawCube(svg, image, gap, cubieSize, colorScheme);
+            return svg;
         }
     }
 }

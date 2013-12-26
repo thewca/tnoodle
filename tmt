@@ -18,9 +18,20 @@ import pdb
 
 cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
-    if tb:
-        traceback.print_exception(etype, value, tb)
-    pdb.post_mortem(tb)
+    # Added this line for debugging why https://travis-ci.org/cubing/tnoodle/builds/15966902
+    # hit pdb instead of just printing a traceback and exiting.
+    # Once that problem is solved, we can delete this code.
+    print("Hit excepthook! stderr.isatty: %s stdin.isatty: %s stdout.isatty: %s" % (sys.stderr.isatty(), sys.stdin.isatty(), sys.stdout.isatty()))
+
+    # Workaround for isatty weirdness mentioned above.
+    isTravisCiBuild = os.environ.get('TRAVIS_BRANCH', None)
+    if not sys.stdout.isatty() or not sys.stderr.isatty() or not sys.stdin.isatty() or isTravisCiBuild:
+        # stdin, stdout, or stderr is redirected, so don't enter pdb
+        sys.__excepthook__(etype, value, tb)
+    else:
+        if tb:
+            traceback.print_exception(etype, value, tb)
+        pdb.post_mortem(tb)
 sys.excepthook = excepthook
 
 def checkShellCmd(*args, **kwargs):
@@ -136,10 +147,13 @@ def topologicalSort(projects, exclude=set()):
         def check(self):
             return
 
+        def __str__(self, timestamps=False):
+            return "all"
+
         def clean(self):
             for dep in self.getDependencies():
                 dep.clean()
-    ultimateRoot = UltimateRoot(name="all", description="")
+    ultimateRoot = UltimateRoot(name=None, description="")
 
     visitedNodes = dfs(ultimateRoot, exclude=exclude)
     assert visitedNodes[0] == ultimateRoot
@@ -300,11 +314,18 @@ class tmt:
         else:
             projects = [ project ]
 
+        # Build everything we need before testing.
+        if command == "check":
+            tmt._make(projectName=project.name, command='compile')
+
         projects.reverse()
         for project in projects:
             commandFunc = getattr(project, command, None)
             assert commandFunc, 'No %s target in %s' % ( command, project )
             commandFunc()
+
+    def _printVersion(self):
+        print(self.VERSION)
 
     def _release(self):
         tmt.releasing = True
@@ -440,6 +461,13 @@ class tmt:
             action='store_true',
             help="Don't bother telling me I don't have flex installed, I already know.")
         parser_make.set_defaults(func=self._make)
+
+        desc = 'Print version string to use for builds'
+        parser_version = subparsers.add_parser(
+            'version',
+            help=desc, description=desc,
+            formatter_class=ArgumentDefaultsHelpFormatter)
+        parser_version.set_defaults(func=self._printVersion)
 
         desc = 'Publish TNoodle to github'
         parser_release = subparsers.add_parser(
@@ -669,6 +697,8 @@ class TmtProject(object):
         TmtProject.projects[name] = self
     def __str__(self, timestamps=False):
         return self.name
+    def __repr__(self):
+        return "<%s name=%s>" % ( type(self), str(self) )
     # The configure method of each project gets called in dependency order.
     # That is, if a project B uses a project A,
     # A.configure() will be called before B.configure().
@@ -976,8 +1006,10 @@ class EclipseProject(TmtProject):
                 # For now, I want to just manually edit those jars, but if we
                 # ever change our mind, we could add -Xlint:-path to the ignored warnings.
 
-                # Yes, I know I'm using the reflecation api, and no, there isn't another choice
+                # Yes, I know I'm using the reflecation api, and no, there is
                 args += [ '-XDignore.symbol.file' ]
+
+
 
             entities = self.getClasspathEntities(includeCompileTimeOnlyDependencies=True)
 
@@ -1139,10 +1171,9 @@ Implementation-Version: %s
         return retVal
 
     def check(self):
+        # Check assumes that we've already been compiled
         if not self.tests:
             return
-
-        tmt._make(projectName=self.name, command='compile')
 
         for testClass in self.tests:
             assert 0 == tmt.java(main=testClass,
@@ -1153,8 +1184,6 @@ Implementation-Version: %s
         if exists(self.bin):
             assert isdir(self.bin)
             rmtree(self.bin)
-            if self.webContent:
-                rmtree(dirname(self.bin))
         if exists(self.binResource):
             assert isdir(self.binResource)
             rmtree(self.binResource)

@@ -1,6 +1,6 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
-import static net.gnehzr.tnoodle.utils.Utils.GSON;
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
