@@ -34,7 +34,7 @@ public class SkewbPuzzle extends Puzzle {
 
     public SkewbPuzzle() {
         skewbSolver = new SkewbSolver();
-        wcaMinScrambleDistance = 4;
+        wcaMinScrambleDistance = 7;
     }
 
     @Override

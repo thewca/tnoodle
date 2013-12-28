@@ -258,6 +258,7 @@ class tmt:
 
         tmt.args.project = None
         tmt.args.no_recursive = False
+        tmt.args.skip_noflex_warning = False
         self._make(command='check')
 
         body = tmt.args.body

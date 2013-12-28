@@ -134,7 +134,7 @@ public class ScrambleTest {
             
             // Test solving the solved state
             String solution = scrambler.getSolvedState().solveIn(0);
-            azzert("".equals(solution));
+            azzertEquals("", solution);
 
             for(int count = 0; count < SCRAMBLE_COUNT; count++) {
                 System.out.print("Scramble ["+(count+1)+"/"+SCRAMBLE_COUNT+"]: ");

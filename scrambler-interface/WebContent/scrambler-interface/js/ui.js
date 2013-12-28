@@ -339,51 +339,34 @@ var mark2 = {};
     mark2.settings = (function() {
 
         var extraScrambles = 2;
-        var events = {
+        var eventOrder = [
             // Official WCA events as of October 06, 2013
             // Names match https://www.worldcubeassociation.org/regulations/#article-9-events
-            // - Exception: "Rubik's Cube" is replaced with "3x3x3" for brevity and consistency.
-            "333":    {name: "3x3x3", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "444":    {name: "4x4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "555":    {name: "5x5x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "222":    {name: "2x2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "333bf":  {name: "3x3x3: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "333oh":  {name: "3x3x3: One-Handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "333fm":  {name: "3x3x3: Fewest Moves", default_round: {type: "best", num_scrambles: 1 } },
-            "333ft":  {name: "3x3x3: With Feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "minx":   {name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "pyram":  {name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "sq1":    {name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "clock":  {name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            "666":    {name: "6x6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "777":    {name: "7x7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "444bf":  {name: "4x4x4 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "555bf":  {name: "5x5x5 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            "333mbf": {name: "3x3x3: Multiple Blindfolded", default_round: {type: "mbf",  num_scrambles: 28 } },
-            "skewb":  {name: "Skewb", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } }
-        };
-
-        // Javascript objects don't retain key order in all browsers, so we create this list for iteration.
-        var eventOrder = [
-            "222",
-            "333",
-            "444",
-            "555",
-            "666",
-            "777",
-            "333bf",
-            "333oh",
-            "333fm",
-            "333ft",
-            "minx",
-            "pyram",
-            "sq1",
-            "clock",
-            "444bf",
-            "555bf",
-            "333mbf",
-            "skewb"
+            // - Exception: "Rubik's Cube" is replaced with "3x3x3 Cube" for consistency.
+            {eventID: "222", name: "2x2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "333", name: "3x3x3 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "444", name: "4x4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "555", name: "5x5x5 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "666", name: "6x6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "777", name: "7x7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "333bf", name: "3x3x3: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "333oh", name: "3x3x3: One-Handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "333fm", name: "3x3x3: Fewest Moves", default_round: {type: "best", num_scrambles: 1 } },
+            {eventID: "333ft", name: "3x3x3: With Feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "minx", name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "pyram", name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "sq1", name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "clock", name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "444bf", name: "4x4x4 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "555bf", name: "5x5x5 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "333mbf", name: "3x3x3: Multiple Blindfolded", default_round: {type: "mbf",  num_scrambles: 28 } },
+            {eventID: "skewb", name: "Skewb", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } }
         ];
+
+        var events = {};
+        eventOrder.forEach(function(event) {
+            events[event.eventID] = event;
+        });
 
         function isFmc(eventID) {
             // Does this eventID end in "fm"?
@@ -1021,7 +1004,7 @@ var mark2 = {};
             };
             var currentEventsTR;
             for (var i = 0; i < settings.event_order.length; i++) {
-                var eventID = settings.event_order[i];
+                var eventID = settings.event_order[i].eventID;
 
                 settings.events[eventID].initialized = false;
 

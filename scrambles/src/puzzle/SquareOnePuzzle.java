@@ -28,7 +28,10 @@ public class SquareOnePuzzle extends Puzzle {
     private static final int radius = 32;
 
     public SquareOnePuzzle() {
-        wcaMinScrambleDistance = 20;
+        // TODO - we can't filter super aggresively until
+        // Chen Shuang's optimal solver is fixed.
+        //wcaMinScrambleDistance = 20;
+        wcaMinScrambleDistance = 11;
     }
 
     @Override
@@ -197,6 +200,9 @@ public class SquareOnePuzzle extends Puzzle {
         return 40;
     }
 
+    /*
+    // TODO - we can't filter super aggresively until
+    // Chen Shuang's optimal solver is fixed.
     @Override
     protected String solveIn(PuzzleState ps, int n) {
         FullCube f = ((SquareOneState)ps).toFullCube();
@@ -204,6 +210,7 @@ public class SquareOnePuzzle extends Puzzle {
         String scramble = s.solutionOpt(f, n);
         return scramble == null ? null : scramble.trim();
     }
+    */
 
     private class SquareOneState extends PuzzleState {
         boolean sliceSolved;
