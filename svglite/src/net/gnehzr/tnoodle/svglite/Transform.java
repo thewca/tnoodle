@@ -9,7 +9,7 @@ public class Transform {
     //  [ b d f ]
     //  [ 0 0 1 ]
     private double a, b, c, d, e, f;
-    private Transform(double a, double b, double c, double d, double e, double f) {
+    public Transform(double a, double b, double c, double d, double e, double f) {
         this.a = a;
         this.b = b;
         this.c = c;

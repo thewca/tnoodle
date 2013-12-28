@@ -17,7 +17,6 @@ import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.EnvGetter;
 import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 import cs.sq12phase.FullCube;
 import cs.sq12phase.Search;
@@ -29,10 +28,7 @@ public class SquareOnePuzzle extends Puzzle {
     private static final int radius = 32;
 
     public SquareOnePuzzle() {
-        String newMinDistance = EnvGetter.getenv("TNOODLE_SQ1_MIN_DISTANCE");
-        if(newMinDistance != null) {
-            wcaMinScrambleDistance = Integer.parseInt(newMinDistance);
-        }
+        wcaMinScrambleDistance = 20;
     }
 
     @Override
@@ -201,6 +197,14 @@ public class SquareOnePuzzle extends Puzzle {
         return 40;
     }
 
+    @Override
+    protected String solveIn(PuzzleState ps, int n) {
+        FullCube f = ((SquareOneState)ps).toFullCube();
+        Search s = new Search();
+        String scramble = s.solutionOpt(f, n);
+        return scramble == null ? null : scramble.trim();
+    }
+
     private class SquareOneState extends PuzzleState {
         boolean sliceSolved;
         int[] pieces;
@@ -213,6 +217,17 @@ public class SquareOnePuzzle extends Puzzle {
         public SquareOneState(boolean sliceSolved, int[] pieces) {
             this.sliceSolved = sliceSolved;
             this.pieces = pieces;
+        }
+
+        FullCube toFullCube() {
+            int[] map1 = new int[]{3, 2, 1, 0, 7, 6, 5, 4, 0xa, 0xb, 8, 9, 0xe, 0xf, 0xc, 0xd};
+            int[] map2 = new int[]{5,4,3,2,1,0,11,10,9,8,7,6,17,16,15,14,13,12,23,22,21,20,19,18};
+            FullCube f = FullCube.randomCube();
+            for (int i=0; i<24; i++) {
+                f.setPiece(map2[i], map1[pieces[i]]);
+            }
+            f.setPiece(24, sliceSolved ? 0 : 1);
+            return f;
         }
 
         private int[] doSlash() {

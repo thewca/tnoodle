@@ -37,6 +37,85 @@ public class Search {
         return sol_string;
     }
 
+    public String solutionOpt(FullCube c, int maxl) {
+        this.c = c;
+        sol_string = null;
+        int shape = c.getShapeIdx();
+        for (length1=Shape.ShapePrunOpt[shape]; length1<=maxl; length1++) {
+            if (phase1Opt(shape, Shape.ShapePrunOpt[shape], length1, 0, -1)) {
+                break;
+            }
+        }
+        return sol_string;
+    }
+
+
+    boolean phase1Opt(int shape, int prunvalue, int maxl, int depth, int lm) {
+        if (maxl == 0) {
+            return isSolvedInPhase1();
+        }
+        //try each possible move. First twist;
+        if (lm != 0) {
+            int shapex = Shape.TwistMove[shape];
+            int prunx = Shape.ShapePrunOpt[shapex];
+            if (prunx < maxl) {
+                move[depth] = 0;
+                if (phase1(shapex, prunx, maxl-1, depth+1, 0)) {
+                    return true;
+                }
+            }
+        }
+
+        //Try top layer
+        int shapex = shape;
+        if(lm <= 0){
+            int m = 0;
+            while (true) {
+                m += Shape.TopMove[shapex];
+                shapex = m >> 4;
+                m &= 0x0f;
+                if (m >= 12) {
+                    break;
+                }
+                int prunx = Shape.ShapePrunOpt[shapex];
+                if (prunx > maxl) {
+                    break;
+                } else if (prunx < maxl) {
+                    move[depth] = m;
+                    if (phase1(shapex, prunx, maxl-1, depth+1, 1)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        shapex = shape;
+        //Try bottom layer
+        if(lm <= 1){
+            int m = 0;
+            while (true) {
+                m += Shape.BottomMove[shapex];
+                shapex = m >> 4;
+                m &= 0x0f;
+                if (m >= 6) {
+                    break;
+                }
+                int prunx = Shape.ShapePrunOpt[shapex];
+                if (prunx > maxl) {
+                    break;
+                } else if (prunx < maxl) {
+                    move[depth] = -m;
+                    if (phase1(shapex, prunx, maxl-1, depth+1, 2)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+ 
+    }
+
     boolean phase1(int shape, int prunvalue, int maxl, int depth, int lm) {
 
         if (prunvalue==0 && maxl<4) {
@@ -107,45 +186,34 @@ public class Search {
     int count = 0;
     Square sq = new Square();
 
+    boolean isSolvedInPhase1() {
+        d.copy(c);
+        for (int i=0; i<length1; i++) {
+            d.doMove(move[i]);
+        }
+        boolean isSolved = d.ul == 0x011233 && d.ur == 455677 && d.dl == 0x998bba && d.dr == 0xddcffe && d.ml == 0;
+        if (isSolved) {
+            sol_string = move2string(length1);
+        }
+        return isSolved;
+    }
 
     boolean init2() {
-//      System.out.print(count++);
-//      System.out.print('\r');
         d.copy(c);
         for (int i=0; i<length1; i++) {
             d.doMove(move[i]);
         }
         assert Shape.ShapePrun[d.getShapeIdx()] == 0;
-//      if(1==1)return false;
-//      Square sq = new Square();
         d.getSquare(sq);
-        //TODO
 
         int edge = sq.edgeperm;
         int corner = sq.cornperm;
         int ml = sq.ml;
-//      int shp = sq.topEdgeFirst ? 0 : 1;
-//      shp |= sq.botEdgeFirst ? 0 : 2;
 
         int prun = Math.max(Square.SquarePrun[sq.edgeperm<<1|ml], Square.SquarePrun[sq.cornperm<<1|ml]);
 
         for (int i=prun; i<maxlen2; i++) {
-//          System.out.println(i);
             if (phase2(edge, corner, sq.topEdgeFirst, sq.botEdgeFirst, ml, i, length1, 0)) {
-
-                sol_string = move2string(i + length1);
-
-//Unnecessary Code. Just for checking whether the solution is correct.
-//              for (int j=0; j<i; j++) {
-//                  d.doMove(move[length1+j]);
-//                  System.out.println(pruncomb[length1+j]);
-//              }
-//              System.out.println();
-//              System.out.println(d.getShapeIdx());
-//              System.out.println(Integer.toHexString(d.ul));
-//              System.out.println(Integer.toHexString(d.ur));
-//              System.out.println(Integer.toHexString(d.dl));
-//              System.out.println(Integer.toHexString(d.dr));
                 sol_string = move2string(i + length1);
                 return true;
             }
@@ -182,11 +250,11 @@ public class Search {
         } else {
             s.append('(').append(top).append(",").append(bottom).append(")");
         }
-        return s.toString();// + " (" + len + "t)";
+        return s.toString();
     }
 
     boolean phase2(int edge, int corner, boolean topEdgeFirst, boolean botEdgeFirst, int ml, int maxl, int depth, int lm) {
-        if (maxl == 0 && !topEdgeFirst && botEdgeFirst/*edge==0 && corner==0 && !topEdgeFirst && botEdgeFirst && ml==0*/) {
+        if (maxl == 0 && !topEdgeFirst && botEdgeFirst) {
             assert edge==0 && corner==0 && ml==0;
             return true;
         }

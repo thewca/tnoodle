@@ -10,6 +10,7 @@ class Shape {
 
     static int[] ShapeIdx = new int[3678];
     static int[] ShapePrun = new int[3768 * 2];
+    static int[] ShapePrunOpt = new int[3768 * 2];
 
     static int[] TopMove = new int[3678 * 2];
     static int[] BottomMove = new int[3678 * 2];
@@ -118,6 +119,7 @@ class Shape {
         }
         for (int i=0; i<3768*2; i++) {
             ShapePrun[i] = -1;
+            ShapePrunOpt[i] = -1;
         }
 
         //0 110110110110 011011011011
@@ -128,6 +130,7 @@ class Shape {
         ShapePrun[getShape2Idx(0x1db6db6)] = 0;
         ShapePrun[getShape2Idx(0x16db6db)] = 0;
         ShapePrun[getShape2Idx(0x06dbdb6)] = 0;
+        ShapePrunOpt[new FullCube().getShapeIdx()] = 0;
         int done = 4;
         int done0 = 0;
         int depth = -1;
@@ -168,6 +171,50 @@ class Shape {
                     if (ShapePrun[idx] == -1) {
                         ++done;
                         ShapePrun[idx] = depth + 1;
+                    }
+                }
+            }
+        }
+        done = 1;
+        done0 = 0;
+        depth = -1;
+        while (done != done0) {
+            done0 = done;
+            ++depth;
+            System.out.println(done);
+            for (int i=0; i<3768*2; i++) {
+                if (ShapePrunOpt[i] == depth) {
+                    // try top
+                    int m = 0;
+                    int idx = i;
+                    do {
+                        idx = TopMove[idx];
+                        m += idx & 0xf;
+                        idx >>= 4;
+                        if (ShapePrunOpt[idx] == -1) {
+                            ++done;
+                            ShapePrunOpt[idx] = depth + 1;
+                        }
+                    } while (m != 12);
+
+                    // try bottom
+                    m = 0;
+                    idx = i;
+                    do {
+                        idx = BottomMove[idx];
+                        m += idx & 0xf;
+                        idx >>= 4;
+                        if (ShapePrunOpt[idx] == -1) {
+                            ++done;
+                            ShapePrunOpt[idx] = depth + 1;
+                        }
+                    } while (m != 12);
+
+                    // try twist
+                    idx = TwistMove[i];
+                    if (ShapePrunOpt[idx] == -1) {
+                        ++done;
+                        ShapePrunOpt[idx] = depth + 1;
                     }
                 }
             }
