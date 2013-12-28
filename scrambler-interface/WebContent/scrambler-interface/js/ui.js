@@ -342,9 +342,9 @@ var mark2 = {};
         var eventOrder = [
             // Official WCA events as of October 06, 2013
             // Names match https://www.worldcubeassociation.org/regulations/#article-9-events
-            // - Exception: "Rubik's Cube" is replaced with "3x3x3" for brevity and consistency.
+            // - Exception: "Rubik's Cube" is replaced with "3x3x3 Cube" for consistency.
             {eventID: "222", name: "2x2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "333", name: "3x3x3", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "333", name: "3x3x3 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "444", name: "4x4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "555", name: "5x5x5 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "666", name: "6x6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
