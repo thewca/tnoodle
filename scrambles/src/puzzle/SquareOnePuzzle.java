@@ -267,7 +267,7 @@ public class SquareOnePuzzle extends Puzzle {
          *
          * @param top Amount to rotate top
          * @param bottom Amount to rotate bottom
-         * @return null if the move is illegal (doesn't allow for a / afterwards)
+         * @return A copy of pieces with (top, bottom) applied to it
          */
         private int[] doRotateTopAndBottom(int top, int bottom) {
             top = modulo(-top, 12);
