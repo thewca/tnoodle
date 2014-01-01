@@ -26,9 +26,10 @@ import OpenSSL.SSL
 from pyasn1.codec.der import decoder as der_decoder
 from socket import _fileobject
 import ssl
+import select
 from cStringIO import StringIO
 
-from .. import connectionpool
+from .. import connection
 from .. import util
 
 __all__ = ['inject_into_urllib3', 'extract_from_urllib3']
@@ -51,20 +52,20 @@ _openssl_verify = {
 
 
 orig_util_HAS_SNI = util.HAS_SNI
-orig_connectionpool_ssl_wrap_socket = connectionpool.ssl_wrap_socket
+orig_connection_ssl_wrap_socket = connection.ssl_wrap_socket
 
 
 def inject_into_urllib3():
     'Monkey-patch urllib3 with PyOpenSSL-backed SSL-support.'
 
-    connectionpool.ssl_wrap_socket = ssl_wrap_socket
+    connection.ssl_wrap_socket = ssl_wrap_socket
     util.HAS_SNI = HAS_SNI
 
 
 def extract_from_urllib3():
     'Undo monkey-patching by :func:`inject_into_urllib3`.'
 
-    connectionpool.ssl_wrap_socket = orig_connectionpool_ssl_wrap_socket
+    connection.ssl_wrap_socket = orig_connection_ssl_wrap_socket
     util.HAS_SNI = orig_util_HAS_SNI
 
 
@@ -336,6 +337,7 @@ def ssl_wrap_socket(sock, keyfile=None, certfile=None, cert_reqs=None,
         try:
             cnx.do_handshake()
         except OpenSSL.SSL.WantReadError:
+            select.select([sock], [], [])
             continue
         except OpenSSL.SSL.Error as e:
             raise ssl.SSLError('bad handshake', e)

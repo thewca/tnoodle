@@ -27,6 +27,10 @@ class ConnectionError(RequestException):
     """A Connection error occurred."""
 
 
+class ProxyError(ConnectionError):
+    """A proxy error occurred."""
+
+
 class SSLError(ConnectionError):
     """An SSL error occurred."""
 
@@ -57,3 +61,7 @@ class InvalidURL(RequestException, ValueError):
 
 class ChunkedEncodingError(RequestException):
     """The server declared chunked encoding but sent an invalid chunk."""
+
+
+class ContentDecodingError(RequestException):
+    """Failed to decode response content"""
