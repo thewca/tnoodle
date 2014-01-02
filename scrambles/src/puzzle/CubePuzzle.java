@@ -8,6 +8,7 @@ import net.gnehzr.tnoodle.svglite.Rectangle;
 import net.gnehzr.tnoodle.svglite.Svg;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.utils.GwtSafeUtils;
@@ -210,9 +211,6 @@ public class CubePuzzle extends Puzzle {
     }
 
     private int[][][] normalize(int[][][] image) {
-        if (size % 2 == 1) {
-            return image;
-        }
         image = cloneImage(image);
 
         int spins = 0;
@@ -314,7 +312,7 @@ public class CubePuzzle extends Puzzle {
 
     public class CubeState extends PuzzleState {
         private final int[][][] image;
-        private int[][][] normalizedImage = null;
+        private CubeState normalizedState = null;
 
         public CubeState() {
             image = new int[6][size][size];
@@ -325,18 +323,23 @@ public class CubePuzzle extends Puzzle {
                     }
                 }
             }
-            normalizedImage = cloneImage(image);
+            normalizedState = this;
         }
 
         public CubeState(int[][][] image) {
             this.image = image;
         }
 
-        private int[][][] getNormalized(){
-            if (normalizedImage == null) {
-                normalizedImage = normalize(image);
+        public boolean isNormalized() {
+            return CubePuzzle.this.isNormalized(image);
+        }
+
+        public CubeState getNormalized() {
+            if(normalizedState == null) {
+                int[][][] normalizedImage = normalize(image);
+                normalizedState = new CubeState(normalizedImage);
             }
-            return normalizedImage;
+            return normalizedState;
         }
 
         public TwoByTwoState toTwoByTwoState() {
@@ -413,8 +416,8 @@ public class CubePuzzle extends Puzzle {
         }
 
         @Override
-        public HashMap<String, CubeState> getSuccessors() {
-            HashMap<String, CubeState> successors = new HashMap<String, CubeState>();
+        public LinkedHashMap<String, CubeState> getSuccessorsByName() {
+            LinkedHashMap<String, CubeState> successors = new LinkedHashMap<String, CubeState>();
             for(Face face : Face.values()) {
                 for(int innerSlice = 0; innerSlice < size/2; innerSlice++) {
                     for(int dir = 1; dir <= 3; dir++) {
@@ -444,12 +447,12 @@ public class CubePuzzle extends Puzzle {
 
         @Override
         public boolean equals(Object other) {
-            return Arrays.deepEquals(getNormalized(), ((CubeState) other).getNormalized());
+            return Arrays.deepEquals(image, ((CubeState) other).image);
         }
 
         @Override
         public int hashCode() {
-            return Arrays.deepHashCode(getNormalized());
+            return Arrays.deepHashCode(image);
         }
 
         protected Svg drawScramble(HashMap<String, Color> colorScheme) {

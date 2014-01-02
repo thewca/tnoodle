@@ -9,6 +9,7 @@ import net.gnehzr.tnoodle.svglite.Path;
 import net.gnehzr.tnoodle.svglite.Transform;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -235,8 +236,8 @@ public class SkewbPuzzle extends Puzzle {
             return g;
         }
 
-        public HashMap<String, PuzzleState> getSuccessors() {
-            HashMap<String, PuzzleState> successors = new HashMap<String, PuzzleState>();
+        public LinkedHashMap<String, PuzzleState> getSuccessorsByName() {
+            LinkedHashMap<String, PuzzleState> successors = new LinkedHashMap<String, PuzzleState>();
             String axes = "RULB";
             for(int axis = 0; axis < axes.length(); axis++) {
                 char face = axes.charAt(axis);

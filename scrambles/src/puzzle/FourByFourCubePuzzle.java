@@ -5,7 +5,7 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
@@ -31,7 +31,7 @@ public class FourByFourCubePuzzle extends CubePuzzle {
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         String scramble = threePhaseSearcher.get().randomState(r);
-        AlgorithmBuilder ab = new AlgorithmBuilder(this, MungingMode.MUNGE_REDUNDANT_MOVES);
+        AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES);
         try {
             ab.appendAlgorithm(scramble);
         } catch (InvalidMoveException e) {

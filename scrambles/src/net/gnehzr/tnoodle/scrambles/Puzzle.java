@@ -15,6 +15,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -22,7 +24,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
 import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
@@ -311,10 +313,10 @@ public abstract class Puzzle implements Exportable {
         PuzzleState solved = getSolvedState();
         fringeSolved.add(solved);
         seenSolved.put(solved, 0);
-        if(enableSpeedup){
-            fringeScrambled.add(ps);
+        if(enableSpeedup) {
+            fringeScrambled.add(ps.getNormalized());
         }
-        seenScrambled.put(ps, 0);
+        seenScrambled.put(ps.getNormalized(), 0);
 
         TimedLogRecordStart start = new TimedLogRecordStart(Level.FINER, "Searching for solution in " + n + " moves.");
         l.log(start);
@@ -354,7 +356,8 @@ public abstract class Puzzle implements Exportable {
                 azzert(false);
             }
 
-            for(PuzzleState next : node.getSuccessors().values()) {
+            for(PuzzleState next : node.getCanonicalSuccessorsByState().keySet()) {
+                next = next.getNormalized();
                 if(seenExtending.containsKey(next)) {
                     continue;
                 }
@@ -385,7 +388,7 @@ public abstract class Puzzle implements Exportable {
 
         /* Step 1: node -----> scrambled */
 
-
+        azzert(node.isNormalized());
         PuzzleState state = node;
         int distanceFromScrambled = seenScrambled.get(state);
 
@@ -395,11 +398,12 @@ public abstract class Puzzle implements Exportable {
 
         outer:
         while(distanceFromScrambled > 0) {
-            for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
-                if(seenScrambled.containsKey(next.getValue())) {
-                    int newDistanceFromScrambled = seenScrambled.get(next.getValue());
+            for(PuzzleState next : state.getCanonicalSuccessorsByState().keySet()) {
+                next = next.getNormalized();
+                if(seenScrambled.containsKey(next)) {
+                    int newDistanceFromScrambled = seenScrambled.get(next);
                     if(newDistanceFromScrambled < distanceFromScrambled) {
-                        state = next.getValue();
+                        state = next;
                         distanceFromScrambled = newDistanceFromScrambled;
                         linkedStates[distanceFromScrambled] = state;
                         continue outer;
@@ -411,21 +415,23 @@ public abstract class Puzzle implements Exportable {
 
         /* Step 2: node <----- scrambled */
 
-        AlgorithmBuilder solution = new AlgorithmBuilder(this, MungingMode.NO_MUNGING, ps);
+        AlgorithmBuilder solution = new AlgorithmBuilder(this, MergingMode.NO_MERGING, ps);
         state = ps;
         distanceFromScrambled = 0;
 
         outer:
-        while(!state.equals(node)) {
-            for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
-                if(next.getValue().equals(linkedStates[distanceFromScrambled+1])) {
-                    state = next.getValue();
+        while(!state.equalsNormalized(node)) {
+            for(Entry<? extends PuzzleState, String> next : state.getCanonicalSuccessorsByState().entrySet()) {
+                PuzzleState nextState = next.getKey();
+                String moveName = next.getValue();
+                if(nextState.equalsNormalized(linkedStates[distanceFromScrambled+1])) {
+                    state = nextState;
                     try {
-                        solution.appendMove(next.getKey());
+                        solution.appendMove(moveName);
                     } catch(InvalidMoveException e) {
                         azzert(false, e);
                     }
-                    distanceFromScrambled = seenScrambled.get(state);
+                    distanceFromScrambled = seenScrambled.get(state.getNormalized());
                     continue outer;
                 }
             }
@@ -434,17 +440,20 @@ public abstract class Puzzle implements Exportable {
 
         /* Step 3: solved <----- node */
         
-        int distanceFromSolved = seenSolved.get(state);
+        int distanceFromSolved = seenSolved.get(state.getNormalized());
         outer:
         while(distanceFromSolved > 0) {
-            for(Entry<String, ? extends PuzzleState> next : state.getSuccessors().entrySet()) {
-                if(seenSolved.containsKey(next.getValue())) {
-                    int newDistanceFromSolved = seenSolved.get(next.getValue());
+            for(Entry<? extends PuzzleState, String> next : state.getCanonicalSuccessorsByState().entrySet()) {
+                PuzzleState nextState = next.getKey();
+                PuzzleState nextStateNormalized = nextState.getNormalized();
+                String moveName = next.getValue();
+                if(seenSolved.containsKey(nextStateNormalized)) {
+                    int newDistanceFromSolved = seenSolved.get(nextStateNormalized);
                     if(newDistanceFromSolved < distanceFromSolved) {
-                        state = next.getValue();
+                        state = nextState;
                         distanceFromSolved = newDistanceFromSolved;
                         try {
-                            solution.appendMove(next.getKey());
+                            solution.appendMove(moveName);
                         } catch(InvalidMoveException e) {
                             azzert(false, e);
                         }
@@ -464,7 +473,7 @@ public abstract class Puzzle implements Exportable {
         /**
          *
          * @param algorithm A space separated String of moves to apply to state
-         * @return
+         * @return The resulting PuzzleState
          * @throws InvalidScrambleException
          */
         public PuzzleState applyAlgorithm(String algorithm) throws InvalidScrambleException {
@@ -480,36 +489,106 @@ public abstract class Puzzle implements Exportable {
         }
 
         /**
-         * @return A HashMap mapping move Strings to resulting PuzzleStates.
-         *         The move Strings may not contain spaces.
+         * Canonical successors are all the successor states that
+         * are "normalized" unique.
+         * @return A mapping of canonical PuzzleState's to the name of
+         *         the move that gets you to them.
          */
-        public abstract HashMap<String, ? extends PuzzleState> getSuccessors();
+        public final HashMap<PuzzleState, String> getCanonicalSuccessorsByState() {
+            LinkedHashMap<String, ? extends PuzzleState> successorsByName =
+                getSuccessorsByName();
+            HashMap<PuzzleState, String> uniqueSuccessors =
+                new HashMap<PuzzleState, String>();
+            HashSet<PuzzleState> statesSeenNormalized = new HashSet<PuzzleState>();
+            // We're not interested in any successor states are just a
+            // rotation away.
+            statesSeenNormalized.add(this.getNormalized());
+            for(Entry<String, ? extends PuzzleState> next : successorsByName.entrySet()) {
+                PuzzleState nextState = next.getValue();
+                PuzzleState nextStateNormalized = nextState.getNormalized();
+                String moveName = next.getKey();
+                // Only add nextState if it's "unique"
+                if(!statesSeenNormalized.contains(nextStateNormalized)) {
+                    uniqueSuccessors.put(nextState, moveName);
+                }
+            }
+
+            return uniqueSuccessors;
+        }
 
         /**
-         * By default, this method returns getSuccessors(). Some puzzles may wish to override
-         * this method to provide a reduced set of moves to be used for scrambling.
+         * There exist PuzzleState's that are 0 moves apart, but are
+         * not .equal(). This is because we consider the visibly different
+         * PuzzleState's to be not equals (consider the state achieved by
+         * applying L to a solved 3x3x3, and the state after applying Rw.
+         * These puzzles "look" different, but they are 0 moves apart.
+         * @return A PuzzleState that all rotations of state will all
+         *         return when normalized. This makes it possible to check
+         *         if 2 puzzle states are 0 moves apart, even if they
+         *         "look" different.
+         * TODO - This method could be implemented in this superclass by
+         *        defining a "cost" for moves (which we will have to do for
+         *        sq1 anyways), and walking the complete
+         *        0 cost state tree for this state. Then we'd return one
+         *        element from that state tree in a deterministic way.
+         *        We could do something simple like returning the state
+         *        that has the smallest hash, but that wouldn't work if
+         *        we have hash collisions. I think the best thing to do
+         *        would be to require all PuzzleStates to implement
+         *        a marshall() function that returns a unique string. Then
+         *        we can just do an alphabetical sort of these and return the
+         *        min or max.
+         */
+        public PuzzleState getNormalized() {
+            return this;
+        }
+
+        public boolean isNormalized() {
+            return this.equals(getNormalized());
+        }
+
+        /**
+         * @return A LinkedHashMap mapping move Strings to resulting PuzzleStates.
+         *         The move Strings may not contain spaces.
+         *         Multiple keys (moves) in the returned LinkedHashMap may
+         *         map to the same state, or states that are .equal().
+         *         Preferred notations should appear earlier in the
+         *         LinkedHashMap.
+         */
+        public abstract LinkedHashMap<String, ? extends PuzzleState> getSuccessorsByName();
+
+        /**
+         * By default, this method returns getSuccessorsByName(). Some
+         * puzzles may wish to override this method to provide a reduced set
+         * of moves to be used for scrambling.
          * <br><br>
-         * One example of where this is useful is a puzzle like the square one.
-         * Someone extending Puzzle to implement SquareOnePuzzle is left with the question of
-         * whether to allow turns that leave the puzzle incapable of doing a /.
+         * One example of where this is useful is a puzzle like the square
+         * one. Someone extending Puzzle to implement SquareOnePuzzle is left
+         * with the question of whether to allow turns that leave the puzzle
+         * incapable of doing a /.
          * <br><br>
-         * If getSuccessors() returns states that cannot do a /, then generateRandomMoves() will
-         * hang because any move that can be applied to one of those states is redundant.
+         * If getSuccessorsByName() returns states that cannot do a /, then
+         * generateRandomMoves() will hang because any move that can be
+         * applied to one of those states is redundant.
          * <br><br>
-         * Alternatively, if getSuccessors() only returns states that can do a /, isRedundant()
-         * breaks. Here's why:<br>
-         * Imagine a solved square one. Lets say we pick the turn (1,0) to apply to it, and now we're
-         * considering applying (2,0) to it. Obviously this is the exact same state you would have achieved by
-         * just applying (3,0) to the solved puzzle, but isRedundant only checks for this against
-         * the previous moves that commute with (2,0). movesCommute("(1,0)", "(2,0)") will only return
-         * true if (2,0) can be applied to a solved square one, even though it results in a state that cannot
+         * Alternatively, if getSuccessorsByName() only returns states that
+         * can do a /, AlgorithmBuilder's isRedundant() breaks.
+         * Here's why:<br>
+         * Imagine a solved square one. Lets say we pick the turn (1,0) to
+         * apply to it, and now we're considering applying (2,0) to it.
+         * Obviously this is the exact same state you would have achieved by
+         * just applying (3,0) to the solved puzzle, but isRedundant()
+         * only checks for this against the previous moves that commute with
+         * (2,0). movesCommute("(1,0)", "(2,0)") will only return
+         * true if (2,0) can be applied to a solved square one, even though
+         * it results in a state that cannot
          * be slashed.
 
          * @return A HashMap mapping move Strings to resulting PuzzleStates.
          *         The move Strings may not contain spaces.
          */
         public HashMap<String, ? extends PuzzleState> getScrambleSuccessors() {
-            return getSuccessors();
+            return getSuccessorsByName();
         }
 
         /**
@@ -521,6 +600,10 @@ public abstract class Puzzle implements Exportable {
          */
         public abstract boolean equals(Object other);
         public abstract int hashCode();
+
+        public boolean equalsNormalized(PuzzleState other) {
+            return getNormalized().equals(other.getNormalized());
+        }
 
         /**
          * Draws the state of the puzzle.
@@ -536,7 +619,7 @@ public abstract class Puzzle implements Exportable {
         }
 
         public boolean isSolved() {
-            return getPuzzle().getSolvedState().equals(this);
+            return equalsNormalized(getPuzzle().getSolvedState());
         }
 
         /**
@@ -547,7 +630,7 @@ public abstract class Puzzle implements Exportable {
          * @throws InvalidMoveRuntimeException if the move is unrecognized.
          */
         public PuzzleState apply(String move) throws InvalidMoveException {
-            HashMap<String, ? extends PuzzleState> successors = getSuccessors();
+            HashMap<String, ? extends PuzzleState> successors = getSuccessorsByName();
             if(!successors.containsKey(move)) {
                 throw new InvalidMoveException("Unrecognized turn " + move);
             }
@@ -606,19 +689,26 @@ public abstract class Puzzle implements Exportable {
      */
     @NoExport
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
-        AlgorithmBuilder ab = new AlgorithmBuilder(this, MungingMode.IGNORE_REDUNDANT_MOVES);
+        AlgorithmBuilder ab = new AlgorithmBuilder(
+                this, MergingMode.NO_MERGING);
         for(int i = 0; i < getRandomMoveCount(); i++) {
-            HashMap<String, ? extends PuzzleState> successors = ab.getState().getScrambleSuccessors();
+            HashMap<String, ? extends PuzzleState> successors =
+                ab.getState().getScrambleSuccessors();
             int length = ab.length();
-            while(ab.length() == length) {
-                String move = GwtSafeUtils.choose(r, successors.keySet());
-                try {
-                    ab.appendMove(move);
-                } catch(InvalidMoveException e) {
-                    azzert(false, e);
-                }
-                // If this move is redundant, there is no reason to select that move again in vain.
-                successors.remove(move);
+            String move;
+            final boolean PRESERVE_STATE = false;
+            try {
+                do {
+                    move = GwtSafeUtils.choose(r, successors.keySet());
+                    // If this move happens to be redundant, there is no
+                    // reason to select this move again in vain.
+                    successors.remove(move);
+                } while(ab.isRedundant(move, PRESERVE_STATE));
+                ab.appendMove(move);
+            } catch(InvalidMoveException e) {
+                l.log(Level.SEVERE, "", e);
+                azzert(false, e);
+                return null;
             }
         }
         return ab.getStateAndGenerator();

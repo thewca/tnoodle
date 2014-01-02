@@ -11,6 +11,7 @@ import net.gnehzr.tnoodle.svglite.Point2D;
 import net.gnehzr.tnoodle.svglite.Text;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
@@ -434,7 +435,8 @@ public class MegaminxPuzzle extends Puzzle {
     }
 
     class MegaminxState extends PuzzleState {
-        private final int[][] image, normalizedImage;
+        private final int[][] image;
+        private MegaminxState normalizedState;
         public MegaminxState() {
             image = new int[12][11];
             for(int i = 0; i < image.length; i++) {
@@ -442,18 +444,28 @@ public class MegaminxPuzzle extends Puzzle {
                     image[i][j] = i;
                 }
             }
-            azzert(isNormalized(image));
-            normalizedImage = image;
+            normalizedState = this;
         }
 
         public MegaminxState(int[][] image) {
             this.image = image;
-            normalizedImage = normalize(image);
+        }
+
+        public PuzzleState getNormalized() {
+            if(normalizedState == null) {
+                int[][] normalizedImage = normalize(image);
+                normalizedState = new MegaminxState(normalize(image));
+            }
+            return normalizedState;
+        }
+
+        public boolean isNormalized() {
+            return MegaminxPuzzle.this.isNormalized(image);
         }
 
         @Override
-        public HashMap<String, MegaminxState> getSuccessors() {
-            HashMap<String, MegaminxState> successors = new HashMap<String, MegaminxState>();
+        public LinkedHashMap<String, MegaminxState> getSuccessorsByName() {
+            LinkedHashMap<String, MegaminxState> successors = new LinkedHashMap<String, MegaminxState>();
 
             String[] prettyDir = new String[] { null, "", "2", "2'", "'" };
             for(Face face : Face.values()) {
@@ -487,7 +499,7 @@ public class MegaminxPuzzle extends Puzzle {
 
         @Override
         public HashMap<String, MegaminxState> getScrambleSuccessors() {
-            HashMap<String, MegaminxState> successors = getSuccessors();
+            HashMap<String, MegaminxState> successors = getSuccessorsByName();
             HashMap<String, MegaminxState> scrambleSuccessors = new HashMap<String, MegaminxState>();
             for(String turn : new String[] { "R++", "R--", "D++", "D--", "U", "U2", "U2'", "U'" }) {
                 scrambleSuccessors.put(turn, successors.get(turn));
@@ -498,12 +510,12 @@ public class MegaminxPuzzle extends Puzzle {
         @Override
         public boolean equals(Object other) {
             MegaminxState o = ((MegaminxState) other);
-            return Arrays.deepEquals(normalizedImage, o.normalizedImage);
+            return Arrays.deepEquals(image, o.image);
         }
 
         @Override
         public int hashCode() {
-            return Arrays.deepHashCode(normalizedImage);
+            return Arrays.deepHashCode(image);
         }
 
         @Override

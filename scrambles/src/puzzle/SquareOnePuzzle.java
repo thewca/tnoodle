@@ -11,6 +11,7 @@ import net.gnehzr.tnoodle.svglite.Path;
 import net.gnehzr.tnoodle.svglite.Rectangle;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -294,7 +295,7 @@ public class SquareOnePuzzle extends Puzzle {
 
         @Override
         public HashMap<String, SquareOneState> getScrambleSuccessors() {
-            HashMap<String, SquareOneState> successors = getSuccessors();
+            HashMap<String, SquareOneState> successors = getSuccessorsByName();
             Iterator<String> iter = successors.keySet().iterator();
             while(iter.hasNext()) {
                 String key = iter.next();
@@ -307,8 +308,8 @@ public class SquareOnePuzzle extends Puzzle {
         }
 
         @Override
-        public HashMap<String, SquareOneState> getSuccessors() {
-            HashMap<String, SquareOneState> successors = new HashMap<String, SquareOneState>();
+        public LinkedHashMap<String, SquareOneState> getSuccessorsByName() {
+            LinkedHashMap<String, SquareOneState> successors = new LinkedHashMap<String, SquareOneState>();
             for(int top = -5; top <= 6; top++) {
                 for(int bottom = -5; bottom <= 6; bottom++) {
                     if(top == 0 && bottom == 0) {

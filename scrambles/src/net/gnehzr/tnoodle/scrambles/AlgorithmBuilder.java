@@ -4,122 +4,175 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
 import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 public class AlgorithmBuilder {
+    private static final Logger l = Logger.getLogger(AlgorithmBuilder.class.getName());
+
     private ArrayList<String> moves;
     /**
      * states.get(i) = state achieved by applying moves[0]...moves[i-1]
      */
     private ArrayList<PuzzleState> states;
     /**
-     * If we absorb something like a cube rotation (consider Uw Dw' on a 4x4),
-     * then we end up in a state that is equals() to the state that had the
-     * cube rotation applied, but the successor states are labelled differently.
-     * Turns passed into appendMove() are treated as if they apply to unsanitizedState,
-     * and then we have to search for a successor to getState() that leads to the same
-     * place.
+     * If we are in CANONICALIZE_MOVES MergingMode, then something like
+     * Uw Dw' on a 4x4x4 will become Uw2. This means the state we end
+     * up in is actually different than the state we would have ended up in
+     * if we had just naively appended moves (NO_MERGING).
+     * unNormalizedState keeps track of the state we would have been in
+     * if we had just naively appended turns.
      */
-    private PuzzleState unsanitizedState;
-    public AlgorithmBuilder(Puzzle puzzle, MungingMode mungingMode) {
-        this(puzzle, mungingMode, puzzle.getSolvedState());
+    private PuzzleState unNormalizedState;
+    public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode) {
+        this(puzzle, mergingMode, puzzle.getSolvedState());
     }
     
-    public AlgorithmBuilder(Puzzle puzzle, MungingMode mungingMode, PuzzleState state) {
-        moves = new ArrayList<String>();
-        states = new ArrayList<PuzzleState>();
-        states.add(state);
-        unsanitizedState = state;
-        setMungingMode(mungingMode);
+    public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode, PuzzleState unNormalizedState) {
+        this.unNormalizedState = unNormalizedState;
+        this.moves = new ArrayList<String>();
+        this.states = new ArrayList<PuzzleState>();
+        states.add(unNormalizedState);
+        setMungingMode(mergingMode);
     }
 
-    private MungingMode mungingMode = MungingMode.NO_MUNGING;
-    public void setMungingMode(MungingMode mungingMode) {
-        this.mungingMode = mungingMode;
+    private MergingMode mergingMode = MergingMode.NO_MERGING;
+    public void setMungingMode(MergingMode mergingMode) {
+        this.mergingMode = mergingMode;
     }
 
-    public static enum MungingMode {
-        NO_MUNGING, IGNORE_REDUNDANT_MOVES, MUNGE_REDUNDANT_MOVES;
+    public static enum MergingMode {
+        // There are several degrees of manipulation we can choose to do
+        // while building an algorithm. Here they are, ranging from least to
+        // most aggressive. Examples are on a 3x3x3.
+
+        // Straightforward, blindly append moves.
+        // For example:
+        //  - "R R" stays unmodified.
+        NO_MERGING,
+
+        // Merge together redundant moves, but preserve the exact state
+        // of the puzzle (unlike CANONICALIZE_MOVES).
+        // In other words, the resulting state will be the
+        // same as if we had used NO_MERGING.
+        // For example:
+        //  - "R R" becomes "R2"
+        //  - "L Rw" stays unmodified.
+        //  - "F x U" will become something like "F2 x".
+        //<<<MERGE_REDUNDANT_MOVES_PRESERVE_STATE,
+
+        // Most aggressive merging.
+        // See PuzzleState.getCanonicalSuccessorsByState() for the
+        // definition of "canonical" moves.
+        // Canonical moves will not necessarily let us preserve the
+        // exact state we would have achieved with NO_MERGING. This is
+        // because canonical moves may not let us rotate the puzzle.
+        // However, the resulting state when normalized will be the
+        // same as the normalization of the state we would have
+        // achieved if we had used NO_MERGING.
+        // For example:
+        //  - "R R" becomes "R2"
+        //  - "L Rw" becomes "L2"
+        //  - "F x U" becomes "F2"
+        CANONICALIZE_MOVES;
     }
 
-    public void appendMove(String newMove) throws InvalidMoveException {
-        PuzzleState sanitizedState = getState();
-        azzert(unsanitizedState.equals(sanitizedState));
-        PuzzleState newUnsanitizedState = unsanitizedState.apply(newMove);
-        if(mungingMode != MungingMode.NO_MUNGING) {
-            if(!sanitizedState.apply(newMove).equals(newUnsanitizedState)) {
-                // We must have ignored something like a cube rotation when
-                // we were updating sanitized state. One of our children should
-                // get us to sanitizedState, though.
-                HashMap<String, ? extends PuzzleState> successors = sanitizedState.getSuccessors();
-                newMove = null;
-                for(String sanitizedNewMove : successors.keySet()) {
-                    if(successors.get(sanitizedNewMove).equals(newUnsanitizedState)) {
-                        newMove = sanitizedNewMove;
-                        break;
-                    }
-                }
-                // One of sanitizedState's children *must* be newUnsanitizedState, if not, something
-                // has gone very wrong.
-                azzert(newMove != null);
+    public boolean isRedundant(String move, boolean preserveState) throws InvalidMoveException {
+        //<<<MergingMode mergingMode = preserveState ? MergingMode.MERGE_REDUNDANT_MOVES_PRESERVE_STATE : MergingMode.CANONICALIZE_MOVES;
+        MergingMode mergingMode = MergingMode.CANONICALIZE_MOVES;//<<<
+        IndexAndMove indexAndMove = findBestIndexForMove(move, mergingMode);
+        return indexAndMove.index < moves.size();
+    }
+
+    private static class IndexAndMove {
+        int index;
+        String move;
+        public IndexAndMove(int index, String move) {
+            this.index = index;
+            this.move = move;
+        }
+    }
+
+    private IndexAndMove findBestIndexForMove(String move, MergingMode mergingMode) throws InvalidMoveException {
+        PuzzleState newUnNormalizedState = unNormalizedState.apply(move);
+        PuzzleState newNormalizedState = newUnNormalizedState.getNormalized();
+
+        HashMap<PuzzleState, String> successors = getState().getCanonicalSuccessorsByState();
+        move = null;
+        // Search for the right move to do to our current state in
+        // order to match up with newNormalizedState.
+        for(PuzzleState ps : successors.keySet()) {
+            if(ps.equalsNormalized(newNormalizedState)) {
+                move = successors.get(ps);
+                break;
             }
+        }
+        // One of getStates()'s successors must be newNormalizedState.
+        // If not, something has gone very wrong.
+        azzert(move != null);
 
-            boolean isRedundant = false;
+        if(mergingMode == MergingMode.CANONICALIZE_MOVES) {
             for(int lastMoveIndex = moves.size() - 1; lastMoveIndex >= 0; lastMoveIndex--) {
-                PuzzleState stateBeforeLastMove = states.get(lastMoveIndex);
-                PuzzleState stateAfterLastMove = states.get(lastMoveIndex+1);
                 String lastMove = moves.get(lastMoveIndex);
-                if(!stateBeforeLastMove.movesCommute(lastMove, newMove)) {
+                PuzzleState stateBeforeLastMove = states.get(lastMoveIndex);
+                if(!stateBeforeLastMove.movesCommute(lastMove, move)) {
                     break;
                 }
-                PuzzleState stateAfterNewMove = stateAfterLastMove.apply(newMove);
+                PuzzleState stateAfterLastMove = states.get(lastMoveIndex+1);
+                PuzzleState stateAfterLastMoveAndNewMove = stateAfterLastMove.apply(move);
 
-                // Does newMove cancel with lastMove? If so, it’s redundant.
-                if(stateBeforeLastMove.equals(stateAfterNewMove)) {
-                    if(mungingMode == MungingMode.IGNORE_REDUNDANT_MOVES) {
-                        return;
+                if(stateBeforeLastMove.equals(stateAfterLastMoveAndNewMove)) {
+                    // move cancels with lastMove
+                    return new IndexAndMove(lastMoveIndex, null);
+                } else {
+                    successors = stateBeforeLastMove.getCanonicalSuccessorsByState();
+                    String alternateLastMove = successors.get(stateAfterLastMoveAndNewMove);
+                    if(alternateLastMove != null) {
+                        // move merges with lastMove
+                        return new IndexAndMove(lastMoveIndex, alternateLastMove);
                     }
-                    isRedundant = true;
-                    moves.remove(lastMoveIndex);
-                    states.remove(lastMoveIndex + 1);
-                }
-                // Does newMove merge with lastMove? If so, it’s redundant.
-                HashMap<String, ? extends PuzzleState> successors = stateBeforeLastMove.getSuccessors();
-                for(String alternateLastMove : successors.keySet()) {
-                    if(successors.get(alternateLastMove).equals(stateAfterNewMove)) {
-                        if(mungingMode == MungingMode.IGNORE_REDUNDANT_MOVES) {
-                            return;
-                        }
-                        isRedundant = true;
-                        moves.set(lastMoveIndex, alternateLastMove);
-                        break;
-                    }
-                }
-                if(isRedundant) {
-                    azzert(mungingMode == MungingMode.MUNGE_REDUNDANT_MOVES);
-                    // We modified moves[ lastMoveIndex ], so everything in
-                    // states[ lastMoveIndex+1, ... ] is now invalid
-                    for(int i = lastMoveIndex + 1; i < states.size(); i++) {
-                        states.set(i, states.get(i - 1).apply(moves.get(i - 1)));
-                    }
-                    unsanitizedState = newUnsanitizedState;
-                    azzert(states.size() == moves.size() + 1);
-                    azzert(unsanitizedState.equals(getState()));
-                    return;
                 }
             }
         }
+        return new IndexAndMove(moves.size(), move);
+    }
 
-        // If we got get here, then we know the move is not redundant, and we can
-        // just append it.
-        moves.add(newMove);
-        states.add(sanitizedState.apply(newMove));
+    public void appendMove(String newMove) throws InvalidMoveException {
+        l.fine("appendMove(" + newMove + ")");
 
-        unsanitizedState = newUnsanitizedState;
+        IndexAndMove indexAndMove = findBestIndexForMove(newMove, mergingMode);
+        if(indexAndMove.index < moves.size()) {
+            // This move is redundant.
+            azzert(mergingMode != MergingMode.NO_MERGING);
+            if(indexAndMove.move == null) {
+                // newMove cancelled perfectly with the move at
+                // indexAndMove.index.
+                moves.remove(indexAndMove.index);
+                states.remove(indexAndMove.index + 1);
+            } else {
+                // newMove merged with the move at indexAndMove.index.
+                moves.set(indexAndMove.index, indexAndMove.move);
+            }
+        } else {
+            // This move is not redundant.
+            moves.add(indexAndMove.move);
+            // The code to update the states array is right below us,
+            // but it requires that the states arary be of the correct
+            // size.
+            states.add(null);
+        }
+
+        // We modified moves[ indexAndMove.index ], so everything in
+        // states[ indexAndMove.index+1, ... ] is now invalid
+        for(int i = indexAndMove.index + 1; i < states.size(); i++) {
+            states.set(i, states.get(i - 1).apply(moves.get(i - 1)));
+        }
+
+        unNormalizedState = unNormalizedState.apply(newMove);
         azzert(states.size() == moves.size() + 1);
-        azzert(unsanitizedState.equals(getState()));
+        azzert(unNormalizedState.equalsNormalized(getState()));
     }
 
     public void appendAlgorithm(String algorithm) throws InvalidMoveException {

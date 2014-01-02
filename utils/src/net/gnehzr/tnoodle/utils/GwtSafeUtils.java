@@ -45,14 +45,22 @@ public final class GwtSafeUtils {
         }
     }
 
-    public static void azzertEquals(Object a, Object b) {
+    private static void azzertEquals(Object a, Object b, boolean assertEquals) {
         boolean equal;
         if(a == null) {
             equal = a == b;
         } else {
             equal = a.equals(b);
         }
-        azzert(equal, a + " is not equal to " + b);
+        String msg = assertEquals ? " should be equal to " :
+                                    " should not be equal to ";
+        azzert(equal == assertEquals, a + msg + b);
+    }
+    public static void azzertNotEquals(Object a, Object b) {
+        azzertEquals(a, b, false);
+    }
+    public static void azzertEquals(Object a, Object b) {
+        azzertEquals(a, b, true);
     }
     public static void azzertSame(Object a, Object b) {
         azzert(a == b, a + " is not == to " + b);

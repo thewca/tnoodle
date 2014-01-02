@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
@@ -65,7 +65,7 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
         String randomState = Tools.randomCube(r);
         String scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
 
-        AlgorithmBuilder ab = new AlgorithmBuilder(this, MungingMode.MUNGE_REDUNDANT_MOVES);
+        AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES);
         try {
             ab.appendAlgorithm(scramble);
         } catch (InvalidMoveException e) {

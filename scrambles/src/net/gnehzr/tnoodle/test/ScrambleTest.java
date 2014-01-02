@@ -2,6 +2,7 @@ package net.gnehzr.tnoodle.test;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertNotEquals;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertSame;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.choose;
 
@@ -14,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
@@ -26,6 +27,7 @@ import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
+import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.Utils;
 import puzzle.ClockPuzzle;
 import puzzle.ClockPuzzle.ClockState;
@@ -42,7 +44,7 @@ import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.Exportable;
 
 public class ScrambleTest {
-    private static final Logger l = Logger.getLogger(Puzzle.class.getName());
+    private static final Logger l = Logger.getLogger(ScrambleTest.class.getName());
     
     private static final Random r = Utils.getSeededRandom();
     
@@ -100,6 +102,7 @@ public class ScrambleTest {
     }
 
     public static void main(String[] args) throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, InvalidMoveException, IOException {
+        TNoodleLogging.initializeLogging();
 
         System.out.println("Testing names.");
         testNames();
@@ -140,7 +143,7 @@ public class ScrambleTest {
                 System.out.print("Scramble ["+(count+1)+"/"+SCRAMBLE_COUNT+"]: ");
                 PuzzleState state = scrambler.getSolvedState();
                 for(int i = 0; i < SCRAMBLE_LENGTH; i++){
-                    HashMap<String, ? extends PuzzleState> successors = state.getSuccessors();
+                    HashMap<String, ? extends PuzzleState> successors = state.getSuccessorsByName();
                     String move = choose(r, successors.keySet());
                     System.out.print(" "+move);
                     state = successors.get(move);
@@ -270,22 +273,34 @@ public class ScrambleTest {
         CubeState solved = fours.getSolvedState();
 
         CubeState state = (CubeState) solved.applyAlgorithm("Rw Lw'");
-        azzertEquals(state, solved);
-        azzertEquals(state.hashCode(), solved.hashCode());
+        CubeState normalizedState = state.getNormalized();
+        CubeState normalizedSolvedState = solved.getNormalized();
+        azzertEquals(normalizedState, normalizedSolvedState);
+        azzertEquals(normalizedState.hashCode(), normalizedSolvedState.hashCode());
         
         state = (CubeState) solved.applyAlgorithm("Uw Dw'");
-        azzertEquals(state, solved);
+        normalizedState = state.getNormalized();
+        azzertEquals(normalizedState, normalizedSolvedState);
         
         CubePuzzle threes = new CubePuzzle(3);
 
-        AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MungingMode.MUNGE_REDUNDANT_MOVES);
-        ab3.appendAlgorithm("D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
-        azzertEquals(ab3.toString(), "D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'");
+        AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MergingMode.CANONICALIZE_MOVES);
+        String alg = "D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'";
+        ab3.appendAlgorithm(alg);
+        azzertEquals(ab3.toString(), alg);
         
         for(int depth = 0; depth < 100; depth++) {
-            state = choose(r, state.getSuccessors().values());
-            azzertEquals(state, state.applyAlgorithm("Uw Dw'"));
+            state = choose(r, state.getSuccessorsByName().values());
+            normalizedState = state.getNormalized();
+            PuzzleState rotatedState = state.applyAlgorithm("Uw Dw'").getNormalized();
+            azzertEquals(normalizedState, rotatedState);
         }
+
+        // TODO - do some actual AlgorithmBuilder testing!
+        // sq1: (0,0) (1,1) => (1,1)
+        //      (1,0) (0,1) => (1,1)
+        // 444: Rw Lw => Rw2 ?
+        // <<<
     }
 
     private static void testTwosConverter() throws InvalidMoveException {
@@ -304,30 +319,24 @@ public class ScrambleTest {
         azzertEquals(twoByTwoState.permutation, permute);
 
         TwoByTwoSolver twoByTwoSolver = new TwoByTwoSolver();
-        azzert(twoByTwoSolver.solveIn(twoByTwoState, 1).equals("R'"));
+        azzertEquals(twoByTwoSolver.solveIn(twoByTwoState, 1), "R'");
 
         int MOVE_R_PRIME = 5;
         orient = TwoByTwoSolver.moveOrient[orient][MOVE_R_PRIME];
         permute = TwoByTwoSolver.movePerm[permute][MOVE_R_PRIME];
-        azzert(orient == 0);
-        azzert(permute == 0);
+        azzertEquals(orient, 0);
+        azzertEquals(permute, 0);
     }
 
     private static void testTwosSolver() throws InvalidScrambleException {
         CubePuzzle twos = new CubePuzzle(2);
         CubeState state = (CubeState) twos.getSolvedState();
         String solution = state.solveIn(0);
-        azzert(solution.equals(""));
+        azzertEquals(solution, "");
 
-        String scrambleString = "R2 B2 F2";
-        try {
-            state = (CubeState) state.applyAlgorithm(scrambleString);
-        } catch (InvalidScrambleException e) {
-            azzert(false, e);
-        }
-
+        state = (CubeState) state.applyAlgorithm("R2 B2 F2");
         solution = state.solveIn(1);
-        azzert(solution != null);
+        azzertNotEquals(solution, null);
         state = (CubeState) state.applyAlgorithm(solution);
         azzert(state.isSolved());
     }
@@ -380,7 +389,7 @@ public class ScrambleTest {
         String spinU = "D++ U2'";
         PuzzleState state = solved.applyAlgorithm(spinL).applyAlgorithm(spinU).applyAlgorithm(spinU).applyAlgorithm(spinL).applyAlgorithm(spinL).applyAlgorithm(spinL);
         state = state.applyAlgorithm(spinU);
-        azzertEquals(state, solved);
+        azzert(state.equalsNormalized(solved));
     }
 
     private static void benchmarking() throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, IOException {
@@ -409,11 +418,14 @@ public class ScrambleTest {
             LazyInstantiator<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
             final Puzzle scrambler = lazyScrambler.cachedInstance();
             
-            start = new TimedLogRecordStart(Level.INFO, "Are " + THREE_BY_THREE_SCRAMBLE_COUNT + " " + puzzle + " one move away from solved?");
+            start = new TimedLogRecordStart(Level.INFO, "Are " + THREE_BY_THREE_SCRAMBLE_COUNT + " " + puzzle + " more than one move away from solved?");
             l.log(start);
+            PuzzleState solved = scrambler.getSolvedState();
             for(int count = 0; count < SCRAMBLE_COUNT; count++){
-                PuzzleState state = scrambler.getSolvedState().applyAlgorithm(scrambler.generateWcaScramble(r));
-                state.solveIn(1);
+                String scramble = scrambler.generateWcaScramble(r);
+                PuzzleState state = solved.applyAlgorithm(scramble);
+                String solution = state.solveIn(1);
+                azzertEquals(solution, null);
             }
             l.log(start.finishedNow());
         }

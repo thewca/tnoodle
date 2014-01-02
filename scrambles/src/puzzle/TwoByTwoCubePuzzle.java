@@ -5,7 +5,7 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MungingMode;
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
@@ -28,7 +28,7 @@ public class TwoByTwoCubePuzzle extends CubePuzzle {
         TwoByTwoState state = twoSolver.randomState(r);
         String scramble = twoSolver.generateExactly(state, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
 
-        AlgorithmBuilder ab = new AlgorithmBuilder(this, MungingMode.MUNGE_REDUNDANT_MOVES);
+        AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES);
         try {
             ab.appendAlgorithm(scramble);
         } catch (InvalidMoveException e) {

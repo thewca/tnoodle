@@ -11,6 +11,7 @@ import net.gnehzr.tnoodle.svglite.PathIterator;
 import net.gnehzr.tnoodle.svglite.Point2D;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -445,8 +446,8 @@ public class PyraminxPuzzle extends Puzzle {
         }
 
         @Override
-        public HashMap<String, PuzzleState> getSuccessors() {
-            HashMap<String, PuzzleState> successors = new HashMap<String, PuzzleState>();
+        public LinkedHashMap<String, PuzzleState> getSuccessorsByName() {
+            LinkedHashMap<String, PuzzleState> successors = new LinkedHashMap<String, PuzzleState>();
 
             String axes = "ulrb";
             for(int axis = 0; axis < axes.length(); axis++) {

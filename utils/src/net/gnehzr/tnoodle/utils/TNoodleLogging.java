@@ -46,6 +46,17 @@ public class TNoodleLogging {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        String fileLogLevel = System.getenv("TNOODLE_FILE_LOG_LEVEL");
+        if(fileLogLevel != null) {
+            Level fl = Level.parse(fileLogLevel);
+            setFileLogLevel(fl);
+        }
+        String consoleLogLevel = System.getenv("TNOODLE_CONSOLE_LOG_LEVEL");
+        if(consoleLogLevel != null) {
+            Level cl = Level.parse(consoleLogLevel);
+            setConsoleLogLevel(cl);
+        }
     }
 
     public static File getLogFile() {

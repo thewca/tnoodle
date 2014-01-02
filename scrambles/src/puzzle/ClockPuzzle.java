@@ -10,6 +10,7 @@ import net.gnehzr.tnoodle.svglite.Svg;
 import net.gnehzr.tnoodle.svglite.Transform;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -143,8 +144,8 @@ public class ClockPuzzle extends Puzzle {
         }
 
         @Override
-        public HashMap<String, PuzzleState> getSuccessors() {
-            HashMap<String, PuzzleState> successors = new HashMap<String, PuzzleState>();
+        public LinkedHashMap<String, PuzzleState> getSuccessorsByName() {
+            LinkedHashMap<String, PuzzleState> successors = new LinkedHashMap<String, PuzzleState>();
 
             for(int turn = 0; turn < turns.length; turn++) {
                 for(int rot = 0; rot < 12; rot++) {
