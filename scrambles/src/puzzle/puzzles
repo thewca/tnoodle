@@ -16,6 +16,11 @@
 #7x7x7
 777 puzzle.CubePuzzle(7)
 
+#3x3x3 no inspection
+333ni puzzle.NoInspectionThreeByThreeCubePuzzle()
+#5x5x5 no inspection
+555ni puzzle.NoInspectionFiveByFiveCubePuzzle()
+
 #Pyraminx
 pyram puzzle.PyraminxPuzzle()
 

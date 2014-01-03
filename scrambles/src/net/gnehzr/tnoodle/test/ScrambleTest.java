@@ -284,6 +284,11 @@ public class ScrambleTest {
         
         CubePuzzle threes = new CubePuzzle(3);
 
+        solved = threes.getSolvedState();
+        CubeState bDone = (CubeState) solved.apply("B");
+        CubeState fwDone = (CubeState) solved.apply("Fw");
+        azzert(bDone.equalsNormalized(fwDone));
+
         AlgorithmBuilder ab3 = new AlgorithmBuilder(threes, MergingMode.CANONICALIZE_MOVES);
         String alg = "D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'";
         ab3.appendAlgorithm(alg);

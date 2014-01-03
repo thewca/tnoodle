@@ -64,7 +64,7 @@ public class AlgorithmBuilder {
         //<<<MERGE_REDUNDANT_MOVES_PRESERVE_STATE,
 
         // Most aggressive merging.
-        // See PuzzleState.getCanonicalSuccessorsByState() for the
+        // See PuzzleState.getCanonicalMovesByState() for the
         // definition of "canonical" moves.
         // Canonical moves will not necessarily let us preserve the
         // exact state we would have achieved with NO_MERGING. This is
@@ -83,7 +83,7 @@ public class AlgorithmBuilder {
         //<<<MergingMode mergingMode = preserveState ? MergingMode.MERGE_REDUNDANT_MOVES_PRESERVE_STATE : MergingMode.CANONICALIZE_MOVES;
         MergingMode mergingMode = MergingMode.CANONICALIZE_MOVES;//<<<
         IndexAndMove indexAndMove = findBestIndexForMove(move, mergingMode);
-        return indexAndMove.index < moves.size();
+        return indexAndMove.index < moves.size() || indexAndMove.move == null;
     }
 
     private static class IndexAndMove {
@@ -97,9 +97,15 @@ public class AlgorithmBuilder {
 
     private IndexAndMove findBestIndexForMove(String move, MergingMode mergingMode) throws InvalidMoveException {
         PuzzleState newUnNormalizedState = unNormalizedState.apply(move);
+        if(newUnNormalizedState.equalsNormalized(unNormalizedState)) {
+            // move must just be a rotation.
+            if(mergingMode == MergingMode.CANONICALIZE_MOVES) {
+                return new IndexAndMove(0, null);
+            }
+        }
         PuzzleState newNormalizedState = newUnNormalizedState.getNormalized();
 
-        HashMap<PuzzleState, String> successors = getState().getCanonicalSuccessorsByState();
+        HashMap<PuzzleState, String> successors = getState().getCanonicalMovesByState();
         move = null;
         // Search for the right move to do to our current state in
         // order to match up with newNormalizedState.
@@ -127,7 +133,7 @@ public class AlgorithmBuilder {
                     // move cancels with lastMove
                     return new IndexAndMove(lastMoveIndex, null);
                 } else {
-                    successors = stateBeforeLastMove.getCanonicalSuccessorsByState();
+                    successors = stateBeforeLastMove.getCanonicalMovesByState();
                     String alternateLastMove = successors.get(stateAfterLastMoveAndNewMove);
                     if(alternateLastMove != null) {
                         // move merges with lastMove

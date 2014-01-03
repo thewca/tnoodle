@@ -356,7 +356,7 @@ public abstract class Puzzle implements Exportable {
                 azzert(false);
             }
 
-            for(PuzzleState next : node.getCanonicalSuccessorsByState().keySet()) {
+            for(PuzzleState next : node.getCanonicalMovesByState().keySet()) {
                 next = next.getNormalized();
                 if(seenExtending.containsKey(next)) {
                     continue;
@@ -398,7 +398,7 @@ public abstract class Puzzle implements Exportable {
 
         outer:
         while(distanceFromScrambled > 0) {
-            for(PuzzleState next : state.getCanonicalSuccessorsByState().keySet()) {
+            for(PuzzleState next : state.getCanonicalMovesByState().keySet()) {
                 next = next.getNormalized();
                 if(seenScrambled.containsKey(next)) {
                     int newDistanceFromScrambled = seenScrambled.get(next);
@@ -421,7 +421,7 @@ public abstract class Puzzle implements Exportable {
 
         outer:
         while(!state.equalsNormalized(node)) {
-            for(Entry<? extends PuzzleState, String> next : state.getCanonicalSuccessorsByState().entrySet()) {
+            for(Entry<? extends PuzzleState, String> next : state.getCanonicalMovesByState().entrySet()) {
                 PuzzleState nextState = next.getKey();
                 String moveName = next.getValue();
                 if(nextState.equalsNormalized(linkedStates[distanceFromScrambled+1])) {
@@ -443,7 +443,7 @@ public abstract class Puzzle implements Exportable {
         int distanceFromSolved = seenSolved.get(state.getNormalized());
         outer:
         while(distanceFromSolved > 0) {
-            for(Entry<? extends PuzzleState, String> next : state.getCanonicalSuccessorsByState().entrySet()) {
+            for(Entry<? extends PuzzleState, String> next : state.getCanonicalMovesByState().entrySet()) {
                 PuzzleState nextState = next.getKey();
                 PuzzleState nextStateNormalized = nextState.getNormalized();
                 String moveName = next.getValue();
@@ -494,7 +494,7 @@ public abstract class Puzzle implements Exportable {
          * @return A mapping of canonical PuzzleState's to the name of
          *         the move that gets you to them.
          */
-        public final HashMap<PuzzleState, String> getCanonicalSuccessorsByState() {
+        public final HashMap<PuzzleState, String> getCanonicalMovesByState() {
             LinkedHashMap<String, ? extends PuzzleState> successorsByName =
                 getSuccessorsByName();
             HashMap<PuzzleState, String> uniqueSuccessors =
@@ -510,6 +510,7 @@ public abstract class Puzzle implements Exportable {
                 // Only add nextState if it's "unique"
                 if(!statesSeenNormalized.contains(nextStateNormalized)) {
                     uniqueSuccessors.put(nextState, moveName);
+                    statesSeenNormalized.add(nextStateNormalized);
                 }
             }
 

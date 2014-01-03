@@ -26,6 +26,15 @@ public class CubePuzzle extends Puzzle {
         }
     }
 
+    private static HashMap<Face, String> faceRotationsByName = new HashMap<Face, String>();
+    static {
+        faceRotationsByName.put(Face.R, "x");
+        faceRotationsByName.put(Face.U, "y");
+        faceRotationsByName.put(Face.F, "z");
+    }
+
+    private static final String[] DIR_TO_STR = new String[] { null, "", "2", "'" };
+
     private static final int gap = 2;
     private static final int cubieSize = 10;
     private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
@@ -418,20 +427,29 @@ public class CubePuzzle extends Puzzle {
         @Override
         public LinkedHashMap<String, CubeState> getSuccessorsByName() {
             LinkedHashMap<String, CubeState> successors = new LinkedHashMap<String, CubeState>();
-            for(Face face : Face.values()) {
-                for(int innerSlice = 0; innerSlice < size/2; innerSlice++) {
+            for(int innerSlice = 0; innerSlice < size; innerSlice++) {
+                for(Face face : Face.values()) {
+                    int outerSlice = 0;
                     for(int dir = 1; dir <= 3; dir++) {
                         String f = face.toString();
-                        String move = "";
-                        int outerSlice = 0;
+                        String move;
                         if(innerSlice == 0) {
-                            move += f;
+                            move = f;
                         } else if (innerSlice == 1) {
-                            move += f + "w";
+                            move = f + "w";
+                        } else if (innerSlice == size - 1) {
+                            // Turning all the slices is a rotation
+                            String rotationName = faceRotationsByName.get(face);
+                            if(rotationName == null) {
+                                // Not all rotations are actually named,
+                                // just skip the unnamed ones.
+                                continue;
+                            }
+                            move = rotationName;
                         } else {
-                            move += (innerSlice+1) + f + "w";
+                            move = (innerSlice+1) + f + "w";
                         }
-                        move += new String[] { null, "", "2", "'" }[dir];
+                        move += DIR_TO_STR[dir];
 
                         int[][][] imageCopy = cloneImage(image);
                         for(int slice = outerSlice; slice <= innerSlice; slice++) {

@@ -374,13 +374,13 @@ var mark2 = {};
         }
         function eventToPuzzle(eventID) {
             var puzzByEvent = {
-                "333bf" : "333",
+                "333bf" : "333ni",
                 "333oh" : "333",
                 "333fm" : "333",
                 "333ft" : "333",
                 "444bf" : "444",
-                "555bf" : "555",
-                "333mbf" : "333"
+                "555bf" : "555ni",
+                "333mbf" : "333ni"
             };
             return puzzByEvent[eventID] || eventID;
         }
