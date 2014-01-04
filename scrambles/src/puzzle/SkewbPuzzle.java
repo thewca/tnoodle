@@ -24,7 +24,7 @@ import org.timepedia.exporter.client.Export;
 
 @Export
 public class SkewbPuzzle extends Puzzle {
-    private static final int MIN_SCRAMBLE_LENGTH = 9;
+    private static final int MIN_SCRAMBLE_LENGTH = 11;
     private static final Logger l = Logger.getLogger(SkewbPuzzle.class.getName());
     private SkewbSolver skewbSolver = null;
 
