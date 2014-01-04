@@ -31,6 +31,7 @@ import net.gnehzr.tnoodle.utils.TNoodleLogging;
 import net.gnehzr.tnoodle.utils.Utils;
 import puzzle.ClockPuzzle;
 import puzzle.ClockPuzzle.ClockState;
+import puzzle.SquareOnePuzzle;
 import puzzle.CubePuzzle;
 import puzzle.CubePuzzle.CubeState;
 import puzzle.ThreeByThreeCubePuzzle;
@@ -295,12 +296,30 @@ public class ScrambleTest {
             PuzzleState rotatedState = state.applyAlgorithm("Uw Dw'").getNormalized();
             azzertEquals(normalizedState, rotatedState);
         }
+    }
 
-        // TODO - do some actual AlgorithmBuilder testing!
-        // sq1: (0,0) (1,1) => (1,1)
-        //      (1,0) (0,1) => (1,1)
-        // 444: Rw Lw => Rw2 ?
-        // <<<
+    private static void testAlgorithmBuilder() throws InvalidMoveException {
+        System.out.println("Testing algorithm builder");
+
+        CubePuzzle fours = new CubePuzzle(4);
+        AlgorithmBuilder ab4 = new AlgorithmBuilder(fours, MergingMode.CANONICALIZE_MOVES);
+        String ogAlg = "Rw Lw";
+        ab4.appendAlgorithm(ogAlg);
+        String shortenedAlg = ab4.toString();
+        System.out.println(ogAlg + " -> " + shortenedAlg);
+        String[] shortenedAlgSplit = AlgorithmBuilder.splitAlgorithm(shortenedAlg);
+        azzertEquals(shortenedAlgSplit.length, 1);
+
+        Puzzle sq1 = new SquareOnePuzzle();
+        AlgorithmBuilder abSq1;
+
+        abSq1 = new AlgorithmBuilder(sq1, MergingMode.CANONICALIZE_MOVES);
+        abSq1.appendAlgorithm("(1,0) (0,1)");
+        azzertEquals(abSq1.toString(), "(1,1)");
+        
+        abSq1 = new AlgorithmBuilder(sq1, MergingMode.CANONICALIZE_MOVES);
+        abSq1.appendAlgorithm("(0,1) (1,1)");
+        azzertEquals(abSq1.toString(), "(1,2)");
     }
 
     private static void testTwosConverter() throws InvalidMoveException {
@@ -436,6 +455,8 @@ public class ScrambleTest {
 
         System.out.println("Testing names.");
         testNames();
+
+        testAlgorithmBuilder();
 
         System.out.println("Testing specific Puzzle issues.");
         testClockPuzzle();

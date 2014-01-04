@@ -61,7 +61,8 @@ public class AlgorithmBuilder {
         //  - "R R" becomes "R2"
         //  - "L Rw" stays unmodified.
         //  - "F x U" will become something like "F2 x".
-        //<<<MERGE_REDUNDANT_MOVES_PRESERVE_STATE,
+        //  TODO - add actual support for this! feel free to rename it
+        //MERGE_REDUNDANT_MOVES_PRESERVE_STATE,
 
         // Most aggressive merging.
         // See PuzzleState.getCanonicalMovesByState() for the
@@ -80,8 +81,9 @@ public class AlgorithmBuilder {
     }
 
     public boolean isRedundant(String move, boolean preserveState) throws InvalidMoveException {
-        //<<<MergingMode mergingMode = preserveState ? MergingMode.MERGE_REDUNDANT_MOVES_PRESERVE_STATE : MergingMode.CANONICALIZE_MOVES;
-        MergingMode mergingMode = MergingMode.CANONICALIZE_MOVES;//<<<
+        // TODO - add support for MERGE_REDUNDANT_MOVES_PRESERVE_STATE
+        //MergingMode mergingMode = preserveState ? MergingMode.MERGE_REDUNDANT_MOVES_PRESERVE_STATE : MergingMode.CANONICALIZE_MOVES;
+        MergingMode mergingMode = MergingMode.CANONICALIZE_MOVES;
         IndexAndMove indexAndMove = findBestIndexForMove(move, mergingMode);
         return indexAndMove.index < moves.size() || indexAndMove.move == null;
     }
