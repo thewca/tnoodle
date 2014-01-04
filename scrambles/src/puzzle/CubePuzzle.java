@@ -426,8 +426,12 @@ public class CubePuzzle extends Puzzle {
 
         @Override
         public LinkedHashMap<String, CubeState> getSuccessorsByName() {
+            return getSuccessorsWithinSlice(size - 1);
+        }
+
+        private LinkedHashMap<String, CubeState> getSuccessorsWithinSlice(int maxSlice) {
             LinkedHashMap<String, CubeState> successors = new LinkedHashMap<String, CubeState>();
-            for(int innerSlice = 0; innerSlice < size; innerSlice++) {
+            for(int innerSlice = 0; innerSlice <= maxSlice; innerSlice++) {
                 for(Face face : Face.values()) {
                     int outerSlice = 0;
                     for(int dir = 1; dir <= 3; dir++) {
@@ -461,6 +465,11 @@ public class CubePuzzle extends Puzzle {
             }
 
             return successors;
+        }
+
+        @Override
+        public HashMap<String, CubeState> getScrambleSuccessors() {
+            return getSuccessorsWithinSlice((int) (size / 2) - 1);
         }
 
         @Override
