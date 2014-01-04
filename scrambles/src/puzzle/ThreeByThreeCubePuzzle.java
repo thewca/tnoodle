@@ -38,6 +38,10 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
 
     @Override
     protected String solveIn(PuzzleState ps, int n) {
+        return solveIn(ps, n, null);
+    }
+
+    public String solveIn(PuzzleState ps, int n, String firstMoveRestriction) {
         CubeState cs = (CubeState) ps;
         boolean useTwoPhase = EnvGetter.getenv("NO_TWO_PHASE") == null;
         if(!useTwoPhase) {
@@ -47,7 +51,7 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
             // TODO - apparently min2phase can't solve the solved cube
             return "";
         }
-        String solution = twoPhaseSearcher.get().solution(cs.toFaceCube(), n, THREE_BY_THREE_TIMEOUT, 0, 0).trim();
+        String solution = twoPhaseSearcher.get().solution(cs.toFaceCube(), n, THREE_BY_THREE_TIMEOUT, 0, 0, firstMoveRestriction).trim();
         if("Error 7".equals(solution)) {
             // No solution exists for given depth
             return null;

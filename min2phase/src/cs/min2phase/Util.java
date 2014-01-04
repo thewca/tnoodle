@@ -1,5 +1,7 @@
 package cs.min2phase;
 
+import java.util.HashMap;
+
 class Util {
 /*	//Edges
 	static final byte UR = 0;
@@ -119,11 +121,16 @@ class Util {
 	static int[][] permMult = new int[24][24];
 	static String[] move2str = {"U", "U2", "U'", "R", "R2", "R'", "F", "F2", "F'",
 								"D", "D2", "D'", "L", "L2", "L'", "B", "B2", "B'"};
+        static HashMap<String, Integer> str2move = new HashMap<String, Integer>();
+        static {
+            for(int i = 0; i < move2str.length; i++) {
+                str2move.put(move2str[i], i);
+            }
+        }
 	static int[] ud2std = {Ux1, Ux2, Ux3, Rx2, Fx2, Dx1, Dx2, Dx3, Lx2, Bx2};
 	static int[] std2ud = new int[18];
 
 	static boolean[][] ckmv2 = new boolean[11][10];
-
 
 	static void toCubieCube(byte[] f, CubieCube ccRet) {
 		byte ori;

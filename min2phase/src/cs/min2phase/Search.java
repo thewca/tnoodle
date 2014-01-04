@@ -51,6 +51,7 @@ public class Search {
 	private long timeOut;
 	private long timeMin;
 	private int verbose;
+        private int firstAxisRestriction = 10;
 	private CubieCube cc = new CubieCube();
 
 	/**
@@ -117,7 +118,11 @@ public class Search {
 	 * 		computing will continue to find shorter solution(s). Btw, if timeMin > timeOut, timeMin will be set to timeOut.
 	 *
 	 * @param verbose
-	 * 		determins the format of the solution(s). see USE_SEPARATOR, INVERSE_SOLUTION, APPEND_LENGTH
+	 * 		determines the format of the solution(s). see USE_SEPARATOR, INVERSE_SOLUTION, APPEND_LENGTH
+         *
+         * @param firstFaceRestriction
+         *              The solution generated will not start by turning
+         *              the face specified by firstFaceRestriction.
 	 *
 	 * @return The solution string or an error code:<br>
 	 * 		Error 1: There is not exactly one facelet of each colour<br>
@@ -127,9 +132,10 @@ public class Search {
 	 * 		Error 5: Twist error: One corner has to be twisted<br>
 	 * 		Error 6: Parity error: Two corners or two edges have to be exchanged<br>
 	 * 		Error 7: No solution exists for the given maxDepth<br>
-	 * 		Error 8: Timeout, no solution within given time
+	 * 		Error 8: Timeout, no solution within given time<br>
+	 * 		Error 9: Invalid firstFaceRestriction
 	 */
-	public synchronized String solution(String facelets, int maxDepth, long timeOut, long timeMin, int verbose) {
+	public synchronized String solution(String facelets, int maxDepth, long timeOut, long timeMin, int verbose, String firstFaceRestriction) {
 		int check = verify(facelets);
 		if (check != 0) {
 			return "Error " + Math.abs(check);
@@ -139,8 +145,21 @@ public class Search {
 		this.timeMin = this.timeOut + Math.min(timeMin - timeOut, 0);
 		this.verbose = verbose;
 		this.solution = null;
+                if(firstFaceRestriction != null) {
+                    if(!Util.str2move.containsKey(firstFaceRestriction)) {
+                        return "Error 9";
+                    }
+                    firstAxisRestriction = Util.str2move.get(firstFaceRestriction);
+                    if(firstAxisRestriction % 3 != 0) {
+                        return "Error 9";
+                    }
+                }
 		return solve(cc);
 	}
+
+	public synchronized String solution(String facelets, int maxDepth, long timeOut, long timeMin, int verbose) {
+            return solution(facelets, maxDepth, timeOut, timeMin, verbose, null);
+        }
 
 	int verify(String facelets) {
 		int count = 0x000000;
@@ -213,7 +232,7 @@ public class Search {
 				valid1 = 0;
 				if ((prun[urfIdx] <= depth1)
 						&& phase1(twist[urfIdx]>>>3, twist[urfIdx]&7, flip[urfIdx]>>>3, flip[urfIdx]&7,
-							slice[urfIdx]&0x1ff, depth1, -1) == 0) {
+							slice[urfIdx]&0x1ff, depth1, firstAxisRestriction) == 0) {
 					return solution == null ? "Error 8" : solution;
 				}
 			}
@@ -227,12 +246,12 @@ public class Search {
 	 * 		1: Try Next Power
 	 * 		2: Try Next Axis
 	 */
-	private int phase1(int twist, int tsym, int flip, int fsym, int slice, int maxl, int lm) {
+	private int phase1(int twist, int tsym, int flip, int fsym, int slice, int maxl, int lastAxis) {
 		if (twist==0 && flip==0 && slice==0 && maxl<5) {
 			return maxl==0 ? initPhase2() : 1;
 		}
 		for (int axis=0; axis<18; axis+=3) {
-			if (axis == lm || axis == lm-9) {
+			if (axis == lastAxis || axis == lastAxis-9) {
 				continue;
 			}
 			for (int power=0; power<3; power++) {
@@ -333,7 +352,7 @@ public class Search {
 			return prun > maxDep2 ? 2 : 1;
 		}
 
-		int lm = depth1==0 ? 10 : Util.std2ud[move[depth1-1]/3*3+1];
+		int lm = depth1==0 ? firstAxisRestriction : Util.std2ud[move[depth1-1]/3*3+1];
 		for (int depth2=prun; depth2<maxDep2; depth2++) {
 			if (phase2(edge, esym, cidx, csym, mid, depth2, depth1, lm)) {
 				sol = depth1 + depth2;

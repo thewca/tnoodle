@@ -33,6 +33,7 @@ import puzzle.ClockPuzzle;
 import puzzle.ClockPuzzle.ClockState;
 import puzzle.CubePuzzle;
 import puzzle.CubePuzzle.CubeState;
+import puzzle.ThreeByThreeCubePuzzle;
 import puzzle.PyraminxPuzzle;
 import puzzle.PyraminxPuzzle.PyraminxState;
 import puzzle.PyraminxSolver;
@@ -99,28 +100,6 @@ public class ScrambleTest {
                 azzertSame(state.solveIn(scrambler.getWcaMinScrambleDistance() - 1), null);
             }
         }
-    }
-
-    public static void main(String[] args) throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, InvalidMoveException, IOException {
-        TNoodleLogging.initializeLogging();
-
-        System.out.println("Testing names.");
-        testNames();
-
-        benchmarking();
-
-        System.out.println("Testing specific Puzzle issues.");
-        testClockPuzzle();
-        testCubePuzzle();
-        testPyraConverter();
-        testMega();
-
-        System.out.println("Testing solveIn method");
-        testSolveIn();
-
-        testScrambleFiltering();
-
-        testThreads();
     }
 
     private static void testSolveIn() throws InvalidScrambleException, BadLazyClassDescriptionException, LazyInstantiatorException, IOException {
@@ -263,9 +242,25 @@ public class ScrambleTest {
     }
     
     private static void testCubePuzzle() throws InvalidScrambleException, InvalidMoveException {
+        testRestricted333CubeSolver();
         testCubeNormalization();
         testTwosConverter();
         testTwosSolver();
+    }
+
+    private static void testRestricted333CubeSolver() throws InvalidScrambleException, InvalidMoveException {
+        ThreeByThreeCubePuzzle threes = new ThreeByThreeCubePuzzle();
+        CubeState solved = (CubeState) threes.getSolvedState();
+
+        // Search for a solution to a cube scrambled with U,
+        // but require that that solution not start with a U turn.
+        CubeState u = (CubeState) solved.apply("U");
+        String solution = threes.solveIn(u, 10, "U");
+        System.out.println("Solution to 'U': " + solution);
+        String[] solutionMoves = AlgorithmBuilder.splitAlgorithm(solution);
+        azzert(!solutionMoves[0].startsWith("U"));
+        CubeState shouldBeSolved = (CubeState) u.applyAlgorithm(solution);
+        azzert(shouldBeSolved.isSolved());
     }
 
     private static void testCubeNormalization() throws InvalidScrambleException, InvalidMoveException {
@@ -282,7 +277,7 @@ public class ScrambleTest {
         normalizedState = state.getNormalized();
         azzertEquals(normalizedState, normalizedSolvedState);
         
-        CubePuzzle threes = new CubePuzzle(3);
+        CubePuzzle threes = new ThreeByThreeCubePuzzle();
 
         solved = threes.getSolvedState();
         CubeState bDone = (CubeState) solved.apply("B");
@@ -435,4 +430,27 @@ public class ScrambleTest {
             l.log(start.finishedNow());
         }
     }
+
+    public static void main(String[] args) throws BadLazyClassDescriptionException, LazyInstantiatorException, InvalidScrambleException, InvalidMoveException, IOException {
+        TNoodleLogging.initializeLogging();
+
+        System.out.println("Testing names.");
+        testNames();
+
+        System.out.println("Testing specific Puzzle issues.");
+        testClockPuzzle();
+        testCubePuzzle();
+        testPyraConverter();
+        testMega();
+
+        benchmarking();
+
+        System.out.println("Testing solveIn method");
+        testSolveIn();
+
+        testScrambleFiltering();
+
+        testThreads();
+    }
+
 }
