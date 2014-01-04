@@ -320,6 +320,12 @@ public class ScrambleTest {
         abSq1 = new AlgorithmBuilder(sq1, MergingMode.CANONICALIZE_MOVES);
         abSq1.appendAlgorithm("(0,1) (1,1)");
         azzertEquals(abSq1.toString(), "(1,2)");
+
+        CubePuzzle fives = new CubePuzzle(5);
+        AlgorithmBuilder ab5 = new AlgorithmBuilder(fives, MergingMode.NO_MERGING);
+        String alg = "U R 4Rw'";
+        ab5.appendAlgorithm(alg);
+        azzertEquals(alg, ab5.toString());
     }
 
     private static void testTwosConverter() throws InvalidMoveException {

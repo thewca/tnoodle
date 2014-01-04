@@ -697,14 +697,13 @@ public abstract class Puzzle implements Exportable {
                 ab.getState().getScrambleSuccessors();
             int length = ab.length();
             String move;
-            final boolean PRESERVE_STATE = false;
             try {
                 do {
                     move = GwtSafeUtils.choose(r, successors.keySet());
                     // If this move happens to be redundant, there is no
                     // reason to select this move again in vain.
                     successors.remove(move);
-                } while(ab.isRedundant(move, PRESERVE_STATE));
+                } while(ab.isRedundant(move));
                 ab.appendMove(move);
             } catch(InvalidMoveException e) {
                 l.log(Level.SEVERE, "", e);

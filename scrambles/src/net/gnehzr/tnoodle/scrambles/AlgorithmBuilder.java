@@ -12,11 +12,11 @@ import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 public class AlgorithmBuilder {
     private static final Logger l = Logger.getLogger(AlgorithmBuilder.class.getName());
 
-    private ArrayList<String> moves;
+    private ArrayList<String> moves = new ArrayList<String>();
     /**
      * states.get(i) = state achieved by applying moves[0]...moves[i-1]
      */
-    private ArrayList<PuzzleState> states;
+    private ArrayList<PuzzleState> states = new ArrayList<PuzzleState>();
     /**
      * If we are in CANONICALIZE_MOVES MergingMode, then something like
      * Uw Dw' on a 4x4x4 will become Uw2. This means the state we end
@@ -25,22 +25,25 @@ public class AlgorithmBuilder {
      * unNormalizedState keeps track of the state we would have been in
      * if we had just naively appended turns.
      */
-    private PuzzleState unNormalizedState;
+    private PuzzleState originalState, unNormalizedState;
+    private ArrayList<String> unModifiedMoves = new ArrayList<String>();
+    private MergingMode mergingMode = MergingMode.NO_MERGING;
     public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode) {
         this(puzzle, mergingMode, puzzle.getSolvedState());
     }
     
-    public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode, PuzzleState unNormalizedState) {
-        this.unNormalizedState = unNormalizedState;
-        this.moves = new ArrayList<String>();
-        this.states = new ArrayList<PuzzleState>();
-        states.add(unNormalizedState);
-        setMungingMode(mergingMode);
+    public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode, PuzzleState originalState) {
+        this.mergingMode = mergingMode;
+        resetToState(originalState);
     }
 
-    private MergingMode mergingMode = MergingMode.NO_MERGING;
-    public void setMungingMode(MergingMode mergingMode) {
-        this.mergingMode = mergingMode;
+    private void resetToState(PuzzleState originalState) {
+        this.originalState = originalState;
+        this.unNormalizedState = originalState;
+        this.unModifiedMoves.clear();
+        this.moves.clear();
+        this.states.clear();
+        states.add(unNormalizedState);
     }
 
     public static enum MergingMode {
@@ -80,7 +83,7 @@ public class AlgorithmBuilder {
         CANONICALIZE_MOVES;
     }
 
-    public boolean isRedundant(String move, boolean preserveState) throws InvalidMoveException {
+    public boolean isRedundant(String move) throws InvalidMoveException {
         // TODO - add support for MERGE_REDUNDANT_MOVES_PRESERVE_STATE
         //MergingMode mergingMode = preserveState ? MergingMode.MERGE_REDUNDANT_MOVES_PRESERVE_STATE : MergingMode.CANONICALIZE_MOVES;
         MergingMode mergingMode = MergingMode.CANONICALIZE_MOVES;
@@ -98,6 +101,10 @@ public class AlgorithmBuilder {
     }
 
     private IndexAndMove findBestIndexForMove(String move, MergingMode mergingMode) throws InvalidMoveException {
+        if(mergingMode == MergingMode.NO_MERGING) {
+            return new IndexAndMove(moves.size(), move);
+        }
+
         PuzzleState newUnNormalizedState = unNormalizedState.apply(move);
         if(newUnNormalizedState.equalsNormalized(unNormalizedState)) {
             // move must just be a rotation.
@@ -149,7 +156,6 @@ public class AlgorithmBuilder {
 
     public void appendMove(String newMove) throws InvalidMoveException {
         l.fine("appendMove(" + newMove + ")");
-
         IndexAndMove indexAndMove = findBestIndexForMove(newMove, mergingMode);
         if(indexAndMove.index < moves.size()) {
             // This move is redundant.
@@ -167,7 +173,7 @@ public class AlgorithmBuilder {
             // This move is not redundant.
             moves.add(indexAndMove.move);
             // The code to update the states array is right below us,
-            // but it requires that the states arary be of the correct
+            // but it requires that the states array be of the correct
             // size.
             states.add(null);
         }
@@ -179,8 +185,28 @@ public class AlgorithmBuilder {
         }
 
         unNormalizedState = unNormalizedState.apply(newMove);
+        unModifiedMoves.add(newMove);
         azzert(states.size() == moves.size() + 1);
         azzert(unNormalizedState.equalsNormalized(getState()));
+    }
+
+    public String popMove() {
+        ArrayList<String> unModifiedMovesCopy = new ArrayList<String>(unModifiedMoves);
+        String poppedMove = unModifiedMovesCopy.remove(unModifiedMovesCopy.size() - 1);
+
+        moves.clear();
+        states.clear();
+        unModifiedMoves.clear();
+        unNormalizedState = originalState;
+        states.add(unNormalizedState);
+        for(String move : unModifiedMovesCopy) {
+            try {
+                appendMove(move);
+            } catch(InvalidMoveException e) {
+                azzert(false, e);
+            }
+        }
+        return poppedMove;
     }
 
     public void appendAlgorithm(String algorithm) throws InvalidMoveException {

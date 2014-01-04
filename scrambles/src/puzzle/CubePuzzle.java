@@ -26,20 +26,61 @@ public class CubePuzzle extends Puzzle {
         }
     }
 
+    private static final String[] DIR_TO_STR = new String[] { null, "", "2", "'" };
     private static HashMap<Face, String> faceRotationsByName = new HashMap<Face, String>();
     static {
         faceRotationsByName.put(Face.R, "x");
         faceRotationsByName.put(Face.U, "y");
         faceRotationsByName.put(Face.F, "z");
     }
+    protected class CubeMove {
+        Face face;
+        int dir;
+        int innerSlice, outerSlice;
+        public CubeMove(Face face, int dir) {
+            this(face, dir, 0);
+        }
+        public CubeMove(Face face, int dir, int innerSlice) {
+            this(face, dir, innerSlice, 0);
+        }
+        public CubeMove(Face face, int dir, int innerSlice, int outerSlice) {
+            this.face = face;
+            this.dir = dir;
+            this.innerSlice = innerSlice;
+            this.outerSlice = outerSlice;
+            // We haven't come up with names for moves where outerSlice != 0
+            azzert(outerSlice == 0);
+        }
 
-    private static final String[] DIR_TO_STR = new String[] { null, "", "2", "'" };
+        public String toString() {
+            String f = face.toString();
+            String move;
+            if(innerSlice == 0) {
+                move = f;
+            } else if (innerSlice == 1) {
+                move = f + "w";
+            } else if (innerSlice == size - 1) {
+                // Turning all the slices is a rotation
+                String rotationName = faceRotationsByName.get(face);
+                if(rotationName == null) {
+                    // Not all rotations are actually named.
+                    return null;
+                }
+                move = rotationName;
+            } else {
+                move = (innerSlice+1) + f + "w";
+            }
+            move += DIR_TO_STR[dir];
+
+            return move;
+        }
+    }
 
     private static final int gap = 2;
     private static final int cubieSize = 10;
     private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
 
-    private final int size;
+    protected final int size;
     public CubePuzzle(int size) {
         azzert(size >= 0 && size < DEFAULT_LENGTHS.length, "Invalid cube size");
         this.size = size;
@@ -435,31 +476,18 @@ public class CubePuzzle extends Puzzle {
                 for(Face face : Face.values()) {
                     int outerSlice = 0;
                     for(int dir = 1; dir <= 3; dir++) {
-                        String f = face.toString();
-                        String move;
-                        if(innerSlice == 0) {
-                            move = f;
-                        } else if (innerSlice == 1) {
-                            move = f + "w";
-                        } else if (innerSlice == size - 1) {
-                            // Turning all the slices is a rotation
-                            String rotationName = faceRotationsByName.get(face);
-                            if(rotationName == null) {
-                                // Not all rotations are actually named,
-                                // just skip the unnamed ones.
-                                continue;
-                            }
-                            move = rotationName;
-                        } else {
-                            move = (innerSlice+1) + f + "w";
+                        CubeMove move = new CubeMove(face, dir, innerSlice, outerSlice);
+                        String moveStr = move.toString();
+                        if(moveStr == null) {
+                            // Skip unnamed rotations.
+                            continue;
                         }
-                        move += DIR_TO_STR[dir];
 
                         int[][][] imageCopy = cloneImage(image);
                         for(int slice = outerSlice; slice <= innerSlice; slice++) {
                             slice(face, slice, dir, imageCopy);
                         }
-                        successors.put(move, new CubeState(imageCopy));
+                        successors.put(moveStr, new CubeState(imageCopy));
                     }
                 }
             }
