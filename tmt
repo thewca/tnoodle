@@ -246,11 +246,23 @@ class tmt:
         self.args.func()
 
     def _graph(self):
+        project = tmt.TmtProject.projects[tmt.args.project]
         if tmt.args.file:
             # TODO look at tmt.args.file and generate a dotty file or something?
             assert False, "not yet implemented"
+        elif tmt.args.show_classpath:
+            # Look at all for all EclipseProject this project depends on,
+            # and add them to the classpath. We have to do this weirdness
+            # because project may not refer to an EclipseProject.
+            entities = set()
+            for p in project.getRecursiveDependenciesTopoSorted():
+                if issubclass(type(p), EclipseProject):
+                    entities.update(p.getClasspathEntities())
+            entities.add(JYTHON_JAR)
+            classpath = EclipseProject.toClasspath(entities)
+            print(classpath)
         else:
-            print(tmt.TmtProject.projects[tmt.args.project].prettyDependencies())
+            print(project.prettyDependencies())
 
     def _pullRequest(self):
         self.assertWorkspaceClean()
@@ -298,17 +310,6 @@ class tmt:
                 s = match.group(0)
                 if s.startswith('"') or s.startswith("'"):
                     print("Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s))
-
-    def _jython(self):
-        # Search for all java projects, and add them to the classpath
-        entities = set()
-        for project in tmt.TmtProject.projects.values():
-            if issubclass(type(project), EclipseProject):
-                entities.update(project.getClasspathEntities())
-        entities.add(JYTHON_JAR)
-        classpath = EclipseProject.toClasspath(entities)
-        args = []
-        tmt.java("org.python.util.jython", classpath, args, quiet=True)
 
     def _make(self, projectName=None, command=None):
         if projectName is None:
@@ -434,13 +435,6 @@ class tmt:
         subparsers = self.parser.add_subparsers(help='Available commands', dest='subparser_name')
         subparsers.required = True # Something changed in python 3 (see http://hg.python.org/cpython/rev/cab204a79e09), so dumb
 
-        desc = 'Open jython interpreter'
-        parser_jython = subparsers.add_parser(
-            'jython',
-            help=desc, description=desc,
-            formatter_class=ArgumentDefaultsHelpFormatter)
-        parser_jython.set_defaults(func=self._jython)
-
         desc = 'Make stuff'
         parser_make = subparsers.add_parser(
             'make',
@@ -525,6 +519,10 @@ class tmt:
             '--no-prune', '-np',
             action="store_true", default=False,
             help='Do not prune duplicate projects')
+        parser_graph.add_argument(
+            '--show-classpath',
+            action="store_true", default=False,
+            help='Print java classpath required to run project')
         parser_graph.set_defaults(func=self._graph)
 
         desc = lint.desc()
@@ -638,7 +636,7 @@ class tmt:
             matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
         return matches
 
-    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False, maxMemory=None, quiet=False):
+    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False, maxMemory=None):
         command = []
         assert debug in [ None, 'jdb', 'attach' ]
         if debug == 'jdb':
@@ -659,8 +657,7 @@ class tmt:
             command.append('-Xmx' + maxMemory)
         command.append(main)
         command += args
-        if not quiet:
-            print(" ".join(command))
+        print(" ".join(command))
         stdout = None
         stderr = None
         if captureOutput:
@@ -842,13 +839,12 @@ class EclipseProject(TmtProject):
     classpathHandler = EclipseClasspathHandler()
     classpathParser.setContentHandler(classpathHandler)
 
-    def __init__(self, name, description, main=None, argv=None, tests=None):
+    def __init__(self, name, description, main=None, argv=None):
         self.main = main
         self.argv = argv
         self.nonJavaSrcDeps = set()
         self.javaFilesToIgnore = set()
         self.nonJavaResourceDeps = set()
-        self.tests = tests
         self.strictCompile = True
 
         self.ignoredWarnings = []
@@ -921,6 +917,7 @@ class EclipseProject(TmtProject):
         self.projects = [ tmt.TmtProject.projects[p] for p in EclipseProject.classpathHandler.projects ]
         self.distDir = join(self.name, 'dist')
         self.src = join(self.name, 'src')
+        self.testDir = join(self.name, 'test')
         self.srcResource = join(self.name, RESOURCE_FOLDER_SRC)
         self.binResource = join(self.name, RESOURCE_FOLDER_BIN)
         self.fullName = 'TNoodle-%s' % ( self.name )
@@ -1194,13 +1191,17 @@ Implementation-Version: %s
         return retVal
 
     def check(self):
-        # Check assumes that we've already been compiled
-        if not self.tests:
+        if not isdir(self.testDir):
             return
-
-        for testClass in self.tests:
-            assert 0 == tmt.java(main=testClass,
-                 classpath=EclipseProject.toClasspath(self.getClasspathEntities()))
+        def isTestFile(filename):
+            return filename.endswith("Test.jy")
+        testFiles = filter(isTestFile, os.listdir(self.testDir))
+        for testFile in testFiles:
+            absTestFile = join(self.testDir, testFile)
+            print("Running test %s" % absTestFile)
+            retVal = os.system("./jython %s" % absTestFile)
+            if retVal != 0:
+                sys.exit(retVal)
 
     def clean(self):
         print('Cleaning: %s' % self.name)

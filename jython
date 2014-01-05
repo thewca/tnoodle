@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+CLASSPATH=`./tmt graph --show-classpath`
+CLASSPATH=$CLASSPATH:lib/jython-standalone-2.7-b1.jar
+java -cp $CLASSPATH org.python.util.jython "$@"

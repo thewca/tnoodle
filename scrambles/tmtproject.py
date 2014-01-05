@@ -15,8 +15,7 @@ class Project(tmt.EclipseProject):
             self,
             tmt.projectName(),
             description=DESCRIPTION,
-            main='net.gnehzr.tnoodle.scrambles.Main',
-            tests=['net.gnehzr.tnoodle.test.ScrambleTest'])
+            main='net.gnehzr.tnoodle.scrambles.Main')
 
     def configure(self):
         tmt.EclipseProject.configure(self)
