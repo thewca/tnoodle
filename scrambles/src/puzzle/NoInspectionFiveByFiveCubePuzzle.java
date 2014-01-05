@@ -56,7 +56,6 @@ public class NoInspectionFiveByFiveCubePuzzle extends CubePuzzle {
         return psag;
     }
 
-    // TODO - write a test for this madness! <<<
     public PuzzleStateAndGenerator applyOrientation(CubeMove[] randomOrientation, PuzzleStateAndGenerator psag) {
         if(randomOrientation.length == 0) {
             // No reorientation required
@@ -72,15 +71,15 @@ public class NoInspectionFiveByFiveCubePuzzle extends CubePuzzle {
             // that last turn of our scramble. This ensures we have a scramble
             // with no redundant turns, and I can't see how it could hurt the
             // quality of our scrambles to do this.
-            if(ab.isRedundant(randomOrientation[0].toString())) {
+            String firstReorientMove = randomOrientation[0].toString();
+            while(ab.isRedundant(firstReorientMove)) {
                 ab.popMove();
             }
             for(CubeMove cm : randomOrientation) {
                 ab.appendMove(cm.toString());
             }
 
-            psag.generator = ab.toString();
-            psag.state = ab.getState();
+            psag = ab.getStateAndGenerator();
             return psag;
         } catch(InvalidMoveException e) {
             azzert(false, e);

@@ -291,7 +291,7 @@ public final class Utils {
         if(seed == null) {
             seed = "" + System.currentTimeMillis();
         }
-        System.out.println("Using TNOODLE_RANDSEED " + seed);
+        System.out.println("Using TNOODLE_RANDSEED=" + seed);
         r = new Random(seed.hashCode());
         return r;
     }

@@ -9,31 +9,9 @@ import math
 import datetime
 import atexit
 
+import tntdebug
+
 javaEEProjectName = "javaee-api-6.0.jar"
-JYTHON_JAR = "lib/jython-standalone-2.7-b1.jar"
-
-# Terribly useful debugging tweaks
-import cgitb
-import traceback
-import pdb
-
-cgitb.enable(display=True, format='text')
-def excepthook(etype, value, tb):
-    # Added this line for debugging why https://travis-ci.org/cubing/tnoodle/builds/15966902
-    # hit pdb instead of just printing a traceback and exiting.
-    # Once that problem is solved, we can delete this code.
-    print("Hit excepthook! stderr.isatty: %s stdin.isatty: %s stdout.isatty: %s" % (sys.stderr.isatty(), sys.stdin.isatty(), sys.stdout.isatty()))
-
-    # Workaround for isatty weirdness mentioned above.
-    isTravisCiBuild = os.environ.get('TRAVIS_BRANCH', None)
-    if not sys.stdout.isatty() or not sys.stderr.isatty() or not sys.stdin.isatty() or isTravisCiBuild:
-        # stdin, stdout, or stderr is redirected, so don't enter pdb
-        sys.__excepthook__(etype, value, tb)
-    else:
-        if tb:
-            traceback.print_exception(etype, value, tb)
-        pdb.post_mortem(tb)
-sys.excepthook = excepthook
 
 def checkShellCmd(*args, **kwargs):
     kwargs['assertSuccess'] = True
@@ -258,7 +236,6 @@ class tmt:
             for p in project.getRecursiveDependenciesTopoSorted():
                 if issubclass(type(p), EclipseProject):
                     entities.update(p.getClasspathEntities())
-            entities.add(JYTHON_JAR)
             classpath = EclipseProject.toClasspath(entities)
             print(classpath)
         else:

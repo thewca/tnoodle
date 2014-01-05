@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+OLD_PWD=$PWD
+cd "$(dirname "$0")"
+
 CLASSPATH=`./tmt graph --show-classpath`
 CLASSPATH=$CLASSPATH:lib/jython-standalone-2.7-b1.jar
-java -cp $CLASSPATH org.python.util.jython "$@"
+JYTHONPATH="." exec java -cp $CLASSPATH org.python.util.jython "$OLD_PWD/$@"

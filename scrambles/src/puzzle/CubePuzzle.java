@@ -18,7 +18,7 @@ import org.timepedia.exporter.client.Export;
 @Export
 public class CubePuzzle extends Puzzle {
 
-    protected static enum Face {
+    public static enum Face {
         L, D, B, R, U, F;
 
         public Face oppositeFace() {
@@ -33,7 +33,7 @@ public class CubePuzzle extends Puzzle {
         faceRotationsByName.put(Face.U, "y");
         faceRotationsByName.put(Face.F, "z");
     }
-    protected class CubeMove {
+    public class CubeMove {
         Face face;
         int dir;
         int innerSlice, outerSlice;
