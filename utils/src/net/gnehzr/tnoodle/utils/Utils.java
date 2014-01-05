@@ -63,18 +63,12 @@ public final class Utils {
     }
 
     private static File getResourceDirectory(boolean assertExists) {
-        File f = getProgramDirectory();
-        if(getCallerClass().getClassLoader() instanceof LazyClassLoader) {
-            // Plugins are loaded from the resource folder, so we've already got the right folder.
-            azzert(f.getName().equals(RESOURCE_FOLDER));
-        } else {
-            f = new File(f, RESOURCE_FOLDER);
-            String version = getVersion();
-            if(!version.equals(DEVEL_VERSION)) {
-                // Each version of tnoodle extracts its resources
-                // to its own subdirectory of RESOURCE_FOLDER
-                f = new File(f, version);
-            }
+        File f = new File(getProgramDirectory(), RESOURCE_FOLDER);
+        String version = getVersion();
+        if(!version.equals(DEVEL_VERSION)) {
+            // Each version of tnoodle extracts its resources
+            // to its own subdirectory of RESOURCE_FOLDER
+            f = new File(f, version);
         }
         if(assertExists) {
             if(!f.isDirectory()) {
@@ -105,7 +99,10 @@ public final class Utils {
             try {
                 callerClass = Class.forName(ste.getClassName());
             } catch(ClassNotFoundException e) {
-                azzert(false, e);
+                // Classes that are part of a web app were loaded with the
+                // servlet container's classloader, so we can't necessarily
+                // find them.
+                return null;
             }
             if(!Utils.class.getPackage().equals(callerClass.getPackage())) {
                 return callerClass;
@@ -117,19 +114,15 @@ public final class Utils {
     private static File getJarFileOrDirectory() {
         Class<?> callerClass = getCallerClass();
 
-        Class<?> referenceClass;
-        if(callerClass.getClassLoader() == Utils.class.getClassLoader()) {
-            referenceClass = callerClass;
-        } else {
-            // If our caller class's classloader was not Utils's classloader, then we
-            // use Utils as a reference. This is to deal with classes that are part of a
-            // web app, and were loaded with the servlet container's classloader.
-            referenceClass = Utils.class;
+        if(callerClass == null) {
+            // We don't know where the class is (it was probably loaded
+            // by the servlet container), so just use Util.
+            callerClass = Utils.class;
         }
 
         File programDirectory;
         try {
-            programDirectory = new File(referenceClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            programDirectory = new File(callerClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         } catch (URISyntaxException e) {
             return new File(".");
         }

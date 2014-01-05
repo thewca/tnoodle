@@ -41,7 +41,6 @@
       <exclude name="TimedLogRecordStart.java"/>
       <exclude name="TimedLogRecordEnd.java"/>
       <exclude name="TNoodleLogging.java"/>
-      <exclude name="LazyClassLoader.java"/>
       <exclude name="LazyInstantiator.java"/>
   </source>
 
