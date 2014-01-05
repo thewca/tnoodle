@@ -243,25 +243,9 @@ public class ScrambleTest {
     }
     
     private static void testCubePuzzle() throws InvalidScrambleException, InvalidMoveException {
-        testRestricted333CubeSolver();
         testCubeNormalization();
         testTwosConverter();
         testTwosSolver();
-    }
-
-    private static void testRestricted333CubeSolver() throws InvalidScrambleException, InvalidMoveException {
-        ThreeByThreeCubePuzzle threes = new ThreeByThreeCubePuzzle();
-        CubeState solved = (CubeState) threes.getSolvedState();
-
-        // Search for a solution to a cube scrambled with U,
-        // but require that that solution not start with a U turn.
-        CubeState u = (CubeState) solved.apply("U");
-        String solution = threes.solveIn(u, 10, "U");
-        System.out.println("Solution to 'U': " + solution);
-        String[] solutionMoves = AlgorithmBuilder.splitAlgorithm(solution);
-        azzert(!solutionMoves[0].startsWith("U"));
-        CubeState shouldBeSolved = (CubeState) u.applyAlgorithm(solution);
-        azzert(shouldBeSolved.isSolved());
     }
 
     private static void testCubeNormalization() throws InvalidScrambleException, InvalidMoveException {

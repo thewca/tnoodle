@@ -33,13 +33,13 @@ def main():
     assert psag2.generator == "F 4Uw"
 
     ab = AlgorithmBuilder(fives, MergingMode.NO_MERGING)
-    ab.appendAlgorithm("D U")
+    ab.appendAlgorithm("D U D U")
     psag1 = ab.getStateAndGenerator()
     psag2 = fives.applyOrientation(reorient, psag1)
-    # The scramble (D U) and the reorient (4Uw) are redundant.
-    # The problematic D and U turns should be removed, and the resulting
-    # scramble should be "4Uw"
-    assert psag2.generator == "4Uw"
+    # The scramble (D U D U) and the reorient (4Uw) are redundant.
+    # The problematic D turns should be removed, and the resulting
+    # scramble should be "U U 4Uw"
+    assert psag2.generator == "U U 4Uw"
 
 if __name__ == "__main__":
     main()

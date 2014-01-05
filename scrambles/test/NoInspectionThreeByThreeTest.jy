@@ -1,0 +1,22 @@
+import puzzle.ThreeByThreeCubePuzzle as ThreeByThreeCubePuzzle
+import puzzle.NoInspectionThreeByThreeCubePuzzle as NoInspectionThreeByThreeCubePuzzle
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder as AlgorithmBuilder
+
+import tntdebug
+
+def main():
+    threes = ThreeByThreeCubePuzzle()
+    solved = threes.getSolvedState()
+
+    # Search for a solution to a cube scrambled with U,
+    # but require that that solution not start with a U turn.
+    u = solved.apply("U")
+    solution = threes.solveIn(u, 10, "U")
+    print "Solution to 'U': %s" % solution
+    solutionMoves = AlgorithmBuilder.splitAlgorithm(solution)
+    assert not solutionMoves[0].startswith("U")
+    shouldBeSolved = u.applyAlgorithm(solution)
+    assert shouldBeSolved.isSolved()
+
+if __name__ == "__main__":
+    main()

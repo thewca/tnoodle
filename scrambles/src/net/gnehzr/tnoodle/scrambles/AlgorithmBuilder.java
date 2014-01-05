@@ -26,7 +26,6 @@ public class AlgorithmBuilder {
      * if we had just naively appended turns.
      */
     private PuzzleState originalState, unNormalizedState;
-    private ArrayList<String> unModifiedMoves = new ArrayList<String>();
     private MergingMode mergingMode = MergingMode.NO_MERGING;
     public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode) {
         this(puzzle, mergingMode, puzzle.getSolvedState());
@@ -40,7 +39,6 @@ public class AlgorithmBuilder {
     private void resetToState(PuzzleState originalState) {
         this.originalState = originalState;
         this.unNormalizedState = originalState;
-        this.unModifiedMoves.clear();
         this.moves.clear();
         this.states.clear();
         states.add(unNormalizedState);
@@ -91,16 +89,16 @@ public class AlgorithmBuilder {
         return indexAndMove.index < moves.size() || indexAndMove.move == null;
     }
 
-    private static class IndexAndMove {
-        int index;
-        String move;
+    public static class IndexAndMove {
+        public int index;
+        public String move;
         public IndexAndMove(int index, String move) {
             this.index = index;
             this.move = move;
         }
     }
 
-    private IndexAndMove findBestIndexForMove(String move, MergingMode mergingMode) throws InvalidMoveException {
+    public IndexAndMove findBestIndexForMove(String move, MergingMode mergingMode) throws InvalidMoveException {
         if(mergingMode == MergingMode.NO_MERGING) {
             return new IndexAndMove(moves.size(), move);
         }
@@ -185,21 +183,19 @@ public class AlgorithmBuilder {
         }
 
         unNormalizedState = unNormalizedState.apply(newMove);
-        unModifiedMoves.add(newMove);
         azzert(states.size() == moves.size() + 1);
         azzert(unNormalizedState.equalsNormalized(getState()));
     }
 
-    public String popMove() {
-        ArrayList<String> unModifiedMovesCopy = new ArrayList<String>(unModifiedMoves);
-        String poppedMove = unModifiedMovesCopy.remove(unModifiedMovesCopy.size() - 1);
+    public String popMove(int index) {
+        ArrayList<String> movesCopy = new ArrayList<String>(moves);
+        String poppedMove = movesCopy.remove(index);
 
         moves.clear();
         states.clear();
-        unModifiedMoves.clear();
         unNormalizedState = originalState;
         states.add(unNormalizedState);
-        for(String move : unModifiedMovesCopy) {
+        for(String move : movesCopy) {
             try {
                 appendMove(move);
             } catch(InvalidMoveException e) {

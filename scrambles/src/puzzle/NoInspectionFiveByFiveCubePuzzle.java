@@ -7,6 +7,7 @@ import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
+import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.IndexAndMove;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import org.timepedia.exporter.client.Export;
 
@@ -73,7 +74,8 @@ public class NoInspectionFiveByFiveCubePuzzle extends CubePuzzle {
             // quality of our scrambles to do this.
             String firstReorientMove = randomOrientation[0].toString();
             while(ab.isRedundant(firstReorientMove)) {
-                ab.popMove();
+                IndexAndMove im = ab.findBestIndexForMove(firstReorientMove, MergingMode.CANONICALIZE_MOVES);
+                ab.popMove(im.index);
             }
             for(CubeMove cm : randomOrientation) {
                 ab.appendMove(cm.toString());
