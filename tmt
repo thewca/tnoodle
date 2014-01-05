@@ -10,6 +10,7 @@ import datetime
 import atexit
 
 javaEEProjectName = "javaee-api-6.0.jar"
+JYTHON_JAR = "lib/jython-standalone-2.7-b1.jar"
 
 # Terribly useful debugging tweaks
 import cgitb
@@ -298,6 +299,17 @@ class tmt:
                 if s.startswith('"') or s.startswith("'"):
                     print("Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s))
 
+    def _jython(self):
+        # Search for all java projects, and add them to the classpath
+        entities = set()
+        for project in tmt.TmtProject.projects.values():
+            if issubclass(type(project), EclipseProject):
+                entities.update(project.getClasspathEntities())
+        entities.add(JYTHON_JAR)
+        classpath = EclipseProject.toClasspath(entities)
+        args = []
+        tmt.java("org.python.util.jython", classpath, args, quiet=True)
+
     def _make(self, projectName=None, command=None):
         if projectName is None:
             projectName = tmt.args.project
@@ -421,6 +433,13 @@ class tmt:
             formatter_class=ArgumentDefaultsHelpFormatter)
         subparsers = self.parser.add_subparsers(help='Available commands', dest='subparser_name')
         subparsers.required = True # Something changed in python 3 (see http://hg.python.org/cpython/rev/cab204a79e09), so dumb
+
+        desc = 'Open jython interpreter'
+        parser_jython = subparsers.add_parser(
+            'jython',
+            help=desc, description=desc,
+            formatter_class=ArgumentDefaultsHelpFormatter)
+        parser_jython.set_defaults(func=self._jython)
 
         desc = 'Make stuff'
         parser_make = subparsers.add_parser(
@@ -619,7 +638,7 @@ class tmt:
             matches |= set( relpath(join(root, f), relativeTo) for f in files if pattern.match(f) )
         return matches
 
-    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False, maxMemory=None):
+    def java(self, main, classpath='', args=[], debug=None, profile=None, wait=True, captureOutput=False, maxMemory=None, quiet=False):
         command = []
         assert debug in [ None, 'jdb', 'attach' ]
         if debug == 'jdb':
@@ -640,7 +659,8 @@ class tmt:
             command.append('-Xmx' + maxMemory)
         command.append(main)
         command += args
-        print(" ".join(command))
+        if not quiet:
+            print(" ".join(command))
         stdout = None
         stderr = None
         if captureOutput:
@@ -880,7 +900,8 @@ class EclipseProject(TmtProject):
             classpath |= project.getClasspathEntities(includeResources=includeResources, includeCompileTimeOnlyDependencies=includeCompileTimeOnlyDependencies, includeSrc=includeSrc)
         return classpath
 
-    def toClasspath(self, entities):
+    @staticmethod
+    def toClasspath(entities):
         separator = None
         if setupWindowsCygwinSymlinking.windowsOrCygwin():
             separator = ';'
@@ -1025,7 +1046,7 @@ class EclipseProject(TmtProject):
                 # bin was just built, so it actually does exist
                 entities.add(self.bin)
 
-            classpath = self.toClasspath(entities)
+            classpath = EclipseProject.toClasspath(entities)
             if classpath:
                 args += [ '-classpath', classpath ]
             args += javaFiles
@@ -1163,7 +1184,7 @@ Implementation-Version: %s
 
         retVal = tmt.java(
                 main=main,
-                classpath=self.toClasspath(classpath),
+                classpath=EclipseProject.toClasspath(classpath),
                 args=args,
                 debug=tmt.args.debug,
                 profile=tmt.args.profile,
@@ -1179,7 +1200,7 @@ Implementation-Version: %s
 
         for testClass in self.tests:
             assert 0 == tmt.java(main=testClass,
-                 classpath=self.toClasspath(self.getClasspathEntities()))
+                 classpath=EclipseProject.toClasspath(self.getClasspathEntities()))
 
     def clean(self):
         print('Cleaning: %s' % self.name)
