@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-OLD_PWD=$PWD
-cd "$(dirname "$0")"
+GIT_ROOT="$(dirname "$0")"
 
-CLASSPATH=`./tmt graph --show-classpath`
-CLASSPATH=$CLASSPATH:lib/jython-standalone-2.7-b1.jar
-JYTHONPATH="." exec java -cp $CLASSPATH org.python.util.jython "$OLD_PWD/$@"
+CLASSPATH=`$GIT_ROOT/tmt graph --show-classpath`
+CLASSPATH=$CLASSPATH:$GIT_ROOT/lib/jython-standalone-2.7-b1.jar
+JYTHONPATH="$GIT_ROOT" exec java -cp $CLASSPATH org.python.util.jython "$@"
