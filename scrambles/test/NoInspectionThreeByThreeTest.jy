@@ -1,22 +1,55 @@
-import puzzle.ThreeByThreeCubePuzzle as ThreeByThreeCubePuzzle
+import puzzle.NoInspectionThreeByThreeCubePuzzle as NoInspectionThreeByThreeCubePuzzle
 import puzzle.NoInspectionThreeByThreeCubePuzzle as NoInspectionThreeByThreeCubePuzzle
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder as AlgorithmBuilder
+import net.gnehzr.tnoodle.utils.Utils as Utils
+r = Utils.getSeededRandom()
 
 import tntdebug
 
 def main():
-    threes = ThreeByThreeCubePuzzle()
+    threes = NoInspectionThreeByThreeCubePuzzle()
     solved = threes.getSolvedState()
 
-    # Search for a solution to a cube scrambled with U,
-    # but require that that solution not start with a U turn.
-    u = solved.apply("U")
-    solution = threes.solveIn(u, 10, "U")
-    print "Solution to 'U': %s" % solution
-    solutionMoves = AlgorithmBuilder.splitAlgorithm(solution)
-    assert not solutionMoves[0].startswith("U")
-    shouldBeSolved = u.applyAlgorithm(solution)
-    assert shouldBeSolved.isSolved()
+    faces =    "URFDLB"
+    oppFaces = "DLBURF"
+    faceToOppFace = dict(zip(faces, oppFaces))
+
+    def testSolveIn(scramble, restriction):
+        # Search for a solution to a cube scrambled with scramble,
+        # but require that that solution not start with restriction
+        u = solved.apply(scramble)
+        solution = threes.solveIn(u, 20, restriction)
+        print "Solution to %s (restriction %s): %s" % (scramble, restriction, solution)
+        # restriction defines an axis of turns that may not start a solution,
+        # so we assert the solution starts with neither restriction, nor
+        # the face opposite restriction.
+        assert not solution.startswith(restriction)
+        assert not solution.startswith(faceToOppFace[restriction])
+        shouldBeSolved = u.applyAlgorithm(solution)
+        assert shouldBeSolved.isSolved()
+
+    for face in faces:
+        for p in [ "", "2", "'" ]:
+            oppFace = faceToOppFace[face]
+            for restriction in [ face, oppFace ]:
+                testSolveIn(face + p, restriction)
+
+    scrambled = solved.applyAlgorithm("L' R2 U D2 L2")
+    solution = threes.solveIn(scrambled, 20, "L")
+    assert not solution.startswith("L")
+    assert scrambled.applyAlgorithm(solution).isSolved()
+
+    # min2phase can look at the inverse of a given cube and try to solve it.
+    # This can screw up restricting the first turn, however. Check that
+    # min2phase handles this correctly. This particular
+    # scramble and restriction caused tickled this behavior originally.
+    scrambled = solved.applyAlgorithm("F D B L' U L' F D' L2 D L' B2 D F2 U B2 R2 U D2 L2")
+    solution = threes.solveIn(scrambled, 20, "L")
+    assert not solution.startswith("L")
+    assert scrambled.applyAlgorithm(solution).isSolved()
+
+    for i in range(10):
+        print threes.generateWcaScramble(r)
 
 if __name__ == "__main__":
     main()

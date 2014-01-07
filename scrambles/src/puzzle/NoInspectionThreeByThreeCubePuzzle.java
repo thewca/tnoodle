@@ -1,10 +1,9 @@
 package puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static puzzle.NoInspectionFiveByFiveCubePuzzle.applyOrientation;
 
 import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import org.timepedia.exporter.client.Export;
 
 @Export
@@ -15,18 +14,20 @@ public class NoInspectionThreeByThreeCubePuzzle extends ThreeByThreeCubePuzzle {
 
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
-        PuzzleStateAndGenerator psag = super.generateRandomMoves(r);
-        String scramble = psag.generator;
-        scramble += " Rw Bw";//<<<
-        CubeState state = getSolvedState();
-        try {
-            state = (CubeState) state.applyAlgorithm(scramble);
-        } catch(InvalidScrambleException e) {
-            azzert(false, e);
+        CubeMove[] randomOrientation = randomOrientationMoves[r.nextInt(randomOrientationMoves.length)];
+        String firstMoveRestriction;
+        if(randomOrientation.length > 0) {
+            Face restrictedFace = randomOrientation[0].face;
+            // Restrictions are for an entire axis, so this will also
+            // prevent the oppossite of restrictedFace from being the first
+            // move of our solution. This ensures that randomOrientation will
+            // never been redundant with our scramble.
+            firstMoveRestriction = restrictedFace.toString();
+        } else {
+            firstMoveRestriction = null;
         }
-
-        psag.generator = scramble;
-        psag.state = state;
+        PuzzleStateAndGenerator psag = super.generateRandomMoves(r, firstMoveRestriction);
+        psag = applyOrientation(this, randomOrientation, psag, false);
         return psag;
     }
 

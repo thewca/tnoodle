@@ -6,6 +6,7 @@ import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Rectangle;
 import net.gnehzr.tnoodle.svglite.Svg;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -81,9 +82,42 @@ public class CubePuzzle extends Puzzle {
     private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
 
     protected final int size;
+    protected CubeMove[] randomUFaceMoves, randomFFaceMoves;
+    protected CubeMove[][] randomOrientationMoves;
     public CubePuzzle(int size) {
         azzert(size >= 0 && size < DEFAULT_LENGTHS.length, "Invalid cube size");
         this.size = size;
+
+        randomUFaceMoves = new CubeMove[] {
+            null,
+            new CubeMove(Face.R, 1, size - 2),
+            new CubeMove(Face.R, 2, size - 2),
+            new CubeMove(Face.R, 3, size - 2),
+            new CubeMove(Face.F, 1, size - 2),
+            new CubeMove(Face.F, 3, size - 2)
+        };
+        randomFFaceMoves = new CubeMove[] {
+            null,
+            new CubeMove(Face.U, 1, size - 2),
+            new CubeMove(Face.U, 2, size - 2),
+            new CubeMove(Face.U, 3, size - 2)
+        };
+        randomOrientationMoves = new CubeMove[randomUFaceMoves.length * randomFFaceMoves.length][];
+        int i = 0;
+        for(CubeMove randomUFaceMove : randomUFaceMoves) {
+            for(CubeMove randomFFaceMove : randomFFaceMoves) {
+                ArrayList<CubeMove> moves = new ArrayList<CubeMove>();
+                if(randomUFaceMove != null) {
+                    moves.add(randomUFaceMove);
+                }
+                if(randomFFaceMove != null) {
+                    moves.add(randomFFaceMove);
+                }
+                CubeMove[] movesArr = moves.toArray(new CubeMove[moves.size()]);
+                randomOrientationMoves[i++] = movesArr;
+            }
+        }
+
     }
 
     @Override

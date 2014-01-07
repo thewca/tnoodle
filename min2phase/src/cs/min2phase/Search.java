@@ -51,7 +51,7 @@ public class Search {
 	private long timeOut;
 	private long timeMin;
 	private int verbose;
-        private int firstAxisRestriction = 10;
+	private int firstAxisRestriction = -1;
 	private CubieCube cc = new CubieCube();
 
 	/**
@@ -77,13 +77,13 @@ public class Search {
 	 * 		is the cube definition string format.<br>
 	 * The names of the facelet positions of the cube:
 	 * <pre>
-	 *             |************|
-	 *             |*U1**U2**U3*|
-	 *             |************|
-	 *             |*U4**U5**U6*|
-	 *             |************|
-	 *             |*U7**U8**U9*|
-	 *             |************|
+	 *	     |************|
+	 *	     |*U1**U2**U3*|
+	 *	     |************|
+	 *	     |*U4**U5**U6*|
+	 *	     |************|
+	 *	     |*U7**U8**U9*|
+	 *	     |************|
 	 * ************|************|************|************|
 	 * *L1**L2**L3*|*F1**F2**F3*|*R1**R2**F3*|*B1**B2**B3*|
 	 * ************|************|************|************|
@@ -91,13 +91,13 @@ public class Search {
 	 * ************|************|************|************|
 	 * *L7**L8**L9*|*F7**F8**F9*|*R7**R8**R9*|*B7**B8**B9*|
 	 * ************|************|************|************|
-	 *             |************|
-	 *             |*D1**D2**D3*|
-	 *             |************|
-	 *             |*D4**D5**D6*|
-	 *             |************|
-	 *             |*D7**D8**D9*|
-	 *             |************|
+	 *	     |************|
+	 *	     |*D1**D2**D3*|
+	 *	     |************|
+	 *	     |*D4**D5**D6*|
+	 *	     |************|
+	 *	     |*D7**D8**D9*|
+	 *	     |************|
 	 * </pre>
 	 * A cube definition string "UBL..." means for example: In position U1 we have the U-color, in position U2 we have the
 	 * B-color, in position U3 we have the L color etc. according to the order U1, U2, U3, U4, U5, U6, U7, U8, U9, R1, R2,
@@ -119,10 +119,10 @@ public class Search {
 	 *
 	 * @param verbose
 	 * 		determines the format of the solution(s). see USE_SEPARATOR, INVERSE_SOLUTION, APPEND_LENGTH
-         *
-         * @param firstFaceRestriction
-         *              The solution generated will not start by turning
-         *              the face specified by firstFaceRestriction.
+	 *
+	 * @param firstFaceRestriction
+	 *	      The solution generated will not start by turning
+	 *	      any face on the axis of firstFaceRestriction.
 	 *
 	 * @return The solution string or an error code:<br>
 	 * 		Error 1: There is not exactly one facelet of each colour<br>
@@ -145,21 +145,28 @@ public class Search {
 		this.timeMin = this.timeOut + Math.min(timeMin - timeOut, 0);
 		this.verbose = verbose;
 		this.solution = null;
-                if(firstFaceRestriction != null) {
-                    if(!Util.str2move.containsKey(firstFaceRestriction)) {
-                        return "Error 9";
-                    }
-                    firstAxisRestriction = Util.str2move.get(firstFaceRestriction);
-                    if(firstAxisRestriction % 3 != 0) {
-                        return "Error 9";
-                    }
-                }
+		if(firstFaceRestriction != null) {
+			if(!Util.str2move.containsKey(firstFaceRestriction)) {
+				return "Error 9";
+			}
+			firstAxisRestriction = Util.str2move.get(firstFaceRestriction);
+			if(firstAxisRestriction % 3 != 0) {
+				return "Error 9";
+			}
+			if(firstAxisRestriction - 9 < 0) {
+				// firstFaceRestriction defines an axis of turns that
+				// aren't permitted. Make sure we restrict the entire
+				// axis, and not just one of the faces. See the axis
+				// filtering in phase1() for more details.
+				firstAxisRestriction += 9;
+			}
+		}
 		return solve(cc);
 	}
 
 	public synchronized String solution(String facelets, int maxDepth, long timeOut, long timeMin, int verbose) {
-            return solution(facelets, maxDepth, timeOut, timeMin, verbose, null);
-        }
+		return solution(facelets, maxDepth, timeOut, timeMin, verbose, null);
+	}
 
 	int verify(String facelets) {
 		int count = 0x000000;
@@ -223,6 +230,15 @@ public class Search {
 		for (depth1=0; depth1<sol; depth1++) {
 			maxDep2 = Math.min(12, sol-depth1);
 			for (urfIdx=0; urfIdx<6; urfIdx++) {
+				if(firstAxisRestriction != -1 && urfIdx >= 3) {
+					// When urfIdx >= 3, we're solving the
+					// inverse cube. This doesn't work
+					// when we're also restricting the 
+					// first turn, so we just skip inverse
+					// solutions when firstAxisRestriction has
+					// been set.
+					continue;
+				}
 				if ((conjMask & (1 << urfIdx)) != 0) {
 					continue;
 				}
@@ -230,9 +246,10 @@ public class Search {
 				mid4[0] = slice[urfIdx];
 				ud8e[0] = ud8e0[urfIdx];
 				valid1 = 0;
+				int lm = firstAxisRestriction == -1 ? -1 : CubieCube.urfMoveInv[urfIdx][firstAxisRestriction]/3*3;
 				if ((prun[urfIdx] <= depth1)
 						&& phase1(twist[urfIdx]>>>3, twist[urfIdx]&7, flip[urfIdx]>>>3, flip[urfIdx]&7,
-							slice[urfIdx]&0x1ff, depth1, firstAxisRestriction) == 0) {
+							slice[urfIdx]&0x1ff, depth1, lm) == 0) {
 					return solution == null ? "Error 8" : solution;
 				}
 			}
@@ -352,7 +369,8 @@ public class Search {
 			return prun > maxDep2 ? 2 : 1;
 		}
 
-		int lm = depth1==0 ? firstAxisRestriction : Util.std2ud[move[depth1-1]/3*3+1];
+		int firstAxisRestrictionUd = firstAxisRestriction == -1 ? 10 : Util.std2ud[CubieCube.urfMoveInv[urfIdx][firstAxisRestriction]/3*3+1];
+		int lm = depth1==0 ? firstAxisRestrictionUd : Util.std2ud[move[depth1-1]/3*3+1];
 		for (int depth2=prun; depth2<maxDep2; depth2++) {
 			if (phase2(edge, esym, cidx, csym, mid, depth2, depth1, lm)) {
 				sol = depth1 + depth2;

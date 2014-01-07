@@ -64,10 +64,9 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
         return solution;
     }
 
-    @Override
-    public PuzzleStateAndGenerator generateRandomMoves(Random r) {
+    public PuzzleStateAndGenerator generateRandomMoves(Random r, String firstMoveRestriction) {
         String randomState = Tools.randomCube(r);
-        String scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION).trim();
+        String scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION, firstMoveRestriction).trim();
 
         AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES);
         try {
@@ -76,5 +75,9 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
             azzert(false, new InvalidScrambleException(scramble, e));
         }
         return ab.getStateAndGenerator();
+    }
+    @Override
+    public PuzzleStateAndGenerator generateRandomMoves(Random r) {
+        return generateRandomMoves(r, null);
     }
 }

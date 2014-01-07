@@ -4,8 +4,6 @@ from puzzle.CubePuzzle import CubeMove
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator as PuzzleStateAndGenerator
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder as AlgorithmBuilder
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode as MergingMode
-import net.gnehzr.tnoodle.utils.Utils as Utils
-r = Utils.getSeededRandom()
 
 import tntdebug
 

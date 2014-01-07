@@ -61,6 +61,17 @@ class CubieCube {
 											{2, 1, 0, 5, 4, 3, 8, 7, 6,11,10, 9,14,13,12,17,16,15},
 											{8, 7, 6, 2, 1, 0, 5, 4, 3,17,16,15,11,10, 9,14,13,12},
 											{5, 4, 3, 8, 7, 6, 2, 1, 0,14,13,12,17,16,15,11,10, 9}};
+	static byte[][] urfMoveInv = new byte[urfMove.length][];
+	static {
+		for(int urfIdx = 0; urfIdx < urfMove.length; urfIdx++) {
+			byte[] urfMoveArr = urfMove[urfIdx];
+			byte[] urfMoveArrInv = new byte[urfMoveArr.length];
+			urfMoveInv[urfIdx] = urfMoveArrInv;
+			for(byte m = 0; m < urfMoveArr.length; m++) {
+				urfMoveArrInv[urfMoveArr[m]] = m;
+			}
+		}
+	}
 
 	byte[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
 	byte[] co = {0, 0, 0, 0, 0, 0, 0, 0};
