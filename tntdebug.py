@@ -5,6 +5,12 @@ import pdb
 import cgitb
 import traceback
 
+if sys.executable is None:
+    # If sys.executable is None, it will cause an exception inside of
+    # cgitb at this line:
+    #  pyver = 'Python ' + sys.version.split()[0] + ': ' + sys.executable
+    sys.executable = "Jython?"
+
 try:
     import java.lang.Throwable as Throwable
 except ImportError:
@@ -12,7 +18,6 @@ except ImportError:
     # Do nothing, we're just running in pure python
     pass
 
-cgitb.enable(display=True, format='text')
 def excepthook(etype, value, tb):
     # Added this line for debugging why https://travis-ci.org/cubing/tnoodle/builds/15966902
     # hit pdb instead of just printing a traceback and exiting.
@@ -23,7 +28,7 @@ def excepthook(etype, value, tb):
     isTravisCiBuild = os.environ.get('TRAVIS_BRANCH', None)
     if not sys.stdout.isatty() or not sys.stderr.isatty() or not sys.stdin.isatty() or isTravisCiBuild:
         # stdin, stdout, or stderr is redirected, so don't enter pdb
-        sys.__excepthook__(etype, value, tb)
+        sys.stderr.write(cgitb.text((etype, value, tb)))
     else:
         if tb:
             traceback.print_exception(etype, value, tb)
