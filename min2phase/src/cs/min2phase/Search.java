@@ -51,7 +51,7 @@ public class Search {
 	private long timeOut;
 	private long timeMin;
 	private int verbose;
-	private int firstAxisRestriction = -1;
+	private int firstAxisRestriction;
 	private CubieCube cc = new CubieCube();
 
 	/**
@@ -145,6 +145,7 @@ public class Search {
 		this.timeMin = this.timeOut + Math.min(timeMin - timeOut, 0);
 		this.verbose = verbose;
 		this.solution = null;
+                this.firstAxisRestriction = -1;
 		if(firstFaceRestriction != null) {
 			if(!Util.str2move.containsKey(firstFaceRestriction)) {
 				return "Error 9";
