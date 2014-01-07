@@ -46,6 +46,7 @@ def main():
     scrambled = solved.applyAlgorithm("F D B L' U L' F D' L2 D L' B2 D F2 U B2 R2 U D2 L2")
     solution = threes.solveIn(scrambled, 20, "L")
     assert not solution.startswith("L")
+    assert not solution.startswith("R")
     assert scrambled.applyAlgorithm(solution).isSolved()
 
     for i in range(10):
