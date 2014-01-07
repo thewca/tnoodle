@@ -9,8 +9,8 @@ class Project(tmt.EclipseProject):
         tmt.WinstoneServer.addPlugin(self)
 
         self.unifiedHtmlFiles = {
-            join(self.distDir, "tnt.html"): "http://localhost:8080/tnt/",
-            join(self.distDir, "bld.html"): "http://localhost:8080/tnt/bld.html"
+            join(self.distDir, "tnt.html"): "http://localhost:2014/tnt/",
+            join(self.distDir, "bld.html"): "http://localhost:2014/tnt/bld.html"
         }
 
     def dist(self, noRemake=False, implementationTitle=None):

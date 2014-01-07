@@ -4,7 +4,7 @@ Database Structure
 
 TODO - document how to create a competition/create a page for it
 
-    http://localhost:8080/h2
+    http://localhost:2014/h2
 
     MERGE INTO competitions (id, admin_pw, intro_pw, country, date_b, date_e, name, place, website) VALUES(0, 'pass', 'pass', 'AF', now(), now()+100, 'Foo comp', 'Place', 'foo.bar.com');
 

@@ -53,6 +53,8 @@ public class TNoodleServer {
     public static String NAME = Utils.getProjectName();
     public static String VERSION = Utils.getVersion();
 
+    private static final int TNOODLE_PORT = 2014;
+
     private static final int MIN_HEAP_SIZE_MEGS = 512;
 
     private static final String ICONS_FOLDER = "icons";
@@ -292,7 +294,7 @@ public class TNoodleServer {
         OptionParser parser = new OptionParser();
         OptionSpec<Integer> httpPortOpt = parser.acceptsAll(Arrays.asList("p", "http"),
                 "The port to run the http server on")
-            .withRequiredArg().ofType(Integer.class).defaultsTo(8080);
+            .withRequiredArg().ofType(Integer.class).defaultsTo(TNOODLE_PORT);
         OptionSpec<?> noBrowserOpt = parser.acceptsAll(Arrays.asList("n", "nobrowser"),
                 "Don't open the browser when starting the server");
         OptionSpec<?> noUpgradeOpt = parser.acceptsAll(Arrays.asList("u", "noupgrade"),

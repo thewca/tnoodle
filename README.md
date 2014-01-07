@@ -35,7 +35,7 @@ Get a high level view of all the projects that comprise tnoodle by running:
 
 ### WCA Scramble Program
 
-When you're ready to develop, run the following and then visit <http://localhost:8080/scramble/>
+When you're ready to develop, run the following and then visit <http://localhost:2014/scramble/>
 
     ./tmt make run -p wca
 
@@ -65,7 +65,7 @@ You can build the `timer` distribution similarly to `wca`:
     # Run .jar file from commandline
     java -jar timer/dist/TNoodle-timer.jar
 
-When TNoodle is running, TNT will be available at <http://localhost:8080/tnt>.
+When TNoodle is running, TNT will be available at <http://localhost:2014/tnt>.
 
 Other projects can be run similarly, too. Run `./tmt graph --descriptions` to see the current list.
 

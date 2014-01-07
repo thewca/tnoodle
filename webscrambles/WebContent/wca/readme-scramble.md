@@ -6,7 +6,7 @@ Visit [/scramble](/scramble) to use the scrambler, or go to [/readme](/readme) t
 
 TNoodle is a Java project started by Jeremy Fleischman. It provides a single program to generate official scrambles for WCA competitions. It should be relatively easy to use:
 
-1. Run the .jar file on your computer. It will open the page <http://localhost:8080/scramble> in your browser.
+1. Run the .jar file on your computer. It will open the page <http://localhost:2014/scramble> in your browser.
 2. Enter the details for your competition (competition name, number of rounds for each event, details for each round). If you would like to password protect the file, enter a password.
 3. Wait for the loading bar to finish and click the "Scramble!" button that appears. A `.zip` file will download in your browser.
 
