@@ -133,14 +133,17 @@ public class ClockPuzzle extends Puzzle {
 
         private boolean[] pins;
         private int[] posit;
+        private boolean rightSideUp;
         public ClockState() {
             pins = new boolean[] {false, false, false, false};
             posit = new int[] {0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0};
+            rightSideUp = true;
         }
 
-        public ClockState(boolean[] pins, int[] posit) {
+        public ClockState(boolean[] pins, int[] posit, boolean rightSideUp) {
             this.pins = pins;
             this.posit = posit;
+            this.rightSideUp = rightSideUp;
         }
 
         @Override
@@ -161,7 +164,7 @@ public class ClockPuzzle extends Puzzle {
                     boolean clockwise = ( rot < 7 );
                     String move = turns[turn] + (clockwise?(rot+"+"):((12-rot)+"-"));
 
-                    successors.put(move, new ClockState(pinsCopy, positCopy));
+                    successors.put(move, new ClockState(pinsCopy, positCopy, rightSideUp));
                 }
             }
 
@@ -171,7 +174,7 @@ public class ClockPuzzle extends Puzzle {
             System.arraycopy(posit, 0, positCopy, 9, 9);
             System.arraycopy(posit, 9, positCopy, 0, 9);
             System.arraycopy(pins, 0, pinsCopy, 0, 4);
-            successors.put("y2", new ClockState(pinsCopy, positCopy));
+            successors.put("y2", new ClockState(pinsCopy, positCopy, !rightSideUp));
 
             // Pins position moves
             for(int pin = 0; pin < 4; pin++) {
@@ -182,7 +185,7 @@ public class ClockPuzzle extends Puzzle {
                 int pinI = (pin==0?1:(pin==1?3:(pin==2?2:0)));
                 pinsC[pinI] = true;
 
-                successors.put(turns[pin], new ClockState(pinsC, positC));
+                successors.put(turns[pin], new ClockState(pinsC, positC, rightSideUp));
             }
 
             return successors;
@@ -214,7 +217,12 @@ public class ClockPuzzle extends Puzzle {
         }
 
         protected void drawBackground(Svg g, HashMap<String, Color> colorScheme) {
-            String[] colorString = {"Front", "Back"};
+            String[] colorString;
+            if(rightSideUp) {
+                colorString = new String[]{"Front", "Back"};
+            } else {
+                colorString = new String[]{"Back", "Front"};
+            }
 
             for(int s = 0; s < 2; s++) {
                 Transform t = Transform.getTranslateInstance((s*2+1)*(radius + gap), radius + gap);
