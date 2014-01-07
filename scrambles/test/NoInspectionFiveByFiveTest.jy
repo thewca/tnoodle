@@ -1,4 +1,4 @@
-import puzzle.NoInspectionFiveByFiveCubePuzzle
+import puzzle.NoInspectionFiveByFiveCubePuzzle as NoInspectionFiveByFiveCubePuzzle
 from puzzle.CubePuzzle import Face
 from puzzle.CubePuzzle import CubeMove
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator as PuzzleStateAndGenerator
@@ -8,7 +8,7 @@ import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode as MergingMode
 import tntdebug
 
 def main():
-    fives = puzzle.NoInspectionFiveByFiveCubePuzzle()
+    fives = NoInspectionFiveByFiveCubePuzzle()
 
     reorient = [ CubeMove(fives, Face.U, 1, 3) ]
     assert reorient[0].toString() == "4Uw"
@@ -16,7 +16,7 @@ def main():
     ab = AlgorithmBuilder(fives, MergingMode.NO_MERGING)
     ab.appendAlgorithm("F R")
     psag1 = ab.getStateAndGenerator()
-    psag2 = fives.applyOrientation(reorient, psag1)
+    psag2 = NoInspectionFiveByFiveCubePuzzle.applyOrientation(fives, reorient, psag1, True)
     # The scramble (F R) and the reorient (4Uw) don't conflict,
     # so the resulting scramble should be "F R 4Uw"
     assert psag2.generator == "F R 4Uw"
@@ -24,7 +24,7 @@ def main():
     ab = AlgorithmBuilder(fives, MergingMode.NO_MERGING)
     ab.appendAlgorithm("F D")
     psag1 = ab.getStateAndGenerator()
-    psag2 = fives.applyOrientation(reorient, psag1)
+    psag2 = NoInspectionFiveByFiveCubePuzzle.applyOrientation(fives, reorient, psag1, True)
     # The scramble (F D) and the reorient (4Uw) are redundant.
     # The problematic D turn should be removed, and the resulting
     # scramble should be "F 4Uw"
@@ -33,7 +33,7 @@ def main():
     ab = AlgorithmBuilder(fives, MergingMode.NO_MERGING)
     ab.appendAlgorithm("D U D U")
     psag1 = ab.getStateAndGenerator()
-    psag2 = fives.applyOrientation(reorient, psag1)
+    psag2 = NoInspectionFiveByFiveCubePuzzle.applyOrientation(fives, reorient, psag1, True)
     # The scramble (D U D U) and the reorient (4Uw) are redundant.
     # The problematic D turns should be removed, and the resulting
     # scramble should be "U U 4Uw"
