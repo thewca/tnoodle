@@ -17,9 +17,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map.Entry;
-import java.util.Queue;
+import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -291,105 +290,145 @@ public abstract class Puzzle implements Exportable {
         return new Dimension(resultWidth, resultHeight);
     }
 
+    private class PuzzleStateAndDistance implements Comparable<PuzzleStateAndDistance> {
+        PuzzleState state;
+        int distance;
+        public PuzzleStateAndDistance(PuzzleState state, int distance) {
+            this.state = state;
+            this.distance = distance;
+        }
+
+        @Override
+        public int compareTo(PuzzleStateAndDistance other) {
+            return this.distance - other.distance;
+        }
+
+        public boolean equals(Object other) {
+            PuzzleStateAndDistance o = (PuzzleStateAndDistance) other;
+            return o.state == this.state && o.distance == this.distance;
+        }
+
+        public int hashCode() {
+            // It's fine to ignore distance, as we shouldn't place
+            // two PuzzleStateAndDistance objects with the same state in
+            // the same collection.
+            return state.hashCode();
+        }
+    }
+
     protected String solveIn(PuzzleState ps, int n) {
         if(ps.isSolved()) {
             return "";
         }
 
-        // For debugging purpose.
-        boolean enableSpeedup = true;
-
         HashMap<PuzzleState, Integer> seenSolved = new HashMap<PuzzleState, Integer>();
-        Queue<PuzzleState> fringeSolved = new LinkedList<PuzzleState>();
+        PriorityQueue<PuzzleStateAndDistance> fringeSolved = new PriorityQueue<PuzzleStateAndDistance>();
         HashMap<PuzzleState, Integer> seenScrambled = new HashMap<PuzzleState, Integer>();
-        Queue<PuzzleState> fringeScrambled = new LinkedList<PuzzleState>();
+        PriorityQueue<PuzzleStateAndDistance> fringeScrambled = new PriorityQueue<PuzzleStateAndDistance>();
 
         // We are using references for a more concise code.
         HashMap<PuzzleState, Integer> seenExtending;
-        Queue<PuzzleState> fringeExtending;
+        PriorityQueue<PuzzleStateAndDistance> fringeExtending;
         HashMap<PuzzleState, Integer> seenComparing;
+        PriorityQueue<PuzzleStateAndDistance> fringeComparing;
 
-        PuzzleState node = getSolvedState();
-        PuzzleState solved = getSolvedState();
-        fringeSolved.add(solved);
-        seenSolved.put(solved, 0);
-        if(enableSpeedup) {
-            fringeScrambled.add(ps.getNormalized());
-        }
-        seenScrambled.put(ps.getNormalized(), 0);
+        // We're only interested in solutions of cost <= n
+        int bestIntersectionCost = n + 1;
+        PuzzleState bestIntersection = null;
+
+        PuzzleState solvedNormalized = getSolvedState().getNormalized();
+        fringeSolved.add(new PuzzleStateAndDistance(solvedNormalized, 0));
+
+        fringeScrambled.add(new PuzzleStateAndDistance(ps.getNormalized(), 0));
 
         TimedLogRecordStart start = new TimedLogRecordStart(Level.FINER, "Searching for solution in " + n + " moves.");
         l.log(start);
 
-        boolean found = false;
-        int max_distance = enableSpeedup ? (n+1)/2 : n;
+        PriorityQueue<PuzzleStateAndDistance> intersections;
 
         // The task here is to do a breadth-first search starting from both the solved state and the scrambled state.
         // When we got an intersection from the two hash maps, we are done!
-        outer:
-        while(!(fringeSolved.isEmpty() && fringeScrambled.isEmpty())) {
+        while(!fringeSolved.isEmpty() && !fringeScrambled.isEmpty()) {
             // We have to choose on which side we are extending our search.
-            // I'm choosing to take the side where the hash map is the smaller.
-            // I just have to take care that the queue is not empty.
-            if(((seenSolved.size() < seenScrambled.size()) && !fringeSolved.isEmpty()) || fringeScrambled.isEmpty()) {
+            // I'm choosing the priority queue with the node nearest
+            // its start.
+            int minScrambledFringe = fringeScrambled.peek().distance;
+            int minSolvedFringe = fringeSolved.peek().distance;
+            if(minSolvedFringe <= minScrambledFringe) {
                 seenExtending = seenSolved;
                 fringeExtending = fringeSolved;
                 seenComparing = seenScrambled;
+                fringeComparing = fringeScrambled;
             } else {
                 seenExtending = seenScrambled;
                 fringeExtending = fringeScrambled;
                 seenComparing = seenSolved;
+                fringeComparing = fringeSolved;
                 // Yes, I'm copying references only.
             }
             
-            node = fringeExtending.poll();
-            int distance = seenExtending.get(node);
-            if(distance == max_distance) {
-                // It's useless to look at the children of this node.
-                // Either their distance is smaller so we've already seen them,
-                // or we don't care about them.
-                // the +1 is because if n is odd, we would have to search from one side
-                // with distance n/2 and from the other side distance n/2 + 1
-                // Because we don't know which is which, let's take (n+1)/2 for both.
+            PuzzleStateAndDistance psad = fringeExtending.poll();
+            PuzzleState node = psad.state;
+            if(seenExtending.containsKey(node)) {
+                // We've already expanded this node, which means we
+                // found an equivalent or better path to it already.
+                azzert(seenExtending.get(node) <= psad.distance);
                 continue;
-            } else if(distance > max_distance) {
-                azzert(false);
+            }
+            seenExtending.put(node, psad.distance);
+            if(seenComparing.containsKey(node)) {
+                // We found an intersection! Compute the total cost of the
+                // path going through this node.
+                int cost = seenComparing.get(node) + psad.distance;
+                if(cost < bestIntersectionCost) {
+                    bestIntersection = node;
+                    bestIntersectionCost = cost;
+                }
+                continue;
+            }
+            // The best possible solution involving this node would
+            // be through a child of this node that gets us across to
+            // the other fringe's smallest distance node.
+            int bestPossibleSolution = psad.distance + fringeComparing.peek().distance;
+            if(bestPossibleSolution >= bestIntersectionCost) {
+                continue;
             }
 
-            for(PuzzleState next : node.getCanonicalMovesByState().keySet()) {
+            HashMap<PuzzleState, String> movesByState = node.getCanonicalMovesByState();
+            for(PuzzleState next : movesByState.keySet()) {
+                int moveCost = node.getMoveCost(movesByState.get(next));
+                int distance = psad.distance + moveCost;
                 next = next.getNormalized();
                 if(seenExtending.containsKey(next)) {
                     continue;
                 }
-                seenExtending.put(next, distance+1);
-                fringeExtending.add(next);
-                if(seenComparing.containsKey(next)) {
-                    found = true;
-                    node = next;
-                    break outer;
-                }
+                // Note that we may have already found a way to next and
+                // placed next into our fringe with a different (or same!)
+                // priority. We'll detect this at the time we pop from our
+                // fringe.
+                fringeExtending.add(new PuzzleStateAndDistance(next, distance));
             }
         }
 
         l.log(start.finishedNow("expanded " + ( seenSolved.size() + seenScrambled.size() ) + " nodes"));
 
-        if(!found) {
+        if(bestIntersection == null) {
             return null;
         }
 
         /* We have found a solution, but we still have to recover the move sequence.
-         * the `node` is the bound between the solved and the scrambled states.
-         * We can travel from `node` to either states, like that:
-         * solved <----- node -----> scrambled
+         * the `bestIntersection` is the bound between the solved and the scrambled states.
+         * We can travel from `bestIntersection` to either states, like that:
+         * solved <----- bestIntersection -----> scrambled
          * However, to build a solution, we need to travel like that:
-         * solved <----- node <----- scrambled
+         * solved <----- bestIntersection <----- scrambled
          * So we have to travel backward for the scrambled side.
          */
 
-        /* Step 1: node -----> scrambled */
+        /* Step 1: bestIntersection -----> scrambled */
 
-        azzert(node.isNormalized());
-        PuzzleState state = node;
+        azzert(bestIntersection.isNormalized());
+        PuzzleState state = bestIntersection;
         int distanceFromScrambled = seenScrambled.get(state);
 
         /* We have to keep track of all states we have visited */
@@ -413,14 +452,14 @@ public abstract class Puzzle implements Exportable {
             azzert(false);
         }
 
-        /* Step 2: node <----- scrambled */
+        /* Step 2: bestIntersection <----- scrambled */
 
-        AlgorithmBuilder solution = new AlgorithmBuilder(this, MergingMode.NO_MERGING, ps);
+        AlgorithmBuilder solution = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES, ps);
         state = ps;
         distanceFromScrambled = 0;
 
         outer:
-        while(!state.equalsNormalized(node)) {
+        while(!state.equalsNormalized(bestIntersection)) {
             for(Entry<? extends PuzzleState, String> next : state.getCanonicalMovesByState().entrySet()) {
                 PuzzleState nextState = next.getKey();
                 String moveName = next.getValue();
@@ -438,7 +477,7 @@ public abstract class Puzzle implements Exportable {
             azzert(false);
         }
 
-        /* Step 3: solved <----- node */
+        /* Step 3: solved <----- bestIntersection */
         
         int distanceFromSolved = seenSolved.get(state.getNormalized());
         outer:
@@ -549,6 +588,19 @@ public abstract class Puzzle implements Exportable {
         }
 
         /**
+         * Most puzzles are happy to split an algorithm by turns, and declare
+         * each turn a move. However, this simple model doesn't work for all
+         * puzzles. For example, square one may wish to declare (3,3) as 1
+         * move. Another possible use for this would be rotations, which
+         * count as 0 moves.
+         * @param move
+         * @return The cost of doing this move.
+         */
+        public int getMoveCost(String move) {
+            return 1;
+        }
+
+        /**
          * @return A LinkedHashMap mapping move Strings to resulting PuzzleStates.
          *         The move Strings may not contain spaces.
          *         Multiple keys (moves) in the returned LinkedHashMap may
@@ -628,7 +680,7 @@ public abstract class Puzzle implements Exportable {
          * that is, it does not mutate the current state, instead it returns a new state.
          * @param move The move to apply
          * @return The PuzzleState achieved after applying move
-         * @throws InvalidMoveRuntimeException if the move is unrecognized.
+         * @throws InvalidMoveException if the move is unrecognized.
          */
         public PuzzleState apply(String move) throws InvalidMoveException {
             HashMap<String, ? extends PuzzleState> successors = getSuccessorsByName();
@@ -692,10 +744,9 @@ public abstract class Puzzle implements Exportable {
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         AlgorithmBuilder ab = new AlgorithmBuilder(
                 this, MergingMode.NO_MERGING);
-        for(int i = 0; i < getRandomMoveCount(); i++) {
+        while(ab.getTotalCost() < getRandomMoveCount()) {
             HashMap<String, ? extends PuzzleState> successors =
                 ab.getState().getScrambleSuccessors();
-            int length = ab.length();
             String move;
             try {
                 do {

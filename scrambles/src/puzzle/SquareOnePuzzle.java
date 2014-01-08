@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Random;
 
+import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
@@ -291,6 +292,24 @@ public class SquareOnePuzzle extends Puzzle {
             }
 
             return newPieces;
+        }
+
+        public int getMoveCost(String move) {
+            if(move.startsWith("(") && move.endsWith(")")) {
+                move = move.substring(1, move.length() - 1);
+                String[] top_bottom = move.split(", ?");
+                azzert(top_bottom.length == 2);
+                int top = Integer.parseInt(top_bottom[0]);
+                int bottom = Integer.parseInt(top_bottom[1]);
+                int topCost = top % 12 == 0 ? 0 : 1;
+                int bottomCost = bottom % 12 == 0 ? 0 : 1;
+                //return topCost + bottomCost;
+                return 1;
+            } else if(move.equals("/")) {
+                return 1;
+            } else {
+                throw new RuntimeException(new InvalidMoveException(move));
+            }
         }
 
         @Override
