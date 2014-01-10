@@ -88,19 +88,20 @@ public class CubePuzzle extends Puzzle {
         azzert(size >= 0 && size < DEFAULT_LENGTHS.length, "Invalid cube size");
         this.size = size;
 
+        int reorientThickness = size/2;
         randomUFaceMoves = new CubeMove[] {
             null,
-            new CubeMove(Face.R, 1, size - 2),
-            new CubeMove(Face.R, 2, size - 2),
-            new CubeMove(Face.R, 3, size - 2),
-            new CubeMove(Face.F, 1, size - 2),
-            new CubeMove(Face.F, 3, size - 2)
+            new CubeMove(Face.R, 1, reorientThickness),
+            new CubeMove(Face.R, 2, reorientThickness),
+            new CubeMove(Face.R, 3, reorientThickness),
+            new CubeMove(Face.F, 1, reorientThickness),
+            new CubeMove(Face.F, 3, reorientThickness)
         };
         randomFFaceMoves = new CubeMove[] {
             null,
-            new CubeMove(Face.U, 1, size - 2),
-            new CubeMove(Face.U, 2, size - 2),
-            new CubeMove(Face.U, 3, size - 2)
+            new CubeMove(Face.U, 1, reorientThickness),
+            new CubeMove(Face.U, 2, reorientThickness),
+            new CubeMove(Face.U, 3, reorientThickness)
         };
         randomOrientationMoves = new CubeMove[randomUFaceMoves.length * randomFFaceMoves.length][];
         int i = 0;
