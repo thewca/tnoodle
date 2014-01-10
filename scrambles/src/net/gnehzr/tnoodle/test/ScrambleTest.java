@@ -432,6 +432,7 @@ public class ScrambleTest {
             PuzzleState solved = scrambler.getSolvedState();
             for(int count = 0; count < SCRAMBLE_COUNT; count++){
                 String scramble = scrambler.generateWcaScramble(r);
+                System.out.println("Searching for solution in <= 1 move to " + scramble);
                 PuzzleState state = solved.applyAlgorithm(scramble);
                 String solution = state.solveIn(1);
                 azzertEquals(solution, null);
