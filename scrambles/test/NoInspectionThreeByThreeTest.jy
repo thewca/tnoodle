@@ -1,10 +1,11 @@
-import puzzle.NoInspectionThreeByThreeCubePuzzle as NoInspectionThreeByThreeCubePuzzle
-import puzzle.NoInspectionThreeByThreeCubePuzzle as NoInspectionThreeByThreeCubePuzzle
-import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder as AlgorithmBuilder
-import net.gnehzr.tnoodle.utils.Utils as Utils
-r = Utils.getSeededRandom()
-
 import tntdebug
+
+from puzzle import NoInspectionThreeByThreeCubePuzzle
+from puzzle import NoInspectionThreeByThreeCubePuzzle
+from net.gnehzr.tnoodle.scrambles import AlgorithmBuilder
+
+from net.gnehzr.tnoodle.utils import Utils
+r = Utils.getSeededRandom()
 
 def main():
     threes = NoInspectionThreeByThreeCubePuzzle()

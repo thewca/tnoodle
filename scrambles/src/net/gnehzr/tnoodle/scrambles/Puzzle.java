@@ -304,11 +304,11 @@ public abstract class Puzzle implements Exportable {
         }
 
         public H pop() {
-            return contents.pop();
+            return contents.removeLast();
         }
 
         public void push(H element) {
-            contents.push(element);
+            contents.addLast(element);
         }
 
         public boolean isEmpty() {
@@ -341,12 +341,14 @@ public abstract class Puzzle implements Exportable {
         }
 
         public void add(H element, int value) {
+            Bucket<H> bucket;
             Bucket<H> searchBucket = new Bucket<H>(value);
-            Bucket<H> bucket = buckets.ceiling(searchBucket);
-            if(bucket == null || bucket.getValue() != value) {
+            if(!buckets.contains(searchBucket)) {
                 // There is no bucket yet for value, so we create one.
                 bucket = searchBucket;
                 buckets.add(bucket);
+            } else {
+                bucket = buckets.tailSet(searchBucket).first();
             }
             bucket.push(element);
         }
@@ -365,7 +367,7 @@ public abstract class Puzzle implements Exportable {
             if(bucket.isEmpty()) {
                 // We just removed the last element from this bucket,
                 // so we can trash the bucket now.
-                buckets.pollFirst();
+                buckets.remove(bucket);
             }
             return h;
         }
