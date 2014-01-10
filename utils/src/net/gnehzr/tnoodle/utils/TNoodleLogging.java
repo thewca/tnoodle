@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,35 +18,23 @@ public class TNoodleLogging {
 
     private static ConsoleHandler ch;
     private static FileHandler fh;
+    private static Logger rootLogger;
+    private static Formatter formatter;
     public static void initializeLogging() {
-        Logger rootLogger = Logger.getLogger("");
+        rootLogger = Logger.getLogger("");
         rootLogger.setLevel(Level.FINEST);
 
         for(Handler h : rootLogger.getHandlers()) {
             rootLogger.removeHandler(h);
         }
 
-        // We print logs of consoleLogLevel or more important to the screen (and to file).
-        // Everything above INFO gets saved to a file.
-        // Everything below INFO is lost forever =(.
-        OneLineLogFormatter formatter = new OneLineLogFormatter();
+        // By default, we print logs of level Level.INFO or higher
+        // or more important to the screen.
+        formatter = new OneLineLogFormatter();
         ch = new ConsoleHandler();
         setConsoleLogLevel(DEFAULT_LOG_LEVEL);
         ch.setFormatter(formatter);
         rootLogger.addHandler(ch);
-
-        try {
-            File logFile = getLogFile();
-            logFile.getParentFile().mkdirs();
-            fh = new FileHandler(logFile.getAbsolutePath(), MAX_BYTES, FILE_COUNT, true);
-            setFileLogLevel(DEFAULT_LOG_LEVEL);
-            fh.setFormatter(formatter);
-            rootLogger.addHandler(fh);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         String fileLogLevel = System.getenv("TNOODLE_FILE_LOG_LEVEL");
         if(fileLogLevel != null) {
@@ -82,6 +71,20 @@ public class TNoodleLogging {
         l.config("Console log level " + level);
     }
     public static void setFileLogLevel(Level level) {
+        if(fh == null) {
+            try {
+                File logFile = getLogFile();
+                logFile.getParentFile().mkdirs();
+                fh = new FileHandler(logFile.getAbsolutePath(), MAX_BYTES, FILE_COUNT, true);
+                setFileLogLevel(DEFAULT_LOG_LEVEL);
+                fh.setFormatter(formatter);
+                rootLogger.addHandler(fh);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         fh.setLevel(level);
         l.config(getLogFile() + " log level " + level);
     }

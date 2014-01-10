@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
@@ -214,7 +213,26 @@ public class SquareOnePuzzle extends Puzzle {
     }
     */
 
-    private class SquareOneState extends PuzzleState {
+    static HashMap<String, Integer> costsByMove = new HashMap<String, Integer>();
+    static {
+        for(int top = -5; top <= 6; top++) {
+            for(int bottom = -5; bottom <= 6; bottom++) {
+                if(top == 0 && bottom == 0) {
+                    // No use doing nothing =)
+                    continue;
+                }
+                //int topCost = top % 12 == 0 ? 0 : 1;
+                //int bottomCost = bottom % 12 == 0 ? 0 : 1;
+                //int cost = topCost + bottomCost;
+                int cost = 1;
+                String turn = "(" + top + "," + bottom + ")";
+                costsByMove.put(turn, cost);
+            }
+        }
+        costsByMove.put("/", 1);
+    }
+
+    public class SquareOneState extends PuzzleState {
         boolean sliceSolved;
         int[] pieces;
 
@@ -295,21 +313,13 @@ public class SquareOnePuzzle extends Puzzle {
         }
 
         public int getMoveCost(String move) {
-            if(move.startsWith("(") && move.endsWith(")")) {
-                move = move.substring(1, move.length() - 1);
-                String[] top_bottom = move.split(", ?");
-                azzert(top_bottom.length == 2);
-                int top = Integer.parseInt(top_bottom[0]);
-                int bottom = Integer.parseInt(top_bottom[1]);
-                int topCost = top % 12 == 0 ? 0 : 1;
-                int bottomCost = bottom % 12 == 0 ? 0 : 1;
-                //return topCost + bottomCost;
-                return 1;
-            } else if(move.equals("/")) {
-                return 1;
-            } else {
-                throw new RuntimeException(new InvalidMoveException(move));
-            }
+            // TODO - We do a lookup here rather than string parsing because
+            // this is a very performance critical section of code.
+            // I believe the best thing to do would be to change the puzzle
+            // api to return move costs as part of the object returned by
+            // getScrambleSuccessors(), then subclasses wouldn't have to do
+            // weird stuff like this for speed.
+            return costsByMove.get(move);
         }
 
         @Override
@@ -410,6 +420,10 @@ public class SquareOnePuzzle extends Puzzle {
             drawFace(g, transform, GwtSafeUtils.copyOfRange(pieces, 12, pieces.length), x, y, radius, colorScheme);
 
             return g;
+        }
+
+        public String toString() {
+            return "sliceSolved: " + sliceSolved + " " + Arrays.toString(pieces);
         }
 
     }
