@@ -14,6 +14,7 @@ public class NoInspectionThreeByThreeCubePuzzle extends ThreeByThreeCubePuzzle {
 
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
+        CubeMove[][] randomOrientationMoves = getRandomOrientationMoves(size /2);
         CubeMove[] randomOrientation = randomOrientationMoves[r.nextInt(randomOrientationMoves.length)];
         String firstMoveRestriction;
         if(randomOrientation.length > 0) {

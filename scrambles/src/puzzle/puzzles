@@ -18,6 +18,8 @@
 
 #3x3x3 no inspection
 333ni puzzle.NoInspectionThreeByThreeCubePuzzle()
+#4x4x4 no inspection
+444ni puzzle.NoInspectionFourByFourCubePuzzle()
 #5x5x5 no inspection
 555ni puzzle.NoInspectionFiveByFiveCubePuzzle()
 
