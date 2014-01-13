@@ -295,7 +295,11 @@
                 copies: 1, // TODO - add support for this to ui.js
                 scrambler: sheet.puzzle,
                 title: sheet.title,
-                fmc: sheet.fmc
+                fmc: sheet.fmc,
+
+                event: sheet.event,
+                round: sheet.round,
+                group: sheet.group
             };
             scrambleRequest.push(request);
         }

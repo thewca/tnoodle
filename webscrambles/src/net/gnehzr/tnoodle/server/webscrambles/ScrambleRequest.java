@@ -12,6 +12,9 @@ import net.gnehzr.tnoodle.svglite.Svg;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.StringReader;
@@ -80,7 +83,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 class ScrambleRequest {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
-
+    private static final String HTML_SCRAMBLE_VIEWER = "/net/gnehzr/tnoodle/server/webscrambles/scrambleviewer.html";
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
@@ -126,6 +129,14 @@ class ScrambleRequest {
     public String title;
     public boolean fmc;
     public HashMap<String, Color> colorScheme;
+
+    // The following attributes are here purely so the scrambler ui
+    // can pass these straight to the generated JSON we put in the
+    // zip file. This makes it easier to align that JSON with the rounds
+    // of a competition.
+    public String group, event;
+    public int round;
+
     public ScrambleRequest(String title, String scrambleRequestUrl, String seed) throws InvalidScrambleRequestException, UnsupportedEncodingException {
         String[] puzzle_count_copies_scheme = scrambleRequestUrl.split("\\*");
         title = URLDecoder.decode(title, "utf-8");
@@ -869,7 +880,15 @@ class ScrambleRequest {
     }
 
     private static final String INVALID_CHARS = "\\/:*?\"<>|";
-    public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password) throws IOException, DocumentException, ZipException {
+    private static String toFileSafeString(String unsafe) {
+        for(int i = 0; i < INVALID_CHARS.length(); i++) {
+            String invalidChar = Pattern.quote("" + INVALID_CHARS.charAt(i));
+            unsafe = unsafe.replaceAll(invalidChar, "");
+        }
+        return unsafe;
+    }
+
+    public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl) throws IOException, DocumentException, ZipException {
         ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 
         ZipParameters parameters = new ZipParameters();
@@ -885,11 +904,7 @@ class ScrambleRequest {
         ZipOutputStream zipOut = new ZipOutputStream(baosZip);
         HashMap<String, Boolean> seenTitles = new HashMap<String, Boolean>();
         for(ScrambleRequest scrambleRequest : scrambleRequests) {
-            String safeTitle = scrambleRequest.title;
-            for(int i = 0; i < INVALID_CHARS.length(); i++) {
-                String invalidChar = Pattern.quote("" + INVALID_CHARS.charAt(i));
-                safeTitle = safeTitle.replaceAll(invalidChar, "");
-            }
+            String safeTitle = toFileSafeString(scrambleRequest.title);
             int salt = 0;
             String tempNewSafeTitle = safeTitle;
             while(seenTitles.get(tempNewSafeTitle) != null) {
@@ -916,17 +931,42 @@ class ScrambleRequest {
             zipOut.closeEntry();
         }
 
-        parameters.setFileNameInZip(globalTitle + ".json");
+        String safeGlobalTitle = toFileSafeString(globalTitle);
+        String jsonFileName = safeGlobalTitle + ".json";
+        parameters.setFileNameInZip(jsonFileName);
         zipOut.putNextEntry(null, parameters);
         HashMap<String, Object> jsonObj = new HashMap<String, Object>();
         jsonObj.put("rounds", scrambleRequests);
         jsonObj.put("competitionName", globalTitle);
         jsonObj.put("version", Utils.getProjectName() + "-" + Utils.getVersion());
         jsonObj.put("generationDate", generationDate);
-        zipOut.write(GSON.toJson(jsonObj).getBytes());
+        jsonObj.put("generationUrl", generationUrl);
+        String json = GSON.toJson(jsonObj);
+        zipOut.write(json.getBytes());
         zipOut.closeEntry();
 
-        parameters.setFileNameInZip(globalTitle + ".pdf");
+        String jsonpFileName = safeGlobalTitle + ".jsonp";
+        parameters.setFileNameInZip(jsonpFileName);
+        zipOut.putNextEntry(null, parameters);
+        String jsonp = "var SCRAMBLES_JSON = " + json + ";";
+        zipOut.write(jsonp.getBytes());
+        zipOut.closeEntry();
+
+        parameters.setFileNameInZip(safeGlobalTitle + ".html");
+        zipOut.putNextEntry(null, parameters);
+
+        InputStream is = ScrambleRequest.class.getResourceAsStream(HTML_SCRAMBLE_VIEWER);
+        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while((line = in.readLine()) != null) {
+            line = line.replaceAll("%SCRAMBLES_JSONP_FILENAME%", jsonpFileName);
+            sb.append(line).append("\n");
+        }
+        zipOut.write(sb.toString().getBytes());
+        zipOut.closeEntry();
+
+        parameters.setFileNameInZip(safeGlobalTitle + ".pdf");
         zipOut.putNextEntry(null, parameters);
         // Note that we're not passing the password into this function. It seems pretty silly
         // to put a password protected pdf inside of a password protected zip file.

@@ -336,6 +336,10 @@ var mark2 = {};
         };
     })();
 
+    function roundToRoundName(round) {
+        return "Round " + round;
+    }
+
     mark2.settings = (function() {
 
         var extraScrambles = 2;
@@ -386,7 +390,7 @@ var mark2 = {};
         }
 
         var defaultRounds = [
-            { eventID: "333", roundName: "Round 1" }
+            { eventID: "333", round: 1 }
         ];
 
         var defaultNumGroups = 1;
@@ -527,23 +531,23 @@ var mark2 = {};
 
                 var eventID = tr.getAttribute("data-event-id");
 
-                var roundName = tr.getElementsByClassName("round_name")[0].value;
+                var round = tr.getAttribute("data-round");
                 var numSolves = parseInt(tr.getElementsByClassName("num_solves")[0].value, 10);
                 var numExtraSolves = parseInt(tr.getElementsByClassName("num_extra_solves")[0].value, 10);
 
                 var numGroups = parseInt(tr.getElementsByClassName("num_groups")[0].value, 10);
 
-                var round = {
+                var roundJson = {
                     eventID: eventID,
-                    roundName: roundName,
+                    round: round,
                     groupCount: numGroups,
                     scrambleCount: numSolves,
                     extraScrambleCount: numExtraSolves
                 };
                 if(includeElement) {
-                    round.element = tr;
+                    roundJson.element = tr;
                 }
-                rounds.push(round);
+                rounds.push(roundJson);
             }
 
             return rounds;
@@ -578,9 +582,10 @@ var mark2 = {};
             for(var i = 0; i < rounds.length; i++) {
                 var round = rounds[i];
                 for(var groupN = 0; groupN < round.groupCount; groupN++) {
-                    var title = round.roundName;
+                    var title = roundToRoundName(round.round);
+                    var group = intToLetters(groupN + 1);
                     if(round.groupCount > 1) {
-                        title += " Group " + intToLetters(groupN + 1);
+                        title += " Group " + group;
                     }
                     var eventName = mark2.settings.events[round.eventID].name;
                     var sheet = {
@@ -588,7 +593,11 @@ var mark2 = {};
                         fmc: settings.isFmc(round.eventID),
                         title: eventName + " " + title,
                         scrambleCount: round.scrambleCount,
-                        extraScrambleCount: round.extraScrambleCount
+                        extraScrambleCount: round.extraScrambleCount,
+
+                        event: round.eventID,
+                        round: round.round,
+                        group: group
                     };
 
                     // Unfortunately, there's no guarantee that rounds in a
@@ -879,11 +888,11 @@ var mark2 = {};
         };
 
 
-        var addRound = function(eventID, roundNameOpt, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt) {
-            var roundName = roundNameOpt;
-            if (roundNameOpt === undefined) {
-                roundName = "Round " + (numCurrentRounds(eventID)+1);
+        var addRound = function(eventID, round, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt) {
+            if (round === undefined) {
+                round = numCurrentRounds(eventID)+1;
             }
+            var roundName = roundToRoundName(round);
 
             var numGroups = numGroupsOpt;
             if (numGroupsOpt === undefined) {
@@ -904,14 +913,17 @@ var mark2 = {};
             var newEventTR = mark2.dom.appendElement(
                     null,
                     "tr",
-                    { id: newEventTR_ID, "data-event-id": eventID }
+                    { id: newEventTR_ID,
+                      "data-event-id": eventID,
+                      "data-round": round
+                    }
                     );
             var rounds = getRounds(true);
             var lastRoundOfEvent = null;
             for(var i = 0; i < rounds.length; i++) {
-                var round = rounds[i];
-                if(round.eventID == eventID) {
-                    lastRoundOfEvent = round.element;
+                var roundJson = rounds[i];
+                if(roundJson.eventID == eventID) {
+                    lastRoundOfEvent = roundJson.element;
                 }
             }
             if(lastRoundOfEvent) {
@@ -926,13 +938,12 @@ var mark2 = {};
                     settings.events[eventID].name);
             nameTD.classList.add("event_name");
 
-            var roundNameTD = mark2.dom.appendElement(newEventTR, "td");
-            var roundNameInput = mark2.dom.appendElement(
-                    roundNameTD,
-                    "input",
-                    { value: roundName }
-                    );
-            roundNameInput.classList.add("round_name");
+            var roundNameTD = mark2.dom.appendElement(
+                    newEventTR,
+                    "td",
+                    {},
+                    roundName);
+            roundNameTD.classList.add("event_name");
 
             var numGroupsTD = mark2.dom.appendElement(newEventTR, "td");
             var numGroupsInput = mark2.dom.appendElement(
@@ -963,7 +974,6 @@ var mark2 = {};
             var removeButton = mark2.dom.appendElement(removeTD, "button", {}, "X");
             removeButton.addEventListener("click", removeRound.bind(null, eventID, newEventTR_ID), false);
 
-            roundNameInput.addEventListener("change", updateHash, false);
             numSolvesInput.addEventListener("change", updateHash, false);
             numExtraSolvesInput.addEventListener("change", updateHash, false);
             numGroupsInput.addEventListener("change", updateHash, false);
@@ -1057,7 +1067,7 @@ var mark2 = {};
 
         var addRounds = function(rounds) {
             for (var i = 0; i < rounds.length; i++) {
-                addRound(rounds[i].eventID, rounds[i].roundName, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount);
+                addRound(rounds[i].eventID, rounds[i].round, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount);
             }
         };
 
