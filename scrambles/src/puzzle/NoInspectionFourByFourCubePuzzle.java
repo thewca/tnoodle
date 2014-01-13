@@ -33,7 +33,6 @@ public class NoInspectionFourByFourCubePuzzle extends FourByFourCubePuzzle {
         try {
             AlgorithmBuilder ab = new AlgorithmBuilder(puzzle, MergingMode.NO_MERGING);
             ab.appendAlgorithm(psag.generator);
-            String firstReorientMove = randomOrientation[0].toString();
             for(CubeMove cm : randomOrientation) {
                 ab.appendMove(cm.toString());
             }
