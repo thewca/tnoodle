@@ -29,6 +29,7 @@ import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.servlet.ServletContext;
 
 import org.w3c.dom.svg.SVGDocument;
 import org.apache.batik.bridge.BridgeContext;
@@ -83,7 +84,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 class ScrambleRequest {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
-    private static final String HTML_SCRAMBLE_VIEWER = "/net/gnehzr/tnoodle/server/webscrambles/scrambleviewer.html";
+    private static final String HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html";
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
@@ -888,7 +889,7 @@ class ScrambleRequest {
         return unsafe;
     }
 
-    public static ByteArrayOutputStream requestsToZip(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl) throws IOException, DocumentException, ZipException {
+    public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl) throws IOException, DocumentException, ZipException {
         ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 
         ZipParameters parameters = new ZipParameters();
@@ -955,7 +956,7 @@ class ScrambleRequest {
         parameters.setFileNameInZip(safeGlobalTitle + ".html");
         zipOut.putNextEntry(null, parameters);
 
-        InputStream is = ScrambleRequest.class.getResourceAsStream(HTML_SCRAMBLE_VIEWER);
+        InputStream is = context.getResourceAsStream(HTML_SCRAMBLE_VIEWER);
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         String line;
