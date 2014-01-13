@@ -307,6 +307,11 @@
     }
     function showZip(e) {
         var title = mark2.ui.getTitle();
+        // Right now, our server acts a little screwy when %2F
+        // appears in our urls. It seems to treat them just like real
+        // slashes. The easiest solution is to just remove them from
+        // the title.
+        title = title.replace(/\//g, "");
         var sheets = mark2.ui.getScrambleSheets();
         var request = toScrambleRequest(sheets);
         var password = mark2.ui.getPassword();
