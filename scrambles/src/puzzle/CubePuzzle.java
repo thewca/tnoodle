@@ -253,7 +253,7 @@ public class CubePuzzle extends Puzzle {
     }
 
     private void drawCube(Svg g, int[][][] state, int gap, int cubieSize, HashMap<String, Color> colorScheme) {
-        paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[0], colorScheme);
+        paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[Face.L.ordinal()], colorScheme);
         paintCubeFace(g, 2*gap+size*cubieSize, 3*gap+2*size*cubieSize, size, cubieSize, state[Face.D.ordinal()], colorScheme);
         paintCubeFace(g, 4*gap+3*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.B.ordinal()], colorScheme);
         paintCubeFace(g, 3*gap+2*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.R.ordinal()], colorScheme);
