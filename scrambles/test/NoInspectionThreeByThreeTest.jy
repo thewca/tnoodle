@@ -1,6 +1,6 @@
 import tntdebug
 
-from puzzle import NoInspectionThreeByThreeCubePuzzle
+from puzzle import TwoByTwoCubePuzzle
 from puzzle import NoInspectionThreeByThreeCubePuzzle
 from net.gnehzr.tnoodle.scrambles import AlgorithmBuilder
 
@@ -8,6 +8,14 @@ from net.gnehzr.tnoodle.utils import Utils
 r = Utils.getSeededRandom()
 
 def main():
+    twos = TwoByTwoCubePuzzle()
+    canonicalMoves = twos.getSolvedState().getCanonicalMovesByState().values()
+    desiredCanonicalMoves = []
+    for face in "RUF":
+        for d in [ "", "'", "2" ]:
+            desiredCanonicalMoves.append(face + d)
+    assert set(canonicalMoves) == set(desiredCanonicalMoves)
+
     threes = NoInspectionThreeByThreeCubePuzzle()
     solved = threes.getSolvedState()
 

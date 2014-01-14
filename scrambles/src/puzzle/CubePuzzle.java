@@ -20,7 +20,7 @@ import org.timepedia.exporter.client.Export;
 public class CubePuzzle extends Puzzle {
 
     public static enum Face {
-        L, D, B, R, U, F;
+        R, U, F, L, D, B;
 
         public Face oppositeFace() {
             return values()[(ordinal() + 3) % 6];
@@ -168,33 +168,35 @@ public class CubePuzzle extends Puzzle {
         int sslice = slice;
         int sdir = dir;
 
-        if(face.ordinal() >= 3) {
+        if(face != Face.L && face != Face.D && face != Face.B) {
             sface = face.oppositeFace();
             sslice = size - 1 - slice;
             sdir = 4 - dir;
         }
         for(int j = 0; j < size; j++) {
-            if(sface.ordinal() == 0) {
+            if(sface == Face.L) {
                 swap(image,
                         Face.U.ordinal(), j, sslice,
                         Face.B.ordinal(), size-1-j, size-1-sslice,
                         Face.D.ordinal(), j, sslice,
                         Face.F.ordinal(), j, sslice,
                         sdir);
-            } else if(sface.ordinal() == 1) {
+            } else if(sface == Face.D) {
                 swap(image,
                         Face.L.ordinal(), size-1-sslice, j,
                         Face.B.ordinal(), size-1-sslice, j,
                         Face.R.ordinal(), size-1-sslice, j,
                         Face.F.ordinal(), size-1-sslice, j,
                         sdir);
-            } else if(sface.ordinal() == 2) {
+            } else if(sface == Face.B) {
                 swap(image,
                         Face.U.ordinal(), sslice, j,
                         Face.R.ordinal(), j, size-1-sslice,
                         Face.D.ordinal(), size-1-sslice, size-1-j,
                         Face.L.ordinal(), size-1-j, sslice,
                         sdir);
+            } else {
+                azzert(false);
             }
         }
         if(slice == 0 || slice == size - 1) {
@@ -251,7 +253,7 @@ public class CubePuzzle extends Puzzle {
     }
 
     private void drawCube(Svg g, int[][][] state, int gap, int cubieSize, HashMap<String, Color> colorScheme) {
-        paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[0], colorScheme);
+        paintCubeFace(g, gap, 2*gap+size*cubieSize, size, cubieSize, state[Face.L.ordinal()], colorScheme);
         paintCubeFace(g, 2*gap+size*cubieSize, 3*gap+2*size*cubieSize, size, cubieSize, state[Face.D.ordinal()], colorScheme);
         paintCubeFace(g, 4*gap+3*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.B.ordinal()], colorScheme);
         paintCubeFace(g, 3*gap+2*size*cubieSize, 2*gap+size*cubieSize, size, cubieSize, state[Face.R.ordinal()], colorScheme);
@@ -317,6 +319,7 @@ public class CubePuzzle extends Puzzle {
                     break;
                 }
             }
+            azzert(idx >= 0);
             Face f = null;
             int dir = 1;
             if (stickersByPiece[idx][0] == Face.D.ordinal()) {
