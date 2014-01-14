@@ -1,0 +1,24 @@
+<html>
+<head>
+<script src="%SCRAMBLES_JSONP_FILENAME%"></script>
+<script>
+
+window.addEventListener("load", function() {
+    document.title = SCRAMBLES_JSON.competitionName;
+
+    var titleArea = document.getElementById("title");
+    titleArea.appendChild(document.createTextNode(SCRAMBLES_JSON.competitionName));
+
+    var regenerateLink = document.getElementById("regenerateLink");
+    regenerateLink.href = SCRAMBLES_JSON.generationUrl;
+});
+</script>
+</head>
+<body>
+
+<a href="" id="regenerateLink">
+    <h1 id="title"></h1>
+</a>
+
+</body>
+</html>

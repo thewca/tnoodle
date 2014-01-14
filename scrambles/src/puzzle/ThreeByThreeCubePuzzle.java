@@ -43,10 +43,6 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
 
     public String solveIn(PuzzleState ps, int n, String firstMoveRestriction) {
         CubeState cs = (CubeState) ps;
-        boolean useTwoPhase = EnvGetter.getenv("NO_TWO_PHASE") == null;
-        if(!useTwoPhase) {
-            return null;
-        }
         if(this.equals(getSolvedState())) {
             // TODO - apparently min2phase can't solve the solved cube
             return "";

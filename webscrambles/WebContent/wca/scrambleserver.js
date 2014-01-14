@@ -87,6 +87,7 @@ tnoodle.Scrambler = function(hostname, port, protocol) {
         if(password) {
             params.password = password;
         }
+        params.generationUrl = location.href;
         tnoodle.postToUrl(that.viewUrl + encodeURIComponent(title) + '.' + ext, params, "POST", target);
     };
     this.showPdf = function(title, scrambleRequest, password, target) {

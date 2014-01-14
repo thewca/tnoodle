@@ -82,27 +82,22 @@ public class CubePuzzle extends Puzzle {
     private static final int[] DEFAULT_LENGTHS = { 0, 0, 25, 25, 40, 60, 80, 100, 120, 140, 160, 180 };
 
     protected final int size;
-    protected CubeMove[] randomUFaceMoves, randomFFaceMoves;
-    protected CubeMove[][] randomOrientationMoves;
-    public CubePuzzle(int size) {
-        azzert(size >= 0 && size < DEFAULT_LENGTHS.length, "Invalid cube size");
-        this.size = size;
-
-        randomUFaceMoves = new CubeMove[] {
+    protected CubeMove[][] getRandomOrientationMoves(int thickness) {
+        CubeMove[] randomUFaceMoves = new CubeMove[] {
             null,
-            new CubeMove(Face.R, 1, size - 2),
-            new CubeMove(Face.R, 2, size - 2),
-            new CubeMove(Face.R, 3, size - 2),
-            new CubeMove(Face.F, 1, size - 2),
-            new CubeMove(Face.F, 3, size - 2)
+            new CubeMove(Face.R, 1, thickness),
+            new CubeMove(Face.R, 2, thickness),
+            new CubeMove(Face.R, 3, thickness),
+            new CubeMove(Face.F, 1, thickness),
+            new CubeMove(Face.F, 3, thickness)
         };
-        randomFFaceMoves = new CubeMove[] {
+        CubeMove[] randomFFaceMoves = new CubeMove[] {
             null,
-            new CubeMove(Face.U, 1, size - 2),
-            new CubeMove(Face.U, 2, size - 2),
-            new CubeMove(Face.U, 3, size - 2)
+            new CubeMove(Face.U, 1, thickness),
+            new CubeMove(Face.U, 2, thickness),
+            new CubeMove(Face.U, 3, thickness)
         };
-        randomOrientationMoves = new CubeMove[randomUFaceMoves.length * randomFFaceMoves.length][];
+        CubeMove[][] randomOrientationMoves = new CubeMove[randomUFaceMoves.length * randomFFaceMoves.length][];
         int i = 0;
         for(CubeMove randomUFaceMove : randomUFaceMoves) {
             for(CubeMove randomFFaceMove : randomFFaceMoves) {
@@ -117,7 +112,12 @@ public class CubePuzzle extends Puzzle {
                 randomOrientationMoves[i++] = movesArr;
             }
         }
+        return randomOrientationMoves;
+    }
 
+    public CubePuzzle(int size) {
+        azzert(size >= 0 && size < DEFAULT_LENGTHS.length, "Invalid cube size");
+        this.size = size;
     }
 
     @Override

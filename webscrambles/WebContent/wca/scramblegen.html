@@ -295,7 +295,11 @@
                 copies: 1, // TODO - add support for this to ui.js
                 scrambler: sheet.puzzle,
                 title: sheet.title,
-                fmc: sheet.fmc
+                fmc: sheet.fmc,
+
+                event: sheet.event,
+                round: sheet.round,
+                group: sheet.group
             };
             scrambleRequest.push(request);
         }
@@ -303,6 +307,11 @@
     }
     function showZip(e) {
         var title = mark2.ui.getTitle();
+        // Right now, our server acts a little screwy when %2F
+        // appears in our urls. It seems to treat them just like real
+        // slashes. The easiest solution is to just remove them from
+        // the title.
+        title = title.replace(/\//g, "");
         var sheets = mark2.ui.getScrambleSheets();
         var request = toScrambleRequest(sheets);
         var password = mark2.ui.getPassword();

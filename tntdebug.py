@@ -12,7 +12,9 @@ if sys.executable is None:
     sys.executable = "Jython?"
 
 try:
-    import java.lang.Throwable as Throwable
+    from java.lang import Throwable
+    from net.gnehzr.tnoodle.utils import TNoodleLogging
+    TNoodleLogging.initializeLogging()
 except ImportError:
     Throwable = None
     # Do nothing, we're just running in pure python

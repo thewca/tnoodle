@@ -26,17 +26,21 @@ public class AlgorithmBuilder {
      * if we had just naively appended turns.
      */
     private PuzzleState originalState, unNormalizedState;
+    private int totalCost;
     private MergingMode mergingMode = MergingMode.NO_MERGING;
+    private Puzzle puzzle;
     public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode) {
         this(puzzle, mergingMode, puzzle.getSolvedState());
     }
     
     public AlgorithmBuilder(Puzzle puzzle, MergingMode mergingMode, PuzzleState originalState) {
+        this.puzzle = puzzle;
         this.mergingMode = mergingMode;
         resetToState(originalState);
     }
 
     private void resetToState(PuzzleState originalState) {
+        this.totalCost = 0;
         this.originalState = originalState;
         this.unNormalizedState = originalState;
         this.moves.clear();
@@ -155,19 +159,25 @@ public class AlgorithmBuilder {
     public void appendMove(String newMove) throws InvalidMoveException {
         l.fine("appendMove(" + newMove + ")");
         IndexAndMove indexAndMove = findBestIndexForMove(newMove, mergingMode);
+        int oldCostMove, newCostMove;
         if(indexAndMove.index < moves.size()) {
             // This move is redundant.
             azzert(mergingMode != MergingMode.NO_MERGING);
+            oldCostMove = states.get(indexAndMove.index).getMoveCost(moves.get(indexAndMove.index));
             if(indexAndMove.move == null) {
                 // newMove cancelled perfectly with the move at
                 // indexAndMove.index.
                 moves.remove(indexAndMove.index);
                 states.remove(indexAndMove.index + 1);
+                newCostMove = 0;
             } else {
                 // newMove merged with the move at indexAndMove.index.
                 moves.set(indexAndMove.index, indexAndMove.move);
+                newCostMove = states.get(indexAndMove.index).getMoveCost(indexAndMove.move);
             }
         } else {
+            oldCostMove = 0;
+            newCostMove = states.get(states.size() - 1).getMoveCost(indexAndMove.move);
             // This move is not redundant.
             moves.add(indexAndMove.move);
             // The code to update the states array is right below us,
@@ -175,6 +185,8 @@ public class AlgorithmBuilder {
             // size.
             states.add(null);
         }
+
+        totalCost += newCostMove - oldCostMove;
 
         // We modified moves[ indexAndMove.index ], so everything in
         // states[ indexAndMove.index+1, ... ] is now invalid
@@ -191,10 +203,7 @@ public class AlgorithmBuilder {
         ArrayList<String> movesCopy = new ArrayList<String>(moves);
         String poppedMove = movesCopy.remove(index);
 
-        moves.clear();
-        states.clear();
-        unNormalizedState = originalState;
-        states.add(unNormalizedState);
+        resetToState(originalState);
         for(String move : movesCopy) {
             try {
                 appendMove(move);
@@ -216,8 +225,8 @@ public class AlgorithmBuilder {
         return states.get(states.size() - 1);
     }
 
-    public int length() {
-        return moves.size();
+    public int getTotalCost() {
+        return totalCost;
     }
 
     public String toString() {
