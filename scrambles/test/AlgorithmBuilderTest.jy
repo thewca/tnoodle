@@ -1,0 +1,14 @@
+import tntdebug
+
+from puzzle import CubePuzzle
+from net.gnehzr.tnoodle.scrambles import AlgorithmBuilder
+from net.gnehzr.tnoodle.scrambles.AlgorithmBuilder import MergingMode
+
+def main():
+    sixes = CubePuzzle(6)
+    ab = AlgorithmBuilder(sixes, MergingMode.NO_MERGING)
+    ab.appendAlgorithm("3Dw2")
+    assert ab.isRedundant("3Dw2")
+
+if __name__ == "__main__":
+    main()
