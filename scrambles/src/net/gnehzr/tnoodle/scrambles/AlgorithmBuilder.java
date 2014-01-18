@@ -100,6 +100,9 @@ public class AlgorithmBuilder {
             this.index = index;
             this.move = move;
         }
+        public String toString() {
+            return "{ index: " + index + " move: " + move + " }";
+        }
     }
 
     public IndexAndMove findBestIndexForMove(String move, MergingMode mergingMode) throws InvalidMoveException {
@@ -140,7 +143,7 @@ public class AlgorithmBuilder {
                 PuzzleState stateAfterLastMove = states.get(lastMoveIndex+1);
                 PuzzleState stateAfterLastMoveAndNewMove = stateAfterLastMove.apply(move);
 
-                if(stateBeforeLastMove.equals(stateAfterLastMoveAndNewMove)) {
+                if(stateBeforeLastMove.equalsNormalized(stateAfterLastMoveAndNewMove)) {
                     // move cancels with lastMove
                     return new IndexAndMove(lastMoveIndex, null);
                 } else {

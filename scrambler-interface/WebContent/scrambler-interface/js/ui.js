@@ -888,7 +888,7 @@ var mark2 = {};
         };
 
 
-        var addRound = function(eventID, round, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt) {
+        var addRound = function(eventID, round, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt, placeLast) {
             if (round === undefined) {
                 round = numCurrentRounds(eventID)+1;
             }
@@ -920,14 +920,16 @@ var mark2 = {};
                     );
             var rounds = getRounds(true);
             var lastRoundOfEvent = null;
-            for(var i = 0; i < rounds.length; i++) {
-                var roundJson = rounds[i];
-                if(roundJson.eventID == eventID) {
-                    lastRoundOfEvent = roundJson.element;
+            if(!placeLast) {
+                for(var i = 0; i < rounds.length; i++) {
+                    var roundJson = rounds[i];
+                    if(roundJson.eventID == eventID) {
+                        lastRoundOfEvent = roundJson.element;
+                    }
                 }
-            }
-            if(lastRoundOfEvent) {
-                lastRoundOfEvent = lastRoundOfEvent.nextSibling;
+                if(lastRoundOfEvent) {
+                    lastRoundOfEvent = lastRoundOfEvent.nextSibling;
+                }
             }
             roundsTbody.insertBefore(newEventTR, lastRoundOfEvent);
 
@@ -1067,7 +1069,8 @@ var mark2 = {};
 
         var addRounds = function(rounds) {
             for (var i = 0; i < rounds.length; i++) {
-                addRound(rounds[i].eventID, rounds[i].round, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount);
+                var placeLast = true;
+                addRound(rounds[i].eventID, rounds[i].round, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount, placeLast);
             }
         };
 
