@@ -488,7 +488,7 @@ public abstract class Puzzle implements Exportable {
             }
 
 
-            HashMap<PuzzleState, String> movesByState = node.getCanonicalMovesByState();
+            HashMap<? extends PuzzleState, String> movesByState = node.getCanonicalMovesByState();
             for(PuzzleState next : movesByState.keySet()) {
                 int moveCost = node.getMoveCost(movesByState.get(next));
                 int nextDistance = distance + moveCost;
@@ -631,7 +631,7 @@ public abstract class Puzzle implements Exportable {
          * @return A mapping of canonical PuzzleState's to the name of
          *         the move that gets you to them.
          */
-        public final HashMap<PuzzleState, String> getCanonicalMovesByState() {
+        public HashMap<? extends PuzzleState, String> getCanonicalMovesByState() {
             LinkedHashMap<String, ? extends PuzzleState> successorsByName =
                 getSuccessorsByName();
             HashMap<PuzzleState, String> uniqueSuccessors =
@@ -739,7 +739,7 @@ public abstract class Puzzle implements Exportable {
          *         The move Strings may not contain spaces.
          */
         public HashMap<String, ? extends PuzzleState> getScrambleSuccessors() {
-            return getSuccessorsByName();
+            return GwtSafeUtils.reverseHashMap(getCanonicalMovesByState());
         }
 
         /**

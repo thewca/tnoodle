@@ -119,7 +119,7 @@ public class AlgorithmBuilder {
         }
         PuzzleState newNormalizedState = newUnNormalizedState.getNormalized();
 
-        HashMap<PuzzleState, String> successors = getState().getCanonicalMovesByState();
+        HashMap<? extends PuzzleState, String> successors = getState().getCanonicalMovesByState();
         move = null;
         // Search for the right move to do to our current state in
         // order to match up with newNormalizedState.
@@ -148,10 +148,12 @@ public class AlgorithmBuilder {
                     return new IndexAndMove(lastMoveIndex, null);
                 } else {
                     successors = stateBeforeLastMove.getCanonicalMovesByState();
-                    String alternateLastMove = successors.get(stateAfterLastMoveAndNewMove);
-                    if(alternateLastMove != null) {
-                        // move merges with lastMove
-                        return new IndexAndMove(lastMoveIndex, alternateLastMove);
+                    for(PuzzleState ps : successors.keySet()) {
+                        if(ps.equalsNormalized(stateAfterLastMoveAndNewMove)) {
+                            String alternateLastMove = successors.get(ps);
+                            // move merges with lastMove
+                            return new IndexAndMove(lastMoveIndex, alternateLastMove);
+                        }
                     }
                 }
             }

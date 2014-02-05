@@ -1179,7 +1179,7 @@ Implementation-Version: %s
             retVal = os.system("./jython %s" % absTestFile)
             if retVal != 0:
                 print("Test %s failed with exit code %s" % (absTestFile, retVal))
-                sys.exit(retVal)
+                sys.exit(1)
 
     def clean(self):
         print('Cleaning: %s' % self.name)

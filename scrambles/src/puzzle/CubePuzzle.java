@@ -504,13 +504,28 @@ public class CubePuzzle extends Puzzle {
 
         @Override
         public LinkedHashMap<String, CubeState> getSuccessorsByName() {
-            return getSuccessorsWithinSlice(size - 1);
+            return getSuccessorsWithinSlice(size - 1, true);
         }
 
-        private LinkedHashMap<String, CubeState> getSuccessorsWithinSlice(int maxSlice) {
+        @Override
+        public HashMap<String, CubeState> getScrambleSuccessors() {
+            return getSuccessorsWithinSlice((int) (size / 2) - 1, false);
+        }
+
+        @Override
+        public HashMap<? extends PuzzleState, String> getCanonicalMovesByState() {
+            return GwtSafeUtils.reverseHashMap(getScrambleSuccessors());
+        }
+
+        private LinkedHashMap<String, CubeState> getSuccessorsWithinSlice(int maxSlice, boolean includeRedundant) {
             LinkedHashMap<String, CubeState> successors = new LinkedHashMap<String, CubeState>();
             for(int innerSlice = 0; innerSlice <= maxSlice; innerSlice++) {
                 for(Face face : Face.values()) {
+                    boolean halfOfEvenCube = size % 2 == 0 && (innerSlice == (size / 2) - 1);
+                    if(!includeRedundant && face.ordinal() >= 3 && halfOfEvenCube) {
+                        // Skip turning the other halves of even sized cubes
+                        continue;
+                    }
                     int outerSlice = 0;
                     for(int dir = 1; dir <= 3; dir++) {
                         CubeMove move = new CubeMove(face, dir, innerSlice, outerSlice);
@@ -530,11 +545,6 @@ public class CubePuzzle extends Puzzle {
             }
 
             return successors;
-        }
-
-        @Override
-        public HashMap<String, CubeState> getScrambleSuccessors() {
-            return getSuccessorsWithinSlice((int) (size / 2) - 1);
         }
 
         @Override
