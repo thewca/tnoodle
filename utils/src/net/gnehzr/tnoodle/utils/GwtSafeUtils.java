@@ -229,5 +229,14 @@ public final class GwtSafeUtils {
             is.close();
         }
     }
+
+    public static <A, B> HashMap<B, A> reverseHashMap(HashMap<A, B> map) {
+        HashMap<B, A> reverseMap = new HashMap<B, A>();
+        for(A a : map.keySet()) {
+            B b = map.get(a);
+            reverseMap.put(b, a);
+        }
+        return reverseMap;
+    }
     
 }

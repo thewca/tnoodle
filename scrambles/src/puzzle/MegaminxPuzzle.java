@@ -483,9 +483,9 @@ public class MegaminxPuzzle extends Puzzle {
             HashMap<String, Face> pochmannFaceNames = new HashMap<String, Face>();
             pochmannFaceNames.put("R", Face.DBR);
             pochmannFaceNames.put("D", Face.D);
-            String[] prettyPochmannDir = new String[] { null, null, "++", "--" };
+            String[] prettyPochmannDir = new String[] { null, "+", "++", "--" , "-"};
             for(String pochmannFaceName : pochmannFaceNames.keySet()) {
-                for(int dir : new int[] { 2, 3 }) {
+                for(int dir = 1; dir < 5; dir++) {
                     String move = pochmannFaceName + prettyPochmannDir[dir];
 
                     int[][] imageCopy = cloneImage(image);
