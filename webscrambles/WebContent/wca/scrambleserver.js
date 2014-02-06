@@ -83,7 +83,7 @@ tnoodle.Scrambler = function(hostname, port, protocol) {
     };
 
     this.showExt = function(title, scrambleRequest, password, ext, target) {
-        var params = { scrambles: JSON.stringify(scrambleRequest) };
+        var params = { sheets: JSON.stringify(scrambleRequest) };
         if(password) {
             params.password = password;
         }

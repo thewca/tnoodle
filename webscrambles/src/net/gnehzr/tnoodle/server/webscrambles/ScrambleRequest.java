@@ -937,7 +937,7 @@ class ScrambleRequest {
         parameters.setFileNameInZip(jsonFileName);
         zipOut.putNextEntry(null, parameters);
         HashMap<String, Object> jsonObj = new HashMap<String, Object>();
-        jsonObj.put("rounds", scrambleRequests);
+        jsonObj.put("sheets", scrambleRequests);
         jsonObj.put("competitionName", globalTitle);
         jsonObj.put("version", Utils.getProjectName() + "-" + Utils.getVersion());
         jsonObj.put("generationDate", generationDate);

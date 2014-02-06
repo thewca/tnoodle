@@ -223,7 +223,7 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             }
             query = parseQuery(body.toString());
 
-            String json = query.get("scrambles");
+            String json = query.get("sheets");
             ScrambleRequest[] scrambleRequests = GSON.fromJson(json, ScrambleRequest[].class);
 
             String password = query.get("password");
