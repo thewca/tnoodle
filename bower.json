@@ -11,6 +11,6 @@
     "tnoodle", "tnoodlejs"
   ],
   "ignore": [
-    "./!(tnoodle.js)"
+    "**/*", "!tnoodle.js"
   ]
 }
