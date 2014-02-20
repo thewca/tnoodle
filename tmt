@@ -384,6 +384,10 @@ class tmt:
                 # After committing that file, there should not be anything left uncommitted.
                 tmt.exitIfWorkspaceNotClean()
 
+        if not tmt.args.dry_run:
+            tnoodleAndroidProject = tmt.TmtProject.projects['tnoodle-android']
+            tnoodleAndroidProject.publishToMavenCentral()
+
         print("Releasing TNoodle")
 
         tagMessage = "version %s" % tmt.VERSION

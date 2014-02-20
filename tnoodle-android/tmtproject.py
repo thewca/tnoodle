@@ -9,17 +9,23 @@ class Project(tmt.TmtProject):
     def getDependencies(self):
         return [ tmt.TmtProject.projects['scrambles'] ]
 
+    def runGradleTask(self, task):
+        retVal = os.system(self.gradlew % task)
+        assert retVal == 0
+
     def compile(self):
         # Note that we skip signing here in order to prevent
         # travis ci issue.
-        retVal = os.system(self.gradlew % "assemble -x signArchives")
-        assert retVal == 0
+        self.runGradleTask("assemble -x signArchives")
 
     def clean(self):
-        retVal = os.system(self.gradlew % "clean")
-        assert retVal == 0
+        self.runGradleTask("clean")
 
     def check(self):
         pass
+
+    def publishToMavenCentral(self):
+        self.runGradleTask("uploadArchives")
+        self.runGradleTask("nexusStagingRelease")
 
 Project(tmt.projectName(), description="Android scrambling library")
