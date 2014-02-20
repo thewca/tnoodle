@@ -6,6 +6,7 @@ import zipfile
 import tempfile
 import time
 import math
+import json
 import datetime
 import atexit
 
@@ -345,14 +346,11 @@ class tmt:
         print(pullCommand)
         assert 0 == os.system(pullCommand)
 
-        assert exists('VERSION')
-        versionFileContents = open('VERSION').read().split('\n')
-        tmt.VERSION = None
-        for line in versionFileContents:
-            if not line.startswith("#"):
-                tmt.VERSION = line
-                break
-        assert tmt.VERSION
+        assert exists('bower.json')
+        with open('bower.json') as bower_json_file:
+            parsed_json = json.load(bower_json_file)
+            tmt.VERSION = parsed_json['version']
+            assert tmt.VERSION
         tag = "v%s" % tmt.VERSION
 
         # We want to compile before we tag, that way we don't have to
