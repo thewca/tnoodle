@@ -150,7 +150,7 @@ class Project(tmt.EclipseProject):
 
         # "-style PRETTY" makes the gwt code almost readable, but also more
         # than doubles the size of the resulting code.
-        #args += [ '-style', 'PRETTY' ]
+        args += [ '-style', 'PRETTY' ]
 
         args.append(GWT_MODULE)
 

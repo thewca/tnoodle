@@ -1,0 +1,16 @@
+{
+  "name": "tnoodlejs",
+  "version": "0.8.5",
+  "homepage": "https://github.com/cubing/tnoodle",
+  "authors": [
+    "Jeremy Fleischman <jeremyfleischman@gmail.com>"
+  ],
+  "description": "A javascript library to generate and draw scrambles for WCA events.",
+  "main": "tnoodlejs/war/tnoodlejs/tnoodle.js",
+  "keywords": [
+    "tnoodle", "tnoodlejs"
+  ],
+  "ignore": [
+    "./!(tnoodlejs/war/tnoodlejs/tnoodle.js)"
+  ]
+}

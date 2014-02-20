@@ -16,8 +16,12 @@ lintIgnoredDirectories = [
    'winstone/src/javax/',
    'min2phase/src/cs/min2phase/',
    'threephase/src/cs/threephase/',
-   'cubecomps/WebContent/cubecomps/',
+   'cubecomps/WebContent/cubecomps/'
 ]
+
+# This directory is automatically produced by GWT, and it does all sorts
+# of "bad" stuff.
+lintIgnoredDirectories += [ 'tnoodlejs/war/tnoodlejs/' ]
 
 ignoredExtensions = {
     ".sfd",
