@@ -198,19 +198,25 @@ class tmt:
         for project in reversed(sortedProjects):
             project.configure()
 
-    def assertWorkspaceClean(self):
+    def isWorkspaceClean(self, printWhy=False):
         retVal, stdout, stderr = tmt.runCmd(['git', 'ls-files', '--other', '--exclude-standard'])
         assert retVal == 0
         if stdout != '':
             sys.stderr.write("Untracked files found, please deal with them before releasing:\n")
             sys.stderr.write(stdout)
-            sys.exit(1)
+            return False
 
         retVal, stdout, stderr = tmt.runCmd(['git', 'diff', '--name-only'])
         assert retVal == 0
         if stdout != '':
             sys.stderr.write("Edited files found, please commit them before releasing:\n")
             sys.stderr.write(stdout)
+            return False
+
+        return True
+
+    def exitIfWorkspaceNotClean(self):
+        if not self.isWorkspaceClean(printWhy=True):
             sys.exit(1)
 
     def assertCommitsPushed(self):
@@ -243,7 +249,7 @@ class tmt:
             print(project.prettyDependencies())
 
     def _pullRequest(self):
-        self.assertWorkspaceClean()
+        self.exitIfWorkspaceNotClean()
         self.assertCommitsPushed()
         ghApi = github.getApi(organization="cubing", repo="tnoodle")
 
@@ -332,7 +338,7 @@ class tmt:
         if not tmt.args.dry_run:
             ghApi = github.getApi(organization="cubing", repo="tnoodle")
 
-            tmt.assertWorkspaceClean()
+            tmt.exitIfWorkspaceNotClean()
 
         pullCommand = 'git pull'
         print(pullCommand)
@@ -365,16 +371,18 @@ class tmt:
         # I think noRemake is ok for generating a single unified html file...
         timerProject.dist(noRemake=True)
 
-        # Copy tnoodle.js to the root of our repository and commit it.
+        # Copy tnoodle.js to the root of our repository and commit it (if necessary).
         tnoodlejsFile = "tnoodlejs/war/tnoodlejs/tnoodle.js"
         copyTNoodleJsCommand = "cp %s tnoodle.js" % tnoodlejsFile
         assert 0 == os.system(copyTNoodleJsCommand)
-        commitTNoodleJsCommand = "git commit tnoodle.js -m 'tnoodlejs updated to %s'" % ( tag )
-        print(commitTNoodleJsCommand)
-        if not tmt.args.dry_run:
-            assert 0 == os.system(commitTNoodleJsCommand)
-            # After committing that file, there should not be anything left uncommitted.
-            tmt.assertWorkspaceClean()
+        if not self.isWorkspaceClean():
+            # The workspace may not be clean because tnoodle.js changed.
+            commitTNoodleJsCommand = "git commit tnoodle.js -m 'tnoodlejs updated to %s'" % ( tag )
+            print(commitTNoodleJsCommand)
+            if not tmt.args.dry_run:
+                assert 0 == os.system(commitTNoodleJsCommand)
+                # After committing that file, there should not be anything left uncommitted.
+                tmt.exitIfWorkspaceNotClean()
 
         print("Releasing TNoodle")
 
