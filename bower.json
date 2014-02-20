@@ -6,7 +6,7 @@
     "Jeremy Fleischman <jeremyfleischman@gmail.com>"
   ],
   "description": "A javascript library to generate and draw scrambles for WCA events.",
-  "main": "tnoodlejs/war/tnoodlejs/tnoodle.js",
+  "main": "tnoodle.js",
   "keywords": [
     "tnoodle", "tnoodlejs"
   ],
