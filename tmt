@@ -328,6 +328,10 @@ class tmt:
         tmt.args.debug = None
         tmt.args.profile = None
 
+        tnoodlejsFile = "tnoodlejs/war/tnoodlejs/tnoodle.js"
+        cleanTNoodleJsCommand = "git checkout %s" % tnoodlejsFile
+        assert 0 == os.system(cleanTNoodleJsCommand)
+
         if not tmt.args.dry_run:
             ghApi = github.getApi(organization="cubing", repo="tnoodle")
 
@@ -349,6 +353,7 @@ class tmt:
                 tmt.VERSION = line
                 break
         assert tmt.VERSION
+        tag = "v%s" % tmt.VERSION
 
         # We want to compile before we tag, that way we don't have to
         # clean up if the code won't compile. We also want to set
@@ -360,22 +365,28 @@ class tmt:
         # the version number of the resulting file will be correct.
         wcaProject = tmt.TmtProject.projects[wcaProjectName]
         wcaProject.dist()
-        tmt.assertWorkspaceClean()#<<<
+
+        timerProject = tmt.TmtProject.projects['timer']
+        tmt.args.project = timerProject.name # yuck =(
+        # I think noRemake is ok for generating a single unified html file...
+        timerProject.dist(noRemake=True)
+
+        commitTNoodleJsCommand = "git commit %s -m 'tnoodlejs updated to %s'" % ( tnoodlejsFile, tag )
+        print(commitTNoodleJsCommand)
+        if not tmt.args.dry_run:
+            # After building, tnoodlejs will have changed, so we commit the new version
+            assert 0 == os.system(commitTNoodleJsCommand)
+            # After committing that file, there should not be anything left uncommitted.
+            tmt.assertWorkspaceClean()
 
         print("Releasing TNoodle")
 
-        tag = "v%s" % tmt.VERSION
         tagMessage = "version %s" % tmt.VERSION
         tagCommand = "git tag -a %s -m '%s'" % (tag, tagMessage)
         print(tagCommand)
         if not tmt.args.dry_run:
             assert 0 == os.system(tagCommand)
         print("Successfully created tag %s" % tag)
-
-        timerProject = tmt.TmtProject.projects['timer']
-        tmt.args.project = timerProject.name # yuck =(
-        # I think noRemake is ok for generating a single unified html file...
-        timerProject.dist(noRemake=True)
 
         baseWcaFileName = os.path.basename(wcaProject.distJarFile())
         files = [
