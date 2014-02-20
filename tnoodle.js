@@ -202,12 +202,12 @@ function tnoodlejs(){
   processMetas();
   try {
     var strongName;
-    unflattenKeylistIntoAnswers(['gecko1_8'], '5E5770CB84170765CB6A768C187A7AA8');
-    unflattenKeylistIntoAnswers(['ie6'], '5E5770CB84170765CB6A768C187A7AA8' + ':1');
-    unflattenKeylistIntoAnswers(['ie8'], '5E5770CB84170765CB6A768C187A7AA8' + ':2');
-    unflattenKeylistIntoAnswers(['ie9'], '5E5770CB84170765CB6A768C187A7AA8' + ':3');
-    unflattenKeylistIntoAnswers(['opera'], '5E5770CB84170765CB6A768C187A7AA8' + ':4');
-    unflattenKeylistIntoAnswers(['safari'], '5E5770CB84170765CB6A768C187A7AA8' + ':5');
+    unflattenKeylistIntoAnswers(['gecko1_8'], '1FD7F5B04BF03330922242AF3458C6B9');
+    unflattenKeylistIntoAnswers(['ie6'], '1FD7F5B04BF03330922242AF3458C6B9' + ':1');
+    unflattenKeylistIntoAnswers(['ie8'], '1FD7F5B04BF03330922242AF3458C6B9' + ':2');
+    unflattenKeylistIntoAnswers(['ie9'], '1FD7F5B04BF03330922242AF3458C6B9' + ':3');
+    unflattenKeylistIntoAnswers(['opera'], '1FD7F5B04BF03330922242AF3458C6B9' + ':4');
+    unflattenKeylistIntoAnswers(['safari'], '1FD7F5B04BF03330922242AF3458C6B9' + ':5');
     strongName = answers[computePropValue('user.agent')];
     var idx = strongName.indexOf(':');
     if (idx != -1) {
@@ -246,7 +246,7 @@ function tnoodlejs(){
 }
 
 tnoodlejs();
-(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '5E5770CB84170765CB6A768C187A7AA8';var _, P0_longLit = {l:0, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$FullCube = 19, Q$double_$1 = 20, Q$int_$1 = 21, Q$int_$2 = 22, Q$Serializable = 23, Q$Boolean = 24, Q$CharSequence = 25, Q$Class = 26, Q$Comparable = 27, Q$Double = 28, Q$Enum = 29, Q$Exception = 30, Q$Integer = 31, Q$Number = 32, Q$Object_$1 = 33, Q$StackTraceElement = 34, Q$String_$1 = 35, Q$Throwable = 36, Q$Date = 37, Q$HashMap = 38, Q$LinkedHashMap$ChainEntry = 39, Q$List = 40, Q$Map = 41, Q$Map$Entry = 42, Q$NoSuchElementException = 43, Q$RandomAccess = 44, Q$Set = 45, Q$TreeMap$Node = 46, Q$TreeMap$SubMapType = 47, Q$Handler = 48, Q$Handler_$1 = 49, Q$Logger = 50, Q$InvalidMoveException = 51, Q$InvalidScrambleException = 52, Q$Puzzle = 53, Q$Puzzle$Bucket = 54, Q$Puzzle$PuzzleState = 55, Q$Color = 56, Q$Element = 57, Q$InvalidHexColorException = 58, Q$Path = 59, Q$Path$Command = 60, Q$Point2D$Double = 61, Q$Transform = 62, Q$Exportable = 63, Q$ClockPuzzle = 64, Q$ClockPuzzle$ClockState = 65, Q$CubePuzzle = 66, Q$CubePuzzle$CubeMove = 67, Q$CubePuzzle$CubeMove_$1 = 68, Q$CubePuzzle$CubeState = 69, Q$CubePuzzle$Face = 70, Q$FourByFourCubePuzzle = 71, Q$FourByFourRandomTurnsCubePuzzle = 72, Q$MegaminxPuzzle = 73, Q$MegaminxPuzzle$Face = 74, Q$MegaminxPuzzle$MegaminxState = 75, Q$NoInspectionFiveByFiveCubePuzzle = 76, Q$NoInspectionFourByFourCubePuzzle = 77, Q$NoInspectionThreeByThreeCubePuzzle = 78, Q$PyraminxPuzzle = 79, Q$PyraminxPuzzle$PyraminxState = 80, Q$SkewbPuzzle = 81, Q$SkewbPuzzle$SkewbState = 82, Q$SquareOnePuzzle = 83, Q$SquareOnePuzzle$SquareOneState = 84, Q$ThreeByThreeCubePuzzle = 85, Q$TwoByTwoCubePuzzle = 86, CM$ = {};
+(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '1FD7F5B04BF03330922242AF3458C6B9';var _, P0_longLit = {l:0, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$FullCube = 19, Q$double_$1 = 20, Q$int_$1 = 21, Q$int_$2 = 22, Q$Serializable = 23, Q$Boolean = 24, Q$CharSequence = 25, Q$Class = 26, Q$Comparable = 27, Q$Double = 28, Q$Enum = 29, Q$Exception = 30, Q$Integer = 31, Q$Number = 32, Q$Object_$1 = 33, Q$StackTraceElement = 34, Q$String_$1 = 35, Q$Throwable = 36, Q$Date = 37, Q$HashMap = 38, Q$LinkedHashMap$ChainEntry = 39, Q$List = 40, Q$Map = 41, Q$Map$Entry = 42, Q$NoSuchElementException = 43, Q$RandomAccess = 44, Q$Set = 45, Q$TreeMap$Node = 46, Q$TreeMap$SubMapType = 47, Q$Handler = 48, Q$Handler_$1 = 49, Q$Logger = 50, Q$InvalidMoveException = 51, Q$InvalidScrambleException = 52, Q$Puzzle = 53, Q$Puzzle$Bucket = 54, Q$Puzzle$PuzzleState = 55, Q$Color = 56, Q$Element = 57, Q$InvalidHexColorException = 58, Q$Path = 59, Q$Path$Command = 60, Q$Point2D$Double = 61, Q$Transform = 62, Q$Exportable = 63, Q$ClockPuzzle = 64, Q$ClockPuzzle$ClockState = 65, Q$CubePuzzle = 66, Q$CubePuzzle$CubeMove = 67, Q$CubePuzzle$CubeMove_$1 = 68, Q$CubePuzzle$CubeState = 69, Q$CubePuzzle$Face = 70, Q$FourByFourCubePuzzle = 71, Q$FourByFourRandomTurnsCubePuzzle = 72, Q$MegaminxPuzzle = 73, Q$MegaminxPuzzle$Face = 74, Q$MegaminxPuzzle$MegaminxState = 75, Q$NoInspectionFiveByFiveCubePuzzle = 76, Q$NoInspectionFourByFourCubePuzzle = 77, Q$NoInspectionThreeByThreeCubePuzzle = 78, Q$PyraminxPuzzle = 79, Q$PyraminxPuzzle$PyraminxState = 80, Q$SkewbPuzzle = 81, Q$SkewbPuzzle$SkewbState = 82, Q$SquareOnePuzzle = 83, Q$SquareOnePuzzle$SquareOneState = 84, Q$ThreeByThreeCubePuzzle = 85, Q$TwoByTwoCubePuzzle = 86, CM$ = {};
 function newSeed(id){
   return new seedTable[id];
 }
@@ -10315,7 +10315,7 @@ function $export0(this$static){
   }
   );
   $wnd.tnoodlejs.getVersion = $entry(function(){
-    return '0.8.6';
+    return '0.8.7';
   }
   );
   $wnd.tnoodlejs.scrambleToSvg = $entry(function(a0, a1, a2){
