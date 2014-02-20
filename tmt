@@ -369,7 +369,7 @@ class tmt:
         tnoodlejsFile = "tnoodlejs/war/tnoodlejs/tnoodle.js"
         copyTNoodleJsCommand = "cp %s tnoodle.js" % tnoodlejsFile
         assert 0 == os.system(copyTNoodleJsCommand)
-        commitTNoodleJsCommand = "git commit %s -m 'tnoodlejs updated to %s'" % ( tnoodlejsFile, tag )
+        commitTNoodleJsCommand = "git commit tnoodle.js -m 'tnoodlejs updated to %s'" % ( tag )
         print(commitTNoodleJsCommand)
         if not tmt.args.dry_run:
             assert 0 == os.system(commitTNoodleJsCommand)

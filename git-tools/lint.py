@@ -19,9 +19,9 @@ lintIgnoredDirectories = [
    'cubecomps/WebContent/cubecomps/'
 ]
 
-# This directory is automatically produced by GWT, and it does all sorts
+# This file is automatically produced by GWT, and it does all sorts
 # of "bad" stuff.
-lintIgnoredDirectories += [ 'tnoodlejs/war/tnoodlejs/' ]
+lintIgnoredDirectories += [ 'tnoodle.js' ]
 
 ignoredExtensions = {
     ".sfd",
