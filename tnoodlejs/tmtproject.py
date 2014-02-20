@@ -117,14 +117,9 @@ class Project(tmt.EclipseProject):
         puzzles = open(join(self.scramblesProject.src, 'puzzle', 'puzzles')).read()
         puzzles = puzzles.replace("\n", "\\n")
 
-        # Note that we only use tmt.VERSION if we're releaseing.
-        # We want GWT builds to be deterministic: compiling twice should result in
-        # the exact same tnoodle.js file, unless something actually changed. This will
-        # prevent unecessary commits to tnoodle.js.
-        version = tmt.VERSION if tmt.releasing else "DEVEL"
         defines = {
             '%%PUZZLES%%': puzzles,
-            '%%VERSION%%': version,
+            '%%VERSION%%': tmt.VERSION,
             '//%%RESOURCES%%': javaResources
         }
         javaFiles = tmt.glob(self.scramblesProject.src, r'.*\.java$')

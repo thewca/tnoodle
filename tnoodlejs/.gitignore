@@ -1,7 +1,4 @@
 gwt-*
 postprocessed
 doc
-
-war/WEB-INF
-war/tnoodlejs/clear.cache.gif
-war/tnoodlejs/tnoodlejs.nocache.js
+war
