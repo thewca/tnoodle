@@ -360,6 +360,7 @@ class tmt:
         # the version number of the resulting file will be correct.
         wcaProject = tmt.TmtProject.projects[wcaProjectName]
         wcaProject.dist()
+        tmt.assertWorkspaceClean()#<<<
 
         print("Releasing TNoodle")
 
