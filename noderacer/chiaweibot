@@ -1,2 +1,0 @@
-function foo() { gm.gui.gameBoards["13057582041496820131"].gameInstance.keydown({keyCode:75});}
-function foo() { gm.gui.gameBoards[now.core.clientId].gameInstance.keydown({keyCode:75});}
