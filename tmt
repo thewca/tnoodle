@@ -366,11 +366,6 @@ class tmt:
         wcaProject = tmt.TmtProject.projects[wcaProjectName]
         wcaProject.dist()
 
-        timerProject = tmt.TmtProject.projects['timer']
-        tmt.args.project = timerProject.name # yuck =(
-        # I think noRemake is ok for generating a single unified html file...
-        timerProject.dist(noRemake=True)
-
         # Copy tnoodle.js to the root of our repository and commit it (if necessary).
         tnoodlejsFile = "tnoodlejs/war/tnoodlejs/tnoodle.js"
         copyTNoodleJsCommand = "cp %s tnoodle.js" % tnoodlejsFile
@@ -401,8 +396,6 @@ class tmt:
         files = [
             ( baseWcaFileName, open(wcaProject.distJarFile(), 'rb').read() ),
         ]
-        for fileName, url in timerProject.unifiedHtmlFiles.items():
-            files.append( ( os.path.basename(fileName), open(fileName, 'rb').read() ) )
         if not tmt.args.dry_run:
             response, uploadResponses = ghApi.createRelease(tag, files=files)
 
