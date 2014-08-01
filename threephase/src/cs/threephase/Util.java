@@ -1,15 +1,8 @@
 package cs.threephase;
 
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Arrays;
 
-import net.gnehzr.tnoodle.utils.Utils;
-import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
-
-public class Util {
-        private static final Logger l = Logger.getLogger(Util.class.getName());
+class Util {
 
 	static int[][] Cnk = new int[25][25];
 	static int[] fact = new int[13];
@@ -30,127 +23,78 @@ public class Util {
 			fact[i+1] = fact[i] * (i+1);
 		}
 	}
-
-	static void write(byte[] arr, DataOutput out) throws IOException {
-		out.write(arr);
+	
+	static OutputStream getOutput(String filename) throws IOException {
+		return new BufferedOutputStream(new FileOutputStream(filename));
 	}
-
-	static void read(byte[] arr, DataInput in) throws IOException {
-		in.readFully(arr);
+	
+	static InputStream getInput(String filename) throws IOException {
+		return new BufferedInputStream(new FileInputStream(filename));
 	}
-
-	static void read(int[][] arr, DataInput in) throws IOException {
-		final int length = arr.length;
-		for (int i=0; i<length; i++) {
-			final int len = arr[i].length;
-			for (int j=0; j<len; j++) {
-				arr[i][j] = in.readInt();
-			}
-		}
-	}
-
-	static void write(int[][] arr, DataOutput out) throws IOException {
-		final int length = arr.length;
-		for (int i=0; i<length; i++) {
-			final int len = arr[i].length;
-			for (int j=0; j<len; j++) {
-				out.writeInt(arr[i][j]);
-			}
-		}
-	}
-
-	public static synchronized void init() {
-		init(true, null);
-	}
-
-	private static void prepareTables() {
-		Center1.initSym2Raw();
-	}
-
-	public static enum InitializationState {
-		UNINITIALIZED,
-		INITING_CENTER1,
-		INITING_EDGE3,
-		INITIALIZED;
-	}
-
-	public static InitializationState getInitializationState() {
-		return inited;
-	}
-
-	static volatile InitializationState inited = InitializationState.UNINITIALIZED;
-
-	private static synchronized void init(boolean tryToReadFile, File tpr_tables) {
-		if(inited != InitializationState.UNINITIALIZED) {
-			return;
-		}
-
-		if(tpr_tables == null) {
-			tpr_tables = new File(Utils.getResourceDirectory(), "tpr_tables");
-			//tpr_tables = new File("tpr_tables");
-		}
-
-		prepareTables();
-		if(tryToReadFile) {
-			try {
-				FileInputStream is = new FileInputStream(tpr_tables);
-				if(initFrom(new DataInputStream(is))) {
-					inited = InitializationState.INITIALIZED;
-				}
-			} catch (FileNotFoundException e) {
-				l.info("Couldn't find " + tpr_tables + ", going to create it.");
-			}
-		}
-		if(inited == InitializationState.UNINITIALIZED) {
-			TimedLogRecordStart start = new TimedLogRecordStart(Level.INFO, "Generating threephase tables");
-			l.log(start);
-
-			inited = InitializationState.INITING_CENTER1;
-			Center1.createMoveTable();
-			inited = InitializationState.INITING_EDGE3;
-			Edge3.createPrun();
-
-			try {
-                            l.info("Writing to " + tpr_tables);
-                            FileOutputStream out = new FileOutputStream(tpr_tables);
-                            DataOutputStream dataOut = new DataOutputStream(out);
-                            initTo(dataOut);
-			} catch(IOException e) {
-				l.log(Level.INFO, "Failed to write to " + tpr_tables, e);
-			}
-
-			l.log(start.finishedNow());
-		}
-		inited = InitializationState.INITIALIZED;
-	}
-
-	public static boolean initFrom(DataInput in) {
+	
+	static boolean read(int[] arr, int idx, int length, String filename) {
 		try {
-			read(Center1.ctsmv, in);
-			read(Edge3.modedTable, in);
-
+			DataInputStream in = new DataInputStream(getInput(filename));
+			for (int i=idx, len=idx+length; i<len; i++) {
+				arr[i] = in.readInt();
+			}
+			in.close();
 			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
 			return false;
 		}
 	}
 
-	public static void initTo(DataOutput out) throws IOException {
-		write(Center1.ctsmv, out);
-		write(Edge3.modedTable, out);
+	static boolean write(int[] arr, int idx, int length, String filename) {
+		try {
+			DataOutputStream out = new DataOutputStream(getOutput(filename));
+			for (int i=idx, len=idx+length; i<len; i++) {
+				out.writeInt(arr[i]);
+			}
+			out.close();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
-        /*
-	public static void main(String[] args) throws IOException {
-		System.out.println(Arrays.toString(args));
-		if(args.length != 1) {
-			System.out.println("Please provide 1 argument: the file to store the tables in");
-			System.exit(1);
+	static boolean read(int[][] data, int l, int r, int width, String filename) {
+		try {
+			InputStream is = getInput(filename);
+			byte[] buf = new byte[width * 4];
+			for (int i=l; i<r; i++) {
+				is.read(buf);
+				for (int j=0; j<width; j++) {
+					data[i][j] = (buf[j*4])&0xff | (buf[j*4+1]<<8)&0xff00 | (buf[j*4+2]<<16)&0xff0000 | (buf[j*4+3]<<24)&0xff000000;
+				}
+			}
+			is.close();
+			return true;
+		} catch (IOException e) {
+			return false;
 		}
-		init(false, new File(args[0]));
 	}
-        */
+	
+	static boolean write(int[][] data, int l, int r, int width, String filename) {
+		try {
+			OutputStream os = getOutput(filename);
+			byte[] buf = new byte[width * 4];
+			for (int i=l; i<r; i++) {
+				int idx = 0;
+				for (int j=0; j<width; j++) {
+					buf[idx++] = (byte)(data[i][j] & 0xff);
+					buf[idx++] = (byte)((data[i][j]>>>8) & 0xff);
+					buf[idx++] = (byte)((data[i][j]>>>16) & 0xff);
+					buf[idx++] = (byte)((data[i][j]>>>24) & 0xff);
+				}
+				os.write(buf);
+			}
+			os.close();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
 
 	public static void swap(int[] arr, int a, int b, int c, int d, int key) {
 		int temp;
@@ -179,7 +123,7 @@ public class Util {
 			return;
 		}
 	}
-
+	
 	public static void swap(byte[] arr, int a, int b, int c, int d, int key) {
 		byte temp;
 		switch (key) {
@@ -207,7 +151,7 @@ public class Util {
 			return;
 		}
 	}
-
+	
 	static void set8Perm(int[] arr, int idx) {
 		int val = 0x76543210;
 		for (int i=0; i<7; i++) {
@@ -221,7 +165,7 @@ public class Util {
 		}
 		arr[7] = val;
 	}
-
+	
 	static void set8Perm(byte[] arr, int idx) {
 		int val = 0x76543210;
 		for (int i=0; i<7; i++) {
@@ -235,19 +179,7 @@ public class Util {
 		}
 		arr[7] = (byte)val;
 	}
-
-	static int parity(int[] arr) {
-		int parity = 0;
-		for (int i=0, len=arr.length; i<len; i++) {
-			for (int j=i; j<len; j++) {
-				if (arr[i] > arr[j]) {
-					parity ^= 1;
-				}
-			}
-		}
-		return parity;
-	}
-
+	
 	static int parity(byte[] arr) {
 		int parity = 0;
 		for (int i=0, len=arr.length; i<len; i++) {
@@ -260,4 +192,11 @@ public class Util {
 		return parity;
 	}
 
+	static void setPruning(int[] table, int index, int value) {
+		table[index >> 3] ^= (0x0f ^ value) << ((index & 7) << 2);
+	}
+
+	static int getPruning(int[] table, int index) {
+		return (table[index >> 3] >> ((index & 7) << 2)) & 0x0f;
+	}
 }

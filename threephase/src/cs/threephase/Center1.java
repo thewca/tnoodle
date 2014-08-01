@@ -15,34 +15,23 @@ import java.util.*;
 */
 
 final class Center1 {
-
+	
 	static int[][] ctsmv = new int[15582][36];
 	static int[] sym2raw = new int[15582];
 	static byte[] csprun = new byte[15582];
-
+	
 	static int[][] symmult = new int[48][48];
 	static int[][] symmove = new int[48][36];
 	static int[] syminv = new int[48];
 	static int[] finish = new int[48];
 
 	static void initSym2Raw() {
-		initSym();
 		Center1 c = new Center1();
-		c.set(0);
-		for (int i=0; i<48; i++) {
-			finish[syminv[i]] = c.get();
-			c.rot(0);
-			if (i%2==1) c.rot(1);
-			if (i%8==7) c.rot(2);
-			if (i%16==15) c.rot(3);
-		}
-
 		int[] occ = new int[735471/32+1];
 		int count = 0;
 		for (int i=0; i<735471; i++) {
 			if ((occ[i>>>5]&(1<<(i&0x1f))) == 0) {
 				sym2raw[count++] = i;
-//				occ[i] = true;
 				c.set(i);
 				for (int j=0; j<48; j++) {
 					int idx = c.get();
@@ -54,36 +43,53 @@ final class Center1 {
 				}
 			}
 		}
-		occ = null;
-		System.gc();
+		assert count == 15582;		
 	}
-
+	
 	static void init() {
-
+		initSym();
 		initSym2Raw();
+
+		Center1 c = new Center1();
+		c.set(0);
+		for (int i=0; i<48; i++) {
+			finish[syminv[i]] = c.get();
+			c.rot(0);
+			if (i%2==1) c.rot(1);
+			if (i%8==7) c.rot(2);
+			if (i%16==15) c.rot(3);
+		}
+		
+		if (!read(ctsmv, 0, 15582, 36, "Center1.move")) {
+			createMoveTable();
+			write(ctsmv, 0, 15582, 36, "Center1.move");
+		}		
+		
 		Arrays.fill(csprun, (byte)-1);
 		csprun[0] = 0;
 		int depth = 0;
 		int done = 1;
-
+		
 		while (done != 15582) {
 			boolean inv = depth > 4;
 			int select = inv ? -1 : depth;
 			int check = inv ? depth : -1;
 			depth++;
 			for (int i=0; i<15582; i++) {
-				if (csprun[i] == select) {
-					for (int m=0; m<27; m++) {
-						int idx = ctsmv[i][m] >>> 6;
-						if (csprun[idx] == check) {
-							++done;
-							if (inv) {
-								csprun[i] = (byte) depth;
-								break;
-							} else {
-								csprun[idx] = (byte) depth;
-							}
-						}
+				if (csprun[i] != select) {
+					continue;
+				}
+				for (int m=0; m<27; m++) {
+					int idx = ctsmv[i][m] >>> 6;
+					if (csprun[idx] != check) {
+						continue;
+					}
+					++done;
+					if (inv) {
+						csprun[i] = (byte) depth;
+						break;
+					} else {
+						csprun[idx] = (byte) depth;
 					}
 				}
 			}
@@ -104,51 +110,51 @@ final class Center1 {
 			}
 		}
 	}
-
+	
 	byte[] ct = new byte[24];
-
+	
 	Center1() {
 		for (int i=0; i<8; i++) {
 			ct[i] = 1;
 		}
 		for (int i=8; i<24; i++) {
 			ct[i] = 0;
-		}
+		}		
 	}
-
+	
 	Center1(byte[] ct) {
 		for (int i=0; i<24; i++) {
 			this.ct[i] = ct[i];
 		}
 	}
-
+	
 	Center1(CenterCube c, int urf) {
 		for (int i=0; i<24; i++) {
 			this.ct[i] = (byte) ((c.ct[i]/2 == urf) ? 1 : 0);
 		}
 	}
-
+	
 	void move(int m) {
 		int key = m % 3;
 		m /= 3;
 		switch (m) {
 		case 0:	//U
-			swap(ct, 0, 1, 2, 3, key);
+			swap(ct, 0, 1, 2, 3, key);			
 			break;
 		case 1:	//R
-			swap(ct, 16, 17, 18, 19, key);
+			swap(ct, 16, 17, 18, 19, key);			
 			break;
 		case 2:	//F
-			swap(ct, 8, 9, 10, 11, key);
+			swap(ct, 8, 9, 10, 11, key);			
 			break;
 		case 3:	//D
-			swap(ct, 4, 5, 6, 7, key);
+			swap(ct, 4, 5, 6, 7, key);			
 			break;
 		case 4:	//L
-			swap(ct, 20, 21, 22, 23, key);
+			swap(ct, 20, 21, 22, 23, key);			
 			break;
 		case 5:	//B
-			swap(ct, 12, 13, 14, 15, key);
+			swap(ct, 12, 13, 14, 15, key);			
 			break;
 		case 6:	//u
 			swap(ct, 0, 1, 2, 3, key);
@@ -179,10 +185,10 @@ final class Center1 {
 			swap(ct, 12, 13, 14, 15, key);
 			swap(ct, 1, 20, 7, 18, key);
 			swap(ct, 0, 23, 6, 17, key);
-			break;
+			break;		
 		}
-	}
-
+	}		
+	
 	void set(int idx) {
 		int r = 8;
 		for (int i=23; i>=0; i--) {
@@ -193,8 +199,8 @@ final class Center1 {
 			}
 		}
 	}
-
-	int get() {
+	
+	int get() {	
 		int idx = 0;
 		int r = 8;
 		for (int i=23; i>=0; i--) {
@@ -222,14 +228,14 @@ final class Center1 {
 	static int raw2sym(int n) {
 		int m = Arrays.binarySearch(sym2raw, n);
 		return (m>=0 ? m : -1);
-	}
+	}	
 
 	void set(Center1 c) {
 		for (int i=0; i<24; i++) {
 			this.ct[i] = c.ct[i];
 		}
 	}
-
+	
 	void rot(int r) {
 		switch (r) {
 		case 0:
@@ -253,8 +259,8 @@ final class Center1 {
 			move(dx3);
 			move(fx1);
 			move(bx3);
-			break;
-		}
+			break;			
+		}	
 	}
 /*
 0	I
@@ -282,8 +288,8 @@ final class Center1 {
 38	yz2
 39	y'z2
  */
-	static String[] rot2str = {"", "y2", "x", "x y2", "x2", "z2", "x'", "x' y2", "", "", "", "", "", "", "", "",
-		"y z", "y' z'", "y2 z", "z'", "y' z", "y z'", "z", "z y2", "", "", "", "", "", "", "", "",
+	static String[] rot2str = {"", "y2", "x", "x y2", "x2", "z2", "x'", "x' y2", "", "", "", "", "", "", "", "", 
+		"y z", "y' z'", "y2 z", "z'", "y' z", "y z'", "z", "z y2", "", "", "", "", "", "", "", "", 
 		"y' x'", "y x", "y'", "y", "y' x", "y x'", "y z2", "y' z2",  "", "", "", "", "", "", "", ""};
 
 
@@ -295,7 +301,7 @@ final class Center1 {
 			if (j%16==15) rot(3);
 		}
 	}
-
+	
 	static int getSolvedSym(CenterCube cube) {
 		Center1 c = new Center1(cube.ct);
 		for (int j=0; j<48; j++) {
@@ -316,7 +322,7 @@ final class Center1 {
 		}
 		return -1;
 	}
-
+	
 	public boolean equals(Object obj) {
 		if (obj instanceof Center1) {
 			Center1 c = (Center1)obj;
@@ -329,7 +335,7 @@ final class Center1 {
 		}
 		return false;
 	}
-
+	
 	static void initSym() {
 		Center1 c = new Center1();
 		for (byte i=0; i<24; i++) {
@@ -338,7 +344,7 @@ final class Center1 {
 		Center1 d = new Center1(c.ct);
 		Center1 e = new Center1(c.ct);
 		Center1 f = new Center1(c.ct);
-
+		
 		for (int i=0; i<48; i++) {
 			for (int j=0; j<48; j++) {
 				for (int k=0; k<48; k++) {
@@ -350,7 +356,7 @@ final class Center1 {
 					}
 					d.rot(0);
 					if (k%2==1) d.rot(1);
-					if (k%8==7) d.rot(2);
+					if (k%8==7) d.rot(2);				
 					if (k%16==15) d.rot(3);
 				}
 				c.rot(0);
@@ -363,7 +369,7 @@ final class Center1 {
 			if (i%8==7) c.rot(2);
 			if (i%16==15) c.rot(3);
 		}
-
+		
 		for (int i=0; i<48; i++) {
 			c.set(e);
 			c.rotate(syminv[i]);
@@ -380,6 +386,6 @@ final class Center1 {
 					}
 				}
 			}
-		}
-	}
+		}		
+	}	
 }

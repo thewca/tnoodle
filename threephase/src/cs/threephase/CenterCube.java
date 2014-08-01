@@ -1,8 +1,8 @@
 package cs.threephase;
 
-import static cs.threephase.Util.swap;
-
-import java.util.Random;
+import java.util.*;
+import static cs.threephase.Moves.*;
+import static cs.threephase.Util.*;
 
 class CenterCube {
 
@@ -17,7 +17,7 @@ class CenterCube {
 	CenterCube(CenterCube c) {
 		copy(c);
 	}
-
+	
 	CenterCube(Random r) {
 		this();
 		for (int i=0; i<23; i++) {
@@ -29,20 +29,20 @@ class CenterCube {
 			}
 		}
 	}
-
+	
 	CenterCube(int[] moveseq) {
 		this();
 		for (int m=0; m<moveseq.length; m++) {
 			move(m);
 		}
 	}
-
+	
 	void copy(CenterCube c) {
 		for (int i=0; i<24; i++) {
 			this.ct[i] = c.ct[i];
 		}
 	}
-
+	
 	void print() {
 		for (int i=0; i<24; i++) {
 			System.out.print(ct[i]);
@@ -50,9 +50,9 @@ class CenterCube {
 		}
 		System.out.println();
 	}
-
+	
 	static int[] center333Map = {0, 4, 2, 1, 5, 3};
-
+	
 	void fill333Facelet(char[] facelet) {
 		int firstIdx = 4, inc = 9;
 		for (int i=0; i<6; i++) {
@@ -115,7 +115,7 @@ class CenterCube {
 			swap(ct, 12, 13, 14, 15, key);
 			swap(ct, 1, 20, 7, 18, key);
 			swap(ct, 0, 23, 6, 17, key);
-			break;
+			break;		
 		}
 	}
 }
