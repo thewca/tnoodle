@@ -314,7 +314,7 @@ public class Search implements Runnable {
 			sol = search333.solution(facelet, 21, 1000000, 30, 0);
 		}
 		int len333 = sol.length() / 3;
-		if (len333 < 15) {
+		if (sol.startsWith("Error")) {
 			System.out.println(sol);
 			throw new RuntimeException();
 		}
