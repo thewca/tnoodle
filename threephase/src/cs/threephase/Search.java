@@ -282,7 +282,7 @@ public class Search implements Runnable {
 					ct3.set(arr2[i].getCenter(), eparity ^ arr2[i].getCorner().getParity());
 					int ct = ct3.getct();
 					int edge = e12.get();
-					int prun = Util.getPruning(Edge3.eprun, e12.getsym());
+					int prun = Math.min(Util.getPruning(Edge3.eprun, e12.getsym()), Edge3.MAX_DEPTH);
 					int lm = 20;
 
 					if (prun <= length123 - arr2[i].length1 - arr2[i].length2 
@@ -460,7 +460,7 @@ public class Search implements Runnable {
 		ct3.set(c2.getCenter(), eparity ^ c2.getCorner().getParity());
 		int ct = ct3.getct();
 		int edge = e12.get();
-		int prun = Util.getPruning(Edge3.eprun, e12.getsym());
+		int prun = Math.min(Util.getPruning(Edge3.eprun, e12.getsym()), Edge3.MAX_DEPTH);
 
 		if (arr2[arr2idx] == null) {
 			arr2[arr2idx] = new FullCube(c2);
@@ -500,7 +500,7 @@ public class Search implements Runnable {
 			symcord1x >>= 3;
 			int cord2x = Edge3.getmvrot(tempe[depth].edge, m<<3|symx) % Edge3.N_RAW;
 
-			int prunx = Util.getPruning(Edge3.eprun, symcord1x * Edge3.N_RAW + cord2x);
+			int prunx = Math.min(Util.getPruning(Edge3.eprun, symcord1x * Edge3.N_RAW + cord2x), Edge3.MAX_DEPTH);
 			if (prunx >= maxl) {
 				if (prunx > maxl && m < 14) {
 					m = skipAxis3[m];

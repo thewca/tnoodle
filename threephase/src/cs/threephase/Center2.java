@@ -23,7 +23,7 @@ class Center2 {
 	static int[][] rlmv = new int[70][28];
 	static char[][] ctmv = new char[6435][28];
 	static int[][] rlrot = new int[70][16];
-	static int[][] ctrot = new int[6435][16];
+	static char[][] ctrot = new char[6435][16];
 	static byte[] ctprun = new byte[6435*35*2];
 	
 	private static int[] pmv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 
@@ -53,7 +53,7 @@ class Center2 {
 		for (int i=0; i<6435; i++) {
 			c.setct(i);
 			for (int j=0; j<16; j++) {
-				ctrot[i][j] = c.getct();
+				ctrot[i][j] = (char) c.getct();
 				c.rot(0);
 				if (j%2==1) c.rot(1);
 				if (j%8==7) c.rot(2);
@@ -64,7 +64,7 @@ class Center2 {
 			for (int m=0; m<28; m++) {
 				c.setct(i);
 				c.move(move2std[m]);
-				ctmv[i][m] = (char)c.getct();
+				ctmv[i][m] = (char) c.getct();
 			}
 		}
 		Arrays.fill(ctprun, (byte)-1);
@@ -74,17 +74,18 @@ class Center2 {
 		int done = 6;
 		while (done != 6435*35*2) {
 			for (int i=0; i<6435*35*2; i++) {
-				if (ctprun[i]==depth) {
-					int ct = i / 70;
-					int rl = i % 70;
-					for (int m=0; m<23; m++) {
-						int ctx = ctmv[ct][m];
-						int rlx = rlmv[rl][m];
-						int idx = ctx * 70 + rlx;
-						if (ctprun[idx] == -1) {
-							ctprun[idx] = (byte)(depth+1);
-							done++;
-						}
+				if (ctprun[i]!=depth) {
+					continue;
+				}
+				int ct = i / 70;
+				int rl = i % 70;
+				for (int m=0; m<23; m++) {
+					int ctx = ctmv[ct][m];
+					int rlx = rlmv[rl][m];
+					int idx = ctx * 70 + rlx;
+					if (ctprun[idx] == -1) {
+						ctprun[idx] = (byte)(depth+1);
+						done++;
 					}
 				}
 			}
