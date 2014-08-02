@@ -127,36 +127,11 @@ public class Search implements Runnable {
 	}
 
 	static {
-		System.out.println("Initialization...");
-		System.out.println("Initialize 3x3x3 Solver...");
 		cs.min2phase.Tools.init();
-		// DataInputStream dis = null;
-		// try {
-		// 	dis = new DataInputStream(new BufferedInputStream(new FileInputStream("twophase.data")));
-		// 	cs.min2phase.Tools.initFrom(dis);
-		// } catch (IOException e) {
-		// 	dis = null;
-		// }
-		// cs.min2phase.Tools.init();
-		// if (dis == null) {
-		// 	DataOutputStream dos = null;
-		// 	try {
-		// 		dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("twophase.data")));
-		// 		cs.min2phase.Tools.saveTo(dos);
-		// 		dos.close();
-		// 	} catch (Exception e) {
-		// 		e.printStackTrace();
-		// 	}
-		// }
-		System.out.println("Initialize Center1 Solver...");
-		Center1.init();
-		System.out.println("Initialize Center2 Solver...");
+		Util.init();
+		Center1.createPrun();
 		Center2.init();
-		System.out.println("Initialize Center3 Solver...");
 		Center3.init();
-		System.out.println("Initialize Edge3 Solver...");
-		Edge3.init();
-		System.out.println("OK");	
 	}
 
 	static Random r = new Random(42);

@@ -106,10 +106,10 @@ public class Edge3 {
 		initEdgex();
 		initRaw2Sym();
 
-		if (!read(eprun, 0, eprun.length, "Edge3.prunS")) {
-			createPrun();
-			write(eprun, 0, eprun.length, "Edge3.prunS");
-		}
+		// if (!read(eprun, 0, eprun.length, "Edge3.prunS")) {
+		// 	createPrun();
+		// 	write(eprun, 0, eprun.length, "Edge3.prunS");
+		// }
 	}
 
 	public String toString() {
