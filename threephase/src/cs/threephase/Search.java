@@ -12,13 +12,15 @@ import static cs.threephase.Center1.csprun;
 import static cs.threephase.Center1.symmove;
 
 import java.util.*;
-import java.io.*;
+// import java.io.*;
 
-public class Search implements Runnable {
+public class Search {
 	static final int PHASE1_SOLUTIONS = 10000;
 	static final int PHASE2_ATTEMPS = 500;
 	static final int PHASE2_SOLUTIONS = 100;
 	static final int PHASE3_ATTEMPS = 100;
+
+	static boolean inited = false;
 
 	PriorityQueue<FullCube> p1sols = new PriorityQueue<FullCube>(PHASE2_ATTEMPS, new FullCube.ValueComparator());
 
@@ -42,12 +44,14 @@ public class Search implements Runnable {
 	cs.min2phase.Search search333 = new cs.min2phase.Search();
 
 	int valid1 = 0;
-	public String solution = "";
-	public long endtime;
+	String solution = "";
 
 	int p1SolsCnt = 0;
 	FullCube[] arr2 = new FullCube[PHASE2_SOLUTIONS];
-	int arr2idx = 0;		
+	int arr2idx = 0;	
+
+	public boolean inverse_solution = true;
+	public boolean with_rotation = false;	
 
 	public Search() {
 		for (int i=0; i<20; i++) {
@@ -55,88 +59,41 @@ public class Search implements Runnable {
 		}
 	}
 
-	public static String tostr(int[] moves) {
-		StringBuilder s = new StringBuilder();
-		for (int m: moves) {
-			s.append(move2str[m]).append(' ');
+	public synchronized static void init() {
+		if (inited) {
+			return;
 		}
-		return s.toString();
-	}
-
-	public static int[] tomove(String s) {
-		s = s.replaceAll("\\s", "");
-		int[] arr = new int[s.length()];
-		int j = 0;
-		for (int i=0, length=s.length(); i<length; i++) {
-			int axis = -1;
-			switch (s.charAt(i)) {
-			case 'U':	axis = 0;	break;
-			case 'R':	axis = 1;	break;
-			case 'F':	axis = 2;	break;
-			case 'D':	axis = 3;	break;
-			case 'L':	axis = 4;	break;
-			case 'B':	axis = 5;	break;
-			case 'u':	axis = 6;	break;
-			case 'r':	axis = 7;	break;
-			case 'f':	axis = 8;	break;
-			case 'd':	axis = 9;	break;
-			case 'l':	axis = 10;	break;
-			case 'b':	axis = 11;	break;
-			default:	continue;
-			}
-			axis *= 3;
-			if (++i<length) {
-				switch (s.charAt(i)) {
-				case '2':	axis++;		break;
-				case '\'':	axis+=2;	break;
-				default:	--i;
-				}
-			}
-			arr[j++] = axis;
-		}
-
-		int[] ret = new int[j];
-		while (--j>=0) {
-			ret[j] = arr[j];
-		}
-		return ret;
-	}
-
-	public static void main(String[] args) {
-		int n_solve;
-		if (args.length == 0) {
-			n_solve = 0;
-		} else {
-			n_solve = Integer.parseInt(args[0]);
-		}
-		Search first = new Search();
-		int[] dis = new int[60];
-		int lasttot = 0;
-		for (int i=n_solve; i!=0; --i) {
-			System.out.println(first.randomState());
-			int curlen = first.totlen - lasttot;
-			lasttot = first.totlen;
-			dis[curlen]++;
-			for (int j=0; j<60; j++) {
-				if (dis[j] != 0) {
-					System.out.println(String.format("%d\t%d\t%d", (n_solve-i+1), j, dis[j]));
-				}
-			}
-			System.out.println(String.format("%5.2f\t%f", first.totlen / 1.0 / (n_solve-i+1), first.tottime / (n_solve-i+1) / 1000000.0));
-		}
-	}
-
-	static {
 		cs.min2phase.Tools.init();
-		Util.init();
+
+		System.out.println("Initialize Center1 Solver...");
+
+		Center1.initSym();
+ 		Center1.raw2sym = new int[735471];
+		Center1.initSym2Raw();
+		Center1.createMoveTable();
+		Center1.raw2sym = null;
 		Center1.createPrun();
+
+		System.out.println("Initialize Center2 Solver...");
+
 		Center2.init();
+
+		System.out.println("Initialize Center3 Solver...");
+
 		Center3.init();
+
+		System.out.println("Initialize Edge3 Solver...");
+
+		Edge3.initMvrot();
+		Edge3.initRaw2Sym();
+		Edge3.createPrun();
+
+		System.out.println("OK");		
+
+		inited = true;	
 	}
 
-	static Random r = new Random(42);
-
-	public String randomMove() {
+	public String randomMove(Random r) {
 		int[] moveseq = new int[40];
 		int lm = 36;
 		for (int i=0; i<moveseq.length;) {
@@ -150,8 +107,9 @@ public class Search implements Runnable {
 		return solve(moveseq);
 	}
 
-	public String randomState() {
-		calc(r.nextInt(0x7fffffff));
+	public String randomState(Random r) {
+		c = new FullCube(r);
+		doSearch();
 		return solution;
 	}
 
@@ -161,31 +119,15 @@ public class Search implements Runnable {
 	}
 
 	public String solve(int[] moveseq) {
-		calc(moveseq);
+		c = new FullCube(moveseq);
+		doSearch();
 		return solution;	
 	}
 
-	public void calc(long seed) {
-	    c = new FullCube(seed);
-	    run();
-	}
-
-	public void calc(int[] moveseq) {
-		c = new FullCube(moveseq);
-		run();
-	}
-
-	public String randomState(Random r) {
-		c = new FullCube(r);
-		run();
-		System.out.println(solution);
-		return solution;
-	}
-
 	int totlen = 0;
-	long tottime = 0;
 
-	public void run() {
+	void doSearch() {
+		init();
 		solution = "";
 		int ud = new Center1(c.getCenter(), 0).getsym();
 		int fb = new Center1(c.getCenter(), 1).getsym();
@@ -197,8 +139,6 @@ public class Search implements Runnable {
 		p1SolsCnt = 0;
 		arr2idx = 0;
 		p1sols.clear();
-
-		long time = System.nanoTime();
 
 		for (length1=Math.min(Math.min(udprun, fbprun), rlprun); length1<100; length1++) {
 			if (rlprun <= length1 && search1(rl>>>6, rl&0x3f, length1, -1, 0) 
@@ -256,12 +196,12 @@ public class Search implements Runnable {
 					int eparity = e12.set(arr2[i].getEdge());
 					ct3.set(arr2[i].getCenter(), eparity ^ arr2[i].getCorner().getParity());
 					int ct = ct3.getct();
-					int edge = e12.get();
-					int prun = Math.min(Util.getPruning(Edge3.eprun, e12.getsym()), Edge3.MAX_DEPTH);
+					int edge = e12.get(10);
+					int prun = Edge3.getprun(e12.getsym());
 					int lm = 20;
 
 					if (prun <= length123 - arr2[i].length1 - arr2[i].length2 
-							&& search3(edge, ct, length123 - arr2[i].length1 - arr2[i].length2, lm, 0)) {
+							&& search3(edge, ct, prun, length123 - arr2[i].length1 - arr2[i].length2, lm, 0)) {
 						solcnt++;
 	//					System.out.println(length123 + " " + solcnt);
 	//					if (solcnt == 5) {
@@ -299,19 +239,16 @@ public class Search implements Runnable {
 		}
 
 		StringBuffer str = new StringBuffer();
-		str.append(solcube.getMoveString(true, false));
+		str.append(solcube.getMoveString(inverse_solution, with_rotation));
 
-		synchronized (solution) {
-			solution = str.toString();
-		}
+		solution = str.toString();
 
-		totlen += length1 + length2 + length + len333;
-		tottime += System.nanoTime() - time;
+		totlen = length1 + length2 + length + len333;
 	}
 
 	public void calc(FullCube s) {
 		c = s;
-		run();
+		doSearch();
 	}
 
 	boolean search1(int ct, int sym, int maxl, int lm, int depth) {
@@ -434,8 +371,8 @@ public class Search implements Runnable {
 		int eparity = e12.set(c2.getEdge());
 		ct3.set(c2.getCenter(), eparity ^ c2.getCorner().getParity());
 		int ct = ct3.getct();
-		int edge = e12.get();
-		int prun = Math.min(Util.getPruning(Edge3.eprun, e12.getsym()), Edge3.MAX_DEPTH);
+		int edge = e12.get(10);
+		int prun = Edge3.getprun(e12.getsym());
 
 		if (arr2[arr2idx] == null) {
 			arr2[arr2idx] = new FullCube(c2);
@@ -449,7 +386,7 @@ public class Search implements Runnable {
 		return arr2idx == arr2.length;
 	}
 
-	public boolean search3(int edge, int ct, int maxl, int lm, int depth) {
+	public boolean search3(int edge, int ct, int prun, int maxl, int lm, int depth) {
 		if (maxl == 0) {
 			return edge == 0 && ct == 0;
 		}
@@ -467,15 +404,15 @@ public class Search implements Runnable {
 				}
 				continue;
 			}
-			int edgex = Edge3.getmv(tempe[depth].edge, m);
+			int edgex = Edge3.getmvrot(tempe[depth].edge, m<<3, 10);
 
 			int cord1x = edgex / Edge3.N_RAW;
 			int symcord1x = Edge3.raw2sym[cord1x];
 			int symx = symcord1x & 0x7;
 			symcord1x >>= 3;
-			int cord2x = Edge3.getmvrot(tempe[depth].edge, m<<3|symx) % Edge3.N_RAW;
+			int cord2x = Edge3.getmvrot(tempe[depth].edge, m<<3|symx, 10) % Edge3.N_RAW;
 
-			int prunx = Math.min(Util.getPruning(Edge3.eprun, symcord1x * Edge3.N_RAW + cord2x), Edge3.MAX_DEPTH);
+			int prunx = Edge3.getprun(symcord1x * Edge3.N_RAW + cord2x, prun);
 			if (prunx >= maxl) {
 				if (prunx > maxl && m < 14) {
 					m = skipAxis3[m];
@@ -483,7 +420,7 @@ public class Search implements Runnable {
 				continue;
 			}
 
-			if (search3(edgex, ctx, maxl - 1, m, depth + 1)) {
+			if (search3(edgex, ctx, prunx, maxl - 1, m, depth + 1)) {
 				move3[depth] = m;
 				return true;
 			}

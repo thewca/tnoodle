@@ -31,6 +31,10 @@
       <exclude name="MainProgram.java"/>
       <exclude name="test.java"/>
   </source>
+  <source path='cs/threephase'>
+      <exclude name="Tools.java"/>
+      <exclude name="test.java"/>
+  </source>
   <source path='net/gnehzr/tnoodle/utils'>
       <exclude name="Utils.java"/>
       <exclude name="GsonUtils.java"/>
@@ -47,7 +51,7 @@
   <source path='net/gnehzr/tnoodle/svglite'/>
 
   <source path='puzzle'>
-      <exclude name="FourByFourCubePuzzle.java"/>
+      <!-- <exclude name="FourByFourCubePuzzle.java"/> -->
   </source>
   <source path='net/gnehzr/tnoodle/scrambles'>
       <exclude name="PuzzlePlugins.java"/>

@@ -1,8 +1,7 @@
 package cs.threephase;
-import java.util.*;
-import java.io.*;
+
+import java.util.Arrays;
 import static cs.threephase.Util.*;
-import static cs.threephase.Moves.*;
 
 /*
  					13	1	
@@ -20,12 +19,16 @@ import static cs.threephase.Moves.*;
  */
 
 public class Edge3 {
+	static final boolean IS_64BIT_PLATFORM = false;
 
 	static final int N_SYM = 1538;
 	static final int N_RAW = 20160;
 	static final int N_EPRUN = N_SYM * N_RAW;
-	static final int MAX_DEPTH = 11;
-	static int[] eprun = new int[N_EPRUN / 8];
+	static final int MAX_DEPTH = 10;
+
+	static final int[] prunValues = {1, 4, 16, 55, 324, 1922, 12275, 77640, 485359, 2778197, 11742425, 27492416, 31002941, 31006080};
+	
+	static int[] eprun = new int[N_EPRUN / 16];
 
 	static int[] sym2raw = new int[N_SYM];
 	static char[] symstate = new char[N_SYM];
@@ -38,28 +41,19 @@ public class Edge3 {
 	int[] temp;
 	boolean isStd = true;
 
-	static int[][] mvrot = new int[20 * 8][12];
-	static int[][] mvroto = new int[20 * 8][12];
-	static int[][] edgex = new int[20][12];
-	static int[][] edgeox = new int[20][12];
+	static int[][] mvrot = new int[20*8][12];
+	static int[][] mvroto = new int[20*8][12];
 	
-	private static int[] fact = {19958400, 1814400, 181440, 20160, 2520, 360, 60, 12, 3, 1};
 	static int[] factX = {1, 1, 2/2, 6/2, 24/2, 120/2, 720/2, 5040/2, 40320/2, 362880/2, 3628800/2, 39916800/2, 479001600/2};
 
-	static void initEdgex() {
-		Edge3 e = new Edge3();
-		for (int m=0; m<20; m++) {
-			e.set(0);
-			e.move(m);
-			for (int i=0; i<12; i++) {
-				edgex[m][i] = e.edge[i];
-			}
-			e.get();
-			for (int i=0; i<12; i++) {
-				edgeox[m][i] = e.temp[i];
-			}
-		}
+	static int done = 0;
 
+	public static double initStatus() {
+		return done * 1.0 / prunValues[MAX_DEPTH - 1];
+	}
+
+	static void initMvrot() {
+		Edge3 e = new Edge3();
 		for (int m=0; m<20; m++) {
 			for (int r=0; r<8; r++) {
 				e.set(0);
@@ -68,7 +62,7 @@ public class Edge3 {
 				for (int i=0; i<12; i++) {
 					mvrot[m<<3|r][i] = e.edge[i];
 				}
-				e.get();
+				e.std();
 				for (int i=0; i<12; i++) {
 					mvroto[m<<3|r][i] = e.temp[i];
 				}
@@ -82,9 +76,9 @@ public class Edge3 {
 		int count = 0;
 		for (int i=0; i<11880; i++) {
 			if ((occ[i>>>3]&(1<<(i&7))) == 0) {
-				e.set4(i);
+				e.set(i * factX[8]);
 				for (int j=0; j<8; j++) {
-					int idx = e.get4();
+					int idx = e.get(4);
 					if (idx == i) {
 						symstate[count] |= 1 << j;
 					}
@@ -102,29 +96,57 @@ public class Edge3 {
 		assert count == 1538;
 	}
 	
-	static void init() {
-		initEdgex();
-		initRaw2Sym();
-
-		// if (!read(eprun, 0, eprun.length, "Edge3.prunS")) {
-		// 	createPrun();
-		// 	write(eprun, 0, eprun.length, "Edge3.prunS");
-		// }
+	static void setPruning(int[] table, int index, int value) {
+		table[index >> 4] ^= (0x3 ^ value) << ((index & 0xf) << 1);
 	}
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		for (int i=0; i<12; i++) {
-			sb.append(String.format("%2c", "0123456789AB".charAt(edge[i])));
-		}
-		sb.append('\n');
-		for (int i=0; i<12; i++) {
-			sb.append(String.format("%2c", "0123456789AB".charAt(edgeo[i])));
-		}
-		return sb.toString();
+	static int getPruning(int[] table, int index) {
+		return (table[index >> 4] >> ((index & 0xf) << 1)) & 0x3;
 	}
 
-	static int done = 0;
+	static int getprun(int edge, int prun) {
+		int depm3 = getPruning(eprun, edge);
+		if (depm3 == 0x3) {
+			return MAX_DEPTH;
+		}
+		return (depm3 - prun + 16) % 3 + prun - 1;
+	}
+
+	static int getprun(int edge) {
+		Edge3 e = new Edge3();
+		int depth = 0;
+		int depm3 = getPruning(eprun, edge);
+		if (depm3 == 0x3) {
+			return MAX_DEPTH;
+		}
+		while (edge!=0) {
+			if (depm3 == 0) {
+				depm3 = 2;
+			} else {
+				depm3--;
+			}
+
+			int symcord1 = edge / N_RAW;
+			int cord1 = sym2raw[symcord1];
+			int cord2 = edge % N_RAW;
+			e.set(cord1 * N_RAW + cord2);
+
+			for (int m=0; m<17; m++) {
+				int cord1x = getmvrot(e.edge, m<<3, 4);
+				int symcord1x = raw2sym[cord1x];
+				int symx = symcord1x & 0x7;
+				symcord1x >>= 3;
+				int cord2x = getmvrot(e.edge, m<<3|symx, 10) % N_RAW;
+				int idx = symcord1x * N_RAW + cord2x;
+				if (getPruning(eprun, idx) == depm3) {
+					depth++;
+					edge = idx;
+					break;
+				}
+			}
+		}
+		return depth;
+	}	
 
 	static void createPrun() {
 		Edge3 e = new Edge3();
@@ -138,20 +160,22 @@ public class Edge3 {
 
 		while (done != N_EPRUN) {
 			boolean inv = depth > 9;
-			int find = inv ? 0xf : depth;
-			int chk = inv ? depth : 0xf;
+			int depm3 = depth % 3;
+			int dep1m3 = (depth + 1) % 3;
+			int find = inv ? 0x3 : depm3;
+			int chk = inv ? depm3 : 0x3;
 
 			if (depth >= MAX_DEPTH - 1) {
 				break;
 			}
 
-			for (int i_=0; i_<N_EPRUN; i_+=8) {
-				int val = eprun[i_ >> 3];
+			for (int i_=0; i_<N_EPRUN; i_+=16) {
+				int val = eprun[i_ >> 4];
 				if (!inv && val == -1) {
 					continue;
 				}
-				for (int i=i_, end=i_+8; i<end; i++, val>>=4) {
-					if ((val & 0xf) != find) {
+				for (int i=i_, end=i_+16; i<end; i++, val>>=2) {
+					if ((val & 0x3) != find) {
 						continue;
 					}
 					int symcord1 = i / N_RAW;
@@ -160,20 +184,20 @@ public class Edge3 {
 					e.set(cord1 * N_RAW + cord2);
 
 					for (int m=0; m<17; m++) {
-						int cord1x = getmv4(e.edge, m);
+						int cord1x = getmvrot(e.edge, m<<3, 4);
 						int symcord1x = raw2sym[cord1x];
 						int symx = symcord1x & 0x7;
 						symcord1x >>= 3;
-						int cord2x = getmvrot(e.edge, m<<3|symx) % N_RAW;
+						int cord2x = getmvrot(e.edge, m<<3|symx, 10) % N_RAW;
 						int idx = symcord1x * N_RAW + cord2x;
 						if (getPruning(eprun, idx) != chk) {
 							continue;
 						}
-						setPruning(eprun, inv ? i : idx, depth + 1);
+						setPruning(eprun, inv ? i : idx, dep1m3);
 						done++;
-						if ((done & 0x3ffff) == 0) {
-							System.out.print(String.format("%d\r", done));
-						}
+						// if ((done & 0x3ffff) == 0) {
+						// 	System.out.print(String.format("%d\r", done));
+						// }
 						if (inv) {
 							break;
 						}
@@ -185,40 +209,37 @@ public class Edge3 {
 						f.move(m);
 						f.rotate(symx);
 						for (int j=1; (symState >>= 1) != 0; j++) {
-							if ((symState & 1) == 1) {
-								g.set(f);
-								g.rotate(j);
-								int idxx = symcord1x * N_RAW + g.get() % N_RAW;
-								if (getPruning(eprun, idxx) == chk) {
-									setPruning(eprun, idxx, depth + 1);
-									done++;
-									if ((done & 0x3ffff) == 0) {
-										System.out.print(String.format("%d\r", done));
-									}
-								}
+							if ((symState & 1) != 1) {
+								continue;
+							}
+							g.set(f);
+							g.rotate(j);
+							int idxx = symcord1x * N_RAW + g.get(10) % N_RAW;
+							if (getPruning(eprun, idxx) == chk) {
+								setPruning(eprun, idxx, dep1m3);
+								done++;
+								// if ((done & 0x3ffff) == 0) {
+								// 	System.out.print(String.format("%d\r", done));
+								// }
 							}
 						}
 					}
 				}
 			}
 			depth++;
-			System.out.println(String.format("%2d%10d", depth, done));
+			System.out.println(depth + "\t" + done);
 		}
-	}
-
-	public static double initStatus() {
-		return done / 11742425.0;
 	}
 
 	static int[] FullEdgeMap = {0, 2, 4, 6, 1, 3, 7, 5, 8, 9, 10, 11};
 
 	int getsym() {
-		int cord1x = get4();
+		int cord1x = get(4);
 		int symcord1x = raw2sym[cord1x];
 		int symx = symcord1x & 0x7;
 		symcord1x >>= 3;
 		rotate(symx);
-		int cord2x = get() % N_RAW;
+		int cord2x = get(10) % N_RAW;
 		return symcord1x * N_RAW + cord2x;
 	}
 
@@ -256,44 +277,34 @@ public class Edge3 {
 		isStd = e.isStd;
 	}
 
-	static int getmv(int[] ep, int mv) {
-		int[] movo = edgeox[mv];
-		int[] mov = edgex[mv];
-		int idx = 0;
-		long val = 0xba9876543210L;
-		for (int i=0; i<10; i++) {
-			int v = movo[ep[mov[i]]] << 2;
-			idx *= 12 - i;
-			idx += (val >> v) & 0xf;
-			val -= 0x111111111110L << v;
-		}
-		return idx;	
-	}
-
-	static int getmv4(int[] ep, int mv) {
-		int[] movo = edgeox[mv];
-		int[] mov = edgex[mv];
-		int idx = 0;
-		long val = 0xba9876543210L;
-		for (int i=0; i<4; i++) {
-			int v = movo[ep[mov[i]]] << 2;
-			idx *= 12 - i;
-			idx += (val >> v) & 0xf;
-			val -= 0x111111111110L << v;
-		}
-		return idx;	
-	}
-
-	static int getmvrot(int[] ep, int mrIdx) {
+	static int getmvrot(int[] ep, int mrIdx, int end) {
 		int[] movo = mvroto[mrIdx];
 		int[] mov = mvrot[mrIdx];
 		int idx = 0;
-		long val = 0xba9876543210L;
-		for (int i=0; i<10; i++) {
-			int v = movo[ep[mov[i]]] << 2;
-			idx *= 12 - i;
-			idx += (val >> v) & 0xf;
-			val -= 0x111111111110L << v;
+
+		if (IS_64BIT_PLATFORM) {
+			long val = 0xba9876543210L;
+			for (int i=0; i<end; i++) {
+				int v = movo[ep[mov[i]]] << 2;
+				idx *= 12 - i;
+				idx += (val >> v) & 0xf;
+				val -= 0x111111111110L << v;
+			}
+		} else {	//long is not as fast as expected
+			int vall = 0x76543210;
+			int valh = 0xba98;
+			for (int i=0; i<end; i++) {
+				int v = movo[ep[mov[i]]] << 2;
+				idx *= 12 - i;
+				if (v >= 32) {
+					idx += (valh >> (v - 32)) & 0xf;
+					valh -= 0x1110 << (v - 32);
+				} else {
+					idx += (vall >> v) & 0xf;
+					valh -= 0x1111;
+					vall -= 0x11111110 << v;
+				}
+			}
 		}
 		return idx;	
 
@@ -314,28 +325,13 @@ public class Edge3 {
 		isStd = true;
 	}
 
-	int get() {
+	int get(int end) {
 		if (!isStd) {
 			std();
 		}
 		int idx = 0;
 		long val = 0xba9876543210L;
-		for (int i=0; i<10; i++) {
-			int v = edge[i] << 2;
-			idx *= 12 - i;
-			idx += (val >> v) & 0xf;
-			val -= 0x111111111110L << v;
-		}
-		return idx;		
-	}
-
-	int get4() {
-		if (!isStd) {
-			std();
-		}
-		int idx = 0;
-		long val = 0xba9876543210L;
-		for (int i=0; i<4; i++) {
+		for (int i=0; i<end; i++) {
 			int v = edge[i] << 2;
 			idx *= 12 - i;
 			idx += (val >> v) & 0xf;
@@ -367,10 +363,6 @@ public class Edge3 {
 			edgeo[i] = i;
 		}
 		isStd = true;
-	}
-
-	void set4(int idx) {
-		set(idx * factX[8]);
 	}
 
 	void move(int i) {

@@ -76,7 +76,7 @@ public class FullCube implements Comparable<FullCube> {
 
 	@Override
 	public int compareTo(FullCube c) {
-		return this.value - c.value;
+		return value - c.value;
 	}
 	
 	public FullCube() {
@@ -90,13 +90,6 @@ public class FullCube implements Comparable<FullCube> {
 		copy(c);
 	}
 	
-	public FullCube(long seed) {
-		Random r = new Random(seed);
-		edge = new EdgeCube(r);
-		center = new CenterCube(r);
-		corner = new CornerCube(r);
-	}
-
 	public FullCube(Random r) {
 		edge = new EdgeCube(r);
 		center = new CenterCube(r);
