@@ -2,7 +2,7 @@ language: android
 jdk: oraclejdk7
 android:
   components:
-    - build-tools-20.0.0
+    - build-tools-19.1.0
 
 env:
   - TNOODLE_INSTALL_GWT=1 ANDROID_TARGET=android-19
