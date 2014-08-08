@@ -61,9 +61,6 @@ public class SessionActivity extends ActionBarActivity
     static {
         try {
             puzzles = new TreeMap<String, LazyInstantiator<Puzzle>>(PuzzlePlugins.getScramblers());
-            // Right now, 444 uses a memory intensive solver that is just
-            // a bit much for a phone. 444rt exists as an alternative.
-            puzzles.remove("444");
 
             shortNames = new ArrayList<String>(puzzles.keySet());
         } catch(IOException e) {
