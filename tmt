@@ -377,7 +377,7 @@ class tmt:
         wcaProject.dist()
 
         # Copy tnoodle.js to the root of our repository and commit it (if necessary).
-        tnoodlejsFile = "tnoodlejs/war/tnoodlejs/tnoodle.js"
+        tnoodlejsFile = "tnoodlejs/WebContent/tnoodlejs/tnoodle.js"
         copyTNoodleJsCommand = "cp %s tnoodle.js" % tnoodlejsFile
         assert 0 == os.system(copyTNoodleJsCommand)
         if not self.isWorkspaceClean():
