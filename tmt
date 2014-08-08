@@ -409,7 +409,7 @@ class tmt:
             if not tmt.args.dry_run:
                 assert 0 == os.system(pushCommand)
 
-            pushCommand += ' git@github.com:cubing/tnoodle.git'
+            pushCommand += ' git@github.com:cubing/tnoodle.git master'
             print(pushCommand)
             if not tmt.args.dry_run:
                 assert 0 == os.system(pushCommand)
