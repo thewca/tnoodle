@@ -70,11 +70,10 @@
 
         var maxWidth = 0;
         var maxHeight = 0;
-        var svgElement = tnoodlejs.scrambleToSvg(scram, puzzle, maxWidth, maxHeight);
+        var svgText = tnoodlejs.scrambleToSvg(scram, puzzle, maxWidth, maxHeight);
 
         var scramble_image = document.getElementById("scramble_image");
-        scramble_image.innerHTML = "";
-        scramble_image.appendChild(svgElement);
+        scramble_image.innerHTML = svgText;
     }
 
 </script>
