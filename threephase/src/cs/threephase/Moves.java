@@ -1,4 +1,5 @@
 package cs.threephase;
+import java.util.*;
 
 class Moves {
 	static final byte U1 = 0;
@@ -100,35 +101,35 @@ class Moves {
 	public static final int bx2 = 34;
 	public static final int bx3 = 35;
 	public static final int eom = 36;//End Of Moves
-
-	public static final String[] move2str = {"U", "U2", "U'", "R", "R2", "R'", "F", "F2", "F'",
-	                                         "D", "D2", "D'", "L", "L2", "L'", "B", "B2", "B'",
-	                                         "Uw", "Uw2", "Uw'", "Rw", "Rw2", "Rw'", "Fw", "Fw2", "Fw'",
-	                                         "Dw", "Dw2", "Dw'", "Lw", "Lw2", "Lw'", "Bw", "Bw2", "Bw'"};
-
-	public static final String[] moveIstr = {"U'", "U2", "U", "R'", "R2", "R", "F'", "F2", "F",
-	                                         "D'", "D2", "D", "L'", "L2", "L", "B'", "B2", "B",
-	                                         "Uw'", "Uw2", "Uw", "Rw'", "Rw2", "Rw", "Fw'", "Fw2", "Fw",
-	                                         "Dw'", "Dw2", "Dw", "Lw'", "Lw2", "Lw", "Bw'", "Bw2", "Bw"};
-
-	static int[] move2std = {Ux1, Ux2, Ux3, Rx1, Rx2, Rx3, Fx1, Fx2, Fx3,
-							 Dx1, Dx2, Dx3, Lx1, Lx2, Lx3, Bx1, Bx2, Bx3,
+	
+	public static final String[] move2str = {"U  ", "U2 ", "U' ", "R  ", "R2 ", "R' ", "F  ", "F2 ", "F' ", 
+											 "D  ", "D2 ", "D' ", "L  ", "L2 ", "L' ", "B  ", "B2 ", "B' ", 
+											 "Uw ", "Uw2", "Uw'", "Rw ", "Rw2", "Rw'", "Fw ", "Fw2", "Fw'", 
+											 "Dw ", "Dw2", "Dw'", "Lw ", "Lw2", "Lw'", "Bw ", "Bw2", "Bw'"};
+	
+	public static final String[] moveIstr = {"U' ", "U2 ", "U  ", "R' ", "R2 ", "R  ", "F' ", "F2 ", "F  ", 
+											 "D' ", "D2 ", "D  ", "L' ", "L2 ", "L  ", "B' ", "B2 ", "B  ", 
+											 "Uw'", "Uw2", "Uw ", "Rw'", "Rw2", "Rw ", "Fw'", "Fw2", "Fw ", 
+											 "Dw'", "Dw2", "Dw ", "Lw'", "Lw2", "Lw ", "Bw'", "Bw2", "Bw "};
+	
+	static int[] move2std = {Ux1, Ux2, Ux3, Rx1, Rx2, Rx3, Fx1, Fx2, Fx3, 
+							 Dx1, Dx2, Dx3, Lx1, Lx2, Lx3, Bx1, Bx2, Bx3, 
 							 ux2, rx1, rx2, rx3, fx2, dx2, lx1, lx2, lx3, bx2, eom};
-
-	static int[] move3std = {Ux1, Ux2, Ux3, Rx2, Fx1, Fx2, Fx3, Dx1, Dx2, Dx3, Lx2, Bx1, Bx2, Bx3,
+	
+	static int[] move3std = {Ux1, Ux2, Ux3, Rx2, Fx1, Fx2, Fx3, Dx1, Dx2, Dx3, Lx2, Bx1, Bx2, Bx3, 
 							 ux2, rx2, fx2, dx2, lx2, bx2, eom};
-
+	
 	static int[] std2move = new int[37];
 	static int[] std3move = new int[37];
-
+		
 	static boolean[][] ckmv = new boolean[37][36];
 	static boolean[][] ckmv2 = new boolean[29][28];
 	static boolean[][] ckmv3 = new boolean[21][20];
-
+	
 	static int[] skipAxis = new int[36];
 	static int[] skipAxis2 = new int[28];
 	static int[] skipAxis3 = new int[20];
-
+	
 	static {
 		for (int i=0; i<29; i++) {
 			std2move[move2std[i]] = i;
