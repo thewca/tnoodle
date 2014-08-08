@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:appcompat-v7:19.0.0'
 }
 
 // From http://www.vandalsoftware.com/post/52468430435/publishing-an-android-library-aar-to-a-maven
