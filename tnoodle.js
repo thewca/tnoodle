@@ -202,12 +202,12 @@ function tnoodlejs(){
   processMetas();
   try {
     var strongName;
-    unflattenKeylistIntoAnswers(['gecko1_8'], '1FD7F5B04BF03330922242AF3458C6B9');
-    unflattenKeylistIntoAnswers(['ie6'], '1FD7F5B04BF03330922242AF3458C6B9' + ':1');
-    unflattenKeylistIntoAnswers(['ie8'], '1FD7F5B04BF03330922242AF3458C6B9' + ':2');
-    unflattenKeylistIntoAnswers(['ie9'], '1FD7F5B04BF03330922242AF3458C6B9' + ':3');
-    unflattenKeylistIntoAnswers(['opera'], '1FD7F5B04BF03330922242AF3458C6B9' + ':4');
-    unflattenKeylistIntoAnswers(['safari'], '1FD7F5B04BF03330922242AF3458C6B9' + ':5');
+    unflattenKeylistIntoAnswers(['gecko1_8'], '48AB81626CD2374C4FD07EED515BF898');
+    unflattenKeylistIntoAnswers(['ie6'], '48AB81626CD2374C4FD07EED515BF898' + ':1');
+    unflattenKeylistIntoAnswers(['ie8'], '48AB81626CD2374C4FD07EED515BF898' + ':2');
+    unflattenKeylistIntoAnswers(['ie9'], '48AB81626CD2374C4FD07EED515BF898' + ':3');
+    unflattenKeylistIntoAnswers(['opera'], '48AB81626CD2374C4FD07EED515BF898' + ':4');
+    unflattenKeylistIntoAnswers(['safari'], '48AB81626CD2374C4FD07EED515BF898' + ':5');
     strongName = answers[computePropValue('user.agent')];
     var idx = strongName.indexOf(':');
     if (idx != -1) {
@@ -246,7 +246,7 @@ function tnoodlejs(){
 }
 
 tnoodlejs();
-(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '1FD7F5B04BF03330922242AF3458C6B9';var _, P0_longLit = {l:0, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$FullCube = 19, Q$double_$1 = 20, Q$int_$1 = 21, Q$int_$2 = 22, Q$Serializable = 23, Q$Boolean = 24, Q$CharSequence = 25, Q$Class = 26, Q$Comparable = 27, Q$Double = 28, Q$Enum = 29, Q$Exception = 30, Q$Integer = 31, Q$Number = 32, Q$Object_$1 = 33, Q$StackTraceElement = 34, Q$String_$1 = 35, Q$Throwable = 36, Q$Date = 37, Q$HashMap = 38, Q$LinkedHashMap$ChainEntry = 39, Q$List = 40, Q$Map = 41, Q$Map$Entry = 42, Q$NoSuchElementException = 43, Q$RandomAccess = 44, Q$Set = 45, Q$TreeMap$Node = 46, Q$TreeMap$SubMapType = 47, Q$Handler = 48, Q$Handler_$1 = 49, Q$Logger = 50, Q$InvalidMoveException = 51, Q$InvalidScrambleException = 52, Q$Puzzle = 53, Q$Puzzle$Bucket = 54, Q$Puzzle$PuzzleState = 55, Q$Color = 56, Q$Element = 57, Q$InvalidHexColorException = 58, Q$Path = 59, Q$Path$Command = 60, Q$Point2D$Double = 61, Q$Transform = 62, Q$Exportable = 63, Q$ClockPuzzle = 64, Q$ClockPuzzle$ClockState = 65, Q$CubePuzzle = 66, Q$CubePuzzle$CubeMove = 67, Q$CubePuzzle$CubeMove_$1 = 68, Q$CubePuzzle$CubeState = 69, Q$CubePuzzle$Face = 70, Q$FourByFourCubePuzzle = 71, Q$FourByFourRandomTurnsCubePuzzle = 72, Q$MegaminxPuzzle = 73, Q$MegaminxPuzzle$Face = 74, Q$MegaminxPuzzle$MegaminxState = 75, Q$NoInspectionFiveByFiveCubePuzzle = 76, Q$NoInspectionFourByFourCubePuzzle = 77, Q$NoInspectionThreeByThreeCubePuzzle = 78, Q$PyraminxPuzzle = 79, Q$PyraminxPuzzle$PyraminxState = 80, Q$SkewbPuzzle = 81, Q$SkewbPuzzle$SkewbState = 82, Q$SquareOnePuzzle = 83, Q$SquareOnePuzzle$SquareOneState = 84, Q$ThreeByThreeCubePuzzle = 85, Q$TwoByTwoCubePuzzle = 86, CM$ = {};
+(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '48AB81626CD2374C4FD07EED515BF898';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$ThreeByThreeCubePuzzle = 92, Q$TwoByTwoCubePuzzle = 93, CM$ = {};
 function newSeed(id){
   return new seedTable[id];
 }
@@ -368,7 +368,7 @@ function RuntimeException_1(message){
   Exception_0.call(this, message);
 }
 
-defineSeed(6, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), RuntimeException_1);
+defineSeed(6, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), RuntimeException_0, RuntimeException_1);
 function JavaScriptException_0(e){
   RuntimeException_0.call(this);
   this.e = e;
@@ -1299,7 +1299,7 @@ function removeTop(srcImgMap, img){
 function setImgSrc(img, src){
   $clinit_ImageSrcIE6();
   var isSameSource, oldSrc, top_0;
-  isSameSource = $equals(img.__pendingSrc || img.src, src);
+  isSameSource = $equals_0(img.__pendingSrc || img.src, src);
   !srcImgMap_0 && (srcImgMap_0 = {});
   oldSrc = img.__pendingSrc;
   if (oldSrc != null) {
@@ -2240,7 +2240,7 @@ _.equals$ = function equals_4(other){
   if (!instanceOf(other, Q$JSONString)) {
     return false;
   }
-  return $equals(this.value, dynamicCast(other, Q$JSONString).value);
+  return $equals_0(this.value, dynamicCast(other, Q$JSONString).value);
 }
 ;
 _.getUnwrapper = function getUnwrapper_4(){
@@ -3030,7 +3030,7 @@ function $getStackTraceAsString(e, newline, indent){
   causedBy = '';
   seenCauses = new HashSet_0;
   while (!!currentCause && !seenCauses.map.containsKey(currentCause)) {
-    $add_0(seenCauses, currentCause);
+    $add_1(seenCauses, currentCause);
     s.impl.append_2(s.data, causedBy);
     causedBy = newline + 'Caused by: ';
     $append_2(s, currentCause.___clazz$.typeName);
@@ -3150,31 +3150,31 @@ function $parseLevel(s){
   if (s == null) {
     return null;
   }
-  if ($equals(s, ($clinit_Level() , 'OFF'))) {
+  if ($equals_0(s, ($clinit_Level() , 'OFF'))) {
     return OFF;
   }
-   else if ($equals(s, 'SEVERE')) {
+   else if ($equals_0(s, 'SEVERE')) {
     return SEVERE;
   }
-   else if ($equals(s, 'WARNING')) {
+   else if ($equals_0(s, 'WARNING')) {
     return WARNING;
   }
-   else if ($equals(s, 'INFO')) {
+   else if ($equals_0(s, 'INFO')) {
     return INFO;
   }
-   else if ($equals(s, 'CONFIG')) {
+   else if ($equals_0(s, 'CONFIG')) {
     return CONFIG;
   }
-   else if ($equals(s, 'FINE')) {
+   else if ($equals_0(s, 'FINE')) {
     return FINE;
   }
-   else if ($equals(s, 'FINER')) {
+   else if ($equals_0(s, 'FINER')) {
     return FINER;
   }
-   else if ($equals(s, 'FINEST')) {
+   else if ($equals_0(s, 'FINEST')) {
     return FINEST;
   }
-   else if ($equals(s, 'ALL')) {
+   else if ($equals_0(s, 'ALL')) {
     return ALL;
   }
   return null;
@@ -3279,7 +3279,7 @@ function $parse(name_0){
 }
 
 function $addHandler(this$static, handler){
-  $add(this$static.handlers, handler);
+  $add_0(this$static.handlers, handler);
 }
 
 function $fine(this$static, msg){
@@ -3303,7 +3303,7 @@ function $getEffectiveLevel(this$static){
 }
 
 function $getHandlers(this$static){
-  return dynamicCast($toArray(this$static.handlers, initDim(_3Ljava_util_logging_Handler_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$Handler_$1]), Q$Handler, this$static.handlers.size, 0)), Q$Handler_$1);
+  return dynamicCast($toArray_0(this$static.handlers, initDim(_3Ljava_util_logging_Handler_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$Handler_$1]), Q$Handler, this$static.handlers.size, 0)), Q$Handler_$1);
 }
 
 function $getLoggerHelper(name_0){
@@ -3335,7 +3335,7 @@ function $log(this$static, level, msg, thrown){
 function $log_0(this$static, record){
   var handler, handler$array, handler$index, handler$max, logger;
   if ($isLoggable(this$static, record.level)) {
-    for (handler$array = dynamicCast($toArray(this$static.handlers, initDim(_3Ljava_util_logging_Handler_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$Handler_$1]), Q$Handler, this$static.handlers.size, 0)), Q$Handler_$1) , handler$index = 0 , handler$max = handler$array.length; handler$index < handler$max; ++handler$index) {
+    for (handler$array = dynamicCast($toArray_0(this$static.handlers, initDim(_3Ljava_util_logging_Handler_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$Handler_$1]), Q$Handler, this$static.handlers.size, 0)), Q$Handler_$1) , handler$index = 0 , handler$max = handler$array.length; handler$index < handler$max; ++handler$index) {
       handler = handler$array[handler$index];
       handler.publish(record);
     }
@@ -3428,7 +3428,7 @@ _.equals$ = function equals_5(obj){
   if (!instanceOf(obj, Q$SafeUri)) {
     return false;
   }
-  return $equals(this.uri, dynamicCast(dynamicCast(obj, Q$SafeUri), Q$SafeUriString).uri);
+  return $equals_0(this.uri, dynamicCast(dynamicCast(obj, Q$SafeUri), Q$SafeUriString).uri);
 }
 ;
 _.hashCode$ = function hashCode_6(){
@@ -3473,11 +3473,11 @@ function $onModuleLoad_0(){
   currentMode = $doc.compatMode;
   allowedModes = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ['CSS1Compat']);
   for (i_0 = 0; i_0 < allowedModes.length; ++i_0) {
-    if ($equals(allowedModes[i_0], currentMode)) {
+    if ($equals_0(allowedModes[i_0], currentMode)) {
       return;
     }
   }
-  allowedModes.length == 1 && $equals('CSS1Compat', allowedModes[0]) && $equals('BackCompat', currentMode)?"GWT no longer supports Quirks Mode (document.compatMode=' BackCompat').<br>Make sure your application's host HTML page has a Standards Mode (document.compatMode=' CSS1Compat') doctype,<br>e.g. by using &lt;!doctype html&gt; at the start of your application's HTML page.<br><br>To continue using this unsupported rendering mode and risk layout problems, suppress this message by adding<br>the following line to your*.gwt.xml module file:<br>&nbsp;&nbsp;&lt;extend-configuration-property name=\"document.compatMode\" value=\"" + currentMode + '"/&gt;':"Your *.gwt.xml module configuration prohibits the use of the current doucment rendering mode (document.compatMode=' " + currentMode + "').<br>Modify your application's host HTML page doctype, or update your custom 'document.compatMode' configuration property settings.";
+  allowedModes.length == 1 && $equals_0('CSS1Compat', allowedModes[0]) && $equals_0('BackCompat', currentMode)?"GWT no longer supports Quirks Mode (document.compatMode=' BackCompat').<br>Make sure your application's host HTML page has a Standards Mode (document.compatMode=' CSS1Compat') doctype,<br>e.g. by using &lt;!doctype html&gt; at the start of your application's HTML page.<br><br>To continue using this unsupported rendering mode and risk layout problems, suppress this message by adding<br>the following line to your*.gwt.xml module file:<br>&nbsp;&nbsp;&lt;extend-configuration-property name=\"document.compatMode\" value=\"" + currentMode + '"/&gt;':"Your *.gwt.xml module configuration prohibits the use of the current doucment rendering mode (document.compatMode=' " + currentMode + "').<br>Modify your application's host HTML page doctype, or update your custom 'document.compatMode' configuration property settings.";
 }
 
 function $clinit_Window(){
@@ -3516,7 +3516,7 @@ function buildListParamMap(queryString){
 function ensureListParameterMap(){
   var currentQueryString;
   currentQueryString = ($clinit_Window() , impl_3).getQueryString();
-  if (!listParamMap || !$equals(cachedQueryString, currentQueryString)) {
+  if (!listParamMap || !$equals_0(cachedQueryString, currentQueryString)) {
     listParamMap = buildListParamMap(currentQueryString);
     cachedQueryString = currentQueryString;
   }
@@ -4080,7 +4080,7 @@ function $onModuleLoad_1(){
   }
   compileTimeValue = impl.getCompileTimeValue();
   runtimeValue = impl.getRuntimeValue();
-  $equals(compileTimeValue, runtimeValue) || ($wnd.alert('ERROR: Possible problem with your *.gwt.xml module file.\nThe compile time user.agent value (' + compileTimeValue + ') does not match the runtime user.agent value (' + runtimeValue + '). Expect more errors.\n') , undefined);
+  $equals_0(compileTimeValue, runtimeValue) || ($wnd.alert('ERROR: Possible problem with your *.gwt.xml module file.\nThe compile time user.agent value (' + compileTimeValue + ') does not match the runtime user.agent value (' + runtimeValue + '). Expect more errors.\n') , undefined);
 }
 
 function UserAgentAsserter_UserAgentPropertyImplGecko1_8_0(){
@@ -5238,15 +5238,15 @@ function $phase2(this$static, eidx, esym, cidx, csym, mid, maxl, depth, lm){
   return false;
 }
 
-function $solution(this$static, facelets, maxDepth, timeMin, verbose, firstFaceRestriction){
+function $solution(this$static, facelets, maxDepth, timeOut, timeMin, verbose, firstFaceRestriction){
   var check;
   check = $verify_0(this$static, facelets);
   if (check != 0) {
     return 'Error ' + (check < 0?-check:check);
   }
   this$static.sol = maxDepth + 1;
-  this$static.timeOut = add(($clinit_System() , fromDouble(currentTimeMillis0())), Pea60_longLit);
-  this$static.timeMin = add(this$static.timeOut, lt(sub(timeMin, Pea60_longLit), P0_longLit)?sub(timeMin, Pea60_longLit):P0_longLit);
+  this$static.timeOut = add(($clinit_System() , fromDouble(currentTimeMillis0())), timeOut);
+  this$static.timeMin = add(this$static.timeOut, lt(sub(timeMin, timeOut), P0_longLit)?sub(timeMin, timeOut):P0_longLit);
   this$static.verbose = verbose;
   this$static.solution = null;
   this$static.firstAxisRestriction = -1;
@@ -5378,7 +5378,7 @@ function Search_0(){
   this.cc = new CubieCube_0;
 }
 
-defineSeed(146, 1, {}, Search_0);
+defineSeed(146, 1, makeCastMap([Q$Search]), Search_0);
 _.depth1 = 0;
 _.firstAxisRestriction = 0;
 _.maxDep2 = 0;
@@ -6492,20 +6492,2310 @@ _.edgeperm = 0;
 _.ml = 0;
 _.topEdgeFirst = false;
 var BottomMove_0, Cnk_0, SquarePrun, TopMove_0, TwistMove_1, fact_0, inited_1 = false;
-defineSeed(154, 1, {});
-defineSeed(153, 154, {});
+function $clinit_Center1(){
+  $clinit_Center1 = nullMethod;
+  ctsmv = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [15582, 36], 2, 1);
+  sym2raw = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 15582, 1);
+  csprun = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 15582, 1);
+  symmult = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [48, 48], 2, 1);
+  symmove = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [48, 36], 2, 1);
+  syminv = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 48, 1);
+  finish_0 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 48, 1);
+}
+
+function $$init_1(this$static){
+  this$static.ct = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 24, 1);
+}
+
+function $equals(this$static, obj){
+  var c, i_0;
+  if (instanceOf(obj, Q$Center1)) {
+    c = dynamicCast(obj, Q$Center1);
+    for (i_0 = 0; i_0 < 24; ++i_0) {
+      if (this$static.ct[i_0] != c.ct[i_0]) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+function $get_1(this$static){
+  var i_0, idx, r;
+  idx = 0;
+  r = 8;
+  for (i_0 = 23; i_0 >= 0; --i_0) {
+    this$static.ct[i_0] == 1 && (idx += ($clinit_Util_0() , Cnk_1)[i_0][r--]);
+  }
+  return idx;
+}
+
+function $getsym(this$static){
+  var cord, j;
+  if (raw2sym != null) {
+    return raw2sym[$get_1(this$static)];
+  }
+  for (j = 0; j < 48; ++j) {
+    cord = raw2sym_0($get_1(this$static));
+    if (cord != -1)
+      return cord * 64 + j;
+    $rot(this$static, 0);
+    j % 2 == 1 && $rot(this$static, 1);
+    j % 8 == 7 && $rot(this$static, 2);
+    j % 16 == 15 && $rot(this$static, 3);
+  }
+  ($clinit_System() , out_0).print_0(101);
+  return -1;
+}
+
+function $move(this$static, m_0){
+  var key;
+  key = m_0 % 3;
+  m_0 = ~~(m_0 / 3);
+  switch (m_0) {
+    case 0:
+      swap(this$static.ct, 0, 1, 2, 3, key);
+      break;
+    case 1:
+      swap(this$static.ct, 16, 17, 18, 19, key);
+      break;
+    case 2:
+      swap(this$static.ct, 8, 9, 10, 11, key);
+      break;
+    case 3:
+      swap(this$static.ct, 4, 5, 6, 7, key);
+      break;
+    case 4:
+      swap(this$static.ct, 20, 21, 22, 23, key);
+      break;
+    case 5:
+      swap(this$static.ct, 12, 13, 14, 15, key);
+      break;
+    case 6:
+      swap(this$static.ct, 0, 1, 2, 3, key);
+      swap(this$static.ct, 8, 20, 12, 16, key);
+      swap(this$static.ct, 9, 21, 13, 17, key);
+      break;
+    case 7:
+      swap(this$static.ct, 16, 17, 18, 19, key);
+      swap(this$static.ct, 1, 15, 5, 9, key);
+      swap(this$static.ct, 2, 12, 6, 10, key);
+      break;
+    case 8:
+      swap(this$static.ct, 8, 9, 10, 11, key);
+      swap(this$static.ct, 2, 19, 4, 21, key);
+      swap(this$static.ct, 3, 16, 5, 22, key);
+      break;
+    case 9:
+      swap(this$static.ct, 4, 5, 6, 7, key);
+      swap(this$static.ct, 10, 18, 14, 22, key);
+      swap(this$static.ct, 11, 19, 15, 23, key);
+      break;
+    case 10:
+      swap(this$static.ct, 20, 21, 22, 23, key);
+      swap(this$static.ct, 0, 8, 4, 14, key);
+      swap(this$static.ct, 3, 11, 7, 13, key);
+      break;
+    case 11:
+      swap(this$static.ct, 12, 13, 14, 15, key);
+      swap(this$static.ct, 1, 20, 7, 18, key);
+      swap(this$static.ct, 0, 23, 6, 17, key);
+  }
+}
+
+function $rot(this$static, r){
+  switch (r) {
+    case 0:
+      $move(this$static, 19);
+      $move(this$static, 28);
+      break;
+    case 1:
+      $move(this$static, 21);
+      $move(this$static, 32);
+      break;
+    case 2:
+      swap(this$static.ct, 0, 3, 1, 2, 1);
+      swap(this$static.ct, 8, 11, 9, 10, 1);
+      swap(this$static.ct, 4, 7, 5, 6, 1);
+      swap(this$static.ct, 12, 15, 13, 14, 1);
+      swap(this$static.ct, 16, 19, 21, 22, 1);
+      swap(this$static.ct, 17, 18, 20, 23, 1);
+      break;
+    case 3:
+      $move(this$static, 18);
+      $move(this$static, 29);
+      $move(this$static, 24);
+      $move(this$static, 35);
+  }
+}
+
+function $rotate(this$static, r){
+  var j;
+  for (j = 0; j < r; ++j) {
+    $rot(this$static, 0);
+    j % 2 == 1 && $rot(this$static, 1);
+    j % 8 == 7 && $rot(this$static, 2);
+    j % 16 == 15 && $rot(this$static, 3);
+  }
+}
+
+function $set_0(this$static, idx){
+  var i_0, r;
+  r = 8;
+  for (i_0 = 23; i_0 >= 0; --i_0) {
+    this$static.ct[i_0] = 0;
+    if (idx >= ($clinit_Util_0() , Cnk_1)[i_0][r]) {
+      idx -= Cnk_1[i_0][r--];
+      this$static.ct[i_0] = 1;
+    }
+  }
+}
+
+function $set_1(this$static, c){
+  var i_0;
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    this$static.ct[i_0] = c.ct[i_0];
+  }
+}
+
+function Center1_0(){
+  var i_0;
+  $$init_1(this);
+  for (i_0 = 0; i_0 < 8; ++i_0) {
+    this.ct[i_0] = 1;
+  }
+  for (i_0 = 8; i_0 < 24; ++i_0) {
+    this.ct[i_0] = 0;
+  }
+}
+
+function Center1_1(c, urf){
+  $clinit_Center1();
+  var i_0;
+  $$init_1(this);
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    this.ct[i_0] = ~~((~~(c.ct[i_0] / 2) == urf?1:0) << 24) >> 24;
+  }
+}
+
+function Center1_2(ct){
+  var i_0;
+  $$init_1(this);
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    this.ct[i_0] = ct[i_0];
+  }
+}
+
+function createMoveTable(){
+  $clinit_Center1();
+  var c, d, i_0, m_0;
+  ($clinit_System() , out_0).println('Create Phase1 Center Move Table...');
+  c = new Center1_0;
+  d = new Center1_0;
+  for (i_0 = 0; i_0 < 15582; ++i_0) {
+    $set_0(d, sym2raw[i_0]);
+    for (m_0 = 0; m_0 < 36; ++m_0) {
+      $set_1(c, d);
+      $move(c, m_0);
+      ctsmv[i_0][m_0] = $getsym(c);
+    }
+  }
+}
+
+function createPrun(){
+  $clinit_Center1();
+  var check, depth, done, i_0, idx, inv, m_0, select;
+  fill_0(csprun);
+  csprun[0] = 0;
+  depth = 0;
+  done = 1;
+  while (done != 15582) {
+    inv = depth > 4;
+    select = inv?-1:depth;
+    check = inv?depth:-1;
+    ++depth;
+    for (i_0 = 0; i_0 < 15582; ++i_0) {
+      if (csprun[i_0] != select) {
+        continue;
+      }
+      for (m_0 = 0; m_0 < 27; ++m_0) {
+        idx = ~~ctsmv[i_0][m_0] >>> 6;
+        if (csprun[idx] != check) {
+          continue;
+        }
+        ++done;
+        if (inv) {
+          csprun[i_0] = ~~(depth << 24) >> 24;
+          break;
+        }
+         else {
+          csprun[idx] = ~~(depth << 24) >> 24;
+        }
+      }
+    }
+  }
+}
+
+function getSolvedSym(cube){
+  $clinit_Center1();
+  var c, check, i_0, j;
+  c = new Center1_2(cube.ct);
+  for (j = 0; j < 48; ++j) {
+    check = true;
+    for (i_0 = 0; i_0 < 24; ++i_0) {
+      if (c.ct[i_0] != ~~(i_0 / 4)) {
+        check = false;
+        break;
+      }
+    }
+    if (check) {
+      return j;
+    }
+    $rot(c, 0);
+    j % 2 == 1 && $rot(c, 1);
+    j % 8 == 7 && $rot(c, 2);
+    j % 16 == 15 && $rot(c, 3);
+  }
+  return -1;
+}
+
+function initSym_0(){
+  $clinit_Center1();
+  var c, d, e, f, i_0, j, k_0;
+  c = new Center1_0;
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    c.ct[i_0] = i_0;
+  }
+  d = new Center1_2(c.ct);
+  e = new Center1_2(c.ct);
+  f = new Center1_2(c.ct);
+  for (i_0 = 0; i_0 < 48; ++i_0) {
+    for (j = 0; j < 48; ++j) {
+      for (k_0 = 0; k_0 < 48; ++k_0) {
+        if ($equals(c, d)) {
+          symmult[i_0][j] = k_0;
+          k_0 == 0 && (syminv[i_0] = j);
+        }
+        $rot(d, 0);
+        k_0 % 2 == 1 && $rot(d, 1);
+        k_0 % 8 == 7 && $rot(d, 2);
+        k_0 % 16 == 15 && $rot(d, 3);
+      }
+      $rot(c, 0);
+      j % 2 == 1 && $rot(c, 1);
+      j % 8 == 7 && $rot(c, 2);
+      j % 16 == 15 && $rot(c, 3);
+    }
+    $rot(c, 0);
+    i_0 % 2 == 1 && $rot(c, 1);
+    i_0 % 8 == 7 && $rot(c, 2);
+    i_0 % 16 == 15 && $rot(c, 3);
+  }
+  for (i_0 = 0; i_0 < 48; ++i_0) {
+    $set_1(c, e);
+    $rotate(c, syminv[i_0]);
+    for (j = 0; j < 36; ++j) {
+      $set_1(d, c);
+      $move(d, j);
+      $rotate(d, i_0);
+      for (k_0 = 0; k_0 < 36; ++k_0) {
+        $set_1(f, e);
+        $move(f, k_0);
+        if ($equals(f, d)) {
+          symmove[i_0][j] = k_0;
+          break;
+        }
+      }
+    }
+  }
+  $set_0(c, 0);
+  for (i_0 = 0; i_0 < 48; ++i_0) {
+    finish_0[syminv[i_0]] = $get_1(c);
+    $rot(c, 0);
+    i_0 % 2 == 1 && $rot(c, 1);
+    i_0 % 8 == 7 && $rot(c, 2);
+    i_0 % 16 == 15 && $rot(c, 3);
+  }
+}
+
+function initSym2Raw(){
+  $clinit_Center1();
+  var c, count, i_0, idx, j, occ;
+  c = new Center1_0;
+  occ = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 22984, 1);
+  count = 0;
+  for (i_0 = 0; i_0 < 735471; ++i_0) {
+    if ((occ[~~i_0 >>> 5] & 1 << (i_0 & 31)) == 0) {
+      $set_0(c, i_0);
+      for (j = 0; j < 48; ++j) {
+        idx = $get_1(c);
+        occ[~~idx >>> 5] |= 1 << (idx & 31);
+        raw2sym != null && (raw2sym[idx] = count << 6 | syminv[j]);
+        $rot(c, 0);
+        j % 2 == 1 && $rot(c, 1);
+        j % 8 == 7 && $rot(c, 2);
+        j % 16 == 15 && $rot(c, 3);
+      }
+      sym2raw[count++] = i_0;
+    }
+  }
+}
+
+function raw2sym_0(n){
+  var m_0;
+  m_0 = binarySearch_0(sym2raw, n);
+  return m_0 >= 0?m_0:-1;
+}
+
+defineSeed(153, 1, makeCastMap([Q$Center1]), Center1_0, Center1_1, Center1_2);
+_.equals$ = function equals_6(obj){
+  return $equals(this, obj);
+}
+;
+var csprun, ctsmv, finish_0, raw2sym = null, sym2raw, syminv, symmove, symmult;
+function $clinit_Center2(){
+  $clinit_Center2 = nullMethod;
+  rlmv = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [70, 28], 2, 1);
+  ctmv = initDims([_3_3C_classLit, _3C_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$char_$1, Q$Serializable])], [Q$char_$1, -1], [6435, 28], 2, 1);
+  rlrot = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [70, 16], 2, 1);
+  ctrot = initDims([_3_3C_classLit, _3C_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$char_$1, Q$Serializable])], [Q$char_$1, -1], [6435, 16], 2, 1);
+  ctprun = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 450450, 1);
+  pmv = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0]);
+}
+
+function $getct(this$static){
+  var i_0, idx, r;
+  idx = 0;
+  r = 8;
+  for (i_0 = 14; i_0 >= 0; --i_0) {
+    this$static.ct[i_0] != this$static.ct[15] && (idx += ($clinit_Util_0() , Cnk_1)[i_0][r--]);
+  }
+  return idx;
+}
+
+function $getrl(this$static){
+  var i_0, idx, r;
+  idx = 0;
+  r = 4;
+  for (i_0 = 6; i_0 >= 0; --i_0) {
+    this$static.rl[i_0] != this$static.rl[7] && (idx += ($clinit_Util_0() , Cnk_1)[i_0][r--]);
+  }
+  return idx * 2 + this$static.parity;
+}
+
+function $move_0(this$static, m_0){
+  var key;
+  this$static.parity ^= pmv[m_0];
+  key = m_0 % 3;
+  m_0 = ~~(m_0 / 3);
+  switch (m_0) {
+    case 0:
+      swap_0(this$static.ct, 0, 1, 2, 3, key);
+      break;
+    case 1:
+      swap_0(this$static.rl, 0, 1, 2, 3, key);
+      break;
+    case 2:
+      swap_0(this$static.ct, 8, 9, 10, 11, key);
+      break;
+    case 3:
+      swap_0(this$static.ct, 4, 5, 6, 7, key);
+      break;
+    case 4:
+      swap_0(this$static.rl, 4, 5, 6, 7, key);
+      break;
+    case 5:
+      swap_0(this$static.ct, 12, 13, 14, 15, key);
+      break;
+    case 6:
+      swap_0(this$static.ct, 0, 1, 2, 3, key);
+      swap_0(this$static.rl, 0, 5, 4, 1, key);
+      swap_0(this$static.ct, 8, 9, 12, 13, key);
+      break;
+    case 7:
+      swap_0(this$static.rl, 0, 1, 2, 3, key);
+      swap_0(this$static.ct, 1, 15, 5, 9, key);
+      swap_0(this$static.ct, 2, 12, 6, 10, key);
+      break;
+    case 8:
+      swap_0(this$static.ct, 8, 9, 10, 11, key);
+      swap_0(this$static.rl, 0, 3, 6, 5, key);
+      swap_0(this$static.ct, 3, 2, 5, 4, key);
+      break;
+    case 9:
+      swap_0(this$static.ct, 4, 5, 6, 7, key);
+      swap_0(this$static.rl, 3, 2, 7, 6, key);
+      swap_0(this$static.ct, 11, 10, 15, 14, key);
+      break;
+    case 10:
+      swap_0(this$static.rl, 4, 5, 6, 7, key);
+      swap_0(this$static.ct, 0, 8, 4, 14, key);
+      swap_0(this$static.ct, 3, 11, 7, 13, key);
+      break;
+    case 11:
+      swap_0(this$static.ct, 12, 13, 14, 15, key);
+      swap_0(this$static.rl, 1, 4, 7, 2, key);
+      swap_0(this$static.ct, 1, 0, 7, 6, key);
+  }
+}
+
+function $rot_0(this$static, r){
+  switch (r) {
+    case 0:
+      $move_0(this$static, 19);
+      $move_0(this$static, 28);
+      break;
+    case 1:
+      $move_0(this$static, 21);
+      $move_0(this$static, 32);
+      break;
+    case 2:
+      swap_0(this$static.ct, 0, 3, 1, 2, 1);
+      swap_0(this$static.ct, 8, 11, 9, 10, 1);
+      swap_0(this$static.ct, 4, 7, 5, 6, 1);
+      swap_0(this$static.ct, 12, 15, 13, 14, 1);
+      swap_0(this$static.rl, 0, 3, 5, 6, 1);
+      swap_0(this$static.rl, 1, 2, 4, 7, 1);
+  }
+}
+
+function $set_2(this$static, c, edgeParity){
+  var i_0;
+  for (i_0 = 0; i_0 < 16; ++i_0) {
+    this$static.ct[i_0] = ~~(c.ct[i_0] / 2);
+  }
+  for (i_0 = 0; i_0 < 8; ++i_0) {
+    this$static.rl[i_0] = c.ct[i_0 + 16];
+  }
+  this$static.parity = edgeParity;
+}
+
+function $setct(this$static, idx){
+  var i_0, r;
+  r = 8;
+  this$static.ct[15] = 0;
+  for (i_0 = 14; i_0 >= 0; --i_0) {
+    if (idx >= ($clinit_Util_0() , Cnk_1)[i_0][r]) {
+      idx -= Cnk_1[i_0][r--];
+      this$static.ct[i_0] = 1;
+    }
+     else {
+      this$static.ct[i_0] = 0;
+    }
+  }
+}
+
+function $setrl(this$static, idx){
+  var i_0, r;
+  this$static.parity = idx & 1;
+  idx >>>= 1;
+  r = 4;
+  this$static.rl[7] = 0;
+  for (i_0 = 6; i_0 >= 0; --i_0) {
+    if (idx >= ($clinit_Util_0() , Cnk_1)[i_0][r]) {
+      idx -= Cnk_1[i_0][r--];
+      this$static.rl[i_0] = 1;
+    }
+     else {
+      this$static.rl[i_0] = 0;
+    }
+  }
+}
+
+function Center2_0(){
+  $clinit_Center2();
+  this.rl = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 8, 1);
+  this.ct = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 16, 1);
+}
+
+function init_3(){
+  $clinit_Center2();
+  var c, ct, ctx, depth, done, i_0, idx, j, m_0, rl, rlx;
+  c = new Center2_0;
+  for (i_0 = 0; i_0 < 70; ++i_0) {
+    for (m_0 = 0; m_0 < 28; ++m_0) {
+      $setrl(c, i_0);
+      $move_0(c, ($clinit_Moves() , move2std)[m_0]);
+      rlmv[i_0][m_0] = $getrl(c);
+    }
+  }
+  for (i_0 = 0; i_0 < 70; ++i_0) {
+    $setrl(c, i_0);
+    for (j = 0; j < 16; ++j) {
+      rlrot[i_0][j] = $getrl(c);
+      $rot_0(c, 0);
+      j % 2 == 1 && $rot_0(c, 1);
+      j % 8 == 7 && $rot_0(c, 2);
+    }
+  }
+  for (i_0 = 0; i_0 < 6435; ++i_0) {
+    $setct(c, i_0);
+    for (j = 0; j < 16; ++j) {
+      ctrot[i_0][j] = $getct(c) & 65535;
+      $rot_0(c, 0);
+      j % 2 == 1 && $rot_0(c, 1);
+      j % 8 == 7 && $rot_0(c, 2);
+    }
+  }
+  for (i_0 = 0; i_0 < 6435; ++i_0) {
+    for (m_0 = 0; m_0 < 28; ++m_0) {
+      $setct(c, i_0);
+      $move_0(c, ($clinit_Moves() , move2std)[m_0]);
+      ctmv[i_0][m_0] = $getct(c) & 65535;
+    }
+  }
+  fill_0(ctprun);
+  ctprun[0] = ctprun[18] = ctprun[28] = ctprun[46] = ctprun[54] = ctprun[56] = 0;
+  depth = 0;
+  done = 6;
+  while (done != 450450) {
+    for (i_0 = 0; i_0 < 450450; ++i_0) {
+      if (ctprun[i_0] != depth) {
+        continue;
+      }
+      ct = ~~(i_0 / 70);
+      rl = i_0 % 70;
+      for (m_0 = 0; m_0 < 23; ++m_0) {
+        ctx = ctmv[ct][m_0];
+        rlx = rlmv[rl][m_0];
+        idx = ctx * 70 + rlx;
+        if (ctprun[idx] == -1) {
+          ctprun[idx] = ~~(depth + 1 << 24) >> 24;
+          ++done;
+        }
+      }
+    }
+    ++depth;
+  }
+}
+
+defineSeed(154, 1, {}, Center2_0);
+_.parity = 0;
+var ctmv, ctprun, ctrot, pmv, rlmv, rlrot;
+function $clinit_Center3(){
+  $clinit_Center3 = nullMethod;
+  ctmove = initDims([_3_3C_classLit, _3C_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$char_$1, Q$Serializable])], [Q$char_$1, -1], [29400, 20], 2, 1);
+  pmove = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+  prun_0 = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 29400, 1);
+  rl2std = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 9, 14, 23, 27, 28, 41, 42, 46, 55, 60, 69]);
+  std2rl = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 70, 1);
+}
+
+function $getct_0(this$static){
+  var check, i_0, idx, idxrl, r;
+  idx = 0;
+  r = 4;
+  for (i_0 = 6; i_0 >= 0; --i_0) {
+    this$static.ud[i_0] != this$static.ud[7] && (idx += ($clinit_Util_0() , Cnk_1)[i_0][r--]);
+  }
+  idx *= 35;
+  r = 4;
+  for (i_0 = 6; i_0 >= 0; --i_0) {
+    this$static.fb[i_0] != this$static.fb[7] && (idx += ($clinit_Util_0() , Cnk_1)[i_0][r--]);
+  }
+  idx *= 12;
+  check = this$static.fb[7] ^ this$static.ud[7];
+  idxrl = 0;
+  r = 4;
+  for (i_0 = 7; i_0 >= 0; --i_0) {
+    this$static.rl[i_0] != check && (idxrl += ($clinit_Util_0() , Cnk_1)[i_0][r--]);
+  }
+  return this$static.parity + 2 * (idx + std2rl[idxrl]);
+}
+
+function $move_1(this$static, i_0){
+  this$static.parity ^= pmove[i_0];
+  switch (i_0) {
+    case 0:
+    case 1:
+    case 2:
+      swap_0(this$static.ud, 0, 1, 2, 3, i_0 % 3);
+      break;
+    case 3:
+      swap_0(this$static.rl, 0, 1, 2, 3, 1);
+      break;
+    case 4:
+    case 5:
+    case 6:
+      swap_0(this$static.fb, 0, 1, 2, 3, (i_0 - 1) % 3);
+      break;
+    case 7:
+    case 8:
+    case 9:
+      swap_0(this$static.ud, 4, 5, 6, 7, (i_0 - 1) % 3);
+      break;
+    case 10:
+      swap_0(this$static.rl, 4, 5, 6, 7, 1);
+      break;
+    case 11:
+    case 12:
+    case 13:
+      swap_0(this$static.fb, 4, 5, 6, 7, (i_0 + 1) % 3);
+      break;
+    case 14:
+      swap_0(this$static.ud, 0, 1, 2, 3, 1);
+      swap_0(this$static.rl, 0, 5, 4, 1, 1);
+      swap_0(this$static.fb, 0, 5, 4, 1, 1);
+      break;
+    case 15:
+      swap_0(this$static.rl, 0, 1, 2, 3, 1);
+      swap_0(this$static.fb, 1, 4, 7, 2, 1);
+      swap_0(this$static.ud, 1, 6, 5, 2, 1);
+      break;
+    case 16:
+      swap_0(this$static.fb, 0, 1, 2, 3, 1);
+      swap_0(this$static.ud, 3, 2, 5, 4, 1);
+      swap_0(this$static.rl, 0, 3, 6, 5, 1);
+      break;
+    case 17:
+      swap_0(this$static.ud, 4, 5, 6, 7, 1);
+      swap_0(this$static.rl, 3, 2, 7, 6, 1);
+      swap_0(this$static.fb, 3, 2, 7, 6, 1);
+      break;
+    case 18:
+      swap_0(this$static.rl, 4, 5, 6, 7, 1);
+      swap_0(this$static.fb, 0, 3, 6, 5, 1);
+      swap_0(this$static.ud, 0, 3, 4, 7, 1);
+      break;
+    case 19:
+      swap_0(this$static.fb, 4, 5, 6, 7, 1);
+      swap_0(this$static.ud, 0, 7, 6, 1, 1);
+      swap_0(this$static.rl, 1, 4, 7, 2, 1);
+  }
+}
+
+function $set_3(this$static, c, eXc_parity){
+  var i_0, parity;
+  parity = c.ct[0] > c.ct[8] ^ c.ct[8] > c.ct[16] ^ c.ct[0] > c.ct[16]?1:0;
+  for (i_0 = 0; i_0 < 8; ++i_0) {
+    this$static.ud[i_0] = c.ct[i_0] & 1 ^ 1;
+    this$static.fb[i_0] = c.ct[i_0 + 8] & 1 ^ 1;
+    this$static.rl[i_0] = c.ct[i_0 + 16] & 1 ^ 1 ^ parity;
+  }
+  this$static.parity = parity ^ eXc_parity;
+}
+
+function $setct_0(this$static, idx){
+  var i_0, idxfb, idxrl, r;
+  this$static.parity = idx & 1;
+  idx >>>= 1;
+  idxrl = rl2std[idx % 12];
+  idx = ~~(idx / 12);
+  r = 4;
+  for (i_0 = 7; i_0 >= 0; --i_0) {
+    this$static.rl[i_0] = 0;
+    if (idxrl >= ($clinit_Util_0() , Cnk_1)[i_0][r]) {
+      idxrl -= Cnk_1[i_0][r--];
+      this$static.rl[i_0] = 1;
+    }
+  }
+  idxfb = idx % 35;
+  idx = ~~(idx / 35);
+  r = 4;
+  this$static.fb[7] = 0;
+  for (i_0 = 6; i_0 >= 0; --i_0) {
+    if (idxfb >= ($clinit_Util_0() , Cnk_1)[i_0][r]) {
+      idxfb -= Cnk_1[i_0][r--];
+      this$static.fb[i_0] = 1;
+    }
+     else {
+      this$static.fb[i_0] = 0;
+    }
+  }
+  r = 4;
+  this$static.ud[7] = 0;
+  for (i_0 = 6; i_0 >= 0; --i_0) {
+    if (idx >= ($clinit_Util_0() , Cnk_1)[i_0][r]) {
+      idx -= Cnk_1[i_0][r--];
+      this$static.ud[i_0] = 1;
+    }
+     else {
+      this$static.ud[i_0] = 0;
+    }
+  }
+}
+
+function Center3_0(){
+  $clinit_Center3();
+  this.ud = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 8, 1);
+  this.rl = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 8, 1);
+  this.fb = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 8, 1);
+}
+
+function init_4(){
+  $clinit_Center3();
+  var c, depth, done, i_0, m_0;
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    std2rl[rl2std[i_0]] = i_0;
+  }
+  c = new Center3_0;
+  for (i_0 = 0; i_0 < 29400; ++i_0) {
+    for (m_0 = 0; m_0 < 20; ++m_0) {
+      $setct_0(c, i_0);
+      $move_1(c, m_0);
+      ctmove[i_0][m_0] = $getct_0(c) & 65535;
+    }
+  }
+  fill_0(prun_0);
+  prun_0[0] = 0;
+  depth = 0;
+  done = 1;
+  while (done != 29400) {
+    for (i_0 = 0; i_0 < 29400; ++i_0) {
+      if (prun_0[i_0] != depth) {
+        continue;
+      }
+      for (m_0 = 0; m_0 < 17; ++m_0) {
+        if (prun_0[ctmove[i_0][m_0]] == -1) {
+          prun_0[ctmove[i_0][m_0]] = ~~(depth + 1 << 24) >> 24;
+          ++done;
+        }
+      }
+    }
+    ++depth;
+  }
+}
+
+defineSeed(155, 1, {}, Center3_0);
+_.parity = 0;
+var ctmove, pmove, prun_0, rl2std, std2rl;
+function $clinit_CenterCube(){
+  $clinit_CenterCube = nullMethod;
+  center333Map = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 4, 2, 1, 5, 3]);
+}
+
+function $copy_1(this$static, c){
+  var i_0;
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    this$static.ct[i_0] = c.ct[i_0];
+  }
+}
+
+function $fill333Facelet(this$static, facelet){
+  var i_0, idx;
+  for (i_0 = 0; i_0 < 6; ++i_0) {
+    idx = center333Map[i_0] << 2;
+    if (this$static.ct[idx] != this$static.ct[idx + 1] || this$static.ct[idx + 1] != this$static.ct[idx + 2] || this$static.ct[idx + 2] != this$static.ct[idx + 3]) {
+      throw new RuntimeException_1('Unsolved Center');
+    }
+    facelet[4 + i_0 * 9] = ($clinit_Util_0() , colorMap4to3)[this$static.ct[idx]];
+  }
+}
+
+function $move_2(this$static, m_0){
+  var key;
+  key = m_0 % 3;
+  m_0 = ~~(m_0 / 3);
+  switch (m_0) {
+    case 0:
+      swap(this$static.ct, 0, 1, 2, 3, key);
+      break;
+    case 1:
+      swap(this$static.ct, 16, 17, 18, 19, key);
+      break;
+    case 2:
+      swap(this$static.ct, 8, 9, 10, 11, key);
+      break;
+    case 3:
+      swap(this$static.ct, 4, 5, 6, 7, key);
+      break;
+    case 4:
+      swap(this$static.ct, 20, 21, 22, 23, key);
+      break;
+    case 5:
+      swap(this$static.ct, 12, 13, 14, 15, key);
+      break;
+    case 6:
+      swap(this$static.ct, 0, 1, 2, 3, key);
+      swap(this$static.ct, 8, 20, 12, 16, key);
+      swap(this$static.ct, 9, 21, 13, 17, key);
+      break;
+    case 7:
+      swap(this$static.ct, 16, 17, 18, 19, key);
+      swap(this$static.ct, 1, 15, 5, 9, key);
+      swap(this$static.ct, 2, 12, 6, 10, key);
+      break;
+    case 8:
+      swap(this$static.ct, 8, 9, 10, 11, key);
+      swap(this$static.ct, 2, 19, 4, 21, key);
+      swap(this$static.ct, 3, 16, 5, 22, key);
+      break;
+    case 9:
+      swap(this$static.ct, 4, 5, 6, 7, key);
+      swap(this$static.ct, 10, 18, 14, 22, key);
+      swap(this$static.ct, 11, 19, 15, 23, key);
+      break;
+    case 10:
+      swap(this$static.ct, 20, 21, 22, 23, key);
+      swap(this$static.ct, 0, 8, 4, 14, key);
+      swap(this$static.ct, 3, 11, 7, 13, key);
+      break;
+    case 11:
+      swap(this$static.ct, 12, 13, 14, 15, key);
+      swap(this$static.ct, 1, 20, 7, 18, key);
+      swap(this$static.ct, 0, 23, 6, 17, key);
+  }
+}
+
+function CenterCube_0(){
+  $clinit_CenterCube();
+  var i_0;
+  this.ct = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 24, 1);
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    this.ct[i_0] = ~~(~~(i_0 / 4) << 24) >> 24;
+  }
+}
+
+function CenterCube_1(r){
+  $clinit_CenterCube();
+  var i_0, m_0, t;
+  CenterCube_0.call(this);
+  for (i_0 = 0; i_0 < 23; ++i_0) {
+    t = i_0 + $nextInt(r, 24 - i_0);
+    if (this.ct[t] != this.ct[i_0]) {
+      m_0 = this.ct[i_0];
+      this.ct[i_0] = this.ct[t];
+      this.ct[t] = m_0;
+    }
+  }
+}
+
+defineSeed(156, 1, {}, CenterCube_0, CenterCube_1);
+var center333Map;
+function $clinit_CornerCube(){
+  $clinit_CornerCube = nullMethod;
+  moveCube_0 = initDim(_3Lcs_threephase_CornerCube_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$CornerCube, 18, 0);
+  cornerFacelet_0 = initValues(_3_3B_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$byte_$1, [initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [8, 9, 20]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [6, 18, 38]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [0, 36, 47]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [2, 45, 11]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [29, 26, 15]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [27, 44, 24]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [33, 53, 42]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [35, 17, 51])]);
+  initMove_0();
+}
+
+function $$init_2(this$static){
+  this$static.cp = initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [0, 1, 2, 3, 4, 5, 6, 7]);
+  this$static.co = initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [0, 0, 0, 0, 0, 0, 0, 0]);
+}
+
+function $copy_2(this$static, c){
+  var i_0;
+  for (i_0 = 0; i_0 < 8; ++i_0) {
+    this$static.cp[i_0] = c.cp[i_0];
+    this$static.co[i_0] = c.co[i_0];
+  }
+}
+
+function $fill333Facelet_0(this$static, facelet){
+  var corn, j, n, ori;
+  for (corn = 0; corn < 8; ++corn) {
+    j = this$static.cp[corn];
+    ori = this$static.co[corn];
+    for (n = 0; n < 3; ++n) {
+      facelet[cornerFacelet_0[corn][(n + ori) % 3]] = $charAt('URFDLB', ~~(cornerFacelet_0[j][n] / 9));
+    }
+  }
+}
+
+function $move_3(this$static, idx){
+  !this$static.temps && (this$static.temps = new CornerCube_0);
+  CornMult_0(this$static, moveCube_0[idx], this$static.temps);
+  $copy_2(this$static, this$static.temps);
+}
+
+function $setTwist_0(this$static, idx){
+  var i_0, twst;
+  twst = 0;
+  for (i_0 = 6; i_0 >= 0; --i_0) {
+    twst += this$static.co[i_0] = ~~(idx % 3 << 24) >> 24;
+    idx = ~~(idx / 3);
+  }
+  this$static.co[7] = ~~((15 - twst) % 3 << 24) >> 24;
+}
+
+function CornMult_0(a, b, prod){
+  var corn, ori, oriA, oriB;
+  for (corn = 0; corn < 8; ++corn) {
+    prod.cp[corn] = a.cp[b.cp[corn]];
+    oriA = a.co[b.cp[corn]];
+    oriB = b.co[corn];
+    ori = oriA;
+    ori = ~~(ori + (oriA < 3?oriB:6 - oriB) << 24) >> 24;
+    ori = ~~(ori % 3 << 24) >> 24;
+    oriA >= 3 ^ oriB >= 3 && (ori = ~~(ori + 3 << 24) >> 24);
+    prod.co[corn] = ori;
+  }
+}
+
+function CornerCube_0(){
+  $clinit_CornerCube();
+  $$init_2(this);
+}
+
+function CornerCube_1(cperm, twist){
+  $$init_2(this);
+  set8Perm_1(this.cp, cperm);
+  $setTwist_0(this, twist);
+}
+
+function CornerCube_2(r){
+  $clinit_CornerCube();
+  CornerCube_1.call(this, $nextInt(r, 40320), $nextInt(r, 2187));
+}
+
+function initMove_0(){
+  var a, p_0;
+  moveCube_0[0] = new CornerCube_1(15120, 0);
+  moveCube_0[3] = new CornerCube_1(21021, 1494);
+  moveCube_0[6] = new CornerCube_1(8064, 1236);
+  moveCube_0[9] = new CornerCube_1(9, 0);
+  moveCube_0[12] = new CornerCube_1(1230, 412);
+  moveCube_0[15] = new CornerCube_1(224, 137);
+  for (a = 0; a < 18; a += 3) {
+    for (p_0 = 0; p_0 < 2; ++p_0) {
+      moveCube_0[a + p_0 + 1] = new CornerCube_0;
+      CornMult_0(moveCube_0[a + p_0], moveCube_0[a], moveCube_0[a + p_0 + 1]);
+    }
+  }
+}
+
+defineSeed(157, 1, makeCastMap([Q$CornerCube]), CornerCube_0, CornerCube_1, CornerCube_2);
+_.temps = null;
+var cornerFacelet_0, moveCube_0;
+function $clinit_Edge3(){
+  $clinit_Edge3 = nullMethod;
+  prunValues = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 4, 16, 55, 324, 1922, 12275, 77640, 485359, 2778197, 11742425, 27492416, 31002941, 31006080]);
+  eprun = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 1937880, 1);
+  sym2raw_0 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 1538, 1);
+  symstate = initDim(_3C_classLit, makeCastMap([Q$char_$1, Q$Serializable]), -1, 1538, 1);
+  raw2sym_1 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 11880, 1);
+  syminv_0 = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 1, 6, 3, 4, 5, 2, 7]);
+  mvrot = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [160, 12], 2, 1);
+  mvroto = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [160, 12], 2, 1);
+  factX = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 1, 1, 3, 12, 60, 360, 2520, 20160, 181440, 1814400, 19958400, 239500800]);
+  FullEdgeMap = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 2, 4, 6, 1, 3, 7, 5, 8, 9, 10, 11]);
+}
+
+function $circle(arr, a, b, c, d){
+  var temp;
+  temp = arr[d];
+  arr[d] = arr[c];
+  arr[c] = arr[b];
+  arr[b] = arr[a];
+  arr[a] = temp;
+}
+
+function $circlex(this$static, a, b, c, d){
+  var temp;
+  temp = this$static.edgeo[d];
+  this$static.edgeo[d] = this$static.edge[c];
+  this$static.edge[c] = this$static.edgeo[b];
+  this$static.edgeo[b] = this$static.edge[a];
+  this$static.edge[a] = temp;
+}
+
+function $get_2(this$static, end){
+  var i_0, idx, v, val;
+  this$static.isStd || $std(this$static);
+  idx = 0;
+  val = Pba9876543210_longLit;
+  for (i_0 = 0; i_0 < end; ++i_0) {
+    v = this$static.edge[i_0] << 2;
+    idx *= 12 - i_0;
+    idx = toInt(add(fromInt(idx), and(shr(val, v), Pf_longLit)));
+    val = sub(val, shl(P111111111110_longLit, v));
+  }
+  return idx;
+}
+
+function $getsym_0(this$static){
+  var cord1x, cord2x, symcord1x, symx;
+  cord1x = $get_2(this$static, 4);
+  symcord1x = raw2sym_1[cord1x];
+  symx = symcord1x & 7;
+  symcord1x >>= 3;
+  $rotate_0(this$static, symx);
+  cord2x = $get_2(this$static, 10) % 20160;
+  return symcord1x * 20160 + cord2x;
+}
+
+function $move_4(this$static, i_0){
+  this$static.isStd = false;
+  switch (i_0) {
+    case 0:
+      $circle(this$static.edge, 0, 4, 1, 5);
+      $circle(this$static.edgeo, 0, 4, 1, 5);
+      break;
+    case 1:
+      $swap_0(this$static.edge, 0, 4, 1, 5);
+      $swap_0(this$static.edgeo, 0, 4, 1, 5);
+      break;
+    case 2:
+      $circle(this$static.edge, 0, 5, 1, 4);
+      $circle(this$static.edgeo, 0, 5, 1, 4);
+      break;
+    case 3:
+      $swap_0(this$static.edge, 5, 10, 6, 11);
+      $swap_0(this$static.edgeo, 5, 10, 6, 11);
+      break;
+    case 4:
+      $circle(this$static.edge, 0, 11, 3, 8);
+      $circle(this$static.edgeo, 0, 11, 3, 8);
+      break;
+    case 5:
+      $swap_0(this$static.edge, 0, 11, 3, 8);
+      $swap_0(this$static.edgeo, 0, 11, 3, 8);
+      break;
+    case 6:
+      $circle(this$static.edge, 0, 8, 3, 11);
+      $circle(this$static.edgeo, 0, 8, 3, 11);
+      break;
+    case 7:
+      $circle(this$static.edge, 2, 7, 3, 6);
+      $circle(this$static.edgeo, 2, 7, 3, 6);
+      break;
+    case 8:
+      $swap_0(this$static.edge, 2, 7, 3, 6);
+      $swap_0(this$static.edgeo, 2, 7, 3, 6);
+      break;
+    case 9:
+      $circle(this$static.edge, 2, 6, 3, 7);
+      $circle(this$static.edgeo, 2, 6, 3, 7);
+      break;
+    case 10:
+      $swap_0(this$static.edge, 4, 8, 7, 9);
+      $swap_0(this$static.edgeo, 4, 8, 7, 9);
+      break;
+    case 11:
+      $circle(this$static.edge, 1, 9, 2, 10);
+      $circle(this$static.edgeo, 1, 9, 2, 10);
+      break;
+    case 12:
+      $swap_0(this$static.edge, 1, 9, 2, 10);
+      $swap_0(this$static.edgeo, 1, 9, 2, 10);
+      break;
+    case 13:
+      $circle(this$static.edge, 1, 10, 2, 9);
+      $circle(this$static.edgeo, 1, 10, 2, 9);
+      break;
+    case 14:
+      $swap_0(this$static.edge, 0, 4, 1, 5);
+      $swap_0(this$static.edgeo, 0, 4, 1, 5);
+      $swap(this$static.edge, 9, 11);
+      $swap(this$static.edgeo, 8, 10);
+      break;
+    case 15:
+      $swap_0(this$static.edge, 5, 10, 6, 11);
+      $swap_0(this$static.edgeo, 5, 10, 6, 11);
+      $swap(this$static.edge, 1, 3);
+      $swap(this$static.edgeo, 0, 2);
+      break;
+    case 16:
+      $swap_0(this$static.edge, 0, 11, 3, 8);
+      $swap_0(this$static.edgeo, 0, 11, 3, 8);
+      $swap(this$static.edge, 5, 7);
+      $swap(this$static.edgeo, 4, 6);
+      break;
+    case 17:
+      $swap_0(this$static.edge, 2, 7, 3, 6);
+      $swap_0(this$static.edgeo, 2, 7, 3, 6);
+      $swap(this$static.edge, 8, 10);
+      $swap(this$static.edgeo, 9, 11);
+      break;
+    case 18:
+      $swap_0(this$static.edge, 4, 8, 7, 9);
+      $swap_0(this$static.edgeo, 4, 8, 7, 9);
+      $swap(this$static.edge, 0, 2);
+      $swap(this$static.edgeo, 1, 3);
+      break;
+    case 19:
+      $swap_0(this$static.edge, 1, 9, 2, 10);
+      $swap_0(this$static.edgeo, 1, 9, 2, 10);
+      $swap(this$static.edge, 4, 6);
+      $swap(this$static.edgeo, 5, 7);
+  }
+}
+
+function $rot_1(this$static, r){
+  this$static.isStd = false;
+  switch (r) {
+    case 0:
+      $move_4(this$static, 14);
+      $move_4(this$static, 17);
+      break;
+    case 1:
+      $circlex(this$static, 11, 5, 10, 6);
+      $circlex(this$static, 5, 10, 6, 11);
+      $circlex(this$static, 1, 2, 3, 0);
+      $circlex(this$static, 4, 9, 7, 8);
+      $circlex(this$static, 8, 4, 9, 7);
+      $circlex(this$static, 0, 1, 2, 3);
+      break;
+    case 2:
+      $swapx(this$static, 4, 5);
+      $swapx(this$static, 5, 4);
+      $swapx(this$static, 11, 8);
+      $swapx(this$static, 8, 11);
+      $swapx(this$static, 7, 6);
+      $swapx(this$static, 6, 7);
+      $swapx(this$static, 9, 10);
+      $swapx(this$static, 10, 9);
+      $swapx(this$static, 1, 1);
+      $swapx(this$static, 0, 0);
+      $swapx(this$static, 3, 3);
+      $swapx(this$static, 2, 2);
+  }
+}
+
+function $rotate_0(this$static, r){
+  while (r >= 2) {
+    r -= 2;
+    $rot_1(this$static, 1);
+    $rot_1(this$static, 2);
+  }
+  r != 0 && $rot_1(this$static, 0);
+}
+
+function $set_4(this$static, idx){
+  var i_0, m_0, p_0, parity, v, val;
+  val = Pba9876543210_longLit;
+  parity = 0;
+  for (i_0 = 0; i_0 < 11; ++i_0) {
+    p_0 = factX[11 - i_0];
+    v = ~~(idx / p_0);
+    idx = idx % p_0;
+    parity ^= v;
+    v <<= 2;
+    this$static.edge[i_0] = toInt(and(shr(val, v), Pf_longLit));
+    m_0 = sub(shl(P1_longLit, v), P1_longLit);
+    val = add(and(val, m_0), and(shr(val, 4), create0(~m_0.l & 4194303, ~m_0.m & 4194303, ~m_0.h & 1048575)));
+  }
+  if ((parity & 1) == 0) {
+    this$static.edge[11] = toInt(val);
+  }
+   else {
+    this$static.edge[11] = this$static.edge[10];
+    this$static.edge[10] = toInt(val);
+  }
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    this$static.edgeo[i_0] = i_0;
+  }
+  this$static.isStd = true;
+}
+
+function $set_5(this$static, e){
+  var i_0;
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    this$static.edge[i_0] = e.edge[i_0];
+    this$static.edgeo[i_0] = e.edgeo[i_0];
+  }
+  this$static.isStd = e.isStd;
+}
+
+function $set_6(this$static, c){
+  var i_0, parity, s, t;
+  this$static.temp == null && (this$static.temp = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 12, 1));
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    this$static.temp[i_0] = i_0;
+    this$static.edge[i_0] = c.ep[FullEdgeMap[i_0] + 12] % 12;
+  }
+  parity = 1;
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    while (this$static.edge[i_0] != i_0) {
+      t = this$static.edge[i_0];
+      this$static.edge[i_0] = this$static.edge[t];
+      this$static.edge[t] = t;
+      s = this$static.temp[i_0];
+      this$static.temp[i_0] = this$static.temp[t];
+      this$static.temp[t] = s;
+      parity ^= 1;
+    }
+  }
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    this$static.edge[i_0] = this$static.temp[c.ep[FullEdgeMap[i_0]] % 12];
+  }
+  return parity;
+}
+
+function $std(this$static){
+  var i_0;
+  this$static.temp == null && (this$static.temp = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 12, 1));
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    this$static.temp[this$static.edgeo[i_0]] = i_0;
+  }
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    this$static.edge[i_0] = this$static.temp[this$static.edge[i_0]];
+    this$static.edgeo[i_0] = i_0;
+  }
+  this$static.isStd = true;
+}
+
+function $swap(arr, x, y){
+  var temp;
+  temp = arr[x];
+  arr[x] = arr[y];
+  arr[y] = temp;
+}
+
+function $swap_0(arr, a, b, c, d){
+  var temp;
+  temp = arr[a];
+  arr[a] = arr[c];
+  arr[c] = temp;
+  temp = arr[b];
+  arr[b] = arr[d];
+  arr[d] = temp;
+}
+
+function $swapx(this$static, x, y){
+  var temp;
+  temp = this$static.edge[x];
+  this$static.edge[x] = this$static.edgeo[y];
+  this$static.edgeo[y] = temp;
+}
+
+function Edge3_0(){
+  $clinit_Edge3();
+  this.edge = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 12, 1);
+  this.edgeo = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 12, 1);
+}
+
+function createPrun_0(){
+  $clinit_Edge3();
+  var chk, cord1, cord1x, cord2, cord2x, dep1m3, depm3, depth, e, end, f, find_0, g, i_0, i_, idx, idxx, inv, j, m_0, symState, symcord1, symcord1x, symx, val;
+  e = new Edge3_0;
+  f = new Edge3_0;
+  g = new Edge3_0;
+  fill_2(eprun);
+  depth = 0;
+  done_0 = 1;
+  setPruning_0(eprun, 0, 0);
+  while (done_0 != 31006080) {
+    inv = depth > 9;
+    depm3 = depth % 3;
+    dep1m3 = (depth + 1) % 3;
+    find_0 = inv?3:depm3;
+    chk = inv?depm3:3;
+    if (depth >= 9) {
+      break;
+    }
+    for (i_ = 0; i_ < 31006080; i_ += 16) {
+      val = eprun[~~i_ >> 4];
+      if (!inv && val == -1) {
+        continue;
+      }
+      for (i_0 = i_ , end = i_ + 16; i_0 < end; ++i_0 , val >>= 2) {
+        if ((val & 3) != find_0) {
+          continue;
+        }
+        symcord1 = ~~(i_0 / 20160);
+        cord1 = sym2raw_0[symcord1];
+        cord2 = i_0 % 20160;
+        $set_4(e, cord1 * 20160 + cord2);
+        for (m_0 = 0; m_0 < 17; ++m_0) {
+          cord1x = getmvrot(e.edge, m_0 << 3, 4);
+          symcord1x = raw2sym_1[cord1x];
+          symx = symcord1x & 7;
+          symcord1x >>= 3;
+          cord2x = getmvrot(e.edge, m_0 << 3 | symx, 10) % 20160;
+          idx = symcord1x * 20160 + cord2x;
+          if (getPruning_0(eprun, idx) != chk) {
+            continue;
+          }
+          setPruning_0(eprun, inv?i_0:idx, dep1m3);
+          ++done_0;
+          if (inv) {
+            break;
+          }
+          symState = symstate[symcord1x];
+          if (symState == 1) {
+            continue;
+          }
+          $set_5(f, e);
+          $move_4(f, m_0);
+          $rotate_0(f, symx);
+          for (j = 1; (symState = ~~symState >> 1 & 65535) != 0; ++j) {
+            if ((symState & 1) != 1) {
+              continue;
+            }
+            $set_5(g, f);
+            $rotate_0(g, j);
+            idxx = symcord1x * 20160 + $get_2(g, 10) % 20160;
+            if (getPruning_0(eprun, idxx) == chk) {
+              setPruning_0(eprun, idxx, dep1m3);
+              ++done_0;
+            }
+          }
+        }
+      }
+    }
+    ++depth;
+    ($clinit_System() , out_0).println(depth + '\t' + done_0);
+  }
+}
+
+function getPruning_0(table, index){
+  return ~~table[~~index >> 4] >> ((index & 15) << 1) & 3;
+}
+
+function getmvrot(ep, mrIdx, end){
+  $clinit_Edge3();
+  var i_0, idx, mov, movo, v, valh, vall;
+  movo = mvroto[mrIdx];
+  mov = mvrot[mrIdx];
+  idx = 0;
+  vall = 1985229328;
+  valh = 47768;
+  for (i_0 = 0; i_0 < end; ++i_0) {
+    v = movo[ep[mov[i_0]]] << 2;
+    idx *= 12 - i_0;
+    if (v >= 32) {
+      idx += ~~valh >> v - 32 & 15;
+      valh -= 4368 << v - 32;
+    }
+     else {
+      idx += ~~vall >> v & 15;
+      valh -= 4369;
+      vall -= 286331152 << v;
+    }
+  }
+  return idx;
+}
+
+function getprun(edge){
+  $clinit_Edge3();
+  var cord1, cord1x, cord2, cord2x, depm3, depth, e, idx, m_0, symcord1, symcord1x, symx;
+  e = new Edge3_0;
+  depth = 0;
+  depm3 = getPruning_0(eprun, edge);
+  if (depm3 == 3) {
+    return 10;
+  }
+  while (edge != 0) {
+    depm3 == 0?(depm3 = 2):--depm3;
+    symcord1 = ~~(edge / 20160);
+    cord1 = sym2raw_0[symcord1];
+    cord2 = edge % 20160;
+    $set_4(e, cord1 * 20160 + cord2);
+    for (m_0 = 0; m_0 < 17; ++m_0) {
+      cord1x = getmvrot(e.edge, m_0 << 3, 4);
+      symcord1x = raw2sym_1[cord1x];
+      symx = symcord1x & 7;
+      symcord1x >>= 3;
+      cord2x = getmvrot(e.edge, m_0 << 3 | symx, 10) % 20160;
+      idx = symcord1x * 20160 + cord2x;
+      if (getPruning_0(eprun, idx) == depm3) {
+        ++depth;
+        edge = idx;
+        break;
+      }
+    }
+  }
+  return depth;
+}
+
+function getprun_0(edge, prun){
+  $clinit_Edge3();
+  var depm3;
+  depm3 = getPruning_0(eprun, edge);
+  if (depm3 == 3) {
+    return 10;
+  }
+  return (depm3 - prun + 16) % 3 + prun - 1;
+}
+
+function initMvrot(){
+  $clinit_Edge3();
+  var e, i_0, m_0, r;
+  e = new Edge3_0;
+  for (m_0 = 0; m_0 < 20; ++m_0) {
+    for (r = 0; r < 8; ++r) {
+      $set_4(e, 0);
+      $move_4(e, m_0);
+      $rotate_0(e, r);
+      for (i_0 = 0; i_0 < 12; ++i_0) {
+        mvrot[m_0 << 3 | r][i_0] = e.edge[i_0];
+      }
+      $std(e);
+      for (i_0 = 0; i_0 < 12; ++i_0) {
+        mvroto[m_0 << 3 | r][i_0] = e.temp[i_0];
+      }
+    }
+  }
+}
+
+function initRaw2Sym(){
+  $clinit_Edge3();
+  var count, e, i_0, idx, j, occ;
+  e = new Edge3_0;
+  occ = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 1485, 1);
+  count = 0;
+  for (i_0 = 0; i_0 < 11880; ++i_0) {
+    if ((occ[~~i_0 >>> 3] & 1 << (i_0 & 7)) == 0) {
+      $set_4(e, i_0 * factX[8]);
+      for (j = 0; j < 8; ++j) {
+        idx = $get_2(e, 4);
+        idx == i_0 && (symstate[count] = (symstate[count] | 1 << j) & 65535);
+        occ[~~idx >> 3] = ~~((occ[~~idx >> 3] | 1 << (idx & 7)) << 24) >> 24;
+        raw2sym_1[idx] = count << 3 | syminv_0[j];
+        $rot_1(e, 0);
+        if (j % 2 == 1) {
+          $rot_1(e, 1);
+          $rot_1(e, 2);
+        }
+      }
+      sym2raw_0[count++] = i_0;
+    }
+  }
+}
+
+function setPruning_0(table, index, value){
+  table[~~index >> 4] ^= (3 ^ value) << ((index & 15) << 1);
+}
+
+defineSeed(158, 1, makeCastMap([Q$Edge3]), Edge3_0);
+_.isStd = true;
+_.temp = null;
+var FullEdgeMap, done_0 = 0, eprun, factX, mvrot, mvroto, prunValues, raw2sym_1, sym2raw_0, syminv_0, symstate;
+function $clinit_EdgeCube(){
+  $clinit_EdgeCube = nullMethod;
+  EdgeColor = initValues(_3_3I_classLit, makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), Q$int_$1, [initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [2, 0]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [5, 0]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [3, 0]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [4, 0]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [3, 1]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [5, 1]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [2, 1]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [4, 1]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [2, 5]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [3, 5]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [3, 4]), initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [2, 4])]);
+  EdgeMap = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [19, 37, 46, 10, 52, 43, 25, 16, 21, 50, 48, 23, 7, 3, 1, 5, 34, 30, 28, 32, 41, 39, 14, 12]);
+}
+
+function $checkEdge(this$static){
+  var ck, i_0, parity;
+  ck = 0;
+  parity = false;
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    ck |= 1 << this$static.ep[i_0];
+    parity = parity != this$static.ep[i_0] >= 12;
+  }
+  ck &= ~~ck >> 12;
+  return ck == 0 && !parity;
+}
+
+function $copy_3(this$static, c){
+  var i_0;
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    this$static.ep[i_0] = c.ep[i_0];
+  }
+}
+
+function $fill333Facelet_1(this$static, facelet){
+  var i_0;
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    facelet[EdgeMap[i_0]] = ($clinit_Util_0() , colorMap4to3)[EdgeColor[this$static.ep[i_0] % 12][~~(this$static.ep[i_0] / 12)]];
+  }
+}
+
+function $move_5(this$static, m_0){
+  var key;
+  key = m_0 % 3;
+  m_0 = ~~(m_0 / 3);
+  switch (m_0) {
+    case 0:
+      swap(this$static.ep, 0, 1, 2, 3, key);
+      swap(this$static.ep, 12, 13, 14, 15, key);
+      break;
+    case 1:
+      swap(this$static.ep, 11, 15, 10, 19, key);
+      swap(this$static.ep, 23, 3, 22, 7, key);
+      break;
+    case 2:
+      swap(this$static.ep, 0, 11, 6, 8, key);
+      swap(this$static.ep, 12, 23, 18, 20, key);
+      break;
+    case 3:
+      swap(this$static.ep, 4, 5, 6, 7, key);
+      swap(this$static.ep, 16, 17, 18, 19, key);
+      break;
+    case 4:
+      swap(this$static.ep, 1, 20, 5, 21, key);
+      swap(this$static.ep, 13, 8, 17, 9, key);
+      break;
+    case 5:
+      swap(this$static.ep, 2, 9, 4, 10, key);
+      swap(this$static.ep, 14, 21, 16, 22, key);
+      break;
+    case 6:
+      swap(this$static.ep, 0, 1, 2, 3, key);
+      swap(this$static.ep, 12, 13, 14, 15, key);
+      swap(this$static.ep, 9, 22, 11, 20, key);
+      break;
+    case 7:
+      swap(this$static.ep, 11, 15, 10, 19, key);
+      swap(this$static.ep, 23, 3, 22, 7, key);
+      swap(this$static.ep, 2, 16, 6, 12, key);
+      break;
+    case 8:
+      swap(this$static.ep, 0, 11, 6, 8, key);
+      swap(this$static.ep, 12, 23, 18, 20, key);
+      swap(this$static.ep, 3, 19, 5, 13, key);
+      break;
+    case 9:
+      swap(this$static.ep, 4, 5, 6, 7, key);
+      swap(this$static.ep, 16, 17, 18, 19, key);
+      swap(this$static.ep, 8, 23, 10, 21, key);
+      break;
+    case 10:
+      swap(this$static.ep, 1, 20, 5, 21, key);
+      swap(this$static.ep, 13, 8, 17, 9, key);
+      swap(this$static.ep, 14, 0, 18, 4, key);
+      break;
+    case 11:
+      swap(this$static.ep, 2, 9, 4, 10, key);
+      swap(this$static.ep, 14, 21, 16, 22, key);
+      swap(this$static.ep, 7, 15, 1, 17, key);
+  }
+}
+
+function EdgeCube_0(){
+  $clinit_EdgeCube();
+  var i_0;
+  this.ep = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 24, 1);
+  for (i_0 = 0; i_0 < 24; ++i_0) {
+    this.ep[i_0] = i_0;
+  }
+}
+
+function EdgeCube_1(r){
+  $clinit_EdgeCube();
+  var i_0, m_0, t;
+  EdgeCube_0.call(this);
+  for (i_0 = 0; i_0 < 23; ++i_0) {
+    t = i_0 + $nextInt(r, 24 - i_0);
+    if (t != i_0) {
+      m_0 = this.ep[i_0];
+      this.ep[i_0] = this.ep[t];
+      this.ep[t] = m_0;
+    }
+  }
+}
+
+defineSeed(159, 1, {}, EdgeCube_0, EdgeCube_1);
+var EdgeColor, EdgeMap;
+function $clinit_FullCube_0(){
+  $clinit_FullCube_0 = nullMethod;
+  move2rot = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [35, 1, 34, 2, 4, 6, 22, 5, 19]);
+}
+
+function $$init_3(this$static){
+  this$static.moveBuffer = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 60, 1);
+}
+
+function $compareTo_1(this$static, c){
+  return this$static.value - c.value;
+}
+
+function $copy_4(this$static, c){
+  var i_0;
+  $copy_3(this$static.edge, c.edge);
+  $copy_1(this$static.center, c.center);
+  $copy_2(this$static.corner, c.corner);
+  this$static.value = c.value;
+  this$static.add1 = c.add1;
+  this$static.length1 = c.length1;
+  this$static.length2 = c.length2;
+  this$static.length3 = c.length3;
+  this$static.sym = c.sym;
+  for (i_0 = 0; i_0 < 60; ++i_0) {
+    this$static.moveBuffer[i_0] = c.moveBuffer[i_0];
+  }
+  this$static.moveLength = c.moveLength;
+  this$static.edgeAvail = c.edgeAvail;
+  this$static.centerAvail = c.centerAvail;
+  this$static.cornerAvail = c.cornerAvail;
+}
+
+function $getCenter(this$static){
+  while (this$static.centerAvail < this$static.moveLength) {
+    $move_2(this$static.center, this$static.moveBuffer[this$static.centerAvail++]);
+  }
+  return this$static.center;
+}
+
+function $getCorner(this$static){
+  while (this$static.cornerAvail < this$static.moveLength) {
+    $move_3(this$static.corner, this$static.moveBuffer[this$static.cornerAvail++] % 18);
+  }
+  return this$static.corner;
+}
+
+function $getEdge(this$static){
+  while (this$static.edgeAvail < this$static.moveLength) {
+    $move_5(this$static.edge, this$static.moveBuffer[this$static.edgeAvail++]);
+  }
+  return this$static.edge;
+}
+
+function $getMoveString(this$static){
+  var finishSym, fixedMoves, i_0, idx, move, rot, sb, sym;
+  fixedMoves = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, this$static.moveLength - (this$static.add1?2:0), 1);
+  idx = 0;
+  for (i_0 = 0; i_0 < this$static.length1; ++i_0) {
+    fixedMoves[idx++] = this$static.moveBuffer[i_0];
+  }
+  sym = this$static.sym;
+  for (i_0 = this$static.length1 + (this$static.add1?2:0); i_0 < this$static.moveLength; ++i_0) {
+    if (($clinit_Center1() , symmove)[sym][this$static.moveBuffer[i_0]] >= 27) {
+      fixedMoves[idx++] = symmove[sym][this$static.moveBuffer[i_0]] - 9;
+      rot = move2rot[symmove[sym][this$static.moveBuffer[i_0]] - 27];
+      sym = symmult[sym][rot];
+    }
+     else {
+      fixedMoves[idx++] = symmove[sym][this$static.moveBuffer[i_0]];
+    }
+  }
+  finishSym = ($clinit_Center1() , symmult)[syminv[sym]][getSolvedSym($getCenter(this$static))];
+  sb = new StringBuffer_0;
+  sym = finishSym;
+  for (i_0 = idx - 1; i_0 >= 0; --i_0) {
+    move = fixedMoves[i_0];
+    move = ~~(move / 3) * 3 + (2 - move % 3);
+    if (symmove[sym][move] >= 27) {
+      $append($append_2(sb, ($clinit_Moves() , move2str_1)[symmove[sym][move] - 9]));
+      rot = move2rot[symmove[sym][move] - 27];
+      sym = symmult[sym][rot];
+    }
+     else {
+      $append($append_2(sb, ($clinit_Moves() , move2str_1)[symmove[sym][move]]));
+    }
+  }
+  return sb.impl.toString_0(sb.data);
+}
+
+function $move_6(this$static, m_0){
+  this$static.moveBuffer[this$static.moveLength++] = ~~(m_0 << 24) >> 24;
+  return;
+}
+
+function FullCube_3(){
+  $clinit_FullCube_0();
+  $$init_3(this);
+  this.edge = new EdgeCube_0;
+  this.center = new CenterCube_0;
+  this.corner = new CornerCube_0;
+}
+
+function FullCube_4(c){
+  $clinit_FullCube_0();
+  FullCube_3.call(this);
+  $copy_4(this, c);
+}
+
+function FullCube_5(r){
+  $clinit_FullCube_0();
+  $$init_3(this);
+  this.edge = new EdgeCube_1(r);
+  this.center = new CenterCube_1(r);
+  this.corner = new CornerCube_2(r);
+}
+
+defineSeed(160, 1, makeCastMap([Q$FullCube_0, Q$Comparable]), FullCube_3, FullCube_4, FullCube_5);
+_.compareTo$ = function compareTo_1(c){
+  return $compareTo_1(this, dynamicCast(c, Q$FullCube_0));
+}
+;
+_.add1 = false;
+_.center = null;
+_.centerAvail = 0;
+_.corner = null;
+_.cornerAvail = 0;
+_.edge = null;
+_.edgeAvail = 0;
+_.length1 = 0;
+_.length2 = 0;
+_.length3 = 0;
+_.moveLength = 0;
+_.sym = 0;
+_.value = 0;
+var move2rot;
+function $compare(c1, c2){
+  return c2.value - c1.value;
+}
+
+function $compare_0(c1, c2){
+  return $compare(dynamicCast(c1, Q$FullCube_0), dynamicCast(c2, Q$FullCube_0));
+}
+
+function FullCube$ValueComparator_0(){
+}
+
+defineSeed(161, 1, {}, FullCube$ValueComparator_0);
+_.compare = function compare(c1, c2){
+  return $compare_0(c1, c2);
+}
+;
+function $clinit_Moves(){
+  $clinit_Moves = nullMethod;
+  var i_0, j;
+  move2str_1 = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ['U  ', 'U2 ', "U' ", 'R  ', 'R2 ', "R' ", 'F  ', 'F2 ', "F' ", 'D  ', 'D2 ', "D' ", 'L  ', 'L2 ', "L' ", 'B  ', 'B2 ', "B' ", 'Uw ', 'Uw2', "Uw'", 'Rw ', 'Rw2', "Rw'", 'Fw ', 'Fw2', "Fw'", 'Dw ', 'Dw2', "Dw'", 'Lw ', 'Lw2', "Lw'", 'Bw ', 'Bw2', "Bw'"]);
+  move2std = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 21, 22, 23, 25, 28, 30, 31, 32, 34, 36]);
+  move3std = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [0, 1, 2, 4, 6, 7, 8, 9, 10, 11, 13, 15, 16, 17, 19, 22, 25, 28, 31, 34, 36]);
+  std2move = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 37, 1);
+  std3move = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 37, 1);
+  ckmv = initDims([_3_3Z_classLit, _3Z_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$boolean_$1, Q$Serializable])], [Q$boolean_$1, -1], [37, 36], 2, 2);
+  ckmv2_0 = initDims([_3_3Z_classLit, _3Z_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$boolean_$1, Q$Serializable])], [Q$boolean_$1, -1], [29, 28], 2, 2);
+  ckmv3 = initDims([_3_3Z_classLit, _3Z_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$boolean_$1, Q$Serializable])], [Q$boolean_$1, -1], [21, 20], 2, 2);
+  skipAxis = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 36, 1);
+  skipAxis2 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 28, 1);
+  skipAxis3 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 20, 1);
+  for (i_0 = 0; i_0 < 29; ++i_0) {
+    std2move[move2std[i_0]] = i_0;
+  }
+  for (i_0 = 0; i_0 < 21; ++i_0) {
+    std3move[move3std[i_0]] = i_0;
+  }
+  for (i_0 = 0; i_0 < 36; ++i_0) {
+    for (j = 0; j < 36; ++j) {
+      ckmv[i_0][j] = ~~(i_0 / 3) == ~~(j / 3) || ~~(i_0 / 3) % 3 == ~~(j / 3) % 3 && i_0 > j;
+    }
+    ckmv[36][i_0] = false;
+  }
+  for (i_0 = 0; i_0 < 29; ++i_0) {
+    for (j = 0; j < 28; ++j) {
+      ckmv2_0[i_0][j] = ckmv[move2std[i_0]][move2std[j]];
+    }
+  }
+  for (i_0 = 0; i_0 < 21; ++i_0) {
+    for (j = 0; j < 20; ++j) {
+      ckmv3[i_0][j] = ckmv[move3std[i_0]][move3std[j]];
+    }
+  }
+  for (i_0 = 0; i_0 < 36; ++i_0) {
+    skipAxis[i_0] = 36;
+    for (j = i_0; j < 36; ++j) {
+      if (!ckmv[i_0][j]) {
+        skipAxis[i_0] = j - 1;
+        break;
+      }
+    }
+  }
+  for (i_0 = 0; i_0 < 28; ++i_0) {
+    skipAxis2[i_0] = 28;
+    for (j = i_0; j < 28; ++j) {
+      if (!ckmv2_0[i_0][j]) {
+        skipAxis2[i_0] = j - 1;
+        break;
+      }
+    }
+  }
+  for (i_0 = 0; i_0 < 20; ++i_0) {
+    skipAxis3[i_0] = 20;
+    for (j = i_0; j < 20; ++j) {
+      if (!ckmv3[i_0][j]) {
+        skipAxis3[i_0] = j - 1;
+        break;
+      }
+    }
+  }
+}
+
+var ckmv, ckmv2_0, ckmv3, move2std, move2str_1, move3std, skipAxis, skipAxis2, skipAxis3, std2move, std3move;
+function $doSearch(this$static){
+  var MAX_LENGTH2, MAX_LENGTH3, ct, edge, eparity, facelet, fb, fbprun, i_0, index, length_0, length12, length123, p1SolsArr, prun, rl, rlprun, s2ct, s2rl, sol, sol333, solcnt, solcube, str, ud, udprun, ret;
+  init_5();
+  this$static.solution = '';
+  ud = $getsym(new Center1_1($getCenter(this$static.c), 0));
+  fb = $getsym(new Center1_1($getCenter(this$static.c), 1));
+  rl = $getsym(new Center1_1($getCenter(this$static.c), 2));
+  udprun = ($clinit_Center1() , csprun)[~~ud >> 6];
+  fbprun = csprun[~~fb >> 6];
+  rlprun = csprun[~~rl >> 6];
+  this$static.p1SolsCnt = 0;
+  this$static.arr2idx = 0;
+  $clear(this$static.p1sols.heap);
+  for (this$static.length1 = (udprun < fbprun?udprun:fbprun) < rlprun?udprun < fbprun?udprun:fbprun:rlprun; this$static.length1 < 100; ++this$static.length1) {
+    if (rlprun <= this$static.length1 && $search1(this$static, ~~rl >>> 6, rl & 63, this$static.length1, -1, 0) || udprun <= this$static.length1 && $search1(this$static, ~~ud >>> 6, ud & 63, this$static.length1, -1, 0) || fbprun <= this$static.length1 && $search1(this$static, ~~fb >>> 6, fb & 63, this$static.length1, -1, 0)) {
+      break;
+    }
+  }
+  p1SolsArr = dynamicCast($toArray_1(this$static.p1sols, initDim(_3Lcs_threephase_FullCube_2_classLit, makeCastMap([Q$FullCube_$1, Q$Serializable, Q$Object_$1]), Q$FullCube_0, 0, 0)), Q$FullCube_$1);
+  mergeSort(p1SolsArr, 0, p1SolsArr.length, ($clinit_Comparators() , $clinit_Comparators() , NATURAL));
+  MAX_LENGTH2 = 9;
+  do {
+    OUT: for (length12 = p1SolsArr[0].value; length12 < 100; ++length12) {
+      for (i_0 = 0; i_0 < p1SolsArr.length; ++i_0) {
+        if (p1SolsArr[i_0].value > length12) {
+          break;
+        }
+        if (length12 - p1SolsArr[i_0].length1 > MAX_LENGTH2) {
+          continue;
+        }
+        $copy_4(this$static.c1, p1SolsArr[i_0]);
+        $set_2(this$static.ct2, $getCenter(this$static.c1), parity_0($getEdge(this$static.c1).ep));
+        s2ct = $getct(this$static.ct2);
+        s2rl = $getrl(this$static.ct2);
+        this$static.length1 = p1SolsArr[i_0].length1;
+        this$static.length2 = length12 - p1SolsArr[i_0].length1;
+        if ($search2(this$static, s2ct, s2rl, this$static.length2, 28, 0)) {
+          break OUT;
+        }
+      }
+    }
+    ++MAX_LENGTH2;
+  }
+   while (length12 == 100);
+  mergeSort(this$static.arr2, 0, this$static.arr2idx, NATURAL);
+  index = 0;
+  solcnt = 0;
+  MAX_LENGTH3 = 13;
+  do {
+    OUT2: for (length123 = this$static.arr2[0].value; length123 < 100; ++length123) {
+      for (i_0 = 0; i_0 < min(this$static.arr2idx, 100); ++i_0) {
+        if (this$static.arr2[i_0].value > length123) {
+          break;
+        }
+        if (length123 - this$static.arr2[i_0].length1 - this$static.arr2[i_0].length2 > MAX_LENGTH3) {
+          continue;
+        }
+        eparity = $set_6(this$static.e12, $getEdge(this$static.arr2[i_0]));
+        $set_3(this$static.ct3, $getCenter(this$static.arr2[i_0]), eparity ^ parity_0($getCorner(this$static.arr2[i_0]).cp));
+        ct = $getct_0(this$static.ct3);
+        edge = $get_2(this$static.e12, 10);
+        prun = getprun($getsym_0(this$static.e12));
+        if (prun <= length123 - this$static.arr2[i_0].length1 - this$static.arr2[i_0].length2 && $search3(this$static, edge, ct, prun, length123 - this$static.arr2[i_0].length1 - this$static.arr2[i_0].length2, 20, 0)) {
+          ++solcnt;
+          index = i_0;
+          break OUT2;
+        }
+      }
+    }
+    ++MAX_LENGTH3;
+  }
+   while (length123 == 100);
+  solcube = new FullCube_4(this$static.arr2[index]);
+  this$static.length1 = solcube.length1;
+  this$static.length2 = solcube.length2;
+  length_0 = length123 - this$static.length1 - this$static.length2;
+  for (i_0 = 0; i_0 < length_0; ++i_0) {
+    $move_6(solcube, ($clinit_Moves() , move3std)[this$static.move3[i_0]]);
+  }
+  facelet = (ret = initDim(_3C_classLit, makeCastMap([Q$char_$1, Q$Serializable]), -1, 54, 1) , $fill333Facelet_1($getEdge(solcube), ret) , $fill333Facelet($getCenter(solcube), ret) , $fill333Facelet_0($getCorner(solcube), ret) , valueOf_1(ret));
+  sol = $solution(this$static.search333, facelet, 20, P64_longLit, P32_longLit, 0, null);
+  sol.indexOf('Error 8') == 0 && (sol = $solution(this$static.search333, facelet, 21, Pf4240_longLit, P1e_longLit, 0, null));
+  ~~(sol.length / 3);
+  if (sol.indexOf('Error') == 0) {
+    ($clinit_System() , out_0).println(sol);
+    throw new RuntimeException_0;
+  }
+  sol333 = tomove(sol);
+  for (i_0 = 0; i_0 < sol333.length; ++i_0) {
+    $move_6(solcube, sol333[i_0]);
+  }
+  str = new StringBuffer_0;
+  $append_2(str, $getMoveString(solcube));
+  this$static.solution = str.impl.toString_0(str.data);
+}
+
+function $init2_0(this$static, sym){
+  var ctp, i_0, next, s2ct, s2rl;
+  $copy_4(this$static.c1, this$static.c);
+  for (i_0 = 0; i_0 < this$static.length1; ++i_0) {
+    $move_6(this$static.c1, this$static.move1[i_0]);
+  }
+  switch (($clinit_Center1() , finish_0)[sym]) {
+    case 0:
+      $move_6(this$static.c1, 24);
+      $move_6(this$static.c1, 35);
+      this$static.move1[this$static.length1] = 24;
+      this$static.move1[this$static.length1 + 1] = 35;
+      this$static.add1 = true;
+      sym = 19;
+      break;
+    case 12869:
+      $move_6(this$static.c1, 18);
+      $move_6(this$static.c1, 29);
+      this$static.move1[this$static.length1] = 18;
+      this$static.move1[this$static.length1 + 1] = 29;
+      this$static.add1 = true;
+      sym = 34;
+      break;
+    case 735470:
+      this$static.add1 = false;
+      sym = 0;
+  }
+  $set_2(this$static.ct2, $getCenter(this$static.c1), parity_0($getEdge(this$static.c1).ep));
+  s2ct = $getct(this$static.ct2);
+  s2rl = $getrl(this$static.ct2);
+  ctp = ($clinit_Center2() , ctprun)[s2ct * 70 + s2rl];
+  this$static.c1.value = ctp + this$static.length1;
+  this$static.c1.length1 = this$static.length1;
+  this$static.c1.add1 = this$static.add1;
+  this$static.c1.sym = sym;
+  ++this$static.p1SolsCnt;
+  if (this$static.p1sols.heap.size < 500) {
+    next = new FullCube_4(this$static.c1);
+  }
+   else {
+    next = dynamicCast($poll(this$static.p1sols), Q$FullCube_0);
+    next.value > this$static.c1.value && $copy_4(next, this$static.c1);
+  }
+  $add(this$static.p1sols, next);
+  return this$static.p1SolsCnt == 10000;
+}
+
+function $init3(this$static){
+  var ct, eparity, i_0, prun;
+  $copy_4(this$static.c2, this$static.c1);
+  for (i_0 = 0; i_0 < this$static.length2; ++i_0) {
+    $move_6(this$static.c2, this$static.move2[i_0]);
+  }
+  if (!$checkEdge($getEdge(this$static.c2))) {
+    return false;
+  }
+  eparity = $set_6(this$static.e12, $getEdge(this$static.c2));
+  $set_3(this$static.ct3, $getCenter(this$static.c2), eparity ^ parity_0($getCorner(this$static.c2).cp));
+  ct = $getct_0(this$static.ct3);
+  $get_2(this$static.e12, 10);
+  prun = getprun($getsym_0(this$static.e12));
+  !this$static.arr2[this$static.arr2idx]?(this$static.arr2[this$static.arr2idx] = new FullCube_4(this$static.c2)):$copy_4(this$static.arr2[this$static.arr2idx], this$static.c2);
+  this$static.arr2[this$static.arr2idx].value = this$static.length1 + this$static.length2 + max(prun, ($clinit_Center3() , prun_0)[ct]);
+  this$static.arr2[this$static.arr2idx].length2 = this$static.length2;
+  ++this$static.arr2idx;
+  return this$static.arr2idx == this$static.arr2.length;
+}
+
+function $randomState(this$static, r){
+  this$static.c = new FullCube_5(r);
+  $doSearch(this$static);
+  return this$static.solution;
+}
+
+function $search1(this$static, ct, sym, maxl, lm, depth){
+  var axis, ctx, m_0, power, prun, symx;
+  if (ct == 0) {
+    return maxl == 0 && $init2_0(this$static, sym);
+  }
+  for (axis = 0; axis < 27; axis += 3) {
+    if (axis == lm || axis == lm - 9 || axis == lm - 18) {
+      continue;
+    }
+    for (power = 0; power < 3; ++power) {
+      m_0 = axis + power;
+      ctx = ($clinit_Center1() , ctsmv)[ct][symmove[sym][m_0]];
+      prun = csprun[~~ctx >>> 6];
+      if (prun >= maxl) {
+        if (prun > maxl) {
+          break;
+        }
+        continue;
+      }
+      symx = symmult[sym][ctx & 63];
+      ctx >>>= 6;
+      this$static.move1[depth] = m_0;
+      if ($search1(this$static, ctx, symx, maxl - 1, axis, depth + 1)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function $search2(this$static, ct, rl, maxl, lm, depth){
+  var ctx, m_0, prun, rlx;
+  if (ct == 0 && ($clinit_Center2() , ctprun)[rl] == 0) {
+    return maxl == 0 && $init3(this$static);
+  }
+  for (m_0 = 0; m_0 < 23; ++m_0) {
+    if (($clinit_Moves() , ckmv2_0)[lm][m_0]) {
+      m_0 = skipAxis2[m_0];
+      continue;
+    }
+    ctx = ($clinit_Center2() , ctmv)[ct][m_0];
+    rlx = rlmv[rl][m_0];
+    prun = ctprun[ctx * 70 + rlx];
+    if (prun >= maxl) {
+      prun > maxl && (m_0 = skipAxis2[m_0]);
+      continue;
+    }
+    this$static.move2[depth] = move2std[m_0];
+    if ($search2(this$static, ctx, rlx, maxl - 1, m_0, depth + 1)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function $search3(this$static, edge, ct, prun, maxl, lm, depth){
+  var cord1x, cord2x, ctx, edgex, m_0, prun1, prunx, symcord1x, symx;
+  if (maxl == 0) {
+    return edge == 0 && ct == 0;
+  }
+  $set_4(this$static.tempe[depth], edge);
+  for (m_0 = 0; m_0 < 17; ++m_0) {
+    if (($clinit_Moves() , ckmv3)[lm][m_0]) {
+      m_0 = skipAxis3[m_0];
+      continue;
+    }
+    ctx = ($clinit_Center3() , ctmove)[ct][m_0];
+    prun1 = prun_0[ctx];
+    if (prun1 >= maxl) {
+      prun1 > maxl && m_0 < 14 && (m_0 = skipAxis3[m_0]);
+      continue;
+    }
+    edgex = getmvrot(this$static.tempe[depth].edge, m_0 << 3, 10);
+    cord1x = ~~(edgex / 20160);
+    symcord1x = ($clinit_Edge3() , raw2sym_1)[cord1x];
+    symx = symcord1x & 7;
+    symcord1x >>= 3;
+    cord2x = getmvrot(this$static.tempe[depth].edge, m_0 << 3 | symx, 10) % 20160;
+    prunx = getprun_0(symcord1x * 20160 + cord2x, prun);
+    if (prunx >= maxl) {
+      prunx > maxl && m_0 < 14 && (m_0 = skipAxis3[m_0]);
+      continue;
+    }
+    if ($search3(this$static, edgex, ctx, prunx, maxl - 1, m_0, depth + 1)) {
+      this$static.move3[depth] = m_0;
+      return true;
+    }
+  }
+  return false;
+}
+
+function Search_4(){
+  var i_0;
+  this.p1sols = new PriorityQueue_0(new FullCube$ValueComparator_0);
+  this.move1 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 15, 1);
+  this.move2 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 20, 1);
+  this.move3 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 20, 1);
+  this.c1 = new FullCube_3;
+  this.c2 = new FullCube_3;
+  this.ct2 = new Center2_0;
+  this.ct3 = new Center3_0;
+  this.e12 = new Edge3_0;
+  this.tempe = initDim(_3Lcs_threephase_Edge3_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$Edge3, 20, 0);
+  this.search333 = new Search_0;
+  this.arr2 = initDim(_3Lcs_threephase_FullCube_2_classLit, makeCastMap([Q$FullCube_$1, Q$Serializable, Q$Object_$1]), Q$FullCube_0, 100, 0);
+  for (i_0 = 0; i_0 < 20; ++i_0) {
+    this.tempe[i_0] = new Edge3_0;
+  }
+}
+
+function init_5(){
+  if (inited_2) {
+    return;
+  }
+  init_0();
+  ($clinit_System() , out_0).println('Initialize Center1 Solver...');
+  initSym_0();
+  $clinit_Center1();
+  raw2sym = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 735471, 1);
+  initSym2Raw();
+  createMoveTable();
+  raw2sym = null;
+  createPrun();
+  out_0.println('Initialize Center2 Solver...');
+  init_3();
+  out_0.println('Initialize Center3 Solver...');
+  init_4();
+  out_0.println('Initialize Edge3 Solver...');
+  initMvrot();
+  initRaw2Sym();
+  createPrun_0();
+  out_0.println('OK');
+  inited_2 = true;
+}
+
+defineSeed(163, 1, makeCastMap([Q$Search_0]), Search_4);
+_.add1 = false;
+_.arr2idx = 0;
+_.c = null;
+_.length1 = 0;
+_.length2 = 0;
+_.p1SolsCnt = 0;
+_.solution = '';
+var inited_2 = false;
+function $clinit_Util_0(){
+  $clinit_Util_0 = nullMethod;
+  var i_0, j;
+  Cnk_1 = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [25, 25], 2, 1);
+  fact_1 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 13, 1);
+  colorMap4to3 = initValues(_3C_classLit, makeCastMap([Q$char_$1, Q$Serializable]), -1, [85, 68, 70, 66, 82, 76]);
+  for (i_0 = 0; i_0 < 25; ++i_0) {
+    Cnk_1[i_0][i_0] = 1;
+    Cnk_1[i_0][0] = 1;
+  }
+  for (i_0 = 1; i_0 < 25; ++i_0) {
+    for (j = 1; j <= i_0; ++j) {
+      Cnk_1[i_0][j] = Cnk_1[i_0 - 1][j] + Cnk_1[i_0 - 1][j - 1];
+    }
+  }
+  fact_1[0] = 1;
+  for (i_0 = 0; i_0 < 12; ++i_0) {
+    fact_1[i_0 + 1] = fact_1[i_0] * (i_0 + 1);
+  }
+}
+
+function parity_0(arr){
+  $clinit_Util_0();
+  var i_0, j, len, parity;
+  parity = 0;
+  for (i_0 = 0 , len = arr.length; i_0 < len; ++i_0) {
+    for (j = i_0; j < len; ++j) {
+      arr[i_0] > arr[j] && (parity ^= 1);
+    }
+  }
+  return parity;
+}
+
+function set8Perm_1(arr, idx){
+  $clinit_Util_0();
+  var i_0, m_0, p_0, v, val;
+  val = 1985229328;
+  for (i_0 = 0; i_0 < 7; ++i_0) {
+    p_0 = fact_1[7 - i_0];
+    v = ~~(idx / p_0);
+    idx -= v * p_0;
+    v <<= 2;
+    arr[i_0] = ~~((~~val >> v & 15) << 24) >> 24;
+    m_0 = (1 << v) - 1;
+    val = (val & m_0) + (~~val >> 4 & ~m_0);
+  }
+  arr[7] = ~~(val << 24) >> 24;
+}
+
+function swap(arr, a, b, c, d, key){
+  $clinit_Util_0();
+  var temp;
+  switch (key) {
+    case 0:
+      temp = arr[d];
+      arr[d] = arr[c];
+      arr[c] = arr[b];
+      arr[b] = arr[a];
+      arr[a] = temp;
+      return;
+    case 1:
+      temp = arr[a];
+      arr[a] = arr[c];
+      arr[c] = temp;
+      temp = arr[b];
+      arr[b] = arr[d];
+      arr[d] = temp;
+      return;
+    case 2:
+      temp = arr[a];
+      arr[a] = arr[b];
+      arr[b] = arr[c];
+      arr[c] = arr[d];
+      arr[d] = temp;
+      return;
+  }
+}
+
+function swap_0(arr, a, b, c, d, key){
+  $clinit_Util_0();
+  var temp;
+  switch (key) {
+    case 0:
+      temp = arr[d];
+      arr[d] = arr[c];
+      arr[c] = arr[b];
+      arr[b] = arr[a];
+      arr[a] = temp;
+      return;
+    case 1:
+      temp = arr[a];
+      arr[a] = arr[c];
+      arr[c] = temp;
+      temp = arr[b];
+      arr[b] = arr[d];
+      arr[d] = temp;
+      return;
+    case 2:
+      temp = arr[a];
+      arr[a] = arr[b];
+      arr[b] = arr[c];
+      arr[c] = arr[d];
+      arr[d] = temp;
+      return;
+  }
+}
+
+function tomove(s){
+  $clinit_Util_0();
+  var arr, axis, i_0, j, length_0, ret;
+  s = $replaceAll(s, '\\s', '');
+  arr = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, s.length, 1);
+  j = 0;
+  for (i_0 = 0 , length_0 = s.length; i_0 < length_0; ++i_0) {
+    switch (s.charCodeAt(i_0)) {
+      case 85:
+        axis = 0;
+        break;
+      case 82:
+        axis = 1;
+        break;
+      case 70:
+        axis = 2;
+        break;
+      case 68:
+        axis = 3;
+        break;
+      case 76:
+        axis = 4;
+        break;
+      case 66:
+        axis = 5;
+        break;
+      case 117:
+        axis = 6;
+        break;
+      case 114:
+        axis = 7;
+        break;
+      case 102:
+        axis = 8;
+        break;
+      case 100:
+        axis = 9;
+        break;
+      case 108:
+        axis = 10;
+        break;
+      case 98:
+        axis = 11;
+        break;
+      default:continue;
+    }
+    axis *= 3;
+    if (++i_0 < length_0) {
+      switch (s.charCodeAt(i_0)) {
+        case 50:
+          ++axis;
+          break;
+        case 39:
+          axis += 2;
+          break;
+        default:--i_0;
+      }
+    }
+    arr[j++] = axis;
+  }
+  ret = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, j, 1);
+  while (--j >= 0) {
+    ret[j] = arr[j];
+  }
+  return ret;
+}
+
+var Cnk_1, colorMap4to3, fact_1;
+defineSeed(166, 1, {});
+defineSeed(165, 166, {});
 function PrintStream_0(){
 }
 
-defineSeed(155, 153, {}, PrintStream_0);
+defineSeed(167, 165, {}, PrintStream_0);
 _.print_0 = function print_0(x){
+}
+;
+_.println = function println(s){
 }
 ;
 function ArithmeticException_0(){
   RuntimeException_1.call(this, 'divide by zero');
 }
 
-defineSeed(156, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), ArithmeticException_0);
+defineSeed(168, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), ArithmeticException_0);
 function ArrayStoreException_0(){
   RuntimeException_0.call(this);
 }
@@ -6514,12 +8804,12 @@ function ArrayStoreException_1(message){
   RuntimeException_1.call(this, message);
 }
 
-defineSeed(157, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), ArrayStoreException_0, ArrayStoreException_1);
+defineSeed(169, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), ArrayStoreException_0, ArrayStoreException_1);
 function Error_1(message, cause){
   Throwable_1.call(this, message, cause);
 }
 
-defineSeed(159, 8, makeCastMap([Q$Serializable, Q$Throwable]));
+defineSeed(171, 8, makeCastMap([Q$Serializable, Q$Throwable]));
 function AssertionError_0(){
   Throwable_0.call(this);
 }
@@ -6528,14 +8818,14 @@ function AssertionError_1(message){
   Error_1.call(this, '' + message, instanceOf(message, Q$Throwable)?dynamicCast(message, Q$Throwable):null);
 }
 
-defineSeed(158, 159, makeCastMap([Q$Serializable, Q$Throwable]), AssertionError_0, AssertionError_1);
+defineSeed(170, 171, makeCastMap([Q$Serializable, Q$Throwable]), AssertionError_0, AssertionError_1);
 function $clinit_Boolean(){
   $clinit_Boolean = nullMethod;
   FALSE_0 = new Boolean_1(false);
   TRUE_0 = new Boolean_1(true);
 }
 
-function $compareTo_1(this$static, other){
+function $compareTo_2(this$static, other){
   return this$static.value == other.value?0:this$static.value?1:-1;
 }
 
@@ -6543,12 +8833,12 @@ function Boolean_1(value){
   this.value = value;
 }
 
-defineSeed(160, 1, makeCastMap([Q$Serializable, Q$Boolean, Q$Comparable]), Boolean_1);
-_.compareTo$ = function compareTo_1(other){
-  return $compareTo_1(this, dynamicCast(other, Q$Boolean));
+defineSeed(172, 1, makeCastMap([Q$Serializable, Q$Boolean, Q$Comparable]), Boolean_1);
+_.compareTo$ = function compareTo_2(other){
+  return $compareTo_2(this, dynamicCast(other, Q$Boolean));
 }
 ;
-_.equals$ = function equals_6(o){
+_.equals$ = function equals_7(o){
   return instanceOf(o, Q$Boolean) && dynamicCast(o, Q$Boolean).value == this.value;
 }
 ;
@@ -6679,7 +8969,7 @@ function setClassLiteral(seedId, clazz){
   proto.___clazz$ = clazz;
 }
 
-defineSeed(162, 1, makeCastMap([Q$Class]), Class_0);
+defineSeed(174, 1, makeCastMap([Q$Class]), Class_0);
 _.toString$ = function toString_15(){
   return ((this.modifiers & 2) != 0?'interface ':(this.modifiers & 1) != 0?'':'class ') + this.typeName;
 }
@@ -6693,7 +8983,7 @@ function ClassCastException_0(){
   RuntimeException_0.call(this);
 }
 
-defineSeed(163, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), ClassCastException_0);
+defineSeed(175, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), ClassCastException_0);
 function __parseAndValidateInt(s, radix){
   var i_0, length_0, startIndex, toReturn;
   if (s == null) {
@@ -6719,16 +9009,16 @@ function __parseAndValidateInt(s, radix){
   return toReturn;
 }
 
-defineSeed(165, 1, makeCastMap([Q$Serializable, Q$Number]));
-function $compareTo_2(this$static, b){
-  return compare(this$static.value, b.value);
+defineSeed(177, 1, makeCastMap([Q$Serializable, Q$Number]));
+function $compareTo_3(this$static, b){
+  return compare_0(this$static.value, b.value);
 }
 
 function Double_0(value){
   this.value = value;
 }
 
-function compare(x, y){
+function compare_0(x, y){
   if (isNaN(x)) {
     return isNaN(y)?0:1;
   }
@@ -6738,12 +9028,12 @@ function compare(x, y){
   return x < y?-1:x > y?1:0;
 }
 
-defineSeed(164, 165, makeCastMap([Q$Serializable, Q$Comparable, Q$Double, Q$Number]), Double_0);
-_.compareTo$ = function compareTo_2(b){
-  return $compareTo_2(this, dynamicCast(b, Q$Double));
+defineSeed(176, 177, makeCastMap([Q$Serializable, Q$Comparable, Q$Double, Q$Number]), Double_0);
+_.compareTo$ = function compareTo_3(b){
+  return $compareTo_3(this, dynamicCast(b, Q$Double));
 }
 ;
-_.equals$ = function equals_7(o){
+_.equals$ = function equals_8(o){
   return instanceOf(o, Q$Double) && dynamicCast(o, Q$Double).value == this.value;
 }
 ;
@@ -6764,7 +9054,7 @@ function IllegalArgumentException_1(message){
   RuntimeException_1.call(this, message);
 }
 
-defineSeed(166, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), IllegalArgumentException_0, IllegalArgumentException_1);
+defineSeed(178, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), IllegalArgumentException_0, IllegalArgumentException_1);
 function IllegalStateException_0(){
   RuntimeException_0.call(this);
 }
@@ -6773,7 +9063,7 @@ function IllegalStateException_1(s){
   RuntimeException_1.call(this, s);
 }
 
-defineSeed(167, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), IllegalStateException_0, IllegalStateException_1);
+defineSeed(179, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), IllegalStateException_0, IllegalStateException_1);
 function IndexOutOfBoundsException_0(){
   RuntimeException_0.call(this);
 }
@@ -6782,8 +9072,8 @@ function IndexOutOfBoundsException_1(message){
   RuntimeException_1.call(this, message);
 }
 
-defineSeed(168, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), IndexOutOfBoundsException_0, IndexOutOfBoundsException_1);
-function $compareTo_3(this$static, b){
+defineSeed(180, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), IndexOutOfBoundsException_0, IndexOutOfBoundsException_1);
+function $compareTo_4(this$static, b){
   return this$static.value < b.value?-1:this$static.value > b.value?1:0;
 }
 
@@ -6877,12 +9167,12 @@ function valueOf_0(i_0){
   return new Integer_0(i_0);
 }
 
-defineSeed(169, 165, makeCastMap([Q$Serializable, Q$Comparable, Q$Integer, Q$Number]), Integer_0);
-_.compareTo$ = function compareTo_3(b){
-  return $compareTo_3(this, dynamicCast(b, Q$Integer));
+defineSeed(181, 177, makeCastMap([Q$Serializable, Q$Comparable, Q$Integer, Q$Number]), Integer_0);
+_.compareTo$ = function compareTo_4(b){
+  return $compareTo_4(this, dynamicCast(b, Q$Integer));
 }
 ;
-_.equals$ = function equals_8(o){
+_.equals$ = function equals_9(o){
   return instanceOf(o, Q$Integer) && dynamicCast(o, Q$Integer).value == this.value;
 }
 ;
@@ -6941,7 +9231,7 @@ function NullPointerException_1(message){
   RuntimeException_1.call(this, message);
 }
 
-defineSeed(173, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), NullPointerException_0, NullPointerException_1);
+defineSeed(185, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), NullPointerException_0, NullPointerException_1);
 function $clinit_Number$__Digits(){
   $clinit_Number$__Digits = nullMethod;
   digits_0 = initValues(_3C_classLit, makeCastMap([Q$char_$1, Q$Serializable]), -1, [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122]);
@@ -6952,7 +9242,7 @@ function NumberFormatException_0(message){
   IllegalArgumentException_1.call(this, message);
 }
 
-defineSeed(175, 166, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), NumberFormatException_0);
+defineSeed(187, 178, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), NumberFormatException_0);
 function $toString_0(this$static){
   return this$static.className + '.' + this$static.methodName + '(' + (this$static.fileName != null?this$static.fileName:'Unknown Source') + (this$static.lineNumber >= 0?':' + this$static.lineNumber:'') + ')';
 }
@@ -6964,7 +9254,7 @@ function StackTraceElement_0(methodName, fileName, lineNumber){
   this.lineNumber = lineNumber;
 }
 
-defineSeed(176, 1, makeCastMap([Q$Serializable, Q$StackTraceElement]), StackTraceElement_0);
+defineSeed(188, 1, makeCastMap([Q$Serializable, Q$StackTraceElement]), StackTraceElement_0);
 _.toString$ = function toString_18(){
   return $toString_0(this);
 }
@@ -6977,7 +9267,7 @@ function $charAt(this$static, index){
   return this$static.charCodeAt(index);
 }
 
-function $equals(this$static, other){
+function $equals_0(this$static, other){
   if (!instanceOf(other, Q$String)) {
     return false;
   }
@@ -7099,7 +9389,7 @@ function __valueOf(x, start, end){
   return String.fromCharCode.apply(null, x);
 }
 
-function compareTo_5(thisStr, otherStr){
+function compareTo_6(thisStr, otherStr){
   thisStr = String(thisStr);
   if (thisStr == otherStr) {
     return 0;
@@ -7178,12 +9468,12 @@ function valueOf_1(x){
 
 _ = String.prototype;
 _.castableTypeMap$ = makeCastMap([Q$String, Q$Serializable, Q$CharSequence, Q$Comparable]);
-_.compareTo$ = function compareTo_4(other){
-  return compareTo_5(this, dynamicCast(other, Q$String));
+_.compareTo$ = function compareTo_5(other){
+  return compareTo_6(this, dynamicCast(other, Q$String));
 }
 ;
-_.equals$ = function equals_9(other){
-  return $equals(this, other);
+_.equals$ = function equals_10(other){
+  return $equals_0(this, other);
 }
 ;
 _.hashCode$ = function hashCode_10(){
@@ -7236,7 +9526,7 @@ function increment(){
 }
 
 var back_0, count_0 = 0, front;
-function $$init_1(this$static){
+function $$init_4(this$static){
   this$static.impl = com_google_gwt_core_client_impl_StringBufferImpl();
   this$static.data = this$static.impl.createData();
 }
@@ -7266,20 +9556,20 @@ function $delete(this$static, end){
 }
 
 function StringBuffer_0(){
-  $$init_1(this);
+  $$init_4(this);
 }
 
 function StringBuffer_1(s){
-  $$init_1(this);
+  $$init_4(this);
   this.impl.append_2(this.data, s);
 }
 
-defineSeed(178, 1, makeCastMap([Q$CharSequence]), StringBuffer_0, StringBuffer_1);
+defineSeed(190, 1, makeCastMap([Q$CharSequence]), StringBuffer_0, StringBuffer_1);
 _.toString$ = function toString_19(){
   return this.impl.toString_0(this.data);
 }
 ;
-function $$init_2(this$static){
+function $$init_5(this$static){
   this$static.impl = com_google_gwt_core_client_impl_StringBufferImpl();
   this$static.data = this$static.impl.createData();
 }
@@ -7336,19 +9626,19 @@ function $toString_1(this$static){
 }
 
 function StringBuilder_0(){
-  $$init_2(this);
+  $$init_5(this);
 }
 
 function StringBuilder_1(){
-  $$init_2(this);
+  $$init_5(this);
 }
 
 function StringBuilder_2(s){
-  $$init_2(this);
+  $$init_5(this);
   this.impl.append_2(this.data, s);
 }
 
-defineSeed(179, 1, makeCastMap([Q$CharSequence]), StringBuilder_0, StringBuilder_1, StringBuilder_2);
+defineSeed(191, 1, makeCastMap([Q$CharSequence]), StringBuilder_0, StringBuilder_1, StringBuilder_2);
 _.toString$ = function toString_20(){
   return $toString_1(this);
 }
@@ -7406,15 +9696,19 @@ function currentTimeMillis0(){
 }
 
 var err, out_0;
-function $get_1(this$static){
+function $get_3(this$static){
   if (!this$static.initialized) {
-    this$static.value = new Search_0;
+    this$static.value = this$static.initialValue();
     this$static.initialized = true;
   }
   return this$static.value;
 }
 
-defineSeed(181, 1, {});
+defineSeed(193, 1, {});
+_.initialValue = function initialValue(){
+  return null;
+}
+;
 _.initialized = false;
 _.value = null;
 function UnsupportedOperationException_0(){
@@ -7425,7 +9719,7 @@ function UnsupportedOperationException_1(message){
   RuntimeException_1.call(this, message);
 }
 
-defineSeed(182, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), UnsupportedOperationException_0, UnsupportedOperationException_1);
+defineSeed(194, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable]), UnsupportedOperationException_0, UnsupportedOperationException_1);
 function $clinit_Random(){
   $clinit_Random = nullMethod;
   var i_0, twoToTheXMinus24Tmp, twoToTheXMinus48Tmp;
@@ -7491,7 +9785,7 @@ function Random_0(){
   this.seedlo = lo ^ 15525485;
 }
 
-defineSeed(184, 1, {}, Random_0);
+defineSeed(196, 1, {}, Random_0);
 _.seedhi = 0;
 _.seedlo = 0;
 var twoToTheXMinus24, twoToTheXMinus48, uniqueSeed = 0;
@@ -7513,7 +9807,7 @@ function SecureRandom_0(){
   Random_0.call(this);
 }
 
-defineSeed(183, 184, {}, SecureRandom_0);
+defineSeed(195, 196, {}, SecureRandom_0);
 function $advanceToFind(iter, o){
   var t;
   while (iter.hasNext()) {
@@ -7540,7 +9834,7 @@ function $toString_2(this$static){
   return sb.impl.toString_0(sb.data);
 }
 
-defineSeed(185, 1, {});
+defineSeed(197, 1, {});
 _.add = function add_0(o){
   throw new UnsupportedOperationException_1('Add not supported on this collection');
 }
@@ -7601,12 +9895,12 @@ function $putAll(this$static, t){
   }
 }
 
-defineSeed(187, 1, makeCastMap([Q$Map]));
+defineSeed(199, 1, makeCastMap([Q$Map]));
 _.containsKey = function containsKey(key){
   return !!$implFindEntry(this, key, false);
 }
 ;
-_.equals$ = function equals_10(obj){
+_.equals$ = function equals_11(obj){
   var entry, entry$iterator, otherKey, otherMap, otherValue;
   if (obj === this) {
     return true;
@@ -7823,7 +10117,7 @@ function $removeStringValue(this$static, key){
   return result;
 }
 
-defineSeed(186, 187, makeCastMap([Q$Map]));
+defineSeed(198, 199, makeCastMap([Q$Map]));
 _.containsKey = function containsKey_0(key){
   return key == null?this.nullSlotLive:instanceOf(key, Q$String)?':' + dynamicCast(key, Q$String) in this.stringMap:$hasHashValue(this, key, this.getHashCode(key));
 }
@@ -7857,8 +10151,8 @@ _.nullSlot = null;
 _.nullSlotLive = false;
 _.size = 0;
 _.stringMap = null;
-defineSeed(189, 185, makeCastMap([Q$Set]));
-_.equals$ = function equals_11(o){
+defineSeed(201, 197, makeCastMap([Q$Set]));
+_.equals$ = function equals_12(o){
   var iter, other, otherItem;
   if (o === this) {
     return true;
@@ -7896,7 +10190,7 @@ function AbstractHashMap$EntrySet_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(188, 189, makeCastMap([Q$Set]), AbstractHashMap$EntrySet_0);
+defineSeed(200, 201, makeCastMap([Q$Set]), AbstractHashMap$EntrySet_0);
 _.contains_0 = function contains_0(o){
   var entry, key, value;
   if (instanceOf(o, Q$Map$Entry)) {
@@ -7923,13 +10217,13 @@ function AbstractHashMap$EntrySetIterator_0(this$0){
   var list;
   this.this$0 = this$0;
   list = new ArrayList_0;
-  this$0.nullSlotLive && $add(list, new AbstractHashMap$MapEntryNull_0(this$0));
+  this$0.nullSlotLive && $add_0(list, new AbstractHashMap$MapEntryNull_0(this$0));
   $addAllStringEntries(this$0, list);
   $addAllHashEntries(this$0, list);
   this.iter = new AbstractList$IteratorImpl_0(list);
 }
 
-defineSeed(190, 1, {}, AbstractHashMap$EntrySetIterator_0);
+defineSeed(202, 1, {}, AbstractHashMap$EntrySetIterator_0);
 _.hasNext = function hasNext(){
   return $hasNext(this.iter);
 }
@@ -7952,8 +10246,8 @@ _.remove_0 = function remove_2(){
 _.iter = null;
 _.last = null;
 _.this$0 = null;
-defineSeed(192, 1, makeCastMap([Q$Map$Entry]));
-_.equals$ = function equals_12(other){
+defineSeed(204, 1, makeCastMap([Q$Map$Entry]));
+_.equals$ = function equals_13(other){
   var entry;
   if (instanceOf(other, Q$Map$Entry)) {
     entry = dynamicCast(other, Q$Map$Entry);
@@ -7981,7 +10275,7 @@ function AbstractHashMap$MapEntryNull_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(191, 192, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryNull_0);
+defineSeed(203, 204, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryNull_0);
 _.getKey = function getKey(){
   return null;
 }
@@ -8000,7 +10294,7 @@ function AbstractHashMap$MapEntryString_0(this$0, key){
   this.key = key;
 }
 
-defineSeed(193, 192, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryString_0);
+defineSeed(205, 204, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryString_0);
 _.getKey = function getKey_0(){
   return this.key;
 }
@@ -8023,7 +10317,7 @@ function indexOutOfBounds(index, size){
   throw new IndexOutOfBoundsException_1('Index: ' + index + ', Size: ' + size);
 }
 
-defineSeed(194, 185, makeCastMap([Q$List]));
+defineSeed(206, 197, makeCastMap([Q$List]));
 _.add_0 = function add_1(index, element){
   throw new UnsupportedOperationException_1('Add not supported on this list');
 }
@@ -8033,7 +10327,7 @@ _.add = function add_2(obj){
   return true;
 }
 ;
-_.equals$ = function equals_13(o){
+_.equals$ = function equals_14(o){
   var elem, elemOther, iter, iterOther, other;
   if (o === this) {
     return true;
@@ -8101,7 +10395,7 @@ function AbstractList$IteratorImpl_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(195, 1, {}, AbstractList$IteratorImpl_0);
+defineSeed(207, 1, {}, AbstractList$IteratorImpl_0);
 _.hasNext = function hasNext_0(){
   return $hasNext(this);
 }
@@ -8128,7 +10422,7 @@ function AbstractMap$1_0(this$0, val$entrySet){
   this.val$entrySet = val$entrySet;
 }
 
-defineSeed(196, 189, makeCastMap([Q$Set]), AbstractMap$1_0);
+defineSeed(208, 201, makeCastMap([Q$Set]), AbstractMap$1_0);
 _.contains_0 = function contains_1(key){
   return this.this$0.containsKey(key);
 }
@@ -8153,7 +10447,7 @@ function AbstractMap$1$1_0(val$outerIter){
   this.val$outerIter = val$outerIter;
 }
 
-defineSeed(197, 1, {}, AbstractMap$1$1_0);
+defineSeed(209, 1, {}, AbstractMap$1$1_0);
 _.hasNext = function hasNext_1(){
   return this.val$outerIter.hasNext();
 }
@@ -8167,8 +10461,20 @@ _.remove_0 = function remove_5(){
 }
 ;
 _.val$outerIter = null;
-defineSeed(198, 194, makeCastMap([Q$List]));
-_.add_0 = function add_3(index, element){
+function $add(this$static, o){
+  if ($offer(this$static, o)) {
+    return true;
+  }
+  throw new IllegalStateException_1('Unable to add element to queue');
+}
+
+defineSeed(210, 197, {});
+_.add = function add_3(o){
+  return $add(this, o);
+}
+;
+defineSeed(211, 206, makeCastMap([Q$List]));
+_.add_0 = function add_4(index, element){
   var iter;
   iter = $listIterator(this, index);
   $addBefore(iter.this$0, element, iter.currentNode);
@@ -8214,11 +10520,11 @@ _.remove_1 = function remove_6(index){
   return old;
 }
 ;
-function $$init_3(this$static){
+function $$init_6(this$static){
   this$static.array = initDim(_3Ljava_lang_Object_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$Object, 0, 0);
 }
 
-function $add(this$static, o){
+function $add_0(this$static, o){
   setCheck(this$static.array, this$static.size++, o);
   return true;
 }
@@ -8228,7 +10534,7 @@ function $clear(this$static){
   this$static.size = 0;
 }
 
-function $get_2(this$static, index){
+function $get_4(this$static, index){
   checkIndex(index, this$static.size);
   return this$static.array[index];
 }
@@ -8250,14 +10556,18 @@ function $remove_0(this$static, index){
   return previous;
 }
 
-function $set_0(this$static, index, o){
+function $set_7(this$static, index, o){
   var previous;
   previous = (checkIndex(index, this$static.size) , this$static.array[index]);
   setCheck(this$static.array, index, o);
   return previous;
 }
 
-function $toArray(this$static, out){
+function $toArray(this$static){
+  return cloneSubrange(this$static.array, 0, this$static.size);
+}
+
+function $toArray_0(this$static, out){
   var i_0;
   out.length < this$static.size && (out = createFrom(out, this$static.size));
   for (i_0 = 0; i_0 < this$static.size; ++i_0) {
@@ -8268,11 +10578,16 @@ function $toArray(this$static, out){
 }
 
 function ArrayList_0(){
-  $$init_3(this);
+  $$init_6(this);
 }
 
-function ArrayList_1(c){
-  $$init_3(this);
+function ArrayList_1(){
+  $$init_6(this);
+  this.array.length = 500;
+}
+
+function ArrayList_2(c){
+  $$init_6(this);
   spliceArray(this.array, 0, 0, c.toArray());
   this.size = this.array.length;
 }
@@ -8289,15 +10604,15 @@ function spliceArray(array, index, deleteCount, values){
   Array.prototype.splice.apply(array, [index, deleteCount].concat(values));
 }
 
-defineSeed(199, 194, makeCastMap([Q$Serializable, Q$List, Q$RandomAccess]), ArrayList_0, ArrayList_1);
-_.add_0 = function add_4(index, o){
+defineSeed(212, 206, makeCastMap([Q$Serializable, Q$List, Q$RandomAccess]), ArrayList_0, ArrayList_1, ArrayList_2);
+_.add_0 = function add_5(index, o){
   (index < 0 || index > this.size) && indexOutOfBounds(index, this.size);
   splice_1(this.array, index, 0, o);
   ++this.size;
 }
 ;
-_.add = function add_5(o){
-  return $add(this, o);
+_.add = function add_6(o){
+  return $add_0(this, o);
 }
 ;
 _.contains_0 = function contains_2(o){
@@ -8305,7 +10620,7 @@ _.contains_0 = function contains_2(o){
 }
 ;
 _.get_0 = function get_2(index){
-  return $get_2(this, index);
+  return $get_4(this, index);
 }
 ;
 _.remove_1 = function remove_7(index){
@@ -8317,11 +10632,11 @@ _.size_0 = function size_4(){
 }
 ;
 _.toArray = function toArray_1(){
-  return cloneSubrange(this.array, 0, this.size);
+  return $toArray(this);
 }
 ;
 _.toArray_0 = function toArray_2(out){
-  return $toArray(this, out);
+  return $toArray_0(this, out);
 }
 ;
 _.size = 0;
@@ -8379,27 +10694,27 @@ function deepEquals(a1, a2){
       }
     }
      else if (instanceOf(obj1, Q$boolean_$1)) {
-      if (!equals_18(dynamicCast(obj1, Q$boolean_$1), dynamicCast(obj2, Q$boolean_$1))) {
+      if (!equals_19(dynamicCast(obj1, Q$boolean_$1), dynamicCast(obj2, Q$boolean_$1))) {
         return false;
       }
     }
      else if (instanceOf(obj1, Q$byte_$1)) {
-      if (!equals_14(dynamicCast(obj1, Q$byte_$1), dynamicCast(obj2, Q$byte_$1))) {
+      if (!equals_15(dynamicCast(obj1, Q$byte_$1), dynamicCast(obj2, Q$byte_$1))) {
         return false;
       }
     }
      else if (instanceOf(obj1, Q$char_$1)) {
-      if (!equals_15(dynamicCast(obj1, Q$char_$1), dynamicCast(obj2, Q$char_$1))) {
+      if (!equals_16(dynamicCast(obj1, Q$char_$1), dynamicCast(obj2, Q$char_$1))) {
         return false;
       }
     }
      else if (instanceOf(obj1, Q$int_$1)) {
-      if (!equals_17(dynamicCast(obj1, Q$int_$1), dynamicCast(obj2, Q$int_$1))) {
+      if (!equals_18(dynamicCast(obj1, Q$int_$1), dynamicCast(obj2, Q$int_$1))) {
         return false;
       }
     }
      else if (instanceOf(obj1, Q$double_$1)) {
-      if (!equals_16(dynamicCast(obj1, Q$double_$1), dynamicCast(obj2, Q$double_$1))) {
+      if (!equals_17(dynamicCast(obj1, Q$double_$1), dynamicCast(obj2, Q$double_$1))) {
         return false;
       }
     }
@@ -8419,25 +10734,6 @@ function deepHashCode(a){
     hashCode = 31 * hashCode + hash | 0;
   }
   return hashCode;
-}
-
-function equals_14(array1, array2){
-  var i_0;
-  if (maskUndefined(array1) === maskUndefined(array2)) {
-    return true;
-  }
-  if (array1 == null || array2 == null) {
-    return false;
-  }
-  if (array1.length != array2.length) {
-    return false;
-  }
-  for (i_0 = 0; i_0 < array1.length; ++i_0) {
-    if (array1[i_0] != array2[i_0]) {
-      return false;
-    }
-  }
-  return true;
 }
 
 function equals_15(array1, array2){
@@ -8514,6 +10810,47 @@ function equals_18(array1, array2){
     }
   }
   return true;
+}
+
+function equals_19(array1, array2){
+  var i_0;
+  if (maskUndefined(array1) === maskUndefined(array2)) {
+    return true;
+  }
+  if (array1 == null || array2 == null) {
+    return false;
+  }
+  if (array1.length != array2.length) {
+    return false;
+  }
+  for (i_0 = 0; i_0 < array1.length; ++i_0) {
+    if (array1[i_0] != array2[i_0]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function fill_0(a){
+  fill_1(a, a.length);
+}
+
+function fill_1(a, toIndex){
+  var i_0;
+  for (i_0 = 0; i_0 < toIndex; ++i_0) {
+    a[i_0] = -1;
+  }
+}
+
+function fill_2(a){
+  fill_3(a, a.length);
+}
+
+function fill_3(a, toIndex){
+  var i_0;
+  for (i_0 = 0; i_0 < toIndex; ++i_0) {
+    a[i_0] = -1;
+  }
 }
 
 function hashCode_15(a){
@@ -8640,7 +10977,7 @@ function replaceContents(target, x){
   var i_0, size;
   size = target.size;
   for (i_0 = 0; i_0 < size; ++i_0) {
-    $set_0(target, i_0, x[i_0]);
+    $set_7(target, i_0, x[i_0]);
   }
 }
 
@@ -8648,8 +10985,8 @@ function unmodifiableList(list){
   return instanceOf(list, Q$RandomAccess)?new Collections$UnmodifiableRandomAccessList_0(list):new Collections$UnmodifiableList_0(list);
 }
 
-defineSeed(202, 1, {});
-_.add = function add_6(o){
+defineSeed(215, 1, {});
+_.add = function add_7(o){
   throw new UnsupportedOperationException_0;
 }
 ;
@@ -8670,7 +11007,7 @@ function Collections$UnmodifiableCollectionIterator_0(it){
   this.it = it;
 }
 
-defineSeed(203, 1, {}, Collections$UnmodifiableCollectionIterator_0);
+defineSeed(216, 1, {}, Collections$UnmodifiableCollectionIterator_0);
 _.hasNext = function hasNext_2(){
   return this.it.hasNext();
 }
@@ -8689,8 +11026,8 @@ function Collections$UnmodifiableList_0(list){
   this.list = list;
 }
 
-defineSeed(204, 202, makeCastMap([Q$List]), Collections$UnmodifiableList_0);
-_.equals$ = function equals_19(o){
+defineSeed(217, 215, makeCastMap([Q$List]), Collections$UnmodifiableList_0);
+_.equals$ = function equals_20(o){
   return this.list.equals$(o);
 }
 ;
@@ -8707,7 +11044,7 @@ function Collections$UnmodifiableMap_0(map){
   this.map = map;
 }
 
-defineSeed(205, 1, makeCastMap([Q$Map]), Collections$UnmodifiableMap_0);
+defineSeed(218, 1, makeCastMap([Q$Map]), Collections$UnmodifiableMap_0);
 _.containsKey = function containsKey_1(key){
   return this.map.containsKey(key);
 }
@@ -8717,7 +11054,7 @@ _.entrySet_0 = function entrySet_1(){
   return this.entrySet;
 }
 ;
-_.equals$ = function equals_20(o){
+_.equals$ = function equals_21(o){
   return this.map.equals$(o);
 }
 ;
@@ -8757,8 +11094,8 @@ function Collections$UnmodifiableSet_0(set){
   this.coll = set;
 }
 
-defineSeed(207, 202, makeCastMap([Q$Set]), Collections$UnmodifiableSet_0);
-_.equals$ = function equals_21(o){
+defineSeed(220, 215, makeCastMap([Q$Set]), Collections$UnmodifiableSet_0);
+_.equals$ = function equals_22(o){
   return this.coll.equals$(o);
 }
 ;
@@ -8770,7 +11107,7 @@ function Collections$UnmodifiableMap$UnmodifiableEntrySet_0(s){
   this.coll = s;
 }
 
-defineSeed(206, 207, makeCastMap([Q$Set]), Collections$UnmodifiableMap$UnmodifiableEntrySet_0);
+defineSeed(219, 220, makeCastMap([Q$Set]), Collections$UnmodifiableMap$UnmodifiableEntrySet_0);
 _.iterator = function iterator_5(){
   var it;
   it = this.coll.iterator();
@@ -8781,7 +11118,7 @@ function Collections$UnmodifiableMap$UnmodifiableEntrySet$1_0(val$it){
   this.val$it = val$it;
 }
 
-defineSeed(208, 1, {}, Collections$UnmodifiableMap$UnmodifiableEntrySet$1_0);
+defineSeed(221, 1, {}, Collections$UnmodifiableMap$UnmodifiableEntrySet$1_0);
 _.hasNext = function hasNext_3(){
   return this.val$it.hasNext();
 }
@@ -8799,8 +11136,8 @@ function Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry_0(en
   this.entry = entry;
 }
 
-defineSeed(209, 1, makeCastMap([Q$Map$Entry]), Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry_0);
-_.equals$ = function equals_22(o){
+defineSeed(222, 1, makeCastMap([Q$Map$Entry]), Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry_0);
+_.equals$ = function equals_23(o){
   return this.entry.equals$(o);
 }
 ;
@@ -8829,7 +11166,7 @@ function Collections$UnmodifiableRandomAccessList_0(list){
   Collections$UnmodifiableList_0.call(this, list);
 }
 
-defineSeed(210, 204, makeCastMap([Q$List, Q$RandomAccess]), Collections$UnmodifiableRandomAccessList_0);
+defineSeed(223, 217, makeCastMap([Q$List, Q$RandomAccess]), Collections$UnmodifiableRandomAccessList_0);
 function $clinit_Comparators(){
   $clinit_Comparators = nullMethod;
   NATURAL = new Comparators$1_0;
@@ -8839,12 +11176,12 @@ var NATURAL;
 function Comparators$1_0(){
 }
 
-defineSeed(212, 1, {}, Comparators$1_0);
-_.compare = function compare_0(o1, o2){
+defineSeed(225, 1, {}, Comparators$1_0);
+_.compare = function compare_1(o1, o2){
   return dynamicCast(o1, Q$Comparable).compareTo$(o2);
 }
 ;
-function $compareTo_4(this$static, other){
+function $compareTo_5(this$static, other){
   return signum(sub(fromDouble(this$static.jsdate.getTime()), fromDouble(other.jsdate.getTime())));
 }
 
@@ -8868,12 +11205,12 @@ function padTwo(number){
   return number < 10?'0' + number:'' + number;
 }
 
-defineSeed(213, 1, makeCastMap([Q$Serializable, Q$Comparable, Q$Date]), Date_1, Date_2);
-_.compareTo$ = function compareTo_6(other){
-  return $compareTo_4(this, dynamicCast(other, Q$Date));
+defineSeed(226, 1, makeCastMap([Q$Serializable, Q$Comparable, Q$Date]), Date_1, Date_2);
+_.compareTo$ = function compareTo_7(other){
+  return $compareTo_5(this, dynamicCast(other, Q$Date));
 }
 ;
-_.equals$ = function equals_23(obj){
+_.equals$ = function equals_24(obj){
   return instanceOf(obj, Q$Date) && eq(fromDouble(this.jsdate.getTime()), fromDouble(dynamicCast(obj, Q$Date).jsdate.getTime()));
 }
 ;
@@ -8904,8 +11241,8 @@ function HashMap_1(toBeCopied){
   $putAll(this, toBeCopied);
 }
 
-defineSeed(215, 186, makeCastMap([Q$Serializable, Q$HashMap, Q$Map]), HashMap_0, HashMap_1);
-_.equals = function equals_24(value1, value2){
+defineSeed(228, 198, makeCastMap([Q$Serializable, Q$HashMap, Q$Map]), HashMap_0, HashMap_1);
+_.equals = function equals_25(value1, value2){
   return maskUndefined(value1) === maskUndefined(value2) || value1 != null && equals__devirtual$(value1, value2);
 }
 ;
@@ -8913,7 +11250,7 @@ _.getHashCode = function getHashCode_1(key){
   return ~~hashCode__devirtual$(key);
 }
 ;
-function $add_0(this$static, o){
+function $add_1(this$static, o){
   var old;
   old = this$static.map.put(o, this$static);
   return old == null;
@@ -8923,9 +11260,9 @@ function HashSet_0(){
   this.map = new HashMap_0;
 }
 
-defineSeed(216, 189, makeCastMap([Q$Serializable, Q$Set]), HashSet_0);
-_.add = function add_7(o){
-  return $add_0(this, o);
+defineSeed(229, 201, makeCastMap([Q$Serializable, Q$Set]), HashSet_0);
+_.add = function add_8(o){
+  return $add_1(this, o);
 }
 ;
 _.contains_0 = function contains_3(o){
@@ -8949,7 +11286,7 @@ function $containsKey(this$static, key){
   return this$static.map.containsKey(key);
 }
 
-function $get_3(this$static, key){
+function $get_5(this$static, key){
   var entry;
   entry = dynamicCast(this$static.map.get(key), Q$LinkedHashMap$ChainEntry);
   if (entry) {
@@ -8991,7 +11328,7 @@ function LinkedHashMap_0(){
   this.head.next = this.head;
 }
 
-defineSeed(217, 215, makeCastMap([Q$Serializable, Q$HashMap, Q$Map]), LinkedHashMap_0);
+defineSeed(230, 228, makeCastMap([Q$Serializable, Q$HashMap, Q$Map]), LinkedHashMap_0);
 _.containsKey = function containsKey_2(key){
   return this.map.containsKey(key);
 }
@@ -9001,7 +11338,7 @@ _.entrySet_0 = function entrySet_2(){
 }
 ;
 _.get = function get_5(key){
-  return $get_3(this, key);
+  return $get_5(this, key);
 }
 ;
 _.put = function put_2(key, value){
@@ -9035,7 +11372,7 @@ function MapEntryImpl_0(key, value){
   this.value = value;
 }
 
-defineSeed(219, 192, makeCastMap([Q$Map$Entry]), MapEntryImpl_0);
+defineSeed(232, 204, makeCastMap([Q$Map$Entry]), MapEntryImpl_0);
 _.getKey = function getKey_2(){
   return this.key;
 }
@@ -9074,7 +11411,7 @@ function LinkedHashMap$ChainEntry_1(this$0, key, value){
   this.next = this.prev = null;
 }
 
-defineSeed(218, 219, makeCastMap([Q$LinkedHashMap$ChainEntry, Q$Map$Entry]), LinkedHashMap$ChainEntry_0, LinkedHashMap$ChainEntry_1);
+defineSeed(231, 232, makeCastMap([Q$LinkedHashMap$ChainEntry, Q$Map$Entry]), LinkedHashMap$ChainEntry_0, LinkedHashMap$ChainEntry_1);
 _.next = null;
 _.prev = null;
 _.this$0 = null;
@@ -9082,7 +11419,7 @@ function LinkedHashMap$EntrySet_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(220, 189, makeCastMap([Q$Set]), LinkedHashMap$EntrySet_0);
+defineSeed(233, 201, makeCastMap([Q$Set]), LinkedHashMap$EntrySet_0);
 _.contains_0 = function contains_4(o){
   var entry, key, value;
   if (!instanceOf(o, Q$Map$Entry)) {
@@ -9091,7 +11428,7 @@ _.contains_0 = function contains_4(o){
   entry = dynamicCast(o, Q$Map$Entry);
   key = entry.getKey();
   if ($containsKey(this.this$0, key)) {
-    value = $get_3(this.this$0, key);
+    value = $get_5(this.this$0, key);
     return equalsWithNullCheck(entry.getValue(), value);
   }
   return false;
@@ -9120,7 +11457,7 @@ function LinkedHashMap$EntrySet$EntryIterator_0(this$1){
   this.next = this$1.this$0.head.next;
 }
 
-defineSeed(221, 1, {}, LinkedHashMap$EntrySet$EntryIterator_0);
+defineSeed(234, 1, {}, LinkedHashMap$EntrySet$EntryIterator_0);
 _.hasNext = function hasNext_4(){
   return this.next != this.this$1.this$0.head;
 }
@@ -9189,8 +11526,8 @@ function LinkedList_0(){
   this.size = 0;
 }
 
-defineSeed(222, 198, makeCastMap([Q$Serializable, Q$List]), LinkedList_0);
-_.add = function add_8(o){
+defineSeed(235, 211, makeCastMap([Q$Serializable, Q$List]), LinkedList_0);
+_.add = function add_9(o){
   new LinkedList$Node_1(o, this.header);
   ++this.size;
   return true;
@@ -9232,7 +11569,7 @@ function LinkedList$ListIteratorImpl_0(this$0, index, startNode){
   this.currentIndex = index;
 }
 
-defineSeed(223, 1, {}, LinkedList$ListIteratorImpl_0);
+defineSeed(236, 1, {}, LinkedList$ListIteratorImpl_0);
 _.hasNext = function hasNext_5(){
   return this.currentNode != this.this$0.header;
 }
@@ -9267,7 +11604,7 @@ function LinkedList$Node_1(value, nextNode){
   nextNode.prev = this;
 }
 
-defineSeed(224, 1, {}, LinkedList$Node_0, LinkedList$Node_1);
+defineSeed(237, 1, {}, LinkedList$Node_0, LinkedList$Node_1);
 _.next = null;
 _.prev = null;
 _.value = null;
@@ -9275,13 +11612,100 @@ function NoSuchElementException_0(){
   RuntimeException_0.call(this);
 }
 
-defineSeed(225, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$NoSuchElementException]), NoSuchElementException_0);
+defineSeed(238, 6, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$NoSuchElementException]), NoSuchElementException_0);
+function $mergeHeaps(this$static, node){
+  var heapSize, smallestChild, value, leftChild, rightChild, smallestChild_0;
+  heapSize = this$static.heap.size;
+  value = $get_4(this$static.heap, node);
+  while (node * 2 + 1 < heapSize) {
+    smallestChild = (leftChild = 2 * node + 1 , rightChild = leftChild + 1 , smallestChild_0 = leftChild , rightChild < heapSize && $compare_0($get_4(this$static.heap, rightChild), $get_4(this$static.heap, leftChild)) < 0 && (smallestChild_0 = rightChild) , smallestChild_0);
+    if ($compare_0(value, $get_4(this$static.heap, smallestChild)) < 0) {
+      break;
+    }
+    $set_7(this$static.heap, node, $get_4(this$static.heap, smallestChild));
+    node = smallestChild;
+  }
+  $set_7(this$static.heap, node, value);
+}
+
+function $offer(this$static, e){
+  var childNode, node;
+  node = this$static.heap.size;
+  $add_0(this$static.heap, e);
+  while (node > 0) {
+    childNode = node;
+    node = ~~((node - 1) / 2);
+    if ($compare_0($get_4(this$static.heap, node), e) <= 0) {
+      $set_7(this$static.heap, childNode, e);
+      return true;
+    }
+    $set_7(this$static.heap, childNode, $get_4(this$static.heap, node));
+  }
+  $set_7(this$static.heap, node, e);
+  return true;
+}
+
+function $poll(this$static){
+  var value;
+  if (this$static.heap.size == 0) {
+    return null;
+  }
+  value = $get_4(this$static.heap, 0);
+  $removeAtIndex(this$static);
+  return value;
+}
+
+function $removeAtIndex(this$static){
+  var lastValue;
+  lastValue = $remove_0(this$static.heap, this$static.heap.size - 1);
+  if (0 < this$static.heap.size) {
+    $set_7(this$static.heap, 0, lastValue);
+    $mergeHeaps(this$static, 0);
+  }
+}
+
+function $toArray_1(this$static, a){
+  return $toArray_0(this$static.heap, a);
+}
+
+function PriorityQueue_0(cmp){
+  this.heap = new ArrayList_1;
+  this.cmp = cmp;
+}
+
+defineSeed(239, 210, {}, PriorityQueue_0);
+_.contains_0 = function contains_5(o){
+  return $indexOf_1(this.heap, o, 0) != -1;
+}
+;
+_.iterator = function iterator_8(){
+  return new Collections$UnmodifiableCollectionIterator_0(unmodifiableList(this.heap).coll.iterator());
+}
+;
+_.size_0 = function size_11(){
+  return this.heap.size;
+}
+;
+_.toArray = function toArray_3(){
+  return $toArray(this.heap);
+}
+;
+_.toArray_0 = function toArray_4(a){
+  return $toArray_0(this.heap, a);
+}
+;
+_.toString$ = function toString_30(){
+  return $toString_2(this.heap);
+}
+;
+_.cmp = null;
+_.heap = null;
 function $clinit_TreeMap(){
   $clinit_TreeMap = nullMethod;
   DEFAULT_COMPARATOR = new TreeMap$1_0;
 }
 
-function $get_4(this$static, k_0){
+function $get_6(this$static, k_0){
   var entry;
   entry = $getEntry(this$static, k_0);
   return entry?entry.value:null;
@@ -9291,7 +11715,7 @@ function $getEntry(this$static, key){
   var c, tree;
   tree = this$static.root;
   while (tree) {
-    c = $compare_0(key, tree.key);
+    c = $compare_2(key, tree.key);
     if (c == 0) {
       return tree;
     }
@@ -9317,7 +11741,7 @@ function $getNodeAtOrAfter(this$static, key){
   foundNode = null;
   node = this$static.root;
   while (node) {
-    c = $compare_0(key, node.key);
+    c = $compare_2(key, node.key);
     if (c == 0) {
       return node;
     }
@@ -9338,7 +11762,7 @@ function $insert_0(this$static, tree, newNode, state){
     return newNode;
   }
    else {
-    c = $compare_0(tree.key, newNode.key);
+    c = $compare_2(tree.key, newNode.key);
     if (c == 0) {
       state.value = tree.value;
       state.found = true;
@@ -9398,7 +11822,7 @@ function $removeWithState(this$static, key, state){
     grandparent = parent_0;
     parent_0 = node;
     node = node.child[dir];
-    c = $compare_0(node.key, key);
+    c = $compare_2(node.key, key);
     dir = c < 0?1:0;
     c == 0 && (!state.matchValue || equals__devirtual$(node.value, state.value)) && (found = node);
     if (!(!!node && node.isRed) && !$isRed(node.child[dir])) {
@@ -9443,10 +11867,10 @@ function $removeWithState(this$static, key, state){
 function $replaceNode_0(this$static, head, node, newNode){
   var direction, parent_0;
   parent_0 = head;
-  direction = parent_0.key == null || $compare_0(node.key, parent_0.key) > 0?1:0;
+  direction = parent_0.key == null || $compare_2(node.key, parent_0.key) > 0?1:0;
   while (parent_0.child[direction] != node) {
     parent_0 = parent_0.child[direction];
-    direction = $compare_0(node.key, parent_0.key) > 0?1:0;
+    direction = $compare_2(node.key, parent_0.key) > 0?1:0;
   }
   parent_0.child[direction] = newNode;
   newNode.isRed = node.isRed;
@@ -9493,7 +11917,7 @@ function throwNSE(node){
   return node;
 }
 
-defineSeed(226, 187, makeCastMap([Q$Serializable, Q$Map]), TreeMap_0);
+defineSeed(240, 199, makeCastMap([Q$Serializable, Q$Map]), TreeMap_0);
 _.containsKey = function containsKey_3(key){
   return !!$getEntry(this, key);
 }
@@ -9507,7 +11931,7 @@ _.firstKey = function firstKey(){
 }
 ;
 _.get = function get_6(k_0){
-  return $get_4(this, k_0);
+  return $get_6(this, k_0);
 }
 ;
 _.put = function put_3(key, value){
@@ -9518,7 +11942,7 @@ _.remove = function remove_14(keyObj){
   return $remove_4(this, keyObj);
 }
 ;
-_.size_0 = function size_11(){
+_.size_0 = function size_12(){
   return this.size;
 }
 ;
@@ -9530,23 +11954,23 @@ _.cmp = null;
 _.root = null;
 _.size = 0;
 var DEFAULT_COMPARATOR;
-function $compare(a, b){
+function $compare_1(a, b){
   if (a == null || b == null) {
     throw new NullPointerException_0;
   }
   return a.compareTo$(b);
 }
 
-function $compare_0(a, b){
-  return $compare(dynamicCast(a, Q$Comparable), dynamicCast(b, Q$Comparable));
+function $compare_2(a, b){
+  return $compare_1(dynamicCast(a, Q$Comparable), dynamicCast(b, Q$Comparable));
 }
 
 function TreeMap$1_0(){
 }
 
-defineSeed(227, 1, {}, TreeMap$1_0);
-_.compare = function compare_1(a, b){
-  return $compare_0(a, b);
+defineSeed(241, 1, {}, TreeMap$1_0);
+_.compare = function compare_2(a, b){
+  return $compare_2(a, b);
 }
 ;
 function $inOrderAdd(this$static, list, type, current, fromKey, toKey){
@@ -9560,12 +11984,12 @@ function $inOrderAdd(this$static, list, type, current, fromKey, toKey){
 
 function $inRange(this$static, type, key, fromKey, toKey){
   if (type.toKeyValid()) {
-    if ($compare_0(key, toKey) >= 0) {
+    if ($compare_2(key, toKey) >= 0) {
       return false;
     }
   }
   if (type.fromKeyValid()) {
-    if ($compare_0(key, fromKey) < 0) {
+    if ($compare_2(key, fromKey) < 0) {
       return false;
     }
   }
@@ -9584,7 +12008,7 @@ function TreeMap$EntryIterator_1(this$0, type, fromKey, toKey){
   this.iter = new AbstractList$IteratorImpl_0(list);
 }
 
-defineSeed(228, 1, {}, TreeMap$EntryIterator_0, TreeMap$EntryIterator_1);
+defineSeed(242, 1, {}, TreeMap$EntryIterator_0, TreeMap$EntryIterator_1);
 _.hasNext = function hasNext_6(){
   return $hasNext(this.iter);
 }
@@ -9605,8 +12029,8 @@ function TreeMap$EntrySet_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(229, 189, makeCastMap([Q$Set]), TreeMap$EntrySet_0);
-_.contains_0 = function contains_5(o){
+defineSeed(243, 201, makeCastMap([Q$Set]), TreeMap$EntrySet_0);
+_.contains_0 = function contains_6(o){
   var entry, lookupEntry;
   if (!instanceOf(o, Q$Map$Entry)) {
     return false;
@@ -9616,11 +12040,11 @@ _.contains_0 = function contains_5(o){
   return !!lookupEntry && equalsWithNullCheck(lookupEntry.value, entry.getValue());
 }
 ;
-_.iterator = function iterator_8(){
+_.iterator = function iterator_9(){
   return new TreeMap$EntryIterator_0(this.this$0);
 }
 ;
-_.size_0 = function size_12(){
+_.size_0 = function size_13(){
   return this.this$0.size;
 }
 ;
@@ -9632,8 +12056,8 @@ function TreeMap$Node_0(key, value){
   this.isRed = true;
 }
 
-defineSeed(230, 1, makeCastMap([Q$Map$Entry, Q$TreeMap$Node]), TreeMap$Node_0);
-_.equals$ = function equals_25(o){
+defineSeed(244, 1, makeCastMap([Q$Map$Entry, Q$TreeMap$Node]), TreeMap$Node_0);
+_.equals$ = function equals_26(o){
   var other;
   if (!instanceOf(o, Q$Map$Entry)) {
     return false;
@@ -9664,7 +12088,7 @@ _.setValue = function setValue_3(value){
   return old;
 }
 ;
-_.toString$ = function toString_30(){
+_.toString$ = function toString_31(){
   return this.key + '=' + this.value;
 }
 ;
@@ -9675,8 +12099,8 @@ _.value = null;
 function TreeMap$State_0(){
 }
 
-defineSeed(231, 1, {}, TreeMap$State_0);
-_.toString$ = function toString_31(){
+defineSeed(245, 1, {}, TreeMap$State_0);
+_.toString$ = function toString_32(){
   return 'State: mv=' + this.matchValue + ' value=' + this.value + ' done=' + this.done + ' found=' + this.found;
 }
 ;
@@ -9686,12 +12110,12 @@ _.matchValue = false;
 _.value = null;
 function $inRange_0(this$static, key){
   if (this$static.type_0.toKeyValid()) {
-    if ($compare_0(key, this$static.toKey) >= 0) {
+    if ($compare_2(key, this$static.toKey) >= 0) {
       return false;
     }
   }
   if (this$static.type_0.fromKeyValid()) {
-    if ($compare_0(key, this$static.fromKey) < 0) {
+    if ($compare_2(key, this$static.fromKey) < 0) {
       return false;
     }
   }
@@ -9702,23 +12126,23 @@ function TreeMap$SubMap_0(this$0, type, fromKey, toKey){
   this.this$0 = this$0;
   switch (type.ordinal) {
     case 2:
-      if ($compare_0(toKey, fromKey) < 0) {
+      if ($compare_2(toKey, fromKey) < 0) {
         throw new IllegalArgumentException_1('subMap: ' + toKey + ' less than ' + fromKey);
       }
 
       break;
     case 1:
-      $compare_0(toKey, toKey);
+      $compare_2(toKey, toKey);
       break;
     case 3:
-      $compare_0(fromKey, fromKey);
+      $compare_2(fromKey, fromKey);
   }
   this.type_0 = type;
   this.fromKey = fromKey;
   this.toKey = toKey;
 }
 
-defineSeed(232, 187, makeCastMap([Q$Map]), TreeMap$SubMap_0);
+defineSeed(246, 199, makeCastMap([Q$Map]), TreeMap$SubMap_0);
 _.containsKey = function containsKey_4(k_0){
   if (!$inRange_0(this, k_0)) {
     return false;
@@ -9733,7 +12157,7 @@ _.entrySet_0 = function entrySet_4(){
 _.firstKey = function firstKey_0(){
   var node, node_0;
   node = throwNSE((this.type_0.fromKeyValid()?(node_0 = $getNodeAtOrAfter(this.this$0, this.fromKey)):(node_0 = $getFirstNode(this.this$0)) , !!node_0 && $inRange_0(this, node_0.key)?node_0:null));
-  if (this.type_0.toKeyValid() && $compare_0(node.key, this.toKey) > 0) {
+  if (this.type_0.toKeyValid() && $compare_2(node.key, this.toKey) > 0) {
     throw new NoSuchElementException_0;
   }
   return node.key;
@@ -9743,7 +12167,7 @@ _.get = function get_7(k_0){
   if (!$inRange_0(this, k_0)) {
     return null;
   }
-  return $get_4(this.this$0, k_0);
+  return $get_6(this.this$0, k_0);
 }
 ;
 _.put = function put_4(key, value){
@@ -9761,7 +12185,7 @@ _.remove = function remove_16(k_0){
 }
 ;
 _.tailMap = function tailMap_0(fromKey){
-  if (this.type_0.fromKeyValid() && $compare_0(fromKey, this.fromKey) < 0) {
+  if (this.type_0.fromKeyValid() && $compare_2(fromKey, this.fromKey) < 0) {
     throw new IllegalArgumentException_1('subMap: ' + fromKey + ' less than ' + this.fromKey);
   }
   return this.type_0.toKeyValid()?$subMap(this.this$0, fromKey, this.toKey):$tailMap(this.this$0, fromKey);
@@ -9775,8 +12199,8 @@ function TreeMap$SubMap$1_0(this$1){
   this.this$1 = this$1;
 }
 
-defineSeed(233, 189, makeCastMap([Q$Set]), TreeMap$SubMap$1_0);
-_.contains_0 = function contains_6(o){
+defineSeed(247, 201, makeCastMap([Q$Set]), TreeMap$SubMap$1_0);
+_.contains_0 = function contains_7(o){
   var entry, key, lookupEntry;
   if (!instanceOf(o, Q$Map$Entry)) {
     return false;
@@ -9790,11 +12214,11 @@ _.contains_0 = function contains_6(o){
   return !!lookupEntry && equalsWithNullCheck(lookupEntry.value, entry.getValue());
 }
 ;
-_.iterator = function iterator_9(){
+_.iterator = function iterator_10(){
   return new TreeMap$EntryIterator_1(this.this$1.this$0, this.this$1.type_0, this.this$1.fromKey, this.this$1.toKey);
 }
 ;
-_.size_0 = function size_13(){
+_.size_0 = function size_14(){
   var it, n;
   n = 0;
   it = new TreeMap$EntryIterator_1(this.this$1.this$0, this.this$1.type_0, this.this$1.fromKey, this.this$1.toKey);
@@ -9824,7 +12248,7 @@ function values_2(){
   return $VALUES_1;
 }
 
-defineSeed(234, 46, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType_0);
+defineSeed(248, 46, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType_0);
 _.fromKeyValid = function fromKeyValid(){
   return false;
 }
@@ -9838,7 +12262,7 @@ function TreeMap$SubMapType$1_0(){
   Enum_0.call(this, 'Head', 1);
 }
 
-defineSeed(235, 234, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType$1_0);
+defineSeed(249, 248, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType$1_0);
 _.toKeyValid = function toKeyValid_0(){
   return true;
 }
@@ -9847,7 +12271,7 @@ function TreeMap$SubMapType$2_0(){
   Enum_0.call(this, 'Range', 2);
 }
 
-defineSeed(236, 234, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType$2_0);
+defineSeed(250, 248, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType$2_0);
 _.fromKeyValid = function fromKeyValid_0(){
   return true;
 }
@@ -9860,12 +12284,12 @@ function TreeMap$SubMapType$3_0(){
   Enum_0.call(this, 'Tail', 3);
 }
 
-defineSeed(237, 234, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType$3_0);
+defineSeed(251, 248, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$TreeMap$SubMapType]), TreeMap$SubMapType$3_0);
 _.fromKeyValid = function fromKeyValid_1(){
   return true;
 }
 ;
-function $add_1(this$static, o){
+function $add_2(this$static, o){
   return this$static.map.put(o, ($clinit_Boolean() , FALSE_0)) == null;
 }
 
@@ -9889,20 +12313,20 @@ function TreeSet_1(map){
   this.map = map;
 }
 
-defineSeed(238, 189, makeCastMap([Q$Serializable, Q$Set]), TreeSet_0, TreeSet_1);
-_.add = function add_9(o){
-  return $add_1(this, o);
+defineSeed(252, 201, makeCastMap([Q$Serializable, Q$Set]), TreeSet_0, TreeSet_1);
+_.add = function add_10(o){
+  return $add_2(this, o);
 }
 ;
-_.contains_0 = function contains_7(o){
+_.contains_0 = function contains_8(o){
   return this.map.containsKey(o);
 }
 ;
-_.iterator = function iterator_10(){
+_.iterator = function iterator_11(){
   return this.map.keySet_0().iterator();
 }
 ;
-_.size_0 = function size_14(){
+_.size_0 = function size_15(){
   return this.map.size_0();
 }
 ;
@@ -9924,7 +12348,7 @@ function $clinit_Level(){
   WARNING = new Level$LevelWarning_0;
 }
 
-defineSeed(240, 1, makeCastMap([Q$Serializable]));
+defineSeed(254, 1, makeCastMap([Q$Serializable]));
 _.getName = function getName(){
   return 'DUMMY';
 }
@@ -9933,7 +12357,7 @@ _.intValue = function intValue(){
   return -1;
 }
 ;
-_.toString$ = function toString_32(){
+_.toString$ = function toString_33(){
   return this.getName();
 }
 ;
@@ -9941,7 +12365,7 @@ var ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING;
 function Level$LevelAll_0(){
 }
 
-defineSeed(241, 240, makeCastMap([Q$Serializable]), Level$LevelAll_0);
+defineSeed(255, 254, makeCastMap([Q$Serializable]), Level$LevelAll_0);
 _.getName = function getName_0(){
   return 'ALL';
 }
@@ -9953,7 +12377,7 @@ _.intValue = function intValue_0(){
 function Level$LevelConfig_0(){
 }
 
-defineSeed(242, 240, makeCastMap([Q$Serializable]), Level$LevelConfig_0);
+defineSeed(256, 254, makeCastMap([Q$Serializable]), Level$LevelConfig_0);
 _.getName = function getName_1(){
   return 'CONFIG';
 }
@@ -9965,7 +12389,7 @@ _.intValue = function intValue_1(){
 function Level$LevelFine_0(){
 }
 
-defineSeed(243, 240, makeCastMap([Q$Serializable]), Level$LevelFine_0);
+defineSeed(257, 254, makeCastMap([Q$Serializable]), Level$LevelFine_0);
 _.getName = function getName_2(){
   return 'FINE';
 }
@@ -9977,7 +12401,7 @@ _.intValue = function intValue_2(){
 function Level$LevelFiner_0(){
 }
 
-defineSeed(244, 240, makeCastMap([Q$Serializable]), Level$LevelFiner_0);
+defineSeed(258, 254, makeCastMap([Q$Serializable]), Level$LevelFiner_0);
 _.getName = function getName_3(){
   return 'FINER';
 }
@@ -9989,7 +12413,7 @@ _.intValue = function intValue_3(){
 function Level$LevelFinest_0(){
 }
 
-defineSeed(245, 240, makeCastMap([Q$Serializable]), Level$LevelFinest_0);
+defineSeed(259, 254, makeCastMap([Q$Serializable]), Level$LevelFinest_0);
 _.getName = function getName_4(){
   return 'FINEST';
 }
@@ -10001,7 +12425,7 @@ _.intValue = function intValue_4(){
 function Level$LevelInfo_0(){
 }
 
-defineSeed(246, 240, makeCastMap([Q$Serializable]), Level$LevelInfo_0);
+defineSeed(260, 254, makeCastMap([Q$Serializable]), Level$LevelInfo_0);
 _.getName = function getName_5(){
   return 'INFO';
 }
@@ -10013,7 +12437,7 @@ _.intValue = function intValue_5(){
 function Level$LevelOff_0(){
 }
 
-defineSeed(247, 240, makeCastMap([Q$Serializable]), Level$LevelOff_0);
+defineSeed(261, 254, makeCastMap([Q$Serializable]), Level$LevelOff_0);
 _.getName = function getName_6(){
   return 'OFF';
 }
@@ -10025,7 +12449,7 @@ _.intValue = function intValue_6(){
 function Level$LevelSevere_0(){
 }
 
-defineSeed(248, 240, makeCastMap([Q$Serializable]), Level$LevelSevere_0);
+defineSeed(262, 254, makeCastMap([Q$Serializable]), Level$LevelSevere_0);
 _.getName = function getName_7(){
   return 'SEVERE';
 }
@@ -10037,7 +12461,7 @@ _.intValue = function intValue_7(){
 function Level$LevelWarning_0(){
 }
 
-defineSeed(249, 240, makeCastMap([Q$Serializable]), Level$LevelWarning_0);
+defineSeed(263, 254, makeCastMap([Q$Serializable]), Level$LevelWarning_0);
 _.getName = function getName_8(){
   return 'WARNING';
 }
@@ -10084,7 +12508,7 @@ function LogManager_0(){
   this.loggerList.put('', this.rootLogger);
 }
 
-defineSeed(250, 1, {}, LogManager_0);
+defineSeed(264, 1, {}, LogManager_0);
 _.loggerList = null;
 _.rootLogger = null;
 var singleton = null;
@@ -10094,7 +12518,7 @@ function LogManager$RootLogger_0(){
   $setLevel_1(this, ($clinit_Level() , ALL));
 }
 
-defineSeed(251, 105, makeCastMap([Q$Logger]), LogManager$RootLogger_0);
+defineSeed(265, 105, makeCastMap([Q$Logger]), LogManager$RootLogger_0);
 function $setLoggerName(this$static, newName){
   this$static.loggerName = newName;
 }
@@ -10105,7 +12529,7 @@ function LogRecord_0(level, msg){
   this.millis = fromDouble((new Date_1).jsdate.getTime());
 }
 
-defineSeed(252, 1, makeCastMap([Q$Serializable]), LogRecord_0);
+defineSeed(266, 1, makeCastMap([Q$Serializable]), LogRecord_0);
 _.level = null;
 _.loggerName = '';
 _.millis = P0_longLit;
@@ -10115,13 +12539,23 @@ function $consoleLog(msg){
   window.console?window.console.log(msg):(document.title = 'LOG:' + msg);
 }
 
+function $println(this$static, s){
+  $append_5(this$static.buf, s);
+  $consoleLog($toString_1(this$static.buf));
+  $setLength(this$static.buf);
+}
+
 function ConsolePrintStream_0(){
   this.buf = new StringBuilder_0;
 }
 
-defineSeed(253, 155, {}, ConsolePrintStream_0);
+defineSeed(267, 167, {}, ConsolePrintStream_0);
 _.print_0 = function print_1(c){
-  c == 10?($append_5(this.buf, '') , $consoleLog($toString_1(this.buf)) , $setLength(this.buf) , undefined):$append_3(this.buf, c);
+  c == 10?$println(this, ''):$append_3(this.buf, c);
+}
+;
+_.println = function println_0(s){
+  $println(this, s);
 }
 ;
 function $clinit_ScrambleJsEntryPoint(){
@@ -10315,7 +12749,7 @@ function $export0(this$static){
   }
   );
   $wnd.tnoodlejs.getVersion = $entry(function(){
-    return '0.8.7';
+    return '0.8.7-13-g7feb0a5';
   }
   );
   $wnd.tnoodlejs.scrambleToSvg = $entry(function(a0, a1, a2){
@@ -10336,7 +12770,7 @@ function TNoodleJsUtilsExporterImpl_0(){
   $export(this);
 }
 
-defineSeed(256, 1, {}, TNoodleJsUtilsExporterImpl_0);
+defineSeed(270, 1, {}, TNoodleJsUtilsExporterImpl_0);
 _.isAssignable = function isAssignable(o){
   return false;
 }
@@ -10361,30 +12795,30 @@ function $appendMove(this$static, newMove){
   indexAndMove = $findBestIndexForMove(this$static, newMove, this$static.mergingMode);
   if (indexAndMove.index_0 < this$static.moves.size) {
     azzert_1(this$static.mergingMode != 0);
-    oldCostMove = dynamicCast($get_2(this$static.states, indexAndMove.index_0), Q$Puzzle$PuzzleState).getMoveCost(dynamicCast($get_2(this$static.moves, indexAndMove.index_0), Q$String));
+    oldCostMove = dynamicCast($get_4(this$static.states, indexAndMove.index_0), Q$Puzzle$PuzzleState).getMoveCost(dynamicCast($get_4(this$static.moves, indexAndMove.index_0), Q$String));
     if (indexAndMove.move == null) {
       $remove_0(this$static.moves, indexAndMove.index_0);
       $remove_0(this$static.states, indexAndMove.index_0 + 1);
       newCostMove = 0;
     }
      else {
-      $set_0(this$static.moves, indexAndMove.index_0, indexAndMove.move);
-      newCostMove = dynamicCast($get_2(this$static.states, indexAndMove.index_0), Q$Puzzle$PuzzleState).getMoveCost(indexAndMove.move);
+      $set_7(this$static.moves, indexAndMove.index_0, indexAndMove.move);
+      newCostMove = dynamicCast($get_4(this$static.states, indexAndMove.index_0), Q$Puzzle$PuzzleState).getMoveCost(indexAndMove.move);
     }
   }
    else {
     oldCostMove = 0;
-    newCostMove = dynamicCast($get_2(this$static.states, this$static.states.size - 1), Q$Puzzle$PuzzleState).getMoveCost(indexAndMove.move);
-    $add(this$static.moves, indexAndMove.move);
-    $add(this$static.states, null);
+    newCostMove = dynamicCast($get_4(this$static.states, this$static.states.size - 1), Q$Puzzle$PuzzleState).getMoveCost(indexAndMove.move);
+    $add_0(this$static.moves, indexAndMove.move);
+    $add_0(this$static.states, null);
   }
   this$static.totalCost += newCostMove - oldCostMove;
   for (i_0 = indexAndMove.index_0 + 1; i_0 < this$static.states.size; ++i_0) {
-    $set_0(this$static.states, i_0, $apply(dynamicCast($get_2(this$static.states, i_0 - 1), Q$Puzzle$PuzzleState), dynamicCast($get_2(this$static.moves, i_0 - 1), Q$String)));
+    $set_7(this$static.states, i_0, $apply(dynamicCast($get_4(this$static.states, i_0 - 1), Q$Puzzle$PuzzleState), dynamicCast($get_4(this$static.moves, i_0 - 1), Q$String)));
   }
   this$static.unNormalizedState = $apply(this$static.unNormalizedState, newMove);
   azzert_1(this$static.states.size == this$static.moves.size + 1);
-  azzert_1($equalsNormalized(this$static.unNormalizedState, (azzert_1(this$static.states.size == this$static.moves.size + 1) , dynamicCast($get_2(this$static.states, this$static.states.size - 1), Q$Puzzle$PuzzleState))));
+  azzert_1($equalsNormalized(this$static.unNormalizedState, (azzert_1(this$static.states.size == this$static.moves.size + 1) , dynamicCast($get_4(this$static.states, this$static.states.size - 1), Q$Puzzle$PuzzleState))));
 }
 
 function $findBestIndexForMove(this$static, move, mergingMode){
@@ -10399,7 +12833,7 @@ function $findBestIndexForMove(this$static, move, mergingMode){
     }
   }
   newNormalizedState = newUnNormalizedState.getNormalized();
-  successors = (azzert_1(this$static.states.size == this$static.moves.size + 1) , dynamicCast($get_2(this$static.states, this$static.states.size - 1), Q$Puzzle$PuzzleState)).getCanonicalMovesByState();
+  successors = (azzert_1(this$static.states.size == this$static.moves.size + 1) , dynamicCast($get_4(this$static.states, this$static.states.size - 1), Q$Puzzle$PuzzleState)).getCanonicalMovesByState();
   move = null;
   for (ps$iterator = $iterator($keySet(successors)); ps$iterator.val$outerIter.hasNext();) {
     ps = dynamicCast($next_0(ps$iterator), Q$Puzzle$PuzzleState);
@@ -10411,12 +12845,12 @@ function $findBestIndexForMove(this$static, move, mergingMode){
   azzert_1(move != null);
   if (mergingMode == 1) {
     for (lastMoveIndex = this$static.moves.size - 1; lastMoveIndex >= 0; --lastMoveIndex) {
-      lastMove = dynamicCast($get_2(this$static.moves, lastMoveIndex), Q$String);
-      stateBeforeLastMove = dynamicCast($get_2(this$static.states, lastMoveIndex), Q$Puzzle$PuzzleState);
+      lastMove = dynamicCast($get_4(this$static.moves, lastMoveIndex), Q$String);
+      stateBeforeLastMove = dynamicCast($get_4(this$static.states, lastMoveIndex), Q$Puzzle$PuzzleState);
       if (!$movesCommute(stateBeforeLastMove, lastMove, move)) {
         break;
       }
-      stateAfterLastMove = dynamicCast($get_2(this$static.states, lastMoveIndex + 1), Q$Puzzle$PuzzleState);
+      stateAfterLastMove = dynamicCast($get_4(this$static.states, lastMoveIndex + 1), Q$Puzzle$PuzzleState);
       stateAfterLastMoveAndNewMove = $apply(stateAfterLastMove, move);
       if (stateBeforeLastMove.getNormalized().equals$(stateAfterLastMoveAndNewMove.getNormalized())) {
         return new AlgorithmBuilder$IndexAndMove_0(lastMoveIndex, null);
@@ -10444,7 +12878,7 @@ function $isRedundant(this$static, move){
 
 function $popMove(this$static, index){
   var e, move, move$iterator, movesCopy, poppedMove;
-  movesCopy = new ArrayList_1(this$static.moves);
+  movesCopy = new ArrayList_2(this$static.moves);
   poppedMove = dynamicCast($remove_0(movesCopy, index), Q$String);
   $resetToState(this$static, this$static.originalState);
   for (move$iterator = new AbstractList$IteratorImpl_0(movesCopy); move$iterator.i < move$iterator.this$0.size_0();) {
@@ -10471,7 +12905,7 @@ function $resetToState(this$static, originalState){
   this$static.unNormalizedState = originalState;
   $clear(this$static.moves);
   $clear(this$static.states);
-  $add(this$static.states, this$static.unNormalizedState);
+  $add_0(this$static.states, this$static.unNormalizedState);
 }
 
 function AlgorithmBuilder_0(puzzle, mergingMode){
@@ -10495,8 +12929,8 @@ function splitAlgorithm(algorithm){
   return $split(algorithm, '\\s+', 0);
 }
 
-defineSeed(257, 1, {}, AlgorithmBuilder_0, AlgorithmBuilder_1);
-_.toString$ = function toString_33(){
+defineSeed(271, 1, {}, AlgorithmBuilder_0, AlgorithmBuilder_1);
+_.toString$ = function toString_34(){
   return join(this.moves, ' ');
 }
 ;
@@ -10510,8 +12944,8 @@ function AlgorithmBuilder$IndexAndMove_0(index, move){
   this.move = move;
 }
 
-defineSeed(258, 1, {}, AlgorithmBuilder$IndexAndMove_0);
-_.toString$ = function toString_34(){
+defineSeed(272, 1, {}, AlgorithmBuilder$IndexAndMove_0);
+_.toString$ = function toString_35(){
   return '{ index: ' + this.index_0 + ' move: ' + this.move + ' }';
 }
 ;
@@ -10521,12 +12955,12 @@ function InvalidMoveException_0(move){
   Exception_0.call(this, 'Invalid move: ' + move);
 }
 
-defineSeed(259, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$InvalidMoveException]), InvalidMoveException_0);
+defineSeed(273, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$InvalidMoveException]), InvalidMoveException_0);
 function InvalidScrambleException_0(scramble, t){
   Throwable_1.call(this, 'Invalid scramble: ' + scramble, t);
 }
 
-defineSeed(260, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$InvalidScrambleException]), InvalidScrambleException_0);
+defineSeed(274, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$InvalidScrambleException]), InvalidScrambleException_0);
 function $clinit_Puzzle(){
   $clinit_Puzzle = nullMethod;
   l_2 = ($clinit_Logger() , $getLoggerHelper(Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit.typeName));
@@ -10547,7 +12981,7 @@ function $drawScramble(this$static, scramble, colorScheme){
     $appendChild(g, dynamicCast($remove_0(children, 0), Q$Element));
   }
   $concatenate(g.transform, new Transform_1(1, 0, 0, 1, 0.5, 0.5));
-  $add(svg.children, g);
+  $add_0(svg.children, g);
   return svg;
 }
 
@@ -10555,7 +12989,7 @@ function $generateRandomMoves(this$static, r){
   var ab, e, move, successors;
   ab = new AlgorithmBuilder_0(this$static, 0);
   while (ab.totalCost < this$static.getRandomMoveCount()) {
-    successors = (azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_2(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)).getScrambleSuccessors();
+    successors = (azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_4(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)).getScrambleSuccessors();
     try {
       do {
         move = dynamicCast(choose(r, $keySet(successors)), Q$String);
@@ -10576,7 +13010,7 @@ function $generateRandomMoves(this$static, r){
         throw $e0;
     }
   }
-  return new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_2(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
+  return new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_4(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
 }
 
 function $generateScrambles(this$static, r, count){
@@ -10613,11 +13047,11 @@ function $generateWcaScramble(this$static, r){
 
 function $getFaceNames(this$static){
   var faces, x;
-  faces = new ArrayList_1($keySet(this$static.getDefaultColorScheme_0()));
+  faces = new ArrayList_2($keySet(this$static.getDefaultColorScheme_0()));
   x = cloneSubrange(faces.array, 0, faces.size);
   mergeSort(x, 0, x.length, ($clinit_Comparators() , $clinit_Comparators() , NATURAL));
   replaceContents(faces, x);
-  return dynamicCast($toArray(faces, initDim(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, faces.size, 0)), Q$String_$1);
+  return dynamicCast($toArray_0(faces, initDim(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, faces.size, 0)), Q$String_$1);
 }
 
 function $parseColorScheme(this$static, scheme){
@@ -10661,7 +13095,7 @@ function Puzzle_0(){
   this.r = ($clinit_Random() , new SecureRandom_0);
 }
 
-defineSeed(261, 1, makeCastMap([Q$Puzzle, Q$Exportable]));
+defineSeed(275, 1, makeCastMap([Q$Puzzle, Q$Exportable]));
 _.generateRandomMoves_0 = function generateRandomMoves(r){
   return $generateRandomMoves(this, r);
 }
@@ -10710,9 +13144,9 @@ _.solveIn_0 = function solveIn(ps, n){
   bestIntersectionCost = n + 1;
   bestIntersection = null;
   solvedNormalized = this.getSolvedState_0().getNormalized();
-  $add_2(fringeSolved, solvedNormalized, 0);
+  $add_3(fringeSolved, solvedNormalized, 0);
   seenSolved.put(solvedNormalized, valueOf_0(0));
-  $add_2(fringeScrambled, ps.getNormalized(), 0);
+  $add_3(fringeScrambled, ps.getNormalized(), 0);
   seenScrambled.put(ps.getNormalized(), valueOf_0(0));
   start = new TimedLogRecordStart_0(($clinit_Level() , FINER), 'Searching for solution in ' + n + ' moves.');
   $log_2(l_2, start);
@@ -10763,7 +13197,7 @@ _.solveIn_0 = function solveIn(ps, n){
           continue;
         }
       }
-      $add_2(fringeExtending, next, nextDistance);
+      $add_3(fringeExtending, next, nextDistance);
       seenExtending.put(next, valueOf_0(nextDistance));
     }
   }
@@ -10853,13 +13287,13 @@ _.solveIn_0 = function solveIn(ps, n){
   return join(solution.moves, ' ');
 }
 ;
-_.toString$ = function toString_35(){
+_.toString$ = function toString_36(){
   return this.getLongName_0();
 }
 ;
 _.wcaMinScrambleDistance = 2;
 var l_2;
-function $compareTo_5(this$static, other){
+function $compareTo_6(this$static, other){
   return this$static.value - other.value;
 }
 
@@ -10868,12 +13302,12 @@ function Puzzle$Bucket_0(value){
   this.contents = new LinkedList_0;
 }
 
-defineSeed(262, 1, makeCastMap([Q$Comparable, Q$Puzzle$Bucket]), Puzzle$Bucket_0);
-_.compareTo$ = function compareTo_7(other){
-  return $compareTo_5(this, dynamicCast(other, Q$Puzzle$Bucket));
+defineSeed(276, 1, makeCastMap([Q$Comparable, Q$Puzzle$Bucket]), Puzzle$Bucket_0);
+_.compareTo$ = function compareTo_8(other){
+  return $compareTo_6(this, dynamicCast(other, Q$Puzzle$Bucket));
 }
 ;
-_.equals$ = function equals_26(o){
+_.equals$ = function equals_27(o){
   var other;
   other = dynamicCast(o, Q$Puzzle$Bucket);
   return this.value == other.value;
@@ -10883,7 +13317,7 @@ _.hashCode$ = function hashCode_26(){
   return this.value;
 }
 ;
-_.toString$ = function toString_36(){
+_.toString$ = function toString_37(){
   return '#: ' + this.value + ': ' + $toString_2(this.contents);
 }
 ;
@@ -10895,7 +13329,7 @@ function $apply(this$static, move){
   if (!successors.map.containsKey(move)) {
     throw new InvalidMoveException_0('Unrecognized turn ' + move);
   }
-  return dynamicCast($get_3(successors, move), Q$Puzzle$PuzzleState);
+  return dynamicCast($get_5(successors, move), Q$Puzzle$PuzzleState);
 }
 
 function $applyAlgorithm(this$static, algorithm){
@@ -10940,13 +13374,13 @@ function $movesCommute(this$static, move1, move2){
   }
 }
 
-defineSeed(263, 1, makeCastMap([Q$Puzzle$PuzzleState]));
+defineSeed(277, 1, makeCastMap([Q$Puzzle$PuzzleState]));
 _.getCanonicalMovesByState = function getCanonicalMovesByState(){
   var moveName, next, next$iterator, nextState, nextStateNormalized, statesSeenNormalized, successorsByName, uniqueSuccessors;
   successorsByName = this.getSuccessorsByName();
   uniqueSuccessors = new HashMap_0;
   statesSeenNormalized = new HashSet_0;
-  $add_0(statesSeenNormalized, this.getNormalized());
+  $add_1(statesSeenNormalized, this.getNormalized());
   for (next$iterator = new LinkedHashMap$EntrySet$EntryIterator_0(new LinkedHashMap$EntrySet_0(successorsByName)); next$iterator.next != next$iterator.this$1.this$0.head;) {
     next = $next_1(next$iterator);
     nextState = dynamicCast(next.value, Q$Puzzle$PuzzleState);
@@ -10954,7 +13388,7 @@ _.getCanonicalMovesByState = function getCanonicalMovesByState(){
     moveName = dynamicCast(next.key, Q$String);
     if (!statesSeenNormalized.map.containsKey(nextStateNormalized)) {
       uniqueSuccessors.put(nextState, moveName);
-      $add_0(statesSeenNormalized, nextStateNormalized);
+      $add_1(statesSeenNormalized, nextStateNormalized);
     }
   }
   return uniqueSuccessors;
@@ -10981,7 +13415,7 @@ _.solveIn_1 = function solveIn_0(n){
 }
 ;
 _.this$0_0 = null;
-function $add_2(this$static, element, value){
+function $add_3(this$static, element, value){
   var bucket, searchBucket;
   searchBucket = new Puzzle$Bucket_0(value);
   if ($contains(this$static.buckets, searchBucket)) {
@@ -10989,7 +13423,7 @@ function $add_2(this$static, element, value){
   }
    else {
     bucket = searchBucket;
-    $add_1(this$static.buckets, bucket);
+    $add_2(this$static.buckets, bucket);
   }
   $addLast(bucket.contents, element);
 }
@@ -10998,12 +13432,12 @@ function Puzzle$SortedBuckets_0(){
   this.buckets = new TreeSet_0;
 }
 
-defineSeed(264, 1, {}, Puzzle$SortedBuckets_0);
+defineSeed(278, 1, {}, Puzzle$SortedBuckets_0);
 _.hashCode$ = function hashCode_27(){
   throw new UnsupportedOperationException_0;
 }
 ;
-_.toString$ = function toString_37(){
+_.toString$ = function toString_38(){
   return $toString_2(this.buckets);
 }
 ;
@@ -11074,7 +13508,7 @@ function PuzzleExporterImpl_0(){
   $export_0(this);
 }
 
-defineSeed(265, 1, {}, PuzzleExporterImpl_0);
+defineSeed(279, 1, {}, PuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_0(o){
   return o != null && instanceOf(o, Q$Puzzle);
 }
@@ -11101,7 +13535,7 @@ function PuzzleImageInfo_0(p_0){
   this.size = p_0.getPreferredSize_0();
 }
 
-defineSeed(266, 1, {}, PuzzleImageInfo_0);
+defineSeed(280, 1, {}, PuzzleImageInfo_0);
 _.colorScheme = null;
 _.size = null;
 function PuzzleStateAndGenerator_0(state, generator){
@@ -11109,10 +13543,10 @@ function PuzzleStateAndGenerator_0(state, generator){
   this.generator = generator;
 }
 
-defineSeed(267, 1, {}, PuzzleStateAndGenerator_0);
+defineSeed(281, 1, {}, PuzzleStateAndGenerator_0);
 _.generator = null;
 _.state = null;
-function $$init_4(this$static){
+function $$init_7(this$static){
   this$static.transform = new Transform_0;
 }
 
@@ -11124,7 +13558,7 @@ function $addIndentation(sb, level){
 }
 
 function $appendChild(this$static, child){
-  $add(this$static.children, child);
+  $add_0(this$static.children, child);
 }
 
 function $buildString(this$static, sb, level){
@@ -11156,7 +13590,7 @@ function $copyChildren(this$static){
   childrenCopy = new ArrayList_0;
   for (child$iterator = new AbstractList$IteratorImpl_0(this$static.children); child$iterator.i < child$iterator.this$0.size_0();) {
     child = dynamicCast($next(child$iterator), Q$Element);
-    $add(childrenCopy, new Element_2(child));
+    $add_0(childrenCopy, new Element_2(child));
   }
   return childrenCopy;
 }
@@ -11202,7 +13636,7 @@ function $toStyleStr(this$static){
 }
 
 function Element_1(tag){
-  $$init_4(this);
+  $$init_7(this);
   this.tag = tag;
   this.children = new ArrayList_0;
   this.attributes = new HashMap_0;
@@ -11211,7 +13645,7 @@ function Element_1(tag){
 }
 
 function Element_2(e){
-  $$init_4(this);
+  $$init_7(this);
   this.tag = e.tag;
   this.attributes = new HashMap_1(e.attributes);
   this.style = new HashMap_1(e.style);
@@ -11219,12 +13653,12 @@ function Element_2(e){
   this.content_0 = this.content_0;
 }
 
-defineSeed(270, 1, makeCastMap([Q$Element]), Element_2);
+defineSeed(284, 1, makeCastMap([Q$Element]), Element_2);
 _.buildString = function buildString(sb, level){
   $buildString(this, sb, level);
 }
 ;
-_.toString$ = function toString_38(){
+_.toString$ = function toString_39(){
   return $toString_4(this);
 }
 ;
@@ -11233,7 +13667,7 @@ _.children = null;
 _.content_0 = null;
 _.style = null;
 _.tag = null;
-defineSeed(269, 270, makeCastMap([Q$Element]));
+defineSeed(283, 284, makeCastMap([Q$Element]));
 function Circle_0(cx, cy, r){
   Element_1.call(this, 'ellipse');
   azzert('cx' != 'style');
@@ -11250,7 +13684,7 @@ function Circle_1(c){
   Element_2.call(this, c);
 }
 
-defineSeed(268, 269, makeCastMap([Q$Element]), Circle_0, Circle_1);
+defineSeed(282, 283, makeCastMap([Q$Element]), Circle_0, Circle_1);
 function $clinit_Color(){
   $clinit_Color = nullMethod;
   RED = new Color_1(255, 0, 0);
@@ -11302,8 +13736,8 @@ function hexToRGB(htmlHex){
   }
 }
 
-defineSeed(271, 1, makeCastMap([Q$Color]), Color_0, Color_1, Color_2);
-_.toString$ = function toString_39(){
+defineSeed(285, 1, makeCastMap([Q$Color]), Color_0, Color_1, Color_2);
+_.toString$ = function toString_40(){
   return '<color #' + $substring(toPowerOfTwoString(16777216 | (this.a_0 << 24 | this.r << 16 | this.g_0 << 8 | this.b) & 16777215), 1) + '>';
 }
 ;
@@ -11317,8 +13751,8 @@ function Dimension_0(width, height){
   this.height = height;
 }
 
-defineSeed(272, 1, {}, Dimension_0);
-_.toString$ = function toString_40(){
+defineSeed(286, 1, {}, Dimension_0);
+_.toString$ = function toString_41(){
   return '<' + Lnet_gnehzr_tnoodle_svglite_Dimension_2_classLit.typeName + ' width=' + this.width + ' height=' + this.height + '>';
 }
 ;
@@ -11328,15 +13762,15 @@ function Group_0(){
   Element_1.call(this, 'g');
 }
 
-defineSeed(273, 270, makeCastMap([Q$Element]), Group_0);
+defineSeed(287, 284, makeCastMap([Q$Element]), Group_0);
 function InvalidHexColorException_0(invalidHex){
   Exception_0.call(this, invalidHex);
 }
 
-defineSeed(274, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$InvalidHexColorException]), InvalidHexColorException_0);
+defineSeed(288, 7, makeCastMap([Q$Serializable, Q$Exception, Q$Throwable, Q$InvalidHexColorException]), InvalidHexColorException_0);
 function $closePath(this$static){
   azzert_0(!!this$static.commands);
-  $add(this$static.commands, new Path$Command_0(4, null));
+  $add_0(this$static.commands, new Path$Command_0(4, null));
 }
 
 function $getD(this$static){
@@ -11356,14 +13790,14 @@ function $lineTo(this$static, x, y){
   var coords;
   azzert_0(!!this$static.commands);
   coords = initValues(_3D_classLit, makeCastMap([Q$double_$1, Q$Serializable]), -1, [x, y]);
-  $add(this$static.commands, new Path$Command_0(1, coords));
+  $add_0(this$static.commands, new Path$Command_0(1, coords));
 }
 
 function $moveTo(this$static, x, y){
   var coords;
   !this$static.commands && (this$static.commands = new ArrayList_0);
   coords = initValues(_3D_classLit, makeCastMap([Q$double_$1, Q$Serializable]), -1, [x, y]);
-  $add(this$static.commands, new Path$Command_0(0, coords));
+  $add_0(this$static.commands, new Path$Command_0(0, coords));
 }
 
 function $translate(this$static, x, y){
@@ -11389,10 +13823,10 @@ function Path_0(){
 
 function Path_1(p_0){
   Element_2.call(this, p_0);
-  !!p_0.commands && (this.commands = new ArrayList_1(p_0.commands));
+  !!p_0.commands && (this.commands = new ArrayList_2(p_0.commands));
 }
 
-defineSeed(275, 270, makeCastMap([Q$Element, Q$Path]), Path_0, Path_1);
+defineSeed(289, 284, makeCastMap([Q$Element, Q$Path]), Path_0, Path_1);
 _.buildString = function buildString_0(sb, level){
   $setAttribute(this, 'd', $getD(this));
   $buildString(this, sb, level);
@@ -11415,8 +13849,8 @@ function Path$Command_0(type, coords){
   this.coords = coords;
 }
 
-defineSeed(276, 1, makeCastMap([Q$Path$Command]), Path$Command_0);
-_.toString$ = function toString_41(){
+defineSeed(290, 1, makeCastMap([Q$Path$Command]), Path$Command_0);
+_.toString$ = function toString_42(){
   return $toString_5(this);
 }
 ;
@@ -11424,7 +13858,7 @@ _.coords = null;
 _.type_0 = 0;
 function $currentSegment(this$static, coords){
   var command, i_0;
-  command = dynamicCast($get_2(this$static.commands, this$static.index_0), Q$Path$Command);
+  command = dynamicCast($get_4(this$static.commands, this$static.index_0), Q$Path$Command);
   azzert(coords.length >= command.coords.length);
   for (i_0 = 0; i_0 < command.coords.length; ++i_0) {
     coords[i_0] = command.coords[i_0];
@@ -11437,7 +13871,7 @@ function PathIterator_0(p_0){
   this.commands = p_0.commands;
 }
 
-defineSeed(277, 1, {}, PathIterator_0);
+defineSeed(291, 1, {}, PathIterator_0);
 _.commands = null;
 _.index_0 = 0;
 function Point2D$Double_0(x, y){
@@ -11445,7 +13879,7 @@ function Point2D$Double_0(x, y){
   this.y = y;
 }
 
-defineSeed(278, 1, makeCastMap([Q$Point2D$Double]), Point2D$Double_0);
+defineSeed(292, 1, makeCastMap([Q$Point2D$Double]), Point2D$Double_0);
 _.x = 0;
 _.y = 0;
 function Rectangle_0(x, y, width, height){
@@ -11464,7 +13898,7 @@ function Rectangle_1(r){
   Element_2.call(this, r);
 }
 
-defineSeed(279, 270, makeCastMap([Q$Element]), Rectangle_0, Rectangle_1);
+defineSeed(293, 284, makeCastMap([Q$Element]), Rectangle_0, Rectangle_1);
 function Svg_0(size){
   Element_1.call(this, 'svg');
   $setAttribute(this, 'width', '' + size.width + 'px');
@@ -11476,7 +13910,7 @@ function Svg_0(size){
   this.attributes.put('xmlns', 'http://www.w3.org/2000/svg');
 }
 
-defineSeed(280, 270, makeCastMap([Q$Element]), Svg_0);
+defineSeed(294, 284, makeCastMap([Q$Element]), Svg_0);
 function Text_1(text, x, y){
   Element_1.call(this, 'text');
   this.content_0 = text;
@@ -11486,7 +13920,7 @@ function Text_1(text, x, y){
   this.attributes.put('y', '' + y);
 }
 
-defineSeed(281, 270, makeCastMap([Q$Element]), Text_1);
+defineSeed(295, 284, makeCastMap([Q$Element]), Text_1);
 function $concatenate(this$static, that){
   var a, b, c, d, e, f;
   a = that.a_0 * this$static.a_0 + that.c * this$static.b;
@@ -11563,7 +13997,7 @@ function isNear(a, b){
   return -1.0E-6 <= a - b && a - b <= 1.0E-6;
 }
 
-defineSeed(282, 1, makeCastMap([Q$Transform]), Transform_0, Transform_1, Transform_2);
+defineSeed(296, 1, makeCastMap([Q$Transform]), Transform_0, Transform_1, Transform_2);
 _.a_0 = 0;
 _.b = 0;
 _.c = 0;
@@ -11735,7 +14169,7 @@ function TimedLogRecordEnd_0(level, msg, extraMsg, startMillis, endMillis){
   LogRecord_0.call(this, level, (str = 'FINISHED ' + msg + ' (took ' + $format(nf, toDouble(div(sub(endMillis, startMillis), P3e8_longLit))) + ' seconds' , extraMsg != null && (str += ', ' + extraMsg) , str += ')' , str));
 }
 
-defineSeed(286, 252, makeCastMap([Q$Serializable]), TimedLogRecordEnd_0);
+defineSeed(300, 266, makeCastMap([Q$Serializable]), TimedLogRecordEnd_0);
 var nf;
 function $finishedAt(this$static, endMillis, extraMsg){
   return new TimedLogRecordEnd_0(this$static.level, this$static.msg, extraMsg, this$static.startMillis, endMillis);
@@ -11755,10 +14189,10 @@ function TimedLogRecordStart_1(level, msg, startMillis){
   this.msg = msg;
 }
 
-defineSeed(287, 252, makeCastMap([Q$Serializable]), TimedLogRecordStart_0);
+defineSeed(301, 266, makeCastMap([Q$Serializable]), TimedLogRecordStart_0);
 _.msg = null;
 _.startMillis = P0_longLit;
-defineSeed(291, 1, {});
+defineSeed(305, 1, {});
 function $addExporter(this$static, c, o){
   this$static.exporterMap.put(c, o);
 }
@@ -11787,7 +14221,7 @@ function $declarePackage(qualifiedExportName){
   prefix = $wnd;
   i_0 = 0;
   for (l_0 = superPackages.length - 1; i_0 < l_0; ++i_0) {
-    if (!$equals(superPackages[i_0], 'client')) {
+    if (!$equals_0(superPackages[i_0], 'client')) {
       prefix[superPackages[i_0]] || (prefix[superPackages[i_0]] = {});
       prefix = prefix != null?prefix[superPackages[i_0]]:null;
     }
@@ -11919,20 +14353,20 @@ function mergeJso(o1, o2){
   }
 }
 
-defineSeed(290, 291, {}, ExporterBaseActual_0);
+defineSeed(304, 305, {}, ExporterBaseActual_0);
 function $matches(this$static, arguments_0){
   var argJsType, gwt, i_0, isBoolean, isClass, isNumber, isPrimitive, jsType, l_0, o;
   for (i_0 = 0 , l_0 = arguments_0.length; i_0 < l_0; ++i_0) {
     jsType = this$static[i_0 + 3];
     argJsType = typeof_$(arguments_0, i_0);
-    if ($equals(argJsType, jsType)) {
+    if ($equals_0(argJsType, jsType)) {
       continue;
     }
-    if ($equals('string', jsType) && $equals('null', argJsType)) {
+    if ($equals_0('string', jsType) && $equals_0('null', argJsType)) {
       continue;
     }
-    isNumber = $equals('number', argJsType);
-    isBoolean = $equals('boolean', argJsType);
+    isNumber = $equals_0('number', argJsType);
+    isBoolean = $equals_0('boolean', argJsType);
     if (Ljava_lang_Object_2_classLit === jsType) {
       isNumber && (arguments_0[i_0] = new Double_0(arguments_0[i_0]) , undefined);
       isBoolean && (arguments_0[i_0] = ($clinit_Boolean() , arguments_0[i_0]?TRUE_0:FALSE_0) , undefined);
@@ -11955,7 +14389,7 @@ function $matches(this$static, arguments_0){
         }
       }
     }
-    if ($equals('object', jsType) && !isNumber && !isBoolean) {
+    if ($equals_0('object', jsType) && !isNumber && !isBoolean) {
       continue;
     }
     return false;
@@ -12033,7 +14467,7 @@ function ClockPuzzle_0(){
   Puzzle_0.call(this);
 }
 
-defineSeed(295, 261, makeCastMap([Q$Puzzle, Q$Exportable, Q$ClockPuzzle]), ClockPuzzle_0);
+defineSeed(309, 275, makeCastMap([Q$Puzzle, Q$Exportable, Q$ClockPuzzle]), ClockPuzzle_0);
 _.generateRandomMoves_0 = function generateRandomMoves_0(r){
   var clockwise, e, isFirst, scramble, scrambleStr, state, turn, x;
   scramble = new StringBuilder_0;
@@ -12112,14 +14546,14 @@ function $drawBackground(this$static, g, colorScheme){
         c = new Circle_0(centerX, centerY, 20);
         !t?$setToIdentity(c.transform):$setTransform(c.transform, t);
         $setStroke_0(c, ($clinit_Color() , BLACK));
-        $add(g.children, c);
+        $add_0(g.children, c);
       }
     }
     outerCircle = new Circle_0(0, 0, 70);
     !t?$setToIdentity(outerCircle.transform):$setTransform(outerCircle.transform, t);
     $setStroke_0(outerCircle, ($clinit_Color() , BLACK));
     $setFill(outerCircle, dynamicCast(colorScheme.get(colorString[s]), Q$Color));
-    $add(g.children, outerCircle);
+    $add_0(g.children, outerCircle);
     for (centerX$array = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [-40, 40]) , centerX$index = 0 , centerX$max = centerX$array.length; centerX$index < centerX$max; ++centerX$index) {
       centerX = centerX$array[centerX$index];
       for (centerY$array = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [-40, 40]) , centerY$index = 0 , centerY$max = centerY$array.length; centerY$index < centerY$max; ++centerY$index) {
@@ -12127,7 +14561,7 @@ function $drawBackground(this$static, g, colorScheme){
         c = new Circle_0(centerX, centerY, 19);
         !t?$setToIdentity(c.transform):$setTransform(c.transform, t);
         $setFill(c, dynamicCast(colorScheme.get(colorString[s]), Q$Color));
-        $add(g.children, c);
+        $add_0(g.children, c);
       }
     }
     for (i_0 = -1; i_0 <= 1; ++i_0) {
@@ -12138,13 +14572,13 @@ function $drawBackground(this$static, g, colorScheme){
         $setStroke_0(clockFace, BLACK);
         $setFill(clockFace, dynamicCast(colorScheme.get(colorString[s] + 'Clock'), Q$Color));
         !tCopy?$setToIdentity(clockFace.transform):$setTransform(clockFace.transform, tCopy);
-        $add(g.children, clockFace);
+        $add_0(g.children, clockFace);
         for (k_0 = 0; k_0 < 12; ++k_0) {
           tickMark = new Circle_0(0, -17, 1);
           $setFill(tickMark, dynamicCast(colorScheme.get(colorString[s] + 'Clock'), Q$Color));
           $concatenate(tickMark.transform, getRotateInstance(30 * k_0 * 0.017453292519943295));
           $concatenate(tickMark.transform, tCopy);
-          $add(g.children, tickMark);
+          $add_0(g.children, tickMark);
         }
       }
     }
@@ -12179,26 +14613,26 @@ function $drawClock(g, clock, position, colorScheme){
   $lineTo(arrow, 0, -10);
   $lineTo(arrow, -2 * cos_0(arrowAngle), -2 * sin_0(arrowAngle));
   azzert_0(!!arrow.commands);
-  $add(arrow.commands, new Path$Command_0(4, null));
+  $add_0(arrow.commands, new Path$Command_0(4, null));
   $setStroke_0(arrow, dynamicCast(colorScheme.get('HandBorder'), Q$Color));
   !t?$setToIdentity(arrow.transform):$setTransform(arrow.transform, t);
-  $add(g.children, arrow);
+  $add_0(g.children, arrow);
   handBase = new Circle_0(0, 0, 2);
   $setStroke_0(handBase, dynamicCast(colorScheme.get('HandBorder'), Q$Color));
   !t?$setToIdentity(handBase.transform):$setTransform(handBase.transform, t);
-  $add(g.children, handBase);
+  $add_0(g.children, handBase);
   arrow = new Path_1(arrow);
   $setFill(arrow, dynamicCast(colorScheme.get('Hand'), Q$Color));
   azzert('stroke' != 'style');
   arrow.attributes.put('stroke', 'none');
   !t?$setToIdentity(arrow.transform):$setTransform(arrow.transform, t);
-  $add(g.children, arrow);
+  $add_0(g.children, arrow);
   handBase = new Circle_1(handBase);
   $setFill(handBase, dynamicCast(colorScheme.get('Hand'), Q$Color));
   azzert('stroke' != 'style');
   handBase.attributes.put('stroke', 'none');
   !t?$setToIdentity(handBase.transform):$setTransform(handBase.transform, t);
-  $add(g.children, handBase);
+  $add_0(g.children, handBase);
 }
 
 function $drawPin(g, t, pinUp, colorScheme){
@@ -12207,7 +14641,7 @@ function $drawPin(g, t, pinUp, colorScheme){
   !t?$setToIdentity(pin.transform):$setTransform(pin.transform, t);
   $setStroke_0(pin, ($clinit_Color() , BLACK));
   $setFill(pin, dynamicCast(colorScheme.get(pinUp?'PinUp':'PinDown'), Q$Color));
-  $add(g.children, pin);
+  $add_0(g.children, pin);
 }
 
 function $drawPins(g, pins, colorScheme){
@@ -12250,7 +14684,7 @@ function ClockPuzzle$ClockState_1(this$0, pins, posit, rightSideUp){
   this.rightSideUp = rightSideUp;
 }
 
-defineSeed(296, 263, makeCastMap([Q$Puzzle$PuzzleState, Q$ClockPuzzle$ClockState]), ClockPuzzle$ClockState_0, ClockPuzzle$ClockState_1);
+defineSeed(310, 277, makeCastMap([Q$Puzzle$PuzzleState, Q$ClockPuzzle$ClockState]), ClockPuzzle$ClockState_0, ClockPuzzle$ClockState_1);
 _.drawScramble = function drawScramble(colorScheme){
   var i_0, svg;
   svg = new Svg_0(new Dimension_0(300, 150));
@@ -12263,10 +14697,10 @@ _.drawScramble = function drawScramble(colorScheme){
   return svg;
 }
 ;
-_.equals$ = function equals_27(other){
+_.equals$ = function equals_28(other){
   var o;
   o = dynamicCast(other, Q$ClockPuzzle$ClockState);
-  return equals_17(this.posit, o.posit);
+  return equals_18(this.posit, o.posit);
 }
 ;
 _.getSuccessorsByName = function getSuccessorsByName(){
@@ -12396,7 +14830,7 @@ function ClockPuzzleExporterImpl_0(){
   $export_1(this);
 }
 
-defineSeed(297, 1, {}, ClockPuzzleExporterImpl_0);
+defineSeed(311, 1, {}, ClockPuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_1(o){
   return o != null && instanceOf(o, Q$ClockPuzzle);
 }
@@ -12442,7 +14876,7 @@ function $getRandomOrientationMoves(this$static, thickness){
       moves = new ArrayList_0;
       !!randomUFaceMove && (setCheck(moves.array, moves.size++, randomUFaceMove) , true);
       !!randomFFaceMove && (setCheck(moves.array, moves.size++, randomFFaceMove) , true);
-      movesArr = dynamicCast($toArray(moves, initDim(_3Lpuzzle_CubePuzzle$CubeMove_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$CubePuzzle$CubeMove_$1]), Q$CubePuzzle$CubeMove, moves.size, 0)), Q$CubePuzzle$CubeMove_$1);
+      movesArr = dynamicCast($toArray_0(moves, initDim(_3Lpuzzle_CubePuzzle$CubeMove_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$CubePuzzle$CubeMove_$1]), Q$CubePuzzle$CubeMove, moves.size, 0)), Q$CubePuzzle$CubeMove_$1);
       randomOrientationMoves[i_0++] = movesArr;
     }
   }
@@ -12556,7 +14990,7 @@ function $paintCubeFace(g, x, y, size, faceColors, colorScheme){
       rect = new Rectangle_0(tempx, tempy, 10, 10);
       $setFill(rect, dynamicCast(colorScheme.get(($clinit_CubePuzzle$Face() , $clinit_CubePuzzle$Face() , $VALUES_2)[faceColors[row][col]].name_0), Q$Color));
       $setStroke_0(rect, ($clinit_Color() , BLACK));
-      $add(g.children, rect);
+      $add_0(g.children, rect);
     }
   }
 }
@@ -12601,7 +15035,7 @@ function slice_0(face, slice, dir, image){
     sdir = 4 - dir;
   }
   for (j = 0; j < size; ++j) {
-    sface == L?swap(image, U.ordinal, j, sslice, B.ordinal, size - 1 - j, size - 1 - sslice, D.ordinal, j, sslice, F.ordinal, j, sslice, sdir):sface == D?swap(image, L.ordinal, size - 1 - sslice, j, B.ordinal, size - 1 - sslice, j, R.ordinal, size - 1 - sslice, j, F.ordinal, size - 1 - sslice, j, sdir):sface == B?swap(image, U.ordinal, sslice, j, R.ordinal, j, size - 1 - sslice, D.ordinal, size - 1 - sslice, size - 1 - j, L.ordinal, size - 1 - j, sslice, sdir):azzert_1(false);
+    sface == L?swap_1(image, U.ordinal, j, sslice, B.ordinal, size - 1 - j, size - 1 - sslice, D.ordinal, j, sslice, F.ordinal, j, sslice, sdir):sface == D?swap_1(image, L.ordinal, size - 1 - sslice, j, B.ordinal, size - 1 - sslice, j, R.ordinal, size - 1 - sslice, j, F.ordinal, size - 1 - sslice, j, sdir):sface == B?swap_1(image, U.ordinal, sslice, j, R.ordinal, j, size - 1 - sslice, D.ordinal, size - 1 - sslice, size - 1 - j, L.ordinal, size - 1 - j, sslice, sdir):azzert_1(false);
   }
   if (slice == 0 || slice == size - 1) {
     if (slice == 0) {
@@ -12618,13 +15052,13 @@ function slice_0(face, slice, dir, image){
     }
     for (j = 0; j < ~~((size + 1) / 2); ++j) {
       for (k_0 = 0; k_0 < ~~(size / 2); ++k_0) {
-        swap(image, f, j, k_0, f, k_0, size - 1 - j, f, size - 1 - j, size - 1 - k_0, f, size - 1 - k_0, j, sdir);
+        swap_1(image, f, j, k_0, f, k_0, size - 1 - j, f, size - 1 - j, size - 1 - k_0, f, size - 1 - k_0, j, sdir);
       }
     }
   }
 }
 
-function swap(image, f1, x1, y1, f2, x2, y2, f3, x3, y3, f4, x4, y4, dir){
+function swap_1(image, f1, x1, y1, f2, x2, y2, f3, x3, y3, f4, x4, y4, dir){
   var temp;
   if (dir == 1) {
     temp = image[f1][x1][y1];
@@ -12653,7 +15087,7 @@ function swap(image, f1, x1, y1, f2, x2, y2, f3, x3, y3, f4, x4, y4, dir){
   }
 }
 
-defineSeed(298, 261, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle]), CubePuzzle_0);
+defineSeed(312, 275, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle]), CubePuzzle_0);
 _.getDefaultColorScheme_0 = function getDefaultColorScheme_0(){
   var colors;
   colors = new HashMap_0;
@@ -12727,8 +15161,8 @@ function CubePuzzle$CubeMove_1(this$0, face, dir, innerSlice){
   azzert_1(true);
 }
 
-defineSeed(299, 1, makeCastMap([Q$CubePuzzle$CubeMove]), CubePuzzle$CubeMove_0, CubePuzzle$CubeMove_1);
-_.toString$ = function toString_42(){
+defineSeed(313, 1, makeCastMap([Q$CubePuzzle$CubeMove]), CubePuzzle$CubeMove_0, CubePuzzle$CubeMove_1);
+_.toString$ = function toString_43(){
   return $toString_6(this);
 }
 ;
@@ -12844,7 +15278,7 @@ function CubePuzzle$CubeState_1(this$0, image){
   this.image = image;
 }
 
-defineSeed(300, 263, makeCastMap([Q$Puzzle$PuzzleState, Q$CubePuzzle$CubeState]), CubePuzzle$CubeState_0, CubePuzzle$CubeState_1);
+defineSeed(314, 277, makeCastMap([Q$Puzzle$PuzzleState, Q$CubePuzzle$CubeState]), CubePuzzle$CubeState_0, CubePuzzle$CubeState_1);
 _.drawScramble = function drawScramble_0(colorScheme){
   var svg;
   svg = new Svg_0(getImageSize(this.this$0.size));
@@ -12852,7 +15286,7 @@ _.drawScramble = function drawScramble_0(colorScheme){
   return svg;
 }
 ;
-_.equals$ = function equals_28(other){
+_.equals$ = function equals_29(other){
   return deepEquals(this.image, dynamicCast(other, Q$CubePuzzle$CubeState).image);
 }
 ;
@@ -12907,7 +15341,7 @@ function values_3(){
   return $VALUES_2;
 }
 
-defineSeed(301, 46, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$CubePuzzle$Face]), CubePuzzle$Face_0);
+defineSeed(315, 46, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$CubePuzzle$Face]), CubePuzzle$Face_0);
 var $VALUES_2, B, D, F, L, R, U;
 function $clinit_CubePuzzle$Face$Map(){
   $clinit_CubePuzzle$Face$Map = nullMethod;
@@ -12996,18 +15430,55 @@ function CubePuzzleExporterImpl_0(){
   $export_2(this);
 }
 
-defineSeed(303, 1, {}, CubePuzzleExporterImpl_0);
+defineSeed(317, 1, {}, CubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_2(o){
   return o != null && instanceOf(o, Q$CubePuzzle);
 }
 ;
 var exported_2 = false;
+function $generateRandomMoves_0(this$static, r){
+  var ab, e, scramble;
+  scramble = $randomState(dynamicCast($get_3(this$static.threePhaseSearcher), Q$Search_0), r);
+  ab = new AlgorithmBuilder_0(this$static, 1);
+  try {
+    $appendAlgorithm(ab, scramble);
+  }
+   catch ($e0) {
+    $e0 = caught($e0);
+    if (instanceOf($e0, Q$InvalidMoveException)) {
+      e = $e0;
+      azzert_3(false, new InvalidScrambleException_0(scramble, e));
+    }
+     else 
+      throw $e0;
+  }
+  return new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_4(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
+}
+
 function FourByFourCubePuzzle_0(){
   $clinit_CubePuzzle();
   CubePuzzle_0.call(this, 4);
+  this.threePhaseSearcher = new FourByFourCubePuzzle$1_0;
 }
 
-defineSeed(304, 298, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$FourByFourCubePuzzle]), FourByFourCubePuzzle_0);
+defineSeed(318, 312, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$FourByFourCubePuzzle]), FourByFourCubePuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_1(r){
+  return $generateRandomMoves_0(this, r);
+}
+;
+_.getInitializationStatus_0 = function getInitializationStatus(){
+  return $clinit_Edge3() , done_0 / prunValues[9];
+}
+;
+_.threePhaseSearcher = null;
+function FourByFourCubePuzzle$1_0(){
+}
+
+defineSeed(319, 193, {}, FourByFourCubePuzzle$1_0);
+_.initialValue = function initialValue_0(){
+  return new Search_4;
+}
+;
 function $export_3(this$static){
   if (!exported_3) {
     exported_3 = true;
@@ -13029,6 +15500,10 @@ function $export0_3(this$static){
   }
   );
   __0 = $wnd.puzzle.FourByFourCubePuzzle.prototype = new Object;
+  __0.generateRandomMoves = $entry(function(a0){
+    return this.g.generateRandomMoves_0(gwtInstance(a0));
+  }
+  );
   __0.generateScramble = $entry(function(){
     return this.g.generateScramble_0();
   }
@@ -13051,6 +15526,10 @@ function $export0_3(this$static){
   );
   __0.getFaceNames = $entry(function(){
     return wrap(this.g.getFaceNames_0());
+  }
+  );
+  __0.getInitializationStatus = $entry(function(){
+    return this.g.getInitializationStatus_0();
   }
   );
   __0.getLongName = $entry(function(){
@@ -13089,7 +15568,7 @@ function FourByFourCubePuzzleExporterImpl_0(){
   $export_3(this);
 }
 
-defineSeed(305, 1, {}, FourByFourCubePuzzleExporterImpl_0);
+defineSeed(320, 1, {}, FourByFourCubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_3(o){
   return o != null && instanceOf(o, Q$FourByFourCubePuzzle);
 }
@@ -13100,7 +15579,7 @@ function FourByFourRandomTurnsCubePuzzle_0(){
   CubePuzzle_0.call(this, 4);
 }
 
-defineSeed(306, 298, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$FourByFourRandomTurnsCubePuzzle]), FourByFourRandomTurnsCubePuzzle_0);
+defineSeed(321, 312, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$FourByFourRandomTurnsCubePuzzle]), FourByFourRandomTurnsCubePuzzle_0);
 _.getLongName_0 = function getLongName_1(){
   return '4x4x4 (fast, unofficial)';
 }
@@ -13190,7 +15669,7 @@ function FourByFourRandomTurnsCubePuzzleExporterImpl_0(){
   $export_4(this);
 }
 
-defineSeed(307, 1, {}, FourByFourRandomTurnsCubePuzzleExporterImpl_0);
+defineSeed(322, 1, {}, FourByFourRandomTurnsCubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_4(o){
   return o != null && instanceOf(o, Q$FourByFourRandomTurnsCubePuzzle);
 }
@@ -13331,18 +15810,18 @@ function bigTurn(image, f){
   var i_0;
   if (f == ($clinit_MegaminxPuzzle$Face() , DBR)) {
     for (i_0 = 0; i_0 < 7; ++i_0) {
-      swap_0(image, 0, (1 + i_0) % 10, 4, (3 + i_0) % 10, 11, (1 + i_0) % 10, 10, (1 + i_0) % 10, 1, (1 + i_0) % 10);
+      swap_2(image, 0, (1 + i_0) % 10, 4, (3 + i_0) % 10, 11, (1 + i_0) % 10, 10, (1 + i_0) % 10, 1, (1 + i_0) % 10);
     }
-    swap_0(image, 0, 10, 4, 10, 11, 10, 10, 10, 1, 10);
+    swap_2(image, 0, 10, 4, 10, 11, 10, 10, 10, 1, 10);
     swapWholeFace(image, 2, 3, 0, 7, 0, 6, 8, 9, 8);
     rotateFace(image, DBR);
   }
    else {
     azzert_1(f == D_0);
     for (i_0 = 0; i_0 < 7; ++i_0) {
-      swap_0(image, 1, (9 + i_0) % 10, 2, (1 + i_0) % 10, 3, (3 + i_0) % 10, 4, (5 + i_0) % 10, 5, (7 + i_0) % 10);
+      swap_2(image, 1, (9 + i_0) % 10, 2, (1 + i_0) % 10, 3, (3 + i_0) % 10, 4, (5 + i_0) % 10, 5, (7 + i_0) % 10);
     }
-    swap_0(image, 1, 10, 2, 10, 3, 10, 4, 10, 5, 10);
+    swap_2(image, 1, 10, 2, 10, 3, 10, 4, 10, 5, 10);
     swapWholeFace(image, 11, 10, 8, 9, 6, 8, 4, 7, 2);
     rotateFace(image, D_0);
   }
@@ -13384,7 +15863,7 @@ function pentagon(pointup){
   }
   $lineTo(p_0, x[0], y[0]);
   azzert_0(!!p_0.commands);
-  $add(p_0.commands, new Path$Command_0(4, null));
+  $add_0(p_0.commands, new Path$Command_0(4, null));
   return p_0;
 }
 
@@ -13393,7 +15872,7 @@ function rotateFace(image, f){
   swapOnFace(image, f, 1, 9, 7, 5, 3);
 }
 
-function swap_0(image, f1, s1, f2, s2, f3, s3, f4, s4, f5, s5){
+function swap_2(image, f1, s1, f2, s2, f3, s3, f4, s4, f5, s5){
   var temp;
   temp = image[f1][s1];
   image[f1][s1] = image[f2][s2];
@@ -13436,7 +15915,7 @@ function swapWholeFace(image, f1, f2, s2, f3, s3, f4, s4, f5, s5){
     image[f4 % 12][(s4 + i_0) % 10] = image[f5 % 12][(s5 + i_0) % 10];
     image[f5 % 12][(s5 + i_0) % 10] = temp;
   }
-  swap_0(image, f1, 10, f2, 10, f3, 10, f4, 10, f5, 10);
+  swap_2(image, f1, 10, f2, 10, f3, 10, f4, 10, f5, 10);
 }
 
 function turn_0(image, face){
@@ -13477,8 +15956,8 @@ function turn_1(image, side, dir){
   }
 }
 
-defineSeed(308, 261, makeCastMap([Q$Puzzle, Q$Exportable, Q$MegaminxPuzzle]), MegaminxPuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_1(r){
+defineSeed(323, 275, makeCastMap([Q$Puzzle, Q$Exportable, Q$MegaminxPuzzle]), MegaminxPuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_2(r){
   var dir, e, i_0, j, scramble, scrambleStr, side, state;
   scramble = new StringBuilder_0;
   for (i_0 = 0; i_0 < 7; ++i_0) {
@@ -13611,7 +16090,7 @@ function values_4(){
   return $VALUES_3;
 }
 
-defineSeed(309, 46, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$MegaminxPuzzle$Face]), MegaminxPuzzle$Face_0);
+defineSeed(324, 46, makeCastMap([Q$Serializable, Q$Comparable, Q$Enum, Q$MegaminxPuzzle$Face]), MegaminxPuzzle$Face_0);
 var $VALUES_3, B_0, BL, BR, D_0, DBL, DBR, DL, DR, F_0, L_0, R_0, U_0;
 function $drawMinx(this$static, g, colorScheme){
   var f, face, face$iterator, label, pentagons, rotateCounterClockwise;
@@ -13687,7 +16166,7 @@ function $drawPentagon(g, p_0, state, rotateCounterClockwise, label, colorScheme
     i_0 < 10 && (j = (i_0 + 2 * rotateCounterClockwise) % 10);
     $setStroke_0(ps[i_0], ($clinit_Color() , BLACK));
     $setFill(ps[i_0], dynamicCast(colorScheme.get('' + ($clinit_MegaminxPuzzle$Face() , $clinit_MegaminxPuzzle$Face() , $VALUES_3)[state[j]]), Q$Color));
-    $add(g.children, ps[i_0]);
+    $add_0(g.children, ps[i_0]);
   }
   if (label != null) {
     centerX = 0;
@@ -13704,7 +16183,7 @@ function $drawPentagon(g, p_0, state, rotateCounterClockwise, label, colorScheme
     labelText.attributes.put('text-anchor', 'middle');
     azzert('dy' != 'style');
     labelText.attributes.put('dy', '0.7ex');
-    $add(g.children, labelText);
+    $add_0(g.children, labelText);
   }
 }
 
@@ -13757,7 +16236,7 @@ function MegaminxPuzzle$MegaminxState_1(this$0, image){
   this.image = image;
 }
 
-defineSeed(310, 263, makeCastMap([Q$Puzzle$PuzzleState, Q$MegaminxPuzzle$MegaminxState]), MegaminxPuzzle$MegaminxState_0, MegaminxPuzzle$MegaminxState_1);
+defineSeed(325, 277, makeCastMap([Q$Puzzle$PuzzleState, Q$MegaminxPuzzle$MegaminxState]), MegaminxPuzzle$MegaminxState_0, MegaminxPuzzle$MegaminxState_1);
 _.drawScramble = function drawScramble_1(colorScheme){
   var svg;
   svg = new Svg_0(new Dimension_0(($clinit_MegaminxPuzzle() , round_int(UNFOLDWIDTH * 2 * 30 + 6)), round_int(UNFOLDHEIGHT * 30 + 4)));
@@ -13765,7 +16244,7 @@ _.drawScramble = function drawScramble_1(colorScheme){
   return svg;
 }
 ;
-_.equals$ = function equals_29(other){
+_.equals$ = function equals_30(other){
   var o;
   o = dynamicCast(other, Q$MegaminxPuzzle$MegaminxState);
   return deepEquals(this.image, o.image);
@@ -13785,7 +16264,7 @@ _.getScrambleSuccessors = function getScrambleSuccessors_1(){
   scrambleSuccessors = new HashMap_0;
   for (turn$array = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ['R++', 'R--', 'D++', 'D--', 'U', 'U2', "U2'", "U'"]) , turn$index = 0 , turn$max = turn$array.length; turn$index < turn$max; ++turn$index) {
     turn = turn$array[turn$index];
-    scrambleSuccessors.put(turn, dynamicCast($get_3(successors, turn), Q$MegaminxPuzzle$MegaminxState));
+    scrambleSuccessors.put(turn, dynamicCast($get_5(successors, turn), Q$MegaminxPuzzle$MegaminxState));
   }
   return scrambleSuccessors;
 }
@@ -13894,7 +16373,7 @@ function MegaminxPuzzleExporterImpl_0(){
   $export_5(this);
 }
 
-defineSeed(311, 1, {}, MegaminxPuzzleExporterImpl_0);
+defineSeed(326, 1, {}, MegaminxPuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_5(o){
   return o != null && instanceOf(o, Q$MegaminxPuzzle);
 }
@@ -13924,7 +16403,7 @@ function applyOrientation(puzzle, randomOrientation, psag, discardRedundantMoves
       cm = randomOrientation[cm$index];
       $appendMove(ab, $toString_6(cm));
     }
-    psag = new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_2(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
+    psag = new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_4(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
     return psag;
   }
    catch ($e0) {
@@ -13939,8 +16418,8 @@ function applyOrientation(puzzle, randomOrientation, psag, discardRedundantMoves
   }
 }
 
-defineSeed(312, 298, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$NoInspectionFiveByFiveCubePuzzle]), NoInspectionFiveByFiveCubePuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_2(r){
+defineSeed(327, 312, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$NoInspectionFiveByFiveCubePuzzle]), NoInspectionFiveByFiveCubePuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_3(r){
   var psag, randomOrientation, randomOrientationMoves;
   randomOrientationMoves = $getRandomOrientationMoves(this, ~~(this.size / 2));
   randomOrientation = randomOrientationMoves[$nextInt(r, randomOrientationMoves.length)];
@@ -14051,7 +16530,7 @@ function __static_wrapper_applyOrientation(a0, a1, a2, a3){
   return applyOrientation(a0, ($clinit_ExporterUtil() , $toArrObject(a1, initDim(_3Lpuzzle_CubePuzzle$CubeMove_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$CubePuzzle$CubeMove_$1]), Q$CubePuzzle$CubeMove, a1.length, 0))), a2, a3);
 }
 
-defineSeed(313, 1, {}, NoInspectionFiveByFiveCubePuzzleExporterImpl_0);
+defineSeed(328, 1, {}, NoInspectionFiveByFiveCubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_6(o){
   return o != null && instanceOf(o, Q$NoInspectionFiveByFiveCubePuzzle);
 }
@@ -14075,7 +16554,7 @@ function applyOrientation_0(puzzle, randomOrientation, psag){
       cm = randomOrientation[cm$index];
       $appendMove(ab, $toString_6(cm));
     }
-    psag = new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_2(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
+    psag = new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_4(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
     return psag;
   }
    catch ($e0) {
@@ -14090,12 +16569,12 @@ function applyOrientation_0(puzzle, randomOrientation, psag){
   }
 }
 
-defineSeed(314, 304, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$FourByFourCubePuzzle, Q$NoInspectionFourByFourCubePuzzle]), NoInspectionFourByFourCubePuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_3(r){
+defineSeed(329, 318, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$FourByFourCubePuzzle, Q$NoInspectionFourByFourCubePuzzle]), NoInspectionFourByFourCubePuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_4(r){
   var psag, randomOrientation, randomOrientationMoves;
   randomOrientationMoves = $getRandomOrientationMoves(this, this.size - 1);
   randomOrientation = randomOrientationMoves[$nextInt(r, randomOrientationMoves.length)];
-  psag = $generateRandomMoves(this, r);
+  psag = $generateRandomMoves_0(this, r);
   psag = applyOrientation_0(this, randomOrientation, psag);
   return psag;
 }
@@ -14162,6 +16641,10 @@ function $export0_7(this$static){
     return wrap(this.g.getFaceNames_0());
   }
   );
+  __0.getInitializationStatus = $entry(function(){
+    return this.g.getInitializationStatus_0();
+  }
+  );
   __0.getLongName = $entry(function(){
     return this.g.getLongName_0();
   }
@@ -14202,7 +16685,7 @@ function __static_wrapper_applyOrientation_0(a0, a1, a2, a3){
   return applyOrientation_0(a0, ($clinit_ExporterUtil() , $toArrObject(a1, initDim(_3Lpuzzle_CubePuzzle$CubeMove_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$CubePuzzle$CubeMove_$1]), Q$CubePuzzle$CubeMove, a1.length, 0))), a2);
 }
 
-defineSeed(315, 1, {}, NoInspectionFourByFourCubePuzzleExporterImpl_0);
+defineSeed(330, 1, {}, NoInspectionFourByFourCubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_7(o){
   return o != null && instanceOf(o, Q$NoInspectionFourByFourCubePuzzle);
 }
@@ -14214,10 +16697,10 @@ function $clinit_ThreeByThreeCubePuzzle(){
   l_3 = ($clinit_Logger() , $getLoggerHelper(Lpuzzle_ThreeByThreeCubePuzzle_2_classLit.typeName));
 }
 
-function $generateRandomMoves_0(this$static, r, firstMoveRestriction){
+function $generateRandomMoves_1(this$static, r, firstMoveRestriction){
   var ab, e, randomState, scramble;
   randomState = ($clinit_Tools() , randomState_0(r));
-  scramble = $trim($solution($get_1(this$static.twoPhaseSearcher), randomState, 21, Pc8_longLit, 2, firstMoveRestriction));
+  scramble = $trim($solution(dynamicCast($get_3(this$static.twoPhaseSearcher), Q$Search), randomState, 21, Pea60_longLit, Pc8_longLit, 2, firstMoveRestriction));
   ab = new AlgorithmBuilder_0(this$static, 1);
   try {
     $appendAlgorithm(ab, scramble);
@@ -14231,7 +16714,7 @@ function $generateRandomMoves_0(this$static, r, firstMoveRestriction){
      else 
       throw $e0;
   }
-  return new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_2(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
+  return new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_4(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
 }
 
 function $solveIn(this$static, ps, n, firstMoveRestriction){
@@ -14240,8 +16723,8 @@ function $solveIn(this$static, ps, n, firstMoveRestriction){
   if (this$static == new CubePuzzle$CubeState_0(this$static)) {
     return '';
   }
-  solution = $trim($solution($get_1(this$static.twoPhaseSearcher), $toFaceCube(cs), n, P0_longLit, 0, firstMoveRestriction));
-  if ($equals('Error 7', solution)) {
+  solution = $trim($solution(dynamicCast($get_3(this$static.twoPhaseSearcher), Q$Search), $toFaceCube(cs), n, Pea60_longLit, P0_longLit, 0, firstMoveRestriction));
+  if ($equals_0('Error 7', solution)) {
     return null;
   }
    else if (solution.indexOf('Error') == 0) {
@@ -14261,13 +16744,13 @@ function ThreeByThreeCubePuzzle_0(){
   this.twoPhaseSearcher = new ThreeByThreeCubePuzzle$1_0;
 }
 
-defineSeed(317, 298, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$ThreeByThreeCubePuzzle]), ThreeByThreeCubePuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_4(r){
-  return $generateRandomMoves_0(this, r, null);
+defineSeed(332, 312, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$ThreeByThreeCubePuzzle]), ThreeByThreeCubePuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_5(r){
+  return $generateRandomMoves_1(this, r, null);
 }
 ;
-_.generateRandomMoves_1 = function generateRandomMoves_5(r, firstMoveRestriction){
-  return $generateRandomMoves_0(this, r, firstMoveRestriction);
+_.generateRandomMoves_1 = function generateRandomMoves_6(r, firstMoveRestriction){
+  return $generateRandomMoves_1(this, r, firstMoveRestriction);
 }
 ;
 _.solveIn_0 = function solveIn_1(ps, n){
@@ -14285,8 +16768,8 @@ function NoInspectionThreeByThreeCubePuzzle_0(){
   ThreeByThreeCubePuzzle_0.call(this);
 }
 
-defineSeed(316, 317, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$NoInspectionThreeByThreeCubePuzzle, Q$ThreeByThreeCubePuzzle]), NoInspectionThreeByThreeCubePuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_6(r){
+defineSeed(331, 332, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$NoInspectionThreeByThreeCubePuzzle, Q$ThreeByThreeCubePuzzle]), NoInspectionThreeByThreeCubePuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_7(r){
   var firstMoveRestriction, psag, randomOrientation, randomOrientationMoves, restrictedFace;
   randomOrientationMoves = $getRandomOrientationMoves(this, ~~(this.size / 2));
   randomOrientation = randomOrientationMoves[$nextInt(r, randomOrientationMoves.length)];
@@ -14297,7 +16780,7 @@ _.generateRandomMoves_0 = function generateRandomMoves_6(r){
    else {
     firstMoveRestriction = null;
   }
-  psag = $generateRandomMoves_0(this, r, firstMoveRestriction);
+  psag = $generateRandomMoves_1(this, r, firstMoveRestriction);
   psag = applyOrientation(this, randomOrientation, psag, false);
   return psag;
 }
@@ -14405,7 +16888,7 @@ function NoInspectionThreeByThreeCubePuzzleExporterImpl_0(){
   $export_8(this);
 }
 
-defineSeed(318, 1, {}, NoInspectionThreeByThreeCubePuzzleExporterImpl_0);
+defineSeed(333, 1, {}, NoInspectionThreeByThreeCubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_8(o){
   return o != null && instanceOf(o, Q$NoInspectionThreeByThreeCubePuzzle);
 }
@@ -14477,7 +16960,7 @@ function $drawTriangle(g, x, y, up, state, colorScheme){
     sticker = ps[i_0];
     $setFill(sticker, colorScheme[state[i_0]]);
     $setStroke_0(sticker, ($clinit_Color() , BLACK));
-    $add(g.children, sticker);
+    $add_0(g.children, sticker);
   }
 }
 
@@ -14508,14 +16991,14 @@ function triangle(pointup){
     $lineTo(p_0, x[ch], y[ch]);
   }
   azzert_0(!!p_0.commands);
-  $add(p_0.commands, new Path$Command_0(4, null));
+  $add_0(p_0.commands, new Path$Command_0(4, null));
   return p_0;
 }
 
-defineSeed(319, 261, makeCastMap([Q$Puzzle, Q$Exportable, Q$PyraminxPuzzle]), PyraminxPuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_7(r){
+defineSeed(334, 275, makeCastMap([Q$Puzzle, Q$Exportable, Q$PyraminxPuzzle]), PyraminxPuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_8(r){
   var e, pState, scramble, state;
-  state = $randomState(r);
+  state = $randomState_0(r);
   scramble = $solve_0(this.pyraminxSolver, state, 11, true, true, false);
   try {
     pState = $applyAlgorithm(new PyraminxPuzzle$PyraminxState_0(this), scramble);
@@ -14559,7 +17042,7 @@ _.getSolvedState_0 = function getSolvedState_3(){
 ;
 _.pyraminxSolver = null;
 var defaultColorScheme_0;
-function $swap(f1, s1, f2, s2, f3, s3, image){
+function $swap_1(f1, s1, f2, s2, f3, s3, image){
   var temp;
   temp = image[f1][s1];
   image[f1][s1] = image[f2][s2];
@@ -14618,24 +17101,24 @@ function $turn(side, dir, image){
 function $turn_0(s, image){
   switch (s) {
     case 0:
-      $swap(0, 8, 3, 8, 2, 2, image);
-      $swap(0, 1, 3, 1, 2, 4, image);
-      $swap(0, 2, 3, 2, 2, 5, image);
+      $swap_1(0, 8, 3, 8, 2, 2, image);
+      $swap_1(0, 1, 3, 1, 2, 4, image);
+      $swap_1(0, 2, 3, 2, 2, 5, image);
       break;
     case 1:
-      $swap(2, 8, 1, 2, 0, 8, image);
-      $swap(2, 7, 1, 1, 0, 7, image);
-      $swap(2, 5, 1, 8, 0, 5, image);
+      $swap_1(2, 8, 1, 2, 0, 8, image);
+      $swap_1(2, 7, 1, 1, 0, 7, image);
+      $swap_1(2, 5, 1, 8, 0, 5, image);
       break;
     case 2:
-      $swap(3, 8, 0, 5, 1, 5, image);
-      $swap(3, 7, 0, 4, 1, 4, image);
-      $swap(3, 5, 0, 2, 1, 2, image);
+      $swap_1(3, 8, 0, 5, 1, 5, image);
+      $swap_1(3, 7, 0, 4, 1, 4, image);
+      $swap_1(3, 5, 0, 2, 1, 2, image);
       break;
     case 3:
-      $swap(1, 8, 2, 2, 3, 5, image);
-      $swap(1, 7, 2, 1, 3, 4, image);
-      $swap(1, 5, 2, 8, 3, 2, image);
+      $swap_1(1, 8, 2, 2, 3, 5, image);
+      $swap_1(1, 7, 2, 1, 3, 4, image);
+      $swap_1(1, 5, 2, 8, 3, 2, image);
       break;
     default:azzert_1(false);
   }
@@ -14652,16 +17135,16 @@ function $turnTip(side, dir, image){
 function $turnTip_0(s, image){
   switch (s) {
     case 0:
-      $swap(0, 0, 3, 0, 2, 3, image);
+      $swap_1(0, 0, 3, 0, 2, 3, image);
       break;
     case 1:
-      $swap(0, 6, 2, 6, 1, 0, image);
+      $swap_1(0, 6, 2, 6, 1, 0, image);
       break;
     case 2:
-      $swap(0, 3, 1, 3, 3, 6, image);
+      $swap_1(0, 3, 1, 3, 3, 6, image);
       break;
     case 3:
-      $swap(1, 6, 2, 0, 3, 3, image);
+      $swap_1(1, 6, 2, 0, 3, 3, image);
       break;
     default:azzert_1(false);
   }
@@ -14685,7 +17168,7 @@ function PyraminxPuzzle$PyraminxState_1(this$0, image){
   this.image = image;
 }
 
-defineSeed(320, 263, makeCastMap([Q$Puzzle$PuzzleState, Q$PyraminxPuzzle$PyraminxState]), PyraminxPuzzle$PyraminxState_0, PyraminxPuzzle$PyraminxState_1);
+defineSeed(335, 277, makeCastMap([Q$Puzzle$PuzzleState, Q$PyraminxPuzzle$PyraminxState]), PyraminxPuzzle$PyraminxState_0, PyraminxPuzzle$PyraminxState_1);
 _.drawScramble = function drawScramble_2(colorScheme){
   var i_0, preferredSize, scheme, svg;
   preferredSize = new Dimension_0(($clinit_PyraminxPuzzle() , 200), round_int(3 * Math.sqrt(3) * 30 + 15));
@@ -14699,7 +17182,7 @@ _.drawScramble = function drawScramble_2(colorScheme){
   return svg;
 }
 ;
-_.equals$ = function equals_30(other){
+_.equals$ = function equals_31(other){
   return deepEquals(this.image, dynamicCast(other, Q$PyraminxPuzzle$PyraminxState).image);
 }
 ;
@@ -14819,7 +17302,7 @@ function PyraminxPuzzleExporterImpl_0(){
   $export_9(this);
 }
 
-defineSeed(321, 1, {}, PyraminxPuzzleExporterImpl_0);
+defineSeed(336, 1, {}, PyraminxPuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_9(o){
   return o != null && instanceOf(o, Q$PyraminxPuzzle);
 }
@@ -14831,7 +17314,7 @@ function $clinit_PyraminxSolver(){
   inverseMoveToString = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ["U'", 'U', "L'", 'L', "R'", 'R', "B'", 'B']);
   tipToString = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ['u', "u'", 'l', "l'", 'r', "r'", 'b', "b'"]);
   inverseTipToString = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ["u'", 'u', "l'", 'l', "r'", 'r', "b'", 'b']);
-  fact_1 = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 1, 2, 6, 24, 120, 720]);
+  fact_2 = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 1, 2, 6, 24, 120, 720]);
   moveEdgePerm = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [720, 8], 2, 1);
   moveEdgeOrient = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [32, 8], 2, 1);
   moveCornerOrient = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [81, 8], 2, 1);
@@ -14841,7 +17324,7 @@ function $clinit_PyraminxSolver(){
   initPrun();
 }
 
-function $randomState(r){
+function $randomState_0(r){
   var state;
   state = new PyraminxSolver$PyraminxSolverState_0;
   do {
@@ -15085,7 +17568,7 @@ function unpackEdgePerm(perm, edges){
   var i_0, m_0, p_0, v, val;
   val = 5517840;
   for (i_0 = 0; i_0 < 5; ++i_0) {
-    p_0 = fact_1[5 - i_0];
+    p_0 = fact_2[5 - i_0];
     v = ~~(perm / p_0);
     perm -= v * p_0;
     v <<= 2;
@@ -15096,8 +17579,8 @@ function unpackEdgePerm(perm, edges){
   edges[5] = val;
 }
 
-defineSeed(322, 1, {}, PyraminxSolver_0);
-var fact_1, inverseMoveToString, inverseTipToString, moveCornerOrient, moveEdgeOrient, moveEdgePerm, moveToString, prunOrient, prunPerm, tipToString;
+defineSeed(337, 1, {}, PyraminxSolver_0);
+var fact_2, inverseMoveToString, inverseTipToString, moveCornerOrient, moveEdgeOrient, moveEdgePerm, moveToString, prunOrient, prunPerm, tipToString;
 function $unsolvedTips(this$static){
   var numberUnsolved, tempTips;
   numberUnsolved = 0;
@@ -15113,7 +17596,7 @@ function $unsolvedTips(this$static){
 function PyraminxSolver$PyraminxSolverState_0(){
 }
 
-defineSeed(323, 1, {}, PyraminxSolver$PyraminxSolverState_0);
+defineSeed(338, 1, {}, PyraminxSolver$PyraminxSolverState_0);
 _.cornerOrient = 0;
 _.edgeOrient = 0;
 _.edgePerm = 0;
@@ -15140,10 +17623,10 @@ function SkewbPuzzle_0(){
   this.wcaMinScrambleDistance = 7;
 }
 
-defineSeed(324, 261, makeCastMap([Q$Puzzle, Q$Exportable, Q$SkewbPuzzle]), SkewbPuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_8(r){
+defineSeed(339, 275, makeCastMap([Q$Puzzle, Q$Exportable, Q$SkewbPuzzle]), SkewbPuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_9(r){
   var e, pState, scramble, state;
-  state = $randomState_0(r);
+  state = $randomState_1(r);
   scramble = $generateExactly(this.skewbSolver, state);
   try {
     pState = $applyAlgorithm(new SkewbPuzzle$SkewbState_0(this), scramble);
@@ -15187,7 +17670,7 @@ _.getSolvedState_0 = function getSolvedState_4(){
 ;
 _.skewbSolver = null;
 var defaultColorScheme_1, sq3d2;
-function $$init_5(this$static){
+function $$init_8(this$static){
   this$static.image = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [6, 5], 2, 1);
 }
 
@@ -15222,7 +17705,7 @@ function $getFacePaths(){
   return p_0;
 }
 
-function $swap_0(f1, s1, f2, s2, f3, s3, image){
+function $swap_2(f1, s1, f2, s2, f3, s3, image){
   var temp;
   temp = image[f1][s1];
   image[f1][s1] = image[f2][s2];
@@ -15235,32 +17718,32 @@ function $turn_1(axis, pow, image){
   for (p_0 = 0; p_0 < pow; ++p_0) {
     switch (axis) {
       case 0:
-        $swap_0(2, 0, 3, 0, 1, 0, image);
-        $swap_0(2, 4, 3, 2, 1, 3, image);
-        $swap_0(2, 2, 3, 1, 1, 4, image);
-        $swap_0(2, 3, 3, 4, 1, 1, image);
-        $swap_0(4, 4, 5, 3, 0, 4, image);
+        $swap_2(2, 0, 3, 0, 1, 0, image);
+        $swap_2(2, 4, 3, 2, 1, 3, image);
+        $swap_2(2, 2, 3, 1, 1, 4, image);
+        $swap_2(2, 3, 3, 4, 1, 1, image);
+        $swap_2(4, 4, 5, 3, 0, 4, image);
         break;
       case 1:
-        $swap_0(0, 0, 1, 0, 5, 0, image);
-        $swap_0(0, 2, 1, 2, 5, 1, image);
-        $swap_0(0, 4, 1, 4, 5, 2, image);
-        $swap_0(0, 1, 1, 1, 5, 3, image);
-        $swap_0(4, 1, 2, 2, 3, 4, image);
+        $swap_2(0, 0, 1, 0, 5, 0, image);
+        $swap_2(0, 2, 1, 2, 5, 1, image);
+        $swap_2(0, 4, 1, 4, 5, 2, image);
+        $swap_2(0, 1, 1, 1, 5, 3, image);
+        $swap_2(4, 1, 2, 2, 3, 4, image);
         break;
       case 2:
-        $swap_0(4, 0, 5, 0, 3, 0, image);
-        $swap_0(4, 3, 5, 4, 3, 3, image);
-        $swap_0(4, 1, 5, 3, 3, 1, image);
-        $swap_0(4, 4, 5, 2, 3, 4, image);
-        $swap_0(2, 3, 0, 1, 1, 4, image);
+        $swap_2(4, 0, 5, 0, 3, 0, image);
+        $swap_2(4, 3, 5, 4, 3, 3, image);
+        $swap_2(4, 1, 5, 3, 3, 1, image);
+        $swap_2(4, 4, 5, 2, 3, 4, image);
+        $swap_2(2, 3, 0, 1, 1, 4, image);
         break;
       case 3:
-        $swap_0(1, 0, 3, 0, 5, 0, image);
-        $swap_0(1, 4, 3, 4, 5, 3, image);
-        $swap_0(1, 3, 3, 3, 5, 1, image);
-        $swap_0(1, 2, 3, 2, 5, 4, image);
-        $swap_0(0, 2, 2, 4, 4, 3, image);
+        $swap_2(1, 0, 3, 0, 5, 0, image);
+        $swap_2(1, 4, 3, 4, 5, 3, image);
+        $swap_2(1, 3, 3, 3, 5, 1, image);
+        $swap_2(1, 2, 3, 2, 5, 4, image);
+        $swap_2(0, 2, 2, 4, 4, 3, image);
         break;
       default:azzert_1(false);
     }
@@ -15271,7 +17754,7 @@ function SkewbPuzzle$SkewbState_0(this$0){
   var i_0, j;
   this.this$0 = this$0;
   this.this$0_0 = this$0;
-  $$init_5(this);
+  $$init_8(this);
   for (i_0 = 0; i_0 < 6; ++i_0) {
     for (j = 0; j < 5; ++j) {
       this.image[i_0][j] = i_0;
@@ -15283,7 +17766,7 @@ function SkewbPuzzle$SkewbState_1(this$0, _image){
   var i_0, j;
   this.this$0 = this$0;
   this.this$0_0 = this$0;
-  $$init_5(this);
+  $$init_8(this);
   for (i_0 = 0; i_0 < 6; ++i_0) {
     for (j = 0; j < 5; ++j) {
       this.image[i_0][j] = _image[i_0][j];
@@ -15291,7 +17774,7 @@ function SkewbPuzzle$SkewbState_1(this$0, _image){
   }
 }
 
-defineSeed(325, 263, makeCastMap([Q$Puzzle$PuzzleState, Q$SkewbPuzzle$SkewbState]), SkewbPuzzle$SkewbState_0, SkewbPuzzle$SkewbState_1);
+defineSeed(340, 277, makeCastMap([Q$Puzzle$PuzzleState, Q$SkewbPuzzle$SkewbState]), SkewbPuzzle$SkewbState_0, SkewbPuzzle$SkewbState_1);
 _.drawScramble = function drawScramble_3(colorScheme){
   var face, g, i_0, p_0, position, scheme;
   g = new Svg_0(new Dimension_0(round_int(ceil(250 * ($clinit_SkewbPuzzle() , sq3d2))), round_int(Math.ceil(187))));
@@ -15306,13 +17789,13 @@ _.drawScramble = function drawScramble_3(colorScheme){
       $concatenate(p_0[i_0].transform, position[face]);
       $setFill(p_0[i_0], scheme[this.image[face][i_0]]);
       $setStroke_0(p_0[i_0], ($clinit_Color() , BLACK));
-      $add(g.children, p_0[i_0]);
+      $add_0(g.children, p_0[i_0]);
     }
   }
   return g;
 }
 ;
-_.equals$ = function equals_31(other){
+_.equals$ = function equals_32(other){
   return deepEquals(this.image, dynamicCast(other, Q$SkewbPuzzle$SkewbState).image);
 }
 ;
@@ -15423,7 +17906,7 @@ function SkewbPuzzleExporterImpl_0(){
   $export_10(this);
 }
 
-defineSeed(326, 1, {}, SkewbPuzzleExporterImpl_0);
+defineSeed(341, 1, {}, SkewbPuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_10(o){
   return o != null && instanceOf(o, Q$SkewbPuzzle);
 }
@@ -15431,14 +17914,14 @@ _.isAssignable = function isAssignable_10(o){
 var exported_10 = false;
 function $clinit_SkewbSolver(){
   $clinit_SkewbSolver = nullMethod;
-  fact_2 = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 1, 1, 3, 12, 60, 360]);
+  fact_3 = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 1, 1, 3, 12, 60, 360]);
   permmv = initDims([_3_3C_classLit, _3C_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$char_$1, Q$Serializable])], [Q$char_$1, -1], [4320, 4], 2, 1);
   twstmv = initDims([_3_3C_classLit, _3C_classLit], [makeCastMap([Q$Serializable, Q$Object_$1]), makeCastMap([Q$char_$1, Q$Serializable])], [Q$char_$1, -1], [2187, 4], 2, 1);
   permprun = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 4320, 1);
   twstprun = initDim(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, 2187, 1);
   cornerpermmv = initValues(_3_3B_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$byte_$1, [initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [6, 5, 10, 1]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [9, 7, 4, 2]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [3, 11, 8, 0]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [10, 1, 6, 5]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [0, 8, 11, 3]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [7, 9, 2, 4]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [4, 2, 9, 7]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [11, 3, 0, 8]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [1, 10, 5, 6]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [8, 0, 3, 11]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [2, 4, 7, 9]), initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [5, 6, 1, 10])]);
   ori_0 = initValues(_3B_classLit, makeCastMap([Q$byte_$1, Q$Serializable]), -1, [0, 1, 2, 0, 2, 1, 1, 2, 0, 2, 1, 0]);
-  init_3();
+  init_6();
 }
 
 function $generateExactly(this$static, state){
@@ -15470,7 +17953,7 @@ function $getSolution(this$static, sol){
   return scrambleSequence;
 }
 
-function $randomState_0(r){
+function $randomState_1(r){
   var state;
   state = new SkewbSolver$SkewbSolverState_0;
   state.perm = $nextInt(r, 4320);
@@ -15520,7 +18003,7 @@ function getpermmv(idx, move){
   parity = 0;
   centerperm = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 6, 1);
   for (i_0 = 0; i_0 < 5; ++i_0) {
-    p_0 = fact_2[5 - i_0];
+    p_0 = fact_3[5 - i_0];
     v = ~~(centerindex / p_0);
     centerindex -= v * p_0;
     parity ^= v;
@@ -15618,7 +18101,7 @@ function gettwstmv(idx, move){
   return idx;
 }
 
-function init_3(){
+function init_6(){
   var c, i_0, j, l_0, m_0, p_0, q;
   for (i_0 = 0; i_0 < 4320; ++i_0) {
     permprun[i_0] = -1;
@@ -15662,13 +18145,13 @@ function init_3(){
   }
 }
 
-defineSeed(327, 1, {}, SkewbSolver_0);
+defineSeed(342, 1, {}, SkewbSolver_0);
 _.solution_length = -1;
-var cornerpermmv, fact_2, ori_0, permmv, permprun, twstmv, twstprun;
+var cornerpermmv, fact_3, ori_0, permmv, permprun, twstmv, twstprun;
 function SkewbSolver$SkewbSolverState_0(){
 }
 
-defineSeed(328, 1, {}, SkewbSolver$SkewbSolverState_0);
+defineSeed(343, 1, {}, SkewbSolver$SkewbSolverState_0);
 _.perm = 0;
 _.twst = 0;
 function $clinit_SquareOnePuzzle(){
@@ -15708,13 +18191,13 @@ function $drawPiece(g, transform, piece, x, y, colorScheme){
   var ch, cls, corner, degree, p_0, p_1, tempx, tempy, tempY, side1, side2, p_2, tempx_0, side;
   corner = (piece + (piece <= 7?0:1)) % 2 == 0;
   degree = 30 * (corner?2:1);
-  p_0 = corner?(p_1 = new Path_0 , $moveTo(p_1, 0, 0) , $lineTo(p_1, 32, 0) , tempx = 32 * (1 + Math.cos(1.3089969389957472) / Math.sqrt(2)) , tempy = 32 * Math.sin(1.3089969389957472) / Math.sqrt(2) , $lineTo(p_1, tempx, tempy) , tempY = Math.sqrt(3) * 32 / 2 , $lineTo(p_1, 16, tempY) , azzert_0(!!p_1.commands) , $add(p_1.commands, new Path$Command_0(4, null)) , $translate(p_1, x, y) , side1 = new Path_0 , $moveTo(side1, 32, 0) , $lineTo(side1, 44.8, 0) , $lineTo(side1, 1.4 * tempx, 1.4 * tempy) , $lineTo(side1, tempx, tempy) , azzert_0(!!side1.commands) , $add(side1.commands, new Path$Command_0(4, null)) , $translate(side1, x, y) , side2 = new Path_0 , $moveTo(side2, 1.4 * tempx, 1.4 * tempy) , $lineTo(side2, tempx, tempy) , $lineTo(side2, 16, tempY) , $lineTo(side2, 22.4, 1.4 * tempY) , azzert_0(!!side2.commands) , $add(side2.commands, new Path$Command_0(4, null)) , $translate(side2, x, y) , initValues(_3Lnet_gnehzr_tnoodle_svglite_Path_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$Path, [p_1, side1, side2])):(p_2 = new Path_0 , $moveTo(p_2, 0, 0) , $lineTo(p_2, 32, 0) , tempx_0 = Math.sqrt(3) * 32 / 2 , $lineTo(p_2, tempx_0, 16) , azzert_0(!!p_2.commands) , $add(p_2.commands, new Path$Command_0(4, null)) , $translate(p_2, x, y) , side = new Path_0 , $moveTo(side, 32, 0) , $lineTo(side, 44.8, 0) , $lineTo(side, 1.4 * tempx_0, 22.4) , $lineTo(side, tempx_0, 16) , azzert_0(!!side.commands) , $add(side.commands, new Path$Command_0(4, null)) , $translate(side, x, y) , initValues(_3Lnet_gnehzr_tnoodle_svglite_Path_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$Path, [p_2, side]));
+  p_0 = corner?(p_1 = new Path_0 , $moveTo(p_1, 0, 0) , $lineTo(p_1, 32, 0) , tempx = 32 * (1 + Math.cos(1.3089969389957472) / Math.sqrt(2)) , tempy = 32 * Math.sin(1.3089969389957472) / Math.sqrt(2) , $lineTo(p_1, tempx, tempy) , tempY = Math.sqrt(3) * 32 / 2 , $lineTo(p_1, 16, tempY) , azzert_0(!!p_1.commands) , $add_0(p_1.commands, new Path$Command_0(4, null)) , $translate(p_1, x, y) , side1 = new Path_0 , $moveTo(side1, 32, 0) , $lineTo(side1, 44.8, 0) , $lineTo(side1, 1.4 * tempx, 1.4 * tempy) , $lineTo(side1, tempx, tempy) , azzert_0(!!side1.commands) , $add_0(side1.commands, new Path$Command_0(4, null)) , $translate(side1, x, y) , side2 = new Path_0 , $moveTo(side2, 1.4 * tempx, 1.4 * tempy) , $lineTo(side2, tempx, tempy) , $lineTo(side2, 16, tempY) , $lineTo(side2, 22.4, 1.4 * tempY) , azzert_0(!!side2.commands) , $add_0(side2.commands, new Path$Command_0(4, null)) , $translate(side2, x, y) , initValues(_3Lnet_gnehzr_tnoodle_svglite_Path_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$Path, [p_1, side1, side2])):(p_2 = new Path_0 , $moveTo(p_2, 0, 0) , $lineTo(p_2, 32, 0) , tempx_0 = Math.sqrt(3) * 32 / 2 , $lineTo(p_2, tempx_0, 16) , azzert_0(!!p_2.commands) , $add_0(p_2.commands, new Path$Command_0(4, null)) , $translate(p_2, x, y) , side = new Path_0 , $moveTo(side, 32, 0) , $lineTo(side, 44.8, 0) , $lineTo(side, 1.4 * tempx_0, 22.4) , $lineTo(side, tempx_0, 16) , azzert_0(!!side.commands) , $add_0(side.commands, new Path$Command_0(4, null)) , $translate(side, x, y) , initValues(_3Lnet_gnehzr_tnoodle_svglite_Path_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1]), Q$Path, [p_2, side]));
   cls = $getPieceColors(piece, colorScheme);
   for (ch = cls.length - 1; ch >= 0; --ch) {
     $setFill(p_0[ch], cls[ch]);
     $setStroke_0(p_0[ch], ($clinit_Color() , BLACK));
     !transform?$setToIdentity(p_0[ch].transform):$setTransform(p_0[ch].transform, transform);
-    $add(g.children, p_0[ch]);
+    $add_0(g.children, p_0[ch]);
   }
   $concatenate(transform, getRotateInstance_0(degree * 0.017453292519943295, x, y));
   return degree;
@@ -15747,8 +18230,8 @@ function SquareOnePuzzle_0(){
   this.wcaMinScrambleDistance = 11;
 }
 
-defineSeed(329, 261, makeCastMap([Q$Puzzle, Q$Exportable, Q$SquareOnePuzzle]), SquareOnePuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_9(r){
+defineSeed(344, 275, makeCastMap([Q$Puzzle, Q$Exportable, Q$SquareOnePuzzle]), SquareOnePuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_10(r){
   var e, s, scramble, state;
   s = new Search_2;
   scramble = $trim($solution_0(s, randomCube(r)));
@@ -15872,7 +18355,7 @@ function SquareOnePuzzle$SquareOneState_1(this$0, sliceSolved, pieces){
   this.pieces = pieces;
 }
 
-defineSeed(330, 263, makeCastMap([Q$Puzzle$PuzzleState, Q$SquareOnePuzzle$SquareOneState]), SquareOnePuzzle$SquareOneState_0, SquareOnePuzzle$SquareOneState_1);
+defineSeed(345, 277, makeCastMap([Q$Puzzle$PuzzleState, Q$SquareOnePuzzle$SquareOneState]), SquareOnePuzzle$SquareOneState_0, SquareOnePuzzle$SquareOneState_1);
 _.drawScramble = function drawScramble_4(colorSchemeMap){
   var colorScheme, corner_width, dim, edge_width, g, half_square_width, height, i_0, left_mid, right_mid, transform, width, x, y;
   g = new Svg_0(new Dimension_0(($clinit_SquareOnePuzzle() , round_int(2 * RADIUS_MULTIPLIER * 1.4 * 32)), round_int(4 * RADIUS_MULTIPLIER * 1.4 * 32)));
@@ -15897,8 +18380,8 @@ _.drawScramble = function drawScramble_4(colorSchemeMap){
     right_mid = new Rectangle_0(width / 2 - half_square_width, height / 2 - 6.399999999999999, corner_width + edge_width, 12.799999999999997);
     $setFill(right_mid, colorScheme[1]);
   }
-  $add(g.children, right_mid);
-  $add(g.children, left_mid);
+  $add_0(g.children, right_mid);
+  $add_0(g.children, left_mid);
   right_mid = new Rectangle_1(right_mid);
   $setStroke_0(right_mid, ($clinit_Color() , BLACK));
   azzert('fill' != 'style');
@@ -15907,8 +18390,8 @@ _.drawScramble = function drawScramble_4(colorSchemeMap){
   $setStroke_0(left_mid, BLACK);
   azzert('fill' != 'style');
   left_mid.attributes.put('fill', 'none');
-  $add(g.children, right_mid);
-  $add(g.children, left_mid);
+  $add_0(g.children, right_mid);
+  $add_0(g.children, left_mid);
   x = width / 2;
   y = height / 4;
   transform = getRotateInstance_0(1.8325957145940461, x, y);
@@ -15919,10 +18402,10 @@ _.drawScramble = function drawScramble_4(colorSchemeMap){
   return g;
 }
 ;
-_.equals$ = function equals_32(other){
+_.equals$ = function equals_33(other){
   var o;
   o = dynamicCast(other, Q$SquareOnePuzzle$SquareOneState);
-  return equals_17(this.pieces, o.pieces) && this.sliceSolved == o.sliceSolved;
+  return equals_18(this.pieces, o.pieces) && this.sliceSolved == o.sliceSolved;
 }
 ;
 _.getMoveCost = function getMoveCost_0(move){
@@ -15935,7 +18418,7 @@ _.getScrambleSuccessors = function getScrambleSuccessors_2(){
   iter = $iterator($keySet(successors));
   while (iter.val$outerIter.hasNext()) {
     key = dynamicCast($next_0(iter), Q$String);
-    state = dynamicCast($get_3(successors, key), Q$SquareOnePuzzle$SquareOneState);
+    state = dynamicCast($get_5(successors, key), Q$SquareOnePuzzle$SquareOneState);
     $canSlash(state) || iter.val$outerIter.remove_0();
   }
   return successors;
@@ -15949,7 +18432,7 @@ _.hashCode$ = function hashCode_33(){
   return hashCode_18(this.pieces) ^ (this.sliceSolved?1:0);
 }
 ;
-_.toString$ = function toString_43(){
+_.toString$ = function toString_44(){
   return 'sliceSolved: ' + this.sliceSolved + ' ' + toString_24(this.pieces);
 }
 ;
@@ -16041,7 +18524,7 @@ function SquareOnePuzzleExporterImpl_0(){
   $export_11(this);
 }
 
-defineSeed(331, 1, {}, SquareOnePuzzleExporterImpl_0);
+defineSeed(346, 1, {}, SquareOnePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_11(o){
   return o != null && instanceOf(o, Q$SquareOnePuzzle);
 }
@@ -16050,7 +18533,11 @@ var exported_11 = false;
 function ThreeByThreeCubePuzzle$1_0(){
 }
 
-defineSeed(332, 181, {}, ThreeByThreeCubePuzzle$1_0);
+defineSeed(347, 193, {}, ThreeByThreeCubePuzzle$1_0);
+_.initialValue = function initialValue_1(){
+  return new Search_0;
+}
+;
 function $export_12(this$static){
   if (!exported_12) {
     exported_12 = true;
@@ -16146,7 +18633,7 @@ function ThreeByThreeCubePuzzleExporterImpl_0(){
   $export_12(this);
 }
 
-defineSeed(333, 1, {}, ThreeByThreeCubePuzzleExporterImpl_0);
+defineSeed(348, 1, {}, ThreeByThreeCubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_12(o){
   return o != null && instanceOf(o, Q$ThreeByThreeCubePuzzle);
 }
@@ -16159,8 +18646,8 @@ function TwoByTwoCubePuzzle_0(){
   this.twoSolver = new TwoByTwoSolver_0;
 }
 
-defineSeed(334, 298, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$TwoByTwoCubePuzzle]), TwoByTwoCubePuzzle_0);
-_.generateRandomMoves_0 = function generateRandomMoves_10(r){
+defineSeed(349, 312, makeCastMap([Q$Puzzle, Q$Exportable, Q$CubePuzzle, Q$TwoByTwoCubePuzzle]), TwoByTwoCubePuzzle_0);
+_.generateRandomMoves_0 = function generateRandomMoves_11(r){
   var ab, e, scramble, state, state_0;
   state = (state_0 = new TwoByTwoSolver$TwoByTwoState_0 , state_0.permutation = $nextInt(r, 5040) , state_0.orientation = $nextInt(r, 729) , state_0);
   scramble = $solve_1(this.twoSolver, state, 11, true, true);
@@ -16177,7 +18664,7 @@ _.generateRandomMoves_0 = function generateRandomMoves_10(r){
      else 
       throw $e0;
   }
-  return new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_2(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
+  return new PuzzleStateAndGenerator_0((azzert_1(ab.states.size == ab.moves.size + 1) , dynamicCast($get_4(ab.states, ab.states.size - 1), Q$Puzzle$PuzzleState)), join(ab.moves, ' '));
 }
 ;
 _.solveIn_0 = function solveIn_4(ps, n){
@@ -16273,7 +18760,7 @@ function TwoByTwoCubePuzzleExporterImpl_0(){
   $export_13(this);
 }
 
-defineSeed(335, 1, {}, TwoByTwoCubePuzzleExporterImpl_0);
+defineSeed(350, 1, {}, TwoByTwoCubePuzzleExporterImpl_0);
 _.isAssignable = function isAssignable_13(o){
   return o != null && instanceOf(o, Q$TwoByTwoCubePuzzle);
 }
@@ -16283,7 +18770,7 @@ function $clinit_TwoByTwoSolver(){
   $clinit_TwoByTwoSolver = nullMethod;
   moveToString_0 = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ['U', 'U2', "U'", 'R', 'R2', "R'", 'F', 'F2', "F'"]);
   inverseMoveToString_0 = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ["U'", 'U2', 'U', "R'", 'R2', 'R', "F'", 'F2', 'F']);
-  fact_3 = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 1, 2, 6, 24, 120, 720]);
+  fact_4 = initValues(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, [1, 1, 2, 6, 24, 120, 720]);
   movePerm = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [5040, 9], 2, 1);
   moveOrient = initDims([_3_3I_classLit, _3I_classLit], [makeCastMap([Q$int_$2, Q$Serializable, Q$Object_$1]), makeCastMap([Q$int_$1, Q$Serializable])], [Q$int_$1, -1], [729, 9], 2, 1);
   prunPerm_0 = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 5040, 1);
@@ -16529,7 +19016,7 @@ function unpackPerm(perm, cubies){
   var i_0, m_0, p_0, v, val;
   val = 106181136;
   for (i_0 = 0; i_0 < 6; ++i_0) {
-    p_0 = fact_3[6 - i_0];
+    p_0 = fact_4[6 - i_0];
     v = ~~(perm / p_0);
     perm -= v * p_0;
     v <<= 2;
@@ -16540,12 +19027,12 @@ function unpackPerm(perm, cubies){
   cubies[6] = val;
 }
 
-defineSeed(336, 1, {}, TwoByTwoSolver_0);
-var fact_3, inverseMoveToString_0, moveOrient, movePerm, moveToString_0, prunOrient_0, prunPerm_0;
+defineSeed(351, 1, {}, TwoByTwoSolver_0);
+var fact_4, inverseMoveToString_0, moveOrient, movePerm, moveToString_0, prunOrient_0, prunPerm_0;
 function TwoByTwoSolver$TwoByTwoState_0(){
 }
 
-defineSeed(337, 1, {}, TwoByTwoSolver$TwoByTwoState_0);
+defineSeed(352, 1, {}, TwoByTwoSolver$TwoByTwoState_0);
 _.orientation = 0;
 _.permutation = 0;
 var $entry = entry_0;
@@ -16565,7 +19052,7 @@ function gwtOnLoad(errFn, modName, modBase, softPermutationId){
   }
 }
 
-var Ljava_lang_Object_2_classLit = createForClass('java.lang.', 'Object', 1, null), Lcom_google_gwt_core_client_JavaScriptObject_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptObject$', 9, Ljava_lang_Object_2_classLit), I_classLit = createForPrimitive('int', ' I'), _3I_classLit = createForArray('', '[I', 343, I_classLit), _3Ljava_lang_Object_2_classLit = createForArray('[Ljava.lang.', 'Object;', 341, Ljava_lang_Object_2_classLit), Z_classLit = createForPrimitive('boolean', ' Z'), _3Z_classLit = createForArray('', '[Z', 344, Z_classLit), Ljava_lang_Throwable_2_classLit = createForClass('java.lang.', 'Throwable', 8, Ljava_lang_Object_2_classLit), Ljava_lang_Exception_2_classLit = createForClass('java.lang.', 'Exception', 7, Ljava_lang_Throwable_2_classLit), Ljava_lang_RuntimeException_2_classLit = createForClass('java.lang.', 'RuntimeException', 6, Ljava_lang_Exception_2_classLit), Ljava_lang_StackTraceElement_2_classLit = createForClass('java.lang.', 'StackTraceElement', 176, Ljava_lang_Object_2_classLit), _3Ljava_lang_StackTraceElement_2_classLit = createForArray('[Ljava.lang.', 'StackTraceElement;', 345, Ljava_lang_StackTraceElement_2_classLit), Lcom_google_gwt_lang_LongLibBase$LongEmul_2_classLit = createForClass('com.google.gwt.lang.', 'LongLibBase$LongEmul', 83, Ljava_lang_Object_2_classLit), _3Lcom_google_gwt_lang_LongLibBase$LongEmul_2_classLit = createForArray('[Lcom.google.gwt.lang.', 'LongLibBase$LongEmul;', 346, Lcom_google_gwt_lang_LongLibBase$LongEmul_2_classLit), Lcom_google_gwt_lang_SeedUtil_2_classLit = createForClass('com.google.gwt.lang.', 'SeedUtil', 84, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_LogConfiguration_2_classLit = createForClass('com.google.gwt.logging.client.', 'LogConfiguration', null, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_LogConfiguration$LogConfigurationImplRegular_2_classLit = createForClass('com.google.gwt.logging.client.', 'LogConfiguration$LogConfigurationImplRegular', 97, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_LogConfiguration$1_2_classLit = createForClass('com.google.gwt.logging.client.', 'LogConfiguration$1', 96, Ljava_lang_Object_2_classLit), Ljava_lang_Enum_2_classLit = createForClass('java.lang.', 'Enum', 46, Ljava_lang_Object_2_classLit), Ljava_lang_Error_2_classLit = createForClass('java.lang.', 'Error', 159, Ljava_lang_Throwable_2_classLit), Ljava_lang_AssertionError_2_classLit = createForClass('java.lang.', 'AssertionError', 158, Ljava_lang_Error_2_classLit), Ljava_lang_Boolean_2_classLit = createForClass('java.lang.', 'Boolean', 160, Ljava_lang_Object_2_classLit), B_classLit = createForPrimitive('byte', ' B'), Ljava_lang_Number_2_classLit = createForClass('java.lang.', 'Number', 165, Ljava_lang_Object_2_classLit), C_classLit = createForPrimitive('char', ' C'), _3C_classLit = createForArray('', '[C', 347, C_classLit), Ljava_lang_Class_2_classLit = createForClass('java.lang.', 'Class', 162, Ljava_lang_Object_2_classLit), D_classLit = createForPrimitive('double', ' D'), _3D_classLit = createForArray('', '[D', 348, D_classLit), Ljava_lang_Double_2_classLit = createForClass('java.lang.', 'Double', 164, Ljava_lang_Number_2_classLit), Ljava_lang_Integer_2_classLit = createForClass('java.lang.', 'Integer', 169, Ljava_lang_Number_2_classLit), _3Ljava_lang_Integer_2_classLit = createForArray('[Ljava.lang.', 'Integer;', 349, Ljava_lang_Integer_2_classLit), Ljava_lang_String_2_classLit = createForClass('java.lang.', 'String', 2, Ljava_lang_Object_2_classLit), _3Ljava_lang_String_2_classLit = createForArray('[Ljava.lang.', 'String;', 342, Ljava_lang_String_2_classLit), _3B_classLit = createForArray('', '[B', 350, B_classLit), Ljava_lang_ClassCastException_2_classLit = createForClass('java.lang.', 'ClassCastException', 163, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_StringBuilder_2_classLit = createForClass('java.lang.', 'StringBuilder', 179, Ljava_lang_Object_2_classLit), Ljava_lang_ArrayStoreException_2_classLit = createForClass('java.lang.', 'ArrayStoreException', 157, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_core_client_JavaScriptException_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptException', 5, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplIe6_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplIe6', 139, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplIe8_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplIe8', 140, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplGecko1_18_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplGecko1_8', 138, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplIe9_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplIe9', 141, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplOpera_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplOpera', 142, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplSafari_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplSafari', 143, Ljava_lang_Object_2_classLit), Ljava_util_logging_Logger_2_classLit = createForClass('java.util.logging.', 'Logger', 105, Ljava_lang_Object_2_classLit), Ljava_io_OutputStream_2_classLit = createForClass('java.io.', 'OutputStream', 154, Ljava_lang_Object_2_classLit), Ljava_io_FilterOutputStream_2_classLit = createForClass('java.io.', 'FilterOutputStream', 153, Ljava_io_OutputStream_2_classLit), Ljava_io_PrintStream_2_classLit = createForClass('java.io.', 'PrintStream', 155, Ljava_io_FilterOutputStream_2_classLit), Lnet_gnehzr_tnoodle_js_ConsolePrintStream_2_classLit = createForClass('net.gnehzr.tnoodle.js.', 'ConsolePrintStream', 253, Ljava_io_PrintStream_2_classLit), Ljava_lang_ArithmeticException_2_classLit = createForClass('java.lang.', 'ArithmeticException', 156, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImpl', 24, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_impl_LoggerImplRegular_2_classLit = createForClass('com.google.gwt.logging.impl.', 'LoggerImplRegular', 103, Ljava_lang_Object_2_classLit), Ljava_util_logging_Handler_2_classLit = createForClass('java.util.logging.', 'Handler', 88, Ljava_lang_Object_2_classLit), _3Ljava_util_logging_Handler_2_classLit = createForArray('[Ljava.util.logging.', 'Handler;', 351, Ljava_util_logging_Handler_2_classLit), Ljava_util_AbstractMap_2_classLit = createForClass('java.util.', 'AbstractMap', 187, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap_2_classLit = createForClass('java.util.', 'AbstractHashMap', 186, Ljava_util_AbstractMap_2_classLit), Ljava_util_HashMap_2_classLit = createForClass('java.util.', 'HashMap', 215, Ljava_util_AbstractHashMap_2_classLit), Ljava_util_AbstractCollection_2_classLit = createForClass('java.util.', 'AbstractCollection', 185, Ljava_lang_Object_2_classLit), Ljava_util_AbstractSet_2_classLit = createForClass('java.util.', 'AbstractSet', 189, Ljava_util_AbstractCollection_2_classLit), Ljava_util_AbstractHashMap$EntrySet_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySet', 188, Ljava_util_AbstractSet_2_classLit), Ljava_util_AbstractHashMap$EntrySetIterator_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySetIterator', 190, Ljava_lang_Object_2_classLit), Ljava_util_AbstractMapEntry_2_classLit = createForClass('java.util.', 'AbstractMapEntry', 192, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap$MapEntryNull_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryNull', 191, Ljava_util_AbstractMapEntry_2_classLit), Ljava_util_AbstractHashMap$MapEntryString_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryString', 193, Ljava_util_AbstractMapEntry_2_classLit), Ljava_util_AbstractMap$1_2_classLit = createForClass('java.util.', 'AbstractMap$1', 196, Ljava_util_AbstractSet_2_classLit), Ljava_util_AbstractMap$1$1_2_classLit = createForClass('java.util.', 'AbstractMap$1$1', 197, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseImpl', 291, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseActual_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseActual', 290, Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit), Lorg_timepedia_exporter_client_Exportable_2_classLit = createForInterface('org.timepedia.exporter.client.', 'Exportable'), Lcom_google_gwt_core_client_impl_StackTraceCreator$Collector_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$Collector', 19, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorMoz_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorMoz', 21, Lcom_google_gwt_core_client_impl_StackTraceCreator$Collector_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorChrome_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorChrome', 20, Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorMoz_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorChromeNoSourceMap_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorChromeNoSourceMap', 22, Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorChrome_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorOpera_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorOpera', 23, Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorMoz_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImplArrayBase_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImplArrayBase', 27, Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImplArray_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImplArray', 26, Lcom_google_gwt_core_client_impl_StringBufferImplArrayBase_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImplAppend_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImplAppend', 25, Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit), Lcom_google_gwt_core_client_Scheduler_2_classLit = createForClass('com.google.gwt.core.client.', 'Scheduler', 14, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_SchedulerImpl_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'SchedulerImpl', 16, Lcom_google_gwt_core_client_Scheduler_2_classLit), Ljava_util_AbstractList_2_classLit = createForClass('java.util.', 'AbstractList', 194, Ljava_util_AbstractCollection_2_classLit), Ljava_util_ArrayList_2_classLit = createForClass('java.util.', 'ArrayList', 199, Ljava_util_AbstractList_2_classLit), Ljava_util_AbstractList$IteratorImpl_2_classLit = createForClass('java.util.', 'AbstractList$IteratorImpl', 195, Ljava_lang_Object_2_classLit), Ljava_util_logging_Level_2_classLit = createForClass('java.util.logging.', 'Level', 240, Ljava_lang_Object_2_classLit), Ljava_util_logging_Level$LevelAll_2_classLit = createForClass('java.util.logging.', 'Level$LevelAll', 241, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelConfig_2_classLit = createForClass('java.util.logging.', 'Level$LevelConfig', 242, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelFine_2_classLit = createForClass('java.util.logging.', 'Level$LevelFine', 243, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelFiner_2_classLit = createForClass('java.util.logging.', 'Level$LevelFiner', 244, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelFinest_2_classLit = createForClass('java.util.logging.', 'Level$LevelFinest', 245, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelInfo_2_classLit = createForClass('java.util.logging.', 'Level$LevelInfo', 246, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelOff_2_classLit = createForClass('java.util.logging.', 'Level$LevelOff', 247, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelSevere_2_classLit = createForClass('java.util.logging.', 'Level$LevelSevere', 248, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelWarning_2_classLit = createForClass('java.util.logging.', 'Level$LevelWarning', 249, Ljava_util_logging_Level_2_classLit), Ljava_lang_NullPointerException_2_classLit = createForClass('java.lang.', 'NullPointerException', 173, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_IllegalArgumentException_2_classLit = createForClass('java.lang.', 'IllegalArgumentException', 166, Ljava_lang_RuntimeException_2_classLit), Ljava_util_logging_LogManager_2_classLit = createForClass('java.util.logging.', 'LogManager', 250, Ljava_lang_Object_2_classLit), Ljava_util_logging_LogManager$RootLogger_2_classLit = createForClass('java.util.logging.', 'LogManager$RootLogger', 251, Ljava_util_logging_Logger_2_classLit), Lcom_google_gwt_logging_impl_LoggerWithExposedConstructor_2_classLit = createForClass('com.google.gwt.logging.impl.', 'LoggerWithExposedConstructor', 104, Ljava_util_logging_Logger_2_classLit), Ljava_util_logging_LogRecord_2_classLit = createForClass('java.util.logging.', 'LogRecord', 252, Ljava_lang_Object_2_classLit), Ljava_lang_UnsupportedOperationException_2_classLit = createForClass('java.lang.', 'UnsupportedOperationException', 182, Ljava_lang_RuntimeException_2_classLit), Ljava_util_MapEntryImpl_2_classLit = createForClass('java.util.', 'MapEntryImpl', 219, Ljava_util_AbstractMapEntry_2_classLit), Lcom_google_gwt_logging_client_ConsoleLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'ConsoleLogHandler', 87, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_DevelopmentModeLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'DevelopmentModeLogHandler', 89, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_FirebugLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'FirebugLogHandler', 90, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_SystemLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'SystemLogHandler', 100, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_NullLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'NullLogHandler', 98, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_NullLoggingPopup_2_classLit = createForClass('com.google.gwt.logging.client.', 'NullLoggingPopup', 99, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_HasWidgetsLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'HasWidgetsLogHandler', 91, Ljava_util_logging_Handler_2_classLit), Ljava_lang_StringBuffer_2_classLit = createForClass('java.lang.', 'StringBuffer', 178, Ljava_lang_Object_2_classLit), Ljava_util_Date_2_classLit = createForClass('java.util.', 'Date', 213, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_PuzzleExporterImpl_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'PuzzleExporterImpl', 265, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle', 261, Ljava_lang_Object_2_classLit), Lpuzzle_CubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'CubePuzzleExporterImpl', 303, Ljava_lang_Object_2_classLit), Lpuzzle_CubePuzzle_2_classLit = createForClass('puzzle.', 'CubePuzzle', 298, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lnet_gnehzr_tnoodle_js_TNoodleJsUtilsExporterImpl_2_classLit = createForClass('net.gnehzr.tnoodle.js.', 'TNoodleJsUtilsExporterImpl', 256, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit = createForClass('net.gnehzr.tnoodle.js.', 'TNoodleJsUtils', null, Ljava_lang_Object_2_classLit), Lpuzzle_ClockPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'ClockPuzzleExporterImpl', 297, Ljava_lang_Object_2_classLit), Lpuzzle_ClockPuzzle_2_classLit = createForClass('puzzle.', 'ClockPuzzle', 295, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_FourByFourCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'FourByFourCubePuzzleExporterImpl', 305, Ljava_lang_Object_2_classLit), Lpuzzle_FourByFourCubePuzzle_2_classLit = createForClass('puzzle.', 'FourByFourCubePuzzle', 304, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_FourByFourRandomTurnsCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'FourByFourRandomTurnsCubePuzzleExporterImpl', 307, Ljava_lang_Object_2_classLit), Lpuzzle_FourByFourRandomTurnsCubePuzzle_2_classLit = createForClass('puzzle.', 'FourByFourRandomTurnsCubePuzzle', 306, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_MegaminxPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'MegaminxPuzzleExporterImpl', 311, Ljava_lang_Object_2_classLit), Lpuzzle_MegaminxPuzzle_2_classLit = createForClass('puzzle.', 'MegaminxPuzzle', 308, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_NoInspectionFiveByFiveCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'NoInspectionFiveByFiveCubePuzzleExporterImpl', 313, Ljava_lang_Object_2_classLit), Lpuzzle_CubePuzzle$CubeMove_2_classLit = createForClass('puzzle.', 'CubePuzzle$CubeMove', 299, Ljava_lang_Object_2_classLit), _3Lpuzzle_CubePuzzle$CubeMove_2_classLit = createForArray('[Lpuzzle.', 'CubePuzzle$CubeMove;', 352, Lpuzzle_CubePuzzle$CubeMove_2_classLit), Lpuzzle_NoInspectionFiveByFiveCubePuzzle_2_classLit = createForClass('puzzle.', 'NoInspectionFiveByFiveCubePuzzle', 312, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_NoInspectionFourByFourCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'NoInspectionFourByFourCubePuzzleExporterImpl', 315, Ljava_lang_Object_2_classLit), Lpuzzle_NoInspectionFourByFourCubePuzzle_2_classLit = createForClass('puzzle.', 'NoInspectionFourByFourCubePuzzle', 314, Lpuzzle_FourByFourCubePuzzle_2_classLit), Lpuzzle_NoInspectionThreeByThreeCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'NoInspectionThreeByThreeCubePuzzleExporterImpl', 318, Ljava_lang_Object_2_classLit), Lpuzzle_ThreeByThreeCubePuzzle_2_classLit = createForClass('puzzle.', 'ThreeByThreeCubePuzzle', 317, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit = createForClass('puzzle.', 'NoInspectionThreeByThreeCubePuzzle', 316, Lpuzzle_ThreeByThreeCubePuzzle_2_classLit), Ljava_util_Random_2_classLit = createForClass('java.util.', 'Random', 184, Ljava_lang_Object_2_classLit), Lpuzzle_PyraminxPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'PyraminxPuzzleExporterImpl', 321, Ljava_lang_Object_2_classLit), Lpuzzle_PyraminxPuzzle_2_classLit = createForClass('puzzle.', 'PyraminxPuzzle', 319, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_SkewbPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'SkewbPuzzleExporterImpl', 326, Ljava_lang_Object_2_classLit), Lpuzzle_SkewbPuzzle_2_classLit = createForClass('puzzle.', 'SkewbPuzzle', 324, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_SquareOnePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'SquareOnePuzzleExporterImpl', 331, Ljava_lang_Object_2_classLit), Lpuzzle_SquareOnePuzzle_2_classLit = createForClass('puzzle.', 'SquareOnePuzzle', 329, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_ThreeByThreeCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'ThreeByThreeCubePuzzleExporterImpl', 333, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'TwoByTwoCubePuzzleExporterImpl', 335, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoCubePuzzle_2_classLit = createForClass('puzzle.', 'TwoByTwoCubePuzzle', 334, Lpuzzle_CubePuzzle_2_classLit), Ljava_util_logging_Formatter_2_classLit = createForClass('java.util.logging.', 'Formatter', 94, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_impl_FormatterImpl_2_classLit = createForClass('com.google.gwt.logging.impl.', 'FormatterImpl', 93, Ljava_util_logging_Formatter_2_classLit), Lcom_google_gwt_logging_client_TextLogFormatter_2_classLit = createForClass('com.google.gwt.logging.client.', 'TextLogFormatter', 101, Lcom_google_gwt_logging_impl_FormatterImpl_2_classLit), Lcom_google_gwt_logging_client_HtmlLogFormatter_2_classLit = createForClass('com.google.gwt.logging.client.', 'HtmlLogFormatter', 92, Lcom_google_gwt_logging_impl_FormatterImpl_2_classLit), Lcom_google_gwt_user_client_ui_UIObject_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'UIObject', 133, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_ui_Widget_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Widget', 132, Lcom_google_gwt_user_client_ui_UIObject_2_classLit), Lcom_google_gwt_user_client_ui_LabelBase_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'LabelBase', 131, Lcom_google_gwt_user_client_ui_Widget_2_classLit), Lcom_google_gwt_user_client_ui_Label_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Label', 130, Lcom_google_gwt_user_client_ui_LabelBase_2_classLit), Lcom_google_gwt_user_client_ui_HTML_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'HTML', 129, Lcom_google_gwt_user_client_ui_Label_2_classLit), Lcom_google_gwt_i18n_client_HasDirection$Direction_2_classLit = createForEnum('com.google.gwt.i18n.client.', 'HasDirection$Direction', 59, Ljava_lang_Enum_2_classLit, values_1), _3Lcom_google_gwt_i18n_client_HasDirection$Direction_2_classLit = createForArray('[Lcom.google.gwt.i18n.client.', 'HasDirection$Direction;', 353, Lcom_google_gwt_i18n_client_HasDirection$Direction_2_classLit), Ljava_util_NoSuchElementException_2_classLit = createForClass('java.util.', 'NoSuchElementException', 225, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_IllegalStateException_2_classLit = createForClass('java.lang.', 'IllegalStateException', 167, Ljava_lang_RuntimeException_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle$PuzzleState', 263, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.scrambles.', 'Puzzle$PuzzleState;', 354, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle$Bucket_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle$Bucket', 262, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle$SortedBuckets_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle$SortedBuckets', 264, Ljava_lang_Object_2_classLit), _3_3Lpuzzle_CubePuzzle$CubeMove_2_classLit = createForArray('[[Lpuzzle.', 'CubePuzzle$CubeMove;', 355, _3Lpuzzle_CubePuzzle$CubeMove_2_classLit), _3_3I_classLit = createForArray('', '[[I', 356, _3I_classLit), _3_3_3I_classLit = createForArray('', '[[[I', 357, _3_3I_classLit), Lpuzzle_CubePuzzle$Face_2_classLit = createForEnum('puzzle.', 'CubePuzzle$Face', 301, Ljava_lang_Enum_2_classLit, values_3), _3Lpuzzle_CubePuzzle$Face_2_classLit = createForArray('[Lpuzzle.', 'CubePuzzle$Face;', 358, Lpuzzle_CubePuzzle$Face_2_classLit), Lpuzzle_CubePuzzle$CubeState_2_classLit = createForClass('puzzle.', 'CubePuzzle$CubeState', 300, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lpuzzle_ClockPuzzle$ClockState_2_classLit = createForClass('puzzle.', 'ClockPuzzle$ClockState', 296, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lpuzzle_MegaminxPuzzle$Face_2_classLit = createForEnum('puzzle.', 'MegaminxPuzzle$Face', 309, Ljava_lang_Enum_2_classLit, values_4), _3Lpuzzle_MegaminxPuzzle$Face_2_classLit = createForArray('[Lpuzzle.', 'MegaminxPuzzle$Face;', 359, Lpuzzle_MegaminxPuzzle$Face_2_classLit), Lpuzzle_MegaminxPuzzle$MegaminxState_2_classLit = createForClass('puzzle.', 'MegaminxPuzzle$MegaminxState', 310, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lnet_gnehzr_tnoodle_svglite_Element_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Element', 270, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Path_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Path', 275, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Path_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Path;', 360, Lnet_gnehzr_tnoodle_svglite_Path_2_classLit), Lnet_gnehzr_tnoodle_svglite_Point2D$Double_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Point2D$Double', 278, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Point2D$Double_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Point2D$Double;', 361, Lnet_gnehzr_tnoodle_svglite_Point2D$Double_2_classLit), Ljava_lang_ThreadLocal_2_classLit = createForClass('java.lang.', 'ThreadLocal', 181, Ljava_lang_Object_2_classLit), Lpuzzle_ThreeByThreeCubePuzzle$1_2_classLit = createForClass('puzzle.', 'ThreeByThreeCubePuzzle$1', 332, Ljava_lang_ThreadLocal_2_classLit), Lpuzzle_PyraminxPuzzle$PyraminxState_2_classLit = createForClass('puzzle.', 'PyraminxPuzzle$PyraminxState', 320, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lnet_gnehzr_tnoodle_svglite_Color_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Color', 271, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Color_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Color;', 362, Lnet_gnehzr_tnoodle_svglite_Color_2_classLit), Lnet_gnehzr_tnoodle_svglite_Transform_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Transform', 282, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Transform_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Transform;', 363, Lnet_gnehzr_tnoodle_svglite_Transform_2_classLit), Lpuzzle_SkewbPuzzle$SkewbState_2_classLit = createForClass('puzzle.', 'SkewbPuzzle$SkewbState', 325, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lpuzzle_SquareOnePuzzle$SquareOneState_2_classLit = createForClass('puzzle.', 'SquareOnePuzzle$SquareOneState', 330, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lcom_google_gwt_user_client_impl_WindowImpl_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'WindowImpl', 125, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableCollection_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableCollection', 202, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableList_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableList', 204, Ljava_util_Collections$UnmodifiableCollection_2_classLit), Ljava_util_Collections$UnmodifiableMap_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap', 205, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableSet_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableSet', 207, Ljava_util_Collections$UnmodifiableCollection_2_classLit), Ljava_util_Collections$UnmodifiableMap$UnmodifiableEntrySet_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap$UnmodifiableEntrySet', 206, Ljava_util_Collections$UnmodifiableSet_2_classLit), Ljava_util_Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry', 209, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableRandomAccessList_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableRandomAccessList', 210, Ljava_util_Collections$UnmodifiableList_2_classLit), Ljava_util_Collections$UnmodifiableCollectionIterator_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableCollectionIterator', 203, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableMap$UnmodifiableEntrySet$1_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap$UnmodifiableEntrySet$1', 208, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Dimension_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Dimension', 272, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_InvalidScrambleException_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'InvalidScrambleException', 260, Ljava_lang_Exception_2_classLit), Lnet_gnehzr_tnoodle_scrambles_PuzzleStateAndGenerator_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'PuzzleStateAndGenerator', 267, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_impl_WindowImplIE_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'WindowImplIE', 126, Lcom_google_gwt_user_client_impl_WindowImpl_2_classLit), Lcom_google_gwt_user_client_impl_WindowImplMozilla_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'WindowImplMozilla', 127, Lcom_google_gwt_user_client_impl_WindowImpl_2_classLit), Ljava_lang_IndexOutOfBoundsException_2_classLit = createForClass('java.lang.', 'IndexOutOfBoundsException', 168, Ljava_lang_RuntimeException_2_classLit), Ljava_util_HashSet_2_classLit = createForClass('java.util.', 'HashSet', 216, Ljava_util_AbstractSet_2_classLit), Lcom_google_gwt_user_client_ui_DirectionalTextHelper_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'DirectionalTextHelper', 128, Ljava_lang_Object_2_classLit), Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign', 45, Ljava_lang_Enum_2_classLit, values_0), _3Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit = createForArray('[Lcom.google.gwt.dom.client.', 'Style$TextAlign;', 364, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit), Lcom_google_gwt_dom_client_Style$TextAlign$1_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$1', 47, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_dom_client_Style$TextAlign$2_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$2', 48, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_dom_client_Style$TextAlign$3_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$3', 49, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_dom_client_Style$TextAlign$4_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$4', 50, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_i18n_client_LocaleInfo_2_classLit = createForClass('com.google.gwt.i18n.client.', 'LocaleInfo', 60, Ljava_lang_Object_2_classLit), Ljava_security_SecureRandom_2_classLit = createForClass('java.security.', 'SecureRandom', 183, Ljava_util_Random_2_classLit), Lcom_google_gwt_user_client_ui_Image_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Image', 134, Lcom_google_gwt_user_client_ui_Widget_2_classLit), Lcom_google_gwt_user_client_ui_Image$State_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Image$State', 135, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_ui_Image$UnclippedState_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Image$UnclippedState', 136, Lcom_google_gwt_user_client_ui_Image$State_2_classLit), Lcom_google_gwt_json_client_JSONValue_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONValue', 65, Ljava_lang_Object_2_classLit), Lcom_google_gwt_json_client_JSONObject_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONObject', 70, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lnet_gnehzr_tnoodle_scrambles_PuzzleImageInfo_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'PuzzleImageInfo', 266, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Svg_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Svg', 280, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Lnet_gnehzr_tnoodle_svglite_Path$Command_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Path$Command', 276, Ljava_lang_Object_2_classLit), Lcs_min2phase_Search_2_classLit = createForClass('cs.min2phase.', 'Search', 146, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_AlgorithmBuilder_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'AlgorithmBuilder', 257, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_AlgorithmBuilder$IndexAndMove_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'AlgorithmBuilder$IndexAndMove', 258, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_InvalidMoveException_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'InvalidMoveException', 259, Ljava_lang_Exception_2_classLit), Lpuzzle_PyraminxSolver_2_classLit = createForClass('puzzle.', 'PyraminxSolver', 322, Ljava_lang_Object_2_classLit), Lpuzzle_PyraminxSolver$PyraminxSolverState_2_classLit = createForClass('puzzle.', 'PyraminxSolver$PyraminxSolverState', 323, Ljava_lang_Object_2_classLit), _3_3C_classLit = createForArray('', '[[C', 365, _3C_classLit), _3_3B_classLit = createForArray('', '[[B', 366, _3B_classLit), Lpuzzle_SkewbSolver_2_classLit = createForClass('puzzle.', 'SkewbSolver', 327, Ljava_lang_Object_2_classLit), Lpuzzle_SkewbSolver$SkewbSolverState_2_classLit = createForClass('puzzle.', 'SkewbSolver$SkewbSolverState', 328, Ljava_lang_Object_2_classLit), Lcs_sq12phase_Search_2_classLit = createForClass('cs.sq12phase.', 'Search', 150, Ljava_lang_Object_2_classLit), Lcs_sq12phase_FullCube_2_classLit = createForClass('cs.sq12phase.', 'FullCube', 149, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoSolver_2_classLit = createForClass('puzzle.', 'TwoByTwoSolver', 336, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoSolver$TwoByTwoState_2_classLit = createForClass('puzzle.', 'TwoByTwoSolver$TwoByTwoState', 337, Ljava_lang_Object_2_classLit), Lcom_google_gwt_dom_client_DOMImpl_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImpl', 28, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_impl_DOMImpl_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImpl', 115, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplTrident_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplTrident', 117, Lcom_google_gwt_user_client_impl_DOMImpl_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplIE8_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplIE8', 118, Lcom_google_gwt_user_client_impl_DOMImplTrident_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplStandard', 121, Lcom_google_gwt_user_client_impl_DOMImpl_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplMozilla_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplMozilla', 122, Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplStandardBase_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplStandardBase', 120, Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplIE9_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplIE9', 119, Lcom_google_gwt_user_client_impl_DOMImplStandardBase_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplIE6_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplIE6', 116, Lcom_google_gwt_user_client_impl_DOMImplTrident_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplOpera_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplOpera', 123, Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplWebkit_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplWebkit', 124, Lcom_google_gwt_user_client_impl_DOMImplStandardBase_2_classLit), Lcom_google_gwt_json_client_JSONArray_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONArray', 64, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_json_client_JSONString_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONString', 72, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_json_client_JSONNumber_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONNumber', 69, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lnet_gnehzr_tnoodle_svglite_InvalidHexColorException_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'InvalidHexColorException', 274, Ljava_lang_Exception_2_classLit), Lnet_gnehzr_tnoodle_svglite_Group_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Group', 273, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), _3_3Z_classLit = createForArray('', '[[Z', 367, _3Z_classLit), Lcs_min2phase_CubieCube_2_classLit = createForClass('cs.min2phase.', 'CubieCube', 145, Ljava_lang_Object_2_classLit), _3Lcs_min2phase_CubieCube_2_classLit = createForArray('[Lcs.min2phase.', 'CubieCube;', 368, Lcs_min2phase_CubieCube_2_classLit), Lcs_sq12phase_Shape_2_classLit = createForClass('cs.sq12phase.', 'Shape', 151, Ljava_lang_Object_2_classLit), Ljava_lang_NumberFormatException_2_classLit = createForClass('java.lang.', 'NumberFormatException', 175, Ljava_lang_IllegalArgumentException_2_classLit), Lcom_google_gwt_dom_client_DOMImplTrident_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplTrident', 30, Lcom_google_gwt_dom_client_DOMImpl_2_classLit), Lcom_google_gwt_dom_client_DOMImplIE8_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplIE8', 31, Lcom_google_gwt_dom_client_DOMImplTrident_2_classLit), Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplStandard', 34, Lcom_google_gwt_dom_client_DOMImpl_2_classLit), Lcom_google_gwt_dom_client_DOMImplMozilla_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplMozilla', 35, Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit), Lcom_google_gwt_dom_client_DOMImplStandardBase_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplStandardBase', 33, Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit), Lcom_google_gwt_dom_client_DOMImplIE9_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplIE9', 32, Lcom_google_gwt_dom_client_DOMImplStandardBase_2_classLit), Lcom_google_gwt_dom_client_DOMImplOpera_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplOpera', 36, Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit), Lcom_google_gwt_dom_client_DOMImplWebkit_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplWebkit', 37, Lcom_google_gwt_dom_client_DOMImplStandardBase_2_classLit), Lcom_google_gwt_dom_client_DOMImplIE6_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplIE6', 29, Lcom_google_gwt_dom_client_DOMImplTrident_2_classLit), Ljava_util_Comparators$1_2_classLit = createForClass('java.util.', 'Comparators$1', 212, Ljava_lang_Object_2_classLit), Lcom_google_gwt_safehtml_shared_SafeUriString_2_classLit = createForClass('com.google.gwt.safehtml.shared.', 'SafeUriString', 107, Ljava_lang_Object_2_classLit), Ljava_util_LinkedHashMap_2_classLit = createForClass('java.util.', 'LinkedHashMap', 217, Ljava_util_HashMap_2_classLit), Ljava_util_LinkedHashMap$ChainEntry_2_classLit = createForClass('java.util.', 'LinkedHashMap$ChainEntry', 218, Ljava_util_MapEntryImpl_2_classLit), Ljava_util_LinkedHashMap$EntrySet_2_classLit = createForClass('java.util.', 'LinkedHashMap$EntrySet', 220, Ljava_util_AbstractSet_2_classLit), Ljava_util_LinkedHashMap$EntrySet$EntryIterator_2_classLit = createForClass('java.util.', 'LinkedHashMap$EntrySet$EntryIterator', 221, Ljava_lang_Object_2_classLit), Lcs_sq12phase_Square_2_classLit = createForClass('cs.sq12phase.', 'Square', 152, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Rectangle_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Rectangle', 279, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Lnet_gnehzr_tnoodle_utils_TimedLogRecordStart_2_classLit = createForClass('net.gnehzr.tnoodle.utils.', 'TimedLogRecordStart', 287, Ljava_util_logging_LogRecord_2_classLit), Lnet_gnehzr_tnoodle_utils_TimedLogRecordEnd_2_classLit = createForClass('net.gnehzr.tnoodle.utils.', 'TimedLogRecordEnd', 286, Ljava_util_logging_LogRecord_2_classLit), Lnet_gnehzr_tnoodle_svglite_Ellipse_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Ellipse', 269, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Lnet_gnehzr_tnoodle_svglite_Circle_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Circle', 268, Lnet_gnehzr_tnoodle_svglite_Ellipse_2_classLit), Ljava_util_TreeSet_2_classLit = createForClass('java.util.', 'TreeSet', 238, Ljava_util_AbstractSet_2_classLit), Lcom_google_gwt_json_client_JSONException_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONException', 67, Ljava_lang_RuntimeException_2_classLit), Lnet_gnehzr_tnoodle_svglite_PathIterator_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'PathIterator', 277, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Text_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Text', 281, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Ljava_util_TreeMap_2_classLit = createForClass('java.util.', 'TreeMap', 226, Ljava_util_AbstractMap_2_classLit), Ljava_util_TreeMap$EntryIterator_2_classLit = createForClass('java.util.', 'TreeMap$EntryIterator', 228, Ljava_lang_Object_2_classLit), Ljava_util_TreeMap$EntrySet_2_classLit = createForClass('java.util.', 'TreeMap$EntrySet', 229, Ljava_util_AbstractSet_2_classLit), Ljava_util_TreeMap$Node_2_classLit = createForClass('java.util.', 'TreeMap$Node', 230, Ljava_lang_Object_2_classLit), _3Ljava_util_TreeMap$Node_2_classLit = createForArray('[Ljava.util.', 'TreeMap$Node;', 369, Ljava_util_TreeMap$Node_2_classLit), Ljava_util_TreeMap$State_2_classLit = createForClass('java.util.', 'TreeMap$State', 231, Ljava_lang_Object_2_classLit), Ljava_util_TreeMap$SubMap_2_classLit = createForClass('java.util.', 'TreeMap$SubMap', 232, Ljava_util_AbstractMap_2_classLit), Ljava_util_TreeMap$SubMapType_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType', 234, Ljava_lang_Enum_2_classLit, values_2), _3Ljava_util_TreeMap$SubMapType_2_classLit = createForArray('[Ljava.util.', 'TreeMap$SubMapType;', 370, Ljava_util_TreeMap$SubMapType_2_classLit), Ljava_util_TreeMap$SubMap$1_2_classLit = createForClass('java.util.', 'TreeMap$SubMap$1', 233, Ljava_util_AbstractSet_2_classLit), Ljava_util_TreeMap$SubMapType$1_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType$1', 235, Ljava_util_TreeMap$SubMapType_2_classLit, null), Ljava_util_TreeMap$SubMapType$2_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType$2', 236, Ljava_util_TreeMap$SubMapType_2_classLit, null), Ljava_util_TreeMap$SubMapType$3_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType$3', 237, Ljava_util_TreeMap$SubMapType_2_classLit, null), Ljava_util_TreeMap$1_2_classLit = createForClass('java.util.', 'TreeMap$1', 227, Ljava_lang_Object_2_classLit), Ljava_util_AbstractSequentialList_2_classLit = createForClass('java.util.', 'AbstractSequentialList', 198, Ljava_util_AbstractList_2_classLit), Ljava_util_LinkedList_2_classLit = createForClass('java.util.', 'LinkedList', 222, Ljava_util_AbstractSequentialList_2_classLit), Ljava_util_LinkedList$ListIteratorImpl_2_classLit = createForClass('java.util.', 'LinkedList$ListIteratorImpl', 223, Ljava_lang_Object_2_classLit), Ljava_util_LinkedList$Node_2_classLit = createForClass('java.util.', 'LinkedList$Node', 224, Ljava_lang_Object_2_classLit), Lcom_google_gwt_json_client_JSONBoolean_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONBoolean', 66, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_json_client_JSONNull_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONNull', 68, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_i18n_client_NumberFormat_2_classLit = createForClass('com.google.gwt.i18n.client.', 'NumberFormat', 61, Ljava_lang_Object_2_classLit), Lcom_google_gwt_i18n_client_constants_NumberConstantsImpl_1_2_classLit = createForClass('com.google.gwt.i18n.client.constants.', 'NumberConstantsImpl_', 62, Ljava_lang_Object_2_classLit);
+var Ljava_lang_Object_2_classLit = createForClass('java.lang.', 'Object', 1, null), Lcom_google_gwt_core_client_JavaScriptObject_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptObject$', 9, Ljava_lang_Object_2_classLit), I_classLit = createForPrimitive('int', ' I'), _3I_classLit = createForArray('', '[I', 358, I_classLit), _3Ljava_lang_Object_2_classLit = createForArray('[Ljava.lang.', 'Object;', 356, Ljava_lang_Object_2_classLit), Z_classLit = createForPrimitive('boolean', ' Z'), _3Z_classLit = createForArray('', '[Z', 359, Z_classLit), Ljava_lang_Throwable_2_classLit = createForClass('java.lang.', 'Throwable', 8, Ljava_lang_Object_2_classLit), Ljava_lang_Exception_2_classLit = createForClass('java.lang.', 'Exception', 7, Ljava_lang_Throwable_2_classLit), Ljava_lang_RuntimeException_2_classLit = createForClass('java.lang.', 'RuntimeException', 6, Ljava_lang_Exception_2_classLit), Ljava_lang_StackTraceElement_2_classLit = createForClass('java.lang.', 'StackTraceElement', 188, Ljava_lang_Object_2_classLit), _3Ljava_lang_StackTraceElement_2_classLit = createForArray('[Ljava.lang.', 'StackTraceElement;', 360, Ljava_lang_StackTraceElement_2_classLit), Lcom_google_gwt_lang_LongLibBase$LongEmul_2_classLit = createForClass('com.google.gwt.lang.', 'LongLibBase$LongEmul', 83, Ljava_lang_Object_2_classLit), _3Lcom_google_gwt_lang_LongLibBase$LongEmul_2_classLit = createForArray('[Lcom.google.gwt.lang.', 'LongLibBase$LongEmul;', 361, Lcom_google_gwt_lang_LongLibBase$LongEmul_2_classLit), Lcom_google_gwt_lang_SeedUtil_2_classLit = createForClass('com.google.gwt.lang.', 'SeedUtil', 84, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_LogConfiguration_2_classLit = createForClass('com.google.gwt.logging.client.', 'LogConfiguration', null, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_LogConfiguration$LogConfigurationImplRegular_2_classLit = createForClass('com.google.gwt.logging.client.', 'LogConfiguration$LogConfigurationImplRegular', 97, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_LogConfiguration$1_2_classLit = createForClass('com.google.gwt.logging.client.', 'LogConfiguration$1', 96, Ljava_lang_Object_2_classLit), Ljava_lang_Enum_2_classLit = createForClass('java.lang.', 'Enum', 46, Ljava_lang_Object_2_classLit), Ljava_lang_Error_2_classLit = createForClass('java.lang.', 'Error', 171, Ljava_lang_Throwable_2_classLit), Ljava_lang_AssertionError_2_classLit = createForClass('java.lang.', 'AssertionError', 170, Ljava_lang_Error_2_classLit), Ljava_lang_Boolean_2_classLit = createForClass('java.lang.', 'Boolean', 172, Ljava_lang_Object_2_classLit), B_classLit = createForPrimitive('byte', ' B'), Ljava_lang_Number_2_classLit = createForClass('java.lang.', 'Number', 177, Ljava_lang_Object_2_classLit), C_classLit = createForPrimitive('char', ' C'), _3C_classLit = createForArray('', '[C', 362, C_classLit), Ljava_lang_Class_2_classLit = createForClass('java.lang.', 'Class', 174, Ljava_lang_Object_2_classLit), D_classLit = createForPrimitive('double', ' D'), _3D_classLit = createForArray('', '[D', 363, D_classLit), Ljava_lang_Double_2_classLit = createForClass('java.lang.', 'Double', 176, Ljava_lang_Number_2_classLit), Ljava_lang_Integer_2_classLit = createForClass('java.lang.', 'Integer', 181, Ljava_lang_Number_2_classLit), _3Ljava_lang_Integer_2_classLit = createForArray('[Ljava.lang.', 'Integer;', 364, Ljava_lang_Integer_2_classLit), Ljava_lang_String_2_classLit = createForClass('java.lang.', 'String', 2, Ljava_lang_Object_2_classLit), _3Ljava_lang_String_2_classLit = createForArray('[Ljava.lang.', 'String;', 357, Ljava_lang_String_2_classLit), _3B_classLit = createForArray('', '[B', 365, B_classLit), Ljava_lang_ClassCastException_2_classLit = createForClass('java.lang.', 'ClassCastException', 175, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_StringBuilder_2_classLit = createForClass('java.lang.', 'StringBuilder', 191, Ljava_lang_Object_2_classLit), Ljava_lang_ArrayStoreException_2_classLit = createForClass('java.lang.', 'ArrayStoreException', 169, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_core_client_JavaScriptException_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptException', 5, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplIe6_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplIe6', 139, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplIe8_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplIe8', 140, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplGecko1_18_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplGecko1_8', 138, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplIe9_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplIe9', 141, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplOpera_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplOpera', 142, Ljava_lang_Object_2_classLit), Lcom_google_gwt_useragent_client_UserAgentAsserter_1UserAgentPropertyImplSafari_2_classLit = createForClass('com.google.gwt.useragent.client.', 'UserAgentAsserter_UserAgentPropertyImplSafari', 143, Ljava_lang_Object_2_classLit), Ljava_util_logging_Logger_2_classLit = createForClass('java.util.logging.', 'Logger', 105, Ljava_lang_Object_2_classLit), Ljava_io_OutputStream_2_classLit = createForClass('java.io.', 'OutputStream', 166, Ljava_lang_Object_2_classLit), Ljava_io_FilterOutputStream_2_classLit = createForClass('java.io.', 'FilterOutputStream', 165, Ljava_io_OutputStream_2_classLit), Ljava_io_PrintStream_2_classLit = createForClass('java.io.', 'PrintStream', 167, Ljava_io_FilterOutputStream_2_classLit), Lnet_gnehzr_tnoodle_js_ConsolePrintStream_2_classLit = createForClass('net.gnehzr.tnoodle.js.', 'ConsolePrintStream', 267, Ljava_io_PrintStream_2_classLit), Ljava_lang_ArithmeticException_2_classLit = createForClass('java.lang.', 'ArithmeticException', 168, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImpl', 24, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_impl_LoggerImplRegular_2_classLit = createForClass('com.google.gwt.logging.impl.', 'LoggerImplRegular', 103, Ljava_lang_Object_2_classLit), Ljava_util_logging_Handler_2_classLit = createForClass('java.util.logging.', 'Handler', 88, Ljava_lang_Object_2_classLit), _3Ljava_util_logging_Handler_2_classLit = createForArray('[Ljava.util.logging.', 'Handler;', 366, Ljava_util_logging_Handler_2_classLit), Ljava_util_AbstractMap_2_classLit = createForClass('java.util.', 'AbstractMap', 199, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap_2_classLit = createForClass('java.util.', 'AbstractHashMap', 198, Ljava_util_AbstractMap_2_classLit), Ljava_util_HashMap_2_classLit = createForClass('java.util.', 'HashMap', 228, Ljava_util_AbstractHashMap_2_classLit), Ljava_util_AbstractCollection_2_classLit = createForClass('java.util.', 'AbstractCollection', 197, Ljava_lang_Object_2_classLit), Ljava_util_AbstractSet_2_classLit = createForClass('java.util.', 'AbstractSet', 201, Ljava_util_AbstractCollection_2_classLit), Ljava_util_AbstractHashMap$EntrySet_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySet', 200, Ljava_util_AbstractSet_2_classLit), Ljava_util_AbstractHashMap$EntrySetIterator_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySetIterator', 202, Ljava_lang_Object_2_classLit), Ljava_util_AbstractMapEntry_2_classLit = createForClass('java.util.', 'AbstractMapEntry', 204, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap$MapEntryNull_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryNull', 203, Ljava_util_AbstractMapEntry_2_classLit), Ljava_util_AbstractHashMap$MapEntryString_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryString', 205, Ljava_util_AbstractMapEntry_2_classLit), Ljava_util_AbstractMap$1_2_classLit = createForClass('java.util.', 'AbstractMap$1', 208, Ljava_util_AbstractSet_2_classLit), Ljava_util_AbstractMap$1$1_2_classLit = createForClass('java.util.', 'AbstractMap$1$1', 209, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseImpl', 305, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseActual_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseActual', 304, Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit), Lorg_timepedia_exporter_client_Exportable_2_classLit = createForInterface('org.timepedia.exporter.client.', 'Exportable'), Lcom_google_gwt_core_client_impl_StackTraceCreator$Collector_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$Collector', 19, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorMoz_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorMoz', 21, Lcom_google_gwt_core_client_impl_StackTraceCreator$Collector_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorChrome_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorChrome', 20, Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorMoz_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorChromeNoSourceMap_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorChromeNoSourceMap', 22, Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorChrome_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorOpera_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$CollectorOpera', 23, Lcom_google_gwt_core_client_impl_StackTraceCreator$CollectorMoz_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImplArrayBase_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImplArrayBase', 27, Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImplArray_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImplArray', 26, Lcom_google_gwt_core_client_impl_StringBufferImplArrayBase_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImplAppend_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImplAppend', 25, Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit), Lcom_google_gwt_core_client_Scheduler_2_classLit = createForClass('com.google.gwt.core.client.', 'Scheduler', 14, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_SchedulerImpl_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'SchedulerImpl', 16, Lcom_google_gwt_core_client_Scheduler_2_classLit), Ljava_util_AbstractList_2_classLit = createForClass('java.util.', 'AbstractList', 206, Ljava_util_AbstractCollection_2_classLit), Ljava_util_ArrayList_2_classLit = createForClass('java.util.', 'ArrayList', 212, Ljava_util_AbstractList_2_classLit), Ljava_util_AbstractList$IteratorImpl_2_classLit = createForClass('java.util.', 'AbstractList$IteratorImpl', 207, Ljava_lang_Object_2_classLit), Ljava_util_logging_Level_2_classLit = createForClass('java.util.logging.', 'Level', 254, Ljava_lang_Object_2_classLit), Ljava_util_logging_Level$LevelAll_2_classLit = createForClass('java.util.logging.', 'Level$LevelAll', 255, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelConfig_2_classLit = createForClass('java.util.logging.', 'Level$LevelConfig', 256, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelFine_2_classLit = createForClass('java.util.logging.', 'Level$LevelFine', 257, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelFiner_2_classLit = createForClass('java.util.logging.', 'Level$LevelFiner', 258, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelFinest_2_classLit = createForClass('java.util.logging.', 'Level$LevelFinest', 259, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelInfo_2_classLit = createForClass('java.util.logging.', 'Level$LevelInfo', 260, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelOff_2_classLit = createForClass('java.util.logging.', 'Level$LevelOff', 261, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelSevere_2_classLit = createForClass('java.util.logging.', 'Level$LevelSevere', 262, Ljava_util_logging_Level_2_classLit), Ljava_util_logging_Level$LevelWarning_2_classLit = createForClass('java.util.logging.', 'Level$LevelWarning', 263, Ljava_util_logging_Level_2_classLit), Ljava_lang_NullPointerException_2_classLit = createForClass('java.lang.', 'NullPointerException', 185, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_IllegalArgumentException_2_classLit = createForClass('java.lang.', 'IllegalArgumentException', 178, Ljava_lang_RuntimeException_2_classLit), Ljava_util_logging_LogManager_2_classLit = createForClass('java.util.logging.', 'LogManager', 264, Ljava_lang_Object_2_classLit), Ljava_util_logging_LogManager$RootLogger_2_classLit = createForClass('java.util.logging.', 'LogManager$RootLogger', 265, Ljava_util_logging_Logger_2_classLit), Lcom_google_gwt_logging_impl_LoggerWithExposedConstructor_2_classLit = createForClass('com.google.gwt.logging.impl.', 'LoggerWithExposedConstructor', 104, Ljava_util_logging_Logger_2_classLit), Ljava_util_logging_LogRecord_2_classLit = createForClass('java.util.logging.', 'LogRecord', 266, Ljava_lang_Object_2_classLit), Ljava_lang_UnsupportedOperationException_2_classLit = createForClass('java.lang.', 'UnsupportedOperationException', 194, Ljava_lang_RuntimeException_2_classLit), Ljava_util_MapEntryImpl_2_classLit = createForClass('java.util.', 'MapEntryImpl', 232, Ljava_util_AbstractMapEntry_2_classLit), Lcom_google_gwt_logging_client_ConsoleLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'ConsoleLogHandler', 87, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_DevelopmentModeLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'DevelopmentModeLogHandler', 89, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_FirebugLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'FirebugLogHandler', 90, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_SystemLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'SystemLogHandler', 100, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_NullLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'NullLogHandler', 98, Ljava_util_logging_Handler_2_classLit), Lcom_google_gwt_logging_client_NullLoggingPopup_2_classLit = createForClass('com.google.gwt.logging.client.', 'NullLoggingPopup', 99, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_client_HasWidgetsLogHandler_2_classLit = createForClass('com.google.gwt.logging.client.', 'HasWidgetsLogHandler', 91, Ljava_util_logging_Handler_2_classLit), Ljava_lang_StringBuffer_2_classLit = createForClass('java.lang.', 'StringBuffer', 190, Ljava_lang_Object_2_classLit), Ljava_util_Date_2_classLit = createForClass('java.util.', 'Date', 226, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_PuzzleExporterImpl_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'PuzzleExporterImpl', 279, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle', 275, Ljava_lang_Object_2_classLit), Lpuzzle_CubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'CubePuzzleExporterImpl', 317, Ljava_lang_Object_2_classLit), Lpuzzle_CubePuzzle_2_classLit = createForClass('puzzle.', 'CubePuzzle', 312, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lnet_gnehzr_tnoodle_js_TNoodleJsUtilsExporterImpl_2_classLit = createForClass('net.gnehzr.tnoodle.js.', 'TNoodleJsUtilsExporterImpl', 270, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit = createForClass('net.gnehzr.tnoodle.js.', 'TNoodleJsUtils', null, Ljava_lang_Object_2_classLit), Lpuzzle_ClockPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'ClockPuzzleExporterImpl', 311, Ljava_lang_Object_2_classLit), Lpuzzle_ClockPuzzle_2_classLit = createForClass('puzzle.', 'ClockPuzzle', 309, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_FourByFourCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'FourByFourCubePuzzleExporterImpl', 320, Ljava_lang_Object_2_classLit), Lpuzzle_FourByFourCubePuzzle_2_classLit = createForClass('puzzle.', 'FourByFourCubePuzzle', 318, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_FourByFourRandomTurnsCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'FourByFourRandomTurnsCubePuzzleExporterImpl', 322, Ljava_lang_Object_2_classLit), Lpuzzle_FourByFourRandomTurnsCubePuzzle_2_classLit = createForClass('puzzle.', 'FourByFourRandomTurnsCubePuzzle', 321, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_MegaminxPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'MegaminxPuzzleExporterImpl', 326, Ljava_lang_Object_2_classLit), Lpuzzle_MegaminxPuzzle_2_classLit = createForClass('puzzle.', 'MegaminxPuzzle', 323, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_NoInspectionFiveByFiveCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'NoInspectionFiveByFiveCubePuzzleExporterImpl', 328, Ljava_lang_Object_2_classLit), Lpuzzle_CubePuzzle$CubeMove_2_classLit = createForClass('puzzle.', 'CubePuzzle$CubeMove', 313, Ljava_lang_Object_2_classLit), _3Lpuzzle_CubePuzzle$CubeMove_2_classLit = createForArray('[Lpuzzle.', 'CubePuzzle$CubeMove;', 367, Lpuzzle_CubePuzzle$CubeMove_2_classLit), Lpuzzle_NoInspectionFiveByFiveCubePuzzle_2_classLit = createForClass('puzzle.', 'NoInspectionFiveByFiveCubePuzzle', 327, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_NoInspectionFourByFourCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'NoInspectionFourByFourCubePuzzleExporterImpl', 330, Ljava_lang_Object_2_classLit), Lpuzzle_NoInspectionFourByFourCubePuzzle_2_classLit = createForClass('puzzle.', 'NoInspectionFourByFourCubePuzzle', 329, Lpuzzle_FourByFourCubePuzzle_2_classLit), Lpuzzle_NoInspectionThreeByThreeCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'NoInspectionThreeByThreeCubePuzzleExporterImpl', 333, Ljava_lang_Object_2_classLit), Lpuzzle_ThreeByThreeCubePuzzle_2_classLit = createForClass('puzzle.', 'ThreeByThreeCubePuzzle', 332, Lpuzzle_CubePuzzle_2_classLit), Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit = createForClass('puzzle.', 'NoInspectionThreeByThreeCubePuzzle', 331, Lpuzzle_ThreeByThreeCubePuzzle_2_classLit), Ljava_util_Random_2_classLit = createForClass('java.util.', 'Random', 196, Ljava_lang_Object_2_classLit), Lpuzzle_PyraminxPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'PyraminxPuzzleExporterImpl', 336, Ljava_lang_Object_2_classLit), Lpuzzle_PyraminxPuzzle_2_classLit = createForClass('puzzle.', 'PyraminxPuzzle', 334, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_SkewbPuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'SkewbPuzzleExporterImpl', 341, Ljava_lang_Object_2_classLit), Lpuzzle_SkewbPuzzle_2_classLit = createForClass('puzzle.', 'SkewbPuzzle', 339, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_SquareOnePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'SquareOnePuzzleExporterImpl', 346, Ljava_lang_Object_2_classLit), Lpuzzle_SquareOnePuzzle_2_classLit = createForClass('puzzle.', 'SquareOnePuzzle', 344, Lnet_gnehzr_tnoodle_scrambles_Puzzle_2_classLit), Lpuzzle_ThreeByThreeCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'ThreeByThreeCubePuzzleExporterImpl', 348, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoCubePuzzleExporterImpl_2_classLit = createForClass('puzzle.', 'TwoByTwoCubePuzzleExporterImpl', 350, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoCubePuzzle_2_classLit = createForClass('puzzle.', 'TwoByTwoCubePuzzle', 349, Lpuzzle_CubePuzzle_2_classLit), Ljava_util_logging_Formatter_2_classLit = createForClass('java.util.logging.', 'Formatter', 94, Ljava_lang_Object_2_classLit), Lcom_google_gwt_logging_impl_FormatterImpl_2_classLit = createForClass('com.google.gwt.logging.impl.', 'FormatterImpl', 93, Ljava_util_logging_Formatter_2_classLit), Lcom_google_gwt_logging_client_TextLogFormatter_2_classLit = createForClass('com.google.gwt.logging.client.', 'TextLogFormatter', 101, Lcom_google_gwt_logging_impl_FormatterImpl_2_classLit), Lcom_google_gwt_logging_client_HtmlLogFormatter_2_classLit = createForClass('com.google.gwt.logging.client.', 'HtmlLogFormatter', 92, Lcom_google_gwt_logging_impl_FormatterImpl_2_classLit), Lcom_google_gwt_user_client_ui_UIObject_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'UIObject', 133, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_ui_Widget_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Widget', 132, Lcom_google_gwt_user_client_ui_UIObject_2_classLit), Lcom_google_gwt_user_client_ui_LabelBase_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'LabelBase', 131, Lcom_google_gwt_user_client_ui_Widget_2_classLit), Lcom_google_gwt_user_client_ui_Label_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Label', 130, Lcom_google_gwt_user_client_ui_LabelBase_2_classLit), Lcom_google_gwt_user_client_ui_HTML_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'HTML', 129, Lcom_google_gwt_user_client_ui_Label_2_classLit), Lcom_google_gwt_i18n_client_HasDirection$Direction_2_classLit = createForEnum('com.google.gwt.i18n.client.', 'HasDirection$Direction', 59, Ljava_lang_Enum_2_classLit, values_1), _3Lcom_google_gwt_i18n_client_HasDirection$Direction_2_classLit = createForArray('[Lcom.google.gwt.i18n.client.', 'HasDirection$Direction;', 368, Lcom_google_gwt_i18n_client_HasDirection$Direction_2_classLit), Ljava_util_NoSuchElementException_2_classLit = createForClass('java.util.', 'NoSuchElementException', 238, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_IllegalStateException_2_classLit = createForClass('java.lang.', 'IllegalStateException', 179, Ljava_lang_RuntimeException_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle$PuzzleState', 277, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.scrambles.', 'Puzzle$PuzzleState;', 369, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle$Bucket_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle$Bucket', 276, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_Puzzle$SortedBuckets_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'Puzzle$SortedBuckets', 278, Ljava_lang_Object_2_classLit), _3_3Lpuzzle_CubePuzzle$CubeMove_2_classLit = createForArray('[[Lpuzzle.', 'CubePuzzle$CubeMove;', 370, _3Lpuzzle_CubePuzzle$CubeMove_2_classLit), _3_3I_classLit = createForArray('', '[[I', 371, _3I_classLit), _3_3_3I_classLit = createForArray('', '[[[I', 372, _3_3I_classLit), Lpuzzle_CubePuzzle$Face_2_classLit = createForEnum('puzzle.', 'CubePuzzle$Face', 315, Ljava_lang_Enum_2_classLit, values_3), _3Lpuzzle_CubePuzzle$Face_2_classLit = createForArray('[Lpuzzle.', 'CubePuzzle$Face;', 373, Lpuzzle_CubePuzzle$Face_2_classLit), Lpuzzle_CubePuzzle$CubeState_2_classLit = createForClass('puzzle.', 'CubePuzzle$CubeState', 314, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lpuzzle_ClockPuzzle$ClockState_2_classLit = createForClass('puzzle.', 'ClockPuzzle$ClockState', 310, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Ljava_lang_ThreadLocal_2_classLit = createForClass('java.lang.', 'ThreadLocal', 193, Ljava_lang_Object_2_classLit), Lpuzzle_FourByFourCubePuzzle$1_2_classLit = createForClass('puzzle.', 'FourByFourCubePuzzle$1', 319, Ljava_lang_ThreadLocal_2_classLit), Lpuzzle_MegaminxPuzzle$Face_2_classLit = createForEnum('puzzle.', 'MegaminxPuzzle$Face', 324, Ljava_lang_Enum_2_classLit, values_4), _3Lpuzzle_MegaminxPuzzle$Face_2_classLit = createForArray('[Lpuzzle.', 'MegaminxPuzzle$Face;', 374, Lpuzzle_MegaminxPuzzle$Face_2_classLit), Lpuzzle_MegaminxPuzzle$MegaminxState_2_classLit = createForClass('puzzle.', 'MegaminxPuzzle$MegaminxState', 325, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lnet_gnehzr_tnoodle_svglite_Element_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Element', 284, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Path_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Path', 289, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Path_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Path;', 375, Lnet_gnehzr_tnoodle_svglite_Path_2_classLit), Lnet_gnehzr_tnoodle_svglite_Point2D$Double_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Point2D$Double', 292, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Point2D$Double_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Point2D$Double;', 376, Lnet_gnehzr_tnoodle_svglite_Point2D$Double_2_classLit), Lpuzzle_ThreeByThreeCubePuzzle$1_2_classLit = createForClass('puzzle.', 'ThreeByThreeCubePuzzle$1', 347, Ljava_lang_ThreadLocal_2_classLit), Lpuzzle_PyraminxPuzzle$PyraminxState_2_classLit = createForClass('puzzle.', 'PyraminxPuzzle$PyraminxState', 335, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lnet_gnehzr_tnoodle_svglite_Color_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Color', 285, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Color_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Color;', 377, Lnet_gnehzr_tnoodle_svglite_Color_2_classLit), Lnet_gnehzr_tnoodle_svglite_Transform_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Transform', 296, Ljava_lang_Object_2_classLit), _3Lnet_gnehzr_tnoodle_svglite_Transform_2_classLit = createForArray('[Lnet.gnehzr.tnoodle.svglite.', 'Transform;', 378, Lnet_gnehzr_tnoodle_svglite_Transform_2_classLit), Lpuzzle_SkewbPuzzle$SkewbState_2_classLit = createForClass('puzzle.', 'SkewbPuzzle$SkewbState', 340, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lpuzzle_SquareOnePuzzle$SquareOneState_2_classLit = createForClass('puzzle.', 'SquareOnePuzzle$SquareOneState', 345, Lnet_gnehzr_tnoodle_scrambles_Puzzle$PuzzleState_2_classLit), Lcom_google_gwt_user_client_impl_WindowImpl_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'WindowImpl', 125, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableCollection_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableCollection', 215, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableList_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableList', 217, Ljava_util_Collections$UnmodifiableCollection_2_classLit), Ljava_util_Collections$UnmodifiableMap_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap', 218, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableSet_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableSet', 220, Ljava_util_Collections$UnmodifiableCollection_2_classLit), Ljava_util_Collections$UnmodifiableMap$UnmodifiableEntrySet_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap$UnmodifiableEntrySet', 219, Ljava_util_Collections$UnmodifiableSet_2_classLit), Ljava_util_Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry', 222, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableRandomAccessList_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableRandomAccessList', 223, Ljava_util_Collections$UnmodifiableList_2_classLit), Ljava_util_Collections$UnmodifiableCollectionIterator_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableCollectionIterator', 216, Ljava_lang_Object_2_classLit), Ljava_util_Collections$UnmodifiableMap$UnmodifiableEntrySet$1_2_classLit = createForClass('java.util.', 'Collections$UnmodifiableMap$UnmodifiableEntrySet$1', 221, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Dimension_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Dimension', 286, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_InvalidScrambleException_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'InvalidScrambleException', 274, Ljava_lang_Exception_2_classLit), Lnet_gnehzr_tnoodle_scrambles_PuzzleStateAndGenerator_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'PuzzleStateAndGenerator', 281, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_impl_WindowImplIE_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'WindowImplIE', 126, Lcom_google_gwt_user_client_impl_WindowImpl_2_classLit), Lcom_google_gwt_user_client_impl_WindowImplMozilla_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'WindowImplMozilla', 127, Lcom_google_gwt_user_client_impl_WindowImpl_2_classLit), Ljava_lang_IndexOutOfBoundsException_2_classLit = createForClass('java.lang.', 'IndexOutOfBoundsException', 180, Ljava_lang_RuntimeException_2_classLit), Ljava_util_HashSet_2_classLit = createForClass('java.util.', 'HashSet', 229, Ljava_util_AbstractSet_2_classLit), Lcom_google_gwt_user_client_ui_DirectionalTextHelper_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'DirectionalTextHelper', 128, Ljava_lang_Object_2_classLit), Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign', 45, Ljava_lang_Enum_2_classLit, values_0), _3Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit = createForArray('[Lcom.google.gwt.dom.client.', 'Style$TextAlign;', 379, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit), Lcom_google_gwt_dom_client_Style$TextAlign$1_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$1', 47, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_dom_client_Style$TextAlign$2_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$2', 48, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_dom_client_Style$TextAlign$3_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$3', 49, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_dom_client_Style$TextAlign$4_2_classLit = createForEnum('com.google.gwt.dom.client.', 'Style$TextAlign$4', 50, Lcom_google_gwt_dom_client_Style$TextAlign_2_classLit, null), Lcom_google_gwt_i18n_client_LocaleInfo_2_classLit = createForClass('com.google.gwt.i18n.client.', 'LocaleInfo', 60, Ljava_lang_Object_2_classLit), Ljava_security_SecureRandom_2_classLit = createForClass('java.security.', 'SecureRandom', 195, Ljava_util_Random_2_classLit), Lcom_google_gwt_user_client_ui_Image_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Image', 134, Lcom_google_gwt_user_client_ui_Widget_2_classLit), Lcom_google_gwt_user_client_ui_Image$State_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Image$State', 135, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_ui_Image$UnclippedState_2_classLit = createForClass('com.google.gwt.user.client.ui.', 'Image$UnclippedState', 136, Lcom_google_gwt_user_client_ui_Image$State_2_classLit), Lcom_google_gwt_json_client_JSONValue_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONValue', 65, Ljava_lang_Object_2_classLit), Lcom_google_gwt_json_client_JSONObject_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONObject', 70, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lnet_gnehzr_tnoodle_scrambles_PuzzleImageInfo_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'PuzzleImageInfo', 280, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Svg_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Svg', 294, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Lnet_gnehzr_tnoodle_scrambles_AlgorithmBuilder_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'AlgorithmBuilder', 271, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_AlgorithmBuilder$IndexAndMove_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'AlgorithmBuilder$IndexAndMove', 272, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_scrambles_InvalidMoveException_2_classLit = createForClass('net.gnehzr.tnoodle.scrambles.', 'InvalidMoveException', 273, Ljava_lang_Exception_2_classLit), Lcs_threephase_Edge3_2_classLit = createForClass('cs.threephase.', 'Edge3', 158, Ljava_lang_Object_2_classLit), _3Lcs_threephase_Edge3_2_classLit = createForArray('[Lcs.threephase.', 'Edge3;', 380, Lcs_threephase_Edge3_2_classLit), Lcs_threephase_FullCube_2_classLit = createForClass('cs.threephase.', 'FullCube', 160, Ljava_lang_Object_2_classLit), _3Lcs_threephase_FullCube_2_classLit = createForArray('[Lcs.threephase.', 'FullCube;', 381, Lcs_threephase_FullCube_2_classLit), Lcs_threephase_Search_2_classLit = createForClass('cs.threephase.', 'Search', 163, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Path$Command_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Path$Command', 290, Ljava_lang_Object_2_classLit), Lcs_min2phase_Search_2_classLit = createForClass('cs.min2phase.', 'Search', 146, Ljava_lang_Object_2_classLit), Lpuzzle_PyraminxSolver_2_classLit = createForClass('puzzle.', 'PyraminxSolver', 337, Ljava_lang_Object_2_classLit), Lpuzzle_PyraminxSolver$PyraminxSolverState_2_classLit = createForClass('puzzle.', 'PyraminxSolver$PyraminxSolverState', 338, Ljava_lang_Object_2_classLit), _3_3C_classLit = createForArray('', '[[C', 382, _3C_classLit), _3_3B_classLit = createForArray('', '[[B', 383, _3B_classLit), Lpuzzle_SkewbSolver_2_classLit = createForClass('puzzle.', 'SkewbSolver', 342, Ljava_lang_Object_2_classLit), Lpuzzle_SkewbSolver$SkewbSolverState_2_classLit = createForClass('puzzle.', 'SkewbSolver$SkewbSolverState', 343, Ljava_lang_Object_2_classLit), Lcs_sq12phase_Search_2_classLit = createForClass('cs.sq12phase.', 'Search', 150, Ljava_lang_Object_2_classLit), Lcs_sq12phase_FullCube_2_classLit = createForClass('cs.sq12phase.', 'FullCube', 149, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoSolver_2_classLit = createForClass('puzzle.', 'TwoByTwoSolver', 351, Ljava_lang_Object_2_classLit), Lpuzzle_TwoByTwoSolver$TwoByTwoState_2_classLit = createForClass('puzzle.', 'TwoByTwoSolver$TwoByTwoState', 352, Ljava_lang_Object_2_classLit), Lcom_google_gwt_dom_client_DOMImpl_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImpl', 28, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_impl_DOMImpl_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImpl', 115, Ljava_lang_Object_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplTrident_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplTrident', 117, Lcom_google_gwt_user_client_impl_DOMImpl_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplIE8_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplIE8', 118, Lcom_google_gwt_user_client_impl_DOMImplTrident_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplStandard', 121, Lcom_google_gwt_user_client_impl_DOMImpl_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplMozilla_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplMozilla', 122, Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplStandardBase_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplStandardBase', 120, Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplIE9_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplIE9', 119, Lcom_google_gwt_user_client_impl_DOMImplStandardBase_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplIE6_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplIE6', 116, Lcom_google_gwt_user_client_impl_DOMImplTrident_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplOpera_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplOpera', 123, Lcom_google_gwt_user_client_impl_DOMImplStandard_2_classLit), Lcom_google_gwt_user_client_impl_DOMImplWebkit_2_classLit = createForClass('com.google.gwt.user.client.impl.', 'DOMImplWebkit', 124, Lcom_google_gwt_user_client_impl_DOMImplStandardBase_2_classLit), Lcom_google_gwt_json_client_JSONArray_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONArray', 64, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_json_client_JSONString_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONString', 72, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_json_client_JSONNumber_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONNumber', 69, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lnet_gnehzr_tnoodle_svglite_InvalidHexColorException_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'InvalidHexColorException', 288, Ljava_lang_Exception_2_classLit), Lnet_gnehzr_tnoodle_svglite_Group_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Group', 287, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Lcs_threephase_FullCube$ValueComparator_2_classLit = createForClass('cs.threephase.', 'FullCube$ValueComparator', 161, Ljava_lang_Object_2_classLit), _3_3Z_classLit = createForArray('', '[[Z', 384, _3Z_classLit), Lcs_min2phase_CubieCube_2_classLit = createForClass('cs.min2phase.', 'CubieCube', 145, Ljava_lang_Object_2_classLit), _3Lcs_min2phase_CubieCube_2_classLit = createForArray('[Lcs.min2phase.', 'CubieCube;', 385, Lcs_min2phase_CubieCube_2_classLit), Lcs_sq12phase_Shape_2_classLit = createForClass('cs.sq12phase.', 'Shape', 151, Ljava_lang_Object_2_classLit), Ljava_lang_NumberFormatException_2_classLit = createForClass('java.lang.', 'NumberFormatException', 187, Ljava_lang_IllegalArgumentException_2_classLit), Lcom_google_gwt_dom_client_DOMImplTrident_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplTrident', 30, Lcom_google_gwt_dom_client_DOMImpl_2_classLit), Lcom_google_gwt_dom_client_DOMImplIE8_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplIE8', 31, Lcom_google_gwt_dom_client_DOMImplTrident_2_classLit), Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplStandard', 34, Lcom_google_gwt_dom_client_DOMImpl_2_classLit), Lcom_google_gwt_dom_client_DOMImplMozilla_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplMozilla', 35, Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit), Lcom_google_gwt_dom_client_DOMImplStandardBase_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplStandardBase', 33, Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit), Lcom_google_gwt_dom_client_DOMImplIE9_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplIE9', 32, Lcom_google_gwt_dom_client_DOMImplStandardBase_2_classLit), Lcom_google_gwt_dom_client_DOMImplOpera_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplOpera', 36, Lcom_google_gwt_dom_client_DOMImplStandard_2_classLit), Lcom_google_gwt_dom_client_DOMImplWebkit_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplWebkit', 37, Lcom_google_gwt_dom_client_DOMImplStandardBase_2_classLit), Lcom_google_gwt_dom_client_DOMImplIE6_2_classLit = createForClass('com.google.gwt.dom.client.', 'DOMImplIE6', 29, Lcom_google_gwt_dom_client_DOMImplTrident_2_classLit), Ljava_util_Comparators$1_2_classLit = createForClass('java.util.', 'Comparators$1', 225, Ljava_lang_Object_2_classLit), Lcom_google_gwt_safehtml_shared_SafeUriString_2_classLit = createForClass('com.google.gwt.safehtml.shared.', 'SafeUriString', 107, Ljava_lang_Object_2_classLit), Ljava_util_LinkedHashMap_2_classLit = createForClass('java.util.', 'LinkedHashMap', 230, Ljava_util_HashMap_2_classLit), Ljava_util_LinkedHashMap$ChainEntry_2_classLit = createForClass('java.util.', 'LinkedHashMap$ChainEntry', 231, Ljava_util_MapEntryImpl_2_classLit), Ljava_util_LinkedHashMap$EntrySet_2_classLit = createForClass('java.util.', 'LinkedHashMap$EntrySet', 233, Ljava_util_AbstractSet_2_classLit), Ljava_util_LinkedHashMap$EntrySet$EntryIterator_2_classLit = createForClass('java.util.', 'LinkedHashMap$EntrySet$EntryIterator', 234, Ljava_lang_Object_2_classLit), Lcs_threephase_EdgeCube_2_classLit = createForClass('cs.threephase.', 'EdgeCube', 159, Ljava_lang_Object_2_classLit), Lcs_threephase_CenterCube_2_classLit = createForClass('cs.threephase.', 'CenterCube', 156, Ljava_lang_Object_2_classLit), Lcs_threephase_CornerCube_2_classLit = createForClass('cs.threephase.', 'CornerCube', 157, Ljava_lang_Object_2_classLit), _3Lcs_threephase_CornerCube_2_classLit = createForArray('[Lcs.threephase.', 'CornerCube;', 386, Lcs_threephase_CornerCube_2_classLit), Lcs_threephase_Center1_2_classLit = createForClass('cs.threephase.', 'Center1', 153, Ljava_lang_Object_2_classLit), Ljava_util_AbstractQueue_2_classLit = createForClass('java.util.', 'AbstractQueue', 210, Ljava_util_AbstractCollection_2_classLit), Ljava_util_PriorityQueue_2_classLit = createForClass('java.util.', 'PriorityQueue', 239, Ljava_util_AbstractQueue_2_classLit), Lcs_threephase_Center2_2_classLit = createForClass('cs.threephase.', 'Center2', 154, Ljava_lang_Object_2_classLit), Lcs_threephase_Center3_2_classLit = createForClass('cs.threephase.', 'Center3', 155, Ljava_lang_Object_2_classLit), Lcs_sq12phase_Square_2_classLit = createForClass('cs.sq12phase.', 'Square', 152, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Rectangle_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Rectangle', 293, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Lnet_gnehzr_tnoodle_utils_TimedLogRecordStart_2_classLit = createForClass('net.gnehzr.tnoodle.utils.', 'TimedLogRecordStart', 301, Ljava_util_logging_LogRecord_2_classLit), Lnet_gnehzr_tnoodle_utils_TimedLogRecordEnd_2_classLit = createForClass('net.gnehzr.tnoodle.utils.', 'TimedLogRecordEnd', 300, Ljava_util_logging_LogRecord_2_classLit), Lnet_gnehzr_tnoodle_svglite_Ellipse_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Ellipse', 283, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Lnet_gnehzr_tnoodle_svglite_Circle_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Circle', 282, Lnet_gnehzr_tnoodle_svglite_Ellipse_2_classLit), Ljava_util_TreeSet_2_classLit = createForClass('java.util.', 'TreeSet', 252, Ljava_util_AbstractSet_2_classLit), Lcom_google_gwt_json_client_JSONException_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONException', 67, Ljava_lang_RuntimeException_2_classLit), Lnet_gnehzr_tnoodle_svglite_PathIterator_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'PathIterator', 291, Ljava_lang_Object_2_classLit), Lnet_gnehzr_tnoodle_svglite_Text_2_classLit = createForClass('net.gnehzr.tnoodle.svglite.', 'Text', 295, Lnet_gnehzr_tnoodle_svglite_Element_2_classLit), Ljava_util_TreeMap_2_classLit = createForClass('java.util.', 'TreeMap', 240, Ljava_util_AbstractMap_2_classLit), Ljava_util_TreeMap$EntryIterator_2_classLit = createForClass('java.util.', 'TreeMap$EntryIterator', 242, Ljava_lang_Object_2_classLit), Ljava_util_TreeMap$EntrySet_2_classLit = createForClass('java.util.', 'TreeMap$EntrySet', 243, Ljava_util_AbstractSet_2_classLit), Ljava_util_TreeMap$Node_2_classLit = createForClass('java.util.', 'TreeMap$Node', 244, Ljava_lang_Object_2_classLit), _3Ljava_util_TreeMap$Node_2_classLit = createForArray('[Ljava.util.', 'TreeMap$Node;', 387, Ljava_util_TreeMap$Node_2_classLit), Ljava_util_TreeMap$State_2_classLit = createForClass('java.util.', 'TreeMap$State', 245, Ljava_lang_Object_2_classLit), Ljava_util_TreeMap$SubMap_2_classLit = createForClass('java.util.', 'TreeMap$SubMap', 246, Ljava_util_AbstractMap_2_classLit), Ljava_util_TreeMap$SubMapType_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType', 248, Ljava_lang_Enum_2_classLit, values_2), _3Ljava_util_TreeMap$SubMapType_2_classLit = createForArray('[Ljava.util.', 'TreeMap$SubMapType;', 388, Ljava_util_TreeMap$SubMapType_2_classLit), Ljava_util_TreeMap$SubMap$1_2_classLit = createForClass('java.util.', 'TreeMap$SubMap$1', 247, Ljava_util_AbstractSet_2_classLit), Ljava_util_TreeMap$SubMapType$1_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType$1', 249, Ljava_util_TreeMap$SubMapType_2_classLit, null), Ljava_util_TreeMap$SubMapType$2_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType$2', 250, Ljava_util_TreeMap$SubMapType_2_classLit, null), Ljava_util_TreeMap$SubMapType$3_2_classLit = createForEnum('java.util.', 'TreeMap$SubMapType$3', 251, Ljava_util_TreeMap$SubMapType_2_classLit, null), Ljava_util_TreeMap$1_2_classLit = createForClass('java.util.', 'TreeMap$1', 241, Ljava_lang_Object_2_classLit), Ljava_util_AbstractSequentialList_2_classLit = createForClass('java.util.', 'AbstractSequentialList', 211, Ljava_util_AbstractList_2_classLit), Ljava_util_LinkedList_2_classLit = createForClass('java.util.', 'LinkedList', 235, Ljava_util_AbstractSequentialList_2_classLit), Ljava_util_LinkedList$ListIteratorImpl_2_classLit = createForClass('java.util.', 'LinkedList$ListIteratorImpl', 236, Ljava_lang_Object_2_classLit), Ljava_util_LinkedList$Node_2_classLit = createForClass('java.util.', 'LinkedList$Node', 237, Ljava_lang_Object_2_classLit), Lcom_google_gwt_json_client_JSONBoolean_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONBoolean', 66, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_json_client_JSONNull_2_classLit = createForClass('com.google.gwt.json.client.', 'JSONNull', 68, Lcom_google_gwt_json_client_JSONValue_2_classLit), Lcom_google_gwt_i18n_client_NumberFormat_2_classLit = createForClass('com.google.gwt.i18n.client.', 'NumberFormat', 61, Ljava_lang_Object_2_classLit), Lcom_google_gwt_i18n_client_constants_NumberConstantsImpl_1_2_classLit = createForClass('com.google.gwt.i18n.client.constants.', 'NumberConstantsImpl_', 62, Ljava_lang_Object_2_classLit);
 if (tnoodlejs) tnoodlejs.onScriptLoad(gwtOnLoad);})();
 }
 TNOODLEJS_GWT();
