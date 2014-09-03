@@ -431,7 +431,7 @@ public class ClockPuzzle extends Puzzle {
         }
 
         /*
-         *  The bit map to filt linearly dependent combinations of moves.
+         *  The bit map to filter linearly dependent combinations of moves.
          */
         static int[] ld_list = {7695, 42588, 47187, 85158, 86697, 156568, 181700, 209201, 231778};
 
@@ -497,7 +497,7 @@ public class ClockPuzzle extends Puzzle {
             for (int idx=0; idx<Cnk[n][k]; idx++) {
                 int val = select(n, k, idx);
 
-                //A few cases of linearly dependent combinations are filted.
+                //A few cases of linearly dependent combinations are filtered.
                 //However, there're still some a few linearly dependent combinations, which will be detected by Gaussian Elimination.
                 boolean isLD = false;
                 for (int r: ld_list) {
