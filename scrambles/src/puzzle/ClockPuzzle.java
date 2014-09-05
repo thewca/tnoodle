@@ -432,8 +432,28 @@ public class ClockPuzzle extends Puzzle {
 
         /*
          *  The bit map to filter linearly dependent combinations of moves.
+         *  The i-th bit denotes whether the i-th move is in the combinations.
          */
-        static int[] ld_list = {7695, 42588, 47187, 85158, 86697, 156568, 181700, 209201, 231778};
+        static int[] ld_list = {
+            // Combinations of 8 moves
+            7695,   //000001111000001111
+            42588,  //001010011001011100
+            47187,  //001011100001010011
+            85158,  //010100110010100110
+            86697,  //010101001010101001
+            156568, //100110001110011000
+            181700, //101100010111000100
+            209201, //110011000100110001
+            231778, //111000100101100010
+
+            // Combinations of 12 moves
+            125690, //011110101011111010
+            128245, //011111010011110101
+            163223, //100111110110010111
+            187339, //101101101111001011
+            208702, //110010111100111110
+            235373  //111001011101101101
+        };
 
         /*
          *  The inverse table of the ring Z/Z12. If the value is -1, the element is not inversable.
@@ -467,6 +487,8 @@ public class ClockPuzzle extends Puzzle {
         /**
          *  @param hands
          *      The 14 hands of the clock. See the comment of the class.
+         *  @param solution
+         *      The solution of the clock is written in the array. The value is NOT the moves which solves the state, but the moves which generates the state.
          *  @return the length of the solution (the number of non-zero elements in the solution array)
          *      -1: invalid input
          */
@@ -475,7 +497,31 @@ public class ClockPuzzle extends Puzzle {
                 return -1;
             }
             int ret = enumAllComb(N_HANDS, hands, solution);
+            if (!checkSolution(hands, solution)) {
+                assert(false);
+            }
             return ret;
+        }
+
+        /**
+         *  Check whether the solution is valid.
+         */
+        public static boolean checkSolution(int[] hands, int[] solution) {
+            int[] clk = new int[N_HANDS];
+            for (int i=0; i<N_MOVES; i++) {
+                if (solution[i] == 0) {
+                    continue;
+                }
+                for (int j=0; j<N_HANDS; j++) {
+                    clk[j] += solution[i] * moveArr[i][j];
+                }
+            }
+            for (int i=0; i<N_HANDS; i++) {
+                if (clk[i] % 12 != hands[i]) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /**
@@ -496,9 +542,7 @@ public class ClockPuzzle extends Puzzle {
 
             for (int idx=0; idx<Cnk[n][k]; idx++) {
                 int val = select(n, k, idx);
-
-                //A few cases of linearly dependent combinations are filtered.
-                //However, there're still some a few linearly dependent combinations, which will be detected by Gaussian Elimination.
+                //All of linearly dependent combinations are filtered if k <= 14. Otherwise, k moves are always linearly dependent.
                 boolean isLD = false;
                 for (int r: ld_list) {
                     if ((val & r) == r) {
@@ -524,7 +568,10 @@ public class ClockPuzzle extends Puzzle {
                     arr[i][k] = hands[i];
                 }
                 int ret = gaussianElimination(arr);
+
+                //We have filtered all linearly dependent combinations. However, if more moves are added into the move set, the ld_list should be re-generated.
                 if (ret != 0) {
+                    assert(false);
                     continue;
                 }
 
