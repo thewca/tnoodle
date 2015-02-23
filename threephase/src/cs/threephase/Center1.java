@@ -314,6 +314,10 @@ final class Center1 {
 		return -1;
 	}
 	
+	public int hashCode() {
+		throw new UnsupportedOperationException();
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof Center1) {
 			Center1 c = (Center1)obj;
