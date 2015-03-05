@@ -770,11 +770,20 @@ class ScrambleRequest {
                     }
                 }
 
-                // If we're not at the end of the scramble, walk
-                // backwards until we're wrapping right before a space
-                // (we don't want to cut a turn in half).
+                // If we're not at the end of the scramble, make sure we're not cutting
+                // a turn in half by walking backwards until we're right after a turn
+                // and any spaces added for padding after that turn (a space is
+                // being used as padding if it is followed immediately by a space).
                 if(endIndex + 1 < paddedScramble.length()) {
-                    while(paddedScramble.charAt(endIndex) != ' ') {
+                    while(true) {
+                        boolean isTurnCharacter = paddedScramble.charAt(endIndex) != ' ';
+                        boolean isPaddingCharacter = false;
+                        if(endIndex + 2 < paddedScramble.length()) {
+                            isPaddingCharacter = paddedScramble.charAt(endIndex) == ' ' && paddedScramble.charAt(endIndex + 1) == ' ';
+                        }
+                        if(!isTurnCharacter && !isPaddingCharacter) {
+                            break;
+                        }
                         endIndex--;
                     }
                 }
