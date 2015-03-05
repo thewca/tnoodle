@@ -780,7 +780,7 @@ class ScrambleRequest {
                 }
                 String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
                 // Walk past all whitespace that comes immediately after the line wrap
-                // we about to insert.
+                // we are about to insert.
                 while(endIndex < paddedScramble.length() && (paddedScramble.charAt(endIndex) == ' ' || paddedScramble.charAt(endIndex) == '\n' )) {
                     endIndex++;
                 }
