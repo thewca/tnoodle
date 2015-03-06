@@ -751,36 +751,35 @@ class ScrambleRequest {
             Phrase scramblePhrase = new Phrase();
 
             int startIndex = 0;
-            int endIndex = 0;
+            int endIndex = 1;
             LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
             while(startIndex < paddedScramble.length()) {
                 // Walk forwards until we've grabbed the maximum number of characters
                 // that fit in a line, we've run out of characters, or we hit a newline.
-                for(; endIndex < paddedScramble.length(); endIndex++) {
-                    if(paddedScramble.charAt(endIndex) == '\n') {
+                for(; endIndex <= paddedScramble.length(); endIndex++) {
+                    if(paddedScramble.charAt(endIndex - 1) == '\n') {
                         break;
                     }
                     String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
                     float substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
                     if(substringWidth > availableScrambleWidth) {
-                        // scrambleSubstring doesn't fit in our avilable space,
-                        // remove one character and it should fit!
-                        endIndex--;
                         break;
                     }
                 }
+                // endIndex is one past the best fit, so remove one character and it should fit!
+                endIndex--;
 
                 // If we're not at the end of the scramble, make sure we're not cutting
                 // a turn in half by walking backwards until we're right after a turn
                 // and any spaces added for padding after that turn (a space is
-                // being used as padding if it is followed immediately by a space).
-                if(endIndex + 1 < paddedScramble.length()) {
+                // being used as padding if it is followed immediately by a
+                // space or by end of string).
+                if(endIndex < paddedScramble.length()) {
                     while(true) {
-                        boolean isTurnCharacter = paddedScramble.charAt(endIndex) != ' ';
-                        boolean isPaddingCharacter = false;
-                        if(endIndex + 2 < paddedScramble.length()) {
-                            isPaddingCharacter = paddedScramble.charAt(endIndex) == ' ' && paddedScramble.charAt(endIndex + 1) == ' ';
-                        }
+                        Character currentCharacter = paddedScramble.charAt(endIndex);
+                        Character nextCharacter = endIndex + 1 <= paddedScramble.length() - 1 ? paddedScramble.charAt(endIndex + 1) : null;
+                        boolean isTurnCharacter = currentCharacter != ' ';
+                        boolean isPaddingCharacter = currentCharacter == ' ' && ( nextCharacter == null || nextCharacter == ' ' );
                         if(!isTurnCharacter && !isPaddingCharacter) {
                             break;
                         }
