@@ -88,6 +88,7 @@ class ScrambleRequest {
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
+    private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 5;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -656,6 +657,63 @@ class ScrambleRequest {
         }
     }
 
+    private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float availableScrambleWidth) {
+        int startIndex = 0;
+        int endIndex = 0;
+        LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
+        while(startIndex < paddedScramble.length()) {
+            // Walk forwards until we've grabbed the maximum number of characters
+            // that fit in a line, we've run out of characters, or we hit a newline.
+            for(endIndex++; endIndex <= paddedScramble.length(); endIndex++) {
+                if(paddedScramble.charAt(endIndex - 1) == '\n') {
+                    break;
+                }
+                String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
+                float substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
+                if(substringWidth > availableScrambleWidth) {
+                    break;
+                }
+            }
+            // endIndex is one past the best fit, so remove one character and it should fit!
+            endIndex--;
+
+            // If we're not at the end of the scramble, make sure we're not cutting
+            // a turn in half by walking backwards until we're right after a turn
+            // and any spaces added for padding after that turn (a space is
+            // being used as padding if it is followed immediately by a
+            // space or by end of string).
+            if(endIndex < paddedScramble.length()) {
+                while(true) {
+                    Character currentCharacter = paddedScramble.charAt(endIndex);
+                    if(currentCharacter == '\n') {
+                        break;
+                    }
+                    Character nextCharacter = endIndex + 1 <= paddedScramble.length() - 1 ? paddedScramble.charAt(endIndex + 1) : null;
+                    boolean isTurnCharacter = currentCharacter != ' ';
+                    boolean isPaddingCharacter = currentCharacter == ' ' && ( nextCharacter == null || nextCharacter == ' ' );
+                    if(!isTurnCharacter && !isPaddingCharacter) {
+                        break;
+                    }
+                    endIndex--;
+                }
+            }
+            String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
+            // Walk past all whitespace that comes immediately after the line wrap
+            // we are about to insert.
+            while(endIndex < paddedScramble.length() && (paddedScramble.charAt(endIndex) == ' ' || paddedScramble.charAt(endIndex) == '\n' )) {
+                endIndex++;
+            }
+            startIndex = endIndex;
+            Chunk lineChunk = new Chunk(scrambleSubstring);
+            lineChunks.add(lineChunk);
+            lineChunk.setFont(scrambleFont);
+
+            // Force a line wrap!
+            lineChunk.append("\n");
+        }
+        return lineChunks;
+    }
+
     private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix) throws DocumentException {
         PdfContentByte cb = docWriter.getDirectContent();
 
@@ -734,80 +792,29 @@ class ScrambleRequest {
             l.log(Level.INFO, "", e);
         }
 
+        int maxLinesPerScramble = 0;
+        for(String scramble : scrambles) {
+            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, " ");
+            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, availableScrambleWidth);
+            if(lineChunks.size() > maxLinesPerScramble) {
+                maxLinesPerScramble = lineChunks.size();
+            }
+        }
         for(int i = 0; i < scrambles.length; i++) {
             String scramble = scrambles[i];
+            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, " ");
             Chunk ch = new Chunk(scrambleNumberPrefix + (i+1) + ".");
             PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
             nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             table.addCell(nthscramble);
 
-            String paddedScramble;
-            if(oneLine) {
-                paddedScramble = scramble;
-            } else {
-                paddedScramble = padTurnsUniformly(scramble, " ");
-            }
             
             Phrase scramblePhrase = new Phrase();
-
-            int startIndex = 0;
-            int endIndex = 0;
-            LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
-            while(startIndex < paddedScramble.length()) {
-                // Walk forwards until we've grabbed the maximum number of characters
-                // that fit in a line, we've run out of characters, or we hit a newline.
-                for(endIndex++; endIndex <= paddedScramble.length(); endIndex++) {
-                    if(paddedScramble.charAt(endIndex - 1) == '\n') {
-                        break;
-                    }
-                    String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
-                    float substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
-                    if(substringWidth > availableScrambleWidth) {
-                        break;
-                    }
-                }
-                // endIndex is one past the best fit, so remove one character and it should fit!
-                endIndex--;
-
-                // If we're not at the end of the scramble, make sure we're not cutting
-                // a turn in half by walking backwards until we're right after a turn
-                // and any spaces added for padding after that turn (a space is
-                // being used as padding if it is followed immediately by a
-                // space or by end of string).
-                if(endIndex < paddedScramble.length()) {
-                    while(true) {
-                        Character currentCharacter = paddedScramble.charAt(endIndex);
-                        if(currentCharacter == '\n') {
-                            break;
-                        }
-                        Character nextCharacter = endIndex + 1 <= paddedScramble.length() - 1 ? paddedScramble.charAt(endIndex + 1) : null;
-                        boolean isTurnCharacter = currentCharacter != ' ';
-                        boolean isPaddingCharacter = currentCharacter == ' ' && ( nextCharacter == null || nextCharacter == ' ' );
-                        if(!isTurnCharacter && !isPaddingCharacter) {
-                            break;
-                        }
-                        endIndex--;
-                    }
-                }
-                String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
-                // Walk past all whitespace that comes immediately after the line wrap
-                // we are about to insert.
-                while(endIndex < paddedScramble.length() && (paddedScramble.charAt(endIndex) == ' ' || paddedScramble.charAt(endIndex) == '\n' )) {
-                    endIndex++;
-                }
-                startIndex = endIndex;
-                Chunk lineChunk = new Chunk(scrambleSubstring);
-                lineChunks.add(lineChunk);
-                lineChunk.setFont(scrambleFont);
-
-                // Force a line wrap!
-                lineChunk.append("\n");
-            }
-            boolean highlight = true;
+            boolean oddLine = false;
+            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, availableScrambleWidth);
             for(Chunk lineChunk : lineChunks) {
-                highlight = !highlight;
-                if(highlight && lineChunks.size() > 3) {
-                    // Only highlight alternating rows if there are more than 3 rows.
+                oddLine = !oddLine;
+                if(maxLinesPerScramble >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING && oddLine) {
                     lineChunk.setBackground(new BaseColor(220, 220, 250));
                 }
                 scramblePhrase.add(lineChunk);
