@@ -714,6 +714,17 @@ class ScrambleRequest {
         return lineChunks;
     }
 
+    //Simple function to determine if a string is present in an array of strings
+    //Will be used to determine which puzzles should have highlighted scrambles
+    public static boolean useLoop(String[] arr, String targetValue) {
+        for(String s: arr) {
+            if(s.equals(targetValue)) {
+                return true;
+            }
+            return false;
+        }
+    }
+
     private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix) throws DocumentException {
         PdfContentByte cb = docWriter.getDirectContent();
 
@@ -792,6 +803,11 @@ class ScrambleRequest {
             l.log(Level.INFO, "", e);
         }
 
+        //check if this puzzle should have highlighted scrambles or not
+        String[] highlighted = {"444","555","666","777","minx"};
+
+        boolean highlight = useLoop(highlighted, scrambler.getShortName());
+
         int maxLinesPerScramble = 0;
         for(String scramble : scrambles) {
             String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, " ");
@@ -808,13 +824,13 @@ class ScrambleRequest {
             nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             table.addCell(nthscramble);
 
-            
             Phrase scramblePhrase = new Phrase();
             boolean oddLine = false;
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, availableScrambleWidth);
             for(Chunk lineChunk : lineChunks) {
                 oddLine = !oddLine;
-                if(maxLinesPerScramble >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING && oddLine) {
+                //if(maxLinesPerScramble >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING && oddLine) {
+                if(highlight && oddLine) {
                     lineChunk.setBackground(new BaseColor(220, 220, 250));
                 }
                 scramblePhrase.add(lineChunk);
