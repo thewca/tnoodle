@@ -721,8 +721,8 @@ class ScrambleRequest {
             if(s.equals(targetValue)) {
                 return true;
             }
-            return false;
         }
+        return false;
     }
 
     private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix) throws DocumentException {
