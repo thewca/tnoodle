@@ -751,12 +751,12 @@ class ScrambleRequest {
             Phrase scramblePhrase = new Phrase();
 
             int startIndex = 0;
-            int endIndex = 1;
+            int endIndex = 0;
             LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
             while(startIndex < paddedScramble.length()) {
                 // Walk forwards until we've grabbed the maximum number of characters
                 // that fit in a line, we've run out of characters, or we hit a newline.
-                for(; endIndex <= paddedScramble.length(); endIndex++) {
+                for(endIndex++; endIndex <= paddedScramble.length(); endIndex++) {
                     if(paddedScramble.charAt(endIndex - 1) == '\n') {
                         break;
                     }
@@ -777,6 +777,9 @@ class ScrambleRequest {
                 if(endIndex < paddedScramble.length()) {
                     while(true) {
                         Character currentCharacter = paddedScramble.charAt(endIndex);
+                        if(currentCharacter == '\n') {
+                            break;
+                        }
                         Character nextCharacter = endIndex + 1 <= paddedScramble.length() - 1 ? paddedScramble.charAt(endIndex + 1) : null;
                         boolean isTurnCharacter = currentCharacter != ' ';
                         boolean isPaddingCharacter = currentCharacter == ' ' && ( nextCharacter == null || nextCharacter == ' ' );
