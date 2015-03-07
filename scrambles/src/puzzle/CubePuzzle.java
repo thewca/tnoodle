@@ -566,10 +566,6 @@ public class CubePuzzle extends Puzzle {
 
     @Override
     public boolean shouldHighlightAlternatingLines() {
-        if(size >= 4) {
-            return true;
-        } else {
-            return false;
-        }
+        return size >= 4;
     }
 }
