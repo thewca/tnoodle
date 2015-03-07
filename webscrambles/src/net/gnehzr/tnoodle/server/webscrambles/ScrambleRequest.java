@@ -95,6 +95,8 @@ class ScrambleRequest {
 
     private static final int WCA_MAX_MOVES_FMC = 80;
 
+    private static final char NON_BREAKING_SPACE = '\u00A0';
+
     private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
     private static SortedMap<String, LazyInstantiator<Puzzle>> puzzles;
     static {
@@ -664,12 +666,13 @@ class ScrambleRequest {
         while(startIndex < paddedScramble.length()) {
             // Walk forwards until we've grabbed the maximum number of characters
             // that fit in a line, we've run out of characters, or we hit a newline.
+            float substringWidth;
             for(endIndex++; endIndex <= paddedScramble.length(); endIndex++) {
                 if(paddedScramble.charAt(endIndex - 1) == '\n') {
                     break;
                 }
                 String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
-                float substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
+                substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
                 if(substringWidth > availableScrambleWidth) {
                     break;
                 }
@@ -679,25 +682,32 @@ class ScrambleRequest {
 
             // If we're not at the end of the scramble, make sure we're not cutting
             // a turn in half by walking backwards until we're right after a turn
-            // and any spaces added for padding after that turn (a space is
-            // being used as padding if it is followed immediately by a
-            // space or by end of string).
+            // any spaces added for padding after that turn are considered part of
+            // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
             if(endIndex < paddedScramble.length()) {
                 while(true) {
-                    Character currentCharacter = paddedScramble.charAt(endIndex);
-                    if(currentCharacter == '\n') {
-                        break;
-                    }
-                    Character nextCharacter = endIndex + 1 <= paddedScramble.length() - 1 ? paddedScramble.charAt(endIndex + 1) : null;
+                    char currentCharacter = paddedScramble.charAt(endIndex);
                     boolean isTurnCharacter = currentCharacter != ' ';
-                    boolean isPaddingCharacter = currentCharacter == ' ' && ( nextCharacter == null || nextCharacter == ' ' );
-                    if(!isTurnCharacter && !isPaddingCharacter) {
+                    if(!isTurnCharacter || currentCharacter == '\n') {
                         break;
                     }
                     endIndex--;
                 }
             }
+
             String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
+
+            // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
+            // space as is available on a line.
+            do {
+                scrambleSubstring += NON_BREAKING_SPACE;
+                substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
+            } while(substringWidth <= availableScrambleWidth);
+            // scrambleSubstring is now too big for our line, so remove the
+            // last character.
+            scrambleSubstring = scrambleSubstring.substring(0, scrambleSubstring.length() - 1);
+
+
             // Walk past all whitespace that comes immediately after the line wrap
             // we are about to insert.
             while(endIndex < paddedScramble.length() && (paddedScramble.charAt(endIndex) == ' ' || paddedScramble.charAt(endIndex) == '\n' )) {
@@ -796,7 +806,7 @@ class ScrambleRequest {
 
         int maxLinesPerScramble = 0;
         for(String scramble : scrambles) {
-            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, " ");
+            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, availableScrambleWidth);
             if(lineChunks.size() > maxLinesPerScramble) {
                 maxLinesPerScramble = lineChunks.size();
@@ -804,7 +814,7 @@ class ScrambleRequest {
         }
         for(int i = 0; i < scrambles.length; i++) {
             String scramble = scrambles[i];
-            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, " ");
+            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
             Chunk ch = new Chunk(scrambleNumberPrefix + (i+1) + ".");
             PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
             nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
