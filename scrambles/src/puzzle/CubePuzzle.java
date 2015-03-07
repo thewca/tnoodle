@@ -563,4 +563,9 @@ public class CubePuzzle extends Puzzle {
             return svg;
         }
     }
+
+    @Override
+    public boolean shouldHighlightAlternatingLines() {
+        return size >= 4;
+    }
 }

@@ -633,4 +633,9 @@ public class MegaminxPuzzle extends Puzzle {
             }
         }
     }
+
+    @Override
+    public boolean shouldHighlightAlternatingLines() {
+        return true;
+    }
 }
