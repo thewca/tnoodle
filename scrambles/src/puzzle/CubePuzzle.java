@@ -563,4 +563,13 @@ public class CubePuzzle extends Puzzle {
             return svg;
         }
     }
+
+    @Override
+    public boolean shouldHighlightAlternatingLines() {
+        if(size >= 4) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

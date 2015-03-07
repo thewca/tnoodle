@@ -193,6 +193,10 @@ public abstract class Puzzle implements Exportable {
         return faces.toArray(new String[faces.size()]);
     }
 
+    public boolean shouldHighlightAlternatingLines() {
+        return false;
+    }
+
 
     /**
      * TODO - document!
@@ -533,7 +537,7 @@ public abstract class Puzzle implements Exportable {
         PuzzleState[] linkedStates = new PuzzleState[distanceFromScrambled + 1];
         linkedStates[distanceFromScrambled] = state;
 
-        outer:
+    outer:
         while(distanceFromScrambled > 0) {
             for(PuzzleState next : state.getCanonicalMovesByState().keySet()) {
                 next = next.getNormalized();
@@ -556,7 +560,7 @@ public abstract class Puzzle implements Exportable {
         state = ps;
         distanceFromScrambled = 0;
 
-        outer:
+    outer:
         while(!state.equalsNormalized(bestIntersection)) {
             for(Entry<? extends PuzzleState, String> next : state.getCanonicalMovesByState().entrySet()) {
                 PuzzleState nextState = next.getKey();
@@ -578,7 +582,7 @@ public abstract class Puzzle implements Exportable {
         // Step 3: solved <----- bestIntersection
         
         int distanceFromSolved = seenSolved.get(state.getNormalized());
-        outer:
+    outer:
         while(distanceFromSolved > 0) {
             for(Entry<? extends PuzzleState, String> next : state.getCanonicalMovesByState().entrySet()) {
                 PuzzleState nextState = next.getKey();

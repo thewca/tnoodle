@@ -804,9 +804,11 @@ class ScrambleRequest {
         }
 
         //check if this puzzle should have highlighted scrambles or not
-        String[] highlighted = {"444","555","666","777","minx"};
+        //String[] highlighted = {"444","555","666","777","minx"};
 
-        boolean highlight = useLoop(highlighted, scrambler.getShortName());
+        //boolean highlight = useLoop(highlighted, scrambler.getShortName());
+
+        boolean highlight = scrambler.shouldHighlightAlternatingLines();
 
         int maxLinesPerScramble = 0;
         for(String scramble : scrambles) {
