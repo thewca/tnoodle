@@ -88,7 +88,7 @@ class ScrambleRequest {
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
-    private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 5;
+    private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(220, 220, 250);
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -792,7 +792,6 @@ class ScrambleRequest {
             l.log(Level.INFO, "", e);
         }
 
-        //check if this puzzle should have highlighted scrambles or not
         boolean highlight = scrambler.shouldHighlightAlternatingLines();
 
         int maxLinesPerScramble = 0;
@@ -817,7 +816,7 @@ class ScrambleRequest {
             for(Chunk lineChunk : lineChunks) {
                 oddLine = !oddLine;
                 if(highlight && oddLine) {
-                    lineChunk.setBackground(new BaseColor(220, 220, 250));
+                    lineChunk.setBackground(HIGHLIGHT_COLOR);
                 }
                 scramblePhrase.add(lineChunk);
             }
