@@ -108,18 +108,6 @@ class ScrambleRequest {
         } catch (IOException e) {
             l.log(Level.INFO, "", e);
         }
-
-        // This is an awful workaround for https://github.com/jfly/tnoodle/issues/1.
-        // Hopefully someday this problem will go away, and this code can simply be deleted.
-        try {
-            ScrambleRequest r = new ScrambleRequest("title", "333", null);
-            requestsToPdf("", new Date(), new ScrambleRequest[] { r }, null);
-        } catch (Throwable e) {
-            l.log(Level.WARNING, "Yikes! Did you just see a warning similar to this " +
-                    "\"java.lang.Error: Probable fatal error:No fonts found.\"? " +
-                    "This exception may have been expected. See " +
-                    "https://github.com/jfly/tnoodle/issues/1 for more details.", e);
-        }
     }
 
     // This is here just to make GSON work.
