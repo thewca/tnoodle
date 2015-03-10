@@ -49,6 +49,15 @@ You can run the `.jar` from the commandline using:
 
 *Important note: You must never use a custom build for any official competitions.* [Contact the WCA Board and the WRC](https://www.worldcubeassociation.org/contact) if you have any questions about this.
 
+### Releasing
+
+First make sure that `./tmt make` works. This will involve installing the
+android sdk and setting up an ANDROID_HOME environment variable.
+
+~/.gradle/gradle.properties needs a few things: .
+
+See http://gradle.org/docs/current/userguide/signing_plugin.html for how to
+create PGP key pair.
 
 ### TNoodle Timer (TNT) and Other Projects
 
