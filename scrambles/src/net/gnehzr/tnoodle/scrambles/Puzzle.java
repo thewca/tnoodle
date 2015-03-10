@@ -193,11 +193,6 @@ public abstract class Puzzle implements Exportable {
         return faces.toArray(new String[faces.size()]);
     }
 
-    public boolean shouldHighlightAlternatingLines() {
-        return false;
-    }
-
-
     /**
      * TODO - document!
      * @param colorScheme

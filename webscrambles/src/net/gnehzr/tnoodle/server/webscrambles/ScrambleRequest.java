@@ -88,6 +88,7 @@ class ScrambleRequest {
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
+    private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4;
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
     private static final int SCRAMBLE_PADDING = 3;
 
@@ -791,8 +792,6 @@ class ScrambleRequest {
             l.log(Level.INFO, "", e);
         }
 
-        boolean highlight = scrambler.shouldHighlightAlternatingLines();
-
         int maxLinesPerScramble = 0;
         for(String scramble : scrambles) {
             String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
@@ -801,6 +800,8 @@ class ScrambleRequest {
                 maxLinesPerScramble = lineChunks.size();
             }
         }
+        boolean highlight = maxLinesPerScramble >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING;
+
         for(int i = 0; i < scrambles.length; i++) {
             String scramble = scrambles[i];
             String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
