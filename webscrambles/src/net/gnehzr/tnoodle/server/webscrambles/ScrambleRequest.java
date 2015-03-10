@@ -587,7 +587,9 @@ class ScrambleRequest {
                     extraScramblesHeader.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
                     extraScramblesHeader.setPaddingBottom(3);
                     headerTable.addCell(extraScramblesHeader);
-                    doc.add(headerTable);
+                    if(!dryRun) {
+                        doc.add(headerTable);
+                    }
                     
                     scrambleNumberPrefix = "E";
                     TableAndHighlighting extraTableAndHighlighting = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix, forceHighlighting);
