@@ -90,7 +90,8 @@ class ScrambleRequest {
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
     private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4;
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
-    private static final int SCRAMBLE_PADDING = 3;
+    private static final int SCRAMBLE_PADDING_VERTICAL = 3;
+    private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -692,7 +693,7 @@ class ScrambleRequest {
             do {
                 scrambleSubstring += NON_BREAKING_SPACE;
                 substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
-            } while(substringWidth <= availableScrambleWidth - 2*SCRAMBLE_PADDING);
+            } while(substringWidth <= availableScrambleWidth - 2*SCRAMBLE_PADDING_HORIZONTAL);
             // scrambleSubstring is now too big for our line, so remove the
             // last character.
             scrambleSubstring = scrambleSubstring.substring(0, scrambleSubstring.length() - 1);
@@ -828,10 +829,10 @@ class ScrambleRequest {
             scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             // This shifts everything up a little bit, because I don't like how
             // ALIGN_MIDDLE works.
-            scrambleCell.setPaddingTop(-SCRAMBLE_IMAGE_PADDING);
-            scrambleCell.setPaddingBottom(SCRAMBLE_IMAGE_PADDING);
-            scrambleCell.setPaddingLeft(SCRAMBLE_IMAGE_PADDING);
-            scrambleCell.setPaddingRight(SCRAMBLE_IMAGE_PADDING);
+            scrambleCell.setPaddingTop(-SCRAMBLE_PADDING_VERTICAL);
+            scrambleCell.setPaddingBottom(SCRAMBLE_PADDING_VERTICAL);
+            scrambleCell.setPaddingLeft(SCRAMBLE_PADDING_HORIZONTAL);
+            scrambleCell.setPaddingRight(SCRAMBLE_PADDING_HORIZONTAL);
             table.addCell(scrambleCell);
 
             if(scrambleImageSize.width > 0 && scrambleImageSize.height > 0) {
