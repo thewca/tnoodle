@@ -202,12 +202,12 @@ function tnoodlejs(){
   processMetas();
   try {
     var strongName;
-    unflattenKeylistIntoAnswers(['gecko1_8'], 'BF9AA8B6D712334EDAAB558238A4DDD0');
-    unflattenKeylistIntoAnswers(['ie6'], 'BF9AA8B6D712334EDAAB558238A4DDD0' + ':1');
-    unflattenKeylistIntoAnswers(['ie8'], 'BF9AA8B6D712334EDAAB558238A4DDD0' + ':2');
-    unflattenKeylistIntoAnswers(['ie9'], 'BF9AA8B6D712334EDAAB558238A4DDD0' + ':3');
-    unflattenKeylistIntoAnswers(['opera'], 'BF9AA8B6D712334EDAAB558238A4DDD0' + ':4');
-    unflattenKeylistIntoAnswers(['safari'], 'BF9AA8B6D712334EDAAB558238A4DDD0' + ':5');
+    unflattenKeylistIntoAnswers(['gecko1_8'], 'C60CE4C59E169165ED90A903B9EDA898');
+    unflattenKeylistIntoAnswers(['ie6'], 'C60CE4C59E169165ED90A903B9EDA898' + ':1');
+    unflattenKeylistIntoAnswers(['ie8'], 'C60CE4C59E169165ED90A903B9EDA898' + ':2');
+    unflattenKeylistIntoAnswers(['ie9'], 'C60CE4C59E169165ED90A903B9EDA898' + ':3');
+    unflattenKeylistIntoAnswers(['opera'], 'C60CE4C59E169165ED90A903B9EDA898' + ':4');
+    unflattenKeylistIntoAnswers(['safari'], 'C60CE4C59E169165ED90A903B9EDA898' + ':5');
     strongName = answers[computePropValue('user.agent')];
     var idx = strongName.indexOf(':');
     if (idx != -1) {
@@ -246,7 +246,7 @@ function tnoodlejs(){
 }
 
 tnoodlejs();
-(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = 'BF9AA8B6D712334EDAAB558238A4DDD0';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubePuzzle = 93, Q$TwoByTwoCubePuzzle = 94, CM$ = {};
+(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = 'C60CE4C59E169165ED90A903B9EDA898';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubePuzzle = 93, Q$TwoByTwoCubePuzzle = 94, CM$ = {};
 function newSeed(id){
   return new seedTable[id];
 }
@@ -6853,6 +6853,10 @@ _.equals$ = function equals_6(obj){
   return $equals(this, obj);
 }
 ;
+_.hashCode$ = function hashCode_7(){
+  throw new UnsupportedOperationException_0;
+}
+;
 var csprun, ctsmv, finish_0, raw2sym = null, sym2raw, syminv, symmove, symmult;
 function $clinit_Center2(){
   $clinit_Center2 = nullMethod;
@@ -8842,7 +8846,7 @@ _.equals$ = function equals_7(o){
   return instanceOf(o, Q$Boolean) && dynamicCast(o, Q$Boolean).value == this.value;
 }
 ;
-_.hashCode$ = function hashCode_7(){
+_.hashCode$ = function hashCode_8(){
   return this.value?1231:1237;
 }
 ;
@@ -9037,7 +9041,7 @@ _.equals$ = function equals_8(o){
   return instanceOf(o, Q$Double) && dynamicCast(o, Q$Double).value == this.value;
 }
 ;
-_.hashCode$ = function hashCode_8(){
+_.hashCode$ = function hashCode_9(){
   return round_int(this.value);
 }
 ;
@@ -9176,7 +9180,7 @@ _.equals$ = function equals_9(o){
   return instanceOf(o, Q$Integer) && dynamicCast(o, Q$Integer).value == this.value;
 }
 ;
-_.hashCode$ = function hashCode_9(){
+_.hashCode$ = function hashCode_10(){
   return this.value;
 }
 ;
@@ -9476,7 +9480,7 @@ _.equals$ = function equals_10(other){
   return $equals_0(this, other);
 }
 ;
-_.hashCode$ = function hashCode_10(){
+_.hashCode$ = function hashCode_11(){
   return getHashCode_0(this);
 }
 ;
@@ -9932,7 +9936,7 @@ _.get = function get(key){
   return !entry?null:entry.getValue();
 }
 ;
-_.hashCode$ = function hashCode_11(){
+_.hashCode$ = function hashCode_12(){
   var entry, entry$iterator, hashCode;
   hashCode = 0;
   for (entry$iterator = this.entrySet_0().iterator(); entry$iterator.hasNext();) {
@@ -10173,7 +10177,7 @@ _.equals$ = function equals_12(o){
   return true;
 }
 ;
-_.hashCode$ = function hashCode_12(){
+_.hashCode$ = function hashCode_13(){
   var hashCode, iter, next;
   hashCode = 0;
   for (iter = this.iterator(); iter.hasNext();) {
@@ -10258,7 +10262,7 @@ _.equals$ = function equals_13(other){
   return false;
 }
 ;
-_.hashCode$ = function hashCode_13(){
+_.hashCode$ = function hashCode_14(){
   var keyHash, valueHash;
   keyHash = 0;
   valueHash = 0;
@@ -10351,7 +10355,7 @@ _.equals$ = function equals_14(o){
   return true;
 }
 ;
-_.hashCode$ = function hashCode_14(){
+_.hashCode$ = function hashCode_15(){
   var iter, k_0, obj;
   k_0 = 1;
   iter = this.iterator();
@@ -10730,7 +10734,7 @@ function deepHashCode(a){
   hashCode = 1;
   for (i_0 = 0 , n = a.length; i_0 < n; ++i_0) {
     obj = a[i_0];
-    instanceOf(obj, Q$Object_$1)?(hash = deepHashCode(dynamicCast(obj, Q$Object_$1))):instanceOf(obj, Q$boolean_$1)?(hash = hashCode_19(dynamicCast(obj, Q$boolean_$1))):instanceOf(obj, Q$byte_$1)?(hash = hashCode_15(dynamicCast(obj, Q$byte_$1))):instanceOf(obj, Q$char_$1)?(hash = hashCode_16(dynamicCast(obj, Q$char_$1))):instanceOf(obj, Q$int_$1)?(hash = hashCode_18(dynamicCast(obj, Q$int_$1))):instanceOf(obj, Q$double_$1)?(hash = hashCode_17(dynamicCast(obj, Q$double_$1))):obj != null?(hash = hashCode__devirtual$(obj)):(hash = 0);
+    instanceOf(obj, Q$Object_$1)?(hash = deepHashCode(dynamicCast(obj, Q$Object_$1))):instanceOf(obj, Q$boolean_$1)?(hash = hashCode_20(dynamicCast(obj, Q$boolean_$1))):instanceOf(obj, Q$byte_$1)?(hash = hashCode_16(dynamicCast(obj, Q$byte_$1))):instanceOf(obj, Q$char_$1)?(hash = hashCode_17(dynamicCast(obj, Q$char_$1))):instanceOf(obj, Q$int_$1)?(hash = hashCode_19(dynamicCast(obj, Q$int_$1))):instanceOf(obj, Q$double_$1)?(hash = hashCode_18(dynamicCast(obj, Q$double_$1))):obj != null?(hash = hashCode__devirtual$(obj)):(hash = 0);
     hashCode = 31 * hashCode + hash | 0;
   }
   return hashCode;
@@ -10853,18 +10857,6 @@ function fill_3(a, toIndex){
   }
 }
 
-function hashCode_15(a){
-  var hashCode, i_0, n;
-  if (a == null) {
-    return 0;
-  }
-  hashCode = 1;
-  for (i_0 = 0 , n = a.length; i_0 < n; ++i_0) {
-    hashCode = 31 * hashCode + a[i_0] | 0;
-  }
-  return hashCode;
-}
-
 function hashCode_16(a){
   var hashCode, i_0, n;
   if (a == null) {
@@ -10884,7 +10876,7 @@ function hashCode_17(a){
   }
   hashCode = 1;
   for (i_0 = 0 , n = a.length; i_0 < n; ++i_0) {
-    hashCode = 31 * hashCode + round_int(a[i_0]) | 0;
+    hashCode = 31 * hashCode + a[i_0] | 0;
   }
   return hashCode;
 }
@@ -10896,12 +10888,24 @@ function hashCode_18(a){
   }
   hashCode = 1;
   for (i_0 = 0 , n = a.length; i_0 < n; ++i_0) {
-    hashCode = 31 * hashCode + a[i_0] | 0;
+    hashCode = 31 * hashCode + round_int(a[i_0]) | 0;
   }
   return hashCode;
 }
 
 function hashCode_19(a){
+  var hashCode, i_0, n;
+  if (a == null) {
+    return 0;
+  }
+  hashCode = 1;
+  for (i_0 = 0 , n = a.length; i_0 < n; ++i_0) {
+    hashCode = 31 * hashCode + a[i_0] | 0;
+  }
+  return hashCode;
+}
+
+function hashCode_20(a){
   var hashCode, i_0, n;
   if (a == null) {
     return 0;
@@ -11035,7 +11039,7 @@ _.get_0 = function get_3(index){
   return this.list.get_0(index);
 }
 ;
-_.hashCode$ = function hashCode_20(){
+_.hashCode$ = function hashCode_21(){
   return this.list.hashCode$();
 }
 ;
@@ -11062,7 +11066,7 @@ _.get = function get_4(key){
   return this.map.get(key);
 }
 ;
-_.hashCode$ = function hashCode_21(){
+_.hashCode$ = function hashCode_22(){
   return this.map.hashCode$();
 }
 ;
@@ -11099,7 +11103,7 @@ _.equals$ = function equals_22(o){
   return this.coll.equals$(o);
 }
 ;
-_.hashCode$ = function hashCode_22(){
+_.hashCode$ = function hashCode_23(){
   return this.coll.hashCode$();
 }
 ;
@@ -11149,7 +11153,7 @@ _.getValue = function getValue_1(){
   return this.entry.getValue();
 }
 ;
-_.hashCode$ = function hashCode_23(){
+_.hashCode$ = function hashCode_24(){
   return this.entry.hashCode$();
 }
 ;
@@ -11214,7 +11218,7 @@ _.equals$ = function equals_24(obj){
   return instanceOf(obj, Q$Date) && eq(fromDouble(this.jsdate.getTime()), fromDouble(dynamicCast(obj, Q$Date).jsdate.getTime()));
 }
 ;
-_.hashCode$ = function hashCode_24(){
+_.hashCode$ = function hashCode_25(){
   var time;
   time = fromDouble(this.jsdate.getTime());
   return toInt(xor(time, shru(time, 32)));
@@ -12074,7 +12078,7 @@ _.getValue = function getValue_3(){
   return this.value;
 }
 ;
-_.hashCode$ = function hashCode_25(){
+_.hashCode$ = function hashCode_26(){
   var keyHash, valueHash;
   keyHash = this.key != null?hashCode__devirtual$(this.key):0;
   valueHash = this.value != null?hashCode__devirtual$(this.value):0;
@@ -12750,7 +12754,7 @@ function $export0(this$static){
   }
   );
   $wnd.tnoodlejs.getVersion = $entry(function(){
-    return '0.8.9';
+    return '0.8.10';
   }
   );
   $wnd.tnoodlejs.scrambleToSvg = $entry(function(a0, a1, a2){
@@ -13314,7 +13318,7 @@ _.equals$ = function equals_27(o){
   return this.value == other.value;
 }
 ;
-_.hashCode$ = function hashCode_26(){
+_.hashCode$ = function hashCode_27(){
   return this.value;
 }
 ;
@@ -13434,7 +13438,7 @@ function Puzzle$SortedBuckets_0(){
 }
 
 defineSeed(278, 1, {}, Puzzle$SortedBuckets_0);
-_.hashCode$ = function hashCode_27(){
+_.hashCode$ = function hashCode_28(){
   throw new UnsupportedOperationException_0;
 }
 ;
@@ -14738,8 +14742,8 @@ _.getSuccessorsByName = function getSuccessorsByName(){
   return successors;
 }
 ;
-_.hashCode$ = function hashCode_28(){
-  return hashCode_18(this.posit);
+_.hashCode$ = function hashCode_29(){
+  return hashCode_19(this.posit);
 }
 ;
 _.pins = null;
@@ -15307,7 +15311,7 @@ _.getSuccessorsByName = function getSuccessorsByName_0(){
   return $getSuccessorsWithinSlice(this, this.this$0.size - 1, true);
 }
 ;
-_.hashCode$ = function hashCode_29(){
+_.hashCode$ = function hashCode_30(){
   return deepHashCode(this.image);
 }
 ;
@@ -16274,7 +16278,7 @@ _.getSuccessorsByName = function getSuccessorsByName_1(){
   return $getSuccessorsByName(this);
 }
 ;
-_.hashCode$ = function hashCode_30(){
+_.hashCode$ = function hashCode_31(){
   return deepHashCode(this.image);
 }
 ;
@@ -17208,7 +17212,7 @@ _.getSuccessorsByName = function getSuccessorsByName_2(){
   return successors;
 }
 ;
-_.hashCode$ = function hashCode_31(){
+_.hashCode$ = function hashCode_32(){
   return deepHashCode(this.image);
 }
 ;
@@ -17817,7 +17821,7 @@ _.getSuccessorsByName = function getSuccessorsByName_3(){
   return successors;
 }
 ;
-_.hashCode$ = function hashCode_32(){
+_.hashCode$ = function hashCode_33(){
   return deepHashCode(this.image);
 }
 ;
@@ -18429,8 +18433,8 @@ _.getSuccessorsByName = function getSuccessorsByName_4(){
   return $getSuccessorsByName_0(this);
 }
 ;
-_.hashCode$ = function hashCode_33(){
-  return hashCode_18(this.pieces) ^ (this.sliceSolved?1:0);
+_.hashCode$ = function hashCode_34(){
+  return hashCode_19(this.pieces) ^ (this.sliceSolved?1:0);
 }
 ;
 _.toString$ = function toString_44(){
