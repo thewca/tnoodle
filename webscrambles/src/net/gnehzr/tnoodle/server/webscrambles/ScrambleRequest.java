@@ -650,7 +650,8 @@ class ScrambleRequest {
         }
     }
 
-    private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float availableScrambleWidth) {
+    private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float scrambleColumnWidth) {
+        float availableScrambleWidth = scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL;
         int startIndex = 0;
         int endIndex = 0;
         LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
@@ -693,7 +694,7 @@ class ScrambleRequest {
             do {
                 scrambleSubstring += NON_BREAKING_SPACE;
                 substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
-            } while(substringWidth <= availableScrambleWidth - 2*SCRAMBLE_PADDING_HORIZONTAL);
+            } while(substringWidth <= availableScrambleWidth);
             // scrambleSubstring is now too big for our line, so remove the
             // last character.
             scrambleSubstring = scrambleSubstring.substring(0, scrambleSubstring.length() - 1);
@@ -732,10 +733,10 @@ class ScrambleRequest {
         col1Width += 5;
 
         float availableWidth = doc.getPageSize().getWidth() - sideMargins;
-        float availableScrambleWidth = availableWidth - col1Width - scrambleImageSize.width - 2*SCRAMBLE_IMAGE_PADDING;
+        float scrambleColumnWidth = availableWidth - col1Width - scrambleImageSize.width - 2*SCRAMBLE_IMAGE_PADDING;
         int availableScrambleHeight = scrambleImageSize.height - 2*SCRAMBLE_IMAGE_PADDING;
 
-        table.setTotalWidth(new float[] { col1Width, availableScrambleWidth, scrambleImageSize.width + 2*SCRAMBLE_IMAGE_PADDING });
+        table.setTotalWidth(new float[] { col1Width, scrambleColumnWidth, scrambleImageSize.width + 2*SCRAMBLE_IMAGE_PADDING });
         table.setLockedWidth(true);
 
         String longestScramble = "";
@@ -775,7 +776,7 @@ class ScrambleRequest {
             // Again, I have no idea where this number is coming from. I'm chalking it up to
             // unaccounted for margins.
             int WIDTH_MARGINS = 40;
-            Rectangle availableArea = new Rectangle(availableScrambleWidth - WIDTH_MARGINS,
+            Rectangle availableArea = new Rectangle(scrambleColumnWidth - WIDTH_MARGINS,
                     availableScrambleHeight - HEIGHT_MARGINS);
             float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, true);
             if(tryToFitOnOneLine) {
@@ -796,7 +797,7 @@ class ScrambleRequest {
         int maxLinesPerScramble = 0;
         for(String scramble : scrambles) {
             String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
-            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, availableScrambleWidth);
+            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
             if(lineChunks.size() > maxLinesPerScramble) {
                 maxLinesPerScramble = lineChunks.size();
             }
@@ -813,7 +814,7 @@ class ScrambleRequest {
 
             Phrase scramblePhrase = new Phrase();
             boolean oddLine = false;
-            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, availableScrambleWidth);
+            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
             for(Chunk lineChunk : lineChunks) {
                 oddLine = !oddLine;
                 if(highlight && oddLine) {
