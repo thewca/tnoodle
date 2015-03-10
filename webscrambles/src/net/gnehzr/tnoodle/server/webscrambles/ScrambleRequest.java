@@ -562,24 +562,44 @@ class ScrambleRequest {
             
             Dimension scrambleImageSize = scrambleRequest.scrambler.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight);
             
-            String scrambleNumberPrefix = "";
-            PdfPTable scramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
-            doc.add(scramblesTable);
+            // First do a dry run just to see if any scrambles require highlighting.
+            // Then do the real run, and force highlighting on every scramble
+            // if any scramble required it.
+            boolean forceHighlighting = false;
+            for(boolean dryRun : new boolean[]{ true, false }) {
+                String scrambleNumberPrefix = "";
+                TableAndHighlighting tableAndHighlighting = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix, forceHighlighting);
+                if(dryRun) {
+                    if(tableAndHighlighting.highlighting) {
+                        forceHighlighting = true;
+                        continue;
+                    }
+                } else {
+                    doc.add(tableAndHighlighting.table);
+                }
 
-            if(scrambleRequest.extraScrambles.length > 0) {
-                PdfPTable headerTable = new PdfPTable(1);
-                headerTable.setTotalWidth(new float[] { availableWidth });
-                headerTable.setLockedWidth(true);
-                
-                PdfPCell extraScramblesHeader = new PdfPCell(new Paragraph("Extra scrambles"));
-                extraScramblesHeader.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-                extraScramblesHeader.setPaddingBottom(3);
-                headerTable.addCell(extraScramblesHeader);
-                doc.add(headerTable);
-                
-                scrambleNumberPrefix = "E";
-                PdfPTable extraScramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
-                doc.add(extraScramblesTable);
+                if(scrambleRequest.extraScrambles.length > 0) {
+                    PdfPTable headerTable = new PdfPTable(1);
+                    headerTable.setTotalWidth(new float[] { availableWidth });
+                    headerTable.setLockedWidth(true);
+                    
+                    PdfPCell extraScramblesHeader = new PdfPCell(new Paragraph("Extra scrambles"));
+                    extraScramblesHeader.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+                    extraScramblesHeader.setPaddingBottom(3);
+                    headerTable.addCell(extraScramblesHeader);
+                    doc.add(headerTable);
+                    
+                    scrambleNumberPrefix = "E";
+                    TableAndHighlighting extraTableAndHighlighting = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix, forceHighlighting);
+                    if(dryRun) {
+                        if(tableAndHighlighting.highlighting) {
+                            forceHighlighting = true;
+                            continue;
+                        }
+                    } else {
+                        doc.add(extraTableAndHighlighting.table);
+                    }
+                }
             }
         }
         doc.newPage();
@@ -716,7 +736,12 @@ class ScrambleRequest {
         return lineChunks;
     }
 
-    private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix) throws DocumentException {
+    static class TableAndHighlighting {
+        PdfPTable table;
+        boolean highlighting;
+    }
+
+    private static TableAndHighlighting createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix, boolean forceHighlighting) throws DocumentException {
         PdfContentByte cb = docWriter.getDirectContent();
 
         PdfPTable table = new PdfPTable(3);
@@ -794,16 +819,7 @@ class ScrambleRequest {
             l.log(Level.INFO, "", e);
         }
 
-        int maxLinesPerScramble = 0;
-        for(String scramble : scrambles) {
-            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
-            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
-            if(lineChunks.size() > maxLinesPerScramble) {
-                maxLinesPerScramble = lineChunks.size();
-            }
-        }
-        boolean highlight = maxLinesPerScramble >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING;
-
+        boolean highlight = forceHighlighting;
         for(int i = 0; i < scrambles.length; i++) {
             String scramble = scrambles[i];
             String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
@@ -815,6 +831,9 @@ class ScrambleRequest {
             Phrase scramblePhrase = new Phrase();
             boolean oddLine = false;
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
+            if(lineChunks.size() >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
+                highlight = true;
+            }
             for(Chunk lineChunk : lineChunks) {
                 oddLine = !oddLine;
                 if(highlight && oddLine) {
@@ -861,7 +880,10 @@ class ScrambleRequest {
             }
         }
         
-        return table;
+        TableAndHighlighting tableAndHighlighting = new TableAndHighlighting();
+        tableAndHighlighting.table = table;
+        tableAndHighlighting.highlighting = highlight;
+        return tableAndHighlighting;
     }
 
     private static void drawSvgToGraphics2D(Svg svg, Graphics2D g2, Dimension size) throws IOException {
