@@ -620,7 +620,48 @@ class ScrambleRequest {
      * @return the calculated font size that makes the text fit
      */
     public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, int runDirection, boolean newlinesAllowed) {
-        try {
+        /*float charHeight = maxFontSize * 0.562f;
+        float charWidth = maxFontSize * 0.6f;
+
+        int minLinesNeeded = (int)Math.ceil( (float)text.length()*charWidth / rect.getWidth() );
+
+        int maxLinesFit = (int)Math.floor( rect.getHeight() / charHeight);
+
+        float size = maxFontSize;
+
+        System.out.println("");
+        System.out.println(text.length() + " chars, " + rect.getWidth() + " x " + rect.getHeight());
+        System.out.println("Initial: height " + charHeight + ", width " + charWidth);
+        System.out.println(minLinesNeeded + " needed, " + maxLinesFit + " available");
+
+        while(minLinesNeeded > maxLinesFit) {
+            //reduce font size
+            size -= 0.5f;
+            
+            //re-calculate
+            charHeight = size * 0.562f;
+            charWidth = size * 0.6f;
+
+            minLinesNeeded = (int)Math.ceil( text.length()*charWidth / rect.getWidth() );
+
+            maxLinesFit = (int)Math.floor( rect.getHeight() / charHeight);
+
+            System.out.println("Font: " + size + ", height " + charHeight + ", width " + charWidth);
+            System.out.println(minLinesNeeded + " needed, " + maxLinesFit + " available");
+        }*/
+
+        float size = (float)Math.sqrt( rect.getWidth() * rect.getHeight() / (0.3372f * (float)text.length()) );
+
+        //System.out.println(text.substring(0,20));
+        System.out.println("W " + rect.getWidth() + ", H " + rect.getHeight() + ", n " + text.length() + " = " + size + "\n");
+        size -= 0.5f; //just to be safe
+
+        if(size > maxFontSize) {
+            size = maxFontSize;
+        }
+        
+        return size;
+        /*try {
             ColumnText ct = null;
             int status = 0;
             if (maxFontSize <= 0) {
@@ -636,6 +677,7 @@ class ScrambleRequest {
                 }
                 int minLines = Math.max(cr, lf) + 1;
                 maxFontSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
+                System.out.println("Max: " + maxFontSize);
             }
             font.setSize(maxFontSize);
             Phrase ph = new Phrase(text, font);
@@ -669,11 +711,12 @@ class ScrambleRequest {
             return size;
         } catch (Exception e) {
             throw new com.itextpdf.text.ExceptionConverter(e);
-        }
+        }*/
     }
 
     private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float scrambleColumnWidth) {
         float availableScrambleWidth = scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL;
+
         int startIndex = 0;
         int endIndex = 0;
         LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
@@ -708,7 +751,7 @@ class ScrambleRequest {
                     endIndex--;
                 }
             }
-
+ 
             String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
 
             // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
@@ -735,6 +778,40 @@ class ScrambleRequest {
             // Force a line wrap!
             lineChunk.append("\n");
         }
+
+        //--------------------------------
+        /*int totalLength = paddedScramble.length();
+
+        float totalWidth = scrambleFont.getBaseFont().getWidthPoint(paddedScramble, scrambleFont.getSize());
+
+        int nLines = lineChunks.size();
+
+        float totalAvailable = (float)nLines * availableScrambleWidth;
+
+        float diff = (totalAvailable - totalWidth);
+
+        float diffPerChar = diff / (float)paddedScramble.length();
+
+        //System.out.println(nLines + " lines -> " + totalAvailable + " total.");
+        //System.out.println("Scramble is " + totalWidth + " wide, so difference is " + diff + " -> " + diffPerChar + "/char");
+
+        float factor = diffPerChar / 0.45f; //it is actually 0.6, but let's play safe
+
+        float newFont = factor + scrambleFont.getSize();
+
+        //System.out.print("Font was " + scrambleFont.getSize());
+
+        Font newScrambleFont = new Font(scrambleFont);
+
+        newScrambleFont.setSize(newFont);
+
+        //System.out.print(" Factor " + factor + ", Font is now " + newScrambleFont.getSize() + "\n");
+
+        for(Chunk nchunk : lineChunks) {
+            nchunk.setFont(newScrambleFont);
+        }*/
+
+        //--------------------------------
         return lineChunks;
     }
 
@@ -803,11 +880,13 @@ class ScrambleRequest {
             // Again, I have no idea where this number is coming from. I'm chalking it up to
             // unaccounted for margins.
             int WIDTH_MARGINS = 40;
-            Rectangle availableArea = new Rectangle(scrambleColumnWidth - WIDTH_MARGINS,
+            Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL/* - WIDTH_MARGINS*/,
                     availableScrambleHeight - HEIGHT_MARGINS);
+            System.out.println("Normal..." + scrambler.getShortName());
             float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, true);
             if(tryToFitOnOneLine) {
                 String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
+                System.out.println("OneLine..." + scrambler.getShortName());
                 float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, false);
                 oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
                 if(oneLine) {
@@ -815,6 +894,8 @@ class ScrambleRequest {
                 }
             }
             scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
+            float scHeight = scrambleFont.getBaseFont().getAscentPoint("R", perfectFontSize) - scrambleFont.getBaseFont().getDescentPoint("R", perfectFontSize);
+            System.out.println("Font: " + perfectFontSize + " = height " + scHeight);
         } catch(IOException e) {
             l.log(Level.INFO, "", e);
         } catch(DocumentException e) {
@@ -836,6 +917,7 @@ class ScrambleRequest {
             if(lineChunks.size() >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
                 highlight = true;
             }
+
             for(Chunk lineChunk : lineChunks) {
                 oddLine = !oddLine;
                 if(highlight && oddLine) {
