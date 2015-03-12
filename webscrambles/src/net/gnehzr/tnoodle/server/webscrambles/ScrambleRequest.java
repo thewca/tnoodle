@@ -621,55 +621,30 @@ class ScrambleRequest {
      * @return the calculated font size that makes the text fit
      */
     public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, int runDirection, boolean newlinesAllowed) {
-        /*float charHeight = maxFontSize * 0.562f;
-        float charWidth = maxFontSize * 0.6f;
 
-        int minLinesNeeded = (int)Math.ceil( (float)text.length()*charWidth / rect.getWidth() );
+        //we don't want the text to go all the way to the top
+        float maxHeight = rect.getHeight() - 5.0f;
 
-        int maxLinesFit = (int)Math.floor( rect.getHeight() / charHeight);
-
-        float size = maxFontSize;
-
-        System.out.println("");
-        System.out.println(text.length() + " chars, " + rect.getWidth() + " x " + rect.getHeight());
-        System.out.println("Initial: height " + charHeight + ", width " + charWidth);
-        System.out.println(minLinesNeeded + " needed, " + maxLinesFit + " available");
-
-        while(minLinesNeeded > maxLinesFit) {
-            //reduce font size
-            size -= 0.5f;
-            
-            //re-calculate
-            charHeight = size * 0.562f;
-            charWidth = size * 0.6f;
-
-            minLinesNeeded = (int)Math.ceil( text.length()*charWidth / rect.getWidth() );
-
-            maxLinesFit = (int)Math.floor( rect.getHeight() / charHeight);
-
-            System.out.println("Font: " + size + ", height " + charHeight + ", width " + charWidth);
-            System.out.println(minLinesNeeded + " needed, " + maxLinesFit + " available");
-        }*/
-
-        //first verify if there's a line break (\n)
+        //first verify if there's a line break (\n) -> megaminx
         int lineBreak = text.indexOf("\n");
 
-        if(lineBreak > 0) {
-            return 10.0f;
+        if(lineBreak > 0) { //if so, calculate the font based only on the width
+            float size = rect.getWidth() / (lineBreak * 0.6f);
+
+            return (size * 0.95f);
         }
 
-
+        //if we can use more than one line,
         if(newlinesAllowed) {
             float minFont = 8.0f;
 
             float maxFont = maxFontSize;
 
-            float precision = 0.2f;
+            float precision = 0.1f;
 
             //first make the chunks using a potentialFontSize
             //midway between min and max
             float oldFont = minFont;
-            //float newFont = (float)(maxFont + minFont) / 2.0f;
             float newFont = maxFont;
 
             System.out.println("Max " + maxFont + ", Min " + minFont + ", Initial " + newFont);
@@ -683,21 +658,23 @@ class ScrambleRequest {
 
             int nLines = lineChunks.size();
 
-            float lineSpace = (float)SCRAMBLE_LEADING - lineHeight;
+            //line spacing is 0.5*font by default
+            float totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
 
-            float totalHeight = (float)nLines * lineHeight + (float)(nLines - 1) * lineSpace;
-
-            boolean fits = (totalHeight < rect.getHeight());
+            boolean fits = (totalHeight < maxHeight);
 
             float diff = Math.abs(newFont - oldFont);
 
-            System.out.println("Font " + newFont + " makes " + nLines + " lines. Each is " + lineHeight + ", total is " + totalHeight);
-            System.out.println("Diff " + diff);
+            boolean stop = false;
+
+            if(diff < precision && fits) {
+                stop = true;
+            }
 
             //loop until it's good enough
-            while( diff > precision && !fits) {
+            while(!stop) {
 
-                if(totalHeight < rect.getHeight()) {
+                if(totalHeight < maxHeight) {
                     //try a bigger one
                     minFont = newFont;
                 } else {
@@ -717,16 +694,18 @@ class ScrambleRequest {
 
                 nLines = lineChunks.size();
 
-                lineSpace = (float)SCRAMBLE_LEADING - lineHeight;
+                totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
 
-                totalHeight = (float)nLines * lineHeight + (float)(nLines - 1) * lineSpace;
-
-                fits = (totalHeight < rect.getHeight());
+                fits = (totalHeight < maxHeight);
 
                 diff = Math.abs(newFont - oldFont);
 
                 System.out.println("Font " + newFont + " makes " + nLines + " lines. Each is " + lineHeight + ", total is " + totalHeight);
                 System.out.println("Diff " + diff);
+
+                if(diff < precision && fits) {
+                    stop = true;
+                }
             }
 
             return newFont;
@@ -741,58 +720,6 @@ class ScrambleRequest {
 
             return fontSize;
         }
-
-        /*try {
-            ColumnText ct = null;
-            int status = 0;
-            if (maxFontSize <= 0) {
-                int cr = 0;
-                int lf = 0;
-                char[] t = text.toCharArray();
-                for (int k = 0; k < t.length; ++k) {
-                    if (t[k] == '\n') {
-                        ++lf;
-                    } else if (t[k] == '\r') {
-                        ++cr;
-                    }
-                }
-                int minLines = Math.max(cr, lf) + 1;
-                maxFontSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
-                System.out.println("Max: " + maxFontSize);
-            }
-            font.setSize(maxFontSize);
-            Phrase ph = new Phrase(text, font);
-            ct = new ColumnText(null);
-            ct.setSimpleColumn(ph, rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), maxFontSize, Element.ALIGN_LEFT);
-            ct.setRunDirection(runDirection);
-            status = ct.go(true);
-            if ((status & ColumnText.NO_MORE_TEXT) != 0 && (newlinesAllowed || ct.getLinesWritten() <= 1)) {
-                return maxFontSize;
-            }
-            float precision = 0.1f;
-            float min = 0;
-            float max = maxFontSize;
-            float size = maxFontSize;
-            for (int k = 0; k < 50; ++k) { //just in case it doesn't converge
-                size = (min + max) / 2;
-                ct = new ColumnText(null);
-                font.setSize(size);
-                ct.setSimpleColumn(new Phrase(text, font), rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), size, Element.ALIGN_LEFT);
-                ct.setRunDirection(runDirection);
-                status = ct.go(true);
-                if ((status & ColumnText.NO_MORE_TEXT) != 0 && (newlinesAllowed || ct.getLinesWritten() <= 1)) {
-                    if (max - min < size * precision) {
-                        return size;
-                    }
-                    min = size;
-                } else {
-                    max = size;
-                }
-            }
-            return size;
-        } catch (Exception e) {
-            throw new com.itextpdf.text.ExceptionConverter(e);
-        }*/
     }
 
     private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float scrambleColumnWidth) {
