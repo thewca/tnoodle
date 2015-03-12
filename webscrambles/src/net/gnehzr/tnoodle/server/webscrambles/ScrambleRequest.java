@@ -92,6 +92,7 @@ class ScrambleRequest {
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
     private static final int SCRAMBLE_PADDING_VERTICAL = 3;
     private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
+    private static final int SCRAMBLE_LEADING = 16;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -650,17 +651,97 @@ class ScrambleRequest {
             System.out.println(minLinesNeeded + " needed, " + maxLinesFit + " available");
         }*/
 
-        float size = (float)Math.sqrt( rect.getWidth() * rect.getHeight() / (0.3372f * (float)text.length()) );
+        //first verify if there's a line break (\n)
+        int lineBreak = text.indexOf("\n");
 
-        //System.out.println(text.substring(0,20));
-        System.out.println("W " + rect.getWidth() + ", H " + rect.getHeight() + ", n " + text.length() + " = " + size + "\n");
-        size -= 0.5f; //just to be safe
-
-        if(size > maxFontSize) {
-            size = maxFontSize;
+        if(lineBreak > 0) {
+            return 10.0f;
         }
-        
-        return size;
+
+
+        if(newlinesAllowed) {
+            float minFont = 8.0f;
+
+            float maxFont = maxFontSize;
+
+            float precision = 0.2f;
+
+            //first make the chunks using a potentialFontSize
+            //midway between min and max
+            float oldFont = minFont;
+            //float newFont = (float)(maxFont + minFont) / 2.0f;
+            float newFont = maxFont;
+
+            System.out.println("Max " + maxFont + ", Min " + minFont + ", Initial " + newFont);
+
+            //determine line height
+            float lineHeight = font.getBaseFont().getAscentPoint(text, newFont) - font.getBaseFont().getDescentPoint(text, newFont);
+            
+            font.setSize(newFont);
+
+            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
+
+            int nLines = lineChunks.size();
+
+            float lineSpace = (float)SCRAMBLE_LEADING - lineHeight;
+
+            float totalHeight = (float)nLines * lineHeight + (float)(nLines - 1) * lineSpace;
+
+            boolean fits = (totalHeight < rect.getHeight());
+
+            float diff = Math.abs(newFont - oldFont);
+
+            System.out.println("Font " + newFont + " makes " + nLines + " lines. Each is " + lineHeight + ", total is " + totalHeight);
+            System.out.println("Diff " + diff);
+
+            //loop until it's good enough
+            while( diff > precision && !fits) {
+
+                if(totalHeight < rect.getHeight()) {
+                    //try a bigger one
+                    minFont = newFont;
+                } else {
+                    //try a smaller one;
+                    maxFont = newFont;
+                }
+
+                oldFont = newFont;
+
+                newFont = (float)(maxFont + minFont) / 2.0f;
+
+                lineHeight = font.getBaseFont().getAscentPoint(text, newFont) - font.getBaseFont().getDescentPoint(text, newFont);
+
+                font.setSize(newFont);
+
+                lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
+
+                nLines = lineChunks.size();
+
+                lineSpace = (float)SCRAMBLE_LEADING - lineHeight;
+
+                totalHeight = (float)nLines * lineHeight + (float)(nLines - 1) * lineSpace;
+
+                fits = (totalHeight < rect.getHeight());
+
+                diff = Math.abs(newFont - oldFont);
+
+                System.out.println("Font " + newFont + " makes " + nLines + " lines. Each is " + lineHeight + ", total is " + totalHeight);
+                System.out.println("Diff " + diff);
+            }
+
+            return newFont;
+ 
+        } else {
+            //trying to fit in a single line
+            float fontSize = rect.getWidth() / (float)text.length();
+
+            fontSize = fontSize / 0.6f;
+
+            System.out.println("Oneline: " + fontSize);
+
+            return fontSize;
+        }
+
         /*try {
             ColumnText ct = null;
             int status = 0;
@@ -779,39 +860,6 @@ class ScrambleRequest {
             lineChunk.append("\n");
         }
 
-        //--------------------------------
-        /*int totalLength = paddedScramble.length();
-
-        float totalWidth = scrambleFont.getBaseFont().getWidthPoint(paddedScramble, scrambleFont.getSize());
-
-        int nLines = lineChunks.size();
-
-        float totalAvailable = (float)nLines * availableScrambleWidth;
-
-        float diff = (totalAvailable - totalWidth);
-
-        float diffPerChar = diff / (float)paddedScramble.length();
-
-        //System.out.println(nLines + " lines -> " + totalAvailable + " total.");
-        //System.out.println("Scramble is " + totalWidth + " wide, so difference is " + diff + " -> " + diffPerChar + "/char");
-
-        float factor = diffPerChar / 0.45f; //it is actually 0.6, but let's play safe
-
-        float newFont = factor + scrambleFont.getSize();
-
-        //System.out.print("Font was " + scrambleFont.getSize());
-
-        Font newScrambleFont = new Font(scrambleFont);
-
-        newScrambleFont.setSize(newFont);
-
-        //System.out.print(" Factor " + factor + ", Font is now " + newScrambleFont.getSize() + "\n");
-
-        for(Chunk nchunk : lineChunks) {
-            nchunk.setFont(newScrambleFont);
-        }*/
-
-        //--------------------------------
         return lineChunks;
     }
 
