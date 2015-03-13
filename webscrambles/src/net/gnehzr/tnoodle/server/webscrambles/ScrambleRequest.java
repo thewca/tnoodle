@@ -623,7 +623,9 @@ class ScrambleRequest {
     public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, int runDirection, boolean newlinesAllowed) {
 
         //we don't want the text to go all the way to the top
-        float maxHeight = rect.getHeight() - 5.0f;
+        float maxHeight = rect.getHeight() - 8.0f;
+
+        System.out.println("MaxH " + maxHeight);
 
         //first verify if there's a line break (\n) -> megaminx
         int lineBreak = text.indexOf("\n");
@@ -646,8 +648,6 @@ class ScrambleRequest {
             //midway between min and max
             float oldFont = minFont;
             float newFont = maxFont;
-
-            System.out.println("Max " + maxFont + ", Min " + minFont + ", Initial " + newFont);
 
             //determine line height
             float lineHeight = font.getBaseFont().getAscentPoint(text, newFont) - font.getBaseFont().getDescentPoint(text, newFont);
@@ -708,13 +708,17 @@ class ScrambleRequest {
                 }
             }
 
+            System.out.println("Font " + newFont + " makes " + nLines + " lines. Each is " + lineHeight + ", total is " + totalHeight);
+            System.out.println("Diff " + diff);
+
             return newFont;
  
         } else {
             //trying to fit in a single line
             float fontSize = rect.getWidth() / (float)text.length();
 
-            fontSize = fontSize / 0.6f;
+            //actual ratio is 0.6, but it may get too big (skewb specially)
+            fontSize = fontSize / 0.65f;
 
             System.out.println("Oneline: " + fontSize);
 
