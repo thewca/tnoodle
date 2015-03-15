@@ -621,15 +621,15 @@ class ScrambleRequest {
      */
     public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, int runDirection, boolean newlinesAllowed) {
 
-        //we don't want the text to go all the way to the top
-        float maxHeight = rect.getHeight() - 8.0f;
-
         //first verify if there's a line break ("\n") -> megaminx
+        //if so, calculate the font based only on the width
         int lineBreak = text.indexOf("\n");
 
-        if(lineBreak > 0) { //if so, calculate the font based only on the width
+        if(lineBreak > 0) {
+            //the char width is fontSize * 0.6 -> this was found with getWidthPoint()
             float size = rect.getWidth() / (lineBreak * 0.6f);
 
+            //the calculated size is a little too big, so we reduce it to 95%
             return (size * 0.95f);
         }
 
@@ -642,11 +642,11 @@ class ScrambleRequest {
             float precision = 0.1f;
 
             //first make the chunks using a potentialFontSize
-            //midway between min and max
+            //starting with the maximum size
             float oldFont = minFont;
             float newFont = maxFont;
 
-            //determine line height
+            //determine line height - using font ascent and descent
             float lineHeight = font.getBaseFont().getAscentPoint(text, newFont) - font.getBaseFont().getDescentPoint(text, newFont);
             
             font.setSize(newFont);
@@ -672,10 +672,8 @@ class ScrambleRequest {
             while(!stop) {
 
                 if(totalHeight < maxHeight) {
-                    //try a bigger one
                     minFont = newFont;
                 } else {
-                    //try a smaller one;
                     maxFont = newFont;
                 }
 
@@ -703,13 +701,11 @@ class ScrambleRequest {
             }
 
             return newFont;
- 
-        } else {
-            //trying to fit in a single line
-            float fontSize = rect.getWidth() / (float)text.length();
-
-            //actual ratio is 0.6, but it may get too big (skewb specially)
-            fontSize = fontSize / 0.65f;
+           
+        } else { //trying to fit in a single line
+            //Again, char width is fontSize * 0.6, but it may get too big (skewb specially)
+            //so we use 0.65 instead
+            float fontSize = (rect.getWidth() / (float)text.length()) * 0.65f;
 
             return fontSize;
         }
@@ -844,7 +840,8 @@ class ScrambleRequest {
             // Gah, I have no idea where this number is coming from, see
             // https://github.com/cubing/tnoodle/issues/124 for why we had to bump
             // it from 8 to 9.
-            int HEIGHT_MARGINS = 9;
+            // Pedro says: I changed this margin to 17, so that text doesn't go all the way to the top of the cell and touch the border
+            int HEIGHT_MARGINS = 17;
             // Again, I have no idea where this number is coming from. I'm chalking it up to
             // unaccounted for margins.
             int WIDTH_MARGINS = 40;
