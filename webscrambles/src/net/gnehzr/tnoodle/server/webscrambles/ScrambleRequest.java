@@ -92,7 +92,6 @@ class ScrambleRequest {
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
     private static final int SCRAMBLE_PADDING_VERTICAL = 3;
     private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
-    private static final int SCRAMBLE_LEADING = 16;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -849,13 +848,11 @@ class ScrambleRequest {
             // Again, I have no idea where this number is coming from. I'm chalking it up to
             // unaccounted for margins.
             int WIDTH_MARGINS = 40;
-            Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL/* - WIDTH_MARGINS*/,
+            Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
                     availableScrambleHeight - HEIGHT_MARGINS);
-            System.out.println("Normal..." + scrambler.getShortName());
             float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, true);
             if(tryToFitOnOneLine) {
                 String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
-                System.out.println("OneLine..." + scrambler.getShortName());
                 float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, false);
                 oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
                 if(oneLine) {
@@ -863,8 +860,6 @@ class ScrambleRequest {
                 }
             }
             scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
-            float scHeight = scrambleFont.getBaseFont().getAscentPoint("R", perfectFontSize) - scrambleFont.getBaseFont().getDescentPoint("R", perfectFontSize);
-            System.out.println("Font: " + perfectFontSize + " = height " + scHeight);
         } catch(IOException e) {
             l.log(Level.INFO, "", e);
         } catch(DocumentException e) {
@@ -881,18 +876,18 @@ class ScrambleRequest {
             table.addCell(nthscramble);
 
             Phrase scramblePhrase = new Phrase();
-            boolean oddLine = true;
+            int nthLine = 1;
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
             if(lineChunks.size() >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
                 highlight = true;
             }
 
             for(Chunk lineChunk : lineChunks) {
-                oddLine = !oddLine;
-                if(highlight && oddLine) {
+                if(highlight && (nthLine % 2 == 0)) {
                     lineChunk.setBackground(HIGHLIGHT_COLOR);
                 }
                 scramblePhrase.add(lineChunk);
+                nthLine++;
             }
 
             PdfPCell scrambleCell = new PdfPCell(new Paragraph(scramblePhrase));
