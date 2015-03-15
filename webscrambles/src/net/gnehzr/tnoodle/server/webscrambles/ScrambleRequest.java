@@ -658,7 +658,7 @@ class ScrambleRequest {
             //line spacing is 0.5*font by default
             float totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
 
-            boolean fits = (totalHeight < maxHeight);
+            boolean fits = (totalHeight < rect.getHeight());
 
             float diff = Math.abs(newFont - oldFont);
 
@@ -671,7 +671,7 @@ class ScrambleRequest {
             //loop until it's good enough
             while(!stop) {
 
-                if(totalHeight < maxHeight) {
+                if(totalHeight < rect.getHeight()) {
                     minFont = newFont;
                 } else {
                     maxFont = newFont;
@@ -691,7 +691,7 @@ class ScrambleRequest {
 
                 totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
 
-                fits = (totalHeight < maxHeight);
+                fits = (totalHeight < rect.getHeight());
 
                 diff = Math.abs(newFont - oldFont);
 
