@@ -625,9 +625,7 @@ class ScrambleRequest {
         //we don't want the text to go all the way to the top
         float maxHeight = rect.getHeight() - 8.0f;
 
-        System.out.println("MaxH " + maxHeight);
-
-        //first verify if there's a line break (\n) -> megaminx
+        //first verify if there's a line break ("\n") -> megaminx
         int lineBreak = text.indexOf("\n");
 
         if(lineBreak > 0) { //if so, calculate the font based only on the width
@@ -700,16 +698,10 @@ class ScrambleRequest {
 
                 diff = Math.abs(newFont - oldFont);
 
-                System.out.println("Font " + newFont + " makes " + nLines + " lines. Each is " + lineHeight + ", total is " + totalHeight);
-                System.out.println("Diff " + diff);
-
                 if(diff < precision && fits) {
                     stop = true;
                 }
             }
-
-            System.out.println("Font " + newFont + " makes " + nLines + " lines. Each is " + lineHeight + ", total is " + totalHeight);
-            System.out.println("Diff " + diff);
 
             return newFont;
  
@@ -719,8 +711,6 @@ class ScrambleRequest {
 
             //actual ratio is 0.6, but it may get too big (skewb specially)
             fontSize = fontSize / 0.65f;
-
-            System.out.println("Oneline: " + fontSize);
 
             return fontSize;
         }
@@ -891,7 +881,7 @@ class ScrambleRequest {
             table.addCell(nthscramble);
 
             Phrase scramblePhrase = new Phrase();
-            boolean oddLine = false;
+            boolean oddLine = true;
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
             if(lineChunks.size() >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
                 highlight = true;
