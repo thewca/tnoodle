@@ -637,6 +637,7 @@ class ScrambleRequest {
                 maxFontSize = potentialFontSize;
             } else {
                 // Line spacing is 0.5*font by default
+                // http://stackoverflow.com/questions/21810133/changing-text-line-spacing
                 float totalHeight = (float) lineChunks.size() * lineHeight * 1.5f - (0.5f * lineHeight);
                 if(totalHeight < rect.getHeight()) {
                     minFontSize = potentialFontSize;
