@@ -654,7 +654,7 @@ class ScrambleRequest {
             int lineCount = lineChunks.size();
 
             //line spacing is 0.5*font by default
-            float totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
+            float totalHeight = (float)lineCount * lineHeight * 1.5f - (0.5f * lineHeight);
 
             boolean fits = (totalHeight < rect.getHeight());
 
@@ -687,7 +687,7 @@ class ScrambleRequest {
 
                 lineCount = lineChunks.size();
 
-                totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
+                totalHeight = (float)lineCount * lineHeight * 1.5f - (0.5f * lineHeight);
 
                 fits = (totalHeight < rect.getHeight());
 
