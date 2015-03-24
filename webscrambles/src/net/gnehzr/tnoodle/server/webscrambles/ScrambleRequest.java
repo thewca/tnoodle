@@ -87,12 +87,12 @@ class ScrambleRequest {
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
+    private static final float MIN_SCRAMBLE_FONT_SIZE = 8.0f;
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
     private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4;
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
     private static final int SCRAMBLE_PADDING_VERTICAL = 3;
     private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
-    private static final float minFont = 8.0f;
     private static final float precision = 0.1f;
 
     private static final int MAX_COUNT = 100;
@@ -638,6 +638,7 @@ class ScrambleRequest {
         //if we can use more than one line,
         if(newlinesAllowed) {
             float maxFont = maxFontSize;
+            float minFont = MIN_SCRAMBLE_FONT_SIZE;
 
             //starting with the maximum size
             float oldFont = minFont;
