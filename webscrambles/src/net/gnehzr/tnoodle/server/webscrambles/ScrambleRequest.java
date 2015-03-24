@@ -644,6 +644,7 @@ class ScrambleRequest {
             float newFont = maxFont;
 
             //determine line height - using font ascent and descent
+            //http://itextpdf.com/sandbox/objects/FitTextInRectangle
             float lineHeight = font.getBaseFont().getAscentPoint(text, newFont) - font.getBaseFont().getDescentPoint(text, newFont);
             
             font.setSize(newFont);
