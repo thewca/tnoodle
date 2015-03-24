@@ -87,13 +87,11 @@ class ScrambleRequest {
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
-    private static final float MIN_SCRAMBLE_FONT_SIZE = 8.0f;
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
     private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4;
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
     private static final int SCRAMBLE_PADDING_VERTICAL = 3;
     private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
-    private static final float precision = 0.1f;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -618,96 +616,42 @@ class ScrambleRequest {
      * @param text the text
      * @param rect the rectangle where the text must fit
      * @param maxFontSize the maximum font size
-     * @param runDirection the run direction
      * @return the calculated font size that makes the text fit
      */
-    public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, int runDirection, boolean newlinesAllowed) {
+    private static final float FITTEXT_FONTSIZE_PRECISION = 0.1f;
+    public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, boolean newlinesAllowed) {
+        float minFontSize = 1f;
+        float potentialFontSize;
+        while(true) {
+            potentialFontSize = (maxFontSize + minFontSize) / 2.0f;
 
-        //first verify if there's a line break ("\n") -> megaminx
-        //if so, calculate the font based only on the width
-        int lineBreak = text.indexOf("\n");
-
-        if(lineBreak > 0) {
-            //the char width is fontSize * 0.6 -> this was found with getWidthPoint()
-            float size = rect.getWidth() / (lineBreak * 0.6f);
-
-            //the calculated size is a little too big, so we reduce it to 95%
-            return (size * 0.95f);
-        }
-
-        //if we can use more than one line,
-        if(newlinesAllowed) {
-            float maxFont = maxFontSize;
-            float minFont = MIN_SCRAMBLE_FONT_SIZE;
-
-            //starting with the maximum size
-            float oldFont = minFont;
-            float newFont = maxFont;
-
-            //determine line height - using font ascent and descent
-            //http://itextpdf.com/sandbox/objects/FitTextInRectangle
-            float lineHeight = font.getBaseFont().getAscentPoint(text, newFont) - font.getBaseFont().getDescentPoint(text, newFont);
-            
-            font.setSize(newFont);
+            // Determine line height - using font ascent and descent
+            //  http://itextpdf.com/sandbox/objects/FitTextInRectangle
+            float lineHeight = font.getBaseFont().getAscentPoint(text, potentialFontSize) - font.getBaseFont().getDescentPoint(text, potentialFontSize);
+            font.setSize(potentialFontSize);
 
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
-
-            int lineCount = lineChunks.size();
-
-            //line spacing is 0.5*font by default
-            float totalHeight = (float)lineCount * lineHeight * 1.5f - (0.5f * lineHeight);
-
-            boolean fits = (totalHeight < rect.getHeight());
-
-            float diff = Math.abs(newFont - oldFont);
-
-            boolean stop = false;
-
-            if(diff < precision && fits) {
-                stop = true;
-            }
-
-            //loop until it's good enough
-            while(!stop) {
-
+            if(!newlinesAllowed && lineChunks.size() > 1) {
+                // If newlines are not allowed, and we had to split the text into more than
+                // one line, then potentialFontSize is too large.
+                maxFontSize = potentialFontSize;
+            } else {
+                // Line spacing is 0.5*font by default
+                float totalHeight = (float) lineChunks.size() * lineHeight * 1.5f - (0.5f * lineHeight);
                 if(totalHeight < rect.getHeight()) {
-                    minFont = newFont;
+                    minFontSize = potentialFontSize;
                 } else {
-                    maxFont = newFont;
-                }
-
-                oldFont = newFont;
-
-                newFont = (float)(maxFont + minFont) / 2.0f;
-
-                lineHeight = font.getBaseFont().getAscentPoint(text, newFont) - font.getBaseFont().getDescentPoint(text, newFont);
-
-                font.setSize(newFont);
-
-                lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
-
-                lineCount = lineChunks.size();
-
-                totalHeight = (float)lineCount * lineHeight * 1.5f - (0.5f * lineHeight);
-
-                fits = (totalHeight < rect.getHeight());
-
-                diff = Math.abs(newFont - oldFont);
-
-                if(diff < precision && fits) {
-                    stop = true;
+                    maxFontSize = potentialFontSize;
                 }
             }
-
-            return newFont;
-           
-        } else { //trying to fit in a single line
-            //The char width is 0.6 * fontSize, but it may get too big (specially skewb)
-            //so instead of 0.6, let's use 0.65, to give a slightly smaller fontSize
-            float fontSize = (rect.getWidth() / (float)text.length()) * 0.65f;
-
-            return fontSize;
+            if(maxFontSize - minFontSize < FITTEXT_FONTSIZE_PRECISION) {
+                // Err on the side of too small, because being too large will screw up
+                // layout.
+                potentialFontSize = minFontSize;
+                break;
+            }
         }
+        return potentialFontSize;
     }
 
     private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float scrambleColumnWidth) {
@@ -734,11 +678,19 @@ class ScrambleRequest {
             endIndex--;
 
             // If we're not at the end of the scramble, make sure we're not cutting
-            // a turn in half by walking backwards until we're right after a turn
-            // any spaces added for padding after that turn are considered part of
+            // a turn in half by walking backwards until we're right before a turn.
+            // Any spaces added for padding after a turn are considered part of
             // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
+            int perfectFitEndIndex = endIndex;
             if(endIndex < paddedScramble.length()) {
                 while(true) {
+                    if(endIndex < startIndex) {
+                        // We walked all the way to the beginning of the line
+                        // without finding a good breaking point. Give up and break
+                        // in the middle of a turn =(.
+                        endIndex = perfectFitEndIndex;
+                        break;
+                    }
                     char currentCharacter = paddedScramble.charAt(endIndex);
                     boolean isTurnCharacter = currentCharacter != ' ';
                     if(!isTurnCharacter || currentCharacter == '\n') {
@@ -836,15 +788,15 @@ class ScrambleRequest {
 
         try {
             BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-            int HEIGHT_MARGINS = 17;
-            // Again, I have no idea where this number is coming from. I'm chalking it up to
-            // unaccounted for margins.
+            // I have no idea where this number is coming from. iTextPdf seems to compute
+            // the vertical space of cells differently than we do.
+            int HEIGHT_MARGINS = 20;
             Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
                     availableScrambleHeight - HEIGHT_MARGINS);
-            float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, true);
+            float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true);
             if(tryToFitOnOneLine) {
                 String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
-                float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, false);
+                float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, false);
                 oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
                 if(oneLine) {
                     perfectFontSize = perfectFontSizeForOneLine;
