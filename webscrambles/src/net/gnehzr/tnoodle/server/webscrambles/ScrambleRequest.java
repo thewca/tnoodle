@@ -92,6 +92,8 @@ class ScrambleRequest {
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
     private static final int SCRAMBLE_PADDING_VERTICAL = 3;
     private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
+    private static final float minFont = 8.0f;
+    private static final float precision = 0.1f;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -635,13 +637,8 @@ class ScrambleRequest {
 
         //if we can use more than one line,
         if(newlinesAllowed) {
-            float minFont = 8.0f;
-
             float maxFont = maxFontSize;
 
-            float precision = 0.1f;
-
-            //first make the chunks using a potentialFontSize
             //starting with the maximum size
             float oldFont = minFont;
             float newFont = maxFont;
@@ -653,7 +650,7 @@ class ScrambleRequest {
 
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
 
-            int nLines = lineChunks.size();
+            int lineCount = lineChunks.size();
 
             //line spacing is 0.5*font by default
             float totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
@@ -687,7 +684,7 @@ class ScrambleRequest {
 
                 lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
 
-                nLines = lineChunks.size();
+                lineCount = lineChunks.size();
 
                 totalHeight = (float)nLines * lineHeight * 1.5f - (0.5f * lineHeight);
 
@@ -703,8 +700,8 @@ class ScrambleRequest {
             return newFont;
            
         } else { //trying to fit in a single line
-            //Again, char width is fontSize * 0.6, but it may get too big (skewb specially)
-            //so we use 0.65 instead
+            //The char width is 0.6 * fontSize, but it may get too big (specially skewb)
+            //so instead of 0.6, let's use 0.65, to give a slightly smaller fontSize
             float fontSize = (rect.getWidth() / (float)text.length()) * 0.65f;
 
             return fontSize;
@@ -837,14 +834,9 @@ class ScrambleRequest {
 
         try {
             BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-            // Gah, I have no idea where this number is coming from, see
-            // https://github.com/cubing/tnoodle/issues/124 for why we had to bump
-            // it from 8 to 9.
-            // Pedro says: I changed this margin to 17, so that text doesn't go all the way to the top of the cell and touch the border
             int HEIGHT_MARGINS = 17;
             // Again, I have no idea where this number is coming from. I'm chalking it up to
             // unaccounted for margins.
-            int WIDTH_MARGINS = 40;
             Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
                     availableScrambleHeight - HEIGHT_MARGINS);
             float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, true);
