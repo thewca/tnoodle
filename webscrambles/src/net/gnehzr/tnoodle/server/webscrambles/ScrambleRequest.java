@@ -824,7 +824,7 @@ class ScrambleRequest {
             nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             table.addCell(nthscramble);
 
-            Phrase scramblePhrase = new Phrase();
+            Phrase scramblePhrase = new Phrase(25.0f);
             int nthLine = 1;
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
             if(lineChunks.size() >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
@@ -839,6 +839,8 @@ class ScrambleRequest {
                 nthLine++;
             }
 
+            System.out.println(scrambler.getShortName() + " " + scramblePhrase.getLeading());
+
             PdfPCell scrambleCell = new PdfPCell(new Paragraph(scramblePhrase));
             // We carefully inserted newlines ourselves to make stuff fit, don't
             // let itextpdf wrap lines for us.
@@ -850,6 +852,8 @@ class ScrambleRequest {
             scrambleCell.setPaddingBottom(SCRAMBLE_PADDING_VERTICAL);
             scrambleCell.setPaddingLeft(SCRAMBLE_PADDING_HORIZONTAL);
             scrambleCell.setPaddingRight(SCRAMBLE_PADDING_HORIZONTAL);
+
+            scrambleCell.setLeading(scrambleFont.getSize() * 1.1f, 0);
             table.addCell(scrambleCell);
 
             if(scrambleImageSize.width > 0 && scrambleImageSize.height > 0) {
