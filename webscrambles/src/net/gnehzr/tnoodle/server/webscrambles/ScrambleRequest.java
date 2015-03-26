@@ -624,10 +624,6 @@ class ScrambleRequest {
         float potentialFontSize;
         while(true) {
             potentialFontSize = (maxFontSize + minFontSize) / 2.0f;
-
-            // Determine line height - using font ascent and descent
-            //  http://itextpdf.com/sandbox/objects/FitTextInRectangle
-            float lineHeight = font.getBaseFont().getAscentPoint(text, potentialFontSize) - font.getBaseFont().getDescentPoint(text, potentialFontSize);
             font.setSize(potentialFontSize);
 
             LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
@@ -636,9 +632,9 @@ class ScrambleRequest {
                 // one line, then potentialFontSize is too large.
                 maxFontSize = potentialFontSize;
             } else {
-                // Line spacing is 0.5*font by default
-                // http://stackoverflow.com/questions/21810133/changing-text-line-spacing
-                float totalHeight = (float) lineChunks.size() * lineHeight * 1.5f - (0.5f * lineHeight);
+                // The font size seems to be a pretty good estimate for how
+                // much vertical space a row actually takes up.
+                float totalHeight = lineChunks.size() * potentialFontSize;
                 if(totalHeight < rect.getHeight()) {
                     minFontSize = potentialFontSize;
                 } else {
@@ -692,10 +688,22 @@ class ScrambleRequest {
                         endIndex = perfectFitEndIndex;
                         break;
                     }
-                    char currentCharacter = paddedScramble.charAt(endIndex);
-                    boolean isTurnCharacter = currentCharacter != ' ';
-                    if(!isTurnCharacter || currentCharacter == '\n') {
-                        break;
+
+                    // Another dirty hack for sq1: turns only line up
+                    // nicely if every line starts with a (x,y). We ensure this
+                    // by forcing every line to end with a /.
+                    boolean isSquareOne = paddedScramble.indexOf('/') >= 0;
+                    if(isSquareOne) {
+                        char previousCharacter = paddedScramble.charAt(endIndex - 1);
+                        if(previousCharacter == '/') {
+                            break;
+                        }
+                    } else {
+                        char currentCharacter = paddedScramble.charAt(endIndex);
+                        boolean isTurnCharacter = currentCharacter != ' ';
+                        if(!isTurnCharacter || currentCharacter == '\n') {
+                            break;
+                        }
                     }
                     endIndex--;
                 }
@@ -789,11 +797,8 @@ class ScrambleRequest {
 
         try {
             BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-            // I have no idea where this number is coming from. iTextPdf seems to compute
-            // the vertical space of cells differently than we do.
-            int HEIGHT_MARGINS = 20;
             Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
-                    availableScrambleHeight - HEIGHT_MARGINS);
+                    availableScrambleHeight - 2*SCRAMBLE_PADDING_VERTICAL);
             float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true);
             if(tryToFitOnOneLine) {
                 String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
