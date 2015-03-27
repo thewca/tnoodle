@@ -850,6 +850,8 @@ class ScrambleRequest {
             scrambleCell.setPaddingBottom(SCRAMBLE_PADDING_VERTICAL);
             scrambleCell.setPaddingLeft(SCRAMBLE_PADDING_HORIZONTAL);
             scrambleCell.setPaddingRight(SCRAMBLE_PADDING_HORIZONTAL);
+            // We space lines a little bit more here - it still fits in the cell height
+            scrambleCell.setLeading(0, 1.1f);
             table.addCell(scrambleCell);
 
             if(scrambleImageSize.width > 0 && scrambleImageSize.height > 0) {
