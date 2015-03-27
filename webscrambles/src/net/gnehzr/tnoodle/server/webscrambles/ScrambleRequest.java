@@ -91,7 +91,7 @@ class ScrambleRequest {
     private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4;
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
     private static final int SCRAMBLE_PADDING_VERTICAL = 3;
-    private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
+    private static final int SCRAMBLE_PADDING_HORIZONTAL = 1;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -665,7 +665,7 @@ class ScrambleRequest {
                 if(paddedScramble.charAt(endIndex - 1) == '\n') {
                     break;
                 }
-                String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
+                String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
                 substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
                 if(substringWidth > availableScrambleWidth) {
                     break;
@@ -709,7 +709,7 @@ class ScrambleRequest {
                 }
             }
  
-            String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
+            String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
 
             // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
             // space as is available on a line.
