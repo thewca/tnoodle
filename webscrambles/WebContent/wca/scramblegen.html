@@ -130,8 +130,8 @@
                 // The user must upgrade in order to generate legal scrambles.
                 // Don't disable the UI, but make it very obvious that they're
                 // using an unallowed version of TNoodle.
-                addStateMessage("This version of TNoodle (" + runningVersion + ") may not be used to generate scrambles for a WCA competition. Upgrade to " + downloadCurrentStr);
-                createWatermarkDiv("Scrambles generated with this version of TNoodle may not be used in competition");
+                addStateMessage("This version of TNoodle (" + runningVersion + ") must not be used to generate scrambles for a WCA competition. Upgrade to " + downloadCurrentStr);
+                createWatermarkDiv("Scrambles generated with this version of TNoodle must not be used in competition");
             } else {
                 assert(false);
             }
