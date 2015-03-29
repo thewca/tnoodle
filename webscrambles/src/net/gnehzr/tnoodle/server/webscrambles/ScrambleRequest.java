@@ -90,8 +90,9 @@ class ScrambleRequest {
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
     private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4;
     private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
-    private static final int SCRAMBLE_PADDING_VERTICAL = 3;
-    private static final int SCRAMBLE_PADDING_HORIZONTAL = 3;
+    private static final int SCRAMBLE_PADDING_VERTICAL_TOP = 3;
+    private static final int SCRAMBLE_PADDING_VERTICAL_BOTTOM = 6;
+    private static final int SCRAMBLE_PADDING_HORIZONTAL = 1;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -665,7 +666,7 @@ class ScrambleRequest {
                 if(paddedScramble.charAt(endIndex - 1) == '\n') {
                     break;
                 }
-                String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
+                String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
                 substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
                 if(substringWidth > availableScrambleWidth) {
                     break;
@@ -709,7 +710,7 @@ class ScrambleRequest {
                 }
             }
  
-            String scrambleSubstring = paddedScramble.substring(startIndex, endIndex);
+            String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
 
             // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
             // space as is available on a line.
@@ -798,7 +799,7 @@ class ScrambleRequest {
         try {
             BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
             Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
-                    availableScrambleHeight - 2*SCRAMBLE_PADDING_VERTICAL);
+                    availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM);
             float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true);
             if(tryToFitOnOneLine) {
                 String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
@@ -846,8 +847,8 @@ class ScrambleRequest {
             scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             // This shifts everything up a little bit, because I don't like how
             // ALIGN_MIDDLE works.
-            scrambleCell.setPaddingTop(-SCRAMBLE_PADDING_VERTICAL);
-            scrambleCell.setPaddingBottom(SCRAMBLE_PADDING_VERTICAL);
+            scrambleCell.setPaddingTop(-SCRAMBLE_PADDING_VERTICAL_TOP);
+            scrambleCell.setPaddingBottom(SCRAMBLE_PADDING_VERTICAL_BOTTOM);
             scrambleCell.setPaddingLeft(SCRAMBLE_PADDING_HORIZONTAL);
             scrambleCell.setPaddingRight(SCRAMBLE_PADDING_HORIZONTAL);
             // We space lines a little bit more here - it still fits in the cell height
