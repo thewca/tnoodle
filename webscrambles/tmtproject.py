@@ -7,5 +7,7 @@ class Project(tmt.EclipseProject):
         tmt.WinstoneServer.addPlugin(self)
 
         self.nonJavaResourceDeps |= tmt.glob(self.src, '.*html$', relativeTo=self.src)
+        self.nonJavaResourceDeps |= tmt.glob(self.src, '.*ttf$', relativeTo=self.src)
+        print(self.nonJavaResourceDeps)
 
 Project(tmt.projectName(), description="A server plugin wrapper for scrambles that also draws pdfs.")
