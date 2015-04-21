@@ -798,19 +798,19 @@ class ScrambleRequest {
 
         try {
             // load the font from the resource folder. This loads the regular version, but can be changed to light, bold, etc if people prefer that
-            BaseFont sourcecode = BaseFont.createFont(Utils.getResourceDirectory().getPath() + "/fonts/SourceCodePro-Regular.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
+            BaseFont sourceCodeFont = BaseFont.createFont(Utils.getResourceDirectory().getPath() + "/fonts/SourceCodePro-Regular.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
             Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
                     availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM);
-            float perfectFontSize = fitText(new Font(sourcecode), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true);
+            float perfectFontSize = fitText(new Font(sourceCodeFont), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true);
             if(tryToFitOnOneLine) {
                 String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
-                float perfectFontSizeForOneLine = fitText(new Font(sourcecode), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, false);
+                float perfectFontSizeForOneLine = fitText(new Font(sourceCodeFont), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, false);
                 oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
                 if(oneLine) {
                     perfectFontSize = perfectFontSizeForOneLine;
                 }
             }
-            scrambleFont = new Font(sourcecode, perfectFontSize, Font.NORMAL);
+            scrambleFont = new Font(sourceCodeFont, perfectFontSize, Font.NORMAL);
         } catch(IOException e) {
             l.log(Level.INFO, "", e);
         } catch(DocumentException e) {
