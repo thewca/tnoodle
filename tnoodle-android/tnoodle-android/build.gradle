@@ -103,8 +103,9 @@ gradle.taskGraph.whenReady { taskGraph ->
         }
         console.printf "signing.secretKeyRingFile is $file\n"
 
-        if(!hasProperty("signing.password")) {
-            def password = console.readPassword("PGP Private Key Password: ")
+        def password = property("signing.password")
+        if(password == null) {
+            password = console.readPassword("PGP Private Key Password: ")
             allprojects { ext."signing.password" = password }
         }
 

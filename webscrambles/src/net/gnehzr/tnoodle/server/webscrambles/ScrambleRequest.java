@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.logging.Level;
@@ -68,9 +69,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
-import com.itextpdf.text.pdf.DefaultSplitCharacter;
 import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfChunk;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfDestination;
 import com.itextpdf.text.pdf.PdfImportedPage;
@@ -89,11 +88,18 @@ class ScrambleRequest {
     private static final int SCRAMBLE_IMAGE_PADDING = 2;
     private static final float MAX_SCRAMBLE_FONT_SIZE = 20;
     private static final float MINIMUM_ONE_LINE_FONT_SIZE = 12;
+    private static final int MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4;
+    private static final BaseColor HIGHLIGHT_COLOR = new BaseColor(230, 230, 230);
+    private static final int SCRAMBLE_PADDING_VERTICAL_TOP = 3;
+    private static final int SCRAMBLE_PADDING_VERTICAL_BOTTOM = 6;
+    private static final int SCRAMBLE_PADDING_HORIZONTAL = 1;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
 
     private static final int WCA_MAX_MOVES_FMC = 80;
+
+    private static final char NON_BREAKING_SPACE = '\u00A0';
 
     private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
     private static SortedMap<String, LazyInstantiator<Puzzle>> puzzles;
@@ -104,18 +110,6 @@ class ScrambleRequest {
             l.log(Level.INFO, "", e);
         } catch (IOException e) {
             l.log(Level.INFO, "", e);
-        }
-
-        // This is an awful workaround for https://github.com/jfly/tnoodle/issues/1.
-        // Hopefully someday this problem will go away, and this code can simply be deleted.
-        try {
-            ScrambleRequest r = new ScrambleRequest("title", "333", null);
-            requestsToPdf("", new Date(), new ScrambleRequest[] { r }, null);
-        } catch (Throwable e) {
-            l.log(Level.WARNING, "Yikes! Did you just see a warning similar to this " +
-                    "\"java.lang.Error: Probable fatal error:No fonts found.\"? " +
-                    "This exception may have been expected. See " +
-                    "https://github.com/jfly/tnoodle/issues/1 for more details.", e);
         }
     }
 
@@ -227,25 +221,6 @@ class ScrambleRequest {
         }
         return scrambleRequests;
     }
-
-
-    private static final DefaultSplitCharacter SPLIT_ON_SPACES = new DefaultSplitCharacter() {
-        @Override
-        public boolean isSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
-            // We don't allow splitting on spaces that are being used as padding
-            // We know a space isn't being used as padding if it is followed immediately by
-            // a non space character.
-            return ( getCurrentCharacter(current, cc, ck) == ' ' &&
-                        ( current == end || getCurrentCharacter(current+1, cc, ck) != ' ') );
-        }
-    };
-
-    private static final DefaultSplitCharacter SPLIT_ON_NEWLINES = new DefaultSplitCharacter() {
-        @Override
-        public boolean isSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
-            return getCurrentCharacter(current, cc, ck) == '\n';
-        }
-    };
 
 
     private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
@@ -414,7 +389,7 @@ class ScrambleRequest {
 //              int allocatedX = (2*linesX-1)*lineWidth;
                 int excessX = availableSolutionWidth-linesX*lineWidth;
                 int moveCount = 0;
-                solutionLines:
+            solutionLines:
                 for(int y = 0; y < linesY; y++) {
                     for(int x = 0; x < linesX; x++) {
                         if(moveCount >= WCA_MAX_MOVES_FMC) {
@@ -588,24 +563,46 @@ class ScrambleRequest {
             
             Dimension scrambleImageSize = scrambleRequest.scrambler.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight);
             
-            String scrambleNumberPrefix = "";
-            PdfPTable scramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
-            doc.add(scramblesTable);
+            // First do a dry run just to see if any scrambles require highlighting.
+            // Then do the real run, and force highlighting on every scramble
+            // if any scramble required it.
+            boolean forceHighlighting = false;
+            for(boolean dryRun : new boolean[]{ true, false }) {
+                String scrambleNumberPrefix = "";
+                TableAndHighlighting tableAndHighlighting = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix, forceHighlighting);
+                if(dryRun) {
+                    if(tableAndHighlighting.highlighting) {
+                        forceHighlighting = true;
+                        continue;
+                    }
+                } else {
+                    doc.add(tableAndHighlighting.table);
+                }
 
-            if(scrambleRequest.extraScrambles.length > 0) {
-                PdfPTable headerTable = new PdfPTable(1);
-                headerTable.setTotalWidth(new float[] { availableWidth });
-                headerTable.setLockedWidth(true);
-                
-                PdfPCell extraScramblesHeader = new PdfPCell(new Paragraph("Extra scrambles"));
-                extraScramblesHeader.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-                extraScramblesHeader.setPaddingBottom(3);
-                headerTable.addCell(extraScramblesHeader);
-                doc.add(headerTable);
-                
-                scrambleNumberPrefix = "E";
-                PdfPTable extraScramblesTable = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix);
-                doc.add(extraScramblesTable);
+                if(scrambleRequest.extraScrambles.length > 0) {
+                    PdfPTable headerTable = new PdfPTable(1);
+                    headerTable.setTotalWidth(new float[] { availableWidth });
+                    headerTable.setLockedWidth(true);
+                    
+                    PdfPCell extraScramblesHeader = new PdfPCell(new Paragraph("Extra scrambles"));
+                    extraScramblesHeader.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+                    extraScramblesHeader.setPaddingBottom(3);
+                    headerTable.addCell(extraScramblesHeader);
+                    if(!dryRun) {
+                        doc.add(headerTable);
+                    }
+                    
+                    scrambleNumberPrefix = "E";
+                    TableAndHighlighting extraTableAndHighlighting = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix, forceHighlighting);
+                    if(dryRun) {
+                        if(tableAndHighlighting.highlighting) {
+                            forceHighlighting = true;
+                            continue;
+                        }
+                    } else {
+                        doc.add(extraTableAndHighlighting.table);
+                    }
+                }
             }
         }
         doc.newPage();
@@ -620,64 +617,135 @@ class ScrambleRequest {
      * @param text the text
      * @param rect the rectangle where the text must fit
      * @param maxFontSize the maximum font size
-     * @param runDirection the run direction
      * @return the calculated font size that makes the text fit
      */
-    public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, int runDirection, boolean newlinesAllowed) {
-        try {
-            ColumnText ct = null;
-            int status = 0;
-            if (maxFontSize <= 0) {
-                int cr = 0;
-                int lf = 0;
-                char[] t = text.toCharArray();
-                for (int k = 0; k < t.length; ++k) {
-                    if (t[k] == '\n') {
-                        ++lf;
-                    } else if (t[k] == '\r') {
-                        ++cr;
-                    }
-                }
-                int minLines = Math.max(cr, lf) + 1;
-                maxFontSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
-            }
-            font.setSize(maxFontSize);
-            Phrase ph = new Phrase(text, font);
-            ct = new ColumnText(null);
-            ct.setSimpleColumn(ph, rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), maxFontSize, Element.ALIGN_LEFT);
-            ct.setRunDirection(runDirection);
-            status = ct.go(true);
-            if ((status & ColumnText.NO_MORE_TEXT) != 0 && (newlinesAllowed || ct.getLinesWritten() <= 1)) {
-                return maxFontSize;
-            }
-            float precision = 0.1f;
-            float min = 0;
-            float max = maxFontSize;
-            float size = maxFontSize;
-            for (int k = 0; k < 50; ++k) { //just in case it doesn't converge
-                size = (min + max) / 2;
-                ct = new ColumnText(null);
-                font.setSize(size);
-                ct.setSimpleColumn(new Phrase(text, font), rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), size, Element.ALIGN_LEFT);
-                ct.setRunDirection(runDirection);
-                status = ct.go(true);
-                if ((status & ColumnText.NO_MORE_TEXT) != 0 && (newlinesAllowed || ct.getLinesWritten() <= 1)) {
-                    if (max - min < size * precision) {
-                        return size;
-                    }
-                    min = size;
+    private static final float FITTEXT_FONTSIZE_PRECISION = 0.1f;
+    public static float fitText(Font font, String text, Rectangle rect, float maxFontSize, boolean newlinesAllowed) {
+        float minFontSize = 1f;
+        float potentialFontSize;
+        while(true) {
+            potentialFontSize = (maxFontSize + minFontSize) / 2.0f;
+            font.setSize(potentialFontSize);
+
+            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
+            if(!newlinesAllowed && lineChunks.size() > 1) {
+                // If newlines are not allowed, and we had to split the text into more than
+                // one line, then potentialFontSize is too large.
+                maxFontSize = potentialFontSize;
+            } else {
+                // The font size seems to be a pretty good estimate for how
+                // much vertical space a row actually takes up.
+                float totalHeight = lineChunks.size() * potentialFontSize;
+                if(totalHeight < rect.getHeight()) {
+                    minFontSize = potentialFontSize;
                 } else {
-                    max = size;
+                    maxFontSize = potentialFontSize;
                 }
             }
-            return size;
-        } catch (Exception e) {
-            throw new com.itextpdf.text.ExceptionConverter(e);
+            if(maxFontSize - minFontSize < FITTEXT_FONTSIZE_PRECISION) {
+                // Err on the side of too small, because being too large will screw up
+                // layout.
+                potentialFontSize = minFontSize;
+                break;
+            }
         }
+        return potentialFontSize;
     }
 
+    private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float scrambleColumnWidth) {
+        float availableScrambleWidth = scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL;
 
-    private static PdfPTable createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix) throws DocumentException {
+        int startIndex = 0;
+        int endIndex = 0;
+        LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
+        while(startIndex < paddedScramble.length()) {
+            // Walk forwards until we've grabbed the maximum number of characters
+            // that fit in a line, we've run out of characters, or we hit a newline.
+            float substringWidth;
+            for(endIndex++; endIndex <= paddedScramble.length(); endIndex++) {
+                if(paddedScramble.charAt(endIndex - 1) == '\n') {
+                    break;
+                }
+                String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
+                substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
+                if(substringWidth > availableScrambleWidth) {
+                    break;
+                }
+            }
+            // endIndex is one past the best fit, so remove one character and it should fit!
+            endIndex--;
+
+            // If we're not at the end of the scramble, make sure we're not cutting
+            // a turn in half by walking backwards until we're right before a turn.
+            // Any spaces added for padding after a turn are considered part of
+            // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
+            int perfectFitEndIndex = endIndex;
+            if(endIndex < paddedScramble.length()) {
+                while(true) {
+                    if(endIndex < startIndex) {
+                        // We walked all the way to the beginning of the line
+                        // without finding a good breaking point. Give up and break
+                        // in the middle of a turn =(.
+                        endIndex = perfectFitEndIndex;
+                        break;
+                    }
+
+                    // Another dirty hack for sq1: turns only line up
+                    // nicely if every line starts with a (x,y). We ensure this
+                    // by forcing every line to end with a /.
+                    boolean isSquareOne = paddedScramble.indexOf('/') >= 0;
+                    if(isSquareOne) {
+                        char previousCharacter = paddedScramble.charAt(endIndex - 1);
+                        if(previousCharacter == '/') {
+                            break;
+                        }
+                    } else {
+                        char currentCharacter = paddedScramble.charAt(endIndex);
+                        boolean isTurnCharacter = currentCharacter != ' ';
+                        if(!isTurnCharacter || currentCharacter == '\n') {
+                            break;
+                        }
+                    }
+                    endIndex--;
+                }
+            }
+ 
+            String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
+
+            // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
+            // space as is available on a line.
+            do {
+                scrambleSubstring += NON_BREAKING_SPACE;
+                substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
+            } while(substringWidth <= availableScrambleWidth);
+            // scrambleSubstring is now too big for our line, so remove the
+            // last character.
+            scrambleSubstring = scrambleSubstring.substring(0, scrambleSubstring.length() - 1);
+
+
+            // Walk past all whitespace that comes immediately after the line wrap
+            // we are about to insert.
+            while(endIndex < paddedScramble.length() && (paddedScramble.charAt(endIndex) == ' ' || paddedScramble.charAt(endIndex) == '\n' )) {
+                endIndex++;
+            }
+            startIndex = endIndex;
+            Chunk lineChunk = new Chunk(scrambleSubstring);
+            lineChunks.add(lineChunk);
+            lineChunk.setFont(scrambleFont);
+
+            // Force a line wrap!
+            lineChunk.append("\n");
+        }
+
+        return lineChunks;
+    }
+
+    static class TableAndHighlighting {
+        PdfPTable table;
+        boolean highlighting;
+    }
+
+    private static TableAndHighlighting createTable(PdfWriter docWriter, Document doc, float sideMargins, Dimension scrambleImageSize, String[] scrambles, Puzzle scrambler, HashMap<String, Color> colorScheme, String scrambleNumberPrefix, boolean forceHighlighting) throws DocumentException {
         PdfContentByte cb = docWriter.getDirectContent();
 
         PdfPTable table = new PdfPTable(3);
@@ -694,49 +762,48 @@ class ScrambleRequest {
         col1Width += 5;
 
         float availableWidth = doc.getPageSize().getWidth() - sideMargins;
-        float availableScrambleWidth = availableWidth - col1Width - scrambleImageSize.width - 2*SCRAMBLE_IMAGE_PADDING;
+        float scrambleColumnWidth = availableWidth - col1Width - scrambleImageSize.width - 2*SCRAMBLE_IMAGE_PADDING;
         int availableScrambleHeight = scrambleImageSize.height - 2*SCRAMBLE_IMAGE_PADDING;
 
-        table.setTotalWidth(new float[] { col1Width, availableScrambleWidth, scrambleImageSize.width + 2*SCRAMBLE_IMAGE_PADDING });
+        table.setTotalWidth(new float[] { col1Width, scrambleColumnWidth, scrambleImageSize.width + 2*SCRAMBLE_IMAGE_PADDING });
         table.setLockedWidth(true);
 
         String longestScramble = "";
-        String longestScrambleOneLine = "";
+        String longestPaddedScramble = "";
         for(String scramble : scrambles) {
-            String padded = padTurnsUniformly(scramble, "M");
-            if(padded.length() > longestScramble.length()) {
-                longestScramble = padded;
-                longestScrambleOneLine = scramble;
+            if(scramble.length() > longestScramble.length()) {
+                longestScramble = scramble;
+            }
+
+            String paddedScramble = padTurnsUniformly(scramble, "M");
+            if(paddedScramble.length() > longestPaddedScramble.length()) {
+                longestPaddedScramble = paddedScramble;
             }
         }
         // I don't know how to configure ColumnText.fitText's word wrapping characters,
         // so instead, I just replace each character I don't want to wrap with M, which
         // should be the widest character (we're using a monospaced font,
         // so that doesn't really matter), and won't get wrapped.
-        longestScramble = longestScramble.replaceAll("\\S", "M");
-        longestScrambleOneLine = longestScrambleOneLine.replaceAll(".", "M");
-        if(longestScramble.indexOf("\n") >= 0) {
+        char widestCharacter = 'M';
+        longestPaddedScramble = longestPaddedScramble.replaceAll("\\S", widestCharacter + "");
+        boolean tryToFitOnOneLine = true;
+        if(longestPaddedScramble.indexOf("\n") >= 0) {
             // If the scramble contains newlines, then we *only* allow wrapping at the
             // newlines.
-            longestScramble = longestScramble.replaceAll(" ", "M");
-            longestScrambleOneLine = null;
+            longestPaddedScramble = longestPaddedScramble.replaceAll(" ", "M");
+            tryToFitOnOneLine = false;
         }
         boolean oneLine = false;
         Font scrambleFont = null;
+
         try {
             BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
-            // Gah, I have no idea where this number is coming from, see
-            // https://github.com/cubing/tnoodle/issues/124 for why we had to bump
-            // it from 8 to 9.
-            int HEIGHT_MARGINS = 9;
-            // Again, I have no idea where this number is coming from. I'm chalking it up to
-            // unaccounted for margins.
-            int WIDTH_MARGINS = 40;
-            Rectangle availableArea = new Rectangle(availableScrambleWidth - WIDTH_MARGINS,
-                    availableScrambleHeight - HEIGHT_MARGINS);
-            float perfectFontSize = fitText(new Font(courier), longestScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, true);
-            if(longestScrambleOneLine != null) {
-                float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, PdfWriter.RUN_DIRECTION_LTR, false);
+            Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
+                    availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM);
+            float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true);
+            if(tryToFitOnOneLine) {
+                String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
+                float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, false);
                 oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
                 if(oneLine) {
                     perfectFontSize = perfectFontSizeForOneLine;
@@ -749,37 +816,43 @@ class ScrambleRequest {
             l.log(Level.INFO, "", e);
         }
 
+        boolean highlight = forceHighlighting;
         for(int i = 0; i < scrambles.length; i++) {
             String scramble = scrambles[i];
+            String paddedScramble = oneLine ? scramble : padTurnsUniformly(scramble, NON_BREAKING_SPACE + "");
             Chunk ch = new Chunk(scrambleNumberPrefix + (i+1) + ".");
             PdfPCell nthscramble = new PdfPCell(new Paragraph(ch));
             nthscramble.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             table.addCell(nthscramble);
 
-            String paddedScramble;
-            if(oneLine) {
-                paddedScramble = scramble;
-            } else {
-                paddedScramble = padTurnsUniformly(scramble, " ");
+            Phrase scramblePhrase = new Phrase();
+            int nthLine = 1;
+            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
+            if(lineChunks.size() >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
+                highlight = true;
             }
-            Chunk scrambleChunk = new Chunk(paddedScramble);
-            if(paddedScramble.indexOf("\n") >= 0) {
-                // If the scramble contains newlines, then we *only* allow wrapping at the
-                // newlines.
-                scrambleChunk.setSplitCharacter(SPLIT_ON_NEWLINES);
-            } else {
-                scrambleChunk.setSplitCharacter(SPLIT_ON_SPACES);
-            }
-            scrambleChunk.setFont(scrambleFont);
 
-            PdfPCell scrambleCell = new PdfPCell(new Paragraph(scrambleChunk));
+            for(Chunk lineChunk : lineChunks) {
+                if(highlight && (nthLine % 2 == 0)) {
+                    lineChunk.setBackground(HIGHLIGHT_COLOR);
+                }
+                scramblePhrase.add(lineChunk);
+                nthLine++;
+            }
+
+            PdfPCell scrambleCell = new PdfPCell(new Paragraph(scramblePhrase));
+            // We carefully inserted newlines ourselves to make stuff fit, don't
+            // let itextpdf wrap lines for us.
+            scrambleCell.setNoWrap(true);
             scrambleCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
             // This shifts everything up a little bit, because I don't like how
             // ALIGN_MIDDLE works.
-            scrambleCell.setPaddingTop(-3);
-            scrambleCell.setPaddingBottom(3);
-            scrambleCell.setPaddingLeft(3);
-            scrambleCell.setPaddingRight(3);
+            scrambleCell.setPaddingTop(-SCRAMBLE_PADDING_VERTICAL_TOP);
+            scrambleCell.setPaddingBottom(SCRAMBLE_PADDING_VERTICAL_BOTTOM);
+            scrambleCell.setPaddingLeft(SCRAMBLE_PADDING_HORIZONTAL);
+            scrambleCell.setPaddingRight(SCRAMBLE_PADDING_HORIZONTAL);
+            // We space lines a little bit more here - it still fits in the cell height
+            scrambleCell.setLeading(0, 1.1f);
             table.addCell(scrambleCell);
 
             if(scrambleImageSize.width > 0 && scrambleImageSize.height > 0) {
@@ -807,7 +880,10 @@ class ScrambleRequest {
             }
         }
         
-        return table;
+        TableAndHighlighting tableAndHighlighting = new TableAndHighlighting();
+        tableAndHighlighting.table = table;
+        tableAndHighlighting.highlighting = highlight;
+        return tableAndHighlighting;
     }
 
     private static void drawSvgToGraphics2D(Svg svg, Graphics2D g2, Dimension size) throws IOException {

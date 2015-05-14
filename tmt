@@ -392,7 +392,11 @@ class tmt:
 
         if not tmt.args.dry_run:
             tnoodleAndroidProject = tmt.TmtProject.projects['tnoodle-android']
-            tnoodleAndroidProject.publishToMavenCentral()
+            # TODO - cannot figure out how to get
+            # http://gradle.org/docs/current/userguide/signing_plugin.html working.
+            # Since we're going to be rewriting tnoodle anyways, lets just not bother
+            # keeping maven up to date.
+            # tnoodleAndroidProject.publishToMavenCentral()
 
         print("Releasing TNoodle")
 

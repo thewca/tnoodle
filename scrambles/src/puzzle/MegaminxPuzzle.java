@@ -633,4 +633,5 @@ public class MegaminxPuzzle extends Puzzle {
             }
         }
     }
+
 }

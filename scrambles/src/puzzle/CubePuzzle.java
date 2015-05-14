@@ -563,4 +563,5 @@ public class CubePuzzle extends Puzzle {
             return svg;
         }
     }
+
 }
