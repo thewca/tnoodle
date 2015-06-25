@@ -45,7 +45,7 @@ To build a distributable/executable `.jar` file, run:
 
 You can run the `.jar` from the commandline using:
 
-    java -jar timer/dist/TNoodle-WCA.jar
+    java -jar wca/dist/TNoodle-WCA.jar
 
 *Important note: You must never use a custom build for any official competitions.* [Contact the WCA Board and the WRC](https://www.worldcubeassociation.org/contact) if you have any questions about this.
 
