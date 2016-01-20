@@ -201,7 +201,7 @@ public class MegaminxPuzzle extends Puzzle {
         colors.put("BR", new Color(0x0000b3));
         colors.put("R", new Color(0xdd0000));
         colors.put("F", new Color(0x006600));
-        colors.put("L", new Color(0x3f0080));
+        colors.put("L", new Color(0x8a1aff));
         colors.put("D", new Color(0x999999));
         colors.put("DR", new Color(0xffffb3));
         colors.put("DBR", new Color(0xff99ff));
