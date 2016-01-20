@@ -198,8 +198,8 @@ public class MegaminxPuzzle extends Puzzle {
         HashMap<String, Color> colors = new HashMap<String, Color>();
         colors.put("U", new Color(0xffffff));
         colors.put("BL", new Color(0xffcc00));
-        colors.put("BR", new Color(0x0000ff));
-        colors.put("R", new Color(0xaa0000));
+        colors.put("BR", new Color(0x0000b3));
+        colors.put("R", new Color(0xdd0000));
         colors.put("F", new Color(0x006600));
         colors.put("L", new Color(0x3f0080));
         colors.put("D", new Color(0x999999));
