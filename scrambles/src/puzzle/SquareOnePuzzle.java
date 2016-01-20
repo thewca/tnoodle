@@ -55,7 +55,7 @@ public class SquareOnePuzzle extends Puzzle {
         defaultColorScheme.put("B", new Color(0xffc800));
         defaultColorScheme.put("R", new Color(0x00ff00));
         defaultColorScheme.put("F", new Color(0xff0000));
-        defaultColorScheme.put("U", new Color(0xffff00));
+        defaultColorScheme.put("U", new Color(0xe6b800));
         defaultColorScheme.put("D", new Color(0xffffff));
     }
     @Override
