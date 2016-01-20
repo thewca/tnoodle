@@ -196,18 +196,18 @@ public class MegaminxPuzzle extends Puzzle {
     @Override
     public HashMap<String, Color> getDefaultColorScheme() {
         HashMap<String, Color> colors = new HashMap<String, Color>();
-        colors.put("U", new Color(0xFFFFFF));
-        colors.put("BL", new Color(0x882222));
-        colors.put("BR", new Color(0x0000FF));
-        colors.put("R", new Color(0x880088));
-        colors.put("F", new Color(0x008800));
-        colors.put("L", new Color(0x88DDFF));
-        colors.put("D", new Color(0xFFFF00));
-        colors.put("DR", new Color(0xFF0000));
-        colors.put("DBR", new Color(0x000088));
-        colors.put("B", new Color(0xFF44FF));
-        colors.put("DBL", new Color(0x00FF00));
-        colors.put("DL", new Color(0xFF8800));
+        colors.put("U", new Color(0xffffff));
+        colors.put("BL", new Color(0xffcc00));
+        colors.put("BR", new Color(0x0000ff));
+        colors.put("R", new Color(0xaa0000));
+        colors.put("F", new Color(0x006600));
+        colors.put("L", new Color(0x3f0080));
+        colors.put("D", new Color(0x999999));
+        colors.put("DR", new Color(0xffffb3));
+        colors.put("DBR", new Color(0xff99ff));
+        colors.put("B", new Color(0x71e600));
+        colors.put("DBL", new Color(0xff8433));
+        colors.put("DL", new Color(0x88ddff));
         return colors;
     }
 
