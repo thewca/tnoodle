@@ -56,6 +56,8 @@ public class SquareOnePuzzle extends Puzzle {
         defaultColorScheme.put("R", new Color(0x00ff00));
         defaultColorScheme.put("F", new Color(0xff0000));
         defaultColorScheme.put("U", new Color(0xe6b800));
+        // Different yellow used compared to other BOY schemes
+        // Yellow/White are always top/bottom in square-1 so increased contrast is beneficial for reasons
         defaultColorScheme.put("D", new Color(0xffffff));
     }
     @Override
