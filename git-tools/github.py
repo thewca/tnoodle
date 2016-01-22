@@ -1,7 +1,8 @@
+import re
 import json
 import getpass
-import mimetypes
 import requests
+import mimetypes
 
 connectedApis = {}
 def getApi(organization, repo):
@@ -79,15 +80,19 @@ class GithubApi(object):
         r = requests.post(createUrl, data=data, auth=self.auth, headers=previewHeaders)
         r.raise_for_status()
 
-        uploadUrl = r.json()['upload_url']
+        uploadUrlTemplate = r.json()['upload_url']
         uploadResponses = []
         for name, data in files:
-            uploadResponse = self.uploadAsset(name, data, uploadUrl)
+            uploadResponse = self.uploadAsset(name, data, uploadUrlTemplate)
             uploadResponses.append(uploadResponse)
         return ( r.json(), uploadResponses )
 
-    def uploadAsset(self, name, data, uploadUrl):
-        uploadUrl = uploadUrl.replace("{?name}", "?name=%s" % name)
+    def uploadAsset(self, name, data, uploadUrlTemplate):
+        # See https://developer.github.com/v3/#hypermedia
+        # and https://developer.github.com/v3/repos/releases/#input-2
+        # for the documentation on these url templates that github provides.
+        uploadUrl = re.sub(r"{\?.*name.*}", "?name=%s" % name, uploadUrlTemplate)
+
         mime, encoding = mimetypes.guess_type(name)
         headers = dict(previewHeaders)
         headers['Content-Type'] = mime
