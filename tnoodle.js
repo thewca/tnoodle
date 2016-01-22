@@ -202,12 +202,12 @@ function tnoodlejs(){
   processMetas();
   try {
     var strongName;
-    unflattenKeylistIntoAnswers(['gecko1_8'], '1B28AE95C025F6A08CC7A1040363AA1B');
-    unflattenKeylistIntoAnswers(['ie6'], '1B28AE95C025F6A08CC7A1040363AA1B' + ':1');
-    unflattenKeylistIntoAnswers(['ie8'], '1B28AE95C025F6A08CC7A1040363AA1B' + ':2');
-    unflattenKeylistIntoAnswers(['ie9'], '1B28AE95C025F6A08CC7A1040363AA1B' + ':3');
-    unflattenKeylistIntoAnswers(['opera'], '1B28AE95C025F6A08CC7A1040363AA1B' + ':4');
-    unflattenKeylistIntoAnswers(['safari'], '1B28AE95C025F6A08CC7A1040363AA1B' + ':5');
+    unflattenKeylistIntoAnswers(['gecko1_8'], '9CFF2C733A5D4FB6655902591F9EBE67');
+    unflattenKeylistIntoAnswers(['ie6'], '9CFF2C733A5D4FB6655902591F9EBE67' + ':1');
+    unflattenKeylistIntoAnswers(['ie8'], '9CFF2C733A5D4FB6655902591F9EBE67' + ':2');
+    unflattenKeylistIntoAnswers(['ie9'], '9CFF2C733A5D4FB6655902591F9EBE67' + ':3');
+    unflattenKeylistIntoAnswers(['opera'], '9CFF2C733A5D4FB6655902591F9EBE67' + ':4');
+    unflattenKeylistIntoAnswers(['safari'], '9CFF2C733A5D4FB6655902591F9EBE67' + ':5');
     strongName = answers[computePropValue('user.agent')];
     var idx = strongName.indexOf(':');
     if (idx != -1) {
@@ -246,7 +246,7 @@ function tnoodlejs(){
 }
 
 tnoodlejs();
-(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '1B28AE95C025F6A08CC7A1040363AA1B';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubePuzzle = 93, Q$TwoByTwoCubePuzzle = 94, CM$ = {};
+(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '9CFF2C733A5D4FB6655902591F9EBE67';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubePuzzle = 93, Q$TwoByTwoCubePuzzle = 94, CM$ = {};
 function newSeed(id){
   return new seedTable[id];
 }
@@ -12754,7 +12754,7 @@ function $export0(this$static){
   }
   );
   $wnd.tnoodlejs.getVersion = $entry(function(){
-    return '0.10.0';
+    return '0.10.1';
   }
   );
   $wnd.tnoodlejs.scrambleToSvg = $entry(function(a0, a1, a2){
@@ -15999,17 +15999,17 @@ _.getDefaultColorScheme_0 = function getDefaultColorScheme_1(){
   var colors;
   colors = new HashMap_0;
   colors.put('U', new Color_0(16777215));
-  colors.put('BL', new Color_0(8921634));
-  colors.put('BR', new Color_0(255));
-  colors.put('R', new Color_0(8913032));
-  colors.put('F', new Color_0(34816));
-  colors.put('L', new Color_0(8969727));
-  colors.put('D', new Color_0(16776960));
-  colors.put('DR', new Color_0(16711680));
-  colors.put('DBR', new Color_0(136));
-  colors.put('B', new Color_0(16729343));
-  colors.put('DBL', new Color_0(65280));
-  colors.put('DL', new Color_0(16746496));
+  colors.put('BL', new Color_0(16763904));
+  colors.put('BR', new Color_0(179));
+  colors.put('R', new Color_0(14483456));
+  colors.put('F', new Color_0(26112));
+  colors.put('L', new Color_0(9050879));
+  colors.put('D', new Color_0(10066329));
+  colors.put('DR', new Color_0(16777139));
+  colors.put('DBR', new Color_0(16751103));
+  colors.put('B', new Color_0(7464448));
+  colors.put('DBL', new Color_0(16745523));
+  colors.put('DL', new Color_0(8969727));
   return colors;
 }
 ;
@@ -18164,12 +18164,12 @@ function $clinit_SquareOnePuzzle(){
   var bottom, top_0, turn;
   $clinit_Puzzle();
   defaultColorScheme_2 = new HashMap_0;
-  defaultColorScheme_2.put('L', new Color_0(16776960));
-  defaultColorScheme_2.put('B', new Color_0(16711680));
-  defaultColorScheme_2.put('R', new Color_0(255));
-  defaultColorScheme_2.put('F', new Color_0(16762880));
-  defaultColorScheme_2.put('U', new Color_0(16777215));
-  defaultColorScheme_2.put('D', new Color_0(65280));
+  defaultColorScheme_2.put('L', new Color_0(255));
+  defaultColorScheme_2.put('B', new Color_0(16762880));
+  defaultColorScheme_2.put('R', new Color_0(65280));
+  defaultColorScheme_2.put('F', new Color_0(16711680));
+  defaultColorScheme_2.put('U', new Color_0(16776960));
+  defaultColorScheme_2.put('D', new Color_0(16777215));
   RADIUS_MULTIPLIER = Math.sqrt(2) * Math.cos(0.2617993877991494);
   costsByMove = new HashMap_0;
   for (top_0 = -5; top_0 <= 6; ++top_0) {
