@@ -225,6 +225,12 @@ public class AlgorithmBuilder {
         }
     }
 
+    public void appendAlgorithms(String[] algorithms) throws InvalidMoveException {
+        for(String algorithm : algorithms) {
+            appendAlgorithm(algorithm);
+        }
+    }
+
     public PuzzleState getState() {
         azzert(states.size() == moves.size() + 1);
         return states.get(states.size() - 1);
