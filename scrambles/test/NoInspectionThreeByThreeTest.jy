@@ -27,7 +27,7 @@ def main():
         # Search for a solution to a cube scrambled with scramble,
         # but require that that solution not start with restriction
         u = solved.apply(scramble)
-        solution = threes.solveIn(u, 20, restriction)
+        solution = threes.solveIn(u, 20, restriction, None)
         print "Solution to %s (restriction %s): %s" % (scramble, restriction, solution)
         # restriction defines an axis of turns that may not start a solution,
         # so we assert the solution starts with neither restriction, nor
@@ -44,7 +44,7 @@ def main():
                 testSolveIn(face + p, restriction)
 
     scrambled = solved.applyAlgorithm("L' R2 U D2 L2")
-    solution = threes.solveIn(scrambled, 20, "L")
+    solution = threes.solveIn(scrambled, 20, "L", None)
     assert not solution.startswith("L")
     assert scrambled.applyAlgorithm(solution).isSolved()
 
@@ -53,7 +53,7 @@ def main():
     # min2phase handles this correctly. This particular
     # scramble and restriction caused tickled this behavior originally.
     scrambled = solved.applyAlgorithm("F D B L' U L' F D' L2 D L' B2 D F2 U B2 R2 U D2 L2")
-    solution = threes.solveIn(scrambled, 20, "L")
+    solution = threes.solveIn(scrambled, 20, "L", None)
     assert not solution.startswith("L")
     assert not solution.startswith("R")
     assert scrambled.applyAlgorithm(solution).isSolved()
