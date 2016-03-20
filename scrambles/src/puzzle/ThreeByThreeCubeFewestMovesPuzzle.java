@@ -18,8 +18,8 @@ public class ThreeByThreeCubeFewestMovesPuzzle extends ThreeByThreeCubePuzzle {
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         // TODO - explain tom2 here
-        String[] scramblePrefix = AlgorithmBuilder.splitAlgorithm("R' F R");
-        String[] scrambleSuffix = AlgorithmBuilder.splitAlgorithm("R' F R");
+        String[] scramblePrefix = AlgorithmBuilder.splitAlgorithm("R' U' F");
+        String[] scrambleSuffix = AlgorithmBuilder.splitAlgorithm("R' U' F");
 
         // super.generateRandomMoves(...) will pick a random state S and find a solution:
         //  solution = sol_0, sol_1, ..., sol_n-1, sol_n

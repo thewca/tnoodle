@@ -63,9 +63,8 @@ def main():
     for i in range(10):
         scramble = threeFm.generateWcaScramble(r)
         print "%s move 333fm scramble: %s" % (len(scramble.split()), scramble)
-        # 333fm scrambles are all supposed to start with R' F R, and end with R' F R
-        assert scramble.startswith("R' F R")
-        assert scramble.endswith("R' F R")
+        assert scramble.startswith("R' U' F")
+        assert scramble.endswith("R' U' F")
 
 if __name__ == "__main__":
     main()
