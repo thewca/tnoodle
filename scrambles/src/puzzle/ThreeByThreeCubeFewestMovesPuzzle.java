@@ -81,12 +81,12 @@ public class ThreeByThreeCubeFewestMovesPuzzle extends ThreeByThreeCubePuzzle {
         //  paddedScramble = scramblePrefix + (sol_n' + sol_(n-1)' + ... + sol_1' + sol_0') + scrambleSuffix
         //
         // We don't want any moves to cancel here, so we need to make sure that
-        // sol_n' doesn't cancel with the last move of scramblePrefix:
-        String solutionLastAxisRestriction = scrambleSuffix[scrambleSuffix.length - 1].substring(0, 1);
+        // sol_n' doesn't cancel with the first move of scramblePrefix:
+        String solutionLastAxisRestriction = scramblePrefix[scramblePrefix.length - 1].substring(0, 1);
         // and we need to make sure that sol_0' doesn't cancel with the first move of
         // scrambleSuffix:
-        String solutionFirstAxisRestriction = scramblePrefix[0].substring(0, 1);
-        PuzzleStateAndGenerator psag = super.generateRandomMoves(r, solutionLastAxisRestriction, solutionFirstAxisRestriction);
+        String solutionFirstAxisRestriction = scrambleSuffix[0].substring(0, 1);
+        PuzzleStateAndGenerator psag = super.generateRandomMoves(r, solutionFirstAxisRestriction, solutionLastAxisRestriction);
         AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.NO_MERGING);
         try {
             ab.appendAlgorithms(scramblePrefix);

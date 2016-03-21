@@ -410,10 +410,9 @@ public class Search {
             // We've done the last move we're allowed to do, make sure it's permitted
             // by lastAxisRestriction.
             if(lastAxisRestriction != -1) {
-                int stdLm = Util.ud2std[lm];
+                int stdLm = CubieCube.urfMove[urfIdx][Util.ud2std[lm]];
                 int lastAxis = (stdLm/3) * 3;
-                int notAllowedAxis = (CubieCube.urfMoveInv[urfIdx][lastAxisRestriction]/3)*3;
-                if (notAllowedAxis == lastAxis || notAllowedAxis == lastAxis+9) {
+                if (lastAxisRestriction == lastAxis || lastAxisRestriction == lastAxis+9) {
                     return false;
                 }
             }

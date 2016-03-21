@@ -2,6 +2,7 @@ import tntdebug
 
 from puzzle import ThreeByThreeCubeFewestMovesPuzzle
 from net.gnehzr.tnoodle.scrambles import AlgorithmBuilder
+from net.gnehzr.tnoodle.scrambles.AlgorithmBuilder import MergingMode
 
 from net.gnehzr.tnoodle.utils import Utils
 r = Utils.getSeededRandom()
@@ -61,7 +62,11 @@ def main():
     assert not lastMove.startswith("L")
 
     for i in range(10):
-        scramble = threeFm.generateWcaScramble(r)
+        uncancelledScramble = threeFm.generateWcaScramble(r)
+        ab = AlgorithmBuilder(threeFm, MergingMode.CANONICALIZE_MOVES)
+        ab.appendAlgorithm(uncancelledScramble)
+        scramble = ab.getStateAndGenerator().generator
+        assert len(scramble) == len(uncancelledScramble)
         print "%s move 333fm scramble: %s" % (len(scramble.split()), scramble)
         assert scramble.startswith("R' U' F")
         assert scramble.endswith("R' U' F")
