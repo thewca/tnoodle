@@ -4,6 +4,7 @@ import java.util.Random;
 
 public class SkewbSolver {
 
+    private static final int N_MOVES = 4;
 
     private static final int[] fact = { 1, 1, 1, 3, 12, 60, 360 };//fact[x] = x!/2
     private static char[][] permmv = new char[4320][4];
@@ -179,7 +180,7 @@ public class SkewbSolver {
         }
     }
 
-    protected boolean search(int depth, int perm, int twst, int maxl, int lm, int[] sol) {
+    protected boolean search(int depth, int perm, int twst, int maxl, int lm, int[] sol, Random randomizeMoves) {
         if (maxl == 0) {
             solution_length = depth;
             return (perm == 0 && twst == 0);
@@ -188,15 +189,17 @@ public class SkewbSolver {
         if (permprun[perm] > maxl || twstprun[twst] > maxl) {
             return false;
         }
-        for (int m = 0; m < 4; m++) {
-            if (m != lm) {
+        int randomOffset = randomizeMoves.nextInt(N_MOVES);
+        for (int m = 0; m < N_MOVES; m++) {
+            int randomMove = (m + randomOffset) % N_MOVES;
+            if (randomMove != lm) {
                 int p = perm;
                 int s = twst;
                 for (int a = 0; a < 2; a++) {
-                    p = permmv[p][m];
-                    s = twstmv[s][m];
-                    if (search(depth + 1, p, s, maxl - 1, m, sol)) {
-                        sol[depth] = m * 2 + a;
+                    p = permmv[p][randomMove];
+                    s = twstmv[s][randomMove];
+                    if (search(depth + 1, p, s, maxl - 1, randomMove, sol, randomizeMoves)) {
+                        sol[depth] = randomMove * 2 + a;
                         return true;
                     }
                 }
@@ -222,9 +225,9 @@ public class SkewbSolver {
         return state;
     }
 
-    public String solveIn(SkewbSolverState state, int length) {
+    public String solveIn(SkewbSolverState state, int length, Random randomizeMoves) {
         int[] sol = new int[MAX_SOLUTION_LENGTH];
-        search(0, state.perm, state.twst, length, -1, sol);
+        search(0, state.perm, state.twst, length, -1, sol, randomizeMoves);
         if (solution_length != -1) {
             return getSolution(sol);
         } else {
@@ -232,9 +235,9 @@ public class SkewbSolver {
         }
     }
 
-    public String generateExactly(SkewbSolverState state, int length) {
+    public String generateExactly(SkewbSolverState state, int length, Random randomizeMoves) {
         int[] sol = new int[MAX_SOLUTION_LENGTH];
-        search(0, state.perm, state.twst, length, -1, sol);
+        search(0, state.perm, state.twst, length, -1, sol, randomizeMoves);
         return getSolution(sol);
     }
 
