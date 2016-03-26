@@ -23,6 +23,9 @@
 #5x5x5 no inspection
 555ni puzzle.NoInspectionFiveByFiveCubePuzzle()
 
+#3x3x3 Fewest Moves
+333fm puzzle.ThreeByThreeCubeFewestMovesPuzzle()
+
 #Pyraminx
 pyram puzzle.PyraminxPuzzle()
 

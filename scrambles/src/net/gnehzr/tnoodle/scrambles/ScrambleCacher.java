@@ -33,7 +33,7 @@ public class ScrambleCacher {
     private boolean running = false;
     public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble, ScrambleCacherListener l) {
         this(puzzle, cacheSize, drawScramble);
-        addScrambleCacherListener(l);
+        ls.add(l);
     }
     public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble) {
         azzert(cacheSize > 0);
@@ -105,9 +105,6 @@ public class ScrambleCacher {
     }
 
     private LinkedList<ScrambleCacherListener> ls = new LinkedList<ScrambleCacherListener>();
-    public void addScrambleCacherListener(ScrambleCacherListener l) {
-        ls.add(l);
-    }
     /**
      * This method will notify all listeners that the cache size has changed.
      * NOTE: Do NOT call this method while holding any monitors!

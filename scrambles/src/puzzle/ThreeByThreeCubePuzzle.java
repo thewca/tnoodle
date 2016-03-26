@@ -38,16 +38,16 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
 
     @Override
     protected String solveIn(PuzzleState ps, int n) {
-        return solveIn(ps, n, null);
+        return solveIn(ps, n, null, null);
     }
 
-    public String solveIn(PuzzleState ps, int n, String firstMoveRestriction) {
+    public String solveIn(PuzzleState ps, int n, String firstAxisRestriction, String lastAxisRestriction) {
         CubeState cs = (CubeState) ps;
         if(this.equals(getSolvedState())) {
             // TODO - apparently min2phase can't solve the solved cube
             return "";
         }
-        String solution = twoPhaseSearcher.get().solution(cs.toFaceCube(), n, THREE_BY_THREE_TIMEOUT, 0, 0, firstMoveRestriction).trim();
+        String solution = twoPhaseSearcher.get().solution(cs.toFaceCube(), n, THREE_BY_THREE_TIMEOUT, 0, 0, firstAxisRestriction, lastAxisRestriction).trim();
         if("Error 7".equals(solution)) {
             // No solution exists for given depth
             return null;
@@ -60,9 +60,9 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
         return solution;
     }
 
-    public PuzzleStateAndGenerator generateRandomMoves(Random r, String firstMoveRestriction) {
+    public PuzzleStateAndGenerator generateRandomMoves(Random r, String firstAxisRestriction, String lastAxisRestriction) {
         String randomState = Tools.randomCube(r);
-        String scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION, firstMoveRestriction).trim();
+        String scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION, firstAxisRestriction, lastAxisRestriction).trim();
 
         AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES);
         try {
@@ -74,6 +74,6 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
     }
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
-        return generateRandomMoves(r, null);
+        return generateRandomMoves(r, null, null);
     }
 }

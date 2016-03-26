@@ -14,20 +14,21 @@ public class NoInspectionThreeByThreeCubePuzzle extends ThreeByThreeCubePuzzle {
 
     @Override
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
-        CubeMove[][] randomOrientationMoves = getRandomOrientationMoves(size /2);
+        CubeMove[][] randomOrientationMoves = getRandomOrientationMoves(size / 2);
         CubeMove[] randomOrientation = randomOrientationMoves[r.nextInt(randomOrientationMoves.length)];
-        String firstMoveRestriction;
+        String firstAxisRestriction;
         if(randomOrientation.length > 0) {
             Face restrictedFace = randomOrientation[0].face;
             // Restrictions are for an entire axis, so this will also
-            // prevent the oppossite of restrictedFace from being the first
+            // prevent the opposite of restrictedFace from being the first
             // move of our solution. This ensures that randomOrientation will
-            // never been redundant with our scramble.
-            firstMoveRestriction = restrictedFace.toString();
+            // never be redundant with our scramble.
+            firstAxisRestriction = restrictedFace.toString();
         } else {
-            firstMoveRestriction = null;
+            firstAxisRestriction = null;
         }
-        PuzzleStateAndGenerator psag = super.generateRandomMoves(r, firstMoveRestriction);
+        String lastAxisRestriction = null;
+        PuzzleStateAndGenerator psag = super.generateRandomMoves(r, firstAxisRestriction, lastAxisRestriction);
         psag = applyOrientation(this, randomOrientation, psag, false);
         return psag;
     }

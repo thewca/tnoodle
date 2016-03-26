@@ -186,8 +186,6 @@ public class ScrambleTest {
             };
             ScrambleCacher c1 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble, cacherStopper);
             ScrambleCacher c2 = new ScrambleCacher(scrambler, SCRAMBLE_COUNT, drawScramble, cacherStopper);
-            c1.addScrambleCacherListener(cacherStopper);
-            c2.addScrambleCacherListener(cacherStopper);
             while(c1.isRunning() || c2.isRunning()) {
                 synchronized(o) {
                     try {

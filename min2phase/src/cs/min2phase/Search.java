@@ -52,6 +52,7 @@ public class Search {
 	private long timeMin;
 	private int verbose;
 	private int firstAxisRestriction;
+	private int lastAxisRestriction;
 	private CubieCube cc = new CubieCube();
 
 	/**
@@ -120,9 +121,13 @@ public class Search {
 	 * @param verbose
 	 * 		determines the format of the solution(s). see USE_SEPARATOR, INVERSE_SOLUTION, APPEND_LENGTH
 	 *
-	 * @param firstFaceRestriction
+	 * @param firstAxisRestrictionStr
 	 *	      The solution generated will not start by turning
-	 *	      any face on the axis of firstFaceRestriction.
+	 *	      any face on the axis of firstAxisRestrictionStr.
+     *
+	 * @param lastAxisRestrictionStr
+	 *	      The solution generated will not end by turning
+	 *	      any face on the axis of lastAxisRestrictionStr.
 	 *
 	 * @return The solution string or an error code:<br>
 	 * 		Error 1: There is not exactly one facelet of each colour<br>
@@ -133,9 +138,9 @@ public class Search {
 	 * 		Error 6: Parity error: Two corners or two edges have to be exchanged<br>
 	 * 		Error 7: No solution exists for the given maxDepth<br>
 	 * 		Error 8: Timeout, no solution within given time<br>
-	 * 		Error 9: Invalid firstFaceRestriction
+	 * 		Error 9: Invalid firstAxisRestrictionStr or lastAxisRestrictionStr
 	 */
-	public synchronized String solution(String facelets, int maxDepth, long timeOut, long timeMin, int verbose, String firstFaceRestriction) {
+	public synchronized String solution(String facelets, int maxDepth, long timeOut, long timeMin, int verbose, String firstAxisRestrictionStr, String lastAxisRestrictionStr) {
 		int check = verify(facelets);
 		if (check != 0) {
 			return "Error " + Math.abs(check);
@@ -146,27 +151,44 @@ public class Search {
 		this.verbose = verbose;
 		this.solution = null;
                 this.firstAxisRestriction = -1;
-		if(firstFaceRestriction != null) {
-			if(!Util.str2move.containsKey(firstFaceRestriction)) {
+                this.lastAxisRestriction = -1;
+		if(firstAxisRestrictionStr != null) {
+			if(!Util.str2move.containsKey(firstAxisRestrictionStr)) {
 				return "Error 9";
 			}
-			firstAxisRestriction = Util.str2move.get(firstFaceRestriction);
+			firstAxisRestriction = Util.str2move.get(firstAxisRestrictionStr);
 			if(firstAxisRestriction % 3 != 0) {
 				return "Error 9";
 			}
 			if(firstAxisRestriction - 9 < 0) {
-				// firstFaceRestriction defines an axis of turns that
+				// firstAxisRestriction defines an axis of turns that
 				// aren't permitted. Make sure we restrict the entire
 				// axis, and not just one of the faces. See the axis
 				// filtering in phase1() for more details.
 				firstAxisRestriction += 9;
 			}
 		}
+		if(lastAxisRestrictionStr != null) {
+			if(!Util.str2move.containsKey(lastAxisRestrictionStr)) {
+				return "Error 9";
+			}
+			lastAxisRestriction = Util.str2move.get(lastAxisRestrictionStr);
+			if(lastAxisRestriction % 3 != 0) {
+				return "Error 9";
+			}
+			if(lastAxisRestriction - 9 < 0) {
+				// lastAxisRestriction defines an axis of turns that
+				// aren't permitted. Make sure we restrict the entire
+				// axis, and not just one of the faces. See the axis
+				// filtering in phase2() for more details.
+				lastAxisRestriction += 9;
+			}
+		}
 		return solve(cc);
 	}
 
 	public synchronized String solution(String facelets, int maxDepth, long timeOut, long timeMin, int verbose) {
-		return solution(facelets, maxDepth, timeOut, timeMin, verbose, null);
+		return solution(facelets, maxDepth, timeOut, timeMin, verbose, null, null);
 	}
 
 	int verify(String facelets) {
@@ -231,7 +253,7 @@ public class Search {
 		for (depth1=0; depth1<sol; depth1++) {
 			maxDep2 = Math.min(12, sol-depth1);
 			for (urfIdx=0; urfIdx<6; urfIdx++) {
-				if(firstAxisRestriction != -1 && urfIdx >= 3) {
+				if((firstAxisRestriction != -1 || lastAxisRestriction != -1) && urfIdx >= 3) {
 					// When urfIdx >= 3, we're solving the
 					// inverse cube. This doesn't work
 					// when we're also restricting the 
@@ -384,9 +406,19 @@ public class Search {
 	}
 
 	private boolean phase2(int eidx, int esym, int cidx, int csym, int mid, int maxl, int depth, int lm) {
-		if (eidx==0 && cidx==0 && mid==0) {
-			return true;
-		}
+        if(maxl == 0) {
+            // We've done the last move we're allowed to do, make sure it's permitted
+            // by lastAxisRestriction.
+            if(lastAxisRestriction != -1) {
+                int stdLm = CubieCube.urfMove[urfIdx][Util.ud2std[lm]];
+                int lastAxis = (stdLm/3) * 3;
+                if (lastAxisRestriction == lastAxis || lastAxisRestriction == lastAxis+9) {
+                    return false;
+                }
+            }
+            // Is the cube solved?
+            return eidx==0 && cidx==0 && mid==0;
+        }
 		for (int m=0; m<10; m++) {
 			if (Util.ckmv2[lm][m]) {
 				continue;
