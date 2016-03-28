@@ -14,18 +14,12 @@ class Project(tmt.TmtProject):
         assert retVal == 0
 
     def compile(self):
-        # Note that we skip signing here in order to prevent
-        # travis ci issue.
-        self.runGradleTask("assemble -x signArchives")
+        self.runGradleTask("assemble")
 
     def clean(self):
         self.runGradleTask("clean")
 
     def check(self):
         pass
-
-    def publishToMavenCentral(self):
-        self.runGradleTask("uploadArchives")
-        self.runGradleTask("nexusStagingRelease")
 
 Project(tmt.projectName(), description="Android scrambling library")

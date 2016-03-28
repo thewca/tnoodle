@@ -15,6 +15,6 @@ dependencies {
     compile 'com.android.support:support-v4:23.2.1'
 
     compile 'com.caverock:androidsvg:1.2.1'
-    
-    compile project(':tnoodle-android')
+
+    compile project(':library')
 }
