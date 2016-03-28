@@ -1,19 +1,19 @@
-package net.gnehzr.tnoodle.android;
+package net.gnehzr.tnoodle.androidsample;
 
-import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,18 +22,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.ImageView;
-
-import java.io.ByteArrayOutputStream;
-import java.util.SortedMap;
-import java.util.ArrayList;
 
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleIcon;
 import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.SortedMap;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -97,7 +97,7 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         mDrawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -109,36 +109,11 @@ public class NavigationDrawerFragment extends Fragment {
         return mDrawerListView;
     }
 
-    class PuzzleArrayAdapter extends ArrayAdapter<String> {
-        public PuzzleArrayAdapter(Context c, int resource, SortedMap<String, LazyInstantiator<Puzzle>> puzzles) {
-            super(c, resource, new ArrayList<String>(puzzles.keySet()));
-        }
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null) {
-                final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = vi.inflate(R.layout.puzzle_list_item, null);
-            }
-            TextView longNameView = (TextView) convertView.findViewById(R.id.puzzle_long_name);
-            String shortName = getItem(position);
-            String longName = PuzzlePlugins.getScramblerLongName(shortName);
-            longNameView.setText(longName);
-
-            ByteArrayOutputStream puzzleIconPngBaos = PuzzleIcon.loadPuzzleIconPng(shortName);
-            if(puzzleIconPngBaos != null) {
-                ImageView puzzleIconView = (ImageView) convertView.findViewById(R.id.puzzle_icon);
-                byte[] puzzleIconPng = puzzleIconPngBaos.toByteArray();
-                Bitmap bitmap = BitmapFactory.decodeByteArray(puzzleIconPng, 0, puzzleIconPng.length);
-                puzzleIconView.setImageBitmap(bitmap);
-            }
-            return convertView;
-        }
-    }
-
     public void setPuzzles(SortedMap<String, LazyInstantiator<Puzzle>> puzzles) {
         ArrayAdapter<String> a = new PuzzleArrayAdapter(
-            getActionBar().getThemedContext(),
-            R.layout.puzzle_list_item,
-            puzzles);
+                getActionBar().getThemedContext(),
+                R.layout.puzzle_list_item,
+                puzzles);
         mDrawerListView.setAdapter(a);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
     }
@@ -306,5 +281,31 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+    }
+
+    class PuzzleArrayAdapter extends ArrayAdapter<String> {
+        public PuzzleArrayAdapter(Context c, int resource, SortedMap<String, LazyInstantiator<Puzzle>> puzzles) {
+            super(c, resource, new ArrayList<String>(puzzles.keySet()));
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = vi.inflate(R.layout.puzzle_list_item, null);
+            }
+            TextView longNameView = (TextView) convertView.findViewById(R.id.puzzle_long_name);
+            String shortName = getItem(position);
+            String longName = PuzzlePlugins.getScramblerLongName(shortName);
+            longNameView.setText(longName);
+
+            ByteArrayOutputStream puzzleIconPngBaos = PuzzleIcon.loadPuzzleIconPng(shortName);
+            if (puzzleIconPngBaos != null) {
+                ImageView puzzleIconView = (ImageView) convertView.findViewById(R.id.puzzle_icon);
+                byte[] puzzleIconPng = puzzleIconPngBaos.toByteArray();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(puzzleIconPng, 0, puzzleIconPng.length);
+                puzzleIconView.setImageBitmap(bitmap);
+            }
+            return convertView;
+        }
     }
 }

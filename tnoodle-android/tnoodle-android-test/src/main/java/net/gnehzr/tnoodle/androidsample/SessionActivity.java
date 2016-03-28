@@ -1,18 +1,18 @@
-package net.gnehzr.tnoodle.android;
+package net.gnehzr.tnoodle.androidsample;
 
-import android.graphics.drawable.PictureDrawable;
-import android.graphics.drawable.Drawable;
 import android.app.Activity;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,54 +21,52 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
+
+import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
+import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.gnehzr.tnoodle.svglite.Svg;
-import net.gnehzr.tnoodle.svglite.Dimension;
-import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
-import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstantiator;
-import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
-
-public class SessionActivity extends ActionBarActivity
+public class SessionActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private static final String TAG = SessionActivity.class.getName();
-
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
-
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
-    private CharSequence mTitle;
-
-    private PlaceholderFragment currentPlaceholderFragment;
-
     private static SortedMap<String, LazyInstantiator<Puzzle>> puzzles;
     private static ArrayList<String> shortNames;
+
     static {
         try {
             puzzles = new TreeMap<String, LazyInstantiator<Puzzle>>(PuzzlePlugins.getScramblers());
 
             shortNames = new ArrayList<String>(puzzles.keySet());
-        } catch(IOException e) {
+        } catch (IOException e) {
             Log.wtf(TAG, e);
-        } catch(BadLazyClassDescriptionException e) {
+        } catch (BadLazyClassDescriptionException e) {
             Log.wtf(TAG, e);
         }
     }
+
+    /**
+     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+     */
+    private NavigationDrawerFragment mNavigationDrawerFragment;
+    /**
+     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
+     */
+    private CharSequence mTitle;
+    private PlaceholderFragment currentPlaceholderFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +74,7 @@ public class SessionActivity extends ActionBarActivity
         setContentView(R.layout.activity_session);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
-            getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
         mNavigationDrawerFragment.setPuzzles(puzzles);
@@ -100,7 +98,7 @@ public class SessionActivity extends ActionBarActivity
     }
 
     private void doScramble() {
-        if(currentPlaceholderFragment != null) {
+        if (currentPlaceholderFragment != null) {
             currentPlaceholderFragment.doScramble();
         }
     }
@@ -156,6 +154,12 @@ public class SessionActivity extends ActionBarActivity
         private View rootView;
         private TextView scrambleView;
         private ImageView scrambleImageView;
+        private Puzzle puzzle;
+        private ScrambleTask scrambleTask;
+
+
+        public PlaceholderFragment() {
+        }
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -169,11 +173,6 @@ public class SessionActivity extends ActionBarActivity
             return fragment;
         }
 
-        public PlaceholderFragment() {
-        }
-
-
-        private Puzzle puzzle;
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -187,7 +186,7 @@ public class SessionActivity extends ActionBarActivity
             LazyInstantiator<Puzzle> lazyPuzzle = puzzles.get(shortName);
             try {
                 puzzle = lazyPuzzle.cachedInstance();
-            } catch(LazyInstantiatorException e) {
+            } catch (LazyInstantiatorException e) {
                 Log.wtf(TAG, e);
             }
 
@@ -195,9 +194,40 @@ public class SessionActivity extends ActionBarActivity
             return rootView;
         }
 
+        private void doScramble() {
+            scrambleView.setText("Scrambling...");
+
+            cancelScrambleIfScrambling();
+            scrambleTask = new ScrambleTask();
+            scrambleTask.execute(puzzle);
+        }
+
+        private void cancelScrambleIfScrambling() {
+            if (scrambleTask != null && scrambleTask.getStatus() == AsyncTask.Status.RUNNING) {
+                scrambleTask.cancel(true);
+            }
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            cancelScrambleIfScrambling();
+        }
+
+        private String getShortName() {
+            return getArguments().getString(ARG_SHORT_NAME);
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            ((SessionActivity) activity).onSectionAttached(getShortName());
+        }
+
         private class ScrambleAndSvg {
             String scramble;
             Svg svg;
+
             public ScrambleAndSvg(String scramble, Svg svg) {
                 this.scramble = scramble;
                 this.svg = svg;
@@ -206,9 +236,11 @@ public class SessionActivity extends ActionBarActivity
 
         private class ScrambleTask extends AsyncTask<Puzzle, Void, ScrambleAndSvg> {
 
-            public ScrambleTask() { }
-
             private Exception exception;
+
+            public ScrambleTask() {
+            }
+
             protected ScrambleAndSvg doInBackground(Puzzle... puzzles) {
                 try {
                     assert puzzles.length == 1;
@@ -216,7 +248,7 @@ public class SessionActivity extends ActionBarActivity
                     String scramble = puzzle.generateScramble();
                     Svg svg = puzzle.drawScramble(scramble, null);
                     return new ScrambleAndSvg(scramble, svg);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     this.exception = e;
                     return null;
                 }
@@ -227,14 +259,14 @@ public class SessionActivity extends ActionBarActivity
             }
 
             protected void onCancelled(ScrambleAndSvg scrambleAndSvg) {
-                if(exception != null) {
+                if (exception != null) {
                     handleException();
                     return;
                 }
             }
 
             protected void onPostExecute(ScrambleAndSvg scrambleAndSvg) {
-                if(exception != null) {
+                if (exception != null) {
                     handleException();
                     return;
                 }
@@ -264,41 +296,10 @@ public class SessionActivity extends ActionBarActivity
                     params.width = (int) (size.width * metrics.density);
                     params.height = (int) (size.height * metrics.density);
                     scrambleImageView.setLayoutParams(params);
-                } catch(SVGParseException e) {
+                } catch (SVGParseException e) {
                     Log.wtf(TAG, e);
                 }
             }
-        }
-
-        private ScrambleTask scrambleTask;
-        private void doScramble() {
-            scrambleView.setText("Scrambling...");
-
-            cancelScrambleIfScrambling();
-            scrambleTask = new ScrambleTask();
-            scrambleTask.execute(puzzle);
-        }
-
-        private void cancelScrambleIfScrambling() {
-            if(scrambleTask != null && scrambleTask.getStatus() == AsyncTask.Status.RUNNING) {
-                scrambleTask.cancel(true);
-            }
-        }
-
-        @Override
-        public void onStop() {
-            super.onStop();
-            cancelScrambleIfScrambling();
-        }
-
-        private String getShortName() {
-            return getArguments().getString(ARG_SHORT_NAME);
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((SessionActivity) activity).onSectionAttached(getShortName());
         }
     }
 
