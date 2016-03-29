@@ -51,12 +51,12 @@ public class SquareOnePuzzle extends Puzzle {
 
     private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
     static {
-        defaultColorScheme.put("L", new Color(0x0000ff));
-        defaultColorScheme.put("B", new Color(0xffc800));
-        defaultColorScheme.put("R", new Color(0x00ff00));
-        defaultColorScheme.put("F", new Color(0xff0000));
-        defaultColorScheme.put("U", new Color(0xffff00));
-        defaultColorScheme.put("D", new Color(0xffffff));
+        defaultColorScheme.put("B", new Color(255, 128, 0)); //orange heraldic tincture
+        defaultColorScheme.put("D", Color.WHITE);
+        defaultColorScheme.put("F", Color.RED);
+        defaultColorScheme.put("L", Color.BLUE);
+        defaultColorScheme.put("R", Color.GREEN);
+        defaultColorScheme.put("U", Color.YELLOW);
     }
     @Override
     public HashMap<String, Color> getDefaultColorScheme() {
