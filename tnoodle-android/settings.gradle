@@ -1,1 +1,1 @@
-include ':tnoodle-android', ':tnoodle-android-test'
+include ':library', ':sample'

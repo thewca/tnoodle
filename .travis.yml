@@ -1,11 +1,15 @@
 language: android
-jdk: oraclejdk7
+jdk: oraclejdk8
 android:
   components:
-    - build-tools-19.0.0
+    - tools
+    - build-tools-23.0.2
+    - android-23
+    - extra-android-support
+    - extra-android-m2repository
 
 env:
-  - TNOODLE_INSTALL_GWT=1 ANDROID_TARGET=android-19
+  - TNOODLE_INSTALL_GWT=1
 
 before_install:
   - sudo apt-get update -qq
