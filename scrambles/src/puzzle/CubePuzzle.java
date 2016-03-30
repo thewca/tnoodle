@@ -224,16 +224,18 @@ public class CubePuzzle extends Puzzle {
         }
     }
 
+    private static HashMap<String, Color> defaultColorScheme = new HashMap<String, Color>();
+    static {
+        defaultColorScheme.put("B", Color.BLUE);
+        defaultColorScheme.put("D", Color.YELLOW);
+        defaultColorScheme.put("F", Color.GREEN);
+        defaultColorScheme.put("L", new Color(255, 128, 0)); //orange heraldic tincture
+        defaultColorScheme.put("R", Color.RED);
+        defaultColorScheme.put("U", Color.WHITE);
+    }
     @Override
     public HashMap<String, Color> getDefaultColorScheme() {
-        HashMap<String, Color> colors = new HashMap<String, Color>();
-        colors.put("B", Color.BLUE);
-        colors.put("D", Color.YELLOW);
-        colors.put("F", Color.GREEN);
-        colors.put("L", new Color(255, 128, 0)); //orange heraldic tincture
-        colors.put("R", Color.RED);
-        colors.put("U", Color.WHITE);
-        return colors;
+        return new HashMap<String, Color>(defaultColorScheme);
     }
 
     @Override
