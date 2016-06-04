@@ -226,7 +226,7 @@ public final class Utils {
         Package p = Utils.class.getPackage();
         String name = p.getImplementationTitle();
         if(name == null) {
-            name = getCallerClass().getName();
+            name = "devel";
         }
         return name;
     }
