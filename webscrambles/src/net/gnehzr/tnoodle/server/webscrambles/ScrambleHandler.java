@@ -1,19 +1,17 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
-import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
+import com.itextpdf.text.DocumentException;
+import net.gnehzr.tnoodle.server.SafeHttpServlet;
+import net.lingala.zip4j.exception.ZipException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import net.gnehzr.tnoodle.server.SafeHttpServlet;
-import net.lingala.zip4j.exception.ZipException;
-
-import com.itextpdf.text.DocumentException;
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 
 @SuppressWarnings("serial")
 public class ScrambleHandler extends SafeHttpServlet {
@@ -39,11 +37,6 @@ public class ScrambleHandler extends SafeHttpServlet {
             }
             globalTitle = path[0].substring(0, lastDot);
             ext = path[0].substring(lastDot+1);
-
-            // Chrome seems to be caching scramble requests. These headers unfortunately
-            // don't seem to prevent that behavior.
-            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-            response.setHeader("Pragma", "no-cache");
 
             if(ext == null || ext.equals("txt")) {
                 // Note that we parse the scramble requests *after* checking the extension.

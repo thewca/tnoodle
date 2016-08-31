@@ -6,6 +6,11 @@
  */
 package winstone;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,12 +26,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Servlet to handle static resources. Simply finds and sends them, or
@@ -130,18 +129,19 @@ public class StaticResourceServlet extends HttpServlet {
                 response.sendRedirect(this.prefix + path + "/");
         }
 
+        // Disabled returning 304 statuses to fix https://github.com/cubing/tnoodle/issues/215
         // Send a 304 if not modified
-        else if (!isInclude && (cachedResDate != -1)
-                && (cachedResDate < (System.currentTimeMillis() / 1000L * 1000L))
-                && (cachedResDate >= (res.lastModified() / 1000L * 1000L))) {
-            String mimeType = getServletContext().getMimeType(
-                    res.getName().toLowerCase());
-            if (mimeType != null)
-                response.setContentType(mimeType);
-            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-            response.setContentLength(0);
-            response.flushBuffer();
-        }
+//        else if (!isInclude && (cachedResDate != -1)
+//                && (cachedResDate < (System.currentTimeMillis() / 1000L * 1000L))
+//                && (cachedResDate >= (res.lastModified() / 1000L * 1000L))) {
+//            String mimeType = getServletContext().getMimeType(
+//                    res.getName().toLowerCase());
+//            if (mimeType != null)
+//                response.setContentType(mimeType);
+//            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+//            response.setContentLength(0);
+//            response.flushBuffer();
+//        }
 
         // Write out the resource if not range or is included
         else if ((request.getHeader(RANGE_HEADER) == null) || isInclude) {

@@ -6,16 +6,15 @@
  */
 package javax.servlet.http;
 
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 /**
  * Base class for http servlets
@@ -103,14 +102,15 @@ public abstract class HttpServlet extends javax.servlet.GenericServlet
             if (lastModified == -1)
                 doGet(request, response);
             else {
-                long ifModifiedSince = request.getDateHeader(HEADER_IFMODSINCE);
-                if (ifModifiedSince < (lastModified / 1000 * 1000)) {
-                    if (!response.containsHeader(HEADER_LASTMOD)
-                            && (lastModified >= 0))
-                        response.setDateHeader(HEADER_LASTMOD, lastModified);
+                // Disabled returning 304 statuses to fix https://github.com/cubing/tnoodle/issues/215
+//                long ifModifiedSince = request.getDateHeader(HEADER_IFMODSINCE);
+//                if (ifModifiedSince < (lastModified / 1000 * 1000)) {
+//                    if (!response.containsHeader(HEADER_LASTMOD)
+//                            && (lastModified >= 0))
+//                        response.setDateHeader(HEADER_LASTMOD, lastModified);
                     doGet(request, response);
-                } else
-                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+//                } else
+//                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
             }
         } else if (method.equals(METHOD_HEAD)) {
             long lastModified = getLastModified(request);

@@ -1,12 +1,12 @@
 package net.gnehzr.tnoodle.server;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.Map;
-
 import winstone.HostGroup;
 import winstone.HttpListener;
 import winstone.ObjectPool;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.Map;
 
 public class AggressiveHttpListener extends HttpListener {
     public static ServerSocket ss;

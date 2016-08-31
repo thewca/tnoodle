@@ -87,7 +87,7 @@ class Project(tmt.EclipseProject):
             gwtUrl = "https://developers.google.com/web-toolkit/download"
             print("You could visit %s and install GWT yourself (be sure to set up a symlink from %s to wherever you installed gwt." % ( gwtUrl, gwtDir ))
             if os.environ.get(INSTALL_GWT_ENV_VAR) or yesNoPrompt("Would you like me to download GWT and extract it to %s for you?" % gwtDir):
-                gwtZipUrl = "http://google-web-toolkit.googlecode.com/files/gwt-2.5.1.zip"
+                gwtZipUrl = "https://storage.googleapis.com/gwt-releases/gwt-2.5.1.zip"
                 dledZipFile = dl(gwtZipUrl)
                 gwtZip = zipfile.ZipFile(dledZipFile)
                 gwtZip.extractall(path=dirname(gwtDir))
