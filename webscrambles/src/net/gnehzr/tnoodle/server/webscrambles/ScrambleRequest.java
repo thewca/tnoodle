@@ -1,59 +1,5 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
-import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.toInt;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.join;
-
-import net.gnehzr.tnoodle.svglite.Color;
-import net.gnehzr.tnoodle.svglite.Dimension;
-import net.gnehzr.tnoodle.svglite.Svg;
-
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.io.ByteArrayOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.io.StringReader;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import javax.servlet.ServletContext;
-
-import org.w3c.dom.svg.SVGDocument;
-import org.apache.batik.bridge.BridgeContext;
-import org.apache.batik.bridge.DocumentLoader;
-import org.apache.batik.bridge.GVTBuilder;
-import org.apache.batik.bridge.UserAgent;
-import org.apache.batik.bridge.UserAgentAdapter;
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
-import org.apache.batik.gvt.GraphicsNode;
-import org.apache.batik.util.XMLResourceDescriptor;
-
-import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
-import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
-import net.gnehzr.tnoodle.utils.LazyInstantiator;
-import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
-import net.gnehzr.tnoodle.utils.Utils;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.ZipOutputStream;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
-
 import com.itextpdf.awt.DefaultFontMapper;
 import com.itextpdf.awt.PdfGraphics2D;
 import com.itextpdf.text.BaseColor;
@@ -80,6 +26,55 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
+import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
+import net.gnehzr.tnoodle.svglite.Color;
+import net.gnehzr.tnoodle.svglite.Dimension;
+import net.gnehzr.tnoodle.svglite.Svg;
+import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
+import net.gnehzr.tnoodle.utils.LazyInstantiator;
+import net.gnehzr.tnoodle.utils.Utils;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.ZipOutputStream;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DocumentLoader;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgent;
+import org.apache.batik.bridge.UserAgentAdapter;
+import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import org.apache.batik.gvt.GraphicsNode;
+import org.apache.batik.util.XMLResourceDescriptor;
+import org.w3c.dom.svg.SVGDocument;
+
+import javax.servlet.ServletContext;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.*;
 
 class ScrambleRequest {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
@@ -797,7 +792,7 @@ class ScrambleRequest {
         Font scrambleFont = null;
 
         try {
-            BaseFont courier = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.EMBEDDED);
+            BaseFont courier = BaseFont.createFont("fonts/LiberationMono-Regular.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
             Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
                     availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM);
             float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true);
