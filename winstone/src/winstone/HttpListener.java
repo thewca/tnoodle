@@ -193,6 +193,9 @@ public class HttpListener implements Listener, Runnable {
         // must be the first header. Ajp13 listener can defer to the Apache Server
         // header
         rsp.setHeader("Server", Launcher.RESOURCES.getString("ServerVersion"));
+        rsp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        rsp.setHeader("Pragma", "no-cache");
+        rsp.setHeader("Expires", "0");
     }
 
     /**
