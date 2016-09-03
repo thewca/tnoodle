@@ -1161,6 +1161,9 @@ Implementation-Version: %s
 """ % ( self.main, implementationTitle, tmt.VERSION )
                 jar.writestr('META-INF/MANIFEST.MF', manifest)
 
+            # Hacky way to add font to jar
+            jar.write("fonts/LiberationMono-Regular.ttf", "/fonts/LiberationMono-Regular.ttf")
+
             # Give subclasses the opportunity to make some last minute tweaks to the jar file
             self.tweakJarFile(jar)
 
