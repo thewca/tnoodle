@@ -159,7 +159,7 @@ public abstract class Puzzle implements Exportable {
         // rather than replacing it.
         // TODO - consider using something other than SecureRandom for seeded scrambles,
         // because we really, really want this to be portable across platforms (desktop java, gwt, and android)
-        // https://github.com/cubing/tnoodle/issues/146
+        // https://github.com/thewca/tnoodle/issues/146
         SecureRandom r = getSecureRandom();
         r.setSeed(seed);
         return generateWcaScramble(r);
