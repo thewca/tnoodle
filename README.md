@@ -1,4 +1,4 @@
-<img src="./winstone/src_tnoodle_resources/icons/tnoodle_logo_1024.png" alt="Tnoodle Logo" height="128px"/>
+<img src="./winstone/src_tnoodle_resources/icons/tnoodle_logo_1024.png" alt="TNoodle Logo" height="128px"/>
 
 # TNoodle
 
@@ -18,7 +18,7 @@ Note that only the scramble program part of TNoodle is "official". Other TNoodle
 
 ### "Scramble Program" vs. "Scrambler"
 
-Officially, `Tnoodle-WCA` is a [scramble program](https://www.worldcubeassociation.org/regulations/#4f), while a [scrambler](https://www.worldcubeassociation.org/regulations/#A2b) is a human. It is fine to refer to TNoodle as a "scrambler" colloquially, but please try to use the official convention wherever possible.
+Officially, `TNoodle-WCA` is a [scramble program](https://www.worldcubeassociation.org/regulations/#4f), while a [scrambler](https://www.worldcubeassociation.org/regulations/#A2b) is a human. It is fine to refer to TNoodle as a "scrambler" colloquially, but please try to use the official convention wherever possible.
 
 
 ## Project Details
@@ -54,10 +54,8 @@ You can run the `.jar` from the commandline using:
 First make sure that `./tmt make` works. This will involve installing the
 android sdk and setting up an ANDROID_HOME environment variable.
 
-~/.gradle/gradle.properties needs a few things: .
-
-See http://gradle.org/docs/current/userguide/signing_plugin.html for how to
-create PGP key pair.
+- Bump the version number in `bower.json`.
+- `./tmt release`
 
 ### TNoodle Timer (TNT) and Other Projects
 

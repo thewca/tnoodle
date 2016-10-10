@@ -436,7 +436,7 @@ class tmt:
     def __init__(self):
         self.releasing = False
         self.parser = ArgumentParser(
-            description='tmt, the Tnoodle Make Tools',
+            description='tmt, the TNoodle Make Tools',
             formatter_class=ArgumentDefaultsHelpFormatter)
         subparsers = self.parser.add_subparsers(help='Available commands', dest='subparser_name')
         subparsers.required = True # Something changed in python 3 (see http://hg.python.org/cpython/rev/cab204a79e09), so dumb
