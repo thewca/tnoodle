@@ -236,6 +236,11 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                 ByteArrayOutputStream totalPdfOutput = ScrambleRequest
                         .requestsToPdf(globalTitle, generationDate, scrambleRequests, password);
                 response.setHeader("Content-Disposition", "inline");
+
+                // Workaround for Chrome bug with saving PDFs:
+                //  https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
+                response.setHeader("Cache-Control", "public");
+
                 sendBytes(request, response, totalPdfOutput, "application/pdf");
             } else if (extension.equals("zip")) {
                 ByteArrayOutputStream zipOutput = ScrambleRequest
