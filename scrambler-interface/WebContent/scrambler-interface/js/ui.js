@@ -544,7 +544,7 @@ var mark2 = {};
                     groupCount: numGroups,
                     scrambleCount: numSolves,
                     extraScrambleCount: numExtraSolves,
-                    copies: numCopies
+                    copies: numCopies,
                 };
                 if(includeElement) {
                     roundJson.element = tr;
@@ -980,7 +980,7 @@ var mark2 = {};
             var numCopiesInput = mark2.dom.appendElement(
                     numCopiesTD,
                     "input",
-                    { type: "number", value: numCopies, min: 0 }
+                    { type: "number", value: numCopies, min: 1 }
                     );
             numCopiesInput.classList.add("num_copies");
 
