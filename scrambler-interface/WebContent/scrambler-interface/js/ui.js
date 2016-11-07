@@ -534,6 +534,7 @@ var mark2 = {};
                 var round = tr.getAttribute("data-round");
                 var numSolves = parseInt(tr.getElementsByClassName("num_solves")[0].value, 10);
                 var numExtraSolves = parseInt(tr.getElementsByClassName("num_extra_solves")[0].value, 10);
+                var numCopies = parseInt(tr.getElementsByClassName("num_copies")[0].value, 10);
 
                 var numGroups = parseInt(tr.getElementsByClassName("num_groups")[0].value, 10);
 
@@ -542,7 +543,8 @@ var mark2 = {};
                     round: round,
                     groupCount: numGroups,
                     scrambleCount: numSolves,
-                    extraScrambleCount: numExtraSolves
+                    extraScrambleCount: numExtraSolves,
+                    copies: numCopies,
                 };
                 if(includeElement) {
                     roundJson.element = tr;
@@ -594,6 +596,7 @@ var mark2 = {};
                         title: eventName + " " + title,
                         scrambleCount: round.scrambleCount,
                         extraScrambleCount: round.extraScrambleCount,
+                        copies: round.copies,
 
                         event: round.eventID,
                         round: round.round,
@@ -888,7 +891,7 @@ var mark2 = {};
         };
 
 
-        var addRound = function(eventID, round, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt, placeLast) {
+        var addRound = function(eventID, round, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt, numCopiesOpt, placeLast) {
             if (round === undefined) {
                 round = numCurrentRounds(eventID)+1;
             }
@@ -908,6 +911,8 @@ var mark2 = {};
             if (numExtraSolvesOpt === undefined) {
                 numExtraSolves = settings.events[eventID].default_round.num_extra_scrambles || 0;
             }
+
+            var numCopies = numCopiesOpt || 1;
 
             var newEventTR_ID = mark2.dom.nextAutoID();
             var newEventTR = mark2.dom.appendElement(
@@ -971,6 +976,14 @@ var mark2 = {};
                     );
             numExtraSolvesInput.classList.add("num_extra_solves");
 
+            var numCopiesTD = mark2.dom.appendElement(newEventTR, "td");
+            var numCopiesInput = mark2.dom.appendElement(
+                    numCopiesTD,
+                    "input",
+                    { type: "number", value: numCopies, min: 1 }
+                    );
+            numCopiesInput.classList.add("num_copies");
+
             var removeTD = mark2.dom.appendElement(newEventTR, "td");
             removeTD.classList.add("round_remove");
             var removeButton = mark2.dom.appendElement(removeTD, "button", {}, "X");
@@ -978,6 +991,7 @@ var mark2 = {};
 
             numSolvesInput.addEventListener("change", updateHash, false);
             numExtraSolvesInput.addEventListener("change", updateHash, false);
+            numCopiesInput.addEventListener("change", updateHash, false);
             numGroupsInput.addEventListener("change", updateHash, false);
 
             sortables.addItems(newEventTR);
@@ -1070,7 +1084,7 @@ var mark2 = {};
         var addRounds = function(rounds) {
             for (var i = 0; i < rounds.length; i++) {
                 var placeLast = true;
-                addRound(rounds[i].eventID, rounds[i].round, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount, placeLast);
+                addRound(rounds[i].eventID, rounds[i].round, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount, rounds[i].copies, placeLast);
             }
         };
 
@@ -1232,6 +1246,9 @@ var mark2 = {};
             td = document.createElement('td');
             tr.appendChild(td);
             td.appendChild(document.createTextNode('# Extra Scrambles'));
+            td = document.createElement('td');
+            tr.appendChild(td);
+            td.appendChild(document.createTextNode('# Copies'));
             td = document.createElement('td');
             tr.appendChild(td);
             td.appendChild(document.createTextNode('Remove'));
