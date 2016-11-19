@@ -872,13 +872,6 @@ var mark2 = {};
             return count;
         };
 
-        var removeRound = function(eventID, scrambleID) {
-            roundsTbody.removeChild(document.getElementById(scrambleID));
-            document.getElementById("event_amount_value_" + eventID).value = numCurrentRounds(eventID);
-
-            updateHash();
-        };
-
         var removeLastRound = function(eventID) {
             var rounds = getRounds(true);
             var lastRoundOfEvent = null;
@@ -983,11 +976,6 @@ var mark2 = {};
                     { type: "number", value: numCopies, min: 1 }
                     );
             numCopiesInput.classList.add("num_copies");
-
-            var removeTD = mark2.dom.appendElement(newEventTR, "td");
-            removeTD.classList.add("round_remove");
-            var removeButton = mark2.dom.appendElement(removeTD, "button", {}, "X");
-            removeButton.addEventListener("click", removeRound.bind(null, eventID, newEventTR_ID), false);
 
             numSolvesInput.addEventListener("change", updateHash, false);
             numExtraSolvesInput.addEventListener("change", updateHash, false);
@@ -1249,9 +1237,6 @@ var mark2 = {};
             td = document.createElement('td');
             tr.appendChild(td);
             td.appendChild(document.createTextNode('# Copies'));
-            td = document.createElement('td');
-            tr.appendChild(td);
-            td.appendChild(document.createTextNode('Remove'));
 
             roundsTbody = document.createElement('tbody');
             roundsTable.appendChild(roundsTbody);
