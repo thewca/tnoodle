@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
-import logo from 'tnoodle_logo.svg';
-import * as WcaApi from 'WcaApi';
-import 'App.css';
+import classNames from 'classnames';
 
-function Layout({ me, children }) {
+import * as WcaApi from 'WcaApi';
+import ManageCompetition from 'ManageCompetition';
+
+import 'App.css';
+import logo from 'tnoodle_logo.svg';
+
+function Layout({ me, busy, children }) {
   return (
     <div className="app">
       <div className="app-header">
-        <img src={logo} className="app-logo" alt="TNoodle logo" />
+        <img src={logo} className={classNames("app-logo", { busy })} alt="TNoodle logo" />
         {me ? <h2>Welcome to TNoodle, {me.name}!</h2> : <h2>Welcome to TNoodle!</h2>}
         <small>(If you're offline or not generating scrambles for an official WCA competition, use the <a href="/scramble/">legacy ui</a>.)</small>
       </div>
@@ -55,43 +59,6 @@ class SelectAndManageCompetition extends Component {
   }
 }
 
-class ManageCompetition extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  componentWillMount() {
-    this.loadCompetition(this.props.competitionId);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if(this.props.competitionId !== nextProps.competitionId) {
-      this.loadCompetition(nextProps.competitionId);
-    }
-  }
-
-  loadCompetition(competitionId) {
-    WcaApi.getCompetitionJson(competitionId).then(competitionJson => {
-      this.setState({ competitionJson });
-    });
-  }
-
-  render() {
-    if(!this.state.competitionJson) {
-      return (
-        <div>Loading competition...</div>
-      );
-    }
-
-    return (
-      <div style={{ textAlign: 'left' }}>
-        <pre>{JSON.stringify(this.state.competitionJson, null, 2)}</pre>
-      </div>
-    );
-  }
-}
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -107,7 +74,7 @@ class App extends Component {
   render() {
     let me = this.state.me;
     return (
-      <Layout me={me}>
+      <Layout me={me} busy={false}>
         <SelectAndManageCompetition />
       </Layout>
     );

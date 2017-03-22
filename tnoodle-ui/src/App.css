@@ -3,8 +3,11 @@
 }
 
 .app-logo {
-  animation: app-logo-spin infinite 20s linear;
   height: 80px;
+}
+
+.app-logo.busy {
+  animation: app-logo-spin infinite 500ms linear;
 }
 
 .app-header {

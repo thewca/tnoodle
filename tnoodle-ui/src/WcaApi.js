@@ -13,6 +13,9 @@ function getHashParameter(name, alt) {
 let wcaAccessToken = getHashParameter('access_token', null);
 if(wcaAccessToken) {
   location.hash = "";
+  localStorage['TNoodle.accessToken'] = wcaAccessToken;
+} else {
+  wcaAccessToken = localStorage['TNoodle.accessToken'];
 }
 
 function wcaApiFetch(path, fetchOptions) {
