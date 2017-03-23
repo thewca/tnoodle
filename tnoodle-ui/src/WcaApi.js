@@ -1,15 +1,3 @@
-let redirectUri = location.origin + location.pathname + location.search;
-let logInUrl = `http://kaladin:3000/oauth/authorize?client_id=e00488e5f685aca8b1f375d9eded764247f070bccb235903ce20f8e437123eac&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
-
-export { logInUrl };
-
-function getHashParameter(name, alt) {
-  name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]");
-  var regex = new RegExp("[\\#&]" + name + "=([^&#]*)");
-  var results = regex.exec(location.hash);
-  return results === null ? alt : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
-
 let wcaAccessToken = getHashParameter('access_token', null);
 if(wcaAccessToken) {
   location.hash = "";
@@ -18,16 +6,15 @@ if(wcaAccessToken) {
   wcaAccessToken = localStorage['TNoodle.accessToken'];
 }
 
-function wcaApiFetch(path, fetchOptions) {
-  // TODO - <<< refresh token https://github.com/doorkeeper-gem/doorkeeper/wiki/Enable-Refresh-Token-Credentials
-  var baseApiUrl = 'http://kaladin:3000/api/v0';
-  fetchOptions = Object.assign({}, fetchOptions, {
-    headers: new Headers({
-      "Authorization": `Bearer ${wcaAccessToken}`,
-      "Content-Type": "application/json",
-    }),
-  });
-  return fetch(`${baseApiUrl}${path}`, fetchOptions);
+export function logIn() {
+  let redirectUri = location.origin + '/oauth/wca';
+  let logInUrl = `http://kaladin:3000/oauth/authorize?client_id=e00488e5f685aca8b1f375d9eded764247f070bccb235903ce20f8e437123eac&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
+  localStorage['TNoodle.preLoginPath'] = location.pathname;
+  document.location = logInUrl;
+}
+
+export function getPreLoginPath() {
+  return localStorage['TNoodle.preLoginPath'] || "/";
 }
 
 export function me() {
@@ -52,4 +39,23 @@ export function getUpcomingManageableCompetitions() {
   return wcaApiFetch(
     `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
   ).then(response => response.json());
+}
+
+function getHashParameter(name, alt) {
+  name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\#&]" + name + "=([^&#]*)");
+  var results = regex.exec(location.hash);
+  return results === null ? alt : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function wcaApiFetch(path, fetchOptions) {
+  // TODO - <<< refresh token https://github.com/doorkeeper-gem/doorkeeper/wiki/Enable-Refresh-Token-Credentials
+  var baseApiUrl = 'http://kaladin:3000/api/v0';
+  fetchOptions = Object.assign({}, fetchOptions, {
+    headers: new Headers({
+      "Authorization": `Bearer ${wcaAccessToken}`,
+      "Content-Type": "application/json",
+    }),
+  });
+  return fetch(`${baseApiUrl}${path}`, fetchOptions);
 }
