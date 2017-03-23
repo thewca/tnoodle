@@ -62,3 +62,20 @@ export function fetchUpcomingManageableCompetitions() {
     });
   };
 }
+
+export function generateMissingScrambles(todo) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: "GENERATE_MISSING_SCRAMBLES",
+      todo,
+    });
+  };
+}
+
+export function setPlannedGroupCount(activityCode, plannedGroupCount) {
+  return {
+    type: "SET_PLANNED_GROUP_COUNT",
+    activityCode,
+    plannedGroupCount,
+  };
+}
