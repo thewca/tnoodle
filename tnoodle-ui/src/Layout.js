@@ -32,7 +32,7 @@ export default connect(
           <div className="app-into">
             {me ? children : (
               <p>
-                To get started, <a href={WcaApi.logInUrl}>log in with the WCA</a>.
+                To get started, <button onClick={() => WcaApi.logIn()}>log in with the WCA</button>.
               </p>
             )}
           </div>

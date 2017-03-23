@@ -4,11 +4,12 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
-import { Route } from 'react-router';
+import { Route, Redirect } from 'react-router';
 import createHistory from 'history/createBrowserHistory';
 import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
 
 import * as reducers from 'reducers';
+import * as WcaApi from 'WcaApi';
 import Home from 'Home';
 import ManageCompetition from 'ManageCompetition';
 
@@ -30,6 +31,7 @@ ReactDOM.render(
     <ConnectedRouter history={history}>
       <div>
         <Route exact path="/" component={Home} />
+        <Route path="/oauth/wca" render={() => <Redirect to={WcaApi.getPreLoginPath()} />} />
         <Route path="/competitions/:competitionId" component={ManageCompetition} />
       </div>
     </ConnectedRouter>
