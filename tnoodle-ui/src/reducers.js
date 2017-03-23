@@ -15,3 +15,12 @@ export const competitionJson = function(competitionJson=null, action) {
       return competitionJson;
   }
 };
+
+export const upcomingManageableCompetitions = function(competitions=null, action) {
+  switch(action.type) {
+    case "FETCH_UPCOMING_COMPS_SUCCESS":
+      return action.competitions;
+    default:
+      return competitions;
+  }
+};

@@ -2,6 +2,9 @@ import * as WcaApi from 'WcaApi';
 
 export function fetchMe() {
   return (dispatch, getState) => {
+    if(getState().me) {
+      return;
+    }
     dispatch({
       type: "FETCH_ME_REQUEST",
     });
@@ -34,6 +37,25 @@ export function fetchCompetitionJson(competitionId) {
       dispatch({
         type: "FETCH_COMPETITION_JSON_FAILURE",
         competitionId,
+      });
+    });
+  };
+}
+
+export function fetchUpcomingManageableCompetitions() {
+  return (dispatch, getState) => {
+    dispatch({
+      type: "FETCH_UPCOMING_COMPS_REQUEST",
+    });
+
+    WcaApi.getUpcomingManageableCompetitions().then(competitions => {
+      dispatch({
+        type: "FETCH_UPCOMING_COMPS_SUCCESS",
+        competitions,
+      });
+    }).catch(error => {
+      dispatch({
+        type: "FETCH_UPCOMING_COMPS_FAILURE",
       });
     });
   };
