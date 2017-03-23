@@ -34,6 +34,18 @@ it('checkScrambles finds missing scrambles', () => {
               },
             ],
           },
+          {
+            nthRound: 4,
+            roundId: "",
+            formatId: "a",
+            plannedGroupCount: 2,
+            groups: [
+              {
+                group: "a",
+                scrambles: [ "1", "2", "3", "4", "5" ],
+              },
+            ],
+          },
         ],
       },
       {
@@ -59,29 +71,41 @@ it('checkScrambles finds missing scrambles', () => {
   let checkedScrambles = checkScrambles(wcaCompetitionJson);
 
   expect(checkedScrambles).toEqual({
-    done: [
+    finishedRounds: [
       {
         eventId: "333",
         nthRound: 3,
-        message: "Scrambles look good!",
+        groupCount: 1,
+        plannedGroupCount: 1,
       },
     ],
-    todo: [
+    groupsWithWrongNumberOfScrambles: [
       {
         eventId: "333",
         nthRound: 2,
         group: "a",
-        message: "Found 3 scrambles, need 5",
+        scrambleCount: 3,
+        requiredScrambleCount: 5,
+      },
+    ],
+    roundsWithMissingGroups: [
+      {
+        eventId: "333",
+        nthRound: 4,
+        groupCount: 1,
+        plannedGroupCount: 2,
       },
       {
         eventId: "222",
         nthRound: 1,
-        message: "No scramble groups found",
+        groupCount: 0,
+        plannedGroupCount: 1,
       },
       {
         eventId: "222",
         nthRound: 2,
-        message: "No scramble groups found",
+        groupCount: 0,
+        plannedGroupCount: 1,
       },
     ],
     warnings: [

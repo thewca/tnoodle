@@ -1,4 +1,3 @@
-
 // From https://github.com/thewca/worldcubeassociation.org/blob/master/WcaOnRails/db/seeds/formats.seeds.rb
 const scrambleCountByFormatId = {
   "1": 1,
@@ -8,10 +7,42 @@ const scrambleCountByFormatId = {
   "m": 3,
 };
 
+export function parseActivityCode(activityCode) {
+  let [ eventId, nthRound, group ] = activityCode.split("-");
+  nthRound = parseInt(nthRound, 10);
+  return { eventId, nthRound, group };
+}
+
+export function buildActivityCode(activity) {
+  return [ activity.eventId, activity.nthRound, activity.group ].filter(el => el).join("-");
+}
+
+export function getActivity(wcaCompetitionJson, activityCode) {
+  let activity = parseActivityCode(activityCode);
+
+  if(!activity.eventId) {
+    return wcaCompetitionJson;
+  }
+  let event = wcaCompetitionJson.events.find(event => event.eventId === activity.eventId);
+
+  if(!activity.nthRound) {
+    return event;
+  }
+  let round = event.rounds.find(round => round.nthRound === activity.nthRound);
+
+  if(!activity.group) {
+    return round;
+  }
+  let group = round.groups.find(group => group.group === activity.group);
+
+  return group;
+}
+
 export function checkScrambles(wcaCompetitionJson) {
   let checked = {
-    done: [],
-    todo: [],
+    finishedRounds: [],
+    groupsWithWrongNumberOfScrambles: [],
+    roundsWithMissingGroups: [],
     warnings: [],
   };
 
@@ -35,16 +66,22 @@ export function checkScrambles(wcaCompetitionJson) {
       }
 
       let groups = wcaRound.groups || [];
-      if(groups.length === 0) {
-        checked.todo.push({
-          eventId: wcaEvent.eventId,
-          nthRound: wcaRound.nthRound,
-          message: "No scramble groups found",
-        });
-        return;
+      if(!wcaRound.plannedGroupCount) {
+        wcaRound.plannedGroupCount = groups.length || 1;
       }
 
       let roundScramblesPerfect = true;
+
+      if(groups.length < wcaRound.plannedGroupCount) {
+        checked.roundsWithMissingGroups.push({
+          eventId: wcaEvent.eventId,
+          nthRound: wcaRound.nthRound,
+          groupCount: groups.length,
+          plannedGroupCount: wcaRound.plannedGroupCount,
+        });
+        roundScramblesPerfect = false;
+      }
+
       groups.forEach(wcaGroup => {
         if(!wcaGroup.group) {
           checked.warnings.push({
@@ -58,12 +95,14 @@ export function checkScrambles(wcaCompetitionJson) {
 
         let scrambleCount = (wcaGroup.scrambles || []).length;
         let requiredScrambleCount = scrambleCountByFormatId[wcaRound.formatId];
-        if(scrambleCount < requiredScrambleCount) {
-          checked.todo.push({
+        if(scrambleCount !== requiredScrambleCount) {
+          checked.groupsWithWrongNumberOfScrambles.push({
             eventId: wcaEvent.eventId,
             nthRound: wcaRound.nthRound,
             group: wcaGroup.group,
-            message: `Found ${scrambleCount} scrambles, need ${requiredScrambleCount}`,
+
+            scrambleCount,
+            requiredScrambleCount,
           });
           roundScramblesPerfect = false;
           return;
@@ -71,10 +110,11 @@ export function checkScrambles(wcaCompetitionJson) {
       });
 
       if(roundScramblesPerfect) {
-        checked.done.push({
+        checked.finishedRounds.push({
           eventId: wcaEvent.eventId,
           nthRound: wcaRound.nthRound,
-          message: "Scrambles look good!",
+          groupCount: groups.length,
+          plannedGroupCount: wcaRound.plannedGroupCount,
         });
       }
     });
