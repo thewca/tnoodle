@@ -39,7 +39,7 @@ export default connect(
     render() {
       return (
         <Layout>
-          <SelectCompetition competitions={this.props.competitions} />
+          {this.props.competitions && <SelectCompetition competitions={this.props.competitions} />}
         </Layout>
       );
     }

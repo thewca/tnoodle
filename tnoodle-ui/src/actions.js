@@ -16,6 +16,7 @@ export function fetchMe() {
     }).catch(error => {
       dispatch({
         type: "FETCH_ME_FAILURE",
+        error,
       });
     });
   };
@@ -37,6 +38,7 @@ export function fetchCompetitionJson(competitionId) {
       dispatch({
         type: "FETCH_COMPETITION_JSON_FAILURE",
         competitionId,
+        error,
       });
     });
   };
