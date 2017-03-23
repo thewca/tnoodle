@@ -13,6 +13,12 @@ export function logIn() {
   document.location = logInUrl;
 }
 
+export function logOut() {
+  localStorage['TNoodle.accessToken'] = null;
+  wcaAccessToken = null;
+  window.location.reload();
+}
+
 export function getPreLoginPath() {
   return localStorage['TNoodle.preLoginPath'] || "/";
 }
@@ -57,5 +63,10 @@ function wcaApiFetch(path, fetchOptions) {
       "Content-Type": "application/json",
     }),
   });
-  return fetch(`${baseApiUrl}${path}`, fetchOptions);
+  return fetch(`${baseApiUrl}${path}`, fetchOptions).then(response => {
+    if(!response.ok) {
+      throw new Error(`${response.status}: ${response.statusText}`);
+    }
+    return response;
+  });
 }
