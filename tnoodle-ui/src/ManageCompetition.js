@@ -97,9 +97,17 @@ function ManageCompetition({ competitionJson, originalCompetitionJson, dispatch 
 
   let enableSaveButton = JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson);
 
+  let promptClearScrambles = function() {
+    if(confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
+      dispatch(actions.clearCompetitionScrambles(competitionJson));
+    }
+  };
+
   return (
     <div>
-      {<button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson))}>Save</button>}
+      <button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson))}>Save</button>
+      <button onClick={promptClearScrambles}>Clear scrambles</button>
+      <button onClick={(e) => dispatch(actions.downloadScrambles(e.shiftKey))}>Download scramble zip</button>
       {finishedRoundsDiv}
       {groupsWithWrongNumberOfScramblesDiv}
       {roundsWithMissingGroupsDiv}
