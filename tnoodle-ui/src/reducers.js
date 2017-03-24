@@ -1,4 +1,5 @@
-import { getActivity } from 'WcaCompetitionJson';
+import { getActivity, normalizeCompetitionJson } from 'WcaCompetitionJson';
+import deepcopy from 'deepcopy';
 
 export const me = function(state=null, action) {
   if(action.type === "FETCH_ME" && action.status === "success") {
@@ -20,11 +21,27 @@ export const originalCompetitionJson = function(state=null, action) {
 
 export const competitionJson = function(state=null, action) {
   if(action.type === "FETCH_COMPETITION_JSON" && action.status === "success") {
-    return action.response;
+    return normalizeCompetitionJson(action.response);
   } else if(action.type === "SET_PLANNED_GROUP_COUNT") {
     let competitionJson = deepcopy(state);
     let round = getActivity(competitionJson, action.activityCode);
     round.plannedGroupCount = action.plannedGroupCount;
+    return competitionJson;
+  } else if(action.type === "GROUP_FOR_ROUND") {
+    let competitionJson = deepcopy(state);
+    let round = getActivity(competitionJson, action.activityCode);
+    round.groups.push({
+      group: action.groupName,
+      scrambles: action.scrambles,
+    });
+    return competitionJson;
+  } else if(action.type === "CLEAR_COMPETITION_SCRAMBLES") {
+    let competitionJson = deepcopy(state);
+    competitionJson.events.forEach(event => {
+      event.rounds.forEach(round => {
+        round.groups = [];
+      });
+    });
     return competitionJson;
   } else {
     return state;
@@ -63,7 +80,3 @@ export const ongoingPromises = function(state={}, action) {
       return state;
   }
 };
-
-function deepcopy(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}

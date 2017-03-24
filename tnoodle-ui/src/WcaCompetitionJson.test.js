@@ -1,4 +1,4 @@
-import { checkScrambles } from 'WcaCompetitionJson';
+import { checkScrambles, normalizeCompetitionJson, getNextAvailableGroupName, getNextGroupName } from 'WcaCompetitionJson';
 
 it('checkScrambles finds missing scrambles', () => {
   let wcaCompetitionJson = {
@@ -68,7 +68,7 @@ it('checkScrambles finds missing scrambles', () => {
     ],
   };
 
-  let checkedScrambles = checkScrambles(wcaCompetitionJson);
+  let checkedScrambles = checkScrambles(normalizeCompetitionJson(wcaCompetitionJson));
 
   expect(checkedScrambles).toEqual({
     finishedRounds: [
@@ -115,5 +115,33 @@ it('checkScrambles finds missing scrambles', () => {
         message: "Missing or invalid formatId",
       },
     ],
+  });
+});
+
+describe('getNextAvailableGroupName', () => {
+  it('starts with "A"', () => {
+    expect(getNextAvailableGroupName([])).toEqual("A");
+  });
+
+  it('moves on to "B"', () => {
+    expect(getNextAvailableGroupName(["A"])).toEqual("B");
+  });
+
+  it('moves on to "B" even if "C" is taken', () => {
+    expect(getNextAvailableGroupName(["C", "A"])).toEqual("B");
+  });
+});
+
+describe('getNextGroupName', () => {
+  it('moves on to "AA" after "Z"', () => {
+    expect(getNextGroupName("Z")).toEqual("AA");
+  });
+
+  it('moves on to "BA" after "AZ"', () => {
+    expect(getNextGroupName("AZ")).toEqual("BA");
+  });
+
+  it('moves on to "AAA" after "ZZ"', () => {
+    expect(getNextGroupName("ZZ")).toEqual("AAA");
   });
 });
