@@ -31,13 +31,13 @@ export function getCompetitionJson(competitionId) {
   return wcaApiFetch(`/competitions/${competitionId}/big-json`).then(response => response.json());
 }
 
-export function setCompetitionJson(competitionId, competitionJson) {
-  return wcaApiFetch(`/competitions/${competitionId}/big-json`, {
+export function saveCompetitionJson(competitionJson) {
+  return wcaApiFetch(`/competitions/${competitionJson.competitionId}/big-json`, {
     method: "PUT",
     body: JSON.stringify({
       big_json: competitionJson,
     }),
-  });
+  }).then(response => response.json());
 }
 
 export function getUpcomingManageableCompetitions() {

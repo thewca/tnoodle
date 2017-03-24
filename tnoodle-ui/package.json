@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "classnames": "^2.2.5",
+    "node-sass": "^4.5.1",
+    "npm-run-all": "^4.0.2",
     "pluralize": "^4.0.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
@@ -19,8 +21,12 @@
     "react-scripts": "0.9.5"
   },
   "scripts": {
-    "start": "NODE_PATH=src react-scripts start",
-    "build": "NODE_PATH=src react-scripts build",
+    "build-css": "node-sass src/ -o src/",
+    "watch-css": "npm run build-css && node-sass src/ -o src/ --watch --recursive",
+    "start-js": "NODE_PATH=src react-scripts start",
+
+    "start": "npm-run-all -p watch-css start-js",
+    "build": "NODE_PATH=src yarn run build-css && react-scripts build",
     "test": "NODE_PATH=src react-scripts test --env=jsdom",
     "eject": "NODE_PATH=src react-scripts eject"
   }

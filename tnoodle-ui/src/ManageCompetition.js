@@ -95,11 +95,11 @@ function ManageCompetition({ competitionJson, originalCompetitionJson, dispatch 
     );
   }
 
-  let showSaveButton = JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson);
+  let enableSaveButton = JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson);
 
   return (
-    <div style={{ textAlign: 'left' }}>
-      {showSaveButton && <button>Save</button>}
+    <div>
+      {<button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson))}>Save</button>}
       {finishedRoundsDiv}
       {groupsWithWrongNumberOfScramblesDiv}
       {roundsWithMissingGroupsDiv}
@@ -125,7 +125,7 @@ export default connect(
     render() {
       let { competitionJson, originalCompetitionJson, dispatch } = this.props;
       return (
-        <Layout>
+        <Layout busy={false}>
           <ManageCompetition competitionJson={competitionJson} originalCompetitionJson={originalCompetitionJson} dispatch={dispatch} />
         </Layout>
       );

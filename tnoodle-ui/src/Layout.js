@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 
-import 'index.css';
+import 'Layout.css';
 import logo from 'tnoodle_logo.svg';
 
 import * as WcaApi from 'WcaApi';
@@ -12,6 +12,7 @@ export default connect(
   state => {
     return {
       me: state.me,
+      errorMessage: state.errorMessage,
     };
   },
 )(
@@ -21,7 +22,7 @@ export default connect(
     }
 
     render() {
-      let { me, busy, children } = this.props;
+      let { me, busy, errorMessage, children } = this.props;
 
       let subtitle;
       if(me) {
@@ -40,12 +41,12 @@ export default connect(
       }
       return (
         <div className="app">
-          <div className="app-header">
-            <img src={logo} className={classNames("app-logo", { busy })} alt="TNoodle logo" />
+          <div className={classNames("app-header", { error: !!errorMessage })}>
+            <img src={logo} className={classNames("app-logo", { busy })} title={errorMessage} alt="TNoodle logo" />
             {subtitle}
             <small>(If you are offline or not generating scrambles for an official WCA competition, use the <a href="/scramble/">legacy ui</a>.)</small>
           </div>
-          <div className="app-into">
+          <div className="app-intro">
             {me ? children : (
               <p>
                 To get started, <button onClick={() => WcaApi.logIn()}>log in with the WCA</button>.
