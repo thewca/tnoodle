@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
@@ -25,14 +25,26 @@ const store = createStore(
   composeWithDevTools(applyMiddleware(middleware, thunk)),
 );
 
+const wrapWithTitle = function(Tag, propsToTitle) {
+  return class extends Component {
+    componentWillMount() {
+      document.title = propsToTitle(this.props);
+    }
+
+    render() {
+      return <Tag {...this.props} />;
+    }
+  };
+};
+
 ReactDOM.render(
   <Provider store={store}>
     { /* ConnectedRouter will use the store from Provider automatically */ }
     <ConnectedRouter history={history}>
       <div>
-        <Route exact path="/" component={Home} />
+        <Route exact path="/" component={wrapWithTitle(Home, () => 'TNoodle')} />
         <Route path="/oauth/wca" render={() => <Redirect to={WcaApi.getPreLoginPath()} />} />
-        <Route path="/competitions/:competitionId" component={ManageCompetition} />
+        <Route path="/competitions/:competitionId" component={wrapWithTitle(ManageCompetition, props => `${props.match.params.competitionId} | TNoodle`)} />
       </div>
     </ConnectedRouter>
   </Provider>,
