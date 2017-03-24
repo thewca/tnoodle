@@ -13,6 +13,8 @@ export const originalCompetitionJson = function(competitionJson=null, action) {
   switch(action.type) {
     case "FETCH_COMPETITION_JSON_SUCCESS":
       return action.competitionJson;
+    case "SAVE_COMPETITION_JSON_SUCCESS":
+      return action.competitionJson;
     default:
       return competitionJson;
   }
@@ -39,6 +41,13 @@ export const upcomingManageableCompetitions = function(competitions=null, action
     default:
       return competitions;
   }
+};
+
+export const errorMessage = function(errorMessage=null, action) {
+  if(action.error) {
+    return action.error;
+  }
+  return errorMessage;
 };
 
 function deepcopy(obj) {

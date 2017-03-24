@@ -79,3 +79,24 @@ export function setPlannedGroupCount(activityCode, plannedGroupCount) {
     plannedGroupCount,
   };
 }
+
+export function saveCompetitionJson(competitionJson) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: "SAVE_COMPETITION_JSON_REQUEST",
+      competitionJson,
+    });
+
+    WcaApi.saveCompetitionJson(competitionJson).then(savedCompetitionJson => {
+      dispatch({
+        type: "SAVE_COMPETITION_JSON_SUCCESS",
+        competitionJson: savedCompetitionJson,
+      });
+    }).catch(error => {
+      dispatch({
+        type: "SAVE_COMPETITION_JSON_FAILURE",
+        competitionJson,
+      });
+    });
+  };
+}
