@@ -125,7 +125,7 @@ export default connect(
     render() {
       let { competitionJson, originalCompetitionJson, dispatch } = this.props;
       return (
-        <Layout busy={false}>
+        <Layout>
           <ManageCompetition competitionJson={competitionJson} originalCompetitionJson={originalCompetitionJson} dispatch={dispatch} />
         </Layout>
       );

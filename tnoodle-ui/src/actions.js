@@ -1,66 +1,19 @@
 import * as WcaApi from 'WcaApi';
 
 export function fetchMe() {
-  return (dispatch, getState) => {
-    if(getState().me) {
-      return;
-    }
-    dispatch({
-      type: "FETCH_ME_REQUEST",
-    });
-    WcaApi.me().then(me => {
-      dispatch({
-        type: "FETCH_ME_SUCCESS",
-        me,
-      });
-    }).catch(error => {
-      dispatch({
-        type: "FETCH_ME_FAILURE",
-        error,
-      });
-    });
-  };
+  return wrapPromiseWithDispatch(WcaApi.me(), 'FETCH_ME');
 }
 
 export function fetchCompetitionJson(competitionId) {
-  return (dispatch, getState) => {
-    dispatch({
-      type: "FETCH_COMPETITION_JSON_REQUEST",
-      competitionId,
-    });
-
-    WcaApi.getCompetitionJson(competitionId).then(competitionJson => {
-      dispatch({
-        type: "FETCH_COMPETITION_JSON_SUCCESS",
-        competitionJson,
-      });
-    }).catch(error => {
-      dispatch({
-        type: "FETCH_COMPETITION_JSON_FAILURE",
-        competitionId,
-        error,
-      });
-    });
-  };
+  return wrapPromiseWithDispatch(WcaApi.getCompetitionJson(competitionId), 'FETCH_COMPETITION_JSON');
 }
 
 export function fetchUpcomingManageableCompetitions() {
-  return (dispatch, getState) => {
-    dispatch({
-      type: "FETCH_UPCOMING_COMPS_REQUEST",
-    });
+  return wrapPromiseWithDispatch(WcaApi.getUpcomingManageableCompetitions(), 'FETCH_UPCOMING_COMPS');
+}
 
-    WcaApi.getUpcomingManageableCompetitions().then(competitions => {
-      dispatch({
-        type: "FETCH_UPCOMING_COMPS_SUCCESS",
-        competitions,
-      });
-    }).catch(error => {
-      dispatch({
-        type: "FETCH_UPCOMING_COMPS_FAILURE",
-      });
-    });
-  };
+export function saveCompetitionJson(competitionJson) {
+  return wrapPromiseWithDispatch(WcaApi.saveCompetitionJson(competitionJson), 'SAVE_COMPETITION_JSON');
 }
 
 export function generateMissingScrambles(todo) {
@@ -80,23 +33,15 @@ export function setPlannedGroupCount(activityCode, plannedGroupCount) {
   };
 }
 
-export function saveCompetitionJson(competitionJson) {
+let promiseCounter = 1;
+function wrapPromiseWithDispatch(promise, description) {
+  let promiseId = promiseCounter++;
   return (dispatch, getState) => {
-    dispatch({
-      type: "SAVE_COMPETITION_JSON_REQUEST",
-      competitionJson,
-    });
-
-    WcaApi.saveCompetitionJson(competitionJson).then(savedCompetitionJson => {
-      dispatch({
-        type: "SAVE_COMPETITION_JSON_SUCCESS",
-        competitionJson: savedCompetitionJson,
-      });
+    dispatch({ type: description, status: 'start', promiseId });
+    promise.then(response => {
+      dispatch({ type: description, status: 'success', promiseId, response });
     }).catch(error => {
-      dispatch({
-        type: "SAVE_COMPETITION_JSON_FAILURE",
-        competitionJson,
-      });
+      dispatch({ type: description, status: 'error', promiseId, error });
     });
   };
 }

@@ -63,6 +63,7 @@ function wcaApiFetch(path, fetchOptions) {
       "Content-Type": "application/json",
     }),
   });
+
   return fetch(`${baseApiUrl}${path}`, fetchOptions).then(response => {
     if(!response.ok) {
       throw new Error(`${response.status}: ${response.statusText}`);
