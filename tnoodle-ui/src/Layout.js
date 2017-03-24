@@ -13,6 +13,7 @@ export default connect(
     return {
       me: state.me,
       errorMessage: state.errorMessage,
+      ongoingPromises: Object.keys(state.ongoingPromises),
     };
   },
 )(
@@ -22,7 +23,8 @@ export default connect(
     }
 
     render() {
-      let { me, busy, errorMessage, children } = this.props;
+      let { me, errorMessage, ongoingPromises, children } = this.props;
+      let busy = ongoingPromises.length > 0;
 
       let subtitle;
       if(me) {
