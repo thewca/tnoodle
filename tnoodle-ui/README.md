@@ -6,5 +6,5 @@ to minimize repeated data entry.
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 - `yarn install` - Install dependencies.
-- `yarn start` - Starts a server accessible at http://localhost:3000/.
+- `yarn start` - Starts a server accessible at http://localhost:3001/.
 - `yarn build` - Compiles to `build/` directory.
