@@ -1,3 +1,7 @@
+import { BASE_PATH } from 'App';
+
+const WCA_ORIGIN = 'http://kaladin:3000';
+
 let wcaAccessToken = getHashParameter('access_token', null);
 if(wcaAccessToken) {
   location.hash = "";
@@ -7,9 +11,9 @@ if(wcaAccessToken) {
 }
 
 export function logIn() {
-  let redirectUri = location.origin + '/oauth/wca';
-  let logInUrl = `http://kaladin:3000/oauth/authorize?client_id=e00488e5f685aca8b1f375d9eded764247f070bccb235903ce20f8e437123eac&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
-  localStorage['TNoodle.preLoginPath'] = location.pathname;
+  let redirectUri = location.origin + BASE_PATH + '/oauth/wca';
+  let logInUrl = `${WCA_ORIGIN}/oauth/authorize?client_id=e00488e5f685aca8b1f375d9eded764247f070bccb235903ce20f8e437123eac&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
+  localStorage['TNoodle.preLoginPath'] = location.pathname.substring(BASE_PATH.length);
   document.location = logInUrl;
 }
 
@@ -56,7 +60,7 @@ function getHashParameter(name, alt) {
 
 function wcaApiFetch(path, fetchOptions) {
   // TODO - <<< refresh token https://github.com/doorkeeper-gem/doorkeeper/wiki/Enable-Refresh-Token-Credentials
-  var baseApiUrl = 'http://kaladin:3000/api/v0';
+  var baseApiUrl = `${WCA_ORIGIN}/api/v0`;
   fetchOptions = Object.assign({}, fetchOptions, {
     headers: new Headers({
       "Authorization": `Bearer ${wcaAccessToken}`,

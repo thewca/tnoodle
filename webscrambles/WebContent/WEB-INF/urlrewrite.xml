@@ -15,13 +15,25 @@
     </rule>
 
     <rule>
-        <from>^/scramble/$</from>
-        <to type="forward">/wca/scramblegen.html</to>
+        <from>^/scramble-new-ui$</from>
+        <to type="redirect">/scramble-new-ui/</to>
+    </rule>
+    <rule>
+        <from>^/scramble-new-ui/static</from>
+        <to type="forward">/wca/new-ui/static</to>
+    </rule>
+    <rule>
+        <from>^/scramble-new-ui/.*</from>
+        <to type="forward">/wca/new-ui/index.html</to>
     </rule>
 
     <rule>
         <from>^/scramble$</from>
         <to type="redirect">/scramble/</to>
+    </rule>
+    <rule>
+        <from>^/scramble/$</from>
+        <to type="forward">/wca/scramblegen.html</to>
     </rule>
 
     <rule>

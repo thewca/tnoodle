@@ -57,25 +57,6 @@ android sdk and setting up an ANDROID_HOME environment variable.
 - Bump the version number in `bower.json`.
 - `./tmt release`
 
-### TNoodle Timer (TNT) and Other Projects
-
-TNoodle contains other distributions, like TNoodle Timer (TNT) as `timer`.
-
-You can build the `timer` distribution similarly to `wca`:
-
-    # Build and run directly.
-    ./tmt make run -p timer
-
-    # Build to .jar file.
-    ./tmt make dist -p timer
-
-    # Run .jar file from commandline
-    java -jar timer/dist/TNoodle-timer.jar
-
-When TNoodle is running, TNT will be available at <http://localhost:2014/tnt>.
-
-Other projects can be run similarly, too. Run `./tmt graph --descriptions` to see the current list.
-
 ### Notes
 
 - Each project is a full fledged Eclipse project (they each have a `.classpath` and `.project` file). Furthermore, the whole tnoodle directory can be opened as an Eclipse workspace. Simply go to File > Import > Existing Projects into Workspace, and enter your tnoodle directory under "Select root directory". Eclipse should automagically detect all the tnoodle projects.

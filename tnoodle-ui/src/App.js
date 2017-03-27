@@ -12,7 +12,11 @@ import * as WcaApi from 'WcaApi';
 import Home from 'Home';
 import ManageCompetition from 'ManageCompetition';
 
-const history = createHistory();
+export const BASE_PATH = process.env.PUBLIC_URL;
+
+const history = createHistory({
+  basename: BASE_PATH,
+});
 
 const middleware = routerMiddleware(history);
 

@@ -2,6 +2,7 @@
   "name": "tnoodle-ui",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://localhost:2014/scramble-new-ui/",
   "dependencies": {
     "classnames": "^2.2.5",
     "node-sass": "^4.5.1",
@@ -25,8 +26,8 @@
     "watch-css": "npm run build-css && node-sass src/ -o src/ --watch --recursive",
     "start-js": "NODE_PATH=src react-scripts start",
 
-    "start": "npm-run-all -p watch-css start-js",
-    "build": "NODE_PATH=src yarn run build-css && react-scripts build",
+    "start": "PORT=3001 BROWSER=none npm-run-all -p watch-css start-js",
+    "build": "yarn run build-css && NODE_PATH=src react-scripts build",
     "test": "NODE_PATH=src react-scripts test --env=jsdom",
     "eject": "NODE_PATH=src react-scripts eject"
   }

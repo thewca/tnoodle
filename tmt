@@ -371,6 +371,7 @@ class tmt:
         # files.
         wcaProjectName = 'wca'
         tmt.args.project = wcaProjectName # yuck =(
+
         # We can't run a dist until after we create the tag. This way
         # the version number of the resulting file will be correct.
         wcaProject = tmt.TmtProject.projects[wcaProjectName]
@@ -1077,6 +1078,8 @@ class EclipseProject(TmtProject):
             os.makedirs(self.distDir)
 
         if not noRemake:
+            rebuildTNoodleUiCmd = "(cd tnoodle-ui; ./build-and-symlink.sh)"
+            assert 0 == os.system(rebuildTNoodleUiCmd)
             tmt._make(projectName=self.name, command='compile')
 
         if self.webContent:
