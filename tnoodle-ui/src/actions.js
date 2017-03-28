@@ -71,7 +71,6 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
   let scrambleRequest = [];
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
-      // <<< sort groups somewhere... >>>
       round.groups.forEach(group => {
         let scrambles = group.scrambles;
         let extraScrambles = group.extraScrambles;
