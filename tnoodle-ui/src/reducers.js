@@ -26,7 +26,7 @@ export const competitionJson = function(state=null, action) {
     let competitionJson = deepcopy(state);
     let round = getActivity(competitionJson, action.activityCode);
     round.plannedGroupCount = action.plannedGroupCount;
-    return competitionJson;
+    return normalizeCompetitionJson(competitionJson);
   } else if(action.type === "GROUP_FOR_ROUND") {
     let competitionJson = deepcopy(state);
     let round = getActivity(competitionJson, action.activityCode);
@@ -34,7 +34,7 @@ export const competitionJson = function(state=null, action) {
       group: action.groupName,
       scrambles: action.scrambles,
     });
-    return competitionJson;
+    return normalizeCompetitionJson(competitionJson);
   } else if(action.type === "CLEAR_COMPETITION_SCRAMBLES") {
     let competitionJson = deepcopy(state);
     competitionJson.events.forEach(event => {
@@ -42,7 +42,7 @@ export const competitionJson = function(state=null, action) {
         round.groups = [];
       });
     });
-    return competitionJson;
+    return normalizeCompetitionJson(competitionJson);
   } else {
     return state;
   }

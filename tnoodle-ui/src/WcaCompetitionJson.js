@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import deepcopy from 'deepcopy';
 
 export function formatIdToScrambleCount(formatId) {
@@ -85,6 +87,7 @@ export function normalizeCompetitionJson(competitionJson) {
       round.groups.forEach(group => {
         group.scrambles = group.scrambles || [];
       });
+      round.groups = _.sortBy(round.groups, group => group.group);
     });
   });
   return competitionJson;
