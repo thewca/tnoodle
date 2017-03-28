@@ -35,86 +35,116 @@ function RoundList({ rounds, dispatch }) {
   );
 }
 
-function ManageCompetition({ competitionJson, originalCompetitionJson, dispatch }) {
-  if(!competitionJson) {
-    return (
-      <div>Loading competition...</div>
-    );
+class ManageCompetition extends Component {
+  constructor() {
+    super();
+    this.state = {
+      scramblePassword: '',
+      showScramblePassword: false,
+    };
   }
 
-  let { finishedRounds, groupsWithWrongNumberOfScrambles, roundsWithMissingGroups, warnings } = checkScrambles(competitionJson);
-
-  let finishedRoundsDiv = null;
-  if(finishedRounds.length > 0) {
-    finishedRoundsDiv = (
-      <div>
-        <h2>Found {pluralize('round', finishedRounds.length, true)} with groups</h2>
-        <RoundList rounds={finishedRounds} dispatch={dispatch} />
-      </div>
-    );
-  }
-
-  let groupsWithWrongNumberOfScramblesDiv = null;
-  if(groupsWithWrongNumberOfScrambles.length > 0) {
-    groupsWithWrongNumberOfScramblesDiv = (
-      <div>
-        <h2>Groups with wrong number of scrambles</h2>
-        <pre>{JSON.stringify(groupsWithWrongNumberOfScrambles, null, 2)}</pre>
-      </div>
-    );
-  }
-
-  let roundsWithMissingGroupsDiv = null;
-  if(roundsWithMissingGroups.length > 0) {
-    roundsWithMissingGroupsDiv = (
-      <div>
-        <h2>Rounds with missing groups</h2>
-        <button onClick={() => dispatch(actions.generateMissingScrambles(roundsWithMissingGroups))}>
-          Generate all missing groups
-        </button>
-        <RoundList rounds={roundsWithMissingGroups} dispatch={dispatch} />
-      </div>
-    );
-  }
-
-  let warningsDiv = null;
-  if(warnings.length > 0) {
-    warningsDiv = (
-      <div>
-        <h2>Warnings</h2>
-        <ul>
-          {warnings.map(warning => {
-            let activityCode = buildActivityCode(warning);
-            return (
-              <li key={activityCode}>
-                {warning.eventId} Round {warning.nthRound}: {warning.message}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  }
-
-  let enableSaveButton = JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson);
-
-  let promptClearScrambles = function() {
-    if(confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
-      dispatch(actions.clearCompetitionScrambles(competitionJson));
+  render() {
+    let { competitionJson, originalCompetitionJson, dispatch } = this.props;
+    if(!competitionJson) {
+      return (
+        <div>Loading competition...</div>
+      );
     }
-  };
 
-  return (
-    <div>
-      <button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson))}>Save</button>
-      <button onClick={promptClearScrambles}>Clear scrambles</button>
-      <button onClick={(e) => dispatch(actions.downloadScrambles(e.shiftKey))}>Download scramble zip</button>
-      {finishedRoundsDiv}
-      {groupsWithWrongNumberOfScramblesDiv}
-      {roundsWithMissingGroupsDiv}
-      {warningsDiv}
-    </div>
-  );
+    let { finishedRounds, groupsWithWrongNumberOfScrambles, roundsWithMissingGroups, warnings } = checkScrambles(competitionJson);
+
+    let finishedRoundsDiv = null;
+    if(finishedRounds.length > 0) {
+      finishedRoundsDiv = (
+        <div>
+          <h2>Found {pluralize('round', finishedRounds.length, true)} with groups</h2>
+          <RoundList rounds={finishedRounds} dispatch={dispatch} />
+        </div>
+      );
+    }
+
+    let groupsWithWrongNumberOfScramblesDiv = null;
+    if(groupsWithWrongNumberOfScrambles.length > 0) {
+      groupsWithWrongNumberOfScramblesDiv = (
+        <div>
+          <h2>Groups with wrong number of scrambles</h2>
+          <pre>{JSON.stringify(groupsWithWrongNumberOfScrambles, null, 2)}</pre>
+        </div>
+      );
+    }
+
+    let roundsWithMissingGroupsDiv = null;
+    if(roundsWithMissingGroups.length > 0) {
+      roundsWithMissingGroupsDiv = (
+        <div>
+          <h2>Rounds with missing groups</h2>
+          <button onClick={() => dispatch(actions.generateMissingScrambles(roundsWithMissingGroups))}>
+            Generate all missing groups
+          </button>
+          <RoundList rounds={roundsWithMissingGroups} dispatch={dispatch} />
+        </div>
+      );
+    }
+
+    let warningsDiv = null;
+    if(warnings.length > 0) {
+      warningsDiv = (
+        <div>
+          <h2>Warnings</h2>
+          <ul>
+            {warnings.map(warning => {
+              let activityCode = buildActivityCode(warning);
+              return (
+                <li key={activityCode}>
+                  {warning.eventId} Round {warning.nthRound}: {warning.message}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    }
+
+    let enableSaveButton = JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson);
+
+    let promptClearScrambles = function() {
+      if(confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
+        dispatch(actions.clearCompetitionScrambles(competitionJson));
+      }
+    };
+
+    return (
+      <div>
+        <button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson))}>Save</button>
+        <button onClick={promptClearScrambles}>Clear scrambles</button>
+        <input
+          type={this.state.showScramblePassword ? "text" : "password"}
+          placeholder="Password"
+          value={this.state.scramblePassword}
+          onChange={e => this.setState({ scramblePassword: e.target.value })}
+        />
+        <label>
+          <input
+            type="checkbox"
+            value={this.state.showScramblePassword}
+            onChange={e => this.setState({ showScramblePassword: e.target.checked })}
+          />
+          Show password
+        </label>
+        <button
+          onClick={e => dispatch(actions.downloadScrambles(e.shiftKey, this.state.scramblePassword))}
+        >
+          Download scramble zip
+        </button>
+
+        {finishedRoundsDiv}
+        {groupsWithWrongNumberOfScramblesDiv}
+        {roundsWithMissingGroupsDiv}
+        {warningsDiv}
+      </div>
+    );
+  }
 }
 
 export default connect(

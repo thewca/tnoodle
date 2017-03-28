@@ -12,6 +12,5 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## TODO
 
 - warning when using outdated version of tnoodle
-- password input
 - copies input? save back to big json?
 - refresh token?
