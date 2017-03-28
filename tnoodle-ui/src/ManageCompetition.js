@@ -6,6 +6,7 @@ import Layout from 'Layout';
 import * as actions from 'actions';
 import { checkScrambles, buildActivityCode } from 'WcaCompetitionJson';
 import { fetchCompetitionJson } from 'actions';
+import { NavigationAwareComponent } from 'App';
 
 function RoundInfo({ round, dispatch }) {
   let activityCode = buildActivityCode(round);
@@ -130,10 +131,18 @@ export default connect(
       this.props.dispatch(fetchCompetitionJson(this.props.competitionId));
     }
 
+    willNavigateAway() {
+      let { originalCompetitionJson, competitionJson } = this.props;
+      if(JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson)) {
+        return "You have unsaved changes to this competition. Are you sure you want to navigate away?";
+      }
+    }
+
     render() {
       let { competitionJson, originalCompetitionJson, dispatch } = this.props;
       return (
         <Layout>
+          <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
           <ManageCompetition competitionJson={competitionJson} originalCompetitionJson={originalCompetitionJson} dispatch={dispatch} />
         </Layout>
       );

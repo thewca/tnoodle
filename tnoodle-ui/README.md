@@ -8,3 +8,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - `yarn install` - Install dependencies.
 - `yarn start` - Starts a server accessible at http://localhost:3001/.
 - `yarn build` - Compiles to `build/` directory.
+
+## TODO
+
+- warning when using outdated version of tnoodle
+- password input
+- copies input? save back to big json?
+- refresh token?

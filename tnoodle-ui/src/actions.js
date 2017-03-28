@@ -67,7 +67,25 @@ export function setPlannedGroupCount(activityCode, plannedGroupCount) {
   };
 }
 
+
 function competitionJsonToTNoodleScrambleRequest(competitionJson) {
+  function eventToPuzzle(eventId) {
+    let puzzByEvent = {
+      "333bf": "333ni",
+      "333oh": "333",
+      "333fm": "333fm",
+      "333ft": "333",
+      "444bf": "444ni",
+      "555bf": "555ni",
+      "333mbf": "333ni",
+    };
+    return puzzByEvent[eventId] || eventId;
+  }
+  function isFmc(eventId) {
+    // Does this eventId end in "fm"?
+    return !!eventId.match(/.*fm$/);
+  }
+
   let scrambleRequest = [];
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
@@ -75,7 +93,7 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
         let scrambles = group.scrambles;
         let extraScrambles = group.extraScrambles;
         let copies = 1;//<<<
-        let scrambler = event.eventId;//<<<
+        let scrambler = eventToPuzzle(event.eventId);
         let title = `Round ${round.nthRound} Group ${group.group}`;
         let request = {
           scrambles: scrambles,
@@ -83,7 +101,7 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
           copies,
           scrambler,
           title,
-          fmc: false,//<<<
+          fmc: isFmc(event.eventId),
 
           event: event.eventId,
           round: round.nthRound,
