@@ -114,14 +114,13 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
   return scrambleRequest;
 }
 
-export function downloadScrambles(asPdf) {
+export function downloadScrambles(asPdf, password) {
   return (dispatch, getState) => {
     let state = getState();
     let competitionJson = state.competitionJson;
 
     let request = competitionJsonToTNoodleScrambleRequest(competitionJson);
     let title = `Scrambles for ${competitionJson.competitionId}`;
-    let password = null;//<<<
     if(asPdf) {
       scrambler.showPdf(title, request, password, '_blank');
     } else {
