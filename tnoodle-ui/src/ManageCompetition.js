@@ -45,7 +45,7 @@ class ManageCompetition extends Component {
   }
 
   render() {
-    let { competitionJson, originalCompetitionJson, dispatch } = this.props;
+    let { competitionJson, originalCompetitionJsonAndHash, dispatch } = this.props;
     if(!competitionJson) {
       return (
         <div>Loading competition...</div>
@@ -106,7 +106,7 @@ class ManageCompetition extends Component {
       );
     }
 
-    let enableSaveButton = JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson);
+    let enableSaveButton = JSON.stringify(originalCompetitionJsonAndHash.json) !== JSON.stringify(competitionJson);
 
     let promptClearScrambles = function() {
       if(confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
@@ -116,7 +116,7 @@ class ManageCompetition extends Component {
 
     return (
       <div>
-        <button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson))}>Save</button>
+        <button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson, originalCompetitionJsonAndHash.hash))}>Save</button>
         <button onClick={promptClearScrambles}>Clear scrambles</button>
         <input
           type={this.state.showScramblePassword ? "text" : "password"}
@@ -152,7 +152,7 @@ export default connect(
     return {
       competitionId: ownProps.match.params.competitionId,
       competitionJson: state.competitionJson,
-      originalCompetitionJson: state.originalCompetitionJson,
+      originalCompetitionJsonAndHash: state.originalCompetitionJsonAndHash,
     };
   },
 )(
@@ -162,18 +162,18 @@ export default connect(
     }
 
     willNavigateAway() {
-      let { originalCompetitionJson, competitionJson } = this.props;
-      if(JSON.stringify(originalCompetitionJson) !== JSON.stringify(competitionJson)) {
+      let { originalCompetitionJsonAndHash, competitionJson } = this.props;
+      if(JSON.stringify(originalCompetitionJsonAndHash.json) !== JSON.stringify(competitionJson)) {
         return "You have unsaved changes to this competition. Are you sure you want to navigate away?";
       }
     }
 
     render() {
-      let { competitionJson, originalCompetitionJson, dispatch } = this.props;
+      let { competitionJson, originalCompetitionJsonAndHash, dispatch } = this.props;
       return (
         <Layout>
           <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
-          <ManageCompetition competitionJson={competitionJson} originalCompetitionJson={originalCompetitionJson} dispatch={dispatch} />
+          <ManageCompetition competitionJson={competitionJson} originalCompetitionJsonAndHash={originalCompetitionJsonAndHash} dispatch={dispatch} />
         </Layout>
       );
     }

@@ -31,15 +31,16 @@ export function me() {
   return wcaApiFetch("/me").then(response => response.json()).then(json => json.me);
 }
 
-export function getCompetitionJson(competitionId) {
-  return wcaApiFetch(`/competitions/${competitionId}/big-json`).then(response => response.json());
+export function getCompetitionJsonAndHash(competitionId) {
+  return wcaApiFetch(`/competitions/${competitionId}/wcif`).then(response => response.json());
 }
 
-export function saveCompetitionJson(competitionJson) {
-  return wcaApiFetch(`/competitions/${competitionJson.competitionId}/big-json`, {
+export function saveCompetitionJson(competitionJson, previousHash) {
+  return wcaApiFetch(`/competitions/${competitionJson.id}/wcif`, {
     method: "PUT",
     body: JSON.stringify({
-      big_json: competitionJson,
+      hash: previousHash,
+      json: competitionJson,
     }),
   }).then(response => response.json());
 }
