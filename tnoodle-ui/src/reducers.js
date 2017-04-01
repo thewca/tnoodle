@@ -9,7 +9,7 @@ export const me = function(state=null, action) {
   }
 };
 
-export const originalCompetitionJson = function(state=null, action) {
+export const originalCompetitionJsonAndHash = function(state=null, action) {
   if(action.type === "SAVE_COMPETITION_JSON" && action.status === "success") {
     return action.response;
   } else if(action.type === "FETCH_COMPETITION_JSON" && action.status === "success") {
@@ -21,7 +21,7 @@ export const originalCompetitionJson = function(state=null, action) {
 
 export const competitionJson = function(state=null, action) {
   if(action.type === "FETCH_COMPETITION_JSON" && action.status === "success") {
-    return normalizeCompetitionJson(action.response);
+    return normalizeCompetitionJson(action.response.json);
   } else if(action.type === "SET_PLANNED_GROUP_COUNT") {
     let competitionJson = deepcopy(state);
     let round = getActivity(competitionJson, action.activityCode);

@@ -9,15 +9,15 @@ export function fetchMe() {
 }
 
 export function fetchCompetitionJson(competitionId) {
-  return wrapPromiseWithDispatch(WcaApi.getCompetitionJson(competitionId), 'FETCH_COMPETITION_JSON');
+  return wrapPromiseWithDispatch(WcaApi.getCompetitionJsonAndHash(competitionId), 'FETCH_COMPETITION_JSON');
 }
 
 export function fetchUpcomingManageableCompetitions() {
   return wrapPromiseWithDispatch(WcaApi.getUpcomingManageableCompetitions(), 'FETCH_UPCOMING_COMPS');
 }
 
-export function saveCompetitionJson(competitionJson) {
-  return wrapPromiseWithDispatch(WcaApi.saveCompetitionJson(competitionJson), 'SAVE_COMPETITION_JSON');
+export function saveCompetitionJson(competitionJson, previousHash) {
+  return wrapPromiseWithDispatch(WcaApi.saveCompetitionJson(competitionJson, previousHash), 'SAVE_COMPETITION_JSON');
 }
 
 export function clearCompetitionScrambles() {
