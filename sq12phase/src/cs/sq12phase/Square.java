@@ -17,10 +17,10 @@ class Square {
 
     static void set8Perm(byte[] arr, int idx) {
         int val = 0x76543210;
-        for (int i=0; i<7; i++) {
-            int p = fact[7-i];
+        for (int i = 0; i < 7; i++) {
+            int p = fact[7 - i];
             int v = idx / p;
-            idx -= v*p;
+            idx -= v * p;
             v <<= 2;
             arr[i] = (byte) ((val >> v) & 07);
             int m = (1 << v) - 1;
@@ -32,7 +32,7 @@ class Square {
     static char get8Perm(byte[] arr) {
         int idx = 0;
         int val = 0x76543210;
-        for (int i=0; i<7; i++) {
+        for (int i = 0; i < 7; i++) {
             int v = arr[i] << 2;
             idx = (8 - i) * idx + ((val >> v) & 07);
             val -= 0x11111110 << v;
@@ -44,9 +44,9 @@ class Square {
 
     static int get8Comb(byte[] arr) {
         int idx = 0, r = 4;
-        for (int i=0; i<8; i++) {
+        for (int i = 0; i < 8; i++) {
             if (arr[i] >= 4) {
-                idx += Cnk[7-i][r--];
+                idx += Cnk[7 - i][r--];
             }
         }
         return idx;
@@ -58,36 +58,36 @@ class Square {
         if (inited) {
             return;
         }
-        for (int i=0; i<12; i++) {
+        for (int i = 0; i < 12; i++) {
             Cnk[i][0] = 1;
             Cnk[i][i] = 1;
-            for (int j=1; j<i; j++) {
-                Cnk[i][j] = Cnk[i-1][j-1] + Cnk[i-1][j];
+            for (int j = 1; j < i; j++) {
+                Cnk[i][j] = Cnk[i - 1][j - 1] + Cnk[i - 1][j];
             }
         }
         byte[] pos = new byte[8];
         byte temp;
 
-        for(int i=0;i<40320;i++){
+        for (int i = 0; i < 40320; i++) {
             //twist
             set8Perm(pos, i);
 
-            temp=pos[2];pos[2]=pos[4];pos[4]=temp;
-            temp=pos[3];pos[3]=pos[5];pos[5]=temp;
-            TwistMove[i]=get8Perm(pos);
+            temp = pos[2]; pos[2] = pos[4]; pos[4] = temp;
+            temp = pos[3]; pos[3] = pos[5]; pos[5] = temp;
+            TwistMove[i] = get8Perm(pos);
 
             //top layer turn
             set8Perm(pos, i);
-            temp=pos[0]; pos[0]=pos[1]; pos[1]=pos[2]; pos[2]=pos[3]; pos[3]=temp;
-            TopMove[i]=get8Perm(pos);
+            temp = pos[0]; pos[0] = pos[1]; pos[1] = pos[2]; pos[2] = pos[3]; pos[3] = temp;
+            TopMove[i] = get8Perm(pos);
 
             //bottom layer turn
             set8Perm(pos, i);
-            temp=pos[4]; pos[4]=pos[5]; pos[5]=pos[6]; pos[6]=pos[7]; pos[7]=temp;
-            BottomMove[i]=get8Perm(pos);
+            temp = pos[4]; pos[4] = pos[5]; pos[5] = pos[6]; pos[6] = pos[7]; pos[7] = temp;
+            BottomMove[i] = get8Perm(pos);
         }
 
-        for (int i=0; i<40320*2; i++) {
+        for (int i = 0; i < 40320 * 2; i++) {
             SquarePrun[i] = -1;
         }
         SquarePrun[0] = 0;
@@ -99,14 +99,14 @@ class Square {
             int check = inv ? depth : -1;
             ++depth;
             OUT:
-            for (int i=0; i<40320*2; i++) {
+            for (int i = 0; i < 40320 * 2; i++) {
                 if (SquarePrun[i] == find) {
                     int idx = i >> 1;
                     int ml = i & 1;
 
                     //try twist
-                    int idxx = TwistMove[idx]<<1 | (1-ml);
-                    if(SquarePrun[idxx] == check) {
+                    int idxx = TwistMove[idx] << 1 | (1 - ml);
+                    if (SquarePrun[idxx] == check) {
                         ++done;
                         SquarePrun[inv ? i : idxx] = (byte) (depth);
                         if (inv) {
@@ -116,11 +116,11 @@ class Square {
 
                     //try turning top layer
                     idxx = idx;
-                    for(int m=0; m<4; m++) {
+                    for (int m = 0; m < 4; m++) {
                         idxx = TopMove[idxx];
-                        if(SquarePrun[idxx<<1|ml] == check){
+                        if (SquarePrun[idxx << 1 | ml] == check) {
                             ++done;
-                            SquarePrun[inv ? i : (idxx<<1|ml)] = (byte) (depth);
+                            SquarePrun[inv ? i : (idxx << 1 | ml)] = (byte) (depth);
                             if (inv) {
                                 continue OUT;
                             }
@@ -128,11 +128,11 @@ class Square {
                     }
                     assert idxx == idx;
                     //try turning bottom layer
-                    for(int m=0; m<4; m++) {
+                    for (int m = 0; m < 4; m++) {
                         idxx = BottomMove[idxx];
-                        if(SquarePrun[idxx<<1|ml] == check){
+                        if (SquarePrun[idxx << 1 | ml] == check) {
                             ++done;
-                            SquarePrun[inv ? i : (idxx<<1|ml)] = (byte) (depth);
+                            SquarePrun[inv ? i : (idxx << 1 | ml)] = (byte) (depth);
                             if (inv) {
                                 continue OUT;
                             }
@@ -141,9 +141,9 @@ class Square {
 
                 }
             }
-            System.out.print(depth);
-            System.out.print('\t');
-            System.out.println(done);
+            // System.out.print(depth);
+            // System.out.print('\t');
+            // System.out.println(done);
         }
         inited = true;
     }
