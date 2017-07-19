@@ -185,7 +185,7 @@ class ScrambleRequest {
 
         this.colorScheme = scrambler.parseColorScheme(scheme);
     }
-    
+
 
     public List<String> getAllScrambles() {
         ArrayList<String> allScrambles = new ArrayList<String>(Arrays.asList(scrambles));
@@ -194,7 +194,7 @@ class ScrambleRequest {
         }
         return allScrambles;
     }
-    
+
 
     public static ScrambleRequest[] parseScrambleRequests(LinkedHashMap<String, String> query, String seed) throws UnsupportedEncodingException, InvalidScrambleRequestException {
         ScrambleRequest[] scrambleRequests;
@@ -216,7 +216,6 @@ class ScrambleRequest {
         }
         return scrambleRequests;
     }
-
 
     private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
         azzert(scrambleRequest.scrambles.length > 0);
@@ -314,225 +313,8 @@ class ScrambleRequest {
 
     private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle) throws DocumentException, IOException {
         if(scrambleRequest.fmc) {
-            Rectangle pageSize = doc.getPageSize();
             for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
-                String scramble = scrambleRequest.scrambles[i];
-                PdfContentByte cb = docWriter.getDirectContent();
-                float LINE_THICKNESS = 0.5f;
-                BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-
-                int bottom = 30;
-                int left = 35;
-                int right = (int) (pageSize.getWidth()-left);
-                int top = (int) (pageSize.getHeight()-bottom);
-
-                int height = top - bottom;
-                int width = right - left;
-
-                int solutionBorderTop = bottom + (int) (height*.5);
-                int scrambleBorderTop = solutionBorderTop + 40;
-
-                int competitorInfoBottom = top - (int) (height*.15);
-                int gradeBottom = competitorInfoBottom - 50;
-                int competitorInfoLeft = right - (int) (width*.45);
-
-                int rulesRight = competitorInfoLeft;
-
-                int padding = 5;
-
-                // Outer border
-                cb.setLineWidth(2f);
-                cb.moveTo(left, top);
-                cb.lineTo(left, bottom);
-                cb.lineTo(right, bottom);
-                cb.lineTo(right, top);
-
-                // Solution border
-                cb.moveTo(left, solutionBorderTop);
-                cb.lineTo(right, solutionBorderTop);
-
-                // Rules bottom border
-                cb.moveTo(left, scrambleBorderTop);
-                cb.lineTo(rulesRight, scrambleBorderTop);
-
-                // Rules right border
-                cb.lineTo(rulesRight, gradeBottom);
-
-                // Grade bottom border
-                cb.moveTo(competitorInfoLeft, gradeBottom);
-                cb.lineTo(right, gradeBottom);
-
-                // Competitor info bottom border
-                cb.moveTo(competitorInfoLeft, competitorInfoBottom);
-                cb.lineTo(right, competitorInfoBottom);
-
-                // Competitor info left border
-                cb.moveTo(competitorInfoLeft, gradeBottom);
-                cb.lineTo(competitorInfoLeft, top);
-
-                // Solution lines
-                int availableSolutionWidth = right - left;
-                int availableSolutionHeight = scrambleBorderTop - bottom;
-                int lineWidth = 25;
-                //int linesX = (availableSolutionWidth/lineWidth + 1)/2;
-                int linesX = 10;
-                int linesY = (int) Math.ceil(1.0*WCA_MAX_MOVES_FMC / linesX);
-
-                cb.setLineWidth(LINE_THICKNESS);
-                cb.stroke();
-
-//              int allocatedX = (2*linesX-1)*lineWidth;
-                int excessX = availableSolutionWidth-linesX*lineWidth;
-                int moveCount = 0;
-            solutionLines:
-                for(int y = 0; y < linesY; y++) {
-                    for(int x = 0; x < linesX; x++) {
-                        if(moveCount >= WCA_MAX_MOVES_FMC) {
-                            break solutionLines;
-                        }
-                        int xPos = left + x*lineWidth + (x+1)*excessX/(linesX+1);
-                        int yPos = solutionBorderTop - (y+1)*availableSolutionHeight/(linesY+1);
-                        cb.moveTo(xPos, yPos);
-                        cb.lineTo(xPos+lineWidth, yPos);
-                        moveCount++;
-                    }
-                }
-
-                float UNDERLINE_THICKNESS = 0.2f;
-                cb.setLineWidth(UNDERLINE_THICKNESS);
-                cb.stroke();
-
-                cb.beginText();
-                int availableScrambleSpace = right-left - 2*padding;
-                int scrambleFontSize = 20;
-                String scrambleStr = "Scramble: " + scramble;
-                float scrambleWidth;
-                do {
-                    scrambleFontSize--;
-                    scrambleWidth = bf.getWidthPoint(scrambleStr, scrambleFontSize);
-                } while(scrambleWidth > availableScrambleSpace);
-
-                cb.setFontAndSize(bf, scrambleFontSize);
-                int scrambleY = 3 + solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
-                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scrambleStr, left+padding, scrambleY, 0);
-                cb.endText();
-
-                int availableScrambleWidth = right-rulesRight;
-                int availableScrambleHeight = gradeBottom-scrambleBorderTop;
-                Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
-                PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
-                Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
-
-                try {
-                    Svg svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme);
-                    drawSvgToGraphics2D(svg, g2, dim);
-                } catch (InvalidScrambleException e) {
-                    l.log(Level.INFO, "", e);
-                } finally {
-                    g2.dispose();
-                }
-
-
-                cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
-
-                ColumnText ct = new ColumnText(cb);
-
-                int fontSize = 15;
-                int marginBottom = 10;
-                int offsetTop = 27;
-                boolean showScrambleCount = scrambleRequest.scrambles.length > 1;
-                if(showScrambleCount) {
-                    offsetTop -= fontSize + 2;
-                }
-
-                cb.beginText();
-                cb.setFontAndSize(bf, fontSize);
-                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, globalTitle, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
-                offsetTop += fontSize + 2;
-                cb.endText();
-
-                cb.beginText();
-                cb.setFontAndSize(bf, fontSize);
-                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
-                cb.endText();
-
-                if(showScrambleCount) {
-                    cb.beginText();
-                    offsetTop += fontSize + 2;
-                    cb.setFontAndSize(bf, fontSize);
-                    cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Scramble " + (i+1) + " of " + scrambleRequest.scrambles.length, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
-                    cb.endText();
-                }
-
-                offsetTop += fontSize + marginBottom;
-
-                cb.beginText();
-                fontSize = 15;
-                cb.setFontAndSize(bf, fontSize);
-                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Competitor: __________________", competitorInfoLeft+padding, top-offsetTop, 0);
-                offsetTop += fontSize + marginBottom;
-                cb.endText();
-
-                cb.beginText();
-
-                fontSize = 15;
-                cb.setFontAndSize(bf, fontSize);
-                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
-
-                cb.setFontAndSize(bf, 19);
-                int wcaIdLength = 63;
-                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
-
-                offsetTop += fontSize + (int) (marginBottom*1.8);
-                cb.endText();
-
-
-                cb.beginText();
-                fontSize = 11;
-                cb.setFontAndSize(bf, fontSize);
-                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "DO NOT FILL IF YOU ARE THE COMPETITOR", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
-                offsetTop += fontSize + marginBottom;
-                cb.endText();
-
-                cb.beginText();
-                fontSize = 11;
-                cb.setFontAndSize(bf, fontSize);
-                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Graded by: _______________ Result: ______", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
-                offsetTop += fontSize + marginBottom;
-                cb.endText();
-
-                cb.beginText();
-                cb.setFontAndSize(bf, 25f);
-                int MAGIC_NUMBER = 40; // kill me now
-                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
-                cb.endText();
-
-                com.itextpdf.text.List rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-                rules.add("Notate your solution by writing one move per bar.");
-                rules.add("To delete moves, clearly erase/blacken them.");
-                rules.add("Face moves F, B, R, L, U, and D are clockwise.");
-                rules.add("Rotations x, y, and z follow R, U, and F.");
-                rules.add("' inverts a move; 2 doubles a move. (e.g.: U', U2)");
-                rules.add("w makes a face move into two layers. (e.g.: Uw)");
-                rules.add("A [lowercase] move is a cube rotation. (e.g.: [u])");
-
-                ct.addElement(rules);
-                int rulesTop = competitorInfoBottom+55;
-                ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
-                ct.go();
-
-                rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-                rules.add("You have 1 hour to find a solution.");
-                rules.add("Your solution length will be counted in OBTM.");
-                int maxMoves = WCA_MAX_MOVES_FMC;
-                rules.add("Your solution must be at most " + maxMoves + " moves, including rotations.");
-                rules.add("Your solution must not be directly derived from any part of the scrambling algorithm.");
-                ct.addElement(rules);
-                MAGIC_NUMBER = 150; // kill me now
-                ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
-                ct.go();
-
-                doc.newPage();
+                addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i);
             }
         } else {
             Rectangle pageSize = doc.getPageSize();
@@ -555,9 +337,9 @@ class ScrambleRequest {
                 // because the scrambles are so uniformly sized.
                 maxScrambleImageWidth = 190;
             }
-            
+
             Dimension scrambleImageSize = scrambleRequest.scrambler.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight);
-            
+
             // First do a dry run just to see if any scrambles require highlighting.
             // Then do the real run, and force highlighting on every scramble
             // if any scramble required it.
@@ -578,7 +360,7 @@ class ScrambleRequest {
                     PdfPTable headerTable = new PdfPTable(1);
                     headerTable.setTotalWidth(new float[] { availableWidth });
                     headerTable.setLockedWidth(true);
-                    
+
                     PdfPCell extraScramblesHeader = new PdfPCell(new Paragraph("Extra scrambles"));
                     extraScramblesHeader.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
                     extraScramblesHeader.setPaddingBottom(3);
@@ -586,7 +368,7 @@ class ScrambleRequest {
                     if(!dryRun) {
                         doc.add(headerTable);
                     }
-                    
+
                     scrambleNumberPrefix = "E";
                     TableAndHighlighting extraTableAndHighlighting = createTable(docWriter, doc, sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix, forceHighlighting);
                     if(dryRun) {
@@ -600,6 +382,345 @@ class ScrambleRequest {
                 }
             }
         }
+        doc.newPage();
+    }
+
+    private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index) throws DocumentException, IOException {
+        boolean withScramble = index != -1;
+        Rectangle pageSize = doc.getPageSize();
+        String scramble = null;
+        if(withScramble) {
+            scramble = scrambleRequest.scrambles[index];
+        }
+        PdfContentByte cb = docWriter.getDirectContent();
+        float LINE_THICKNESS = 0.5f;
+        BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+
+        int bottom = 30;
+        int left = 35;
+        int right = (int) (pageSize.getWidth()-left);
+        int top = (int) (pageSize.getHeight()-bottom);
+
+        int height = top - bottom;
+        int width = right - left;
+
+        int solutionBorderTop = bottom + (int) (height*.5);
+        int scrambleBorderTop = solutionBorderTop + 40;
+
+        int competitorInfoBottom = top - (int) (height*(withScramble ? .15 : .27));
+        int gradeBottom = competitorInfoBottom - 50;
+        int competitorInfoLeft = right - (int) (width*.45);
+
+        int rulesRight = competitorInfoLeft;
+
+        int padding = 5;
+
+        // Outer border
+        cb.setLineWidth(2f);
+        cb.moveTo(left, top);
+        cb.lineTo(left, bottom);
+        cb.lineTo(right, bottom);
+        cb.lineTo(right, top);
+
+        // Solution border
+        if(withScramble) {
+            cb.moveTo(left, solutionBorderTop);
+            cb.lineTo(right, solutionBorderTop);
+        }
+
+        // Rules bottom border
+        cb.moveTo(left, scrambleBorderTop);
+        cb.lineTo((withScramble ? rulesRight : right), scrambleBorderTop);
+
+        // Rules right border
+        if(!withScramble) {
+            cb.moveTo(rulesRight, scrambleBorderTop);
+        }
+        cb.lineTo(rulesRight, gradeBottom);
+
+        // Grade bottom border
+        cb.moveTo(competitorInfoLeft, gradeBottom);
+        cb.lineTo(right, gradeBottom);
+
+        // Competitor info bottom border
+        cb.moveTo(competitorInfoLeft, competitorInfoBottom);
+        cb.lineTo(right, competitorInfoBottom);
+
+        // Competitor info left border
+        cb.moveTo(competitorInfoLeft, gradeBottom);
+        cb.lineTo(competitorInfoLeft, top);
+
+        // Solution lines
+        int availableSolutionWidth = right - left;
+        int availableSolutionHeight = scrambleBorderTop - bottom;
+        int lineWidth = 25;
+        int linesX = 10;
+        int linesY = (int) Math.ceil(1.0*WCA_MAX_MOVES_FMC / linesX);
+
+        cb.setLineWidth(LINE_THICKNESS);
+        cb.stroke();
+
+        int excessX = availableSolutionWidth-linesX*lineWidth;
+        int moveCount = 0;
+    solutionLines:
+        for(int y = 0; y < linesY; y++) {
+            for(int x = 0; x < linesX; x++) {
+                if(moveCount >= WCA_MAX_MOVES_FMC) {
+                    break solutionLines;
+                }
+                int xPos = left + x*lineWidth + (x+1)*excessX/(linesX+1);
+                int yPos = (withScramble ? solutionBorderTop : scrambleBorderTop) - (y+1)*availableSolutionHeight/(linesY+1);
+                cb.moveTo(xPos, yPos);
+                cb.lineTo(xPos+lineWidth, yPos);
+                moveCount++;
+            }
+        }
+
+        float UNDERLINE_THICKNESS = 0.2f;
+        cb.setLineWidth(UNDERLINE_THICKNESS);
+        cb.stroke();
+
+        if(withScramble) {
+            cb.beginText();
+            int availableScrambleSpace = right-left - 2*padding;
+            int scrambleFontSize = 20;
+            String scrambleStr = "Scramble: " + scramble;
+            float scrambleWidth;
+            do {
+                scrambleFontSize--;
+                scrambleWidth = bf.getWidthPoint(scrambleStr, scrambleFontSize);
+            } while(scrambleWidth > availableScrambleSpace);
+
+            cb.setFontAndSize(bf, scrambleFontSize);
+            int scrambleY = 3 + solutionBorderTop+(scrambleBorderTop-solutionBorderTop-scrambleFontSize)/2;
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scrambleStr, left+padding, scrambleY, 0);
+            cb.endText();
+
+            int availableScrambleWidth = right-rulesRight;
+            int availableScrambleHeight = gradeBottom-scrambleBorderTop;
+            Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth-2, availableScrambleHeight-2);
+            PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+            Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
+
+            try {
+                Svg svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme);
+                drawSvgToGraphics2D(svg, g2, dim);
+            } catch (InvalidScrambleException e) {
+                l.log(Level.INFO, "", e);
+            } finally {
+                g2.dispose();
+            }
+
+
+            cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, rulesRight + (availableScrambleWidth-dim.width)/2, scrambleBorderTop + (availableScrambleHeight-dim.height)/2);
+        }
+
+        ColumnText ct = new ColumnText(cb);
+
+        int fontSize = 15;
+        int marginBottom = 10;
+        int offsetTop = 27;
+        boolean showScrambleCount = withScramble && scrambleRequest.scrambles.length > 1;
+        if(showScrambleCount) {
+            offsetTop -= fontSize + 2;
+        }
+
+        cb.beginText();
+        cb.setFontAndSize(bf, fontSize);
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, globalTitle, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+        offsetTop += fontSize + 2;
+        cb.endText();
+
+        if(withScramble) {
+            cb.beginText();
+            cb.setFontAndSize(bf, fontSize);
+            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, 0);
+            cb.endText();
+        } else {
+            offsetTop += marginBottom;
+            cb.beginText();
+            cb.setFontAndSize(bf, fontSize);
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Round: __", competitorInfoLeft + padding, top - offsetTop, 0);
+            cb.endText();
+        }
+
+        if(showScrambleCount) {
+            cb.beginText();
+            offsetTop += fontSize + 2;
+            cb.setFontAndSize(bf, fontSize);
+            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Scramble " + (index+1) + " of " + scrambleRequest.scrambles.length, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+            cb.endText();
+        }
+
+        offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
+
+        if(!withScramble) {
+            cb.beginText();
+            fontSize = 15;
+            cb.setFontAndSize(bf, fontSize);
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Attempt: __", competitorInfoLeft + padding, top - offsetTop, 0);
+            offsetTop += fontSize + (int) (marginBottom * 2.8);
+            cb.endText();
+        }
+
+        cb.beginText();
+        fontSize = 15;
+        cb.setFontAndSize(bf, fontSize);
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Competitor: __________________", competitorInfoLeft+padding, top-offsetTop, 0);
+        offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
+        cb.endText();
+
+        cb.beginText();
+
+        fontSize = 15;
+        cb.setFontAndSize(bf, fontSize);
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
+
+        cb.setFontAndSize(bf, 19);
+        int wcaIdLength = 63;
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
+
+        offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1.8 : 1.4));
+        cb.endText();
+
+
+        cb.beginText();
+        fontSize = 11;
+        cb.setFontAndSize(bf, fontSize);
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "DO NOT FILL IF YOU ARE THE COMPETITOR", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+        offsetTop += fontSize + marginBottom;
+        cb.endText();
+
+        cb.beginText();
+        fontSize = 11;
+        cb.setFontAndSize(bf, fontSize);
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Graded by: _______________ Result: ______", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+        offsetTop += fontSize + (marginBottom*(withScramble ? 1 : 5));
+        cb.endText();
+
+        if(!withScramble) {
+            cb.beginText();
+            fontSize = 11;
+            cb.setFontAndSize(bf, fontSize);
+            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Please see separate sheet for scrambles.", competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, 0);
+            offsetTop += fontSize + marginBottom;
+            cb.endText();
+        }
+
+        cb.beginText();
+        cb.setFontAndSize(bf, 25f);
+        int MAGIC_NUMBER = 40; // kill me now
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
+        cb.endText();
+
+        com.itextpdf.text.List rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+        rules.add("Notate your solution by writing one move per bar.");
+        rules.add("To delete moves, clearly erase/blacken them.");
+        rules.add("Face moves F, B, R, L, U, and D are clockwise.");
+        rules.add("Rotations x, y, and z follow R, U, and F.");
+        rules.add("' inverts a move; 2 doubles a move. (e.g.: U', U2)");
+        rules.add("w makes a face move into two layers. (e.g.: Uw)");
+        rules.add("A [lowercase] move is a cube rotation. (e.g.: [u])");
+
+        ct.addElement(rules);
+        int rulesTop = competitorInfoBottom + (withScramble ? 55 : 143);
+        ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
+        ct.go();
+
+        rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+        rules.add("You have 1 hour to find a solution.");
+        rules.add("Your solution length will be counted in OBTM.");
+        int maxMoves = WCA_MAX_MOVES_FMC;
+        rules.add("Your solution must be at most " + maxMoves + " moves, including rotations.");
+        rules.add("Your solution must not be directly derived from any part of the scrambling algorithm.");
+        ct.addElement(rules);
+        MAGIC_NUMBER = 150; // kill me now
+        ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
+        ct.go();
+
+        doc.newPage();
+    }
+
+    private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle) throws DocumentException, IOException {
+        addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1);
+    }
+
+    private static void addFmcScrambleCutoutSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index) throws DocumentException, IOException {
+        Rectangle pageSize = doc.getPageSize();
+        String scramble = scrambleRequest.scrambles[index];
+        PdfContentByte cb = docWriter.getDirectContent();
+
+        BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+        BaseFont bfBold = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+
+        int bottom = 30;
+        int left = 35;
+        int right = (int) (pageSize.getWidth()-left);
+        int top = (int) (pageSize.getHeight()-bottom);
+
+        int height = top - bottom;
+        int width = right - left;
+
+        int fontSize = 12;
+        int padding = 90;
+        int marginBottom = 10;
+        int offsetTop = 27;
+
+        int availableScrambleSpace = width - padding;
+        int scrambleFontSize = 20;
+        float scrambleWidth;
+        do {
+            scrambleFontSize--;
+            scrambleWidth = bf.getWidthPoint(scramble, scrambleFontSize);
+        } while (scrambleWidth > availableScrambleSpace);
+
+        int availableScrambleWidth = (int) (width * .45);
+        int availableScrambleHeight = height - (int) (height * .77) - 90;
+        Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth - 8, availableScrambleHeight - 8);
+        PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
+        Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
+
+        try {
+            Svg svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme);
+            drawSvgToGraphics2D(svg, g2, dim);
+        } catch (InvalidScrambleException e) {
+            l.log(Level.INFO, "", e);
+        } finally {
+            g2.dispose();
+        }
+
+        cb.setLineDash(3f, 3f);
+        cb.moveTo(left, top - offsetTop + (marginBottom * 3));
+        cb.lineTo(right, top - offsetTop + (marginBottom * 3));
+        cb.stroke();
+
+        final int scramblesPerSheet = 8;
+        for (int y = 0; y < scramblesPerSheet; y++) {
+            cb.beginText();
+            cb.setFontAndSize(bfBold, fontSize); // TODO: Dynamic font size: #235
+            if(scrambleRequest.scrambles.length > 1) {
+                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length + ":", left, top - offsetTop, 0);
+            } else {
+                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + ":", left, top - offsetTop, 0);
+            }
+            offsetTop += fontSize + marginBottom;
+            cb.endText();
+
+            cb.beginText();
+            cb.setFontAndSize(bf, scrambleFontSize);
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scramble, left, top - offsetTop, 0);
+            offsetTop += scrambleFontSize + marginBottom;
+            cb.endText();
+
+            cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, right - padding, top - offsetTop - 1);
+
+            cb.moveTo(left, top - offsetTop - marginBottom);
+            cb.lineTo(right, top - offsetTop - marginBottom);
+            cb.stroke();
+
+            offsetTop += marginBottom * 4;
+        }
+
         doc.newPage();
     }
 
@@ -704,7 +825,7 @@ class ScrambleRequest {
                     endIndex--;
                 }
             }
- 
+
             String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
 
             // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
@@ -874,7 +995,7 @@ class ScrambleRequest {
                 table.addCell("");
             }
         }
-        
+
         TableAndHighlighting tableAndHighlighting = new TableAndHighlighting();
         tableAndHighlighting.table = table;
         tableAndHighlighting.highlighting = highlight;
@@ -975,6 +1096,84 @@ class ScrambleRequest {
 
         ZipOutputStream zipOut = new ZipOutputStream(baosZip);
         HashMap<String, Boolean> seenTitles = new HashMap<String, Boolean>();
+
+        boolean fmcBeingHeld = false;
+        for(ScrambleRequest scrambleRequest : scrambleRequests) {
+            if(scrambleRequest.fmc) {
+                fmcBeingHeld = true;
+
+                String safeTitle = toFileSafeString(scrambleRequest.title) + " Scramble Cutout Sheet";
+                int salt = 0;
+                String tempNewSafeTitle = safeTitle;
+                while(seenTitles.get(tempNewSafeTitle) != null) {
+                    tempNewSafeTitle = safeTitle + " (" + (++salt) + ")";
+                }
+                safeTitle = tempNewSafeTitle;
+                seenTitles.put(safeTitle, true);
+
+                String pdfFileName = "pdf/" + safeTitle + ".pdf";
+                parameters.setFileNameInZip(pdfFileName);
+                zipOut.putNextEntry(null, parameters);
+
+                ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
+                Rectangle pageSize = PageSize.LETTER;
+                Document doc = new Document(pageSize, 0, 0, 75, 75);
+                PdfWriter docWriter = PdfWriter.getInstance(doc, pdfOut);
+
+                docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
+
+                doc.addCreationDate();
+                doc.addProducer();
+                if(globalTitle != null) {
+                    doc.addTitle(globalTitle);
+                }
+
+                doc.open();
+                for (int i = 0; i < scrambleRequest.scrambles.length; i++) {
+                    addFmcScrambleCutoutSheet(docWriter, doc, scrambleRequest, globalTitle, i);
+                }
+                doc.close();
+
+                // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
+                PdfReader pdfReader = new PdfReader(pdfOut.toByteArray());
+                byte[] b = new byte[(int) pdfReader.getFileLength()];
+                pdfReader.getSafeFile().readFully(b);
+                zipOut.write(b);
+
+                zipOut.closeEntry();
+            }
+        }
+        if(fmcBeingHeld) {
+            String pdfFileName = "pdf/3x3x3 Fewest Moves Solution Sheet.pdf";
+            parameters.setFileNameInZip(pdfFileName);
+            zipOut.putNextEntry(null, parameters);
+
+            ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
+            Rectangle pageSize = PageSize.LETTER;
+            Document doc = new Document(pageSize, 0, 0, 75, 75);
+            PdfWriter docWriter = PdfWriter.getInstance(doc, pdfOut);
+
+            docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
+
+            doc.addCreationDate();
+            doc.addProducer();
+            if(globalTitle != null) {
+                doc.addTitle(globalTitle);
+            }
+
+            doc.open();
+            addGenericFmcSolutionSheet(docWriter, doc, globalTitle);
+            doc.close();
+
+            // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
+            PdfReader pdfReader = new PdfReader(pdfOut.toByteArray());
+            byte[] b = new byte[(int) pdfReader.getFileLength()];
+            pdfReader.getSafeFile().readFully(b);
+            zipOut.write(b);
+
+            zipOut.closeEntry();
+        }
+
         for(ScrambleRequest scrambleRequest : scrambleRequests) {
             String safeTitle = toFileSafeString(scrambleRequest.title);
             int salt = 0;
