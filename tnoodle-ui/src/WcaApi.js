@@ -12,7 +12,8 @@ if(wcaAccessToken) {
 
 export function logIn() {
   let redirectUri = location.origin + BASE_PATH + '/oauth/wca';
-  let logInUrl = `${WCA_ORIGIN}/oauth/authorize?client_id=e00488e5f685aca8b1f375d9eded764247f070bccb235903ce20f8e437123eac&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
+  let appId = '591741961b44646d5b53bcd8a94d542333d80b085d4f8c3e0387119576f88109';
+  let logInUrl = `${WCA_ORIGIN}/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
   localStorage['TNoodle.preLoginPath'] = location.pathname.substring(BASE_PATH.length);
   document.location = logInUrl;
 }
