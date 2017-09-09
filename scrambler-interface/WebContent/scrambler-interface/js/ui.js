@@ -11,6 +11,8 @@ var mark2 = {};
 (function() {
     "use strict";
 
+    var THREE_MULTI_DEFAULT_PUZZLES_PER_ATTEMPT = 28;
+
     // Implementation of bind() for Safari.
     if (!Function.prototype.bind) {
         Function.prototype.bind = function (oThis) {
@@ -363,7 +365,7 @@ var mark2 = {};
             {eventID: "clock", name: "Rubik's Clock", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "444bf", name: "4x4x4 Cube: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             {eventID: "555bf", name: "5x5x5 Cube: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            {eventID: "333mbf", name: "3x3x3: Multiple Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: 60 } },
+            {eventID: "333mbf", name: "3x3x3: Multiple Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: THREE_MULTI_DEFAULT_PUZZLES_PER_ATTEMPT } },
             {eventID: "skewb", name: "Skewb", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } }
         ];
 
@@ -980,6 +982,10 @@ var mark2 = {};
                     "input",
                     { type: "number", value: numExtraSolves, min: 0 }
                     );
+            if(eventID === "333mbf") {
+                numExtraSolvesTD.appendChild(document.createElement("br"));
+                numExtraSolvesTD.appendChild(document.createTextNode("Note: For multiple blindfolded, this is actually the number of scrambles you want generated for each attempt in the round! Unless you know better, you should set this to something really large like " + THREE_MULTI_DEFAULT_PUZZLES_PER_ATTEMPT + "."));
+            }
             numExtraSolvesInput.classList.add("num_extra_solves");
 
             var numCopiesTD = mark2.dom.appendElement(newEventTR, "td");
