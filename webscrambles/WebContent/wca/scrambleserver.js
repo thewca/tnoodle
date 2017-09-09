@@ -260,7 +260,8 @@ tnoodle.ajax = function(callback, url, data) {
         callback(json);
     };
     xhr.onerror = function(error) {
-        callback({error: error});
+        console.error(error);
+        callback({error: "Failed to connect to server"});
     };
     try {
         xhr.send(null);
@@ -330,11 +331,7 @@ tnoodle.retryAjax = function(callback, url, data) {
                 clearTimeout(pendingTimeout);
                 pendingTimeout = null;
                 if(json.error) {
-                    if(json.error instanceof XMLHttpRequestProgressEvent) {
-                        tnoodle.ajaxState[ajaxId].lastError = "Can't connect to server";
-                    } else {
-                        tnoodle.ajaxState[ajaxId].lastError = json.error;
-                    }
+                    tnoodle.ajaxState[ajaxId].lastError = json.error;
                     retry();
                 } else {
                     delete tnoodle.ajaxState[ajaxId];
