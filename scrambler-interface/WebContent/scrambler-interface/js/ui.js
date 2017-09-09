@@ -347,24 +347,24 @@ var mark2 = {};
             // Official WCA events as of October 06, 2013
             // Names match https://www.worldcubeassociation.org/regulations/#article-9-events
             // - Exception: "Rubik's Cube" is replaced with "3x3x3 Cube" for consistency.
-            {eventID: "222", name: "2x2x2 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "333", name: "3x3x3 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "444", name: "4x4x4 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "555", name: "5x5x5 Cube", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "666", name: "6x6x6 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            {eventID: "777", name: "7x7x7 Cube", default_round: {type: "mean", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            {eventID: "333bf", name: "3x3x3: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            {eventID: "333oh", name: "3x3x3: One-Handed", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "333fm", name: "3x3x3: Fewest Moves", default_round: {type: "best", num_scrambles: 1 } },
-            {eventID: "333ft", name: "3x3x3: With Feet", default_round: {type: "avg",  num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            {eventID: "minx", name: "Megaminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "pyram", name: "Pyraminx", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "sq1", name: "Square-1", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "clock", name: "Rubik's Clock", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "444bf", name: "4x4x4 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            {eventID: "555bf", name: "5x5x5 Cube: Blindfolded", default_round: {type: "best", num_scrambles: 3, num_extra_scrambles: extraScrambles } },
-            {eventID: "333mbf", name: "3x3x3: Multiple Blindfolded", default_round: {type: "mbf",  num_scrambles: 28 } },
-            {eventID: "skewb", name: "Skewb", default_round: {type: "avg",  num_scrambles: 5, num_extra_scrambles: extraScrambles } }
+            {eventID: "222", name: "2x2x2 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "333", name: "3x3x3 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "444", name: "4x4x4 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "555", name: "5x5x5 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "666", name: "6x6x6 Cube", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "777", name: "7x7x7 Cube", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "333bf", name: "3x3x3: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "333oh", name: "3x3x3: One-Handed", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "333fm", name: "3x3x3: Fewest Moves", default_round: { num_scrambles: 1 } },
+            {eventID: "333ft", name: "3x3x3: With Feet", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "minx", name: "Megaminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "pyram", name: "Pyraminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "sq1", name: "Square-1", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "clock", name: "Rubik's Clock", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "444bf", name: "4x4x4 Cube: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "555bf", name: "5x5x5 Cube: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "333mbf", name: "3x3x3: Multiple Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: 60 } },
+            {eventID: "skewb", name: "Skewb", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } }
         ];
 
         var events = {};
@@ -384,7 +384,7 @@ var mark2 = {};
                 "333ft" : "333",
                 "444bf" : "444ni",
                 "555bf" : "555ni",
-                "333mbf" : "333ni"
+                "333mbf" : "333ni",
             };
             return puzzByEvent[eventID] || eventID;
         }
@@ -600,7 +600,7 @@ var mark2 = {};
 
                         event: round.eventID,
                         round: round.round,
-                        group: group
+                        group: group,
                     };
 
                     // Unfortunately, there's no guarantee that rounds in a
@@ -649,12 +649,25 @@ var mark2 = {};
             return sum(generatedCounts);
         }
 
+        function getRequiredScrambleCountForSheet(sheet) {
+            if(sheet.event === "333mbf") {
+                // In 333mbf, scrambleCount is actually the number of attempts in the round,
+                // and extraScrambleCount is actually the maximum number of puzzles we expect
+                // for each attempt.
+                var attemptCount = sheet.scrambleCount;
+                var puzzlesPerAttempt = sheet.extraScrambleCount;
+                return attemptCount * puzzlesPerAttempt;
+            } else {
+                return sheet.scrambleCount + sheet.extraScrambleCount;
+            }
+        }
+
         function getRequiredScrambleCountByPuzzle() {
             var requiredScrambleCountByPuzzle = {};
             var sheets = getScrambleSheets();
             for(var i = 0; i < sheets.length; i++) {
                 var sheet = sheets[i];
-                requiredScrambleCountByPuzzle[sheet.puzzle] = (requiredScrambleCountByPuzzle[sheet.puzzle] || 0) + sheet.scrambleCount + sheet.extraScrambleCount;
+                requiredScrambleCountByPuzzle[sheet.puzzle] = (requiredScrambleCountByPuzzle[sheet.puzzle] || 0) + getRequiredScrambleCountForSheet(sheet);
             }
             return requiredScrambleCountByPuzzle;
         }
@@ -666,7 +679,7 @@ var mark2 = {};
                 var sheet = sheets[i];
                 // There may be more scrambles generated for this sheet than we need.
                 var additionalScramblesCount = Math.min(
-                    sheet.scrambleCount + sheet.extraScrambleCount,
+                    getRequiredScrambleCountForSheet(sheet),
                     (generatedScrambleCountByGuid[sheet.guid] || 0)
                 );
 
@@ -1230,7 +1243,7 @@ var mark2 = {};
             td.appendChild(document.createTextNode('# Groups'));
             td = document.createElement('td');
             tr.appendChild(td);
-            td.appendChild(document.createTextNode('# Scrambles'));
+            td.appendChild(document.createTextNode('# Attempts'));
             td = document.createElement('td');
             tr.appendChild(td);
             td.appendChild(document.createTextNode('# Extra Scrambles'));
@@ -1380,7 +1393,8 @@ var mark2 = {};
             getTitle: getCompetitionName,
             getPassword: getPassword,
             scramblesGenerated: scramblesGenerated,
-            puzzlesInitializing: puzzlesInitializing
+            puzzlesInitializing: puzzlesInitializing,
+            getRequiredScrambleCountForSheet: getRequiredScrambleCountForSheet,
         };
     })();
 

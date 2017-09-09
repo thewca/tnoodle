@@ -218,6 +218,39 @@ class ScrambleRequest {
     }
 
     private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
+        // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
+        // list of 333ni scrambles.
+        // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
+        // rather than 1 sheet per round (as we do with every other event).
+        boolean is333mbf = scrambleRequest.scrambler.getShortName().equals("333ni") && scrambleRequest.scrambles[0].indexOf('\n') > 0;
+        if(is333mbf) {
+            Document doc = new Document();
+            ByteArrayOutputStream totalPdfOutput = new ByteArrayOutputStream();
+            PdfSmartCopy totalPdfWriter = new PdfSmartCopy(doc, totalPdfOutput);
+            doc.open();
+
+            for(int nthAttempt = 1; nthAttempt <= scrambleRequest.scrambles.length; nthAttempt++) {
+                String[] scrambles = scrambleRequest.scrambles[nthAttempt - 1].split("\n");
+
+                ScrambleRequest attemptRequest = new ScrambleRequest();
+                attemptRequest.scrambles = scrambles;
+                attemptRequest.extraScrambles = new String[0];
+                attemptRequest.scrambler = scrambleRequest.scrambler;
+                attemptRequest.copies = scrambleRequest.copies;
+                attemptRequest.title = scrambleRequest.title + " Attempt " + nthAttempt;
+                attemptRequest.fmc = false;
+                attemptRequest.colorScheme = scrambleRequest.colorScheme;
+
+                PdfReader pdfReader = createPdf(globalTitle, creationDate, attemptRequest);
+                for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
+                    PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
+                    totalPdfWriter.addPage(page);
+                }
+            }
+            doc.close();
+            return new PdfReader(totalPdfOutput.toByteArray());
+        }
+
         azzert(scrambleRequest.scrambles.length > 0);
         ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
         Rectangle pageSize = PageSize.LETTER;
