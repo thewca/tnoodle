@@ -202,12 +202,12 @@ function tnoodlejs(){
   processMetas();
   try {
     var strongName;
-    unflattenKeylistIntoAnswers(['gecko1_8'], '43471D4BCF44E991257261D487CEC7BA');
-    unflattenKeylistIntoAnswers(['ie6'], '43471D4BCF44E991257261D487CEC7BA' + ':1');
-    unflattenKeylistIntoAnswers(['ie8'], '43471D4BCF44E991257261D487CEC7BA' + ':2');
-    unflattenKeylistIntoAnswers(['ie9'], '43471D4BCF44E991257261D487CEC7BA' + ':3');
-    unflattenKeylistIntoAnswers(['opera'], '43471D4BCF44E991257261D487CEC7BA' + ':4');
-    unflattenKeylistIntoAnswers(['safari'], '43471D4BCF44E991257261D487CEC7BA' + ':5');
+    unflattenKeylistIntoAnswers(['gecko1_8'], 'FA56308C9F9AA0A3E6CBA3DAF27F6E1A');
+    unflattenKeylistIntoAnswers(['ie6'], 'FA56308C9F9AA0A3E6CBA3DAF27F6E1A' + ':1');
+    unflattenKeylistIntoAnswers(['ie8'], 'FA56308C9F9AA0A3E6CBA3DAF27F6E1A' + ':2');
+    unflattenKeylistIntoAnswers(['ie9'], 'FA56308C9F9AA0A3E6CBA3DAF27F6E1A' + ':3');
+    unflattenKeylistIntoAnswers(['opera'], 'FA56308C9F9AA0A3E6CBA3DAF27F6E1A' + ':4');
+    unflattenKeylistIntoAnswers(['safari'], 'FA56308C9F9AA0A3E6CBA3DAF27F6E1A' + ':5');
     strongName = answers[computePropValue('user.agent')];
     var idx = strongName.indexOf(':');
     if (idx != -1) {
@@ -246,7 +246,7 @@ function tnoodlejs(){
 }
 
 tnoodlejs();
-(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '43471D4BCF44E991257261D487CEC7BA';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubeFewestMovesPuzzle = 93, Q$ThreeByThreeCubePuzzle = 94, Q$TwoByTwoCubePuzzle = 95, CM$ = {};
+(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = 'FA56308C9F9AA0A3E6CBA3DAF27F6E1A';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubeFewestMovesPuzzle = 93, Q$ThreeByThreeCubePuzzle = 94, Q$TwoByTwoCubePuzzle = 95, CM$ = {};
 function newSeed(id){
   return new seedTable[id];
 }
@@ -12762,7 +12762,7 @@ function $export0(this$static){
   );
   __0 = $wnd.tnoodlejs.prototype = new Object;
   $wnd.tnoodlejs.getLogLevel = $entry(function(a0){
-    return runDispatch(null, Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit, 0, arguments, true, false)[0];
+    return runDispatch(null, Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit, 1, arguments, true, false)[0];
   }
   );
   $wnd.tnoodlejs.getPuzzleIcon = $entry(function(a0){
@@ -12774,7 +12774,7 @@ function $export0(this$static){
   }
   );
   $wnd.tnoodlejs.getVersion = $entry(function(){
-    return '0.11.5';
+    return '0.12.0';
   }
   );
   $wnd.tnoodlejs.scrambleToSvg = $entry(function(a0, a1, a2){
@@ -12782,10 +12782,10 @@ function $export0(this$static){
   }
   );
   $wnd.tnoodlejs.setLogLevel = $entry(function(a0, a1){
-    runDispatch(null, Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit, 1, arguments, true, false)[0];
+    runDispatch(null, Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit, 0, arguments, true, false)[0];
   }
   );
-  registerDispatchMap(Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit, {0:{0:[[getLogLevel, null, undefined]], 1:[[getLogLevel_0, null, undefined, 'string']]}, 1:{1:[[setLogLevel, null, undefined, 'string']], 2:[[setLogLevel_0, null, undefined, 'string', 'string']]}}, true);
+  registerDispatchMap(Lnet_gnehzr_tnoodle_js_TNoodleJsUtils_2_classLit, {0:{1:[[setLogLevel, null, undefined, 'string']], 2:[[setLogLevel_0, null, undefined, 'string', 'string']]}, 1:{0:[[getLogLevel, null, undefined]], 1:[[getLogLevel_0, null, undefined, 'string']]}}, true);
   if (pkg)
     for (p in pkg)
       $wnd.tnoodlejs[p] === undefined && ($wnd.tnoodlejs[p] = pkg[p]);
@@ -16847,7 +16847,7 @@ function $export0_8(this$static){
   );
   __0 = $wnd.puzzle.NoInspectionThreeByThreeCubePuzzle.prototype = new Object;
   __0.generateRandomMoves = $entry(function(a0, a1, a2){
-    return runDispatch(this.g, Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit, 0, arguments, false, false)[0];
+    return runDispatch(this.g, Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit, 1, arguments, false, false)[0];
   }
   );
   __0.generateScramble = $entry(function(){
@@ -16879,7 +16879,7 @@ function $export0_8(this$static){
   }
   );
   __0.getPreferredSize = $entry(function(a0, a1){
-    return runDispatch(this.g, Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit, 1, arguments, false, false)[0];
+    return runDispatch(this.g, Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit, 0, arguments, false, false)[0];
   }
   );
   __0.getShortName = $entry(function(){
@@ -16898,19 +16898,19 @@ function $export0_8(this$static){
     return this.g.toString$();
   }
   );
-  registerDispatchMap(Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit, {0:{1:[[function(){
-    return this.generateRandomMoves_0.apply(this, arguments);
-  }
-  , null, undefined, Ljava_util_Random_2_classLit]], 3:[[function(){
-    return this.generateRandomMoves_1.apply(this, arguments);
-  }
-  , null, undefined, Ljava_util_Random_2_classLit, 'string', 'string']]}, 1:{0:[[function(){
+  registerDispatchMap(Lpuzzle_NoInspectionThreeByThreeCubePuzzle_2_classLit, {0:{0:[[function(){
     return this.getPreferredSize_0.apply(this, arguments);
   }
   , null, undefined]], 2:[[function(){
     return this.getPreferredSize_1.apply(this, arguments);
   }
-  , null, undefined, 'number', 'number']]}}, false);
+  , null, undefined, 'number', 'number']]}, 1:{1:[[function(){
+    return this.generateRandomMoves_0.apply(this, arguments);
+  }
+  , null, undefined, Ljava_util_Random_2_classLit]], 3:[[function(){
+    return this.generateRandomMoves_1.apply(this, arguments);
+  }
+  , null, undefined, Ljava_util_Random_2_classLit, 'string', 'string']]}}, false);
   if (pkg)
     for (p in pkg)
       $wnd.puzzle.NoInspectionThreeByThreeCubePuzzle[p] === undefined && ($wnd.puzzle.NoInspectionThreeByThreeCubePuzzle[p] = pkg[p]);
@@ -18732,7 +18732,7 @@ function $export0_13(this$static){
   );
   __0 = $wnd.puzzle.ThreeByThreeCubeFewestMovesPuzzle.prototype = new Object;
   __0.generateRandomMoves = $entry(function(a0, a1, a2){
-    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubeFewestMovesPuzzle_2_classLit, 0, arguments, false, false)[0];
+    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubeFewestMovesPuzzle_2_classLit, 1, arguments, false, false)[0];
   }
   );
   __0.generateScramble = $entry(function(){
@@ -18764,7 +18764,7 @@ function $export0_13(this$static){
   }
   );
   __0.getPreferredSize = $entry(function(a0, a1){
-    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubeFewestMovesPuzzle_2_classLit, 1, arguments, false, false)[0];
+    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubeFewestMovesPuzzle_2_classLit, 0, arguments, false, false)[0];
   }
   );
   __0.getShortName = $entry(function(){
@@ -18783,19 +18783,19 @@ function $export0_13(this$static){
     return this.g.toString$();
   }
   );
-  registerDispatchMap(Lpuzzle_ThreeByThreeCubeFewestMovesPuzzle_2_classLit, {0:{1:[[function(){
-    return this.generateRandomMoves_0.apply(this, arguments);
-  }
-  , null, undefined, Ljava_util_Random_2_classLit]], 3:[[function(){
-    return this.generateRandomMoves_1.apply(this, arguments);
-  }
-  , null, undefined, Ljava_util_Random_2_classLit, 'string', 'string']]}, 1:{0:[[function(){
+  registerDispatchMap(Lpuzzle_ThreeByThreeCubeFewestMovesPuzzle_2_classLit, {0:{0:[[function(){
     return this.getPreferredSize_0.apply(this, arguments);
   }
   , null, undefined]], 2:[[function(){
     return this.getPreferredSize_1.apply(this, arguments);
   }
-  , null, undefined, 'number', 'number']]}}, false);
+  , null, undefined, 'number', 'number']]}, 1:{1:[[function(){
+    return this.generateRandomMoves_0.apply(this, arguments);
+  }
+  , null, undefined, Ljava_util_Random_2_classLit]], 3:[[function(){
+    return this.generateRandomMoves_1.apply(this, arguments);
+  }
+  , null, undefined, Ljava_util_Random_2_classLit, 'string', 'string']]}}, false);
   if (pkg)
     for (p in pkg)
       $wnd.puzzle.ThreeByThreeCubeFewestMovesPuzzle[p] === undefined && ($wnd.puzzle.ThreeByThreeCubeFewestMovesPuzzle[p] = pkg[p]);
@@ -18841,7 +18841,7 @@ function $export0_14(this$static){
   );
   __0 = $wnd.puzzle.ThreeByThreeCubePuzzle.prototype = new Object;
   __0.generateRandomMoves = $entry(function(a0, a1, a2){
-    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubePuzzle_2_classLit, 0, arguments, false, false)[0];
+    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubePuzzle_2_classLit, 1, arguments, false, false)[0];
   }
   );
   __0.generateScramble = $entry(function(){
@@ -18873,7 +18873,7 @@ function $export0_14(this$static){
   }
   );
   __0.getPreferredSize = $entry(function(a0, a1){
-    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubePuzzle_2_classLit, 1, arguments, false, false)[0];
+    return runDispatch(this.g, Lpuzzle_ThreeByThreeCubePuzzle_2_classLit, 0, arguments, false, false)[0];
   }
   );
   __0.getShortName = $entry(function(){
@@ -18892,19 +18892,19 @@ function $export0_14(this$static){
     return this.g.toString$();
   }
   );
-  registerDispatchMap(Lpuzzle_ThreeByThreeCubePuzzle_2_classLit, {0:{1:[[function(){
-    return this.generateRandomMoves_0.apply(this, arguments);
-  }
-  , null, undefined, Ljava_util_Random_2_classLit]], 3:[[function(){
-    return this.generateRandomMoves_1.apply(this, arguments);
-  }
-  , null, undefined, Ljava_util_Random_2_classLit, 'string', 'string']]}, 1:{0:[[function(){
+  registerDispatchMap(Lpuzzle_ThreeByThreeCubePuzzle_2_classLit, {0:{0:[[function(){
     return this.getPreferredSize_0.apply(this, arguments);
   }
   , null, undefined]], 2:[[function(){
     return this.getPreferredSize_1.apply(this, arguments);
   }
-  , null, undefined, 'number', 'number']]}}, false);
+  , null, undefined, 'number', 'number']]}, 1:{1:[[function(){
+    return this.generateRandomMoves_0.apply(this, arguments);
+  }
+  , null, undefined, Ljava_util_Random_2_classLit]], 3:[[function(){
+    return this.generateRandomMoves_1.apply(this, arguments);
+  }
+  , null, undefined, Ljava_util_Random_2_classLit, 'string', 'string']]}}, false);
   if (pkg)
     for (p in pkg)
       $wnd.puzzle.ThreeByThreeCubePuzzle[p] === undefined && ($wnd.puzzle.ThreeByThreeCubePuzzle[p] = pkg[p]);
