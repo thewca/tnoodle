@@ -285,10 +285,25 @@
         for(var i = 0; i < sheets.length; i++) {
             var sheet = sheets[i];
             var generatedScrambles = requestsByGuid[sheet.guid].scrambles;
-            assert(generatedScrambles.length >= sheet.scrambleCount + sheet.extraScrambleCount);
-            // It's possible we generated more scrambles than we actually need.
-            var scrambles = generatedScrambles.slice(0, sheet.scrambleCount);
-            var extraScrambles = generatedScrambles.slice(sheet.scrambleCount, sheet.scrambleCount+sheet.extraScrambleCount);
+            var requiredScrambleCount = mark2.ui.getRequiredScrambleCountForSheet(sheet);
+            assert(generatedScrambles.length >= requiredScrambleCount);
+
+            var scrambles, extraScrambles;
+            if(sheet.event === "333mbf") {
+                scrambles = [];
+                extraScrambles = null;
+
+                var multiAttemptCount = sheet.scrambleCount;
+                var puzzlesPerMultiAttempt = sheet.extraScrambleCount;
+                for(var attemptN = 0; attemptN < multiAttemptCount; attemptN++) {
+                    var scramblesForMultiAttempt = generatedScrambles.slice(attemptN * puzzlesPerMultiAttempt, (attemptN + 1) * puzzlesPerMultiAttempt);
+                    scrambles.push(scramblesForMultiAttempt.join("\n"));
+                }
+            } else {
+                // It's possible we generated more scrambles than we actually need.
+                scrambles = generatedScrambles.slice(0, sheet.scrambleCount);
+                extraScrambles = generatedScrambles.slice(sheet.scrambleCount, requiredScrambleCount);
+            }
             var request = {
                 scrambles: scrambles,
                 extraScrambles: extraScrambles,
@@ -375,10 +390,11 @@
                 requestsByGuid[sheet.guid] = request;
             }
 
-            if(request.scrambles.length < (sheet.scrambleCount + sheet.extraScrambleCount)) {
+            var requiredScrambleCount = mark2.ui.getRequiredScrambleCountForSheet(sheet);
+            if(request.scrambles.length < requiredScrambleCount) {
                 var seed = null;
                 var maxScramblesPerRequest = maxScramblesPerRequestByPuzzle[sheet.puzzle] || DEFAULT_MAX_SCRAMBLES_PER_REQUEST;
-                var unrequestedScrambleCount = (sheet.scrambleCount + sheet.extraScrambleCount) - request.scrambles.length;
+                var unrequestedScrambleCount = requiredScrambleCount - request.scrambles.length;
                 var scramblesToRequest = Math.min(unrequestedScrambleCount, maxScramblesPerRequest);
                 request.scrambles.length += scramblesToRequest;
 
