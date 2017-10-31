@@ -689,7 +689,7 @@ var mark2 = {};
                     (generatedScrambleCountByPuzzle[sheet.puzzle] || 0) +
                     additionalScramblesCount
                 );
-                        
+
             }
             return generatedScrambleCountByPuzzle;
         }
@@ -1313,7 +1313,12 @@ var mark2 = {};
 
             competitionNameInput.addEventListener('change', updateHash, false);
 
-            scrambleButton.addEventListener('click', callbacks.showScrambles, false);
+            scrambleButton.addEventListener('click', function(e) {
+                mark2.dom.emptyElement(scrambleButton);
+                scrambleButton.appendChild(document.createTextNode("Scramble! (Note: You've already generated scrambles. If you click this button again, the generated scrambles will be the same as the ones you already generated. If you want to generate completely new scrambles, refresh the page (you will not lose your events and rounds).)"));
+                scrambleButton.classList.add('clicked');
+                callbacks.showScrambles(e);
+            }, false);
 
             initializeEventsTable();
 
