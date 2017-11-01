@@ -21,3 +21,4 @@ script:
   - ./tmt lint -a
   - ./tmt make dist -p wca
   - ./tmt make check
+  - (cd tnoodle-ui; yarn test)

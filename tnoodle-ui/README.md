@@ -24,6 +24,10 @@ For example:
 REACT_APP_WCA_ORIGIN=http://localhost:3000 REACT_APP_TNOODLE_APP_ID= yarn start
 ```
 
+## Running tests
+
+`yarn test`
+
 ## TODO
 
 - warning when using outdated version of tnoodle
