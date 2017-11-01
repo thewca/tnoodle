@@ -1,6 +1,7 @@
 import { BASE_PATH } from 'App';
 
-const WCA_ORIGIN = 'http://kaladin:3000';
+const WCA_ORIGIN = process.env.REACT_APP_WCA_ORIGIN || 'https://www.worldcubeassociation.org';
+const TNOODLE_APP_ID = process.env.REACT_APP_TNOODLE_APP_ID || '6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40';
 
 let wcaAccessToken = getHashParameter('access_token', null);
 if(wcaAccessToken) {
@@ -12,8 +13,7 @@ if(wcaAccessToken) {
 
 export function logIn() {
   let redirectUri = location.origin + BASE_PATH + '/oauth/wca';
-  let appId = '591741961b44646d5b53bcd8a94d542333d80b085d4f8c3e0387119576f88109';
-  let logInUrl = `${WCA_ORIGIN}/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
+  let logInUrl = `${WCA_ORIGIN}/oauth/authorize?client_id=${TNOODLE_APP_ID}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`;
   localStorage['TNoodle.preLoginPath'] = location.pathname.substring(BASE_PATH.length);
   document.location = logInUrl;
 }
