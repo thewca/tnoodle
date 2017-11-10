@@ -53,8 +53,10 @@ import org.w3c.dom.svg.SVGDocument;
 import javax.servlet.ServletContext;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.FontMetrics;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -68,6 +70,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -217,7 +221,7 @@ class ScrambleRequest {
         return scrambleRequests;
     }
 
-    private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest) throws DocumentException, IOException {
+    private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest, String language, String country) throws DocumentException, IOException {
         // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -241,7 +245,7 @@ class ScrambleRequest {
                 attemptRequest.fmc = false;
                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
 
-                PdfReader pdfReader = createPdf(globalTitle, creationDate, attemptRequest);
+                PdfReader pdfReader = createPdf(globalTitle, creationDate, attemptRequest, language, country);
                 for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
                     PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
                     totalPdfWriter.addPage(page);
@@ -267,7 +271,7 @@ class ScrambleRequest {
 
         doc.open();
         // Note that we ignore scrambleRequest.copies here.
-        addScrambles(docWriter, doc, scrambleRequest, globalTitle);
+        addScrambles(docWriter, doc, scrambleRequest, globalTitle, language, country);
         doc.close();
 
         // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
@@ -344,10 +348,10 @@ class ScrambleRequest {
 //      return ps.getReader();
     }
 
-    private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle) throws DocumentException, IOException {
+    private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, String language, String country) throws DocumentException, IOException {
         if(scrambleRequest.fmc) {
             for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
-                addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i);
+                addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, language, country);
             }
         } else {
             Rectangle pageSize = doc.getPageSize();
@@ -388,7 +392,7 @@ class ScrambleRequest {
                 } else {
                     doc.add(tableAndHighlighting.table);
                 }
-
+                
                 if(scrambleRequest.extraScrambles.length > 0) {
                     PdfPTable headerTable = new PdfPTable(1);
                     headerTable.setTotalWidth(new float[] { availableWidth });
@@ -418,7 +422,14 @@ class ScrambleRequest {
         doc.newPage();
     }
 
-    private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index) throws DocumentException, IOException {
+    private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index, String language, String country) throws DocumentException, IOException {
+        
+        // internationalization
+        Locale currentLocale;
+        ResourceBundle messages;
+        currentLocale = new Locale(language, country);
+        messages = ResourceBundle.getBundle("net.gnehzr.tnoodle.server.webscrambles.Internationalization.MessagesBundle", currentLocale);
+        
         boolean withScramble = index != -1;
         Rectangle pageSize = doc.getPageSize();
         String scramble = null;
@@ -517,7 +528,7 @@ class ScrambleRequest {
             cb.beginText();
             int availableScrambleSpace = right-left - 2*padding;
             int scrambleFontSize = 20;
-            String scrambleStr = "Scramble: " + scramble;
+            String scrambleStr = messages.getString("Scramble")+": " + scramble;
             float scrambleWidth;
             do {
                 scrambleFontSize--;
@@ -557,31 +568,39 @@ class ScrambleRequest {
         if(showScrambleCount) {
             offsetTop -= fontSize + 2;
         }
+        
+        String tempMessage = ""; // saves typing in i18n
+        
+        // the 100 number in the fit text function is just some big number. Hopefully, fitting the width will be enough to fit the height.
 
         cb.beginText();
-        cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, globalTitle, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+        tempMessage = globalTitle;
+        cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), fontSize, false));
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, tempMessage, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
         offsetTop += fontSize + 2;
         cb.endText();
 
         if(withScramble) {
             cb.beginText();
-            cb.setFontAndSize(bf, fontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, scrambleRequest.title, competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, 0);
+            tempMessage = scrambleRequest.title;
+            cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, top - offsetTop), fontSize, false));
+            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, tempMessage, competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, 0);
             cb.endText();
         } else {
             offsetTop += marginBottom;
             cb.beginText();
-            cb.setFontAndSize(bf, fontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Round: __", competitorInfoLeft + padding, top - offsetTop, 0);
+            tempMessage = messages.getString("Round")+": __";
+            cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, top - offsetTop), fontSize, false));
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, tempMessage, competitorInfoLeft + padding, top - offsetTop, 0);
             cb.endText();
         }
 
         if(showScrambleCount) {
             cb.beginText();
+            tempMessage = messages.getString("Scramble")+" " + (index+1) + " "+messages.getString("of")+" "+ scrambleRequest.scrambles.length;
             offsetTop += fontSize + 2;
-            cb.setFontAndSize(bf, fontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Scramble " + (index+1) + " of " + scrambleRequest.scrambles.length, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
+            cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), fontSize, false));
+            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, tempMessage, competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, 0);
             cb.endText();
         }
 
@@ -589,17 +608,19 @@ class ScrambleRequest {
 
         if(!withScramble) {
             cb.beginText();
+            tempMessage = messages.getString("Attempt")+": __";
             fontSize = 15;
-            cb.setFontAndSize(bf, fontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Attempt: __", competitorInfoLeft + padding, top - offsetTop, 0);
+            cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), fontSize, false));
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, tempMessage, competitorInfoLeft + padding, top - offsetTop, 0);
             offsetTop += fontSize + (int) (marginBottom * 2.8);
             cb.endText();
         }
 
         cb.beginText();
+        tempMessage = messages.getString("Competitor")+": __________________";
         fontSize = 15;
-        cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "Competitor: __________________", competitorInfoLeft+padding, top-offsetTop, 0);
+        cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), fontSize, false));
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, tempMessage, competitorInfoLeft+padding, top-offsetTop, 0);
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
         cb.endText();
 
@@ -613,69 +634,99 @@ class ScrambleRequest {
         int wcaIdLength = 63;
         cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
 
+        fontSize = 15;
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1.8 : 1.4));
         cb.endText();
 
 
         cb.beginText();
         fontSize = 11;
-        cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "DO NOT FILL IF YOU ARE THE COMPETITOR", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+        tempMessage = messages.getString("Warning");
+        cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), fontSize, false));
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, tempMessage, competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
         offsetTop += fontSize + marginBottom;
         cb.endText();
 
         cb.beginText();
+        tempMessage = messages.getString("Graded")+": _______________ "+messages.getString("Result")+": ______";
         fontSize = 11;
-        cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Graded by: _______________ Result: ______", competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
+        cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), fontSize, false));
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, tempMessage, competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, 0);
         offsetTop += fontSize + (marginBottom*(withScramble ? 1 : 5));
         cb.endText();
 
         if(!withScramble) {
             cb.beginText();
+            tempMessage = messages.getString("Warning2");
             fontSize = 11;
-            cb.setFontAndSize(bf, fontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Please see separate sheet for scrambles.", competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, 0);
+            cb.setFontAndSize(bf, fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), fontSize, false));
+            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, tempMessage, competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, 0);
             offsetTop += fontSize + marginBottom;
             cb.endText();
         }
 
         cb.beginText();
-        cb.setFontAndSize(bf, 25f);
+        tempMessage = messages.getString("Event");
+        float eventHeight = fitText(new Font(bf), tempMessage, new Rectangle(right-competitorInfoLeft, 100), 25f, false);
+        cb.setFontAndSize(bf, eventHeight);
         int MAGIC_NUMBER = 40; // kill me now
-        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "Fewest Moves", left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, tempMessage, left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, 0);
         cb.endText();
-
-        com.itextpdf.text.List rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-        rules.add("Notate your solution by writing one move per bar.");
-        rules.add("To delete moves, clearly erase/blacken them.");
-        rules.add("Face moves F, B, R, L, U, and D are clockwise.");
-        rules.add("Rotations x, y, and z follow R, U, and F.");
-        rules.add("' inverts a move; 2 doubles a move. (e.g.: U', U2)");
-        rules.add("w makes a face move into two layers. (e.g.: Uw)");
-        rules.add("A [lowercase] move is a cube rotation. (e.g.: [u])");
-
-        ct.addElement(rules);
-        int rulesTop = competitorInfoBottom + (withScramble ? 55 : 143);
-        ct.setSimpleColumn(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop, 0, Element.ALIGN_LEFT);
-        ct.go();
-
-        rules = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-        rules.add("You have 1 hour to find a solution.");
-        rules.add("Your solution length will be counted in OBTM.");
+        
+        ArrayList<String> rulesList = new ArrayList<String>();
+        rulesList.add("- "+messages.getString("rule1"));
+        rulesList.add("- "+messages.getString("rule2"));
+        rulesList.add("- "+messages.getString("rule3"));
+        rulesList.add("- "+messages.getString("rule4"));
+        rulesList.add("- "+messages.getString("rule5"));
+        rulesList.add("- "+messages.getString("rule6"));
+        rulesList.add("- "+messages.getString("rule7"));
+        rulesList.add("- "+messages.getString("rule8"));
+        rulesList.add("- "+messages.getString("rule9"));
         int maxMoves = WCA_MAX_MOVES_FMC;
-        rules.add("Your solution must be at most " + maxMoves + " moves, including rotations.");
-        rules.add("Your solution must not be directly derived from any part of the scrambling algorithm.");
-        ct.addElement(rules);
-        MAGIC_NUMBER = 150; // kill me now
-        ct.setSimpleColumn(left+padding, scrambleBorderTop, rulesRight-padding, rulesTop-MAGIC_NUMBER, 0, Element.ALIGN_LEFT);
+        rulesList.add("- "+String.format(messages.getString("rule10"), maxMoves));
+        rulesList.add("- "+messages.getString("rule11"));
+
+        int rulesTop = competitorInfoBottom + (withScramble ? 55 : 143);
+        Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop);
+        
+        float potentialFontSize = 15f;
+        // resize rules vertically
+        while (true){
+            int numberOfLines = 0;
+            for (String item : rulesList){
+                float substringWidth = bf.getWidthPoint(item, potentialFontSize);
+                numberOfLines += Math.ceil(substringWidth/rulesRectangle.getWidth());
+            }
+            
+            float totalHeight = numberOfLines*potentialFontSize;
+            
+            // 0.65 used to fit text, found by brute Force.
+            // a better approach would be considering the actual rendered font height
+            if (totalHeight < (0.65*rulesRectangle.getHeight())){
+                break;
+            }
+            potentialFontSize -= 0.1f;
+        }
+        
+        String rules = "";
+        for (String item : rulesList){
+            rules += item+"\n";
+        }
+        
+        ct = new ColumnText(cb);
+        ct.setSimpleColumn(rulesRectangle);
+        Paragraph paragraph = new Paragraph(rules);
+        paragraph.setFont(new Font(bf, potentialFontSize));
+        ct.addElement(paragraph);
+        
         ct.go();
 
         doc.newPage();
     }
 
-    private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle) throws DocumentException, IOException {
-        addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1);
+    private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, String language, String country) throws DocumentException, IOException {
+        addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1, language, country);
     }
 
     private static void addFmcScrambleCutoutSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index) throws DocumentException, IOException {
@@ -1195,7 +1246,7 @@ class ScrambleRequest {
             }
 
             doc.open();
-            addGenericFmcSolutionSheet(docWriter, doc, globalTitle);
+            addGenericFmcSolutionSheet(docWriter, doc, globalTitle, "en", "US");
             doc.close();
 
             // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
@@ -1221,7 +1272,7 @@ class ScrambleRequest {
             parameters.setFileNameInZip(pdfFileName);
             zipOut.putNextEntry(null, parameters);
 
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
+            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, "en", "US");
             byte[] b = new byte[(int) pdfReader.getFileLength()];
             pdfReader.getSafeFile().readFully(b);
             zipOut.write(b);
@@ -1233,6 +1284,116 @@ class ScrambleRequest {
             zipOut.putNextEntry(null, parameters);
             zipOut.write(join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
             zipOut.closeEntry();
+                
+            parameters.setFileNameInZip("Internationalization/");
+            
+            ArrayList<String> availableLanguages = new ArrayList<String>();            
+            // TODO
+            // Jeremy, this is where the iteration over files can let internationalization easier to handle.
+            // The following lines must be replaced.
+            availableLanguages.add("MessagesBundle.properties");
+            availableLanguages.add("MessagesBundle_en_US.properties");
+            availableLanguages.add("MessagesBundle_pt_BR.properties");
+            
+            for (String item : availableLanguages) {
+                String[] temp = item.split("_|\\.");
+                
+                if (temp.length != 4) continue; // we are ignoring the properties.bundle and some eventual error
+                
+                String language = temp[1];
+                String country = temp[2];
+                
+                // fewest moves regular sheet
+                pdfFileName = "Internationalization/"+language+"_"+country+"_"+safeTitle+".pdf";
+                parameters.setFileNameInZip(pdfFileName);
+                zipOut.putNextEntry(null, parameters);
+
+                ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
+                Rectangle pageSize = PageSize.LETTER;
+                Document doc = new Document(pageSize, 0, 0, 75, 75);
+                PdfWriter docWriter = PdfWriter.getInstance(doc, pdfOut);
+
+                docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
+
+                doc.addCreationDate();
+                doc.addProducer();
+                if(globalTitle != null) {
+                    doc.addTitle(globalTitle);
+                }
+
+                doc.open();
+                for (int i=0; i<scrambleRequest.scrambles.length; i++){
+                    addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, language, country);
+                }
+                doc.close();
+
+                pdfReader = new PdfReader(pdfOut.toByteArray());
+                b = new byte[(int) pdfReader.getFileLength()];
+                pdfReader.getSafeFile().readFully(b);
+                zipOut.write(b);
+
+                zipOut.closeEntry();
+                
+                // Cutout sheet. Is this really necessary?
+                pdfFileName = "Internationalization/"+language+"_"+country+"_"+safeTitle+" Cutout Sheet.pdf";
+                parameters.setFileNameInZip(pdfFileName);
+                zipOut.putNextEntry(null, parameters);
+
+                pdfOut = new ByteArrayOutputStream();
+                pageSize = PageSize.LETTER;
+                doc = new Document(pageSize, 0, 0, 75, 75);
+                docWriter = PdfWriter.getInstance(doc, pdfOut);
+
+                docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
+
+                doc.addCreationDate();
+                doc.addProducer();
+                if(globalTitle != null) {
+                    doc.addTitle(globalTitle);
+                }
+
+                doc.open();
+                for (int i=0; i<scrambleRequest.scrambles.length; i++){
+                    addFmcScrambleCutoutSheet(docWriter, doc, scrambleRequest, globalTitle, i);
+                }
+                doc.close();
+
+                pdfReader = new PdfReader(pdfOut.toByteArray());
+                b = new byte[(int) pdfReader.getFileLength()];
+                pdfReader.getSafeFile().readFully(b);
+                zipOut.write(b);
+
+                zipOut.closeEntry();
+                
+                 // Generic sheet.
+                pdfFileName = "Internationalization/"+language+"_"+country+"_"+safeTitle+" Solution Sheet.pdf";
+                parameters.setFileNameInZip(pdfFileName);
+                zipOut.putNextEntry(null, parameters);
+
+                pdfOut = new ByteArrayOutputStream();
+                pageSize = PageSize.LETTER;
+                doc = new Document(pageSize, 0, 0, 75, 75);
+                docWriter = PdfWriter.getInstance(doc, pdfOut);
+
+                docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
+
+                doc.addCreationDate();
+                doc.addProducer();
+                if(globalTitle != null) {
+                    doc.addTitle(globalTitle);
+                }
+
+                doc.open(); // there's no need to generate 1 per round, since the fields can be filled
+                addGenericFmcSolutionSheet(docWriter, doc, globalTitle, language, country);
+                doc.close();
+
+                pdfReader = new PdfReader(pdfOut.toByteArray());
+                b = new byte[(int) pdfReader.getFileLength()];
+                pdfReader.getSafeFile().readFully(b);
+                zipOut.write(b);
+
+                zipOut.closeEntry();
+             }
         }
 
         String safeGlobalTitle = toFileSafeString(globalTitle);
@@ -1292,7 +1453,6 @@ class ScrambleRequest {
             totalPdfWriter.setEncryption(password.getBytes(), password.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
         }
 
-
         doc.open();
 
         PdfContentByte cb = totalPdfWriter.getDirectContent();
@@ -1319,7 +1479,7 @@ class ScrambleRequest {
             new PdfOutline(puzzleLink,
                     PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.title);
 
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest);
+            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, "en", "US");
             for(int j = 0; j < scrambleRequest.copies; j++) {
                 for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
                     PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
@@ -1332,5 +1492,4 @@ class ScrambleRequest {
         doc.close();
         return totalPdfOutput;
     }
-
 }
