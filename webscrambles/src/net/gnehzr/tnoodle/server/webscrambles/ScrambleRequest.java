@@ -53,10 +53,8 @@ import org.w3c.dom.svg.SVGDocument;
 import javax.servlet.ServletContext;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.awt.FontMetrics;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1287,7 +1285,7 @@ class ScrambleRequest {
                 
             parameters.setFileNameInZip("Internationalization/");
             
-            ArrayList<String> availableLanguages = new ArrayList<String>();            
+            ArrayList<String> availableLanguages = new ArrayList<String>();
             // TODO
             // Jeremy, this is where the iteration over files can let internationalization easier to handle.
             // The following lines must be replaced.
@@ -1298,7 +1296,9 @@ class ScrambleRequest {
             for (String item : availableLanguages) {
                 String[] temp = item.split("_|\\.");
                 
-                if (temp.length != 4) continue; // we are ignoring the properties.bundle and some eventual error
+                if (temp.length != 4){
+                	continue; // we are ignoring the properties.bundle and some eventual error
+                }
                 
                 String language = temp[1];
                 String country = temp[2];
@@ -1393,7 +1393,7 @@ class ScrambleRequest {
                 zipOut.write(b);
 
                 zipOut.closeEntry();
-             }
+            }
         }
 
         String safeGlobalTitle = toFileSafeString(globalTitle);
