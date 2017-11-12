@@ -1297,7 +1297,7 @@ class ScrambleRequest {
                 String[] temp = item.split("_|\\.");
                 
                 if (temp.length != 4){
-                	continue; // we are ignoring the properties.bundle and some eventual error
+                    continue;
                 }
                 
                 String language = temp[1];
