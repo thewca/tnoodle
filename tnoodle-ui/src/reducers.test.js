@@ -10,18 +10,16 @@ it('SET_PLANNED_GROUP_COUNT', () => {
   let wcaCompetitionJson = {
     events: [
       {
-        eventId: "333",
+        id: "333",
         rounds: [
           {
-            nthRound: 1,
-            roundId: "",
-            formatId: "",
+            id: "333-r1",
+            format: "",
             groups: [],
           },
           {
-            nthRound: 2,
-            roundId: "",
-            formatId: "a",
+            id: "333-r2",
+            format: "a",
             groups: [
               {
                 group: "a",
@@ -38,7 +36,7 @@ it('SET_PLANNED_GROUP_COUNT', () => {
     competitionJson: wcaCompetitionJson,
   };
 
-  let nextState = rootReducer(state, actions.setPlannedGroupCount('333-1', 3));
+  let nextState = rootReducer(state, actions.setPlannedGroupCount('333-r1', 3));
 
   expect(nextState.competitionJson.events[0].rounds[0].plannedGroupCount).toEqual(3);
 });

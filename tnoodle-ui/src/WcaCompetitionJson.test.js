@@ -1,47 +1,50 @@
-import { checkScrambles, normalizeCompetitionJson, getNextAvailableGroupName, getNextGroupName } from 'WcaCompetitionJson';
+import {
+  checkScrambles,
+  normalizeCompetitionJson,
+  getNextAvailableGroupName,
+  getNextGroupName,
+  parseActivityCode,
+  buildActivityCode,
+} from 'WcaCompetitionJson';
 
 it('checkScrambles finds missing scrambles', () => {
   let wcaCompetitionJson = {
     events: [
       {
-        eventId: "333",
+        id: "333",
         rounds: [
           {
-            nthRound: 1,
-            roundId: "",
-            formatId: "",
+            id: "333-r1",
+            format: "",
             groups: [],
           },
           {
-            nthRound: 2,
-            roundId: "",
-            formatId: "a",
+            id: "333-r2",
+            format: "a",
             groups: [
               {
-                group: "a",
+                group: "A",
                 scrambles: [ "1", "2", "3" ],
               },
             ],
           },
           {
-            nthRound: 3,
-            roundId: "",
-            formatId: "a",
+            id: "333-r3",
+            format: "a",
             groups: [
               {
-                group: "a",
+                group: "A",
                 scrambles: [ "1", "2", "3", "4", "5" ],
               },
             ],
           },
           {
-            nthRound: 4,
-            roundId: "",
-            formatId: "a",
+            id: "333-r4",
+            format: "a",
             plannedGroupCount: 2,
             groups: [
               {
-                group: "a",
+                group: "A",
                 scrambles: [ "1", "2", "3", "4", "5" ],
               },
             ],
@@ -49,18 +52,16 @@ it('checkScrambles finds missing scrambles', () => {
         ],
       },
       {
-        eventId: "222",
+        id: "222",
         rounds: [
           {
-            nthRound: 1,
-            roundId: "",
-            formatId: "a",
+            id: "222-r1",
+            format: "a",
             groups: [],
           },
           {
-            nthRound: 2,
-            roundId: "",
-            formatId: "a",
+            id: "222-r2",
+            format: "a",
             groups: null,
           },
         ],
@@ -73,46 +74,39 @@ it('checkScrambles finds missing scrambles', () => {
   expect(checkedScrambles).toEqual({
     finishedRounds: [
       {
-        eventId: "333",
-        nthRound: 3,
+        id: "333-r3",
         groupCount: 1,
         plannedGroupCount: 1,
       },
     ],
     groupsWithWrongNumberOfScrambles: [
       {
-        eventId: "333",
-        nthRound: 2,
-        group: "a",
+        id: "333-r2-gA",
         scrambleCount: 3,
         requiredScrambleCount: 5,
       },
     ],
     roundsWithMissingGroups: [
       {
-        eventId: "333",
-        nthRound: 4,
+        id: "333-r4",
         groupCount: 1,
         plannedGroupCount: 2,
       },
       {
-        eventId: "222",
-        nthRound: 1,
+        id: "222-r1",
         groupCount: 0,
         plannedGroupCount: 1,
       },
       {
-        eventId: "222",
-        nthRound: 2,
+        id: "222-r2",
         groupCount: 0,
         plannedGroupCount: 1,
       },
     ],
     warnings: [
       {
-        eventId: "333",
-        nthRound: 1,
-        message: "Missing or invalid formatId",
+        id: "333-r1",
+        message: "Missing or invalid format",
       },
     ],
   });
@@ -143,5 +137,28 @@ describe('getNextGroupName', () => {
 
   it('moves on to "AAA" after "ZZ"', () => {
     expect(getNextGroupName("ZZ")).toEqual("AAA");
+  });
+});
+
+describe('parseActivityCode and buildActivityCode', () => {
+  it('333 round 1', () => {
+    let activityCode = "333-r1";
+    let parsed = { eventId: "333", roundNumber: 1 };
+    expect(parseActivityCode(activityCode)).toEqual(parsed);
+    expect(buildActivityCode(parsed)).toEqual(activityCode);
+  });
+
+  it('333 round 1 group A', () => {
+    let activityCode = "333-r1-gA";
+    let parsed = { eventId: "333", roundNumber: 1, group: "A" };
+    expect(parseActivityCode(activityCode)).toEqual(parsed);
+    expect(buildActivityCode(parsed)).toEqual(activityCode);
+  });
+
+  it('333 group A', () => {
+    let activityCode = "333-gA";
+    let parsed = { eventId: "333", group: "A" };
+    expect(parseActivityCode(activityCode)).toEqual(parsed);
+    expect(buildActivityCode(parsed)).toEqual(activityCode);
   });
 });

@@ -21,7 +21,7 @@ export const originalCompetitionJsonAndHash = function(state=null, action) {
 
 export const competitionJson = function(state=null, action) {
   if(action.type === "FETCH_COMPETITION_JSON" && action.status === "success") {
-    return normalizeCompetitionJson(action.response.json);
+    return normalizeCompetitionJson(action.response);
   } else if(action.type === "SET_PLANNED_GROUP_COUNT") {
     let competitionJson = deepcopy(state);
     let round = getActivity(competitionJson, action.activityCode);

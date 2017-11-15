@@ -21,7 +21,7 @@ Then, run `yarn start` with the `REACT_APP_WCA_ORIGIN` and `REACT_APP_TNOODLE_AP
 For example:
 
 ```
-REACT_APP_WCA_ORIGIN=http://localhost:3000 REACT_APP_TNOODLE_APP_ID= yarn start
+REACT_APP_WCA_ORIGIN=http://localhost:3000 REACT_APP_TNOODLE_APP_ID=ddb5b6d20a48e01a4ee95a64bbd5151273dd6f6b5c622b13d19519530ba41658 yarn start
 ```
 
 ## Running tests

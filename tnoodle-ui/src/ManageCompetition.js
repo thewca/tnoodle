@@ -4,17 +4,16 @@ import pluralize from 'pluralize';
 
 import Layout from 'Layout';
 import * as actions from 'actions';
-import { checkScrambles, buildActivityCode } from 'WcaCompetitionJson';
+import { checkScrambles } from 'WcaCompetitionJson';
 import { fetchCompetitionJson } from 'actions';
 import { NavigationAwareComponent } from 'App';
 
 function RoundInfo({ round, dispatch }) {
-  let activityCode = buildActivityCode(round);
   return (
     <div>
-      {round.eventId} Round {round.nthRound} has {pluralize('group', round.groupCount, true)} generated
+      {round.id} has {pluralize('group', round.groupCount, true)} generated
       out of a planned <input type="number" value={round.plannedGroupCount} onChange={(e) => {
-        dispatch(actions.setPlannedGroupCount(activityCode, parseInt(e.target.value, 10)));
+        dispatch(actions.setPlannedGroupCount(round.id, parseInt(e.target.value, 10)));
       }} />.
     </div>
   );
@@ -24,9 +23,8 @@ function RoundList({ rounds, dispatch }) {
   return (
     <ul>
       {rounds.map(round => {
-        let activityCode = buildActivityCode(round);
         return (
-          <li key={activityCode}>
+          <li key={round.id}>
             <RoundInfo round={round} dispatch={dispatch} />
           </li>
         );
@@ -94,10 +92,9 @@ class ManageCompetition extends Component {
           <h2>Warnings</h2>
           <ul>
             {warnings.map(warning => {
-              let activityCode = buildActivityCode(warning);
               return (
-                <li key={activityCode}>
-                  {warning.eventId} Round {warning.nthRound}: {warning.message}
+                <li key={warning.id}>
+                  {warning.eventId} Round {warning.roundNumber}: {warning.message}
                 </li>
               );
             })}
@@ -109,7 +106,7 @@ class ManageCompetition extends Component {
     let enableSaveButton = JSON.stringify(originalCompetitionJsonAndHash.json) !== JSON.stringify(competitionJson);
 
     let promptClearScrambles = function() {
-      if(confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
+      if(window.confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
         dispatch(actions.clearCompetitionScrambles(competitionJson));
       }
     };

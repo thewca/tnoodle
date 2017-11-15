@@ -2,15 +2,20 @@ import _ from 'lodash';
 
 import deepcopy from 'deepcopy';
 
-export function formatIdToScrambleCount(formatId) {
+export function formatToScrambleCount(format) {
   // From https://github.com/thewca/worldcubeassociation.org/blob/master/WcaOnRails/db/seeds/formats.seeds.rb
-  return {
+  let scrambleCount = {
     "1": 1,
     "2": 2,
     "3": 3,
     "a": 5,
     "m": 3,
-  }[formatId];
+  }[format];
+  if(!scrambleCount) {
+    throw new Error(`Unrecognized format: ${format}`);
+  }
+
+  return scrambleCount;
 }
 
 const nextLetterInAlphabet = letter => {
@@ -45,13 +50,34 @@ export function getNextAvailableGroupName(usedGroupNames) {
 }
 
 export function parseActivityCode(activityCode) {
-  let [ eventId, nthRound, group ] = activityCode.split("-");
-  nthRound = parseInt(nthRound, 10);
-  return { eventId, nthRound, group };
+  let eventId, roundNumber, group;
+  let parts = activityCode.split("-");
+  eventId = parts.shift();
+
+  parts.forEach(part => {
+    let firstLetter = part[0];
+    let rest = part.substring(1);
+    if(firstLetter === "r") {
+      roundNumber = parseInt(rest, 10);
+    } else if(firstLetter === "g") {
+      group = rest;
+    } else {
+      throw new Error(`Unrecognized activity code part ${part}`);
+    }
+  });
+  return { eventId, roundNumber, group };
 }
 
 export function buildActivityCode(activity) {
-  return [ activity.eventId, activity.nthRound, activity.group ].filter(el => el).join("-");
+  let activityCode = activity.eventId;
+  if(activity.roundNumber) {
+    activityCode += "-r" + activity.roundNumber;
+  }
+  if(activity.group) {
+    activityCode += "-g" + activity.group;
+  }
+
+  return activityCode;
 }
 
 export function getActivity(wcaCompetitionJson, activityCode) {
@@ -60,12 +86,12 @@ export function getActivity(wcaCompetitionJson, activityCode) {
   if(!activity.eventId) {
     return wcaCompetitionJson;
   }
-  let event = wcaCompetitionJson.events.find(event => event.eventId === activity.eventId);
+  let event = wcaCompetitionJson.events.find(event => event.id === activity.eventId);
 
-  if(!activity.nthRound) {
+  if(!activity.roundNumber) {
     return event;
   }
-  let round = event.rounds.find(round => round.nthRound === activity.nthRound);
+  let round = event.rounds[activity.roundNumber - 1];
 
   if(!activity.group) {
     return round;
@@ -103,19 +129,14 @@ export function checkScrambles(wcaCompetitionJson) {
 
   wcaCompetitionJson.events.forEach(wcaEvent => {
     wcaEvent.rounds.forEach(wcaRound => {
-      if(!wcaRound.nthRound) {
-        checked.warnings.push({
-          eventId: wcaEvent.eventId,
-          message: "Missing nthRound",
-        });
-        return;
-      }
+      let eventId = wcaEvent.id;
+      let { roundNumber } = parseActivityCode(wcaRound.id);
 
-      if(!wcaRound.formatId) {
+      if(!wcaRound.format) {
         checked.warnings.push({
-          eventId: wcaEvent.eventId,
-          nthRound: wcaRound.nthRound,
-          message: "Missing or invalid formatId",
+          id: buildActivityCode({ eventId, roundNumber }),
+
+          message: "Missing or invalid format",
         });
         return;
       }
@@ -123,8 +144,7 @@ export function checkScrambles(wcaCompetitionJson) {
       let roundScramblesPerfect = true;
       if(wcaRound.groups.length < wcaRound.plannedGroupCount) {
         checked.roundsWithMissingGroups.push({
-          eventId: wcaEvent.eventId,
-          nthRound: wcaRound.nthRound,
+          id: buildActivityCode({ eventId, roundNumber }),
           groupCount: wcaRound.groups.length,
           plannedGroupCount: wcaRound.plannedGroupCount,
         });
@@ -132,10 +152,12 @@ export function checkScrambles(wcaCompetitionJson) {
       }
 
       wcaRound.groups.forEach(wcaGroup => {
-        if(!wcaGroup.group) {
+        let { group } = wcaGroup;
+
+        if(!group) {
           checked.warnings.push({
-            eventId: wcaEvent.eventId,
-            nthRound: wcaRound.nthRound,
+            id: buildActivityCode({ eventId, roundNumber }),
+
             message: "Group has no group name",
           });
           roundScramblesPerfect = false;
@@ -143,12 +165,10 @@ export function checkScrambles(wcaCompetitionJson) {
         }
 
         let scrambleCount = wcaGroup.scrambles.length;
-        let requiredScrambleCount = formatIdToScrambleCount(wcaRound.formatId);
+        let requiredScrambleCount = formatToScrambleCount(wcaRound.format);
         if(scrambleCount !== requiredScrambleCount) {
           checked.groupsWithWrongNumberOfScrambles.push({
-            eventId: wcaEvent.eventId,
-            nthRound: wcaRound.nthRound,
-            group: wcaGroup.group,
+            id: buildActivityCode({ eventId, roundNumber, group }),
 
             scrambleCount,
             requiredScrambleCount,
@@ -160,8 +180,7 @@ export function checkScrambles(wcaCompetitionJson) {
 
       if(roundScramblesPerfect) {
         checked.finishedRounds.push({
-          eventId: wcaEvent.eventId,
-          nthRound: wcaRound.nthRound,
+          id: buildActivityCode({ eventId, roundNumber }),
           groupCount: wcaRound.groups.length,
           plannedGroupCount: wcaRound.plannedGroupCount,
         });

@@ -1,6 +1,6 @@
 import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
-import { buildActivityCode, getActivity, formatIdToScrambleCount, getNextAvailableGroupName } from 'WcaCompetitionJson';
+import { parseActivityCode, getActivity, formatToScrambleCount, getNextAvailableGroupName } from 'WcaCompetitionJson';
 
 const scrambler = new tnoodle.Scrambler('localhost', '2014');
 
@@ -36,7 +36,8 @@ export function generateMissingScrambles(rounds) {
     let state = getState();
     let competitionJson = state.competitionJson;
     rounds.forEach(round => {
-      let activityCode = buildActivityCode(round);
+      let activityCode = round.id;
+      let { eventId } = parseActivityCode(activityCode);
       let wcaRound = getActivity(competitionJson, activityCode);
       let groupsToGenerateCount = wcaRound.plannedGroupCount - wcaRound.groups.length;
       let usedGroupNames = wcaRound.groups.map(wcaGroup => wcaGroup.group);
@@ -44,7 +45,7 @@ export function generateMissingScrambles(rounds) {
       for(let i = 0; i < groupsToGenerateCount; i++) {
         namesOfGroupsToGenerate.push(getNextAvailableGroupName(usedGroupNames.concat(namesOfGroupsToGenerate)));
       }
-      let scramblesPerGroup = formatIdToScrambleCount(wcaRound.formatId);
+      let scramblesPerGroup = formatToScrambleCount(wcaRound.format);
       namesOfGroupsToGenerate.forEach(groupName => {
         scrambler.loadScrambles(scrambles => {
           dispatch({
@@ -53,7 +54,7 @@ export function generateMissingScrambles(rounds) {
             groupName,
             scrambles,
           });
-        }, round.eventId, null, scramblesPerGroup);
+        }, eventToTNoodlePuzzle(eventId), null, scramblesPerGroup);
       });
     });
   };
@@ -67,20 +68,20 @@ export function setPlannedGroupCount(activityCode, plannedGroupCount) {
   };
 }
 
+function eventToTNoodlePuzzle(eventId) {
+  let puzzByEvent = {
+    "333bf": "333ni",
+    "333oh": "333",
+    "333fm": "333fm",
+    "333ft": "333",
+    "444bf": "444ni",
+    "555bf": "555ni",
+    "333mbf": "333ni",
+  };
+  return puzzByEvent[eventId] || eventId;
+}
 
 function competitionJsonToTNoodleScrambleRequest(competitionJson) {
-  function eventToPuzzle(eventId) {
-    let puzzByEvent = {
-      "333bf": "333ni",
-      "333oh": "333",
-      "333fm": "333fm",
-      "333ft": "333",
-      "444bf": "444ni",
-      "555bf": "555ni",
-      "333mbf": "333ni",
-    };
-    return puzzByEvent[eventId] || eventId;
-  }
   function isFmc(eventId) {
     // Does this eventId end in "fm"?
     return !!eventId.match(/.*fm$/);
@@ -89,22 +90,23 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
   let scrambleRequest = [];
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
+      let { roundNumber } = parseActivityCode(round.id);
       round.groups.forEach(group => {
         let scrambles = group.scrambles;
         let extraScrambles = group.extraScrambles;
         let copies = 1;//<<<
-        let scrambler = eventToPuzzle(event.eventId);
-        let title = `Round ${round.nthRound} Group ${group.group}`;
+        let scrambler = eventToTNoodlePuzzle(event.id);
+        let title = `${event.id} Round ${roundNumber} Group ${group.group}`;
         let request = {
           scrambles: scrambles,
           extraScrambles: extraScrambles,
           copies,
           scrambler,
           title,
-          fmc: isFmc(event.eventId),
+          fmc: isFmc(event.id),
 
-          event: event.eventId,
-          round: round.nthRound,
+          event: event.id,
+          round: round.roundNumber,
           group: group.group,
         };
         scrambleRequest.push(request);
@@ -120,7 +122,7 @@ export function downloadScrambles(asPdf, password) {
     let competitionJson = state.competitionJson;
 
     let request = competitionJsonToTNoodleScrambleRequest(competitionJson);
-    let title = `Scrambles for ${competitionJson.competitionId}`;
+    let title = `Scrambles for ${competitionJson.id}`;
     if(asPdf) {
       scrambler.showPdf(title, request, password, '_blank');
     } else {
