@@ -1267,10 +1267,11 @@ class ScrambleRequest {
             zipOut.putNextEntry(null, parameters);
             zipOut.write(join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
             zipOut.closeEntry();
-                
-        	if (!scrambleRequest.fmc){ // i18n is only for fmc
-        		continue;
-        	}
+            
+            // i18n is only for fmc
+            if (!scrambleRequest.fmc){
+                continue;
+            }
             
             ArrayList<String> availableLanguages = new ArrayList<String>();
             // TODO
@@ -1281,7 +1282,7 @@ class ScrambleRequest {
             availableLanguages.add("MessagesBundle_pt_BR.properties");
             
             for (String item : availableLanguages) {
-            	            	
+            
                 String[] temp = item.split("_|\\.");
                 
                 if (temp.length != 4){
