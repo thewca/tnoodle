@@ -828,7 +828,7 @@ class ScrambleRequest {
                 potentialFontSize = minFontSize;
                 break;
             }
-        }    
+        }
         return potentialFontSize;
     }
 
