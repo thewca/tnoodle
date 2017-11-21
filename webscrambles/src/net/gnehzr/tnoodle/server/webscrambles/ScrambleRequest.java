@@ -1268,6 +1268,10 @@ class ScrambleRequest {
             zipOut.write(join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
             zipOut.closeEntry();
                 
+        	if (!scrambleRequest.fmc){ // i18n is only for fmc
+        		continue;
+        	}
+            
             ArrayList<String> availableLanguages = new ArrayList<String>();
             // TODO
             // Jeremy, this is where the iteration over files can let internationalization easier to handle.
@@ -1277,6 +1281,7 @@ class ScrambleRequest {
             availableLanguages.add("MessagesBundle_pt_BR.properties");
             
             for (String item : availableLanguages) {
+            	            	
                 String[] temp = item.split("_|\\.");
                 
                 if (temp.length != 4){
