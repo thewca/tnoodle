@@ -219,7 +219,7 @@ class ScrambleRequest {
         return scrambleRequests;
     }
 
-    private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest, String language, String country) throws DocumentException, IOException {
+    private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest, Locale locale) throws DocumentException, IOException {
         // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -243,7 +243,7 @@ class ScrambleRequest {
                 attemptRequest.fmc = false;
                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
 
-                PdfReader pdfReader = createPdf(globalTitle, creationDate, attemptRequest, language, country);
+                PdfReader pdfReader = createPdf(globalTitle, creationDate, attemptRequest, locale);
                 for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
                     PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
                     totalPdfWriter.addPage(page);
@@ -269,7 +269,7 @@ class ScrambleRequest {
 
         doc.open();
         // Note that we ignore scrambleRequest.copies here.
-        addScrambles(docWriter, doc, scrambleRequest, globalTitle, language, country);
+        addScrambles(docWriter, doc, scrambleRequest, globalTitle, locale);
         doc.close();
 
         // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
@@ -346,10 +346,10 @@ class ScrambleRequest {
 //      return ps.getReader();
     }
 
-    private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, String language, String country) throws DocumentException, IOException {
+    private static void addScrambles(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, Locale locale) throws DocumentException, IOException {
         if(scrambleRequest.fmc) {
             for(int i = 0; i < scrambleRequest.scrambles.length; i++) {
-                addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, language, country);
+                addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, locale);
             }
         } else {
             Rectangle pageSize = doc.getPageSize();
@@ -420,12 +420,12 @@ class ScrambleRequest {
         doc.newPage();
     }
 
-    private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index, String language, String country) throws DocumentException, IOException {
+    private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index, Locale locale) throws DocumentException, IOException {
         
         // internationalization
         Locale currentLocale;
         ResourceBundle messages;
-        currentLocale = new Locale(language, country);
+        currentLocale = new Locale(locale.getLanguage(), locale.getCountry());
         messages = ResourceBundle.getBundle("net.gnehzr.tnoodle.server.webscrambles.Internationalization.MessagesBundle", currentLocale);
         
         boolean withScramble = index != -1;
@@ -688,29 +688,9 @@ class ScrambleRequest {
         int rulesTop = competitorInfoBottom + (withScramble ? 55 : 143);
         Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop);
         
-        float potentialFontSize = 15f;
-        // resize rules vertically
-        while (true){
-            int numberOfLines = 0;
-            for (String item : rulesList){
-                float substringWidth = bf.getWidthPoint(item, potentialFontSize);
-                numberOfLines += Math.ceil(substringWidth/rulesRectangle.getWidth());
-            }
-            
-            float totalHeight = numberOfLines*potentialFontSize;
-            
-            // 0.65 used to fit text, found by brute Force.
-            // a better approach would be considering the actual rendered font height
-            if (totalHeight < (0.65*rulesRectangle.getHeight())){
-                break;
-            }
-            potentialFontSize -= 0.1f;
-        }
+        String rules = String.join("\n", rulesList);
         
-        String rules = "";
-        for (String item : rulesList){
-            rules += item+"\n";
-        }
+        float potentialFontSize = fitText(new Font(bf), rules, rulesRectangle, 15f, true);
         
         ct = new ColumnText(cb);
         ct.setSimpleColumn(rulesRectangle);
@@ -723,8 +703,8 @@ class ScrambleRequest {
         doc.newPage();
     }
 
-    private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, String language, String country) throws DocumentException, IOException {
-        addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1, language, country);
+    private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, Locale locale) throws DocumentException, IOException {
+        addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1, locale);
     }
 
     private static void addFmcScrambleCutoutSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index) throws DocumentException, IOException {
@@ -825,7 +805,7 @@ class ScrambleRequest {
             potentialFontSize = (maxFontSize + minFontSize) / 2.0f;
             font.setSize(potentialFontSize);
 
-            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(text, font, rect.getWidth());
+            LinkedList<Chunk> lineChunks = splitTextToLineChunks(text, font, rect.getWidth());
             if(!newlinesAllowed && lineChunks.size() > 1) {
                 // If newlines are not allowed, and we had to split the text into more than
                 // one line, then potentialFontSize is too large.
@@ -833,7 +813,9 @@ class ScrambleRequest {
             } else {
                 // The font size seems to be a pretty good estimate for how
                 // much vertical space a row actually takes up.
-                float totalHeight = lineChunks.size() * potentialFontSize;
+                
+                // 1.5 due line spacing
+                float totalHeight = 1.5f * lineChunks.size() * potentialFontSize;
                 if(totalHeight < rect.getHeight()) {
                     minFontSize = potentialFontSize;
                 } else {
@@ -846,94 +828,97 @@ class ScrambleRequest {
                 potentialFontSize = minFontSize;
                 break;
             }
-        }
+        }    
         return potentialFontSize;
     }
 
-    private static LinkedList<Chunk> splitScrambleToLineChunks(String paddedScramble, Font scrambleFont, float scrambleColumnWidth) {
+    private static LinkedList<Chunk> splitTextToLineChunks(String text, Font scrambleFont, float scrambleColumnWidth) {
         float availableScrambleWidth = scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL;
 
-        int startIndex = 0;
-        int endIndex = 0;
         LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
-        while(startIndex < paddedScramble.length()) {
-            // Walk forwards until we've grabbed the maximum number of characters
-            // that fit in a line, we've run out of characters, or we hit a newline.
-            float substringWidth;
-            for(endIndex++; endIndex <= paddedScramble.length(); endIndex++) {
-                if(paddedScramble.charAt(endIndex - 1) == '\n') {
-                    break;
-                }
-                String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
-                substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
-                if(substringWidth > availableScrambleWidth) {
-                    break;
-                }
-            }
-            // endIndex is one past the best fit, so remove one character and it should fit!
-            endIndex--;
-
-            // If we're not at the end of the scramble, make sure we're not cutting
-            // a turn in half by walking backwards until we're right before a turn.
-            // Any spaces added for padding after a turn are considered part of
-            // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
-            int perfectFitEndIndex = endIndex;
-            if(endIndex < paddedScramble.length()) {
-                while(true) {
-                    if(endIndex < startIndex) {
-                        // We walked all the way to the beginning of the line
-                        // without finding a good breaking point. Give up and break
-                        // in the middle of a turn =(.
-                        endIndex = perfectFitEndIndex;
+        String[] lineList = text.split("\n");
+        
+        for (String line:lineList){
+            int startIndex = 0;
+            int endIndex = 0;
+            while(startIndex < line.length()) {
+                // Walk forwards until we've grabbed the maximum number of characters
+                // that fit in a line, we've run out of characters, or we hit a newline.
+                float substringWidth;
+                for(endIndex++; endIndex <= line.length(); endIndex++) {
+                    String scrambleSubstring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
+                    substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
+                    if(substringWidth > availableScrambleWidth) {
                         break;
                     }
-
-                    // Another dirty hack for sq1: turns only line up
-                    // nicely if every line starts with a (x,y). We ensure this
-                    // by forcing every line to end with a /.
-                    boolean isSquareOne = paddedScramble.indexOf('/') >= 0;
-                    if(isSquareOne) {
-                        char previousCharacter = paddedScramble.charAt(endIndex - 1);
-                        if(previousCharacter == '/') {
-                            break;
-                        }
-                    } else {
-                        char currentCharacter = paddedScramble.charAt(endIndex);
-                        boolean isTurnCharacter = currentCharacter != ' ';
-                        if(!isTurnCharacter || currentCharacter == '\n') {
-                            break;
-                        }
-                    }
-                    endIndex--;
                 }
+                // endIndex is one past the best fit, so remove one character and it should fit!
+                endIndex--;
+    
+                // If we're not at the end of the scramble, make sure we're not cutting
+                // a turn in half by walking backwards until we're right before a turn.
+                // Any spaces added for padding after a turn are considered part of
+                // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
+                int perfectFitEndIndex = endIndex;
+                if(endIndex < line.length()) {
+                    while(true) {
+                        if(endIndex < startIndex) {
+                            // We walked all the way to the beginning of the line
+                            // without finding a good breaking point. Give up and break
+                            // in the middle of a turn =(.
+                            endIndex = perfectFitEndIndex;
+                            break;
+                        }
+    
+                        // Another dirty hack for sq1: turns only line up
+                        // nicely if every line starts with a (x,y). We ensure this
+                        // by forcing every line to end with a /.
+                        boolean isSquareOne = line.indexOf('/') >= 0;
+                        if(isSquareOne) {
+                            char previousCharacter = line.charAt(endIndex - 1);
+                            if(previousCharacter == '/') {
+                                break;
+                            }
+                        } else {
+                            char currentCharacter = line.charAt(endIndex);
+                            boolean isTurnCharacter = currentCharacter != ' ';
+                            if(!isTurnCharacter) {
+                                break;
+                            }
+                        }
+                        endIndex--;
+                    }
+                }
+    
+                String scrambleSubstring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
+    
+                // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
+                // space as is available on a line.
+                do {
+                    scrambleSubstring += NON_BREAKING_SPACE;
+                    substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
+                } while(substringWidth <= availableScrambleWidth);
+                // scrambleSubstring is now too big for our line, so remove the
+                // last character.
+                scrambleSubstring = scrambleSubstring.substring(0, scrambleSubstring.length() - 1);
+    
+    
+                // Walk past all whitespace that comes immediately after the line wrap
+                // we are about to insert.
+                while(endIndex < line.length() && (line.charAt(endIndex) == ' ')) {
+                    endIndex++;
+                }
+                startIndex = endIndex;
+                Chunk lineChunk = new Chunk(scrambleSubstring);
+                lineChunks.add(lineChunk);
+                lineChunk.setFont(scrambleFont);
+    
+                // Force a line wrap!
+                lineChunk.append("\n");
             }
-
-            String scrambleSubstring = NON_BREAKING_SPACE + paddedScramble.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
-
-            // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
-            // space as is available on a line.
-            do {
-                scrambleSubstring += NON_BREAKING_SPACE;
-                substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
-            } while(substringWidth <= availableScrambleWidth);
-            // scrambleSubstring is now too big for our line, so remove the
-            // last character.
-            scrambleSubstring = scrambleSubstring.substring(0, scrambleSubstring.length() - 1);
-
-
-            // Walk past all whitespace that comes immediately after the line wrap
-            // we are about to insert.
-            while(endIndex < paddedScramble.length() && (paddedScramble.charAt(endIndex) == ' ' || paddedScramble.charAt(endIndex) == '\n' )) {
-                endIndex++;
-            }
-            startIndex = endIndex;
-            Chunk lineChunk = new Chunk(scrambleSubstring);
-            lineChunks.add(lineChunk);
-            lineChunk.setFont(scrambleFont);
-
-            // Force a line wrap!
-            lineChunk.append("\n");
         }
+        
+//        for (Chunk c : lineChunks) System.out.println(c); // print chunks to check
 
         return lineChunks;
     }
@@ -1025,7 +1010,7 @@ class ScrambleRequest {
 
             Phrase scramblePhrase = new Phrase();
             int nthLine = 1;
-            LinkedList<Chunk> lineChunks = splitScrambleToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
+            LinkedList<Chunk> lineChunks = splitTextToLineChunks(paddedScramble, scrambleFont, scrambleColumnWidth);
             if(lineChunks.size() >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
                 highlight = true;
             }
@@ -1244,7 +1229,7 @@ class ScrambleRequest {
             }
 
             doc.open();
-            addGenericFmcSolutionSheet(docWriter, doc, globalTitle, "en", "US");
+            addGenericFmcSolutionSheet(docWriter, doc, globalTitle, new Locale("en", "US"));
             doc.close();
 
             // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
@@ -1270,7 +1255,7 @@ class ScrambleRequest {
             parameters.setFileNameInZip(pdfFileName);
             zipOut.putNextEntry(null, parameters);
 
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, "en", "US");
+            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, new Locale("en", "US"));
             byte[] b = new byte[(int) pdfReader.getFileLength()];
             pdfReader.getSafeFile().readFully(b);
             zipOut.write(b);
@@ -1283,8 +1268,6 @@ class ScrambleRequest {
             zipOut.write(join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
             zipOut.closeEntry();
                 
-            parameters.setFileNameInZip("Internationalization/");
-            
             ArrayList<String> availableLanguages = new ArrayList<String>();
             // TODO
             // Jeremy, this is where the iteration over files can let internationalization easier to handle.
@@ -1302,9 +1285,10 @@ class ScrambleRequest {
                 
                 String language = temp[1];
                 String country = temp[2];
+                Locale locale = new Locale(language, country);
                 
                 // fewest moves regular sheet
-                pdfFileName = "Internationalization/"+language+"_"+country+"_"+safeTitle+".pdf";
+                pdfFileName = "pdf/translations/"+language+"_"+country+"_"+safeTitle+".pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1323,7 +1307,7 @@ class ScrambleRequest {
 
                 doc.open();
                 for (int i=0; i<scrambleRequest.scrambles.length; i++){
-                    addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, language, country);
+                    addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, locale);
                 }
                 doc.close();
 
@@ -1335,7 +1319,7 @@ class ScrambleRequest {
                 zipOut.closeEntry();
                 
                 // Cutout sheet. Is this really necessary?
-                pdfFileName = "Internationalization/"+language+"_"+country+"_"+safeTitle+" Cutout Sheet.pdf";
+                pdfFileName = "pdf/translations/"+language+"_"+country+"_"+safeTitle+" Cutout Sheet.pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1366,7 +1350,7 @@ class ScrambleRequest {
                 zipOut.closeEntry();
                 
                  // Generic sheet.
-                pdfFileName = "Internationalization/"+language+"_"+country+"_"+safeTitle+" Solution Sheet.pdf";
+                pdfFileName = "pdf/translations/"+language+"_"+country+"_"+safeTitle+" Solution Sheet.pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1384,7 +1368,7 @@ class ScrambleRequest {
                 }
 
                 doc.open(); // there's no need to generate 1 per round, since the fields can be filled
-                addGenericFmcSolutionSheet(docWriter, doc, globalTitle, language, country);
+                addGenericFmcSolutionSheet(docWriter, doc, globalTitle, locale);
                 doc.close();
 
                 pdfReader = new PdfReader(pdfOut.toByteArray());
@@ -1479,7 +1463,7 @@ class ScrambleRequest {
             new PdfOutline(puzzleLink,
                     PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.title);
 
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, "en", "US");
+            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, new Locale("en", "US"));
             for(int j = 0; j < scrambleRequest.copies; j++) {
                 for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
                     PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
