@@ -785,12 +785,12 @@ class ScrambleRequest {
      */
     private static final float FITTEXT_FONTSIZE_PRECISION = 0.1f;
     private static float fitText(Font font, String text, Rectangle rect, float maxFontSize, boolean newlinesAllowed, float leadingMultiplier) {
-    	
-    	// ideally, we could pass the object in which our text is going to be rendered
-    	// as argument instead of asking leadingMultiplier, but we are currently rendering
-    	// text in pdfcell, columntext and others
-    	// it'd be painful to render lines in a common object to ask leadingMultiplier
-    	
+        
+        // ideally, we could pass the object in which our text is going to be rendered
+        // as argument instead of asking leadingMultiplier, but we are currently rendering
+        // text in pdfcell, columntext and others
+        // it'd be painful to render lines in a common object to ask leadingMultiplier
+        
         float minFontSize = 1f;
         float potentialFontSize;
         
