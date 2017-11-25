@@ -55,6 +55,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1267,19 +1268,12 @@ class ScrambleRequest {
                 continue;
             }
             
-            ArrayList<String> availableLanguages = new ArrayList<String>();
-            // TODO
-            // Jeremy, this is where the iteration over files can let internationalization easier to handle.
-            // The following lines must be replaced.
-            availableLanguages.add("MessagesBundle.properties");
-            availableLanguages.add("MessagesBundle_en_US.properties");
-            availableLanguages.add("MessagesBundle_pt_BR.properties");
-            
-            for (String item : availableLanguages) {
-            
-                String[] temp = item.split("_|\\.");
+            File i18nDir = new File(Utils.getResourceDirectory(), "net/gnehzr/tnoodle/server/webscrambles/Internationalization");
+            File[] propertiesFiles = i18nDir.listFiles();
+            for(File propertyFile : propertiesFiles) {
+                String[] temp = propertyFile.getName().split("_|\\.");
                 
-                if (temp.length != 4){
+                if(temp.length != 4) {
                     continue;
                 }
                 
