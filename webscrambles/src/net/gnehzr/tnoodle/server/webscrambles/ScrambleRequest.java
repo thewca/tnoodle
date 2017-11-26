@@ -709,7 +709,7 @@ class ScrambleRequest {
         int height = top - bottom;
         int width = right - left;
 
-        int fontSize = 12;
+        float fontSize = 12;
         int padding = 90;
         int marginBottom = 10;
         int offsetTop = 27;
@@ -752,9 +752,9 @@ class ScrambleRequest {
                 title = globalTitle + " - " + scrambleRequest.title + ":";
             }
             
-            fontSize = (int)fitText(new Font(bfBold), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
+            fontSize = fitText(new Font(bfBold), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
 
-            cb.setFontAndSize(bfBold, fontSize); // TODO: Dynamic font size: #235
+            cb.setFontAndSize(bfBold, fontSize);
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, title, left, top - offsetTop, 0);
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + ":", left, top - offsetTop, 0);
             cb.endText();
