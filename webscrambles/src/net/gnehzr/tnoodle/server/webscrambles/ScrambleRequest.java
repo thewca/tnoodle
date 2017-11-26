@@ -91,6 +91,7 @@ class ScrambleRequest {
     private static final int SCRAMBLE_PADDING_VERTICAL_TOP = 3;
     private static final int SCRAMBLE_PADDING_VERTICAL_BOTTOM = 6;
     private static final int SCRAMBLE_PADDING_HORIZONTAL = 1;
+    private static final int TEXT_PADDING_HORIZONTAL = 1;
 
     private static final int MAX_COUNT = 100;
     private static final int MAX_COPIES = 100;
@@ -425,7 +426,7 @@ class ScrambleRequest {
         
         // internationalization
         Locale currentLocale = new Locale(locale.getLanguage(), locale.getCountry());
-        ResourceBundle messages = ResourceBundle.getBundle("net.gnehzr.tnoodle.server.webscrambles.Internationalization.MessagesBundle", currentLocale);
+        ResourceBundle messages = ResourceBundle.getBundle("net.gnehzr.tnoodle.server.webscrambles.Internationalization.MessagesBundle", currentLocale, new UTF8Control());
         
         boolean withScramble = index != -1;
         Rectangle pageSize = doc.getPageSize();
@@ -681,7 +682,7 @@ class ScrambleRequest {
         doc.newPage();
     }
     
-    private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align){
+    private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align) {
         cb.beginText();
         cb.setFontAndSize(bf, fitText(new Font(bf), text, new Rectangle((int)rect.getRight(), (int)rect.getTop()), maxFontSize, false, 1));
         cb.showTextAligned(align, text, (int)rect.getLeft(), (int)rect.getBottom(), 0);
@@ -826,31 +827,31 @@ class ScrambleRequest {
         return potentialFontSize;
     }
 
-    private static LinkedList<Chunk> splitTextToLineChunks(String text, Font scrambleFont, float scrambleColumnWidth) {
-        float availableScrambleWidth = scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL;
+    private static LinkedList<Chunk> splitTextToLineChunks(String text, Font font, float textColumnWidth) {
+        float availableTextWidth = textColumnWidth - 2*TEXT_PADDING_HORIZONTAL;
 
         LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
         String[] lineList = text.split("\n");
         
-        for (String line:lineList){
+        for (String line:lineList) {
             int startIndex = 0;
             int endIndex = 0;
             while(startIndex < line.length()) {
                 // Walk forwards until we've grabbed the maximum number of characters
-                // that fit in a line, we've run out of characters, or we hit a newline.
+                // that fit in a line or we've run out of characters.
                 float substringWidth;
                 for(endIndex++; endIndex <= line.length(); endIndex++) {
-                    String scrambleSubstring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
-                    substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
-                    if(substringWidth > availableScrambleWidth) {
+                    String substring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
+                    substringWidth = font.getBaseFont().getWidthPoint(substring, font.getSize());
+                    if(substringWidth > availableTextWidth) {
                         break;
                     }
                 }
                 // endIndex is one past the best fit, so remove one character and it should fit!
                 endIndex--;
     
-                // If we're not at the end of the scramble, make sure we're not cutting
-                // a turn in half by walking backwards until we're right before a turn.
+                // If we're not at the end of the text, make sure we're not cutting
+                // a word (or turn) in half by walking backwards until we're right before a turn.
                 // Any spaces added for padding after a turn are considered part of
                 // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
                 int perfectFitEndIndex = endIndex;
@@ -859,7 +860,7 @@ class ScrambleRequest {
                         if(endIndex < startIndex) {
                             // We walked all the way to the beginning of the line
                             // without finding a good breaking point. Give up and break
-                            // in the middle of a turn =(.
+                            // in the middle of a word =(.
                             endIndex = perfectFitEndIndex;
                             break;
                         }
@@ -884,18 +885,17 @@ class ScrambleRequest {
                     }
                 }
     
-                String scrambleSubstring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
+                String substring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
     
-                // Add NON_BREAKING_SPACE until the scrambleSubstring takes up as much as
+                // Add NON_BREAKING_SPACE until the substring takes up as much as
                 // space as is available on a line.
                 do {
-                    scrambleSubstring += NON_BREAKING_SPACE;
-                    substringWidth = scrambleFont.getBaseFont().getWidthPoint(scrambleSubstring, scrambleFont.getSize());
-                } while(substringWidth <= availableScrambleWidth);
-                // scrambleSubstring is now too big for our line, so remove the
+                    substring += NON_BREAKING_SPACE;
+                    substringWidth = font.getBaseFont().getWidthPoint(substring, font.getSize());
+                } while(substringWidth <= availableTextWidth);
+                // substring is now too big for our line, so remove the
                 // last character.
-                scrambleSubstring = scrambleSubstring.substring(0, scrambleSubstring.length() - 1);
-    
+                substring = substring.substring(0, substring.length() - 1);
     
                 // Walk past all whitespace that comes immediately after the line wrap
                 // we are about to insert.
@@ -903,9 +903,9 @@ class ScrambleRequest {
                     endIndex++;
                 }
                 startIndex = endIndex;
-                Chunk lineChunk = new Chunk(scrambleSubstring);
+                Chunk lineChunk = new Chunk(substring);
                 lineChunks.add(lineChunk);
-                lineChunk.setFont(scrambleFont);
+                lineChunk.setFont(font);
     
                 // Force a line wrap!
                 lineChunk.append("\n");
@@ -1264,7 +1264,7 @@ class ScrambleRequest {
             zipOut.closeEntry();
             
             // i18n is only for fmc
-            if (!scrambleRequest.fmc){
+            if (!scrambleRequest.fmc) {
                 continue;
             }
             
@@ -1300,7 +1300,7 @@ class ScrambleRequest {
                 }
 
                 doc.open();
-                for (int i=0; i<scrambleRequest.scrambles.length; i++){
+                for (int i=0; i<scrambleRequest.scrambles.length; i++) {
                     addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, locale);
                 }
                 doc.close();
