@@ -745,15 +745,21 @@ class ScrambleRequest {
         final int scramblesPerSheet = 8;
         for (int y = 0; y < scramblesPerSheet; y++) {
             cb.beginText();
-            cb.setFontAndSize(bfBold, fontSize); // TODO: Dynamic font size: #235
+            String title = "";
             if(scrambleRequest.scrambles.length > 1) {
-                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length + ":", left, top - offsetTop, 0);
+                title = globalTitle + " - " + scrambleRequest.title + " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length + ":";
             } else {
-                cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + ":", left, top - offsetTop, 0);
+                title = globalTitle + " - " + scrambleRequest.title + ":";
             }
-            offsetTop += fontSize + marginBottom;
-            cb.endText();
+            
+            fontSize = (int)fitText(new Font(bfBold), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
 
+            cb.setFontAndSize(bfBold, fontSize); // TODO: Dynamic font size: #235
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, title, left, top - offsetTop, 0);
+            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + ":", left, top - offsetTop, 0);
+            cb.endText();
+            offsetTop += fontSize + marginBottom;
+            
             cb.beginText();
             cb.setFontAndSize(bf, scrambleFontSize);
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scramble, left, top - offsetTop, 0);
