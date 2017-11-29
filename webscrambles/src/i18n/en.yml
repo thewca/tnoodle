@@ -1,0 +1,25 @@
+en:
+    fmc:
+        scramble: Scramble
+        round: Round
+        of: of
+        attempt: Attempt
+        competitor: Competitor
+        warning: DO NOT FILL IF YOU ARE THE COMPETITOR.
+        event: Fewest Moves
+        graded: Graded by
+        result: Result
+
+        rule1: Notate your solution by writing one move per bar.
+        rule2: To delete moves, clearly erase or blacken them.
+        rule3: Face moves F, B, R, L, U, and D are clockwise.
+        rule4: Rotations x, y, and z follow R, U, and F.
+        rule5: "' inverts a move; 2 doubles a move. (e.g.: U', U2)"
+        rule6: "w makes a face move into two layers. (e.g.: Uw)"
+        rule7: "A [lowercase] move is a cube rotation. (e.g.: [u])"
+        rule8: You have 1 hour to find a solution.
+        rule9: Your solution length will be counted in OBTM.
+        rule10: Your solution must be at most %s moves, including rotations.
+        rule11: Your solution must not be directly derived from any part of the scrambling algorithm.
+
+        scrambleOnSeparateSheet: Please see separate sheet for scrambles.

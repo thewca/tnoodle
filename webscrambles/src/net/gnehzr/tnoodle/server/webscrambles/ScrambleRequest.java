@@ -55,7 +55,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -70,7 +69,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,6 +76,7 @@ import java.util.regex.Pattern;
 
 import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.*;
+import static net.gnehzr.tnoodle.server.webscrambles.Translate.translate;
 
 class ScrambleRequest {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
@@ -423,11 +422,6 @@ class ScrambleRequest {
     }
 
     private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index, Locale locale) throws DocumentException, IOException {
-        
-        // internationalization
-        Locale currentLocale = new Locale(locale.getLanguage(), locale.getCountry());
-        ResourceBundle messages = ResourceBundle.getBundle("net.gnehzr.tnoodle.server.webscrambles.Internationalization.MessagesBundle", currentLocale, new UTF8Control());
-        
         boolean withScramble = index != -1;
         Rectangle pageSize = doc.getPageSize();
         String scramble = null;
@@ -526,7 +520,7 @@ class ScrambleRequest {
             cb.beginText();
             int availableScrambleSpace = right-left - 2*padding;
             int scrambleFontSize = 20;
-            String scrambleStr = messages.getString("Scramble")+": " + scramble;
+            String scrambleStr = translate("fmc.scramble", locale)+": " + scramble;
             float scrambleWidth;
             do {
                 scrambleFontSize--;
@@ -579,14 +573,14 @@ class ScrambleRequest {
             offsetTop += marginBottom;
             
             rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, top - offsetTop);
-            fitAndShowText(cb, messages.getString("Round")+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+            fitAndShowText(cb, translate("fmc.round", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
         }
 
         if(showScrambleCount) {
             offsetTop += fontSize + 2;
 
             rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, messages.getString("Scramble")+" " + (index+1) + " "+messages.getString("of")+" "+ scrambleRequest.scrambles.length, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            fitAndShowText(cb, translate("fmc.scramble", locale)+" " + (index+1) + " "+translate("of", locale)+" "+ scrambleRequest.scrambles.length, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         }
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
@@ -595,14 +589,14 @@ class ScrambleRequest {
             fontSize = 15;
 
             rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, messages.getString("Attempt")+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+            fitAndShowText(cb, translate("fmc.attempt", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
             
             offsetTop += fontSize + (int) (marginBottom * 2.8);
         }
         fontSize = 15;
 
         rect = new Rectangle(competitorInfoLeft+padding, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, messages.getString("Competitor")+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
         
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
@@ -622,14 +616,14 @@ class ScrambleRequest {
         fontSize = 11;
 
         rect = new Rectangle(competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, messages.getString("Warning"), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        fitAndShowText(cb, translate("fmc.warning", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
         offsetTop += fontSize + marginBottom;
 
         fontSize = 11;
 
         rect = new Rectangle(competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, messages.getString("Graded")+": _______________ "+messages.getString("Result")+": ______", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        fitAndShowText(cb, translate("fmc.graded", locale)+": _______________ "+translate("fmc.result", locale)+": ______", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         
         offsetTop += fontSize + (marginBottom*(withScramble ? 1 : 5));
 
@@ -637,7 +631,7 @@ class ScrambleRequest {
             fontSize = 11;
 
             rect = new Rectangle(competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, messages.getString("Warning2"), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            fitAndShowText(cb, translate("fmc.scrambleOnSeparateSheet", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
             
             offsetTop += fontSize + marginBottom;
         }
@@ -646,21 +640,21 @@ class ScrambleRequest {
         
         fontSize = 25;
         rect = new Rectangle(left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, messages.getString("Event"), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         
         ArrayList<String> rulesList = new ArrayList<String>();
-        rulesList.add("- "+messages.getString("rule1"));
-        rulesList.add("- "+messages.getString("rule2"));
-        rulesList.add("- "+messages.getString("rule3"));
-        rulesList.add("- "+messages.getString("rule4"));
-        rulesList.add("- "+messages.getString("rule5"));
-        rulesList.add("- "+messages.getString("rule6"));
-        rulesList.add("- "+messages.getString("rule7"));
-        rulesList.add("- "+messages.getString("rule8"));
-        rulesList.add("- "+messages.getString("rule9"));
+        rulesList.add("- "+translate("fmc.rule1", locale));
+        rulesList.add("- "+translate("fmc.rule2", locale));
+        rulesList.add("- "+translate("fmc.rule3", locale));
+        rulesList.add("- "+translate("fmc.rule4", locale));
+        rulesList.add("- "+translate("fmc.rule5", locale));
+        rulesList.add("- "+translate("fmc.rule6", locale));
+        rulesList.add("- "+translate("fmc.rule7", locale));
+        rulesList.add("- "+translate("fmc.rule8", locale));
+        rulesList.add("- "+translate("fmc.rule9", locale));
         int maxMoves = WCA_MAX_MOVES_FMC;
-        rulesList.add("- "+String.format(messages.getString("rule10"), maxMoves));
-        rulesList.add("- "+messages.getString("rule11"));
+        rulesList.add("- "+String.format(translate("fmc.rule10", locale), maxMoves));
+        rulesList.add("- "+translate("fmc.rule11", locale));
 
         int rulesTop = competitorInfoBottom + (withScramble ? 55 : 143);
         Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop);
@@ -1274,21 +1268,9 @@ class ScrambleRequest {
                 continue;
             }
             
-            File i18nDir = new File(Utils.getResourceDirectory(), "net/gnehzr/tnoodle/server/webscrambles/Internationalization");
-            File[] propertiesFiles = i18nDir.listFiles();
-            for(File propertyFile : propertiesFiles) {
-                String[] temp = propertyFile.getName().split("_|\\.");
-                
-                if(temp.length != 4) {
-                    continue;
-                }
-                
-                String language = temp[1];
-                String country = temp[2];
-                Locale locale = new Locale(language, country);
-                
+            for(Locale locale : Translate.getLocales()) {
                 // fewest moves regular sheet
-                pdfFileName = "pdf/translations/"+language+"_"+country+"_"+safeTitle+".pdf";
+                pdfFileName = "pdf/translations/"+locale.getLanguage()+"_"+locale.getCountry()+"_"+safeTitle+".pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1319,7 +1301,7 @@ class ScrambleRequest {
                 zipOut.closeEntry();
                 
                  // Generic sheet.
-                pdfFileName = "pdf/translations/"+language+"_"+country+"_"+safeTitle+" Solution Sheet.pdf";
+                pdfFileName = "pdf/translations/"+locale.getLanguage()+"_"+locale.getCountry()+"_"+safeTitle+" Solution Sheet.pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1433,7 +1415,7 @@ class ScrambleRequest {
             new PdfOutline(puzzleLink,
                     PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.title);
 
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, new Locale("en", "US"));
+            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE);
             for(int j = 0; j < scrambleRequest.copies; j++) {
                 for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
                     PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
