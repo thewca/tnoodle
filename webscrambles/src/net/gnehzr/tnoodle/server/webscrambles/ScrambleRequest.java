@@ -1224,7 +1224,7 @@ class ScrambleRequest {
             }
 
             doc.open();
-            addGenericFmcSolutionSheet(docWriter, doc, globalTitle, new Locale("en", "US"));
+            addGenericFmcSolutionSheet(docWriter, doc, globalTitle, Translate.DEFAULT_LOCALE);
             doc.close();
 
             // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
@@ -1250,7 +1250,7 @@ class ScrambleRequest {
             parameters.setFileNameInZip(pdfFileName);
             zipOut.putNextEntry(null, parameters);
 
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, new Locale("en", "US"));
+            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE);
             byte[] b = new byte[(int) pdfReader.getFileLength()];
             pdfReader.getSafeFile().readFully(b);
             zipOut.write(b);
@@ -1262,12 +1262,12 @@ class ScrambleRequest {
             zipOut.putNextEntry(null, parameters);
             zipOut.write(join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
             zipOut.closeEntry();
-            
+
             // i18n is only for fmc
             if (!scrambleRequest.fmc) {
                 continue;
             }
-            
+
             for(Locale locale : Translate.getLocales()) {
                 // fewest moves regular sheet
                 pdfFileName = "pdf/translations/"+locale.getLanguage()+"_"+locale.getCountry()+"_"+safeTitle+".pdf";
