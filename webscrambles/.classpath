@@ -15,6 +15,7 @@
 	<classpathentry exported="true" kind="lib" path="/lib/itextpdf-5.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/bcprov-jdk15on-147.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/zip4j_1.3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="/lib/snakeyaml-1.19.jar"/>
 
 	<classpathentry exported="true" kind="lib" path="/lib/batik-anim.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-awt-util.jar"/>
@@ -26,7 +27,7 @@
 	<classpathentry exported="true" kind="lib" path="/lib/batik-transcoder.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-parser.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-dom.jar"/>
-        <classpathentry exported="true" kind="lib" path="/lib/batik-xml.jar"/>
+	<classpathentry exported="true" kind="lib" path="/lib/batik-xml.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-css.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-script.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-util.jar"/>
