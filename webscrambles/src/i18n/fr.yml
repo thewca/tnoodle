@@ -1,0 +1,50 @@
+fr:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Mélange
+        #original_hash: ec7b598
+        round: Tour
+        #original_hash: de04fa0
+        of: sur
+        #original_hash: 43d44fe
+        attempt: Essai
+        #original_hash: 4705687
+        competitor: Compétiteur
+        #original_hash: 220a57b
+        warning: NE PAS REMPLIR SI VOUS ÊTES LE COMPÉTITEUR.
+        #original_hash: 0263083
+        event: Résolution Optimisée
+        #original_hash: 960085a
+        graded: Corrigé par
+        #original_hash: 5faa59d
+        result: Résultat
+        #original_hash: 4c41d93
+        rule1: Notez votre solution en écrivant un mouvement par tiret.
+        #original_hash: a3ee677
+        rule2: 'Pour supprimer des mouvements, effacez les clairement ou noircissez les.'
+        #original_hash: c8586f5
+        rule3: >-
+          Les mouvements F, B, R, L, U, et D sont dans le sens des aiguilles d'une
+          montre.
+        #original_hash: f07869e
+        rule4: 'Les rotations x, y, et z suivent les mouvements R, U, et F.'
+        #original_hash: 43198b7
+        rule5: >-
+          Ajouter ' inverse un mouvement ; ajouter 2 double un mouvement (ex. : U',
+          U2).
+        #original_hash: 5650a3f
+        rule6: 'Ajouter w implique l''utilisation de deux tranches adjacentes (ex. : Uw).'
+        #original_hash: 9574506
+        rule7: 'Un mouvement [minuscule] est une rotation de cube (ex. : [u]).'
+        #original_hash: 01f81e9
+        rule8: Vous avez 1 heure pour trouver une solution.
+        #original_hash: aa29fea
+        rule9: La longueur de votre solution sera comptée avec la métrique OBTM.
+        #original_hash: c5cc2f6
+        rule10: >-
+          Votre solution doit avoir au plus %s mouvements, en incluant les
+          rotations.
+        #original_hash: 7822590
+        rule11: Votre solution ne doit être en aucun cas dérivée d'une partie du mélange.
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Merci de consulter la feuille séparée pour le mélange.
