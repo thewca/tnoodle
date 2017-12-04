@@ -1163,6 +1163,7 @@ Implementation-Version: %s
 
             # Hacky way to add font to jar
             jar.write("fonts/LiberationMono-Regular.ttf", "/fonts/LiberationMono-Regular.ttf")
+            jar.write("fonts/arialuni.ttf", "/fonts/arialuni.ttf")
 
             # Give subclasses the opportunity to make some last minute tweaks to the jar file
             self.tweakJarFile(jar)
