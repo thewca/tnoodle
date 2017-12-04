@@ -1270,7 +1270,7 @@ class ScrambleRequest {
 
             for(Locale locale : Translate.getLocales()) {
                 // fewest moves regular sheet
-                pdfFileName = "pdf/translations/"+locale.getLanguage()+"_"+locale.getCountry()+"_"+safeTitle+".pdf";
+                pdfFileName = "pdf/translations/"+locale.toLanguageTag()+"_"+safeTitle+".pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1301,7 +1301,7 @@ class ScrambleRequest {
                 zipOut.closeEntry();
                 
                  // Generic sheet.
-                pdfFileName = "pdf/translations/"+locale.getLanguage()+"_"+locale.getCountry()+"_"+safeTitle+" Solution Sheet.pdf";
+                pdfFileName = "pdf/translations/"+locale.toLanguageTag()+"_"+safeTitle+" Solution Sheet.pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
