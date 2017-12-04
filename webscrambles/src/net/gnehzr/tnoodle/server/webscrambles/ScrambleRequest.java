@@ -99,6 +99,18 @@ class ScrambleRequest {
 
     private static final char NON_BREAKING_SPACE = '\u00A0';
 
+    private static BaseFont monoFont, sansSerifFont;
+    static {
+        try {
+            monoFont = BaseFont.createFont("fonts/LiberationMono-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            sansSerifFont = BaseFont.createFont("fonts/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        } catch (DocumentException e) {
+            l.log(Level.INFO, "", e);
+        } catch (IOException e) {
+            l.log(Level.INFO, "", e);
+        }
+    }
+
     private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
     private static SortedMap<String, LazyInstantiator<Puzzle>> puzzles;
     static {
@@ -430,7 +442,7 @@ class ScrambleRequest {
         }
         PdfContentByte cb = docWriter.getDirectContent();
         float LINE_THICKNESS = 0.5f;
-        BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+        BaseFont bf = sansSerifFont;
 
         int bottom = 30;
         int left = 35;
@@ -520,7 +532,7 @@ class ScrambleRequest {
             cb.beginText();
             int availableScrambleSpace = right-left - 2*padding;
             int scrambleFontSize = 20;
-            String scrambleStr = translate("fmc.scramble", locale)+": " + scramble;
+            String scrambleStr = translate("fmc.scramble", locale) + ": " + scramble;
             float scrambleWidth;
             do {
                 scrambleFontSize--;
@@ -692,8 +704,7 @@ class ScrambleRequest {
         String scramble = scrambleRequest.scrambles[index];
         PdfContentByte cb = docWriter.getDirectContent();
 
-        BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-        BaseFont bfBold = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+        BaseFont bf = sansSerifFont;
 
         int bottom = 30;
         int left = 35;
@@ -746,9 +757,9 @@ class ScrambleRequest {
                 title = globalTitle + " - " + scrambleRequest.title + ":";
             }
             
-            fontSize = fitText(new Font(bfBold), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
+            fontSize = fitText(new Font(bf), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
 
-            cb.setFontAndSize(bfBold, fontSize);
+            cb.setFontAndSize(bf, fontSize);
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, title, left, top - offsetTop, 0);
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + ":", left, top - offsetTop, 0);
             cb.endText();
@@ -973,25 +984,18 @@ class ScrambleRequest {
         boolean oneLine = false;
         Font scrambleFont = null;
 
-        try {
-            BaseFont courier = BaseFont.createFont("fonts/LiberationMono-Regular.ttf", BaseFont.CP1252, BaseFont.EMBEDDED);
-            Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
-                    availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM);
-            float perfectFontSize = fitText(new Font(courier), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true, leadingMultiplier);
-            if(tryToFitOnOneLine) {
-                String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
-                float perfectFontSizeForOneLine = fitText(new Font(courier), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, false, leadingMultiplier);
-                oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
-                if(oneLine) {
-                    perfectFontSize = perfectFontSizeForOneLine;
-                }
+        Rectangle availableArea = new Rectangle(scrambleColumnWidth - 2*SCRAMBLE_PADDING_HORIZONTAL,
+                availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM);
+        float perfectFontSize = fitText(new Font(monoFont), longestPaddedScramble, availableArea, MAX_SCRAMBLE_FONT_SIZE, true, leadingMultiplier);
+        if(tryToFitOnOneLine) {
+            String longestScrambleOneLine = longestScramble.replaceAll(".", widestCharacter + "");
+            float perfectFontSizeForOneLine = fitText(new Font(monoFont), longestScrambleOneLine, availableArea, MAX_SCRAMBLE_FONT_SIZE, false, leadingMultiplier);
+            oneLine = perfectFontSizeForOneLine >= MINIMUM_ONE_LINE_FONT_SIZE;
+            if(oneLine) {
+                perfectFontSize = perfectFontSizeForOneLine;
             }
-            scrambleFont = new Font(courier, perfectFontSize, Font.NORMAL);
-        } catch(IOException e) {
-            l.log(Level.INFO, "", e);
-        } catch(DocumentException e) {
-            l.log(Level.INFO, "", e);
         }
+        scrambleFont = new Font(monoFont, perfectFontSize, Font.NORMAL);
 
         boolean highlight = forceHighlighting;
         for(int i = 0; i < scrambles.length; i++) {
