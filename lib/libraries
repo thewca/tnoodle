@@ -44,4 +44,4 @@ requests: https://github.com/kennethreitz/requests
 
 **** Fonts ****
 fonts/LiberationMono-Regular.ttf: https://github.com/thewca/tnoodle/pull/223
-fonts/arialuni.ttf: https://github.com/xhtml2pdf/xhtml2pdf/blob/master/tests/samples/font/arialuni.ttf
+fonts/wqy-microhei.ttf: https://github.com/thewca/tnoodle/pull/246#issuecomment-349533724
