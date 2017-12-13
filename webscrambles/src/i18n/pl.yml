@@ -13,11 +13,11 @@ pl:
         #original_hash: 220a57b
         warning: 'NIE WYPEŁNIAJ TEGO, JEŻELI JESTEŚ ZAWODNIKIEM.'
         #original_hash: 0263083
-        event: Najmniej ruchów
+        event: Najmniejsza liczba ruchów
         #original_hash: 960085a
         graded: Ocenione przez
         #original_hash: 5faa59d
-        result: Wynik
+        result: Rezultat
         #original_hash: 4c41d93
         rule1: >-
             Zapisz swoje rozwiązanie, wpisując po jednym ruchu w każde z
@@ -26,7 +26,7 @@ pl:
         rule2: 'W celu usunięcia ruchów, skreśl je wyraźnie lub zamaluj.'
         #original_hash: c8586f5
         rule3: >-
-            Ruchy ścian F, B, R, L, U oraz D są zgodne z ruchem wskazówek
+            Ruchy ścianami F, B, R, L, U oraz D są zgodne z ruchem wskazówek
             zegara.
         #original_hash: f07869e
         rule4: >-
@@ -43,9 +43,9 @@ pl:
             Wyrażenie [ruch zapisany małą literą] również oznacza rotację
             kostki. (np. [u])
         #original_hash: 01f81e9
-        rule8: Masz godzinę na znalezienie i zapisanie rozwiązania.
+        rule8: Masz 1 godzinę na znalezienie rozwiązania.
         #original_hash: aa29fea
-        rule9: Długość twojego rozwiązania zostanie określona zgodnie z OBTM.
+        rule9: Długość twojego rozwiązania zostanie obliczona zgodnie z OBTM.
         #original_hash: c5cc2f6
         rule10: >-
             Twoje rozwiązanie może składać się z co najwyżej %s ruchów, łącznie
@@ -53,6 +53,6 @@ pl:
         #original_hash: 7822590
         rule11: >-
             Twoje rozwiązanie nie może pochodzić bezpośrednio od żadnej części
-            sekwencji mieszającej.
+            algorytmu mieszającego.
         #original_hash: e014b51
         scrambleOnSeparateSheet: Sekwencja mieszająca znajduje się na osobnym arkuszu.
