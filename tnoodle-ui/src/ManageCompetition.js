@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import pluralize from 'pluralize';
 
 import Layout from 'Layout';
+import pluralize from 'pluralize';
+import { toWcaUrl } from 'WcaApi';
 import * as actions from 'actions';
-import { checkScrambles } from 'WcaCompetitionJson';
-import { fetchCompetitionJson } from 'actions';
 import { NavigationAwareComponent } from 'App';
+import { fetchCompetitionJson } from 'actions';
+import { checkScrambles } from 'WcaCompetitionJson';
 
 function RoundInfo({ round, dispatch }) {
   return (
@@ -130,6 +131,9 @@ class ManageCompetition extends Component {
           Download scramble zip
         </button>
 
+        <p>
+          Go to the <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">edit events page on the WCA website</a>.
+        </p>
         {finishedRoundsDiv}
         {groupsWithWrongNumberOfScramblesDiv}
         {roundsWithMissingGroupsDiv}
@@ -144,7 +148,6 @@ export default connect(
     return {
       competitionId: ownProps.match.params.competitionId,
       competitionJson: state.competitionJson,
-      originalCompetitionJsonAndHash: state.originalCompetitionJsonAndHash,
     };
   },
 )(
@@ -154,18 +157,15 @@ export default connect(
     }
 
     willNavigateAway() {
-      let { originalCompetitionJsonAndHash, competitionJson } = this.props;
-      if(JSON.stringify(originalCompetitionJsonAndHash.json) !== JSON.stringify(competitionJson)) {
-        return "You have unsaved changes to this competition. Are you sure you want to navigate away?";
-      }
+      return "Any scrambles you've gnerated will disappear when you navigate away."
     }
 
     render() {
-      let { competitionJson, originalCompetitionJsonAndHash, dispatch } = this.props;
+      let { competitionJson, dispatch } = this.props;
       return (
         <Layout>
           <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
-          <ManageCompetition competitionJson={competitionJson} originalCompetitionJsonAndHash={originalCompetitionJsonAndHash} dispatch={dispatch} />
+          <ManageCompetition competitionJson={competitionJson} dispatch={dispatch} />
         </Layout>
       );
     }
