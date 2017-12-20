@@ -19,7 +19,7 @@ export function toWcaUrl(path) {
 export function logIn() {
   let redirectUri = window.location.origin + BASE_PATH + '/oauth/wca';
   let logInUrl = toWcaUrl(`/oauth/authorize?client_id=${TNOODLE_APP_ID}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`);
-  localStorage['TNoodle.preLoginPath'] = window.location.pathname.substring(BASE_PATH.length);
+  localStorage['TNoodle.preLoginPath'] = window.location.href.substring((window.location.origin + BASE_PATH).length);
   document.location = logInUrl;
 }
 

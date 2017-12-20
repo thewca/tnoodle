@@ -1,8 +1,8 @@
 import { toWcaUrl } from 'WcaApi';
 import * as actions from 'actions';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import React, { Component } from 'react';
+import PreserveSearchLink from 'PreserveSearchLink';
 
 export default connect(
   state => {
@@ -33,7 +33,7 @@ export default connect(
             <div className="list-group">
               {competitions.map(competition => {
                 return (
-                  <Link key={competition.id} to={`/competitions/${competition.id}`} className="list-group-item list-group-item-action">{competition.id}</Link>
+                  <PreserveSearchLink key={competition.id} to={`/competitions/${competition.id}`} className="list-group-item list-group-item-action">{competition.id}</PreserveSearchLink>
                 );
               })}
             </div>
