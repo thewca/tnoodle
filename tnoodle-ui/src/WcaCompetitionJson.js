@@ -62,7 +62,7 @@ export function parseActivityCode(activityCode) {
     } else if(firstLetter === "g") {
       group = rest;
     } else {
-      throw new Error(`Unrecognized activity code part ${part}`);
+      throw new Error(`Unrecognized activity code part: ${part} of ${activityCode}`);
     }
   });
   return { eventId, roundNumber, group };
