@@ -50,7 +50,7 @@ export default connect(
         contents = (
           <div>
             <div className="d-flex justify-content-around mt-5">
-              <a className="btn btn-outline-primary btn-home" href="/scramble/">Legacy UI</a>
+              <a className="btn btn-outline-primary btn-home" href="/scramble-legacy/">Legacy UI</a>
               <button className="btn btn-outline-primary btn-home pointer" onClick={() => WcaApi.logIn()}>Log in with the WCA</button>
             </div>
           </div>

@@ -104,7 +104,7 @@
             if(runningVersion === null) {
                 runningVersion = versionJson.running_version;
             }
-            
+
 
             if(versionJson.ignorableError) {
                 // There was an error connecting to the server or something.
@@ -458,8 +458,9 @@
         showScrambles: showZip,
         competitionChanged: competitionChanged
     };
-    
+
     window.addEventListener('load', function() {
+        addStateMessage("This is the legacy TNoodle UI. Try out <a href='/scramble/'>the new UI</a>.");
         var tnoodleLinkSpan = document.createElement('span');
         var tnoodleLink = document.createElement('a');
         tnoodleLink.href = '/readme';
