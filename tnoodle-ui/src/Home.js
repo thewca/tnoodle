@@ -10,23 +10,21 @@ class SelectCompetition extends Component {
   render() {
     let competitions = this.props.competitions;
     return (
-      <div>
-        <h2>Select a competition to manage</h2>
+      <div className="competitions-picker">
+        <h2 className="text-center mt-5">Select an upcoming competition:</h2>
         {competitions.length === 0 ? (
           <span>
             No competitions found, are you sure you have upcoming competitions?
             Try checking <a href={toWcaUrl("/competitions/mine")} target="_blank">on the WCA website</a>.
           </span>
         ) : (
-          <ul>
+          <div className="list-group m-auto">
             {competitions.map(competition => {
               return (
-                <li key={competition.id}>
-                  <Link to={`/competitions/${competition.id}`}>{competition.id}</Link>
-                </li>
+                <Link key={competition.id} to={`/competitions/${competition.id}`} className="list-group-item list-group-item-action">{competition.id}</Link>
               );
             })}
-          </ul>
+          </div>
         )}
       </div>
     );

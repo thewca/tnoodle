@@ -26,19 +26,34 @@ export default connect(
       let { me, errorMessage, ongoingPromises, children } = this.props;
       let busy = ongoingPromises.length > 0;
 
-      let subtitle;
+      let subtitle, contents;
       if(me) {
         subtitle = (
-          <h2>
-            Welcome to TNoodle, {me.name}!
-            <button onClick={() => WcaApi.logOut()}>
+          <React.Fragment>
+            <h2>
+              Welcome to TNoodle, {me.name}!
+            </h2>
+            <button className="btn btn-outline-light pointer" onClick={() => WcaApi.logOut()}>
               Log out
             </button>
-          </h2>
+          </React.Fragment>
         );
+        contents = children;
       } else {
         subtitle = (
-          <h2>Welcome to TNoodle!</h2>
+          <React.Fragment>
+            <h2>Welcome to TNoodle!</h2>
+            <div></div>
+          </React.Fragment>
+        );
+
+        contents = (
+          <div>
+            <div className="d-flex justify-content-around mt-5">
+              <a className="btn btn-outline-primary btn-home" href="/scramble/">Legacy UI</a>
+              <button className="btn btn-outline-primary btn-home pointer" onClick={() => WcaApi.logIn()}>Log in with the WCA</button>
+            </div>
+          </div>
         );
       }
       return (
@@ -46,14 +61,9 @@ export default connect(
           <div className={classNames("app-header", { error: !!errorMessage })}>
             <img src={logo} className={classNames("app-logo", { busy })} title={errorMessage} alt="TNoodle logo" />
             {subtitle}
-            <small>(If you are offline or not generating scrambles for an official WCA competition, use the <a href="/scramble/">legacy ui</a>.)</small>
           </div>
           <div className="app-intro">
-            {me ? children : (
-              <p>
-                To get started, <button onClick={() => WcaApi.logIn()}>log in with the WCA</button>.
-              </p>
-            )}
+            {contents}
           </div>
         </div>
       );
