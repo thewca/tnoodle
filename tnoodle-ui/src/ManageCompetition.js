@@ -12,9 +12,7 @@ function RoundInfo({ round, dispatch }) {
   return (
     <div>
       {round.id} has {pluralize('group', round.groupCount, true)} generated
-      out of a planned <input type="number" value={round.plannedGroupCount} onChange={(e) => {
-        dispatch(actions.setPlannedGroupCount(round.id, parseInt(e.target.value, 10)));
-      }} />.
+      out of a planned {round.scrambleGroupCount}.
     </div>
   );
 }
@@ -43,7 +41,7 @@ class ManageCompetition extends Component {
   }
 
   render() {
-    let { competitionJson, originalCompetitionJsonAndHash, dispatch } = this.props;
+    let { competitionJson, dispatch } = this.props;
     if(!competitionJson) {
       return (
         <div>Loading competition...</div>
@@ -103,8 +101,6 @@ class ManageCompetition extends Component {
       );
     }
 
-    let enableSaveButton = JSON.stringify(originalCompetitionJsonAndHash.json) !== JSON.stringify(competitionJson);
-
     let promptClearScrambles = function() {
       if(window.confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
         dispatch(actions.clearCompetitionScrambles(competitionJson));
@@ -113,7 +109,6 @@ class ManageCompetition extends Component {
 
     return (
       <div>
-        <button disabled={!enableSaveButton} onClick={() => dispatch(actions.saveCompetitionJson(competitionJson, originalCompetitionJsonAndHash.hash))}>Save</button>
         <button onClick={promptClearScrambles}>Clear scrambles</button>
         <input
           type={this.state.showScramblePassword ? "text" : "password"}

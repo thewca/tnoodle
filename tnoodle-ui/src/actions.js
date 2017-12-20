@@ -16,10 +16,6 @@ export function fetchUpcomingManageableCompetitions() {
   return wrapPromiseWithDispatch(WcaApi.getUpcomingManageableCompetitions(), 'FETCH_UPCOMING_COMPS');
 }
 
-export function saveCompetitionJson(competitionJson, previousHash) {
-  return wrapPromiseWithDispatch(WcaApi.saveCompetitionJson(competitionJson, previousHash), 'SAVE_COMPETITION_JSON');
-}
-
 export function clearCompetitionScrambles() {
   return {
     type: "CLEAR_COMPETITION_SCRAMBLES",
@@ -39,7 +35,7 @@ export function generateMissingScrambles(rounds) {
       let activityCode = round.id;
       let { eventId } = parseActivityCode(activityCode);
       let wcaRound = getActivity(competitionJson, activityCode);
-      let groupsToGenerateCount = wcaRound.plannedGroupCount - wcaRound.groups.length;
+      let groupsToGenerateCount = wcaRound.scrambleGroupCount - wcaRound.groups.length;
       let usedGroupNames = wcaRound.groups.map(wcaGroup => wcaGroup.group);
       let namesOfGroupsToGenerate = [];
       for(let i = 0; i < groupsToGenerateCount; i++) {
@@ -57,14 +53,6 @@ export function generateMissingScrambles(rounds) {
         }, eventToTNoodlePuzzle(eventId), null, scramblesPerGroup);
       });
     });
-  };
-}
-
-export function setPlannedGroupCount(activityCode, plannedGroupCount) {
-  return {
-    type: "SET_PLANNED_GROUP_COUNT",
-    activityCode,
-    plannedGroupCount,
   };
 }
 
@@ -94,7 +82,7 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
       round.groups.forEach(group => {
         let scrambles = group.scrambles;
         let extraScrambles = group.extraScrambles;
-        let copies = 1;//<<<
+        let copies = 1;
         let scrambler = eventToTNoodlePuzzle(event.id);
         let title = `${event.id} Round ${roundNumber} Group ${group.group}`;
         let request = {

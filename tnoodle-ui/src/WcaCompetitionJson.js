@@ -107,8 +107,8 @@ export function normalizeCompetitionJson(competitionJson) {
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
       round.groups = round.groups || [];
-      if(!round.plannedGroupCount) {
-        round.plannedGroupCount = round.groups.length || 1;
+      if(!round.scrambleGroupCount) {
+        round.scrambleGroupCount = round.groups.length || 1;
       }
       round.groups.forEach(group => {
         group.scrambles = group.scrambles || [];
@@ -142,11 +142,11 @@ export function checkScrambles(wcaCompetitionJson) {
       }
 
       let roundScramblesPerfect = true;
-      if(wcaRound.groups.length < wcaRound.plannedGroupCount) {
+      if(wcaRound.groups.length < wcaRound.scrambleGroupCount) {
         checked.roundsWithMissingGroups.push({
           id: buildActivityCode({ eventId, roundNumber }),
           groupCount: wcaRound.groups.length,
-          plannedGroupCount: wcaRound.plannedGroupCount,
+          scrambleGroupCount: wcaRound.scrambleGroupCount,
         });
         roundScramblesPerfect = false;
       }
@@ -182,7 +182,7 @@ export function checkScrambles(wcaCompetitionJson) {
         checked.finishedRounds.push({
           id: buildActivityCode({ eventId, roundNumber }),
           groupCount: wcaRound.groups.length,
-          plannedGroupCount: wcaRound.plannedGroupCount,
+          scrambleGroupCount: wcaRound.scrambleGroupCount,
         });
       }
     });

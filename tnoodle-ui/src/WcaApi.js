@@ -41,16 +41,6 @@ export function getCompetitionJsonAndHash(competitionId) {
   return wcaApiFetch(`/competitions/${competitionId}/wcif`).then(response => response.json());
 }
 
-export function saveCompetitionJson(competitionJson, previousHash) {
-  return wcaApiFetch(`/competitions/${competitionJson.id}/wcif`, {
-    method: "PUT",
-    body: JSON.stringify({
-      hash: previousHash,
-      json: competitionJson,
-    }),
-  }).then(response => response.json());
-}
-
 export function getUpcomingManageableCompetitions() {
   let oneWeekAgo = new Date(Date.now() - 7*24*60*60*1000);
   return wcaApiFetch(
@@ -66,7 +56,7 @@ function getHashParameter(name, alt) {
 }
 
 function wcaApiFetch(path, fetchOptions) {
-  // TODO - <<< refresh token https://github.com/doorkeeper-gem/doorkeeper/wiki/Enable-Refresh-Token-Credentials
+  // TODO - look into refresh token https://github.com/doorkeeper-gem/doorkeeper/wiki/Enable-Refresh-Token-Credentials
   var baseApiUrl = toWcaUrl("/api/v0");
   fetchOptions = Object.assign({}, fetchOptions, {
     headers: new Headers({
