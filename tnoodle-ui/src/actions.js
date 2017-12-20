@@ -1,3 +1,4 @@
+import events from 'wca/events';
 import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
 import { parseActivityCode, getActivity, formatToScrambleCount, getNextAvailableGroupName } from 'WcaCompetitionJson';
@@ -85,7 +86,7 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
         let extraScrambles = group.extraScrambles;
         let copies = 1;
         let scrambler = eventToTNoodlePuzzle(event.id);
-        let title = `${event.id} Round ${roundNumber} Group ${group.group}`;
+        let title = `${events.byId[event.id].name} Round ${roundNumber} Group ${group.group}`;
         let request = {
           scrambles: scrambles,
           extraScrambles: extraScrambles,
