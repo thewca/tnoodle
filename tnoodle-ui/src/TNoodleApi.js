@@ -14,7 +14,7 @@ function xAddListener(obj, event, func, useCapture) {
 // This is a useful option for simulating a slow server (milliseconds).
 tnoodle.FAKE_SCRAMBLE_DELAY = 0;
 
-tnoodle.Scrambler = function(hostname, port, protocol) {
+tnoodle.Scrambler = function(baseUrl) {
     function assert(expr, msg) {
         msg = msg || "";
         if(!expr) {
@@ -23,18 +23,7 @@ tnoodle.Scrambler = function(hostname, port, protocol) {
     }
     var that = this;
 
-    if(!hostname) {
-        hostname = location.hostname;
-        port = location.port;
-        protocol = location.protocol;
-    }
-    if(!port) {
-        port = "80";
-    }
-    if(!protocol) {
-        protocol = "http:";
-    }
-    this.serverUrl = protocol + "//" + hostname + ":" + port;
+    this.serverUrl = baseUrl;
 
     /**** Scramble server stuff ***/
     this.puzzlesUrl = this.serverUrl + "/puzzles/.json";

@@ -2,7 +2,8 @@ import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
 import { parseActivityCode, getActivity, formatToScrambleCount, getNextAvailableGroupName } from 'WcaCompetitionJson';
 
-const scrambler = new tnoodle.Scrambler('localhost', '2014');
+let TNOODLE_BASE_URL = "http://localhost:2014";
+const scrambler = new tnoodle.Scrambler(TNOODLE_BASE_URL);
 
 export function fetchMe() {
   return wrapPromiseWithDispatch(WcaApi.me(), 'FETCH_ME');
@@ -14,6 +15,12 @@ export function fetchCompetitionJson(competitionId) {
 
 export function fetchUpcomingManageableCompetitions() {
   return wrapPromiseWithDispatch(WcaApi.getUpcomingManageableCompetitions(), 'FETCH_UPCOMING_COMPS');
+}
+
+export function fetchVersionInfo() {
+  return wrapPromiseWithDispatch(async function() {
+    return await (await fetch(`${TNOODLE_BASE_URL}/version.json`)).json();
+  }(), 'FETCH_VERSION_INFO');
 }
 
 export function clearCompetitionScrambles() {

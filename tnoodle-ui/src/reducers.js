@@ -9,6 +9,14 @@ export const me = function(state=null, action) {
   }
 };
 
+export const versionInfo = function(state=null, action) {
+  if(action.type === "FETCH_VERSION_INFO" && action.status === "success") {
+    return action.response;
+  } else {
+    return state;
+  }
+};
+
 export const competitionJson = function(state=null, action) {
   if(action.type === "FETCH_COMPETITION_JSON" && action.status === "success") {
     return normalizeCompetitionJson(action.response);

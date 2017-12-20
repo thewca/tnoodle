@@ -10,11 +10,13 @@ body {
   text-align: center;
 }
 
+$app-header-bg-color: black;
 .app-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 
-  background-color: #222;
+  background-color: $app-header-bg-color;
   padding: 20px;
   color: white;
 
@@ -26,12 +28,12 @@ body {
     height: 80px;
 
     &.busy {
-      animation: app-logo-spin infinite 500ms linear;
+      animation: 500ms app-logo-spin infinite linear;
     }
   }
 
-  h2 {
-    align-self: center;
+  &.alarm {
+    animation: 500ms alarm-flash infinite alternate linear;
   }
 
   &.error {
@@ -59,6 +61,11 @@ body {
 
 .pointer {
   cursor: pointer;
+}
+
+@keyframes alarm-flash {
+  from { background-color: $app-header-bg-color; }
+  to { background-color: red; }
 }
 
 @keyframes app-logo-spin {
