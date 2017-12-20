@@ -1,4 +1,5 @@
 @import '~bootstrap/dist/css/bootstrap.min.css';
+@import 'https://cubing.github.io/icons/css/cubing-icons.css';
 
 $app-header-bg-color: black;
 .app-header {
@@ -52,6 +53,12 @@ $app-header-bg-color: black;
   height: 40px;
   .progress-bar {
     font-size: 30px;
+  }
+}
+
+.manage-competition {
+  .cubing-icon {
+    font-size: 3em;
   }
 }
 
