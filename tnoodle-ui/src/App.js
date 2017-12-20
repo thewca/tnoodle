@@ -72,7 +72,6 @@ export const App = function() {
       <ConnectedRouter history={history}>
         <Layout>
           <Route exact path="/" component={wrapWithTitle(Home, () => 'TNoodle')} />
-          <Route path="/oauth/wca" render={() => <Redirect to={WcaApi.getPreLoginPath()} />} />
           <Route exact path="/competitions/" component={wrapWithTitle(SelectCompetition, () => "Select a competition")} />
           <Route path="/competitions/:competitionId" component={wrapWithTitle(ManageCompetition, props => `${props.match.params.competitionId} | TNoodle`)} />
         </Layout>

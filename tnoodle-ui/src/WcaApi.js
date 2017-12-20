@@ -1,15 +1,26 @@
 import { BASE_PATH } from 'App';
 
 // Members of the Software Team can configure this here: https://www.worldcubeassociation.org/oauth/applications/123.
-const WCA_ORIGIN = process.env.REACT_APP_WCA_ORIGIN || 'https://www.worldcubeassociation.org';
-const TNOODLE_APP_ID = process.env.REACT_APP_TNOODLE_APP_ID || '6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40';
+let WCA_ORIGIN = process.env.REACT_APP_WCA_ORIGIN || 'https://www.worldcubeassociation.org';
+let TNOODLE_APP_ID = process.env.REACT_APP_TNOODLE_APP_ID || '6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40';
+
+if(isUsingStaging()) {
+  // Members of the Software Team can configure this here: https://staging.worldcubeassociation.org/oauth/applications/2
+  WCA_ORIGIN = "https://staging.worldcubeassociation.org";
+  TNOODLE_APP_ID = "28e8d62d7eccf6e9bae5ff33288e5c5e2d567bcd0c893e3083e0c165b0ace5c8";
+}
 
 let wcaAccessToken = getHashParameter('access_token', null);
 if(wcaAccessToken) {
   window.location.hash = "";
   localStorage['TNoodle.accessToken'] = wcaAccessToken;
+  gotoPreLoginPath();
 } else {
   wcaAccessToken = localStorage['TNoodle.accessToken'];
+}
+
+export function isUsingStaging() {
+  return new URLSearchParams(window.location.search).has('staging');
 }
 
 export function toWcaUrl(path) {
@@ -19,18 +30,20 @@ export function toWcaUrl(path) {
 export function logIn() {
   let redirectUri = window.location.origin + BASE_PATH + '/oauth/wca';
   let logInUrl = toWcaUrl(`/oauth/authorize?client_id=${TNOODLE_APP_ID}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`);
-  localStorage['TNoodle.preLoginPath'] = window.location.href.substring((window.location.origin + BASE_PATH).length);
-  document.location = logInUrl;
+  localStorage['TNoodle.preLoginHref'] = window.location.href;
+  window.location = logInUrl;
 }
 
 export function logOut() {
-  localStorage['TNoodle.accessToken'] = null;
+  delete localStorage['TNoodle.accessToken'];
   wcaAccessToken = null;
   window.location.reload();
 }
 
-export function getPreLoginPath() {
-  return localStorage['TNoodle.preLoginPath'] || "/";
+export function gotoPreLoginPath() {
+  let preLoginHref = localStorage['TNoodle.preLoginHref'] || "/";
+  delete localStorage['TNoodle.preLoginHref'];
+  window.location.replace(preLoginHref);
 }
 
 export function me() {

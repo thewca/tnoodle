@@ -46,7 +46,9 @@ export default connect(
           <div>
             <div className="d-flex justify-content-around">
               <a className="btn btn-outline-primary btn-home" href="/scramble-legacy/">Legacy UI</a>
-              <button className="btn btn-outline-primary btn-home pointer" onClick={() => WcaApi.logIn()}>Log in with the WCA</button>
+              <button className="btn btn-outline-primary btn-home pointer" onClick={() => WcaApi.logIn()}>
+                Log in with the WCA {WcaApi.isUsingStaging() && "(staging)"}
+              </button>
             </div>
           </div>
         );
