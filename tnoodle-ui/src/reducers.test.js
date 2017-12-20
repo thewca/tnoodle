@@ -6,7 +6,7 @@ import * as reducers from 'reducers';
 
 let rootReducer = combineReducers(reducers);
 
-it('SET_PLANNED_GROUP_COUNT', () => {
+it('GROUP_FOR_ROUND', () => {
   let wcaCompetitionJson = {
     events: [
       {
@@ -22,7 +22,7 @@ it('SET_PLANNED_GROUP_COUNT', () => {
             format: "a",
             groups: [
               {
-                group: "a",
+                group: "A",
                 scrambles: [ "1", "2", "3" ],
               },
             ],
@@ -36,7 +36,15 @@ it('SET_PLANNED_GROUP_COUNT', () => {
     competitionJson: wcaCompetitionJson,
   };
 
-  let nextState = rootReducer(state, actions.setPlannedGroupCount('333-r1', 3));
+  let nextState = rootReducer(state, {
+    type: "GROUP_FOR_ROUND",
+    activityCode: "333-r1",
+    groupName: "A",
+    scrambles: [ "Scramble 1", "Scramble Dos" ],
+  });
 
-  expect(nextState.competitionJson.events[0].rounds[0].plannedGroupCount).toEqual(3);
+  expect(nextState.competitionJson.events[0].rounds[0].groups).toEqual([{
+    group: "A",
+    scrambles: [ "Scramble 1", "Scramble Dos" ],
+  }]);
 });

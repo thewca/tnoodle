@@ -41,7 +41,7 @@ it('checkScrambles finds missing scrambles', () => {
           {
             id: "333-r4",
             format: "a",
-            plannedGroupCount: 2,
+            scrambleGroupCount: 2,
             groups: [
               {
                 group: "A",
@@ -76,7 +76,7 @@ it('checkScrambles finds missing scrambles', () => {
       {
         id: "333-r3",
         groupCount: 1,
-        plannedGroupCount: 1,
+        scrambleGroupCount: 1,
       },
     ],
     groupsWithWrongNumberOfScrambles: [
@@ -90,17 +90,17 @@ it('checkScrambles finds missing scrambles', () => {
       {
         id: "333-r4",
         groupCount: 1,
-        plannedGroupCount: 2,
+        scrambleGroupCount: 2,
       },
       {
         id: "222-r1",
         groupCount: 0,
-        plannedGroupCount: 1,
+        scrambleGroupCount: 1,
       },
       {
         id: "222-r2",
         groupCount: 0,
-        plannedGroupCount: 1,
+        scrambleGroupCount: 1,
       },
     ],
     warnings: [
