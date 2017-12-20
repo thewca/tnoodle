@@ -28,14 +28,6 @@ export const competitionJson = function(state=null, action) {
       scrambles: action.scrambles,
     });
     return normalizeCompetitionJson(competitionJson);
-  } else if(action.type === "CLEAR_COMPETITION_SCRAMBLES") {
-    let competitionJson = deepcopy(state);
-    competitionJson.events.forEach(event => {
-      event.rounds.forEach(round => {
-        round.groups = [];
-      });
-    });
-    return normalizeCompetitionJson(competitionJson);
   } else {
     return state;
   }

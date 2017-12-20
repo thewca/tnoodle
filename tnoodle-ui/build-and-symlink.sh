@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Exit if any command fails
+set -e
+
 # Copied from https://stackoverflow.com/a/7305217/1739415
 relpath(){ python3 -c "import os.path; print(os.path.relpath('$1', start='${2:-$PWD}'))" ; }
 
