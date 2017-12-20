@@ -125,12 +125,16 @@ export function checkScrambles(wcaCompetitionJson) {
     groupsWithWrongNumberOfScrambles: [],
     roundsWithMissingGroups: [],
     warnings: [],
+    currentScrambleCount: 0,
+    scramblesNeededCount: 0,
   };
 
   wcaCompetitionJson.events.forEach(wcaEvent => {
     wcaEvent.rounds.forEach(wcaRound => {
       let eventId = wcaEvent.id;
       let { roundNumber } = parseActivityCode(wcaRound.id);
+      let requiredScrambleCountPerGroup = formatToScrambleCount(wcaRound.format);
+      checked.scramblesNeededCount += requiredScrambleCountPerGroup * wcaRound.scrambleGroupCount;
 
       if(!wcaRound.format) {
         checked.warnings.push({
@@ -165,13 +169,13 @@ export function checkScrambles(wcaCompetitionJson) {
         }
 
         let scrambleCount = wcaGroup.scrambles.length;
-        let requiredScrambleCount = formatToScrambleCount(wcaRound.format);
-        if(scrambleCount !== requiredScrambleCount) {
+        checked.currentScrambleCount += scrambleCount;
+        if(scrambleCount !== requiredScrambleCountPerGroup) {
           checked.groupsWithWrongNumberOfScrambles.push({
             id: buildActivityCode({ eventId, roundNumber, group }),
 
             scrambleCount,
-            requiredScrambleCount,
+            requiredScrambleCountPerGroup,
           });
           roundScramblesPerfect = false;
           return;

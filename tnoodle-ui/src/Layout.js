@@ -44,7 +44,7 @@ export default connect(
 
         contents = (
           <div>
-            <div className="d-flex justify-content-around mt-5">
+            <div className="d-flex justify-content-around">
               <a className="btn btn-outline-primary btn-home" href="/scramble-legacy/">Legacy UI</a>
               <button className="btn btn-outline-primary btn-home pointer" onClick={() => WcaApi.logIn()}>Log in with the WCA</button>
             </div>
@@ -58,7 +58,7 @@ export default connect(
             {analyzedVersion.message ? analyzedVersion.message : title}
             {logOutButton}
           </div>
-          <div className="app-intro">
+          <div className="container">
             {contents}
           </div>
         </div>

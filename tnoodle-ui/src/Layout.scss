@@ -1,21 +1,12 @@
 @import '~bootstrap/dist/css/bootstrap.min.css';
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-}
-
-.app {
-  text-align: center;
-}
-
 $app-header-bg-color: black;
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
+  text-align: center;
   background-color: $app-header-bg-color;
   padding: 20px;
   color: white;
@@ -43,15 +34,9 @@ $app-header-bg-color: black;
   }
 }
 
-.competitions-picker {
-  .list-group {
-    max-width: 400px;
-  }
-}
-
-.app-intro {
+.app-header + .container {
   font-size: large;
-  text-align: left;
+  padding-top: 3em;
 }
 
 .btn-home {
@@ -61,6 +46,13 @@ $app-header-bg-color: black;
 
 .pointer {
   cursor: pointer;
+}
+
+.scramble-generation.progress {
+  height: 40px;
+  .progress-bar {
+    font-size: 30px;
+  }
 }
 
 @keyframes alarm-flash {

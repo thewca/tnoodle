@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import React, { Component } from 'react';
 
 import pluralize from 'pluralize';
 import { toWcaUrl } from 'WcaApi';
@@ -8,28 +8,8 @@ import { NavigationAwareComponent } from 'App';
 import { fetchCompetitionJson } from 'actions';
 import { checkScrambles } from 'WcaCompetitionJson';
 
-function RoundInfo({ round, dispatch }) {
-  return (
-    <div>
-      {round.id} has {pluralize('group', round.groupCount, true)} generated
-      out of a planned {round.scrambleGroupCount}.
-    </div>
-  );
-}
-
-function RoundList({ rounds, dispatch }) {
-  return (
-    <ul>
-      {rounds.map(round => {
-        return (
-          <li key={round.id}>
-            <RoundInfo round={round} dispatch={dispatch} />
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
+import FaEye from 'react-icons/lib/fa/eye';
+import FaEyeSlash from 'react-icons/lib/fa/eye-slash';
 
 class ManageCompetition extends Component {
   constructor() {
@@ -48,17 +28,7 @@ class ManageCompetition extends Component {
       );
     }
 
-    let { finishedRounds, groupsWithWrongNumberOfScrambles, roundsWithMissingGroups, warnings } = checkScrambles(competitionJson);
-
-    let finishedRoundsDiv = null;
-    if(finishedRounds.length > 0) {
-      finishedRoundsDiv = (
-        <div>
-          <h2>Found {pluralize('round', finishedRounds.length, true)} with groups</h2>
-          <RoundList rounds={finishedRounds} dispatch={dispatch} />
-        </div>
-      );
-    }
+    let { groupsWithWrongNumberOfScrambles, roundsWithMissingGroups, warnings, scramblesNeededCount, currentScrambleCount } = checkScrambles(competitionJson);
 
     let groupsWithWrongNumberOfScramblesDiv = null;
     if(groupsWithWrongNumberOfScrambles.length > 0) {
@@ -66,19 +36,6 @@ class ManageCompetition extends Component {
         <div>
           <h2>Groups with wrong number of scrambles</h2>
           <pre>{JSON.stringify(groupsWithWrongNumberOfScrambles, null, 2)}</pre>
-        </div>
-      );
-    }
-
-    let roundsWithMissingGroupsDiv = null;
-    if(roundsWithMissingGroups.length > 0) {
-      roundsWithMissingGroupsDiv = (
-        <div>
-          <h2>Rounds with missing groups</h2>
-          <button onClick={() => dispatch(actions.generateMissingScrambles(roundsWithMissingGroups))}>
-            Generate all missing groups
-          </button>
-          <RoundList rounds={roundsWithMissingGroups} dispatch={dispatch} />
         </div>
       );
     }
@@ -101,41 +58,62 @@ class ManageCompetition extends Component {
       );
     }
 
-    let promptClearScrambles = function() {
-      if(window.confirm("Are you sure you want to clear all the scrambles already generated for this competition?")) {
-        dispatch(actions.clearCompetitionScrambles(competitionJson));
-      }
-    };
+    let { showScramblePassword, scramblePassword } = this.state;
+    let progress = currentScrambleCount / scramblesNeededCount;
+
+    let generationArea;
+    if(progress === 1) {
+      generationArea = <button
+          className="btn btn-block btn-lg btn-primary"
+          onClick={e => dispatch(actions.downloadScrambles(e.shiftKey, scramblePassword))}
+        >
+        Download scrambles
+      </button>;
+    } else if(this.state.hasStartedGeneratingScrambles) {
+      generationArea = <div className="progress scramble-generation">
+        <div className="progress-bar progress-bar-striped progress-bar-animated" style={{width: Math.max(5, progress*100) + "%"}}></div>
+      </div>;
+    } else {
+      generationArea = <button
+          className="btn btn-block btn-lg btn-primary"
+          onClick={() => {
+            dispatch(actions.generateMissingScrambles(roundsWithMissingGroups));
+            this.setState({ hasStartedGeneratingScrambles: true });
+          }}
+        >
+        Generate {pluralize('scramble', scramblesNeededCount, true)} for {competitionJson.id}
+      </button>;
+    }
 
     return (
       <div>
-        <button onClick={promptClearScrambles}>Clear scrambles</button>
-        <input
-          type={this.state.showScramblePassword ? "text" : "password"}
-          placeholder="Password"
-          value={this.state.scramblePassword}
-          onChange={e => this.setState({ scramblePassword: e.target.value })}
-        />
-        <label>
-          <input
-            type="checkbox"
-            value={this.state.showScramblePassword}
-            onChange={e => this.setState({ showScramblePassword: e.target.checked })}
-          />
-          Show password
-        </label>
-        <button
-          onClick={e => dispatch(actions.downloadScrambles(e.shiftKey, this.state.scramblePassword))}
-        >
-          Download scramble zip
-        </button>
-
         <p>
-          Go to the <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">edit events page on the WCA website</a>.
+          Found {pluralize('event', competitionJson.events.length, true)} for {competitionJson.id}.
+          You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
         </p>
-        {finishedRoundsDiv}
+
+        <div className="form-group">
+          <div className="input-group">
+            <span
+              className="input-group-addon pointer"
+              title={showScramblePassword ? "Hide password" : "Show password"}
+              onClick={() => this.setState({ showScramblePassword: !showScramblePassword })}
+            >
+              {showScramblePassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
+            <input
+              type={showScramblePassword ? "text" : "password"}
+              className="form-control"
+              placeholder="Password"
+              value={scramblePassword}
+              onChange={e => this.setState({ scramblePassword: e.target.value })}
+            />
+          </div>
+        </div>
+
+        {generationArea}
+
         {groupsWithWrongNumberOfScramblesDiv}
-        {roundsWithMissingGroupsDiv}
         {warningsDiv}
       </div>
     );
@@ -161,10 +139,10 @@ export default connect(
 
     render() {
       let { competitionJson, dispatch } = this.props;
-      return <React.Fragment>
+      return <div className="container">
         <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
         <ManageCompetition competitionJson={competitionJson} dispatch={dispatch} />
-      </React.Fragment>;
+      </div>;
     }
   }
 );

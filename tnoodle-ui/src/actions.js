@@ -23,12 +23,6 @@ export function fetchVersionInfo() {
   }(), 'FETCH_VERSION_INFO');
 }
 
-export function clearCompetitionScrambles() {
-  return {
-    type: "CLEAR_COMPETITION_SCRAMBLES",
-  };
-}
-
 export function generateMissingScrambles(rounds) {
   return (dispatch, getState) => {
     dispatch({
@@ -121,7 +115,7 @@ export function downloadScrambles(asPdf, password) {
     if(asPdf) {
       scrambler.showPdf(title, request, password, '_blank');
     } else {
-      scrambler.showZip(title, request, password, '');
+      scrambler.showZip(title, request, password, '_blank');
     }
   };
 }

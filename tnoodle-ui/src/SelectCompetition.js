@@ -23,14 +23,14 @@ export default connect(
       }
       return (
         <div className="competitions-picker">
-          <h2 className="text-center mt-5">Select an upcoming competition:</h2>
+          <h2 className="text-center">Select an upcoming competition:</h2>
           {competitions.length === 0 ? (
-            <span>
+            <div className="text-center">
               No competitions found, are you sure you have upcoming competitions?
               Try checking <a href={toWcaUrl("/competitions/mine")} target="_blank">on the WCA website</a>.
-            </span>
+            </div>
           ) : (
-            <div className="list-group m-auto">
+            <div className="list-group">
               {competitions.map(competition => {
                 return (
                   <Link key={competition.id} to={`/competitions/${competition.id}`} className="list-group-item list-group-item-action">{competition.id}</Link>
