@@ -1,7 +1,7 @@
 {
-    "name": "git-tools"
-  , "private": true
-  , "dependencies": {
+  "name": "git-tools",
+  "private": true,
+  "dependencies": {
     "jshint": ">= 1.1.0"
   }
 }

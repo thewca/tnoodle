@@ -2,7 +2,7 @@
   "name": "tnoodle-ui",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://localhost:2014/scramble-new-ui/",
+  "homepage": "http://localhost:2014/scramble/",
   "dependencies": {
     "bootstrap": "4.0.0-beta.2",
     "classnames": "^2.2.5",
