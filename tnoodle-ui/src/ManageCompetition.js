@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import Layout from 'Layout';
 import pluralize from 'pluralize';
 import { toWcaUrl } from 'WcaApi';
 import * as actions from 'actions';
@@ -162,12 +161,10 @@ export default connect(
 
     render() {
       let { competitionJson, dispatch } = this.props;
-      return (
-        <Layout>
-          <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
-          <ManageCompetition competitionJson={competitionJson} dispatch={dispatch} />
-        </Layout>
-      );
+      return <React.Fragment>
+        <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
+        <ManageCompetition competitionJson={competitionJson} dispatch={dispatch} />
+      </React.Fragment>;
     }
   }
 );

@@ -2,7 +2,6 @@ import * as WcaApi from 'WcaApi';
 import * as actions from 'actions';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import ReactTimeout from 'react-timeout';
 import React, { Component } from 'react';
 
 import 'Layout.css';
@@ -17,7 +16,7 @@ export default connect(
       ongoingPromises: Object.keys(state.ongoingPromises),
     };
   },
-)(ReactTimeout(
+)(
   class extends Component {
     componentWillMount() {
       this.props.dispatch(actions.fetchMe());
@@ -66,7 +65,7 @@ export default connect(
       );
     }
   }
-));
+);
 
 function analyzeVersion(versionInfo) {
   if(!versionInfo) {

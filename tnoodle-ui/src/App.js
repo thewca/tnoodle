@@ -7,10 +7,12 @@ import { Route, Redirect } from 'react-router';
 import createHistory from 'history/createBrowserHistory';
 import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
 
-import * as reducers from 'reducers';
-import * as WcaApi from 'WcaApi';
 import Home from 'Home';
+import Layout from 'Layout';
+import * as WcaApi from 'WcaApi';
+import * as reducers from 'reducers';
 import ManageCompetition from 'ManageCompetition';
+import SelectCompetition from 'SelectCompetition';
 
 export const BASE_PATH = process.env.PUBLIC_URL;
 
@@ -68,11 +70,12 @@ export const App = function() {
     <Provider store={store}>
       { /* ConnectedRouter will use the store from Provider automatically */ }
       <ConnectedRouter history={history}>
-        <div>
+        <Layout>
           <Route exact path="/" component={wrapWithTitle(Home, () => 'TNoodle')} />
           <Route path="/oauth/wca" render={() => <Redirect to={WcaApi.getPreLoginPath()} />} />
+          <Route exact path="/competitions/" component={wrapWithTitle(SelectCompetition, () => "Select a competition")} />
           <Route path="/competitions/:competitionId" component={wrapWithTitle(ManageCompetition, props => `${props.match.params.competitionId} | TNoodle`)} />
-        </div>
+        </Layout>
       </ConnectedRouter>
     </Provider>
   );
