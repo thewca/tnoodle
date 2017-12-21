@@ -11,7 +11,7 @@ export function fetchMe() {
 }
 
 export function fetchCompetitionJson(competitionId) {
-  return wrapPromiseWithDispatch(WcaApi.getCompetitionJsonAndHash(competitionId), 'FETCH_COMPETITION_JSON');
+  return wrapPromiseWithDispatch(WcaApi.getCompetitionJson(competitionId), 'FETCH_COMPETITION_JSON');
 }
 
 export function fetchUpcomingManageableCompetitions() {
