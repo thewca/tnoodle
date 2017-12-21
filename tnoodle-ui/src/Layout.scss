@@ -49,10 +49,17 @@ $app-header-bg-color: black;
   cursor: pointer;
 }
 
-.scramble-generation.progress {
-  height: 40px;
-  .progress-bar {
-    font-size: 30px;
+.scramble-form {
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .scramble-generation.progress {
+    height: 100%;
+
+    .progress-bar {
+      font-size: 30px;
+    }
   }
 }
 
