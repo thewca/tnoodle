@@ -3,13 +3,12 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
-import { Route, Redirect } from 'react-router';
+import { Route } from 'react-router';
 import createHistory from 'history/createBrowserHistory';
 import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
 
 import Home from 'Home';
 import Layout from 'Layout';
-import * as WcaApi from 'WcaApi';
 import * as reducers from 'reducers';
 import ManageCompetition from 'ManageCompetition';
 import SelectCompetition from 'SelectCompetition';

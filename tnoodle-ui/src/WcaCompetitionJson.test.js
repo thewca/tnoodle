@@ -72,6 +72,8 @@ it('checkScrambles finds missing scrambles', () => {
   let checkedScrambles = checkScrambles(normalizeCompetitionJson(wcaCompetitionJson));
 
   expect(checkedScrambles).toEqual({
+    currentScrambleCount: 13,
+    scramblesNeededCount: 30,
     finishedRounds: [
       {
         id: "333-r3",
@@ -83,7 +85,7 @@ it('checkScrambles finds missing scrambles', () => {
       {
         id: "333-r2-gA",
         scrambleCount: 3,
-        requiredScrambleCount: 5,
+        requiredScrambleCountPerGroup: 5,
       },
     ],
     roundsWithMissingGroups: [
