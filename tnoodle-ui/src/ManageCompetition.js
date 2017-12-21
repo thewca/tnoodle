@@ -83,7 +83,7 @@ class ManageCompetition extends Component {
             this.setState({ hasStartedGeneratingScrambles: true });
           }}
         >
-        Generate {pluralize('scramble', scramblesNeededCount, true)} for {competitionJson.id}
+        Generate {pluralize('scramble', scramblesNeededCount, true)}
       </button>;
     }
 
@@ -102,26 +102,34 @@ class ManageCompetition extends Component {
           You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
         </p>
 
-        <div className="form-group">
-          <div className="input-group">
-            <span
-              className="input-group-addon pointer"
-              title={showScramblePassword ? "Hide password" : "Show password"}
-              onClick={() => this.setState({ showScramblePassword: !showScramblePassword })}
-            >
-              {showScramblePassword ? <FaEye /> : <FaEyeSlash />}
-            </span>
-            <input
-              type={showScramblePassword ? "text" : "password"}
-              className="form-control"
-              placeholder="Password"
-              value={scramblePassword}
-              onChange={e => this.setState({ scramblePassword: e.target.value })}
-            />
+        <div className="row">
+          <div className="col-12 col-md-6 form-group">
+            <div className="input-group input-group-lg">
+              <input
+                type={showScramblePassword ? "text" : "password"}
+                className="form-control"
+                placeholder="Password"
+                value={scramblePassword}
+                ref={input => this.passwordInput = input}
+                onChange={e => this.setState({ scramblePassword: e.target.value })}
+              />
+              <span
+                className="input-group-addon pointer"
+                title={showScramblePassword ? "Hide password" : "Show password"}
+                onClick={() => {
+                  this.passwordInput.focus();
+                  this.setState({ showScramblePassword: !showScramblePassword })
+                }}
+              >
+                {showScramblePassword ? <FaEye /> : <FaEyeSlash />}
+              </span>
+            </div>
+          </div>
+
+          <div className="col-12 col-md-6">
+            {generationArea}
           </div>
         </div>
-
-        {generationArea}
 
         {groupsWithWrongNumberOfScramblesDiv}
         {warningsDiv}

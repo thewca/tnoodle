@@ -60,6 +60,10 @@ $app-header-bg-color: black;
   .cubing-icon {
     font-size: 3em;
   }
+
+  .form-control:focus + .input-group-addon {
+    color: #007bff;
+  }
 }
 
 @keyframes alarm-flash {
