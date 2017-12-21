@@ -5,10 +5,9 @@ let WCA_ORIGIN = process.env.REACT_APP_WCA_ORIGIN || 'https://www.worldcubeassoc
 let TNOODLE_APP_ID = process.env.REACT_APP_TNOODLE_APP_ID || '6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40';
 
 if(isUsingStaging()) {
-  // The TNoodle staging application is created when importing the developer database. See:
-  //  https://github.com/thewca/worldcubeassociation.org/blob/master/WcaOnRails/lib/tasks/db.rake
+  // See https://github.com/thewca/worldcubeassociation.org/wiki/OAuth-documentation-notes#staging-oauth-application
   WCA_ORIGIN = "https://staging.worldcubeassociation.org";
-  TNOODLE_APP_ID = "tnoodle-development-uid";
+  TNOODLE_APP_ID = "example-application-id";
 }
 
 let wcaAccessToken = getHashParameter('access_token');
@@ -51,7 +50,7 @@ export function me() {
   return wcaApiFetch("/me").then(response => response.json()).then(json => json.me);
 }
 
-export function getCompetitionJsonAndHash(competitionId) {
+export function getCompetitionJson(competitionId) {
   return wcaApiFetch(`/competitions/${competitionId}/wcif`).then(response => response.json());
 }
 
