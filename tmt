@@ -152,13 +152,6 @@ class tmt:
             self.VERSION = os.environ[ TNOODLE_FORCE_VERSION ]
         else:
             retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
-
-            # On Lucas's computer, git describe sometimes returns a blank string. Try again a few times if this is the case.
-            for i in range(8):
-                if stdout != "":
-                    break
-                retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
-
             assert retVal == 0
             self.VERSION = stdout.strip()
             versionPrefix = "v"
