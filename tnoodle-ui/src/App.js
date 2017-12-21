@@ -13,7 +13,7 @@ import * as reducers from 'reducers';
 import ManageCompetition from 'ManageCompetition';
 import SelectCompetition from 'SelectCompetition';
 
-export const BASE_PATH = process.env.PUBLIC_URL;
+export const BASE_PATH = process.env.PUBLIC_URL || "/scramble";
 
 const history = createHistory({
   basename: BASE_PATH,
