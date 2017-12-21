@@ -5,12 +5,13 @@ let WCA_ORIGIN = process.env.REACT_APP_WCA_ORIGIN || 'https://www.worldcubeassoc
 let TNOODLE_APP_ID = process.env.REACT_APP_TNOODLE_APP_ID || '6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40';
 
 if(isUsingStaging()) {
-  // Members of the Software Team can configure this here: https://staging.worldcubeassociation.org/oauth/applications/2
+  // The TNoodle staging application is created when importing the developer database. See:
+  //  https://github.com/thewca/worldcubeassociation.org/blob/master/WcaOnRails/lib/tasks/db.rake
   WCA_ORIGIN = "https://staging.worldcubeassociation.org";
-  TNOODLE_APP_ID = "28e8d62d7eccf6e9bae5ff33288e5c5e2d567bcd0c893e3083e0c165b0ace5c8";
+  TNOODLE_APP_ID = "tnoodle-development-uid";
 }
 
-let wcaAccessToken = getHashParameter('access_token', null);
+let wcaAccessToken = getHashParameter('access_token');
 if(wcaAccessToken) {
   window.location.hash = "";
   localStorage['TNoodle.accessToken'] = wcaAccessToken;
@@ -20,7 +21,7 @@ if(wcaAccessToken) {
 }
 
 export function isUsingStaging() {
-  return new URLSearchParams(window.location.search).has('staging');
+  return !!getQueryParameter('staging');
 }
 
 export function toWcaUrl(path) {
@@ -61,11 +62,27 @@ export function getUpcomingManageableCompetitions() {
   ).then(response => response.json());
 }
 
-function getHashParameter(name, alt) {
-  name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]");
-  var regex = new RegExp("[\\#&]" + name + "=([^&#]*)");
-  var results = regex.exec(window.location.hash);
-  return results === null ? alt : decodeURIComponent(results[1].replace(/\+/g, " "));
+function getHashParameter(name) {
+  return parseQueryString(window.location.hash)[name];
+}
+
+function getQueryParameter(name) {
+  return parseQueryString(window.location.search)[name];
+}
+
+// Copied from https://stackoverflow.com/a/3855394/1739415
+function parseQueryString(query) {
+  if (!query) {
+    return {};
+  }
+
+  return (/^[?#]/.test(query) ? query.slice(1) : query)
+    .split('&')
+    .reduce((params, param) => {
+      let [ key, value ] = param.split('=');
+      params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+      return params;
+    }, {});
 }
 
 function wcaApiFetch(path, fetchOptions) {
