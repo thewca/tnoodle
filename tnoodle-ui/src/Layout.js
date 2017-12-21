@@ -46,7 +46,11 @@ export default connect(
           <div>
             <div className="d-flex justify-content-around">
               <a className="btn btn-outline-primary btn-home" href="/scramble-legacy/">Legacy UI</a>
-              <button className="btn btn-outline-primary btn-home pointer" onClick={() => WcaApi.logIn()}>
+              <button
+                className="btn btn-outline-primary btn-home pointer"
+                onClick={() => WcaApi.logIn()}
+                title={WcaApi.isUsingStaging() ? "Remove the staging= url parameter if you want to log in with www.worldcubeassociation.org." : "Add a staging=true url parameter if you want to log in with staging.worldcubeassociation.org."}
+              >
                 Log in with the WCA {WcaApi.isUsingStaging() && "(staging)"}
               </button>
             </div>
