@@ -403,7 +403,7 @@ class ScrambleRequest {
                 } else {
                     doc.add(tableAndHighlighting.table);
                 }
-                
+
                 if(scrambleRequest.extraScrambles.length > 0) {
                     PdfPTable headerTable = new PdfPTable(1);
                     headerTable.setTotalWidth(new float[] { availableWidth });
@@ -570,12 +570,12 @@ class ScrambleRequest {
         if(showScrambleCount) {
             offsetTop -= fontSize + 2;
         }
-        
+
         // the 100 number in the fit text function is just some big number. Hopefully, fitting the width will be enough to fit the height.
         Rectangle rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-        
+
         fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-        
+
         offsetTop += fontSize + 2;
 
         if(withScramble) {
@@ -583,7 +583,7 @@ class ScrambleRequest {
             fitAndShowText(cb, scrambleRequest.title, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         } else {
             offsetTop += marginBottom;
-            
+
             rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, top - offsetTop);
             fitAndShowText(cb, translate("fmc.round", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
         }
@@ -592,7 +592,7 @@ class ScrambleRequest {
             offsetTop += fontSize + 2;
 
             rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, translate("fmc.scramble", locale)+" " + (index+1) + " "+translate("of", locale)+" "+ scrambleRequest.scrambles.length, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            fitAndShowText(cb, translate("fmc.scramble", locale)+" " + (index+1) + " "+translate("fmc.of", locale)+" "+ scrambleRequest.scrambles.length, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         }
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
@@ -602,14 +602,14 @@ class ScrambleRequest {
 
             rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, 100);
             fitAndShowText(cb, translate("fmc.attempt", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
-            
+
             offsetTop += fontSize + (int) (marginBottom * 2.8);
         }
         fontSize = 15;
 
         rect = new Rectangle(competitorInfoLeft+padding, top-offsetTop, right-competitorInfoLeft, 100);
         fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
-        
+
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
         fontSize = 15;
@@ -636,7 +636,7 @@ class ScrambleRequest {
 
         rect = new Rectangle(competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
         fitAndShowText(cb, translate("fmc.graded", locale)+": _______________ "+translate("fmc.result", locale)+": ______", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-        
+
         offsetTop += fontSize + (marginBottom*(withScramble ? 1 : 5));
 
         if(!withScramble) {
@@ -644,16 +644,16 @@ class ScrambleRequest {
 
             rect = new Rectangle(competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, right-competitorInfoLeft, 100);
             fitAndShowText(cb, translate("fmc.scrambleOnSeparateSheet", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-            
+
             offsetTop += fontSize + marginBottom;
         }
 
         int MAGIC_NUMBER = 40; // kill me now
-        
+
         fontSize = 25;
         rect = new Rectangle(left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, right-competitorInfoLeft, 100);
         fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-        
+
         ArrayList<String> rulesList = new ArrayList<String>();
         rulesList.add("- "+translate("fmc.rule1", locale));
         rulesList.add("- "+translate("fmc.rule2", locale));
@@ -670,24 +670,24 @@ class ScrambleRequest {
 
         int rulesTop = competitorInfoBottom + (withScramble ? 55 : 143);
         Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop);
-        
+
         String rules = String.join("\n", rulesList);
         float leadingMultiplier = 1.5f; // default pdf leading
-        
+
         float potentialFontSize = fitText(new Font(bf), rules, rulesRectangle, 15f, true, leadingMultiplier);
-        
+
         ColumnText ct = new ColumnText(cb);
         ct.setSimpleColumn(rulesRectangle);
         Paragraph paragraph = new Paragraph(rules);
         paragraph.setFont(new Font(bf, potentialFontSize));
         paragraph.setMultipliedLeading(leadingMultiplier);
         ct.addElement(paragraph);
-        
+
         ct.go();
 
         doc.newPage();
     }
-    
+
     private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align) {
         cb.beginText();
         cb.setFontAndSize(bf, fitText(new Font(bf), text, new Rectangle((int)rect.getRight(), (int)rect.getTop()), maxFontSize, false, 1));
@@ -756,7 +756,7 @@ class ScrambleRequest {
             } else {
                 title = globalTitle + " - " + scrambleRequest.title + ":";
             }
-            
+
             fontSize = fitText(new Font(bf), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
 
             cb.setFontAndSize(bf, fontSize);
@@ -764,7 +764,7 @@ class ScrambleRequest {
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + ":", left, top - offsetTop, 0);
             cb.endText();
             offsetTop += fontSize + marginBottom;
-            
+
             cb.beginText();
             cb.setFontAndSize(bf, scrambleFontSize);
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scramble, left, top - offsetTop, 0);
@@ -798,15 +798,15 @@ class ScrambleRequest {
      */
     private static final float FITTEXT_FONTSIZE_PRECISION = 0.1f;
     private static float fitText(Font font, String text, Rectangle rect, float maxFontSize, boolean newlinesAllowed, float leadingMultiplier) {
-        
+
         // ideally, we could pass the object in which our text is going to be rendered
         // as argument instead of asking leadingMultiplier, but we are currently rendering
         // text in pdfcell, columntext and others
         // it'd be painful to render lines in a common object to ask leadingMultiplier
-        
+
         float minFontSize = 1f;
         float potentialFontSize;
-        
+
         while(true) {
             potentialFontSize = (maxFontSize + minFontSize) / 2.0f;
             font.setSize(potentialFontSize);
@@ -819,9 +819,9 @@ class ScrambleRequest {
             } else {
                 // The font size seems to be a pretty good estimate for how
                 // much vertical space a row actually takes up.
-                
+
                 float totalHeight = lineChunks.size() * potentialFontSize * leadingMultiplier;
-                
+
                 if(totalHeight < rect.getHeight()) {
                     minFontSize = potentialFontSize;
                 } else {
@@ -843,7 +843,7 @@ class ScrambleRequest {
 
         LinkedList<Chunk> lineChunks = new LinkedList<Chunk>();
         String[] lineList = text.split("\n");
-        
+
         for (String line:lineList) {
             int startIndex = 0;
             int endIndex = 0;
@@ -860,7 +860,7 @@ class ScrambleRequest {
                 }
                 // endIndex is one past the best fit, so remove one character and it should fit!
                 endIndex--;
-    
+
                 // If we're not at the end of the text, make sure we're not cutting
                 // a word (or turn) in half by walking backwards until we're right before a turn.
                 // Any spaces added for padding after a turn are considered part of
@@ -875,7 +875,7 @@ class ScrambleRequest {
                             endIndex = perfectFitEndIndex;
                             break;
                         }
-    
+
                         // Another dirty hack for sq1: turns only line up
                         // nicely if every line starts with a (x,y). We ensure this
                         // by forcing every line to end with a /.
@@ -895,9 +895,9 @@ class ScrambleRequest {
                         endIndex--;
                     }
                 }
-    
+
                 String substring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE;
-    
+
                 // Add NON_BREAKING_SPACE until the substring takes up as much as
                 // space as is available on a line.
                 do {
@@ -907,7 +907,7 @@ class ScrambleRequest {
                 // substring is now too big for our line, so remove the
                 // last character.
                 substring = substring.substring(0, substring.length() - 1);
-    
+
                 // Walk past all whitespace that comes immediately after the line wrap
                 // we are about to insert.
                 while(endIndex < line.length() && (line.charAt(endIndex) == ' ')) {
@@ -917,12 +917,12 @@ class ScrambleRequest {
                 Chunk lineChunk = new Chunk(substring);
                 lineChunks.add(lineChunk);
                 lineChunk.setFont(font);
-    
+
                 // Force a line wrap!
                 lineChunk.append("\n");
             }
         }
-        
+
         return lineChunks;
     }
 
@@ -935,7 +935,7 @@ class ScrambleRequest {
         PdfContentByte cb = docWriter.getDirectContent();
 
         PdfPTable table = new PdfPTable(3);
-        
+
         float leadingMultiplier = 1;
 
         int charsWide = scrambleNumberPrefix.length() + 1 + (int) Math.log10(scrambles.length);
@@ -1303,7 +1303,7 @@ class ScrambleRequest {
                 zipOut.write(b);
 
                 zipOut.closeEntry();
-                
+
                  // Generic sheet.
                 pdfFileName = "pdf/translations/"+locale.toLanguageTag()+"_"+safeTitle+" Solution Sheet.pdf";
                 parameters.setFileNameInZip(pdfFileName);
