@@ -648,28 +648,31 @@ class ScrambleRequest {
             offsetTop += fontSize + marginBottom;
         }
 
-        int MAGIC_NUMBER = 40; // kill me now
+        int MAGIC_NUMBER = 30; // kill me now
 
         fontSize = 25;
         rect = new Rectangle(left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, right-competitorInfoLeft, 100);
         fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
         ArrayList<String> rulesList = new ArrayList<String>();
-        rulesList.add("- "+translate("fmc.rule1", locale));
-        rulesList.add("- "+translate("fmc.rule2", locale));
-        rulesList.add("- "+translate("fmc.rule3", locale));
-        rulesList.add("- "+translate("fmc.rule4", locale));
-        rulesList.add("- "+translate("fmc.rule5", locale));
-        rulesList.add("- "+translate("fmc.rule6", locale));
-        rulesList.add("- "+translate("fmc.rule7", locale));
-        rulesList.add("- "+translate("fmc.rule8", locale));
-        rulesList.add("- "+translate("fmc.rule9", locale));
+        rulesList.add("• "+translate("fmc.rule1", locale));
+        rulesList.add("• "+translate("fmc.rule2", locale));
+        rulesList.add("• "+translate("fmc.rule3", locale));
         int maxMoves = WCA_MAX_MOVES_FMC;
-        rulesList.add("- "+String.format(translate("fmc.rule10", locale), maxMoves));
-        rulesList.add("- "+translate("fmc.rule11", locale));
+        rulesList.add("• "+String.format(translate("fmc.rule4", locale), maxMoves));
+        rulesList.add("• "+translate("fmc.rule5", locale));
+        rulesList.add("• "+translate("fmc.rule6", locale));
+        rulesList.add("  • "+translate("fmc.faceMoves", locale));
+        rulesList.add("    • "+String.format("R     U     F     L     B     D      (%s)", translate("fmc.clockwise", locale)));
+        rulesList.add("    • "+String.format("R'    U'    F'    L'    B'    D'      (%s)", translate("fmc.counterClockwise", locale)));
+        rulesList.add("    • "+String.format("R2   U2   F2   L2   B2   D2    (%s)", translate("fmc.double", locale)));
+        rulesList.add("  • "+translate("fmc.rotations", locale));
+        rulesList.add("    • "+String.format("[r]     [u]     [f]     [l]     [b]     [d]      (%s)", translate("fmc.clockwise", locale)));
+        rulesList.add("    • "+String.format("[r']    [u']    [f']    [l']    [b']    [d']      (%s)", translate("fmc.counterClockwise", locale)));
+        rulesList.add("    • "+String.format("[r2]   [u2]   [f2]   [l2]   [b2]   [d2]    (%s)", translate("fmc.double", locale)));
 
-        int rulesTop = competitorInfoBottom + (withScramble ? 55 : 143);
-        Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop, competitorInfoLeft-padding, rulesTop);
+        int rulesTop = competitorInfoBottom + (withScramble ? 65 : 153);
+        Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop+padding*2, competitorInfoLeft-padding, rulesTop);
 
         String rules = String.join("\n", rulesList);
         float leadingMultiplier = 1.5f; // default pdf leading
