@@ -92,6 +92,10 @@ h1 {
   margin-top: 15px;
 }
 
+.scrambleButton.clicked {
+  background-color: red;
+}
+
 #top_interface #helpLinkDiv {
   position: absolute;
   right: 30px;
