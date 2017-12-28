@@ -29,8 +29,13 @@ def excepthook(etype, value, tb):
     # Workaround for isatty weirdness mentioned above.
     isTravisCiBuild = os.environ.get('TRAVIS_BRANCH', None)
     if not sys.stdout.isatty() or not sys.stderr.isatty() or not sys.stdin.isatty() or isTravisCiBuild:
-        # stdin, stdout, or stderr is redirected, so don't enter pdb
+        # We're not running interactively, so don't enter PDB.
         sys.stderr.write(cgitb.text((etype, value, tb)))
+
+        while tb.tb_next:
+            tb = tb.tb_next
+        sys.stderr.write("Globals: {}\n".format(tb.tb_frame.f_locals))
+        sys.stderr.write("Locals: {}\n".format(tb.tb_frame.f_locals))
     else:
         if tb:
             traceback.print_exception(etype, value, tb)
