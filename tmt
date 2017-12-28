@@ -148,8 +148,10 @@ class tmt:
         os.chdir(entryPoint())
         assert exists('README.md')
 
-        if os.environ.get( TNOODLE_FORCE_VERSION ):
-            self.VERSION = os.environ[ TNOODLE_FORCE_VERSION ]
+        if os.environ.get(TNOODLE_FORCE_VERSION):
+            self.VERSION = os.environ[TNOODLE_FORCE_VERSION]
+        elif os.environ.get("TRAVIS"):
+            self.VERSION = os.environ["TRAVIS_COMMIT"]
         else:
             retVal, stdout, stderr = tmt.runCmd([ 'git', 'describe' ])
             assert retVal == 0
@@ -158,6 +160,7 @@ class tmt:
             assert self.VERSION.startswith(versionPrefix)
             self.VERSION = self.VERSION[len(versionPrefix):]
 
+            # Check if our working tree is dirty (uncommitted changes).
             retVal, stdout, stderr = self.runCmd([ "git", "ls-files", "-m", "-o", "-d", "--exclude-standard" ])
             if stdout:
                 self.VERSION += "-%s" % int(time.time())
