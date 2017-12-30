@@ -1,0 +1,53 @@
+et:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Segamine
+        #original_hash: ec7b598
+        round: voor
+        #original_hash: de04fa0
+        of: /
+        #original_hash: 43d44fe
+        attempt: katse
+        #original_hash: 4705687
+        competitor: Võistleja
+        #original_hash: 220a57b
+        warning: 'ÄRA TÄIDA, KUI OLED VÕISTLEJA.'
+        #original_hash: 0263083
+        event: Vähimad käigud
+        #original_hash: 960085a
+        graded: Hindaja
+        #original_hash: 5faa59d
+        result: Tulemus
+        #original_hash: 49debdc
+        rule1: Teil on 60 minutit lahenduskäigu leidmiseks ja kirjapanekuks.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Kirjutage üks liigutus lahtrisse. Liigutuse kustutamiseks tõmmake
+            see selgelt maha.
+        #original_hash: 7822590
+        rule3: >-
+            Teie lahendus ei tohi olla otseselt tuletatud ühestki
+            segamisalgoritmi osast.
+        #original_hash: c5cc2f6
+        rule4: >-
+            Üles märgitud liigutuste ja rotatsioonide koguarv ei tohi olla
+            suurem kui %s.
+        #original_hash: 1ba5f27
+        rule5: Tulemuste loendamise meetrikaks on OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Kasutage ainult WCA Regulatsioonide 12. artiklis kirjeldatud
+            notatsiooni. Kui te pole endas kindel, siis kasutage ainult neid
+            liigutusi:
+        #original_hash: dd22ec2
+        faceMoves: Külgede liigutused
+        #original_hash: 57e9da1
+        rotations: Rotatsioonid
+        #original_hash: c75ac6f
+        clockwise: Päripäeva
+        #original_hash: 80fe739
+        counterClockwise: Vastupäeva
+        #original_hash: 8158159
+        double: 180 kraadi
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Palun vaadake segamist eraldi lehelt.
