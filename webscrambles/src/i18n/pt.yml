@@ -1,0 +1,50 @@
+pt:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Embaralhamento
+        #original_hash: ec7b598
+        round: Ronda
+        #original_hash: de04fa0
+        of: de
+        #original_hash: 43d44fe
+        attempt: Tentativa
+        #original_hash: 4705687
+        competitor: Competidor
+        #original_hash: 220a57b
+        warning: NÃO PREENCHA SE FOR O COMPETIDOR.
+        #original_hash: 0263083
+        event: Menos Movimentos
+        #original_hash: 960085a
+        graded: Avaliado por
+        #original_hash: 5faa59d
+        result: Resultado
+        #original_hash: 49debdc
+        rule1: Tem 60 minutos para encontrar e escrever uma solução.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Escreva 1 movimento por traço. Para apagar um movimento, risque-o
+            completamente.
+        #original_hash: 7822590
+        rule3: >-
+            A sua solução não pode derivar diretamente de qualquer parte do
+            algoritmo de embaralhamento.
+        #original_hash: c5cc2f6
+        rule4: 'A sua solução deve ter no máximo %s movimentos, incluindo rotações.'
+        #original_hash: 1ba5f27
+        rule5: O seu resultado será contado em OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Use apenas notação do Artigo 12 dos Regulamentos da WCA. Se não
+            tiver certeza, use apenas os movimentos listados aqui:
+        #original_hash: dd22ec2
+        faceMoves: Movimentos de Faces
+        #original_hash: 57e9da1
+        rotations: Rotações
+        #original_hash: c75ac6f
+        clockwise: Sentido Horário
+        #original_hash: 80fe739
+        counterClockwise: Sentido Anti-horário
+        #original_hash: 8158159
+        double: Duplo
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Por favor veja a folha separada para embaralhamentos.
