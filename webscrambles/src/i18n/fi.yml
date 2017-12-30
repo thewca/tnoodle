@@ -1,0 +1,48 @@
+fi:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Sekoitussarja
+        #original_hash: ec7b598
+        round: Kierros
+        #original_hash: de04fa0
+        of: /
+        #original_hash: 43d44fe
+        attempt: Yritys
+        #original_hash: 4705687
+        competitor: Kilpailija
+        #original_hash: 220a57b
+        warning: 'ÄLÄ TÄYTÄ, JOS OLET KILPAILIJA.'
+        #original_hash: 0263083
+        event: Vähiten siirtoja
+        #original_hash: 960085a
+        graded: Tarkistaja
+        #original_hash: 5faa59d
+        result: Tulos
+        #original_hash: 49debdc
+        rule1: Sinulla on 60 minuuttia aikaa löytää ja kirjoittaa ratkaisu.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Kirjoita 1 siirto viivaa kohden. Poistaaksesi siirron, mustaa se
+            selkeästi.
+        #original_hash: 7822590
+        rule3: Ratkaisu ei saa olla suoraan johdettu mistään sekoitussarjan osasta.
+        #original_hash: c5cc2f6
+        rule4: 'Ratkaisun suurin sallittu pituus on %s siirtoa, sisältäen rotaatiot.'
+        #original_hash: 1ba5f27
+        rule5: Tulos lasketaan OBTM-notaatiolla.
+        #original_hash: 42e1a95
+        rule6: >-
+            Käytä vain WCA-sääntöjen artiklan 12 notaatiota. Jos olet epävarma,
+            käytä vain tässä lueteltuja siirtoja:
+        #original_hash: dd22ec2
+        faceMoves: Pintasiirrot
+        #original_hash: 57e9da1
+        rotations: Rotaatiot
+        #original_hash: c75ac6f
+        clockwise: Myötäpäivään
+        #original_hash: 80fe739
+        counterClockwise: Vastapäivään
+        #original_hash: 8158159
+        double: 180 astetta
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Sekoitussarjat ovat erillisellä paperiarkilla.
