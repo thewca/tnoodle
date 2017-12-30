@@ -1,0 +1,44 @@
+ja:
+    fmc:
+        #original_hash: b7126cd
+        scramble: スクランブル
+        #original_hash: ec7b598
+        round: ラウンド
+        #original_hash: de04fa0
+        of: ／
+        #original_hash: 43d44fe
+        attempt: 試技
+        #original_hash: 4705687
+        competitor: 競技者名
+        #original_hash: 220a57b
+        warning: 競技者は以下の欄に記入しないでください。
+        #original_hash: 0263083
+        event: 3x3x3 最少手数競技
+        #original_hash: 960085a
+        graded: 採点者
+        #original_hash: 5faa59d
+        result: 結果
+        #original_hash: 49debdc
+        rule1: 制限時間は60分（解答を探す時間・書く時間の合計）です。
+        #original_hash: 8b6b48b
+        rule2: 下線1つにつき1手を記入してください。修正するときは，修正する手順を塗りつぶしてください。
+        #original_hash: 7822590
+        rule3: 解答はスクランブルを一部でも用いたもの（逆スクランブルなど）であってはいけません。
+        #original_hash: c5cc2f6
+        rule4: 解答は%s手以内である必要があります。
+        #original_hash: 1ba5f27
+        rule5: 解答は面の回転を1手，持ち替えを0手として数えます。
+        #original_hash: 42e1a95
+        rule6: 回転記号はWCA大会規則12条にあるもののみ使用可能です。不安な場合，以下の記号を用いてください。
+        #original_hash: dd22ec2
+        faceMoves: 面の回転
+        #original_hash: 57e9da1
+        rotations: 持ち替え
+        #original_hash: c75ac6f
+        clockwise: 時計回り
+        #original_hash: 80fe739
+        counterClockwise: 反時計回り
+        #original_hash: 8158159
+        double: 180度回転
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: スクランブルは別紙を参照してください。
