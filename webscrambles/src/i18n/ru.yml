@@ -1,0 +1,50 @@
+ru:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Скрамбл
+        #original_hash: ec7b598
+        round: Раунд
+        #original_hash: de04fa0
+        of: из
+        #original_hash: 43d44fe
+        attempt: Попытка
+        #original_hash: 4705687
+        competitor: Участник
+        #original_hash: 220a57b
+        warning: 'ОСТАВЬТЕ ПУСТЫМ, ЕСЛИ ВЫ УЧАСТНИК'
+        #original_hash: 0263083
+        event: Сборка на количество ходов
+        #original_hash: 960085a
+        graded: Проверил(а)
+        #original_hash: 5faa59d
+        result: Результат
+        #original_hash: 49debdc
+        rule1: У вас есть 60 минут на поиск и запись решения.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Пишите 1 ход над каждой чертой. Чтобы удалить ход, чётко зачеркните
+            его.
+        #original_hash: 7822590
+        rule3: >-
+            Ваше решение не должно быть выведено из скрамбла или любой его
+            части.
+        #original_hash: c5cc2f6
+        rule4: 'Ваше решение должно состоять не более, чем из %s ходов и вращений.'
+        #original_hash: 1ba5f27
+        rule5: Длина решения вычисляется в метрике вращений внешних блоков.
+        #original_hash: 42e1a95
+        rule6: >-
+            Используйте только ходы, разрешённые Статьёй 12 Положений WCA. Если
+            вы не уверены, используйте только следующие ходы:
+        #original_hash: dd22ec2
+        faceMoves: Движения граней
+        #original_hash: 57e9da1
+        rotations: Повороты
+        #original_hash: c75ac6f
+        clockwise: По часовой
+        #original_hash: 80fe739
+        counterClockwise: Против часовой
+        #original_hash: 8158159
+        double: На 180 градусов
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Смотрите скрамбл на другом листе
