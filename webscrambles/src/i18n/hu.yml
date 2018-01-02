@@ -1,0 +1,51 @@
+hu:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Keverés
+        #original_hash: ec7b598
+        round: Forduló
+        #original_hash: de04fa0
+        of: /
+        #original_hash: 43d44fe
+        attempt: Kirakás
+        #original_hash: 4705687
+        competitor: Versenyző
+        #original_hash: 220a57b
+        warning: 'NE TÖLTSD KI, HA VERSENYZŐ VAGY'
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: Ellenőrizte
+        #original_hash: 5faa59d
+        result: Eredmény
+        #original_hash: 49debdc
+        rule1: 60 perced van egy megoldás megtalálására és leírására.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Egy vonalra egy mozdulatot írj! Ha törölni szeretnél valamit, akkor
+            azt egyértelműen satírozd ki!
+        #original_hash: 7822590
+        rule3: >-
+            A megoldásod nem származhat közvetlenül a keverési algoritmus egyik
+            részéből sem.
+        #original_hash: c5cc2f6
+        rule4: 'A megoldásod maximum %s mozdulat lehet, az átfogásokat is beleértve.'
+        #original_hash: 1ba5f27
+        rule5: Az eredményedet az OBTM-nek megfelelően fogjuk számolni.
+        #original_hash: 42e1a95
+        rule6: >-
+            Csak a WCA Szabályzat 12. Cikkében szereplő jelölések elfogadottak!
+            Ha bizonytalan vagy, akkor csak az itt listázott mozdulatokat
+            használd:
+        #original_hash: dd22ec2
+        faceMoves: Oldalak forgatása
+        #original_hash: 57e9da1
+        rotations: Kocka elforgatásai
+        #original_hash: c75ac6f
+        clockwise: Óramutató járásával megegyező
+        #original_hash: 80fe739
+        counterClockwise: Óramutató járásával ellentétes
+        #original_hash: 8158159
+        double: Dupla
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: A keveréseket egy másik lapon találod.
