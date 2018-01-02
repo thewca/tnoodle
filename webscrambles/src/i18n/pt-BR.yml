@@ -10,16 +10,16 @@ pt-BR:
         graded: Verificado por
         result: Resultado
 
-        rule1: Escreva a sua solução, um movimento por barra.
-        rule2: Para anular movimentos, apague ou rasure completamente.
-        rule3: Movimentos de face F, B, R, L, U e D são no sentido horário.
-        rule4: As rotações x, y e z seguem R, U e F.
-        rule5: "' inverte um movimento; 2 dobra um movimento (ex.: U', U2)."
-        rule6: "w faz com que uma face seja girada em duas camadas (ex.: Uw)."
-        rule7: "Uma letra [minúscula] representa uma rotação no cubo (ex.: [u])."
-        rule8: Você tem 1 hora para encontrar uma solução.
-        rule9: O tamanho da sua solução será contado em OBTM.
-        rule10: Sua solução deve ter %s movimentos no máximo, incluindo rotações.
-        rule11: A sua solução não deve referir diretamente a nenhuma parte do embaralhamento.
+        rule1: Você tem 60 minutos para encontrar e escrever uma solução.
+        rule2: Escreva 1 movimento por barra. Para anular um movimento, rasure-o completamente.
+        rule3: Sua solução não deve ser derivada diretamente de nenhuma parte do embaralhamento.
+        rule4: Sua solução deve ter %s movimentos no máximo, incluindo rotações.
+        rule5: Seu resultado será contado em OBTM.
+        rule6: "Use as notações do Artigo 12 das regulações da WCA. Se você tem dúvidas, use apenas os movimentos listados aqui:"
+        faceMoves: Movimentos de Face
+        rotations: Rotações
+        clockwise: "Horário"
+        counterClockwise: "Anti-horário"
+        double: "Duplo"
 
         scrambleOnSeparateSheet: Favor ver a imagem do embaralhamento separadamente.
