@@ -1,0 +1,52 @@
+es:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Mezcla
+        #original_hash: ec7b598
+        round: Ronda
+        #original_hash: de04fa0
+        of: de
+        #original_hash: 43d44fe
+        attempt: Intento
+        #original_hash: 4705687
+        competitor: Competidor
+        #original_hash: 220a57b
+        warning: NO RELLENAR SI ERES EL COMPETIDOR.
+        #original_hash: 0263083
+        event: Menos Movimientos
+        #original_hash: 960085a
+        graded: Corregido por
+        #original_hash: 5faa59d
+        result: Resultado
+        #original_hash: 49debdc
+        rule1: Tienes 60 minutos para encontrar y escribir una solución.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Escribe 1 movimiento por cada barra. Para borrar un movimiento,
+            táchalo de forma clara.
+        #original_hash: 7822590
+        rule3: >-
+            Tu solución no debe derivarse directamente de ninguna parte del
+            algoritmo de mezcla.
+        #original_hash: c5cc2f6
+        rule4: >-
+            Tu solución debe tener como mucho %s movimientos, incluyendo
+            rotaciones.
+        #original_hash: 1ba5f27
+        rule5: Tu resultado será contabilizado en OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Usar sólo la notación descrita en el Artículo 12 del Reglamento WCA.
+            Si no estás seguro, usa sólo los movimientos listados aquí.
+        #original_hash: dd22ec2
+        faceMoves: Movimientos de capa externa.
+        #original_hash: 57e9da1
+        rotations: Rotaciones
+        #original_hash: c75ac6f
+        clockwise: En sentido horario
+        #original_hash: 80fe739
+        counterClockwise: En sentido antihorario
+        #original_hash: 8158159
+        double: Doble
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: 'Por favor, mira las mezclas en hoja aparte.'
