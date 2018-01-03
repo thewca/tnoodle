@@ -1,0 +1,50 @@
+nb:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Blanding
+        #original_hash: ec7b598
+        round: Runde
+        #original_hash: de04fa0
+        of: av
+        #original_hash: 43d44fe
+        attempt: Forsøk
+        #original_hash: 4705687
+        competitor: Deltaker
+        #original_hash: 220a57b
+        warning: FYLL IKKE UT OM DU ER DELTAKER.
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: Vurdert av
+        #original_hash: 5faa59d
+        result: Resultat
+        #original_hash: 49debdc
+        rule1: Du har 60 minutter på å finne og skrive ned en løsning.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Skriv 1 trekk per linje. For å slette et trekk, strek den ut
+            tydelig.
+        #original_hash: 7822590
+        rule3: Din løsning skal ikke direkte bruke noen deler av blandealgoritmen.
+        #original_hash: c5cc2f6
+        rule4: >-
+            Løsningen din skal ikke være lengre enn %s trekk, inkludert
+            rotasjoner.
+        #original_hash: 1ba5f27
+        rule5: Resultatet ditt blir talt i OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Bruk kun notasjon fra Artikkel 12 i WCA-Reglementet. Hvis du er
+            usikker, bruk kun følgende trekk:
+        #original_hash: dd22ec2
+        faceMoves: Trekk
+        #original_hash: 57e9da1
+        rotations: Rotasjoner
+        #original_hash: c75ac6f
+        clockwise: Med klokka
+        #original_hash: 80fe739
+        counterClockwise: Mot klokka
+        #original_hash: 8158159
+        double: Dobbel
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Vennligst se separat ark for blandinger.
