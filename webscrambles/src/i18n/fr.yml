@@ -18,33 +18,36 @@ fr:
         graded: Corrigé par
         #original_hash: 5faa59d
         result: Résultat
-        #original_hash: 4c41d93
-        rule1: Notez votre solution en écrivant un mouvement par tiret.
-        #original_hash: a3ee677
-        rule2: 'Pour supprimer des mouvements, effacez les clairement ou noircissez les.'
-        #original_hash: c8586f5
-        rule3: >-
-          Les mouvements F, B, R, L, U, et D sont dans le sens des aiguilles d'une
-          montre.
-        #original_hash: f07869e
-        rule4: 'Les rotations x, y, et z suivent les mouvements R, U, et F.'
-        #original_hash: 43198b7
-        rule5: >-
-          Ajouter ' inverse un mouvement ; ajouter 2 double un mouvement (ex. : U',
-          U2).
-        #original_hash: 5650a3f
-        rule6: 'Ajouter w implique l''utilisation de deux tranches adjacentes (ex. : Uw).'
-        #original_hash: 9574506
-        rule7: 'Un mouvement [minuscule] est une rotation de cube (ex. : [u]).'
-        #original_hash: 01f81e9
-        rule8: Vous avez 1 heure pour trouver une solution.
-        #original_hash: aa29fea
-        rule9: La longueur de votre solution sera comptée avec la métrique OBTM.
-        #original_hash: c5cc2f6
-        rule10: >-
-          Votre solution doit avoir au plus %s mouvements, en incluant les
-          rotations.
+        #original_hash: 49debdc
+        rule1: Vous avez 60 minutes pour trouver et écrire une solution.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Inscrivez 1 mouvement par tiret. Pour supprimer un mouvement,
+            noircissez-le clairement.
         #original_hash: 7822590
-        rule11: Votre solution ne doit être en aucun cas dérivée d'une partie du mélange.
+        rule3: >-
+            Votre solution ne doit pas être obtenue à partir d'une quelconque
+            partie du mélange.
+        #original_hash: c5cc2f6
+        rule4: >-
+            Votre solution doit faire au plus %s mouvements, en incluant les
+            rotations.
+        #original_hash: 1ba5f27
+        rule5: Votre résultat sera compté en OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Utilisez uniquement la notation définie par l'Article 12 du
+            Règlement WCA. Si vous avez un doute, utilisez uniquement les
+            mouvements ci-dessous :
+        #original_hash: dd22ec2
+        faceMoves: Mouvements de face
+        #original_hash: 57e9da1
+        rotations: Rotations
+        #original_hash: c75ac6f
+        clockwise: Sens horaire
+        #original_hash: 80fe739
+        counterClockwise: Sens antihoraire
+        #original_hash: 8158159
+        double: Double
         #original_hash: e014b51
         scrambleOnSeparateSheet: Merci de consulter la feuille séparée pour le mélange.
