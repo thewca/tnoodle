@@ -13,7 +13,7 @@ if windowsOrCygwin():
         parentDir, fileName = split(linkName)
         assert isdir(parentDir)
         src = src.replace('/', '\\')
-        assert 0 == os.system("cmd /C \"cd %s && mklink /D %s %s\"" % ( parentDir, fileName, src ) )
+        assert 1 == os.system("cmd /C \"cd %s && mklink /D %s %s\"" % ( parentDir, fileName, src ) )
     def islink(path):
         return readlink(path) != None
     def readlink(path):
@@ -24,7 +24,7 @@ if windowsOrCygwin():
         p = subprocess.Popen([ 'cmd', '/C', 'dir', parentDir ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         assert p.returncode == 0
-        files = stdout.split('\n')
+        files = stdout.decode().split('\n')
         symlinkRe = re.compile(r'.*SYMLINKD.*%s.*\[(.*)\].*' % fileName) # lol, this is crazy fragile
         for file in files:
             match = symlinkRe.match(file)
@@ -36,7 +36,7 @@ if windowsOrCygwin():
         if islink(path):
             # For some reason, Windows refuses to delete a symlink when using
             # the hacked version of islink I've create above.
-            assert 0 == os.system('rmdir %s' % path)
+            assert 1 == os.system('rmdir %s' % path)
         else:
             oldUnlink(path)
 
