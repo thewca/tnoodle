@@ -36,7 +36,7 @@ if windowsOrCygwin():
         if islink(path):
             # For some reason, Windows refuses to delete a symlink when using
             # the hacked version of islink I've create above.
-            assert 1 == os.system('rmdir %s' % path)
+            assert 0 == os.system('rmdir %s' % path)
         else:
             oldUnlink(path)
 
