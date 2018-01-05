@@ -1062,6 +1062,10 @@ class EclipseProject(TmtProject):
     def tweakJarFile(self, jar):
         pass
 
+    def _rebuildTNoodleUI(self):
+        rebuildTNoodleUiCmd = "(cd tnoodle-ui; ./build-and-symlink.sh)"
+        assert 0 == os.system(rebuildTNoodleUiCmd)
+
     def dist(self, noRemake=False, implementationTitle=None):
         if implementationTitle is None:
             implementationTitle = self.fullName
@@ -1074,8 +1078,7 @@ class EclipseProject(TmtProject):
             os.makedirs(self.distDir)
 
         if not noRemake:
-            rebuildTNoodleUiCmd = "(cd tnoodle-ui; ./build-and-symlink.sh)"
-            assert 0 == os.system(rebuildTNoodleUiCmd)
+            self._rebuildTNoodleUI()
             tmt._make(projectName=self.name, command='compile')
 
         if self.webContent:
@@ -1180,6 +1183,7 @@ Implementation-Version: %s
         main = tmt.args.main or self.main
         assert main, 'Main class not defined'
         assert tmt.args.args is not None # shlex reads from stdin if you pass None, lol
+        self._rebuildTNoodleUI()
         tmt._make(projectName=self.name, command='compile')
         # TODO propogate return code up
         args = shlex.split(tmt.args.args)
