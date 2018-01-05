@@ -1,0 +1,25 @@
+﻿vi:
+    fmc:
+        scramble: Tráo
+        round: Vòng
+        of: trong tổng số
+        attempt: Lần thử
+        competitor: Thí sinh
+        warning: ĐỪNG ĐIỀN NẾU BẠN LÀ THÍ SINH.
+        event: Số lần xoay tối thiểu
+        graded: Được phân loại bởi
+        result: Kết quả
+
+        rule1: Bạn có 60 phút để tìm và viết một cách giải.
+        rule2: Viết môt lần xoay cho mỗi ô. Để xóa một lần xoay, tô đen nó.
+        rule3: Lời giải của bạn không được trích từ bất kì phần nào của thuật toán tráo.
+        rule4: Lời giải của bạn không được có quá %s lượt xoay, bao gồm cả xoay khối.
+        rule5: Kết quả của bạn sẽ được tính trong OBTM.
+        rule6: "Chỉ sử dụng kí hiệu từ Điều số 12 trong Luật WCA. Nếu bạn không chắc, chỉ sử dụng chính xác những lần xoay được nêu dưới đây:"
+        faceMoves: Xoay mặt
+        rotations: Xoay khối
+        clockwise: "Xuôi chiều kim đồng hồ"
+        counterClockwise: "Ngược chiều kim đồng hồ"
+        double: "Kép"
+
+        scrambleOnSeparateSheet: Hãy nhìn một tờ khác để xem các lượt tráo.
