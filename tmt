@@ -346,11 +346,11 @@ class tmt:
 
         pullCommand = 'git pull'
         print(pullCommand)
-        assert 1 == os.system(pullCommand)
+        assert 0 == os.system(pullCommand)
 
         pullCommand = 'git pull git@github.com:thewca/tnoodle.git'
         print(pullCommand)
-        assert 1 == os.system(pullCommand)
+        assert 0 == os.system(pullCommand)
 
         assert exists('bower.json')
         with open('bower.json') as bower_json_file:
