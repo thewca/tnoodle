@@ -1,0 +1,50 @@
+id:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Scramble
+        #original_hash: ec7b598
+        round: Ronde
+        #original_hash: de04fa0
+        of: dari
+        #original_hash: 43d44fe
+        attempt: Attempt
+        #original_hash: 4705687
+        competitor: Kompetitor
+        #original_hash: 220a57b
+        warning: JANGAN DIISI JIKA ANDA MERUPAKAN KOMPETITOR.
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: Dinilai oleh
+        #original_hash: 5faa59d
+        result: Hasil
+        #original_hash: 49debdc
+        rule1: >-
+            Anda memiliki waktu 60 menit untuk mencari dan menuliskan solusi
+            Anda.
+        #original_hash: 8b6b48b
+        rule2: 'Tulis 1 gerakan per garis. Untuk menghapus gerakan, coret saja.'
+        #original_hash: 7822590
+        rule3: >-
+            Solusi Anda tidak boleh didapatkan secara langsung dari bagian
+            apapun pada algoritma Scramble.
+        #original_hash: c5cc2f6
+        rule4: 'Solusi Anda tidak boleh melebihi %s gerakan, termasuk rotasi.'
+        #original_hash: 1ba5f27
+        rule5: Hasil Anda akan dihitung dalam satuan OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Hanya gunakan notasi dari Pasal 12 Regulasi WCA. Jika Anda tidak
+            yakin, gunakan gerakan yang hanya tertulis di sini:
+        #original_hash: dd22ec2
+        faceMoves: Gerakan Sisi
+        #original_hash: 57e9da1
+        rotations: Rotasi
+        #original_hash: c75ac6f
+        clockwise: Searah Jarum Jam
+        #original_hash: 80fe739
+        counterClockwise: Berlawanan Arah Jarum Jam
+        #original_hash: 8158159
+        double: Ganda
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Silakan lihat Scramble pada lembar terpisah.
