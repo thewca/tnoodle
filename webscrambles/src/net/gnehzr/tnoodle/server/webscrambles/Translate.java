@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 
 import net.gnehzr.tnoodle.utils.EnvGetter;
@@ -95,14 +97,42 @@ public class Translate {
     }
 
     public static String translate(String key, Locale locale) {
-        // First, attempt to translate in the given locale.
+        return translate(key, locale, new HashMap<String, String>());
+    }
+
+    public static String translate(String key, Locale locale, Map<String, String> substitutions) {
+        // Attempt to translate in the given locale.
         String translation = translate(key, locale, false);
-        if(translation != null) {
-            return translation;
-        } else {
-            // If we couldn't find a translation in the given locale, fallback to the base locale.
-            return translate(key, BASE_LOCALE, true);
+        if(translation == null) {
+            // If we couldn't find a translation in the given locale, fall back to the base locale.
+            translation = translate(key, BASE_LOCALE, true);
         }
+
+        translation = interpolate(translation, substitutions);
+        return translation;
+    }
+
+    // Interpolate translation keys in the same way Ruby on Rails does.
+    // See: http://guides.rubyonrails.org/i18n.html#passing-variables-to-translations
+    private static String interpolate(String interpolateMe, Map<String, String> substitutions) {
+        // Copy the given Map, as we're going to mutate it later on.
+        substitutions = new HashMap<String, String>(substitutions);
+
+        // Now interpolate variables in the input string.
+        //
+        // Find anything that looks like %{...}, unless the percent sign is escaped as in %%{...}
+        Pattern templatePattern = Pattern.compile("(?<!%)%\\{([^}]+)\\}");
+        Matcher matcher = templatePattern.matcher(interpolateMe);
+        StringBuffer sb = new StringBuffer();
+        while(matcher.find()) {
+            String key = matcher.group(1);
+            String replacement = substitutions.remove(key);
+            azzert(replacement != null, String.format("Substitution for key: %s not found", key));
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+        azzert(substitutions.size() == 0, String.format("Unused substitution values: %s", substitutions.keySet()));
+        return sb.toString();
     }
 
     // Copied from https://gist.github.com/aslakhellesoy/3858814
