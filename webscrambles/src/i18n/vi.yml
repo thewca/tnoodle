@@ -1,0 +1,50 @@
+vi:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Lần giải %{scrambleIndex} trong tổng số %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Công thức tráo
+        #original_hash: ec7b598
+        round: Vòng
+        #original_hash: 43d44fe
+        attempt: Lần giải
+        #original_hash: 4705687
+        competitor: Thí sinh
+        #original_hash: 220a57b
+        warning: ĐỪNG ĐIỀN NẾU BẠN LÀ THÍ SINH
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: Được đánh giá bởi
+        #original_hash: 5faa59d
+        result: Kết quả
+        #original_hash: 49debdc
+        rule1: Bạn có 60 phút để tìm và viết một cách giải.
+        #original_hash: 8b6b48b
+        rule2: 'Viết một bước xoay cho mỗi ô. Để xóa một bước xoay, tô đen nó.'
+        #original_hash: 7822590
+        rule3: >-
+            Lời giải của bạn không được trích từ bất kì phần nào của thuật toán
+            tráo.
+        #original_hash: 45551a7
+        rule4: >-
+            Lời giải của bạn không được có quá %{maxMoves} bước xoay, bao gồm cả
+            xoay khối.
+        #original_hash: 1ba5f27
+        rule5: Kết quả của bạn sẽ được tính trong OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Chỉ sử dụng kí hiệu từ Điều số 12 trong Luật WCA. Nếu bạn không
+            chắc, chỉ sử dụng chính xác những bước xoay được nêu dưới đây:
+        #original_hash: dd22ec2
+        faceMoves: Xoay mặt
+        #original_hash: 57e9da1
+        rotations: Xoay cả khối rubik
+        #original_hash: c75ac6f
+        clockwise: Xoay 90 độ xuôi chiều kim đồng hồ
+        #original_hash: 80fe739
+        counterClockwise: Xoay 90 độ ngược chiều kim đồng hồ
+        #original_hash: 8158159
+        double: Xoay 180 độ
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Hãy nhìn một tờ khác để xem các công thức tráo.
