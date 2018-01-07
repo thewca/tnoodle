@@ -255,7 +255,6 @@ class tmt:
 
         tmt.args.project = None
         tmt.args.no_recursive = False
-        tmt.args.skip_noflex_warning = False
         self._make(command='check')
 
         body = tmt.args.body
@@ -265,35 +264,6 @@ class tmt:
 
     def _describe(self):
         print(self.VERSION)
-
-    def _strings(self):
-        files = lint.gitFilesList(tmt.args.all)
-        commentOrStringRe = re.compile(r"(\"(\\.|[^\\\"])*\"|'(\\.|[^\\'])*'|//[^\n]*|/(\\.|[^\\\/\n])*/|/\*.*?\*/)", re.DOTALL)
-        externalizeableFileExts = set((".js", ".java"))
-        for f in files:
-            if not os.path.exists(f):
-                # This file must have been deleted as part of this commit.
-                continue
-            if os.path.isdir(f):
-                continue
-            fileName, ext = os.path.splitext(f)
-            if ext not in externalizeableFileExts:
-                continue
-
-            contents = open(f).read()
-
-            offsetToLineNumber = []
-            lineNumber = 1
-            for ch in contents:
-                if ch == '\n':
-                    lineNumber += 1
-                offsetToLineNumber.append(lineNumber)
-
-            for match in commentOrStringRe.finditer(contents):
-                start, end = match.span()
-                s = match.group(0)
-                if s.startswith('"') or s.startswith("'"):
-                    print("Found string on %s:%s  %s" % (f, offsetToLineNumber[start], s))
 
     def _make(self, projectName=None, command=None):
         if projectName is None:
@@ -325,11 +295,17 @@ class tmt:
     def _printVersion(self):
         print(self.VERSION)
 
+    def _i18n(self):
+        assert tmt.args.command == "check"
+
+        i18nDir = 'webscrambles/src/i18n'
+        args = [ 'bundle', 'exec', 'wca_i18n', '--verbose', join(i18nDir, 'en.yml') ] + list(tmt.glob(i18nDir, r'.*\.yml$'))
+        runCmd(args, assertSuccess=True, showStatus=True)
+
     def _release(self):
         tmt.releasing = True
         # Urg, we have to set some arguments explicitly because
         # we're not picking up the defaults from the parser_make.
-        tmt.args.skip_noflex_warning = False
         tmt.args.main = None
         tmt.args.args = ""
         tmt.args.debug = None
@@ -472,11 +448,6 @@ class tmt:
             choices=['samples', 'times'],
             default=None,
             help='Profile program (stats will be written to profile.hprof)')
-        parser_make.add_argument(
-            '--skip-noflex-warning',
-            default=False,
-            action='store_true',
-            help="Don't bother telling me I don't have flex installed, I already know.")
         parser_make.set_defaults(func=self._make)
 
         desc = 'Print version string to use for builds'
@@ -538,16 +509,16 @@ class tmt:
             lint.main(tmt.args)
         parser_lint.set_defaults(func=lintIt)
 
-        desc = "Scan files for strings ripe for i18n."
-        parser_strings = subparsers.add_parser(
-            'strings',
+        desc = 'i18n tools'
+        parser_i18n = subparsers.add_parser(
+            'i18n',
             help=desc, description=desc,
             formatter_class=ArgumentDefaultsHelpFormatter)
-        parser_strings.add_argument(
-            '--all', '-a',
-            action="store_true", default=False,
-            help="Check all files, even if they haven't been edited")
-        parser_strings.set_defaults(func=self._strings)
+        parser_i18n.set_defaults(func=self._i18n)
+        parser_i18n.add_argument(
+            'command',
+            choices=['check'],
+            help='command!')
 
         desc = "Print the version"
         describe = subparsers.add_parser(
