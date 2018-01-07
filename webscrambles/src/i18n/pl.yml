@@ -1,11 +1,11 @@
 pl:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Sekwencja mieszająca %{scrambleIndex} z %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Sekwencja mieszająca
         #original_hash: ec7b598
         round: Runda
-        #original_hash: de04fa0
-        of: z
         #original_hash: 43d44fe
         attempt: Próba
         #original_hash: 4705687
@@ -28,10 +28,10 @@ pl:
         rule3: >-
             Twoje rozwiązanie nie może pochodzić bezpośrednio od żadnej części
             algorytmu mieszającego.
-        #original_hash: c5cc2f6
+        #original_hash: 45551a7
         rule4: >-
-            Twoje rozwiązanie może składać się z co najwyżej %s ruchów, łącznie
-            z rotacjami.
+            Twoje rozwiązanie może składać się z co najwyżej %{maxMoves} ruchów,
+            łącznie z rotacjami.
         #original_hash: 1ba5f27
         rule5: Twój rezultat zostanie obliczony zgodnie z OBTM.
         #original_hash: 42e1a95
