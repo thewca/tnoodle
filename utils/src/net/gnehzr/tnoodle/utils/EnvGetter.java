@@ -9,4 +9,9 @@ public class EnvGetter {
     public static final String getenv(String key) {
         return System.getenv(key);
     }
+
+    public static final String getenv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        return value != null ? value : defaultValue;
+    }
 }
