@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Set;
 
+import net.gnehzr.tnoodle.utils.EnvGetter;
 import net.gnehzr.tnoodle.utils.Utils;
 
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -21,7 +22,8 @@ public class Translate {
     private Translate() {}
 
     private static final Logger l = Logger.getLogger(Translate.class.getName());
-    public static final Locale DEFAULT_LOCALE = new Locale("en");
+    private static final Locale BASE_LOCALE = Locale.forLanguageTag("en");
+    public static final Locale DEFAULT_LOCALE = Locale.forLanguageTag(EnvGetter.getenv("TNOODLE_DEFAULT_LOCALE", BASE_LOCALE.toLanguageTag()));
 
     private static final HashMap<Locale, HashMap<String, ?>> TRANSLATIONS = new HashMap<Locale, HashMap<String, ?>>();
     static {
@@ -98,8 +100,8 @@ public class Translate {
         if(translation != null) {
             return translation;
         } else {
-            // If we couldn't find a translation in the given locale, fallback to the default locale.
-            return translate(key, DEFAULT_LOCALE, true);
+            // If we couldn't find a translation in the given locale, fallback to the base locale.
+            return translate(key, BASE_LOCALE, true);
         }
     }
 
