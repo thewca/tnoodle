@@ -22,7 +22,7 @@ fr:
         rule1: Vous avez 60 minutes pour trouver et écrire une solution.
         #original_hash: 8b6b48b
         rule2: >-
-            Inscrivez 1 mouvement par tiret. Pour supprimer un mouvement,
+            Inscrivez 1 mouvement par emplacement. Pour supprimer un mouvement,
             noircissez-le clairement.
         #original_hash: 7822590
         rule3: >-
