@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    colorize (0.8.1)
+    wca_i18n (0.4.1)
+      colorize (~> 0.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  wca_i18n
+
+BUNDLED WITH
+   1.16.0
