@@ -1,0 +1,52 @@
+ro:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Scramble-ul %{scrambleIndex} din %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Scramble
+        #original_hash: ec7b598
+        round: Runda
+        #original_hash: 43d44fe
+        attempt: Încercarea
+        #original_hash: 4705687
+        competitor: Concurent
+        #original_hash: 220a57b
+        warning: NU SE COMPLETEAZĂ DE CĂTRE CONCURENT
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: 'Verificat de:'
+        #original_hash: 5faa59d
+        result: Rezultat
+        #original_hash: 49debdc
+        rule1: Ai 60 de minute să găsești și să scrii o soluție.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Scrie 1 mișcare pe fiecare linie. Pentru a șterge o mișcare, trebuie
+            să o tai clar.
+        #original_hash: 7822590
+        rule3: >-
+            Soluția ta nu trebuie să fie derivată direct din nicio parte a
+            algoritmului de scramble.
+        #original_hash: 45551a7
+        rule4: >-
+            Soluția ta trebuie să conțină cel mult %{maxMoves} mișcări, inclusiv
+            rotațiile.
+        #original_hash: 1ba5f27
+        rule5: Rezultatul tău va fi numărat conform OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Folosește numai notații din Articolul 12 al Regulamentului WCA. Dacă
+            nu ești sigur, folosește doar mutările următoare:
+        #original_hash: dd22ec2
+        faceMoves: Mișcări ale fețelor
+        #original_hash: 57e9da1
+        rotations: Rotații
+        #original_hash: c75ac6f
+        clockwise: În sensul acelor de ceas
+        #original_hash: 80fe739
+        counterClockwise: În sens invers acelor de ceas
+        #original_hash: 8158159
+        double: Duble
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Te rugăm să te uiți pe foaia separată pentru scramble-uri.
