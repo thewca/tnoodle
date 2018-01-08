@@ -1,13 +1,13 @@
 et:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Segamine %{scrambleIndex} / %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Segamine
         #original_hash: ec7b598
-        round: voor
-        #original_hash: de04fa0
-        of: /
+        round: Voor
         #original_hash: 43d44fe
-        attempt: katse
+        attempt: Katse
         #original_hash: 4705687
         competitor: Võistleja
         #original_hash: 220a57b
@@ -28,12 +28,12 @@ et:
         rule3: >-
             Teie lahendus ei tohi olla otseselt tuletatud ühestki
             segamisalgoritmi osast.
-        #original_hash: c5cc2f6
+        #original_hash: 45551a7
         rule4: >-
-            Üles märgitud liigutuste ja rotatsioonide koguarv ei tohi olla
-            suurem kui %s.
+            Kirja pandud liigutuste ja rotatsioonide koguarv ei tohi olla suurem
+            kui %{maxMoves}.
         #original_hash: 1ba5f27
-        rule5: Tulemuste loendamise meetrikaks on OBTM.
+        rule5: Tulemuse loendamise meetrikaks on OBTM.
         #original_hash: 42e1a95
         rule6: >-
             Kasutage ainult WCA Regulatsioonide 12. artiklis kirjeldatud
