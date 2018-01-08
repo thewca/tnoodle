@@ -1,11 +1,11 @@
 pt:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Embaralhamento %{scrambleIndex} de %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Embaralhamento
         #original_hash: ec7b598
         round: Ronda
-        #original_hash: de04fa0
-        of: de
         #original_hash: 43d44fe
         attempt: Tentativa
         #original_hash: 4705687
@@ -28,8 +28,10 @@ pt:
         rule3: >-
             A sua solução não pode derivar diretamente de qualquer parte do
             algoritmo de embaralhamento.
-        #original_hash: c5cc2f6
-        rule4: 'A sua solução deve ter no máximo %s movimentos, incluindo rotações.'
+        #original_hash: 45551a7
+        rule4: >-
+            A sua solução deve ter no máximo %{maxMoves} movimentos, incluindo
+            rotações.
         #original_hash: 1ba5f27
         rule5: O seu resultado será contado em OBTM.
         #original_hash: 42e1a95
