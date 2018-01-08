@@ -1,11 +1,11 @@
 da:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Blanding %{scrambleIndex} af %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Blanding
         #original_hash: ec7b598
         round: Runde
-        #original_hash: de04fa0
-        of: af
         #original_hash: 43d44fe
         attempt: Forsøg
         #original_hash: 4705687
@@ -28,8 +28,8 @@ da:
         rule3: >-
             Din løsning må ikke være taget direkte fra nogen del af
             blandingssekvensen.
-        #original_hash: c5cc2f6
-        rule4: 'Din løsning må være maksimum %s træk, inklusive rotationer.'
+        #original_hash: 45551a7
+        rule4: 'Din løsning må være maksimum %{maxMoves} træk, inklusive rotationer.'
         #original_hash: 1ba5f27
         rule5: Dit resultat vil blive talt i OBTM.
         #original_hash: 42e1a95
