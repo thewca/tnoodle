@@ -1,25 +1,44 @@
 zh-CN:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: '第%{scrambleIndex}个打乱，总共%{scrambleCount}个'
+        #original_hash: b7126cd
         scramble: 打乱
+        #original_hash: ec7b598
         round: 轮次
-        of: of
-        attempt: 序号
+        #original_hash: 43d44fe
+        attempt: 尝试
+        #original_hash: 4705687
         competitor: 选手
+        #original_hash: 220a57b
         warning: 选手请勿填写。
+        #original_hash: 0263083
         event: 最少步还原
+        #original_hash: 960085a
         graded: 阅卷人
+        #original_hash: 5faa59d
         result: 成绩
-
-        rule1: 请将你的解法一线一步地填在下划线上。
-        rule2: 如需删除转动，请清晰地将其划掉或涂黑。
-        rule3: 用 F, B, R, L, U, D 代表顺时针单层转动。
-        rule4: 整体转动 x, y, z 的方向同 R, U, F。
-        rule5: "' 代表反向转动; 2 代表转两次。(例如: U', U2)"
-        rule6: "w 将单层转动变为两层转动。(例如: Uw)"
-        rule7: "[小写字母] 代表整体转动。(例如: [u])"
-        rule8: 你有一小时的时间寻找解法。
-        rule9: 你的解法长度会根据OBTM进行计算。
-        rule10: 你的解法长度不能超过%s步，包括整体转动。
-        rule11: 禁止通过打乱公式的任何部分直接推得解法。
-
+        #original_hash: 49debdc
+        rule1: 你有一小时的时间寻找解法。
+        #original_hash: 8b6b48b
+        rule2: 每横线一步，如需删除转动，请清晰地将其涂黑。
+        #original_hash: 7822590
+        rule3: 禁止通过打乱公式的任何部分直接推得解法。
+        #original_hash: 45551a7
+        rule4: '你的解法长度不能超过%{maxMoves}步，包括整体转动。'
+        #original_hash: 1ba5f27
+        rule5: 你的解法长度会根据OBTM进行计算。
+        #original_hash: 42e1a95
+        rule6: 只能使用WCA规则第12章所述的转动表示方法。如不确定，请仅使用以下转动：
+        #original_hash: dd22ec2
+        faceMoves: 单层转动
+        #original_hash: 57e9da1
+        rotations: 整体转动
+        #original_hash: c75ac6f
+        clockwise: 顺时针
+        #original_hash: 80fe739
+        counterClockwise: 逆时针
+        #original_hash: 8158159
+        double: 180度
+        #original_hash: e014b51
         scrambleOnSeparateSheet: 打乱见附页。
