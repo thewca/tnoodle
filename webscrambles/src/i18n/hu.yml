@@ -1,11 +1,11 @@
 hu:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: '%{scrambleIndex}. / %{scrambleCount} keverés'
         #original_hash: b7126cd
         scramble: Keverés
         #original_hash: ec7b598
         round: Forduló
-        #original_hash: de04fa0
-        of: /
         #original_hash: 43d44fe
         attempt: Kirakás
         #original_hash: 4705687
@@ -28,8 +28,10 @@ hu:
         rule3: >-
             A megoldásod nem származhat közvetlenül a keverési algoritmus egyik
             részéből sem.
-        #original_hash: c5cc2f6
-        rule4: 'A megoldásod maximum %s mozdulat lehet, az átfogásokat is beleértve.'
+        #original_hash: 45551a7
+        rule4: >-
+            A megoldásod maximum %{maxMoves} mozdulat lehet, az átfogásokat is
+            beleértve.
         #original_hash: 1ba5f27
         rule5: Az eredményedet az OBTM-nek megfelelően fogjuk számolni.
         #original_hash: 42e1a95
