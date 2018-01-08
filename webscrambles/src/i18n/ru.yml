@@ -1,11 +1,11 @@
 ru:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Скрамбл %{scrambleIndex} из %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Скрамбл
         #original_hash: ec7b598
         round: Раунд
-        #original_hash: de04fa0
-        of: из
         #original_hash: 43d44fe
         attempt: Попытка
         #original_hash: 4705687
@@ -28,8 +28,10 @@ ru:
         rule3: >-
             Ваше решение не должно быть выведено из скрамбла или любой его
             части.
-        #original_hash: c5cc2f6
-        rule4: 'Ваше решение должно состоять не более, чем из %s ходов и вращений.'
+        #original_hash: 45551a7
+        rule4: >-
+            Ваше решение должно состоять не более, чем из %{maxMoves} ходов и
+            вращений.
         #original_hash: 1ba5f27
         rule5: Длина решения вычисляется в метрике вращений внешних блоков.
         #original_hash: 42e1a95
