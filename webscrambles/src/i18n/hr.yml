@@ -1,0 +1,50 @@
+hr:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Scramble %{scrambleIndex} od %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Scramble
+        #original_hash: ec7b598
+        round: Runda
+        #original_hash: 43d44fe
+        attempt: Pokušaj
+        #original_hash: 4705687
+        competitor: Natjecatelj
+        #original_hash: 220a57b
+        warning: NE ISPUNJAVAJTE AKO STE NATJECATELJ.
+        #original_hash: 0263083
+        event: Najmanje poteza
+        #original_hash: 960085a
+        graded: Ocijenio/la
+        #original_hash: 5faa59d
+        result: Rezultat
+        #original_hash: 49debdc
+        rule1: Imate 60 minuta za traženje i zapisivanje rješenja.
+        #original_hash: 8b6b48b
+        rule2: 'Napišite 1 potez po polju. Za brisanje poteza, čitko ga zacrnite.'
+        #original_hash: 7822590
+        rule3: >-
+            Vaše rješenje ne smije biti direktno izvedeno iz bilo kojeg dijela
+            algoritma za scramblanje.
+        #original_hash: 45551a7
+        rule4: >-
+            Vaše rješenje smije sadržavati maksimalno %{maxMoves} poteza,
+            uključujući rotacije.
+        #original_hash: 1ba5f27
+        rule5: Vaš rezultat će se brojati u OBTM-u.
+        #original_hash: 42e1a95
+        rule6: >-
+            Koristite samo notaciju iz Članka 12 WCA Pravilnika. Ukoliko niste
+            sigurni, koristite ove poteze:
+        #original_hash: dd22ec2
+        faceMoves: Face potezi
+        #original_hash: 57e9da1
+        rotations: Rotacije
+        #original_hash: c75ac6f
+        clockwise: U smjeru kazaljke na satu
+        #original_hash: 80fe739
+        counterClockwise: Suprotno smjeru kazaljke na satu
+        #original_hash: 8158159
+        double: Dvostruki
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Pogledajte poseban list za scrambleove.
