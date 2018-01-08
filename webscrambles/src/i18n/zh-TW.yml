@@ -1,11 +1,11 @@
 zh-TW:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: '轉亂步驟 %{scrambleIndex}之%{scrambleCount}'
         #original_hash: b7126cd
         scramble: 轉亂步驟
         #original_hash: ec7b598
         round: 輪次
-        #original_hash: de04fa0
-        of: 之
         #original_hash: 43d44fe
         attempt: 還原
         #original_hash: 4705687
@@ -24,8 +24,8 @@ zh-TW:
         rule2: 每一格填寫一步。若要刪除一步，請將其清晰地塗銷。
         #original_hash: 7822590
         rule3: 您寫出的解法不能由題目上的轉亂步驟衍生而來。
-        #original_hash: c5cc2f6
-        rule4: 您的解法最多只能有%s步，包含整顆方塊旋轉。
+        #original_hash: 45551a7
+        rule4: '您的解法最多只能有%{maxMoves}步，包含整顆方塊旋轉。'
         #original_hash: 1ba5f27
         rule5: 您的成績將以外層轉動計數(OBTM)來計算。
         #original_hash: 42e1a95
