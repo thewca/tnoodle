@@ -1,11 +1,11 @@
 fr:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Mélange %{scrambleIndex} sur %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Mélange
         #original_hash: ec7b598
         round: Tour
-        #original_hash: de04fa0
-        of: sur
         #original_hash: 43d44fe
         attempt: Essai
         #original_hash: 4705687
@@ -28,10 +28,10 @@ fr:
         rule3: >-
             Votre solution ne doit pas être obtenue à partir d'une quelconque
             partie du mélange.
-        #original_hash: c5cc2f6
+        #original_hash: 45551a7
         rule4: >-
-            Votre solution doit faire au plus %s mouvements, en incluant les
-            rotations.
+            Votre solution doit faire au plus %{maxMoves} mouvements, en
+            incluant les rotations.
         #original_hash: 1ba5f27
         rule5: Votre résultat sera compté en OBTM.
         #original_hash: 42e1a95
