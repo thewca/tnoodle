@@ -1,11 +1,11 @@
 pl:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Sekwencja mieszająca %{scrambleIndex} z %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Sekwencja mieszająca
         #original_hash: ec7b598
         round: Runda
-        #original_hash: de04fa0
-        of: z
         #original_hash: 43d44fe
         attempt: Próba
         #original_hash: 4705687
@@ -18,41 +18,35 @@ pl:
         graded: Ocenione przez
         #original_hash: 5faa59d
         result: Rezultat
-        #original_hash: 4c41d93
-        rule1: >-
-            Zapisz swoje rozwiązanie, wpisując po jednym ruchu w każde z
-            wyznaczonych miejsc.
-        #original_hash: a3ee677
-        rule2: 'W celu usunięcia ruchów, skreśl je wyraźnie lub zamaluj.'
-        #original_hash: c8586f5
-        rule3: >-
-            Ruchy ścianami F, B, R, L, U oraz D są zgodne z ruchem wskazówek
-            zegara.
-        #original_hash: f07869e
-        rule4: >-
-            Rotacje x, y oraz z odpowiadają ruchom R, U oraz F wykonywanym całą
-            kostką.
-        #original_hash: 43198b7
-        rule5: >-
-            Znak ' oznacza ruch przeciwny do ruchu wskazówek zegara. Cyfra 2
-            podwaja ruch. (np. U', U2)
-        #original_hash: 5650a3f
-        rule6: Litera w służy do zapisu ruchu dwiema warstwami. (np. Uw)
-        #original_hash: 9574506
-        rule7: >-
-            Wyrażenie [ruch zapisany małą literą] również oznacza rotację
-            kostki. (np. [u])
-        #original_hash: 01f81e9
-        rule8: Masz 1 godzinę na znalezienie rozwiązania.
-        #original_hash: aa29fea
-        rule9: Długość twojego rozwiązania zostanie obliczona zgodnie z OBTM.
-        #original_hash: c5cc2f6
-        rule10: >-
-            Twoje rozwiązanie może składać się z co najwyżej %s ruchów, łącznie
-            z rotacjami.
+        #original_hash: 49debdc
+        rule1: Masz 60 minut na znalezienie i zapisanie rozwiązania.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Zapisz każdy ruch nad osobną kreską. W celu usunięcia ruchu wyraźnie
+            go zamaluj.
         #original_hash: 7822590
-        rule11: >-
+        rule3: >-
             Twoje rozwiązanie nie może pochodzić bezpośrednio od żadnej części
             algorytmu mieszającego.
+        #original_hash: 45551a7
+        rule4: >-
+            Twoje rozwiązanie może składać się z co najwyżej %{maxMoves} ruchów,
+            łącznie z rotacjami.
+        #original_hash: 1ba5f27
+        rule5: Twój rezultat zostanie obliczony zgodnie z OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Używaj wyłącznie notacji z Artykułu 12 Regulaminu WCA. Jeżeli nie
+            jesteś pewien, używaj tylko ruchów wypisanych tutaj:
+        #original_hash: dd22ec2
+        faceMoves: Ruchy ścianami
+        #original_hash: 57e9da1
+        rotations: Rotacje
+        #original_hash: c75ac6f
+        clockwise: Zgodnie z ruchem wskazówek zegara
+        #original_hash: 80fe739
+        counterClockwise: Przeciwnie do ruchu wskazówek zegara
+        #original_hash: 8158159
+        double: Podwójne
         #original_hash: e014b51
         scrambleOnSeparateSheet: Sekwencja mieszająca znajduje się na osobnym arkuszu.

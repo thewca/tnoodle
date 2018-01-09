@@ -32,7 +32,7 @@ class Project(tmt.EclipseProject):
 
         self.nonJavaResourceDeps |= tmt.glob(self.srcResource, '.*$', relativeTo=self.srcResource)
         for f in xmlFileTypes:
-                self.nonJavaResourceDeps -= tmt.glob(self.srcResource, "%s$" % f, relativeTo=self.srcResource)
+            self.nonJavaResourceDeps -= tmt.glob(self.srcResource, "%s$" % f, relativeTo=self.srcResource)
 
         self.nonJavaSrcDeps |= tmt.glob(self.src, '.*\\.properties$', relativeTo=self.src)
         self.nonJavaSrcDeps |= tmt.glob(self.src, '.*\\.xsd$', relativeTo=self.src)
@@ -147,14 +147,14 @@ class Project(tmt.EclipseProject):
 """
                 root = ET.fromstring(h2ConsoleServlet)
                 for child in reversed(root):
-                        xmlRoot.insert(0, child)
+                    xmlRoot.insert(0, child)
 
             for project in deps:
                 if project in list(self.plugins.values()):
                     assert project.webContent
                     pluginXmlFile = join(project.webContent, "WEB-INF", f)
                     if not os.path.exists(pluginXmlFile):
-                            continue
+                        continue
                     tree = ET.parse(pluginXmlFile)
                     root = tree.getroot()
                     for child in reversed(root):

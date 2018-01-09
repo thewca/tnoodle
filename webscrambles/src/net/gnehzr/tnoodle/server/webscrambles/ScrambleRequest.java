@@ -592,7 +592,11 @@ class ScrambleRequest {
             offsetTop += fontSize + 2;
 
             rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, translate("fmc.scramble", locale)+" " + (index+1) + " "+translate("fmc.of", locale)+" "+ scrambleRequest.scrambles.length, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+
+            HashMap<String, String> substitutions = new HashMap<String, String>();
+            substitutions.put("scrambleIndex", ""+(index+1));
+            substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
+            fitAndShowText(cb, translate("fmc.scrambleXofY", locale, substitutions), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         }
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
@@ -659,7 +663,11 @@ class ScrambleRequest {
         rulesList.add("• "+translate("fmc.rule2", locale));
         rulesList.add("• "+translate("fmc.rule3", locale));
         int maxMoves = WCA_MAX_MOVES_FMC;
-        rulesList.add("• "+String.format(translate("fmc.rule4", locale), maxMoves));
+
+        HashMap<String, String> substitutions = new HashMap<String, String>();
+        substitutions.put("maxMoves", ""+maxMoves);
+        rulesList.add("• "+translate("fmc.rule4", locale, substitutions));
+
         rulesList.add("• "+translate("fmc.rule5", locale));
         rulesList.add("• "+translate("fmc.rule6", locale));
         rulesList.add("  • "+translate("fmc.faceMoves", locale));

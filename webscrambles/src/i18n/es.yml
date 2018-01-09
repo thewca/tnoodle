@@ -1,11 +1,11 @@
 es:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Mezcla %{scrambleIndex} de %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Mezcla
         #original_hash: ec7b598
         round: Ronda
-        #original_hash: de04fa0
-        of: de
         #original_hash: 43d44fe
         attempt: Intento
         #original_hash: 4705687
@@ -28,10 +28,10 @@ es:
         rule3: >-
             Tu solución no debe derivarse directamente de ninguna parte del
             algoritmo de mezcla.
-        #original_hash: c5cc2f6
+        #original_hash: 45551a7
         rule4: >-
-            Tu solución debe tener como mucho %s movimientos, incluyendo
-            rotaciones.
+            Tu solución debe tener como mucho %{maxMoves} movimientos,
+            incluyendo rotaciones.
         #original_hash: 1ba5f27
         rule5: Tu resultado será contabilizado en OBTM.
         #original_hash: 42e1a95

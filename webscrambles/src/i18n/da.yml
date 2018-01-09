@@ -1,0 +1,50 @@
+da:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Blanding %{scrambleIndex} af %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Blanding
+        #original_hash: ec7b598
+        round: Runde
+        #original_hash: 43d44fe
+        attempt: Forsøg
+        #original_hash: 4705687
+        competitor: Deltager
+        #original_hash: 220a57b
+        warning: 'UDFYLD IKKE DETTE, HVIS DU ER DELTAGEREN.'
+        #original_hash: 0263083
+        event: 3x3x3 i Færrest Træk
+        #original_hash: 960085a
+        graded: Bedømt af
+        #original_hash: 5faa59d
+        result: Resultat
+        #original_hash: 49debdc
+        rule1: Du har 60 minutter til at finde og skrive en løsning.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Skriv 1 træk per felt. For at slette et træk, så overstreg feltet
+            helt.
+        #original_hash: 7822590
+        rule3: >-
+            Din løsning må ikke være taget direkte fra nogen del af
+            blandingssekvensen.
+        #original_hash: 45551a7
+        rule4: 'Din løsning må være maksimum %{maxMoves} træk, inklusive rotationer.'
+        #original_hash: 1ba5f27
+        rule5: Dit resultat vil blive talt i OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Brug kun notationen fra artikel 12 i WCA-regelsættet. Hvis du er i
+            tvivl, så benyt kun de træk, der er beskrevet herunder:
+        #original_hash: dd22ec2
+        faceMoves: Træk
+        #original_hash: 57e9da1
+        rotations: Rotationer af hele terningen
+        #original_hash: c75ac6f
+        clockwise: 'med uret, 90°'
+        #original_hash: 80fe739
+        counterClockwise: 'mod uret, 90°'
+        #original_hash: 8158159
+        double: 180°
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Se et andet stykke papir for blandingen.

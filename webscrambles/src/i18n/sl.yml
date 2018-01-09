@@ -1,0 +1,51 @@
+sl:
+    fmc:
+        #original_hash: b7126cd
+        scramble: Mešalni algoritem
+        #original_hash: ec7b598
+        round: Runda
+        #original_hash: de04fa0
+        of: od
+        #original_hash: 43d44fe
+        attempt: Poskus
+        #original_hash: 4705687
+        competitor: Tekmovalec
+        #original_hash: 220a57b
+        warning: NE IZPOLNI ČE SI TEKMOVALEC
+        #original_hash: 0263083
+        event: 3x3x3 Optimalno
+        #original_hash: 960085a
+        graded: Ocenil
+        #original_hash: 5faa59d
+        result: Rezultat
+        #original_hash: 49debdc
+        rule1: 'Na voljo je 60 minut, da se najde in zapiše rešitev.'
+        #original_hash: 8b6b48b
+        rule2: >-
+            Na vsako črtico zapišite 1 potezo. Za izbris poteze jo jasno
+            prečrtajte.
+        #original_hash: 7822590
+        rule3: >-
+            Rešitev ne sme biti neposredno izpeljana iz kateregakoli dela
+            mešalnega algoritma.
+        #original_hash: c5cc2f6
+        rule4: 'Rešitev mora vsebovati največ %s potez, vključujoč rotacije.'
+        #original_hash: 1ba5f27
+        rule5: Za štetje potez se uporablja OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Uporabite samo notacije iz člena 12 WCA pravilnika. Če niste
+            prepričani o legalnosti potez, potem uporabite le te, ki so napisane
+            tukaj:
+        #original_hash: dd22ec2
+        faceMoves: Zunanje poteze
+        #original_hash: 57e9da1
+        rotations: Rotacije
+        #original_hash: c75ac6f
+        clockwise: v smeri urnega kazalca
+        #original_hash: 80fe739
+        counterClockwise: v nasprotni smeri urnega kazalca
+        #original_hash: 8158159
+        double: dvojne poteze
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Prosim poglejte posebni list za mešalne algoritme.

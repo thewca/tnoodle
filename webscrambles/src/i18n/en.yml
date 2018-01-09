@@ -1,8 +1,8 @@
 en:
     fmc:
+        scrambleXofY: Scramble %{scrambleIndex} of %{scrambleCount}
         scramble: Scramble
         round: Round
-        of: of
         attempt: Attempt
         competitor: Competitor
         warning: DO NOT FILL IF YOU ARE THE COMPETITOR.
@@ -13,7 +13,7 @@ en:
         rule1: You have 60 minutes to find and write a solution.
         rule2: Write 1 move per bar. To delete a move, clearly blacken it.
         rule3: Your solution must not be directly derived from any part of the scrambling algorithm.
-        rule4: Your solution must be at most %s moves, including rotations.
+        rule4: Your solution must be at most %{maxMoves} moves, including rotations.
         rule5: Your result will be counted in OBTM.
         rule6: "Only use notation from Article 12 of the WCA Regulations. If you are uncertain, use only the exact moves listed here:"
         faceMoves: Face Moves

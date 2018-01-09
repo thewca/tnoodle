@@ -11,3 +11,5 @@ tmtc
 *.pyc
 *.log.*
 node_modules/
+
+webscrambles/WebContent/wca/new-ui/

@@ -26,7 +26,7 @@ public final class Utils {
 
     private static final String RESOURCE_FOLDER = "tnoodle_resources";
     private static final String DEVEL_VERSION = "devel";
-    public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
+    public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
 
     private Utils() {}
 
