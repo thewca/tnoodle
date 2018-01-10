@@ -1,8 +1,8 @@
 pt-BR:
     fmc:
+        scrambleXofY: Embaralhamento %{scrambleIndex} de %{scrambleCount}
         scramble: Embaralhamento
         round: Rodada
-        of: de
         attempt: Tentativa
         competitor: Competidor
         warning: NÃO PREENCHA SE VOCÊ FOR O COMPETIDOR.
@@ -13,7 +13,7 @@ pt-BR:
         rule1: Você tem 60 minutos para encontrar e escrever uma solução.
         rule2: Escreva 1 movimento por barra. Para anular um movimento, rasure-o completamente.
         rule3: Sua solução não deve ser derivada diretamente de nenhuma parte do embaralhamento.
-        rule4: Sua solução deve ter %s movimentos no máximo, incluindo rotações.
+        rule4: Sua solução deve ter %{maxMoves} movimentos no máximo, incluindo rotações.
         rule5: Seu resultado será contado em OBTM.
         rule6: "Use as notações do Artigo 12 das regulações da WCA. Se você tem dúvidas, use apenas os movimentos listados aqui:"
         faceMoves: Movimentos de Face
