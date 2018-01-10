@@ -612,14 +612,14 @@ class ScrambleRequest {
         fontSize = 15;
 
         rect = new Rectangle(competitorInfoLeft+padding, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+        fitAndShowText(cb, translate("fmc.competitor", locale)+": ___________________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
         fontSize = 15;
         cb.beginText();
         cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, translate("wcaid", locale) + ":", competitorInfoLeft+padding, top-offsetTop, 0);
 
         cb.setFontAndSize(bf, 19);
         int wcaIdLength = 63;
