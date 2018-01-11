@@ -1,11 +1,11 @@
 id:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Scramble %{scrambleIndex} dari %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Scramble
         #original_hash: ec7b598
-        round: Ronde
-        #original_hash: de04fa0
-        of: dari
+        round: Babak
         #original_hash: 43d44fe
         attempt: Attempt
         #original_hash: 4705687
@@ -28,8 +28,10 @@ id:
         rule3: >-
             Solusi Anda tidak boleh didapatkan secara langsung dari bagian
             apapun pada algoritma Scramble.
-        #original_hash: c5cc2f6
-        rule4: 'Solusi Anda tidak boleh melebihi %s gerakan, termasuk rotasi.'
+        #original_hash: 45551a7
+        rule4: >-
+            Solusi Anda tidak boleh melebihi %{maxMoves} gerakan, termasuk
+            rotasi.
         #original_hash: 1ba5f27
         rule5: Hasil Anda akan dihitung dalam satuan OBTM.
         #original_hash: 42e1a95
