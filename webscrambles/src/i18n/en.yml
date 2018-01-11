@@ -9,7 +9,11 @@ en:
         event: Fewest Moves
         graded: Graded by
         result: Result
+<<<<<<< HEAD
         wca_id: WCA ID
+=======
+        wcaid: WCA ID
+>>>>>>> 54a55c97209a0789bc2f6396298f1f5f303a72bd
 
         rule1: You have 60 minutes to find and write a solution.
         rule2: Write 1 move per bar. To delete a move, clearly blacken it.
