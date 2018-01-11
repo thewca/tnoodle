@@ -1,11 +1,11 @@
 ko:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: '스크럼블 %{scrambleIndex} / %{scrambleCount}'
         #original_hash: b7126cd
         scramble: 스크럼블
         #original_hash: ec7b598
         round: 라운드
-        #original_hash: de04fa0
-        of: /
         #original_hash: 43d44fe
         attempt: 시도
         #original_hash: 4705687
@@ -24,8 +24,8 @@ ko:
         rule2: 칸 하나당 회전기호 1개씩 쓸 수 있으며 잘못 적었을 시 명백하게 지우셔야 합니다.
         #original_hash: 7822590
         rule3: 제출한 답안은 주어진 스크럼블의 어떠한 부분과도 직접적으로 연관이 있으면 안됩니다.
-        #original_hash: c5cc2f6
-        rule4: 답안은 큐브 전체 회전 기호를 포함하여 최대 %s회전까지 작성하실 수 있습니다.
+        #original_hash: 45551a7
+        rule4: '답안은 큐브 전체 회전 기호를 포함하여 최대 %{maxMoves}회전까지 작성하실 수 있습니다.'
         #original_hash: 1ba5f27
         rule5: '답안은 외부 블록 턴 방식(OBTM)으로 채점됩니다. (면의 움직임 1회전, 퍼즐 전체 회전은 0회전)'
         #original_hash: 42e1a95
