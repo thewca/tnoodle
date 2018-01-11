@@ -1,0 +1,54 @@
+de:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Scramble %{scrambleIndex} von %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Scramble
+        #original_hash: ec7b598
+        round: Runde
+        #original_hash: 43d44fe
+        attempt: Versuch
+        #original_hash: 4705687
+        competitor: Teilnehmer
+        #original_hash: 220a57b
+        warning: NICHT AUSFÜLLEN WENN DU SELBST TEILNIMMST.
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: Ausgewertet von
+        #original_hash: 5faa59d
+        result: Ergebnis
+        #original_hash: 49debdc
+        rule1: >-
+            Du hast 60 Minuten Zeit, um eine Lösung zu finden und
+            aufzuschreiben.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Notiere genau 1 Zug pro Balken. Um einen Zug ungültig zu machen,
+            bitte klar und deutlich durchstreichen.
+        #original_hash: 7822590
+        rule3: >-
+            Deine Lösung darf nicht in direktem Zusammenhang mit Teilen des
+            Scrambles stehen.
+        #original_hash: 45551a7
+        rule4: >-
+            Deine Lösung darf höchstens %{maxMoves} Züge umfassen,
+            Würfeldrehungen inbegriffen.
+        #original_hash: 1ba5f27
+        rule5: Dein Ergebnis wird in OBTM ausgezählt.
+        #original_hash: 42e1a95
+        rule6: >-
+            Benutze nur die Notation aus Artikel 12 des WCA-Regelwerks. Wenn du
+            dir unsicher bist, nutze ausschließlich die hier aufgeführten Züge:
+        #original_hash: dd22ec2
+        faceMoves: Drehungen einer Seite
+        #original_hash: 57e9da1
+        rotations: Drehungen des gesamten Würfels
+        #original_hash: c75ac6f
+        clockwise: Im Uhrzeigersinn
+        #original_hash: 80fe739
+        counterClockwise: Gegen den Uhrzeigersinn
+        #original_hash: 8158159
+        double: Doppeldrehung
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Bitte sieh auf dem separaten Scramble-Zettel nach.
