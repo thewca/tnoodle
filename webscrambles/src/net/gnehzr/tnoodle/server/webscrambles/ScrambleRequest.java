@@ -51,6 +51,7 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
 
 import javax.servlet.ServletContext;
+
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.BufferedReader;
@@ -583,7 +584,7 @@ class ScrambleRequest {
             offsetTop -= fontSize + 2;
         }
 
-        // the 100 number in the fit text function is just some big number. Hopefully, fitting the width will be enough to fit the height.
+        // The 100 number in the fit text function is just some big number. Hopefully, fitting the width will be enough to fit the height.
         Rectangle rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
 
         fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
@@ -631,7 +632,7 @@ class ScrambleRequest {
         fontSize = 15;
         cb.beginText();
         cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, translate("fmc.wca_id", locale) + ":", competitorInfoLeft+padding, top-offsetTop, 0);
 
         cb.setFontAndSize(bf, 19);
         int wcaIdLength = 63;
@@ -664,6 +665,96 @@ class ScrambleRequest {
             offsetTop += fontSize + marginBottom;
         }
 
+        // Table
+        int tableWidth = competitorInfoLeft-left;
+        int tableHeight = 160;
+        int tableLines = 8;
+        int cellWidth = 25;
+        int cellHeight = tableHeight/tableLines;
+        int columns = 7;
+        int firstColumnWidth = tableWidth-(columns-1)*cellWidth;
+
+        PdfPTable table = new PdfPTable(columns);
+        table.setTotalWidth(new float[]{firstColumnWidth, cellWidth, cellWidth, cellWidth, cellWidth, cellWidth, cellWidth});
+        table.setLockedWidth(true);
+
+        String[] movesType = {
+                translate("fmc.faceMoves", locale),
+                translate("fmc.rotations", locale)};
+        String[] direction = {
+                translate("fmc.clockwise", locale),
+                translate("fmc.counterClockwise", locale),
+                translate("fmc.double", locale)};
+
+        String[] directionModifiers = {"", "'", "2"};
+        String[] moves = {"F", "R", "U", "B", "L", "D"};
+        String[][][] movesCell = new String[movesType.length][direction.length][moves.length];
+
+        // Face moves.
+        for (int i=0; i<directionModifiers.length; i++){
+            for (int j=0; j<moves.length; j++){
+                movesCell[0][i][j] = moves[j]+directionModifiers[i];
+            }
+        }
+        // Rotations.
+        for (int i=0; i<directionModifiers.length; i++){
+            for (int j=0; j<moves.length; j++){
+                movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
+            }
+        }
+
+        float maxFirstColumnWidth = 0; // Variable used to center the table.
+
+        for (int i=0; i<movesType.length; i++) {
+            Rectangle currentRectangle = new Rectangle(firstColumnWidth, tableHeight);
+
+            Font tempFont = new Font(bf);
+            float size = fitText(tempFont, movesType[i], currentRectangle, 10, false, 1f);
+
+            maxFirstColumnWidth = Math.max(maxFirstColumnWidth, tempFont.getBaseFont().getWidthPoint(movesType[i], size));
+
+            PdfPCell cell = new PdfPCell(new Phrase(movesType[i], new Font(bf, size, Font.BOLD)));
+            cell.setFixedHeight(cellHeight);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            cell.setBorder(Rectangle.NO_BORDER);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Phrase(""));
+            cell.setFixedHeight(cellHeight);
+            cell.setColspan(columns-1);
+            cell.setBorder(Rectangle.NO_BORDER);
+            table.addCell(cell);
+
+            for (int j=0; j<directionModifiers.length; j++) {
+                size = fitText(new Font(bf), direction[j], currentRectangle, 10, false, 1f);
+
+                maxFirstColumnWidth = Math.max(maxFirstColumnWidth, tempFont.getBaseFont().getWidthPoint(direction[j], size));
+
+                cell = new PdfPCell(new Phrase(direction[j], new Font(bf, size)));
+                cell.setFixedHeight(cellHeight);
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cell.setBorder(Rectangle.NO_BORDER);
+                table.addCell(cell);
+                for (int k=0; k<moves.length; k++) {
+                    cell = new PdfPCell(new Phrase(movesCell[i][j][k], new Font(bf, 10)));
+                    cell.setFixedHeight(cellHeight);
+                    cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    table.addCell(cell);
+                }
+            }
+        }
+
+        // Center
+        float tableOffset = (tableWidth-(columns-1)*cellWidth-maxFirstColumnWidth)/2;
+
+        // Position the table
+        table.writeSelectedRows(0, -1, left-tableOffset, scrambleBorderTop+tableHeight, cb);
+
+        // Rules
         int MAGIC_NUMBER = 30; // kill me now
 
         fontSize = 25;
@@ -674,6 +765,7 @@ class ScrambleRequest {
         rulesList.add("• "+translate("fmc.rule1", locale));
         rulesList.add("• "+translate("fmc.rule2", locale));
         rulesList.add("• "+translate("fmc.rule3", locale));
+
         int maxMoves = WCA_MAX_MOVES_FMC;
 
         HashMap<String, String> substitutions = new HashMap<String, String>();
@@ -682,33 +774,45 @@ class ScrambleRequest {
 
         rulesList.add("• "+translate("fmc.rule5", locale));
         rulesList.add("• "+translate("fmc.rule6", locale));
-        rulesList.add("  • "+translate("fmc.faceMoves", locale));
-        rulesList.add("    • "+String.format("R     U     F     L     B     D      (%s)", translate("fmc.clockwise", locale)));
-        rulesList.add("    • "+String.format("R'    U'    F'    L'    B'    D'      (%s)", translate("fmc.counterClockwise", locale)));
-        rulesList.add("    • "+String.format("R2   U2   F2   L2   B2   D2    (%s)", translate("fmc.double", locale)));
-        rulesList.add("  • "+translate("fmc.rotations", locale));
-        rulesList.add("    • "+String.format("[r]     [u]     [f]     [l]     [b]     [d]      (%s)", translate("fmc.clockwise", locale)));
-        rulesList.add("    • "+String.format("[r']    [u']    [f']    [l']    [b']    [d']      (%s)", translate("fmc.counterClockwise", locale)));
-        rulesList.add("    • "+String.format("[r2]   [u2]   [f2]   [l2]   [b2]   [d2]    (%s)", translate("fmc.double", locale)));
 
         int rulesTop = competitorInfoBottom + (withScramble ? 65 : 153);
-        Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop+padding*2, competitorInfoLeft-padding, rulesTop);
 
+        Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop+tableHeight, competitorInfoLeft-padding, rulesTop);
         String rules = String.join("\n", rulesList);
-        float leadingMultiplier = 1.5f; // default pdf leading
-
-        float potentialFontSize = fitText(new Font(bf), rules, rulesRectangle, 15f, true, leadingMultiplier);
-
-        ColumnText ct = new ColumnText(cb);
-        ct.setSimpleColumn(rulesRectangle);
-        Paragraph paragraph = new Paragraph(rules);
-        paragraph.setFont(new Font(bf, potentialFontSize));
-        paragraph.setMultipliedLeading(leadingMultiplier);
-        ct.addElement(paragraph);
-
-        ct.go();
+        fitAndShowTextNew(cb, rules, bf, rulesRectangle, 15, Element.ALIGN_LEFT, 1.5f);
 
         doc.newPage();
+    }
+
+    private static void fitAndShowTextNew(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leading) throws DocumentException {
+        // We create a temp pdf and check if the text fit in a rectangle there.
+        // If it's ok, we add the text to original pdf.
+
+        // TODO replace fitAndShowText (old) with this new one
+        // See https://github.com/thewca/tnoodle/issues/306
+
+        do{
+            PdfContentByte tempCb = new PdfContentByte(cb.getPdfWriter());
+
+            ColumnText tempCt = new ColumnText(tempCb);
+            tempCt.setSimpleColumn(rect);
+            tempCt.setLeading(leading*maxFontSize);
+
+            Paragraph p = new Paragraph(text, new Font(bf, maxFontSize));
+            tempCt.addText(p);
+
+            int status = tempCt.go();
+            if (!ColumnText.hasMoreText(status)) { // all the text fit in the rectangle
+                ColumnText ct = new ColumnText(cb);
+                ct.setSimpleColumn(rect);
+                ct.setLeading(leading*maxFontSize);
+                ct.addText(p);
+                ct.go();
+                break;
+            }
+
+            maxFontSize -= 0.1;
+        } while(true);
     }
 
     private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align) {
