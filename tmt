@@ -1034,6 +1034,8 @@ class EclipseProject(TmtProject):
         pass
 
     def _rebuildTNoodleUI(self):
+        if os.environ.get("TNOODLE_SKIP_TNOODLE_UI"):
+            return
         rebuildTNoodleUiCmd = "(cd tnoodle-ui; ./build-and-symlink.sh)"
         assert 0 == os.system(rebuildTNoodleUiCmd)
 
