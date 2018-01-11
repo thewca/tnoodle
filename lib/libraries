@@ -44,4 +44,5 @@ requests: https://github.com/kennethreitz/requests
 
 **** Fonts ****
 fonts/LiberationMono-Regular.ttf: https://github.com/thewca/tnoodle/pull/223
+fonts/NotoSans-Regular.ttf: https://github.com/googlei18n/noto-fonts
 fonts/wqy-microhei.ttf: https://github.com/thewca/tnoodle/pull/246#issuecomment-349533724

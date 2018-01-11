@@ -99,16 +99,28 @@ class ScrambleRequest {
 
     private static final char NON_BREAKING_SPACE = '\u00A0';
 
-    private static BaseFont monoFont, sansSerifFont;
+    private static BaseFont monoFont, notoSans;
+    private static HashMap<Locale, BaseFont> FONT_BY_LOCALE = new HashMap<Locale, BaseFont>();
     static {
         try {
             monoFont = BaseFont.createFont("fonts/LiberationMono-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            sansSerifFont = BaseFont.createFont("fonts/wqy-microhei.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+            BaseFont cjk = BaseFont.createFont("fonts/wqy-microhei.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            FONT_BY_LOCALE.put(Locale.forLanguageTag("zh-CN"), cjk);
+            FONT_BY_LOCALE.put(Locale.forLanguageTag("zh-TW"), cjk);
+            FONT_BY_LOCALE.put(Locale.forLanguageTag("ko"), cjk);
+            FONT_BY_LOCALE.put(Locale.forLanguageTag("ja"), cjk);
+
+            notoSans = BaseFont.createFont("fonts/NotoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         } catch (DocumentException e) {
             l.log(Level.INFO, "", e);
         } catch (IOException e) {
             l.log(Level.INFO, "", e);
         }
+    }
+
+    private static BaseFont getFontForLocale(Locale locale) {
+        return FONT_BY_LOCALE.getOrDefault(locale, notoSans);
     }
 
     private static HashMap<String, ScrambleCacher> scrambleCachers = new HashMap<String, ScrambleCacher>();
@@ -442,7 +454,7 @@ class ScrambleRequest {
         }
         PdfContentByte cb = docWriter.getDirectContent();
         float LINE_THICKNESS = 0.5f;
-        BaseFont bf = sansSerifFont;
+        BaseFont bf = getFontForLocale(locale);
 
         int bottom = 30;
         int left = 35;
@@ -715,7 +727,7 @@ class ScrambleRequest {
         String scramble = scrambleRequest.scrambles[index];
         PdfContentByte cb = docWriter.getDirectContent();
 
-        BaseFont bf = sansSerifFont;
+        BaseFont bf = getFontForLocale(Translate.DEFAULT_LOCALE);
 
         int bottom = 30;
         int left = 35;
