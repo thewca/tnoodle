@@ -1,11 +1,11 @@
 nb:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Blanding %{scrambleIndex} av %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Blanding
         #original_hash: ec7b598
         round: Runde
-        #original_hash: de04fa0
-        of: av
         #original_hash: 43d44fe
         attempt: Forsøk
         #original_hash: 4705687
@@ -22,16 +22,16 @@ nb:
         rule1: Du har 60 minutter på å finne og skrive ned en løsning.
         #original_hash: 8b6b48b
         rule2: >-
-            Skriv 1 trekk per linje. For å slette et trekk, strek den ut
+            Skriv 1 trekk per linje. For å slette et trekk, strek det ut
             tydelig.
         #original_hash: 7822590
         rule3: Din løsning skal ikke direkte bruke noen deler av blandealgoritmen.
-        #original_hash: c5cc2f6
+        #original_hash: 45551a7
         rule4: >-
-            Løsningen din skal ikke være lengre enn %s trekk, inkludert
+            Løsningen din skal ikke være lengre enn %{maxMoves} trekk, inkludert
             rotasjoner.
         #original_hash: 1ba5f27
-        rule5: Resultatet ditt blir talt i OBTM.
+        rule5: Resultatet ditt blir talt i OBTM
         #original_hash: 42e1a95
         rule6: >-
             Bruk kun notasjon fra Artikkel 12 i WCA-Reglementet. Hvis du er
