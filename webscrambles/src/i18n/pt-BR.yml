@@ -1,25 +1,52 @@
 pt-BR:
     fmc:
-        scrambleXofY: Embaralhamento %{scrambleIndex} de %{scrambleCount}
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Embaralhamento %{scrambleIndex} de %{scrambleCount}'
+        #original_hash: b7126cd
         scramble: Embaralhamento
+        #original_hash: ec7b598
         round: Rodada
+        #original_hash: 43d44fe
         attempt: Tentativa
+        #original_hash: 4705687
         competitor: Competidor
+        #original_hash: 220a57b
         warning: NÃO PREENCHA SE VOCÊ FOR O COMPETIDOR.
+        #original_hash: 0263083
         event: Menos Movimentos
+        #original_hash: 960085a
         graded: Verificado por
+        #original_hash: 5faa59d
         result: Resultado
-
+        #original_hash: 49debdc
         rule1: Você tem 60 minutos para encontrar e escrever uma solução.
-        rule2: Escreva 1 movimento por barra. Para anular um movimento, rasure-o completamente.
-        rule3: Sua solução não deve ser derivada diretamente de nenhuma parte do embaralhamento.
-        rule4: Sua solução deve ter %{maxMoves} movimentos no máximo, incluindo rotações.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Escreva 1 movimento por barra. Para anular um movimento, rasure-o
+            completamente.
+        #original_hash: 7822590
+        rule3: >-
+            Sua solução não deve ser derivada diretamente de nenhuma parte do
+            embaralhamento.
+        #original_hash: 45551a7
+        rule4: >-
+            Sua solução deve ter %{maxMoves} movimentos no máximo, incluindo
+            rotações.
+        #original_hash: 1ba5f27
         rule5: Seu resultado será contado em OBTM.
-        rule6: "Use as notações do Artigo 12 das regulações da WCA. Se você tem dúvidas, use apenas os movimentos listados aqui:"
+        #original_hash: 42e1a95
+        rule6: >-
+            Use as notações do Artigo 12 das regulações da WCA. Se você tem
+            dúvidas, use apenas os movimentos listados aqui:
+        #original_hash: dd22ec2
         faceMoves: Movimentos de Face
+        #original_hash: 57e9da1
         rotations: Rotações
-        clockwise: "Horário"
-        counterClockwise: "Anti-horário"
-        double: "Duplo"
-
+        #original_hash: c75ac6f
+        clockwise: Horário
+        #original_hash: 80fe739
+        counterClockwise: Anti-horário
+        #original_hash: 8158159
+        double: Duplo
+        #original_hash: e014b51
         scrambleOnSeparateSheet: Favor ver a imagem do embaralhamento separadamente.
