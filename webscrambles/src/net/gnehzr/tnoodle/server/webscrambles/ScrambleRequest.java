@@ -664,7 +664,7 @@ class ScrambleRequest {
 
             offsetTop += fontSize + marginBottom;
         }
-        
+
         // Table
         int tableWidth = competitorInfoLeft-left;
         int tableHeight = 160;
@@ -673,7 +673,7 @@ class ScrambleRequest {
         int cellHeight = tableHeight/tableLines;
         int columns = 7;
         int firstColumnWidth = tableWidth-(columns-1)*cellWidth;
-        
+
         PdfPTable table = new PdfPTable(columns);
         table.setTotalWidth(new float[]{firstColumnWidth, cellWidth, cellWidth, cellWidth, cellWidth, cellWidth, cellWidth});
         table.setLockedWidth(true);
@@ -689,7 +689,7 @@ class ScrambleRequest {
         String[] directionModifiers = {"", "'", "2"};
         String[] moves = {"F", "R", "U", "B", "L", "D"};
         String[][][] movesCell = new String[movesType.length][direction.length][moves.length];
-        
+
         // Face moves.
         for (int i=0; i<directionModifiers.length; i++){
             for (int j=0; j<moves.length; j++){
@@ -702,43 +702,43 @@ class ScrambleRequest {
                 movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
             }
         }
-        
+
         float maxFirstColumnWidth = 0; // Variable used to center the table.
-        
+
         for (int i=0; i<movesType.length; i++) {
             Rectangle currentRectangle = new Rectangle(firstColumnWidth, tableHeight);
-            
-            Font tempFont = new Font(sansSerifFont);
+
+            Font tempFont = new Font(bf);
             float size = fitText(tempFont, movesType[i], currentRectangle, 10, false, 1f);
-            
+
             maxFirstColumnWidth = Math.max(maxFirstColumnWidth, tempFont.getBaseFont().getWidthPoint(movesType[i], size));
-            
-            PdfPCell cell = new PdfPCell(new Phrase(movesType[i], new Font(sansSerifFont, size, Font.BOLD)));
+
+            PdfPCell cell = new PdfPCell(new Phrase(movesType[i], new Font(bf, size, Font.BOLD)));
             cell.setFixedHeight(cellHeight);
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             cell.setBorder(Rectangle.NO_BORDER);
             table.addCell(cell);
-            
+
             cell = new PdfPCell(new Phrase(""));
             cell.setFixedHeight(cellHeight);
             cell.setColspan(columns-1);
             cell.setBorder(Rectangle.NO_BORDER);
             table.addCell(cell);
-            
+
             for (int j=0; j<directionModifiers.length; j++) {
-                size = fitText(new Font(sansSerifFont), direction[j], currentRectangle, 10, false, 1f);
-                
+                size = fitText(new Font(bf), direction[j], currentRectangle, 10, false, 1f);
+
                 maxFirstColumnWidth = Math.max(maxFirstColumnWidth, tempFont.getBaseFont().getWidthPoint(direction[j], size));
-                
-                cell = new PdfPCell(new Phrase(direction[j], new Font(sansSerifFont, size)));
+
+                cell = new PdfPCell(new Phrase(direction[j], new Font(bf, size)));
                 cell.setFixedHeight(cellHeight);
                 cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 cell.setBorder(Rectangle.NO_BORDER);
                 table.addCell(cell);
                 for (int k=0; k<moves.length; k++) {
-                    cell = new PdfPCell(new Phrase(movesCell[i][j][k], new Font(sansSerifFont, 10)));
+                    cell = new PdfPCell(new Phrase(movesCell[i][j][k], new Font(bf, 10)));
                     cell.setFixedHeight(cellHeight);
                     cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -747,13 +747,13 @@ class ScrambleRequest {
                 }
             }
         }
-        
+
         // Center
         float tableOffset = (tableWidth-(columns-1)*cellWidth-maxFirstColumnWidth)/2;
-        
+
         // Position the table
         table.writeSelectedRows(0, -1, left-tableOffset, scrambleBorderTop+tableHeight, cb);
-        
+
         // Rules
         int MAGIC_NUMBER = 30; // kill me now
 
@@ -780,27 +780,27 @@ class ScrambleRequest {
         Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop+tableHeight, competitorInfoLeft-padding, rulesTop);
         String rules = String.join("\n", rulesList);
         fitAndShowTextNew(cb, rules, bf, rulesRectangle, 15, Element.ALIGN_LEFT, 1.5f);
-        
+
         doc.newPage();
     }
-    
+
     private static void fitAndShowTextNew(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leading) throws DocumentException {
         // We create a temp pdf and check if the text fit in a rectangle there.
         // If it's ok, we add the text to original pdf.
-        
+
         // TODO replace fitAndShowText (old) with this new one
         // See https://github.com/thewca/tnoodle/issues/306
-        
+
         do{
             PdfContentByte tempCb = new PdfContentByte(cb.getPdfWriter());
-            
+
             ColumnText tempCt = new ColumnText(tempCb);
             tempCt.setSimpleColumn(rect);
             tempCt.setLeading(leading*maxFontSize);
-            
+
             Paragraph p = new Paragraph(text, new Font(bf, maxFontSize));
             tempCt.addText(p);
-            
+
             int status = tempCt.go();
             if (!ColumnText.hasMoreText(status)) { // all the text fit in the rectangle
                 ColumnText ct = new ColumnText(cb);
@@ -810,11 +810,11 @@ class ScrambleRequest {
                 ct.go();
                 break;
             }
-            
+
             maxFontSize -= 0.1;
         } while(true);
     }
-    
+
     private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align) {
         cb.beginText();
         cb.setFontAndSize(bf, fitText(new Font(bf), text, new Rectangle((int)rect.getRight(), (int)rect.getTop()), maxFontSize, false, 1));
