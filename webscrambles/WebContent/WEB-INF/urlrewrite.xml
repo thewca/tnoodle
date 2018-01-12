@@ -16,7 +16,7 @@
 
     <rule>
         <from>^/scramble$</from>
-        <to type="redirect" qsappend="true">/scramble/</to>
+        <to type="redirect" last="true" qsappend="true">/scramble/</to>
     </rule>
     <rule>
         <from>^/scramble/static</from>
@@ -29,7 +29,7 @@
 
     <rule>
         <from>^/scramble-legacy$</from>
-        <to type="redirect" qsappend="true">/scramble-legacy/</to>
+        <to type="redirect" last="true" qsappend="true">/scramble-legacy/</to>
     </rule>
     <rule>
         <from>^/scramble-legacy/$</from>
