@@ -1,7 +1,7 @@
 fi:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Sekoitussarja %{scrambleIndex} / %{scrambleCount}'
+        scrambleXofY: 'Yritys %{scrambleIndex} / %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Sekoitussarja
         #original_hash: ec7b598
