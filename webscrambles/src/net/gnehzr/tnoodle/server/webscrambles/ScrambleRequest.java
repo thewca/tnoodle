@@ -519,6 +519,7 @@ class ScrambleRequest {
         int linesY = (int) Math.ceil(1.0*WCA_MAX_MOVES_FMC / linesX);
 
         cb.setLineWidth(LINE_THICKNESS);
+        cb.setColorStroke(new BaseColor(0xC6, 0xC6, 0xC6)); // leduyquang753: Somehow this affects also the color of the borders, which were drawn above...
         cb.stroke();
 
         int excessX = availableSolutionWidth-linesX*lineWidth;
@@ -540,6 +541,7 @@ class ScrambleRequest {
         float UNDERLINE_THICKNESS = 0.2f;
         cb.setLineWidth(UNDERLINE_THICKNESS);
         cb.stroke();
+        cb.setColorStroke(new BaseColor(0x00, 0x00, 0x00));
 
         if(withScramble) {
             cb.beginText();
@@ -587,18 +589,18 @@ class ScrambleRequest {
         // The 100 number in the fit text function is just some big number. Hopefully, fitting the width will be enough to fit the height.
         Rectangle rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
 
-        fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        fitAndShowText(cb, globalTitle, "", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
         offsetTop += fontSize + 2;
 
         if(withScramble) {
             rect = new Rectangle(competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, right-competitorInfoLeft, top - offsetTop);
-            fitAndShowText(cb, scrambleRequest.title, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            fitAndShowText(cb, scrambleRequest.title, "", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         } else {
             offsetTop += marginBottom;
 
             rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, top - offsetTop);
-            fitAndShowText(cb, translate("fmc.round", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+            fitAndShowText(cb, translate("fmc.round", locale)+": ", "__", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
         }
 
         if(showScrambleCount) {
@@ -609,7 +611,7 @@ class ScrambleRequest {
             HashMap<String, String> substitutions = new HashMap<String, String>();
             substitutions.put("scrambleIndex", ""+(index+1));
             substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
-            fitAndShowText(cb, translate("fmc.scrambleXofY", locale, substitutions), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            fitAndShowText(cb, translate("fmc.scrambleXofY", locale, substitutions), "", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         }
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
@@ -618,14 +620,14 @@ class ScrambleRequest {
             fontSize = 15;
 
             rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, translate("fmc.attempt", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+            fitAndShowText(cb, translate("fmc.attempt", locale)+": ", "__", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
 
             offsetTop += fontSize + (int) (marginBottom * 2.8);
         }
         fontSize = 15;
 
         rect = new Rectangle(competitorInfoLeft+padding, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+        fitAndShowText(cb, translate("fmc.competitor", locale)+": ", "____________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
@@ -635,8 +637,10 @@ class ScrambleRequest {
         cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
 
         cb.setFontAndSize(bf, 19);
+        cb.setColorFill(new BaseColor(0xC6, 0xC6, 0xC6)); // Gray grey grey...
         int wcaIdLength = 63;
         cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
+        cb.setColorFill(new BaseColor(0x00, 0x00, 0x00)); // Get the black eggs back.
 
         fontSize = 15;
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1.8 : 1.4));
@@ -645,14 +649,22 @@ class ScrambleRequest {
         fontSize = 11;
 
         rect = new Rectangle(competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.warning", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        fitAndShowText(cb, translate("fmc.warning", locale), "", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
         offsetTop += fontSize + marginBottom;
 
         fontSize = 11;
-
-        rect = new Rectangle(competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.graded", locale)+": _______________ "+translate("fmc.result", locale)+": ______", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        
+        
+        // leduyquang753: This stuff is quite complicated to work with
+        rect = new Rectangle(competitorInfoLeft + padding, top-offsetTop, right-competitorInfoLeft, 100);
+        fontSize = (int) fitText(new Font(bf), translate("fmc.graded", locale)+": _______________" + translate("fmc.result", locale)+": ______", new Rectangle((int)rect.getRight(), (int)rect.getTop()), fontSize, false, 1); // You know, verbose.
+        fitAndShowText(cb, translate("fmc.graded", locale)+": ", "_______________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+        
+        int morePadding = (int) bf.getWidthPoint(translate("fmc.graded", locale)+": _______________ ", fontSize) + 5;
+        rect = new Rectangle(competitorInfoLeft + padding + morePadding, top-offsetTop, right-competitorInfoLeft, 100);
+        fitAndShowText(cb, translate("fmc.result", locale)+": ", "______", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+        fontSize = 11;
 
         offsetTop += fontSize + (marginBottom*(withScramble ? 1 : 5));
 
@@ -660,7 +672,7 @@ class ScrambleRequest {
             fontSize = 11;
 
             rect = new Rectangle(competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, translate("fmc.scrambleOnSeparateSheet", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            fitAndShowText(cb, translate("fmc.scrambleOnSeparateSheet", locale), "", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
             offsetTop += fontSize + marginBottom;
         }
@@ -755,11 +767,11 @@ class ScrambleRequest {
         table.writeSelectedRows(0, -1, left-tableOffset, scrambleBorderTop+tableHeight, cb);
 
         // Rules
-        int MAGIC_NUMBER = 30; // kill me now
+        int MAGIC_NUMBER = 30; // KILL. ME. NOW. Why am I magical???
 
         fontSize = 25;
         rect = new Rectangle(left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        fitAndShowText(cb, translate("fmc.event", locale), "", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
         ArrayList<String> rulesList = new ArrayList<String>();
         rulesList.add("• "+translate("fmc.rule1", locale));
@@ -790,6 +802,8 @@ class ScrambleRequest {
 
         // TODO replace fitAndShowText (old) with this new one
         // See https://github.com/thewca/tnoodle/issues/306
+        
+        // leduyquang753: Hey! If we are going to discard the old one, so am I going to have to implement the gray stuff twice???
 
         do{
             PdfContentByte tempCb = new PdfContentByte(cb.getPdfWriter());
@@ -815,11 +829,21 @@ class ScrambleRequest {
         } while(true);
     }
 
-    private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align) {
+    private static void fitAndShowText(PdfContentByte cb, String text, String textGrayed, BaseFont bf, Rectangle rect, float maxFontSize, int align) {
+    // leduyquang753: Currently the form is still keeping using the old function, so I implemented the gray stuff here. Please tell me if this dies. Thanks.
+        float fitThat = fitText(new Font(bf), text + textGrayed, new Rectangle((int)rect.getRight(), (int)rect.getTop()), maxFontSize, false, 1); // Fit it! Once and forever!
         cb.beginText();
-        cb.setFontAndSize(bf, fitText(new Font(bf), text, new Rectangle((int)rect.getRight(), (int)rect.getTop()), maxFontSize, false, 1));
+        cb.setFontAndSize(bf, fitThat);
         cb.showTextAligned(align, text, (int)rect.getLeft(), (int)rect.getBottom(), 0);
         cb.endText();
+        if (textGrayed != "") { // The gray stuff
+            cb.beginText();
+            cb.setColorFill(new BaseColor(0xC6, 0xC6, 0xC6)); // Gray.
+            cb.setFontAndSize(bf, fitThat);
+            cb.showTextAligned(align, textGrayed, (int) (rect.getLeft() + bf.getWidthPoint(text, fitThat)), (int)rect.getBottom(), 0);
+            cb.setColorFill(new BaseColor(0x00, 0x00, 0x00)); // Black eggs.
+            cb.endText();
+        }
     }
 
     private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, Locale locale) throws DocumentException, IOException {
