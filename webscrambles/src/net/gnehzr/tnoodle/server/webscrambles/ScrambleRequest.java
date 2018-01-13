@@ -622,21 +622,26 @@ class ScrambleRequest {
 
             offsetTop += fontSize + (int) (marginBottom * 2.8);
         }
-        fontSize = 15;
 
         rect = new Rectangle(competitorInfoLeft+padding, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+        //fontSize = (int) (fitText(new Font(bf), translate("fmc.competitor", locale)+": __________________", rect, 15, false, 1f));
+        rect = new Rectangle((competitorInfoLeft+right)/2, top-offsetTop, right-competitorInfoLeft, 100);
+        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
+        
         fontSize = 15;
+        int wcaIdWidth = (int) (bf.getWidthPoint("WCA ID:", fontSize) + bf.getWidthPoint("_ _ _ _  _ _ _ _  _ _", 19));
+        int wcaIdStartPoint = competitorInfoLeft + (right - competitorInfoLeft - wcaIdWidth) / 2;
+        
         cb.beginText();
         cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", wcaIdStartPoint, top-offsetTop, 0);
 
         cb.setFontAndSize(bf, 19);
         int wcaIdLength = 63;
-        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
+        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", wcaIdStartPoint+wcaIdLength, top-offsetTop, 0);
 
         fontSize = 15;
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1.8 : 1.4));
