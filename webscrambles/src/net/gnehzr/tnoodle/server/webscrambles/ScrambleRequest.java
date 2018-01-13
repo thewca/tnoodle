@@ -657,12 +657,15 @@ class ScrambleRequest {
         
         
         // leduyquang753: This stuff is quite complicated to work with
-        rect = new Rectangle(competitorInfoLeft + padding, top-offsetTop, right-competitorInfoLeft, 100);
         fontSize = (int) fitText(new Font(bf), translate("fmc.graded", locale)+": _______________" + translate("fmc.result", locale)+": ______", new Rectangle((int)rect.getRight(), (int)rect.getTop()), fontSize, false, 1); // You know, verbose.
+        String gradedString = translate("fmc.graded", locale)+": _______________" + translate("fmc.result", locale)+": ______";
+        int startPoint = (int) (competitorInfoLeft + (right - competitorInfoLeft - bf.getWidthPoint(gradedString, fontSize)) / 2 + padding); // Center the line
+        
+        rect = new Rectangle(startPoint, top-offsetTop, right-competitorInfoLeft, 100);
         fitAndShowText(cb, translate("fmc.graded", locale)+": ", "_______________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
         
         int morePadding = (int) bf.getWidthPoint(translate("fmc.graded", locale)+": _______________ ", fontSize) + 5;
-        rect = new Rectangle(competitorInfoLeft + padding + morePadding, top-offsetTop, right-competitorInfoLeft, 100);
+        rect = new Rectangle(startPoint + morePadding, top-offsetTop, right-competitorInfoLeft, 100);
         fitAndShowText(cb, translate("fmc.result", locale)+": ", "______", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
         fontSize = 11;
 
