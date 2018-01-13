@@ -17,13 +17,12 @@ class ManageCompetition extends Component {
   constructor() {
     super();
     this.state = {
-      scramblePassword: '',
       showScramblePassword: false,
     };
   }
 
   render() {
-    let { competitionJson, dispatch } = this.props;
+    let { competitionJson, scrambleZip, scramblePassword, dispatch } = this.props;
     if(!competitionJson) {
       return (
         <div>Loading competition...</div>
@@ -60,20 +59,31 @@ class ManageCompetition extends Component {
       );
     }
 
-    let { showScramblePassword, scramblePassword } = this.state;
+    let { showScramblePassword } = this.state;
     let progress = currentScrambleCount / scramblesNeededCount;
+    let finishedGeneratingScrambles = currentScrambleCount >= scramblesNeededCount;
 
     let generationArea;
-    if(progress === 1) {
-      generationArea = <button
+    if(scrambleZip) {
+      generationArea = <a
           className="btn btn-block btn-lg btn-primary"
-          onClick={e => dispatch(actions.downloadScrambles(e.shiftKey, scramblePassword))}
+          download={scrambleZip.title}
+          href={scrambleZip.url}
+          onClick={e => {
+            if(e.shiftKey) {
+                e.preventDefault();
+                dispatch(actions.downloadScrambles({ pdf: true, password: scramblePassword }));
+            }
+          }}
         >
         Download scrambles
-      </button>;
+      </a>;
     } else if(this.state.hasStartedGeneratingScrambles) {
       generationArea = <div className="progress scramble-generation">
-        <div className="progress-bar progress-bar-striped progress-bar-animated" style={{width: Math.max(5, progress*100) + "%"}}></div>
+        <div className="progress-bar progress-bar-striped progress-bar-animated"
+             style={{width: Math.max(5, progress*100) + "%"}}>
+          {finishedGeneratingScrambles ? "Generating zip file..." : ""}
+        </div>
       </div>;
     } else {
       generationArea = <button
@@ -90,7 +100,7 @@ class ManageCompetition extends Component {
     return (
       <div className="manage-competition">
         <p>
-          Found {pluralize('event', competitionJson.events.length, true)} for {competitionJson.id}.
+          Found {pluralize('event', competitionJson.events.length, true)} for {competitionJson.name}.
         </p>
         <div className="text-center">
           {competitionJson.events.map(event => {
@@ -112,7 +122,7 @@ class ManageCompetition extends Component {
                   placeholder="Password"
                   value={scramblePassword}
                   ref={input => this.passwordInput = input}
-                  onChange={e => this.setState({ scramblePassword: e.target.value })}
+                  onChange={e => dispatch(actions.setScramblePassword(e.target.value))}
                 />
                 <span
                   className="input-group-addon pointer"
@@ -145,6 +155,7 @@ export default connect(
     return {
       competitionId: ownProps.match.params.competitionId,
       competitionJson: state.competitionJson,
+      scrambleZip: state.scrambleZip,
     };
   },
 )(
@@ -158,10 +169,9 @@ export default connect(
     }
 
     render() {
-      let { competitionJson, dispatch } = this.props;
       return <div className="container">
         <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
-        <ManageCompetition competitionJson={competitionJson} dispatch={dispatch} />
+        <ManageCompetition {...this.props} />
       </div>;
     }
   }

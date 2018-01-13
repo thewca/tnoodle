@@ -6,6 +6,7 @@
   "dependencies": {
     "bootstrap": "4.0.0-beta.2",
     "classnames": "^2.2.5",
+    "form-urlencoded": "^2.0.4",
     "lodash": "^4.17.4",
     "node-sass": "^4.5.1",
     "npm-run-all": "^4.0.2",

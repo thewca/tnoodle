@@ -1,7 +1,7 @@
 import events from 'wca/events';
 import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
-import { parseActivityCode, getActivity, formatToScrambleCount, getNextAvailableGroupName } from 'WcaCompetitionJson';
+import { parseActivityCode, getActivity, formatToScrambleCount, getNextAvailableGroupName, checkScrambles } from 'WcaCompetitionJson';
 
 let TNOODLE_BASE_URL = "http://localhost:2014";
 const scrambler = new tnoodle.Scrambler(TNOODLE_BASE_URL);
@@ -31,12 +31,10 @@ export function generateMissingScrambles(rounds) {
       rounds,
     });
 
-    let state = getState();
-    let competitionJson = state.competitionJson;
     rounds.forEach(round => {
       let activityCode = round.id;
       let { eventId } = parseActivityCode(activityCode);
-      let wcaRound = getActivity(competitionJson, activityCode);
+      let wcaRound = getActivity(getState().competitionJson, activityCode);
       let groupsToGenerateCount = wcaRound.scrambleGroupCount - wcaRound.groups.length;
       let usedGroupNames = wcaRound.groups.map(wcaGroup => wcaGroup.group);
       let namesOfGroupsToGenerate = [];
@@ -52,6 +50,8 @@ export function generateMissingScrambles(rounds) {
             groupName,
             scrambles,
           });
+
+          dispatch(maybeRegenerateScramblesZip());
         }, eventToTNoodlePuzzle(eventId), null, scramblesPerGroup);
       });
     });
@@ -106,17 +106,52 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
   return scrambleRequest;
 }
 
-export function downloadScrambles(asPdf, password) {
+let pendingRegenerationTimer = null;
+const ZIP_GENERATION_PAUSE_MS = 200;
+export function setScramblePassword(scramblePassword) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: "SET_SCRAMBLE_PASSWORD",
+      scramblePassword,
+    });
+    dispatch({ type: "CLEAR_SCRAMBLE_ZIP" });
+
+    // Debounce regenerating the scramble zip file, because when the user types in
+    // password "foo", setScramblePassword is called 3 times.
+    if(pendingRegenerationTimer) {
+      clearTimeout(pendingRegenerationTimer);
+    }
+    pendingRegenerationTimer = setTimeout(function() {
+      dispatch(maybeRegenerateScramblesZip());
+      pendingRegenerationTimer = null;
+    }, ZIP_GENERATION_PAUSE_MS);
+  }
+}
+
+export function maybeRegenerateScramblesZip() {
+  return (dispatch, getState) => {
+    let { currentScrambleCount, scramblesNeededCount } = checkScrambles(getState().competitionJson);
+    if(currentScrambleCount >= scramblesNeededCount) {
+      dispatch({ type: "CLEAR_SCRAMBLE_ZIP" });
+      dispatch(downloadScrambles({ pdf: false, password: getState().scramblePassword }));
+    }
+  };
+}
+
+export function downloadScrambles({ pdf, password }) {
   return (dispatch, getState) => {
     let state = getState();
     let competitionJson = state.competitionJson;
 
     let request = competitionJsonToTNoodleScrambleRequest(competitionJson);
     let title = `Scrambles for ${competitionJson.id}`;
-    if(asPdf) {
-      scrambler.showPdf(title, request, password, '_blank');
+    if(pdf) {
+      return scrambler.showPdf(title, request, password, "_blank");
     } else {
-      scrambler.showZip(title, request, password, '_blank');
+      return scrambler.fetchZip(title, request, password).then(titleBlob => dispatch({
+        type: "SCRAMBLE_ZIP_FETCHED",
+        ...titleBlob,
+      }));
     }
   };
 }

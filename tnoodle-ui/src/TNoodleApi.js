@@ -1,4 +1,7 @@
 /* eslint-disable */
+
+import formurlencoded from 'form-urlencoded';
+
 // Copied and modified from webscrambles/WebContent/wca/scrambleserver.js
 var tnoodle = {};
 export default tnoodle;
@@ -74,19 +77,45 @@ tnoodle.Scrambler = function(baseUrl) {
         return scheme;
     };
 
-    this.showExt = function(title, scrambleRequest, password, ext, target) {
-        var params = { sheets: JSON.stringify(scrambleRequest) };
+    this.showExt = function(title, scrambleRequest, password, ext, {target, doFetch}) {
+        var body = {}
+        body.sheets = JSON.stringify(scrambleRequest);
         if(password) {
-            params.password = password;
+            body.password = password;
         }
-        params.generationUrl = location.href;
-        tnoodle.postToUrl(that.viewUrl + encodeURIComponent(title) + '.' + ext, params, "POST", target);
+        body.generationUrl = location.href;
+        let url = that.viewUrl + encodeURIComponent(title) + '.' + ext;
+
+        if(doFetch) {
+            return fetch(url, {
+                method: "POST",
+                body: formurlencoded(body),
+                headers: {
+                  'Content-type': 'application/x-www-form-urlencoded',
+                },
+            }).then(res => {
+              if(res.status != 200) {
+                return res.text().then(text => {
+                  throw new Error(`Fetch returned ${res.status}: ${text}`);
+                });
+              }
+              return res.blob();
+            }).then(blob => { return {title, blob}; });
+        } else {
+            tnoodle.postToUrl(url, body, "POST", target);
+        }
     };
+    this.fetchPdf = function(title, scrambleRequest, password) {
+        return that.showExt(title, scrambleRequest, password, 'pdf', { doFetch: true });
+    }
     this.showPdf = function(title, scrambleRequest, password, target) {
-        that.showExt(title, scrambleRequest, password, 'pdf', target);
+        return that.showExt(title, scrambleRequest, password, 'pdf', { target });
     };
+    this.fetchZip = function(title, scrambleRequest, password) {
+        return that.showExt(title, scrambleRequest, password, 'zip', { doFetch: true });
+    }
     this.showZip = function(title, scrambleRequest, password, target) {
-        that.showExt(title, scrambleRequest, password, 'zip', target);
+        return that.showExt(title, scrambleRequest, password, 'zip', { target });
     };
 
     this.loadPuzzles = function(callback, includeStatus) {
