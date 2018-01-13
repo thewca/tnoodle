@@ -625,7 +625,7 @@ class ScrambleRequest {
 
         rect = new Rectangle(competitorInfoLeft+padding, top-offsetTop, right-competitorInfoLeft, 100);
         //fontSize = (int) (fitText(new Font(bf), translate("fmc.competitor", locale)+": __________________", rect, 15, false, 1f));
-        rect = new Rectangle((competitorInfoLeft+right)/2, top-offsetTop, right-competitorInfoLeft, 100);
+        rect = new Rectangle((competitorInfoLeft+right)/2-5, top-offsetTop, right-competitorInfoLeft, 100);
         fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
@@ -633,7 +633,7 @@ class ScrambleRequest {
         
         fontSize = 15;
         int wcaIdWidth = (int) (bf.getWidthPoint("WCA ID:", fontSize) + bf.getWidthPoint("_ _ _ _  _ _ _ _  _ _", 19));
-        int wcaIdStartPoint = competitorInfoLeft + (right - competitorInfoLeft - wcaIdWidth) / 2;
+        int wcaIdStartPoint = competitorInfoLeft + (right - competitorInfoLeft - wcaIdWidth) / 2 - 5;
         
         cb.beginText();
         cb.setFontAndSize(bf, fontSize);
