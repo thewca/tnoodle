@@ -26,6 +26,7 @@ export const competitionJson = function(state=null, action) {
     round.groups.push({
       group: action.groupName,
       scrambles: action.scrambles,
+      extraScrambles: action.extraScrambles,
     });
     return normalizeCompetitionJson(competitionJson);
   } else {

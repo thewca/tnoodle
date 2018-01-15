@@ -41,18 +41,21 @@ export function generateMissingScrambles(rounds) {
       for(let i = 0; i < groupsToGenerateCount; i++) {
         namesOfGroupsToGenerate.push(getNextAvailableGroupName(usedGroupNames.concat(namesOfGroupsToGenerate)));
       }
-      let scramblesPerGroup = formatToScrambleCount(wcaRound.format);
+      let { scrambleCount, extraScrambleCount } = formatToScrambleCount(wcaRound.format);
       namesOfGroupsToGenerate.forEach(groupName => {
-        scrambler.loadScrambles(scrambles => {
+        scrambler.loadScrambles(generatedScrambles => {
+          let scrambles = generatedScrambles.slice(0, scrambleCount);
+          let extraScrambles = generatedScrambles.slice(scrambleCount, scrambleCount + extraScrambleCount);
           dispatch({
             type: "GROUP_FOR_ROUND",
             activityCode,
             groupName,
             scrambles,
+            extraScrambles,
           });
 
           dispatch(maybeRegenerateScramblesZip());
-        }, eventToTNoodlePuzzle(eventId), null, scramblesPerGroup);
+        }, eventToTNoodlePuzzle(eventId), null, scrambleCount + extraScrambleCount);
       });
     });
   };

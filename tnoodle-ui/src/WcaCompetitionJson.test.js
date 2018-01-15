@@ -25,6 +25,7 @@ it('checkScrambles finds missing scrambles', () => {
               {
                 group: "A",
                 scrambles: [ "1", "2", "3" ],
+                extraScrambles: [ "E1", "E2" ],
               },
             ],
           },
@@ -35,6 +36,7 @@ it('checkScrambles finds missing scrambles', () => {
               {
                 group: "A",
                 scrambles: [ "1", "2", "3", "4", "5" ],
+                extraScrambles: [ "E1", "E2" ],
               },
             ],
           },
@@ -46,6 +48,7 @@ it('checkScrambles finds missing scrambles', () => {
               {
                 group: "A",
                 scrambles: [ "1", "2", "3", "4", "5" ],
+                extraScrambles: [ "E1", "E2" ],
               },
             ],
           },
@@ -72,8 +75,8 @@ it('checkScrambles finds missing scrambles', () => {
   let checkedScrambles = checkScrambles(normalizeCompetitionJson(wcaCompetitionJson));
 
   expect(checkedScrambles).toEqual({
-    currentScrambleCount: 13,
-    scramblesNeededCount: 30,
+    currentScrambleCount: 19,
+    scramblesNeededCount: 6*(5+2),
     finishedRounds: [
       {
         id: "333-r3",
