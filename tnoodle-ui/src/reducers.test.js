@@ -24,6 +24,7 @@ it('GROUP_FOR_ROUND', () => {
               {
                 group: "A",
                 scrambles: [ "1", "2", "3" ],
+                extraScrambles: [ "E1" ],
               },
             ],
           },
@@ -41,10 +42,12 @@ it('GROUP_FOR_ROUND', () => {
     activityCode: "333-r1",
     groupName: "A",
     scrambles: [ "Scramble 1", "Scramble Dos" ],
+    extraScrambles: [ "E1", "E2" ],
   });
 
   expect(nextState.competitionJson.events[0].rounds[0].groups).toEqual([{
     group: "A",
     scrambles: [ "Scramble 1", "Scramble Dos" ],
+    extraScrambles: [ "E1", "E2" ],
   }]);
 });

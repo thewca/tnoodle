@@ -14,11 +14,11 @@ describe('async actions', () => {
   afterEach(() => xhrMock.teardown());
 
   it('generateMissingScrambles', () => {
-    xhrMock.get("http://localhost:2014/scramble/.json?=333*5&showIndices=0", (req, res) => {
+    xhrMock.get("http://localhost:2014/scramble/.json?=333*7&showIndices=0", (req, res) => {
       return res
         .status(200)
         .header('Content-Type', 'application/json')
-        .body(JSON.stringify([{ scrambles: ['Scramble 1', 'Scramble 2'] }]))
+        .body(JSON.stringify([{ scrambles: ['S1', 'S2', 'S3', 'S4', 'S5', 'E1', 'E2'] }]))
       ;
     });
 
@@ -57,7 +57,8 @@ describe('async actions', () => {
         type: 'GROUP_FOR_ROUND',
         activityCode: "333-r1",
         groupName: "A",
-        scrambles: [ "Scramble 1", "Scramble 2" ],
+        scrambles: [ "S1", "S2", "S3", "S4", "S5" ],
+        extraScrambles: [ "E1", "E2" ],
       },
     ];
     const store = mockStore({ competitionJson: normalizeCompetitionJson(wcaCompetitionJson) });

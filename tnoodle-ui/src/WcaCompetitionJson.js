@@ -15,7 +15,7 @@ export function formatToScrambleCount(format) {
     throw new Error(`Unrecognized format: ${format}`);
   }
 
-  return scrambleCount;
+  return { scrambleCount, extraScrambleCount: 2 };
 }
 
 const nextLetterInAlphabet = letter => {
@@ -112,6 +112,7 @@ export function normalizeCompetitionJson(competitionJson) {
       }
       round.groups.forEach(group => {
         group.scrambles = group.scrambles || [];
+        group.extraScrambles = group.extraScrambles || [];
       });
       round.groups = _.sortBy(round.groups, group => group.group);
     });
@@ -143,8 +144,8 @@ export function checkScrambles(wcaCompetitionJson) {
         return;
       }
 
-      let requiredScrambleCountPerGroup = formatToScrambleCount(wcaRound.format);
-      checked.scramblesNeededCount += requiredScrambleCountPerGroup * wcaRound.scrambleGroupCount;
+      let { scrambleCount: requiredScrambleCountPerGroup, extraScrambleCount: requiredExtraScrambleCountPerGroup } = formatToScrambleCount(wcaRound.format);
+      checked.scramblesNeededCount += (requiredScrambleCountPerGroup + requiredExtraScrambleCountPerGroup) * wcaRound.scrambleGroupCount;
 
       let roundScramblesPerfect = true;
       if(wcaRound.groups.length < wcaRound.scrambleGroupCount) {
@@ -171,12 +172,27 @@ export function checkScrambles(wcaCompetitionJson) {
 
         let scrambleCount = wcaGroup.scrambles.length;
         checked.currentScrambleCount += scrambleCount;
+
+        let extraScrambleCount = wcaGroup.extraScrambles.length;
+        checked.currentScrambleCount += extraScrambleCount;
+
         if(scrambleCount !== requiredScrambleCountPerGroup) {
           checked.groupsWithWrongNumberOfScrambles.push({
             id: buildActivityCode({ eventId, roundNumber, group }),
 
             scrambleCount,
             requiredScrambleCountPerGroup,
+          });
+          roundScramblesPerfect = false;
+          return;
+        }
+
+        if(extraScrambleCount !== requiredExtraScrambleCountPerGroup) {
+          checked.groupsWithWrongNumberOfScrambles.push({
+            id: buildActivityCode({ eventId, roundNumber, group }),
+
+            extraScrambleCount,
+            requiredExtraScrambleCountPerGroup,
           });
           roundScramblesPerfect = false;
           return;
