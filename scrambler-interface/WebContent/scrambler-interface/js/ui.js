@@ -358,7 +358,7 @@ var mark2 = {};
             {eventID: "333bf", name: "3x3x3: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             {eventID: "333oh", name: "3x3x3: One-Handed", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "333fm", name: "3x3x3: Fewest Moves", default_round: { num_scrambles: 1 } },
-            {eventID: "333ft", name: "3x3x3: With Feet", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
+            {eventID: "333ft", name: "3x3x3: With Feet", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "minx", name: "Megaminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "pyram", name: "Pyraminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "sq1", name: "Square-1", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
@@ -689,7 +689,7 @@ var mark2 = {};
                     (generatedScrambleCountByPuzzle[sheet.puzzle] || 0) +
                     additionalScramblesCount
                 );
-                        
+
             }
             return generatedScrambleCountByPuzzle;
         }
