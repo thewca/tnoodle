@@ -34,6 +34,14 @@ export const competitionJson = function(state=null, action) {
   }
 };
 
+export const loadCompetitionJsonError = function(state=null, action) {
+  if(action.type === "FETCH_COMPETITION_JSON" && action.status === "error") {
+    return action.error;
+  } else {
+    return state;
+  }
+}
+
 export const scrambleZip = function(state=null, action) {
   if(action.type === "SCRAMBLE_ZIP_FETCHED") {
     return {
