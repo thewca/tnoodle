@@ -38,6 +38,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
         }
 
         try {
+            response.setHeader("Access-Control-Allow-Origin", "*"); //this allows x-domain ajax
             wrappedService(request, response, path, query);
         } catch(Throwable e) {
             sendError(request, response, e);
@@ -51,12 +52,12 @@ public abstract class SafeHttpServlet extends HttpServlet {
         }
         return path;
     }
-    
+
     public static String getExtension(HttpServletRequest request) {
         String[] filename_ext = GwtSafeUtils.parseExtension(getCompletePath(request));
         return filename_ext[1];
     }
-    
+
     protected abstract void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws Exception;
 
     public static LinkedHashMap<String, String> parseQuery(String query) {
@@ -83,7 +84,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
     protected static void sendJS(HttpServletRequest request, HttpServletResponse response, String js) {
         sendBytes(request, response, js.getBytes(), "application/javascript"); //TODO - charset?
     }
-    
+
     protected static void sendJSON(HttpServletRequest request, HttpServletResponse response, String json) {
         String callback = parseQuery(request.getQueryString()).get("callback");
         String ext = getExtension(request);
@@ -93,7 +94,6 @@ public abstract class SafeHttpServlet extends HttpServlet {
         // .json, our catch(Throwable e) {...} in handle() above will wrap up exceptions
         // as text, and we'll respond to a request that expects JSON with plaintext.
         azzert("json".equals(ext), "Attempted to respond with JSON to a url not ending in .json.");
-        response.setHeader("Access-Control-Allow-Origin", "*"); //this allows x-domain ajax
         if(callback != null) {
             json = callback + "(" + json + ")";
         }
@@ -104,6 +104,8 @@ public abstract class SafeHttpServlet extends HttpServlet {
         sendError(request, response, Utils.throwableToString(error));
     }
     protected static void sendError(HttpServletRequest request, HttpServletResponse response, String error) {
+        response.setStatus(500);
+
         String extension = getExtension(request);
         if("json".equals(extension)) {
             HashMap<String, String> json = new HashMap<String, String>();

@@ -33,6 +33,27 @@ export const competitionJson = function(state=null, action) {
   }
 };
 
+export const scrambleZip = function(state=null, action) {
+  if(action.type === "SCRAMBLE_ZIP_FETCHED") {
+    return {
+      title: action.title,
+      url: URL.createObjectURL(action.blob),
+    };
+  } else if(action.type === "CLEAR_SCRAMBLE_ZIP") {
+    return null;
+  } else {
+    return state;
+  }
+}
+
+export const scramblePassword = function(state=null, action) {
+  if(action.type === "SET_SCRAMBLE_PASSWORD") {
+    return action.scramblePassword;
+  } else {
+    return state;
+  }
+}
+
 export const upcomingManageableCompetitions = function(competitions=null, action) {
   if(action.type === "FETCH_UPCOMING_COMPS" && action.status === "success") {
     return action.response;

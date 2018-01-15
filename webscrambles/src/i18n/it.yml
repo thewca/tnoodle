@@ -1,0 +1,52 @@
+it:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Scramble %{scrambleIndex} di %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Scramble
+        #original_hash: ec7b598
+        round: Round
+        #original_hash: 43d44fe
+        attempt: Tentativo
+        #original_hash: 4705687
+        competitor: Partecipante
+        #original_hash: 220a57b
+        warning: NON RIEMPIRE SE SEI IL PARTECIPANTE.
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: Controllato da
+        #original_hash: 5faa59d
+        result: Risultato
+        #original_hash: 49debdc
+        rule1: Hai 60 minuti per trovare e scrivere una soluzione.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Scrivi una mossa per spazio. Per eliminare una mossa, cancellala
+            chiaramente.
+        #original_hash: 7822590
+        rule3: >-
+            La tua soluzione non deve essere direttamente derivata da alcuna
+            parte dell'algoritmo di scrambling.
+        #original_hash: 45551a7
+        rule4: >-
+            La tua soluzione può essere al massimo %{maxMoves} mosse, rotazioni
+            incluse.
+        #original_hash: 1ba5f27
+        rule5: Il risultato sarà contato in OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Utilizza solo la notazione indicata nell'articolo 12 del Regolamento
+            WCA. Se non sei sicuro, usa solamente le mosse elencate qui:
+        #original_hash: dd22ec2
+        faceMoves: Mosse di una faccia
+        #original_hash: 57e9da1
+        rotations: Rotazioni
+        #original_hash: c75ac6f
+        clockwise: In senso orario
+        #original_hash: 80fe739
+        counterClockwise: In senso antiorario
+        #original_hash: 8158159
+        double: Doppia
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Si prega di consultare il foglio a parte per lo scramble.

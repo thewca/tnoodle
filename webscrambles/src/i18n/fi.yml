@@ -1,11 +1,11 @@
 fi:
     fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Yritys %{scrambleIndex} / %{scrambleCount}'
         #original_hash: b7126cd
         scramble: Sekoitussarja
         #original_hash: ec7b598
         round: Kierros
-        #original_hash: de04fa0
-        of: /
         #original_hash: 43d44fe
         attempt: Yritys
         #original_hash: 4705687
@@ -26,8 +26,10 @@ fi:
             selkeästi.
         #original_hash: 7822590
         rule3: Ratkaisu ei saa olla suoraan johdettu mistään sekoitussarjan osasta.
-        #original_hash: c5cc2f6
-        rule4: 'Ratkaisun suurin sallittu pituus on %s siirtoa, sisältäen rotaatiot.'
+        #original_hash: 45551a7
+        rule4: >-
+            Ratkaisun suurin sallittu pituus on %{maxMoves} siirtoa, sisältäen
+            rotaatiot.
         #original_hash: 1ba5f27
         rule5: Tulos lasketaan OBTM-notaatiolla.
         #original_hash: 42e1a95

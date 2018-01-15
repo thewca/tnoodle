@@ -12,7 +12,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/scrambler-interface"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scrambles"/>
-	<classpathentry exported="true" kind="lib" path="/lib/itextpdf-5.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/lib/itext5-itextpdf-5.5.12.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/bcprov-jdk15on-147.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/zip4j_1.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/snakeyaml-1.19.jar"/>

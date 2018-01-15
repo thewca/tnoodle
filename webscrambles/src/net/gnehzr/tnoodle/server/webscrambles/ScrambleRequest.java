@@ -702,18 +702,23 @@ class ScrambleRequest {
                 movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
             }
         }
-
+        Rectangle firstColumnRectangle = new Rectangle(firstColumnWidth, tableHeight);
+        float firstColumnFontSize = fitText(new Font(bf), movesType[0], firstColumnRectangle, 10, false, 1f);
+        
+        for (String item : movesType){
+            firstColumnFontSize = Math.min(firstColumnFontSize, fitText(new Font(bf, firstColumnFontSize, Font.BOLD), item, firstColumnRectangle, 10, false, 1f));
+        }
+        for (String item : direction){
+            firstColumnFontSize = Math.min(firstColumnFontSize, fitText(new Font(bf, firstColumnFontSize), item, firstColumnRectangle, 10, false, 1f));
+        }
+        
         float maxFirstColumnWidth = 0; // Variable used to center the table.
 
         for (int i=0; i<movesType.length; i++) {
-            Rectangle currentRectangle = new Rectangle(firstColumnWidth, tableHeight);
 
-            Font tempFont = new Font(bf);
-            float size = fitText(tempFont, movesType[i], currentRectangle, 10, false, 1f);
+            maxFirstColumnWidth = Math.max(maxFirstColumnWidth, bf.getWidthPoint(movesType[i], firstColumnFontSize));
 
-            maxFirstColumnWidth = Math.max(maxFirstColumnWidth, tempFont.getBaseFont().getWidthPoint(movesType[i], size));
-
-            PdfPCell cell = new PdfPCell(new Phrase(movesType[i], new Font(bf, size, Font.BOLD)));
+            PdfPCell cell = new PdfPCell(new Phrase(movesType[i], new Font(bf, firstColumnFontSize, Font.BOLD)));
             cell.setFixedHeight(cellHeight);
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -727,11 +732,13 @@ class ScrambleRequest {
             table.addCell(cell);
 
             for (int j=0; j<directionModifiers.length; j++) {
-                size = fitText(new Font(bf), direction[j], currentRectangle, 10, false, 1f);
+                maxFirstColumnWidth = Math.max(maxFirstColumnWidth, bf.getWidthPoint(direction[j], firstColumnFontSize));
 
-                maxFirstColumnWidth = Math.max(maxFirstColumnWidth, tempFont.getBaseFont().getWidthPoint(direction[j], size));
+                cell = new PdfPCell(new Phrase(direction[j], new Font(bf, firstColumnFontSize)));
 
-                cell = new PdfPCell(new Phrase(direction[j], new Font(bf, size)));
+                maxFirstColumnWidth = Math.max(maxFirstColumnWidth, bf.getWidthPoint(direction[j], firstColumnFontSize));
+
+                cell = new PdfPCell(new Phrase(direction[j], new Font(bf, firstColumnFontSize)));
                 cell.setFixedHeight(cellHeight);
                 cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
