@@ -22,8 +22,12 @@ class ManageCompetition extends Component {
   }
 
   render() {
-    let { competitionJson, scrambleZip, scramblePassword, dispatch } = this.props;
-    if(!competitionJson) {
+    let { competitionJson, loadCompetitionJsonError, scrambleZip, scramblePassword, dispatch } = this.props;
+    if(loadCompetitionJsonError) {
+      return (
+        <div>Error while loading competition! <code>{loadCompetitionJsonError.message}</code></div>
+      );
+    } else if(!competitionJson) {
       return (
         <div>Loading competition...</div>
       );
@@ -155,6 +159,7 @@ export default connect(
     return {
       competitionId: ownProps.match.params.competitionId,
       competitionJson: state.competitionJson,
+      loadCompetitionJsonError: state.loadCompetitionJsonError,
       scrambleZip: state.scrambleZip,
     };
   },

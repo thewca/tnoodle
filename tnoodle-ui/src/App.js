@@ -3,7 +3,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
-import { Route } from 'react-router';
+import { Route, Switch } from 'react-router';
 import createHistory from 'history/createBrowserHistory';
 import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
 
@@ -70,11 +70,20 @@ export const App = function() {
       { /* ConnectedRouter will use the store from Provider automatically */ }
       <ConnectedRouter history={history}>
         <Layout>
-          <Route exact path="/" component={wrapWithTitle(Home, () => 'TNoodle')} />
-          <Route exact path="/competitions/" component={wrapWithTitle(SelectCompetition, () => "Select a competition")} />
-          <Route path="/competitions/:competitionId" component={wrapWithTitle(ManageCompetition, props => `${props.match.params.competitionId} | TNoodle`)} />
+          <Switch>
+            <Route exact path="/" component={wrapWithTitle(Home, () => 'TNoodle')} />
+            <Route exact path="/competitions/" component={wrapWithTitle(SelectCompetition, () => "Select a competition")} />
+            <Route path="/competitions/:competitionId" component={wrapWithTitle(ManageCompetition, props => `${props.match.params.competitionId} | TNoodle`)} />
+            <Route component={NoMatch} />
+          </Switch>
         </Layout>
       </ConnectedRouter>
     </Provider>
   );
 };
+
+const NoMatch = ({ location }) => (
+  <div>
+    <h3>No match for <code>{location.pathname}</code></h3>
+  </div>
+);
