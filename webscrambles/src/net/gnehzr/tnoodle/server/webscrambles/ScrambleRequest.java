@@ -737,10 +737,6 @@ class ScrambleRequest {
                 maxFirstColumnWidth = Math.max(maxFirstColumnWidth, bf.getWidthPoint(direction[j], firstColumnFontSize));
 
                 cell = new PdfPCell(new Phrase(direction[j], new Font(bf, firstColumnFontSize)));
-
-                maxFirstColumnWidth = Math.max(maxFirstColumnWidth, bf.getWidthPoint(direction[j], firstColumnFontSize));
-
-                cell = new PdfPCell(new Phrase(direction[j], new Font(bf, firstColumnFontSize)));
                 cell.setFixedHeight(cellHeight);
                 cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
