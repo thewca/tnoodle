@@ -26,12 +26,21 @@ export const competitionJson = function(state=null, action) {
     round.groups.push({
       group: action.groupName,
       scrambles: action.scrambles,
+      extraScrambles: action.extraScrambles,
     });
     return normalizeCompetitionJson(competitionJson);
   } else {
     return state;
   }
 };
+
+export const loadCompetitionJsonError = function(state=null, action) {
+  if(action.type === "FETCH_COMPETITION_JSON" && action.status === "error") {
+    return action.error;
+  } else {
+    return state;
+  }
+}
 
 export const scrambleZip = function(state=null, action) {
   if(action.type === "SCRAMBLE_ZIP_FETCHED") {

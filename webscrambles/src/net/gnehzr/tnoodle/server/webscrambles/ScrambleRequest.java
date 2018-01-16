@@ -664,15 +664,21 @@ class ScrambleRequest {
 
             offsetTop += fontSize + marginBottom;
         }
+        
+        int fmcMargin = 10;
+
 
         // Table
-        int tableWidth = competitorInfoLeft-left;
+        int tableWidth = competitorInfoLeft-left-2*fmcMargin;
         int tableHeight = 160;
         int tableLines = 8;
         int cellWidth = 25;
         int cellHeight = tableHeight/tableLines;
         int columns = 7;
         int firstColumnWidth = tableWidth-(columns-1)*cellWidth;
+        
+        int movesFontSize = 10;
+        Font movesFont = new Font(bf, movesFontSize);
 
         PdfPTable table = new PdfPTable(columns);
         table.setTotalWidth(new float[]{firstColumnWidth, cellWidth, cellWidth, cellWidth, cellWidth, cellWidth, cellWidth});
@@ -702,7 +708,8 @@ class ScrambleRequest {
                 movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
             }
         }
-        Rectangle firstColumnRectangle = new Rectangle(firstColumnWidth, tableHeight);
+        
+        Rectangle firstColumnRectangle = new Rectangle(firstColumnWidth, cellHeight);
         float firstColumnFontSize = fitText(new Font(bf), movesType[0], firstColumnRectangle, 10, false, 1f);
         
         for (String item : movesType){
@@ -712,18 +719,13 @@ class ScrambleRequest {
             firstColumnFontSize = Math.min(firstColumnFontSize, fitText(new Font(bf, firstColumnFontSize), item, firstColumnRectangle, 10, false, 1f));
         }
         
-        float maxFirstColumnWidth = 0; // Variable used to center the table.
+        // Center the table
+        float maxFirstColumnWidth = 0;
+        float maxLastColumnWidth = 0;
 
         for (int i=0; i<movesType.length; i++) {
 
             maxFirstColumnWidth = Math.max(maxFirstColumnWidth, bf.getWidthPoint(movesType[i], firstColumnFontSize));
-
-            PdfPCell cell = new PdfPCell(new Phrase(movesType[i], new Font(bf, firstColumnFontSize, Font.BOLD)));
-            cell.setFixedHeight(cellHeight);
-            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            cell.setBorder(Rectangle.NO_BORDER);
-            table.addCell(cell);
 
             cell = new PdfPCell(new Phrase(""));
             cell.setFixedHeight(cellHeight);
@@ -745,21 +747,22 @@ class ScrambleRequest {
                 cell.setBorder(Rectangle.NO_BORDER);
                 table.addCell(cell);
                 for (int k=0; k<moves.length; k++) {
-                    cell = new PdfPCell(new Phrase(movesCell[i][j][k], new Font(bf, 10)));
+                    cell = new PdfPCell(new Phrase(movesCell[i][j][k], movesFont));
                     cell.setFixedHeight(cellHeight);
                     cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                     cell.setBorder(Rectangle.NO_BORDER);
                     table.addCell(cell);
+                    
+                    if (k == moves.length-1) {
+                        maxLastColumnWidth = Math.max(maxLastColumnWidth, bf.getWidthPoint(movesCell[i][j][k], movesFontSize));
+                    }
                 }
             }
         }
-
-        // Center
-        float tableOffset = (tableWidth-(columns-1)*cellWidth-maxFirstColumnWidth)/2;
-
+        
         // Position the table
-        table.writeSelectedRows(0, -1, left-tableOffset, scrambleBorderTop+tableHeight, cb);
+        table.writeSelectedRows(0, -1, left+fmcMargin+(cellWidth-maxLastColumnWidth)/2-(firstColumnWidth-maxFirstColumnWidth)/2, scrambleBorderTop+tableHeight+fmcMargin, cb);
 
         // Rules
         int MAGIC_NUMBER = 30; // kill me now
@@ -783,14 +786,14 @@ class ScrambleRequest {
         rulesList.add("• "+translate("fmc.rule6", locale));
 
         int rulesTop = competitorInfoBottom + (withScramble ? 65 : 153);
-
-        Rectangle rulesRectangle = new Rectangle(left+padding, scrambleBorderTop+tableHeight, competitorInfoLeft-padding, rulesTop);
+        
+        Rectangle rulesRectangle = new Rectangle(left+fmcMargin, scrambleBorderTop+tableHeight+fmcMargin, competitorInfoLeft-fmcMargin, rulesTop+fmcMargin);
         String rules = String.join("\n", rulesList);
-        fitAndShowTextNew(cb, rules, bf, rulesRectangle, 15, Element.ALIGN_LEFT, 1.5f);
+        fitAndShowTextNew(cb, rules, bf, rulesRectangle, 15, Element.ALIGN_JUSTIFIED, 1.5f);
 
         doc.newPage();
     }
-
+    
     private static void fitAndShowTextNew(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leading) throws DocumentException {
         // We create a temp pdf and check if the text fit in a rectangle there.
         // If it's ok, we add the text to original pdf.
@@ -812,12 +815,13 @@ class ScrambleRequest {
             if (!ColumnText.hasMoreText(status)) { // all the text fit in the rectangle
                 ColumnText ct = new ColumnText(cb);
                 ct.setSimpleColumn(rect);
+                ct.setAlignment(align);
                 ct.setLeading(leading*maxFontSize);
                 ct.addText(p);
                 ct.go();
                 break;
             }
-
+            
             maxFontSize -= 0.1;
         } while(true);
     }
