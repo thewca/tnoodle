@@ -7,8 +7,10 @@ generates a scramble for that cube.
 The tnoodle.js file in the root directory (1 level above this) is what you need. So, the function
 for generating scrambles can be called like this:
 
-puzzles[333].generateScramble()
-         ^  This is where you should put the cube type.
+function puzzlesLoaded(puzzles) {
+  puzzles[333].generateScramble()
+          ^  This is where you should put the cube type.
+}
 
 Cube Types
 333     => 3x3x3
