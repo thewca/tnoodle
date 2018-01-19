@@ -6,10 +6,11 @@
         margin: 10px;
     }
 </style>
+<!-- For Documentation, please read the readme.txt file in this same directory. -->
 <script>
     window.TNOODLE_ENV = { "TNOODLE_333_MIN_DISTANCE": "1" };
 </script>
-<script src="war/tnoodlejs/tnoodlejs.nocache.js"></script>
+<script src="../tnoodle.js"></script>
 <script>
     function puzzlesLoaded(puzzles) {
         window.puzzles = puzzles;
@@ -35,6 +36,7 @@
             updateScrambleInfo();
             function onIconClick(e) {
                 var puzzle = puzzles[this.shortName];
+                console.log(puzzles);
                 newScramble(puzzle);
             }
             function onIconMouseover(e) {
@@ -49,6 +51,7 @@
             for(var shortName in puzzles) {
                 var puzzle = puzzles[shortName];
                 var longName = puzzle.getLongName();
+                console.log(shortName);
 
                 var icon = tnoodlejs.getPuzzleIcon(puzzle);
                 icon.shortName = shortName;
