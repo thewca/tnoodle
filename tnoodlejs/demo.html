@@ -6,10 +6,11 @@
         margin: 10px;
     }
 </style>
+<!-- For Documentation, please read the readme.txt file in this same directory. -->
 <script>
     window.TNOODLE_ENV = { "TNOODLE_333_MIN_DISTANCE": "1" };
 </script>
-<script src="war/tnoodlejs/tnoodlejs.nocache.js"></script>
+<script src="../tnoodle.js"></script>
 <script>
     function puzzlesLoaded(puzzles) {
         window.puzzles = puzzles;
@@ -49,7 +50,6 @@
             for(var shortName in puzzles) {
                 var puzzle = puzzles[shortName];
                 var longName = puzzle.getLongName();
-
                 var icon = tnoodlejs.getPuzzleIcon(puzzle);
                 icon.shortName = shortName;
                 scramble_icons.appendChild(icon);
@@ -66,16 +66,13 @@
         var scramble_area = document.getElementById("scramble_area");
         scramble_area.innerHTML = "";
         scramble_area.appendChild(document.createTextNode(scram));
-
-
+        //Display scramble image
         var maxWidth = 0;
         var maxHeight = 0;
         var svgText = tnoodlejs.scrambleToSvg(scram, puzzle, maxWidth, maxHeight);
-
         var scramble_image = document.getElementById("scramble_image");
         scramble_image.innerHTML = svgText;
     }
-
 </script>
 </head>
 <body>
