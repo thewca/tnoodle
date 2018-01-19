@@ -36,7 +36,6 @@
             updateScrambleInfo();
             function onIconClick(e) {
                 var puzzle = puzzles[this.shortName];
-                console.log(puzzles);
                 newScramble(puzzle);
             }
             function onIconMouseover(e) {
@@ -51,8 +50,6 @@
             for(var shortName in puzzles) {
                 var puzzle = puzzles[shortName];
                 var longName = puzzle.getLongName();
-                console.log(shortName);
-
                 var icon = tnoodlejs.getPuzzleIcon(puzzle);
                 icon.shortName = shortName;
                 scramble_icons.appendChild(icon);
@@ -69,16 +66,13 @@
         var scramble_area = document.getElementById("scramble_area");
         scramble_area.innerHTML = "";
         scramble_area.appendChild(document.createTextNode(scram));
-
-
+        //Display scramble image
         var maxWidth = 0;
         var maxHeight = 0;
         var svgText = tnoodlejs.scrambleToSvg(scram, puzzle, maxWidth, maxHeight);
-
         var scramble_image = document.getElementById("scramble_image");
         scramble_image.innerHTML = svgText;
     }
-
 </script>
 </head>
 <body>
