@@ -5,11 +5,11 @@ in your browser, and you should see a couple of puzzle icons. When you click one
 generates a scramble for that puzzle.
 
 The tnoodle.js file in the root directory (1 level above this) is what you need. So, the function
-for generating scrambles can be called like this:
+for generating scrambles can be called like this (you can just copy paste this if you want!):
 
 function puzzlesLoaded(puzzles) {
   puzzles['333'].generateScramble()
-          ^  This is where you should put the puzzle type.
+  //        ^  This is where you should put the puzzle type.
 }
 
 Most used puzzle types
