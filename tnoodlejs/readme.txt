@@ -1,7 +1,7 @@
 Note: This is the documentation for USING tnoodle in JavaScript. This is NOT on EDITING tnoodle
 in JavaScript.
-If you want a working example of tnoodle, then you can open demo.html (in the current directory) 
-in your browser, and you should see a couple of puzzle icons. When you click one of them, it 
+If you want a working example of tnoodle, then you can open demo.html (in the current directory)
+in your browser, and you should see a couple of puzzle icons. When you click one of them, it
 generates a scramble for that puzzle.
 
 The tnoodle.js file in the root directory (1 level above this) is what you need. So, the function
@@ -18,5 +18,5 @@ Most used puzzle types
 222     => 2x2x2
 pyram   => Pyraminx
 
-For all the available puzzles, and a more detailed explanation, please visit 
+For all the available puzzles, and a more detailed explanation, please visit
 https://github.com/thewca/tnoodle/blob/master/scrambles/src/puzzle/puzzles.
