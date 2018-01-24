@@ -1,8 +1,8 @@
+import os
 import re
 import json
 import getpass
 import requests
-import mimetypes
 
 connectedApis = {}
 def getApi(organization, repo):
@@ -33,22 +33,20 @@ def set_query_parameter(url, param_name, param_value):
 
     return urlunsplit((scheme, netloc, path, new_query_string, fragment))
 
-# See "Preview mode" on http://developer.github.com/changes/2013-09-25-releases-api/
-# This should be deletable in 30 days or so.
-previewHeaders = { "Accept": "application/vnd.github.manifold-preview" }
-
 class GithubApi(object):
     def __init__(self, organization, repo):
         self.baseApiUrl = 'https://api.github.com/repos/%s/%s' % ( organization, repo )
         self.baseUrl = 'https://github.com/%s/%s' % ( organization, repo )
-        self.username = input('Username (for %s/%s): ' % (organization, repo))
-        print("Attempting to connect to github as %s" % ( self.username ))
-        self.password = getpass.getpass()
-        self.auth = (self.username, self.password)
-        r = requests.get('https://api.github.com/user', auth=self.auth)
-        r.raise_for_status()
 
-        r = requests.get(self.baseApiUrl, auth=self.auth)
+        ghAccessToken = os.environ.get("TNOODLE_GH_ACCESS_TOKEN")
+        if not ghAccessToken:
+            assert False, "You must specify a GitHub Personal Access Token by setting the TNOODLE_GH_ACCESS_TOKEN environment variable. If you do not have an auth token, you can create one here: https://github.com/settings/tokens/new"
+
+        self.authorizationHeader = {
+            "Authorization": "token {}".format(ghAccessToken),
+        }
+
+        r = requests.get(self.baseApiUrl, headers=self.authorizationHeader)
         if r.status_code == requests.codes.not_found:
             assert False, "Couldn't find %s/%s, is it really a repo?" % (organization, repo)
         r.raise_for_status()
@@ -58,7 +56,7 @@ class GithubApi(object):
         page = 1
         while True:
             pageUrl = set_query_parameter(url, 'page', str(page))
-            r = requests.get(pageUrl, auth=self.auth, headers=previewHeaders)
+            r = requests.get(pageUrl, headers=self.authorizationHeader)
             r.raise_for_status()
             if len(r.json) == 0:
                 # Once the array returned is empty, we've hit the end.
@@ -77,7 +75,7 @@ class GithubApi(object):
             'tag_name': tag,
             'draft': draft
         })
-        r = requests.post(createUrl, data=data, auth=self.auth, headers=previewHeaders)
+        r = requests.post(createUrl, data=data, headers=self.authorizationHeader)
         r.raise_for_status()
 
         uploadUrlTemplate = r.json()['upload_url']
@@ -93,35 +91,22 @@ class GithubApi(object):
         # for the documentation on these url templates that github provides.
         uploadUrl = re.sub(r"{\?.*name.*}", "?name=%s" % name, uploadUrlTemplate)
 
-        mime, encoding = mimetypes.guess_type(name)
-        headers = dict(previewHeaders)
+        filename, ext = os.path.splitext(name)
+        mime = {
+            ".jar": "application/zip",
+        }[ext]
+        headers = dict(self.authorizationHeader)
         headers['Content-Type'] = mime
 
-        r = requests.post(uploadUrl, auth=self.auth, headers=headers, data=data)
+        r = requests.post(uploadUrl, headers=headers, data=data)
         r.raise_for_status()
         return r.json()
 
     def deleteRelease(self, id):
         deleteUrl = '%s/releases/%s' % (self.baseApiUrl, id)
-        r = requests.delete(deleteUrl, auth=self.auth, headers=previewHeaders)
+        r = requests.delete(deleteUrl, headers=self.authorizationHeader)
         r.raise_for_status()
 
     def listAssets(self, releaseId):
         listUrl = '%s/releases/%s/assets' % (self.baseApiUrl, releaseId)
         return depaginate(listUrl)
-
-    def pullRequest(self, title, body):
-        pullUrl = '%s/pulls' % self.baseApiUrl
-        data = json.dumps({
-            "title": title,
-            "body": body,
-            "base": "master",
-            "head": "%s:master" % self.username
-        })
-        r = requests.post(pullUrl, auth=self.auth, data=data)
-        if r.status_code != requests.codes.created:
-            print(r.json())
-            r.raise_for_status()
-        else:
-            pullRequestUrl = '%s/pull/%s' % (self.baseUrl, r.json()['number'])
-            print("Pull request created at %s" % pullRequestUrl)
