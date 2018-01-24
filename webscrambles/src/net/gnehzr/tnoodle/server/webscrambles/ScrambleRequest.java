@@ -250,7 +250,7 @@ class ScrambleRequest {
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
         // rather than 1 sheet per round (as we do with every other event).
-        boolean is333mbf = scrambleRequest.scrambler.getShortName().equals("333ni") && scrambleRequest.scrambles[0].indexOf('\n') > 0;
+        boolean is333mbf = scrambleRequest.event.equals("333mbf");
         if(is333mbf) {
             Document doc = new Document();
             ByteArrayOutputStream totalPdfOutput = new ByteArrayOutputStream();
@@ -267,6 +267,7 @@ class ScrambleRequest {
                 attemptRequest.copies = scrambleRequest.copies;
                 attemptRequest.title = scrambleRequest.title + " Attempt " + nthAttempt;
                 attemptRequest.fmc = false;
+                attemptRequest.event = "333bf";
                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
 
                 PdfReader pdfReader = createPdf(globalTitle, creationDate, attemptRequest, locale);
@@ -664,7 +665,7 @@ class ScrambleRequest {
 
             offsetTop += fontSize + marginBottom;
         }
-        
+
         int fmcMargin = 10;
 
 
@@ -676,7 +677,7 @@ class ScrambleRequest {
         int cellHeight = tableHeight/tableLines;
         int columns = 7;
         int firstColumnWidth = tableWidth-(columns-1)*cellWidth;
-        
+
         int movesFontSize = 10;
         Font movesFont = new Font(bf, movesFontSize);
 
@@ -708,17 +709,17 @@ class ScrambleRequest {
                 movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
             }
         }
-        
+
         Rectangle firstColumnRectangle = new Rectangle(firstColumnWidth, cellHeight);
         float firstColumnFontSize = fitText(new Font(bf), movesType[0], firstColumnRectangle, 10, false, 1f);
-        
+
         for (String item : movesType){
             firstColumnFontSize = Math.min(firstColumnFontSize, fitText(new Font(bf, firstColumnFontSize, Font.BOLD), item, firstColumnRectangle, 10, false, 1f));
         }
         for (String item : direction){
             firstColumnFontSize = Math.min(firstColumnFontSize, fitText(new Font(bf, firstColumnFontSize), item, firstColumnRectangle, 10, false, 1f));
         }
-        
+
         // Center the table
         float maxFirstColumnWidth = 0;
         float maxLastColumnWidth = 0;
@@ -757,14 +758,14 @@ class ScrambleRequest {
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                     cell.setBorder(Rectangle.NO_BORDER);
                     table.addCell(cell);
-                    
+
                     if (k == moves.length-1) {
                         maxLastColumnWidth = Math.max(maxLastColumnWidth, bf.getWidthPoint(movesCell[i][j][k], movesFontSize));
                     }
                 }
             }
         }
-        
+
         // Position the table
         table.writeSelectedRows(0, -1, left+fmcMargin+(cellWidth-maxLastColumnWidth)/2-(firstColumnWidth-maxFirstColumnWidth)/2, scrambleBorderTop+tableHeight+fmcMargin, cb);
 
@@ -790,14 +791,14 @@ class ScrambleRequest {
         rulesList.add("• "+translate("fmc.rule6", locale));
 
         int rulesTop = competitorInfoBottom + (withScramble ? 65 : 153);
-        
+
         Rectangle rulesRectangle = new Rectangle(left+fmcMargin, scrambleBorderTop+tableHeight+fmcMargin, competitorInfoLeft-fmcMargin, rulesTop+fmcMargin);
         String rules = String.join("\n", rulesList);
         fitAndShowTextNew(cb, rules, bf, rulesRectangle, 15, Element.ALIGN_JUSTIFIED, 1.5f);
 
         doc.newPage();
     }
-    
+
     private static void fitAndShowTextNew(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leading) throws DocumentException {
         // We create a temp pdf and check if the text fit in a rectangle there.
         // If it's ok, we add the text to original pdf.
@@ -825,7 +826,7 @@ class ScrambleRequest {
                 ct.go();
                 break;
             }
-            
+
             maxFontSize -= 0.1;
         } while(true);
     }
