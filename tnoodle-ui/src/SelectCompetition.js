@@ -33,7 +33,8 @@ export default connect(
             <div className="list-group">
               {competitions.map(competition => {
                 return (
-                  <PreserveSearchLink key={competition.id} to={`/competitions/${competition.id}`} className="list-group-item list-group-item-action">{competition.id}</PreserveSearchLink>
+                  <PreserveSearchLink key={competition.id} to={`/competitions/${competition.id}`} className="list-group-item list-group-item-action">{competition.name}</PreserveSearchLink>
+
                 );
               })}
             </div>
