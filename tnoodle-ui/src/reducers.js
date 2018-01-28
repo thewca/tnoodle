@@ -29,14 +29,50 @@ export const competitionJson = function(state=null, action) {
       extraScrambles: action.extraScrambles,
     });
     return normalizeCompetitionJson(competitionJson);
+  } else if(action.type === "CLEAR_SCRAMBLES") {
+    let competitionJson = deepcopy(state);
+    competitionJson.events.forEach(event => {
+      event.rounds.forEach(round => {
+        round.groups = [];
+      });
+    });
+    return normalizeCompetitionJson(competitionJson);
   } else {
     return state;
   }
 };
 
+export const isGeneratingScrambles = function(state=false, action) {
+  if(action.type === "GENERATE_MISSING_SCRAMBLES") {
+    return true;
+  } else if(action.type === "DONE_GENERATING_SCRAMBLES") {
+    return false;
+  } else {
+    return state;
+  }
+}
+
+export const isGeneratingZip = function(state=false, action) {
+  if(action.type === "BEGIN_FETCH_SCRAMBLE_ZIP") {
+    return true;
+  } else if(action.type === "SCRAMBLE_ZIP_FETCHED") {
+    return false;
+  } else {
+    return state;
+  }
+}
+
 export const loadCompetitionJsonError = function(state=null, action) {
   if(action.type === "FETCH_COMPETITION_JSON" && action.status === "error") {
     return action.error;
+  } else {
+    return state;
+  }
+}
+
+export const puzzlesPer333mbfAttempt = function(state=28, action) {
+  if(action.type === "SET_PUZZLES_PER_333MBF_ATTEMPT") {
+    return action.puzzlesPer333mbfAttempt;
   } else {
     return state;
   }

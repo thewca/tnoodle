@@ -22,7 +22,16 @@ class ManageCompetition extends Component {
   }
 
   render() {
-    let { competitionJson, loadCompetitionJsonError, scrambleZip, scramblePassword, dispatch } = this.props;
+    let {
+      competitionJson,
+      loadCompetitionJsonError,
+      scrambleZip,
+      scramblePassword,
+      puzzlesPer333mbfAttempt,
+      isGeneratingScrambles,
+      isGeneratingZip,
+      dispatch,
+    } = this.props;
     if(loadCompetitionJsonError) {
       return (
         <div>Error while loading competition! <code>{loadCompetitionJsonError.message}</code></div>
@@ -33,7 +42,7 @@ class ManageCompetition extends Component {
       );
     }
 
-    let { groupsWithWrongNumberOfScrambles, roundsWithMissingGroups, warnings, scramblesNeededCount, currentScrambleCount } = checkScrambles(competitionJson);
+    let { groupsWithWrongNumberOfScrambles, warnings, scramblesNeededCount, currentScrambleCount } = checkScrambles(competitionJson);
 
     let groupsWithWrongNumberOfScramblesDiv = null;
     if(groupsWithWrongNumberOfScrambles.length > 0) {
@@ -65,7 +74,6 @@ class ManageCompetition extends Component {
 
     let { showScramblePassword } = this.state;
     let progress = currentScrambleCount / scramblesNeededCount;
-    let finishedGeneratingScrambles = currentScrambleCount >= scramblesNeededCount;
 
     let generationArea;
     if(scrambleZip) {
@@ -75,30 +83,28 @@ class ManageCompetition extends Component {
           href={scrambleZip.url}
           onClick={e => {
             if(e.shiftKey) {
-                e.preventDefault();
-                dispatch(actions.downloadScrambles({ pdf: true, password: scramblePassword }));
+              e.preventDefault();
+              dispatch(actions.downloadScrambles({ pdf: true, password: scramblePassword }));
             }
           }}
         >
         Download scrambles
       </a>;
-    } else if(this.state.hasStartedGeneratingScrambles) {
+    } else if(isGeneratingScrambles || isGeneratingZip) {
       generationArea = <div className="progress scramble-generation">
         <div className="progress-bar progress-bar-striped progress-bar-animated"
              style={{width: Math.max(5, progress*100) + "%"}}>
-          {finishedGeneratingScrambles ? "Generating zip file..." : ""}
+          {isGeneratingZip ? "Generating zip file..." : ""}
         </div>
       </div>;
     } else {
       generationArea = <button
           className="btn btn-block btn-lg btn-primary"
           onClick={() => {
-            let puzzlesPerMbfAttempt = 28;//<<<
-            dispatch(actions.generateMissingScrambles(roundsWithMissingGroups, puzzlesPerMbfAttempt));
-            this.setState({ hasStartedGeneratingScrambles: true });
+            dispatch(actions.generateMissingScrambles());
           }}
         >
-        Generate {pluralize('scramble', scramblesNeededCount, true)}
+        Generate scrambles
       </button>;
     }
 
@@ -117,12 +123,27 @@ class ManageCompetition extends Component {
           You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
         </p>
 
+        {competitionJson.events.map(event => event.id).includes('333mbf') && (
+          <p>
+            This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
+            <input
+              type="number"
+              disabled={isGeneratingScrambles || isGeneratingZip}
+              className="form-control"
+              value={puzzlesPer333mbfAttempt}
+              ref={input => this.puzzlesPerMbfAttemptInput = input}
+              onChange={e => dispatch(actions.setPuzzlesPer333mbfAttempt(e.target.value))}
+            />
+          </p>
+        )}
+
         <div className="row scramble-form">
           <div className="col-6">
             <div className="form-group">
               <div className="input-group input-group-lg">
                 <input
                   type={showScramblePassword ? "text" : "password"}
+                  disabled={isGeneratingScrambles || isGeneratingZip}
                   className="form-control"
                   placeholder="Password"
                   value={scramblePassword}
@@ -161,6 +182,9 @@ export default connect(
       competitionId: ownProps.match.params.competitionId,
       competitionJson: state.competitionJson,
       loadCompetitionJsonError: state.loadCompetitionJsonError,
+      puzzlesPer333mbfAttempt: state.puzzlesPer333mbfAttempt,
+      isGeneratingScrambles: state.isGeneratingScrambles,
+      isGeneratingZip: state.isGeneratingZip,
       scrambleZip: state.scrambleZip,
     };
   },

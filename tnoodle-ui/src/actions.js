@@ -24,13 +24,14 @@ export function fetchVersionInfo() {
   }(), 'FETCH_VERSION_INFO');
 }
 
-export function generateMissingScrambles(rounds, puzzlesPerMbfAttempt) {
+export function generateMissingScrambles(rounds) {
   return (dispatch, getState) => {
     dispatch({
       type: "GENERATE_MISSING_SCRAMBLES",
-      rounds,
     });
 
+    let { roundsWithMissingGroups: rounds } = checkScrambles(getState().competitionJson);
+    let puzzlesPer333mbfAttempt = getState().puzzlesPer333mbfAttempt;
     rounds.forEach(round => {
       let activityCode = round.id;
       let { eventId } = parseActivityCode(activityCode);
@@ -46,7 +47,7 @@ export function generateMissingScrambles(rounds, puzzlesPerMbfAttempt) {
         let tnoodlePuzzle = eventToTNoodlePuzzle(eventId);
         let tnoodleScramblesToGenerate = (scrambleCount + extraScrambleCount);
         if(eventId === "333mbf") {
-          tnoodleScramblesToGenerate *= puzzlesPerMbfAttempt;
+          tnoodleScramblesToGenerate *= puzzlesPer333mbfAttempt;
         }
 
         scrambler.loadScrambles(generatedScrambles => {
@@ -55,10 +56,10 @@ export function generateMissingScrambles(rounds, puzzlesPerMbfAttempt) {
             scrambles = [];
             extraScrambles = [];
             for(let i = 0; i < scrambleCount; i++) {
-              scrambles = scrambles.concat(generatedScrambles.splice(0, puzzlesPerMbfAttempt).join("\n"));
+              scrambles = scrambles.concat(generatedScrambles.splice(0, puzzlesPer333mbfAttempt).join("\n"));
             }
             for(let i = 0; i < extraScrambleCount; i++) {
-              extraScrambles = extraScrambles.concat(generatedScrambles.splice(0, puzzlesPerMbfAttempt).join("\n"));
+              extraScrambles = extraScrambles.concat(generatedScrambles.splice(0, puzzlesPer333mbfAttempt).join("\n"));
             }
           } else {
             scrambles = generatedScrambles.slice(0, scrambleCount);
@@ -132,6 +133,10 @@ let pendingRegenerationTimer = null;
 const ZIP_GENERATION_PAUSE_MS = 200;
 export function setScramblePassword(scramblePassword) {
   return (dispatch, getState) => {
+    if(getState().isGeneratingScrambles || getState().isGeneratingZip) {
+      throw new Error("Cannot set scramble password while generating scrambles or zip file");
+    }
+
     dispatch({
       type: "SET_SCRAMBLE_PASSWORD",
       scramblePassword,
@@ -150,10 +155,26 @@ export function setScramblePassword(scramblePassword) {
   }
 }
 
+export function setPuzzlesPer333mbfAttempt(puzzlesPer333mbfAttempt) {
+  return (dispatch, getState) => {
+    if(getState().isGeneratingScrambles || getState().isGeneratingZip) {
+      throw new Error("Cannot set puzzles per 333mbf attempt while generating scrambles or zip file");
+    }
+
+    dispatch({
+      type: "SET_PUZZLES_PER_333MBF_ATTEMPT",
+      puzzlesPer333mbfAttempt,
+    });
+    dispatch({ type: "CLEAR_SCRAMBLE_ZIP" });
+    dispatch({ type: "CLEAR_SCRAMBLES" });
+  };
+}
+
 export function maybeRegenerateScramblesZip() {
   return (dispatch, getState) => {
     let { currentScrambleCount, scramblesNeededCount } = checkScrambles(getState().competitionJson);
     if(currentScrambleCount >= scramblesNeededCount) {
+      dispatch({ type: "DONE_GENERATING_SCRAMBLES" });
       dispatch({ type: "CLEAR_SCRAMBLE_ZIP" });
       dispatch(downloadScrambles({ pdf: false, password: getState().scramblePassword }));
     }
@@ -170,6 +191,7 @@ export function downloadScrambles({ pdf, password }) {
     if(pdf) {
       return scrambler.showPdf(title, request, password, "_blank");
     } else {
+      dispatch({ type: "BEGIN_FETCH_SCRAMBLE_ZIP" });
       return scrambler.fetchZip(title, request, password).then(titleBlob => dispatch({
         type: "SCRAMBLE_ZIP_FETCHED",
         ...titleBlob,
