@@ -24,7 +24,7 @@ export function fetchVersionInfo() {
   }(), 'FETCH_VERSION_INFO');
 }
 
-export function generateMissingScrambles(rounds) {
+export function generateMissingScrambles(rounds, puzzlesPerMbfAttempt) {
   return (dispatch, getState) => {
     dispatch({
       type: "GENERATE_MISSING_SCRAMBLES",
@@ -41,11 +41,30 @@ export function generateMissingScrambles(rounds) {
       for(let i = 0; i < groupsToGenerateCount; i++) {
         namesOfGroupsToGenerate.push(getNextAvailableGroupName(usedGroupNames.concat(namesOfGroupsToGenerate)));
       }
-      let { scrambleCount, extraScrambleCount } = formatToScrambleCount(wcaRound.format);
+      let { scrambleCount, extraScrambleCount } = formatToScrambleCount(wcaRound.format, eventId);
       namesOfGroupsToGenerate.forEach(groupName => {
+        let tnoodlePuzzle = eventToTNoodlePuzzle(eventId);
+        let tnoodleScramblesToGenerate = (scrambleCount + extraScrambleCount);
+        if(eventId === "333mbf") {
+          tnoodleScramblesToGenerate *= puzzlesPerMbfAttempt;
+        }
+
         scrambler.loadScrambles(generatedScrambles => {
-          let scrambles = generatedScrambles.slice(0, scrambleCount);
-          let extraScrambles = generatedScrambles.slice(scrambleCount, scrambleCount + extraScrambleCount);
+          let scrambles, extraScrambles;
+          if(eventId === "333mbf") {
+            scrambles = [];
+            extraScrambles = [];
+            for(let i = 0; i < scrambleCount; i++) {
+              scrambles = scrambles.concat(generatedScrambles.splice(0, puzzlesPerMbfAttempt).join("\n"));
+            }
+            for(let i = 0; i < extraScrambleCount; i++) {
+              extraScrambles = extraScrambles.concat(generatedScrambles.splice(0, puzzlesPerMbfAttempt).join("\n"));
+            }
+          } else {
+            scrambles = generatedScrambles.slice(0, scrambleCount);
+            extraScrambles = generatedScrambles.slice(scrambleCount, scrambleCount + extraScrambleCount);
+          }
+
           dispatch({
             type: "GROUP_FOR_ROUND",
             activityCode,
@@ -55,7 +74,7 @@ export function generateMissingScrambles(rounds) {
           });
 
           dispatch(maybeRegenerateScramblesZip());
-        }, eventToTNoodlePuzzle(eventId), null, scrambleCount + extraScrambleCount);
+        }, tnoodlePuzzle, null, tnoodleScramblesToGenerate);
       });
     });
   };

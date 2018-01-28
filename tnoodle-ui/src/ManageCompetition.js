@@ -93,7 +93,8 @@ class ManageCompetition extends Component {
       generationArea = <button
           className="btn btn-block btn-lg btn-primary"
           onClick={() => {
-            dispatch(actions.generateMissingScrambles(roundsWithMissingGroups));
+            let puzzlesPerMbfAttempt = 28;//<<<
+            dispatch(actions.generateMissingScrambles(roundsWithMissingGroups, puzzlesPerMbfAttempt));
             this.setState({ hasStartedGeneratingScrambles: true });
           }}
         >
