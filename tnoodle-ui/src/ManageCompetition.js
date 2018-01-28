@@ -195,7 +195,7 @@ export default connect(
     }
 
     willNavigateAway() {
-      return "Any scrambles you've gnerated will disappear when you navigate away."
+      return "Any scrambles you've generated will disappear when you navigate away.";
     }
 
     render() {

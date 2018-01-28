@@ -3,11 +3,15 @@ import * as actions from 'actions';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import React, { Component } from 'react';
+import { withRouter } from 'react-router';
 
 import 'Layout.css';
 import logo from 'tnoodle_logo.svg';
 
-export default connect(
+// See
+// https://github.com/ReactTraining/react-router/blob/master/packages/react-router/docs/guides/blocked-updates.md
+// for why we're wrapping this component in a call to `withRouter`.
+export default withRouter(connect(
   state => {
     return {
       me: state.me,
@@ -71,7 +75,7 @@ export default connect(
       );
     }
   }
-);
+));
 
 function analyzeVersion(versionInfo) {
   if(!versionInfo) {
