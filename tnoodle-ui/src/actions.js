@@ -166,7 +166,7 @@ export function downloadScrambles({ pdf, password }) {
     let competitionJson = state.competitionJson;
 
     let request = competitionJsonToTNoodleScrambleRequest(competitionJson);
-    let title = `Scrambles for ${competitionJson.id}`;
+    let title = `Scrambles for ${competitionJson.name}`;
     if(pdf) {
       return scrambler.showPdf(title, request, password, "_blank");
     } else {
