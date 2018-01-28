@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import deepcopy from 'deepcopy';
 
-export function formatToScrambleCount(format) {
+export function formatToScrambleCount(format, eventId) {
   // From https://github.com/thewca/worldcubeassociation.org/blob/master/WcaOnRails/db/seeds/formats.seeds.rb
   let scrambleCount = {
     "1": 1,
@@ -15,7 +15,8 @@ export function formatToScrambleCount(format) {
     throw new Error(`Unrecognized format: ${format}`);
   }
 
-  return { scrambleCount, extraScrambleCount: 2 };
+  let extraScrambleCount = (eventId !== "333mbf" ? 2 : 0);
+  return { scrambleCount, extraScrambleCount };
 }
 
 const nextLetterInAlphabet = letter => {
@@ -144,7 +145,7 @@ export function checkScrambles(wcaCompetitionJson) {
         return;
       }
 
-      let { scrambleCount: requiredScrambleCountPerGroup, extraScrambleCount: requiredExtraScrambleCountPerGroup } = formatToScrambleCount(wcaRound.format);
+      let { scrambleCount: requiredScrambleCountPerGroup, extraScrambleCount: requiredExtraScrambleCountPerGroup } = formatToScrambleCount(wcaRound.format, eventId);
       checked.scramblesNeededCount += (requiredScrambleCountPerGroup + requiredExtraScrambleCountPerGroup) * wcaRound.scrambleGroupCount;
 
       let roundScramblesPerfect = true;

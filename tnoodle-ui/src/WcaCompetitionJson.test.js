@@ -69,6 +69,16 @@ it('checkScrambles finds missing scrambles', () => {
           },
         ],
       },
+      {
+        id: "333mbf",
+        rounds: [
+          {
+            id: "333mbf-r1",
+            format: "2",
+            groups: null,
+          },
+        ],
+      },
     ],
   };
 
@@ -76,7 +86,7 @@ it('checkScrambles finds missing scrambles', () => {
 
   expect(checkedScrambles).toEqual({
     currentScrambleCount: 19,
-    scramblesNeededCount: 6*(5+2),
+    scramblesNeededCount: 6*(5+2) + 2,
     finishedRounds: [
       {
         id: "333-r3",
@@ -104,6 +114,11 @@ it('checkScrambles finds missing scrambles', () => {
       },
       {
         id: "222-r2",
+        groupCount: 0,
+        scrambleGroupCount: 1,
+      },
+      {
+        id: "333mbf-r1",
         groupCount: 0,
         scrambleGroupCount: 1,
       },
