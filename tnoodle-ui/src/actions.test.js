@@ -77,7 +77,6 @@ describe('async actions', () => {
     const expectedActions = [
       {
         type: 'GENERATE_MISSING_SCRAMBLES',
-        rounds,
       },
       {
         type: 'GROUP_FOR_ROUND',
@@ -97,10 +96,12 @@ describe('async actions', () => {
         extraScrambles: [],
       },
     ];
-    const store = mockStore({ competitionJson: normalizeCompetitionJson(wcaCompetitionJson) });
+    const store = mockStore({
+      competitionJson: normalizeCompetitionJson(wcaCompetitionJson),
+      puzzlesPer333mbfAttempt: 20,
+    });
 
-    let puzzlesPerMbfAttempt = 20;
-    store.dispatch(actions.generateMissingScrambles(rounds, puzzlesPerMbfAttempt));
+    store.dispatch(actions.generateMissingScrambles());
 
     // This setTimeout is a quick hack to wait for our async thunks to run.
     return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
