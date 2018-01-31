@@ -13,6 +13,8 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.log.CounterFactory;
+import com.itextpdf.text.log.NoOpCounter;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfAction;
@@ -118,6 +120,9 @@ class ScrambleRequest {
         } catch (IOException e) {
             l.log(Level.INFO, "", e);
         }
+
+        // Email agpl@itextpdf.com if you want to know what this is about =)
+        CounterFactory.getInstance().setCounter(new NoOpCounter());
     }
 
     private static BaseFont getFontForLocale(Locale locale) {
