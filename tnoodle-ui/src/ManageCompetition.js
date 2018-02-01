@@ -79,7 +79,7 @@ class ManageCompetition extends Component {
     if(scrambleZip) {
       generationArea = <a
           className="btn btn-block btn-lg btn-primary"
-          download={scrambleZip.title}
+          download={scrambleZip.title + ".zip"}
           href={scrambleZip.url}
           onClick={e => {
             if(e.shiftKey) {
