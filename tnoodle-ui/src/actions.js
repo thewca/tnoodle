@@ -119,7 +119,7 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
           fmc: isFmc(event.id),
 
           event: event.id,
-          round: round.roundNumber,
+          round: roundNumber,
           group: group.group,
         };
         scrambleRequest.push(request);
