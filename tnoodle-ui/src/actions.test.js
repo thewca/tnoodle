@@ -103,8 +103,9 @@ describe('async actions', () => {
 
     store.dispatch(actions.generateMissingScrambles());
 
-    // This setTimeout is a quick hack to wait for our async thunks to run.
-    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+    // This setTimeout 10 is a dirty hack to wait for our async thunks and promises to run.
+    // I don't know what the right way is to wait for all aynchronous work to finish in node/browser js.
+    return new Promise((resolve) => setTimeout(resolve, 10)).then(() => {
       expect(store.getActions()).toEqual(expectedActions);
     });
   });

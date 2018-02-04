@@ -133,32 +133,44 @@ tnoodle.Scrambler = function(baseUrl) {
     };
     var requestCount = 0;
     this.loadScrambles = function(callback, puzzle, seed, count) {
-        var query = {};
-        if(seed) { query.seed = seed; }
         if(!count) { count = 1; }
 
-        // The backend lightly protects itself by not allowing more than 100
-        // scrambles in a single request.
-        assert(count <= 100);
+        var pendingRequests = [];
+        while(count > 0) {
+            // The backend lightly protects itself by not allowing more than 100
+            // scrambles in a single request.
+            let toRequestCount = Math.min(count, 100);
+            count -= toRequestCount;
 
-        query[''] = encodeURIComponent(puzzle) + "*" + count;
-        // Freaking Chrome seems to cache scramble requests if they're close enough
-        // together, even if we POST. This forces it to not.
-        query['showIndices'] = (requestCount++);
-        var pendingLoadScrambles = tnoodle.retryAjax(function(scrambleRequests) {
-            assert(!scrambleRequests.error);
+            pendingRequests.push(new Promise((resolve, reject) => {
+                var query = {};
+                if(seed) { query.seed = seed; }
 
-            var scrambles = [];
-            for(var i = 0; i < scrambleRequests.length; i++) {
-                scrambles = scrambles.concat(scrambleRequests[i].scrambles);
-            }
-            if(tnoodle.FAKE_SCRAMBLE_DELAY) {
-                setTimeout(callback.bind(null, scrambles), tnoodle.FAKE_SCRAMBLE_DELAY);
-            } else {
-                callback(scrambles);
-            }
-        }, this.scrambleUrl + ".json", query);
-        return pendingLoadScrambles;
+                query[''] = encodeURIComponent(puzzle) + "*" + toRequestCount;
+                // Freaking Chrome seems to cache scramble requests if they're close enough
+                // together, even if we POST. This forces it to not.
+                query['showIndices'] = (requestCount++);
+                var pendingLoadScrambles = tnoodle.retryAjax(function(scrambleRequests) {
+                    assert(!scrambleRequests.error);
+
+                    var scrambles = [];
+                    for(var i = 0; i < scrambleRequests.length; i++) {
+                        scrambles = scrambles.concat(scrambleRequests[i].scrambles);
+                    }
+                    if(tnoodle.FAKE_SCRAMBLE_DELAY) {
+                        setTimeout(resolve.bind(null, scrambles), tnoodle.FAKE_SCRAMBLE_DELAY);
+                    } else {
+                        resolve(scrambles);
+                    }
+                }, this.scrambleUrl + ".json", query);
+            }));
+        }
+
+      let promise = Promise.all(pendingRequests)
+        .then(scrambles => {
+          callback(Array.prototype.concat([], ...scrambles));
+        })
+        .catch(err => console.error(err));
     };
     this.getScrambleImage = function(puzzle, scramble, colorScheme, width, height) {
         scramble = scramble || "";
