@@ -143,6 +143,7 @@ class ManageCompetition extends Component {
               <div className="input-group input-group-lg">
                 <input
                   type={showScramblePassword ? "text" : "password"}
+                  autoComplete="new-password"
                   disabled={isGeneratingScrambles || isGeneratingZip}
                   className="form-control"
                   placeholder="Password"
