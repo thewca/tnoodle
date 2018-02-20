@@ -108,9 +108,6 @@ export function normalizeCompetitionJson(competitionJson) {
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
       round.groups = round.groups || [];
-      if(!round.scrambleGroupCount) {
-        round.scrambleGroupCount = round.groups.length || 1;
-      }
       round.groups.forEach(group => {
         group.scrambles = group.scrambles || [];
         group.extraScrambles = group.extraScrambles || [];
