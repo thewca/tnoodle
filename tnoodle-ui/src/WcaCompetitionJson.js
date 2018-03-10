@@ -81,25 +81,27 @@ export function buildActivityCode(activity) {
   return activityCode;
 }
 
-export function getActivity(wcaCompetitionJson, activityCode) {
+export function getRound(wcaCompetitionJson, activityCode) {
   let activity = parseActivityCode(activityCode);
 
   if(!activity.eventId) {
-    return wcaCompetitionJson;
+    throw new Error(`Activity code ${activityCode} missing eventId`);
   }
   let event = wcaCompetitionJson.events.find(event => event.id === activity.eventId);
 
   if(!activity.roundNumber) {
-    return event;
+    throw new Error(`Activity code ${activityCode} missing roundNumber`);
   }
   let round = event.rounds[activity.roundNumber - 1];
-
-  if(!activity.group) {
-    return round;
+  if(!round) {
+    throw new Error(`Could not find round corresponding to activity code ${activityCode}`);
   }
-  let group = round.groups.find(group => group.group === activity.group);
 
-  return group;
+  if(activity.group) {
+    throw new Error(`Activity code ${activityCode} should not have a group`);
+  }
+
+  return round;
 }
 
 export function normalizeCompetitionJson(competitionJson) {
