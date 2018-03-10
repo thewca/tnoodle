@@ -1,7 +1,7 @@
 import events from 'wca/events';
 import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
-import { parseActivityCode, getActivity, formatToScrambleCount, getNextAvailableGroupName, checkScrambles } from 'WcaCompetitionJson';
+import { parseActivityCode, getRound, formatToScrambleCount, getNextAvailableGroupName, checkScrambles } from 'WcaCompetitionJson';
 
 let TNOODLE_BASE_URL = "http://localhost:2014";
 const scrambler = new tnoodle.Scrambler(TNOODLE_BASE_URL);
@@ -35,7 +35,7 @@ export function generateMissingScrambles(rounds) {
     rounds.forEach(round => {
       let activityCode = round.id;
       let { eventId } = parseActivityCode(activityCode);
-      let wcaRound = getActivity(getState().competitionJson, activityCode);
+      let wcaRound = getRound(getState().competitionJson, activityCode);
       let setsToGenerateCount = wcaRound.scrambleSetCount - wcaRound.groups.length;
       let usedGroupNames = wcaRound.groups.map(wcaGroup => wcaGroup.group);
       let namesOfGroupsToGenerate = [];

@@ -1,4 +1,4 @@
-import { getActivity, normalizeCompetitionJson } from 'WcaCompetitionJson';
+import { getRound, normalizeCompetitionJson } from 'WcaCompetitionJson';
 import deepcopy from 'deepcopy';
 
 export const me = function(state=null, action) {
@@ -22,7 +22,7 @@ export const competitionJson = function(state=null, action) {
     return normalizeCompetitionJson(action.response);
   } else if(action.type === "GROUP_FOR_ROUND") {
     let competitionJson = deepcopy(state);
-    let round = getActivity(competitionJson, action.activityCode);
+    let round = getRound(competitionJson, action.activityCode);
     round.groups.push({
       group: action.groupName,
       scrambles: action.scrambles,
