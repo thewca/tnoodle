@@ -36,10 +36,10 @@ export function generateMissingScrambles(rounds) {
       let activityCode = round.id;
       let { eventId } = parseActivityCode(activityCode);
       let wcaRound = getActivity(getState().competitionJson, activityCode);
-      let groupsToGenerateCount = wcaRound.scrambleGroupCount - wcaRound.groups.length;
+      let setsToGenerateCount = wcaRound.scrambleSetCount - wcaRound.groups.length;
       let usedGroupNames = wcaRound.groups.map(wcaGroup => wcaGroup.group);
       let namesOfGroupsToGenerate = [];
-      for(let i = 0; i < groupsToGenerateCount; i++) {
+      for(let i = 0; i < setsToGenerateCount; i++) {
         namesOfGroupsToGenerate.push(getNextAvailableGroupName(usedGroupNames.concat(namesOfGroupsToGenerate)));
       }
       let { scrambleCount, extraScrambleCount } = formatToScrambleCount(wcaRound.format, eventId);
