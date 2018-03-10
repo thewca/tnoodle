@@ -108,8 +108,11 @@ export function normalizeCompetitionJson(competitionJson) {
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
       round.groups = round.groups || [];
-      if(!round.scrambleGroupCount) {
-        round.scrambleGroupCount = round.groups.length || 1;
+      if(!round.scrambleSetCount) {
+        // We look at scrambleGroupCount here for backwards compatibility.
+        // The attribute has been renamed to scrambleSetCount, but the WCA website has not
+        // yet been updated accordingly.
+        round.scrambleSetCount = round.scrambleGroupCount || round.groups.length || 1;
       }
       round.groups.forEach(group => {
         group.scrambles = group.scrambles || [];
@@ -146,14 +149,14 @@ export function checkScrambles(wcaCompetitionJson) {
       }
 
       let { scrambleCount: requiredScrambleCountPerGroup, extraScrambleCount: requiredExtraScrambleCountPerGroup } = formatToScrambleCount(wcaRound.format, eventId);
-      checked.scramblesNeededCount += (requiredScrambleCountPerGroup + requiredExtraScrambleCountPerGroup) * wcaRound.scrambleGroupCount;
+      checked.scramblesNeededCount += (requiredScrambleCountPerGroup + requiredExtraScrambleCountPerGroup) * wcaRound.scrambleSetCount;
 
       let roundScramblesPerfect = true;
-      if(wcaRound.groups.length < wcaRound.scrambleGroupCount) {
+      if(wcaRound.groups.length < wcaRound.scrambleSetCount) {
         checked.roundsWithMissingGroups.push({
           id: buildActivityCode({ eventId, roundNumber }),
           groupCount: wcaRound.groups.length,
-          scrambleGroupCount: wcaRound.scrambleGroupCount,
+          scrambleSetCount: wcaRound.scrambleSetCount,
         });
         roundScramblesPerfect = false;
       }
@@ -204,7 +207,7 @@ export function checkScrambles(wcaCompetitionJson) {
         checked.finishedRounds.push({
           id: buildActivityCode({ eventId, roundNumber }),
           groupCount: wcaRound.groups.length,
-          scrambleGroupCount: wcaRound.scrambleGroupCount,
+          scrambleSetCount: wcaRound.scrambleSetCount,
         });
       }
     });
