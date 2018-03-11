@@ -8,7 +8,7 @@ import * as actions from 'actions';
 import CubingIcon from 'CubingIcon';
 import { NavigationAwareComponent } from 'App';
 import { fetchCompetitionJson } from 'actions';
-import { checkScrambles } from 'WcaCompetitionJson';
+import { checkJson } from 'WcaCompetitionJson';
 
 import FaEye from 'react-icons/lib/fa/eye';
 import FaEyeSlash from 'react-icons/lib/fa/eye-slash';
@@ -42,7 +42,7 @@ class ManageCompetition extends Component {
       );
     }
 
-    let { groupsWithWrongNumberOfScrambles, warnings, scramblesNeededCount, currentScrambleCount } = checkScrambles(competitionJson);
+    let { groupsWithWrongNumberOfScrambles, warnings, scramblesNeededCount, currentScrambleCount } = checkJson(competitionJson);
 
     let groupsWithWrongNumberOfScramblesDiv = null;
     if(groupsWithWrongNumberOfScrambles.length > 0) {
