@@ -129,8 +129,6 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
   return scrambleRequest;
 }
 
-let pendingRegenerationTimer = null;
-const ZIP_GENERATION_PAUSE_MS = 200;
 export function setScramblePassword(scramblePassword) {
   return (dispatch, getState) => {
     if(getState().isGeneratingScrambles || getState().isGeneratingZip) {
@@ -142,16 +140,6 @@ export function setScramblePassword(scramblePassword) {
       scramblePassword,
     });
     dispatch({ type: "CLEAR_SCRAMBLE_ZIP" });
-
-    // Debounce regenerating the scramble zip file, because when the user types in
-    // password "foo", setScramblePassword is called 3 times.
-    if(pendingRegenerationTimer) {
-      clearTimeout(pendingRegenerationTimer);
-    }
-    pendingRegenerationTimer = setTimeout(function() {
-      dispatch(maybeRegenerateScramblesZip());
-      pendingRegenerationTimer = null;
-    }, ZIP_GENERATION_PAUSE_MS);
   }
 }
 
