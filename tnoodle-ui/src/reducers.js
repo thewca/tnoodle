@@ -20,11 +20,11 @@ export const versionInfo = function(state=null, action) {
 export const competitionJson = function(state=null, action) {
   if(action.type === "FETCH_COMPETITION_JSON" && action.status === "success") {
     return normalizeCompetitionJson(action.response);
-  } else if(action.type === "GROUP_FOR_ROUND") {
+  } else if(action.type === "SCRAMBLE_SET_FOR_ROUND") {
     let competitionJson = deepcopy(state);
     let round = getRound(competitionJson, action.activityCode);
-    round.groups.push({
-      group: action.groupName,
+    round.scrambleSets.push({
+      id: action.scrambleSetId,
       scrambles: action.scrambles,
       extraScrambles: action.extraScrambles,
     });
@@ -33,7 +33,7 @@ export const competitionJson = function(state=null, action) {
     let competitionJson = deepcopy(state);
     competitionJson.events.forEach(event => {
       event.rounds.forEach(round => {
-        round.groups = [];
+        round.scrambleSets = [];
       });
     });
     return normalizeCompetitionJson(competitionJson);

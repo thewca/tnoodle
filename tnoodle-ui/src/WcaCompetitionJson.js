@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import deepcopy from 'deepcopy';
 
 export function formatToScrambleCount(format, eventId) {
@@ -17,37 +15,6 @@ export function formatToScrambleCount(format, eventId) {
 
   let extraScrambleCount = (eventId !== "333mbf" ? 2 : 0);
   return { scrambleCount, extraScrambleCount };
-}
-
-const nextLetterInAlphabet = letter => {
-  let nthLetter = letter.charCodeAt(0) - 'A'.charCodeAt(0) + 1;
-  if(nthLetter >= 26) {
-    return null;
-  }
-  return String.fromCharCode('A'.charCodeAt(0) + nthLetter);
-};
-
-export function getNextGroupName(groupName) {
-  if(groupName === "") {
-    return "A";
-  }
-
-  let allButLastLetter = groupName.substring(0, groupName.length - 1);
-  let lastLetter = groupName[groupName.length - 1];
-  let nextLetter = nextLetterInAlphabet(lastLetter);
-  if(nextLetter) {
-    return allButLastLetter + nextLetter;
-  } else {
-    return getNextGroupName(allButLastLetter) + "A";
-  }
-}
-
-export function getNextAvailableGroupName(usedGroupNames) {
-  let potentialGroupName = "A";
-  while(usedGroupNames.indexOf(potentialGroupName) >= 0) {
-    potentialGroupName = getNextGroupName(potentialGroupName);
-  }
-  return potentialGroupName;
 }
 
 export function parseActivityCode(activityCode) {
@@ -109,18 +76,17 @@ export function normalizeCompetitionJson(competitionJson) {
   competitionJson.events = competitionJson.events || [];
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
-      round.groups = round.groups || [];
+      round.scrambleSets = round.scrambleSets || [];
       if(!round.scrambleSetCount) {
         // We look at scrambleGroupCount here for backwards compatibility.
         // The attribute has been renamed to scrambleSetCount, but the WCA website has not
         // yet been updated accordingly.
-        round.scrambleSetCount = round.scrambleGroupCount || round.groups.length || 1;
+        round.scrambleSetCount = round.scrambleGroupCount || round.scrambleSets.length || 1;
       }
-      round.groups.forEach(group => {
-        group.scrambles = group.scrambles || [];
-        group.extraScrambles = group.extraScrambles || [];
+      round.scrambleSets.forEach(scrambleSet => {
+        scrambleSet.scrambles = scrambleSet.scrambles || [];
+        scrambleSet.extraScrambles = scrambleSet.extraScrambles || [];
       });
-      round.groups = _.sortBy(round.groups, group => group.group);
     });
   });
   return competitionJson;
@@ -129,8 +95,8 @@ export function normalizeCompetitionJson(competitionJson) {
 export function checkJson(wcaCompetitionJson) {
   let checked = {
     finishedRounds: [],
-    groupsWithWrongNumberOfScrambles: [],
-    roundsWithMissingGroups: [],
+    setsWithWrongNumberOfScrambles: [],
+    roundsWithMissingSets: [],
     warnings: [],
     currentScrambleCount: 0,
     scramblesNeededCount: 0,
@@ -139,66 +105,54 @@ export function checkJson(wcaCompetitionJson) {
   wcaCompetitionJson.events.forEach(wcaEvent => {
     wcaEvent.rounds.forEach(wcaRound => {
       let eventId = wcaEvent.id;
-      let { roundNumber } = parseActivityCode(wcaRound.id);
 
       if(!wcaRound.format) {
         checked.warnings.push({
-          id: buildActivityCode({ eventId, roundNumber }),
+          id: wcaRound.id,
 
           message: "Missing or invalid format",
         });
         return;
       }
 
-      let { scrambleCount: requiredScrambleCountPerGroup, extraScrambleCount: requiredExtraScrambleCountPerGroup } = formatToScrambleCount(wcaRound.format, eventId);
-      checked.scramblesNeededCount += (requiredScrambleCountPerGroup + requiredExtraScrambleCountPerGroup) * wcaRound.scrambleSetCount;
+      let { scrambleCount: requiredScrambleCountPerSet, extraScrambleCount: requiredExtraScrambleCountPerSet } = formatToScrambleCount(wcaRound.format, eventId);
+      checked.scramblesNeededCount += (requiredScrambleCountPerSet + requiredExtraScrambleCountPerSet) * wcaRound.scrambleSetCount;
 
       let roundScramblesPerfect = true;
-      if(wcaRound.groups.length < wcaRound.scrambleSetCount) {
-        checked.roundsWithMissingGroups.push({
-          id: buildActivityCode({ eventId, roundNumber }),
-          groupCount: wcaRound.groups.length,
-          scrambleSetCount: wcaRound.scrambleSetCount,
+      if(wcaRound.scrambleSets.length < wcaRound.scrambleSetCount) {
+        checked.roundsWithMissingSets.push({
+          id: wcaRound.id,
+
+          scrambleSetCount: wcaRound.scrambleSets.length,
+          correctScrambleSetCount: wcaRound.scrambleSetCount,
         });
         roundScramblesPerfect = false;
       }
 
-      wcaRound.groups.forEach(wcaGroup => {
-        let { group } = wcaGroup;
-
-        if(!group) {
-          checked.warnings.push({
-            id: buildActivityCode({ eventId, roundNumber }),
-
-            message: "Group has no group name",
-          });
-          roundScramblesPerfect = false;
-          return;
-        }
-
-        let scrambleCount = wcaGroup.scrambles.length;
+      wcaRound.scrambleSets.forEach(wcaScrambleSet => {
+        let scrambleCount = wcaScrambleSet.scrambles.length;
         checked.currentScrambleCount += scrambleCount;
 
-        let extraScrambleCount = wcaGroup.extraScrambles.length;
+        let extraScrambleCount = wcaScrambleSet.extraScrambles.length;
         checked.currentScrambleCount += extraScrambleCount;
 
-        if(scrambleCount !== requiredScrambleCountPerGroup) {
-          checked.groupsWithWrongNumberOfScrambles.push({
-            id: buildActivityCode({ eventId, roundNumber, group }),
+        if(scrambleCount !== requiredScrambleCountPerSet) {
+          checked.setsWithWrongNumberOfScrambles.push({
+            id: wcaScrambleSet.id,
 
             scrambleCount,
-            requiredScrambleCountPerGroup,
+            requiredScrambleCountPerSet,
           });
           roundScramblesPerfect = false;
           return;
         }
 
-        if(extraScrambleCount !== requiredExtraScrambleCountPerGroup) {
-          checked.groupsWithWrongNumberOfScrambles.push({
-            id: buildActivityCode({ eventId, roundNumber, group }),
+        if(extraScrambleCount !== requiredExtraScrambleCountPerSet) {
+          checked.setsWithWrongNumberOfScrambles.push({
+            id: wcaScrambleSet.id,
 
             extraScrambleCount,
-            requiredExtraScrambleCountPerGroup,
+            requiredExtraScrambleCountPerSet,
           });
           roundScramblesPerfect = false;
           return;
@@ -207,9 +161,7 @@ export function checkJson(wcaCompetitionJson) {
 
       if(roundScramblesPerfect) {
         checked.finishedRounds.push({
-          id: buildActivityCode({ eventId, roundNumber }),
-          groupCount: wcaRound.groups.length,
-          scrambleSetCount: wcaRound.scrambleSetCount,
+          id: wcaRound.id,
         });
       }
     });

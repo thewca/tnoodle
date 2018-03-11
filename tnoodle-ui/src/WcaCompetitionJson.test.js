@@ -1,8 +1,6 @@
 import {
   checkJson,
   normalizeCompetitionJson,
-  getNextAvailableGroupName,
-  getNextGroupName,
   parseActivityCode,
   buildActivityCode,
 } from 'WcaCompetitionJson';
@@ -16,14 +14,14 @@ it('checkJson finds missing scrambles', () => {
           {
             id: "333-r1",
             format: "",
-            groups: [],
+            scrambleSets: [],
           },
           {
             id: "333-r2",
             format: "a",
-            groups: [
+            scrambleSets: [
               {
-                group: "A",
+                id: "333-r2-set1",
                 scrambles: [ "1", "2", "3" ],
                 extraScrambles: [ "E1", "E2" ],
               },
@@ -32,9 +30,9 @@ it('checkJson finds missing scrambles', () => {
           {
             id: "333-r3",
             format: "a",
-            groups: [
+            scrambleSets: [
               {
-                group: "A",
+                id: "333-r3-set1",
                 scrambles: [ "1", "2", "3", "4", "5" ],
                 extraScrambles: [ "E1", "E2" ],
               },
@@ -44,9 +42,9 @@ it('checkJson finds missing scrambles', () => {
             id: "333-r4",
             format: "a",
             scrambleSetCount: 2,
-            groups: [
+            scrambleSets: [
               {
-                group: "A",
+                id: "333-r4-set1",
                 scrambles: [ "1", "2", "3", "4", "5" ],
                 extraScrambles: [ "E1", "E2" ],
               },
@@ -60,12 +58,12 @@ it('checkJson finds missing scrambles', () => {
           {
             id: "222-r1",
             format: "a",
-            groups: [],
+            scrambleSets: [],
           },
           {
             id: "222-r2",
             format: "a",
-            groups: null,
+            scrambleSets: null,
           },
         ],
       },
@@ -75,7 +73,7 @@ it('checkJson finds missing scrambles', () => {
           {
             id: "333mbf-r1",
             format: "2",
-            groups: null,
+            scrambleSets: null,
           },
         ],
       },
@@ -90,37 +88,35 @@ it('checkJson finds missing scrambles', () => {
     finishedRounds: [
       {
         id: "333-r3",
-        groupCount: 1,
-        scrambleSetCount: 1,
       },
     ],
-    groupsWithWrongNumberOfScrambles: [
+    setsWithWrongNumberOfScrambles: [
       {
-        id: "333-r2-gA",
+        id: "333-r2-set1",
         scrambleCount: 3,
-        requiredScrambleCountPerGroup: 5,
+        requiredScrambleCountPerSet: 5,
       },
     ],
-    roundsWithMissingGroups: [
+    roundsWithMissingSets: [
       {
         id: "333-r4",
-        groupCount: 1,
-        scrambleSetCount: 2,
+        scrambleSetCount: 1,
+        correctScrambleSetCount: 2,
       },
       {
         id: "222-r1",
-        groupCount: 0,
-        scrambleSetCount: 1,
+        scrambleSetCount: 0,
+        correctScrambleSetCount: 1,
       },
       {
         id: "222-r2",
-        groupCount: 0,
-        scrambleSetCount: 1,
+        scrambleSetCount: 0,
+        correctScrambleSetCount: 1,
       },
       {
         id: "333mbf-r1",
-        groupCount: 0,
-        scrambleSetCount: 1,
+        scrambleSetCount: 0,
+        correctScrambleSetCount: 1,
       },
     ],
     warnings: [
@@ -129,34 +125,6 @@ it('checkJson finds missing scrambles', () => {
         message: "Missing or invalid format",
       },
     ],
-  });
-});
-
-describe('getNextAvailableGroupName', () => {
-  it('starts with "A"', () => {
-    expect(getNextAvailableGroupName([])).toEqual("A");
-  });
-
-  it('moves on to "B"', () => {
-    expect(getNextAvailableGroupName(["A"])).toEqual("B");
-  });
-
-  it('moves on to "B" even if "C" is taken', () => {
-    expect(getNextAvailableGroupName(["C", "A"])).toEqual("B");
-  });
-});
-
-describe('getNextGroupName', () => {
-  it('moves on to "AA" after "Z"', () => {
-    expect(getNextGroupName("Z")).toEqual("AA");
-  });
-
-  it('moves on to "BA" after "AZ"', () => {
-    expect(getNextGroupName("AZ")).toEqual("BA");
-  });
-
-  it('moves on to "AAA" after "ZZ"', () => {
-    expect(getNextGroupName("ZZ")).toEqual("AAA");
   });
 });
 

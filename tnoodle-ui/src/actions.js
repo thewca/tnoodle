@@ -1,7 +1,8 @@
 import events from 'wca/events';
 import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
-import { parseActivityCode, getRound, formatToScrambleCount, getNextAvailableGroupName, checkJson } from 'WcaCompetitionJson';
+import { parseActivityCode, getRound, formatToScrambleCount, checkJson } from 'WcaCompetitionJson';
+import indexToLetters from 'indexToLetters';
 
 let TNOODLE_BASE_URL = "http://localhost:2014";
 const scrambler = new tnoodle.Scrambler(TNOODLE_BASE_URL);
@@ -30,20 +31,19 @@ export function generateMissingScrambles(rounds) {
       type: "GENERATE_MISSING_SCRAMBLES",
     });
 
-    let { roundsWithMissingGroups: rounds } = checkJson(getState().competitionJson);
+    let { roundsWithMissingSets: rounds } = checkJson(getState().competitionJson);
     let puzzlesPer333mbfAttempt = getState().puzzlesPer333mbfAttempt;
     rounds.forEach(round => {
       let activityCode = round.id;
-      let { eventId } = parseActivityCode(activityCode);
+      let { eventId, roundNumber } = parseActivityCode(activityCode);
       let wcaRound = getRound(getState().competitionJson, activityCode);
-      let setsToGenerateCount = wcaRound.scrambleSetCount - wcaRound.groups.length;
-      let usedGroupNames = wcaRound.groups.map(wcaGroup => wcaGroup.group);
-      let namesOfGroupsToGenerate = [];
+      let setsToGenerateCount = wcaRound.scrambleSetCount - wcaRound.scrambleSets.length;
+      let idsOfSetsToGenerate = [];
       for(let i = 0; i < setsToGenerateCount; i++) {
-        namesOfGroupsToGenerate.push(getNextAvailableGroupName(usedGroupNames.concat(namesOfGroupsToGenerate)));
+        idsOfSetsToGenerate.push(`${eventId}-r${roundNumber}-set${i+1}`);
       }
       let { scrambleCount, extraScrambleCount } = formatToScrambleCount(wcaRound.format, eventId);
-      namesOfGroupsToGenerate.forEach(groupName => {
+      idsOfSetsToGenerate.forEach(scrambleSetId => {
         let tnoodlePuzzle = eventToTNoodlePuzzle(eventId);
         let tnoodleScramblesToGenerate = (scrambleCount + extraScrambleCount);
         if(eventId === "333mbf") {
@@ -67,9 +67,9 @@ export function generateMissingScrambles(rounds) {
           }
 
           dispatch({
-            type: "GROUP_FOR_ROUND",
+            type: "SCRAMBLE_SET_FOR_ROUND",
             activityCode,
-            groupName,
+            scrambleSetId,
             scrambles,
             extraScrambles,
           });
@@ -104,12 +104,13 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
       let { roundNumber } = parseActivityCode(round.id);
-      round.groups.forEach(group => {
-        let scrambles = group.scrambles;
-        let extraScrambles = group.extraScrambles;
+      round.scrambleSets.forEach((scrambleSet, index) => {
+        let scrambles = scrambleSet.scrambles;
+        let extraScrambles = scrambleSet.extraScrambles;
         let copies = 1;
         let scrambler = eventToTNoodlePuzzle(event.id);
-        let title = `${events.byId[event.id].name} Round ${roundNumber} Group ${group.group}`;
+        let prettyIndex = indexToLetters(index);
+        let title = `${events.byId[event.id].name} Round ${roundNumber} Scramble Set ${prettyIndex}`;
         let request = {
           scrambles: scrambles,
           extraScrambles: extraScrambles,
@@ -120,7 +121,8 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
 
           event: event.id,
           round: roundNumber,
-          group: group.group,
+          group: prettyIndex, // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
+          scrambleSetId: scrambleSet.id,
         };
         scrambleRequest.push(request);
       });

@@ -6,7 +6,7 @@ import * as reducers from 'reducers';
 
 let rootReducer = combineReducers(reducers);
 
-it('GROUP_FOR_ROUND', () => {
+it('SCRAMBLE_SET_FOR_ROUND', () => {
   let wcaCompetitionJson = {
     events: [
       {
@@ -15,14 +15,14 @@ it('GROUP_FOR_ROUND', () => {
           {
             id: "333-r1",
             format: "",
-            groups: [],
+            scrambleSets: [],
           },
           {
             id: "333-r2",
             format: "a",
-            groups: [
+            scrambleSets: [
               {
-                group: "A",
+                id: "333-r1-set1",
                 scrambles: [ "1", "2", "3" ],
                 extraScrambles: [ "E1" ],
               },
@@ -38,16 +38,54 @@ it('GROUP_FOR_ROUND', () => {
   };
 
   let nextState = rootReducer(state, {
-    type: "GROUP_FOR_ROUND",
+    type: "SCRAMBLE_SET_FOR_ROUND",
     activityCode: "333-r1",
-    groupName: "A",
+    scrambleSetId: "333-r1-set1",
     scrambles: [ "Scramble 1", "Scramble Dos" ],
     extraScrambles: [ "E1", "E2" ],
   });
 
-  expect(nextState.competitionJson.events[0].rounds[0].groups).toEqual([{
-    group: "A",
+  expect(nextState.competitionJson.events[0].rounds[0].scrambleSets).toEqual([{
+    id: "333-r1-set1",
     scrambles: [ "Scramble 1", "Scramble Dos" ],
     extraScrambles: [ "E1", "E2" ],
   }]);
+});
+
+it('CLEAR_SCRAMBLES', () => {
+  let wcaCompetitionJson = {
+    events: [
+      {
+        id: "333",
+        rounds: [
+          {
+            id: "333-r1",
+            format: "",
+            scrambleSets: [],
+          },
+          {
+            id: "333-r2",
+            format: "a",
+            scrambleSets: [
+              {
+                id: "333-r1-set1",
+                scrambles: [ "1", "2", "3" ],
+                extraScrambles: [ "E1" ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  let state = {
+    competitionJson: wcaCompetitionJson,
+  };
+
+  let nextState = rootReducer(state, {
+    type: "CLEAR_SCRAMBLES",
+  });
+
+  expect(nextState.competitionJson.events[0].rounds[1].scrambleSets).toEqual([]);
 });
