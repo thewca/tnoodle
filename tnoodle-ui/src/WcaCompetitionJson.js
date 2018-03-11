@@ -126,7 +126,7 @@ export function normalizeCompetitionJson(competitionJson) {
   return competitionJson;
 }
 
-export function checkScrambles(wcaCompetitionJson) {
+export function checkJson(wcaCompetitionJson) {
   let checked = {
     finishedRounds: [],
     groupsWithWrongNumberOfScrambles: [],

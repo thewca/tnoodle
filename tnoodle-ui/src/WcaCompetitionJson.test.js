@@ -1,5 +1,5 @@
 import {
-  checkScrambles,
+  checkJson,
   normalizeCompetitionJson,
   getNextAvailableGroupName,
   getNextGroupName,
@@ -7,7 +7,7 @@ import {
   buildActivityCode,
 } from 'WcaCompetitionJson';
 
-it('checkScrambles finds missing scrambles', () => {
+it('checkJson finds missing scrambles', () => {
   let wcaCompetitionJson = {
     events: [
       {
@@ -82,9 +82,9 @@ it('checkScrambles finds missing scrambles', () => {
     ],
   };
 
-  let checkedScrambles = checkScrambles(normalizeCompetitionJson(wcaCompetitionJson));
+  let checked = checkJson(normalizeCompetitionJson(wcaCompetitionJson));
 
-  expect(checkedScrambles).toEqual({
+  expect(checked).toEqual({
     currentScrambleCount: 19,
     scramblesNeededCount: 6*(5+2) + 2,
     finishedRounds: [

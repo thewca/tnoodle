@@ -1,7 +1,7 @@
 import events from 'wca/events';
 import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
-import { parseActivityCode, getRound, formatToScrambleCount, getNextAvailableGroupName, checkScrambles } from 'WcaCompetitionJson';
+import { parseActivityCode, getRound, formatToScrambleCount, getNextAvailableGroupName, checkJson } from 'WcaCompetitionJson';
 
 let TNOODLE_BASE_URL = "http://localhost:2014";
 const scrambler = new tnoodle.Scrambler(TNOODLE_BASE_URL);
@@ -30,7 +30,7 @@ export function generateMissingScrambles(rounds) {
       type: "GENERATE_MISSING_SCRAMBLES",
     });
 
-    let { roundsWithMissingGroups: rounds } = checkScrambles(getState().competitionJson);
+    let { roundsWithMissingGroups: rounds } = checkJson(getState().competitionJson);
     let puzzlesPer333mbfAttempt = getState().puzzlesPer333mbfAttempt;
     rounds.forEach(round => {
       let activityCode = round.id;
@@ -160,7 +160,7 @@ export function setPuzzlesPer333mbfAttempt(puzzlesPer333mbfAttempt) {
 
 export function maybeRegenerateScramblesZip() {
   return (dispatch, getState) => {
-    let { currentScrambleCount, scramblesNeededCount } = checkScrambles(getState().competitionJson);
+    let { currentScrambleCount, scramblesNeededCount } = checkJson(getState().competitionJson);
     if(currentScrambleCount >= scramblesNeededCount) {
       dispatch({ type: "DONE_GENERATING_SCRAMBLES" });
       dispatch({ type: "CLEAR_SCRAMBLE_ZIP" });
