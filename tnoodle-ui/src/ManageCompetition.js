@@ -42,14 +42,14 @@ class ManageCompetition extends Component {
       );
     }
 
-    let { groupsWithWrongNumberOfScrambles, warnings, scramblesNeededCount, currentScrambleCount } = checkJson(competitionJson);
+    let { setsWithWrongNumberOfScrambles, warnings, scramblesNeededCount, currentScrambleCount } = checkJson(competitionJson);
 
-    let groupsWithWrongNumberOfScramblesDiv = null;
-    if(groupsWithWrongNumberOfScrambles.length > 0) {
-      groupsWithWrongNumberOfScramblesDiv = (
+    let setsWithWrongNumberOfScramblesDiv = null;
+    if(setsWithWrongNumberOfScrambles.length > 0) {
+      setsWithWrongNumberOfScramblesDiv = (
         <div>
-          <h2>Groups with wrong number of scrambles</h2>
-          <pre>{JSON.stringify(groupsWithWrongNumberOfScrambles, null, 2)}</pre>
+          <h2>Scramble sets with wrong number of scrambles</h2>
+          <pre>{JSON.stringify(setsWithWrongNumberOfScrambles, null, 2)}</pre>
         </div>
       );
     }
@@ -170,7 +170,7 @@ class ManageCompetition extends Component {
           </div>
         </div>
 
-        {groupsWithWrongNumberOfScramblesDiv}
+        {setsWithWrongNumberOfScramblesDiv}
         {warningsDiv}
       </div>
     );

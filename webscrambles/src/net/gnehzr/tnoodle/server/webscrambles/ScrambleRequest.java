@@ -157,7 +157,8 @@ class ScrambleRequest {
     // can pass these straight to the generated JSON we put in the
     // zip file. This makes it easier to align that JSON with the rounds
     // of a competition.
-    public String group, event;
+    public String group; // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
+    public String scrambleSetId, event;
     public int round;
 
     public ScrambleRequest(String title, String scrambleRequestUrl, String seed) throws InvalidScrambleRequestException, UnsupportedEncodingException {

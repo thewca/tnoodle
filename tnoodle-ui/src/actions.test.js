@@ -46,14 +46,14 @@ describe('async actions', () => {
             {
               id: "333-r1",
               format: "a",
-              groups: [],
+              scrambleSets: [],
             },
             {
               id: "333-r2",
               format: "a",
-              groups: [
+              scrambleSets: [
                 {
-                  group: "a",
+                  id: "333-r2-set1",
                   scrambles: [ "1", "2", "3" ],
                 },
               ],
@@ -66,7 +66,7 @@ describe('async actions', () => {
             {
               id: "333mbf-r1",
               format: "2",
-              groups: [],
+              scrambleSets: [],
             },
           ],
         },
@@ -79,16 +79,16 @@ describe('async actions', () => {
         type: 'GENERATE_MISSING_SCRAMBLES',
       },
       {
-        type: 'GROUP_FOR_ROUND',
+        type: 'SCRAMBLE_SET_FOR_ROUND',
         activityCode: "333-r1",
-        groupName: "A",
+        scrambleSetId: "333-r1-set1",
         scrambles: [ "S1", "S2", "S3", "S4", "S5" ],
         extraScrambles: [ "E1", "E2" ],
       },
       {
-        type: 'GROUP_FOR_ROUND',
+        type: 'SCRAMBLE_SET_FOR_ROUND',
         activityCode: "333mbf-r1",
-        groupName: "A",
+        scrambleSetId: "333mbf-r1-set1",
         scrambles: [
           twentyMbfScrambles1.join("\n"),
           twentyMbfScrambles2.join("\n"),

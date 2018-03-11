@@ -395,7 +395,7 @@ var mark2 = {};
             { eventID: "333", round: 1 }
         ];
 
-        var defaultNumGroups = 1;
+        var defaultNumScrambleSets = 1;
 
         return {
             events: events,
@@ -404,7 +404,7 @@ var mark2 = {};
             event_order: eventOrder,
             default_rounds: defaultRounds,
 
-            default_num_groups: defaultNumGroups
+            default_num_scramble_sets: defaultNumScrambleSets,
         };
     })();
 
@@ -538,12 +538,12 @@ var mark2 = {};
                 var numExtraSolves = parseInt(tr.getElementsByClassName("num_extra_solves")[0].value, 10);
                 var numCopies = parseInt(tr.getElementsByClassName("num_copies")[0].value, 10);
 
-                var numGroups = parseInt(tr.getElementsByClassName("num_groups")[0].value, 10);
+                var numScrambleSets = parseInt(tr.getElementsByClassName("num_scramble_sets")[0].value, 10);
 
                 var roundJson = {
                     eventID: eventID,
                     round: round,
-                    groupCount: numGroups,
+                    scrambleSetCount: numScrambleSets,
                     scrambleCount: numSolves,
                     extraScrambleCount: numExtraSolves,
                     copies: numCopies,
@@ -585,13 +585,14 @@ var mark2 = {};
             var sheetByGuid = {};
             for(var i = 0; i < rounds.length; i++) {
                 var round = rounds[i];
-                for(var groupN = 0; groupN < round.groupCount; groupN++) {
+                for(var setN = 0; setN < round.scrambleSetCount; setN++) {
                     var title = roundToRoundName(round.round);
-                    var group = intToLetters(groupN + 1);
-                    if(round.groupCount > 1) {
-                        title += " Group " + group;
+                    var prettyIndex = intToLetters(setN + 1);
+                    if(round.scrambleSetCount > 1) {
+                        title += " Scramble Set " + prettyIndex;
                     }
                     var eventName = mark2.settings.events[round.eventID].name;
+                    var scrambleSetId = round.eventID + "-" + (i+1) + "-set" + setN;
                     var sheet = {
                         puzzle: settings.eventToPuzzle(round.eventID),
                         fmc: settings.isFmc(round.eventID),
@@ -602,13 +603,14 @@ var mark2 = {};
 
                         event: round.eventID,
                         round: round.round,
-                        group: group,
+                        group: prettyIndex, // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
+                        scrambleSetId: scrambleSetId,
                     };
 
                     // Unfortunately, there's no guarantee that rounds in a
                     // competition have unique names, so we must suffix with a
                     // unique number.
-                    var baseGuid = getCompetitionName() + sheet.puzzle + sheet.title;
+                    var baseGuid = getCompetitionName() + scrambleSetId;
                     var guid = baseGuid;
                     var uniqueId = 0;
                     while(sheetByGuid[guid]) {
@@ -899,15 +901,15 @@ var mark2 = {};
         };
 
 
-        var addRound = function(eventID, round, numGroupsOpt, numSolvesOpt, numExtraSolvesOpt, numCopiesOpt, placeLast) {
+        var addRound = function(eventID, round, numScrambleSetsOpt, numSolvesOpt, numExtraSolvesOpt, numCopiesOpt, placeLast) {
             if (round === undefined) {
                 round = numCurrentRounds(eventID)+1;
             }
             var roundName = roundToRoundName(round);
 
-            var numGroups = numGroupsOpt;
-            if (numGroupsOpt === undefined) {
-                numGroups = settings.default_num_groups;
+            var numScrambleSets = numScrambleSetsOpt;
+            if (numScrambleSetsOpt === undefined) {
+                numScrambleSets = settings.default_num_scramble_sets;
             }
 
             var numSolves = numSolvesOpt;
@@ -960,13 +962,13 @@ var mark2 = {};
                     roundName);
             roundNameTD.classList.add("event_name");
 
-            var numGroupsTD = mark2.dom.appendElement(newEventTR, "td");
-            var numGroupsInput = mark2.dom.appendElement(
-                    numGroupsTD,
+            var numScrambleSetsTD = mark2.dom.appendElement(newEventTR, "td");
+            var numScrambleSetsInput = mark2.dom.appendElement(
+                    numScrambleSetsTD,
                     "input",
-                    { type: "number", value: numGroups, min: 1 }
+                    { type: "number", value: numScrambleSets, min: 1 }
                     );
-            numGroupsInput.classList.add("num_groups");
+            numScrambleSetsInput.classList.add("num_scramble_sets");
 
             var numSolvesTD = mark2.dom.appendElement(newEventTR, "td");
             var numSolvesInput = mark2.dom.appendElement(
@@ -999,7 +1001,7 @@ var mark2 = {};
             numSolvesInput.addEventListener("change", updateHash, false);
             numExtraSolvesInput.addEventListener("change", updateHash, false);
             numCopiesInput.addEventListener("change", updateHash, false);
-            numGroupsInput.addEventListener("change", updateHash, false);
+            numScrambleSetsInput.addEventListener("change", updateHash, false);
 
             sortables.addItems(newEventTR);
         };
@@ -1091,7 +1093,7 @@ var mark2 = {};
         var addRounds = function(rounds) {
             for (var i = 0; i < rounds.length; i++) {
                 var placeLast = true;
-                addRound(rounds[i].eventID, rounds[i].round, rounds[i].groupCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount, rounds[i].copies, placeLast);
+                addRound(rounds[i].eventID, rounds[i].round, rounds[i].scrambleSetCount, rounds[i].scrambleCount, rounds[i].extraScrambleCount, rounds[i].copies, placeLast);
             }
         };
 
@@ -1246,7 +1248,7 @@ var mark2 = {};
             td.appendChild(document.createTextNode('Round Names'));
             td = document.createElement('td');
             tr.appendChild(td);
-            td.appendChild(document.createTextNode('# Groups'));
+            td.appendChild(document.createTextNode('# Scramble Sets'));
             td = document.createElement('td');
             tr.appendChild(td);
             td.appendChild(document.createTextNode('# Attempts'));

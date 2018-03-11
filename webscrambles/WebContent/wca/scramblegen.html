@@ -314,7 +314,8 @@
 
                 event: sheet.event,
                 round: sheet.round,
-                group: sheet.group
+                group: sheet.group, // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
+                scrambleSetId: sheet.scrambleSetId,
             };
             scrambleRequest.push(request);
         }

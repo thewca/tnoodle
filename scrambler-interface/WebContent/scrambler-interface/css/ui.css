@@ -209,7 +209,7 @@ h1 {
   width: 10em;
 }
 
-#events_rounds_interface #rounds_table td input.num_groups {
+#events_rounds_interface #rounds_table td input.num_scramble_sets {
   width: 3em;
 }
 
