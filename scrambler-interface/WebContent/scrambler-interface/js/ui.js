@@ -346,9 +346,8 @@ var mark2 = {};
 
         var extraScrambles = 2;
         var eventOrder = [
-            // Official WCA events as of October 06, 2013
+            // Official WCA events as of March 12, 2018
             // Names match https://www.worldcubeassociation.org/regulations/#article-9-events
-            // - Exception: "Rubik's Cube" is replaced with "3x3x3 Cube" for consistency.
             {eventID: "222", name: "2x2x2 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "333", name: "3x3x3 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "444", name: "4x4x4 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
@@ -362,7 +361,7 @@ var mark2 = {};
             {eventID: "minx", name: "Megaminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "pyram", name: "Pyraminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "sq1", name: "Square-1", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
-            {eventID: "clock", name: "Rubik's Clock", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
+            {eventID: "clock", name: "Clock", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "444bf", name: "4x4x4 Cube: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             {eventID: "555bf", name: "5x5x5 Cube: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             {eventID: "333mbf", name: "3x3x3: Multiple Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: THREE_MULTI_DEFAULT_PUZZLES_PER_ATTEMPT } },
