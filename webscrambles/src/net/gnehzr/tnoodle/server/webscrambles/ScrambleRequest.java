@@ -593,8 +593,21 @@ class ScrambleRequest {
 
         // The 100 number in the fit text function is just some big number. Hopefully, fitting the width will be enough to fit the height.
         Rectangle rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
+<<<<<<< Updated upstream
 
-        fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        if(withScramble) {
+            fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        }
+        else {
+            fitAndShowText(cb, "____________________________", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+=======
+        
+        if(withScramble) {
+        	fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        } else {
+        	fitAndShowText(cb, "____________________________", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+>>>>>>> Stashed changes
+        }
 
         offsetTop += fontSize + 2;
 
