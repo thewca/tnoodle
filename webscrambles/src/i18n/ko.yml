@@ -1,9 +1,9 @@
 ko:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: '스크럼블 %{scrambleIndex} / %{scrambleCount}'
+        scrambleXofY: '스크램블 %{scrambleIndex} / %{scrambleCount}'
         #original_hash: b7126cd
-        scramble: 스크럼블
+        scramble: 스크램블
         #original_hash: ec7b598
         round: 라운드
         #original_hash: 43d44fe
@@ -23,7 +23,7 @@ ko:
         #original_hash: 8b6b48b
         rule2: 칸 하나당 회전기호 1개씩 쓸 수 있으며 잘못 적었을 시 명백하게 지우셔야 합니다.
         #original_hash: 7822590
-        rule3: 제출한 답안은 주어진 스크럼블의 어떠한 부분과도 직접적으로 연관이 있으면 안됩니다.
+        rule3: 제출한 답안은 주어진 스크램블의 어떠한 부분과도 직접적으로 연관이 있으면 안됩니다.
         #original_hash: 45551a7
         rule4: '답안은 큐브 전체 회전 기호를 포함하여 최대 %{maxMoves}회전까지 작성하실 수 있습니다.'
         #original_hash: 1ba5f27
@@ -43,4 +43,4 @@ ko:
         #original_hash: 8158159
         double: 180도 회전
         #original_hash: e014b51
-        scrambleOnSeparateSheet: 스크럼블을 보기 위해서는 다른 용지를 보세요.
+        scrambleOnSeparateSheet: 스크램블을 보기 위해서는 다른 용지를 보세요.
