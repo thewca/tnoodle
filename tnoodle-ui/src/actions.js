@@ -15,6 +15,10 @@ export function fetchCompetitionJson(competitionId) {
   return wrapPromiseWithDispatch(WcaApi.getCompetitionJson(competitionId), 'FETCH_COMPETITION_JSON');
 }
 
+export function fetchRecords() {
+  return wrapPromiseWithDispatch(WcaApi.getRecords(), 'FETCH_RECORDS');
+}
+
 export function fetchUpcomingManageableCompetitions() {
   return wrapPromiseWithDispatch(WcaApi.getUpcomingManageableCompetitions(), 'FETCH_UPCOMING_COMPS');
 }
