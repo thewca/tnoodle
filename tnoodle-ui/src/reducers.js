@@ -70,7 +70,7 @@ export const loadCompetitionJsonError = function(state=null, action) {
   }
 }
 
-export const puzzlesPer333mbfAttempt = function(state=28, action) {
+export const puzzlesPer333mbfAttempt = function(state=null, action) {
   if(action.type === "SET_PUZZLES_PER_333MBF_ATTEMPT") {
     return action.puzzlesPer333mbfAttempt;
   } else {
