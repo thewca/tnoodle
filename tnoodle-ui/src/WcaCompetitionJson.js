@@ -13,7 +13,7 @@ export function formatToScrambleCount(format, eventId) {
     throw new Error(`Unrecognized format: ${format}`);
   }
 
-  let extraScrambleCount = (eventId !== "333mbf" ? 2 : 0);
+  let extraScrambleCount = (eventId === "333mbf" || eventId === "333fm" ? 0 : 2);
   return { scrambleCount, extraScrambleCount };
 }
 
