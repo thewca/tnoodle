@@ -34,9 +34,6 @@ class ManageCompetition extends Component {
     return <React.Fragment>
       <p>
         This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
-        {' '}<button className="btn btn-sm btn-primary" onClick={e => {
-          dispatch(actions.setPuzzlesPer333mbfAttempt(suggestedNumberOfPuzzles));
-        }}>May I suggest {suggestedNumberOfPuzzles}?</button>
       </p>
       <p>
         <input
