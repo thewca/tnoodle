@@ -3,15 +3,67 @@ import React, { Component } from 'react';
 
 import events from 'wca/events';
 import pluralize from 'pluralize';
-import { toWcaUrl } from 'WcaApi';
+import * as WcaApi from 'WcaApi';
 import * as actions from 'actions';
 import CubingIcon from 'CubingIcon';
 import { NavigationAwareComponent } from 'App';
-import { fetchCompetitionJson } from 'actions';
+import { fetchCompetitionJson, fetchRecords } from 'actions';
 import { checkJson } from 'WcaCompetitionJson';
 
 import FaEye from 'react-icons/lib/fa/eye';
 import FaEyeSlash from 'react-icons/lib/fa/eye-slash';
+
+
+const MultiBldPuzzleCountInput = connect(
+  (state, ownProps) => {
+    return {
+      records: state.records,
+    };
+  },
+)(
+  class extends Component {
+    componentWillMount() {
+      this.props.dispatch(fetchRecords());
+    }
+
+    render() {
+      let {
+        value,
+        onChange,
+        disabled,
+        records,
+      } = this.props;
+
+      let suggestedNumberOfPuzzles, title;
+      if(records) {
+        const wrMbfPuzzlesAttempted = WcaApi.valueToSolveTime(records.world_records['333mbf'].single, '333mbf').puzzlesAttemptedCount;
+        const scramblesPerPage = 7;
+        suggestedNumberOfPuzzles = wrMbfPuzzlesAttempted ? Math.ceil(wrMbfPuzzlesAttempted/scramblesPerPage)*scramblesPerPage : null;
+        title = `We took the number of puzzles attempted in the current ${events.byId['333mbf'].name} world record (${wrMbfPuzzlesAttempted}) and rounded up to the next multiple of ${scramblesPerPage}, as ${scramblesPerPage} scrambles fit on a page.`;
+      }
+
+      return <React.Fragment>
+        <p>
+          This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
+          {' '}{suggestedNumberOfPuzzles && <button title={title}
+                                                    className="btn btn-sm btn-primary"
+                                                    onClick={e => onChange(suggestedNumberOfPuzzles)}>
+            May we suggest {suggestedNumberOfPuzzles}?
+          </button>}
+        </p>
+        <p>
+          <input
+            type="number"
+            placeholder="How many puzzles do you expect people to attempt?"
+            disabled={disabled}
+            className="form-control"
+            value={value || ''}
+            onChange={e => onChange(e.target.value)}
+          />
+        </p>
+      </React.Fragment>;
+    }
+});
 
 class ManageCompetition extends Component {
   constructor() {
@@ -19,37 +71,6 @@ class ManageCompetition extends Component {
     this.state = {
       showScramblePassword: false,
     };
-  }
-
-  _renderMbldArea() {
-    let {
-      puzzlesPer333mbfAttempt,
-      isGeneratingScrambles,
-      isGeneratingZip,
-      dispatch,
-    } = this.props;
-
-    const suggestedNumberOfPuzzles = 28;
-
-    return <React.Fragment>
-      <p>
-        This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
-        {' '}<button className="btn btn-sm btn-primary" onClick={e => {
-          dispatch(actions.setPuzzlesPer333mbfAttempt(suggestedNumberOfPuzzles));
-        }}>May I suggest {suggestedNumberOfPuzzles}?</button>
-      </p>
-      <p>
-        <input
-          type="number"
-          placeholder="How many puzzles do you expect people to attempt?"
-          disabled={isGeneratingScrambles || isGeneratingZip}
-          className="form-control"
-          value={puzzlesPer333mbfAttempt}
-          ref={input => this.puzzlesPerMbfAttemptInput = input}
-          onChange={e => dispatch(actions.setPuzzlesPer333mbfAttempt(e.target.value))}
-        />
-      </p>
-    </React.Fragment>;
   }
 
   render() {
@@ -159,10 +180,14 @@ class ManageCompetition extends Component {
           })}
         </div>
         <p>
-          You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
+          You can view and change the rounds over on <a href={WcaApi.toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
         </p>
 
-        {hasMbld && this._renderMbldArea()}
+        {hasMbld && <MultiBldPuzzleCountInput
+          disabled={isGeneratingScrambles || isGeneratingZip}
+          value={puzzlesPer333mbfAttempt}
+          onChange={newNumberOfPuzzles => dispatch(actions.setPuzzlesPer333mbfAttempt(newNumberOfPuzzles))}
+        />}
 
         <div className="row scramble-form">
           <div className="col-6">

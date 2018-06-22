@@ -61,6 +61,68 @@ export function getUpcomingManageableCompetitions() {
   ).then(response => response.json());
 }
 
+export function getRecords() {
+  return wcaApiFetch(`/records`).then(response => response.json());
+}
+
+
+// Copied from https://github.com/cubing/ccm/blob/master/both/lib/wca.js.
+const DNF_VALUE = -1;
+const DNS_VALUE = -2;
+
+const DNF_SOLVE_TIME = {
+  puzzlesSolvedCount: 0,
+  puzzlesAttemptedCount: 1,
+};
+
+const DNS_SOLVE_TIME = {
+  puzzlesSolvedCount: 0,
+  puzzlesAttemptedCount: 0,
+};
+
+export function valueToSolveTime(wcaValue, eventId) {
+  if(wcaValue === 0) {
+    // A wcaValue of 0 means "nothing happened here"
+    return null;
+  }
+  if(wcaValue === DNF_VALUE) {
+    return DNF_SOLVE_TIME;
+  }
+  if(wcaValue === DNS_VALUE) {
+    return DNS_SOLVE_TIME;
+  }
+
+  if(eventId === '333fm') {
+    var moveCount = wcaValue;
+    return {
+      moveCount: moveCount,
+    };
+  } else if(eventId === '333mbf') {
+    // From https://www.worldcubeassociation.org/results/misc/export.html
+    var difference = 99 - Math.floor(wcaValue / 1e7);
+    wcaValue %= 1e7;
+
+    var timeInSeconds = Math.floor(wcaValue / 1e2);
+    wcaValue %= 1e2;
+
+    var missed = wcaValue;
+    var solved = difference + missed;
+    var attempted = solved + missed;
+
+    return {
+      millis: timeInSeconds*1000,
+      puzzlesSolvedCount: solved,
+      puzzlesAttemptedCount: attempted,
+    };
+  } else {
+    var centiseconds = wcaValue;
+    return {
+      millis: centiseconds*10,
+      decimals: 2,
+    };
+  }
+}
+
 function getHashParameter(name) {
   return parseQueryString(window.location.hash)[name];
 }
