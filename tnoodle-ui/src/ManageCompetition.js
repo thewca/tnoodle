@@ -29,8 +29,6 @@ class ManageCompetition extends Component {
       dispatch,
     } = this.props;
 
-    const suggestedNumberOfPuzzles = 28;
-
     return <React.Fragment>
       <p>
         This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
