@@ -40,7 +40,7 @@ class GithubApi(object):
 
         ghAccessToken = os.environ.get("TNOODLE_GH_ACCESS_TOKEN")
         if not ghAccessToken:
-            assert False, "You must specify a GitHub Personal Access Token by setting the TNOODLE_GH_ACCESS_TOKEN environment variable. If you do not have an auth token, you can create one here: https://github.com/settings/tokens/new"
+            assert False, "You must specify a GitHub Personal Access Token by setting the TNOODLE_GH_ACCESS_TOKEN environment variable. If you do not have an auth token, you can create one here: https://github.com/settings/tokens/new. That access token only needs the `public_repo` permission."
 
         self.authorizationHeader = {
             "Authorization": "token {}".format(ghAccessToken),
