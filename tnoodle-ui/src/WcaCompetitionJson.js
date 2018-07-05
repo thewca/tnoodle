@@ -81,7 +81,8 @@ export function normalizeCompetitionJson(competitionJson) {
         // We look at scrambleGroupCount here for backwards compatibility.
         // The attribute has been renamed to scrambleSetCount, but the WCA website has not
         // yet been updated accordingly.
-        round.scrambleSetCount = round.scrambleGroupCount || round.scrambleSets.length || 1;
+        // TODO: remove the reference to scrambleGroupCount once the WCA website has been updated.
+        round.scrambleSetCount = round.scrambleSetCount || round.scrambleGroupCount || round.scrambleSets.length || 1;
       }
       round.scrambleSets.forEach(scrambleSet => {
         scrambleSet.scrambles = scrambleSet.scrambles || [];
