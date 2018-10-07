@@ -1,6 +1,7 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
 
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Svg;
@@ -42,6 +43,7 @@ public class SkewbPuzzle extends Puzzle {
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         SkewbSolverState state = skewbSolver.randomState(r);
         String scramble = skewbSolver.generateExactly(state, MIN_SCRAMBLE_LENGTH, r);
+        azzertEquals(scramble.split(" ").length, MIN_SCRAMBLE_LENGTH);
 
         PuzzleState pState;
         try {
