@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import winstone.Logger;
 
 /**
