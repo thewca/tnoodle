@@ -180,14 +180,16 @@ public class SkewbSolver {
         }
     }
 
-    protected boolean search(int depth, int perm, int twst, int maxl, int lm, int[] sol, Random randomizeMoves) {
+    protected int search(int depth, int perm, int twst, int maxl, int lm, int[] sol, Random randomizeMoves) {
         if (maxl == 0) {
-            solution_length = depth;
-            return (perm == 0 && twst == 0);
+            if (perm == 0 && twst == 0) {
+                return depth;
+            } else {
+                return -1;
+            }
         }
-        solution_length = -1;
         if (permprun[perm] > maxl || twstprun[twst] > maxl) {
-            return false;
+            return -1;
         }
         int randomOffset = randomizeMoves.nextInt(N_MOVES);
         for (int m = 0; m < N_MOVES; m++) {
@@ -198,14 +200,15 @@ public class SkewbSolver {
                 for (int a = 0; a < 2; a++) {
                     p = permmv[p][randomMove];
                     s = twstmv[s][randomMove];
-                    if (search(depth + 1, p, s, maxl - 1, randomMove, sol, randomizeMoves)) {
+                    int searchResult = search(depth + 1, p, s, maxl - 1, randomMove, sol, randomizeMoves);
+                    if (searchResult != -1) {
                         sol[depth] = randomMove * 2 + a;
-                        return true;
+                        return searchResult;
                     }
                 }
             }
         }
-        return false;
+        return -1;
     }
 
     public static class SkewbSolverState {
@@ -227,9 +230,9 @@ public class SkewbSolver {
 
     public String solveIn(SkewbSolverState state, int length, Random randomizeMoves) {
         int[] sol = new int[MAX_SOLUTION_LENGTH];
-        search(0, state.perm, state.twst, length, -1, sol, randomizeMoves);
-        if (solution_length != -1) {
-            return getSolution(sol);
+        int solutionLength = search(0, state.perm, state.twst, length, -1, sol, randomizeMoves);
+        if (solutionLength != -1) {
+            return getSolution(sol, solutionLength);
         } else {
             return null;
         }
@@ -237,11 +240,13 @@ public class SkewbSolver {
 
     public String generateExactly(SkewbSolverState state, int length, Random randomizeMoves) {
         int[] sol = new int[MAX_SOLUTION_LENGTH];
-        search(0, state.perm, state.twst, length, -1, sol, randomizeMoves);
-        return getSolution(sol);
+        int solutionLength = search(0, state.perm, state.twst, length, -1, sol, randomizeMoves);
+        if (solutionLength != -1) {
+            return getSolution(sol, solutionLength);
+        } else {
+            return null;
+        }
     }
-
-    int solution_length = -1;
 
     /**
      * The solver is written in jaap's notation. Now we're going to convert the result to FCN(fixed corner notation):
@@ -251,10 +256,10 @@ public class SkewbSolver {
      *     should be swapped. For example, if the next move is R, we should turn U instead. Because the R corner is at U after rotation.
      *     In another word, "F R" is converted to "B U". The correctness can be easily verified and the procedure is recursable.
      */
-    private String getSolution(int[] sol) {
+    private String getSolution(int[] sol, int solutionLength) {
         StringBuffer sb = new StringBuffer();
         String[] move2str = { "L", "R", "B", "U" };//RLDB (in jaap's notation) rotated by z2
-        for (int i = 0; i < solution_length; i++) {
+        for (int i = 0; i < solutionLength; i++) {
             int axis = sol[i] >> 1;
             int pow = sol[i] & 1;
             if (axis == 2) {//step two.
