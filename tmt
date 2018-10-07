@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from os.path import exists, dirname, join, isdir, split, abspath, relpath, basename
-import sys, os, imp, re, subprocess, shutil, shlex
+import sys, os, importlib, re, subprocess, shutil, shlex
 import zipfile
 import tempfile
 import time
@@ -186,7 +186,7 @@ class tmt:
         projectFiles = ( join(dir, PROJECT_FILE_NAME) for dir in os.listdir('.') )
         for projectFile in sorted(filter(exists, projectFiles)):
             projectName = dirname(projectFile)
-            imp.load_source('', projectFile)
+            importlib.machinery.SourceFileLoader('', projectFile).load_module()
             assert dirname(projectFile) in tmt.TmtProject.projects
 
         for projectName, project in sorted(tmt.TmtProject.projects.items()):
@@ -658,7 +658,7 @@ sys.modules['tmt'] = tmt
 
 import collections
 
-class CaseInsensitiveDict(collections.Mapping):
+class CaseInsensitiveDict(collections.abc.Mapping):
     def __init__(self, d=None):
         if d is None:
             d = {}
