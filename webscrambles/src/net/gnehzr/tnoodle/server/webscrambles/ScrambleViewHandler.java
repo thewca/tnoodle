@@ -164,8 +164,8 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                     // with some tweaks.
                     DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
                     TranscodingHints hints = new TranscodingHints();
-                    hints.put(ImageTranscoder.KEY_WIDTH, new Float(size.width));
-                    hints.put(ImageTranscoder.KEY_HEIGHT, new Float(size.height));
+                    hints.put(ImageTranscoder.KEY_WIDTH, Float.valueOf(size.width));
+                    hints.put(ImageTranscoder.KEY_HEIGHT, Float.valueOf(size.height));
                     hints.put(ImageTranscoder.KEY_DOM_IMPLEMENTATION, impl);
                     hints.put(ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI,SVGConstants.SVG_NAMESPACE_URI);
                     hints.put(ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI,SVGConstants.SVG_NAMESPACE_URI);
