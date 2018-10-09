@@ -16,7 +16,7 @@ Also note that tnoodle creates a `tnoodle_resources` folder with about 10MB of f
 
 ## Details
 
-TNoodle implements the highest-quality scramble generation available at this time. Except for 5x5x5-7x7x7 and Megaminx, every puzzle is scrambled by generating a random permutation/state using Java's SecureRandom class and computing a scrambling algorithm for it.
+TNoodle implements the highest-quality scramble generation available at this time. Except for 5x5x5-7x7x7 and Megaminx, every puzzle is scrambled by generating a random permutation/state using Java's SecureRandom class and computing a scramble sequence for it.
 
 ### Random-State Scrambles
 
@@ -27,12 +27,12 @@ TNoodle implements the highest-quality scramble generation available at this tim
 
 ### Scramble Length
 
-- Every generated scramble algorithm for 2x2x2 and Pyraminx has a minimum number of 11 moves (God's number for both puzzles). This makes it harder to distinguish scrambles by scramble length (something that has been a historical issue).
+- Every generated scramble sequence for 2x2x2, Pyraminx, and Skewb has a minimum number of 11 moves (God's number for all these puzzles). This makes it harder to distinguish scrambles by scramble length (something that has been a historical issue).
 
 ### Scramble Filtering
 
-- Scrambles are filtered according to rules set by the WCA Board. Note that these rules are not hardcoded in the [WCA Regulations](http://www.worldcubeassociation.org/regulations/).
-- This version of TNoodle generates scrambles obeying the following rules:
+- Scrambles are filtered according to requirements in [Regulation 4b3](https://www.worldcubeassociation.org/regulations/#4b3) of the WCA Regulations.
+- This version of TNoodle generates scrambles satisfying the following rules:
 
 %SCRAMBLE_FILTERING_THRESHOLDS%
 
