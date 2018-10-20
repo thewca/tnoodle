@@ -95,7 +95,7 @@ function analyzeVersion(versionInfo) {
   }
   var isAllowed = versionInfo.allowed.indexOf(runningVersion) >= 0;
   var isCurrent = runningVersion === versionInfo.current.name;
-  var downloadCurrent = (<span><a href={versionInfo.current.download} target='_blank'>{versionInfo.current.name}</a> (<a href={versionInfo.current.information} target='_blank'>details</a>)</span>);
+  var downloadCurrent = (<span><a href={versionInfo.current.download} target='_blank' rel="noopener noreferrer">{versionInfo.current.name}</a> (<a href={versionInfo.current.information} target='_blank' rel="noopener noreferrer">details</a>)</span>);
   if(isAllowed && isCurrent) {
     // There is nothing to do here
     return {};

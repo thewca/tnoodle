@@ -154,7 +154,7 @@ class ManageCompetition extends Component {
           })}
         </div>
         <p>
-          You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
+          You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank" rel="noopener noreferrer">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
         </p>
 
         {hasMbld && this._renderMbldArea()}

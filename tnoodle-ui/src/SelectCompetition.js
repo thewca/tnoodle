@@ -27,7 +27,7 @@ export default connect(
           {competitions.length === 0 ? (
             <div className="text-center">
               No competitions found, are you sure you have upcoming competitions?
-              Try checking <a href={toWcaUrl("/competitions/mine")} target="_blank">on the WCA website</a>.
+              Try checking <a href={toWcaUrl("/competitions/mine")} target="_blank" rel="noopener noreferrer">on the WCA website</a>.
             </div>
           ) : (
             <div className="list-group">
