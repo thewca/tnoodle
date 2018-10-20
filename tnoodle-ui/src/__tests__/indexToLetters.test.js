@@ -1,4 +1,4 @@
-import indexToLetters from 'indexToLetters';
+import indexToLetters from '../utils/indexToLetters';
 
 it('generates A', () => {
     expect(indexToLetters(0)).toEqual("A");
