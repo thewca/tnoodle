@@ -6,6 +6,7 @@
   "dependencies": {
     "bootstrap": "4.0.0-beta.2",
     "classnames": "^2.2.5",
+    "cross-env": "^5.2.0",
     "form-urlencoded": "^2.0.4",
     "lodash": "^4.17.4",
     "node-sass": "^4.5.1",
@@ -30,11 +31,17 @@
   "scripts": {
     "build-css": "node-sass src/ -o src/",
     "watch-css": "npm run build-css && node-sass src/ -o src/ --watch --recursive",
-    "start-js": "NODE_PATH=src react-scripts start",
-    "start": "PORT=3001 BROWSER=none npm-run-all -p watch-css start-js",
-    "build": "yarn run build-css && CI=true NODE_PATH=src react-scripts build",
-    "test": "NODE_PATH=src react-scripts test --env=jsdom",
-    "test:debug": "NODE_PATH=src react-scripts --inspect-brk test --runInBand --env=jsdom",
-    "eject": "NODE_PATH=src react-scripts eject"
-  }
+    "start-js": "cross-env NODE_PATH=./src react-scripts start",
+    "start": "cross-env PORT=3001 BROWSER=none npm-run-all -p watch-css start-js",
+    "build": "yarn run build-css && cross-env CI=true NODE_PATH=./src react-scripts build",
+    "test": "cross-env NODE_PATH=./src react-scripts test --env=jsdom",
+    "test:debug": "cross-env NODE_PATH=./src react-scripts --inspect-brk test --runInBand --env=jsdom",
+    "eject": "cross-env NODE_PATH=./src react-scripts eject"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
