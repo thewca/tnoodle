@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PreserveSearchRedirect from 'PreserveSearchRedirect';
+import PreserveSearchRedirect from '../PreserveSearchRedirect';
 
 export default class extends Component {
   render() {
