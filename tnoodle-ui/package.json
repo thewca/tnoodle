@@ -37,11 +37,5 @@
     "test": "cross-env NODE_PATH=./src react-scripts test --env=jsdom",
     "test:debug": "cross-env NODE_PATH=./src react-scripts --inspect-brk test --runInBand --env=jsdom",
     "eject": "cross-env NODE_PATH=./src react-scripts eject"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  }
 }
