@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
 import React, { Component } from 'react';
+import DocumentTitle from 'react-document-title';
 
 import events from 'wca/events';
 import pluralize from 'pluralize';
 import { toWcaUrl } from '../../api/WcaApi';
 import * as actions from '../../redux/actions/actions';
 import CubingIcon from '../CubingIcon';
-import { NavigationAwareComponent } from '../App';
+import NavigationAwareComponent from '../NavigationAwareComponent';
 import { fetchCompetitionJson } from '../../redux/actions/actions';
 import { checkJson } from '../../utils/WcaCompetitionJson';
 
@@ -265,12 +266,16 @@ export default connect((state, ownProps) => {
 
     render() {
       return (
-        <div className="container">
-          <NavigationAwareComponent
-            willNavigateAway={this.willNavigateAway.bind(this)}
-          />
-          <ManageCompetition {...this.props} />
-        </div>
+        <DocumentTitle
+          title={`${this.props.match.params.competitionId} | TNoodle`}
+        >
+          <div className="container">
+            <NavigationAwareComponent
+              willNavigateAway={this.willNavigateAway.bind(this)}
+            />
+            <ManageCompetition {...this.props} />
+          </div>
+        </DocumentTitle>
       );
     }
   }

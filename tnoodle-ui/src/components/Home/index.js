@@ -1,8 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
+import DocumentTitle from 'react-document-title';
 import PreserveSearchRedirect from '../PreserveSearchRedirect';
 
-export default class extends Component {
-  render() {
-    return <PreserveSearchRedirect to="/competitions" />;
-  }
-}
+const Home = () => (
+  <DocumentTitle title="TNoodle">
+    <PreserveSearchRedirect to="/competitions" />
+  </DocumentTitle>
+);
+
+export default Home;
