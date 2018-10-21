@@ -19,7 +19,8 @@ $app-header-bg-color: black;
   .app-logo {
     height: 80px;
 
-    &.busy {
+    &.busy,
+    &:hover {
       animation: 500ms app-logo-spin infinite linear;
     }
   }
@@ -74,11 +75,19 @@ $app-header-bg-color: black;
 }
 
 @keyframes alarm-flash {
-  from { background-color: $app-header-bg-color; }
-  to { background-color: red; }
+  from {
+    background-color: $app-header-bg-color;
+  }
+  to {
+    background-color: red;
+  }
 }
 
 @keyframes app-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
