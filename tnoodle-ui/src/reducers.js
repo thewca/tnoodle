@@ -107,8 +107,8 @@ export const upcomingManageableCompetitions = function(competitions=null, action
 };
 
 export const errorMessage = function(errorMessage=null, action) {
-  if(action.error) {
-    return action.error;
+  if(action.status === 'error') {
+    return action.error.message;
   }
   return errorMessage;
 };

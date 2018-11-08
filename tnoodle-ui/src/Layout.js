@@ -35,6 +35,11 @@ export default withRouter(connect(
 
       let title, contents;
       let logOutButton = <div></div>;
+
+      const error = errorMessage && (
+        <div className="alert alert-danger text-center" role="alert">{errorMessage}</div>
+      )
+
       if(me) {
         title = <h2>
           Welcome to TNoodle, {me.name}!
@@ -63,11 +68,12 @@ export default withRouter(connect(
       }
       return (
         <div className="app">
-          <div className={classNames("app-header", { error: !!errorMessage, alarm: analyzedVersion.alarm })}>
+          <div className={classNames("app-header", { error: !!errorMessage, alarm: analyzedVersion.alarm || !!errorMessage})}>
             <img src={logo} className={classNames("app-logo", { busy })} title={errorMessage} alt="TNoodle logo" />
             {analyzedVersion.message ? analyzedVersion.message : title}
             {logOutButton}
           </div>
+          {error}
           <div className="container">
             {contents}
           </div>
