@@ -64,10 +64,12 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -251,7 +253,7 @@ class ScrambleRequest {
         return scrambleRequests;
     }
 
-    private static PdfReader createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest, Locale locale) throws DocumentException, IOException {
+    private static ByteArrayOutputStream createPdf(String globalTitle, Date creationDate, ScrambleRequest scrambleRequest, Locale locale, String password) throws DocumentException, IOException {
         // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -261,6 +263,9 @@ class ScrambleRequest {
             Document doc = new Document();
             ByteArrayOutputStream totalPdfOutput = new ByteArrayOutputStream();
             PdfSmartCopy totalPdfWriter = new PdfSmartCopy(doc, totalPdfOutput);
+            if (password != null) {
+                totalPdfWriter.setEncryption(password.getBytes(), password.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
+            }
             doc.open();
 
             for(int nthAttempt = 1; nthAttempt <= scrambleRequest.scrambles.length; nthAttempt++) {
@@ -276,14 +281,15 @@ class ScrambleRequest {
                 attemptRequest.event = "333bf";
                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
 
-                PdfReader pdfReader = createPdf(globalTitle, creationDate, attemptRequest, locale);
+                // We pass a null password, since the resulting pages will be processed further before encryption.
+                PdfReader pdfReader = new PdfReader(createPdf(globalTitle, creationDate, attemptRequest, locale, null).toByteArray());
                 for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
                     PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
                     totalPdfWriter.addPage(page);
                 }
             }
             doc.close();
-            return new PdfReader(totalPdfOutput.toByteArray());
+            return totalPdfOutput;
         }
 
         azzert(scrambleRequest.scrambles.length > 0);
@@ -291,6 +297,11 @@ class ScrambleRequest {
         Rectangle pageSize = PageSize.LETTER;
         Document doc = new Document(pageSize, 0, 0, 75, 75);
         PdfWriter docWriter = PdfWriter.getInstance(doc, pdfOut);
+        if(scrambleRequest.fmc && password != null) {
+            // We don't watermark the FMC sheets because they already have
+            // the competition name on them. So we encrypt directly.
+            docWriter.setEncryption(password.getBytes(), password.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
+        }
 
         docWriter.setBoxSize("art", new Rectangle(36, 54, pageSize.getWidth()-36, pageSize.getHeight()-54));
 
@@ -305,17 +316,20 @@ class ScrambleRequest {
         addScrambles(docWriter, doc, scrambleRequest, globalTitle, locale);
         doc.close();
 
-        // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
-        PdfReader pr = new PdfReader(pdfOut.toByteArray());
         if(scrambleRequest.fmc) {
             // We don't watermark the FMC sheets because they already have
             // the competition name on them.
-            return pr;
+            return pdfOut;
         }
+        // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
+        PdfReader pr = new PdfReader(pdfOut.toByteArray());
 
         pdfOut = new ByteArrayOutputStream();
         doc = new Document(pageSize, 0, 0, 75, 75);
         docWriter = PdfWriter.getInstance(doc, pdfOut);
+        if (password != null) {
+            docWriter.setEncryption(password.getBytes(), password.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
+        }
         doc.open();
 
         PdfContentByte cb = docWriter.getDirectContent();
@@ -357,8 +371,7 @@ class ScrambleRequest {
         doc.close();
 
         // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
-        pr = new PdfReader(pdfOut.toByteArray());
-        return pr;
+        return pdfOut;
 
 //      The PdfStamper class doesn't seem to be working.
 //      pdfOut = new ByteArrayOutputStream();
@@ -1296,6 +1309,20 @@ class ScrambleRequest {
         return unsafe;
     }
 
+    // Excludes ambiguous characters: 0/O, 1/I
+    private static final String PASSCODE_DIGIT_SET = "23456789abcdefghijkmnpqrstuvwxyz";
+    private static final int PASSCODE_NUM_CHARS = 8;
+
+    private static String randomPasscode() {
+        SecureRandom secureRandom = new SecureRandom();
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < PASSCODE_NUM_CHARS; i++) {
+            int idx = secureRandom.nextInt(PASSCODE_DIGIT_SET.length());
+            builder.append(PASSCODE_DIGIT_SET.charAt(idx));
+        }
+        return builder.toString();
+    }
+
     public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl) throws IOException, DocumentException, ZipException {
         ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 
@@ -1312,12 +1339,27 @@ class ScrambleRequest {
         ZipOutputStream zipOut = new ZipOutputStream(baosZip);
         HashMap<String, Boolean> seenTitles = new HashMap<String, Boolean>();
 
+        // Computer display zip
+        // This .zip file is nested in the main .zip. It is intentionally not
+        // protected with a password, since it's just an easy way to distribute
+        // a collection of files that are each are encrypted using their own
+        // passcode.
+        ByteArrayOutputStream computerDisplayBaosZip = new ByteArrayOutputStream();
+        ZipParameters computerDisplayZipParameters = new ZipParameters();
+        computerDisplayZipParameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+        computerDisplayZipParameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        computerDisplayZipParameters.setSourceExternalStream(true);
+        ZipOutputStream computerDisplayZipOut = new ZipOutputStream(computerDisplayBaosZip);
+
+        String safeGlobalTitle = toFileSafeString(globalTitle);
+        String computerDisplayFileName = safeGlobalTitle + " - Computer Display PDFs";
+
         boolean fmcBeingHeld = false;
         for(ScrambleRequest scrambleRequest : scrambleRequests) {
             if(scrambleRequest.fmc) {
                 fmcBeingHeld = true;
 
-                String safeTitle = toFileSafeString(scrambleRequest.title) + " Scramble Cutout Sheet";
+                String safeTitle = toFileSafeString(scrambleRequest.title) + " - Scramble Cutout Sheet";
                 int salt = 0;
                 String tempNewSafeTitle = safeTitle;
                 while(seenTitles.get(tempNewSafeTitle) != null) {
@@ -1326,7 +1368,7 @@ class ScrambleRequest {
                 safeTitle = tempNewSafeTitle;
                 seenTitles.put(safeTitle, true);
 
-                String pdfFileName = "pdf/" + safeTitle + ".pdf";
+                String pdfFileName = "Printing/Fewest Moves - Additional Files/" + safeTitle + ".pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1349,7 +1391,6 @@ class ScrambleRequest {
                 }
                 doc.close();
 
-                // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
                 PdfReader pdfReader = new PdfReader(pdfOut.toByteArray());
                 byte[] b = new byte[(int) pdfReader.getFileLength()];
                 pdfReader.getSafeFile().readFully(b);
@@ -1359,7 +1400,7 @@ class ScrambleRequest {
             }
         }
         if(fmcBeingHeld) {
-            String pdfFileName = "pdf/3x3x3 Fewest Moves Solution Sheet.pdf";
+            String pdfFileName = "Printing/Fewest Moves - Additional Files/3x3x3 Fewest Moves Solution Sheet.pdf";
             parameters.setFileNameInZip(pdfFileName);
             zipOut.putNextEntry(null, parameters);
 
@@ -1389,6 +1430,8 @@ class ScrambleRequest {
             zipOut.closeEntry();
         }
 
+        LinkedHashMap<String, String> passcodes = new LinkedHashMap<String, String>();
+
         for(ScrambleRequest scrambleRequest : scrambleRequests) {
             String safeTitle = toFileSafeString(scrambleRequest.title);
             int salt = 0;
@@ -1399,18 +1442,26 @@ class ScrambleRequest {
             safeTitle = tempNewSafeTitle;
             seenTitles.put(safeTitle, true);
 
-            String pdfFileName = "pdf/" + safeTitle + ".pdf";
+            // Without passcode, for printing
+            String pdfFileName = "Printing/Scramble Sets/" + safeTitle + ".pdf";
             parameters.setFileNameInZip(pdfFileName);
             zipOut.putNextEntry(null, parameters);
-
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE);
-            byte[] b = new byte[(int) pdfReader.getFileLength()];
-            pdfReader.getSafeFile().readFully(b);
-            zipOut.write(b);
-
+            ByteArrayOutputStream pdfByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, null);
+            zipOut.write(pdfByteStream.toByteArray());
             zipOut.closeEntry();
 
-            String txtFileName = "txt/" + safeTitle + ".txt";
+            // With passcode, for computer display
+            String passcode = randomPasscode();
+            passcodes.put(safeTitle, passcode);
+
+            pdfFileName = computerDisplayFileName + "/" + safeTitle + ".pdf";
+            computerDisplayZipParameters.setFileNameInZip(pdfFileName);
+            computerDisplayZipOut.putNextEntry(null, computerDisplayZipParameters);
+            pdfByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, passcode);
+            computerDisplayZipOut.write(pdfByteStream.toByteArray());
+            computerDisplayZipOut.closeEntry();
+
+            String txtFileName = "Interchange/txt/" + safeTitle + ".txt";
             parameters.setFileNameInZip(txtFileName);
             zipOut.putNextEntry(null, parameters);
             zipOut.write(join(stripNewlines(scrambleRequest.getAllScrambles()), "\r\n").getBytes());
@@ -1423,7 +1474,7 @@ class ScrambleRequest {
 
             for(Locale locale : Translate.getLocales()) {
                 // fewest moves regular sheet
-                pdfFileName = "pdf/translations/"+locale.toLanguageTag()+"_"+safeTitle+".pdf";
+                pdfFileName = "Printing/Fewest Moves - Additional Files/Translations/"+locale.toLanguageTag()+"_"+safeTitle+".pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1446,15 +1497,15 @@ class ScrambleRequest {
                 }
                 doc.close();
 
-                pdfReader = new PdfReader(pdfOut.toByteArray());
-                b = new byte[(int) pdfReader.getFileLength()];
+                PdfReader pdfReader = new PdfReader(pdfOut.toByteArray());
+                byte[] b = new byte[(int) pdfReader.getFileLength()];
                 pdfReader.getSafeFile().readFully(b);
                 zipOut.write(b);
 
                 zipOut.closeEntry();
 
                  // Generic sheet.
-                pdfFileName = "pdf/translations/"+locale.toLanguageTag()+"_"+safeTitle+" Solution Sheet.pdf";
+                pdfFileName = "Printing/Fewest Moves - Additional Files/Translations/"+locale.toLanguageTag()+"_"+safeTitle+" Solution Sheet.pdf";
                 parameters.setFileNameInZip(pdfFileName);
                 zipOut.putNextEntry(null, parameters);
 
@@ -1485,8 +1536,39 @@ class ScrambleRequest {
             }
         }
 
-        String safeGlobalTitle = toFileSafeString(globalTitle);
-        String jsonFileName = safeGlobalTitle + ".json";
+        computerDisplayZipOut.finish();
+        computerDisplayZipOut.close();
+        parameters.setFileNameInZip(computerDisplayFileName + ".zip");
+        zipOut.putNextEntry(null, parameters);
+        zipOut.write(computerDisplayBaosZip.toByteArray());
+        zipOut.closeEntry();
+
+        String txtFileName = safeGlobalTitle + " - Computer Display PDF Passcodes - SECRET.txt";
+        parameters.setFileNameInZip(txtFileName);
+        zipOut.putNextEntry(null, parameters);
+        StringBuilder builder = new StringBuilder();
+        builder.append("SECRET SCRAMBLE SET PASSCODES\r\n");
+        if (globalTitle != null) {
+            builder.append(globalTitle);
+            builder.append("\r\n");
+        }
+        builder.append("\r\n");
+        builder.append("Make sure that only Delegates have access to this file.\r\n");
+        builder.append("Give passcodes to scramblers when the corresponding\r\n");
+        builder.append("groups begin (but not earlier). If you have to put\r\n");
+        builder.append("someone else in charge of the passcodes temporarily,\r\n");
+        builder.append("only give them the minimum amount of passcodes needed.\r\n");
+        builder.append("\r\n");
+        for (Map.Entry<String, String> entry : passcodes.entrySet()) {
+            builder.append(String.format("%40s", entry.getKey()));
+            builder.append(": ");
+            builder.append(entry.getValue());
+            builder.append("\r\n");
+        }
+        zipOut.write(builder.toString().getBytes());
+        zipOut.closeEntry();
+
+        String jsonFileName = "Interchange/" + safeGlobalTitle + ".json";
         parameters.setFileNameInZip(jsonFileName);
         zipOut.putNextEntry(null, parameters);
         HashMap<String, Object> jsonObj = new HashMap<String, Object>();
@@ -1499,14 +1581,14 @@ class ScrambleRequest {
         zipOut.write(json.getBytes());
         zipOut.closeEntry();
 
-        String jsonpFileName = safeGlobalTitle + ".jsonp";
+        String jsonpFileName = "Interchange/" + safeGlobalTitle + ".jsonp";
         parameters.setFileNameInZip(jsonpFileName);
         zipOut.putNextEntry(null, parameters);
         String jsonp = "var SCRAMBLES_JSON = " + json + ";";
         zipOut.write(jsonp.getBytes());
         zipOut.closeEntry();
 
-        parameters.setFileNameInZip(safeGlobalTitle + ".html");
+        parameters.setFileNameInZip("Interchange/" + safeGlobalTitle + ".html");
         zipOut.putNextEntry(null, parameters);
 
         InputStream is = context.getResourceAsStream(HTML_SCRAMBLE_VIEWER);
@@ -1520,7 +1602,7 @@ class ScrambleRequest {
         zipOut.write(sb.toString().getBytes());
         zipOut.closeEntry();
 
-        parameters.setFileNameInZip(safeGlobalTitle + ".pdf");
+        parameters.setFileNameInZip("Printing/" + safeGlobalTitle + " - All Scrambles.pdf");
         zipOut.putNextEntry(null, parameters);
         // Note that we're not passing the password into this function. It seems pretty silly
         // to put a password protected pdf inside of a password protected zip file.
@@ -1568,7 +1650,8 @@ class ScrambleRequest {
             new PdfOutline(puzzleLink,
                     PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.title);
 
-            PdfReader pdfReader = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE);
+            // We pass a null password, since the resulting pages will be processed further before encryption.
+            PdfReader pdfReader = new PdfReader(createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, null).toByteArray());
             for(int j = 0; j < scrambleRequest.copies; j++) {
                 for(int pageN = 1; pageN <= pdfReader.getNumberOfPages(); pageN++) {
                     PdfImportedPage page = totalPdfWriter.getImportedPage(pdfReader, pageN);
