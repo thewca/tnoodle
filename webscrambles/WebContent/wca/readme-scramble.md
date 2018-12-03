@@ -1,4 +1,4 @@
-# TNoodle WCA Scrambler
+# TNoodle WCA Scramble Program
 
 Visit [/scramble](/scramble) to use the scrambler, or go to [/readme](/readme) to see the TNoodle readme.
 
