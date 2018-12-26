@@ -597,7 +597,7 @@ class ScrambleRequest {
         if(withScramble) {
             fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         } else {
-            fitAndShowText(cb, "____________________________", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            fitAndShowText(cb, translate("fmc.competition", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
         }
 
         offsetTop += fontSize + 2;
