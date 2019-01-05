@@ -599,6 +599,7 @@ class ScrambleRequest {
         int fontSize = 15;
         int marginBottom = 10;
         int offsetTop = 27;
+        int marginLeft = 5;
         boolean showScrambleCount = withScramble && scrambleRequest.scrambles.length > 1;
         if(showScrambleCount) {
             offsetTop -= fontSize + 2;
@@ -616,8 +617,9 @@ class ScrambleRequest {
         } else {
             offsetTop += marginBottom;
             
-            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-            fitAndShowText(cb, translate("fmc.round", locale)+": ____", bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+            rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+            fitAndShowText(cb, translate("fmc.round", locale)+": ____", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
+            
         }
 
         if(showScrambleCount) {
@@ -637,20 +639,20 @@ class ScrambleRequest {
         if(!withScramble) {
             fontSize = 15;
             
-            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-            fitAndShowText(cb, translate("fmc.attempt", locale)+": ____", bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+            rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+            fitAndShowText(cb, translate("fmc.attempt", locale)+": ____", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
 
             offsetTop += fontSize + (int) (marginBottom * 2.8);
         }
         fontSize = 15;
 
-        rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+        rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
         
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
-        rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-        fitAndShowText(cb, "WCA ID: __ __ __ __  __ __ __ __  __ __", bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+        rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        fitAndShowText(cb, "WCA ID: __ __ __ __  __ __ __ __  __ __", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
         
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1.8 : 1.4));
 
@@ -839,7 +841,7 @@ class ScrambleRequest {
             maxFontSize -= 0.1;
         } while(true);
     }
-
+    
     private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, Locale locale) throws DocumentException, IOException {
         addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1, locale);
     }
