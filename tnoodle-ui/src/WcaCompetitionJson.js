@@ -13,7 +13,7 @@ export function formatToScrambleCount(format, eventId) {
     throw new Error(`Unrecognized format: ${format}`);
   }
 
-  let extraScrambleCount = (eventId !== "333mbf" ? 2 : 0);
+  let extraScrambleCount = (eventId === "333mbf" || eventId === "333fm" ? 0 : 2);
   return { scrambleCount, extraScrambleCount };
 }
 
@@ -81,7 +81,8 @@ export function normalizeCompetitionJson(competitionJson) {
         // We look at scrambleGroupCount here for backwards compatibility.
         // The attribute has been renamed to scrambleSetCount, but the WCA website has not
         // yet been updated accordingly.
-        round.scrambleSetCount = round.scrambleGroupCount || round.scrambleSets.length || 1;
+        // TODO: remove the reference to scrambleGroupCount once the WCA website has been updated.
+        round.scrambleSetCount = round.scrambleSetCount || round.scrambleGroupCount || round.scrambleSets.length || 1;
       }
       round.scrambleSets.forEach(scrambleSet => {
         scrambleSet.scrambles = scrambleSet.scrambles || [];

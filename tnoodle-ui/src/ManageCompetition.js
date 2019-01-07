@@ -21,6 +21,32 @@ class ManageCompetition extends Component {
     };
   }
 
+  _renderMbldArea() {
+    let {
+      puzzlesPer333mbfAttempt,
+      isGeneratingScrambles,
+      isGeneratingZip,
+      dispatch,
+    } = this.props;
+
+    return <React.Fragment>
+      <p>
+        This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
+      </p>
+      <p>
+        <input
+          type="number"
+          placeholder="How many puzzles do you expect people to attempt?"
+          disabled={isGeneratingScrambles || isGeneratingZip}
+          className="form-control"
+          value={puzzlesPer333mbfAttempt}
+          ref={input => this.puzzlesPerMbfAttemptInput = input}
+          onChange={e => dispatch(actions.setPuzzlesPer333mbfAttempt(e.target.value))}
+        />
+      </p>
+    </React.Fragment>;
+  }
+
   render() {
     let {
       competitionJson,
@@ -74,6 +100,7 @@ class ManageCompetition extends Component {
 
     let { showScramblePassword } = this.state;
     let progress = currentScrambleCount / scramblesNeededCount;
+    let hasMbld = competitionJson.events.find(event => event.id === '333mbf');
 
     let generationArea;
     if(scrambleZip) {
@@ -98,8 +125,15 @@ class ManageCompetition extends Component {
         </div>
       </div>;
     } else {
+      let disabled, title;
+      if(hasMbld && !puzzlesPer333mbfAttempt) {
+        disabled = true;
+        title = `You must set a number of puzzles to generate scrambles for ${events.byId['333mbf'].name}.`;
+      }
       generationArea = <button
           className="btn btn-block btn-lg btn-primary"
+          disabled={disabled}
+          title={title}
           onClick={() => {
             dispatch(actions.generateMissingScrambles());
           }}
@@ -123,19 +157,7 @@ class ManageCompetition extends Component {
           You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
         </p>
 
-        {competitionJson.events.map(event => event.id).includes('333mbf') && (
-          <p>
-            This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
-            <input
-              type="number"
-              disabled={isGeneratingScrambles || isGeneratingZip}
-              className="form-control"
-              value={puzzlesPer333mbfAttempt}
-              ref={input => this.puzzlesPerMbfAttemptInput = input}
-              onChange={e => dispatch(actions.setPuzzlesPer333mbfAttempt(e.target.value))}
-            />
-          </p>
-        )}
+        {hasMbld && this._renderMbldArea()}
 
         <div className="row scramble-form">
           <div className="col-6">

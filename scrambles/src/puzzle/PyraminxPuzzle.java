@@ -41,6 +41,7 @@ public class PyraminxPuzzle extends Puzzle {
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         PyraminxSolverState state = pyraminxSolver.randomState(r);
         String scramble = pyraminxSolver.generateExactly(state, MIN_SCRAMBLE_LENGTH, false);
+        azzertEquals(scramble.split(" ").length, MIN_SCRAMBLE_LENGTH + state.unsolvedTips());
 
         PuzzleState pState;
         try {

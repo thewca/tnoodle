@@ -202,12 +202,12 @@ function tnoodlejs(){
   processMetas();
   try {
     var strongName;
-    unflattenKeylistIntoAnswers(['gecko1_8'], '72E40D8B5458DBA4C27B7E4974145DE4');
-    unflattenKeylistIntoAnswers(['ie6'], '72E40D8B5458DBA4C27B7E4974145DE4' + ':1');
-    unflattenKeylistIntoAnswers(['ie8'], '72E40D8B5458DBA4C27B7E4974145DE4' + ':2');
-    unflattenKeylistIntoAnswers(['ie9'], '72E40D8B5458DBA4C27B7E4974145DE4' + ':3');
-    unflattenKeylistIntoAnswers(['opera'], '72E40D8B5458DBA4C27B7E4974145DE4' + ':4');
-    unflattenKeylistIntoAnswers(['safari'], '72E40D8B5458DBA4C27B7E4974145DE4' + ':5');
+    unflattenKeylistIntoAnswers(['gecko1_8'], '6A3536386280D7102EB8DF9B6F10F8A9');
+    unflattenKeylistIntoAnswers(['ie6'], '6A3536386280D7102EB8DF9B6F10F8A9' + ':1');
+    unflattenKeylistIntoAnswers(['ie8'], '6A3536386280D7102EB8DF9B6F10F8A9' + ':2');
+    unflattenKeylistIntoAnswers(['ie9'], '6A3536386280D7102EB8DF9B6F10F8A9' + ':3');
+    unflattenKeylistIntoAnswers(['opera'], '6A3536386280D7102EB8DF9B6F10F8A9' + ':4');
+    unflattenKeylistIntoAnswers(['safari'], '6A3536386280D7102EB8DF9B6F10F8A9' + ':5');
     strongName = answers[computePropValue('user.agent')];
     var idx = strongName.indexOf(':');
     if (idx != -1) {
@@ -246,7 +246,7 @@ function tnoodlejs(){
 }
 
 tnoodlejs();
-(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '72E40D8B5458DBA4C27B7E4974145DE4';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubeFewestMovesPuzzle = 93, Q$ThreeByThreeCubePuzzle = 94, Q$TwoByTwoCubePuzzle = 95, CM$ = {};
+(function () {var $gwt_version = "2.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var $strongName = '6A3536386280D7102EB8DF9B6F10F8A9';var _, P0_longLit = {l:0, m:0, h:0}, P1_longLit = {l:1, m:0, h:0}, Pf_longLit = {l:15, m:0, h:0}, P1e_longLit = {l:30, m:0, h:0}, P32_longLit = {l:50, m:0, h:0}, P64_longLit = {l:100, m:0, h:0}, Pc8_longLit = {l:200, m:0, h:0}, P3e8_longLit = {l:1000, m:0, h:0}, Pea60_longLit = {l:60000, m:0, h:0}, Pf4240_longLit = {l:1000000, m:0, h:0}, P111110_longLit = {l:1118480, m:0, h:0}, Pffffff_longLit = {l:4194303, m:3, h:0}, P111111111110_longLit = {l:1118480, m:279620, h:1}, Pba9876543210_longLit = {l:1323536, m:2777561, h:11}, seedTable = {}, Q$Object = 0, Q$String = 1, Q$boolean_$1 = 2, Q$byte_$1 = 3, Q$char_$1 = 4, Q$Style$HasCssName = 5, Q$Style$TextAlign = 6, Q$HasDirection$Direction = 7, Q$JSONArray = 8, Q$JSONNumber = 9, Q$JSONObject = 10, Q$JSONString = 11, Q$LongLibBase$LongEmul = 12, Q$HtmlLogFormatter = 13, Q$SafeUri = 14, Q$SafeUriString = 15, Q$EventListener = 16, Q$UserAgentAsserter$UserAgentProperty = 17, Q$CubieCube = 18, Q$Search = 19, Q$FullCube = 20, Q$Center1 = 21, Q$CornerCube = 22, Q$Edge3 = 23, Q$FullCube_0 = 24, Q$FullCube_$1 = 25, Q$Search_0 = 26, Q$double_$1 = 27, Q$int_$1 = 28, Q$int_$2 = 29, Q$Serializable = 30, Q$Boolean = 31, Q$CharSequence = 32, Q$Class = 33, Q$Comparable = 34, Q$Double = 35, Q$Enum = 36, Q$Exception = 37, Q$Integer = 38, Q$Number = 39, Q$Object_$1 = 40, Q$StackTraceElement = 41, Q$String_$1 = 42, Q$Throwable = 43, Q$Date = 44, Q$HashMap = 45, Q$LinkedHashMap$ChainEntry = 46, Q$List = 47, Q$Map = 48, Q$Map$Entry = 49, Q$NoSuchElementException = 50, Q$RandomAccess = 51, Q$Set = 52, Q$TreeMap$Node = 53, Q$TreeMap$SubMapType = 54, Q$Handler = 55, Q$Handler_$1 = 56, Q$Logger = 57, Q$InvalidMoveException = 58, Q$InvalidScrambleException = 59, Q$Puzzle = 60, Q$Puzzle$Bucket = 61, Q$Puzzle$PuzzleState = 62, Q$Color = 63, Q$Element = 64, Q$InvalidHexColorException = 65, Q$Path = 66, Q$Path$Command = 67, Q$Point2D$Double = 68, Q$Transform = 69, Q$Exportable = 70, Q$ClockPuzzle = 71, Q$ClockPuzzle$ClockState = 72, Q$CubePuzzle = 73, Q$CubePuzzle$CubeMove = 74, Q$CubePuzzle$CubeMove_$1 = 75, Q$CubePuzzle$CubeState = 76, Q$CubePuzzle$Face = 77, Q$FourByFourCubePuzzle = 78, Q$FourByFourRandomTurnsCubePuzzle = 79, Q$MegaminxPuzzle = 80, Q$MegaminxPuzzle$Face = 81, Q$MegaminxPuzzle$MegaminxState = 82, Q$NoInspectionFiveByFiveCubePuzzle = 83, Q$NoInspectionFourByFourCubePuzzle = 84, Q$NoInspectionThreeByThreeCubePuzzle = 85, Q$PyraminxPuzzle = 86, Q$PyraminxPuzzle$PyraminxState = 87, Q$SkewbPuzzle = 88, Q$SkewbPuzzle$SkewbState = 89, Q$SquareOnePuzzle = 90, Q$SquareOnePuzzle$SquareOneState = 91, Q$SquareOneUnfilteredPuzzle = 92, Q$ThreeByThreeCubeFewestMovesPuzzle = 93, Q$ThreeByThreeCubePuzzle = 94, Q$TwoByTwoCubePuzzle = 95, CM$ = {};
 function newSeed(id){
   return new seedTable[id];
 }
@@ -12774,7 +12774,7 @@ function $export0(this$static){
   }
   );
   $wnd.tnoodlejs.getVersion = $entry(function(){
-    return '0.13.3';
+    return '0.14.0';
   }
   );
   $wnd.tnoodlejs.scrambleToSvg = $entry(function(a0, a1, a2){
@@ -17032,6 +17032,8 @@ _.generateRandomMoves_0 = function generateRandomMoves_8(r){
   var e, pState, scramble, state;
   state = $randomState_0(r);
   scramble = $solve_0(this.pyraminxSolver, state, 11, true, true, false);
+  $clinit_GwtSafeUtils();
+  azzertEquals(valueOf_0($split(scramble, ' ', 0).length), valueOf_0(11 + $unsolvedTips(state)));
   try {
     pState = $applyAlgorithm(new PyraminxPuzzle$PyraminxState_0(this), scramble);
   }
@@ -17660,6 +17662,8 @@ _.generateRandomMoves_0 = function generateRandomMoves_9(r){
   var e, pState, scramble, state;
   state = $randomState_1(r);
   scramble = $generateExactly(this.skewbSolver, state, r);
+  $clinit_GwtSafeUtils();
+  azzertEquals(valueOf_0($split(scramble, ' ', 0).length), valueOf_0(11));
   try {
     pState = $applyAlgorithm(new SkewbPuzzle$SkewbState_0(this), scramble);
   }
@@ -17957,17 +17961,17 @@ function $clinit_SkewbSolver(){
 }
 
 function $generateExactly(this$static, state, randomizeMoves){
-  var sol;
+  var sol, solutionLength;
   sol = initDim(_3I_classLit, makeCastMap([Q$int_$1, Q$Serializable]), -1, 12, 1);
-  $search_0(this$static, 0, state.perm, state.twst, 11, -1, sol, randomizeMoves);
-  return $getSolution(this$static, sol);
+  solutionLength = $search_0(this$static, 0, state.perm, state.twst, 11, -1, sol, randomizeMoves);
+  return solutionLength != -1?$getSolution(sol, solutionLength):null;
 }
 
-function $getSolution(this$static, sol){
+function $getSolution(sol, solutionLength){
   var axis, i_0, move2str, p_0, pow, sb, scrambleSequence, temp;
   sb = new StringBuffer_0;
   move2str = initValues(_3Ljava_lang_String_2_classLit, makeCastMap([Q$Serializable, Q$Object_$1, Q$String_$1]), Q$String, ['L', 'R', 'B', 'U']);
-  for (i_0 = 0; i_0 < this$static.solution_length; ++i_0) {
+  for (i_0 = 0; i_0 < solutionLength; ++i_0) {
     axis = ~~sol[i_0] >> 1;
     pow = sol[i_0] & 1;
     if (axis == 2) {
@@ -17997,14 +18001,12 @@ function $randomState_1(r){
 }
 
 function $search_0(this$static, depth, perm, twst, maxl, lm, sol, randomizeMoves){
-  var a, m_0, p_0, randomMove, randomOffset, s;
+  var a, m_0, p_0, randomMove, randomOffset, s, searchResult;
   if (maxl == 0) {
-    this$static.solution_length = depth;
-    return perm == 0 && twst == 0;
+    return perm == 0 && twst == 0?depth:-1;
   }
-  this$static.solution_length = -1;
   if (permprun[perm] > maxl || twstprun[twst] > maxl) {
-    return false;
+    return -1;
   }
   randomOffset = $nextInt(randomizeMoves, 4);
   for (m_0 = 0; m_0 < 4; ++m_0) {
@@ -18015,14 +18017,15 @@ function $search_0(this$static, depth, perm, twst, maxl, lm, sol, randomizeMoves
       for (a = 0; a < 2; ++a) {
         p_0 = permmv[p_0][randomMove];
         s = twstmv[s][randomMove];
-        if ($search_0(this$static, depth + 1, p_0, s, maxl - 1, randomMove, sol, randomizeMoves)) {
+        searchResult = $search_0(this$static, depth + 1, p_0, s, maxl - 1, randomMove, sol, randomizeMoves);
+        if (searchResult != -1) {
           sol[depth] = randomMove * 2 + a;
-          return true;
+          return searchResult;
         }
       }
     }
   }
-  return false;
+  return -1;
 }
 
 function SkewbSolver_0(){
@@ -18180,7 +18183,6 @@ function init_6(){
 }
 
 defineSeed(342, 1, {}, SkewbSolver_0);
-_.solution_length = -1;
 var cornerpermmv, fact_3, ori_0, permmv, permprun, twstmv, twstprun;
 function SkewbSolver$SkewbSolverState_0(){
 }
@@ -18932,6 +18934,8 @@ _.generateRandomMoves_0 = function generateRandomMoves_12(r){
   var ab, e, scramble, state, state_0;
   state = (state_0 = new TwoByTwoSolver$TwoByTwoState_0 , state_0.permutation = $nextInt(r, 5040) , state_0.orientation = $nextInt(r, 729) , state_0);
   scramble = $solve_1(this.twoSolver, state, 11, true, true);
+  $clinit_GwtSafeUtils();
+  azzertEquals(valueOf_0($split(scramble, ' ', 0).length), valueOf_0(11));
   ab = new AlgorithmBuilder_0(this, 1);
   try {
     $appendAlgorithm(ab, scramble);

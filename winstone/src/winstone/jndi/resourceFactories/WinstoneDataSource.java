@@ -20,8 +20,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import winstone.Logger;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;

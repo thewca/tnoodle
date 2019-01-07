@@ -12,7 +12,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Connecting to staging WCA server
 
-Set the `staging` url parameter. For example, try going to http://localhost:3001/staging=true
+Set the `staging` url parameter. For example, try going to http://localhost:3001?staging=true
 
 ## Connecting to a development WCA server
 

@@ -1,6 +1,7 @@
 package puzzle;
 
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
 
 import java.util.Random;
 
@@ -27,6 +28,7 @@ public class TwoByTwoCubePuzzle extends CubePuzzle {
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         TwoByTwoState state = twoSolver.randomState(r);
         String scramble = twoSolver.generateExactly(state, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
+        azzertEquals(scramble.split(" ").length, TWO_BY_TWO_MIN_SCRAMBLE_LENGTH);
 
         AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES);
         try {
