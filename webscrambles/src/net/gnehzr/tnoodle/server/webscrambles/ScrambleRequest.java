@@ -599,94 +599,87 @@ class ScrambleRequest {
         int fontSize = 15;
         int marginBottom = 10;
         int offsetTop = 27;
+        int marginLeft = 5;
         boolean showScrambleCount = withScramble && scrambleRequest.scrambles.length > 1;
         if(showScrambleCount) {
             offsetTop -= fontSize + 2;
         }
-
-        // The 100 number in the fit text function is just some big number. Hopefully, fitting the width will be enough to fit the height.
-        Rectangle rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-
-        fitAndShowText(cb, globalTitle, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+        
+        float leadingMultiplier = 1;
+        Rectangle rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        fitAndShowText(cb, globalTitle, bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
 
         offsetTop += fontSize + 2;
 
         if(withScramble) {
-            rect = new Rectangle(competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, right-competitorInfoLeft, top - offsetTop);
-            fitAndShowText(cb, scrambleRequest.title, bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
+            fitAndShowText(cb, scrambleRequest.title, bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
         } else {
             offsetTop += marginBottom;
-
-            rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, top - offsetTop);
-            fitAndShowText(cb, translate("fmc.round", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+            
+            rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+            fitAndShowText(cb, translate("fmc.round", locale)+": ____", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
+            
         }
 
         if(showScrambleCount) {
             offsetTop += fontSize + 2;
 
-            rect = new Rectangle(competitorInfoLeft+(right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-
             HashMap<String, String> substitutions = new HashMap<String, String>();
             substitutions.put("scrambleIndex", ""+(index+1));
             substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
-            fitAndShowText(cb, translate("fmc.scrambleXofY", locale, substitutions), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
+            
+            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
+            fitAndShowText(cb, translate("fmc.scrambleXofY", locale, substitutions), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+
         }
 
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
         if(!withScramble) {
             fontSize = 15;
-
-            rect = new Rectangle(competitorInfoLeft + padding, top - offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, translate("fmc.attempt", locale)+": __", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
+            
+            rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+            fitAndShowText(cb, translate("fmc.attempt", locale)+": ____", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
 
             offsetTop += fontSize + (int) (marginBottom * 2.8);
         }
         fontSize = 15;
 
-        rect = new Rectangle(competitorInfoLeft+padding, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, PdfContentByte.ALIGN_LEFT);
-
+        rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
+        
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
 
-        fontSize = 15;
-        cb.beginText();
-        cb.setFontAndSize(bf, fontSize);
-        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "WCA ID:", competitorInfoLeft+padding, top-offsetTop, 0);
-
-        cb.setFontAndSize(bf, 19);
-        int wcaIdLength = 63;
-        cb.showTextAligned(PdfContentByte.ALIGN_LEFT, "_ _ _ _  _ _ _ _  _ _", competitorInfoLeft+padding+wcaIdLength, top-offsetTop, 0);
-
-        fontSize = 15;
+        rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        fitAndShowText(cb, "WCA ID: __ __ __ __  __ __ __ __  __ __", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
+        
         offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1.8 : 1.4));
-        cb.endText();
 
         fontSize = 11;
 
-        rect = new Rectangle(competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.warning", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-
+        rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        fitAndShowText(cb, translate("fmc.warning", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+        
         offsetTop += fontSize + marginBottom;
 
         fontSize = 11;
 
-        rect = new Rectangle(competitorInfoLeft + (right-competitorInfoLeft)/2, top-offsetTop, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.graded", locale)+": _______________ "+translate("fmc.result", locale)+": ______", bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-
+        rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        fitAndShowText(cb, translate("fmc.graded", locale)+": _______________ "+translate("fmc.result", locale)+": ______", bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+        
         offsetTop += fontSize + (marginBottom*(withScramble ? 1 : 5));
 
         if(!withScramble) {
             fontSize = 11;
 
-            rect = new Rectangle(competitorInfoLeft + (right - competitorInfoLeft) / 2, top - offsetTop, right-competitorInfoLeft, 100);
-            fitAndShowText(cb, translate("fmc.scrambleOnSeparateSheet", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-
+            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
+            fitAndShowText(cb, translate("fmc.scrambleOnSeparateSheet", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+            
             offsetTop += fontSize + marginBottom;
         }
-
+        
         int fmcMargin = 10;
-
 
         // Table
         int tableWidth = competitorInfoLeft-left-2*fmcMargin;
@@ -696,7 +689,7 @@ class ScrambleRequest {
         int cellHeight = tableHeight/tableLines;
         int columns = 7;
         int firstColumnWidth = tableWidth-(columns-1)*cellWidth;
-
+        
         int movesFontSize = 10;
         Font movesFont = new Font(bf, movesFontSize);
 
@@ -728,7 +721,7 @@ class ScrambleRequest {
                 movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
             }
         }
-
+        
         Rectangle firstColumnRectangle = new Rectangle(firstColumnWidth, cellHeight);
         float firstColumnFontSize = fitText(new Font(bf), movesType[0], firstColumnRectangle, 10, false, 1f);
 
@@ -792,9 +785,10 @@ class ScrambleRequest {
         int MAGIC_NUMBER = 30; // kill me now
 
         fontSize = 25;
-        rect = new Rectangle(left+(competitorInfoLeft-left)/2, top-MAGIC_NUMBER, right-competitorInfoLeft, 100);
-        fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, PdfContentByte.ALIGN_CENTER);
-
+        
+        rect = new Rectangle(left, top-MAGIC_NUMBER+fontSize, competitorInfoLeft, top-MAGIC_NUMBER);
+        fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+        
         ArrayList<String> rulesList = new ArrayList<String>();
         rulesList.add("• "+translate("fmc.rule1", locale));
         rulesList.add("• "+translate("fmc.rule2", locale));
@@ -810,27 +804,25 @@ class ScrambleRequest {
         rulesList.add("• "+translate("fmc.rule6", locale));
 
         int rulesTop = competitorInfoBottom + (withScramble ? 65 : 153);
-
+        
+        leadingMultiplier = 1.5f;
         Rectangle rulesRectangle = new Rectangle(left+fmcMargin, scrambleBorderTop+tableHeight+fmcMargin, competitorInfoLeft-fmcMargin, rulesTop+fmcMargin);
         String rules = String.join("\n", rulesList);
-        fitAndShowTextNew(cb, rules, bf, rulesRectangle, 15, Element.ALIGN_JUSTIFIED, 1.5f);
+        fitAndShowText(cb, rules, bf, rulesRectangle, 15, Element.ALIGN_JUSTIFIED, leadingMultiplier);
 
         doc.newPage();
     }
-
-    private static void fitAndShowTextNew(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leading) throws DocumentException {
+    
+    private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leadingMultiplier) throws DocumentException {
         // We create a temp pdf and check if the text fit in a rectangle there.
         // If it's ok, we add the text to original pdf.
-
-        // TODO replace fitAndShowText (old) with this new one
-        // See https://github.com/thewca/tnoodle/issues/306
 
         do{
             PdfContentByte tempCb = new PdfContentByte(cb.getPdfWriter());
 
             ColumnText tempCt = new ColumnText(tempCb);
             tempCt.setSimpleColumn(rect);
-            tempCt.setLeading(leading*maxFontSize);
+            tempCt.setLeading(leadingMultiplier*maxFontSize);
 
             Paragraph p = new Paragraph(text, new Font(bf, maxFontSize));
             tempCt.addText(p);
@@ -840,23 +832,16 @@ class ScrambleRequest {
                 ColumnText ct = new ColumnText(cb);
                 ct.setSimpleColumn(rect);
                 ct.setAlignment(align);
-                ct.setLeading(leading*maxFontSize);
+                ct.setLeading(leadingMultiplier*maxFontSize);
                 ct.addText(p);
                 ct.go();
                 break;
             }
-
+            
             maxFontSize -= 0.1;
         } while(true);
     }
-
-    private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align) {
-        cb.beginText();
-        cb.setFontAndSize(bf, fitText(new Font(bf), text, new Rectangle((int)rect.getRight(), (int)rect.getTop()), maxFontSize, false, 1));
-        cb.showTextAligned(align, text, (int)rect.getLeft(), (int)rect.getBottom(), 0);
-        cb.endText();
-    }
-
+    
     private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, Locale locale) throws DocumentException, IOException {
         addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1, locale);
     }
