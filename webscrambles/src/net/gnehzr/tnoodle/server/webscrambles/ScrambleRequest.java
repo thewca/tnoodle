@@ -635,10 +635,22 @@ class ScrambleRequest {
             list.add(translate("fmc.attempt", locale)+shortFill);
             alignList.add(Element.ALIGN_LEFT);
         }
+        if (withScramble) { // more space for filling name
+            list.add("");
+            alignList.add(Element.ALIGN_LEFT);
+        }
         list.add(translate("fmc.competitor", locale)+longFill);
         alignList.add(Element.ALIGN_LEFT);
+        if (withScramble) {
+            list.add("");
+            alignList.add(Element.ALIGN_LEFT);
+        }
         list.add("WCA ID: __ __ __ __  __ __ __ __  __ __");
         alignList.add(Element.ALIGN_LEFT);
+        if (withScramble) { // add space below
+            list.add("");
+            alignList.add(Element.ALIGN_LEFT);
+        }
         populateRect(cb, competitorInfoRect, list, alignList, bf, fontSize);
         
         // graded
