@@ -530,7 +530,7 @@ class ScrambleRequest {
         // Competitor info left border
         cb.moveTo(competitorInfoLeft, gradeBottom);
         cb.lineTo(competitorInfoLeft, top);
-
+        
         // Solution lines
         int availableSolutionWidth = right - left;
         int availableSolutionHeight = scrambleBorderTop - bottom;
@@ -598,90 +598,73 @@ class ScrambleRequest {
 
         int fontSize = 15;
         int marginBottom = 10;
-        int offsetTop = 27;
-        int marginLeft = 5;
+        int margin = 5;
         boolean showScrambleCount = withScramble && scrambleRequest.scrambles.length > 1;
-        if(showScrambleCount) {
-            offsetTop -= fontSize + 2;
-        }
+
+        Rectangle competitorInfoRect = new Rectangle(competitorInfoLeft+margin, top, right-margin, competitorInfoBottom);
+        Rectangle gradeRect = new Rectangle(competitorInfoLeft+margin, competitorInfoBottom, right-margin, gradeBottom);
+        Rectangle scrambleImageRect = new Rectangle(competitorInfoLeft+margin, gradeBottom, right-margin, scrambleBorderTop);
         
-        float leadingMultiplier = 1;
-        Rectangle rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
+        String shortFill = ": ____";
+        String longFill = ": __________________";
+
+        // competitor and competition info
+        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<Integer> alignList = new ArrayList<Integer>();
+        
         if(withScramble) {
-            fitAndShowText(cb, globalTitle, bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+            list.add(globalTitle);
+            alignList.add(Element.ALIGN_CENTER);
+            list.add(scrambleRequest.title);
+            alignList.add(Element.ALIGN_CENTER);
+            
+            if(showScrambleCount) {
+
+                HashMap<String, String> substitutions = new HashMap<String, String>();
+                substitutions.put("scrambleIndex", ""+(index+1));
+                substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
+                
+                list.add(translate("fmc.scrambleXofY", locale, substitutions));
+                alignList.add(Element.ALIGN_CENTER);
+            }
         } else {
-            rect = new Rectangle(competitorInfoLeft+marginLeft, top-fontSize, right, top);
-            fitAndShowText(cb, translate("fmc.competition", locale)+": __________________", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
+            list.add(translate("fmc.competition", locale)+longFill);
+            alignList.add(Element.ALIGN_LEFT);
+            list.add(translate("fmc.round", locale)+shortFill);
+            alignList.add(Element.ALIGN_LEFT);
+            list.add(translate("fmc.attempt", locale)+shortFill);
+            alignList.add(Element.ALIGN_LEFT);
         }
-
-        offsetTop += fontSize + 2;
-
-        if(withScramble) {
-            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-            fitAndShowText(cb, scrambleRequest.title, bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
-        } else {
-            offsetTop += marginBottom;
-            
-            rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
-            fitAndShowText(cb, translate("fmc.round", locale)+": ____", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
-            
-        }
-
-        if(showScrambleCount) {
-            offsetTop += fontSize + 2;
-
-            HashMap<String, String> substitutions = new HashMap<String, String>();
-            substitutions.put("scrambleIndex", ""+(index+1));
-            substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
-            
-            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-            fitAndShowText(cb, translate("fmc.scrambleXofY", locale, substitutions), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
-
-        }
-
-        offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
-
-        if(!withScramble) {
-            fontSize = 15;
-            
-            rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
-            fitAndShowText(cb, translate("fmc.attempt", locale)+": ____", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
-
-            offsetTop += fontSize + (int) (marginBottom * 2.8);
-        }
-        fontSize = 15;
-
-        rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
-        fitAndShowText(cb, translate("fmc.competitor", locale)+": __________________", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
+        list.add(translate("fmc.competitor", locale)+longFill);
+        alignList.add(Element.ALIGN_LEFT);
+        list.add("WCA ID: __ __ __ __  __ __ __ __  __ __");
+        alignList.add(Element.ALIGN_LEFT);
+        populateRect(cb, competitorInfoRect, list, alignList, bf, fontSize);
         
-        offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1 : 2.8));
-
-        rect = new Rectangle(competitorInfoLeft+marginLeft, top-offsetTop+fontSize, right, top-offsetTop);
-        fitAndShowText(cb, "WCA ID: __ __ __ __  __ __ __ __  __ __", bf, rect, fontSize, Element.ALIGN_LEFT, leadingMultiplier);
-        
-        offsetTop += fontSize + (int) (marginBottom*(withScramble ? 1.8 : 1.4));
-
+        // graded
         fontSize = 11;
-
-        rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-        fitAndShowText(cb, translate("fmc.warning", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
-        
-        offsetTop += fontSize + marginBottom;
-
+        list = new ArrayList<String>();
+        alignList = new ArrayList<Integer>();
+        list.add(translate("fmc.warning", locale));
+        alignList.add(Element.ALIGN_CENTER);
+        list.add(translate("fmc.graded", locale)+longFill+" "+translate("fmc.result", locale)+shortFill);
+        alignList.add(Element.ALIGN_CENTER);
         fontSize = 11;
-
-        rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-        fitAndShowText(cb, translate("fmc.graded", locale)+": _______________ "+translate("fmc.result", locale)+": ______", bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
+        populateRect(cb, gradeRect, list, alignList, bf, fontSize);
         
-        offsetTop += fontSize + (marginBottom*(withScramble ? 1 : 5));
-
         if(!withScramble) {
             fontSize = 11;
-
-            rect = new Rectangle(competitorInfoLeft, top-offsetTop+fontSize, right, top-offsetTop);
-            fitAndShowText(cb, translate("fmc.scrambleOnSeparateSheet", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
             
-            offsetTop += fontSize + marginBottom;
+            list = new ArrayList<String>();
+            alignList = new ArrayList<Integer>();
+            
+            list.add(""); // fake vertical centering
+            alignList.add(Element.ALIGN_CENTER);
+
+            list.add(translate("fmc.scrambleOnSeparateSheet", locale));
+            alignList.add(Element.ALIGN_CENTER);
+            
+            populateRect(cb, scrambleImageRect, list, alignList, bf, fontSize);
         }
         
         int fmcMargin = 10;
@@ -788,10 +771,10 @@ class ScrambleRequest {
 
         // Rules
         int MAGIC_NUMBER = 30; // kill me now
-
+        float leadingMultiplier = 1;
         fontSize = 25;
         
-        rect = new Rectangle(left, top-MAGIC_NUMBER+fontSize, competitorInfoLeft, top-MAGIC_NUMBER);
+        Rectangle rect = new Rectangle(left, top-MAGIC_NUMBER+fontSize, competitorInfoLeft, top-MAGIC_NUMBER);
         fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
         
         ArrayList<String> rulesList = new ArrayList<String>();
@@ -845,6 +828,21 @@ class ScrambleRequest {
             
             maxFontSize -= 0.1;
         } while(true);
+    }
+    
+    private static void populateRect(PdfContentByte cb, Rectangle rect, ArrayList<String> list, ArrayList<Integer> alignList, BaseFont bf, int fontSize)  throws DocumentException {
+
+        float totalHeight = rect.getHeight();
+        float width = rect.getWidth();
+        float x = rect.getLeft();
+        float y = rect.getTop();
+        
+        float height = totalHeight/(list.size());
+        
+        for (int i=0; i<list.size(); i++) {
+            Rectangle temp = new Rectangle(x, y+height*i-totalHeight-fontSize, x+width, y+height*i-totalHeight);
+            fitAndShowText(cb, list.get(i), bf, temp, 15, alignList.get(i), 1f);
+        }
     }
     
     private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, Locale locale) throws DocumentException, IOException {
