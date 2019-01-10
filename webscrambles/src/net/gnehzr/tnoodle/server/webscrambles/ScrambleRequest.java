@@ -843,6 +843,8 @@ class ScrambleRequest {
     }
     
     private static void populateRect(PdfContentByte cb, Rectangle rect, ArrayList<String> list, ArrayList<Integer> alignList, BaseFont bf, int fontSize)  throws DocumentException {
+        
+        azzert(list.size() == alignList.size(), "Make sure list.size() == alignList.size()");
 
         float totalHeight = rect.getHeight();
         float width = rect.getWidth();
