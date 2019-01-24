@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import events from 'wca/events';
 import * as WcaApi from 'WcaApi';
 import tnoodle from 'TNoodleApi';
@@ -100,10 +101,13 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
     return !!eventId.match(/.*fm$/);
   }
 
+  let activities = _.flatMap(_.flatMap(competitionJson.schedule.venues, 'rooms'), 'activities');
   let scrambleRequest = [];
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
       let { roundNumber } = parseActivityCode(round.id);
+      let roundActivities = activities.filter(activity => activity.activityCode.startsWith(round.id));
+      let roundStartTime = _.min(_.map(roundActivities, 'startTime'));
       round.scrambleSets.forEach((scrambleSet, index) => {
         let scrambles = scrambleSet.scrambles;
         let extraScrambles = scrambleSet.extraScrambles;
@@ -123,6 +127,7 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
           round: roundNumber,
           group: prettyIndex, // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
           scrambleSetId: scrambleSet.id,
+          roundStartTime,
         };
         scrambleRequest.push(request);
       });
