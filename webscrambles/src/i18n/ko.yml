@@ -18,6 +18,8 @@ ko:
         graded: 채점자
         #original_hash: 5faa59d
         result: 결과
+        #original_hash: 1917f4f
+        competition: 대회
         #original_hash: 49debdc
         rule1: 제한시간은 60분이며 60분 안에 답을 찾고 쓰셔야 합니다.
         #original_hash: 8b6b48b

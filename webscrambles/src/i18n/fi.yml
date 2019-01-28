@@ -18,6 +18,8 @@ fi:
         graded: Tarkistaja
         #original_hash: 5faa59d
         result: Tulos
+        #original_hash: 1917f4f
+        competition: Kilpailu
         #original_hash: 49debdc
         rule1: Sinulla on 60 minuuttia aikaa löytää ja kirjoittaa ratkaisu.
         #original_hash: 8b6b48b
