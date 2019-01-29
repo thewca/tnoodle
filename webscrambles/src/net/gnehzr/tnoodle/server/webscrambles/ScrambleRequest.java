@@ -155,6 +155,7 @@ class ScrambleRequest {
     public boolean fmc;
     public HashMap<String, Color> colorScheme;
     public Date roundStartTime;
+    public String[] roomNames;
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
