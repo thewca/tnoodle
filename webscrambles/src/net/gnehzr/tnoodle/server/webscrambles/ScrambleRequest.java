@@ -67,6 +67,7 @@ import java.net.URLDecoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +84,7 @@ import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.*;
 import static net.gnehzr.tnoodle.server.webscrambles.Translate.translate;
 
-class ScrambleRequest {
+class ScrambleRequest implements Comparable<ScrambleRequest> {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
     private static final String HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html";
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
@@ -146,7 +147,6 @@ class ScrambleRequest {
     // This is here just to make GSON work.
     public ScrambleRequest(){}
 
-
     public String[] scrambles;
     public String[] extraScrambles = new String[0];
     public Puzzle scrambler;
@@ -164,6 +164,10 @@ class ScrambleRequest {
     public String group; // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
     public String scrambleSetId, event;
     public int round;
+    
+    public int compareTo(ScrambleRequest other) {
+        return this.roundStartTime.compareTo(other.roundStartTime);
+    }
 
     public ScrambleRequest(String title, String scrambleRequestUrl, String seed) throws InvalidScrambleRequestException, UnsupportedEncodingException {
         String[] puzzle_count_copies_scheme = scrambleRequestUrl.split("\\*");
@@ -1610,9 +1614,26 @@ class ScrambleRequest {
         zipOut.putNextEntry(null, parameters);
         // Note that we're not passing the password into this function. It seems pretty silly
         // to put a password protected pdf inside of a password protected zip file.
-        ByteArrayOutputStream baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
+
+        boolean ordered = false;
+        ByteArrayOutputStream baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null, ordered);
         zipOut.write(baos.toByteArray());
         zipOut.closeEntry();
+        
+        ordered = true;
+        for (ScrambleRequest temp : scrambleRequests) { // Check if the schedule is available. This will also let legacy as is.
+            if (temp.roundStartTime == null) {
+                ordered = false;
+                break;
+            }
+        }
+        if (ordered) { // TODO let this room aware
+            parameters.setFileNameInZip("Printing/Schedule/" + safeGlobalTitle + " - All Scrambles Ordered.pdf");
+            zipOut.putNextEntry(null, parameters);
+            baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null, ordered);
+            zipOut.write(baos.toByteArray());
+            zipOut.closeEntry();
+        }
 
         zipOut.finish();
         zipOut.close();
@@ -1620,7 +1641,7 @@ class ScrambleRequest {
         return baosZip;
     }
 
-    public static ByteArrayOutputStream requestsToPdf(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password) throws DocumentException, IOException {
+    public static ByteArrayOutputStream requestsToPdf(String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, boolean ordered) throws DocumentException, IOException {
         Document doc = new Document();
         ByteArrayOutputStream totalPdfOutput = new ByteArrayOutputStream();
         PdfSmartCopy totalPdfWriter = new PdfSmartCopy(doc, totalPdfOutput);
@@ -1635,10 +1656,25 @@ class ScrambleRequest {
 
         HashMap<String, PdfOutline> outlineByPuzzle = new HashMap<String, PdfOutline>();
         boolean expandPuzzleLinks = false;
+        
+        ArrayList<ScrambleRequest> scrambleRequestList = new ArrayList<ScrambleRequest>(Arrays.asList(scrambleRequests));
+        
+        if (ordered) {
+            boolean flag = true;
+            for (ScrambleRequest item : scrambleRequestList) {
+                if (item.roundStartTime == null) {
+                    flag = false;
+                    break;
+                }
+            }
+            azzert(flag, "You asked for ordered scrambles, but one of the rounds has no startTime.");
+            
+            Collections.sort(scrambleRequestList);
+        }
 
         int pages = 1;
-        for(int i = 0; i < scrambleRequests.length; i++) {
-            ScrambleRequest scrambleRequest = scrambleRequests[i];
+        for(int i = 0; i < scrambleRequestList.size(); i++) {
+            ScrambleRequest scrambleRequest = scrambleRequestList.get(i);
 
             String shortName = scrambleRequest.scrambler.getShortName();
 
@@ -1668,4 +1704,5 @@ class ScrambleRequest {
         doc.close();
         return totalPdfOutput;
     }
+    
 }

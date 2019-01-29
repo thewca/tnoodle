@@ -231,10 +231,11 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
             Date generationDate = new Date();
             String globalTitle = name;
-
+            
             if (extension.equals("pdf")) {
+                boolean ordered = false;
                 ByteArrayOutputStream totalPdfOutput = ScrambleRequest
-                        .requestsToPdf(globalTitle, generationDate, scrambleRequests, password);
+                        .requestsToPdf(globalTitle, generationDate, scrambleRequests, password, ordered);
                 response.setHeader("Content-Disposition", "inline");
 
                 // Workaround for Chrome bug with saving PDFs:

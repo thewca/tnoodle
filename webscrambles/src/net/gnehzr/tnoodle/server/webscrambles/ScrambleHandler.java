@@ -63,8 +63,9 @@ public class ScrambleHandler extends SafeHttpServlet {
                 ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
                 sendJSON(request, response, GSON.toJson(scrambleRequests));
             } else if(ext.equals("pdf")) {
+                boolean ordered = false;
                 ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-                ByteArrayOutputStream totalPdfOutput = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
+                ByteArrayOutputStream totalPdfOutput = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null, ordered);
                 response.setHeader("Content-Disposition", "inline");
 
                 // Workaround for Chrome bug with saving PDFs:
