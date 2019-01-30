@@ -84,6 +84,8 @@ import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.*;
 import static net.gnehzr.tnoodle.server.webscrambles.Translate.translate;
 
+// TODO this file bigger than it should be.
+
 class ScrambleRequest implements Comparable<ScrambleRequest> {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
     private static final String HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html";
@@ -1627,12 +1629,33 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 break;
             }
         }
-        if (ordered) { // TODO let this room aware
-            parameters.setFileNameInZip("Printing/Schedule/" + safeGlobalTitle + " - All Scrambles Ordered.pdf");
-            zipOut.putNextEntry(null, parameters);
-            baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null, ordered);
-            zipOut.write(baos.toByteArray());
-            zipOut.closeEntry();
+        if (ordered) {
+            
+            ArrayList<ArrayList<ScrambleRequest>> schedule = new ArrayList<ArrayList<ScrambleRequest>>();
+            ArrayList<String> roomList = new ArrayList<String>();
+            
+            for (ScrambleRequest scrambleRequest : scrambleRequests) {
+                for (String room : scrambleRequest.roomNames) {
+                    if (!roomList.contains(room)) {
+                        roomList.add(room);
+                        schedule.add(new ArrayList<ScrambleRequest>());
+                    }
+                    int i = roomList.indexOf(room);
+                    schedule.get(i).add(scrambleRequest);
+                }
+            }
+            
+            boolean hasMultipleRooms = roomList.size() > 1;
+            
+            for (int i=0; i<roomList.size(); i++) {
+                
+                String prefix = "Printing/Scrambles Ordered/";
+                parameters.setFileNameInZip(prefix + safeGlobalTitle + (hasMultipleRooms ? " - " + roomList.get(i) : "") + ".pdf");
+                zipOut.putNextEntry(null, parameters);
+                baos = requestsToPdf(globalTitle, generationDate, schedule.get(i).toArray(new ScrambleRequest[schedule.get(i).size()]), null, ordered);
+                zipOut.write(baos.toByteArray());
+                zipOut.closeEntry();
+            }
         }
 
         zipOut.finish();
