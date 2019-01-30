@@ -67,6 +67,7 @@ import java.net.URLDecoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1624,37 +1625,62 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         
         ordered = true;
         for (ScrambleRequest temp : scrambleRequests) { // Check if the schedule is available. This will also let legacy as is.
-            if (temp.roundStartTime == null) {
+            if (temp.roundStartTime == null || temp.roomNames.length == 0) {
                 ordered = false;
                 break;
             }
         }
         if (ordered) {
             
-            ArrayList<ArrayList<ScrambleRequest>> schedule = new ArrayList<ArrayList<ScrambleRequest>>();
-            ArrayList<String> roomList = new ArrayList<String>();
+            ArrayList<ArrayList<ArrayList<ScrambleRequest>>> schedule = new ArrayList<ArrayList<ArrayList<ScrambleRequest>>>();
+            ArrayList<Integer> dateList = new ArrayList<Integer>();
+            ArrayList<ArrayList<String>> roomList = new ArrayList<ArrayList<String>>();
             
             for (ScrambleRequest scrambleRequest : scrambleRequests) {
+                
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(scrambleRequest.roundStartTime);
+                Integer date = cal.get(Calendar.DAY_OF_YEAR); // this will work as long as WCA forbid competitions between 2 years
+                // This is considering the schedule based on the current location, and not the venue's.
+                // We need to get timezone to fix this
+                // TODO get timezone
+                
+                if (!dateList.contains(date)) {
+                    schedule.add(new ArrayList<ArrayList<ScrambleRequest>>());
+                    dateList.add(date);
+                    roomList.add(new ArrayList<String>());
+                }
+                
+                int j = dateList.indexOf(date);
+                
                 for (String room : scrambleRequest.roomNames) {
-                    if (!roomList.contains(room)) {
-                        roomList.add(room);
-                        schedule.add(new ArrayList<ScrambleRequest>());
+                    if (!roomList.get(j).contains(room)) {
+                        roomList.get(j).add(room);
+                        schedule.get(j).add(new ArrayList<ScrambleRequest>());
                     }
-                    int i = roomList.indexOf(room);
-                    schedule.get(i).add(scrambleRequest);
+                    int i = roomList.get(j).indexOf(room);
+                    schedule.get(j).get(i).add(scrambleRequest);
                 }
             }
             
-            boolean hasMultipleRooms = roomList.size() > 1;
+            // TODO sort schedule and roomlist and schedule based on datelist
             
-            for (int i=0; i<roomList.size(); i++) {
+            boolean hasMultipleDays = dateList.size() > 1;
+            for (int j=0; j<dateList.size(); j++) {
+                boolean hasMultipleRooms = roomList.get(j).size() > 1;
                 
-                String prefix = "Printing/Scrambles Ordered/";
-                parameters.setFileNameInZip(prefix + safeGlobalTitle + (hasMultipleRooms ? " - " + roomList.get(i) : "") + ".pdf");
-                zipOut.putNextEntry(null, parameters);
-                baos = requestsToPdf(globalTitle, generationDate, schedule.get(i).toArray(new ScrambleRequest[schedule.get(i).size()]), null, ordered);
-                zipOut.write(baos.toByteArray());
-                zipOut.closeEntry();
+                for (int i=0; i<roomList.get(j).size(); i++) {
+                    
+                    String prefix = "Printing/Scrambles Ordered/";
+                    if (hasMultipleDays) {
+                        prefix += "Day "+(j+1)+"/";
+                    }
+                    parameters.setFileNameInZip(prefix + safeGlobalTitle + (hasMultipleRooms ? " - " + roomList.get(j).get(i) : "") + ".pdf");
+                    zipOut.putNextEntry(null, parameters);
+                    baos = requestsToPdf(globalTitle, generationDate, schedule.get(j).get(i).toArray(new ScrambleRequest[schedule.get(j).get(i).size()]), null, ordered);
+                    zipOut.write(baos.toByteArray());
+                    zipOut.closeEntry();
+                }
             }
         }
 
