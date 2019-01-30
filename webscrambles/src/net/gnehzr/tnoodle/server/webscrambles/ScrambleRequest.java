@@ -69,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -1663,7 +1664,14 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 }
             }
             
-            // TODO sort schedule and roomlist and schedule based on datelist
+            // This should sort the days correctly
+            // If this is not working, then the folder Day 1 might hold scrambles for another day
+            ArrayList<Integer> temp = new ArrayList<Integer>(dateList);
+            schedule.sort(Comparator.comparingInt(temp::indexOf)); // Java 8
+            temp = new ArrayList<Integer>(dateList);
+            roomList.sort(Comparator.comparingInt(temp::indexOf));
+            
+            // No need to sort dateList though
             
             boolean hasMultipleDays = dateList.size() > 1;
             for (int j=0; j<dateList.size(); j++) {
