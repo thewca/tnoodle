@@ -1642,6 +1642,10 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             
             for (ScrambleRequest scrambleRequest : scrambleRequests) {
             
+                // TODO
+                // figure out why we are generating more scrambles than needed to
+                // FMCBrasil2019
+            
                 Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(scrambleRequest.timeZone));
                 cal.setTime(scrambleRequest.roundStartTime);
                 
@@ -1682,10 +1686,11 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 
                 for (int i=0; i<roomList.get(j).size(); i++) {
                     
-                    String prefix = "Printing/Scrambles Ordered/";
+                    String prefix = "Printing/Ordered Scrambles/";
                     if (hasMultipleDays) {
                         prefix += "Day "+(j+1)+"/";
                     }
+                    prefix += "Ordered ";
                     parameters.setFileNameInZip(prefix + safeGlobalTitle + (hasMultipleRooms ? " - " + roomList.get(j).get(i) : "") + ".pdf");
                     zipOut.putNextEntry(null, parameters);
                     baos = requestsToPdf(globalTitle, generationDate, schedule.get(j).get(i).toArray(new ScrambleRequest[schedule.get(j).get(i).size()]), null, ordered);
@@ -1727,7 +1732,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                     break;
                 }
             }
-            azzert(flag, "You asked for ordered scrambles, but one of the rounds has no startTime.");
+            azzert(flag, "You asked for ordered scrambles, but at least one of the rounds has no startTime.");
             
             Collections.sort(scrambleRequestList);
         }
