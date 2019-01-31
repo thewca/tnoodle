@@ -105,6 +105,8 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
     _.flatMap(competitionJson.schedule.venues, 'rooms'),
     room => room.activities.map(activity => [activity, room])
   );
+//  let venue = _.flatMap(competitionJson.schedule.venues, 'name');
+  let timeZone = _.flatMap(competitionJson.schedule.venues, 'timezone').toString();
   let scrambleRequest = [];
   competitionJson.events.forEach(event => {
     event.rounds.forEach(round => {
@@ -135,6 +137,8 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
           scrambleSetId: scrambleSet.id,
           roundStartTime,
           roomNames,
+//          venue, // this is for the case we consider venue in the future
+          timeZone,
         };
         scrambleRequest.push(request);
       });

@@ -78,6 +78,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -160,6 +161,8 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     public HashMap<String, Color> colorScheme;
     public Date roundStartTime;
     public String[] roomNames;
+//    public String venue; // this is for the case we consider venue in the future
+    public String timeZone;
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -1625,8 +1628,8 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         zipOut.closeEntry();
         
         ordered = true;
-        for (ScrambleRequest temp : scrambleRequests) { // Check if the schedule is available. This will also let legacy as is.
-            if (temp.roundStartTime == null || temp.roomNames.length == 0) {
+        for (ScrambleRequest scrambleRequest : scrambleRequests) { // Check if the schedule is available. This will also let legacy as is.
+            if (scrambleRequest.roundStartTime == null || scrambleRequest.roomNames == null || scrambleRequest.timeZone == null) {
                 ordered = false;
                 break;
             }
@@ -1638,13 +1641,13 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             ArrayList<ArrayList<String>> roomList = new ArrayList<ArrayList<String>>();
             
             for (ScrambleRequest scrambleRequest : scrambleRequests) {
-                
-                Calendar cal = Calendar.getInstance();
+            
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(scrambleRequest.timeZone));
                 cal.setTime(scrambleRequest.roundStartTime);
-                Integer date = cal.get(Calendar.DAY_OF_YEAR); // this will work as long as WCA forbid competitions between 2 years
-                // This is considering the schedule based on the current location, and not the venue's.
-                // We need to get timezone to fix this
-                // TODO get timezone
+                
+                // this will work as long as WCA forbid competitions between 2 years overlap
+                // if there's a simple way to get the day based on, let's say, 1970, we should do that
+                Integer date = cal.get(Calendar.DAY_OF_YEAR);
                 
                 if (!dateList.contains(date)) {
                     schedule.add(new ArrayList<ArrayList<ScrambleRequest>>());
