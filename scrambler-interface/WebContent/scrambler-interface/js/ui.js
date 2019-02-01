@@ -12,6 +12,7 @@ var mark2 = {};
     "use strict";
 
     var THREE_MULTI_DEFAULT_PUZZLES_PER_ATTEMPT = 28;
+    var WCA_MINIMUM_MBLD_PER_ATTEMPT = 2;
 
     // Implementation of bind() for Safari.
     if (!Function.prototype.bind) {
@@ -255,7 +256,6 @@ var mark2 = {};
         }(self));
 
     }
-
 
     /*
 
@@ -978,10 +978,14 @@ var mark2 = {};
             numSolvesInput.classList.add("num_solves");
 
             var numExtraSolvesTD = mark2.dom.appendElement(newEventTR, "td");
+            var minimum = 0;
+            if(eventID === "333mbf") {
+                minimum = WCA_MINIMUM_MBLD_PER_ATTEMPT;
+            }
             var numExtraSolvesInput = mark2.dom.appendElement(
                     numExtraSolvesTD,
                     "input",
-                    { type: "number", value: numExtraSolves, min: 0 }
+                    { type: "number", value: numExtraSolves, min: minimum }
                     );
             if(eventID === "333mbf") {
                 numExtraSolvesTD.appendChild(document.createElement("br"));
