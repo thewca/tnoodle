@@ -128,7 +128,7 @@ class ManageCompetition extends Component {
       let disabled, title;
       const WCA_MINIMUM_MBLD_PER_ATTEMPT = 2;
       // perhaps we should set also an upper bound to avoid numbers like 2e3
-      if(hasMbld && (!puzzlesPer333mbfAttempt || puzzlesPer333mbfAttempt < 2)) {
+      if(hasMbld && (!puzzlesPer333mbfAttempt || puzzlesPer333mbfAttempt < WCA_MINIMUM_MBLD_PER_ATTEMPT)) {
         disabled = true;
         title = `You must set a number of puzzles, at least ${WCA_MINIMUM_MBLD_PER_ATTEMPT}, to generate scrambles for ${events.byId['333mbf'].name}.`;
       }
