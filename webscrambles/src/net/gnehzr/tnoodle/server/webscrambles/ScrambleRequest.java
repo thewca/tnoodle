@@ -171,7 +171,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     public String group; // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
     public String scrambleSetId, event;
     public int round;
-    
+
     public int compareTo(ScrambleRequest other) {
         return this.roundStartTime.compareTo(other.roundStartTime);
     }
@@ -543,7 +543,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         // Competitor info left border
         cb.moveTo(competitorInfoLeft, gradeBottom);
         cb.lineTo(competitorInfoLeft, top);
-        
+
         // Solution lines
         int availableSolutionWidth = right - left;
         int availableSolutionHeight = scrambleBorderTop - bottom;
@@ -617,26 +617,26 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         Rectangle competitorInfoRect = new Rectangle(competitorInfoLeft+margin, top, right-margin, competitorInfoBottom);
         Rectangle gradeRect = new Rectangle(competitorInfoLeft+margin, competitorInfoBottom, right-margin, gradeBottom);
         Rectangle scrambleImageRect = new Rectangle(competitorInfoLeft+margin, gradeBottom, right-margin, scrambleBorderTop);
-        
+
         String shortFill = ": ____";
         String longFill = ": __________________";
 
         // competitor and competition info
         ArrayList<String> list = new ArrayList<String>();
         ArrayList<Integer> alignList = new ArrayList<Integer>();
-        
+
         if(withScramble) {
             list.add(globalTitle);
             alignList.add(Element.ALIGN_CENTER);
             list.add(scrambleRequest.title);
             alignList.add(Element.ALIGN_CENTER);
-            
+
             if(showScrambleCount) {
 
                 HashMap<String, String> substitutions = new HashMap<String, String>();
                 substitutions.put("scrambleIndex", ""+(index+1));
                 substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
-                
+
                 list.add(translate("fmc.scrambleXofY", locale, substitutions));
                 alignList.add(Element.ALIGN_CENTER);
             }
@@ -665,7 +665,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             alignList.add(Element.ALIGN_LEFT);
         }
         populateRect(cb, competitorInfoRect, list, alignList, bf, fontSize);
-        
+
         // graded
         fontSize = 11;
         list = new ArrayList<String>();
@@ -676,22 +676,22 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         alignList.add(Element.ALIGN_CENTER);
         fontSize = 11;
         populateRect(cb, gradeRect, list, alignList, bf, fontSize);
-        
+
         if(!withScramble) {
             fontSize = 11;
-            
+
             list = new ArrayList<String>();
             alignList = new ArrayList<Integer>();
-            
+
             list.add(""); // fake vertical centering
             alignList.add(Element.ALIGN_CENTER);
 
             list.add(translate("fmc.scrambleOnSeparateSheet", locale));
             alignList.add(Element.ALIGN_CENTER);
-            
+
             populateRect(cb, scrambleImageRect, list, alignList, bf, fontSize);
         }
-        
+
         int fmcMargin = 10;
 
         // Table
@@ -702,7 +702,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         int cellHeight = tableHeight/tableLines;
         int columns = 7;
         int firstColumnWidth = tableWidth-(columns-1)*cellWidth;
-        
+
         int movesFontSize = 10;
         Font movesFont = new Font(bf, movesFontSize);
 
@@ -734,7 +734,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
             }
         }
-        
+
         Rectangle firstColumnRectangle = new Rectangle(firstColumnWidth, cellHeight);
         float firstColumnFontSize = fitText(new Font(bf), movesType[0], firstColumnRectangle, 10, false, 1f);
 
@@ -798,10 +798,10 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         int MAGIC_NUMBER = 30; // kill me now
         float leadingMultiplier = 1;
         fontSize = 25;
-        
+
         Rectangle rect = new Rectangle(left, top-MAGIC_NUMBER+fontSize, competitorInfoLeft, top-MAGIC_NUMBER);
         fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
-        
+
         ArrayList<String> rulesList = new ArrayList<String>();
         rulesList.add("• "+translate("fmc.rule1", locale));
         rulesList.add("• "+translate("fmc.rule2", locale));
@@ -817,7 +817,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         rulesList.add("• "+translate("fmc.rule6", locale));
 
         int rulesTop = competitorInfoBottom + (withScramble ? 65 : 153);
-        
+
         leadingMultiplier = 1.5f;
         Rectangle rulesRectangle = new Rectangle(left+fmcMargin, scrambleBorderTop+tableHeight+fmcMargin, competitorInfoLeft-fmcMargin, rulesTop+fmcMargin);
         String rules = String.join("\n", rulesList);
@@ -825,7 +825,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
 
         doc.newPage();
     }
-    
+
     private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leadingMultiplier) throws DocumentException {
         // We create a temp pdf and check if the text fit in a rectangle there.
         // If it's ok, we add the text to original pdf.
@@ -850,28 +850,28 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 ct.go();
                 break;
             }
-            
+
             maxFontSize -= 0.1;
         } while(true);
     }
-    
+
     private static void populateRect(PdfContentByte cb, Rectangle rect, ArrayList<String> list, ArrayList<Integer> alignList, BaseFont bf, int fontSize)  throws DocumentException {
-        
+
         azzert(list.size() == alignList.size(), "Make sure list.size() == alignList.size()");
 
         float totalHeight = rect.getHeight();
         float width = rect.getWidth();
         float x = rect.getLeft();
         float y = rect.getTop();
-        
+
         float height = totalHeight/(list.size());
-        
+
         for (int i=0; i<list.size(); i++) {
             Rectangle temp = new Rectangle(x, y+height*i-totalHeight-fontSize, x+width, y+height*i-totalHeight);
             fitAndShowText(cb, list.get(i), bf, temp, 15, alignList.get(i), 1f);
         }
     }
-    
+
     private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, Locale locale) throws DocumentException, IOException {
         addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1, locale);
     }
@@ -1626,7 +1626,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         ByteArrayOutputStream baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null, ordered);
         zipOut.write(baos.toByteArray());
         zipOut.closeEntry();
-        
+
         ordered = true;
         for (ScrambleRequest scrambleRequest : scrambleRequests) { // Check if the schedule is available. This will also let legacy as is.
             if (scrambleRequest.roundStartTime == null || scrambleRequest.roomNames == null || scrambleRequest.timeZone == null) {
@@ -1635,32 +1635,32 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             }
         }
         if (ordered) {
-            
-            ArrayList<ArrayList<ArrayList<ScrambleRequest>>> schedule = new ArrayList<ArrayList<ArrayList<ScrambleRequest>>>();
+
+            // we split scrambleRequest based on day and room
+
             ArrayList<Integer> dateList = new ArrayList<Integer>();
             ArrayList<ArrayList<String>> roomList = new ArrayList<ArrayList<String>>();
-            
+            ArrayList<ArrayList<ArrayList<ScrambleRequest>>> schedule = new ArrayList<ArrayList<ArrayList<ScrambleRequest>>>();
+
             for (ScrambleRequest scrambleRequest : scrambleRequests) {
-            
-                // TODO
-                // figure out why we are generating more scrambles than needed to
-                // FMCBrasil2019
-            
+
                 Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(scrambleRequest.timeZone));
                 cal.setTime(scrambleRequest.roundStartTime);
-                
-                // this will work as long as WCA forbid competitions between 2 years overlap
+
+                // this will work as long as WCA forbid competitions between years overlap
                 // if there's a simple way to get the day based on, let's say, 1970, we should do that
                 Integer date = cal.get(Calendar.DAY_OF_YEAR);
-                
+
                 if (!dateList.contains(date)) {
-                    schedule.add(new ArrayList<ArrayList<ScrambleRequest>>());
                     dateList.add(date);
                     roomList.add(new ArrayList<String>());
+                    schedule.add(new ArrayList<ArrayList<ScrambleRequest>>());
                 }
-                
+
                 int j = dateList.indexOf(date);
-                
+
+                // if an event happen simultaneously at multiple rooms,
+                // this for will make sure every room gets a copy
                 for (String room : scrambleRequest.roomNames) {
                     if (!roomList.get(j).contains(room)) {
                         roomList.get(j).add(room);
@@ -1670,28 +1670,32 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                     schedule.get(j).get(i).add(scrambleRequest);
                 }
             }
-            
+
             // This should sort the days correctly
             // If this is not working, then the folder Day 1 might hold scrambles for another day
             ArrayList<Integer> temp = new ArrayList<Integer>(dateList);
             schedule.sort(Comparator.comparingInt(temp::indexOf)); // Java 8
             temp = new ArrayList<Integer>(dateList);
             roomList.sort(Comparator.comparingInt(temp::indexOf));
-            
+
             // No need to sort dateList though
-            
+
             boolean hasMultipleDays = dateList.size() > 1;
             for (int j=0; j<dateList.size(); j++) {
                 boolean hasMultipleRooms = roomList.get(j).size() > 1;
-                
+
                 for (int i=0; i<roomList.get(j).size(); i++) {
-                    
-                    String prefix = "Printing/Ordered Scrambles/";
+
+                    String pathAndFilename = "Printing/Ordered Scrambles/";
                     if (hasMultipleDays) {
-                        prefix += "Day "+(j+1)+"/";
+                        pathAndFilename += "Day "+(j+1)+"/";
                     }
-                    prefix += "Ordered ";
-                    parameters.setFileNameInZip(prefix + safeGlobalTitle + (hasMultipleRooms ? " - " + roomList.get(j).get(i) : "") + ".pdf");
+                    pathAndFilename += "Ordered "+safeGlobalTitle;
+                    if (hasMultipleRooms) {
+                        pathAndFilename += " - " + roomList.get(j).get(i);
+                    }
+                    pathAndFilename += ".pdf";
+                    parameters.setFileNameInZip(pathAndFilename);
                     zipOut.putNextEntry(null, parameters);
                     baos = requestsToPdf(globalTitle, generationDate, schedule.get(j).get(i).toArray(new ScrambleRequest[schedule.get(j).get(i).size()]), null, ordered);
                     zipOut.write(baos.toByteArray());
@@ -1721,9 +1725,9 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
 
         HashMap<String, PdfOutline> outlineByPuzzle = new HashMap<String, PdfOutline>();
         boolean expandPuzzleLinks = false;
-        
+
         ArrayList<ScrambleRequest> scrambleRequestList = new ArrayList<ScrambleRequest>(Arrays.asList(scrambleRequests));
-        
+
         if (ordered) {
             boolean flag = true;
             for (ScrambleRequest item : scrambleRequestList) {
@@ -1733,13 +1737,26 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 }
             }
             azzert(flag, "You asked for ordered scrambles, but at least one of the rounds has no startTime.");
-            
+
             Collections.sort(scrambleRequestList);
         }
+        ArrayList<String> generated = new ArrayList<String>();
 
         int pages = 1;
-        for(int i = 0; i < scrambleRequestList.size(); i++) {
-            ScrambleRequest scrambleRequest = scrambleRequestList.get(i);
+        for(ScrambleRequest scrambleRequest : scrambleRequestList) {
+
+            // this is a  harmless hack
+            // for some reason, while using ordered = true, tnoodle was generating 3x the scrambles needed for
+            // FMCEurope2019 and FMCBrasil2019
+            // here we check which scrambles have already been generated and skip them
+            String name = scrambleRequest.title;
+            if (ordered) {
+                   if (generated.contains(name)) {
+                       continue;
+                   } else {
+                       generated.add(name);
+                   }
+            }
 
             String shortName = scrambleRequest.scrambler.getShortName();
 
@@ -1769,5 +1786,5 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         doc.close();
         return totalPdfOutput;
     }
-    
+
 }
