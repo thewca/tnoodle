@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
@@ -16,6 +16,7 @@
 	<classpathentry exported="true" kind="lib" path="/lib/bcprov-jdk15on-147.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/zip4j_1.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/snakeyaml-1.19.jar"/>
+
 	<classpathentry exported="true" kind="lib" path="/lib/batik-anim.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-awt-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-bridge.jar"/>
@@ -31,6 +32,7 @@
 	<classpathentry exported="true" kind="lib" path="/lib/batik-script.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/batik-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="/lib/xml-apis-ext.jar"/>
+
 	<classpathentry combineaccessrules="false" kind="src" path="/winstone"/>
 	<classpathentry kind="lib" path="/lib/javaee-api-6.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/web-utils"/>

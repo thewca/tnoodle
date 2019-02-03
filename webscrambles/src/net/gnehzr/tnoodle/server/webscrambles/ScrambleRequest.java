@@ -69,7 +69,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -1637,12 +1636,15 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         if (ordered) {
 
             // we split scrambleRequest based on day and room
-
             ArrayList<Integer> dateList = new ArrayList<Integer>();
             ArrayList<ArrayList<String>> roomList = new ArrayList<ArrayList<String>>();
             ArrayList<ArrayList<ArrayList<ScrambleRequest>>> schedule = new ArrayList<ArrayList<ArrayList<ScrambleRequest>>>();
 
+            // let's say attempt = 3 > 1. we are generating 3x more scrambles than needed.
             for (ScrambleRequest scrambleRequest : scrambleRequests) {
+
+                int attempts = scrambleRequest.scrambles.length;
+//              System.out.println("Attempts: "+attempts);
 
                 Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(scrambleRequest.timeZone));
                 cal.setTime(scrambleRequest.roundStartTime);
@@ -1671,14 +1673,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 }
             }
 
-            // This should sort the days correctly
-            // If this is not working, then the folder Day 1 might hold scrambles for another day
-            ArrayList<Integer> temp = new ArrayList<Integer>(dateList);
-            schedule.sort(Comparator.comparingInt(temp::indexOf)); // Java 8
-            temp = new ArrayList<Integer>(dateList);
-            roomList.sort(Comparator.comparingInt(temp::indexOf));
-
-            // No need to sort dateList though
+            int firstDay = Collections.min(dateList); // this is a fake sort by days =)
 
             boolean hasMultipleDays = dateList.size() > 1;
             for (int j=0; j<dateList.size(); j++) {
@@ -1688,7 +1683,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
 
                     String pathAndFilename = "Printing/Ordered Scrambles/";
                     if (hasMultipleDays) {
-                        pathAndFilename += "Day "+(j+1)+"/";
+                        pathAndFilename += "Day "+(dateList.get(j)-firstDay+1)+"/";
                     }
                     pathAndFilename += "Ordered "+safeGlobalTitle;
                     if (hasMultipleRooms) {
@@ -1740,23 +1735,9 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
 
             Collections.sort(scrambleRequestList);
         }
-        ArrayList<String> generated = new ArrayList<String>();
 
         int pages = 1;
         for(ScrambleRequest scrambleRequest : scrambleRequestList) {
-
-            // this is a  harmless hack
-            // for some reason, while using ordered = true, tnoodle was generating 3x the scrambles needed for
-            // FMCEurope2019 and FMCBrasil2019
-            // here we check which scrambles have already been generated and skip them
-            String name = scrambleRequest.title;
-            if (ordered) {
-                   if (generated.contains(name)) {
-                       continue;
-                   } else {
-                       generated.add(name);
-                   }
-            }
 
             String shortName = scrambleRequest.scrambler.getShortName();
 
