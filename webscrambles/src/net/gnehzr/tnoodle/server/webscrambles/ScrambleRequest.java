@@ -70,6 +70,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -162,6 +163,8 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     public String[] roomNames;
 //    public String venue; // this is for the case we consider venue in the future
     public String timeZone;
+    public String test;
+    public int competitionStartYear;
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -1641,17 +1644,25 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             ArrayList<ArrayList<ArrayList<ScrambleRequest>>> schedule = new ArrayList<ArrayList<ArrayList<ScrambleRequest>>>();
 
             // let's say attempt = 3 > 1. we are generating 3x more scrambles than needed.
+            // I think this is because actions.js is passing the parent activity instead of the child activities
+            // problem would be solved passing activityCode
             for (ScrambleRequest scrambleRequest : scrambleRequests) {
-
-                int attempts = scrambleRequest.scrambles.length;
-//              System.out.println("Attempts: "+attempts);
 
                 Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(scrambleRequest.timeZone));
                 cal.setTime(scrambleRequest.roundStartTime);
 
-                // this will work as long as WCA forbid competitions between years overlap
-                // if there's a simple way to get the day based on, let's say, 1970, we should do that
-                Integer date = cal.get(Calendar.DAY_OF_YEAR);
+                int date = cal.get(Calendar.DAY_OF_YEAR);
+
+                // fix year overlap
+                int currentYear = cal.get(Calendar.YEAR);
+                for (int year = scrambleRequest.competitionStartYear; year<currentYear; year++) {
+                    date += 365;
+
+                    GregorianCalendar temp = new GregorianCalendar();
+                    if (temp.isLeapYear(year)) {
+                        date++;
+                    }
+                }
 
                 if (!dateList.contains(date)) {
                     dateList.add(date);
