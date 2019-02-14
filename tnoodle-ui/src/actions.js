@@ -131,47 +131,6 @@ function competitionJsonToTNoodleScrambleRequest(competitionJson) {
   return scrambleRequest;
 }
 
-export function generateScheduleLists(competitionJson) {
-  
-  let venuesList = [];
-  let timeZonesList = [];
-  let roomsList = [];
-  let activitiesList = [];
-//  let scramblesList = [];
-  
-  competitionJson.schedule.venues.forEach(venue => {
-
-    console.log(venue.name);
-    venuesList.push(venue.name);
-    console.log(venue.timezone);
-    timeZonesList.push(venue.timezone);
-    
-    let thisRooms = [];
-    let thisActivities = [];
-    
-    venue.rooms.forEach(room => {
-    console.log(room.name);
-      thisRooms.push(room.name);
-      
-      let activities = [];
-      room.activities.forEach(activity => {
-        try {
-          parseActivityCode(activity.activityCode);
-          console.log(activity.activityCode);
-          activities.push(activity.activityCode);
-        } catch(err) {
-          // ignore not WCA activities like lunch 
-        }
-      });
-      thisActivities.push(activities);
-    });
-    
-    roomsList.push(thisRooms);
-    activitiesList.push(thisActivities);
-
-  });
-}
-
 export function setScramblePassword(scramblePassword) {
   return (dispatch, getState) => {
     if(getState().isGeneratingScrambles || getState().isGeneratingZip) {

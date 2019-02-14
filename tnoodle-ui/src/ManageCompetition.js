@@ -138,7 +138,6 @@ class ManageCompetition extends Component {
           title={title}
           onClick={() => {
             dispatch(actions.generateMissingScrambles());
-            actions.generateScheduleLists(competitionJson);
           }}
         >
         Generate scrambles

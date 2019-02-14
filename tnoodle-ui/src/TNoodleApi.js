@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import formurlencoded from 'form-urlencoded';
+import * as WcaApi from 'WcaApi';
 
 // Copied and modified from webscrambles/WebContent/wca/scrambleserver.js
 var tnoodle = {};
@@ -77,15 +78,25 @@ tnoodle.Scrambler = function(baseUrl) {
         return scheme;
     };
 
-    this.showExt = function(title, scrambleRequest, password, ext, {target, doFetch}) {
-        var body = {}
+    this.showExt = async function(title, scrambleRequest, password, ext, {target, doFetch}) {
+    	
+        var body = {};
         body.sheets = JSON.stringify(scrambleRequest);
         if(password) {
             body.password = password;
         }
         body.generationUrl = location.href;
         let url = that.viewUrl + encodeURIComponent(title) + '.' + ext;
-
+        
+        // we get competitionJson to send to TNoodle
+        // is there a way to reuse what we have?
+        let competitionId = body.generationUrl.split("/");
+        competitionId = competitionId[competitionId.length-1];
+        competitionId = competitionId.split("?")[0]; // staging
+        await WcaApi.getCompetitionJson(competitionId).then(competitionJson => {
+        	body.schedule = JSON.stringify(competitionJson.schedule);
+        });
+        
         if(doFetch) {
             return fetch(url, {
                 method: "POST",

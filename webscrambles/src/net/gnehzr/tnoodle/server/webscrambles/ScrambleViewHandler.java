@@ -223,11 +223,13 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             }
             query = parseQuery(body.toString());
 
-            String json = query.get("sheets");
+            String json = query.get("sheets"); // all the scrambles
             ScrambleRequest[] scrambleRequests = GSON.fromJson(json, ScrambleRequest[].class);
 
             String password = query.get("password");
             String generationUrl = query.get("generationUrl");
+            
+            System.out.println("Schedule:\n"+query.remove("schedule"));
 
             Date generationDate = new Date();
             String globalTitle = name;
