@@ -224,13 +224,12 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             query = parseQuery(body.toString());
 
             String json = query.get("sheets"); // all the scrambles
+            System.out.println(json);
             ScrambleRequest[] scrambleRequests = GSON.fromJson(json, ScrambleRequest[].class);
 
             String password = query.get("password");
             String generationUrl = query.get("generationUrl");
             
-            System.out.println("Schedule:\n"+query.remove("schedule"));
-
             Date generationDate = new Date();
             String globalTitle = name;
 
@@ -250,6 +249,11 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                 String safeTitle = globalTitle.replaceAll("\"", "'");
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
                 sendBytes(request, response, zipOutput, "application/zip");
+                
+                String schedule = query.remove("schedule");
+                
+                OrderedScrambles.generateOrderedScrambles(zipOutput, schedule, json);
+                
             } else {
                 azzert(false);
             }
