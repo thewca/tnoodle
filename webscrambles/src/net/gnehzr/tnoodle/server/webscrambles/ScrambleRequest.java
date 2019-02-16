@@ -146,7 +146,6 @@ class ScrambleRequest {
     // This is here just to make GSON work.
     public ScrambleRequest(){}
 
-
     public String[] scrambles;
     public String[] extraScrambles = new String[0];
     public Puzzle scrambler;

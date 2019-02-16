@@ -17,12 +17,16 @@ public class OrderedScrambles {
         System.out.println(schedule);
         JsonObject scheduleJson = new JsonParser().parse(schedule).getAsJsonObject();
         
+        boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
+        
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             String venueName = parseMarkdown(removeQuotation(venue.getAsJsonObject().get("name").toString()));
             String timezone = removeQuotation(venue.getAsJsonObject().get("timezone").toString());
             
+            boolean hasMultipleRooms = venue.getAsJsonObject().getAsJsonArray("rooms").size()>1;
+            
             for (JsonElement room : venue.getAsJsonObject().getAsJsonArray("rooms")) {
-                ArrayList<ScrambleRequest> scrambleRequestList = new ArrayList<ScrambleRequest>(); 
+                ArrayList<ScrambleRequest> scrambleRequestList = new ArrayList<ScrambleRequest>();
                 
                 String roomName = removeQuotation(room.getAsJsonObject().get("name").toString());
                 
@@ -45,11 +49,9 @@ public class OrderedScrambles {
                         for (String item : activityList) {
                             if (item.charAt(0) == 'r') {
                                 round = Integer.parseInt(""+item.charAt(1));
-                            }
-                            else if (item.charAt(0) == 'g') {
+                            } else if (item.charAt(0) == 'g') {
                                 group = Integer.parseInt(""+item.charAt(1));
-                            }
-                            else if (item.charAt(0) == 'a') {
+                            } else if (item.charAt(0) == 'a') {
                                 attempt = Integer.parseInt(""+item.charAt(1));
                             }
                         }
@@ -60,8 +62,8 @@ public class OrderedScrambles {
                                 scrambleRequestList.add(item);
                             }
                         }
-                        /*
-                        // then, we start removing                        
+                        
+                        // then, we start removing
                         if (round > 0) {
                             ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
                             for (ScrambleRequest scrambleRequest : scrambleRequestList) {
@@ -71,28 +73,61 @@ public class OrderedScrambles {
                             }
                             scrambleRequestList = new ArrayList<ScrambleRequest>(temp);
                         }
+                        
+                        // are we really getting groups from competitionJson?
                         if (group > 0) {
+                            
+                            ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
                             for (ScrambleRequest scrambleRequest : scrambleRequestList) {
-                                if (scrambleRequest.group != group) {
-                                    scrambleRequestList.remove(scrambleRequest);
+                                
+                                if (compareFirstCharToNumber(scrambleRequest.group, group)) {
+                                    temp.add(scrambleRequest);
                                 }
                             }
+                            scrambleRequestList = new ArrayList<ScrambleRequest>(temp);
                         }
+                        
                         if (attempt > 0) {
                             
+                            ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
+                            
                             for (ScrambleRequest scrambleRequest : scrambleRequestList) {
-                                scrambleRequest.scrambles = new String[]{scrambleRequest.scrambles[attempt-1]};
-                                System.out.println("Attempt: "+attempt);
-                                for (String scramble : scrambleRequest.scrambles) {
-                                    System.out.println(scramble);
-                                }
+                                ScrambleRequest attemptRequest = new ScrambleRequest();
+                                attemptRequest.scrambles = new String[]{scrambleRequest.scrambles[attempt-1]};
+                                attemptRequest.extraScrambles = scrambleRequest.extraScrambles;
+                                attemptRequest.scrambler = scrambleRequest.scrambler;
+                                attemptRequest.copies = scrambleRequest.copies;
+                                attemptRequest.title = scrambleRequest.title + " Attempt " + attempt;
+                                attemptRequest.fmc = scrambleRequest.fmc;
+                                attemptRequest.event = scrambleRequest.event;
+                                attemptRequest.colorScheme = scrambleRequest.colorScheme;
+                                
+                                temp.add(attemptRequest);
                             }
-                        }*/
+                            scrambleRequestList = new ArrayList<ScrambleRequest>(temp);
+                        }
                     }
-                    System.out.println("");
+                    
+                    String pdfFileName = "Ordered Scrambles/";
+                    if (hasMultipleVenues) {
+                        pdfFileName += venueName+"/";
+                    }
+                    pdfFileName += "Ordered Scrambles";
+                    if (hasMultipleRooms) {
+                        pdfFileName += roomName;
+                    }
+                    pdfFileName += ".pdf";
+                    
+                    // convert scramblerequests to array, then to pdf here
+                    // btw, scrambleRequestList is probably wrong by this days
+                    // add to the zip
                 }
             }
         }
+    }
+    
+    private static boolean compareFirstCharToNumber(String letter, int number) {
+        return letter.charAt(0)-'A' == number-1;
     }
     
     private static String removeQuotation(String s) {
