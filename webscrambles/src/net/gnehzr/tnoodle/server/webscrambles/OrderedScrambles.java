@@ -22,7 +22,6 @@ public class OrderedScrambles {
     private static final String wcifIgnorableKey = "other";
 
     public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, String schedule, String json) throws DocumentException, IOException, ZipException {
-        System.out.println(schedule);
         JsonObject scheduleJson = new JsonParser().parse(schedule).getAsJsonObject();
         
         boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
@@ -64,42 +63,43 @@ public class OrderedScrambles {
                             }
                         }
                         
+                        ArrayList<ScrambleRequest> scrambleRequestTemp = new ArrayList<ScrambleRequest>();
                         // first, we add all requests whose events equals what we need
                         for (ScrambleRequest item : scrambleRequests) {
                             if ((item.event).equals(eventId)) {
-                                scrambleRequestList.add(item);
+                                scrambleRequestTemp.add(item);
                             }
                         }
                         
                         // then, we start removing
                         if (round > 0) {
                             ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
-                            for (ScrambleRequest scrambleRequest : scrambleRequestList) {
+                            for (ScrambleRequest scrambleRequest : scrambleRequestTemp) {
                                 if (scrambleRequest.round == round) {
                                     temp.add(scrambleRequest);
                                 }
                             }
-                            scrambleRequestList = new ArrayList<ScrambleRequest>(temp);
+                            scrambleRequestTemp = new ArrayList<ScrambleRequest>(temp);
                         }
                         
                         // are we really getting groups from competitionJson?
                         if (group > 0) {
                             
                             ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
-                            for (ScrambleRequest scrambleRequest : scrambleRequestList) {
+                            for (ScrambleRequest scrambleRequest : scrambleRequestTemp) {
                                 
                                 if (compareFirstCharToNumber(scrambleRequest.group, group)) {
                                     temp.add(scrambleRequest);
                                 }
                             }
-                            scrambleRequestList = new ArrayList<ScrambleRequest>(temp);
+                            scrambleRequestTemp = new ArrayList<ScrambleRequest>(temp);
                         }
                         
                         if (attempt > 0) {
                             
                             ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
                             
-                            for (ScrambleRequest scrambleRequest : scrambleRequestList) {
+                            for (ScrambleRequest scrambleRequest : scrambleRequestTemp) {
                                 ScrambleRequest attemptRequest = new ScrambleRequest();
                                 attemptRequest.scrambles = new String[]{scrambleRequest.scrambles[attempt-1]};
                                 attemptRequest.extraScrambles = scrambleRequest.extraScrambles;
@@ -112,32 +112,44 @@ public class OrderedScrambles {
                                 
                                 temp.add(attemptRequest);
                             }
-                            scrambleRequestList = new ArrayList<ScrambleRequest>(temp);
+                            scrambleRequestTemp = new ArrayList<ScrambleRequest>(temp);
+                        }
+                        for (ScrambleRequest scrambleRequest : scrambleRequestTemp) {
+                            scrambleRequestList.add(scrambleRequest);
                         }
                     }
-                    
-                    String pdfFileName = "Ordered Scrambles/";
-                    if (hasMultipleVenues) {
-                        pdfFileName += venueName+"/";
-                    }
-                    
-                    // Add day
-                    
-                    pdfFileName += "Ordered Scrambles";
-                    if (hasMultipleRooms) {
-                        pdfFileName += roomName;
-                    }
-                    pdfFileName += ".pdf";
-                    
-                    parameters.setFileNameInZip(pdfFileName);
-                    zipOut.putNextEntry(null, parameters);
-                    ScrambleRequest[] scrambleRequests = scrambleRequestList.toArray(new ScrambleRequest[scrambleRequestList.size()]);
-                    ByteArrayOutputStream baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
-                    zipOut.write(baos.toByteArray());
-                    zipOut.closeEntry();
-                    
                 }
+
+                String pdfFileName = "Printing/Ordered Scrambles/";
+                if (hasMultipleVenues) {
+                    pdfFileName += venueName+"/";
+                }
+                
+                // Add day
+                // Day logic goes here
+                
+                pdfFileName += "Ordered Scrambles";
+                if (hasMultipleRooms) {
+                    pdfFileName += " - "+roomName;
+                }
+                pdfFileName += ".pdf";
+                
+                parameters.setFileNameInZip(pdfFileName);
+                zipOut.putNextEntry(null, parameters);
+                ScrambleRequest[] scrambleRequests = scrambleRequestList.toArray(new ScrambleRequest[scrambleRequestList.size()]);
+                ByteArrayOutputStream baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
+                zipOut.write(baos.toByteArray());
+                zipOut.closeEntry();
             }
+            
+            // 333 and 333bf are swapped for WC2019
+            // possible solution: add ScrambleRequest.roundStartDate make ScrambleRequest comparable by date
+            // add scrambleRequestList
+            
+            // FMC sheets are generated wrongly in case of multiple attempts
+            // this is due how the scrambleXofY boolean is assigned
+            // possible solution: add ScrambleRequest.total attempt. If > 1, then use scrambleXofY
+            // another is to check if scramble title has attempt on it, but we would lose the total number
         }
     }
     
