@@ -596,7 +596,6 @@ class ScrambleRequest {
         }
 
         int fontSize = 15;
-        int marginBottom = 10;
         int margin = 5;
         boolean showScrambleCount = withScramble && scrambleRequest.scrambles.length > 1;
 
@@ -1324,7 +1323,7 @@ class ScrambleRequest {
         return builder.toString();
     }
 
-    public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl) throws IOException, DocumentException, ZipException {
+    public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl, String scheduleJsonStringfied, String sheet) throws IOException, DocumentException, ZipException {
         ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 
         ZipParameters parameters = new ZipParameters();
@@ -1535,6 +1534,10 @@ class ScrambleRequest {
 
                 zipOut.closeEntry();
             }
+        }
+        
+        if (scheduleJsonStringfied != null && sheet != null) {
+            OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, zipOut, parameters, scheduleJsonStringfied, sheet);
         }
 
         computerDisplayZipOut.finish();

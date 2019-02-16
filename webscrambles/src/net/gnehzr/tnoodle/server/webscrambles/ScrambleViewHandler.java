@@ -244,16 +244,14 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
                 sendBytes(request, response, totalPdfOutput, "application/pdf");
             } else if (extension.equals("zip")) {
+                String schedule = query.remove("schedule");
+                
                 ByteArrayOutputStream zipOutput = ScrambleRequest
-                        .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl);
+                        .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl, schedule, json);
+
                 String safeTitle = globalTitle.replaceAll("\"", "'");
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
                 sendBytes(request, response, zipOutput, "application/zip");
-                
-                String schedule = query.remove("schedule");
-                
-                OrderedScrambles.generateOrderedScrambles(zipOutput, schedule, json);
-                
             } else {
                 azzert(false);
             }

@@ -3,17 +3,25 @@ package net.gnehzr.tnoodle.server.webscrambles;
 import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.ZipOutputStream;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.itextpdf.text.DocumentException;
+
+import net.lingala.zip4j.model.ZipParameters;
 
 public class OrderedScrambles {
     
     private static final String wcifIgnorableKey = "other";
 
-    public static void generateOrderedScrambles(ByteArrayOutputStream zipOutput, String schedule, String json) {
+    public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, String schedule, String json) throws DocumentException, IOException, ZipException {
         System.out.println(schedule);
         JsonObject scheduleJson = new JsonParser().parse(schedule).getAsJsonObject();
         
@@ -112,15 +120,22 @@ public class OrderedScrambles {
                     if (hasMultipleVenues) {
                         pdfFileName += venueName+"/";
                     }
+                    
+                    // Add day
+                    
                     pdfFileName += "Ordered Scrambles";
                     if (hasMultipleRooms) {
                         pdfFileName += roomName;
                     }
                     pdfFileName += ".pdf";
                     
-                    // convert scramblerequests to array, then to pdf here
-                    // btw, scrambleRequestList is probably wrong by this days
-                    // add to the zip
+                    parameters.setFileNameInZip(pdfFileName);
+                    zipOut.putNextEntry(null, parameters);
+                    ScrambleRequest[] scrambleRequests = scrambleRequestList.toArray(new ScrambleRequest[scrambleRequestList.size()]);
+                    ByteArrayOutputStream baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
+                    zipOut.write(baos.toByteArray());
+                    zipOut.closeEntry();
+                    
                 }
             }
         }

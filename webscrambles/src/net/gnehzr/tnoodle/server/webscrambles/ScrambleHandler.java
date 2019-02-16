@@ -74,7 +74,7 @@ public class ScrambleHandler extends SafeHttpServlet {
                 sendBytes(request, response, totalPdfOutput, "application/pdf");
             } else if(ext.equals("zip")) {
                 ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-                ByteArrayOutputStream baosZip = ScrambleRequest.requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, seed, generationUrl);
+                ByteArrayOutputStream baosZip = ScrambleRequest.requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, seed, generationUrl, null, null);
                 sendBytes(request, response, baosZip, "application/zip");
             } else {
                 throw new InvalidScrambleRequestException("Invalid extension: " + ext);
