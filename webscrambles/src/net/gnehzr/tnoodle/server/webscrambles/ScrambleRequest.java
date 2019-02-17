@@ -153,6 +153,8 @@ class ScrambleRequest {
     public String title;
     public boolean fmc;
     public HashMap<String, Color> colorScheme;
+    public int totalAttempt;
+    public int attempt;
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -257,6 +259,9 @@ class ScrambleRequest {
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
         // rather than 1 sheet per round (as we do with every other event).
+        
+        // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
+        // to fix this, we pass the attempt number
         boolean is333mbf = scrambleRequest.event.equals("333mbf");
         if(is333mbf) {
             Document doc = new Document();
@@ -275,7 +280,7 @@ class ScrambleRequest {
                 attemptRequest.extraScrambles = new String[0];
                 attemptRequest.scrambler = scrambleRequest.scrambler;
                 attemptRequest.copies = scrambleRequest.copies;
-                attemptRequest.title = scrambleRequest.title + " Attempt " + nthAttempt;
+                attemptRequest.title = scrambleRequest.title + " Attempt " + (scrambleRequest.attempt>1? scrambleRequest.attempt: nthAttempt);
                 attemptRequest.fmc = false;
                 attemptRequest.event = "333bf";
                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
@@ -464,6 +469,8 @@ class ScrambleRequest {
         }
         doc.newPage();
     }
+    
+    
 
     private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index, Locale locale) throws DocumentException, IOException {
         boolean withScramble = index != -1;
@@ -597,7 +604,7 @@ class ScrambleRequest {
 
         int fontSize = 15;
         int margin = 5;
-        boolean showScrambleCount = withScramble && scrambleRequest.scrambles.length > 1;
+        boolean showScrambleCount = withScramble && (scrambleRequest.scrambles.length > 1 || scrambleRequest.totalAttempt > 1);
 
         Rectangle competitorInfoRect = new Rectangle(competitorInfoLeft+margin, top, right-margin, competitorInfoBottom);
         Rectangle gradeRect = new Rectangle(competitorInfoLeft+margin, competitorInfoBottom, right-margin, gradeBottom);
@@ -617,10 +624,16 @@ class ScrambleRequest {
             alignList.add(Element.ALIGN_CENTER);
             
             if(showScrambleCount) {
+                
+                if (scrambleRequest.totalAttempt > 1) { // this is for ordered scrambles
+                    index = Math.max(scrambleRequest.attempt-1, index);
+                } else {
+                    scrambleRequest.totalAttempt = scrambleRequest.scrambles.length;
+                }
 
                 HashMap<String, String> substitutions = new HashMap<String, String>();
                 substitutions.put("scrambleIndex", ""+(index+1));
-                substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
+                substitutions.put("scrambleCount", ""+(scrambleRequest.totalAttempt));
                 
                 list.add(translate("fmc.scrambleXofY", locale, substitutions));
                 alignList.add(Element.ALIGN_CENTER);

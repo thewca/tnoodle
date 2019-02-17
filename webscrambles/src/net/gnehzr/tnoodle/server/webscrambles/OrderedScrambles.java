@@ -45,7 +45,7 @@ public class OrderedScrambles {
                     
                     if (!eventId.equals(wcifIgnorableKey)) {
 
-                        System.out.println(activityCode);
+                        System.out.println(activityCode+" "+roomName);
                         
                         ScrambleRequest[] scrambleRequests = GSON.fromJson(json, ScrambleRequest[].class);
                         
@@ -105,10 +105,14 @@ public class OrderedScrambles {
                                 attemptRequest.extraScrambles = scrambleRequest.extraScrambles;
                                 attemptRequest.scrambler = scrambleRequest.scrambler;
                                 attemptRequest.copies = scrambleRequest.copies;
-                                attemptRequest.title = scrambleRequest.title + " Attempt " + attempt;
+                                
+                                attemptRequest.title = scrambleRequest.title;
+
                                 attemptRequest.fmc = scrambleRequest.fmc;
                                 attemptRequest.event = scrambleRequest.event;
                                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
+                                attemptRequest.attempt = attempt;
+                                attemptRequest.totalAttempt = scrambleRequest.scrambles.length; // usefull for fmc
                                 
                                 temp.add(attemptRequest);
                             }
