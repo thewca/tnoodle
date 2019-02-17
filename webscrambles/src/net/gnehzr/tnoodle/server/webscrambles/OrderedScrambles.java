@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipOutputStream;
@@ -55,11 +56,11 @@ public class OrderedScrambles {
                         
                         for (String item : activityList) {
                             if (item.charAt(0) == 'r') {
-                                round = Integer.parseInt(""+item.charAt(1));
+                                round = Integer.parseInt(item.substring(1));
                             } else if (item.charAt(0) == 'g') {
-                                group = Integer.parseInt(""+item.charAt(1));
+                                group = Integer.parseInt(item.substring(1));
                             } else if (item.charAt(0) == 'a') {
-                                attempt = Integer.parseInt(""+item.charAt(1));
+                                attempt = Integer.parseInt(item.substring(1));
                             }
                         }
                         
@@ -82,9 +83,7 @@ public class OrderedScrambles {
                             scrambleRequestTemp = new ArrayList<ScrambleRequest>(temp);
                         }
                         
-                        // are we really getting groups from competitionJson?
                         if (group > 0) {
-                            
                             ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
                             for (ScrambleRequest scrambleRequest : scrambleRequestTemp) {
                                 
@@ -112,7 +111,7 @@ public class OrderedScrambles {
                                 attemptRequest.event = scrambleRequest.event;
                                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
                                 attemptRequest.attempt = attempt;
-                                attemptRequest.totalAttempt = scrambleRequest.scrambles.length; // usefull for fmc
+                                attemptRequest.totalAttempt = scrambleRequest.scrambles.length; // useful for fmc
                                 
                                 temp.add(attemptRequest);
                             }
@@ -176,6 +175,12 @@ public class OrderedScrambles {
             s = s.substring(s.indexOf('[')+1, s.indexOf(']'));
         }
         return s;
+    }
+    
+    // https://stackoverflow.com/a/30184795/2697796
+    private static long dayDifferente(Date date1, Date date2) {
+        long diff = date2.getTime() - date1.getTime();
+        return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
     
 }
