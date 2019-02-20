@@ -470,8 +470,6 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         }
         doc.newPage();
     }
-    
-    
 
     private static void addFmcSolutionSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index, Locale locale) throws DocumentException, IOException {
         boolean withScramble = index != -1;

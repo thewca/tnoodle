@@ -36,14 +36,14 @@ public class OrderedScrambles {
         boolean hasMultipleDays = Integer.parseInt(scheduleJson.get("numberOfDays").toString())>1;
         boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
         
-        Date competitionStartDate = getEarlierActivityTime(scheduleJson);
-
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             String venueName = parseMarkdown(removeQuotation(venue.getAsJsonObject().get("name").toString()));
-            String timezone = removeQuotation(venue.getAsJsonObject().get("timezone").toString());
+            TimeZone timezone = TimeZone.getTimeZone(removeQuotation(venue.getAsJsonObject().get("timezone").toString()));
+            
+            Date competitionStartDate = getEarlierActivityTime(scheduleJson, timezone);
             
             DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+            sdf.setTimeZone(timezone);
 
             boolean hasMultipleRooms = venue.getAsJsonObject().getAsJsonArray("rooms").size()>1;
 
@@ -66,14 +66,11 @@ public class OrderedScrambles {
 
                         try {
                             activityStartTime = sdf.parse(removeQuotation(activity.getAsJsonObject().get("startTime").toString()));
-                            System.out.println("From json: "+activity.getAsJsonObject().get("startTime").toString()+" Activity start: "+activityStartTime);
                         } catch (ParseException e) {
                             // log: activity with invalid startTime
-                            e.printStackTrace();
                             return;
                         }
-                        long activityDay = dayDifferente(competitionStartDate, activityStartTime, TimeZone.getTimeZone(timezone))+1;
-                        System.out.println(activityCode+" - Room: "+roomName +" - Day: "+activityDay);
+                        long activityDay = dayDifferente(competitionStartDate, activityStartTime, timezone)+1;
 
                         if (!dayList.contains(activityDay)) {
                             dayList.add(activityDay);
@@ -220,17 +217,16 @@ public class OrderedScrambles {
         return s;
     }
 
-    // https://stackoverflow.com/a/30184795/2697796
     private static long dayDifferente(Date date1, Date date2, TimeZone timezone) {
         
-        Calendar cal1 = Calendar.getInstance(timezone);
+        Calendar cal1 = Calendar.getInstance();
         cal1.setTime(date1);
         cal1.set(Calendar.HOUR_OF_DAY, 0);
         cal1.set(Calendar.MINUTE, 0);
         cal1.set(Calendar.SECOND, 0);
         cal1.set(Calendar.MILLISECOND, 0);
         
-        Calendar cal2 = Calendar.getInstance(timezone);
+        Calendar cal2 = Calendar.getInstance();
         cal2.setTime(date2);
         cal2.set(Calendar.HOUR_OF_DAY, 0);
         cal2.set(Calendar.MINUTE, 0);
@@ -238,12 +234,13 @@ public class OrderedScrambles {
         cal2.set(Calendar.MILLISECOND, 0);
         
         long diff = Math.abs(cal1.getTimeInMillis() - cal2.getTimeInMillis());
-        return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        return TimeUnit.MILLISECONDS.toDays(diff);
     }
 
-    private static Date getEarlierActivityTime(JsonObject scheduleJson) {
+    private static Date getEarlierActivityTime(JsonObject scheduleJson, TimeZone timezone) {
 
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        sdf.setTimeZone(timezone);
         Date date = null;
 
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
