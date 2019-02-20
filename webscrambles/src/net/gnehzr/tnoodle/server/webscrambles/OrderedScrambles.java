@@ -4,10 +4,11 @@ import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -31,39 +32,25 @@ public class OrderedScrambles {
     public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, String schedule, String json) throws DocumentException, IOException, ZipException {
         JsonObject scheduleJson = new JsonParser().parse(schedule).getAsJsonObject();
 
-        System.out.println("Earlier: "+getEarlierActivityTime(scheduleJson));
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date competitionStartDate;
-
         boolean hasMultipleDays = Integer.parseInt(scheduleJson.get("numberOfDays").toString())>1;
-
-        try {
-            competitionStartDate = sdf.parse(removeQuotation(scheduleJson.get("startDate").toString()));
-            System.out.println("From json: "+removeQuotation(scheduleJson.get("startDate").toString())+" Competition start: "+competitionStartDate);
-        } catch (ParseException e) {
-            // log: we tried to generate ordered scrambles, but it was not possible.
-            // invalid startDate
-            e.printStackTrace();
-            return;
-        }
-
         boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
+        
+        Date competitionStartDate = getEarlierActivityTime(scheduleJson);
 
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             String venueName = parseMarkdown(removeQuotation(venue.getAsJsonObject().get("name").toString()));
             String timezone = removeQuotation(venue.getAsJsonObject().get("timezone").toString());
-
-            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(timezone));
-            cal.setTime(competitionStartDate);
+            
+            DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            sdf.setTimeZone(TimeZone.getTimeZone(timezone));
 
             boolean hasMultipleRooms = venue.getAsJsonObject().getAsJsonArray("rooms").size()>1;
 
-            ArrayList<Long> dayList = new ArrayList<Long>();
-            ArrayList<ArrayList<ScrambleRequest>> scrambleRequestListByDay = new ArrayList<ArrayList<ScrambleRequest>>();
-
             for (JsonElement room : venue.getAsJsonObject().getAsJsonArray("rooms")) {
 
+                ArrayList<Long> dayList = new ArrayList<Long>();
+                ArrayList<ArrayList<ScrambleRequest>> scrambleRequestListByDay = new ArrayList<ArrayList<ScrambleRequest>>();
+                
                 String roomName = removeQuotation(room.getAsJsonObject().get("name").toString());
 
                 for (JsonElement activity : room.getAsJsonObject().getAsJsonArray("activities")) {
@@ -165,6 +152,7 @@ public class OrderedScrambles {
 
                         int index = dayList.indexOf(activityDay);
                         for (ScrambleRequest scrambleRequest : scrambleRequestTemp) {
+                            scrambleRequest.roundStartTime = activityStartTime;
                             scrambleRequestListByDay.get(index).add(scrambleRequest);
                         }
                     }
@@ -172,6 +160,8 @@ public class OrderedScrambles {
 
                 for (int index = 0; index<dayList.size(); index++) {
                     if (scrambleRequestListByDay.get(index).size()>0) {
+                        Collections.sort(scrambleRequestListByDay.get(index));
+                        
                         String pdfFileName = "Printing/Ordered Scrambles/";
 
                         if (hasMultipleVenues) {
@@ -236,7 +226,7 @@ public class OrderedScrambles {
 
     private static Date getEarlierActivityTime(JsonObject scheduleJson) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = null;
 
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {

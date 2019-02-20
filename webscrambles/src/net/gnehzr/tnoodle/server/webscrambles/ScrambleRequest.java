@@ -83,7 +83,7 @@ import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.*;
 import static net.gnehzr.tnoodle.server.webscrambles.Translate.translate;
 
-class ScrambleRequest {
+class ScrambleRequest implements Comparable<ScrambleRequest> {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
     private static final String HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html";
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
@@ -155,6 +155,7 @@ class ScrambleRequest {
     public HashMap<String, Color> colorScheme;
     public int totalAttempt;
     public int attempt;
+    public Date roundStartTime;
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -1680,5 +1681,10 @@ class ScrambleRequest {
 
         doc.close();
         return totalPdfOutput;
+    }
+    
+    @Override
+    public int compareTo(ScrambleRequest other) {
+        return this.roundStartTime.compareTo(other.roundStartTime);
     }
 }
