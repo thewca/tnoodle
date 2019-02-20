@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
@@ -71,7 +72,7 @@ public class OrderedScrambles {
                             e.printStackTrace();
                             return;
                         }
-                        long activityDay = dayDifferente(competitionStartDate, activityStartTime)+1;
+                        long activityDay = dayDifferente(competitionStartDate, activityStartTime, TimeZone.getTimeZone(timezone))+1;
                         System.out.println(activityCode+" - Room: "+roomName +" - Day: "+activityDay);
 
                         if (!dayList.contains(activityDay)) {
@@ -173,6 +174,11 @@ public class OrderedScrambles {
                         }
 
                         pdfFileName += "Ordered Scrambles";
+                        
+                        if (hasMultipleDays) {
+                            pdfFileName += " - Day "+dayList.get(index);
+                        }
+                        
                         if (hasMultipleRooms) {
                             pdfFileName += " - "+roomName;
                         }
@@ -187,12 +193,8 @@ public class OrderedScrambles {
                     }
                 }
             }
-
-            // 333 and 333bf are swapped for WC2019
-            // possible solution: add ScrambleRequest.roundStartDate make ScrambleRequest comparable by date
-            // add scrambleRequestList
             
-            // TODO: let day timezone aware to fix day numbering
+            // TODO: there's an issue with the first event of some days in WC2019
             // Java is very annoying with dates
         }
     }
@@ -219,8 +221,23 @@ public class OrderedScrambles {
     }
 
     // https://stackoverflow.com/a/30184795/2697796
-    private static long dayDifferente(Date date1, Date date2) {
-        long diff = date2.getTime() - date1.getTime();
+    private static long dayDifferente(Date date1, Date date2, TimeZone timezone) {
+        
+        Calendar cal1 = Calendar.getInstance(timezone);
+        cal1.setTime(date1);
+        cal1.set(Calendar.HOUR_OF_DAY, 0);
+        cal1.set(Calendar.MINUTE, 0);
+        cal1.set(Calendar.SECOND, 0);
+        cal1.set(Calendar.MILLISECOND, 0);
+        
+        Calendar cal2 = Calendar.getInstance(timezone);
+        cal2.setTime(date2);
+        cal2.set(Calendar.HOUR_OF_DAY, 0);
+        cal2.set(Calendar.MINUTE, 0);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        
+        long diff = Math.abs(cal1.getTimeInMillis() - cal2.getTimeInMillis());
         return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 
