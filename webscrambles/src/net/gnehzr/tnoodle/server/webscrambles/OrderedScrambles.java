@@ -170,7 +170,7 @@ public class OrderedScrambles {
                         String pdfFileName = "Printing/Ordered Scrambles/";
 
                         if (hasMultipleVenues) {
-                            pdfFileName += venueName+"/";
+                            pdfFileName += venueName.replace('/', ' ')+"/";
                         }
 
                         if (hasMultipleDays || dayList.size() > 1) {
@@ -182,14 +182,14 @@ public class OrderedScrambles {
                         // In addition to different folders, we stamp venue, day and room in the PDF's name
                         // to prevent different files with the same name.
                         if (hasMultipleVenues) {
-                            pdfFileName += " - " + venueName;
+                            pdfFileName += " - " + venueName.replace('/', ' ');
                         }
                         if (hasMultipleDays || dayList.size() > 1) {
                             pdfFileName += " - Day "+dayList.get(index);
                         }
                         
                         if (hasMultipleRooms) {
-                            pdfFileName += " - "+roomName;
+                            pdfFileName += " - "+roomName.replace('/', ' ');
                         }
                         pdfFileName += ".pdf";
 
