@@ -30,8 +30,8 @@ public class OrderedScrambles {
 
     private static final String wcifIgnorableKey = "other";
 
-    public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, String schedule, String json) throws DocumentException, IOException, ZipException {
-        JsonObject scheduleJson = new JsonParser().parse(schedule).getAsJsonObject();
+    public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, String scheduleJsonStringfied, String sheet) throws DocumentException, IOException, ZipException {
+        JsonObject scheduleJson = new JsonParser().parse(scheduleJsonStringfied).getAsJsonObject();
 
         boolean hasMultipleDays = Integer.parseInt(scheduleJson.get("numberOfDays").toString())>1;
         boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
@@ -40,7 +40,10 @@ public class OrderedScrambles {
             String venueName = parseMarkdown(removeQuotation(venue.getAsJsonObject().get("name").toString()));
             TimeZone timezone = TimeZone.getTimeZone(removeQuotation(venue.getAsJsonObject().get("timezone").toString()));
             
+            // We consider the competition start date as the earlier activity from the schedule.
+            // This prevents miscalculation of dates for multiple timezones.
             Date competitionStartDate = getEarlierActivityTime(scheduleJson, timezone);
+            azzert(competitionStartDate != null, "I could not find the earlier activity.");
             
             DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             sdf.setTimeZone(timezone);
@@ -68,21 +71,20 @@ public class OrderedScrambles {
                             activityStartTime = sdf.parse(removeQuotation(activity.getAsJsonObject().get("startTime").toString()));
                         } catch (ParseException e) {
                             // log: activity with invalid startTime
-                            return;
+                            return; // No ordered scrambles is generated
                         }
-                        long activityDay = dayDifferente(competitionStartDate, activityStartTime, timezone)+1;
+                        long activityDay = dayDifference(competitionStartDate, activityStartTime)+1;
 
                         if (!dayList.contains(activityDay)) {
                             dayList.add(activityDay);
                             scrambleRequestListByDay.add(new ArrayList<ScrambleRequest>());
                         }
 
-                        ScrambleRequest[] scrambleRequests = GSON.fromJson(json, ScrambleRequest[].class);
-
                         int round = -1;
                         int group = -1;
                         int attempt = -1;
-
+                        
+                        // This part assumes every round, group and attempt is labeled with an integer from competitionJson
                         for (String item : activityList) {
                             if (item.charAt(0) == 'r') {
                                 round = Integer.parseInt(item.substring(1));
@@ -93,8 +95,10 @@ public class OrderedScrambles {
                             }
                         }
 
-                        ArrayList<ScrambleRequest> scrambleRequestTemp = new ArrayList<ScrambleRequest>();
+                        ScrambleRequest[] scrambleRequests = GSON.fromJson(sheet, ScrambleRequest[].class);
+                        
                         // first, we add all requests whose events equals what we need
+                        ArrayList<ScrambleRequest> scrambleRequestTemp = new ArrayList<ScrambleRequest>();
                         for (ScrambleRequest item : scrambleRequests) {
                             if ((item.event).equals(eventId)) {
                                 scrambleRequestTemp.add(item);
@@ -158,6 +162,9 @@ public class OrderedScrambles {
 
                 for (int index = 0; index<dayList.size(); index++) {
                     if (scrambleRequestListByDay.get(index).size()>0) {
+                        
+                        // Since we are iterating over the schedule, this did not seem necessary,
+                        // but it was for some cases (like the order of MBLD for WC2019).
                         Collections.sort(scrambleRequestListByDay.get(index));
                         
                         String pdfFileName = "Printing/Ordered Scrambles/";
@@ -166,13 +173,18 @@ public class OrderedScrambles {
                             pdfFileName += venueName+"/";
                         }
 
-                        if (hasMultipleDays) {
+                        if (hasMultipleDays || dayList.size() > 1) {
                             pdfFileName += "Day "+dayList.get(index)+"/";
                         }
 
                         pdfFileName += "Ordered Scrambles";
                         
-                        if (hasMultipleDays) {
+                        // In addition to different folders, we stamp venue, day and room in the PDF's name
+                        // to prevent different files with the same name.
+                        if (hasMultipleVenues) {
+                            pdfFileName += " - " + venueName;
+                        }
+                        if (hasMultipleDays || dayList.size() > 1) {
                             pdfFileName += " - Day "+dayList.get(index);
                         }
                         
@@ -190,9 +202,6 @@ public class OrderedScrambles {
                     }
                 }
             }
-            
-            // TODO: there's an issue with the first event of some days in WC2019
-            // Java is very annoying with dates
         }
     }
 
@@ -210,6 +219,7 @@ public class OrderedScrambles {
         return s;
     }
 
+    // In case venue or room is using markdown
     private static String parseMarkdown(String s) {
         if (s.indexOf('[') >= 0 && s.indexOf(']') >= 0) {
             s = s.substring(s.indexOf('[')+1, s.indexOf(']'));
@@ -217,7 +227,7 @@ public class OrderedScrambles {
         return s;
     }
 
-    private static long dayDifferente(Date date1, Date date2, TimeZone timezone) {
+    private static long dayDifference(Date date1, Date date2) {
         
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(date1);
