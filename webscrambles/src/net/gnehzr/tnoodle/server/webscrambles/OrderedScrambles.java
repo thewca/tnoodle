@@ -192,6 +192,9 @@ public class OrderedScrambles {
                             pdfFileName += " - "+roomName.replace('/', ' ');
                         }
                         pdfFileName += ".pdf";
+                        
+                        // removing slashes may add double+ extra spaces
+                        pdfFileName = pdfFileName.replaceAll("\\s+", " ");
 
                         parameters.setFileNameInZip(pdfFileName);
                         zipOut.putNextEntry(null, parameters);
