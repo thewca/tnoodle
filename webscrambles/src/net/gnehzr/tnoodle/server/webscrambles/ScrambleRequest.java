@@ -877,18 +877,15 @@ class ScrambleRequest {
         int height = top - bottom;
         int width = right - left;
 
-        float fontSize = 12;
-        int padding = 90;
-        int marginBottom = 10;
-        int offsetTop = 27;
-
-        int availableScrambleSpace = width - padding;
-        int scrambleFontSize = 20;
-        int titleFontSize = 15;
+        int spaceScrambleImage = 5; // scramble image won't touch the scramble
+        int scrambleImagePadding = 8; // scramble image won't touch the dashed lines
+        int fontSize = 20;
+        
+        final int scramblesPerSheet = 8;
+        int availableScrambleHeight = height/scramblesPerSheet;
 
         int availableScrambleWidth = (int) (width * .45);
-        int availableScrambleHeight = height - (int) (height * .77) - 90;
-        Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth - 8, availableScrambleHeight - 8);
+        Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth, availableScrambleHeight - 2*scrambleImagePadding);
         PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
         Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
 
@@ -901,39 +898,43 @@ class ScrambleRequest {
             g2.dispose();
         }
 
-        cb.setLineDash(3f, 3f);
-        cb.moveTo(left, top - offsetTop + (marginBottom * 3));
-        cb.lineTo(right, top - offsetTop + (marginBottom * 3));
-        cb.stroke();
-
-        final int scramblesPerSheet = 8;
-        for (int y = 0; y < scramblesPerSheet; y++) {
-
-            String title = globalTitle + " - " + scrambleRequest.title;
-            if(scrambleRequest.scrambles.length > 1) {
-                title += " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length;
-            }
-            
-            Rectangle rect = new Rectangle(left, top - offsetTop, left+availableScrambleSpace, top - offsetTop + scrambleFontSize);
-            fitAndShowText(cb, title, bf, rect, titleFontSize, Element.ALIGN_LEFT, 1);
-
-            offsetTop += fontSize + marginBottom;
-            
-            rect = new Rectangle(left, top - offsetTop, left+availableScrambleSpace, top - offsetTop + scrambleFontSize);
-            fitAndShowText(cb, scramble, bf, rect, scrambleFontSize, Element.ALIGN_LEFT, 1);
-
-            offsetTop += scrambleFontSize + marginBottom;
-
-            cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, right - padding, top - offsetTop - 1);
-
-            cb.moveTo(left, top - offsetTop - marginBottom);
-            cb.lineTo(right, top - offsetTop - marginBottom);
-            cb.stroke();
-
-            offsetTop += marginBottom * 4;
+        String title = globalTitle + " - " + scrambleRequest.title;
+        if(scrambleRequest.scrambles.length > 1) {
+            title += " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length;
         }
+        
+        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<Integer> alignList = new ArrayList<Integer>();
+        
+        list.add(""); // space above
+        alignList.add(Element.ALIGN_LEFT);
+        
+        list.add(title);
+        alignList.add(Element.ALIGN_LEFT);
+        list.add(scramble);
+        alignList.add(Element.ALIGN_LEFT);
 
+        list.add(""); // space bellow
+        alignList.add(Element.ALIGN_LEFT);
+
+        for (int i = 0; i < scramblesPerSheet; i++) {
+            Rectangle rect = new Rectangle(left, top - i*availableScrambleHeight, right - dim.width - spaceScrambleImage, top - (i+1)*availableScrambleHeight);
+            populateRect(cb, rect, list, alignList, bf, fontSize);
+
+            cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, right - dim.width, top - (i+1)*availableScrambleHeight + (availableScrambleHeight-dim.getHeight())/2);
+
+            drawDashedLine(cb, left, right, top - i*availableScrambleHeight);
+        }
+        drawDashedLine(cb, left, right, top - scramblesPerSheet*availableScrambleHeight);
+        
         doc.newPage();
+    }
+    
+    private static void drawDashedLine(PdfContentByte cb, int left, int right, int yPosition) {
+        cb.setLineDash(3f, 3f);
+        cb.moveTo(left, yPosition);
+        cb.lineTo(right, yPosition);
+        cb.stroke();
     }
 
     /**
