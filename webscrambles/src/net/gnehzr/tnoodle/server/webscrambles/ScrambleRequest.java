@@ -146,7 +146,6 @@ class ScrambleRequest {
     // This is here just to make GSON work.
     public ScrambleRequest(){}
 
-
     public String[] scrambles;
     public String[] extraScrambles = new String[0];
     public Puzzle scrambler;
@@ -885,11 +884,7 @@ class ScrambleRequest {
 
         int availableScrambleSpace = width - padding;
         int scrambleFontSize = 20;
-        float scrambleWidth;
-        do {
-            scrambleFontSize--;
-            scrambleWidth = bf.getWidthPoint(scramble, scrambleFontSize);
-        } while (scrambleWidth > availableScrambleSpace);
+        int titleFontSize = 15;
 
         int availableScrambleWidth = (int) (width * .45);
         int availableScrambleHeight = height - (int) (height * .77) - 90;
@@ -913,25 +908,21 @@ class ScrambleRequest {
 
         final int scramblesPerSheet = 8;
         for (int y = 0; y < scramblesPerSheet; y++) {
-            cb.beginText();
+
             String title = globalTitle + " - " + scrambleRequest.title;
             if(scrambleRequest.scrambles.length > 1) {
                 title += " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length;
             }
+            
+            Rectangle rect = new Rectangle(left, top - offsetTop, left+availableScrambleSpace, top - offsetTop + scrambleFontSize);
+            fitAndShowText(cb, title, bf, rect, titleFontSize, Element.ALIGN_LEFT, 1);
 
-            fontSize = fitText(new Font(bf), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
-
-            cb.setFontAndSize(bf, fontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, title, left, top - offsetTop, 0);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title, left, top - offsetTop, 0);
-            cb.endText();
             offsetTop += fontSize + marginBottom;
+            
+            rect = new Rectangle(left, top - offsetTop, left+availableScrambleSpace, top - offsetTop + scrambleFontSize);
+            fitAndShowText(cb, scramble, bf, rect, scrambleFontSize, Element.ALIGN_LEFT, 1);
 
-            cb.beginText();
-            cb.setFontAndSize(bf, scrambleFontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scramble, left, top - offsetTop, 0);
             offsetTop += scrambleFontSize + marginBottom;
-            cb.endText();
 
             cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, right - padding, top - offsetTop - 1);
 
@@ -1385,8 +1376,7 @@ class ScrambleRequest {
                     doc.addTitle(globalTitle);
                 }
 
-                // perhaps we should use i18n on the cutout sheet (scramblexofY)
-                // and place it with the other internationalized pdfs
+                // TODO: i18n. See https://github.com/thewca/tnoodle/issues/396
                 doc.open();
                 for (int i = 0; i < scrambleRequest.scrambles.length; i++) {
                     addFmcScrambleCutoutSheet(docWriter, doc, scrambleRequest, globalTitle, i);
