@@ -869,8 +869,8 @@ class ScrambleRequest {
 
         BaseFont bf = getFontForLocale(Translate.DEFAULT_LOCALE);
 
-        int bottom = 30;
-        int left = 35;
+        int bottom = 10;
+        int left = 20;
         int right = (int) (pageSize.getWidth()-left);
         int top = (int) (pageSize.getHeight()-bottom);
 
