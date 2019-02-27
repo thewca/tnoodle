@@ -1,32 +1,33 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
 import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
 
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipOutputStream;
+import net.lingala.zip4j.model.ZipParameters;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import com.itextpdf.text.DocumentException;
 
-import net.lingala.zip4j.model.ZipParameters;
-
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;;
-
 public class OrderedScrambles {
+    
+    // TODO we are using Joda-Time for dates, via its .jar file
+    // We can update java to java8 and use java.time, which is the same class, as of JSR-310
+    // We can dismiss joda-time-2.10.1.jar from /lib
 
     private static final String wcifIgnorableKey = "other";
 
@@ -36,27 +37,25 @@ public class OrderedScrambles {
         boolean hasMultipleDays = Integer.parseInt(scheduleJson.get("numberOfDays").toString())>1;
         boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
         
+        // We consider the competition start date as the earlier activity from the schedule.
+        // This prevents miscalculation of dates for multiple timezones.
+        String competitionStartString = getEarlierActivityString(scheduleJson);
+        
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             String venueName = parseMarkdown(removeQuotation(venue.getAsJsonObject().get("name").toString()));
-            TimeZone timezone = TimeZone.getTimeZone(removeQuotation(venue.getAsJsonObject().get("timezone").toString()));
+                        
+            DateTimeZone timezone = DateTimeZone.forID(removeQuotation(venue.getAsJsonObject().get("timezone").toString()));
+            DateTime competitionStartDate = new DateTime(competitionStartString, timezone);
             
-            // We consider the competition start date as the earlier activity from the schedule.
-            // This prevents miscalculation of dates for multiple timezones.
-            Date competitionStartDate = getEarlierActivityTime(scheduleJson, timezone);
-            azzert(competitionStartDate != null, "I could not find the earlier activity.");
-            
-            DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            sdf.setTimeZone(timezone);
-
             boolean hasMultipleRooms = venue.getAsJsonObject().getAsJsonArray("rooms").size()>1;
 
             for (JsonElement room : venue.getAsJsonObject().getAsJsonArray("rooms")) {
 
-                ArrayList<Long> dayList = new ArrayList<Long>();
+                ArrayList<Integer> dayList = new ArrayList<Integer>();
                 ArrayList<ArrayList<ScrambleRequest>> scrambleRequestListByDay = new ArrayList<ArrayList<ScrambleRequest>>();
                 
                 String roomName = removeQuotation(room.getAsJsonObject().get("name").toString());
-
+                                
                 for (JsonElement activity : room.getAsJsonObject().getAsJsonArray("activities")) {
                     String activityCode = removeQuotation(activity.getAsJsonObject().get("activityCode").toString());
 
@@ -65,16 +64,10 @@ public class OrderedScrambles {
 
                     if (!eventId.equals(wcifIgnorableKey)) {
 
-                        Date activityStartTime;
+                        DateTime activityStartTime = new DateTime(removeQuotation(activity.getAsJsonObject().get("startTime").toString()), timezone);
 
-                        try {
-                            activityStartTime = sdf.parse(removeQuotation(activity.getAsJsonObject().get("startTime").toString()));
-                        } catch (ParseException e) {
-                            // log: activity with invalid startTime
-                            return; // No ordered scrambles is generated
-                        }
-                        long activityDay = dayDifference(competitionStartDate, activityStartTime)+1;
-
+                        int activityDay = Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), activityStartTime.withTimeAtStartOfDay()).getDays()+1;
+                        
                         if (!dayList.contains(activityDay)) {
                             dayList.add(activityDay);
                             scrambleRequestListByDay.add(new ArrayList<ScrambleRequest>());
@@ -230,47 +223,23 @@ public class OrderedScrambles {
         return s;
     }
 
-    private static long dayDifference(Date date1, Date date2) {
-        
-        Calendar cal1 = Calendar.getInstance();
-        cal1.setTime(date1);
-        cal1.set(Calendar.HOUR_OF_DAY, 0);
-        cal1.set(Calendar.MINUTE, 0);
-        cal1.set(Calendar.SECOND, 0);
-        cal1.set(Calendar.MILLISECOND, 0);
-        
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTime(date2);
-        cal2.set(Calendar.HOUR_OF_DAY, 0);
-        cal2.set(Calendar.MINUTE, 0);
-        cal2.set(Calendar.SECOND, 0);
-        cal2.set(Calendar.MILLISECOND, 0);
-        
-        long diff = Math.abs(cal1.getTimeInMillis() - cal2.getTimeInMillis());
-        return TimeUnit.MILLISECONDS.toDays(diff);
-    }
+    private static String getEarlierActivityString(JsonObject scheduleJson) {
 
-    private static Date getEarlierActivityTime(JsonObject scheduleJson, TimeZone timezone) {
-
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        sdf.setTimeZone(timezone);
-        Date date = null;
-
+        DateTime date = null;
+        String out = "";
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             for (JsonElement room : venue.getAsJsonObject().getAsJsonArray("rooms")) {
                 for (JsonElement activity : room.getAsJsonObject().getAsJsonArray("activities")) {
-
-                    try {
-                        Date activityStartTime = sdf.parse(removeQuotation(activity.getAsJsonObject().get("startTime").toString()));
-                        if (date == null || activityStartTime.before(date)) {
-                            date = activityStartTime;
-                        }
-                    } catch (ParseException e) {
-
+                    String tempString = removeQuotation(activity.getAsJsonObject().get("startTime").toString());
+                    DateTime tempDate = DateTime.parse(tempString);
+                    if (date == null || tempDate.isBefore(date)) {
+                        date = tempDate;
+                        out = tempString;
                     }
                 }
             }
         }
-        return date;
+        azzert(!out.equals(""), "I could not find the earlier activity.");
+        return out;
     }
 }

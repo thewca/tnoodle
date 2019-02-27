@@ -50,6 +50,7 @@ import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.util.XMLResourceDescriptor;
+import org.joda.time.DateTime;
 import org.w3c.dom.svg.SVGDocument;
 
 import javax.servlet.ServletContext;
@@ -155,7 +156,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     public HashMap<String, Color> colorScheme;
     public int totalAttempt;
     public int attempt;
-    public Date roundStartTime;
+    public DateTime roundStartTime;
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
