@@ -243,10 +243,17 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
                 sendBytes(request, response, totalPdfOutput, "application/pdf");
             } else if (extension.equals("zip")) {
+                
+                byte[] sourceBytes = globalTitle.getBytes("windows-1252");
+                globalTitle = new String(sourceBytes , "UTF-8");
+                
                 ByteArrayOutputStream zipOutput = ScrambleRequest
                         .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl);
+                
                 String safeTitle = globalTitle.replaceAll("\"", "'");
+
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
+                
                 sendBytes(request, response, zipOutput, "application/zip");
             } else {
                 azzert(false);
