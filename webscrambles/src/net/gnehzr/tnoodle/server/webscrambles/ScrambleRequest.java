@@ -157,6 +157,13 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     public int totalAttempt;
     public int attempt;
     public DateTime roundStartTime;
+    
+    // totalAttempt and attempt are useful for when we have multiple attempts split in the schedule.
+    // When not using ordered scrambles, we create an array of ScrambleRequest and
+    // the position in the array is related to the attempt, hence we can print attempt number (mainly for FMC and MBLD)
+    // and use, for example, scramble 1 or 3 (3 here is array.length)
+    // But when using ordered scrambles, each attempt is treated like an individual ScrambleRequest.
+    // We use totalAttempt as array.length and attempt as the position that scramble would be on the array.
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the

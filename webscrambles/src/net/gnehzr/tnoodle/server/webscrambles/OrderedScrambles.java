@@ -226,7 +226,7 @@ public class OrderedScrambles {
     private static String getEarlierActivityString(JsonObject scheduleJson) {
 
         DateTime date = null;
-        String out = "";
+        String out = null;
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             for (JsonElement room : venue.getAsJsonObject().getAsJsonArray("rooms")) {
                 for (JsonElement activity : room.getAsJsonObject().getAsJsonArray("activities")) {
@@ -239,7 +239,7 @@ public class OrderedScrambles {
                 }
             }
         }
-        azzert(!out.equals(""), "I could not find the earlier activity.");
+        azzert(out != null, "I could not find the earlier activity.");
         return out;
     }
 }
