@@ -641,7 +641,6 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 HashMap<String, String> substitutions = new HashMap<String, String>();
                 substitutions.put("scrambleIndex", ""+(index+1));
                 substitutions.put("scrambleCount", ""+(scrambleRequest.totalAttempt));
-                substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
                 list.add(translate("fmc.scrambleXofY", locale, substitutions));
                 alignList.add(Element.ALIGN_CENTER);
             }
@@ -1335,12 +1334,13 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         return builder.toString();
     }
 
-    public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl, String scheduleJsonStringfied, String sheet) throws IOException, DocumentException, ZipException {
+    public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, LinkedHashMap<String, String> query) throws IOException, DocumentException, ZipException {
         ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
         parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        String password = query.get("password");
         if(password != null) {
             parameters.setEncryptFiles(true);
             parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
@@ -1366,6 +1366,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         String safeGlobalTitle = toFileSafeString(globalTitle);
         String computerDisplayFileName = safeGlobalTitle + " - Computer Display PDFs";
 
+        ScrambleRequest[] scrambleRequests = GSON.fromJson(query.get("sheets"), ScrambleRequest[].class);
         boolean fmcBeingHeld = false;
         for(ScrambleRequest scrambleRequest : scrambleRequests) {
             if(scrambleRequest.fmc) {
@@ -1549,8 +1550,8 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             }
         }
         
-        if (scheduleJsonStringfied != null && sheet != null) {
-            OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, zipOut, parameters, scheduleJsonStringfied, sheet);
+        if (query.get("schedule") != null && query.get("sheets") != null) {
+            OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, zipOut, parameters, query);
         }
 
         computerDisplayZipOut.finish();
@@ -1593,7 +1594,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         jsonObj.put("competitionName", globalTitle);
         jsonObj.put("version", Utils.getProjectName() + "-" + Utils.getVersion());
         jsonObj.put("generationDate", generationDate);
-        jsonObj.put("generationUrl", generationUrl);
+        jsonObj.put("generationUrl", query.get("generationUrl"));
         String json = GSON.toJson(jsonObj);
         zipOut.write(json.getBytes());
         zipOut.closeEntry();

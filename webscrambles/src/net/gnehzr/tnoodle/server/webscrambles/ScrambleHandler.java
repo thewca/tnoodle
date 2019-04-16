@@ -26,7 +26,6 @@ public class ScrambleHandler extends SafeHttpServlet {
 
             // TODO - this means you can't have a round named "seed" or "showIndices" or "callback" or "generationUrl"!
             String seed = query.remove("seed");
-            String generationUrl = query.remove("generationUrl");
             boolean showIndices = query.remove("showIndices") != null;
             query.remove("callback");
 
@@ -73,13 +72,11 @@ public class ScrambleHandler extends SafeHttpServlet {
 
                 sendBytes(request, response, totalPdfOutput, "application/pdf");
             } else if(ext.equals("zip")) {
-                ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
-                ByteArrayOutputStream baosZip = ScrambleRequest.requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, seed, generationUrl, null, null);
+                ByteArrayOutputStream baosZip = ScrambleRequest.requestsToZip(getServletContext(), globalTitle, generationDate, query);
                 sendBytes(request, response, baosZip, "application/zip");
             } else {
                 throw new InvalidScrambleRequestException("Invalid extension: " + ext);
             }
         }
     }
-
 }

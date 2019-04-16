@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -31,8 +32,8 @@ public class OrderedScrambles {
 
     private static final String wcifIgnorableKey = "other";
 
-    public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, String scheduleJsonStringfied, String sheet) throws DocumentException, IOException, ZipException {
-        JsonObject scheduleJson = new JsonParser().parse(scheduleJsonStringfied).getAsJsonObject();
+    public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, LinkedHashMap<String, String> query) throws DocumentException, IOException, ZipException {
+        JsonObject scheduleJson = new JsonParser().parse(query.get("schedule")).getAsJsonObject();
 
         boolean hasMultipleDays = scheduleJson.get("numberOfDays").getAsInt()>1;
         boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
@@ -40,6 +41,8 @@ public class OrderedScrambles {
         // We consider the competition start date as the earlier activity from the schedule.
         // This prevents miscalculation of dates for multiple timezones.
         String competitionStartString = getEarlierActivityString(scheduleJson);
+        
+        ScrambleRequest[] allScrambleRequests = GSON.fromJson(query.get("sheets"), ScrambleRequest[].class);
         
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             String venueName = parseMarkdown(venue.getAsJsonObject().get("name").getAsString());
@@ -88,11 +91,9 @@ public class OrderedScrambles {
                             }
                         }
 
-                        ScrambleRequest[] scrambleRequests = GSON.fromJson(sheet, ScrambleRequest[].class);
-                        
                         // first, we add all requests whose events equals what we need
                         ArrayList<ScrambleRequest> scrambleRequestTemp = new ArrayList<ScrambleRequest>();
-                        for (ScrambleRequest item : scrambleRequests) {
+                        for (ScrambleRequest item : allScrambleRequests) {
                             if ((item.event).equals(eventId)) {
                                 scrambleRequestTemp.add(item);
                             }
