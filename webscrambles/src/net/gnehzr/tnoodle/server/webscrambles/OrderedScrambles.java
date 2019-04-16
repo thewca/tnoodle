@@ -34,7 +34,7 @@ public class OrderedScrambles {
     public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, String scheduleJsonStringfied, String sheet) throws DocumentException, IOException, ZipException {
         JsonObject scheduleJson = new JsonParser().parse(scheduleJsonStringfied).getAsJsonObject();
 
-        boolean hasMultipleDays = Integer.parseInt(scheduleJson.get("numberOfDays").toString())>1;
+        boolean hasMultipleDays = scheduleJson.get("numberOfDays").getAsInt()>1;
         boolean hasMultipleVenues = scheduleJson.getAsJsonArray("venues").size()>1;
         
         // We consider the competition start date as the earlier activity from the schedule.
@@ -42,9 +42,9 @@ public class OrderedScrambles {
         String competitionStartString = getEarlierActivityString(scheduleJson);
         
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
-            String venueName = parseMarkdown(removeQuotation(venue.getAsJsonObject().get("name").toString()));
+            String venueName = parseMarkdown(venue.getAsJsonObject().get("name").getAsString());
                         
-            DateTimeZone timezone = DateTimeZone.forID(removeQuotation(venue.getAsJsonObject().get("timezone").toString()));
+            DateTimeZone timezone = DateTimeZone.forID(venue.getAsJsonObject().get("timezone").getAsString());
             DateTime competitionStartDate = new DateTime(competitionStartString, timezone);
             
             boolean hasMultipleRooms = venue.getAsJsonObject().getAsJsonArray("rooms").size()>1;
@@ -54,17 +54,17 @@ public class OrderedScrambles {
                 ArrayList<Integer> dayList = new ArrayList<Integer>();
                 ArrayList<ArrayList<ScrambleRequest>> scrambleRequestListByDay = new ArrayList<ArrayList<ScrambleRequest>>();
                 
-                String roomName = removeQuotation(room.getAsJsonObject().get("name").toString());
+                String roomName = room.getAsJsonObject().get("name").getAsString();
                                 
                 for (JsonElement activity : room.getAsJsonObject().getAsJsonArray("activities")) {
-                    String activityCode = removeQuotation(activity.getAsJsonObject().get("activityCode").toString());
+                    String activityCode = activity.getAsJsonObject().get("activityCode").getAsString();
 
                     String[] activityList = activityCode.split("-");
                     String eventId = activityList[0];
 
                     if (!eventId.equals(wcifIgnorableKey)) {
 
-                        DateTime activityStartTime = new DateTime(removeQuotation(activity.getAsJsonObject().get("startTime").toString()), timezone);
+                        DateTime activityStartTime = new DateTime(activity.getAsJsonObject().get("startTime").getAsString(), timezone);
 
                         int activityDay = Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), activityStartTime.withTimeAtStartOfDay()).getDays()+1;
                         
@@ -166,7 +166,7 @@ public class OrderedScrambles {
                             pdfFileName += venueName.replace('/', ' ')+"/";
                         }
 
-                        if (hasMultipleDays || dayList.size() > 1) {
+                        if (hasMultipleDays || dayList.size() > 1) { // Double check, just in case.
                             pdfFileName += "Day "+dayList.get(index)+"/";
                         }
 
@@ -205,16 +205,6 @@ public class OrderedScrambles {
         return letter.charAt(0)-'A' == number-1;
     }
 
-    private static String removeQuotation(String s) {
-        if (s.charAt(0) == '"') {
-            s = s.substring(1, s.length());
-        }
-        if (s.charAt(s.length()-1) == '"') {
-            s = s.substring(0, s.length()-1);
-        }
-        return s;
-    }
-
     // In case venue or room is using markdown
     private static String parseMarkdown(String s) {
         if (s.indexOf('[') >= 0 && s.indexOf(']') >= 0) {
@@ -230,7 +220,7 @@ public class OrderedScrambles {
         for (JsonElement venue : scheduleJson.getAsJsonArray("venues")) {
             for (JsonElement room : venue.getAsJsonObject().getAsJsonArray("rooms")) {
                 for (JsonElement activity : room.getAsJsonObject().getAsJsonArray("activities")) {
-                    String tempString = removeQuotation(activity.getAsJsonObject().get("startTime").toString());
+                    String tempString = activity.getAsJsonObject().get("startTime").getAsString();
                     DateTime tempDate = DateTime.parse(tempString);
                     if (date == null || tempDate.isBefore(date)) {
                         date = tempDate;
