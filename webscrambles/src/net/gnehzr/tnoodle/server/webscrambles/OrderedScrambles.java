@@ -114,7 +114,7 @@ public class OrderedScrambles {
                             ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
                             for (ScrambleRequest scrambleRequest : scrambleRequestTemp) {
 
-                                if (compareFirstCharToNumber(scrambleRequest.group, group)) {
+                                if (compareLettersCharToNumber(scrambleRequest.group, group)) {
                                     temp.add(scrambleRequest);
                                 }
                             }
@@ -202,8 +202,14 @@ public class OrderedScrambles {
         }
     }
 
-    private static boolean compareFirstCharToNumber(String letter, int number) {
-        return letter.charAt(0)-'A' == number-1;
+    private static boolean compareLettersCharToNumber(String letters, int number) {
+        int sum = 0;
+        int pow = 1;
+        for (int i=letters.length()-1; i >= 0; i--) {
+            sum += (letters.charAt(i)-'A'+1)*pow;
+            pow *= 26;
+        }
+        return sum == number;
     }
 
     // In case venue or room is using markdown
