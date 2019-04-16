@@ -543,7 +543,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         // Competitor info left border
         cb.moveTo(competitorInfoLeft, gradeBottom);
         cb.lineTo(competitorInfoLeft, top);
-        
+
         // Solution lines
         int availableSolutionWidth = right - left;
         int availableSolutionHeight = scrambleBorderTop - bottom;
@@ -616,20 +616,20 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         Rectangle competitorInfoRect = new Rectangle(competitorInfoLeft+margin, top, right-margin, competitorInfoBottom);
         Rectangle gradeRect = new Rectangle(competitorInfoLeft+margin, competitorInfoBottom, right-margin, gradeBottom);
         Rectangle scrambleImageRect = new Rectangle(competitorInfoLeft+margin, gradeBottom, right-margin, scrambleBorderTop);
-        
+
         String shortFill = ": ____";
         String longFill = ": __________________";
 
         // competitor and competition info
         ArrayList<String> list = new ArrayList<String>();
         ArrayList<Integer> alignList = new ArrayList<Integer>();
-        
+
         if(withScramble) {
             list.add(globalTitle);
             alignList.add(Element.ALIGN_CENTER);
             list.add(scrambleRequest.title);
             alignList.add(Element.ALIGN_CENTER);
-            
+
             if(showScrambleCount) {
                 
                 if (scrambleRequest.totalAttempt > 1) { // this is for ordered scrambles
@@ -641,7 +641,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 HashMap<String, String> substitutions = new HashMap<String, String>();
                 substitutions.put("scrambleIndex", ""+(index+1));
                 substitutions.put("scrambleCount", ""+(scrambleRequest.totalAttempt));
-                
+                substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
                 list.add(translate("fmc.scrambleXofY", locale, substitutions));
                 alignList.add(Element.ALIGN_CENTER);
             }
@@ -670,7 +670,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             alignList.add(Element.ALIGN_LEFT);
         }
         populateRect(cb, competitorInfoRect, list, alignList, bf, fontSize);
-        
+
         // graded
         fontSize = 11;
         list = new ArrayList<String>();
@@ -681,22 +681,22 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         alignList.add(Element.ALIGN_CENTER);
         fontSize = 11;
         populateRect(cb, gradeRect, list, alignList, bf, fontSize);
-        
+
         if(!withScramble) {
             fontSize = 11;
-            
+
             list = new ArrayList<String>();
             alignList = new ArrayList<Integer>();
-            
+
             list.add(""); // fake vertical centering
             alignList.add(Element.ALIGN_CENTER);
 
             list.add(translate("fmc.scrambleOnSeparateSheet", locale));
             alignList.add(Element.ALIGN_CENTER);
-            
+
             populateRect(cb, scrambleImageRect, list, alignList, bf, fontSize);
         }
-        
+
         int fmcMargin = 10;
 
         // Table
@@ -707,7 +707,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         int cellHeight = tableHeight/tableLines;
         int columns = 7;
         int firstColumnWidth = tableWidth-(columns-1)*cellWidth;
-        
+
         int movesFontSize = 10;
         Font movesFont = new Font(bf, movesFontSize);
 
@@ -739,7 +739,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
             }
         }
-        
+
         Rectangle firstColumnRectangle = new Rectangle(firstColumnWidth, cellHeight);
         float firstColumnFontSize = fitText(new Font(bf), movesType[0], firstColumnRectangle, 10, false, 1f);
 
@@ -803,10 +803,10 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         int MAGIC_NUMBER = 30; // kill me now
         float leadingMultiplier = 1;
         fontSize = 25;
-        
+
         Rectangle rect = new Rectangle(left, top-MAGIC_NUMBER+fontSize, competitorInfoLeft, top-MAGIC_NUMBER);
         fitAndShowText(cb, translate("fmc.event", locale), bf, rect, fontSize, Element.ALIGN_CENTER, leadingMultiplier);
-        
+
         ArrayList<String> rulesList = new ArrayList<String>();
         rulesList.add("• "+translate("fmc.rule1", locale));
         rulesList.add("• "+translate("fmc.rule2", locale));
@@ -822,7 +822,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         rulesList.add("• "+translate("fmc.rule6", locale));
 
         int rulesTop = competitorInfoBottom + (withScramble ? 65 : 153);
-        
+
         leadingMultiplier = 1.5f;
         Rectangle rulesRectangle = new Rectangle(left+fmcMargin, scrambleBorderTop+tableHeight+fmcMargin, competitorInfoLeft-fmcMargin, rulesTop+fmcMargin);
         String rules = String.join("\n", rulesList);
@@ -830,7 +830,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
 
         doc.newPage();
     }
-    
+
     private static void fitAndShowText(PdfContentByte cb, String text, BaseFont bf, Rectangle rect, float maxFontSize, int align, float leadingMultiplier) throws DocumentException {
         // We create a temp pdf and check if the text fit in a rectangle there.
         // If it's ok, we add the text to original pdf.
@@ -855,63 +855,57 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 ct.go();
                 break;
             }
-            
+
             maxFontSize -= 0.1;
         } while(true);
     }
-    
+
     private static void populateRect(PdfContentByte cb, Rectangle rect, ArrayList<String> list, ArrayList<Integer> alignList, BaseFont bf, int fontSize)  throws DocumentException {
-        
+
         azzert(list.size() == alignList.size(), "Make sure list.size() == alignList.size()");
 
         float totalHeight = rect.getHeight();
         float width = rect.getWidth();
         float x = rect.getLeft();
         float y = rect.getTop();
-        
+
         float height = totalHeight/(list.size());
-        
+
         for (int i=0; i<list.size(); i++) {
             Rectangle temp = new Rectangle(x, y+height*i-totalHeight-fontSize, x+width, y+height*i-totalHeight);
             fitAndShowText(cb, list.get(i), bf, temp, 15, alignList.get(i), 1f);
         }
     }
-    
+
     private static void addGenericFmcSolutionSheet(PdfWriter docWriter, Document doc, String globalTitle, Locale locale) throws DocumentException, IOException {
         addFmcSolutionSheet(docWriter, doc, null, globalTitle, -1, locale);
     }
 
     private static void addFmcScrambleCutoutSheet(PdfWriter docWriter, Document doc, ScrambleRequest scrambleRequest, String globalTitle, int index) throws DocumentException, IOException {
+
         Rectangle pageSize = doc.getPageSize();
         String scramble = scrambleRequest.scrambles[index];
         PdfContentByte cb = docWriter.getDirectContent();
 
         BaseFont bf = getFontForLocale(Translate.DEFAULT_LOCALE);
 
-        int bottom = 30;
-        int left = 35;
+        int bottom = 10;
+        int left = 20;
         int right = (int) (pageSize.getWidth()-left);
         int top = (int) (pageSize.getHeight()-bottom);
 
         int height = top - bottom;
         int width = right - left;
 
-        float fontSize = 12;
-        int padding = 90;
-        int marginBottom = 10;
-        int offsetTop = 27;
-
-        int availableScrambleSpace = width - padding;
-        int scrambleFontSize = 20;
-        float scrambleWidth;
-        do {
-            scrambleFontSize--;
-            scrambleWidth = bf.getWidthPoint(scramble, scrambleFontSize);
-        } while (scrambleWidth > availableScrambleSpace);
+        int spaceScrambleImage = 5; // scramble image won't touch the scramble
+        int scrambleImagePadding = 8; // scramble image won't touch the dashed lines
+        int fontSize = 20;
+        
+        final int scramblesPerSheet = 8;
+        int availableScrambleHeight = height/scramblesPerSheet;
 
         int availableScrambleWidth = (int) (width * .45);
-        int availableScrambleHeight = height - (int) (height * .77) - 90;
-        Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth - 8, availableScrambleHeight - 8);
+        Dimension dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth, availableScrambleHeight - 2*scrambleImagePadding);
         PdfTemplate tp = cb.createTemplate(dim.width, dim.height);
         Graphics2D g2 = new PdfGraphics2D(tp, dim.width, dim.height, new DefaultFontMapper());
 
@@ -924,45 +918,43 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             g2.dispose();
         }
 
-        cb.setLineDash(3f, 3f);
-        cb.moveTo(left, top - offsetTop + (marginBottom * 3));
-        cb.lineTo(right, top - offsetTop + (marginBottom * 3));
-        cb.stroke();
-
-        final int scramblesPerSheet = 8;
-        for (int y = 0; y < scramblesPerSheet; y++) {
-            cb.beginText();
-            String title = "";
-            if(scrambleRequest.scrambles.length > 1) {
-                title = globalTitle + " - " + scrambleRequest.title + " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length + ":";
-            } else {
-                title = globalTitle + " - " + scrambleRequest.title + ":";
-            }
-
-            fontSize = fitText(new Font(bf), title, new Rectangle(availableScrambleSpace, 100), scrambleFontSize, false, 1f);
-
-            cb.setFontAndSize(bf, fontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, title, left, top - offsetTop, 0);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, globalTitle + " - " + scrambleRequest.title + ":", left, top - offsetTop, 0);
-            cb.endText();
-            offsetTop += fontSize + marginBottom;
-
-            cb.beginText();
-            cb.setFontAndSize(bf, scrambleFontSize);
-            cb.showTextAligned(PdfContentByte.ALIGN_LEFT, scramble, left, top - offsetTop, 0);
-            offsetTop += scrambleFontSize + marginBottom;
-            cb.endText();
-
-            cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, right - padding, top - offsetTop - 1);
-
-            cb.moveTo(left, top - offsetTop - marginBottom);
-            cb.lineTo(right, top - offsetTop - marginBottom);
-            cb.stroke();
-
-            offsetTop += marginBottom * 4;
+        String title = globalTitle + " - " + scrambleRequest.title;
+        if(scrambleRequest.scrambles.length > 1) {
+            title += " - Scramble " + (index + 1) + " of " + scrambleRequest.scrambles.length;
         }
+        
+        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<Integer> alignList = new ArrayList<Integer>();
+        
+        list.add(""); // space above
+        alignList.add(Element.ALIGN_LEFT);
+        
+        list.add(title);
+        alignList.add(Element.ALIGN_LEFT);
+        list.add(scramble);
+        alignList.add(Element.ALIGN_LEFT);
 
+        list.add(""); // space bellow
+        alignList.add(Element.ALIGN_LEFT);
+
+        for (int i = 0; i < scramblesPerSheet; i++) {
+            Rectangle rect = new Rectangle(left, top - i*availableScrambleHeight, right - dim.width - spaceScrambleImage, top - (i+1)*availableScrambleHeight);
+            populateRect(cb, rect, list, alignList, bf, fontSize);
+
+            cb.addImage(Image.getInstance(tp), dim.width, 0, 0, dim.height, right - dim.width, top - (i+1)*availableScrambleHeight + (availableScrambleHeight-dim.getHeight())/2);
+
+            drawDashedLine(cb, left, right, top - i*availableScrambleHeight);
+        }
+        drawDashedLine(cb, left, right, top - scramblesPerSheet*availableScrambleHeight);
+        
         doc.newPage();
+    }
+    
+    private static void drawDashedLine(PdfContentByte cb, int left, int right, int yPosition) {
+        cb.setLineDash(3f, 3f);
+        cb.moveTo(left, yPosition);
+        cb.lineTo(right, yPosition);
+        cb.stroke();
     }
 
     /**
@@ -1405,6 +1397,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                     doc.addTitle(globalTitle);
                 }
 
+                // TODO: i18n. See https://github.com/thewca/tnoodle/issues/396
                 doc.open();
                 for (int i = 0; i < scrambleRequest.scrambles.length; i++) {
                     addFmcScrambleCutoutSheet(docWriter, doc, scrambleRequest, globalTitle, i);
