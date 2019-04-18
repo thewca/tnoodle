@@ -1595,6 +1595,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         jsonObj.put("version", Utils.getProjectName() + "-" + Utils.getVersion());
         jsonObj.put("generationDate", generationDate);
         jsonObj.put("generationUrl", query.get("generationUrl"));
+        jsonObj.put("schedule", query.get("schedule"));
         String json = GSON.toJson(jsonObj);
         zipOut.write(json.getBytes());
         zipOut.closeEntry();
