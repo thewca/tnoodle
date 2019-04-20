@@ -21,12 +21,10 @@ import com.itextpdf.text.DocumentException;
 
 public class OrderedScrambles {
     
-    // TODO we are using Joda-Time for dates, via its .jar file
-    // We can update java to java8 and use java.time, which is the same class, as of JSR-310
-    // We can dismiss joda-time-2.10.1.jar from /lib
+    // TODO see https://github.com/thewca/tnoodle/issues/400
 
     public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, LinkedHashMap<String, String> query) throws DocumentException, IOException, ZipException {
-        WCIFHandler wh = new WCIFHandler(query);
+        WCIFHelper wh = new WCIFHelper(query);
 
         boolean hasMultipleDays = wh.hasMultipleDays();
         boolean hasMultipleVenues = wh.hasMultipleVenues();
@@ -36,7 +34,7 @@ public class OrderedScrambles {
         String competitionStartString = wh.getEarlierActivityString();
         
         for (JsonElement venue : wh.getVenues()) {
-            String venueName = wh.getVenueName(venue);
+            String venueName = wh.getSafeVenueName(venue);
                         
             DateTimeZone timezone = wh.getTimeZone(venue);
             DateTime competitionStartDate = new DateTime(competitionStartString, timezone);
@@ -48,7 +46,7 @@ public class OrderedScrambles {
                 ArrayList<Integer> dayList = new ArrayList<Integer>();
                 ArrayList<ArrayList<ScrambleRequest>> scrambleRequestListByDay = new ArrayList<ArrayList<ScrambleRequest>>();
                 
-                String roomName = wh.getRoomName(room);
+                String roomName = wh.getSafeRoomName(room);
                                 
                 for (JsonElement activity : wh.getActivities(room)) {
                     String activityCode = wh.getActivityCode(activity);
@@ -78,7 +76,7 @@ public class OrderedScrambles {
                         String pdfFileName = "Printing/Ordered Scrambles/";
 
                         if (hasMultipleVenues) {
-                            pdfFileName += venueName.replace('/', ' ')+"/";
+                            pdfFileName += venueName+"/";
                         }
 
                         if (hasMultipleDays || dayList.size() > 1) { // Double check, just in case.
@@ -90,20 +88,17 @@ public class OrderedScrambles {
                         // In addition to different folders, we stamp venue, day and room in the PDF's name
                         // to prevent different files with the same name.
                         if (hasMultipleVenues) {
-                            pdfFileName += " - " + venueName.replace('/', ' ');
+                            pdfFileName += " - " + venueName;
                         }
                         if (hasMultipleDays || dayList.size() > 1) {
                             pdfFileName += " - Day "+dayList.get(index);
                         }
                         
                         if (hasMultipleRooms) {
-                            pdfFileName += " - "+roomName.replace('/', ' ');
+                            pdfFileName += " - "+roomName;
                         }
                         pdfFileName += ".pdf";
                         
-                        // removing slashes may add double+ extra spaces
-                        pdfFileName = pdfFileName.replaceAll("\\s+", " ");
-
                         parameters.setFileNameInZip(pdfFileName);
                         zipOut.putNextEntry(null, parameters);
                         ScrambleRequest[] scrambleRequests = scrambleRequestListByDay.get(index).toArray(new ScrambleRequest[scrambleRequestListByDay.get(index).size()]);

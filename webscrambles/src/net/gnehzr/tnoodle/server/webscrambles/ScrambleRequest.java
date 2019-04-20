@@ -159,11 +159,10 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     public DateTime roundStartTime;
     
     // totalAttempt and attempt are useful for when we have multiple attempts split in the schedule.
-    // When not using ordered scrambles, we create an array of ScrambleRequest and
-    // the position in the array is related to the attempt, hence we can print attempt number (mainly for FMC and MBLD)
-    // and use, for example, scramble 1 or 3 (3 here is array.length)
-    // But when using ordered scrambles, each attempt is treated like an individual ScrambleRequest.
-    // We use totalAttempt as array.length and attempt as the position that scramble would be on the array.
+    // Usually, tnoodle prints scrambles for a ScrambleRequest iterating over ScrambleRequest.scrambles.
+    // So, if ScrambleRequest.scrambles.length == 3, tnoodle prints Scramble 1 of 3, Scramble 2 of 3 and Scramble 3 of 3.
+    // But for OrderedScrambles, these scrambles are split on the schedule, so we replace Scramble.scrambles = {Scramble.scrambles[attempt]}.
+    // To continue printing Scramble x of y, we use attempt as x and totalAttempt as y.
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -1312,7 +1311,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     }
 
     private static final String INVALID_CHARS = "\\/:*?\"<>|";
-    private static String toFileSafeString(String unsafe) {
+    public static String toFileSafeString(String unsafe) {
         for(int i = 0; i < INVALID_CHARS.length(); i++) {
             String invalidChar = Pattern.quote("" + INVALID_CHARS.charAt(i));
             unsafe = unsafe.replaceAll(invalidChar, "");

@@ -15,7 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class WCIFHandler {
+public class WCIFHelper {
     
     // Currently, we mark not cubing related activities as other-lunch or other-speech, for example.
     // If we ever accept any other such ignorable key, it should be added here.
@@ -25,7 +25,7 @@ public class WCIFHandler {
     private JsonObject schedule;
     private JsonParser parser;
 
-    public WCIFHandler(LinkedHashMap<String, String> query) {
+    public WCIFHelper(LinkedHashMap<String, String> query) {
         parser = new JsonParser();
         schedule = parser.parse(query.get("schedule")).getAsJsonObject();
         
@@ -56,16 +56,16 @@ public class WCIFHandler {
         return activity.getAsJsonObject().get("startTime").getAsString();
     }
     
-    public String getVenueName(JsonElement venue) {
-        return parseMarkdown(venue.getAsJsonObject().get("name").getAsString());
+    public String getSafeVenueName(JsonElement venue) {
+        return ScrambleRequest.toFileSafeString(parseMarkdown(venue.getAsJsonObject().get("name").getAsString()));
     }
     
     public boolean hasMultipleRooms(JsonElement venue) {
         return venue.getAsJsonObject().getAsJsonArray("rooms").size()>1;
     }
     
-    public String getRoomName(JsonElement room) {
-        return parseMarkdown(room.getAsJsonObject().get("name").getAsString());
+    public String getSafeRoomName(JsonElement room) {
+        return ScrambleRequest.toFileSafeString(parseMarkdown(room.getAsJsonObject().get("name").getAsString()));
     }
     
     public String getActivityCode(JsonElement activity) {
