@@ -241,8 +241,13 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
                 sendBytes(request, response, totalPdfOutput, "application/pdf");
             } else if (extension.equals("zip")) {
+                
+                String generationUrl = query.get("generationUrl");
+                String schedule = query.get("schedule");
+                WCIFHelper wcifHelper = new WCIFHelper(schedule, scrambleRequests);
+                
                 ByteArrayOutputStream zipOutput = ScrambleRequest
-                        .requestsToZip(getServletContext(), globalTitle, generationDate, query);
+                        .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl, wcifHelper);
 
                 String safeTitle = globalTitle.replaceAll("\"", "'");
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");

@@ -1,11 +1,9 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
-import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -21,15 +19,26 @@ public class WCIFHelper {
     // If we ever accept any other such ignorable key, it should be added here.
     private static final String[] wcifIgnorableKeys = new String[]{"other"};
 
-    private ArrayList<ScrambleRequest> allScrambleRequests;
+    private ScrambleRequest[] allScrambleRequests;
     private JsonObject schedule;
     private JsonParser parser;
 
-    public WCIFHelper(LinkedHashMap<String, String> query) {
+    public WCIFHelper(String schedule, ScrambleRequest[] scrambleRequests) {
+        if (schedule == null) {
+            return;
+        }
         parser = new JsonParser();
-        schedule = parser.parse(query.get("schedule")).getAsJsonObject();
+        this.schedule = parser.parse(schedule).getAsJsonObject();
         
-        allScrambleRequests = new ArrayList<ScrambleRequest>(Arrays.asList(GSON.fromJson(query.get("sheets"), ScrambleRequest[].class)));
+        this.allScrambleRequests = scrambleRequests;
+    }
+    
+    public JsonObject getSchedule() {
+        return schedule;
+    }
+    
+    public ScrambleRequest[] getAllScrambleRequests() {
+        return allScrambleRequests;
     }
     
     public boolean hasMultipleDays() {

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -19,41 +18,49 @@ import com.google.gson.JsonElement;
 
 import com.itextpdf.text.DocumentException;
 
+import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
+
+
 public class OrderedScrambles {
     
     // TODO see https://github.com/thewca/tnoodle/issues/400
 
-    public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, LinkedHashMap<String, String> query) throws DocumentException, IOException, ZipException {
-        WCIFHelper wh = new WCIFHelper(query);
+    public static void generateOrderedScrambles(String globalTitle, Date generationDate, ZipOutputStream zipOut, ZipParameters parameters, WCIFHelper wcifHelper) throws DocumentException, IOException, ZipException {
+        
+        if (wcifHelper == null || wcifHelper.getSchedule() == null) {
+            return;
+        }
+        
+        azzert(wcifHelper.getAllScrambleRequests() != null, "There should be scramble requests.");
 
-        boolean hasMultipleDays = wh.hasMultipleDays();
-        boolean hasMultipleVenues = wh.hasMultipleVenues();
+        boolean hasMultipleDays = wcifHelper.hasMultipleDays();
+        boolean hasMultipleVenues = wcifHelper.hasMultipleVenues();
         
         // We consider the competition start date as the earlier activity from the schedule.
         // This prevents miscalculation of dates for multiple timezones.
-        String competitionStartString = wh.getEarlierActivityString();
+        String competitionStartString = wcifHelper.getEarlierActivityString();
         
-        for (JsonElement venue : wh.getVenues()) {
-            String venueName = wh.getSafeVenueName(venue);
+        for (JsonElement venue : wcifHelper.getVenues()) {
+            String venueName = wcifHelper.getSafeVenueName(venue);
                         
-            DateTimeZone timezone = wh.getTimeZone(venue);
+            DateTimeZone timezone = wcifHelper.getTimeZone(venue);
             DateTime competitionStartDate = new DateTime(competitionStartString, timezone);
             
-            boolean hasMultipleRooms = wh.hasMultipleRooms(venue);
+            boolean hasMultipleRooms = wcifHelper.hasMultipleRooms(venue);
 
-            for (JsonElement room : wh.getRooms(venue)) {
+            for (JsonElement room : wcifHelper.getRooms(venue)) {
 
                 ArrayList<Integer> dayList = new ArrayList<Integer>();
                 ArrayList<ArrayList<ScrambleRequest>> scrambleRequestListByDay = new ArrayList<ArrayList<ScrambleRequest>>();
                 
-                String roomName = wh.getSafeRoomName(room);
+                String roomName = wcifHelper.getSafeRoomName(room);
                                 
-                for (JsonElement activity : wh.getActivities(room)) {
-                    String activityCode = wh.getActivityCode(activity);
+                for (JsonElement activity : wcifHelper.getActivities(room)) {
+                    String activityCode = wcifHelper.getActivityCode(activity);
 
-                    for (ScrambleRequest scrambleRequest : wh.getScrambleRequests(activityCode)) {
+                    for (ScrambleRequest scrambleRequest : wcifHelper.getScrambleRequests(activityCode)) {
 
-                        DateTime activityStartTime = wh.getActivityStartTime(activity, timezone);
+                        DateTime activityStartTime = wcifHelper.getActivityStartTime(activity, timezone);
 
                         int activityDay = Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), activityStartTime.withTimeAtStartOfDay()).getDays()+1;
                         
