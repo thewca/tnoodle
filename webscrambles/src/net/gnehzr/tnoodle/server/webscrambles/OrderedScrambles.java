@@ -75,6 +75,11 @@ public class OrderedScrambles {
                     }
                 }
 
+                // hasMultipleDays gets a variable assigned on the competition creation using the website's form.
+                // Online schedule fit to it and the user should not be able to put events outside it, but we double check here.
+                // The next assignment fix possible mistakes (eg. a competition is assigned with 1 day, but events are spread among 2 days).
+                hasMultipleDays = hasMultipleDays || dayList.size() > 1;
+
                 for (int index = 0; index<dayList.size(); index++) {
                     if (scrambleRequestListByDay.get(index).size()>0) {
                         
@@ -97,7 +102,8 @@ public class OrderedScrambles {
                         if (hasMultipleVenues) {
                             pdfFileName += " - " + venueName;
                         }
-                        if (hasMultipleDays || dayList.size() > 1) {
+                        
+                        if (hasMultipleDays) {
                             pdfFileName += " - Day "+dayList.get(index);
                         }
                         

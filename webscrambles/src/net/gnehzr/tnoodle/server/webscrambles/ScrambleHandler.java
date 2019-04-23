@@ -75,7 +75,6 @@ public class ScrambleHandler extends SafeHttpServlet {
             } else if(ext.equals("zip")) {
                 ScrambleRequest[] scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed);
                 
-                System.out.println("Zip no handler");
                 ByteArrayOutputStream baosZip = ScrambleRequest
                         .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, seed, generationUrl, null);
                 sendBytes(request, response, baosZip, "application/zip");
