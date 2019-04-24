@@ -223,12 +223,10 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             }
             query = parseQuery(body.toString());
 
-            String json = query.get("sheets");
-            ScrambleRequest[] scrambleRequests = GSON.fromJson(json, ScrambleRequest[].class);
+            ScrambleRequest[] scrambleRequests = GSON.fromJson(query.get("sheets"), ScrambleRequest[].class);
 
             String password = query.get("password");
-            String generationUrl = query.get("generationUrl");
-
+            
             Date generationDate = new Date();
             String globalTitle = name;
 
@@ -243,8 +241,14 @@ public class ScrambleViewHandler extends SafeHttpServlet {
 
                 sendBytes(request, response, totalPdfOutput, "application/pdf");
             } else if (extension.equals("zip")) {
+                
+                String generationUrl = query.get("generationUrl");
+                String schedule = query.get("schedule");
+                WCIFHelper wcifHelper = new WCIFHelper(schedule, scrambleRequests);
+                
                 ByteArrayOutputStream zipOutput = ScrambleRequest
-                        .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl);
+                        .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl, wcifHelper);
+
                 String safeTitle = globalTitle.replaceAll("\"", "'");
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
                 sendBytes(request, response, zipOutput, "application/zip");

@@ -50,6 +50,7 @@ import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.util.XMLResourceDescriptor;
+import org.joda.time.DateTime;
 import org.w3c.dom.svg.SVGDocument;
 
 import javax.servlet.ServletContext;
@@ -83,7 +84,7 @@ import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.*;
 import static net.gnehzr.tnoodle.server.webscrambles.Translate.translate;
 
-class ScrambleRequest {
+class ScrambleRequest implements Comparable<ScrambleRequest> {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
     private static final String HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html";
     private static final int MAX_SCRAMBLES_PER_PAGE = 7;
@@ -153,6 +154,15 @@ class ScrambleRequest {
     public String title;
     public boolean fmc;
     public HashMap<String, Color> colorScheme;
+    public int totalAttempt;
+    public int attempt;
+    public DateTime roundStartTime;
+    
+    // totalAttempt and attempt are useful for when we have multiple attempts split in the schedule.
+    // Usually, tnoodle prints scrambles for a ScrambleRequest iterating over ScrambleRequest.scrambles.
+    // So, if ScrambleRequest.scrambles.length == 3, tnoodle prints Scramble 1 of 3, Scramble 2 of 3 and Scramble 3 of 3.
+    // But for OrderedScrambles, these scrambles are split on the schedule, so we replace Scramble.scrambles = {Scramble.scrambles[attempt]}.
+    // To continue printing Scramble x of y, we use attempt as x and totalAttempt as y.
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -257,6 +267,9 @@ class ScrambleRequest {
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
         // rather than 1 sheet per round (as we do with every other event).
+        
+        // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
+        // to fix this, we pass the attempt number
         boolean is333mbf = scrambleRequest.event.equals("333mbf");
         if(is333mbf) {
             Document doc = new Document();
@@ -275,7 +288,7 @@ class ScrambleRequest {
                 attemptRequest.extraScrambles = new String[0];
                 attemptRequest.scrambler = scrambleRequest.scrambler;
                 attemptRequest.copies = scrambleRequest.copies;
-                attemptRequest.title = scrambleRequest.title + " Attempt " + nthAttempt;
+                attemptRequest.title = scrambleRequest.title + " Attempt " + (scrambleRequest.attempt>1? scrambleRequest.attempt: nthAttempt);
                 attemptRequest.fmc = false;
                 attemptRequest.event = "333bf";
                 attemptRequest.colorScheme = scrambleRequest.colorScheme;
@@ -597,7 +610,7 @@ class ScrambleRequest {
 
         int fontSize = 15;
         int margin = 5;
-        boolean showScrambleCount = withScramble && scrambleRequest.scrambles.length > 1;
+        boolean showScrambleCount = withScramble && (scrambleRequest.scrambles.length > 1 || scrambleRequest.totalAttempt > 1);
 
         Rectangle competitorInfoRect = new Rectangle(competitorInfoLeft+margin, top, right-margin, competitorInfoBottom);
         Rectangle gradeRect = new Rectangle(competitorInfoLeft+margin, competitorInfoBottom, right-margin, gradeBottom);
@@ -617,11 +630,16 @@ class ScrambleRequest {
             alignList.add(Element.ALIGN_CENTER);
 
             if(showScrambleCount) {
+                
+                if (scrambleRequest.totalAttempt > 1) { // this is for ordered scrambles
+                    index = Math.max(scrambleRequest.attempt-1, index);
+                } else {
+                    scrambleRequest.totalAttempt = scrambleRequest.scrambles.length;
+                }
 
                 HashMap<String, String> substitutions = new HashMap<String, String>();
                 substitutions.put("scrambleIndex", ""+(index+1));
-                substitutions.put("scrambleCount", ""+(scrambleRequest.scrambles.length));
-
+                substitutions.put("scrambleCount", ""+(scrambleRequest.totalAttempt));
                 list.add(translate("fmc.scrambleXofY", locale, substitutions));
                 alignList.add(Element.ALIGN_CENTER);
             }
@@ -1293,7 +1311,7 @@ class ScrambleRequest {
     }
 
     private static final String INVALID_CHARS = "\\/:*?\"<>|";
-    private static String toFileSafeString(String unsafe) {
+    public static String toFileSafeString(String unsafe) {
         for(int i = 0; i < INVALID_CHARS.length(); i++) {
             String invalidChar = Pattern.quote("" + INVALID_CHARS.charAt(i));
             unsafe = unsafe.replaceAll(invalidChar, "");
@@ -1315,7 +1333,7 @@ class ScrambleRequest {
         return builder.toString();
     }
 
-    public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl) throws IOException, DocumentException, ZipException {
+    public static ByteArrayOutputStream requestsToZip(ServletContext context, String globalTitle, Date generationDate, ScrambleRequest[] scrambleRequests, String password, String generationUrl, WCIFHelper wcifHelper) throws IOException, DocumentException, ZipException {
         ByteArrayOutputStream baosZip = new ByteArrayOutputStream();
 
         ZipParameters parameters = new ZipParameters();
@@ -1529,6 +1547,8 @@ class ScrambleRequest {
             }
         }
 
+        OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, zipOut, parameters, wcifHelper);
+
         computerDisplayZipOut.finish();
         computerDisplayZipOut.close();
         parameters.setFileNameInZip(computerDisplayFileName + ".zip");
@@ -1570,6 +1590,9 @@ class ScrambleRequest {
         jsonObj.put("version", Utils.getProjectName() + "-" + Utils.getVersion());
         jsonObj.put("generationDate", generationDate);
         jsonObj.put("generationUrl", generationUrl);
+        if (wcifHelper != null) {
+            jsonObj.put("schedule", wcifHelper.getSchedule());
+        }
         String json = GSON.toJson(jsonObj);
         zipOut.write(json.getBytes());
         zipOut.closeEntry();
@@ -1656,5 +1679,10 @@ class ScrambleRequest {
 
         doc.close();
         return totalPdfOutput;
+    }
+    
+    @Override
+    public int compareTo(ScrambleRequest other) {
+        return this.roundStartTime.compareTo(other.roundStartTime);
     }
 }

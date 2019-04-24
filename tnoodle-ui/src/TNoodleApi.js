@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import formurlencoded from 'form-urlencoded';
+import * as WcaApi from 'WcaApi';
 
 // Copied and modified from webscrambles/WebContent/wca/scrambleserver.js
 var tnoodle = {};
@@ -77,14 +78,17 @@ tnoodle.Scrambler = function(baseUrl) {
         return scheme;
     };
 
-    this.showExt = function(title, scrambleRequest, password, ext, {target, doFetch}) {
-        var body = {}
+    this.showExt = function(title, scrambleRequest, password, ext, {target, doFetch}, competitionJson) {
+
+        var body = {};
         body.sheets = JSON.stringify(scrambleRequest);
         if(password) {
             body.password = password;
         }
         body.generationUrl = location.href;
         let url = that.viewUrl + encodeURIComponent(title) + '.' + ext;
+
+        body.schedule = JSON.stringify(competitionJson.schedule);
 
         if(doFetch) {
             return fetch(url, {
@@ -111,8 +115,8 @@ tnoodle.Scrambler = function(baseUrl) {
     this.showPdf = function(title, scrambleRequest, password, target) {
         return that.showExt(title, scrambleRequest, password, 'pdf', { target });
     };
-    this.fetchZip = function(title, scrambleRequest, password) {
-        return that.showExt(title, scrambleRequest, password, 'zip', { doFetch: true });
+    this.fetchZip = function(title, scrambleRequest, password, competitionJson) {
+        return that.showExt(title, scrambleRequest, password, 'zip', { doFetch: true }, competitionJson);
     }
     this.showZip = function(title, scrambleRequest, password, target) {
         return that.showExt(title, scrambleRequest, password, 'zip', { target });

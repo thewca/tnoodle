@@ -182,7 +182,7 @@ export function downloadScrambles({ pdf, password }) {
       return scrambler.showPdf(title, request, password, "_blank");
     } else {
       dispatch({ type: "BEGIN_FETCH_SCRAMBLE_ZIP" });
-      return scrambler.fetchZip(title, request, password).then(titleBlob => dispatch({
+      return scrambler.fetchZip(title, request, password, competitionJson).then(titleBlob => dispatch({
         type: "SCRAMBLE_ZIP_FETCHED",
         ...titleBlob,
       }));
