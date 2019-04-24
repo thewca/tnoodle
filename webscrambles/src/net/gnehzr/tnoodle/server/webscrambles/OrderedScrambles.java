@@ -91,7 +91,7 @@ public class OrderedScrambles {
                             pdfFileName += venueName+"/";
                         }
 
-                        if (hasMultipleDays || dayList.size() > 1) { // Double check, just in case.
+                        if (hasMultipleDays) {
                             pdfFileName += "Day "+dayList.get(index)+"/";
                         }
 
