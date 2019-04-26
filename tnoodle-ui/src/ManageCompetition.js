@@ -1,23 +1,23 @@
-import { connect } from 'react-redux';
-import React, { Component } from 'react';
+import { connect } from "react-redux";
+import React, { Component } from "react";
 
-import events from 'wca/events';
-import pluralize from 'pluralize';
-import { toWcaUrl } from 'WcaApi';
-import * as actions from 'actions';
-import CubingIcon from 'CubingIcon';
-import { NavigationAwareComponent } from 'App';
-import { fetchCompetitionJson } from 'actions';
-import { checkJson } from 'WcaCompetitionJson';
+import events from "wca/events";
+import pluralize from "pluralize";
+import { toWcaUrl } from "WcaApi";
+import * as actions from "actions";
+import CubingIcon from "CubingIcon";
+import { NavigationAwareComponent } from "App";
+import { fetchCompetitionJson } from "actions";
+import { checkJson } from "WcaCompetitionJson";
 
-import FaEye from 'react-icons/lib/fa/eye';
-import FaEyeSlash from 'react-icons/lib/fa/eye-slash';
+import FaEye from "react-icons/lib/fa/eye";
+import FaEyeSlash from "react-icons/lib/fa/eye-slash";
 
 class ManageCompetition extends Component {
   constructor() {
     super();
     this.state = {
-      showScramblePassword: false,
+      showScramblePassword: false
     };
   }
 
@@ -26,25 +26,30 @@ class ManageCompetition extends Component {
       puzzlesPer333mbfAttempt,
       isGeneratingScrambles,
       isGeneratingZip,
-      dispatch,
+      dispatch
     } = this.props;
 
-    return <React.Fragment>
-      <p>
-        This competition has {events.byId['333mbf'].name}. How many scrambles do you want for each attempt?
-      </p>
-      <p>
-        <input
-          type="number"
-          placeholder="How many puzzles do you expect people to attempt?"
-          disabled={isGeneratingScrambles || isGeneratingZip}
-          className="form-control"
-          value={puzzlesPer333mbfAttempt}
-          ref={input => this.puzzlesPerMbfAttemptInput = input}
-          onChange={e => dispatch(actions.setPuzzlesPer333mbfAttempt(e.target.value))}
-        />
-      </p>
-    </React.Fragment>;
+    return (
+      <React.Fragment>
+        <p>
+          This competition has {events.byId["333mbf"].name}. How many scrambles
+          do you want for each attempt?
+        </p>
+        <p>
+          <input
+            type="number"
+            placeholder="How many puzzles do you expect people to attempt?"
+            disabled={isGeneratingScrambles || isGeneratingZip}
+            className="form-control"
+            value={puzzlesPer333mbfAttempt}
+            ref={input => (this.puzzlesPerMbfAttemptInput = input)}
+            onChange={e =>
+              dispatch(actions.setPuzzlesPer333mbfAttempt(e.target.value))
+            }
+          />
+        </p>
+      </React.Fragment>
+    );
   }
 
   render() {
@@ -56,22 +61,28 @@ class ManageCompetition extends Component {
       puzzlesPer333mbfAttempt,
       isGeneratingScrambles,
       isGeneratingZip,
-      dispatch,
+      dispatch
     } = this.props;
-    if(loadCompetitionJsonError) {
+    if (loadCompetitionJsonError) {
       return (
-        <div>Error while loading competition! <code>{loadCompetitionJsonError.message}</code></div>
+        <div>
+          Error while loading competition!{" "}
+          <code>{loadCompetitionJsonError.message}</code>
+        </div>
       );
-    } else if(!competitionJson) {
-      return (
-        <div>Loading competition...</div>
-      );
+    } else if (!competitionJson) {
+      return <div>Loading competition...</div>;
     }
 
-    let { setsWithWrongNumberOfScrambles, warnings, scramblesNeededCount, currentScrambleCount } = checkJson(competitionJson);
+    let {
+      setsWithWrongNumberOfScrambles,
+      warnings,
+      scramblesNeededCount,
+      currentScrambleCount
+    } = checkJson(competitionJson);
 
     let setsWithWrongNumberOfScramblesDiv = null;
-    if(setsWithWrongNumberOfScrambles.length > 0) {
+    if (setsWithWrongNumberOfScrambles.length > 0) {
       setsWithWrongNumberOfScramblesDiv = (
         <div>
           <h2>Scramble sets with wrong number of scrambles</h2>
@@ -81,7 +92,7 @@ class ManageCompetition extends Component {
     }
 
     let warningsDiv = null;
-    if(warnings.length > 0) {
+    if (warnings.length > 0) {
       warningsDiv = (
         <div>
           <h2>Warnings</h2>
@@ -89,7 +100,8 @@ class ManageCompetition extends Component {
             {warnings.map(warning => {
               return (
                 <li key={warning.id}>
-                  {warning.eventId} Round {warning.roundNumber}: {warning.message}
+                  {warning.eventId} Round {warning.roundNumber}:{" "}
+                  {warning.message}
                 </li>
               );
             })}
@@ -100,39 +112,61 @@ class ManageCompetition extends Component {
 
     let { showScramblePassword } = this.state;
     let progress = currentScrambleCount / scramblesNeededCount;
-    let hasMbld = competitionJson.events.find(event => event.id === '333mbf');
+    let hasMbld = competitionJson.events.find(event => event.id === "333mbf");
+    let maxRounds = Math.max.apply(
+      Math,
+      competitionJson.events.map(event => event.rounds.length)
+    );
 
     let generationArea;
-    if(scrambleZip) {
-      generationArea = <a
+    if (scrambleZip) {
+      generationArea = (
+        <a
           className="btn btn-block btn-lg btn-primary"
           download={scrambleZip.title + ".zip"}
           href={scrambleZip.url}
           onClick={e => {
-            if(e.shiftKey) {
+            if (e.shiftKey) {
               e.preventDefault();
-              dispatch(actions.downloadScrambles({ pdf: true, password: scramblePassword }));
+              dispatch(
+                actions.downloadScrambles({
+                  pdf: true,
+                  password: scramblePassword
+                })
+              );
             }
           }}
         >
-        Download scrambles
-      </a>;
-    } else if(isGeneratingScrambles || isGeneratingZip) {
-      generationArea = <div className="progress scramble-generation">
-        <div className="progress-bar progress-bar-striped progress-bar-animated"
-             style={{width: Math.max(5, progress*100) + "%"}}>
-          {isGeneratingZip ? "Generating zip file..." : ""}
+          Download scrambles
+        </a>
+      );
+    } else if (isGeneratingScrambles || isGeneratingZip) {
+      generationArea = (
+        <div className="progress scramble-generation">
+          <div
+            className="progress-bar progress-bar-striped progress-bar-animated"
+            style={{ width: Math.max(5, progress * 100) + "%" }}
+          >
+            {isGeneratingZip ? "Generating zip file..." : ""}
+          </div>
         </div>
-      </div>;
+      );
     } else {
       let disabled, title;
       const WCA_MINIMUM_MBLD_PER_ATTEMPT = 2;
       // perhaps we should set also an upper bound to avoid numbers like 2e3
-      if(hasMbld && (!puzzlesPer333mbfAttempt || puzzlesPer333mbfAttempt < WCA_MINIMUM_MBLD_PER_ATTEMPT)) {
+      if (
+        hasMbld &&
+        (!puzzlesPer333mbfAttempt ||
+          puzzlesPer333mbfAttempt < WCA_MINIMUM_MBLD_PER_ATTEMPT)
+      ) {
         disabled = true;
-        title = `You must set a number of puzzles, at least ${WCA_MINIMUM_MBLD_PER_ATTEMPT}, to generate scrambles for ${events.byId['333mbf'].name}.`;
+        title = `You must set a number of puzzles, at least ${WCA_MINIMUM_MBLD_PER_ATTEMPT}, to generate scrambles for ${
+          events.byId["333mbf"].name
+        }.`;
       }
-      generationArea = <button
+      generationArea = (
+        <button
           className="btn btn-block btn-lg btn-primary"
           disabled={disabled}
           title={title}
@@ -140,23 +174,68 @@ class ManageCompetition extends Component {
             dispatch(actions.generateMissingScrambles());
           }}
         >
-        Generate scrambles
-      </button>;
+          Generate scrambles
+        </button>
+      );
     }
 
     return (
       <div className="manage-competition">
         <p>
-          Found {pluralize('event', competitionJson.events.length, true)} for {competitionJson.name}.
+          Found {pluralize("event", competitionJson.events.length, true)} for{" "}
+          {competitionJson.name}.
         </p>
         <div className="text-center">
-          {competitionJson.events.map(event => {
-            let title = `${pluralize('round', event.rounds.length, true)} of ${events.byId[event.id].name}`;
-            return <CubingIcon key={event.id} event={event.id} title={title} />
-          })}
+          <table className="table table-striped table-bordered table-hover table-condensed">
+            <thead className="thead-dark">
+              <tr>
+                <th scope="col">Event</th>
+                {Array.from(Array(maxRounds), (e, i) => {
+                  return (
+                    <th key={i} scope="col">
+                      Groups for Round {i + 1}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {competitionJson.events.map(event => {
+                return (
+                  <tr>
+                    <td>
+                      <CubingIcon key={event.id} event={event.id} />
+                    </td>
+                    {event.rounds.map(round => {
+                      return (
+                        <td className="align-middle">
+                          {round.scrambleSetCount}
+                        </td>
+                      );
+                    })}
+
+                    {/* Fill empty cells with --- */}
+                    {Array.from(Array(maxRounds - event.rounds.length), () => {
+                      return <td className="align-middle">---</td>;
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
         <p>
-          You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
+          You can view and change the rounds over on{" "}
+          <a
+            href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)}
+            target="_blank"
+          >
+            the WCA website
+          </a>
+          .{" "}
+          <strong>
+            Refresh this page after making any changes on the WCA website.
+          </strong>
         </p>
 
         {hasMbld && this._renderMbldArea()}
@@ -172,15 +251,21 @@ class ManageCompetition extends Component {
                   className="form-control"
                   placeholder="Password"
                   value={scramblePassword}
-                  ref={input => this.passwordInput = input}
-                  onChange={e => dispatch(actions.setScramblePassword(e.target.value))}
+                  ref={input => (this.passwordInput = input)}
+                  onChange={e =>
+                    dispatch(actions.setScramblePassword(e.target.value))
+                  }
                 />
                 <span
                   className="input-group-addon pointer"
-                  title={showScramblePassword ? "Hide password" : "Show password"}
+                  title={
+                    showScramblePassword ? "Hide password" : "Show password"
+                  }
                   onClick={() => {
                     this.passwordInput.focus();
-                    this.setState({ showScramblePassword: !showScramblePassword })
+                    this.setState({
+                      showScramblePassword: !showScramblePassword
+                    });
                   }}
                 >
                   {showScramblePassword ? <FaEye /> : <FaEyeSlash />}
@@ -189,9 +274,7 @@ class ManageCompetition extends Component {
             </div>
           </div>
 
-          <div className="col-6">
-            {generationArea}
-          </div>
+          <div className="col-6">{generationArea}</div>
         </div>
 
         {setsWithWrongNumberOfScramblesDiv}
@@ -201,19 +284,17 @@ class ManageCompetition extends Component {
   }
 }
 
-export default connect(
-  (state, ownProps) => {
-    return {
-      competitionId: ownProps.match.params.competitionId,
-      competitionJson: state.competitionJson,
-      loadCompetitionJsonError: state.loadCompetitionJsonError,
-      puzzlesPer333mbfAttempt: state.puzzlesPer333mbfAttempt,
-      isGeneratingScrambles: state.isGeneratingScrambles,
-      isGeneratingZip: state.isGeneratingZip,
-      scrambleZip: state.scrambleZip,
-    };
-  },
-)(
+export default connect((state, ownProps) => {
+  return {
+    competitionId: ownProps.match.params.competitionId,
+    competitionJson: state.competitionJson,
+    loadCompetitionJsonError: state.loadCompetitionJsonError,
+    puzzlesPer333mbfAttempt: state.puzzlesPer333mbfAttempt,
+    isGeneratingScrambles: state.isGeneratingScrambles,
+    isGeneratingZip: state.isGeneratingZip,
+    scrambleZip: state.scrambleZip
+  };
+})(
   class extends Component {
     componentWillMount() {
       this.props.dispatch(fetchCompetitionJson(this.props.competitionId));
@@ -224,10 +305,14 @@ export default connect(
     }
 
     render() {
-      return <div className="container">
-        <NavigationAwareComponent willNavigateAway={this.willNavigateAway.bind(this)} />
-        <ManageCompetition {...this.props} />
-      </div>;
+      return (
+        <div className="container">
+          <NavigationAwareComponent
+            willNavigateAway={this.willNavigateAway.bind(this)}
+          />
+          <ManageCompetition {...this.props} />
+        </div>
+      );
     }
   }
 );
