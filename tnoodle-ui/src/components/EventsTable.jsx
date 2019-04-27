@@ -13,8 +13,8 @@ class EventsTable extends Component {
         <table className="table table-striped table-bordered table-hover table-condensed">
           <thead className="thead-dark">
             <tr>
+              <th scope="col" />
               <th scope="col">Event</th>
-              <th scope="col">Event Name</th>
               {Array.from(Array(maxRounds), (e, i) => {
                 return (
                   <th key={i} scope="col">
