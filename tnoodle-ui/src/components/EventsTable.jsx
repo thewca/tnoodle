@@ -4,10 +4,7 @@ import CubingIcon from "../CubingIcon";
 class EventsTable extends Component {
   render() {
     const { events } = this.props;
-    let maxRounds = Math.max.apply(
-      Math,
-      events.map(event => event.rounds.length)
-    );
+    let maxRounds = Math.max(...events.map(event => event.rounds.length));
     return (
       <div className="text-center">
         <table className="table table-striped table-bordered table-hover table-condensed">
@@ -15,7 +12,7 @@ class EventsTable extends Component {
             <tr>
               <th scope="col" />
               <th scope="col">Event</th>
-              {Array.from(Array(maxRounds), (e, i) => {
+              {Array.from({ length: maxRounds }, (_, i) => {
                 return (
                   <th key={i} scope="col">
                     Groups for Round {i + 1}
@@ -26,19 +23,25 @@ class EventsTable extends Component {
           </thead>
           <tbody>
             {events.map(event => (
-              <tr>
+              <tr key={event.id}>
                 <td>
-                  <CubingIcon key={event.id} event={event.id} />
+                  <CubingIcon event={event.id} />
                 </td>
                 <td className="align-middle">{event.id}</td>
                 {event.rounds.map(round => (
-                  <td className="align-middle">{round.scrambleSetCount}</td>
+                  <td key={round.id} className="align-middle">
+                    {round.scrambleSetCount}
+                  </td>
                 ))}
-
-                {/* Fill empty cells with --- */}
-                {Array.from(Array(maxRounds - event.rounds.length), () => {
-                  return <td className="align-middle">-- -- --</td>;
-                })}
+                {/* Fill empty cells with -- -- -- */}
+                {Array.from(
+                  { length: maxRounds - event.rounds.length },
+                  (_, i) => (
+                    <td key={i} className="align-middle">
+                      -- -- --
+                    </td>
+                  )
+                )}
               </tr>
             ))}
           </tbody>
