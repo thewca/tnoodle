@@ -10,11 +10,13 @@ class EventsTable extends Component {
         <table className="table table-striped table-bordered table-hover table-condensed">
           <thead className="thead-dark">
             <tr>
-              <th scope="col" />
-              <th scope="col">Event</th>
+              <th className="align-middle" scope="col" />
+              <th className="align-middle" scope="col">
+                Event
+              </th>
               {Array.from({ length: maxRounds }, (_, i) => {
                 return (
-                  <th key={i} scope="col">
+                  <th className="align-middle" key={i} scope="col">
                     Scramble Sets for Round {i + 1}
                   </th>
                 );
