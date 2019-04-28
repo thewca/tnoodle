@@ -15,7 +15,7 @@ class EventsTable extends Component {
               {Array.from({ length: maxRounds }, (_, i) => {
                 return (
                   <th key={i} scope="col">
-                    Groups for Round {i + 1}
+                    Scramble Sets for Round {i + 1}
                   </th>
                 );
               })}
