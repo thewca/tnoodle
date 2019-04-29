@@ -5,10 +5,10 @@ import events from 'wca/events';
 import pluralize from 'pluralize';
 import { toWcaUrl } from 'WcaApi';
 import * as actions from 'actions';
-import CubingIcon from 'CubingIcon';
 import { NavigationAwareComponent } from 'App';
 import { fetchCompetitionJson } from 'actions';
 import { checkJson } from 'WcaCompetitionJson';
+import EventsTable from './components/EventsTable';
 
 import FaEye from 'react-icons/lib/fa/eye';
 import FaEyeSlash from 'react-icons/lib/fa/eye-slash';
@@ -149,12 +149,7 @@ class ManageCompetition extends Component {
         <p>
           Found {pluralize('event', competitionJson.events.length, true)} for {competitionJson.name}.
         </p>
-        <div className="text-center">
-          {competitionJson.events.map(event => {
-            let title = `${pluralize('round', event.rounds.length, true)} of ${events.byId[event.id].name}`;
-            return <CubingIcon key={event.id} event={event.id} title={title} />
-          })}
-        </div>
+        <EventsTable events = {competitionJson.events} />
         <p>
           You can view and change the rounds over on <a href={toWcaUrl(`/competitions/${competitionJson.id}/events/edit`)} target="_blank">the WCA website</a>. <strong>Refresh this page after making any changes on the WCA website.</strong>
         </p>
