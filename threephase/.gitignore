@@ -1,1 +1,8 @@
 CACHED_THREEPHASE_TABLES_DELETE_TO_RECREATE
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
