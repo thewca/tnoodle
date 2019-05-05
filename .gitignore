@@ -12,5 +12,7 @@ tmtc
 *.log.*
 node_modules/
 *.iml
+.gradle/
+.idea/
 
 webscrambles/WebContent/wca/new-ui/
