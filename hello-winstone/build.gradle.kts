@@ -8,13 +8,12 @@ description = "A very basic demo of a java servlet and a php page."
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
     implementation(project(":web-utils"))
-
-    implementation("com.h2database:h2:1.4.199")
+    implementation(project(":quercus"))
+    implementation(project(":winstone"))
 }
 
 application {
@@ -23,20 +22,4 @@ application {
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
-tasks {
-    val resourceRoot = sourceSets["main"].output.resourcesDir
-    val tnoodleResources = "$resourceRoot/tnoodle_resources"
-
-    val webInf = "$tnoodleResources/webapps/ROOT/WEB-INF"
-    val libDir = "$webInf/lib"
-    val classesDir = "$webInf/classes"
-
-    create<Copy>("copyStuff") {
-        delete(libDir)
-
-        into(libDir)
-        from(configurations.runtimeClasspath.get().exclude("tnoodle"))
-    }
 }
