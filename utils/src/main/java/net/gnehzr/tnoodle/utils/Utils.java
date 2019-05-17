@@ -5,15 +5,16 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -26,37 +27,22 @@ public final class Utils {
 
     private static final String RESOURCE_FOLDER = "tnoodle_resources";
     private static final String DEVEL_VERSION = "devel";
+
     public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
 
-    private Utils() {}
+    private Utils() {
+    }
 
     public static String throwableToString(Throwable e) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bytes));
+
         return bytes.toString();
     }
 
     public static void copyFile(File sourceFile, File destFile) throws IOException {
-        if(!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-        try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if(source != null) {
-                source.close();
-            }
-            if(destination != null) {
-                destination.close();
-            }
-        }
+        Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
-
 
     public static File getResourceDirectory() {
         return getResourceDirectory(true);
@@ -65,19 +51,23 @@ public final class Utils {
     private static File getResourceDirectory(boolean assertExists) {
         File f = new File(getProgramDirectory(), RESOURCE_FOLDER);
         String version = getVersion();
-        if(!version.equals(DEVEL_VERSION)) {
+
+        if (!version.equals(DEVEL_VERSION)) {
             // Each version of tnoodle extracts its resources
             // to its own subdirectory of RESOURCE_FOLDER
             f = new File(f, version);
         }
-        if(assertExists) {
-            if(!f.isDirectory()) {
+
+        if (assertExists) {
+            if (!f.isDirectory()) {
                 l.log(Level.SEVERE, f.getAbsolutePath() + " does not exist, or is not a directory!");
-                azzert(f.isDirectory());
+                azzert(false);
             }
         }
+
         return f;
     }
+
     /**
      * @return A File representing the directory in which this program resides.
      * If this is a jar file, this should be obvious, otherwise it's the directory in which
@@ -85,26 +75,28 @@ public final class Utils {
      */
     public static File getProgramDirectory() {
         File programDirectory = getJarFileOrDirectory();
-        if(programDirectory.isFile()) { //this should indicate a jar file
+
+        if (programDirectory.isFile()) { //this should indicate a jar file
             programDirectory = programDirectory.getParentFile();
         }
+
         return programDirectory;
     }
 
     private static Class<?> getCallerClass() {
-        Class<?> callerClass = null;
+        Class<?> callerClass;
         StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
         for (int i = 2; i < stElements.length; i++) {
             StackTraceElement ste = stElements[i];
             try {
                 callerClass = Class.forName(ste.getClassName());
-            } catch(ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 // Classes that are part of a web app were loaded with the
                 // servlet container's classloader, so we can't necessarily
                 // find them.
                 return null;
             }
-            if(!Utils.class.getPackage().equals(callerClass.getPackage())) {
+            if (!Utils.class.getPackage().equals(callerClass.getPackage())) {
                 return callerClass;
             }
         }
@@ -114,28 +106,33 @@ public final class Utils {
     private static File getJarFileOrDirectory() {
         Class<?> callerClass = getCallerClass();
 
-        if(callerClass == null) {
+        if (callerClass == null) {
             // We don't know where the class is (it was probably loaded
             // by the servlet container), so just use Util.
             callerClass = Utils.class;
         }
 
-        File programDirectory;
         try {
-            programDirectory = new File(callerClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            return new File(callerClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         } catch (URISyntaxException e) {
             return new File(".");
         }
-        return programDirectory;
     }
 
     public static File getJarFile() {
         File potentialJarFile = getJarFileOrDirectory();
-        if(potentialJarFile.isFile()) {
+
+        if (potentialJarFile.isFile()) {
             return potentialJarFile;
         }
+
         return null;
     }
+
+    /**
+     * Maximum loop count when creating temp directories.
+     */
+    private static final int TEMP_DIR_ATTEMPTS = 10000;
 
     /**
      * Copied from http://code.google.com/p/guava-libraries/source/browse/guava/src/com/google/common/io/Files.java from http://stackoverflow.com/questions/617414/create-a-temporary-directory-in-java
@@ -157,9 +154,6 @@ public final class Utils {
      * @return the newly-created directory
      * @throws IllegalStateException if the directory could not be created
      */
-    /** Maximum loop count when creating temp directories. */
-    private static final int TEMP_DIR_ATTEMPTS = 10000;
-
     public static File createTempDir() {
         // Calling renameTo() on something in java.io.tmpdir to something in
         // tnoodle_resources doesn't seem to work. We opt to just put temp folders
@@ -170,37 +164,42 @@ public final class Utils {
 
         for (int counter = 0; counter < TEMP_DIR_ATTEMPTS; counter++) {
             File tempDir = new File(baseDir, baseName + counter);
+
             if (tempDir.mkdir()) {
                 return tempDir;
             }
         }
+
         throw new IllegalStateException("Failed to create directory within "
-                + TEMP_DIR_ATTEMPTS + " attempts (tried "
-                + baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
+            + TEMP_DIR_ATTEMPTS + " attempts (tried "
+            + baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
     }
 
-    public static void doFirstRunStuff() throws FileNotFoundException, IOException {
+    public static void doFirstRunStuff() throws IOException {
         File jarFile = getJarFile();
 
-        if(jarFile != null) {
+        if (jarFile != null) {
             File resourceDirectory = getResourceDirectory(false);
-            if(resourceDirectory.isDirectory()) {
+
+            if (resourceDirectory.isDirectory()) {
                 // If the resource folder already exists, we don't bother re-extracting the
                 // files.
                 return;
             }
 
-
             File tempResourceDirectory = createTempDir();
+
             JarInputStream jarIs = new JarInputStream(new FileInputStream(jarFile));
             JarEntry entry;
+
             byte[] buf = new byte[1024];
-            while((entry = jarIs.getNextJarEntry()) != null) {
-                if(entry.isDirectory()) {
+
+            while ((entry = jarIs.getNextJarEntry()) != null) {
+                if (entry.isDirectory()) {
                     continue;
                 }
 
-                if(entry.getName().startsWith(RESOURCE_FOLDER)) {
+                if (entry.getName().startsWith(RESOURCE_FOLDER)) {
                     // Remove the leading RESOURCE_FOLDER from the filename,
                     // so we can put it in resourceDirectory directly.
                     String destName = entry.getName().substring(RESOURCE_FOLDER.length());
@@ -225,31 +224,37 @@ public final class Utils {
     public static String getProjectName() {
         Package p = Utils.class.getPackage();
         String name = p.getImplementationTitle();
-        if(name == null) {
-            name = getCallerClass().getName();
+
+        if (name == null) {
+            return getCallerClass().getName();
         }
+
         return name;
     }
 
     public static String getVersion() {
         Package p = Utils.class.getPackage();
         String version = p.getImplementationVersion();
-        if(version == null) {
-            version = DEVEL_VERSION;
+
+        if (version == null) {
+            return DEVEL_VERSION;
         }
+
         return version;
     }
 
+    public static HashMap<String, String> parseQuery(String query) {
+        LinkedHashMap<String, String> queryMap = new LinkedHashMap<>();
 
-    public static LinkedHashMap<String, String> parseQuery(String query) {
-        LinkedHashMap<String, String> queryMap = new LinkedHashMap<String, String>();
-        if(query == null) {
+        if (query == null) {
             return queryMap;
         }
+
         String[] pairs = query.split("&");
-        for(String pair : pairs) {
+
+        for (String pair : pairs) {
             String[] key_value = pair.split("=");
-            if(key_value.length == 1) {
+            if (key_value.length == 1) {
                 queryMap.put(key_value[0], ""); // this allows for flags such as http://foo/blah?kill&burn
             } else {
                 try {
@@ -259,6 +264,7 @@ public final class Utils {
                 }
             }
         }
+
         return queryMap;
     }
 
@@ -267,24 +273,29 @@ public final class Utils {
     }
 
     public static File getWebappDir(String webappName) {
-        if(webappName == null) {
+        if (webappName == null) {
             webappName = "ROOT";
         }
+
         return new File(getWebappsDir(), webappName);
     }
 
     private static Random r;
+
     public static Random getSeededRandom() {
-        if(r != null) {
+        if (r != null) {
             return r;
         }
 
         String randSeedEnvVar = "TNOODLE_RANDSEED";
         String seed = System.getenv(randSeedEnvVar);
-        if(seed == null) {
+
+        if (seed == null) {
             seed = "" + System.currentTimeMillis();
         }
+
         System.out.println("Using TNOODLE_RANDSEED=" + seed);
+
         r = new Random(seed.hashCode());
         return r;
     }
