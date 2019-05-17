@@ -20,11 +20,11 @@
     </rule>
     <rule>
         <from>^/scramble/static</from>
-        <to type="forward">/wca/new-ui/static</to>
+        <to>/wca/new-ui/static</to>
     </rule>
     <rule>
         <from>^/scramble/[^.]*$</from>
-        <to type="forward">/wca/new-ui/index.html</to>
+        <to>/wca/new-ui/index.html</to>
     </rule>
 
     <rule>
@@ -33,16 +33,16 @@
     </rule>
     <rule>
         <from>^/scramble-legacy/$</from>
-        <to type="forward">/wca/scramblegen.html</to>
+        <to>/wca/scramblegen.html</to>
     </rule>
 
     <rule>
         <from>^/readme$</from>
-        <to type="forward">/wca/readme-tnoodle.md</to>
+        <to>/wca/readme-tnoodle.md</to>
     </rule>
     <rule>
         <from>^/readme.md$</from>
-        <to type="forward">/wca/readme-tnoodle.md</to>
+        <to>/wca/readme-tnoodle.md</to>
     </rule>
 
 </urlrewrite>

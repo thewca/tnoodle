@@ -30,10 +30,9 @@ public class Translate {
     private static final HashMap<Locale, HashMap<String, ?>> TRANSLATIONS = new HashMap<Locale, HashMap<String, ?>>();
     static {
         HashMap<String, HashMap<String, ?>> translationsByLanguageTag = new HashMap<String, HashMap<String, ?>>();
-        File i18nDir = new File(Utils.getResourceDirectory(), "i18n");
+        File i18nDir = new File(Utils.getResourceDirectory(), "tnoodle_resources/i18n");
         File[] ymlFiles = i18nDir.listFiles();
         for(File ymlFile : ymlFiles) {
-            HashMap<String, ?> data = null;
             try {
                 Yaml yaml = new Yaml(new Constructor(HashMap.class));
                 deepMerge(translationsByLanguageTag, yaml.load(new FileInputStream(ymlFile)));

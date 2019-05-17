@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +25,9 @@ public class ScrambleImporterHandler extends SafeHttpServlet {
     private final Pattern BOUNDARY_PATTERN = Pattern.compile("^.+boundary\\=(.+)$");
 
     @Override
-    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HashMap<String, String> query = parseQuery(request.getQueryString());
+
         if(request.getMethod().toLowerCase().equals("post")) {
             // TODO look into http://commons.apache.org/fileupload/using.html
             // we assume a POST means we're uploading a file
