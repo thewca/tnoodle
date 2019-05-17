@@ -241,7 +241,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     }
 
 
-    public static ScrambleRequest[] parseScrambleRequests(LinkedHashMap<String, String> query, String seed) throws UnsupportedEncodingException, InvalidScrambleRequestException {
+    public static ScrambleRequest[] parseScrambleRequests(Map<String, String> query, String seed) throws UnsupportedEncodingException, InvalidScrambleRequestException {
         ScrambleRequest[] scrambleRequests;
         if(query.size() == 0) {
             throw new InvalidScrambleRequestException("Must specify at least one scramble request");

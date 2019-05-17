@@ -5,17 +5,15 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.parseExtension;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,12 +51,12 @@ public class PuzzleListHandler extends SafeHttpServlet {
         puzzleInfosJSON = GSON.toJson(puzzleInfos);
     }
 
-    private Map<String, Object> getPuzzleInfo(LazyInstantiator<Puzzle> lazyScrambler, boolean includeStatus) throws InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, MalformedURLException, BadLazyClassDescriptionException, LazyInstantiatorException {
+    private Map<String, Object> getPuzzleInfo(LazyInstantiator<Puzzle> lazyScrambler, boolean includeStatus) throws LazyInstantiatorException {
         Puzzle scrambler = lazyScrambler.cachedInstance();
         Map<String, Object> info = puzzleInfoByShortName.get(scrambler.getShortName());
         azzert(info != null);
         // info is unmodifiable, so we copy it
-        info = new HashMap<String, Object>(info);
+        info = new HashMap<>(info);
         if(includeStatus) {
             info.put("initializationStatus", scrambler.getInitializationStatus());
         }
@@ -66,7 +64,10 @@ public class PuzzleListHandler extends SafeHttpServlet {
     }
 
     @Override
-    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, BadLazyClassDescriptionException, LazyInstantiatorException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HashMap<String, String> query = parseQuery(request.getQueryString());
+        String[] path = parsePath(request.getPathInfo());
+
         boolean includeStatus = query.get("includeStatus") != null;
         if(path.length == 0) {
             sendError(request, response, "Please specify an extension (and optionally, a puzzle)");
@@ -78,32 +79,36 @@ public class PuzzleListHandler extends SafeHttpServlet {
                 sendError(request, response, "Please specify an extension");
                 return;
             }
-            SortedMap<String, LazyInstantiator<Puzzle>> scramblers = PuzzlePlugins.getScramblers();
-            if(extension.equals("json")) {
-                if(puzzle.equals("")) {
-                    if(includeStatus) {
-                        ArrayList<Map<String, Object>> puzzleInfosWithStatus = new ArrayList<Map<String, Object>>();
-                        for(Map<String, Object> puzzleInfo : puzzleInfos) {
-                            LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzleInfo.get("shortName"));
-                            azzert(lazyScrambler != null);
-                            puzzleInfosWithStatus.add(getPuzzleInfo(lazyScrambler, includeStatus));
+            try {
+                SortedMap<String, LazyInstantiator<Puzzle>> scramblers = PuzzlePlugins.getScramblers();
+                if(extension.equals("json")) {
+                    if(puzzle.equals("")) {
+                        if(includeStatus) {
+                            ArrayList<Map<String, Object>> puzzleInfosWithStatus = new ArrayList<>();
+                            for(Map<String, Object> puzzleInfo : puzzleInfos) {
+                                LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzleInfo.get("shortName"));
+                                azzert(lazyScrambler != null);
+                                puzzleInfosWithStatus.add(getPuzzleInfo(lazyScrambler, includeStatus));
+                            }
+                            sendJSON(request, response, GSON.toJson(puzzleInfosWithStatus));
+                        } else {
+                            sendJSON(request, response, puzzleInfosJSON);
                         }
-                        sendJSON(request, response, GSON.toJson(puzzleInfosWithStatus));
                     } else {
-                        sendJSON(request, response, puzzleInfosJSON);
+                        LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzle);
+                        if (lazyScrambler == null) {
+                            sendError(request, response, "Invalid scrambler: " + puzzle);
+                            return;
+                        }
+                        Map<String, Object> puzzleInfo = getPuzzleInfo(lazyScrambler, includeStatus);
+                        String puzzleInfoJSON = GSON.toJson(puzzleInfo);
+                        sendJSON(request, response, puzzleInfoJSON);
                     }
                 } else {
-                    LazyInstantiator<Puzzle> lazyScrambler = scramblers.get(puzzle);
-                    if (lazyScrambler == null) {
-                        sendError(request, response, "Invalid scrambler: " + puzzle);
-                        return;
-                    }
-                    Map<String, Object> puzzleInfo = getPuzzleInfo(lazyScrambler, includeStatus);
-                    String puzzleInfoJSON = GSON.toJson(puzzleInfo);
-                    sendJSON(request, response, puzzleInfoJSON);
+                    sendError(request, response, "Invalid extension: " + extension);
                 }
-            } else {
-                sendError(request, response, "Invalid extension: " + extension);
+            } catch (BadLazyClassDescriptionException | LazyInstantiatorException e) {
+                throw new ServletException(e);
             }
         }
     }

@@ -27,10 +27,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,7 +68,6 @@ public class ScrambleViewHandler extends SafeHttpServlet {
     public ScrambleViewHandler() throws IOException, BadLazyClassDescriptionException {
         this.scramblers = PuzzlePlugins.getScramblers();
     }
-
 
     // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
     class BufferedImageTranscoder extends ImageTranscoder {
@@ -118,7 +115,10 @@ public class ScrambleViewHandler extends SafeHttpServlet {
     }
 
     @Override
-    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws ServletException, IOException, IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, DocumentException, ZipException, BadLazyClassDescriptionException, LazyInstantiatorException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, IllegalArgumentException, SecurityException, ServletException {
+        String[] path = parsePath(request.getPathInfo());
+        HashMap<String, String> query = parseQuery(request.getQueryString());
+
         if (path.length == 0) {
             sendError(request, response, "Please specify a puzzle.");
             return;
@@ -138,7 +138,12 @@ public class ScrambleViewHandler extends SafeHttpServlet {
                 sendError(request, response, "Invalid scrambler: " + puzzle);
                 return;
             }
-            Puzzle scrambler = lazyScrambler.cachedInstance();
+            Puzzle scrambler;
+            try {
+                scrambler = lazyScrambler.cachedInstance();
+            } catch (LazyInstantiatorException e) {
+                throw new ServletException(e);
+            }
             HashMap<String, Color> colorScheme = scrambler
                     .parseColorScheme(query.get("scheme"));
             String scramble = query.get("scramble");
@@ -231,27 +236,35 @@ public class ScrambleViewHandler extends SafeHttpServlet {
             String globalTitle = name;
 
             if (extension.equals("pdf")) {
-                ByteArrayOutputStream totalPdfOutput = ScrambleRequest
-                        .requestsToPdf(globalTitle, generationDate, scrambleRequests, password);
-                response.setHeader("Content-Disposition", "inline");
+                try {
+                    ByteArrayOutputStream totalPdfOutput = ScrambleRequest
+                            .requestsToPdf(globalTitle, generationDate, scrambleRequests, password);
+                    response.setHeader("Content-Disposition", "inline");
 
-                // Workaround for Chrome bug with saving PDFs:
-                //  https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
-                response.setHeader("Cache-Control", "public");
+                    // Workaround for Chrome bug with saving PDFs:
+                    //  https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
+                    response.setHeader("Cache-Control", "public");
 
-                sendBytes(request, response, totalPdfOutput, "application/pdf");
+                    sendBytes(request, response, totalPdfOutput, "application/pdf");
+                } catch (DocumentException e) {
+                    throw new ServletException(e);
+                }
             } else if (extension.equals("zip")) {
-                
+
                 String generationUrl = query.get("generationUrl");
                 String schedule = query.get("schedule");
                 WCIFHelper wcifHelper = new WCIFHelper(schedule, scrambleRequests);
-                
-                ByteArrayOutputStream zipOutput = ScrambleRequest
-                        .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl, wcifHelper);
 
-                String safeTitle = globalTitle.replaceAll("\"", "'");
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
-                sendBytes(request, response, zipOutput, "application/zip");
+                try {
+                    ByteArrayOutputStream zipOutput = ScrambleRequest
+                            .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, password, generationUrl, wcifHelper);
+
+                    String safeTitle = globalTitle.replaceAll("\"", "'");
+                    response.setHeader("Content-Disposition", "attachment; filename=\"" + safeTitle + ".zip\"");
+                    sendBytes(request, response, zipOutput, "application/zip");
+                } catch (DocumentException | ZipException e) {
+                    throw new ServletException(e);
+                }
             } else {
                 azzert(false);
             }

@@ -120,7 +120,7 @@ public class WCIFHelper {
     
     public ArrayList<ScrambleRequest> getScrambleRequests(String activityCode) {
         
-        ArrayList<ScrambleRequest> scrambleRequests = new ArrayList<ScrambleRequest>();
+        ArrayList<ScrambleRequest> scrambleRequests = new ArrayList<>();
         
         int round = 0;
         int group = 0;
@@ -153,7 +153,7 @@ public class WCIFHelper {
 
         // Then, we start removing, iterating over a copy, removing from original.
         if (round > 0) {
-            for (ScrambleRequest scrambleRequest : new ArrayList<ScrambleRequest>(scrambleRequests)) {
+            for (ScrambleRequest scrambleRequest : new ArrayList<>(scrambleRequests)) {
                 if (scrambleRequest.round != round) {
                     scrambleRequests.remove(scrambleRequest);
                 }
@@ -161,7 +161,7 @@ public class WCIFHelper {
         }
 
         if (group > 0) {
-            for (ScrambleRequest scrambleRequest : new ArrayList<ScrambleRequest>(scrambleRequests)) {
+            for (ScrambleRequest scrambleRequest : new ArrayList<>(scrambleRequests)) {
                 if (!compareLettersCharToNumber(scrambleRequest.group, group)) {
                     scrambleRequests.remove(scrambleRequest);
                 }
@@ -169,7 +169,7 @@ public class WCIFHelper {
         }
 
         if (attempt > 0) {
-            ArrayList<ScrambleRequest> temp = new ArrayList<ScrambleRequest>();
+            ArrayList<ScrambleRequest> temp = new ArrayList<>();
             for (ScrambleRequest scrambleRequest : scrambleRequests) {
                 ScrambleRequest attemptRequest = new ScrambleRequest();
                 attemptRequest.scrambles = new String[]{scrambleRequest.scrambles[attempt-1]};
@@ -187,7 +187,7 @@ public class WCIFHelper {
 
                 temp.add(attemptRequest);
             }
-            scrambleRequests = new ArrayList<ScrambleRequest>(temp);
+            scrambleRequests = new ArrayList<>(temp);
         }
         azzert(scrambleRequests.size() > 0, "An activity of the schedule did not match an event.");
         return scrambleRequests;

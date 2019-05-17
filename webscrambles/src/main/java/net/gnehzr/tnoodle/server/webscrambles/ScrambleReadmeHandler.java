@@ -63,8 +63,7 @@ public class ScrambleReadmeHandler extends SafeHttpServlet {
     }
 
     @Override
-    protected void wrappedService(HttpServletRequest request, HttpServletResponse response, String[] path, LinkedHashMap<String, String> query) throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
-        sendMarkdown(request, response, scramblesReadme);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        sendMarkdown(req, resp, scramblesReadme);
     }
-
 }
