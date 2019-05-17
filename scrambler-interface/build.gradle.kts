@@ -1,5 +1,9 @@
+import configurations.Server.configureWinstonePlugin
+
 plugins {
-    war
+    java
 }
 
 description = "A generic competition scramble generator interface."
+
+configureWinstonePlugin()

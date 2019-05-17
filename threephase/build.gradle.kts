@@ -1,3 +1,5 @@
+import configurations.Languages.configureJava
+
 plugins {
     `java-library`
 }
@@ -8,6 +10,4 @@ dependencies {
     implementation(project(":min2phase"))
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
+configureJava()
