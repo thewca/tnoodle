@@ -1,9 +1,12 @@
+import configurations.Languages.configureJava
+
+import dependencies.Versions.GWT
+
 import org.wisepersist.gradle.plugins.gwt.Style
 
 plugins {
     java
-    war
-    id("gwt") version "1.0.8"
+    GWT
 }
 
 description = "Compiles the scramble java code to javascript using GWT."
@@ -13,21 +16,19 @@ repositories {
 }
 
 dependencies {
-    gwt(project(":scrambles"))
+    gwt(files("$projectDir/src/main/java"))
 
     val dependentSourceProjects = listOf("scrambles", "svglite", "utils", "min2phase", "sq12phase", "threephase")
 
     for (depProject in dependentSourceProjects) {
-        gwt(files("../$depProject/src/main/java"))
+        gwt(files("$rootDir/$depProject/src/main/java"))
     }
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
+configureJava()
 
-gwt {
-    gwtVersion = "2.5.1"
+gwt { // TODO move this configuration up to buildSrc
+    gwtVersion = GWT
 
     modules("scrambles")
 

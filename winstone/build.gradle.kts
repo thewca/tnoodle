@@ -1,7 +1,12 @@
+import configurations.Languages.configureJava
+
+import dependencies.Libraries.APPLEJAVAEXTENSIONS
+import dependencies.Libraries.NATIVE_TRAY_ADAPTER
+import dependencies.Libraries.URLREWRITEFILTER
+import dependencies.Libraries.WINSTONE
+
 plugins {
-    java
-    application
-    id("com.github.johnrengelman.shadow") version "5.0.0"
+    `java-library`
 }
 
 description = "Tiny embeddable webserver that implements the java servlet spec."
@@ -11,19 +16,13 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":web-utils"))
+    api(project(":web-utils"))
 
-    implementation("net.sourceforge.winstone:winstone:0.9.10")
+    implementation(WINSTONE)
 
-    implementation("com.github.taksan:native-tray-adapter:1.2-SNAPSHOT")
-    implementation("com.apple:AppleJavaExtensions:1.4")
-    implementation("org.tuckey:urlrewritefilter:4.0.3")
+    implementation(NATIVE_TRAY_ADAPTER)
+    implementation(APPLEJAVAEXTENSIONS)
+    implementation(URLREWRITEFILTER)
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
-application {
-    mainClassName = "net.gnehzr.tnoodle.server.TNoodleServer"
-}
+configureJava()

@@ -1,5 +1,9 @@
+import configurations.Server.configureWinstonePlugin
+
 plugins {
-    war
+    java
 }
 
 description = "mootools js library"
+
+configureWinstonePlugin()

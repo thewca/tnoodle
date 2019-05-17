@@ -1,3 +1,9 @@
+import configurations.Languages.configureJava
+import configurations.Server.configureWinstonePlugin
+
+import dependencies.Libraries.H2
+import dependencies.Libraries.QUERCUS
+
 plugins {
     `java-library`
 }
@@ -9,11 +15,10 @@ repositories {
 }
 
 dependencies {
-    runtime("com.h2database:h2:1.4.199")
-    runtime("com.caucho:quercus:4.0.60")
+    runtime(H2)
+    runtime(QUERCUS)
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
+configureJava()
+configureWinstonePlugin()
 

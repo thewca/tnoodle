@@ -1,3 +1,8 @@
+import configurations.Languages.configureJava
+
+import dependencies.Libraries.JAVAX_SERVLET_API
+import dependencies.Libraries.MARKDOWNJ_CORE
+
 plugins {
     `java-library`
 }
@@ -10,11 +15,9 @@ repositories {
 
 dependencies {
     api(project(":utils"))
-    api("javax.servlet:javax.servlet-api:4.0.1")
+    api(JAVAX_SERVLET_API)
 
-    implementation("org.markdownj:markdownj-core:0.4")
+    implementation(MARKDOWNJ_CORE)
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
+configureJava()

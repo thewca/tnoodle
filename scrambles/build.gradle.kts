@@ -1,3 +1,8 @@
+import configurations.Languages.configureJava
+
+import dependencies.Libraries.GWTEXPORTER
+import dependencies.Libraries.GWT_USER
+
 plugins {
     `java-library`
 }
@@ -16,10 +21,8 @@ dependencies {
     implementation(project(":threephase"))
     implementation(project(":sq12phase"))
 
-    implementation("com.google.gwt:gwt-user:2.5.1")
-    implementation("org.timepedia.exporter:gwtexporter:2.5.1")
+    implementation(GWT_USER)
+    implementation(GWTEXPORTER)
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
+configureJava()
