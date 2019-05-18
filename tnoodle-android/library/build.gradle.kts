@@ -6,39 +6,16 @@ plugins {
 }
 
 configure<AppExtension> {
-    compileSdkVersion(23)
+    compileSdkVersion(28)
 
     defaultConfig {
         minSdkVersion(8)
-        targetSdkVersion(23)
+        targetSdkVersion(28)
     }
+}
 
-    sourceSets {
-        getByName("main") {
-            java.apply {
-                srcDir("../../utils/src")
-                exclude("net/gnehzr/tnoodle/utils/Launcher.java")
-                exclude("net/gnehzr/tnoodle/utils/Launcher.java")
-                exclude("net/gnehzr/tnoodle/utils/TNoodleLogging.java")
-                exclude("net/gnehzr/tnoodle/utils/OneLineLogFormatter.java")
-                exclude("net/gnehzr/tnoodle/utils/GsonUtils.java")
-
-                srcDirs("../../sq12phase/src", "../../min2phase/src", "../../threephase/src")
-                exclude("cs/min2phase/MainProgram.java")
-
-                srcDir("../../scrambles/src")
-                exclude("net/gnehzr/tnoodle/js/**")
-                exclude("net/gnehzr/tnoodle/jre/**")
-                exclude("net/gnehzr/tnoodle/test/**")
-                exclude("net/gnehzr/tnoodle/scrambles/Main.java")
-                exclude("net/gnehzr/tnoodle/scrambles/PuzzleImageInfo.java")
-
-                srcDir("../../svglite/src")
-            }
-
-            resources.setSrcDirs(java.srcDirs)
-        }
-    }
+dependencies {
+    implementation(project(":scrambles"))
 }
 
 // build a jar with source files
