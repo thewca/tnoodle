@@ -1,17 +1,18 @@
+import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
 
 import dependencies.Libraries.JAVAX_SERVLET_API
 import dependencies.Libraries.MARKDOWNJ_CORE
 
+description = "Dumping ground for useful Java functions used by web servlets"
+
+attachRepositories()
+
 plugins {
     `java-library`
 }
 
-description="Dumping ground for useful Java functions used by web servlets"
-
-repositories {
-    mavenCentral()
-}
+configureJava()
 
 dependencies {
     api(project(":utils"))
@@ -19,5 +20,3 @@ dependencies {
 
     implementation(MARKDOWNJ_CORE)
 }
-
-configureJava()

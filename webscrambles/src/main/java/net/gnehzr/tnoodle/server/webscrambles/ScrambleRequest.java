@@ -109,15 +109,15 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
     private static HashMap<Locale, BaseFont> FONT_BY_LOCALE = new HashMap<Locale, BaseFont>();
     static {
         try {
-            monoFont = BaseFont.createFont("fonts/LiberationMono-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            monoFont = BaseFont.createFont("tnoodle_resources/fonts/LiberationMono-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-            BaseFont cjk = BaseFont.createFont("fonts/wqy-microhei.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            BaseFont cjk = BaseFont.createFont("tnoodle_resources/fonts/wqy-microhei.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             FONT_BY_LOCALE.put(Locale.forLanguageTag("zh-CN"), cjk);
             FONT_BY_LOCALE.put(Locale.forLanguageTag("zh-TW"), cjk);
             FONT_BY_LOCALE.put(Locale.forLanguageTag("ko"), cjk);
             FONT_BY_LOCALE.put(Locale.forLanguageTag("ja"), cjk);
 
-            notoSans = BaseFont.createFont("fonts/NotoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            notoSans = BaseFont.createFont("tnoodle_resources/fonts/NotoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         } catch (DocumentException e) {
             l.log(Level.INFO, "", e);
         } catch (IOException e) {

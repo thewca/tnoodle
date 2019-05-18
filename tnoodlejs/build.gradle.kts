@@ -1,19 +1,20 @@
+import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
 
 import dependencies.Versions.GWT
 
 import org.wisepersist.gradle.plugins.gwt.Style
 
+description = "Compiles the scramble java code to javascript using GWT."
+
+attachRepositories()
+
 plugins {
     java
     GWT
 }
 
-description = "Compiles the scramble java code to javascript using GWT."
-
-repositories {
-    mavenCentral()
-}
+configureJava()
 
 dependencies {
     gwt(files("$projectDir/src/main/java"))
@@ -25,9 +26,7 @@ dependencies {
     }
 }
 
-configureJava()
-
-gwt { // TODO move this configuration up to buildSrc
+gwt { // TODO move this configuration up to buildSrc perhaps?
     gwtVersion = GWT
 
     modules("scrambles")

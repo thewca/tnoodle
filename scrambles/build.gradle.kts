@@ -1,16 +1,15 @@
+import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
 
 import dependencies.Libraries.GWTEXPORTER
 import dependencies.Libraries.GWT_USER
 
-plugins {
-    `java-library`
-}
-
 description = "A Java scrambling suite. Java applications can use this project as a library. A perfect example of this is the webscrambles package."
 
-repositories {
-    mavenCentral()
+attachRepositories()
+
+plugins {
+    `java-library`
 }
 
 dependencies {
