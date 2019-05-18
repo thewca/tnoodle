@@ -86,7 +86,7 @@ public abstract class SafeHttpServlet extends HttpServlet {
 
         String extension = getExtension(request);
         if ("json".equals(extension)) {
-            HashMap<String, String> json = new HashMap<String, String>();
+            HashMap<String, String> json = new HashMap<>();
             json.put("error", error);
             sendJSON(request, response, GSON.toJson(json));
         } else {
