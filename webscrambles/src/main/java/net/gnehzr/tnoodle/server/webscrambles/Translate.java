@@ -24,13 +24,15 @@ public class Translate {
     private Translate() {}
 
     private static final Logger l = Logger.getLogger(Translate.class.getName());
+
     private static final Locale BASE_LOCALE = Locale.forLanguageTag("en");
     public static final Locale DEFAULT_LOCALE = Locale.forLanguageTag(EnvGetter.getenv("TNOODLE_DEFAULT_LOCALE", BASE_LOCALE.toLanguageTag()));
 
     private static final HashMap<Locale, HashMap<String, ?>> TRANSLATIONS = new HashMap<Locale, HashMap<String, ?>>();
+
     static {
         HashMap<String, HashMap<String, ?>> translationsByLanguageTag = new HashMap<String, HashMap<String, ?>>();
-        File i18nDir = new File(Utils.getResourceDirectory(), "tnoodle_resources/i18n");
+        File i18nDir = new File(Utils.getResourceDirectory(), "i18n");
         File[] ymlFiles = i18nDir.listFiles();
         for(File ymlFile : ymlFiles) {
             try {

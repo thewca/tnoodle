@@ -11,10 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Plugins<H> {
-    private HashMap<String, LazyInstantiator<H>> filePlugins = new HashMap<String, LazyInstantiator<H>>();
-    private HashMap<String, String> pluginComment = new HashMap<String, String>();
+    private HashMap<String, LazyInstantiator<H>> filePlugins;
+    private HashMap<String, String> pluginComment;
+
     public Plugins(String packageName, Class<H> pluginClass, ClassLoader classLoader) throws IOException, BadLazyClassDescriptionException {
-        if(classLoader == null) {
+        if (classLoader == null) {
             classLoader = getClass().getClassLoader();
         }
 
@@ -27,14 +28,17 @@ public class Plugins<H> {
 
         String line;
         String lastComment = null;
-        while((line = in.readLine()) != null) {
+
+        while ((line = in.readLine()) != null) {
             line = line.trim();
+
             // lines starting with # and empty lines are ignored
-            if(line.isEmpty()) {
+            if (line.isEmpty()) {
                 lastComment = null;
                 continue;
             }
-            if(line.startsWith("#")) {
+
+            if (line.startsWith("#")) {
                 lastComment = line.substring(1);
                 continue;
             }

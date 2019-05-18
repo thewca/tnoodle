@@ -4,6 +4,7 @@ import configurations.Server.configureWinstonePlugin
 import configurations.Server.configureEmbeddedRunnable
 
 import dependencies.Libraries.BATIK_ALL
+import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.JODA_TIME
 import dependencies.Libraries.SNAKEYAML
@@ -30,8 +31,11 @@ dependencies {
     implementation(ITEXTPDF)
     implementation(BATIK_ALL)
     implementation(SNAKEYAML)
+    implementation(BOUNCYCASTLE)
 
     "server"(project(":scrambler-interface"))
+
+    //runtime(project(":tnoodle-ui"))
 }
 
 configureEmbeddedRunnable()

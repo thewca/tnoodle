@@ -6,9 +6,17 @@ import org.gradle.api.plugins.ApplicationPluginConvention
 
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
+import org.w3c.dom.Document
+import org.xml.sax.InputSource
 import java.io.File
+import java.io.StringReader
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
 object Server {
     const val SERVER_MAIN = "net.gnehzr.tnoodle.server.TNoodleServer"
@@ -17,12 +25,11 @@ object Server {
     const val MERGING_SUFFIX = "TNOODLE_MERGED"
 
     fun Project.configureWinstonePlugin() {
-        configurations {
-            create("server")
+        configurations.create("server") {
+            configurations["implementation"].extendsFrom(this)
         }
 
         dependencies {
-            "implementation"(project(":winstone"))
             "server"(project(":winstone"))
         }
     }
@@ -41,9 +48,7 @@ object Server {
                 for ((name, xmlFiles) in groupedWebFiles) {
                     val targetFile = file("$rootFolder/$name.$MERGING_SUFFIX").apply { delete() }
 
-                    for (xmlFile in xmlFiles) { // TODO actual merging
-                        targetFile.appendText("${xmlFile.absolutePath}\n")
-                    }
+                    mergeWebXMLFiles(xmlFiles, targetFile)
                 }
 
                 for (dep in serverDependencies) {
@@ -96,4 +101,37 @@ object Server {
     }
 
     private fun Project.defaultResourcePath() = "$projectDir/src/main/resources"
+
+    private fun mergeWebXMLFiles(origFiles: List<File>, destFile: File) {
+        val foo = origFiles.map { it.parseAsXML() }
+            .reduce(this::mergeDocuments)
+
+        val input = DOMSource(foo)
+        val output = StreamResult(destFile)
+
+        TRANSFORMER.transform(input, output)
+    }
+
+    private fun mergeDocuments(acc: Document, next: Document): Document {
+        val nodeList = next.documentElement.childNodes
+
+        for (i in 0 until nodeList.length) {
+            val importNode = acc.importNode(nodeList.item(i), true)
+            acc.documentElement.appendChild(importNode)
+        }
+
+        return acc
+    }
+
+    private fun File.parseAsXML(): Document {
+        val xmlInput = InputSource(this.inputStream())
+
+        return DOCUMENT_BUILDER.parse(xmlInput)
+    }
+
+    private val DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance()
+    private val DOCUMENT_BUILDER = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder()
+
+    private val TRANSFORMER_FACTORY = TransformerFactory.newInstance()
+    private val TRANSFORMER = TRANSFORMER_FACTORY.newTransformer().apply { setOutputProperty(OutputKeys.INDENT, "yes") }
 }

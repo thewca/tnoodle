@@ -19,7 +19,8 @@ object Versions {
     val WINSTONE = "0.9.10"
     val NATIVE_TRAY_ADAPTER = "1.2-SNAPSHOT"
     val APPLEJAVAEXTENSIONS = "1.4"
-    val URLREWRITEFILTER = "4.0.3"
+    val URLREWRITEFILTER = "5.0.0-SNAPSHOT"
+    val BOUNCYCASTLE = "1.61"
 
     object Plugins {
         val SHADOW = "5.0.0"
