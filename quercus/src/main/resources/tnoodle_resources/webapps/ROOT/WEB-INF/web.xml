@@ -20,4 +20,33 @@
                 <url-pattern>*.php</url-pattern>
         </servlet-mapping>
 
+        <!-- H2 web console -->
+        <servlet>
+            <servlet-name>H2Console</servlet-name>
+            <servlet-class>org.h2.server.web.WebServlet</servlet-class>
+            <init-param>
+                <param-name>properties</param-name>
+                <param-value>null</param-value>
+            </init-param>
+            <!--
+            <init-param>
+                    <param-name>webAllowOthers</param-name>
+                    <param-value></param-value>
+            </init-param>
+            <init-param>
+                    <param-name>trace</param-name>
+                    <param-value></param-value>
+            </init-param>
+            -->
+            <load-on-startup>1</load-on-startup>
+        </servlet>
+        <servlet>
+            <servlet-name>InitializeH2Console</servlet-name>
+            <servlet-class>net.gnehzr.tnoodle.server.InitializeH2Console</servlet-class>
+            <load-on-startup>1</load-on-startup>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>H2Console</servlet-name>
+            <url-pattern>/h2/*</url-pattern>
+        </servlet-mapping>
 </web-app>

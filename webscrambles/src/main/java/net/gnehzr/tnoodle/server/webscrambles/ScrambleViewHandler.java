@@ -273,9 +273,15 @@ public class ScrambleViewHandler extends SafeHttpServlet {
         }
     }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        this.doGet(req, resp); // FIXME a bit hacky, is the get really needed? preferrably all code would be in doPost anyways
+    }
+
     static {
         GsonUtils.registerTypeAdapter(PuzzleImageInfo.class, new PuzzleImageInfoizer());
     }
+
     private static class PuzzleImageInfoizer implements JsonSerializer<PuzzleImageInfo> {
         @Override
         public JsonElement serialize(PuzzleImageInfo pii, Type typeOfT, JsonSerializationContext context) {

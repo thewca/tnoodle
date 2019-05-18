@@ -18,4 +18,5 @@ object Libraries {
     val NATIVE_TRAY_ADAPTER = "com.github.taksan:native-tray-adapter:${Versions.NATIVE_TRAY_ADAPTER}"
     val APPLEJAVAEXTENSIONS = "com.apple:AppleJavaExtensions:${Versions.APPLEJAVAEXTENSIONS}"
     val URLREWRITEFILTER = "org.tuckey:urlrewritefilter:${Versions.URLREWRITEFILTER}"
+    val BOUNCYCASTLE = "org.bouncycastle:bcprov-jdk15on:${Versions.BOUNCYCASTLE}"
 }

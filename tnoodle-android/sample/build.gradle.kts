@@ -13,6 +13,10 @@ configure<AppExtension> {
     }
 }
 
+repositories {
+    google()
+}
+
 dependencies {
     implementation("com.android.support:appcompat-v7:23.2.1")
     implementation("com.android.support:support-v4:23.2.1")

@@ -50,7 +50,7 @@ public class TNoodleServer {
 
     private static final int MIN_HEAP_SIZE_MEGS = 512;
 
-    private static final String ICONS_FOLDER = "tnoodle_resources/icons";
+    private static final String ICONS_FOLDER = "icons";
 
     private static final String ICON_WRAPPER = "tnoodle_logo_1024_gray.png";
     private static final String ICON_WORKER = "tnoodle_logo_1024.png";
