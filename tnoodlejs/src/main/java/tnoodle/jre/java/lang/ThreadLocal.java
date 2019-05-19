@@ -1,4 +1,4 @@
-package tnoodle.jre.java.lang;
+package java.lang;
 
 /*
  * This is an implementation of ThreadLocal for

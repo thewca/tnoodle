@@ -14,8 +14,13 @@ configure<LibraryExtension> {
     }
 }
 
+repositories {
+    jcenter()
+    google()
+}
+
 dependencies {
-    implementation(project(":scrambles"))
+    api(project(":scrambles"))
 }
 
 // build a jar with source files

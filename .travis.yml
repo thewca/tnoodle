@@ -19,6 +19,4 @@ before_install:
   - bundle install
   - (cd git-tools; npm install -d)
 script:
-  - ./tmt i18n check
-  - ./gradlew check
-  - ./gradlew generateOfficialJAR
+  - ./gradlew generateOfficialRelease

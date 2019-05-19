@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package tnoodle.js;
+package net.gnehzr.tnoodle.js;
 
 import java.io.OutputStream;
 import java.io.PrintStream;

@@ -2,7 +2,6 @@ package net.gnehzr.tnoodle.puzzle;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
-import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import org.junit.jupiter.api.Test;
 

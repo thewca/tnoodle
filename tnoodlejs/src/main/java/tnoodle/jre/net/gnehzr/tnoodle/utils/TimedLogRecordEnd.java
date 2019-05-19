@@ -1,4 +1,4 @@
-package tnoodle.jre.net.gnehzr.tnoodle.utils;
+package net.gnehzr.tnoodle.utils;
 
 import com.google.gwt.i18n.client.NumberFormat;
 

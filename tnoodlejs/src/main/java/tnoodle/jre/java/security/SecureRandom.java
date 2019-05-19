@@ -1,4 +1,4 @@
-package tnoodle.jre.java.security;
+package java.security;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;

@@ -1,4 +1,4 @@
-package tnoodle.jre.org.timepedia.exporter.client;
+package org.timepedia.exporter.client;
 
 public @interface ExportClosure {
 }

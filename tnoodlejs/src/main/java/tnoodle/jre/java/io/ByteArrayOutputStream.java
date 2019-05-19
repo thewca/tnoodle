@@ -1,4 +1,4 @@
-package tnoodle.jre.java.io;
+package java.io;
 
 public interface ByteArrayOutputStream {
 

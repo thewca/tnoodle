@@ -1,4 +1,4 @@
-package tnoodle.jre.net.gnehzr.tnoodle.utils;
+package net.gnehzr.tnoodle.utils;
 
 /*
  * This is in its own class so we can override it in gwt
