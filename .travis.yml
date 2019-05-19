@@ -19,4 +19,8 @@ before_install:
   - bundle install
   - (cd git-tools; npm install -d)
 script:
-  - ./gradlew generateOfficialRelease
+  #- ./tmt i18n check
+  #- ./tmt lint -a
+  - ./gradlew :webscrambles:deployOfficial
+  #- ./tmt make check
+  - (cd tnoodle-ui; yarn test)
