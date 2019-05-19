@@ -35,7 +35,11 @@ dependencies {
 
     "server"(project(":scrambler-interface"))
 
-    //runtime(project(":tnoodle-ui"))
+    runtime(project(":tnoodle-ui"))
 }
 
 configureEmbeddedRunnable()
+
+tasks.getByName("processResources") {
+    dependsOn(":tnoodle-ui:assemble")
+}

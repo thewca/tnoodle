@@ -3,6 +3,7 @@ package configurations
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
 import org.gradle.api.plugins.ApplicationPluginConvention
+import org.gradle.api.tasks.bundling.Jar
 
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -73,6 +74,15 @@ object Server {
 
         configure<ApplicationPluginConvention> {
             mainClassName = SERVER_MAIN
+        }
+
+        tasks.withType<Jar> {
+            manifest {
+                attributes(mapOf(
+                    "Implementation-Title" to "TNoodle-${project.name}",
+                    "Implementation-Version" to "GRADLE"
+                ))
+            }
         }
     }
 
