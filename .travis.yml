@@ -20,7 +20,5 @@ before_install:
   - (cd git-tools; npm install -d)
 script:
   - ./tmt i18n check
-  - ./tmt lint -a
-  - ./tmt make dist -p wca
-  - ./tmt make check
-  - (cd tnoodle-ui; yarn test)
+  - ./gradlew check
+  - ./gradlew generateOfficialJAR

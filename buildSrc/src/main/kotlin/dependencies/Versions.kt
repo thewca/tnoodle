@@ -29,5 +29,6 @@ object Versions {
         val SHADOW = "5.0.0"
         val GWT = "1.0.8"
         val NODEJS = "1.3.1"
+        val JRUBY = "1.7.0"
     }
 }

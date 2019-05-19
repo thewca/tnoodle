@@ -1,5 +1,6 @@
 import dependencies.Plugins.SHADOW_ACTUAL
 import dependencies.Plugins.GWT_ACTUAL
+import dependencies.Plugins.JRUBY_ACTUAL
 import dependencies.Plugins.NODEJS_ACTUAL
 
 import org.gradle.plugin.use.PluginDependenciesSpec
@@ -19,3 +20,6 @@ inline val PluginDependenciesSpec.GWT: PluginDependencySpec
 
 inline val PluginDependenciesSpec.NODEJS: PluginDependencySpec
     get() = NODEJS_ACTUAL
+
+inline val PluginDependenciesSpec.JRUBY: PluginDependencySpec
+    get() = JRUBY_ACTUAL

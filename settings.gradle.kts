@@ -6,6 +6,9 @@ pluginManagement {
             if (requested.id.id == "gwt") {
                 useModule("org.wisepersist:gwt-gradle-plugin:${requested.version}")
             }
+            if (requested.id.id == "com.github.jruby-gradle.base") {
+                useModule("com.github.jruby-gradle:jruby-gradle-plugin:${requested.version}")
+            }
         }
     }
 }
