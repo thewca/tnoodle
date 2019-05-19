@@ -3,7 +3,6 @@ import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
 
 import dependencies.Libraries.GWTEXPORTER
-import dependencies.Libraries.GWT_USER
 import dependencies.Libraries.JUNIT_JUPITER_API
 import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 
@@ -27,8 +26,6 @@ dependencies {
     implementation(project(":threephase"))
     implementation(project(":sq12phase"))
 
-    implementation(GWT_USER)
-    
     api(GWTEXPORTER)
 
     testImplementation(JUNIT_JUPITER_API)

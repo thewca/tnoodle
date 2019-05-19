@@ -3,6 +3,7 @@ package dependencies
 object Versions {
     val GWT = "2.5.1"
     val JUNIT_JUPITER = "5.4.2"
+    val BATIK = "1.11"
 
     val H2 = "1.4.199"
     val QUERCUS = "4.0.60"
@@ -15,7 +16,7 @@ object Versions {
     val JODA_TIME = "2.10.1"
     val ZIP4J = "1.3.2"
     val ITEXTPDF = "5.5.13"
-    val BATIK_ALL = "1.11"
+    val BATIK_TRANSCODER = BATIK
     val SNAKEYAML = "1.24"
     val WINSTONE = "0.9.10"
     val NATIVE_TRAY_ADAPTER = "1.2-SNAPSHOT"

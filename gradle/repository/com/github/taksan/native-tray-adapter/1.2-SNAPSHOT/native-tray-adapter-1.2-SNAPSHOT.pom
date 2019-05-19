@@ -57,7 +57,7 @@ providing a native look and feel.</description>
 			<artifactId>junit</artifactId>
 			<version>4.8</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.taksan</groupId>

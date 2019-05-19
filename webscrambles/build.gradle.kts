@@ -7,7 +7,7 @@ import configurations.Server.SERVER_MAIN
 import configurations.Server.configureWinstonePlugin
 import configurations.Server.configureEmbeddedRunnable
 
-import dependencies.Libraries.BATIK_ALL
+import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.JODA_TIME
@@ -35,7 +35,7 @@ dependencies {
     implementation(JODA_TIME)
     implementation(ZIP4J)
     implementation(ITEXTPDF)
-    implementation(BATIK_ALL)
+    implementation(BATIK_TRANSCODER)
     implementation(SNAKEYAML)
     implementation(BOUNCYCASTLE)
 
