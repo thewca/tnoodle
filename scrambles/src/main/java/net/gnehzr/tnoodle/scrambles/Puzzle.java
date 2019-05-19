@@ -379,7 +379,7 @@ public abstract class Puzzle implements Exportable {
             throw new UnsupportedOperationException();
         }
 
-        public boolean equals() {
+        public boolean equals(Object o) {
             throw new UnsupportedOperationException();
         }
     }

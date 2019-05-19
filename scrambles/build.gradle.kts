@@ -1,5 +1,6 @@
 import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
+import configurations.Languages.configureCheckstyle
 
 import dependencies.Libraries.GWTEXPORTER
 import dependencies.Libraries.GWT_USER
@@ -12,24 +13,27 @@ attachRepositories()
 
 plugins {
     `java-library`
+    checkstyle
 }
+
+configureJava()
+configureCheckstyle()
 
 dependencies {
     api(project(":svglite"))
     api(project(":min2phase"))
-    
+
     implementation(project(":utils"))
     implementation(project(":threephase"))
     implementation(project(":sq12phase"))
 
     implementation(GWT_USER)
-    implementation(GWTEXPORTER)
+    
+    api(GWTEXPORTER)
 
     testImplementation(JUNIT_JUPITER_API)
     testRuntime(JUNIT_JUPITER_ENGINE)
 }
-
-configureJava()
 
 tasks.withType<Test> {
     useJUnitPlatform()
