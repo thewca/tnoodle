@@ -1,5 +1,6 @@
 import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
+import configurations.Languages.configureCheckstyle
 
 import dependencies.Libraries.APPLEJAVAEXTENSIONS
 import dependencies.Libraries.NATIVE_TRAY_ADAPTER
@@ -12,9 +13,11 @@ attachRepositories()
 
 plugins {
     `java-library`
+    checkstyle
 }
 
 configureJava()
+configureCheckstyle()
 
 dependencies {
     api(project(":web-utils"))

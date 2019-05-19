@@ -1,5 +1,6 @@
 import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
+import configurations.Languages.configureCheckstyle
 
 import dependencies.Libraries.JAVAX_SERVLET_API
 import dependencies.Libraries.MARKDOWNJ_CORE
@@ -10,9 +11,11 @@ attachRepositories()
 
 plugins {
     `java-library`
+    checkstyle
 }
 
 configureJava()
+configureCheckstyle()
 
 dependencies {
     api(project(":utils"))

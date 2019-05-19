@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
+import configurations.Languages.configureCheckstyle
 import configurations.Server.SERVER_MAIN
 import configurations.Server.configureWinstonePlugin
 import configurations.Server.configureEmbeddedRunnable
@@ -19,11 +20,13 @@ attachRepositories()
 
 plugins {
     java
+    checkstyle
     application
     SHADOW
 }
 
 configureJava()
+configureCheckstyle()
 configureWinstonePlugin()
 
 dependencies {
