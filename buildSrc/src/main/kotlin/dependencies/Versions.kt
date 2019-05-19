@@ -14,7 +14,7 @@ object Versions {
     val MARKDOWNJ_CORE = "0.4"
     val JAVAX_SERVLET_API = "4.0.1"
     val JODA_TIME = "2.10.1"
-    val ZIP4J = "1.3.2"
+    val ZIP4J = "1.3.3"
     val ITEXTPDF = "5.5.13"
     val BATIK_TRANSCODER = BATIK
     val SNAKEYAML = "1.24"
