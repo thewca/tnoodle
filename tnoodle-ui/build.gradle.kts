@@ -41,3 +41,7 @@ tasks.getByName("yarn_install") {
 tasks.getByName("assemble") {
     dependsOn("bundle", "propagateResources")
 }
+
+tasks.getByName("check") {
+    dependsOn("yarn_test")
+}

@@ -12,4 +12,7 @@ object Plugins {
 
     inline val PluginDependenciesSpec.NODEJS_ACTUAL: PluginDependencySpec
         get() = id("com.moowork.node").version(Versions.Plugins.NODEJS)
+
+    inline val PluginDependenciesSpec.JRUBY_ACTUAL: PluginDependencySpec
+        get() = id("com.github.jruby-gradle.base").version(Versions.Plugins.JRUBY)
 }
