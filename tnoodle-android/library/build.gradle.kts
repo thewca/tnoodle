@@ -24,22 +24,22 @@ dependencies {
 }
 
 // build a jar with source files
-tasks.register<Jar>("sourcesJar") {
-    //from(sourceSets["main"].java.srcDirs)
+val sourcesJar = tasks.create<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
+    from(project(":scrambles").sourceSets["main"].java)
 }
 
 val javadoc = tasks.create<Javadoc>("javadoc") {
     isFailOnError = false
 
-    //source = sourceSets["main"].java.srcDirs
+    source = project(":scrambles").sourceSets["main"].java.asFileTree
 
     classpath += project.files(options.bootClasspath)
     classpath += configurations["compile"]
 }
 
 // build a jar with javadoc
-tasks.register<Jar>("javadocJar") {
+val javadocJar = tasks.register<Jar>("javadocJar") {
     dependsOn("javadoc")
 
     archiveClassifier.set("javadoc")
@@ -47,6 +47,6 @@ tasks.register<Jar>("javadocJar") {
 }
 
 artifacts {
-    //add("archive", "sourcesJar")
-    //add("archive", "javadocJar")
+    add("archives", sourcesJar)
+    add("archives", javadocJar)
 }
