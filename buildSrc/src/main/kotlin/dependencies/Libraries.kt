@@ -12,7 +12,7 @@ object Libraries {
     val JODA_TIME = "joda-time:joda-time:${Versions.JODA_TIME}"
     val ZIP4J = "net.lingala.zip4j:zip4j:${Versions.ZIP4J}"
     val ITEXTPDF = "com.itextpdf:itextpdf:${Versions.ITEXTPDF}"
-    val BATIK_ALL = "org.apache.xmlgraphics:batik-all:${Versions.BATIK_ALL}"
+    val BATIK_TRANSCODER = "org.apache.xmlgraphics:batik-transcoder:${Versions.BATIK_TRANSCODER}"
     val SNAKEYAML = "org.yaml:snakeyaml:${Versions.SNAKEYAML}"
     val WINSTONE = "net.sourceforge.winstone:winstone:${Versions.WINSTONE}"
     val NATIVE_TRAY_ADAPTER = "com.github.taksan:native-tray-adapter:${Versions.NATIVE_TRAY_ADAPTER}"
