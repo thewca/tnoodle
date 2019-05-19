@@ -1,8 +1,6 @@
 package dependencies
 
 object Libraries {
-    val H2 = "com.h2database:h2:${Versions.H2}"
-    val QUERCUS = "com.caucho:quercus:${Versions.QUERCUS}"
     val GWT_USER = "com.google.gwt:gwt-user:${Versions.GWT_USER}"
     val GWTEXPORTER = "org.timepedia.exporter:gwtexporter:${Versions.GWTEXPORTER}"
     val GSON = "com.google.code.gson:gson:${Versions.GSON}"
