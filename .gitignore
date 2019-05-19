@@ -15,3 +15,5 @@ node_modules/
 .gradle/
 .idea/
 local.properties
+TNoodle-WCA-*.jar
+./tnoodle_resources

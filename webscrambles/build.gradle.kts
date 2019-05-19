@@ -50,9 +50,9 @@ tasks.getByName("processResources") {
     dependsOn(":tnoodle-ui:assemble")
 }
 
-tasks.create<ShadowJar>("deployOfficial") {
+tasks.create<ShadowJar>("shadowJarOfficial") {
     description = "compile a JAR file that can be used as official release"
-    group = "WCA"
+    group = "shadow"
 
     archiveClassifier.set("wca")
 
