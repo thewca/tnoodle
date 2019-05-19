@@ -19,7 +19,12 @@ public class Plugins<H> {
             classLoader = getClass().getClassLoader();
         }
 
-        String pluginDefinitionsFilename = packageName + "/" + packageName + "s";
+        System.out.println("Package name is " + packageName);
+        String[] packageParts = packageName.split("\\.");
+        String fileName = packageParts[packageParts.length - 1];
+
+        String packageDir = packageName.replace(".", "/");
+        String pluginDefinitionsFilename = packageDir + "/" + fileName + "s";
         InputStream is = classLoader.getResourceAsStream(pluginDefinitionsFilename);
         azzert(is != null);
         BufferedReader in = new BufferedReader(new InputStreamReader(is));

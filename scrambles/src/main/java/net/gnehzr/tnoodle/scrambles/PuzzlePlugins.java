@@ -10,7 +10,7 @@ import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
 import net.gnehzr.tnoodle.utils.LazyInstantiator;
 import net.gnehzr.tnoodle.utils.Plugins;
 import net.gnehzr.tnoodle.utils.Strings;
-import puzzle.CubePuzzle;
+import net.gnehzr.tnoodle.puzzle.CubePuzzle;
 
 import java.util.SortedMap;
 
