@@ -25,7 +25,8 @@ tasks.create<Copy>("generateOfficialRelease") {
 
     val targetProject = "webscrambles"
 
-    dependsOn("check", ":$targetProject:shadowJarOfficial")
+    dependsOn(getTasksByName("check", true))
+    dependsOn(":$targetProject:shadowJarOfficial")
 
     from("$targetProject/build/libs") {
         include("$targetProject-wca.jar")
@@ -36,7 +37,7 @@ tasks.create<Copy>("generateOfficialRelease") {
 }
 
 tasks.create<JavaExec>("startOfficialServer") {
-    description = "Starts the TNoodle server from an official release artifact. Builds one if necessary"
+    description = "Starts the TNoodle server from an official release artifact. Builds one if necessary."
     group = "WCA"
 
     dependsOn("generateOfficialRelease")

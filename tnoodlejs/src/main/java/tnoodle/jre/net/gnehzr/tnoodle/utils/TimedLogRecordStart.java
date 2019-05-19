@@ -1,4 +1,4 @@
-package tnoodle.jre.net.gnehzr.tnoodle.utils;
+package net.gnehzr.tnoodle.utils;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;

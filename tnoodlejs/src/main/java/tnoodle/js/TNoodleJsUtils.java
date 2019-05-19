@@ -1,18 +1,18 @@
-package tnoodle.js;
+package net.gnehzr.tnoodle.js;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.json.client.*;
 import com.google.gwt.user.client.ui.Image;
+import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
+import net.gnehzr.tnoodle.scrambles.Puzzle;
+import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo;
+import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Svg;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
-import tnoodle.scrambles.InvalidScrambleException;
-import tnoodle.scrambles.Puzzle;
-import tnoodle.scrambles.PuzzleImageInfo;
-import tnoodle.scrambles.PuzzlePlugins;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -50,14 +50,14 @@ public class TNoodleJsUtils implements Exportable {
     }
 
     public static String getVersion() {
-        return ScrambleJsEntryPoint.VERSION;
+        return net.gnehzr.tnoodle.js.ScrambleJsEntryPoint.VERSION;
     }
 
     public static Element getPuzzleIcon(Puzzle puzzle) {
         String filename = PuzzlePlugins.PUZZLE_PACKAGE + "/" + puzzle.getShortName() + ".png";
-        if(ScrambleJsEntryPoint.resources.containsKey(filename)) {
+        if(net.gnehzr.tnoodle.js.ScrambleJsEntryPoint.resources.containsKey(filename)) {
             Image image = new Image();
-            image.setUrl("data:image/png;base64," + ScrambleJsEntryPoint.resources.get(filename));
+            image.setUrl("data:image/png;base64," + net.gnehzr.tnoodle.js.ScrambleJsEntryPoint.resources.get(filename));
             return image.getElement();
         }
 

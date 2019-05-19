@@ -1,4 +1,4 @@
-package tnoodle.js;
+package net.gnehzr.tnoodle.js;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -23,7 +23,7 @@ public class ScrambleJsEntryPoint implements EntryPoint {
         ExporterUtil.exportAll();
         onLoadImpl();
 
-        ConsolePrintStream cps = new ConsolePrintStream();
+        net.gnehzr.tnoodle.js.ConsolePrintStream cps = new net.gnehzr.tnoodle.js.ConsolePrintStream();
         System.setOut(cps);
         System.setErr(cps);
     }
