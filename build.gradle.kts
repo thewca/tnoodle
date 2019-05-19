@@ -25,7 +25,7 @@ tasks.create<Copy>("generateOfficialRelease") {
 
     val targetProject = "webscrambles"
 
-    dependsOn("$targetProject:check", ":$targetProject:shadowJarOfficial")
+    dependsOn("check", ":$targetProject:shadowJarOfficial")
 
     from("$targetProject/build/libs") {
         include("$targetProject-wca.jar")

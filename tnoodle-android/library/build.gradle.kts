@@ -1,11 +1,11 @@
-import com.android.build.gradle.AppExtension
+import com.android.build.gradle.LibraryExtension
 
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     id("com.github.dcendents.android-maven")
 }
 
-configure<AppExtension> {
+configure<LibraryExtension> {
     compileSdkVersion(28)
 
     defaultConfig {
