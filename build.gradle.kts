@@ -1,7 +1,7 @@
 import configurations.Languages.attachRepositories
 
 group = "org.worldcubeassociation"
-version = "1.0-SNAPSHOT"
+version = "0.14.0"
 
 buildscript {
     repositories {

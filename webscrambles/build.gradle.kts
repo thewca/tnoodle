@@ -1,5 +1,8 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
+import configurations.Server.SERVER_MAIN
 import configurations.Server.configureWinstonePlugin
 import configurations.Server.configureEmbeddedRunnable
 
@@ -42,4 +45,30 @@ configureEmbeddedRunnable()
 
 tasks.getByName("processResources") {
     dependsOn(":tnoodle-ui:assemble")
+}
+
+tasks.create<ShadowJar>("deployOfficial") {
+    description = "compile a JAR file that can be used as official release"
+    group = "WCA"
+
+    archiveClassifier.set("wca")
+
+    val origJarTask = tasks.getByName("jar") as? Jar
+    origJarTask?.manifest?.also { manifest.inheritFrom(it) }
+
+    manifest {
+        attributes(mapOf(
+            "Implementation-Title" to "TNoodle-WCA",
+            "Implementation-Version" to project.rootProject.version,
+            "Main-Class" to SERVER_MAIN
+        ))
+    }
+
+    from(sourceSets["main"].output)
+    exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
+
+    val projectRuntime = project.configurations.findByName("runtimeClasspath")
+        ?: project.configurations.findByName("runtime")
+
+    configurations = listOfNotNull(projectRuntime)
 }

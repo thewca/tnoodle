@@ -79,8 +79,7 @@ object Server {
         tasks.withType<Jar> {
             manifest {
                 attributes(mapOf(
-                    "Implementation-Title" to "TNoodle-${project.name}",
-                    "Implementation-Version" to "GRADLE"
+                    "Implementation-Title" to "TNoodle-${project.name}"
                 ))
             }
         }
@@ -97,7 +96,7 @@ object Server {
     }
 
     private fun Project.serverDependencies(): List<Project> {
-        if (configurations.none { it.name == "server" }) {
+        if (configurations.findByName("server") == null) {
             return emptyList()
         }
 
