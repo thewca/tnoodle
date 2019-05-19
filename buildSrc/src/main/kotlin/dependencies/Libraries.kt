@@ -19,4 +19,6 @@ object Libraries {
     val APPLEJAVAEXTENSIONS = "com.apple:AppleJavaExtensions:${Versions.APPLEJAVAEXTENSIONS}"
     val URLREWRITEFILTER = "org.tuckey:urlrewritefilter:${Versions.URLREWRITEFILTER}"
     val BOUNCYCASTLE = "org.bouncycastle:bcprov-jdk15on:${Versions.BOUNCYCASTLE}"
+    val JUNIT_JUPITER_API = "org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT_JUPITER_API}"
+    val JUNIT_JUPITER_ENGINE = "org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT_JUPITER_ENGINE}"
 }

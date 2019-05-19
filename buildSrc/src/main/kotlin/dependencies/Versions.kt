@@ -2,6 +2,7 @@ package dependencies
 
 object Versions {
     val GWT = "2.5.1"
+    val JUNIT_JUPITER = "5.4.2"
 
     val H2 = "1.4.199"
     val QUERCUS = "4.0.60"
@@ -21,6 +22,8 @@ object Versions {
     val APPLEJAVAEXTENSIONS = "1.4"
     val URLREWRITEFILTER = "5.0.0-SNAPSHOT"
     val BOUNCYCASTLE = "1.61"
+    val JUNIT_JUPITER_API = JUNIT_JUPITER
+    val JUNIT_JUPITER_ENGINE = JUNIT_JUPITER
 
     object Plugins {
         val SHADOW = "5.0.0"

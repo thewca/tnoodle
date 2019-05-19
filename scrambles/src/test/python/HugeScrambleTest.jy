@@ -1,3 +1,0 @@
-# This is just a thin wrapper for our old java test
-import net.gnehzr.tnoodle.test.ScrambleTest as ScrambleTest
-ScrambleTest.main([])
