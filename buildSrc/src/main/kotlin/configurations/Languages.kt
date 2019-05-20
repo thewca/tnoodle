@@ -8,11 +8,21 @@ import org.gradle.api.plugins.quality.Checkstyle
 import org.gradle.kotlin.dsl.*
 
 object Languages {
-    fun Project.attachRepositories() {
+    fun Project.attachLocalRepositories() {
         repositories {
-            mavenCentral()
             maven(url = "$rootDir/gradle/repository")
         }
+    }
+
+    fun Project.attachRemoteRepositories() {
+        repositories {
+            mavenCentral()
+        }
+    }
+
+    fun Project.attachRepositories() {
+        attachLocalRepositories()
+        attachRemoteRepositories()
     }
 
     fun Project.configureJava() {

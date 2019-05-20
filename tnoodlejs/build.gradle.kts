@@ -1,4 +1,4 @@
-import configurations.Languages.attachRepositories
+import configurations.Languages.attachRemoteRepositories
 import configurations.Languages.configureJava
 
 import dependencies.Versions.GWT
@@ -9,7 +9,7 @@ import org.wisepersist.gradle.plugins.gwt.Style
 
 description = "Compiles the scramble java code to javascript using GWT."
 
-attachRepositories()
+attachRemoteRepositories()
 
 plugins {
     java

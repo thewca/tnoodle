@@ -1,6 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-import configurations.Languages.attachRepositories
+import configurations.Languages.attachRemoteRepositories
 import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
 import configurations.Server.SERVER_MAIN
@@ -16,7 +16,7 @@ import dependencies.Libraries.ZIP4J
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
 
-attachRepositories()
+attachRemoteRepositories()
 
 plugins {
     java
