@@ -7,7 +7,7 @@ description = "A generic competition scramble generator interface."
 attachRepositories()
 
 plugins {
-    java
+    `java-base`
 }
 
 configureJava()
