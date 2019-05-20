@@ -1,4 +1,5 @@
-import com.moowork.gradle.node.npm.NpmTask
+import com.moowork.gradle.node.NodeExtension
+import com.moowork.gradle.node.yarn.YarnTask
 
 description = "A web ui for TNoodle that uses modern technology, and interacts with the WCA website api to minimize repeated data entry."
 
@@ -7,7 +8,11 @@ plugins {
     NODEJS
 }
 
-tasks.create<NpmTask>("bundle") {
+configure<NodeExtension> {
+  download = true
+}
+
+tasks.create<YarnTask>("bundle") {
     dependsOn("yarn_install")
 
     inputs.files(fileTree("src"))
@@ -16,7 +21,7 @@ tasks.create<NpmTask>("bundle") {
 
     outputs.dir("build/static")
 
-    setArgs(listOf("run", "build"))
+    setYarnCommand("build")
 }
 
 tasks.create<Copy>("propagateResources") {
