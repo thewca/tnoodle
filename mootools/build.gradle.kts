@@ -1,10 +1,10 @@
-import configurations.Languages.attachRepositories
+import configurations.Languages.attachRemoteRepositories
 import configurations.Languages.configureJava
 import configurations.Server.configureWinstonePlugin
 
 description = "mootools js library"
 
-attachRepositories()
+attachRemoteRepositories()
 
 plugins {
     `java-base`

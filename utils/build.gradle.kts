@@ -1,4 +1,4 @@
-import configurations.Languages.attachRepositories
+import configurations.Languages.attachRemoteRepositories
 import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
 
@@ -7,7 +7,7 @@ import dependencies.Libraries.JOPT_SIMPLE
 
 description = "Dumping ground for useful Java functions used throughout tnoodle"
 
-attachRepositories()
+attachRemoteRepositories()
 
 plugins {
     `java-library`

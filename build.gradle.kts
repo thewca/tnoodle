@@ -1,4 +1,4 @@
-import configurations.Languages.attachRepositories
+import configurations.Languages.attachLocalRepositories
 
 group = "org.worldcubeassociation"
 version = "0.14.0"
@@ -16,7 +16,7 @@ buildscript {
 }
 
 allprojects {
-    attachRepositories()
+    attachLocalRepositories()
 }
 
 tasks.create<Copy>("generateOfficialRelease") {

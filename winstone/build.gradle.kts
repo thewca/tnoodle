@@ -1,4 +1,4 @@
-import configurations.Languages.attachRepositories
+import configurations.Languages.attachRemoteRepositories
 import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
 
@@ -9,7 +9,7 @@ import dependencies.Libraries.WINSTONE
 
 description = "Tiny embeddable webserver that implements the java servlet spec."
 
-attachRepositories()
+attachRemoteRepositories()
 
 plugins {
     `java-library`

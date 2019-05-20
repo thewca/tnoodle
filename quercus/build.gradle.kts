@@ -1,4 +1,4 @@
-import configurations.Languages.attachRepositories
+import configurations.Languages.attachRemoteRepositories
 import configurations.Languages.configureJava
 import configurations.Server.configureWinstonePlugin
 
@@ -7,7 +7,7 @@ import dependencies.Libraries.QUERCUS
 
 description = "A 100% java implementation of php."
 
-attachRepositories()
+attachRemoteRepositories()
 
 plugins {
     java
