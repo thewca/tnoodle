@@ -7,7 +7,7 @@ description = "mootools js library"
 attachRepositories()
 
 plugins {
-    java
+    `java-base`
 }
 
 configureJava()

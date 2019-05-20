@@ -27,7 +27,7 @@ object Server {
 
     fun Project.configureWinstonePlugin() {
         configurations.create("server") {
-            configurations["implementation"].extendsFrom(this)
+            configurations.findByName("implementation")?.extendsFrom(this)
         }
 
         dependencies {
