@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-GIT_ROOT="$(dirname "$0")"
-
-CLASSPATH=`$GIT_ROOT/tmt graph --show-classpath`
-CLASSPATH=$CLASSPATH:$GIT_ROOT/lib/jython-standalone-2.7-b1.jar
-JYTHONPATH="$GIT_ROOT" exec java -cp $CLASSPATH org.python.util.jython "$@"
