@@ -33,7 +33,7 @@ tasks.create<Copy>("propagateResources") {
     }
 
     val targetBaseDir = project(":webscrambles").buildDir
-    into("$targetBaseDir/resources/main/tnoodle_resources/webapps/ROOT/wca/new-ui")
+    into("$targetBaseDir/resources/main/wca/new-ui")
 }
 
 tasks.getByName("yarn_install") {
