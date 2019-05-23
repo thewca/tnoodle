@@ -1,11 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 import configurations.Languages.attachRemoteRepositories
-import configurations.Languages.configureJava
-import configurations.Languages.configureCheckstyle
-import configurations.Server.SERVER_MAIN
-import configurations.Server.configureWinstonePlugin
-import configurations.Server.configureEmbeddedRunnable
 
 import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
@@ -13,6 +8,7 @@ import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.JODA_TIME
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
 
@@ -29,18 +25,17 @@ buildscript {
 attachRemoteRepositories()
 
 plugins {
-    java
-    checkstyle
     application
     SHADOW
+    KOTLIN_JVM
 }
-
-configureJava()
-configureCheckstyle()
-configureWinstonePlugin()
 
 dependencies {
     implementation(project(":scrambles"))
+
+    implementation(project(":server-ktor"))
+
+    implementation(kotlin("stdlib-jdk8"))
 
     implementation(JODA_TIME)
     implementation(ZIP4J)
@@ -49,12 +44,12 @@ dependencies {
     implementation(SNAKEYAML)
     implementation(BOUNCYCASTLE)
 
-    "server"(project(":scrambler-interface"))
-
     runtime(project(":tnoodle-ui"))
 }
 
-configureEmbeddedRunnable()
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+}
 
 tasks.getByName("processResources") {
     dependsOn(":tnoodle-ui:assemble")
@@ -89,7 +84,7 @@ tasks.create<ShadowJar>("shadowJarOfficial") {
         attributes(mapOf(
             "Implementation-Title" to "TNoodle-WCA",
             "Implementation-Version" to project.rootProject.version,
-            "Main-Class" to SERVER_MAIN
+            "Main-Class" to "org.worldcubeassociation.tnoodle.server.TNoodleServer"
         ))
     }
 
