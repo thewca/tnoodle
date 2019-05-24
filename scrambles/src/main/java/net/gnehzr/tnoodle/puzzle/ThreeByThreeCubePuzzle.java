@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -10,7 +8,6 @@ import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.EnvGetter;
 import cs.min2phase.SearchWCA;
 import cs.min2phase.Tools;
 import org.timepedia.exporter.client.Export;
@@ -25,7 +22,7 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
     private ThreadLocal<SearchWCA> twoPhaseSearcher = null;
     public ThreeByThreeCubePuzzle() {
         super(3);
-        String newMinDistance = EnvGetter.getenv("TNOODLE_333_MIN_DISTANCE");
+        String newMinDistance = System.getenv("TNOODLE_333_MIN_DISTANCE");
         if(newMinDistance != null) {
             wcaMinScrambleDistance = Integer.parseInt(newMinDistance);
         }
@@ -54,7 +51,7 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
         } else if(solution.startsWith("Error")) {
             // TODO - Not really sure what to do here.
             l.severe(solution + " while searching for solution to " + cs.toFaceCube());
-            azzert(false);
+            assert false;
             return null;
         }
         return solution;
@@ -68,7 +65,7 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
         try {
             ab.appendAlgorithm(scramble);
         } catch (InvalidMoveException e) {
-            azzert(false, new InvalidScrambleException(scramble, e));
+            throw new RuntimeException(new InvalidScrambleException(scramble, e));
         }
         return ab.getStateAndGenerator();
     }

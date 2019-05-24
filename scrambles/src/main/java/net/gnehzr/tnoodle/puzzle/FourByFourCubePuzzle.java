@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import java.util.Random;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
@@ -35,7 +33,7 @@ public class FourByFourCubePuzzle extends CubePuzzle {
         try {
             ab.appendAlgorithm(scramble);
         } catch (InvalidMoveException e) {
-            azzert(false, new InvalidScrambleException(scramble, e));
+            throw new RuntimeException(new InvalidScrambleException(scramble, e));
         }
         return ab.getStateAndGenerator();
     }

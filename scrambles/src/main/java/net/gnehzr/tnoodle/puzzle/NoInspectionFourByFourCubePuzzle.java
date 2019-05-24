@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
@@ -40,8 +38,7 @@ public class NoInspectionFourByFourCubePuzzle extends FourByFourCubePuzzle {
             psag = ab.getStateAndGenerator();
             return psag;
         } catch(InvalidMoveException e) {
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

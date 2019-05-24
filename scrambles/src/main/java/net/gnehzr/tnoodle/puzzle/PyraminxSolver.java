@@ -1,6 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 import java.util.Random;
 
 public class PyraminxSolver {
@@ -203,7 +202,7 @@ public class PyraminxSolver {
                 cycleAndOrient(edges, 2, 4, 5, times);
                 break;
             default:
-                azzert(false);
+                assert false;
         }
     }
 
@@ -380,7 +379,7 @@ public class PyraminxSolver {
                 }
                 tempTips /= 3;
             }
-            azzert(numberUnsolved <= 4);
+            assert numberUnsolved <= 4;
             return numberUnsolved;
         }
     }

@@ -1,8 +1,5 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.ceil;
-
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.InvalidHexColorException;
@@ -12,27 +9,19 @@ import net.gnehzr.tnoodle.svglite.Element;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.LinkedList;
-import java.util.TreeSet;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
-import net.gnehzr.tnoodle.utils.TimedLogRecordStart;
-import net.gnehzr.tnoodle.utils.GwtSafeUtils;
-
 
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportClosure;
 import org.timepedia.exporter.client.Exportable;
 import org.timepedia.exporter.client.NoExport;
+
+import static java.lang.Math.ceil;
 
 /**
  * Puzzle and TwistyPuzzle encapsulate all the information to filter out
@@ -118,7 +107,7 @@ public abstract class Puzzle implements Exportable {
     }
 
     private SecureRandom r = getSecureRandom();
-    private static final SecureRandom getSecureRandom() {
+    public static final SecureRandom getSecureRandom() {
         try {
             try {
                 return SecureRandom.getInstance("SHA1PRNG", "SUN");
@@ -128,8 +117,7 @@ public abstract class Puzzle implements Exportable {
             }
         } catch(NoSuchAlgorithmException e) {
             l.log(Level.SEVERE, "Couldn't get SecureRandomInstance", e);
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -195,7 +183,7 @@ public abstract class Puzzle implements Exportable {
 
     /**
      * TODO - document!
-     * @param colorScheme
+     * @param scheme
      * @return
      */
     public HashMap<String, Color> parseColorScheme(String scheme) {
@@ -285,8 +273,8 @@ public abstract class Puzzle implements Exportable {
             maxHeight = Integer.MAX_VALUE;
         }
         double ratio = 1.0 * getPreferredSize().width / getPreferredSize().height;
-        int resultWidth = Math.min(maxWidth, ceil(maxHeight*ratio));
-        int resultHeight = Math.min(maxHeight, ceil(maxWidth/ratio));
+        int resultWidth = (int) Math.min(maxWidth, ceil(maxHeight*ratio));
+        int resultHeight = (int) Math.min(maxHeight, ceil(maxWidth/ratio));
         return new Dimension(resultWidth, resultHeight);
     }
 
@@ -404,9 +392,6 @@ public abstract class Puzzle implements Exportable {
         fringeScrambled.add(ps.getNormalized(), 0);
         seenScrambled.put(ps.getNormalized(), 0);
 
-        TimedLogRecordStart start = new TimedLogRecordStart(Level.FINER, "Searching for solution in " + n + " moves.");
-        l.log(start);
-
         int fringeTies = 0;
 
         // The task here is to do a breadth-first search starting from both the solved state and the scrambled state.
@@ -508,8 +493,6 @@ public abstract class Puzzle implements Exportable {
             }
         }
 
-        l.log(start.finishedNow("expanded " + ( seenSolved.size() + seenScrambled.size() ) + " nodes"));
-
         if(bestIntersection == null) {
             return null;
         }
@@ -524,7 +507,7 @@ public abstract class Puzzle implements Exportable {
 
         // Step 1: bestIntersection -----> scrambled
 
-        azzert(bestIntersection.isNormalized());
+        assert bestIntersection.isNormalized();
         PuzzleState state = bestIntersection;
         int distanceFromScrambled = seenScrambled.get(state);
 
@@ -546,7 +529,7 @@ public abstract class Puzzle implements Exportable {
                     }
                 }
             }
-            azzert(false);
+            assert false;
         }
 
         // Step 2: bestIntersection <----- scrambled
@@ -565,13 +548,13 @@ public abstract class Puzzle implements Exportable {
                     try {
                         solution.appendMove(moveName);
                     } catch(InvalidMoveException e) {
-                        azzert(false, e);
+                        throw new RuntimeException(e);
                     }
                     distanceFromScrambled = seenScrambled.get(state.getNormalized());
                     continue outer;
                 }
             }
-            azzert(false);
+            assert false;
         }
 
         // Step 3: solved <----- bestIntersection
@@ -591,13 +574,13 @@ public abstract class Puzzle implements Exportable {
                         try {
                             solution.appendMove(moveName);
                         } catch(InvalidMoveException e) {
-                            azzert(false, e);
+                            throw new RuntimeException(e);
                         }
                         continue outer;
                     }
                 }
             }
-            azzert(false);
+            assert false;
         }
 
         return solution.toString();
@@ -738,7 +721,13 @@ public abstract class Puzzle implements Exportable {
          *         The move Strings may not contain spaces.
          */
         public HashMap<String, ? extends PuzzleState> getScrambleSuccessors() {
-            return GwtSafeUtils.reverseHashMap(getCanonicalMovesByState());
+            HashMap<String, PuzzleState> reversed = new HashMap<>();
+
+            for (Map.Entry<? extends PuzzleState, String> entry : getCanonicalMovesByState().entrySet()) {
+                reversed.put(entry.getValue(), entry.getKey());
+            }
+
+            return reversed;
         }
 
         /**
@@ -847,7 +836,7 @@ public abstract class Puzzle implements Exportable {
             String move;
             try {
                 do {
-                    move = GwtSafeUtils.choose(r, successors.keySet());
+                    move = choose(r, successors.keySet());
                     // If this move happens to be redundant, there is no
                     // reason to select this move again in vain.
                     successors.remove(move);
@@ -855,11 +844,45 @@ public abstract class Puzzle implements Exportable {
                 ab.appendMove(move);
             } catch(InvalidMoveException e) {
                 l.log(Level.SEVERE, "", e);
-                azzert(false, e);
-                return null;
+                throw new RuntimeException(e);
             }
         }
         return ab.getStateAndGenerator();
     }
 
+    public static int[] cloneArr(int[] src) {
+        int[] dest = new int[src.length];
+        System.arraycopy(src, 0, dest, 0, src.length);
+        return dest;
+    }
+
+    public static void deepCopy(int[][] src, int[][] dest) {
+        for(int i = 0; i < src.length; i++) {
+            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+        }
+    }
+
+    public static void deepCopy(int[][][] src, int[][][] dest) {
+        for(int i = 0; i < src.length; i++) {
+            deepCopy(src[i], dest[i]);
+        }
+    }
+
+    public static <H> H choose(Random r, Iterable<H> keySet) {
+        H chosen = null;
+        int count = 0;
+        for(H element : keySet) {
+            if(r.nextInt(++count) == 0) {
+                chosen = element;
+            }
+        }
+        assert count > 0;
+        return chosen;
+    }
+
+    public static int[] copyOfRange(int[] src, int from, int to) {
+        int[] dest = new int[to - from];
+        System.arraycopy(src, from, dest, 0, dest.length);
+        return dest;
+    }
 }

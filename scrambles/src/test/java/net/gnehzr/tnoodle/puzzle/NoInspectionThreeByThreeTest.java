@@ -3,7 +3,6 @@ package net.gnehzr.tnoodle.puzzle;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.utils.Utils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -79,7 +78,7 @@ public class NoInspectionThreeByThreeTest {
 
         assertTrue(scrambled.applyAlgorithm(solution).isSolved());
 
-        Random r = Utils.getSeededRandom();
+        Random r = Puzzle.getSecureRandom();
 
         for (int i = 0; i < 10; i++) {
             System.out.println(threes.generateWcaScramble(r));

@@ -4,7 +4,6 @@ import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.utils.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -75,7 +74,7 @@ public class ThreeByThreeCubeFewestMovesTest {
         assertFalse(firstMove.startsWith("L"));
         assertFalse(lastMove.startsWith("L"));
 
-        Random r = Utils.getSeededRandom();
+        Random r = Puzzle.getSecureRandom();
 
         for (int i = 0; i < 10; i++) {
             String uncancelledScramble = threeFm.generateWcaScramble(r);

@@ -1,13 +1,10 @@
 package net.gnehzr.tnoodle.scrambles;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle;
-import net.gnehzr.tnoodle.utils.BadLazyClassDescriptionException;
-import net.gnehzr.tnoodle.utils.LazyInstantiator;
-import net.gnehzr.tnoodle.utils.LazyInstantiatorException;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AlgorithmBuilderTest {
     @Test
-    void testRedundantMoves() throws LazyInstantiatorException, InvalidMoveException, IOException, BadLazyClassDescriptionException {
+    void testRedundantMoves() throws InvalidMoveException {
         // This test doesn't really belong here, but I don't have a better
         // place for it right now.
         Puzzle sixes = new CubePuzzle(6);
@@ -26,14 +23,14 @@ public class AlgorithmBuilderTest {
         assertFalse(moves.contains("3Lw"));
         assertFalse(moves.contains("3Dw"));
 
-        Map<String, LazyInstantiator<Puzzle>> lazyScramblers = PuzzlePlugins.getScramblers();
+        Map<String, Puzzle> lazyScramblers = new HashMap<>();
+        // FIXME Map<String, Puzzle> lazyScramblers = PuzzlePlugins.getScramblers();
 
-        for (Map.Entry<String, LazyInstantiator<Puzzle>> lazyEntry : lazyScramblers.entrySet()) {
+        for (Map.Entry<String, Puzzle> lazyEntry : lazyScramblers.entrySet()) {
             String puzzle = lazyEntry.getKey();
-            LazyInstantiator<Puzzle> lazyScrambler = lazyEntry.getValue();
+            Puzzle scrambler = lazyEntry.getValue();
 
             System.out.println("Testing redundant moves on " + puzzle);
-            Puzzle scrambler = lazyScrambler.cachedInstance();
 
             for (String move : scrambler.getSolvedState().getSuccessorsByName().keySet()) {
                 AlgorithmBuilder ab = new AlgorithmBuilder(scrambler, AlgorithmBuilder.MergingMode.NO_MERGING);

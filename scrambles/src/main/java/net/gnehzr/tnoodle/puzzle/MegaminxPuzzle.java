@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
@@ -17,7 +15,6 @@ import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 import org.timepedia.exporter.client.Export;
 
@@ -54,7 +51,7 @@ public class MegaminxPuzzle extends Puzzle {
                 case DL:
                     return BR;
                 default:
-                    azzert(false);
+                    assert false;
                     return null;
             }
         }
@@ -83,7 +80,8 @@ public class MegaminxPuzzle extends Puzzle {
     private static final double UNFOLDWIDTH = 4 * Math.cos(.1 * Math.PI) + 2 * Math.cos(.3 * Math.PI);
 
     private static void turn(int[][] image, Face side, int dir) {
-        dir = GwtSafeUtils.modulo(dir, 5);
+        dir = ((dir % 5) + 5) % 5;
+
         for(int i = 0; i < dir; i++) {
             turn(image, side);
         }
@@ -106,7 +104,7 @@ public class MegaminxPuzzle extends Puzzle {
             case 5:
                 swapOnSide(image, b, 0, 8, 1, 8, 10, 8, 11, 8, 4, 0); break;
             default:
-                azzert(false);
+                assert false;
         }
 
         rotateFace(image, face);
@@ -139,7 +137,8 @@ public class MegaminxPuzzle extends Puzzle {
     }
 
     private static void bigTurn(int[][] image, Face side, int dir) {
-        dir = GwtSafeUtils.modulo(dir, 5);
+        dir = ((dir % 5) + 5) % 5;
+
         for(int i = 0; i < dir; i++) {
             bigTurn(image, side);
         }
@@ -156,7 +155,7 @@ public class MegaminxPuzzle extends Puzzle {
 
             rotateFace(image, Face.DBR);
         } else {
-            azzert(f == Face.D);
+            assert f == Face.D;
             for(int i = 0; i < 7; i++) {
                 swap(image, 1, (9+i)%10, 2, (1+i)%10, 3, (3+i)%10, 4, (5+i)%10, 5, (7+i)%10);
             }
@@ -339,8 +338,7 @@ public class MegaminxPuzzle extends Puzzle {
         try {
             state = state.applyAlgorithm(scrambleStr);
         } catch(InvalidScrambleException e) {
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
         return new PuzzleStateAndGenerator(state, scrambleStr);
     }
@@ -352,7 +350,7 @@ public class MegaminxPuzzle extends Puzzle {
 
     private int[][] cloneImage(int[][] image) {
         int[][] imageCopy = new int[image.length][image[0].length];
-        GwtSafeUtils.deepCopy(image, imageCopy);
+        deepCopy(image, imageCopy);
         return imageCopy;
     }
 
@@ -407,7 +405,7 @@ public class MegaminxPuzzle extends Puzzle {
                 spinMinx(image, Face.L, -2);
                 break;
             default:
-                azzert(false);
+                assert false;
         }
     }
 
@@ -420,17 +418,17 @@ public class MegaminxPuzzle extends Puzzle {
         for(Face face : Face.values()) {
             if(image[face.ordinal()][centerIndex] == Face.U.ordinal()) {
                 spinToTop(image, face);
-                azzert(image[Face.U.ordinal()][centerIndex] == Face.U.ordinal());
+                assert image[Face.U.ordinal()][centerIndex] == Face.U.ordinal();
                 for(int chooseF = 0; chooseF < 5; chooseF++) {
                     spinMinx(image, Face.U, 1);
                     if(isNormalized(image)) {
                         return image;
                     }
                 }
-                azzert(false);
+                assert false;
             }
         }
-        azzert(false);
+        assert false;
         return null;
     }
 
@@ -537,7 +535,7 @@ public class MegaminxPuzzle extends Puzzle {
                 } else if(f >= 6 && f <= 11) {
                     rotateCounterClockwise = 2;
                 } else {
-                    azzert(false);
+                    assert false;
                     return;
                 }
                 String label = null;

@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.svglite;
 
-import static net.gnehzr.tnoodle.svglite.Utils.azzert;
-
 import java.util.ArrayList;
 
 public class PathIterator {
@@ -28,7 +26,7 @@ public class PathIterator {
 
     public int currentSegment(double[] coords) {
         Path.Command command = commands.get(index);
-        azzert(coords.length >= command.coords.length);
+        assert coords.length >= command.coords.length;
         for(int i = 0; i < command.coords.length; i++) {
             coords[i] = command.coords[i];
         }

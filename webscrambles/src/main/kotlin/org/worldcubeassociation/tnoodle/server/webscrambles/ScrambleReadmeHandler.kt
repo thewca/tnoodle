@@ -4,7 +4,6 @@ import io.ktor.application.call
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
-import net.gnehzr.tnoodle.scrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.markdownToHTML
 

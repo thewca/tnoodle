@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.svglite;
 
-import static net.gnehzr.tnoodle.svglite.Utils.azzert;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -57,12 +55,12 @@ public class Element {
     }
 
     public String getAttribute(String key) {
-        azzert(key != "style");
+        assert key != "style";
         return attributes.get(key);
     }
 
     public void setAttribute(String key, String value) {
-        azzert(key != "style");
+        assert key != "style";
         attributes.put(key, value);
     }
 

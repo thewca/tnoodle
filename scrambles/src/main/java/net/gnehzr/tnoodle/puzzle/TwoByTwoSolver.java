@@ -1,7 +1,6 @@
 package net.gnehzr.tnoodle.puzzle;
 
 import java.util.Random;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 public class TwoByTwoSolver {
     public TwoByTwoSolver() {}
@@ -163,7 +162,7 @@ public class TwoByTwoSolver {
                 cycleAndOrient(cubies, 1, 0, 4, 5, times);
                 break;
             default:
-                azzert(false);
+                assert false;
                 break;
         }
     }
@@ -334,8 +333,7 @@ public class TwoByTwoSolver {
     /**
      * Return a generator of a given position in exactly length number of turns or not at all.
      * Returns either the solution or the generator (inverse solution)
-     * @param perm      permutation
-     * @param orient    random int generator
+     * @param state     puzzle state
      * @param length    length of the desired solution
      * @return          a string representing the solution or the scramble of a random position
      */
@@ -460,7 +458,7 @@ public class TwoByTwoSolver {
                     return computeCost(solution, index - 1, current_cost + cost_regrip + cost_F, -1);
                 }
             default:
-                azzert(false);
+                assert false;
                 break;
         }
         return -1;

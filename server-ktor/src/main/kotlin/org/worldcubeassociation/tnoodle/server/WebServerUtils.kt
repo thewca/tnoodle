@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.utils
+package org.worldcubeassociation.tnoodle.server
 
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -9,15 +9,14 @@ import java.io.UnsupportedEncodingException
 import java.net.URISyntaxException
 import java.net.URLDecoder
 import java.nio.channels.FileChannel
-import java.text.SimpleDateFormat
 import java.util.jar.JarEntry
 import java.util.jar.JarInputStream
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.Random
 
-object Utils {
-    private val l = Logger.getLogger(Utils::class.java.name)
+object WebServerUtils {
+    private val l = Logger.getLogger(WebServerUtils::class.java.name)
 
     private val RESOURCE_FOLDER = "tnoodle_resources"
     private val DEVEL_VERSION = "devel"
@@ -56,7 +55,7 @@ object Utils {
                     return null
                 }
 
-                if (Utils::class.java.getPackage() != callerClass!!.getPackage()) {
+                if (WebServerUtils::class.java.getPackage() != callerClass!!.getPackage()) {
                     return callerClass
                 }
             }
@@ -70,7 +69,7 @@ object Utils {
             var callerClass = callerClass
 
             if (callerClass == null) {
-                callerClass = Utils::class.java
+                callerClass = WebServerUtils::class.java
             }
 
             val programDirectory: File
@@ -118,7 +117,7 @@ object Utils {
 
     val projectName: String
         get() {
-            val p = Utils::class.java.getPackage()
+            val p = WebServerUtils::class.java.getPackage()
             var name: String? = p.implementationTitle
 
             if (name == null) {
@@ -130,7 +129,7 @@ object Utils {
 
     val version: String
         get() {
-            val p = Utils::class.java.getPackage()
+            val p = WebServerUtils::class.java.getPackage()
             var version: String? = p.implementationVersion
             if (version == null) {
                 version = DEVEL_VERSION

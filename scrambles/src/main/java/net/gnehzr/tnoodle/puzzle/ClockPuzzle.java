@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Circle;
@@ -123,8 +121,7 @@ public class ClockPuzzle extends Puzzle {
         try {
             state = state.applyAlgorithm(scrambleStr);
         } catch(InvalidScrambleException e) {
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
         return new PuzzleStateAndGenerator(state, scrambleStr);
     }

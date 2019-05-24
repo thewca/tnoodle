@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.svglite;
 
-import static net.gnehzr.tnoodle.svglite.Utils.azzert;
-
 import java.util.ArrayList;
 
 public class Path extends Element {
@@ -52,7 +50,7 @@ public class Path extends Element {
     }
 
     private void azzertMoveTo() {
-        azzert(commands != null, "First command must be moveTo");
+        assert commands != null : "First command must be moveTo";
     }
 
     public void lineTo(double x, double y) {
@@ -82,7 +80,7 @@ public class Path extends Element {
                 case PathIterator.SEG_CLOSE:
                     break;
                 default:
-                    azzert(false);
+                    assert false;
             }
         }
     }
