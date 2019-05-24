@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException
 import java.net.URISyntaxException
 import java.net.URLDecoder
 import java.nio.channels.FileChannel
+import java.text.SimpleDateFormat
 import java.util.jar.JarEntry
 import java.util.jar.JarInputStream
 import java.util.logging.Level
@@ -16,6 +17,8 @@ import java.util.logging.Logger
 import java.util.Random
 
 object WebServerUtils {
+    val SDF = SimpleDateFormat("YYYY-mm-dd")
+
     private val l = Logger.getLogger(WebServerUtils::class.java.name)
 
     private val RESOURCE_FOLDER = "tnoodle_resources"

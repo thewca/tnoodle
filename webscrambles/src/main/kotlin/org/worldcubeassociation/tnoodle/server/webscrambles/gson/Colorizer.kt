@@ -1,7 +1,7 @@
-package org.worldcubeassociation.tnoodle.server.gson
+package org.worldcubeassociation.tnoodle.server.webscrambles.gson
 
 import com.google.gson.*
-import org.worldcubeassociation.tnoodle.svglite.Color
+import net.gnehzr.tnoodle.svglite.Color
 import java.lang.reflect.Type
 
 // registerTypeAdapter
