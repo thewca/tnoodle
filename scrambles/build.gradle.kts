@@ -13,6 +13,7 @@ attachRemoteRepositories()
 plugins {
     `java-library`
     checkstyle
+    `maven-publish`
 }
 
 configureJava()
@@ -37,5 +38,33 @@ tasks.withType<Test> {
 
     testLogging {
         showStandardStreams = true
+    }
+}
+
+tasks.create<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allJava)
+}
+
+tasks.create<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.javadoc.get().destinationDir)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("binary") {
+            from(components["java"])
+
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+        }
+
+        create<MavenPublication>("binaryWithSources") {
+            from(components["java"])
+
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+        }
     }
 }
