@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.Random;
@@ -36,7 +34,7 @@ public class ScrambleCacher {
         ls.add(l);
     }
     public ScrambleCacher(final Puzzle puzzle, int cacheSize, final boolean drawScramble) {
-        azzert(cacheSize > 0);
+        assert cacheSize > 0;
         scrambles = new String[cacheSize];
         Thread t = new Thread() {
             public void run() {

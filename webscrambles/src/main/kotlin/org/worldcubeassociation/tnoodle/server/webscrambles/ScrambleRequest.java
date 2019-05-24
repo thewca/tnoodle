@@ -11,7 +11,6 @@ import com.itextpdf.text.log.NoOpCounter;
 import com.itextpdf.text.pdf.*;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.ZipOutputStream;
@@ -86,7 +85,7 @@ public class ScrambleRequest implements Comparable<ScrambleRequest> {
     private static SortedMap<String, Puzzle> puzzles;
     static {
         try {
-            puzzles = PuzzlePlugins.getScramblers();
+            puzzles = PuzzlePlugins.INSTANCE.getScramblers();
         } catch (IOException e) {
             l.log(Level.INFO, "", e);
         }

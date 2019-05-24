@@ -1,12 +1,11 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import org.worldcubeassociation.tnoodle.utils.EnvGetter
-import org.worldcubeassociation.tnoodle.utils.Utils
+import org.worldcubeassociation.tnoodle.server.WebServerUtils
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.HashMap
 import java.util.Locale
@@ -28,7 +27,7 @@ object Translate {
     init {
         val translationsByLanguageTag = HashMap<String, HashMap<String, *>>()
 
-        val i18nDir = File(Utils.resourceDirectory, "i18n")
+        val i18nDir = File(WebServerUtils.resourceDirectory, "i18n")
         val ymlFiles = i18nDir.listFiles()
 
         for (ymlFile in ymlFiles) {

@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
@@ -93,8 +91,7 @@ public class ThreeByThreeCubeFewestMovesPuzzle extends ThreeByThreeCubePuzzle {
             ab.appendAlgorithm(psag.generator);
             ab.appendAlgorithms(scrambleSuffix);
         } catch(InvalidMoveException e) {
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
         return ab.getStateAndGenerator();
     }

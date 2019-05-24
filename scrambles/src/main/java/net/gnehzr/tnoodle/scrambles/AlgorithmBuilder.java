@@ -1,13 +1,10 @@
 package net.gnehzr.tnoodle.scrambles;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
 import net.gnehzr.tnoodle.scrambles.Puzzle.PuzzleState;
-import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 public class AlgorithmBuilder {
     private static final Logger l = Logger.getLogger(AlgorithmBuilder.class.getName());
@@ -131,7 +128,7 @@ public class AlgorithmBuilder {
         }
         // One of getStates()'s successors must be newNormalizedState.
         // If not, something has gone very wrong.
-        azzert(move != null);
+        assert move != null;
 
         if(mergingMode == MergingMode.CANONICALIZE_MOVES) {
             for(int lastMoveIndex = moves.size() - 1; lastMoveIndex >= 0; lastMoveIndex--) {
@@ -167,7 +164,7 @@ public class AlgorithmBuilder {
         int oldCostMove, newCostMove;
         if(indexAndMove.index < moves.size()) {
             // This move is redundant.
-            azzert(mergingMode != MergingMode.NO_MERGING);
+            assert mergingMode != MergingMode.NO_MERGING;
             oldCostMove = states.get(indexAndMove.index).getMoveCost(moves.get(indexAndMove.index));
             if(indexAndMove.move == null) {
                 // newMove cancelled perfectly with the move at
@@ -200,8 +197,8 @@ public class AlgorithmBuilder {
         }
 
         unNormalizedState = unNormalizedState.apply(newMove);
-        azzert(states.size() == moves.size() + 1);
-        azzert(unNormalizedState.equalsNormalized(getState()));
+        assert states.size() == moves.size() + 1;
+        assert unNormalizedState.equalsNormalized(getState());
     }
 
     public String popMove(int index) {
@@ -213,7 +210,7 @@ public class AlgorithmBuilder {
             try {
                 appendMove(move);
             } catch(InvalidMoveException e) {
-                azzert(false, e);
+                throw new RuntimeException(e);
             }
         }
         return poppedMove;
@@ -232,7 +229,7 @@ public class AlgorithmBuilder {
     }
 
     public PuzzleState getState() {
-        azzert(states.size() == moves.size() + 1);
+        assert states.size() == moves.size() + 1;
         return states.get(states.size() - 1);
     }
 
@@ -241,7 +238,7 @@ public class AlgorithmBuilder {
     }
 
     public String toString() {
-        return GwtSafeUtils.join(moves, " ");
+        return String.join(" ", moves);
     }
 
     public PuzzleStateAndGenerator getStateAndGenerator() {

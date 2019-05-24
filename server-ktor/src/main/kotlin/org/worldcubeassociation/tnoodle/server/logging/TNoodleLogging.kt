@@ -1,5 +1,6 @@
-package org.worldcubeassociation.tnoodle.utils
+package org.worldcubeassociation.tnoodle.server.logging
 
+import org.worldcubeassociation.tnoodle.server.WebServerUtils
 import java.io.File
 import java.io.IOException
 import java.util.logging.ConsoleHandler
@@ -21,7 +22,7 @@ object TNoodleLogging {
     private var formatter: Formatter? = null
 
     val logFile: File
-        get() = File(Utils.resourceDirectory, "log/tnoodle.log")
+        get() = File(WebServerUtils.resourceDirectory, "log/tnoodle.log")
 
     val levels: Array<Level>
         get() = arrayOf(Level.ALL, Level.FINEST, Level.FINER, Level.FINE, Level.CONFIG, Level.INFO, Level.WARNING, Level.SEVERE, Level.OFF)

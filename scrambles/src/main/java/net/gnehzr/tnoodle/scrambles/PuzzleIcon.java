@@ -3,7 +3,6 @@ package net.gnehzr.tnoodle.scrambles;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -14,14 +13,20 @@ public class PuzzleIcon {
 
     public static final ByteArrayOutputStream loadPuzzleIconPng(String shortName) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        InputStream in = PuzzleIcon.class.getResourceAsStream("/" + PuzzlePlugins.PUZZLE_PACKAGE + "/" + shortName + ".png");
-        if(in != null) {
-            try {
-                GwtSafeUtils.fullyReadInputStream(in, bytes);
-                return bytes;
-            } catch (IOException e) {
-                l.log(Level.INFO, "", e);
+        try(InputStream in = PuzzleIcon.class.getResourceAsStream("/icon/" + shortName + ".png")) {
+            final byte[] buffer = new byte[0x10000];
+
+            for(;;) {
+                int read = in.read(buffer);
+                if(read < 0) {
+                    break;
+                }
+                bytes.write(buffer, 0, read);
             }
+            
+            return bytes;
+        } catch (IOException e) {
+            l.log(Level.INFO, "", e);
         }
         return null;
     }

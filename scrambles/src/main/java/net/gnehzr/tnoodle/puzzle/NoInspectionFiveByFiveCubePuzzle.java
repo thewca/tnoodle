@@ -1,7 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import java.util.Random;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
@@ -42,7 +40,7 @@ public class NoInspectionFiveByFiveCubePuzzle extends CubePuzzle {
             // quality of our scrambles to do this.
             String firstReorientMove = randomOrientation[0].toString();
             while(ab.isRedundant(firstReorientMove)) {
-                azzert(discardRedundantMoves);
+                assert discardRedundantMoves;
                 IndexAndMove im = ab.findBestIndexForMove(firstReorientMove, MergingMode.CANONICALIZE_MOVES);
                 ab.popMove(im.index);
             }
@@ -53,8 +51,7 @@ public class NoInspectionFiveByFiveCubePuzzle extends CubePuzzle {
             psag = ab.getStateAndGenerator();
             return psag;
         } catch(InvalidMoveException e) {
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

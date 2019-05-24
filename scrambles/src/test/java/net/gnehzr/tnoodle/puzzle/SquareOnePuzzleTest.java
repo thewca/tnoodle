@@ -4,7 +4,6 @@ import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.Utils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +40,6 @@ public class SquareOnePuzzleTest {
         solution = state.solveIn(2);
         assertEquals(solution, "(-3,1)");
 
-        System.out.println(sq1.generateWcaScramble(Utils.getSeededRandom()));
+        System.out.println(sq1.generateScramble());
     }
 }

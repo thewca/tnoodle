@@ -1,8 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
-
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Svg;
@@ -20,7 +17,6 @@ import net.gnehzr.tnoodle.puzzle.PyraminxSolver.PyraminxSolverState;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 import org.timepedia.exporter.client.Export;
 
@@ -41,14 +37,13 @@ public class PyraminxPuzzle extends Puzzle {
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         PyraminxSolverState state = pyraminxSolver.randomState(r);
         String scramble = pyraminxSolver.generateExactly(state, MIN_SCRAMBLE_LENGTH, false);
-        azzertEquals(scramble.split(" ").length, MIN_SCRAMBLE_LENGTH + state.unsolvedTips());
+        assert scramble.split(" ").length == MIN_SCRAMBLE_LENGTH + state.unsolvedTips();
 
         PuzzleState pState;
         try {
             pState = getSolvedState().applyAlgorithm(scramble);
         } catch (InvalidScrambleException e) {
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
 
         return new PuzzleStateAndGenerator(pState, scramble);
@@ -300,7 +295,7 @@ public class PyraminxPuzzle extends Puzzle {
                     swap(1, 5, 2, 8, 3, 2, image);
                     break;
                 default:
-                    azzert(false);
+                    assert false;
             }
             turnTip(s, image);
         }
@@ -320,7 +315,7 @@ public class PyraminxPuzzle extends Puzzle {
                     swap(1, 6, 2, 0, 3, 3, image);
                     break;
                 default:
-                    azzert(false);
+                    assert false;
             }
         }
 
@@ -397,7 +392,7 @@ public class PyraminxPuzzle extends Puzzle {
 
             int[] corners = new int[4];
             for (int i = 0; i < corners.length; i++){
-                azzertEquals(stickersToCorners[i][0] + stickersToCorners[i][1] + stickersToCorners[i][2], correctSum[i]);
+                assert  stickersToCorners[i][0] + stickersToCorners[i][1] + stickersToCorners[i][2] == correctSum[i];
                 // The following code is not pretty, sorry...
                 if(( stickersToCorners[i][0] < stickersToCorners[i][1] ) && ( stickersToCorners[i][0] < stickersToCorners[i][2] )) {
                     corners[i] = 0;
@@ -424,14 +419,14 @@ public class PyraminxPuzzle extends Puzzle {
             for (int i = 0; i < tips.length; i++){
                 int[] stickers = stickersToTips[i];
                 // We can use the same color check as for the corners.
-                azzertEquals(stickers[0] + stickers[1] + stickers[2], correctSum[i]);
+                assert stickers[0] + stickers[1] + stickers[2] == correctSum[i];
 
                 // For the tips, we don't have to check colors against face, but against the attached corner.
                 int cornerPrimaryColor = stickersToCorners[i][0];
                 int clockwiseTurnsToMatchCorner = 0;
                 while(stickers[clockwiseTurnsToMatchCorner] != cornerPrimaryColor) {
                     clockwiseTurnsToMatchCorner++;
-                    azzert(clockwiseTurnsToMatchCorner < 3);
+                    assert clockwiseTurnsToMatchCorner < 3;
                 }
                 tips[i] = clockwiseTurnsToMatchCorner;
             }
@@ -462,7 +457,7 @@ public class PyraminxPuzzle extends Puzzle {
                         }
 
                         int[][] imageCopy = new int[image.length][image[0].length];
-                        GwtSafeUtils.deepCopy(image, imageCopy);
+                        deepCopy(image, imageCopy);
 
                         if(tip) {
                             turnTip(axis, dir, imageCopy);

@@ -1,8 +1,5 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzertEquals;
-
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Svg;
 import net.gnehzr.tnoodle.svglite.Dimension;
@@ -19,7 +16,6 @@ import net.gnehzr.tnoodle.puzzle.SkewbSolver.SkewbSolverState;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
-import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 
 import org.timepedia.exporter.client.Export;
 
@@ -43,14 +39,13 @@ public class SkewbPuzzle extends Puzzle {
     public PuzzleStateAndGenerator generateRandomMoves(Random r) {
         SkewbSolverState state = skewbSolver.randomState(r);
         String scramble = skewbSolver.generateExactly(state, MIN_SCRAMBLE_LENGTH, r);
-        azzertEquals(scramble.split(" ").length, MIN_SCRAMBLE_LENGTH);
+        assert scramble.split(" ").length == MIN_SCRAMBLE_LENGTH;
 
         PuzzleState pState;
         try {
             pState = getSolvedState().applyAlgorithm(scramble);
         } catch (InvalidScrambleException e) {
-            azzert(false, e);
-            return null;
+            throw new RuntimeException(e);
         }
         return new PuzzleStateAndGenerator(pState, scramble);
     }
@@ -182,7 +177,7 @@ public class SkewbPuzzle extends Puzzle {
                         swap(0, 2, 2, 4, 4, 3, image);
                         break;
                     default:
-                        azzert(false);
+                        assert false;
                 }
             }
         }
@@ -249,7 +244,7 @@ public class SkewbPuzzle extends Puzzle {
                         turn += "'";
                     }
                     int[][] imageCopy = new int[image.length][image[0].length];
-                    GwtSafeUtils.deepCopy(image, imageCopy);
+                    deepCopy(image, imageCopy);
                     turn(axis, pow, imageCopy);
                     successors.put(turn, new SkewbState(imageCopy));
                 }

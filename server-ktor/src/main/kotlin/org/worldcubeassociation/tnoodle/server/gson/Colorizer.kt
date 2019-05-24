@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.utils.gson
+package org.worldcubeassociation.tnoodle.server.gson
 
 import com.google.gson.*
 import org.worldcubeassociation.tnoodle.svglite.Color

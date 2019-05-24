@@ -6,7 +6,6 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import net.gnehzr.tnoodle.scrambles.Puzzle
-import net.gnehzr.tnoodle.scrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object PuzzleListHandler : RouteHandler {

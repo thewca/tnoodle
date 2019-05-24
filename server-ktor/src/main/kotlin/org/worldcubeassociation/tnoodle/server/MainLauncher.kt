@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.utils
+package org.worldcubeassociation.tnoodle.server
 
 import java.io.BufferedInputStream
 import java.io.File
@@ -61,7 +61,7 @@ object MainLauncher {
             needsReExecing = true
         }
 
-        val jar = Utils.jarFile
+        val jar = WebServerUtils.jarFile
         var jvm = "java"
         val os = System.getProperty("os.name")
         l.info("Detected os: $os")
@@ -93,7 +93,7 @@ object MainLauncher {
                     jvm = "\"" + newLauncher.path + "\""
                 } else {
                     try {
-                        Utils.copyFile(java, newLauncher)
+                        WebServerUtils.copyFile(java, newLauncher)
                         jvm = "\"" + newLauncher.path + "\""
 
                         // We successfully created a new executable, so lets use it!

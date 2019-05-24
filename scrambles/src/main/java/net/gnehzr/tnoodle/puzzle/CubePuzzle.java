@@ -1,18 +1,13 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Dimension;
 import net.gnehzr.tnoodle.svglite.Rectangle;
 import net.gnehzr.tnoodle.svglite.Svg;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+
+import java.util.*;
 
 import net.gnehzr.tnoodle.scrambles.Puzzle;
-import net.gnehzr.tnoodle.utils.GwtSafeUtils;
 import net.gnehzr.tnoodle.puzzle.TwoByTwoSolver.TwoByTwoState;
 import org.timepedia.exporter.client.Export;
 
@@ -50,7 +45,7 @@ public class CubePuzzle extends Puzzle {
             this.innerSlice = innerSlice;
             this.outerSlice = outerSlice;
             // We haven't come up with names for moves where outerSlice != 0
-            azzert(outerSlice == 0);
+            assert outerSlice == 0;
         }
 
         public String toString() {
@@ -116,7 +111,7 @@ public class CubePuzzle extends Puzzle {
     }
 
     public CubePuzzle(int size) {
-        azzert(size >= 0 && size < DEFAULT_LENGTHS.length, "Invalid cube size");
+        assert size >= 0 && size < DEFAULT_LENGTHS.length : "Invalid cube size";
         this.size = size;
     }
 
@@ -156,13 +151,13 @@ public class CubePuzzle extends Puzzle {
             image[f2][x2][y2] = image[f1][x1][y1];
             image[f1][x1][y1] = temp;
         } else {
-            azzert(false);
+            assert false;
         }
     }
 
     private static void slice(Face face, int slice, int dir, int[][][] image) {
         int size = image[0].length;
-        azzert(slice >= 0 && slice < size);
+        assert slice >= 0 && slice < size;
 
         Face sface = face;
         int sslice = slice;
@@ -196,7 +191,7 @@ public class CubePuzzle extends Puzzle {
                         Face.L.ordinal(), size-1-j, sslice,
                         sdir);
             } else {
-                azzert(false);
+                assert false;
             }
         }
         if(slice == 0 || slice == size - 1) {
@@ -208,7 +203,7 @@ public class CubePuzzle extends Puzzle {
                 f = face.oppositeFace().ordinal();
                 sdir = dir;
             } else {
-                azzert(false);
+                assert false;
                 return;
             }
             for(int j = 0; j < (size+1)/2; j++) {
@@ -288,7 +283,7 @@ public class CubePuzzle extends Puzzle {
 
     private int[][][] cloneImage(int[][][] image) {
         int[][][] imageCopy = new int[image.length][image[0].length][image[0][0].length];
-        GwtSafeUtils.deepCopy(image, imageCopy);
+        deepCopy(image, imageCopy);
         return imageCopy;
     }
 
@@ -303,7 +298,7 @@ public class CubePuzzle extends Puzzle {
 
         int spins = 0;
         while (!isNormalized(image)) {
-            azzert(spins < 2);
+            assert spins < 2;
             int[][] stickersByPiece = getStickersByPiece(image);
 
             int goal = 0;
@@ -321,7 +316,7 @@ public class CubePuzzle extends Puzzle {
                     break;
                 }
             }
-            azzert(idx >= 0);
+            assert idx >= 0;
             Face f = null;
             int dir = 1;
             if (stickersByPiece[idx][0] == Face.D.ordinal()) {
@@ -340,7 +335,7 @@ public class CubePuzzle extends Puzzle {
                         case 6:
                             dir = 3; break;
                         default:
-                            azzert(false);
+                            assert false;
                     }
                 }
             } else if (stickersByPiece[idx][1] == Face.D.ordinal()) {
@@ -354,7 +349,7 @@ public class CubePuzzle extends Puzzle {
                     case 3: case 5:
                         f = Face.B; break; // on L
                     default:
-                        azzert(false);
+                        assert false;
                 }
             } else {
                 switch (idx) {
@@ -367,7 +362,7 @@ public class CubePuzzle extends Puzzle {
                     case 1: case 7:
                         f = Face.B; break; // on L
                     default:
-                        azzert(false);
+                        assert false;
                 }
             }
             spinCube(image, f, dir);
@@ -478,7 +473,7 @@ public class CubePuzzle extends Puzzle {
                 int clockwiseTurnsToGetToPrimaryColor = 0;
                 while(stickers[clockwiseTurnsToGetToPrimaryColor] != uColor && stickers[clockwiseTurnsToGetToPrimaryColor] != dColor) {
                     clockwiseTurnsToGetToPrimaryColor++;
-                    azzert(clockwiseTurnsToGetToPrimaryColor < 3);
+                    assert clockwiseTurnsToGetToPrimaryColor < 3;
                 }
                 int piece = (clockwiseTurnsToGetToPrimaryColor << 3) + pieceVal;
                 pieces[i] = piece;
@@ -490,7 +485,7 @@ public class CubePuzzle extends Puzzle {
         }
         
         public String toFaceCube() {
-            azzert(size == 3);
+            assert size == 3;
             String state = "";
             for(char f : "URFDLB".toCharArray()) {
                 Face face = Face.valueOf("" + f);
@@ -516,7 +511,13 @@ public class CubePuzzle extends Puzzle {
 
         @Override
         public HashMap<? extends PuzzleState, String> getCanonicalMovesByState() {
-            return GwtSafeUtils.reverseHashMap(getScrambleSuccessors());
+            HashMap<PuzzleState, String> reversed = new HashMap<>();
+
+            for (Map.Entry<String, ? extends PuzzleState> entry : getScrambleSuccessors().entrySet()) {
+                reversed.put(entry.getValue(), entry.getKey());
+            }
+
+            return reversed;
         }
 
         private LinkedHashMap<String, CubeState> getSuccessorsWithinSlice(int maxSlice, boolean includeRedundant) {

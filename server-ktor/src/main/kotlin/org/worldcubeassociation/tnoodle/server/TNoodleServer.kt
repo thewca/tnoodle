@@ -6,8 +6,7 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import org.worldcubeassociation.tnoodle.utils.MainLauncher
-import org.worldcubeassociation.tnoodle.utils.TNoodleLogging
+import org.worldcubeassociation.tnoodle.server.logging.TNoodleLogging
 import net.gnehzr.tnoodle.utils.Utils
 import java.awt.*
 import java.io.File

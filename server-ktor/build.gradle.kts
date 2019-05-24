@@ -14,8 +14,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":utils"))
-
     api("io.ktor:ktor-server-netty:1.2.0")
     implementation("io.ktor:ktor-server-host-common:1.2.0")
     
