@@ -1,21 +1,9 @@
 import configurations.Languages.attachLocalRepositories
 
-group = "org.worldcubeassociation"
-version = "0.14.0"
-
-buildscript {
-    repositories {
-        mavenCentral()
-        google()
-    }
-
-    dependencies {
-        classpath("com.android.tools.build:gradle:3.4.1")
-        classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-    }
-}
-
 allprojects {
+    group = "org.worldcubeassociation"
+    version = "0.14.0"
+    
     attachLocalRepositories()
 }
 
