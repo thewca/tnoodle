@@ -1,7 +1,7 @@
 import configurations.Languages.attachLocalRepositories
 
 allprojects {
-    group = "org.worldcubeassociation"
+    group = "org.worldcubeassociation.tnoodle"
     version = "0.14.0"
     
     attachLocalRepositories()
