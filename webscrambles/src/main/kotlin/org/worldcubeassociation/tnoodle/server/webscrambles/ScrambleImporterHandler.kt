@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import com.google.gson.GsonBuilder
 import io.ktor.application.call
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -18,9 +17,6 @@ import java.util.regex.Matcher
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object ScrambleImporterHandler : RouteHandler {
-    private val GSON_BUILDER = GsonBuilder().disableHtmlEscaping()
-    private val GSON = GSON_BUILDER.create() // TODO over standard content negotiation
-
     override fun install(router: Routing) {
         router.post("/import") {
             val multipart = call.receiveMultipart()
@@ -42,7 +38,7 @@ object ScrambleImporterHandler : RouteHandler {
         }
 
         router.param("url") {
-            router.get("/import") {
+            get("/import") {
                 val urlStr = call.parameters["url"]!!
 
                 val cleanUrlStr = if (urlStr.startsWith("http")) urlStr else "http://$urlStr"

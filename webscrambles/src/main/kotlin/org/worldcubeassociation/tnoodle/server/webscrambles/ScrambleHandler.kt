@@ -29,20 +29,19 @@ object ScrambleHandler : RouteHandler {
 
             query.remove("callback")
 
-            val lastDot = filename.lastIndexOf(".")
+            val (title, extension) = filename.split(".", limit = 2)
 
-            if (lastDot < 0) {
+            if (extension.isEmpty()) {
                 throw InvalidScrambleRequestException("No extension specified")
             }
-
-            val globalTitle = filename.substring(0, lastDot)
 
             // Note that we parse the scramble requests *after* checking the extension.
             // This way, someone who makes a request for "/scramble/foo.bar" will get a warning about
             // the ".bar" extension, rather than incorrect scramble requests.
+            // FIXME do what the comment says
             val scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed)
 
-            when (val ext = filename.substring(lastDot + 1)) {
+            when (extension) {
                 "txt" -> {
                     val sb = StringBuilder()
                     for (scrambleRequest in scrambleRequests) {
@@ -63,11 +62,9 @@ object ScrambleHandler : RouteHandler {
 
                     call.respondText(sb.toString())
                 }
-                "json" -> {
-                    call.respond(scrambleRequests)
-                }
+                "json" -> call.respond(scrambleRequests)
                 "pdf" -> {
-                    val totalPdfOutput = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null)
+                    val totalPdfOutput = ScrambleRequest.requestsToPdf(title, generationDate, scrambleRequests, null)
                     call.response.header("Content-Disposition", "inline")
 
                     // Workaround for Chrome bug with saving PDFs:
@@ -78,11 +75,11 @@ object ScrambleHandler : RouteHandler {
                 }
                 "zip" -> {
                     val baosZip = ScrambleRequest
-                        .requestsToZip(getServletContext(), globalTitle, generationDate, scrambleRequests, seed, generationUrl, null)
+                        .requestsToZip(title, generationDate, scrambleRequests, seed, generationUrl, null)
 
                     call.respondBytes(baosZip.toByteArray(), ContentType.Application.Zip)
                 }
-                else -> throw InvalidScrambleRequestException("Invalid extension: $ext")
+                else -> throw InvalidScrambleRequestException("Invalid extension: $extension")
             }
         }
     }

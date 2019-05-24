@@ -14,7 +14,7 @@ object PuzzleListHandler : RouteHandler {
     private val puzzleInfos: List<Map<String, String?>>
 
     init {
-        val scramblers = PuzzlePlugins.getScramblers()
+        val scramblers = PuzzlePlugins.PUZZLES
 
         puzzleInfos = scramblers.keys.map {
             mapOf(
@@ -43,14 +43,13 @@ object PuzzleListHandler : RouteHandler {
 
             val puzzleExt = call.parameters["puzzleExt"]!!
 
-            val (puzzle, extension) = parseExtension(puzzleExt)
+            val (puzzle, extension) = puzzleExt.split(".", limit = 2)
 
-            if (extension == null) {
-                call.respondText("Please specify an extension")
-                return@get
+            if (extension.isEmpty()) {
+                return@get call.respondText("Please specify an extension")
             }
 
-            val scramblers = PuzzlePlugins.getScramblers()
+            val scramblers = PuzzlePlugins.PUZZLES
 
             if (extension == "json") {
                 if (puzzle == "") {
@@ -60,13 +59,7 @@ object PuzzleListHandler : RouteHandler {
 
                     call.respond(puzzleInfosWithStatus)
                 } else {
-                    val cachedPuzzle = scramblers[puzzle]
-
-                    if (cachedPuzzle == null) {
-                        call.respondText("Invalid scrambler: $puzzle")
-                        return@get
-                    }
-
+                    val cachedPuzzle = scramblers[puzzle] ?: return@get call.respondText("Invalid scrambler: $puzzle")
                     val puzzleInfo = getPuzzleInfo(cachedPuzzle, includeStatus)
 
                     call.respond(puzzleInfo)

@@ -9,7 +9,7 @@ import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.routing.MarkdownHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
 
-fun Application.tnoodleServer() {
+fun Application.tnoodleBase() {
     routing {
         JsEnvHandler.install(this)
         MarkdownHandler.install(this)

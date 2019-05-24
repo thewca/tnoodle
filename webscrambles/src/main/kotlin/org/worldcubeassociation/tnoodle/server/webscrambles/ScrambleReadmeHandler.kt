@@ -10,7 +10,7 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.markdownTo
 import java.io.File
 
 object ScrambleReadmeHandler : RouteHandler {
-    private var scramblers = PuzzlePlugins.getScramblers()
+    private val scramblers = PuzzlePlugins.PUZZLES
 
     override fun install(router: Routing) {
         router.get("/readme/scramble") {

@@ -31,11 +31,12 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":scrambles"))
-
-    implementation(project(":server-ktor"))
-
     implementation(kotlin("stdlib-jdk8"))
+    
+    implementation(project(":scrambles"))
+    implementation(project(":server-ktor"))
+    
+    implementation("io.ktor:ktor-gson:1.2.0")
 
     implementation(JODA_TIME)
     implementation(ZIP4J)

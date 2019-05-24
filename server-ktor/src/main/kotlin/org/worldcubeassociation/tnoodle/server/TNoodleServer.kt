@@ -7,7 +7,8 @@ import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.worldcubeassociation.tnoodle.server.logging.TNoodleLogging
-import net.gnehzr.tnoodle.utils.Utils
+import tray.SystemTrayProvider
+import tray.java.JavaIconAdapter
 import java.awt.*
 import java.io.File
 import java.io.IOException
@@ -20,12 +21,14 @@ import javax.swing.ImageIcon
 object TNoodleServer {
     const val TNOODLE_PORT = 2014
 
-    var NAME = Utils.projectName
-    var VERSION = Utils.version
+    var NAME = WebServerUtils.projectName
+    var VERSION = WebServerUtils.version
+
+    const val MIN_HEAP_SIZE_MEGS = 1024 // FIXME what was the original value?
 
     @JvmStatic
     fun main(args: Array<String>) {
-        Utils.doFirstRunStuff()
+        WebServerUtils.doFirstRunStuff()
         TNoodleLogging.initializeLogging()
 
         val parser = ArgParser(args)
@@ -56,7 +59,7 @@ object TNoodleServer {
 
         val env = applicationEngineEnvironment {
             module {
-                tnoodleServer()
+                tnoodleBase()
             }
 
             connector {
@@ -85,19 +88,19 @@ object TNoodleServer {
                 if (d.isSupported(Desktop.Action.BROWSE)) {
                     try {
                         val uri = URI(url)
-                        l.info("Attempting to open $uri in browser.")
+                        // FIXME l.info("Attempting to open $uri in browser.")
                         d.browse(uri)
                     } catch (e: URISyntaxException) {
-                        l.warning("Could not convert $url to URI", e)
+                        // FIXME l.warning("Could not convert $url to URI", e)
                     } catch (e: IOException) {
-                        l.warning("Error opening tab in browser", e)
+                        // FIXME l.warning("Error opening tab in browser", e)
                     }
 
                 } else {
-                    l.warning("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.")
+                    // FIXME l.warning("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.")
                 }
             } else {
-                l.warning("Sorry, it appears the Desktop api is not supported on your platform.")
+                // FIXME l.warning("Sorry, it appears the Desktop api is not supported on your platform.")
             }
         }
 
@@ -107,31 +110,35 @@ object TNoodleServer {
     // Preferred way to detect OSX according to https://developer.apple.com/library/mac/#technotes/tn2002/tn2110.html
     fun isOSX() = System.getProperty("os.name").contains("OS X")
 
+    const val ICONS_FOLDER = "icons"
+
+    const val ICON_WORKER = "tnoodle_logo_1024.png"
+    const val ICON_WRAPPER = "tnoodle_logo_1024_gray.png"
+
     /*
      * Sets the dock icon in OSX. Could be made to have uses in other operating systems.
      */
     private fun setApplicationIcon() {
         // Find out which icon to use.
         val processType = MainLauncher.processType
-        val iconFileName: String
 
-        if (processType === MainLauncher.PROCESS_TYPE.WORKER) {
-            iconFileName = ICON_WORKER
+        val iconFileName = if (processType === MainLauncher.PROCESS_TYPE.WORKER) {
+            ICON_WORKER
         } else {
-            iconFileName = ICON_WRAPPER
+            ICON_WRAPPER
         }
 
         // Get the file name of the icon.
-        val fullFileName = "${Utils.resourceDirectory}/$ICONS_FOLDER/$iconFileName"
+        val fullFileName = "${WebServerUtils.resourceDirectory}/$ICONS_FOLDER/$iconFileName"
         val image = ImageIcon(fullFileName).image
 
         // OSX-specific code to set the dock icon.
         if (isOSX()) {
             try {
                 val application = com.apple.eawt.Application.getApplication()
-                application.setDockIconImage(image)
+                application.dockIconImage = image
             } catch (e: Exception) {
-                l.log(Level.WARNING, "Error setting OSX dock icon", e)
+                // FIXME l.log(Level.WARNING, "Error setting OSX dock icon", e)
             }
         } else {
             if (iconFileName != ICON_WORKER) {
@@ -140,18 +147,18 @@ object TNoodleServer {
             }
 
             if (!SystemTray.isSupported()) {
-                l.warning("SystemTray is not supported")
+                // FIXME l.warning("SystemTray is not supported")
                 return
             }
 
             val imageUrl = try {
                 File(fullFileName).toURI().toURL()
             } catch (e: MalformedURLException) {
-                l.log(Level.WARNING, "Could not convert $fullFileName to a URL", e)
+                // FIXME l.log(Level.WARNING, "Could not convert $fullFileName to a URL", e)
                 return
             }
 
-            val trayAdapter = SystemTrayProvider().getSystemTray()
+            val trayAdapter = SystemTrayProvider().systemTray
 
             val popup = PopupMenu()
 
@@ -163,7 +170,7 @@ object TNoodleServer {
             openItem.addActionListener { openTabInBrowser(true) }
 
             exitItem.addActionListener {
-                l.info("Exit initiated from tray icon")
+                // FIXME l.info("Exit initiated from tray icon")
                 System.exit(0)
             }
 
@@ -175,9 +182,8 @@ object TNoodleServer {
                 //trayIconAdapter.setImageAutoSize(true);
 
                 val st = SystemTray.getSystemTray()
-                val jia = trayIconAdapter as JavaIconAdapter
-                val ti = jia.getTrayIcon()
-                ti.setImage(image.getScaledInstance(st.trayIconSize.width, -1, Image.SCALE_SMOOTH))
+                val ti = trayIconAdapter.trayIcon
+                ti.image = image.getScaledInstance(st.trayIconSize.width, -1, Image.SCALE_SMOOTH)
 
             }
         }

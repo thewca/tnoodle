@@ -6,14 +6,13 @@ import org.joda.time.DateTime
 import org.joda.time.Days
 
 import java.util.ArrayList
-import java.util.Collections
 import java.util.Date
 
 object OrderedScrambles {
     // TODO see https://github.com/thewca/tnoodle/issues/400
 
-    fun generateOrderedScrambles(globalTitle: String, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper?) {
-        if (wcifHelper?.schedule == null) {
+    fun generateOrderedScrambles(globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
+        if (wcifHelper.schedule == null) {
             return
         }
 
@@ -100,7 +99,7 @@ object OrderedScrambles {
 
                         parameters.fileNameInZip = pdfFileName
                         zipOut.putNextEntry(null, parameters)
-                        val scrambleRequests = scrambleRequestListByDay[index].toTypedArray()
+                        val scrambleRequests = scrambleRequestListByDay[index]
                         val baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null)
                         zipOut.write(baos.toByteArray())
                         zipOut.closeEntry()
