@@ -53,14 +53,9 @@ tasks.create<Jar>("javadocJar") {
 
 publishing {
     publications {
-        create<MavenPublication>("binary") {
-            from(components["java"])
+        create<MavenPublication>("scrambles") {
+            artifactId = "tnoodle-scrambles"
 
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
-        }
-
-        create<MavenPublication>("binaryWithSources") {
             from(components["java"])
 
             artifact(tasks["sourcesJar"])
