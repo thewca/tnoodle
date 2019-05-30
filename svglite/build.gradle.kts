@@ -6,7 +6,31 @@ description = "A dead simple svg generation library written in pure Java, with n
 plugins {
     `java-library`
     checkstyle
+    `maven-publish`
 }
 
 configureJava()
 configureCheckstyle()
+
+tasks.create<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allJava)
+}
+
+tasks.create<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.javadoc.get().destinationDir)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("svglite") {
+            artifactId = "tnoodle-svglite"
+
+            from(components["java"])
+
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+        }
+    }
+}

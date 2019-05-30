@@ -1,6 +1,7 @@
 import configurations.Languages.attachRemoteRepositories
 import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
+import configurations.Languages.configureJUnit5
 
 import dependencies.Libraries.GWTEXPORTER
 import dependencies.Libraries.JUNIT_JUPITER_API
@@ -24,6 +25,7 @@ dependencies {
     api(project(":min2phase"))
 
     implementation(project(":utils"))
+    
     implementation(project(":threephase"))
     implementation(project(":sq12phase"))
 
@@ -33,13 +35,7 @@ dependencies {
     testRuntime(JUNIT_JUPITER_ENGINE)
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-
-    testLogging {
-        showStandardStreams = true
-    }
-}
+configureJUnit5()
 
 tasks.create<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
