@@ -5,6 +5,8 @@ object Versions {
     val JUNIT_JUPITER = "5.4.2"
     val BATIK = "1.11"
 
+    val H2 = "1.4.199"
+    val QUERCUS = "4.0.60"
     val GWT_USER = GWT
     val GWTEXPORTER = GWT
     val GSON = "2.8.5"
