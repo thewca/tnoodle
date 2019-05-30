@@ -1,9 +1,10 @@
 import configurations.Languages.attachRemoteRepositories
-import dependencies.Libraries.APPLEJAVAEXTENSIONS
 
+import dependencies.Libraries.APPLEJAVAEXTENSIONS
 import dependencies.Libraries.JUNIT_JUPITER_API
 import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 import dependencies.Libraries.NATIVE_TRAY_ADAPTER
+import dependencies.Libraries.MARKDOWNJ_CORE
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -12,7 +13,7 @@ description = "Embeddable webserver built around the Kotlin ktor framework"
 attachRemoteRepositories()
 
 plugins {
-    KOTLIN_JVM
+    kotlin("jvm")
 }
 
 dependencies {
@@ -23,6 +24,7 @@ dependencies {
 
     implementation(APPLEJAVAEXTENSIONS)
     implementation(NATIVE_TRAY_ADAPTER)
+    implementation(MARKDOWNJ_CORE)
 
     testImplementation(JUNIT_JUPITER_API)
     testRuntime(JUNIT_JUPITER_ENGINE)
