@@ -14,6 +14,10 @@ allprojects {
     attachLocalRepositories()
 }
 
+plugins { 
+    KOTLIN_JVM
+}
+
 val releasePrefix = "TNoodle-WCA"
 
 tasks.create<Copy>("generateOfficialRelease") {

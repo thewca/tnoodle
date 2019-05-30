@@ -27,7 +27,7 @@ attachRemoteRepositories()
 plugins {
     application
     SHADOW
-    KOTLIN_JVM
+    kotlin("jvm")
 }
 
 dependencies {
