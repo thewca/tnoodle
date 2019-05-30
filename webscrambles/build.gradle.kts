@@ -50,6 +50,20 @@ tasks.getByName("processResources") {
     dependsOn(":tnoodle-ui:assemble")
 }
 
+tasks.create<Exec>("i18nCheck") {
+    val i18nDir = "$projectDir/src/main/resources/i18n"
+    val baseFile = file("$i18nDir/en.yml")
+
+    val ymlFiles = fileTree(i18nDir).files - baseFile
+
+    executable = "bundle"
+    args = listOf("exec", "wca_i18n", baseFile) + ymlFiles
+}
+
+tasks.getByName("check") {
+    dependsOn("i18nCheck")
+}
+
 tasks.create<ShadowJar>("shadowJarOfficial") {
     description = "compile a JAR file that can be used as official release"
     group = "shadow"
