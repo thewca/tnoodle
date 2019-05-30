@@ -16,6 +16,7 @@ configure<AppExtension> {
 repositories {
     jcenter()
     google()
+    mavenLocal()
 }
 
 dependencies {
@@ -24,6 +25,6 @@ dependencies {
 
     implementation("com.caverock:androidsvg:1.2.1")
 
-    implementation(project(":tnoodle-android:library"))
-    implementation(project(":utils"))
+    implementation("org.worldcubeassociation.tnoodle:tnoodle-scrambles:${rootProject.version}")
+    implementation("org.worldcubeassociation.tnoodle:tnoodle-utils:${rootProject.version}")
 }
