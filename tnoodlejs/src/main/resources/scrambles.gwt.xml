@@ -50,7 +50,7 @@
 
   <source path='net/gnehzr/tnoodle/svglite'/>
 
-  <source path='puzzle'>
+  <source path='net/gnehzr/tnoodle/puzzle'>
       <!-- <exclude name="FourByFourCubePuzzle.java"/> -->
   </source>
   <source path='net/gnehzr/tnoodle/scrambles'>
