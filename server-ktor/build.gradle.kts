@@ -3,6 +3,11 @@ import configurations.Languages.attachRemoteRepositories
 import dependencies.Libraries.APPLEJAVAEXTENSIONS
 import dependencies.Libraries.JUNIT_JUPITER_API
 import dependencies.Libraries.JUNIT_JUPITER_ENGINE
+import dependencies.Libraries.KOTLIN_ARGPARSER
+import dependencies.Libraries.KTOR_GSON
+import dependencies.Libraries.KTOR_SERVER_CIO
+import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
+import dependencies.Libraries.LOGBACK_CLASSIC
 import dependencies.Libraries.NATIVE_TRAY_ADAPTER
 import dependencies.Libraries.MARKDOWNJ_CORE
 
@@ -17,14 +22,14 @@ plugins {
 }
 
 dependencies {
-    api("io.ktor:ktor-server-cio:1.2.0")
+    api(KTOR_SERVER_CIO)
+    api(KTOR_GSON)
 
-    implementation("io.ktor:ktor-server-host-common:1.2.0")
-    implementation("io.ktor:ktor-gson:1.2.0")
+    implementation(KTOR_SERVER_HOST_COMMON)
+
+    runtime(LOGBACK_CLASSIC)
     
-    runtime("ch.qos.logback:logback-classic:1.2.3")
-    
-    implementation("com.xenomachina:kotlin-argparser:2.0.7")
+    implementation(KOTLIN_ARGPARSER)
 
     implementation(APPLEJAVAEXTENSIONS)
     implementation(NATIVE_TRAY_ADAPTER)
