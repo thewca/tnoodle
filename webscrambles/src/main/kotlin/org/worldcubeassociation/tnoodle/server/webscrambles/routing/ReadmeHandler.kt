@@ -21,9 +21,11 @@ object ReadmeHandler : RouteHandler {
 
                 val scrambleFilteringInfo = StringBuilder()
 
-                for (s in scramblers.values) {
+                for (scrGet in scramblers.values) {
+                    val scr by scrGet
+
                     // those 2 spaces at the end are no accident: http://meta.stackoverflow.com/questions/26011/should-the-markdown-renderer-treat-a-single-line-break-as-br
-                    val line = "${s.longName}: &ge; ${s.wcaMinScrambleDistance} moves away from solved  \n"
+                    val line = "${scr.longName}: &ge; ${scr.wcaMinScrambleDistance} moves away from solved  \n"
 
                     scrambleFilteringInfo.append(line)
                 }

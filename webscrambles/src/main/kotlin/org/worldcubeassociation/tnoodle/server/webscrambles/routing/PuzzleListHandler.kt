@@ -53,14 +53,14 @@ object PuzzleListHandler : RouteHandler {
             val scramblers = PuzzlePlugins.PUZZLES
 
             if (extension == "json") {
-                if (puzzle == "") {
+                if (puzzle.isBlank()) {
                     val puzzleInfosWithStatus = puzzleInfos
                         .map { scramblers[it["shortName"]]!! }
-                        .map { getPuzzleInfo(it, includeStatus) }
+                        .map { getPuzzleInfo(it.value, includeStatus) }
 
                     call.respond(puzzleInfosWithStatus)
                 } else {
-                    val cachedPuzzle = scramblers[puzzle] ?: return@get call.respondText("Invalid scrambler: $puzzle")
+                    val cachedPuzzle by scramblers[puzzle] ?: return@get call.respondText("Invalid scrambler: $puzzle")
                     val puzzleInfo = getPuzzleInfo(cachedPuzzle, includeStatus)
 
                     call.respond(puzzleInfo)
