@@ -1,14 +1,18 @@
 package org.worldcubeassociation.tnoodle.server
 
+import com.apple.eawt.Application
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
+import io.ktor.util.KtorExperimentalAPI
+import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.application.TNoodleBaseServer
-import org.worldcubeassociation.tnoodle.server.logging.TNoodleLogging
+import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.util.MainLauncher
+import org.worldcubeassociation.tnoodle.server.util.MainLauncher.NO_REEXEC_OPT
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import tray.SystemTrayProvider
 import tray.java.JavaIconAdapter
@@ -16,13 +20,14 @@ import java.awt.*
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.logging.Level
 import javax.swing.ImageIcon
 
 object TNoodleServer {
     const val TNOODLE_PORT = 2014
 
-    const val MIN_HEAP_SIZE_MEGS = 1024 // FIXME what was the original value?
+    const val MIN_HEAP_SIZE_MEGS = 512
+
+    val LOG = LoggerFactory.getLogger(TNoodleServer::class.java)
 
     val NAME = WebServerUtils.projectName
     val VERSION = WebServerUtils.version
@@ -31,35 +36,34 @@ object TNoodleServer {
 
     fun registerModule(app: ApplicationHandler) = SERVER_MODULES.add(app)
 
+    @KtorExperimentalAPI
     fun launch(cliArgs: Array<String>) {
         WebServerUtils.doFirstRunStuff()
-        TNoodleLogging.initializeLogging()
 
         val parser = ArgParser(cliArgs)
 
         val desiredPort by parser.storing("-p", "--http", help = "The port to run the http server on", transform = String::toInt).default(TNOODLE_PORT)
-        val desiredJsEnv by parser.storing("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';", transform = {}).default("")
+
+        val desiredJsEnv by parser.adding("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
+
+        for (jsEnv in desiredJsEnv) {
+            val (key, strValue) = jsEnv.split("=", limit = 2)
+            JsEnvHandler.putJsEnv(key, strValue)
+        }
 
         val noBrowser by parser.flagging("-n", "--nobrowser", help = "Don't open the browser when starting the server")
-        val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of $NAME is running on the desired port(s), do not attempt to kill it and start up")
-        val noReexec by parser.flagging("--noreexec", help = "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.")
+        // val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of $NAME is running on the desired port(s), do not attempt to kill it and start up")
+        val noReexec by parser.flagging(NO_REEXEC_OPT, help = "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.")
 
-        val consoleLevels = TNoodleLogging.levels.associateBy { "--console-${it.name}" }
-        val fileLevels = TNoodleLogging.levels.associateBy { "--file-${it.name}" }
-
-        val consoleLoggingLevel by parser.mapping(consoleLevels, help = "The minimum level a log must be to be printed to the console.").default(Level.WARNING)
-        val fileLoggingLevel by parser.mapping(fileLevels, help = "The minimum level a log must be to be printed to ${TNoodleLogging.logFile}").default(Level.INFO)
-
-        TNoodleLogging.setConsoleLogLevel(consoleLoggingLevel)
-        TNoodleLogging.setFileLogLevel(fileLoggingLevel)
-
-        // Note that we set the log level *before* we do any of this.
-        // These two calls to setApplicationIcon() are intentional.
-        // We want different icons for the parent process and the child
-        // process.
         setApplicationIcon()
-        MainLauncher.wrapMain(cliArgs, MIN_HEAP_SIZE_MEGS)
-        setApplicationIcon()
+
+        if (!noReexec) {
+            MainLauncher.wrapMain(cliArgs, MIN_HEAP_SIZE_MEGS)
+
+            // This second call to setApplicationIcon() is intentional.
+            // We want different icons for the parent and child processes.
+            setApplicationIcon()
+        }
 
         val env = applicationEngineEnvironment {
             module {
@@ -80,12 +84,10 @@ object TNoodleServer {
 
         embeddedServer(CIO, env).start()
 
-        // FIXME logging
-
-        println("$NAME-$VERSION started")
+        LOG.info("$NAME-$VERSION started")
 
         val url = openTabInBrowser(!noBrowser)
-        println("Visit $url for a readme and demo.")
+        LOG.info("Visit $url for a readme and demo.")
     }
 
     fun openTabInBrowser(browse: Boolean): String {
@@ -98,19 +100,19 @@ object TNoodleServer {
                 if (d.isSupported(Desktop.Action.BROWSE)) {
                     try {
                         val uri = URI(url)
-                        // FIXME l.info("Attempting to open $uri in browser.")
+                        LOG.info("Attempting to open $uri in browser.")
                         d.browse(uri)
                     } catch (e: URISyntaxException) {
-                        // FIXME l.warning("Could not convert $url to URI", e)
+                        LOG.warn("Could not convert $url to URI", e)
                     } catch (e: IOException) {
-                        // FIXME l.warning("Error opening tab in browser", e)
+                        LOG.warn("Error opening tab in browser", e)
                     }
 
                 } else {
-                    // FIXME l.warning("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.")
+                    LOG.error("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.")
                 }
             } else {
-                // FIXME l.warning("Sorry, it appears the Desktop api is not supported on your platform.")
+                LOG.error("Sorry, it appears the Desktop api is not supported on your platform.")
             }
         }
 
@@ -132,11 +134,7 @@ object TNoodleServer {
         // Find out which icon to use.
         val processType = MainLauncher.processType
 
-        val iconFileName = if (processType === MainLauncher.PROCESS_TYPE.WORKER) {
-            ICON_WORKER
-        } else {
-            ICON_WRAPPER
-        }
+        val iconFileName = if (processType === MainLauncher.ProcessType.WORKER) ICON_WORKER else ICON_WRAPPER
 
         // Get the file name of the icon.
         val fullFileName = "/$ICONS_FOLDER/$iconFileName"
@@ -147,10 +145,9 @@ object TNoodleServer {
         // OSX-specific code to set the dock icon.
         if (isOSX()) {
             try {
-                val application = com.apple.eawt.Application.getApplication()
-                application.dockIconImage = image
+                Application.getApplication().dockIconImage = image
             } catch (e: Exception) {
-                // FIXME l.log(Level.WARNING, "Error setting OSX dock icon", e)
+                LOG.warn("Error setting OSX dock icon", e)
             }
         } else {
             if (iconFileName != ICON_WORKER) {
@@ -159,7 +156,7 @@ object TNoodleServer {
             }
 
             if (!SystemTray.isSupported()) {
-                // FIXME l.warning("SystemTray is not supported")
+                LOG.warn("SystemTray is not supported")
                 return
             }
 
@@ -176,7 +173,7 @@ object TNoodleServer {
             openItem.addActionListener { openTabInBrowser(true) }
 
             exitItem.addActionListener {
-                // FIXME l.info("Exit initiated from tray icon")
+                LOG.info("Exit initiated from tray icon")
                 System.exit(0)
             }
 
@@ -189,8 +186,8 @@ object TNoodleServer {
 
                 val st = SystemTray.getSystemTray()
                 val ti = trayIconAdapter.trayIcon
-                ti.image = image.getScaledInstance(st.trayIconSize.width, -1, Image.SCALE_SMOOTH)
 
+                ti.image = image.getScaledInstance(st.trayIconSize.width, -1, Image.SCALE_SMOOTH)
             }
         }
     }
