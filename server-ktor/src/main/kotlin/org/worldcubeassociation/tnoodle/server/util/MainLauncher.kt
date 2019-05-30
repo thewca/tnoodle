@@ -1,22 +1,18 @@
 package org.worldcubeassociation.tnoodle.server.util
 
-import java.io.BufferedInputStream
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.logging.Level
-import java.util.logging.Logger
 
 object MainLauncher {
-    private val l = Logger.getLogger(MainLauncher::class.java.name)
+    private val LOG = LoggerFactory.getLogger(MainLauncher::class.java)
 
-    val NO_REEXEC_OPT = "noReexec"
+    const val NO_REEXEC_OPT = "--noReexec"
 
-    var processType = MainLauncher.PROCESS_TYPE.UNKNOWN
+    var processType = MainLauncher.ProcessType.UNKNOWN
         private set
 
-    enum class PROCESS_TYPE {
+    enum class ProcessType {
         UNKNOWN,
         WRAPPER,
         WORKER
@@ -33,13 +29,10 @@ object MainLauncher {
      * an appropriate -Xmx to the jvm.
      */
     fun wrapMain(args: Array<String>, minHeapSizeMegs: Int, name: String? = null) {
-        var name = name
+        LOG.trace("Entering ${MainLauncher::class.java}, method wrapMain, args ${args + minHeapSizeMegs.toString()}")
 
-        l.entering(MainLauncher::class.java.toString(), "wrapMain", arrayOf<Any>(name ?: "", Arrays.toString(args), minHeapSizeMegs))
-
-        if ("--$NO_REEXEC_OPT" in args) {
-            args[0] = "" // FIXME
-            processType = MainLauncher.PROCESS_TYPE.WORKER
+        if (NO_REEXEC_OPT in args) {
+            processType = MainLauncher.ProcessType.WORKER
             return
         }
 
@@ -50,115 +43,92 @@ object MainLauncher {
         val main = stack[stack.size - 1]
         val mainClass = main.className
 
-
         var newHeapSizeMegs = (Runtime.getRuntime().maxMemory() / 1024 / 1024).toInt()
-        var needsReExecing = false
+        var needsReExecing = newHeapSizeMegs < minHeapSizeMegs
 
         if (newHeapSizeMegs < minHeapSizeMegs) {
             // Note that we don't want to use minHeapSizeMegs, as that may be 0 or something.
             // We want to re-exec with -Xmx = MAX(newHeapSizeMegs, minHeapSizeMegs)
             newHeapSizeMegs = minHeapSizeMegs
-            needsReExecing = true
         }
 
         val jar = WebServerUtils.jarFile
+
         var jvm = "java"
         val os = System.getProperty("os.name")
-        l.info("Detected os: $os")
-        if (System.getProperty("os.name").startsWith("Windows")) {
+
+        LOG.info("Detected os: $os")
+
+        if (os.startsWith("Windows")) {
             // We only do this java.exe magic if we're on windows
-            // Linux and Mac seem to show useful information if you
-            // ps -efw
-            if (name == null) {
-                if (jar == null) {
-                    name = mainClass
-                } else {
-                    name = jar.name
-                    if (name!!.toLowerCase().endsWith(".jar")) {
-                        name = name.substring(0, name.length - ".jar".length)
-                    }
-                }
-            }
-            if (!name!!.toLowerCase().endsWith(".exe")) {
-                name = "$name.exe"
-            }
+            // Linux and Mac seem to show useful information if you ps -efw
+            val launcherName = name ?: jar?.name?.substringBeforeLast(".jar") ?: mainClass
+            val launcherExecutable = "${launcherName.substringBeforeLast(".exe")}.exe"
+
             val jre = File(System.getProperty("java.home"))
             val java = File("$jre\\bin", "java.exe")
-            val launcherDir = File("$jre\\temp-launcher")
-            launcherDir.mkdir()
+
+            val launcherDir = File("$jre\\temp-launcher").apply { mkdir() }
+
             if (launcherDir.isDirectory) {
-                val newLauncher = File(launcherDir, name)
-                if (newLauncher.exists()) {
-                    // This will fail if someone puts something stupid in the directory
-                    jvm = "\"" + newLauncher.path + "\""
-                } else {
+                val newLauncher = File(launcherDir, launcherExecutable)
+
+                // This will fail if someone puts something stupid in the directory
+                jvm = "\"${newLauncher.path}\""
+
+                if (!newLauncher.exists()) {
                     try {
                         WebServerUtils.copyFile(java, newLauncher)
-                        jvm = "\"" + newLauncher.path + "\""
+                        LOG.info("Successfully copied $java -> $newLauncher")
 
                         // We successfully created a new executable, so lets use it!
                         needsReExecing = true
-                        l.info("Successfully copied $java -> $newLauncher")
                     } catch (e: IOException) {
-                        l.log(Level.WARNING, "Couldn't copy java.exe", e)
+                        LOG.warn("Couldn't copy java.exe", e)
                     }
-
                 }
             } else {
-                l.log(Level.WARNING, "$launcherDir is not a directory.")
+                LOG.warn("$launcherDir is not a directory.")
             }
         }
-        l.info("needsReExecing: $needsReExecing")
-        if (!needsReExecing) {
-            processType = MainLauncher.PROCESS_TYPE.WORKER
-            return
+
+        LOG.info("needsReExecing: $needsReExecing")
+
+        if (needsReExecing) {
+            processType = MainLauncher.ProcessType.WRAPPER
         } else {
-            processType = MainLauncher.PROCESS_TYPE.WRAPPER
+            processType = MainLauncher.ProcessType.WORKER
+            return
         }
 
-        val classpath = System.getProperty("java.class.path")
         // Fortunately, classpath contains our jar file if we were run
         // with the -jar command line arg, so classpath and our mainClass
         // are all we need to re-exec ourselves.
+        val classpath = System.getProperty("java.class.path")
 
         // Note that any command line arguments that are passed to the jvm won't
         // pass through to the new jvm we create. I don't believe it's possible to figure
         // them out in a general way.
-        val jvmArgs = ArrayList<String>()
-        jvmArgs.add(jvm)
-        jvmArgs.add("-Xmx" + newHeapSizeMegs + "m")
-        jvmArgs.add("-classpath")
-        jvmArgs.add(classpath)
-        jvmArgs.add(mainClass)
-        jvmArgs.add("--$NO_REEXEC_OPT")
-        jvmArgs.addAll(Arrays.asList(*args))
+        val jvmArgs = listOf(jvm, "-Xmx${newHeapSizeMegs}m", "-classpath", classpath, mainClass, NO_REEXEC_OPT) + args
 
         try {
-            l.info("Re-execing with $jvmArgs")
-            val pb = ProcessBuilder(jvmArgs)
-            pb.redirectErrorStream(true)
+            LOG.info("Re-execing with $jvmArgs")
+
+            val pb = ProcessBuilder(jvmArgs).apply { redirectErrorStream(true) }
             val p = pb.start()
 
             // If we don't do something like this on Windows, killing the parent process
             // will leave the child process around.
             // There's still the change that if we get forcibly shut down, we won't
             // execute this shutdown hook.
-            Runtime.getRuntime().addShutdownHook(object : Thread() {
-                override fun run() {
-                    p.destroy()
-                }
-            })
+            Runtime.getRuntime().addShutdownHook(Thread { p.destroy() })
 
-            val `in` = BufferedInputStream(p.inputStream)
-            val buff = ByteArray(1024)
-            var read: Int = `in`.read(buff)
-            while (read >= 0) {
-                System.out.write(buff, 0, read)
-                read = `in`.read(buff)
-            }
+            val stream = p.inputStream.buffered()
+            System.out.write(stream.readBytes())
+
             System.exit(0)
         } catch (e: IOException) {
-            l.log(Level.WARNING, "", e)
+            LOG.warn("", e)
         }
     }
 }
