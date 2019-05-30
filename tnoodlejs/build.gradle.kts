@@ -34,7 +34,6 @@ dependencies {
 }
 
 gwt {
-    // TODO move this configuration up to buildSrc perhaps?
     gwtVersion = GWT
 
     modules("scrambles")

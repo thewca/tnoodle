@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.Image;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.Puzzle;
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo;
-import net.gnehzr.tnoodle.scrambles.PuzzlePlugins;
 import net.gnehzr.tnoodle.svglite.Color;
 import net.gnehzr.tnoodle.svglite.Svg;
 import org.timepedia.exporter.client.Export;
@@ -23,6 +22,8 @@ import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 @ExportPackage("")
 @Export("tnoodlejs")
 public class TNoodleJsUtils implements Exportable {
+    private static final String PUZZLE_PACKAGE = "net.gnehzr.tnoodle.puzzle";
+
     private TNoodleJsUtils() {}
     
     public static void setLogLevel(String levelStr) {
@@ -54,7 +55,7 @@ public class TNoodleJsUtils implements Exportable {
     }
 
     public static Element getPuzzleIcon(Puzzle puzzle) {
-        String filename = PuzzlePlugins.PUZZLE_PACKAGE + "/" + puzzle.getShortName() + ".png";
+        String filename = PUZZLE_PACKAGE + "/" + puzzle.getShortName() + ".png";
         if(net.gnehzr.tnoodle.js.ScrambleJsEntryPoint.resources.containsKey(filename)) {
             Image image = new Image();
             image.setUrl("data:image/png;base64," + net.gnehzr.tnoodle.js.ScrambleJsEntryPoint.resources.get(filename));
