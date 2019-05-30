@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.application.call
 import io.ktor.http.content.PartData
@@ -15,6 +15,7 @@ import java.net.URL
 import java.util.regex.Matcher
 
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 
 object ScrambleImporterHandler : RouteHandler {
     override fun install(router: Routing) {

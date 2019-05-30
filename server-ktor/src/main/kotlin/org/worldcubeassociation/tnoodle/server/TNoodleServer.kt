@@ -6,7 +6,10 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import org.worldcubeassociation.tnoodle.server.application.TNoodleBaseServer
 import org.worldcubeassociation.tnoodle.server.logging.TNoodleLogging
+import org.worldcubeassociation.tnoodle.server.util.MainLauncher
+import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import tray.SystemTrayProvider
 import tray.java.JavaIconAdapter
 import java.awt.*
@@ -21,17 +24,20 @@ import javax.swing.ImageIcon
 object TNoodleServer {
     const val TNOODLE_PORT = 2014
 
-    var NAME = WebServerUtils.projectName
-    var VERSION = WebServerUtils.version
-
     const val MIN_HEAP_SIZE_MEGS = 1024 // FIXME what was the original value?
 
-    @JvmStatic
-    fun main(args: Array<String>) {
+    val NAME = WebServerUtils.projectName
+    val VERSION = WebServerUtils.version
+
+    private val SERVER_MODULES = mutableListOf<ApplicationHandler>()
+
+    fun registerModule(app: ApplicationHandler) = SERVER_MODULES.add(app)
+
+    fun launch(cliArgs: Array<String>) {
         WebServerUtils.doFirstRunStuff()
         TNoodleLogging.initializeLogging()
 
-        val parser = ArgParser(args)
+        val parser = ArgParser(cliArgs)
 
         val desiredPort by parser.storing("-p", "--http", help = "The port to run the http server on", transform = String::toInt).default(TNOODLE_PORT)
         val desiredJsEnv by parser.storing("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';", transform = {}).default("")
@@ -54,12 +60,18 @@ object TNoodleServer {
         // We want different icons for the parent process and the child
         // process.
         setApplicationIcon()
-        MainLauncher.wrapMain(args, MIN_HEAP_SIZE_MEGS)
+        MainLauncher.wrapMain(cliArgs, MIN_HEAP_SIZE_MEGS)
         setApplicationIcon()
 
         val env = applicationEngineEnvironment {
             module {
-                tnoodleBase()
+                TNoodleBaseServer().spinUp(this)
+            }
+
+            for (serverModule in SERVER_MODULES) {
+                module {
+                    serverModule.spinUp(this)
+                }
             }
 
             connector {
@@ -68,9 +80,9 @@ object TNoodleServer {
             }
         }
 
-        embeddedServer(Netty, env).start(wait = true)
+        embeddedServer(Netty, env).start()
 
-        // TODO logging
+        // FIXME logging
 
         println("$NAME-$VERSION started")
 
@@ -108,7 +120,7 @@ object TNoodleServer {
     }
 
     // Preferred way to detect OSX according to https://developer.apple.com/library/mac/#technotes/tn2002/tn2110.html
-    fun isOSX() = System.getProperty("os.name").contains("OS X")
+    fun isOSX() = "OS X" in System.getProperty("os.name")
 
     const val ICONS_FOLDER = "icons"
 
@@ -129,8 +141,10 @@ object TNoodleServer {
         }
 
         // Get the file name of the icon.
-        val fullFileName = "${WebServerUtils.resourceDirectory}/$ICONS_FOLDER/$iconFileName"
-        val image = ImageIcon(fullFileName).image
+        val fullFileName = "/$ICONS_FOLDER/$iconFileName"
+        val imageUrl = TNoodleServer.javaClass.getResource(fullFileName)
+
+        val image = ImageIcon(imageUrl).image
 
         // OSX-specific code to set the dock icon.
         if (isOSX()) {
@@ -151,19 +165,13 @@ object TNoodleServer {
                 return
             }
 
-            val imageUrl = try {
-                File(fullFileName).toURI().toURL()
-            } catch (e: MalformedURLException) {
-                // FIXME l.log(Level.WARNING, "Could not convert $fullFileName to a URL", e)
-                return
-            }
-
             val trayAdapter = SystemTrayProvider().systemTray
 
             val popup = PopupMenu()
 
             val openItem = MenuItem("Open")
             popup.add(openItem)
+
             val exitItem = MenuItem("Exit")
             popup.add(exitItem)
 

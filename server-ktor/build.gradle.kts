@@ -18,7 +18,11 @@ plugins {
 
 dependencies {
     api("io.ktor:ktor-server-netty:1.2.0")
+
     implementation("io.ktor:ktor-server-host-common:1.2.0")
+    implementation("io.ktor:ktor-gson:1.2.0")
+    
+    runtime("ch.qos.logback:logback-classic:1.2.3")
     
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
 

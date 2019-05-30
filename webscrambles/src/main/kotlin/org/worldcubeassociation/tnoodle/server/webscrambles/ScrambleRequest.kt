@@ -2,13 +2,15 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.*
+import net.gnehzr.tnoodle.puzzle.CubePuzzle
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher
 import net.lingala.zip4j.io.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.util.Zip4jConstants
 import org.joda.time.DateTime
-import org.worldcubeassociation.tnoodle.server.WebServerUtils
+import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
+import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.addFmcScrambleCutoutSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.addFmcSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.addGenericFmcSolutionSheet
@@ -16,6 +18,8 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.add
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.randomPasscode
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.stripNewlines
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.toFileSafeString
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.OrderedScrambles
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
 import java.util.*
@@ -25,7 +29,7 @@ import net.gnehzr.tnoodle.svglite.Color as SVGColor
 data class ScrambleRequest(
     val scrambles: List<String>,
     val extraScrambles: List<String>,
-    val scrambler: Puzzle?,
+    val scrambler: Puzzle,
     val copies: Int,
     val title: String,
     val fmc: Boolean,
@@ -35,9 +39,9 @@ data class ScrambleRequest(
     // So, if ScrambleRequest.scrambles.length == 3, tnoodle prints Scramble 1 of 3, Scramble 2 of 3 and Scramble 3 of 3.
     // But for OrderedScrambles, these scrambles are split on the schedule, so we replace Scramble.scrambles = {Scramble.scrambles[attempt]}.
     // To continue printing Scramble x of y, we use attempt as x and totalAttempt as y.
-    val roundStartTime: DateTime?,
-    val totalAttempt: Int,
-    val attempt: Int,
+    var roundStartTime: DateTime?,
+    var totalAttempt: Int,
+    var attempt: Int,
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -54,7 +58,7 @@ data class ScrambleRequest(
     constructor() : this(
         listOf(),
         listOf(),
-        null,
+        CubePuzzle(2), // FIXME
         0,
         "",
         false,

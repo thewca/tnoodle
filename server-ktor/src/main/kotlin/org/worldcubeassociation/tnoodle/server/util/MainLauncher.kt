@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server
+package org.worldcubeassociation.tnoodle.server.util
 
 import java.io.BufferedInputStream
 import java.io.File

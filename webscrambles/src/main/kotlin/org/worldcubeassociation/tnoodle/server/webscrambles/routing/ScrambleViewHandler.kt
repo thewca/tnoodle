@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.application.call
 import io.ktor.http.ContentType
@@ -20,6 +20,10 @@ import org.apache.batik.transcoder.TranscodingHints
 import org.apache.batik.transcoder.image.ImageTranscoder
 import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
+import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
 
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
@@ -90,7 +94,7 @@ object ScrambleViewHandler : RouteHandler {
                         imageTranscoder.transcodingHints = hints
 
                         val input = TranscoderInput(svgFile)
-                        imageTranscoder.transcode(input, null)
+                        imageTranscoder.transcode(input, TranscoderOutput())
 
                         val img = imageTranscoder.bufferedImage
 
@@ -118,20 +122,17 @@ object ScrambleViewHandler : RouteHandler {
                 return@post call.respondText("No extension specified.")
             }
 
-            val scrambler = scramblers[name] ?: return@post call.respondText("Invalid scrambler: $name")
-
             val body = call.receiveText()
             val query = QueryStringDecoder(body).parameters().mapValues { it.value.first() }
 
-            val scrambleRequests = GSON.fromJson(query["sheets"], Array<ScrambleRequest>::class.java)
+            val scrambleRequests = GSON.fromJson(query["sheets"], Array<ScrambleRequest>::class.java).toList()
             val password = query["password"]
 
             val generationDate = Date()
 
             when (extension) {
                 "pdf" -> {
-                    val totalPdfOutput = ScrambleRequest
-                        .requestsToPdf(name, generationDate, scrambleRequests, password)
+                    val totalPdfOutput = ScrambleRequest.requestsToPdf(name, generationDate, scrambleRequests, password)
 
                     call.response.header("Content-Disposition", "inline")
 
@@ -147,8 +148,7 @@ object ScrambleViewHandler : RouteHandler {
 
                     val wcifHelper = WCIFHelper(schedule, scrambleRequests)
 
-                    val zipOutput = ScrambleRequest
-                        .requestsToZip(name, generationDate, scrambleRequests, password, generationUrl, wcifHelper)
+                    val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, scrambleRequests, password, generationUrl, wcifHelper)
 
                     val safeTitle = name.replace("\"".toRegex(), "'")
 

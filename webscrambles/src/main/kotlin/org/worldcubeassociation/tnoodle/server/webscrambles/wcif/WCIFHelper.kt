@@ -1,15 +1,17 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.toFileSafeString
 
 import java.util.ArrayList
 import java.util.Arrays
 
-class WCIFHelper(schedule: String?, val allScrambleRequests: Array<ScrambleRequest>) {
+class WCIFHelper(schedule: String?, val allScrambleRequests: List<ScrambleRequest>) {
     private val parser = JsonParser()
     val schedule = parser.parse(schedule).asJsonObject
 
@@ -57,7 +59,7 @@ class WCIFHelper(schedule: String?, val allScrambleRequests: Array<ScrambleReque
     }
 
     fun getSafeVenueName(venue: JsonElement): String {
-        return ScrambleRequest.toFileSafeString(parseMarkdown(venue.asJsonObject.get("name").asString))
+        return toFileSafeString(parseMarkdown(venue.asJsonObject.get("name").asString))
     }
 
     fun hasMultipleRooms(venue: JsonElement): Boolean {
@@ -65,7 +67,7 @@ class WCIFHelper(schedule: String?, val allScrambleRequests: Array<ScrambleReque
     }
 
     fun getSafeRoomName(room: JsonElement): String {
-        return ScrambleRequest.toFileSafeString(parseMarkdown(room.asJsonObject.get("name").asString))
+        return toFileSafeString(parseMarkdown(room.asJsonObject.get("name").asString))
     }
 
     fun getActivityCode(activity: JsonElement): String {
@@ -132,7 +134,7 @@ class WCIFHelper(schedule: String?, val allScrambleRequests: Array<ScrambleReque
 
         if (group > 0) {
             for (scrambleRequest in ArrayList(scrambleRequests)) {
-                if (!compareLettersCharToNumber(scrambleRequest.group, group)) {
+                if (!compareLettersCharToNumber(scrambleRequest.group!!, group)) {
                     scrambleRequests.remove(scrambleRequest)
                 }
             }
@@ -141,19 +143,11 @@ class WCIFHelper(schedule: String?, val allScrambleRequests: Array<ScrambleReque
         if (attempt > 0) {
             val temp = ArrayList<ScrambleRequest>()
             for (scrambleRequest in scrambleRequests) {
-                val attemptRequest = ScrambleRequest()
-                attemptRequest.scrambles = arrayOf(scrambleRequest.scrambles[attempt - 1])
-                attemptRequest.extraScrambles = scrambleRequest.extraScrambles
-                attemptRequest.scrambler = scrambleRequest.scrambler
-                attemptRequest.copies = scrambleRequest.copies
-
-                attemptRequest.title = scrambleRequest.title
-
-                attemptRequest.fmc = scrambleRequest.fmc
-                attemptRequest.event = scrambleRequest.event
-                attemptRequest.colorScheme = scrambleRequest.colorScheme
-                attemptRequest.attempt = attempt
-                attemptRequest.totalAttempt = scrambleRequest.scrambles.size // useful for fmc
+                val attemptRequest = scrambleRequest.copy(
+                    scrambles = listOf(scrambleRequest.scrambles[attempt - 1]),
+                    attempt = attempt,
+                    totalAttempt = scrambleRequest.scrambles.size // useful for fmc
+                )
 
                 temp.add(attemptRequest)
             }

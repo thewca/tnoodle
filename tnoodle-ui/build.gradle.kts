@@ -8,8 +8,8 @@ plugins {
     NODEJS
 }
 
-configure<NodeExtension> {
-  download = true
+configure<NodeExtension> { 
+    download = true
 }
 
 tasks.create<YarnTask>("bundle") {
