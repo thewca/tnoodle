@@ -2,12 +2,13 @@ package org.worldcubeassociation.tnoodle.server.routing
 
 import io.ktor.application.call
 import io.ktor.http.ContentType
+import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 
-import net.gnehzr.tnoodle.utils.GsonUtils.GSON
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 
 object JsEnvHandler : RouteHandler {
     override fun install(router: Routing) {
@@ -17,7 +18,7 @@ object JsEnvHandler : RouteHandler {
         }
 
         router.get("/env.json") {
-            call.respondText(GSON.toJson(JS_ENV), ContentType.Application.Json)
+            call.respond(JS_ENV)
         }
     }
 

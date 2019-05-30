@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.logging
 
-import org.worldcubeassociation.tnoodle.server.WebServerUtils
+import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import java.util.logging.Formatter
 import java.util.logging.LogRecord
 

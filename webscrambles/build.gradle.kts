@@ -72,6 +72,10 @@ tasks.getByName("check") {
     dependsOn("i18nCheck")
 }
 
+application {
+    mainClassName = "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
+}
+
 tasks.create<ShadowJar>("shadowJarOfficial") {
     description = "compile a JAR file that can be used as official release"
     group = "shadow"

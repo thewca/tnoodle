@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.application.call
 import io.ktor.http.ContentType
@@ -10,6 +10,8 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.util.toMap
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
+import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 
 import java.util.Date
 
@@ -74,8 +76,7 @@ object ScrambleHandler : RouteHandler {
                     call.respondBytes(totalPdfOutput.toByteArray(), ContentType.Application.Pdf)
                 }
                 "zip" -> {
-                    val baosZip = ScrambleRequest
-                        .requestsToZip(title, generationDate, scrambleRequests, seed, generationUrl, null)
+                    val baosZip = ScrambleRequest.requestsToZip(title, generationDate, scrambleRequests, seed, generationUrl, null)
 
                     call.respondBytes(baosZip.toByteArray(), ContentType.Application.Zip)
                 }

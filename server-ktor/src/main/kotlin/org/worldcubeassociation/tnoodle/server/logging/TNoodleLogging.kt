@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.logging
 
-import org.worldcubeassociation.tnoodle.server.WebServerUtils
+import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import java.io.File
 import java.io.IOException
 import java.util.logging.ConsoleHandler

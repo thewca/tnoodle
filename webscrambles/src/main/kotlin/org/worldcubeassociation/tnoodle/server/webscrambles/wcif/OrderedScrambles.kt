@@ -1,9 +1,10 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import net.lingala.zip4j.io.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import org.joda.time.DateTime
 import org.joda.time.Days
+import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 
 import java.util.ArrayList
 import java.util.Date
