@@ -19,6 +19,16 @@ object StaticContentHandler : RouteHandler {
             static("/static") {
                 resources("wca/new-ui/static")
             }
+
+            static("oauth") {
+                resource("*", "wca/new-ui/index.html")
+            }
+
+            static("competitions") {
+                resource("*", "wca/new-ui/index.html")
+
+                defaultResource("wca/new-ui/index.html")
+            }
         }
 
         router.static("/scramble-legacy") {
@@ -40,8 +50,7 @@ object StaticContentHandler : RouteHandler {
         }
 
         router.static("/wca") {
-            resource("tnoodle_logo.svg", "wca/tnoodle_logo.svg")
-            resource("scrambleserver.js", "wca/scrambleserver.js")
+            resources("wca")
         }
     }
 }
