@@ -3,7 +3,6 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 
-import java.io.File
 import java.nio.file.Paths
 import java.util.HashMap
 import java.util.Locale
@@ -91,7 +90,7 @@ object Translate {
         // Now interpolate variables in the input string.
         //
         // Find anything that looks like %{...}, unless the percent sign is escaped as in %%{...}
-        val templatePattern = Pattern.compile("(?<!%)%\\{([^}]+)\\}")
+        val templatePattern = Pattern.compile("(?<!%)%\\{([^}]+)}")
         val matcher = templatePattern.matcher(interpolateMe)
 
         val sb = StringBuffer()
