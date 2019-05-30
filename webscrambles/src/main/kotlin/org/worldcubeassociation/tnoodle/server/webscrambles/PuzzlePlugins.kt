@@ -8,9 +8,9 @@ import java.util.*
 object PuzzlePlugins {
     private val plugins = Plugins<Puzzle>()
 
-    val PUZZLES: SortedMap<String, Puzzle> by lazy { getScramblers() }
+    val PUZZLES: SortedMap<String, Lazy<Puzzle>> by lazy { getScramblers() }
 
-    private fun getScramblers(): SortedMap<String, Puzzle> {
+    private fun getScramblers(): SortedMap<String, Lazy<Puzzle>> {
         plugins.register("222", "2x2x2") { TwoByTwoCubePuzzle() }
         plugins.register("333", "3x3x3") { ThreeByThreeCubePuzzle() }
         plugins.register("444", "4x4x4") { FourByFourCubePuzzle() }

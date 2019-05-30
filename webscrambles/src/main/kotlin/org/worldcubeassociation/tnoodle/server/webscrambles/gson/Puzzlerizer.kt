@@ -11,8 +11,10 @@ class Puzzlerizer : JsonSerializer<Puzzle>, JsonDeserializer<Puzzle> {
             val scramblerName = json.asString
             val scramblers = PuzzlePlugins.PUZZLES
 
-            return scramblers[scramblerName]
+            val loadedScrambler by scramblers[scramblerName]
                 ?: throw JsonParseException("$scramblerName not found in: ${scramblers.keys}")
+
+            return loadedScrambler
         } catch (e: Exception) {
             throw JsonParseException(e)
         }

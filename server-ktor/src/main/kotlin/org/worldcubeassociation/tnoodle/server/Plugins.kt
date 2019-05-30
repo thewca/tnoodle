@@ -1,7 +1,14 @@
 package org.worldcubeassociation.tnoodle.server
 
-class Plugins<H> {
-    private val filePlugins = mutableMapOf<String, H>()
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
+
+class Plugins<H> : ReadOnlyProperty<String, H> {
+    override fun getValue(thisRef: String, property: KProperty<*>): H {
+        return filePlugins.getValue(thisRef).value
+    }
+
+    private val filePlugins = mutableMapOf<String, Lazy<H>>()
     private val pluginComment = mutableMapOf<String, String>()
 
     val plugins
@@ -11,9 +18,7 @@ class Plugins<H> {
         get() = pluginComment.toMap()
 
     fun register(name: String, comment: String, builder: () -> H) {
-        val cachedInstance by lazy(builder)
-
-        filePlugins[name] = cachedInstance
+        filePlugins[name] = lazy(builder)
         pluginComment[name] = comment
     }
 }

@@ -83,7 +83,6 @@ data class ScrambleRequest(
         private val MAX_COPIES = 100
 
         private val SCRAMBLE_CACHERS = mutableMapOf<String, ScrambleCacher>()
-        private var PLUGIN_PUZZLES = PuzzlePlugins.PUZZLES
 
         fun parseScrambleRequests(query: Map<String, String>, seed: String?): List<ScrambleRequest> {
             if (query.isEmpty()) {
@@ -104,7 +103,7 @@ data class ScrambleRequest(
 
                     val decodedTitle = URLDecoder.decode(title, "utf-8")
 
-                    val scrambler = PLUGIN_PUZZLES[puzzle] ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
+                    val scrambler by PuzzlePlugins.PUZZLES[puzzle] ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
 
                     val scrambleCacher = SCRAMBLE_CACHERS.getOrPut(puzzle) { ScrambleCacher(scrambler) }
 

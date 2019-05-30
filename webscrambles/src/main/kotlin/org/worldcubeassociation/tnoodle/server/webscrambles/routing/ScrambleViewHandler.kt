@@ -57,7 +57,7 @@ object ScrambleViewHandler : RouteHandler {
                 return@get call.respondText("No extension specified.")
             }
 
-            val scrambler = scramblers[name] ?: return@get call.respondText("Invalid scrambler: $name")
+            val scrambler by scramblers[name] ?: return@get call.respondText("Invalid scrambler: $name")
 
             val queryStr = call.request.uri.substringAfter('?', "")
             val query = parseQuery(queryStr).toMutableMap()
