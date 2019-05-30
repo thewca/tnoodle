@@ -9,12 +9,7 @@ object GsonUtil {
     }
 
     val GSON: Gson
-        get() {
-            TYPE_ADAPTERS.forEach { GSON_BUILDER.registerTypeAdapter(it.first, it.second) }
-            TYPE_HIERARCHY_ADAPTERS.forEach { GSON_BUILDER.registerTypeHierarchyAdapter(it.first, it.second) }
-
-            return GSON_BUILDER.create()
-        }
+        get() = GSON_BUILDER.create()
 
     private val BUILDER_CONFIGS = mutableListOf<(GsonBuilder) -> Unit>()
 
@@ -25,6 +20,14 @@ object GsonUtil {
     fun GsonBuilder.configureLoaded() {
         for (cfg in BUILDER_CONFIGS) {
             cfg(this)
+        }
+
+        for ((cls, adapter) in TYPE_ADAPTERS) {
+            registerTypeAdapter(cls, adapter)
+        }
+
+        for ((cls, hierarchyAdapter) in TYPE_HIERARCHY_ADAPTERS) {
+            registerTypeHierarchyAdapter(cls, hierarchyAdapter)
         }
     }
 

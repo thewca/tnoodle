@@ -14,6 +14,20 @@ object RouteRedirectHandler : RouteHandler {
             call.respondRedirect("/scramble", true)
         }
 
+        // NEW-UI
+
+        router.get("/scramble/oauth/*") {
+            call.respondRedirect("/scramble", true)
+        }
+
+        router.get("/scramble/competitions") {
+            call.respondRedirect("/scramble", true)
+        }
+
+        router.get("/scramble/competitions/*") {
+            call.respondRedirect("/scramble", true)
+        }
+
         // README shortcuts
 
         router.get("/about") {

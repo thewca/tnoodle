@@ -2,14 +2,15 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.application.call
 import io.ktor.http.ContentType
+import io.ktor.request.uri
 import io.ktor.response.header
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
-import io.ktor.util.toMap
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 
@@ -22,13 +23,17 @@ object ScrambleHandler : RouteHandler {
 
             val generationDate = Date()
 
-            val query = call.request.queryParameters.toMap().mapValues { it.value.first() }.toMutableMap()
+            val queryStr = call.request.uri.substringAfter('?', "")
+            val query = parseQuery(queryStr).toMutableMap()
 
             // TODO - this means you can't have a round named "seed" or "showIndices" or "callback" or "generationUrl"!
             val seed = query.remove("seed")
             val generationUrl = query.remove("generationUrl")
-            val showIndices = query.remove("showIndices") != null
+            val showIndicesTag = query.remove("showIndices") ?: "0"
 
+            val showIndices = showIndicesTag == "1"
+
+            // FIXME why do we blindly remove this?
             query.remove("callback")
 
             val (title, extension) = filename.split(".", limit = 2)
@@ -37,10 +42,6 @@ object ScrambleHandler : RouteHandler {
                 throw InvalidScrambleRequestException("No extension specified")
             }
 
-            // Note that we parse the scramble requests *after* checking the extension.
-            // This way, someone who makes a request for "/scramble/foo.bar" will get a warning about
-            // the ".bar" extension, rather than incorrect scramble requests.
-            // FIXME do what the comment says
             val scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed)
 
             when (extension) {

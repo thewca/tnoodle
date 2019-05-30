@@ -12,8 +12,8 @@ import java.util.Date
 object OrderedScrambles {
     // TODO see https://github.com/thewca/tnoodle/issues/400
 
-    fun generateOrderedScrambles(globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
-        if (wcifHelper.schedule == null) {
+    fun generateOrderedScrambles(globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper?) {
+        if (wcifHelper?.schedule == null) {
             return
         }
 

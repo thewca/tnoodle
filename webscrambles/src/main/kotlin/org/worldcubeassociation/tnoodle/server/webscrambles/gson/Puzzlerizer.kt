@@ -5,7 +5,6 @@ import net.gnehzr.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import java.lang.reflect.Type
 
-// registerTypeHierarchyAdapter
 class Puzzlerizer : JsonSerializer<Puzzle>, JsonDeserializer<Puzzle> {
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Puzzle {
         try {

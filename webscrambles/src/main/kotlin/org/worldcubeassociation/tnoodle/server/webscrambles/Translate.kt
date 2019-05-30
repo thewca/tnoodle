@@ -1,10 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 
 import java.io.File
+import java.nio.file.Paths
 import java.util.HashMap
 import java.util.Locale
 import java.util.regex.Pattern
@@ -19,7 +19,9 @@ object Translate {
         get() = TRANSLATIONS.keys
 
     private fun loadTranslationResources(): Map<Locale, Map<String, *>> {
-        val i18nDir = File(WebServerUtils.resourceDirectory, "i18n")
+        val i18nDirPath = Translate.javaClass.getResource("/i18n")
+        val i18nDir = Paths.get(i18nDirPath.toURI()).toFile()
+
         val ymlFiles = i18nDir.listFiles()
 
         val yaml = Yaml(Constructor(HashMap::class.java))
