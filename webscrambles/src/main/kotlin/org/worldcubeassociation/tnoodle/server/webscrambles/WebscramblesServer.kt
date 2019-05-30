@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import io.ktor.application.Application
 import io.ktor.routing.routing
+import io.ktor.util.KtorExperimentalAPI
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo
 import net.gnehzr.tnoodle.svglite.Color
@@ -27,6 +28,7 @@ class WebscramblesServer : ApplicationHandler {
     }
 
     companion object {
+        @KtorExperimentalAPI
         @JvmStatic
         fun main(args: Array<String>) {
             GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())

@@ -11,6 +11,7 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
+import io.ktor.routing.route
 import net.gnehzr.tnoodle.scrambles.PuzzleIcon
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo
 import org.apache.batik.anim.dom.SVGDOMImplementation
@@ -48,115 +49,117 @@ object ScrambleViewHandler : RouteHandler {
     }
 
     override fun install(router: Routing) {
-        router.get("/view/{puzzleExt?}") {
-            val puzzleExt = call.parameters["puzzleExt"] ?: return@get call.respondText("Please specify a puzzle")
+        router.route("/view") {
+            get("/{puzzleExt}") {
+                val puzzleExt = call.parameters["puzzleExt"] ?: return@get call.respondText("Please specify a puzzle")
 
-            val (name, extension) = puzzleExt.split(".", limit = 2)
+                val (name, extension) = puzzleExt.split(".", limit = 2)
 
-            if (extension.isEmpty()) {
-                return@get call.respondText("No extension specified.")
-            }
+                if (extension.isEmpty()) {
+                    return@get call.respondText("No extension specified.")
+                }
 
-            val scrambler by scramblers[name] ?: return@get call.respondText("Invalid scrambler: $name")
+                val scrambler by scramblers[name] ?: return@get call.respondText("Invalid scrambler: $name")
 
-            val queryStr = call.request.uri.substringAfter('?', "")
-            val query = parseQuery(queryStr).toMutableMap()
+                val queryStr = call.request.uri.substringAfter('?', "")
+                val query = parseQuery(queryStr).toMutableMap()
 
-            val colorScheme = query["scheme"]?.let { scrambler.parseColorScheme(it) } ?: hashMapOf()
-            val scramble = query["scramble"]
+                val colorScheme = query["scheme"]?.let { scrambler.parseColorScheme(it) } ?: hashMapOf()
+                val scramble = query["scramble"]
 
-            when (extension) {
-                "png" -> {
-                    if (query.containsKey("icon")) {
-                        val icon = PuzzleIcon.loadPuzzleIconPng(scrambler.shortName)
+                when (extension) {
+                    "png" -> {
+                        if (query.containsKey("icon")) {
+                            val icon = PuzzleIcon.loadPuzzleIconPng(scrambler.shortName)
 
-                        call.respondBytes(icon.toByteArray(), ContentType.Image.PNG)
-                    } else {
-                        val svg = scrambler.drawScramble(scramble, colorScheme)
-                        val svgFile = svg.toString().byteInputStream()
+                            call.respondBytes(icon.toByteArray(), ContentType.Image.PNG)
+                        } else {
+                            val svg = scrambler.drawScramble(scramble, colorScheme)
+                            val svgFile = svg.toString().byteInputStream()
 
-                        val (width, height) = scrambler.preferredSize.let { it.width to it.height }
-                        val imageTranscoder = BufferedImageTranscoder()
+                            val (width, height) = scrambler.preferredSize.let { it.width to it.height }
+                            val imageTranscoder = BufferedImageTranscoder()
 
-                        // Copied from http://stackoverflow.com/a/6634963
-                        // with some tweaks.
-                        val impl = SVGDOMImplementation.getDOMImplementation()
+                            // Copied from http://stackoverflow.com/a/6634963
+                            // with some tweaks.
+                            val impl = SVGDOMImplementation.getDOMImplementation()
 
-                        val hints = TranscodingHints().apply {
-                            this[ImageTranscoder.KEY_WIDTH] = width.toFloat()
-                            this[ImageTranscoder.KEY_HEIGHT] = height.toFloat()
-                            this[ImageTranscoder.KEY_DOM_IMPLEMENTATION] = impl
-                            this[ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI] = SVGConstants.SVG_NAMESPACE_URI
-                            this[ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI] = SVGConstants.SVG_NAMESPACE_URI
-                            this[ImageTranscoder.KEY_DOCUMENT_ELEMENT] = SVGConstants.SVG_SVG_TAG
-                            this[ImageTranscoder.KEY_XML_PARSER_VALIDATING] = false
+                            val hints = TranscodingHints().apply {
+                                this[ImageTranscoder.KEY_WIDTH] = width.toFloat()
+                                this[ImageTranscoder.KEY_HEIGHT] = height.toFloat()
+                                this[ImageTranscoder.KEY_DOM_IMPLEMENTATION] = impl
+                                this[ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI] = SVGConstants.SVG_NAMESPACE_URI
+                                this[ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI] = SVGConstants.SVG_NAMESPACE_URI
+                                this[ImageTranscoder.KEY_DOCUMENT_ELEMENT] = SVGConstants.SVG_SVG_TAG
+                                this[ImageTranscoder.KEY_XML_PARSER_VALIDATING] = false
+                            }
+
+                            imageTranscoder.transcodingHints = hints
+
+                            val input = TranscoderInput(svgFile)
+                            imageTranscoder.transcode(input, TranscoderOutput())
+
+                            val img = imageTranscoder.bufferedImage
+
+                            val bytes = ByteArrayOutputStream().also { ImageIO.write(img, "png", it) }
+
+                            call.respondBytes(bytes.toByteArray(), ContentType.Image.PNG)
                         }
-
-                        imageTranscoder.transcodingHints = hints
-
-                        val input = TranscoderInput(svgFile)
-                        imageTranscoder.transcode(input, TranscoderOutput())
-
-                        val img = imageTranscoder.bufferedImage
-
-                        val bytes = ByteArrayOutputStream().also { ImageIO.write(img, "png", it) }
-
-                        call.respondBytes(bytes.toByteArray(), ContentType.Image.PNG)
                     }
+                    "svg" -> {
+                        val svg = scrambler.drawScramble(scramble, colorScheme)
+
+                        call.respondText(svg.toString(), ContentType.Image.SVG)
+                    }
+                    "json" -> call.respond(PuzzleImageInfo(scrambler))
+                    else -> call.respondText("Invalid extension: $extension")
                 }
-                "svg" -> {
-                    val svg = scrambler.drawScramble(scramble, colorScheme)
-
-                    call.respondText(svg.toString(), ContentType.Image.SVG)
-                }
-                "json" -> call.respond(PuzzleImageInfo(scrambler))
-                else -> call.respondText("Invalid extension: $extension")
-            }
-        }
-
-        router.post("/view/{puzzleExt?}") {
-            val puzzleExt = call.parameters["puzzleExt"] ?: return@post call.respondText("Please specify a puzzle")
-
-            val (name, extension) = puzzleExt.split(".", limit = 2)
-
-            if (extension.isEmpty()) {
-                return@post call.respondText("No extension specified.")
             }
 
-            val body = call.receiveText()
-            val query = parseQuery(body)
+            post("/{puzzleExt}") {
+                val puzzleExt = call.parameters["puzzleExt"] ?: return@post call.respondText("Please specify a puzzle")
 
-            val scrambleRequests = GSON.fromJson(query["sheets"], Array<ScrambleRequest>::class.java).toList()
-            val password = query["password"]
+                val (name, extension) = puzzleExt.split(".", limit = 2)
 
-            val generationDate = Date()
-
-            when (extension) {
-                "pdf" -> {
-                    val totalPdfOutput = ScrambleRequest.requestsToPdf(name, generationDate, scrambleRequests, password)
-
-                    call.response.header("Content-Disposition", "inline")
-
-                    // Workaround for Chrome bug with saving PDFs:
-                    // https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
-                    call.response.header("Cache-Control", "public")
-
-                    call.respondBytes(totalPdfOutput.toByteArray(), ContentType.Application.Pdf)
+                if (extension.isEmpty()) {
+                    return@post call.respondText("No extension specified.")
                 }
-                "zip" -> {
-                    val generationUrl = query["generationUrl"]
-                    val schedule = query["schedule"] ?: ""
 
-                    val wcifHelper = WCIFHelper(schedule, scrambleRequests)
+                val body = call.receiveText()
+                val query = parseQuery(body)
 
-                    val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, scrambleRequests, password, generationUrl, wcifHelper)
+                val scrambleRequests = GSON.fromJson(query["sheets"], Array<ScrambleRequest>::class.java).toList()
+                val password = query["password"]
 
-                    val safeTitle = name.replace("\"".toRegex(), "'")
+                val generationDate = Date()
 
-                    call.response.header("Content-Disposition", "attachment; filename=\"$safeTitle.zip\"")
-                    call.respondBytes(zipOutput.toByteArray(), ContentType.Application.Zip)
+                when (extension) {
+                    "pdf" -> {
+                        val totalPdfOutput = ScrambleRequest.requestsToPdf(name, generationDate, scrambleRequests, password)
+
+                        call.response.header("Content-Disposition", "inline")
+
+                        // Workaround for Chrome bug with saving PDFs:
+                        // https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
+                        call.response.header("Cache-Control", "public")
+
+                        call.respondBytes(totalPdfOutput.toByteArray(), ContentType.Application.Pdf)
+                    }
+                    "zip" -> {
+                        val generationUrl = query["generationUrl"]
+                        val schedule = query["schedule"] ?: ""
+
+                        val wcifHelper = WCIFHelper(schedule, scrambleRequests)
+
+                        val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, scrambleRequests, password, generationUrl, wcifHelper)
+
+                        val safeTitle = name.replace("\"".toRegex(), "'")
+
+                        call.response.header("Content-Disposition", "attachment; filename=\"$safeTitle.zip\"")
+                        call.respondBytes(zipOutput.toByteArray(), ContentType.Application.Zip)
+                    }
+                    else -> call.respondText("Invalid extension: $extension")
                 }
-                else -> call.respondText("Invalid extension: $extension")
             }
         }
     }
