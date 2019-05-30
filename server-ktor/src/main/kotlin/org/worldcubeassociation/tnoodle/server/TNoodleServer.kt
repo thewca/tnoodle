@@ -2,10 +2,10 @@ package org.worldcubeassociation.tnoodle.server
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
+import io.ktor.server.cio.CIO
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.jetty.Jetty
 import org.worldcubeassociation.tnoodle.server.application.TNoodleBaseServer
 import org.worldcubeassociation.tnoodle.server.logging.TNoodleLogging
 import org.worldcubeassociation.tnoodle.server.util.MainLauncher
@@ -78,7 +78,7 @@ object TNoodleServer {
             }
         }
 
-        embeddedServer(Jetty, env).start()
+        embeddedServer(CIO, env).start()
 
         // FIXME logging
 
