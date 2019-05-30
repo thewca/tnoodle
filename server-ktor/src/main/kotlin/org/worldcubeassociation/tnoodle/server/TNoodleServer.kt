@@ -5,7 +5,7 @@ import com.xenomachina.argparser.default
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.server.jetty.Jetty
 import org.worldcubeassociation.tnoodle.server.application.TNoodleBaseServer
 import org.worldcubeassociation.tnoodle.server.logging.TNoodleLogging
 import org.worldcubeassociation.tnoodle.server.util.MainLauncher
@@ -13,9 +13,7 @@ import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import tray.SystemTrayProvider
 import tray.java.JavaIconAdapter
 import java.awt.*
-import java.io.File
 import java.io.IOException
-import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.logging.Level
@@ -80,7 +78,7 @@ object TNoodleServer {
             }
         }
 
-        embeddedServer(Netty, env).start()
+        embeddedServer(Jetty, env).start()
 
         // FIXME logging
 

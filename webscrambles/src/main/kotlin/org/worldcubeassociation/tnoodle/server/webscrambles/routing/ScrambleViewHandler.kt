@@ -3,6 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.request.receiveText
+import io.ktor.request.uri
 import io.ktor.response.header
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
@@ -10,9 +11,8 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
-import io.ktor.util.toMap
-import io.netty.handler.codec.http.QueryStringDecoder
-import net.gnehzr.tnoodle.scrambles.*
+import net.gnehzr.tnoodle.scrambles.PuzzleIcon
+import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo
 import org.apache.batik.anim.dom.SVGDOMImplementation
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
@@ -20,15 +20,15 @@ import org.apache.batik.transcoder.TranscodingHints
 import org.apache.batik.transcoder.image.ImageTranscoder
 import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
-
-import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
-import java.io.*
-import java.util.Date
+import java.io.ByteArrayOutputStream
+import java.util.*
+import javax.imageio.ImageIO
 
 object ScrambleViewHandler : RouteHandler {
     private val scramblers = PuzzlePlugins.PUZZLES
@@ -59,7 +59,8 @@ object ScrambleViewHandler : RouteHandler {
 
             val scrambler = scramblers[name] ?: return@get call.respondText("Invalid scrambler: $name")
 
-            val query = call.request.queryParameters.toMap().mapValues { it.value.first() }
+            val queryStr = call.request.uri.substringAfter('?', "")
+            val query = parseQuery(queryStr).toMutableMap()
 
             val colorScheme = query["scheme"]?.let { scrambler.parseColorScheme(it) } ?: hashMapOf()
             val scramble = query["scramble"]
@@ -123,7 +124,7 @@ object ScrambleViewHandler : RouteHandler {
             }
 
             val body = call.receiveText()
-            val query = QueryStringDecoder(body).parameters().mapValues { it.value.first() }
+            val query = parseQuery(body)
 
             val scrambleRequests = GSON.fromJson(query["sheets"], Array<ScrambleRequest>::class.java).toList()
             val password = query["password"]
@@ -144,7 +145,7 @@ object ScrambleViewHandler : RouteHandler {
                 }
                 "zip" -> {
                     val generationUrl = query["generationUrl"]
-                    val schedule = query["schedule"]
+                    val schedule = query["schedule"] ?: ""
 
                     val wcifHelper = WCIFHelper(schedule, scrambleRequests)
 

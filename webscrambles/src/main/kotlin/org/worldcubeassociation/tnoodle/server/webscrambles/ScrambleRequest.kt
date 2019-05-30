@@ -95,7 +95,13 @@ data class ScrambleRequest(
                     // (http://www.worldcubeassociation.org/results/c.php?i=StanfordFall2011).
                     val uniqueSeed = seed?.let { "$title$it" }
 
-                    val (puzzle, countStr, copiesStr, scheme) = reqUrl.split("*").map { URLDecoder.decode(it, "utf-8") }
+                    val destructuringIsStupidParts = reqUrl.split("*").map { URLDecoder.decode(it, "utf-8") }
+
+                    val puzzle = destructuringIsStupidParts[0]
+                    val countStr = destructuringIsStupidParts.getOrNull(1) ?: "1"
+                    val copiesStr = destructuringIsStupidParts.getOrNull(2) ?: "1"
+                    val scheme = destructuringIsStupidParts.getOrNull(3) ?: ""
+
                     val decodedTitle = URLDecoder.decode(title, "utf-8")
 
                     val scrambler = PLUGIN_PUZZLES[puzzle] ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
@@ -110,6 +116,7 @@ data class ScrambleRequest(
 
                     val genScrambles = uniqueSeed?.let { scrambler.generateSeededScrambles(seed, count) }
                         ?: scrambleCacher.newScrambles(count)
+
                     val scrambles = genScrambles.toList()
 
                     val colorScheme = scrambler.parseColorScheme(scheme)
@@ -485,7 +492,7 @@ data class ScrambleRequest(
                 }
             }
 
-            OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, zipOut, parameters, wcifHelper!!)
+            OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, zipOut, parameters, wcifHelper)
 
             computerDisplayZipOut.finish()
             computerDisplayZipOut.close()
@@ -527,9 +534,12 @@ data class ScrambleRequest(
             jsonObj["competitionName"] = globalTitle
             jsonObj["version"] = WebServerUtils.projectName + "-" + WebServerUtils.version
             jsonObj["generationDate"] = generationDate
-            jsonObj["generationUrl"] = generationUrl!!
 
-            if (wcifHelper != null) {
+            if (generationUrl != null) {
+                jsonObj["generationUrl"] = generationUrl
+            }
+
+            if (wcifHelper?.schedule != null) {
                 jsonObj["schedule"] = wcifHelper.schedule
             }
 

@@ -13,10 +13,10 @@ import java.util.Arrays
 
 class WCIFHelper(schedule: String?, val allScrambleRequests: List<ScrambleRequest>) {
     private val parser = JsonParser()
-    val schedule = parser.parse(schedule).asJsonObject
+    val schedule = schedule?.takeIf { it.isNotBlank() }?.let { parser.parse(it)?.asJsonObject }
 
     val venues: JsonArray
-        get() = schedule.getAsJsonArray("venues")
+        get() = schedule?.getAsJsonArray("venues") ?: JsonArray()
 
     val earlierActivityString: String?
         get() {
@@ -39,11 +39,11 @@ class WCIFHelper(schedule: String?, val allScrambleRequests: List<ScrambleReques
         }
 
     fun hasMultipleDays(): Boolean {
-        return schedule.get("numberOfDays").asInt > 1
+        return schedule != null && schedule.get("numberOfDays").asInt > 1
     }
 
     fun hasMultipleVenues(): Boolean {
-        return schedule.getAsJsonArray("venues").size() > 1
+        return schedule != null && schedule.getAsJsonArray("venues").size() > 1
     }
 
     fun getRooms(venue: JsonElement): JsonArray {
