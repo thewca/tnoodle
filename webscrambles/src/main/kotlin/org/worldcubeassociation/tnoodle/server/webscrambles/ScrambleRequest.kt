@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import net.gnehzr.tnoodle.puzzle.CubePuzzle
+import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher
 import net.lingala.zip4j.io.ZipOutputStream
@@ -49,24 +49,6 @@ data class ScrambleRequest(
 ) : Comparable<ScrambleRequest> {
     val allScrambles get() = scrambles + extraScrambles
 
-    // This is here just to make GSON work.
-    constructor() : this(
-        listOf(),
-        listOf(),
-        CubePuzzle(2), // FIXME does gson really need this?
-        0,
-        "",
-        false,
-        null,
-        null,
-        0,
-        0,
-        null,
-        null,
-        "",
-        0
-    )
-
     override fun compareTo(other: ScrambleRequest): Int {
         return this.roundStartTime!!.compareTo(other.roundStartTime)
     }
@@ -78,6 +60,24 @@ data class ScrambleRequest(
         private val MAX_COPIES = 100
 
         private val SCRAMBLE_CACHERS = mutableMapOf<String, ScrambleCacher>()
+
+        fun empty(scrambler: Puzzle) =
+            ScrambleRequest(
+                listOf(),
+                listOf(),
+                scrambler,
+                0,
+                "",
+                false,
+                null,
+                null,
+                0,
+                0,
+                null,
+                null,
+                "",
+                0
+            )
 
         fun parseScrambleRequests(query: Map<String, String>, seed: String?): List<ScrambleRequest> {
             if (query.isEmpty()) {
@@ -115,16 +115,12 @@ data class ScrambleRequest(
 
                     val colorScheme = scrambler.parseColorScheme(scheme)
 
-                    ScrambleRequest(
-                        scrambles,
-                        listOf(),
-                        scrambler,
-                        copies,
-                        decodedTitle,
-                        fmc,
-                        colorScheme,
-                        null,
-                        0, 0, null, null, "", 0 // FIXME what were the previous defaults?
+                    empty(scrambler).copy(
+                        scrambles = scrambles,
+                        copies = copies,
+                        title = decodedTitle,
+                        fmc = fmc,
+                        colorScheme = colorScheme
                     )
                 }
             }
@@ -229,8 +225,8 @@ data class ScrambleRequest(
 
             if (fmcBeingHeld) {
                 val zipName = "Printing/Fewest Moves - Additional Files/3x3x3 Fewest Moves Solution Sheet.pdf"
-                // FIXME random
-                val sheet = FmcGenericSolutionSheet(scrambleRequests.random(), globalTitle, null, Translate.DEFAULT_LOCALE)
+
+                val sheet = FmcGenericSolutionSheet(empty(ThreeByThreeCubePuzzle()), globalTitle, null, Translate.DEFAULT_LOCALE)
 
                 zipOut.putFileEntry(zipName, sheet.render(), parameters)
             }
