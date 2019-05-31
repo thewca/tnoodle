@@ -170,16 +170,17 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, pass
             alignList.add(Element.ALIGN_CENTER)
 
             if (showScrambleCount) {
-
                 if (scrambleRequest.totalAttempt > 1) { // this is for ordered scrambles
                     index = Math.max(scrambleRequest.attempt - 1, index)
-                } else {
-                    scrambleRequest.totalAttempt = scrambleRequest.scrambles.size
                 }
 
-                val substitutions = HashMap<String, String>()
-                substitutions["scrambleIndex"] = "" + (index + 1)
-                substitutions["scrambleCount"] = "" + scrambleRequest.totalAttempt
+                val absoluteTotal = scrambleRequest.totalAttempt.takeIf { it > 1 } ?: scrambleRequest.scrambles.size
+
+                val substitutions = mapOf(
+                    "scrambleIndex" to (index + 1).toString(),
+                    "scrambleCount" to absoluteTotal.toString()
+                )
+                
                 list.add(Translate.translate("fmc.scrambleXofY", locale, substitutions))
                 alignList.add(Element.ALIGN_CENTER)
             }
