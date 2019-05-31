@@ -17,7 +17,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FontUtil.MINIMUM
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FontUtil.MONO_FONT
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FontUtil.getFontForLocale
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfDrawUtil.drawDashedLine
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfDrawUtil.drawSvgToGraphics2D
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfDrawUtil.drawSvg
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfDrawUtil.fitAndShowText
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfUtil.NON_BREAKING_SPACE
@@ -36,7 +36,7 @@ object PdfSheetUtil {
 
     const val WCA_MAX_MOVES_FMC = 80
 
-    private val MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4
+    private const val MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4
     private val HIGHLIGHT_COLOR = BaseColor(230, 230, 230)
 
     fun addScrambles(docWriter: PdfWriter, doc: Document, scrambleRequest: ScrambleRequest, globalTitle: String?, locale: Locale) {
@@ -230,7 +230,7 @@ object PdfSheetUtil {
 
             try {
                 val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
-                drawSvgToGraphics2D(svg, g2, dim)
+                g2.drawSvg(svg, dim)
             } finally {
                 g2.dispose()
             }
@@ -298,7 +298,7 @@ object PdfSheetUtil {
             alignList.add(Element.ALIGN_LEFT)
         }
 
-        populateRect(cb, competitorInfoRect, list, alignList, bf, fontSize)
+        cb.populateRect(competitorInfoRect, list, alignList, bf, fontSize)
 
         // graded
         fontSize = 11
@@ -309,7 +309,7 @@ object PdfSheetUtil {
         list.add(Translate.translate("fmc.graded", locale) + longFill + " " + Translate.translate("fmc.result", locale) + shortFill)
         alignList.add(Element.ALIGN_CENTER)
         fontSize = 11
-        populateRect(cb, gradeRect, list, alignList, bf, fontSize)
+        cb.populateRect(gradeRect, list, alignList, bf, fontSize)
 
         if (!withScramble) {
             fontSize = 11
@@ -323,7 +323,7 @@ object PdfSheetUtil {
             list.add(Translate.translate("fmc.scrambleOnSeparateSheet", locale))
             alignList.add(Element.ALIGN_CENTER)
 
-            populateRect(cb, scrambleImageRect, list, alignList, bf, fontSize)
+            cb.populateRect(scrambleImageRect, list, alignList, bf, fontSize)
         }
 
         val fmcMargin = 10
@@ -429,7 +429,7 @@ object PdfSheetUtil {
         fontSize = 25
 
         val rect = Rectangle(left.toFloat(), (top - MAGIC_NUMBER + fontSize).toFloat(), competitorInfoLeft.toFloat(), (top - MAGIC_NUMBER).toFloat())
-        fitAndShowText(cb, Translate.translate("fmc.event", locale), bf, rect, fontSize.toFloat(), Element.ALIGN_CENTER, leadingMultiplier)
+        cb.fitAndShowText(Translate.translate("fmc.event", locale), bf, rect, fontSize.toFloat(), Element.ALIGN_CENTER, leadingMultiplier)
 
         val rulesList = ArrayList<String>()
         rulesList.add("• " + Translate.translate("fmc.rule1", locale))
@@ -450,7 +450,7 @@ object PdfSheetUtil {
         leadingMultiplier = 1.5f
         val rulesRectangle = Rectangle((left + fmcMargin).toFloat(), (scrambleBorderTop + tableHeight + fmcMargin).toFloat(), (competitorInfoLeft - fmcMargin).toFloat(), (rulesTop + fmcMargin).toFloat())
         val rules = rulesList.joinToString("\n")
-        fitAndShowText(cb, rules, bf, rulesRectangle, 15f, Element.ALIGN_JUSTIFIED, leadingMultiplier)
+        cb.fitAndShowText(rules, bf, rulesRectangle, 15f, Element.ALIGN_JUSTIFIED, leadingMultiplier)
 
         doc.newPage()
     }
@@ -568,7 +568,7 @@ object PdfSheetUtil {
 
                 try {
                     val svg = scrambler.drawScramble(scramble, colorScheme)
-                    drawSvgToGraphics2D(svg, g2, scrambleImageSize)
+                    g2.drawSvg(svg, scrambleImageSize)
                 } catch (e: Exception) {
                     table.addCell("Error drawing scramble: " + e.message)
                     // FIXME l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e)
@@ -622,7 +622,7 @@ object PdfSheetUtil {
 
         try {
             val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
-            drawSvgToGraphics2D(svg, g2, dim)
+            g2.drawSvg(svg, dim)
         } finally {
             g2.dispose()
         }
@@ -648,13 +648,13 @@ object PdfSheetUtil {
 
         for (i in 0 until scramblesPerSheet) {
             val rect = Rectangle(left.toFloat(), (top - i * availableScrambleHeight).toFloat(), (right - dim.width - spaceScrambleImage).toFloat(), (top - (i + 1) * availableScrambleHeight).toFloat())
-            populateRect(cb, rect, list, alignList, bf, fontSize)
+            cb.populateRect(rect, list, alignList, bf, fontSize)
 
             cb.addImage(Image.getInstance(tp), dim.width.toDouble(), 0.0, 0.0, dim.height.toDouble(), (right - dim.width).toDouble(), top.toDouble() - (i + 1) * availableScrambleHeight + (availableScrambleHeight - dim.getHeight()) / 2)
 
-            drawDashedLine(cb, left, right, top - i * availableScrambleHeight)
+            cb.drawDashedLine(left, right, top - i * availableScrambleHeight)
         }
-        drawDashedLine(cb, left, right, top - scramblesPerSheet * availableScrambleHeight)
+        cb.drawDashedLine(left, right, top - scramblesPerSheet * availableScrambleHeight)
 
         doc.newPage()
     }
