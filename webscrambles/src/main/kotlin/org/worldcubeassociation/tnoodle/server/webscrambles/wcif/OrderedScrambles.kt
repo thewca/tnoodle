@@ -7,13 +7,14 @@ import org.joda.time.Days
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.filterForActivity
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfContent
 
 import java.util.Date
 
 object OrderedScrambles {
     // TODO see https://github.com/thewca/tnoodle/issues/400
 
-    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
+    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, renderedScrambles: List<PdfContent>, globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
         if (wcifHelper.venues.isEmpty()) {
             return
         }
@@ -60,7 +61,13 @@ object OrderedScrambles {
                         // to prevent different files with the same name.
                         val pdfFileName = parts.joinToString("")
 
-                        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, scrambles.sorted(), null)
+                        // have to use this nastly little hack if we want to benefit from caching
+                        val sortingTrickery = scrambles.zip(renderedScrambles).sortedBy { it.first }
+
+                        val sortedScrambles = sortingTrickery.map { it.first }
+                        val sortedPdfs = sortingTrickery.map { it.second }
+
+                        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, sortedScrambles, sortedPdfs)
                         zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
                     }
                 }

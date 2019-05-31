@@ -13,7 +13,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 
-class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?, password: String?): FmcSheet(request, globalTitle, password) {
+class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?): FmcSheet(request, globalTitle) {
     override fun PdfWriter.writeContents() {
         for (i in scrambleRequest.scrambles.indices) {
             addFmcScrambleCutoutSheet(scrambleRequest, title, i)

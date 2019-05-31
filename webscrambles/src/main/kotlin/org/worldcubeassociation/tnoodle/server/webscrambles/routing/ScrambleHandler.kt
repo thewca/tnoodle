@@ -67,7 +67,7 @@ object ScrambleHandler : RouteHandler {
                 }
                 "json" -> call.respond(scrambleRequests)
                 "pdf" -> {
-                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate, scrambleRequests, null)
+                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate, scrambleRequests)
                     call.response.header("Content-Disposition", "inline")
 
                     // Workaround for Chrome bug with saving PDFs:

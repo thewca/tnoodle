@@ -135,7 +135,7 @@ object ScrambleViewHandler : RouteHandler {
 
                 when (extension) {
                     "pdf" -> {
-                        val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(name, generationDate, scrambleRequests, password)
+                        val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(name, generationDate, scrambleRequests)
 
                         call.response.header("Content-Disposition", "inline")
 
