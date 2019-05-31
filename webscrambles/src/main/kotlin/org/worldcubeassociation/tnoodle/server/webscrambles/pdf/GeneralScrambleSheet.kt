@@ -5,7 +5,6 @@ import com.itextpdf.awt.PdfGraphics2D
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
-import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfWriter
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.svglite.Color
@@ -17,10 +16,9 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.TableAndHighlighting
-import java.io.ByteArrayOutputStream
 import java.util.HashMap
 
-class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String?, password: String?) : BaseScrambleSheet(scrambleRequest, globalTitle, password) {
+class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String?) : BaseScrambleSheet(scrambleRequest, globalTitle) {
     override fun PdfWriter.writeContents() {
         val pageSize = document.pageSize
 

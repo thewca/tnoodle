@@ -126,7 +126,7 @@ data class ScrambleRequest(
             }
         }
 
-        fun createPdf(globalTitle: String?, creationDate: Date, scrambleRequest: ScrambleRequest, locale: Locale, password: String?): PdfContent {
+        fun ScrambleRequest.createPdf(globalTitle: String?, creationDate: Date, locale: Locale): PdfContent {
             // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
             // list of 333ni scrambles.
             // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -134,37 +134,37 @@ data class ScrambleRequest(
 
             // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
             // to fix this, we pass the attempt number
-            if (scrambleRequest.event == "333mbf") {
+            if (event == "333mbf") {
                 val singleSheets = mutableListOf<PdfContent>()
 
-                for (nthAttempt in 1..scrambleRequest.scrambles.size) {
-                    val scrambles = scrambleRequest.scrambles[nthAttempt - 1].split("\n")
+                for (nthAttempt in 1..scrambles.size) {
+                    val scrambles = scrambles[nthAttempt - 1].split("\n")
 
-                    val attemptRequest = scrambleRequest.copy(
+                    val attemptRequest = copy(
                         scrambles = scrambles,
                         extraScrambles = listOf(),
-                        title = "${scrambleRequest.title} Attempt ${if (scrambleRequest.attempt > 1) scrambleRequest.attempt else nthAttempt}",
+                        title = "$title Attempt ${if (attempt > 1) attempt else nthAttempt}",
                         fmc = false,
                         event = "333bf"
                     )
 
-                    val singleSheet = createPdf(globalTitle, creationDate, attemptRequest, locale, null)
+                    val singleSheet = attemptRequest.createPdf(globalTitle, creationDate, locale)
                     singleSheets.add(singleSheet)
                 }
 
-                return MergedPdf(*singleSheets.toTypedArray(), password = password)
+                return MergedPdf(*singleSheets.toTypedArray())
             }
 
-            assert(scrambleRequest.scrambles.isNotEmpty())
+            assert(scrambles.isNotEmpty())
 
-            if (scrambleRequest.fmc) {
+            if (fmc) {
                 // We don't watermark the FMC sheets because they already have
                 // the competition name on them. So we encrypt directly.
-                return FmcSolutionSheet(scrambleRequest, globalTitle, password, locale)
+                return FmcSolutionSheet(this, globalTitle, locale)
             }
 
-            val genericSheet = GeneralScrambleSheet(scrambleRequest, globalTitle, null) // encrypt when watermarking
-            return WatermarkPdfWrapper(genericSheet, scrambleRequest.title, creationDate, globalTitle, password)
+            val genericSheet = GeneralScrambleSheet(this, globalTitle) // encrypt when watermarking
+            return WatermarkPdfWrapper(genericSheet, title, creationDate, globalTitle)
         }
 
         private fun defaultZipParameters(password: String? = null) = ZipParameters().apply {
@@ -226,12 +226,13 @@ data class ScrambleRequest(
             if (fmcBeingHeld) {
                 val zipName = "Printing/Fewest Moves - Additional Files/3x3x3 Fewest Moves Solution Sheet.pdf"
 
-                val sheet = FmcGenericSolutionSheet(empty(ThreeByThreeCubePuzzle()), globalTitle, null, Translate.DEFAULT_LOCALE)
+                val sheet = FmcGenericSolutionSheet(empty(ThreeByThreeCubePuzzle()), globalTitle, Translate.DEFAULT_LOCALE)
 
                 zipOut.putFileEntry(zipName, sheet.render(), parameters)
             }
 
             val passcodes = mutableMapOf<String, String>()
+            val renderedPdfs = mutableListOf<PdfContent>()
 
             for (scrambleRequest in scrambleRequests) {
                 val fileTitle = scrambleRequest.title.toFileSafeString()
@@ -241,7 +242,7 @@ data class ScrambleRequest(
 
                 // Without passcode, for printing
                 val pdfPrintingZipName = "Printing/Scramble Sets/$safeTitle.pdf"
-                val pdfPrintingByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, null)
+                val pdfPrintingByteStream = scrambleRequest.createPdf(globalTitle, generationDate, Translate.DEFAULT_LOCALE)
 
                 zipOut.putFileEntry(pdfPrintingZipName, pdfPrintingByteStream.render(), parameters)
 
@@ -250,9 +251,11 @@ data class ScrambleRequest(
                 passcodes[safeTitle] = passcode
 
                 val computerDisplayZipName = "$computerDisplayFileName/$safeTitle.pdf"
-                val computerDisplayByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, passcode)
 
-                computerDisplayZipOut.putFileEntry(computerDisplayZipName, computerDisplayByteStream.render(), computerDisplayZipParameters)
+                computerDisplayZipOut.putFileEntry(computerDisplayZipName, pdfPrintingByteStream.render(passcode), computerDisplayZipParameters)
+
+                // register in cache to speed up overall generation process
+                renderedPdfs.add(pdfPrintingByteStream)
 
                 val txtZipName = "Interchange/txt/$safeTitle.txt"
                 val txtScrambles = stripNewlines(scrambleRequest.allScrambles).joinToString("\r\n")
@@ -265,27 +268,27 @@ data class ScrambleRequest(
                 }
 
                 val cutoutZipName = "Printing/Fewest Moves - Additional Files/$safeTitle - Scramble Cutout Sheet.pdf"
-                val cutoutSheet = FmcScrambleCutoutSheet(scrambleRequest, globalTitle, password)
+                val cutoutSheet = FmcScrambleCutoutSheet(scrambleRequest, globalTitle)
 
-                zipOut.putFileEntry(cutoutZipName, cutoutSheet.render(), parameters)
+                zipOut.putFileEntry(cutoutZipName, cutoutSheet.render(password), parameters)
 
                 for (locale in Translate.locales) {
                     // fewest moves regular sheet
                     val printingPdfZipName = "Printing/Fewest Moves - Additional Files/Translations/${locale.toLanguageTag()}_$safeTitle.pdf"
-                    val printingSheet = FmcSolutionSheet(scrambleRequest, globalTitle, password, locale)
+                    val printingSheet = FmcSolutionSheet(scrambleRequest, globalTitle, locale)
 
-                    zipOut.putFileEntry(printingPdfZipName, printingSheet.render(), parameters)
+                    zipOut.putFileEntry(printingPdfZipName, printingSheet.render(password), parameters)
 
                     // Generic sheet.
                     val genericPrintingPdfZipName = "Printing/Fewest Moves - Additional Files/Translations/${locale.toLanguageTag()}_$safeTitle Solution Sheet.pdf"
-                    val genericPrintingSheet = FmcGenericSolutionSheet(scrambleRequest, globalTitle, password, locale)
+                    val genericPrintingSheet = FmcGenericSolutionSheet(scrambleRequest, globalTitle, locale)
 
-                    zipOut.putFileEntry(genericPrintingPdfZipName, genericPrintingSheet.render(), parameters)
+                    zipOut.putFileEntry(genericPrintingPdfZipName, genericPrintingSheet.render(password), parameters)
                 }
             }
 
             if (wcifHelper != null) {
-                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, zipOut, parameters, wcifHelper)
+                OrderedScrambles.generateOrderedScrambles(scrambleRequests, renderedPdfs, globalTitle, generationDate, zipOut, parameters, wcifHelper)
             }
 
             computerDisplayZipOut.finish()
@@ -333,7 +336,7 @@ data class ScrambleRequest(
 
             // Note that we're not passing the password into this function. It seems pretty silly
             // to put a password protected pdf inside of a password protected zip file.
-            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, scrambleRequests, null)
+            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, scrambleRequests, renderedPdfs)
             zipOut.putFileEntry(printingCompleteZipName, printingCompleteSheet.render(), parameters)
 
             zipOut.finish()
@@ -342,11 +345,11 @@ data class ScrambleRequest(
             return baosZip
         }
 
-        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, password: String?): PdfContent {
-            val originalPdfs = scrambleRequests.map { createPdf(globalTitle, generationDate, it, Translate.DEFAULT_LOCALE, password) }
+        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, scramblePdfs: List<PdfContent>? = null): PdfContent {
+            val originalPdfs = scramblePdfs ?: scrambleRequests.map { it.createPdf(globalTitle, generationDate, Translate.DEFAULT_LOCALE) }
             val configurations = scrambleRequests.map { Triple(it.title, it.scrambler.longName, it.copies) }
 
-            return MergedPdfWithOutline(*originalPdfs.toTypedArray(), configuration = configurations, globalTitle = globalTitle, password = password)
+            return MergedPdfWithOutline(*originalPdfs.toTypedArray(), configuration = configurations, globalTitle = globalTitle)
         }
     }
 }

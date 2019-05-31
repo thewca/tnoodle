@@ -43,7 +43,7 @@ class WCIFHelper(schedule: String) {
             .flatMap { it.rooms }
             .flatMap { it.activities }
             .map { it.startTime }
-            .maxBy { DateTime.parse(it) } ?: error("I could not find the earliest activity")
+            .minBy { DateTime.parse(it) } ?: error("I could not find the earliest activity")
 
     val hasMultipleDays: Boolean get() = numberOfDays > 1
     val hasMultipleVenues: Boolean get() = venues.size > 1

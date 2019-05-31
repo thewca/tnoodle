@@ -5,10 +5,16 @@ import com.itextpdf.text.PageSize
 import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 
-abstract class BasePdfSheet<W : PdfWriter>(val title: String?, val password: String?) : PdfContent {
+abstract class BasePdfSheet<W : PdfWriter>(val title: String?) : PdfContent {
     abstract val document: Document
 
-    override fun render(): ByteArray {
+    private var renderingCache: ByteArray? = null
+
+    override fun render(password: String?): ByteArray {
+        return renderingCache?.takeIf { password == null } ?: directRender(password)
+    }
+
+    private fun directRender(password: String?): ByteArray {
         val pdfBytes = ByteArrayOutputStream()
         val docWriter = this.document.getWriter(pdfBytes)
 
@@ -20,14 +26,15 @@ abstract class BasePdfSheet<W : PdfWriter>(val title: String?, val password: Str
         docWriter.writeContents()
         document.close()
 
-        return this.finalise(pdfBytes)
+        return this.finalise(pdfBytes, password)
+            .also { if (password == null) renderingCache = it }
     }
 
     abstract fun W.writeContents()
 
     abstract fun Document.getWriter(bytes: ByteArrayOutputStream): W
 
-    open fun finalise(processedBytes: ByteArrayOutputStream): ByteArray = processedBytes.toByteArray()
+    open fun finalise(processedBytes: ByteArrayOutputStream, password: String?): ByteArray = processedBytes.toByteArray()
 
     companion object {
         val PAGE_SIZE = PageSize.LETTER

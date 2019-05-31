@@ -16,7 +16,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import java.util.*
 
-open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, password: String?, locale: Locale): FmcSheet(request, globalTitle, password, locale) {
+open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, locale: Locale): FmcSheet(request, globalTitle, locale) {
     override fun PdfWriter.writeContents() {
         for (i in scrambleRequest.scrambles.indices) {
             addFmcSolutionSheet(document, scrambleRequest, title, i, locale)
@@ -212,7 +212,6 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, pass
         cb.populateRect(competitorInfoRect, list, alignList, bf, fontSize)
 
         // graded
-        fontSize = 11
         list = ArrayList()
         alignList = ArrayList()
         list.add(Translate.translate("fmc.warning", locale))
