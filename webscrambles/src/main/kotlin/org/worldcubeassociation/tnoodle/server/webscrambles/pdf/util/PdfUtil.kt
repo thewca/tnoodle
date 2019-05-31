@@ -1,19 +1,19 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
+package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
 import com.itextpdf.text.Chunk
 import com.itextpdf.text.Font
 import com.itextpdf.text.Rectangle
-import java.util.*
+import java.util.LinkedList
 
 object PdfUtil {
     const val NON_BREAKING_SPACE = '\u00A0'
     const val TEXT_PADDING_HORIZONTAL = 1
 
-    fun splitTextToLineChunks(text: String, font: Font, textColumnWidth: Float): LinkedList<Chunk> {
+    fun String.splitToLineChunks(font: Font, textColumnWidth: Float): LinkedList<Chunk> {
         val availableTextWidth = textColumnWidth - 2 * TEXT_PADDING_HORIZONTAL
 
         val lineChunks = LinkedList<Chunk>()
-        val lineList = text.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val lineList = split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
         for (line in lineList) {
             var startIndex = 0
@@ -129,7 +129,7 @@ object PdfUtil {
             potentialFontSize = (maxFontSize + minFontSize) / 2.0f
             font.size = potentialFontSize
 
-            val lineChunks = splitTextToLineChunks(text, font, rect.width)
+            val lineChunks = text.splitToLineChunks(font, rect.width)
             if (!newlinesAllowed && lineChunks.size > 1) {
                 // If newlines are not allowed, and we had to split the text into more than
                 // one line, then potentialFontSize is too large.

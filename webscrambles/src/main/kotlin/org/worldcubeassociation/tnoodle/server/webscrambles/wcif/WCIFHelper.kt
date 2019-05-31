@@ -6,7 +6,7 @@ import com.google.gson.JsonParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.toFileSafeString
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 
 import java.util.ArrayList
 import java.util.Arrays
@@ -59,7 +59,7 @@ class WCIFHelper(schedule: String?, val allScrambleRequests: List<ScrambleReques
     }
 
     fun getSafeVenueName(venue: JsonElement): String {
-        return toFileSafeString(parseMarkdown(venue.asJsonObject.get("name").asString))
+        return parseMarkdown(venue.asJsonObject.get("name").asString).toFileSafeString()
     }
 
     fun hasMultipleRooms(venue: JsonElement): Boolean {
@@ -67,7 +67,7 @@ class WCIFHelper(schedule: String?, val allScrambleRequests: List<ScrambleReques
     }
 
     fun getSafeRoomName(room: JsonElement): String {
-        return toFileSafeString(parseMarkdown(room.asJsonObject.get("name").asString))
+        return parseMarkdown(room.asJsonObject.get("name").asString).toFileSafeString()
     }
 
     fun getActivityCode(activity: JsonElement): String {

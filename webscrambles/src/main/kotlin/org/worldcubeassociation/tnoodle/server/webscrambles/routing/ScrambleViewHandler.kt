@@ -135,7 +135,7 @@ object ScrambleViewHandler : RouteHandler {
 
                 when (extension) {
                     "pdf" -> {
-                        val totalPdfOutput = ScrambleRequest.requestsToPdf(name, generationDate, scrambleRequests, password)
+                        val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(name, generationDate, scrambleRequests, password)
 
                         call.response.header("Content-Disposition", "inline")
 
@@ -143,7 +143,7 @@ object ScrambleViewHandler : RouteHandler {
                         // https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
                         call.response.header("Cache-Control", "public")
 
-                        call.respondBytes(totalPdfOutput.toByteArray(), ContentType.Application.Pdf)
+                        call.respondBytes(totalPdfOutput.render(), ContentType.Application.Pdf)
                     }
                     "zip" -> {
                         val generationUrl = query["generationUrl"]

@@ -101,8 +101,8 @@ object OrderedScrambles {
                         parameters.fileNameInZip = pdfFileName
                         zipOut.putNextEntry(null, parameters)
                         val scrambleRequests = scrambleRequestListByDay[index]
-                        val baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null)
-                        zipOut.write(baos.toByteArray())
+                        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, scrambleRequests, null)
+                        zipOut.write(sheet.render())
                         zipOut.closeEntry()
                     }
                 }

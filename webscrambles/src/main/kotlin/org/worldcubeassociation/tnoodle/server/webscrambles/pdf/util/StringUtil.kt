@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
+package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
 import java.security.SecureRandom
 import kotlin.math.ceil
@@ -33,7 +33,7 @@ object StringUtil {
         }
     }
 
-    fun toFileSafeString(unsafe: String) = unsafe.filter { it !in INVALID_CHARS }
+    fun String.toFileSafeString() = filter { it !in INVALID_CHARS }
 
     fun stripNewlines(strings: List<String>) = strings.map { it.replace("\n", " ") }
 

@@ -1,7 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import com.itextpdf.text.*
-import com.itextpdf.text.pdf.*
 import net.gnehzr.tnoodle.puzzle.CubePuzzle
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher
@@ -11,13 +9,10 @@ import net.lingala.zip4j.util.Zip4jConstants
 import org.joda.time.DateTime
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.addFmcScrambleCutoutSheet
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.addFmcSolutionSheet
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.addGenericFmcSolutionSheet
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfSheetUtil.addScrambles
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.randomPasscode
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.stripNewlines
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.StringUtil.toFileSafeString
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.randomPasscode
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.stripNewlines
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.OrderedScrambles
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
 import java.io.ByteArrayOutputStream
@@ -58,7 +53,7 @@ data class ScrambleRequest(
     constructor() : this(
         listOf(),
         listOf(),
-        CubePuzzle(2), // FIXME
+        CubePuzzle(2), // FIXME does gson really need this?
         0,
         "",
         false,
@@ -94,12 +89,12 @@ data class ScrambleRequest(
                     // (http://www.worldcubeassociation.org/results/c.php?i=StanfordFall2011).
                     val uniqueSeed = seed?.let { "$title$it" }
 
-                    val destructuringIsStupidParts = reqUrl.split("*").map { URLDecoder.decode(it, "utf-8") }
+                    val destructuredRequest = reqUrl.split("*").map { URLDecoder.decode(it, "utf-8") }
 
-                    val puzzle = destructuringIsStupidParts[0]
-                    val countStr = destructuringIsStupidParts.getOrNull(1) ?: "1"
-                    val copiesStr = destructuringIsStupidParts.getOrNull(2) ?: "1"
-                    val scheme = destructuringIsStupidParts.getOrNull(3) ?: ""
+                    val puzzle = destructuredRequest[0]
+                    val countStr = destructuredRequest.getOrNull(1) ?: "1"
+                    val copiesStr = destructuredRequest.getOrNull(2) ?: "1"
+                    val scheme = destructuredRequest.getOrNull(3) ?: ""
 
                     val decodedTitle = URLDecoder.decode(title, "utf-8")
 
@@ -129,13 +124,13 @@ data class ScrambleRequest(
                         fmc,
                         colorScheme,
                         null,
-                        0, 0, null, null, "", 0 // FIXME
+                        0, 0, null, null, "", 0 // FIXME what were the previous defaults?
                     )
                 }
             }
         }
 
-        private fun createPdf(globalTitle: String?, creationDate: Date, scrambleRequest: ScrambleRequest, locale: Locale, password: String?): ByteArrayOutputStream {
+        fun createPdf(globalTitle: String?, creationDate: Date, scrambleRequest: ScrambleRequest, locale: Locale, password: String?): PdfContent {
             // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
             // list of 333ni scrambles.
             // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -143,16 +138,8 @@ data class ScrambleRequest(
 
             // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
             // to fix this, we pass the attempt number
-            val is333mbf = scrambleRequest.event == "333mbf"
-
-            if (is333mbf) {
-                val doc = Document()
-                val totalPdfOutput = ByteArrayOutputStream()
-                val totalPdfWriter = PdfSmartCopy(doc, totalPdfOutput)
-                if (password != null) {
-                    totalPdfWriter.setEncryption(password.toByteArray(), password.toByteArray(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128)
-                }
-                doc.open()
+            if (scrambleRequest.event == "333mbf") {
+                val singleSheets = mutableListOf<PdfContent>()
 
                 for (nthAttempt in 1..scrambleRequest.scrambles.size) {
                     val scrambles = scrambleRequest.scrambles[nthAttempt - 1].split("\n")
@@ -160,334 +147,144 @@ data class ScrambleRequest(
                     val attemptRequest = scrambleRequest.copy(
                         scrambles = scrambles,
                         extraScrambles = listOf(),
-                        title = scrambleRequest.title + " Attempt " + if (scrambleRequest.attempt > 1) scrambleRequest.attempt else nthAttempt,
+                        title = "${scrambleRequest.title} Attempt ${if (scrambleRequest.attempt > 1) scrambleRequest.attempt else nthAttempt}",
                         fmc = false,
                         event = "333bf"
                     )
 
-                    // We pass a null password, since the resulting pages will be processed further before encryption.
-                    val pdfReader = PdfReader(createPdf(globalTitle, creationDate, attemptRequest, locale, null).toByteArray())
-                    for (pageN in 1..pdfReader.numberOfPages) {
-                        val page = totalPdfWriter.getImportedPage(pdfReader, pageN)
-                        totalPdfWriter.addPage(page)
-                    }
+                    val singleSheet = createPdf(globalTitle, creationDate, attemptRequest, locale, null)
+                    singleSheets.add(singleSheet)
                 }
-                doc.close()
-                return totalPdfOutput
+
+                return MergedPdf(*singleSheets.toTypedArray(), password = password)
             }
 
             assert(scrambleRequest.scrambles.isNotEmpty())
-            var pdfOut = ByteArrayOutputStream()
-            val pageSize = PageSize.LETTER
-            var doc = Document(pageSize, 0f, 0f, 75f, 75f)
-            var docWriter = PdfWriter.getInstance(doc, pdfOut)
-            if (scrambleRequest.fmc && password != null) {
-                // We don't watermark the FMC sheets because they already have
-                // the competition name on them. So we encrypt directly.
-                docWriter.setEncryption(password.toByteArray(), password.toByteArray(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128)
-            }
-
-            docWriter.setBoxSize("art", Rectangle(36f, 54f, pageSize.width - 36, pageSize.height - 54))
-
-            doc.addCreationDate()
-            doc.addProducer()
-            if (globalTitle != null) {
-                doc.addTitle(globalTitle)
-            }
-
-            doc.open()
-            // Note that we ignore scrambleRequest.copies here.
-            addScrambles(docWriter, doc, scrambleRequest, globalTitle, locale)
-            doc.close()
 
             if (scrambleRequest.fmc) {
                 // We don't watermark the FMC sheets because they already have
-                // the competition name on them.
-                return pdfOut
+                // the competition name on them. So we encrypt directly.
+                return FmcSolutionSheet(scrambleRequest, globalTitle, password, locale)
             }
-            // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
-            val pr = PdfReader(pdfOut.toByteArray())
 
-            pdfOut = ByteArrayOutputStream()
-            doc = Document(pageSize, 0f, 0f, 75f, 75f)
-            docWriter = PdfWriter.getInstance(doc, pdfOut)
+            val genericSheet = GeneralScrambleSheet(scrambleRequest, globalTitle, null) // encrypt when watermarking
+            return WatermarkPdfWrapper(genericSheet, scrambleRequest.title, creationDate, globalTitle, password)
+        }
+
+        private fun defaultZipParameters(password: String? = null) = ZipParameters().apply {
+            compressionMethod = Zip4jConstants.COMP_DEFLATE
+            compressionLevel = Zip4jConstants.DEFLATE_LEVEL_NORMAL
+
+            isSourceExternalStream = true
+
             if (password != null) {
-                docWriter.setEncryption(password.toByteArray(), password.toByteArray(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128)
+                isEncryptFiles = true
+                encryptionMethod = Zip4jConstants.ENC_METHOD_STANDARD
+
+                setPassword(password)
             }
-            doc.open()
+        }
 
-            val cb = docWriter.directContent
+        private fun String.toUniqueTitle(seenTitles: List<String>): String {
+            var salt = 0
+            var tempNewSafeTitle = this
 
-            for (pageN in 1..pr.numberOfPages) {
-                val page = docWriter.getImportedPage(pr, pageN)
-
-                doc.newPage()
-                cb.addTemplate(page, 0f, 0f)
-
-                val rect = pr.getBoxSize(pageN, "art")
-
-                // Header
-                ColumnText.showTextAligned(cb,
-                    Element.ALIGN_LEFT, Phrase(WebServerUtils.SDF.format(creationDate)),
-                    rect.left, rect.top, 0f)
-
-                ColumnText.showTextAligned(cb,
-                    Element.ALIGN_CENTER, Phrase(globalTitle),
-                    (pageSize.left + pageSize.right) / 2, pageSize.top - 60, 0f)
-
-                ColumnText.showTextAligned(cb,
-                    Element.ALIGN_CENTER, Phrase(scrambleRequest.title),
-                    (pageSize.left + pageSize.right) / 2, pageSize.top - 45, 0f)
-
-                if (pr.numberOfPages > 1) {
-                    ColumnText.showTextAligned(cb,
-                        Element.ALIGN_RIGHT, Phrase(pageN.toString() + "/" + pr.numberOfPages),
-                        rect.right, rect.top, 0f)
-                }
-
-                // Footer
-                val generatedBy = "Generated by " + WebServerUtils.projectName + "-" + WebServerUtils.version
-                ColumnText.showTextAligned(cb,
-                    Element.ALIGN_CENTER, Phrase(generatedBy),
-                    (pageSize.left + pageSize.right) / 2, pageSize.bottom + 40, 0f)
+            while (tempNewSafeTitle in seenTitles) {
+                tempNewSafeTitle = "$this (${++salt})"
             }
 
-            doc.close()
+            return tempNewSafeTitle
+        }
 
-            // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
-            return pdfOut
+        private fun ZipOutputStream.putFileEntry(fileName: String, contents: ByteArray, parameters: ZipParameters = defaultZipParameters()) {
+            parameters.fileNameInZip = fileName
 
-            //      The PdfStamper class doesn't seem to be working.
-            //      pdfOut = new ByteArrayOutputStream();
-            //      PdfStamper ps = new PdfStamper(pr, pdfOut);
-            //
-            //      for(int pageN = 1; pageN <= pr.getNumberOfPages(); pageN++) {
-            //          PdfContentByte pb = ps.getUnderContent(pageN);
-            //          Rectangle rect = pr.getBoxSize(pageN, "art");
-            //          System.out.println(rect.getLeft());
-            //          System.out.println(rect.getWidth());
-            //          ColumnText.showTextAligned(pb,
-            //                  Element.ALIGN_LEFT, new Phrase("Hello people!"), 36, 540, 0);
-            ////            ColumnText.showTextAligned(pb,
-            ////                    Element.ALIGN_CENTER, new Phrase("HELLO WORLD"),
-            ////                    (rect.getLeft() + rect.getRight()) / 2, rect.getTop(), 0);
-            //      }
-            //      ps.close();
-            //      return ps.getReader();
+            putNextEntry(null, parameters)
+            write(contents)
+
+            closeEntry()
         }
 
         fun requestsToZip(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
             val baosZip = ByteArrayOutputStream()
 
-            val parameters = ZipParameters()
-            parameters.compressionMethod = Zip4jConstants.COMP_DEFLATE
-            parameters.compressionLevel = Zip4jConstants.DEFLATE_LEVEL_NORMAL
-            if (password != null) {
-                parameters.isEncryptFiles = true
-                parameters.encryptionMethod = Zip4jConstants.ENC_METHOD_STANDARD
-                parameters.setPassword(password)
-            }
-            parameters.isSourceExternalStream = true
-
+            val parameters = defaultZipParameters(password)
             val zipOut = ZipOutputStream(baosZip)
-            val seenTitles = HashMap<String, Boolean>()
+
+            val seenTitles = mutableListOf<String>()
 
             // Computer display zip
             // This .zip file is nested in the main .zip. It is intentionally not
             // protected with a password, since it's just an easy way to distribute
-            // a collection of files that are each are encrypted using their own
-            // passcode.
+            // a collection of files that are each are encrypted using their own passcode.
             val computerDisplayBaosZip = ByteArrayOutputStream()
-            val computerDisplayZipParameters = ZipParameters()
-            computerDisplayZipParameters.compressionMethod = Zip4jConstants.COMP_DEFLATE
-            computerDisplayZipParameters.compressionLevel = Zip4jConstants.DEFLATE_LEVEL_NORMAL
-            computerDisplayZipParameters.isSourceExternalStream = true
+
+            val computerDisplayZipParameters = defaultZipParameters()
             val computerDisplayZipOut = ZipOutputStream(computerDisplayBaosZip)
 
-            val safeGlobalTitle = toFileSafeString(globalTitle!!)
+            val safeGlobalTitle = globalTitle?.toFileSafeString()
             val computerDisplayFileName = "$safeGlobalTitle - Computer Display PDFs"
 
-            var fmcBeingHeld = false
-            for (scrambleRequest in scrambleRequests) {
-                if (scrambleRequest.fmc) {
-                    fmcBeingHeld = true
+            val fmcBeingHeld = scrambleRequests.any { it.fmc }
 
-                    var safeTitle = toFileSafeString(scrambleRequest.title) + " - Scramble Cutout Sheet"
-                    var salt = 0
-                    var tempNewSafeTitle = safeTitle
-                    while (seenTitles[tempNewSafeTitle] != null) {
-                        tempNewSafeTitle = safeTitle + " (" + ++salt + ")"
-                    }
-                    safeTitle = tempNewSafeTitle
-                    seenTitles[safeTitle] = true
-
-                    val pdfFileName = "Printing/Fewest Moves - Additional Files/$safeTitle.pdf"
-                    parameters.fileNameInZip = pdfFileName
-                    zipOut.putNextEntry(null, parameters)
-
-                    val pdfOut = ByteArrayOutputStream()
-                    val pageSize = PageSize.LETTER
-                    val doc = Document(pageSize, 0f, 0f, 75f, 75f)
-                    val docWriter = PdfWriter.getInstance(doc, pdfOut)
-
-                    docWriter.setBoxSize("art", Rectangle(36f, 54f, pageSize.width - 36, pageSize.height - 54))
-
-                    doc.addCreationDate()
-                    doc.addProducer()
-                    if (globalTitle != null) {
-                        doc.addTitle(globalTitle)
-                    }
-
-                    // TODO: i18n. See https://github.com/thewca/tnoodle/issues/396
-                    doc.open()
-                    for (i in scrambleRequest.scrambles.indices) {
-                        addFmcScrambleCutoutSheet(docWriter, doc, scrambleRequest, globalTitle, i)
-                    }
-                    doc.close()
-
-                    val pdfReader = PdfReader(pdfOut.toByteArray())
-                    val b = ByteArray(pdfReader.fileLength.toInt())
-                    pdfReader.safeFile.readFully(b)
-                    zipOut.write(b)
-
-                    zipOut.closeEntry()
-                }
-            }
             if (fmcBeingHeld) {
-                val pdfFileName = "Printing/Fewest Moves - Additional Files/3x3x3 Fewest Moves Solution Sheet.pdf"
-                parameters.fileNameInZip = pdfFileName
-                zipOut.putNextEntry(null, parameters)
+                val zipName = "Printing/Fewest Moves - Additional Files/3x3x3 Fewest Moves Solution Sheet.pdf"
+                // FIXME random
+                val sheet = FmcGenericSolutionSheet(scrambleRequests.random(), globalTitle, null, Translate.DEFAULT_LOCALE)
 
-                val pdfOut = ByteArrayOutputStream()
-                val pageSize = PageSize.LETTER
-                val doc = Document(pageSize, 0f, 0f, 75f, 75f)
-                val docWriter = PdfWriter.getInstance(doc, pdfOut)
-
-                docWriter.setBoxSize("art", Rectangle(36f, 54f, pageSize.width - 36, pageSize.height - 54))
-
-                doc.addCreationDate()
-                doc.addProducer()
-                if (globalTitle != null) {
-                    doc.addTitle(globalTitle)
-                }
-
-                doc.open()
-                // FIXME
-                addGenericFmcSolutionSheet(docWriter, doc, scrambleRequests.random(), globalTitle, Translate.DEFAULT_LOCALE)
-                doc.close()
-
-                // TODO - is there a better way to convert from a PdfWriter to a PdfReader?
-                val pdfReader = PdfReader(pdfOut.toByteArray())
-                val b = ByteArray(pdfReader.fileLength.toInt())
-                pdfReader.safeFile.readFully(b)
-                zipOut.write(b)
-
-                zipOut.closeEntry()
+                zipOut.putFileEntry(zipName, sheet.render(), parameters)
             }
 
-            val passcodes = LinkedHashMap<String, String>()
+            val passcodes = mutableMapOf<String, String>()
 
             for (scrambleRequest in scrambleRequests) {
-                var safeTitle = toFileSafeString(scrambleRequest.title)
-                var salt = 0
-                var tempNewSafeTitle = safeTitle
-                while (seenTitles[tempNewSafeTitle] != null) {
-                    tempNewSafeTitle = safeTitle + " (" + ++salt + ")"
-                }
-                safeTitle = tempNewSafeTitle
-                seenTitles[safeTitle] = true
+                val fileTitle = scrambleRequest.title.toFileSafeString()
+                val safeTitle = fileTitle.toUniqueTitle(seenTitles)
+
+                seenTitles += safeTitle
 
                 // Without passcode, for printing
-                var pdfFileName = "Printing/Scramble Sets/$safeTitle.pdf"
-                parameters.fileNameInZip = pdfFileName
-                zipOut.putNextEntry(null, parameters)
-                var pdfByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, null)
-                zipOut.write(pdfByteStream.toByteArray())
-                zipOut.closeEntry()
+                val pdfPrintingZipName = "Printing/Scramble Sets/$safeTitle.pdf"
+                val pdfPrintingByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, null)
+
+                zipOut.putFileEntry(pdfPrintingZipName, pdfPrintingByteStream.render(), parameters)
 
                 // With passcode, for computer display
                 val passcode = randomPasscode()
                 passcodes[safeTitle] = passcode
 
-                pdfFileName = "$computerDisplayFileName/$safeTitle.pdf"
-                computerDisplayZipParameters.fileNameInZip = pdfFileName
-                computerDisplayZipOut.putNextEntry(null, computerDisplayZipParameters)
-                pdfByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, passcode)
-                computerDisplayZipOut.write(pdfByteStream.toByteArray())
-                computerDisplayZipOut.closeEntry()
+                val computerDisplayZipName = "$computerDisplayFileName/$safeTitle.pdf"
+                val computerDisplayByteStream = createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, passcode)
 
-                val txtFileName = "Interchange/txt/$safeTitle.txt"
-                parameters.fileNameInZip = txtFileName
-                zipOut.putNextEntry(null, parameters)
-                zipOut.write(stripNewlines(scrambleRequest.allScrambles).joinToString("\r\n").toByteArray())
-                zipOut.closeEntry()
+                computerDisplayZipOut.putFileEntry(computerDisplayZipName, computerDisplayByteStream.render(), computerDisplayZipParameters)
+
+                val txtZipName = "Interchange/txt/$safeTitle.txt"
+                val txtScrambles = stripNewlines(scrambleRequest.allScrambles).joinToString("\r\n")
+
+                zipOut.putFileEntry(txtZipName, txtScrambles.toByteArray(), parameters)
 
                 // i18n is only for fmc
                 if (!scrambleRequest.fmc) {
                     continue
                 }
 
+                val cutoutZipName = "Printing/Fewest Moves - Additional Files/$safeTitle - Scramble Cutout Sheet.pdf"
+                val cutoutSheet = FmcScrambleCutoutSheet(scrambleRequest, globalTitle, password)
+
+                zipOut.putFileEntry(cutoutZipName, cutoutSheet.render(), parameters)
+
                 for (locale in Translate.locales) {
                     // fewest moves regular sheet
-                    pdfFileName = "Printing/Fewest Moves - Additional Files/Translations/" + locale.toLanguageTag() + "_" + safeTitle + ".pdf"
-                    parameters.fileNameInZip = pdfFileName
-                    zipOut.putNextEntry(null, parameters)
+                    val printingPdfZipName = "Printing/Fewest Moves - Additional Files/Translations/${locale.toLanguageTag()}_$safeTitle.pdf"
+                    val printingSheet = FmcSolutionSheet(scrambleRequest, globalTitle, password, locale)
 
-                    var pdfOut = ByteArrayOutputStream()
-                    var pageSize = PageSize.LETTER
-                    var doc = Document(pageSize, 0f, 0f, 75f, 75f)
-                    var docWriter = PdfWriter.getInstance(doc, pdfOut)
-
-                    docWriter.setBoxSize("art", Rectangle(36f, 54f, pageSize.width - 36, pageSize.height - 54))
-
-                    doc.addCreationDate()
-                    doc.addProducer()
-                    if (globalTitle != null) {
-                        doc.addTitle(globalTitle)
-                    }
-
-                    doc.open()
-                    for (i in scrambleRequest.scrambles.indices) {
-                        addFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, i, locale)
-                    }
-                    doc.close()
-
-                    var pdfReader = PdfReader(pdfOut.toByteArray())
-                    var b = ByteArray(pdfReader.fileLength.toInt())
-                    pdfReader.safeFile.readFully(b)
-                    zipOut.write(b)
-
-                    zipOut.closeEntry()
+                    zipOut.putFileEntry(printingPdfZipName, printingSheet.render(), parameters)
 
                     // Generic sheet.
-                    pdfFileName = "Printing/Fewest Moves - Additional Files/Translations/" + locale.toLanguageTag() + "_" + safeTitle + " Solution Sheet.pdf"
-                    parameters.fileNameInZip = pdfFileName
-                    zipOut.putNextEntry(null, parameters)
+                    val genericPrintingPdfZipName = "Printing/Fewest Moves - Additional Files/Translations/${locale.toLanguageTag()}_$safeTitle Solution Sheet.pdf"
+                    val genericPrintingSheet = FmcGenericSolutionSheet(scrambleRequest, globalTitle, password, locale)
 
-                    pdfOut = ByteArrayOutputStream()
-                    pageSize = PageSize.LETTER
-                    doc = Document(pageSize, 0f, 0f, 75f, 75f)
-                    docWriter = PdfWriter.getInstance(doc, pdfOut)
-
-                    docWriter.setBoxSize("art", Rectangle(36f, 54f, pageSize.width - 36, pageSize.height - 54))
-
-                    doc.addCreationDate()
-                    doc.addProducer()
-                    if (globalTitle != null) {
-                        doc.addTitle(globalTitle)
-                    }
-
-                    // there's no need to generate 1 per round, since the fields can be filled
-                    doc.open()
-                    addGenericFmcSolutionSheet(docWriter, doc, scrambleRequest, globalTitle, locale)
-                    doc.close()
-
-                    pdfReader = PdfReader(pdfOut.toByteArray())
-                    b = ByteArray(pdfReader.fileLength.toInt())
-                    pdfReader.safeFile.readFully(b)
-                    zipOut.write(b)
-
-                    zipOut.closeEntry()
+                    zipOut.putFileEntry(genericPrintingPdfZipName, genericPrintingSheet.render(), parameters)
                 }
             }
 
@@ -495,79 +292,51 @@ data class ScrambleRequest(
 
             computerDisplayZipOut.finish()
             computerDisplayZipOut.close()
-            parameters.fileNameInZip = "$computerDisplayFileName.zip"
-            zipOut.putNextEntry(null, parameters)
-            zipOut.write(computerDisplayBaosZip.toByteArray())
-            zipOut.closeEntry()
+
+            val computerDisplayZipName = "$computerDisplayFileName.zip"
+            zipOut.putFileEntry(computerDisplayZipName, computerDisplayBaosZip.toByteArray(), parameters)
 
             val txtFileName = "$safeGlobalTitle - Computer Display PDF Passcodes - SECRET.txt"
-            parameters.fileNameInZip = txtFileName
-            zipOut.putNextEntry(null, parameters)
-            val builder = StringBuilder()
-            builder.append("SECRET SCRAMBLE SET PASSCODES\r\n")
-            if (globalTitle != null) {
-                builder.append(globalTitle)
-                builder.append("\r\n")
-            }
-            builder.append("\r\n")
-            builder.append("Make sure that only Delegates have access to this file.\r\n")
-            builder.append("Give passcodes to scramblers when the corresponding\r\n")
-            builder.append("groups begin (but not earlier). If you have to put\r\n")
-            builder.append("someone else in charge of the passcodes temporarily,\r\n")
-            builder.append("only give them the minimum amount of passcodes needed.\r\n")
-            builder.append("\r\n")
-            for ((key, value) in passcodes) {
-                builder.append(String.format("%40s", key))
-                builder.append(": ")
-                builder.append(value)
-                builder.append("\r\n")
-            }
-            zipOut.write(builder.toString().toByteArray())
-            zipOut.closeEntry()
+            val passcodeList = passcodes.entries.joinToString("\r\n") { "${it.key}: ${it.value}" }
+
+            val templateContent = ScrambleRequest::class.java.getResourceAsStream("/text/passcodeTemplate.txt").bufferedReader().readText()
+                .replace("%%GLOBAL_TITLE%%", globalTitle.orEmpty())
+                .replace("%%PASSCODES%%", passcodeList)
+
+            zipOut.putFileEntry(txtFileName, templateContent.toByteArray(), parameters)
 
             val jsonFileName = "Interchange/$safeGlobalTitle.json"
-            parameters.fileNameInZip = jsonFileName
-            zipOut.putNextEntry(null, parameters)
-            val jsonObj = HashMap<String, Any>()
-            jsonObj["sheets"] = scrambleRequests
-            jsonObj["competitionName"] = globalTitle
-            jsonObj["version"] = WebServerUtils.projectName + "-" + WebServerUtils.version
-            jsonObj["generationDate"] = generationDate
 
-            if (generationUrl != null) {
-                jsonObj["generationUrl"] = generationUrl
-            }
+            val jsonObj = mapOf(
+                "sheets" to scrambleRequests,
+                "competitionName" to globalTitle,
+                "version" to "${WebServerUtils.projectName}-${WebServerUtils.version}",
+                "generationDate" to generationDate,
+                "generationUrl" to generationUrl,
+                "schedule" to wcifHelper?.schedule
+            ).filterValues { it != null }
 
-            if (wcifHelper?.schedule != null) {
-                jsonObj["schedule"] = wcifHelper.schedule
-            }
-
-            val json = GSON.toJson(jsonObj)
-            zipOut.write(json.toByteArray())
-            zipOut.closeEntry()
+            val jsonStr = GSON.toJson(jsonObj)
+            zipOut.putFileEntry(jsonFileName, jsonStr.toByteArray(), parameters)
 
             val jsonpFileName = "Interchange/$safeGlobalTitle.jsonp"
-            parameters.fileNameInZip = jsonpFileName
-            zipOut.putNextEntry(null, parameters)
-            val jsonp = "var SCRAMBLES_JSON = $json;"
-            zipOut.write(jsonp.toByteArray())
-            zipOut.closeEntry()
+            val jsonp = "var SCRAMBLES_JSON = $jsonStr;"
 
-            parameters.fileNameInZip = "Interchange/$safeGlobalTitle.html"
-            zipOut.putNextEntry(null, parameters)
+            zipOut.putFileEntry(jsonpFileName, jsonp.toByteArray(), parameters)
 
-            val viewerResource = ScrambleRequest::class.java.getResourceAsStream(HTML_SCRAMBLE_VIEWER)
-            val sb = viewerResource.bufferedReader().lineSequence().map { it.replace("%SCRAMBLES_JSONP_FILENAME%", jsonpFileName) }
-            zipOut.write(sb.joinToString("\n").toByteArray())
-            zipOut.closeEntry()
+            val htmlZipName = "Interchange/$safeGlobalTitle.html"
 
-            parameters.fileNameInZip = "Printing/$safeGlobalTitle - All Scrambles.pdf"
-            zipOut.putNextEntry(null, parameters)
+            val viewerResource = ScrambleRequest::class.java.getResourceAsStream(HTML_SCRAMBLE_VIEWER).bufferedReader().readText()
+                .replace("%SCRAMBLES_JSONP_FILENAME%", jsonpFileName)
+
+            zipOut.putFileEntry(htmlZipName, viewerResource.toByteArray(), parameters)
+
+            val printingCompleteZipName = "Printing/$safeGlobalTitle - All Scrambles.pdf"
+
             // Note that we're not passing the password into this function. It seems pretty silly
             // to put a password protected pdf inside of a password protected zip file.
-            val baos = requestsToPdf(globalTitle, generationDate, scrambleRequests, null)
-            zipOut.write(baos.toByteArray())
-            zipOut.closeEntry()
+            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, scrambleRequests, null)
+            zipOut.putFileEntry(printingCompleteZipName, printingCompleteSheet.render(), parameters)
 
             zipOut.finish()
             zipOut.close()
@@ -575,56 +344,11 @@ data class ScrambleRequest(
             return baosZip
         }
 
-        fun requestsToPdf(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, password: String?): ByteArrayOutputStream {
-            val doc = Document()
+        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, password: String?): PdfContent {
+            val originalPdfs = scrambleRequests.map { createPdf(globalTitle, generationDate, it, Translate.DEFAULT_LOCALE, password) }
+            val configurations = scrambleRequests.map { Triple(it.title, it.scrambler.longName, it.copies) }
 
-            val totalPdfOutput = ByteArrayOutputStream()
-            val totalPdfWriter = PdfSmartCopy(doc, totalPdfOutput)
-
-            if (password != null) {
-                totalPdfWriter.setEncryption(password.toByteArray(), password.toByteArray(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128)
-            }
-
-            doc.open()
-
-            val cb = totalPdfWriter.directContent
-            val root = cb.rootOutline
-
-            val outlineByPuzzle = HashMap<String, PdfOutline>()
-            val expandPuzzleLinks = false
-
-            var pages = 1
-            for (i in scrambleRequests.indices) {
-                val scrambleRequest = scrambleRequests[i]
-
-                val shortName = scrambleRequest.scrambler.shortName
-
-                var puzzleLink: PdfOutline? = outlineByPuzzle[shortName]
-                if (puzzleLink == null) {
-                    val d = PdfDestination(PdfDestination.FIT)
-                    puzzleLink = PdfOutline(root,
-                        PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.scrambler.longName, expandPuzzleLinks)
-                    outlineByPuzzle[shortName] = puzzleLink
-                }
-
-                val d = PdfDestination(PdfDestination.FIT)
-                PdfOutline(puzzleLink,
-                    PdfAction.gotoLocalPage(pages, d, totalPdfWriter), scrambleRequest.title)
-
-                // We pass a null password, since the resulting pages will be processed further before encryption.
-                val pdfReader = PdfReader(createPdf(globalTitle, generationDate, scrambleRequest, Translate.DEFAULT_LOCALE, null).toByteArray())
-
-                for (j in 0 until scrambleRequest.copies) {
-                    for (pageN in 1..pdfReader.numberOfPages) {
-                        val page = totalPdfWriter.getImportedPage(pdfReader, pageN)
-                        totalPdfWriter.addPage(page)
-                        pages++
-                    }
-                }
-            }
-
-            doc.close()
-            return totalPdfOutput
+            return MergedOutlinePdf(*originalPdfs.toTypedArray(), configuration = configurations, globalTitle = globalTitle, password = password)
         }
     }
 }

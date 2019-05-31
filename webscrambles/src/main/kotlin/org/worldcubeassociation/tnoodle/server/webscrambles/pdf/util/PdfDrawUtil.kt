@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
+package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
 import com.itextpdf.text.Font
 import com.itextpdf.text.Paragraph

@@ -1,0 +1,10 @@
+SECRET SCRAMBLE SET PASSCODES
+%%GLOBAL_TITLE%%
+
+Make sure that only Delegates have access to this file.
+Give passcodes to scramblers when the corresponding
+groups begin (but not earlier). If you have to put
+someone else in charge of the passcodes temporarily,
+only give them the minimum amount of passcodes needed.
+
+%%PASSCODES%%
