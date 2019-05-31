@@ -344,7 +344,7 @@ data class ScrambleRequest(
             val originalPdfs = scrambleRequests.map { createPdf(globalTitle, generationDate, it, Translate.DEFAULT_LOCALE, password) }
             val configurations = scrambleRequests.map { Triple(it.title, it.scrambler.longName, it.copies) }
 
-            return MergedOutlinePdf(*originalPdfs.toTypedArray(), configuration = configurations, globalTitle = globalTitle, password = password)
+            return MergedPdfWithOutline(*originalPdfs.toTypedArray(), configuration = configurations, globalTitle = globalTitle, password = password)
         }
     }
 }
