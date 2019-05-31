@@ -3,33 +3,29 @@ import configurations.Languages.configureJava
 
 import dependencies.Versions.GWT
 
-import dependencies.Libraries.GWT_USER
-
 import org.wisepersist.gradle.plugins.gwt.Style
 
 description = "Compiles the scramble java code to javascript using GWT."
 
 attachRemoteRepositories()
 
+repositories {
+    mavenLocal()
+}
+
 plugins {
-    java
     GWT
 }
 
 configureJava()
 
 dependencies {
-    implementation(project(":scrambles"))
-    implementation(project(":utils"))
+    implementation("org.worldcubeassociation.tnoodle:tnoodle-scrambles:${rootProject.version}")
 
-    implementation(GWT_USER)
-
-    gwt(files("$projectDir/src/main/java"))
-
-    val dependentSourceProjects = listOf("scrambles", "svglite", "utils", "min2phase", "sq12phase", "threephase")
+    val dependentSourceProjects = listOf("tnoodle-scrambles", "tnoodle-svglite", "tnoodle-utils", "scrambler-min2phase", "scrambler-sq12phase", "scrambler-threephase")
 
     for (depProject in dependentSourceProjects) {
-        gwt(files("$rootDir/$depProject/src/main/java"))
+        gwt(group = "org.worldcubeassociation.tnoodle", name = depProject, version = rootProject.version.toString(), classifier = "sources")
     }
 }
 

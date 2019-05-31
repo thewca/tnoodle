@@ -18,7 +18,6 @@
   <set-property name="gwt.logging.logLevel" value="INFO"/>
   <set-property name="gwt.logging.enabled" value="TRUE"/>
   <set-property name="gwt.logging.consoleHandler" value="ENABLED"/>
-  <set-property name="gwt.logging.popupHandler" value="DISABLED" />
   <set-property name="gwt.logging.simpleRemoteHandler" value="DISABLED" />
 
   <entry-point class='net.gnehzr.tnoodle.js.ScrambleJsEntryPoint'/>
