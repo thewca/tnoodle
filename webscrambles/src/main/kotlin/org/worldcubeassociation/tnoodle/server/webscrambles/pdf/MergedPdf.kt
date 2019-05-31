@@ -6,7 +6,7 @@ import com.itextpdf.text.pdf.PdfSmartCopy
 import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 
-class MergedPdf(vararg val toMerge: PdfContent) : BasePdfSheet<PdfSmartCopy>(null) {
+class MergedPdf(val toMerge: List<PdfContent>) : BasePdfSheet<PdfSmartCopy>(null) {
     override val document = Document()
 
     override fun Document.getWriter(bytes: ByteArrayOutputStream) = PdfSmartCopy(document, bytes)
