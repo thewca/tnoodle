@@ -16,73 +16,80 @@ import org.apache.batik.bridge.UserAgentAdapter
 import org.apache.batik.util.XMLResourceDescriptor
 import java.awt.Graphics2D
 import java.awt.geom.AffineTransform
-import java.io.StringReader
 
 object PdfDrawUtil {
-    fun drawSvgToGraphics2D(svg: Svg, g2: Graphics2D, size: Dimension) {
+    fun Graphics2D.drawSvg(svg: Svg, size: Dimension) {
         // Copied (and modified) from http://stackoverflow.com/a/12502943
+
+        val userAgent = UserAgentAdapter()
+
+        val loader = DocumentLoader(userAgent)
+        val ctx = BridgeContext(userAgent, loader).apply { setDynamicState(BridgeContext.DYNAMIC) }
 
         val parser = XMLResourceDescriptor.getXMLParserClassName()
         val factory = SAXSVGDocumentFactory(parser)
-        val userAgent = UserAgentAdapter()
-        val loader = DocumentLoader(userAgent)
-        val ctx = BridgeContext(userAgent, loader)
-        ctx.setDynamicState(BridgeContext.DYNAMIC)
-        val builder = GVTBuilder()
 
-        val svgReader = StringReader(svg.toString())
-        val parsedSvgDocument = factory.createSVGDocument(null, svgReader)
-        val chartGfx = builder.build(ctx, parsedSvgDocument)
+        val parsedSvgDocument = factory.createSVGDocument(null, svg.toString().reader())
+
+        val chartGfx = GVTBuilder().build(ctx, parsedSvgDocument)
+
         val actualSize = svg.size
+
         val scaleWidth = 1.0 * size.width / actualSize.width
         val scaleHeight = 1.0 * size.height / actualSize.height
+
         chartGfx.transform = AffineTransform.getScaleInstance(scaleWidth, scaleHeight)
 
-        chartGfx.paint(g2)
+        chartGfx.paint(this)
     }
 
-    fun drawDashedLine(cb: PdfContentByte, left: Int, right: Int, yPosition: Int) {
-        cb.setLineDash(3f, 3f)
-        cb.moveTo(left.toFloat(), yPosition.toFloat())
-        cb.lineTo(right.toFloat(), yPosition.toFloat())
-        cb.stroke()
+    fun PdfContentByte.drawDashedLine(left: Int, right: Int, yPosition: Int) {
+        setLineDash(3f, 3f)
+        moveTo(left.toFloat(), yPosition.toFloat())
+        lineTo(right.toFloat(), yPosition.toFloat())
+        stroke()
     }
 
-    fun fitAndShowText(cb: PdfContentByte, text: String, bf: BaseFont, rect: Rectangle, maxFontSize: Float, align: Int, leadingMultiplier: Float) {
-        var maxFontSize = maxFontSize
-        // We create a temp pdf and check if the text fit in a rectangle there.
-        // If it's ok, we add the text to original pdf.
+    fun PdfContentByte.fitAndShowText(text: String, bf: BaseFont, rect: Rectangle, maxFontSize: Float, align: Int, leadingMultiplier: Float): Int {
+        val iterationThreshold = 0.1f
+        var iterMaxFontSize = maxFontSize + iterationThreshold
 
         do {
-            val tempCb = PdfContentByte(cb.pdfWriter)
+            iterMaxFontSize -= iterationThreshold
 
-            val tempCt = ColumnText(tempCb)
-            tempCt.setSimpleColumn(rect)
-            tempCt.leading = leadingMultiplier * maxFontSize
+            // We create a temp pdf and check if the text fit in a rectangle there.
+            val tempCb = PdfContentByte(pdfWriter)
 
-            val p = Paragraph(text, Font(bf, maxFontSize))
-            tempCt.addText(p)
-
-            val status = tempCt.go()
-            if (!ColumnText.hasMoreText(status)) { // all the text fit in the rectangle
-                val ct = ColumnText(cb)
-                ct.setSimpleColumn(rect)
-                ct.alignment = align
-                ct.leading = leadingMultiplier * maxFontSize
-                ct.addText(p)
-                ct.go()
-                break
+            val tempCt = ColumnText(tempCb).apply {
+                insertTextParagraph(text, bf, rect, iterMaxFontSize, align, leadingMultiplier)
             }
 
-            maxFontSize -= 0.1f
-        } while (true)
+            val status = tempCt.go()
+        } while (ColumnText.hasMoreText(status))
+
+        // If it's ok, we add the text to original pdf.
+        val ct = ColumnText(this).apply {
+            insertTextParagraph(text, bf, rect, iterMaxFontSize, align, leadingMultiplier)
+        }
+
+        return ct.go()
     }
 
-    fun populateRect(cb: PdfContentByte, rect: Rectangle, list: ArrayList<String>, alignList: ArrayList<Int>, bf: BaseFont, fontSize: Int) {
-        assert(list.size == alignList.size) { "Make sure list.size() == alignList.size()" }
+    private fun ColumnText.insertTextParagraph(text: String, bf: BaseFont, rect: Rectangle, fontSize: Float, align: Int, leadingMultiplier: Float) {
+        setSimpleColumn(rect)
+        leading = leadingMultiplier * fontSize
+
+        alignment = align
+
+        addText(Paragraph(text, Font(bf, fontSize)))
+    }
+
+    fun PdfContentByte.populateRect(rect: Rectangle, list: List<String>, alignList: List<Int>, bf: BaseFont, fontSize: Int) {
+        assert(list.size == alignList.size) { "Make sure that list and alignList are of the same size" }
 
         val totalHeight = rect.height
         val width = rect.width
+
         val x = rect.left
         val y = rect.top
 
@@ -90,7 +97,7 @@ object PdfDrawUtil {
 
         for (i in list.indices) {
             val temp = Rectangle(x, y + height * i - totalHeight - fontSize.toFloat(), x + width, y + height * i - totalHeight)
-            fitAndShowText(cb, list[i], bf, temp, 15f, alignList[i], 1f)
+            fitAndShowText(list[i], bf, temp, 15f, alignList[i], 1f)
         }
     }
 }
