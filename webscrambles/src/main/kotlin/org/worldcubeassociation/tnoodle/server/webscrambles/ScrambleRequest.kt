@@ -152,7 +152,7 @@ data class ScrambleRequest(
                     singleSheets.add(singleSheet)
                 }
 
-                return MergedPdf(*singleSheets.toTypedArray())
+                return MergedPdf(singleSheets)
             }
 
             assert(scrambles.isNotEmpty())
@@ -349,7 +349,7 @@ data class ScrambleRequest(
             val originalPdfs = scramblePdfs ?: scrambleRequests.map { it.createPdf(globalTitle, generationDate, Translate.DEFAULT_LOCALE) }
             val configurations = scrambleRequests.map { Triple(it.title, it.scrambler.longName, it.copies) }
 
-            return MergedPdfWithOutline(*originalPdfs.toTypedArray(), configuration = configurations, globalTitle = globalTitle)
+            return MergedPdfWithOutline(originalPdfs, configurations, globalTitle)
         }
     }
 }
