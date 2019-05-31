@@ -180,7 +180,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, pass
                     "scrambleIndex" to (index + 1).toString(),
                     "scrambleCount" to absoluteTotal.toString()
                 )
-                
+
                 list.add(Translate.translate("fmc.scrambleXofY", locale, substitutions))
                 alignList.add(Element.ALIGN_CENTER)
             }

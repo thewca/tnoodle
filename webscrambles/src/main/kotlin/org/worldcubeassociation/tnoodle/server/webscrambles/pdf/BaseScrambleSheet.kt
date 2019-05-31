@@ -25,7 +25,7 @@ abstract class BaseScrambleSheet(val scrambleRequest: ScrambleRequest, globalTit
     }
 
     override fun finalise(processedBytes: ByteArrayOutputStream): ByteArray {
-        val pdfReader = PdfReader(processedBytes.toByteArray())
+        val pdfReader = PdfReader(processedBytes.toByteArray(), password?.toByteArray())
 
         val buffer = ByteArray(pdfReader.fileLength.toInt())
         pdfReader.safeFile.readFully(buffer)

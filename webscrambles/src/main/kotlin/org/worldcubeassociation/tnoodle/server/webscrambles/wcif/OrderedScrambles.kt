@@ -14,6 +14,10 @@ object OrderedScrambles {
     // TODO see https://github.com/thewca/tnoodle/issues/400
 
     fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
+        if (wcifHelper.venues.isEmpty()) {
+            return
+        }
+
         var hasMultipleDays = wcifHelper.hasMultipleDays
         val hasMultipleVenues = wcifHelper.hasMultipleVenues
 
