@@ -1,9 +1,6 @@
 package dependencies
 
 object Libraries {
-    val H2 = "com.h2database:h2:${Versions.H2}"
-    val QUERCUS = "com.caucho:quercus:${Versions.QUERCUS}"
-    val GWT_USER = "com.google.gwt:gwt-user:${Versions.GWT_USER}"
     val GWTEXPORTER = "org.timepedia.exporter:gwtexporter:${Versions.GWTEXPORTER}"
     val GSON = "com.google.code.gson:gson:${Versions.GSON}"
     val JOPT_SIMPLE = "net.sf.jopt-simple:jopt-simple:${Versions.JOPT_SIMPLE}"
@@ -21,4 +18,13 @@ object Libraries {
     val BOUNCYCASTLE = "org.bouncycastle:bcprov-jdk15on:${Versions.BOUNCYCASTLE}"
     val JUNIT_JUPITER_API = "org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT_JUPITER_API}"
     val JUNIT_JUPITER_ENGINE = "org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT_JUPITER_ENGINE}"
+    val ANDROID_APPCOMPAT_V7 = "com.android.support:appcompat-v7:${Versions.ANDROID_APPCOMPAT_V7}"
+    val ANDROID_SUPPORT_V4 = "com.android.support:support-v4:${Versions.ANDROID_SUPPORT_V4}"
+    val ANDROIDSVG = "com.caverock:androidsvg:${Versions.ANDROIDSVG}"
+
+    val ANDROID_BUILD_TOOLS = "com.android.tools.build:gradle:${Versions.ANDROID_BUILD_TOOLS}"
+
+    object Buildscript {
+        val ANDROID_BUILD_TOOLS_ACTUAL = ANDROID_BUILD_TOOLS
+    }
 }

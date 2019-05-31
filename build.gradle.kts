@@ -1,5 +1,7 @@
 import configurations.Languages.attachLocalRepositories
 
+import dependencies.Libraries.ANDROID_BUILD_TOOLS
+
 buildscript {
     repositories {
         mavenCentral()
@@ -7,8 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.1")
-        classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
+        classpath(ANDROID_BUILD_TOOLS)
     }
 }
 
@@ -18,6 +19,8 @@ allprojects {
     
     attachLocalRepositories()
 }
+
+val releasePrefix = "TNoodle-WCA"
 
 tasks.create<Copy>("generateOfficialRelease") {
     description = "Generate an official WCA release artifact. THIS WILL RUN TESTS!"
@@ -30,7 +33,7 @@ tasks.create<Copy>("generateOfficialRelease") {
 
     from("$targetProject/build/libs") {
         include("$targetProject-wca.jar")
-        rename("$targetProject-wca.jar", "TNoodle-WCA-$version.jar")
+        rename("$targetProject-wca.jar", "$releasePrefix-$version.jar")
     }
 
     into(rootDir)
@@ -43,5 +46,5 @@ tasks.create<JavaExec>("startOfficialServer") {
     dependsOn("generateOfficialRelease")
 
     main = "-jar"
-    args = listOf("TNoodle-WCA-$version.jar")
+    args = listOf("$releasePrefix-$version.jar")
 }
