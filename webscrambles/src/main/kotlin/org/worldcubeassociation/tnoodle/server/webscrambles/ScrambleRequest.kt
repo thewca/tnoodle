@@ -34,9 +34,9 @@ data class ScrambleRequest(
     // So, if ScrambleRequest.scrambles.length == 3, tnoodle prints Scramble 1 of 3, Scramble 2 of 3 and Scramble 3 of 3.
     // But for OrderedScrambles, these scrambles are split on the schedule, so we replace Scramble.scrambles = {Scramble.scrambles[attempt]}.
     // To continue printing Scramble x of y, we use attempt as x and totalAttempt as y.
-    var roundStartTime: DateTime?,
-    var totalAttempt: Int,
-    var attempt: Int,
+    val roundStartTime: DateTime?,
+    val totalAttempt: Int,
+    val attempt: Int,
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
@@ -192,7 +192,7 @@ data class ScrambleRequest(
             return tempNewSafeTitle
         }
 
-        private fun ZipOutputStream.putFileEntry(fileName: String, contents: ByteArray, parameters: ZipParameters = defaultZipParameters()) {
+        fun ZipOutputStream.putFileEntry(fileName: String, contents: ByteArray, parameters: ZipParameters = defaultZipParameters()) {
             parameters.fileNameInZip = fileName
 
             putNextEntry(null, parameters)
@@ -284,7 +284,9 @@ data class ScrambleRequest(
                 }
             }
 
-            OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, zipOut, parameters, wcifHelper)
+            if (wcifHelper != null) {
+                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, zipOut, parameters, wcifHelper)
+            }
 
             computerDisplayZipOut.finish()
             computerDisplayZipOut.close()

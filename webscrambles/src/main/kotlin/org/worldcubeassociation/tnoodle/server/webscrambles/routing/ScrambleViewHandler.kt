@@ -149,7 +149,7 @@ object ScrambleViewHandler : RouteHandler {
                         val generationUrl = query["generationUrl"]
                         val schedule = query["schedule"] ?: ""
 
-                        val wcifHelper = WCIFHelper(schedule, scrambleRequests)
+                        val wcifHelper = WCIFHelper(schedule)
 
                         val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, scrambleRequests, password, generationUrl, wcifHelper)
 

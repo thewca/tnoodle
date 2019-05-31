@@ -1,178 +1,106 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 
-import java.util.ArrayList
-import java.util.Arrays
+import kotlin.math.pow
 
-class WCIFHelper(schedule: String?, val allScrambleRequests: List<ScrambleRequest>) {
-    private val parser = JsonParser()
-    val schedule = schedule?.takeIf { it.isNotBlank() }?.let { parser.parse(it)?.asJsonObject }
+class WCIFHelper(schedule: String) {
+    val schedule = PARSER.parse(schedule)?.asJsonObject
 
-    val venues: JsonArray
-        get() = schedule?.getAsJsonArray("venues") ?: JsonArray()
+    val venues: List<Venue>
+    val numberOfDays: Int
 
-    val earlierActivityString: String?
-        get() {
-            var date: DateTime? = null
-            var out: String? = null
-            for (venue in venues) {
-                for (room in getRooms(venue)) {
-                    for (activity in getActivities(room)) {
-                        val startTime = getActivityStartTime(activity)
-                        val tempDate = DateTime.parse(startTime)
-                        if (date == null || tempDate.isBefore(date)) {
-                            date = tempDate
-                            out = startTime
-                        }
-                    }
+    init {
+        val parsedSchedule = PARSER.parse(schedule)?.asJsonObject
+
+        val rawVenues = parsedSchedule?.getAsJsonArray("venues") ?: JsonArray()
+
+        venues = rawVenues.map { it.asJsonObject }.map { jsonVenue ->
+            val rawRooms = jsonVenue.getAsJsonArray("rooms") ?: JsonArray()
+
+            val rooms = rawRooms.map { it.asJsonObject }.map { jsonRoom ->
+                val rawActivities = jsonRoom.asJsonObject.getAsJsonArray("activities") ?: JsonArray()
+
+                val activities = rawActivities.map { it.asJsonObject }.map { jsonActivity ->
+                    Activity(jsonActivity.get("activityCode").asString, jsonActivity.get("startTime").asString)
                 }
+
+                Room(jsonRoom.get("name").asString, activities)
             }
-            assert(out != null) { "I could not find the earlier activity." }
-            return out
+
+            Venue(jsonVenue.get("name").asString, rooms, jsonVenue.get("timezone").asString)
         }
 
-    fun hasMultipleDays(): Boolean {
-        return schedule != null && schedule.get("numberOfDays").asInt > 1
+        numberOfDays = parsedSchedule?.get("numberOfDays")?.asInt ?: 0
     }
 
-    fun hasMultipleVenues(): Boolean {
-        return schedule != null && schedule.getAsJsonArray("venues").size() > 1
-    }
+    val earliestActivityString: String
+        get() = venues
+            .flatMap { it.rooms }
+            .flatMap { it.activities }
+            .map { it.startTime }
+            .maxBy { DateTime.parse(it) } ?: error("I could not find the earlier activity")
 
-    fun getRooms(venue: JsonElement): JsonArray {
-        return venue.asJsonObject.getAsJsonArray("rooms")
-    }
-
-    fun getActivities(room: JsonElement): JsonArray {
-        return room.asJsonObject.getAsJsonArray("activities")
-    }
-
-    fun getActivityStartTime(activity: JsonElement): String {
-        return activity.asJsonObject.get("startTime").asString
-    }
-
-    fun getSafeVenueName(venue: JsonElement): String {
-        return parseMarkdown(venue.asJsonObject.get("name").asString).toFileSafeString()
-    }
-
-    fun hasMultipleRooms(venue: JsonElement): Boolean {
-        return venue.asJsonObject.getAsJsonArray("rooms").size() > 1
-    }
-
-    fun getSafeRoomName(room: JsonElement): String {
-        return parseMarkdown(room.asJsonObject.get("name").asString).toFileSafeString()
-    }
-
-    fun getActivityCode(activity: JsonElement): String {
-        return activity.asJsonObject.get("activityCode").asString
-    }
-
-    // In case venue or room is using markdown
-    private fun parseMarkdown(s: String): String {
-        if (s.indexOf('[') >= 0 && s.indexOf(']') >= 0) {
-            return s.substring(s.indexOf('[') + 1, s.indexOf(']'))
-        }
-
-        return s
-    }
-
-    fun getActivityStartTime(activity: JsonElement, timezone: DateTimeZone): DateTime {
-        return DateTime(activity.asJsonObject.get("startTime").asString, timezone)
-    }
-
-    fun getTimeZone(venue: JsonElement): DateTimeZone {
-        return DateTimeZone.forID(venue.asJsonObject.get("timezone").asString)
-    }
-
-    fun getScrambleRequests(activityCode: String): ArrayList<ScrambleRequest> {
-        var scrambleRequests = ArrayList<ScrambleRequest>()
-
-        var round = 0
-        var group = 0
-        var attempt = 0
-
-        val activitySplit = activityCode.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val event = activitySplit[0]
-
-        if (Arrays.asList(*wcifIgnorableKeys).indexOf(event) >= 0) {
-            return scrambleRequests
-        }
-
-        // This part assumes every round, group and attempt is labeled with an integer from competitionJson
-        for (item in activityCode.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
-            if (item[0] == 'r') {
-                round = Integer.parseInt(item.substring(1))
-            } else if (item[0] == 'g') {
-                group = Integer.parseInt(item.substring(1))
-            } else if (item[0] == 'a') {
-                attempt = Integer.parseInt(item.substring(1))
-            }
-        }
-
-        // First, we add all requests whose events equals what we need
-        for (item in allScrambleRequests) {
-            if (item.event == event) {
-                scrambleRequests.add(item)
-            }
-        }
-
-        // Then, we start removing, iterating over a copy, removing from original.
-        if (round > 0) {
-            for (scrambleRequest in ArrayList(scrambleRequests)) {
-                if (scrambleRequest.round != round) {
-                    scrambleRequests.remove(scrambleRequest)
-                }
-            }
-        }
-
-        if (group > 0) {
-            for (scrambleRequest in ArrayList(scrambleRequests)) {
-                if (!compareLettersCharToNumber(scrambleRequest.group!!, group)) {
-                    scrambleRequests.remove(scrambleRequest)
-                }
-            }
-        }
-
-        if (attempt > 0) {
-            val temp = ArrayList<ScrambleRequest>()
-            for (scrambleRequest in scrambleRequests) {
-                val attemptRequest = scrambleRequest.copy(
-                    scrambles = listOf(scrambleRequest.scrambles[attempt - 1]),
-                    attempt = attempt,
-                    totalAttempt = scrambleRequest.scrambles.size // useful for fmc
-                )
-
-                temp.add(attemptRequest)
-            }
-            scrambleRequests = ArrayList(temp)
-        }
-
-        assert(scrambleRequests.isNotEmpty()) { "An activity of the schedule did not match an event." }
-
-        return scrambleRequests
-    }
-
-    private fun compareLettersCharToNumber(letters: String, number: Int): Boolean {
-        var sum = 0
-        var pow = 1
-        for (i in letters.length - 1 downTo 0) {
-            sum += (letters[i] - 'A' + 1) * pow
-            pow *= 26
-        }
-        return sum == number
-    }
+    val hasMultipleDays: Boolean get() = numberOfDays > 1
+    val hasMultipleVenues: Boolean get() = venues.size > 1
 
     companion object {
+        private val PARSER = JsonParser()
+
+        fun List<ScrambleRequest>.filterForActivity(activity: Activity, timeZone: DateTimeZone): List<ScrambleRequest> {
+            val activitySplit = activity.activityCode.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val event = activitySplit[0]
+
+            if (WCIF_IGNORABLE_KEYS.contains(event)) {
+                return emptyList()
+            }
+
+            var round = 0
+            var group = 0
+            var attempt = 0
+
+            // This part assumes every round, group and attempt is labeled with an integer from competitionJson
+            for (item in activitySplit) {
+                when {
+                    item[0] == 'r' -> round = item.substring(1).toInt()
+                    item[0] == 'g' -> group = item.substring(1).toInt()
+                    item[0] == 'a' -> attempt = item.substring(1).toInt()
+                }
+            }
+
+            // First, we add all requests whose events equals what we need
+            val matchingRequests = filter { it.event == event }
+                // Then, we start removing, depending on the defined details.
+                .filter { round > 0 && it.round != round }.toMutableList()
+                .filter { group > 0 && compareLettersCharToNumber(it.group.orEmpty(), group) }
+
+            val mappedRequests = matchingRequests.map { request ->
+                attempt.takeIf { it > 0 }?.let {
+                    request.copy(
+                        scrambles = listOf(request.scrambles[attempt - 1]),
+                        attempt = attempt,
+                        totalAttempt = request.scrambles.size // useful for fmc
+                    )
+                } ?: request
+            }.map { it.copy(roundStartTime = activity.getLocalStartTime(timeZone)) }
+
+            return mappedRequests.takeIf { it.isNotEmpty() } ?: error("An activity of the schedule did not match an event.")
+        }
+
+        fun compareLettersCharToNumber(letters: String, number: Int): Boolean {
+            val sum = letters.reversed().withIndex().sumBy { (i, c) ->
+                (c - 'A' + 1) * (26f.pow(i).toInt())
+            }
+
+            return sum == number
+        }
 
         // Currently, we mark not cubing related activities as other-lunch or other-speech, for example.
         // If we ever accept any other such ignorable key, it should be added here.
-        private val wcifIgnorableKeys = arrayOf("other")
+        private val WCIF_IGNORABLE_KEYS = listOf("other")
     }
 }
