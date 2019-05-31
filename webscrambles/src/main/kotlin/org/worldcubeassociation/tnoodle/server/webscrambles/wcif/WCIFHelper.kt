@@ -43,7 +43,7 @@ class WCIFHelper(schedule: String) {
             .flatMap { it.rooms }
             .flatMap { it.activities }
             .map { it.startTime }
-            .maxBy { DateTime.parse(it) } ?: error("I could not find the earlier activity")
+            .maxBy { DateTime.parse(it) } ?: error("I could not find the earliest activity")
 
     val hasMultipleDays: Boolean get() = numberOfDays > 1
     val hasMultipleVenues: Boolean get() = venues.size > 1
@@ -75,8 +75,8 @@ class WCIFHelper(schedule: String) {
             // First, we add all requests whose events equals what we need
             val matchingRequests = filter { it.event == event }
                 // Then, we start removing, depending on the defined details.
-                .filter { round > 0 && it.round != round }.toMutableList()
-                .filter { group > 0 && compareLettersCharToNumber(it.group.orEmpty(), group) }
+                .filter { round <= 0 || it.round == round }
+                .filter { group <= 0 || compareLettersCharToNumber(it.group.orEmpty(), group) }
 
             val mappedRequests = matchingRequests.map { request ->
                 attempt.takeIf { it > 0 }?.let {
