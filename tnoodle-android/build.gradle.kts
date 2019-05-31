@@ -1,15 +1,21 @@
 import com.android.build.gradle.AppExtension
+import dependencies.Libraries.ANDROIDSVG
+import dependencies.Libraries.ANDROID_APPCOMPAT_V7
+import dependencies.Libraries.ANDROID_SUPPORT_V4
+
+import dependencies.Versions.ANDROID_SDK
+import dependencies.Versions.ANDROID_SDK_MIN
 
 plugins {
-    id("com.android.application")
+    ANDROID_APP
 }
 
 configure<AppExtension> {
-    compileSdkVersion(28)
+    compileSdkVersion(ANDROID_SDK)
 
     defaultConfig {
-        minSdkVersion(17)
-        targetSdkVersion(28)
+        minSdkVersion(ANDROID_SDK_MIN)
+        targetSdkVersion(ANDROID_SDK)
     }
 }
 
@@ -20,11 +26,11 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.support:appcompat-v7:28.0.0")
-    implementation("com.android.support:support-v4:28.0.0")
+    implementation(ANDROID_APPCOMPAT_V7)
+    implementation(ANDROID_SUPPORT_V4)
 
-    implementation("com.caverock:androidsvg:1.2.1")
+    implementation(ANDROIDSVG)
 
-    implementation("org.worldcubeassociation.tnoodle:tnoodle-scrambles:${rootProject.version}")
-    implementation("org.worldcubeassociation.tnoodle:tnoodle-utils:${rootProject.version}")
+    implementation("${rootProject.group}:tnoodle-scrambles:${rootProject.version}")
+    implementation("${rootProject.group}:tnoodle-utils:${rootProject.version}")
 }

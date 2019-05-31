@@ -20,12 +20,12 @@ plugins {
 configureJava()
 
 dependencies {
-    implementation("org.worldcubeassociation.tnoodle:tnoodle-scrambles:${rootProject.version}")
+    implementation("${rootProject.group}:tnoodle-scrambles:${rootProject.version}")
 
     val dependentSourceProjects = listOf("tnoodle-scrambles", "tnoodle-svglite", "tnoodle-utils", "scrambler-min2phase", "scrambler-sq12phase", "scrambler-threephase")
 
     for (depProject in dependentSourceProjects) {
-        gwt(group = "org.worldcubeassociation.tnoodle", name = depProject, version = rootProject.version.toString(), classifier = "sources")
+        gwt(group = rootProject.group.toString(), name = depProject, version = rootProject.version.toString(), classifier = "sources")
     }
 }
 
