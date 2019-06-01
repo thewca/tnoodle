@@ -194,6 +194,8 @@ data class ScrambleRequest(
             closeEntry()
         }
 
+        private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
+
         fun requestsToZip(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
             val baosZip = ByteArrayOutputStream()
 
@@ -225,7 +227,6 @@ data class ScrambleRequest(
             }
 
             val passcodes = mutableMapOf<String, String>()
-            val renderedPdfs = mutableListOf<PdfContent>()
 
             for (scrambleRequest in scrambleRequests) {
                 val fileTitle = scrambleRequest.title.toFileSafeString()
@@ -239,6 +240,9 @@ data class ScrambleRequest(
 
                 zipOut.putFileEntry(pdfPrintingZipName, pdfPrintingByteStream.render(), parameters)
 
+                // register in cache to speed up overall generation process
+                PDF_CACHE[scrambleRequest] = pdfPrintingByteStream
+
                 // With passcode, for computer display
                 val passcode = randomPasscode()
                 passcodes[safeTitle] = passcode
@@ -246,9 +250,6 @@ data class ScrambleRequest(
                 val computerDisplayZipName = "$computerDisplayFileName/$safeTitle.pdf"
 
                 computerDisplayZipOut.putFileEntry(computerDisplayZipName, pdfPrintingByteStream.render(passcode), computerDisplayZipParameters)
-
-                // register in cache to speed up overall generation process
-                renderedPdfs.add(pdfPrintingByteStream)
 
                 val txtZipName = "Interchange/txt/$safeTitle.txt"
                 val txtScrambles = stripNewlines(scrambleRequest.allScrambles).joinToString("\r\n")
@@ -281,7 +282,7 @@ data class ScrambleRequest(
             }
 
             if (wcifHelper != null) {
-                OrderedScrambles.generateOrderedScrambles(scrambleRequests, renderedPdfs, globalTitle, generationDate, zipOut, parameters, wcifHelper)
+                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, zipOut, parameters, wcifHelper)
             }
 
             computerDisplayZipOut.finish()
@@ -329,7 +330,7 @@ data class ScrambleRequest(
 
             // Note that we're not passing the password into this function. It seems pretty silly
             // to put a password protected pdf inside of a password protected zip file.
-            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, scrambleRequests, renderedPdfs)
+            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, scrambleRequests)
             zipOut.putFileEntry(printingCompleteZipName, printingCompleteSheet.render(), parameters)
 
             zipOut.finish()
@@ -338,8 +339,11 @@ data class ScrambleRequest(
             return baosZip
         }
 
-        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, scramblePdfs: List<PdfContent>? = null): PdfContent {
-            val originalPdfs = scramblePdfs ?: scrambleRequests.map { it.createPdf(globalTitle, generationDate, Translate.DEFAULT_LOCALE) }
+        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>): PdfContent {
+            val originalPdfs = scrambleRequests.map {
+                PDF_CACHE.getOrPut(it) { it.createPdf(globalTitle, generationDate, Translate.DEFAULT_LOCALE) }
+            }
+
             val configurations = scrambleRequests.map { Triple(it.title, it.scrambler.longName, it.copies) }
 
             return MergedPdfWithOutline(originalPdfs, configurations, globalTitle)

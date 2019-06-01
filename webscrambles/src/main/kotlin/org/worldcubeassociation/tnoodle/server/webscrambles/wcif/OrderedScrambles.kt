@@ -14,12 +14,10 @@ import java.util.Date
 object OrderedScrambles {
     // TODO see https://github.com/thewca/tnoodle/issues/400
 
-    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, renderedScrambles: List<PdfContent>, globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
+    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
         if (wcifHelper.venues.isEmpty()) {
             return
         }
-
-        val zippedRequests = scrambleRequests.zip(renderedScrambles)
 
         var hasMultipleDays = wcifHelper.hasMultipleDays
         val hasMultipleVenues = wcifHelper.hasMultipleVenues
@@ -38,8 +36,8 @@ object OrderedScrambles {
                 val roomName = room.fileSafeName
 
                 val requestsPerDay = room.activities
-                    .flatMap { zippedRequests.filterForActivity(it, timezone) }
-                    .groupBy { Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), it.third.withTimeAtStartOfDay()).days + 1 }
+                    .flatMap { scrambleRequests.filterForActivity(it, timezone) }
+                    .groupBy { Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), it.second.withTimeAtStartOfDay()).days + 1 }
 
                 // hasMultipleDays gets a variable assigned on the competition creation using the website's form.
                 // Online schedule fit to it and the user should not be able to put events outside it, but we double check here.
@@ -63,13 +61,9 @@ object OrderedScrambles {
                         // to prevent different files with the same name.
                         val pdfFileName = parts.joinToString("")
 
-                        // have to use this nastly little hack if we want to benefit from caching
-                        val sortingTrickery = scrambles.sortedBy { it.third }
+                        val sortedScrambles = scrambles.sortedBy { it.second }.map { it.first }
 
-                        val sortedScrambles = sortingTrickery.map { it.first }
-                        val sortedPdfs = sortingTrickery.map { it.second }
-
-                        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, sortedScrambles, sortedPdfs)
+                        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, sortedScrambles)
                         zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
                     }
                 }
