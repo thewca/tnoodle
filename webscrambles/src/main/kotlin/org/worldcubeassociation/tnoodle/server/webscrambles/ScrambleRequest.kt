@@ -6,7 +6,6 @@ import net.gnehzr.tnoodle.scrambles.ScrambleCacher
 import net.lingala.zip4j.io.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.util.Zip4jConstants
-import org.joda.time.DateTime
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
@@ -34,7 +33,6 @@ data class ScrambleRequest(
     // So, if ScrambleRequest.scrambles.length == 3, tnoodle prints Scramble 1 of 3, Scramble 2 of 3 and Scramble 3 of 3.
     // But for OrderedScrambles, these scrambles are split on the schedule, so we replace Scramble.scrambles = {Scramble.scrambles[attempt]}.
     // To continue printing Scramble x of y, we use attempt as x and totalAttempt as y.
-    val roundStartTime: DateTime?,
     val totalAttempt: Int,
     val attempt: Int,
 
@@ -46,12 +44,8 @@ data class ScrambleRequest(
     val scrambleSetId: String?,
     val event: String,
     val round: Int
-) : Comparable<ScrambleRequest> {
+) {
     val allScrambles get() = scrambles + extraScrambles
-
-    override fun compareTo(other: ScrambleRequest): Int {
-        return this.roundStartTime!!.compareTo(other.roundStartTime)
-    }
 
     companion object {
         private val HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html"
@@ -69,7 +63,6 @@ data class ScrambleRequest(
                 0,
                 "",
                 false,
-                null,
                 null,
                 0,
                 0,

@@ -5,6 +5,7 @@ import com.google.gson.JsonParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfContent
 
 import kotlin.math.pow
 
@@ -51,13 +52,15 @@ class WCIFHelper(schedule: String) {
     companion object {
         private val PARSER = JsonParser()
 
-        fun List<ScrambleRequest>.filterForActivity(activity: Activity, timeZone: DateTimeZone): List<ScrambleRequest> {
+        fun List<Pair<ScrambleRequest, PdfContent>>.filterForActivity(activity: Activity, timeZone: DateTimeZone): List<Triple<ScrambleRequest, PdfContent, DateTime>> {
             val activitySplit = activity.activityCode.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val event = activitySplit[0]
 
             if (WCIF_IGNORABLE_KEYS.contains(event)) {
                 return emptyList()
             }
+
+            val activityTime = activity.getLocalStartTime(timeZone)
 
             var round = 0
             var group = 0
@@ -73,20 +76,22 @@ class WCIFHelper(schedule: String) {
             }
 
             // First, we add all requests whose events equals what we need
-            val matchingRequests = filter { it.event == event }
+            val matchingRequests = filter { it.first.event == event }
                 // Then, we start removing, depending on the defined details.
-                .filter { round <= 0 || it.round == round }
-                .filter { group <= 0 || compareLettersCharToNumber(it.group.orEmpty(), group) }
+                .filter { round <= 0 || it.first.round == round }
+                .filter { group <= 0 || compareLettersCharToNumber(it.first.group.orEmpty(), group) }
 
-            val mappedRequests = matchingRequests.map { request ->
-                attempt.takeIf { it > 0 }?.let {
+            val mappedRequests = matchingRequests.map { (request, pdf) ->
+                val scramblesForAttempt = attempt.takeIf { it > 0 }?.let {
                     request.copy(
                         scrambles = listOf(request.scrambles[attempt - 1]),
                         attempt = attempt,
                         totalAttempt = request.scrambles.size // useful for fmc
                     )
                 } ?: request
-            }.map { it.copy(roundStartTime = activity.getLocalStartTime(timeZone)) }
+
+                Triple(scramblesForAttempt, pdf, activityTime)
+            }
 
             return mappedRequests.takeIf { it.isNotEmpty() } ?: error("An activity of the schedule did not match an event.")
         }
