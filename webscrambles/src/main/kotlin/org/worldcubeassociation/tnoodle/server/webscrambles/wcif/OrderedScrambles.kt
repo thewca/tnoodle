@@ -19,6 +19,8 @@ object OrderedScrambles {
             return
         }
 
+        val zippedRequests = scrambleRequests.zip(renderedScrambles)
+
         var hasMultipleDays = wcifHelper.hasMultipleDays
         val hasMultipleVenues = wcifHelper.hasMultipleVenues
 
@@ -36,8 +38,8 @@ object OrderedScrambles {
                 val roomName = room.fileSafeName
 
                 val requestsPerDay = room.activities
-                    .flatMap { scrambleRequests.filterForActivity(it, timezone) }
-                    .groupBy { Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), it.roundStartTime!!.withTimeAtStartOfDay()).days + 1 }
+                    .flatMap { zippedRequests.filterForActivity(it, timezone) }
+                    .groupBy { Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), it.third.withTimeAtStartOfDay()).days + 1 }
 
                 // hasMultipleDays gets a variable assigned on the competition creation using the website's form.
                 // Online schedule fit to it and the user should not be able to put events outside it, but we double check here.
@@ -62,7 +64,7 @@ object OrderedScrambles {
                         val pdfFileName = parts.joinToString("")
 
                         // have to use this nastly little hack if we want to benefit from caching
-                        val sortingTrickery = scrambles.zip(renderedScrambles).sortedBy { it.first }
+                        val sortingTrickery = scrambles.sortedBy { it.third }
 
                         val sortedScrambles = sortingTrickery.map { it.first }
                         val sortedPdfs = sortingTrickery.map { it.second }
