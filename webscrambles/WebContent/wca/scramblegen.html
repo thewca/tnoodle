@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>WCA Scramble Program</title>
 
-<script type="text/javascript">
+<script>
     function assert(expr, msg) {
         msg = msg || "";
         if(!expr) {
@@ -24,13 +24,13 @@
         return results === null ? alt : decodeURIComponent(results[1].replace(/\+/g, " "));
     }
 </script>
-<script type="text/javascript" src="/scrambler-interface/js/ui.js"></script>
-<script type="text/javascript" src="/mootools/mootools-core-1.4.2.js"></script>
-<script type="text/javascript" src="/mootools/mootools-more-1.4.0.1.js"></script>
+<script src="/scrambler-interface/js/ui.js"></script>
+<script src="/mootools/mootools-core-1.4.2.js"></script>
+<script src="/mootools/mootools-more-1.4.0.1.js"></script>
 <link type="text/css" href="/scrambler-interface/css/ui.css" rel="stylesheet" />
 
-<script type="text/javascript" src="/wca/scrambleserver.js"></script>
-<style type="text/css">
+<script src="/wca/scrambleserver.js"></script>
+<style>
 
 #status {
     border-bottom: 1px solid black;
@@ -82,7 +82,7 @@
 }
 </style>
 
-<script type="text/javascript">
+<script>
 (function() {
     var CHECK_VERSION_PERIOD = 30*1000;
 
