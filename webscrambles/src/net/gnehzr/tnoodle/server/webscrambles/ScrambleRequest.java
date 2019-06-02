@@ -78,11 +78,11 @@ import java.util.Locale;
 import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import static net.gnehzr.tnoodle.utils.GsonUtils.GSON;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.*;
 import static net.gnehzr.tnoodle.server.webscrambles.Translate.translate;
+import static net.gnehzr.tnoodle.server.webscrambles.Utils.toFileSafeString;
 
 class ScrambleRequest implements Comparable<ScrambleRequest> {
     private static final Logger l = Logger.getLogger(ScrambleRequest.class.getName());
@@ -1308,15 +1308,6 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             newStrings.add(newString.replaceAll("\n", " "));
         }
         return newStrings;
-    }
-
-    private static final String INVALID_CHARS = "\\/:*?\"<>|";
-    public static String toFileSafeString(String unsafe) {
-        for(int i = 0; i < INVALID_CHARS.length(); i++) {
-            String invalidChar = Pattern.quote("" + INVALID_CHARS.charAt(i));
-            unsafe = unsafe.replaceAll(invalidChar, "");
-        }
-        return unsafe;
     }
 
     // Excludes ambiguous characters: 0/O, 1/I

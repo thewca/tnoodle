@@ -1,5 +1,6 @@
 package net.gnehzr.tnoodle.server.webscrambles;
 
+import static net.gnehzr.tnoodle.server.webscrambles.Utils.toFileSafeString;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
 
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class WCIFHelper {
     }
     
     public String getSafeVenueName(JsonElement venue) {
-        return ScrambleRequest.toFileSafeString(parseMarkdown(venue.getAsJsonObject().get("name").getAsString()));
+        return toFileSafeString(parseMarkdown(venue.getAsJsonObject().get("name").getAsString()));
     }
     
     public boolean hasMultipleRooms(JsonElement venue) {
@@ -74,7 +75,7 @@ public class WCIFHelper {
     }
     
     public String getSafeRoomName(JsonElement room) {
-        return ScrambleRequest.toFileSafeString(parseMarkdown(room.getAsJsonObject().get("name").getAsString()));
+        return toFileSafeString(parseMarkdown(room.getAsJsonObject().get("name").getAsString()));
     }
     
     public String getActivityCode(JsonElement activity) {
