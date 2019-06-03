@@ -1,7 +1,7 @@
 package dependencies
 
 object Versions {
-    val GWT = "2.7.0"
+    val GWT = "2.5.1"
     val JUNIT_JUPITER = "5.4.2"
     val BATIK = "1.11"
 
