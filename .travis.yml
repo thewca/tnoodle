@@ -3,24 +3,11 @@ jdk: oraclejdk8
 android:
   components:
     - tools
-    - build-tools-23.0.2
-    - android-23
+    - build-tools-28.0.0
+    - android-28
     - extra-android-support
     - extra-android-m2repository
 
-env:
-  - TNOODLE_INSTALL_GWT=1
-
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq python3
-  - nvm install v8.4
-  - nvm use v8.4
-  - bundle install
-  - (cd git-tools; npm install -d)
 script:
-  #- ./tmt i18n check
-  #- ./tmt lint -a
-  - ./gradlew :webscrambles:deployOfficial
-  #- ./tmt make check
-  - (cd tnoodle-ui; yarn test)
+  - ./gradlew publishToMavenLocal
+  - ./gradlew generateOfficialRelease
