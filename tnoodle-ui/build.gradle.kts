@@ -47,6 +47,6 @@ tasks.getByName("assemble") {
     dependsOn("bundle", "propagateResources")
 }
 
-/*tasks.getByName("check") {
+tasks.getByName("check") {
     dependsOn("yarn_test")
-}*/
+}
