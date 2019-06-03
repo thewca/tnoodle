@@ -16,6 +16,16 @@ import dependencies.Libraries.ZIP4J
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
 
+buildscript {
+    repositories {
+        maven(url = "$rootDir/gradle/repository")
+    }
+
+    dependencies {
+        classpath("com.github.thewca:wca_i18n:0.4.3")
+    }
+}
+
 attachRemoteRepositories()
 
 plugins {
@@ -50,14 +60,16 @@ tasks.getByName("processResources") {
     dependsOn(":tnoodle-ui:assemble")
 }
 
-tasks.create<Exec>("i18nCheck") {
-    val i18nDir = "$projectDir/src/main/resources/i18n"
+tasks.create<JavaExec>("i18nCheck") {
+    val i18nDir = "$projectDir/src/main/resources/tnoodle_resources/i18n"
     val baseFile = file("$i18nDir/en.yml")
 
     val ymlFiles = fileTree(i18nDir).files - baseFile
 
-    executable = "bundle"
-    args = listOf("exec", "wca_i18n", baseFile) + ymlFiles
+    main = "JarMain" // Warbler gives *fantastic* class names to the jruby bundles :/
+    classpath = buildscript.configurations["classpath"]
+
+    setArgs(listOf(baseFile) + ymlFiles)
 }
 
 tasks.getByName("check") {
