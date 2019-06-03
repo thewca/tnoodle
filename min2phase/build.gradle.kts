@@ -19,6 +19,14 @@ tasks.create<Jar>("javadocJar") {
     from(tasks.javadoc.get().destinationDir)
 }
 
+sourceSets {
+    main {
+        java {
+            exclude("cs/min2phase/MainProgram.java")
+        }
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("scrambler") {
