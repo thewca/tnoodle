@@ -34,7 +34,7 @@
     "start-js": "NODE_PATH=src react-scripts start",
     "start": "PORT=3001 BROWSER=none npm-run-all -p watch-css start-js",
     "build": "yarn run build-css && CI=true NODE_PATH=src react-scripts build",
-    "test": "NODE_PATH=src react-scripts test --env=jsdom",
+    "test": "CI=true NODE_PATH=src react-scripts test --env=jsdom",
     "test:debug": "NODE_PATH=src react-scripts --inspect-brk test --runInBand --env=jsdom",
     "eject": "NODE_PATH=src react-scripts eject"
   }
