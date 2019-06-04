@@ -19,7 +19,7 @@ tasks.create<YarnTask>("bundle") {
     inputs.files(fileTree("public"))
     inputs.file("package.json")
 
-    outputs.dir("build/static")
+    outputs.dir("${project.buildDir}/static")
 
     setYarnCommand("build")
 }
@@ -52,5 +52,5 @@ tasks.getByName("check") {
 }
 
 tasks.getByName("yarn_test") {
-    dependsOn("yarn_install")
+    dependsOn("bundle")
 }
