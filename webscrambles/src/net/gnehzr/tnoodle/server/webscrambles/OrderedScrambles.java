@@ -18,8 +18,8 @@ import com.google.gson.JsonElement;
 
 import com.itextpdf.text.DocumentException;
 
+import static net.gnehzr.tnoodle.server.webscrambles.Utils.toFileSafeString;
 import static net.gnehzr.tnoodle.utils.GwtSafeUtils.azzert;
-
 
 public class OrderedScrambles {
     
@@ -32,6 +32,12 @@ public class OrderedScrambles {
         }
         
         azzert(wcifHelper.getAllScrambleRequests() != null, "There should be scramble requests.");
+        
+        // allActivities hold activities without repetition.
+        // A ScrambleRequest is added to AllScramblesOrdered if its activity is not on allActivities.
+        // This is needed because the same activity may happen on different rooms.
+        ArrayList<ScrambleRequest> allScramblesOrdered = new ArrayList<ScrambleRequest>();
+        ArrayList<String> allActivities = new ArrayList<String>();
 
         boolean hasMultipleDays = wcifHelper.hasMultipleDays();
         boolean hasMultipleVenues = wcifHelper.hasMultipleVenues();
@@ -57,6 +63,11 @@ public class OrderedScrambles {
                                 
                 for (JsonElement activity : wcifHelper.getActivities(room)) {
                     String activityCode = wcifHelper.getActivityCode(activity);
+                    
+                    int indexAllActivities = allActivities.indexOf(activityCode);
+                    if (indexAllActivities < 0) {
+                        allActivities.add(activityCode);
+                    }
 
                     for (ScrambleRequest scrambleRequest : wcifHelper.getScrambleRequests(activityCode)) {
 
@@ -72,6 +83,14 @@ public class OrderedScrambles {
                         int index = dayList.indexOf(activityDay);
                         scrambleRequest.roundStartTime = activityStartTime;
                         scrambleRequestListByDay.get(index).add(scrambleRequest);
+                        
+                        // A case to be considered here is the scenario where the competition
+                        // for whatever reason, has the same activity happening on different start time
+                        // If this is true, we currently have no control on which one is going to be considered.
+                        // This is not serious because it makes no sense to repeat activity on the schedule.
+                        if (indexAllActivities < 0) {
+                            allScramblesOrdered.add(scrambleRequest);
+                        }
                     }
                 }
 
@@ -122,5 +141,17 @@ public class OrderedScrambles {
                 }
             }
         }
+        
+        // Generate all scrambles ordered
+        Collections.sort(allScramblesOrdered);
+        String safeGlobalTitle = toFileSafeString(globalTitle);
+        String pdfFileName = "Printing/Ordered Scrambles/Ordered "+safeGlobalTitle+" - All Scrambles.pdf";
+
+        parameters.setFileNameInZip(pdfFileName);
+        zipOut.putNextEntry(null, parameters);
+        ScrambleRequest[] scrambleRequests = allScramblesOrdered.toArray(new ScrambleRequest[allScramblesOrdered.size()]);
+        ByteArrayOutputStream baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
+        zipOut.write(baos.toByteArray());
+        zipOut.closeEntry();
     }
 }
