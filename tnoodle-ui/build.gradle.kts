@@ -50,3 +50,7 @@ tasks.getByName("assemble") {
 tasks.getByName("check") {
     dependsOn("yarn_test")
 }
+
+tasks.getByName("yarn_test") {
+    dependsOn("yarn_install")
+}
