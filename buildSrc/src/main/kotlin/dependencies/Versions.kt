@@ -9,6 +9,7 @@ object Versions {
     val ANDROID_SDK_MIN = 17
 
     val ANDROID_LIB = "$ANDROID_SDK.0.0"
+    val ANDROID_BUILD_LIB = "$ANDROID_SDK.0.3"
 
     val GWTEXPORTER = GWT
     val GSON = "2.8.5"
