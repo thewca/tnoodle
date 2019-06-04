@@ -38,6 +38,11 @@ Get an overview of the core project tasks by executing
 
     ./gradlew tasks
 
+If you want fancy console output, set the option `org.gradle.console` to value `rich`.
+This setting is currently not checked in because it makes Travis CI logs horrible to read, but you can easily include it by modifying (or creating, if it doesn't exist yet) `~/.gradle/gradle.properties` to something like
+
+    org.gradle.console=rich
+
 
 ### WCA Scramble Program
 
