@@ -5,12 +5,14 @@ import dependencies.Libraries.ANDROID_SUPPORT_V4
 
 import dependencies.Versions.ANDROID_SDK
 import dependencies.Versions.ANDROID_SDK_MIN
+import dependencies.Versions.ANDROID_BUILD_LIB
 
 plugins {
     ANDROID_APP
 }
 
 configure<AppExtension> {
+    buildToolsVersion(ANDROID_BUILD_LIB)
     compileSdkVersion(ANDROID_SDK)
 
     defaultConfig {
