@@ -66,6 +66,7 @@ First make sure that `./gradlew build` works. This will involve installing the
 android sdk and setting up an ANDROID_HOME environment variable.
 
 - Bump the version number in the root project `build.gradle.kts`.
+- `./gradlew publishToMavenLocal`
 - `./gradlew generateOfficialRelease`
 
 Be aware that this command will invoke all build tests! Especially for the `:scrambles` project, this can take some ~15 minutes to finish.
