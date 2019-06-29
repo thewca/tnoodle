@@ -408,7 +408,7 @@ public class ScrambleTest {
         int THREE_BY_THREE_TIMEOUT = 5*1000; //milliseconds
 
         cs.min2phase.Search threeSolver = new cs.min2phase.Search();
-        cs.min2phase.Tools.init();
+        cs.min2phase.Search.init();
         TimedLogRecordStart start = new TimedLogRecordStart(Level.INFO, "Searching for " + THREE_BY_THREE_SCRAMBLE_COUNT + " random 3x3x3 cubes in less that " + THREE_BY_THREE_MAX_SCRAMBLE_LENGTH + " moves");
         l.log(start);
         for(int i = 0; i < THREE_BY_THREE_SCRAMBLE_COUNT; i++){

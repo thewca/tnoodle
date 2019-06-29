@@ -11,7 +11,7 @@ import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import net.gnehzr.tnoodle.scrambles.PuzzleStateAndGenerator;
 import net.gnehzr.tnoodle.utils.EnvGetter;
-import cs.min2phase.Search;
+import cs.min2phase.SearchWCA;
 import cs.min2phase.Tools;
 import org.timepedia.exporter.client.Export;
 
@@ -22,16 +22,16 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
     private static final int THREE_BY_THREE_TIMEMIN = 200; //milliseconds
     private static final int THREE_BY_THREE_TIMEOUT = 60*1000; //milliseconds
 
-    private ThreadLocal<Search> twoPhaseSearcher = null;
+    private ThreadLocal<SearchWCA> twoPhaseSearcher = null;
     public ThreeByThreeCubePuzzle() {
         super(3);
         String newMinDistance = EnvGetter.getenv("TNOODLE_333_MIN_DISTANCE");
         if(newMinDistance != null) {
             wcaMinScrambleDistance = Integer.parseInt(newMinDistance);
         }
-        twoPhaseSearcher = new ThreadLocal<Search>() {
-            protected Search initialValue() {
-                return new Search();
+        twoPhaseSearcher = new ThreadLocal<SearchWCA>() {
+            protected SearchWCA initialValue() {
+                return new SearchWCA();
             };
         };
     }
@@ -62,7 +62,7 @@ public class ThreeByThreeCubePuzzle extends CubePuzzle {
 
     public PuzzleStateAndGenerator generateRandomMoves(Random r, String firstAxisRestriction, String lastAxisRestriction) {
         String randomState = Tools.randomCube(r);
-        String scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, Search.INVERSE_SOLUTION, firstAxisRestriction, lastAxisRestriction).trim();
+        String scramble = twoPhaseSearcher.get().solution(randomState, THREE_BY_THREE_MAX_SCRAMBLE_LENGTH, THREE_BY_THREE_TIMEOUT, THREE_BY_THREE_TIMEMIN, SearchWCA.INVERSE_SOLUTION, firstAxisRestriction, lastAxisRestriction).trim();
 
         AlgorithmBuilder ab = new AlgorithmBuilder(this, MergingMode.CANONICALIZE_MOVES);
         try {
