@@ -117,7 +117,7 @@ public class SearchWCA extends Search {
 
 	@Override
 	protected int phase2(int edge, int esym, int corn, int csym, int mid, int maxl, int depth, int lm) {
-		if (depth1 == 0 && depth == 1 && (firstMoveFilter[urfIdx] >> lm & 1) != 0) {
+		if (depth1 == 0 && depth == 1 && (firstMoveFilter[urfIdx] >> Util.ud2std[lm] & 1) != 0) {
 			return -1;
 		}
 		if (edge == 0 && corn == 0 && mid == 0 && (preMoveLen > 0 || (lastMoveFilter[urfIdx] >> Util.ud2std[lm] & 1) == 0)) {
