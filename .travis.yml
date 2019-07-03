@@ -10,5 +10,4 @@ android:
 
 script:
   - ./gradlew check
-  - ./gradlew publishToMavenLocal
   - ./gradlew generateOfficialRelease
