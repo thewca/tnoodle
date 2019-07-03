@@ -67,6 +67,7 @@ First make sure that `./gradlew build` works. This will involve installing the
 android sdk and setting up an ANDROID_HOME environment variable.
 
 - Bump the version number in the root project `build.gradle.kts`.
+- Verify that all tests succeed by invking `./gradlew check`.
 - `./gradlew publishToMavenLocal`
 - `./gradlew generateOfficialRelease`
 

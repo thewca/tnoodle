@@ -23,12 +23,11 @@ allprojects {
 val releasePrefix = "TNoodle-WCA"
 
 tasks.create<Copy>("generateOfficialRelease") {
-    description = "Generate an official WCA release artifact. THIS WILL RUN TESTS!"
+    description = "Generate an official WCA release artifact."
     group = "WCA"
 
     val targetProject = "webscrambles"
 
-    dependsOn(getTasksByName("check", true))
     dependsOn(":$targetProject:shadowJarOfficial")
 
     from("$targetProject/build/libs") {
