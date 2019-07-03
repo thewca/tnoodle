@@ -32,8 +32,8 @@ tasks.create<Copy>("generateOfficialRelease") {
     dependsOn(":$targetProject:shadowJarOfficial")
 
     from("$targetProject/build/libs") {
-        include("$targetProject-wca.jar")
-        rename("$targetProject-wca.jar", "$releasePrefix-$version.jar")
+        include("$targetProject-$version-wca.jar")
+        rename("$targetProject-$version-wca.jar", "$releasePrefix-$version.jar")
     }
 
     into(rootDir)
