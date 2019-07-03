@@ -28,6 +28,7 @@ tasks.create<Copy>("generateOfficialRelease") {
 
     val targetProject = "webscrambles"
 
+    dependsOn(getTasksByName("publishToMavenLocal", true))
     dependsOn(":$targetProject:shadowJarOfficial")
 
     from("$targetProject/build/libs") {
