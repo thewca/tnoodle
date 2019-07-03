@@ -31,7 +31,7 @@ which is automatically sourced by Gradle. It contains common code and shared con
 
 ### Overview
 
-Gradle is served through the use of a `Gradle wrapper` available as `gradlew` (UNIX systems) or `gradlew.bat` (that other operating system nobody wants to use)
+Gradle is served through the use of a `Gradle wrapper` available as `gradlew` (UNIX systems) or `gradlew.bat` (DOS systems)
 It is recommended to set up an alias to simplify task generation, along the lines of `alias gw='./gradlew --parallel'`.
 
 Get an overview of the core project tasks by executing
