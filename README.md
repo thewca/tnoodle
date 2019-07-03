@@ -42,6 +42,11 @@ If you want fancy console output, set the option `org.gradle.console` to value `
 This setting is currently not checked in because it makes Travis CI logs horrible to read, but you can easily include it by modifying (or creating, if it doesn't exist yet) `~/.gradle/gradle.properties` to something like
 
     org.gradle.console=rich
+    
+### Setup
+
+The installation of TNoodle currently requires an Android SDK to be set up as per [the official instructions](https://developer.android.com/studio).
+Scroll all the way to the bottom of the page and opt for "Command Line Tools only" if you want to avoid several GB of IDE overhead in downloads.
 
 
 ### WCA Scramble Program
