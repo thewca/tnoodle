@@ -1,12 +1,5 @@
-language: android
-jdk: oraclejdk8
-android:
-  components:
-    - tools
-    - build-tools-28.0.3
-    - android-28
-    - extra-android-support
-    - extra-android-m2repository
+language: java
+jdk: openjdk8
 
 script:
   - ./gradlew publishToMavenLocal
