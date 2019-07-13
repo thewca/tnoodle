@@ -26,5 +26,10 @@ object Versions {
     object Plugins {
         val SHADOW = "5.0.0"
         val NODEJS = "1.3.1"
+
+        val KOTLIN = Versions.KOTLIN
+
+        val KOTLIN_JVM = KOTLIN
+        val KOTLIN_MULTIPLATFORM = KOTLIN
     }
 }

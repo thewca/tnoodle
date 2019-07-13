@@ -1,3 +1,5 @@
+import dependencies.Plugins.KOTLIN_JVM_ACTUAL
+import dependencies.Plugins.KOTLIN_MULTIPLATFORM_ACTUAL
 import dependencies.Plugins.SHADOW_ACTUAL
 import dependencies.Plugins.NODEJS_ACTUAL
 
@@ -15,3 +17,9 @@ inline val PluginDependenciesSpec.SHADOW: PluginDependencySpec
 
 inline val PluginDependenciesSpec.NODEJS: PluginDependencySpec
     get() = NODEJS_ACTUAL
+
+inline val PluginDependenciesSpec.KOTLIN_JVM: PluginDependencySpec
+    get() = KOTLIN_JVM_ACTUAL
+
+inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM: PluginDependencySpec
+    get() = KOTLIN_MULTIPLATFORM_ACTUAL
