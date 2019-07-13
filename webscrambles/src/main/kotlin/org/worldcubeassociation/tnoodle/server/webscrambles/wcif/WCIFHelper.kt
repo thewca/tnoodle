@@ -1,16 +1,16 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfContent
 
 import kotlin.math.pow
 
 class WCIFHelper(schedule: String) {
-    val schedule = PARSER.parse(schedule)?.asJsonObject
+    val schedule: JsonObject?
 
     val venues: List<Venue>
     val numberOfDays: Int
@@ -37,6 +37,7 @@ class WCIFHelper(schedule: String) {
         }
 
         numberOfDays = parsedSchedule?.get("numberOfDays")?.asInt ?: 0
+        this.schedule = parsedSchedule
     }
 
     val earliestActivityString: String
