@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
 
+attachRemoteRepositories()
+
 buildscript {
     repositories {
         maven(url = "$rootDir/gradle/repository")
@@ -21,8 +23,6 @@ buildscript {
         classpath("com.github.thewca:wca_i18n:0.4.3")
     }
 }
-
-attachRemoteRepositories()
 
 plugins {
     application
@@ -54,6 +54,10 @@ tasks.getByName("processResources") {
     dependsOn(":tnoodle-ui:assemble")
 }
 
+application {
+    mainClassName = "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
+}
+
 tasks.create<JavaExec>("i18nCheck") {
     val i18nDir = "$projectDir/src/main/resources/tnoodle_resources/i18n"
     val baseFile = file("$i18nDir/en.yml")
@@ -70,10 +74,6 @@ tasks.getByName("check") {
     dependsOn("i18nCheck")
 }
 
-application {
-    mainClassName = "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
-}
-
 tasks.create<ShadowJar>("shadowJarOfficial") {
     description = "compile a JAR file that can be used as official release"
     group = "shadow"
@@ -87,7 +87,7 @@ tasks.create<ShadowJar>("shadowJarOfficial") {
         attributes(mapOf(
             "Implementation-Title" to "TNoodle-WCA",
             "Implementation-Version" to project.rootProject.version,
-            "Main-Class" to "org.worldcubeassociation.tnoodle.server.TNoodleServer"
+            "Main-Class" to "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
         ))
     }
 
