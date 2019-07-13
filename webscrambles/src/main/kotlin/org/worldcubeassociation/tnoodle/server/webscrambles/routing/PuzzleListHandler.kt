@@ -7,7 +7,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
+import net.gnehzr.tnoodle.plugins.PuzzlePlugins
 
 object PuzzleListHandler : RouteHandler {
     private val puzzleInfoByShortName: Map<String, Map<String, String>>
