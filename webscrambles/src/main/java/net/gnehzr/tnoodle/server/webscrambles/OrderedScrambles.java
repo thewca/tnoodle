@@ -131,12 +131,15 @@ public class OrderedScrambles {
                         }
                         pdfFileName += ".pdf";
                         
-                        parameters.setFileNameInZip(pdfFileName);
-                        zipOut.putNextEntry(null, parameters);
-                        ScrambleRequest[] scrambleRequests = scrambleRequestListByDay.get(index).toArray(new ScrambleRequest[scrambleRequestListByDay.get(index).size()]);
-                        ByteArrayOutputStream baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
-                        zipOut.write(baos.toByteArray());
-                        zipOut.closeEntry();
+                        // If a competition has 1 venue, day or room, we only print all scrambles ordered
+                        if (hasMultipleVenues || hasMultipleDays || hasMultipleRooms) {
+                            parameters.setFileNameInZip(pdfFileName);
+                            zipOut.putNextEntry(null, parameters);
+                            ScrambleRequest[] scrambleRequests = scrambleRequestListByDay.get(index).toArray(new ScrambleRequest[scrambleRequestListByDay.get(index).size()]);
+                            ByteArrayOutputStream baos = ScrambleRequest.requestsToPdf(globalTitle, generationDate, scrambleRequests, null);
+                            zipOut.write(baos.toByteArray());
+                            zipOut.closeEntry();
+                        }
                     }
                 }
             }
