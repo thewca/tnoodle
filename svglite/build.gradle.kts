@@ -12,10 +12,6 @@ plugins {
     `maven-publish`
 }
 
-repositories {
-    jcenter()
-}
-
 configureJava()
 configureCheckstyle()
 
