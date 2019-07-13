@@ -3,8 +3,6 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 
-import java.nio.file.Paths
-import java.util.HashMap
 import java.util.Locale
 import java.util.regex.Pattern
 
@@ -18,22 +16,21 @@ object Translate {
         get() = TRANSLATIONS.keys
 
     private fun loadTranslationResources(): Map<Locale, Map<String, *>> {
-        val i18nDirPath = Translate.javaClass.getResource("/i18n")
-        val i18nDir = Paths.get(i18nDirPath.toURI()).toFile()
-
-        val ymlFiles = i18nDir.listFiles()
-
         val yaml = Yaml(Constructor(HashMap::class.java))
-        val loadedMaps = ymlFiles.map { yaml.load<HashMap<String, *>>(it.inputStream()) }
+        val locales = Locale.getAvailableLocales() + DEFAULT_LOCALE
 
-        val translationsByLanguageTag = loadedMaps.reduce(::deepMerge)
+        val loadedMaps = locales
+            .mapNotNull { ClassLoader.getSystemResourceAsStream("i18n/${it.toLanguageTag()}.yml") }
+            .map { yaml.load<Map<String, Map<String, *>>>(it) }
 
-        return translationsByLanguageTag.mapKeys { Locale.forLanguageTag(it.key) }.mapValues { it.value as Map<String, *> }
+        return loadedMaps
+            .reduce { a, b -> a + b }
+            .mapKeys { Locale.forLanguageTag(it.key) }
     }
 
     private fun getTranslationsFor(locale: Locale): Map<String, *>? {
         return TRANSLATIONS[locale]
-            ?: error("No locale matching given locale: " + locale.toLanguageTag() + " found")
+            ?: error("No locale matching given locale: ${locale.toLanguageTag()} found")
     }
 
     private fun translate(key: String, locale: Locale, azzertIfInvalid: Boolean): String? {
@@ -108,24 +105,5 @@ object Translate {
         assert(mutateSubstitutions.isEmpty()) { String.format("Unused substitution values: %s", mutateSubstitutions.keys) }
 
         return sb.toString()
-    }
-
-    // Copied from https://gist.github.com/aslakhellesoy/3858814
-    private fun deepMerge(original: Map<String, *>, newMap: Map<String, *>): Map<String, *> {
-        val mergeOriginal = original.toMutableMap()
-
-        for ((key, newChild) in newMap) {
-            val originalChild = original[key]
-
-            if (originalChild is Map<*, *> && newChild is Map<*, *>) {
-                mergeOriginal[key] = deepMerge(
-                    originalChild.mapKeys { it.key.toString() },
-                    newChild.mapKeys { it.key.toString() })
-            } else {
-                mergeOriginal[key] = newChild
-            }
-        }
-
-        return mergeOriginal
     }
 }
