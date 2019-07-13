@@ -1,4 +1,4 @@
-import configurations.Languages.attachRemoteRepositories
+import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
 import configurations.Languages.configureJUnit5
@@ -9,7 +9,7 @@ import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 
 description = "A Java scrambling suite. Java applications can use this project as a library. A perfect example of this is the webscrambles package."
 
-attachRemoteRepositories()
+attachRepositories()
 
 plugins {
     `java-library`
@@ -22,10 +22,8 @@ configureCheckstyle()
 
 dependencies {
     api(project(":svglite"))
-    api(project(":min2phase"))
 
-    implementation(project(":utils"))
-    
+    implementation(project(":min2phase"))
     implementation(project(":threephase"))
     implementation(project(":sq12phase"))
 
