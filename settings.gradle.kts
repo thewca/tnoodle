@@ -1,15 +1,5 @@
 rootProject.name = "tnoodle"
 
-pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "gwt") {
-                useModule("org.wisepersist:gwt-gradle-plugin:${requested.version}")
-            }
-        }
-    }
-}
-
 include("min2phase")
 include("mootools")
 include("scrambler-interface")

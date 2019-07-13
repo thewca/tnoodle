@@ -5,12 +5,6 @@ object Versions {
     val JUNIT_JUPITER = "5.4.2"
     val BATIK = "1.11"
 
-    val ANDROID_SDK = 28
-    val ANDROID_SDK_MIN = 17
-
-    val ANDROID_LIB = "$ANDROID_SDK.0.0"
-    val ANDROID_BUILD_LIB = "$ANDROID_SDK.0.3"
-
     val GWTEXPORTER = GWT
     val GSON = "2.8.5"
     val JOPT_SIMPLE = "3.2"
@@ -28,14 +22,9 @@ object Versions {
     val BOUNCYCASTLE = "1.61"
     val JUNIT_JUPITER_API = JUNIT_JUPITER
     val JUNIT_JUPITER_ENGINE = JUNIT_JUPITER
-    val ANDROID_BUILD_TOOLS = "3.4.1"
-    val ANDROID_APPCOMPAT_V7 = ANDROID_LIB
-    val ANDROID_SUPPORT_V4 = ANDROID_LIB
-    val ANDROIDSVG = "1.2.1"
 
     object Plugins {
         val SHADOW = "5.0.0"
-        val GWT = "1.0.8"
         val NODEJS = "1.3.1"
     }
 }
