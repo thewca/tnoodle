@@ -41,8 +41,7 @@ Get an overview of the core project tasks by executing
     
 ### Setup
 
-The installation of TNoodle currently requires an Android SDK to be set up as per [the official instructions](https://developer.android.com/studio).
-Scroll all the way to the bottom of the page and opt for "Command Line Tools only" if you want to avoid several GB of IDE overhead in downloads.
+Gradle automagically handles all dependencies for you. You just need an Internet connection upon your first build run!
 
 
 ### WCA Scramble Program
@@ -63,8 +62,7 @@ You can run the `.jar` from the commandline using: (replace the `$VERSION` tag a
 
 ### Releasing
 
-First make sure that `./gradlew build` works. This will involve installing the
-android sdk and setting up an ANDROID_HOME environment variable.
+First make sure that `./gradlew build` works.
 
 - Bump the version number in the root project `build.gradle.kts`.
 - Verify that all tests succeed by invoking `./gradlew check`.
