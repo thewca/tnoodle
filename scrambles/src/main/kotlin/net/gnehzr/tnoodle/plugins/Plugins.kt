@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server
+package net.gnehzr.tnoodle.plugins
 
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty

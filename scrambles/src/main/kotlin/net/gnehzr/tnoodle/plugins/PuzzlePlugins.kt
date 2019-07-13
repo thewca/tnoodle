@@ -1,8 +1,7 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package net.gnehzr.tnoodle.plugins
 
 import net.gnehzr.tnoodle.puzzle.*
 import net.gnehzr.tnoodle.scrambles.Puzzle
-import org.worldcubeassociation.tnoodle.server.Plugins
 import java.util.*
 
 object PuzzlePlugins {
