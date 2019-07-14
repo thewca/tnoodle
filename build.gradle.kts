@@ -20,6 +20,12 @@ plugins {
 
 val releasePrefix = "TNoodle-WCA"
 
+tasks.create("registerReleaseTag") {
+    doFirst {
+        project.ext.set("TNOODLE_VERSION", project.version)
+    }
+}
+
 tasks.create<Copy>("generateOfficialRelease") {
     description = "Generate an official WCA release artifact."
     group = "WCA"
@@ -27,7 +33,7 @@ tasks.create<Copy>("generateOfficialRelease") {
     val targetProject = "webscrambles"
 
     dependsOn(getTasksByName("publishToMavenLocal", true))
-    dependsOn(":$targetProject:shadowJarOfficial")
+    dependsOn("registerReleaseTag", ":$targetProject:cleanShadowJar", ":$targetProject:shadowJar")
 
     from("$targetProject/build/libs") {
         include("$targetProject-$version-wca.jar")
