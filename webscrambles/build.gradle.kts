@@ -57,7 +57,7 @@ application {
 }
 
 tasks.create<JavaExec>("i18nCheck") {
-    val i18nDir = "$projectDir/src/main/resources/tnoodle_resources/i18n"
+    val i18nDir = "$projectDir/src/main/resources/i18n"
     val baseFile = file("$i18nDir/en.yml")
 
     val ymlFiles = fileTree(i18nDir).files - baseFile
