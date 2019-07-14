@@ -7,7 +7,6 @@ import dependencies.Libraries.JODA_TIME
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import proguard.gradle.ProGuardTask
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
 
@@ -20,7 +19,6 @@ buildscript {
 
     dependencies {
         classpath("com.github.thewca:wca_i18n:0.4.3")
-        classpath("net.sf.proguard:proguard-gradle:6.1.1")
     }
 }
 
@@ -72,45 +70,6 @@ tasks.create<JavaExec>("i18nCheck") {
 
 tasks.getByName("check") {
     dependsOn("i18nCheck")
-}
-
-tasks.create<ProGuardTask>("proguardMinify") {
-    injars("$buildDir/libs/${project.name}-$version-all.jar")
-    outjars("$buildDir/minified/foofoo.jar")
-
-    if (JavaVersion.current().isJava9Compatible) {
-        libraryjars("${System.getProperty("java.home")}/jmods")
-    } else {
-        libraryjars("${System.getProperty("java.home")}/lib/rt.jar")
-        libraryjars("${System.getProperty("java.home")}/lib/jce.jar")
-    }
-
-    libraryjars(configurations.findByName("runtimeClasspath")?.files)
-
-    printmapping("$buildDir/minified/proguard.map")
-    allowaccessmodification()
-    dontskipnonpubliclibraryclassmembers()
-
-    // FIXME...? Routes currently don't work in the browser when code gets obfuscated or optimised
-    dontobfuscate()
-    dontoptimize()
-
-    keep("class org.worldcubeassociation.tnoodle.server.** { *; }")
-    keep("class io.ktor.server.cio.CIO { *; }")
-    keep("class kotlin.reflect.jvm.internal.** { *; }")
-    keep("class kotlin.text.RegexOption { *; }")
-
-    keepclasseswithmembernames("""class * {
-        native <methods>;
-    }""".trimIndent())
-
-    keepclasseswithmembernames("""enum * {
-        <fields>;
-        public static **[] values();
-        public static ** valueOf(java.lang.String);
-    }""")
-
-    dontwarn()
 }
 
 tasks.create("registerManifest") {
