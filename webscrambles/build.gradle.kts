@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.BATIK_TRANSCODER
@@ -74,28 +72,21 @@ tasks.getByName("check") {
     dependsOn("i18nCheck")
 }
 
-tasks.create<ShadowJar>("shadowJarOfficial") {
-    description = "compile a JAR file that can be used as official release"
-    group = "shadow"
-
-    archiveClassifier.set("wca")
-
-    val origJarTask = tasks.getByName("jar") as? Jar
-    origJarTask?.manifest?.also { manifest.inheritFrom(it) }
-
-    manifest {
-        attributes(mapOf(
-            "Implementation-Title" to "TNoodle-WCA",
-            "Implementation-Version" to project.rootProject.version,
-            "Main-Class" to "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
-        ))
+tasks.create("registerManifest") {
+    tasks.withType<Jar> {
+        dependsOn("registerManifest")
     }
 
-    from(sourceSets["main"].output)
-    exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
+    doLast {
+        tasks.withType<Jar> {
+            manifest {
+                val version = project.findProperty("TNOODLE_VERSION") ?: "devel"
 
-    val projectRuntime = project.configurations.findByName("runtimeClasspath")
-        ?: project.configurations.findByName("runtime")
-
-    configurations = listOfNotNull(projectRuntime)
+                attributes(
+                    "Implementation-Title" to "TNoodle-WCA",
+                    "Implementation-Version" to version
+                )
+            }
+        }
+    }
 }
