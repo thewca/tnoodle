@@ -1,3 +1,4 @@
+import dependencies.Libraries.Buildscript.PROGUARD_GRADLE_ACTUAL
 import dependencies.Plugins.KOTLIN_JVM_ACTUAL
 import dependencies.Plugins.KOTLIN_MULTIPLATFORM_ACTUAL
 import dependencies.Plugins.SHADOW_ACTUAL
@@ -23,3 +24,6 @@ inline val PluginDependenciesSpec.KOTLIN_JVM: PluginDependencySpec
 
 inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM: PluginDependencySpec
     get() = KOTLIN_MULTIPLATFORM_ACTUAL
+
+inline val PROGUARD_GRADLE: String
+    get() = PROGUARD_GRADLE_ACTUAL

@@ -5,11 +5,10 @@ import proguard.gradle.ProGuardTask
 buildscript {
     repositories {
         mavenCentral()
-        google()
     }
 
     dependencies {
-        classpath("net.sf.proguard:proguard-gradle:6.1.1")
+        classpath(PROGUARD_GRADLE)
     }
 }
 

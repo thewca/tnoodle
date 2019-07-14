@@ -6,6 +6,7 @@ object Versions {
     val BATIK = "1.11"
     val KOTLIN = "1.3.41"
     val KTOR = "1.2.0"
+    val PROGUARD = "6.1.1"
 
     val GWTEXPORTER = GWT
     val MARKDOWNJ_CORE = "0.4"
@@ -27,6 +28,7 @@ object Versions {
     val KTOR_SERVER_HOST_COMMON = KTOR
     val LOGBACK_CLASSIC = "1.2.3"
     val KOTLIN_ARGPARSER = "2.0.7"
+    val PROGUARD_GRADLE = PROGUARD
 
     object Plugins {
         val SHADOW = "5.0.0"
