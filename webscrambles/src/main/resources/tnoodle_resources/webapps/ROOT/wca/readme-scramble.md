@@ -20,7 +20,7 @@ TNoodle implements the highest-quality scramble generation available at this tim
 
 ### Random-State Scrambles
 
-- The notion of "random state" is straightforward for 2x2x2-4x4x4, Pyraminx, and Clock: every possible state has equal weight.
+- The notion of "random state" is straightforward for 2x2x2-4x4x4, Pyraminx, Skewb, and Clock: every possible state has equal weight.
 - For Square-1, it is possible to define a "most reasonable" random-state distribution as the limiting distribution of performing random moves ("Markov random-state" scrambles). Note that the middle slice is also randomized.
 - For 5x5x5-7x7x7, random-state scramblers are impractical, so we generate 60/80/100 random moves.
 - For Megaminx, it is important to have *practical* scramblers, so we use Stefan Pochmann's suggestion that has been used by the WCA since 2008.
