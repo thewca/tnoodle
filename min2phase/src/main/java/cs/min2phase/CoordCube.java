@@ -48,9 +48,6 @@ class CoordCube {
 			return;
 		}
 		if (initLevel == 0) {
-			CubieCube.initMove();
-			CubieCube.initSym();
-
 			CubieCube.initPermSym2Raw();
 			initCPermMove();
 			initEPermMove();

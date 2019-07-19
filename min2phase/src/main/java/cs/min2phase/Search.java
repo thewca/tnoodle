@@ -234,8 +234,10 @@ public class Search {
 	}
 
 	public synchronized static void init() {
-		CoordCube.init(true);
-		inited = true;
+		if (!inited) {
+			CoordCube.init(true);
+			inited = true;
+		}
 	}
 
 	int verify(String facelets) {
