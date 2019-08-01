@@ -15,11 +15,11 @@ buildscript {
 allprojects {
     group = "org.worldcubeassociation.tnoodle"
     version = "0.15.0"
-    
+
     attachLocalRepositories()
 }
 
-plugins { 
+plugins {
     KOTLIN_JVM apply false
 }
 
@@ -68,6 +68,11 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
     keep("class io.ktor.server.cio.CIO { *; }")
     keep("class kotlin.reflect.jvm.internal.** { *; }")
     keep("class kotlin.text.RegexOption { *; }")
+
+    // CSS rendering uses reflection black magic, so static bytecode optimisers need a little help
+    keep("class org.apache.batik.css.parser.** { *; }")
+    keep("class org.apache.batik.dom.** { *; }")
+    keep("class com.itextpdf.text.ImgTemplate { *; }")
 
     keepclasseswithmembernames("""class * {
         native <methods>;
