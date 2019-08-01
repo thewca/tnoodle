@@ -28,6 +28,7 @@ object OrderedScrambles {
 
         for (venue in wcifHelper.venues) {
             val venueName = venue.fileSafeName
+            val hasMultipleRooms = venue.hasMultipleRooms
 
             val timezone = venue.dateTimeZone
             val competitionStartDate = DateTime(competitionStartString, timezone)
@@ -53,18 +54,20 @@ object OrderedScrambles {
                             "Ordered Scrambles",
                             " - $venueName".takeIf { hasMultipleVenues },
                             " - Day $day".takeIf { hasMultipleDays },
-                            " - $roomName".takeIf { venue.hasMultipleRooms },
+                            " - $roomName".takeIf { hasMultipleRooms },
                             ".pdf"
                         )
 
-                        // In addition to different folders, we stamp venue, day and room in the PDF's name
-                        // to prevent different files with the same name.
-                        val pdfFileName = parts.joinToString("")
+                        if (hasMultipleVenues || hasMultipleDays || hasMultipleRooms) {
+                            // In addition to different folders, we stamp venue, day and room in the PDF's name
+                            // to prevent different files with the same name.
+                            val pdfFileName = parts.joinToString("")
 
-                        val sortedScrambles = scrambles.sortedBy { it.second }.map { it.first }
+                            val sortedScrambles = scrambles.sortedBy { it.second }.map { it.first }
 
-                        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, sortedScrambles)
-                        zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
+                            val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, sortedScrambles)
+                            zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
+                        }
                     }
                 }
             }
