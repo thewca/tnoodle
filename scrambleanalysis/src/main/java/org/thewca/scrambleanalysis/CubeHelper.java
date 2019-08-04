@@ -4,12 +4,7 @@ import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 
 public class CubeHelper {
 
-	/**
-	 * For 3x3x3 only.
-	 * 
-	 * @param cubeState
-	 * @return
-	 */
+	// For 3x3 only.
 
 	// For DB edge orientation, we only care about U/D, Equator F/B.
 	private static int[] edgesIndex = { 1, 3, 5, 7, // U edges index
@@ -23,20 +18,26 @@ public class CubeHelper {
 	private static int[] attachedEdgesIndex = { 46, 37, 10, 19, // Attached to the U face.
 			25, 43, 16, 52, // Attached to the D face
 			41, 12, // Attached to Equator front
-			39, 14 // Attached to Equator back
+			14, 39 // Attached to Equator back
 	};
 
 	private static int[] cornersIndex = { 0, 2, 6, 8, // U corners
 			27, 29, 33, 35 }; // D corners
 	private static int[] cornersIndexClockWise = { 36, 45, 18, 9, // U twist clockwise
-			42, 26, 53, 17, // D stickers
+			44, 26, 53, 17, // D stickers
 	};
 	private static int[] cornersIndexCounterClockWise = { 47, 11, 38, 20, // U twists
-			24, 15, 42, 51}; // D twists
+			24, 15, 42, 51 }; // D twists
 
-	public static int countMisorientedEdges(CubeState cubeState) {
-		String representation = cubeState.toFaceCube();
-		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers.";
+	/**
+	 * Count misoriented edges considering the FB axis.
+	 * 
+	 * @param cubeState
+	 * @return
+	 * @throws RepresentationException 
+	 */
+	public static int countMisorientedEdges(String representation) throws RepresentationException {
+		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
 
 		int central = 4; // Index 4 represents the central sticker;
 		int stickersPerFace = 9;
@@ -47,14 +48,76 @@ public class CubeHelper {
 		char dColor = representation.charAt(central + 3 * stickersPerFace);
 		char lColor = representation.charAt(central + 4 * stickersPerFace);
 		char bColor = representation.charAt(central + 5 * stickersPerFace);
+
+		int result = 0;
+		for (int i = 0; i < edgesIndex.length; i++) {
+			
+			int index = edgesIndex[i];
+			char color = representation.charAt(index);
+
+			int attachedIndex = attachedEdgesIndex[i];
+			int attachedColor = representation.charAt(attachedIndex);
+			
+			if (color == uColor || color == dColor) {
+				// Yay, oriented edge.
+			} else if (color == rColor || color == lColor) {
+				result++;
+			} else if (color == fColor || color == bColor){
+				if (attachedColor == uColor || attachedColor == dColor) {
+					result++;
+				}
+			} else {
+				throw new RepresentationException();
+			}
+		}
+		return result;
+	}
+	
+	public static int countMisorientedEdges(CubeState cubeState) throws RepresentationException {
+		String representation = cubeState.toFaceCube();
+		return countMisorientedEdges(representation);
+	}
+	
+	/**
+	 *  Sum of corner orientation.
+	 *  0 for oriented, 1 for clockwise, 2 for counter clock wise.
+	 * @param representation
+	 * @return The sum of it.
+	 * @throws RepresentationException 
+	 */
+	public static int cornerOrientationSum(String representation) throws RepresentationException {
+		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
+
+		int central = 4; // Index 4 represents the central sticker;
+		int stickersPerFace = 9;
+		
+		char uColor = representation.charAt(central + 0 * stickersPerFace);
+		char dColor = representation.charAt(central + 3 * stickersPerFace);
 		
 		int result = 0;
-		for (int i=0; i<edgesIndex.length; i++) {
+		
+		int corners = 8;
+		for (int i=0; i<corners; i++) {
+			int index = cornersIndex[i];
+			int indexClockWise = cornersIndexClockWise[i];
+			int indexCounterClockWise = cornersIndexCounterClockWise[i];
 			
+			char sticker = representation.charAt(index);
+			char stickerClockWise = representation.charAt(indexClockWise);
+			char stickerCounterClockWise = representation.charAt(indexCounterClockWise);
+			
+			if (sticker == uColor || sticker == dColor) {
+				// Corner oriented
+			} else if (stickerClockWise == uColor || stickerClockWise == dColor) {
+				result++;
+			} else if (stickerCounterClockWise == uColor || stickerCounterClockWise == dColor) {
+				result += 2;
+			} else {
+				throw new RepresentationException();
+			}
 		}
-
-		return 0;
-
+		
+		return result;
+		
 	}
-
 }
