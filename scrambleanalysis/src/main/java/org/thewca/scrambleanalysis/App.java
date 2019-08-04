@@ -2,17 +2,19 @@ package org.thewca.scrambleanalysis;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
+import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 
-import static org.thewca.scrambleanalysis.CubeHelper.cornerOrientationSum;
-import static org.thewca.scrambleanalysis.CubeHelper.countMisorientedEdges;
+import static org.thewca.scrambleanalysis.CubeHelper.*;
 
 public class App {
 
-	public static void main(String[] args) throws RepresentationException, InvalidScrambleException {
+	public static void main(String[] args)
+			throws RepresentationException, InvalidScrambleException, InvalidMoveException {
 		ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
 
 		int N = 1000;
+		int parity = 0;
 
 		int[] edgeOrientation = { 0, 0, 0, 0, 0, 0, 0 }; // 0, 2, 4, ..., 12 edges misoriented
 		int[] cornerOrientation = { 0, 0, 0, 0, 0, 0 }; // 0, 3, 6, ..., 15
@@ -30,14 +32,20 @@ public class App {
 
 			edgeOrientation[misorientedEdges / 2]++;
 			cornerOrientation[cornerSum / 3]++;
+
+			if (hasParity(scramble)) {
+				parity++;
+			}
 		}
 
 		// MVP for histogram.
-		System.out.println("Histogram for edges");
+		System.out.println("Histogram for edges, out of " + N);
 		histogram(N, edgeOrientation);
 
-		System.out.println("\n\nHistogram for corners");
+		System.out.println("\nHistogram for corners, out of " + N);
 		histogram(N, cornerOrientation);
+
+		System.out.println("\nParity cases: " + parity + "/" + N);
 	}
 
 	public static void histogram(int N, int[] array) {
