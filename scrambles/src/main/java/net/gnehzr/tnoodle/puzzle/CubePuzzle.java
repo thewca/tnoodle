@@ -488,7 +488,15 @@ public class CubePuzzle extends Puzzle {
             state.orientation = TwoByTwoSolver.packOrient(pieces);
             return state;
         }
-        
+        /**
+         * Returns a string representing the colors of the cube.
+         * Looking at the face, each sticker is described in the reading order,
+         * that is, from left to right, from up to bottom.
+         * Faces order follow U, R, F, D, L, B.
+         * @return A string, not spaced, containing the color of each sticker.
+         * This color refers to the solved state. If white is the color of the U face when solved,
+         * then every white sticker is described as U.
+         */
         public String toFaceCube() {
             azzert(size == 3);
             String state = "";
