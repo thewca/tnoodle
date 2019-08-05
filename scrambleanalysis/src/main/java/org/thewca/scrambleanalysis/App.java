@@ -2,22 +2,47 @@ package org.thewca.scrambleanalysis;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
-import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
-import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 
 import static org.thewca.scrambleanalysis.CubeHelper.*;
+import static org.thewca.scrambleanalysis.statistics.Histogram.histogram;
+
+import java.util.ArrayList;
+
+import org.thewca.scrambleanalysis.statistics.Distribution;
 
 public class App {
 
-	public static void main(String[] args)
-			throws RepresentationException, InvalidScrambleException, InvalidMoveException {
+	public static void main(String[] args) throws Exception {
 		ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
 
-		int N = 1000;
-		int parity = 0;
+		long N = 10000;
+		long parity = 0;
 
-		int[] edgeOrientation = { 0, 0, 0, 0, 0, 0, 0 }; // 0, 2, 4, ..., 12 edges misoriented
-		int[] cornerOrientation = { 0, 0, 0, 0, 0, 0 }; // 0, 3, 6, ..., 15
+		// The number at position 0 counts the number of scrambles with 0 misoriented
+		// edges.
+		// The number at position 1 counts the number of scrambles with 1 misoriented
+		// edges.
+		// etc
+		// The odd numbers are possible for edge orientation because we are ignoring 1
+		// edge, since it depends on the others.
+		// We ignore it for easier analysis using Binomial Distribution.
+		ArrayList<Long> misorientedEdgesList = new ArrayList<Long>();
+		// Similarly, we only consider 7 corners.
+		ArrayList<Long> cornerSumList = new ArrayList<Long>();
+
+		int edges = 12;
+		ArrayList<String> subtitleEdges = new ArrayList<String>();
+		for (int i = 0; i < edges; i++) {
+			misorientedEdgesList.add(0L);
+			subtitleEdges.add(String.format("%02d", i) + " edges");
+		}
+
+		int corners = 8;
+		ArrayList<String> subtitleCorners = new ArrayList<String>();
+		for (int i = 0; i < corners * 2; i++) { // Corner sum might be up to 2, so, the *2 here.
+			cornerSumList.add(0L);
+			subtitleCorners.add(String.format("%02d", i) + " sum");
+		}
 
 		for (int i = 0; i < N; i++) {
 
@@ -27,49 +52,29 @@ public class App {
 			CubeState cubeState = (CubeState) solved.applyAlgorithm(scramble);
 			String representation = cubeState.toFaceCube();
 
-			int misorientedEdges = countMisorientedEdges(representation);
+			int misorientedEdges = countMisorientedEdgesIgnoringUB(representation);
 			int cornerSum = cornerOrientationSum(representation);
 
-			edgeOrientation[misorientedEdges / 2]++;
-			cornerOrientation[cornerSum / 3]++;
+			misorientedEdgesList.set(misorientedEdges, misorientedEdgesList.get(misorientedEdges) + 1);
+			cornerSumList.set(cornerSum, cornerSumList.get(cornerSum) + 1);
 
 			if (hasParity(scramble)) {
 				parity++;
 			}
+
+			assert countMisorientedEdges(representation) == countMisorientedEdgesv2(representation);
 		}
 
 		// MVP for histogram.
 		System.out.println("Histogram for edges, out of " + N);
-		histogram(N, edgeOrientation);
+		histogram(N, misorientedEdgesList, subtitleEdges);
 
 		System.out.println("\nHistogram for corners, out of " + N);
-		histogram(N, cornerOrientation);
+		histogram(N, cornerSumList, subtitleCorners);
 
 		System.out.println("\nParity cases: " + parity + "/" + N);
-	}
 
-	public static void histogram(int N, int[] array) {
-		int numberOfChars = 20;
-		char theChar = '#';
-
-		int max = array[0];
-		for (int item : array) {
-			System.out.print(item + " ");
-			if (item > max) {
-				max = item;
-			}
-		}
-		if (max == 0) {
-			return;
-		}
-		System.out.println("");
-
-		for (int item : array) {
-			String out = "";
-			for (int i = 0; i < 1.0 * item / max * numberOfChars; i++) {
-				out += theChar;
-			}
-			System.out.println(out);
-		}
+		System.out.println("\nExpected distribution for edges.");
+		Distribution.expected(N);
 	}
 }
