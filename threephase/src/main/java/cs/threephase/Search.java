@@ -63,7 +63,7 @@ public class Search {
 		if (inited) {
 			return;
 		}
-		cs.min2phase.Tools.init();
+		cs.min2phase.Search.init();
 
 		System.out.println("Initialize Center1 Solver...");
 
