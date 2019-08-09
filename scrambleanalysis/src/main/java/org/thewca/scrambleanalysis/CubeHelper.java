@@ -13,7 +13,7 @@ public class CubeHelper {
 
 	// Refer to toFaceCube representation.
 	// For DB edge orientation, we only care about U/D, Equator F/B.
-	private static int[] edgesIndex = { 1, 3, 5, 7, // U edges index
+	private static final int[] edgesIndex = { 1, 3, 5, 7, // U edges index
 			28, 30, 32, 34, // D edges index
 			21, 23, // Equator front
 			48, 50 // Equator back
@@ -21,18 +21,18 @@ public class CubeHelper {
 
 	// Each edge has 2 stickers. This array represents, respectively, the index of
 	// the other attached sticker.
-	private static int[] attachedEdgesIndex = { 46, 37, 10, 19, // Attached to the U face.
+	private static final int[] attachedEdgesIndex = { 46, 37, 10, 19, // Attached to the U face.
 			25, 43, 16, 52, // Attached to the D face
 			41, 12, // Attached to Equator front
 			14, 39 // Attached to Equator back
 	};
 
-	private static int[] cornersIndex = { 0, 2, 6, 8, // U corners
+	private static final int[] cornersIndex = { 0, 2, 6, 8, // U corners
 			27, 29, 33, 35 }; // D corners
-	private static int[] cornersIndexClockWise = { 36, 45, 18, 9, // U twist clockwise
+	private static final int[] cornersIndexClockWise = { 36, 45, 18, 9, // U twist clockwise
 			44, 26, 53, 17, // D stickers
 	};
-	private static int[] cornersIndexCounterClockWise = { 47, 11, 38, 20, // U twists
+	private static final int[] cornersIndexCounterClockWise = { 47, 11, 38, 20, // U twists
 			24, 15, 42, 51 }; // D twists
 
 	/**
@@ -42,41 +42,8 @@ public class CubeHelper {
 	 * @return
 	 * @throws RepresentationException
 	 */
-	public static int countMisorientedEdges(String representation) throws RepresentationException {
-		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
-
-		char uColor = representation.charAt(central + 0 * stickersPerFace);
-		char rColor = representation.charAt(central + 1 * stickersPerFace);
-		char fColor = representation.charAt(central + 2 * stickersPerFace);
-		char dColor = representation.charAt(central + 3 * stickersPerFace);
-		char lColor = representation.charAt(central + 4 * stickersPerFace);
-		char bColor = representation.charAt(central + 5 * stickersPerFace);
-
-		int result = 0;
-		for (int i = 0; i < edgesIndex.length; i++) {
-
-			int index = edgesIndex[i];
-			char color = representation.charAt(index);
-
-			int attachedIndex = attachedEdgesIndex[i];
-			int attachedColor = representation.charAt(attachedIndex);
-
-			if (color == uColor || color == dColor) {
-				// Yay, oriented edge.
-			} else if (color == rColor || color == lColor) {
-				result++;
-			} else if (color == fColor || color == bColor) {
-				if (attachedColor == uColor || attachedColor == dColor) {
-					result++;
-				}
-			} else {
-				throw new RepresentationException();
-			}
-		}
-		return result;
-	}
 	
-	public static int countMisorientedEdgesv2(String representation) throws Exception {
+	public static int countMisorientedEdges(String representation) throws RepresentationException {
 		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
 
 		int result = 0;
@@ -98,7 +65,7 @@ public class CubeHelper {
 	// For calculations, we do not look at the 12 edges. Since the last one depends
 	// on the others,
 	// it is excluded from the probability. The method helps on this.
-	private static boolean isOrientedEdge(String representation, int sticker) throws Exception {
+	private static boolean isOrientedEdge(String representation, int sticker) throws RepresentationException {
 		char color;
 		char attachedColor;
 
@@ -132,7 +99,7 @@ public class CubeHelper {
 		throw new RepresentationException();
 	}
 	
-	public static int countMisorientedEdgesIgnoringUB(String representation) throws Exception {
+	public static int countMisorientedEdgesIgnoringUB(String representation) throws RepresentationException {
 		int result = countMisorientedEdges(representation);
 		int sticker = 1; // U of the UB edge. Actually, any edge would do it.
 		if (!isOrientedEdge(representation, sticker)) {
