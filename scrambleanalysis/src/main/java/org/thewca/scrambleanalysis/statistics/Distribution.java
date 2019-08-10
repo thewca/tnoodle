@@ -20,21 +20,23 @@ public class Distribution {
 	 */
 	public static long[] expectedEdgeOrientationDistribution(long N) {
 
-		// TODO add a limit for N.
+		// TODO add a limit for N. This should be big enough so N*p still fit long.
+		// Also, N >= 2048.
 
 		double prob = 0.5;
-		long[] array = new long[edges];
+		long[] array = new long[edges]; // From 0 to 11 possible edges, it's still 12 options.
 
-		BinomialDistribution bd = new BinomialDistribution(edges, prob);
+		// Remember: last edge depends on the others.
+		BinomialDistribution bd = new BinomialDistribution(edges - 1, prob);
 
 		for (int i = 0; i < edges; i++) {
-			array[i] = (Math.round(N * bd.probability(i)));
+			array[i] = Math.round(bd.probability(i) * N);
 		}
 
 		return array;
 	}
 
-	public static void expectedEdgeOrientationHistogram(Long N) {
+	public static void expectedEdgeOrientationHistogram(long N) {
 		long[] array = expectedEdgeOrientationDistribution(N);
 
 		String[] subtitle = new String[edges];

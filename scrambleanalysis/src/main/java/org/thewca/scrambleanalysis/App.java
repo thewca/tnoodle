@@ -19,11 +19,12 @@ public class App {
 	public static void main(String[] args) throws InvalidScrambleException, RepresentationException, InvalidMoveException {
 		ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
 
-		long N = 10000;
+		// The rarest case here is 0 oriented edges, which happens on about 1/2^11, so we need at least N = 2^11
+		long N = 2048;
 		long parity = 0;
 
 		int edges = 12;
-		int corners = 8;
+//		int corners = 8;
 		
 		// The number at position 0 counts the number of scrambles with 0 misoriented
 		// edges.
@@ -35,7 +36,7 @@ public class App {
 		// We ignore it for easier analysis using Binomial Distribution.
 		long[] misorientedEdgesList = new long[edges];
 		// Similarly, we only consider 7 corners.
-		long[] cornerSumList = new long[2 * corners];
+//		long[] cornerSumList = new long[2 * corners];
 
 		String[] subtitleEdges = new String[edges];
 		for (int i = 0; i < edges; i++) {
@@ -43,13 +44,14 @@ public class App {
 			subtitleEdges[i] = String.format("%02d", i) + " edges";
 		}
 
-		String[] subtitleCorners = new String[2 * corners];
-		for (int i = 0; i < 2 * corners; i++) { // Corner sum might be up to 2, so, the *2 here.
-			cornerSumList[i] = 0; // Just in case.
-			subtitleCorners[i] = String.format("%02d", i) + " sum";
-		}
+//		String[] subtitleCorners = new String[2 * corners];
+//		for (int i = 0; i < 2 * corners; i++) { // Corner sum might be up to 2, so, the *2 here.
+//			cornerSumList[i] = 0; // Just in case.
+//			subtitleCorners[i] = String.format("%02d", i) + " sum";
+//		}
 
 		for (int i = 0; i < N; i++) {
+			System.out.println("Scramble: " + i);
 
 			String scramble = cube.generateScramble();
 
@@ -58,10 +60,10 @@ public class App {
 			String representation = cubeState.toFaceCube();
 
 			int misorientedEdges = countMisorientedEdgesIgnoringUB(representation);
-			int cornerSum = cornerOrientationSum(representation);
+//			int cornerSum = cornerOrientationSum(representation);
 
 			misorientedEdgesList[misorientedEdges]++;
-			cornerSumList[cornerSum]++;
+//			cornerSumList[cornerSum]++;
 
 			if (hasParity(scramble)) {
 				parity++;
@@ -70,19 +72,12 @@ public class App {
 
 		long[] expectedEdges = Distribution.expectedEdgeOrientationDistribution(N);
 		
-		for (int i=0; i<edges; i++) {
-			if (expectedEdges[i] == 0 && misorientedEdgesList[i] == 0) {
-				expectedEdges[i] = 1;
-				misorientedEdgesList[i] = 1;
-			}
-		}
-
 		// MVP for histogram.
 		System.out.println("Histogram for edges, out of " + N);
 		histogram(N, misorientedEdgesList, subtitleEdges);
 
-		System.out.println("\nHistogram for corners, out of " + N);
-		histogram(N, cornerSumList, subtitleCorners);
+//		System.out.println("\nHistogram for corners, out of " + N);
+//		histogram(N, cornerSumList, subtitleCorners);
 
 		System.out.println("\nParity cases: " + parity + "/" + N);
 
@@ -90,10 +85,9 @@ public class App {
 		histogram(N, expectedEdges);
 		
 		ChiSquareTest cst = new ChiSquareTest();
-		double alpha = 0.01;
+		double alpha = 0.05;
 		System.out.println(cst.chiSquareDataSetsComparison(misorientedEdgesList, expectedEdges));
-		boolean flag = cst.chiSquareTestDataSetsComparison(misorientedEdgesList, expectedEdges, alpha);
-		System.out.println("Passed? " + flag);
-		
+		boolean nullHipCanBeRejected = cst.chiSquareTestDataSetsComparison(misorientedEdgesList, expectedEdges, alpha);
+		System.out.println("Passed? " + !nullHipCanBeRejected);
 	}
 }
