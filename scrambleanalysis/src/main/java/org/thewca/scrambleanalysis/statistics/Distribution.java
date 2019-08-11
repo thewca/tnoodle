@@ -58,6 +58,38 @@ public class Distribution {
 		return array;
 	}
 	
+	public static long[] expectedCornersOrientationSumDistribution(long N) {
+
+		// TODO add a limit for N. This should be big enough so N*p still fit long.
+		// Also, N >= 2048.
+
+		double prob = 1./3;
+		long[] array = new long[2 * corners - 1]; // From 0 to 11 possible edges, it's still 12 options.
+
+		// Does this make sense?
+		// Sum two can be achieved either with +1+1 or +2.
+		// TODO investigate if this breaks binomial behavior.
+		
+		// Remember: last edge depends on the others.
+		BinomialDistribution bd = new BinomialDistribution(2 * corners - 1, prob);
+
+		for (int i = 0; i < 2 * corners - 1; i++) {
+			array[i] = Math.round(bd.probability(i) * N);
+		}
+
+		return array;
+	}
+	
+	public static long[] expectedCornersFinalOrientation(long N) {
+
+		long[] array = new long[corners * 3];
+
+		for (int i = 0; i < corners * 3; i++) {
+			array[i] = N / 3;
+		}
+		return array;
+	}
+	
 	public static long[] expectedCornersFinalPosition(long N) {
 
 		long[] array = new long[corners];

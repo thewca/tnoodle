@@ -37,19 +37,22 @@ public class App {
 		// edge, since it depends on the others.
 		// We ignore it for easier analysis using Binomial Distribution.
 		long[] misorientedEdgesList = new long[edges];
+
 		// Similarly, we only consider 7 corners.
-//		long[] cornerSumList = new long[2 * corners];
+		// Max sum is 7*2 = 14, so we need a 15 sized array.
+//		long[] cornerSumList = new long[2 * corners - 1];
 
-		// Count how many times edge index j ended on index k.
+		// New approach for corners.
+		// For each corner, we check if its orientation is
+		// Oriented -> 0
+		// Clock wise -> 1
+		// Counter clockwise -> 2
+		// Then we check the randomness of corners[i][j].
+		long[][] cornersOrientation = new long[corners][3];
+
+		// Count how many times edge/corner index j ended on index k.
 		long[][] finalEdgesPosition = new long[edges][edges];
-
 		long[][] finalCornersPosition = new long[corners][corners];
-
-//		String[] subtitleCorners = new String[2 * corners];
-//		for (int i = 0; i < 2 * corners; i++) { // Corner sum might be up to 2, so, the *2 here.
-//			cornerSumList[i] = 0; // Just in case.
-//			subtitleCorners[i] = String.format("%02d", i) + " sum";
-//		}
 
 		for (int i = 0; i < N; i++) {
 			System.out.println("Scramble: " + i);
@@ -61,7 +64,7 @@ public class App {
 			String representation = cubeState.toFaceCube();
 
 			int misorientedEdges = countMisorientedEdgesIgnoringUB(representation);
-//			int cornerSum = cornerOrientationSum(representation);
+			int cornerSum = cornerOrientationSum(representation);
 
 			misorientedEdgesList[misorientedEdges]++;
 //			cornerSumList[cornerSum]++;
@@ -78,6 +81,9 @@ public class App {
 			for (int j = 0; j < corners; j++) {
 				int finalPosition = getFinalPositionOfCorner(representation, j);
 				finalCornersPosition[j][finalPosition]++;
+
+				int orientationNumber = getCornerOrientationNumber(representation, j);
+				cornersOrientation[j][orientationNumber]++;
 			}
 		}
 
@@ -105,7 +111,17 @@ public class App {
 			}
 		}
 		System.out.println("Corners in random position? " + cornersRandomPosition);
-
+		
+		long[] gatheredCorners = new long[corners * 3];
+		for (int i=0; i<corners; i++) {
+			for (int j=0; j<3; j++) {
+				gatheredCorners[3*i + j] = cornersOrientation[i][j];
+			}
+		}
+		histogram(gatheredCorners);
+		
+		boolean randomCOCanBeRejected = cst.chiSquareTestDataSetsComparison(Distribution.expectedCornersFinalOrientation(N), gatheredCorners, alpha);
+		System.out.println("Random CO? " + !randomCOCanBeRejected);
 	}
 
 }

@@ -17,7 +17,7 @@ public class CubeHelper {
 	private static final int stickersPerFace = 9;
 
 	private static final int corners = 8;;
-	
+
 	// Refer to toFaceCube representation.
 	// For FB edge orientation, we only care about edges on U/D, Equator F/B.
 	// Also, this sets an order to edges, which will be reused
@@ -114,6 +114,39 @@ public class CubeHelper {
 		throw new RepresentationException();
 	}
 
+	/**
+	 * Given a representation, returns a number that represents the orientation of a
+	 * corner at index cornerIndex
+	 * 
+	 * @param representation: a representation of a cube.
+	 * @param cornerIndex:    0 <= cornerIndex < 8
+	 * @return: 0 if the corner is oriented. 1 if the corner is oriented clockwise.
+	 *          2 if the corner is oriented counter clockwise.
+	 * @throws RepresentationException 
+	 */
+	public static int getCornerOrientationNumber(String representation, int cornerIndex) throws RepresentationException {
+		char uColor = representation.charAt(central + 0 * stickersPerFace);
+		char dColor = representation.charAt(central + 3 * stickersPerFace);
+
+		int index = cornersIndex[cornerIndex];
+		int indexClockWise = cornersIndexClockWise[cornerIndex];
+		int indexCounterClockWise = cornersIndexCounterClockWise[cornerIndex];
+
+		char sticker = representation.charAt(index);
+		char stickerClockWise = representation.charAt(indexClockWise);
+		char stickerCounterClockWise = representation.charAt(indexCounterClockWise);
+
+		if (sticker == uColor || sticker == dColor) {
+			return 0;
+		} else if (stickerClockWise == uColor || stickerClockWise == dColor) {
+			return 1;
+		} else if (stickerCounterClockWise == uColor || stickerCounterClockWise == dColor) {
+			return 2;
+		} else {
+			throw new RepresentationException();
+		}
+	}
+
 	public static int countMisorientedEdgesIgnoringUB(String representation) throws RepresentationException {
 		int result = countMisorientedEdges(representation);
 		int sticker = 1; // U of the UB edge. Actually, any edge would do it.
@@ -134,32 +167,10 @@ public class CubeHelper {
 	public static int cornerOrientationSum(String representation) throws RepresentationException {
 		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
 
-		int central = 4; // Index 4 represents the central sticker;
-		int stickersPerFace = 9;
-
-		char uColor = representation.charAt(central + 0 * stickersPerFace);
-		char dColor = representation.charAt(central + 3 * stickersPerFace);
-
 		int result = 0;
-
-		for (int i = 0; i < corners; i++) {
-			int index = cornersIndex[i];
-			int indexClockWise = cornersIndexClockWise[i];
-			int indexCounterClockWise = cornersIndexCounterClockWise[i];
-
-			char sticker = representation.charAt(index);
-			char stickerClockWise = representation.charAt(indexClockWise);
-			char stickerCounterClockWise = representation.charAt(indexCounterClockWise);
-
-			if (sticker == uColor || sticker == dColor) {
-				// Corner oriented
-			} else if (stickerClockWise == uColor || stickerClockWise == dColor) {
-				result++;
-			} else if (stickerCounterClockWise == uColor || stickerCounterClockWise == dColor) {
-				result += 2;
-			} else {
-				throw new RepresentationException();
-			}
+		
+		for (int i=0; i<corners-1; i++) {
+			result += getCornerOrientationNumber(representation, i);
 		}
 
 		return result;
@@ -286,9 +297,9 @@ public class CubeHelper {
 		char initialClockWiseColor = representation
 				.charAt(initialClockWiseIndex - initialClockWiseIndex % stickersPerFace + central);
 		char initialCounterClockWiseColor = representation
-				.charAt(initialCounterClockWiseIndex - initialCounterClockWiseIndex % stickersPerFace + central);		
+				.charAt(initialCounterClockWiseIndex - initialCounterClockWiseIndex % stickersPerFace + central);
 		String initial = "" + initialColor + initialClockWiseColor + initialCounterClockWiseColor;
-		
+
 		for (int j = 0; j < corners; j++) {
 			char color = representation.charAt(cornersIndex[j]);
 			char clockWiseColor = representation.charAt(cornersIndexClockWise[j]);
