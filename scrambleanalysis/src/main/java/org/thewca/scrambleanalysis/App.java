@@ -22,11 +22,11 @@ public class App {
 
 		// The rarest case here is 0 oriented edges, which happens on about 1/2^11, so
 		// we need at least N = 2^11
-		long N = 2048;
+		long N = 100;
 		long parity = 0;
 
 		int edges = 12;
-//		int corners = 8;
+		int corners = 8;
 
 		// The number at position 0 counts the number of scrambles with 0 misoriented
 		// edges.
@@ -41,7 +41,9 @@ public class App {
 //		long[] cornerSumList = new long[2 * corners];
 
 		// Count how many times edge index j ended on index k.
-		long[][] finalPositions = new long[edges][edges];
+		long[][] finalEdgesPosition = new long[edges][edges];
+
+		long[][] finalCornersPosition = new long[corners][corners];
 
 //		String[] subtitleCorners = new String[2 * corners];
 //		for (int i = 0; i < 2 * corners; i++) { // Corner sum might be up to 2, so, the *2 here.
@@ -70,25 +72,40 @@ public class App {
 
 			for (int j = 0; j < edges; j++) {
 				int finalPosition = getFinalPositionOfEdge(representation, j);
-				finalPositions[j][finalPosition]++;
+				finalEdgesPosition[j][finalPosition]++;
+			}
+
+			for (int j = 0; j < corners; j++) {
+				int finalPosition = getFinalPositionOfCorner(representation, j);
+				finalCornersPosition[j][finalPosition]++;
 			}
 		}
 
 		ChiSquareTest cst = new ChiSquareTest();
 		double alpha = 0.01;
 
-		long[] expectedEdges = Distribution.expectedEdgesOrientationDistribution(N);
-		boolean randomEOCanBeRejected = cst.chiSquareTestDataSetsComparison(misorientedEdgesList, expectedEdges, alpha);
-		System.out.println("Random EO? " + !randomEOCanBeRejected);
+//		long[] expectedEdges = Distribution.expectedEdgesOrientationDistribution(N);
+//		boolean randomEOCanBeRejected = cst.chiSquareTestDataSetsComparison(misorientedEdgesList, expectedEdges, alpha);
+//		System.out.println("Random EO? " + !randomEOCanBeRejected);
 
-		boolean edgesRandomPosition = true;
-		long[] expectedEdgesFinalPosition = Distribution.expectedEdgesFinalPosition(N);
-		for (long[] item : finalPositions) {
-			if (cst.chiSquareTestDataSetsComparison(expectedEdgesFinalPosition, item, alpha)) {
-				edgesRandomPosition = false;
+		/*
+		 * boolean edgesRandomPosition = true; long[] expectedEdgesFinalPosition =
+		 * Distribution.expectedEdgesFinalPosition(N); for (long[] item :
+		 * finalPositions) { if
+		 * (cst.chiSquareTestDataSetsComparison(expectedEdgesFinalPosition, item,
+		 * alpha)) { edgesRandomPosition = false; } }
+		 * System.out.println("Edges in random position? " + edgesRandomPosition);
+		 */
+
+		boolean cornersRandomPosition = true;
+		long[] expectedCornersFinalPosition = Distribution.expectedCornersFinalPosition(N);
+		for (long[] item : finalCornersPosition) {
+			if (cst.chiSquareTestDataSetsComparison(expectedCornersFinalPosition, item, alpha)) {
+				cornersRandomPosition = false;
 			}
 		}
-		System.out.println("Edges in random position? " + edgesRandomPosition);
+		System.out.println("Corners in random position? " + cornersRandomPosition);
+
 	}
 
 }

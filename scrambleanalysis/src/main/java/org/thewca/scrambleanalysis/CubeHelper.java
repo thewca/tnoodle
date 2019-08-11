@@ -5,6 +5,8 @@ import java.util.Arrays;
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 
+import static org.thewca.scrambleanalysis.utils.Utils.stringCompareIgnoringOrder;
+
 public class CubeHelper {
 	// For 3x3 only.
 
@@ -14,6 +16,8 @@ public class CubeHelper {
 	private static final int central = 4; // Index 4 represents the central sticker;
 	private static final int stickersPerFace = 9;
 
+	private static final int corners = 8;;
+	
 	// Refer to toFaceCube representation.
 	// For FB edge orientation, we only care about edges on U/D, Equator F/B.
 	// Also, this sets an order to edges, which will be reused
@@ -138,7 +142,6 @@ public class CubeHelper {
 
 		int result = 0;
 
-		int corners = 8;
 		for (int i = 0; i < corners; i++) {
 			int index = cornersIndex[i];
 			int indexClockWise = cornersIndexClockWise[i];
@@ -231,7 +234,7 @@ public class CubeHelper {
 	 *          attachedEdgesIndex). If the final position of a sticker is in UL
 	 *          (either U or L), it returns 1 (which is the index of UL in
 	 *          edgesIndex). etc.
-	 * @throws RepresentationException 
+	 * @throws RepresentationException
 	 */
 	public static int getFinalPositionOfEdge(String representation, int i) throws RepresentationException {
 		// Here, we are reusing the position of edges mentioned above.
@@ -239,7 +242,7 @@ public class CubeHelper {
 		if (representation.length() != 54) {
 			throw new IllegalArgumentException("Representation size must be 54.");
 		}
-		if (i < 0 || i > 11) {
+		if (i < 0 || i >= edges) {
 			throw new IllegalArgumentException("Make sure 0 <= i <= 11.");
 		}
 
@@ -247,12 +250,13 @@ public class CubeHelper {
 		int initialAttachedIndex = attachedEdgesIndex[i];
 
 		char initialColor = representation.charAt(central + initialEdgeIndex / stickersPerFace * stickersPerFace);
-		char initialAttachedColor = representation.charAt(central + initialAttachedIndex / stickersPerFace * stickersPerFace);
+		char initialAttachedColor = representation
+				.charAt(central + initialAttachedIndex / stickersPerFace * stickersPerFace);
 
 		for (int j = 0; j < edges; j++) {
 			char color = representation.charAt(edgesIndex[j]);
 			char attachedColor = representation.charAt(attachedEdgesIndex[j]);
-			
+
 			if (color == initialColor && attachedColor == initialAttachedColor) {
 				return j;
 			}
@@ -263,62 +267,41 @@ public class CubeHelper {
 
 		throw new RepresentationException();
 	}
-	
+
 	public static int getFinalPositionOfCorner(String representation, int i) throws RepresentationException {
 		// Here, we are reusing the position of edges mentioned above.
 
 		if (representation.length() != 54) {
 			throw new IllegalArgumentException("Representation size must be 54.");
 		}
-		if (i < 0 || i > 11) {
+		if (i < 0 || i >= corners) {
 			throw new IllegalArgumentException("Make sure 0 <= i <= 7.");
 		}
 
-		int initialEdgeIndex = edgesIndex[i];
-		int initialAttachedIndex = attachedEdgesIndex[i];
+		int initialIndex = cornersIndex[i];
+		int initialClockWiseIndex = cornersIndexClockWise[i];
+		int initialCounterClockWiseIndex = cornersIndexCounterClockWise[i];
 
-		char initialColor = representation.charAt(central + initialEdgeIndex / stickersPerFace * stickersPerFace);
-		char initialAttachedColor = representation.charAt(central + initialAttachedIndex / stickersPerFace * stickersPerFace);
+		char initialColor = representation.charAt(initialIndex - initialIndex % stickersPerFace + central);
+		char initialClockWiseColor = representation
+				.charAt(initialClockWiseIndex - initialClockWiseIndex % stickersPerFace + central);
+		char initialCounterClockWiseColor = representation
+				.charAt(initialCounterClockWiseIndex - initialCounterClockWiseIndex % stickersPerFace + central);		
+		String initial = "" + initialColor + initialClockWiseColor + initialCounterClockWiseColor;
+		
+		for (int j = 0; j < corners; j++) {
+			char color = representation.charAt(cornersIndex[j]);
+			char clockWiseColor = representation.charAt(cornersIndexClockWise[j]);
+			char counterClockWiseColor = representation.charAt(cornersIndexCounterClockWise[j]);
 
-		for (int j = 0; j < edges; j++) {
-			char color = representation.charAt(edgesIndex[j]);
-			char attachedColor = representation.charAt(attachedEdgesIndex[j]);
-			
-			if (color == initialColor && attachedColor == initialAttachedColor) {
+			String current = "" + color + clockWiseColor + counterClockWiseColor;
+
+			if (stringCompareIgnoringOrder(initial, current)) {
 				return j;
 			}
-			if (color == initialAttachedColor && attachedColor == initialColor) {
-				return j;
-			}
+
 		}
 
 		throw new RepresentationException();
-	}
-	
-	/**
-	 * Give two string, compares them ignoring order of chars.
-	 * UFR == FRU = FRU
-	 * @param st1
-	 * @param st2
-	 * @return
-	 */
-	private boolean stringCompareIgnoringOrder(String st1, String st2) {
-		if (st1.length() != st2.length()) {
-			return false;
-		}
-
-		char[] chars1 = st1.toCharArray();
-		char[] chars2 = st1.toCharArray();
-		
-		Arrays.sort(chars1);
-		Arrays.sort(chars2);
-		
-		for (int i=0; i<st1.length(); i++) {
-			if (chars1[i] != chars2[i]) {
-				return false;
-			}
-		}
-		
-		return true;
 	}
 }

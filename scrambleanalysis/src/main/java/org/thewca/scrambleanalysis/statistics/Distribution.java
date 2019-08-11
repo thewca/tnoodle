@@ -7,6 +7,7 @@ import static org.thewca.scrambleanalysis.statistics.Histogram.*;
 public class Distribution {
 
 	private static final int edges = 12;
+	private static final int corners = 8;
 
 	/**
 	 * Remember that we do not count 1 edge (as it depends on the others).
@@ -54,6 +55,16 @@ public class Distribution {
 			array[i] = N / edges;
 		}
 
+		return array;
+	}
+	
+	public static long[] expectedCornersFinalPosition(long N) {
+
+		long[] array = new long[corners];
+
+		for (int i = 0; i < corners; i++) {
+			array[i] = N / corners;
+		}
 		return array;
 	}
 }
