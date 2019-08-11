@@ -1,13 +1,17 @@
 package org.thewca.scrambleanalysis.statistics;
 
-import org.apache.commons.math3.distribution.BinomialDistribution;
+import static org.thewca.scrambleanalysis.statistics.Histogram.histogram;
 
-import static org.thewca.scrambleanalysis.statistics.Histogram.*;
+import java.util.Random;
+
+import org.apache.commons.math3.distribution.BinomialDistribution;
 
 public class Distribution {
 
 	private static final int edges = 12;
 	private static final int corners = 8;
+
+	private static final Random random = new Random();
 
 	/**
 	 * Remember that we do not count 1 edge (as it depends on the others).
@@ -35,6 +39,24 @@ public class Distribution {
 		return array;
 	}
 
+	// Here we generate the expected array distribution for edge sum.
+	// Perhaps this could be calculated, but it's kind of tricky, since the last
+	// edge orientation depends on the others.
+	public static long[] expectedEdgesOrientation(int N) {
+
+		long[] array = new long[edges / 2 + 1];
+
+		for (int i = 0; i < N; i++) {
+			int sum = 0;
+			for (int j = 0; j < edges - 1; j++) {
+				sum += Math.round(Math.random()); // 0 or 1
+			}
+			sum += sum % 2; // The last edge makes the sum even.
+			array[sum / 2]++;
+		}
+		return array;
+	}
+
 	public static void expectedEdgesOrientationHistogram(long N) {
 		long[] array = expectedEdgesOrientationDistribution(N);
 
@@ -46,7 +68,7 @@ public class Distribution {
 
 		histogram(array, subtitle);
 	}
-	
+
 	public static long[] expectedEdgesFinalPosition(long N) {
 
 		long[] array = new long[edges];
@@ -57,19 +79,19 @@ public class Distribution {
 
 		return array;
 	}
-	
+
 	public static long[] expectedCornersOrientationSumDistribution(long N) {
 
 		// TODO add a limit for N. This should be big enough so N*p still fit long.
 		// Also, N >= 2048.
 
-		double prob = 1./3;
+		double prob = 1. / 3;
 		long[] array = new long[2 * corners - 1]; // From 0 to 11 possible edges, it's still 12 options.
 
 		// Does this make sense?
 		// Sum two can be achieved either with +1+1 or +2.
 		// TODO investigate if this breaks binomial behavior.
-		
+
 		// Remember: last edge depends on the others.
 		BinomialDistribution bd = new BinomialDistribution(2 * corners - 1, prob);
 
@@ -79,7 +101,7 @@ public class Distribution {
 
 		return array;
 	}
-	
+
 	public static long[] expectedCornersFinalOrientation(long N) {
 
 		long[] array = new long[corners * 3];
@@ -89,7 +111,7 @@ public class Distribution {
 		}
 		return array;
 	}
-	
+
 	public static long[] expectedCornersFinalPosition(long N) {
 
 		long[] array = new long[corners];

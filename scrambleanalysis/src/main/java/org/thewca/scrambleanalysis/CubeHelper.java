@@ -1,11 +1,9 @@
 package org.thewca.scrambleanalysis;
 
-import java.util.Arrays;
+import static org.thewca.scrambleanalysis.utils.Utils.stringCompareIgnoringOrder;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
-
-import static org.thewca.scrambleanalysis.utils.Utils.stringCompareIgnoringOrder;
 
 public class CubeHelper {
 	// For 3x3 only.
@@ -62,10 +60,8 @@ public class CubeHelper {
 		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
 
 		int result = 0;
-		for (int i = 0; i < edgesIndex.length; i++) {
-
-			int index = edgesIndex[i];
-			if (!isOrientedEdge(representation, index)) {
+		for (int i = 0; i < edges; i++) {
+			if (!isOrientedEdge(representation, i)) {
 				result++;
 			}
 		}
@@ -77,10 +73,7 @@ public class CubeHelper {
 		return countMisorientedEdges(representation);
 	}
 
-	// For calculations, we do not look at the 12 edges. Since the last one depends
-	// on the others,
-	// it is excluded from the probability. The method helps on this.
-	private static boolean isOrientedEdge(String representation, int sticker) throws RepresentationException {
+	public static boolean isOrientedEdge(String representation, int index) throws RepresentationException {
 		char color;
 		char attachedColor;
 
@@ -91,24 +84,20 @@ public class CubeHelper {
 		char lColor = representation.charAt(central + 4 * stickersPerFace);
 		char bColor = representation.charAt(central + 5 * stickersPerFace);
 
-		for (int i = 0; i < edgesIndex.length; i++) {
-			if (edgesIndex[i] == sticker) {
-				color = representation.charAt(edgesIndex[i]);
-				attachedColor = representation.charAt(attachedEdgesIndex[i]);
+		color = representation.charAt(edgesIndex[index]);
+		attachedColor = representation.charAt(attachedEdgesIndex[index]);
 
-				if (color == uColor || color == dColor) {
-					return true;
-				}
-				if (color == rColor || color == lColor) {
-					return false;
-				}
-				// Now, we're left with f and b colors.
-				if (attachedColor == uColor || attachedColor == dColor) {
-					return false;
-				} else if (attachedColor == rColor || attachedColor == lColor) {
-					return true;
-				}
-			}
+		if (color == uColor || color == dColor) {
+			return true;
+		}
+		if (color == rColor || color == lColor) {
+			return false;
+		}
+		// Now, we're left with f and b colors.
+		if (attachedColor == uColor || attachedColor == dColor) {
+			return false;
+		} else if (attachedColor == rColor || attachedColor == lColor) {
+			return true;
 		}
 
 		throw new RepresentationException();
@@ -122,9 +111,10 @@ public class CubeHelper {
 	 * @param cornerIndex:    0 <= cornerIndex < 8
 	 * @return: 0 if the corner is oriented. 1 if the corner is oriented clockwise.
 	 *          2 if the corner is oriented counter clockwise.
-	 * @throws RepresentationException 
+	 * @throws RepresentationException
 	 */
-	public static int getCornerOrientationNumber(String representation, int cornerIndex) throws RepresentationException {
+	public static int getCornerOrientationNumber(String representation, int cornerIndex)
+			throws RepresentationException {
 		char uColor = representation.charAt(central + 0 * stickersPerFace);
 		char dColor = representation.charAt(central + 3 * stickersPerFace);
 
@@ -147,14 +137,6 @@ public class CubeHelper {
 		}
 	}
 
-	public static int countMisorientedEdgesIgnoringUB(String representation) throws RepresentationException {
-		int result = countMisorientedEdges(representation);
-		int sticker = 1; // U of the UB edge. Actually, any edge would do it.
-		if (!isOrientedEdge(representation, sticker)) {
-			result--;
-		}
-		return result;
-	}
 
 	/**
 	 * Sum of corner orientation. 0 for oriented, 1 for clockwise, 2 for counter
@@ -168,8 +150,8 @@ public class CubeHelper {
 		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
 
 		int result = 0;
-		
-		for (int i=0; i<corners-1; i++) {
+
+		for (int i = 0; i < corners; i++) {
 			result += getCornerOrientationNumber(representation, i);
 		}
 
