@@ -4,8 +4,6 @@ import org.apache.commons.math3.distribution.BinomialDistribution;
 
 import static org.thewca.scrambleanalysis.statistics.Histogram.*;
 
-import java.util.ArrayList;
-
 public class Distribution {
 
 	private static final int edges = 12;
@@ -18,7 +16,7 @@ public class Distribution {
 	 *         in N scrambles. Position 0 is for 0 edges; position 1 is for 1 edge,
 	 *         etc.
 	 */
-	public static long[] expectedEdgeOrientationDistribution(long N) {
+	public static long[] expectedEdgesOrientationDistribution(long N) {
 
 		// TODO add a limit for N. This should be big enough so N*p still fit long.
 		// Also, N >= 2048.
@@ -36,8 +34,8 @@ public class Distribution {
 		return array;
 	}
 
-	public static void expectedEdgeOrientationHistogram(long N) {
-		long[] array = expectedEdgeOrientationDistribution(N);
+	public static void expectedEdgesOrientationHistogram(long N) {
+		long[] array = expectedEdgesOrientationDistribution(N);
 
 		String[] subtitle = new String[edges];
 
@@ -45,6 +43,17 @@ public class Distribution {
 			subtitle[i] = String.format("%02d", i) + " edges";
 		}
 
-		histogram(N, array, subtitle);
+		histogram(array, subtitle);
+	}
+	
+	public static long[] expectedEdgesFinalPosition(long N) {
+
+		long[] array = new long[edges];
+
+		for (int i = 0; i < edges; i++) {
+			array[i] = N / edges;
+		}
+
+		return array;
 	}
 }

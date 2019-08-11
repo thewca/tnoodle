@@ -8,24 +8,26 @@ import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 import static org.thewca.scrambleanalysis.CubeHelper.*;
 import static org.thewca.scrambleanalysis.statistics.Histogram.histogram;
 
-import java.util.ArrayList;
+import java.util.Random;
 
-import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
 import org.thewca.scrambleanalysis.statistics.Distribution;
 
 public class App {
 
-	public static void main(String[] args) throws InvalidScrambleException, RepresentationException, InvalidMoveException {
+	public static void main(String[] args)
+			throws InvalidScrambleException, RepresentationException, InvalidMoveException {
+
 		ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
 
-		// The rarest case here is 0 oriented edges, which happens on about 1/2^11, so we need at least N = 2^11
+		// The rarest case here is 0 oriented edges, which happens on about 1/2^11, so
+		// we need at least N = 2^11
 		long N = 2048;
 		long parity = 0;
 
 		int edges = 12;
 //		int corners = 8;
-		
+
 		// The number at position 0 counts the number of scrambles with 0 misoriented
 		// edges.
 		// The number at position 1 counts the number of scrambles with 1 misoriented
@@ -38,11 +40,8 @@ public class App {
 		// Similarly, we only consider 7 corners.
 //		long[] cornerSumList = new long[2 * corners];
 
-		String[] subtitleEdges = new String[edges];
-		for (int i = 0; i < edges; i++) {
-			misorientedEdgesList[i] = 0; // Just in case.
-			subtitleEdges[i] = String.format("%02d", i) + " edges";
-		}
+		// Count how many times edge index j ended on index k.
+		long[][] finalPositions = new long[edges][edges];
 
 //		String[] subtitleCorners = new String[2 * corners];
 //		for (int i = 0; i < 2 * corners; i++) { // Corner sum might be up to 2, so, the *2 here.
@@ -53,7 +52,7 @@ public class App {
 		for (int i = 0; i < N; i++) {
 			System.out.println("Scramble: " + i);
 
-			String scramble = cube.generateScramble();
+			String scramble = cube.generateWcaScramble(new Random());
 
 			CubeState solved = cube.getSolvedState();
 			CubeState cubeState = (CubeState) solved.applyAlgorithm(scramble);
@@ -68,26 +67,28 @@ public class App {
 			if (hasParity(scramble)) {
 				parity++;
 			}
+
+			for (int j = 0; j < edges; j++) {
+				int finalPosition = getFinalPositionOfEdge(representation, j);
+				finalPositions[j][finalPosition]++;
+			}
 		}
 
-		long[] expectedEdges = Distribution.expectedEdgeOrientationDistribution(N);
-		
-		// MVP for histogram.
-		System.out.println("Histogram for edges, out of " + N);
-		histogram(N, misorientedEdgesList, subtitleEdges);
-
-//		System.out.println("\nHistogram for corners, out of " + N);
-//		histogram(N, cornerSumList, subtitleCorners);
-
-		System.out.println("\nParity cases: " + parity + "/" + N);
-
-		System.out.println("\nExpected distribution for edges.");
-		histogram(N, expectedEdges);
-		
 		ChiSquareTest cst = new ChiSquareTest();
-		double alpha = 0.05;
-		System.out.println(cst.chiSquareDataSetsComparison(misorientedEdgesList, expectedEdges));
-		boolean nullHipCanBeRejected = cst.chiSquareTestDataSetsComparison(misorientedEdgesList, expectedEdges, alpha);
-		System.out.println("Passed? " + !nullHipCanBeRejected);
+		double alpha = 0.01;
+
+		long[] expectedEdges = Distribution.expectedEdgesOrientationDistribution(N);
+		boolean randomEOCanBeRejected = cst.chiSquareTestDataSetsComparison(misorientedEdgesList, expectedEdges, alpha);
+		System.out.println("Random EO? " + !randomEOCanBeRejected);
+
+		boolean edgesRandomPosition = true;
+		long[] expectedEdgesFinalPosition = Distribution.expectedEdgesFinalPosition(N);
+		for (long[] item : finalPositions) {
+			if (cst.chiSquareTestDataSetsComparison(expectedEdgesFinalPosition, item, alpha)) {
+				edgesRandomPosition = false;
+			}
+		}
+		System.out.println("Edges in random position? " + edgesRandomPosition);
 	}
+
 }

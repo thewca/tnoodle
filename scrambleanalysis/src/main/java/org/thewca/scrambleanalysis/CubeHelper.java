@@ -1,5 +1,7 @@
 package org.thewca.scrambleanalysis;
 
+import java.util.Arrays;
+
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 
@@ -8,11 +10,17 @@ public class CubeHelper {
 
 	private static char[] ALLOWED = { 'U', 'R', 'F', 'D', 'L', 'B' };
 
+	private static final int edges = 12;
 	private static final int central = 4; // Index 4 represents the central sticker;
 	private static final int stickersPerFace = 9;
 
 	// Refer to toFaceCube representation.
-	// For DB edge orientation, we only care about U/D, Equator F/B.
+	// For FB edge orientation, we only care about edges on U/D, Equator F/B.
+	// Also, this sets an order to edges, which will be reused
+	// UB, UL, UR, UF
+	// DF, DL, DR, DB
+	// FL, FR
+	// BR, BL
 	private static final int[] edgesIndex = { 1, 3, 5, 7, // U edges index
 			28, 30, 32, 34, // D edges index
 			21, 23, // Equator front
@@ -27,6 +35,9 @@ public class CubeHelper {
 			14, 39 // Attached to Equator back
 	};
 
+	// Again, an order to corners
+	// UBL, UBR, UFL, UFR,
+	// DFL, DFR, DBL, DBR
 	private static final int[] cornersIndex = { 0, 2, 6, 8, // U corners
 			27, 29, 33, 35 }; // D corners
 	private static final int[] cornersIndexClockWise = { 36, 45, 18, 9, // U twist clockwise
@@ -42,7 +53,7 @@ public class CubeHelper {
 	 * @return
 	 * @throws RepresentationException
 	 */
-	
+
 	public static int countMisorientedEdges(String representation) throws RepresentationException {
 		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
 
@@ -98,7 +109,7 @@ public class CubeHelper {
 
 		throw new RepresentationException();
 	}
-	
+
 	public static int countMisorientedEdgesIgnoringUB(String representation) throws RepresentationException {
 		int result = countMisorientedEdges(representation);
 		int sticker = 1; // U of the UB edge. Actually, any edge would do it.
@@ -187,5 +198,127 @@ public class CubeHelper {
 		}
 
 		return sum % 2 == 1;
+	}
+
+	// Actually, these next 2 methods did not need to be public, but it's for
+	// consistency with the
+	// getFinalLocationOfEdheSticker method.
+	public int[] getEdgesIndex() {
+		return edgesIndex;
+	}
+
+	public int[] getAttachedEdgesIndex() {
+		return attachedEdgesIndex;
+	}
+
+	/**
+	 * Given a representation of a cube and the initial position of an edge (when
+	 * solved), returns the final index position of that edge. The UB sticker is the
+	 * first one on a toFaceCube representation, so call this 0 (index). Consider a
+	 * U applied to a solved cube and let's call this repr. UB goes to UR, which is
+	 * the 3rd edge in a representation (solved).
+	 * getFinalLocationOfEdgeSticker(repr, 0) returns 2, which is 3rd sticker (0
+	 * based).
+	 * 
+	 * UF is initially the 4th edge, so index 3. When an F is applied it goes to RF,
+	 * which is the 6th edge on the toFaceCube representation, so this returns 5.
+	 * 
+	 * @param representation: the final representation of a cube.
+	 * @param i:              the index, when solved, of a edge (0 for UB or BU, 1
+	 *                        for UL or LU, 3 for UR...
+	 * @return: If the final position of a sticker is in UB (either U or B), it
+	 *          returns 0 (which is the index of UB in edgesIndex or
+	 *          attachedEdgesIndex). If the final position of a sticker is in UL
+	 *          (either U or L), it returns 1 (which is the index of UL in
+	 *          edgesIndex). etc.
+	 * @throws RepresentationException 
+	 */
+	public static int getFinalPositionOfEdge(String representation, int i) throws RepresentationException {
+		// Here, we are reusing the position of edges mentioned above.
+
+		if (representation.length() != 54) {
+			throw new IllegalArgumentException("Representation size must be 54.");
+		}
+		if (i < 0 || i > 11) {
+			throw new IllegalArgumentException("Make sure 0 <= i <= 11.");
+		}
+
+		int initialEdgeIndex = edgesIndex[i];
+		int initialAttachedIndex = attachedEdgesIndex[i];
+
+		char initialColor = representation.charAt(central + initialEdgeIndex / stickersPerFace * stickersPerFace);
+		char initialAttachedColor = representation.charAt(central + initialAttachedIndex / stickersPerFace * stickersPerFace);
+
+		for (int j = 0; j < edges; j++) {
+			char color = representation.charAt(edgesIndex[j]);
+			char attachedColor = representation.charAt(attachedEdgesIndex[j]);
+			
+			if (color == initialColor && attachedColor == initialAttachedColor) {
+				return j;
+			}
+			if (color == initialAttachedColor && attachedColor == initialColor) {
+				return j;
+			}
+		}
+
+		throw new RepresentationException();
+	}
+	
+	public static int getFinalPositionOfCorner(String representation, int i) throws RepresentationException {
+		// Here, we are reusing the position of edges mentioned above.
+
+		if (representation.length() != 54) {
+			throw new IllegalArgumentException("Representation size must be 54.");
+		}
+		if (i < 0 || i > 11) {
+			throw new IllegalArgumentException("Make sure 0 <= i <= 7.");
+		}
+
+		int initialEdgeIndex = edgesIndex[i];
+		int initialAttachedIndex = attachedEdgesIndex[i];
+
+		char initialColor = representation.charAt(central + initialEdgeIndex / stickersPerFace * stickersPerFace);
+		char initialAttachedColor = representation.charAt(central + initialAttachedIndex / stickersPerFace * stickersPerFace);
+
+		for (int j = 0; j < edges; j++) {
+			char color = representation.charAt(edgesIndex[j]);
+			char attachedColor = representation.charAt(attachedEdgesIndex[j]);
+			
+			if (color == initialColor && attachedColor == initialAttachedColor) {
+				return j;
+			}
+			if (color == initialAttachedColor && attachedColor == initialColor) {
+				return j;
+			}
+		}
+
+		throw new RepresentationException();
+	}
+	
+	/**
+	 * Give two string, compares them ignoring order of chars.
+	 * UFR == FRU = FRU
+	 * @param st1
+	 * @param st2
+	 * @return
+	 */
+	private boolean stringCompareIgnoringOrder(String st1, String st2) {
+		if (st1.length() != st2.length()) {
+			return false;
+		}
+
+		char[] chars1 = st1.toCharArray();
+		char[] chars2 = st1.toCharArray();
+		
+		Arrays.sort(chars1);
+		Arrays.sort(chars2);
+		
+		for (int i=0; i<st1.length(); i++) {
+			if (chars1[i] != chars2[i]) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

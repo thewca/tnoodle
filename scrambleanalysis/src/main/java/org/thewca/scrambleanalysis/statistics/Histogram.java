@@ -1,7 +1,7 @@
 package org.thewca.scrambleanalysis.statistics;
 
 public class Histogram {
-	public static void histogram(long N, long[] array, String[] subtitle) {
+	public static void histogram(long[] array, String[] subtitle) {
 
 		long numberOfChars = 100;
 		char theChar = '#';
@@ -30,12 +30,12 @@ public class Histogram {
 		}
 	}
 
-	public static void histogram(long N, long[] array) {
+	public static void histogram(long[] array) {
 		String[] subtitle = new String[array.length];
 		for (int i = 0; i < array.length; i++) {
 			subtitle[i] = "";
 		}
-		histogram(N, array, subtitle);
+		histogram(array, subtitle);
 	}
 
 }
