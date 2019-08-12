@@ -1,15 +1,14 @@
 package org.thewca.scrambleanalysis;
 
+import static org.thewca.scrambleanalysis.CubeTest.testScrambles;
+
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
-
-import static org.thewca.scrambleanalysis.CubeTest.testScrambles;
 
 public class App {
 
@@ -22,8 +21,8 @@ public class App {
 
 		ArrayList<String> scrambles = new ArrayList<String>();
 
-//		String fileName = "randomMovesScrambles.txt";
-		String fileName = "randomStateScrambles.txt";
+		String fileName = "randomMovesScrambles.txt";
+//		String fileName = "randomStateScrambles.txt";
 		File file = new File(fileName);
 		try {
 			Scanner input = new Scanner(file);
@@ -48,8 +47,6 @@ public class App {
 		}*/
 
 		testScrambles(scrambles);
-//		for (String scramble : scrambles) {
-//			System.out.println(scramble);
-//		}
+		
 	}
 }

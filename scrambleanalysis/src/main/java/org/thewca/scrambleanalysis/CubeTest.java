@@ -93,7 +93,7 @@ public class CubeTest {
 		ChiSquareTest cst = new ChiSquareTest();
 		double alpha = 0.01;
 
-		long[] expectedEdges = Distribution.expectedEdgesOrientation(N);
+		long[] expectedEdges = Distribution.estimatedEdgesOrientation(N);
 		boolean randomEO = !cst.chiSquareTestDataSetsComparison(misorientedEdgesList, expectedEdges, alpha);
 		System.out.println("Random EO? " + randomEO);
 

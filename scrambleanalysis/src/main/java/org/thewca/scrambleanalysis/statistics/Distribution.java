@@ -1,8 +1,8 @@
 package org.thewca.scrambleanalysis.statistics;
 
 import static org.thewca.scrambleanalysis.statistics.Histogram.histogram;
-
-import java.util.Random;
+import static org.thewca.scrambleanalysis.utils.Math.factorial;
+import static org.thewca.scrambleanalysis.utils.Math.nCp;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
@@ -10,8 +10,6 @@ public class Distribution {
 
 	private static final int edges = 12;
 	private static final int corners = 8;
-
-	private static final Random random = new Random();
 
 	/**
 	 * Remember that we do not count 1 edge (as it depends on the others).
@@ -42,7 +40,7 @@ public class Distribution {
 	// Here we generate the expected array distribution for edge sum.
 	// Perhaps this could be calculated, but it's kind of tricky, since the last
 	// edge orientation depends on the others.
-	public static long[] expectedEdgesOrientation(int N) {
+	public static long[] estimatedEdgesOrientation(int N) {
 
 		long[] array = new long[edges / 2 + 1];
 
@@ -57,16 +55,43 @@ public class Distribution {
 		return array;
 	}
 
-	public static void expectedEdgesOrientationHistogram(long N) {
-		long[] array = expectedEdgesOrientationDistribution(N);
+	/**
+	 * 
+	 * @return An array whose size is 7. On the index 0, the chance of 0 pairs
+	 *         oriented; on the index 1, the probability for 1 misoriented pair; on
+	 *         the index 2, the probability for 2 misoriented pairs;
+	 */
+	public static double[] expectedEdgesOrientationProbability() {
+		long[] array = new long[7];
 
-		String[] subtitle = new String[edges];
+		long total = 0L;
 
-		for (int i = 0; i < edges; i++) {
-			subtitle[i] = String.format("%02d", i) + " edges";
+		for (long i = 0; i <= 6; i++) {
+			long result = 1L;
+
+			// Select where the misoriented edges will be placed
+			result *= nCp(12L, 2 * i);
+
+			// Select which edges (colors) will be placed on the selected misoriented spots.
+			result *= nCp(12L, 2 * i);
+
+			// Place the selected edges
+			result *= factorial(2 * i);
+
+			// Place the remaining
+			result *= factorial(12 - 2 * i);
+
+			array[(int) i] = result;
+
+			total += result;
+			System.out.println("\nTotal: " + total + "\n");
 		}
 
-		histogram(array, subtitle);
+		double[] expected = new double[7];
+		for (int i = 0; i < 7; i++) {
+			expected[i] = 1.0 * array[i] / total;
+		}
+		return expected;
 	}
 
 	public static long[] expectedEdgesFinalPosition(long N) {
