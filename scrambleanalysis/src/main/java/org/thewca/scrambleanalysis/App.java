@@ -1,52 +1,26 @@
 package org.thewca.scrambleanalysis;
 
 import static org.thewca.scrambleanalysis.CubeTest.testScrambles;
+import static org.thewca.scrambleanalysis.ScrambleProvider.readStubRandomMovesScrambles;
+import static org.thewca.scrambleanalysis.ScrambleProvider.readStubRandomStateScrambles;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
 import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 
 public class App {
 
 	public static void main(String[] args)
-			throws InvalidScrambleException, RepresentationException, InvalidMoveException {
+			throws InvalidScrambleException, RepresentationException, InvalidMoveException, IOException {
 
-		int N = 500;
+		ArrayList<String> scramblesRandomState = readStubRandomStateScrambles();
+		ArrayList<String> scramblesRandomMoves = readStubRandomMovesScrambles();
 
-		ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
-
-		ArrayList<String> scrambles = new ArrayList<String>();
-
-		String fileName = "randomMovesScrambles.txt";
-//		String fileName = "randomStateScrambles.txt";
-		File file = new File(fileName);
-		try {
-			Scanner input = new Scanner(file);
-
-			while (input.hasNextLine()) {
-				String scramble = input.nextLine();
-				if (scramble.length() > 0) {
-					scrambles.add(scramble);					
-				}
-			}
-			input.close();
-		} catch (Exception e) {
-
-		}
-
-/*		Random random = new Random();
-		for (int i = 0; i < N; i++) {
-			System.out.println("Generating scramble " + (i + 1) + "/" + N);
-			String scramble = cube.generateWcaScramble(random);
-			System.out.println(scramble);
-			scrambles.add(scramble);
-		}*/
-
-		testScrambles(scrambles);
+		boolean passed = testScrambles(scramblesRandomMoves);
+		
+		System.out.println("\nPassed? "+passed);
 		
 	}
 }

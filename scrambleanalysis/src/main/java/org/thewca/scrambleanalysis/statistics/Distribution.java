@@ -1,6 +1,5 @@
 package org.thewca.scrambleanalysis.statistics;
 
-import static org.thewca.scrambleanalysis.statistics.Histogram.histogram;
 import static org.thewca.scrambleanalysis.utils.Math.factorial;
 import static org.thewca.scrambleanalysis.utils.Math.nCp;
 
@@ -11,35 +10,10 @@ public class Distribution {
 	private static final int edges = 12;
 	private static final int corners = 8;
 
-	/**
-	 * Remember that we do not count 1 edge (as it depends on the others).
-	 * 
-	 * @param N, the number scrambles.
-	 * @return An array of Long containing the expected number of misoriented edges
-	 *         in N scrambles. Position 0 is for 0 edges; position 1 is for 1 edge,
-	 *         etc.
-	 */
-	public static long[] expectedEdgesOrientationDistribution(long N) {
-
-		// TODO add a limit for N. This should be big enough so N*p still fit long.
-		// Also, N >= 2048.
-
-		double prob = 0.5;
-		long[] array = new long[edges]; // From 0 to 11 possible edges, it's still 12 options.
-
-		// Remember: last edge depends on the others.
-		BinomialDistribution bd = new BinomialDistribution(edges - 1, prob);
-
-		for (int i = 0; i < edges; i++) {
-			array[i] = Math.round(bd.probability(i) * N);
-		}
-
-		return array;
-	}
-
 	// Here we generate the expected array distribution for edge sum.
 	// Perhaps this could be calculated, but it's kind of tricky, since the last
 	// edge orientation depends on the others.
+	@Deprecated
 	public static long[] estimatedEdgesOrientation(int N) {
 
 		long[] array = new long[edges / 2 + 1];
@@ -84,7 +58,6 @@ public class Distribution {
 			array[(int) i] = result;
 
 			total += result;
-			System.out.println("\nTotal: " + total + "\n");
 		}
 
 		double[] expected = new double[7];
