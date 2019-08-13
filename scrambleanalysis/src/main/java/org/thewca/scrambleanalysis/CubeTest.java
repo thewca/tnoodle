@@ -5,13 +5,16 @@ import static org.thewca.scrambleanalysis.CubeHelper.countMisorientedEdges;
 import static org.thewca.scrambleanalysis.CubeHelper.getFinalPositionOfCorner;
 import static org.thewca.scrambleanalysis.CubeHelper.getFinalPositionOfEdge;
 import static org.thewca.scrambleanalysis.CubeHelper.hasParity;
+import static org.thewca.scrambleanalysis.statistics.Distribution.expectedCornersFinalPosition;
+import static org.thewca.scrambleanalysis.statistics.Distribution.expectedCornersOrientationProbability;
+import static org.thewca.scrambleanalysis.statistics.Distribution.expectedEdgesFinalPosition;
+import static org.thewca.scrambleanalysis.statistics.Distribution.expectedEdgesOrientationProbability;
 
 import java.util.ArrayList;
 
+import org.apache.commons.math3.stat.inference.AlternativeHypothesis;
+import org.apache.commons.math3.stat.inference.BinomialTest;
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
-import static org.thewca.scrambleanalysis.statistics.Distribution.expectedEdgesOrientationProbability;
-import static org.thewca.scrambleanalysis.statistics.Distribution.expectedEdgesFinalPosition;
-import static org.thewca.scrambleanalysis.statistics.Distribution.expectedCornersFinalPosition;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
@@ -30,20 +33,13 @@ public class CubeTest {
 
 		ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
 
-		long parity = 0;
-
-		// New approach for corners.
-		// For each corner, we check if its orientation is
-		// Oriented -> 0
-		// Clock wise -> 1
-		// Counter clockwise -> 2
-		// Then we check the randomness of corners[i][j].
-//		long[][] cornersOrientation = new long[corners][3];
-
+		long[] misorientedEdgesList = new long[7];
 		long[][] finalEdgesPosition = new long[edges][edges];
+
+		long[] misorientedCornersList = new long[6]; // Sum is 0, 3, 6, ..., 15.
 		long[][] finalCornersPosition = new long[corners][corners];
 
-		long[] misorientedEdgesList = new long[edges / 2 + 1];
+		int parity = 0;
 
 		for (int i = 0; i < N; i++) {
 
@@ -57,10 +53,7 @@ public class CubeTest {
 			int cornerSum = cornerOrientationSum(representation);
 
 			misorientedEdgesList[misorientedEdges / 2]++;
-
-			if (hasParity(scramble)) {
-				parity++;
-			}
+			misorientedCornersList[cornerSum / 3]++;
 
 			for (int j = 0; j < edges; j++) {
 				int finalPosition = getFinalPositionOfEdge(representation, j);
@@ -70,11 +63,11 @@ public class CubeTest {
 			for (int j = 0; j < corners; j++) {
 				int finalPosition = getFinalPositionOfCorner(representation, j);
 				finalCornersPosition[j][finalPosition]++;
-
-//			 int orientationNumber = getCornerOrientationNumber(representation, j);
-//			 cornersOrientation[j][orientationNumber]++;
 			}
 
+			if (hasParity(scramble)) {
+				parity++;
+			}
 		}
 
 		ChiSquareTest cst = new ChiSquareTest();
@@ -93,7 +86,11 @@ public class CubeTest {
 			}
 		}
 		System.out.println("Edges in random position? " + edgesRandomPosition);
-		
+
+		double[] expectedCorners = expectedCornersOrientationProbability();
+		boolean randomCO = !cst.chiSquareTest(expectedCorners, misorientedCornersList, alpha);
+		System.out.println("Random CO? " + randomCO);
+
 		boolean cornersRandomPosition = true;
 		long[] expectedCornersFinalPosition = expectedCornersFinalPosition(N);
 		for (long[] item : finalCornersPosition) {
@@ -102,9 +99,14 @@ public class CubeTest {
 				break;
 			}
 		}
-		System.out.println("\nCorners in random position? " + cornersRandomPosition);
-		
-		return randomEO && edgesRandomPosition && cornersRandomPosition;
+		System.out.println("Corners in random position? " + cornersRandomPosition);
+
+		BinomialTest bt = new BinomialTest();
+		double probability = 0.5;
+		boolean randomParity = !bt.binomialTest(N, parity, probability, AlternativeHypothesis.TWO_SIDED, alpha);
+		System.out.println("Random parity? " + randomParity);
+
+		return randomEO && edgesRandomPosition && randomCO && cornersRandomPosition && randomParity;
 	}
 
 }

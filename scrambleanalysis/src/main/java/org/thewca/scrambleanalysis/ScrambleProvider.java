@@ -42,6 +42,7 @@ public class ScrambleProvider {
 		return getScrambles(fileName);
 	}
 
+	// This is the main test
 	public static ArrayList<String> generateWcaScrambles(int N) {
 
 		Random random = new Random();
@@ -51,7 +52,6 @@ public class ScrambleProvider {
 
 		for (int i = 0; i < N; i++) {
 
-			// Add quiet?
 			System.out.println("Generating scramble " + (i + 1) + "/" + N);
 			String scramble = cube.generateWcaScramble(random);
 			scrambles.add(scramble);
