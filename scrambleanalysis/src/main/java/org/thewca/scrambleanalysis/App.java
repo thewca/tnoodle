@@ -1,10 +1,5 @@
 package org.thewca.scrambleanalysis;
 
-import static org.thewca.scrambleanalysis.CubeTest.testScrambles;
-import static org.thewca.scrambleanalysis.ScrambleProvider.readStubRandomMovesScrambles;
-import static org.thewca.scrambleanalysis.ScrambleProvider.readStubRandomStateScrambles;
-import static org.thewca.scrambleanalysis.ScrambleProvider.generateWcaScrambles;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,20 +10,17 @@ public class App {
 
 	public static void main(String[] args)
 			throws InvalidScrambleException, RepresentationException, InvalidMoveException, IOException {
+		
+		// ArrayList<String> scrambles = ScrambleProvider.getScrambles(fileName);
+		// Then run boolean passed = testScrambles(scrambles);
+		// to test your set of scrambles
 
-		ArrayList<String> scramblesRandomMoves = readStubRandomMovesScrambles();
-		ArrayList<String> scramblesRandomState = readStubRandomStateScrambles();
+		
+		
+		// Uncomment the following to test randomness of the generated scrambles.
 
-		boolean randomMovesPassed = testScrambles(scramblesRandomMoves);
-		System.out.println("Random moves passed? " + randomMovesPassed);
-		
-		System.out.println("");
-		
-		boolean randomStateWcaPassed = testScrambles(scramblesRandomState);
-		System.out.println("Random state passed? " + randomStateWcaPassed);
-		
-		ArrayList<String> scrambles = generateWcaScrambles(2048);
-		boolean passed = testScrambles(scrambles);
+		ArrayList<String> scrambles = ScrambleProvider.generateWcaScrambles(2200);
+		boolean passed = CubeTest.testScrambles(scrambles);
 		System.out.println("\nMain test passed? " + passed);
 
 	}

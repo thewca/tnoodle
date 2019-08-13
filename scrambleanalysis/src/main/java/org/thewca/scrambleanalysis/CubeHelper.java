@@ -52,10 +52,9 @@ public class CubeHelper {
 	 * Count misoriented edges considering the FB axis.
 	 * 
 	 * @param cubeState
-	 * @return
+	 * @return the number of misoriented edges in a cube.
 	 * @throws RepresentationException
 	 */
-
 	public static int countMisorientedEdges(String representation) throws RepresentationException {
 		assert representation.length() == 54 : "Expected size: 54 = 6x9 stickers. Use cubeState.toFaceCube().";
 
@@ -79,10 +78,10 @@ public class CubeHelper {
 
 		char uColor = representation.charAt(central + 0 * stickersPerFace);
 		char rColor = representation.charAt(central + 1 * stickersPerFace);
-		char fColor = representation.charAt(central + 2 * stickersPerFace);
+		// char fColor = representation.charAt(central + 2 * stickersPerFace);
 		char dColor = representation.charAt(central + 3 * stickersPerFace);
 		char lColor = representation.charAt(central + 4 * stickersPerFace);
-		char bColor = representation.charAt(central + 5 * stickersPerFace);
+		// char bColor = representation.charAt(central + 5 * stickersPerFace);
 
 		color = representation.charAt(edgesIndex[index]);
 		attachedColor = representation.charAt(attachedEdgesIndex[index]);

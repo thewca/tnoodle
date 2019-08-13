@@ -10,7 +10,7 @@ import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
 
 public class ScrambleProvider {
 
-	private static ArrayList<String> getScrambles(String fileName) throws IOException {
+	public static ArrayList<String> getScrambles(String fileName) throws IOException {
 
 		ArrayList<String> scrambles = new ArrayList<String>();
 
@@ -32,16 +32,6 @@ public class ScrambleProvider {
 		return scrambles;
 	}
 
-	public static ArrayList<String> readStubRandomMovesScrambles() throws IOException {
-		String fileName = "randomMovesScrambles.txt";
-		return getScrambles(fileName);
-	}
-
-	public static ArrayList<String> readStubRandomStateScrambles() throws IOException {
-		String fileName = "randomStateScrambles.txt";
-		return getScrambles(fileName);
-	}
-
 	// This is the main test
 	public static ArrayList<String> generateWcaScrambles(int N) {
 
@@ -52,7 +42,10 @@ public class ScrambleProvider {
 
 		for (int i = 0; i < N; i++) {
 
-			System.out.println("Generating scramble " + (i + 1) + "/" + N);
+			// Give some status to the user
+			if (i%1000 == 0) {
+				System.out.println("Generating scramble " + (i + 1) + "/" + N);
+			}
 			String scramble = cube.generateWcaScramble(random);
 			scrambles.add(scramble);
 		}
