@@ -2,8 +2,6 @@ package org.thewca.scrambleanalysis.utils;
 
 public class MathUtils {
 	
-	// TODO: limit
-	
 	public static long nCp(long n, long p) {
 		return factorial(n) / factorial(p) / factorial(n - p);
 	}

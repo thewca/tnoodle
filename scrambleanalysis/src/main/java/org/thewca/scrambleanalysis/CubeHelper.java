@@ -131,11 +131,9 @@ public class CubeHelper {
 			return 1;
 		} else if (stickerCounterClockWise == uColor || stickerCounterClockWise == dColor) {
 			return 2;
-		} else {
-			throw new RepresentationException();
 		}
+		throw new RepresentationException();
 	}
-
 
 	/**
 	 * Sum of corner orientation. 0 for oriented, 1 for clockwise, 2 for counter

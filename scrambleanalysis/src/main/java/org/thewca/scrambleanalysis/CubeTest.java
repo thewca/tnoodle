@@ -19,6 +19,8 @@ import org.thewca.scrambleanalysis.statistics.Distribution;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
+import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
+import net.gnehzr.tnoodle.scrambles.InvalidScrambleException;
 
 public class CubeTest {
 
@@ -26,13 +28,13 @@ public class CubeTest {
 	private static final int corners = 8;
 
 	public static boolean testScrambles(ArrayList<String> scrambles)
-			throws Exception {
+			throws InvalidScrambleException, RepresentationException, InvalidMoveException {
 
 		int N = scrambles.size();
-		
+
 		long minimumSampleSize = Distribution.minimumSampleSize();
 		if (N < Distribution.minimumSampleSize()) {
-			throw new Exception("Minimum sample size is " + minimumSampleSize);
+			throw new IllegalArgumentException("Minimum sample size is " + minimumSampleSize);
 		}
 
 		ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
