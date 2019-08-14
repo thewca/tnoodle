@@ -2,7 +2,7 @@ package org.thewca.scrambleanalysis.utils;
 
 import java.util.Arrays;
 
-public class Utils {
+public class StringUtils {
 	
 	/**
 	 * Give two string, compares them ignoring order of chars.

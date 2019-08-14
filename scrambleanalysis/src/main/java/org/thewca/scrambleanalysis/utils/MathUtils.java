@@ -1,6 +1,6 @@
 package org.thewca.scrambleanalysis.utils;
 
-public class Math {
+public class MathUtils {
 	
 	// TODO: limit
 	

@@ -1,6 +1,6 @@
 package org.thewca.scrambleanalysis.statistics;
 
-import static org.thewca.scrambleanalysis.utils.Math.nCp;
+import static org.thewca.scrambleanalysis.utils.MathUtils.nCp;
 
 public class Distribution {
 
@@ -108,13 +108,14 @@ public class Distribution {
 	public static long minimumSampleSize() {
 		long min = 0;
 
-		// Actually, this is fixed to 2187, but it's nice to have a way to know where
+		// Actually, this is fixed to 6561, but it's nice to have a way to know where
 		// does this comes from.
 
-		// Minimum number required so we have at least 1 expected result for edge.
+		// Minimum number required so we have at least 3 expected result for edges or corners.
+		// Some places say we must have at least 3 results.
 		double[] expectedEdges = expectedEdgesOrientationProbability();
 		for (double item : expectedEdges) {
-			long number = Math.round(1.0 / item);
+			long number = Math.round(3.0 / item);
 			min = Math.max(number, min);
 		}
 

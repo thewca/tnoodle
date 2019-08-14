@@ -1,6 +1,6 @@
 package org.thewca.scrambleanalysis;
 
-import static org.thewca.scrambleanalysis.utils.Utils.stringCompareIgnoringOrder;
+import static org.thewca.scrambleanalysis.utils.StringUtils.stringCompareIgnoringOrder;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;

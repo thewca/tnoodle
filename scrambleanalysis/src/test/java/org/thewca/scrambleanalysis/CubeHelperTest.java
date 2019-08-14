@@ -24,9 +24,6 @@ public class CubeHelperTest {
 	ThreeByThreeCubePuzzle cube = new ThreeByThreeCubePuzzle();
 	Logger logger = Logger.getLogger(CubeHelperTest.class.getName());
 
-	public CubeHelperTest() {
-	}
-
 	@Test
 	public void orientationTest() throws InvalidScrambleException, RepresentationException, InvalidMoveException {
 		int n = 1;
