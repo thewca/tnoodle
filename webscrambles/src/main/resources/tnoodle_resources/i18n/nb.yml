@@ -1,7 +1,7 @@
 nb:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Blanding %{scrambleIndex} av %{scrambleCount}'
+        scrambleXofY: "Blanding %{scrambleIndex} av %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Blanding
         #original_hash: ec7b598
@@ -20,6 +20,8 @@ nb:
         result: Resultat
         #original_hash: 1917f4f
         competition: Konkurranse
+        #original_hash: ca817e3
+        registrantId: ID de inscrição
         #original_hash: 49debdc
         rule1: Du har 60 minutter på å finne og skrive ned en løsning.
         #original_hash: 8b6b48b

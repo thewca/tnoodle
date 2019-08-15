@@ -1,7 +1,7 @@
 et:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Segamine %{scrambleIndex} / %{scrambleCount}'
+        scrambleXofY: "Segamine %{scrambleIndex} / %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Segamine
         #original_hash: ec7b598
@@ -11,7 +11,7 @@ et:
         #original_hash: 4705687
         competitor: Võistleja
         #original_hash: 220a57b
-        warning: 'ÄRA TÄIDA, KUI OLED VÕISTLEJA.'
+        warning: "ÄRA TÄIDA, KUI OLED VÕISTLEJA."
         #original_hash: 0263083
         event: Vähimad käigud
         #original_hash: 960085a
@@ -20,6 +20,8 @@ et:
         result: Tulemus
         #original_hash: 1917f4f
         competition: Võistlus
+        #original_hash: ca817e3
+        registrantId: Registreerija ID
         #original_hash: 49debdc
         rule1: Teil on 60 minutit lahenduskäigu leidmiseks ja kirjapanekuks.
         #original_hash: 8b6b48b

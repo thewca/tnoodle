@@ -1,7 +1,7 @@
 id:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Scramble %{scrambleIndex} dari %{scrambleCount}'
+        scrambleXofY: "Scramble %{scrambleIndex} dari %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Scramble
         #original_hash: ec7b598
@@ -20,12 +20,14 @@ id:
         result: Hasil
         #original_hash: 1917f4f
         competition: Kompetisi
+        #original_hash: ca817e3
+        registrantId: ID Pendaftar
         #original_hash: 49debdc
         rule1: >-
             Anda memiliki waktu 60 menit untuk mencari dan menuliskan solusi
             Anda.
         #original_hash: 8b6b48b
-        rule2: 'Tulis 1 gerakan per garis. Untuk menghapus gerakan, coret saja.'
+        rule2: "Tulis 1 gerakan per garis. Untuk menghapus gerakan, coret saja."
         #original_hash: 7822590
         rule3: >-
             Solusi Anda tidak boleh didapatkan secara langsung dari bagian

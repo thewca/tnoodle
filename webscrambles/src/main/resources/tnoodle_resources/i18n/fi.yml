@@ -20,6 +20,8 @@ fi:
         result: Tulos
         #original_hash: 1917f4f
         competition: Kilpailu
+        #original_hash: ca817e3
+        registrantId: Kilpailijan ID
         #original_hash: 49debdc
         rule1: Sinulla on 60 minuuttia aikaa löytää ja kirjoittaa ratkaisu.
         #original_hash: 8b6b48b

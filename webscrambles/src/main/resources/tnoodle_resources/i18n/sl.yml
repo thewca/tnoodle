@@ -1,7 +1,7 @@
 sl:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Mešalni algoritem %{scrambleIndex} od %{scrambleCount}'
+        scrambleXofY: "Mešalni algoritem %{scrambleIndex} od %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Mešalni algoritem
         #original_hash: ec7b598
@@ -20,8 +20,10 @@ sl:
         result: Rezultat
         #original_hash: 1917f4f
         competition: Tekmovanje
+        #original_hash: ca817e3
+        registrantId: Registracijski ID
         #original_hash: 49debdc
-        rule1: 'Na voljo je 60 minut, da se najde in zapiše rešitev.'
+        rule1: "Na voljo je 60 minut, da se najde in zapiše rešitev."
         #original_hash: 8b6b48b
         rule2: >-
             Na vsako črtico zapišite 1 potezo. Za izbris poteze jo jasno

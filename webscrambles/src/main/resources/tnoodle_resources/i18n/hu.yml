@@ -1,7 +1,7 @@
 hu:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: '%{scrambleIndex}. / %{scrambleCount} keverés'
+        scrambleXofY: "%{scrambleIndex}. / %{scrambleCount} keverés"
         #original_hash: b7126cd
         scramble: Keverés
         #original_hash: ec7b598
@@ -11,7 +11,7 @@ hu:
         #original_hash: 4705687
         competitor: Versenyző
         #original_hash: 220a57b
-        warning: 'NE TÖLTSD KI, HA VERSENYZŐ VAGY'
+        warning: "NE TÖLTSD KI, HA VERSENYZŐ VAGY"
         #original_hash: 0263083
         event: Fewest Moves
         #original_hash: 960085a
@@ -20,6 +20,8 @@ hu:
         result: Eredmény
         #original_hash: 1917f4f
         competition: Verseny
+        #original_hash: ca817e3
+        registrantId: Regisztrációs ID
         #original_hash: 49debdc
         rule1: 60 perced van egy megoldás megtalálására és leírására.
         #original_hash: 8b6b48b

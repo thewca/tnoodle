@@ -1,7 +1,7 @@
 it:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Scramble %{scrambleIndex} di %{scrambleCount}'
+        scrambleXofY: "Scramble %{scrambleIndex} di %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Scramble
         #original_hash: ec7b598
@@ -20,6 +20,8 @@ it:
         result: Risultato
         #original_hash: 1917f4f
         competition: Competizione
+        #original_hash: ca817e3
+        registrantId: ID partecipante
         #original_hash: 49debdc
         rule1: Hai 60 minuti per trovare e scrivere una soluzione.
         #original_hash: 8b6b48b
