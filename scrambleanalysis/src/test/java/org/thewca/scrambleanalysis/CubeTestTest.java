@@ -11,7 +11,9 @@ public class CubeTestTest {
 
 	private Random random = new Random();
 
-	@Test
+	// This checks if the main test fail for random moves, but there's a chance random moves passes.
+	// It would be awkward if someone in the future sends a change and this not related test fails travis.
+	//@Test
 	public void test() throws Exception {
 		// Test should fail for random moves, but there's a chance this gives a false
 		// positive.
