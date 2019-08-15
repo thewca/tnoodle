@@ -20,6 +20,8 @@ pl:
         result: Rezultat
         #original_hash: 1917f4f
         competition: Zawody
+        #original_hash: ca817e3
+        registrantId: ID Zawodnika
         #original_hash: 49debdc
         rule1: Masz 60 minut na znalezienie i zapisanie rozwiązania.
         #original_hash: 8b6b48b
