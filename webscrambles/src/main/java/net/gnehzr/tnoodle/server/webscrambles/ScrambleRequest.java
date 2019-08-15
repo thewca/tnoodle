@@ -667,6 +667,12 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
             list.add("");
             alignList.add(Element.ALIGN_LEFT);
         }
+        list.add(translate("fmc.registrantId", locale)+shortFill);
+        alignList.add(Element.ALIGN_LEFT);
+        if (withScramble) {
+            list.add("");
+            alignList.add(Element.ALIGN_LEFT);
+        }
         populateRect(cb, competitorInfoRect, list, alignList, bf, fontSize);
 
         // graded
@@ -867,7 +873,7 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         float x = rect.getLeft();
         float y = rect.getTop();
 
-        float height = totalHeight/(list.size());
+        float height = totalHeight/list.size();
 
         for (int i=0; i<list.size(); i++) {
             Rectangle temp = new Rectangle(x, y+height*i-totalHeight-fontSize, x+width, y+height*i-totalHeight);
