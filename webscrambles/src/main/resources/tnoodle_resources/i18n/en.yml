@@ -10,6 +10,7 @@ en:
         graded: Graded by
         result: Result
         competition: Competition
+        registrantId: Registrant ID
 
         rule1: You have 60 minutes to find and write a solution.
         rule2: Write 1 move per bar. To delete a move, clearly blacken it.
