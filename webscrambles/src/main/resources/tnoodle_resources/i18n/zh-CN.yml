@@ -20,6 +20,8 @@ zh-CN:
         result: 成绩
         #original_hash: 1917f4f
         competition: 比赛
+        #original_hash: ca817e3
+        registrantId: 编号
         #original_hash: 49debdc
         rule1: 你有一小时的时间寻找解法。
         #original_hash: 8b6b48b
