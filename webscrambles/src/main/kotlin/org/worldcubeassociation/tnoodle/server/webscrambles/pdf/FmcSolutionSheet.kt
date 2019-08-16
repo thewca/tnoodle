@@ -208,6 +208,12 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
             list.add("")
             alignList.add(Element.ALIGN_LEFT)
         }
+        list.add(Translate.translate("fmc.registrantId", locale) + shortFill)
+        alignList.add(Element.ALIGN_LEFT)
+        if (withScramble) {
+            list.add("")
+            alignList.add(Element.ALIGN_LEFT)
+        }
 
         cb.populateRect(competitorInfoRect, list, alignList, bf, fontSize)
 
