@@ -4,7 +4,7 @@ object Versions {
     val GWT = "2.5.1"
     val JUNIT_JUPITER = "5.4.2"
     val BATIK = "1.11"
-    val KOTLIN = "1.3.41"
+    val KOTLIN = "1.3.50"
     val KTOR = "1.2.0"
     val PROGUARD = "6.1.1"
 
