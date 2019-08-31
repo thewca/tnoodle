@@ -5,7 +5,7 @@ import dependencies.Libraries.JUNIT_JUPITER_API
 import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 import dependencies.Libraries.KOTLIN_ARGPARSER
 import dependencies.Libraries.KTOR_GSON
-import dependencies.Libraries.KTOR_SERVER_CIO
+import dependencies.Libraries.KTOR_SERVER_NETTY
 import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
 import dependencies.Libraries.LOGBACK_CLASSIC
 import dependencies.Libraries.NATIVE_TRAY_ADAPTER
@@ -22,13 +22,13 @@ plugins {
 }
 
 dependencies {
-    api(KTOR_SERVER_CIO)
+    api(KTOR_SERVER_NETTY)
     api(KTOR_GSON)
 
     implementation(KTOR_SERVER_HOST_COMMON)
 
     runtime(LOGBACK_CLASSIC)
-    
+
     implementation(KOTLIN_ARGPARSER)
 
     implementation(APPLEJAVAEXTENSIONS)
