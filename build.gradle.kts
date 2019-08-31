@@ -65,7 +65,7 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
 
     // cf. https://github.com/ktorio/ktor-samples/tree/master/other/proguard
     keep("class org.worldcubeassociation.tnoodle.server.** { *; }")
-    keep("class io.ktor.server.cio.CIO { *; }")
+    keep("class io.ktor.server.netty.Netty { *; }")
     keep("class kotlin.reflect.jvm.internal.** { *; }")
     keep("class kotlin.text.RegexOption { *; }")
 
@@ -73,6 +73,8 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
     keep("class org.apache.batik.css.parser.** { *; }")
     keep("class org.apache.batik.dom.** { *; }")
     keep("class com.itextpdf.text.ImgTemplate { *; }")
+
+    keep("class ch.qos.logback.core.FileAppender { *; }")
 
     keepclasseswithmembernames("""class * {
         native <methods>;

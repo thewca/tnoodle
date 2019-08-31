@@ -3,11 +3,10 @@ package org.worldcubeassociation.tnoodle.server
 import com.apple.eawt.Application
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
-import io.ktor.server.cio.CIO
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
-import io.ktor.util.KtorExperimentalAPI
+import io.ktor.server.netty.Netty
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.application.TNoodleBaseServer
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
@@ -36,7 +35,6 @@ object TNoodleServer {
 
     fun registerModule(app: ApplicationHandler) = SERVER_MODULES.add(app)
 
-    @KtorExperimentalAPI
     fun launch(cliArgs: Array<String>) {
         WebServerUtils.doFirstRunStuff()
 
@@ -82,7 +80,7 @@ object TNoodleServer {
             }
         }
 
-        embeddedServer(CIO, env).start()
+        embeddedServer(Netty, env).start()
 
         LOG.info("$NAME-$VERSION started")
 
