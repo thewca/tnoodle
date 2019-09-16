@@ -20,6 +20,8 @@ zh-TW:
         result: 成績
         #original_hash: 1917f4f
         competition: 比賽
+        #original_hash: ca817e3
+        registrantId: 比賽註冊ID
         #original_hash: 49debdc
         rule1: 您有60分鐘的時間尋找並寫出解法。
         #original_hash: 8b6b48b
@@ -27,7 +29,7 @@ zh-TW:
         #original_hash: 7822590
         rule3: 您寫出的解法不能由題目上的轉亂步驟衍生而來。
         #original_hash: 45551a7
-        rule4: '您的解法最多只能有%{maxMoves}步，包含整顆方塊旋轉。'
+        rule4: '您的解法最多只能有%{maxMoves}步，包含整顆方塊轉動。'
         #original_hash: 1ba5f27
         rule5: 您的成績將以外層轉動計數(OBTM)來計算。
         #original_hash: 42e1a95
@@ -35,7 +37,7 @@ zh-TW:
         #original_hash: dd22ec2
         faceMoves: 最外層轉動
         #original_hash: 57e9da1
-        rotations: 整顆方塊旋轉
+        rotations: 整顆方塊轉轉
         #original_hash: c75ac6f
         clockwise: 順時鐘90度
         #original_hash: 80fe739
