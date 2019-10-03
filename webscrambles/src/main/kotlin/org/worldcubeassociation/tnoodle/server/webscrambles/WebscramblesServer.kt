@@ -16,6 +16,11 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
 
 object WebscramblesServer : ApplicationHandler {
     override fun spinUp(app: Application) {
+        GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())
+        GsonUtil.registerTypeAdapter(PuzzleImageInfo::class.java, PuzzleImageInfoizer())
+
+        GsonUtil.registerTypeHierarchyAdapter(Puzzle::class.java, Puzzlerizer())
+
         app.routing {
             PuzzleListHandler.install(this)
             RouteRedirectHandler.install(this)
@@ -29,12 +34,7 @@ object WebscramblesServer : ApplicationHandler {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())
-        GsonUtil.registerTypeAdapter(PuzzleImageInfo::class.java, PuzzleImageInfoizer())
-
-        GsonUtil.registerTypeHierarchyAdapter(Puzzle::class.java, Puzzlerizer())
-
-        TNoodleServer.registerModule(WebscramblesServer)
+        TNoodleServer.registerModule(this)
 
         TNoodleServer.launch(args)
     }
