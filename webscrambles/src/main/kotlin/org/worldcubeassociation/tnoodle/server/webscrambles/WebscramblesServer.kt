@@ -28,7 +28,6 @@ class WebscramblesServer : ApplicationHandler {
     }
 
     companion object {
-        @KtorExperimentalAPI
         @JvmStatic
         fun main(args: Array<String>) {
             GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())
