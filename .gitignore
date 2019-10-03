@@ -19,3 +19,4 @@ TNoodle-WCA-*.jar
 tnoodle_resources/
 tnoodle_pruning_cache/
 **/logging/*.log
+.tnoodle

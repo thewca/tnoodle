@@ -10,8 +10,11 @@ import java.util.Random
 object WebServerUtils {
     val SDF = SimpleDateFormat("YYYY-mm-dd")
 
+    private val CONFIG_FILE = javaClass.getResourceAsStream("/.tnoodle")
+    private val CONFIG_DATA = CONFIG_FILE?.reader()?.readLines() ?: listOf()
+
     private val PRUNING_FOLDER = "tnoodle_pruning_cache"
-    private val DEVEL_VERSION = "devel"
+    private val DEVEL_VERSION = "devel-TEMP"
 
     /**
      * @return A File representing the directory in which this program resides.
@@ -66,13 +69,11 @@ object WebServerUtils {
         get() = jarFileOrDirectory.takeIf { it.isFile }
 
     val projectName: String
-        get() = System.getProperty("com.google.appengine.application.id").takeIf { it.isNotBlank() }
-            ?: javaClass.getPackage().implementationTitle
+        get() = CONFIG_DATA.getOrNull(0)
             ?: callerClass?.simpleName!!
 
     val version: String
-        get() = System.getProperty("com.google.appengine.application.version").takeIf { it.isNotBlank() }
-            ?: javaClass.getPackage().implementationVersion
+        get() = CONFIG_DATA.getOrNull(1)
             ?: DEVEL_VERSION
 
     val SEEDED_RANDOM: Random by lazy {
