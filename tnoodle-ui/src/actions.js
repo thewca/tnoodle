@@ -4,7 +4,7 @@ import tnoodle from 'TNoodleApi';
 import { parseActivityCode, getRound, formatToScrambleCount, checkJson } from 'WcaCompetitionJson';
 import indexToLetters from 'indexToLetters';
 
-let TNOODLE_BASE_URL = "http://localhost:2014";
+let TNOODLE_BASE_URL = window.location.origin;
 const scrambler = new tnoodle.Scrambler(TNOODLE_BASE_URL);
 
 export function fetchMe() {
