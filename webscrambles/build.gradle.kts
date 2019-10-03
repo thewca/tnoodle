@@ -56,7 +56,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClassName = "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
+    mainClassName = "org.worldcubeassociation.tnoodle.server.TNoodleServer"
 }
 
 configure<AppEngineStandardExtension> {
