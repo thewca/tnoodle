@@ -59,10 +59,17 @@ application {
     mainClassName = "org.worldcubeassociation.tnoodle.server.TNoodleServer"
 }
 
+val cloudVersion = project.findProperty("TNOODLE_VERSION") as? String
+    ?: "GCLOUD_CONFIG"
+
 configure<AppEngineStandardExtension> {
+    run {
+        projectId = "wca-scrambles-unofficial"
+        version = cloudVersion
+    }
     deploy {
         projectId = "wca-scrambles-unofficial"
-        version = "GCLOUD_CONFIG"
+        version = cloudVersion
     }
 }
 
