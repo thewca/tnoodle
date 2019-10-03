@@ -1,6 +1,8 @@
+import com.google.cloud.tools.gradle.appengine.core.GcloudTask
 import com.google.cloud.tools.gradle.appengine.standard.AppEngineStandardExtension
+import com.google.cloud.tools.gradle.appengine.standard.DevAppServerRunTask
 
-import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.CompilerSettings.KOTLIN_JVM_TARGE
 import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.BATIK_TRANSCODER
@@ -9,6 +11,7 @@ import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
 import dependencies.Plugins.GOOGLE_APPENGINE
+import org.gradle.internal.impldep.com.beust.jcommander.converters.InetAddressConverter
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
@@ -59,17 +62,13 @@ application {
     mainClassName = "org.worldcubeassociation.tnoodle.server.TNoodleServer"
 }
 
-val cloudVersion = project.findProperty("TNOODLE_VERSION") as? String
-    ?: "GCLOUD_CONFIG"
-
 configure<AppEngineStandardExtension> {
     run {
         projectId = "wca-scrambles-unofficial"
-        version = cloudVersion
     }
     deploy {
         projectId = "wca-scrambles-unofficial"
-        version = cloudVersion
+        version = "GCLOUD_CONFIG"
     }
 }
 
@@ -89,21 +88,19 @@ tasks.getByName("check") {
     dependsOn("i18nCheck")
 }
 
-tasks.create("registerManifest") {
-    tasks.withType<Jar> {
-        dependsOn("registerManifest")
+tasks.create("dumpVersionToFile") {
+    tasks.withType<ProcessResources> {
+        dependsOn("dumpVersionToFile")
     }
 
     doLast {
-        tasks.withType<Jar> {
-            manifest {
-                val version = project.findProperty("TNOODLE_VERSION") ?: "devel"
+        val tNoodleTitle = project.findProperty("TNOODLE_IMPL")
+            ?: "TNoodle-LOCAL"
 
-                attributes(
-                    "Implementation-Title" to "TNoodle-WCA",
-                    "Implementation-Version" to version
-                )
-            }
-        }
+        val tNoodleVersion = project.findProperty("TNOODLE_VERSION")
+            ?: "devel" // TODO git-hash
+
+        val fileDir = "$projectDir/src/main/resources/.tnoodle"
+        file(fileDir).writeText("$tNoodleTitle\n$tNoodleVersion")
     }
 }

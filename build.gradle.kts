@@ -28,6 +28,7 @@ val releasePrefix = "TNoodle-WCA"
 
 tasks.create("registerReleaseTag") {
     doFirst {
+        project.ext.set("TNOODLE_IMPL", releasePrefix)
         project.ext.set("TNOODLE_VERSION", project.version)
     }
 }
@@ -102,4 +103,14 @@ tasks.create<JavaExec>("startOfficialServer") {
 
 tasks.create("generateDebugRelease") {
     dependsOn(":webscrambles:shadowJar")
+}
+
+tasks.create("deployToCloud") {
+    dependsOn(getTasksByName("publishToMavenLocal", true))
+    dependsOn("registerReleaseTag", ":webscrambles:appengineDeploy")
+}
+
+tasks.create("emulateCloudLocal") {
+    dependsOn(getTasksByName("publishToMavenLocal", true))
+    dependsOn("registerReleaseTag", ":webscrambles:appengineRun")
 }
