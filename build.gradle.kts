@@ -33,6 +33,14 @@ tasks.create("registerReleaseTag") {
     }
 }
 
+tasks.create("registerCloudReleaseTag") {
+    dependsOn("registerReleaseTag")
+
+    doFirst {
+        project.ext.set("TNOODLE_IMPL", "TNoodle-CLOUD")
+    }
+}
+
 tasks.create<ProGuardTask>("generateOfficialRelease") {
     description = "Generate an official WCA release artifact."
     group = "WCA"
@@ -107,10 +115,10 @@ tasks.create("generateDebugRelease") {
 
 tasks.create("deployToCloud") {
     dependsOn(getTasksByName("publishToMavenLocal", true))
-    dependsOn("registerReleaseTag", ":webscrambles:appengineDeploy")
+    dependsOn("registerCloudReleaseTag", ":webscrambles:appengineDeploy")
 }
 
 tasks.create("emulateCloudLocal") {
     dependsOn(getTasksByName("publishToMavenLocal", true))
-    dependsOn("registerReleaseTag", ":webscrambles:appengineRun")
+    dependsOn("registerCloudReleaseTag", ":webscrambles:appengineRun")
 }
