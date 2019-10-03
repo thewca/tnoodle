@@ -62,6 +62,7 @@ application {
 configure<AppEngineStandardExtension> {
     deploy {
         projectId = "wca-scrambles-unofficial"
+        version = "GCLOUD_CONFIG"
     }
 }
 
