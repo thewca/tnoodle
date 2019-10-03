@@ -39,6 +39,8 @@ object TNoodleServer : ApplicationHandler {
     val VERSION = WebServerUtils.version
 
     override fun spinUp(app: io.ktor.application.Application) {
+        WebServerUtils.overrideFontConfig()
+
         app.routing {
             JsEnvHandler.install(this)
             StylesheetHandler.install(this)

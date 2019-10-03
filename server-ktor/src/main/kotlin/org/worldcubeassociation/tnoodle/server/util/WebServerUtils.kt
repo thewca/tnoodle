@@ -6,9 +6,16 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.text.SimpleDateFormat
 import java.util.Random
+import java.io.File.separator
 
 object WebServerUtils {
     val SDF = SimpleDateFormat("YYYY-mm-dd")
+
+    val JAVA_HOME = System.getProperty("java.home")
+    val FONT_CONFIG_NAME = "fontconfig.Prodimage.properties"
+    val FONT_CONFIG_PROPERTY = "sun.awt.fontconfig"
+
+    val FONT_CONFIG = ("$JAVA_HOME${separator}lib${separator}$FONT_CONFIG_NAME")
 
     private val CONFIG_FILE = javaClass.getResourceAsStream("/version.tnoodle")
     private val CONFIG_DATA = CONFIG_FILE?.reader()?.readLines() ?: listOf()
@@ -104,6 +111,15 @@ object WebServerUtils {
         }
 
         return file
+    }
+
+    fun overrideFontConfig() {
+        val googleAppEngineEnv = System.getProperty("com.google.appengine.runtime.environment").orEmpty()
+        val runningOnGoogleCloud = googleAppEngineEnv.isNotBlank()
+
+        if (runningOnGoogleCloud && File(FONT_CONFIG).exists()) {
+            System.setProperty(FONT_CONFIG_PROPERTY, FONT_CONFIG)
+        }
     }
 
     fun doFirstRunStuff() {
