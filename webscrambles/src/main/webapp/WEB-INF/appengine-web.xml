@@ -9,5 +9,6 @@
         <include path="/**.yml"/>
         <include path="/**.ttf"/>
         <include path="/**.txt"/>
+        <include path="/**.tnoodle"/>
     </resource-files>
 </appengine-web-app>
