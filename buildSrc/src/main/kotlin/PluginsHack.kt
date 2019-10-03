@@ -1,4 +1,5 @@
 import dependencies.Libraries.Buildscript.PROGUARD_GRADLE_ACTUAL
+import dependencies.Libraries.Buildscript.WCA_I18N_ACTUAL
 import dependencies.Plugins.KOTLIN_JVM_ACTUAL
 import dependencies.Plugins.KOTLIN_MULTIPLATFORM_ACTUAL
 import dependencies.Plugins.SHADOW_ACTUAL
@@ -27,3 +28,6 @@ inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM: PluginDependencySpec
 
 inline val PROGUARD_GRADLE: String
     get() = PROGUARD_GRADLE_ACTUAL
+
+inline val WCA_I18N: String
+    get() = WCA_I18N_ACTUAL

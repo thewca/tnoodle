@@ -18,7 +18,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.github.thewca:wca_i18n:0.4.3")
+        classpath(WCA_I18N)
     }
 }
 
@@ -30,10 +30,10 @@ plugins {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    
+
     implementation(project(":scrambles"))
     implementation(project(":server-ktor"))
-    
+
     implementation(JODA_TIME)
     implementation(ZIP4J)
     implementation(ITEXTPDF)

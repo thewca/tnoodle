@@ -23,8 +23,10 @@ object Libraries {
     val LOGBACK_CLASSIC = "ch.qos.logback:logback-classic:${Versions.LOGBACK_CLASSIC}"
     val KOTLIN_ARGPARSER = "com.xenomachina:kotlin-argparser:${Versions.KOTLIN_ARGPARSER}"
     val PROGUARD_GRADLE = "net.sf.proguard:proguard-gradle:${Versions.PROGUARD_GRADLE}"
+    val WCA_I18N = "com.github.thewca:wca_i18n:${Versions.WCA_I18N}"
 
     object Buildscript {
         val PROGUARD_GRADLE_ACTUAL = PROGUARD_GRADLE
+        val WCA_I18N_ACTUAL = WCA_I18N
     }
 }
