@@ -30,6 +30,7 @@ object Versions {
     val LOGBACK_CLASSIC = "1.2.3"
     val KOTLIN_ARGPARSER = "2.0.7"
     val PROGUARD_GRADLE = PROGUARD
+    val WCA_I18N = "0.4.3"
 
     object Plugins {
         val SHADOW = "5.0.0"
