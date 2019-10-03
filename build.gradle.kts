@@ -9,6 +9,7 @@ buildscript {
 
     dependencies {
         classpath(PROGUARD_GRADLE)
+        classpath(GOOGLE_APPENGINE_GRADLE)
     }
 }
 
