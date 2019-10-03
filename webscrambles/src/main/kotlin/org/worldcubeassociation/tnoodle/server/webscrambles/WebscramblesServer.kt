@@ -2,12 +2,10 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import io.ktor.application.Application
 import io.ktor.routing.routing
-import io.ktor.util.KtorExperimentalAPI
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo
 import net.gnehzr.tnoodle.svglite.Color
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
-import org.worldcubeassociation.tnoodle.server.TNoodleServer
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.gson.Colorizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.gson.PuzzleImageInfoizer
