@@ -13,7 +13,7 @@ import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.configureLoaded
 
-class TNoodleBaseServer : ApplicationHandler {
+object TNoodleBaseServer : ApplicationHandler {
     override fun spinUp(app: Application) {
         app.routing {
             JsEnvHandler.install(this)
