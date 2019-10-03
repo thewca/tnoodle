@@ -10,7 +10,7 @@ import java.util.Random
 object WebServerUtils {
     val SDF = SimpleDateFormat("YYYY-mm-dd")
 
-    private val CONFIG_FILE = javaClass.getResourceAsStream("/.tnoodle")
+    private val CONFIG_FILE = javaClass.getResourceAsStream("/version.tnoodle")
     private val CONFIG_DATA = CONFIG_FILE?.reader()?.readLines() ?: listOf()
 
     private val PRUNING_FOLDER = "tnoodle_pruning_cache"

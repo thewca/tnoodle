@@ -100,7 +100,7 @@ tasks.create("dumpVersionToFile") {
         val tNoodleVersion = project.findProperty("TNOODLE_VERSION")
             ?: "devel" // TODO git-hash
 
-        val fileDir = "$projectDir/src/main/resources/.tnoodle"
+        val fileDir = "$projectDir/src/main/resources/version.tnoodle"
         file(fileDir).writeText("$tNoodleTitle\n$tNoodleVersion")
     }
 }
