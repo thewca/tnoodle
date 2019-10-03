@@ -8,6 +8,7 @@ import io.ktor.routing.get
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import net.gnehzr.tnoodle.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
 
 object PuzzleListHandler : RouteHandler {
     private val puzzleInfoByShortName: Map<String, Map<String, String>>
@@ -44,7 +45,7 @@ object PuzzleListHandler : RouteHandler {
 
             val puzzleExt = call.parameters["puzzleExt"]!!
 
-            val (puzzle, extension) = puzzleExt.split(".", limit = 2)
+            val (puzzle, extension) = splitNameAndExtension(puzzleExt)
 
             if (extension.isEmpty()) {
                 return@get call.respondText("Please specify an extension")

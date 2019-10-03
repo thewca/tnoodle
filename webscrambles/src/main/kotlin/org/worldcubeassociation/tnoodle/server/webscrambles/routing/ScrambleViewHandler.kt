@@ -24,6 +24,7 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import net.gnehzr.tnoodle.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
 import java.awt.image.BufferedImage
@@ -53,7 +54,7 @@ object ScrambleViewHandler : RouteHandler {
             get("/{puzzleExt}") {
                 val puzzleExt = call.parameters["puzzleExt"] ?: return@get call.respondText("Please specify a puzzle")
 
-                val (name, extension) = puzzleExt.split(".", limit = 2)
+                val (name, extension) = splitNameAndExtension(puzzleExt)
 
                 if (extension.isEmpty()) {
                     return@get call.respondText("No extension specified.")
@@ -119,7 +120,7 @@ object ScrambleViewHandler : RouteHandler {
             post("/{puzzleExt}") {
                 val puzzleExt = call.parameters["puzzleExt"] ?: return@post call.respondText("Please specify a puzzle")
 
-                val (name, extension) = puzzleExt.split(".", limit = 2)
+                val (name, extension) = splitNameAndExtension(puzzleExt)
 
                 if (extension.isEmpty()) {
                     return@post call.respondText("No extension specified.")

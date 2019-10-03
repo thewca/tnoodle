@@ -50,5 +50,13 @@ interface RouteHandler {
             return queryMap
         }
 
+        fun splitNameAndExtension(input: String): Pair<String, String> {
+            val nameParts = input.split(".")
+
+            val name = nameParts.dropLast(1).joinToString(".")
+            val extension = nameParts.lastOrNull().orEmpty()
+
+            return name to extension
+        }
     }
 }
