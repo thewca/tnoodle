@@ -1,3 +1,4 @@
+import dependencies.Libraries.Buildscript.GOOGLE_APPENGINE_GRADLE_ACTUAL
 import dependencies.Libraries.Buildscript.PROGUARD_GRADLE_ACTUAL
 import dependencies.Libraries.Buildscript.WCA_I18N_ACTUAL
 import dependencies.Plugins.KOTLIN_JVM_ACTUAL
@@ -31,3 +32,6 @@ inline val PROGUARD_GRADLE: String
 
 inline val WCA_I18N: String
     get() = WCA_I18N_ACTUAL
+
+inline val GOOGLE_APPENGINE_GRADLE: String
+    get() = GOOGLE_APPENGINE_GRADLE_ACTUAL

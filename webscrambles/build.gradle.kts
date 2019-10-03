@@ -1,3 +1,5 @@
+import com.google.cloud.tools.gradle.appengine.standard.AppEngineStandardExtension
+
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
@@ -6,6 +8,7 @@ import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
+import dependencies.Plugins.GOOGLE_APPENGINE
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
@@ -22,10 +25,15 @@ buildscript {
     }
 }
 
+apply {
+    plugin(GOOGLE_APPENGINE)
+}
+
 plugins {
     application
     SHADOW
     kotlin("jvm")
+    war
 }
 
 dependencies {
@@ -49,6 +57,12 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClassName = "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
+}
+
+configure<AppEngineStandardExtension> {
+    deploy {
+        projectId = "wca-scrambles-unofficial"
+    }
 }
 
 tasks.create<JavaExec>("i18nCheck") {

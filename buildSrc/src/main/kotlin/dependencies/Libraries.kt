@@ -23,9 +23,11 @@ object Libraries {
     val KOTLIN_ARGPARSER = "com.xenomachina:kotlin-argparser:${Versions.KOTLIN_ARGPARSER}"
     val PROGUARD_GRADLE = "net.sf.proguard:proguard-gradle:${Versions.PROGUARD_GRADLE}"
     val WCA_I18N = "com.github.thewca:wca_i18n:${Versions.WCA_I18N}"
+    val GOOGLE_APPENGINE_GRADLE = "com.google.cloud.tools:appengine-gradle-plugin:${Versions.GOOGLE_APPENGINE_GRADLE}"
 
     object Buildscript {
         val PROGUARD_GRADLE_ACTUAL = PROGUARD_GRADLE
         val WCA_I18N_ACTUAL = WCA_I18N
+        val GOOGLE_APPENGINE_GRADLE_ACTUAL = GOOGLE_APPENGINE_GRADLE
     }
 }
