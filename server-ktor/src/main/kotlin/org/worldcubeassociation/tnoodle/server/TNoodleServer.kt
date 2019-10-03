@@ -2,11 +2,20 @@ package org.worldcubeassociation.tnoodle.server
 
 import com.apple.eawt.Application
 import com.xenomachina.argparser.ArgParser
+import io.ktor.application.install
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.gson.gson
+import io.ktor.routing.routing
+import io.ktor.server.engine.ShutDownUrl
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
+import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
+import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
+import org.worldcubeassociation.tnoodle.server.util.GsonUtil.configureLoaded
 import org.worldcubeassociation.tnoodle.server.util.MainLauncher
 import org.worldcubeassociation.tnoodle.server.util.MainLauncher.NO_REEXEC_OPT
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
@@ -19,7 +28,7 @@ import java.net.URISyntaxException
 import javax.swing.ImageIcon
 import kotlin.system.exitProcess
 
-object TNoodleServer {
+object TNoodleServer : ApplicationHandler {
     const val TNOODLE_PORT = 2014
 
     const val MIN_HEAP_SIZE_MEGS = 512
@@ -28,6 +37,29 @@ object TNoodleServer {
 
     val NAME = WebServerUtils.projectName
     val VERSION = WebServerUtils.version
+
+    override fun spinUp(app: io.ktor.application.Application) {
+        app.routing {
+            JsEnvHandler.install(this)
+            StylesheetHandler.install(this)
+            VersionHandler.install(this)
+        }
+
+        app.install(ShutDownUrl.ApplicationCallFeature) {
+            shutDownUrl = "/kill/now"
+            exitCodeSupplier = { 0 }
+        }
+
+        app.install(DefaultHeaders) {
+            header("Access-Control-Allow-Origin", "*")
+        }
+
+        app.install(ContentNegotiation) {
+            gson {
+                configureLoaded()
+            }
+        }
+    }
 
     @JvmStatic
     fun main(args: Array<String>) {
