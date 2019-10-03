@@ -4,6 +4,7 @@ import com.apple.eawt.Application
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -20,6 +21,7 @@ import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import javax.swing.ImageIcon
+import kotlin.system.exitProcess
 
 object TNoodleServer {
     const val TNOODLE_PORT = 2014
@@ -64,14 +66,14 @@ object TNoodleServer {
         }
 
         val env = applicationEngineEnvironment {
-            module {
-                TNoodleBaseServer.spinUp(this)
-            }
-
             for (serverModule in SERVER_MODULES) {
                 module {
                     serverModule.spinUp(this)
                 }
+            }
+
+            module {
+                TNoodleBaseServer.spinUp(this)
             }
 
             connector {
@@ -172,7 +174,7 @@ object TNoodleServer {
 
             exitItem.addActionListener {
                 LOG.info("Exit initiated from tray icon")
-                System.exit(0)
+                exitProcess(0)
             }
 
             val trayIconAdapter = trayAdapter.createAndAddTrayIcon(imageUrl, "$NAME v$VERSION", popup)
