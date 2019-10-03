@@ -2,14 +2,10 @@ package org.worldcubeassociation.tnoodle.server
 
 import com.apple.eawt.Application
 import com.xenomachina.argparser.ArgParser
-import com.xenomachina.argparser.default
-import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.commandLineEnvironment
-import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.slf4j.LoggerFactory
-import org.worldcubeassociation.tnoodle.server.application.TNoodleBaseServer
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.util.MainLauncher
 import org.worldcubeassociation.tnoodle.server.util.MainLauncher.NO_REEXEC_OPT
@@ -33,16 +29,11 @@ object TNoodleServer {
     val NAME = WebServerUtils.projectName
     val VERSION = WebServerUtils.version
 
-    private val SERVER_MODULES = mutableListOf<ApplicationHandler>()
-
-    fun registerModule(app: ApplicationHandler) = SERVER_MODULES.add(app)
-
-    fun launch(cliArgs: Array<String>) {
+    @JvmStatic
+    fun main(args: Array<String>) {
         WebServerUtils.doFirstRunStuff()
 
-        val parser = ArgParser(cliArgs)
-
-        val desiredPort by parser.storing("-p", "--http", help = "The port to run the http server on", transform = String::toInt).default(TNOODLE_PORT)
+        val parser = ArgParser(args)
 
         val desiredJsEnv by parser.adding("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
 
@@ -53,7 +44,7 @@ object TNoodleServer {
         setApplicationIcon()
 
         if (!noReexec) {
-            MainLauncher.wrapMain(cliArgs, MIN_HEAP_SIZE_MEGS)
+            MainLauncher.wrapMain(args, MIN_HEAP_SIZE_MEGS)
 
             // This second call to setApplicationIcon() is intentional.
             // We want different icons for the parent and child processes.
@@ -65,24 +56,8 @@ object TNoodleServer {
             JsEnvHandler.putJsEnv(key, strValue)
         }
 
-        val env = applicationEngineEnvironment {
-            for (serverModule in SERVER_MODULES) {
-                module {
-                    serverModule.spinUp(this)
-                }
-            }
-
-            module {
-                TNoodleBaseServer.spinUp(this)
-            }
-
-            connector {
-                host = "localhost"
-                port = desiredPort
-            }
-        }
-
-        embeddedServer(Netty, env).start()
+        val cliEnv = commandLineEnvironment(args)
+        embeddedServer(Netty, cliEnv).start()
 
         LOG.info("$NAME-$VERSION started")
 

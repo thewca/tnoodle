@@ -31,11 +31,4 @@ object WebscramblesServer : ApplicationHandler {
             StaticContentHandler.install(this)
         }
     }
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-        TNoodleServer.registerModule(this)
-
-        TNoodleServer.launch(args)
-    }
 }
