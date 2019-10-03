@@ -11,6 +11,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
+import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 
@@ -36,7 +37,7 @@ object ScrambleHandler : RouteHandler {
             // FIXME why do we blindly remove this?
             query.remove("callback")
 
-            val (title, extension) = filename.split(".", limit = 2)
+            val (title, extension) = splitNameAndExtension(filename)
 
             if (extension.isEmpty()) {
                 throw InvalidScrambleRequestException("No extension specified")
