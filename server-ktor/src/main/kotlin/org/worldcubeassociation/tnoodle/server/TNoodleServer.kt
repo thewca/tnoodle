@@ -65,7 +65,7 @@ object TNoodleServer {
 
         val env = applicationEngineEnvironment {
             module {
-                TNoodleBaseServer().spinUp(this)
+                TNoodleBaseServer.spinUp(this)
             }
 
             for (serverModule in SERVER_MODULES) {

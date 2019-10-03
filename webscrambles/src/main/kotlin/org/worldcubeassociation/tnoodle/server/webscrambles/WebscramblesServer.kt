@@ -14,7 +14,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.gson.PuzzleImageInfo
 import org.worldcubeassociation.tnoodle.server.webscrambles.gson.Puzzlerizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
 
-class WebscramblesServer : ApplicationHandler {
+object WebscramblesServer : ApplicationHandler {
     override fun spinUp(app: Application) {
         app.routing {
             PuzzleListHandler.install(this)
@@ -27,17 +27,15 @@ class WebscramblesServer : ApplicationHandler {
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())
-            GsonUtil.registerTypeAdapter(PuzzleImageInfo::class.java, PuzzleImageInfoizer())
+    @JvmStatic
+    fun main(args: Array<String>) {
+        GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())
+        GsonUtil.registerTypeAdapter(PuzzleImageInfo::class.java, PuzzleImageInfoizer())
 
-            GsonUtil.registerTypeHierarchyAdapter(Puzzle::class.java, Puzzlerizer())
+        GsonUtil.registerTypeHierarchyAdapter(Puzzle::class.java, Puzzlerizer())
 
-            TNoodleServer.registerModule(WebscramblesServer())
+        TNoodleServer.registerModule(WebscramblesServer)
 
-            TNoodleServer.launch(args)
-        }
+        TNoodleServer.launch(args)
     }
 }
