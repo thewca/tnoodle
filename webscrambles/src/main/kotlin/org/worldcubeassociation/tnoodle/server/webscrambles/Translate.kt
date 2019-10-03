@@ -10,7 +10,7 @@ object Translate {
     private val BASE_LOCALE = Locale.forLanguageTag("en")
     val DEFAULT_LOCALE = System.getenv("TNOODLE_DEFAULT_LOCALE")?.let { Locale.forLanguageTag(it) } ?: BASE_LOCALE
 
-    private val TRANSLATIONS = loadTranslationResources()
+    val TRANSLATIONS = loadTranslationResources()
 
     val locales
         get() = TRANSLATIONS.keys
@@ -20,12 +20,15 @@ object Translate {
         val locales = Locale.getAvailableLocales() + DEFAULT_LOCALE
 
         val loadedMaps = locales
-            .mapNotNull { ClassLoader.getSystemResourceAsStream("i18n/${it.toLanguageTag()}.yml") }
+            .mapNotNull { javaClass.getResourceAsStream("/i18n/${it.toLanguageTag()}.yml") }
             .map { yaml.load<Map<String, Map<String, *>>>(it) }
 
-        return loadedMaps
-            .reduce { a, b -> a + b }
-            .mapKeys { Locale.forLanguageTag(it.key) }
+        val mergedMaps = loadedMaps
+            .takeIf { it.isNotEmpty() }
+            ?.reduce { a, b -> a + b }
+            ?.mapKeys { Locale.forLanguageTag(it.key) }
+
+        return mergedMaps ?: emptyMap()
     }
 
     private fun getTranslationsFor(locale: Locale): Map<String, *>? {
