@@ -66,16 +66,14 @@ object WebServerUtils {
         get() = jarFileOrDirectory.takeIf { it.isFile }
 
     val projectName: String
-        get() {
-            val p = WebServerUtils::class.java.getPackage()
-            return p.implementationTitle ?: callerClass?.simpleName!!
-        }
+        get() = System.getProperty("com.google.appengine.application.id").takeIf { it.isNotBlank() }
+            ?: javaClass.getPackage().implementationTitle
+            ?: callerClass?.simpleName!!
 
     val version: String
-        get() {
-            val p = WebServerUtils::class.java.getPackage()
-            return p.implementationVersion ?: DEVEL_VERSION
-        }
+        get() = System.getProperty("com.google.appengine.application.version").takeIf { it.isNotBlank() }
+            ?: javaClass.getPackage().implementationVersion
+            ?: DEVEL_VERSION
 
     val SEEDED_RANDOM: Random by lazy {
         val randSeedEnvVar = "TNOODLE_RANDSEED"
