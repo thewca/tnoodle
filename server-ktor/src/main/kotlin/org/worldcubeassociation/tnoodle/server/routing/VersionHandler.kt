@@ -28,6 +28,11 @@ object VersionHandler : RouteHandler {
 
                 json[runningVersionKey] = "${TNoodleServer.NAME}-${TNoodleServer.VERSION}"
 
+                if (WebServerUtils.runningOnGoogleCloud()) {
+                    json["google_cloud"] = true
+                    json["gcs_bucket"] = WebServerUtils.getCloudBucketName()
+                }
+
                 call.respond(json)
             } catch (e: IOException) {
                 val json = HashMap<String, Any>()
