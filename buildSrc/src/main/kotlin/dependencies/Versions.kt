@@ -11,7 +11,7 @@ object Versions {
     val GWTEXPORTER = GWT
     val MARKDOWNJ_CORE = "0.4"
     val JODA_TIME = "2.10.1"
-    val ZIP4J = "1.3.3"
+    val ZIP4J = "2.2.1"
     val ITEXTPDF = "5.5.13"
     val BATIK_TRANSCODER = BATIK
     val SNAKEYAML = "1.24"

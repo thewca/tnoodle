@@ -4,9 +4,11 @@ import net.gnehzr.tnoodle.plugins.PuzzlePlugins
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher
-import net.lingala.zip4j.io.ZipOutputStream
+import net.lingala.zip4j.io.outputstream.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
-import net.lingala.zip4j.util.Zip4jConstants
+import net.lingala.zip4j.model.enums.CompressionLevel
+import net.lingala.zip4j.model.enums.CompressionMethod
+import net.lingala.zip4j.model.enums.EncryptionMethod
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
@@ -161,17 +163,13 @@ data class ScrambleRequest(
             return WatermarkPdfWrapper(genericSheet, title, creationDate, globalTitle)
         }
 
-        private fun defaultZipParameters(password: String? = null) = ZipParameters().apply {
-            compressionMethod = Zip4jConstants.COMP_DEFLATE
-            compressionLevel = Zip4jConstants.DEFLATE_LEVEL_NORMAL
+        private fun defaultZipParameters(useEncryption: Boolean = false) = ZipParameters().apply {
+            compressionMethod = CompressionMethod.DEFLATE
+            compressionLevel = CompressionLevel.NORMAL
 
-            isSourceExternalStream = true
-
-            if (password != null) {
+            if (useEncryption) {
                 isEncryptFiles = true
-                encryptionMethod = Zip4jConstants.ENC_METHOD_STANDARD
-
-                setPassword(password)
+                encryptionMethod = EncryptionMethod.AES
             }
         }
 
@@ -189,7 +187,7 @@ data class ScrambleRequest(
         fun ZipOutputStream.putFileEntry(fileName: String, contents: ByteArray, parameters: ZipParameters = defaultZipParameters()) {
             parameters.fileNameInZip = fileName
 
-            putNextEntry(null, parameters)
+            putNextEntry(parameters)
             write(contents)
 
             closeEntry()
@@ -200,8 +198,11 @@ data class ScrambleRequest(
         fun requestsToZip(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
             val baosZip = ByteArrayOutputStream()
 
-            val parameters = defaultZipParameters(password)
-            val zipOut = ZipOutputStream(baosZip)
+            val usePassword = password != null
+            val parameters = defaultZipParameters(usePassword)
+
+            val zipOut = password?.let { ZipOutputStream(baosZip, it.toCharArray()) }
+                ?: ZipOutputStream(baosZip)
 
             val seenTitles = mutableListOf<String>()
 
@@ -286,7 +287,6 @@ data class ScrambleRequest(
                 OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, zipOut, parameters, wcifHelper)
             }
 
-            computerDisplayZipOut.finish()
             computerDisplayZipOut.close()
 
             val computerDisplayZipName = "$computerDisplayFileName.zip"
@@ -334,7 +334,6 @@ data class ScrambleRequest(
             val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, scrambleRequests)
             zipOut.putFileEntry(printingCompleteZipName, printingCompleteSheet.render(), parameters)
 
-            zipOut.finish()
             zipOut.close()
 
             return baosZip
