@@ -113,16 +113,22 @@ object WebServerUtils {
         return file
     }
 
-    fun overrideFontConfig() {
+    private fun runningOnGoogleCloud(): Boolean {
         val googleAppEngineEnv = System.getProperty("com.google.appengine.runtime.environment").orEmpty()
-        val runningOnGoogleCloud = googleAppEngineEnv.isNotBlank()
+        return googleAppEngineEnv.isNotBlank()
+    }
 
-        if (runningOnGoogleCloud && File(FONT_CONFIG).exists()) {
+    fun overrideFontConfig() {
+        if (runningOnGoogleCloud() && File(FONT_CONFIG).exists()) {
             System.setProperty(FONT_CONFIG_PROPERTY, FONT_CONFIG)
         }
     }
 
-    fun doFirstRunStuff() {
+    fun createLocalPruningCache() {
+        if (runningOnGoogleCloud()) {
+            return
+        }
+
         val jarFile = jarFile
 
         if (jarFile != null) {
