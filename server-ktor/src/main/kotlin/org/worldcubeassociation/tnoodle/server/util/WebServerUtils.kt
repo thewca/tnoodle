@@ -120,6 +120,15 @@ object WebServerUtils {
         return file
     }
 
+    fun pruningTableExists(tableName: String): Boolean {
+        return if (runningOnGoogleCloud()) {
+            val blobId = remotePruningBlob(tableName)
+            GCS_SERVICE.get(blobId).exists()
+        } else {
+            localPruningFile(tableName).exists()
+        }
+    }
+
     fun getPruningTableInput(tableName: String): InputStream {
         return if (runningOnGoogleCloud()) {
             val blobId = remotePruningBlob(tableName)
