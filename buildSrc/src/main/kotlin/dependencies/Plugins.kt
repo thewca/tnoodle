@@ -5,8 +5,6 @@ import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
 object Plugins {
-    val GOOGLE_APPENGINE = "com.google.cloud.tools.appengine"
-
     inline val PluginDependenciesSpec.SHADOW_ACTUAL: PluginDependencySpec
         get() = id("com.github.johnrengelman.shadow").version(Versions.Plugins.SHADOW)
 
@@ -18,4 +16,8 @@ object Plugins {
 
     inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM_ACTUAL: PluginDependencySpec
         get() = id("kotlin-multiplatform").version(Versions.Plugins.KOTLIN_MULTIPLATFORM)
+
+    // not versioned because the classpath from the buildscript {} block already implies a version
+    inline val PluginDependenciesSpec.GOOGLE_APPENGINE_ACTUAL: PluginDependencySpec
+        get() = id("com.google.cloud.tools.appengine")
 }
