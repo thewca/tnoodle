@@ -1,4 +1,3 @@
-import com.google.cloud.tools.gradle.appengine.core.GcloudTask
 import com.google.cloud.tools.gradle.appengine.standard.AppEngineStandardExtension
 import com.google.cloud.tools.gradle.appengine.standard.DevAppServerRunTask
 
@@ -10,8 +9,6 @@ import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
-import dependencies.Plugins.GOOGLE_APPENGINE
-import org.gradle.internal.impldep.com.beust.jcommander.converters.InetAddressConverter
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
@@ -28,15 +25,12 @@ buildscript {
     }
 }
 
-apply {
-    plugin(GOOGLE_APPENGINE)
-}
-
 plugins {
     application
     SHADOW
     kotlin("jvm")
     war
+    GOOGLE_APPENGINE
 }
 
 dependencies {
