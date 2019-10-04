@@ -65,7 +65,7 @@ object TNoodleServer : ApplicationHandler {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        WebServerUtils.doFirstRunStuff()
+        WebServerUtils.createLocalPruningCache()
 
         val parser = ArgParser(args)
 
