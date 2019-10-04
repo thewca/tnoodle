@@ -32,6 +32,7 @@ object Versions {
     val PROGUARD_GRADLE = PROGUARD
     val WCA_I18N = "0.4.3"
     val GOOGLE_APPENGINE_GRADLE = "2.1.0"
+    val GOOGLE_CLOUD_STORAGE = "1.85.0"
 
     object Plugins {
         val SHADOW = "5.2.0"
