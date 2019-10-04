@@ -93,7 +93,8 @@
     var DEFAULT_MAX_SCRAMBLES_PER_REQUEST = 10;
     var maxScramblesPerRequestByPuzzle = { '444': 1, 'sq1': 1 };
 
-    var scrambleServer = new tnoodle.Scrambler();
+    var currentLocation = window.location.origin;
+    var scrambleServer = new tnoodle.Scrambler(currentLocation);
 
     function checkVersion() {
         scrambleServer.checkVersion(function(versionJson) {
