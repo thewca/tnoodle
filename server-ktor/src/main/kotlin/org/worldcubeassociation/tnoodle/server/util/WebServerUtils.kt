@@ -158,13 +158,13 @@ object WebServerUtils {
 
     private fun remotePruningBlob(tableName: String) = BlobId.of(getCloudBucketName(), tableName)
 
-    private fun runningOnGoogleCloud(): Boolean {
+    fun runningOnGoogleCloud(): Boolean {
         val googleAppEngineEnv = System.getProperty("com.google.appengine.runtime.environment").orEmpty()
         return googleAppEngineEnv.isNotBlank()
     }
 
     private fun getCloudHostname() = System.getProperty("com.google.appengine.application.id")
-    private fun getCloudBucketName() = "${getCloudHostname()}.appspot.com"
+    fun getCloudBucketName() = "${getCloudHostname()}.appspot.com"
 
     fun overrideFontConfig() {
         if (runningOnGoogleCloud() && File(FONT_CONFIG).exists()) {
