@@ -123,7 +123,7 @@ object WebServerUtils {
     fun pruningTableExists(tableName: String): Boolean {
         return if (runningOnGoogleCloud()) {
             val blobId = remotePruningBlob(tableName)
-            GCS_SERVICE.get(blobId).exists()
+            GCS_SERVICE.get(blobId)?.exists() ?: false
         } else {
             localPruningFile(tableName).exists()
         }
