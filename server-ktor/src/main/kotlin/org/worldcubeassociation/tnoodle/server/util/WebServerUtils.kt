@@ -149,7 +149,8 @@ object WebServerUtils {
 
             Channels.newOutputStream(blobWriter)
         } else {
-            localPruningFile(tableName).outputStream()
+            localPruningFile(tableName).takeIf { it.parentFile.isDirectory || it.parentFile.mkdirs() }?.outputStream()
+                ?: error("Unable to create pruning file for table '$tableName'")
         }
     }
 
