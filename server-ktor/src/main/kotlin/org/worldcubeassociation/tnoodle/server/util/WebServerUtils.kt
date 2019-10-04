@@ -10,7 +10,7 @@ import java.util.Random
 object WebServerUtils {
     val SDF = SimpleDateFormat("YYYY-mm-dd")
 
-    private val RESOURCE_FOLDER = "tnoodle_resources"
+    private val PRUNING_FOLDER = "tnoodle_pruning_cache"
     private val DEVEL_VERSION = "devel"
 
     /**
@@ -93,11 +93,11 @@ object WebServerUtils {
 
     fun copyFile(sourceFile: File, destFile: File) = Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
 
-    private fun getResourceDirectory(assertExists: Boolean): File {
-        val baseDir = File(programDirectory, RESOURCE_FOLDER)
+    fun getPruningTableCache(assertExists: Boolean = true): File {
+        val baseDir = File(programDirectory, PRUNING_FOLDER)
 
-        // Each version of tnoodle extracts its resources
-        // to its own subdirectory of RESOURCE_FOLDER
+        // Each version of tnoodle extracts its pruning tables
+        // to its own subdirectory of PRUNING_FOLDER
         val file = baseDir.takeIf { version == DEVEL_VERSION } ?: File(baseDir, version)
 
         if (assertExists && !file.isDirectory) {
@@ -111,15 +111,15 @@ object WebServerUtils {
         val jarFile = jarFile
 
         if (jarFile != null) {
-            val resourceDirectory = getResourceDirectory(false)
+            val pruningTableDirectory = getPruningTableCache(false)
 
-            if (resourceDirectory.isDirectory) {
-                // If the resource folder already exists, we don't bother re-extracting the
+            if (pruningTableDirectory.isDirectory) {
+                // If the pruning table folder already exists, we don't bother re-extracting the
                 // files.
                 return
             }
 
-            assert(resourceDirectory.mkdirs())
+            assert(pruningTableDirectory.mkdirs())
         }
     }
 }
