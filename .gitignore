@@ -17,4 +17,5 @@ node_modules/
 local.properties
 TNoodle-WCA-*.jar
 ./tnoodle_resources
+./tnoodle_pruning_cache
 **/logging/*.log
