@@ -1,13 +1,12 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import net.lingala.zip4j.io.ZipOutputStream
+import net.lingala.zip4j.io.outputstream.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.filterForActivity
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.PdfContent
 
 import java.util.Date
 
