@@ -2,6 +2,9 @@ import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.APPLEJAVAEXTENSIONS
+import dependencies.Libraries.GOOGLE_CLOUD_STORAGE
+import dependencies.Libraries.JUNIT_JUPITER_API
+import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 import dependencies.Libraries.KOTLIN_ARGPARSER
 import dependencies.Libraries.KTOR_GSON
 import dependencies.Libraries.KTOR_SERVER_CIO
@@ -38,6 +41,11 @@ dependencies {
     implementation(APPLEJAVAEXTENSIONS)
     implementation(NATIVE_TRAY_ADAPTER)
     implementation(MARKDOWNJ_CORE)
+
+    implementation(GOOGLE_CLOUD_STORAGE)
+
+    testImplementation(JUNIT_JUPITER_API)
+    testRuntime(JUNIT_JUPITER_ENGINE)
 }
 
 tasks.withType<KotlinCompile> {
