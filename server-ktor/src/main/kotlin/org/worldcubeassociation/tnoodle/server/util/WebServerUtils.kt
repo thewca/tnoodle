@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.util
 
+import com.google.cloud.storage.StorageOptions
 import java.io.*
 import java.net.URISyntaxException
 import java.nio.file.Files
@@ -7,6 +8,10 @@ import java.nio.file.StandardCopyOption
 import java.text.SimpleDateFormat
 import java.util.Random
 import java.io.File.separator
+import com.google.cloud.storage.BlobInfo
+import com.google.cloud.storage.BlobId
+import java.nio.channels.Channels
+
 
 object WebServerUtils {
     val SDF = SimpleDateFormat("YYYY-mm-dd")
@@ -22,6 +27,8 @@ object WebServerUtils {
 
     private val PRUNING_FOLDER = "tnoodle_pruning_cache"
     private val DEVEL_VERSION = "devel-TEMP"
+
+    val GCS_SERVICE by lazy { StorageOptions.getDefaultInstance().service }
 
     /**
      * @return A File representing the directory in which this program resides.
@@ -99,7 +106,7 @@ object WebServerUtils {
 
     fun copyFile(sourceFile: File, destFile: File) = Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
 
-    fun getPruningTableCache(assertExists: Boolean = true): File {
+    private fun getPruningTableCache(assertExists: Boolean = true): File {
         val baseDir = File(programDirectory, PRUNING_FOLDER)
 
         // Each version of tnoodle extracts its pruning tables
@@ -113,10 +120,41 @@ object WebServerUtils {
         return file
     }
 
+    fun getPruningTableInput(tableName: String): InputStream {
+        return if (runningOnGoogleCloud()) {
+            val blobId = remotePruningBlob(tableName)
+            val blobReader = GCS_SERVICE.get(blobId).reader()
+
+            Channels.newInputStream(blobReader)
+        } else {
+            localPruningFile(tableName).inputStream()
+        }
+    }
+
+    fun getPruningTableOutput(tableName: String): OutputStream {
+        return if (runningOnGoogleCloud()) {
+            val blobId = remotePruningBlob(tableName)
+            val blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").build()
+
+            val blobWriter = GCS_SERVICE.create(blobInfo).writer()
+
+            Channels.newOutputStream(blobWriter)
+        } else {
+            localPruningFile(tableName).outputStream()
+        }
+    }
+
+    private fun localPruningFile(tableName: String) = File(getPruningTableCache(false), "$tableName.prun")
+
+    private fun remotePruningBlob(tableName: String) = BlobId.of(getCloudBucketName(), tableName)
+
     private fun runningOnGoogleCloud(): Boolean {
         val googleAppEngineEnv = System.getProperty("com.google.appengine.runtime.environment").orEmpty()
         return googleAppEngineEnv.isNotBlank()
     }
+
+    private fun getCloudHostname() = System.getProperty("com.google.appengine.application.id")
+    private fun getCloudBucketName() = "${getCloudHostname()}.appspot.com"
 
     fun overrideFontConfig() {
         if (runningOnGoogleCloud() && File(FONT_CONFIG).exists()) {
