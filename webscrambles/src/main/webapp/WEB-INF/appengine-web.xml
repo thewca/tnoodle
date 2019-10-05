@@ -11,5 +11,5 @@
         <include path="/**.txt"/>
         <include path="/**.tnoodle"/>
     </resource-files>
-    <instance-class>F4_HIGHMEM</instance-class>
+    <instance-class>F4</instance-class>
 </appengine-web-app>
