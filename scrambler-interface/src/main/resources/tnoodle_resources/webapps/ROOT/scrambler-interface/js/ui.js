@@ -11,7 +11,7 @@ var mark2 = {};
 (function() {
     "use strict";
 
-    var THREE_MULTI_DEFAULT_PUZZLES_PER_ATTEMPT = 28;
+    var THREE_MULTI_DEFAULT_PUZZLES_PER_ATTEMPT = 100;
     var WCA_MINIMUM_MBLD_PER_ATTEMPT = 2;
 
     // Implementation of bind() for Safari.
