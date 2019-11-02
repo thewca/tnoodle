@@ -1,10 +1,12 @@
 package net.gnehzr.tnoodle.scrambles;
 
+import kotlin.Lazy;
+
+import net.gnehzr.tnoodle.plugins.PuzzlePlugins;
 import net.gnehzr.tnoodle.puzzle.CubePuzzle;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,12 +25,11 @@ public class AlgorithmBuilderTest {
         assertFalse(moves.contains("3Lw"));
         assertFalse(moves.contains("3Dw"));
 
-        Map<String, Puzzle> lazyScramblers = new HashMap<>();
-        // FIXME Map<String, Puzzle> lazyScramblers = PuzzlePlugins.getScramblers();
+        Map<String, Lazy<Puzzle>> lazyScramblers = PuzzlePlugins.INSTANCE.getPUZZLES();
 
-        for (Map.Entry<String, Puzzle> lazyEntry : lazyScramblers.entrySet()) {
+        for (Map.Entry<String, Lazy<Puzzle>> lazyEntry : lazyScramblers.entrySet()) {
             String puzzle = lazyEntry.getKey();
-            Puzzle scrambler = lazyEntry.getValue();
+            Puzzle scrambler = lazyEntry.getValue().getValue();
 
             System.out.println("Testing redundant moves on " + puzzle);
 
