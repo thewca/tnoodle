@@ -1,7 +1,7 @@
 es:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Mezcla %{scrambleIndex} de %{scrambleCount}'
+        scrambleXofY: "Mezcla %{scrambleIndex} de %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Mezcla
         #original_hash: ec7b598
@@ -20,6 +20,8 @@ es:
         result: Resultado
         #original_hash: 1917f4f
         competition: Competición
+        #original_hash: ca817e3
+        registrantId: ID del registro
         #original_hash: 49debdc
         rule1: Tienes 60 minutos para encontrar y escribir una solución.
         #original_hash: 8b6b48b
@@ -51,4 +53,4 @@ es:
         #original_hash: 8158159
         double: Doble
         #original_hash: e014b51
-        scrambleOnSeparateSheet: 'Por favor, mira las mezclas en hoja aparte.'
+        scrambleOnSeparateSheet: "Por favor, mira las mezclas en hoja aparte."

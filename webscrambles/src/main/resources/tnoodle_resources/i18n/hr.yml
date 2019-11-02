@@ -1,7 +1,7 @@
 hr:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Scramble %{scrambleIndex} od %{scrambleCount}'
+        scrambleXofY: "Scramble %{scrambleIndex} od %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Scramble
         #original_hash: ec7b598
@@ -20,10 +20,12 @@ hr:
         result: Rezultat
         #original_hash: 1917f4f
         competition: Natjecanje
+        #original_hash: ca817e3
+        registrantId: Registracijski ID
         #original_hash: 49debdc
         rule1: Imate 60 minuta za traženje i zapisivanje rješenja.
         #original_hash: 8b6b48b
-        rule2: 'Napišite 1 potez po polju. Za brisanje poteza, čitko ga zacrnite.'
+        rule2: "Napišite 1 potez po polju. Za brisanje poteza, čitko ga zacrnite."
         #original_hash: 7822590
         rule3: >-
             Vaše rješenje ne smije biti direktno izvedeno iz bilo kojeg dijela

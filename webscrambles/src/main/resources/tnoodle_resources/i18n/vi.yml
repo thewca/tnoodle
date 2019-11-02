@@ -1,7 +1,7 @@
 vi:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Lần giải %{scrambleIndex} trong tổng số %{scrambleCount}'
+        scrambleXofY: "Lần giải %{scrambleIndex} trong tổng số %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Công thức tráo
         #original_hash: ec7b598
@@ -20,10 +20,12 @@ vi:
         result: Kết quả
         #original_hash: 1917f4f
         competition: Giải đấu
+        #original_hash: ca817e3
+        registrantId: Số báo danh
         #original_hash: 49debdc
         rule1: Bạn có 60 phút để tìm và viết một cách giải.
         #original_hash: 8b6b48b
-        rule2: 'Viết một bước xoay cho mỗi ô. Để xóa một bước xoay, tô đen nó.'
+        rule2: "Viết một bước xoay cho mỗi ô. Để xóa một bước xoay, tô đen nó."
         #original_hash: 7822590
         rule3: >-
             Lời giải của bạn không được trích từ bất kì phần nào của thuật toán

@@ -1,7 +1,7 @@
 ro:
     fmc:
         #original_hash: 9e60b9f
-        scrambleXofY: 'Scramble-ul %{scrambleIndex} din %{scrambleCount}'
+        scrambleXofY: "Scramble-ul %{scrambleIndex} din %{scrambleCount}"
         #original_hash: b7126cd
         scramble: Scramble
         #original_hash: ec7b598
@@ -15,11 +15,13 @@ ro:
         #original_hash: 0263083
         event: Fewest Moves
         #original_hash: 960085a
-        graded: 'Verificat de:'
+        graded: "Verificat de:"
         #original_hash: 5faa59d
         result: Rezultat
         #original_hash: 1917f4f
         competition: Competiție
+        #original_hash: ca817e3
+        registrantId: ID de Înregistrare
         #original_hash: 49debdc
         rule1: Ai 60 de minute să găsești și să scrii o soluție.
         #original_hash: 8b6b48b
