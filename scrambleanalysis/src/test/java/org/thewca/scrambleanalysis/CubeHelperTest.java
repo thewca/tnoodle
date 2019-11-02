@@ -1,8 +1,7 @@
 package org.thewca.scrambleanalysis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.thewca.scrambleanalysis.CubeHelper.cornerOrientationSum;
 import static org.thewca.scrambleanalysis.CubeHelper.countMisorientedEdges;
 import static org.thewca.scrambleanalysis.CubeHelper.getFinalPositionOfCorner;
@@ -12,7 +11,7 @@ import static org.thewca.scrambleanalysis.CubeHelper.isOrientedEdge;
 
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import net.gnehzr.tnoodle.puzzle.CubePuzzle.CubeState;
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle;
@@ -120,13 +119,13 @@ public class CubeHelperTest {
 
 		String scramble2 = "R U R' U R U2 R'";
 		String representation2 = getRepresentation(scramble2);
-		
+
 		assertEquals(getFinalPositionOfEdge(representation1, 0), 3);
 		assertEquals(getFinalPositionOfEdge(representation2, 0), 1);
 
 		assertEquals(getFinalPositionOfCorner(representation1, 0), 3);
 		assertEquals(getFinalPositionOfCorner(representation2, 0), 3);
-		
+
 		assertEquals(getFinalPositionOfCorner(getRepresentation("R"), 1), 7);
 		assertEquals(getFinalPositionOfCorner(getRepresentation("R'"), 1), 3);
 	}

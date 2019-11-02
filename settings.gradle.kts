@@ -2,6 +2,7 @@ rootProject.name = "tnoodle"
 
 include("min2phase")
 include("mootools")
+include("scrambleanalysis")
 include("scrambler-interface")
 include("scrambles")
 include("sq12phase")
