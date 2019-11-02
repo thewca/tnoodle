@@ -98,3 +98,7 @@ tasks.create<JavaExec>("startOfficialServer") {
     main = "-jar"
     args = listOf("$releasePrefix-$version.jar")
 }
+
+tasks.create("generateDebugRelease") {
+    dependsOn(":webscrambles:shadowJar")
+}
