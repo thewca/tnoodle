@@ -14,7 +14,7 @@ describe('async actions', () => {
   afterEach(() => xhrMock.teardown());
 
   it('generateMissingScrambles', () => {
-    xhrMock.get("http://localhost:2014/scramble/.json?=333*7&showIndices=0", (req, res) => {
+    xhrMock.get("http://localhost/scramble/.json?=333*7&showIndices=0", (req, res) => {
       return res
         .status(200)
         .header('Content-Type', 'application/json')
@@ -24,7 +24,7 @@ describe('async actions', () => {
 
     let twentyMbfScrambles1 = [...Array(20).keys()].map(i => `Attempt-1.${i}`);
     let twentyMbfScrambles2 = [...Array(20).keys()].map(i => `Attempt-2.${i}`);
-    xhrMock.get("http://localhost:2014/scramble/.json?=333ni*40&showIndices=1", (req, res) => {
+    xhrMock.get("http://localhost/scramble/.json?=333ni*40&showIndices=1", (req, res) => {
       return res
         .status(200)
         .header('Content-Type', 'application/json')
@@ -33,7 +33,7 @@ describe('async actions', () => {
     });
 
     // Catch any unexpected API calls.
-    xhrMock.get(new RegExp("http://localhost:2014/*"), (req, res) => {
+    xhrMock.get(new RegExp("http://localhost/*"), (req, res) => {
       console.error(`Not mocked: ${req.method()} ${req.url()}`);
       return res.status(500);
     });
