@@ -12,7 +12,7 @@
     "npm-run-all": "^4.0.2",
     "pluralize": "^4.0.0",
     "react": "16.2.0",
-    "react-dom": "^16.2.0",
+    "react-dom": "^16.2.1",
     "react-icons": "^2.2.7",
     "react-redux": "^5.0.3",
     "react-router": "^4.0.0",
