@@ -4,6 +4,7 @@ import dependencies.Libraries.Buildscript.WCA_I18N_ACTUAL
 import dependencies.Plugins.DEPENDENCY_VERSIONS_ACTUAL
 import dependencies.Plugins.GIT_VERSION_TAG_ACTUAL
 import dependencies.Plugins.GOOGLE_APPENGINE_ACTUAL
+import dependencies.Plugins.KOTLESS_ACTUAL
 import dependencies.Plugins.KOTLIN_JVM_ACTUAL
 import dependencies.Plugins.KOTLIN_MULTIPLATFORM_ACTUAL
 import dependencies.Plugins.KOTLIN_SERIALIZATION_ACTUAL
@@ -42,6 +43,9 @@ inline val PluginDependenciesSpec.DEPENDENCY_VERSIONS: PluginDependencySpec
 
 inline val PluginDependenciesSpec.GIT_VERSION_TAG: PluginDependencySpec
     get() = GIT_VERSION_TAG_ACTUAL
+
+inline val PluginDependenciesSpec.KOTLESS: PluginDependencySpec
+    get() = KOTLESS_ACTUAL
 
 inline val PROGUARD_GRADLE: String
     get() = PROGUARD_GRADLE_ACTUAL
