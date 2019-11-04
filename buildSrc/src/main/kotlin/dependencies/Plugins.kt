@@ -29,4 +29,7 @@ object Plugins {
     // not versioned because the classpath from the buildscript {} block already implies a version
     inline val PluginDependenciesSpec.GOOGLE_APPENGINE_ACTUAL: PluginDependencySpec
         get() = id("com.google.cloud.tools.appengine")
+
+    inline val PluginDependenciesSpec.KOTLESS_ACTUAL: PluginDependencySpec
+        get() = id("io.kotless").version(Versions.Plugins.KOTLESS)
 }

@@ -6,6 +6,7 @@ object Versions {
     val KOTLIN = "1.3.61"
     val KTOR = "1.3.0"
     val PROGUARD = "6.2.2"
+    val KOTLESS = "0.1.3"
 
     val MARKDOWNJ_CORE = "0.4"
     val ZIP4J = "2.3.1"
@@ -32,6 +33,7 @@ object Versions {
     val GOOGLE_CLOUD_STORAGE = "1.103.0"
     val TNOODLE_SCRAMBLES = "0.17.0"
     val APACHE_COMMONS_LANG3 = "3.9"
+    val KOTLESS_KTOR = KOTLESS
 
     object Plugins {
         val SHADOW = "5.2.0"
@@ -44,5 +46,7 @@ object Versions {
         val KOTLIN_JVM = KOTLIN
         val KOTLIN_MULTIPLATFORM = KOTLIN
         val KOTLIN_SERIALIZATION = KOTLIN
+
+        val KOTLESS = Versions.KOTLESS
     }
 }

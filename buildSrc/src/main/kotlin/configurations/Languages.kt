@@ -19,6 +19,7 @@ object Languages {
         repositories {
             mavenCentral()
             maven(url = "https://dl.bintray.com/thewca/tnoodle-lib")
+            jcenter()
         }
     }
 
