@@ -4,7 +4,6 @@ import configurations.Languages.attachRemoteRepositories
 import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
-import dependencies.Libraries.JODA_TIME
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -35,7 +34,6 @@ dependencies {
     implementation(project(":scrambles"))
     implementation(project(":server-ktor"))
 
-    implementation(JODA_TIME)
     implementation(ZIP4J)
     implementation(ITEXTPDF)
     implementation(BATIK_TRANSCODER)
