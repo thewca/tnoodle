@@ -2,17 +2,17 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import net.lingala.zip4j.io.outputstream.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
-import org.joda.time.DateTime
-import org.joda.time.Days
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.filterForActivity
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.atStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
+import java.time.LocalDateTime
+import java.time.Period
+import java.time.ZonedDateTime
 
 import java.util.Date
 
 object OrderedScrambles {
-    // TODO see https://github.com/thewca/tnoodle/issues/400
-
     fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
         if (wcifHelper.venues.isEmpty()) {
             return
@@ -30,14 +30,14 @@ object OrderedScrambles {
             val hasMultipleRooms = venue.hasMultipleRooms
 
             val timezone = venue.dateTimeZone
-            val competitionStartDate = DateTime(competitionStartString, timezone)
+            val competitionStartDate = ZonedDateTime.of(LocalDateTime.parse(competitionStartString), timezone)
 
             for (room in venue.rooms) {
                 val roomName = room.fileSafeName
 
                 val requestsPerDay = room.activities
                     .flatMap { scrambleRequests.filterForActivity(it, timezone) }
-                    .groupBy { Days.daysBetween(competitionStartDate.withTimeAtStartOfDay(), it.second.withTimeAtStartOfDay()).days + 1 }
+                    .groupBy { Period.between(competitionStartDate.atStartOfDay(), it.second.atStartOfDay()).days + 1 }
 
                 // hasMultipleDays gets a variable assigned on the competition creation using the website's form.
                 // Online schedule fit to it and the user should not be able to put events outside it, but we double check here.
