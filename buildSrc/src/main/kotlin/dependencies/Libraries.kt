@@ -3,7 +3,6 @@ package dependencies
 object Libraries {
     val GWTEXPORTER = "org.timepedia.exporter:gwtexporter:${Versions.GWTEXPORTER}"
     val MARKDOWNJ_CORE = "org.markdownj:markdownj-core:${Versions.MARKDOWNJ_CORE}"
-    val JODA_TIME = "joda-time:joda-time:${Versions.JODA_TIME}"
     val ZIP4J = "net.lingala.zip4j:zip4j:${Versions.ZIP4J}"
     val ITEXTPDF = "com.itextpdf:itextpdf:${Versions.ITEXTPDF}"
     val BATIK_TRANSCODER = "org.apache.xmlgraphics:batik-transcoder:${Versions.BATIK_TRANSCODER}"
