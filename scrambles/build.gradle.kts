@@ -1,9 +1,9 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
-import configurations.Languages.configureCheckstyle
-import configurations.Languages.configureJUnit5
-import configurations.Languages.configureMavenPublication
+import configurations.Frameworks.configureCheckstyle
+import configurations.Frameworks.configureJUnit5
+import configurations.Publications.configureMavenPublication
 
 import dependencies.Libraries.GWTEXPORTER
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile

@@ -1,5 +1,5 @@
 import configurations.Languages.configureJava
-import configurations.Languages.configureMavenPublication
+import configurations.Publications.configureMavenPublication
 
 description = "A copy of Chen Shuang's 4x4 scrambler."
 
