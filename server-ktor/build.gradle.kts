@@ -1,3 +1,4 @@
+import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.APPLEJAVAEXTENSIONS
@@ -35,5 +36,5 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
