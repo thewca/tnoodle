@@ -1,4 +1,5 @@
 import configurations.Languages.configureJava
+import configurations.Languages.configureMavenPublication
 
 description = "A copy of Chen Shuang's 4x4 scrambler."
 
@@ -8,17 +9,8 @@ plugins {
 }
 
 configureJava()
+configureMavenPublication("scrambler-threephase")
 
 dependencies {
     implementation(project(":min2phase"))
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("scrambler") {
-            artifactId = "scrambler-threephase"
-
-            from(components["java"])
-        }
-    }
 }
