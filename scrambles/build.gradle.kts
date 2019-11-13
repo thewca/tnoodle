@@ -1,3 +1,4 @@
+import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
@@ -35,7 +36,7 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
 
 configureJUnit5()
