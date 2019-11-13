@@ -2,6 +2,7 @@ import configurations.Languages.attachRepositories
 import configurations.Languages.configureJava
 import configurations.Languages.configureCheckstyle
 import configurations.Languages.configureJUnit5
+import configurations.Languages.configureMavenPublication
 
 import dependencies.Libraries.GWTEXPORTER
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -19,6 +20,7 @@ plugins {
 
 configureJava()
 configureCheckstyle()
+configureMavenPublication("tnoodle-scrambles")
 
 dependencies {
     api(project(":svglite"))
@@ -37,13 +39,3 @@ tasks.withType<KotlinCompile> {
 }
 
 configureJUnit5()
-
-publishing {
-    publications {
-        create<MavenPublication>("scrambles") {
-            artifactId = "tnoodle-scrambles"
-
-            from(components["java"])
-        }
-    }
-}

@@ -1,4 +1,5 @@
 import configurations.Languages.configureJava
+import configurations.Languages.configureMavenPublication
 
 description = "A copy of Chen Shuang's square 1 two phase solver."
 
@@ -8,13 +9,4 @@ plugins {
 }
 
 configureJava()
-
-publishing {
-    publications {
-        create<MavenPublication>("scrambler") {
-            artifactId = "scrambler-sq12phase"
-
-            from(components["java"])
-        }
-    }
-}
+configureMavenPublication("scrambler-sq12phase")

@@ -7,6 +7,8 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.quality.Checkstyle
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.testing.Test
 
 import org.gradle.kotlin.dsl.*
@@ -57,6 +59,20 @@ object Languages {
 
             testLogging {
                 showStandardStreams = true
+            }
+        }
+    }
+
+    fun Project.configureMavenPublication(targetArtifactId: String? = null) {
+        configure<PublishingExtension> {
+            publications {
+                create<MavenPublication>("scrambler") {
+                    targetArtifactId?.let {
+                        artifactId = it
+                    }
+
+                    from(components["java"])
+                }
             }
         }
     }
