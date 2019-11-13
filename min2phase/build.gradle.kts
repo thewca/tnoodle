@@ -1,5 +1,5 @@
 import configurations.Languages.configureJava
-import configurations.Languages.configureMavenPublication
+import configurations.Publications.configureMavenPublication
 
 description = "Chen Shuang's (https://github.com/cs0x7f) awesome 3x3 scrambler built on top of Herbert Kociemba's Java library."
 
