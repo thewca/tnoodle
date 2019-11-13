@@ -25,7 +25,7 @@ dependencies {
 
     implementation(KTOR_SERVER_HOST_COMMON)
 
-    runtime(LOGBACK_CLASSIC)
+    runtimeOnly(LOGBACK_CLASSIC)
 
     implementation(KOTLIN_ARGPARSER)
 
