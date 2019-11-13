@@ -1,8 +1,6 @@
 import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.APPLEJAVAEXTENSIONS
-import dependencies.Libraries.JUNIT_JUPITER_API
-import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 import dependencies.Libraries.KOTLIN_ARGPARSER
 import dependencies.Libraries.KTOR_GSON
 import dependencies.Libraries.KTOR_SERVER_NETTY
@@ -34,19 +32,8 @@ dependencies {
     implementation(APPLEJAVAEXTENSIONS)
     implementation(NATIVE_TRAY_ADAPTER)
     implementation(MARKDOWNJ_CORE)
-
-    testImplementation(JUNIT_JUPITER_API)
-    testRuntime(JUNIT_JUPITER_ENGINE)
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-
-    testLogging {
-        showStandardStreams = true
-    }
 }

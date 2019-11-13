@@ -4,8 +4,6 @@ import configurations.Languages.configureCheckstyle
 import configurations.Languages.configureJUnit5
 
 import dependencies.Libraries.GWTEXPORTER
-import dependencies.Libraries.JUNIT_JUPITER_API
-import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "A Java scrambling suite. Java applications can use this project as a library. A perfect example of this is the webscrambles package."
@@ -32,9 +30,6 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     api(GWTEXPORTER)
-
-    testImplementation(JUNIT_JUPITER_API)
-    testRuntime(JUNIT_JUPITER_ENGINE)
 }
 
 tasks.withType<KotlinCompile> {
