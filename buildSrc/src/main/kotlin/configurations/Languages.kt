@@ -1,5 +1,7 @@
 package configurations
 
+import dependencies.Libraries.JUNIT_JUPITER_API
+import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
@@ -45,6 +47,11 @@ object Languages {
     }
 
     fun Project.configureJUnit5() {
+        dependencies {
+            add("testImplementation", JUNIT_JUPITER_API)
+            add("testRuntimeOnly", JUNIT_JUPITER_ENGINE)
+        }
+
         tasks.withType<Test> {
             useJUnitPlatform()
 
