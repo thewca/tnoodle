@@ -8,7 +8,7 @@ plugins {
     NODEJS
 }
 
-configure<NodeExtension> { 
+configure<NodeExtension> {
     download = true
 }
 
@@ -24,18 +24,6 @@ tasks.create<YarnTask>("bundle") {
     setYarnCommand("build")
 }
 
-tasks.create<Copy>("propagateResources") {
-    dependsOn("bundle")
-
-    from("${project.buildDir}") {
-        include("static/**/*")
-        include("*.html")
-    }
-
-    val targetBaseDir = project(":webscrambles").buildDir
-    into("$targetBaseDir/resources/main/wca/new-ui")
-}
-
 tasks.getByName("yarn_install") {
     inputs.file("package.json")
     inputs.file("yarn.lock")
@@ -44,7 +32,7 @@ tasks.getByName("yarn_install") {
 }
 
 tasks.getByName("assemble") {
-    dependsOn("bundle", "propagateResources")
+    dependsOn("bundle", "packageReactFrontend")
 }
 
 tasks.getByName("check") {
@@ -53,4 +41,24 @@ tasks.getByName("check") {
 
 tasks.getByName("yarn_test") {
     dependsOn("bundle")
+}
+
+configurations.create("reactYarnBundle")
+
+tasks.create<Zip>("packageReactFrontend") {
+    dependsOn("bundle")
+
+    archiveBaseName.set("npm-react-app")
+    archiveExtension.set("jar")
+
+    from("${project.buildDir}") {
+        include("static/**/*")
+        include("*.html")
+
+        into("wca/new-ui")
+    }
+
+    artifacts {
+      add("reactYarnBundle", this@create)
+    }
 }

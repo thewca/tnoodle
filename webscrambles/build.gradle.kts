@@ -41,15 +41,11 @@ dependencies {
     implementation(SNAKEYAML)
     implementation(BOUNCYCASTLE)
 
-    runtime(project(":tnoodle-ui"))
+    runtime(project(":tnoodle-ui", "reactYarnBundle"))
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.getByName("processResources") {
-    dependsOn(":tnoodle-ui:assemble")
 }
 
 application {
