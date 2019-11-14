@@ -15,11 +15,12 @@ configure<NodeExtension> {
 tasks.create<YarnTask>("bundle") {
     dependsOn("yarn_install")
 
-    inputs.files(fileTree("src"))
-    inputs.files(fileTree("public"))
+    inputs.files(fileTree("src").exclude("*.css"))
+    inputs.dir("public")
     inputs.file("package.json")
 
     outputs.dir("${project.buildDir}/static")
+    outputs.file("${project.buildDir}/index.html")
 
     setYarnCommand("build")
 }
@@ -32,7 +33,7 @@ tasks.getByName("yarn_install") {
 }
 
 tasks.getByName("assemble") {
-    dependsOn("bundle", "packageReactFrontend")
+    dependsOn("packageReactFrontend")
 }
 
 tasks.getByName("check") {
@@ -58,7 +59,5 @@ tasks.create<Zip>("packageReactFrontend") {
         into("wca/new-ui")
     }
 
-    artifacts {
-      add("reactYarnBundle", this@create)
-    }
+    artifacts.add("reactYarnBundle", this)
 }
