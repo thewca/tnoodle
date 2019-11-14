@@ -1,5 +1,4 @@
 import com.moowork.gradle.node.NodeExtension
-import com.moowork.gradle.node.yarn.YarnTask
 
 description = "A web ui for TNoodle that uses modern technology, and interacts with the WCA website api to minimize repeated data entry."
 
@@ -12,7 +11,7 @@ configure<NodeExtension> {
     download = true
 }
 
-tasks.create<YarnTask>("bundle") {
+tasks.getByName("yarn_build") {
     dependsOn("yarn_install")
 
     inputs.files(fileTree("src").exclude("*.css"))
@@ -21,8 +20,6 @@ tasks.create<YarnTask>("bundle") {
 
     outputs.dir("${project.buildDir}/static")
     outputs.file("${project.buildDir}/index.html")
-
-    setYarnCommand("build")
 }
 
 tasks.getByName("yarn_install") {
@@ -41,15 +38,17 @@ tasks.getByName("check") {
 }
 
 tasks.getByName("yarn_test") {
-    dependsOn("bundle")
+    dependsOn("yarn_build")
 }
 
-configurations.create("reactYarnBundle")
+configurations.create("reactFrontendBundle") {
+    configurations.getByName("default").extendsFrom(this)
+}
 
 tasks.create<Zip>("packageReactFrontend") {
-    dependsOn("bundle")
+    dependsOn("yarn_build")
 
-    archiveBaseName.set("npm-react-app")
+    archiveBaseName.set("react-frontend")
     archiveExtension.set("jar")
 
     from("${project.buildDir}") {
@@ -59,5 +58,5 @@ tasks.create<Zip>("packageReactFrontend") {
         into("wca/new-ui")
     }
 
-    artifacts.add("reactYarnBundle", this)
+    artifacts.add("reactFrontendBundle", this)
 }

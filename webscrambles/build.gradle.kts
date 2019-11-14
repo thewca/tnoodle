@@ -41,7 +41,7 @@ dependencies {
     implementation(SNAKEYAML)
     implementation(BOUNCYCASTLE)
 
-    runtime(project(":tnoodle-ui", "reactYarnBundle"))
+    runtime(project(":tnoodle-ui"))
 }
 
 tasks.withType<KotlinCompile> {
