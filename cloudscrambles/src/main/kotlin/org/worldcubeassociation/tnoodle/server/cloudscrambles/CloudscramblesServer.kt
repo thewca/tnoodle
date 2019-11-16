@@ -5,10 +5,10 @@ import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer
 
 object CloudscramblesServer : ApplicationHandler {
-    val webscramblesWrapper = WebscramblesServer(GoogleServerCacheConfig)
+    val webscramblesWrapper = WebscramblesServer(GoogleServerEnvironmentConfig)
 
     override fun spinUp(app: Application) {
-        GoogleServerCacheConfig.overrideFontConfig()
+        GoogleServerEnvironmentConfig.overrideFontConfig()
 
         webscramblesWrapper.spinUp(app)
     }

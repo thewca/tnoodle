@@ -14,18 +14,18 @@ import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil
-import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
+import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher.NO_REEXEC_OPT
 import org.worldcubeassociation.tnoodle.server.webscrambles.gson.Colorizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.gson.PuzzleImageInfoizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.gson.Puzzlerizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.server.LocalServerCacheConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.server.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.OfflineJarUtils
 
-class WebscramblesServer(val cacheConfig: ServerCacheConfig) : ApplicationHandler {
-    private val baseServer = TNoodleServer(cacheConfig)
+class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
+    private val baseServer = TNoodleServer(environmentConfig)
 
     override fun spinUp(app: Application) {
         GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())
@@ -33,8 +33,8 @@ class WebscramblesServer(val cacheConfig: ServerCacheConfig) : ApplicationHandle
 
         GsonUtil.registerTypeHierarchyAdapter(Puzzle::class.java, Puzzlerizer())
 
-        val scrambleHandler = ScrambleHandler(cacheConfig)
-        val scrambleViewHandler = ScrambleViewHandler(cacheConfig)
+        val scrambleHandler = ScrambleHandler(environmentConfig)
+        val scrambleViewHandler = ScrambleViewHandler(environmentConfig)
 
         app.routing {
             PuzzleListHandler.install(this)
@@ -82,7 +82,7 @@ class WebscramblesServer(val cacheConfig: ServerCacheConfig) : ApplicationHandle
             val cliEnv = commandLineEnvironment(args)
             embeddedServer(Netty, cliEnv).start()
 
-            LOG.info("${LocalServerCacheConfig.projectTitle} started")
+            LOG.info("${LocalServerEnvironmentConfig.projectTitle} started")
 
             val url = OfflineJarUtils.openTabInBrowser(!noBrowser)
             LOG.info("Visit $url for a readme and demo.")

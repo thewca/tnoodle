@@ -103,7 +103,7 @@ object OfflineJarUtils {
                 exitProcess(0)
             }
 
-            val tooltip = "${LocalServerCacheConfig.projectName} v${LocalServerCacheConfig.version}"
+            val tooltip = "${LocalServerEnvironmentConfig.projectName} v${LocalServerEnvironmentConfig.version}"
             val trayIconAdapter = trayAdapter.createAndAddTrayIcon(imageUrl, tooltip, popup)
 
             if (trayIconAdapter is JavaIconAdapter) {
