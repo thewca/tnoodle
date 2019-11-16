@@ -12,13 +12,13 @@ import io.ktor.routing.get
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
-import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
+import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 
 import java.util.Date
 
-class ScrambleHandler(val cacheConfig: ServerCacheConfig) : RouteHandler {
+class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
     override fun install(router: Routing) {
         router.get("/scramble/{filename}") {
             val filename = call.parameters["filename"]!!
@@ -69,7 +69,7 @@ class ScrambleHandler(val cacheConfig: ServerCacheConfig) : RouteHandler {
                 }
                 "json" -> call.respond(scrambleRequests)
                 "pdf" -> {
-                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate, cacheConfig.projectTitle, scrambleRequests)
+                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate, environmentConfig.projectTitle, scrambleRequests)
                     call.response.header("Content-Disposition", "inline")
 
                     // Workaround for Chrome bug with saving PDFs:
@@ -79,7 +79,7 @@ class ScrambleHandler(val cacheConfig: ServerCacheConfig) : RouteHandler {
                     call.respondBytes(totalPdfOutput.render(), ContentType.Application.Pdf)
                 }
                 "zip" -> {
-                    val baosZip = ScrambleRequest.requestsToZip(title, generationDate, cacheConfig.projectTitle, scrambleRequests, seed, generationUrl, null)
+                    val baosZip = ScrambleRequest.requestsToZip(title, generationDate, environmentConfig.projectTitle, scrambleRequests, seed, generationUrl, null)
 
                     call.respondBytes(baosZip.toByteArray(), ContentType.Application.Zip)
                 }

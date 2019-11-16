@@ -3,7 +3,7 @@ package org.worldcubeassociation.tnoodle.server.util
 import java.io.InputStream
 import java.io.OutputStream
 
-interface ServerCacheConfig {
+interface ServerEnvironmentConfig {
     val projectName: String
     val version: String
 

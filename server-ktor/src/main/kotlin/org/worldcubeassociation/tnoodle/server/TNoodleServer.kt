@@ -10,13 +10,13 @@ import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.configureLoaded
-import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
+import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
-class TNoodleServer(val cacheConfig: ServerCacheConfig) : ApplicationHandler {
+class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
     override fun spinUp(app: io.ktor.application.Application) {
-        cacheConfig.createLocalPruningCache()
+        environmentConfig.createLocalPruningCache()
 
-        val versionHandler = VersionHandler(cacheConfig.projectTitle)
+        val versionHandler = VersionHandler(environmentConfig.projectTitle)
 
         app.routing {
             JsEnvHandler.install(this)

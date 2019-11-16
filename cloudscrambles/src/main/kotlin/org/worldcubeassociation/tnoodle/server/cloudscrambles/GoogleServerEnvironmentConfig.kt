@@ -3,7 +3,7 @@ package org.worldcubeassociation.tnoodle.server.cloudscrambles
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.StorageOptions
-import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
+import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.DEVEL_VERSION
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.callerClass
 import java.io.File
@@ -12,7 +12,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.nio.channels.Channels
 
-object GoogleServerCacheConfig : ServerCacheConfig {
+object GoogleServerEnvironmentConfig : ServerEnvironmentConfig {
     val GCS_SERVICE by lazy { StorageOptions.getDefaultInstance().service }
 
     private val CONFIG_FILE = javaClass.getResourceAsStream("/version.tnoodle")
