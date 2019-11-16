@@ -10,6 +10,7 @@ pluginManagement {
     }
 }
 
+include("cloudscrambles")
 include("min2phase")
 include("scrambles")
 include("server-ktor")

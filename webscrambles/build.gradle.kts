@@ -1,14 +1,15 @@
-import com.google.cloud.tools.gradle.appengine.standard.AppEngineStandardExtension
-import com.google.cloud.tools.gradle.appengine.standard.DevAppServerRunTask
-
 import configurations.CompilerSettings.KOTLIN_JVM_TARGE
 import configurations.Languages.attachRemoteRepositories
 
+import dependencies.Libraries.APPLEJAVAEXTENSIONS
 import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
+import dependencies.Libraries.KOTLIN_ARGPARSER
+import dependencies.Libraries.NATIVE_TRAY_ADAPTER
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "A server plugin wrapper for scrambles that also draws pdfs."
@@ -29,8 +30,6 @@ plugins {
     application
     SHADOW
     kotlin("jvm")
-    war
-    GOOGLE_APPENGINE
 }
 
 dependencies {
@@ -44,6 +43,9 @@ dependencies {
     implementation(BATIK_TRANSCODER)
     implementation(SNAKEYAML)
     implementation(BOUNCYCASTLE)
+    implementation(KOTLIN_ARGPARSER)
+    implementation(APPLEJAVAEXTENSIONS)
+    implementation(NATIVE_TRAY_ADAPTER)
 
     runtimeOnly(project(":tnoodle-ui"))
 }
@@ -53,17 +55,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClassName = "org.worldcubeassociation.tnoodle.server.TNoodleServer"
-}
-
-configure<AppEngineStandardExtension> {
-    run {
-        projectId = "wca-scrambles-unofficial"
-    }
-    deploy {
-        projectId = "wca-scrambles-unofficial"
-        version = "GCLOUD_CONFIG"
-    }
+    mainClassName = "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
 }
 
 tasks.create<JavaExec>("i18nCheck") {
@@ -80,21 +72,4 @@ tasks.create<JavaExec>("i18nCheck") {
 
 tasks.getByName("check") {
     dependsOn("i18nCheck")
-}
-
-tasks.create("dumpVersionToFile") {
-    tasks.withType<ProcessResources> {
-        dependsOn("dumpVersionToFile")
-    }
-
-    doLast {
-        val tNoodleTitle = project.findProperty("TNOODLE_IMPL")
-            ?: "TNoodle-LOCAL"
-
-        val tNoodleVersion = project.findProperty("TNOODLE_VERSION")
-            ?: "devel" // TODO git-hash
-
-        val fileDir = "$projectDir/src/main/resources/version.tnoodle"
-        file(fileDir).writeText("$tNoodleTitle\n$tNoodleVersion")
-    }
 }

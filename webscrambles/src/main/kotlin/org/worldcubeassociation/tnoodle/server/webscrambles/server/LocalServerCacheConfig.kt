@@ -1,5 +1,6 @@
-package org.worldcubeassociation.tnoodle.server.util
+package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
+import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.DEVEL_VERSION
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.PRUNING_FOLDER
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.jarFile

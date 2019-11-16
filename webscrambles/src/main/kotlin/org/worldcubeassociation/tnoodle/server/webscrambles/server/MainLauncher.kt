@@ -1,15 +1,17 @@
-package org.worldcubeassociation.tnoodle.server.util
+package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
 import org.slf4j.LoggerFactory
+import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import java.io.File
 import java.io.IOException
+import kotlin.system.exitProcess
 
 object MainLauncher {
     private val LOG = LoggerFactory.getLogger(MainLauncher::class.java)
 
     const val NO_REEXEC_OPT = "--noReexec"
 
-    var processType = MainLauncher.ProcessType.UNKNOWN
+    var processType = ProcessType.UNKNOWN
         private set
 
     enum class ProcessType {
@@ -32,7 +34,7 @@ object MainLauncher {
         LOG.trace("Entering ${MainLauncher::class.java}, method wrapMain, args ${args + minHeapSizeMegs.toString()}")
 
         if (NO_REEXEC_OPT in args) {
-            processType = MainLauncher.ProcessType.WORKER
+            processType = ProcessType.WORKER
             return
         }
 
@@ -95,9 +97,9 @@ object MainLauncher {
         LOG.info("needsReExecing: $needsReExecing")
 
         if (needsReExecing) {
-            processType = MainLauncher.ProcessType.WRAPPER
+            processType = ProcessType.WRAPPER
         } else {
-            processType = MainLauncher.ProcessType.WORKER
+            processType = ProcessType.WORKER
             return
         }
 
@@ -126,7 +128,7 @@ object MainLauncher {
             val stream = p.inputStream.buffered()
             System.out.write(stream.readBytes())
 
-            System.exit(0)
+            exitProcess(0)
         } catch (e: IOException) {
             LOG.warn("", e)
         }
