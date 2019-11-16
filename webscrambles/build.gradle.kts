@@ -73,3 +73,26 @@ tasks.create<JavaExec>("i18nCheck") {
 tasks.getByName("check") {
     dependsOn("i18nCheck")
 }
+
+tasks.create("registerManifest") {
+    tasks.withType<Jar> {
+        dependsOn("registerManifest")
+    }
+
+    doLast {
+        tasks.withType<Jar> {
+            manifest {
+                val tnoodleTitle = project.findProperty("TNOODLE_IMPL")
+                    ?: "TNoodle-LOCAL"
+
+                val tnoodleVersion = project.findProperty("TNOODLE_VERSION")
+                    ?: "devel"
+
+                attributes(
+                    "Implementation-Title" to tnoodleTitle,
+                    "Implementation-Version" to tnoodleVersion
+                )
+            }
+        }
+    }
+}

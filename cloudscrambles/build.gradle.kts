@@ -9,7 +9,6 @@ description = "An extension over the webscrambles module to incorporate Google C
 attachRemoteRepositories()
 
 plugins {
-    SHADOW
     kotlin("jvm")
     war
     GOOGLE_APPENGINE
