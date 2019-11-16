@@ -16,10 +16,13 @@ class TNoodleServer(val cacheConfig: ServerCacheConfig) : ApplicationHandler {
     override fun spinUp(app: io.ktor.application.Application) {
         cacheConfig.createLocalPruningCache()
 
+        val versionString = "${cacheConfig.projectName}-${cacheConfig.version}"
+        val versionHandler = VersionHandler(versionString)
+
         app.routing {
             JsEnvHandler.install(this)
             StylesheetHandler.install(this)
-            VersionHandler.install(this)
+            versionHandler.install(this)
         }
 
         app.install(ShutDownUrl.ApplicationCallFeature) {
