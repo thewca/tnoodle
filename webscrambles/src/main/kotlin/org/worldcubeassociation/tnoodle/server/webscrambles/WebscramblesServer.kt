@@ -87,8 +87,5 @@ class WebscramblesServer(val cacheConfig: ServerCacheConfig) : ApplicationHandle
             val url = OfflineJarUtils.openTabInBrowser(!noBrowser)
             LOG.info("Visit $url for a readme and demo.")
         }
-
-        fun spinUpLocally(app: Application) =
-            WebscramblesServer(LocalServerCacheConfig).spinUp(app)
     }
 }
