@@ -54,6 +54,9 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
 
         val LOG = LoggerFactory.getLogger(WebscramblesServer::class.java)
 
+        fun spinUpLocally(app: Application) =
+            WebscramblesServer(LocalServerEnvironmentConfig).spinUp(app)
+
         @JvmStatic
         fun main(args: Array<String>) {
             val parser = ArgParser(args)
