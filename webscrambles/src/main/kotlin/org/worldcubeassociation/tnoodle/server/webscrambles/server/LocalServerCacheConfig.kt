@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
 import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
+import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.DEVEL_VERSION
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.PRUNING_FOLDER
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.jarFile
@@ -8,8 +9,13 @@ import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.programDirect
 import java.io.*
 
 object LocalServerCacheConfig : ServerCacheConfig {
-    override val projectName get() = "TODO"
-    override val version get() = "TODO"
+    override val projectName
+        get() = LocalServerCacheConfig::class.java.getPackage()?.implementationTitle
+            ?: WebServerUtils.callerClass?.simpleName!!
+
+    override val version
+        get() = LocalServerCacheConfig::class.java.getPackage()?.implementationVersion
+            ?: DEVEL_VERSION
 
     private fun getPruningTableCache(assertExists: Boolean = true): File {
         val baseDir = File(programDirectory, PRUNING_FOLDER)

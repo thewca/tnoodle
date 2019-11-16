@@ -115,10 +115,10 @@ tasks.create("generateDebugRelease") {
 
 tasks.create("deployToCloud") {
     dependsOn(getTasksByName("publishToMavenLocal", true))
-    dependsOn("registerCloudReleaseTag", ":webscrambles:appengineDeploy")
+    dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineDeploy")
 }
 
 tasks.create("emulateCloudLocal") {
     dependsOn(getTasksByName("publishToMavenLocal", true))
-    dependsOn("registerCloudReleaseTag", ":webscrambles:appengineRun")
+    dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineRun")
 }
