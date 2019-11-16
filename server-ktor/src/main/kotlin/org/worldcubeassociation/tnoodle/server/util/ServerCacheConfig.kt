@@ -7,6 +7,9 @@ interface ServerCacheConfig {
     val projectName: String
     val version: String
 
+    val projectTitle
+        get() = "$projectName-$version"
+
     fun pruningTableExists(tableName: String): Boolean
 
     fun getPruningTableInput(tableName: String): InputStream

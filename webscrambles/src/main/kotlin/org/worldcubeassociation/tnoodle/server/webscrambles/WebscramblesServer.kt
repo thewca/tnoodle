@@ -33,13 +33,16 @@ class WebscramblesServer(val cacheConfig: ServerCacheConfig) : ApplicationHandle
 
         GsonUtil.registerTypeHierarchyAdapter(Puzzle::class.java, Puzzlerizer())
 
+        val scrambleHandler = ScrambleHandler(cacheConfig)
+        val scrambleViewHandler = ScrambleViewHandler(cacheConfig)
+
         app.routing {
             PuzzleListHandler.install(this)
             RouteRedirectHandler.install(this)
-            ScrambleHandler.install(this)
+            scrambleHandler.install(this)
             ScrambleImporterHandler.install(this)
             ReadmeHandler.install(this)
-            ScrambleViewHandler.install(this)
+            scrambleViewHandler.install(this)
             StaticContentHandler.install(this)
         }
 
@@ -79,7 +82,7 @@ class WebscramblesServer(val cacheConfig: ServerCacheConfig) : ApplicationHandle
             val cliEnv = commandLineEnvironment(args)
             embeddedServer(Netty, cliEnv).start()
 
-            LOG.info("${LocalServerCacheConfig.projectName}-${LocalServerCacheConfig.version} started")
+            LOG.info("${LocalServerCacheConfig.projectTitle} started")
 
             val url = OfflineJarUtils.openTabInBrowser(!noBrowser)
             LOG.info("Visit $url for a readme and demo.")

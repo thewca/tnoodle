@@ -25,6 +25,7 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import net.gnehzr.tnoodle.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
+import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
 import java.awt.image.BufferedImage
@@ -32,7 +33,7 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 import javax.imageio.ImageIO
 
-object ScrambleViewHandler : RouteHandler {
+class ScrambleViewHandler(val cacheConfig: ServerCacheConfig) : RouteHandler {
     private val scramblers = PuzzlePlugins.PUZZLES
 
     // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
@@ -136,7 +137,7 @@ object ScrambleViewHandler : RouteHandler {
 
                 when (extension) {
                     "pdf" -> {
-                        val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(name, generationDate, scrambleRequests)
+                        val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(name, generationDate, cacheConfig.projectTitle, scrambleRequests)
 
                         call.response.header("Content-Disposition", "inline")
 
@@ -152,7 +153,7 @@ object ScrambleViewHandler : RouteHandler {
 
                         val wcifHelper = WCIFHelper(schedule)
 
-                        val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, scrambleRequests, password, generationUrl, wcifHelper)
+                        val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, cacheConfig.projectTitle, scrambleRequests, password, generationUrl, wcifHelper)
 
                         val safeTitle = name.replace("\"".toRegex(), "'")
 
