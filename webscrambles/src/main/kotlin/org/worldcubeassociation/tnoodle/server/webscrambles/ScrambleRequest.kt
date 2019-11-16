@@ -10,7 +10,6 @@ import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.CompressionMethod
 import net.lingala.zip4j.model.enums.EncryptionMethod
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.randomPasscode
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.stripNewlines
@@ -122,7 +121,7 @@ data class ScrambleRequest(
             }
         }
 
-        fun ScrambleRequest.createPdf(globalTitle: String?, creationDate: Date, locale: Locale): PdfContent {
+        fun ScrambleRequest.createPdf(globalTitle: String?, creationDate: Date, versionTag: String, locale: Locale): PdfContent {
             // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
             // list of 333ni scrambles.
             // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -144,7 +143,7 @@ data class ScrambleRequest(
                         event = "333bf"
                     )
 
-                    val singleSheet = attemptRequest.createPdf(globalTitle, creationDate, locale)
+                    val singleSheet = attemptRequest.createPdf(globalTitle, creationDate, versionTag, locale)
                     singleSheets.add(singleSheet)
                 }
 
@@ -160,7 +159,7 @@ data class ScrambleRequest(
             }
 
             val genericSheet = GeneralScrambleSheet(this, globalTitle) // encrypt when watermarking
-            return WatermarkPdfWrapper(genericSheet, title, creationDate, globalTitle)
+            return WatermarkPdfWrapper(genericSheet, title, creationDate, versionTag, globalTitle)
         }
 
         private fun defaultZipParameters(useEncryption: Boolean = false) = ZipParameters().apply {
@@ -195,7 +194,7 @@ data class ScrambleRequest(
 
         private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
 
-        fun requestsToZip(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
+        fun requestsToZip(globalTitle: String?, generationDate: Date, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
             val baosZip = ByteArrayOutputStream()
 
             val usePassword = password != null
@@ -238,7 +237,7 @@ data class ScrambleRequest(
 
                 // Without passcode, for printing
                 val pdfPrintingZipName = "Printing/Scramble Sets/$safeTitle.pdf"
-                val pdfPrintingByteStream = scrambleRequest.createPdf(globalTitle, generationDate, Translate.DEFAULT_LOCALE)
+                val pdfPrintingByteStream = scrambleRequest.createPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
                 zipOut.putFileEntry(pdfPrintingZipName, pdfPrintingByteStream.render(), parameters)
 
@@ -284,7 +283,7 @@ data class ScrambleRequest(
             }
 
             if (wcifHelper != null) {
-                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, zipOut, parameters, wcifHelper)
+                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, versionTag, zipOut, parameters, wcifHelper)
             }
 
             computerDisplayZipOut.close()
@@ -306,7 +305,7 @@ data class ScrambleRequest(
             val jsonObj = mapOf(
                 "sheets" to scrambleRequests,
                 "competitionName" to globalTitle,
-                "version" to "${WebServerUtils.projectName}-${WebServerUtils.version}",
+                "version" to versionTag,
                 "generationDate" to generationDate,
                 "generationUrl" to generationUrl,
                 "schedule" to wcifHelper?.schedule
@@ -331,7 +330,7 @@ data class ScrambleRequest(
 
             // Note that we're not passing the password into this function. It seems pretty silly
             // to put a password protected pdf inside of a password protected zip file.
-            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, scrambleRequests)
+            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, versionTag, scrambleRequests)
             zipOut.putFileEntry(printingCompleteZipName, printingCompleteSheet.render(), parameters)
 
             zipOut.close()
@@ -339,9 +338,9 @@ data class ScrambleRequest(
             return baosZip
         }
 
-        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, scrambleRequests: List<ScrambleRequest>): PdfContent {
+        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, versionTag: String, scrambleRequests: List<ScrambleRequest>): PdfContent {
             val originalPdfs = scrambleRequests.map {
-                PDF_CACHE.getOrPut(it) { it.createPdf(globalTitle, generationDate, Translate.DEFAULT_LOCALE) }
+                PDF_CACHE.getOrPut(it) { it.createPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE) }
             }
 
             val configurations = scrambleRequests.map { Triple(it.title, it.scrambler.longName, it.copies) }

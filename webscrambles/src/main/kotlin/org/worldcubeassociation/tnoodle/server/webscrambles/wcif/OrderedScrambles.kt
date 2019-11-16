@@ -14,7 +14,7 @@ import java.time.ZonedDateTime
 import java.util.Date
 
 object OrderedScrambles {
-    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: Date, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
+    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: Date, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
         if (wcifHelper.venues.isEmpty()) {
             return
         }
@@ -65,7 +65,7 @@ object OrderedScrambles {
 
                             val sortedScrambles = scrambles.sortedBy { it.second }.map { it.first }
 
-                            val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, sortedScrambles)
+                            val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, sortedScrambles)
                             zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
                         }
                     }

@@ -12,12 +12,13 @@ import io.ktor.routing.get
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
+import org.worldcubeassociation.tnoodle.server.util.ServerCacheConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 
 import java.util.Date
 
-object ScrambleHandler : RouteHandler {
+class ScrambleHandler(val cacheConfig: ServerCacheConfig) : RouteHandler {
     override fun install(router: Routing) {
         router.get("/scramble/{filename}") {
             val filename = call.parameters["filename"]!!
@@ -68,7 +69,7 @@ object ScrambleHandler : RouteHandler {
                 }
                 "json" -> call.respond(scrambleRequests)
                 "pdf" -> {
-                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate, scrambleRequests)
+                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate, cacheConfig.projectTitle, scrambleRequests)
                     call.response.header("Content-Disposition", "inline")
 
                     // Workaround for Chrome bug with saving PDFs:
@@ -78,7 +79,7 @@ object ScrambleHandler : RouteHandler {
                     call.respondBytes(totalPdfOutput.render(), ContentType.Application.Pdf)
                 }
                 "zip" -> {
-                    val baosZip = ScrambleRequest.requestsToZip(title, generationDate, scrambleRequests, seed, generationUrl, null)
+                    val baosZip = ScrambleRequest.requestsToZip(title, generationDate, cacheConfig.projectTitle, scrambleRequests, seed, generationUrl, null)
 
                     call.respondBytes(baosZip.toByteArray(), ContentType.Application.Zip)
                 }
