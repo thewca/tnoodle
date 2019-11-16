@@ -15,7 +15,7 @@ import org.worldcubeassociation.tnoodle.server.TNoodleServer
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 
-object VersionHandler : RouteHandler {
+class VersionHandler(val versionKey: String) : RouteHandler {
     override fun install(router: Routing) {
         router.get("/version.json") {
             try {
@@ -26,12 +26,7 @@ object VersionHandler : RouteHandler {
                 val runningVersionKey = "running_version"
                 assert(!json.containsKey(runningVersionKey))
 
-                json[runningVersionKey] = "${TNoodleServer.NAME}-${TNoodleServer.VERSION}"
-
-                if (WebServerUtils.runningOnGoogleCloud()) {
-                    json["google_cloud"] = true
-                    json["gcs_bucket"] = WebServerUtils.getCloudBucketName()
-                }
+                json[runningVersionKey] = versionKey
 
                 call.respond(json)
             } catch (e: IOException) {
@@ -43,6 +38,8 @@ object VersionHandler : RouteHandler {
         }
     }
 
-    const val API_VERSION = "0"
-    const val BASE_URL = "https://www.worldcubeassociation.org/api/v$API_VERSION/scramble-program"
+    companion object {
+        const val API_VERSION = "0"
+        const val BASE_URL = "https://www.worldcubeassociation.org/api/v$API_VERSION/scramble-program"
+    }
 }
