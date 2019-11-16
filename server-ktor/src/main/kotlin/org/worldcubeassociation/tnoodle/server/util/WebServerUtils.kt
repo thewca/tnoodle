@@ -1,34 +1,25 @@
 package org.worldcubeassociation.tnoodle.server.util
 
-import com.google.cloud.storage.StorageOptions
+import com.apple.eawt.Application
+import org.worldcubeassociation.tnoodle.server.TNoodleServer
+import tray.SystemTrayProvider
+import tray.java.JavaIconAdapter
+import java.awt.*
 import java.io.*
+import java.net.URI
 import java.net.URISyntaxException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.text.SimpleDateFormat
 import java.util.Random
-import java.io.File.separator
-import com.google.cloud.storage.BlobInfo
-import com.google.cloud.storage.BlobId
-import java.nio.channels.Channels
-
+import javax.swing.ImageIcon
+import kotlin.system.exitProcess
 
 object WebServerUtils {
     val SDF = SimpleDateFormat("YYYY-mm-dd")
 
-    val JAVA_HOME = System.getProperty("java.home")
-    val FONT_CONFIG_NAME = "fontconfig.Prodimage.properties"
-    val FONT_CONFIG_PROPERTY = "sun.awt.fontconfig"
-
-    val FONT_CONFIG = ("$JAVA_HOME${separator}lib${separator}$FONT_CONFIG_NAME")
-
-    private val CONFIG_FILE = javaClass.getResourceAsStream("/version.tnoodle")
-    private val CONFIG_DATA = CONFIG_FILE?.reader()?.readLines() ?: listOf()
-
-    private val PRUNING_FOLDER = "tnoodle_pruning_cache"
-    private val DEVEL_VERSION = "devel-TEMP"
-
-    val GCS_SERVICE by lazy { StorageOptions.getDefaultInstance().service }
+    val PRUNING_FOLDER = "tnoodle_pruning_cache"
+    val DEVEL_VERSION = "devel-TEMP"
 
     /**
      * @return A File representing the directory in which this program resides.
@@ -44,7 +35,7 @@ object WebServerUtils {
     // Classes that are part of a web app were loaded with the
     // servlet container's classloader, so we can't necessarily
     // find them.
-    private val callerClass: Class<*>?
+    val callerClass: Class<*>?
         get() {
             val stElements = Thread.currentThread().stackTrace
 
@@ -82,14 +73,6 @@ object WebServerUtils {
     val jarFile: File?
         get() = jarFileOrDirectory.takeIf { it.isFile }
 
-    val projectName: String
-        get() = CONFIG_DATA.getOrNull(0)
-            ?: callerClass?.simpleName!!
-
-    val version: String
-        get() = CONFIG_DATA.getOrNull(1)
-            ?: DEVEL_VERSION
-
     val SEEDED_RANDOM: Random by lazy {
         val randSeedEnvVar = "TNOODLE_RANDSEED"
 
@@ -104,91 +87,103 @@ object WebServerUtils {
             e.printStackTrace(PrintStream(this))
         }.toString()
 
-    fun copyFile(sourceFile: File, destFile: File) = Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    fun copyFile(sourceFile: File, destFile: File) =
+        Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
 
-    private fun getPruningTableCache(assertExists: Boolean = true): File {
-        val baseDir = File(programDirectory, PRUNING_FOLDER)
+    // Preferred way to detect OSX according to https://developer.apple.com/library/mac/#technotes/tn2002/tn2110.html
+    fun isOSX() = "OS X" in System.getProperty("os.name")
 
-        // Each version of tnoodle extracts its pruning tables
-        // to its own subdirectory of PRUNING_FOLDER
-        val file = baseDir.takeIf { version == DEVEL_VERSION } ?: File(baseDir, version)
+    fun openTabInBrowser(browse: Boolean): String {
+        val url = "http://localhost:${TNoodleServer.TNOODLE_PORT}"
 
-        if (assertExists && !file.isDirectory) {
-            throw FileNotFoundException("${file.absolutePath} does not exist, or is not a directory")
+        if (browse) {
+            if (Desktop.isDesktopSupported()) {
+                val d = Desktop.getDesktop()
+
+                if (d.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        val uri = URI(url)
+                        TNoodleServer.LOG.info("Attempting to open $uri in browser.")
+                        d.browse(uri)
+                    } catch (e: URISyntaxException) {
+                        TNoodleServer.LOG.warn("Could not convert $url to URI", e)
+                    } catch (e: IOException) {
+                        TNoodleServer.LOG.warn("Error opening tab in browser", e)
+                    }
+
+                } else {
+                    TNoodleServer.LOG.error("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.")
+                }
+            } else {
+                TNoodleServer.LOG.error("Sorry, it appears the Desktop api is not supported on your platform.")
+            }
         }
 
-        return file
+        return url
     }
 
-    fun pruningTableExists(tableName: String): Boolean {
-        return if (runningOnGoogleCloud()) {
-            val blobId = remotePruningBlob(tableName)
-            GCS_SERVICE.get(blobId)?.exists() ?: false
+    /*
+     * Sets the dock icon in OSX. Could be made to have uses in other operating systems.
+     */
+    fun setApplicationIcon() {
+        // Find out which icon to use.
+        val processType = MainLauncher.processType
+
+        val iconFileName = if (processType === MainLauncher.ProcessType.WORKER) TNoodleServer.ICON_WORKER else TNoodleServer.ICON_WRAPPER
+
+        // Get the file name of the icon.
+        val fullFileName = "/${TNoodleServer.ICONS_FOLDER}/$iconFileName"
+        val imageUrl = TNoodleServer::class.java.getResource(fullFileName)
+
+        val image = ImageIcon(imageUrl).image
+
+        // OSX-specific code to set the dock icon.
+        if (isOSX()) {
+            try {
+                Application.getApplication().dockIconImage = image
+            } catch (e: Exception) {
+                TNoodleServer.LOG.warn("Error setting OSX dock icon", e)
+            }
         } else {
-            localPruningFile(tableName).exists()
-        }
-    }
-
-    fun getPruningTableInput(tableName: String): InputStream {
-        return if (runningOnGoogleCloud()) {
-            val blobId = remotePruningBlob(tableName)
-            val blobReader = GCS_SERVICE.get(blobId).reader()
-
-            Channels.newInputStream(blobReader)
-        } else {
-            localPruningFile(tableName).inputStream()
-        }
-    }
-
-    fun getPruningTableOutput(tableName: String): OutputStream {
-        return if (runningOnGoogleCloud()) {
-            val blobId = remotePruningBlob(tableName)
-            val blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").build()
-
-            val blobWriter = GCS_SERVICE.create(blobInfo).writer()
-
-            Channels.newOutputStream(blobWriter)
-        } else {
-            localPruningFile(tableName).takeIf { it.parentFile.isDirectory || it.parentFile.mkdirs() }?.outputStream()
-                ?: error("Unable to create pruning file for table '$tableName'")
-        }
-    }
-
-    private fun localPruningFile(tableName: String) = File(getPruningTableCache(false), "$tableName.prun")
-
-    private fun remotePruningBlob(tableName: String) = BlobId.of(getCloudBucketName(), tableName)
-
-    fun runningOnGoogleCloud(): Boolean {
-        val googleAppEngineEnv = System.getProperty("com.google.appengine.runtime.environment").orEmpty()
-        return googleAppEngineEnv.isNotBlank()
-    }
-
-    private fun getCloudHostname() = System.getProperty("com.google.appengine.application.id")
-    fun getCloudBucketName() = "${getCloudHostname()}.appspot.com"
-
-    fun overrideFontConfig() {
-        if (runningOnGoogleCloud() && File(FONT_CONFIG).exists()) {
-            System.setProperty(FONT_CONFIG_PROPERTY, FONT_CONFIG)
-        }
-    }
-
-    fun createLocalPruningCache() {
-        if (runningOnGoogleCloud()) {
-            return
-        }
-
-        val jarFile = jarFile
-
-        if (jarFile != null) {
-            val pruningTableDirectory = getPruningTableCache(false)
-
-            if (pruningTableDirectory.isDirectory) {
-                // If the pruning table folder already exists, we don't bother re-extracting the
-                // files.
+            if (iconFileName != TNoodleServer.ICON_WORKER) {
+                // Only want to create one tray icon.
                 return
             }
 
-            assert(pruningTableDirectory.mkdirs())
+            if (!SystemTray.isSupported()) {
+                TNoodleServer.LOG.warn("SystemTray is not supported")
+                return
+            }
+
+            val trayAdapter = SystemTrayProvider().systemTray
+
+            val popup = PopupMenu()
+
+            val openItem = MenuItem("Open")
+            popup.add(openItem)
+
+            val exitItem = MenuItem("Exit")
+            popup.add(exitItem)
+
+            openItem.addActionListener { openTabInBrowser(true) }
+
+            exitItem.addActionListener {
+                TNoodleServer.LOG.info("Exit initiated from tray icon")
+                exitProcess(0)
+            }
+
+            val trayIconAdapter = trayAdapter.createAndAddTrayIcon(imageUrl, "$NAME v$VERSION", popup)
+
+            if (trayIconAdapter is JavaIconAdapter) {
+                // Unfortunately, java internally uses some shitty resizing
+                // algorithm for this, so we have to do this ourselves.
+                //trayIconAdapter.setImageAutoSize(true);
+
+                val st = SystemTray.getSystemTray()
+                val ti = trayIconAdapter.trayIcon
+
+                ti.image = image.getScaledInstance(st.trayIconSize.width, -1, Image.SCALE_SMOOTH)
+            }
         }
     }
 }

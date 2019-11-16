@@ -1,0 +1,16 @@
+package org.worldcubeassociation.tnoodle.server.util
+
+import java.io.InputStream
+import java.io.OutputStream
+
+interface ServerCacheConfig {
+    val projectName: String
+    val version: String
+
+    fun pruningTableExists(tableName: String): Boolean
+
+    fun getPruningTableInput(tableName: String): InputStream
+    fun getPruningTableOutput(tableName: String): OutputStream
+
+    fun createLocalPruningCache()
+}
