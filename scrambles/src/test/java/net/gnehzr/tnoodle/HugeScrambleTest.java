@@ -7,10 +7,9 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.SortedMap;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import kotlin.Lazy;
-import net.gnehzr.tnoodle.plugins.PuzzlePlugins;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder;
 import net.gnehzr.tnoodle.scrambles.AlgorithmBuilder.MergingMode;
 import net.gnehzr.tnoodle.scrambles.InvalidMoveException;
@@ -38,9 +37,9 @@ import org.timepedia.exporter.client.Exportable;
 
 public class HugeScrambleTest {
     private static final Logger l = Logger.getLogger(HugeScrambleTest.class.getName());
-    
+
     private static final Random r = Puzzle.getSecureRandom();
-    
+
     static class LockHolder extends Thread {
         public LockHolder() {
             setDaemon(true);
@@ -84,10 +83,10 @@ public class HugeScrambleTest {
 
         int SCRAMBLE_COUNT = 10;
 
-        SortedMap<String, Lazy<Puzzle>> lazyScramblers = PuzzlePlugins.INSTANCE.getPUZZLES();
+        SortedMap<String, Supplier<Puzzle>> lazyScramblers = TestPuzzles.getTestablePuzzles();
         for(String puzzle : lazyScramblers.keySet()) {
-            Lazy<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
-            final Puzzle scrambler = lazyScrambler.getValue();
+            Supplier<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+            final Puzzle scrambler = lazyScrambler.get();
             for(int count = 0; count < SCRAMBLE_COUNT; count++){
                 PuzzleState state = scrambler.getSolvedState().applyAlgorithm(scrambler.generateWcaScramble(r));
                 assertSame(state.solveIn(scrambler.getWcaMinScrambleDistance() - 1), null);
@@ -100,14 +99,14 @@ public class HugeScrambleTest {
         int SCRAMBLE_COUNT = 10;
         int SCRAMBLE_LENGTH = 4;
 
-        SortedMap<String, Lazy<Puzzle>> lazyScramblers = PuzzlePlugins.INSTANCE.getPUZZLES();
+        SortedMap<String, Supplier<Puzzle>> lazyScramblers = TestPuzzles.getTestablePuzzles();
 
         for(String puzzle : lazyScramblers.keySet()) {
-            Lazy<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
-            final Puzzle scrambler = lazyScrambler.getValue();
+            Supplier<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+            final Puzzle scrambler = lazyScrambler.get();
 
             System.out.println("Testing " + puzzle);
-            
+
             // Test solving the solved state
             String solution = scrambler.getSolvedState().solveIn(0);
             assertEquals("", solution);
@@ -138,11 +137,11 @@ public class HugeScrambleTest {
         int SCRAMBLE_COUNT = 10;
         boolean drawScramble = true;
 
-        SortedMap<String, Lazy<Puzzle>> lazyScramblers = PuzzlePlugins.INSTANCE.getPUZZLES();
+        SortedMap<String, Supplier<Puzzle>> lazyScramblers = TestPuzzles.getTestablePuzzles();
 
         for(String puzzle : lazyScramblers.keySet()) {
-            Lazy<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
-            final Puzzle scrambler = lazyScrambler.getValue();
+            Supplier<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+            final Puzzle scrambler = lazyScrambler.get();
 
             System.out.println("Testing " + puzzle);
 
@@ -194,17 +193,15 @@ public class HugeScrambleTest {
 
     @Test
     public void testNames() {
-        SortedMap<String, Lazy<Puzzle>> lazyScramblers = PuzzlePlugins.INSTANCE.getPUZZLES();
+        SortedMap<String, Supplier<Puzzle>> lazyScramblers = TestPuzzles.getTestablePuzzles();
 
         // Check that the names by which the scramblers refer to themselves
         // is the same as the names by which we refer to them in the plugin definitions file.
         for(String shortName : lazyScramblers.keySet()) {
-            String longName = PuzzlePlugins.INSTANCE.getScramblerLongName(shortName);
-            Lazy<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
-            Puzzle scrambler = lazyScrambler.getValue();
-            
+            Supplier<Puzzle> lazyScrambler = lazyScramblers.get(shortName);
+            Puzzle scrambler = lazyScrambler.get();
+
             assertEquals(shortName, scrambler.getShortName());
-            assertEquals(longName, scrambler.getLongName());
 
             System.out.println(Exportable.class + " isAssignableFrom " + scrambler.getClass());
             assertTrue(Exportable.class.isAssignableFrom(scrambler.getClass()));
@@ -232,7 +229,7 @@ public class HugeScrambleTest {
             System.out.println(solution);
         }
     }
-    
+
     @Test
     public void testCubePuzzle() throws InvalidScrambleException, InvalidMoveException {
         testCubeNormalization();
@@ -250,11 +247,11 @@ public class HugeScrambleTest {
         CubeState normalizedSolvedState = solved.getNormalized();
         assertEquals(normalizedState, normalizedSolvedState);
         assertEquals(normalizedState.hashCode(), normalizedSolvedState.hashCode());
-        
+
         state = (CubeState) solved.applyAlgorithm("Uw Dw'");
         normalizedState = state.getNormalized();
         assertEquals(normalizedState, normalizedSolvedState);
-        
+
         CubePuzzle threes = new ThreeByThreeCubePuzzle();
 
         solved = threes.getSolvedState();
@@ -266,7 +263,7 @@ public class HugeScrambleTest {
         String alg = "D2 U' L2 B2 F2 D B2 U' B2 F D' F U' R F2 L2 D' B D F'";
         ab3.appendAlgorithm(alg);
         assertEquals(ab3.toString(), alg);
-        
+
         for(int depth = 0; depth < 100; depth++) {
             state = Puzzle.choose(r, state.getSuccessorsByName().values());
             normalizedState = state.getNormalized();
@@ -294,7 +291,7 @@ public class HugeScrambleTest {
         abSq1 = new AlgorithmBuilder(sq1, MergingMode.CANONICALIZE_MOVES);
         abSq1.appendAlgorithm("(1,0) (0,1)");
         assertEquals(abSq1.toString(), "(1,1)");
-        
+
         abSq1 = new AlgorithmBuilder(sq1, MergingMode.CANONICALIZE_MOVES);
         abSq1.appendAlgorithm("(0,1) (1,1)");
         assertEquals(abSq1.toString(), "(1,2)");
@@ -422,12 +419,12 @@ public class HugeScrambleTest {
 
         // How long does it takes to test if a puzzle is solvable in <= 1 move?
         int SCRAMBLE_COUNT = 100;
-        SortedMap<String, Lazy<Puzzle>> lazyScramblers = PuzzlePlugins.INSTANCE.getPUZZLES();
-        
+        SortedMap<String, Supplier<Puzzle>> lazyScramblers = TestPuzzles.getTestablePuzzles();
+
         for(String puzzle : lazyScramblers.keySet()) {
-            Lazy<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
-            final Puzzle scrambler = lazyScrambler.getValue();
-            
+            Supplier<Puzzle> lazyScrambler = lazyScramblers.get(puzzle);
+            final Puzzle scrambler = lazyScrambler.get();
+
             l.info("Are " + THREE_BY_THREE_SCRAMBLE_COUNT + " " + puzzle + " more than one move away from solved?");
             startMillis = System.currentTimeMillis();
             PuzzleState solved = scrambler.getSolvedState();
