@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import net.gnehzr.tnoodle.plugins.PuzzlePlugins
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher

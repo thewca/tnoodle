@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.gson
 
 import com.google.gson.*
 import net.gnehzr.tnoodle.scrambles.Puzzle
-import net.gnehzr.tnoodle.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import java.lang.reflect.Type
 
 class Puzzlerizer : JsonSerializer<Puzzle>, JsonDeserializer<Puzzle> {
