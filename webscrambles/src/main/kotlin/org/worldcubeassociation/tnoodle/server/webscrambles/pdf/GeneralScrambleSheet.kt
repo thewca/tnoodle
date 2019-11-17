@@ -15,7 +15,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil.spl
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil
-import kotlin.math.log10
 import kotlin.math.min
 
 class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String?) : BaseScrambleSheet(scrambleRequest, globalTitle) {
@@ -49,17 +48,14 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
         val forceStdHighlighting = requiresHighlighting(sideMargins, scrambleImageSize, scrambleRequest.scrambles, STD_SCRAMBLE_PREFIX)
 
         // Also check extra scrambles for visual consistency
-        // TODO adapt "requiresHighlighting" so the code can naturally deal with empty lists
-        val forceExtraHighlighting = scrambleRequest.extraScrambles.takeIf { it.isNotEmpty() }?.let {
-            requiresHighlighting(sideMargins, scrambleImageSize, it, EXTRA_SCRAMBLE_PREFIX)
-        } ?: false
+        val forceExtraHighlighting = requiresHighlighting(sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, EXTRA_SCRAMBLE_PREFIX)
 
-        val forceHighlighting = forceStdHighlighting || forceExtraHighlighting
+        val useHighlighting = forceStdHighlighting || forceExtraHighlighting
 
         // First do a dry run just to see if any scrambles require highlighting.
         // Then do the real run, and force highlighting on every scramble
         // if any scramble required it.
-        val table = createTable(sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, STD_SCRAMBLE_PREFIX, forceHighlighting)
+        val table = createTable(sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, STD_SCRAMBLE_PREFIX, useHighlighting)
         document.add(table)
 
         if (scrambleRequest.extraScrambles.isNotEmpty()) {
@@ -76,13 +72,16 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
             headerTable.addCell(extraScramblesHeader)
             document.add(headerTable)
 
-            val extraTable = createTable(sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, EXTRA_SCRAMBLE_PREFIX, forceHighlighting)
+            val extraTable = createTable(sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, EXTRA_SCRAMBLE_PREFIX, useHighlighting)
             document.add(extraTable)
         }
     }
 
     fun getIndexColumnWidth(scrambles: List<String>, scrambleNumberPrefix: String): Float {
-        val charsWide = scrambleNumberPrefix.length + 1 + log10(scrambles.size.toDouble()).toInt()
+        val scramblesOrdinalLength = scrambles.size.toString().length
+        // + 1 at the end represents the dot.
+        val charsWide = scrambleNumberPrefix.length + scramblesOrdinalLength + 1
+
         // M has got to be as wide or wider than the widest digit in our font
         val wideString = WIDEST_CHAR_STRING.repeat(charsWide) + "."
 
@@ -113,14 +112,14 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
         // so instead, I just replace each character I don't want to wrap with M, which
         // should be the widest character (we're using a monospaced font,
         // so that doesn't really matter), and won't get wrapped.
-        var longestPaddedScramble = longestPaddedScrambleRaw.replace("\\S".toRegex(), WIDEST_CHAR_STRING)
+        val longestPaddedScrambleForMultiLine = longestPaddedScrambleRaw.replace("\\S".toRegex(), WIDEST_CHAR_STRING)
 
-        val tryToFitOnOneLine = "\n" !in longestPaddedScramble
-        if (tryToFitOnOneLine) {
-            // If the scramble contains newlines, then we *only* allow wrapping at the
-            // newlines.
-            longestPaddedScramble = longestPaddedScramble.replace(" ".toRegex(), WIDEST_CHAR_STRING)
-        }
+        // If the scramble contains newlines, then we *only* allow wrapping at the newlines.
+        val longestPaddedScrambleForOneLine = longestPaddedScrambleForMultiLine.replace(" ".toRegex(), WIDEST_CHAR_STRING)
+
+        val tryToFitOnOneLine = "\n" !in longestPaddedScrambleForMultiLine
+        val longestPaddedScramble = longestPaddedScrambleForOneLine.takeIf { tryToFitOnOneLine } ?: longestPaddedScrambleForMultiLine
+
         val availableArea = Rectangle(scrambleColumnWidth - 2 * SCRAMBLE_PADDING_HORIZONTAL,
             (availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM).toFloat())
 
@@ -147,7 +146,7 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
         return lineChunks.any { it.size >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING }
     }
 
-    fun PdfWriter.createTable(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambler: Puzzle, colorScheme: HashMap<String, Color>?, scrambleNumberPrefix: String, forceHighlighting: Boolean): PdfPTable {
+    fun PdfWriter.createTable(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambler: Puzzle, colorScheme: HashMap<String, Color>?, scrambleNumberPrefix: String, useHighlighting: Boolean): PdfPTable {
         val cb = directContent
 
         val indexColumnWidth = getIndexColumnWidth(scrambles, scrambleNumberPrefix)
@@ -172,7 +171,7 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
             val scramblePhrase = Phrase()
 
             for ((nthLine, lineChunk) in lineChunks.withIndex()) {
-                if (forceHighlighting && nthLine % 2 == 1) {
+                if (useHighlighting && nthLine % 2 == 1) {
                     lineChunk.setBackground(HIGHLIGHT_COLOR)
                 }
 
