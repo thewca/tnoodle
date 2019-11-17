@@ -30,6 +30,7 @@ data class ScrambleRequest(
     val title: String,
     val fmc: Boolean,
     val colorScheme: HashMap<String, SVGColor>?,
+
     // totalAttempt and attempt are useful for when we have multiple attempts split in the schedule.
     // Usually, tnoodle prints scrambles for a ScrambleRequest iterating over ScrambleRequest.scrambles.
     // So, if ScrambleRequest.scrambles.length == 3, tnoodle prints Scramble 1 of 3, Scramble 2 of 3 and Scramble 3 of 3.
