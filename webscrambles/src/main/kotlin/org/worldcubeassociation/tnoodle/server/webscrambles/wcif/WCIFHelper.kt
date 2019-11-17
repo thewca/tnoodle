@@ -6,6 +6,7 @@ import com.google.gson.JsonParser
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 import kotlin.math.pow
 
@@ -45,13 +46,16 @@ class WCIFHelper(schedule: String) {
             .flatMap { it.rooms }
             .flatMap { it.activities }
             .map { it.startTime }
-            .minBy { ZonedDateTime.parse(it) } ?: error("I could not find the earliest activity")
+            .minBy { ZonedDateTime.parse(it, WCIF_DATE_FORMAT) }
+            ?: error("I could not find the earliest activity")
 
     val hasMultipleDays: Boolean get() = numberOfDays > 1
     val hasMultipleVenues: Boolean get() = venues.size > 1
 
     companion object {
         private val PARSER = JsonParser()
+
+        val WCIF_DATE_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
         fun List<ScrambleRequest>.filterForActivity(activity: Activity, timeZone: ZoneId): List<Pair<ScrambleRequest, ZonedDateTime>> {
             val activitySplit = activity.activityCode.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -94,7 +98,8 @@ class WCIFHelper(schedule: String) {
                 scramblesForAttempt to activityTime
             }
 
-            return mappedRequests.takeIf { it.isNotEmpty() } ?: error("An activity of the schedule did not match an event.")
+            return mappedRequests.takeIf { it.isNotEmpty() }
+                ?: error("An activity of the schedule did not match an event.")
         }
 
         fun ZonedDateTime.atStartOfDay() = toLocalDate().atStartOfDay().toLocalDate()

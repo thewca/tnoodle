@@ -6,6 +6,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.filterForActivity
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.atStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.WCIF_DATE_FORMAT
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.ZonedDateTime
@@ -30,7 +31,7 @@ object OrderedScrambles {
             val hasMultipleRooms = venue.hasMultipleRooms
 
             val timezone = venue.dateTimeZone
-            val competitionStartDate = ZonedDateTime.of(LocalDateTime.parse(competitionStartString), timezone)
+            val competitionStartDate = ZonedDateTime.of(LocalDateTime.parse(competitionStartString, WCIF_DATE_FORMAT), timezone)
 
             for (room in venue.rooms) {
                 val roomName = room.fileSafeName
