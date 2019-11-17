@@ -83,20 +83,18 @@ object PdfDrawUtil {
         addText(Paragraph(text, Font(bf, fontSize)))
     }
 
-    fun PdfContentByte.populateRect(rect: Rectangle, list: List<String>, alignList: List<Int>, bf: BaseFont, fontSize: Int) {
-        assert(list.size == alignList.size) { "Make sure that list and alignList are of the same size" }
-
+    fun PdfContentByte.populateRect(rect: Rectangle, itemsWithAlignment: List<Pair<String, Int>>, bf: BaseFont, fontSize: Int) {
         val totalHeight = rect.height
         val width = rect.width
 
         val x = rect.left
         val y = rect.top
 
-        val height = totalHeight / list.size
+        val height = totalHeight / itemsWithAlignment.size
 
-        for (i in list.indices) {
+        for ((i, content) in itemsWithAlignment.withIndex()) {
             val temp = Rectangle(x, y + height * i - totalHeight - fontSize.toFloat(), x + width, y + height * i - totalHeight)
-            fitAndShowText(list[i], bf, temp, 15f, alignList[i], 1f)
+            fitAndShowText(content.first, bf, temp, 15f, content.second, 1f)
         }
     }
 }
