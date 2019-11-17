@@ -5,5 +5,5 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 data class Activity(val activityCode: String, val startTime: String) {
-    fun getLocalStartTime(timeZone: ZoneId) = ZonedDateTime.of(LocalDateTime.parse(startTime), timeZone)
+    fun getLocalStartTime(timeZone: ZoneId) = ZonedDateTime.of(LocalDateTime.parse(startTime, WCIFHelper.WCIF_DATE_FORMAT), timeZone)
 }
