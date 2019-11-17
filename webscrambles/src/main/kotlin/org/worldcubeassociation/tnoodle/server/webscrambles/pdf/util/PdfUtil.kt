@@ -101,7 +101,7 @@ object PdfUtil {
     private val FITTEXT_FONTSIZE_PRECISION = 0.1f
 
     /**
-     * Copied from ColumnText.java in the itextpdf 5.3.0 source code.
+     * Adapted from ColumnText.java in the itextpdf 5.3.0 source code.
      * Added the newlinesAllowed argument.
      *
      * Fits the text to some rectangle adjusting the font size as needed.
@@ -111,48 +111,47 @@ object PdfUtil {
      * @param maxFontSize the maximum font size
      * @param newlinesAllowed output text can be split into lines
      * @param leadingMultiplier leading multiplier between lines
+     *
      * @return the calculated font size that makes the text fit
      */
     fun fitText(font: Font, text: String, rect: Rectangle, maxFontSize: Float, newlinesAllowed: Boolean, leadingMultiplier: Float): Float {
-        var maxFontSize = maxFontSize
-
         // ideally, we could pass the object in which our text is going to be rendered
         // as argument instead of asking leadingMultiplier, but we are currently rendering
         // text in pdfcell, columntext and others
         // it'd be painful to render lines in a common object to ask leadingMultiplier
-
-        var minFontSize = 1f
-        var potentialFontSize: Float
-
-        while (true) {
-            potentialFontSize = (maxFontSize + minFontSize) / 2.0f
-            font.size = potentialFontSize
+        return estimateByAverageInterval(1f, maxFontSize, FITTEXT_FONTSIZE_PRECISION) {
+            // FIXME inplace modification is no good
+            font.size = it
 
             val lineChunks = text.splitToLineChunks(font, rect.width)
-            if (!newlinesAllowed && lineChunks.size > 1) {
-                // If newlines are not allowed, and we had to split the text into more than
-                // one line, then potentialFontSize is too large.
-                maxFontSize = potentialFontSize
-            } else {
-                // The font size seems to be a pretty good estimate for how
-                // much vertical space a row actually takes up.
 
-                val totalHeight = lineChunks.size.toFloat() * potentialFontSize * leadingMultiplier
+            // The font size seems to be a pretty good estimate for how
+            // much vertical space a row actually takes up.
+            val heightPerLine = it * leadingMultiplier
+            val totalHeight = lineChunks.size.toFloat() * heightPerLine
 
-                if (totalHeight < rect.height) {
-                    minFontSize = potentialFontSize
-                } else {
-                    maxFontSize = potentialFontSize
-                }
-            }
-            if (maxFontSize - minFontSize < FITTEXT_FONTSIZE_PRECISION) {
-                // Err on the side of too small, because being too large will screw up
-                // layout.
-                potentialFontSize = minFontSize
-                break
-            }
+            val shouldIncrease = totalHeight < rect.height
+            // If newlines are NOT allowed, but we had to split the text into more than
+            // one line, then our current guess is too large.
+            val mustNotIncrease = !newlinesAllowed && lineChunks.size > 1
+
+            shouldIncrease && !mustNotIncrease
         }
-        
-        return potentialFontSize
+    }
+
+    private fun estimateByAverageInterval(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
+        if (max - min < precision) {
+            // Ground recursion: We have converged arbitrarily close to some target value.
+            return min
+        }
+
+        val potentialFontSize = (min + max) / 2f
+        val iterationShouldIncrease = shouldIncrease(potentialFontSize)
+
+        return if (iterationShouldIncrease) {
+            estimateByAverageInterval(potentialFontSize, max, precision, shouldIncrease)
+        } else {
+            estimateByAverageInterval(min, potentialFontSize, precision, shouldIncrease)
+        }
     }
 }
