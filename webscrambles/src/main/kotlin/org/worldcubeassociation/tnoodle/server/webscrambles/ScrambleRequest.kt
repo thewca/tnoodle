@@ -246,7 +246,7 @@ data class ScrambleRequest(
                 computerDisplayZipOut.putFileEntry(computerDisplayZipName, pdfPrintingByteStream.render(passcode), computerDisplayZipParameters)
 
                 val txtZipName = "Interchange/txt/$safeTitle.txt"
-                val txtScrambles = stripNewlines(scrambleRequest.allScrambles).joinToString("\r\n")
+                val txtScrambles = scrambleRequest.allScrambles.stripNewlines().joinToString("\r\n")
 
                 zipOut.putFileEntry(txtZipName, txtScrambles.toByteArray(), parameters)
 

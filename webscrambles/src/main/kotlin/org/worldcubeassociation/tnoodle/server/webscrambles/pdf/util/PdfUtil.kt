@@ -3,17 +3,16 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 import com.itextpdf.text.Chunk
 import com.itextpdf.text.Font
 import com.itextpdf.text.Rectangle
-import java.util.LinkedList
 
 object PdfUtil {
     const val NON_BREAKING_SPACE = '\u00A0'
     const val TEXT_PADDING_HORIZONTAL = 1
 
-    fun String.splitToLineChunks(font: Font, textColumnWidth: Float): LinkedList<Chunk> {
+    fun String.splitToLineChunks(font: Font, textColumnWidth: Float): List<Chunk> {
         val availableTextWidth = textColumnWidth - 2 * TEXT_PADDING_HORIZONTAL
 
-        val lineChunks = LinkedList<Chunk>()
-        val lineList = split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val lineChunks = mutableListOf<Chunk>()
+        val lineList = split("\n".toRegex()).dropLastWhile { it.isEmpty() }
 
         for (line in lineList) {
             var startIndex = 0
@@ -99,6 +98,8 @@ object PdfUtil {
         return lineChunks
     }
 
+    private val FITTEXT_FONTSIZE_PRECISION = 0.1f
+
     /**
      * Copied from ColumnText.java in the itextpdf 5.3.0 source code.
      * Added the newlinesAllowed argument.
@@ -112,8 +113,6 @@ object PdfUtil {
      * @param leadingMultiplier leading multiplier between lines
      * @return the calculated font size that makes the text fit
      */
-    private val FITTEXT_FONTSIZE_PRECISION = 0.1f
-
     fun fitText(font: Font, text: String, rect: Rectangle, maxFontSize: Float, newlinesAllowed: Boolean, leadingMultiplier: Float): Float {
         var maxFontSize = maxFontSize
 
@@ -153,6 +152,7 @@ object PdfUtil {
                 break
             }
         }
+        
         return potentialFontSize
     }
 }

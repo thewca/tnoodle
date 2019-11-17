@@ -34,8 +34,7 @@ object StringUtil {
     }
 
     fun String.toFileSafeString() = filter { it !in INVALID_CHARS }
-
-    fun stripNewlines(strings: List<String>) = strings.map { it.replace("\n", " ") }
+    fun List<String>.stripNewlines() = map { it.replace("\n", " ") }
 
     fun randomPasscode(): String {
         val secureRandom = SecureRandom()
