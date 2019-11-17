@@ -16,7 +16,6 @@ plugins {
     `java-library`
     checkstyle
     `maven-publish`
-    kotlin("jvm")
 }
 
 configureJava()
@@ -30,13 +29,7 @@ dependencies {
     implementation(project(":threephase"))
     implementation(project(":sq12phase"))
 
-    implementation(kotlin("stdlib-jdk8"))
-
     api(GWTEXPORTER)
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
 
 configureJUnit5()
