@@ -15,8 +15,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil.spl
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.TableAndHighlighting
-import java.util.HashMap
 import kotlin.math.log10
 import kotlin.math.min
 
@@ -47,72 +45,64 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
 
         val scrambleImageSize = scrambleRequest.scrambler.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight)
 
+        // First check if any scramble requires highlighting.
+        val forceStdHighlighting = requiresHighlighting(sideMargins, scrambleImageSize, scrambleRequest.scrambles, STD_SCRAMBLE_PREFIX)
+
+        // Also check extra scrambles for visual consistency
+        // TODO adapt "requiresHighlighting" so the code can naturally deal with empty lists
+        val forceExtraHighlighting = scrambleRequest.extraScrambles.takeIf { it.isNotEmpty() }?.let {
+            requiresHighlighting(sideMargins, scrambleImageSize, it, EXTRA_SCRAMBLE_PREFIX)
+        } ?: false
+
+        val forceHighlighting = forceStdHighlighting || forceExtraHighlighting
+
         // First do a dry run just to see if any scrambles require highlighting.
         // Then do the real run, and force highlighting on every scramble
         // if any scramble required it.
-        var forceHighlighting = false
-        for (dryRun in booleanArrayOf(true, false)) {
-            val scrambleNumberPrefix = ""
-            val tableAndHighlighting = createTable(sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, scrambleNumberPrefix, forceHighlighting)
-            if (dryRun) {
-                if (tableAndHighlighting.highlighting) {
-                    forceHighlighting = true
-                    continue
-                }
-            } else {
-                document.add(tableAndHighlighting.table)
+        val table = createTable(sideMargins, scrambleImageSize, scrambleRequest.scrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, STD_SCRAMBLE_PREFIX, forceHighlighting)
+        document.add(table)
+
+        if (scrambleRequest.extraScrambles.isNotEmpty()) {
+            val headerTable = PdfPTable(1).apply {
+                setTotalWidth(floatArrayOf(availableWidth))
+                isLockedWidth = true
             }
 
-            if (scrambleRequest.extraScrambles.isNotEmpty()) {
-                val headerTable = PdfPTable(1).apply {
-                    setTotalWidth(floatArrayOf(availableWidth))
-                    isLockedWidth = true
-                }
-
-                val extraScramblesHeader = PdfPCell(Paragraph("Extra scrambles")).apply {
-                    verticalAlignment = PdfPCell.ALIGN_MIDDLE
-                    paddingBottom = 3f
-                }
-
-                headerTable.addCell(extraScramblesHeader)
-                if (!dryRun) {
-                    document.add(headerTable)
-                }
-
-                val extraScrambleNumberPrefix = "E"
-                val extraTableAndHighlighting = createTable(sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, extraScrambleNumberPrefix, forceHighlighting)
-                if (dryRun) {
-                    if (tableAndHighlighting.highlighting) {
-                        forceHighlighting = true
-                        continue
-                    }
-                } else {
-                    document.add(extraTableAndHighlighting.table)
-                }
+            val extraScramblesHeader = PdfPCell(Paragraph(TABLE_HEADING_EXTRA_SCRAMBLES)).apply {
+                verticalAlignment = PdfPCell.ALIGN_MIDDLE
+                paddingBottom = 3f
             }
+
+            headerTable.addCell(extraScramblesHeader)
+            document.add(headerTable)
+
+            val extraTable = createTable(sideMargins, scrambleImageSize, scrambleRequest.extraScrambles, scrambleRequest.scrambler, scrambleRequest.colorScheme, EXTRA_SCRAMBLE_PREFIX, forceHighlighting)
+            document.add(extraTable)
         }
     }
 
-    fun PdfWriter.createTable(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambler: Puzzle, colorScheme: HashMap<String, Color>?, scrambleNumberPrefix: String, forceHighlighting: Boolean): TableAndHighlighting {
-        val cb = directContent
-
-        val leadingMultiplier = 1f
-
+    fun getIndexColumnWidth(scrambles: List<String>, scrambleNumberPrefix: String): Float {
         val charsWide = scrambleNumberPrefix.length + 1 + log10(scrambles.size.toDouble()).toInt()
         // M has got to be as wide or wider than the widest digit in our font
         val wideString = WIDEST_CHAR_STRING.repeat(charsWide) + "."
 
         // I don't know why we need the +5, perhaps there's some padding?
-        val col1Width = Chunk(wideString).widthPoint + 5f
+        return Chunk(wideString).widthPoint + 5f
+    }
+
+    fun PdfWriter.getScrambleColumnWidth(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambleNumberPrefix: String): Float {
+        val col1Width = getIndexColumnWidth(scrambles, scrambleNumberPrefix)
 
         val availableWidth = pageSize.width - sideMargins
-        val scrambleColumnWidth = availableWidth - col1Width - scrambleImageSize.width.toFloat() - (2 * SCRAMBLE_IMAGE_PADDING).toFloat()
-        val availableScrambleHeight = scrambleImageSize.height - 2 * SCRAMBLE_IMAGE_PADDING
 
-        val table = PdfPTable(3).apply {
-            setTotalWidth(floatArrayOf(col1Width, scrambleColumnWidth, (scrambleImageSize.width + 2 * SCRAMBLE_IMAGE_PADDING).toFloat()))
-            isLockedWidth = true
-        }
+        return availableWidth - col1Width - scrambleImageSize.width.toFloat() - (2 * SCRAMBLE_IMAGE_PADDING).toFloat()
+    }
+
+    fun PdfWriter.getFontConfiguration(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambleNumberPrefix: String): Pair<Font, Boolean> {
+        val leadingMultiplier = 1f
+
+        val scrambleColumnWidth = getScrambleColumnWidth(sideMargins, scrambleImageSize, scrambles, scrambleNumberPrefix)
+        val availableScrambleHeight = scrambleImageSize.height - 2 * SCRAMBLE_IMAGE_PADDING
 
         val longestScramble = scrambles.maxBy { it.length } ?: ""
 
@@ -144,28 +134,49 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
 
         val scrambleFont = Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL)
 
-        var highlight = forceHighlighting
+        return scrambleFont to oneLine
+    }
+
+    fun PdfWriter.requiresHighlighting(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambleNumberPrefix: String): Boolean {
+        val scrambleColumnWidth = getScrambleColumnWidth(sideMargins, scrambleImageSize, scrambles, scrambleNumberPrefix)
+        val (scrambleFont, oneLine) = getFontConfiguration(sideMargins, scrambleImageSize, scrambles, scrambleNumberPrefix)
+
+        val paddedScrambles = scrambles.map { if (oneLine) it else StringUtil.padTurnsUniformly(it, PdfUtil.NON_BREAKING_SPACE.toString()) }
+        val lineChunks = paddedScrambles.map { it.splitToLineChunks(scrambleFont, scrambleColumnWidth) }
+
+        return lineChunks.any { it.size >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING }
+    }
+
+    fun PdfWriter.createTable(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambler: Puzzle, colorScheme: HashMap<String, Color>?, scrambleNumberPrefix: String, forceHighlighting: Boolean): PdfPTable {
+        val cb = directContent
+
+        val indexColumnWidth = getIndexColumnWidth(scrambles, scrambleNumberPrefix)
+        val scrambleColumnWidth = getScrambleColumnWidth(sideMargins, scrambleImageSize, scrambles, scrambleNumberPrefix)
+
+        val (scrambleFont, oneLine) = getFontConfiguration(sideMargins, scrambleImageSize, scrambles, scrambleNumberPrefix)
+
+        val table = PdfPTable(3).apply {
+            setTotalWidth(floatArrayOf(indexColumnWidth, scrambleColumnWidth, (scrambleImageSize.width + 2 * SCRAMBLE_IMAGE_PADDING).toFloat()))
+            isLockedWidth = true
+        }
+
         for ((i, scramble) in scrambles.withIndex()) {
-            val paddedScramble = if (oneLine) scramble else StringUtil.padTurnsUniformly(scramble, PdfUtil.NON_BREAKING_SPACE.toString())
-            val ch = Chunk(scrambleNumberPrefix + (i + 1) + ".")
+            val ch = Chunk("$scrambleNumberPrefix${i + 1}.")
             val nthscramble = PdfPCell(Paragraph(ch)).apply {
                 verticalAlignment = PdfPCell.ALIGN_MIDDLE
             }
             table.addCell(nthscramble)
 
-            val scramblePhrase = Phrase()
-            var nthLine = 1
+            val paddedScramble = if (oneLine) scramble else StringUtil.padTurnsUniformly(scramble, PdfUtil.NON_BREAKING_SPACE.toString())
             val lineChunks = paddedScramble.splitToLineChunks(scrambleFont, scrambleColumnWidth)
-            if (lineChunks.size >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING) {
-                highlight = true
-            }
+            val scramblePhrase = Phrase()
 
-            for (lineChunk in lineChunks) {
-                if (highlight && nthLine % 2 == 0) {
+            for ((nthLine, lineChunk) in lineChunks.withIndex()) {
+                if (forceHighlighting && nthLine % 2 == 1) {
                     lineChunk.setBackground(HIGHLIGHT_COLOR)
                 }
+
                 scramblePhrase.add(lineChunk)
-                nthLine++
             }
 
             val scrambleCell = PdfPCell(Paragraph(scramblePhrase)).apply {
@@ -173,12 +184,14 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
                 // let itextpdf wrap lines for us.
                 isNoWrap = true
                 verticalAlignment = PdfPCell.ALIGN_MIDDLE
+
                 // This shifts everything up a little bit, because I don't like how
                 // ALIGN_MIDDLE works.
                 paddingTop = (-SCRAMBLE_PADDING_VERTICAL_TOP).toFloat()
                 paddingBottom = SCRAMBLE_PADDING_VERTICAL_BOTTOM.toFloat()
                 paddingLeft = SCRAMBLE_PADDING_HORIZONTAL.toFloat()
                 paddingRight = SCRAMBLE_PADDING_HORIZONTAL.toFloat()
+
                 // We space lines a little bit more here - it still fits in the cell height
                 val extraLeadingMultiplier = 1.1f
                 setLeading(0f, extraLeadingMultiplier)
@@ -201,6 +214,7 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
                 } finally {
                     g2.dispose() // iTextPdf blows up if we do not dispose of this
                 }
+
                 val imgCell = PdfPCell(Image.getInstance(tp), true).apply {
                     backgroundColor = BaseColor.LIGHT_GRAY
                     verticalAlignment = PdfPCell.ALIGN_MIDDLE
@@ -209,11 +223,11 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
 
                 table.addCell(imgCell)
             } else {
-                table.addCell("")
+                table.addCell(EMPTY_CELL_CONTENT)
             }
         }
 
-        return TableAndHighlighting(table, highlight)
+        return table
     }
 
     companion object {
@@ -225,6 +239,13 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
         const val SCRAMBLE_PADDING_HORIZONTAL = 1
 
         const val WIDEST_CHAR_STRING = "M"
+
+        const val EMPTY_CELL_CONTENT = ""
+
+        const val STD_SCRAMBLE_PREFIX = EMPTY_CELL_CONTENT
+        const val EXTRA_SCRAMBLE_PREFIX = "E"
+
+        const val TABLE_HEADING_EXTRA_SCRAMBLES = "Extra Scrambles"
 
         private const val MIN_LINES_TO_ALTERNATE_HIGHLIGHTING = 4
 
