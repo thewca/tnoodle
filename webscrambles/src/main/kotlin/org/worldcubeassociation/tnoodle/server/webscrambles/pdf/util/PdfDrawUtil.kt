@@ -51,25 +51,24 @@ object PdfDrawUtil {
     }
 
     fun PdfContentByte.fitAndShowText(text: String, bf: BaseFont, rect: Rectangle, maxFontSize: Float, align: Int, leadingMultiplier: Float): Int {
-        val iterationThreshold = 0.1f
-        var iterMaxFontSize = maxFontSize + iterationThreshold
+        // We create a temp pdf and check if the text fit in a rectangle there.
+        val tempCb = PdfContentByte(pdfWriter)
+        val status = tempCb.showTextStatus(text, bf, rect, maxFontSize, align, leadingMultiplier)
 
-        do {
-            iterMaxFontSize -= iterationThreshold
+        if (ColumnText.hasMoreText(status)) {
+            val iterMaxFontSize = maxFontSize - 0.1f
+            // FIXME brute-force approach doesn't seem healthy
+            return fitAndShowText(text, bf, rect, iterMaxFontSize, align, leadingMultiplier)
+        }
 
-            // We create a temp pdf and check if the text fit in a rectangle there.
-            val tempCb = PdfContentByte(pdfWriter)
+        // TODO see if we can recycle "status" from above if not drawn on a separate canvas
+        return showTextStatus(text, bf, rect, maxFontSize, align, leadingMultiplier)
+    }
 
-            val tempCt = ColumnText(tempCb).apply {
-                insertTextParagraph(text, bf, rect, iterMaxFontSize, align, leadingMultiplier)
-            }
-
-            val status = tempCt.go()
-        } while (ColumnText.hasMoreText(status))
-
+    private fun PdfContentByte.showTextStatus(text: String, bf: BaseFont, rect: Rectangle, fontSize: Float, align: Int, leadingMultiplier: Float): Int {
         // If it's ok, we add the text to original pdf.
         val ct = ColumnText(this).apply {
-            insertTextParagraph(text, bf, rect, iterMaxFontSize, align, leadingMultiplier)
+            insertTextParagraph(text, bf, rect, fontSize, align, leadingMultiplier)
         }
 
         return ct.go()
