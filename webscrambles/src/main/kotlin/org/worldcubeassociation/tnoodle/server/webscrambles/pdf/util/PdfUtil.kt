@@ -17,19 +17,23 @@ object PdfUtil {
         for (line in lineList) {
             var startIndex = 0
             var endIndex = 0
+
             while (startIndex < line.length) {
                 // Walk forwards until we've grabbed the maximum number of characters
                 // that fit in a line or we've run out of characters.
-                var substringWidth: Float
                 endIndex++
+
                 while (endIndex <= line.length) {
                     val substring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE
-                    substringWidth = font.baseFont.getWidthPoint(substring, font.size)
+                    val substringWidth = font.baseFont.getWidthPoint(substring, font.size)
+
                     if (substringWidth > availableTextWidth) {
                         break
                     }
+
                     endIndex++
                 }
+
                 // endIndex is one past the best fit, so remove one character and it should fit!
                 endIndex--
 
@@ -38,6 +42,7 @@ object PdfUtil {
                 // Any spaces added for padding after a turn are considered part of
                 // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
                 val perfectFitEndIndex = endIndex
+
                 if (endIndex < line.length) {
                     while (true) {
                         if (endIndex < startIndex) {
@@ -51,19 +56,23 @@ object PdfUtil {
                         // Another dirty hack for sq1: turns only line up
                         // nicely if every line starts with a (x,y). We ensure this
                         // by forcing every line to end with a /.
-                        val isSquareOne = line.indexOf('/') >= 0
+                        val isSquareOne = "/" in line
+
                         if (isSquareOne) {
                             val previousCharacter = line[endIndex - 1]
+
                             if (previousCharacter == '/') {
                                 break
                             }
                         } else {
                             val currentCharacter = line[endIndex]
                             val isTurnCharacter = currentCharacter != ' '
+
                             if (!isTurnCharacter) {
                                 break
                             }
                         }
+
                         endIndex--
                     }
                 }
@@ -74,8 +83,9 @@ object PdfUtil {
                 // space as is available on a line.
                 do {
                     substring += NON_BREAKING_SPACE
-                    substringWidth = font.baseFont.getWidthPoint(substring, font.size)
+                    val substringWidth = font.baseFont.getWidthPoint(substring, font.size)
                 } while (substringWidth <= availableTextWidth)
+
                 // substring is now too big for our line, so remove the
                 // last character.
                 substring = substring.substring(0, substring.length - 1)
@@ -85,13 +95,17 @@ object PdfUtil {
                 while (endIndex < line.length && line[endIndex] == ' ') {
                     endIndex++
                 }
-                startIndex = endIndex
-                val lineChunk = Chunk(substring)
-                lineChunks.add(lineChunk)
-                lineChunk.font = font
 
-                // Force a line wrap!
-                lineChunk.append("\n")
+                startIndex = endIndex
+
+                val lineChunk = Chunk(substring).apply {
+                    this.font = font
+
+                    // Force a line wrap!
+                    append("\n")
+                }
+
+                lineChunks.add(lineChunk)
             }
         }
 
