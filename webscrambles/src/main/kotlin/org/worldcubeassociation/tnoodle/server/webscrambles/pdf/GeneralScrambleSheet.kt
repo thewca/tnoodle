@@ -1,7 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
-import com.itextpdf.awt.DefaultFontMapper
-import com.itextpdf.awt.PdfGraphics2D
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
@@ -10,7 +8,7 @@ import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.svglite.Color
 import net.gnehzr.tnoodle.svglite.Dimension
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.drawSvg
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil.splitToLineChunks
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
@@ -199,20 +197,8 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
             table.addCell(scrambleCell)
 
             if (scrambleImageSize.width > 0 && scrambleImageSize.height > 0) {
-                val tp = cb.createTemplate((scrambleImageSize.width + 2 * SCRAMBLE_IMAGE_PADDING).toFloat(), (scrambleImageSize.height + 2 * SCRAMBLE_IMAGE_PADDING).toFloat())
-                val g2 = PdfGraphics2D(tp, tp.width, tp.height, DefaultFontMapper())
-                g2.translate(SCRAMBLE_IMAGE_PADDING, SCRAMBLE_IMAGE_PADDING)
-
-                try {
-                    val svg = scrambler.drawScramble(scramble, colorScheme)
-                    g2.drawSvg(svg, scrambleImageSize)
-                } catch (e: Exception) {
-                    table.addCell("Error drawing scramble: " + e.message)
-                    // FIXME l.log(Level.WARNING, "Error drawing scramble, if you're having font issues, try installing ttf-dejavu.", e)
-                    continue
-                } finally {
-                    g2.dispose() // iTextPdf blows up if we do not dispose of this
-                }
+                val svg = scrambler.drawScramble(scramble, colorScheme)
+                val tp = cb.renderSvgToPDF(svg, scrambleImageSize, SCRAMBLE_IMAGE_PADDING)
 
                 val imgCell = PdfPCell(Image.getInstance(tp), true).apply {
                     backgroundColor = BaseColor.LIGHT_GRAY

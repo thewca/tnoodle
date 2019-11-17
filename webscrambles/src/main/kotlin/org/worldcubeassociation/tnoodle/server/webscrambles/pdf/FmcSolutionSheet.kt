@@ -1,7 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
-import com.itextpdf.awt.DefaultFontMapper
-import com.itextpdf.awt.PdfGraphics2D
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfPCell
@@ -9,7 +7,7 @@ import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.drawSvg
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.fitAndShowText
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
@@ -139,15 +137,8 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
             val availableScrambleHeight = gradeBottom - scrambleBorderTop
 
             val dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth - 2, availableScrambleHeight - 2)
-            val tp = cb.createTemplate(dim.width.toFloat(), dim.height.toFloat())
-            val g2 = PdfGraphics2D(tp, dim.width.toFloat(), dim.height.toFloat(), DefaultFontMapper())
-
-            try {
-                val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
-                g2.drawSvg(svg, dim)
-            } finally {
-                g2.dispose()
-            }
+            val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
+            val tp = cb.renderSvgToPDF(svg, dim)
 
             cb.addImage(Image.getInstance(tp), dim.width.toFloat(), 0f, 0f, dim.height.toFloat(), (competitorInfoLeft + (availableScrambleWidth - dim.width) / 2).toFloat(), (scrambleBorderTop + (availableScrambleHeight - dim.height) / 2).toFloat())
         }

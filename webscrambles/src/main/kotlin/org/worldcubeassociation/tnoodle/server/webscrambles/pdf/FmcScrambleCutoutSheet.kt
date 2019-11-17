@@ -1,7 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
-import com.itextpdf.awt.DefaultFontMapper
-import com.itextpdf.awt.PdfGraphics2D
 import com.itextpdf.text.Element
 import com.itextpdf.text.Image
 import com.itextpdf.text.Rectangle
@@ -9,7 +7,7 @@ import com.itextpdf.text.pdf.PdfWriter
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.drawDashedLine
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.drawSvg
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 
@@ -37,16 +35,9 @@ class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?): Fm
         val availablePaddedScrambleHeight = availableScrambleHeight - 2 * SCRAMBLE_IMAGE_PADDING
 
         val dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth, availablePaddedScrambleHeight)
+        val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
 
-        val tp = directContent.createTemplate(dim.width.toFloat(), dim.height.toFloat())
-        val g2 = PdfGraphics2D(tp, dim.width.toFloat(), dim.height.toFloat(), DefaultFontMapper())
-
-        try {
-            val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
-            g2.drawSvg(svg, dim)
-        } finally {
-            g2.dispose()
-        }
+        val tp = directContent.renderSvgToPDF(svg, dim)
 
         val scrambleSuffix = " - Scramble ${index + 1} of ${scrambleRequest.scrambles.size}"
             .takeIf { scrambleRequest.scrambles.size > 1 } ?: ""

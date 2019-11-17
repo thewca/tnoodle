@@ -1,11 +1,14 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
+import com.itextpdf.awt.DefaultFontMapper
+import com.itextpdf.awt.PdfGraphics2D
 import com.itextpdf.text.Font
 import com.itextpdf.text.Paragraph
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.BaseFont
 import com.itextpdf.text.pdf.ColumnText
 import com.itextpdf.text.pdf.PdfContentByte
+import com.itextpdf.text.pdf.PdfTemplate
 import net.gnehzr.tnoodle.svglite.Dimension
 import net.gnehzr.tnoodle.svglite.Svg
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
@@ -14,33 +17,44 @@ import org.apache.batik.bridge.DocumentLoader
 import org.apache.batik.bridge.GVTBuilder
 import org.apache.batik.bridge.UserAgentAdapter
 import org.apache.batik.util.XMLResourceDescriptor
-import java.awt.Graphics2D
 import java.awt.geom.AffineTransform
 
 object PdfDrawUtil {
-    fun Graphics2D.drawSvg(svg: Svg, size: Dimension) {
-        // Copied (and modified) from http://stackoverflow.com/a/12502943
+    fun PdfContentByte.renderSvgToPDF(svg: Svg, dim: Dimension, padding: Int = 0): PdfTemplate {
+        val tp = createTemplate(dim.width.toFloat() + 2 * padding, dim.height.toFloat() + 2 * padding)
+        val g2 = PdfGraphics2D(tp, tp.width, tp.height, DefaultFontMapper())
 
-        val userAgent = UserAgentAdapter()
+        if (padding > 0) {
+            g2.translate(padding, padding)
+        }
 
-        val loader = DocumentLoader(userAgent)
-        val ctx = BridgeContext(userAgent, loader).apply { setDynamicState(BridgeContext.DYNAMIC) }
+        try {
+            // Copied (and modified) from http://stackoverflow.com/a/12502943
+            val userAgent = UserAgentAdapter()
 
-        val parser = XMLResourceDescriptor.getXMLParserClassName()
-        val factory = SAXSVGDocumentFactory(parser)
+            val loader = DocumentLoader(userAgent)
+            val ctx = BridgeContext(userAgent, loader).apply { setDynamicState(BridgeContext.DYNAMIC) }
 
-        val parsedSvgDocument = factory.createSVGDocument(null, svg.toString().reader())
+            val parser = XMLResourceDescriptor.getXMLParserClassName()
+            val factory = SAXSVGDocumentFactory(parser)
 
-        val chartGfx = GVTBuilder().build(ctx, parsedSvgDocument)
+            val parsedSvgDocument = factory.createSVGDocument(null, svg.toString().reader())
 
-        val actualSize = svg.size
+            val chartGfx = GVTBuilder().build(ctx, parsedSvgDocument)
 
-        val scaleWidth = 1.0 * size.width / actualSize.width
-        val scaleHeight = 1.0 * size.height / actualSize.height
+            val actualSize = svg.size
 
-        chartGfx.transform = AffineTransform.getScaleInstance(scaleWidth, scaleHeight)
+            val scaleWidth = dim.width.toDouble() / actualSize.width
+            val scaleHeight = dim.height.toDouble() / actualSize.height
 
-        chartGfx.paint(this)
+            chartGfx.transform = AffineTransform.getScaleInstance(scaleWidth, scaleHeight)
+
+            chartGfx.paint(g2)
+        } finally {
+            g2.dispose() // iTextPdf blows up if we do not dispose of this
+        }
+
+        return tp
     }
 
     fun PdfContentByte.drawDashedLine(left: Int, right: Int, yPosition: Int) {
