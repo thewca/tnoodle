@@ -48,19 +48,20 @@ class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?): Fm
             g2.dispose()
         }
 
-        var title = "$globalTitle - ${scrambleRequest.title}"
+        val scrambleSuffix = " - Scramble ${index + 1} of ${scrambleRequest.scrambles.size}"
+            .takeIf { scrambleRequest.scrambles.size > 1 } ?: ""
 
-        if (scrambleRequest.scrambles.size > 1) {
-            title += " - Scramble ${index + 1} of ${scrambleRequest.scrambles.size}"
-        }
+        val title = "$globalTitle - ${scrambleRequest.title}$scrambleSuffix"
 
         // empty strings for space above and below
         val textList = listOf("", title, scramble, "")
         val alignList = List(textList.size) { Element.ALIGN_LEFT }
 
+        val paddedTitleItems = textList.zip(alignList)
+
         for (i in 0 until SCRAMBLES_PER_SHEET) {
             val rect = Rectangle(LEFT.toFloat(), (top - i * availableScrambleHeight).toFloat(), (right - dim.width - SPACE_SCRAMBLE_IMAGE).toFloat(), (top - (i + 1) * availableScrambleHeight).toFloat())
-            directContent.populateRect(rect, textList, alignList, BASE_FONT, FONT_SIZE)
+            directContent.populateRect(rect, paddedTitleItems, BASE_FONT, FONT_SIZE)
 
             directContent.addImage(Image.getInstance(tp), dim.width.toDouble(), 0.0, 0.0, dim.height.toDouble(), (right - dim.width).toDouble(), top.toDouble() - (i + 1) * availableScrambleHeight + (availableScrambleHeight - dim.getHeight()) / 2)
 
