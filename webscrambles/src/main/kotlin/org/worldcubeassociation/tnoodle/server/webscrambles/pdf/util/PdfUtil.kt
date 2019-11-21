@@ -11,105 +11,114 @@ object PdfUtil {
     fun String.splitToLineChunks(font: Font, textColumnWidth: Float): List<Chunk> {
         val availableTextWidth = textColumnWidth - 2 * TEXT_PADDING_HORIZONTAL
 
-        val lineChunks = mutableListOf<Chunk>()
-        val lineList = split("\n".toRegex()).dropLastWhile { it.isEmpty() }
+        return split("\n").dropLastWhile { it.isEmpty() }
+            .flatMap { it.splitLineToChunks(font, availableTextWidth) }
+            .map { it.toLineWrapChunk(font) }
+    }
 
-        for (line in lineList) {
-            var startIndex = 0
-            var endIndex = 0
+    fun String.splitLineToChunks(font: Font, availableTextWidth: Float): List<String> {
+        val lineChunks = mutableListOf<String>()
+        val cutIndices = mutableListOf<Int>()
 
-            while (startIndex < line.length) {
-                // Walk forwards until we've grabbed the maximum number of characters
-                // that fit in a line or we've run out of characters.
-                endIndex++
-
-                while (endIndex <= line.length) {
-                    val substring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE
-                    val substringWidth = font.baseFont.getWidthPoint(substring, font.size)
-
-                    if (substringWidth > availableTextWidth) {
-                        break
-                    }
-
-                    endIndex++
-                }
-
-                // endIndex is one past the best fit, so remove one character and it should fit!
-                endIndex--
-
-                // If we're not at the end of the text, make sure we're not cutting
-                // a word (or turn) in half by walking backwards until we're right before a turn.
-                // Any spaces added for padding after a turn are considered part of
-                // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
-                val perfectFitEndIndex = endIndex
-
-                if (endIndex < line.length) {
-                    while (true) {
-                        if (endIndex < startIndex) {
-                            // We walked all the way to the beginning of the line
-                            // without finding a good breaking point. Give up and break
-                            // in the middle of a word =(.
-                            endIndex = perfectFitEndIndex
-                            break
-                        }
-
-                        // Another dirty hack for sq1: turns only line up
-                        // nicely if every line starts with a (x,y). We ensure this
-                        // by forcing every line to end with a /.
-                        val isSquareOne = "/" in line
-
-                        if (isSquareOne) {
-                            val previousCharacter = line[endIndex - 1]
-
-                            if (previousCharacter == '/') {
-                                break
-                            }
-                        } else {
-                            val currentCharacter = line[endIndex]
-                            val isTurnCharacter = currentCharacter != ' '
-
-                            if (!isTurnCharacter) {
-                                break
-                            }
-                        }
-
-                        endIndex--
-                    }
-                }
-
-                var substring = NON_BREAKING_SPACE + line.substring(startIndex, endIndex) + NON_BREAKING_SPACE
-
-                // Add NON_BREAKING_SPACE until the substring takes up as much as
-                // space as is available on a line.
-                do {
-                    substring += NON_BREAKING_SPACE
-                    val substringWidth = font.baseFont.getWidthPoint(substring, font.size)
-                } while (substringWidth <= availableTextWidth)
-
-                // substring is now too big for our line, so remove the
-                // last character.
-                substring = substring.substring(0, substring.length - 1)
-
-                // Walk past all whitespace that comes immediately after the line wrap
-                // we are about to insert.
-                while (endIndex < line.length && line[endIndex] == ' ') {
-                    endIndex++
-                }
-
-                startIndex = endIndex
-
-                val lineChunk = Chunk(substring).apply {
-                    this.font = font
-
-                    // Force a line wrap!
-                    append("\n")
-                }
-
-                lineChunks.add(lineChunk)
+        for (i in indices) {
+            // Walk past all whitespace that comes immediately after
+            // the last line wrap we just inserted.
+            if (this[i] == ' ') {
+                continue
             }
+
+            val cuttingProgress = cutIndices.max() ?: 0
+
+            if (i < cuttingProgress) {
+                continue
+            }
+
+            val optimalCutIndex = optimalCutIndex(i, font, availableTextWidth)
+            cutIndices.add(optimalCutIndex)
+
+            val substring = substring(i, optimalCutIndex).padNbsp()
+                .fillToWidthMax(NON_BREAKING_SPACE.toString(), font, availableTextWidth)
+
+            lineChunks.add(substring)
         }
 
         return lineChunks
+    }
+
+    private fun String.padNbsp() = NON_BREAKING_SPACE + this + NON_BREAKING_SPACE
+
+    fun String.optimalCutIndex(startIndex: Int, font: Font, availableTextWidth: Float): Int {
+        val endIndex = longestFittingSubstringIndex(font, availableTextWidth, startIndex)
+
+        // If we're not at the end of the text, make sure we're not cutting
+        // a word (or turn) in half by walking backwards until we're right before a turn.
+        if (endIndex < length) {
+            return tryBackwardsWordEndIndex(startIndex, endIndex)
+        }
+
+        return endIndex
+    }
+
+    fun String.longestFittingSubstringIndex(font: Font, maxWidth: Float, startIndex: Int = 0, fallback: Int = startIndex): Int {
+        val searchRange = startIndex..length
+
+        val endpoint = searchRange.findLast {
+            val substring = substring(startIndex, it).padNbsp()
+            val substringWidth = font.baseFont.getWidthPoint(substring, font.size)
+
+            substringWidth <= maxWidth
+        }
+
+        return endpoint ?: fallback
+    }
+
+    fun String.tryBackwardsWordEndIndex(frontStopIndex: Int = 0, endIndex: Int = lastIndex, fallback: Int = endIndex): Int {
+        for (perfectFitIndex in endIndex downTo frontStopIndex) {
+            // Another dirty hack for sq1: turns only line up
+            // nicely if every line starts with a (x,y). We ensure this
+            // by forcing every line to end with a /.
+            val isSquareOne = "/" in this
+
+            // Any spaces added for padding after a turn are considered part of
+            // that turn because they're actually NON_BREAKING_SPACE, not a ' '.
+            val terminatingChar = if (isSquareOne) '/' else ' '
+            val indexBias = if (isSquareOne) 1 else 0
+
+            if (this[perfectFitIndex - indexBias] == terminatingChar) {
+                return perfectFitIndex
+            }
+        }
+
+        // We walked all the way to the beginning of the line
+        // without finding a good breaking point.
+        // Give up and break in the middle of a word =(.
+        return fallback
+    }
+
+    fun String.fillToWidthMax(padding: String, font: Font, maxLength: Float): String {
+        val paddingList = mutableListOf<String>()
+
+        // Add $padding until the substring takes up as much
+        // space as is available on a line.
+        do {
+            paddingList.add(padding)
+
+            val currentPadding = paddingList.joinToString("")
+            val paddedString = this + currentPadding
+
+            val substringWidth = font.baseFont.getWidthPoint(paddedString, font.size)
+        } while (substringWidth <= maxLength)
+
+        // substring is now too big for our line, so remove the
+        // last character.
+        return this + paddingList.drop(1).joinToString("")
+    }
+
+    fun String.toLineWrapChunk(font: Font) = Chunk(this).apply {
+        this.font = font
+
+        // Force a line wrap!
+        append("\n")
     }
 
     private val FITTEXT_FONTSIZE_PRECISION = 0.1f
