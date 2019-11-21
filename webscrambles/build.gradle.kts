@@ -1,4 +1,4 @@
-import configurations.CompilerSettings.KOTLIN_JVM_TARGE
+import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.APPLEJAVAEXTENSIONS

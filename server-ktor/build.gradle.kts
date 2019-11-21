@@ -1,8 +1,6 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
-import dependencies.Libraries.JUNIT_JUPITER_API
-import dependencies.Libraries.JUNIT_JUPITER_ENGINE
 import dependencies.Libraries.KTOR_GSON
 import dependencies.Libraries.KTOR_SERVER_NETTY
 import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
@@ -25,17 +23,11 @@ dependencies {
     api(KTOR_GSON)
 
     implementation(KTOR_SERVER_HOST_COMMON)
-
-    runtimeOnly(LOGBACK_CLASSIC)
-
-    implementation(KOTLIN_ARGPARSER)
-
     implementation(KTOR_SERVER_SERVLET)
 
     implementation(MARKDOWNJ_CORE)
 
-    testImplementation(JUNIT_JUPITER_API)
-    testRuntime(JUNIT_JUPITER_ENGINE)
+    runtimeOnly(LOGBACK_CLASSIC)
 }
 
 tasks.withType<KotlinCompile> {
