@@ -97,42 +97,37 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
     }
 
     fun PdfWriter.getFontConfiguration(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambleNumberPrefix: String): Pair<Font, Boolean> {
-        val leadingMultiplier = 1f
-
         val scrambleColumnWidth = getScrambleColumnWidth(sideMargins, scrambleImageSize, scrambles, scrambleNumberPrefix)
         val availableScrambleHeight = scrambleImageSize.height - 2 * SCRAMBLE_IMAGE_PADDING
 
+        val availableArea = Rectangle(scrambleColumnWidth - 2 * SCRAMBLE_PADDING_HORIZONTAL,
+            (availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM).toFloat())
+
         val longestScramble = scrambles.maxBy { it.length } ?: ""
 
-        val longestPaddedScrambleRaw = scrambles.map { StringUtil.padTurnsUniformly(it, WIDEST_CHAR_STRING) }
-            .maxBy { it.length } ?: ""
+        val longestAlignedScramble = scrambles.map { StringUtil.padTurnsUniformly(it, WIDEST_CHAR_STRING) }
+            .maxBy { it.length } ?: longestScramble
+
+        val longestScrambleOneLine = "\n" !in longestAlignedScramble//Masked
 
         // I don't know how to configure ColumnText.fitText's word wrapping characters,
         // so instead, I just replace each character I don't want to wrap with M, which
         // should be the widest character (we're using a monospaced font,
         // so that doesn't really matter), and won't get wrapped.
-        val longestPaddedScrambleForMultiLine = longestPaddedScrambleRaw.replace("\\S".toRegex(), WIDEST_CHAR_STRING)
+        val longestScrambleMasked = longestScramble.replace(".".toRegex(), WIDEST_CHAR_STRING)
+        val longestAlignedScrambleMasked = longestAlignedScramble.replace("\\S".toRegex(), WIDEST_CHAR_STRING)
+        val longestAlignedScrambleMaskedAndStuffed = longestAlignedScrambleMasked.replace(" ".toRegex(), WIDEST_CHAR_STRING)
+
+        val fontSizeForMaskedUnaligned = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScrambleMasked, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, false, 1f) // FIXME const
 
         // If the scramble contains newlines, then we *only* allow wrapping at the newlines.
-        val longestPaddedScrambleForOneLine = longestPaddedScrambleForMultiLine.replace(" ".toRegex(), WIDEST_CHAR_STRING)
+        val longestRespectingNewlines = longestAlignedScrambleMasked.takeIf { longestScrambleOneLine } ?: longestAlignedScrambleMaskedAndStuffed
+        val fontSizeIfIncludingNewlines = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestRespectingNewlines, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true, 1f) // FIXME const
 
-        val tryToFitOnOneLine = "\n" !in longestPaddedScrambleForMultiLine
-        val longestPaddedScramble = longestPaddedScrambleForOneLine.takeIf { tryToFitOnOneLine } ?: longestPaddedScrambleForMultiLine
+        val oneLine = longestScrambleOneLine && fontSizeForMaskedUnaligned >= FontUtil.MINIMUM_ONE_LINE_FONT_SIZE
+        val perfectFontSize = fontSizeForMaskedUnaligned.takeIf { oneLine } ?: fontSizeIfIncludingNewlines
 
-        val availableArea = Rectangle(scrambleColumnWidth - 2 * SCRAMBLE_PADDING_HORIZONTAL,
-            (availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM).toFloat())
-
-        val longestScrambleOneLine = longestScramble.replace(".".toRegex(), WIDEST_CHAR_STRING)
-        val perfectFontSizeForOneLine = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScrambleOneLine, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, false, leadingMultiplier)
-
-        val oneLine = tryToFitOnOneLine && perfectFontSizeForOneLine >= FontUtil.MINIMUM_ONE_LINE_FONT_SIZE
-
-        val perfectFontSize = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestPaddedScramble, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true, leadingMultiplier)
-            .takeUnless { oneLine } ?: perfectFontSizeForOneLine
-
-        val scrambleFont = Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL)
-
-        return scrambleFont to oneLine
+        return Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL) to oneLine
     }
 
     fun PdfWriter.requiresHighlighting(sideMargins: Float, scrambleImageSize: Dimension, scrambles: List<String>, scrambleNumberPrefix: String): Boolean {
