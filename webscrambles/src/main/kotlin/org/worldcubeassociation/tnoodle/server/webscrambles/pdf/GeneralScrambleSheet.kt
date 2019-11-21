@@ -13,6 +13,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil.spl
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil
+import kotlin.math.log10
 import kotlin.math.min
 
 class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String?) : BaseScrambleSheet(scrambleRequest, globalTitle) {
@@ -76,7 +77,7 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
     }
 
     fun getIndexColumnWidth(scrambles: List<String>, scrambleNumberPrefix: String): Float {
-        val scramblesOrdinalLength = scrambles.size.toString().length
+        val scramblesOrdinalLength = log10(scrambles.size.toDouble()).toInt()
         // + 1 at the end represents the dot.
         val charsWide = scrambleNumberPrefix.length + scramblesOrdinalLength + 1
 
