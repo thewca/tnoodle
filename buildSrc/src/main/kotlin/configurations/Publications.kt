@@ -11,7 +11,7 @@ object Publications {
     fun Project.configureMavenPublication(targetArtifactId: String? = null) {
         configure<PublishingExtension> {
             publications {
-                create<MavenPublication>("scrambler") {
+                create<MavenPublication>("tnoodle") {
                     targetArtifactId?.let {
                         artifactId = it
                     }
