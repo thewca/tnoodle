@@ -387,6 +387,7 @@ public class PyraminxSolver {
     /**
      * Generate a random pyraminx position.
      * @param r         random int generator
+     * @return          A randomised Pyraminx state, based on the seeding of {@code r}
      */
     public PyraminxSolverState randomState(Random r) {
         PyraminxSolverState state = new PyraminxSolverState();

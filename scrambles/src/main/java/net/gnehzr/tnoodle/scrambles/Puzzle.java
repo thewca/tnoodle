@@ -71,6 +71,8 @@ public abstract class Puzzle implements Exportable {
     /**
      * Returns the minimum distance from solved that any scramble this Puzzle
      * generates will be.
+     *
+     * @return The integer representing the exact minimum scramble distance
      */
     public int getWcaMinScrambleDistance() {
         return wcaMinScrambleDistance;
@@ -130,7 +132,12 @@ public abstract class Puzzle implements Exportable {
         return generateScrambles(r, count);
     }
 
-    /** seeded scrambles, these can't be cached, so they'll be a little slower **/
+    /**
+     * seeded scrambles, these can't be cached, so they'll be a little slower
+     *
+     * @param seed The seed to be used for generating this scramble
+     * @return A scramble similar to {@link #generateScramble}, except that it is guaranteed to be based on {@code seed}
+     */
     @Export
     public final String generateSeededScramble(String seed) {
         return generateSeededScramble(seed.getBytes());
@@ -172,7 +179,7 @@ public abstract class Puzzle implements Exportable {
 
     /**
      * TODO - document! alphabetical
-     * @return
+     * @return TODO, see above
      */
     @Export
     public String[] getFaceNames() {
@@ -183,8 +190,8 @@ public abstract class Puzzle implements Exportable {
 
     /**
      * TODO - document!
-     * @param scheme
-     * @return
+     * @param scheme TODO, see above
+     * @return TODO, see above
      */
     public HashMap<String, Color> parseColorScheme(String scheme) {
         HashMap<String, Color> colorScheme = getDefaultColorScheme();
@@ -225,6 +232,7 @@ public abstract class Puzzle implements Exportable {
      * @param colorScheme A HashMap mapping face names to Colors.
      *          Any missing entries will be merged with the defaults from getDefaultColorScheme().
      *          If null, just the defaults are used.
+     * @return An SVG object representing the drawn scramble.
      * @throws InvalidScrambleException If scramble is invalid.
      */
     public Svg drawScramble(String scramble, HashMap<String, Color> colorScheme) throws InvalidScrambleException {
@@ -593,7 +601,7 @@ public abstract class Puzzle implements Exportable {
          *
          * @param algorithm A space separated String of moves to apply to state
          * @return The resulting PuzzleState
-         * @throws InvalidScrambleException
+         * @throws InvalidScrambleException If the scramble is invalid, for example if it uses invalid notation.
          */
         public PuzzleState applyAlgorithm(String algorithm) throws InvalidScrambleException {
             PuzzleState state = this;
@@ -673,7 +681,7 @@ public abstract class Puzzle implements Exportable {
          * puzzles. For example, square one may wish to declare (3,3) as 1
          * move. Another possible use for this would be rotations, which
          * count as 0 moves.
-         * @param move
+         * @param move The move for which to compute costs
          * @return The cost of doing this move.
          */
         public int getMoveCost(String move) {
@@ -734,7 +742,7 @@ public abstract class Puzzle implements Exportable {
          * Returns true if this state is equal to other.
          * Note that a puzzle like 4x4 must compare all orientations of the puzzle, otherwise
          * generateRandomMoves() will allow for trivial sequences of turns like Lw Rw'.
-         * @param other
+         * @param other The other object to check for equality
          * @return true if this is equal to other
          */
         public abstract boolean equals(Object other);
@@ -749,6 +757,7 @@ public abstract class Puzzle implements Exportable {
          * NOTE: It is assumed that this method is thread safe! That means unless you know what you're doing,
          * use the synchronized keyword when implementing this method:<br>
          * <code>protected synchronized void drawScramble();</code>
+         * @param colorScheme The color scheme to use while drawing
          * @return An Svg instance representing this scramble.
          */
         protected abstract Svg drawScramble(HashMap<String, Color> colorScheme);
