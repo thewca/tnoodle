@@ -1,11 +1,7 @@
 package net.gnehzr.tnoodle.puzzle;
 
-import net.gnehzr.tnoodle.svglite.Color;
-import net.gnehzr.tnoodle.svglite.Dimension;
-import net.gnehzr.tnoodle.svglite.Circle;
-import net.gnehzr.tnoodle.svglite.Path;
-import net.gnehzr.tnoodle.svglite.Svg;
-import net.gnehzr.tnoodle.svglite.Transform;
+import net.gnehzr.tnoodle.svglite.*;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,6 +28,7 @@ public class ClockPuzzle extends Puzzle {
     private static final int arrowHeight = 10;
     private static final int arrowRadius = 2;
     private static final int pinRadius = 4;
+    private static final int pinUpOffset = 6;
     private static final double arrowAngle = Math.PI / 2 - Math.acos( (double)arrowRadius / (double)arrowHeight );
 
     private static final int gap = 5;
@@ -257,7 +254,7 @@ public class ClockPuzzle extends Puzzle {
                     for(int j = -1; j <= 1; j++) {
                         Transform tCopy = new Transform(t);
                         tCopy.translate(2*i*clockOuterRadius, 2*j*clockOuterRadius);
-                        
+
                         Circle clockFace = new Circle(0, 0, clockRadius);
                         clockFace.setStroke(Color.BLACK);
                         clockFace.setFill(colorScheme.get(colorString[s]+ "Clock"));
@@ -362,6 +359,50 @@ public class ClockPuzzle extends Puzzle {
             pin.setStroke(Color.BLACK);
             pin.setFill(colorScheme.get( pinUp ? "PinUp" : "PinDown" ));
             g.appendChild(pin);
+
+            // there have been problems in the past with clock pin states being "inverted",
+            // see https://github.com/thewca/tnoodle/issues/423 for details.
+            if (pinUp) {
+                Transform bodyTransform = new Transform(t);
+                // pin circle transform relates to the circle *center*. Since it is two
+                // radii wide, we only move *one* radius to the right.
+                bodyTransform.translate(-pinRadius, -pinUpOffset);
+
+                Rectangle cylinderBody = new Rectangle(0, 0, 2 * pinRadius, pinUpOffset);
+                cylinderBody.setTransform(bodyTransform);
+                cylinderBody.setStroke(null);
+                cylinderBody.setFill(colorScheme.get( "PinUp" ));
+                g.appendChild(cylinderBody);
+
+                // We are NOT using the rectangle stroke, because those border strokes would cross through
+                // the bottom circle (ie cylinder "foot"). Drawing paths left and right is less cumbersome
+                // than drawing a stroked rectangle and overlaying it yet again with a stroke-less circle
+                Path cylinderWalls = new Path();
+
+                // left border
+                cylinderWalls.moveTo(0, 0);
+                cylinderWalls.lineTo(0, pinUpOffset);
+
+                // right border
+                cylinderWalls.moveTo(2 * pinRadius, 0);
+                cylinderWalls.lineTo(2 * pinRadius, pinUpOffset);
+
+                cylinderWalls.closePath();
+                cylinderWalls.setStroke(Color.BLACK);
+                cylinderWalls.setTransform(bodyTransform);
+                g.appendChild(cylinderWalls);
+
+                // Cylinder top "lid". Basically just a second pin circle
+                // that is lifted `pinRadius` pixels high.
+                Transform headTransform = new Transform(t);
+                headTransform.translate(0, -pinUpOffset);
+
+                Circle cylinderHead = new Circle(0, 0, pinRadius);
+                cylinderHead.setTransform(headTransform);
+                cylinderHead.setStroke(Color.BLACK);
+                cylinderHead.setFill(colorScheme.get( "PinUp" ));
+                g.appendChild(cylinderHead);
+            }
         }
 
     }
