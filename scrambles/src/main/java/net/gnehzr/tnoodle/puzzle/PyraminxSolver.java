@@ -76,7 +76,7 @@ public class PyraminxSolver {
 
     /**
      * Converts the list of edges into a number representing the permutation of the edges.
-     * @param edges   edges representation (ori << 3 + perm)
+     * @param edges   edges representation (ori &lt;&lt; 3 + perm)
      * @return        an integer between 0 and 719 representing the permutation of 6 elements
      */
     public static int packEdgePerm(int[] edges) {
@@ -111,7 +111,7 @@ public class PyraminxSolver {
 
     /**
      * Converts the list of edges into a number representing the orientation of the edges.
-     * @param edges    edges representation (ori << 3 + perm)
+     * @param edges    edges representation (ori &lt;&lt; 3 + perm)
      * @return         an integer between 0 and 31 representing the orientation of 5 elements (the 6th is fixed)
      */
     public static int packEdgeOrient(int[] edges) {

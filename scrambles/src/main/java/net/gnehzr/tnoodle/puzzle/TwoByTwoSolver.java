@@ -42,7 +42,7 @@ public class TwoByTwoSolver {
 
     /**
      * Converts the list of cubies into a number representing the permutation of the cubies.
-     * @param cubies   cubies representation (ori << 3 + perm)
+     * @param cubies   cubies representation (ori &lt;&lt; 3 + perm)
      * @return         an integer between 0 and 5039 representing the permutation of 7 elements
      */
     public static int packPerm(int[] cubies){
@@ -59,7 +59,7 @@ public class TwoByTwoSolver {
     /**
      * Converts an integer representing a permutation of 7 elements into a list of cubies.
      * @param perm     an integer between 0 and 5039 representing the permutation of 7 elements
-     * @param cubies   cubies representation (ori << 3 + perm)
+     * @param cubies   cubies representation (ori &lt;&lt; 3 + perm)
      */
     public static void unpackPerm(int perm, int[] cubies){
         int val = 0x6543210;
@@ -77,7 +77,7 @@ public class TwoByTwoSolver {
 
     /**
      * Converts the list of cubies into a number representing the orientation of the cubies.
-     * @param cubies   cubies representation (ori << 3 + perm)
+     * @param cubies   cubies representation (ori &lt;&lt; 3 + perm)
      * @return         an integer between 0 and 728 representing the orientation of 6 elements (the 7th is fixed)
      */
     public static int packOrient(int[] cubies){
@@ -91,7 +91,7 @@ public class TwoByTwoSolver {
     /**
      * Converts an integer representing the orientation of 6 elements into a list of cubies.
      * @param ori      an integer between 0 and 728 representing the orientation of 6 elements (the 7th is fixed)
-     * @param cubies   cubies representation (ori << 3 + perm)
+     * @param cubies   cubies representation (ori &lt;&lt; 3 + perm)
      */
     public static void unpackOrient(int ori, int[] cubies){
         int sum_ori = 0;

@@ -25,7 +25,7 @@ import static java.lang.Math.ceil;
 
 /**
  * Puzzle and TwistyPuzzle encapsulate all the information to filter out
- * scrambles <= wcaMinScrambleDistance (defaults to 1)
+ * scrambles &lt;= wcaMinScrambleDistance (defaults to 1)
  * move away from solved (see generateWcaScramble),
  * and to generate random turn scrambles generically (see generateRandomMoves).
  *
@@ -310,7 +310,7 @@ public abstract class Puzzle implements Exportable {
         public int compareTo(Bucket<H> other) {
             return this.value - other.value;
         }
-        
+
         public int hashCode() {
             return this.value;
         }
@@ -443,7 +443,7 @@ public abstract class Puzzle implements Exportable {
                 fringeComparing = fringeSolved;
                 minComparingFringe = minFringeSolved;
             }
-            
+
             PuzzleState node = fringeExtending.pop();
             int distance = seenExtending.get(node);
             if(seenComparing.containsKey(node)) {
@@ -558,7 +558,7 @@ public abstract class Puzzle implements Exportable {
         }
 
         // Step 3: solved <----- bestIntersection
-        
+
         int distanceFromSolved = seenSolved.get(state.getNormalized());
     outer:
         while(distanceFromSolved > 0) {

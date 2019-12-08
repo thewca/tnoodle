@@ -1,4 +1,4 @@
-/**
+/*
     Copyright (C) 2015  Shuang Chen
 
     This program is free software: you can redistribute it and/or modify
@@ -158,7 +158,7 @@ public class Search {
 	 *
 	 * @param probeMin
 	 *      defines the minimum number of the probes of phase 2. So, if a solution is found within given probes, the
-	 *      computing will continue to find shorter solution(s). Btw, if probeMin > probeMax, probeMin will be set to probeMax.
+	 *      computing will continue to find shorter solution(s). Btw, if probeMin &gt; probeMax, probeMin will be set to probeMax.
 	 *
 	 * @param verbose
 	 *      determins the format of the solution(s). see USE_SEPARATOR, INVERSE_SOLUTION, APPEND_LENGTH, OPTIMAL_SOLUTION
