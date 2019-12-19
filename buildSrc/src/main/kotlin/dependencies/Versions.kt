@@ -36,6 +36,8 @@ object Versions {
     object Plugins {
         val SHADOW = "5.2.0"
         val NODEJS = "2.2.0"
+        val DEPENDENCY_VERSIONS = "0.27.0"
+        val GIT_VERSION_TAG = "0.12.2"
 
         val KOTLIN = Versions.KOTLIN
 

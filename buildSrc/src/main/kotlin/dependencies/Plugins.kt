@@ -17,6 +17,12 @@ object Plugins {
     inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM_ACTUAL: PluginDependencySpec
         get() = id("kotlin-multiplatform").version(Versions.Plugins.KOTLIN_MULTIPLATFORM)
 
+    inline val PluginDependenciesSpec.DEPENDENCY_VERSIONS_ACTUAL: PluginDependencySpec
+        get() = id("com.github.ben-manes.versions").version(Versions.Plugins.DEPENDENCY_VERSIONS)
+
+    inline val PluginDependenciesSpec.GIT_VERSION_TAG_ACTUAL: PluginDependencySpec
+        get() = id("com.palantir.git-version").version(Versions.Plugins.GIT_VERSION_TAG)
+
     // not versioned because the classpath from the buildscript {} block already implies a version
     inline val PluginDependenciesSpec.GOOGLE_APPENGINE_ACTUAL: PluginDependencySpec
         get() = id("com.google.cloud.tools.appengine")

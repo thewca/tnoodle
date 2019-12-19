@@ -1,6 +1,8 @@
 import dependencies.Libraries.Buildscript.GOOGLE_APPENGINE_GRADLE_ACTUAL
 import dependencies.Libraries.Buildscript.PROGUARD_GRADLE_ACTUAL
 import dependencies.Libraries.Buildscript.WCA_I18N_ACTUAL
+import dependencies.Plugins.DEPENDENCY_VERSIONS_ACTUAL
+import dependencies.Plugins.GIT_VERSION_TAG_ACTUAL
 import dependencies.Plugins.GOOGLE_APPENGINE_ACTUAL
 import dependencies.Plugins.KOTLIN_JVM_ACTUAL
 import dependencies.Plugins.KOTLIN_MULTIPLATFORM_ACTUAL
@@ -30,6 +32,12 @@ inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM: PluginDependencySpec
 
 inline val PluginDependenciesSpec.GOOGLE_APPENGINE: PluginDependencySpec
     get() = GOOGLE_APPENGINE_ACTUAL
+
+inline val PluginDependenciesSpec.DEPENDENCY_VERSIONS: PluginDependencySpec
+    get() = DEPENDENCY_VERSIONS_ACTUAL
+
+inline val PluginDependenciesSpec.GIT_VERSION_TAG: PluginDependencySpec
+    get() = GIT_VERSION_TAG_ACTUAL
 
 inline val PROGUARD_GRADLE: String
     get() = PROGUARD_GRADLE_ACTUAL
