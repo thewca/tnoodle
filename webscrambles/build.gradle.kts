@@ -1,5 +1,6 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
+import configurations.ProjectVersions.gitVersionTag
 
 import dependencies.Libraries.APPLEJAVAEXTENSIONS
 import dependencies.Libraries.BATIK_TRANSCODER
@@ -30,6 +31,7 @@ plugins {
     application
     SHADOW
     kotlin("jvm")
+    GIT_VERSION_TAG
 }
 
 dependencies {
@@ -86,7 +88,7 @@ tasks.create("registerManifest") {
                     ?: "TNoodle-LOCAL"
 
                 val tnoodleVersion = project.findProperty("TNOODLE_VERSION")
-                    ?: "devel"
+                    ?: "devel-${project.gitVersionTag()}"
 
                 attributes(
                     "Implementation-Title" to tnoodleTitle,
