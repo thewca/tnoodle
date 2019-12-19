@@ -22,6 +22,7 @@ allprojects {
 
 plugins {
     KOTLIN_JVM apply false
+    DEPENDENCY_VERSIONS
 }
 
 val releasePrefix = "TNoodle-WCA"
