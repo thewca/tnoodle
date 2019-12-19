@@ -265,6 +265,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
 
         val directionModifiers = arrayOf("", "'", "2")
         val moves = arrayOf("F", "R", "U", "B", "L", "D")
+        val rotations = arrayOf("", "x", "y", "z", "", "")
         val movesCell = Array(movesType.size) { Array<Array<String?>>(direction.size) { arrayOfNulls(moves.size) } }
 
         // Face moves.
@@ -275,8 +276,12 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         }
         // Rotations.
         for (i in directionModifiers.indices) {
-            for (j in moves.indices) {
-                movesCell[1][i][j] = "[" + moves[j].toLowerCase() + directionModifiers[i] + "]"
+            for (j in rotations.indices) {
+                if (!rotations[j].isBlank()) {
+                    movesCell[1][i][j] = rotations[j].toLowerCase() + directionModifiers[i]
+                } else {
+                    movesCell[1][i][j] = "";
+                }
             }
         }
 
