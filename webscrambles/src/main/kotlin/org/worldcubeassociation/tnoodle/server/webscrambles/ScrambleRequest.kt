@@ -168,7 +168,7 @@ data class ScrambleRequest(
 
             if (useEncryption) {
                 isEncryptFiles = true
-                encryptionMethod = EncryptionMethod.AES
+                encryptionMethod = EncryptionMethod.ZIP_STANDARD
             }
         }
 
