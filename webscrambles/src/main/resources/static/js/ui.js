@@ -346,7 +346,7 @@ var mark2 = {};
 
         var extraScrambles = 2;
         var eventOrder = [
-            // Official WCA events as of March 12, 2018
+            // Official WCA events as of January 1, 2020
             // Names match https://www.worldcubeassociation.org/regulations/#article-9-events
             {eventID: "222", name: "2x2x2 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "333", name: "3x3x3 Cube", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
@@ -357,7 +357,6 @@ var mark2 = {};
             {eventID: "333bf", name: "3x3x3: Blindfolded", default_round: { num_scrambles: 3, num_extra_scrambles: extraScrambles } },
             {eventID: "333oh", name: "3x3x3: One-Handed", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "333fm", name: "3x3x3: Fewest Moves", default_round: { num_scrambles: 1 } },
-            {eventID: "333ft", name: "3x3x3: With Feet", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "minx", name: "Megaminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "pyram", name: "Pyraminx", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
             {eventID: "sq1", name: "Square-1", default_round: { num_scrambles: 5, num_extra_scrambles: extraScrambles } },
@@ -382,7 +381,6 @@ var mark2 = {};
                 "333bf" : "333ni",
                 "333oh" : "333",
                 "333fm" : "333fm",
-                "333ft" : "333",
                 "444bf" : "444ni",
                 "555bf" : "555ni",
                 "333mbf" : "333ni",
