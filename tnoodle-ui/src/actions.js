@@ -86,7 +86,6 @@ function eventToTNoodlePuzzle(eventId) {
     "333bf": "333ni",
     "333oh": "333",
     "333fm": "333fm",
-    "333ft": "333",
     "444bf": "444ni",
     "555bf": "555ni",
     "333mbf": "333ni",
