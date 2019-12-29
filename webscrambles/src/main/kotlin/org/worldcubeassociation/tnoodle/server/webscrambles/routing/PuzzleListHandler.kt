@@ -11,63 +11,46 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameA
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 
 object PuzzleListHandler : RouteHandler {
-    private val puzzleInfoByShortName: Map<String, Map<String, String>>
+    private fun getPuzzleInfo(scrambler: Puzzle, includeStatus: Boolean): Map<String, Any?> {
+        val nameData = mapOf(
+            "shortName" to scrambler.shortName,
+            "longName" to PuzzlePlugins.getScramblerLongName(scrambler.shortName)
+        )
 
-    private val puzzleInfos: List<Map<String, String?>>
-
-    init {
-        val scramblers = PuzzlePlugins.PUZZLES
-
-        puzzleInfos = scramblers.keys.map {
-            mapOf(
-                "shortName" to it,
-                "longName" to PuzzlePlugins.getScramblerLongName(it)!!
+        if (includeStatus) {
+            return nameData + mapOf(
+                "initializationStatus" to scrambler.initializationStatus
             )
         }
 
-        puzzleInfoByShortName = puzzleInfos.associateBy { it["shortName"]!! }
-    }
-
-    private fun getPuzzleInfo(scrambler: Puzzle, includeStatus: Boolean): Map<String, Any> {
-        val info: Map<String, Any> = puzzleInfoByShortName[scrambler.shortName]!!
-
-        // info is unmodifiable, so we copy it
-        return info.toMutableMap().apply {
-            if (includeStatus) {
-                this["initializationStatus"] = scrambler.initializationStatus
-            }
-        }
+        return nameData
     }
 
     override fun install(router: Routing) {
-        router.get("/puzzles/{puzzleExt}") {
+        router.get("/puzzles/{filename}") {
             val includeStatus = call.request.queryParameters["includeStatus"] != null
 
-            val puzzleExt = call.parameters["puzzleExt"]!!
-
-            val (puzzle, extension) = splitNameAndExtension(puzzleExt)
-
-            if (extension.isEmpty()) {
-                return@get call.respondText("Please specify an extension")
-            }
+            val fileName = call.parameters["filename"]!!
+            val (puzzleName, fileExt) = splitNameAndExtension(fileName)
 
             val scramblers = PuzzlePlugins.PUZZLES
 
-            if (extension == "json") {
-                if (puzzle.isBlank()) {
-                    val puzzleInfosWithStatus = puzzleInfos
-                        .map { scramblers[it["shortName"]]!! }
+            if (fileExt == "json") {
+                if (puzzleName.isBlank()) {
+                    val puzzleInfos = scramblers.values
                         .map { getPuzzleInfo(it.value, includeStatus) }
 
-                    call.respond(puzzleInfosWithStatus)
+                    call.respond(puzzleInfos)
                 } else {
-                    val cachedPuzzle by scramblers[puzzle] ?: return@get call.respondText("Invalid scrambler: $puzzle")
+                    val cachedPuzzle by scramblers[puzzleName]
+                        ?: return@get call.respondText("Invalid scrambler: $puzzleName")
+
                     val puzzleInfo = getPuzzleInfo(cachedPuzzle, includeStatus)
 
                     call.respond(puzzleInfo)
                 }
             } else {
-                call.respond("Invalid extension: $extension")
+                call.respond("Invalid extension: $fileExt")
             }
         }
     }
