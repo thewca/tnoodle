@@ -40,7 +40,6 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             PuzzleListHandler.install(this)
             RouteRedirectHandler.install(this)
             scrambleHandler.install(this)
-            ScrambleImporterHandler.install(this)
             ReadmeHandler.install(this)
             scrambleViewHandler.install(this)
             StaticContentHandler.install(this)
