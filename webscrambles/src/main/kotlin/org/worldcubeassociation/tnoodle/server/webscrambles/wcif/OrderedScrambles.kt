@@ -72,5 +72,23 @@ object OrderedScrambles {
                 }
             }
         }
+
+        // Generate all scrambles ordered
+        // TODO cleaner approach. This is a hasty, dirty fix before the 2020 release - Gregor, Dec 29 2019
+        val allScramblesOrdered = wcifHelper.venues
+            .flatMap { it.dateTimeZone toEach it.rooms }
+            .flatMap { it.first toEach it.second.activities }
+            .flatMap { scrambleRequests.filterForActivity(it.second, it.first) }
+            .distinctBy { it.first }
+            .sortedBy { it.second }
+            .map { it.first }
+
+        val pdfFileName = "Printing/Ordered Scrambles/Ordered $globalTitle - All Scrambles.pdf"
+
+        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, allScramblesOrdered)
+        zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
     }
+
+    private infix fun <T, S> T.toEach(items: Iterable<S>) =
+        items.map { this to it }
 }
