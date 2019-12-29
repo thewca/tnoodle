@@ -55,10 +55,8 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                 "txt" -> {
                     val sb = StringBuilder()
                     for (scrambleRequest in scrambleRequests) {
-                        for (j in 0 until scrambleRequest.copies) {
-                            for (i in scrambleRequest.scrambles.indices) {
-                                val scramble = scrambleRequest.scrambles[i]
-
+                        repeat(scrambleRequest.copies) {
+                            for ((i, scramble) in scrambleRequest.scrambles.withIndex()) {
                                 if (showIndices) {
                                     sb.append(i + 1).append(". ")
                                 }

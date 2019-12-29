@@ -11,27 +11,20 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.markdownTo
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 
 object ReadmeHandler : RouteHandler {
-    private val scramblers = PuzzlePlugins.PUZZLES
-
     override fun install(router: Routing) {
         router.route("/readme") {
             get("/scramble") {
                 val scramblesReadmeStream = ReadmeHandler.javaClass.getResourceAsStream("/wca/readme-scramble.md")
                 val rawReadme = scramblesReadmeStream.bufferedReader().readText()
 
-                val scrambleFilteringInfo = StringBuilder()
+                val scrambleFilteringInfo = PuzzlePlugins.PUZZLES.values
+                    .map { it.value }
+                    .joinToString("\n") {
+                        // those 2 spaces at the end are no accident: http://meta.stackoverflow.com/questions/26011/should-the-markdown-renderer-treat-a-single-line-break-as-br
+                        "${it.longName}: &ge; ${it.wcaMinScrambleDistance} moves away from solved  "
+                    }
 
-                for (scrGet in scramblers.values) {
-                    val scr by scrGet
-
-                    // those 2 spaces at the end are no accident: http://meta.stackoverflow.com/questions/26011/should-the-markdown-renderer-treat-a-single-line-break-as-br
-                    val line = "${scr.longName}: &ge; ${scr.wcaMinScrambleDistance} moves away from solved  \n"
-
-                    scrambleFilteringInfo.append(line)
-                }
-
-                val scramblesReadme = rawReadme.replace("%SCRAMBLE_FILTERING_THRESHOLDS%",
-                    scrambleFilteringInfo.toString())
+                val scramblesReadme = rawReadme.replace("%SCRAMBLE_FILTERING_THRESHOLDS%", scrambleFilteringInfo)
 
                 call.respondText(markdownToHTML(scramblesReadme), ContentType.Text.Html)
             }
