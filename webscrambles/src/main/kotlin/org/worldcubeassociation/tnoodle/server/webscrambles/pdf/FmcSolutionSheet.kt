@@ -264,8 +264,8 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         val direction = arrayOf(Translate.translate("fmc.clockwise", locale), Translate.translate("fmc.counterClockwise", locale), Translate.translate("fmc.double", locale))
 
         val directionModifiers = arrayOf("", "'", "2")
-        val moves = arrayOf("F", "R", "U", "B", "L", "D")
-        val rotations = arrayOf("", "x", "y", "z", "", "")
+        val moves = arrayOf("R", "U", "F", "L", "D", "B")
+        val rotations = arrayOf("x", "y", "z", "", "", "")
         val movesCell = Array(movesType.size) { Array<Array<String?>>(direction.size) { arrayOfNulls(moves.size) } }
 
         // Face moves.
