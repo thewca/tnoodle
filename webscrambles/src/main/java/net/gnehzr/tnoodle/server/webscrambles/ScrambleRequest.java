@@ -722,7 +722,8 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
                 translate("fmc.double", locale)};
 
         String[] directionModifiers = {"", "'", "2"};
-        String[] moves = {"F", "R", "U", "B", "L", "D"};
+        String[] moves = {"R", "U", "F", "L", "D", "B"};
+        String[] rotations = {"x", "y", "z", "", "", ""};
         String[][][] movesCell = new String[movesType.length][direction.length][moves.length];
 
         // Face moves.
@@ -733,8 +734,12 @@ class ScrambleRequest implements Comparable<ScrambleRequest> {
         }
         // Rotations.
         for (int i=0; i<directionModifiers.length; i++){
-            for (int j=0; j<moves.length; j++){
-                movesCell[1][i][j] = "["+moves[j].toLowerCase()+directionModifiers[i]+"]";
+            for (int j=0; j<rotations.length; j++){
+		if (rotations[j].length() == 0) {
+			movesCell[1][i][j] = "";
+		} else {
+                	movesCell[1][i][j] = rotations[j]+directionModifiers[i];
+		}
             }
         }
 
