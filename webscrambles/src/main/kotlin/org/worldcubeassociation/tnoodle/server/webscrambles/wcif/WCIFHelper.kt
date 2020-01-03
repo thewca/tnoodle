@@ -102,7 +102,10 @@ class WCIFHelper(schedule: String) {
                 ?: error("An activity of the schedule did not match an event.")
         }
 
-        fun ZonedDateTime.atStartOfDay() = toLocalDate().atStartOfDay().toLocalDate()
+        fun String.parseWCIFDateWithTimezone(timeZone: ZoneId) = ZonedDateTime.parse(this, WCIF_DATE_FORMAT)
+            .withZoneSameInstant(timeZone)
+
+        fun ZonedDateTime.atLocalStartOfDay() = toLocalDate().atStartOfDay(zone).toLocalDate()
 
         fun compareLettersCharToNumber(letters: String, number: Int): Boolean {
             val sum = letters.reversed().withIndex().sumBy { (i, c) ->

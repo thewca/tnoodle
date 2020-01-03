@@ -4,12 +4,10 @@ import net.lingala.zip4j.io.outputstream.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.filterForActivity
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.atStartOfDay
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.WCIF_DATE_FORMAT
-import java.time.LocalDateTime
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.parseWCIFDateWithTimezone
 import java.time.Period
-import java.time.ZonedDateTime
 
 import java.util.Date
 
@@ -31,14 +29,14 @@ object OrderedScrambles {
             val hasMultipleRooms = venue.hasMultipleRooms
 
             val timezone = venue.dateTimeZone
-            val competitionStartDate = ZonedDateTime.of(LocalDateTime.parse(competitionStartString, WCIF_DATE_FORMAT), timezone)
+            val competitionStartDate = competitionStartString.parseWCIFDateWithTimezone(timezone)
 
             for (room in venue.rooms) {
                 val roomName = room.fileSafeName
 
                 val requestsPerDay = room.activities
                     .flatMap { scrambleRequests.filterForActivity(it, timezone) }
-                    .groupBy { Period.between(competitionStartDate.atStartOfDay(), it.second.atStartOfDay()).days + 1 }
+                    .groupBy { Period.between(competitionStartDate.atLocalStartOfDay(), it.second.atLocalStartOfDay()).days + 1 }
 
                 // hasMultipleDays gets a variable assigned on the competition creation using the website's form.
                 // Online schedule fit to it and the user should not be able to put events outside it, but we double check here.
