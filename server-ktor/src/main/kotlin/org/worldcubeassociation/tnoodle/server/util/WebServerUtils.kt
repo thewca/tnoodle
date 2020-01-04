@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat
 import java.util.Random
 
 object WebServerUtils {
-    val SDF = SimpleDateFormat("YYYY-mm-dd")
+    val SDF = SimpleDateFormat("yyyy-MM-dd")
 
     val PRUNING_FOLDER = "tnoodle_pruning_cache"
     val DEVEL_VERSION = "devel-TEMP"
