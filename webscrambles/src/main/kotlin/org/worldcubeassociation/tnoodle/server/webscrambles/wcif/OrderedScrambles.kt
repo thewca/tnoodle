@@ -7,12 +7,11 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Comp
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.parseWCIFDateWithTimezone
+import java.time.LocalDate
 import java.time.Period
 
-import java.util.Date
-
 object OrderedScrambles {
-    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: Date, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
+    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: LocalDate, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
         if (wcifHelper.venues.isEmpty()) {
             return
         }

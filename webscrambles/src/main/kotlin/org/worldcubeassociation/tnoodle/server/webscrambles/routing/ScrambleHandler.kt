@@ -15,15 +15,14 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameA
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-
-import java.util.Date
+import java.time.LocalDate
 
 class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
     override fun install(router: Routing) {
         router.get("/scramble/{filename}") {
             val filename = call.parameters["filename"]!!
 
-            val generationDate = Date()
+            val generationDate = LocalDate.now()
 
             val queryStr = call.request.uri.substringAfter('?', "")
             val query = parseQuery(queryStr).toMutableMap()

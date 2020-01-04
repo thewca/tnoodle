@@ -5,10 +5,11 @@ import java.net.URISyntaxException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.Random
 
 object WebServerUtils {
-    val SDF = SimpleDateFormat("yyyy-MM-dd")
+    val DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     val PRUNING_FOLDER = "tnoodle_pruning_cache"
     val DEVEL_VERSION = "devel-TEMP"

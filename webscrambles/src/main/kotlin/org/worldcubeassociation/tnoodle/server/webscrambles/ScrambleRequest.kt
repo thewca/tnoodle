@@ -17,6 +17,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.OrderedScramble
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
+import java.time.LocalDate
 import java.util.*
 import kotlin.math.min
 import net.gnehzr.tnoodle.svglite.Color as SVGColor
@@ -120,7 +121,7 @@ data class ScrambleRequest(
             }
         }
 
-        fun ScrambleRequest.createPdf(globalTitle: String?, creationDate: Date, versionTag: String, locale: Locale): PdfContent {
+        fun ScrambleRequest.createPdf(globalTitle: String?, creationDate: LocalDate, versionTag: String, locale: Locale): PdfContent {
             // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
             // list of 333ni scrambles.
             // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -193,7 +194,7 @@ data class ScrambleRequest(
 
         private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
 
-        fun requestsToZip(globalTitle: String?, generationDate: Date, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
+        fun requestsToZip(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
             val baosZip = ByteArrayOutputStream()
 
             val usePassword = password != null
@@ -337,7 +338,7 @@ data class ScrambleRequest(
             return baosZip
         }
 
-        fun requestsToCompletePdf(globalTitle: String?, generationDate: Date, versionTag: String, scrambleRequests: List<ScrambleRequest>): PdfContent {
+        fun requestsToCompletePdf(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>): PdfContent {
             val originalPdfs = scrambleRequests.map {
                 PDF_CACHE.getOrPut(it) { it.createPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE) }
             }
