@@ -87,6 +87,7 @@ public class ScrambleCacher {
                 }
             }
         });
+        t.setDaemon(true);
         running = true;
         t.start();
     }
