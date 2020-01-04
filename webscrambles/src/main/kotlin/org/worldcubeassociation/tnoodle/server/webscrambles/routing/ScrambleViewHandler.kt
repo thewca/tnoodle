@@ -30,7 +30,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.util.*
+import java.time.LocalDate
 import javax.imageio.ImageIO
 
 class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
@@ -133,7 +133,7 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                 val scrambleRequests = GSON.fromJson(query["sheets"], Array<ScrambleRequest>::class.java).toList()
                 val password = query["password"]
 
-                val generationDate = Date()
+                val generationDate = LocalDate.now()
 
                 when (extension) {
                     "pdf" -> {
