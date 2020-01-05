@@ -15,10 +15,13 @@ function App() {
         <div className="header" id="header">
           <div className="container">
             <img
+              className="tnoodle-logo"
               src={require("./assets/tnoodle_logo.svg")}
               alt="TNoodle logo"
             />
-            <h1 className="display-3">TNoodle</h1>
+            <h1 className="display-3" id="title">
+              TNoodle
+            </h1>
           </div>
         </div>
 
