@@ -4,6 +4,8 @@ import { WCA_EVENTS, MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import { parseActivityCode } from "../functions/wcif.functions";
 import { isDigit } from "../functions/validations.functions";
 
+import "./EventsTable";
+
 class EventsTable extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +22,10 @@ class EventsTable extends Component {
 
     let state = { events: events };
     this.state = state;
+  }
 
+  componentDidMount() {
+    // Since 333 starts with 1 round, we add an empty round.
     this.addEmptyRound();
   }
 
@@ -117,7 +122,7 @@ class EventsTable extends Component {
     return (
       <div className="container text-center">
         <table className="table table-striped table-bordered table-hover table-condensed">
-          <thead className="thead-dark">
+          <thead className="thead thead-dark">
             <tr>
               <th className="align-middle" scope="col" />
               <th className="align-middle" scope="col">
