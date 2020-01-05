@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import CubingIcon from "./CubingIcon";
-import { wcaEvents } from "../constants/wca.constants";
+import { WCA_EVENTS, MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import { parseActivityCode } from "../functions/wcif.functions";
 import { isDigit } from "../functions/validations.functions";
 
@@ -8,9 +8,11 @@ class EventsTable extends Component {
   constructor(props) {
     super(props);
 
+    this.MAX_SETS_FOR_ROUNDS = 100;
+
     // Fill scramble sets for each round. Each position in the array means one one round.
     let events = {};
-    wcaEvents.forEach(wcaEvent => {
+    WCA_EVENTS.forEach(wcaEvent => {
       events[wcaEvent.id] = { roundsForEvents: [0] };
     });
     // As usual, 333 starts with 1 round
@@ -18,7 +20,45 @@ class EventsTable extends Component {
 
     let state = { events: events };
     this.state = state;
+
+    this.addEmptyRound();
   }
+
+  addEmptyRound = () => {
+    // Do not allow keep adding rounds
+    let currentNumberOfRounds = this.getCurrentNumberOfRounds();
+    if (currentNumberOfRounds === MAX_WCA_ROUNDS) {
+      return;
+    }
+
+    let state = this.state;
+
+    WCA_EVENTS.forEach(wcaEvent => {
+      state.events[wcaEvent.id].roundsForEvents.push(0);
+    });
+    this.setState(state);
+  };
+
+  removeRoundAtIndex = index => {
+    // At least 1 round.
+    let currentNumberOfRounds = this.getCurrentNumberOfRounds();
+    if (currentNumberOfRounds === 1) {
+      return;
+    }
+
+    let state = this.state;
+    WCA_EVENTS.forEach(event => {
+      state.events[event.id].roundsForEvents.splice(index, 1);
+    });
+
+    // If we remove a round but the last one is filled, we add an empty round to make the behavior consistent.
+    let lastRoundIndex = this.getCurrentNumberOfRounds() - 1;
+    if (this.getMaxSetsForRound(lastRoundIndex) > 0) {
+      this.addEmptyRound();
+    }
+
+    this.setState(state);
+  };
 
   handleScrambleSetsChange = evt => {
     let target = evt.target;
@@ -34,17 +74,45 @@ class EventsTable extends Component {
     let roundIndex = roundNumber - 1;
 
     let state = this.state;
-    state.events[eventId].roundsForEvents[roundIndex] = Number(value);
+
+    let previousMaxRounds = this.getMaxSetsForRound(roundIndex);
+
+    // We do not allow infinity rounds. Things can get strange for ridiculous big numbers.
+    state.events[eventId].roundsForEvents[roundIndex] = Math.min(
+      Number(value),
+      this.MAX_SETS_FOR_ROUNDS
+    );
+
+    let currentMaxRounds = this.getMaxSetsForRound(roundIndex);
+
+    if (previousMaxRounds === 0 && currentMaxRounds > 0) {
+      this.addEmptyRound();
+    } else if (previousMaxRounds > 0 && currentMaxRounds === 0) {
+      this.removeRoundAtIndex(roundIndex);
+    }
 
     this.setState(state);
   };
 
-  render() {
-    let maxRounds = Math.max(
-      ...wcaEvents.map(
+  getMaxSetsForRound = roundIndex => {
+    return Math.max(
+      ...WCA_EVENTS.map(
+        event => this.state.events[event.id].roundsForEvents[roundIndex]
+      )
+    );
+  };
+
+  getCurrentNumberOfRounds = () => {
+    // We check for every event just in case.
+    return Math.max(
+      ...WCA_EVENTS.map(
         event => this.state.events[event.id].roundsForEvents.length
       )
     );
+  };
+
+  render() {
+    let numberOfRounds = this.getCurrentNumberOfRounds();
 
     return (
       <div className="container text-center">
@@ -55,7 +123,7 @@ class EventsTable extends Component {
               <th className="align-middle" scope="col">
                 Event
               </th>
-              {Array.from({ length: maxRounds }, (_, i) => {
+              {Array.from({ length: numberOfRounds }, (_, i) => {
                 return (
                   <th className="align-middle" key={i} scope="col">
                     Scramble Sets for Round {i + 1}
@@ -65,13 +133,13 @@ class EventsTable extends Component {
             </tr>
           </thead>
           <tbody>
-            {wcaEvents.map(event => (
+            {WCA_EVENTS.map(event => (
               <tr key={event.id}>
                 <td>
                   <CubingIcon event={event.id} />
                 </td>
                 <td className="align-middle">{event.id}</td>
-                {Array.from({ length: maxRounds }, (_, i) => {
+                {Array.from({ length: numberOfRounds }, (_, i) => {
                   // For consistency, we keep the id in the WCIF activity code format 333-r1
                   let round = i + 1;
                   let id = event.id + "-r" + round;
@@ -79,8 +147,9 @@ class EventsTable extends Component {
                     <td key={id}>
                       <input
                         id={id}
-                        value={this.state.events[event.id].roundsForEvents[0]}
+                        value={this.state.events[event.id].roundsForEvents[i]}
                         onChange={this.handleScrambleSetsChange}
+                        size={5}
                       ></input>
                     </td>
                   );
