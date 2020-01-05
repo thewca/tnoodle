@@ -2,14 +2,30 @@ import React, { Component } from "react";
 import CubingIcon from "./CubingIcon";
 
 class EventsTable extends Component {
+  constructor(props) {
+    super(props);
+
+    let state = {};
+  }
   render() {
     let events = [
-      { id: "333" },
       { id: "222" },
+      { id: "333" },
+      { id: "333bf" },
+      { id: "333fm" },
+      { id: "333mbf" },
+      { id: "333oh" },
       { id: "444" },
+      { id: "444bf" },
       { id: "555" },
+      { id: "555bf" },
       { id: "666" },
-      { id: "777" }
+      { id: "777" },
+      { id: "clock" },
+      { id: "minx" },
+      { id: "pyram" },
+      { id: "skewb" },
+      { id: "sq1" }
     ];
 
     return (
