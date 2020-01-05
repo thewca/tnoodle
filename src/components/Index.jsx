@@ -4,6 +4,9 @@ import "./Index.css";
 
 import { Link } from "react-router-dom";
 
+import CubingIcon from "./CubingIcon";
+import { WCA_EVENTS } from "../constants/wca.constants";
+
 class Index extends Component {
   constructor(props) {
     super(props);
@@ -49,6 +52,16 @@ class Index extends Component {
                   Go Online »
                 </Link>
               </p>
+            </div>
+          </div>
+
+          <div className="row" id="events-to-show">
+            <div className="col-md-12">
+              {WCA_EVENTS.map(event => (
+                <span key={event.id}>
+                  <CubingIcon event={event.id} />
+                </span>
+              ))}
             </div>
           </div>
         </div>
