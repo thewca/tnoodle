@@ -1,5 +1,5 @@
 // WCA Events as of 2020/01/01
-export const wcaEvents = [
+export const WCA_EVENTS = [
   { id: "333" },
   { id: "222" },
   { id: "444" },
@@ -18,3 +18,6 @@ export const wcaEvents = [
   { id: "555bf" },
   { id: "333mbf" }
 ];
+
+// Currently, WCA allow up to 4 rounds for each event.
+export const MAX_WCA_ROUNDS = 4;
