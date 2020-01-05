@@ -1,8 +1,16 @@
 import React, { Component } from "react";
+import CubingIcon from "./CubingIcon";
 
 class EventsTable extends Component {
   render() {
-    let events = [{ id: "333" }, { id: "222" }];
+    let events = [
+      { id: "333" },
+      { id: "222" },
+      { id: "444" },
+      { id: "555" },
+      { id: "666" },
+      { id: "777" }
+    ];
 
     return (
       <div className="container text-center">
@@ -13,7 +21,7 @@ class EventsTable extends Component {
               <th className="align-middle" scope="col">
                 Event
               </th>
-              {Array.from({ length: 2 }, (_, i) => {
+              {Array.from({ length: 1 }, (_, i) => {
                 return (
                   <th className="align-middle" key={i} scope="col">
                     Scramble Sets for Round {i + 1}
@@ -25,7 +33,9 @@ class EventsTable extends Component {
           <tbody>
             {events.map(event => (
               <tr key={event.id}>
-                <td>Icon</td>
+                <td>
+                  <CubingIcon event={event.id} />
+                </td>
                 <td className="align-middle">{event.id}</td>
                 input
               </tr>
