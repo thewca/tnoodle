@@ -14,6 +14,10 @@ function App() {
       <div className="App">
         <div className="header" id="header">
           <div className="container">
+            <img
+              src={require("./assets/tnoodle_logo.svg")}
+              alt="TNoodle logo"
+            />
             <h1 className="display-3">TNoodle</h1>
           </div>
         </div>

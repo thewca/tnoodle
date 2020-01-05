@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import EventsTable from "./EventsTable";
+
 class OfflineScrambler extends Component {
   constructor(props) {
     super(props);
@@ -9,6 +11,7 @@ class OfflineScrambler extends Component {
     return (
       <div>
         <h1>Offline Scrambler</h1>
+        <EventsTable></EventsTable>
       </div>
     );
   }
