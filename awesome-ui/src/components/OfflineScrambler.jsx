@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import EventsTable from "./EventsTable";
+import EntryInterface from "./EntryInterface";
 
 class OfflineScrambler extends Component {
   constructor(props) {
@@ -10,7 +11,7 @@ class OfflineScrambler extends Component {
   render() {
     return (
       <div>
-        <h1>Offline Scrambler</h1>
+        <EntryInterface></EntryInterface>
         <EventsTable></EventsTable>
       </div>
     );
