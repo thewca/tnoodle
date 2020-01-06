@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import "./Index.css";
+import "./Index.scss";
 
 import { Link } from "react-router-dom";
 

@@ -4,13 +4,15 @@ import { WCA_EVENTS, MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import { parseActivityCode } from "../functions/wcif.functions";
 import { isDigit } from "../functions/validations.functions";
 
-import "./EventsTable";
+import "./EventsTable.scss";
 
 class EventsTable extends Component {
   constructor(props) {
     super(props);
 
     this.MAX_SETS_FOR_ROUNDS = 100;
+    this.MAX_MBLD_SCRAMBLES = 1000;
+    this.MIN_MBLD_SCRAMBLES = 2;
 
     // Fill scramble sets for each round. Each position in the array means one one round.
     let events = {};
@@ -20,7 +22,7 @@ class EventsTable extends Component {
     // As usual, 333 starts with 1 round
     events[333].roundsForEvents[0] = 1;
 
-    let state = { events: events };
+    let state = { events: events, mbldScrambles: 42 };
     this.state = state;
   }
 
@@ -107,6 +109,42 @@ class EventsTable extends Component {
     );
   };
 
+  maybeShowMbldInput = () => {
+    let hasMbld = this.state.events["333mbf"].roundsForEvents[0] > 0;
+
+    if (!hasMbld) {
+      return;
+    }
+
+    return (
+      <div className="row">
+        <div className="col-md-12 text-right">
+          <p>
+            This competition has 3x3x3 Multi-Blind. How many scrambles do you
+            want for each attempt?
+          </p>
+          <input
+            value={this.state.mbldScrambles}
+            onChange={this.handleMbldChange}
+          ></input>
+        </div>
+      </div>
+    );
+  };
+
+  handleMbldChange = evt => {
+    let target = evt.target;
+    let value = target.value;
+    if (!isDigit(value)) {
+      return;
+    }
+    let state = this.state;
+    let mbldScrambles = Math.min(Number(value), this.MAX_MBLD_SCRAMBLES);
+    mbldScrambles = Math.max(mbldScrambles, this.MIN_MBLD_SCRAMBLES);
+    state.mbldScrambles = mbldScrambles;
+    this.setState(state);
+  };
+
   getCurrentNumberOfRounds = () => {
     // We check for every event just in case.
     return Math.max(
@@ -114,6 +152,10 @@ class EventsTable extends Component {
         event => this.state.events[event.id].roundsForEvents.length
       )
     );
+  };
+
+  generateScrambles = () => {
+    console.log("Mocked scrambles");
   };
 
   render() {
@@ -155,6 +197,11 @@ class EventsTable extends Component {
                         value={this.state.events[event.id].roundsForEvents[i]}
                         onChange={this.handleScrambleSetsChange}
                         size={5}
+                        disabled={
+                          i > 0 &&
+                          this.state.events[event.id].roundsForEvents[i - 1] ===
+                            0
+                        }
                       ></input>
                     </td>
                   );
@@ -163,6 +210,18 @@ class EventsTable extends Component {
             ))}
           </tbody>
         </table>
+        {this.maybeShowMbldInput()}
+
+        <div className="row" id="scramble-btn-wrapper">
+          <div className="col-md-12">
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={this.generateScrambles()}
+            >
+              Generate Scrambles
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

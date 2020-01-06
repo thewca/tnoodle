@@ -48,3 +48,13 @@ nav li {
 .nav-link {
   color: #fff !important;
 }
+
+#navbar-wrapper {
+  padding-bottom: 10px;
+}
+
+#footer-wrapper {
+  color: #fff !important;
+  font-weight: bold;
+  padding-top: 10px;
+}
