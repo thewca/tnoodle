@@ -29,7 +29,7 @@ class WatermarkPdfWrapper(val original: PdfContent, val creationTitle: String, v
 
             // Header
             ColumnText.showTextAligned(cb,
-                Element.ALIGN_LEFT, Phrase(creationDate.format(WebServerUtils.DTF)),
+                Element.ALIGN_LEFT, Phrase(creationDate.toString()),
                 rect.left, rect.top, 0f)
 
             ColumnText.showTextAligned(cb,

@@ -9,8 +9,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Random
 
 object WebServerUtils {
-    val DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
     val PRUNING_FOLDER = "tnoodle_pruning_cache"
     val DEVEL_VERSION = "devel-TEMP"
 
