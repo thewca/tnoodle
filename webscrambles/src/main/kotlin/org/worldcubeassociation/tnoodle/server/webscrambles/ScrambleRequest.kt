@@ -49,6 +49,45 @@ data class ScrambleRequest(
 ) {
     val allScrambles get() = scrambles + extraScrambles
 
+    fun createPdf(globalTitle: String?, creationDate: LocalDate, versionTag: String, locale: Locale): PdfContent {
+        // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
+        // list of 333ni scrambles.
+        // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
+        // rather than 1 sheet per round (as we do with every other event).
+
+        // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
+        // to fix this, we pass the attempt number
+        if (event == "333mbf") {
+            val singleSheets = scrambles.mapIndexed { nthAttempt, scrambleStr ->
+                val scrambles = scrambleStr.split("\n")
+                val titleAttemptNum = if (attempt > 1) attempt else (nthAttempt + 1)
+
+                val attemptRequest = copy(
+                    scrambles = scrambles,
+                    extraScrambles = listOf(),
+                    title = "$title Attempt $titleAttemptNum",
+                    fmc = false,
+                    event = "333bf"
+                )
+
+                attemptRequest.createPdf(globalTitle, creationDate, versionTag, locale)
+            }
+
+            return MergedPdf(singleSheets)
+        }
+
+        assert(scrambles.isNotEmpty())
+
+        if (fmc) {
+            // We don't watermark the FMC sheets because they already have
+            // the competition name on them. So we encrypt directly.
+            return FmcSolutionSheet(this, globalTitle, locale)
+        }
+
+        val genericSheet = GeneralScrambleSheet(this, globalTitle) // encrypt when watermarking
+        return WatermarkPdfWrapper(genericSheet, title, creationDate, versionTag, globalTitle)
+    }
+
     companion object {
         private val HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html"
 
@@ -93,7 +132,8 @@ data class ScrambleRequest(
 
                     val decodedTitle = URLDecoder.decode(title, "utf-8")
 
-                    val scrambler by PuzzlePlugins.PUZZLES[puzzle] ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
+                    val scrambler by PuzzlePlugins.PUZZLES[puzzle]
+                        ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
 
                     val scrambleCacher = SCRAMBLE_CACHERS.getOrPut(puzzle) { ScrambleCacher(scrambler) }
 
@@ -119,47 +159,6 @@ data class ScrambleRequest(
                     )
                 }
             }
-        }
-
-        fun ScrambleRequest.createPdf(globalTitle: String?, creationDate: LocalDate, versionTag: String, locale: Locale): PdfContent {
-            // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
-            // list of 333ni scrambles.
-            // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
-            // rather than 1 sheet per round (as we do with every other event).
-
-            // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
-            // to fix this, we pass the attempt number
-            if (event == "333mbf") {
-                val singleSheets = mutableListOf<PdfContent>()
-
-                for (nthAttempt in 1..scrambles.size) {
-                    val scrambles = scrambles[nthAttempt - 1].split("\n")
-
-                    val attemptRequest = copy(
-                        scrambles = scrambles,
-                        extraScrambles = listOf(),
-                        title = "$title Attempt ${if (attempt > 1) attempt else nthAttempt}",
-                        fmc = false,
-                        event = "333bf"
-                    )
-
-                    val singleSheet = attemptRequest.createPdf(globalTitle, creationDate, versionTag, locale)
-                    singleSheets.add(singleSheet)
-                }
-
-                return MergedPdf(singleSheets)
-            }
-
-            assert(scrambles.isNotEmpty())
-
-            if (fmc) {
-                // We don't watermark the FMC sheets because they already have
-                // the competition name on them. So we encrypt directly.
-                return FmcSolutionSheet(this, globalTitle, locale)
-            }
-
-            val genericSheet = GeneralScrambleSheet(this, globalTitle) // encrypt when watermarking
-            return WatermarkPdfWrapper(genericSheet, title, creationDate, versionTag, globalTitle)
         }
 
         private fun defaultZipParameters(useEncryption: Boolean = false) = ZipParameters().apply {
