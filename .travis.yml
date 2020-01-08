@@ -1,5 +1,6 @@
 language: java
 jdk: openjdk8
+sudo: required
 
 script:
   - ./gradlew publishToMavenLocal
