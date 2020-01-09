@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
-import EventsTable from "./EventsTable";
 import EntryInterface from "./EntryInterface";
+import EventsPicker from "./EventsPicker";
 
 class OfflineScrambler extends Component {
   constructor(props) {
@@ -11,8 +11,9 @@ class OfflineScrambler extends Component {
   render() {
     return (
       <div>
-        <EntryInterface></EntryInterface>
-        <EventsTable></EventsTable>
+        <EntryInterface />
+        <EventsPicker />
+        {/*<EventsTable></EventsTable>*/}
       </div>
     );
   }
