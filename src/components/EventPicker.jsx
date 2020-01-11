@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
 
+import "./EventPicker.scss";
+
 class EventPicker extends Component {
   constructor(props) {
     super(props);
@@ -77,24 +79,25 @@ class EventPicker extends Component {
       });
     });
     return (
-      <div>
-        <div>
-          <h3>
+      <div className="container">
+        <div className="row">
+          <span className="col-2 p-0">
             <CubingIcon event={event.id} />
-            <span>{event.name}</span>
-            <div>
-              <select onChange={this.handleNumberOfRoundsChange} id={event.id}>
-                {options.map(op => (
-                  <option value={op.value} disabled={op.disabled} key={op.text}>
-                    {op.text}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </h3>
+          </span>
+          <h3 className="col-6 p-0">{event.name}</h3>
+          <div className="col-4 p-0">
+            <select onChange={this.handleNumberOfRoundsChange} id={event.id}>
+              {options.map(op => (
+                <option value={op.value} disabled={op.disabled} key={op.text}>
+                  {op.text}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <table>
-          <thead>
+
+        <table className="table table-condensed">
+          <thead className="thead-light">
             <tr>
               <th>#</th>
               <th>Format</th>
@@ -122,6 +125,7 @@ class EventPicker extends Component {
                   </td>
                   <td>
                     <input
+                      className="numeric-input"
                       type="number"
                       value={this.state.rounds[i].scrambleSetCount}
                       onChange={evt =>
@@ -135,6 +139,7 @@ class EventPicker extends Component {
                   </td>
                   <td>
                     <input
+                      className="numeric-input"
                       type="number"
                       value={this.state.rounds[i].copies}
                       onChange={evt =>
