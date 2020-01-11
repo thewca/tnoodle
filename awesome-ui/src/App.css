@@ -9,7 +9,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .tnoodle-logo {
-    animation: tnoodle-logo-spin 1 0.5s ease;
+    animation: tnoodle-logo-spin 3 0.9s ease;
   }
 }
 
