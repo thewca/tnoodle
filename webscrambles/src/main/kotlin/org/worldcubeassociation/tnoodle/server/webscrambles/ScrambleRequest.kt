@@ -113,52 +113,46 @@ data class ScrambleRequest(
                 0
             )
 
-        fun parseScrambleRequests(query: Map<String, String>, seed: String?): List<ScrambleRequest> {
-            if (query.isEmpty()) {
-                throw InvalidScrambleRequestException("Must specify at least one scramble request")
-            } else {
-                return query.map { (title, reqUrl) ->
-                    // Note that we prefix the seed with the title of the round! This ensures that we get unique
-                    // scrambles in different rounds. Thanks to Ravi Fernando for noticing this at Stanford Fall 2011.
-                    // (http://www.worldcubeassociation.org/results/c.php?i=StanfordFall2011).
-                    val uniqueSeed = seed?.let { "$title$it" }
+        fun parseScrambleRequest(title: String, reqUrl: String, seed: String?): ScrambleRequest {
+            // Note that we prefix the seed with the title of the round! This ensures that we get unique
+            // scrambles in different rounds. Thanks to Ravi Fernando for noticing this at Stanford Fall 2011.
+            // (http://www.worldcubeassociation.org/results/c.php?i=StanfordFall2011).
+            val uniqueSeed = seed?.let { "$title$it" }
 
-                    val destructuredRequest = reqUrl.split("*").map { URLDecoder.decode(it, "utf-8") }
+            val destructuredRequest = reqUrl.split("*").map { URLDecoder.decode(it, "utf-8") }
 
-                    val puzzle = destructuredRequest[0]
-                    val countStr = destructuredRequest.getOrNull(1) ?: "1"
-                    val copiesStr = destructuredRequest.getOrNull(2) ?: "1"
-                    val scheme = destructuredRequest.getOrNull(3) ?: ""
+            val puzzle = destructuredRequest[0]
+            val countStr = destructuredRequest.getOrNull(1) ?: "1"
+            val copiesStr = destructuredRequest.getOrNull(2) ?: "1"
+            val scheme = destructuredRequest.getOrNull(3) ?: ""
 
-                    val decodedTitle = URLDecoder.decode(title, "utf-8")
+            val decodedTitle = URLDecoder.decode(title, "utf-8")
 
-                    val scrambler by PuzzlePlugins.PUZZLES[puzzle]
-                        ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
+            val scrambler by PuzzlePlugins.PUZZLES[puzzle]
+                ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
 
-                    val scrambleCacher = SCRAMBLE_CACHERS.getOrPut(puzzle) { ScrambleCacher(scrambler) }
+            val scrambleCacher = SCRAMBLE_CACHERS.getOrPut(puzzle) { ScrambleCacher(scrambler) }
 
-                    val fmc = countStr == "fmc"
+            val fmc = countStr == "fmc"
 
-                    val count: Int = if (fmc) 1 else min(countStr.toInt(), MAX_COUNT)
+            val count: Int = if (fmc) 1 else min(countStr.toInt(), MAX_COUNT)
 
-                    val copies = min(copiesStr.toInt(), MAX_COPIES)
+            val copies = min(copiesStr.toInt(), MAX_COPIES)
 
-                    val genScrambles = uniqueSeed?.let { scrambler.generateSeededScrambles(seed, count) }
-                        ?: scrambleCacher.newScrambles(count)
+            val genScrambles = uniqueSeed?.let { scrambler.generateSeededScrambles(seed, count) }
+                ?: scrambleCacher.newScrambles(count)
 
-                    val scrambles = genScrambles.toList()
+            val scrambles = genScrambles.toList()
 
-                    val colorScheme = scrambler.parseColorScheme(scheme)
+            val colorScheme = scrambler.parseColorScheme(scheme)
 
-                    empty(scrambler).copy(
-                        scrambles = scrambles,
-                        copies = copies,
-                        title = decodedTitle,
-                        fmc = fmc,
-                        colorScheme = colorScheme
-                    )
-                }
-            }
+            return empty(scrambler).copy(
+                scrambles = scrambles,
+                copies = copies,
+                title = decodedTitle,
+                fmc = fmc,
+                colorScheme = colorScheme
+            )
         }
 
         private fun defaultZipParameters(useEncryption: Boolean = false) = ZipParameters().apply {
