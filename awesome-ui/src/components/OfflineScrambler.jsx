@@ -8,12 +8,12 @@ class OfflineScrambler extends Component {
     super(props);
     this.state = {};
   }
+
   render() {
     return (
       <div>
         <EntryInterface />
         <EventsPicker />
-        {/*<EventsTable></EventsTable>*/}
       </div>
     );
   }
