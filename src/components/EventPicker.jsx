@@ -1,23 +1,63 @@
 import React, { Component } from "react";
-
 import CubingIcon from "./CubingIcon";
-
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
 
 class EventPicker extends Component {
   constructor(props) {
     super(props);
-    let state = { value: 0, format: "" };
+
+    // State wcif like
+    let state = { id: props.event.id, rounds: [] };
     this.state = state;
   }
 
-  handleSelectChange = evt => {
+  handleNumberOfRoundsChange = evt => {
+    let numberOfRounds = Number(evt.target.value);
     let state = this.state;
-    state.value = evt.target.value;
+    let rounds = state.rounds;
+
+    // Ajust the number of rounds in case we have to remove
+    while (rounds.length > numberOfRounds) {
+      rounds.pop();
+    }
+
+    // case we have to add
+    let event = this.state.id;
+    while (rounds.length < numberOfRounds) {
+      rounds.push({
+        id: event + "-r" + (rounds.length + 1),
+        format: this.props.event.format_ids[0],
+        scrambleSetCount: 1,
+        copies: 1
+      });
+    }
+    state.rounds = rounds;
     this.setState(state);
   };
 
-  roundFormatChanged = evt => {};
+  handleNumberOfScrambleSetsChange = (round, value) => {
+    if (value < 1) {
+      return;
+    }
+    let state = this.state;
+    state.rounds[round].scrambleSetCount = Number(value);
+    this.setState(state);
+  };
+
+  roundFormatChanged = (round, value) => {
+    let state = this.state;
+    state.rounds[round].format = value;
+    this.setState(state);
+  };
+
+  handleNumberOfCopiesChange = (round, value) => {
+    if (value < 1) {
+      return;
+    }
+    let state = this.state;
+    state.rounds[round].copies = value;
+    this.setState(state);
+  };
 
   abbreviate = str => {
     return FORMATS[str].shortName;
@@ -25,7 +65,6 @@ class EventPicker extends Component {
 
   render() {
     let { event } = this.props;
-    console.log(event);
     let options = [
       { text: "# of rounds?", value: 0, disabled: false },
       { text: "────────", disabled: true }
@@ -38,13 +77,13 @@ class EventPicker extends Component {
       });
     });
     return (
-      <div className="panel panel-default">
-        <div className="panel-heading">
+      <div>
+        <div>
           <h3>
             <CubingIcon event={event.id} />
             <span>{event.name}</span>
-            <div className="input-group">
-              <select onChange={this.handleSelectChange} id={event.id}>
+            <div>
+              <select onChange={this.handleNumberOfRoundsChange} id={event.id}>
                 {options.map(op => (
                   <option value={op.value} disabled={op.disabled} key={op.text}>
                     {op.text}
@@ -64,15 +103,15 @@ class EventPicker extends Component {
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: this.state.value }, (_, i) => {
+            {Array.from({ length: this.state.rounds.length }, (_, i) => {
               return (
                 <tr key={i}>
                   <td>{i + 1}</td>
                   <td>
                     <select
-                      name="format"
-                      className="form-control input-xs"
-                      onChange={this.roundFormatChanged}
+                      onChange={evt =>
+                        this.roundFormatChanged(i, evt.target.value)
+                      }
                     >
                       {event.format_ids.map(format => (
                         <option key={format} value={format}>
@@ -80,6 +119,32 @@ class EventPicker extends Component {
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      value={this.state.rounds[i].scrambleSetCount}
+                      onChange={evt =>
+                        this.handleNumberOfScrambleSetsChange(
+                          i,
+                          Number(evt.target.value)
+                        )
+                      }
+                      min={1}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      value={this.state.rounds[i].copies}
+                      onChange={evt =>
+                        this.handleNumberOfCopiesChange(
+                          i,
+                          Number(evt.target.value)
+                        )
+                      }
+                      min={1}
+                    />
                   </td>
                 </tr>
               );

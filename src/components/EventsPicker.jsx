@@ -5,6 +5,8 @@ import EventPicker from "./EventPicker";
 import { WCA_EVENTS } from "../constants/wca.constants";
 import _ from "lodash";
 
+import "./EventsPicker.scss";
+
 class EventsPicker extends Component {
   render() {
     let EVENTS_PER_LINE = 3;
@@ -17,7 +19,10 @@ class EventsPicker extends Component {
             <div className="row" key={i}>
               {events.map(event => {
                 return (
-                  <div className="col-md-4" key={event.id}>
+                  <div
+                    className="col-md-4 border border-secondary rounded"
+                    key={event.id}
+                  >
                     <EventPicker event={event} />
                   </div>
                 );
