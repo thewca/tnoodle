@@ -43,7 +43,13 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                 throw InvalidScrambleRequestException("No extension specified")
             }
 
-            val scrambleRequests = ScrambleRequest.parseScrambleRequests(query, seed)
+            if (query.isEmpty()) {
+                throw InvalidScrambleRequestException("Must specify at least one scramble request")
+            }
+
+            val scrambleRequests = query.map { (title, reqUrl) ->
+                ScrambleRequest.parseScrambleRequest(title, reqUrl, seed)
+            }
 
             when (extension) {
                 "txt" -> {
