@@ -13,16 +13,21 @@ interface RouteHandler {
     companion object {
         private val MD_PROCESSOR = MarkdownProcessor()
 
+        const val MARKDOWN_TITLE_CHAR = '#'
+
         fun markdownToHTML(dataString: String): String {
-            var titleCode = ""
+            val titleLine = dataString.lineSequence()
+                .firstOrNull()
 
             // We assume that a title line is the first line, starts with one #, and possibly ends with one #
-            if (dataString.startsWith("#")) {
-                val title = Scanner(dataString).nextLine()
-                    .substring(1).trimEnd('#').trim()
+            val titleContent = titleLine?.takeIf { it.startsWith(MARKDOWN_TITLE_CHAR) }
+                ?.substringAfter(MARKDOWN_TITLE_CHAR)
+                ?.trimEnd(MARKDOWN_TITLE_CHAR)
+                ?.trim()
 
-                titleCode = "<title>$title</title>\n"
-            }
+            val titleCode = titleContent
+                ?.let { "<title>$it</title>\n" }
+                .orEmpty()
 
             return "<html><head>\n$titleCode<link href=\"/css/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />\n</head>\n<body>\n${MD_PROCESSOR.markdown(dataString)}</body>\n</html>\n"
         }
