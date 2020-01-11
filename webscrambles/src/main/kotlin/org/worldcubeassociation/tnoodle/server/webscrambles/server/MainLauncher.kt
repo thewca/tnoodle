@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import java.io.File
 import java.io.IOException
+import kotlin.math.max
 import kotlin.system.exitProcess
 
 object MainLauncher {
@@ -41,59 +42,21 @@ object MainLauncher {
         val t = Thread.currentThread()
         assert("main" == t.name)
 
-        val stack = t.stackTrace
-        val main = stack[stack.size - 1]
-        val mainClass = main.className
+        val availableHeapSizeMegs = (Runtime.getRuntime().maxMemory() / 1024 / 1024).toInt()
 
-        var newHeapSizeMegs = (Runtime.getRuntime().maxMemory() / 1024 / 1024).toInt()
-        var needsReExecing = newHeapSizeMegs < minHeapSizeMegs
+        // Note that we don't want to use minHeapSizeMegs, as that may be 0 or something.
+        // We want to re-exec with -Xmx = MAX(newHeapSizeMegs, minHeapSizeMegs)
+        val newHeapSizeMegs = max(availableHeapSizeMegs, minHeapSizeMegs)
 
-        if (newHeapSizeMegs < minHeapSizeMegs) {
-            // Note that we don't want to use minHeapSizeMegs, as that may be 0 or something.
-            // We want to re-exec with -Xmx = MAX(newHeapSizeMegs, minHeapSizeMegs)
-            newHeapSizeMegs = minHeapSizeMegs
-        }
-
-        val jar = WebServerUtils.jarFile
-
-        var jvm = "java"
         val os = System.getProperty("os.name")
+        val mainClass = t.stackTrace.last().className
 
         LOG.info("Detected os: $os")
 
-        if (os.startsWith("Windows")) {
-            // We only do this java.exe magic if we're on windows
-            // Linux and Mac seem to show useful information if you ps -efw
-            val launcherName = name ?: jar?.name?.substringBeforeLast(".jar") ?: mainClass
-            val launcherExecutable = "${launcherName.substringBeforeLast(".exe")}.exe"
+        val needsHeapSizeReExec = newHeapSizeMegs < minHeapSizeMegs
+        val (jvm, needsJvmReExec) = detectJVM(os, name, mainClass)
 
-            val jre = File(System.getProperty("java.home"))
-            val java = File("$jre\\bin", "java.exe")
-
-            val launcherDir = File("$jre\\temp-launcher").apply { mkdir() }
-
-            if (launcherDir.isDirectory) {
-                val newLauncher = File(launcherDir, launcherExecutable)
-
-                // This will fail if someone puts something stupid in the directory
-                jvm = "\"${newLauncher.path}\""
-
-                if (!newLauncher.exists()) {
-                    try {
-                        WebServerUtils.copyFile(java, newLauncher)
-                        LOG.info("Successfully copied $java -> $newLauncher")
-
-                        // We successfully created a new executable, so lets use it!
-                        needsReExecing = true
-                    } catch (e: IOException) {
-                        LOG.warn("Couldn't copy java.exe", e)
-                    }
-                }
-            } else {
-                LOG.warn("$launcherDir is not a directory.")
-            }
-        }
-
+        val needsReExecing = needsHeapSizeReExec || needsJvmReExec
         LOG.info("needsReExecing: $needsReExecing")
 
         if (needsReExecing) {
@@ -130,7 +93,48 @@ object MainLauncher {
 
             exitProcess(0)
         } catch (e: IOException) {
-            LOG.warn("", e)
+            LOG.warn("Starting the child process failed!", e)
         }
+    }
+
+    private fun detectJVM(os: String, name: String?, mainClass: String): Pair<String, Boolean> {
+        if (os.startsWith("Windows")) {
+            val jar = WebServerUtils.jarFile
+
+            // We only do this java.exe magic if we're on windows
+            // Linux and Mac seem to show useful information if you ps -efw
+            val launcherName = name ?: jar?.name?.substringBeforeLast(".jar") ?: mainClass
+            val launcherExecutable = "${launcherName.substringBeforeLast(".exe")}.exe"
+
+            val jre = File(System.getProperty("java.home"))
+            val java = File("$jre\\bin", "java.exe")
+
+            val launcherDir = File("$jre\\temp-launcher").apply { mkdir() }
+
+            if (launcherDir.isDirectory) {
+                val newLauncher = File(launcherDir, launcherExecutable)
+
+                // This will fail if someone puts something stupid in the directory
+                val jvm = "\"${newLauncher.path}\""
+
+                if (!newLauncher.exists()) {
+                    try {
+                        WebServerUtils.copyFile(java, newLauncher)
+                        LOG.info("Successfully copied $java -> $newLauncher")
+
+                        // We successfully created a new executable, so lets use it!
+                        return jvm to true
+                    } catch (e: IOException) {
+                        LOG.warn("Couldn't copy java.exe", e)
+                    }
+                }
+
+                return jvm to false
+            } else {
+                LOG.warn("$launcherDir is not a directory.")
+            }
+        }
+
+        return "java" to false
     }
 }
