@@ -165,15 +165,15 @@ data class ScrambleRequest(
             }
         }
 
-        private fun String.toUniqueTitle(seenTitles: List<String>): String {
-            var salt = 0
-            var tempNewSafeTitle = this
+        private tailrec fun String.toUniqueTitle(seenTitles: List<String>, suffixSalt: Int = 0): String {
+            val suffixedTitle = "$this (${suffixSalt})"
+                .takeUnless { suffixSalt == 0 } ?: this
 
-            while (tempNewSafeTitle in seenTitles) {
-                tempNewSafeTitle = "$this (${++salt})"
+            if (this !in seenTitles) {
+                return suffixedTitle
             }
 
-            return tempNewSafeTitle
+            return toUniqueTitle(seenTitles, suffixSalt + 1)
         }
 
         fun ZipOutputStream.putFileEntry(fileName: String, contents: ByteArray, parameters: ZipParameters = defaultZipParameters()) {
