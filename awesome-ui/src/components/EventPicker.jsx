@@ -35,6 +35,7 @@ class EventPicker extends Component {
     }
     state.rounds = rounds;
     this.setState(state);
+    this.updateEvent();
   };
 
   handleNumberOfScrambleSetsChange = (round, value) => {
@@ -44,12 +45,14 @@ class EventPicker extends Component {
     let state = this.state;
     state.rounds[round].scrambleSetCount = Number(value);
     this.setState(state);
+    this.updateEvent();
   };
 
   roundFormatChanged = (round, value) => {
     let state = this.state;
     state.rounds[round].format = value;
     this.setState(state);
+    this.updateEvent();
   };
 
   handleNumberOfCopiesChange = (round, value) => {
@@ -59,10 +62,15 @@ class EventPicker extends Component {
     let state = this.state;
     state.rounds[round].copies = value;
     this.setState(state);
+    this.updateEvent();
   };
 
   abbreviate = str => {
     return FORMATS[str].shortName;
+  };
+
+  updateEvent = () => {
+    this.props.updateEvent(this.state);
   };
 
   render() {
@@ -84,7 +92,7 @@ class EventPicker extends Component {
           <span className="col-2 p-0">
             <CubingIcon event={event.id} />
           </span>
-          <h3 className="col-6 p-0">{event.name}</h3>
+          <h5 className="col-6 p-0">{event.name}</h5>
           <div className="col-4 p-0">
             <select onChange={this.handleNumberOfRoundsChange} id={event.id}>
               {options.map(op => (

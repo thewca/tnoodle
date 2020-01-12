@@ -6,6 +6,9 @@ class EntryInterface extends Component {
   constructor(props) {
     super(props);
 
+    this.handleCompetitionNameOrPasswordChange =
+      props.handleCompetitionNameOrPasswordChange;
+
     this.state = {
       competitionName: this.getDefaultCompetitionName(),
       password: ""
@@ -27,12 +30,18 @@ class EntryInterface extends Component {
     let state = this.state;
     state.competitionName = event.target.value;
     this.setState(state);
+
+    // Propagate the change.
+    this.handleCompetitionNameOrPasswordChange(this.state);
   };
 
   handlePassword = event => {
     let state = this.state;
     state.password = event.target.value;
     this.setState(state);
+
+    // Propagate the change.
+    this.handleCompetitionNameOrPasswordChange(this.state);
   };
 
   render() {
