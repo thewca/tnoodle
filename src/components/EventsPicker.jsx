@@ -8,7 +8,7 @@ import _ from "lodash";
 class EventsPicker extends Component {
   constructor(props) {
     super(props);
-    this.updateEvent = props.updateEvent;
+    this.handleUpdateEvent = props.handleUpdateEvent;
   }
   render() {
     let EVENTS_PER_LINE = 3;
@@ -25,7 +25,10 @@ class EventsPicker extends Component {
                     className="col-4 p-0 border border-secondary rounded"
                     key={event.id}
                   >
-                    <EventPicker event={event} updateEvent={this.updateEvent} />
+                    <EventPicker
+                      event={event}
+                      handleUpdateEvent={this.handleUpdateEvent}
+                    />
                   </div>
                 );
               })}
