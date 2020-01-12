@@ -70,7 +70,7 @@ class EventPicker extends Component {
   };
 
   updateEvent = () => {
-    this.props.updateEvent(this.state);
+    this.props.handleUpdateEvent(this.state);
   };
 
   render() {
