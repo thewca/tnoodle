@@ -7,21 +7,49 @@ class OfflineScrambler extends Component {
   constructor(props) {
     super(props);
 
-    this.generateScrambles = props.generateScrambles;
-    this.updateEvent = props.updateEvent;
-    this.handleCompetitionNameOrPasswordChange =
-      props.handleCompetitionNameOrPasswordChange;
+    this.handleUpdateWcif = props.updateWcif;
+
+    // State wcif like
+    let state = { formatVersion: "1.0", name: "", events: [], password: "" };
+    this.state = state;
   }
+
+  generateScrambles = () => {
+    this.handleUpdateWcif(this.state);
+    this.props.generateScrambles();
+  };
+
+  handleUpdateEvent = event => {
+    let state = this.state;
+
+    // Avoid duplicated events in wcif
+    let events = state.events.filter(e => e.id !== event.id);
+    events.push(event);
+    state.events = events;
+    this.setState(state);
+    this.handleUpdateWcif(this.state);
+  };
+
+  handleCompetitionNameChange = competitionName => {
+    let state = this.state;
+    state.name = competitionName;
+    this.setState(state);
+  };
+
+  handlePasswordChange = password => {
+    let state = this.state;
+    state.password = password;
+    this.setState(state);
+  };
 
   render() {
     return (
       <div>
         <EntryInterface
-          handleCompetitionNameOrPasswordChange={
-            this.handleCompetitionNameOrPasswordChange
-          }
+          handleCompetitionNameChange={this.handleCompetitionNameChange}
+          handlePasswordChange={this.handlePasswordChange}
         />
-        <EventsPicker updateEvent={this.updateEvent} />
+        <EventsPicker handleUpdateEvent={this.handleUpdateEvent} />
         <div className="container p-3">
           <button
             className="btn btn-primary btn-lg"

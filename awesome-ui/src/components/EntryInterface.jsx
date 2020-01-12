@@ -6,13 +6,14 @@ class EntryInterface extends Component {
   constructor(props) {
     super(props);
 
-    this.handleCompetitionNameOrPasswordChange =
-      props.handleCompetitionNameOrPasswordChange;
-
     this.state = {
       competitionName: this.getDefaultCompetitionName(),
-      password: ""
+      password: "",
+      showPassword: false
     };
+
+    // Set initial competition name to the wcif
+    props.handleCompetitionNameChange(this.state.competitionName);
   }
 
   getDefaultCompetitionName = () => {
@@ -26,22 +27,22 @@ class EntryInterface extends Component {
     this.setState(state);
   };
 
-  handleCompetitionName = event => {
+  handleCompetitionNameChange = event => {
     let state = this.state;
     state.competitionName = event.target.value;
     this.setState(state);
 
     // Propagate the change.
-    this.handleCompetitionNameOrPasswordChange(this.state);
+    this.props.handleCompetitionNameChange(this.state.competitionName);
   };
 
-  handlePassword = event => {
+  handlePasswordChange = event => {
     let state = this.state;
     state.password = event.target.value;
     this.setState(state);
 
     // Propagate the change.
-    this.handleCompetitionNameOrPasswordChange(this.state);
+    this.props.handlePasswordChange(this.state.password);
   };
 
   render() {
@@ -55,7 +56,7 @@ class EntryInterface extends Component {
             <input
               id="competitionName"
               placeholder="Competition Name"
-              onChange={this.handleCompetitionName}
+              onChange={this.handleCompetitionNameChange}
               value={this.state.competitionName}
               size={40}
             />
@@ -71,7 +72,8 @@ class EntryInterface extends Component {
               id="passwordInput"
               type={this.state.showPassword ? "" : "password"}
               placeholder="Password"
-              onChange={this.handlePassword}
+              onChange={this.handlePasswordChange}
+              value={this.state.password}
             />
             <div onClick={this.toogleShowPassword}>
               <input

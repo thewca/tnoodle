@@ -16,18 +16,16 @@ function App() {
   let onlineScramblerLink = "/webscrambles/online";
   let aboutLink = "/about";
 
-  let wcif = { formatVersion: "1.0", name: "", events: [] };
+  let wcif = {};
+
+  let updateWcif = payload => {
+    wcif = payload;
+  };
 
   let tnoodleEndpoint = "http://localhost:2014";
 
-  let updateEvent = event => {
-    let events = wcif.events.filter(e => e.id !== event.id);
-    events.push(event);
-    wcif.events = events;
-  };
-
   let generateScrambles = () => {
-    console.log(generateScrambles);
+    console.log("Generating scrambles");
     console.log(wcif);
 
     fetch(tnoodleEndpoint, {
@@ -36,18 +34,10 @@ function App() {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        wcif
-      })
+      body: wcif
     })
-      .then(r => console.log(r))
+      .then(respnse => console.log(respnse))
       .catch(error => console.log(error));
-  };
-
-  let handleCompetitionNameOrPasswordChange = payload => {
-    wcif.name = payload.competitionName;
-    wcif.password = payload.password;
-    console.log(wcif);
   };
 
   return (
@@ -62,14 +52,14 @@ function App() {
           <Route path={offlineScramblerLink}>
             <OfflineScrambler
               generateScrambles={generateScrambles}
-              updateEvent={updateEvent}
-              handleCompetitionNameOrPasswordChange={
-                handleCompetitionNameOrPasswordChange
-              }
+              updateWcif={updateWcif}
             />
           </Route>
           <Route path={onlineScramblerLink}>
-            <OnlineScrambler />
+            <OnlineScrambler
+              generateScrambles={generateScrambles}
+              updateWcif={updateWcif}
+            />
           </Route>
           <Route path={aboutLink}>
             <About />
