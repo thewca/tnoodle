@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import EventPicker from "./EventPicker";
 
-import { WCA_EVENTS } from "../constants/wca.constants";
+import { WCA_EVENTS } from "../../constants/wca.constants";
 import _ from "lodash";
 
 class EventsPicker extends Component {
