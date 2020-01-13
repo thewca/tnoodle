@@ -16,11 +16,30 @@ function App() {
   let onlineScramblerLink = "/webscrambles/online";
   let aboutLink = "/about";
 
+  let wcaBaseUrl = "https://www.worldcubeassociation.org";
+  let versionEndpoint = "/api/v0/scramble-program";
+
   let wcif = {};
 
   let updateWcif = payload => {
     wcif = payload;
   };
+
+  // Check if the version is allowed.
+  let analyzeVersion = () => {
+    let url = wcaBaseUrl + versionEndpoint;
+    fetch(url)
+      .then(res => res.json())
+      .then(
+        result => {
+          console.log(result);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+  };
+  analyzeVersion();
 
   let tnoodleEndpoint = "http://localhost:2014";
 
