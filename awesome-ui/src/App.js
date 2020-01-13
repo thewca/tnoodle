@@ -11,7 +11,9 @@ import Navbar from "./components/Navbar";
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-function App() {
+export const BASE_PATH = process.env.PUBLIC_URL;
+
+export const App = function() {
   let offlineScramblerLink = "/webscrambles/offline";
   let onlineScramblerLink = "/webscrambles/online";
   let aboutLink = "/about";
@@ -90,6 +92,4 @@ function App() {
       </div>
     </Router>
   );
-}
-
-export default App;
+};
