@@ -169,7 +169,7 @@ data class ScrambleRequest(
             val suffixedTitle = "$this (${suffixSalt})"
                 .takeUnless { suffixSalt == 0 } ?: this
 
-            if (this !in seenTitles) {
+            if (suffixedTitle !in seenTitles) {
                 return suffixedTitle
             }
 
