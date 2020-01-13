@@ -1,8 +1,8 @@
 import React from "react";
 import "./App.css";
 import Index from "./components/Index";
-import OfflineScrambler from "./components/OfflineScrambler";
-import OnlineScrambler from "./components/OnlineScrambler";
+import OfflineScrambler from "./components/offline-scrambler/OfflineScrambler";
+import OnlineScrambler from "./components/online-scrambler/OnlineScrambler";
 import About from "./components/About";
 
 import "bootstrap/dist/css/bootstrap.css";

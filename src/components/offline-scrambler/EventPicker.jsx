@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import CubingIcon from "./CubingIcon";
-import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
+import CubingIcon from "../CubingIcon";
+import { MAX_WCA_ROUNDS, FORMATS } from "../../constants/wca.constants";
 
 import "./EventPicker.scss";
 
