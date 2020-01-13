@@ -6,8 +6,15 @@ class OnlineScrambler extends Component {
     this.state = {};
   }
   render() {
+    if (!this.state.me) {
+      return (
+        <div className="container">
+          <button className="btn btn-outline-primary btn-lg">Log In</button>
+        </div>
+      );
+    }
     return (
-      <div>
+      <div className="container">
         <h1>Online Scrambler</h1>
       </div>
     );
