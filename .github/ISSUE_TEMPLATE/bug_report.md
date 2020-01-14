@@ -26,11 +26,9 @@ Please don't use phrases like "It works just as usual"
  - TNoodle Version [e.g. 0.15.1]
 - Java version [e.g. Java 8] ([how to find out](https://www.java.com/en/download/help/version_manual.xml))
 
-[OPTIONAL]
-
-## Screenshots
+## Screenshots [OPTIONAL]
 If applicable, add screenshots to help explain your problem.
 
-## Additional context
+## Additional context [OPTIONAL]
 Add any other context about the problem here.
 For example: "Only happens if my computer is not connected to the Internet"
