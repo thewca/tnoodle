@@ -13,6 +13,7 @@ object Libraries {
     val KOTLIN_STDLIB_JVM = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.KOTLIN_STDLIB_JVM}"
     val KOTLIN_STDLIB_JS = "org.jetbrains.kotlin:kotlin-stdlib-js:${Versions.KOTLIN_STDLIB_JS}"
     val KOTLIN_STDLIB_COMMON = "org.jetbrains.kotlin:kotlin-stdlib-common:${Versions.KOTLIN_STDLIB_COMMON}"
+    val KOTLIN_SERIALIZATION_JVM = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.KOTLIN_SERIALIZATION_JVM}"
     val KTOR_SERVER_NETTY = "io.ktor:ktor-server-netty:${Versions.KTOR_SERVER_NETTY}"
     val KTOR_SERVER_SERVLET = "io.ktor:ktor-server-servlet:${Versions.KTOR_SERVER_SERVLET}"
     val KTOR_GSON = "io.ktor:ktor-gson:${Versions.KTOR_GSON}"
