@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
+package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import java.time.ZoneId
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.parseWCIFDateWithTimezone
