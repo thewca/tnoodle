@@ -77,7 +77,9 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
             )
 
         fun Activity.createScrambleRequest(): ScrambleRequest? {
-            val puzzleString = readEventCode()
+            val eventString = readEventCode()
+
+            val puzzleString = eventString
                 .replace("bf", "ni")
                 .replace("mbf", "ni")
                 .replace("oh", "")
@@ -86,9 +88,21 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
                 return null
             }
 
-            val puzzle by PuzzlePlugins.PUZZLES[puzzleString]
+            val isFmc = "fm" in eventString
 
-            return ScrambleRequest.empty(puzzle)
+            val parsedRequest = ScrambleRequest.parseScrambleRequest("WCIF auto-generated", "$puzzleString*5", null)
+                .copy(event = eventString, fmc = isFmc)
+
+            val activityCodeData = readPrefixCodes()
+
+            val round = activityCodeData['r']?.toInt() ?: parsedRequest.round
+            val group = activityCodeData['g']?.toInt()
+            val attempt = activityCodeData['a']?.toInt() ?: parsedRequest.attempt
+
+            // FIXME
+            val letterGroup = group?.let { 'A' - 1 + it }?.toString() ?: parsedRequest.group
+
+            return parsedRequest.copy(round = round, group = letterGroup, attempt = attempt)
         }
 
         fun String.matchesNumericalIndex(number: Int): Boolean {
