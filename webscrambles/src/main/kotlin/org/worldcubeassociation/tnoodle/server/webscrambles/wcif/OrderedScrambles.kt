@@ -3,34 +3,34 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 import net.lingala.zip4j.io.outputstream.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.filterForActivity
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import java.time.LocalDate
 import java.time.Period
 
 object OrderedScrambles {
-    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: LocalDate, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: Schedule) {
-        if (wcifHelper.venues.isEmpty()) {
+    fun generateOrderedScrambles(globalTitle: String?, generationDate: LocalDate, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifConfig: WCIFRequestBinding) {
+        val wcifSchedule = wcifConfig.wcif.schedule
+
+        if (wcifSchedule.venues.isEmpty()) {
             return
         }
 
-        val activityDays = wcifHelper.activitiesWithLocalStartTimes
+        val activityDays = wcifSchedule.activitiesWithLocalStartTimes
             .map { it.value.dayOfYear }
             .distinct()
 
         // hasMultipleDays gets a variable assigned on the competition creation using the website's form.
         // Online schedule fit to it and the user should not be able to put events outside it, but we double check here.
         // The next assignment fix possible mistakes (eg. a competition is assigned with 1 day, but events are spread among 2 days).
-        val hasMultipleDays = wcifHelper.hasMultipleDays || activityDays.size > 1
-        val hasMultipleVenues = wcifHelper.hasMultipleVenues
+        val hasMultipleDays = wcifSchedule.hasMultipleDays || activityDays.size > 1
+        val hasMultipleVenues = wcifSchedule.hasMultipleVenues
 
         // We consider the competition start date as the earlier activity from the schedule.
         // This prevents miscalculation of dates for multiple timezones.
-        val competitionStartActivity = wcifHelper.earliestActivity
+        val competitionStartActivity = wcifSchedule.earliestActivity
 
-        for (venue in wcifHelper.venues) {
+        for (venue in wcifSchedule.venues) {
             val venueName = venue.fileSafeName
             val hasMultipleRooms = venue.hasMultipleRooms
 
@@ -49,8 +49,8 @@ object OrderedScrambles {
                     }
 
                 for ((nthDay, activities) in activitiesPerDay) {
-                    val scrambles = activities
-                        .associateWith { scrambleRequests.filterForActivity(it) }
+                    val scrambles = wcifConfig.activityScrambleRequests
+                        .filterKeys { it in activities }
 
                     val activitiesHaveScrambles = scrambles.values.any { it.isNotEmpty() }
 
@@ -86,9 +86,9 @@ object OrderedScrambles {
         }
 
         // Generate all scrambles ordered
-        val allScramblesOrdered = wcifHelper.activitiesWithLocalStartTimes.entries
+        val allScramblesOrdered = wcifSchedule.activitiesWithLocalStartTimes.entries
             .sortedBy { it.value }
-            .flatMap { scrambleRequests.filterForActivity(it.key) }
+            .flatMap { wcifConfig.activityScrambleRequests[it.key].orEmpty() }
             .distinct()
 
         val pdfFileName = "Printing/Ordered Scrambles/Ordered $globalTitle - All Scrambles.pdf"
