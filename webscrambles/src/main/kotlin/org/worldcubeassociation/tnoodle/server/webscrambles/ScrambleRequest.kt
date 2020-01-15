@@ -14,6 +14,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.stripNewlines
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.OrderedScrambles
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding.Companion.computeBindings
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
@@ -277,8 +278,8 @@ data class ScrambleRequest(
             }
 
             if (wcif != null) {
-                val schedule = wcif.schedule
-                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, versionTag, zipOut, parameters, schedule)
+                val bindings = wcif.computeBindings(scrambleRequests)
+                OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, versionTag, zipOut, parameters, bindings)
             }
 
             computerDisplayZipOut.close()
