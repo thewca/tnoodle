@@ -14,7 +14,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.stripNewlines
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.OrderedScrambles
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
 import java.time.LocalDate
@@ -188,7 +188,7 @@ data class ScrambleRequest(
 
         private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
 
-        fun requestsToZip(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIFHelper?): ByteArrayOutputStream {
+        fun requestsToZip(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcif: WCIF?): ByteArrayOutputStream {
             val baosZip = ByteArrayOutputStream()
 
             val usePassword = password != null
@@ -276,8 +276,9 @@ data class ScrambleRequest(
                 }
             }
 
-            if (wcifHelper != null) {
-                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, versionTag, zipOut, parameters, wcifHelper)
+            if (wcif != null) {
+                val schedule = wcif.schedule
+                OrderedScrambles.generateOrderedScrambles(scrambleRequests, globalTitle, generationDate, versionTag, zipOut, parameters, schedule)
             }
 
             computerDisplayZipOut.close()
@@ -302,7 +303,7 @@ data class ScrambleRequest(
                 "version" to versionTag,
                 "generationDate" to generationDate,
                 "generationUrl" to generationUrl,
-                "schedule" to wcifHelper?.schedule
+                "schedule" to wcif?.schedule
             ).filterValues { it != null }
 
             val jsonStr = GSON.toJson(jsonObj)

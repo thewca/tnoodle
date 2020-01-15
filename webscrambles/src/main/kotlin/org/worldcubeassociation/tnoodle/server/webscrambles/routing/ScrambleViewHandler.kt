@@ -27,7 +27,7 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameA
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
@@ -149,11 +149,11 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                     }
                     "zip" -> {
                         val generationUrl = query["generationUrl"]
-                        val schedule = query["schedule"] ?: "{}"
+                        val schedule = query["schedule"]
 
-                        val wcifHelper = WCIFHelper(schedule)
+                        val wcif = schedule?.let { WCIFParser.parse(it) }
 
-                        val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, environmentConfig.projectTitle, scrambleRequests, password, generationUrl, wcifHelper)
+                        val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, environmentConfig.projectTitle, scrambleRequests, password, generationUrl, wcif)
 
                         val safeTitle = name.replace("\"".toRegex(), "'")
 
