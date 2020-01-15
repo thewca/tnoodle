@@ -20,7 +20,7 @@ import java.net.URLDecoder
 import java.time.LocalDate
 import java.util.*
 import kotlin.math.min
-import net.gnehzr.tnoodle.svglite.Color as SVGColor
+import net.gnehzr.tnoodle.svglite.Color
 
 data class ScrambleRequest(
     val scrambles: List<String>,
@@ -29,7 +29,7 @@ data class ScrambleRequest(
     val copies: Int,
     val title: String,
     val fmc: Boolean,
-    val colorScheme: HashMap<String, SVGColor>?,
+    val colorScheme: HashMap<String, Color>?,
 
     // totalAttempt and attempt are useful for when we have multiple attempts split in the schedule.
     // Usually, tnoodle prints scrambles for a ScrambleRequest iterating over ScrambleRequest.scrambles.
