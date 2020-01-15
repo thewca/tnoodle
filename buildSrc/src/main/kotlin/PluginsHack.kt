@@ -6,6 +6,7 @@ import dependencies.Plugins.GIT_VERSION_TAG_ACTUAL
 import dependencies.Plugins.GOOGLE_APPENGINE_ACTUAL
 import dependencies.Plugins.KOTLIN_JVM_ACTUAL
 import dependencies.Plugins.KOTLIN_MULTIPLATFORM_ACTUAL
+import dependencies.Plugins.KOTLIN_SERIALIZATION_ACTUAL
 import dependencies.Plugins.SHADOW_ACTUAL
 import dependencies.Plugins.NODEJS_ACTUAL
 
@@ -29,6 +30,9 @@ inline val PluginDependenciesSpec.KOTLIN_JVM: PluginDependencySpec
 
 inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM: PluginDependencySpec
     get() = KOTLIN_MULTIPLATFORM_ACTUAL
+
+inline val PluginDependenciesSpec.KOTLIN_SERIALIZATION: PluginDependencySpec
+    get() = KOTLIN_SERIALIZATION_ACTUAL
 
 inline val PluginDependenciesSpec.GOOGLE_APPENGINE: PluginDependencySpec
     get() = GOOGLE_APPENGINE_ACTUAL

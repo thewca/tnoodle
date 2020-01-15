@@ -19,6 +19,7 @@ object Versions {
     val KOTLIN_STDLIB_JVM = KOTLIN
     val KOTLIN_STDLIB_JS = KOTLIN
     val KOTLIN_STDLIB_COMMON = KOTLIN
+    val KOTLIN_SERIALIZATION_JVM = "0.14.0"
     val KTOR_SERVER_NETTY = KTOR
     val KTOR_SERVER_SERVLET = KTOR
     val KTOR_GSON = KTOR
@@ -41,5 +42,6 @@ object Versions {
 
         val KOTLIN_JVM = KOTLIN
         val KOTLIN_MULTIPLATFORM = KOTLIN
+        val KOTLIN_SERIALIZATION = KOTLIN
     }
 }

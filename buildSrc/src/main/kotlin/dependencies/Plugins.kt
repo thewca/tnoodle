@@ -14,6 +14,9 @@ object Plugins {
     inline val PluginDependenciesSpec.KOTLIN_JVM_ACTUAL: PluginDependencySpec
         get() = kotlin("jvm").version(Versions.Plugins.KOTLIN_JVM)
 
+    inline val PluginDependenciesSpec.KOTLIN_SERIALIZATION_ACTUAL: PluginDependencySpec
+        get() = kotlin("plugin.serialization").version(Versions.Plugins.KOTLIN_SERIALIZATION)
+
     inline val PluginDependenciesSpec.KOTLIN_MULTIPLATFORM_ACTUAL: PluginDependencySpec
         get() = id("kotlin-multiplatform").version(Versions.Plugins.KOTLIN_MULTIPLATFORM)
 

@@ -7,6 +7,7 @@ import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.KOTLIN_ARGPARSER
 import dependencies.Libraries.SYSTEM_TRAY
+import dependencies.Libraries.KOTLIN_SERIALIZATION_JVM
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.TNOODLE_SCRAMBLES
 import dependencies.Libraries.ZIP4J
@@ -32,6 +33,7 @@ plugins {
     SHADOW
     kotlin("jvm")
     GIT_VERSION_TAG
+    KOTLIN_SERIALIZATION
 }
 
 dependencies {
@@ -47,6 +49,7 @@ dependencies {
     implementation(KOTLIN_ARGPARSER)
     implementation(SYSTEM_TRAY)
     implementation(TNOODLE_SCRAMBLES)
+    implementation(KOTLIN_SERIALIZATION_JVM)
 
     runtimeOnly(project(":tnoodle-ui"))
 }
