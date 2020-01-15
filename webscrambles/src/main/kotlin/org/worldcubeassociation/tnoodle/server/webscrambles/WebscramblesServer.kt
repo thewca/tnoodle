@@ -6,19 +6,12 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import net.gnehzr.tnoodle.scrambles.Puzzle
-import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo
-import net.gnehzr.tnoodle.svglite.Color
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
-import org.worldcubeassociation.tnoodle.server.util.GsonUtil
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher.NO_REEXEC_OPT
-import org.worldcubeassociation.tnoodle.server.webscrambles.gson.Colorizer
-import org.worldcubeassociation.tnoodle.server.webscrambles.gson.PuzzleImageInfoizer
-import org.worldcubeassociation.tnoodle.server.webscrambles.gson.Puzzlerizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
@@ -28,11 +21,6 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
     private val baseServer = TNoodleServer(environmentConfig)
 
     override fun spinUp(app: Application) {
-        GsonUtil.registerTypeAdapter(Color::class.java, Colorizer())
-        GsonUtil.registerTypeAdapter(PuzzleImageInfo::class.java, PuzzleImageInfoizer())
-
-        GsonUtil.registerTypeHierarchyAdapter(Puzzle::class.java, Puzzlerizer())
-
         val scrambleHandler = ScrambleHandler(environmentConfig)
         val scrambleViewHandler = ScrambleViewHandler(environmentConfig)
 
