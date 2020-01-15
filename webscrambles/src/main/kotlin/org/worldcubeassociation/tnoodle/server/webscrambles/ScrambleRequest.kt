@@ -6,20 +6,24 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding.Companion.computeBindings
+import kotlinx.serialization.Serializable
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Colorizer
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Puzzlerizer
 import java.net.URLDecoder
 import java.time.LocalDate
 import java.util.*
 import kotlin.math.min
 import net.gnehzr.tnoodle.svglite.Color
 
+@Serializable
 data class ScrambleRequest(
     val scrambles: List<String>,
     val extraScrambles: List<String>,
-    val scrambler: Puzzle,
+    @Serializable(with = Puzzlerizer::class) val scrambler: Puzzle,
     val copies: Int,
     val title: String,
     val fmc: Boolean,
-    val colorScheme: HashMap<String, Color>?,
+    val colorScheme: HashMap<String, @Serializable(with = Colorizer::class) Color>?,
 
     // totalAttempt and attempt are useful for when we have multiple attempts split in the schedule.
     // Usually, tnoodle prints scrambles for a ScrambleRequest iterating over ScrambleRequest.scrambles.

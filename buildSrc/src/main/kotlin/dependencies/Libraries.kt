@@ -17,6 +17,7 @@ object Libraries {
     val KTOR_SERVER_NETTY = "io.ktor:ktor-server-netty:${Versions.KTOR_SERVER_NETTY}"
     val KTOR_SERVER_SERVLET = "io.ktor:ktor-server-servlet:${Versions.KTOR_SERVER_SERVLET}"
     val KTOR_GSON = "io.ktor:ktor-gson:${Versions.KTOR_GSON}"
+    val KTOR_SERIALIZATION = "io.ktor:ktor-serialization:${Versions.KTOR_SERIALIZATION}"
     val KTOR_SERVER_HOST_COMMON = "io.ktor:ktor-server-host-common:${Versions.KTOR_SERVER_HOST_COMMON}"
     val LOGBACK_CLASSIC = "ch.qos.logback:logback-classic:${Versions.LOGBACK_CLASSIC}"
     val KOTLIN_ARGPARSER = "com.xenomachina:kotlin-argparser:${Versions.KOTLIN_ARGPARSER}"

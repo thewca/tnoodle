@@ -6,14 +6,17 @@ import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
+import kotlinx.serialization.internal.StringSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.map
 
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 
 object JsEnvHandler : RouteHandler {
     override fun install(router: Routing) {
         router.get("/env.js") {
-            val js = "window.TNOODLE_ENV = ${GSON.toJson(JS_ENV)};"
+            val serial = (StringSerializer to StringSerializer).map
+            val js = "window.TNOODLE_ENV = ${Json.stringify(serial, JS_ENV)};"
             call.respondText(js, ContentType.Application.JavaScript)
         }
 

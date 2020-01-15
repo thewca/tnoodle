@@ -1,18 +1,18 @@
 package org.worldcubeassociation.tnoodle.server.routing
 
-import com.google.gson.reflect.TypeToken
 import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
+import kotlinx.serialization.internal.StringSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.map
 
 import java.io.IOException
 import java.net.URL
 import java.util.HashMap
 
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.TNoodleServer
-import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 
 class VersionHandler(val versionKey: String) : RouteHandler {
@@ -21,7 +21,8 @@ class VersionHandler(val versionKey: String) : RouteHandler {
             try {
                 val raw = URL(BASE_URL).readText()
 
-                val json: MutableMap<String, Any> = GSON.fromJson(raw, object : TypeToken<HashMap<String, Any>>() {}.type)
+                val serial = (StringSerializer to StringSerializer).map
+                val json = Json.parse(serial, raw).toMutableMap()
 
                 val runningVersionKey = "running_version"
                 assert(!json.containsKey(runningVersionKey))

@@ -2,6 +2,7 @@ import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.KTOR_GSON
+import dependencies.Libraries.KTOR_SERIALIZATION
 import dependencies.Libraries.KTOR_SERVER_NETTY
 import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
 import dependencies.Libraries.KTOR_SERVER_SERVLET
@@ -21,6 +22,7 @@ plugins {
 dependencies {
     api(KTOR_SERVER_NETTY)
     api(KTOR_GSON)
+    api(KTOR_SERIALIZATION)
 
     implementation(KTOR_SERVER_HOST_COMMON)
     implementation(KTOR_SERVER_SERVLET)

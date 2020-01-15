@@ -3,13 +3,12 @@ package org.worldcubeassociation.tnoodle.server
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
-import io.ktor.gson.gson
 import io.ktor.routing.routing
+import io.ktor.serialization.serialization
 import io.ktor.server.engine.ShutDownUrl
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
-import org.worldcubeassociation.tnoodle.server.util.GsonUtil.configureLoaded
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
 class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
@@ -32,9 +31,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         }
 
         app.install(ContentNegotiation) {
-            gson {
-                configureLoaded()
-            }
+            serialization()
         }
     }
 }

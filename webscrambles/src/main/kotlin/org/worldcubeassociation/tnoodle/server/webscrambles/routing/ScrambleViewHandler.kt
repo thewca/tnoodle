@@ -12,6 +12,8 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.list
 import net.gnehzr.tnoodle.scrambles.PuzzleIcon
 import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo
 import org.apache.batik.anim.dom.SVGDOMImplementation
@@ -22,7 +24,6 @@ import org.apache.batik.transcoder.image.ImageTranscoder
 import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
-import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
@@ -113,7 +114,9 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
 
                         call.respondText(svg.toString(), ContentType.Image.SVG)
                     }
-                    "json" -> call.respond(PuzzleImageInfo(scrambler))
+                    "json" -> {
+                        call.respond(PuzzleImageInfo(scrambler))
+                    }
                     else -> call.respondText("Invalid extension: $extension")
                 }
             }
@@ -130,7 +133,8 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                 val body = call.receiveText()
                 val query = parseQuery(body)
 
-                val scrambleRequests = GSON.fromJson(query["sheets"], Array<ScrambleRequest>::class.java).toList()
+                val reqRaw = query.getValue("sheets")
+                val scrambleRequests = Json.parse(ScrambleRequest.serializer().list, reqRaw)
                 val password = query["password"]
 
                 val generationDate = LocalDate.now()
