@@ -20,7 +20,7 @@ class WCIFHelper(schedule: String) {
     val numberOfDays: Int
 
     init {
-        val parsedSchedule = PARSER.parse(schedule)?.asJsonObject
+        val parsedSchedule = JsonParser.parseString(schedule)?.asJsonObject
 
         val rawVenues = parsedSchedule?.getAsJsonArray("venues") ?: JsonArray()
 
@@ -64,8 +64,6 @@ class WCIFHelper(schedule: String) {
     val hasMultipleVenues: Boolean get() = venues.size > 1
 
     companion object {
-        private val PARSER = JsonParser()
-
         val WCIF_DATE_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
         fun List<ScrambleRequest>.filterForActivity(activity: Activity): List<ScrambleRequest> {
