@@ -43,6 +43,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             ReadmeHandler.install(this)
             scrambleViewHandler.install(this)
             StaticContentHandler.install(this)
+            WcifHandler.install(this)
         }
 
         baseServer.spinUp(app)

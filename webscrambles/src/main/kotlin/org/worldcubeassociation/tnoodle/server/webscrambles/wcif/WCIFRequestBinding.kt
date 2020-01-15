@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
@@ -12,28 +13,33 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
         private val WCIF_IGNORABLE_KEYS = listOf("other")
 
         fun WCIF.computeBindings(allScrambleRequests: List<ScrambleRequest>): WCIFRequestBinding {
-            val allActivities = schedule.venues
-                .flatMap { it.rooms }
-                .flatMap { it.activities }
-                .flatMap { it.finestChildActivities } // FIXME do we want this w/ legacy?
+            val index = schedule.allActivities
+                .associateWith { allScrambleRequests.filterForActivity(it) }
 
-            val index = allActivities.associateWith { allScrambleRequests.filterForActivity(it) }
+            return WCIFRequestBinding(this, index)
+        }
+
+        fun WCIF.generateBindings(): WCIFRequestBinding {
+            val index = schedule.allActivities
+                .associateWith { it.createScrambleRequest() }
+                .mapValues { listOfNotNull(it.value) }
 
             return WCIFRequestBinding(this, index)
         }
 
         fun List<ScrambleRequest>.filterForActivity(activity: Activity): List<ScrambleRequest> {
-            val activitySplit = activity.activityCode.split("-")
-            val event = activitySplit[0]
+            val event = activity.readEventCode()
 
             if (event in WCIF_IGNORABLE_KEYS) {
                 return emptyList()
             }
 
+            val activityCodeData = activity.readPrefixCodes()
+
             // This part assumes every round, group and attempt is labeled with an integer from competitionJson
-            val round = activitySplit.findPrefixedGroup("r")?.toInt() ?: 0
-            val group = activitySplit.findPrefixedGroup("g")?.toInt() ?: 0
-            val attempt = activitySplit.findPrefixedGroup("a")?.toInt() ?: 0
+            val round = activityCodeData['r']?.toInt() ?: 0
+            val group = activityCodeData['g']?.toInt() ?: 0
+            val attempt = activityCodeData['a']?.toInt() ?: 0
 
             // First, we add all requests whose events equals what we need
             val matchingRequests = filter { it.event == event }
@@ -50,8 +56,18 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
                 ?: error("An activity of the schedule did not match an event.")
         }
 
-        fun List<String>.findPrefixedGroup(prefix: String) =
-            find { it.startsWith(prefix) }?.substring(prefix.length)
+        fun Activity.readPrefixCodes(): Map<Char, String> {
+            val activitySplit = activityCode.split("-")
+            val prefixGroups = activitySplit.drop(1)
+
+            return prefixGroups.associateWith { it.substring(1) }
+                .mapKeys { it.key.first() }
+        }
+
+        fun Activity.readEventCode(): String {
+            val activitySplit = activityCode.split("-")
+            return activitySplit.first()
+        }
 
         fun ScrambleRequest.copyForAttempt(targetAttempt: Int) =
             copy(
@@ -59,6 +75,21 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
                 attempt = targetAttempt,
                 totalAttempt = scrambles.size // useful for FMC
             )
+
+        fun Activity.createScrambleRequest(): ScrambleRequest? {
+            val puzzleString = readEventCode()
+                .replace("bf", "ni")
+                .replace("mbf", "ni")
+                .replace("oh", "")
+
+            if (puzzleString in WCIF_IGNORABLE_KEYS) {
+                return null
+            }
+
+            val puzzle by PuzzlePlugins.PUZZLES[puzzleString]
+
+            return ScrambleRequest.empty(puzzle)
+        }
 
         fun String.matchesNumericalIndex(number: Int): Boolean {
             val sum = reversed().withIndex().sumBy { (i, c) ->
