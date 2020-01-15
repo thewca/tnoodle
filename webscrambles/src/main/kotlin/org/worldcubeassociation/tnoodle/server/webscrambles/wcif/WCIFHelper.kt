@@ -4,6 +4,9 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Room
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Venue
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
