@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.time.ZoneId
@@ -19,9 +20,8 @@ object WCIFParser {
             val rooms = rawRooms.map { it.asJsonObject }.map { jsonRoom ->
                 val rawActivities = jsonRoom.asJsonObject.getAsJsonArray("activities") ?: JsonArray()
 
-                val activities = rawActivities.map { it.asJsonObject }.map { jsonActivity ->
-                    Activity(jsonActivity.get("activityCode").asString, jsonActivity.get("startTime").asString)
-                }
+                val activities = rawActivities.map { it.asJsonObject }
+                    .map { jsonActivity -> parseActivity(jsonActivity) }
 
                 Room(jsonRoom.get("name").asString, activities)
             }
@@ -33,6 +33,18 @@ object WCIFParser {
 
         val modelSchedule = Schedule(numberOfDays, venues)
         return WCIF(modelSchedule)
+    }
+
+    private fun parseActivity(rawActivity: JsonObject): Activity {
+        val children = rawActivity.get("childActivities").asJsonArray
+            .map { it.asJsonObject }
+            .map { parseActivity(it) }
+
+        return Activity(
+            rawActivity.get("activityCode").asString,
+            rawActivity.get("startTime").asString,
+            children
+        )
     }
 
     val WCIF_DATE_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME
