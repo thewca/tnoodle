@@ -3,14 +3,15 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 import net.lingala.zip4j.io.outputstream.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.filterForActivity
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFHelper.Companion.atLocalStartOfDay
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.filterForActivity
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import java.time.LocalDate
 import java.time.Period
 
 object OrderedScrambles {
-    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: LocalDate, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: WCIFHelper) {
+    fun generateOrderedScrambles(scrambleRequests: List<ScrambleRequest>, globalTitle: String?, generationDate: LocalDate, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifHelper: Schedule) {
         if (wcifHelper.venues.isEmpty()) {
             return
         }
