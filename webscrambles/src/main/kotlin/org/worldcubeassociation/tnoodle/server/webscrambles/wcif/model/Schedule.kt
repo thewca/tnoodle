@@ -7,6 +7,11 @@ data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
             ?.key
             ?: error("I could not find the earliest activity")
 
+    val allActivities = venues
+        .flatMap { it.rooms }
+        .flatMap { it.activities }
+        .flatMap { it.nestedChildActivities } // FIXME do we want this w/ legacy?
+
     val activitiesWithLocalStartTimes = venues
         .associateWith { it.rooms }
         .mapValues { it.value.flatMap(Room::activities) }
