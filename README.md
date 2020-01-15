@@ -6,7 +6,6 @@ TNoodle is a software suite that contains the official WCA scramble program. It 
 
 [![Build Status](https://travis-ci.org/thewca/tnoodle.svg?branch=master)](https://travis-ci.org/thewca/tnoodle)
 
-
 ## WCA Scramble Program
 
 The official scramble program for the [World Cube Association](https://www.worldcubeassociation.org/) has been part of the TNoodle project since January 1, 2013. It will contain the sole official scramble program for the foreseeable future.
@@ -15,11 +14,9 @@ All WCA official competitions must always use the current version of the officia
 
 Note that only the scramble program part of TNoodle is "official". Other TNoodle projects may be convenient for certain uses (including at official competitions), but do not have any official status.
 
-
 ### "Scramble Program" vs. "Scrambler"
 
 Officially, `TNoodle-WCA` is a [scramble program](https://www.worldcubeassociation.org/regulations/#4f), while a [scrambler](https://www.worldcubeassociation.org/regulations/#A2b) is a human. It is fine to refer to TNoodle as a "scrambler" colloquially, but please try to use the official convention wherever possible.
-
 
 ## Project Details
 
@@ -27,7 +24,6 @@ TNoodle is organised as a multi-project [Gradle](https://gradle.com) build. The 
 
 Every sub-project has its individual artifact configuration and `build.gradle` file. Furthermore, there is a central `buildSrc` folder,
 which is automatically sourced by Gradle. It contains common code and shared configuration setups.
-
 
 ### Overview
 
@@ -38,11 +34,9 @@ Get an overview of the core project tasks by executing
 
     ./gradlew tasks
 
-    
 ### Setup
 
 Gradle automagically handles all dependencies for you. You just need an Internet connection upon your first build run!
-
 
 ### WCA Scramble Program
 
@@ -58,18 +52,8 @@ You can run the `.jar` from the commandline using: (replace the `$VERSION` tag a
 
     java -jar TNoodle-WCA-$VERSION.jar
 
-*Important note: You must never use a custom build for any official competitions.* [Contact the WCA Board and the WRC](https://www.worldcubeassociation.org/contact) if you have any questions about this.
-
-### Releasing
-
-First make sure that `./gradlew build` works.
-
-- Bump the version number in the root project `build.gradle.kts`.
-- Verify that all tests succeed by invoking `./gradlew check`.
-- Build a release JAR with `./gradlew generateOfficialRelease`.
-
-Be aware that this command will invoke all build tests! Especially for the `:scrambles` project, this can take some ~15 minutes to finish.
+_Important note: You must never use a custom build for any official competitions._ [Contact the WCA Board and the WRC](https://www.worldcubeassociation.org/contact) if you have any questions about this.
 
 ### Notes
 
-- Each project is a fully fledged Gradle project (they each have a `build.gradle.kts` file). Your IDE should be able to import Gradle build structures nowadays. if not, this is a good indicator that your IDE is outdated and should be replaced.
+-   Each project is a fully fledged Gradle project (they each have a `build.gradle.kts` file). Your IDE should be able to import Gradle build structures nowadays. if not, this is a good indicator that your IDE is outdated and should be replaced.
