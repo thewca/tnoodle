@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
@@ -12,6 +11,14 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
         // If we ever accept any other such ignorable key, it should be added here.
         private val WCIF_IGNORABLE_KEYS = listOf("other")
 
+        private val EVENT_MAPPING = mapOf(
+            "333bf" to "333ni",
+            "333oh" to "333",
+            "444bf" to "444ni",
+            "555bf" to "555ni",
+            "333mbf" to "333ni"
+        )
+
         fun WCIF.computeBindings(allScrambleRequests: List<ScrambleRequest>): WCIFRequestBinding {
             val index = schedule.allActivities
                 .associateWith { allScrambleRequests.filterForActivity(it) }
@@ -19,9 +26,9 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
             return WCIFRequestBinding(this, index)
         }
 
-        fun WCIF.generateBindings(): WCIFRequestBinding {
+        fun WCIF.generateBindings(title: String): WCIFRequestBinding {
             val index = schedule.allActivities
-                .associateWith { it.createScrambleRequest() }
+                .associateWith { it.createScrambleRequest(title, 5) }
                 .mapValues { listOfNotNull(it.value) }
 
             return WCIFRequestBinding(this, index)
@@ -45,7 +52,7 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
             val matchingRequests = filter { it.event == event }
                 // Then, we start removing, depending on the defined details.
                 .filter { round <= 0 || it.round == round }
-                .filter { group <= 0 || it.group.orEmpty().matchesNumericalIndex(group) }
+                .filter { group <= 0 || it.group.orEmpty().toNumericalIndex() == group }
 
             val mappedRequests = matchingRequests.map { request ->
                 request.takeUnless { attempt > 0 }
@@ -76,13 +83,9 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
                 totalAttempt = scrambles.size // useful for FMC
             )
 
-        fun Activity.createScrambleRequest(): ScrambleRequest? {
+        fun Activity.createScrambleRequest(title: String, numScrambles: Int, copies: Int = 1): ScrambleRequest? {
             val eventString = readEventCode()
-
-            val puzzleString = eventString
-                .replace("bf", "ni")
-                .replace("mbf", "ni")
-                .replace("oh", "")
+            val puzzleString = EVENT_MAPPING[eventString] ?: eventString
 
             if (puzzleString in WCIF_IGNORABLE_KEYS) {
                 return null
@@ -90,27 +93,28 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
 
             val isFmc = "fm" in eventString
 
-            val parsedRequest = ScrambleRequest.parseScrambleRequest("WCIF auto-generated", "$puzzleString*5", null)
+            val parsedRequest = ScrambleRequest.parseScrambleRequest(title, "$puzzleString*$numScrambles*$copies", null)
                 .copy(event = eventString, fmc = isFmc)
 
             val activityCodeData = readPrefixCodes()
 
             val round = activityCodeData['r']?.toInt() ?: parsedRequest.round
-            val group = activityCodeData['g']?.toInt()
+            val group = activityCodeData['g']?.toInt()?.toColumnIndexString() ?: parsedRequest.group
             val attempt = activityCodeData['a']?.toInt() ?: parsedRequest.attempt
 
-            // FIXME
-            val letterGroup = group?.let { 'A' - 1 + it }?.toString() ?: parsedRequest.group
-
-            return parsedRequest.copy(round = round, group = letterGroup, attempt = attempt)
+            return parsedRequest.copy(round = round, group = group, attempt = attempt)
         }
 
-        fun String.matchesNumericalIndex(number: Int): Boolean {
-            val sum = reversed().withIndex().sumBy { (i, c) ->
+        fun String.toNumericalIndex(): Int {
+            return reversed().withIndex().sumBy { (i, c) ->
                 (c - 'A' + 1) * (26f.pow(i).toInt())
             }
+        }
 
-            return sum == number
+        fun Int.toColumnIndexString(): String {
+            return List(this) {
+                'A' + ((this / 26f.pow(it).toInt()) % 26)
+            }.joinToString("")
         }
     }
 }
