@@ -1,95 +1,72 @@
-import React from "react";
+import React, { Component } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
+import "bootstrap/dist/css/bootstrap.css";
+
 import "./App.css";
 import Index from "./components/Index";
 import OfflineScrambler from "./components/offline-scrambler/OfflineScrambler";
 import OnlineScrambler from "./components/online-scrambler/OnlineScrambler";
 import About from "./components/About";
 
-import "bootstrap/dist/css/bootstrap.css";
-
 import Navbar from "./components/Navbar";
 
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { wcif: {}, me: undefined };
+  }
+
+  offlineScramblerLink = "/webscrambles/offline";
+  onlineScramblerLink = "/webscrambles/online";
+  aboutLink = "/about";
+
+  updateWcif = wcif => {
+    let state = this.state;
+    state.wcif = wcif;
+    this.setState(state);
+  };
+
+  generateScrambles = () => {
+    console.log("Generating scrambles");
+    console.log(this.state.wcif);
+  };
+
+  render() {
+    return (
+      <Router>
+        <div className="App">
+          <Navbar
+            offlineScramblerLink={this.offlineScramblerLink}
+            onlineScramblerLink={this.onlineScramblerLink}
+            aboutLink={this.aboutLink}
+          />
+          <Switch>
+            <Route path={this.offlineScramblerLink}>
+              <OfflineScrambler
+                generateScrambles={this.generateScrambles}
+                updateWcif={this.updateWcif}
+              />
+            </Route>
+            <Route path={this.onlineScramblerLink}>
+              <OnlineScrambler
+                generateScrambles={this.generateScrambles}
+                updateWcif={this.updateWcif}
+              />
+            </Route>
+            <Route path={this.aboutLink}>
+              <About />
+            </Route>
+            <Route path="/">
+              <Index />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+    );
+  }
+}
+
+export default App;
 
 export const BASE_PATH = process.env.PUBLIC_URL;
-
-export const App = function() {
-  let offlineScramblerLink = "/webscrambles/offline";
-  let onlineScramblerLink = "/webscrambles/online";
-  let aboutLink = "/about";
-
-  let wcaBaseUrl = "https://www.worldcubeassociation.org";
-  let versionEndpoint = "/api/v0/scramble-program";
-
-  let wcif = {};
-
-  let updateWcif = payload => {
-    wcif = payload;
-  };
-
-  // Check if the version is allowed.
-  let analyzeVersion = () => {
-    let url = wcaBaseUrl + versionEndpoint;
-    fetch(url)
-      .then(res => res.json())
-      .then(
-        result => {
-          console.log(result);
-        },
-        error => {
-          console.log(error);
-        }
-      );
-  };
-  analyzeVersion();
-
-  let tnoodleEndpoint = "http://localhost:2014";
-
-  let generateScrambles = () => {
-    console.log("Generating scrambles");
-    console.log(wcif);
-
-    fetch(tnoodleEndpoint, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: wcif
-    })
-      .then(respnse => console.log(respnse))
-      .catch(error => console.log(error));
-  };
-
-  return (
-    <Router>
-      <div className="App">
-        <Navbar
-          offlineScramblerLink={offlineScramblerLink}
-          onlineScramblerLink={onlineScramblerLink}
-          aboutLink={aboutLink}
-        />
-        <Switch>
-          <Route path={offlineScramblerLink}>
-            <OfflineScrambler
-              generateScrambles={generateScrambles}
-              updateWcif={updateWcif}
-            />
-          </Route>
-          <Route path={onlineScramblerLink}>
-            <OnlineScrambler
-              generateScrambles={generateScrambles}
-              updateWcif={updateWcif}
-            />
-          </Route>
-          <Route path={aboutLink}>
-            <About />
-          </Route>
-          <Route path="/">
-            <Index />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
-  );
-};
