@@ -1,7 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
+import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Event
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
 import kotlin.math.pow
 
@@ -19,6 +22,11 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
             "333mbf" to "333ni"
         )
 
+        private val FORMAT_SCRAMBLE_COUNTS = mapOf(
+            "a" to 5,
+            "m" to 3
+        )
+
         fun WCIF.computeBindings(allScrambleRequests: List<ScrambleRequest>): WCIFRequestBinding {
             val index = schedule.allActivities
                 .associateWith { allScrambleRequests.filterForActivity(it) }
@@ -28,7 +36,7 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
 
         fun WCIF.generateBindings(title: String): WCIFRequestBinding {
             val index = schedule.allActivities
-                .associateWith { it.createScrambleRequest(title, 5) }
+                .associateWith { it.createScrambleRequest(title, events) }
                 .mapValues { listOfNotNull(it.value) }
 
             return WCIFRequestBinding(this, index)
@@ -83,7 +91,7 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
                 totalAttempt = scrambles.size // useful for FMC
             )
 
-        fun Activity.createScrambleRequest(title: String, numScrambles: Int, copies: Int = 1): ScrambleRequest? {
+        fun Activity.createScrambleRequest(title: String, events: List<Event>, copies: Int = 1): ScrambleRequest? {
             val eventString = readEventCode()
             val puzzleString = EVENT_MAPPING[eventString] ?: eventString
 
@@ -93,7 +101,17 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
 
             val isFmc = "fm" in eventString
 
-            val parsedRequest = ScrambleRequest.parseScrambleRequest(title, "$puzzleString*$numScrambles*$copies", null)
+            val matchingEvent = events.find { activityCode.startsWith(it.id) }
+                ?: error("No maching event in WCIF was found for $activityCode")
+
+            val matchingRound = matchingEvent.rounds.find { activityCode.startsWith(it.id) }
+                ?: error("No matching round in WCIF was found for $activityCode")
+
+            val scrambleCount = matchingRound.format.toIntOrNull()
+                ?: FORMAT_SCRAMBLE_COUNTS[matchingRound.format]
+                ?: error("Unable to determine preferred number of scrambles for format ${matchingRound.format}")
+
+            val parsedRequest = ScrambleRequest.parseScrambleRequest(title, "$puzzleString*$scrambleCount*$copies", null)
                 .copy(event = eventString, fmc = isFmc)
 
             val activityCodeData = readPrefixCodes()
