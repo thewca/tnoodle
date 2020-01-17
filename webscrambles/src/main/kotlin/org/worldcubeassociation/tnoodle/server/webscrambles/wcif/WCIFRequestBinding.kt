@@ -101,7 +101,7 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
 
             val isFmc = "fm" in eventString
 
-            val matchingEvent = events.find { activityCode.startsWith(it.id) }
+            val matchingEvent = events.find { eventString == it.id }
                 ?: error("No maching event in WCIF was found for $activityCode")
 
             val matchingRound = matchingEvent.rounds.find { activityCode.startsWith(it.id) }
