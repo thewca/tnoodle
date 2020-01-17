@@ -158,7 +158,7 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                         val safeTitle = name.replace("\"".toRegex(), "'")
 
                         call.response.header("Content-Disposition", "attachment; filename=\"$safeTitle.zip\"")
-                        call.respondBytes(zipOutput.toByteArray(), ContentType.Application.Zip)
+                        call.respondBytes(zipOutput, ContentType.Application.Zip)
                     }
                     else -> call.respondText("Invalid extension: $extension")
                 }

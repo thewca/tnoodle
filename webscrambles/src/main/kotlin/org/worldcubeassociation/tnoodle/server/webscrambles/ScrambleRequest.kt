@@ -3,11 +3,6 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher
-import net.lingala.zip4j.io.outputstream.ZipOutputStream
-import net.lingala.zip4j.model.ZipParameters
-import net.lingala.zip4j.model.enums.CompressionLevel
-import net.lingala.zip4j.model.enums.CompressionMethod
-import net.lingala.zip4j.model.enums.EncryptionMethod
 import org.worldcubeassociation.tnoodle.server.util.GsonUtil.GSON
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.randomPasscode
@@ -16,7 +11,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.OrderedScrambles
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding.Companion.computeBindings
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
-import java.io.ByteArrayOutputStream
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.*
 import java.net.URLDecoder
 import java.time.LocalDate
 import java.util.*
@@ -92,6 +87,7 @@ data class ScrambleRequest(
 
     companion object {
         private val HTML_SCRAMBLE_VIEWER = "/wca/scrambleviewer.html"
+        private val TXT_PASSCODE_TEMPLATE = "/text/passcodeTemplate.txt"
 
         private val MAX_COUNT = 100
         private val MAX_COPIES = 100
@@ -157,17 +153,7 @@ data class ScrambleRequest(
             )
         }
 
-        private fun defaultZipParameters(useEncryption: Boolean = false) = ZipParameters().apply {
-            compressionMethod = CompressionMethod.DEFLATE
-            compressionLevel = CompressionLevel.NORMAL
-
-            if (useEncryption) {
-                isEncryptFiles = true
-                encryptionMethod = EncryptionMethod.ZIP_STANDARD
-            }
-        }
-
-        private tailrec fun String.toUniqueTitle(seenTitles: List<String>, suffixSalt: Int = 0): String {
+        private tailrec fun String.toUniqueTitle(seenTitles: Set<String>, suffixSalt: Int = 0): String {
             val suffixedTitle = "$this (${suffixSalt})"
                 .takeUnless { suffixSalt == 0 } ?: this
 
@@ -178,125 +164,48 @@ data class ScrambleRequest(
             return toUniqueTitle(seenTitles, suffixSalt + 1)
         }
 
-        fun ZipOutputStream.putFileEntry(fileName: String, contents: ByteArray, parameters: ZipParameters = defaultZipParameters()) {
-            parameters.fileNameInZip = fileName
-
-            putNextEntry(parameters)
-            write(contents)
-
-            closeEntry()
-        }
-
         private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
 
-        fun requestsToZip(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcif: WCIF?): ByteArrayOutputStream {
-            val baosZip = ByteArrayOutputStream()
+        private fun List<ScrambleRequest>.toUniqueTitles(): Map<String, ScrambleRequest> {
+            return fold(emptyMap()) { acc, req ->
+                val fileTitle = req.title.toFileSafeString()
+                val safeTitle = fileTitle.toUniqueTitle(acc.keys)
 
-            val usePassword = password != null
-            val parameters = defaultZipParameters(usePassword)
+                acc + (safeTitle to req)
+            }
+        }
 
-            val zipOut = password?.let { ZipOutputStream(baosZip, it.toCharArray()) }
-                ?: ZipOutputStream(baosZip)
+        /**
+         * Computer display zip
+         *
+         * This .zip file is nested in the main .zip. It is intentionally not
+         * protected with a password, since it's just an easy way to distribute
+         * a collection of files that are each are encrypted using their own passcode.
+         */
+        fun generateComputerDisplayZip(globalTitle: String?, scrambleRequests: List<ScrambleRequest>, generationDate: LocalDate, versionTag: String): Pair<ByteArray, Map<String, String>> {
+            val uniqueTitles = scrambleRequests.toUniqueTitles()
 
-            val seenTitles = mutableListOf<String>()
+            // With passcode, for computer display
+            val passcodes = uniqueTitles.mapValues { randomPasscode() }
 
-            // Computer display zip
-            // This .zip file is nested in the main .zip. It is intentionally not
-            // protected with a password, since it's just an easy way to distribute
-            // a collection of files that are each are encrypted using their own passcode.
-            val computerDisplayBaosZip = ByteArrayOutputStream()
+            val displayZip = zipArchive {
+                for ((uniqueTitle, scrambleRequest) in uniqueTitles) {
+                    val computerDisplayPdf = scrambleRequest.createPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
-            val computerDisplayZipParameters = defaultZipParameters()
-            val computerDisplayZipOut = ZipOutputStream(computerDisplayBaosZip)
+                    val passcode = passcodes.getValue(uniqueTitle)
+                    val computerDisplayBytes = computerDisplayPdf.render(passcode)
 
+                    file("$uniqueTitle.pdf", computerDisplayBytes)
+                }
+            }
+
+            val zipData = displayZip.compress()
+
+            return zipData to passcodes
+        }
+
+        fun FolderBuilder.interchangeFolder(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, generationUrl: String?, wcifHelper: WCIF?) {
             val safeGlobalTitle = globalTitle?.toFileSafeString()
-            val computerDisplayFileName = "$safeGlobalTitle - Computer Display PDFs"
-
-            val fmcBeingHeld = scrambleRequests.any { it.fmc }
-
-            if (fmcBeingHeld) {
-                val zipName = "Printing/Fewest Moves - Additional Files/3x3x3 Fewest Moves Solution Sheet.pdf"
-
-                val sheet = FmcGenericSolutionSheet(empty(ThreeByThreeCubePuzzle()), globalTitle, Translate.DEFAULT_LOCALE)
-
-                zipOut.putFileEntry(zipName, sheet.render(), parameters)
-            }
-
-            val passcodes = mutableMapOf<String, String>()
-
-            for (scrambleRequest in scrambleRequests) {
-                val fileTitle = scrambleRequest.title.toFileSafeString()
-                val safeTitle = fileTitle.toUniqueTitle(seenTitles)
-
-                seenTitles += safeTitle
-
-                // Without passcode, for printing
-                val pdfPrintingZipName = "Printing/Scramble Sets/$safeTitle.pdf"
-                val pdfPrintingByteStream = scrambleRequest.createPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
-
-                zipOut.putFileEntry(pdfPrintingZipName, pdfPrintingByteStream.render(), parameters)
-
-                // register in cache to speed up overall generation process
-                PDF_CACHE[scrambleRequest] = pdfPrintingByteStream
-
-                // With passcode, for computer display
-                val passcode = randomPasscode()
-                passcodes[safeTitle] = passcode
-
-                val computerDisplayZipName = "$computerDisplayFileName/$safeTitle.pdf"
-
-                computerDisplayZipOut.putFileEntry(computerDisplayZipName, pdfPrintingByteStream.render(passcode), computerDisplayZipParameters)
-
-                val txtZipName = "Interchange/txt/$safeTitle.txt"
-                val txtScrambles = scrambleRequest.allScrambles.stripNewlines().joinToString("\r\n")
-
-                zipOut.putFileEntry(txtZipName, txtScrambles.toByteArray(), parameters)
-
-                // i18n is only for fmc
-                if (!scrambleRequest.fmc) {
-                    continue
-                }
-
-                val cutoutZipName = "Printing/Fewest Moves - Additional Files/$safeTitle - Scramble Cutout Sheet.pdf"
-                val cutoutSheet = FmcScrambleCutoutSheet(scrambleRequest, globalTitle)
-
-                zipOut.putFileEntry(cutoutZipName, cutoutSheet.render(password), parameters)
-
-                for (locale in Translate.locales) {
-                    // fewest moves regular sheet
-                    val printingPdfZipName = "Printing/Fewest Moves - Additional Files/Translations/${locale.toLanguageTag()}_$safeTitle.pdf"
-                    val printingSheet = FmcSolutionSheet(scrambleRequest, globalTitle, locale)
-
-                    zipOut.putFileEntry(printingPdfZipName, printingSheet.render(password), parameters)
-
-                    // Generic sheet.
-                    val genericPrintingPdfZipName = "Printing/Fewest Moves - Additional Files/Translations/${locale.toLanguageTag()}_$safeTitle Solution Sheet.pdf"
-                    val genericPrintingSheet = FmcGenericSolutionSheet(scrambleRequest, globalTitle, locale)
-
-                    zipOut.putFileEntry(genericPrintingPdfZipName, genericPrintingSheet.render(password), parameters)
-                }
-            }
-
-            if (wcif != null) {
-                val bindings = wcif.computeBindings(scrambleRequests)
-                OrderedScrambles.generateOrderedScrambles(globalTitle, generationDate, versionTag, zipOut, parameters, bindings)
-            }
-
-            computerDisplayZipOut.close()
-
-            val computerDisplayZipName = "$computerDisplayFileName.zip"
-            zipOut.putFileEntry(computerDisplayZipName, computerDisplayBaosZip.toByteArray(), parameters)
-
-            val txtFileName = "$safeGlobalTitle - Computer Display PDF Passcodes - SECRET.txt"
-            val passcodeList = passcodes.entries.joinToString("\r\n") { "${it.key}: ${it.value}" }
-
-            val templateContent = ScrambleRequest::class.java.getResourceAsStream("/text/passcodeTemplate.txt").bufferedReader().readText()
-                .replace("%%GLOBAL_TITLE%%", globalTitle.orEmpty())
-                .replace("%%PASSCODES%%", passcodeList)
-
-            zipOut.putFileEntry(txtFileName, templateContent.toByteArray(), parameters)
-
-            val jsonFileName = "Interchange/$safeGlobalTitle.json"
 
             val jsonObj = mapOf(
                 "sheets" to scrambleRequests,
@@ -304,34 +213,113 @@ data class ScrambleRequest(
                 "version" to versionTag,
                 "generationDate" to generationDate,
                 "generationUrl" to generationUrl,
-                "schedule" to wcif?.schedule
+                "schedule" to wcifHelper?.schedule
             ).filterValues { it != null }
 
             val jsonStr = GSON.toJson(jsonObj)
-            zipOut.putFileEntry(jsonFileName, jsonStr.toByteArray(), parameters)
 
-            val jsonpFileName = "Interchange/$safeGlobalTitle.jsonp"
-            val jsonp = "var SCRAMBLES_JSON = $jsonStr;"
-
-            zipOut.putFileEntry(jsonpFileName, jsonp.toByteArray(), parameters)
-
-            val htmlZipName = "Interchange/$safeGlobalTitle.html"
+            val jsonpFileName = "$safeGlobalTitle.jsonp"
+            val jsonpStr = "var SCRAMBLES_JSON = $jsonStr;"
 
             val viewerResource = ScrambleRequest::class.java.getResourceAsStream(HTML_SCRAMBLE_VIEWER).bufferedReader().readText()
                 .replace("%SCRAMBLES_JSONP_FILENAME%", jsonpFileName)
 
-            zipOut.putFileEntry(htmlZipName, viewerResource.toByteArray(), parameters)
+            folder("Interchange") {
+                folder("txt") {
+                    val uniqueTitles = scrambleRequests.toUniqueTitles()
 
-            val printingCompleteZipName = "Printing/$safeGlobalTitle - All Scrambles.pdf"
+                    for ((uniqueTitle, scrambleRequest) in uniqueTitles) {
+                        val txtScrambles = scrambleRequest.allScrambles.stripNewlines().joinToString("\r\n")
+                        file("$uniqueTitle.txt", txtScrambles)
+                    }
+                }
 
-            // Note that we're not passing the password into this function. It seems pretty silly
-            // to put a password protected pdf inside of a password protected zip file.
-            val printingCompleteSheet = requestsToCompletePdf(globalTitle, generationDate, versionTag, scrambleRequests)
-            zipOut.putFileEntry(printingCompleteZipName, printingCompleteSheet.render(), parameters)
+                file("$safeGlobalTitle.json", jsonStr)
+                file(jsonpFileName, jsonpStr)
+                file("$safeGlobalTitle.html", viewerResource)
+            }
+        }
 
-            zipOut.close()
+        fun FolderBuilder.printingFolder(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, wcifHelper: WCIF?) {
+            val safeGlobalTitle = globalTitle?.toFileSafeString()
 
-            return baosZip
+            val uniqueTitles = scrambleRequests.toUniqueTitles()
+            val fmcRequests = uniqueTitles.filterValues { it.fmc }
+
+            val genericSolutionSheetPdf = FmcGenericSolutionSheet(empty(ThreeByThreeCubePuzzle()), globalTitle, Translate.DEFAULT_LOCALE)
+            val printingCompletePdf = requestsToCompletePdf(globalTitle, generationDate, versionTag, scrambleRequests)
+
+            folder("Printing") {
+                folder("Scramble Sets") {
+                    for ((uniq, req) in uniqueTitles) {
+                        // Without passcode, for printing
+                        val pdfPrintingByteStream = req.createPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
+                            // register in cache to speed up overall generation process
+                            .also { PDF_CACHE[req] = it }
+
+                        file("$uniq.pdf", pdfPrintingByteStream.render())
+                    }
+                }
+
+                if (fmcRequests.isNotEmpty()) {
+                    file("3x3x3 Fewest Moves Solution Sheet.pdf", genericSolutionSheetPdf.render())
+
+                    folder("Fewest Moves - Additional Files") {
+                        for ((uniq, req) in fmcRequests) {
+                            val cutoutZipName = "$uniq - Scramble Cutout Sheet.pdf"
+                            val cutoutSheet = FmcScrambleCutoutSheet(req, globalTitle)
+
+                            file(cutoutZipName, cutoutSheet.render(password))
+
+                            folder("Translations") {
+                                for (locale in Translate.locales) {
+                                    val languageMarkerTitle = "${locale.toLanguageTag()}_$uniq"
+
+                                    // fewest moves regular sheet
+                                    val printingSheet = FmcSolutionSheet(req, globalTitle, locale)
+
+                                    // Generic sheet.
+                                    val genericPrintingSheet = FmcGenericSolutionSheet(req, globalTitle, locale)
+
+                                    file("$languageMarkerTitle.pdf", printingSheet.render(password))
+                                    file("$languageMarkerTitle Solution Sheet.pdf", genericPrintingSheet.render(password))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (wcifHelper != null) {
+                    val bindings = wcifHelper.computeBindings(scrambleRequests)
+                    OrderedScrambles.generateOrderedScrambles(this, globalTitle, generationDate, versionTag, bindings)
+                }
+
+                // Note that we're not passing the password into this function. It seems pretty silly
+                // to put a password protected pdf inside of a password protected zip file.
+                file("$safeGlobalTitle - All Scrambles.pdf", printingCompletePdf.render())
+            }
+        }
+
+        fun requestsToZip(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIF?): ByteArray {
+            val safeGlobalTitle = globalTitle?.toFileSafeString()
+
+            val (computerDisplayZipBytes, passcodes) = generateComputerDisplayZip(globalTitle, scrambleRequests, generationDate, versionTag)
+            val passcodeList = passcodes.entries.joinToString("\r\n") { "${it.key}: ${it.value}" }
+
+            val passcodeListingTxt = ScrambleRequest::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
+                .bufferedReader().readText()
+                .replace("%%GLOBAL_TITLE%%", globalTitle.orEmpty())
+                .replace("%%PASSCODES%%", passcodeList)
+
+            val requestArchive = zipArchive {
+                printingFolder(globalTitle, generationDate, versionTag, scrambleRequests, password, wcifHelper)
+                interchangeFolder(globalTitle, generationDate, versionTag, scrambleRequests, generationUrl, wcifHelper)
+
+                file("$safeGlobalTitle - Computer Display PDFs.zip", computerDisplayZipBytes)
+                file("$safeGlobalTitle - Computer Display PDF Passcodes - SECRET.txt", passcodeListingTxt)
+            }
+
+            return requestArchive.compress(password)
         }
 
         fun requestsToCompletePdf(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>): PdfContent {
