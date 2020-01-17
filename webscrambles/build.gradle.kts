@@ -2,12 +2,11 @@ import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.gitVersionTag
 
-import dependencies.Libraries.APPLEJAVAEXTENSIONS
 import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.KOTLIN_ARGPARSER
-import dependencies.Libraries.NATIVE_TRAY_ADAPTER
+import dependencies.Libraries.SYSTEM_TRAY
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.ZIP4J
 
@@ -46,8 +45,7 @@ dependencies {
     implementation(SNAKEYAML)
     implementation(BOUNCYCASTLE)
     implementation(KOTLIN_ARGPARSER)
-    implementation(APPLEJAVAEXTENSIONS)
-    implementation(NATIVE_TRAY_ADAPTER)
+    implementation(SYSTEM_TRAY)
 
     runtimeOnly(project(":tnoodle-ui"))
 }
