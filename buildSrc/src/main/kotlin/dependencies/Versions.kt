@@ -14,8 +14,6 @@ object Versions {
     val ITEXTPDF = "5.5.13.1"
     val BATIK_TRANSCODER = BATIK
     val SNAKEYAML = "1.25"
-    val NATIVE_TRAY_ADAPTER = "1.2-SNAPSHOT"
-    val APPLEJAVAEXTENSIONS = "1.4"
     val SYSTEM_TRAY = "3.17"
     val BOUNCYCASTLE = "1.64"
     val JUNIT_JUPITER_API = JUNIT_JUPITER
