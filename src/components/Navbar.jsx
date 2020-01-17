@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Link } from "react-router-dom";
 
 function Navbar(props) {
@@ -54,6 +53,14 @@ function Navbar(props) {
                 <Link className="nav-link" to={aboutLink}>
                   About
                 </Link>
+              </li>
+              <li>
+                <button
+                  className="btn btn-outline-primary bg-light btn-lg"
+                  onClick={props.isLogged ? props.logOut : props.logIn}
+                >
+                  {props.isLogged ? "Log out" : "Log in"}
+                </button>
               </li>
             </ul>
           </div>

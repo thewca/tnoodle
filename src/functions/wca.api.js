@@ -53,7 +53,9 @@ export function gotoPreLoginPath() {
 
 export function me() {
   return wcaApiFetch("/me")
-    .then(response => response.json())
+    .then(response => {
+      return response.json();
+    })
     .then(json => json.me);
 }
 
