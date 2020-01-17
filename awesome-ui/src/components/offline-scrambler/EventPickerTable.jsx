@@ -5,7 +5,7 @@ import EventPicker from "./EventPicker";
 import { WCA_EVENTS } from "../../constants/wca.constants";
 import _ from "lodash";
 
-class EventsPicker extends Component {
+class EventPickerTable extends Component {
   constructor(props) {
     super(props);
     this.handleUpdateEvent = props.handleUpdateEvent;
@@ -40,4 +40,4 @@ class EventsPicker extends Component {
   }
 }
 
-export default EventsPicker;
+export default EventPickerTable;

@@ -1,20 +1,22 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import "bootstrap/dist/css/bootstrap.css";
-
-import "./App.css";
 import Index from "./components/Index";
 import OfflineScrambler from "./components/offline-scrambler/OfflineScrambler";
 import OnlineScrambler from "./components/online-scrambler/OnlineScrambler";
 import About from "./components/About";
-
 import Navbar from "./components/Navbar";
+
+import * as WcaApi from "./functions/wca.api";
+
+import "bootstrap/dist/css/bootstrap.css";
+
+import "./App.css";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { wcif: {}, me: undefined };
+    this.state = { wcif: {}, me: undefined, isLogged: false };
   }
 
   offlineScramblerLink = "/webscrambles/offline";
@@ -32,6 +34,35 @@ class App extends Component {
     console.log(this.state.wcif);
   };
 
+  logIn = () => {
+    WcaApi.logIn();
+  };
+
+  logOut = () => {
+    WcaApi.logOut();
+    let state = this.state;
+    state.me = undefined;
+    state.isLogged = false;
+    this.setState(state);
+  };
+
+  fetchMe = () => {
+    if (this.state.me != null) {
+      return;
+    }
+
+    WcaApi.me()
+      .then(result => {
+        let state = this.state;
+        state.me = result;
+        state.isLogged = true;
+        this.setState(state);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   render() {
     return (
       <Router>
@@ -40,6 +71,9 @@ class App extends Component {
             offlineScramblerLink={this.offlineScramblerLink}
             onlineScramblerLink={this.onlineScramblerLink}
             aboutLink={this.aboutLink}
+            logIn={this.logIn}
+            isLogged={this.state.isLogged}
+            logOut={this.logOut}
           />
           <Switch>
             <Route path={this.offlineScramblerLink}>
@@ -52,6 +86,8 @@ class App extends Component {
               <OnlineScrambler
                 generateScrambles={this.generateScrambles}
                 updateWcif={this.updateWcif}
+                me={this.state.me}
+                fetchMe={this.fetchMe}
               />
             </Route>
             <Route path={this.aboutLink}>

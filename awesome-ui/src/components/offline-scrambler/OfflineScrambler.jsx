@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import EntryInterface from "./EntryInterface";
-import EventsPicker from "./EventsPicker";
+import EventPickerTable from "./EventPickerTable";
 
 class OfflineScrambler extends Component {
   constructor(props) {
@@ -49,7 +49,7 @@ class OfflineScrambler extends Component {
           handleCompetitionNameChange={this.handleCompetitionNameChange}
           handlePasswordChange={this.handlePasswordChange}
         />
-        <EventsPicker handleUpdateEvent={this.handleUpdateEvent} />
+        <EventPickerTable handleUpdateEvent={this.handleUpdateEvent} />
         <div className="container p-3">
           <button
             className="btn btn-primary btn-lg"
