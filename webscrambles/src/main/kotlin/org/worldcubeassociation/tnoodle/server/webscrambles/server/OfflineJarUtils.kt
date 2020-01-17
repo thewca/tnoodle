@@ -1,9 +1,8 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
-import com.apple.eawt.Application
+import dorkbox.systemTray.SystemTray
+import dorkbox.systemTray.MenuItem
 import org.slf4j.LoggerFactory
-import tray.SystemTrayProvider
-import tray.java.JavaIconAdapter
 import java.awt.*
 import java.io.IOException
 import java.net.URI
@@ -20,9 +19,6 @@ object OfflineJarUtils {
 
     const val ICON_WORKER = "tnoodle_logo_1024.png"
     const val ICON_WRAPPER = "tnoodle_logo_1024_gray.png"
-
-    // Preferred way to detect OSX according to https://developer.apple.com/library/mac/#technotes/tn2002/tn2110.html
-    fun isOSX() = "OS X" in System.getProperty("os.name")
 
     fun openTabInBrowser(browse: Boolean): String {
         val url = "http://localhost:$TNOODLE_PORT"
@@ -62,60 +58,36 @@ object OfflineJarUtils {
 
         val iconFileName = if (processType === MainLauncher.ProcessType.WORKER) ICON_WORKER else ICON_WRAPPER
 
+        if (iconFileName != ICON_WORKER) {
+            // Only want to create one tray icon.
+            return
+        }
+
+        val trayAdapter = SystemTray.get()
+
+        if (trayAdapter == null) {
+            LOG.warn("SystemTray is not supported")
+            return
+        }
+
+        val openItem = MenuItem("Open") { openTabInBrowser(true) }
+        trayAdapter.menu.add(openItem)
+
+        val exitItem = MenuItem("Exit") {
+            LOG.info("Exit initiated from tray icon")
+            exitProcess(0)
+        }
+
+        trayAdapter.menu.add(exitItem)
+
+        val tooltip = "${LocalServerEnvironmentConfig.projectName} v${LocalServerEnvironmentConfig.version}"
+        trayAdapter.setTooltip(tooltip)
+        trayAdapter.status = tooltip
+
         // Get the file name of the icon.
         val fullFileName = "/${ICONS_FOLDER}/$iconFileName"
         val imageUrl = OfflineJarUtils::class.java.getResource(fullFileName)
 
-        val image = ImageIcon(imageUrl).image
-
-        // OSX-specific code to set the dock icon.
-        if (isOSX()) {
-            try {
-                Application.getApplication().dockIconImage = image
-            } catch (e: Exception) {
-                LOG.warn("Error setting OSX dock icon", e)
-            }
-        } else {
-            if (iconFileName != ICON_WORKER) {
-                // Only want to create one tray icon.
-                return
-            }
-
-            if (!SystemTray.isSupported()) {
-                LOG.warn("SystemTray is not supported")
-                return
-            }
-
-            val trayAdapter = SystemTrayProvider().systemTray
-
-            val popup = PopupMenu()
-
-            val openItem = MenuItem("Open")
-            popup.add(openItem)
-
-            val exitItem = MenuItem("Exit")
-            popup.add(exitItem)
-
-            openItem.addActionListener { openTabInBrowser(true) }
-
-            exitItem.addActionListener {
-                LOG.info("Exit initiated from tray icon")
-                exitProcess(0)
-            }
-
-            val tooltip = "${LocalServerEnvironmentConfig.projectName} v${LocalServerEnvironmentConfig.version}"
-            val trayIconAdapter = trayAdapter.createAndAddTrayIcon(imageUrl, tooltip, popup)
-
-            if (trayIconAdapter is JavaIconAdapter) {
-                // Unfortunately, java internally uses some shitty resizing
-                // algorithm for this, so we have to do this ourselves.
-                //trayIconAdapter.setImageAutoSize(true);
-
-                val st = SystemTray.getSystemTray()
-                val ti = trayIconAdapter.trayIcon
-
-                ti.image = image.getScaledInstance(st.trayIconSize.width, -1, Image.SCALE_SMOOTH)
-            }
-        }
+        trayAdapter.setImage(imageUrl)
     }
 }
