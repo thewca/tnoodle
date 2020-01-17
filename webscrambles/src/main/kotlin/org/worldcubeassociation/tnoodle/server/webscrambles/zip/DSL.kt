@@ -1,5 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.File
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipNode
+
 class FolderBuilder {
     val contents = mutableListOf<ZipNode>()
 

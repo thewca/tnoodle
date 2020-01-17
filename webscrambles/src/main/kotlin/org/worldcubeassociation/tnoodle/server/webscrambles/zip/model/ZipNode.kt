@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.zip
+package org.worldcubeassociation.tnoodle.server.webscrambles.zip.model
 
 interface ZipNode {
     val path: String

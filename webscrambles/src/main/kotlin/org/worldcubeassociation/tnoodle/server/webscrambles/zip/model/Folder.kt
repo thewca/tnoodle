@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.zip
+package org.worldcubeassociation.tnoodle.server.webscrambles.zip.model
 
 data class Folder(val name: String, private val rawChildren: List<ZipNode>, val parent: Folder? = null) : ZipNode {
     constructor(name: String, parent: Folder? = null) : this(name, emptyList(), parent)
