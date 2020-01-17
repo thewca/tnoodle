@@ -1,10 +1,12 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.zip
+package org.worldcubeassociation.tnoodle.server.webscrambles.zip.model
 
 import net.lingala.zip4j.io.outputstream.ZipOutputStream
 import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.CompressionMethod
 import net.lingala.zip4j.model.enums.EncryptionMethod
+import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import java.io.ByteArrayOutputStream
 
 class ZipArchive(val entries: List<ZipNode>) {
@@ -51,6 +53,26 @@ class ZipArchive(val entries: List<ZipNode>) {
             if (useEncryption) {
                 isEncryptFiles = true
                 encryptionMethod = EncryptionMethod.ZIP_STANDARD
+            }
+        }
+
+        private tailrec fun String.toUniqueTitle(seenTitles: Set<String>, suffixSalt: Int = 0): String {
+            val suffixedTitle = "$this (${suffixSalt})"
+                .takeUnless { suffixSalt == 0 } ?: this
+
+            if (suffixedTitle !in seenTitles) {
+                return suffixedTitle
+            }
+
+            return toUniqueTitle(seenTitles, suffixSalt + 1)
+        }
+
+        fun List<ScrambleRequest>.toUniqueTitles(): Map<String, ScrambleRequest> {
+            return fold(emptyMap()) { acc, req ->
+                val fileTitle = req.title.toFileSafeString()
+                val safeTitle = fileTitle.toUniqueTitle(acc.keys)
+
+                acc + (safeTitle to req)
             }
         }
     }
