@@ -7,8 +7,6 @@ object Libraries {
     val ITEXTPDF = "com.itextpdf:itextpdf:${Versions.ITEXTPDF}"
     val BATIK_TRANSCODER = "org.apache.xmlgraphics:batik-transcoder:${Versions.BATIK_TRANSCODER}"
     val SNAKEYAML = "org.yaml:snakeyaml:${Versions.SNAKEYAML}"
-    val NATIVE_TRAY_ADAPTER = "com.github.taksan:native-tray-adapter:${Versions.NATIVE_TRAY_ADAPTER}"
-    val APPLEJAVAEXTENSIONS = "com.apple:AppleJavaExtensions:${Versions.APPLEJAVAEXTENSIONS}"
     val SYSTEM_TRAY = "com.dorkbox:SystemTray:${Versions.SYSTEM_TRAY}"
     val BOUNCYCASTLE = "org.bouncycastle:bcprov-jdk15on:${Versions.BOUNCYCASTLE}"
     val JUNIT_JUPITER_API = "org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT_JUPITER_API}"
