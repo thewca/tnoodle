@@ -1,20 +1,26 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import net.lingala.zip4j.io.outputstream.ZipOutputStream
-import net.lingala.zip4j.model.ZipParameters
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
-import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest.Companion.putFileEntry
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.FolderBuilder
 import java.time.LocalDate
 import java.time.Period
 
 object OrderedScrambles {
-    fun generateOrderedScrambles(globalTitle: String?, generationDate: LocalDate, versionTag: String, zipOut: ZipOutputStream, parameters: ZipParameters, wcifConfig: WCIFRequestBinding) {
+    fun generateOrderedScrambles(builder: FolderBuilder, globalTitle: String?, generationDate: LocalDate, versionTag: String, wcifConfig: WCIFRequestBinding) {
         val wcifSchedule = wcifConfig.wcif.schedule
 
         if (wcifSchedule.venues.isEmpty()) {
             return
         }
+
+        builder.folder("Ordered Scrambles") {
+            orderedScrambles(globalTitle, generationDate, versionTag, wcifConfig)
+        }
+    }
+
+    fun FolderBuilder.orderedScrambles(globalTitle: String?, generationDate: LocalDate, versionTag: String, wcifConfig: WCIFRequestBinding) {
+        val wcifSchedule = wcifConfig.wcif.schedule
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
             .map { it.value.dayOfYear }
@@ -58,7 +64,6 @@ object OrderedScrambles {
                         val filenameDay = nthDay + 1
 
                         val parts = listOfNotNull(
-                            "Printing/Ordered Scrambles/",
                             "$venueName/".takeIf { hasMultipleVenues },
                             "Day $filenameDay/".takeIf { hasMultipleDays },
                             "Ordered Scrambles",
@@ -78,7 +83,7 @@ object OrderedScrambles {
                                 .flatMap { it.value }
 
                             val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, sortedScrambles)
-                            zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
+                            file(pdfFileName, sheet.render())
                         }
                     }
                 }
@@ -91,9 +96,8 @@ object OrderedScrambles {
             .flatMap { wcifConfig.activityScrambleRequests[it.key].orEmpty() }
             .distinct()
 
-        val pdfFileName = "Printing/Ordered Scrambles/Ordered $globalTitle - All Scrambles.pdf"
+        val completeOrderedPdf = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, allScramblesOrdered)
 
-        val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, allScramblesOrdered)
-        zipOut.putFileEntry(pdfFileName, sheet.render(), parameters)
+        file("Ordered $globalTitle - All Scrambles.pdf", completeOrderedPdf.render())
     }
 }

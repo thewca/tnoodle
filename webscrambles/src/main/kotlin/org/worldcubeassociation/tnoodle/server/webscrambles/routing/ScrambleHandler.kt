@@ -84,7 +84,7 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                 "zip" -> {
                     val baosZip = ScrambleRequest.requestsToZip(title, generationDate, environmentConfig.projectTitle, scrambleRequests, seed, generationUrl, null)
 
-                    call.respondBytes(baosZip.toByteArray(), ContentType.Application.Zip)
+                    call.respondBytes(baosZip, ContentType.Application.Zip)
                 }
                 else -> throw InvalidScrambleRequestException("Invalid extension: $extension")
             }
