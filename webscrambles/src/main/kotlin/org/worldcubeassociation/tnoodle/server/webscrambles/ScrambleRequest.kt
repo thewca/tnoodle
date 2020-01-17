@@ -137,7 +137,7 @@ data class ScrambleRequest(
 
             val fmc = countStr == "fmc"
 
-            val count: Int = if (fmc) 1 else min(countStr.toInt(), MAX_COUNT)
+            val count = if (fmc) 1 else min(countStr.toInt(), MAX_COUNT)
 
             val copies = min(copiesStr.toInt(), MAX_COPIES)
 

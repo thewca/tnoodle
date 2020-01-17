@@ -16,11 +16,15 @@ object WcifHandler : RouteHandler {
             val body = call.receiveText()
             val query = parseQuery(body)
 
-            val schedule = query["schedule"]
-                ?: return@post call.respond("Please specify a schedule in WCIF format")
+            val wcifJson = query["wcif"]
+                ?: return@post call.respond("Please specify a WCIF JSON")
 
-            val wcif = WCIFParser.parse(schedule)
-            val bindings = wcif.generateBindings()
+            val wcif = WCIFParser.parseComplete(wcifJson)
+
+            val title = query["title"]
+                ?: return@post call.respond("Please specify a title for the request set")
+
+            val bindings = wcif.generateBindings(title)
 
             val flatRequests = bindings.activityScrambleRequests
                 .values.flatten()

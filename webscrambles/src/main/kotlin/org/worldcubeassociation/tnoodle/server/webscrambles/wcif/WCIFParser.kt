@@ -9,10 +9,23 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 object WCIFParser {
-    fun parse(schedule: String): WCIF {
+    fun parseComplete(wcif: String): WCIF {
+        val parsedObject = JsonParser.parseString(wcif)?.asJsonObject
+
+        val schedule = parsedObject?.getAsJsonObject("schedule")
+        val events = parsedObject?.getAsJsonArray("events")
+
+        return parse(schedule, events)
+    }
+
+    fun parsePartial(schedule: String): WCIF {
         val parsedSchedule = JsonParser.parseString(schedule)?.asJsonObject
 
-        val rawVenues = parsedSchedule?.getAsJsonArray("venues") ?: JsonArray()
+        return parse(parsedSchedule)
+    }
+
+    fun parse(scheduleRaw: JsonObject?, eventsRaw: JsonArray? = null): WCIF {
+        val rawVenues = scheduleRaw?.getAsJsonArray("venues") ?: JsonArray()
 
         val venues = rawVenues.map { it.asJsonObject }.map { jsonVenue ->
             val rawRooms = jsonVenue.getAsJsonArray("rooms") ?: JsonArray()
@@ -29,10 +42,22 @@ object WCIFParser {
             Venue(jsonVenue.get("name").asString, rooms, jsonVenue.get("timezone").asString)
         }
 
-        val numberOfDays = parsedSchedule?.get("numberOfDays")?.asInt ?: 0
-
+        val numberOfDays = scheduleRaw?.get("numberOfDays")?.asInt ?: 0
         val modelSchedule = Schedule(numberOfDays, venues)
-        return WCIF(modelSchedule)
+
+        val rawEvents = eventsRaw ?: JsonArray()
+
+        val events = rawEvents.map { it.asJsonObject }.map { jsonEvent ->
+            val rawRounds = jsonEvent.getAsJsonArray("rounds") ?: JsonArray()
+
+            val rounds = rawRounds.map { it.asJsonObject }.map { jsonRound ->
+                Round(jsonRound.get("id").asString, jsonRound.get("format").asString, jsonRound.get("scrambleSetCount").asInt)
+            }
+
+            Event(jsonEvent.get("id").asString, rounds)
+        }
+
+        return WCIF(events, modelSchedule)
     }
 
     private fun parseActivity(rawActivity: JsonObject): Activity {

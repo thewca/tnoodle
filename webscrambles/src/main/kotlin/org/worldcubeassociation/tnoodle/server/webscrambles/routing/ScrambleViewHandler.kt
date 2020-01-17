@@ -151,7 +151,7 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                         val generationUrl = query["generationUrl"]
                         val schedule = query["schedule"]
 
-                        val wcif = schedule?.let { WCIFParser.parse(it) }
+                        val wcif = schedule?.let { WCIFParser.parsePartial(it) }
 
                         val zipOutput = ScrambleRequest.requestsToZip(name, generationDate, environmentConfig.projectTitle, scrambleRequests, password, generationUrl, wcif)
 
