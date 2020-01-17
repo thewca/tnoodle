@@ -1,12 +1,9 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.model
 
-data class Folder(val name: String, private val rawChildren: List<ZipNode>, val parent: Folder? = null) : ZipNode {
+data class Folder(val name: String, private val rawChildren: List<ZipNode>, val parent: Folder? = null) : AbstractNode(name, parent) {
     constructor(name: String, parent: Folder? = null) : this(name, emptyList(), parent)
 
     val children = rawChildren.map { it.withParent(this) }
-
-    override val path: String
-        get() = parent?.let { it.path + "/" }.orEmpty() + name
 
     override fun withParent(parent: Folder) = copy(parent = parent)
 
@@ -21,8 +18,4 @@ data class Folder(val name: String, private val rawChildren: List<ZipNode>, val 
 
     operator fun plus(child: ZipNode) = copy(rawChildren = children + child)
     operator fun plus(moreChildren: List<ZipNode>) = copy(rawChildren = children + moreChildren)
-
-    companion object {
-        val EMPTY = Folder("")
-    }
 }
