@@ -1,28 +1,38 @@
 import React, { Component } from "react";
 
+import SelectCompetition from "./SelectCompetition";
+
 import * as WcaApi from "../../functions/wca.api";
 
 class OnlineScrambler extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+
+    this.props.fetchMe();
+
+    let me = this.props.me;
+    this.state = { me: me, competitions: undefined };
+
+    if (me != null) {
+      WcaApi.getUpcomingManageableCompetitions().then(result => {
+        let state = this.state;
+        state.competitions = result;
+        this.state = state;
+      });
+    }
   }
   render() {
-    if (!this.state.me) {
+    if (this.state.me == null) {
       return (
-        <div className="container">
-          <button
-            className="btn btn-outline-primary btn-lg"
-            onClick={WcaApi.logIn}
-          >
-            Log In
-          </button>
+        <div>
+          <h1>You have to login first</h1>
         </div>
       );
     }
     return (
       <div className="container">
-        <h1>Online Scrambler</h1>
+        <h1>Welcome, {this.state.me.name}</h1>
+        <SelectCompetition competitions={this.state.competitions} />
       </div>
     );
   }
