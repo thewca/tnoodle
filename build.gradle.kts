@@ -87,6 +87,10 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
 
     keep("class ch.qos.logback.core.FileAppender { *; }")
 
+    keep("class com.sun.jna.** { *; }")
+    keep("class dorkbox.util.jna.** { *; }")
+    keep("class dorkbox.systemTray.** { *; }")
+
     keepclasseswithmembernames("""class * {
         native <methods>;
     }""".trimIndent())
