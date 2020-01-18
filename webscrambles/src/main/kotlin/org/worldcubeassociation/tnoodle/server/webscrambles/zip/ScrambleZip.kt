@@ -11,14 +11,12 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding.Companion.computeBindings
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.toUniqueTitles
 import java.time.LocalDate
 import java.time.Period
 
-data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifHelper: WCIF?) {
+data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBindings: WCIFRequestBinding?) {
     val uniqueTitles = scrambleRequests.toUniqueTitles()
 
     fun assemble(globalTitle: String?, generationDate: LocalDate, versionTag: String, password: String?, generationUrl: String?): ZipArchive {
@@ -53,7 +51,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifHelp
             "version" to versionTag,
             "generationDate" to generationDate,
             "generationUrl" to generationUrl,
-            "schedule" to wcifHelper?.schedule
+            "schedule" to wcifBindings?.wcif?.schedule
         ).filterValues { it != null }
 
         val jsonStr = GsonUtil.GSON.toJson(jsonObj)
@@ -124,11 +122,9 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifHelp
                 }
             }
 
-            if (wcifHelper != null) {
-                val wcifBinding = wcifHelper.computeBindings(scrambleRequests)
-
+            if (wcifBindings != null) {
                 folder("Ordered Scrambles") {
-                    orderedScramblesFolder(globalTitle, generationDate, versionTag, wcifBinding)
+                    orderedScramblesFolder(globalTitle, generationDate, versionTag)
                 }
             }
 
@@ -138,8 +134,12 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifHelp
         }
     }
 
-    fun FolderBuilder.orderedScramblesFolder(globalTitle: String?, generationDate: LocalDate, versionTag: String, wcifConfig: WCIFRequestBinding) {
-        val wcifSchedule = wcifConfig.wcif.schedule
+    fun FolderBuilder.orderedScramblesFolder(globalTitle: String?, generationDate: LocalDate, versionTag: String) {
+        if (wcifBindings == null) {
+            return
+        }
+
+        val wcifSchedule = wcifBindings.wcif.schedule
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
             .map { it.value.dayOfYear }
@@ -174,7 +174,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifHelp
                     }
 
                 for ((nthDay, activities) in activitiesPerDay) {
-                    val scrambles = wcifConfig.activityScrambleRequests
+                    val scrambles = wcifBindings.activityScrambleRequests
                         .filterKeys { it in activities }
 
                     val activitiesHaveScrambles = scrambles.values.any { it.isNotEmpty() }
@@ -212,7 +212,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifHelp
         // Generate all scrambles ordered
         val allScramblesOrdered = wcifSchedule.activitiesWithLocalStartTimes.entries
             .sortedBy { it.value }
-            .flatMap { wcifConfig.activityScrambleRequests[it.key].orEmpty() }
+            .flatMap { wcifBindings.activityScrambleRequests[it.key].orEmpty() }
             .distinct()
 
         val completeOrderedPdf = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, allScramblesOrdered)

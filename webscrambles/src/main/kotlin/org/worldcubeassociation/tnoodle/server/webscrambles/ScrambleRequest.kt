@@ -5,6 +5,7 @@ import net.gnehzr.tnoodle.scrambles.ScrambleCacher
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding.Companion.computeBindings
 import java.net.URLDecoder
 import java.time.LocalDate
 import java.util.*
@@ -150,7 +151,9 @@ data class ScrambleRequest(
         private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
 
         fun requestsToZip(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIF?): ByteArray {
-            val scrambleZip = ScrambleZip(scrambleRequests, wcifHelper)
+            val bindings = wcifHelper?.computeBindings(scrambleRequests)
+
+            val scrambleZip = ScrambleZip(scrambleRequests, bindings)
             val zipFile = scrambleZip.assemble(globalTitle, generationDate, versionTag, password, generationUrl)
 
             return zipFile.compress(password)
