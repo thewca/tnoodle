@@ -7,15 +7,23 @@ data class Folder(val name: String, private val rawChildren: List<ZipNode>, val 
 
     override fun withParent(parent: Folder) = copy(parent = parent)
 
-    val files: List<File>
-        get() = children.filterIsInstance<File>()
-
     val allFiles: List<File>
-        get() = files + children.filterIsInstance<Folder>()
-            .flatMap { it.allFiles }
+        get() = flattenFiles(children)
 
     operator fun div(childName: String) = Folder(childName, this)
 
     operator fun plus(child: ZipNode) = copy(rawChildren = children + child)
     operator fun plus(moreChildren: List<ZipNode>) = copy(rawChildren = children + moreChildren)
+
+    companion object {
+        fun flattenFiles(nodes: List<ZipNode>): List<File> {
+            return nodes.flatMap {
+                when (it) {
+                    is File -> listOf(it)
+                    is Folder -> it.allFiles
+                    else -> listOf()
+                }
+            }
+        }
+    }
 }

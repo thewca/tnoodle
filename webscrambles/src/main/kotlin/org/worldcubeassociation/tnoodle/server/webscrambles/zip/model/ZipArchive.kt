@@ -11,9 +11,7 @@ import java.io.ByteArrayOutputStream
 
 class ZipArchive(val entries: List<ZipNode>) {
     val allFiles: List<File>
-        get() = entries.filterIsInstance<File>() +
-            entries.filterIsInstance<Folder>()
-                .flatMap { it.allFiles }
+        get() = Folder.flattenFiles(entries)
 
     private var zippingCache: ByteArray? = null
 
