@@ -21,7 +21,7 @@ data class ComputerDisplayZip(val scrambleRequests: List<ScrambleRequest>) {
     fun assemble(globalTitle: String?, generationDate: LocalDate, versionTag: String): ZipArchive {
         return zipArchive {
             for ((uniqueTitle, scrambleRequest) in uniqueTitledRequests) {
-                val computerDisplayPdf = scrambleRequest.getCachedPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
+                val computerDisplayPdf = scrambleRequest.createPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
                 val passcode = passcodes.getValue(uniqueTitle)
                 val computerDisplayBytes = computerDisplayPdf.render(passcode)
