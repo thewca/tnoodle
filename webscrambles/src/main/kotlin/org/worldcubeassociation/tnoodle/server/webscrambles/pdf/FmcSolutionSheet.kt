@@ -264,7 +264,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         )
 
         val pureMoves = DIRECTION_MODIFIERS.map { mod -> WCA_MOVES.map { mov -> "$mov$mod" } }
-        val rotationMoves = DIRECTION_MODIFIERS.map { mod -> WCA_MOVES.map { mov -> "[${mov.toLowerCase()}$mod]" } }
+        val rotationMoves = DIRECTION_MODIFIERS.map { mod -> WCA_ROTATIONS.map { mov -> "$mov$mod".takeIf { mov.isNotBlank() } } }
 
         val movesCell = listOf(pureMoves, rotationMoves)
 
@@ -284,7 +284,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         val directionMaxWidth = direction.map { bf.getWidthPoint(it, firstColumnFontSize) }.max() ?: 0f
         val maxFirstColumnWidth = max(movesTypeMaxWidth, directionMaxWidth)
 
-        val lastColumnValues = movesCell.flatMap { c -> c.map { it.last() } }
+        val lastColumnValues = movesCell.flatMap { c -> c.map { it.filterNotNull().last() } }
         val maxLastColumnWidth = lastColumnValues.map { bf.getWidthPoint(it, movesFontSize.toFloat()) }.max() ?: 0f
 
         for (i in movesType.indices) {
@@ -316,7 +316,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
                 table.addCell(directionTitleCell)
 
                 for (k in WCA_MOVES.indices) {
-                    val moveStringCell = PdfPCell(Phrase(movesCell[i][j][k], movesFont)).apply {
+                    val moveStringCell = PdfPCell(Phrase(movesCell[i][j][k].orEmpty(), movesFont)).apply {
                         fixedHeight = cellHeight.toFloat()
                         verticalAlignment = Element.ALIGN_MIDDLE
                         horizontalAlignment = Element.ALIGN_CENTER
@@ -371,7 +371,9 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         const val SHORT_FILL = ": ____"
         const val LONG_FILL = ": __________________"
 
-        val WCA_MOVES = arrayOf("F", "R", "U", "B", "L", "D")
+        val WCA_MOVES = arrayOf("R", "U", "F", "L", "D", "B")
+        val WCA_ROTATIONS = arrayOf("x", "y", "z", "", "", "")
+
         val DIRECTION_MODIFIERS = arrayOf("", "'", "2")
     }
 }
