@@ -1,12 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Event
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
-import kotlin.math.pow
+import kotlin.math.*
 
 data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<Activity, List<ScrambleRequest>>) {
     companion object {
@@ -125,14 +123,16 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
 
         fun String.toNumericalIndex(): Int {
             return reversed().withIndex().sumBy { (i, c) ->
-                (c - 'A' + 1) * (26f.pow(i).toInt())
+                (c - ('A' - 1)) * (26f.pow(i).toInt())
             }
         }
 
         fun Int.toColumnIndexString(): String {
-            return List(this) {
-                'A' + ((this / 26f.pow(it).toInt()) % 26)
-            }.joinToString("")
+            val iterLength = max(1, ceil(log(this.toFloat(), 26f)).roundToInt())
+
+            return List(iterLength) {
+                ('A' - 1) + ((this / 26f.pow(it).toInt()) % 26)
+            }.joinToString("").reversed()
         }
     }
 }
