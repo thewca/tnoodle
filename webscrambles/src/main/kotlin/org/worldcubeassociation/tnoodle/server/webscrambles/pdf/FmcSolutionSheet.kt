@@ -143,13 +143,19 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
             cb.addImage(Image.getInstance(tp), dim.width.toFloat(), 0f, 0f, dim.height.toFloat(), (competitorInfoLeft + (availableScrambleWidth - dim.width) / 2).toFloat(), (scrambleBorderTop + (availableScrambleHeight - dim.height) / 2).toFloat())
         }
 
-        val fontSize = 15
+        val fontSize = 15f
+        val font = Font(bf, fontSize)
         val margin = 5
         val showScrambleCount = withScramble && (scrambleRequest.scrambles.size > 1 || scrambleRequest.totalAttempt > 1)
+        val titleFontSize = 25f
+        val titleFont = Font(bf, titleFontSize)
 
+        val titleRect = Rectangle(left.toFloat(), top.toFloat(), competitorInfoLeft.toFloat(), top.toFloat() - titleFontSize)
         val competitorInfoRect = Rectangle((competitorInfoLeft + margin).toFloat(), top.toFloat(), (right - margin).toFloat(), competitorInfoBottom.toFloat())
         val gradeRect = Rectangle((competitorInfoLeft + margin).toFloat(), competitorInfoBottom.toFloat(), (right - margin).toFloat(), gradeBottom.toFloat())
         val scrambleImageRect = Rectangle((competitorInfoLeft + margin).toFloat(), gradeBottom.toFloat(), (right - margin).toFloat(), scrambleBorderTop.toFloat())
+
+        cb.fitAndShowText(Translate.translate("fmc.event", locale), titleRect, titleFont, Element.ALIGN_CENTER)
 
         val personalDetailsItems = mutableListOf<Pair<String, Int>>()
 
@@ -206,7 +212,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
             personalDetailsItems.add("" to Element.ALIGN_LEFT)
         }
 
-        cb.populateRect(competitorInfoRect, personalDetailsItems, bf, fontSize)
+        cb.populateRect(competitorInfoRect, personalDetailsItems, font)
 
         // graded
         val gradingTextGradedBy = Translate.translate("fmc.graded", locale) + LONG_FILL
@@ -220,7 +226,8 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
             gradingText to Element.ALIGN_CENTER
         )
 
-        cb.populateRect(gradeRect, gradingItemsWithAlignment, bf, 11) // FIXME const
+        val gradedFont = Font(bf, 11f)
+        cb.populateRect(gradeRect, gradingItemsWithAlignment, gradedFont)
 
         if (!withScramble) {
             val separateSheetAdvice = Translate.translate("fmc.scrambleOnSeparateSheet", locale)
@@ -230,7 +237,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
                 separateSheetAdvice to Element.ALIGN_CENTER
             )
 
-            cb.populateRect(scrambleImageRect, separateSheetAdviceItems, bf, 11) // FIXME const
+            cb.populateRect(scrambleImageRect, separateSheetAdviceItems, gradedFont) // FIXME const
         }
 
         val fmcMargin = 10
@@ -331,15 +338,9 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         // Position the table
         table.writeSelectedRows(0, -1, left.toFloat() + fmcMargin.toFloat() + (cellWidth - maxLastColumnWidth) / 2 - (firstColumnWidth - maxFirstColumnWidth) / 2, (scrambleBorderTop + tableHeight + fmcMargin).toFloat(), cb)
 
-        // Rules
-        val leadingMultiplier = 1f
-        val ruleFontSize = 25
-
-        val rect = Rectangle(left.toFloat(), (top - MAGIC_NUMBER + ruleFontSize).toFloat(), competitorInfoLeft.toFloat(), (top - MAGIC_NUMBER).toFloat())
-        cb.fitAndShowText(Translate.translate("fmc.event", locale), bf, rect, ruleFontSize.toFloat(), Element.ALIGN_CENTER, leadingMultiplier)
-
         val substitutions = mapOf("maxMoves" to WCA_MAX_MOVES_FMC.toString())
 
+        // Rules
         val rulesList = listOf(
             Translate.translate("fmc.rule1", locale),
             Translate.translate("fmc.rule2", locale),
@@ -354,7 +355,8 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         val rulesRectangle = Rectangle((left + fmcMargin).toFloat(), (scrambleBorderTop + tableHeight + fmcMargin).toFloat(), (competitorInfoLeft - fmcMargin).toFloat(), (rulesTop + fmcMargin).toFloat())
         val rules = rulesList.joinToString("\n") { "• $it" }
 
-        cb.fitAndShowText(rules, bf, rulesRectangle, 15f, Element.ALIGN_JUSTIFIED, 1.5f) // TODO const
+        val rulesFont = Font(bf, 15f)
+        cb.fitAndShowText(rules, rulesRectangle, rulesFont, Element.ALIGN_JUSTIFIED, 1.5f)
 
         doc.newPage()
     }
@@ -363,8 +365,6 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         const val FMC_LINE_THICKNESS = 0.5f
 
         const val UNDERLINE_THICKNESS = 0.2f
-
-        const val MAGIC_NUMBER = 30 // kill me now
 
         const val FORM_TEMPLATE_WCA_ID = "WCA ID: __ __ __ __  __ __ __ __  __ __"
 
