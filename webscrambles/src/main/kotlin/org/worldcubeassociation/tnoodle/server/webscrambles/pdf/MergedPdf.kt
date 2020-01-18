@@ -9,7 +9,7 @@ import java.io.ByteArrayOutputStream
 class MergedPdf(val toMerge: List<PdfContent>) : BasePdfSheet<PdfSmartCopy>(null) {
     override val document = Document()
 
-    override fun Document.getWriter(bytes: ByteArrayOutputStream) = PdfSmartCopy(document, bytes)
+    override fun Document.getWriter(bytes: ByteArrayOutputStream) = PdfSmartCopy(this, bytes)
 
     override fun PdfSmartCopy.writeContents() {
         for (content in toMerge) {

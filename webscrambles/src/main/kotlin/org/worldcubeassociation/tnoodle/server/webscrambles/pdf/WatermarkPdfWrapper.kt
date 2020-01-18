@@ -13,7 +13,7 @@ import java.time.LocalDate
 class WatermarkPdfWrapper(val original: PdfContent, val creationTitle: String, val creationDate: LocalDate, val versionTag: String, globalTitle: String?) : BasePdfSheet<PdfWriter>(globalTitle) {
     override val document = Document(PAGE_SIZE, 0f, 0f, 75f, 75f)
 
-    override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter = PdfWriter.getInstance(document, bytes)
+    override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter = PdfWriter.getInstance(this, bytes)
 
     override fun PdfWriter.writeContents() {
         val cb = directContent

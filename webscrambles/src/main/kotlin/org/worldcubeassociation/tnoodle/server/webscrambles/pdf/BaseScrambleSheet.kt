@@ -19,7 +19,7 @@ abstract class BaseScrambleSheet(val scrambleRequest: ScrambleRequest, globalTit
         }
 
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter {
-        return PdfWriter.getInstance(document, bytes).apply {
+        return PdfWriter.getInstance(this, bytes).apply {
             setBoxSize("art", Rectangle(36f, 54f, PAGE_SIZE.width - 36, PAGE_SIZE.height - 54))
         }
     }
