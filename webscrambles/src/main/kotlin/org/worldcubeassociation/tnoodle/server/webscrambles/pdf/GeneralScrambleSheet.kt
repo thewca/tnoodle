@@ -78,9 +78,7 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
     }
 
     fun getIndexColumnWidth(scrambles: List<String>, scrambleNumberPrefix: String): Float {
-        val scramblesOrdinalLength = log10(scrambles.size.toDouble()).toInt()
-        // + 1 at the end represents the dot.
-        val charsWide = scrambleNumberPrefix.length + scramblesOrdinalLength + 1
+        val charsWide = scrambleNumberPrefix.length + scrambles.size.toString().length
 
         // M has got to be as wide or wider than the widest digit in our font
         val wideString = WIDEST_CHAR_STRING.repeat(charsWide) + "."
@@ -120,7 +118,8 @@ class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String
         val fontSizeForMaskedUnaligned = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScrambleMasked, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, false, 1f) // FIXME const
 
         // If the scramble contains newlines, then we *only* allow wrapping at the newlines.
-        val longestRespectingNewlines = longestAlignedScrambleMasked.takeIf { longestScrambleOneLine } ?: longestAlignedScrambleMaskedAndStuffed
+        val longestRespectingNewlines = longestAlignedScrambleMasked.takeIf { longestScrambleOneLine }
+            ?: longestAlignedScrambleMaskedAndStuffed
         val fontSizeIfIncludingNewlines = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestRespectingNewlines, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true, 1f) // FIXME const
 
         val oneLine = longestScrambleOneLine && fontSizeForMaskedUnaligned >= FontUtil.MINIMUM_ONE_LINE_FONT_SIZE
