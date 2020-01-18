@@ -8,7 +8,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import java.io.ByteArrayOutputStream
 
 abstract class BaseScrambleSheet(val scrambleRequest: ScrambleRequest, globalTitle: String?) : BasePdfSheet<PdfWriter>(globalTitle) {
-    override val document =
+    override fun openDocument() =
         Document(PAGE_SIZE, 0f, 0f, 75f, 75f).apply {
             addCreationDate()
             addProducer()

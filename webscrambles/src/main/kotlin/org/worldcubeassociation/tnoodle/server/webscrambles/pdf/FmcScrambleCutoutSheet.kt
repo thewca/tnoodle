@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
+import com.itextpdf.text.Document
 import com.itextpdf.text.Element
 import com.itextpdf.text.Image
 import com.itextpdf.text.Rectangle
@@ -12,14 +13,14 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 
 class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?): FmcSheet(request, globalTitle) {
-    override fun PdfWriter.writeContents() {
+    override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleRequest.scrambles.indices) {
-            addFmcScrambleCutoutSheet(scrambleRequest, title, i)
+            addFmcScrambleCutoutSheet(document, scrambleRequest, title, i)
             document.newPage()
         }
     }
 
-    private fun PdfWriter.addFmcScrambleCutoutSheet(scrambleRequest: ScrambleRequest, globalTitle: String?, index: Int) {
+    private fun PdfWriter.addFmcScrambleCutoutSheet(document: Document, scrambleRequest: ScrambleRequest, globalTitle: String?, index: Int) {
         val pageSize = document.pageSize
         val scramble = scrambleRequest.scrambles[index]
 

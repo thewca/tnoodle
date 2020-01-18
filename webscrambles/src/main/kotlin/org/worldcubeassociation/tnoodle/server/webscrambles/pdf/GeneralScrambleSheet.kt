@@ -18,7 +18,7 @@ import kotlin.math.log10
 import kotlin.math.min
 
 class GeneralScrambleSheet(scrambleRequest: ScrambleRequest, globalTitle: String?) : BaseScrambleSheet(scrambleRequest, globalTitle) {
-    override fun PdfWriter.writeContents() {
+    override fun PdfWriter.writeContents(document: Document) {
         val pageSize = document.pageSize
 
         val sideMargins = 100f + document.leftMargin() + document.rightMargin()
