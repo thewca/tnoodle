@@ -6,7 +6,7 @@ import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 
 abstract class BasePdfSheet<W : PdfWriter>(val title: String?) : PdfContent {
-    abstract val document: Document
+    open fun openDocument() = Document()
 
     private var renderingCache: ByteArray? = null
 
@@ -16,21 +16,23 @@ abstract class BasePdfSheet<W : PdfWriter>(val title: String?) : PdfContent {
 
     private fun directRender(password: String?): ByteArray {
         val pdfBytes = ByteArrayOutputStream()
-        val docWriter = this.document.getWriter(pdfBytes)
+        val pdfDocument = openDocument()
+
+        val docWriter = pdfDocument.getWriter(pdfBytes)
 
         if (password != null) {
             docWriter.setEncryption(password.toByteArray(), password.toByteArray(), PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128)
         }
 
-        document.open()
-        docWriter.writeContents()
-        document.close()
+        pdfDocument.open()
+        docWriter.writeContents(pdfDocument)
+        pdfDocument.close()
 
         return this.finalise(pdfBytes, password)
             .also { if (password == null) renderingCache = it }
     }
 
-    abstract fun W.writeContents()
+    abstract fun W.writeContents(document: Document)
 
     abstract fun Document.getWriter(bytes: ByteArrayOutputStream): W
 

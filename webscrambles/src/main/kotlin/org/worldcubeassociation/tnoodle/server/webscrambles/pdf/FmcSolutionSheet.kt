@@ -18,7 +18,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, locale: Locale) : FmcSheet(request, globalTitle, locale) {
-    override fun PdfWriter.writeContents() {
+    override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleRequest.scrambles.indices) {
             addFmcSolutionSheet(document, scrambleRequest, title, i, locale)
             document.newPage()

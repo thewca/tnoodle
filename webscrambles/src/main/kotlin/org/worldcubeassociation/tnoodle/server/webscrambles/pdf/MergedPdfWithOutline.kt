@@ -5,11 +5,9 @@ import com.itextpdf.text.pdf.*
 import java.io.ByteArrayOutputStream
 
 class MergedPdfWithOutline(val toMerge: List<PdfContent>, val configuration: List<Triple<String, String, Int>>, globalTitle: String?) : BasePdfSheet<PdfSmartCopy>(globalTitle) {
-    override val document = Document()
-
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfSmartCopy = PdfSmartCopy(this, bytes)
 
-    override fun PdfSmartCopy.writeContents() {
+    override fun PdfSmartCopy.writeContents(document: Document) {
         val root = directContent.rootOutline
 
         val outlineByPuzzle = mutableMapOf<String, PdfOutline>()

@@ -7,11 +7,9 @@ import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 
 class MergedPdf(val toMerge: List<PdfContent>) : BasePdfSheet<PdfSmartCopy>(null) {
-    override val document = Document()
-
     override fun Document.getWriter(bytes: ByteArrayOutputStream) = PdfSmartCopy(this, bytes)
 
-    override fun PdfSmartCopy.writeContents() {
+    override fun PdfSmartCopy.writeContents(document: Document) {
         for (content in toMerge) {
             val contentReader = PdfReader(content.render())
 
