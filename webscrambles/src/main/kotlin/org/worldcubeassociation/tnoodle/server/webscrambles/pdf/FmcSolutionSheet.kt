@@ -160,12 +160,12 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
             if (showScrambleCount) {
                 // this is for ordered scrambles
                 val attemptIndex = scrambleRequest.takeIf { it.totalAttempt > 1 }?.attempt ?: index
-                val orderedIndex = max(attemptIndex, index)
+                val orderedIndex = max(attemptIndex, index + 1)
 
                 val absoluteTotal = scrambleRequest.totalAttempt.takeIf { it > 1 } ?: scrambleRequest.scrambles.size
 
                 val substitutions = mapOf(
-                    "scrambleIndex" to (orderedIndex + 1).toString(),
+                    "scrambleIndex" to orderedIndex.toString(),
                     "scrambleCount" to absoluteTotal.toString()
                 )
 
