@@ -260,16 +260,15 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         val tableWidth = competitorInfoLeft - left - 2 * margin
         val tableHeight = rulesRect.bottom - scrambleBorderTop - 2 * margin
         val tableLines = movesType.size * (direction.size + 1) // +1 for the title
-        val cellWidth = 25
+        val firstColumnWidth = tableWidth / 2
+        val cellWidth = (tableWidth - firstColumnWidth) / WCA_MOVES.size
         val cellHeight = tableHeight / tableLines
-        val columns = 7
-        val firstColumnWidth = tableWidth - (columns - 1) * cellWidth
-
+        val columns = WCA_MOVES.size + 1 // +1 for the first column
         val movesFontSize = 10
         val movesFont = Font(bf, movesFontSize.toFloat())
 
         val table = PdfPTable(columns).apply {
-            setTotalWidth(floatArrayOf(firstColumnWidth.toFloat(), cellWidth.toFloat(), cellWidth.toFloat(), cellWidth.toFloat(), cellWidth.toFloat(), cellWidth.toFloat(), cellWidth.toFloat()))
+            setTotalWidth(floatArrayOf(firstColumnWidth.toFloat(), *FloatArray(WCA_MOVES.size) { it -> cellWidth.toFloat() }))
             isLockedWidth = true
         }
 
