@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import "./EntryInterface.scss";
-
 class EntryInterface extends Component {
   constructor(props) {
     super(props);
@@ -49,12 +47,11 @@ class EntryInterface extends Component {
     return (
       <div className="container">
         <div className="row" id="entry-items">
-          <div className="col-md-3 text-right">
-            <p className="entry-spec">Competition Name: </p>
-          </div>
-          <div className="col-md-3">
+          <div className="col-md-6 text-left form-group">
+            <label className="font-weight-bold pr-1">Competition Name: </label>
             <input
               id="competitionName"
+              className="form-control"
               placeholder="Competition Name"
               onChange={this.handleCompetitionNameChange}
               value={this.state.competitionName}
@@ -62,16 +59,13 @@ class EntryInterface extends Component {
             />
           </div>
 
-          <div className="col-md-1"></div>
-
-          <div className="col-md-3 text-right">
-            <p className="entry-spec">Password:</p>
-          </div>
-          <div className="col-md-2">
+          <div className="col-md-6 text-left form-group">
+            <label className="font-weight-bold pr-1">Password:</label>
             <input
               id="passwordInput"
-              type={this.state.showPassword ? "" : "password"}
+              className="form-control"
               placeholder="Password"
+              type={this.state.showPassword ? "" : "password"}
               onChange={this.handlePasswordChange}
               value={this.state.password}
             />

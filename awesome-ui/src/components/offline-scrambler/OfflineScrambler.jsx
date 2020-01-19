@@ -50,7 +50,7 @@ class OfflineScrambler extends Component {
           handlePasswordChange={this.handlePasswordChange}
         />
         <EventPickerTable handleUpdateEvent={this.handleUpdateEvent} />
-        <div className="container p-3">
+        <div className="container form-group p-3">
           <button
             className="btn btn-primary btn-lg"
             onClick={this.generateScrambles}
