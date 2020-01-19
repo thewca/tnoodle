@@ -87,7 +87,7 @@ class EventPicker extends Component {
       });
     });
     return (
-      <div className="container">
+      <div className="container-fluid">
         <div className="row">
           <span className="col-2 p-0">
             <CubingIcon event={event.id} />
@@ -116,7 +116,7 @@ class EventPicker extends Component {
           <tbody>
             {Array.from({ length: this.state.rounds.length }, (_, i) => {
               return (
-                <tr key={i}>
+                <tr key={i} className="form-group">
                   <td>{i + 1}</td>
                   <td>
                     <select
@@ -133,7 +133,7 @@ class EventPicker extends Component {
                   </td>
                   <td>
                     <input
-                      className="numeric-input"
+                      className="form-control"
                       type="number"
                       value={this.state.rounds[i].scrambleSetCount}
                       onChange={evt =>
@@ -147,7 +147,7 @@ class EventPicker extends Component {
                   </td>
                   <td>
                     <input
-                      className="numeric-input"
+                      className="form-control"
                       type="number"
                       value={this.state.rounds[i].copies}
                       onChange={evt =>
