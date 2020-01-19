@@ -9,7 +9,7 @@ class SelectCompetition extends Component {
   }
   render() {
     if (this.state.competitions == null) {
-      return;
+      return <div>Nothing to show</div>;
     }
     return (
       <div className="competitions-picker">

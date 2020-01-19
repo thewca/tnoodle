@@ -15,7 +15,7 @@ class EventPickerTable extends Component {
     let eventChunks = _.chunk(WCA_EVENTS, EVENTS_PER_LINE);
 
     return (
-      <div className="container p-0">
+      <div className="container-fluid p-0">
         {eventChunks.map((events, i) => {
           return (
             <div className="row" key={i}>
