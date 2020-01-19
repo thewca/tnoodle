@@ -95,9 +95,8 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
             }
 
             if (fmcRequests.isNotEmpty()) {
-                file("3x3x3 Fewest Moves Solution Sheet.pdf", genericSolutionSheetPdf.render())
-
                 folder("Fewest Moves - Additional Files") {
+                    file("3x3x3 Fewest Moves Solution Sheet.pdf", genericSolutionSheetPdf.render())
                     for ((uniq, req) in fmcRequests) {
                         val cutoutZipName = "$uniq - Scramble Cutout Sheet.pdf"
                         val cutoutSheet = FmcScrambleCutoutSheet(req, globalTitle)

@@ -1,9 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
-import com.itextpdf.text.Document
-import com.itextpdf.text.Element
-import com.itextpdf.text.Image
-import com.itextpdf.text.Rectangle
+import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfWriter
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
@@ -12,7 +9,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 
-class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?): FmcSheet(request, globalTitle) {
+class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?) : FmcSheet(request, globalTitle) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleRequest.scrambles.indices) {
             addFmcScrambleCutoutSheet(document, scrambleRequest, title, i)
@@ -51,9 +48,11 @@ class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?): Fm
 
         val paddedTitleItems = textList.zip(alignList)
 
+        val font = Font(BASE_FONT, FONT_SIZE)
+
         for (i in 0 until SCRAMBLES_PER_SHEET) {
             val rect = Rectangle(LEFT.toFloat(), (top - i * availableScrambleHeight).toFloat(), (right - dim.width - SPACE_SCRAMBLE_IMAGE).toFloat(), (top - (i + 1) * availableScrambleHeight).toFloat())
-            directContent.populateRect(rect, paddedTitleItems, BASE_FONT, FONT_SIZE)
+            directContent.populateRect(rect, paddedTitleItems, font)
 
             directContent.addImage(Image.getInstance(tp), dim.width.toDouble(), 0.0, 0.0, dim.height.toDouble(), (right - dim.width).toDouble(), top.toDouble() - (i + 1) * availableScrambleHeight + (availableScrambleHeight - dim.getHeight()) / 2)
 
@@ -72,7 +71,7 @@ class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?): Fm
         val SPACE_SCRAMBLE_IMAGE = 5 // scramble image won't touch the scramble
         val SCRAMBLE_IMAGE_PADDING = 8 // scramble image won't touch the dashed lines
 
-        val FONT_SIZE = 20
+        val FONT_SIZE = 20f
 
         val SCRAMBLES_PER_SHEET = 8
     }

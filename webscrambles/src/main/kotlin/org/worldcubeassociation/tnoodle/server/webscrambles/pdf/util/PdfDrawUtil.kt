@@ -2,10 +2,10 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
 import com.itextpdf.awt.DefaultFontMapper
 import com.itextpdf.awt.PdfGraphics2D
+import com.itextpdf.text.Element
 import com.itextpdf.text.Font
 import com.itextpdf.text.Paragraph
 import com.itextpdf.text.Rectangle
-import com.itextpdf.text.pdf.BaseFont
 import com.itextpdf.text.pdf.ColumnText
 import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfTemplate
@@ -64,40 +64,39 @@ object PdfDrawUtil {
         stroke()
     }
 
-    fun PdfContentByte.fitAndShowText(text: String, bf: BaseFont, rect: Rectangle, maxFontSize: Float, align: Int, leadingMultiplier: Float): Int {
+    fun PdfContentByte.fitAndShowText(text: String, rect: Rectangle, font: Font, align: Int = Element.ALIGN_LEFT, leadingMultiplier: Float = 1f): Int {
         // We create a temp pdf and check if the text fit in a rectangle there.
         val tempCb = PdfContentByte(pdfWriter)
-        val status = tempCb.showTextStatus(text, bf, rect, maxFontSize, align, leadingMultiplier)
+        val status = tempCb.showTextStatus(text, rect, font, align, leadingMultiplier)
 
         if (ColumnText.hasMoreText(status)) {
-            val iterMaxFontSize = maxFontSize - 0.1f
+            val iterMaxFontSize = font.size - 0.1f
+            val iterFont = Font(font.baseFont, iterMaxFontSize)
             // FIXME brute-force approach doesn't seem healthy
-            return fitAndShowText(text, bf, rect, iterMaxFontSize, align, leadingMultiplier)
+            return fitAndShowText(text, rect, iterFont, align, leadingMultiplier)
         }
 
         // TODO see if we can recycle "status" from above if not drawn on a separate canvas
-        return showTextStatus(text, bf, rect, maxFontSize, align, leadingMultiplier)
+        return showTextStatus(text, rect, font, align, leadingMultiplier)
     }
 
-    private fun PdfContentByte.showTextStatus(text: String, bf: BaseFont, rect: Rectangle, fontSize: Float, align: Int, leadingMultiplier: Float): Int {
+    private fun PdfContentByte.showTextStatus(text: String, rect: Rectangle, font: Font, align: Int, leadingMultiplier: Float): Int {
         // If it's ok, we add the text to original pdf.
         val ct = ColumnText(this).apply {
-            insertTextParagraph(text, bf, rect, fontSize, align, leadingMultiplier)
+            insertTextParagraph(text, rect, font, align, leadingMultiplier)
         }
 
         return ct.go()
     }
 
-    private fun ColumnText.insertTextParagraph(text: String, bf: BaseFont, rect: Rectangle, fontSize: Float, align: Int, leadingMultiplier: Float) {
+    private fun ColumnText.insertTextParagraph(text: String, rect: Rectangle, font: Font, align: Int = Element.ALIGN_LEFT, leadingMultiplier: Float = 1f) {
         setSimpleColumn(rect)
-        leading = leadingMultiplier * fontSize
-
+        leading = leadingMultiplier * font.size
         alignment = align
-
-        addText(Paragraph(text, Font(bf, fontSize)))
+        addText(Paragraph(text, font))
     }
 
-    fun PdfContentByte.populateRect(rect: Rectangle, itemsWithAlignment: List<Pair<String, Int>>, bf: BaseFont, fontSize: Int) {
+    fun PdfContentByte.populateRect(rect: Rectangle, itemsWithAlignment: List<Pair<String, Int>>, font: Font) {
         val totalHeight = rect.height
         val width = rect.width
 
@@ -107,8 +106,8 @@ object PdfDrawUtil {
         val height = totalHeight / itemsWithAlignment.size
 
         for ((i, content) in itemsWithAlignment.withIndex()) {
-            val temp = Rectangle(x, y + height * i - totalHeight - fontSize.toFloat(), x + width, y + height * i - totalHeight)
-            fitAndShowText(content.first, bf, temp, 15f, content.second, 1f)
+            val temp = Rectangle(x, y + height * i - totalHeight - font.size, x + width, y + height * i - totalHeight)
+            fitAndShowText(content.first, temp, font, content.second)
         }
     }
 }
