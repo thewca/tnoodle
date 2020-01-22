@@ -51,7 +51,6 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
     val targetBuildDir = project(":$targetProject").buildDir
     val targetConfigurations = project(":$targetProject").configurations
 
-    dependsOn(getTasksByName("publishToMavenLocal", true))
     dependsOn("registerReleaseTag", ":$targetProject:cleanShadowJar", ":$targetProject:shadowJar")
 
     injars("$targetBuildDir/libs/$targetProject-$version-all.jar")
@@ -119,11 +118,9 @@ tasks.create("generateDebugRelease") {
 }
 
 tasks.create("deployToCloud") {
-    dependsOn(getTasksByName("publishToMavenLocal", true))
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineDeploy")
 }
 
 tasks.create("emulateCloudLocal") {
-    dependsOn(getTasksByName("publishToMavenLocal", true))
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineRun")
 }

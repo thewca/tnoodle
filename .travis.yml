@@ -3,6 +3,6 @@ jdk: openjdk8
 sudo: true
 
 script:
-  - ./gradlew publishToMavenLocal
+  - ./gradlew assemble
   - ./gradlew check
   - ./gradlew generateDebugRelease
