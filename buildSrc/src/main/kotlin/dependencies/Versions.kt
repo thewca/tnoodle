@@ -1,14 +1,12 @@
 package dependencies
 
 object Versions {
-    val GWT = "2.5.1"
     val JUNIT_JUPITER = "5.4.2"
     val BATIK = "1.12"
     val KOTLIN = "1.3.61"
     val KTOR = "1.3.0"
     val PROGUARD = "6.2.0"
 
-    val GWTEXPORTER = GWT
     val MARKDOWNJ_CORE = "0.4"
     val ZIP4J = "2.2.8"
     val ITEXTPDF = "5.5.13.1"
