@@ -26,15 +26,4 @@ object Languages {
         attachLocalRepositories()
         attachRemoteRepositories()
     }
-
-    fun Project.configureJava() {
-        configure<JavaPluginConvention> {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-        }
-
-        configure<JavaPluginExtension> {
-            withJavadocJar()
-            withSourcesJar()
-        }
-    }
 }

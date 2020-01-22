@@ -1,7 +1,6 @@
 package dependencies
 
 object Libraries {
-    val GWTEXPORTER = "org.timepedia.exporter:gwtexporter:${Versions.GWTEXPORTER}"
     val MARKDOWNJ_CORE = "org.markdownj:markdownj-core:${Versions.MARKDOWNJ_CORE}"
     val ZIP4J = "net.lingala.zip4j:zip4j:${Versions.ZIP4J}"
     val ITEXTPDF = "com.itextpdf:itextpdf:${Versions.ITEXTPDF}"
