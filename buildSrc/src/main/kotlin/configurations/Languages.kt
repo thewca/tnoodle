@@ -18,6 +18,7 @@ object Languages {
     fun Project.attachRemoteRepositories() {
         repositories {
             mavenCentral()
+            maven(url = "https://dl.bintray.com/thewca/tnoodle-lib")
         }
     }
 

@@ -8,6 +8,7 @@ import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.KOTLIN_ARGPARSER
 import dependencies.Libraries.SYSTEM_TRAY
 import dependencies.Libraries.SNAKEYAML
+import dependencies.Libraries.TNOODLE_SCRAMBLES
 import dependencies.Libraries.ZIP4J
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -36,7 +37,6 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation(project(":scrambles"))
     implementation(project(":server-ktor"))
 
     implementation(ZIP4J)
@@ -46,6 +46,7 @@ dependencies {
     implementation(BOUNCYCASTLE)
     implementation(KOTLIN_ARGPARSER)
     implementation(SYSTEM_TRAY)
+    implementation(TNOODLE_SCRAMBLES)
 
     runtimeOnly(project(":tnoodle-ui"))
 }

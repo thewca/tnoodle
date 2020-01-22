@@ -31,6 +31,7 @@ object Versions {
     val WCA_I18N = "0.4.3"
     val GOOGLE_APPENGINE_GRADLE = "2.2.0"
     val GOOGLE_CLOUD_STORAGE = "1.102.0"
+    val TNOODLE_SCRAMBLES = "0.16.3"
 
     object Plugins {
         val SHADOW = "5.2.0"
