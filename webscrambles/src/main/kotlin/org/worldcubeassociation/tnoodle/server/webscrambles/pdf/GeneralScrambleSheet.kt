@@ -18,19 +18,21 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     override fun PdfWriter.writeContents(document: Document) {
         val pageSize = document.pageSize
 
-        val sideMargins = 100f + document.leftMargin() + document.rightMargin()
-        val availableWidth = pageSize.width - sideMargins
+        val availableWidth = pageSize.width - 2 * HORIZONTAL_MARGIN
+        val availableHeight = pageSize.height - 2 * VERTICAL_MARGIN
 
-        // Yeee magic numbers. This should make space for the headerTable.
-        val extraScrambleSpacing = 20.takeIf { scrambleSet.extraScrambles.isNotEmpty() } ?: 0
+        val headerAndFooterHeight = availableHeight / HEADER_AND_FOOTER_HEIGHT_RATIO
+        val extraScrambleLabelHeight = if (scrambleSet.extraScrambles.isNotEmpty()) availableHeight / EXTRA_SCRAMBLES_HEIGHT_RATIO else 0f
 
-        val vertMargins = document.topMargin() + document.bottomMargin()
-        val availableHeight = pageSize.height - vertMargins - extraScrambleSpacing
+        val indexColumnWidth = availableWidth / INDEX_COLUMN_WIDTH_RATIO
+
+        // Available height for all scrambles (including extras)
+        val allScramblesHeight = availableHeight - 2 * headerAndFooterHeight - extraScrambleLabelHeight
 
         val scramblesPerPage = min(MAX_SCRAMBLES_PER_PAGE, scrambleSet.allScrambles.size)
-        val maxScrambleImageHeight = (availableHeight / scramblesPerPage - 2 * SCRAMBLE_IMAGE_PADDING).toInt()
+        val maxScrambleImageHeight = (allScramblesHeight / scramblesPerPage - 2 * SCRAMBLE_IMAGE_PADDING).toInt()
 
-        // We don't let scramble images take up more than half the page
+        // We don't let scramble images take up too much of a the page
         val maxScrambleImageWidth = (availableWidth / 2).toInt().takeUnless {
             // TODO - If we allow the megaminx image to be too wide, the
             //   Megaminx scrambles get really tiny. This tweak allocates
@@ -41,18 +43,19 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
 
         val scrambleImageSize = scramblingPuzzle.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight)
 
-        val indexColumnWidth = availableWidth / INDEX_COLUMN_WIDTH_RATIO
-        val scrambleColumnWidth = availableWidth - indexColumnWidth - scrambleImageSize.width.toFloat() - (2 * SCRAMBLE_IMAGE_PADDING).toFloat()
+        val scrambleImageHeight = scrambleImageSize.height.toFloat()
+        val scrambleColumnWidth = availableWidth - indexColumnWidth - scrambleImageSize.width
 
         val allScrambleStrings = scrambleSet.allScrambles.flatMap { it.allScrambleStrings }
+        val scrambleFont = getFontConfiguration(scrambleColumnWidth, scrambleImageHeight, allScrambleStrings)
 
-        val (scrambleFont, oneLine) = getFontConfiguration(scrambleColumnWidth, scrambleImageSize, allScrambleStrings)
-        val useHighlighting = requiresHighlighting(scrambleColumnWidth, allScrambleStrings, scrambleFont, oneLine)
+        // First check if any scramble requires highlighting.
+        val useHighlighting = requiresHighlighting(scrambleColumnWidth, scrambleFont, allScrambleStrings)
 
         // First do a dry run just to see if any scrambles require highlighting.
         // Then do the real run, and force highlighting on every scramble
         // if any scramble required it.
-        val table = directContent.createTable(scrambleFont, oneLine, scrambleColumnWidth, indexColumnWidth, scrambleImageSize, scrambleSet.scrambles, STD_SCRAMBLE_PREFIX, useHighlighting)
+        val table = directContent.createTable(scrambleColumnWidth, indexColumnWidth, scrambleFont, scrambleImageSize, scrambleSet.scrambles, STD_SCRAMBLE_PREFIX, useHighlighting)
         document.add(table)
 
         if (scrambleSet.extraScrambles.isNotEmpty()) {
@@ -63,22 +66,24 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
 
             val extraScramblesHeader = PdfPCell(Paragraph(TABLE_HEADING_EXTRA_SCRAMBLES)).apply {
                 verticalAlignment = PdfPCell.ALIGN_MIDDLE
-                paddingBottom = 3f
+                horizontalAlignment = PdfPCell.ALIGN_CENTER
+                fixedHeight = extraScrambleLabelHeight
+                border = PdfPCell.NO_BORDER
             }
 
             headerTable.addCell(extraScramblesHeader)
             document.add(headerTable)
 
-            val extraTable = directContent.createTable(scrambleFont, oneLine, scrambleColumnWidth, indexColumnWidth, scrambleImageSize, scrambleSet.extraScrambles, EXTRA_SCRAMBLE_PREFIX, useHighlighting)
+            val extraTable = directContent.createTable(scrambleColumnWidth, indexColumnWidth, scrambleFont, scrambleImageSize, scrambleSet.extraScrambles, EXTRA_SCRAMBLE_PREFIX, useHighlighting)
             document.add(extraTable)
         }
     }
 
-    fun getFontConfiguration(scrambleColumnWidth: Float, scrambleImageSize: Dimension, scrambles: List<String>): Pair<Font, Boolean> {
-        val availableScrambleHeight = scrambleImageSize.height - 2 * SCRAMBLE_IMAGE_PADDING
+    private fun getFontConfiguration(scrambleColumnWidth: Float, scrambleImageSize: Float, scrambles: List<String>): Font {
+        val availableScrambleHeight = scrambleImageSize - 2 * SCRAMBLE_IMAGE_PADDING
 
         val availableArea = Rectangle(scrambleColumnWidth - 2 * SCRAMBLE_PADDING_HORIZONTAL,
-            (availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM).toFloat())
+            (availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM))
 
         val longestScramble = scrambles.maxBy { it.length } ?: ""
 
@@ -105,17 +110,18 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val oneLine = longestScrambleOneLine && fontSizeForMaskedUnaligned >= FontUtil.MINIMUM_ONE_LINE_FONT_SIZE
         val perfectFontSize = fontSizeForMaskedUnaligned.takeIf { oneLine } ?: fontSizeIfIncludingNewlines
 
-        return Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL) to oneLine
+        return Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL)
     }
 
-    fun requiresHighlighting(scrambleColumnWidth: Float, scrambles: List<String>, scrambleFont: Font, oneLine: Boolean): Boolean {
-        val paddedScrambles = scrambles.map { if (oneLine) it else StringUtil.padTurnsUniformly(it, PdfUtil.NON_BREAKING_SPACE.toString()) }
+    private fun requiresHighlighting(scrambleColumnWidth: Float, scrambleFont: Font, scrambles: List<String>): Boolean {
+        val paddedScrambles = scrambles.map { StringUtil.padTurnsUniformly(it, PdfUtil.NON_BREAKING_SPACE.toString()) }
         val lineChunks = paddedScrambles.map { it.splitToLineChunks(scrambleFont, scrambleColumnWidth) }
 
         return lineChunks.any { it.size >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING }
     }
 
-    private fun PdfContentByte.createTable(scrambleFont: Font, oneLine: Boolean, scrambleColumnWidth: Float, indexColumnWidth: Float, scrambleImageSize: Dimension, scrambles: List<Scramble>, scrambleNumberPrefix: String, useHighlighting: Boolean): PdfPTable {
+    private fun PdfContentByte.createTable(scrambleColumnWidth: Float, indexColumnWidth: Float, scrambleFont: Font, scrambleImageSize: Dimension, scrambles: List<Scramble>, scrambleNumberPrefix: String, useHighlighting: Boolean): PdfPTable {
+
         val table = PdfPTable(3).apply {
             setTotalWidth(floatArrayOf(indexColumnWidth, scrambleColumnWidth, (scrambleImageSize.width + 2 * SCRAMBLE_IMAGE_PADDING).toFloat()))
             isLockedWidth = true
@@ -124,13 +130,13 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val strScrambles = scrambles.flatMap { it.allScrambleStrings }
 
         for ((i, scramble) in strScrambles.withIndex()) {
-            val ch = Chunk("$scrambleNumberPrefix${i + 1}.")
-            val nthScramble = PdfPCell(Paragraph(ch)).apply {
+            val indexCell = PdfPCell(Paragraph("$scrambleNumberPrefix${i + 1}")).apply {
                 verticalAlignment = PdfPCell.ALIGN_MIDDLE
+                horizontalAlignment = PdfPCell.ALIGN_CENTER
             }
-            table.addCell(nthScramble)
+            table.addCell(indexCell)
 
-            val paddedScramble = if (oneLine) scramble else StringUtil.padTurnsUniformly(scramble, PdfUtil.NON_BREAKING_SPACE.toString())
+            val paddedScramble = StringUtil.padTurnsUniformly(scramble, PdfUtil.NON_BREAKING_SPACE.toString())
             val lineChunks = paddedScramble.splitToLineChunks(scrambleFont, scrambleColumnWidth)
             val scramblePhrase = Phrase()
 
@@ -138,7 +144,6 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
                 if (useHighlighting && nthLine % 2 == 1) {
                     lineChunk.setBackground(HIGHLIGHT_COLOR)
                 }
-
                 scramblePhrase.add(lineChunk)
             }
 
@@ -147,17 +152,6 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
                 // let itextpdf wrap lines for us.
                 isNoWrap = true
                 verticalAlignment = PdfPCell.ALIGN_MIDDLE
-
-                // This shifts everything up a little bit, because I don't like how
-                // ALIGN_MIDDLE works.
-                paddingTop = (-SCRAMBLE_PADDING_VERTICAL_TOP).toFloat()
-                paddingBottom = SCRAMBLE_PADDING_VERTICAL_BOTTOM.toFloat()
-                paddingLeft = SCRAMBLE_PADDING_HORIZONTAL.toFloat()
-                paddingRight = SCRAMBLE_PADDING_HORIZONTAL.toFloat()
-
-                // We space lines a little bit more here - it still fits in the cell height
-                val extraLeadingMultiplier = 1.1f
-                setLeading(0f, extraLeadingMultiplier)
             }
 
             table.addCell(scrambleCell)
@@ -202,6 +196,11 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
 
         private val HIGHLIGHT_COLOR = BaseColor(230, 230, 230)
 
-        const val INDEX_COLUMN_WIDTH_RATIO = 20f
+        const val HEADER_AND_FOOTER_HEIGHT_RATIO = 12
+        const val INDEX_COLUMN_WIDTH_RATIO = 25
+        const val EXTRA_SCRAMBLES_HEIGHT_RATIO = 30
+
+        const val VERTICAL_MARGIN = 15f
+        const val HORIZONTAL_MARGIN = 35f
     }
 }
