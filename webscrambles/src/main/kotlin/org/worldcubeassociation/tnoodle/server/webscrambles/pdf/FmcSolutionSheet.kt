@@ -7,10 +7,10 @@ import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.fitAndShowText
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import java.util.*
 import kotlin.math.ceil
@@ -268,7 +268,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         val movesFont = Font(bf, movesFontSize.toFloat())
 
         val table = PdfPTable(columns).apply {
-            setTotalWidth(floatArrayOf(firstColumnWidth.toFloat(), *FloatArray(WCA_MOVES.size) { it -> cellWidth.toFloat() }))
+            setTotalWidth(floatArrayOf(firstColumnWidth.toFloat(), *FloatArray(WCA_MOVES.size) { cellWidth.toFloat() }))
             isLockedWidth = true
         }
 

@@ -11,7 +11,7 @@ object FontUtil {
     val NOTO_SANS_FONT: BaseFont = BaseFont.createFont("fonts/NotoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
 
     const val MAX_SCRAMBLE_FONT_SIZE = 20f
-    const val MINIMUM_ONE_LINE_FONT_SIZE = 12f
+    const val MINIMUM_ONE_LINE_FONT_SIZE = 15f
 
     private val FONT_BY_LOCALE = mapOf(
         Locale.forLanguageTag("zh-CN") to CJK_FONT,
