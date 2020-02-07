@@ -5,7 +5,7 @@ object Versions {
     val BATIK = "1.12"
     val KOTLIN = "1.3.61"
     val KTOR = "1.3.0"
-    val PROGUARD = "6.2.0"
+    val PROGUARD = "6.2.2"
 
     val MARKDOWNJ_CORE = "0.4"
     val ZIP4J = "2.2.8"
@@ -29,12 +29,12 @@ object Versions {
     val PROGUARD_GRADLE = PROGUARD
     val WCA_I18N = "0.4.3"
     val GOOGLE_APPENGINE_GRADLE = "2.2.0"
-    val GOOGLE_CLOUD_STORAGE = "1.102.0"
+    val GOOGLE_CLOUD_STORAGE = "1.103.0"
     val TNOODLE_SCRAMBLES = "0.16.3"
 
     object Plugins {
         val SHADOW = "5.2.0"
-        val NODEJS = "2.2.0"
+        val NODEJS = "2.2.1"
         val DEPENDENCY_VERSIONS = "0.27.0"
         val GIT_VERSION_TAG = "0.12.2"
 
