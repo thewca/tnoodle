@@ -7,12 +7,12 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 object WCIFParser {
-    fun parseComplete(wcif: String): WCIF {
-        return JsonConfig.SERIALIZER.parse(WCIF.serializer(), wcif)
+    fun parseComplete(wcif: String): Competition {
+        return JsonConfig.SERIALIZER.parse(Competition.serializer(), wcif)
     }
 
-    fun parsePartial(schedule: String): WCIF {
-        return WCIF(emptyList(), JsonConfig.SERIALIZER.parse(Schedule.serializer(), schedule))
+    fun parsePartial(schedule: String): Competition {
+        return Competition(emptyList(), JsonConfig.SERIALIZER.parse(Schedule.serializer(), schedule))
     }
 
     val WCIF_DATE_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME
