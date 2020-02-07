@@ -38,18 +38,16 @@ data class WCIFRequestBinding(val wcif: Competition, val activityScrambleRequest
         }
 
         fun List<ScrambleRequest>.filterForActivity(activity: Activity): List<ScrambleRequest> {
-            val event = activity.readEventCode()
+            val event = activity.activityCode.eventId
 
             if (event in ActivityCode.IGNORABLE_KEYS) {
                 return emptyList()
             }
 
-            val activityCodeData = activity.readPrefixCodes()
-
             // This part assumes every round, group and attempt is labeled with an integer from competitionJson
-            val round = activityCodeData['r']?.toInt() ?: 0
-            val group = activityCodeData['g']?.toInt() ?: 0
-            val attempt = activityCodeData['a']?.toInt() ?: 0
+            val round = activity.activityCode.roundNumber ?: 0
+            val group = activity.activityCode.groupNumber ?: 0
+            val attempt = activity.activityCode.attemptNumber ?: 0
 
             // First, we add all requests whose events equals what we need
             val matchingRequests = filter { it.event == event }
@@ -66,19 +64,6 @@ data class WCIFRequestBinding(val wcif: Competition, val activityScrambleRequest
                 ?: error("An activity of the schedule did not match an event.")
         }
 
-        fun Activity.readPrefixCodes(): Map<Char, String> {
-            val activitySplit = activityCode.split("-")
-            val prefixGroups = activitySplit.drop(1)
-
-            return prefixGroups.associateWith { it.substring(1) }
-                .mapKeys { it.key.first() }
-        }
-
-        fun Activity.readEventCode(): String {
-            val activitySplit = activityCode.split("-")
-            return activitySplit.first()
-        }
-
         fun ScrambleRequest.copyForAttempt(targetAttempt: Int) =
             copy(
                 scrambles = listOf(scrambles[targetAttempt - 1]),
@@ -87,7 +72,7 @@ data class WCIFRequestBinding(val wcif: Competition, val activityScrambleRequest
             )
 
         fun Activity.createScrambleRequest(title: String, events: List<Event>, copies: Int = 1): ScrambleRequest? {
-            val eventString = readEventCode()
+            val eventString = activityCode.eventId
             val puzzleString = EVENT_MAPPING[eventString] ?: eventString
 
             if (puzzleString in ActivityCode.IGNORABLE_KEYS) {
@@ -99,7 +84,7 @@ data class WCIFRequestBinding(val wcif: Competition, val activityScrambleRequest
             val matchingEvent = events.find { eventString == it.id }
                 ?: error("No maching event in WCIF was found for $activityCode")
 
-            val matchingRound = matchingEvent.rounds.find { activityCode.startsWith(it.id) }
+            val matchingRound = matchingEvent.rounds.find { it.idCode.isParentOf(activityCode) }
                 ?: error("No matching round in WCIF was found for $activityCode")
 
             val scrambleCount = matchingRound.format.toIntOrNull()
@@ -109,11 +94,9 @@ data class WCIFRequestBinding(val wcif: Competition, val activityScrambleRequest
             val parsedRequest = ScrambleRequest.parseScrambleRequest(title, "$puzzleString*$scrambleCount*$copies", null)
                 .copy(event = eventString, fmc = isFmc)
 
-            val activityCodeData = readPrefixCodes()
-
-            val round = activityCodeData['r']?.toInt() ?: parsedRequest.round
-            val group = activityCodeData['g']?.toInt()?.toColumnIndexString() ?: parsedRequest.group
-            val attempt = activityCodeData['a']?.toInt() ?: parsedRequest.attempt
+            val round = activityCode.roundNumber ?: parsedRequest.round
+            val group = activityCode.groupNumber?.toColumnIndexString() ?: parsedRequest.group
+            val attempt = activityCode.attemptNumber ?: parsedRequest.attempt
 
             return parsedRequest.copy(round = round, group = group, attempt = attempt)
         }
