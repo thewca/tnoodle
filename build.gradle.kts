@@ -73,6 +73,8 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
     dontobfuscate()
     dontoptimize()
 
+    dontnote("kotlinx.serialization.SerializationKt")
+
     // cf. https://github.com/ktorio/ktor-samples/tree/master/other/proguard
     keep("class org.worldcubeassociation.tnoodle.server.** { *; }")
     keep("class io.ktor.server.netty.Netty { *; }")
@@ -89,6 +91,23 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
     keep("class com.sun.jna.** { *; }")
     keep("class dorkbox.util.jna.** { *; }")
     keep("class dorkbox.systemTray.** { *; }")
+
+    keep(mapOf("includedescriptorclasses" to true), "class org.worldcubeassociation.tnoodle.server.webscrambles.**\$\$serializer { *; }")
+
+    keepattributes("*Annotation")
+    keepattributes("InnerClasses")
+
+    keepclasseswithmembers("""
+        class org.worldcubeassociation.tnoodle.server.webscrambles.** {
+            kotlinx.serialization.KSerializer serializer(...);
+        }
+    """.trimIndent())
+
+    keepclassmembers("""
+        class org.worldcubeassociation.tnoodle.server.webscrambles.** {
+            *** Companion;
+        }
+    """.trimIndent())
 
     keepclasseswithmembernames("""class * {
         native <methods>;
