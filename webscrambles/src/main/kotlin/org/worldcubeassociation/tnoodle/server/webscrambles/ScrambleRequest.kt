@@ -24,22 +24,22 @@ data class ScrambleRequest(
     val copies: Int,
     val title: String,
     val fmc: Boolean,
-    val colorScheme: HashMap<String, @Serializable(with = Colorizer::class) Color>?,
+    val colorScheme: HashMap<String, @Serializable(with = Colorizer::class) Color>? = null,
 
     // totalAttempt and attempt are useful for when we have multiple attempts split in the schedule.
     // Usually, tnoodle prints scrambles for a ScrambleRequest iterating over ScrambleRequest.scrambles.
     // So, if ScrambleRequest.scrambles.length == 3, tnoodle prints Scramble 1 of 3, Scramble 2 of 3 and Scramble 3 of 3.
     // But for OrderedScrambles, these scrambles are split on the schedule, so we replace Scramble.scrambles = {Scramble.scrambles[attempt]}.
     // To continue printing Scramble x of y, we use attempt as x and totalAttempt as y.
-    val totalAttempt: Int,
-    val attempt: Int,
+    val totalAttempt: Int = 0,
+    val attempt: Int = 0,
 
     // The following attributes are here purely so the scrambler ui
     // can pass these straight to the generated JSON we put in the
     // zip file. This makes it easier to align that JSON with the rounds
     // of a competition.
-    val group: String?, // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
-    val scrambleSetId: String?,
+    val group: String? = null, // This legacy field is still used by the WCA Workbook Assistant. When we get rid of the WA, we can get rid of this.
+    val scrambleSetId: String? = null,
     val event: String,
     val round: Int
 ) {
