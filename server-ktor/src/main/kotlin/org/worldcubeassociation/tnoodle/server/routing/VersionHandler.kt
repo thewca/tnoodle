@@ -4,15 +4,13 @@ import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
-import kotlinx.serialization.internal.StringSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.map
 
 import java.io.IOException
 import java.net.URL
-import java.util.HashMap
 
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.serial.ScramblingProgramInfo
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 
 class VersionHandler(val versionKey: String) : RouteHandler {
@@ -20,19 +18,15 @@ class VersionHandler(val versionKey: String) : RouteHandler {
         router.get("/version.json") {
             try {
                 val raw = URL(BASE_URL).readText()
+                val json = Json.parse(ScramblingProgramInfo.serializer(), raw)
 
-                val serial = (StringSerializer to StringSerializer).map
-                val json = Json.parse(serial, raw).toMutableMap()
+                val tnoodleJson = json.copy(running_version = versionKey)
 
-                val runningVersionKey = "running_version"
-                assert(!json.containsKey(runningVersionKey))
-
-                json[runningVersionKey] = versionKey
-
-                call.respond(json)
+                call.respond(tnoodleJson)
             } catch (e: IOException) {
-                val json = HashMap<String, Any>()
-                json["ignorableError"] = WebServerUtils.throwableToString(e)
+                val json = mapOf(
+                    "ignorableError" to WebServerUtils.throwableToString(e)
+                )
 
                 call.respond(json)
             }

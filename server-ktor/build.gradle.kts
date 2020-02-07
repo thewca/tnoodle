@@ -16,6 +16,7 @@ attachRemoteRepositories()
 
 plugins {
     kotlin("jvm")
+    KOTLIN_SERIALIZATION
 }
 
 dependencies {
