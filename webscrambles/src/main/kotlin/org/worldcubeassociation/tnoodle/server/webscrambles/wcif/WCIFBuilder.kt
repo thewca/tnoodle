@@ -20,9 +20,14 @@ object WCIFBuilder {
         }
     }
 
-    fun requestsToZip(wcif: Competition, pdfPassword: String, generationDate: LocalDateTime, versionTag: String, generationUrl: String): ZipArchive {
+    fun wcifToZip(wcif: Competition, pdfPassword: String?, generationDate: LocalDateTime, versionTag: String, generationUrl: String): ZipArchive {
         val scrambleZip = ScrambleZip(wcif)
         return scrambleZip.assemble(generationDate, versionTag, pdfPassword, generationUrl)
+    }
+
+    fun wcifToCompletePdf(wcif: Competition, generationDate: LocalDate, versionTag: String): PdfContent {
+        val drawingData = wcif.events.toScrambleSetData()
+        return requestsToCompletePdf(drawingData, generationDate, versionTag)
     }
 
     fun requestsToCompletePdf(scrambleRequests: List<ScrambleDrawingData>, generationDate: LocalDate, versionTag: String): PdfContent {

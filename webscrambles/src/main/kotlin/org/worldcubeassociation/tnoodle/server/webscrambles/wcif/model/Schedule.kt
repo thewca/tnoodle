@@ -30,4 +30,8 @@ data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
 
     val hasMultipleDays: Boolean get() = numberOfDays > 1
     val hasMultipleVenues: Boolean get() = venues.size > 1
+
+    companion object {
+        val EMPTY = Schedule(0, emptyList())
+    }
 }
