@@ -7,12 +7,15 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 object WCIFParser {
+    private val SERIALIZER = JsonConfig[JsonConfig.SERIALIZER_WCIF]
+
     fun parseComplete(wcif: String): Competition {
-        return JsonConfig.SERIALIZER.parse(Competition.serializer(), wcif)
+        return SERIALIZER.parse(Competition.serializer(), wcif)
     }
 
     fun parsePartial(schedule: String): Competition {
-        return Competition(emptyList(), JsonConfig.SERIALIZER.parse(Schedule.serializer(), schedule))
+        val parsedSchedule = SERIALIZER.parse(Schedule.serializer(), schedule)
+        return Competition("1.0", "id", "name", "shortName", emptyList(), parsedSchedule)
     }
 
     val WCIF_DATE_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME
