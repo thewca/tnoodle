@@ -6,6 +6,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding.Companion.computeBindings
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.getCachedPdf
 import kotlinx.serialization.Serializable
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Colorizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Puzzlerizer
@@ -17,6 +18,7 @@ import net.gnehzr.tnoodle.svglite.Color
 import java.time.LocalDateTime
 
 @Serializable
+@Deprecated("Use WCIF instead.")
 data class ScrambleRequest(
     val scrambles: List<String>,
     val extraScrambles: List<String>,
@@ -43,50 +45,8 @@ data class ScrambleRequest(
     val event: String,
     val round: Int
 ) {
-    val allScrambles get() = scrambles + extraScrambles
-
-    fun createPdf(globalTitle: String?, creationDate: LocalDate, versionTag: String, locale: Locale): PdfContent {
-        // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
-        // list of 333ni scrambles.
-        // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
-        // rather than 1 sheet per round (as we do with every other event).
-
-        // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
-        // to fix this, we pass the attempt number
-        if (event == "333mbf") {
-            val singleSheets = scrambles.mapIndexed { nthAttempt, scrambleStr ->
-                val scrambles = scrambleStr.split("\n")
-                val titleAttemptNum = if (attempt > 1) attempt else (nthAttempt + 1)
-
-                val attemptRequest = copy(
-                    scrambles = scrambles,
-                    extraScrambles = listOf(),
-                    title = "$title Attempt $titleAttemptNum",
-                    fmc = false,
-                    event = "333bf"
-                )
-
-                attemptRequest.createPdf(globalTitle, creationDate, versionTag, locale)
-            }
-
-            return MergedPdf(singleSheets)
-        }
-
-        assert(scrambles.isNotEmpty())
-
-        if (fmc) {
-            // We don't watermark the FMC sheets because they already have
-            // the competition name on them. So we encrypt directly.
-            return FmcSolutionSheet(this, globalTitle, locale)
-        }
-
-        val genericSheet = GeneralScrambleSheet(this, globalTitle) // encrypt when watermarking
-        return WatermarkPdfWrapper(genericSheet, title, creationDate, versionTag, globalTitle)
-    }
-
-    // register in cache to speed up overall generation process
-    fun getCachedPdf(globalTitle: String?, creationDate: LocalDate, versionTag: String, locale: Locale) =
-        PDF_CACHE.getOrPut(this) { createPdf(globalTitle, creationDate, versionTag, locale) }
+    val allScrambles: List<String>
+        get() = scrambles + extraScrambles
 
     companion object {
         private val MAX_COUNT = 100
@@ -153,13 +113,11 @@ data class ScrambleRequest(
             )
         }
 
-        private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
-
         fun requestsToZip(globalTitle: String?, generationDate: LocalDateTime, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: Competition?): ByteArray {
-            val bindings = wcifHelper?.computeBindings(scrambleRequests)
+            val bindings = wcifHelper?.copy(shortName = globalTitle ?: wcifHelper.shortName)?.computeBindings(scrambleRequests)
 
             val scrambleZip = ScrambleZip(scrambleRequests, bindings)
-            val zipFile = scrambleZip.assemble(globalTitle, generationDate, versionTag, password, generationUrl)
+            val zipFile = scrambleZip.assemble(generationDate, versionTag, password, generationUrl)
 
             return zipFile.compress(password)
         }

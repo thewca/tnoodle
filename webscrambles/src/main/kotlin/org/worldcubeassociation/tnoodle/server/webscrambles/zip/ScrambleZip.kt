@@ -11,6 +11,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.getCachedPdf
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.toUniqueTitles
 import java.time.LocalDate
@@ -19,8 +20,9 @@ import java.time.Period
 
 data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBindings: WCIFRequestBinding?) {
     val uniqueTitles = scrambleRequests.toUniqueTitles()
+    val globalTitle = wcifBindings?.wcif?.shortName
 
-    fun assemble(globalTitle: String?, generationDate: LocalDateTime, versionTag: String, password: String?, generationUrl: String?): ZipArchive {
+    fun assemble(generationDate: LocalDateTime, versionTag: String, password: String?, generationUrl: String?): ZipArchive {
         val safeGlobalTitle = globalTitle?.toFileSafeString()
 
         val computerDisplayZip = ComputerDisplayZip(scrambleRequests)
@@ -35,19 +37,19 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
             .replace("%%PASSCODES%%", passcodeList)
 
         return zipArchive {
-            printingFolder(globalTitle, generationDate.toLocalDate(), versionTag, password)
-            interchangeFolder(globalTitle, generationDate, versionTag, generationUrl)
+            printingFolder(generationDate.toLocalDate(), versionTag, password)
+            interchangeFolder(generationDate, versionTag, generationUrl)
 
             file("$safeGlobalTitle - Computer Display PDFs.zip", computerDisplayZipBytes.compress())
             file("$safeGlobalTitle - Computer Display PDF Passcodes - SECRET.txt", passcodeListingTxt)
         }
     }
 
-    fun FolderBuilder.interchangeFolder(globalTitle: String?, generationDate: LocalDateTime, versionTag: String, generationUrl: String?) {
+    fun FolderBuilder.interchangeFolder(generationDate: LocalDateTime, versionTag: String, generationUrl: String?) {
         val safeGlobalTitle = globalTitle?.toFileSafeString()
 
         val jsonInterchangeData = ZipInterchangeInfo(scrambleRequests, globalTitle, versionTag, generationDate, generationUrl, wcifBindings?.wcif?.schedule)
-        val jsonStr = JsonConfig.SERIALIZER.stringify(ZipInterchangeInfo.serializer(), jsonInterchangeData)
+        val jsonStr = JsonConfig[JsonConfig.SERIALIZER_TNOODLE].stringify(ZipInterchangeInfo.serializer(), jsonInterchangeData)
 
         val jsonpFileName = "$safeGlobalTitle.jsonp"
         val jsonpStr = "var SCRAMBLES_JSON = $jsonStr;"
@@ -69,7 +71,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
         }
     }
 
-    fun FolderBuilder.printingFolder(globalTitle: String?, generationDate: LocalDate, versionTag: String, password: String?) {
+    fun FolderBuilder.printingFolder(generationDate: LocalDate, versionTag: String, password: String?) {
         val safeGlobalTitle = globalTitle?.toFileSafeString()
 
         val fmcRequests = uniqueTitles.filterValues { it.fmc }
