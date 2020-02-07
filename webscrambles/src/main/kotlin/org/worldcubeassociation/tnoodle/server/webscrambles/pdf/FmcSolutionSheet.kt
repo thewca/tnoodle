@@ -5,27 +5,28 @@ import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
-import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.fitAndShowText
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, locale: Locale) : FmcSheet(request, globalTitle, locale) {
+open class FmcSolutionSheet(wcif: Competition, activity: Activity, locale: Locale) : FmcSheet(wcif, activity, locale) {
     override fun PdfWriter.writeContents(document: Document) {
-        for (i in scrambleRequest.scrambles.indices) {
-            addFmcSolutionSheet(document, scrambleRequest, title, i, locale)
+        for (i in scrambleSet.scrambles.indices) {
+            addFmcSolutionSheet(document, title, i, locale)
             document.newPage()
         }
     }
 
-    protected fun PdfWriter.addFmcSolutionSheet(doc: Document, scrambleRequest: ScrambleRequest, globalTitle: String?, index: Int, locale: Locale) {
+    protected fun PdfWriter.addFmcSolutionSheet(doc: Document, globalTitle: String?, index: Int, locale: Locale) {
         val withScramble = index != -1
         val pageSize = doc.pageSize
 
@@ -116,7 +117,8 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         cb.stroke()
 
         if (withScramble) {
-            val scramble = scrambleRequest.scrambles[index]
+            val scrambleModel = scrambleSet.scrambles[index]
+            val scramble = scrambleModel.allScrambleStrings.single()
 
             cb.beginText()
             val scrambleStr = Translate.translate("fmc.scramble", locale) + ": " + scramble
@@ -136,8 +138,8 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
             val availableScrambleWidth = right - competitorInfoLeft
             val availableScrambleHeight = gradeBottom - scrambleBorderTop
 
-            val dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth - 2, availableScrambleHeight - 2)
-            val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
+            val dim = scramblingPuzzle.getPreferredSize(availableScrambleWidth - 2, availableScrambleHeight - 2)
+            val svg = scramblingPuzzle.drawScramble(scramble, null)
             val tp = cb.renderSvgToPDF(svg, dim)
 
             cb.addImage(Image.getInstance(tp), dim.width.toFloat(), 0f, 0f, dim.height.toFloat(), (competitorInfoLeft + (availableScrambleWidth - dim.width) / 2).toFloat(), (scrambleBorderTop + (availableScrambleHeight - dim.height) / 2).toFloat())
@@ -146,7 +148,7 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
         val fontSize = 15f
         val font = Font(bf, fontSize)
         val margin = 5
-        val showScrambleCount = withScramble && (scrambleRequest.scrambles.size > 1 || scrambleRequest.totalAttempt > 1)
+        val showScrambleCount = withScramble && (scrambleSet.scrambles.size > 1 || activity.activityCode.attemptNumber != null)
         val titleFontSize = 25f
         val titleFont = Font(bf, titleFontSize)
         val rulesHeight = height / 6
@@ -163,14 +165,14 @@ open class FmcSolutionSheet(request: ScrambleRequest, globalTitle: String?, loca
 
         if (withScramble) {
             personalDetailsItems.add(globalTitle!! to Element.ALIGN_CENTER)
-            personalDetailsItems.add(scrambleRequest.title to Element.ALIGN_CENTER)
+            personalDetailsItems.add(title.orEmpty() to Element.ALIGN_CENTER) // FIXME WCIF what is the difference to scrReq title?
 
             if (showScrambleCount) {
                 // this is for ordered scrambles
-                val attemptIndex = scrambleRequest.takeIf { it.totalAttempt > 1 }?.attempt ?: index
+                val attemptIndex = activity.activityCode.attemptNumber ?: index
                 val orderedIndex = max(attemptIndex, index + 1)
 
-                val absoluteTotal = scrambleRequest.totalAttempt.takeIf { it > 1 } ?: scrambleRequest.scrambles.size
+                val absoluteTotal = currentRound.expectedAttemptNum
 
                 val substitutions = mapOf(
                     "scrambleIndex" to orderedIndex.toString(),

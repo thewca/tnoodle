@@ -5,7 +5,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStri
 
 @Serializable
 data class Scramble(val scrambleString: String) {
-    val allScrambles: List<String>
+    val allScrambleStrings: List<String>
         get() = scrambleString.split(WCIF_NEWLINE_CHAR)
 
     @Serializer(forClass = Scramble::class)

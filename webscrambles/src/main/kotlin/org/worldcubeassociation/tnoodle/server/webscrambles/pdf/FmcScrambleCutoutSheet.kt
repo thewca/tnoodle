@@ -2,24 +2,26 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfWriter
-import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.drawDashedLine
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 
-class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?) : FmcSheet(request, globalTitle) {
+class FmcScrambleCutoutSheet(wcif: Competition, activity: Activity) : FmcSheet(wcif, activity) {
     override fun PdfWriter.writeContents(document: Document) {
-        for (i in scrambleRequest.scrambles.indices) {
-            addFmcScrambleCutoutSheet(document, scrambleRequest, title, i)
+        for (i in scrambleSet.scrambles.indices) {
+            addFmcScrambleCutoutSheet(document, title, i)
             document.newPage()
         }
     }
 
-    private fun PdfWriter.addFmcScrambleCutoutSheet(document: Document, scrambleRequest: ScrambleRequest, globalTitle: String?, index: Int) {
+    private fun PdfWriter.addFmcScrambleCutoutSheet(document: Document, globalTitle: String?, index: Int) {
         val pageSize = document.pageSize
-        val scramble = scrambleRequest.scrambles[index]
+        val scrambleModel = scrambleSet.scrambles[index]
+        val scramble = scrambleModel.allScrambleStrings.single() // we assume FMC only has one scramble
 
         val right = (pageSize.width - LEFT).toInt()
         val top = (pageSize.height - BOTTOM).toInt()
@@ -32,15 +34,15 @@ class FmcScrambleCutoutSheet(request: ScrambleRequest, globalTitle: String?) : F
         val availableScrambleWidth = (width * .45).toInt()
         val availablePaddedScrambleHeight = availableScrambleHeight - 2 * SCRAMBLE_IMAGE_PADDING
 
-        val dim = scrambleRequest.scrambler.getPreferredSize(availableScrambleWidth, availablePaddedScrambleHeight)
-        val svg = scrambleRequest.scrambler.drawScramble(scramble, scrambleRequest.colorScheme)
+        val dim = scramblingPuzzle.getPreferredSize(availableScrambleWidth, availablePaddedScrambleHeight)
+        val svg = scramblingPuzzle.drawScramble(scramble, null)
 
         val tp = directContent.renderSvgToPDF(svg, dim)
 
-        val scrambleSuffix = " - Scramble ${index + 1} of ${scrambleRequest.scrambles.size}"
-            .takeIf { scrambleRequest.scrambles.size > 1 } ?: ""
+        val scrambleSuffix = " - Scramble ${index + 1} of ${currentRound.expectedAttemptNum}"
+            .takeIf { currentRound.expectedAttemptNum > 1 } ?: ""
 
-        val title = "$globalTitle - ${scrambleRequest.title}$scrambleSuffix"
+        val title = "$globalTitle - ${title}$scrambleSuffix" // FIXME WCIF this was scrRequest title before -- discern!!
 
         // empty strings for space above and below
         val textList = listOf("", title, scramble, "")
