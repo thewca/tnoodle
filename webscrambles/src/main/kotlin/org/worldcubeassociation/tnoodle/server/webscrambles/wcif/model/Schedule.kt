@@ -1,5 +1,9 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Serializable
 data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
     val earliestActivity: Activity
         get() = activitiesWithLocalStartTimes
@@ -7,11 +11,13 @@ data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
             ?.key
             ?: error("I could not find the earliest activity")
 
+    @Transient
     val allActivities = venues
         .flatMap { it.rooms }
         .flatMap { it.activities }
         .flatMap { it.nestedChildActivities } // FIXME do we want this w/ legacy?
 
+    @Transient
     val activitiesWithLocalStartTimes = venues
         .associateWith { it.rooms }
         .mapValues { it.value.flatMap(Room::activities) }
