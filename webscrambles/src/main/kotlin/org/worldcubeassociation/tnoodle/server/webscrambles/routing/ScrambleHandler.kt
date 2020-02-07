@@ -15,14 +15,14 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameA
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
     override fun install(router: Routing) {
         router.get("/scramble/{filename}") {
             val filename = call.parameters["filename"]!!
 
-            val generationDate = LocalDate.now()
+            val generationDate = LocalDateTime.now()
 
             val queryStr = call.request.uri.substringAfter('?', "")
             val query = parseQuery(queryStr).toMutableMap()
@@ -72,7 +72,7 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                 }
                 "json" -> call.respond(scrambleRequests)
                 "pdf" -> {
-                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate, environmentConfig.projectTitle, scrambleRequests)
+                    val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(title, generationDate.toLocalDate(), environmentConfig.projectTitle, scrambleRequests)
                     call.response.header("Content-Disposition", "inline")
 
                     // Workaround for Chrome bug with saving PDFs:
