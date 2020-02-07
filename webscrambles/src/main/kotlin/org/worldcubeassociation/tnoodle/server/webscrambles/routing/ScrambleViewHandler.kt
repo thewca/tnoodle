@@ -141,7 +141,7 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                 val query = parseQuery(body)
 
                 val reqRaw = query.getValue("sheets")
-                val scrambleRequests = JsonConfig.SERIALIZER.parse(ScrambleRequest.serializer().list, reqRaw)
+                val scrambleRequests = JsonConfig[JsonConfig.SERIALIZER_TNOODLE].parse(ScrambleRequest.serializer().list, reqRaw)
                 val password = query["password"]
 
                 val generationDate = LocalDateTime.now()
