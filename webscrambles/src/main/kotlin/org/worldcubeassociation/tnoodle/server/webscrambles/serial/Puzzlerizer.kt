@@ -6,13 +6,19 @@ import net.gnehzr.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 
 @Serializer(forClass = Puzzle::class)
-object Puzzlerizer : SingletonStringEncoder<Puzzle>("Puzzle") {
-    override fun encodeInstance(instance: Puzzle) = instance.shortName
+object Puzzlerizer : KSerializer<Puzzle> {
+    override val descriptor: SerialDescriptor
+        get() = StringDescriptor.withName("Puzzle")
 
-    override fun makeInstance(deserialized: String): Puzzle {
+    override fun deserialize(decoder: Decoder): Puzzle {
         val scramblers = PuzzlePlugins.PUZZLES
+        val deserialized = decoder.decodeString()
 
         return scramblers[deserialized]?.value
             ?: error("$deserialized not found in: ${scramblers.keys}")
+    }
+
+    override fun serialize(encoder: Encoder, obj: Puzzle) {
+        encoder.encodeString(obj.shortName)
     }
 }
