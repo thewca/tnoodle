@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
-import kotlinx.serialization.json.Json
 import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle
+import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcGenericSolutionSheet
@@ -47,7 +47,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
         val safeGlobalTitle = globalTitle?.toFileSafeString()
 
         val jsonInterchangeData = ZipInterchangeInfo(scrambleRequests, globalTitle, versionTag, generationDate, generationUrl, wcifBindings?.wcif?.schedule)
-        val jsonStr = Json.stringify(ZipInterchangeInfo.serializer(), jsonInterchangeData)
+        val jsonStr = JsonConfig.SERIALIZER.stringify(ZipInterchangeInfo.serializer(), jsonInterchangeData)
 
         val jsonpFileName = "$safeGlobalTitle.jsonp"
         val jsonpStr = "var SCRAMBLES_JSON = $jsonStr;"
