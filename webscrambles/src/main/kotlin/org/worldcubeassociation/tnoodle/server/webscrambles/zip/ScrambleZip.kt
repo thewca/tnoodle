@@ -14,16 +14,17 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBind
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.toUniqueTitles
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.Period
 
 data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBindings: WCIFRequestBinding?) {
     val uniqueTitles = scrambleRequests.toUniqueTitles()
 
-    fun assemble(globalTitle: String?, generationDate: LocalDate, versionTag: String, password: String?, generationUrl: String?): ZipArchive {
+    fun assemble(globalTitle: String?, generationDate: LocalDateTime, versionTag: String, password: String?, generationUrl: String?): ZipArchive {
         val safeGlobalTitle = globalTitle?.toFileSafeString()
 
         val computerDisplayZip = ComputerDisplayZip(scrambleRequests)
-        val computerDisplayZipBytes = computerDisplayZip.assemble(globalTitle, generationDate, versionTag)
+        val computerDisplayZipBytes = computerDisplayZip.assemble(globalTitle, generationDate.toLocalDate(), versionTag)
 
         val passcodeList = computerDisplayZip.passcodes.entries
             .joinToString("\r\n") { "${it.key}: ${it.value}" }
@@ -34,7 +35,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
             .replace("%%PASSCODES%%", passcodeList)
 
         return zipArchive {
-            printingFolder(globalTitle, generationDate, versionTag, password)
+            printingFolder(globalTitle, generationDate.toLocalDate(), versionTag, password)
             interchangeFolder(globalTitle, generationDate, versionTag, generationUrl)
 
             file("$safeGlobalTitle - Computer Display PDFs.zip", computerDisplayZipBytes.compress())
@@ -42,7 +43,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
         }
     }
 
-    fun FolderBuilder.interchangeFolder(globalTitle: String?, generationDate: LocalDate, versionTag: String, generationUrl: String?) {
+    fun FolderBuilder.interchangeFolder(globalTitle: String?, generationDate: LocalDateTime, versionTag: String, generationUrl: String?) {
         val safeGlobalTitle = globalTitle?.toFileSafeString()
 
         val jsonInterchangeData = ZipInterchangeInfo(scrambleRequests, globalTitle, versionTag, generationDate, generationUrl, wcifBindings?.wcif?.schedule)

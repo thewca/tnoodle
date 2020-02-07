@@ -14,6 +14,7 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.math.min
 import net.gnehzr.tnoodle.svglite.Color
+import java.time.LocalDateTime
 
 @Serializable
 data class ScrambleRequest(
@@ -154,7 +155,7 @@ data class ScrambleRequest(
 
         private val PDF_CACHE = mutableMapOf<ScrambleRequest, PdfContent>()
 
-        fun requestsToZip(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIF?): ByteArray {
+        fun requestsToZip(globalTitle: String?, generationDate: LocalDateTime, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: WCIF?): ByteArray {
             val bindings = wcifHelper?.computeBindings(scrambleRequests)
 
             val scrambleZip = ScrambleZip(scrambleRequests, bindings)

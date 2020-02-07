@@ -31,7 +31,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.imageio.ImageIO
 
 class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
@@ -137,11 +137,11 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                 val scrambleRequests = Json.parse(ScrambleRequest.serializer().list, reqRaw)
                 val password = query["password"]
 
-                val generationDate = LocalDate.now()
+                val generationDate = LocalDateTime.now()
 
                 when (extension) {
                     "pdf" -> {
-                        val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(name, generationDate, environmentConfig.projectTitle, scrambleRequests)
+                        val totalPdfOutput = ScrambleRequest.requestsToCompletePdf(name, generationDate.toLocalDate(), environmentConfig.projectTitle, scrambleRequests)
 
                         call.response.header("Content-Disposition", "inline")
 
