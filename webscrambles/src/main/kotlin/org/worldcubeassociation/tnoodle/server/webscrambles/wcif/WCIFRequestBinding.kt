@@ -2,16 +2,13 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Event
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.WCIF
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import kotlin.math.*
 
-data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<Activity, List<ScrambleRequest>>) {
+data class WCIFRequestBinding(val wcif: Competition, val activityScrambleRequests: Map<Activity, List<ScrambleRequest>>) {
     companion object {
-        // Currently, we mark not cubing related activities as other-lunch or other-speech, for example.
-        // If we ever accept any other such ignorable key, it should be added here.
-        private val WCIF_IGNORABLE_KEYS = listOf("other")
-
         private val EVENT_MAPPING = mapOf(
             "333bf" to "333ni",
             "333oh" to "333",
@@ -25,14 +22,14 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
             "m" to 3
         )
 
-        fun WCIF.computeBindings(allScrambleRequests: List<ScrambleRequest>): WCIFRequestBinding {
+        fun Competition.computeBindings(allScrambleRequests: List<ScrambleRequest>): WCIFRequestBinding {
             val index = schedule.allActivities
                 .associateWith { allScrambleRequests.filterForActivity(it) }
 
             return WCIFRequestBinding(this, index)
         }
 
-        fun WCIF.generateBindings(title: String): WCIFRequestBinding {
+        fun Competition.generateBindings(title: String): WCIFRequestBinding {
             val index = schedule.allActivities
                 .associateWith { it.createScrambleRequest(title, events) }
                 .mapValues { listOfNotNull(it.value) }
@@ -43,7 +40,7 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
         fun List<ScrambleRequest>.filterForActivity(activity: Activity): List<ScrambleRequest> {
             val event = activity.readEventCode()
 
-            if (event in WCIF_IGNORABLE_KEYS) {
+            if (event in ActivityCode.IGNORABLE_KEYS) {
                 return emptyList()
             }
 
@@ -93,7 +90,7 @@ data class WCIFRequestBinding(val wcif: WCIF, val activityScrambleRequests: Map<
             val eventString = readEventCode()
             val puzzleString = EVENT_MAPPING[eventString] ?: eventString
 
-            if (puzzleString in WCIF_IGNORABLE_KEYS) {
+            if (puzzleString in ActivityCode.IGNORABLE_KEYS) {
                 return null
             }
 
