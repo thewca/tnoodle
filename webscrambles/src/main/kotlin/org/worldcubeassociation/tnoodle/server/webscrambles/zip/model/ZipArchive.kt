@@ -9,7 +9,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import java.io.ByteArrayOutputStream
 
-class ZipArchive(val entries: List<ZipNode>) {
+class ZipArchive(private val entries: List<ZipNode>) {
     val allFiles: List<File>
         get() = Folder.flattenFiles(entries)
 
