@@ -2,105 +2,145 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
-import kotlin.math.*
 
 object WCIFBindingGenerator {
-    private val EVENT_MAPPING = mapOf(
-        "333bf" to "333ni",
-        "333oh" to "333",
-        "444bf" to "444ni",
-        "555bf" to "555ni",
-        "333mbf" to "333ni"
-    )
-
-    private val FORMAT_SCRAMBLE_COUNTS = mapOf(
-        "a" to 5,
-        "m" to 3
-    )
+    const val PSEUDO_ID = "%%pseudoGen"
 
     fun requestsToPseudoWCIF(requests: List<ScrambleRequest>): Competition {
-        return Competition("1.0", "pseudoGen", "Pseudo-generated scrambleReq conversion", "Pseudo conversion", emptyList(), Schedule.EMPTY)
+        val rounds = requests.groupBy { it.event to it.round }
+            .map { (k, it) ->
+                val roundId = "${k.first}-r${k.second}"
+
+                val avgScrambleSetSize = it.map { scr -> scr.scrambles.size }.average().toInt()
+                val format = guessRoundFormat(avgScrambleSetSize, k.first)
+
+                val scrambleSets = it.map { scr ->
+                    ScrambleSet(
+                        42, // dummy ID -- indexed separately down below
+                        scr.scrambles.map(::Scramble),
+                        scr.extraScrambles.map(::Scramble),
+                        listOf(FmcExtension(scr.fmc))
+                    )
+                }
+
+                Round(roundId, format, it.size, scrambleSets)
+            }
+
+        val events = rounds.groupBy { it.idCode.eventId }
+            .map { Event(it.key, it.value) }
+
+        val indexEvents = reindexScrambleSets(events)
+        val name = requests.map { it.title }.random()
+
+        return Competition("1.0", PSEUDO_ID, name, name, indexEvents, Schedule.EMPTY)
     }
 
     fun fillScrambleSets(wcif: Competition): Competition {
-        return wcif // FIXME WCIF
-    }
+        val scrambledEvents = wcif.events.map { e ->
+            val scrambledRounds = e.rounds.map { r -> scrambleRound(r) }
 
-    fun List<ScrambleRequest>.filterForActivity(activity: Activity): List<ScrambleRequest> {
-        val event = activity.activityCode.eventId
-
-        if (event in ActivityCode.IGNORABLE_KEYS) {
-            return emptyList()
+            e.copy(rounds = scrambledRounds)
         }
 
-        // This part assumes every round, group and attempt is labeled with an integer from competitionJson
-        val round = activity.activityCode.roundNumber ?: 0
-        val group = activity.activityCode.groupNumber ?: 0
-        val attempt = activity.activityCode.attemptNumber ?: 0
+        val indexedEvents = reindexScrambleSets(scrambledEvents)
+        val scrambled = wcif.copy(events = indexedEvents)
 
-        // First, we add all requests whose events equals what we need
-        val matchingRequests = filter { it.event == event }
-            // Then, we start removing, depending on the defined details.
-            .filter { round <= 0 || it.round == round }
-            .filter { group <= 0 || it.group.orEmpty().toNumericalIndex() == group }
-
-        val mappedRequests = matchingRequests.map { request ->
-            request.takeUnless { attempt > 0 }
-                ?: request.copyForAttempt(attempt)
-        }
-
-        return mappedRequests.takeIf { it.isNotEmpty() }
-            ?: error("An activity of the schedule did not match an event.")
+        return matchActivities(scrambled)
     }
 
-    fun ScrambleRequest.copyForAttempt(targetAttempt: Int) =
-        copy(
-            scrambles = listOf(scrambles[targetAttempt - 1]),
-            attempt = targetAttempt,
-            totalAttempt = scrambles.size // useful for FMC
-        )
+    private fun reindexScrambleSets(events: List<Event>): List<Event> {
+        val indexTable = events.flatMap { it.rounds }
+            .flatMap { it.scrambleSets }
+            .withIndex()
+            .associateWith { it.index }
+            .mapKeys { it.key.value }
 
-    fun Activity.createScrambleRequest(title: String, events: List<Event>, copies: Int = 1): ScrambleRequest? {
-        val eventString = activityCode.eventId
-        val puzzleString = EVENT_MAPPING[eventString] ?: eventString
+        return events.map { e ->
+            val reindexedRounds = e.rounds.map { r ->
+                val reindexedScrambleSets = r.scrambleSets.map { s ->
+                    val reIndex = indexTable.getValue(s)
 
-        if (puzzleString in ActivityCode.IGNORABLE_KEYS) {
-            return null
-        }
+                    s.copy(id = reIndex)
+                }
 
-        val isFmc = "fm" in eventString
+                r.copy(scrambleSets = reindexedScrambleSets)
+            }
 
-        val matchingEvent = events.find { eventString == it.id }
-            ?: error("No maching event in WCIF was found for $activityCode")
-
-        val matchingRound = matchingEvent.rounds.find { it.idCode.isParentOf(activityCode) }
-            ?: error("No matching round in WCIF was found for $activityCode")
-
-        val scrambleCount = matchingRound.format.toIntOrNull()
-            ?: FORMAT_SCRAMBLE_COUNTS[matchingRound.format]
-            ?: error("Unable to determine preferred number of scrambles for format ${matchingRound.format}")
-
-        val parsedRequest = ScrambleRequest.parseScrambleRequest(title, "$puzzleString*$scrambleCount*$copies", null)
-            .copy(event = eventString, fmc = isFmc)
-
-        val round = activityCode.roundNumber ?: parsedRequest.round
-        val group = activityCode.groupNumber?.toColumnIndexString() ?: parsedRequest.group
-        val attempt = activityCode.attemptNumber ?: parsedRequest.attempt
-
-        return parsedRequest.copy(round = round, group = group, attempt = attempt)
-    }
-
-    fun String.toNumericalIndex(): Int {
-        return reversed().withIndex().sumBy { (i, c) ->
-            (c - ('A' - 1)) * (26f.pow(i).toInt())
+            e.copy(rounds = reindexedRounds)
         }
     }
 
-    fun Int.toColumnIndexString(): String {
-        val iterLength = max(1, ceil(log(this.toFloat(), 26f)).roundToInt())
+    private fun scrambleRound(round: Round): Round {
+        val scrambles = List(round.scrambleSetCount) { generateScrambleSet(round) }
 
-        return List(iterLength) {
-            ('A' - 1) + ((this / 26f.pow(it).toInt()) % 26)
-        }.joinToString("").reversed()
+        return round.copy(scrambleSets = scrambles)
+    }
+
+    private fun generateScrambleSet(round: Round): ScrambleSet {
+        val puzzle = round.loadScrambler()
+
+        val scrambles = puzzle.generateScrambles(round.expectedAttemptNum).asList().map { Scramble(it) }
+
+        val extraScrambleNum = round.extensions.findExtension<ExtraScrambleCountExtension>()?.data
+            ?: defaultExtraCount(round.idCode.eventId)
+        val extraScrambles = puzzle.generateScrambles(extraScrambleNum).asList().map { Scramble(it) }
+
+        // FIXME WCIF extensions
+        // dummy ID -- indexing happens afterwards
+        return ScrambleSet(42, scrambles, extraScrambles)
+    }
+
+    private fun defaultExtraCount(eventId: String): Int {
+        return when (eventId) {
+            "333mbf", "333fm" -> 0
+            else -> 2
+        }
+    }
+
+    private fun guessRoundFormat(numScrambles: Int, eventId: String): String {
+        return when (numScrambles) {
+            1, 2 -> numScrambles.toString()
+            3 -> when (eventId) {
+                "333fm", "333bf" -> "m"
+                else -> "3"
+            }
+            else -> "a"
+        }
+    }
+
+    fun matchActivities(wcif: Competition): Competition {
+        val matchedVenues = wcif.schedule.venues.map { v ->
+            val matchedRooms = v.rooms.map { r ->
+                val matchedActivities = r.activities.map { a ->
+                    matchActivity(a, wcif)
+                }
+
+                r.copy(activities = matchedActivities)
+            }
+
+            v.copy(rooms = matchedRooms)
+        }
+
+        val matchedSchedule = wcif.schedule.copy(venues = matchedVenues)
+        return wcif.copy(schedule = matchedSchedule)
+    }
+
+    private fun matchActivity(activity: Activity, wcif: Competition): Activity {
+        val matchedId = findScrambleSetId(wcif, activity)
+        val matchedChildren = activity.childActivities.map { matchActivity(it, wcif) }
+
+        return activity.copy(scrambleSetId = matchedId, childActivities = matchedChildren)
+    }
+
+    private fun findScrambleSetId(wcif: Competition, activity: Activity): Int {
+        val matchingSets = wcif.events
+            .filter { it.id == activity.activityCode.eventId }
+            .flatMap { it.rounds }
+            .find { it.idCode.isParentOf(activity.activityCode) }
+            ?.scrambleSets ?: error("An activity of the schedule did not match an event.")
+
+        val groupNumber = activity.activityCode.groupNumber ?: error("Trying to match an Activity that has no group!")
+
+        return matchingSets[groupNumber].id
     }
 }
