@@ -9,18 +9,14 @@ import net.gnehzr.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleInfoJsonData
 
 object PuzzleListHandler : RouteHandler {
-    private fun getPuzzleInfo(scrambler: Puzzle, includeStatus: Boolean): Map<String, Any?> {
-        val nameData = mapOf(
-            "shortName" to scrambler.shortName,
-            "longName" to PuzzlePlugins.getScramblerLongName(scrambler.shortName)
-        )
+    private fun getPuzzleInfo(scrambler: Puzzle, includeStatus: Boolean): PuzzleInfoJsonData {
+        val nameData = PuzzleInfoJsonData(scrambler.shortName, PuzzlePlugins.getScramblerLongName(scrambler.shortName))
 
         if (includeStatus) {
-            return nameData + mapOf(
-                "initializationStatus" to scrambler.initializationStatus
-            )
+            return nameData.copy(initializationStatus = scrambler.initializationStatus)
         }
 
         return nameData
