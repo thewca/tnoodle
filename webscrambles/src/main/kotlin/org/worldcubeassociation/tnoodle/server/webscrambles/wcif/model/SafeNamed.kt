@@ -1,7 +1,9 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
+import kotlinx.serialization.Serializable
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 
+@Serializable
 abstract class SafeNamed(val unsafeName: String) {
     val safeName: String
         get() = parseMarkdown(unsafeName)

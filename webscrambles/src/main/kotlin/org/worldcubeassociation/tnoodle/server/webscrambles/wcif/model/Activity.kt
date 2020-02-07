@@ -1,8 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
+import kotlinx.serialization.Serializable
 import java.time.ZoneId
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.parseWCIFDateWithTimezone
 
+@Serializable
 data class Activity(val activityCode: String, val startTime: String, val childActivities: List<Activity> = emptyList()) {
     val nestedChildActivities: List<Activity>
         get() = childActivities.takeUnless { it.isEmpty() }
