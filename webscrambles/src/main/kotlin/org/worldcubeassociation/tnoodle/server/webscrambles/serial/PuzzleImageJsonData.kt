@@ -4,7 +4,10 @@ import kotlinx.serialization.Serializable
 import net.gnehzr.tnoodle.svglite.Color
 
 @Serializable
-data class PuzzleImageJsonData(val size: DimensionJsonData, val colorScheme: Map<String, @Serializable(with = Colorizer::class) Color>)
+data class PuzzleImageJsonData(
+    val size: DimensionJsonData,
+    val colorScheme: Map<String, @Serializable(with = Colorizer::class) Color>
+)
 
 @Serializable
 data class DimensionJsonData(val width: Int, val height: Int)

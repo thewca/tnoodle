@@ -28,6 +28,8 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameA
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.DimensionJsonData
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleImageJsonData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
@@ -115,7 +117,12 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                         call.respondText(svg.toString(), ContentType.Image.SVG)
                     }
                     "json" -> {
-                        call.respond(PuzzleImageInfo(scrambler))
+                        val obj = PuzzleImageInfo(scrambler)
+
+                        val dim = DimensionJsonData(obj.size.width, obj.size.height)
+                        val jsonData = PuzzleImageJsonData(dim, obj.colorScheme)
+
+                        call.respond(jsonData)
                     }
                     else -> call.respondText("Invalid extension: $extension")
                 }

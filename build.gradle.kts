@@ -117,6 +117,10 @@ tasks.create("generateDebugRelease") {
     dependsOn(":webscrambles:shadowJar")
 }
 
+tasks.create("startDebugServer") {
+    dependsOn(":webscrambles:runShadow")
+}
+
 tasks.create("deployToCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineDeploy")
 }
