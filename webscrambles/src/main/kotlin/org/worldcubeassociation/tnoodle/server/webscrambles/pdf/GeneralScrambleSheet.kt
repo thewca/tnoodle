@@ -11,12 +11,10 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil.splitToLineChunks
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Scramble
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import kotlin.math.min
 
-class GeneralScrambleSheet(wcif: Competition, activity: Activity) : BaseScrambleSheet(wcif, activity) {
+class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode) : BaseScrambleSheet(scrambleSet, activityCode) {
     override fun PdfWriter.writeContents(document: Document) {
         val pageSize = document.pageSize
 
