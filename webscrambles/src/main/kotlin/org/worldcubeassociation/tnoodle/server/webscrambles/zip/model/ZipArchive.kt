@@ -5,7 +5,6 @@ import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.CompressionMethod
 import net.lingala.zip4j.model.enums.EncryptionMethod
-import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import java.io.ByteArrayOutputStream
 
@@ -65,9 +64,9 @@ class ZipArchive(private val entries: List<ZipNode>) {
             return toUniqueTitle(seenTitles, suffixSalt + 1)
         }
 
-        fun List<ScrambleRequest>.toUniqueTitles(): Map<String, ScrambleRequest> {
+        fun <T> List<T>.withUniqueTitles(titleGen: (T) -> String = { it.toString() }): Map<String, T> {
             return fold(emptyMap()) { acc, req ->
-                val fileTitle = req.title.toFileSafeString()
+                val fileTitle = titleGen(req).toFileSafeString()
                 val safeTitle = fileTitle.toUniqueTitle(acc.keys)
 
                 acc + (safeTitle to req)

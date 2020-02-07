@@ -1,39 +1,47 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
-import net.gnehzr.tnoodle.puzzle.ThreeByThreeCubePuzzle
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
-import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcGenericSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcScrambleCutoutSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.stripNewlines
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.getCachedPdf
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.toScrambleSetData
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.toUniqueTitles
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.withUniqueTitles
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 
-data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBindings: WCIFRequestBinding?) {
-    val uniqueTitles = scrambleRequests.toUniqueTitles()
-    val globalTitle = wcifBindings?.wcif?.shortName
+data class ScrambleZip(val wcif: Competition) {
+    val scrambleDrawingData = wcif.events.toScrambleSetData()
+    val uniqueTitles = scrambleDrawingData.withUniqueTitles()
+
+    val globalTitle = wcif.shortName // FIXME WCIF use long name?
+    val safeGlobalTitle = globalTitle.toFileSafeString()
+
+    val wcifBindings = wcif.schedule.allActivities
+        .associateWith { scrambleDrawingData.find { sdd -> sdd.scrambleSet.id == it.scrambleSetId } }
+
+    private fun Competition.hasSchedule(): Boolean = schedule.allActivities.isNotEmpty()
 
     fun assemble(generationDate: LocalDateTime, versionTag: String, password: String?, generationUrl: String?): ZipArchive {
-        val safeGlobalTitle = globalTitle?.toFileSafeString()
-
-        val computerDisplayZip = ComputerDisplayZip(scrambleRequests)
-        val computerDisplayZipBytes = computerDisplayZip.assemble(globalTitle, generationDate.toLocalDate(), versionTag)
+        val computerDisplayZip = ComputerDisplayZip(wcif)
+        val computerDisplayZipBytes = computerDisplayZip.assemble(generationDate.toLocalDate(), versionTag)
 
         val passcodeList = computerDisplayZip.passcodes.entries
             .joinToString("\r\n") { "${it.key}: ${it.value}" }
 
-        val passcodeListingTxt = ScrambleRequest::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
+        val passcodeListingTxt = this::class.java.getResourceAsStream(TXT_PASSCODE_TEMPLATE)
             .bufferedReader().readText()
-            .replace("%%GLOBAL_TITLE%%", globalTitle.orEmpty())
+            .replace("%%GLOBAL_TITLE%%", globalTitle)
             .replace("%%PASSCODES%%", passcodeList)
 
         return zipArchive {
@@ -46,21 +54,20 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
     }
 
     fun FolderBuilder.interchangeFolder(generationDate: LocalDateTime, versionTag: String, generationUrl: String?) {
-        val safeGlobalTitle = globalTitle?.toFileSafeString()
-
-        val jsonInterchangeData = ZipInterchangeInfo(scrambleRequests, globalTitle, versionTag, generationDate, generationUrl, wcifBindings?.wcif?.schedule)
+        val jsonInterchangeData = ZipInterchangeInfo(globalTitle, versionTag, generationDate, generationUrl, wcif)
         val jsonStr = JsonConfig[JsonConfig.SERIALIZER_TNOODLE].stringify(ZipInterchangeInfo.serializer(), jsonInterchangeData)
 
         val jsonpFileName = "$safeGlobalTitle.jsonp"
         val jsonpStr = "var SCRAMBLES_JSON = $jsonStr;"
 
-        val viewerResource = ScrambleRequest::class.java.getResourceAsStream(HTML_SCRAMBLE_VIEWER).bufferedReader().readText()
+        val viewerResource = this::class.java.getResourceAsStream(HTML_SCRAMBLE_VIEWER).bufferedReader().readText()
             .replace("%SCRAMBLES_JSONP_FILENAME%", jsonpFileName)
 
         folder("Interchange") {
             folder("txt") {
                 for ((uniqueTitle, scrambleRequest) in uniqueTitles) {
-                    val txtScrambles = scrambleRequest.allScrambles.stripNewlines().joinToString("\r\n")
+                    val scrambleLines = scrambleRequest.scrambleSet.allScrambles.flatMap { it.allScrambleStrings }
+                    val txtScrambles = scrambleLines.stripNewlines().joinToString("\r\n")
                     file("$uniqueTitle.txt", txtScrambles)
                 }
             }
@@ -72,18 +79,16 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
     }
 
     fun FolderBuilder.printingFolder(generationDate: LocalDate, versionTag: String, password: String?) {
-        val safeGlobalTitle = globalTitle?.toFileSafeString()
+        val fmcRequests = uniqueTitles.filterValues { it.isFmc }
 
-        val fmcRequests = uniqueTitles.filterValues { it.fmc }
-
-        val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleRequest.empty(ThreeByThreeCubePuzzle()), globalTitle, Translate.DEFAULT_LOCALE)
-        val printingCompletePdf = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, scrambleRequests)
+        val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), ActivityCode("333fm-r1"), Translate.DEFAULT_LOCALE)
+        val printingCompletePdf = WCIFBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag)
 
         folder("Printing") {
             folder("Scramble Sets") {
                 for ((uniq, req) in uniqueTitles) {
                     // Without passcode, for printing
-                    val pdfPrintingByteStream = req.getCachedPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
+                    val pdfPrintingByteStream = req.getCachedPdf(generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
                     file("$uniq.pdf", pdfPrintingByteStream.render())
                 }
@@ -94,7 +99,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
                     file("3x3x3 Fewest Moves Solution Sheet.pdf", genericSolutionSheetPdf.render())
                     for ((uniq, req) in fmcRequests) {
                         val cutoutZipName = "$uniq - Scramble Cutout Sheet.pdf"
-                        val cutoutSheet = FmcScrambleCutoutSheet(req, globalTitle)
+                        val cutoutSheet = FmcScrambleCutoutSheet(req.scrambleSet, req.activityCode)
 
                         file(cutoutZipName, cutoutSheet.render(password))
 
@@ -103,10 +108,10 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
                                 val languageMarkerTitle = "${locale.toLanguageTag()}_$uniq"
 
                                 // fewest moves regular sheet
-                                val printingSheet = FmcSolutionSheet(req, globalTitle, locale)
+                                val printingSheet = FmcSolutionSheet(req.scrambleSet, req.activityCode, locale)
 
                                 // Generic sheet.
-                                val genericPrintingSheet = FmcGenericSolutionSheet(req, globalTitle, locale)
+                                val genericPrintingSheet = FmcGenericSolutionSheet(req.scrambleSet, req.activityCode, locale)
 
                                 file("$languageMarkerTitle.pdf", printingSheet.render(password))
                                 file("$languageMarkerTitle Solution Sheet.pdf", genericPrintingSheet.render(password))
@@ -116,7 +121,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
                 }
             }
 
-            if (wcifBindings != null) {
+            if (wcif.hasSchedule()) {
                 folder("Ordered Scrambles") {
                     orderedScramblesFolder(globalTitle, generationDate, versionTag)
                 }
@@ -129,11 +134,7 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
     }
 
     fun FolderBuilder.orderedScramblesFolder(globalTitle: String?, generationDate: LocalDate, versionTag: String) {
-        if (wcifBindings == null) {
-            return
-        }
-
-        val wcifSchedule = wcifBindings.wcif.schedule
+        val wcifSchedule = wcif.takeIf { it.hasSchedule() }?.schedule ?: return
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
             .map { it.value.dayOfYear }
@@ -168,10 +169,9 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
                     }
 
                 for ((nthDay, activities) in activitiesPerDay) {
-                    val scrambles = wcifBindings.activityScrambleRequests
-                        .filterKeys { it in activities }
+                    val scrambles = activities.associateWith { wcifBindings.getValue(it)!! } // FIXME WCIF
 
-                    val activitiesHaveScrambles = scrambles.values.any { it.isNotEmpty() }
+                    val activitiesHaveScrambles = scrambles.values.isNotEmpty()
 
                     if (activitiesHaveScrambles) {
                         val filenameDay = nthDay + 1
@@ -193,9 +193,9 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
 
                             val sortedScrambles = scrambles.entries
                                 .sortedBy { it.key.getLocalStartTime(timezone) }
-                                .flatMap { it.value }
+                                .map { it.value }
 
-                            val sheet = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, sortedScrambles)
+                            val sheet = WCIFBuilder.requestsToCompletePdf(sortedScrambles, generationDate, versionTag)
                             file(pdfFileName, sheet.render())
                         }
                     }
@@ -206,10 +206,10 @@ data class ScrambleZip(val scrambleRequests: List<ScrambleRequest>, val wcifBind
         // Generate all scrambles ordered
         val allScramblesOrdered = wcifSchedule.activitiesWithLocalStartTimes.entries
             .sortedBy { it.value }
-            .flatMap { wcifBindings.activityScrambleRequests[it.key].orEmpty() }
+            .mapNotNull { wcifBindings[it.key] } // FIXME WCIF
             .distinct()
 
-        val completeOrderedPdf = ScrambleRequest.requestsToCompletePdf(globalTitle, generationDate, versionTag, allScramblesOrdered)
+        val completeOrderedPdf = WCIFBuilder.requestsToCompletePdf(allScramblesOrdered, generationDate, versionTag)
 
         file("Ordered $globalTitle - All Scrambles.pdf", completeOrderedPdf.render())
     }

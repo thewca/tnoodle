@@ -7,10 +7,9 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 
-class FmcScrambleCutoutSheet(wcif: Competition, activity: Activity) : FmcSheet(wcif, activity) {
+class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode) : FmcSheet(scrambleSet, activityCode) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleSet.scrambles.indices) {
             addFmcScrambleCutoutSheet(document, title, i)
@@ -39,8 +38,8 @@ class FmcScrambleCutoutSheet(wcif: Competition, activity: Activity) : FmcSheet(w
 
         val tp = directContent.renderSvgToPDF(svg, dim)
 
-        val scrambleSuffix = " - Scramble ${index + 1} of ${currentRound.expectedAttemptNum}"
-            .takeIf { currentRound.expectedAttemptNum > 1 } ?: ""
+        val scrambleSuffix = " - Scramble ${index + 1} of ${expectedAttemptNum}"
+            .takeIf { expectedAttemptNum > 1 } ?: ""
 
         val title = "$globalTitle - ${title}$scrambleSuffix" // FIXME WCIF this was scrRequest title before -- discern!!
 

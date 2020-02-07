@@ -11,14 +11,13 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.populateRect
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Activity
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-open class FmcSolutionSheet(wcif: Competition, activity: Activity, locale: Locale) : FmcSheet(wcif, activity, locale) {
+open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, locale: Locale) : FmcSheet(scrambleSet, activityCode, locale) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleSet.scrambles.indices) {
             addFmcSolutionSheet(document, title, i, locale)
@@ -148,7 +147,7 @@ open class FmcSolutionSheet(wcif: Competition, activity: Activity, locale: Local
         val fontSize = 15f
         val font = Font(bf, fontSize)
         val margin = 5
-        val showScrambleCount = withScramble && (scrambleSet.scrambles.size > 1 || activity.activityCode.attemptNumber != null)
+        val showScrambleCount = withScramble && (scrambleSet.scrambles.size > 1 || activityCode.attemptNumber != null)
         val titleFontSize = 25f
         val titleFont = Font(bf, titleFontSize)
         val rulesHeight = height / 6
@@ -169,14 +168,12 @@ open class FmcSolutionSheet(wcif: Competition, activity: Activity, locale: Local
 
             if (showScrambleCount) {
                 // this is for ordered scrambles
-                val attemptIndex = activity.activityCode.attemptNumber ?: index
+                val attemptIndex = activityCode.attemptNumber ?: index
                 val orderedIndex = max(attemptIndex, index + 1)
-
-                val absoluteTotal = currentRound.expectedAttemptNum
 
                 val substitutions = mapOf(
                     "scrambleIndex" to orderedIndex.toString(),
-                    "scrambleCount" to absoluteTotal.toString()
+                    "scrambleCount" to expectedAttemptNum.toString()
                 )
 
                 val translatedInfo = Translate.translate("fmc.scrambleXofY", locale, substitutions)

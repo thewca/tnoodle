@@ -1,21 +1,14 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
+import kotlinx.serialization.Serializable
 import net.gnehzr.tnoodle.scrambles.Puzzle
 import net.gnehzr.tnoodle.scrambles.ScrambleCacher
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFRequestBinding.Companion.computeBindings
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.getCachedPdf
-import kotlinx.serialization.Serializable
+import net.gnehzr.tnoodle.svglite.Color
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Colorizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Puzzlerizer
 import java.net.URLDecoder
-import java.time.LocalDate
 import java.util.*
 import kotlin.math.min
-import net.gnehzr.tnoodle.svglite.Color
-import java.time.LocalDateTime
 
 @Serializable
 @Deprecated("Use WCIF instead.")
@@ -45,9 +38,6 @@ data class ScrambleRequest(
     val event: String,
     val round: Int
 ) {
-    val allScrambles: List<String>
-        get() = scrambles + extraScrambles
-
     companion object {
         private val MAX_COUNT = 100
         private val MAX_COPIES = 100
@@ -111,25 +101,6 @@ data class ScrambleRequest(
                 fmc = fmc,
                 colorScheme = colorScheme
             )
-        }
-
-        fun requestsToZip(globalTitle: String?, generationDate: LocalDateTime, versionTag: String, scrambleRequests: List<ScrambleRequest>, password: String?, generationUrl: String?, wcifHelper: Competition?): ByteArray {
-            val bindings = wcifHelper?.copy(shortName = globalTitle ?: wcifHelper.shortName)?.computeBindings(scrambleRequests)
-
-            val scrambleZip = ScrambleZip(scrambleRequests, bindings)
-            val zipFile = scrambleZip.assemble(generationDate, versionTag, password, generationUrl)
-
-            return zipFile.compress(password)
-        }
-
-        fun requestsToCompletePdf(globalTitle: String?, generationDate: LocalDate, versionTag: String, scrambleRequests: List<ScrambleRequest>): PdfContent {
-            val originalPdfs = scrambleRequests.map {
-                it.getCachedPdf(globalTitle, generationDate, versionTag, Translate.DEFAULT_LOCALE)
-            }
-
-            val configurations = scrambleRequests.map { Triple(it.title, it.scrambler.longName, it.copies) }
-
-            return MergedPdfWithOutline(originalPdfs, configurations, globalTitle)
         }
     }
 }
