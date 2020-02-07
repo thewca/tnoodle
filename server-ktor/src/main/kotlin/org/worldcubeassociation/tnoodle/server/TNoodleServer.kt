@@ -9,6 +9,7 @@ import io.ktor.server.engine.ShutDownUrl
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
+import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
 class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
@@ -31,7 +32,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         }
 
         app.install(ContentNegotiation) {
-            serialization()
+            serialization(json = JsonConfig.SERIALIZER)
         }
     }
 }
