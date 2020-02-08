@@ -8,7 +8,6 @@ data class Scramble(val scrambleString: String) {
     val allScrambleStrings: List<String>
         get() = scrambleString.split(WCIF_NEWLINE_CHAR)
 
-    @Serializer(forClass = Scramble::class)
     companion object : SingletonStringEncoder<Scramble>("Scramble") {
         const val WCIF_NEWLINE_CHAR = "\n"
 
