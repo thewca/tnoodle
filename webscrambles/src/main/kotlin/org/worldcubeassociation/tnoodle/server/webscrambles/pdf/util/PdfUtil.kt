@@ -142,7 +142,7 @@ object PdfUtil {
         // as argument instead of asking leadingMultiplier, but we are currently rendering
         // text in pdfcell, columntext and others
         // it'd be painful to render lines in a common object to ask leadingMultiplier
-        return estimateByAverageInterval(1f, maxFontSize, FITTEXT_FONTSIZE_PRECISION) {
+        return binarySearch(1f, maxFontSize, FITTEXT_FONTSIZE_PRECISION) {
             // FIXME inplace modification is no good
             font.size = it
 
@@ -162,7 +162,7 @@ object PdfUtil {
         }
     }
 
-    private fun estimateByAverageInterval(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
+    fun binarySearch(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
         if (max - min < precision) {
             // Ground recursion: We have converged arbitrarily close to some target value.
             return min
@@ -172,9 +172,9 @@ object PdfUtil {
         val iterationShouldIncrease = shouldIncrease(potentialFontSize)
 
         return if (iterationShouldIncrease) {
-            estimateByAverageInterval(potentialFontSize, max, precision, shouldIncrease)
+            binarySearch(potentialFontSize, max, precision, shouldIncrease)
         } else {
-            estimateByAverageInterval(min, potentialFontSize, precision, shouldIncrease)
+            binarySearch(min, potentialFontSize, precision, shouldIncrease)
         }
     }
 }
