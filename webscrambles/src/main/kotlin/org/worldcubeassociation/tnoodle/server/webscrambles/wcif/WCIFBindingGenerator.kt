@@ -2,6 +2,8 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 
 object WCIFBindingGenerator {
     const val PSEUDO_ID = "%%pseudoGen"
@@ -51,9 +53,8 @@ object WCIFBindingGenerator {
     private fun reindexScrambleSets(events: List<Event>): List<Event> {
         val indexTable = events.flatMap { it.rounds }
             .flatMap { it.scrambleSets }
-            .withIndex()
-            .associateWith { it.index }
-            .mapKeys { it.key.value }
+            .mapIndexed { i, scr -> scr to i }
+            .toMap()
 
         return events.map { e ->
             val reindexedRounds = e.rounds.map { r ->
@@ -81,7 +82,7 @@ object WCIFBindingGenerator {
 
         val scrambles = puzzle.generateScrambles(round.expectedAttemptNum).asList().map { Scramble(it) }
 
-        val extraScrambleNum = round.extensions.findExtension<ExtraScrambleCountExtension>()?.data
+        val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.data
             ?: defaultExtraCount(round.idCode.eventId)
         val extraScrambles = puzzle.generateScrambles(extraScrambleNum).asList().map { Scramble(it) }
 
@@ -126,6 +127,10 @@ object WCIFBindingGenerator {
     }
 
     private fun matchActivity(activity: Activity, wcif: Competition): Activity {
+        if (activity.activityCode.eventId in ActivityCode.IGNORABLE_KEYS) {
+            return activity
+        }
+
         val matchedId = findScrambleSetId(wcif, activity)
         val matchedChildren = activity.childActivities.map { matchActivity(it, wcif) }
 

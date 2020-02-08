@@ -1,16 +1,12 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
+package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.serializer
 
 @Serializable
 sealed class Extension(val id: String, val specUrl: String) {
     abstract val data: Any
 }
-
-inline fun <reified T : Extension> List<Extension>.findExtension() =
-    filterIsInstance<T>().singleOrNull()
 
 @Serializable
 @SerialName(FmcExtension.ID)

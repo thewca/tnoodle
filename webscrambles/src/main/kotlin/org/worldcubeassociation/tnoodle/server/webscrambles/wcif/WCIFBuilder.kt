@@ -3,6 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ScrambleZip
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import java.time.LocalDate
@@ -59,7 +60,7 @@ object WCIFBuilder {
                 val attemptScrambles = scrambleSet.copy(
                     scrambles = scrambles,
                     extraScrambles = listOf(),
-                    extensions = scrambleSet.extensions + FmcExtension(false)
+                    extensions = scrambleSet.withExtension(FmcExtension(false))
                 )
 
                 val attemptRequest = ScrambleDrawingData(attemptScrambles, pseudoCode)
@@ -70,7 +71,7 @@ object WCIFBuilder {
         }
 
         assert(scrambleSet.scrambles.isNotEmpty())
-        val isFmc = scrambleSet.extensions.findExtension<FmcExtension>()?.data ?: false
+        val isFmc = scrambleSet.findExtension<FmcExtension>()?.data ?: false
 
         if (isFmc) {
             // We don't watermark the FMC sheets because they already have

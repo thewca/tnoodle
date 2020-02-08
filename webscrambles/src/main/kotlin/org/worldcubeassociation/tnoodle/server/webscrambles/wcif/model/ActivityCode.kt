@@ -37,7 +37,6 @@ data class ActivityCode(val activityCodeString: String) {
         return compile(eventId, roundNumber, groupNumber, attemptNumber)
     }
 
-    @Serializer(forClass = ActivityCode::class)
     companion object : SingletonStringEncoder<ActivityCode>("ActivityCode") {
         // Currently, we mark not cubing related activities as other-lunch or other-speech, for example.
         // If we ever accept any other such ignorable key, it should be added here.
