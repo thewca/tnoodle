@@ -21,6 +21,17 @@ data class FmcExtension(override val data: Boolean) : Extension(SPEC_URL) {
 }
 
 @Serializable
+@SerialName(FmcLanguagesExtension.ID)
+data class FmcLanguagesExtension(override val data: List<String>) : Extension(SPEC_URL) {
+    override val id get() = ID
+
+    companion object {
+        const val ID = "org.worldcubeassociation.tnoodle.FmcLanguages"
+        const val SPEC_URL = "TODO"
+    }
+}
+
+@Serializable
 @SerialName(FmcAttemptCountExtension.ID)
 data class FmcAttemptCountExtension(override val data: Int) : Extension(SPEC_URL) {
     override val id get() = FmcExtension.ID

@@ -12,6 +12,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
 import java.time.LocalDate
@@ -39,6 +40,7 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
             if (fmcRequests.isNotEmpty()) {
                 folder("Fewest Moves - Additional Files") {
                     file("3x3x3 Fewest Moves Solution Sheet.pdf", genericSolutionSheetPdf.render())
+
                     for ((uniq, req) in fmcRequests) {
                         val cutoutZipName = "$uniq - Scramble Cutout Sheet.pdf"
                         val cutoutSheet = FmcScrambleCutoutSheet(req.scrambleSet, req.activityCode, globalTitle)
@@ -46,7 +48,14 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
                         file(cutoutZipName, cutoutSheet.render(password))
 
                         folder("Translations") {
+                            val requestedTranslations = req.scrambleSet.findExtension<FmcLanguagesExtension>()
+                                ?.data?.takeUnless { it.isEmpty() } ?: Translate.locales.map { it.toLanguageTag() }
+
                             for (locale in Translate.locales) {
+                                if (locale.toLanguageTag() !in requestedTranslations) {
+                                    continue
+                                }
+
                                 val languageMarkerTitle = "${locale.toLanguageTag()}_$uniq"
 
                                 // fewest moves regular sheet
