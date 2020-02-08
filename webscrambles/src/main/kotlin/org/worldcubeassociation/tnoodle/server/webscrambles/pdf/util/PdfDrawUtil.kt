@@ -65,19 +65,18 @@ object PdfDrawUtil {
     }
 
     fun PdfContentByte.fitAndShowText(text: String, rect: Rectangle, font: Font, align: Int = Element.ALIGN_LEFT, leadingMultiplier: Float = 1f): Int {
-        // We create a temp pdf and check if the text fit in a rectangle there.
-        val tempCb = PdfContentByte(pdfWriter)
-        val status = tempCb.showTextStatus(text, rect, font, align, leadingMultiplier)
+        val approxFontSize = PdfUtil.binarySearch(1f, font.size, 1f) {
+            val iterFont = Font(font.baseFont, it)
 
-        if (ColumnText.hasMoreText(status)) {
-            val iterMaxFontSize = font.size - 0.1f
-            val iterFont = Font(font.baseFont, iterMaxFontSize)
-            // FIXME brute-force approach doesn't seem healthy
-            return fitAndShowText(text, rect, iterFont, align, leadingMultiplier)
+            // We create a temp pdf and check if the text fit in a rectangle there.
+            val tempCb = PdfContentByte(pdfWriter)
+            val status = tempCb.showTextStatus(text, rect, iterFont, align, leadingMultiplier)
+
+            ColumnText.hasMoreText(status).not()
         }
 
-        // TODO see if we can recycle "status" from above if not drawn on a separate canvas
-        return showTextStatus(text, rect, font, align, leadingMultiplier)
+        val approxFont = Font(font.baseFont, approxFontSize)
+        return showTextStatus(text, rect, approxFont, align, leadingMultiplier)
     }
 
     private fun PdfContentByte.showTextStatus(text: String, rect: Rectangle, font: Font, align: Int, leadingMultiplier: Float): Int {
