@@ -5,7 +5,7 @@ import com.itextpdf.text.PageSize
 import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 
-abstract class BasePdfSheet<W : PdfWriter>(val title: String?) : PdfContent {
+abstract class BasePdfSheet<W : PdfWriter> : PdfContent {
     open fun openDocument() = Document()
 
     private var renderingCache: ByteArray? = null

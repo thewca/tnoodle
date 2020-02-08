@@ -8,7 +8,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension
 object WCIFBindingGenerator {
     const val PSEUDO_ID = "%%pseudoGen"
 
-    fun requestsToPseudoWCIF(requests: List<ScrambleRequest>): Competition {
+    fun requestsToPseudoWCIF(requests: List<ScrambleRequest>, name: String): Competition {
         val rounds = requests.groupBy { it.event to it.round }
             .map { (k, it) ->
                 val roundId = "${k.first}-r${k.second}"
@@ -32,7 +32,6 @@ object WCIFBindingGenerator {
             .map { Event(it.key, it.value) }
 
         val indexEvents = reindexScrambleSets(events)
-        val name = requests.map { it.title }.random()
 
         return Competition("1.0", PSEUDO_ID, name, name, indexEvents, Schedule.EMPTY)
     }
@@ -78,7 +77,8 @@ object WCIFBindingGenerator {
     }
 
     private fun generateScrambleSet(round: Round): ScrambleSet {
-        val puzzle = round.loadScrambler()
+        val puzzle = Event.loadScrambler(round.idCode.eventId)
+            ?: error("Unable to load scrambler for Round ${round.idCode}")
 
         val scrambles = puzzle.generateScrambles(round.expectedAttemptNum).asList().map { Scramble(it) }
 
@@ -86,7 +86,7 @@ object WCIFBindingGenerator {
             ?: defaultExtraCount(round.idCode.eventId)
         val extraScrambles = puzzle.generateScrambles(extraScrambleNum).asList().map { Scramble(it) }
 
-        // FIXME WCIF extensions
+        // FIXME WCIF how to handle 333mbf?
         // dummy ID -- indexing happens afterwards
         return ScrambleSet(42, scrambles, extraScrambles)
     }

@@ -13,12 +13,14 @@ import java.util.*
 object WCIFBuilder {
     private val PDF_CACHE = mutableMapOf<ScrambleDrawingData, PdfContent>()
 
-    fun List<Event>.toScrambleSetData(): List<ScrambleDrawingData> {
-        return flatMap { e ->
+    fun Competition.toScrambleSetData(): CompetitionDrawingData {
+        val sheets = events.flatMap { e ->
             e.rounds.flatMap { r ->
                 r.scrambleSets.mapIndexed { scrNum, it -> ScrambleDrawingData(it, r.idCode.copyParts(groupNumber = scrNum)) }
             }
         }
+
+        return CompetitionDrawingData(shortName, sheets)
     }
 
     fun wcifToZip(wcif: Competition, pdfPassword: String?, generationDate: LocalDateTime, versionTag: String, generationUrl: String): ZipArchive {
@@ -27,22 +29,25 @@ object WCIFBuilder {
     }
 
     fun wcifToCompletePdf(wcif: Competition, generationDate: LocalDate, versionTag: String): PdfContent {
-        val drawingData = wcif.events.toScrambleSetData()
+        val drawingData = wcif.toScrambleSetData()
         return requestsToCompletePdf(drawingData, generationDate, versionTag)
     }
 
-    fun requestsToCompletePdf(scrambleRequests: List<ScrambleDrawingData>, generationDate: LocalDate, versionTag: String): PdfContent {
+    fun requestsToCompletePdf(sheetRequest: CompetitionDrawingData, generationDate: LocalDate, versionTag: String): PdfContent {
+        val scrambleRequests = sheetRequest.scrambleSheets
+
         val originalPdfs = scrambleRequests.map {
-            it.getCachedPdf(generationDate, versionTag, Translate.DEFAULT_LOCALE)
+            it.getCachedPdf(generationDate, versionTag, sheetRequest.competitionTitle, Translate.DEFAULT_LOCALE)
         }
 
-        val configurations = scrambleRequests.map { Triple("someExcitingTitle", it.scramblingPuzzle.longName, 1) } // FIXME WCIF copies, title
+        val configurations = scrambleRequests.map {
+            Triple(it.activityCode.compileTitleString(false), Event.getEventName(it.activityCode.eventId).orEmpty(), 1)
+        } // FIXME COPIES
 
-        // FIXME WCIF
-        return MergedPdfWithOutline(originalPdfs, configurations, "globalTitle")
+        return MergedPdfWithOutline(originalPdfs, configurations, sheetRequest.competitionTitle)
     }
 
-    fun ScrambleDrawingData.createPdf(creationDate: LocalDate, versionTag: String, locale: Locale): PdfContent {
+    fun ScrambleDrawingData.createPdf(creationDate: LocalDate, versionTag: String, sheetTitle: String, locale: Locale): PdfContent {
         // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -55,7 +60,7 @@ object WCIFBuilder {
                 val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
                 // FIXME WCIF val titleAttemptNum = if (attempt > 1) attempt else (nthAttempt + 1)
 
-                val pseudoCode = ActivityCode.compile("333bf", activityCode.roundNumber, activityCode.groupNumber, activityCode.attemptNumber)
+                val pseudoCode = activityCode.copyParts(eventId = "333bf")
 
                 val attemptScrambles = scrambleSet.copy(
                     scrambles = scrambles,
@@ -63,8 +68,8 @@ object WCIFBuilder {
                     extensions = scrambleSet.withExtension(FmcExtension(false))
                 )
 
-                val attemptRequest = ScrambleDrawingData(attemptScrambles, pseudoCode)
-                attemptRequest.createPdf(creationDate, versionTag, locale)
+                val attemptRequest = copy(scrambleSet = attemptScrambles, activityCode = pseudoCode)
+                attemptRequest.createPdf(creationDate, versionTag, sheetTitle, locale)
             }
 
             return MergedPdf(singleSheets)
@@ -76,14 +81,14 @@ object WCIFBuilder {
         if (isFmc) {
             // We don't watermark the FMC sheets because they already have
             // the competition name on them. So we encrypt directly.
-            return FmcSolutionSheet(scrambleSet, activityCode, locale)
+            return FmcSolutionSheet(scrambleSet, activityCode, sheetTitle, locale)
         }
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking
-        return WatermarkPdfWrapper(genericSheet, "scrReq Title", creationDate, versionTag, "globalTitle") // FIXME WCIF
+        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(), creationDate, versionTag, sheetTitle)
     }
 
     // register in cache to speed up overall generation process
-    fun ScrambleDrawingData.getCachedPdf(creationDate: LocalDate, versionTag: String, locale: Locale) =
-        PDF_CACHE.getOrPut(this) { createPdf(creationDate, versionTag, locale) }
+    fun ScrambleDrawingData.getCachedPdf(creationDate: LocalDate, versionTag: String, sheetTitle: String, locale: Locale) =
+        PDF_CACHE.getOrPut(this) { createPdf(creationDate, versionTag, sheetTitle, locale) }
 }

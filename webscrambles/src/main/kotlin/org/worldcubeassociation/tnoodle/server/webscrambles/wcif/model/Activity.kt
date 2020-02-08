@@ -11,12 +11,5 @@ data class Activity(val id: Int, val activityCode: @Serializable(with = Activity
             ?.flatMap { it.nestedChildActivities }
             ?: listOf(this)
 
-    fun findScrambleSet(wcif: Competition): ScrambleSet? {
-        return wcif.events.asSequence()
-            .flatMap { it.rounds.asSequence() }
-            .flatMap { it.scrambleSets.asSequence() }
-            .find { it.id == scrambleSetId } // FIXME WCIF if only one attempt specified, then only draw one scr (singleton list)
-    }
-
     fun getLocalStartTime(timeZone: ZoneId) = startTime.parseWCIFDateWithTimezone(timeZone)
 }

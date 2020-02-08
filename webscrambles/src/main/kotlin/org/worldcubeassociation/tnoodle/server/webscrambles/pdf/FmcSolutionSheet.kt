@@ -17,15 +17,15 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, locale: Locale) : FmcSheet(scrambleSet, activityCode, locale) {
+open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String, locale: Locale) : FmcSheet(scrambleSet, activityCode, competitionTitle, locale) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleSet.scrambles.indices) {
-            addFmcSolutionSheet(document, title, i, locale)
+            addFmcSolutionSheet(document, i, locale)
             document.newPage()
         }
     }
 
-    protected fun PdfWriter.addFmcSolutionSheet(doc: Document, globalTitle: String?, index: Int, locale: Locale) {
+    protected fun PdfWriter.addFmcSolutionSheet(doc: Document, index: Int, locale: Locale) {
         val withScramble = index != -1
         val pageSize = doc.pageSize
 
@@ -163,8 +163,10 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val personalDetailsItems = mutableListOf<Pair<String, Int>>()
 
         if (withScramble) {
-            personalDetailsItems.add(globalTitle!! to Element.ALIGN_CENTER)
-            personalDetailsItems.add(title.orEmpty() to Element.ALIGN_CENTER) // FIXME WCIF what is the difference to scrReq title?
+            val activityTitle = activityCode.compileTitleString()
+
+            personalDetailsItems.add(competitionTitle to Element.ALIGN_CENTER)
+            personalDetailsItems.add(activityTitle to Element.ALIGN_CENTER)
 
             if (showScrambleCount) {
                 // this is for ordered scrambles
@@ -238,7 +240,7 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
                 separateSheetAdvice to Element.ALIGN_CENTER
             )
 
-            cb.populateRect(scrambleImageRect, separateSheetAdviceItems, gradedFont) // FIXME const
+            cb.populateRect(scrambleImageRect, separateSheetAdviceItems, gradedFont)
         }
 
         val movesType = listOf(

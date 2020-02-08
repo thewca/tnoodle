@@ -4,7 +4,7 @@ import com.itextpdf.text.Document
 import com.itextpdf.text.pdf.*
 import java.io.ByteArrayOutputStream
 
-class MergedPdfWithOutline(val toMerge: List<PdfContent>, val configuration: List<Triple<String, String, Int>>, globalTitle: String?) : BasePdfSheet<PdfSmartCopy>(globalTitle) {
+class MergedPdfWithOutline(val toMerge: List<PdfContent>, val configuration: List<Triple<String, String, Int>>, globalTitle: String?) : BasePdfSheet<PdfSmartCopy>() {
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfSmartCopy = PdfSmartCopy(this, bytes)
 
     override fun PdfSmartCopy.writeContents(document: Document) {

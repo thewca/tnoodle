@@ -6,11 +6,10 @@ import com.itextpdf.text.Phrase
 import com.itextpdf.text.pdf.ColumnText
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfWriter
-import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 
-class WatermarkPdfWrapper(val original: PdfContent, val creationTitle: String, val creationDate: LocalDate, val versionTag: String, globalTitle: String?) : BasePdfSheet<PdfWriter>(globalTitle) {
+class WatermarkPdfWrapper(val original: PdfContent, val creationTitle: String, val creationDate: LocalDate, val versionTag: String, val globalTitle: String?) : BasePdfSheet<PdfWriter>() {
     override fun openDocument() = Document(PAGE_SIZE, 0f, 0f, 75f, 75f)
 
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter = PdfWriter.getInstance(this, bytes)
@@ -33,7 +32,7 @@ class WatermarkPdfWrapper(val original: PdfContent, val creationTitle: String, v
                 rect.left, rect.top, 0f)
 
             ColumnText.showTextAligned(cb,
-                Element.ALIGN_CENTER, Phrase(title),
+                Element.ALIGN_CENTER, Phrase(globalTitle),
                 (PAGE_SIZE.left + PAGE_SIZE.right) / 2, PAGE_SIZE.top - 60, 0f)
 
             ColumnText.showTextAligned(cb,
