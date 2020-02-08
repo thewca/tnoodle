@@ -4,6 +4,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 
 object WCIFScrambleMatcher {
     const val PSEUDO_ID = "%%pseudoGen"
@@ -82,15 +83,41 @@ object WCIFScrambleMatcher {
         val puzzle = Event.loadScrambler(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
-        val scrambles = puzzle.generateScrambles(round.expectedAttemptNum).asList().map { Scramble(it) }
+        val scrambles = if (round.idCode.eventId == "333mbf") {
+            val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
+                ?.data ?: error("No multiBLD number for round $round specified")
+
+            List(round.expectedAttemptNum) {
+                val scrambles = puzzle.generateScrambles(multiExtCount).joinToString(Scramble.WCIF_NEWLINE_CHAR)
+                Scramble(scrambles)
+            }
+        } else {
+            puzzle.generateScrambles(round.expectedAttemptNum).asList().map { Scramble(it) }
+        }
 
         val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.data
             ?: defaultExtraCount(round.idCode.eventId)
         val extraScrambles = puzzle.generateScrambles(extraScrambleNum).asList().map { Scramble(it) }
 
-        // FIXME WCIF how to handle 333mbf?
         // dummy ID -- indexing happens afterwards
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
+    }
+
+    fun installMultiCount(wcif: Competition, count: Int): Competition {
+        fun installRoundExtension(e: Event): Event {
+            val extendedRounds = e.rounds.map { r ->
+                r.copy(extensions = r.withExtension(MultiScrambleCountExtension(count)))
+            }
+
+            return e.copy(rounds = extendedRounds)
+        }
+
+        val extendedEvents = wcif.events.map { e ->
+            e.takeUnless { it.id == "333mbf" }
+                ?: installRoundExtension(e)
+        }
+
+        return wcif.copy(events = extendedEvents)
     }
 
     private fun defaultExtraCount(eventId: String): Int {
@@ -194,7 +221,7 @@ object WCIFScrambleMatcher {
             return activity.copy(scrambleSetId = onlyPossibleSet.id)
         }
 
-        val scrambleSet = matchedRound.scrambleSets[actGroup]
+        val scrambleSet = matchedRound.scrambleSets[actGroup - 1]
 
         return activity.copy(scrambleSetId = scrambleSet.id)
     }
