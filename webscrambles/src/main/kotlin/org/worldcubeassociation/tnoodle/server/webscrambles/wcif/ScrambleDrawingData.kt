@@ -10,5 +10,5 @@ data class CompetitionDrawingData(val competitionTitle: String, val scrambleShee
 data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode) {
     val isFmc: Boolean
         get() = scrambleSet.findExtension<FmcExtension>()
-            ?.data ?: false
+            ?.data ?: activityCode.eventId == "333fm"
 }

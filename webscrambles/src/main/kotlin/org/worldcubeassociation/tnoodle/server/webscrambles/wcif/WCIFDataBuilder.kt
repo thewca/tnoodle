@@ -5,6 +5,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcAttemptCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.CompetitionZippingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ScrambleZip
@@ -25,7 +26,11 @@ object WCIFDataBuilder {
 
                     if (e.id == "333fm") {
                         val formatExtension = FmcAttemptCountExtension(r.expectedAttemptNum)
-                        val extendedScrSet = it.copy(extensions = it.withExtension(formatExtension))
+                        val languageExtension = r.findExtension<FmcLanguagesExtension>()
+
+                        val allExtensions = listOfNotNull(formatExtension, languageExtension).toTypedArray()
+
+                        val extendedScrSet = it.copy(extensions = it.withExtensions(*allExtensions))
 
                         ScrambleDrawingData(extendedScrSet, copyCode)
                     } else {

@@ -4,9 +4,7 @@ import net.gnehzr.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
 
 object WCIFScrambleMatcher {
     const val PSEUDO_ID = "%%pseudoGen"
@@ -112,17 +110,23 @@ object WCIFScrambleMatcher {
             ?: generateScrambles(num)
     }
 
-    fun installMultiCount(wcif: Competition, count: Int): Competition {
+    fun installMultiCount(wcif: Competition, count: Int) =
+        installExtensionForEvents(wcif, MultiScrambleCountExtension(count), "333mbf")
+
+    fun installFmcLanguages(wcif: Competition, languageTags: List<String>) =
+        installExtensionForEvents(wcif, FmcLanguagesExtension(languageTags), "333fm")
+
+    private fun installExtensionForEvents(wcif: Competition, ext: Extension, eventId: String): Competition {
         fun installRoundExtension(e: Event): Event {
             val extendedRounds = e.rounds.map { r ->
-                r.copy(extensions = r.withExtension(MultiScrambleCountExtension(count)))
+                r.copy(extensions = r.withExtension(ext))
             }
 
             return e.copy(rounds = extendedRounds)
         }
 
         val extendedEvents = wcif.events.map { e ->
-            e.takeUnless { it.id == "333mbf" }
+            e.takeUnless { it.id == eventId }
                 ?: installRoundExtension(e)
         }
 

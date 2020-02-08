@@ -34,14 +34,19 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
         val wcif = WCIFParser.parseComplete(wcifJson)
 
-        val extendedWcif = query["multi-cubes"]?.let {
+        val extendedWcifStepOne = query["multi-cubes"]?.let {
             val count = it.toIntOrNull()
                 ?: return null.also { _ -> call.respondText("Not a valid number: $it") }
 
             WCIFScrambleMatcher.installMultiCount(wcif, count)
         } ?: wcif
 
-        return WCIFScrambleMatcher.fillScrambleSets(extendedWcif)
+        val extendedWcifStepTwo = query["fmc-languages"]?.let {
+            val listing = it.split(",").map(String::trim)
+            WCIFScrambleMatcher.installFmcLanguages(extendedWcifStepOne, listing)
+        } ?: extendedWcifStepOne
+
+        return WCIFScrambleMatcher.fillScrambleSets(extendedWcifStepTwo)
     }
 
     override fun install(router: Routing) {
