@@ -1,37 +1,71 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.request.receiveText
+import io.ktor.request.uri
 import io.ktor.response.respond
+import io.ktor.response.respondBytes
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.post
+import io.ktor.util.pipeline.PipelineContext
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
+import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import java.time.LocalDateTime
 
-object WcifHandler : RouteHandler {
+class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
+    private suspend fun PipelineContext<Unit, ApplicationCall>.readQuery(): Map<String, String> {
+        val body = call.receiveText()
+        return parseQuery(body)
+    }
+
+    private suspend fun PipelineContext<Unit, ApplicationCall>.yieldScrambledWcif(suspendQuery: Map<String, String>? = null): Competition? {
+        // suspend fn not supported as default argument…
+        val query = suspendQuery ?: readQuery()
+
+        val wcifJson = query["wcif"]
+            ?: return null.also { call.respond("Please specify a WCIF JSON") }
+
+        val wcif = WCIFParser.parseComplete(wcifJson)
+
+        val extendedWcif = query["multi-cubes"]?.let {
+            val count = it.toIntOrNull()
+                ?: return null.also { _ -> call.respondText("Not a valid number: $it") }
+
+            WCIFScrambleMatcher.installMultiCount(wcif, count)
+        } ?: wcif
+
+        return WCIFScrambleMatcher.fillScrambleSets(extendedWcif)
+    }
+
     override fun install(router: Routing) {
-        router.post("/wcif/requests") {
-            val body = call.receiveText()
-            val query = parseQuery(body)
+        router.post("/wcif/scrambles") {
+            val wcif = yieldScrambledWcif()
+                ?: return@post call.respond("Something went wrong during WCIF creation.")
 
-            val wcifJson = query["wcif"]
-                ?: return@post call.respond("Please specify a WCIF JSON")
+            call.respond(wcif)
+        }
 
-            val wcif = WCIFParser.parseComplete(wcifJson)
+        router.post("/wcif/zip") {
+            val generationDate = LocalDateTime.now()
+            val query = readQuery()
 
-            val extendedWcif = query["multi-cubes"]?.let {
-                val count = it.toIntOrNull()
-                    ?: return@post call.respondText("Not a valid number: $it")
+            val wcif = yieldScrambledWcif(query)
+                ?: return@post call.respond("Something went wrong during WCIF creation.")
 
-                WCIFScrambleMatcher.installMultiCount(wcif, count)
-            } ?: wcif
+            val pdfPassword = query["pdf-password"]
+            val zipPassword = query["zip-password"]
 
-            val bindings = WCIFScrambleMatcher.fillScrambleSets(extendedWcif)
+            val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.projectTitle, call.request.uri)
+            val bytes = zip.compress(zipPassword)
 
-            call.respond(bindings)
+            call.respondBytes(bytes)
         }
     }
 }

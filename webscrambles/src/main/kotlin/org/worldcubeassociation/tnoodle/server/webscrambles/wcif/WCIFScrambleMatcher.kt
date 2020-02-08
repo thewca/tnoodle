@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import net.gnehzr.tnoodle.scrambles.ScrambleCacher
+import net.gnehzr.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
@@ -10,8 +11,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension
 object WCIFScrambleMatcher {
     const val PSEUDO_ID = "%%pseudoGen"
     const val ID_PENDING = 0 // FIXME should this be -1?
-
-    private val SCRAMBLE_CACHERS = mutableMapOf<String, ScrambleCacher>()
 
     fun requestsToPseudoWCIF(requests: List<ScrambleRequest>, name: String): Competition {
         val rounds = requests.groupBy { it.event to it.round }
@@ -86,26 +85,31 @@ object WCIFScrambleMatcher {
         val puzzle = Event.loadScrambler(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
-        val cacher = SCRAMBLE_CACHERS.getOrPut(puzzle.shortName) { ScrambleCacher(puzzle) }
-
         val scrambles = if (round.idCode.eventId == "333mbf") {
             val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
                 ?.data ?: error("No multiBLD number for round $round specified")
 
             List(round.expectedAttemptNum) {
-                val scrambles = cacher.newScrambles(multiExtCount).joinToString(Scramble.WCIF_NEWLINE_CHAR)
+                val scrambles = puzzle.generateEfficientScrambles(multiExtCount)
+                    .joinToString(Scramble.WCIF_NEWLINE_CHAR)
+
                 Scramble(scrambles)
             }
         } else {
-            cacher.newScrambles(round.expectedAttemptNum).asList().map { Scramble(it) }
+            puzzle.generateEfficientScrambles(round.expectedAttemptNum).map { Scramble(it) }
         }
 
         val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.data
             ?: defaultExtraCount(round.idCode.eventId)
-        val extraScrambles = cacher.newScrambles(extraScrambleNum).asList().map { Scramble(it) }
+        val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum).map { Scramble(it) }
 
         // dummy ID -- indexing happens afterwards
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
+    }
+
+    private fun Puzzle.generateEfficientScrambles(num: Int): Array<String> {
+        return PuzzlePlugins.SCRAMBLE_CACHERS[this.shortName]?.newScrambles(num)
+            ?: generateScrambles(num)
     }
 
     fun installMultiCount(wcif: Competition, count: Int): Competition {
