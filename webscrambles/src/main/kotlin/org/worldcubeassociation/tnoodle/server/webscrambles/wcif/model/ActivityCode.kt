@@ -80,7 +80,7 @@ data class ActivityCode(val activityCodeString: String) {
             val iterLength = max(1, ceil(log(this.toFloat(), 26f)).roundToInt())
 
             return List(iterLength) {
-                ('A' - 1) + ((this / 26f.pow(it).toInt()) % 26)
+                'A' + ((this / 26f.pow(it).toInt()) % 26)
             }.joinToString("").reversed()
         }
 
