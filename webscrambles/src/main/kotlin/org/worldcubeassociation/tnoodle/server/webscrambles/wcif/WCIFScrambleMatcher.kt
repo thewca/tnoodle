@@ -110,11 +110,9 @@ object WCIFScrambleMatcher {
             ?: generateScrambles(num)
     }
 
-    fun installMultiCount(wcif: Competition, count: Int) =
-        installExtensionForEvents(wcif, MultiScrambleCountExtension(count), "333mbf")
-
-    fun installFmcLanguages(wcif: Competition, languageTags: List<String>) =
-        installExtensionForEvents(wcif, FmcLanguagesExtension(languageTags), "333fm")
+    fun installExtensions(wcif: Competition, ext: Map<Extension, String>): Competition {
+        return ext.entries.fold(wcif) { acc, e -> installExtensionForEvents(acc, e.key, e.value) }
+    }
 
     private fun installExtensionForEvents(wcif: Competition, ext: Extension, eventId: String): Competition {
         fun installRoundExtension(e: Event): Event {

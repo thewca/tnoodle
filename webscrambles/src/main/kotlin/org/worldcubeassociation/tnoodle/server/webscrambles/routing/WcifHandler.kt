@@ -18,6 +18,8 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import java.time.LocalDateTime
 
 class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
@@ -35,19 +37,25 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
         val wcif = WCIFParser.parseComplete(wcifJson)
 
-        val extendedWcifStepOne = query["multi-cubes"]?.let {
+        val multiExt = query["multi-cubes"]?.let {
             val count = it.toIntOrNull()
                 ?: return null.also { _ -> call.respondText("Not a valid number: $it") }
 
-            WCIFScrambleMatcher.installMultiCount(wcif, count)
-        } ?: wcif
+            MultiScrambleCountExtension(count)
+        }
 
-        val extendedWcifStepTwo = query["fmc-languages"]?.let {
+        val fmcExt = query["fmc-languages"]?.let {
             val listing = it.split(",").map(String::trim)
-            WCIFScrambleMatcher.installFmcLanguages(extendedWcifStepOne, listing)
-        } ?: extendedWcifStepOne
+            FmcLanguagesExtension(listing)
+        }
 
-        return WCIFScrambleMatcher.fillScrambleSets(extendedWcifStepTwo)
+        val optionalExtensions = listOfNotNull(
+            multiExt?.to("333mbf"),
+            fmcExt?.to("333fm")
+        ).toMap()
+
+        val extendedWcif = WCIFScrambleMatcher.installExtensions(wcif, optionalExtensions)
+        return WCIFScrambleMatcher.fillScrambleSets(extendedWcif)
     }
 
     override fun install(router: Routing) {
