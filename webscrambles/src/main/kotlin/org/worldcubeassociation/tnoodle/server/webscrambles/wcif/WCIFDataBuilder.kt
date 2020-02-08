@@ -29,7 +29,6 @@ object WCIFDataBuilder {
                         val languageExtension = r.findExtension<FmcLanguagesExtension>()
 
                         val allExtensions = listOfNotNull(formatExtension, languageExtension).toTypedArray()
-
                         val extendedScrSet = it.copy(extensions = it.withExtensions(*allExtensions))
 
                         ScrambleDrawingData(extendedScrSet, copyCode)

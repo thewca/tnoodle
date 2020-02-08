@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
+import io.ktor.http.ContentType
 import io.ktor.request.receiveText
 import io.ktor.request.uri
 import io.ktor.response.respond
@@ -70,7 +71,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
             val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.projectTitle, call.request.uri)
             val bytes = zip.compress(zipPassword)
 
-            call.respondBytes(bytes)
+            call.respondBytes(bytes, ContentType.Application.Zip)
         }
     }
 }
