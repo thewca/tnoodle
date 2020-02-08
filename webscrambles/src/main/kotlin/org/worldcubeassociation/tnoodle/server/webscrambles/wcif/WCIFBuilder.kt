@@ -4,8 +4,10 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.CompetitionZippingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ScrambleZip
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.withUniqueTitles
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -24,7 +26,17 @@ object WCIFBuilder {
     }
 
     fun wcifToZip(wcif: Competition, pdfPassword: String?, generationDate: LocalDateTime, versionTag: String, generationUrl: String): ZipArchive {
-        val scrambleZip = ScrambleZip(wcif)
+        val drawingData = wcif.toScrambleSetData()
+
+        val namedSheets = drawingData.scrambleSheets
+            .withUniqueTitles { it.activityCode.compileTitleString() }
+
+        val zippingData = CompetitionZippingData(wcif, namedSheets)
+        return requestsToZip(zippingData, pdfPassword, generationDate, versionTag, generationUrl)
+    }
+
+    fun requestsToZip(zipRequest: CompetitionZippingData, pdfPassword: String?, generationDate: LocalDateTime, versionTag: String, generationUrl: String): ZipArchive {
+        val scrambleZip = ScrambleZip(zipRequest.namedSheets, zipRequest.wcif)
         return scrambleZip.assemble(generationDate, versionTag, pdfPassword, generationUrl)
     }
 
