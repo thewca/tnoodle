@@ -1,7 +1,9 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStringEncoder
+import kotlin.math.*
 
 @Serializable
 data class ActivityCode(val activityCodeString: String) {
@@ -37,6 +39,23 @@ data class ActivityCode(val activityCodeString: String) {
         return compile(eventId, roundNumber, groupNumber, attemptNumber)
     }
 
+    fun compileTitleString(includeEvent: Boolean = true): String {
+        val parts = structureParts.map { (k, v) ->
+            val translatePrefix = PREFIX_TRANSLATIONS[k]
+            val translateValue = v.takeUnless { k == WCIF_PREFIX_GROUP }
+                ?: v.toIntOrNull()?.toColumnIndexString()
+
+            "$translatePrefix $translateValue"
+        }.joinToString(TRANSLATION_DELIMITER)
+
+        if (!includeEvent) {
+            return parts
+        }
+
+        val prefix = Event.getEventName(eventId)
+        return "$prefix $parts"
+    }
+
     companion object : SingletonStringEncoder<ActivityCode>("ActivityCode") {
         // Currently, we mark not cubing related activities as other-lunch or other-speech, for example.
         // If we ever accept any other such ignorable key, it should be added here.
@@ -47,6 +66,23 @@ data class ActivityCode(val activityCodeString: String) {
         const val WCIF_PREFIX_ROUND = 'r'
         const val WCIF_PREFIX_GROUP = 'g'
         const val WCIF_PREFIX_ATTEMPT = 'a'
+
+        // TODO i18n
+        val PREFIX_TRANSLATIONS = mapOf(
+            WCIF_PREFIX_ROUND to "Round",
+            WCIF_PREFIX_GROUP to "Scramble Set", // FIXME WCIF I feel this is cheating. Better idea how to handle!
+            WCIF_PREFIX_ATTEMPT to "Attempt"
+        )
+
+        const val TRANSLATION_DELIMITER = " "
+
+        fun Int.toColumnIndexString(): String {
+            val iterLength = max(1, ceil(log(this.toFloat(), 26f)).roundToInt())
+
+            return List(iterLength) {
+                ('A' - 1) + ((this / 26f.pow(it).toInt()) % 26)
+            }.joinToString("").reversed()
+        }
 
         fun compile(event: String, round: Int? = null, group: Int? = null, attempt: Int? = null): ActivityCode {
             val parts = listOfNotNull(

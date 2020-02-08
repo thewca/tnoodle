@@ -53,7 +53,7 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                 ScrambleRequest.parseScrambleRequest(title, reqUrl, seed)
             }
 
-            val wcif = WCIFBindingGenerator.requestsToPseudoWCIF(scrambleRequests)
+            val wcif = WCIFBindingGenerator.requestsToPseudoWCIF(scrambleRequests, title)
 
             when (extension) {
                 "txt" -> {

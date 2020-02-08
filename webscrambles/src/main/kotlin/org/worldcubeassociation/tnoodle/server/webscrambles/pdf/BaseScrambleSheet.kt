@@ -4,20 +4,17 @@ import com.itextpdf.text.Document
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfWriter
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Event
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import java.io.ByteArrayOutputStream
 
-abstract class BaseScrambleSheet(val scrambleSet: ScrambleSet, val activityCode: ActivityCode) : BasePdfSheet<PdfWriter>("globalTitle") {
+abstract class BaseScrambleSheet(val scrambleSet: ScrambleSet, val activityCode: ActivityCode) : BasePdfSheet<PdfWriter>() {
     override fun openDocument() =
         Document(PAGE_SIZE, 0f, 0f, 75f, 75f).apply {
             addCreationDate()
             addProducer()
-
-            if (title != null) {
-                addTitle(title)
-            }
+            addTitle(activityCode.compileTitleString())
         }
 
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter {
@@ -26,7 +23,7 @@ abstract class BaseScrambleSheet(val scrambleSet: ScrambleSet, val activityCode:
         }
     }
 
-    protected val scramblingPuzzle = PuzzlePlugins.PUZZLES[activityCode.eventId]?.value // FIXME WCIF bf --> ni
+    protected val scramblingPuzzle = Event.loadScrambler(activityCode.eventId)
         ?: error("Cannot draw PDF: Scrambler for $activityCode not found in plugins")
 
     override fun finalise(processedBytes: ByteArrayOutputStream, password: String?): ByteArray {

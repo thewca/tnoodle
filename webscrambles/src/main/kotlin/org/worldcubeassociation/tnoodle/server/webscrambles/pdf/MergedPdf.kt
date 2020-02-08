@@ -3,10 +3,9 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 import com.itextpdf.text.Document
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfSmartCopy
-import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 
-class MergedPdf(val toMerge: List<PdfContent>) : BasePdfSheet<PdfSmartCopy>(null) {
+class MergedPdf(val toMerge: List<PdfContent>) : BasePdfSheet<PdfSmartCopy>() {
     override fun Document.getWriter(bytes: ByteArrayOutputStream) = PdfSmartCopy(this, bytes)
 
     override fun PdfSmartCopy.writeContents(document: Document) {

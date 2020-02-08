@@ -9,15 +9,15 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 
-class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode) : FmcSheet(scrambleSet, activityCode) {
+class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String) : FmcSheet(scrambleSet, activityCode, competitionTitle) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleSet.scrambles.indices) {
-            addFmcScrambleCutoutSheet(document, title, i)
+            addFmcScrambleCutoutSheet(document, i)
             document.newPage()
         }
     }
 
-    private fun PdfWriter.addFmcScrambleCutoutSheet(document: Document, globalTitle: String?, index: Int) {
+    private fun PdfWriter.addFmcScrambleCutoutSheet(document: Document, index: Int) {
         val pageSize = document.pageSize
         val scrambleModel = scrambleSet.scrambles[index]
         val scramble = scrambleModel.allScrambleStrings.single() // we assume FMC only has one scramble
@@ -38,10 +38,11 @@ class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCod
 
         val tp = directContent.renderSvgToPDF(svg, dim)
 
-        val scrambleSuffix = " - Scramble ${index + 1} of ${expectedAttemptNum}"
+        val scrambleSuffix = " - Scramble ${index + 1} of $expectedAttemptNum"
             .takeIf { expectedAttemptNum > 1 } ?: ""
 
-        val title = "$globalTitle - ${title}$scrambleSuffix" // FIXME WCIF this was scrRequest title before -- discern!!
+        val attemptTitle = activityCode.compileTitleString()
+        val title = "$competitionTitle - $attemptTitle$scrambleSuffix"
 
         // empty strings for space above and below
         val textList = listOf("", title, scramble, "")

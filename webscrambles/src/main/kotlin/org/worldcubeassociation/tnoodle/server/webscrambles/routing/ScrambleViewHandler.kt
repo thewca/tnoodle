@@ -147,7 +147,7 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                 val scrambleRequests = JsonConfig[JsonConfig.SERIALIZER_TNOODLE].parse(ScrambleRequest.serializer().list, reqRaw)
                 val password = query["password"]
 
-                val wcif = WCIFBindingGenerator.requestsToPseudoWCIF(scrambleRequests)
+                val wcif = WCIFBindingGenerator.requestsToPseudoWCIF(scrambleRequests, name)
 
                 val generationDate = LocalDateTime.now()
 
