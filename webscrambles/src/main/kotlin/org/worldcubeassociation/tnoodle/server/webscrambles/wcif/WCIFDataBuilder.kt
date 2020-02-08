@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-object WCIFBuilder {
+object WCIFDataBuilder {
     private val PDF_CACHE = mutableMapOf<ScrambleDrawingData, PdfContent>()
 
     fun Competition.toScrambleSetData(): CompetitionDrawingData {

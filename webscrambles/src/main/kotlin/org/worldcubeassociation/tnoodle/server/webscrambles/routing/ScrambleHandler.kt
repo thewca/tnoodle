@@ -15,8 +15,8 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameA
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBindingGenerator
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import java.time.LocalDateTime
 
 class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
@@ -53,7 +53,7 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                 ScrambleRequest.parseScrambleRequest(title, reqUrl, seed)
             }
 
-            val wcif = WCIFBindingGenerator.requestsToPseudoWCIF(scrambleRequests, title)
+            val wcif = WCIFScrambleMatcher.requestsToPseudoWCIF(scrambleRequests, title)
 
             when (extension) {
                 "txt" -> {
@@ -76,7 +76,7 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                 }
                 "json" -> call.respond(scrambleRequests)
                 "pdf" -> {
-                    val totalPdfOutput = WCIFBuilder.wcifToCompletePdf(wcif, generationDate.toLocalDate(), environmentConfig.projectTitle)
+                    val totalPdfOutput = WCIFDataBuilder.wcifToCompletePdf(wcif, generationDate.toLocalDate(), environmentConfig.projectTitle)
                     call.response.header("Content-Disposition", "inline")
 
                     // Workaround for Chrome bug with saving PDFs:
@@ -86,7 +86,7 @@ class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHan
                     call.respondBytes(totalPdfOutput.render(), ContentType.Application.Pdf)
                 }
                 "zip" -> {
-                    val modelZip = WCIFBuilder.wcifToZip(wcif, null, generationDate, environmentConfig.projectTitle, generationUrl.orEmpty())
+                    val modelZip = WCIFDataBuilder.wcifToZip(wcif, null, generationDate, environmentConfig.projectTitle, generationUrl.orEmpty())
                     val baosZip = modelZip.compress()
 
                     call.respondBytes(baosZip, ContentType.Application.Zip)

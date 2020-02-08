@@ -7,8 +7,8 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawingData
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.getCachedPdf
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.getCachedPdf
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
@@ -24,7 +24,7 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
         val fmcRequests = uniqueTitles.filterValues { it.isFmc }
 
         val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), ActivityCode("333fm-r1"), globalTitle, Translate.DEFAULT_LOCALE)
-        val printingCompletePdf = WCIFBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag)
+        val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag)
 
         return folder("Printing") {
             folder("Scramble Sets") {

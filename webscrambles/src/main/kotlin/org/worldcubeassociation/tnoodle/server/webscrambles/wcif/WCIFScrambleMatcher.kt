@@ -5,8 +5,9 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 
-object WCIFBindingGenerator {
+object WCIFScrambleMatcher {
     const val PSEUDO_ID = "%%pseudoGen"
+    const val ID_PENDING = 0 // FIXME should this be -1?
 
     fun requestsToPseudoWCIF(requests: List<ScrambleRequest>, name: String): Competition {
         val rounds = requests.groupBy { it.event to it.round }
@@ -18,7 +19,7 @@ object WCIFBindingGenerator {
 
                 val scrambleSets = it.map { scr ->
                     ScrambleSet(
-                        42, // dummy ID -- indexed separately down below
+                        ID_PENDING, // dummy ID -- indexed separately down below
                         scr.scrambles.map(::Scramble),
                         scr.extraScrambles.map(::Scramble),
                         listOf(FmcExtension(scr.fmc))
@@ -52,7 +53,7 @@ object WCIFBindingGenerator {
     private fun reindexScrambleSets(events: List<Event>): List<Event> {
         val indexTable = events.flatMap { it.rounds }
             .flatMap { it.scrambleSets }
-            .mapIndexed { i, scr -> scr to i }
+            .mapIndexed { i, scr -> scr to i + 1 }
             .toMap()
 
         return events.map { e ->
@@ -76,6 +77,7 @@ object WCIFBindingGenerator {
         return round.copy(scrambleSets = scrambles)
     }
 
+    // FIXME coroutines, progressBar, ScrambleCacher
     private fun generateScrambleSet(round: Round): ScrambleSet {
         val puzzle = Event.loadScrambler(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
@@ -88,7 +90,7 @@ object WCIFBindingGenerator {
 
         // FIXME WCIF how to handle 333mbf?
         // dummy ID -- indexing happens afterwards
-        return ScrambleSet(42, scrambles, extraScrambles)
+        return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
     }
 
     private fun defaultExtraCount(eventId: String): Int {
@@ -122,8 +124,34 @@ object WCIFBindingGenerator {
             v.copy(rooms = matchedRooms)
         }
 
-        val matchedSchedule = wcif.schedule.copy(venues = matchedVenues)
+        val matchedVenuesWithIndex = reindexActivities(matchedVenues)
+        val matchedSchedule = wcif.schedule.copy(venues = matchedVenuesWithIndex)
+
         return wcif.copy(schedule = matchedSchedule)
+    }
+
+    private fun reindexActivities(venues: List<Venue>): List<Venue> {
+        val allActivities = venues.flatMap { it.rooms }
+            .flatMap { it.activities }
+
+        val reindexingActivities = allActivities.filter { it.id != ID_PENDING }
+        val maxAssignedId = (allActivities - reindexingActivities)
+            .maxBy { it.id }?.id ?: 1
+
+        val idIndex = reindexingActivities.mapIndexed { i, act -> act to i + maxAssignedId }
+            .toMap()
+
+        return venues.map { v ->
+            val matchedRooms = v.rooms.map { r ->
+                val matchedActivities = r.activities.map { a ->
+                    idIndex[a]?.let { a.copy(id = it) } ?: a
+                }
+
+                r.copy(activities = matchedActivities)
+            }
+
+            v.copy(rooms = matchedRooms)
+        }
     }
 
     private fun matchActivity(activity: Activity, wcif: Competition): Activity {
@@ -131,21 +159,51 @@ object WCIFBindingGenerator {
             return activity
         }
 
-        val matchedId = findScrambleSetId(wcif, activity)
-        val matchedChildren = activity.childActivities.map { matchActivity(it, wcif) }
+        val children = activity.childActivities
 
-        return activity.copy(scrambleSetId = matchedId, childActivities = matchedChildren)
+        // we have children that need to be specified!
+        if (children.isNotEmpty()) {
+            val matchedChildren = children.map { matchActivity(it, wcif) }
+            return activity.copy(childActivities = matchedChildren)
+        }
+
+        val matchedRound = findRound(wcif, activity)
+        val actGroup = activity.activityCode.groupNumber
+
+        // uh oh. no child activities where there should be some.
+        if (actGroup == null) {
+            val actAttempt = activity.activityCode.attemptNumber
+
+            // resort to creating them ourselves…
+            if (actAttempt == null) {
+                val inventedChildren = List(matchedRound.scrambleSetCount) {
+                    val copiedActCode = activity.activityCode.copyParts(groupNumber = it + 1)
+                    val childSetId = matchedRound.scrambleSets[it].id
+
+                    activity.copy(id = ID_PENDING, activityCode = copiedActCode, childActivities = listOf(), scrambleSetId = childSetId)
+                }
+
+                return activity.copy(childActivities = inventedChildren)
+            }
+
+            if (matchedRound.scrambleSetCount > 1) {
+                error("Attempt-only specification ${activity.activityCode} for activity ${activity.id} is impossible to match")
+            }
+
+            val onlyPossibleSet = matchedRound.scrambleSets.single()
+            return activity.copy(scrambleSetId = onlyPossibleSet.id)
+        }
+
+        val scrambleSet = matchedRound.scrambleSets[actGroup]
+
+        return activity.copy(scrambleSetId = scrambleSet.id)
     }
 
-    private fun findScrambleSetId(wcif: Competition, activity: Activity): Int {
-        val matchingSets = wcif.events
+    private fun findRound(wcif: Competition, activity: Activity): Round {
+        return wcif.events
             .filter { it.id == activity.activityCode.eventId }
             .flatMap { it.rounds }
             .find { it.idCode.isParentOf(activity.activityCode) }
-            ?.scrambleSets ?: error("An activity of the schedule did not match an event.")
-
-        val groupNumber = activity.activityCode.groupNumber ?: error("Trying to match an Activity that has no group!")
-
-        return matchingSets[groupNumber].id
+            ?: error("An activity of the schedule did not match an event.")
     }
 }
