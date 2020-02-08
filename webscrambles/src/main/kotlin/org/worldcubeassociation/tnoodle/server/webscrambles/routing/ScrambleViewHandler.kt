@@ -30,8 +30,8 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.DimensionJsonData
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleImageJsonData
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBindingGenerator
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import java.awt.image.BufferedImage
@@ -147,13 +147,13 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                 val scrambleRequests = JsonConfig[JsonConfig.SERIALIZER_TNOODLE].parse(ScrambleRequest.serializer().list, reqRaw)
                 val password = query["password"]
 
-                val wcif = WCIFBindingGenerator.requestsToPseudoWCIF(scrambleRequests, name)
+                val wcif = WCIFScrambleMatcher.requestsToPseudoWCIF(scrambleRequests, name)
 
                 val generationDate = LocalDateTime.now()
 
                 when (extension) {
                     "pdf" -> {
-                        val totalPdfOutput = WCIFBuilder.wcifToCompletePdf(wcif, generationDate.toLocalDate(), environmentConfig.projectTitle)
+                        val totalPdfOutput = WCIFDataBuilder.wcifToCompletePdf(wcif, generationDate.toLocalDate(), environmentConfig.projectTitle)
 
                         call.response.header("Content-Disposition", "inline")
 
@@ -170,8 +170,10 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                         val parsedSchedule = schedule?.let { WCIFParser.parsePartial(it) }?.schedule ?: Schedule.EMPTY
                         val orderedWcif = wcif.copy(schedule = parsedSchedule)
 
+                        val matchedWcif = WCIFScrambleMatcher.matchActivities(orderedWcif)
+
                         //val zipFile = WCIFBuilder.wcifToZip(name, generationDate, environmentConfig.projectTitle, scrambleRequests, password, generationUrl, wcif)
-                        val zipFile = WCIFBuilder.wcifToZip(orderedWcif, password, generationDate, environmentConfig.projectTitle, generationUrl.orEmpty())
+                        val zipFile = WCIFDataBuilder.wcifToZip(matchedWcif, password, generationDate, environmentConfig.projectTitle, generationUrl.orEmpty())
                         val zipOutput = zipFile.compress(password)
 
                         val safeTitle = name.replace("\"".toRegex(), "'")

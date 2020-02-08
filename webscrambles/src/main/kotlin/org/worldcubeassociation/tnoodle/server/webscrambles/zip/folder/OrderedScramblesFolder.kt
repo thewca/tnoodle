@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
@@ -79,7 +79,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                                     .map { it.value }
 
                                 val sheetData = scrambleDrawingData.copy(scrambleSheets = sortedScrambles)
-                                val sheet = WCIFBuilder.requestsToCompletePdf(sheetData, generationDate, versionTag)
+                                val sheet = WCIFDataBuilder.requestsToCompletePdf(sheetData, generationDate, versionTag)
 
                                 file(pdfFileName, sheet.render())
                             }
@@ -95,7 +95,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                 .distinct()
 
             val allScramblesData = scrambleDrawingData.copy(scrambleSheets = allScramblesOrdered)
-            val completeOrderedPdf = WCIFBuilder.requestsToCompletePdf(allScramblesData, generationDate, versionTag)
+            val completeOrderedPdf = WCIFDataBuilder.requestsToCompletePdf(allScramblesData, generationDate, versionTag)
 
             val safeGlobalTitle = globalTitle.toFileSafeString()
             file("Ordered $safeGlobalTitle - All Scrambles.pdf", completeOrderedPdf.render())

@@ -3,7 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.randomPasscode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawingData
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.getCachedPdf
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.getCachedPdf
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import java.time.LocalDate
 
