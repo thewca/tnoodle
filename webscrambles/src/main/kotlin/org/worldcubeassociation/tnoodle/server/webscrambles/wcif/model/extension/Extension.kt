@@ -37,7 +37,7 @@ data class ExtraScrambleCountExtension(override val data: Int) : Extension(ID, S
 
 @Serializable
 @SerialName(MultiScrambleCountExtension.ID)
-data class MultiScrambleCountExtension(override val data: Boolean) : Extension(ID, SPEC_URL) {
+data class MultiScrambleCountExtension(override val data: Int) : Extension(ID, SPEC_URL) {
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.MultiScrambleCount"
         const val SPEC_URL = "TODO"
