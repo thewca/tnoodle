@@ -2,18 +2,12 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.randomPasscode
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.getCachedPdf
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFBuilder.toScrambleSetData
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.withUniqueTitles
 import java.time.LocalDate
 
-data class ComputerDisplayZip(val wcif: Competition) {
-    val scrambleDrawingData = wcif.toScrambleSetData()
-
-    val scrambleSets = scrambleDrawingData.scrambleSheets
-        .withUniqueTitles { it.activityCode.compileTitleString() }
+data class ComputerDisplayZip(val scrambleSets: Map<String, ScrambleDrawingData>, val competitionTitle: String) {
     val passcodes = scrambleSets.mapValues { randomPasscode() }
 
     /**
@@ -26,7 +20,7 @@ data class ComputerDisplayZip(val wcif: Competition) {
     fun assemble(generationDate: LocalDate, versionTag: String): ZipArchive {
         return zipArchive {
             for ((uniqueTitle, scrambleData) in scrambleSets) {
-                val computerDisplayPdf = scrambleData.getCachedPdf(generationDate, versionTag, scrambleDrawingData.competitionTitle, Translate.DEFAULT_LOCALE)
+                val computerDisplayPdf = scrambleData.getCachedPdf(generationDate, versionTag, competitionTitle, Translate.DEFAULT_LOCALE)
 
                 val passcode = passcodes.getValue(uniqueTitle)
                 val computerDisplayBytes = computerDisplayPdf.render(passcode)

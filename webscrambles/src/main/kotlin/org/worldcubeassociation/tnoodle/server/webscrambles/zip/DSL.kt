@@ -15,6 +15,10 @@ class FolderBuilder {
         contents.add(folder)
     }
 
+    fun folder(preFolder: Folder) {
+        contents.add(preFolder)
+    }
+
     fun file(name: String, content: String) {
         val file = File(name, content)
         contents.add(file)
@@ -29,4 +33,9 @@ class FolderBuilder {
 fun zipArchive(builderFn: FolderBuilder.() -> Unit): ZipArchive {
     val builder = FolderBuilder().apply(builderFn)
     return ZipArchive(builder.contents)
+}
+
+fun folder(name: String, builderFn: FolderBuilder.() -> Unit): Folder {
+    val builder = FolderBuilder().apply(builderFn)
+    return Folder(name, builder.contents)
 }
