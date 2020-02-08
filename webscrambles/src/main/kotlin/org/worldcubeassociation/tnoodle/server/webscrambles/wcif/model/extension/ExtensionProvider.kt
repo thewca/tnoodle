@@ -10,7 +10,7 @@ abstract class ExtensionProvider {
         extensions.extend(ext)
 
     fun withExtensions(vararg ext: Extension): List<Extension> {
-        return ext.fold(emptyList()) { acc, e -> acc.extend(e) }
+        return ext.fold(extensions) { acc, e -> acc.extend(e) }
     }
 
     inline fun <reified T : Extension> hasExtension() =
