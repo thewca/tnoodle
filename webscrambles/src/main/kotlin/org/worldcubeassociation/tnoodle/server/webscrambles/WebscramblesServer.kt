@@ -24,6 +24,8 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
         val scrambleHandler = ScrambleHandler(environmentConfig)
         val scrambleViewHandler = ScrambleViewHandler(environmentConfig)
 
+        val wcifHandler = WcifHandler(environmentConfig)
+
         app.routing {
             PuzzleListHandler.install(this)
             RouteRedirectHandler.install(this)
@@ -31,7 +33,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             ReadmeHandler.install(this)
             scrambleViewHandler.install(this)
             StaticContentHandler.install(this)
-            WcifHandler.install(this)
+            wcifHandler.install(this)
         }
 
         baseServer.spinUp(app)

@@ -4,6 +4,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
@@ -13,6 +14,7 @@ import java.time.Period
 data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingData: CompetitionDrawingData) {
     fun assemble(wcifSchedule: Schedule, generationDate: LocalDate, versionTag: String): Folder {
         val wcifBindings = wcifSchedule.allActivities
+            .filter { it.activityCode.eventId !in ActivityCode.IGNORABLE_KEYS }
             .associateWith { ac ->
                 scrambleDrawingData.scrambleSheets.find { it.scrambleSet.id == ac.scrambleSetId }
                     ?: error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
@@ -53,6 +55,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
 
                     val activitiesPerDay = room.activities
                         .flatMap { it.nestedChildActivities }
+                        .filter { it.activityCode.eventId !in ActivityCode.IGNORABLE_KEYS }
                         .groupBy {
                             Period.between(
                                 competitionStartDate.atLocalStartOfDay(),
