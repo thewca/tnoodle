@@ -3,7 +3,9 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcAttemptCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.CompetitionZippingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ScrambleZip
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
@@ -18,7 +20,18 @@ object WCIFDataBuilder {
     fun Competition.toScrambleSetData(): CompetitionDrawingData {
         val sheets = events.flatMap { e ->
             e.rounds.flatMap { r ->
-                r.scrambleSets.mapIndexed { scrNum, it -> ScrambleDrawingData(it, r.idCode.copyParts(groupNumber = scrNum)) }
+                r.scrambleSets.mapIndexed { scrNum, it ->
+                    val copyCode = r.idCode.copyParts(groupNumber = scrNum)
+
+                    if (e.id == "333fm") {
+                        val formatExtension = FmcAttemptCountExtension(r.expectedAttemptNum)
+                        val extendedScrSet = it.copy(extensions = it.withExtension(formatExtension))
+
+                        ScrambleDrawingData(extendedScrSet, copyCode)
+                    } else {
+                        ScrambleDrawingData(it, copyCode)
+                    }
+                }
             }
         }
 
@@ -67,17 +80,17 @@ object WCIFDataBuilder {
 
         // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
         // to fix this, we pass the attempt number
-        if (activityCode.eventId == "333mbf") {
+        if (activityCode.eventId == "333mbf" && !scrambleSet.hasExtension<MultiScrambleCountExtension>()) {
             val singleSheets = scrambleSet.scrambles.mapIndexed { nthAttempt, scrambleStr ->
                 val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
-                // FIXME WCIF val titleAttemptNum = if (attempt > 1) attempt else (nthAttempt + 1)
 
-                val pseudoCode = activityCode.copyParts(eventId = "333bf")
+                // FIXME this feels hacky
+                val pseudoCode = activityCode.copyParts(groupNumber = nthAttempt)
 
                 val attemptScrambles = scrambleSet.copy(
                     scrambles = scrambles,
                     extraScrambles = listOf(),
-                    extensions = scrambleSet.withExtension(FmcExtension(false))
+                    extensions = scrambleSet.withExtensions(FmcExtension(false), MultiScrambleCountExtension(scrambles.size))
                 )
 
                 val attemptRequest = copy(scrambleSet = attemptScrambles, activityCode = pseudoCode)

@@ -13,6 +13,9 @@ abstract class ExtensionProvider {
         return ext.fold(emptyList()) { acc, e -> acc.extend(e) }
     }
 
+    inline fun <reified T : Extension> hasExtension() =
+        findExtension<T>() != null
+
     inline fun <reified T : Extension> findExtension() =
         extensions.filterIsInstance<T>().singleOrNull()
 

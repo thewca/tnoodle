@@ -70,7 +70,7 @@ data class ActivityCode(val activityCodeString: String) {
         // TODO i18n
         val PREFIX_TRANSLATIONS = mapOf(
             WCIF_PREFIX_ROUND to "Round",
-            WCIF_PREFIX_GROUP to "Scramble Set", // FIXME WCIF I feel this is cheating. Better idea how to handle!
+            WCIF_PREFIX_GROUP to "Scramble Set", // FIXME I feel this is cheating. Better idea how to handle!
             WCIF_PREFIX_ATTEMPT to "Attempt"
         )
 
