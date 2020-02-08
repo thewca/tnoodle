@@ -16,6 +16,14 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
             .associateWith { ac ->
                 scrambleDrawingData.scrambleSheets.find { it.scrambleSet.id == ac.scrambleSetId }
                     ?: error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
+            }.mapValues { (act, scr) ->
+                act.activityCode.attemptNumber?.let {
+                    val origScrambles = scr.scrambleSet.allScrambles
+                    val designatedScramble = origScrambles[it - 1]
+
+                    val modifiedSet = scr.scrambleSet.copy(scrambles = listOf(designatedScramble))
+                    scr.copy(scrambleSet = modifiedSet)
+                } ?: scr
             }
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
@@ -44,6 +52,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                     val roomName = room.fileSafeName
 
                     val activitiesPerDay = room.activities
+                        .flatMap { it.nestedChildActivities }
                         .groupBy {
                             Period.between(
                                 competitionStartDate.atLocalStartOfDay(),
