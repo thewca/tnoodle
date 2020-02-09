@@ -3,6 +3,9 @@ import configurations.Languages.attachRemoteRepositories
 
 import dependencies.Libraries.GOOGLE_CLOUD_STORAGE
 import dependencies.Libraries.KOTLESS_KTOR
+import io.kotless.DSLType
+import io.kotless.plugin.gradle.dsl.kotless
+import io.kotless.plugin.gradle.dsl.Webapp.Route53
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "An extension over the webscrambles module to incorporate Google Cloud support"
@@ -55,5 +58,13 @@ tasks.create("dumpVersionToFile") {
 
         val fileDir = "$projectDir/src/main/resources/version.tnoodle"
         file(fileDir).writeText("$tNoodleTitle\n$tNoodleVersion")
+    }
+}
+
+kotless {
+    config {
+        dsl {
+            type = DSLType.Ktor
+        }
     }
 }
