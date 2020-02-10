@@ -11,18 +11,18 @@ class EventPickerTable extends Component {
     this.handleUpdateEvent = props.handleUpdateEvent;
   }
   render() {
-    let EVENTS_PER_LINE = 3;
+    let EVENTS_PER_LINE = 2;
     let eventChunks = _.chunk(WCA_EVENTS, EVENTS_PER_LINE);
 
     return (
-      <div className="container-fluid p-0">
+      <div className="container">
         {eventChunks.map((events, i) => {
           return (
             <div className="row" key={i}>
               {events.map(event => {
                 return (
                   <div
-                    className="col-4 p-0 border border-secondary rounded"
+                    className="col-6 border border-secondary rounded"
                     key={event.id}
                   >
                     <EventPicker

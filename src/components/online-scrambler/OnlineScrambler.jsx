@@ -1,41 +1,67 @@
 import React, { Component } from "react";
-
 import SelectCompetition from "./SelectCompetition";
+import { connect } from "react-redux";
+import { fetchMe, isLogged } from "../../api/wca.api";
+import { updateMe } from "../../redux/ActionCreators";
 
-import * as WcaApi from "../../functions/wca.api";
+const mapStateToProps = store => ({
+  me: store.me
+});
 
-class OnlineScrambler extends Component {
-  constructor(props) {
-    super(props);
+const mapDispatchToProps = {
+  updateMe: updateMe
+};
 
-    this.props.fetchMe();
-
-    let me = this.props.me;
-    this.state = { me: me, competitions: undefined };
-
-    if (me != null) {
-      WcaApi.getUpcomingManageableCompetitions().then(result => {
-        let state = this.state;
-        state.competitions = result;
-        this.state = state;
-      });
+const OnlineScrambler = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
+  class extends Component {
+    constructor(props) {
+      super(props);
+      this.state = { competitions: [], me: this.props.me, unauthorized: false };
     }
-  }
-  render() {
-    if (this.state.me == null) {
+
+    componentDidMount() {
+      if (!isLogged()) {
+        return;
+      }
+      if (this.state.me == null) {
+        fetchMe()
+          .then(me => {
+            this.setState({ ...this.state, me: me });
+          })
+          .catch(e => {
+            this.setState({ ...this.state, unauthorized: true });
+          });
+      }
+    }
+
+    render() {
+      if (this.state.unauthorized) {
+        return (
+          <div>
+            <h4>There was a problem while fetching information.</h4>
+            <p>Try to log in again.</p>
+          </div>
+        );
+      }
+
+      if (this.state.me == null) {
+        return (
+          <div>
+            <h1>You have to login first</h1>
+          </div>
+        );
+      }
       return (
-        <div>
-          <h1>You have to login first</h1>
+        <div className="container">
+          <h1>Welcome, {this.state.me.name}</h1>
+          <SelectCompetition competitions={this.props.competitions} />
         </div>
       );
     }
-    return (
-      <div className="container">
-        <h1>Welcome, {this.state.me.name}</h1>
-        <SelectCompetition competitions={this.state.competitions} />
-      </div>
-    );
   }
-}
+);
 
 export default OnlineScrambler;
