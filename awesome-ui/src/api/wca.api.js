@@ -31,12 +31,20 @@ export function toWcaUrl(path) {
 }
 
 export function logIn() {
+  if (isLogged()) {
+    return;
+  }
+
   let redirectUri = window.location.origin + BASE_PATH + "/oauth/wca";
   let logInUrl = toWcaUrl(
     `/oauth/authorize?client_id=${TNOODLE_APP_ID}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
   );
   localStorage["TNoodle.preLoginHref"] = window.location.href;
   window.location = logInUrl;
+}
+
+export function isLogged() {
+  return localStorage["TNoodle.accessToken"] != null;
 }
 
 export function logOut() {
@@ -51,11 +59,9 @@ export function gotoPreLoginPath() {
   window.location.replace(preLoginHref);
 }
 
-export function me() {
+export function fetchMe() {
   return wcaApiFetch("/me")
-    .then(response => {
-      return response.json();
-    })
+    .then(response => response.json())
     .then(json => json.me);
 }
 
