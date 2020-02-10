@@ -87,13 +87,13 @@ class EventPicker extends Component {
       });
     });
     return (
-      <div className="container-fluid">
+      <div className="container">
         <div className="row">
-          <span className="col-2 p-0">
+          <span className="col-2">
             <CubingIcon event={event.id} />
           </span>
-          <h5 className="col-6 p-0">{event.name}</h5>
-          <div className="col-4 p-0">
+          <h5 className="col-6 font-weight-bold">{event.name}</h5>
+          <div className="col-4">
             <select onChange={this.handleNumberOfRoundsChange} id={event.id}>
               {options.map(op => (
                 <option value={op.value} disabled={op.disabled} key={op.text}>

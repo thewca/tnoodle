@@ -7,16 +7,14 @@ class OfflineScrambler extends Component {
   constructor(props) {
     super(props);
 
-    this.handleUpdateWcif = props.updateWcif;
-
     // State wcif like
     let state = { formatVersion: "1.0", name: "", events: [], password: "" };
     this.state = state;
   }
 
   generateScrambles = () => {
-    this.handleUpdateWcif(this.state);
-    this.props.generateScrambles();
+    // TODO update wcif
+    console.log("Getting scrambles");
   };
 
   handleUpdateEvent = event => {

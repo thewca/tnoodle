@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { toWcaUrl } from "../../functions/wca.api";
+import { toWcaUrl } from "../../api/wca.api";
 
 class SelectCompetition extends Component {
   constructor(props) {
@@ -18,10 +18,7 @@ class SelectCompetition extends Component {
           <div className="text-center">
             No competitions found, are you sure you have upcoming competitions?
             Try checking{" "}
-            <a href={toWcaUrl("/competitions/mine")} target="_blank">
-              on the WCA website
-            </a>
-            .
+            <a href={toWcaUrl("/competitions/mine")}>on the WCA website</a>.
           </div>
         ) : (
           <div className="list-group">
