@@ -84,10 +84,8 @@ data class ScrambleRequest(
 
             val copies = min(copiesStr.toInt(), MAX_COPIES)
 
-            val genScrambles = uniqueSeed?.let { scrambler.generateSeededScrambles(seed, count) }
+            val scrambles = uniqueSeed?.let { scrambler.generateSeededScrambles(seed, count).asList() }
                 ?: plugin.generateEfficientScrambles(count)
-
-            val scrambles = genScrambles.toList()
 
             val colorScheme = scrambler.parseColorScheme(scheme)
 
