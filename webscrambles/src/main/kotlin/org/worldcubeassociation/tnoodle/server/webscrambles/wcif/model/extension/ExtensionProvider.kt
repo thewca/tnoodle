@@ -6,12 +6,15 @@ import kotlinx.serialization.Serializable
 abstract class ExtensionProvider {
     abstract val extensions: List<Extension>
 
-    fun withExtension(ext: Extension) =
-        extensions.extend(ext)
+    fun withExtension(ext: Extension?) =
+        ext?.let { extensions.extend(it) } ?: extensions
 
     fun withExtensions(vararg ext: Extension): List<Extension> {
         return ext.fold(extensions) { acc, e -> acc.extend(e) }
     }
+
+    fun withExtensions(ext: List<Extension?>) =
+        withExtensions(*ext.filterNotNull().toTypedArray())
 
     inline fun <reified T : Extension> hasExtension() =
         findExtension<T>() != null
