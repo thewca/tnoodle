@@ -15,6 +15,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
     fun assemble(wcifSchedule: Schedule, generationDate: LocalDate, versionTag: String): Folder {
         val wcifBindings = wcifSchedule.allActivities
             .filter { it.activityCode.eventId !in ActivityCode.IGNORABLE_KEYS }
+            .filter { it.scrambleSetId != null }
             .associateWith { ac ->
                 scrambleDrawingData.scrambleSheets.find { it.scrambleSet.id == ac.scrambleSetId }
                     ?: error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
@@ -54,7 +55,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                     val roomName = room.fileSafeName
 
                     val activitiesPerDay = room.activities
-                        .flatMap { it.nestedChildActivities }
+                        .flatMap { it.leafChildActivities }
                         .filter { it.activityCode.eventId !in ActivityCode.IGNORABLE_KEYS }
                         .groupBy {
                             Period.between(
@@ -103,7 +104,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
             // Generate all scrambles ordered
             val allScramblesOrdered = wcifSchedule.activitiesWithLocalStartTimes.entries
                 .sortedBy { it.value }
-                .mapNotNull { wcifBindings[it.key] } // the notNull will effectively never happen, because we guarantee that all activities are indexed
+                .mapNotNull { wcifBindings[it.key] } // the notNull will effectively never happen, because we guarantee that all relevant activities are indexed
                 .distinct()
 
             val allScramblesData = scrambleDrawingData.copy(scrambleSheets = allScramblesOrdered)

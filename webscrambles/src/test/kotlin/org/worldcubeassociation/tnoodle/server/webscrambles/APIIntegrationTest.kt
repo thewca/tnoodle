@@ -24,9 +24,9 @@ object APIIntegrationTest {
         val generationDate = LocalDateTime.now()
 
         for (upcomingComp in upcomingComps) {
-            println("Testing ZIP builder for '${upcomingComp.name}'")
-
             val id = upcomingComp.id
+            println("Testing ZIP builder for '${upcomingComp.name}' (id $id)")
+
             val url = "https://www.worldcubeassociation.org/api/v0/competitions/$id/wcif/public"
 
             val wcifRaw = URL(url).readText()

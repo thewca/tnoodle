@@ -1,7 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import org.worldcubeassociation.tnoodle.scrambles.Puzzle
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
@@ -166,18 +164,19 @@ object WCIFScrambleMatcher {
     private fun reindexActivities(venues: List<Venue>): List<Venue> {
         val allActivities = venues.flatMap { it.rooms }
             .flatMap { it.activities }
+            .flatMap { it.selfAndChildActivities }
 
-        val reindexingActivities = allActivities.filter { it.id != ID_PENDING }
+        val reindexingActivities = allActivities.filter { it.id == ID_PENDING }
         val maxAssignedId = (allActivities - reindexingActivities)
             .maxBy { it.id }?.id ?: 1
 
-        val idIndex = reindexingActivities.mapIndexed { i, act -> act to i + maxAssignedId }
+        val idIndex = reindexingActivities.mapIndexed { i, act -> act to i + maxAssignedId + 1 }
             .toMap()
 
         return venues.map { v ->
             val matchedRooms = v.rooms.map { r ->
                 val matchedActivities = r.activities.map { a ->
-                    idIndex[a]?.let { a.copy(id = it) } ?: a
+                    reindexActivityAndChildren(a, idIndex)
                 }
 
                 r.copy(activities = matchedActivities)
@@ -185,6 +184,13 @@ object WCIFScrambleMatcher {
 
             v.copy(rooms = matchedRooms)
         }
+    }
+
+    private fun reindexActivityAndChildren(activity: Activity, index: Map<Activity, Int>): Activity {
+        val reindexedChildren = activity.childActivities.map { reindexActivityAndChildren(it, index) }
+        val reindexId = index[activity] ?: activity.id
+
+        return activity.copy(id = reindexId, childActivities = reindexedChildren)
     }
 
     private fun matchActivity(activity: Activity, wcif: Competition): Activity {

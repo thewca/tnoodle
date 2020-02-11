@@ -88,6 +88,6 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
     }
 
     companion object {
-        private fun Schedule.isNotEmpty() = allActivities.isNotEmpty()
+        private fun Schedule.isNotEmpty() = leafActivities.isNotEmpty()
     }
 }
