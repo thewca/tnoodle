@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.Serializable
-import net.gnehzr.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 
 @Serializable

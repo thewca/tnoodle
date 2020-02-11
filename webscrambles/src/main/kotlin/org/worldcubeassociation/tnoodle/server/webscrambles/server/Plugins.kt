@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
-import net.gnehzr.tnoodle.scrambles.Puzzle
-import net.gnehzr.tnoodle.scrambles.ScrambleCacher
+import org.worldcubeassociation.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.scrambles.ScrambleCacher
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 

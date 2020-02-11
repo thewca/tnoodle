@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.StringDescriptor
-import net.gnehzr.tnoodle.svglite.Color
+import org.worldcubeassociation.tnoodle.svglite.Color
 
 @Serializer(forClass = Color::class)
 object Colorizer : SingletonStringEncoder<Color>("Color") {

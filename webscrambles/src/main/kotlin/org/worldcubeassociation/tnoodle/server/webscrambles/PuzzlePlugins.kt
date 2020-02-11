@@ -1,8 +1,8 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import net.gnehzr.tnoodle.puzzle.*
-import net.gnehzr.tnoodle.scrambles.Puzzle
-import net.gnehzr.tnoodle.scrambles.ScrambleCacher
+import org.worldcubeassociation.tnoodle.puzzle.*
+import org.worldcubeassociation.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.scrambles.ScrambleCacher
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.Plugins
 import java.util.*
 

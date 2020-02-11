@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
 import kotlinx.serialization.Serializable
-import net.gnehzr.tnoodle.svglite.Color
+import org.worldcubeassociation.tnoodle.svglite.Color
 
 @Serializable
 data class PuzzleImageJsonData(

@@ -5,7 +5,7 @@ import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
-import net.gnehzr.tnoodle.svglite.Dimension
+import org.worldcubeassociation.tnoodle.svglite.Dimension
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
