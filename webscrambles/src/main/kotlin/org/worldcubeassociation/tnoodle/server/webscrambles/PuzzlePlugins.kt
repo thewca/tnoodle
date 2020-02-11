@@ -1,7 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import org.worldcubeassociation.tnoodle.scrambles.PuzzleRegistry
-import org.worldcubeassociation.tnoodle.scrambles.ScrambleCacher
 
 enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
     // To all fellow programmers who wonder about effectively copying an interface:
@@ -28,21 +27,25 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
     val description get() = registry.description
     val scrambler get() = registry.also { warmUpCache() }.scrambler
 
-    val cacheSize get() = SCRAMBLE_CACHERS[this.key]?.availableCount
+    val cacheSize get() = SCRAMBLE_CACHERS[this.key]?.available
 
     fun warmUpCache(cacheSize: Int = CACHE_SIZE) {
-        SCRAMBLE_CACHERS.getOrPut(this.key) { ScrambleCacher(this.registry.scrambler, cacheSize, false) }
+        SCRAMBLE_CACHERS.getOrPut(this.key) { CoroutineScrambleCacher(this.registry.scrambler, cacheSize) }
     }
 
-    fun generateEfficientScrambles(num: Int): Array<String> {
-        return SCRAMBLE_CACHERS[this.key]?.newScrambles(num)
-            ?: this.scrambler.generateScrambles(num)
+    fun generateEfficientScrambles(num: Int, action: (String) -> Unit = {}): List<String> {
+        return List(num) {
+            yieldScramble().also(action)
+        }
     }
+
+    private fun yieldScramble() = SCRAMBLE_CACHERS[this.key]?.getScramble()
+        ?: this.scrambler.generateScramble()
 
     companion object {
         const val CACHE_SIZE = 30
 
-        private val SCRAMBLE_CACHERS = mutableMapOf<String, ScrambleCacher>()
+        private val SCRAMBLE_CACHERS = mutableMapOf<String, CoroutineScrambleCacher>()
 
         val WCA_PUZZLES = values().associateBy { it.key }.toSortedMap()
     }
