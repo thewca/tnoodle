@@ -1,34 +1,23 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.server
 
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.scrambles.PuzzleRegistry
 import org.worldcubeassociation.tnoodle.scrambles.ScrambleCacher
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 
-class Plugins<P : Puzzle> : ReadOnlyProperty<String, P> {
-    override fun getValue(thisRef: String, property: KProperty<*>): P {
-        return filePlugins.getValue(thisRef).value
-    }
-
-    private val filePlugins = mutableMapOf<String, Lazy<P>>()
-    private val pluginComment = mutableMapOf<String, String>()
+class Plugins {
+    private val filePlugins = mutableMapOf<String, Lazy<Puzzle>>()
     private val extraCachers = mutableMapOf<String, ScrambleCacher>()
 
-    val plugins: Map<String, Lazy<P>>
+    val plugins: Map<String, Lazy<Puzzle>>
         get() = filePlugins
-
-    val comments: Map<String, String>
-        get() = pluginComment
 
     val cachers: Map<String, ScrambleCacher>
         get() = extraCachers
 
-    fun register(name: String, comment: String, builder: () -> P) {
-        filePlugins[name] = lazy {
-            builder().also { extraCachers[name] = ScrambleCacher(it, CACHE_SIZE, false) }
+    fun register(value: PuzzleRegistry) {
+        filePlugins[value.key] = lazy {
+            value.also { extraCachers[it.key] = ScrambleCacher(it.scrambler, CACHE_SIZE, false) }.scrambler
         }
-
-        pluginComment[name] = comment
     }
 
     companion object {
