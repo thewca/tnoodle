@@ -13,9 +13,10 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleInfoJso
 
 object PuzzleListHandler : RouteHandler {
     private fun getPuzzleInfo(scrambler: Puzzle, includeStatus: Boolean): PuzzleInfoJsonData {
-        val nameData = PuzzleInfoJsonData(scrambler.shortName, PuzzlePlugins.getScramblerLongName(scrambler.shortName))
+        val nameData = PuzzleInfoJsonData(scrambler.shortName, PuzzlePlugins.getScramblerDescription(scrambler.shortName))
 
         if (includeStatus) {
+            PuzzlePlugins.initiateCaching(scrambler.shortName)
             return nameData.copy(initializationStatus = scrambler.initializationStatus)
         }
 
@@ -29,7 +30,7 @@ object PuzzleListHandler : RouteHandler {
             val fileName = call.parameters["filename"]!!
             val (puzzleName, fileExt) = splitNameAndExtension(fileName)
 
-            val scramblers = PuzzlePlugins.PUZZLES
+            val scramblers = PuzzlePlugins.WCA_PUZZLES
 
             if (fileExt == "json") {
                 if (puzzleName.isBlank()) {

@@ -40,7 +40,7 @@ import java.time.LocalDateTime
 import javax.imageio.ImageIO
 
 class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
-    private val scramblers = PuzzlePlugins.PUZZLES
+    private val scramblers = PuzzlePlugins.WCA_PUZZLES
 
     // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
     internal class BufferedImageTranscoder : ImageTranscoder() {

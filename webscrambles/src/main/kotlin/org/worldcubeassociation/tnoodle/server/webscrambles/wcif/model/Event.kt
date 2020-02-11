@@ -25,12 +25,12 @@ data class Event(val id: String, val rounds: List<Round>) {
 
         fun loadScrambler(eventId: String): Puzzle? {
             val puzzleId = EVENT_SCRAMBLER_MAPPING[eventId] ?: eventId
-            val supplier = PuzzlePlugins.PUZZLES[puzzleId]
+            val supplier = PuzzlePlugins.WCA_PUZZLES[puzzleId]
 
             return supplier?.value
         }
 
         fun getEventName(eventId: String) =
-            EVENT_NAMES[eventId] ?: PuzzlePlugins.getScramblerLongName(eventId)
+            EVENT_NAMES[eventId] ?: PuzzlePlugins.getScramblerDescription(eventId)
     }
 }

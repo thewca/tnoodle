@@ -32,7 +32,7 @@ class PuzzlePlugins {
 
         private val plugins = PuzzlePlugins()
 
-        val PUZZLES: SortedMap<String, Lazy<Puzzle>> by lazy { loadScramblers() }
+        val WCA_PUZZLES: SortedMap<String, Lazy<Puzzle>> by lazy { loadScramblers() }
         val SCRAMBLE_CACHERS: Map<String, ScrambleCacher> get() = plugins.loadedCachers
 
         private fun loadScramblers(): SortedMap<String, Lazy<Puzzle>> {
@@ -63,5 +63,8 @@ class PuzzlePlugins {
         fun initiateCaching(puzzleKey: String) =
             findRegistryEntry(puzzleKey)
                 ?.let { plugins.warmUpCache(it) }
+
+        fun getScramblerDescription(puzzleKey: String) =
+            findRegistryEntry(puzzleKey)?.description
     }
 }

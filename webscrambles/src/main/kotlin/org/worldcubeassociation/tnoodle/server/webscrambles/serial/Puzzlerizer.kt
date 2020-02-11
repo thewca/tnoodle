@@ -11,7 +11,7 @@ object Puzzlerizer : KSerializer<Puzzle> {
         get() = StringDescriptor.withName("Puzzle")
 
     override fun deserialize(decoder: Decoder): Puzzle {
-        val scramblers = PuzzlePlugins.PUZZLES
+        val scramblers = PuzzlePlugins.WCA_PUZZLES
         val deserialized = decoder.decodeString()
 
         return scramblers[deserialized]?.value
