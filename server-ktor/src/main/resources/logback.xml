@@ -14,10 +14,21 @@
         </encoder>
     </appender>
 
+    <!-- Stop output INFO at start -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
     <root level="debug">
-        <appender-ref ref="FILE" />
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 
     <logger name="io.netty" level="INFO"/>
+
+    <logger name="cs.sq12phase" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="cs.threephase" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
 </configuration>

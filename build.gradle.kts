@@ -86,7 +86,7 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
     keep("class org.apache.batik.dom.** { *; }")
     keep("class com.itextpdf.text.ImgTemplate { *; }")
 
-    keep("class ch.qos.logback.core.FileAppender { *; }")
+    keep("class ch.qos.logback.core.** { *; }")
 
     keep("class com.sun.jna.** { *; }")
     keep("class dorkbox.util.jna.** { *; }")
