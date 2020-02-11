@@ -1,4 +1,5 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.gitVersionTag
 
@@ -55,6 +56,8 @@ dependencies {
 
     runtimeOnly(project(":tnoodle-ui"))
 }
+
+configureJUnit5()
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
