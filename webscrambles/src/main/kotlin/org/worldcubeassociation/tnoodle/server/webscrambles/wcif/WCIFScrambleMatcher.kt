@@ -1,5 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
+import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
@@ -36,9 +41,11 @@ object WCIFScrambleMatcher {
         return Competition("1.0", PSEUDO_ID, name, name, indexEvents, Schedule.EMPTY)
     }
 
-    fun fillScrambleSets(wcif: Competition): Competition {
+    suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
         val scrambledEvents = wcif.events.map { e ->
-            val scrambledRounds = e.rounds.map { r -> scrambleRound(r) }
+            val scrambledRounds = coroutineScope {
+                e.rounds.map { r -> async { scrambleRound(r, onUpdate) } }.awaitAll()
+            }
 
             e.copy(rounds = scrambledRounds)
         }
@@ -47,6 +54,10 @@ object WCIFScrambleMatcher {
         val scrambled = wcif.copy(events = indexedEvents)
 
         return matchActivities(scrambled)
+    }
+
+    fun fillScrambleSets(wcif: Competition): Competition {
+        return runBlocking { fillScrambleSetsAsync(wcif) { _, _ -> Unit } }
     }
 
     private fun reindexScrambleSets(events: List<Event>): List<Event> {
@@ -70,14 +81,14 @@ object WCIFScrambleMatcher {
         }
     }
 
-    private fun scrambleRound(round: Round): Round {
-        val scrambles = List(round.scrambleSetCount) { generateScrambleSet(round) }
+    private fun scrambleRound(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): Round {
+        val scrambles = List(round.scrambleSetCount) { generateScrambleSet(round, onUpdate) }
 
         return round.copy(scrambleSets = scrambles)
     }
 
     // FIXME coroutines, progressBar
-    private fun generateScrambleSet(round: Round): ScrambleSet {
+    private fun generateScrambleSet(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): ScrambleSet {
         val puzzle = Event.findPuzzlePlugin(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
@@ -86,18 +97,20 @@ object WCIFScrambleMatcher {
                 ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
 
             List(round.expectedAttemptNum) {
-                val scrambles = puzzle.generateEfficientScrambles(multiExtCount)
+                val scrambles = puzzle.generateEfficientScrambles(multiExtCount) { onUpdate(puzzle, it) }
                     .joinToString(Scramble.WCIF_NEWLINE_CHAR)
 
                 Scramble(scrambles)
             }
         } else {
-            puzzle.generateEfficientScrambles(round.expectedAttemptNum).map { Scramble(it) }
+            puzzle.generateEfficientScrambles(round.expectedAttemptNum) { onUpdate(puzzle, it) }
+                .map { Scramble(it) }
         }
 
         val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
             ?: defaultExtraCount(round.idCode.eventId)
-        val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum).map { Scramble(it) }
+        val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum) { onUpdate(puzzle, it) }
+            .map { Scramble(it) }
 
         // dummy ID -- indexing happens afterwards
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
@@ -243,6 +256,6 @@ object WCIFScrambleMatcher {
             .filter { it.id == activity.activityCode.eventId }
             .flatMap { it.rounds }
             .find { it.idCode.isParentOf(activity.activityCode) }
-            ?: error("An activity of the schedule did not match an event.")
+            ?: error("An activity of the schedule did not match an event: $activity")
     }
 }
