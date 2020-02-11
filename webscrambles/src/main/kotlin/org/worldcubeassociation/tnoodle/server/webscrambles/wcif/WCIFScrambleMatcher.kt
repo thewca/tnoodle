@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import net.gnehzr.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*

@@ -9,8 +9,8 @@ import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.ColumnText
 import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfTemplate
-import net.gnehzr.tnoodle.svglite.Dimension
-import net.gnehzr.tnoodle.svglite.Svg
+import org.worldcubeassociation.tnoodle.svglite.Dimension
+import org.worldcubeassociation.tnoodle.svglite.Svg
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.batik.bridge.BridgeContext
 import org.apache.batik.bridge.DocumentLoader

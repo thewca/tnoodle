@@ -13,14 +13,14 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import kotlinx.serialization.list
-import net.gnehzr.tnoodle.scrambles.PuzzleIcon
-import net.gnehzr.tnoodle.scrambles.PuzzleImageInfo
 import org.apache.batik.anim.dom.SVGDOMImplementation
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.TranscodingHints
 import org.apache.batik.transcoder.image.ImageTranscoder
 import org.apache.batik.util.SVGConstants
+import org.worldcubeassociation.tnoodle.scrambles.PuzzleIcon
+import org.worldcubeassociation.tnoodle.scrambles.PuzzleImageInfo
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension

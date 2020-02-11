@@ -1,9 +1,9 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import kotlinx.serialization.Serializable
-import net.gnehzr.tnoodle.scrambles.Puzzle
-import net.gnehzr.tnoodle.scrambles.ScrambleCacher
-import net.gnehzr.tnoodle.svglite.Color
+import org.worldcubeassociation.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.scrambles.ScrambleCacher
+import org.worldcubeassociation.tnoodle.svglite.Color
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Colorizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Puzzlerizer
 import java.net.URLDecoder

@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.StringDescriptor
-import net.gnehzr.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 
 @Serializer(forClass = Puzzle::class)
