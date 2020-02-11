@@ -40,8 +40,6 @@ import java.time.LocalDateTime
 import javax.imageio.ImageIO
 
 class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
-    private val scramblers = PuzzlePlugins.WCA_PUZZLES
-
     // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
     internal class BufferedImageTranscoder : ImageTranscoder() {
         var bufferedImage: BufferedImage? = null
@@ -67,7 +65,8 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                     return@get call.respondText("No extension specified.")
                 }
 
-                val scrambler by scramblers[name] ?: return@get call.respondText("Invalid scrambler: $name")
+                val scrambler by PuzzlePlugins.WCA_PUZZLES[name]
+                    ?: return@get call.respondText("Invalid scrambler: $name")
 
                 val queryStr = call.request.uri.substringAfter('?', "")
                 val query = parseQuery(queryStr).toMutableMap()

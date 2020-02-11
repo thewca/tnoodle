@@ -5,18 +5,19 @@ import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
-import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleInfoJsonData
 
 object PuzzleListHandler : RouteHandler {
-    private fun getPuzzleInfo(scrambler: Puzzle, includeStatus: Boolean): PuzzleInfoJsonData {
-        val nameData = PuzzleInfoJsonData(scrambler.shortName, PuzzlePlugins.getScramblerDescription(scrambler.shortName))
+    private fun getPuzzleInfo(scramblerKey: String, includeStatus: Boolean): PuzzleInfoJsonData? {
+        val description = PuzzlePlugins.getScramblerDescription(scramblerKey) ?: return null
+
+        val nameData = PuzzleInfoJsonData(scramblerKey, description)
 
         if (includeStatus) {
-            PuzzlePlugins.initiateCaching(scrambler.shortName)
+            val scrambler = PuzzlePlugins.WCA_PUZZLES.getValue(scramblerKey).value
             return nameData.copy(initializationStatus = scrambler.initializationStatus)
         }
 
@@ -30,19 +31,15 @@ object PuzzleListHandler : RouteHandler {
             val fileName = call.parameters["filename"]!!
             val (puzzleName, fileExt) = splitNameAndExtension(fileName)
 
-            val scramblers = PuzzlePlugins.WCA_PUZZLES
-
             if (fileExt == "json") {
                 if (puzzleName.isBlank()) {
-                    val puzzleInfos = scramblers.values
-                        .map { getPuzzleInfo(it.value, includeStatus) }
+                    val puzzleInfos = PuzzlePlugins.WCA_PUZZLES.keys
+                        .mapNotNull { getPuzzleInfo(it, includeStatus) }
 
                     call.respond(puzzleInfos)
                 } else {
-                    val cachedPuzzle by scramblers[puzzleName]
+                    val puzzleInfo = getPuzzleInfo(puzzleName, includeStatus)
                         ?: return@get call.respondText("Invalid scrambler: $puzzleName")
-
-                    val puzzleInfo = getPuzzleInfo(cachedPuzzle, includeStatus)
 
                     call.respond(puzzleInfo)
                 }
