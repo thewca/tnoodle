@@ -3,10 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcAttemptCountExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.CompetitionZippingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ScrambleZip
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
@@ -24,17 +21,19 @@ object WCIFDataBuilder {
                 r.scrambleSets.mapIndexed { scrNum, it ->
                     val copyCode = r.idCode.copyParts(groupNumber = scrNum)
 
-                    if (e.id == "333fm") {
+                    val specificExtensions = if (e.id == "333fm") {
                         val formatExtension = FmcAttemptCountExtension(r.expectedAttemptNum)
                         val languageExtension = r.findExtension<FmcLanguagesExtension>()
 
-                        val allExtensions = listOfNotNull(formatExtension, languageExtension).toTypedArray()
-                        val extendedScrSet = it.copy(extensions = it.withExtensions(*allExtensions))
-
-                        ScrambleDrawingData(extendedScrSet, copyCode)
+                        listOfNotNull(formatExtension, languageExtension)
                     } else {
-                        ScrambleDrawingData(it, copyCode)
+                        listOf()
                     }
+
+                    val generalExtensions = specificExtensions + r.findExtension<SheetCopyCountExtension>()
+                    val extendedScrSet = it.copy(extensions = it.withExtensions(generalExtensions))
+
+                    ScrambleDrawingData(extendedScrSet, copyCode)
                 }
             }
         }
@@ -70,10 +69,10 @@ object WCIFDataBuilder {
         }
 
         val configurations = scrambleRequests.map {
-            Triple(it.activityCode.compileTitleString(false), Event.getEventName(it.activityCode.eventId).orEmpty(), 1)
-        } // FIXME COPIES
+            Triple(it.activityCode.compileTitleString(false), Event.getEventName(it.activityCode.eventId).orEmpty(), it.numCopies)
+        }
 
-        return MergedPdfWithOutline(originalPdfs, configurations, sheetRequest.competitionTitle)
+        return MergedPdfWithOutline(originalPdfs, configurations)
     }
 
     fun ScrambleDrawingData.createPdf(creationDate: LocalDate, versionTag: String, sheetTitle: String, locale: Locale): PdfContent {
