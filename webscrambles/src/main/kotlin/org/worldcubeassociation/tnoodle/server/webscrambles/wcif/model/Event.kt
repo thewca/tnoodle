@@ -26,9 +26,9 @@ data class Event(val id: String, val rounds: List<Round>) {
         fun getScramblerName(eventId: String) =
             EVENT_SCRAMBLER_MAPPING[eventId] ?: eventId
 
-        fun loadScrambler(eventId: String): Puzzle? {
+        fun findPuzzlePlugin(eventId: String): PuzzlePlugins? {
             val puzzleId = getScramblerName(eventId)
-            return PuzzlePlugins.WCA_PUZZLES[puzzleId]?.scrambler
+            return PuzzlePlugins.WCA_PUZZLES[puzzleId]
         }
 
         fun getEventName(eventId: String): String? {

@@ -26,16 +26,24 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
     // TODO have tnoodle-lib provide an interface that this stuff can be delegated to
     val key get() = registry.key
     val description get() = registry.description
-    val scrambler get() = registry.also { warmUpCache(it) }.scrambler
+    val scrambler get() = registry.also { warmUpCache() }.scrambler
 
-    private fun warmUpCache(value: PuzzleRegistry, cacheSize: Int = CACHE_SIZE) {
-        SCRAMBLE_CACHERS.computeIfAbsent(value.key) { ScrambleCacher(value.scrambler, cacheSize, false) }
+    val cacheSize get() = SCRAMBLE_CACHERS[this.key]?.availableCount
+
+    fun warmUpCache(cacheSize: Int = CACHE_SIZE) {
+        SCRAMBLE_CACHERS.computeIfAbsent(this.key) { ScrambleCacher(this.scrambler, cacheSize, false) }
+    }
+
+    fun generateEfficientScrambles(num: Int): Array<String> {
+        return SCRAMBLE_CACHERS[this.key]?.newScrambles(num)
+            ?: this.scrambler.generateScrambles(num)
     }
 
     companion object {
         const val CACHE_SIZE = 30
 
-        val WCA_PUZZLES = values().associateBy { it.key }.toSortedMap()
         private val SCRAMBLE_CACHERS = mutableMapOf<String, ScrambleCacher>()
+
+        val WCA_PUZZLES = values().associateBy { it.key }.toSortedMap()
     }
 }
