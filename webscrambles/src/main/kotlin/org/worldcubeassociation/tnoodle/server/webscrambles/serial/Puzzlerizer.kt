@@ -14,7 +14,7 @@ object Puzzlerizer : KSerializer<Puzzle> {
         val scramblers = PuzzlePlugins.WCA_PUZZLES
         val deserialized = decoder.decodeString()
 
-        return scramblers[deserialized]?.value
+        return scramblers[deserialized]?.scrambler
             ?: error("$deserialized not found in: ${scramblers.keys}")
     }
 

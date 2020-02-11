@@ -65,7 +65,7 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                     return@get call.respondText("No extension specified.")
                 }
 
-                val scrambler by PuzzlePlugins.WCA_PUZZLES[name]
+                val scrambler = PuzzlePlugins.WCA_PUZZLES[name]?.scrambler
                     ?: return@get call.respondText("Invalid scrambler: $name")
 
                 val queryStr = call.request.uri.substringAfter('?', "")

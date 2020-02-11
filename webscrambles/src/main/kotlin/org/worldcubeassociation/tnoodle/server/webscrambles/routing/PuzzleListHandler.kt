@@ -12,13 +12,12 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleInfoJso
 
 object PuzzleListHandler : RouteHandler {
     private fun getPuzzleInfo(scramblerKey: String, includeStatus: Boolean): PuzzleInfoJsonData? {
-        val description = PuzzlePlugins.getScramblerDescription(scramblerKey) ?: return null
+        val plugin = PuzzlePlugins.WCA_PUZZLES[scramblerKey] ?: return null
 
-        val nameData = PuzzleInfoJsonData(scramblerKey, description)
+        val nameData = PuzzleInfoJsonData(scramblerKey, plugin.description)
 
         if (includeStatus) {
-            val scrambler = PuzzlePlugins.WCA_PUZZLES.getValue(scramblerKey).value
-            return nameData.copy(initializationStatus = scrambler.initializationStatus)
+            return nameData.copy(initializationStatus = plugin.scrambler.initializationStatus)
         }
 
         return nameData
