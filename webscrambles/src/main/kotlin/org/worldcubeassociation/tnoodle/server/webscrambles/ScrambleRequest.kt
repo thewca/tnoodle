@@ -2,7 +2,6 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import kotlinx.serialization.Serializable
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
-import org.worldcubeassociation.tnoodle.scrambles.ScrambleCacher
 import org.worldcubeassociation.tnoodle.svglite.Color
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Colorizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Puzzlerizer
@@ -42,8 +41,6 @@ data class ScrambleRequest(
         private val MAX_COUNT = 100
         private val MAX_COPIES = 100
 
-        private val SCRAMBLE_CACHERS = mutableMapOf<String, ScrambleCacher>()
-
         fun empty(scrambler: Puzzle) =
             ScrambleRequest(
                 listOf(),
@@ -76,10 +73,10 @@ data class ScrambleRequest(
 
             val decodedTitle = URLDecoder.decode(title, "utf-8")
 
-            val scrambler = PuzzlePlugins.WCA_PUZZLES[puzzle]?.scrambler
+            val plugin = PuzzlePlugins.WCA_PUZZLES[puzzle]
                 ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
 
-            val scrambleCacher = SCRAMBLE_CACHERS.getOrPut(puzzle) { ScrambleCacher(scrambler) }
+            val scrambler = plugin.scrambler
 
             val fmc = countStr == "fmc"
 
@@ -88,7 +85,7 @@ data class ScrambleRequest(
             val copies = min(copiesStr.toInt(), MAX_COPIES)
 
             val genScrambles = uniqueSeed?.let { scrambler.generateSeededScrambles(seed, count) }
-                ?: scrambleCacher.newScrambles(count)
+                ?: plugin.generateEfficientScrambles(count)
 
             val scrambles = genScrambles.toList()
 

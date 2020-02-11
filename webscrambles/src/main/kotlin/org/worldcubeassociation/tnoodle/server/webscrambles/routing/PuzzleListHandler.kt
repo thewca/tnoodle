@@ -17,7 +17,9 @@ object PuzzleListHandler : RouteHandler {
         val nameData = PuzzleInfoJsonData(scramblerKey, plugin.description)
 
         if (includeStatus) {
-            return nameData.copy(initializationStatus = plugin.scrambler.initializationStatus)
+            return nameData.copy(
+                initializationStatus = plugin.scrambler.initializationStatus,
+                cacheQueue = plugin.cacheSize)
         }
 
         return nameData

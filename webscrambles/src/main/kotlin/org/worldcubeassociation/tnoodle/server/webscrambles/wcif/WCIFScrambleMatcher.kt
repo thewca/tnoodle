@@ -80,7 +80,7 @@ object WCIFScrambleMatcher {
 
     // FIXME coroutines, progressBar
     private fun generateScrambleSet(round: Round): ScrambleSet {
-        val puzzle = Event.loadScrambler(round.idCode.eventId)
+        val puzzle = Event.findPuzzlePlugin(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
         val scrambles = if (round.idCode.eventId == "333mbf") {
@@ -103,11 +103,6 @@ object WCIFScrambleMatcher {
 
         // dummy ID -- indexing happens afterwards
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
-    }
-
-    private fun Puzzle.generateEfficientScrambles(num: Int): Array<String> {
-        return PuzzlePlugins.SCRAMBLE_CACHERS[this.shortName]?.newScrambles(num)
-            ?: generateScrambles(num)
     }
 
     fun installExtensions(wcif: Competition, ext: Map<Extension, String>): Competition {
