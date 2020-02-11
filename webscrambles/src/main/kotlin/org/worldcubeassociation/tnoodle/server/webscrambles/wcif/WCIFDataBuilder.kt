@@ -104,7 +104,6 @@ object WCIFDataBuilder {
         }
 
         assert(scrambleSet.scrambles.isNotEmpty())
-        val isFmc = scrambleSet.findExtension<FmcExtension>()?.data ?: false
 
         if (isFmc) {
             // We don't watermark the FMC sheets because they already have
