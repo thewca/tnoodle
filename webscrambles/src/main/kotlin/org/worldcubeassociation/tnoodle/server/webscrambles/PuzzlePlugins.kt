@@ -31,7 +31,7 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
     val cacheSize get() = SCRAMBLE_CACHERS[this.key]?.availableCount
 
     fun warmUpCache(cacheSize: Int = CACHE_SIZE) {
-        SCRAMBLE_CACHERS.computeIfAbsent(this.key) { ScrambleCacher(this.scrambler, cacheSize, false) }
+        SCRAMBLE_CACHERS.getOrPut(this.key) { ScrambleCacher(this.registry.scrambler, cacheSize, false) }
     }
 
     fun generateEfficientScrambles(num: Int): Array<String> {
