@@ -6,10 +6,13 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.pars
 
 @Serializable
 data class Activity(val id: Int, val activityCode: @Serializable(with = ActivityCode.Companion::class) ActivityCode, val startTime: String, val childActivities: List<Activity> = emptyList(), val scrambleSetId: Int? = null) {
-    val nestedChildActivities: List<Activity>
+    val leafChildActivities: List<Activity>
         get() = childActivities.takeUnless { it.isEmpty() }
-            ?.flatMap { it.nestedChildActivities }
+            ?.flatMap { it.leafChildActivities }
             ?: listOf(this)
+
+    val selfAndChildActivities: List<Activity>
+        get() = listOf(this) + childActivities.flatMap { it.selfAndChildActivities }
 
     fun getLocalStartTime(timeZone: ZoneId) = startTime.parseWCIFDateWithTimezone(timeZone)
 }
