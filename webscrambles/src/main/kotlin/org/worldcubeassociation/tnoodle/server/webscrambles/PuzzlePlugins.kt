@@ -1,70 +1,41 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.scrambles.PuzzleRegistry
 import org.worldcubeassociation.tnoodle.scrambles.ScrambleCacher
-import java.util.*
 
-class PuzzlePlugins {
-    private val plugins = mutableSetOf<PuzzleRegistry>()
-    private val extraCachers = mutableMapOf<String, ScrambleCacher>()
+enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
+    // To all fellow programmers who wonder about effectively copying an interface:
+    // 1-- Be able to intercept the `scrambler` reference (see getter below)
+    // 2-- Be able to limit the selection of tnoodle-lib `Puzzle`s that are exposed.
+    TWO(PuzzleRegistry.TWO),
+    THREE(PuzzleRegistry.THREE),
+    FOUR(PuzzleRegistry.FOUR),
+    FIVE(PuzzleRegistry.FIVE),
+    SIX(PuzzleRegistry.SIX),
+    SEVEN(PuzzleRegistry.SEVEN),
+    THREE_BLD(PuzzleRegistry.THREE_NI),
+    FOUR_BLD(PuzzleRegistry.FOUR_NI),
+    FIVE_BLD(PuzzleRegistry.FIVE_NI),
+    THREE_FMC(PuzzleRegistry.THREE_FM),
+    PYRA(PuzzleRegistry.PYRA),
+    SQ1(PuzzleRegistry.SQ1),
+    MEGA(PuzzleRegistry.MEGA),
+    CLOCK(PuzzleRegistry.CLOCK),
+    SKEWB(PuzzleRegistry.SKEWB);
 
-    val lazyMapping: Map<PuzzleRegistry, Lazy<Puzzle>>
-        get() = plugins.associateWith { makeLazy(it) }
-
-    val loadedCachers: Map<String, ScrambleCacher>
-        get() = extraCachers
-
-    fun register(value: PuzzleRegistry) {
-        plugins += value
-    }
-
-    private fun makeLazy(value: PuzzleRegistry): Lazy<Puzzle> {
-        return lazy { value.also { warmUpCache(it) }.scrambler }
-    }
+    // TODO have tnoodle-lib provide an interface that this stuff can be delegated to
+    val key get() = registry.key
+    val description get() = registry.description
+    val scrambler get() = registry.also { warmUpCache(it) }.scrambler
 
     private fun warmUpCache(value: PuzzleRegistry, cacheSize: Int = CACHE_SIZE) {
-        extraCachers.computeIfAbsent(value.key) { ScrambleCacher(value.scrambler, cacheSize, false) }
+        SCRAMBLE_CACHERS.computeIfAbsent(value.key) { ScrambleCacher(value.scrambler, cacheSize, false) }
     }
 
     companion object {
         const val CACHE_SIZE = 30
 
-        private val plugins = PuzzlePlugins()
-
-        val WCA_PUZZLES: SortedMap<String, Lazy<Puzzle>> by lazy { loadScramblers() }
-        val SCRAMBLE_CACHERS: Map<String, ScrambleCacher> get() = plugins.loadedCachers
-
-        private fun loadScramblers(): SortedMap<String, Lazy<Puzzle>> {
-            plugins.register(PuzzleRegistry.TWO)
-            plugins.register(PuzzleRegistry.THREE)
-            plugins.register(PuzzleRegistry.FOUR)
-            plugins.register(PuzzleRegistry.FIVE)
-            plugins.register(PuzzleRegistry.SIX)
-            plugins.register(PuzzleRegistry.SEVEN)
-            plugins.register(PuzzleRegistry.THREE_NI)
-            plugins.register(PuzzleRegistry.FOUR_NI)
-            plugins.register(PuzzleRegistry.FIVE_NI)
-            plugins.register(PuzzleRegistry.THREE_FM)
-            plugins.register(PuzzleRegistry.PYRA)
-            plugins.register(PuzzleRegistry.SQ1)
-            plugins.register(PuzzleRegistry.MEGA)
-            plugins.register(PuzzleRegistry.CLOCK)
-            plugins.register(PuzzleRegistry.SKEWB)
-
-            return plugins.lazyMapping
-                .mapKeys { it.key.key }
-                .toSortedMap(naturalOrder())
-        }
-
-        private fun findRegistryEntry(puzzleKey: String) =
-            plugins.plugins.find { it.key == puzzleKey }
-
-        fun initiateCaching(puzzleKey: String) =
-            findRegistryEntry(puzzleKey)
-                ?.let { plugins.warmUpCache(it) }
-
-        fun getScramblerDescription(puzzleKey: String) =
-            findRegistryEntry(puzzleKey)?.description
+        val WCA_PUZZLES = values().associateBy { it.key }.toSortedMap()
+        private val SCRAMBLE_CACHERS = mutableMapOf<String, ScrambleCacher>()
     }
 }

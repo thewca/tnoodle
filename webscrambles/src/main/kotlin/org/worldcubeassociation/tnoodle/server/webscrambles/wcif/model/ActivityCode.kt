@@ -1,7 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStringEncoder
 import kotlin.math.*
 

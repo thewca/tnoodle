@@ -23,14 +23,17 @@ data class Event(val id: String, val rounds: List<Round>) {
             "333mbf" to "3x3x3 Multiple Blindfolded"
         )
 
-        fun loadScrambler(eventId: String): Puzzle? {
-            val puzzleId = EVENT_SCRAMBLER_MAPPING[eventId] ?: eventId
-            val supplier = PuzzlePlugins.WCA_PUZZLES[puzzleId]
+        fun getScramblerName(eventId: String) =
+            EVENT_SCRAMBLER_MAPPING[eventId] ?: eventId
 
-            return supplier?.value
+        fun loadScrambler(eventId: String): Puzzle? {
+            val puzzleId = getScramblerName(eventId)
+            return PuzzlePlugins.WCA_PUZZLES[puzzleId]?.scrambler
         }
 
-        fun getEventName(eventId: String) =
-            EVENT_NAMES[eventId] ?: PuzzlePlugins.getScramblerDescription(eventId)
+        fun getEventName(eventId: String): String? {
+            val puzzleId = getScramblerName(eventId)
+            return EVENT_NAMES[eventId] ?: PuzzlePlugins.WCA_PUZZLES[puzzleId]?.description
+        }
     }
 }
