@@ -22,10 +22,11 @@ object APIIntegrationTest {
         val upcomingComps = JsonConfig.SERIALIZER.parse(UpcomingCompetition.serializer().list, upcomingRaw)
 
         val generationDate = LocalDateTime.now()
+        val testCompCount = upcomingComps.size
 
-        for (upcomingComp in upcomingComps) {
+        for ((i, upcomingComp) in upcomingComps.withIndex()) {
             val id = upcomingComp.id
-            println("Testing ZIP builder for '${upcomingComp.name}' (id $id)")
+            println("(${i+1}/$testCompCount) Testing ZIP builder for '${upcomingComp.name}' (id $id)")
 
             val url = "https://www.worldcubeassociation.org/api/v0/competitions/$id/wcif/public"
 
