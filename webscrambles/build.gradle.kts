@@ -6,6 +6,7 @@ import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.KOTLIN_ARGPARSER
+import dependencies.Libraries.APACHE_COMMONS_LANG3
 import dependencies.Libraries.SYSTEM_TRAY
 import dependencies.Libraries.KOTLIN_SERIALIZATION_JVM
 import dependencies.Libraries.SNAKEYAML
@@ -50,6 +51,7 @@ dependencies {
     implementation(SYSTEM_TRAY)
     implementation(TNOODLE_SCRAMBLES)
     implementation(KOTLIN_SERIALIZATION_JVM)
+    implementation(APACHE_COMMONS_LANG3)
 
     runtimeOnly(project(":tnoodle-ui"))
 }
