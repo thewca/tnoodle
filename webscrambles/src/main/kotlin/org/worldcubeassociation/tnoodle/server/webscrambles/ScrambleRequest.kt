@@ -76,7 +76,7 @@ data class ScrambleRequest(
 
             val decodedTitle = URLDecoder.decode(title, "utf-8")
 
-            val scrambler by PuzzlePlugins.PUZZLES[puzzle]
+            val scrambler by PuzzlePlugins.WCA_PUZZLES[puzzle]
                 ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
 
             val scrambleCacher = SCRAMBLE_CACHERS.getOrPut(puzzle) { ScrambleCacher(scrambler) }
