@@ -55,6 +55,7 @@ dependencies {
     implementation(APACHE_COMMONS_LANG3)
 
     runtimeOnly(project(":tnoodle-ui"))
+    runtimeOnly(project(":awesome-ui"))
 }
 
 configureJUnit5()

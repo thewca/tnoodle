@@ -31,6 +31,24 @@ object StaticContentHandler : RouteHandler {
             }
         }
 
+        router.static("/the-future") {
+            defaultResource("wca/awesome-ui/index.html")
+
+            static("/static") {
+                resources("wca/awesome-ui/static")
+            }
+
+            static("oauth") {
+                resource("*", "wca/awesome-ui/index.html")
+            }
+
+            static("competitions") {
+                resource("*", "wca/awesome-ui/index.html")
+
+                defaultResource("wca/awesome-ui/index.html")
+            }
+        }
+
         router.static("/scramble-legacy") {
             defaultResource("wca/scramblegen.html")
         }
