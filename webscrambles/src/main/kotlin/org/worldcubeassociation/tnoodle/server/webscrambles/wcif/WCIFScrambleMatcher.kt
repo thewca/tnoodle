@@ -21,7 +21,7 @@ object WCIFScrambleMatcher {
                         ID_PENDING, // dummy ID -- indexed separately down below
                         scr.scrambles.map(::Scramble),
                         scr.extraScrambles.map(::Scramble),
-                        listOf(FmcExtension(scr.fmc))
+                        listOf(FmcExtension(scr.fmc).build()) // FIXME avoid "build()" once KotlinX serializer has been fixed (#448)
                     )
                 }
 
@@ -83,7 +83,7 @@ object WCIFScrambleMatcher {
 
         val scrambles = if (round.idCode.eventId == "333mbf") {
             val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
-                ?.data ?: error("No multiBLD number for round $round specified")
+                ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
 
             List(round.expectedAttemptNum) {
                 val scrambles = puzzle.generateEfficientScrambles(multiExtCount)
@@ -95,7 +95,7 @@ object WCIFScrambleMatcher {
             puzzle.generateEfficientScrambles(round.expectedAttemptNum).map { Scramble(it) }
         }
 
-        val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.data
+        val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
             ?: defaultExtraCount(round.idCode.eventId)
         val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum).map { Scramble(it) }
 
@@ -103,11 +103,11 @@ object WCIFScrambleMatcher {
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
     }
 
-    fun installExtensions(wcif: Competition, ext: Map<Extension, String>): Competition {
+    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, String>): Competition {
         return ext.entries.fold(wcif) { acc, e -> installExtensionForEvents(acc, e.key, e.value) }
     }
 
-    fun installExtensionForEvents(wcif: Competition, ext: Extension, eventId: String): Competition {
+    fun installExtensionForEvents(wcif: Competition, ext: ExtensionBuilder, eventId: String): Competition {
         fun installRoundExtension(e: Event): Event {
             val extendedRounds = e.rounds.map { r ->
                 r.copy(extensions = r.withExtension(ext))
