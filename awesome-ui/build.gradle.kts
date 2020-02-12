@@ -54,6 +54,8 @@ tasks.create<Zip>("packageReactFrontend") {
     from("${project.buildDir}") {
         include("static/**/*")
         include("*.html")
+        include("*.png")
+        include("robots.txt")
 
         into("wca/awesome-ui")
     }
