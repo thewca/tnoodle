@@ -6,10 +6,6 @@ import { WCA_EVENTS } from "../../constants/wca.constants";
 import _ from "lodash";
 
 class EventPickerTable extends Component {
-  constructor(props) {
-    super(props);
-    this.handleUpdateEvent = props.handleUpdateEvent;
-  }
   render() {
     let EVENTS_PER_LINE = 2;
     let eventChunks = _.chunk(WCA_EVENTS, EVENTS_PER_LINE);
@@ -25,10 +21,7 @@ class EventPickerTable extends Component {
                     className="col-6 border border-secondary rounded"
                     key={event.id}
                   >
-                    <EventPicker
-                      event={event}
-                      handleUpdateEvent={this.handleUpdateEvent}
-                    />
+                    <EventPicker event={event} />
                   </div>
                 );
               })}
