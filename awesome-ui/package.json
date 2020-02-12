@@ -2,6 +2,7 @@
   "name": "tnoodle-ui",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://localhost:2014/the-future",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -17,6 +18,9 @@
     "react-scripts": "3.3.0",
     "redux": "^4.0.5"
   },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -24,9 +28,6 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -39,9 +40,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "homepage": "http://campos20.github.io/tnoodle-ui",
-  "devDependencies": {
-    "gh-pages": "^2.2.0"
   }
 }
