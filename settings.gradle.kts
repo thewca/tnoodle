@@ -10,6 +10,7 @@ pluginManagement {
     }
 }
 
+include("awesome-ui")
 include("cloudscrambles")
 include("server-ktor")
 include("tnoodle-ui")
