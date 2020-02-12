@@ -5,20 +5,16 @@ import kotlinx.serialization.internal.StringDescriptor
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 
-@Serializer(forClass = Puzzle::class)
-object Puzzlerizer : KSerializer<Puzzle> {
-    override val descriptor: SerialDescriptor
-        get() = StringDescriptor.withName("Puzzle")
+object Puzzlerizer : SingletonStringEncoder<Puzzle>("Puzzle") {
+    override fun serialize(encoder: Encoder, obj: Puzzle) {
+        encoder.encodeString(obj.shortName)
+    }
 
-    override fun deserialize(decoder: Decoder): Puzzle {
+    override fun encodeInstance(instance: Puzzle) = instance.shortName
+    override fun makeInstance(deserialized: String): Puzzle {
         val scramblers = PuzzlePlugins.WCA_PUZZLES
-        val deserialized = decoder.decodeString()
 
         return scramblers[deserialized]?.scrambler
             ?: error("$deserialized not found in: ${scramblers.keys}")
-    }
-
-    override fun serialize(encoder: Encoder, obj: Puzzle) {
-        encoder.encodeString(obj.shortName)
     }
 }

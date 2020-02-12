@@ -14,7 +14,7 @@ import kotlin.math.min
 data class ScrambleRequest(
     val scrambles: List<String>,
     val extraScrambles: List<String>,
-    @Serializable(with = Puzzlerizer::class) val scrambler: Puzzle,
+    val scrambler: @Serializable(with = Puzzlerizer::class) Puzzle,
     val copies: Int,
     val title: String,
     val fmc: Boolean,
