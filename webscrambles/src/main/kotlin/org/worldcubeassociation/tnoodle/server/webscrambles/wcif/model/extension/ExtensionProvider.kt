@@ -1,37 +1,37 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension
 
 import kotlinx.serialization.Serializable
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Extension
 
 @Serializable
 abstract class ExtensionProvider {
     abstract val extensions: List<Extension>
 
-    fun withExtension(ext: Extension?) =
+    fun withExtension(ext: ExtensionBuilder?) =
         ext?.let { extensions.extend(it) } ?: extensions
 
-    fun withExtensions(vararg ext: Extension): List<Extension> {
-        return ext.fold(extensions) { acc, e -> acc.extend(e) }
-    }
+    fun withExtensions(ext: List<ExtensionBuilder?>) =
+        ext.filterNotNull().fold(extensions) { acc, e -> acc.extend(e) }
 
-    fun withExtensions(ext: List<Extension?>) =
-        withExtensions(*ext.filterNotNull().toTypedArray())
+    fun withExtensions(vararg ext: ExtensionBuilder) =
+        withExtensions(ext.asList())
 
-    inline fun <reified T : Extension> hasExtension() =
+    inline fun <reified T : ExtensionBuilder> hasExtension() =
         findExtension<T>() != null
 
-    inline fun <reified T : Extension> findExtension() =
-        extensions.filterIsInstance<T>().singleOrNull()
+    inline fun <reified T : ExtensionBuilder> findExtension() =
+        extensions.mapNotNull { it.parsedData<T>() }.singleOrNull()
 
     companion object {
-        fun List<Extension>.extend(ext: Extension): List<Extension> {
+        fun List<Extension>.extend(ext: ExtensionBuilder): List<Extension> {
             val index = indexOfFirst { it.id == ext.id }
 
             if (index == -1) {
-                return this + ext
+                return this + ext.build()
             }
 
             return toMutableList()
-                .apply { this[index] = ext }
+                .apply { this[index] = ext.build() }
         }
     }
 }
