@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 data class ZipInterchangeInfo(
     val competitionName: String?,
     val version: String,
-    @Serializable(with = LocalDateTimeSerializer::class) val generationDate: LocalDateTime,
+    val generationDate: @Serializable(with = LocalDateTimeSerializer::class) LocalDateTime,
     val generationUrl: String?,
     val wcif: Competition
 )
