@@ -12,25 +12,19 @@ import "bootstrap/dist/css/bootstrap.css";
 
 import "./App.css";
 
-const App = connect(
-  null,
-  null
-)(
-  class App extends Component {
-    constructor(props) {
-      super(props);
-      this.state = { wcif: {}, me: undefined, isLogged: false };
-    }
+const mapStateToProps = store => ({
+  wcif: store.wcif
+});
 
+const App = connect(mapStateToProps)(
+  class App extends Component {
     offlineScramblerLink = "/webscrambles/offline";
     onlineScramblerLink = "/webscrambles/online";
     aboutLink = "/about";
 
-    updateWcif = wcif => {
-      let state = this.state;
-      state.wcif = wcif;
-      this.setState(state);
-      console.log(wcif);
+    generateScrambles = () => {
+      console.log("Generating scrambles");
+      console.log(this.props.wcif);
     };
 
     render() {
@@ -44,13 +38,10 @@ const App = connect(
             />
             <Switch>
               <Route path={this.offlineScramblerLink}>
-                <OfflineScrambler
-                  generateScrambles={this.generateScrambles}
-                  updateWcif={this.updateWcif}
-                />
+                <OfflineScrambler generateScrambles={this.generateScrambles} />
               </Route>
               <Route path={this.onlineScramblerLink}>
-                <OnlineScrambler />
+                <OnlineScrambler generateScrambles={this.generateScrambles} />
               </Route>
               <Route path={this.aboutLink}>
                 <About />
