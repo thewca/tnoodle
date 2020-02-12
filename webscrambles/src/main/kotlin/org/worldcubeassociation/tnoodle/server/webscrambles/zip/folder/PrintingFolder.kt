@@ -49,7 +49,7 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
 
                         folder("Translations") {
                             val requestedTranslations = req.scrambleSet.findExtension<FmcLanguagesExtension>()
-                                ?.data?.takeUnless { it.isEmpty() } ?: Translate.locales.map { it.toLanguageTag() }
+                                ?.languageTags?.takeUnless { it.isEmpty() } ?: Translate.locales.map { it.toLanguageTag() }
 
                             for (locale in Translate.locales) {
                                 if (locale.toLanguageTag() !in requestedTranslations) {
