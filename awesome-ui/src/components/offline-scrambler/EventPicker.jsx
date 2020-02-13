@@ -2,16 +2,23 @@ import React, { Component } from "react";
 import CubingIcon from "../CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../../constants/wca.constants";
 import { connect } from "react-redux";
-import { updateWcaEvent } from "../../redux/ActionCreators";
+import { updateWcaEvent, updateMbld } from "../../redux/ActionCreators";
 
 import "./EventPicker.scss";
 
+const MIN_MBLD = 2;
+
+const mapStateToProps = store => ({
+  mbld: store.wcif.mbld
+});
+
 const mapDispatchToProps = {
-  updateWcaEvent: updateWcaEvent
+  updateWcaEvent: updateWcaEvent,
+  updateMbld: updateMbld
 };
 
 const EventPicker = connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(
   class extends Component {
@@ -20,6 +27,10 @@ const EventPicker = connect(
 
       // State wcif like
       this.state = { id: props.event.id, rounds: [] };
+
+      if (this.state.id === "333mbf") {
+        this.state.mbld = props.mbld;
+      }
     }
 
     handleNumberOfRoundsChange = evt => {
@@ -82,6 +93,46 @@ const EventPicker = connect(
       this.props.updateWcaEvent(this.state);
     };
 
+    maybeShowMbld = () => {
+      if (this.state.id === "333mbf" && this.state.rounds.length > 0) {
+        return (
+          <tfoot>
+            <tr>
+              <th colSpan={3} className="align-middle">
+                Number of scrambles
+              </th>
+              <td>
+                <input
+                  className="form-control"
+                  type="number"
+                  value={this.state.mbld}
+                  onChange={evt =>
+                    this.handleMbldChange(Number(evt.target.value))
+                  }
+                  min={MIN_MBLD}
+                  onBlur={this.verifyMbld}
+                />
+              </td>
+            </tr>
+          </tfoot>
+        );
+      }
+    };
+
+    handleMbldChange = mbld => {
+      this.setState({ ...this.state, mbld: mbld });
+      this.props.updateMbld(mbld);
+    };
+
+    // When mbld loses focus
+    verifyMbld = () => {
+      let mbld = this.state.mbld;
+      if (mbld < MIN_MBLD) {
+        mbld = MIN_MBLD;
+        this.handleMbldChange(mbld);
+      }
+    };
+
     render() {
       let { event } = this.props;
       let options = [
@@ -101,7 +152,9 @@ const EventPicker = connect(
             <span className="col-2">
               <CubingIcon event={event.id} />
             </span>
-            <h5 className="col-6 font-weight-bold">{event.name}</h5>
+            <h5 className="col-6 font-weight-bold align-bottom">
+              {event.name}
+            </h5>
             <div className="col-4">
               <select onChange={this.handleNumberOfRoundsChange} id={event.id}>
                 {options.map(op => (
@@ -126,8 +179,8 @@ const EventPicker = connect(
               {Array.from({ length: this.state.rounds.length }, (_, i) => {
                 return (
                   <tr key={i} className="form-group">
-                    <td>{i + 1}</td>
-                    <td>
+                    <td className="align-middle">{i + 1}</td>
+                    <td className="align-middle">
                       <select
                         onChange={evt =>
                           this.roundFormatChanged(i, evt.target.value)
@@ -172,6 +225,7 @@ const EventPicker = connect(
                 );
               })}
             </tbody>
+            {this.maybeShowMbld()}
           </table>
         </div>
       );
