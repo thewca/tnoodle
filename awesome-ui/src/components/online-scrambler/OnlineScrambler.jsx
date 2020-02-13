@@ -28,14 +28,17 @@ const OnlineScrambler = connect(
       }
       if (this.state.me == null) {
         fetchMe()
-          .then(me => {
-            this.setState({ ...this.state, me: me });
-          })
+          .then(me => this.handleUpdateMe(me))
           .catch(e => {
             this.setState({ ...this.state, unauthorized: true });
           });
       }
     }
+
+    handleUpdateMe = me => {
+      this.setState({ ...this.state, me: me });
+      this.props.updateMe(me);
+    };
 
     render() {
       if (this.state.unauthorized) {
