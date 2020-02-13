@@ -29,3 +29,8 @@ export const updateMbld = mbld => ({
   type: ActionTypes.UPDATE_MBLD,
   payload: { mbld: mbld }
 });
+
+export const updateCompetitions = competitions => ({
+  type: ActionTypes.UPDATE_COMPETITIONS,
+  payload: { competitions: competitions }
+});

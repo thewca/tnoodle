@@ -65,5 +65,12 @@ export const Reducer = (store, action) => {
     };
   }
 
+  if (action.type === ActionTypes.UPDATE_COMPETITIONS) {
+    return {
+      ...store,
+      competitions: action.payload.competitions
+    };
+  }
+
   return store || defaultStore;
 };
