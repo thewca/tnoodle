@@ -19,7 +19,7 @@ const OnlineScrambler = connect(
   class extends Component {
     constructor(props) {
       super(props);
-      this.state = { competitions: [], me: this.props.me, unauthorized: false };
+      this.state = { me: this.props.me, unauthorized: false };
     }
 
     componentDidMount() {
@@ -60,7 +60,7 @@ const OnlineScrambler = connect(
       return (
         <div className="container">
           <h1>Welcome, {this.state.me.name}</h1>
-          <SelectCompetition competitions={this.props.competitions} />
+          <SelectCompetition />
         </div>
       );
     }
