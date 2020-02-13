@@ -24,3 +24,8 @@ export const updateWcaEvent = wcaEvent => ({
   type: ActionTypes.UPDATE_WCA_EVENT,
   payload: { wcaEvent: wcaEvent }
 });
+
+export const updateMbld = mbld => ({
+  type: ActionTypes.UPDATE_MBLD,
+  payload: { mbld: mbld }
+});

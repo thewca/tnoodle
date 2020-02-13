@@ -1,10 +1,13 @@
 import { ActionTypes } from "./Types";
 
+// TODO find out a better place for this and mbld expected name on the server side
+
 const defaultWcif = {
   formatVersion: "1.0",
   name: "",
   events: [],
-  password: ""
+  password: "",
+  mbld: 28
 };
 const defaultStore = { wcif: defaultWcif };
 
@@ -48,6 +51,16 @@ export const Reducer = (store, action) => {
           ),
           action.payload.wcaEvent
         ]
+      }
+    };
+  }
+
+  if (action.type === ActionTypes.UPDATE_MBLD) {
+    return {
+      ...store,
+      wcif: {
+        ...store.wcif,
+        mbld: action.payload.mbld
       }
     };
   }
