@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { HashRouter, Switch, Route } from "react-router-dom";
 
 import Index from "./components/Index";
 import OfflineScrambler from "./components/offline-scrambler/OfflineScrambler";
@@ -30,7 +30,7 @@ const App = connect(mapStateToProps)(
 
     render() {
       return (
-        <Router>
+        <HashRouter basename="/">
           <div className="App">
             <Navbar
               offlineScramblerLink={this.offlineScramblerLink}
@@ -60,7 +60,7 @@ const App = connect(mapStateToProps)(
               </Route>
             </Switch>
           </div>
-        </Router>
+        </HashRouter>
       );
     }
   }
