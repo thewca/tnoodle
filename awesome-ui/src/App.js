@@ -6,6 +6,7 @@ import OfflineScrambler from "./components/offline-scrambler/OfflineScrambler";
 import OnlineScrambler from "./components/online-scrambler/OnlineScrambler";
 import About from "./components/About";
 import Navbar from "./components/Navbar";
+import ManageCompetition from "./components/online-scrambler/ManageCompetition";
 import { connect } from "react-redux";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -43,6 +44,14 @@ const App = connect(mapStateToProps)(
               <Route path={this.onlineScramblerLink}>
                 <OnlineScrambler generateScrambles={this.generateScrambles} />
               </Route>
+              <Route
+                path="/competitions/:competitionId"
+                component={props => (
+                  <ManageCompetition
+                    competitionId={props.match.params.competitionId}
+                  />
+                )}
+              ></Route>
               <Route path={this.aboutLink}>
                 <About />
               </Route>
