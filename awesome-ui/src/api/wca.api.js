@@ -1,17 +1,26 @@
 import { BASE_PATH } from "../App";
 
 // Members of the Software Team can configure this here: https://www.worldcubeassociation.org/oauth/applications/123.
-let WCA_ORIGIN =
-  process.env.REACT_APP_WCA_ORIGIN || "https://www.worldcubeassociation.org";
-let TNOODLE_APP_ID =
-  process.env.REACT_APP_TNOODLE_APP_ID ||
-  "6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40";
 
-if (isUsingStaging()) {
-  // See https://github.com/thewca/worldcubeassociation.org/wiki/OAuth-documentation-notes#staging-oauth-application
-  WCA_ORIGIN = "https://staging.worldcubeassociation.org";
-  TNOODLE_APP_ID = "example-application-id";
-}
+// See https://github.com/thewca/worldcubeassociation.org/wiki/OAuth-documentation-notes#staging-oauth-application
+let getWcaOrigin = () => {
+  if (isUsingStaging()) {
+    return "https://staging.worldcubeassociation.org";
+  }
+  return (
+    process.env.REACT_APP_WCA_ORIGIN || "https://www.worldcubeassociation.org"
+  );
+};
+
+let getTnoodleAppId = () => {
+  if (isUsingStaging()) {
+    return "example-application-id";
+  }
+  return (
+    process.env.REACT_APP_TNOODLE_APP_ID ||
+    "6145bf3e65fbad4715b049dae2d72a64b8e9a794010abf518fa9364b05a5dd40"
+  );
+};
 
 let wcaAccessToken = getHashParameter("access_token");
 if (wcaAccessToken) {
@@ -27,7 +36,7 @@ export function isUsingStaging() {
 }
 
 export function toWcaUrl(path) {
-  return `${WCA_ORIGIN}${path}`;
+  return `${getWcaOrigin()}${path}`;
 }
 
 export function logIn() {
@@ -37,7 +46,7 @@ export function logIn() {
 
   let redirectUri = window.location.origin + BASE_PATH + "/oauth/wca";
   let logInUrl = toWcaUrl(
-    `/oauth/authorize?client_id=${TNOODLE_APP_ID}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
+    `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
   );
   localStorage["TNoodle.preLoginHref"] = window.location.href;
   window.location = logInUrl;
@@ -83,7 +92,9 @@ function getHashParameter(name) {
 }
 
 function getQueryParameter(name) {
-  return parseQueryString(window.location.search)[name];
+  let urlSplit = window.location.href.split("?");
+  let lastElement = urlSplit.slice(-1)[0];
+  return parseQueryString(lastElement)[name];
 }
 
 // Copied from https://stackoverflow.com/a/3855394/1739415

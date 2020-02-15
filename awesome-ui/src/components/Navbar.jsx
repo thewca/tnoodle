@@ -30,6 +30,7 @@ const TnoodleNavbar = connect(
     }
 
     handleLogIn = () => {
+      console.log(this.props.location);
       if (this.state.isLogged) {
         return;
       }
@@ -68,7 +69,7 @@ const TnoodleNavbar = connect(
               </div>
             </div>
             <div className="col-6">
-              <Navbar collapseOnelect expand="lg" className="bg-dark">
+              <Navbar expand="lg" className="bg-dark">
                 <Navbar.Toggle />
                 <Navbar.Collapse>
                   <Nav>
