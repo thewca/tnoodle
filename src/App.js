@@ -5,7 +5,7 @@ import Index from "./components/Index";
 import OfflineScrambler from "./components/offline-scrambler/OfflineScrambler";
 import OnlineScrambler from "./components/online-scrambler/OnlineScrambler";
 import About from "./components/About";
-import Navbar from "./components/Navbar";
+import TnoodleNavbar from "./components/Navbar";
 import ManageCompetition from "./components/online-scrambler/ManageCompetition";
 import { connect } from "react-redux";
 
@@ -32,7 +32,7 @@ const App = connect(mapStateToProps)(
       return (
         <HashRouter basename="/">
           <div className="App">
-            <Navbar
+            <TnoodleNavbar
               offlineScramblerLink={this.offlineScramblerLink}
               onlineScramblerLink={this.onlineScramblerLink}
               aboutLink={this.aboutLink}
