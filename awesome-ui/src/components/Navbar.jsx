@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { logIn, logOut, fetchMe, isLogged } from "../api/wca.api";
 import { updateMe } from "../redux/ActionCreators";
+import { Nav, Navbar } from "react-bootstrap";
 
 const mapStateToProps = store => ({
   me: store.me
@@ -12,7 +13,7 @@ const mapDispatchToProps = {
   updateMe: updateMe
 };
 
-const Navbar = connect(
+const TnoodleNavbar = connect(
   mapStateToProps,
   mapDispatchToProps
 )(
@@ -46,80 +47,79 @@ const Navbar = connect(
 
     render() {
       return (
-        <div id="navbar-wrapper">
-          <nav
-            className="navbar navbar-expand-lg navbar-dark bg-dark static-top"
-            id="navbar"
-          >
-            <div className="container">
-              <Link className="navbar-brand" to="/">
-                <img
-                  className="tnoodle-logo"
-                  src={require("../assets/tnoodle_logo.svg")}
-                  alt="TNoodle logo"
-                />
-              </Link>
-              <div className="">
-                <Link to="/">
-                  <h1 className="display-3" id="title">
-                    TNoodle
-                  </h1>
-                </Link>
-              </div>
-              <button
-                className="navbar-toggler"
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbarResponsive"
-                aria-controls="navbarResponsive"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-              >
-                <span className="navbar-toggler-icon"></span>
-              </button>
-              <div className="collapse navbar-collapse" id="navbarResponsive">
-                <ul className="navbar-nav ml-auto">
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to={this.state.offlineScramblerLink}
-                    >
-                      Offline Scrambler
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to={this.state.onlineScramblerLink}
-                    >
-                      Online Scrambler
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link" to={this.state.aboutLink}>
-                      About
-                    </Link>
-                  </li>
-                  <li>
-                    <button
-                      className="btn btn-outline-primary bg-light btn-lg"
-                      onClick={
-                        this.state.isLogged
-                          ? this.handleLogOut
-                          : this.handleLogIn
-                      }
-                    >
-                      {this.state.isLogged ? "Log out" : "Log in"}
-                    </button>
-                  </li>
-                </ul>
+        <div className="container-fluid bg-dark">
+          <div className="row">
+            <div className="col-6">
+              <div className="container">
+                <div className="row pl-5">
+                  <Link className="navbar-brand" to="/">
+                    <img
+                      className="tnoodle-logo"
+                      src={require("../assets/tnoodle_logo.svg")}
+                      alt="TNoodle logo"
+                    />
+                  </Link>
+                  <Link to="/">
+                    <h1 className="display-3" id="title">
+                      TNoodle
+                    </h1>
+                  </Link>
+                </div>
               </div>
             </div>
-          </nav>
+            <div className="col-6">
+              <Navbar collapseOnelect expand="lg" className="bg-dark">
+                <Navbar.Toggle />
+                <Navbar.Collapse>
+                  <Nav>
+                    <Nav.Item>
+                      <Nav.Link
+                        eventKey="1"
+                        as={Link}
+                        to={this.state.offlineScramblerLink}
+                      >
+                        Offline Scrambler
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link
+                        eventKey="2"
+                        as={Link}
+                        to={this.state.onlineScramblerLink}
+                      >
+                        Online Scrambler
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link
+                        eventKey="3"
+                        as={Link}
+                        to={this.state.aboutLink}
+                      >
+                        About
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <button
+                        className="btn btn-outline-primary bg-light btn-lg"
+                        onClick={
+                          this.state.isLogged
+                            ? this.handleLogOut
+                            : this.handleLogIn
+                        }
+                      >
+                        {this.state.isLogged ? "Log out" : "Log in"}
+                      </button>
+                    </Nav.Item>
+                  </Nav>
+                </Navbar.Collapse>
+              </Navbar>
+            </div>
+          </div>
         </div>
       );
     }
   }
 );
 
-export default Navbar;
+export default TnoodleNavbar;
