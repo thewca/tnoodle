@@ -3,55 +3,30 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
-import io.ktor.request.receiveText
+import io.ktor.request.receive
 import io.ktor.request.uri
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
-import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.post
-import io.ktor.util.pipeline.PipelineContext
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.WcifScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import java.time.LocalDateTime
 
 class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
-    private suspend fun PipelineContext<Unit, ApplicationCall>.readQuery(): Map<String, String> {
-        val body = call.receiveText()
-        return parseQuery(body)
-    }
-
-    private suspend fun PipelineContext<Unit, ApplicationCall>.yieldScrambledWcif(suspendQuery: Map<String, String>? = null): Competition? {
+    private suspend fun ApplicationCall.yieldScrambledWcif(suspendRequest: WcifScrambleRequest? = null): Competition {
         // suspend fn not supported as default argument…
-        val query = suspendQuery ?: readQuery()
+        val request = suspendRequest ?: this.receive()
 
-        val wcifJson = query["wcif"]
-            ?: return null.also { call.respond("Please specify a WCIF JSON") }
-
-        val wcif = WCIFParser.parseComplete(wcifJson)
-
-        val multiExt = query["multi-cubes"]?.let {
-            val count = it.toIntOrNull()
-                ?: return null.also { _ -> call.respondText("Not a valid number: $it") }
-
-            MultiScrambleCountExtension(count)
-        }
-
-        val fmcExt = query["fmc-languages"]?.let {
-            val listing = it.split(",").map(String::trim)
-            FmcLanguagesExtension(listing)
-        }
+        val wcif = request.wcif
 
         val optionalExtensions = listOfNotNull(
-            multiExt?.to("333mbf"),
-            fmcExt?.to("333fm")
+            request.multiCubes?.to("333mbf"),
+            request.fmcLanguages?.to("333fm")
         ).toMap()
 
         val extendedWcif = WCIFScrambleMatcher.installExtensions(wcif, optionalExtensions)
@@ -60,23 +35,20 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
     override fun install(router: Routing) {
         router.post("/wcif/scrambles") {
-            val wcif = yieldScrambledWcif()
-                ?: return@post call.respond("Something went wrong during WCIF creation.")
-
+            val wcif = call.yieldScrambledWcif()
             call.respond(wcif)
         }
 
         router.post("/wcif/zip") {
             val generationDate = LocalDateTime.now()
-            val query = readQuery()
+            val wcifRequest = call.receive<WcifScrambleRequest>()
 
-            val wcif = yieldScrambledWcif(query)
-                ?: return@post call.respond("Something went wrong during WCIF creation.")
+            val wcif = call.yieldScrambledWcif(wcifRequest)
 
-            val pdfPassword = query["pdf-password"]
-            val zipPassword = query["zip-password"]
-
+            val pdfPassword = wcifRequest.pdfPassword
             val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.projectTitle, call.request.uri)
+
+            val zipPassword = wcifRequest.zipPassword
             val bytes = zip.compress(zipPassword)
 
             call.respondBytes(bytes, ContentType.Application.Zip)

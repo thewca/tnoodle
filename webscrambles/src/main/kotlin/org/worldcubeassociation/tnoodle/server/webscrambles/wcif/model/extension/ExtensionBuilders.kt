@@ -6,8 +6,9 @@ import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Extension
 
 @Serializable
-sealed class ExtensionBuilder(private val specUrl: String) {
+sealed class ExtensionBuilder {
     abstract val id: String
+    protected abstract val specUrl: String
 
     fun build(): Extension {
         val rawData = JsonConfig.SERIALIZER.toJson(serializer(), this)
@@ -23,8 +24,9 @@ sealed class ExtensionBuilder(private val specUrl: String) {
 
 @Serializable
 @SerialName(FmcExtension.ID)
-data class FmcExtension(val isFmc: Boolean) : ExtensionBuilder(SPEC_URL) {
+data class FmcExtension(val isFmc: Boolean) : ExtensionBuilder() {
     override val id get() = ID
+    override val specUrl get() = SPEC_URL
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.FmcFlag"
@@ -34,8 +36,9 @@ data class FmcExtension(val isFmc: Boolean) : ExtensionBuilder(SPEC_URL) {
 
 @Serializable
 @SerialName(FmcLanguagesExtension.ID)
-data class FmcLanguagesExtension(val languageTags: List<String>) : ExtensionBuilder(SPEC_URL) {
+data class FmcLanguagesExtension(val languageTags: List<String>) : ExtensionBuilder() {
     override val id get() = ID
+    override val specUrl get() = SPEC_URL
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.FmcLanguages"
@@ -45,8 +48,9 @@ data class FmcLanguagesExtension(val languageTags: List<String>) : ExtensionBuil
 
 @Serializable
 @SerialName(FmcAttemptCountExtension.ID)
-data class FmcAttemptCountExtension(val totalAttempts: Int) : ExtensionBuilder(SPEC_URL) {
+data class FmcAttemptCountExtension(val totalAttempts: Int) : ExtensionBuilder() {
     override val id get() = ID
+    override val specUrl get() = SPEC_URL
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.FmcAttemptCount"
@@ -56,8 +60,9 @@ data class FmcAttemptCountExtension(val totalAttempts: Int) : ExtensionBuilder(S
 
 @Serializable
 @SerialName(ExtraScrambleCountExtension.ID)
-data class ExtraScrambleCountExtension(val extraAttempts: Int) : ExtensionBuilder(SPEC_URL) {
+data class ExtraScrambleCountExtension(val extraAttempts: Int) : ExtensionBuilder() {
     override val id get() = ID
+    override val specUrl get() = SPEC_URL
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.ExtraScrambleCount"
@@ -67,8 +72,9 @@ data class ExtraScrambleCountExtension(val extraAttempts: Int) : ExtensionBuilde
 
 @Serializable
 @SerialName(MultiScrambleCountExtension.ID)
-data class MultiScrambleCountExtension(val requestedScrambles: Int) : ExtensionBuilder(SPEC_URL) {
+data class MultiScrambleCountExtension(val requestedScrambles: Int) : ExtensionBuilder() {
     override val id get() = ID
+    override val specUrl get() = SPEC_URL
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.MultiScrambleCount"
@@ -78,8 +84,9 @@ data class MultiScrambleCountExtension(val requestedScrambles: Int) : ExtensionB
 
 @Serializable
 @SerialName(SheetCopyCountExtension.ID)
-data class SheetCopyCountExtension(val numCopies: Int) : ExtensionBuilder(SPEC_URL) {
+data class SheetCopyCountExtension(val numCopies: Int) : ExtensionBuilder() {
     override val id get() = ID
+    override val specUrl get() = SPEC_URL
 
     companion object {
         const val ID = "org.worldcubeassociation.tnoodle.SheetCopyCount"
