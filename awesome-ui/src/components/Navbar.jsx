@@ -23,6 +23,7 @@ const TnoodleNavbar = connect(
       super(props);
 
       this.state = {
+        homeLink: props.homeLink,
         offlineScramblerLink: props.offlineScramblerLink,
         onlineScramblerLink: props.onlineScramblerLink,
         aboutLink: props.aboutLink,
@@ -53,14 +54,17 @@ const TnoodleNavbar = connect(
             <div className="col-6">
               <div className="container">
                 <div className="row pl-5">
-                  <Link className="navbar-brand" to="/">
+                  <Link
+                    className="navbar-brand"
+                    to={linkWithQueryParams(this.state.homeLink)}
+                  >
                     <img
                       className="tnoodle-logo"
                       src={require("../assets/tnoodle_logo.svg")}
                       alt="TNoodle logo"
                     />
                   </Link>
-                  <Link to="/">
+                  <Link to={linkWithQueryParams(this.state.homeLink)}>
                     <h1 className="display-3" id="title">
                       TNoodle
                     </h1>
