@@ -6,8 +6,7 @@ import { wcaEventId2WcaEventName } from "../../functions/wca.helper";
 import { MBLD_MIN, MBLD_DEFAULT } from "../../constants/wca.constants";
 import { fetchZip } from "../../api/tnoodle.api";
 
-import FaEye from "react-icons/lib/fa/eye";
-import FaEyeSlash from "react-icons/lib/fa/eye-slash";
+import { FaEyeSlash, FaEye } from "react-icons/fa";
 
 class ManageCompetition extends Component {
   constructor(props) {
@@ -84,6 +83,13 @@ class ManageCompetition extends Component {
 
   handleMbldChange = mbld => this.setState({ ...this.state, mbld: mbld });
 
+  handleGenerateScrambles = () => {
+    let wcif = this.state.wcif;
+    wcif.password = this.state.password;
+    wcif.mbld = this.state.mbld;
+    fetchZip(wcif);
+  };
+
   render() {
     if (this.state.loading) {
       return <p>Loading...</p>;
@@ -92,7 +98,7 @@ class ManageCompetition extends Component {
       return <p>Error fetching information.</p>;
     }
     return (
-      <div className="container">
+      <div className="container manage-competition">
         <p>
           Found {this.state.wcif.events.length} event
           {this.state.wcif.events.length > 1 ? "s" : ""} for{" "}
@@ -117,33 +123,30 @@ class ManageCompetition extends Component {
         {this.maybeRenderMbldArea()}
 
         <div className="row">
-          <div className="input-group input-group-lg">
-            <div className="col-6">
+          <div className="col-md-6 text-left form-group">
+            <input
+              className="form-control"
+              placeholder="Password"
+              type={this.state.showPassword ? "" : "password"}
+              onChange={this.handlePasswordChange}
+              value={this.state.password}
+            />
+            <div onClick={this.toogleShowPassword}>
               <input
-                className="form-control"
-                placeholder="Password"
-                type={this.state.showPassword ? "" : "password"}
-                onChange={this.handlePasswordChange}
-                value={this.state.password}
+                type="checkbox"
+                checked={this.state.showPassword}
+                readOnly
               />
-              <span
-                className="input-group-addon pointer"
-                title={
-                  this.state.showPassword ? "Hide password" : "Show password"
-                }
-                onClick={this.toogleShowPassword}
-              >
-                {this.state.showPassword ? <FaEye /> : <FaEyeSlash />}
-              </span>
+              <label>Show password</label>
             </div>
-            <div className="col-6">
-              <button
-                className="btn btn-primary form-control"
-                onClick={_ => fetchZip(this.state.wcif)}
-              >
-                Generate Scrambles
-              </button>
-            </div>
+          </div>
+          <div className="col-6">
+            <button
+              className="btn btn-primary form-control"
+              onClick={this.handleGenerateScrambles}
+            >
+              Generate Scrambles
+            </button>
           </div>
         </div>
       </div>
