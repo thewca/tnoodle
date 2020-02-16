@@ -23,6 +23,7 @@ const SelectCompetition = connect(
       this.state = { competitions: props.competitions };
     }
 
+    // This is pretty much for caching competitions
     componentDidMount() {
       if (this.state.competitions == null) {
         getUpcomingManageableCompetitions().then(competitions =>
