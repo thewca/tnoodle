@@ -19,9 +19,11 @@ const mapStateToProps = store => ({
 
 const App = connect(mapStateToProps)(
   class App extends Component {
+    homeLink = "/";
     offlineScramblerLink = "/scramble/offline";
     onlineScramblerLink = "/scramble/online";
     aboutLink = "/about";
+    competitionLink = "/competitions/:competitionId";
 
     generateScrambles = () => {
       console.log("Generating scrambles");
@@ -45,9 +47,10 @@ const App = connect(mapStateToProps)(
 
     render() {
       return (
-        <HashRouter basename="/">
+        <HashRouter basename={this.homeLink}>
           <div className="App">
             <TnoodleNavbar
+              homeLink={this.homeLink}
               offlineScramblerLink={this.offlineScramblerLink}
               onlineScramblerLink={this.onlineScramblerLink}
               aboutLink={this.aboutLink}
@@ -60,7 +63,7 @@ const App = connect(mapStateToProps)(
                 <OnlineScrambler />
               </Route>
               <Route
-                path="/competitions/:competitionId"
+                path={this.competitionLink}
                 component={props => (
                   <ManageCompetition
                     competitionId={props.match.params.competitionId}
@@ -70,7 +73,7 @@ const App = connect(mapStateToProps)(
               <Route path={this.aboutLink}>
                 <About />
               </Route>
-              <Route path="/">
+              <Route path={this.homeLink}>
                 <Index
                   offlineScramblerLink={this.offlineScramblerLink}
                   onlineScramblerLink={this.onlineScramblerLink}
