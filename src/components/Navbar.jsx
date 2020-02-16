@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { logIn, logOut, fetchMe, isLogged } from "../api/wca.api";
 import { updateMe } from "../redux/ActionCreators";
 import { Nav, Navbar } from "react-bootstrap";
+import linkWithQueryParams from "../functions/preserve.search";
 
 const mapStateToProps = store => ({
   me: store.me
@@ -30,7 +31,6 @@ const TnoodleNavbar = connect(
     }
 
     handleLogIn = () => {
-      console.log(this.props.location);
       if (this.state.isLogged) {
         return;
       }
@@ -77,7 +77,9 @@ const TnoodleNavbar = connect(
                       <Nav.Link
                         eventKey="1"
                         as={Link}
-                        to={this.state.offlineScramblerLink}
+                        to={linkWithQueryParams(
+                          this.state.offlineScramblerLink
+                        )}
                       >
                         Offline Scrambler
                       </Nav.Link>
@@ -86,7 +88,7 @@ const TnoodleNavbar = connect(
                       <Nav.Link
                         eventKey="2"
                         as={Link}
-                        to={this.state.onlineScramblerLink}
+                        to={linkWithQueryParams(this.state.onlineScramblerLink)}
                       >
                         Online Scrambler
                       </Nav.Link>
@@ -95,7 +97,7 @@ const TnoodleNavbar = connect(
                       <Nav.Link
                         eventKey="3"
                         as={Link}
-                        to={this.state.aboutLink}
+                        to={linkWithQueryParams(this.state.aboutLink)}
                       >
                         About
                       </Nav.Link>

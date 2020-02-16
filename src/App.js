@@ -19,13 +19,28 @@ const mapStateToProps = store => ({
 
 const App = connect(mapStateToProps)(
   class App extends Component {
-    offlineScramblerLink = "/webscrambles/offline";
-    onlineScramblerLink = "/webscrambles/online";
+    offlineScramblerLink = "/scramble/offline";
+    onlineScramblerLink = "/scramble/online";
     aboutLink = "/about";
 
     generateScrambles = () => {
       console.log("Generating scrambles");
       console.log(this.props.wcif);
+
+      return;
+
+      fetch("http://localhost:2014/wcif/zip", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: this.props.wcif
+      })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(e => console.log(e));
     };
 
     render() {
@@ -42,7 +57,7 @@ const App = connect(mapStateToProps)(
                 <OfflineScrambler generateScrambles={this.generateScrambles} />
               </Route>
               <Route path={this.onlineScramblerLink}>
-                <OnlineScrambler generateScrambles={this.generateScrambles} />
+                <OnlineScrambler />
               </Route>
               <Route
                 path="/competitions/:competitionId"
@@ -56,7 +71,10 @@ const App = connect(mapStateToProps)(
                 <About />
               </Route>
               <Route path="/">
-                <Index />
+                <Index
+                  offlineScramblerLink={this.offlineScramblerLink}
+                  onlineScramblerLink={this.onlineScramblerLink}
+                />
               </Route>
             </Switch>
           </div>

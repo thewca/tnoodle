@@ -33,7 +33,10 @@ const ManageCompetition = connect(
       };
     }
 
+    MIN_MBLD = 2;
+
     componentDidMount() {
+      // Fetch competition json
       getCompetitionJson(this.state.competitionId)
         .then(wcif => {
           this.setState({
@@ -57,15 +60,19 @@ const ManageCompetition = connect(
     };
 
     handlePasswordChange = event => {
+      event.preventDefault();
       this.setState({
         ...this.state,
         password: event.target.value
       });
 
-      //this.props.updatePassword(this.state.password);
+      this.props.updatePassword(this.state.password);
     };
 
-    _renderMbldArea() {
+    maybeRenderMbldArea() {
+      if (!this.hasMbld()) {
+        return;
+      }
       return (
         <React.Fragment>
           <p>
@@ -74,13 +81,13 @@ const ManageCompetition = connect(
           </p>
           <p>
             <input
+              className="form-control"
               type="number"
               placeholder="How many puzzles do you expect people to attempt?"
-              disabled={false /*isGeneratingScrambles || isGeneratingZip*/}
-              className="form-control"
               value={this.state.mbld}
-              ref={input => (this.puzzlesPerMbfAttemptInput = input)}
-              onChange={e => this.handleMbldChange(e.target.value)}
+              onChange={evt => this.handleMbldChange(Number(evt.target.value))}
+              min={this.MIN_MBLD}
+              onBlur={this.verifyMbld}
             />
           </p>
         </React.Fragment>
@@ -89,7 +96,7 @@ const ManageCompetition = connect(
 
     handleMbldChange = mbld => {
       this.setState({ ...this.state, mbld: mbld });
-      //this.props.updateMbld(mbld);
+      this.props.updateMbld(mbld);
     };
 
     render() {
@@ -110,30 +117,29 @@ const ManageCompetition = connect(
           <p>
             You can view and change the rounds over on{" "}
             <a
-              href={toWcaUrl(`/competitions/${this.state.id}/events/edit`)}
-              target="_blank"
+              href={toWcaUrl(
+                `/competitions/${this.state.competitionId}/events/edit`
+              )}
             >
               the WCA website
             </a>
-            .{" "}
             <strong>
               Refresh this page after making any changes on the WCA website.
             </strong>
           </p>
 
-          {this.hasMbld() && this._renderMbldArea()}
+          {this.maybeRenderMbldArea()}
 
-          <div className="row scramble-form">
+          <div className="row">
             <div className="col-6">
-              <div className="form-group">
+              <div className="form">
                 <div className="input-group input-group-lg">
                   <input
-                    type={this.state.showPassword ? "text" : "password"}
-                    autoComplete="new-password"
                     className="form-control"
                     placeholder="Password"
-                    value={this.state.password}
+                    type={this.state.showPassword ? "" : "password"}
                     onChange={this.handlePasswordChange}
+                    value={this.state.password}
                   />
                   <span
                     className="input-group-addon pointer"

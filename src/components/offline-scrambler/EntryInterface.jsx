@@ -79,7 +79,6 @@ const EntryInterface = connect(
             <div className="col-md-6 text-left form-group">
               <label className="font-weight-bold pr-1">Password:</label>
               <input
-                id="passwordInput"
                 className="form-control"
                 placeholder="Password"
                 type={this.state.showPassword ? "" : "password"}
@@ -88,7 +87,6 @@ const EntryInterface = connect(
               />
               <div onClick={this.toogleShowPassword}>
                 <input
-                  id="showPassword"
                   type="checkbox"
                   checked={this.state.showPassword}
                   readOnly
