@@ -1,0 +1,841 @@
+{
+  "formatVersion": "1.0",
+  "id": "AdelaideSummer2020",
+  "name": "Adelaide Summer 2020",
+  "shortName": "Adelaide Summer 2020",
+  "events": [
+    {
+      "id": "333",
+      "rounds": [
+        {
+          "id": "333-r1",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 60000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": {
+            "type": "ranking",
+            "level": 40
+          },
+          "scrambleSetCount": 4,
+          "extensions": []
+        },
+        {
+          "id": "333-r2",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 12000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": {
+            "type": "ranking",
+            "level": 8
+          },
+          "scrambleSetCount": 2,
+          "results": [],
+          "extensions": []
+        },
+        {
+          "id": "333-r3",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 12000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": null,
+          "scrambleSetCount": 1,
+          "results": [],
+          "extensions": []
+        }
+      ],
+      "extensions": []
+    },
+    {
+      "id": "222",
+      "rounds": [
+        {
+          "id": "222-r1",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 12000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": {
+            "type": "ranking",
+            "level": 8
+          },
+          "scrambleSetCount": 4,
+          "extensions": []
+        },
+        {
+          "id": "222-r2",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 12000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": null,
+          "scrambleSetCount": 1,
+          "results": [],
+          "extensions": []
+        }
+      ],
+      "extensions": []
+    },
+    {
+      "id": "444",
+      "rounds": [
+        {
+          "id": "444-r1",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 15000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": {
+            "numberOfAttempts": 2,
+            "attemptResult": 8000
+          },
+          "advancementCondition": {
+            "type": "ranking",
+            "level": 8
+          },
+          "scrambleSetCount": 2,
+          "extensions": []
+        },
+        {
+          "id": "444-r2",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 15000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": null,
+          "scrambleSetCount": 1,
+          "results": [],
+          "extensions": []
+        }
+      ],
+      "extensions": []
+    },
+    {
+      "id": "555",
+      "rounds": [
+        {
+          "id": "555-r1",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 21000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": {
+            "numberOfAttempts": 2,
+            "attemptResult": 15000
+          },
+          "advancementCondition": null,
+          "scrambleSetCount": 2,
+          "extensions": []
+        }
+      ],
+      "extensions": []
+    },
+    {
+      "id": "333bf",
+      "rounds": [
+        {
+          "id": "333bf-r1",
+          "format": "3",
+          "timeLimit": {
+            "centiseconds": 60000,
+            "cumulativeRoundIds": ["333bf-r1"]
+          },
+          "cutoff": null,
+          "advancementCondition": null,
+          "scrambleSetCount": 1,
+          "extensions": []
+        }
+      ],
+      "extensions": []
+    },
+    {
+      "id": "333oh",
+      "rounds": [
+        {
+          "id": "333oh-r1",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 9000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": {
+            "numberOfAttempts": 2,
+            "attemptResult": 4500
+          },
+          "advancementCondition": {
+            "type": "ranking",
+            "level": 8
+          },
+          "scrambleSetCount": 2,
+          "extensions": []
+        },
+        {
+          "id": "333oh-r2",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 9000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": null,
+          "scrambleSetCount": 1,
+          "results": [],
+          "extensions": []
+        }
+      ],
+      "extensions": []
+    },
+    {
+      "id": "pyram",
+      "rounds": [
+        {
+          "id": "pyram-r1",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 12000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": {
+            "type": "ranking",
+            "level": 8
+          },
+          "scrambleSetCount": 3,
+          "extensions": []
+        },
+        {
+          "id": "pyram-r2",
+          "format": "a",
+          "timeLimit": {
+            "centiseconds": 12000,
+            "cumulativeRoundIds": []
+          },
+          "cutoff": null,
+          "advancementCondition": null,
+          "scrambleSetCount": 1,
+          "results": [],
+          "extensions": []
+        }
+      ],
+      "extensions": []
+    }
+  ],
+  "schedule": {
+    "startDate": "2020-01-11",
+    "numberOfDays": 1,
+    "venues": [
+      {
+        "id": 1,
+        "name": "Adelaide Oval",
+        "latitudeMicrodegrees": -34915085,
+        "longitudeMicrodegrees": 138599455,
+        "countryIso2": "AU",
+        "timezone": "Australia/Adelaide",
+        "rooms": [
+          {
+            "id": 1,
+            "name": "Ian McLachlan Room",
+            "color": "#304a96",
+            "activities": [
+              {
+                "id": 1,
+                "name": "3x3x3 Cube, Round 1",
+                "activityCode": "333-r1",
+                "startTime": "2020-01-10T23:35:00Z",
+                "endTime": "2020-01-11T00:55:00Z",
+                "childActivities": [
+                  {
+                    "id": 20,
+                    "name": "3x3x3 Cube, Round 1, Group 1",
+                    "activityCode": "333-r1-g1",
+                    "startTime": "2020-01-10T23:35:00Z",
+                    "endTime": "2020-01-10T23:55:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 21,
+                    "name": "3x3x3 Cube, Round 1, Group 2",
+                    "activityCode": "333-r1-g2",
+                    "startTime": "2020-01-10T23:55:00Z",
+                    "endTime": "2020-01-11T00:15:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 22,
+                    "name": "3x3x3 Cube, Round 1, Group 3",
+                    "activityCode": "333-r1-g3",
+                    "startTime": "2020-01-11T00:15:00Z",
+                    "endTime": "2020-01-11T00:35:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 23,
+                    "name": "3x3x3 Cube, Round 1, Group 4",
+                    "activityCode": "333-r1-g4",
+                    "startTime": "2020-01-11T00:35:00Z",
+                    "endTime": "2020-01-11T00:55:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 4,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Registration",
+                "activityCode": "other-registration",
+                "startTime": "2020-01-10T22:10:00Z",
+                "endTime": "2020-01-10T22:30:00Z",
+                "childActivities": [],
+                "extensions": []
+              },
+              {
+                "id": 3,
+                "name": "Tutorial for new competitors",
+                "activityCode": "other-tutorial",
+                "startTime": "2020-01-10T22:30:00Z",
+                "endTime": "2020-01-10T22:45:00Z",
+                "childActivities": [],
+                "extensions": []
+              },
+              {
+                "id": 4,
+                "name": "2x2x2 Cube, Round 1",
+                "activityCode": "222-r1",
+                "startTime": "2020-01-10T22:45:00Z",
+                "endTime": "2020-01-10T23:35:00Z",
+                "childActivities": [
+                  {
+                    "id": 27,
+                    "name": "2x2x2 Cube, Round 1, Group 1",
+                    "activityCode": "222-r1-g1",
+                    "startTime": "2020-01-10T22:45:00Z",
+                    "endTime": "2020-01-10T22:57:30Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 28,
+                    "name": "2x2x2 Cube, Round 1, Group 2",
+                    "activityCode": "222-r1-g2",
+                    "startTime": "2020-01-10T22:57:30Z",
+                    "endTime": "2020-01-10T23:10:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 29,
+                    "name": "2x2x2 Cube, Round 1, Group 3",
+                    "activityCode": "222-r1-g3",
+                    "startTime": "2020-01-10T23:10:00Z",
+                    "endTime": "2020-01-10T23:22:30Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 30,
+                    "name": "2x2x2 Cube, Round 1, Group 4",
+                    "activityCode": "222-r1-g4",
+                    "startTime": "2020-01-10T23:22:30Z",
+                    "endTime": "2020-01-10T23:35:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 4,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 5,
+                "name": "Pyraminx, Round 1",
+                "activityCode": "pyram-r1",
+                "startTime": "2020-01-11T00:55:00Z",
+                "endTime": "2020-01-11T01:45:00Z",
+                "childActivities": [
+                  {
+                    "id": 41,
+                    "name": "Pyraminx, Round 1, Group 1",
+                    "activityCode": "pyram-r1-g1",
+                    "startTime": "2020-01-11T00:55:00Z",
+                    "endTime": "2020-01-11T01:11:40Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 42,
+                    "name": "Pyraminx, Round 1, Group 2",
+                    "activityCode": "pyram-r1-g2",
+                    "startTime": "2020-01-11T01:11:40Z",
+                    "endTime": "2020-01-11T01:28:20Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 43,
+                    "name": "Pyraminx, Round 1, Group 3",
+                    "activityCode": "pyram-r1-g3",
+                    "startTime": "2020-01-11T01:28:20Z",
+                    "endTime": "2020-01-11T01:45:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 3,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 6,
+                "name": "4x4x4 Cube, Round 1",
+                "activityCode": "444-r1",
+                "startTime": "2020-01-11T01:45:00Z",
+                "endTime": "2020-01-11T02:45:00Z",
+                "childActivities": [
+                  {
+                    "id": 32,
+                    "name": "4x4x4 Cube, Round 1, Group 1",
+                    "activityCode": "444-r1-g1",
+                    "startTime": "2020-01-11T01:45:00Z",
+                    "endTime": "2020-01-11T02:15:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 33,
+                    "name": "4x4x4 Cube, Round 1, Group 2",
+                    "activityCode": "444-r1-g2",
+                    "startTime": "2020-01-11T02:15:00Z",
+                    "endTime": "2020-01-11T02:45:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 2,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 7,
+                "name": "Lunch",
+                "activityCode": "other-lunch",
+                "startTime": "2020-01-11T02:45:00Z",
+                "endTime": "2020-01-11T03:30:00Z",
+                "childActivities": [],
+                "extensions": []
+              },
+              {
+                "id": 8,
+                "name": "3x3x3 Blindfolded, Round 1",
+                "activityCode": "333bf-r1",
+                "startTime": "2020-01-11T03:30:00Z",
+                "endTime": "2020-01-11T03:50:00Z",
+                "childActivities": [
+                  {
+                    "id": 37,
+                    "name": "3x3x3 Blindfolded, Round 1, Group 1",
+                    "activityCode": "333bf-r1-g1",
+                    "startTime": "2020-01-11T03:30:00Z",
+                    "endTime": "2020-01-11T03:50:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 1,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 9,
+                "name": "3x3x3 One-Handed, Round 1",
+                "activityCode": "333oh-r1",
+                "startTime": "2020-01-11T03:50:00Z",
+                "endTime": "2020-01-11T04:30:00Z",
+                "childActivities": [
+                  {
+                    "id": 38,
+                    "name": "3x3x3 One-Handed, Round 1, Group 1",
+                    "activityCode": "333oh-r1-g1",
+                    "startTime": "2020-01-11T03:50:00Z",
+                    "endTime": "2020-01-11T04:10:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 39,
+                    "name": "3x3x3 One-Handed, Round 1, Group 2",
+                    "activityCode": "333oh-r1-g2",
+                    "startTime": "2020-01-11T04:10:00Z",
+                    "endTime": "2020-01-11T04:30:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 2,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 10,
+                "name": "3x3x3 Cube, Round 2",
+                "activityCode": "333-r2",
+                "startTime": "2020-01-11T04:30:00Z",
+                "endTime": "2020-01-11T05:00:00Z",
+                "childActivities": [
+                  {
+                    "id": 24,
+                    "name": "3x3x3 Cube, Round 2, Group 1",
+                    "activityCode": "333-r2-g1",
+                    "startTime": "2020-01-11T04:30:00Z",
+                    "endTime": "2020-01-11T04:45:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 25,
+                    "name": "3x3x3 Cube, Round 2, Group 2",
+                    "activityCode": "333-r2-g2",
+                    "startTime": "2020-01-11T04:45:00Z",
+                    "endTime": "2020-01-11T05:00:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 2,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 11,
+                "name": "5x5x5 Cube, Round 1",
+                "activityCode": "555-r1",
+                "startTime": "2020-01-11T05:00:00Z",
+                "endTime": "2020-01-11T06:00:00Z",
+                "childActivities": [
+                  {
+                    "id": 35,
+                    "name": "5x5x5 Cube, Round 1, Group 1",
+                    "activityCode": "555-r1-g1",
+                    "startTime": "2020-01-11T05:00:00Z",
+                    "endTime": "2020-01-11T05:30:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  },
+                  {
+                    "id": 36,
+                    "name": "5x5x5 Cube, Round 1, Group 2",
+                    "activityCode": "555-r1-g2",
+                    "startTime": "2020-01-11T05:30:00Z",
+                    "endTime": "2020-01-11T06:00:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 2,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 12,
+                "name": "Pyraminx, Round 2",
+                "activityCode": "pyram-r2",
+                "startTime": "2020-01-11T06:00:00Z",
+                "endTime": "2020-01-11T06:15:00Z",
+                "childActivities": [
+                  {
+                    "id": 44,
+                    "name": "Pyraminx, Round 2, Group 1",
+                    "activityCode": "pyram-r2-g1",
+                    "startTime": "2020-01-11T06:00:00Z",
+                    "endTime": "2020-01-11T06:15:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 1,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 13,
+                "name": "3x3x3 One-Handed, Round 2",
+                "activityCode": "333oh-r2",
+                "startTime": "2020-01-11T06:15:00Z",
+                "endTime": "2020-01-11T06:30:00Z",
+                "childActivities": [
+                  {
+                    "id": 40,
+                    "name": "3x3x3 One-Handed, Round 2, Group 1",
+                    "activityCode": "333oh-r2-g1",
+                    "startTime": "2020-01-11T06:15:00Z",
+                    "endTime": "2020-01-11T06:30:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 1,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 14,
+                "name": "4x4x4 Cube, Round 2",
+                "activityCode": "444-r2",
+                "startTime": "2020-01-11T06:30:00Z",
+                "endTime": "2020-01-11T06:50:00Z",
+                "childActivities": [
+                  {
+                    "id": 34,
+                    "name": "4x4x4 Cube, Round 2, Group 1",
+                    "activityCode": "444-r2-g1",
+                    "startTime": "2020-01-11T06:30:00Z",
+                    "endTime": "2020-01-11T06:50:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 1,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 15,
+                "name": "2x2x2 Cube, Round 2",
+                "activityCode": "222-r2",
+                "startTime": "2020-01-11T06:50:00Z",
+                "endTime": "2020-01-11T07:00:00Z",
+                "childActivities": [
+                  {
+                    "id": 31,
+                    "name": "2x2x2 Cube, Round 2, Group 1",
+                    "activityCode": "222-r2-g1",
+                    "startTime": "2020-01-11T06:50:00Z",
+                    "endTime": "2020-01-11T07:00:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 1,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 16,
+                "name": "3x3x3 Cube, Round 3",
+                "activityCode": "333-r3",
+                "startTime": "2020-01-11T07:00:00Z",
+                "endTime": "2020-01-11T07:15:00Z",
+                "childActivities": [
+                  {
+                    "id": 26,
+                    "name": "3x3x3 Cube, Round 3, Group 1",
+                    "activityCode": "333-r3-g1",
+                    "startTime": "2020-01-11T07:00:00Z",
+                    "endTime": "2020-01-11T07:15:00Z",
+                    "childActivities": [],
+                    "extensions": []
+                  }
+                ],
+                "extensions": [
+                  {
+                    "id": "groupifier.ActivityConfig",
+                    "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/ActivityConfig.json",
+                    "data": {
+                      "capacity": 1,
+                      "groups": 1,
+                      "scramblers": 0,
+                      "runners": 0,
+                      "assignJudges": false
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 17,
+                "name": "Awards",
+                "activityCode": "other-awards",
+                "startTime": "2020-01-11T07:25:00Z",
+                "endTime": "2020-01-11T07:35:00Z",
+                "childActivities": [],
+                "extensions": []
+              },
+              {
+                "id": 19,
+                "name": "Packup",
+                "activityCode": "other-misc",
+                "startTime": "2020-01-11T07:15:00Z",
+                "endTime": "2020-01-11T07:25:00Z",
+                "childActivities": [],
+                "extensions": []
+              }
+            ],
+            "extensions": [
+              {
+                "id": "groupifier.RoomConfig",
+                "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/RoomConfig.json",
+                "data": {
+                  "stations": 12
+                }
+              }
+            ]
+          }
+        ],
+        "extensions": []
+      }
+    ]
+  },
+  "extensions": [
+    {
+      "id": "groupifier.CompetitionConfig",
+      "specUrl": "https://groupifier.jonatanklosko.com/wcif-extensions/CompetitionConfig.json",
+      "data": {
+        "localNamesFirst": false,
+        "scorecardsBackgroundUrl": "",
+        "competitorsSortingRule": "symmetric",
+        "noTasksForNewcomers": false,
+        "tasksForOwnEventsOnly": false
+      }
+    }
+  ]
+}
