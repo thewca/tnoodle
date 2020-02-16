@@ -26,7 +26,6 @@ const TnoodleNavbar = connect(
         homeLink: props.homeLink,
         offlineScramblerLink: props.offlineScramblerLink,
         onlineScramblerLink: props.onlineScramblerLink,
-        aboutLink: props.aboutLink,
         isLogged: isLogged()
       };
     }
@@ -95,15 +94,6 @@ const TnoodleNavbar = connect(
                         to={linkWithQueryParams(this.state.onlineScramblerLink)}
                       >
                         Online Scrambler
-                      </Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                      <Nav.Link
-                        eventKey="3"
-                        as={Link}
-                        to={linkWithQueryParams(this.state.aboutLink)}
-                      >
-                        About
                       </Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
