@@ -8,6 +8,8 @@ import { connect } from "react-redux";
 import { getCompetitionJson } from "../../api/wca.api";
 import { toWcaUrl } from "../../api/wca.api";
 import EventsTable from "./EventsTable";
+import { wcaEventId2WcaEventName } from "../../functions/wca.helper";
+import { MBLD_MIN, MBLD_DEFAULT } from "../../constants/wca.constants";
 
 const mapDispatchToProps = {
   updateWcif: updateWcif,
@@ -29,11 +31,11 @@ const ManageCompetition = connect(
         wcif: null,
         showPassword: false,
         password: "",
-        mbld: 28
+        mbld: MBLD_DEFAULT
       };
     }
 
-    MIN_MBLD = 2;
+    multiBlindId = "333mbf";
 
     componentDidMount() {
       // Fetch competition json
@@ -51,7 +53,8 @@ const ManageCompetition = connect(
         );
     }
 
-    hasMbld = () => this.state.wcif.events.find(event => event.id === "333mbf");
+    hasMbld = () =>
+      this.state.wcif.events.find(event => event.id === this.multiBlindId);
 
     toogleShowPassword = () => {
       let state = this.state;
@@ -66,7 +69,8 @@ const ManageCompetition = connect(
         password: event.target.value
       });
 
-      this.props.updatePassword(this.state.password);
+      // TODO this refreshes the page and I don't know why
+      // this.props.updatePassword(this.state.password);
     };
 
     maybeRenderMbldArea() {
@@ -76,8 +80,8 @@ const ManageCompetition = connect(
       return (
         <React.Fragment>
           <p>
-            This competition has 333mbf. How many scrambles do you want for each
-            attempt?
+            This competition has {wcaEventId2WcaEventName(this.multiBlindId)}.
+            How many scrambles do you want for each attempt?
           </p>
           <p>
             <input
@@ -86,7 +90,7 @@ const ManageCompetition = connect(
               placeholder="How many puzzles do you expect people to attempt?"
               value={this.state.mbld}
               onChange={evt => this.handleMbldChange(Number(evt.target.value))}
-              min={this.MIN_MBLD}
+              min={MBLD_MIN}
               onBlur={this.verifyMbld}
             />
           </p>
@@ -96,7 +100,9 @@ const ManageCompetition = connect(
 
     handleMbldChange = mbld => {
       this.setState({ ...this.state, mbld: mbld });
-      this.props.updateMbld(mbld);
+
+      // TODO this refreshes the page and I don't know why
+      // this.props.updateMbld(mbld);
     };
 
     render() {
@@ -121,9 +127,10 @@ const ManageCompetition = connect(
                 `/competitions/${this.state.competitionId}/events/edit`
               )}
             >
-              the WCA website
+              the WCA website.
             </a>
             <strong>
+              {" "}
               Refresh this page after making any changes on the WCA website.
             </strong>
           </p>

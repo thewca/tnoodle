@@ -1,4 +1,5 @@
 import { ActionTypes } from "./Types";
+import { MBLD_DEFAULT } from "../constants/wca.constants";
 
 // TODO find out a better place for this and mbld expected name on the server side
 
@@ -7,7 +8,7 @@ const defaultWcif = {
   name: "",
   events: [],
   password: "",
-  mbld: 28
+  mbld: MBLD_DEFAULT
 };
 const defaultStore = { wcif: defaultWcif };
 

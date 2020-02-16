@@ -1,3 +1,9 @@
+// Currently, WCA allow up to 4 rounds for each event.
+export const MAX_WCA_ROUNDS = 4;
+
+export const MBLD_MIN = 2;
+export const MBLD_DEFAULT = 35;
+
 export const FORMATS = {
   "1": { name: "Best of 1", shortName: "Bo1" },
   "2": { name: "Best of 2", shortName: "Bo2" },
@@ -162,6 +168,3 @@ export const WCA_EVENTS = [
     is_multiple_blindfolded: true
   }
 ];
-
-// Currently, WCA allow up to 4 rounds for each event.
-export const MAX_WCA_ROUNDS = 4;
