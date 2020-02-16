@@ -3,6 +3,7 @@ import { toWcaUrl, getUpcomingManageableCompetitions } from "../../api/wca.api";
 import { updateCompetitions } from "../../redux/ActionCreators";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import linkWithSearchParams from "../../functions/preserve.search";
 
 const mapStateToProps = store => ({
   competitions: store.competitions
@@ -54,7 +55,7 @@ const SelectCompetition = connect(
                 return (
                   <Link
                     key={competition.id}
-                    to={`/competitions/${competition.id}`}
+                    to={linkWithSearchParams(`/competitions/${competition.id}`)}
                     className="list-group-item list-group-item-action"
                   >
                     {competition.name}
