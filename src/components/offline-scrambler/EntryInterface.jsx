@@ -34,12 +34,6 @@ const EntryInterface = connect(
       return "Scrambles for " + date.toISOString().split("T")[0];
     };
 
-    toogleShowPassword = () => {
-      let state = this.state;
-      state.showPassword = !state.showPassword;
-      this.setState(state);
-    };
-
     handleCompetitionNameChange = event => {
       let state = this.state;
       state.competitionName = event.target.value;
@@ -47,6 +41,12 @@ const EntryInterface = connect(
 
       // Propagate the change.
       this.props.updateCompetitionName(this.state.competitionName);
+    };
+
+    toogleShowPassword = () => {
+      let state = this.state;
+      state.showPassword = !state.showPassword;
+      this.setState(state);
     };
 
     handlePasswordChange = event => {
