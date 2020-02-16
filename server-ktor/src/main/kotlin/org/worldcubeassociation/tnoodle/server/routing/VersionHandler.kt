@@ -20,7 +20,7 @@ class VersionHandler(val versionKey: String) : RouteHandler {
                 val raw = URL(BASE_URL).readText()
                 val json = JsonConfig.SERIALIZER.parse(ScramblingProgramInfo.serializer(), raw)
 
-                val tnoodleJson = json.copy(running_version = versionKey)
+                val tnoodleJson = json.copy(runningVersion = versionKey)
 
                 call.respond(tnoodleJson)
             } catch (e: IOException) {
