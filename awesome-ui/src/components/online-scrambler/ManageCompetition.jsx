@@ -6,8 +6,6 @@ import { wcaEventId2WcaEventName } from "../../functions/wca.helper";
 import { MBLD_MIN, MBLD_DEFAULT } from "../../constants/wca.constants";
 import { fetchZip } from "../../api/tnoodle.api";
 
-import { FaEyeSlash, FaEye } from "react-icons/fa";
-
 class ManageCompetition extends Component {
   constructor(props) {
     super(props);
