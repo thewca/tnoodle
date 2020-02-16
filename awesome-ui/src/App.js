@@ -25,26 +25,6 @@ const App = connect(mapStateToProps)(
     aboutLink = "/about";
     competitionLink = "/competitions/:competitionId";
 
-    generateScrambles = () => {
-      console.log("Generating scrambles");
-      console.log(this.props.wcif);
-
-      return;
-
-      fetch("http://localhost:2014/wcif/zip", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: this.props.wcif
-      })
-        .then(response => {
-          console.log(response);
-        })
-        .catch(e => console.log(e));
-    };
-
     render() {
       return (
         <HashRouter basename={this.homeLink}>
@@ -57,7 +37,7 @@ const App = connect(mapStateToProps)(
             />
             <Switch>
               <Route path={this.offlineScramblerLink}>
-                <OfflineScrambler generateScrambles={this.generateScrambles} />
+                <OfflineScrambler />
               </Route>
               <Route path={this.onlineScramblerLink}>
                 <OnlineScrambler />
