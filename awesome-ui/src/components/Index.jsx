@@ -6,18 +6,16 @@ import { Link } from "react-router-dom";
 
 import CubingIcon from "./CubingIcon";
 import { WCA_EVENTS } from "../constants/wca.constants";
+import linkWithQueryParams from "../functions/preserve.search";
 
 class Index extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
   render() {
+    let { offlineScramblerLink, onlineScramblerLink } = this.props;
     return (
       <div>
         <div className="container">
           <div className="row">
-            <div className="col-md-5 scrambler-mode">
+            <div className="col-md-5">
               <h2>Offline Scrambler Program</h2>
               <p>
                 Generate scrambles by manually selecting events, number of
@@ -26,7 +24,7 @@ class Index extends Component {
               </p>
               <p>
                 <Link
-                  to="webscrambles/offline"
+                  to={linkWithQueryParams(offlineScramblerLink)}
                   className="btn btn-secondary"
                   role="button"
                 >
@@ -35,17 +33,17 @@ class Index extends Component {
               </p>
             </div>
             <div className="col-md-2"></div>
-            <div className="col-md-5 scrambler-mode">
+            <div className="col-md-5">
               <h2>Online Scrambler Program</h2>
               <p>
                 This area is mostly for delegates and organisers. Syncronize
                 with your WCA account to fetch data from your next competitions
-                to keep you from manually input events, rounds, competition name
-                and more.
+                to prevent you from manually inputing events, rounds,
+                competition name and more.
               </p>
               <p>
                 <Link
-                  to="webscrambles/online"
+                  to={linkWithQueryParams(onlineScramblerLink)}
                   className="btn btn-secondary"
                   role="button"
                 >

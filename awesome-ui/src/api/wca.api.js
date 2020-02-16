@@ -91,7 +91,7 @@ function getHashParameter(name) {
   return parseQueryString(window.location.hash)[name];
 }
 
-function getQueryParameter(name) {
+export function getQueryParameter(name) {
   let urlSplit = window.location.href.split("?");
   let lastElement = urlSplit.slice(-1)[0];
   return parseQueryString(lastElement)[name];
