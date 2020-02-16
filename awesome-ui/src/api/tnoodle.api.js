@@ -7,7 +7,9 @@ export const fetchZip = wcif => {
       Accept: "application/json",
       "Content-Type": "application/json"
     },
-    body: wcif
+    body: JSON.stringify({
+        'wcif': wcif
+    })
   })
     .then(response => {
       console.log(response);
