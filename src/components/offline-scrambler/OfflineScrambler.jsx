@@ -1,31 +1,32 @@
 import React, { Component } from "react";
-
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
+import { fetchZip } from "../../api/tnoodle.api";
+import { connect } from "react-redux";
 
-class OfflineScrambler extends Component {
-  constructor(props) {
-    super(props);
+const mapStateToProps = store => ({
+  wcif: store.wcif
+});
 
-    this.generateScrambles = props.generateScrambles;
-  }
-
-  render() {
-    return (
-      <div>
-        <EntryInterface />
-        <EventPickerTable />
-        <div className="container form-group p-3">
-          <button
-            className="btn btn-primary btn-lg"
-            onClick={this.generateScrambles}
-          >
-            Generate Scrambles
-          </button>
+const OfflineScrambler = connect(mapStateToProps)(
+  class extends Component {
+    render() {
+      return (
+        <div>
+          <EntryInterface />
+          <EventPickerTable />
+          <div className="container form-group p-3">
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={_ => fetchZip(this.props.wcif)}
+            >
+              Generate Scrambles
+            </button>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
-}
+);
 
 export default OfflineScrambler;
