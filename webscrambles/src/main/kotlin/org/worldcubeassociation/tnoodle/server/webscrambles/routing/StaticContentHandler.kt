@@ -41,12 +41,6 @@ object StaticContentHandler : RouteHandler {
             static("oauth") {
                 resource("*", "wca/awesome-ui/index.html")
             }
-
-            static("competitions") {
-                resource("*", "wca/awesome-ui/index.html")
-
-                defaultResource("wca/awesome-ui/index.html")
-            }
         }
 
         router.static("/scramble-legacy") {
