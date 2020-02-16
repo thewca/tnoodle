@@ -41,7 +41,7 @@ const SelectCompetition = connect(
       }
       return (
         <div className="competitions-picker">
-          <h2 className="text-center">Select an upcoming competition:</h2>
+          <h5 className="text-center">Select an upcoming competition:</h5>
           {this.state.competitions.length === 0 ? (
             <div className="text-center">
               No competitions found, are you sure you have upcoming
