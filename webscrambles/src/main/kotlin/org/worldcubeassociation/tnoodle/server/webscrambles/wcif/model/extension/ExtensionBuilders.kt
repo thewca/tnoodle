@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extensio
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Extension
 
@@ -11,8 +12,12 @@ sealed class ExtensionBuilder {
     protected abstract val specUrl: String
 
     fun build(): Extension {
-        val rawData = JsonConfig.SERIALIZER.toJson(serializer(), this)
-        return Extension(id, specUrl, rawData.jsonObject)
+        val serialJson = JsonConfig.SERIALIZER.toJson(serializer(), this)
+
+        val extValues = serialJson.jsonObject - JsonConfig.CLASS_DISCRIMINATOR
+        val extSerial = JsonObject(extValues)
+
+        return Extension(id, specUrl, extSerial)
     }
 
     companion object {
