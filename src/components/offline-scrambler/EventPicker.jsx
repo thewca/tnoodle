@@ -3,10 +3,9 @@ import CubingIcon from "../CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../../constants/wca.constants";
 import { connect } from "react-redux";
 import { updateWcaEvent, updateMbld } from "../../redux/ActionCreators";
+import { MBLD_MIN } from "../../constants/wca.constants";
 
 import "./EventPicker.scss";
-
-const MIN_MBLD = 2;
 
 const mapStateToProps = store => ({
   mbld: store.wcif.mbld
@@ -109,7 +108,7 @@ const EventPicker = connect(
                   onChange={evt =>
                     this.handleMbldChange(Number(evt.target.value))
                   }
-                  min={MIN_MBLD}
+                  min={MBLD_MIN}
                   onBlur={this.verifyMbld}
                 />
               </td>
@@ -127,8 +126,8 @@ const EventPicker = connect(
     // When mbld loses focus
     verifyMbld = () => {
       let mbld = this.state.mbld;
-      if (mbld < MIN_MBLD) {
-        mbld = MIN_MBLD;
+      if (mbld < MBLD_MIN) {
+        mbld = MBLD_MIN;
         this.handleMbldChange(mbld);
       }
     };
