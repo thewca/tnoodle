@@ -16,7 +16,7 @@ object JobSchedulingHandler : RouteHandler {
 
     private val JOBS = mutableMapOf<Int, MutableMap<String, Int>>()
     private val RESULTS = mutableMapOf<Int, Pair<ContentType, ByteArray>>()
-    private val ERRORS = mutableMapOf<Int, Pair<HttpStatusCode, Throwable>?>()
+    private val ERRORS = mutableMapOf<Int, Pair<HttpStatusCode, Throwable>>()
 
     private const val JOB_ID_PARAM = "jobId"
 
@@ -73,6 +73,10 @@ object JobSchedulingHandler : RouteHandler {
 
     fun registerResult(jobId: Int, contentType: ContentType, resultData: ByteArray) {
         RESULTS[jobId] = contentType to resultData
+    }
+
+    fun reportError(jobId: Int, statusCode: HttpStatusCode, error: Throwable) {
+        ERRORS[jobId] = statusCode to error
     }
 
     fun Route.registerJobPaths(job: LongRunningJob) {
