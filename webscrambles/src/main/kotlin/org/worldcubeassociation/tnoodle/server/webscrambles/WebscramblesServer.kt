@@ -13,6 +13,7 @@ import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher.NO_REEXEC_OPT
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.OfflineJarUtils
@@ -34,6 +35,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             scrambleViewHandler.install(this)
             StaticContentHandler.install(this)
             wcifHandler.install(this)
+            JobSchedulingHandler.install(this)
         }
 
         baseServer.spinUp(app)
