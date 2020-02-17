@@ -83,7 +83,9 @@ object JobSchedulingHandler : RouteHandler {
 
         put {
             val jobId = job.launch(call, this) // FIXME "this" param is ugly
-            call.respond(HttpStatusCode.Created, jobId) // TODO target status
+            val creationMessage = JobCreationMessage(jobId, job.targetStatus)
+
+            call.respond(HttpStatusCode.Created, creationMessage)
         }
     }
 }
