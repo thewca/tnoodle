@@ -6,17 +6,21 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.coroutines.CoroutineContext
 
-abstract class LongRunningJob {
+abstract class LongRunningJob : CoroutineScope {
+    override val coroutineContext: CoroutineContext
+        get() = JobSchedulingHandler.JOB_CONTEXT
+
     abstract val targetStatus: Map<String, Int>
     open val errorCodes: Map<Throwable, HttpStatusCode> = emptyMap()
 
     abstract suspend fun ApplicationCall.compute(jobId: Int): Pair<ContentType, ByteArray>
 
-    fun launch(call: ApplicationCall, scope: CoroutineScope): Int {
+    fun launch(call: ApplicationCall): Int {
         val jobId = JobSchedulingHandler.nextJobID()
 
-        scope.launch(context = JobSchedulingHandler.JOB_CONTEXT) {
+        launch {
             try {
                 val (type, data) = call.compute(jobId)
                 JobSchedulingHandler.registerResult(jobId, type, data)
