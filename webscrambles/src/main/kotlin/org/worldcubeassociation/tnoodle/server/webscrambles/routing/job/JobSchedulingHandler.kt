@@ -6,8 +6,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
-import io.ktor.routing.Routing
-import io.ktor.routing.get
+import io.ktor.routing.*
 import kotlinx.coroutines.asCoroutineDispatcher
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import java.util.concurrent.Executors
@@ -74,5 +73,17 @@ object JobSchedulingHandler : RouteHandler {
 
     fun registerResult(jobId: Int, contentType: ContentType, resultData: ByteArray) {
         RESULTS[jobId] = contentType to resultData
+    }
+
+    fun Route.registerJobPaths(job: LongRunningJob) {
+        post {
+            val (type, data) = job.computeBlocking(call)
+            call.respondBytes(data, type)
+        }
+
+        put {
+            val jobId = job.launch(call, this) // FIXME "this" param is ugly
+            call.respond(HttpStatusCode.Created, jobId) // TODO target status
+        }
     }
 }
