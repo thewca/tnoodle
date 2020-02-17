@@ -60,6 +60,29 @@ object WCIFScrambleMatcher {
         return runBlocking { fillScrambleSetsAsync(wcif) { _, _ -> Unit } }
     }
 
+    fun getScrambleCountsPerEvent(wcif: Competition): Map<String, Int> {
+        return wcif.events.associateWith { it.rounds }
+            .mapValues { (_, rs) ->
+                rs.map { it.scrambleSetCount * scrambleCountPerSet(it) }.sum()
+            }.mapKeys { it.key.id }
+    }
+
+    private fun scrambleCountPerSet(round: Round): Int {
+        val baseCount = if (round.idCode.eventId == "333mbf") {
+            val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
+                ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
+
+            round.expectedAttemptNum * multiExtCount
+        } else {
+            round.expectedAttemptNum
+        }
+
+        val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
+            ?: defaultExtraCount(round.idCode.eventId)
+
+        return baseCount + extraScrambleNum
+    }
+
     private fun reindexScrambleSets(events: List<Event>): List<Event> {
         val indexTable = events.flatMap { it.rounds }
             .flatMap { it.scrambleSets }
@@ -87,7 +110,6 @@ object WCIFScrambleMatcher {
         return round.copy(scrambleSets = scrambles)
     }
 
-    // FIXME coroutines, progressBar
     private fun generateScrambleSet(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): ScrambleSet {
         val puzzle = Event.findPuzzlePlugin(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
