@@ -39,7 +39,8 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
         }
     }
 
-    private fun yieldScramble() = SCRAMBLE_CACHERS[this.key]?.getScramble()
+    private fun yieldScramble() = SCRAMBLE_CACHERS[this.key]
+        ?.takeIf { it.available > 0 }?.getScramble()
         ?: this.scrambler.generateScramble()
 
     companion object {
