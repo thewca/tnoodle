@@ -19,20 +19,28 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competiti
 import java.time.LocalDateTime
 
 class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
-    internal class ScramblingJob(val scrambledToResult: suspend ApplicationCall.(Competition, WcifScrambleRequest, Int) -> Pair<ContentType, ByteArray>) : LongRunningJob() {
-        override val targetStatus: Map<String, Int>
-            get() = emptyMap() // TODO
+    internal data class ScramblingJobData(val request: WcifScrambleRequest, val requestUrl: String)
 
-        override suspend fun ApplicationCall.compute(jobId: Int): Pair<ContentType, ByteArray> {
-            val wcifRequest = receive<WcifScrambleRequest>()
-            val baseWcif = yieldExtendedWcif(wcifRequest)
+    internal class ScramblingJob(val extraTargetData: Map<String, Int>, val scrambledToResult: suspend (Competition, ScramblingJobData, Int) -> Pair<ContentType, ByteArray>) : LongRunningJob<ScramblingJobData>() {
+        constructor(scrambledToResult: suspend (Competition, ScramblingJobData, Int) -> Pair<ContentType, ByteArray>) : this(emptyMap(), scrambledToResult)
 
-            val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(baseWcif) { pzl, _ ->
+        override suspend fun ApplicationCall.extractData(): ScramblingJobData {
+            val requestData = receive<WcifScrambleRequest>()
+            val requestUrl = request.uri
+
+            return ScramblingJobData(requestData, requestUrl)
+        }
+
+        override suspend fun ScramblingJobData.compute(jobId: Int): Pair<ContentType, ByteArray> {
+            val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(request.extendedWcif) { pzl, _ ->
                 JobSchedulingHandler.registerProgress(jobId, pzl.key)
             }
 
-            return scrambledToResult(wcif, wcifRequest, jobId)
+            return scrambledToResult(wcif, this, jobId)
         }
+
+        override fun getTargetState(data: ScramblingJobData) =
+            WCIFScrambleMatcher.getScrambleCountsPerEvent(data.request.extendedWcif) + extraTargetData
     }
 
     override fun install(router: Routing) {
@@ -47,13 +55,13 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
             }
 
             route("/zip") {
-                val job = ScramblingJob { wcif, req, jobId ->
+                val job = ScramblingJob(mapOf("PDF" to 1)) { wcif, data, jobId ->
                     val generationDate = LocalDateTime.now()
 
-                    val pdfPassword = req.pdfPassword
-                    val zipPassword = req.zipPassword
+                    val pdfPassword = data.request.pdfPassword
+                    val zipPassword = data.request.zipPassword
 
-                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.projectTitle, request.uri)
+                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.projectTitle, data.requestUrl)
                     val bytes = zip.compress(zipPassword)
 
                     JobSchedulingHandler.registerProgress(jobId, "PDF")
@@ -63,22 +71,5 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
                 registerJobPaths(job)
             }
         }
-    }
-
-    companion object {
-        private suspend fun ApplicationCall.yieldExtendedWcif(suspendRequest: WcifScrambleRequest? = null): Competition {
-            // suspend fn not supported as default argument…
-            val request = suspendRequest ?: this.receive()
-
-            val wcif = request.wcif
-
-            val optionalExtensions = listOfNotNull(
-                request.multiCubes?.to("333mbf"),
-                request.fmcLanguages?.to("333fm")
-            ).toMap()
-
-            return WCIFScrambleMatcher.installExtensions(wcif, optionalExtensions)
-        }
-
     }
 }

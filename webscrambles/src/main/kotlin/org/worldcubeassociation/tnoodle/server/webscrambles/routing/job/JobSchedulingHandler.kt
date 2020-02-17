@@ -79,17 +79,15 @@ object JobSchedulingHandler : RouteHandler {
         ERRORS[jobId] = statusCode to error
     }
 
-    fun Route.registerJobPaths(job: LongRunningJob) {
+    fun <T> Route.registerJobPaths(job: LongRunningJob<T>) {
         post {
             val (type, data) = job.computeBlocking(call)
             call.respondBytes(data, type)
         }
 
         put {
-            val jobId = job.launch(call)
-            val creationMessage = JobCreationMessage(jobId, job.targetStatus)
-
-            call.respond(HttpStatusCode.Created, creationMessage)
+            val jobCreation = job.launch(call)
+            call.respond(HttpStatusCode.Created, jobCreation)
         }
     }
 }
