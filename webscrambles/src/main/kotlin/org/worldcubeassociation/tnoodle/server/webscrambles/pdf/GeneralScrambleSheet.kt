@@ -46,7 +46,8 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val scrambleImageHeight = scrambleImageSize.height.toFloat()
         val scrambleColumnWidth = availableWidth - indexColumnWidth - scrambleImageSize.width
 
-        val allScrambleStrings = scrambleSet.allScrambles.flatMap { it.allScrambleStrings }
+        val allScrambleStrings = scrambleSet.allScrambles.toPDFStrings(scramblingPuzzle.shortName)
+
         val scrambleFont = getFontConfiguration(scrambleColumnWidth, scrambleImageHeight, allScrambleStrings)
 
         // First check if any scramble requires highlighting.
@@ -127,7 +128,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
             isLockedWidth = true
         }
 
-        val strScrambles = scrambles.flatMap { it.allScrambleStrings }
+        val strScrambles = scrambles.toPDFStrings(scramblingPuzzle.shortName)
 
         for ((i, scramble) in strScrambles.withIndex()) {
             val indexCell = PdfPCell(Paragraph("$scrambleNumberPrefix${i + 1}")).apply {
@@ -176,6 +177,11 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     }
 
     companion object {
+        private fun List<Scramble>.toPDFStrings(puzzleName: String) =
+            flatMap { it.allScrambleStrings }
+                .takeUnless { puzzleName == "minx" } // minx scrambles intentionally include "\n" chars for alignment
+                ?: map { it.scrambleString }
+
         const val MAX_SCRAMBLES_PER_PAGE = 7
         const val SCRAMBLE_IMAGE_PADDING = 2
 
