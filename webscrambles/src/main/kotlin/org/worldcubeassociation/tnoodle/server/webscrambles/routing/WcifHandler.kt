@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
+import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.LongRunningJob
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.WcifScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
@@ -33,6 +34,19 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
         ).toMap()
 
         return WCIFScrambleMatcher.installExtensions(wcif, optionalExtensions)
+    }
+
+    internal class ScramblingJob(val baseWcif: Competition, val scrambledToResult: suspend (Competition) -> Pair<ContentType, ByteArray>) : LongRunningJob() {
+        override val targetStatus: Map<String, Int>
+            get() = emptyMap() // TODO
+
+        override suspend fun compute(jobId: Int): Pair<ContentType, ByteArray> {
+            val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(baseWcif) { pzl, _ ->
+                JobSchedulingHandler.registerProgress(jobId, pzl.key)
+            }
+
+            return scrambledToResult(wcif)
+        }
     }
 
     override fun install(router: Routing) {
