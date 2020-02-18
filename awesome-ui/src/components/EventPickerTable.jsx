@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import EventPicker from "./EventPicker";
 import { connect } from "react-redux";
-import { WCA_EVENTS } from "../../constants/wca.constants";
-import { fetchZip } from "../../api/tnoodle.api";
+import { WCA_EVENTS } from "../constants/wca.constants";
+import { fetchZip } from "../api/tnoodle.api";
 
 const mapStateToProps = store => ({
     wcif: store.wcif

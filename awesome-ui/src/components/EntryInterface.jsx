@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-import {
-    updatePassword,
-    updateCompetitionName
-} from "../../redux/ActionCreators";
+import { updatePassword, updateCompetitionName } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 
 const mapDispatchToProps = {
@@ -20,6 +17,7 @@ const EntryInterface = connect(
 
             this.state = {
                 competitionName: props.name,
+                disabled: props.disabled,
                 password: "",
                 showPassword: false
             };
@@ -55,19 +53,18 @@ const EntryInterface = connect(
 
         render() {
             return (
-                <div className="container">
-                    <div className="row" id="entry-items">
+                <div className="container mt-2">
+                    <div className="row">
                         <div className="col-md-6 text-left form-group">
                             <label className="font-weight-bold pr-1">
                                 Competition Name:{" "}
                             </label>
                             <input
-                                id="competitionName"
                                 className="form-control"
                                 placeholder="Competition Name"
                                 onChange={this.handleCompetitionNameChange}
                                 value={this.state.competitionName}
-                                size={40}
+                                disabled={this.state.disabled ? "disabled" : ""}
                             />
                         </div>
 

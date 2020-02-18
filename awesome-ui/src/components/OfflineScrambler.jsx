@@ -11,9 +11,10 @@ class OfflineScrambler extends Component {
     render() {
         return (
             <div>
-                <EntryInterface name={this.getDefaultCompetitionName()} />
-
-                {/** We pass an empty wcif for consistency */}
+                <EntryInterface
+                    name={this.getDefaultCompetitionName()}
+                    disabled={false}
+                />
                 <EventPickerTable />
             </div>
         );

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import CubingIcon from "../CubingIcon";
-import { MAX_WCA_ROUNDS, FORMATS } from "../../constants/wca.constants";
 import { connect } from "react-redux";
-import { updateWcaEvent, updateMbld } from "../../redux/ActionCreators";
-import { MBLD_MIN } from "../../constants/wca.constants";
+import CubingIcon from "./CubingIcon";
+import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
+import { updateWcaEvent, updateMbld } from "../redux/ActionCreators";
+import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
     mbld: store.wcif.mbld

@@ -20,10 +20,10 @@ export const Reducer = (store, action) => {
         };
     }
 
-    if (action.type === ActionTypes.UPDATE_WCIF) {
+    if (action.type === ActionTypes.UPDATE_EVENTS) {
         return {
             ...store,
-            wcif: action.payload.wcif
+            wcif: {...store.wcif, events: action.payload.events}
         };
     }
 
