@@ -16,6 +16,7 @@ node_modules/
 .idea/
 local.properties
 TNoodle-WCA-*.jar
+TNoodle-Docker-*.jar
 tnoodle_resources/
 tnoodle_pruning_cache/
 **/logging/*.log

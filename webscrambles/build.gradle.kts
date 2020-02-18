@@ -1,4 +1,5 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.FileUtils.symlink
 import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.gitVersionTag
@@ -104,5 +105,17 @@ tasks.create("registerManifest") {
                 )
             }
         }
+    }
+}
+
+tasks.getByName("shadowJar") {
+    doLast {
+        val targetProject = project.name
+
+        val originFile = file("$buildDir/libs/$targetProject-$version-all.jar")
+        val targetLn = rootProject.file("TNoodle-Docker-latest.jar")
+            .also { if (it.exists()) it.delete() }
+
+        symlink(targetLn, originFile)
     }
 }
