@@ -5,9 +5,7 @@ import { MBLD_DEFAULT } from "../constants/wca.constants";
 
 const defaultWcif = {
     formatVersion: "1.0",
-    id: "",
     name: "",
-    shortName: "",
     events: [],
     password: "",
     mbld: MBLD_DEFAULT
@@ -37,15 +35,11 @@ export const Reducer = (store, action) => {
     }
 
     if (action.type === ActionTypes.UPDATE_COMPETITION_NAME) {
-        let competitionName = action.payload.competitionName;
-        let id = competitionName.replace(/\s/g, "");
         return {
             ...store,
             wcif: {
                 ...store.wcif,
-                id: id,
-                name: competitionName,
-                shortName: competitionName
+                name: action.payload.competitionName
             }
         };
     }
