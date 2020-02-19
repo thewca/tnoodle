@@ -255,6 +255,10 @@ const EventPicker = connect(
                     disabled: false
                 });
             });
+
+            let styleFirstTwoColumns = { width: "10%" };
+            let styleLastTwoColumns = { width: "40%" };
+
             return (
                 <div
                     className={
@@ -271,16 +275,16 @@ const EventPicker = connect(
                                         : ""
                                 }
                             >
-                                <th></th>
-                                <th>
+                                <th style={styleFirstTwoColumns}></th>
+                                <th style={styleFirstTwoColumns}>
                                     <CubingIcon event={event.id} />
                                 </th>
-                                <th>
+                                <th style={styleLastTwoColumns}>
                                     <h5 className="font-weight-bold">
                                         {event.name}
                                     </h5>
                                 </th>
-                                <th>
+                                <th style={styleLastTwoColumns}>
                                     <select
                                         onChange={
                                             this.handleNumberOfRoundsChange
