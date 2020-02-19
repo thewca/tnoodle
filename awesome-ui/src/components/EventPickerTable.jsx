@@ -13,7 +13,7 @@ const EventPickerTable = connect(mapStateToProps)(
         constructor(props) {
             super(props);
 
-            let events = props.events || [];
+            let events = props.events || props.wcif.events || [];
 
             // Prevent offline from remembering online order
             let wcaEvents = [...WCA_EVENTS];
@@ -21,7 +21,7 @@ const EventPickerTable = connect(mapStateToProps)(
             // If the events > 0, this means that this was a fetched wcif so we disabled the manual selection
             let disabled = events.length > 0;
 
-            // This will sort the filled events first for visual
+            // At start, this will sort the filled events first for visual. Helpful for fetching info.
             if (disabled) {
                 wcaEvents.forEach(wcaEvent => {
                     let isEmpty = !events.find(item => item.id === wcaEvent.id);
@@ -44,7 +44,17 @@ const EventPickerTable = connect(mapStateToProps)(
                 wcaEvents: wcaEvents
             };
         }
+
+        handleScrambleButton = () => {
+            fetchZip(this.props.wcif);
+        };
+
         render() {
+            // At least 1 events must have at least 1 round.
+            let disableScrambleButton = !this.props.wcif.events
+                .map(event => event.rounds.length > 0)
+                .reduce((flag1, flag2) => flag1 || flag2, false);
+
             return (
                 <div className="container">
                     {this.state.wcaEvents.map(event => {
@@ -64,7 +74,13 @@ const EventPickerTable = connect(mapStateToProps)(
                         <div className="col-12">
                             <button
                                 className="btn btn-primary btn-lg"
-                                onClick={_ => fetchZip(this.props.wcif)}
+                                onClick={this.handleScrambleButton}
+                                disabled={disableScrambleButton}
+                                title={
+                                    disableScrambleButton
+                                        ? "No events selected."
+                                        : ""
+                                }
                             >
                                 Generate Scrambles
                             </button>

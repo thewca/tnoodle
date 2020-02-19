@@ -15,7 +15,8 @@ class OfflineScrambler extends Component {
                     name={this.getDefaultCompetitionName()}
                     disabled={false}
                 />
-                <EventPickerTable />
+                {/* empty events for cleaning when navigating aroud */}
+                <EventPickerTable events={[]} />
             </div>
         );
     }

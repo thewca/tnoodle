@@ -4,6 +4,7 @@ import { getCompetitionJson } from "../api/wca.api";
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
 import { updateEvents } from "../redux/ActionCreators";
+import Loading from "./Loading";
 
 const mapDispatchToProps = {
     updateEvents
@@ -42,11 +43,7 @@ const ManageCompetition = connect(
                 return <p>Error fetching information.</p>;
             }
             if (this.state.loading) {
-                return (
-                    <div className="spinner-border m-5" role="status">
-                        <span className="sr-only">Loading...</span>
-                    </div>
-                );
+                return <Loading />;
             }
             return (
                 <div>

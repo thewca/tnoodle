@@ -125,7 +125,7 @@ const EventPicker = connect(
                             </th>
                             <td>
                                 <input
-                                    className="form-control"
+                                    className="form-control bg-info"
                                     type="number"
                                     value={this.state.mbld}
                                     onChange={evt =>

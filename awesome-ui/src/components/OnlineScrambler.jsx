@@ -3,6 +3,7 @@ import SelectCompetition from "./SelectCompetition";
 import { connect } from "react-redux";
 import { fetchMe, isLogged } from "../api/wca.api";
 import { updateMe } from "../redux/ActionCreators";
+import Loading from "./Loading";
 
 const mapStateToProps = store => ({
     me: store.me
@@ -19,7 +20,11 @@ const OnlineScrambler = connect(
     class extends Component {
         constructor(props) {
             super(props);
-            this.state = { me: this.props.me, unauthorized: false };
+            this.state = {
+                me: this.props.me,
+                unauthorized: false,
+                loading: false
+            };
         }
 
         componentDidMount() {
@@ -27,13 +32,21 @@ const OnlineScrambler = connect(
                 return;
             }
             if (this.state.me == null) {
+                this.setLoading(true);
                 fetchMe()
-                    .then(me => this.handleUpdateMe(me))
+                    .then(me => {
+                        this.handleUpdateMe(me);
+                        this.setLoading(false);
+                    })
                     .catch(e => {
                         this.setState({ ...this.state, unauthorized: true });
                     });
             }
         }
+
+        setLoading = flag => {
+            this.setState({ ...this.state, loading: flag });
+        };
 
         handleUpdateMe = me => {
             this.setState({ ...this.state, me: me });
@@ -50,6 +63,10 @@ const OnlineScrambler = connect(
                 );
             }
 
+            if (this.state.loading) {
+                return <Loading />;
+            }
+
             if (this.state.me == null) {
                 return (
                     <div>
@@ -57,6 +74,7 @@ const OnlineScrambler = connect(
                     </div>
                 );
             }
+
             return (
                 <div className="container">
                     <h1>Welcome, {this.state.me.name}</h1>
