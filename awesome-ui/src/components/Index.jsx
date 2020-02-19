@@ -13,7 +13,7 @@ class Index extends Component {
         return (
             <div>
                 <div className="container">
-                    <div className="row">
+                    <div className="row mt-3">
                         <div className="col-md-5">
                             <h2>Offline Scrambler Program</h2>
                             <p>

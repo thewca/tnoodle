@@ -47,7 +47,7 @@ const TnoodleNavbar = connect(
 
         render() {
             return (
-                <div className="container-fluid bg-dark">
+                <div className="container-fluid bg-dark pb-2">
                     <div className="row">
                         <div className="col-6">
                             <div className="container">
