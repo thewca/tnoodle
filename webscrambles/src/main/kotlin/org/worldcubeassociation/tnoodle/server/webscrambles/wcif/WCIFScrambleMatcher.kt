@@ -7,12 +7,89 @@ import kotlinx.coroutines.runBlocking
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
+import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 object WCIFScrambleMatcher {
     const val ID_PENDING = 0 // FIXME should this be -1?
 
     // SCRAMBLE SET FILLING -----
+    const val CIPHER_ALGORITHM = "AES"
+    const val CIPHER_SALT = "TNOODLE_WCIF"
+    const val CIPHER_KEY_ITERATIONS = 1000
+    const val CIPHER_KEY_LENGTH = 128 * 8
+
+    val CIPHER_CHARSET = Charsets.UTF_8
+
+    val CIPHER_KEY_FACTORY = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+
+    fun encryptScrambleSets(wcif: Competition, password: String): Competition {
+        return cryptScrambleSets(wcif, password, Cipher.ENCRYPT_MODE, WCIFScrambleMatcher::applyCipherEncrypt)
+    }
+
+    fun decryptScrambleSets(wcif: Competition, password: String): Competition {
+        return cryptScrambleSets(wcif, password, Cipher.DECRYPT_MODE, WCIFScrambleMatcher::applyCipherDecrypt)
+    }
+
+    private fun cryptScrambleSets(wcif: Competition, password: String, cipherOpMode: Int, cipherMethod: (List<Scramble>, Cipher) -> List<Scramble>): Competition {
+        val cipherKey = generateKey(password)
+
+        val cipherInstance = Cipher.getInstance(CIPHER_ALGORITHM)
+            .apply { init(cipherOpMode, cipherKey) }
+
+        val scrambledEvents = wcif.events.map { e ->
+            val scrambledRounds = e.rounds.map { r ->
+                val cryptedSets = r.scrambleSets.map { scr ->
+                    val cryptedStdScrambles = cipherMethod(scr.scrambles, cipherInstance)
+                    val cryptedExtraScrambles = cipherMethod(scr.extraScrambles, cipherInstance)
+
+                    scr.copy(scrambles = cryptedStdScrambles, extraScrambles = cryptedExtraScrambles)
+                }
+
+                r.copy(scrambleSets = cryptedSets)
+            }
+
+            e.copy(rounds = scrambledRounds)
+        }
+
+        return wcif.copy(events = scrambledEvents)
+    }
+
+    private fun applyCipherEncrypt(scrambles: List<Scramble>, cipher: Cipher): List<Scramble> {
+        return scrambles.map {
+            val contentBytes = it.scrambleString.toByteArray(CIPHER_CHARSET)
+
+            val cipherContent = cipher.doFinal(contentBytes)
+            val cipherString = Base64.getEncoder().encodeToString(cipherContent)
+
+            it.copy(scrambleString = cipherString)
+        }
+    }
+
+    private fun applyCipherDecrypt(scrambles: List<Scramble>, cipher: Cipher): List<Scramble> {
+        return scrambles.map {
+            val contentBytes = Base64.getDecoder().decode(it.scrambleString)
+
+            val cipherContent = cipher.doFinal(contentBytes)
+            val cipherString = cipherContent.toString(CIPHER_CHARSET)
+
+            it.copy(scrambleString = cipherString)
+        }
+    }
+
+    private fun generateKey(password: String): SecretKey {
+        val saltBytes = CIPHER_SALT.toByteArray(CIPHER_CHARSET)
+        val spec = PBEKeySpec(password.toCharArray(), saltBytes, CIPHER_KEY_ITERATIONS, CIPHER_KEY_LENGTH)
+
+        return CIPHER_KEY_FACTORY.generateSecret(spec)
+    }
 
     suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
         val scrambledEvents = wcif.events.map { e ->
