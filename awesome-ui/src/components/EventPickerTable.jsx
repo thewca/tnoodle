@@ -3,6 +3,7 @@ import EventPicker from "./EventPicker";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
 import { fetchZip } from "../api/tnoodle.api";
+import { toWcaUrl } from "../api/wca.api";
 
 const mapStateToProps = store => ({
     wcif: store.wcif
@@ -19,10 +20,10 @@ const EventPickerTable = connect(mapStateToProps)(
             let wcaEvents = [...WCA_EVENTS];
 
             // If the events > 0, this means that this was a fetched wcif so we disabled the manual selection
-            let disabled = events.length > 0;
+            let editingDisabled = events.length > 0;
 
             // At start, this will sort the filled events first for visual. Helpful for fetching info.
-            if (disabled) {
+            if (editingDisabled) {
                 wcaEvents.forEach(wcaEvent => {
                     let isEmpty = !events.find(item => item.id === wcaEvent.id);
                     wcaEvent.isEmpty = isEmpty;
@@ -40,13 +41,44 @@ const EventPickerTable = connect(mapStateToProps)(
 
             this.state = {
                 events: events,
-                disabled: disabled,
-                wcaEvents: wcaEvents
+                editingDisabled: editingDisabled,
+                wcaEvents: wcaEvents,
+                competitionId: props.competitionId
             };
         }
 
         handleScrambleButton = () => {
             fetchZip(this.props.wcif);
+        };
+
+        maybeShowEditWarning = () => {
+            if (this.state.competitionId == null) {
+                return;
+            }
+            return (
+                <div className="row">
+                    <p>
+                        Found {this.state.events.length} event
+                        {this.state.events.length > 1 ? "s" : ""} for{" "}
+                        {this.props.wcif.name}.
+                    </p>
+                    <p>
+                        You can view and change the rounds over on{" "}
+                        <a
+                            href={toWcaUrl(
+                                `/competitions/${this.state.competitionId}/events/edit`
+                            )}
+                        >
+                            the WCA website.
+                        </a>
+                        <strong>
+                            {" "}
+                            Refresh this page after making any changes on the
+                            WCA website.
+                        </strong>
+                    </p>
+                </div>
+            );
         };
 
         render() {
@@ -57,6 +89,7 @@ const EventPickerTable = connect(mapStateToProps)(
 
             return (
                 <div className="container">
+                    {this.maybeShowEditWarning()}
                     {this.state.wcaEvents.map(event => {
                         return (
                             <div className="row" key={event.id}>
@@ -65,7 +98,7 @@ const EventPickerTable = connect(mapStateToProps)(
                                     wcifEvent={this.state.events.find(
                                         item => item.id === event.id
                                     )}
-                                    disabled={this.state.disabled}
+                                    disabled={this.state.editingDisabled}
                                 />
                             </div>
                         );
