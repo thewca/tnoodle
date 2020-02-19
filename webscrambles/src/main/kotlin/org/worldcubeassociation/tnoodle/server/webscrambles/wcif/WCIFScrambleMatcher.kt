@@ -16,6 +16,7 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 object WCIFScrambleMatcher {
     const val ID_PENDING = 0 // FIXME should this be -1?
@@ -23,12 +24,12 @@ object WCIFScrambleMatcher {
     // SCRAMBLE SET FILLING -----
     const val CIPHER_ALGORITHM = "AES"
     const val CIPHER_SALT = "TNOODLE_WCIF"
-    const val CIPHER_KEY_ITERATIONS = 1000
-    const val CIPHER_KEY_LENGTH = 128 * 8
+    const val CIPHER_KEY_ITERATIONS = 65536
+    const val CIPHER_KEY_LENGTH = 256
 
     val CIPHER_CHARSET = Charsets.UTF_8
 
-    val CIPHER_KEY_FACTORY = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+    val CIPHER_KEY_FACTORY = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
 
     fun encryptScrambleSets(wcif: Competition, password: String): Competition {
         return cryptScrambleSets(wcif, password, Cipher.ENCRYPT_MODE, WCIFScrambleMatcher::applyCipherEncrypt)
@@ -88,7 +89,8 @@ object WCIFScrambleMatcher {
         val saltBytes = CIPHER_SALT.toByteArray(CIPHER_CHARSET)
         val spec = PBEKeySpec(password.toCharArray(), saltBytes, CIPHER_KEY_ITERATIONS, CIPHER_KEY_LENGTH)
 
-        return CIPHER_KEY_FACTORY.generateSecret(spec)
+        val key = CIPHER_KEY_FACTORY.generateSecret(spec)
+        return SecretKeySpec(key.encoded, CIPHER_ALGORITHM)
     }
 
     suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
