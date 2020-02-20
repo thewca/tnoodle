@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server.webscrambles.plugins
 
 enum class EventPlugins(val key: String, val description: String, val scrambler: PuzzlePlugins) {
     TWO(PuzzlePlugins.TWO),

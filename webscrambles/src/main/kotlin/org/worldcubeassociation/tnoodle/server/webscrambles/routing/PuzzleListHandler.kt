@@ -8,7 +8,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleInfoJsonData
 
 object PuzzleListHandler : RouteHandler {

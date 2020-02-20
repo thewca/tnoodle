@@ -2,7 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
 import kotlinx.serialization.*
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 
 object Puzzlerizer : SingletonStringEncoder<Puzzle>("Puzzle") {
     override fun serialize(encoder: Encoder, obj: Puzzle) {

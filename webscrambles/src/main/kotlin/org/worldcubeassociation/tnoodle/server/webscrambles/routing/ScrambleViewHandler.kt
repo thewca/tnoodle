@@ -26,7 +26,7 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
-import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.DimensionJsonData
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleImageJsonData

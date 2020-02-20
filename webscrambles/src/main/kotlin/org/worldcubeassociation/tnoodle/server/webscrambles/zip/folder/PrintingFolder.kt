@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.EventPlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcGenericSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcScrambleCutoutSheet

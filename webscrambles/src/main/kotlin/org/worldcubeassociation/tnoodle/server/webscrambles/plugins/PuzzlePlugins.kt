@@ -1,6 +1,7 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles
+package org.worldcubeassociation.tnoodle.server.webscrambles.plugins
 
 import org.worldcubeassociation.tnoodle.scrambles.PuzzleRegistry
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.cache.CoroutineScrambleCacher
 
 enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
     // To all fellow programmers who wonder about effectively copying an interface:
