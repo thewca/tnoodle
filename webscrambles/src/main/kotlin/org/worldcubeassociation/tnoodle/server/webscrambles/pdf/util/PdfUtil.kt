@@ -162,13 +162,14 @@ object PdfUtil {
         }
     }
 
-    fun binarySearch(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
+    tailrec fun binarySearch(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
+        val potentialFontSize = (min + max) / 2f
+
         if (max - min < precision) {
             // Ground recursion: We have converged arbitrarily close to some target value.
-            return min
+            return potentialFontSize
         }
 
-        val potentialFontSize = (min + max) / 2f
         val iterationShouldIncrease = shouldIncrease(potentialFontSize)
 
         return if (iterationShouldIncrease) {

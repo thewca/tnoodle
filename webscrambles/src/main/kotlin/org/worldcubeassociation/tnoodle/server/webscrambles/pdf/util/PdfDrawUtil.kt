@@ -40,14 +40,11 @@ object PdfDrawUtil {
 
             val parsedSvgDocument = factory.createSVGDocument(null, svg.toString().reader())
 
+            val scaleWidth = dim.width.toDouble() / svg.size.width
+            val scaleHeight = dim.height.toDouble() / svg.size.height
+
             val chartGfx = GVTBuilder().build(ctx, parsedSvgDocument)
-
-            val actualSize = svg.size
-
-            val scaleWidth = dim.width.toDouble() / actualSize.width
-            val scaleHeight = dim.height.toDouble() / actualSize.height
-
-            chartGfx.transform = AffineTransform.getScaleInstance(scaleWidth, scaleHeight)
+                .apply { transform = AffineTransform.getScaleInstance(scaleWidth, scaleHeight) }
 
             chartGfx.paint(g2)
         } finally {
