@@ -76,7 +76,7 @@ data class ScrambleRequest(
             val plugin = PuzzlePlugins.WCA_PUZZLES[puzzle]
                 ?: throw InvalidScrambleRequestException("Invalid scrambler: $puzzle")
 
-            val scrambler = plugin.scrambler
+            val scrambler = plugin.scramblerWithCache
 
             val fmc = countStr == "fmc"
 

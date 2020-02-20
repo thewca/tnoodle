@@ -18,7 +18,7 @@ object ReadmeHandler : RouteHandler {
                 val rawReadme = scramblesReadmeStream.bufferedReader().readText()
 
                 val scrambleFilteringInfo = PuzzlePlugins.values()
-                    .map { it.scramblerWithoutCache }
+                    .map { it.scrambler }
                     .joinToString("\n") {
                         // those 2 spaces at the end are no accident: http://meta.stackoverflow.com/questions/26011/should-the-markdown-renderer-treat-a-single-line-break-as-br
                         "${it.longName}: &ge; ${it.wcaMinScrambleDistance} moves away from solved  "

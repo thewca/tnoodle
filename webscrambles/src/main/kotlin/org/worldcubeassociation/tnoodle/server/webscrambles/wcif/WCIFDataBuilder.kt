@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
@@ -21,7 +22,7 @@ object WCIFDataBuilder {
                 r.scrambleSets.mapIndexed { scrNum, it ->
                     val copyCode = r.idCode.copyParts(groupNumber = scrNum)
 
-                    val specificExtensions = if (e.id == "333fm") {
+                    val specificExtensions = if (e.plugin == EventPlugins.THREE_FM) {
                         val formatExtension = FmcAttemptCountExtension(r.expectedAttemptNum)
                         val languageExtension = r.findExtension<FmcLanguagesExtension>()
 
@@ -83,7 +84,7 @@ object WCIFDataBuilder {
 
         // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
         // to fix this, we pass the attempt number
-        if (activityCode.eventId == "333mbf" && !scrambleSet.hasExtension<MultiScrambleCountExtension>()) {
+        if (activityCode.eventPlugin == EventPlugins.THREE_MULTI_BLD && !scrambleSet.hasExtension<MultiScrambleCountExtension>()) {
             val singleSheets = scrambleSet.scrambles.mapIndexed { nthAttempt, scrambleStr ->
                 val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
 

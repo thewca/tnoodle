@@ -4,6 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import org.worldcubeassociation.tnoodle.server.webscrambles.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
@@ -19,7 +20,9 @@ object WCIFScrambleMatcher {
                 val roundId = "${k.first}-r${k.second}"
 
                 val avgScrambleSetSize = it.map { scr -> scr.scrambles.size }.average().toInt()
-                val format = guessRoundFormat(avgScrambleSetSize, k.first)
+
+                val eventPlugin = EventPlugins.WCA_EVENTS[k.first]
+                val format = guessRoundFormat(avgScrambleSetSize, eventPlugin)
 
                 val scrambleSets = it.map { scr ->
                     ScrambleSet(
@@ -68,7 +71,7 @@ object WCIFScrambleMatcher {
     }
 
     private fun scrambleCountPerSet(round: Round): Int {
-        val baseCount = if (round.idCode.eventId == "333mbf") {
+        val baseCount = if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
             val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
                 ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
 
@@ -78,7 +81,7 @@ object WCIFScrambleMatcher {
         }
 
         val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
-            ?: defaultExtraCount(round.idCode.eventId)
+            ?: defaultExtraCount(round.idCode.eventPlugin)
 
         return baseCount + extraScrambleNum
     }
@@ -114,7 +117,7 @@ object WCIFScrambleMatcher {
         val puzzle = Event.findPuzzlePlugin(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
-        val scrambles = if (round.idCode.eventId == "333mbf") {
+        val scrambles = if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
             val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
                 ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
 
@@ -130,7 +133,7 @@ object WCIFScrambleMatcher {
         }
 
         val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
-            ?: defaultExtraCount(round.idCode.eventId)
+            ?: defaultExtraCount(round.idCode.eventPlugin)
         val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum) { onUpdate(puzzle, it) }
             .map { Scramble(it) }
 
@@ -138,11 +141,11 @@ object WCIFScrambleMatcher {
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
     }
 
-    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, String>): Competition {
+    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, EventPlugins>): Competition {
         return ext.entries.fold(wcif) { acc, e -> installExtensionForEvents(acc, e.key, e.value) }
     }
 
-    fun installExtensionForEvents(wcif: Competition, ext: ExtensionBuilder, eventId: String): Competition {
+    fun installExtensionForEvents(wcif: Competition, ext: ExtensionBuilder, event: EventPlugins): Competition {
         fun installRoundExtension(e: Event): Event {
             val extendedRounds = e.rounds.map { r ->
                 r.copy(extensions = r.withExtension(ext))
@@ -152,25 +155,25 @@ object WCIFScrambleMatcher {
         }
 
         val extendedEvents = wcif.events.map { e ->
-            e.takeUnless { it.id == eventId }
+            e.takeUnless { it.id == event.key }
                 ?: installRoundExtension(e)
         }
 
         return wcif.copy(events = extendedEvents)
     }
 
-    private fun defaultExtraCount(eventId: String): Int {
-        return when (eventId) {
-            "333mbf", "333fm" -> 0
+    private fun defaultExtraCount(event: EventPlugins?): Int {
+        return when (event) {
+            EventPlugins.THREE_MULTI_BLD, EventPlugins.THREE_FM -> 0
             else -> 2
         }
     }
 
-    private fun guessRoundFormat(numScrambles: Int, eventId: String): String {
+    private fun guessRoundFormat(numScrambles: Int, event: EventPlugins?): String {
         return when (numScrambles) {
             1, 2 -> numScrambles.toString()
-            3 -> when (eventId) {
-                "333fm", "333bf" -> "m"
+            3 -> when (event) {
+                EventPlugins.THREE_FM, EventPlugins.THREE_BLD -> "m"
                 else -> "3"
             }
             else -> "a"

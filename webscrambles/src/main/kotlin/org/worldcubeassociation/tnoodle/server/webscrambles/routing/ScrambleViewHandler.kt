@@ -61,7 +61,7 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
         val name = parameters["puzzleKey"]
             ?: return respondText("Please specify a puzzle")
 
-        val scrambler = PuzzlePlugins.WCA_PUZZLES[name]?.scramblerWithoutCache
+        val scrambler = PuzzlePlugins.WCA_PUZZLES[name]?.scrambler
             ?: return respondText("Invalid scrambler: $name")
 
         val scramble = request.queryParameters["scramble"]
