@@ -6,6 +6,7 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kotlinx.io.IOException
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
@@ -17,6 +18,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSched
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.LocalServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.OfflineJarUtils
+import java.net.URL
 
 class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
     private val baseServer = TNoodleServer(environmentConfig)
@@ -54,7 +56,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             val desiredJsEnv by parser.adding("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
 
             val noBrowser by parser.flagging("-n", "--nobrowser", help = "Don't open the browser when starting the server")
-            // val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of $NAME is running on the desired port(s), do not attempt to kill it and start up")
+            val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of TNoodle is running on the desired port(s), do not attempt to kill it and start up")
             val noReexec by parser.flagging(NO_REEXEC_OPT, help = "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.")
 
             OfflineJarUtils.setApplicationIcon()
@@ -70,6 +72,16 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             for (jsEnv in desiredJsEnv) {
                 val (key, strValue) = jsEnv.split("=", limit = 2)
                 JsEnvHandler.putJsEnv(key, strValue)
+            }
+
+            if (!noUpgrade) {
+                try {
+                    val shutdownMaybe = URL("http://localhost:2014${TNoodleServer.KILL_URL}").openStream()
+                    shutdownMaybe.close()
+                } catch (ignored: IOException) {
+                    // NOOP. This means we couldn't connect to localhost:2014
+                    // in which case the shutdown attempt is unnecessary anyways.
+                }
             }
 
             val cliEnv = commandLineEnvironment(args)

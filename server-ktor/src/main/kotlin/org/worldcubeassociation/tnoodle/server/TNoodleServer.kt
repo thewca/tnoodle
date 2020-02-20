@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server
 
+import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
@@ -13,7 +14,7 @@ import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
 class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
-    override fun spinUp(app: io.ktor.application.Application) {
+    override fun spinUp(app: Application) {
         val versionHandler = VersionHandler(environmentConfig.projectTitle)
 
         app.routing {
@@ -23,7 +24,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         }
 
         app.install(ShutDownUrl.ApplicationCallFeature) {
-            shutDownUrl = "/kill/now"
+            shutDownUrl = KILL_URL
             exitCodeSupplier = { 0 }
         }
 
@@ -34,5 +35,9 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         app.install(ContentNegotiation) {
             serialization(json = JsonConfig.SERIALIZER)
         }
+    }
+
+    companion object {
+        const val KILL_URL = "/kill/tnoodle/now"
     }
 }
