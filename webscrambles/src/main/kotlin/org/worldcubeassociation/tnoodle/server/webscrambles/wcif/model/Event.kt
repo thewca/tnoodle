@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.Serializable
-import org.worldcubeassociation.tnoodle.server.webscrambles.EventPlugins
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 
 @Serializable
 data class Event(val id: String, val rounds: List<Round>) {

@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import kotlinx.serialization.Serializable
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.svglite.Color
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Colorizer
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.Puzzlerizer
