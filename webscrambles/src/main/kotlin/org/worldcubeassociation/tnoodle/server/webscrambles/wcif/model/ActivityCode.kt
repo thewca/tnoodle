@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStringEncoder
 import kotlin.math.*
 
@@ -11,6 +12,9 @@ data class ActivityCode(val activityCodeString: String) {
 
     val eventId: String
         get() = activityParts.first()
+
+    val eventPlugin: EventPlugins?
+        get() = EventPlugins.WCA_EVENTS[eventId]
 
     @Transient
     private val structureParts = activityParts

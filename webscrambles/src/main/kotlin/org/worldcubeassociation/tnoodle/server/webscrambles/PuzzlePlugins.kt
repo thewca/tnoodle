@@ -25,8 +25,8 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
     // TODO have tnoodle-lib provide an interface that this stuff can be delegated to
     val key get() = registry.key
     val description get() = registry.description
-    val scrambler get() = registry.also { warmUpCache() }.scrambler
-    val scramblerWithoutCache get() = registry.scrambler
+    val scrambler get() = registry.scrambler
+    val scramblerWithCache get() = registry.also { warmUpCache() }.scrambler
 
     val cacheSize get() = SCRAMBLE_CACHERS[this.key]?.available
 
@@ -42,7 +42,7 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
 
     private fun yieldScramble() = SCRAMBLE_CACHERS[this.key]
         ?.takeIf { it.available > 0 }?.getScramble()
-        ?: this.scrambler.generateScramble()
+        ?: this.scramblerWithCache.generateScramble()
 
     companion object {
         const val CACHE_SIZE = 14
