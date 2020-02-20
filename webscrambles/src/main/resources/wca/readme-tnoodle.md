@@ -2,9 +2,7 @@
 
 An http server built to generate scrambles and images for twisty puzzles. Supports json, png, svg, pdf, and zip formats.  It is currently being used by the following programs.
 
-* [TNT](/tnt/) - A new timer aiming to replace CCT.
 * [WCA Scramble Program](/scramble) - WCA scramble program. See [its readme](/readme/scramble).
-* [bld.js](/tnt/bld.html) - A bld cycle generator for Pochmann-style combine orient+permute methods.
 
 Looking for something that's missing? Want to contribute? Check out the latest version of the code on [github](http://github.com/thewca/tnoodle)!
 
@@ -113,15 +111,9 @@ Response:
 
 If json, then boundaries of the puzzles faces will be returned in json format. This is necessary information for creating a color scheme chooser.
 
-<a href="view/sq1.png?scramble=(3,3) /"><img src="view/sq1.png?scramble=(3,3) /" /></a>
-<a href="view/sq1.svg?scramble=(3,3) /"><img src="view/sq1.svg?scramble=(3,3) /" /></a>
+![/view/sq1.png?scramble=(3,3) /](/view/sq1.png?scramble=(3,3)%20/)
+![/view/sq1.svg?scramble=(3,3) /](/view/sq1.png?scramble=(3,3)%20/)
 
 ### POST to view/TITLE.[pdf|zip] ###
 
 The body should be `scrambles=SCRAMBLES`, where `SCRAMBLES` is a json string that was retrieved from scramble/.json (see "A fullfilled scramble request").
-
-### import/?url=URL ###
-url is a url pointing to a text file with newline separated scrambles.
-The scrambles will be returned through the callback (if specified).
-
-This url also supports HTML form POST uploading of text files. The response is a Javascript script that calls parent.postMessage with all the scrambles as an argument.
