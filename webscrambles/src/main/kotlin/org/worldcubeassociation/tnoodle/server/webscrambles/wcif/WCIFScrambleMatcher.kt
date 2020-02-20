@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
+import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.FormatPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
 
@@ -33,7 +34,7 @@ object WCIFScrambleMatcher {
                     )
                 }
 
-                Round(roundId, format, it.size, scrambleSets)
+                Round(roundId, format.key, it.size, scrambleSets)
             }
 
         val events = rounds.groupBy { it.idCode.eventId }
@@ -169,14 +170,14 @@ object WCIFScrambleMatcher {
         }
     }
 
-    private fun guessRoundFormat(numScrambles: Int, event: EventPlugins?): String {
+    private fun guessRoundFormat(numScrambles: Int, event: EventPlugins?): FormatPlugins {
         return when (numScrambles) {
-            1, 2 -> numScrambles.toString()
+            1, 2 -> FormatPlugins.WCA_FORMATS.getValue(numScrambles.toString())
             3 -> when (event) {
-                EventPlugins.THREE_FM, EventPlugins.THREE_BLD -> "m"
-                else -> "3"
+                EventPlugins.THREE_FM, EventPlugins.SIX, EventPlugins.SEVEN -> FormatPlugins.MEAN_OF_3
+                else -> FormatPlugins.BEST_OF_3
             }
-            else -> "a"
+            else -> FormatPlugins.AVERAGE_OF_5
         }
     }
 
