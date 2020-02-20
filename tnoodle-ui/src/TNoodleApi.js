@@ -30,7 +30,7 @@ tnoodle.Scrambler = function(baseUrl) {
     this.serverUrl = baseUrl;
 
     /**** Scramble server stuff ***/
-    this.puzzlesUrl = this.serverUrl + "/puzzles/.json";
+    this.puzzlesUrl = this.serverUrl + "/puzzles/json";
     this.scrambleUrl = this.serverUrl + "/scramble/";
     this.viewUrl = this.serverUrl + "/view/";
     this.importUrl = this.serverUrl + "/import/";
@@ -86,7 +86,7 @@ tnoodle.Scrambler = function(baseUrl) {
             body.password = password;
         }
         body.generationUrl = location.href;
-        let url = that.viewUrl + encodeURIComponent(title) + '.' + ext;
+        let url = that.viewUrl + encodeURIComponent(title) + '/' + ext;
 
         body.schedule = JSON.stringify(competitionJson.schedule);
 
@@ -150,7 +150,7 @@ tnoodle.Scrambler = function(baseUrl) {
                 var query = {};
                 if(seed) { query.seed = seed; }
 
-                query[''] = encodeURIComponent(puzzle) + "*" + toRequestCount;
+                query['standard-sheet'] = encodeURIComponent(puzzle) + "*" + toRequestCount;
                 // Freaking Chrome seems to cache scramble requests if they're close enough
                 // together, even if we POST. This forces it to not.
                 query['showIndices'] = (requestCount++);
@@ -166,7 +166,7 @@ tnoodle.Scrambler = function(baseUrl) {
                     } else {
                         resolve(scrambles);
                     }
-                }, this.scrambleUrl + ".json", query);
+                }, this.scrambleUrl + "json", query);
             }));
         }
 
