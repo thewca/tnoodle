@@ -36,6 +36,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             StaticContentHandler.install(this)
             wcifHandler.install(this)
             JobSchedulingHandler.install(this)
+            FrontendDataHandler.install(this)
         }
 
         baseServer.spinUp(app)
