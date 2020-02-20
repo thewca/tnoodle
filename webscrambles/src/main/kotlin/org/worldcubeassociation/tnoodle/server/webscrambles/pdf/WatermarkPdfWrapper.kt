@@ -2,14 +2,26 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
+import com.itextpdf.text.Font
 import com.itextpdf.text.Phrase
 import com.itextpdf.text.pdf.ColumnText
+import com.itextpdf.text.pdf.PdfGState
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfWriter
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
+import kotlin.math.PI
+import kotlin.math.atan
 
-class WatermarkPdfWrapper(val original: PdfContent, val creationTitle: String, val creationDate: LocalDate, val versionTag: String, val globalTitle: String?) : BasePdfSheet<PdfWriter>() {
+class WatermarkPdfWrapper(
+    val original: PdfContent,
+    val creationTitle: String,
+    val creationDate: LocalDate,
+    val versionTag: String,
+    val globalTitle: String?,
+    val staging: Boolean = false
+) : BasePdfSheet<PdfWriter>() {
     override fun openDocument() = Document(PAGE_SIZE, 0f, 0f, 75f, 75f)
 
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter = PdfWriter.getInstance(this, bytes)
@@ -51,6 +63,24 @@ class WatermarkPdfWrapper(val original: PdfContent, val creationTitle: String, v
             ColumnText.showTextAligned(cb,
                 Element.ALIGN_CENTER, Phrase(generatedBy),
                 (PAGE_SIZE.left + PAGE_SIZE.right) / 2, PAGE_SIZE.bottom + 40, 0f)
+
+            // Staging watermark
+            if (staging) {
+                val transparentState = PdfGState().apply {
+                    setFillOpacity(0.2f)
+                }
+
+                cb.saveState()
+                cb.setGState(transparentState)
+
+                val diagRotation = atan(PAGE_SIZE.height / PAGE_SIZE.width) * (180f / PI)
+
+                ColumnText.showTextAligned(cb,
+                    Element.ALIGN_CENTER, Phrase("STAGING", Font(FontUtil.NOTO_SANS_FONT, 100f, Font.BOLD)),
+                    (PAGE_SIZE.left + PAGE_SIZE.right) / 2, (PAGE_SIZE.top + PAGE_SIZE.bottom) / 2, diagRotation.toFloat())
+
+                cb.restoreState()
+            }
         }
     }
 }
