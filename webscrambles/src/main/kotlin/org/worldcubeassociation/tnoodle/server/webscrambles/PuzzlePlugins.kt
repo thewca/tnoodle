@@ -26,6 +26,7 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
     val key get() = registry.key
     val description get() = registry.description
     val scrambler get() = registry.also { warmUpCache() }.scrambler
+    val scramblerWithoutCache get() = registry.scrambler
 
     val cacheSize get() = SCRAMBLE_CACHERS[this.key]?.available
 

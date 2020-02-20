@@ -17,15 +17,19 @@ object RouteRedirectHandler : RouteHandler {
         // README shortcuts
 
         router.get("/about") {
-            call.respondRedirect("/readme/scrambles")
+            call.respondRedirect("/readme/scramble")
+        }
+
+        router.get("/about.md") {
+            call.respondRedirect("/about", true)
         }
 
         router.get("/readme") {
-            call.respondRedirect("/readme/tnoodle", true)
+            call.respondRedirect("/readme/tnoodle")
         }
 
         router.get("/readme.md") {
-            call.respondRedirect("/readme/tnoodle", true)
+            call.respondRedirect("/readme", true)
         }
     }
 }
