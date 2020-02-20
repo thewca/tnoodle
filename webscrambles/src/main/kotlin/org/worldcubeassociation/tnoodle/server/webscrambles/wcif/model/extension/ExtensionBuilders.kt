@@ -98,3 +98,15 @@ data class SheetCopyCountExtension(val numCopies: Int) : ExtensionBuilder() {
         const val SPEC_URL = "TODO"
     }
 }
+
+@Serializable
+@SerialName(StagingFlagExtension.ID)
+data class StagingFlagExtension(val isStaging: Boolean) : ExtensionBuilder() {
+    override val id get() = ID
+    override val specUrl get() = SPEC_URL
+
+    companion object {
+        const val ID = "org.worldcubeassociation.tnoodle.StagingFlag"
+        const val SPEC_URL = "TODO"
+    }
+}

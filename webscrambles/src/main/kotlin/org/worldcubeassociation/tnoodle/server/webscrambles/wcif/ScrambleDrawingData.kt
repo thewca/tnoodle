@@ -8,7 +8,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension
 // FIXME do we need some kind of "Scrambles for" prefix?
 data class CompetitionDrawingData(val competitionTitle: String, val scrambleSheets: List<ScrambleDrawingData>)
 
-data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode) {
+data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode, val isStaging: Boolean = false) {
     val isFmc: Boolean
         get() = scrambleSet.findExtension<FmcExtension>()
             ?.isFmc ?: (activityCode.eventId == "333fm")

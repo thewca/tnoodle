@@ -33,7 +33,7 @@ object WCIFDataBuilder {
                     val generalExtensions = specificExtensions + r.findExtension<SheetCopyCountExtension>()
                     val extendedScrSet = it.copy(extensions = it.withExtensions(generalExtensions))
 
-                    ScrambleDrawingData(extendedScrSet, copyCode)
+                    ScrambleDrawingData(extendedScrSet, copyCode, hasExtension<StagingFlagExtension>())
                 }
             }
         }
@@ -112,7 +112,7 @@ object WCIFDataBuilder {
         }
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking
-        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(), creationDate, versionTag, sheetTitle)
+        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(), creationDate, versionTag, sheetTitle, isStaging)
     }
 
     // register in cache to speed up overall generation process
