@@ -1,97 +1,62 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
-import io.ktor.http.ContentType
-import io.ktor.request.uri
-import io.ktor.response.header
 import io.ktor.response.respond
-import io.ktor.response.respondBytes
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
+import io.ktor.routing.route
+import io.ktor.util.toMap
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
-import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
-import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.InvalidScrambleRequestException
 import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
-import java.time.LocalDateTime
 
-class ScrambleHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
+object ScrambleHandler : RouteHandler {
+    private suspend fun ApplicationCall.withScrambleSheets(handle: suspend ApplicationCall.(List<ScrambleRequest>, Boolean) -> Unit) {
+        val query = request.queryParameters.toMap()
+            .mapValues { it.value.first() }
+            .toMutableMap()
+
+        // TODO - this means you can't have a round named "seed" or "showIndices"!
+        val seed = query.remove("seed")
+        val showIndicesTag = query.remove("showIndices") ?: "0"
+
+        if (query.isEmpty()) {
+            throw InvalidScrambleRequestException("Must specify at least one scramble request")
+        }
+
+        val scrambleRequests = query.map { (title, reqUrl) ->
+            ScrambleRequest.parseScrambleRequest(title, reqUrl, seed)
+        }
+
+        val showIndices = showIndicesTag == "1"
+        handle(scrambleRequests, showIndices)
+    }
+
     override fun install(router: Routing) {
-        router.get("/scramble/{filename}") {
-            val filename = call.parameters["filename"]!!
+        router.route("scramble") {
+            get("txt") {
+                call.withScrambleSheets { reqList, showIndices ->
+                    val scrambleLines = reqList.joinToString("\r\n") { req ->
+                        val copiedRequests = List(req.copies) { req.scrambles }
 
-            val generationDate = LocalDateTime.now()
+                        copiedRequests.withIndex().joinToString("\r\n") { (i, scr) ->
+                            val prefix = "${i + 1}. ".takeIf { showIndices }.orEmpty()
 
-            val queryStr = call.request.uri.substringAfter('?', "")
-            val query = parseQuery(queryStr).toMutableMap()
-
-            // TODO - this means you can't have a round named "seed" or "showIndices" or "callback" or "generationUrl"!
-            val seed = query.remove("seed")
-            val generationUrl = query.remove("generationUrl")
-            val showIndicesTag = query.remove("showIndices") ?: "0"
-
-            val showIndices = showIndicesTag == "1"
-
-            // FIXME why do we blindly remove this?
-            query.remove("callback")
-
-            val (title, extension) = splitNameAndExtension(filename)
-
-            if (extension.isEmpty()) {
-                throw InvalidScrambleRequestException("No extension specified")
-            }
-
-            if (query.isEmpty()) {
-                throw InvalidScrambleRequestException("Must specify at least one scramble request")
-            }
-
-            val scrambleRequests = query.map { (title, reqUrl) ->
-                ScrambleRequest.parseScrambleRequest(title, reqUrl, seed)
-            }
-
-            val wcif = WCIFScrambleMatcher.requestsToPseudoWCIF(scrambleRequests, title)
-
-            when (extension) {
-                "txt" -> {
-                    val sb = StringBuilder()
-                    for (scrambleRequest in scrambleRequests) {
-                        repeat(scrambleRequest.copies) {
-                            for ((i, scramble) in scrambleRequest.scrambles.withIndex()) {
-                                if (showIndices) {
-                                    sb.append(i + 1).append(". ")
-                                }
-
-                                // We replace newlines with spaces
-                                sb.append(scramble.replace("\n".toRegex(), " "))
-                                sb.append("\r\n")
+                            scr.joinToString("\r\n") {
+                                prefix + it.replace("\n", " ")
                             }
                         }
                     }
 
-                    call.respondText(sb.toString())
+                    respondText(scrambleLines)
                 }
-                "json" -> call.respond(scrambleRequests)
-                "pdf" -> {
-                    val totalPdfOutput = WCIFDataBuilder.wcifToCompletePdf(wcif, generationDate.toLocalDate(), environmentConfig.projectTitle)
-                    call.response.header("Content-Disposition", "inline")
-
-                    // Workaround for Chrome bug with saving PDFs:
-                    //  https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
-                    call.response.header("Cache-Control", "public")
-
-                    call.respondBytes(totalPdfOutput.render(), ContentType.Application.Pdf)
+            }
+            get("json") {
+                call.withScrambleSheets { reqList, _ ->
+                    respond(reqList)
                 }
-                "zip" -> {
-                    val modelZip = WCIFDataBuilder.wcifToZip(wcif, null, generationDate, environmentConfig.projectTitle, generationUrl.orEmpty())
-                    val baosZip = modelZip.compress()
-
-                    call.respondBytes(baosZip, ContentType.Application.Zip)
-                }
-                else -> throw InvalidScrambleRequestException("Invalid extension: $extension")
             }
         }
     }
