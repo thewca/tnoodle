@@ -3,7 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.produce
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
-import java.util.concurrent.Executors
+import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
 import kotlin.coroutines.CoroutineContext
 
 class CoroutineScrambleCacher(val puzzle: Puzzle, capacity: Int) : CoroutineScope {
@@ -11,13 +11,13 @@ class CoroutineScrambleCacher(val puzzle: Puzzle, capacity: Int) : CoroutineScop
         private set
 
     override val coroutineContext: CoroutineContext
-        get() = THREAD_POOL
+        get() = JobSchedulingHandler.JOB_CONTEXT
 
     @ExperimentalCoroutinesApi
     private val buffer = produce(capacity = capacity) {
         while (true) {
             send(puzzle.generateScramble())
-            synchronized(available) { available++ }
+                .also { synchronized(available) { available++ } }
         }
     }
 
@@ -25,8 +25,4 @@ class CoroutineScrambleCacher(val puzzle: Puzzle, capacity: Int) : CoroutineScop
         .also { synchronized(available) { available-- } }
 
     fun getScramble(): String = runBlocking { yieldScramble() }
-
-    companion object {
-        val THREAD_POOL = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
-    }
 }

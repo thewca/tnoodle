@@ -45,7 +45,7 @@ enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
         ?: this.scrambler.generateScramble()
 
     companion object {
-        const val CACHE_SIZE = 30
+        const val CACHE_SIZE = 14
 
         private val SCRAMBLE_CACHERS = mutableMapOf<String, CoroutineScrambleCacher>()
 
