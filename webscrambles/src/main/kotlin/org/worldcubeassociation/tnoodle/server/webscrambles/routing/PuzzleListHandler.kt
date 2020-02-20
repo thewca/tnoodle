@@ -1,12 +1,13 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
+import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.splitNameAndExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleInfoJsonData
 
@@ -25,27 +26,37 @@ object PuzzleListHandler : RouteHandler {
         return nameData
     }
 
+    private suspend fun ApplicationCall.respondPuzzles(format: String?, puzzleKeys: Set<String> = emptySet()) {
+        val includeStatus = "includeStatus" in request.queryParameters
+
+        if (format == "json") {
+            val puzzleInfos = puzzleKeys
+                .mapNotNull { getPuzzleInfo(it, includeStatus) }
+
+            val responseItem = puzzleInfos.singleOrNull()
+                ?: puzzleInfos
+
+            respond(responseItem)
+        } else {
+            respondText("Invalid extension: $format")
+        }
+    }
+
     override fun install(router: Routing) {
-        router.get("/puzzles/{filename}") {
-            val includeStatus = call.request.queryParameters["includeStatus"] != null
+        router.route("puzzles") {
+            // FIXME ktor apparently has a problem with {optional?} parameters in the middle of a route.
+            // therefore this code is currently effectively duplicated.
+            get("{puzzleKey}/{format}") {
+                val format = call.parameters["format"]
+                val puzzleKey = call.parameters["puzzleKey"].orEmpty()
 
-            val fileName = call.parameters["filename"]!!
-            val (puzzleName, fileExt) = splitNameAndExtension(fileName)
+                call.respondPuzzles(format, setOf(puzzleKey))
+            }
 
-            if (fileExt == "json") {
-                if (puzzleName.isBlank()) {
-                    val puzzleInfos = PuzzlePlugins.WCA_PUZZLES.keys
-                        .mapNotNull { getPuzzleInfo(it, includeStatus) }
+            get("{format}") {
+                val format = call.parameters["format"]
 
-                    call.respond(puzzleInfos)
-                } else {
-                    val puzzleInfo = getPuzzleInfo(puzzleName, includeStatus)
-                        ?: return@get call.respondText("Invalid scrambler: $puzzleName")
-
-                    call.respond(puzzleInfo)
-                }
-            } else {
-                call.respond("Invalid extension: $fileExt")
+                call.respondPuzzles(format, PuzzlePlugins.WCA_PUZZLES.keys)
             }
         }
     }
