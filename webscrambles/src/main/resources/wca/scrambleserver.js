@@ -23,7 +23,7 @@ tnoodle.Scrambler = function(baseUrl) {
     this.serverUrl = baseUrl;
 
     /**** Scramble server stuff ***/
-    this.puzzlesUrl = this.serverUrl + "/puzzles/.json";
+    this.puzzlesUrl = this.serverUrl + "/puzzles/json";
     this.scrambleUrl = this.serverUrl + "/scramble/";
     this.viewUrl = this.serverUrl + "/view/";
     this.importUrl = this.serverUrl + "/import/";
@@ -77,7 +77,7 @@ tnoodle.Scrambler = function(baseUrl) {
             params.password = password;
         }
         params.generationUrl = location.href;
-        tnoodle.postToUrl(that.viewUrl + encodeURIComponent(title) + '.' + ext, params, "POST", target);
+        tnoodle.postToUrl(that.viewUrl + encodeURIComponent(title) + '/' + ext, params, "POST", target);
     };
     this.showPdf = function(title, scrambleRequest, password, target) {
         that.showExt(title, scrambleRequest, password, 'pdf', target);
@@ -109,7 +109,7 @@ tnoodle.Scrambler = function(baseUrl) {
         // scrambles in a single request.
         assert(count <= 100);
 
-        query[''] = encodeURIComponent(puzzle) + "*" + count;
+        query['legacy-sheet'] = encodeURIComponent(puzzle) + "*" + count;
         // Freaking Chrome seems to cache scramble requests if they're close enough
         // together, even if we POST. This forces it to not.
         query['showIndices'] = (requestCount++);
@@ -125,7 +125,7 @@ tnoodle.Scrambler = function(baseUrl) {
             } else {
                 callback(scrambles);
             }
-        }, this.scrambleUrl + ".json", query);
+        }, this.scrambleUrl + "json", query);
         return pendingLoadScrambles;
     };
     this.getScrambleImage = function(puzzle, scramble, colorScheme, width, height) {
