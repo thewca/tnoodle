@@ -2,6 +2,7 @@
 export const MAX_WCA_ROUNDS = 4;
 
 export const MBLD_MIN = 2;
+export const MBLD_DEFAULT = 35;
 
 export const FORMATS = {
     "1": { name: "Best of 1", shortName: "Bo1" },

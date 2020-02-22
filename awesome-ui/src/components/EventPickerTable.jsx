@@ -6,7 +6,9 @@ import { fetchZip } from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
 
 const mapStateToProps = store => ({
-    wcif: store.wcif
+    wcif: store.wcif,
+    mbld: store.mbld,
+    password: store.password
 });
 
 const EventPickerTable = connect(mapStateToProps)(
@@ -50,7 +52,7 @@ const EventPickerTable = connect(mapStateToProps)(
 
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
-            fetchZip(this.props.wcif)
+            fetchZip(this.props.wcif, this.props.mbld, this.props.password)
                 .then(response => response.blob())
                 .then(blob => {
                     this.setGeneratingScrambles(false);

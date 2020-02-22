@@ -6,7 +6,7 @@ import { updateWcaEvent, updateMbld } from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
-    mbld: store.wcif.mbld
+    mbld: store.mbld
 });
 
 const mapDispatchToProps = {

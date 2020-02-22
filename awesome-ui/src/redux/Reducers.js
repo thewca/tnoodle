@@ -1,9 +1,8 @@
 import { ActionTypes } from "./Types";
 import { defaultWcif } from "../constants/default.wcif";
+import { MBLD_DEFAULT } from "../constants/wca.constants";
 
-// TODO find mbld expected name on the server side
-
-const defaultStore = { wcif: defaultWcif };
+const defaultStore = { wcif: defaultWcif, mbld: MBLD_DEFAULT, password: "" };
 
 export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_ME) {
@@ -23,7 +22,7 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_PASSWORD) {
         return {
             ...store,
-            wcif: { ...store.wcif, password: action.payload.password }
+            password: action.payload.password
         };
     }
 
@@ -59,10 +58,7 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_MBLD) {
         return {
             ...store,
-            wcif: {
-                ...store.wcif,
-                mbld: action.payload.mbld
-            }
+            mbld: action.payload.mbld
         };
     }
 
