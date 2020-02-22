@@ -57,11 +57,10 @@ const ManageCompetition = connect(
                 return (
                     <div>
                         <EntryInterface
-                            name={this.state.wcif.name}
+                            competitionName={this.state.wcif.name}
                             disabled={true}
                         />
                         <EventPickerTable
-                            events={this.state.wcif.events}
                             competitionId={this.state.competitionId}
                         />
                     </div>

@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
-import { updateWcif } from "../redux/ActionCreators";
+import { updateWcif, updateCompetitionName } from "../redux/ActionCreators";
 
 const mapDispatchToProps = {
-    updateWcif: updateWcif
+    updateWcif,
+    updateCompetitionName
 };
 
 const OfflineScrambler = connect(
@@ -16,10 +17,16 @@ const OfflineScrambler = connect(
         constructor(props) {
             super(props);
 
+            let competitionName = this.getDefaultCompetitionName();
+
             // In case the user is navigating around, information from an online competition might be cached.
-            // We clear it here just is case.
+            // We clear it here just is case. This resets WCIF to default values.
             props.updateWcif();
+            props.updateCompetitionName(competitionName);
+
+            this.state = { competitionName };
         }
+
         getDefaultCompetitionName = () => {
             let date = new Date();
             return "Scrambles for " + date.toISOString().split("T")[0];
@@ -29,11 +36,10 @@ const OfflineScrambler = connect(
             return (
                 <div>
                     <EntryInterface
-                        name={this.getDefaultCompetitionName()}
+                        competitionName={this.state.competitionName}
                         disabled={false}
                     />
-                    {/* empty events for cleaning when navigating aroud */}
-                    <EventPickerTable events={[]} />
+                    <EventPickerTable />
                 </div>
             );
         }

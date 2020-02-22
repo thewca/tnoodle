@@ -3,8 +3,8 @@ import { updatePassword, updateCompetitionName } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 
 const mapDispatchToProps = {
-    updatePassword: updatePassword,
-    updateCompetitionName: updateCompetitionName
+    updatePassword,
+    updateCompetitionName
 };
 
 const EntryInterface = connect(
@@ -16,7 +16,7 @@ const EntryInterface = connect(
             super(props);
 
             this.state = {
-                competitionName: props.name,
+                competitionName: props.competitionName,
                 disabled: props.disabled,
                 password: "",
                 showPassword: false

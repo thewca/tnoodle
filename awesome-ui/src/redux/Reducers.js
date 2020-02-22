@@ -1,17 +1,8 @@
 import { ActionTypes } from "./Types";
-import { MBLD_DEFAULT } from "../constants/wca.constants";
+import { defaultWcif } from "../constants/default.wcif";
 
-// TODO find out a better place for this and mbld expected name on the server side
+// TODO find mbld expected name on the server side
 
-const defaultWcif = {
-    formatVersion: "1.0",
-    name: "",
-    id: "",
-    events: [],
-    password: "",
-    mbld: MBLD_DEFAULT,
-    schedule: {}
-};
 const defaultStore = { wcif: defaultWcif };
 
 export const Reducer = (store, action) => {
@@ -44,6 +35,7 @@ export const Reducer = (store, action) => {
             wcif: {
                 ...store.wcif,
                 name: competitionName,
+                shortName: competitionName,
                 id: id
             }
         };
@@ -81,6 +73,9 @@ export const Reducer = (store, action) => {
         };
     }
 
+    /**
+     * Either sets or reset WCIF to default.
+     */
     if (action.type === ActionTypes.UPDATE_WCIF) {
         return {
             ...store,
