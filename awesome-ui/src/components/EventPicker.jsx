@@ -22,6 +22,8 @@ const EventPicker = connect(
         constructor(props) {
             super(props);
 
+            this.setBlobNull = props.setBlobNull;
+
             // State wcif like
             let wcifEvent = props.wcifEvent || { rounds: [] };
 
@@ -99,6 +101,7 @@ const EventPicker = connect(
 
         updateEvent = () => {
             this.props.updateWcaEvent(this.state);
+            this.setBlobNull();
         };
 
         handleMbldChange = mbld => {

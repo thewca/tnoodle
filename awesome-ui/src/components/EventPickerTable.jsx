@@ -46,7 +46,6 @@ const EventPickerTable = connect(mapStateToProps)(
                 fileZipBlob: null,
                 wcif: props.wcif
             };
-            console.log(this.state);
         }
 
         handleScrambleButton = () => {
@@ -152,6 +151,15 @@ const EventPickerTable = connect(mapStateToProps)(
             );
         };
 
+        /**
+         * When user change some event, we reset blob.
+         * If the user generate a scramble and then change some event,
+         * this allow generating other set of scrambles.
+         */
+        setBlobNull = () => {
+            this.setState({ ...this.state, fileZipBlob: null });
+        };
+
         render() {
             return (
                 <div className="container">
@@ -165,6 +173,7 @@ const EventPickerTable = connect(mapStateToProps)(
                                         item => item.id === event.id
                                     )}
                                     disabled={this.state.editingDisabled}
+                                    setBlobNull={this.setBlobNull}
                                 />
                             </div>
                         );
