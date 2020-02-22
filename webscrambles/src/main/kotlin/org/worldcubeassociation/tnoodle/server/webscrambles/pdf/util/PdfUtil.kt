@@ -142,7 +142,7 @@ object PdfUtil {
         // as argument instead of asking leadingMultiplier, but we are currently rendering
         // text in pdfcell, columntext and others
         // it'd be painful to render lines in a common object to ask leadingMultiplier
-        return binarySearch(1f, maxFontSize, FITTEXT_FONTSIZE_PRECISION) {
+        return binarySearchDec(1f, maxFontSize, FITTEXT_FONTSIZE_PRECISION) {
             // FIXME inplace modification is no good
             font.size = it
 
@@ -153,29 +153,44 @@ object PdfUtil {
             val heightPerLine = it * leadingMultiplier
             val totalHeight = lineChunks.size.toFloat() * heightPerLine
 
-            val shouldIncrease = totalHeight < rect.height
+            val shouldDecrease = totalHeight > rect.height
             // If newlines are NOT allowed, but we had to split the text into more than
             // one line, then our current guess is too large.
-            val mustNotIncrease = !newlinesAllowed && lineChunks.size > 1
+            val mustDecrease = !newlinesAllowed && lineChunks.size > 1
 
-            shouldIncrease && !mustNotIncrease
+            shouldDecrease || mustDecrease
         }
     }
 
-    tailrec fun binarySearch(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
-        val potentialFontSize = (min + max) / 2f
-
+    tailrec fun binarySearchInc(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
         if (max - min < precision) {
             // Ground recursion: We have converged arbitrarily close to some target value.
-            return potentialFontSize
+            return max
         }
 
+        val potentialFontSize = (min + max) / 2f
         val iterationShouldIncrease = shouldIncrease(potentialFontSize)
 
         return if (iterationShouldIncrease) {
-            binarySearch(potentialFontSize, max, precision, shouldIncrease)
+            binarySearchInc(potentialFontSize, max, precision, shouldIncrease)
         } else {
-            binarySearch(min, potentialFontSize, precision, shouldIncrease)
+            binarySearchInc(min, potentialFontSize, precision, shouldIncrease)
+        }
+    }
+
+    tailrec fun binarySearchDec(min: Float, max: Float, precision: Float, shouldDecrease: (Float) -> Boolean): Float {
+        if (max - min < precision) {
+            // Ground recursion: We have converged arbitrarily close to some target value.
+            return min
+        }
+
+        val potentialFontSize = (min + max) / 2f
+        val iterationShouldDecrease = shouldDecrease(potentialFontSize)
+
+        return if (iterationShouldDecrease) {
+            binarySearchDec(min, potentialFontSize, precision, shouldDecrease)
+        } else {
+            binarySearchDec(potentialFontSize, max, precision, shouldDecrease)
         }
     }
 }
