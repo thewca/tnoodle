@@ -57,7 +57,7 @@ tasks.create<Zip>("packageReactFrontend") {
         include("*.png")
         include("robots.txt")
 
-        into("wca/awesome-ui")
+        into("wca/tnoodle-ui")
     }
 
     artifacts.add("reactFrontendBundle", this)

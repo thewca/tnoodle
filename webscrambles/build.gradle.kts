@@ -55,7 +55,7 @@ dependencies {
     implementation(KOTLIN_SERIALIZATION_JVM)
     implementation(APACHE_COMMONS_LANG3)
 
-    runtimeOnly(project(":awesome-ui"))
+    runtimeOnly(project(":tnoodle-ui"))
 }
 
 configureJUnit5()

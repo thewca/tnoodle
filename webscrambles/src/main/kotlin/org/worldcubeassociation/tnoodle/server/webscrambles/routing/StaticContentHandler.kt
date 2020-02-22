@@ -14,14 +14,14 @@ object StaticContentHandler : RouteHandler {
         }
 
         router.static("/scramble") {
-            defaultResource("wca/awesome-ui/index.html")
+            defaultResource("wca/tnoodle-ui/index.html")
 
             static("/static") {
-                resources("wca/awesome-ui/static")
+                resources("wca/tnoodle-ui/static")
             }
 
             static("oauth") {
-                resource("*", "wca/awesome-ui/index.html")
+                resource("*", "wca/tnoodle-ui/index.html")
             }
         }
 
