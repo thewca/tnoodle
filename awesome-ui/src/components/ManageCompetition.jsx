@@ -5,6 +5,7 @@ import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
 import { updateEvents } from "../redux/ActionCreators";
 import Loading from "./Loading";
+import Error from "./Error";
 
 const mapDispatchToProps = {
     updateEvents
@@ -40,7 +41,7 @@ const ManageCompetition = connect(
 
         render() {
             if (this.state.error) {
-                return <p>Error fetching information.</p>;
+                return <Error />;
             }
             if (this.state.loading) {
                 return <Loading />;
