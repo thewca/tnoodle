@@ -1,16 +1,8 @@
 import { ActionTypes } from "./Types";
+import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 
-// TODO find out a better place for this and mbld expected name on the server side
-
-const defaultWcif = {
-    formatVersion: "1.0",
-    name: "",
-    events: [],
-    password: "",
-    mbld: MBLD_DEFAULT
-};
-const defaultStore = { wcif: defaultWcif };
+const defaultStore = { wcif: defaultWcif, mbld: MBLD_DEFAULT, password: "" };
 
 export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_ME) {
@@ -23,23 +15,27 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_EVENTS) {
         return {
             ...store,
-            wcif: {...store.wcif, events: action.payload.events}
+            wcif: { ...store.wcif, events: action.payload.events }
         };
     }
 
     if (action.type === ActionTypes.UPDATE_PASSWORD) {
         return {
             ...store,
-            wcif: { ...store.wcif, password: action.payload.password }
+            password: action.payload.password
         };
     }
 
     if (action.type === ActionTypes.UPDATE_COMPETITION_NAME) {
+        let competitionName = action.payload.competitionName;
+        let id = competitionName.replace(/[\W]/gi, "");
         return {
             ...store,
             wcif: {
                 ...store.wcif,
-                name: action.payload.competitionName
+                name: competitionName,
+                shortName: competitionName,
+                id: id
             }
         };
     }
@@ -62,10 +58,7 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_MBLD) {
         return {
             ...store,
-            wcif: {
-                ...store.wcif,
-                mbld: action.payload.mbld
-            }
+            mbld: action.payload.mbld
         };
     }
 
@@ -73,6 +66,16 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             competitions: action.payload.competitions
+        };
+    }
+
+    /**
+     * Either sets or reset WCIF to default.
+     */
+    if (action.type === ActionTypes.UPDATE_WCIF) {
+        return {
+            ...store,
+            wcif: action.payload.wcif || defaultWcif
         };
     }
 

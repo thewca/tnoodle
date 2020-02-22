@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import "./Index.scss";
-
 import { Link } from "react-router-dom";
 
 import CubingIcon from "./CubingIcon";

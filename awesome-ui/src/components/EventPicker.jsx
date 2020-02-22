@@ -6,7 +6,7 @@ import { updateWcaEvent, updateMbld } from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
-    mbld: store.wcif.mbld
+    mbld: store.mbld
 });
 
 const mapDispatchToProps = {
@@ -21,6 +21,8 @@ const EventPicker = connect(
     class extends Component {
         constructor(props) {
             super(props);
+
+            this.setBlobNull = props.setBlobNull;
 
             // State wcif like
             let wcifEvent = props.wcifEvent || { rounds: [] };
@@ -99,6 +101,7 @@ const EventPicker = connect(
 
         updateEvent = () => {
             this.props.updateWcaEvent(this.state);
+            this.setBlobNull();
         };
 
         handleMbldChange = mbld => {

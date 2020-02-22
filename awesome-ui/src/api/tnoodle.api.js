@@ -1,18 +1,16 @@
-export const fetchZip = wcif => {
-  console.log(wcif);
+export const fetchZip = (wcif, mbld, password) => {
+    let payload = { wcif, multiCubes: { requestedScrambles: mbld } };
 
-  fetch("http://localhost:2014/wcif/zip", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        'wcif': wcif
-    })
-  })
-    .then(response => {
-      console.log(response);
-    })
-    .catch(e => console.log(e));
+    if (password != null && password.length > 0) {
+        payload.zipPassword = password;
+    }
+
+    return fetch("http://localhost:2014/wcif/zip", {
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
 };
