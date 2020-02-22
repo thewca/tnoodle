@@ -24,7 +24,6 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
     private val baseServer = TNoodleServer(environmentConfig)
 
     override fun spinUp(app: Application) {
-        val scrambleViewHandler = ScrambleViewHandler(environmentConfig)
         val wcifHandler = WcifHandler(environmentConfig)
 
         app.routing {
@@ -32,7 +31,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             RouteRedirectHandler.install(this)
             ScrambleHandler.install(this)
             ReadmeHandler.install(this)
-            scrambleViewHandler.install(this)
+            ScrambleViewHandler.install(this)
             StaticContentHandler.install(this)
             wcifHandler.install(this)
             JobSchedulingHandler.install(this)
