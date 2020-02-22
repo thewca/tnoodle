@@ -17,26 +17,28 @@ object PdfUtil {
     }
 
     fun String.splitLineToChunks(font: Font, availableTextWidth: Float): List<String> {
-        return splitLineToChunksRec(font, availableTextWidth, 0, listOf())
+        return splitLineToChunksRec(font, availableTextWidth, listOf())
     }
 
-    private tailrec fun String.splitLineToChunksRec(font: Font, availableTextWidth: Float, i: Int, acc: List<String>): List<String> {
-        if (i >= length) {
+    private tailrec fun String.splitLineToChunksRec(font: Font, availableTextWidth: Float, acc: List<String>): List<String> {
+        if (isEmpty()) {
             return acc
         }
 
         // Walk past all whitespace that comes immediately after
         // the last line wrap we just inserted.
-        if (this[i] == ' ') {
-            return splitLineToChunksRec(font, availableTextWidth, i + 1, acc)
+        if (first() == ' ') {
+            return substring(1)
+                .splitLineToChunksRec(font, availableTextWidth, acc)
         }
 
-        val optimalCutIndex = optimalCutIndex(i, font, availableTextWidth)
+        val optimalCutIndex = optimalCutIndex(0, font, availableTextWidth)
 
-        val substring = substring(i, optimalCutIndex).padNbsp()
+        val substring = substring(0, optimalCutIndex).padNbsp()
             .fillToWidthMax(NON_BREAKING_SPACE.toString(), font, availableTextWidth)
 
-        return splitLineToChunksRec(font, availableTextWidth, optimalCutIndex, acc + substring)
+        return substring(optimalCutIndex)
+            .splitLineToChunksRec(font, availableTextWidth, acc + substring)
     }
 
     private fun String.padNbsp() = NON_BREAKING_SPACE + this + NON_BREAKING_SPACE

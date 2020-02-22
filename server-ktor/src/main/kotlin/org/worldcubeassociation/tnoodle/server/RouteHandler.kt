@@ -2,10 +2,8 @@ package org.worldcubeassociation.tnoodle.server
 
 import io.ktor.routing.Routing
 import org.markdownj.MarkdownProcessor
-import java.util.*
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
-
 
 interface RouteHandler {
     fun install(router: Routing)
