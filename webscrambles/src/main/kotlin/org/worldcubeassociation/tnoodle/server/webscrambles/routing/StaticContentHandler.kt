@@ -14,24 +14,6 @@ object StaticContentHandler : RouteHandler {
         }
 
         router.static("/scramble") {
-            defaultResource("wca/new-ui/index.html")
-
-            static("/static") {
-                resources("wca/new-ui/static")
-            }
-
-            static("oauth") {
-                resource("*", "wca/new-ui/index.html")
-            }
-
-            static("competitions") {
-                resource("*", "wca/new-ui/index.html")
-
-                defaultResource("wca/new-ui/index.html")
-            }
-        }
-
-        router.static("/the-future") {
             defaultResource("wca/awesome-ui/index.html")
 
             static("/static") {
@@ -41,24 +23,6 @@ object StaticContentHandler : RouteHandler {
             static("oauth") {
                 resource("*", "wca/awesome-ui/index.html")
             }
-        }
-
-        router.static("/scramble-legacy") {
-            defaultResource("wca/scramblegen.html")
-        }
-
-        router.static("/scrambler-interface") {
-            static("/js") {
-                resources("static/js")
-            }
-
-            static("/css") {
-                resources("static/css")
-            }
-        }
-
-        router.static("/mootools") {
-            resources("static/mootools")
         }
 
         router.static("/wca") {
