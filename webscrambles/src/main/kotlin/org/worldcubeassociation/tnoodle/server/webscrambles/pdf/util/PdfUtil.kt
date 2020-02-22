@@ -95,23 +95,17 @@ object PdfUtil {
         return fallback
     }
 
-    fun String.fillToWidthMax(padding: String, font: Font, maxLength: Float): String {
-        val paddingList = mutableListOf<String>()
+    tailrec fun String.fillToWidthMax(padding: String, font: Font, maxLength: Float): String {
+        // Add $padding until the substring takes up as much space as is available on a line.
+        val paddedString = this + padding
+        val substringWidth = font.baseFont.getWidthPoint(paddedString, font.size)
 
-        // Add $padding until the substring takes up as much
-        // space as is available on a line.
-        do {
-            paddingList.add(padding)
+        if (substringWidth > maxLength) {
+            // substring is now too big for our line, so remove the last character.
+            return this
+        }
 
-            val currentPadding = paddingList.joinToString("")
-            val paddedString = this + currentPadding
-
-            val substringWidth = font.baseFont.getWidthPoint(paddedString, font.size)
-        } while (substringWidth <= maxLength)
-
-        // substring is now too big for our line, so remove the
-        // last character.
-        return this + paddingList.drop(1).joinToString("")
+        return paddedString.fillToWidthMax(padding, font, maxLength)
     }
 
     fun String.toLineWrapChunk(font: Font) = Chunk(this).apply {
