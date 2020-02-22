@@ -17,32 +17,26 @@ object PdfUtil {
     }
 
     fun String.splitLineToChunks(font: Font, availableTextWidth: Float): List<String> {
-        val lineChunks = mutableListOf<String>()
-        val cutIndices = mutableListOf<Int>()
+        return splitLineToChunksRec(font, availableTextWidth, 0, listOf())
+    }
 
-        for (i in indices) {
-            // Walk past all whitespace that comes immediately after
-            // the last line wrap we just inserted.
-            if (this[i] == ' ') {
-                continue
-            }
-
-            val cuttingProgress = cutIndices.max() ?: 0
-
-            if (i < cuttingProgress) {
-                continue
-            }
-
-            val optimalCutIndex = optimalCutIndex(i, font, availableTextWidth)
-            cutIndices.add(optimalCutIndex)
-
-            val substring = substring(i, optimalCutIndex).padNbsp()
-                .fillToWidthMax(NON_BREAKING_SPACE.toString(), font, availableTextWidth)
-
-            lineChunks.add(substring)
+    private tailrec fun String.splitLineToChunksRec(font: Font, availableTextWidth: Float, i: Int, acc: List<String>): List<String> {
+        if (i >= length) {
+            return acc
         }
 
-        return lineChunks
+        // Walk past all whitespace that comes immediately after
+        // the last line wrap we just inserted.
+        if (this[i] == ' ') {
+            return splitLineToChunksRec(font, availableTextWidth, i + 1, acc)
+        }
+
+        val optimalCutIndex = optimalCutIndex(i, font, availableTextWidth)
+
+        val substring = substring(i, optimalCutIndex).padNbsp()
+            .fillToWidthMax(NON_BREAKING_SPACE.toString(), font, availableTextWidth)
+
+        return splitLineToChunksRec(font, availableTextWidth, optimalCutIndex, acc + substring)
     }
 
     private fun String.padNbsp() = NON_BREAKING_SPACE + this + NON_BREAKING_SPACE
