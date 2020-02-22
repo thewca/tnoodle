@@ -62,14 +62,14 @@ object PdfDrawUtil {
     }
 
     fun PdfContentByte.fitAndShowText(text: String, rect: Rectangle, font: Font, align: Int = Element.ALIGN_LEFT, leadingMultiplier: Float = 1f): Int {
-        val approxFontSize = PdfUtil.binarySearch(1f, font.size, 1f) {
+        val approxFontSize = PdfUtil.binarySearchDec(1f, font.size, 1f) {
             val iterFont = Font(font.baseFont, it)
 
             // We create a temp pdf and check if the text fit in a rectangle there.
             val tempCb = PdfContentByte(pdfWriter)
             val status = tempCb.showTextStatus(text, rect, iterFont, align, leadingMultiplier)
 
-            ColumnText.hasMoreText(status).not()
+            ColumnText.hasMoreText(status)
         }
 
         val approxFont = Font(font.baseFont, approxFontSize)
