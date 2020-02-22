@@ -34,3 +34,8 @@ export const updateCompetitions = competitions => ({
     type: ActionTypes.UPDATE_COMPETITIONS,
     payload: { competitions }
 });
+
+export const updateWcif = wcif => ({
+    type: ActionTypes.UPDATE_WCIF,
+    payload: { wcif }
+});

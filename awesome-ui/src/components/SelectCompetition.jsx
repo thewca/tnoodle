@@ -31,11 +31,12 @@ const SelectCompetition = connect(
         // This is pretty much for caching competitions
         componentDidMount() {
             if (this.state.competitions == null) {
-                this.setState({ ...this.state, loading: true });
+                this.setLoading(true);
                 getUpcomingManageableCompetitions()
-                    .then(competitions =>
-                        this.handleUpdateCompetitions(competitions)
-                    )
+                    .then(competitions => {
+                        this.handleUpdateCompetitions(competitions);
+                        this.setLoading(false);
+                    })
                     .catch(e => {
                         this.setState({
                             ...this.state,
@@ -44,6 +45,8 @@ const SelectCompetition = connect(
                     });
             }
         }
+
+        setLoading = flag => this.setState({ ...this.state, loading: flag });
 
         handleUpdateCompetitions = competitions => {
             this.setState({ ...this.state, competitions: competitions });

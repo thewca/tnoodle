@@ -3,12 +3,12 @@ import { connect } from "react-redux";
 import { getCompetitionJson } from "../api/wca.api";
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
-import { updateEvents } from "../redux/ActionCreators";
+import { updateWcif } from "../redux/ActionCreators";
 import Loading from "./Loading";
 import Error from "./Error";
 
 const mapDispatchToProps = {
-    updateEvents
+    updateWcif
 };
 
 const ManageCompetition = connect(
@@ -19,25 +19,32 @@ const ManageCompetition = connect(
         constructor(props) {
             super(props);
             this.state = {
-                loading: true,
+                loading: false,
                 error: false,
-                competitionId: props.competitionId
+                competitionId: props.competitionId,
+                wcif: null
             };
         }
 
         componentDidMount() {
+            this.setLoading(true);
             // Fetch competition json
             getCompetitionJson(this.state.competitionId)
                 .then(wcif => {
                     this.setState({
                         ...this.state,
-                        loading: false,
                         wcif: wcif
                     });
-                    this.props.updateEvents(wcif.events);
+                    this.props.updateWcif(wcif);
+                    this.setLoading(false);
                 })
-                .catch(e => this.setState({ ...this.state, error: true }));
+                .catch(e => {
+                    console.log(e);
+                    this.setState({ ...this.state, error: true });
+                });
         }
+
+        setLoading = flag => this.setState({ ...this.state, loading: flag });
 
         render() {
             if (this.state.error) {
@@ -46,18 +53,21 @@ const ManageCompetition = connect(
             if (this.state.loading) {
                 return <Loading />;
             }
-            return (
-                <div>
-                    <EntryInterface
-                        name={this.state.wcif.name}
-                        disabled={true}
-                    />
-                    <EventPickerTable
-                        events={this.state.wcif.events}
-                        competitionId={this.state.competitionId}
-                    />
-                </div>
-            );
+            if (this.state.wcif != null) {
+                return (
+                    <div>
+                        <EntryInterface
+                            name={this.state.wcif.name}
+                            disabled={true}
+                        />
+                        <EventPickerTable
+                            events={this.state.wcif.events}
+                            competitionId={this.state.competitionId}
+                        />
+                    </div>
+                );
+            }
+            return <p>Nothong to show.</p>;
         }
     }
 );

@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
-import { updateEvents } from "../redux/ActionCreators";
+import { updateWcif } from "../redux/ActionCreators";
 
 const mapDispatchToProps = {
-    updateEvents: updateEvents
+    updateWcif: updateWcif
 };
 
 const OfflineScrambler = connect(
@@ -16,9 +16,9 @@ const OfflineScrambler = connect(
         constructor(props) {
             super(props);
 
-            // In case the user is navigating around, events from an online competition might be cached.
+            // In case the user is navigating around, information from an online competition might be cached.
             // We clear it here just is case.
-            props.updateEvents([]);
+            props.updateWcif();
         }
         getDefaultCompetitionName = () => {
             let date = new Date();

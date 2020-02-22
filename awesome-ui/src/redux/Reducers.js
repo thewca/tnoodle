@@ -6,9 +6,11 @@ import { MBLD_DEFAULT } from "../constants/wca.constants";
 const defaultWcif = {
     formatVersion: "1.0",
     name: "",
+    id: "",
     events: [],
     password: "",
-    mbld: MBLD_DEFAULT
+    mbld: MBLD_DEFAULT,
+    schedule: {}
 };
 const defaultStore = { wcif: defaultWcif };
 
@@ -23,7 +25,7 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_EVENTS) {
         return {
             ...store,
-            wcif: {...store.wcif, events: action.payload.events}
+            wcif: { ...store.wcif, events: action.payload.events }
         };
     }
 
@@ -35,11 +37,14 @@ export const Reducer = (store, action) => {
     }
 
     if (action.type === ActionTypes.UPDATE_COMPETITION_NAME) {
+        let competitionName = action.payload.competitionName;
+        let id = competitionName.replace(/[\W]/gi, "");
         return {
             ...store,
             wcif: {
                 ...store.wcif,
-                name: action.payload.competitionName
+                name: competitionName,
+                id: id
             }
         };
     }
@@ -73,6 +78,13 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             competitions: action.payload.competitions
+        };
+    }
+
+    if (action.type === ActionTypes.UPDATE_WCIF) {
+        return {
+            ...store,
+            wcif: action.payload.wcif || defaultWcif
         };
     }
 
