@@ -6,44 +6,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
-import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.FormatPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
 
 object WCIFScrambleMatcher {
-    const val PSEUDO_ID = "%%pseudoGen"
     const val ID_PENDING = 0 // FIXME should this be -1?
-
-    fun requestsToPseudoWCIF(requests: List<ScrambleRequest>, name: String): Competition {
-        val rounds = requests.groupBy { it.event to it.round }
-            .map { (k, it) ->
-                val roundId = "${k.first}-r${k.second}"
-
-                val avgScrambleSetSize = it.map { scr -> scr.scrambles.size }.average().toInt()
-
-                val eventPlugin = EventPlugins.WCA_EVENTS[k.first]
-                val format = guessRoundFormat(avgScrambleSetSize, eventPlugin)
-
-                val scrambleSets = it.map { scr ->
-                    ScrambleSet(
-                        ID_PENDING, // dummy ID -- indexed separately down below
-                        scr.scrambles.map(::Scramble),
-                        scr.extraScrambles.map(::Scramble),
-                        listOf(FmcExtension(scr.fmc).build()) // FIXME avoid "build()" once KotlinX serializer has been fixed (#448)
-                    )
-                }
-
-                Round(roundId, format.key, it.size, scrambleSets)
-            }
-
-        val events = rounds.groupBy { it.idCode.eventId }
-            .map { Event(it.key, it.value) }
-
-        val indexEvents = reindexScrambleSets(events)
-
-        return Competition("1.0", PSEUDO_ID, name, name, indexEvents, Schedule.EMPTY)
-    }
 
     suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
         val scrambledEvents = wcif.events.map { e ->
@@ -167,17 +134,6 @@ object WCIFScrambleMatcher {
         return when (event) {
             EventPlugins.THREE_MULTI_BLD, EventPlugins.THREE_FM -> 0
             else -> 2
-        }
-    }
-
-    private fun guessRoundFormat(numScrambles: Int, event: EventPlugins?): FormatPlugins {
-        return when (numScrambles) {
-            1, 2 -> FormatPlugins.WCA_FORMATS.getValue(numScrambles.toString())
-            3 -> when (event) {
-                EventPlugins.THREE_FM, EventPlugins.SIX, EventPlugins.SEVEN -> FormatPlugins.MEAN_OF_3
-                else -> FormatPlugins.BEST_OF_3
-            }
-            else -> FormatPlugins.AVERAGE_OF_5
         }
     }
 

@@ -3,18 +3,14 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
-import io.ktor.request.receiveText
-import io.ktor.response.header
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
-import io.ktor.routing.post
 import io.ktor.routing.route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.list
 import org.apache.batik.anim.dom.SVGDOMImplementation
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
@@ -23,26 +19,15 @@ import org.apache.batik.transcoder.image.ImageTranscoder
 import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.parseQuery
-import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
-import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
-import org.worldcubeassociation.tnoodle.server.webscrambles.ScrambleRequest
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.DimensionJsonData
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleImageJsonData
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.svglite.Svg
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.imageio.ImageIO
 
-class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
+object ScrambleViewHandler : RouteHandler {
     // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
     internal class BufferedImageTranscoder : ImageTranscoder() {
         var bufferedImage: BufferedImage? = null
@@ -71,22 +56,6 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
         val svg = scrambler.drawScramble(scramble, colorScheme)
 
         handle(scrambler, svg)
-    }
-
-    private suspend fun ApplicationCall.withSheetsWCIF(handle: suspend ApplicationCall.(Competition, Map<String, String>) -> Unit) {
-        val name = parameters["competitionName"]
-            ?: return respondText("Please specify a competition title")
-
-        val body = receiveText()
-        val query = parseQuery(body)
-
-        val reqRaw = query["sheets"]
-            ?: return respondText("Please add at least one scramble sheet to this request!")
-
-        val scrambleRequests = JsonConfig.SERIALIZER.parse(ScrambleRequest.serializer().list, reqRaw)
-        val wcif = WCIFScrambleMatcher.requestsToPseudoWCIF(scrambleRequests, name)
-
-        handle(wcif, query)
     }
 
     override fun install(router: Routing) {
@@ -138,46 +107,6 @@ class ScrambleViewHandler(val environmentConfig: ServerEnvironmentConfig) : Rout
                         val jsonData = PuzzleImageJsonData(dim, puzzle.defaultColorScheme)
 
                         respond(jsonData)
-                    }
-                }
-            }
-            route("{competitionName}") {
-                post("pdf") {
-                    call.withSheetsWCIF { wcif, _ ->
-                        val generationDate = LocalDate.now()
-
-                        val totalPdfOutput = WCIFDataBuilder.wcifToCompletePdf(wcif, generationDate, environmentConfig.projectTitle)
-
-                        response.header("Content-Disposition", "inline")
-
-                        // Workaround for Chrome bug with saving PDFs:
-                        // https://bugs.chromium.org/p/chromium/issues/detail?id=69677#c35
-                        response.header("Cache-Control", "public")
-
-                        respondBytes(totalPdfOutput.render(), ContentType.Application.Pdf)
-                    }
-                }
-                post("zip") {
-                    call.withSheetsWCIF { wcif, query ->
-                        val generationUrl = query["generationUrl"].orEmpty()
-                        val schedule = query["schedule"]
-                        val password = query["password"]
-
-                        val generationDate = LocalDateTime.now()
-
-                        val parsedSchedule = schedule?.let { WCIFParser.parsePartial(it) }?.schedule ?: Schedule.EMPTY
-                        val orderedWcif = wcif.copy(schedule = parsedSchedule)
-
-                        val matchedWcif = WCIFScrambleMatcher.matchActivities(orderedWcif)
-
-                        //val zipFile = WCIFBuilder.wcifToZip(name, generationDate, environmentConfig.projectTitle, scrambleRequests, password, generationUrl, wcif)
-                        val zipFile = WCIFDataBuilder.wcifToZip(matchedWcif, password, generationDate, environmentConfig.projectTitle, generationUrl)
-                        val zipOutput = zipFile.compress(password)
-
-                        val safeTitle = matchedWcif.shortName.replace("\"".toRegex(), "'")
-
-                        response.header("Content-Disposition", "attachment; filename=\"$safeTitle.zip\"")
-                        respondBytes(zipOutput, ContentType.Application.Zip)
                     }
                 }
             }
