@@ -23,21 +23,11 @@ const EventPickerTable = connect(mapStateToProps)(
             // Prevent offline from remembering online order
             let wcaEvents = [...WCA_EVENTS];
 
-            // At start, this will sort the filled events first for visual. Helpful for fetching info.
+            // This filters events to show only those in the competition.
             if (editingDisabled) {
-                wcaEvents.forEach(wcaEvent => {
-                    let isEmpty = !events.find(item => item.id === wcaEvent.id);
-                    wcaEvent.isEmpty = isEmpty;
-                });
-                wcaEvents.sort((a, b) => {
-                    if (a.isEmpty === b.isEmpty) {
-                        return 1;
-                    }
-                    if (b.isEmpty) {
-                        return -1;
-                    }
-                    return 1;
-                });
+                wcaEvents = wcaEvents.filter(wcaEvent =>
+                    events.find(item => item.id === wcaEvent.id)
+                );
             }
 
             this.state = {
