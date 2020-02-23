@@ -28,11 +28,11 @@ object PdfUtil {
         // Walk past all whitespace that comes immediately after
         // the last line wrap we just inserted.
         if (first() == ' ') {
-            return substring(1)
+            return drop(1)
                 .splitLineToChunksRec(font, availableTextWidth, acc)
         }
 
-        val optimalCutIndex = optimalCutIndex(0, font, availableTextWidth)
+        val optimalCutIndex = optimalCutIndex(font, availableTextWidth)
 
         val substring = substring(0, optimalCutIndex).padNbsp()
             .fillToWidthMax(NON_BREAKING_SPACE.toString(), font, availableTextWidth)
@@ -43,23 +43,23 @@ object PdfUtil {
 
     private fun String.padNbsp() = NON_BREAKING_SPACE + this + NON_BREAKING_SPACE
 
-    fun String.optimalCutIndex(startIndex: Int, font: Font, availableTextWidth: Float): Int {
-        val endIndex = longestFittingSubstringIndex(font, availableTextWidth, startIndex)
+    fun String.optimalCutIndex(font: Font, availableTextWidth: Float): Int {
+        val endIndex = longestFittingSubstringIndex(font, availableTextWidth, 0)
 
         // If we're not at the end of the text, make sure we're not cutting
         // a word (or turn) in half by walking backwards until we're right before a turn.
         if (endIndex < length) {
-            return tryBackwardsWordEndIndex(startIndex, endIndex)
+            return tryBackwardsWordEndIndex(endIndex)
         }
 
         return endIndex
     }
 
-    fun String.longestFittingSubstringIndex(font: Font, maxWidth: Float, startIndex: Int = 0, fallback: Int = startIndex): Int {
-        val searchRange = startIndex..length
+    fun String.longestFittingSubstringIndex(font: Font, maxWidth: Float, fallback: Int): Int {
+        val searchRange = 0..length
 
         val endpoint = searchRange.findLast {
-            val substring = substring(startIndex, it).padNbsp()
+            val substring = substring(0, it).padNbsp()
             val substringWidth = font.baseFont.getWidthPoint(substring, font.size)
 
             substringWidth <= maxWidth
@@ -68,8 +68,8 @@ object PdfUtil {
         return endpoint ?: fallback
     }
 
-    fun String.tryBackwardsWordEndIndex(frontStopIndex: Int = 0, endIndex: Int = lastIndex, fallback: Int = endIndex): Int {
-        for (perfectFitIndex in endIndex downTo frontStopIndex) {
+    fun String.tryBackwardsWordEndIndex(endIndex: Int = lastIndex, fallback: Int = endIndex): Int {
+        for (perfectFitIndex in endIndex downTo 0) {
             // Another dirty hack for sq1: turns only line up
             // nicely if every line starts with a (x,y). We ensure this
             // by forcing every line to end with a /.
