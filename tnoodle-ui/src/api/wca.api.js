@@ -75,6 +75,10 @@ export function fetchMe() {
         .then(json => json.me);
 }
 
+export function fetchVersionInfo() {
+    return wcaApiFetch("/scramble-program").then(response => response.json());
+}
+
 export function getCompetitionJson(competitionId) {
     // TODO graphql here
     return wcaApiFetch(`/competitions/${competitionId}/wcif`).then(response =>

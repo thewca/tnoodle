@@ -3,7 +3,7 @@ import { HashRouter, Switch, Route } from "react-router-dom";
 import Index from "./components/Index";
 import OfflineScrambler from "./components/OfflineScrambler";
 import OnlineScrambler from "./components/OnlineScrambler";
-import TnoodleNavbar from "./components/Navbar";
+import TnoodleNavbar from "./components/TnoodleNavbar";
 import ManageCompetition from "./components/ManageCompetition";
 
 import "bootstrap/dist/css/bootstrap.css";
