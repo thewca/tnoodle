@@ -58,8 +58,6 @@ const EventPickerTable = connect(mapStateToProps)(
         downloadZip = () => {
             // TODO add [Unofficial] before the zip name if staging or !official tnoodle version
 
-            console.log(this.state);
-
             let fileName = this.state.wcif.name + ".zip";
 
             const link = document.createElement("a");
