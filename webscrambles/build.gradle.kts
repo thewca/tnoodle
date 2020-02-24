@@ -48,13 +48,13 @@ dependencies {
     implementation(ITEXTPDF)
     implementation(BATIK_TRANSCODER)
     implementation(SNAKEYAML)
-    implementation(BOUNCYCASTLE)
     implementation(KOTLIN_ARGPARSER)
     implementation(SYSTEM_TRAY)
     implementation(TNOODLE_SCRAMBLES)
     implementation(KOTLIN_SERIALIZATION_JVM)
     implementation(APACHE_COMMONS_LANG3)
 
+    runtimeOnly(BOUNCYCASTLE)
     runtimeOnly(project(":tnoodle-ui"))
 }
 

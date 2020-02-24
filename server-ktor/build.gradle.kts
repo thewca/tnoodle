@@ -1,6 +1,7 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
+import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.KTOR_SERIALIZATION
 import dependencies.Libraries.KTOR_SERVER_NETTY
 import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
@@ -26,6 +27,7 @@ dependencies {
     implementation(KTOR_SERVER_HOST_COMMON)
     implementation(KTOR_SERVER_SERVLET)
 
+    implementation(BOUNCYCASTLE)
     implementation(MARKDOWNJ_CORE)
 
     runtimeOnly(LOGBACK_CLASSIC)
