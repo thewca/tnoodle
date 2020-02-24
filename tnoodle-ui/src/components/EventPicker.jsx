@@ -150,14 +150,14 @@ const EventPicker = connect(
 
         maybeShowTableTitles = () => {
             if (this.state.rounds.length === 0) {
-                return;
+                return null;
             }
             return (
                 <tr className="thead-light">
-                    <th>#</th>
-                    <th>Format</th>
-                    <th>Scramble Sets</th>
-                    <th>Copies</th>
+                    <th scope="col">#</th>
+                    <th scope="col">Format</th>
+                    <th scope="col">Scramble Sets</th>
+                    <th scope="col">Copies</th>
                 </tr>
             );
         };
@@ -173,7 +173,9 @@ const EventPicker = connect(
                         (_, i) => {
                             return (
                                 <tr key={i} className="form-group">
-                                    <td className="align-middle">{i + 1}</td>
+                                    <th scope="row" className="align-middle">
+                                        {i + 1}
+                                    </th>
                                     <td className="align-middle">
                                         <select
                                             onChange={evt =>
@@ -265,61 +267,50 @@ const EventPicker = connect(
             let styleLastTwoColumns = { width: "40%" };
 
             return (
-                <div
-                    className={
-                        "container border rounded m-3 shadow " +
-                        (this.state.rounds.length === 0 ? "bg-secondary" : "")
-                    }
-                >
-                    <table className="table">
-                        <thead>
-                            <tr
-                                className={
-                                    this.state.rounds.length === 0
-                                        ? "text-white"
-                                        : ""
-                                }
-                            >
-                                <th style={styleFirstTwoColumns}></th>
-                                <th style={styleFirstTwoColumns}>
-                                    <CubingIcon event={event.id} />
-                                </th>
-                                <th style={styleLastTwoColumns}>
-                                    <h5 className="font-weight-bold">
-                                        {event.name}
-                                    </h5>
-                                </th>
-                                <th style={styleLastTwoColumns}>
-                                    <select
-                                        onChange={
-                                            this.handleNumberOfRoundsChange
-                                        }
-                                        id={event.id}
-                                        defaultValue={this.state.rounds.length}
-                                        disabled={
-                                            this.state.disabled
-                                                ? "disabled"
-                                                : ""
-                                        }
-                                    >
-                                        {options.map(op => (
-                                            <option
-                                                value={op.value}
-                                                disabled={op.disabled}
-                                                key={op.text}
-                                            >
-                                                {op.text}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </th>
-                            </tr>
-                            {this.maybeShowTableTitles()}
-                        </thead>
-                        {this.maybeShowTableBody(event)}
-                        {this.maybeShowMbld()}
-                    </table>
-                </div>
+                <table className="table table-sm rounded m-0 shadow">
+                    <thead>
+                        <tr
+                            className={
+                                this.state.rounds.length === 0
+                                    ? "bg-secondary text-white"
+                                    : "thead-light"
+                            }
+                        >
+                            <th style={styleFirstTwoColumns} scope="col"></th>
+                            <th style={styleFirstTwoColumns} scope="col">
+                                <CubingIcon event={event.id} />
+                            </th>
+                            <th style={styleLastTwoColumns} scope="col">
+                                <h5 className="font-weight-bold">
+                                    {event.name}
+                                </h5>
+                            </th>
+                            <th style={styleLastTwoColumns} scope="col">
+                                <select
+                                    onChange={this.handleNumberOfRoundsChange}
+                                    id={event.id}
+                                    defaultValue={this.state.rounds.length}
+                                    disabled={
+                                        this.state.disabled ? "disabled" : ""
+                                    }
+                                >
+                                    {options.map(op => (
+                                        <option
+                                            value={op.value}
+                                            disabled={op.disabled}
+                                            key={op.text}
+                                        >
+                                            {op.text}
+                                        </option>
+                                    ))}
+                                </select>
+                            </th>
+                        </tr>
+                        {this.maybeShowTableTitles()}
+                    </thead>
+                    {this.maybeShowTableBody(event)}
+                    {this.maybeShowMbld()}
+                </table>
             );
         }
     }
