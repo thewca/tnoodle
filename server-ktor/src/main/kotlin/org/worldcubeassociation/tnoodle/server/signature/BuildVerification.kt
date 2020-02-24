@@ -4,6 +4,7 @@ import org.bouncycastle.util.io.pem.PemReader
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.Signature
+import java.security.SignatureException
 import java.security.spec.X509EncodedKeySpec
 
 object BuildVerification {
@@ -32,9 +33,13 @@ object BuildVerification {
 
         val preparedCheck = signatureProvider.apply { update(fileBytes) }
 
-        val signatureBytes = this::class.java.getResourceAsStream("/$resourcePath.sign")?.readAllBytes()
+        val signatureBytes = this::class.java.getResourceAsStream("$resourcePath.sign")?.readAllBytes()
             ?: return false
 
-        return preparedCheck.verify(signatureBytes)
+        return try {
+            preparedCheck.verify(signatureBytes)
+        } catch (e: SignatureException) {
+            false
+        }
     }
 }
