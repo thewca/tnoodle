@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { logIn, logOut, fetchMe, isLogged } from "../api/wca.api";
 import { updateMe } from "../redux/ActionCreators";
 import { Nav, Navbar } from "react-bootstrap";
+import VersionInfo from "./VersionInfo";
 
 const mapStateToProps = store => ({
     me: store.me
@@ -25,6 +26,7 @@ const TnoodleNavbar = connect(
                 homeLink: props.homeLink,
                 offlineScramblerLink: props.offlineScramblerLink,
                 onlineScramblerLink: props.onlineScramblerLink,
+
                 isLogged: isLogged()
             };
         }
@@ -47,7 +49,7 @@ const TnoodleNavbar = connect(
 
         render() {
             return (
-                <div className="container-fluid bg-dark pb-2">
+                <div className="container-fluid bg-dark sticky-top">
                     <div className="row">
                         <div className="col-6">
                             <div className="container">
@@ -118,6 +120,7 @@ const TnoodleNavbar = connect(
                             </Navbar>
                         </div>
                     </div>
+                    <VersionInfo />
                 </div>
             );
         }

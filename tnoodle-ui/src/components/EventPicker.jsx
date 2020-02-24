@@ -123,12 +123,14 @@ const EventPicker = connect(
                 return (
                     <tfoot>
                         <tr>
-                            <th colSpan={3} className="align-middle">
-                                Number of scrambles
+                            <th colSpan={3}>
+                                <p className="text-right">
+                                    Select the number of scrambles
+                                </p>
                             </th>
                             <td>
                                 <input
-                                    className="form-control bg-info"
+                                    className="form-control bg-dark text-white"
                                     type="number"
                                     value={this.state.mbld}
                                     onChange={evt =>

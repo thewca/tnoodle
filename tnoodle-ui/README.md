@@ -1,68 +1,31 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# TNoodle Web UI
 
-## Available Scripts
+A web ui for TNoodle that uses modern technology. It allows manual selection or interaction with the WCA website api to minimize repeated data entry.
 
-In the project directory, you can run:
+This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
-### `yarn start`
+-   `yarn install` - Install dependencies.
+-   `yarn start` - Starts a server accessible at http://localhost:3001.
+-   `yarn build` - Compiles to `build/` directory.
+-   `yarn test` - Run tests.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Connecting to staging WCA server
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Set the `staging` url parameter. For example, try going to http://localhost:3001?staging=true
 
-### `yarn test`
+## Connecting to a development WCA server
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Create an OAuth application at http://localhost:3000/oauth/applications/new.
 
-### `yarn build`
+-   Name: TNoodle
+-   Redirect URI: urn:ietf:wg:oauth:2.0:oob
+    http://localhost:2014/scramble/oauth/wca
+    http://localhost:3001/scramble/oauth/wca
+-   Scopes: public manage_competitions
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Then, run `yarn start` with the `REACT_APP_WCA_ORIGIN` and `REACT_APP_TNOODLE_APP_ID` variables set.
+For example:
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+```
+REACT_APP_WCA_ORIGIN=http://localhost:3000 REACT_APP_TNOODLE_APP_ID=tnoodle-development-uid yarn start
+```
