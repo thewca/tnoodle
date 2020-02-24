@@ -56,6 +56,7 @@ tasks.create<Zip>("packageReactFrontend") {
         include("*.html")
         include("*.png")
         include("robots.txt")
+        include("manifest.json")
 
         into("wca/tnoodle-ui")
     }

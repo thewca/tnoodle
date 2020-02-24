@@ -9,14 +9,16 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object StaticContentHandler : RouteHandler {
     override fun install(router: Routing) {
-        router.static("/") {
+        router.static {
             resource("favicon.ico", "wca/favicon.ico")
+            resource("robots.txt", "wca/tnoodle-ui/robots.txt")
         }
 
-        router.static("/scramble") {
+        router.static("scramble") {
+            resources("wca/tnoodle-ui")
             defaultResource("wca/tnoodle-ui/index.html")
 
-            static("/static") {
+            static("static") {
                 resources("wca/tnoodle-ui/static")
             }
 
@@ -25,7 +27,7 @@ object StaticContentHandler : RouteHandler {
             }
         }
 
-        router.static("/wca") {
+        router.static("wca") {
             resources("wca")
         }
     }
