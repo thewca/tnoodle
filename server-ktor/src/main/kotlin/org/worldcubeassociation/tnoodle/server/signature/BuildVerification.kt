@@ -25,14 +25,14 @@ object BuildVerification {
     }
 
     fun loadPublicKey(keyBytes: ByteArray): PublicKey {
-        val spec = X509EncodedKeySpec(keyBytes, ENCRYPTION_ALGORITHM)
+        val spec = X509EncodedKeySpec(keyBytes)
         return keyFactory.generatePublic(spec)
     }
 
     fun checkBuildSignature(resourcePath: String): Boolean {
         val publicKey = PUBLIC_KEY_BYTES?.let(this::loadPublicKey) ?: return false
 
-        val fileBytes = this::class.java.getResourceAsStream(resourcePath)?.readAllBytes()
+        val fileBytes = this::class.java.getResourceAsStream(resourcePath)?.readBytes()
             ?: return false
 
         val preparedCheck = signatureInstance.apply {
@@ -40,7 +40,7 @@ object BuildVerification {
             update(fileBytes)
         }
 
-        val signatureBytes = this::class.java.getResourceAsStream("$resourcePath.sign")?.readAllBytes()
+        val signatureBytes = this::class.java.getResourceAsStream("$resourcePath.sign")?.readBytes()
             ?: return false
 
         return try {
