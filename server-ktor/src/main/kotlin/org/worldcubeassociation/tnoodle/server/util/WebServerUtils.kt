@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Random
 
 object WebServerUtils {
-    val PRUNING_FOLDER = "tnoodle_pruning_cache"
     val DEVEL_VERSION = "devel-TEMP"
 
     /**
@@ -72,11 +71,6 @@ object WebServerUtils {
 
         Random(seed.hashCode().toLong())
     }
-
-    fun throwableToString(e: Throwable) =
-        ByteArrayOutputStream().apply {
-            e.printStackTrace(PrintStream(this))
-        }.toString()
 
     fun copyFile(sourceFile: File, destFile: File) =
         Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
