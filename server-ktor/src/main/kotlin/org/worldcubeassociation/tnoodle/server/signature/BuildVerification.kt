@@ -8,30 +8,37 @@ import java.security.SignatureException
 import java.security.spec.X509EncodedKeySpec
 
 object BuildVerification {
-    const val PUBLIC_KEY_PEM = "/signature/tnoodle_public.pem"
+    const val ENCRYPTION_ALGORITHM = "RSA"
+    const val SIGNATURE_ALGORITHM = "SHA256with$ENCRYPTION_ALGORITHM"
+
+    private const val PUBLIC_KEY_PEM = "/signature/tnoodle_public.pem"
 
     val BUILD_VERIFIED by lazy { checkBuildSignature(PUBLIC_KEY_PEM) }
+    val PUBLIC_KEY_BYTES = loadPublicKeyBytes(PUBLIC_KEY_PEM)
 
-    private val keyFactory = KeyFactory.getInstance("RSA")
-    private val publicTnoodleKey = loadPublicKey(PUBLIC_KEY_PEM)
+    private val keyFactory = KeyFactory.getInstance(ENCRYPTION_ALGORITHM)
+    private val signatureInstance = Signature.getInstance(SIGNATURE_ALGORITHM)
 
-    private val signatureInstance = Signature.getInstance("SHA256withRSA")
-    private val signatureProvider get() = signatureInstance.apply { initVerify(publicTnoodleKey) }
+    fun loadPublicKeyBytes(resourcePath: String): ByteArray? {
+        return this::class.java.getResourceAsStream(resourcePath)?.reader()
+            ?.use { PemReader(it).readPemObject().content }
+    }
 
-    fun loadPublicKey(resourcePath: String): PublicKey {
-        this::class.java.getResourceAsStream(resourcePath)?.reader()?.use {
-            val keyBytes = PemReader(it).readPemObject().content
-
-            val spec = X509EncodedKeySpec(keyBytes, "RSA")
-            return keyFactory.generatePublic(spec)
-        } ?: error("Key at $resourcePath not found!")
+    fun loadPublicKey(keyBytes: ByteArray): PublicKey {
+        val spec = X509EncodedKeySpec(keyBytes, ENCRYPTION_ALGORITHM)
+        return keyFactory.generatePublic(spec)
     }
 
     fun checkBuildSignature(resourcePath: String): Boolean {
+        val publicKey = PUBLIC_KEY_BYTES?.let(this::loadPublicKey) ?: return false
+
         val fileBytes = this::class.java.getResourceAsStream(resourcePath)?.readAllBytes()
             ?: return false
 
-        val preparedCheck = signatureProvider.apply { update(fileBytes) }
+        val preparedCheck = signatureInstance.apply {
+            initVerify(publicKey)
+            update(fileBytes)
+        }
 
         val signatureBytes = this::class.java.getResourceAsStream("$resourcePath.sign")?.readAllBytes()
             ?: return false
