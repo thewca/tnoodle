@@ -15,7 +15,7 @@ import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
 class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
     override fun spinUp(app: Application) {
-        val versionHandler = VersionHandler(environmentConfig.projectTitle)
+        val versionHandler = VersionHandler(environmentConfig)
 
         app.routing {
             JsEnvHandler.install(this)
