@@ -57,7 +57,7 @@ const EntryInterface = connect(
                     <div className="row">
                         <div className="col-md-6 text-left form-group">
                             <label className="font-weight-bold pr-1">
-                                Competition Name:{" "}
+                                Competition Name
                             </label>
                             <input
                                 className="form-control"
@@ -70,7 +70,7 @@ const EntryInterface = connect(
 
                         <div className="col-md-6 text-left form-group">
                             <label className="font-weight-bold pr-1">
-                                Password:
+                                Password
                             </label>
                             <input
                                 className="form-control"
