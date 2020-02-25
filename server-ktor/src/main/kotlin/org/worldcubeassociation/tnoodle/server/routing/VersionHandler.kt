@@ -16,7 +16,7 @@ class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {
     override fun install(router: Routing) {
         router.get("version") {
             val keyBytes = BuildVerification.PUBLIC_KEY_BYTES?.let {
-                Base64.getEncoder().encode(it)
+                Base64.getEncoder().encodeToString(it)
             }
 
             //FIXME this is a temporary stub implementation until we have actual key pairs
