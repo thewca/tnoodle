@@ -43,7 +43,13 @@ const EventPickerTable = connect(mapStateToProps)(
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
             fetchZip(this.props.wcif, this.props.mbld, this.props.password)
-                .then(response => response.blob())
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    this.setGeneratingScrambles(false);
+                    throw new Error("Could not generate scrambles.");
+                })
                 .then(blob => {
                     this.setGeneratingScrambles(false);
                     this.setState({ ...this.state, fileZipBlob: blob });
