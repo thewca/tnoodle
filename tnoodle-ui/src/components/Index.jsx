@@ -9,17 +9,19 @@ class Index extends Component {
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-3 bg-dark">
-                            <img
-                                className="tnoodle-logo mt-2"
-                                src={require("../assets/tnoodle_logo.svg")}
-                                alt="TNoodle logo"
-                            />
-                            <h1 className="display-3" id="title">
-                                TNoodle
-                            </h1>
+                            <div className="sticky-top">
+                                <img
+                                    className="tnoodle-logo mt-2"
+                                    src={require("../assets/tnoodle_logo.svg")}
+                                    alt="TNoodle logo"
+                                />
+                                <h1 className="display-3" id="title">
+                                    TNoodle
+                                </h1>
+                            </div>
                         </div>
                         <div className="col-9">
-                            <EntryInterface competitionName="" />
+                            <EntryInterface />
                             <EventPickerTable />
                         </div>
                     </div>

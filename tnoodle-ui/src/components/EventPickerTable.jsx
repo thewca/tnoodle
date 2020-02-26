@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
 import { fetchZip } from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
+import VersionInfo from "./VersionInfo";
 
 const mapStateToProps = store => ({
     wcif: store.wcif,
@@ -159,6 +160,7 @@ const EventPickerTable = connect(mapStateToProps)(
         render() {
             return (
                 <div className="container">
+                    <VersionInfo />
                     {this.maybeShowEditWarning()}
                     {this.state.wcaEvents.map(event => {
                         return (

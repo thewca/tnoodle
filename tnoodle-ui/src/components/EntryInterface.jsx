@@ -16,7 +16,7 @@ const EntryInterface = connect(
             super(props);
 
             this.state = {
-                competitionName: props.competitionName,
+                competitionName: props.competitionName || "",
                 disabled: props.disabled,
                 password: "",
                 showPassword: false
