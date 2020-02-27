@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import EventPicker from "./EventPicker";
+import _ from "lodash";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
 import { fetchZip } from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
+import EventPicker from "./EventPicker";
 import VersionInfo from "./VersionInfo";
 
 const mapStateToProps = store => ({
@@ -11,6 +12,9 @@ const mapStateToProps = store => ({
     mbld: store.mbld,
     password: store.password
 });
+
+const BOOTSTRAP_GRID = 12;
+const EVENTS_PER_LINE = 2;
 
 const EventPickerTable = connect(mapStateToProps)(
     class extends Component {
@@ -31,9 +35,11 @@ const EventPickerTable = connect(mapStateToProps)(
                 );
             }
 
+            let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
+
             this.state = {
-                editingDisabled: editingDisabled,
-                wcaEvents: wcaEvents,
+                editingDisabled,
+                eventChunks,
                 competitionId: props.competitionId,
                 generatingScrambles: false,
                 fileZipBlob: null,
@@ -158,21 +164,33 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         render() {
+            let classColPerEvent = `col-${BOOTSTRAP_GRID / EVENTS_PER_LINE}`;
             return (
                 <div className="container">
                     <VersionInfo />
                     {this.maybeShowEditWarning()}
-                    {this.state.wcaEvents.map(event => {
+                    {this.state.eventChunks.map(chunk => {
                         return (
-                            <div className="row" key={event.id}>
-                                <EventPicker
-                                    event={event}
-                                    wcifEvent={this.state.wcif.events.find(
-                                        item => item.id === event.id
-                                    )}
-                                    disabled={this.state.editingDisabled}
-                                    setBlobNull={this.setBlobNull}
-                                />
+                            <div className="row">
+                                {chunk.map(event => {
+                                    return (
+                                        <div
+                                            className={classColPerEvent}
+                                            key={event.id}
+                                        >
+                                            <EventPicker
+                                                event={event}
+                                                wcifEvent={this.state.wcif.events.find(
+                                                    item => item.id === event.id
+                                                )}
+                                                disabled={
+                                                    this.state.editingDisabled
+                                                }
+                                                setBlobNull={this.setBlobNull}
+                                            />
+                                        </div>
+                                    );
+                                })}
                             </div>
                         );
                     })}
