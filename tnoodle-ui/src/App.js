@@ -1,20 +1,35 @@
 import React, { Component } from "react";
-import Index from "./components/Index";
+import EntryInterface from "./components/EntryInterface";
+import EventPickerTable from "./components/EventPickerTable";
 
 import "bootstrap/dist/css/bootstrap.css";
 
 import "./App.css";
 
 class App extends Component {
-    homeLink = "/";
-    offlineScramblerLink = "/scramble/offline";
-    onlineScramblerLink = "/scramble/online";
-    competitionLink = "/competitions/:competitionId";
-
     render() {
         return (
             <div className="App">
-                <Index />
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-3 bg-dark">
+                            <div className="sticky-top">
+                                <img
+                                    className="tnoodle-logo mt-2"
+                                    src={require("./assets/tnoodle_logo.svg")}
+                                    alt="TNoodle logo"
+                                />
+                                <h1 className="display-3" id="title">
+                                    TNoodle
+                                </h1>
+                            </div>
+                        </div>
+                        <div className="col-9">
+                            <EntryInterface />
+                            <EventPickerTable />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
