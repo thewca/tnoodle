@@ -252,22 +252,23 @@ const EventPicker = connect(
         render() {
             let { event } = this.props;
             let options = [
-                { text: "# of rounds?", value: 0, disabled: false },
+                { text: "Rounds", value: 0, disabled: false },
                 { text: "────────", disabled: true }
             ];
             Array.from({ length: MAX_WCA_ROUNDS }).forEach((_, i) => {
                 options.push({
-                    text: i + 1 + " round" + (i > 0 ? "s" : ""),
+                    text: i + 1 + " Round" + (i > 0 ? "s" : ""),
                     value: i + 1,
                     disabled: false
                 });
             });
 
             let styleFirstTwoColumns = { width: "10%" };
-            let styleLastTwoColumns = { width: "40%" };
+            let styleTitleColumn = { width: "60%" };
+            let styleLastColumn = { width: "20%" };
 
             return (
-                <table className="table table-sm rounded m-0 shadow">
+                <table className="table table-sm m-0 shadow-lg rounded">
                     <thead>
                         <tr
                             className={
@@ -280,12 +281,12 @@ const EventPicker = connect(
                             <th style={styleFirstTwoColumns} scope="col">
                                 <CubingIcon event={event.id} />
                             </th>
-                            <th style={styleLastTwoColumns} scope="col">
+                            <th style={styleTitleColumn} scope="col">
                                 <h5 className="font-weight-bold">
                                     {event.name}
                                 </h5>
                             </th>
-                            <th style={styleLastTwoColumns} scope="col">
+                            <th style={styleLastColumn} scope="col">
                                 <select
                                     onChange={this.handleNumberOfRoundsChange}
                                     id={event.id}

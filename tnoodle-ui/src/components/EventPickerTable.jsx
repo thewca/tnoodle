@@ -10,7 +10,8 @@ import VersionInfo from "./VersionInfo";
 const mapStateToProps = store => ({
     wcif: store.wcif,
     mbld: store.mbld,
-    password: store.password
+    password: store.password,
+    editingDisabled: store.editingDisabled
 });
 
 const BOOTSTRAP_GRID = 12;
@@ -21,11 +22,10 @@ const EventPickerTable = connect(mapStateToProps)(
         constructor(props) {
             super(props);
 
-            // If the events > 0, this means that this was a fetched wcif so we disabled the manual selection
             let events = props.wcif.events;
-            let editingDisabled = events.length > 0;
+            let editingDisabled = props.editingDisabled;
 
-            // Prevent offline from remembering online order
+            // Prevent from remembering previous order
             let wcaEvents = [...WCA_EVENTS];
 
             // This filters events to show only those in the competition.
@@ -164,14 +164,15 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         render() {
-            let classColPerEvent = `col-${BOOTSTRAP_GRID / EVENTS_PER_LINE}`;
+            let classColPerEvent = `pl-1 pr-1 col-${BOOTSTRAP_GRID /
+                EVENTS_PER_LINE}`;
             return (
-                <div className="container">
+                <div className="container-fluid">
                     <VersionInfo />
                     {this.maybeShowEditWarning()}
-                    {this.state.eventChunks.map(chunk => {
+                    {this.state.eventChunks.map((chunk, i) => {
                         return (
-                            <div className="row">
+                            <div className="row p-0" key={i}>
                                 {chunk.map(event => {
                                     return (
                                         <div

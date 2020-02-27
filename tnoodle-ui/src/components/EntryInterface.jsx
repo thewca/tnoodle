@@ -2,13 +2,17 @@ import React, { Component } from "react";
 import { updatePassword, updateCompetitionName } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 
+const mapStateToProps = store => ({
+    editingDisabled: store.editingDisabled
+});
+
 const mapDispatchToProps = {
     updatePassword,
     updateCompetitionName
 };
 
 const EntryInterface = connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(
     class EntryInterface extends Component {
@@ -16,8 +20,8 @@ const EntryInterface = connect(
             super(props);
 
             this.state = {
+                editingDisabled: props.editingDisabled,
                 competitionName: props.competitionName || "",
-                disabled: props.disabled,
                 password: "",
                 showPassword: false
             };
