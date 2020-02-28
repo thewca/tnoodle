@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.signature
+package org.worldcubeassociation.tnoodle.server.cryptography
 
 import java.util.*
 import javax.crypto.Cipher
@@ -8,16 +8,17 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 object SymmetricCipher {
-    const val CIPHER_ALGORITHM = "AES"
-
     const val CIPHER_SALT = "TNOODLE_WCA"
     const val CIPHER_KEY_ITERATIONS = 65536
     const val CIPHER_KEY_LENGTH = 256
 
+    const val CIPHER_ALGORITHM = "AES"
+    const val CIPHER_KEY_ALGORITHM = "PBKDF2WithHmacSHA$CIPHER_KEY_LENGTH"
+
     val CIPHER_CHARSET = Charsets.UTF_8
 
     val CIPHER_INSTANCE = Cipher.getInstance(CIPHER_ALGORITHM)
-    val CIPHER_KEY_FACTORY = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+    val CIPHER_KEY_FACTORY = SecretKeyFactory.getInstance(CIPHER_KEY_ALGORITHM)
 
     fun applyCipherEncrypt(cipher: Cipher, unencrypted: String): String {
         val contentBytes = unencrypted.toByteArray(CIPHER_CHARSET)
