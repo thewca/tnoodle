@@ -2,7 +2,12 @@ import { ActionTypes } from "./Types";
 import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 
-const defaultStore = { wcif: defaultWcif, mbld: MBLD_DEFAULT, password: "" };
+const defaultStore = {
+    wcif: defaultWcif,
+    mbld: MBLD_DEFAULT,
+    password: "",
+    editingStatus: true
+};
 
 export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_ME) {
@@ -76,6 +81,13 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             wcif: action.payload.wcif || defaultWcif
+        };
+    }
+
+    if (action.type === ActionTypes.UPDATE_EDITING_STATUS) {
+        return {
+            ...store,
+            editingStatus: action.payload.editingStatus
         };
     }
 

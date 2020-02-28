@@ -39,3 +39,8 @@ export const updateWcif = wcif => ({
     type: ActionTypes.UPDATE_WCIF,
     payload: { wcif }
 });
+
+export const updateEditingStatus = flag => ({
+    type: ActionTypes.UPDATE_EDITING_STATUS,
+    payload: { editingStatus: flag }
+});

@@ -11,7 +11,7 @@ const mapStateToProps = store => ({
     wcif: store.wcif,
     mbld: store.mbld,
     password: store.password,
-    editingDisabled: store.editingDisabled
+    editingStatus: store.editingStatus
 });
 
 const BOOTSTRAP_GRID = 12;
@@ -21,32 +21,8 @@ const EventPickerTable = connect(mapStateToProps)(
     class extends Component {
         constructor(props) {
             super(props);
-
-            let events = props.wcif.events;
-            let editingDisabled = props.editingDisabled;
-
-            // Prevent from remembering previous order
-            let wcaEvents = [...WCA_EVENTS];
-
-            // This filters events to show only those in the competition.
-            if (editingDisabled) {
-                wcaEvents = wcaEvents.filter(wcaEvent =>
-                    events.find(item => item.id === wcaEvent.id)
-                );
-            }
-
-            let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
-
-            this.state = {
-                editingDisabled,
-                eventChunks,
-                competitionId: props.competitionId,
-                generatingScrambles: false,
-                fileZipBlob: null,
-                wcif: props.wcif
-            };
+            this.state = { fileZipBlob: null, generatingScrambles: false };
         }
-
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
             fetchZip(this.props.wcif, this.props.mbld, this.props.password)
@@ -71,7 +47,7 @@ const EventPickerTable = connect(mapStateToProps)(
         downloadZip = () => {
             // TODO add [Unofficial] before the zip name if staging or !official tnoodle version
 
-            let fileName = this.state.wcif.name + ".zip";
+            let fileName = this.props.wcif.name + ".zip";
 
             const link = document.createElement("a");
             link.href = URL.createObjectURL(this.state.fileZipBlob);
@@ -87,24 +63,24 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         maybeShowEditWarning = () => {
-            if (this.state.competitionId == null) {
+            if (this.props.competitionId == null) {
                 return;
             }
             return (
                 <div className="row">
                     <p>
-                        Found {this.state.wcif.events.length} event
-                        {this.state.wcif.events.length > 1 ? "s" : ""} for{" "}
+                        Found {this.props.wcif.events.length} event
+                        {this.props.wcif.events.length > 1 ? "s" : ""} for{" "}
                         {this.props.wcif.name}.
                     </p>
                     <p>
                         You can view and change the rounds over on{" "}
                         <a
                             href={toWcaUrl(
-                                `/competitions/${this.state.competitionId}/events/edit`
+                                `/competitions/${this.props.competitionId}/events/edit`
                             )}
                         >
-                            the WCA website.
+                            the WCA props.
                         </a>
                         <strong>
                             Refresh this page after making any changes on the
@@ -164,13 +140,29 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         render() {
+            console.log(this.props);
+            let events = this.props.wcif.events;
+            let editingDisabled = !this.props.editingStatus;
+
+            // Prevent from remembering previous order
+            let wcaEvents = [...WCA_EVENTS];
+
+            // This filters events to show only those in the competition.
+            if (editingDisabled) {
+                wcaEvents = wcaEvents.filter(wcaEvent =>
+                    events.find(item => item.id === wcaEvent.id)
+                );
+            }
+
+            let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
+
             let classColPerEvent = `pl-1 pr-1 col-${BOOTSTRAP_GRID /
                 EVENTS_PER_LINE}`;
             return (
                 <div className="container-fluid">
                     <VersionInfo />
                     {this.maybeShowEditWarning()}
-                    {this.state.eventChunks.map((chunk, i) => {
+                    {eventChunks.map((chunk, i) => {
                         return (
                             <div className="row p-0" key={i}>
                                 {chunk.map(event => {
@@ -181,12 +173,10 @@ const EventPickerTable = connect(mapStateToProps)(
                                         >
                                             <EventPicker
                                                 event={event}
-                                                wcifEvent={this.state.wcif.events.find(
+                                                wcifEvent={this.props.wcif.events.find(
                                                     item => item.id === event.id
                                                 )}
-                                                disabled={
-                                                    this.state.editingDisabled
-                                                }
+                                                disabled={editingDisabled}
                                                 setBlobNull={this.setBlobNull}
                                             />
                                         </div>

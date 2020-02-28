@@ -6,7 +6,8 @@ import { updateWcaEvent, updateMbld } from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
-    mbld: store.mbld
+    mbld: store.mbld,
+    editingStatus: store.editingStatus
 });
 
 const mapDispatchToProps = {
@@ -33,7 +34,7 @@ const EventPicker = connect(
             this.state = {
                 id: props.event.id,
                 rounds: wcifEvent.rounds,
-                disabled: props.disabled
+                disabled: !props.editingStatus
             };
 
             if (this.state.id === "333mbf") {
