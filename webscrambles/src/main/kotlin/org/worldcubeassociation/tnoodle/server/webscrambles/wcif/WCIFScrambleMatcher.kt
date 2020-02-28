@@ -4,6 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import org.worldcubeassociation.tnoodle.server.cryptography.StringEncryption
 import org.worldcubeassociation.tnoodle.server.cryptography.SymmetricCipher
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
@@ -11,23 +12,27 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
+import java.security.Key
 import javax.crypto.Cipher
 
 object WCIFScrambleMatcher {
     const val ID_PENDING = 0 // FIXME should this be -1?
 
-    // SCRAMBLE SET FILLING -----
-    fun encryptScrambleSets(wcif: Competition, password: String): Competition {
-        return cryptScrambleSets(wcif, password, Cipher.ENCRYPT_MODE, SymmetricCipher::applyCipherEncrypt)
-    }
+    // SCRAMBLE SET ENCRYPTION / DECRYPTION -----
 
-    fun decryptScrambleSets(wcif: Competition, password: String): Competition {
-        return cryptScrambleSets(wcif, password, Cipher.DECRYPT_MODE, SymmetricCipher::applyCipherDecrypt)
-    }
+    fun encryptScrambleSets(wcif: Competition, cipherKey: Key) =
+        cryptScrambleSets(wcif, cipherKey, Cipher.ENCRYPT_MODE, StringEncryption::applyCipherEncrypt)
 
-    private fun cryptScrambleSets(wcif: Competition, password: String, cipherOpMode: Int, cipherMethod: (Cipher, String) -> String): Competition {
-        val cipherKey = SymmetricCipher.generateKey(password)
+    fun encryptScrambleSets(wcif: Competition, password: String) =
+        encryptScrambleSets(wcif, SymmetricCipher.generateKey(password))
 
+    fun decryptScrambleSets(wcif: Competition, cipherKey: Key) =
+        cryptScrambleSets(wcif, cipherKey, Cipher.DECRYPT_MODE, StringEncryption::applyCipherDecrypt)
+
+    fun decryptScrambleSets(wcif: Competition, password: String) =
+        decryptScrambleSets(wcif, SymmetricCipher.generateKey(password))
+
+    private fun cryptScrambleSets(wcif: Competition, cipherKey: Key, cipherOpMode: Int, cipherMethod: (Cipher, String) -> String): Competition {
         val initedCipherInstance = SymmetricCipher.CIPHER_INSTANCE
             .apply { init(cipherOpMode, cipherKey) }
 
@@ -51,6 +56,8 @@ object WCIFScrambleMatcher {
 
         return wcif.copy(events = scrambledEvents)
     }
+
+    // SCRAMBLE SET FILLING -----
 
     suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
         val scrambledEvents = wcif.events.map { e ->
