@@ -7,7 +7,7 @@ import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
     mbld: store.mbld,
-    editingStatus: store.editingStatus
+    editingDisabled: store.editingDisabled
 });
 
 const mapDispatchToProps = {
@@ -34,7 +34,7 @@ const EventPicker = connect(
             this.state = {
                 id: props.event.id,
                 rounds: wcifEvent.rounds,
-                disabled: !props.editingStatus
+                disabled: props.editingDisabled
             };
 
             if (this.state.id === "333mbf") {
@@ -265,11 +265,10 @@ const EventPicker = connect(
             });
 
             let styleFirstTwoColumns = { width: "10%" };
-            let styleTitleColumn = { width: "60%" };
-            let styleLastColumn = { width: "20%" };
+            let styleLastTwoColumns = { width: "40%" };
 
             return (
-                <table className="table table-sm m-0 shadow-lg rounded">
+                <table className="table table-sm m-0 shadow rounded">
                     <thead>
                         <tr
                             className={
@@ -282,12 +281,12 @@ const EventPicker = connect(
                             <th style={styleFirstTwoColumns} scope="col">
                                 <CubingIcon event={event.id} />
                             </th>
-                            <th style={styleTitleColumn} scope="col">
+                            <th style={styleLastTwoColumns} scope="col">
                                 <h5 className="font-weight-bold">
                                     {event.name}
                                 </h5>
                             </th>
-                            <th style={styleLastColumn} scope="col">
+                            <th style={styleLastTwoColumns} scope="col">
                                 <select
                                     onChange={this.handleNumberOfRoundsChange}
                                     id={event.id}

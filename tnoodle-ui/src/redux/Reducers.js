@@ -6,7 +6,7 @@ const defaultStore = {
     wcif: defaultWcif,
     mbld: MBLD_DEFAULT,
     password: "",
-    editingStatus: true
+    editingDisabled: false
 };
 
 export const Reducer = (store, action) => {
@@ -87,7 +87,7 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_EDITING_STATUS) {
         return {
             ...store,
-            editingStatus: action.payload.editingStatus
+            editingDisabled: action.payload.editingDisabled
         };
     }
 

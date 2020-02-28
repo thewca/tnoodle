@@ -11,7 +11,7 @@ const mapStateToProps = store => ({
     wcif: store.wcif,
     mbld: store.mbld,
     password: store.password,
-    editingStatus: store.editingStatus
+    editingDisabled: store.editingDisabled
 });
 
 const BOOTSTRAP_GRID = 12;
@@ -142,7 +142,7 @@ const EventPickerTable = connect(mapStateToProps)(
         render() {
             console.log(this.props);
             let events = this.props.wcif.events;
-            let editingDisabled = !this.props.editingStatus;
+            let editingDisabled = this.props.editingDisabled;
 
             // Prevent from remembering previous order
             let wcaEvents = [...WCA_EVENTS];
@@ -156,7 +156,7 @@ const EventPickerTable = connect(mapStateToProps)(
 
             let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
 
-            let classColPerEvent = `pl-1 pr-1 col-${BOOTSTRAP_GRID /
+            let classColPerEvent = `border border-dark p-1 col-${BOOTSTRAP_GRID /
                 EVENTS_PER_LINE}`;
             return (
                 <div className="container-fluid">

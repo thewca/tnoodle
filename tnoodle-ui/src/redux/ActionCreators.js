@@ -42,5 +42,5 @@ export const updateWcif = wcif => ({
 
 export const updateEditingStatus = flag => ({
     type: ActionTypes.UPDATE_EDITING_STATUS,
-    payload: { editingStatus: flag }
+    payload: { editingDisabled: flag }
 });

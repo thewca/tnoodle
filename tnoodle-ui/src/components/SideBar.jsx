@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { updateWcif, updateEditingStatus } from "../redux/ActionCreators";
+import {
+    updateWcif,
+    updateEditingStatus,
+    updateCompetitionName
+} from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 
 const mapDispatchToProps = {
     updateWcif,
-    updateEditingStatus
+    updateEditingStatus,
+    updateCompetitionName
 };
 
 const SideBar = connect(
@@ -15,7 +20,7 @@ const SideBar = connect(
     class extends Component {
         handleManualSelection = () => {
             this.props.updateWcif(defaultWcif);
-            this.props.updateEditingStatus(true);
+            this.props.updateEditingStatus(false);
         };
 
         handleCompetitionSelection = () => {
@@ -55,162 +60,374 @@ const SideBar = connect(
                         extensions: []
                     }
                 ],
-                schedule: {
-                    startDate: "2019-02-10",
-                    numberOfDays: 1,
-                    venues: [
-                        {
-                            id: 2,
-                            name:
-                                "[Múltiplos lugares](https://www.worldcubeassociation.org/competitions/FMCBrasil2019#4113-lugares)",
-                            latitudeMicrodegrees: -15822291,
-                            longitudeMicrodegrees: -47928765,
-                            countryIso2: "BR",
-                            timezone: "America/Sao_Paulo",
-                            rooms: [
-                                {
-                                    id: 3,
-                                    name: "Sala",
-                                    color: "#304a96",
-                                    activities: [
-                                        {
-                                            id: 13,
-                                            name:
-                                                "3x3x3 Fewest Moves, Round 1, Attempt 1",
-                                            activityCode: "333fm-r1-a1",
-                                            startTime: "2019-02-10T11:00:00Z",
-                                            endTime: "2019-02-10T12:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 14,
-                                            name:
-                                                "3x3x3 Fewest Moves, Round 1, Attempt 2",
-                                            activityCode: "333fm-r1-a2",
-                                            startTime: "2019-02-10T12:30:00Z",
-                                            endTime: "2019-02-10T13:30:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 15,
-                                            name:
-                                                "3x3x3 Fewest Moves, Round 1, Attempt 3",
-                                            activityCode: "333fm-r1-a3",
-                                            startTime: "2019-02-10T14:00:00Z",
-                                            endTime: "2019-02-10T15:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 17,
-                                            name:
-                                                "3x3x3 Fewest Moves, Round 2, Attempt 1",
-                                            activityCode: "333fm-r2-a1",
-                                            startTime: "2019-02-10T16:00:00Z",
-                                            endTime: "2019-02-10T17:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 18,
-                                            name:
-                                                "3x3x3 Fewest Moves, Round 2, Attempt 2",
-                                            activityCode: "333fm-r2-a2",
-                                            startTime: "2019-02-10T17:30:00Z",
-                                            endTime: "2019-02-10T18:30:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 19,
-                                            name:
-                                                "3x3x3 Fewest Moves, Round 2, Attempt 3",
-                                            activityCode: "333fm-r2-a3",
-                                            startTime: "2019-02-10T19:00:00Z",
-                                            endTime: "2019-02-10T20:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 25,
-                                            name: "Intervalo (break)",
-                                            activityCode: "other-misc",
-                                            startTime: "2019-02-10T12:00:00Z",
-                                            endTime: "2019-02-10T12:30:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 26,
-                                            name: "Intervalo (break)",
-                                            activityCode: "other-misc",
-                                            startTime: "2019-02-10T13:30:00Z",
-                                            endTime: "2019-02-10T14:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 27,
-                                            name: "Intervalo (break)",
-                                            activityCode: "other-misc",
-                                            startTime: "2019-02-10T17:00:00Z",
-                                            endTime: "2019-02-10T17:30:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 28,
-                                            name: "Intervalo (break)",
-                                            activityCode: "other-misc",
-                                            startTime: "2019-02-10T18:30:00Z",
-                                            endTime: "2019-02-10T19:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 29,
-                                            name:
-                                                "Credenciamento (registration)",
-                                            activityCode: "other-registration",
-                                            startTime: "2019-02-10T10:30:00Z",
-                                            endTime: "2019-02-10T11:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 30,
-                                            name: "Premiação (awards)",
-                                            activityCode: "other-awards",
-                                            startTime: "2019-02-10T20:00:00Z",
-                                            endTime: "2019-02-10T20:30:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        },
-                                        {
-                                            id: 31,
-                                            name: "Almoço (lunch)",
-                                            activityCode: "other-lunch",
-                                            startTime: "2019-02-10T15:00:00Z",
-                                            endTime: "2019-02-10T16:00:00Z",
-                                            childActivities: [],
-                                            extensions: []
-                                        }
-                                    ],
-                                    extensions: []
-                                }
-                            ],
-                            extensions: []
-                        }
-                    ]
-                },
                 competitorLimit: null,
                 extensions: []
             };
 
             this.props.updateWcif(wcif);
-            this.props.updateEditingStatus(false);
+            this.props.updateEditingStatus(true);
+            this.props.updateCompetitionName("FMC Brasil 2019");
+        };
+
+        handleCompetitionSelection2 = () => {
+            let wcif = {
+                formatVersion: "1.0",
+                id: "UberlandiaOpen2019",
+                name: "Uberlândia Open 2019",
+                shortName: "Uberlândia Open 2019",
+
+                events: [
+                    {
+                        id: "333",
+                        rounds: [
+                            {
+                                id: "333-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 30000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: {
+                                    type: "ranking",
+                                    level: 20
+                                },
+                                scrambleSetCount: 4,
+                                results: [],
+                                extensions: []
+                            },
+                            {
+                                id: "333-r2",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 18000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: {
+                                    type: "ranking",
+                                    level: 12
+                                },
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            },
+                            {
+                                id: "333-r3",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 12000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "222",
+                        rounds: [
+                            {
+                                id: "222-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 24000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: {
+                                    type: "percent",
+                                    level: 75
+                                },
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            },
+                            {
+                                id: "222-r2",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 18000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: {
+                                    type: "ranking",
+                                    level: 6
+                                },
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            },
+                            {
+                                id: "222-r3",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 12000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: null,
+                                scrambleSetCount: 2,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "444",
+                        rounds: [
+                            {
+                                id: "444-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 30000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: {
+                                    numberOfAttempts: 2,
+                                    attemptResult: 12000
+                                },
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "555",
+                        rounds: [
+                            {
+                                id: "555-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 36000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: {
+                                    numberOfAttempts: 2,
+                                    attemptResult: 18000
+                                },
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "666",
+                        rounds: [
+                            {
+                                id: "666-r1",
+                                format: "m",
+                                timeLimit: {
+                                    centiseconds: 60000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: {
+                                    numberOfAttempts: 1,
+                                    attemptResult: 30000
+                                },
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "777",
+                        rounds: [
+                            {
+                                id: "777-r1",
+                                format: "m",
+                                timeLimit: {
+                                    centiseconds: 90000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: {
+                                    numberOfAttempts: 1,
+                                    attemptResult: 48000
+                                },
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "333bf",
+                        rounds: [
+                            {
+                                id: "333bf-r1",
+                                format: "3",
+                                timeLimit: {
+                                    centiseconds: 120000,
+                                    cumulativeRoundIds: ["333bf-r1"]
+                                },
+                                cutoff: null,
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "333fm",
+                        rounds: [
+                            {
+                                id: "333fm-r1",
+                                format: "m",
+                                timeLimit: null,
+                                cutoff: null,
+                                advancementCondition: null,
+                                scrambleSetCount: 2,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "333oh",
+                        rounds: [
+                            {
+                                id: "333oh-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 24000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: {
+                                    numberOfAttempts: 2,
+                                    attemptResult: 12000
+                                },
+                                advancementCondition: {
+                                    type: "ranking",
+                                    level: 4
+                                },
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            },
+                            {
+                                id: "333oh-r2",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 18000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: null,
+                                scrambleSetCount: 2,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "clock",
+                        rounds: [
+                            {
+                                id: "clock-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 12000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: {
+                                    numberOfAttempts: 2,
+                                    attemptResult: 4500
+                                },
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "minx",
+                        rounds: [
+                            {
+                                id: "minx-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 30000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: {
+                                    numberOfAttempts: 2,
+                                    attemptResult: 21000
+                                },
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "pyram",
+                        rounds: [
+                            {
+                                id: "pyram-r1",
+                                format: "a",
+                                timeLimit: {
+                                    centiseconds: 12000,
+                                    cumulativeRoundIds: []
+                                },
+                                cutoff: null,
+                                advancementCondition: null,
+                                scrambleSetCount: 3,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    },
+                    {
+                        id: "333mbf",
+                        rounds: [
+                            {
+                                id: "333mbf-r1",
+                                format: "2",
+                                timeLimit: null,
+                                cutoff: null,
+                                advancementCondition: null,
+                                scrambleSetCount: 2,
+                                results: [],
+                                extensions: []
+                            }
+                        ],
+                        extensions: []
+                    }
+                ],
+
+                competitorLimit: 50,
+                extensions: []
+            };
+
+            this.props.updateWcif(wcif);
+            this.props.updateEditingStatus(true);
+            this.props.updateCompetitionName("Uberlândia Open 2019");
         };
 
         render() {
@@ -241,6 +458,15 @@ const SideBar = connect(
                                 onClick={this.handleCompetitionSelection}
                             >
                                 Competition 1
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                type="button"
+                                className="btn btn-dark btn-lg btn-block btn-outline-light"
+                                onClick={this.handleCompetitionSelection2}
+                            >
+                                Competition 2
                             </button>
                         </li>
                     </ul>

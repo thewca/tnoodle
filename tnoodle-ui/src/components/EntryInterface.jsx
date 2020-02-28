@@ -3,7 +3,8 @@ import { updatePassword, updateCompetitionName } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 
 const mapStateToProps = store => ({
-    editingDisabled: store.editingDisabled
+    editingDisabled: store.editingDisabled,
+    competitionName: store.competitionName
 });
 
 const mapDispatchToProps = {
