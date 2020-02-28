@@ -10,15 +10,9 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.signature.BuildVerification
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
-import java.util.*
-
 class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {
     override fun install(router: Routing) {
         router.get("version") {
-            val keyBytes = BuildVerification.PUBLIC_KEY_BYTES?.let {
-                Base64.getEncoder().encodeToString(it)
-            }
-
             //FIXME this is a temporary stub implementation until we have actual key pairs
             //val buildVerified = BuildVerification.BUILD_VERIFIED
             val buildVerified = version.projectName == "TNoodle-WCA"
@@ -26,7 +20,7 @@ class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {
             val json = json {
                 "runningVersion" to version.projectTitle
                 "officialBuild" to buildVerified
-                "keyBytes" to keyBytes
+                "keyBytes" to BuildVerification.PUBLIC_KEY_BYTES_BASE64
             }
 
             call.respond(json)
