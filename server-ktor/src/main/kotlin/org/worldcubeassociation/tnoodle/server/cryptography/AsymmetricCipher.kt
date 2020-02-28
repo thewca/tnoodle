@@ -8,8 +8,8 @@ import java.util.*
 
 object AsymmetricCipher {
     const val ENCRYPTION_ALGORITHM = "RSA"
-    const val PUBLIC_KEY_PEM = "/signature/tnoodle_public.pem"
-    private const val PRIVATE_KEY_PEM8 = "/signature/tnoodle_private.pkcs8.pem"
+    const val PUBLIC_KEY_PEM = "/rsa/tnoodle_public.pem"
+    private const val PRIVATE_KEY_PEM8 = "/rsa/tnoodle_private.pkcs8.pem"
 
     val PUBLIC_KEY_BYTES = loadRSAKeyBytes(PUBLIC_KEY_PEM)
     val PUBLIC_KEY_BYTES_BASE64 = PUBLIC_KEY_BYTES?.let { Base64.getEncoder().encodeToString(it) }

@@ -20,7 +20,8 @@ object BuildVerification {
             update(fileBytes)
         }
 
-        val signatureBytes = this::class.java.getResourceAsStream("$resourcePath.sign")?.readBytes()
+        val signaturePath = "/signature$resourcePath.sign"
+        val signatureBytes = this::class.java.getResourceAsStream(signaturePath)?.readBytes()
             ?: return false
 
         return try {
