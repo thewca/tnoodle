@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.cryptography
 
-import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
@@ -19,20 +18,6 @@ object SymmetricCipher {
 
     val CIPHER_INSTANCE = Cipher.getInstance(CIPHER_ALGORITHM)
     val CIPHER_KEY_FACTORY = SecretKeyFactory.getInstance(CIPHER_KEY_ALGORITHM)
-
-    fun applyCipherEncrypt(cipher: Cipher, unencrypted: String): String {
-        val contentBytes = unencrypted.toByteArray(CIPHER_CHARSET)
-
-        val cipherContent = cipher.doFinal(contentBytes)
-        return Base64.getEncoder().encodeToString(cipherContent)
-    }
-
-    fun applyCipherDecrypt(cipher: Cipher, encryptedBase64: String): String {
-        val contentBytes = Base64.getDecoder().decode(encryptedBase64)
-
-        val cipherContent = cipher.doFinal(contentBytes)
-        return cipherContent.toString(CIPHER_CHARSET)
-    }
 
     fun generateKey(password: String): SecretKey {
         val saltBytes = CIPHER_SALT.toByteArray(CIPHER_CHARSET)
