@@ -1,5 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStringEncoder
+
 data class AssignmentCode(val wcaString: String) {
     val isStaff
         get() = this.wcaString.startsWith(PREFIX_STAFF)
@@ -22,7 +24,7 @@ data class AssignmentCode(val wcaString: String) {
     val isStaffAnnouncer
         get() = this.wcaString == STAFF_ANNOUNCER
 
-    companion object {
+    companion object : SingletonStringEncoder<AssignmentCode>("AssignmentCode") {
         const val PREFIX_STAFF = "staff"
 
         const val COMPETITOR = "competitor"
@@ -31,5 +33,8 @@ data class AssignmentCode(val wcaString: String) {
         const val STAFF_RUNNER = "$PREFIX_STAFF-runner"
         const val STAFF_DATAENTRY = "$PREFIX_STAFF-dataentry"
         const val STAFF_ANNOUNCER = "$PREFIX_STAFF-announcer"
+
+        override fun encodeInstance(instance: AssignmentCode) = instance.wcaString
+        override fun makeInstance(deserialized: String) = AssignmentCode(deserialized)
     }
 }
