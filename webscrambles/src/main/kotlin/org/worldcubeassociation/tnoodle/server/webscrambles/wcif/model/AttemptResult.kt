@@ -1,27 +1,33 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
+import kotlinx.serialization.Transient
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStringEncoder
 import java.time.Duration
 
-data class AttemptResult(val value: Int) {
+// value has to be string to preserve leading zeros from MBLD
+data class AttemptResult(val value: String) {
+    @Transient
+    private val intValue = value.toInt()
+
     val isSkipped
-        get() = this.value == ATTEMPT_SKIPPED
+        get() = this.intValue == ATTEMPT_SKIPPED
 
     val isDnf
-        get() = this.value == ATTEMPT_DNF
+        get() = this.intValue == ATTEMPT_DNF
 
     val isDns
-        get() = this.value == ATTEMPT_DNS
+        get() = this.intValue == ATTEMPT_DNS
 
     val asDuration
-        get() = Duration.ofMillis(this.value * CENTISECONDS_TO_MILLISECONDS)
+        get() = Duration.ofMillis(this.intValue * CENTISECONDS_TO_MILLISECONDS)
 
     val asFmcAverage
-        get() = this.value / 100f
+        get() = this.intValue / 100f
 
     val asMultiResult
         get() = decodeMultiResult(this.value)
 
-    companion object {
+    companion object : SingletonStringEncoder<AttemptResult>("AttemptResult") {
         const val ATTEMPT_SKIPPED = 0
         const val ATTEMPT_DNF = -1
         const val ATTEMPT_DNS = -2
@@ -33,16 +39,14 @@ data class AttemptResult(val value: Int) {
 
         private const val MULTIBLD_NEW_BASE_VALUE = 99
 
-        fun decodeMultiResult(encodedValue: Int): Triple<Int, Int, Duration>? {
-            val encodedString = encodedValue.toString().padStart(LENGTH_MULTIBLD_FORMAT_NEW, PREFIX_MULTIBLD_FORMAT_NEW)
-
-            if (!encodedString.startsWith(PREFIX_MULTIBLD_FORMAT_NEW) || encodedString.length != LENGTH_MULTIBLD_FORMAT_NEW) {
+        fun decodeMultiResult(encodedValue: String): Triple<Int, Int, Duration>? {
+            if (!encodedValue.startsWith(PREFIX_MULTIBLD_FORMAT_NEW) || encodedValue.length != LENGTH_MULTIBLD_FORMAT_NEW) {
                 return null
             }
 
-            val dd = encodedString.substring(1, 3)
-            val ttttt = encodedString.substring(3, 8)
-            val mm = encodedString.substring(8, 10)
+            val dd = encodedValue.substring(1, 3)
+            val ttttt = encodedValue.substring(3, 8)
+            val mm = encodedValue.substring(8, 10)
 
             val duration = Duration.ofSeconds(ttttt.toLong())
             val difference = MULTIBLD_NEW_BASE_VALUE - dd.toInt()
@@ -65,5 +69,8 @@ data class AttemptResult(val value: Int) {
             val stringRepresentation = "$PREFIX_MULTIBLD_FORMAT_NEW$dd$ttttt$mm"
             return stringRepresentation.toInt()
         }
+
+        override fun encodeInstance(instance: AttemptResult) = instance.value
+        override fun makeInstance(deserialized: String) = AttemptResult(deserialized)
     }
 }
