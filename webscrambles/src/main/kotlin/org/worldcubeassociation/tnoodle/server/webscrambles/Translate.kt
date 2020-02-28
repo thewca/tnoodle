@@ -12,7 +12,7 @@ object Translate {
 
     val TRANSLATIONS = loadTranslationResources()
 
-    val locales
+    val TRANSLATED_LOCALES
         get() = TRANSLATIONS.keys
 
     private fun loadTranslationResources(): Map<Locale, Map<String, *>> {

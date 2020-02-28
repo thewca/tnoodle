@@ -100,6 +100,9 @@ data class ActivityCode(val activityCodeString: String) {
             return ActivityCode(codeString)
         }
 
+        fun compile(event: EventPlugins, round: Int? = null, group: Int? = null, attempt: Int? = null) =
+            compile(event.key, round, group, attempt)
+
         override fun encodeInstance(instance: ActivityCode) = instance.activityCodeString
         override fun makeInstance(deserialized: String) = ActivityCode(deserialized)
     }

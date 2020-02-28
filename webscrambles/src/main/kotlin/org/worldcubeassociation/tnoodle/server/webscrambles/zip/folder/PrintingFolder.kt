@@ -11,22 +11,24 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawing
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.getCachedPdf
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
 import java.time.LocalDate
+import java.util.*
 
-data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, val globalTitle: String, val wcifSchedule: Schedule) {
+data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, val globalTitle: String, val wcif: Competition) {
     val scrambleSheetsFlat = uniqueTitles.values.toList()
     val scrambleDrawingData = CompetitionDrawingData(globalTitle, scrambleSheetsFlat)
 
     fun assemble(generationDate: LocalDate, versionTag: String, password: String?): Folder {
         val fmcRequests = uniqueTitles.filterValues { it.isFmc }
 
-        val pseudoActivityCode = "${EventPlugins.THREE_FM.key}-${ActivityCode.WCIF_PREFIX_ROUND}1"
-        val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), ActivityCode(pseudoActivityCode), globalTitle, Translate.DEFAULT_LOCALE)
+        val pseudoActivityCode = ActivityCode.compile(EventPlugins.THREE_FM, round = 1)
+        val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), pseudoActivityCode, globalTitle, Translate.DEFAULT_LOCALE)
         val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag)
 
         return folder("Printing") {
@@ -51,9 +53,11 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
 
                         folder("Translations") {
                             val requestedTranslations = req.scrambleSet.findExtension<FmcLanguagesExtension>()
-                                ?.languageTags?.takeUnless { it.isEmpty() } ?: Translate.locales.map { it.toLanguageTag() }
+                                ?.languageTags?.takeUnless { it.isEmpty() }
+                                ?: compileCompetitorLanguages().takeUnless { it.isEmpty() }
+                                ?: Translate.TRANSLATED_LOCALES.map { it.toLanguageTag() }
 
-                            for (locale in Translate.locales) {
+                            for (locale in Translate.TRANSLATED_LOCALES) {
                                 if (locale.toLanguageTag() !in requestedTranslations) {
                                     continue
                                 }
@@ -74,9 +78,9 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
                 }
             }
 
-            if (wcifSchedule.isNotEmpty()) {
+            if (wcif.schedule.isNotEmpty()) {
                 val orderedScramblesFolder = OrderedScramblesFolder(globalTitle, scrambleDrawingData)
-                val orderedScramblesNode = orderedScramblesFolder.assemble(wcifSchedule, generationDate, versionTag)
+                val orderedScramblesNode = orderedScramblesFolder.assemble(wcif.schedule, generationDate, versionTag)
 
                 folder(orderedScramblesNode)
             }
@@ -89,7 +93,36 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
         }
     }
 
+    private fun compileCompetitorLanguages(): List<String> {
+        val competitorCountries = this.wcif.persons
+            .map { it.countryIso2 }
+            .map { it.isoString }
+            .distinct()
+
+        val countryLocales = competitorCountries.flatMap { getTranslatedCountryLanguage(it) }
+            .toSet() + Translate.DEFAULT_LOCALE
+
+        return countryLocales.distinct().map { it.toLanguageTag() }
+    }
+
     companion object {
         private fun Schedule.isNotEmpty() = leafActivities.isNotEmpty()
+
+        private val COUNTRY_ISO2_LOCALES = Locale.getAvailableLocales()
+            .groupBy { it.country }
+
+        private val TRANSLATED_LANGUAGE_ISO2 = Translate.TRANSLATED_LOCALES
+            .map { it.language }.toSet()
+
+        private fun getTranslatedCountryLanguage(iso2: String): List<Locale> {
+            val candidateLocales = COUNTRY_ISO2_LOCALES[iso2] ?: return emptyList()
+
+            val translatedLocales = candidateLocales.filter { it.language in TRANSLATED_LANGUAGE_ISO2 }
+
+            val localLanguages = translatedLocales.filter { Locale(it.language, iso2) in Translate.TRANSLATED_LOCALES }
+            val generalLanguages = translatedLocales.flatMap { Translate.TRANSLATED_LOCALES.filter { l -> l.language == it.language } }
+
+            return localLanguages.takeIf { it.isNotEmpty() } ?: generalLanguages
+        }
     }
 }
