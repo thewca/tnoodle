@@ -7,7 +7,7 @@ import io.ktor.routing.get
 import kotlinx.serialization.json.json
 
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.signature.BuildVerification
+import org.worldcubeassociation.tnoodle.server.cryptography.AsymmetricCipher
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
 class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {
@@ -20,7 +20,7 @@ class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {
             val json = json {
                 "runningVersion" to version.projectTitle
                 "officialBuild" to buildVerified
-                "keyBytes" to BuildVerification.PUBLIC_KEY_BYTES_BASE64
+                "keyBytes" to AsymmetricCipher.PUBLIC_KEY_BYTES_BASE64
             }
 
             call.respond(json)

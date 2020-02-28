@@ -4,7 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
-import org.worldcubeassociation.tnoodle.server.signature.SymmetricCipher
+import org.worldcubeassociation.tnoodle.server.cryptography.SymmetricCipher
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
