@@ -5,7 +5,9 @@ import {
     updateWcif,
     updateEditingStatus,
     updateCompetitionName,
-    updateCompetitions
+    updateCompetitions,
+    updateMe,
+    updateCompetitionId
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -13,20 +15,22 @@ import {
     logIn,
     logOut,
     fetchMe,
-    getUpcomingManageableCompetitions
+    getUpcomingManageableCompetitions,
+    getCompetitionJson
 } from "../api/wca.api";
 
 const mapStateToProps = store => ({
     me: store.me,
-    competitions: store.competitions,
-    competitionId: store.competitionId
+    competitions: store.competitions
 });
 
 const mapDispatchToProps = {
     updateWcif,
     updateEditingStatus,
     updateCompetitionName,
-    updateCompetitions
+    updateCompetitions,
+    updateMe,
+    updateCompetitionId
 };
 
 const SideBar = connect(
@@ -42,7 +46,8 @@ const SideBar = connect(
                 competitions: props.competitions,
                 loadingUser: false,
                 loadingCompetitions: false,
-                loadingCompetitionInformation: false
+                loadingCompetitionInformation: false,
+                competitionId: null
             };
         }
 
@@ -71,7 +76,7 @@ const SideBar = connect(
                         this.setLoadingUser(false);
                     })
                     .catch(e => {
-                        console.log(
+                        console.error(
                             "Could not get information about the logged user",
                             e
                         );
@@ -88,19 +93,38 @@ const SideBar = connect(
                         this.setLoadingCompetitions(false);
                     })
                     .catch(e => {
-                        console.log("Could not get upcoming competitions", e);
+                        console.error("Could not get upcoming competitions", e);
                         this.setLoadingCompetitions(false);
                     });
             }
         }
 
         handleManualSelection = () => {
-            this.props.updateWcif(defaultWcif);
+            this.props.updateWcif({ ...defaultWcif });
             this.props.updateEditingStatus(false);
+            this.props.updateCompetitionId(null);
         };
 
         handleCompetitionSelection = competitionId => {
-            console.log(competitionId);
+            this.setState({
+                ...this.state,
+                loadingCompetitionInformation: true,
+                competitionId
+            });
+            getCompetitionJson(competitionId)
+                .then(wcif => {
+                    this.setLoadingCompetitionInformation(false);
+                    this.props.updateEditingStatus(true);
+                    this.props.updateWcif(wcif);
+                    this.props.updateCompetitionId(wcif.id);
+                })
+                .catch(e => {
+                    console.error(
+                        "Could not get information for " + competitionId,
+                        e
+                    );
+                    this.setLoadingCompetitionInformation(false);
+                });
         };
 
         logInButton = () => {
@@ -132,6 +156,18 @@ const SideBar = connect(
                     <div className="text-white">
                         <Loading />
                         <p>Loading competitions...</p>
+                    </div>
+                );
+            }
+
+            if (this.state.loadingCompetitionInformation) {
+                return (
+                    <div className="text-white">
+                        <Loading />
+                        <p>
+                            Loading information for {this.state.competitionId}
+                            ...
+                        </p>
                     </div>
                 );
             }

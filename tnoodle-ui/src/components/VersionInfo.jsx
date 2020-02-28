@@ -23,7 +23,7 @@ class VersionInfo extends Component {
                     allowedTnoodleVersions: response.allowed
                 });
             })
-            .catch(e => console.log(e));
+            .catch(e => console.error(e));
 
         fetchRunningVersion()
             .then(response => response.json())
@@ -31,7 +31,7 @@ class VersionInfo extends Component {
                 let { runningVersion, officialBuild } = version;
                 this.setState({ ...this.state, runningVersion, officialBuild });
             })
-            .catch(e => console.log(e));
+            .catch(e => console.error(e));
     }
 
     render() {

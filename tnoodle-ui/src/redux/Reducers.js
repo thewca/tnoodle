@@ -91,5 +91,9 @@ export const Reducer = (store, action) => {
         };
     }
 
+    if (action.type === ActionTypes.UPDATE_COMPETITION_ID) {
+        return { ...store, competitionId: action.payload.competitionId };
+    }
+
     return store || defaultStore;
 };

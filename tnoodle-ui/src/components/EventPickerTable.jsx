@@ -11,7 +11,8 @@ const mapStateToProps = store => ({
     wcif: store.wcif,
     mbld: store.mbld,
     password: store.password,
-    editingDisabled: store.editingDisabled
+    editingDisabled: store.editingDisabled,
+    competitionId: store.competitionId
 });
 
 const BOOTSTRAP_GRID = 12;
@@ -37,7 +38,7 @@ const EventPickerTable = connect(mapStateToProps)(
                     this.setGeneratingScrambles(false);
                     this.setState({ ...this.state, fileZipBlob: blob });
                 })
-                .catch(e => console.log(e));
+                .catch(e => console.error(e));
         };
 
         setGeneratingScrambles = flag => {
@@ -140,7 +141,6 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         render() {
-            console.log(this.props);
             let events = this.props.wcif.events;
             let editingDisabled = this.props.editingDisabled;
 

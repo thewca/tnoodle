@@ -44,3 +44,8 @@ export const updateEditingStatus = flag => ({
     type: ActionTypes.UPDATE_EDITING_STATUS,
     payload: { editingDisabled: flag }
 });
+
+export const updateCompetitionId = competitionId => ({
+    type: ActionTypes.UPDATE_COMPETITION_ID,
+    payload: { competitionId }
+});
