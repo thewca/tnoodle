@@ -30,7 +30,7 @@ object Versions {
     val PROGUARD_GRADLE = PROGUARD
     val WCA_I18N = "0.4.3"
     val GOOGLE_APPENGINE_GRADLE = "2.2.0"
-    val GOOGLE_CLOUD_STORAGE = "1.104.0"
+    val GOOGLE_CLOUD_STORAGE = "1.103.0"
     val TNOODLE_SCRAMBLES = "0.17.0"
     val APACHE_COMMONS_LANG3 = "3.9"
     val KOTLESS_KTOR = KOTLESS
