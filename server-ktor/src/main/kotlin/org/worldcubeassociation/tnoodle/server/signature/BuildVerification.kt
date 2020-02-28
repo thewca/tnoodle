@@ -6,6 +6,7 @@ import java.security.PublicKey
 import java.security.Signature
 import java.security.SignatureException
 import java.security.spec.X509EncodedKeySpec
+import java.util.*
 
 object BuildVerification {
     const val ENCRYPTION_ALGORITHM = "RSA"
@@ -14,7 +15,9 @@ object BuildVerification {
     private const val PUBLIC_KEY_PEM = "/signature/tnoodle_public.pem"
 
     val BUILD_VERIFIED by lazy { checkBuildSignature(PUBLIC_KEY_PEM) }
+
     val PUBLIC_KEY_BYTES = loadPublicKeyBytes(PUBLIC_KEY_PEM)
+    val PUBLIC_KEY_BYTES_BASE64 = PUBLIC_KEY_BYTES?.let { Base64.getEncoder().encodeToString(it) }
 
     private val keyFactory = KeyFactory.getInstance(ENCRYPTION_ALGORITHM)
     private val signatureInstance = Signature.getInstance(SIGNATURE_ALGORITHM)
