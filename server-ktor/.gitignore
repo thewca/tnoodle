@@ -1,1 +1,2 @@
 src/main/resources/signature/*.sign
+src/main/resources/signature/*.pkcs8.pem
