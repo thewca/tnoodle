@@ -13,7 +13,7 @@ object WCIFParser {
 
     fun parsePartial(schedule: String): Competition {
         val parsedSchedule = JsonConfig.SERIALIZER.parse(Schedule.serializer(), schedule)
-        return Competition("1.0", "id", "name", "shortName", emptyList(), parsedSchedule)
+        return Competition("1.0", "id", "name", "shortName", emptyList(), emptyList(), parsedSchedule)
     }
 
     val WCIF_DATE_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME
