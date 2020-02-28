@@ -12,6 +12,8 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension
 object WCIFScrambleMatcher {
     const val ID_PENDING = 0 // FIXME should this be -1?
 
+    // SCRAMBLE SET FILLING -----
+
     suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
         val scrambledEvents = wcif.events.map { e ->
             val scrambledRounds = coroutineScope {
@@ -27,56 +29,13 @@ object WCIFScrambleMatcher {
         return matchActivities(scrambled)
     }
 
-    fun fillScrambleSets(wcif: Competition): Competition {
-        return runBlocking { fillScrambleSetsAsync(wcif) { _, _ -> Unit } }
-    }
+    // helper fn for synchronously running tests
+    fun fillScrambleSets(wcif: Competition) = runBlocking { fillScrambleSetsAsync(wcif) { _, _ -> Unit } }
 
-    fun getScrambleCountsPerEvent(wcif: Competition): Map<String, Int> {
-        return wcif.events.associateWith { it.rounds }
-            .mapValues { (_, rs) ->
-                rs.map { it.scrambleSetCount * scrambleCountPerSet(it) }.sum()
-            }.mapKeys { it.key.id }
-    }
-
-    private fun scrambleCountPerSet(round: Round): Int {
-        val baseCount = if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
-            val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
-                ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
-
-            round.expectedAttemptNum * multiExtCount
-        } else {
-            round.expectedAttemptNum
+    private suspend fun scrambleRound(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): Round {
+        val scrambles = coroutineScope {
+            List(round.scrambleSetCount) { async { generateScrambleSet(round, onUpdate) } }.awaitAll()
         }
-
-        val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
-            ?: defaultExtraCount(round.idCode.eventPlugin)
-
-        return baseCount + extraScrambleNum
-    }
-
-    private fun reindexScrambleSets(events: List<Event>): List<Event> {
-        val indexTable = events.flatMap { it.rounds }
-            .flatMap { it.scrambleSets }
-            .mapIndexed { i, scr -> scr to i + 1 }
-            .toMap()
-
-        return events.map { e ->
-            val reindexedRounds = e.rounds.map { r ->
-                val reindexedScrambleSets = r.scrambleSets.map { s ->
-                    val reIndex = indexTable.getValue(s)
-
-                    s.copy(id = reIndex)
-                }
-
-                r.copy(scrambleSets = reindexedScrambleSets)
-            }
-
-            e.copy(rounds = reindexedRounds)
-        }
-    }
-
-    private fun scrambleRound(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): Round {
-        val scrambles = List(round.scrambleSetCount) { generateScrambleSet(round, onUpdate) }
 
         return round.copy(scrambleSets = scrambles)
     }
@@ -85,33 +44,68 @@ object WCIFScrambleMatcher {
         val puzzle = Event.findPuzzlePlugin(round.idCode.eventId)
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
-        val scrambles = if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
-            val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
-                ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
+        val standardScrambleNum = standardScrambleCountPerSet(round)
 
-            List(round.expectedAttemptNum) {
-                val scrambles = puzzle.generateEfficientScrambles(multiExtCount) { onUpdate(puzzle, it) }
+        val scrambles = if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
+            val countPerAttempt = standardScrambleNum / round.scrambleSetCount
+
+            List(round.expectedAttemptNum) { _ ->
+                val scrambles = puzzle.generateEfficientScrambles(countPerAttempt) { onUpdate(puzzle, it) }
                     .joinToString(Scramble.WCIF_NEWLINE_CHAR)
 
                 Scramble(scrambles)
             }
         } else {
-            puzzle.generateEfficientScrambles(round.expectedAttemptNum) { onUpdate(puzzle, it) }
-                .map { Scramble(it) }
+            puzzle.generateEfficientScrambles(standardScrambleNum) { onUpdate(puzzle, it) }.map(::Scramble)
         }
 
-        val extraScrambleNum = round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
-            ?: defaultExtraCount(round.idCode.eventPlugin)
-        val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum) { onUpdate(puzzle, it) }
-            .map { Scramble(it) }
+        val extraScrambleNum = extraScrambleCountPerSet(round)
+        val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum) { onUpdate(puzzle, it) }.map(::Scramble)
 
         // dummy ID -- indexing happens afterwards
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
     }
 
-    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, EventPlugins>): Competition {
-        return ext.entries.fold(wcif) { acc, e -> installExtensionForEvents(acc, e.key, e.value) }
+    private fun standardScrambleCountPerSet(round: Round): Int {
+        return if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
+            val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
+                ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
+
+            round.expectedAttemptNum * multiExtCount
+        } else {
+            round.expectedAttemptNum
+        }
     }
+
+    private fun extraScrambleCountPerSet(round: Round): Int {
+        return round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
+            ?: defaultExtraCount(round.idCode.eventPlugin)
+    }
+
+    private fun defaultExtraCount(event: EventPlugins?): Int {
+        return when (event) {
+            EventPlugins.THREE_MULTI_BLD, EventPlugins.THREE_FM -> 0
+            else -> 2
+        }
+    }
+
+    // JOB RESULT SCRAMBLE COUNT COMPUTATION -----
+
+    fun getScrambleCountsPerEvent(wcif: Competition): Map<String, Int> {
+        return wcif.events.associateWith { it.rounds }
+            .mapValues { (_, rs) ->
+                rs.map { it.scrambleSetCount * totalScrambleCountPerSet(it) }.sum()
+            }.mapKeys { it.key.id }
+    }
+
+    private fun totalScrambleCountPerSet(round: Round): Int {
+        return standardScrambleCountPerSet(round) + extraScrambleCountPerSet(round)
+    }
+
+    // EXTENSION HANDLING -----
+
+    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, EventPlugins>) =
+        ext.entries.fold(wcif) { acc, e -> installExtensionForEvents(acc, e.key, e.value) }
 
     fun installExtensionForEvents(wcif: Competition, ext: ExtensionBuilder, event: EventPlugins): Competition {
         fun installRoundExtension(e: Event): Event {
@@ -130,43 +124,14 @@ object WCIFScrambleMatcher {
         return wcif.copy(events = extendedEvents)
     }
 
-    private fun defaultExtraCount(event: EventPlugins?): Int {
-        return when (event) {
-            EventPlugins.THREE_MULTI_BLD, EventPlugins.THREE_FM -> 0
-            else -> 2
-        }
-    }
-
-    fun matchActivities(wcif: Competition): Competition {
-        val matchedVenues = wcif.schedule.venues.map { v ->
-            val matchedRooms = v.rooms.map { r ->
-                val matchedActivities = r.activities.map { a ->
-                    matchActivity(a, wcif)
-                }
-
-                r.copy(activities = matchedActivities)
-            }
-
-            v.copy(rooms = matchedRooms)
-        }
-
-        val matchedVenuesWithIndex = reindexActivities(matchedVenues)
-        val matchedSchedule = wcif.schedule.copy(venues = matchedVenuesWithIndex)
-
-        return wcif.copy(schedule = matchedSchedule)
-    }
+    // INDEXING -----
 
     private fun reindexActivities(venues: List<Venue>): List<Venue> {
         val allActivities = venues.flatMap { it.rooms }
             .flatMap { it.activities }
             .flatMap { it.selfAndChildActivities }
 
-        val reindexingActivities = allActivities.filter { it.id == ID_PENDING }
-        val maxAssignedId = (allActivities - reindexingActivities)
-            .maxBy { it.id }?.id ?: 1
-
-        val idIndex = reindexingActivities.mapIndexed { i, act -> act to i + maxAssignedId + 1 }
-            .toMap()
+        val idIndex = buildReindexingMap(allActivities)
 
         return venues.map { v ->
             val matchedRooms = v.rooms.map { r ->
@@ -188,7 +153,56 @@ object WCIFScrambleMatcher {
         return activity.copy(id = reindexId, childActivities = reindexedChildren)
     }
 
-    private fun matchActivity(activity: Activity, wcif: Competition): Activity {
+    private fun reindexScrambleSets(events: List<Event>): List<Event> {
+        val allScrambleSets = events.flatMap { it.rounds }
+            .flatMap { it.scrambleSets }
+
+        val indexTable = buildReindexingMap(allScrambleSets)
+
+        return events.map { e ->
+            val reindexedRounds = e.rounds.map { r ->
+                val reindexedScrambleSets = r.scrambleSets.map { s ->
+                    indexTable[s]?.let { s.copy(id = it) } ?: s
+                }
+
+                r.copy(scrambleSets = reindexedScrambleSets)
+            }
+
+            e.copy(rounds = reindexedRounds)
+        }
+    }
+
+    private fun <T : IndexingIdProvider> buildReindexingMap(candidates: List<T>): Map<T, Int> {
+        val forReindexing = candidates.filter { it.id == ID_PENDING }
+        val maxAssignedId = (candidates - forReindexing)
+            .maxBy { it.id }?.id ?: 1
+
+        return forReindexing.mapIndexed { i, elem -> elem to i + maxAssignedId + 1 }
+            .toMap()
+    }
+
+    // ACTIVITY MATCHING -----
+
+    fun matchActivities(wcif: Competition): Competition {
+        val matchedVenues = wcif.schedule.venues.map { v ->
+            val matchedRooms = v.rooms.map { r ->
+                val matchedActivities = r.activities.map { a ->
+                    matchActivity(a, wcif.events)
+                }
+
+                r.copy(activities = matchedActivities)
+            }
+
+            v.copy(rooms = matchedRooms)
+        }
+
+        val matchedVenuesWithIndex = reindexActivities(matchedVenues)
+        val matchedSchedule = wcif.schedule.copy(venues = matchedVenuesWithIndex)
+
+        return wcif.copy(schedule = matchedSchedule)
+    }
+
+    private fun matchActivity(activity: Activity, events: List<Event>): Activity {
         if (activity.activityCode.eventId in ActivityCode.IGNORABLE_KEYS) {
             return activity
         }
@@ -197,11 +211,11 @@ object WCIFScrambleMatcher {
 
         // we have children that need to be specified!
         if (children.isNotEmpty()) {
-            val matchedChildren = children.map { matchActivity(it, wcif) }
+            val matchedChildren = children.map { matchActivity(it, events) }
             return activity.copy(childActivities = matchedChildren)
         }
 
-        val matchedRound = findRound(wcif, activity)
+        val matchedRound = findRound(events, activity)
         val actGroup = activity.activityCode.groupNumber
 
         // uh oh. no child activities where there should be some.
@@ -233,8 +247,8 @@ object WCIFScrambleMatcher {
         return activity.copy(scrambleSetId = scrambleSet.id)
     }
 
-    private fun findRound(wcif: Competition, activity: Activity): Round {
-        return wcif.events
+    private fun findRound(events: List<Event>, activity: Activity): Round {
+        return events
             .filter { it.id == activity.activityCode.eventId }
             .flatMap { it.rounds }
             .find { it.idCode.isParentOf(activity.activityCode) }
