@@ -4,52 +4,41 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import org.worldcubeassociation.tnoodle.server.signature.SymmetricCipher
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
-import java.util.*
 import javax.crypto.Cipher
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.PBEKeySpec
-import javax.crypto.spec.SecretKeySpec
 
 object WCIFScrambleMatcher {
     const val ID_PENDING = 0 // FIXME should this be -1?
 
     // SCRAMBLE SET FILLING -----
-    const val CIPHER_ALGORITHM = "AES"
-    const val CIPHER_SALT = "TNOODLE_WCIF"
-    const val CIPHER_KEY_ITERATIONS = 65536
-    const val CIPHER_KEY_LENGTH = 256
-
-    val CIPHER_CHARSET = Charsets.UTF_8
-
-    val CIPHER_KEY_FACTORY = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-
     fun encryptScrambleSets(wcif: Competition, password: String): Competition {
-        return cryptScrambleSets(wcif, password, Cipher.ENCRYPT_MODE, WCIFScrambleMatcher::applyCipherEncrypt)
+        return cryptScrambleSets(wcif, password, Cipher.ENCRYPT_MODE, SymmetricCipher::applyCipherEncrypt)
     }
 
     fun decryptScrambleSets(wcif: Competition, password: String): Competition {
-        return cryptScrambleSets(wcif, password, Cipher.DECRYPT_MODE, WCIFScrambleMatcher::applyCipherDecrypt)
+        return cryptScrambleSets(wcif, password, Cipher.DECRYPT_MODE, SymmetricCipher::applyCipherDecrypt)
     }
 
-    private fun cryptScrambleSets(wcif: Competition, password: String, cipherOpMode: Int, cipherMethod: (List<Scramble>, Cipher) -> List<Scramble>): Competition {
-        val cipherKey = generateKey(password)
+    private fun cryptScrambleSets(wcif: Competition, password: String, cipherOpMode: Int, cipherMethod: (Cipher, String) -> String): Competition {
+        val cipherKey = SymmetricCipher.generateKey(password)
 
-        val cipherInstance = Cipher.getInstance(CIPHER_ALGORITHM)
+        val initedCipherInstance = SymmetricCipher.CIPHER_INSTANCE
             .apply { init(cipherOpMode, cipherKey) }
+
+        fun applyCipherToScrambles(scrambles: List<Scramble>, cipherFn: (String) -> String) =
+            scrambles.map { it.copy(scrambleString = cipherFn(it.scrambleString)) }
 
         val scrambledEvents = wcif.events.map { e ->
             val scrambledRounds = e.rounds.map { r ->
                 val cryptedSets = r.scrambleSets.map { scr ->
-                    val cryptedStdScrambles = cipherMethod(scr.scrambles, cipherInstance)
-                    val cryptedExtraScrambles = cipherMethod(scr.extraScrambles, cipherInstance)
+                    val cryptedStdScrambles = applyCipherToScrambles(scr.scrambles) { cipherMethod(initedCipherInstance, it) }
+                    val cryptedExtraScrambles = applyCipherToScrambles(scr.extraScrambles) { cipherMethod(initedCipherInstance, it) }
 
                     scr.copy(scrambles = cryptedStdScrambles, extraScrambles = cryptedExtraScrambles)
                 }
@@ -61,36 +50,6 @@ object WCIFScrambleMatcher {
         }
 
         return wcif.copy(events = scrambledEvents)
-    }
-
-    private fun applyCipherEncrypt(scrambles: List<Scramble>, cipher: Cipher): List<Scramble> {
-        return scrambles.map {
-            val contentBytes = it.scrambleString.toByteArray(CIPHER_CHARSET)
-
-            val cipherContent = cipher.doFinal(contentBytes)
-            val cipherString = Base64.getEncoder().encodeToString(cipherContent)
-
-            it.copy(scrambleString = cipherString)
-        }
-    }
-
-    private fun applyCipherDecrypt(scrambles: List<Scramble>, cipher: Cipher): List<Scramble> {
-        return scrambles.map {
-            val contentBytes = Base64.getDecoder().decode(it.scrambleString)
-
-            val cipherContent = cipher.doFinal(contentBytes)
-            val cipherString = cipherContent.toString(CIPHER_CHARSET)
-
-            it.copy(scrambleString = cipherString)
-        }
-    }
-
-    private fun generateKey(password: String): SecretKey {
-        val saltBytes = CIPHER_SALT.toByteArray(CIPHER_CHARSET)
-        val spec = PBEKeySpec(password.toCharArray(), saltBytes, CIPHER_KEY_ITERATIONS, CIPHER_KEY_LENGTH)
-
-        val key = CIPHER_KEY_FACTORY.generateSecret(spec)
-        return SecretKeySpec(key.encoded, CIPHER_ALGORITHM)
     }
 
     suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
