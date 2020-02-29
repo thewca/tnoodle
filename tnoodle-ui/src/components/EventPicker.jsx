@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Select from "react-select";
 import { connect } from "react-redux";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
@@ -101,6 +102,7 @@ const EventPicker = connect(
 
         // When mbld loses focus
         verifyMbld = () => {
+            // TODO search for the best result and warn if someone selects less mbld than this.
             let mbld = this.state.mbld;
             if (mbld < MBLD_MIN) {
                 mbld = MBLD_MIN;
@@ -239,20 +241,20 @@ const EventPicker = connect(
             );
             let rounds = wcaEvent != null ? wcaEvent.rounds : [];
             let { event } = this.props;
-            let options = [
-                { text: "Rounds", value: 0, disabled: false },
-                { text: "────────", disabled: true }
-            ];
-            Array.from({ length: MAX_WCA_ROUNDS }).forEach((_, i) => {
-                options.push({
-                    text: i + 1 + " Round" + (i > 0 ? "s" : ""),
-                    value: i + 1,
-                    disabled: false
-                });
-            });
 
             let styleFirstTwoColumns = { width: "10%" };
             let styleLastTwoColumns = { width: "40%" };
+
+            let disabled = this.props.editingDisabled;
+
+            const options = [
+                { value: 0, label: "Rounds" },
+                { label: "────────", isDisabled: true },
+                ...Array.from({ length: MAX_WCA_ROUNDS }).map((_, i) => ({
+                    label: i + 1 + " Round" + (i > 0 ? "s" : ""),
+                    value: i + 1
+                }))
+            ];
 
             return (
                 <table className="table table-sm m-0 shadow rounded">
@@ -274,30 +276,18 @@ const EventPicker = connect(
                                 </h5>
                             </th>
                             <th style={styleLastTwoColumns} scope="col">
-                                <select
+                                <Select
+                                    defaultValue={options[rounds.length]}
+                                    options={options}
+                                    isDisabled={disabled ? "disabled" : ""}
+                                    className="text-dark"
                                     onChange={evt =>
                                         this.handleNumberOfRoundsChange(
                                             rounds,
-                                            evt.target.value
+                                            evt.value
                                         )
                                     }
-                                    defaultValue={rounds.length}
-                                    disabled={
-                                        this.props.editingDisabled
-                                            ? "disabled"
-                                            : ""
-                                    }
-                                >
-                                    {options.map(op => (
-                                        <option
-                                            value={op.value}
-                                            disabled={op.disabled}
-                                            key={op.text}
-                                        >
-                                            {op.text}
-                                        </option>
-                                    ))}
-                                </select>
+                                />
                             </th>
                         </tr>
                         {this.maybeShowTableTitles(rounds)}
