@@ -5,7 +5,6 @@ import { WCA_EVENTS } from "../constants/wca.constants";
 import { fetchZip } from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
 import EventPicker from "./EventPicker";
-import VersionInfo from "./VersionInfo";
 
 const mapStateToProps = store => ({
     wcif: store.wcif,
@@ -160,7 +159,6 @@ const EventPickerTable = connect(mapStateToProps)(
                 EVENTS_PER_LINE}`;
             return (
                 <div className="container-fluid">
-                    <VersionInfo />
                     {this.maybeShowEditWarning()}
                     {eventChunks.map((chunk, i) => {
                         return (

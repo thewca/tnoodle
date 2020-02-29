@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import EntryInterface from "./components/EntryInterface";
 import EventPickerTable from "./components/EventPickerTable";
-
-import "bootstrap/dist/css/bootstrap.css";
-
-import "./App.css";
 import SideBar from "./components/SideBar";
+import VersionInfo from "./components/VersionInfo";
+import "bootstrap/dist/css/bootstrap.css";
+import "./App.css";
 
 class App extends Component {
     render() {
@@ -17,6 +16,7 @@ class App extends Component {
                             <SideBar />
                         </div>
                         <div className="col-9">
+                            <VersionInfo />
                             <EntryInterface />
                             <EventPickerTable />
                         </div>
