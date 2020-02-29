@@ -67,8 +67,8 @@ const SideBar = connect(
         };
 
         componentDidMount() {
-            this.setLoadingUser(true);
             if (this.state.me == null && isLogged()) {
+                this.setLoadingUser(true);
                 fetchMe()
                     .then(me => {
                         this.setState({ ...this.state, me });
@@ -129,7 +129,7 @@ const SideBar = connect(
 
         logInButton = () => {
             return (
-                <li className="pt-3">
+                <li className="pt-2">
                     <button
                         type="button"
                         className="btn btn-light btn-lg btn-block btn-outline-secondary"
@@ -188,7 +188,7 @@ const SideBar = connect(
                         <li>
                             <button
                                 type="button"
-                                className="btn btn-dark btn-lg btn-block btn-outline-light"
+                                className="btn btn-dark btn-lg btn-block btn-outline-light mb-2"
                                 onClick={this.handleManualSelection}
                             >
                                 Manual Selection
