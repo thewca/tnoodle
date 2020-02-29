@@ -249,7 +249,6 @@ const EventPicker = connect(
 
             const options = [
                 { value: 0, label: "Rounds" },
-                { label: "────────", isDisabled: true },
                 ...Array.from({ length: MAX_WCA_ROUNDS }).map((_, i) => ({
                     label: i + 1 + " Round" + (i > 0 ? "s" : ""),
                     value: i + 1
@@ -277,7 +276,7 @@ const EventPicker = connect(
                             </th>
                             <th style={styleLastTwoColumns} scope="col">
                                 <Select
-                                    defaultValue={options[rounds.length]}
+                                    inputValue={options[rounds.length].label}
                                     options={options}
                                     isDisabled={disabled ? "disabled" : ""}
                                     className="text-dark"
