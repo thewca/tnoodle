@@ -7,7 +7,8 @@ import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
     mbld: store.mbld,
-    editingDisabled: store.editingDisabled
+    editingDisabled: store.editingDisabled,
+    wcif: store.wcif
 });
 
 const mapDispatchToProps = {
@@ -25,23 +26,13 @@ const EventPicker = connect(
 
             this.setBlobNull = props.setBlobNull;
 
-            // State wcif like
-            let wcifEvent = props.wcifEvent || { rounds: [] };
-
-            // If we ever support copies on the website, we can dismiss this
-            wcifEvent.rounds.forEach(round => (round.copies = 1));
-
             this.state = {
-                id: props.event.id,
-                rounds: wcifEvent.rounds,
-                disabled: props.editingDisabled
+                id: props.event.id
             };
 
             if (this.state.id === "333mbf") {
                 this.state.mbld = props.mbld;
             }
-
-            updateWcaEvent(this.state);
         }
 
         handleNumberOfRoundsChange = evt => {
@@ -119,8 +110,8 @@ const EventPicker = connect(
             }
         };
 
-        maybeShowMbld = () => {
-            if (this.state.id === "333mbf" && this.state.rounds.length > 0) {
+        maybeShowMbld = rounds => {
+            if (this.state.id === "333mbf" && rounds.length > 0) {
                 return (
                     <tfoot>
                         <tr>
@@ -149,8 +140,8 @@ const EventPicker = connect(
             }
         };
 
-        maybeShowTableTitles = () => {
-            if (this.state.rounds.length === 0) {
+        maybeShowTableTitles = rounds => {
+            if (rounds.length === 0) {
                 return null;
             }
             return (
@@ -163,94 +154,89 @@ const EventPicker = connect(
             );
         };
 
-        maybeShowTableBody = event => {
-            if (this.state.rounds.length === 0) {
+        maybeShowTableBody = (event, rounds) => {
+            if (rounds.length === 0) {
                 return;
             }
             return (
                 <tbody>
-                    {Array.from(
-                        { length: this.state.rounds.length },
-                        (_, i) => {
-                            return (
-                                <tr key={i} className="form-group">
-                                    <th scope="row" className="align-middle">
-                                        {i + 1}
-                                    </th>
-                                    <td className="align-middle">
-                                        <select
-                                            onChange={evt =>
-                                                this.roundFormatChanged(
-                                                    i,
-                                                    evt.target.value
-                                                )
-                                            }
-                                            disabled={
-                                                this.state.disabled
-                                                    ? "disabled"
-                                                    : ""
-                                            }
-                                        >
-                                            {event.format_ids.map(format => (
-                                                <option
-                                                    key={format}
-                                                    value={format}
-                                                >
-                                                    {this.abbreviate(format)}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input
-                                            className="form-control"
-                                            type="number"
-                                            value={
-                                                this.state.rounds[i]
-                                                    .scrambleSetCount
-                                            }
-                                            onChange={evt =>
-                                                this.handleNumberOfScrambleSetsChange(
-                                                    i,
-                                                    Number(evt.target.value)
-                                                )
-                                            }
-                                            min={1}
-                                            disabled={
-                                                this.state.disabled
-                                                    ? "disabled"
-                                                    : ""
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            className="form-control"
-                                            type="number"
-                                            value={this.state.rounds[i].copies}
-                                            onChange={evt =>
-                                                this.handleNumberOfCopiesChange(
-                                                    i,
-                                                    Number(evt.target.value)
-                                                )
-                                            }
-                                            min={1}
-                                            disabled={
-                                                this.state.disabled
-                                                    ? "disabled"
-                                                    : ""
-                                            }
-                                        />
-                                    </td>
-                                </tr>
-                            );
-                        }
-                    )}
+                    {Array.from({ length: rounds.length }, (_, i) => {
+                        return (
+                            <tr key={i} className="form-group">
+                                <th scope="row" className="align-middle">
+                                    {i + 1}
+                                </th>
+                                <td className="align-middle">
+                                    <select
+                                        onChange={evt =>
+                                            this.roundFormatChanged(
+                                                i,
+                                                evt.target.value
+                                            )
+                                        }
+                                        disabled={
+                                            this.props.editingDisabled
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    >
+                                        {event.format_ids.map(format => (
+                                            <option key={format} value={format}>
+                                                {this.abbreviate(format)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input
+                                        className="form-control"
+                                        type="number"
+                                        value={rounds[i].scrambleSetCount}
+                                        onChange={evt =>
+                                            this.handleNumberOfScrambleSetsChange(
+                                                i,
+                                                Number(evt.target.value)
+                                            )
+                                        }
+                                        min={1}
+                                        disabled={
+                                            this.props.editingDisabled
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        className="form-control"
+                                        type="number"
+                                        value={rounds[i].copies}
+                                        onChange={evt =>
+                                            this.handleNumberOfCopiesChange(
+                                                i,
+                                                Number(evt.target.value)
+                                            )
+                                        }
+                                        min={1}
+                                        disabled={
+                                            this.props.editingDisabled
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    />
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             );
         };
 
         render() {
+            let wcaEvent = this.props.wcif.events.find(
+                event => event.id === this.state.id
+            );
+            let rounds = wcaEvent != null ? wcaEvent.rounds : [];
             let { event } = this.props;
             let options = [
                 { text: "Rounds", value: 0, disabled: false },
@@ -272,7 +258,7 @@ const EventPicker = connect(
                     <thead>
                         <tr
                             className={
-                                this.state.rounds.length === 0
+                                rounds.length === 0
                                     ? "bg-secondary text-white"
                                     : "thead-light"
                             }
@@ -289,10 +275,11 @@ const EventPicker = connect(
                             <th style={styleLastTwoColumns} scope="col">
                                 <select
                                     onChange={this.handleNumberOfRoundsChange}
-                                    id={event.id}
-                                    defaultValue={this.state.rounds.length}
+                                    defaultValue={rounds.length}
                                     disabled={
-                                        this.state.disabled ? "disabled" : ""
+                                        this.props.editingDisabled
+                                            ? "disabled"
+                                            : ""
                                     }
                                 >
                                     {options.map(op => (
@@ -307,10 +294,10 @@ const EventPicker = connect(
                                 </select>
                             </th>
                         </tr>
-                        {this.maybeShowTableTitles()}
+                        {this.maybeShowTableTitles(rounds)}
                     </thead>
-                    {this.maybeShowTableBody(event)}
-                    {this.maybeShowMbld()}
+                    {this.maybeShowTableBody(event, rounds)}
+                    {this.maybeShowMbld(rounds)}
                 </table>
             );
         }
