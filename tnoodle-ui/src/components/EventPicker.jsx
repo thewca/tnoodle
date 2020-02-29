@@ -35,10 +35,12 @@ const EventPicker = connect(
             }
         }
 
-        handleNumberOfRoundsChange = evt => {
-            let numberOfRounds = Number(evt.target.value);
-            let state = this.state;
-            let rounds = state.rounds;
+        getWcaEvent = rounds => {
+            return { id: this.state.id, rounds };
+        };
+
+        handleNumberOfRoundsChange = (rounds, value) => {
+            let numberOfRounds = Number(value);
 
             // Ajust the number of rounds in case we have to remove
             while (rounds.length > numberOfRounds) {
@@ -46,54 +48,50 @@ const EventPicker = connect(
             }
 
             // case we have to add
-            let event = this.state.id;
+            let eventId = this.state.id;
             while (rounds.length < numberOfRounds) {
                 rounds.push({
-                    id: event + "-r" + (rounds.length + 1),
+                    id: eventId + "-r" + (rounds.length + 1),
                     format: this.props.event.format_ids[0],
                     scrambleSetCount: 1,
                     copies: 1
                 });
             }
-            state.rounds = rounds;
-            this.setState(state);
-            this.updateEvent();
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
-        handleNumberOfScrambleSetsChange = (round, value) => {
+        handleNumberOfScrambleSetsChange = (round, value, rounds) => {
             if (value < 1) {
                 return;
             }
-            let state = this.state;
-            state.rounds[round].scrambleSetCount = Number(value);
-            this.setState(state);
-            this.updateEvent();
+            rounds[round].scrambleSetCount = Number(value);
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
-        roundFormatChanged = (round, value) => {
-            let state = this.state;
-            state.rounds[round].format = value;
-            this.setState(state);
-            this.updateEvent();
+        handleRoundFormatChanged = (round, value, rounds) => {
+            rounds[round].format = value;
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
-        handleNumberOfCopiesChange = (round, value) => {
+        handleNumberOfCopiesChange = (round, value, rounds) => {
             if (value < 1) {
                 return;
             }
-            let state = this.state;
-            state.rounds[round].copies = value;
-            this.setState(state);
-            this.updateEvent();
+            rounds[round].copies = value;
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
         abbreviate = str => {
             return FORMATS[str].shortName;
         };
 
-        updateEvent = () => {
-            this.props.updateWcaEvent(this.state);
+        updateEvent = wcaEvent => {
             this.setBlobNull();
+            this.props.updateWcaEvent(wcaEvent);
         };
 
         handleMbldChange = mbld => {
@@ -169,9 +167,10 @@ const EventPicker = connect(
                                 <td className="align-middle">
                                     <select
                                         onChange={evt =>
-                                            this.roundFormatChanged(
+                                            this.handleRoundFormatChanged(
                                                 i,
-                                                evt.target.value
+                                                evt.target.value,
+                                                rounds
                                             )
                                         }
                                         disabled={
@@ -195,7 +194,8 @@ const EventPicker = connect(
                                         onChange={evt =>
                                             this.handleNumberOfScrambleSetsChange(
                                                 i,
-                                                Number(evt.target.value)
+                                                Number(evt.target.value),
+                                                rounds
                                             )
                                         }
                                         min={1}
@@ -214,7 +214,8 @@ const EventPicker = connect(
                                         onChange={evt =>
                                             this.handleNumberOfCopiesChange(
                                                 i,
-                                                Number(evt.target.value)
+                                                Number(evt.target.value),
+                                                rounds
                                             )
                                         }
                                         min={1}
@@ -274,7 +275,12 @@ const EventPicker = connect(
                             </th>
                             <th style={styleLastTwoColumns} scope="col">
                                 <select
-                                    onChange={this.handleNumberOfRoundsChange}
+                                    onChange={evt =>
+                                        this.handleNumberOfRoundsChange(
+                                            rounds,
+                                            evt.target.value
+                                        )
+                                    }
                                     defaultValue={rounds.length}
                                     disabled={
                                         this.props.editingDisabled
