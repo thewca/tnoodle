@@ -248,6 +248,8 @@ const EventPicker = connect(
             let styleFirstTwoColumns = { width: "10%" };
             let styleLastTwoColumns = { width: "40%" };
 
+            let disabled = this.props.editingDisabled;
+
             return (
                 <table className="table table-sm m-0 shadow rounded">
                     <thead>
@@ -281,6 +283,7 @@ const EventPicker = connect(
                                     }
                                     min={0}
                                     max={MAX_WCA_ROUNDS}
+                                    disabled={disabled ? "disabled" : ""}
                                 />
                             </th>
                         </tr>

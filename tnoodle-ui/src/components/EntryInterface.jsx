@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { updatePassword, updateCompetitionName } from "../redux/ActionCreators";
 import { connect } from "react-redux";
+import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 const mapStateToProps = store => ({
     editingDisabled: store.editingDisabled,
@@ -27,10 +28,9 @@ const EntryInterface = connect(
             };
         }
 
-        componentDidMount = function() {
-            //this.props.updateCompetitionName(this.state.competitionName);
-            //this.props.updatePassword(this.state.password);
-        };
+        componentDidMount() {
+            this.props.updateCompetitionName(getDefaultCompetitionName());
+        }
 
         handleCompetitionNameChange = event => {
             this.props.updateCompetitionName(event.target.value);

@@ -18,6 +18,7 @@ import {
     getUpcomingManageableCompetitions,
     getCompetitionJson
 } from "../api/wca.api";
+import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 const mapStateToProps = store => ({
     me: store.me,
@@ -99,15 +100,11 @@ const SideBar = connect(
             }
         }
 
-        getDefaultCompetitionName = () => {
-            return "Scrambles for" + new Date();
-        };
-
         handleManualSelection = () => {
             this.props.updateEditingStatus(false);
             this.props.updateCompetitionId(null);
-            this.props.updateCompetitionName(this.getDefaultCompetitionName());
             this.props.updateWcif({ ...defaultWcif });
+            this.props.updateCompetitionName(getDefaultCompetitionName());
         };
 
         handleCompetitionSelection = competitionId => {
@@ -120,9 +117,9 @@ const SideBar = connect(
                 .then(wcif => {
                     this.setLoadingCompetitionInformation(false);
                     this.props.updateEditingStatus(true);
+                    this.props.updateWcif(wcif);
                     this.props.updateCompetitionId(wcif.id);
                     this.props.updateCompetitionName(wcif.name);
-                    this.props.updateWcif(wcif);
                 })
                 .catch(e => {
                     console.error(

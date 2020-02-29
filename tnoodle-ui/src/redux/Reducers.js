@@ -1,6 +1,10 @@
 import { ActionTypes } from "./Types";
 import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
+import {
+    competitionName2Id,
+    competitionName2ShortName
+} from "../util/competition.name.util";
 
 const defaultStore = {
     wcif: defaultWcif,
@@ -33,13 +37,14 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_COMPETITION_NAME) {
         let competitionName = action.payload.competitionName;
-        let id = competitionName.replace(/[\W]/gi, "");
+        let shortName = competitionName2ShortName(competitionName);
+        let id = competitionName2Id(competitionName);
         return {
             ...store,
             wcif: {
                 ...store.wcif,
                 name: competitionName,
-                shortName: competitionName,
+                shortName: shortName,
                 id: id
             }
         };
