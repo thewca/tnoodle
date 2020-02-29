@@ -99,10 +99,15 @@ const SideBar = connect(
             }
         }
 
+        getDefaultCompetitionName = () => {
+            return "Scrambles for" + new Date();
+        };
+
         handleManualSelection = () => {
-            this.props.updateWcif({ ...defaultWcif });
             this.props.updateEditingStatus(false);
             this.props.updateCompetitionId(null);
+            this.props.updateCompetitionName(this.getDefaultCompetitionName());
+            this.props.updateWcif({ ...defaultWcif });
         };
 
         handleCompetitionSelection = competitionId => {
@@ -115,8 +120,9 @@ const SideBar = connect(
                 .then(wcif => {
                     this.setLoadingCompetitionInformation(false);
                     this.props.updateEditingStatus(true);
-                    this.props.updateWcif(wcif);
                     this.props.updateCompetitionId(wcif.id);
+                    this.props.updateCompetitionName(wcif.name);
+                    this.props.updateWcif(wcif);
                 })
                 .catch(e => {
                     console.error(

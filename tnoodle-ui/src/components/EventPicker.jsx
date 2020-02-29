@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import Select from "react-select";
 import { connect } from "react-redux";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
@@ -42,6 +41,10 @@ const EventPicker = connect(
 
         handleNumberOfRoundsChange = (rounds, value) => {
             let numberOfRounds = Number(value);
+
+            if (numberOfRounds < 0 || numberOfRounds > MAX_WCA_ROUNDS) {
+                return;
+            }
 
             // Ajust the number of rounds in case we have to remove
             while (rounds.length > numberOfRounds) {
@@ -245,16 +248,6 @@ const EventPicker = connect(
             let styleFirstTwoColumns = { width: "10%" };
             let styleLastTwoColumns = { width: "40%" };
 
-            let disabled = this.props.editingDisabled;
-
-            const options = [
-                { value: 0, label: "Rounds" },
-                ...Array.from({ length: MAX_WCA_ROUNDS }).map((_, i) => ({
-                    label: i + 1 + " Round" + (i > 0 ? "s" : ""),
-                    value: i + 1
-                }))
-            ];
-
             return (
                 <table className="table table-sm m-0 shadow rounded">
                     <thead>
@@ -275,17 +268,19 @@ const EventPicker = connect(
                                 </h5>
                             </th>
                             <th style={styleLastTwoColumns} scope="col">
-                                <Select
-                                    inputValue={options[rounds.length].label}
-                                    options={options}
-                                    isDisabled={disabled ? "disabled" : ""}
-                                    className="text-dark"
+                                <label>Rounds</label>
+                                <input
+                                    className="bg-light form-control"
+                                    type="number"
+                                    value={rounds.length}
                                     onChange={evt =>
                                         this.handleNumberOfRoundsChange(
                                             rounds,
-                                            evt.value
+                                            Number(evt.target.value)
                                         )
                                     }
+                                    min={0}
+                                    max={MAX_WCA_ROUNDS}
                                 />
                             </th>
                         </tr>

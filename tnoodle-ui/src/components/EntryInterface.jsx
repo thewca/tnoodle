@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
 const mapStateToProps = store => ({
     editingDisabled: store.editingDisabled,
-    competitionName: store.competitionName
+    competitionName: store.wcif.name
 });
 
 const mapDispatchToProps = {
@@ -22,24 +22,18 @@ const EntryInterface = connect(
 
             this.state = {
                 editingDisabled: props.editingDisabled,
-                competitionName: props.competitionName || "",
                 password: "",
                 showPassword: false
             };
         }
 
         componentDidMount = function() {
-            this.props.updateCompetitionName(this.state.competitionName);
-            this.props.updatePassword(this.state.password);
+            //this.props.updateCompetitionName(this.state.competitionName);
+            //this.props.updatePassword(this.state.password);
         };
 
         handleCompetitionNameChange = event => {
-            let state = this.state;
-            state.competitionName = event.target.value;
-            this.setState(state);
-
-            // Propagate the change.
-            this.props.updateCompetitionName(this.state.competitionName);
+            this.props.updateCompetitionName(event.target.value);
         };
 
         handlePasswordChange = event => {
@@ -57,6 +51,8 @@ const EntryInterface = connect(
         };
 
         render() {
+            let competitionName = this.props.competitionName;
+            let disabled = this.props.editingDisabled;
             return (
                 <div className="container mt-2">
                     <div className="row">
@@ -68,8 +64,8 @@ const EntryInterface = connect(
                                 className="form-control"
                                 placeholder="Competition Name"
                                 onChange={this.handleCompetitionNameChange}
-                                value={this.state.competitionName}
-                                disabled={this.state.disabled ? "disabled" : ""}
+                                value={competitionName}
+                                disabled={disabled ? "disabled" : ""}
                             />
                         </div>
 
