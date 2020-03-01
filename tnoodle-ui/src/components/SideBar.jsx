@@ -140,6 +140,11 @@ const SideBar = connect(
                     >
                         {isLogged() ? "Log Out" : "Log In"}
                     </button>
+                    {this.state.me != null && (
+                        <p className="text-white">
+                            Welcome, {this.state.me.name}
+                        </p>
+                    )}
                 </li>
             );
         };
