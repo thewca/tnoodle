@@ -1,5 +1,9 @@
 import React, { Component } from "react";
-import { updatePassword, updateCompetitionName } from "../redux/ActionCreators";
+import {
+    updatePassword,
+    updateCompetitionName,
+    updateFileZipBlob
+} from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
@@ -10,7 +14,8 @@ const mapStateToProps = store => ({
 
 const mapDispatchToProps = {
     updatePassword,
-    updateCompetitionName
+    updateCompetitionName,
+    updateFileZipBlob
 };
 
 const EntryInterface = connect(
@@ -34,6 +39,9 @@ const EntryInterface = connect(
 
         handleCompetitionNameChange = event => {
             this.props.updateCompetitionName(event.target.value);
+
+            // Require another zip with the new name.
+            this.props.updateFileZipBlob(null);
         };
 
         handlePasswordChange = event => {
@@ -42,6 +50,9 @@ const EntryInterface = connect(
             this.setState(state);
 
             this.props.updatePassword(this.state.password);
+
+            // Require another zip with the new password, in case there was a zip generated.
+            this.props.updateFileZipBlob(null);
         };
 
         toogleShowPassword = () => {

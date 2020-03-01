@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
 import { fetchZip } from "../api/tnoodle.api";
 import { toWcaUrl, isUsingStaging } from "../api/wca.api";
+import { updateFileZipBlob } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
 
 const mapStateToProps = store => ({
@@ -12,17 +13,23 @@ const mapStateToProps = store => ({
     password: store.password,
     editingDisabled: store.editingDisabled,
     competitionId: store.competitionId,
-    officialZip: store.officialZip
+    officialZip: store.officialZip,
+    fileZipBlob: store.fileZipBlob
 });
+
+const mapDispatchToProps = { updateFileZipBlob };
 
 const BOOTSTRAP_GRID = 12;
 const EVENTS_PER_LINE = 2;
 
-const EventPickerTable = connect(mapStateToProps)(
+const EventPickerTable = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(
     class extends Component {
         constructor(props) {
             super(props);
-            this.state = { fileZipBlob: null, generatingScrambles: false };
+            this.state = { generatingScrambles: false };
         }
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
@@ -36,7 +43,7 @@ const EventPickerTable = connect(mapStateToProps)(
                 })
                 .then(blob => {
                     this.setGeneratingScrambles(false);
-                    this.setState({ ...this.state, fileZipBlob: blob });
+                    this.props.updateFileZipBlob(blob);
                 })
                 .catch(e => console.error(e));
         };
@@ -60,7 +67,7 @@ const EventPickerTable = connect(mapStateToProps)(
                 ".zip";
 
             const link = document.createElement("a");
-            link.href = URL.createObjectURL(this.state.fileZipBlob);
+            link.href = URL.createObjectURL(this.props.fileZipBlob);
             link.download = fileName;
             link.target = "_blank";
             link.setAttribute("type", "hidden");
@@ -114,7 +121,7 @@ const EventPickerTable = connect(mapStateToProps)(
                     </button>
                 );
             }
-            if (this.state.fileZipBlob != null) {
+            if (this.props.fileZipBlob != null) {
                 return (
                     <button
                         className="btn btn-primary btn-lg"
@@ -139,15 +146,6 @@ const EventPickerTable = connect(mapStateToProps)(
                     Generate Scrambles
                 </button>
             );
-        };
-
-        /**
-         * When user change some event, we reset blob.
-         * If the user generate a scramble and then change some event,
-         * this allow generating other set of scrambles.
-         */
-        setBlobNull = () => {
-            this.setState({ ...this.state, fileZipBlob: null });
         };
 
         render() {

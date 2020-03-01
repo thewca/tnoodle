@@ -54,3 +54,13 @@ export const updateOfficialZipStatus = flag => ({
     type: ActionTypes.UPDATE_OFFICIAL_ZIP_STATUS,
     payload: { officialZip: flag }
 });
+
+/**
+ * When user change some event, we reset blob.
+ * If the user generate a scramble and then change some event,
+ * this allow generating other set of scrambles.
+ */
+export const updateFileZipBlob = fileZipBlob => ({
+    type: ActionTypes.UPDATE_FILE_ZIP_BLOB,
+    payload: { fileZipBlob: fileZipBlob }
+});

@@ -11,7 +11,8 @@ const defaultStore = {
     mbld: MBLD_DEFAULT,
     password: "",
     editingDisabled: false,
-    officialZip: true
+    officialZip: true,
+    fileZipBlob: null
 };
 
 export const Reducer = (store, action) => {
@@ -103,6 +104,10 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_OFFICIAL_ZIP_STATUS) {
         return { ...store, officialZip: action.payload.officialZip };
+    }
+
+    if (action.type === ActionTypes.UPDATE_FILE_ZIP_BLOB) {
+        return { ...store, fileZipBlob: action.payload.fileZipBlob };
     }
 
     return store || defaultStore;

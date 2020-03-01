@@ -7,7 +7,8 @@ import {
     updateCompetitionName,
     updateCompetitions,
     updateMe,
-    updateCompetitionId
+    updateCompetitionId,
+    updateFileZipBlob
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -31,7 +32,8 @@ const mapDispatchToProps = {
     updateCompetitionName,
     updateCompetitions,
     updateMe,
-    updateCompetitionId
+    updateCompetitionId,
+    updateFileZipBlob
 };
 
 const SideBar = connect(
@@ -105,6 +107,7 @@ const SideBar = connect(
             this.props.updateCompetitionId(null);
             this.props.updateWcif({ ...defaultWcif });
             this.props.updateCompetitionName(getDefaultCompetitionName());
+            this.props.updateFileZipBlob(null);
         };
 
         handleCompetitionSelection = competitionId => {
@@ -120,6 +123,7 @@ const SideBar = connect(
                     this.props.updateWcif(wcif);
                     this.props.updateCompetitionId(wcif.id);
                     this.props.updateCompetitionName(wcif.name);
+                    this.props.updateFileZipBlob(null);
                 })
                 .catch(e => {
                     console.error(

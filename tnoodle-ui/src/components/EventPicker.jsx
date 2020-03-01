@@ -2,7 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
-import { updateWcaEvent, updateMbld } from "../redux/ActionCreators";
+import {
+    updateWcaEvent,
+    updateMbld,
+    updateFileZipBlob
+} from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
@@ -12,8 +16,9 @@ const mapStateToProps = store => ({
 });
 
 const mapDispatchToProps = {
-    updateWcaEvent: updateWcaEvent,
-    updateMbld: updateMbld
+    updateWcaEvent,
+    updateMbld,
+    updateFileZipBlob
 };
 
 const EventPicker = connect(
@@ -23,8 +28,6 @@ const EventPicker = connect(
     class extends Component {
         constructor(props) {
             super(props);
-
-            this.setBlobNull = props.setBlobNull;
 
             this.state = {
                 id: props.event.id
@@ -94,7 +97,7 @@ const EventPicker = connect(
         };
 
         updateEvent = wcaEvent => {
-            this.setBlobNull();
+            this.props.updateFileZipBlob(null);
             this.props.updateWcaEvent(wcaEvent);
         };
 
