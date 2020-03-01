@@ -1,60 +1,64 @@
 .App {
-  text-align: center;
-  font-family: Helvetica, Tahoma, Arial;
+    text-align: center;
+    font-family: Helvetica, Tahoma, Arial;
 }
 
 .tnoodle-logo {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .tnoodle-logo {
-    animation: tnoodle-logo-spin 3 0.9s ease;
-  }
+    .tnoodle-logo {
+        animation: tnoodle-logo-spin 3 0.9s ease;
+    }
 }
 
 #header {
-  background-color: #282c34;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 @keyframes tnoodle-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 #title {
-  margin: 0px;
-  margin-bottom: 10px;
-  font-size: 300%;
-  color: #fff;
-  font-variant: small-caps;
-  text-shadow: 2px 2px 5px #888;
+    margin: 0px;
+    margin-bottom: 10px;
+    font-size: 300%;
+    color: #fff;
+    font-variant: small-caps;
+    text-shadow: 2px 2px 5px #888;
 }
 
 nav li {
-  font-size: 20px;
+    font-size: 20px;
 }
 
 .nav-link {
-  color: #fff !important;
+    color: #fff !important;
 }
 
 #navbar-wrapper {
-  padding-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 #footer-wrapper {
-  color: #fff !important;
-  font-weight: bold;
-  padding-top: 10px;
+    color: #fff !important;
+    font-weight: bold;
+    padding-top: 10px;
+}
+
+#side-bar {
+    height: 100vh;
 }

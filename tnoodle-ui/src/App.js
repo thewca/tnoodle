@@ -1,56 +1,31 @@
 import React, { Component } from "react";
-import { HashRouter, Switch, Route } from "react-router-dom";
-import Index from "./components/Index";
-import OfflineScrambler from "./components/OfflineScrambler";
-import OnlineScrambler from "./components/OnlineScrambler";
-import TnoodleNavbar from "./components/TnoodleNavbar";
-import ManageCompetition from "./components/ManageCompetition";
-
+import EntryInterface from "./components/EntryInterface";
+import EventPickerTable from "./components/EventPickerTable";
+import SideBar from "./components/SideBar";
+import VersionInfo from "./components/VersionInfo";
 import "bootstrap/dist/css/bootstrap.css";
-
 import "./App.css";
 
 class App extends Component {
-    homeLink = "/";
-    offlineScramblerLink = "/scramble/offline";
-    onlineScramblerLink = "/scramble/online";
-    competitionLink = "/competitions/:competitionId";
-
     render() {
         return (
-            <HashRouter basename={this.homeLink}>
-                <div className="App">
-                    <TnoodleNavbar
-                        homeLink={this.homeLink}
-                        offlineScramblerLink={this.offlineScramblerLink}
-                        onlineScramblerLink={this.onlineScramblerLink}
-                    />
-                    <Switch>
-                        <Route path={this.offlineScramblerLink}>
-                            <OfflineScrambler />
-                        </Route>
-                        <Route path={this.onlineScramblerLink}>
-                            <OnlineScrambler />
-                        </Route>
-                        <Route
-                            path={this.competitionLink}
-                            component={props => (
-                                <ManageCompetition
-                                    competitionId={
-                                        props.match.params.competitionId
-                                    }
-                                />
-                            )}
-                        ></Route>
-                        <Route path={this.homeLink}>
-                            <Index
-                                offlineScramblerLink={this.offlineScramblerLink}
-                                onlineScramblerLink={this.onlineScramblerLink}
-                            />
-                        </Route>
-                    </Switch>
+            <div className="App">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div
+                            className="col-3 bg-dark sticky-top overflow-auto"
+                            id="side-bar"
+                        >
+                            <SideBar />
+                        </div>
+                        <div className="col-9">
+                            <VersionInfo />
+                            <EntryInterface />
+                            <EventPickerTable />
+                        </div>
+                    </div>
                 </div>
-            </HashRouter>
+            </div>
         );
     }
 }

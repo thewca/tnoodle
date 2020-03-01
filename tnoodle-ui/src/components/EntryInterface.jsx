@@ -1,14 +1,25 @@
 import React, { Component } from "react";
-import { updatePassword, updateCompetitionName } from "../redux/ActionCreators";
+import {
+    updatePassword,
+    updateCompetitionName,
+    updateFileZipBlob
+} from "../redux/ActionCreators";
 import { connect } from "react-redux";
+import { getDefaultCompetitionName } from "../util/competition.name.util";
+
+const mapStateToProps = store => ({
+    editingDisabled: store.editingDisabled,
+    competitionName: store.wcif.name
+});
 
 const mapDispatchToProps = {
     updatePassword,
-    updateCompetitionName
+    updateCompetitionName,
+    updateFileZipBlob
 };
 
 const EntryInterface = connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(
     class EntryInterface extends Component {
@@ -16,25 +27,21 @@ const EntryInterface = connect(
             super(props);
 
             this.state = {
-                competitionName: props.competitionName,
-                disabled: props.disabled,
+                editingDisabled: props.editingDisabled,
                 password: "",
                 showPassword: false
             };
         }
 
-        componentDidMount = function() {
-            this.props.updateCompetitionName(this.state.competitionName);
-            this.props.updatePassword(this.state.password);
-        };
+        componentDidMount() {
+            this.props.updateCompetitionName(getDefaultCompetitionName());
+        }
 
         handleCompetitionNameChange = event => {
-            let state = this.state;
-            state.competitionName = event.target.value;
-            this.setState(state);
+            this.props.updateCompetitionName(event.target.value);
 
-            // Propagate the change.
-            this.props.updateCompetitionName(this.state.competitionName);
+            // Require another zip with the new name.
+            this.props.updateFileZipBlob(null);
         };
 
         handlePasswordChange = event => {
@@ -43,6 +50,9 @@ const EntryInterface = connect(
             this.setState(state);
 
             this.props.updatePassword(this.state.password);
+
+            // Require another zip with the new password, in case there was a zip generated.
+            this.props.updateFileZipBlob(null);
         };
 
         toogleShowPassword = () => {
@@ -52,6 +62,8 @@ const EntryInterface = connect(
         };
 
         render() {
+            let competitionName = this.props.competitionName;
+            let disabled = this.props.editingDisabled;
             return (
                 <div className="container mt-2">
                     <div className="row">
@@ -63,8 +75,8 @@ const EntryInterface = connect(
                                 className="form-control"
                                 placeholder="Competition Name"
                                 onChange={this.handleCompetitionNameChange}
-                                value={this.state.competitionName}
-                                disabled={this.state.disabled ? "disabled" : ""}
+                                value={competitionName}
+                                disabled={disabled ? "disabled" : ""}
                             />
                         </div>
 

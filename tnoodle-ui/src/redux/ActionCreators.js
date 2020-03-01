@@ -39,3 +39,28 @@ export const updateWcif = wcif => ({
     type: ActionTypes.UPDATE_WCIF,
     payload: { wcif }
 });
+
+export const updateEditingStatus = flag => ({
+    type: ActionTypes.UPDATE_EDITING_STATUS,
+    payload: { editingDisabled: flag }
+});
+
+export const updateCompetitionId = competitionId => ({
+    type: ActionTypes.UPDATE_COMPETITION_ID,
+    payload: { competitionId }
+});
+
+export const updateOfficialZipStatus = flag => ({
+    type: ActionTypes.UPDATE_OFFICIAL_ZIP_STATUS,
+    payload: { officialZip: flag }
+});
+
+/**
+ * When user change some event, we reset blob.
+ * If the user generate a scramble and then change some event,
+ * this allow generating other set of scrambles.
+ */
+export const updateFileZipBlob = fileZipBlob => ({
+    type: ActionTypes.UPDATE_FILE_ZIP_BLOB,
+    payload: { fileZipBlob: fileZipBlob }
+});

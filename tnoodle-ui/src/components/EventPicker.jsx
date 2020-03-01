@@ -2,16 +2,23 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
-import { updateWcaEvent, updateMbld } from "../redux/ActionCreators";
+import {
+    updateWcaEvent,
+    updateMbld,
+    updateFileZipBlob
+} from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 
 const mapStateToProps = store => ({
-    mbld: store.mbld
+    mbld: store.mbld,
+    editingDisabled: store.editingDisabled,
+    wcif: store.wcif
 });
 
 const mapDispatchToProps = {
-    updateWcaEvent: updateWcaEvent,
-    updateMbld: updateMbld
+    updateWcaEvent,
+    updateMbld,
+    updateFileZipBlob
 };
 
 const EventPicker = connect(
@@ -22,31 +29,25 @@ const EventPicker = connect(
         constructor(props) {
             super(props);
 
-            this.setBlobNull = props.setBlobNull;
-
-            // State wcif like
-            let wcifEvent = props.wcifEvent || { rounds: [] };
-
-            // If we ever support copies on the website, we can dismiss this
-            wcifEvent.rounds.forEach(round => (round.copies = 1));
-
             this.state = {
-                id: props.event.id,
-                rounds: wcifEvent.rounds,
-                disabled: props.disabled
+                id: props.event.id
             };
 
             if (this.state.id === "333mbf") {
                 this.state.mbld = props.mbld;
             }
-
-            updateWcaEvent(this.state);
         }
 
-        handleNumberOfRoundsChange = evt => {
-            let numberOfRounds = Number(evt.target.value);
-            let state = this.state;
-            let rounds = state.rounds;
+        getWcaEvent = rounds => {
+            return { id: this.state.id, rounds };
+        };
+
+        handleNumberOfRoundsChange = (rounds, value) => {
+            let numberOfRounds = Number(value);
+
+            if (numberOfRounds < 0 || numberOfRounds > MAX_WCA_ROUNDS) {
+                return;
+            }
 
             // Ajust the number of rounds in case we have to remove
             while (rounds.length > numberOfRounds) {
@@ -54,54 +55,50 @@ const EventPicker = connect(
             }
 
             // case we have to add
-            let event = this.state.id;
+            let eventId = this.state.id;
             while (rounds.length < numberOfRounds) {
                 rounds.push({
-                    id: event + "-r" + (rounds.length + 1),
+                    id: eventId + "-r" + (rounds.length + 1),
                     format: this.props.event.format_ids[0],
                     scrambleSetCount: 1,
                     copies: 1
                 });
             }
-            state.rounds = rounds;
-            this.setState(state);
-            this.updateEvent();
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
-        handleNumberOfScrambleSetsChange = (round, value) => {
+        handleNumberOfScrambleSetsChange = (round, value, rounds) => {
             if (value < 1) {
                 return;
             }
-            let state = this.state;
-            state.rounds[round].scrambleSetCount = Number(value);
-            this.setState(state);
-            this.updateEvent();
+            rounds[round].scrambleSetCount = Number(value);
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
-        roundFormatChanged = (round, value) => {
-            let state = this.state;
-            state.rounds[round].format = value;
-            this.setState(state);
-            this.updateEvent();
+        handleRoundFormatChanged = (round, value, rounds) => {
+            rounds[round].format = value;
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
-        handleNumberOfCopiesChange = (round, value) => {
+        handleNumberOfCopiesChange = (round, value, rounds) => {
             if (value < 1) {
                 return;
             }
-            let state = this.state;
-            state.rounds[round].copies = value;
-            this.setState(state);
-            this.updateEvent();
+            rounds[round].copies = value;
+            let wcaEvent = this.getWcaEvent(rounds);
+            this.updateEvent(wcaEvent);
         };
 
         abbreviate = str => {
             return FORMATS[str].shortName;
         };
 
-        updateEvent = () => {
-            this.props.updateWcaEvent(this.state);
-            this.setBlobNull();
+        updateEvent = wcaEvent => {
+            this.props.updateFileZipBlob(null);
+            this.props.updateWcaEvent(wcaEvent);
         };
 
         handleMbldChange = mbld => {
@@ -111,6 +108,7 @@ const EventPicker = connect(
 
         // When mbld loses focus
         verifyMbld = () => {
+            // TODO search for the best result and warn if someone selects less mbld than this.
             let mbld = this.state.mbld;
             if (mbld < MBLD_MIN) {
                 mbld = MBLD_MIN;
@@ -118,8 +116,8 @@ const EventPicker = connect(
             }
         };
 
-        maybeShowMbld = () => {
-            if (this.state.id === "333mbf" && this.state.rounds.length > 0) {
+        maybeShowMbld = rounds => {
+            if (this.state.id === "333mbf" && rounds.length > 0) {
                 return (
                     <tfoot>
                         <tr>
@@ -148,8 +146,8 @@ const EventPicker = connect(
             }
         };
 
-        maybeShowTableTitles = () => {
-            if (this.state.rounds.length === 0) {
+        maybeShowTableTitles = rounds => {
+            if (rounds.length === 0) {
                 return null;
             }
             return (
@@ -162,116 +160,105 @@ const EventPicker = connect(
             );
         };
 
-        maybeShowTableBody = event => {
-            if (this.state.rounds.length === 0) {
+        maybeShowTableBody = (event, rounds) => {
+            if (rounds.length === 0) {
                 return;
             }
             return (
                 <tbody>
-                    {Array.from(
-                        { length: this.state.rounds.length },
-                        (_, i) => {
-                            return (
-                                <tr key={i} className="form-group">
-                                    <th scope="row" className="align-middle">
-                                        {i + 1}
-                                    </th>
-                                    <td className="align-middle">
-                                        <select
-                                            onChange={evt =>
-                                                this.roundFormatChanged(
-                                                    i,
-                                                    evt.target.value
-                                                )
-                                            }
-                                            disabled={
-                                                this.state.disabled
-                                                    ? "disabled"
-                                                    : ""
-                                            }
-                                        >
-                                            {event.format_ids.map(format => (
-                                                <option
-                                                    key={format}
-                                                    value={format}
-                                                >
-                                                    {this.abbreviate(format)}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input
-                                            className="form-control"
-                                            type="number"
-                                            value={
-                                                this.state.rounds[i]
-                                                    .scrambleSetCount
-                                            }
-                                            onChange={evt =>
-                                                this.handleNumberOfScrambleSetsChange(
-                                                    i,
-                                                    Number(evt.target.value)
-                                                )
-                                            }
-                                            min={1}
-                                            disabled={
-                                                this.state.disabled
-                                                    ? "disabled"
-                                                    : ""
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            className="form-control"
-                                            type="number"
-                                            value={this.state.rounds[i].copies}
-                                            onChange={evt =>
-                                                this.handleNumberOfCopiesChange(
-                                                    i,
-                                                    Number(evt.target.value)
-                                                )
-                                            }
-                                            min={1}
-                                            disabled={
-                                                this.state.disabled
-                                                    ? "disabled"
-                                                    : ""
-                                            }
-                                        />
-                                    </td>
-                                </tr>
-                            );
-                        }
-                    )}
+                    {Array.from({ length: rounds.length }, (_, i) => {
+                        return (
+                            <tr key={i} className="form-group">
+                                <th scope="row" className="align-middle">
+                                    {i + 1}
+                                </th>
+                                <td className="align-middle">
+                                    <select
+                                        onChange={evt =>
+                                            this.handleRoundFormatChanged(
+                                                i,
+                                                evt.target.value,
+                                                rounds
+                                            )
+                                        }
+                                        disabled={
+                                            this.props.editingDisabled
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    >
+                                        {event.format_ids.map(format => (
+                                            <option key={format} value={format}>
+                                                {this.abbreviate(format)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input
+                                        className="form-control"
+                                        type="number"
+                                        value={rounds[i].scrambleSetCount}
+                                        onChange={evt =>
+                                            this.handleNumberOfScrambleSetsChange(
+                                                i,
+                                                Number(evt.target.value),
+                                                rounds
+                                            )
+                                        }
+                                        min={1}
+                                        disabled={
+                                            this.props.editingDisabled
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        className="form-control"
+                                        type="number"
+                                        value={rounds[i].copies}
+                                        onChange={evt =>
+                                            this.handleNumberOfCopiesChange(
+                                                i,
+                                                Number(evt.target.value),
+                                                rounds
+                                            )
+                                        }
+                                        min={1}
+                                        disabled={
+                                            this.props.editingDisabled
+                                                ? "disabled"
+                                                : ""
+                                        }
+                                    />
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             );
         };
 
         render() {
+            let wcaEvent = this.props.wcif.events.find(
+                event => event.id === this.state.id
+            );
+            let rounds = wcaEvent != null ? wcaEvent.rounds : [];
             let { event } = this.props;
-            let options = [
-                { text: "# of rounds?", value: 0, disabled: false },
-                { text: "────────", disabled: true }
-            ];
-            Array.from({ length: MAX_WCA_ROUNDS }).forEach((_, i) => {
-                options.push({
-                    text: i + 1 + " round" + (i > 0 ? "s" : ""),
-                    value: i + 1,
-                    disabled: false
-                });
-            });
 
             let styleFirstTwoColumns = { width: "10%" };
             let styleLastTwoColumns = { width: "40%" };
 
+            let disabled = this.props.editingDisabled;
+
             return (
-                <table className="table table-sm rounded m-0 shadow">
+                <table className="table table-sm m-0 shadow rounded">
                     <thead>
                         <tr
                             className={
-                                this.state.rounds.length === 0
+                                rounds.length === 0
                                     ? "bg-secondary text-white"
                                     : "thead-light"
                             }
@@ -286,30 +273,27 @@ const EventPicker = connect(
                                 </h5>
                             </th>
                             <th style={styleLastTwoColumns} scope="col">
-                                <select
-                                    onChange={this.handleNumberOfRoundsChange}
-                                    id={event.id}
-                                    defaultValue={this.state.rounds.length}
-                                    disabled={
-                                        this.state.disabled ? "disabled" : ""
+                                <label>Rounds</label>
+                                <input
+                                    className="bg-light form-control"
+                                    type="number"
+                                    value={rounds.length}
+                                    onChange={evt =>
+                                        this.handleNumberOfRoundsChange(
+                                            rounds,
+                                            Number(evt.target.value)
+                                        )
                                     }
-                                >
-                                    {options.map(op => (
-                                        <option
-                                            value={op.value}
-                                            disabled={op.disabled}
-                                            key={op.text}
-                                        >
-                                            {op.text}
-                                        </option>
-                                    ))}
-                                </select>
+                                    min={0}
+                                    max={MAX_WCA_ROUNDS}
+                                    disabled={disabled ? "disabled" : ""}
+                                />
                             </th>
                         </tr>
-                        {this.maybeShowTableTitles()}
+                        {this.maybeShowTableTitles(rounds)}
                     </thead>
-                    {this.maybeShowTableBody(event)}
-                    {this.maybeShowMbld()}
+                    {this.maybeShowTableBody(event, rounds)}
+                    {this.maybeShowMbld(rounds)}
                 </table>
             );
         }

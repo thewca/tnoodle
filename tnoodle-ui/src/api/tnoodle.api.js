@@ -11,6 +11,8 @@ export const fetchZip = (wcif, mbld, password) => {
         payload.zipPassword = password;
     }
 
+    console.log(payload);
+
     return fetch(url, {
         method: "POST",
         headers: {

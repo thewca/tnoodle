@@ -21,3 +21,4 @@ tnoodle_resources/
 tnoodle_pruning_cache/
 **/logging/*.log
 version.tnoodle
+*.hprof

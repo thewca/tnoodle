@@ -1,54 +1,51 @@
 import React, { Component } from "react";
-import EventPicker from "./EventPicker";
+import _ from "lodash";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
 import { fetchZip } from "../api/tnoodle.api";
-import { toWcaUrl } from "../api/wca.api";
+import { toWcaUrl, isUsingStaging } from "../api/wca.api";
+import { updateFileZipBlob } from "../redux/ActionCreators";
+import EventPicker from "./EventPicker";
 
 const mapStateToProps = store => ({
     wcif: store.wcif,
     mbld: store.mbld,
-    password: store.password
+    password: store.password,
+    editingDisabled: store.editingDisabled,
+    competitionId: store.competitionId,
+    officialZip: store.officialZip,
+    fileZipBlob: store.fileZipBlob
 });
 
-const EventPickerTable = connect(mapStateToProps)(
+const mapDispatchToProps = { updateFileZipBlob };
+
+const BOOTSTRAP_GRID = 12;
+const EVENTS_PER_LINE = 2;
+
+const EventPickerTable = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(
     class extends Component {
         constructor(props) {
             super(props);
-
-            // If the events > 0, this means that this was a fetched wcif so we disabled the manual selection
-            let events = props.wcif.events;
-            let editingDisabled = events.length > 0;
-
-            // Prevent offline from remembering online order
-            let wcaEvents = [...WCA_EVENTS];
-
-            // This filters events to show only those in the competition.
-            if (editingDisabled) {
-                wcaEvents = wcaEvents.filter(wcaEvent =>
-                    events.find(item => item.id === wcaEvent.id)
-                );
-            }
-
-            this.state = {
-                editingDisabled: editingDisabled,
-                wcaEvents: wcaEvents,
-                competitionId: props.competitionId,
-                generatingScrambles: false,
-                fileZipBlob: null,
-                wcif: props.wcif
-            };
+            this.state = { generatingScrambles: false };
         }
-
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
             fetchZip(this.props.wcif, this.props.mbld, this.props.password)
-                .then(response => response.blob())
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    this.setGeneratingScrambles(false);
+                    throw new Error("Could not generate scrambles.");
+                })
                 .then(blob => {
                     this.setGeneratingScrambles(false);
-                    this.setState({ ...this.state, fileZipBlob: blob });
+                    this.props.updateFileZipBlob(blob);
                 })
-                .catch(e => console.log(e));
+                .catch(e => console.error(e));
         };
 
         setGeneratingScrambles = flag => {
@@ -56,12 +53,21 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         downloadZip = () => {
-            // TODO add [Unofficial] before the zip name if staging or !official tnoodle version
+            // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
+            // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
+            // a competition from staging, add a [Unofficial]
 
-            let fileName = this.state.wcif.name + ".zip";
+            let isUnofficialZip =
+                !this.props.officialZip ||
+                (this.props.competitionId != null && isUsingStaging());
+
+            let fileName =
+                (isUnofficialZip ? "[Unofficial] " : "") +
+                this.props.wcif.name +
+                ".zip";
 
             const link = document.createElement("a");
-            link.href = URL.createObjectURL(this.state.fileZipBlob);
+            link.href = URL.createObjectURL(this.props.fileZipBlob);
             link.download = fileName;
             link.target = "_blank";
             link.setAttribute("type", "hidden");
@@ -74,26 +80,27 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         maybeShowEditWarning = () => {
-            if (this.state.competitionId == null) {
+            if (this.props.competitionId == null) {
                 return;
             }
             return (
                 <div className="row">
                     <p>
-                        Found {this.state.wcif.events.length} event
-                        {this.state.wcif.events.length > 1 ? "s" : ""} for{" "}
+                        Found {this.props.wcif.events.length} event
+                        {this.props.wcif.events.length > 1 ? "s" : ""} for{" "}
                         {this.props.wcif.name}.
                     </p>
                     <p>
                         You can view and change the rounds over on{" "}
                         <a
                             href={toWcaUrl(
-                                `/competitions/${this.state.competitionId}/events/edit`
+                                `/competitions/${this.props.competitionId}/events/edit`
                             )}
                         >
-                            the WCA website.
+                            the WCA.
                         </a>
                         <strong>
+                            {" "}
                             Refresh this page after making any changes on the
                             WCA website.
                         </strong>
@@ -114,7 +121,7 @@ const EventPickerTable = connect(mapStateToProps)(
                     </button>
                 );
             }
-            if (this.state.fileZipBlob != null) {
+            if (this.props.fileZipBlob != null) {
                 return (
                     <button
                         className="btn btn-primary btn-lg"
@@ -141,30 +148,47 @@ const EventPickerTable = connect(mapStateToProps)(
             );
         };
 
-        /**
-         * When user change some event, we reset blob.
-         * If the user generate a scramble and then change some event,
-         * this allow generating other set of scrambles.
-         */
-        setBlobNull = () => {
-            this.setState({ ...this.state, fileZipBlob: null });
-        };
-
         render() {
+            let events = this.props.wcif.events;
+            let editingDisabled = this.props.editingDisabled;
+
+            // Prevent from remembering previous order
+            let wcaEvents = [...WCA_EVENTS];
+
+            // This filters events to show only those in the competition.
+            if (editingDisabled) {
+                wcaEvents = wcaEvents.filter(wcaEvent =>
+                    events.find(item => item.id === wcaEvent.id)
+                );
+            }
+
+            let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
+
+            let classColPerEvent = `border border-dark p-1 col-${BOOTSTRAP_GRID /
+                EVENTS_PER_LINE}`;
             return (
-                <div className="container">
+                <div className="container-fluid">
                     {this.maybeShowEditWarning()}
-                    {this.state.wcaEvents.map(event => {
+                    {eventChunks.map((chunk, i) => {
                         return (
-                            <div className="row" key={event.id}>
-                                <EventPicker
-                                    event={event}
-                                    wcifEvent={this.state.wcif.events.find(
-                                        item => item.id === event.id
-                                    )}
-                                    disabled={this.state.editingDisabled}
-                                    setBlobNull={this.setBlobNull}
-                                />
+                            <div className="row p-0" key={i}>
+                                {chunk.map(event => {
+                                    return (
+                                        <div
+                                            className={classColPerEvent}
+                                            key={event.id}
+                                        >
+                                            <EventPicker
+                                                event={event}
+                                                wcifEvent={this.props.wcif.events.find(
+                                                    item => item.id === event.id
+                                                )}
+                                                disabled={editingDisabled}
+                                                setBlobNull={this.setBlobNull}
+                                            />
+                                        </div>
+                                    );
+                                })}
                             </div>
                         );
                     })}
