@@ -58,3 +58,7 @@ nav li {
     font-weight: bold;
     padding-top: 10px;
 }
+
+#side-bar {
+    height: 100vh;
+}

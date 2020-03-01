@@ -12,7 +12,10 @@ class App extends Component {
             <div className="App">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-3 bg-dark">
+                        <div
+                            className="col-3 bg-dark sticky-top overflow-auto"
+                            id="side-bar"
+                        >
                             <SideBar />
                         </div>
                         <div className="col-9">
