@@ -86,9 +86,9 @@ const VersionInfo = connect(
                 return (
                     <div className="row text-white text-right">
                         <div className="col-12 bg-danger">
-                            This TNoodle version is not allowed anymore. Do not
-                            use scrambles generated in any official competition
-                            and consider downloading the latest version{" "}
+                            This TNoodle version is not allowed. Do not use
+                            scrambles generated in any official competition and
+                            consider downloading the latest version{" "}
                             <a href={this.state.currentTnoodle.download}>
                                 here
                             </a>

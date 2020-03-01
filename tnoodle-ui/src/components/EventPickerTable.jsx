@@ -55,7 +55,7 @@ const EventPickerTable = connect(mapStateToProps)(
                 (this.props.competitionId != null && isUsingStaging());
 
             let fileName =
-                (isUnofficialZip ? "[Unofficial]" : "") +
+                (isUnofficialZip ? "[Unofficial] " : "") +
                 this.props.wcif.name +
                 ".zip";
 
@@ -90,9 +90,10 @@ const EventPickerTable = connect(mapStateToProps)(
                                 `/competitions/${this.props.competitionId}/events/edit`
                             )}
                         >
-                            the WCA props.
+                            the WCA.
                         </a>
                         <strong>
+                            {" "}
                             Refresh this page after making any changes on the
                             WCA website.
                         </strong>
