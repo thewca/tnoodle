@@ -49,3 +49,8 @@ export const updateCompetitionId = competitionId => ({
     type: ActionTypes.UPDATE_COMPETITION_ID,
     payload: { competitionId }
 });
+
+export const updateOfficialZipStatus = flag => ({
+    type: ActionTypes.UPDATE_OFFICIAL_ZIP_STATUS,
+    payload: { officialZip: flag }
+});

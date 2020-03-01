@@ -3,7 +3,7 @@ import _ from "lodash";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
 import { fetchZip } from "../api/tnoodle.api";
-import { toWcaUrl } from "../api/wca.api";
+import { toWcaUrl, isUsingStaging } from "../api/wca.api";
 import EventPicker from "./EventPicker";
 
 const mapStateToProps = store => ({
@@ -11,7 +11,8 @@ const mapStateToProps = store => ({
     mbld: store.mbld,
     password: store.password,
     editingDisabled: store.editingDisabled,
-    competitionId: store.competitionId
+    competitionId: store.competitionId,
+    officialZip: store.officialZip
 });
 
 const BOOTSTRAP_GRID = 12;
@@ -45,9 +46,18 @@ const EventPickerTable = connect(mapStateToProps)(
         };
 
         downloadZip = () => {
-            // TODO add [Unofficial] before the zip name if staging or !official tnoodle version
+            // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
+            // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
+            // a competition from staging, add a [Unofficial]
 
-            let fileName = this.props.wcif.name + ".zip";
+            let isUnofficialZip =
+                !this.props.officialZip ||
+                (this.props.competitionId != null && isUsingStaging());
+
+            let fileName =
+                (isUnofficialZip ? "[Unofficial]" : "") +
+                this.props.wcif.name +
+                ".zip";
 
             const link = document.createElement("a");
             link.href = URL.createObjectURL(this.state.fileZipBlob);

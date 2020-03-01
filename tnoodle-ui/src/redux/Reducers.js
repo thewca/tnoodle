@@ -10,7 +10,8 @@ const defaultStore = {
     wcif: defaultWcif,
     mbld: MBLD_DEFAULT,
     password: "",
-    editingDisabled: false
+    editingDisabled: false,
+    officialZip: true
 };
 
 export const Reducer = (store, action) => {
@@ -98,6 +99,10 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_COMPETITION_ID) {
         return { ...store, competitionId: action.payload.competitionId };
+    }
+
+    if (action.type === ActionTypes.UPDATE_OFFICIAL_ZIP_STATUS) {
+        return { ...store, officialZip: action.payload.officialZip };
     }
 
     return store || defaultStore;
