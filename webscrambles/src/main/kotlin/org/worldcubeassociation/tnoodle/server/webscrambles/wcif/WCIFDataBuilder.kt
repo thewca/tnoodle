@@ -88,8 +88,8 @@ object WCIFDataBuilder {
             val singleSheets = scrambleSet.scrambles.mapIndexed { nthAttempt, scrambleStr ->
                 val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
 
-                // FIXME this feels hacky
-                val pseudoCode = activityCode.copyParts(groupNumber = nthAttempt)
+                // +1 for human readability so the first attempt (index 0) gets printed as "Attempt 1"
+                val pseudoCode = activityCode.copyParts(attemptNumber = nthAttempt + 1)
 
                 val attemptScrambles = scrambleSet.copy(
                     scrambles = scrambles,
