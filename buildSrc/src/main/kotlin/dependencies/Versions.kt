@@ -3,7 +3,7 @@ package dependencies
 object Versions {
     val JUNIT_JUPITER = "5.6.0"
     val BATIK = "1.12"
-    val KOTLIN = "1.3.61"
+    val KOTLIN = "1.3.70"
     val KTOR = "1.3.1"
     val PROGUARD = "6.2.2"
     val KOTLESS = "0.1.3"
