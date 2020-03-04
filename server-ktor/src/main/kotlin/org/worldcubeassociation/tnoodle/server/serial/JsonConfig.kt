@@ -7,7 +7,7 @@ object JsonConfig {
     const val CLASS_DISCRIMINATOR = "id"
 
     val TNOODLE_DEFAULT = JsonConfiguration.Stable
-        .copy(encodeDefaults = false, strictMode = false, classDiscriminator = CLASS_DISCRIMINATOR)
+        .copy(encodeDefaults = false, ignoreUnknownKeys = true, classDiscriminator = CLASS_DISCRIMINATOR)
 
     val SERIALIZER by lazy { Json(TNOODLE_DEFAULT) }
 }
