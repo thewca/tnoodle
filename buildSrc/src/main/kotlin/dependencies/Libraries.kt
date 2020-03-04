@@ -14,6 +14,7 @@ object Libraries {
     val KOTLIN_STDLIB_JS = "org.jetbrains.kotlin:kotlin-stdlib-js:${Versions.KOTLIN_STDLIB_JS}"
     val KOTLIN_STDLIB_COMMON = "org.jetbrains.kotlin:kotlin-stdlib-common:${Versions.KOTLIN_STDLIB_COMMON}"
     val KOTLIN_SERIALIZATION_JVM = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.KOTLIN_SERIALIZATION_JVM}"
+    val KOTLIN_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KOTLIN_COROUTINES_CORE}"
     val KTOR_SERVER_NETTY = "io.ktor:ktor-server-netty:${Versions.KTOR_SERVER_NETTY}"
     val KTOR_SERVER_SERVLET = "io.ktor:ktor-server-servlet:${Versions.KTOR_SERVER_SERVLET}"
     val KTOR_SERIALIZATION = "io.ktor:ktor-serialization:${Versions.KTOR_SERIALIZATION}"
