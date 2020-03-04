@@ -21,8 +21,11 @@ sealed class ExtensionBuilder {
     }
 
     companion object {
-        val REGISTERED_CHILDREN = List(serializer().descriptor.elementsCount) {
-            serializer().descriptor.getElementName(it)
+        val NESTED_DESCRIPTOR_INDEX = serializer().descriptor.getElementIndex("value")
+        val NESTED_DESCRIPTOR = serializer().descriptor.getElementDescriptor(NESTED_DESCRIPTOR_INDEX)
+
+        val REGISTERED_CHILDREN = List(NESTED_DESCRIPTOR.elementsCount) {
+            NESTED_DESCRIPTOR.getElementName(it)
         }
     }
 }
