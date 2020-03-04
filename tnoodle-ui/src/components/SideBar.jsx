@@ -18,7 +18,8 @@ import {
     logOut,
     fetchMe,
     getUpcomingManageableCompetitions,
-    getCompetitionJson
+    getCompetitionJson,
+    getQueryParameter
 } from "../api/wca.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
@@ -103,6 +104,11 @@ const SideBar = connect(
                         this.setLoadingCompetitions(false);
                     });
             }
+
+            let competitionId = getQueryParameter("competitionId");
+            if (competitionId != null) {
+                this.handleCompetitionSelection(competitionId);
+            }
         }
 
         handleManualSelection = () => {
@@ -111,9 +117,12 @@ const SideBar = connect(
             this.props.updateWcif({ ...defaultWcif });
             this.props.updateCompetitionName(getDefaultCompetitionName());
             this.props.updateFileZipBlob(null);
+            this.removeCompetitionIdQueryParam();
         };
 
         handleCompetitionSelection = competitionId => {
+            this.updateCompetitionIdQueryParam(competitionId);
+
             // For quick switching between competitions.
             let cachedWcif = this.props.cachedWcifs[competitionId];
             if (cachedWcif != null) {
@@ -138,6 +147,26 @@ const SideBar = connect(
                     );
                     this.setLoadingCompetitionInformation(false);
                 });
+        };
+
+        updateCompetitionIdQueryParam = competitionId => {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set("competitionId", competitionId);
+            window.history.pushState(
+                {},
+                "",
+                window.location.origin + "?" + searchParams.toString()
+            );
+        };
+
+        removeCompetitionIdQueryParam = () => {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.delete("competitionId");
+            window.history.pushState(
+                {},
+                "",
+                window.location.origin + "?" + searchParams.toString()
+            );
         };
 
         setWcif = wcif => {
