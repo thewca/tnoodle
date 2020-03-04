@@ -127,6 +127,7 @@ const SideBar = connect(
             let cachedWcif = this.props.cachedWcifs[competitionId];
             if (cachedWcif != null) {
                 this.setWcif(cachedWcif);
+                this.maybeAddCompetition(cachedWcif.id, cachedWcif.name);
                 return;
             }
 
@@ -139,6 +140,7 @@ const SideBar = connect(
                 .then(wcif => {
                     this.setWcif(wcif);
                     this.props.addCachedWcif(wcif);
+                    this.maybeAddCompetition(wcif.id, wcif.name);
                 })
                 .catch(e => {
                     console.error(
@@ -147,6 +149,25 @@ const SideBar = connect(
                     );
                     this.setLoadingCompetitionInformation(false);
                 });
+        };
+
+        // In case we use competitionId from query params, it's not fetched.
+        // We add it to the list.
+        maybeAddCompetition = (competitionId, competitionName) => {
+            console.log(this.state.competitions);
+            if (
+                !this.state.competitions.find(
+                    competition => competition.name === competitionName
+                )
+            ) {
+                this.setState({
+                    ...this.state,
+                    competitions: [
+                        ...this.state.competitions,
+                        { id: competitionId, name: competitionName }
+                    ]
+                });
+            }
         };
 
         updateCompetitionIdQueryParam = competitionId => {
