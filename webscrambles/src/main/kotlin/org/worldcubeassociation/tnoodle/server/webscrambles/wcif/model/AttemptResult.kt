@@ -1,33 +1,33 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.Transient
-import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonIntEncoder
 import java.time.Duration
 
 // value has to be string to preserve leading zeros from MBLD
-data class AttemptResult(val value: String) {
+data class AttemptResult(val value: Int) {
     @Transient
-    private val intValue = value.toInt()
+    private val stringValue = value.toString().padStart(10, PREFIX_MULTIBLD_FORMAT_NEW)
 
     val isSkipped
-        get() = this.intValue == ATTEMPT_SKIPPED
+        get() = this.value == ATTEMPT_SKIPPED
 
     val isDnf
-        get() = this.intValue == ATTEMPT_DNF
+        get() = this.value == ATTEMPT_DNF
 
     val isDns
-        get() = this.intValue == ATTEMPT_DNS
+        get() = this.value == ATTEMPT_DNS
 
     val asDuration
-        get() = Duration.ofMillis(this.intValue * CENTISECONDS_TO_MILLISECONDS)
+        get() = Duration.ofMillis(this.value * CENTISECONDS_TO_MILLISECONDS)
 
     val asFmcAverage
-        get() = this.intValue / 100f
+        get() = this.value / 100f
 
     val asMultiResult
-        get() = decodeMultiResult(this.value)
+        get() = decodeMultiResult(this.stringValue)
 
-    companion object : SingletonStringEncoder<AttemptResult>("AttemptResult") {
+    companion object : SingletonIntEncoder<AttemptResult>("AttemptResult") {
         const val ATTEMPT_SKIPPED = 0
         const val ATTEMPT_DNF = -1
         const val ATTEMPT_DNS = -2
@@ -70,6 +70,6 @@ data class AttemptResult(val value: String) {
         }
 
         override fun encodeInstance(instance: AttemptResult) = instance.value
-        override fun makeInstance(deserialized: String) = AttemptResult(deserialized)
+        override fun makeInstance(deserialized: Int) = AttemptResult(deserialized)
     }
 }
