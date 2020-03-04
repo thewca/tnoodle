@@ -55,10 +55,10 @@ data class AttemptResult(val value: String) {
             val solved = difference + missed
             val attempted = solved + missed
 
-            return Triple(attempted, solved, duration)
+            return Triple(solved, attempted, duration)
         }
 
-        fun encodeMultiResult(solved: Int, attempted: Int, time: Duration): Int {
+        fun encodeMultiResult(solved: Int, attempted: Int, time: Duration): String {
             val missed = attempted - solved
             val difference = solved - missed
 
@@ -66,8 +66,7 @@ data class AttemptResult(val value: String) {
             val mm = missed.toString().padStart(2, PREFIX_MULTIBLD_FORMAT_NEW)
             val ttttt = time.seconds.toString().padStart(5, PREFIX_MULTIBLD_FORMAT_NEW)
 
-            val stringRepresentation = "$PREFIX_MULTIBLD_FORMAT_NEW$dd$ttttt$mm"
-            return stringRepresentation.toInt()
+            return "$PREFIX_MULTIBLD_FORMAT_NEW$dd$ttttt$mm"
         }
 
         override fun encodeInstance(instance: AttemptResult) = instance.value
