@@ -34,6 +34,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             ScrambleViewHandler.install(this)
             StaticContentHandler.install(this)
             wcifHandler.install(this)
+            WcifDataHandler.install(this)
             JobSchedulingHandler.install(this)
             FrontendDataHandler.install(this)
         }
