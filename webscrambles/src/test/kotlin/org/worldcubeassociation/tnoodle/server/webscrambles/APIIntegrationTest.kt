@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import kotlinx.serialization.list
+import kotlinx.serialization.builtins.list
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
