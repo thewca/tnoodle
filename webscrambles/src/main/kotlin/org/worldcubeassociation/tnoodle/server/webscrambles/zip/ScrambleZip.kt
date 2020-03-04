@@ -18,7 +18,7 @@ data class ScrambleZip(val namedSheets: Map<String, ScrambleDrawingData>, val wc
         val interchangeFolder = InterchangeFolder(wcif, namedSheets, globalTitle)
         val interchangeFolderNode = interchangeFolder.assemble(generationDate, versionTag, generationUrl)
 
-        val printingFolder = PrintingFolder(namedSheets, globalTitle, wcif)
+        val printingFolder = PrintingFolder(namedSheets, globalTitle, wcif.schedule)
         val printingFolderNode = printingFolder.assemble(generationDate.toLocalDate(), versionTag, password)
 
         val passcodeList = computerDisplayZip.passcodes.entries
