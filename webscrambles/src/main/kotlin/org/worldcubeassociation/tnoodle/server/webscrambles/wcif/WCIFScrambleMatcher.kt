@@ -92,7 +92,7 @@ object WCIFScrambleMatcher {
         val standardScrambleNum = standardScrambleCountPerSet(round)
 
         val scrambles = if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
-            val countPerAttempt = standardScrambleNum / round.scrambleSetCount
+            val countPerAttempt = standardScrambleNum / round.expectedAttemptNum
 
             List(round.expectedAttemptNum) { _ ->
                 val scrambles = puzzle.generateEfficientScrambles(countPerAttempt) { onUpdate(puzzle, it) }

@@ -174,6 +174,7 @@ const EventPicker = connect(
                                 </th>
                                 <td className="align-middle">
                                     <select
+                                        value={rounds[i].format}
                                         onChange={evt =>
                                             this.handleRoundFormatChanged(
                                                 i,
