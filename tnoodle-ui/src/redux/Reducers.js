@@ -12,7 +12,8 @@ const defaultStore = {
     password: "",
     editingDisabled: false,
     officialZip: true,
-    fileZipBlob: null
+    fileZipBlob: null,
+    cachedWcifs: {}
 };
 
 export const Reducer = (store, action) => {
@@ -108,6 +109,16 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_FILE_ZIP_BLOB) {
         return { ...store, fileZipBlob: action.payload.fileZipBlob };
+    }
+
+    if (action.type === ActionTypes.ADD_CACHED_WCIF) {
+        return {
+            ...store,
+            cachedWcifs: {
+                ...store.cachedWcifs,
+                [action.payload.wcif.id]: action.payload.wcif
+            }
+        };
     }
 
     return store || defaultStore;

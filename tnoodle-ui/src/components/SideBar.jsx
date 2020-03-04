@@ -8,7 +8,8 @@ import {
     updateCompetitions,
     updateMe,
     updateCompetitionId,
-    updateFileZipBlob
+    updateFileZipBlob,
+    addCachedWcif
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -23,7 +24,8 @@ import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 const mapStateToProps = store => ({
     me: store.me,
-    competitions: store.competitions
+    competitions: store.competitions,
+    cachedWcifs: store.cachedWcifs
 });
 
 const mapDispatchToProps = {
@@ -33,7 +35,8 @@ const mapDispatchToProps = {
     updateCompetitions,
     updateMe,
     updateCompetitionId,
-    updateFileZipBlob
+    updateFileZipBlob,
+    addCachedWcif
 };
 
 const SideBar = connect(
@@ -111,6 +114,13 @@ const SideBar = connect(
         };
 
         handleCompetitionSelection = competitionId => {
+            // For quick switching between competitions.
+            let cachedWcif = this.props.cachedWcifs[competitionId];
+            if (cachedWcif != null) {
+                this.setWcif(cachedWcif);
+                return;
+            }
+
             this.setState({
                 ...this.state,
                 loadingCompetitionInformation: true,
@@ -118,12 +128,8 @@ const SideBar = connect(
             });
             getCompetitionJson(competitionId)
                 .then(wcif => {
-                    this.setLoadingCompetitionInformation(false);
-                    this.props.updateEditingStatus(true);
-                    this.props.updateWcif(wcif);
-                    this.props.updateCompetitionId(wcif.id);
-                    this.props.updateCompetitionName(wcif.name);
-                    this.props.updateFileZipBlob(null);
+                    this.setWcif(wcif);
+                    this.props.addCachedWcif(wcif);
                 })
                 .catch(e => {
                     console.error(
@@ -132,6 +138,15 @@ const SideBar = connect(
                     );
                     this.setLoadingCompetitionInformation(false);
                 });
+        };
+
+        setWcif = wcif => {
+            this.setLoadingCompetitionInformation(false);
+            this.props.updateEditingStatus(true);
+            this.props.updateWcif(wcif);
+            this.props.updateCompetitionId(wcif.id);
+            this.props.updateCompetitionName(wcif.name);
+            this.props.updateFileZipBlob(null);
         };
 
         logInButton = () => {
