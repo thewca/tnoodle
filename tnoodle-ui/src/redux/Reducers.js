@@ -1,6 +1,7 @@
 import { ActionTypes } from "./Types";
 import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
+import { getDefaultCopiesExtension } from "../api/tnoodle.api";
 import {
     competitionName2Id,
     competitionName2ShortName
@@ -86,9 +87,17 @@ export const Reducer = (store, action) => {
      * Either sets or reset WCIF to default.
      */
     if (action.type === ActionTypes.UPDATE_WCIF) {
+        let wcif = action.payload.wcif || defaultWcif;
+
+        // Sets copies to 1 since it does not come from the website.
+        wcif.events.forEach(event =>
+            event.rounds.forEach(round =>
+                round.extensions.push(getDefaultCopiesExtension())
+            )
+        );
         return {
             ...store,
-            wcif: action.payload.wcif || defaultWcif
+            wcif
         };
     }
 

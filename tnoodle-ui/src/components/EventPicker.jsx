@@ -8,6 +8,10 @@ import {
     updateFileZipBlob
 } from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
+import {
+    getDefaultCopiesExtension,
+    copiesExtensionId
+} from "../api/tnoodle.api";
 
 const mapStateToProps = store => ({
     mbld: store.mbld,
@@ -61,7 +65,7 @@ const EventPicker = connect(
                     id: eventId + "-r" + (rounds.length + 1),
                     format: this.props.event.format_ids[0],
                     scrambleSetCount: 1,
-                    copies: 1
+                    extensions: [getDefaultCopiesExtension()]
                 });
             }
             let wcaEvent = this.getWcaEvent(rounds);
@@ -87,7 +91,9 @@ const EventPicker = connect(
             if (value < 1) {
                 return;
             }
-            rounds[round].copies = value;
+            rounds[round].extensions.find(
+                extension => extension.id === copiesExtensionId
+            ).data.numCopies = value;
             let wcaEvent = this.getWcaEvent(rounds);
             this.updateEvent(wcaEvent);
         };
@@ -164,9 +170,13 @@ const EventPicker = connect(
             if (rounds.length === 0) {
                 return;
             }
+
             return (
                 <tbody>
                     {Array.from({ length: rounds.length }, (_, i) => {
+                        let copies = rounds[i].extensions.find(
+                            extension => extension.id === copiesExtensionId
+                        ).data.numCopies;
                         return (
                             <tr key={i} className="form-group">
                                 <th scope="row" className="align-middle">
@@ -219,7 +229,7 @@ const EventPicker = connect(
                                     <input
                                         className="form-control"
                                         type="number"
-                                        value={rounds[i].copies}
+                                        value={copies}
                                         onChange={evt =>
                                             this.handleNumberOfCopiesChange(
                                                 i,
@@ -228,11 +238,6 @@ const EventPicker = connect(
                                             )
                                         }
                                         min={1}
-                                        disabled={
-                                            this.props.editingDisabled
-                                                ? "disabled"
-                                                : ""
-                                        }
                                     />
                                 </td>
                             </tr>

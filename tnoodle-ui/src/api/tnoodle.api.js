@@ -1,4 +1,5 @@
-let baseUrl = window.location.origin;
+let baseUrl = "http://localhost:2014";
+//let baseUrl = window.location.origin;
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
 
@@ -11,6 +12,7 @@ export const fetchZip = (wcif, mbld, password) => {
         payload.zipPassword = password;
     }
 
+    // TODO keep this until we're going to prof just because
     console.log(payload);
 
     return fetch(url, {
@@ -26,4 +28,21 @@ export const fetchZip = (wcif, mbld, password) => {
 export const fetchRunningVersion = () => {
     let url = baseUrl + versionEndpoint;
     return fetch(url);
+};
+
+export const copiesExtensionId =
+    "org.worldcubeassociation.tnoodle.SheetCopyCount";
+
+/**
+ * This is the default extension the backend expects
+ * @param {} copies
+ */
+export const getDefaultCopiesExtension = (copies = 1) => {
+    return {
+        id: copiesExtensionId,
+        specUrl: "",
+        data: {
+            numCopies: copies
+        }
+    };
 };
