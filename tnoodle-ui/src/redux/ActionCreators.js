@@ -64,3 +64,8 @@ export const updateFileZipBlob = fileZipBlob => ({
     type: ActionTypes.UPDATE_FILE_ZIP_BLOB,
     payload: { fileZipBlob: fileZipBlob }
 });
+
+export const addCachedWcif = wcif => ({
+    type: ActionTypes.ADD_CACHED_WCIF,
+    payload: { wcif }
+});

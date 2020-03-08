@@ -8,7 +8,8 @@ import {
     updateCompetitions,
     updateMe,
     updateCompetitionId,
-    updateFileZipBlob
+    updateFileZipBlob,
+    addCachedWcif
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -17,13 +18,15 @@ import {
     logOut,
     fetchMe,
     getUpcomingManageableCompetitions,
-    getCompetitionJson
+    getCompetitionJson,
+    getQueryParameter
 } from "../api/wca.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 const mapStateToProps = store => ({
     me: store.me,
-    competitions: store.competitions
+    competitions: store.competitions,
+    cachedWcifs: store.cachedWcifs
 });
 
 const mapDispatchToProps = {
@@ -33,7 +36,8 @@ const mapDispatchToProps = {
     updateCompetitions,
     updateMe,
     updateCompetitionId,
-    updateFileZipBlob
+    updateFileZipBlob,
+    addCachedWcif
 };
 
 const SideBar = connect(
@@ -100,7 +104,16 @@ const SideBar = connect(
                         this.setLoadingCompetitions(false);
                     });
             }
+
+            let competitionId = getQueryParameter("competitionId");
+            if (competitionId != null) {
+                this.handleCompetitionSelection(competitionId);
+            }
         }
+
+        pluralize = (string, number) => {
+            return string + (number > 1 ? "s" : "");
+        };
 
         handleManualSelection = () => {
             this.props.updateEditingStatus(false);
@@ -108,9 +121,20 @@ const SideBar = connect(
             this.props.updateWcif({ ...defaultWcif });
             this.props.updateCompetitionName(getDefaultCompetitionName());
             this.props.updateFileZipBlob(null);
+            this.removeCompetitionIdQueryParam();
         };
 
         handleCompetitionSelection = competitionId => {
+            this.updateCompetitionIdQueryParam(competitionId);
+
+            // For quick switching between competitions.
+            let cachedWcif = this.props.cachedWcifs[competitionId];
+            if (cachedWcif != null) {
+                this.setWcif(cachedWcif);
+                this.maybeAddCompetition(cachedWcif.id, cachedWcif.name);
+                return;
+            }
+
             this.setState({
                 ...this.state,
                 loadingCompetitionInformation: true,
@@ -118,12 +142,9 @@ const SideBar = connect(
             });
             getCompetitionJson(competitionId)
                 .then(wcif => {
-                    this.setLoadingCompetitionInformation(false);
-                    this.props.updateEditingStatus(true);
-                    this.props.updateWcif(wcif);
-                    this.props.updateCompetitionId(wcif.id);
-                    this.props.updateCompetitionName(wcif.name);
-                    this.props.updateFileZipBlob(null);
+                    this.setWcif(wcif);
+                    this.props.addCachedWcif(wcif);
+                    this.maybeAddCompetition(wcif.id, wcif.name);
                 })
                 .catch(e => {
                     console.error(
@@ -132,6 +153,53 @@ const SideBar = connect(
                     );
                     this.setLoadingCompetitionInformation(false);
                 });
+        };
+
+        // In case we use competitionId from query params, it's not fetched.
+        // We add it to the list.
+        maybeAddCompetition = (competitionId, competitionName) => {
+            if (
+                !this.state.competitions.find(
+                    competition => competition.name === competitionName
+                )
+            ) {
+                this.setState({
+                    ...this.state,
+                    competitions: [
+                        ...this.state.competitions,
+                        { id: competitionId, name: competitionName }
+                    ]
+                });
+            }
+        };
+
+        updateCompetitionIdQueryParam = competitionId => {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set("competitionId", competitionId);
+            window.history.pushState(
+                {},
+                "",
+                window.location.origin + "?" + searchParams.toString()
+            );
+        };
+
+        removeCompetitionIdQueryParam = () => {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.delete("competitionId");
+            window.history.pushState(
+                {},
+                "",
+                window.location.origin + "?" + searchParams.toString()
+            );
+        };
+
+        setWcif = wcif => {
+            this.setLoadingCompetitionInformation(false);
+            this.props.updateEditingStatus(true);
+            this.props.updateWcif(wcif);
+            this.props.updateCompetitionId(wcif.id);
+            this.props.updateCompetitionName(wcif.name);
+            this.props.updateFileZipBlob(null);
         };
 
         logInButton = () => {
@@ -145,8 +213,15 @@ const SideBar = connect(
                         {isLogged() ? "Log Out" : "Log In"}
                     </button>
                     {this.state.me != null && (
-                        <p className="text-white">
-                            Welcome, {this.state.me.name}
+                        <p className="text-white mt-2">
+                            Welcome, {this.state.me.name}.{" "}
+                            {this.state.competitions != null &&
+                                `You have ${
+                                    this.state.competitions.length
+                                } manegeable ${this.pluralize(
+                                    " competition",
+                                    this.state.competitions.length
+                                )} upcoming.`}
                         </p>
                     )}
                 </li>

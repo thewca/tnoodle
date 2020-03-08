@@ -45,7 +45,10 @@ const EventPickerTable = connect(
                     this.setGeneratingScrambles(false);
                     this.props.updateFileZipBlob(blob);
                 })
-                .catch(e => console.error(e));
+                .catch(e => {
+                    console.error(e);
+                    this.setGeneratingScrambles(false);
+                });
         };
 
         setGeneratingScrambles = flag => {
