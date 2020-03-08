@@ -111,6 +111,10 @@ const SideBar = connect(
             }
         }
 
+        pluralize = (string, number) => {
+            return string + (number > 1 ? "s" : "");
+        };
+
         handleManualSelection = () => {
             this.props.updateEditingStatus(false);
             this.props.updateCompetitionId(null);
@@ -209,8 +213,15 @@ const SideBar = connect(
                         {isLogged() ? "Log Out" : "Log In"}
                     </button>
                     {this.state.me != null && (
-                        <p className="text-white">
-                            Welcome, {this.state.me.name}
+                        <p className="text-white mt-2">
+                            Welcome, {this.state.me.name}.{" "}
+                            {this.state.competitions != null &&
+                                `You have ${
+                                    this.state.competitions.length
+                                } manegeable ${this.pluralize(
+                                    " competition",
+                                    this.state.competitions.length
+                                )} upcoming.`}
                         </p>
                     )}
                 </li>
