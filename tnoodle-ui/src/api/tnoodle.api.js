@@ -1,5 +1,4 @@
-let baseUrl = "http://localhost:2014";
-//let baseUrl = window.location.origin;
+let baseUrl = window.location.origin;
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
 
