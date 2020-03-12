@@ -5,7 +5,7 @@ import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.routing.routing
-import io.ktor.serialization.serialization
+import io.ktor.serialization.json
 import io.ktor.server.engine.ShutDownUrl
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
@@ -33,7 +33,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         }
 
         app.install(ContentNegotiation) {
-            serialization(json = JsonConfig.SERIALIZER)
+            json(json = JsonConfig.SERIALIZER)
         }
     }
 
