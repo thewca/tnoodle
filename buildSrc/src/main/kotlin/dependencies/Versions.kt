@@ -4,7 +4,7 @@ object Versions {
     val JUNIT_JUPITER = "5.6.0"
     val BATIK = "1.12"
     val KOTLIN = "1.3.70"
-    val KTOR = "1.3.1"
+    val KTOR = "1.3.2"
     val PROGUARD = "6.2.2"
     val KOTLESS = "0.1.3"
 
@@ -21,7 +21,7 @@ object Versions {
     val KOTLIN_STDLIB_JS = KOTLIN
     val KOTLIN_STDLIB_COMMON = KOTLIN
     val KOTLIN_SERIALIZATION_JVM = "0.20.0"
-    val KOTLIN_COROUTINES_CORE = "1.3.3"
+    val KOTLIN_COROUTINES_CORE = "1.3.4"
     val KTOR_SERVER_NETTY = KTOR
     val KTOR_SERVER_SERVLET = KTOR
     val KTOR_SERIALIZATION = KTOR
