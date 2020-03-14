@@ -14,7 +14,8 @@ const mapStateToProps = store => ({
     editingDisabled: store.editingDisabled,
     competitionId: store.competitionId,
     officialZip: store.officialZip,
-    fileZipBlob: store.fileZipBlob
+    fileZipBlob: store.fileZipBlob,
+    translations: store.translations
 });
 
 const mapDispatchToProps = { updateFileZipBlob };
@@ -33,7 +34,12 @@ const EventPickerTable = connect(
         }
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
-            fetchZip(this.props.wcif, this.props.mbld, this.props.password)
+            fetchZip(
+                this.props.wcif,
+                this.props.mbld,
+                this.props.password,
+                this.props.translations
+            )
                 .then(response => {
                     if (response.ok) {
                         return response.blob();
@@ -65,7 +71,7 @@ const EventPickerTable = connect(
                 (this.props.competitionId != null && isUsingStaging());
 
             let fileName =
-                (isUnofficialZip ? "[Unofficial] " : "") +
+                (isUnofficialZip ? "[UNOFFICIAL] " : "") +
                 this.props.wcif.name +
                 ".zip";
 

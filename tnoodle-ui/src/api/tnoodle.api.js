@@ -2,10 +2,18 @@ let baseUrl = window.location.origin;
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
 
-export const fetchZip = (wcif, mbld, password) => {
+export const fetchZip = (wcif, mbld, password, translations) => {
     let url = baseUrl + zipEndpoint;
 
-    let payload = { wcif, multiCubes: { requestedScrambles: mbld } };
+    // TODO find out how translations are expected
+
+    let payload = {
+        wcif,
+        multiCubes: { requestedScrambles: mbld },
+        translations: translations
+            .filter(translation => translation.status)
+            .map(translation => translation.id)
+    };
 
     if (password != null && password.length > 0) {
         payload.zipPassword = password;

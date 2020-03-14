@@ -7,7 +7,6 @@ import {
     competitionName2ShortName
 } from "../util/competition.name.util";
 
-// TODO remove default translations
 const defaultStore = {
     wcif: defaultWcif,
     mbld: MBLD_DEFAULT,
