@@ -7,7 +7,6 @@ export const competitionName2Id = competitionName => {
     return competitionName.replace(/[\W]/gi, "");
 };
 
-// TODO check wcif for the real purpose of shortName
 export const competitionName2ShortName = competitionName => {
     return competitionName;
 };

@@ -114,7 +114,6 @@ const EventPicker = connect(
 
         // When mbld loses focus
         verifyMbld = () => {
-            // TODO search for the best result and warn if someone selects less mbld than this.
             let mbld = this.state.mbld;
             if (mbld < MBLD_MIN) {
                 mbld = MBLD_MIN;

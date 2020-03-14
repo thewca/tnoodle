@@ -80,7 +80,6 @@ export function fetchVersionInfo() {
 }
 
 export function getCompetitionJson(competitionId) {
-    // TODO graphql here
     return wcaApiFetch(`/competitions/${competitionId}/wcif`).then(response =>
         response.json()
     );
