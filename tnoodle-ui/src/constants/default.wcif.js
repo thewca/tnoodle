@@ -4,5 +4,6 @@ export const defaultWcif = {
     shortName: "",
     id: "",
     events: [],
+    persons: [],
     schedule: { numberOfDays: 0, venues: [] }
 };

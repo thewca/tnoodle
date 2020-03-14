@@ -8,6 +8,7 @@ import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
 import dependencies.Libraries.KTOR_SERVER_SERVLET
 import dependencies.Libraries.LOGBACK_CLASSIC
 import dependencies.Libraries.MARKDOWNJ_CORE
+import dependencies.Libraries.KOTLIN_SERIALIZATION_JVM
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -29,6 +30,8 @@ dependencies {
 
     implementation(BOUNCYCASTLE)
     implementation(MARKDOWNJ_CORE)
+
+    implementation(KOTLIN_SERIALIZATION_JVM)
 
     runtimeOnly(LOGBACK_CLASSIC)
 }

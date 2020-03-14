@@ -11,11 +11,6 @@ object WCIFParser {
         return JsonConfig.SERIALIZER.parse(Competition.serializer(), wcif)
     }
 
-    fun parsePartial(schedule: String): Competition {
-        val parsedSchedule = JsonConfig.SERIALIZER.parse(Schedule.serializer(), schedule)
-        return Competition("1.0", "id", "name", "shortName", emptyList(), parsedSchedule)
-    }
-
     val WCIF_DATE_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
     fun String.parseWCIFDateWithTimezone(timeZone: ZoneId) = ZonedDateTime.parse(this, WCIF_DATE_FORMAT)

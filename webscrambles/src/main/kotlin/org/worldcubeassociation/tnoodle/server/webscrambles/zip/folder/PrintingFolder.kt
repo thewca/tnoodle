@@ -25,8 +25,8 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
     fun assemble(generationDate: LocalDate, versionTag: String, password: String?): Folder {
         val fmcRequests = uniqueTitles.filterValues { it.isFmc }
 
-        val pseudoActivityCode = "${EventPlugins.THREE_FM.key}-${ActivityCode.WCIF_PREFIX_ROUND}1"
-        val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), ActivityCode(pseudoActivityCode), globalTitle, Translate.DEFAULT_LOCALE)
+        val pseudoActivityCode = ActivityCode.compile(EventPlugins.THREE_FM, round = 1)
+        val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), pseudoActivityCode, globalTitle, Translate.DEFAULT_LOCALE)
         val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag)
 
         return folder("Printing") {
@@ -51,9 +51,10 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
 
                         folder("Translations") {
                             val requestedTranslations = req.scrambleSet.findExtension<FmcLanguagesExtension>()
-                                ?.languageTags?.takeUnless { it.isEmpty() } ?: Translate.locales.map { it.toLanguageTag() }
+                                ?.languageTags?.takeUnless { it.isEmpty() }
+                                ?: Translate.TRANSLATED_LOCALES.map { it.toLanguageTag() }
 
-                            for (locale in Translate.locales) {
+                            for (locale in Translate.TRANSLATED_LOCALES) {
                                 if (locale.toLanguageTag() !in requestedTranslations) {
                                     continue
                                 }

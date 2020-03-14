@@ -102,9 +102,7 @@ object ScrambleViewHandler : RouteHandler {
                 get("json") {
                     call.withScramble { puzzle, _ ->
                         val pzlSize = puzzle.preferredSize
-
-                        val dim = DimensionJsonData(pzlSize.width, pzlSize.height)
-                        val jsonData = PuzzleImageJsonData(dim, puzzle.defaultColorScheme)
+                        val jsonData = PuzzleImageJsonData(pzlSize.width, pzlSize.height, puzzle.defaultColorScheme)
 
                         respond(jsonData)
                     }
