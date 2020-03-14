@@ -51,6 +51,7 @@ const EventPicker = connect(
 
             if (this.state.id === "333fm") {
                 this.state.translationsPerLine = 4;
+                this.state.showTranslations = false;
             }
         }
 
@@ -175,11 +176,41 @@ const EventPicker = connect(
             this.props.resetTranslations();
         };
 
+        toggleTranslations = () => {
+            this.setState({
+                ...this.state,
+                showTranslations: !this.state.showTranslations
+            });
+        };
+
         maybeShowFmcTranslations = numberOfRounds => {
             if (this.state.id !== "333fm") {
                 return;
             }
 
+            if (numberOfRounds > 0) {
+                return (
+                    <tfoot>
+                        <tr>
+                            <th colSpan={4} className="text-center">
+                                <button
+                                    className="btn btn-info"
+                                    onClick={this.toggleTranslations}
+                                >
+                                    Translations
+                                </button>
+                            </th>
+                        </tr>
+                        {this.maybeShowFmcTranslationsDetails()}
+                    </tfoot>
+                );
+            }
+        };
+
+        maybeShowFmcTranslationsDetails = () => {
+            if (!this.state.showTranslations) {
+                return;
+            }
             let translations = _.chunk(
                 this.props.translations,
                 this.state.translationsPerLine
@@ -195,98 +226,87 @@ const EventPicker = connect(
             let spaceStyle = {
                 width: `${spaceWidth}%`
             };
-            if (numberOfRounds >= 0) {
-                return (
-                    <tfoot>
-                        <tr>
-                            <th colSpan={4} className="text-center">
-                                <button
-                                    className="btn btn-info"
-                                    onClick={this.toggleTranslations}
-                                >
-                                    Translations
-                                </button>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th colSpan={4}>
-                                <button
-                                    className="btn btn-outline-secondary btn-group"
-                                    onClick={this.selectAllTranslations}
-                                >
-                                    Select All
-                                </button>
-                                <button
-                                    className="btn btn-outline-secondary btn-group"
-                                    onClick={this.selectNoneTranslation}
-                                >
-                                    Select None
-                                </button>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th colSpan={4} className="text-center">
-                                <table className="table table-hover">
-                                    <tbody>
-                                        {translations.map(
-                                            (translationsChunk, i) => (
-                                                <tr key={i}>
-                                                    {translationsChunk.map(
-                                                        (translation, j) => (
-                                                            <React.Fragment
-                                                                key={j}
+            return (
+                <React.Fragment>
+                    <tr>
+                        <th colSpan={4}>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={this.selectAllTranslations}
+                            >
+                                Select All
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={this.selectNoneTranslation}
+                            >
+                                Select None
+                            </button>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th colSpan={4} className="text-center">
+                            <table className="table table-hover">
+                                <tbody>
+                                    {translations.map(
+                                        (translationsChunk, i) => (
+                                            <tr key={i}>
+                                                {translationsChunk.map(
+                                                    (translation, j) => (
+                                                        <React.Fragment key={j}>
+                                                            <th
+                                                                style={
+                                                                    contentStyle
+                                                                }
                                                             >
-                                                                <th
-                                                                    style={
-                                                                        contentStyle
+                                                                <label>
+                                                                    {
+                                                                        translation.id
                                                                     }
-                                                                >
-                                                                    <label>
-                                                                        {
+                                                                </label>
+                                                            </th>
+                                                            <th
+                                                                style={
+                                                                    contentStyle
+                                                                }
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={
+                                                                        translation.status
+                                                                    }
+                                                                    onChange={_ =>
+                                                                        this.handleTranslation(
                                                                             translation.id
-                                                                        }
-                                                                    </label>
-                                                                </th>
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </th>
+                                                            {j <
+                                                                this.state
+                                                                    .translationsPerLine -
+                                                                    1 && (
                                                                 <th
                                                                     style={
-                                                                        contentStyle
+                                                                        spaceStyle
                                                                     }
-                                                                >
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        checked={
-                                                                            translation.status
-                                                                        }
-                                                                        onChange={_ =>
-                                                                            this.handleTranslation(
-                                                                                translation.id
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </th>
-                                                                {j <
-                                                                    this.state
-                                                                        .translationsPerLine -
-                                                                        1 && (
-                                                                    <th
-                                                                        style={
-                                                                            spaceStyle
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            </React.Fragment>
-                                                        )
-                                                    )}
-                                                </tr>
-                                            )
-                                        )}
-                                    </tbody>
-                                </table>
-                            </th>
-                        </tr>
-                    </tfoot>
-                );
-            }
+                                                                />
+                                                            )}
+                                                        </React.Fragment>
+                                                    )
+                                                )}
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+                </React.Fragment>
+            );
         };
 
         maybeShowTableTitles = rounds => {
