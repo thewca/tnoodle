@@ -38,7 +38,7 @@ if (wcaAccessToken) {
 }
 
 export function isUsingStaging() {
-    return !!getQueryParameter("staging");
+    return getQueryParameter("staging") === "true";
 }
 
 export function toWcaUrl(path) {
