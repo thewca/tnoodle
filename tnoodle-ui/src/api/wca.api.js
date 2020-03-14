@@ -67,6 +67,7 @@ export function isLogged() {
 }
 
 export function logOut() {
+    delete localStorage[TNOODLE_LAST_LOGIN_ENV];
     delete localStorage[TNOODLE_ACCESS_TOKEN_KEY];
     wcaAccessToken = null;
     window.location.reload();
