@@ -127,7 +127,7 @@ const EventPickerTable = connect(
             if (this.props.fileZipBlob != null) {
                 return (
                     <button
-                        className="btn btn-primary btn-lg"
+                        className="btn btn-success btn-lg"
                         onClick={this.downloadZip}
                     >
                         Download Scrambles
