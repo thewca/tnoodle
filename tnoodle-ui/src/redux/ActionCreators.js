@@ -69,3 +69,18 @@ export const addCachedWcif = wcif => ({
     type: ActionTypes.ADD_CACHED_WCIF,
     payload: { wcif }
 });
+
+export const updateTranslation = id => ({
+    type: ActionTypes.UPDATE_TRANSLATION,
+    payload: { id }
+});
+
+export const resetTranslations = () => ({
+    type: ActionTypes.RESET_TRANSLATIONS,
+    payload: {}
+});
+
+export const selectAllTranslations = () => ({
+    type: ActionTypes.SELECT_ALL_TRANSLATIONS,
+    payload: {}
+});

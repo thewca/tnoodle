@@ -7,6 +7,7 @@ import {
     competitionName2ShortName
 } from "../util/competition.name.util";
 
+// TODO remove default translations
 const defaultStore = {
     wcif: defaultWcif,
     mbld: MBLD_DEFAULT,
@@ -14,7 +15,32 @@ const defaultStore = {
     editingDisabled: false,
     officialZip: true,
     fileZipBlob: null,
-    cachedWcifs: {}
+    cachedWcifs: {},
+    translations: [
+        { id: "da", status: true },
+        { id: "de", status: true },
+        { id: "en", status: true },
+        { id: "es", status: true },
+        { id: "et", status: true },
+        { id: "fi", status: true },
+        { id: "fr", status: true },
+        { id: "hr", status: true },
+        { id: "hu", status: true },
+        { id: "id", status: true },
+        { id: "it", status: true },
+        { id: "ja", status: true },
+        { id: "ko", status: true },
+        { id: "nb", status: true },
+        { id: "pl", status: true },
+        { id: "pt-BR", status: true },
+        { id: "pt", status: true },
+        { id: "ro", status: true },
+        { id: "ru", status: true },
+        { id: "sl", status: true },
+        { id: "vi", status: true },
+        { id: "zh-CN", status: true },
+        { id: "zh-TW", status: true }
+    ]
 };
 
 export const Reducer = (store, action) => {
@@ -127,6 +153,45 @@ export const Reducer = (store, action) => {
                 ...store.cachedWcifs,
                 [action.payload.wcif.id]: action.payload.wcif
             }
+        };
+    }
+
+    if (action.type === ActionTypes.RESET_TRANSLATIONS) {
+        return {
+            ...store,
+            translations: [
+                ...store.translations.map(translation => ({
+                    ...translation,
+                    status: false
+                }))
+            ]
+        };
+    }
+
+    if (action.type === ActionTypes.UPDATE_TRANSLATION) {
+        return {
+            ...store,
+            translations: [
+                ...store.translations.map(translation => ({
+                    ...translation,
+                    status:
+                        translation.id === action.payload.id
+                            ? !translation.status
+                            : translation.status
+                }))
+            ]
+        };
+    }
+
+    if (action.type === ActionTypes.SELECT_ALL_TRANSLATIONS) {
+        return {
+            ...store,
+            translations: [
+                ...store.translations.map(translation => ({
+                    ...translation,
+                    status: true
+                }))
+            ]
         };
     }
 

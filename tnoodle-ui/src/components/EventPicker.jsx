@@ -1,11 +1,15 @@
 import React, { Component } from "react";
+import _ from "lodash";
 import { connect } from "react-redux";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
 import {
     updateWcaEvent,
     updateMbld,
-    updateFileZipBlob
+    updateFileZipBlob,
+    updateTranslation,
+    selectAllTranslations,
+    resetTranslations
 } from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 import {
@@ -16,13 +20,17 @@ import {
 const mapStateToProps = store => ({
     mbld: store.mbld,
     editingDisabled: store.editingDisabled,
-    wcif: store.wcif
+    wcif: store.wcif,
+    translations: store.translations
 });
 
 const mapDispatchToProps = {
     updateWcaEvent,
     updateMbld,
-    updateFileZipBlob
+    updateFileZipBlob,
+    updateTranslation,
+    selectAllTranslations,
+    resetTranslations
 };
 
 const EventPicker = connect(
@@ -39,6 +47,10 @@ const EventPicker = connect(
 
             if (this.state.id === "333mbf") {
                 this.state.mbld = props.mbld;
+            }
+
+            if (this.state.id === "333fm") {
+                this.state.translationsPerLine = 4;
             }
         }
 
@@ -145,6 +157,132 @@ const EventPicker = connect(
                                     onBlur={this.verifyMbld}
                                 />
                             </td>
+                        </tr>
+                    </tfoot>
+                );
+            }
+        };
+
+        handleTranslation = id => {
+            this.props.updateTranslation(id);
+        };
+
+        selectAllTranslations = () => {
+            this.props.selectAllTranslations();
+        };
+
+        selectNoneTranslation = () => {
+            this.props.resetTranslations();
+        };
+
+        maybeShowFmcTranslations = numberOfRounds => {
+            if (this.state.id !== "333fm") {
+                return;
+            }
+
+            let translations = _.chunk(
+                this.props.translations,
+                this.state.translationsPerLine
+            );
+
+            let chunkWidth = 100.0 / this.state.translationsPerLine; // For each translation
+            let filledWidth = 0.8 * chunkWidth; // For label and the checkbox
+            let spaceWidth = chunkWidth - filledWidth;
+            let contentWidth = filledWidth / 2; // For each label or checkbox
+            let contentStyle = {
+                width: `${contentWidth}%`
+            };
+            let spaceStyle = {
+                width: `${spaceWidth}%`
+            };
+            if (numberOfRounds >= 0) {
+                return (
+                    <tfoot>
+                        <tr>
+                            <th colSpan={4} className="text-center">
+                                <button
+                                    className="btn btn-info"
+                                    onClick={this.toggleTranslations}
+                                >
+                                    Translations
+                                </button>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colSpan={4}>
+                                <button
+                                    className="btn btn-outline-secondary btn-group"
+                                    onClick={this.selectAllTranslations}
+                                >
+                                    Select All
+                                </button>
+                                <button
+                                    className="btn btn-outline-secondary btn-group"
+                                    onClick={this.selectNoneTranslation}
+                                >
+                                    Select None
+                                </button>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colSpan={4} className="text-center">
+                                <table className="table table-hover">
+                                    <tbody>
+                                        {translations.map(
+                                            (translationsChunk, i) => (
+                                                <tr key={i}>
+                                                    {translationsChunk.map(
+                                                        (translation, j) => (
+                                                            <React.Fragment
+                                                                key={j}
+                                                            >
+                                                                <th
+                                                                    style={
+                                                                        contentStyle
+                                                                    }
+                                                                >
+                                                                    <label>
+                                                                        {
+                                                                            translation.id
+                                                                        }
+                                                                    </label>
+                                                                </th>
+                                                                <th
+                                                                    style={
+                                                                        contentStyle
+                                                                    }
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={
+                                                                            translation.status
+                                                                        }
+                                                                        onChange={_ =>
+                                                                            this.handleTranslation(
+                                                                                translation.id
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </th>
+                                                                {j <
+                                                                    this.state
+                                                                        .translationsPerLine -
+                                                                        1 && (
+                                                                    <th
+                                                                        style={
+                                                                            spaceStyle
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </React.Fragment>
+                                                        )
+                                                    )}
+                                                </tr>
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </th>
                         </tr>
                     </tfoot>
                 );
@@ -299,6 +437,7 @@ const EventPicker = connect(
                     </thead>
                     {this.maybeShowTableBody(event, rounds)}
                     {this.maybeShowMbld(rounds)}
+                    {this.maybeShowFmcTranslations(rounds.length)}
                 </table>
             );
         }
