@@ -16,34 +16,36 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competiti
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.PrintingFolder
 import java.util.*
 
-object WcifDataHandler : RouteHandler {
+object FrontendDataHandler : RouteHandler {
     override fun install(router: Routing) {
-        router.route("wcif/data") {
-            get("events") {
-                val eventData = EventPlugins.values().map {
-                    json {
-                        "id" to it.key
-                        "name" to it.description
-                        "format_ids" to it.legalFormats.map(FormatPlugins::key)
-                        "can_change_time_limit" to (it !in EventPlugins.ONE_HOUR_EVENTS)
-                        "is_timed_event" to (it !in EventPlugins.ONE_HOUR_EVENTS)
-                        "is_fewest_moves" to (it == EventPlugins.THREE_FM)
-                        "is_multiple_blindfolded" to (it == EventPlugins.THREE_MULTI_BLD)
+        router.route("frontend") {
+            route("data") {
+                get("events") {
+                    val eventData = EventPlugins.values().map {
+                        json {
+                            "id" to it.key
+                            "name" to it.description
+                            "format_ids" to it.legalFormats.map(FormatPlugins::key)
+                            "can_change_time_limit" to (it !in EventPlugins.ONE_HOUR_EVENTS)
+                            "is_timed_event" to (it !in EventPlugins.ONE_HOUR_EVENTS)
+                            "is_fewest_moves" to (it == EventPlugins.THREE_FM)
+                            "is_multiple_blindfolded" to (it == EventPlugins.THREE_MULTI_BLD)
+                        }
                     }
+
+                    call.respond(eventData)
                 }
 
-                call.respond(eventData)
-            }
-
-            get("formats") {
-                val formatData = FormatPlugins.WCA_FORMATS.mapValues {
-                    json {
-                        "name" to it.value.description
-                        "shortName" to it.value.tag
+                get("formats") {
+                    val formatData = FormatPlugins.WCA_FORMATS.mapValues {
+                        json {
+                            "name" to it.value.description
+                            "shortName" to it.value.tag
+                        }
                     }
-                }
 
-                call.respond(formatData)
+                    call.respond(formatData)
+                }
             }
 
             route("fmc/languages") {
