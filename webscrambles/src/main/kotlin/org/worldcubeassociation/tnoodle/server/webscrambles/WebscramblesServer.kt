@@ -36,7 +36,6 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             wcifHandler.install(this)
             WcifDataHandler.install(this)
             JobSchedulingHandler.install(this)
-            FrontendDataHandler.install(this)
         }
 
         baseServer.spinUp(app)
