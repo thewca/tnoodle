@@ -6,7 +6,3 @@ export const getDefaultCompetitionName = () => {
 export const competitionName2Id = competitionName => {
     return competitionName.replace(/[\W]/gi, "");
 };
-
-export const competitionName2ShortName = competitionName => {
-    return competitionName;
-};

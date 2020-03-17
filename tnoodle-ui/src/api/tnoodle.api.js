@@ -1,18 +1,18 @@
 let baseUrl = window.location.origin;
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
+let languagesEndpoint = "/frontend/fmc/languages/available";
+
+export const copiesExtensionId =
+    "org.worldcubeassociation.tnoodle.SheetCopyCount";
 
 export const fetchZip = (wcif, mbld, password, translations) => {
     let url = baseUrl + zipEndpoint;
 
-    // TODO find out how translations are expected
-
     let payload = {
         wcif,
         multiCubes: { requestedScrambles: mbld },
-        translations: translations
-            .filter(translation => translation.status)
-            .map(translation => translation.id)
+        fmcLanguages: languageHelper(translations)
     };
 
     if (password != null && password.length > 0) {
@@ -30,15 +30,11 @@ export const fetchZip = (wcif, mbld, password, translations) => {
 };
 
 export const fetchRunningVersion = () => {
-    let url = baseUrl + versionEndpoint;
-    return fetch(url);
+    return fetch(baseUrl + versionEndpoint);
 };
 
-export const copiesExtensionId =
-    "org.worldcubeassociation.tnoodle.SheetCopyCount";
-
 /**
- * This is the default extension the backend expects
+ * This is the default extension object the backend expects
  * @param {} copies
  */
 export const getDefaultCopiesExtension = (copies = 1) => {
@@ -48,5 +44,20 @@ export const getDefaultCopiesExtension = (copies = 1) => {
         data: {
             numCopies: copies
         }
+    };
+};
+
+export const fetchAvailableLanguages = () => {
+    return fetch(baseUrl + languagesEndpoint);
+};
+
+const languageHelper = translations => {
+    if (translations == null) {
+        return null;
+    }
+    return {
+        fmcLanguages: translations
+            .filter(translation => translation.status)
+            .map(translation => translation.id)
     };
 };

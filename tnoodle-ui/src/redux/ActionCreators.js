@@ -70,6 +70,11 @@ export const addCachedWcif = wcif => ({
     payload: { wcif }
 });
 
+export const updateTranslations = translations => ({
+    type: ActionTypes.UPDATE_TRANSLATIONS,
+    payload: { translations }
+});
+
 export const updateTranslation = id => ({
     type: ActionTypes.UPDATE_TRANSLATION,
     payload: { id }

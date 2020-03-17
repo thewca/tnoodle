@@ -184,7 +184,7 @@ const EventPicker = connect(
         };
 
         maybeShowFmcTranslations = numberOfRounds => {
-            if (this.state.id !== "333fm") {
+            if (this.state.id !== "333fm" || this.props.translations == null) {
                 return;
             }
 

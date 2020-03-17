@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
-import { fetchZip } from "../api/tnoodle.api";
+import { fetchZip, fetchAvailableLanguages } from "../api/tnoodle.api";
 import { toWcaUrl, isUsingStaging } from "../api/wca.api";
-import { updateFileZipBlob } from "../redux/ActionCreators";
+import { updateFileZipBlob, updateTranslations } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
 
 const mapStateToProps = store => ({
@@ -18,7 +18,7 @@ const mapStateToProps = store => ({
     translations: store.translations
 });
 
-const mapDispatchToProps = { updateFileZipBlob };
+const mapDispatchToProps = { updateFileZipBlob, updateTranslations };
 
 const BOOTSTRAP_GRID = 12;
 const EVENTS_PER_LINE = 2;
@@ -32,6 +32,19 @@ const EventPickerTable = connect(
             super(props);
             this.state = { generatingScrambles: false };
         }
+
+        componentDidMount = function() {
+            fetchAvailableLanguages()
+                .then(response => response.json())
+                .then(languages => {
+                    let translations = languages.map(language => ({
+                        id: language,
+                        status: true
+                    }));
+                    this.props.updateTranslations(translations);
+                });
+        };
+
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
             fetchZip(

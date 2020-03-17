@@ -2,10 +2,7 @@ import { ActionTypes } from "./Types";
 import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 import { getDefaultCopiesExtension } from "../api/tnoodle.api";
-import {
-    competitionName2Id,
-    competitionName2ShortName
-} from "../util/competition.name.util";
+import { competitionName2Id } from "../util/competition.name.util";
 
 const defaultStore = {
     wcif: defaultWcif,
@@ -15,31 +12,7 @@ const defaultStore = {
     officialZip: true,
     fileZipBlob: null,
     cachedWcifs: {},
-    translations: [
-        { id: "da", status: true },
-        { id: "de", status: true },
-        { id: "en", status: true },
-        { id: "es", status: true },
-        { id: "et", status: true },
-        { id: "fi", status: true },
-        { id: "fr", status: true },
-        { id: "hr", status: true },
-        { id: "hu", status: true },
-        { id: "id", status: true },
-        { id: "it", status: true },
-        { id: "ja", status: true },
-        { id: "ko", status: true },
-        { id: "nb", status: true },
-        { id: "pl", status: true },
-        { id: "pt-BR", status: true },
-        { id: "pt", status: true },
-        { id: "ro", status: true },
-        { id: "ru", status: true },
-        { id: "sl", status: true },
-        { id: "vi", status: true },
-        { id: "zh-CN", status: true },
-        { id: "zh-TW", status: true }
-    ]
+    translations: null
 };
 
 export const Reducer = (store, action) => {
@@ -66,15 +39,14 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_COMPETITION_NAME) {
         let competitionName = action.payload.competitionName;
-        let shortName = competitionName2ShortName(competitionName);
         let id = competitionName2Id(competitionName);
         return {
             ...store,
             wcif: {
                 ...store.wcif,
                 name: competitionName,
-                shortName: shortName,
-                id: id
+                shortName: competitionName,
+                id
             }
         };
     }
@@ -179,6 +151,13 @@ export const Reducer = (store, action) => {
                             : translation.status
                 }))
             ]
+        };
+    }
+
+    if (action.type === ActionTypes.UPDATE_TRANSLATIONS) {
+        return {
+            ...store,
+            translations: action.payload.translations
         };
     }
 
