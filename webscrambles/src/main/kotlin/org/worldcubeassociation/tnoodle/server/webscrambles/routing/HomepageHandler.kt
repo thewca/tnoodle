@@ -6,30 +6,22 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 
-object RouteRedirectHandler : RouteHandler {
+object HomepageHandler : RouteHandler {
     override fun install(router: Route) {
         // HOMEPAGE
 
-        router.get("/") {
+        router.get {
             call.respondRedirect("/scramble", true)
         }
 
-        // README shortcuts
+        // README shortcut
 
-        router.get("/about") {
+        router.get("about") {
             call.respondRedirect("/readme/scramble")
         }
 
-        router.get("/about.md") {
-            call.respondRedirect("/about", true)
-        }
-
-        router.get("/readme") {
+        router.get("readme") {
             call.respondRedirect("/readme/tnoodle")
-        }
-
-        router.get("/readme.md") {
-            call.respondRedirect("/readme", true)
         }
     }
 }

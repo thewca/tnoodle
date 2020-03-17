@@ -12,8 +12,8 @@ import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 
 object ReadmeHandler : RouteHandler {
     override fun install(router: Route) {
-        router.route("/readme") {
-            get("/scramble") {
+        router.route("readme") {
+            get("scramble") {
                 val scramblesReadmeStream = ReadmeHandler.javaClass.getResourceAsStream("/wca/readme-scramble.md")
                 val rawReadme = scramblesReadmeStream.bufferedReader().readText()
 
@@ -29,7 +29,7 @@ object ReadmeHandler : RouteHandler {
                 call.respondText(markdownToHTML(scramblesReadme), ContentType.Text.Html)
             }
 
-            get("/tnoodle") {
+            get("tnoodle") {
                 val tnoodleReadmeStream = ReadmeHandler.javaClass.getResourceAsStream("/wca/readme-tnoodle.md")
                 val readme = tnoodleReadmeStream.bufferedReader().readText()
 

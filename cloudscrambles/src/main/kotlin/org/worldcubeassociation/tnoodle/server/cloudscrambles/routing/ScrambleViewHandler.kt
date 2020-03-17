@@ -27,6 +27,11 @@ import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
 object ScrambleViewHandler : RouteHandler {
+    private const val PUZZLE_KEY_PARAM = PuzzleListHandler.PUZZLE_KEY_PARAM
+
+    private const val QUERY_SCRAMBLE_PARAM = "scramble"
+    private const val QUERY_COLOR_SCHEME_PARAM = "scheme"
+
     // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
     internal class BufferedImageTranscoder : ImageTranscoder() {
         var bufferedImage: BufferedImage? = null
@@ -42,14 +47,14 @@ object ScrambleViewHandler : RouteHandler {
     }
 
     private suspend fun ApplicationCall.withScramble(handle: suspend ApplicationCall.(Puzzle, Svg) -> Unit) {
-        val name = parameters["puzzleKey"]
+        val name = parameters[PUZZLE_KEY_PARAM]
             ?: return respondText("Please specify a puzzle")
 
         val scrambler = PuzzleData.WCA_PUZZLES[name]?.scrambler
             ?: return respondText("Invalid scrambler: $name")
 
-        val scramble = request.queryParameters["scramble"]
-        val colorScheme = request.queryParameters["scheme"]
+        val scramble = request.queryParameters[QUERY_SCRAMBLE_PARAM]
+        val colorScheme = request.queryParameters[QUERY_COLOR_SCHEME_PARAM]
             ?.let { scrambler.parseColorScheme(it) } ?: hashMapOf()
 
         val svg = scrambler.drawScramble(scramble, colorScheme)
@@ -59,7 +64,7 @@ object ScrambleViewHandler : RouteHandler {
 
     override fun install(router: Route) {
         router.route("view") {
-            route("{puzzleKey}") {
+            route("{$PUZZLE_KEY_PARAM}") {
                 get("png") {
                     call.withScramble { puzzle, svg ->
                         val svgFile = svg.toString().byteInputStream()

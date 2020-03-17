@@ -39,9 +39,9 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
                 JobSchedulingHandler.install(this)
             }
 
+            FrontendApplicationHandler.install(this)
+            HomepageHandler.install(this)
             ReadmeHandler.install(this)
-            RouteRedirectHandler.install(this)
-            StaticContentHandler.install(this)
             wcifHandler.install(this)
         }
 
