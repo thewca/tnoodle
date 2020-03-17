@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.cryptography
+package org.worldcubeassociation.tnoodle.server.crypto
 
 import org.bouncycastle.util.io.pem.PemReader
 import java.security.*
