@@ -11,7 +11,7 @@ object HomepageHandler : RouteHandler {
         // HOMEPAGE
 
         router.get("/") {
-            call.respondText("Hello, friend!")
+            call.respondText("Welcome, friend!")
         }
     }
 }
