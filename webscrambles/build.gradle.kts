@@ -42,7 +42,7 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation(project(":server-ktor"))
+    implementation(project(":tnoodle-server"))
 
     implementation(ZIP4J)
     implementation(ITEXTPDF)

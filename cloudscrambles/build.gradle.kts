@@ -22,7 +22,7 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation(project(":server-ktor"))
+    implementation(project(":tnoodle-server"))
 
     implementation(KOTLESS_KTOR)
     implementation(GOOGLE_CLOUD_STORAGE)
