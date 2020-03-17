@@ -13,5 +13,7 @@ enum class FormatPlugins(val key: String, val description: String, val tag: Stri
         val BIG_AVERAGE_FORMATS = sortedSetOf(AVERAGE_OF_5, BEST_OF_3, BEST_OF_2, BEST_OF_1)
         val SMALL_AVERAGE_FORMATS = sortedSetOf(MEAN_OF_3, BEST_OF_2, BEST_OF_1)
         val BLD_SPECIAL_FORMATS = sortedSetOf(BEST_OF_3, BEST_OF_2, BEST_OF_1)
+
+        val DEFAULT_FALLBACK_FORMAT = AVERAGE_OF_5
     }
 }
