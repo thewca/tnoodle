@@ -3,13 +3,13 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser.atLocalStartOfDay
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
 import java.time.LocalDate
 import java.time.Period
+import java.time.ZonedDateTime
 
 data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingData: CompetitionDrawingData) {
     fun assemble(wcifSchedule: Schedule, generationDate: LocalDate, versionTag: String): Folder {
@@ -113,5 +113,9 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
             val safeGlobalTitle = globalTitle.toFileSafeString()
             file("Ordered $safeGlobalTitle - All Scrambles.pdf", completeOrderedPdf.render())
         }
+    }
+
+    companion object {
+        fun ZonedDateTime.atLocalStartOfDay() = toLocalDate().atStartOfDay(zone).toLocalDate()
     }
 }

@@ -8,8 +8,8 @@ import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.UpcomingCompetition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFParser
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import java.net.URL
 import java.time.LocalDateTime
@@ -34,9 +34,8 @@ object APIIntegrationTest {
             val wcifRaw = URL(url).readText()
             val multiCubes = MultiScrambleCountExtension(Random.nextInt(10, 20))
 
-            val blankWcif = WCIFParser.parseComplete(wcifRaw).run {
-                WCIFScrambleMatcher.installExtensionForEvents(this, multiCubes, EventPlugins.THREE_MULTI_BLD)
-            }
+            val websiteWcif = JsonConfig.SERIALIZER.parse(Competition.serializer(), wcifRaw)
+            val blankWcif = WCIFScrambleMatcher.installExtensionForEvents(websiteWcif, multiCubes, EventPlugins.THREE_MULTI_BLD)
 
             println("Fetched WCIF. On to computing scrambles…")
             val scrambledWcif = WCIFScrambleMatcher.fillScrambleSets(blankWcif)
