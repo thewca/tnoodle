@@ -23,7 +23,7 @@ abstract class BaseScrambleSheet(val scrambleSet: ScrambleSet, val activityCode:
         }
     }
 
-    protected val scramblingPuzzle = Event.findPuzzlePlugin(activityCode.eventId)?.scrambler
+    protected val scramblingPuzzle = activityCode.eventPlugin?.scrambler?.scrambler
         ?: error("Cannot draw PDF: Scrambler for $activityCode not found in plugins")
 
     override fun finalise(processedBytes: ByteArrayOutputStream, password: String?): ByteArray {

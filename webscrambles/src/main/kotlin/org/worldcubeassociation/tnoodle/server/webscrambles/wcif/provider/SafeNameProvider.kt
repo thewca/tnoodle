@@ -1,9 +1,9 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
+package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 
-abstract class SafeNamed {
-    abstract val name: String
+interface SafeNameProvider {
+    val name: String
 
     val safeName: String
         get() = parseMarkdown(name)
