@@ -16,7 +16,7 @@ import dependencies.Libraries.ZIP4J
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-description = "A server plugin wrapper for scrambles that also draws pdfs."
+description = "An extension over the core server to provide a user-friendly UI. Also draws PDFs."
 
 attachRemoteRepositories()
 
@@ -31,9 +31,9 @@ buildscript {
 }
 
 plugins {
+    kotlin("jvm")
     application
     SHADOW
-    kotlin("jvm")
     GIT_VERSION_TAG
     KOTLIN_SERIALIZATION
 }
