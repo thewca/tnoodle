@@ -7,11 +7,14 @@ import io.ktor.http.content.static
 import io.ktor.routing.Route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 
-object FrontendApplicationHandler : RouteHandler {
+object StaticResourceHandler : RouteHandler {
     override fun install(router: Route) {
         router.static {
-            resource("favicon.ico", "wca/favicon.ico")
             resource("robots.txt", "wca/tnoodle-ui/robots.txt")
+        }
+
+        router.static("css") {
+            resources("css")
         }
 
         router.static("scramble") {
