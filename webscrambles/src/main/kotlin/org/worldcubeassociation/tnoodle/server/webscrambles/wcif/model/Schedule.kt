@@ -5,12 +5,6 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
-    val earliestActivity: Activity
-        get() = activitiesWithLocalStartTimes
-            .minBy { it.value }
-            ?.key
-            ?: error("I could not find the earliest activity")
-
     @Transient
     val allActivities = venues
         .flatMap { it.rooms }
@@ -35,10 +29,12 @@ data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
         // convert timezone to local start date of respective activity
         .mapValues { it.key.getLocalStartTime(it.value) }
 
+    val earliestActivity: Activity
+        get() = activitiesWithLocalStartTimes
+            .minBy { it.value }
+            ?.key
+            ?: error("I could not find the earliest activity")
+
     val hasMultipleDays: Boolean get() = numberOfDays > 1
     val hasMultipleVenues: Boolean get() = venues.size > 1
-
-    companion object {
-        val EMPTY = Schedule(0, emptyList())
-    }
 }

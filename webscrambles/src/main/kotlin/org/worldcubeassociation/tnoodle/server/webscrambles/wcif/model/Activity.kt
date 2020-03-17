@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.Serializable
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider.IndexingIdProvider
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter

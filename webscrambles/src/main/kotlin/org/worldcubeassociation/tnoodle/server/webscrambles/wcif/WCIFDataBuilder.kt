@@ -22,7 +22,7 @@ object WCIFDataBuilder {
                 r.scrambleSets.mapIndexed { scrNum, it ->
                     val copyCode = r.idCode.copyParts(groupNumber = scrNum)
 
-                    val specificExtensions = if (e.plugin == EventPlugins.THREE_FM) {
+                    val specificExtensions = if (e.eventPlugin == EventPlugins.THREE_FM) {
                         val formatExtension = FmcAttemptCountExtension(r.expectedAttemptNum)
                         val languageExtension = r.findExtension<FmcLanguagesExtension>()
 
@@ -70,7 +70,7 @@ object WCIFDataBuilder {
         }
 
         val configurations = scrambleRequests.map {
-            Triple(it.activityCode.compileTitleString(false), Event.getEventName(it.activityCode.eventId).orEmpty(), it.numCopies)
+            Triple(it.activityCode.compileTitleString(false), it.activityCode.eventPlugin?.description.orEmpty(), it.numCopies)
         }
 
         return MergedPdfWithOutline(originalPdfs, configurations)

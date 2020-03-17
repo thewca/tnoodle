@@ -12,6 +12,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider.IndexingIdProvider
 import java.security.Key
 import javax.crypto.Cipher
 
@@ -86,7 +87,7 @@ object WCIFScrambleMatcher {
     }
 
     private fun generateScrambleSet(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): ScrambleSet {
-        val puzzle = Event.findPuzzlePlugin(round.idCode.eventId)
+        val puzzle = round.idCode.eventPlugin?.scrambler
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
         val standardScrambleNum = standardScrambleCountPerSet(round)

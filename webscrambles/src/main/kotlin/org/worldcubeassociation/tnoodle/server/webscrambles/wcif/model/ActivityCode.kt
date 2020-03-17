@@ -3,24 +3,22 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 import kotlinx.serialization.*
 import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider.EventIdProvider
 import kotlin.math.*
 
 @Serializable
-data class ActivityCode(val activityCodeString: String) {
+data class ActivityCode(val activityCodeString: String) : EventIdProvider {
     @Transient
     private val activityParts = activityCodeString.split(WCIF_DELIMITER)
-
-    val eventId: String
-        get() = activityParts.first()
-
-    val eventPlugin: EventPlugins?
-        get() = EventPlugins.WCA_EVENTS[eventId]
 
     @Transient
     private val structureParts = activityParts
         .drop(1) // drop eventId prefix
         .associateBy { it.first() }
         .mapValues { it.value.drop(1) }
+
+    override val eventId: String
+        get() = activityParts.first()
 
     val roundNumber: Int?
         get() = intPart(WCIF_PREFIX_ROUND)
@@ -55,7 +53,7 @@ data class ActivityCode(val activityCodeString: String) {
             return parts
         }
 
-        val prefix = Event.getEventName(eventId)
+        val prefix = eventPlugin?.description
         return "$prefix $parts"
     }
 
