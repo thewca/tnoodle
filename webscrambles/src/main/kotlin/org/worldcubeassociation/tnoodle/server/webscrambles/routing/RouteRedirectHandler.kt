@@ -2,12 +2,12 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.application.call
 import io.ktor.response.respondRedirect
-import io.ktor.routing.Routing
+import io.ktor.routing.Route
 import io.ktor.routing.get
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object RouteRedirectHandler : RouteHandler {
-    override fun install(router: Routing) {
+    override fun install(router: Route) {
         // HOMEPAGE
 
         router.get("/") {

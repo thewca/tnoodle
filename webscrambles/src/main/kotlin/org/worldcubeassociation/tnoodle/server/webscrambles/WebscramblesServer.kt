@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import com.xenomachina.argparser.ArgParser
 import io.ktor.application.Application
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
@@ -15,6 +16,8 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher.
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
 import org.worldcubeassociation.tnoodle.server.LocalServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.ApplicationDataHandler
+import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.WcifDataHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.OfflineJarUtils
 import java.io.IOException
@@ -27,8 +30,15 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
         val wcifHandler = WcifHandler(environmentConfig)
 
         app.routing {
-            FrontendDataHandler.install(this)
-            JobSchedulingHandler.install(this)
+            route("frontend") {
+                ApplicationDataHandler.install(this)
+                WcifDataHandler.install(this)
+            }
+
+            route("jobs") {
+                JobSchedulingHandler.install(this)
+            }
+
             ReadmeHandler.install(this)
             RouteRedirectHandler.install(this)
             StaticContentHandler.install(this)

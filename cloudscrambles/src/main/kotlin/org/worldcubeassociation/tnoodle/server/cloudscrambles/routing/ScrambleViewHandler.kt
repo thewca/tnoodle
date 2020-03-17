@@ -6,7 +6,7 @@ import io.ktor.http.ContentType
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
 import io.ktor.response.respondText
-import io.ktor.routing.Routing
+import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +57,7 @@ object ScrambleViewHandler : RouteHandler {
         handle(scrambler, svg)
     }
 
-    override fun install(router: Routing) {
+    override fun install(router: Route) {
         router.route("view") {
             route("{puzzleKey}") {
                 get("png") {

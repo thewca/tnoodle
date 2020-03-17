@@ -3,15 +3,15 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.response.respondText
-import io.ktor.routing.Routing
+import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.markdownj.MarkdownProcessor
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.markdownToHTML
 import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
 
 object ReadmeHandler : RouteHandler {
-    override fun install(router: Routing) {
+    override fun install(router: Route) {
         router.route("/readme") {
             get("/scramble") {
                 val scramblesReadmeStream = ReadmeHandler.javaClass.getResourceAsStream("/wca/readme-scramble.md")
@@ -36,5 +36,26 @@ object ReadmeHandler : RouteHandler {
                 call.respondText(markdownToHTML(readme), ContentType.Text.Html)
             }
         }
+    }
+
+    private val MD_PROCESSOR = MarkdownProcessor()
+
+    const val MARKDOWN_TITLE_CHAR = '#'
+
+    fun markdownToHTML(dataString: String): String {
+        val titleLine = dataString.lineSequence()
+            .firstOrNull()
+
+        // We assume that a title line is the first line, starts with one #, and possibly ends with one #
+        val titleContent = titleLine?.takeIf { it.startsWith(MARKDOWN_TITLE_CHAR) }
+            ?.substringAfter(MARKDOWN_TITLE_CHAR)
+            ?.trimEnd(MARKDOWN_TITLE_CHAR)
+            ?.trim()
+
+        val titleCode = titleContent
+            ?.let { "<title>$it</title>\n" }
+            .orEmpty()
+
+        return "<html><head>\n$titleCode<link href=\"/css/markdown.css\" rel=\"stylesheet\" type=\"text/css\" />\n</head>\n<body>\n${MD_PROCESSOR.markdown(dataString)}</body>\n</html>\n"
     }
 }

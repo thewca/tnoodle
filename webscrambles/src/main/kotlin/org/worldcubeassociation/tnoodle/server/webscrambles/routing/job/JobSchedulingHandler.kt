@@ -7,10 +7,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
 import io.ktor.routing.*
-import kotlinx.coroutines.asCoroutineDispatcher
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadFactory
 
 object JobSchedulingHandler : RouteHandler {
     private val JOBS = mutableMapOf<Int, MutableMap<String, Int>>()
@@ -30,23 +27,27 @@ object JobSchedulingHandler : RouteHandler {
         return jobId
     }
 
-    override fun install(router: Routing) {
-        router.get("/jobs/status/{$JOB_ID_PARAM}") {
-            val jobId = call.checkAndYieldJobId() ?: return@get
+    override fun install(router: Route) {
+        router.route("status") {
+            get("{$JOB_ID_PARAM}") {
+                val jobId = call.checkAndYieldJobId() ?: return@get
 
-            val progress = JOBS[jobId]
-                ?: return@get call.respond(HttpStatusCode.NoContent)
+                val progress = JOBS[jobId]
+                    ?: return@get call.respond(HttpStatusCode.NoContent)
 
-            return@get call.respond(HttpStatusCode.PartialContent, progress)
+                return@get call.respond(HttpStatusCode.PartialContent, progress)
+            }
         }
 
-        router.get("/jobs/result/{$JOB_ID_PARAM}") {
-            val jobId = call.checkAndYieldJobId() ?: return@get
+        router.route("result") {
+            get("{$JOB_ID_PARAM}") {
+                val jobId = call.checkAndYieldJobId() ?: return@get
 
-            val (contentType, result) = RESULTS[jobId]
-                ?: return@get call.respond(HttpStatusCode.NoContent)
+                val (contentType, result) = RESULTS[jobId]
+                    ?: return@get call.respond(HttpStatusCode.NoContent)
 
-            return@get call.respondBytes(result, contentType)
+                return@get call.respondBytes(result, contentType)
+            }
         }
     }
 

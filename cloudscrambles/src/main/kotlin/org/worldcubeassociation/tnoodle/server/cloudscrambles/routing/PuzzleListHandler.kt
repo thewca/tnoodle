@@ -4,7 +4,7 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.response.respondText
-import io.ktor.routing.Routing
+import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
@@ -42,7 +42,7 @@ object PuzzleListHandler : RouteHandler {
         }
     }
 
-    override fun install(router: Routing) {
+    override fun install(router: Route) {
         router.route("puzzles") {
             // FIXME ktor apparently has a problem with {optional?} parameters in the middle of a route.
             // therefore this code is currently effectively duplicated.
