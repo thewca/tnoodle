@@ -30,7 +30,7 @@ object ScrambleHandler : RouteHandler {
     override fun install(router: Route) {
         router.route("scramble") {
             route("{puzzleKey}") {
-                get("txt") {
+                get("raw") {
                     call.withScrambleSheets { scrList, enumerate ->
                         val scrambleLines = scrList.withIndex().joinToString("\r\n") { (i, scr) ->
                             val prefix = "${i + 1}. ".takeIf { enumerate }.orEmpty()
@@ -41,7 +41,8 @@ object ScrambleHandler : RouteHandler {
                         respondText(scrambleLines)
                     }
                 }
-                get("json") {
+
+                get {
                     call.withScrambleSheets { reqList, enumerate ->
                         if (enumerate) {
                             respond(reqList)

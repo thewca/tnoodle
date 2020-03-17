@@ -1,6 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.cloudscrambles
 
 import io.ktor.application.Application
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
@@ -21,9 +22,14 @@ object CloudscramblesServer : ApplicationHandler {
 
         app.routing {
             HomepageHandler.install(this)
-            ScrambleHandler.install(this)
-            ScrambleViewHandler.install(this)
-            PuzzleListHandler.install(this)
+
+            route("api") {
+                route("v0") {
+                    ScrambleHandler.install(this)
+                    ScrambleViewHandler.install(this)
+                    PuzzleListHandler.install(this)
+                }
+            }
         }
 
         webscramblesWrapper.spinUp(app)

@@ -26,37 +26,32 @@ object PuzzleListHandler : RouteHandler {
         return nameData
     }
 
-    private suspend fun ApplicationCall.respondPuzzles(format: String?, puzzleKeys: Set<String> = emptySet()) {
+    private suspend fun ApplicationCall.withPuzzleData(puzzleKeys: Set<String>, handle: suspend ApplicationCall.(List<PuzzleInfoJsonData>) -> Unit) {
         val includeStatus = "includeStatus" in request.queryParameters
 
-        if (format == "json") {
-            val puzzleInfos = puzzleKeys
-                .mapNotNull { getPuzzleInfo(it, includeStatus) }
+        val puzzleInfos = puzzleKeys
+            .mapNotNull { getPuzzleInfo(it, includeStatus) }
 
-            val responseItem = puzzleInfos.singleOrNull()
-                ?: puzzleInfos
-
-            respond(responseItem)
-        } else {
-            respondText("Invalid extension: $format")
-        }
+        handle(puzzleInfos)
     }
 
     override fun install(router: Route) {
         router.route("puzzles") {
-            // FIXME ktor apparently has a problem with {optional?} parameters in the middle of a route.
-            // therefore this code is currently effectively duplicated.
-            get("{puzzleKey}/{format}") {
-                val format = call.parameters["format"]
-                val puzzleKey = call.parameters["puzzleKey"].orEmpty()
-
-                call.respondPuzzles(format, setOf(puzzleKey))
+            get {
+                call.withPuzzleData(PuzzlePlugins.WCA_PUZZLES.keys) {
+                    respond(it)
+                }
             }
 
-            get("{format}") {
-                val format = call.parameters["format"]
+            get("{puzzleKey}") {
+                val puzzleKey = call.parameters["puzzleKey"].orEmpty()
 
-                call.respondPuzzles(format, PuzzlePlugins.WCA_PUZZLES.keys)
+                call.withPuzzleData(setOf(puzzleKey)) {
+                    val singleItem = it.singleOrNull()
+                        ?: return@withPuzzleData respondText("Invalid puzzle ID: $puzzleKey")
+
+                    respond(singleItem)
+                }
             }
         }
     }
