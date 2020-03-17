@@ -20,7 +20,6 @@ import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
-import org.worldcubeassociation.tnoodle.server.webscrambles.serial.DimensionJsonData
 import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleImageJsonData
 import org.worldcubeassociation.tnoodle.svglite.Svg
 import java.awt.image.BufferedImage
@@ -62,10 +61,10 @@ object ScrambleViewHandler : RouteHandler {
         router.route("view") {
             route("{puzzleKey}") {
                 get("png") {
-                    call.withScramble { scrambler, svg ->
+                    call.withScramble { puzzle, svg ->
                         val svgFile = svg.toString().byteInputStream()
 
-                        val (width, height) = scrambler.preferredSize.let { it.width to it.height }
+                        val (width, height) = puzzle.preferredSize.let { it.width to it.height }
                         val imageTranscoder = BufferedImageTranscoder()
 
                         // Copied from http://stackoverflow.com/a/6634963
