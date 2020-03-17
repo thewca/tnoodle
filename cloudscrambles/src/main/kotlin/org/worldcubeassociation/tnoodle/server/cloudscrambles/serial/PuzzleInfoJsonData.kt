@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.serial
+package org.worldcubeassociation.tnoodle.server.cloudscrambles.serial
 
 import kotlinx.serialization.Serializable
 

@@ -1,5 +1,6 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.serial
+package org.worldcubeassociation.tnoodle.server.serial
 
+import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
 import org.worldcubeassociation.tnoodle.svglite.Color
 
 object Colorizer : SingletonStringEncoder<Color>("Color") {

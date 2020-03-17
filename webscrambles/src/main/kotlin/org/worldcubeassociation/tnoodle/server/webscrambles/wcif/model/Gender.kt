@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
 
 enum class Gender(val wcaString: String) {
     MALE("m"),

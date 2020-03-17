@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
 import kotlinx.serialization.Serializable
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension

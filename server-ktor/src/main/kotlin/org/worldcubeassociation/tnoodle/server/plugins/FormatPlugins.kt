@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.plugins
+package org.worldcubeassociation.tnoodle.server.plugins
 
 enum class FormatPlugins(val key: String, val description: String, val tag: String, val numSolves: Int) {
     AVERAGE_OF_5("a", "Average of 5", "Ao5", 5),

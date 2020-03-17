@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.routing
+package org.worldcubeassociation.tnoodle.server.cloudscrambles.routing
 
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -19,8 +19,8 @@ import org.apache.batik.transcoder.image.ImageTranscoder
 import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
-import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleImageJsonData
+import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleImageJsonData
+import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.svglite.Svg
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream

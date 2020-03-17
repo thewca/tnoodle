@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.routing
+package org.worldcubeassociation.tnoodle.server.cloudscrambles.routing
 
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -8,8 +8,8 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
-import org.worldcubeassociation.tnoodle.server.webscrambles.serial.PuzzleInfoJsonData
+import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleInfoJsonData
+import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
 
 object PuzzleListHandler : RouteHandler {
     private fun getPuzzleInfo(scramblerKey: String, includeStatus: Boolean): PuzzleInfoJsonData? {

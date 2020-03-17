@@ -1,6 +1,7 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.serial
+package org.worldcubeassociation.tnoodle.server.cloudscrambles.serial
 
 import kotlinx.serialization.Serializable
+import org.worldcubeassociation.tnoodle.server.serial.Colorizer
 import org.worldcubeassociation.tnoodle.svglite.Color
 
 @Serializable

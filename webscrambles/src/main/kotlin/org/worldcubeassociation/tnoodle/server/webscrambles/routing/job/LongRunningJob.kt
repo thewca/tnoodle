@@ -6,11 +6,12 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.worldcubeassociation.tnoodle.server.plugins.cache.CoroutineScrambleCacher
 import kotlin.coroutines.CoroutineContext
 
 abstract class LongRunningJob<T> : CoroutineScope {
     override val coroutineContext: CoroutineContext
-        get() = JobSchedulingHandler.JOB_CONTEXT
+        get() = CoroutineScrambleCacher.JOB_CONTEXT
 
     open val errorCodes: Map<Throwable, HttpStatusCode> = emptyMap()
 

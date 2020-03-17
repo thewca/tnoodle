@@ -1,11 +1,10 @@
 import com.google.cloud.tools.gradle.appengine.standard.AppEngineStandardExtension
 import configurations.Languages.attachRemoteRepositories
-
+import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.GOOGLE_CLOUD_STORAGE
 import dependencies.Libraries.KOTLESS_KTOR
 import io.kotless.DSLType
 import io.kotless.plugin.gradle.dsl.kotless
-import io.kotless.plugin.gradle.dsl.Webapp.Route53
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "An extension over the webscrambles module to incorporate Google Cloud support"
@@ -17,17 +16,17 @@ plugins {
     war
     GOOGLE_APPENGINE
     KOTLESS
+    KOTLIN_SERIALIZATION
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation(project(":webscrambles"))
     implementation(project(":server-ktor"))
 
     implementation(KOTLESS_KTOR)
-
     implementation(GOOGLE_CLOUD_STORAGE)
+    implementation(BATIK_TRANSCODER)
 }
 
 tasks.withType<KotlinCompile> {
