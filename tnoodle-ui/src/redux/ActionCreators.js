@@ -113,3 +113,8 @@ export const setSuggestedFmcTranslations = suggestedFmcTranslations => ({
     type: ActionTypes.SET_SUGGESTED_FMC_TRANSLATIONS,
     payload: { suggestedFmcTranslations }
 });
+
+export const setBestMbldAttempt = bestMbldAttempt => ({
+    type: ActionTypes.SET_BEST_MBLD_ATTEMPT,
+    payload: { bestMbldAttempt }
+});
