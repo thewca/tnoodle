@@ -8,7 +8,6 @@ import dependencies.Libraries.KTOR_SERVER_NETTY
 import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
 import dependencies.Libraries.KTOR_SERVER_SERVLET
 import dependencies.Libraries.LOGBACK_CLASSIC
-import dependencies.Libraries.MARKDOWNJ_CORE
 import dependencies.Libraries.KOTLIN_SERIALIZATION_JVM
 import dependencies.Libraries.TNOODLE_SCRAMBLES
 

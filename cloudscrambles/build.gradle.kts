@@ -1,22 +1,23 @@
 import com.google.cloud.tools.gradle.appengine.standard.AppEngineStandardExtension
+import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
+import configurations.ProjectVersions.gitVersionTag
 import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.GOOGLE_CLOUD_STORAGE
 import dependencies.Libraries.KOTLESS_KTOR
-import io.kotless.DSLType
-import io.kotless.plugin.gradle.dsl.kotless
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-description = "An extension over the webscrambles module to incorporate Google Cloud support"
+description = "An extension over the core server to expose scrambles in a Google Cloud environment"
 
 attachRemoteRepositories()
 
 plugins {
     kotlin("jvm")
     war
+    GIT_VERSION_TAG
+    KOTLIN_SERIALIZATION
     GOOGLE_APPENGINE
     KOTLESS
-    KOTLIN_SERIALIZATION
 }
 
 dependencies {
@@ -30,7 +31,7 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
 
 configure<AppEngineStandardExtension> {
@@ -53,17 +54,9 @@ tasks.create("dumpVersionToFile") {
             ?: "TNoodle-LOCAL"
 
         val tNoodleVersion = project.findProperty("TNOODLE_VERSION")
-            ?: "devel" // TODO git-hash
+            ?: "devel-${project.gitVersionTag()}"
 
         val fileDir = "$projectDir/src/main/resources/version.tnoodle"
         file(fileDir).writeText("$tNoodleTitle\n$tNoodleVersion")
-    }
-}
-
-kotless {
-    config {
-        dsl {
-            type = DSLType.Ktor
-        }
     }
 }
