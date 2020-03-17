@@ -44,8 +44,8 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
     }
 
     override fun install(router: Route) {
-        router.route("/wcif") {
-            route("/scrambles") {
+        router.route("wcif") {
+            route("scrambles") {
                 val job = ScramblingJob { wcif, _, _ ->
                     val resultBytes = JsonConfig.SERIALIZER.stringify(Competition.serializer(), wcif)
                     ContentType.Application.Json to resultBytes.toByteArray()
@@ -54,7 +54,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
                 registerJobPaths(job)
             }
 
-            route("/zip") {
+            route("zip") {
                 val job = ScramblingJob(mapOf("PDF" to 1)) { wcif, data, jobId ->
                     val generationDate = LocalDateTime.now()
 

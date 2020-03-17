@@ -12,6 +12,8 @@ import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleInfoJ
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 
 object PuzzleListHandler : RouteHandler {
+    const val PUZZLE_KEY_PARAM = "puzzleKey"
+
     private fun getPuzzleInfo(scramblerKey: String, includeStatus: Boolean): PuzzleInfoJsonData? {
         val puzzle = PuzzleData.WCA_PUZZLES[scramblerKey] ?: return null
 
@@ -43,8 +45,8 @@ object PuzzleListHandler : RouteHandler {
                 }
             }
 
-            get("{puzzleKey}") {
-                val puzzleKey = call.parameters["puzzleKey"].orEmpty()
+            get("{$PUZZLE_KEY_PARAM}") {
+                val puzzleKey = call.parameters[PUZZLE_KEY_PARAM].orEmpty()
 
                 call.withPuzzleData(setOf(puzzleKey)) {
                     val singleItem = it.singleOrNull()

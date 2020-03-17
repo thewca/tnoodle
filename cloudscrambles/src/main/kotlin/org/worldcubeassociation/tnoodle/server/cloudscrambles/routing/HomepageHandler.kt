@@ -10,7 +10,7 @@ object HomepageHandler : RouteHandler {
     override fun install(router: Route) {
         // HOMEPAGE
 
-        router.get("/") {
+        router.get {
             call.respondText("Welcome, friend!")
         }
     }
