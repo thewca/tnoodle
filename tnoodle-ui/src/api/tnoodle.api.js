@@ -3,6 +3,7 @@ let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
 let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
 let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
+let bestMbldAttemptEndpoint = "/frontend/mbld/best";
 
 export const copiesExtensionId =
     "org.worldcubeassociation.tnoodle.SheetCopyCount";
@@ -23,6 +24,10 @@ export const fetchZip = (wcif, mbld, password, translations) => {
 
 export const fetchSuggestedFmcTranslations = wcif => {
     return postToTnoodle(suggestedFmcTranslationsEndpoint, wcif);
+};
+
+export const fetchBestMbldAttempt = wcif => {
+    return postToTnoodle(bestMbldAttemptEndpoint, wcif);
 };
 
 export const fetchRunningVersion = () => {
@@ -49,7 +54,7 @@ export const fetchAvailableFmcTranslations = () => {
 
 /**
  * Builds the object expected for FMC translations
- * @param {*} translations e.g. ["de", "da", "pt-BR"]
+ * @param {array} translations e.g. ["de", "da", "pt-BR"]
  */
 const fmcTranslationsHelper = translations => {
     if (translations == null) {

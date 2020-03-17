@@ -23,7 +23,8 @@ const mapStateToProps = store => ({
     editingDisabled: store.editingDisabled,
     wcif: store.wcif,
     translations: store.translations,
-    suggestedFmcTranslations: store.suggestedFmcTranslations
+    suggestedFmcTranslations: store.suggestedFmcTranslations,
+    bestMbldAttempt: store.bestMbldAttempt
 });
 
 const mapDispatchToProps = {
@@ -124,7 +125,7 @@ const EventPicker = connect(
         };
 
         handleMbldChange = mbld => {
-            this.setState({ ...this.state, mbld: mbld });
+            this.setState({ ...this.state, mbld });
             this.props.updateMbld(mbld);
         };
 
@@ -162,7 +163,24 @@ const EventPicker = connect(
                                 />
                             </td>
                         </tr>
+                        {this.showMbldWarning()}
                     </tfoot>
+                );
+            }
+        };
+
+        showMbldWarning = () => {
+            let bestMbldAttempt = this.props.bestMbldAttempt;
+            let showMbldWarning =
+                bestMbldAttempt != null && this.props.mbld < bestMbldAttempt;
+
+            if (showMbldWarning) {
+                return (
+                    <tr className="bg-warning">
+                        <th colSpan={4}>
+                            {`You selected ${this.state.mbld} cubes for Multi-Blind, but there's a competitor who already tried ${this.props.bestMbldAttempt} at a competition. Proceed if you are really certain of it.`}
+                        </th>
+                    </tr>
                 );
             }
         };

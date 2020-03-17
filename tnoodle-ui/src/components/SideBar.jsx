@@ -11,7 +11,8 @@ import {
     updateFileZipBlob,
     addCachedObject,
     addSuggestedFmcTranslations,
-    setSuggestedFmcTranslations
+    setSuggestedFmcTranslations,
+    setBestMbldAttempt
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -23,7 +24,10 @@ import {
     getCompetitionJson,
     getQueryParameter
 } from "../api/wca.api";
-import { fetchSuggestedFmcTranslations } from "../api/tnoodle.api";
+import {
+    fetchSuggestedFmcTranslations,
+    fetchBestMbldAttempt
+} from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 const mapStateToProps = store => ({
@@ -42,7 +46,8 @@ const mapDispatchToProps = {
     updateFileZipBlob,
     addCachedObject,
     addSuggestedFmcTranslations,
-    setSuggestedFmcTranslations
+    setSuggestedFmcTranslations,
+    setBestMbldAttempt
 };
 
 const SideBar = connect(
@@ -124,6 +129,7 @@ const SideBar = connect(
             this.props.updateEditingStatus(false);
             this.props.updateCompetitionId(null);
             this.props.updateWcif({ ...defaultWcif });
+            this.props.setBestMbldAttempt(null);
             this.props.updateCompetitionName(getDefaultCompetitionName());
             this.props.updateFileZipBlob(null);
             this.removeCompetitionIdQueryParam();
@@ -144,6 +150,9 @@ const SideBar = connect(
                 this.props.addSuggestedFmcTranslations(
                     cachedSuggestedFmcTranslations
                 );
+
+                let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
+                this.props.setBestMbldAttempt(cachedBestMbldAttempt);
                 return;
             }
 
@@ -160,6 +169,8 @@ const SideBar = connect(
                     this.maybeAddCompetition(wcif.id, wcif.name);
 
                     this.getAndCacheSuggestedFmcTranslations(wcif);
+
+                    this.getAndCacheBestMbldAttempt(wcif);
                 })
                 .catch(e => {
                     console.error(
@@ -180,6 +191,20 @@ const SideBar = connect(
                         translations
                     );
                     this.props.addSuggestedFmcTranslations(translations);
+                });
+        };
+
+        getAndCacheBestMbldAttempt = wcif => {
+            fetchBestMbldAttempt(wcif)
+                .then(response => response.json())
+                .then(bestAttempt => {
+                    let attempted = bestAttempt.attempted;
+                    this.props.addCachedObject(
+                        wcif.id,
+                        "bestMbldAttempt",
+                        attempted
+                    );
+                    this.props.setBestMbldAttempt(attempted);
                 });
         };
 

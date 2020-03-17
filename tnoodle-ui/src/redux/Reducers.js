@@ -13,7 +13,8 @@ const defaultStore = {
     fileZipBlob: null,
     cachedObjects: {},
     translations: null,
-    suggestedFmcTranslations: null
+    suggestedFmcTranslations: null,
+    bestMbldAttempt: null
 };
 
 export const Reducer = (store, action) => {
@@ -194,6 +195,13 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             translations: [...translations]
+        };
+    }
+
+    if (action.type === ActionTypes.SET_BEST_MBLD_ATTEMPT) {
+        return {
+            ...store,
+            bestMbldAttempt: action.payload.bestMbldAttempt
         };
     }
 
