@@ -7,6 +7,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.json
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
@@ -66,6 +67,20 @@ object FrontendDataHandler : RouteHandler {
 
                 get("available") {
                     call.respond(AVAILABLE_LANGUAGE_TAGS)
+                }
+            }
+
+            route("mbld") {
+                post("best") {
+                    val wcif = call.receive<Competition>()
+
+                    val mbldResults = wcif.persons
+                        .flatMap { it.personalBests }
+                        .filter { it.eventPlugin == EventPlugins.THREE_MULTI_BLD }
+                        .mapNotNull { it.best.asMultiResult }
+
+                    val bestMbldAttempt = mbldResults.maxBy { it.attempted } ?: JsonNull
+                    call.respond(bestMbldAttempt)
                 }
             }
         }
