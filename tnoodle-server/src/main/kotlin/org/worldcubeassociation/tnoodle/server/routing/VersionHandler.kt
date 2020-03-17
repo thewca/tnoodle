@@ -7,7 +7,7 @@ import io.ktor.routing.get
 import kotlinx.serialization.json.json
 
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.cryptography.AsymmetricCipher
+import org.worldcubeassociation.tnoodle.server.crypto.AsymmetricCipher
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 
 class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {

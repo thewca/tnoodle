@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.cryptography
+package org.worldcubeassociation.tnoodle.server.crypto
 
 import java.security.*
 
