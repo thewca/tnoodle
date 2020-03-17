@@ -96,11 +96,20 @@ export const selectAllTranslations = () => ({
 });
 
 /**
+ * Stores the suggestedFmcTranslations
+ * @param {array} suggestedFmcTranslations
+ */
+export const addSuggestedFmcTranslations = suggestedFmcTranslations => ({
+    type: ActionTypes.ADD_SUGGESTED_FMC_TRANSLATIONS,
+    payload: { suggestedFmcTranslations }
+});
+
+/**
  * Given an array of languages and a previous array of FMC languages,
  * set as selected FMC language only those present on the first array.
  * @param {array} suggestedFmcTranslations
  */
-export const setSuggestedTranslations = suggestedFmcTranslations => ({
-    type: ActionTypes.SET_SUGGESTED_TRANSLATIONS,
+export const setSuggestedFmcTranslations = suggestedFmcTranslations => ({
+    type: ActionTypes.SET_SUGGESTED_FMC_TRANSLATIONS,
     payload: { suggestedFmcTranslations }
 });

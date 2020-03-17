@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
-import { fetchZip, fetchAvailableFmcLanguages } from "../api/tnoodle.api";
+import { fetchZip, fetchAvailableFmcTranslations } from "../api/tnoodle.api";
 import { toWcaUrl, isUsingStaging } from "../api/wca.api";
 import { updateFileZipBlob, updateTranslations } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
@@ -34,13 +34,15 @@ const EventPickerTable = connect(
         }
 
         componentDidMount = function() {
-            fetchAvailableFmcLanguages()
+            fetchAvailableFmcTranslations()
                 .then(response => response.json())
-                .then(languages => {
-                    let translations = languages.map(language => ({
-                        id: language,
-                        status: true
-                    }));
+                .then(availableTranslations => {
+                    let translations = availableTranslations.map(
+                        translation => ({
+                            id: translation,
+                            status: true
+                        })
+                    );
                     this.props.updateTranslations(translations);
                 })
                 .catch(error => {

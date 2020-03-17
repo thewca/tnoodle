@@ -12,7 +12,8 @@ const defaultStore = {
     officialZip: true,
     fileZipBlob: null,
     cachedObjects: {},
-    translations: null
+    translations: null,
+    suggestedFmcTranslations: null
 };
 
 export const Reducer = (store, action) => {
@@ -123,6 +124,7 @@ export const Reducer = (store, action) => {
             cachedObjects: {
                 ...store.cachedObjects,
                 [action.payload.competitionId]: {
+                    ...store.cachedObjects[action.payload.competitionId],
                     [action.payload.identifier]: action.payload.object
                 }
             }
@@ -175,11 +177,18 @@ export const Reducer = (store, action) => {
         };
     }
 
-    if (action.type === ActionTypes.SET_SUGGESTED_TRANSLATIONS) {
+    if (action.type === ActionTypes.ADD_SUGGESTED_FMC_TRANSLATIONS) {
+        return {
+            ...store,
+            suggestedFmcTranslations: action.payload.suggestedFmcTranslations
+        };
+    }
+
+    if (action.type === ActionTypes.SET_SUGGESTED_FMC_TRANSLATIONS) {
         let translations = store.translations.map(translation => ({
             ...translation,
             status: action.payload.suggestedFmcTranslations.includes(
-                translation
+                translation.id
             )
         }));
         return {

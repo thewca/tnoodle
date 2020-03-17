@@ -10,7 +10,8 @@ import {
     updateCompetitionId,
     updateFileZipBlob,
     addCachedObject,
-    setSuggestedTranslations
+    addSuggestedFmcTranslations,
+    setSuggestedFmcTranslations
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -22,7 +23,7 @@ import {
     getCompetitionJson,
     getQueryParameter
 } from "../api/wca.api";
-import { fetchSuggestedLanguages } from "../api/tnoodle.api";
+import { fetchSuggestedFmcTranslations } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 const mapStateToProps = store => ({
@@ -40,7 +41,8 @@ const mapDispatchToProps = {
     updateCompetitionId,
     updateFileZipBlob,
     addCachedObject,
-    setSuggestedTranslations
+    addSuggestedFmcTranslations,
+    setSuggestedFmcTranslations
 };
 
 const SideBar = connect(
@@ -137,8 +139,11 @@ const SideBar = connect(
                 this.setWcif(cachedWcif);
                 this.maybeAddCompetition(cachedWcif.id, cachedWcif.name);
 
-                let cachedSuggestedLanguages = cachedObject.suggestedLanguages;
-                this.setSuggestedLanguages(cachedSuggestedLanguages);
+                let cachedSuggestedFmcTranslations =
+                    cachedObject.suggestedFmcTranslations;
+                this.props.addSuggestedFmcTranslations(
+                    cachedSuggestedFmcTranslations
+                );
                 return;
             }
 
@@ -154,7 +159,7 @@ const SideBar = connect(
                     this.props.addCachedObject(competitionId, "wcif", wcif);
                     this.maybeAddCompetition(wcif.id, wcif.name);
 
-                    this.getAndCacheSuggestedFmcLanguages(wcif);
+                    this.getAndCacheSuggestedFmcTranslations(wcif);
                 })
                 .catch(e => {
                     console.error(
@@ -165,16 +170,16 @@ const SideBar = connect(
                 });
         };
 
-        getAndCacheSuggestedFmcLanguages = wcif => {
-            fetchSuggestedLanguages(wcif)
+        getAndCacheSuggestedFmcTranslations = wcif => {
+            fetchSuggestedFmcTranslations(wcif)
                 .then(response => response.json())
-                .then(languages => {
-                    console.log(languages);
+                .then(translations => {
                     this.props.addCachedObject(
                         wcif.id,
-                        "suggestedFmcLanguages",
-                        languages
+                        "suggestedFmcTranslations",
+                        translations
                     );
+                    this.props.addSuggestedFmcTranslations(translations);
                 });
         };
 
@@ -225,9 +230,11 @@ const SideBar = connect(
             this.props.updateFileZipBlob(null);
         };
 
-        setSuggestedLanguages = suggestedFmcLanguages => {
-            if (suggestedFmcLanguages != null) {
-                this.props.setSuggestedTranslations(suggestedFmcLanguages);
+        setSuggestedFmcTranslations = suggestedFmcTranslations => {
+            if (suggestedFmcTranslations != null) {
+                this.props.setSuggestedFmcTranslations(
+                    suggestedFmcTranslations
+                );
             }
         };
 

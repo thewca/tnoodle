@@ -9,7 +9,8 @@ import {
     updateFileZipBlob,
     updateTranslation,
     selectAllTranslations,
-    resetTranslations
+    resetTranslations,
+    setSuggestedFmcTranslations
 } from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 import {
@@ -21,7 +22,8 @@ const mapStateToProps = store => ({
     mbld: store.mbld,
     editingDisabled: store.editingDisabled,
     wcif: store.wcif,
-    translations: store.translations
+    translations: store.translations,
+    suggestedFmcTranslations: store.suggestedFmcTranslations
 });
 
 const mapDispatchToProps = {
@@ -30,7 +32,8 @@ const mapDispatchToProps = {
     updateFileZipBlob,
     updateTranslation,
     selectAllTranslations,
-    resetTranslations
+    resetTranslations,
+    setSuggestedFmcTranslations
 };
 
 const EventPicker = connect(
@@ -181,6 +184,9 @@ const EventPicker = connect(
 
         selectSuggestedTranslations = () => {
             this.props.updateFileZipBlob(null);
+            this.props.setSuggestedFmcTranslations(
+                this.props.suggestedFmcTranslations
+            );
         };
 
         toggleTranslations = () => {
@@ -251,6 +257,16 @@ const EventPicker = connect(
                             >
                                 Select None
                             </button>
+                            {this.props.suggestedFmcTranslations != null && (
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary"
+                                    onClick={this.selectSuggestedTranslations}
+                                    title="This selection is based on competitor's nationalities."
+                                >
+                                    Select Suggested
+                                </button>
+                            )}
                         </th>
                     </tr>
 

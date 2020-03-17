@@ -1,8 +1,8 @@
 let baseUrl = window.location.origin;
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
-let fmcLanguagesEndpoint = "/frontend/fmc/languages/available";
-let suggestedFmcLanguagesEndpoint = "/frontend/fmc/languages/competitors";
+let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
+let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
 
 export const copiesExtensionId =
     "org.worldcubeassociation.tnoodle.SheetCopyCount";
@@ -11,7 +11,7 @@ export const fetchZip = (wcif, mbld, password, translations) => {
     let payload = {
         wcif,
         multiCubes: { requestedScrambles: mbld },
-        fmcLanguages: fmcLanguageHelper(translations)
+        fmcLanguages: fmcTranslationsHelper(translations)
     };
 
     if (password != null && password.length > 0) {
@@ -21,8 +21,8 @@ export const fetchZip = (wcif, mbld, password, translations) => {
     return postToTnoodle(zipEndpoint, payload);
 };
 
-export const fetchSuggestedLanguages = wcif => {
-    return postToTnoodle(suggestedFmcLanguagesEndpoint, wcif);
+export const fetchSuggestedFmcTranslations = wcif => {
+    return postToTnoodle(suggestedFmcTranslationsEndpoint, wcif);
 };
 
 export const fetchRunningVersion = () => {
@@ -43,15 +43,15 @@ export const getDefaultCopiesExtension = (copies = 1) => {
     };
 };
 
-export const fetchAvailableFmcLanguages = () => {
-    return fetch(baseUrl + fmcLanguagesEndpoint);
+export const fetchAvailableFmcTranslations = () => {
+    return fetch(baseUrl + fmcTranslationsEndpoint);
 };
 
 /**
  * Builds the object expected for FMC translations
  * @param {*} translations e.g. ["de", "da", "pt-BR"]
  */
-const fmcLanguageHelper = translations => {
+const fmcTranslationsHelper = translations => {
     if (translations == null) {
         return null;
     }
