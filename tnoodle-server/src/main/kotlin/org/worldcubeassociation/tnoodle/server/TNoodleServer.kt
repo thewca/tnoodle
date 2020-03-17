@@ -8,7 +8,7 @@ import io.ktor.routing.routing
 import io.ktor.serialization.json
 import io.ktor.server.engine.ShutDownUrl
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
-import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
+import org.worldcubeassociation.tnoodle.server.routing.IconHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 
@@ -18,7 +18,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
 
         app.routing {
             JsEnvHandler.install(this)
-            StylesheetHandler.install(this)
+            IconHandler.install(this)
             versionHandler.install(this)
         }
 

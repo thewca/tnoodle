@@ -14,13 +14,13 @@ import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 
 object JsEnvHandler : RouteHandler {
     override fun install(router: Route) {
-        router.get("/env.js") {
+        router.get("env.js") {
             val serial = MapSerializer(String.serializer(), String.serializer())
             val js = "window.TNOODLE_ENV = ${JsonConfig.SERIALIZER.stringify(serial, JS_ENV)};"
             call.respondText(js, ContentType.Application.JavaScript)
         }
 
-        router.get("/env.json") {
+        router.get("env.json") {
             call.respond(JS_ENV)
         }
     }
