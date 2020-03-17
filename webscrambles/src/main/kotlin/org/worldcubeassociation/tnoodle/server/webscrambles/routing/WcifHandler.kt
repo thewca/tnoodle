@@ -8,7 +8,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
-import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler.registerJobPaths
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.LongRunningJob

@@ -11,17 +11,6 @@ import java.util.Random
 object WebServerUtils {
     val DEVEL_VERSION = "devel-TEMP"
 
-    /**
-     * @return A File representing the directory in which this program resides.
-     * If this is a jar file, this should be obvious, otherwise it's the directory in which
-     * our calling class resides.
-     */
-    val programDirectory: File
-        get() {
-            val programDirectory = jarFileOrDirectory
-            return programDirectory.takeUnless { it.isFile } ?: programDirectory.parentFile
-        }
-
     // Classes that are part of a web app were loaded with the
     // servlet container's classloader, so we can't necessarily
     // find them.
@@ -62,15 +51,6 @@ object WebServerUtils {
 
     val jarFile: File?
         get() = jarFileOrDirectory.takeIf { it.isFile }
-
-    val SEEDED_RANDOM: Random by lazy {
-        val randSeedEnvVar = "TNOODLE_RANDSEED"
-
-        val seed = System.getenv(randSeedEnvVar) ?: System.currentTimeMillis().toString()
-        println("Using TNOODLE_RANDSEED=$seed")
-
-        Random(seed.hashCode().toLong())
-    }
 
     fun copyFile(sourceFile: File, destFile: File) =
         Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
