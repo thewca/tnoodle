@@ -7,22 +7,22 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import kotlinx.serialization.json.json
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
-import org.worldcubeassociation.tnoodle.server.plugins.FormatPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
+import org.worldcubeassociation.tnoodle.server.model.FormatData
 
 object ApplicationDataHandler : RouteHandler {
     override fun install(router: Route) {
         router.route("data") {
             get("events") {
-                val eventData = EventPlugins.values().map {
+                val eventData = EventData.values().map {
                     json {
                         "id" to it.key
                         "name" to it.description
-                        "format_ids" to it.legalFormats.map(FormatPlugins::key)
-                        "can_change_time_limit" to (it !in EventPlugins.ONE_HOUR_EVENTS)
-                        "is_timed_event" to (it !in EventPlugins.ONE_HOUR_EVENTS)
-                        "is_fewest_moves" to (it == EventPlugins.THREE_FM)
-                        "is_multiple_blindfolded" to (it == EventPlugins.THREE_MULTI_BLD)
+                        "format_ids" to it.legalFormats.map(FormatData::key)
+                        "can_change_time_limit" to (it !in EventData.ONE_HOUR_EVENTS)
+                        "is_timed_event" to (it !in EventData.ONE_HOUR_EVENTS)
+                        "is_fewest_moves" to (it == EventData.THREE_FM)
+                        "is_multiple_blindfolded" to (it == EventData.THREE_MULTI_BLD)
                     }
                 }
 
@@ -30,7 +30,7 @@ object ApplicationDataHandler : RouteHandler {
             }
 
             get("formats") {
-                val formatData = FormatPlugins.WCA_FORMATS.mapValues {
+                val formatData = FormatData.WCA_FORMATS.mapValues {
                     json {
                         "name" to it.value.description
                         "shortName" to it.value.tag

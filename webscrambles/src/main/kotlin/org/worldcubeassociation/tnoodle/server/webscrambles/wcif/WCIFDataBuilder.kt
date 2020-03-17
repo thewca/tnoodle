@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
@@ -22,7 +22,7 @@ object WCIFDataBuilder {
                 r.scrambleSets.mapIndexed { scrNum, it ->
                     val copyCode = r.idCode.copyParts(groupNumber = scrNum)
 
-                    val specificExtensions = if (e.eventPlugin == EventPlugins.THREE_FM) {
+                    val specificExtensions = if (e.eventModel == EventData.THREE_FM) {
                         val formatExtension = FmcAttemptCountExtension(r.expectedAttemptNum)
                         val languageExtension = r.findExtension<FmcLanguagesExtension>()
 
@@ -70,7 +70,7 @@ object WCIFDataBuilder {
         }
 
         val configurations = scrambleRequests.map {
-            Triple(it.activityCode.compileTitleString(false), it.activityCode.eventPlugin?.description.orEmpty(), it.numCopies)
+            Triple(it.activityCode.compileTitleString(false), it.activityCode.eventModel?.description.orEmpty(), it.numCopies)
         }
 
         return MergedPdfWithOutline(originalPdfs, configurations)
@@ -84,7 +84,7 @@ object WCIFDataBuilder {
 
         // for ordered scrambles, we recreate scrambleRequest so it contains only 1 scramble
         // to fix this, we pass the attempt number
-        if (activityCode.eventPlugin == EventPlugins.THREE_MULTI_BLD && !scrambleSet.hasExtension<MultiScrambleCountExtension>()) {
+        if (activityCode.eventModel == EventData.THREE_MULTI_BLD && !scrambleSet.hasExtension<MultiScrambleCountExtension>()) {
             val singleSheets = scrambleSet.scrambles.mapIndexed { nthAttempt, scrambleStr ->
                 val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
 

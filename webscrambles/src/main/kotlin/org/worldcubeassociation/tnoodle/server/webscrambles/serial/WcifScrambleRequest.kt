@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
 import kotlinx.serialization.Serializable
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
@@ -21,8 +21,8 @@ data class WcifScrambleRequest(
 
     private fun compileExtendedWcif(): Competition {
         val optionalExtensions = listOfNotNull(
-            multiCubes?.to(EventPlugins.THREE_MULTI_BLD),
-            fmcLanguages?.to(EventPlugins.THREE_FM)
+            multiCubes?.to(EventData.THREE_MULTI_BLD),
+            fmcLanguages?.to(EventData.THREE_FM)
         ).toMap()
 
         val stagedWcif = wcif.copy(extensions = wcif.withExtension(isStaging))

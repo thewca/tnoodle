@@ -6,7 +6,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.worldcubeassociation.tnoodle.server.plugins.cache.CoroutineScrambleCacher
+import org.worldcubeassociation.tnoodle.server.model.cache.CoroutineScrambleCacher
 import kotlin.coroutines.CoroutineContext
 
 abstract class LongRunningJob<T> : CoroutineScope {

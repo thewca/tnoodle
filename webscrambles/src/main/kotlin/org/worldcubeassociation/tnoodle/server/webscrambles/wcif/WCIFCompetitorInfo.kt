@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.result.MultiBldResult
@@ -36,7 +36,7 @@ object WCIFCompetitorInfo {
     fun <T: Comparable<T>> getBestMultiPB(wcif: Competition, comparator: (MultiBldResult) -> T): MultiBldResult? {
         val mbldResults = wcif.persons
             .flatMap { it.personalBests }
-            .filter { it.eventPlugin == EventPlugins.THREE_MULTI_BLD }
+            .filter { it.eventModel == EventData.THREE_MULTI_BLD }
             .mapNotNull { it.best.asMultiResult }
 
         return mbldResults.maxBy { comparator(it) }

@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.*
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider.EventIdProvider
 import kotlin.math.*
@@ -53,7 +53,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
             return parts
         }
 
-        val prefix = eventPlugin?.description
+        val prefix = eventModel?.description
         return "$prefix $parts"
     }
 
@@ -98,7 +98,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
             return ActivityCode(codeString)
         }
 
-        fun compile(event: EventPlugins, round: Int? = null, group: Int? = null, attempt: Int? = null) =
+        fun compile(event: EventData, round: Int? = null, group: Int? = null, attempt: Int? = null) =
             compile(event.key, round, group, attempt)
 
         override fun encodeInstance(instance: ActivityCode) = instance.activityCodeString

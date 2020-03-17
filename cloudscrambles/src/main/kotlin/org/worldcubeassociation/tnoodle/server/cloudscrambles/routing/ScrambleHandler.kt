@@ -9,7 +9,7 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import kotlinx.serialization.json.JsonNull
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 
 object ScrambleHandler : RouteHandler {
     private suspend fun ApplicationCall.withScrambleSheets(handle: suspend ApplicationCall.(List<String>, Boolean) -> Unit) {
@@ -18,7 +18,7 @@ object ScrambleHandler : RouteHandler {
 
         val numScrambles = request.queryParameters["numScrambles"]?.toIntOrNull() ?: 1
 
-        val scramblingPuzzle = PuzzlePlugins.WCA_PUZZLES[puzzle]
+        val scramblingPuzzle = PuzzleData.WCA_PUZZLES[puzzle]
             ?: return respondText("$puzzle is not a valid TNoodle puzzle!")
 
         val scrambles = scramblingPuzzle.generateEfficientScrambles(numScrambles)
