@@ -1,6 +1,6 @@
-package org.worldcubeassociation.tnoodle.server.plugins
+package org.worldcubeassociation.tnoodle.server.model
 
-enum class FormatPlugins(val key: String, val description: String, val tag: String, val numSolves: Int) {
+enum class FormatData(val key: String, val description: String, val tag: String, val numSolves: Int) {
     AVERAGE_OF_5("a", "Average of 5", "Ao5", 5),
     MEAN_OF_3("m", "Mean of 3", "Mo3", 3),
     BEST_OF_3("3", "Best of 3", "Bo3", 3),

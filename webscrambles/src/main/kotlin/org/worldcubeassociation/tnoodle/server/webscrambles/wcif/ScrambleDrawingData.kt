@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
@@ -12,7 +12,7 @@ data class CompetitionDrawingData(val competitionTitle: String, val scrambleShee
 data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode, val isStaging: Boolean = false) {
     val isFmc: Boolean
         get() = scrambleSet.findExtension<FmcExtension>()
-            ?.isFmc ?: (activityCode.eventPlugin == EventPlugins.THREE_FM)
+            ?.isFmc ?: (activityCode.eventModel == EventData.THREE_FM)
 
     val numCopies: Int
         get() = scrambleSet.findExtension<SheetCopyCountExtension>()

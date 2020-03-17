@@ -5,7 +5,6 @@ import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfWriter
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Event
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import java.io.ByteArrayOutputStream
 
@@ -23,8 +22,8 @@ abstract class BaseScrambleSheet(val scrambleSet: ScrambleSet, val activityCode:
         }
     }
 
-    protected val scramblingPuzzle = activityCode.eventPlugin?.scrambler?.scrambler
-        ?: error("Cannot draw PDF: Scrambler for $activityCode not found in plugins")
+    protected val scramblingPuzzle = activityCode.eventModel?.scrambler?.scrambler
+        ?: error("Cannot draw PDF: Scrambler model for $activityCode not found")
 
     override fun finalise(processedBytes: ByteArrayOutputStream, password: String?): ByteArray {
         val pdfReader = PdfReader(processedBytes.toByteArray(), password?.toByteArray())

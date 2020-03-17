@@ -1,10 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider
 
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
 
 interface EventIdProvider {
     val eventId: String
 
-    val eventPlugin: EventPlugins?
-        get() = EventPlugins.WCA_EVENTS[eventId]
+    val eventModel: EventData?
+        get() = EventData.WCA_EVENTS[eventId]
 }

@@ -1,9 +1,9 @@
-package org.worldcubeassociation.tnoodle.server.plugins
+package org.worldcubeassociation.tnoodle.server.model
 
 import org.worldcubeassociation.tnoodle.scrambles.PuzzleRegistry
-import org.worldcubeassociation.tnoodle.server.plugins.cache.CoroutineScrambleCacher
+import org.worldcubeassociation.tnoodle.server.model.cache.CoroutineScrambleCacher
 
-enum class PuzzlePlugins(private val registry: PuzzleRegistry) {
+enum class PuzzleData(private val registry: PuzzleRegistry) {
     // To all fellow programmers who wonder about effectively copying an interface:
     // 1-- Be able to intercept the `scrambler` reference (see getter below)
     // 2-- Be able to limit the selection of tnoodle-lib `Puzzle`s that are exposed.

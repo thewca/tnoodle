@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcGenericSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcScrambleCutoutSheet
@@ -25,7 +25,7 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
     fun assemble(generationDate: LocalDate, versionTag: String, password: String?): Folder {
         val fmcRequests = uniqueTitles.filterValues { it.isFmc }
 
-        val pseudoActivityCode = ActivityCode.compile(EventPlugins.THREE_FM, round = 1)
+        val pseudoActivityCode = ActivityCode.compile(EventData.THREE_FM, round = 1)
         val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), pseudoActivityCode, globalTitle, Translate.DEFAULT_LOCALE)
         val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag)
 

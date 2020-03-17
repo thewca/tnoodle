@@ -6,8 +6,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.worldcubeassociation.tnoodle.server.crypto.StringEncryption
 import org.worldcubeassociation.tnoodle.server.crypto.SymmetricCipher
-import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
-import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.model.EventData
+import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
@@ -60,7 +60,7 @@ object WCIFScrambleMatcher {
 
     // SCRAMBLE SET FILLING -----
 
-    suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzlePlugins, String) -> Unit): Competition {
+    suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzleData, String) -> Unit): Competition {
         val scrambledEvents = wcif.events.map { e ->
             val scrambledRounds = coroutineScope {
                 e.rounds.map { r -> async { scrambleRound(r, onUpdate) } }.awaitAll()
@@ -78,7 +78,7 @@ object WCIFScrambleMatcher {
     // helper fn for synchronously running tests
     fun fillScrambleSets(wcif: Competition) = runBlocking { fillScrambleSetsAsync(wcif) { _, _ -> Unit } }
 
-    private suspend fun scrambleRound(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): Round {
+    private suspend fun scrambleRound(round: Round, onUpdate: (PuzzleData, String) -> Unit): Round {
         val scrambles = coroutineScope {
             List(round.scrambleSetCount) { async { generateScrambleSet(round, onUpdate) } }.awaitAll()
         }
@@ -86,13 +86,13 @@ object WCIFScrambleMatcher {
         return round.copy(scrambleSets = scrambles)
     }
 
-    private fun generateScrambleSet(round: Round, onUpdate: (PuzzlePlugins, String) -> Unit): ScrambleSet {
-        val puzzle = round.idCode.eventPlugin?.scrambler
+    private fun generateScrambleSet(round: Round, onUpdate: (PuzzleData, String) -> Unit): ScrambleSet {
+        val puzzle = round.idCode.eventModel?.scrambler
             ?: error("Unable to load scrambler for Round ${round.idCode}")
 
         val standardScrambleNum = standardScrambleCountPerSet(round)
 
-        val scrambles = if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
+        val scrambles = if (round.idCode.eventModel == EventData.THREE_MULTI_BLD) {
             val countPerAttempt = standardScrambleNum / round.expectedAttemptNum
 
             List(round.expectedAttemptNum) { _ ->
@@ -113,7 +113,7 @@ object WCIFScrambleMatcher {
     }
 
     private fun standardScrambleCountPerSet(round: Round): Int {
-        return if (round.idCode.eventPlugin == EventPlugins.THREE_MULTI_BLD) {
+        return if (round.idCode.eventModel == EventData.THREE_MULTI_BLD) {
             val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
                 ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
 
@@ -125,12 +125,12 @@ object WCIFScrambleMatcher {
 
     private fun extraScrambleCountPerSet(round: Round): Int {
         return round.findExtension<ExtraScrambleCountExtension>()?.extraAttempts
-            ?: defaultExtraCount(round.idCode.eventPlugin)
+            ?: defaultExtraCount(round.idCode.eventModel)
     }
 
-    private fun defaultExtraCount(event: EventPlugins?): Int {
+    private fun defaultExtraCount(event: EventData?): Int {
         return when (event) {
-            EventPlugins.THREE_MULTI_BLD, EventPlugins.THREE_FM -> 0
+            EventData.THREE_MULTI_BLD, EventData.THREE_FM -> 0
             else -> 2
         }
     }
@@ -150,10 +150,10 @@ object WCIFScrambleMatcher {
 
     // EXTENSION HANDLING -----
 
-    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, EventPlugins>) =
+    fun installExtensions(wcif: Competition, ext: Map<ExtensionBuilder, EventData>) =
         ext.entries.fold(wcif) { acc, e -> installExtensionForEvents(acc, e.key, e.value) }
 
-    fun installExtensionForEvents(wcif: Competition, ext: ExtensionBuilder, event: EventPlugins): Competition {
+    fun installExtensionForEvents(wcif: Competition, ext: ExtensionBuilder, event: EventData): Competition {
         fun installRoundExtension(e: Event): Event {
             val extendedRounds = e.rounds.map { r ->
                 r.copy(extensions = r.withExtension(ext))

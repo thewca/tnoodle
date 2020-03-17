@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.Serializable
-import org.worldcubeassociation.tnoodle.server.plugins.FormatPlugins
+import org.worldcubeassociation.tnoodle.server.model.FormatData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionProvider
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider.FormatIdProvider
 
@@ -14,6 +14,6 @@ data class Round(val id: String, val format: String, val scrambleSetCount: Int, 
         get() = format
 
     val expectedAttemptNum: Int
-        get() = formatPlugin?.numSolves
-            ?: FormatPlugins.DEFAULT_FALLBACK_FORMAT.numSolves
+        get() = formatModel?.numSolves
+            ?: FormatData.DEFAULT_FALLBACK_FORMAT.numSolves
 }

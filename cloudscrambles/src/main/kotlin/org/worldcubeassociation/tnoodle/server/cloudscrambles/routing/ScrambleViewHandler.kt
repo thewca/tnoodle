@@ -20,7 +20,7 @@ import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleImageJsonData
-import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 import org.worldcubeassociation.tnoodle.svglite.Svg
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
@@ -45,7 +45,7 @@ object ScrambleViewHandler : RouteHandler {
         val name = parameters["puzzleKey"]
             ?: return respondText("Please specify a puzzle")
 
-        val scrambler = PuzzlePlugins.WCA_PUZZLES[name]?.scrambler
+        val scrambler = PuzzleData.WCA_PUZZLES[name]?.scrambler
             ?: return respondText("Invalid scrambler: $name")
 
         val scramble = request.queryParameters["scramble"]

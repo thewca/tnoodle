@@ -9,18 +9,18 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleInfoJsonData
-import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 
 object PuzzleListHandler : RouteHandler {
     private fun getPuzzleInfo(scramblerKey: String, includeStatus: Boolean): PuzzleInfoJsonData? {
-        val plugin = PuzzlePlugins.WCA_PUZZLES[scramblerKey] ?: return null
+        val puzzle = PuzzleData.WCA_PUZZLES[scramblerKey] ?: return null
 
-        val nameData = PuzzleInfoJsonData(scramblerKey, plugin.description)
+        val nameData = PuzzleInfoJsonData(scramblerKey, puzzle.description)
 
         if (includeStatus) {
             return nameData.copy(
-                initializationStatus = plugin.scrambler.initializationStatus,
-                cacheQueue = plugin.cacheSize)
+                initializationStatus = puzzle.scrambler.initializationStatus,
+                cacheQueue = puzzle.cacheSize)
         }
 
         return nameData
@@ -38,7 +38,7 @@ object PuzzleListHandler : RouteHandler {
     override fun install(router: Route) {
         router.route("puzzles") {
             get {
-                call.withPuzzleData(PuzzlePlugins.WCA_PUZZLES.keys) {
+                call.withPuzzleData(PuzzleData.WCA_PUZZLES.keys) {
                     respond(it)
                 }
             }

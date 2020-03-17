@@ -8,7 +8,7 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import org.markdownj.MarkdownProcessor
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 
 object ReadmeHandler : RouteHandler {
     override fun install(router: Route) {
@@ -17,7 +17,7 @@ object ReadmeHandler : RouteHandler {
                 val scramblesReadmeStream = ReadmeHandler.javaClass.getResourceAsStream("/wca/readme-scramble.md")
                 val rawReadme = scramblesReadmeStream.bufferedReader().readText()
 
-                val scrambleFilteringInfo = PuzzlePlugins.values()
+                val scrambleFilteringInfo = PuzzleData.values()
                     .map { it.scrambler }
                     .joinToString("\n") {
                         // those 2 spaces at the end are no accident: http://meta.stackoverflow.com/questions/26011/should-the-markdown-renderer-treat-a-single-line-break-as-br

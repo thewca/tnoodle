@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.plugins.cache
+package org.worldcubeassociation.tnoodle.server.model.cache
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.produce
