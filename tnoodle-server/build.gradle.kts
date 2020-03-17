@@ -33,7 +33,6 @@ dependencies {
     implementation(KTOR_SERVER_HOST_COMMON)
     implementation(KTOR_SERVER_SERVLET)
     implementation(BOUNCYCASTLE)
-    implementation(MARKDOWNJ_CORE)
 
     runtimeOnly(LOGBACK_CLASSIC)
 }

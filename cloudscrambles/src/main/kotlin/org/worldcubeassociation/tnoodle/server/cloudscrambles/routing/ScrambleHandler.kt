@@ -4,7 +4,7 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.response.respondText
-import io.ktor.routing.Routing
+import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 import kotlinx.serialization.json.JsonNull
@@ -27,7 +27,7 @@ object ScrambleHandler : RouteHandler {
         handle(scrambles, enumerate)
     }
 
-    override fun install(router: Routing) {
+    override fun install(router: Route) {
         router.route("scramble") {
             route("{puzzleKey}") {
                 get("txt") {

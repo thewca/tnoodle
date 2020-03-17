@@ -4,7 +4,7 @@ import io.ktor.application.ApplicationCall
 import io.ktor.http.ContentType
 import io.ktor.request.receive
 import io.ktor.request.uri
-import io.ktor.routing.Routing
+import io.ktor.routing.Route
 import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
@@ -43,7 +43,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
             WCIFScrambleMatcher.getScrambleCountsPerEvent(data.request.extendedWcif) + extraTargetData
     }
 
-    override fun install(router: Routing) {
+    override fun install(router: Route) {
         router.route("/wcif") {
             route("/scrambles") {
                 val job = ScramblingJob { wcif, _, _ ->

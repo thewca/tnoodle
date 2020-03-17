@@ -4,15 +4,14 @@ import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.gitVersionTag
 
+import dependencies.Libraries.APACHE_COMMONS_LANG3
 import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.KOTLIN_ARGPARSER
-import dependencies.Libraries.APACHE_COMMONS_LANG3
-import dependencies.Libraries.SYSTEM_TRAY
-import dependencies.Libraries.KOTLIN_SERIALIZATION_JVM
-import dependencies.Libraries.KOTLIN_COROUTINES_CORE
+import dependencies.Libraries.MARKDOWNJ_CORE
 import dependencies.Libraries.SNAKEYAML
+import dependencies.Libraries.SYSTEM_TRAY
 import dependencies.Libraries.ZIP4J
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -45,6 +44,7 @@ dependencies {
     implementation(project(":tnoodle-server"))
 
     implementation(ZIP4J)
+    implementation(MARKDOWNJ_CORE)
     implementation(ITEXTPDF)
     implementation(BATIK_TRANSCODER)
     implementation(SNAKEYAML)
