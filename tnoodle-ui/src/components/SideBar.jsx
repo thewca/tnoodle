@@ -9,7 +9,8 @@ import {
     updateMe,
     updateCompetitionId,
     updateFileZipBlob,
-    addCachedWcif
+    addCachedObject,
+    setSuggestedTranslations
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -21,12 +22,13 @@ import {
     getCompetitionJson,
     getQueryParameter
 } from "../api/wca.api";
+import { fetchSuggestedLanguages } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 const mapStateToProps = store => ({
     me: store.me,
     competitions: store.competitions,
-    cachedWcifs: store.cachedWcifs
+    cachedObjects: store.cachedObjects
 });
 
 const mapDispatchToProps = {
@@ -37,7 +39,8 @@ const mapDispatchToProps = {
     updateMe,
     updateCompetitionId,
     updateFileZipBlob,
-    addCachedWcif
+    addCachedObject,
+    setSuggestedTranslations
 };
 
 const SideBar = connect(
@@ -128,10 +131,14 @@ const SideBar = connect(
             this.updateCompetitionIdQueryParam(competitionId);
 
             // For quick switching between competitions.
-            let cachedWcif = this.props.cachedWcifs[competitionId];
-            if (cachedWcif != null) {
+            let cachedObject = this.props.cachedObjects[competitionId];
+            if (cachedObject != null) {
+                let cachedWcif = cachedObject.wcif;
                 this.setWcif(cachedWcif);
                 this.maybeAddCompetition(cachedWcif.id, cachedWcif.name);
+
+                let cachedSuggestedLanguages = cachedObject.suggestedLanguages;
+                this.setSuggestedLanguages(cachedSuggestedLanguages);
                 return;
             }
 
@@ -140,11 +147,14 @@ const SideBar = connect(
                 loadingCompetitionInformation: true,
                 competitionId
             });
+
             getCompetitionJson(competitionId)
                 .then(wcif => {
                     this.setWcif(wcif);
-                    this.props.addCachedWcif(wcif);
+                    this.props.addCachedObject(competitionId, "wcif", wcif);
                     this.maybeAddCompetition(wcif.id, wcif.name);
+
+                    this.getAndCacheSuggestedFmcLanguages(wcif);
                 })
                 .catch(e => {
                     console.error(
@@ -152,6 +162,19 @@ const SideBar = connect(
                         e
                     );
                     this.setLoadingCompetitionInformation(false);
+                });
+        };
+
+        getAndCacheSuggestedFmcLanguages = wcif => {
+            fetchSuggestedLanguages(wcif)
+                .then(response => response.json())
+                .then(languages => {
+                    console.log(languages);
+                    this.props.addCachedObject(
+                        wcif.id,
+                        "suggestedFmcLanguages",
+                        languages
+                    );
                 });
         };
 
@@ -200,6 +223,12 @@ const SideBar = connect(
             this.props.updateCompetitionId(wcif.id);
             this.props.updateCompetitionName(wcif.name);
             this.props.updateFileZipBlob(null);
+        };
+
+        setSuggestedLanguages = suggestedFmcLanguages => {
+            if (suggestedFmcLanguages != null) {
+                this.props.setSuggestedTranslations(suggestedFmcLanguages);
+            }
         };
 
         logInButton = () => {

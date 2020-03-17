@@ -65,9 +65,14 @@ export const updateFileZipBlob = fileZipBlob => ({
     payload: { fileZipBlob: fileZipBlob }
 });
 
-export const addCachedWcif = wcif => ({
-    type: ActionTypes.ADD_CACHED_WCIF,
-    payload: { wcif }
+/**
+ * @param {string} competitionId Since we cache information considering competitions, use id like WC2015.
+ * @param {string} identifier WCIF or suggestedFmcLanguages
+ * @param {json} object
+ */
+export const addCachedObject = (competitionId, identifier, object) => ({
+    type: ActionTypes.ADD_CACHED_OBJECT,
+    payload: { competitionId, identifier, object }
 });
 
 export const updateTranslations = translations => ({
@@ -88,4 +93,14 @@ export const resetTranslations = () => ({
 export const selectAllTranslations = () => ({
     type: ActionTypes.SELECT_ALL_TRANSLATIONS,
     payload: {}
+});
+
+/**
+ * Given an array of languages and a previous array of FMC languages,
+ * set as selected FMC language only those present on the first array.
+ * @param {array} suggestedFmcTranslations
+ */
+export const setSuggestedTranslations = suggestedFmcTranslations => ({
+    type: ActionTypes.SET_SUGGESTED_TRANSLATIONS,
+    payload: { suggestedFmcTranslations }
 });

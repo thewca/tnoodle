@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
-import { fetchZip, fetchAvailableLanguages } from "../api/tnoodle.api";
+import { fetchZip, fetchAvailableFmcLanguages } from "../api/tnoodle.api";
 import { toWcaUrl, isUsingStaging } from "../api/wca.api";
 import { updateFileZipBlob, updateTranslations } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
@@ -34,7 +34,7 @@ const EventPickerTable = connect(
         }
 
         componentDidMount = function() {
-            fetchAvailableLanguages()
+            fetchAvailableFmcLanguages()
                 .then(response => response.json())
                 .then(languages => {
                     let translations = languages.map(language => ({
@@ -42,6 +42,9 @@ const EventPickerTable = connect(
                         status: true
                     }));
                     this.props.updateTranslations(translations);
+                })
+                .catch(error => {
+                    console.error("Could not get FMC translations.", error);
                 });
         };
 
@@ -65,7 +68,7 @@ const EventPickerTable = connect(
                     this.props.updateFileZipBlob(blob);
                 })
                 .catch(e => {
-                    console.error(e);
+                    console.error("Could not get scrambles", e);
                     this.setGeneratingScrambles(false);
                 });
         };

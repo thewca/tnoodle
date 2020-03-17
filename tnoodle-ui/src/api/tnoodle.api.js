@@ -1,32 +1,28 @@
 let baseUrl = window.location.origin;
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
-let languagesEndpoint = "/frontend/fmc/languages/available";
+let fmcLanguagesEndpoint = "/frontend/fmc/languages/available";
+let suggestedFmcLanguagesEndpoint = "/frontend/fmc/languages/competitors";
 
 export const copiesExtensionId =
     "org.worldcubeassociation.tnoodle.SheetCopyCount";
 
 export const fetchZip = (wcif, mbld, password, translations) => {
-    let url = baseUrl + zipEndpoint;
-
     let payload = {
         wcif,
         multiCubes: { requestedScrambles: mbld },
-        fmcLanguages: languageHelper(translations)
+        fmcLanguages: fmcLanguageHelper(translations)
     };
 
     if (password != null && password.length > 0) {
         payload.zipPassword = password;
     }
 
-    return fetch(url, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    });
+    return postToTnoodle(zipEndpoint, payload);
+};
+
+export const fetchSuggestedLanguages = wcif => {
+    return postToTnoodle(suggestedFmcLanguagesEndpoint, wcif);
 };
 
 export const fetchRunningVersion = () => {
@@ -47,17 +43,31 @@ export const getDefaultCopiesExtension = (copies = 1) => {
     };
 };
 
-export const fetchAvailableLanguages = () => {
-    return fetch(baseUrl + languagesEndpoint);
+export const fetchAvailableFmcLanguages = () => {
+    return fetch(baseUrl + fmcLanguagesEndpoint);
 };
 
-const languageHelper = translations => {
+/**
+ * Builds the object expected for FMC translations
+ * @param {*} translations e.g. ["de", "da", "pt-BR"]
+ */
+const fmcLanguageHelper = translations => {
     if (translations == null) {
         return null;
     }
     return {
-        fmcLanguages: translations
+        languageTags: translations
             .filter(translation => translation.status)
             .map(translation => translation.id)
     };
 };
+
+const postToTnoodle = (endpoint, payload) =>
+    fetch(baseUrl + endpoint, {
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });

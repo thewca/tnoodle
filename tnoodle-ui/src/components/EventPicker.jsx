@@ -165,15 +165,22 @@ const EventPicker = connect(
         };
 
         handleTranslation = id => {
+            this.props.updateFileZipBlob(null);
             this.props.updateTranslation(id);
         };
 
         selectAllTranslations = () => {
+            this.props.updateFileZipBlob(null);
             this.props.selectAllTranslations();
         };
 
         selectNoneTranslation = () => {
+            this.props.updateFileZipBlob(null);
             this.props.resetTranslations();
+        };
+
+        selectSuggestedTranslations = () => {
+            this.props.updateFileZipBlob(null);
         };
 
         toggleTranslations = () => {

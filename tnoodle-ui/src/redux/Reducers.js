@@ -11,7 +11,7 @@ const defaultStore = {
     editingDisabled: false,
     officialZip: true,
     fileZipBlob: null,
-    cachedWcifs: {},
+    cachedObjects: {},
     translations: null
 };
 
@@ -117,12 +117,14 @@ export const Reducer = (store, action) => {
         return { ...store, fileZipBlob: action.payload.fileZipBlob };
     }
 
-    if (action.type === ActionTypes.ADD_CACHED_WCIF) {
+    if (action.type === ActionTypes.ADD_CACHED_OBJECT) {
         return {
             ...store,
-            cachedWcifs: {
-                ...store.cachedWcifs,
-                [action.payload.wcif.id]: action.payload.wcif
+            cachedObjects: {
+                ...store.cachedObjects,
+                [action.payload.competitionId]: {
+                    [action.payload.identifier]: action.payload.object
+                }
             }
         };
     }
@@ -170,6 +172,19 @@ export const Reducer = (store, action) => {
                     status: true
                 }))
             ]
+        };
+    }
+
+    if (action.type === ActionTypes.SET_SUGGESTED_TRANSLATIONS) {
+        let translations = store.translations.map(translation => ({
+            ...translation,
+            status: action.payload.suggestedFmcTranslations.includes(
+                translation
+            )
+        }));
+        return {
+            ...store,
+            translations: [...translations]
         };
     }
 
