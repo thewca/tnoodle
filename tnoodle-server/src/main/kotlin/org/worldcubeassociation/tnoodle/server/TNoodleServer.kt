@@ -11,7 +11,6 @@ import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.routing.StylesheetHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
-import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 
 class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
     override fun spinUp(app: Application) {

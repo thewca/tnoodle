@@ -8,7 +8,7 @@ import org.worldcubeassociation.tnoodle.server.cloudscrambles.routing.HomepageHa
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.routing.PuzzleListHandler
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.routing.ScrambleHandler
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.routing.ScrambleViewHandler
-import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 
 object CloudscramblesServer : ApplicationHandler {
     override fun spinUp(app: Application) {

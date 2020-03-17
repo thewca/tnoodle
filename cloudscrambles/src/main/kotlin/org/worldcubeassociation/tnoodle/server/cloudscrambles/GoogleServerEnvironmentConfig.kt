@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.cloudscrambles
 
-import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.DEVEL_VERSION
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.callerClass
 import java.io.File

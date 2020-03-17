@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.util
+package org.worldcubeassociation.tnoodle.server
 
 interface ServerEnvironmentConfig {
     val projectName: String

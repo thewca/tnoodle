@@ -1,6 +1,6 @@
-package org.worldcubeassociation.tnoodle.server
+package org.worldcubeassociation.tnoodle.server.config
 
-import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils.DEVEL_VERSION
 
