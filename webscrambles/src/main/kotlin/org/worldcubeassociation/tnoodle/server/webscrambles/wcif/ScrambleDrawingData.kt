@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet

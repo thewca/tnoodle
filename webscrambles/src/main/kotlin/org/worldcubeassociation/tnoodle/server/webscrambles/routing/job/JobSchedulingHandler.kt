@@ -13,10 +13,6 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 
 object JobSchedulingHandler : RouteHandler {
-    val DAEMON_FACTORY = ThreadFactory { Executors.defaultThreadFactory().newThread(it).apply { isDaemon = true } }
-
-    val JOB_CONTEXT = Executors.newFixedThreadPool(2, DAEMON_FACTORY).asCoroutineDispatcher()
-
     private val JOBS = mutableMapOf<Int, MutableMap<String, Int>>()
     private val RESULTS = mutableMapOf<Int, Pair<ContentType, ByteArray>>()
     private val ERRORS = mutableMapOf<Int, Pair<HttpStatusCode, Throwable>>()

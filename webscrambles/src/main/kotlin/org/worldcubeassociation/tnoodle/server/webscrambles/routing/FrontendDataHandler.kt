@@ -11,8 +11,8 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.json
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.FormatPlugins
+import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.plugins.FormatPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.PrintingFolder
 import java.util.*

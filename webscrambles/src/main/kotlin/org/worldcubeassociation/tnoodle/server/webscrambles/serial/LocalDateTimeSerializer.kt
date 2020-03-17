@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
+import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

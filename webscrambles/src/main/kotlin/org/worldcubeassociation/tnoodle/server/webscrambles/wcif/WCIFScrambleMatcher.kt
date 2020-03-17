@@ -6,8 +6,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.worldcubeassociation.tnoodle.server.cryptography.StringEncryption
 import org.worldcubeassociation.tnoodle.server.cryptography.SymmetricCipher
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.EventPlugins
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.plugins.EventPlugins
+import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension

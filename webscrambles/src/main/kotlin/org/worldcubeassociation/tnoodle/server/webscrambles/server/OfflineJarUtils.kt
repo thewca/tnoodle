@@ -3,11 +3,11 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.server
 import dorkbox.systemTray.SystemTray
 import dorkbox.systemTray.MenuItem
 import org.slf4j.LoggerFactory
+import org.worldcubeassociation.tnoodle.server.LocalServerEnvironmentConfig
 import java.awt.*
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import javax.swing.ImageIcon
 import kotlin.system.exitProcess
 
 object OfflineJarUtils {

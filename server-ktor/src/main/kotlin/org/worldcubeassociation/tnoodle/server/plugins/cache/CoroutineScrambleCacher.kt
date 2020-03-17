@@ -1,9 +1,10 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.plugins.cache
+package org.worldcubeassociation.tnoodle.server.plugins.cache
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.produce
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
-import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
 import kotlin.coroutines.CoroutineContext
 
 class CoroutineScrambleCacher(val puzzle: Puzzle, capacity: Int) : CoroutineScope {
@@ -11,7 +12,7 @@ class CoroutineScrambleCacher(val puzzle: Puzzle, capacity: Int) : CoroutineScop
         private set
 
     override val coroutineContext: CoroutineContext
-        get() = JobSchedulingHandler.JOB_CONTEXT
+        get() = JOB_CONTEXT
 
     @ExperimentalCoroutinesApi
     private val buffer = produce(capacity = capacity) {
@@ -25,4 +26,10 @@ class CoroutineScrambleCacher(val puzzle: Puzzle, capacity: Int) : CoroutineScop
         .also { synchronized(available) { available-- } }
 
     fun getScramble(): String = runBlocking { yieldScramble() }
+
+    companion object {
+        val DAEMON_FACTORY = ThreadFactory { Executors.defaultThreadFactory().newThread(it).apply { isDaemon = true } }
+
+        val JOB_CONTEXT = Executors.newFixedThreadPool(2, DAEMON_FACTORY).asCoroutineDispatcher()
+    }
 }

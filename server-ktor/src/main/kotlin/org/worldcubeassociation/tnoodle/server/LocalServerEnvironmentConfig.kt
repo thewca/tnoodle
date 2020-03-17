@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.server
+package org.worldcubeassociation.tnoodle.server
 
 import org.worldcubeassociation.tnoodle.server.util.ServerEnvironmentConfig
 import org.worldcubeassociation.tnoodle.server.util.WebServerUtils

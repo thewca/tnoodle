@@ -1,7 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.Serializable
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.FormatPlugins
+import org.worldcubeassociation.tnoodle.server.plugins.FormatPlugins
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionProvider
 
 @Serializable

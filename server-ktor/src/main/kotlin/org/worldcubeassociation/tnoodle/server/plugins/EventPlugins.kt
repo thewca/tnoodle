@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.plugins
+package org.worldcubeassociation.tnoodle.server.plugins
 
 enum class EventPlugins(val key: String, val description: String, val scrambler: PuzzlePlugins, val legalFormats: Set<FormatPlugins>) {
     THREE(PuzzlePlugins.THREE, FormatPlugins.BIG_AVERAGE_FORMATS),

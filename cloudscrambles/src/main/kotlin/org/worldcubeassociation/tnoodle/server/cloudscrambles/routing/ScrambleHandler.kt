@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.routing
+package org.worldcubeassociation.tnoodle.server.cloudscrambles.routing
 
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -9,7 +9,7 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import kotlinx.serialization.json.JsonNull
 import org.worldcubeassociation.tnoodle.server.RouteHandler
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
 
 object ScrambleHandler : RouteHandler {
     private suspend fun ApplicationCall.withScrambleSheets(handle: suspend ApplicationCall.(List<String>, Boolean) -> Unit) {

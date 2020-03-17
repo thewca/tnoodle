@@ -13,7 +13,6 @@ import dependencies.Libraries.SYSTEM_TRAY
 import dependencies.Libraries.KOTLIN_SERIALIZATION_JVM
 import dependencies.Libraries.KOTLIN_COROUTINES_CORE
 import dependencies.Libraries.SNAKEYAML
-import dependencies.Libraries.TNOODLE_SCRAMBLES
 import dependencies.Libraries.ZIP4J
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -51,10 +50,7 @@ dependencies {
     implementation(SNAKEYAML)
     implementation(KOTLIN_ARGPARSER)
     implementation(SYSTEM_TRAY)
-    implementation(TNOODLE_SCRAMBLES)
-    implementation(KOTLIN_SERIALIZATION_JVM)
     implementation(APACHE_COMMONS_LANG3)
-    implementation(KOTLIN_COROUTINES_CORE)
 
     runtimeOnly(BOUNCYCASTLE)
     runtimeOnly(project(":tnoodle-ui"))

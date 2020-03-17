@@ -8,7 +8,7 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.RouteHandler.Companion.markdownToHTML
-import org.worldcubeassociation.tnoodle.server.webscrambles.plugins.PuzzlePlugins
+import org.worldcubeassociation.tnoodle.server.plugins.PuzzlePlugins
 
 object ReadmeHandler : RouteHandler {
     override fun install(router: Routing) {
