@@ -1,39 +1,36 @@
 let baseUrl = window.location.origin;
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
+let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
+let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
 
-export const fetchZip = (wcif, mbld, password) => {
-    let url = baseUrl + zipEndpoint;
+export const copiesExtensionId =
+    "org.worldcubeassociation.tnoodle.SheetCopyCount";
 
-    let payload = { wcif, multiCubes: { requestedScrambles: mbld } };
+export const fetchZip = (wcif, mbld, password, translations) => {
+    let payload = {
+        wcif,
+        multiCubes: { requestedScrambles: mbld },
+        fmcLanguages: fmcTranslationsHelper(translations)
+    };
 
     if (password != null && password.length > 0) {
         payload.zipPassword = password;
     }
 
-    // TODO keep this until we're going to prof just because
-    console.log(payload);
+    return postToTnoodle(zipEndpoint, payload);
+};
 
-    return fetch(url, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    });
+export const fetchSuggestedFmcTranslations = wcif => {
+    return postToTnoodle(suggestedFmcTranslationsEndpoint, wcif);
 };
 
 export const fetchRunningVersion = () => {
-    let url = baseUrl + versionEndpoint;
-    return fetch(url);
+    return fetch(baseUrl + versionEndpoint);
 };
 
-export const copiesExtensionId =
-    "org.worldcubeassociation.tnoodle.SheetCopyCount";
-
 /**
- * This is the default extension the backend expects
+ * This is the default extension object the backend expects
  * @param {} copies
  */
 export const getDefaultCopiesExtension = (copies = 1) => {
@@ -45,3 +42,32 @@ export const getDefaultCopiesExtension = (copies = 1) => {
         }
     };
 };
+
+export const fetchAvailableFmcTranslations = () => {
+    return fetch(baseUrl + fmcTranslationsEndpoint);
+};
+
+/**
+ * Builds the object expected for FMC translations
+ * @param {*} translations e.g. ["de", "da", "pt-BR"]
+ */
+const fmcTranslationsHelper = translations => {
+    if (translations == null) {
+        return null;
+    }
+    return {
+        languageTags: translations
+            .filter(translation => translation.status)
+            .map(translation => translation.id)
+    };
+};
+
+const postToTnoodle = (endpoint, payload) =>
+    fetch(baseUrl + endpoint, {
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });

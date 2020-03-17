@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { WCA_EVENTS } from "../constants/wca.constants";
-import { fetchZip } from "../api/tnoodle.api";
+import { fetchZip, fetchAvailableFmcTranslations } from "../api/tnoodle.api";
 import { toWcaUrl, isUsingStaging } from "../api/wca.api";
-import { updateFileZipBlob } from "../redux/ActionCreators";
+import { updateFileZipBlob, updateTranslations } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
 
 const mapStateToProps = store => ({
@@ -14,10 +14,11 @@ const mapStateToProps = store => ({
     editingDisabled: store.editingDisabled,
     competitionId: store.competitionId,
     officialZip: store.officialZip,
-    fileZipBlob: store.fileZipBlob
+    fileZipBlob: store.fileZipBlob,
+    translations: store.translations
 });
 
-const mapDispatchToProps = { updateFileZipBlob };
+const mapDispatchToProps = { updateFileZipBlob, updateTranslations };
 
 const BOOTSTRAP_GRID = 12;
 const EVENTS_PER_LINE = 2;
@@ -31,9 +32,32 @@ const EventPickerTable = connect(
             super(props);
             this.state = { generatingScrambles: false };
         }
+
+        componentDidMount = function() {
+            fetchAvailableFmcTranslations()
+                .then(response => response.json())
+                .then(availableTranslations => {
+                    let translations = availableTranslations.map(
+                        translation => ({
+                            id: translation,
+                            status: true
+                        })
+                    );
+                    this.props.updateTranslations(translations);
+                })
+                .catch(error => {
+                    console.error("Could not get FMC translations.", error);
+                });
+        };
+
         handleScrambleButton = () => {
             this.setGeneratingScrambles(true);
-            fetchZip(this.props.wcif, this.props.mbld, this.props.password)
+            fetchZip(
+                this.props.wcif,
+                this.props.mbld,
+                this.props.password,
+                this.props.translations
+            )
                 .then(response => {
                     if (response.ok) {
                         return response.blob();
@@ -46,7 +70,7 @@ const EventPickerTable = connect(
                     this.props.updateFileZipBlob(blob);
                 })
                 .catch(e => {
-                    console.error(e);
+                    console.error("Could not get scrambles", e);
                     this.setGeneratingScrambles(false);
                 });
         };
@@ -65,7 +89,7 @@ const EventPickerTable = connect(
                 (this.props.competitionId != null && isUsingStaging());
 
             let fileName =
-                (isUnofficialZip ? "[Unofficial] " : "") +
+                (isUnofficialZip ? "[UNOFFICIAL] " : "") +
                 this.props.wcif.name +
                 ".zip";
 
@@ -127,7 +151,7 @@ const EventPickerTable = connect(
             if (this.props.fileZipBlob != null) {
                 return (
                     <button
-                        className="btn btn-primary btn-lg"
+                        className="btn btn-success btn-lg"
                         onClick={this.downloadZip}
                     >
                         Download Scrambles

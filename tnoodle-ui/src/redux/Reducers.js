@@ -2,10 +2,7 @@ import { ActionTypes } from "./Types";
 import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
 import { getDefaultCopiesExtension } from "../api/tnoodle.api";
-import {
-    competitionName2Id,
-    competitionName2ShortName
-} from "../util/competition.name.util";
+import { competitionName2Id } from "../util/competition.name.util";
 
 const defaultStore = {
     wcif: defaultWcif,
@@ -14,7 +11,9 @@ const defaultStore = {
     editingDisabled: false,
     officialZip: true,
     fileZipBlob: null,
-    cachedWcifs: {}
+    cachedObjects: {},
+    translations: null,
+    suggestedFmcTranslations: null
 };
 
 export const Reducer = (store, action) => {
@@ -41,15 +40,14 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_COMPETITION_NAME) {
         let competitionName = action.payload.competitionName;
-        let shortName = competitionName2ShortName(competitionName);
         let id = competitionName2Id(competitionName);
         return {
             ...store,
             wcif: {
                 ...store.wcif,
                 name: competitionName,
-                shortName: shortName,
-                id: id
+                shortName: competitionName,
+                id
             }
         };
     }
@@ -120,13 +118,82 @@ export const Reducer = (store, action) => {
         return { ...store, fileZipBlob: action.payload.fileZipBlob };
     }
 
-    if (action.type === ActionTypes.ADD_CACHED_WCIF) {
+    if (action.type === ActionTypes.ADD_CACHED_OBJECT) {
         return {
             ...store,
-            cachedWcifs: {
-                ...store.cachedWcifs,
-                [action.payload.wcif.id]: action.payload.wcif
+            cachedObjects: {
+                ...store.cachedObjects,
+                [action.payload.competitionId]: {
+                    ...store.cachedObjects[action.payload.competitionId],
+                    [action.payload.identifier]: action.payload.object
+                }
             }
+        };
+    }
+
+    if (action.type === ActionTypes.RESET_TRANSLATIONS) {
+        return {
+            ...store,
+            translations: [
+                ...store.translations.map(translation => ({
+                    ...translation,
+                    status: false
+                }))
+            ]
+        };
+    }
+
+    if (action.type === ActionTypes.UPDATE_TRANSLATION) {
+        return {
+            ...store,
+            translations: [
+                ...store.translations.map(translation => ({
+                    ...translation,
+                    status:
+                        translation.id === action.payload.id
+                            ? !translation.status
+                            : translation.status
+                }))
+            ]
+        };
+    }
+
+    if (action.type === ActionTypes.UPDATE_TRANSLATIONS) {
+        return {
+            ...store,
+            translations: action.payload.translations
+        };
+    }
+
+    if (action.type === ActionTypes.SELECT_ALL_TRANSLATIONS) {
+        return {
+            ...store,
+            translations: [
+                ...store.translations.map(translation => ({
+                    ...translation,
+                    status: true
+                }))
+            ]
+        };
+    }
+
+    if (action.type === ActionTypes.ADD_SUGGESTED_FMC_TRANSLATIONS) {
+        return {
+            ...store,
+            suggestedFmcTranslations: action.payload.suggestedFmcTranslations
+        };
+    }
+
+    if (action.type === ActionTypes.SET_SUGGESTED_FMC_TRANSLATIONS) {
+        let translations = store.translations.map(translation => ({
+            ...translation,
+            status: action.payload.suggestedFmcTranslations.includes(
+                translation.id
+            )
+        }));
+        return {
+            ...store,
+            translations: [...translations]
         };
     }
 

@@ -1,11 +1,16 @@
 import React, { Component } from "react";
+import _ from "lodash";
 import { connect } from "react-redux";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
 import {
     updateWcaEvent,
     updateMbld,
-    updateFileZipBlob
+    updateFileZipBlob,
+    updateTranslation,
+    selectAllTranslations,
+    resetTranslations,
+    setSuggestedFmcTranslations
 } from "../redux/ActionCreators";
 import { MBLD_MIN } from "../constants/wca.constants";
 import {
@@ -16,13 +21,19 @@ import {
 const mapStateToProps = store => ({
     mbld: store.mbld,
     editingDisabled: store.editingDisabled,
-    wcif: store.wcif
+    wcif: store.wcif,
+    translations: store.translations,
+    suggestedFmcTranslations: store.suggestedFmcTranslations
 });
 
 const mapDispatchToProps = {
     updateWcaEvent,
     updateMbld,
-    updateFileZipBlob
+    updateFileZipBlob,
+    updateTranslation,
+    selectAllTranslations,
+    resetTranslations,
+    setSuggestedFmcTranslations
 };
 
 const EventPicker = connect(
@@ -39,6 +50,11 @@ const EventPicker = connect(
 
             if (this.state.id === "333mbf") {
                 this.state.mbld = props.mbld;
+            }
+
+            if (this.state.id === "333fm") {
+                this.state.translationsPerLine = 4;
+                this.state.showTranslations = false;
             }
         }
 
@@ -114,7 +130,6 @@ const EventPicker = connect(
 
         // When mbld loses focus
         verifyMbld = () => {
-            // TODO search for the best result and warn if someone selects less mbld than this.
             let mbld = this.state.mbld;
             if (mbld < MBLD_MIN) {
                 mbld = MBLD_MIN;
@@ -150,6 +165,171 @@ const EventPicker = connect(
                     </tfoot>
                 );
             }
+        };
+
+        handleTranslation = id => {
+            this.props.updateFileZipBlob(null);
+            this.props.updateTranslation(id);
+        };
+
+        selectAllTranslations = () => {
+            this.props.updateFileZipBlob(null);
+            this.props.selectAllTranslations();
+        };
+
+        selectNoneTranslation = () => {
+            this.props.updateFileZipBlob(null);
+            this.props.resetTranslations();
+        };
+
+        selectSuggestedTranslations = () => {
+            this.props.updateFileZipBlob(null);
+            this.props.setSuggestedFmcTranslations(
+                this.props.suggestedFmcTranslations
+            );
+        };
+
+        toggleTranslations = () => {
+            this.setState({
+                ...this.state,
+                showTranslations: !this.state.showTranslations
+            });
+        };
+
+        maybeShowFmcTranslations = numberOfRounds => {
+            if (this.state.id !== "333fm" || this.props.translations == null) {
+                return;
+            }
+
+            if (numberOfRounds > 0) {
+                return (
+                    <tfoot>
+                        <tr>
+                            <th colSpan={4} className="text-center">
+                                <button
+                                    className="btn btn-info"
+                                    onClick={this.toggleTranslations}
+                                >
+                                    Translations
+                                </button>
+                            </th>
+                        </tr>
+                        {this.maybeShowFmcTranslationsDetails()}
+                    </tfoot>
+                );
+            }
+        };
+
+        maybeShowFmcTranslationsDetails = () => {
+            if (!this.state.showTranslations) {
+                return;
+            }
+            let translations = _.chunk(
+                this.props.translations,
+                this.state.translationsPerLine
+            );
+
+            let chunkWidth = 100.0 / this.state.translationsPerLine; // For each translation
+            let filledWidth = 0.8 * chunkWidth; // For label and the checkbox
+            let spaceWidth = chunkWidth - filledWidth;
+            let contentWidth = filledWidth / 2; // For each label or checkbox
+            let contentStyle = {
+                width: `${contentWidth}%`
+            };
+            let spaceStyle = {
+                width: `${spaceWidth}%`
+            };
+            return (
+                <React.Fragment>
+                    <tr>
+                        <th colSpan={4}>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={this.selectAllTranslations}
+                            >
+                                Select All
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={this.selectNoneTranslation}
+                            >
+                                Select None
+                            </button>
+                            {this.props.suggestedFmcTranslations != null && (
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary"
+                                    onClick={this.selectSuggestedTranslations}
+                                    title="This selection is based on competitor's nationalities."
+                                >
+                                    Select Suggested
+                                </button>
+                            )}
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th colSpan={4} className="text-center">
+                            <table className="table table-hover">
+                                <tbody>
+                                    {translations.map(
+                                        (translationsChunk, i) => (
+                                            <tr key={i}>
+                                                {translationsChunk.map(
+                                                    (translation, j) => (
+                                                        <React.Fragment key={j}>
+                                                            <th
+                                                                style={
+                                                                    contentStyle
+                                                                }
+                                                            >
+                                                                <label>
+                                                                    {
+                                                                        translation.id
+                                                                    }
+                                                                </label>
+                                                            </th>
+                                                            <th
+                                                                style={
+                                                                    contentStyle
+                                                                }
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={
+                                                                        translation.status
+                                                                    }
+                                                                    onChange={_ =>
+                                                                        this.handleTranslation(
+                                                                            translation.id
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </th>
+                                                            {j <
+                                                                this.state
+                                                                    .translationsPerLine -
+                                                                    1 && (
+                                                                <th
+                                                                    style={
+                                                                        spaceStyle
+                                                                    }
+                                                                />
+                                                            )}
+                                                        </React.Fragment>
+                                                    )
+                                                )}
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+                </React.Fragment>
+            );
         };
 
         maybeShowTableTitles = rounds => {
@@ -300,6 +480,7 @@ const EventPicker = connect(
                     </thead>
                     {this.maybeShowTableBody(event, rounds)}
                     {this.maybeShowMbld(rounds)}
+                    {this.maybeShowFmcTranslations(rounds.length)}
                 </table>
             );
         }

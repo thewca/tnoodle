@@ -2,6 +2,11 @@ import { BASE_PATH } from "../App";
 
 // Members of the Software Team can configure this here: https://www.worldcubeassociation.org/oauth/applications/123.
 
+const TNOODLE_ACCESS_TOKEN_KEY = "TNoodle.accessToken";
+const TNOODLE_LAST_LOGIN_ENV = "TNoodle.lastLoginEnv";
+const STAGING = "staging";
+const PRODUCTION = "production";
+
 // See https://github.com/thewca/worldcubeassociation.org/wiki/OAuth-documentation-notes#staging-oauth-application
 let getWcaOrigin = () => {
     if (isUsingStaging()) {
@@ -26,14 +31,14 @@ let getTnoodleAppId = () => {
 let wcaAccessToken = getHashParameter("access_token");
 if (wcaAccessToken) {
     window.location.hash = "";
-    localStorage["TNoodle.accessToken"] = wcaAccessToken;
+    localStorage[TNOODLE_ACCESS_TOKEN_KEY] = wcaAccessToken;
     gotoPreLoginPath();
 } else {
-    wcaAccessToken = localStorage["TNoodle.accessToken"];
+    wcaAccessToken = localStorage[TNOODLE_ACCESS_TOKEN_KEY];
 }
 
 export function isUsingStaging() {
-    return !!getQueryParameter("staging");
+    return getQueryParameter("staging") === "true";
 }
 
 export function toWcaUrl(path) {
@@ -45,6 +50,7 @@ export function logIn() {
         return;
     }
 
+    localStorage[TNOODLE_LAST_LOGIN_ENV] = getCurrentEnv();
     let redirectUri = window.location.origin + BASE_PATH + "/oauth/wca";
     let logInUrl = toWcaUrl(
         `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
@@ -54,11 +60,15 @@ export function logIn() {
 }
 
 export function isLogged() {
-    return localStorage["TNoodle.accessToken"] != null;
+    return (
+        localStorage[TNOODLE_ACCESS_TOKEN_KEY] != null &&
+        getCurrentEnv() === getLastLoginEnv()
+    );
 }
 
 export function logOut() {
-    delete localStorage["TNoodle.accessToken"];
+    delete localStorage[TNOODLE_LAST_LOGIN_ENV];
+    delete localStorage[TNOODLE_ACCESS_TOKEN_KEY];
     wcaAccessToken = null;
     window.location.reload();
 }
@@ -80,7 +90,6 @@ export function fetchVersionInfo() {
 }
 
 export function getCompetitionJson(competitionId) {
-    // TODO graphql here
     return wcaApiFetch(`/competitions/${competitionId}/wcif`).then(response =>
         response.json()
     );
@@ -119,6 +128,10 @@ function parseQueryString(query) {
             return params;
         }, {});
 }
+
+const getLastLoginEnv = () => localStorage[TNOODLE_LAST_LOGIN_ENV];
+
+const getCurrentEnv = () => (isUsingStaging() ? STAGING : PRODUCTION);
 
 function wcaApiFetch(path, fetchOptions) {
     // TODO - look into refresh token https://github.com/doorkeeper-gem/doorkeeper/wiki/Enable-Refresh-Token-Credentials
