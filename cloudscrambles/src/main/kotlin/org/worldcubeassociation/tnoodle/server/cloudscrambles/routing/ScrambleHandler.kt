@@ -35,6 +35,10 @@ object ScrambleHandler : RouteHandler {
     override fun install(router: Route) {
         router.route("scramble") {
             route("{$PUZZLE_KEY_PARAM}") {
+                get {
+                    call.withScrambleSheets { reqList, _ -> respond(reqList) }
+                }
+
                 get("raw") {
                     call.withScrambleSheets { scrList, enumerate ->
                         val scrambleLines = scrList.withIndex().joinToString("\r\n") { (i, scr) ->
@@ -44,17 +48,6 @@ object ScrambleHandler : RouteHandler {
                         }
 
                         respondText(scrambleLines)
-                    }
-                }
-
-                get {
-                    call.withScrambleSheets { reqList, enumerate ->
-                        if (enumerate) {
-                            respond(reqList)
-                        } else {
-                            val response = reqList.singleOrNull() ?: JsonNull
-                            respond(response)
-                        }
                     }
                 }
             }
