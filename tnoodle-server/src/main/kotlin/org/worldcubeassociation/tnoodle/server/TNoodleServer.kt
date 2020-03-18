@@ -27,9 +27,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
             exitCodeSupplier = { 0 }
         }
 
-        app.install(DefaultHeaders) {
-            header("Access-Control-Allow-Origin", "*")
-        }
+        app.install(DefaultHeaders)
 
         app.install(ContentNegotiation) {
             json(json = JsonConfig.SERIALIZER)
