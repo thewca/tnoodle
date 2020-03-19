@@ -1,10 +1,19 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
-import { WCA_EVENTS } from "../constants/wca.constants";
-import { fetchZip, fetchAvailableFmcTranslations } from "../api/tnoodle.api";
+import {
+    fetchZip,
+    fetchAvailableFmcTranslations,
+    fetchFormats,
+    fetchWcaEvents
+} from "../api/tnoodle.api";
 import { toWcaUrl, isUsingStaging } from "../api/wca.api";
-import { updateFileZipBlob, updateTranslations } from "../redux/ActionCreators";
+import {
+    updateFileZipBlob,
+    updateTranslations,
+    setWcaFormats,
+    setWcaEvents
+} from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
 
 const mapStateToProps = store => ({
@@ -15,10 +24,16 @@ const mapStateToProps = store => ({
     competitionId: store.competitionId,
     officialZip: store.officialZip,
     fileZipBlob: store.fileZipBlob,
-    translations: store.translations
+    translations: store.translations,
+    wcaEvents: store.wcaEvents
 });
 
-const mapDispatchToProps = { updateFileZipBlob, updateTranslations };
+const mapDispatchToProps = {
+    updateFileZipBlob,
+    updateTranslations,
+    setWcaFormats,
+    setWcaEvents
+};
 
 const BOOTSTRAP_GRID = 12;
 const EVENTS_PER_LINE = 2;
@@ -34,6 +49,34 @@ const EventPickerTable = connect(
         }
 
         componentDidMount = function() {
+            this.getFormats();
+            this.getWcaEvents();
+            this.getFmcTranslations();
+        };
+
+        getFormats = () => {
+            fetchFormats()
+                .then(response => response.json())
+                .then(formats => {
+                    this.props.setWcaFormats(formats);
+                })
+                .catch(error => {
+                    console.error("Could not get WCA formats", error);
+                });
+        };
+
+        getWcaEvents = () => {
+            fetchWcaEvents()
+                .then(response => response.json())
+                .then(wcaEvents => {
+                    this.props.setWcaEvents(wcaEvents);
+                })
+                .catch(error => {
+                    console.error("Could get WCA events", error);
+                });
+        };
+
+        getFmcTranslations = () => {
             fetchAvailableFmcTranslations()
                 .then(response => response.json())
                 .then(availableTranslations => {
@@ -176,11 +219,14 @@ const EventPickerTable = connect(
         };
 
         render() {
+            // Prevent from remembering previous order
+            let wcaEvents = this.props.wcaEvents;
+            if (wcaEvents == null) {
+                return null;
+            }
+
             let events = this.props.wcif.events;
             let editingDisabled = this.props.editingDisabled;
-
-            // Prevent from remembering previous order
-            let wcaEvents = [...WCA_EVENTS];
 
             // This filters events to show only those in the competition.
             if (editingDisabled) {

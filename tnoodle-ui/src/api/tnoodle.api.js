@@ -1,9 +1,13 @@
+//let baseUrl = window.location.origin;
 let baseUrl = window.location.origin;
+
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
 let fmcTranslationsEndpoint = "/frontend/fmc/languages/available";
 let suggestedFmcTranslationsEndpoint = "/frontend/fmc/languages/competitors";
 let bestMbldAttemptEndpoint = "/frontend/mbld/best";
+let wcaEventsEndpoint = "/frontend/data/events";
+let formatsEndpoint = "/frontend/data/formats";
 
 export const copiesExtensionId =
     "org.worldcubeassociation.tnoodle.SheetCopyCount";
@@ -20,6 +24,14 @@ export const fetchZip = (wcif, mbld, password, translations) => {
     }
 
     return postToTnoodle(zipEndpoint, payload);
+};
+
+export const fetchWcaEvents = () => {
+    return fetch(baseUrl + wcaEventsEndpoint);
+};
+
+export const fetchFormats = () => {
+    return fetch(baseUrl + formatsEndpoint);
 };
 
 export const fetchSuggestedFmcTranslations = wcif => {

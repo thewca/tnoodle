@@ -118,3 +118,13 @@ export const setBestMbldAttempt = bestMbldAttempt => ({
     type: ActionTypes.SET_BEST_MBLD_ATTEMPT,
     payload: { bestMbldAttempt }
 });
+
+export const setWcaFormats = wcaFormats => ({
+    type: ActionTypes.SET_WCA_FORMATS,
+    payload: { wcaFormats }
+});
+
+export const setWcaEvents = wcaEvents => ({
+    type: ActionTypes.SET_WCA_EVENTS,
+    payload: { wcaEvents }
+});

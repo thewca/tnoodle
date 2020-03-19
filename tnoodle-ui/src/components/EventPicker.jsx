@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
 import CubingIcon from "./CubingIcon";
-import { MAX_WCA_ROUNDS, FORMATS } from "../constants/wca.constants";
+import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import {
     updateWcaEvent,
     updateMbld,
@@ -24,7 +24,8 @@ const mapStateToProps = store => ({
     wcif: store.wcif,
     translations: store.translations,
     suggestedFmcTranslations: store.suggestedFmcTranslations,
-    bestMbldAttempt: store.bestMbldAttempt
+    bestMbldAttempt: store.bestMbldAttempt,
+    wcaFormats: store.wcaFormats
 });
 
 const mapDispatchToProps = {
@@ -116,7 +117,10 @@ const EventPicker = connect(
         };
 
         abbreviate = str => {
-            return FORMATS[str].shortName;
+            if (this.props.wcaFormats != null) {
+                return this.props.wcaFormats[str].shortName;
+            }
+            return "-";
         };
 
         updateEvent = wcaEvent => {
