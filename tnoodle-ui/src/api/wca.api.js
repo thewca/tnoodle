@@ -50,7 +50,6 @@ export function logIn() {
         return;
     }
 
-    localStorage[TNOODLE_LAST_LOGIN_ENV] = getCurrentEnv();
     let redirectUri = window.location.origin + BASE_PATH + "/oauth/wca";
     let logInUrl = toWcaUrl(
         `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
@@ -75,6 +74,9 @@ export function logOut() {
 
 export function gotoPreLoginPath() {
     let preLoginHref = localStorage["TNoodle.preLoginHref"] || "/";
+    localStorage[TNOODLE_LAST_LOGIN_ENV] = preLoginHref.includes("staging=true")
+        ? STAGING
+        : PRODUCTION;
     delete localStorage["TNoodle.preLoginHref"];
     window.location.replace(preLoginHref);
 }
