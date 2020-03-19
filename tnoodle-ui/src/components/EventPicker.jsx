@@ -1,36 +1,32 @@
 import React, { Component } from "react";
-import _ from "lodash";
 import { connect } from "react-redux";
+import _ from "lodash";
 import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import {
     updateWcaEvent,
-    updateMbld,
     updateFileZipBlob,
     updateTranslation,
     selectAllTranslations,
     resetTranslations,
     setSuggestedFmcTranslations
 } from "../redux/ActionCreators";
-import { MBLD_MIN } from "../constants/wca.constants";
 import {
     getDefaultCopiesExtension,
     copiesExtensionId
 } from "../api/tnoodle.api";
+import MbldDetail from "./MbldDetail";
 
 const mapStateToProps = store => ({
-    mbld: store.mbld,
     editingDisabled: store.editingDisabled,
     wcif: store.wcif,
     translations: store.translations,
     suggestedFmcTranslations: store.suggestedFmcTranslations,
-    bestMbldAttempt: store.bestMbldAttempt,
     wcaFormats: store.wcaFormats
 });
 
 const mapDispatchToProps = {
     updateWcaEvent,
-    updateMbld,
     updateFileZipBlob,
     updateTranslation,
     selectAllTranslations,
@@ -50,7 +46,7 @@ const EventPicker = connect(
                 id: props.event.id
             };
 
-            if (this.state.id === "333mbf") {
+            if (this.props.event.is_multiple_blindfolded) {
                 this.state.mbld = props.mbld;
             }
 
@@ -126,67 +122,6 @@ const EventPicker = connect(
         updateEvent = wcaEvent => {
             this.props.updateFileZipBlob(null);
             this.props.updateWcaEvent(wcaEvent);
-        };
-
-        handleMbldChange = mbld => {
-            this.setState({ ...this.state, mbld });
-            this.props.updateMbld(mbld);
-        };
-
-        // When mbld loses focus
-        verifyMbld = () => {
-            let mbld = this.state.mbld;
-            if (mbld < MBLD_MIN) {
-                mbld = MBLD_MIN;
-                this.handleMbldChange(mbld);
-            }
-        };
-
-        maybeShowMbld = rounds => {
-            if (this.state.id === "333mbf" && rounds.length > 0) {
-                return (
-                    <tfoot>
-                        <tr>
-                            <th colSpan={3}>
-                                <p className="text-right">
-                                    Select the number of scrambles
-                                </p>
-                            </th>
-                            <td>
-                                <input
-                                    className="form-control bg-dark text-white"
-                                    type="number"
-                                    value={this.state.mbld}
-                                    onChange={evt =>
-                                        this.handleMbldChange(
-                                            Number(evt.target.value)
-                                        )
-                                    }
-                                    min={MBLD_MIN}
-                                    onBlur={this.verifyMbld}
-                                />
-                            </td>
-                        </tr>
-                        {this.showMbldWarning()}
-                    </tfoot>
-                );
-            }
-        };
-
-        showMbldWarning = () => {
-            let bestMbldAttempt = this.props.bestMbldAttempt;
-            let showMbldWarning =
-                bestMbldAttempt != null && this.props.mbld < bestMbldAttempt;
-
-            if (showMbldWarning) {
-                return (
-                    <tr className="bg-warning">
-                        <th colSpan={4}>
-                            {`You selected ${this.state.mbld} cubes for Multi-Blind, but there's a competitor who already tried ${this.props.bestMbldAttempt} at a competition. Proceed if you are really certain of it.`}
-                        </th>
-                    </tr>
-                );
-            }
         };
 
         handleTranslation = id => {
@@ -501,7 +436,9 @@ const EventPicker = connect(
                         {this.maybeShowTableTitles(rounds)}
                     </thead>
                     {this.maybeShowTableBody(event, rounds)}
-                    {this.maybeShowMbld(rounds)}
+                    {this.state.id === "333mbf" && rounds.length > 0 && (
+                        <MbldDetail />
+                    )}
                     {this.maybeShowFmcTranslations(rounds.length)}
                 </table>
             );
