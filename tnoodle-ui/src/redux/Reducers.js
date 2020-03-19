@@ -14,7 +14,9 @@ const defaultStore = {
     cachedObjects: {},
     translations: null,
     suggestedFmcTranslations: null,
-    bestMbldAttempt: null
+    bestMbldAttempt: null,
+    wcaFormats: null,
+    wcaEvents: null
 };
 
 export const Reducer = (store, action) => {
@@ -202,6 +204,20 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             bestMbldAttempt: action.payload.bestMbldAttempt
+        };
+    }
+
+    if (action.type === ActionTypes.SET_WCA_FORMATS) {
+        return {
+            ...store,
+            wcaFormats: action.payload.wcaFormats
+        };
+    }
+
+    if (action.type === ActionTypes.SET_WCA_EVENTS) {
+        return {
+            ...store,
+            wcaEvents: action.payload.wcaEvents
         };
     }
 
