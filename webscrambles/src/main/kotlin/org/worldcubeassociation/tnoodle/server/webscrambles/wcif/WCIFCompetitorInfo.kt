@@ -10,10 +10,12 @@ object WCIFCompetitorInfo {
     private val COUNTRY_ISO2_LOCALES = Locale.getAvailableLocales()
         .groupBy { it.country }
 
+    private val TRANSLATED_BY_LANGUAGE_TAG = Translate.TRANSLATED_LOCALES
+        .groupBy { it.language }
+
     fun detectTranslationLocales(wcif: Competition): Set<Locale> {
         val competitorCountries = wcif.persons
-            .map { it.countryIso2 }
-            .map { it.isoString }
+            .map { it.countryIso2.isoString }
             .distinct()
 
         val countryLocales = competitorCountries.flatMap { getTranslatedCountryLanguages(it) }
@@ -25,15 +27,15 @@ object WCIFCompetitorInfo {
     private fun getTranslatedCountryLanguages(iso2: String): List<Locale> {
         val candidateLocales = COUNTRY_ISO2_LOCALES[iso2] ?: return emptyList()
 
-        val translatedLocales = candidateLocales.filter { it in Translate.TRANSLATED_LOCALES }
+        val languageGroup = candidateLocales.flatMap { TRANSLATED_BY_LANGUAGE_TAG[it.language].orEmpty() }
 
-        val localLanguages = translatedLocales.filter { Locale(it.language, iso2) in Translate.TRANSLATED_LOCALES }
-        val generalLanguages = translatedLocales.flatMap { Translate.TRANSLATED_LOCALES.filter { l -> l.language == it.language } }
+        val localLanguages = languageGroup.filter { it.country == iso2 }
+        val generalLanguages = languageGroup.filter { it.language !in localLanguages.map(Locale::getLanguage) }
 
-        return localLanguages.takeIf { it.isNotEmpty() } ?: generalLanguages
+        return localLanguages + generalLanguages
     }
 
-    fun <T: Comparable<T>> getBestMultiPB(wcif: Competition, comparator: (MultiBldResult) -> T): MultiBldResult? {
+    fun <T : Comparable<T>> getBestMultiPB(wcif: Competition, comparator: (MultiBldResult) -> T): MultiBldResult? {
         val mbldResults = wcif.persons
             .flatMap { it.personalBests }
             .filter { it.eventModel == EventData.THREE_MULTI_BLD }
