@@ -82,13 +82,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val longestScramble = scrambles.flatMap{it.split(NEW_LINE)}.maxBy { it.length } ?: ""
         val maxLines = scrambles.map{it.split(NEW_LINE)}.map{it.count()}.max() ?: 1
 
-        // I don't know how to configure ColumnText.fitText's word wrapping characters,
-        // so instead, I just replace each character I don't want to wrap with M, which
-        // should be the widest character (we're using a monospaced font,
-        // so that doesn't really matter), and won't get wrapped.
-        val longestScrambleMasked = longestScramble.replace(".".toRegex(), WIDEST_CHAR_STRING)
-
-        val fontSizeForMaskedUnaligned = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScrambleMasked, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true, 1f) // FIXME const
+        val fontSizeForMaskedUnaligned = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScramble, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true) // FIXME const
 
         // If the scramble contains newlines, then we *only* allow wrapping at the newlines.
         val fontSizeIfIncludingNewlines = availableScrambleHeight / maxLines
@@ -172,8 +166,6 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         const val SCRAMBLE_PADDING_VERTICAL_TOP = 3
         const val SCRAMBLE_PADDING_VERTICAL_BOTTOM = 6
         const val SCRAMBLE_PADDING_HORIZONTAL = 1
-
-        const val WIDEST_CHAR_STRING = "M"
 
         const val EMPTY_CELL_CONTENT = ""
 
