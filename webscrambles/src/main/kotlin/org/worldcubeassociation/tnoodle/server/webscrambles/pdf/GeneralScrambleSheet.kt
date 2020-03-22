@@ -33,13 +33,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val maxScrambleImageHeight = (allScramblesHeight / scramblesPerPage - 2 * SCRAMBLE_IMAGE_PADDING).toInt()
 
         // We don't let scramble images take up too much of a the page
-        val maxScrambleImageWidth = (availableWidth / 2).toInt().takeUnless {
-            // TODO - If we allow the megaminx image to be too wide, the
-            //   Megaminx scrambles get really tiny. This tweak allocates
-            //   a more optimal amount of space to the scrambles. This is possible
-            //   because the scrambles are so uniformly sized.
-            scramblingPuzzle.shortName == "minx"
-        } ?: 190
+        val maxScrambleImageWidth = (availableWidth / 3).toInt()
 
         val scrambleImageSize = scramblingPuzzle.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight)
 
@@ -53,12 +47,11 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         // First check if any scramble requires highlighting.
         val useHighlighting = requiresHighlighting(scrambleColumnWidth, scrambleFont, allScrambleStrings)
 
-        // First do a dry run just to see if any scrambles require highlighting.
-        // Then do the real run, and force highlighting on every scramble
-        // if any scramble required it.
+        // Add main scrambles
         val table = directContent.createTable(scrambleColumnWidth, indexColumnWidth, scrambleFont, scrambleImageSize, scrambleSet.scrambles, STD_SCRAMBLE_PREFIX, useHighlighting)
         document.add(table)
 
+        // Maybe add extra scrambles
         if (scrambleSet.extraScrambles.isNotEmpty()) {
             val headerTable = PdfPTable(1).apply {
                 setTotalWidth(floatArrayOf(availableWidth))
@@ -86,30 +79,21 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val availableArea = Rectangle(scrambleColumnWidth - 2 * SCRAMBLE_PADDING_HORIZONTAL,
             (availableScrambleHeight - SCRAMBLE_PADDING_VERTICAL_TOP - SCRAMBLE_PADDING_VERTICAL_BOTTOM))
 
-        val longestScramble = scrambles.maxBy { it.length } ?: ""
-
-        val longestAlignedScramble = scrambles.map { StringUtil.padTurnsUniformly(it, WIDEST_CHAR_STRING) }
-            .maxBy { it.length } ?: longestScramble
-
-        val longestScrambleOneLine = "\n" !in longestAlignedScramble//Masked
+        val longestScramble = scrambles.flatMap{it.split(NEW_LINE)}.maxBy { it.length } ?: ""
+        val maxLines = scrambles.map{it.split(NEW_LINE)}.map{it.count()}.max() ?: 1
 
         // I don't know how to configure ColumnText.fitText's word wrapping characters,
         // so instead, I just replace each character I don't want to wrap with M, which
         // should be the widest character (we're using a monospaced font,
         // so that doesn't really matter), and won't get wrapped.
         val longestScrambleMasked = longestScramble.replace(".".toRegex(), WIDEST_CHAR_STRING)
-        val longestAlignedScrambleMasked = longestAlignedScramble.replace("\\S".toRegex(), WIDEST_CHAR_STRING)
-        val longestAlignedScrambleMaskedAndStuffed = longestAlignedScrambleMasked.replace(" ".toRegex(), WIDEST_CHAR_STRING)
 
-        val fontSizeForMaskedUnaligned = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScrambleMasked, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, false, 1f) // FIXME const
+        val fontSizeForMaskedUnaligned = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScrambleMasked, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true, 1f) // FIXME const
 
         // If the scramble contains newlines, then we *only* allow wrapping at the newlines.
-        val longestRespectingNewlines = longestAlignedScrambleMasked.takeIf { longestScrambleOneLine }
-            ?: longestAlignedScrambleMaskedAndStuffed
-        val fontSizeIfIncludingNewlines = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestRespectingNewlines, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true, 1f) // FIXME const
+        val fontSizeIfIncludingNewlines = availableScrambleHeight / maxLines
 
-        val oneLine = longestScrambleOneLine && fontSizeForMaskedUnaligned >= FontUtil.MINIMUM_ONE_LINE_FONT_SIZE
-        val perfectFontSize = fontSizeForMaskedUnaligned.takeIf { oneLine } ?: fontSizeIfIncludingNewlines
+        val perfectFontSize = fontSizeForMaskedUnaligned.takeIf { maxLines == 1 } ?: fontSizeIfIncludingNewlines
 
         return Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL)
     }
@@ -208,5 +192,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
 
         const val VERTICAL_MARGIN = 15f
         const val HORIZONTAL_MARGIN = 35f
+
+        const val NEW_LINE = "\n"
     }
 }
