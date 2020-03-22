@@ -10,7 +10,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil.splitToLineChunks
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import kotlin.math.min
 
@@ -88,8 +87,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     }
 
     private fun requiresHighlighting(scrambleColumnWidth: Float, scrambleFont: Font, scrambles: List<String>): Boolean {
-        val paddedScrambles = scrambles.map { StringUtil.padTurnsUniformly(it, PdfUtil.NON_BREAKING_SPACE.toString()) }
-        val lineChunks = paddedScrambles.map { it.splitToLineChunks(scrambleFont, scrambleColumnWidth) }
+        val lineChunks = scrambles.map { it.splitToLineChunks(scrambleFont, scrambleColumnWidth) }
 
         return lineChunks.any { it.size >= MIN_LINES_TO_ALTERNATE_HIGHLIGHTING }
     }
@@ -110,8 +108,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
             }
             table.addCell(indexCell)
 
-            val paddedScramble = StringUtil.padTurnsUniformly(scramble, PdfUtil.NON_BREAKING_SPACE.toString())
-            val lineChunks = paddedScramble.splitToLineChunks(scrambleFont, scrambleColumnWidth)
+            val lineChunks = scramble.splitToLineChunks(scrambleFont, scrambleColumnWidth)
             val scramblePhrase = Phrase()
 
             for ((nthLine, lineChunk) in lineChunks.withIndex()) {
