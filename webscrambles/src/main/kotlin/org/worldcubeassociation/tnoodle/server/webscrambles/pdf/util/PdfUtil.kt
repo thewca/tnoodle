@@ -127,7 +127,7 @@ object PdfUtil {
      *
      * @return the calculated font size that makes the text fit
      */
-    fun fitText(font: Font, text: String, rect: Rectangle, maxFontSize: Float, newlinesAllowed: Boolean, leadingMultiplier: Float): Float {
+    fun fitText(font: Font, text: String, rect: Rectangle, maxFontSize: Float, newlinesAllowed: Boolean, leadingMultiplier: Float = 1f): Float {
         // ideally, we could pass the object in which our text is going to be rendered
         // as argument instead of asking leadingMultiplier, but we are currently rendering
         // text in pdfcell, columntext and others
