@@ -120,51 +120,32 @@ object PdfUtil {
      * Fits the text to some rectangle adjusting the font size as needed.
      * @param font the font to use
      * @param text the text
-     * @param rect the rectangle where the text must fit
+     * @param availableArea the rectangle where the text must fit
      * @param maxFontSize the maximum font size
      * @param newlinesAllowed output text can be split into lines
      * @param leadingMultiplier leading multiplier between lines
      *
      * @return the calculated font size that makes the text fit
      */
-    fun fitText(font: Font, text: String, rect: Rectangle, maxFontSize: Float, newlinesAllowed: Boolean, leadingMultiplier: Float = 1f): Float {
-        // ideally, we could pass the object in which our text is going to be rendered
-        // as argument instead of asking leadingMultiplier, but we are currently rendering
-        // text in pdfcell, columntext and others
-        // it'd be painful to render lines in a common object to ask leadingMultiplier
+    fun fitText(font: Font, text: String, availableArea: Rectangle, maxFontSize: Float, newlinesAllowed: Boolean, leadingMultiplier: Float = 1f): Float {
         return binarySearchDec(1f, maxFontSize, FITTEXT_FONTSIZE_PRECISION) {
             // FIXME inplace modification is no good
             font.size = it
 
-            val lineChunks = text.splitToLineChunks(font, rect.width)
+            val paddedScramble = StringUtil.padTurnsUniformly(text, PdfUtil.NON_BREAKING_SPACE.toString())
+            val lineChunks = paddedScramble.splitToLineChunks(font, availableArea.width)
 
             // The font size seems to be a pretty good estimate for how
             // much vertical space a row actually takes up.
             val heightPerLine = it * leadingMultiplier
             val totalHeight = lineChunks.size.toFloat() * heightPerLine
 
-            val shouldDecrease = totalHeight > rect.height
+            val shouldDecrease = totalHeight > availableArea.height
             // If newlines are NOT allowed, but we had to split the text into more than
             // one line, then our current guess is too large.
             val mustDecrease = !newlinesAllowed && lineChunks.size > 1
 
             shouldDecrease || mustDecrease
-        }
-    }
-
-    tailrec fun binarySearchInc(min: Float, max: Float, precision: Float, shouldIncrease: (Float) -> Boolean): Float {
-        if (max - min < precision) {
-            // Ground recursion: We have converged arbitrarily close to some target value.
-            return max
-        }
-
-        val potentialFontSize = (min + max) / 2f
-        val iterationShouldIncrease = shouldIncrease(potentialFontSize)
-
-        return if (iterationShouldIncrease) {
-            binarySearchInc(potentialFontSize, max, precision, shouldIncrease)
-        } else {
-            binarySearchInc(min, potentialFontSize, precision, shouldIncrease)
         }
     }
 
