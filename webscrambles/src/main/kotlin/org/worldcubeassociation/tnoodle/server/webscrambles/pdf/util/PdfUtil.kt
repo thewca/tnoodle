@@ -41,7 +41,7 @@ object PdfUtil {
 
     private fun String.padNbsp() = NON_BREAKING_SPACE + this + NON_BREAKING_SPACE
 
-    fun String.optimalCutIndex(font: Font, availableTextWidth: Float): Int {
+    private fun String.optimalCutIndex(font: Font, availableTextWidth: Float): Int {
         val endIndex = longestFittingSubstringIndex(font, availableTextWidth, 0)
 
         // If we're not at the end of the text, make sure we're not cutting
@@ -53,7 +53,7 @@ object PdfUtil {
         return endIndex
     }
 
-    fun String.longestFittingSubstringIndex(font: Font, maxWidth: Float, fallback: Int): Int {
+    private fun String.longestFittingSubstringIndex(font: Font, maxWidth: Float, fallback: Int): Int {
         val searchRange = 0..length
 
         val endpoint = searchRange.findLast {
@@ -66,7 +66,7 @@ object PdfUtil {
         return endpoint ?: fallback
     }
 
-    fun String.tryBackwardsWordEndIndex(endIndex: Int = lastIndex, fallback: Int = endIndex): Int {
+    private fun String.tryBackwardsWordEndIndex(endIndex: Int = lastIndex, fallback: Int = endIndex): Int {
         for (perfectFitIndex in endIndex downTo 0) {
             // Another dirty hack for sq1: turns only line up
             // nicely if every line starts with a (x,y). We ensure this
@@ -89,7 +89,7 @@ object PdfUtil {
         return fallback
     }
 
-    tailrec fun String.fillToWidthMax(padding: String, font: Font, maxLength: Float): String {
+    private tailrec fun String.fillToWidthMax(padding: String, font: Font, maxLength: Float): String {
         // Add $padding until the substring takes up as much space as is available on a line.
         val paddedString = this + padding
         val substringWidth = font.baseFont.getWidthPoint(paddedString, font.size)
@@ -102,14 +102,14 @@ object PdfUtil {
         return paddedString.fillToWidthMax(padding, font, maxLength)
     }
 
-    fun String.toLineWrapChunk(font: Font) = Chunk(this).apply {
+    private fun String.toLineWrapChunk(font: Font) = Chunk(this).apply {
         this.font = font
 
         // Force a line wrap!
         append("\n")
     }
 
-    private val FITTEXT_FONTSIZE_PRECISION = 0.1f
+    private const val FITTEXT_FONTSIZE_PRECISION = 0.1f
 
     /**
      * Adapted from ColumnText.java in the itextpdf 5.3.0 source code.
