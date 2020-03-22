@@ -5,22 +5,20 @@ import com.itextpdf.text.Font
 import com.itextpdf.text.Rectangle
 
 object PdfUtil {
-    const val NON_BREAKING_SPACE = '\u00A0'
-    const val TEXT_PADDING_HORIZONTAL = 1
+    private const val NON_BREAKING_SPACE = '\u00A0'
+    private const val TEXT_PADDING_HORIZONTAL = 1
 
     fun String.splitToLineChunks(font: Font, textColumnWidth: Float): List<Chunk> {
         val availableTextWidth = textColumnWidth - 2 * TEXT_PADDING_HORIZONTAL
 
-        return split("\n").dropLastWhile { it.isEmpty() }
+        val padded = StringUtil.padTurnsUniformly(this, NON_BREAKING_SPACE.toString())
+
+        return padded.split("\n").dropLastWhile { it.isEmpty() }
             .flatMap { it.splitLineToChunks(font, availableTextWidth) }
             .map { it.toLineWrapChunk(font) }
     }
 
-    fun String.splitLineToChunks(font: Font, availableTextWidth: Float): List<String> {
-        return splitLineToChunksRec(font, availableTextWidth, listOf())
-    }
-
-    private tailrec fun String.splitLineToChunksRec(font: Font, availableTextWidth: Float, acc: List<String>): List<String> {
+    private tailrec fun String.splitLineToChunks(font: Font, availableTextWidth: Float, acc: List<String> = listOf()): List<String> {
         if (isEmpty()) {
             return acc
         }
@@ -29,7 +27,7 @@ object PdfUtil {
         // the last line wrap we just inserted.
         if (first() == ' ') {
             return drop(1)
-                .splitLineToChunksRec(font, availableTextWidth, acc)
+                .splitLineToChunks(font, availableTextWidth, acc)
         }
 
         val optimalCutIndex = optimalCutIndex(font, availableTextWidth)
@@ -38,7 +36,7 @@ object PdfUtil {
             .fillToWidthMax(NON_BREAKING_SPACE.toString(), font, availableTextWidth)
 
         return substring(optimalCutIndex)
-            .splitLineToChunksRec(font, availableTextWidth, acc + substring)
+            .splitLineToChunks(font, availableTextWidth, acc + substring)
     }
 
     private fun String.padNbsp() = NON_BREAKING_SPACE + this + NON_BREAKING_SPACE
@@ -132,8 +130,7 @@ object PdfUtil {
             // FIXME inplace modification is no good
             font.size = it
 
-            val paddedScramble = StringUtil.padTurnsUniformly(text, PdfUtil.NON_BREAKING_SPACE.toString())
-            val lineChunks = paddedScramble.splitToLineChunks(font, availableArea.width)
+            val lineChunks = text.splitToLineChunks(font, availableArea.width)
 
             // The font size seems to be a pretty good estimate for how
             // much vertical space a row actually takes up.
