@@ -32,7 +32,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val maxScrambleImageHeight = (allScramblesHeight / scramblesPerPage - 2 * SCRAMBLE_IMAGE_PADDING).toInt()
 
         // We don't let scramble images take up too much of a the page
-        val maxScrambleImageWidth = (availableWidth / 3).toInt()
+        val maxScrambleImageWidth = (availableWidth / MAX_SCRAMBLE_IMAGE_RATIO).toInt()
 
         val scrambleImageSize = scramblingPuzzle.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight)
 
@@ -41,7 +41,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val scrambleImageHeight = scrambleImageSize.height.toFloat()
         val scrambleColumnWidth = availableWidth - indexColumnWidth - scrambleImageSize.width
 
-        val availableArea = Rectangle(scrambleColumnWidth, scrambleImageHeight - 2 * SCRAMBLE_MARGIN)
+        val availableArea = Rectangle(scrambleColumnWidth, scrambleImageHeight)
 
         val scrambleFont = getFontConfiguration(availableArea, allScrambleStrings)
 
@@ -75,12 +75,15 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     }
 
     private fun getFontConfiguration(availableArea: Rectangle, scrambles: List<String>): Font {
-        val longestScramble = scrambles.flatMap { it.split(NEW_LINE) }.maxBy { it.length } ?: ""
+        val longestScramble = scrambles.flatMap { it.split(NEW_LINE) }.maxBy { it.length }.orEmpty()
         val maxLines = scrambles.map { it.split(NEW_LINE) }.map { it.count() }.max() ?: 1
 
         val fontSize = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScramble, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true) // FIXME const
         val fontSizeIfIncludingNewlines = availableArea.height / maxLines
 
+        // fontSize should fit horizontally. fontSizeIfIncludingNewlines should fit considering \n
+        // In case maxLines = 1, fontSizeIfIncludingNewlines is just ignored (as 1 font size should fill the whole rectangle's height)
+        // in case we have maxLines > 1, we fit width or height and take the min of it.
         val perfectFontSize = min(fontSize, fontSizeIfIncludingNewlines)
 
         return Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL)
@@ -153,9 +156,8 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
                 ?: map { it.scrambleString }
 
         const val MAX_SCRAMBLES_PER_PAGE = 7
+        const val MAX_SCRAMBLE_IMAGE_RATIO = 3
         const val SCRAMBLE_IMAGE_PADDING = 2
-
-        const val SCRAMBLE_MARGIN = 2
 
         const val EMPTY_CELL_CONTENT = ""
 
