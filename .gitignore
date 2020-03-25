@@ -9,7 +9,7 @@ bin_tnoodle_resources/
 .metadata
 tmtc
 *.pyc
-*.log.*
+*.log
 node_modules/
 *.iml
 .gradle/
