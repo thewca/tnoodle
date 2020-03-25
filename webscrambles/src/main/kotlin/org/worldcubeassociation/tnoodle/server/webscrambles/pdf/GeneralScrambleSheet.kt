@@ -41,9 +41,9 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val scrambleImageHeight = scrambleImageSize.height.toFloat()
         val scrambleColumnWidth = availableWidth - indexColumnWidth - scrambleImageSize.width
 
-        val availableArea = Rectangle(scrambleColumnWidth, scrambleImageHeight)
+        val availableScrambleArea = Rectangle(scrambleColumnWidth, scrambleImageHeight - 2 * SCRAMBLE_MARGIN)
 
-        val scrambleFont = getFontConfiguration(availableArea, allScrambleStrings)
+        val scrambleFont = getFontConfiguration(availableScrambleArea, allScrambleStrings)
 
         // First check if any scramble requires highlighting.
         val useHighlighting = requiresHighlighting(scrambleColumnWidth, scrambleFont, allScrambleStrings)
@@ -158,6 +158,8 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         const val MAX_SCRAMBLES_PER_PAGE = 7
         const val MAX_SCRAMBLE_IMAGE_RATIO = 3
         const val SCRAMBLE_IMAGE_PADDING = 2
+
+        const val SCRAMBLE_MARGIN = 5
 
         const val EMPTY_CELL_CONTENT = ""
 
