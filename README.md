@@ -1,4 +1,4 @@
-<img src="./server-ktor/src/main/resources/icons/tnoodle_logo_1024.png" alt="TNoodle Logo" height="128px"/>
+<img src="./tnoodle-server/src/main/resources/icons/tnoodle_logo_1024.png" alt="TNoodle Logo" height="128px"/>
 
 # TNoodle
 
