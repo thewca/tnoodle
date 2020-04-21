@@ -12,7 +12,7 @@ import {
     addCachedObject,
     addSuggestedFmcTranslations,
     setSuggestedFmcTranslations,
-    setBestMbldAttempt
+    setBestMbldAttempt,
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
 import {
@@ -22,18 +22,18 @@ import {
     fetchMe,
     getUpcomingManageableCompetitions,
     getCompetitionJson,
-    getQueryParameter
+    getQueryParameter,
 } from "../api/wca.api";
 import {
     fetchSuggestedFmcTranslations,
-    fetchBestMbldAttempt
+    fetchBestMbldAttempt,
 } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
     me: store.me,
     competitions: store.competitions,
-    cachedObjects: store.cachedObjects
+    cachedObjects: store.cachedObjects,
 });
 
 const mapDispatchToProps = {
@@ -47,7 +47,7 @@ const mapDispatchToProps = {
     addCachedObject,
     addSuggestedFmcTranslations,
     setSuggestedFmcTranslations,
-    setBestMbldAttempt
+    setBestMbldAttempt,
 };
 
 const SideBar = connect(
@@ -64,22 +64,22 @@ const SideBar = connect(
                 loadingUser: false,
                 loadingCompetitions: false,
                 loadingCompetitionInformation: false,
-                competitionId: null
+                competitionId: null,
             };
         }
 
-        setLoadingUser = flag => {
+        setLoadingUser = (flag) => {
             this.setState({ ...this.state, loadingUser: flag });
         };
 
-        setLoadingCompetitions = flag => {
+        setLoadingCompetitions = (flag) => {
             this.setState({ ...this.state, loadingCompetitions: flag });
         };
 
-        setLoadingCompetitionInformation = flag => {
+        setLoadingCompetitionInformation = (flag) => {
             this.setState({
                 ...this.state,
-                loadingCompetitionInformation: flag
+                loadingCompetitionInformation: flag,
             });
         };
 
@@ -87,12 +87,12 @@ const SideBar = connect(
             if (this.state.me == null && isLogged()) {
                 this.setLoadingUser(true);
                 fetchMe()
-                    .then(me => {
+                    .then((me) => {
                         this.setState({ ...this.state, me });
                         this.props.updateMe(me);
                         this.setLoadingUser(false);
                     })
-                    .catch(e => {
+                    .catch((e) => {
                         console.error(
                             "Could not get information about the logged user",
                             e
@@ -104,12 +104,12 @@ const SideBar = connect(
             if (this.state.competitions == null && isLogged()) {
                 this.setLoadingCompetitions(true);
                 getUpcomingManageableCompetitions()
-                    .then(competitions => {
+                    .then((competitions) => {
                         this.setState({ ...this.state, competitions });
                         this.props.updateCompetitions(competitions);
                         this.setLoadingCompetitions(false);
                     })
-                    .catch(e => {
+                    .catch((e) => {
                         console.error("Could not get upcoming competitions", e);
                         this.setLoadingCompetitions(false);
                     });
@@ -135,7 +135,7 @@ const SideBar = connect(
             this.removeCompetitionIdQueryParam();
         };
 
-        handleCompetitionSelection = competitionId => {
+        handleCompetitionSelection = (competitionId) => {
             this.updateCompetitionIdQueryParam(competitionId);
 
             // For quick switching between competitions.
@@ -159,11 +159,11 @@ const SideBar = connect(
             this.setState({
                 ...this.state,
                 loadingCompetitionInformation: true,
-                competitionId
+                competitionId,
             });
 
             getCompetitionJson(competitionId)
-                .then(wcif => {
+                .then((wcif) => {
                     this.setWcif(wcif);
                     this.props.addCachedObject(competitionId, "wcif", wcif);
                     this.maybeAddCompetition(wcif.id, wcif.name);
@@ -172,7 +172,7 @@ const SideBar = connect(
 
                     this.getAndCacheBestMbldAttempt(wcif);
                 })
-                .catch(e => {
+                .catch((e) => {
                     console.error(
                         "Could not get information for " + competitionId,
                         e
@@ -181,10 +181,10 @@ const SideBar = connect(
                 });
         };
 
-        getAndCacheSuggestedFmcTranslations = wcif => {
+        getAndCacheSuggestedFmcTranslations = (wcif) => {
             fetchSuggestedFmcTranslations(wcif)
-                .then(response => response.json())
-                .then(translations => {
+                .then((response) => response.json())
+                .then((translations) => {
                     this.props.addCachedObject(
                         wcif.id,
                         "suggestedFmcTranslations",
@@ -194,10 +194,10 @@ const SideBar = connect(
                 });
         };
 
-        getAndCacheBestMbldAttempt = wcif => {
+        getAndCacheBestMbldAttempt = (wcif) => {
             fetchBestMbldAttempt(wcif)
-                .then(response => response.json())
-                .then(bestAttempt => {
+                .then((response) => response.json())
+                .then((bestAttempt) => {
                     let attempted = bestAttempt.attempted;
                     this.props.addCachedObject(
                         wcif.id,
@@ -213,20 +213,20 @@ const SideBar = connect(
         maybeAddCompetition = (competitionId, competitionName) => {
             if (
                 !this.state.competitions.find(
-                    competition => competition.name === competitionName
+                    (competition) => competition.name === competitionName
                 )
             ) {
                 this.setState({
                     ...this.state,
                     competitions: [
                         ...this.state.competitions,
-                        { id: competitionId, name: competitionName }
-                    ]
+                        { id: competitionId, name: competitionName },
+                    ],
                 });
             }
         };
 
-        updateCompetitionIdQueryParam = competitionId => {
+        updateCompetitionIdQueryParam = (competitionId) => {
             var searchParams = new URLSearchParams(window.location.search);
             searchParams.set("competitionId", competitionId);
             window.history.pushState(
@@ -246,7 +246,7 @@ const SideBar = connect(
             );
         };
 
-        setWcif = wcif => {
+        setWcif = (wcif) => {
             this.setLoadingCompetitionInformation(false);
             this.props.updateEditingStatus(true);
             this.props.updateWcif(wcif);
@@ -255,7 +255,7 @@ const SideBar = connect(
             this.props.updateFileZipBlob(null);
         };
 
-        setSuggestedFmcTranslations = suggestedFmcTranslations => {
+        setSuggestedFmcTranslations = (suggestedFmcTranslations) => {
             if (suggestedFmcTranslations != null) {
                 this.props.setSuggestedFmcTranslations(
                     suggestedFmcTranslations
@@ -332,7 +332,10 @@ const SideBar = connect(
                     <h1 className="display-3" id="title">
                         TNoodle
                     </h1>
-                    <ul className="list-group">
+                    <ul
+                        className="list-group"
+                        style={{ listStyleType: "none" }}
+                    >
                         <li>
                             <button
                                 type="button"
@@ -348,7 +351,7 @@ const SideBar = connect(
                                     <button
                                         type="button"
                                         className="btn btn-dark btn-lg btn-block btn-outline-light"
-                                        onClick={_ =>
+                                        onClick={(_) =>
                                             this.handleCompetitionSelection(
                                                 competition.id
                                             )
