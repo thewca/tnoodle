@@ -16,28 +16,29 @@ const defaultStore = {
     suggestedFmcTranslations: null,
     bestMbldAttempt: null,
     wcaFormats: null,
-    wcaEvents: null
+    wcaEvents: null,
+    flashMessage: { text: "Hello World", bootstrapBackground: "warning" },
 };
 
 export const Reducer = (store, action) => {
     if (action.type === ActionTypes.UPDATE_ME) {
         return {
             ...store,
-            me: action.payload.me
+            me: action.payload.me,
         };
     }
 
     if (action.type === ActionTypes.UPDATE_EVENTS) {
         return {
             ...store,
-            wcif: { ...store.wcif, events: action.payload.events }
+            wcif: { ...store.wcif, events: action.payload.events },
         };
     }
 
     if (action.type === ActionTypes.UPDATE_PASSWORD) {
         return {
             ...store,
-            password: action.payload.password
+            password: action.payload.password,
         };
     }
 
@@ -50,8 +51,8 @@ export const Reducer = (store, action) => {
                 ...store.wcif,
                 name: competitionName,
                 shortName: competitionName,
-                id
-            }
+                id,
+            },
         };
     }
 
@@ -62,25 +63,25 @@ export const Reducer = (store, action) => {
                 ...store.wcif,
                 events: [
                     ...store.wcif.events.filter(
-                        wcaEvent => wcaEvent.id !== action.payload.wcaEvent.id
+                        (wcaEvent) => wcaEvent.id !== action.payload.wcaEvent.id
                     ),
-                    action.payload.wcaEvent
-                ]
-            }
+                    action.payload.wcaEvent,
+                ],
+            },
         };
     }
 
     if (action.type === ActionTypes.UPDATE_MBLD) {
         return {
             ...store,
-            mbld: action.payload.mbld
+            mbld: action.payload.mbld,
         };
     }
 
     if (action.type === ActionTypes.UPDATE_COMPETITIONS) {
         return {
             ...store,
-            competitions: action.payload.competitions
+            competitions: action.payload.competitions,
         };
     }
 
@@ -91,21 +92,21 @@ export const Reducer = (store, action) => {
         let wcif = action.payload.wcif || defaultWcif;
 
         // Sets copies to 1 since it does not come from the website.
-        wcif.events.forEach(event =>
-            event.rounds.forEach(round =>
+        wcif.events.forEach((event) =>
+            event.rounds.forEach((round) =>
                 round.extensions.push(getDefaultCopiesExtension())
             )
         );
         return {
             ...store,
-            wcif
+            wcif,
         };
     }
 
     if (action.type === ActionTypes.UPDATE_EDITING_STATUS) {
         return {
             ...store,
-            editingDisabled: action.payload.editingDisabled
+            editingDisabled: action.payload.editingDisabled,
         };
     }
 
@@ -128,9 +129,9 @@ export const Reducer = (store, action) => {
                 ...store.cachedObjects,
                 [action.payload.competitionId]: {
                     ...store.cachedObjects[action.payload.competitionId],
-                    [action.payload.identifier]: action.payload.object
-                }
-            }
+                    [action.payload.identifier]: action.payload.object,
+                },
+            },
         };
     }
 
@@ -138,11 +139,11 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             translations: [
-                ...store.translations.map(translation => ({
+                ...store.translations.map((translation) => ({
                     ...translation,
-                    status: false
-                }))
-            ]
+                    status: false,
+                })),
+            ],
         };
     }
 
@@ -150,21 +151,21 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             translations: [
-                ...store.translations.map(translation => ({
+                ...store.translations.map((translation) => ({
                     ...translation,
                     status:
                         translation.id === action.payload.id
                             ? !translation.status
-                            : translation.status
-                }))
-            ]
+                            : translation.status,
+                })),
+            ],
         };
     }
 
     if (action.type === ActionTypes.UPDATE_TRANSLATIONS) {
         return {
             ...store,
-            translations: action.payload.translations
+            translations: action.payload.translations,
         };
     }
 
@@ -172,52 +173,52 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             translations: [
-                ...store.translations.map(translation => ({
+                ...store.translations.map((translation) => ({
                     ...translation,
-                    status: true
-                }))
-            ]
+                    status: true,
+                })),
+            ],
         };
     }
 
     if (action.type === ActionTypes.ADD_SUGGESTED_FMC_TRANSLATIONS) {
         return {
             ...store,
-            suggestedFmcTranslations: action.payload.suggestedFmcTranslations
+            suggestedFmcTranslations: action.payload.suggestedFmcTranslations,
         };
     }
 
     if (action.type === ActionTypes.SET_SUGGESTED_FMC_TRANSLATIONS) {
-        let translations = store.translations.map(translation => ({
+        let translations = store.translations.map((translation) => ({
             ...translation,
             status: action.payload.suggestedFmcTranslations.includes(
                 translation.id
-            )
+            ),
         }));
         return {
             ...store,
-            translations: [...translations]
+            translations: [...translations],
         };
     }
 
     if (action.type === ActionTypes.SET_BEST_MBLD_ATTEMPT) {
         return {
             ...store,
-            bestMbldAttempt: action.payload.bestMbldAttempt
+            bestMbldAttempt: action.payload.bestMbldAttempt,
         };
     }
 
     if (action.type === ActionTypes.SET_WCA_FORMATS) {
         return {
             ...store,
-            wcaFormats: action.payload.wcaFormats
+            wcaFormats: action.payload.wcaFormats,
         };
     }
 
     if (action.type === ActionTypes.SET_WCA_EVENTS) {
         return {
             ...store,
-            wcaEvents: action.payload.wcaEvents
+            wcaEvents: action.payload.wcaEvents,
         };
     }
 

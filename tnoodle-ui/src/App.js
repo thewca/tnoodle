@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import EntryInterface from "./components/EntryInterface";
 import EventPickerTable from "./components/EventPickerTable";
 import SideBar from "./components/SideBar";
+import FlashMessage from "./components/FlashMessage";
 import VersionInfo from "./components/VersionInfo";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
@@ -20,6 +21,7 @@ class App extends Component {
                         </div>
                         <div className="col-9">
                             <VersionInfo />
+                            <FlashMessage />
                             <EntryInterface />
                             <EventPickerTable />
                         </div>
