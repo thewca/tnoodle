@@ -5,5 +5,5 @@ export const defaultWcif = {
     id: "",
     events: [],
     persons: [],
-    schedule: { numberOfDays: 0, venues: [] }
+    schedule: { numberOfDays: 0, venues: [] },
 };

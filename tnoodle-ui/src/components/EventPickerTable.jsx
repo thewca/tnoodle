@@ -5,18 +5,21 @@ import {
     fetchZip,
     fetchAvailableFmcTranslations,
     fetchFormats,
-    fetchWcaEvents
+    fetchWcaEvents,
 } from "../api/tnoodle.api";
 import { toWcaUrl, isUsingStaging } from "../api/wca.api";
 import {
     updateFileZipBlob,
     updateTranslations,
     setWcaFormats,
-    setWcaEvents
+    setWcaEvents,
+    updateFlashMessage,
 } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
 
-const mapStateToProps = store => ({
+let DANGER = "danger";
+
+const mapStateToProps = (store) => ({
     wcif: store.wcif,
     mbld: store.mbld,
     password: store.password,
@@ -25,14 +28,15 @@ const mapStateToProps = store => ({
     officialZip: store.officialZip,
     fileZipBlob: store.fileZipBlob,
     translations: store.translations,
-    wcaEvents: store.wcaEvents
+    wcaEvents: store.wcaEvents,
 });
 
 const mapDispatchToProps = {
     updateFileZipBlob,
     updateTranslations,
     setWcaFormats,
-    setWcaEvents
+    setWcaEvents,
+    updateFlashMessage,
 };
 
 const BOOTSTRAP_GRID = 12;
@@ -48,48 +52,79 @@ const EventPickerTable = connect(
             this.state = { generatingScrambles: false };
         }
 
-        componentDidMount = function() {
+        componentDidMount = function () {
             this.getFormats();
             this.getWcaEvents();
             this.getFmcTranslations();
         };
 
+        setFlashMessage = (text, bg, response) => {
+            this.props.updateFlashMessage(text + " " + response.statusText, bg);
+        };
+
         getFormats = () => {
             fetchFormats()
-                .then(response => response.json())
-                .then(formats => {
-                    this.props.setWcaFormats(formats);
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+
+                    // Error
+                    this.setFlashMessage(
+                        "Could not get WCA formats",
+                        DANGER,
+                        response
+                    );
                 })
-                .catch(error => {
-                    console.error("Could not get WCA formats", error);
+                .then((formats) => {
+                    this.props.setWcaFormats(formats);
                 });
         };
 
         getWcaEvents = () => {
             fetchWcaEvents()
-                .then(response => response.json())
-                .then(wcaEvents => {
-                    this.props.setWcaEvents(wcaEvents);
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+
+                    // Error
+                    this.setFlashMessage(
+                        "Could get WCA events",
+                        DANGER,
+                        response
+                    );
                 })
-                .catch(error => {
-                    console.error("Could get WCA events", error);
+                .then((wcaEvents) => {
+                    this.props.setWcaEvents(wcaEvents);
                 });
         };
 
         getFmcTranslations = () => {
             fetchAvailableFmcTranslations()
-                .then(response => response.json())
-                .then(availableTranslations => {
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+
+                    // Error
+                    this.setFlashMessage(
+                        "Could not get FMC translations.",
+                        DANGER,
+                        response
+                    );
+                })
+                .then((availableTranslations) => {
+                    if (!availableTranslations) {
+                        return;
+                    }
                     let translations = availableTranslations.map(
-                        translation => ({
+                        (translation) => ({
                             id: translation,
-                            status: true
+                            status: true,
                         })
                     );
                     this.props.updateTranslations(translations);
-                })
-                .catch(error => {
-                    console.error("Could not get FMC translations.", error);
                 });
         };
 
@@ -101,24 +136,21 @@ const EventPickerTable = connect(
                 this.props.password,
                 this.props.translations
             )
-                .then(response => {
+                .then((response) => {
+                    this.setGeneratingScrambles(false);
                     if (response.ok) {
                         return response.blob();
                     }
-                    this.setGeneratingScrambles(false);
-                    throw new Error("Could not generate scrambles.");
+                    this.setFlashMessage(
+                        "Could not get scrambles.",
+                        DANGER,
+                        response
+                    );
                 })
-                .then(blob => {
-                    this.setGeneratingScrambles(false);
-                    this.props.updateFileZipBlob(blob);
-                })
-                .catch(e => {
-                    console.error("Could not get scrambles", e);
-                    this.setGeneratingScrambles(false);
-                });
+                .then((blob) => this.props.updateFileZipBlob(blob));
         };
 
-        setGeneratingScrambles = flag => {
+        setGeneratingScrambles = (flag) => {
             this.setState({ ...this.state, generatingScrambles: flag });
         };
 
@@ -204,7 +236,7 @@ const EventPickerTable = connect(
 
             // At least 1 events must have at least 1 round.
             let disableScrambleButton = !this.props.wcif.events
-                .map(event => event.rounds.length > 0)
+                .map((event) => event.rounds.length > 0)
                 .reduce((flag1, flag2) => flag1 || flag2, false);
             return (
                 <button
@@ -230,22 +262,23 @@ const EventPickerTable = connect(
 
             // This filters events to show only those in the competition.
             if (editingDisabled) {
-                wcaEvents = wcaEvents.filter(wcaEvent =>
-                    events.find(item => item.id === wcaEvent.id)
+                wcaEvents = wcaEvents.filter((wcaEvent) =>
+                    events.find((item) => item.id === wcaEvent.id)
                 );
             }
 
             let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
 
-            let classColPerEvent = `border border-dark p-1 col-${BOOTSTRAP_GRID /
-                EVENTS_PER_LINE}`;
+            let classColPerEvent = `border border-dark p-1 col-${
+                BOOTSTRAP_GRID / EVENTS_PER_LINE
+            }`;
             return (
                 <div className="container-fluid">
                     {this.maybeShowEditWarning()}
                     {eventChunks.map((chunk, i) => {
                         return (
                             <div className="row p-0" key={i}>
-                                {chunk.map(event => {
+                                {chunk.map((event) => {
                                     return (
                                         <div
                                             className={classColPerEvent}
@@ -254,7 +287,8 @@ const EventPickerTable = connect(
                                             <EventPicker
                                                 event={event}
                                                 wcifEvent={this.props.wcif.events.find(
-                                                    item => item.id === event.id
+                                                    (item) =>
+                                                        item.id === event.id
                                                 )}
                                                 disabled={editingDisabled}
                                                 setBlobNull={this.setBlobNull}

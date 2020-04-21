@@ -16,7 +16,7 @@ export const fetchZip = (wcif, mbld, password, translations) => {
     let payload = {
         wcif,
         multiCubes: { requestedScrambles: mbld },
-        fmcLanguages: fmcTranslationsHelper(translations)
+        fmcLanguages: fmcTranslationsHelper(translations),
     };
 
     if (password != null && password.length > 0) {
@@ -34,11 +34,11 @@ export const fetchFormats = () => {
     return fetch(baseUrl + formatsEndpoint);
 };
 
-export const fetchSuggestedFmcTranslations = wcif => {
+export const fetchSuggestedFmcTranslations = (wcif) => {
     return postToTnoodle(suggestedFmcTranslationsEndpoint, wcif);
 };
 
-export const fetchBestMbldAttempt = wcif => {
+export const fetchBestMbldAttempt = (wcif) => {
     return postToTnoodle(bestMbldAttemptEndpoint, wcif);
 };
 
@@ -55,8 +55,8 @@ export const getDefaultCopiesExtension = (copies = 1) => {
         id: copiesExtensionId,
         specUrl: "",
         data: {
-            numCopies: copies
-        }
+            numCopies: copies,
+        },
     };
 };
 
@@ -68,14 +68,14 @@ export const fetchAvailableFmcTranslations = () => {
  * Builds the object expected for FMC translations
  * @param {array} translations e.g. ["de", "da", "pt-BR"]
  */
-const fmcTranslationsHelper = translations => {
+const fmcTranslationsHelper = (translations) => {
     if (translations == null) {
         return null;
     }
     return {
         languageTags: translations
-            .filter(translation => translation.status)
-            .map(translation => translation.id)
+            .filter((translation) => translation.status)
+            .map((translation) => translation.id),
     };
 };
 
@@ -84,7 +84,7 @@ const postToTnoodle = (endpoint, payload) =>
         method: "POST",
         headers: {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
     });
