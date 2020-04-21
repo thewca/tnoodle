@@ -68,21 +68,6 @@ const SideBar = connect(
             };
         }
 
-        setLoadingUser = (flag) => {
-            this.setState({ ...this.state, loadingUser: flag });
-        };
-
-        setLoadingCompetitions = (flag) => {
-            this.setState({ ...this.state, loadingCompetitions: flag });
-        };
-
-        setLoadingCompetitionInformation = (flag) => {
-            this.setState({
-                ...this.state,
-                loadingCompetitionInformation: flag,
-            });
-        };
-
         componentDidMount() {
             if (this.state.me == null && isLogged()) {
                 this.setLoadingUser(true);
@@ -120,6 +105,21 @@ const SideBar = connect(
                 this.handleCompetitionSelection(competitionId);
             }
         }
+
+        setLoadingUser = (flag) => {
+            this.setState({ ...this.state, loadingUser: flag });
+        };
+
+        setLoadingCompetitions = (flag) => {
+            this.setState({ ...this.state, loadingCompetitions: flag });
+        };
+
+        setLoadingCompetitionInformation = (flag) => {
+            this.setState({
+                ...this.state,
+                loadingCompetitionInformation: flag,
+            });
+        };
 
         pluralize = (string, number) => {
             return string + (number > 1 ? "s" : "");
