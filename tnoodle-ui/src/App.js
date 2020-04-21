@@ -20,8 +20,8 @@ class App extends Component {
                             <SideBar />
                         </div>
                         <div className="col-9">
-                            <VersionInfo />
                             <FlashMessage />
+                            <VersionInfo />
                             <EntryInterface />
                             <EventPickerTable />
                         </div>

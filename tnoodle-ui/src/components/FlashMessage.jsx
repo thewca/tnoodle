@@ -16,13 +16,20 @@ const FlashMessage = connect(
 )(
     class extends Component {
         render() {
+            let text = this.props.flashMessage.text;
+            let bg = this.props.flashMessage.bootstrapBackground;
+            if (!text || !bg) {
+                return null;
+            }
+
+            // Clear the message after 5 seconds
+            setTimeout(() => {
+                this.props.updateFlashMessage("", "");
+            }, 5 * 1000);
+
             return (
-                <div className="row">
-                    <div
-                        className={`col-12 bg-${this.props.flashMessage.bootstrapBackground}`}
-                    >
-                        {this.props.flashMessage.text}
-                    </div>
+                <div className="row sticky-top">
+                    <div className={`col-12 bg-${bg}`}>{text}</div>
                 </div>
             );
         }
