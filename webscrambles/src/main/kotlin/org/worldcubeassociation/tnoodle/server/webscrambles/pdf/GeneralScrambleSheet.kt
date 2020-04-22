@@ -20,7 +20,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         val availableWidth = pageSize.width - 2 * HORIZONTAL_MARGIN
         val availableHeight = pageSize.height - 2 * VERTICAL_MARGIN
 
-        val headerAndFooterHeight = availableHeight / HEADER_AND_FOOTER_HEIGHT_RATIO
+        val headerAndFooterHeight = availableHeight / WatermarkPdfWrapper.HEADER_AND_FOOTER_HEIGHT_RATIO
         val extraScrambleLabelHeight = if (scrambleSet.extraScrambles.isNotEmpty()) availableHeight / EXTRA_SCRAMBLES_HEIGHT_RATIO else 0f
 
         val indexColumnWidth = availableWidth / INDEX_COLUMN_WIDTH_RATIO
@@ -172,7 +172,6 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
 
         private val HIGHLIGHT_COLOR = BaseColor(230, 230, 230)
 
-        const val HEADER_AND_FOOTER_HEIGHT_RATIO = 12
         const val INDEX_COLUMN_WIDTH_RATIO = 25
         const val EXTRA_SCRAMBLES_HEIGHT_RATIO = 30
 
