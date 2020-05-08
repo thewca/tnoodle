@@ -28,6 +28,7 @@ object Libraries {
     val TNOODLE_SCRAMBLES = "org.worldcubeassociation.tnoodle:lib-scrambles:${Versions.TNOODLE_SCRAMBLES}"
     val APACHE_COMMONS_LANG3 = "org.apache.commons:commons-lang3:${Versions.APACHE_COMMONS_LANG3}"
     val KOTLESS_KTOR = "io.kotless:ktor-lang:${Versions.KOTLESS_KTOR}"
+    val TESTING_MOCKK = "io.mockk:mockk:${Versions.TESTING_MOCKK}"
 
     object Buildscript {
         val PROGUARD_GRADLE_ACTUAL = PROGUARD_GRADLE
