@@ -12,6 +12,7 @@ import dependencies.Libraries.KOTLIN_ARGPARSER
 import dependencies.Libraries.MARKDOWNJ_CORE
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.SYSTEM_TRAY
+import dependencies.Libraries.TESTING_MOCKK
 import dependencies.Libraries.ZIP4J
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -54,6 +55,8 @@ dependencies {
 
     runtimeOnly(BOUNCYCASTLE)
     runtimeOnly(project(":tnoodle-ui"))
+
+    testImplementation(TESTING_MOCKK)
 }
 
 configureJUnit5()

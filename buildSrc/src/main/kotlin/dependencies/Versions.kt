@@ -35,6 +35,7 @@ object Versions {
     val TNOODLE_SCRAMBLES = "0.18.0"
     val APACHE_COMMONS_LANG3 = "3.10"
     val KOTLESS_KTOR = KOTLESS
+    val TESTING_MOCKK = "1.10.0"
 
     object Plugins {
         val SHADOW = "5.2.0"
