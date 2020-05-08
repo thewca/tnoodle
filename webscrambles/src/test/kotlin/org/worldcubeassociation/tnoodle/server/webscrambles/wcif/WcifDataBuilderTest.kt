@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 
 import io.mockk.spyk
 import io.mockk.verify
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.getCachedPdf
@@ -18,10 +19,12 @@ object WcifDataBuilderTest {
     fun testPDFCachingCaches() {
         val scrToDraw = spyk(randomScrambleSet(EventData.THREE))
 
-        scrToDraw.getCachedDummyPdf()
-        scrToDraw.getCachedDummyPdf()
+        val first = scrToDraw.getCachedDummyPdf()
+        val second = scrToDraw.getCachedDummyPdf()
 
         verify(atMost = 1) { scrToDraw.createPdf(any(), any(), any(), any()) }
+
+        Assertions.assertSame(first, second)
     }
 
     @Test
@@ -38,17 +41,20 @@ object WcifDataBuilderTest {
         val deepUpdatedScramble = scrToDraw.copy(scrambleSet = scrToDraw.scrambleSet.copy(scrambles = randomScrambleDrawing.scrambleSet.scrambles))
         val deepScrToDraw = spyk(deepUpdatedScramble)
 
-        scrToDraw.getCachedDummyPdf()
-        shallowScrToDraw.getCachedDummyPdf()
-        deepScrToDraw.getCachedDummyPdf()
+        val firstBase = scrToDraw.getCachedDummyPdf()
+        val shallowPdf = shallowScrToDraw.getCachedDummyPdf()
+        val deepPdf = deepScrToDraw.getCachedDummyPdf()
 
         verify(exactly = 1) { scrToDraw.createPdf(any(), any(), any(), any()) }
         verify(exactly = 1) { shallowScrToDraw.createPdf(any(), any(), any(), any()) }
         verify(exactly = 1) { deepScrToDraw.createPdf(any(), any(), any(), any()) }
 
-        scrToDraw.getCachedDummyPdf()
+        val secondBase = scrToDraw.getCachedDummyPdf()
 
         verify(exactly = 1) { scrToDraw.createPdf(any(), any(), any(), any()) }
+
+        Assertions.assertSame(firstBase, secondBase)
+        Assertions.assertNotSame(shallowPdf, deepPdf)
     }
 
     private fun randomScrambleSet(event: EventData): ScrambleDrawingData {
