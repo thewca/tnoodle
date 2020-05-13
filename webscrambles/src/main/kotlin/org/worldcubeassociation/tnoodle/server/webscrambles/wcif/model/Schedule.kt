@@ -2,6 +2,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
 
 @Serializable
 data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
@@ -31,9 +32,8 @@ data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
 
     val earliestActivity: Activity
         get() = activitiesWithLocalStartTimes
-            .minBy { it.value }
-            ?.key
-            ?: error("I could not find the earliest activity")
+            .minBy { it.value }?.key
+            ?: ScheduleMatchingException.error("Unable to compute earliest activity")
 
     val hasMultipleDays: Boolean get() = numberOfDays > 1
     val hasMultipleVenues: Boolean get() = venues.size > 1

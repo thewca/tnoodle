@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.TranslationException
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 
@@ -33,7 +34,7 @@ object Translate {
 
     private fun getTranslationsFor(locale: Locale): Map<String, *> {
         return TRANSLATIONS[locale]
-            ?: error("No locale matching given locale: ${locale.toLanguageTag()} found")
+            ?: TranslationException.error("No locale matching given locale: ${locale.toLanguageTag()} found")
     }
 
     private fun translateNullable(key: String, locale: Locale): String? {
@@ -49,10 +50,10 @@ object Translate {
 
         val translation = descendKeys(baseTranslations, parts) {
             "${locale.toLanguageTag()} couldn't find part $it of $key"
-        } ?: error("${locale.toLanguageTag()} translation key $key not found")
+        } ?: TranslationException.error("${locale.toLanguageTag()} translation key $key not found")
 
         return translation as? String
-            ?: error("${locale.toLanguageTag()} translation key $key is of type ${translation.javaClass}, but we were expecting String.")
+            ?: TranslationException.error("${locale.toLanguageTag()} translation key $key is of type ${translation.javaClass}, but we were expecting String.")
     }
 
     private tailrec fun descendKeys(translationGroup: Map<*, *>, parts: List<String>, errorProvider: ((String) -> String)? = null): String? {
@@ -71,7 +72,7 @@ object Translate {
 
         if (nextGroup !is Map<*, *>) {
             return errorProvider?.invoke(nextPart)
-                ?.let { error(it) }
+                ?.let { TranslationException.error(it) }
         }
 
         return descendKeys(nextGroup, remainingParts)
@@ -98,10 +99,10 @@ object Translate {
         val pattern = Regex("(?<!%)%\\{([^}]+)}")
         val interpolated = pattern.replace(interpolateMe) {
             val key = it.groups[1]?.value
-                ?: error("Translation Regex broken: Group without content for $interpolateMe")
+                ?: TranslationException.error("Translation Regex broken: Group without content for $interpolateMe")
 
             mutateSubstitutions.remove(key)
-                ?: error("Substitution for key: $key not found")
+                ?: TranslationException.error("Substitution for key: $key not found")
         }
 
         assert(mutateSubstitutions.isEmpty()) { "Unused substitution values: ${mutateSubstitutions.keys}" }
