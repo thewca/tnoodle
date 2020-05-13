@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
@@ -18,7 +19,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
             .filter { it.scrambleSetId != null }
             .associateWith { ac ->
                 scrambleDrawingData.scrambleSheets.find { it.scrambleSet.id == ac.scrambleSetId }
-                    ?: error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
+                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
             }.mapValues { (act, scr) ->
                 act.activityCode.attemptNumber?.let {
                     val origScrambles = scr.scrambleSet.allScrambles

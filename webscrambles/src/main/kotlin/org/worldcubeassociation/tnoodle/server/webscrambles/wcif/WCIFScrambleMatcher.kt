@@ -8,6 +8,7 @@ import org.worldcubeassociation.tnoodle.server.crypto.StringEncryption
 import org.worldcubeassociation.tnoodle.server.crypto.SymmetricCipher
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
+import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScrambleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtraScrambleCountExtension
@@ -88,7 +89,7 @@ object WCIFScrambleMatcher {
 
     private fun generateScrambleSet(round: Round, onUpdate: (PuzzleData, String) -> Unit): ScrambleSet {
         val puzzle = round.idCode.eventModel?.scrambler
-            ?: error("Unable to load scrambler for Round ${round.idCode}")
+            ?: ScrambleMatchingException.error("Unable to load scrambler for Round ${round.idCode}")
 
         val standardScrambleNum = standardScrambleCountPerSet(round)
 
@@ -115,7 +116,7 @@ object WCIFScrambleMatcher {
     private fun standardScrambleCountPerSet(round: Round): Int {
         return if (round.idCode.eventModel == EventData.THREE_MULTI_BLD) {
             val multiExtCount = round.findExtension<MultiScrambleCountExtension>()
-                ?.requestedScrambles ?: error("No multiBLD number for round $round specified")
+                ?.requestedScrambles ?: ScrambleMatchingException.error("No multiBLD number for round $round specified")
 
             round.expectedAttemptNum * multiExtCount
         } else {
@@ -281,7 +282,7 @@ object WCIFScrambleMatcher {
             }
 
             if (matchedRound.scrambleSetCount > 1) {
-                error("Attempt-only specification ${activity.activityCode} for activity ${activity.id} is impossible to match")
+                ScrambleMatchingException.error("Attempt-only specification ${activity.activityCode} for activity ${activity.id} is impossible to match")
             }
 
             val onlyPossibleSet = matchedRound.scrambleSets.single()
@@ -298,6 +299,6 @@ object WCIFScrambleMatcher {
             .filter { it.id == activity.activityCode.eventId }
             .flatMap { it.rounds }
             .find { it.idCode.isParentOf(activity.activityCode) }
-            ?: error("An activity of the schedule did not match an event: $activity")
+            ?: ScrambleMatchingException.error("An activity of the schedule did not match an event: $activity")
     }
 }
