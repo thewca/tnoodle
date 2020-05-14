@@ -24,7 +24,11 @@ object WcifDataHandler : RouteHandler {
                 }
 
                 get("available") {
-                    call.respond(AVAILABLE_LANGUAGE_TAGS)
+                    val tagsWithNames = PrintingFolder.FMC_LOCALES_BY_TAG
+                        .mapValues { it.value.displayName }
+                        .toSortedMap()
+
+                    call.respond(tagsWithNames)
                 }
             }
         }
@@ -41,7 +45,4 @@ object WcifDataHandler : RouteHandler {
             }
         }
     }
-
-    private val AVAILABLE_LANGUAGE_TAGS
-        get() = PrintingFolder.FMC_LOCALE_AVAILABLE_TAGS.toSortedSet()
 }

@@ -132,7 +132,7 @@ const FmcTranslationsDetail = connect(
                                                             >
                                                                 <label>
                                                                     {
-                                                                        translation.id
+                                                                        translation.display
                                                                     }
                                                                 </label>
                                                             </th>
