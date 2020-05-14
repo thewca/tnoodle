@@ -118,9 +118,10 @@ const EventPickerTable = connect(
                     if (!availableTranslations) {
                         return;
                     }
-                    let translations = availableTranslations.map(
-                        (translation) => ({
-                            id: translation,
+                    let translations = Object.keys(availableTranslations).map(
+                        (translationId) => ({
+                            id: translationId,
+                            display: availableTranslations[translationId],
                             status: true,
                         })
                     );
