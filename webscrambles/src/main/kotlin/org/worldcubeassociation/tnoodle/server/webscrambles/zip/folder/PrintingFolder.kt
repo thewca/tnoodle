@@ -50,7 +50,7 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
                         file(cutoutZipName, cutoutSheet.render(password))
 
                         val requestedTranslations = req.scrambleSet.findExtension<FmcLanguagesExtension>()
-                            ?.languageTags ?: FMC_LOCALE_AVAILABLE_TAGS
+                            ?.languageTags ?: FMC_LOCALES_BY_TAG.keys
 
                         val translationLocales = requestedTranslations.mapNotNull { FMC_LOCALES_BY_TAG[it] }
 
@@ -93,6 +93,5 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
         private fun Schedule.isNotEmpty() = leafActivities.isNotEmpty()
 
         val FMC_LOCALES_BY_TAG = Translate.TRANSLATED_LOCALES.associateBy { it.toLanguageTag() }
-        val FMC_LOCALE_AVAILABLE_TAGS get() = FMC_LOCALES_BY_TAG.keys
     }
 }
