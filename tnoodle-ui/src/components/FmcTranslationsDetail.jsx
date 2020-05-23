@@ -1,19 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { capitalize } from "../util/string.util";
 import _ from "lodash";
 import {
     updateFileZipBlob,
     updateTranslation,
     selectAllTranslations,
     resetTranslations,
-    setSuggestedFmcTranslations
+    setSuggestedFmcTranslations,
 } from "../redux/ActionCreators";
 
-const TRANSLATIONS_PER_LINE = 4;
+const TRANSLATIONS_PER_LINE = 3;
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
     translations: store.translations,
-    suggestedFmcTranslations: store.suggestedFmcTranslations
+    suggestedFmcTranslations: store.suggestedFmcTranslations,
 });
 
 const mapDispatchToProps = {
@@ -21,7 +22,7 @@ const mapDispatchToProps = {
     updateTranslation,
     selectAllTranslations,
     resetTranslations,
-    setSuggestedFmcTranslations
+    setSuggestedFmcTranslations,
 };
 
 const FmcTranslationsDetail = connect(
@@ -34,7 +35,7 @@ const FmcTranslationsDetail = connect(
             this.state = { showTranslations: false };
         }
 
-        handleTranslation = id => {
+        handleTranslation = (id) => {
             this.props.updateFileZipBlob(null);
             this.props.updateTranslation(id);
         };
@@ -59,7 +60,7 @@ const FmcTranslationsDetail = connect(
         toggleTranslations = () => {
             this.setState({
                 ...this.state,
-                showTranslations: !this.state.showTranslations
+                showTranslations: !this.state.showTranslations,
             });
         };
 
@@ -79,10 +80,10 @@ const FmcTranslationsDetail = connect(
             let labelWidth = 0.7 * chunkWidth;
             let checkboxAndSpaceWidth = (chunkWidth - labelWidth) / 2;
             let labelStyle = {
-                width: `${labelWidth}%`
+                width: `${labelWidth}%`,
             };
             let checkboxAndSpaceStyle = {
-                width: `${checkboxAndSpaceWidth}%`
+                width: `${checkboxAndSpaceWidth}%`,
             };
             return (
                 <React.Fragment>
@@ -123,47 +124,59 @@ const FmcTranslationsDetail = connect(
                                         (translationsChunk, i) => (
                                             <tr key={i}>
                                                 {translationsChunk.map(
-                                                    (translation, j) => (
-                                                        <React.Fragment key={j}>
-                                                            <th
-                                                                style={
-                                                                    labelStyle
-                                                                }
+                                                    (translation, j) => {
+                                                        let checkboxId = `fmc-${translation.id}`;
+                                                        return (
+                                                            <React.Fragment
+                                                                key={j}
                                                             >
-                                                                <label>
-                                                                    {
-                                                                        translation.display
+                                                                <th
+                                                                    style={
+                                                                        labelStyle
                                                                     }
-                                                                </label>
-                                                            </th>
-                                                            <th
-                                                                style={
-                                                                    checkboxAndSpaceStyle
-                                                                }
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        translation.status
-                                                                    }
-                                                                    onChange={_ =>
-                                                                        this.handleTranslation(
-                                                                            translation.id
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </th>
-                                                            {j <
-                                                                TRANSLATIONS_PER_LINE -
-                                                                    1 && (
+                                                                >
+                                                                    <label
+                                                                        htmlFor={
+                                                                            checkboxId
+                                                                        }
+                                                                    >
+                                                                        {capitalize(
+                                                                            translation.display
+                                                                        )}
+                                                                    </label>
+                                                                </th>
                                                                 <th
                                                                     style={
                                                                         checkboxAndSpaceStyle
                                                                     }
-                                                                />
-                                                            )}
-                                                        </React.Fragment>
-                                                    )
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        id={
+                                                                            checkboxId
+                                                                        }
+                                                                        checked={
+                                                                            translation.status
+                                                                        }
+                                                                        onChange={() =>
+                                                                            this.handleTranslation(
+                                                                                translation.id
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </th>
+                                                                {j <
+                                                                    TRANSLATIONS_PER_LINE -
+                                                                        1 && (
+                                                                    <th
+                                                                        style={
+                                                                            checkboxAndSpaceStyle
+                                                                        }
+                                                                    />
+                                                                )}
+                                                            </React.Fragment>
+                                                        );
+                                                    }
                                                 )}
                                             </tr>
                                         )
