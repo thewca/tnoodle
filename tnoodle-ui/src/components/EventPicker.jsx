@@ -1,24 +1,23 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import CubingIcon from "./CubingIcon";
 import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import { updateWcaEvent, updateFileZipBlob } from "../redux/ActionCreators";
 import {
     getDefaultCopiesExtension,
-    copiesExtensionId
+    copiesExtensionId,
 } from "../api/tnoodle.api";
 import MbldDetail from "./MbldDetail";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
     editingDisabled: store.editingDisabled,
     wcif: store.wcif,
-    wcaFormats: store.wcaFormats
+    wcaFormats: store.wcaFormats,
 });
 
 const mapDispatchToProps = {
     updateWcaEvent,
-    updateFileZipBlob
+    updateFileZipBlob,
 };
 
 const EventPicker = connect(
@@ -26,7 +25,7 @@ const EventPicker = connect(
     mapDispatchToProps
 )(
     class extends Component {
-        getWcaEvent = rounds => {
+        getWcaEvent = (rounds) => {
             return { id: this.props.event.id, rounds };
         };
 
@@ -49,7 +48,7 @@ const EventPicker = connect(
                     id: eventId + "-r" + (rounds.length + 1),
                     format: this.props.event.format_ids[0],
                     scrambleSetCount: 1,
-                    extensions: [getDefaultCopiesExtension()]
+                    extensions: [getDefaultCopiesExtension()],
                 });
             }
             let wcaEvent = this.getWcaEvent(rounds);
@@ -76,25 +75,25 @@ const EventPicker = connect(
                 return;
             }
             rounds[round].extensions.find(
-                extension => extension.id === copiesExtensionId
+                (extension) => extension.id === copiesExtensionId
             ).data.numCopies = value;
             let wcaEvent = this.getWcaEvent(rounds);
             this.updateEvent(wcaEvent);
         };
 
-        abbreviate = str => {
+        abbreviate = (str) => {
             if (this.props.wcaFormats != null) {
                 return this.props.wcaFormats[str].shortName;
             }
             return "-";
         };
 
-        updateEvent = wcaEvent => {
+        updateEvent = (wcaEvent) => {
             this.props.updateFileZipBlob(null);
             this.props.updateWcaEvent(wcaEvent);
         };
 
-        maybeShowTableTitles = rounds => {
+        maybeShowTableTitles = (rounds) => {
             if (rounds.length === 0) {
                 return null;
             }
@@ -108,7 +107,7 @@ const EventPicker = connect(
             );
         };
 
-        maybeShowTableBody = rounds => {
+        maybeShowTableBody = (rounds) => {
             if (rounds.length === 0) {
                 return;
             }
@@ -117,7 +116,7 @@ const EventPicker = connect(
                 <tbody>
                     {Array.from({ length: rounds.length }, (_, i) => {
                         let copies = rounds[i].extensions.find(
-                            extension => extension.id === copiesExtensionId
+                            (extension) => extension.id === copiesExtensionId
                         ).data.numCopies;
                         return (
                             <tr key={i} className="form-group">
@@ -127,7 +126,7 @@ const EventPicker = connect(
                                 <td className="align-middle">
                                     <select
                                         value={rounds[i].format}
-                                        onChange={evt =>
+                                        onChange={(evt) =>
                                             this.handleRoundFormatChanged(
                                                 i,
                                                 evt.target.value,
@@ -141,7 +140,7 @@ const EventPicker = connect(
                                         }
                                     >
                                         {this.props.event.format_ids.map(
-                                            format => (
+                                            (format) => (
                                                 <option
                                                     key={format}
                                                     value={format}
@@ -157,7 +156,7 @@ const EventPicker = connect(
                                         className="form-control"
                                         type="number"
                                         value={rounds[i].scrambleSetCount}
-                                        onChange={evt =>
+                                        onChange={(evt) =>
                                             this.handleNumberOfScrambleSetsChange(
                                                 i,
                                                 Number(evt.target.value),
@@ -177,7 +176,7 @@ const EventPicker = connect(
                                         className="form-control"
                                         type="number"
                                         value={copies}
-                                        onChange={evt =>
+                                        onChange={(evt) =>
                                             this.handleNumberOfCopiesChange(
                                                 i,
                                                 Number(evt.target.value),
@@ -196,7 +195,7 @@ const EventPicker = connect(
 
         render() {
             let wcaEvent = this.props.wcif.events.find(
-                event => event.id === this.props.event.id
+                (event) => event.id === this.props.event.id
             );
             let rounds = wcaEvent != null ? wcaEvent.rounds : [];
 
@@ -216,10 +215,22 @@ const EventPicker = connect(
                             }
                         >
                             <th style={styleFirstTwoColumns} scope="col"></th>
-                            <th style={styleFirstTwoColumns} scope="col">
-                                <CubingIcon event={this.props.event.id} />
+                            <th
+                                style={styleFirstTwoColumns}
+                                scope="col"
+                                className="align-middle"
+                            >
+                                <img
+                                    className="img-thumbnail"
+                                    src={require(`../assets/cubing-icon/${this.props.event.id}.svg`)}
+                                    alt="TNoodle logo"
+                                />
                             </th>
-                            <th style={styleLastTwoColumns} scope="col">
+                            <th
+                                style={styleLastTwoColumns}
+                                className="align-middle"
+                                scope="col"
+                            >
                                 <h5 className="font-weight-bold">
                                     {this.props.event.name}
                                 </h5>
@@ -230,7 +241,7 @@ const EventPicker = connect(
                                     className="bg-light form-control"
                                     type="number"
                                     value={rounds.length}
-                                    onChange={evt =>
+                                    onChange={(evt) =>
                                         this.handleNumberOfRoundsChange(
                                             rounds,
                                             Number(evt.target.value)

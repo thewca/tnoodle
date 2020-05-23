@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="500"
+   height="500"
+   viewBox="0 0 500 500"
+   id="Layer_1"
+   xml:space="preserve"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="clock2.svg"><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="0.472"
+     inkscape:cx="250"
+     inkscape:cy="250"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Layer_1"><inkscape:grid
+       type="xygrid"
+       id="grid2985" /></sodipodi:namedview><metadata
+     id="metadata25"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs23" /><path
+     style="fill:#000000"
+     d="M 250 40 C 134.02021 40 40 134.0202 40 250 C 40 365.9798 134.02021 460 250 460 C 365.97979 460 460 365.9798 460 250 C 460 134.0202 365.97979 40 250 40 z M 250 59.09375 L 300.6875 236.46875 L 300.65625 236.46875 C 301.94186 241.04199 302.625 245.8575 302.625 250.84375 C 302.625 280.02998 279.0706 303.6875 250 303.6875 C 220.92939 303.6875 197.375 280.02998 197.375 250.84375 C 197.375 245.8575 198.05814 241.04199 199.34375 236.46875 L 199.28125 236.46875 L 250 59.09375 z M 250 124.90625 L 216.65625 241.5625 L 216.6875 241.5625 C 215.84199 244.57021 215.375 247.72065 215.375 251 C 215.375 270.19513 230.88092 285.75 250 285.75 C 269.11911 285.75 284.625 270.19513 284.625 251 C 284.625 247.72065 284.15801 244.57021 283.3125 241.5625 L 283.34375 241.5625 L 250 124.90625 z "
+     id="circle17" /></svg>
