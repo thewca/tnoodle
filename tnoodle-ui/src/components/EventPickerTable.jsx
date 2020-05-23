@@ -49,7 +49,10 @@ const EventPickerTable = connect(
     class extends Component {
         constructor(props) {
             super(props);
-            this.state = { generatingScrambles: false };
+            this.state = {
+                generatingScrambles: false,
+                competitionNameFileZip: "",
+            };
         }
 
         componentDidMount = function () {
@@ -130,7 +133,12 @@ const EventPickerTable = connect(
         };
 
         handleScrambleButton = () => {
-            this.setGeneratingScrambles(true);
+            // If user navigates during generation proccess, we still get the correct name
+            this.setState({
+                ...this.state,
+                competitionNameFileZip: this.props.wcif.name,
+                generatingScrambles: true,
+            });
             fetchZip(
                 this.props.wcif,
                 this.props.mbld,
@@ -166,7 +174,7 @@ const EventPickerTable = connect(
 
             let fileName =
                 (isUnofficialZip ? "[UNOFFICIAL] " : "") +
-                this.props.wcif.name +
+                this.state.competitionNameFileZip +
                 ".zip";
 
             const link = document.createElement("a");
