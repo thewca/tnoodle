@@ -10,18 +10,9 @@ import java.net.URI
 import java.net.URISyntaxException
 import kotlin.system.exitProcess
 
-object OfflineJarUtils {
-    val LOG = LoggerFactory.getLogger(OfflineJarUtils::class.java)
-
-    const val TNOODLE_PORT = 2014
-
-    const val ICONS_FOLDER = "icons"
-
-    const val ICON_WORKER = "tnoodle_logo_1024.png"
-    const val ICON_WRAPPER = "tnoodle_logo_1024_gray.png"
-
+data class OfflineJarUtils(val port: Int) {
     fun openTabInBrowser(browse: Boolean): String {
-        val url = "http://localhost:$TNOODLE_PORT"
+        val url = "http://localhost:$port"
 
         if (browse) {
             if (Desktop.isDesktopSupported()) {
@@ -89,5 +80,16 @@ object OfflineJarUtils {
         val imageUrl = OfflineJarUtils::class.java.getResource(fullFileName)
 
         trayAdapter.setImage(imageUrl)
+    }
+
+    companion object {
+        val LOG = LoggerFactory.getLogger(OfflineJarUtils::class.java)
+
+        const val TNOODLE_PORT = 2014
+
+        const val ICONS_FOLDER = "icons"
+
+        const val ICON_WORKER = "tnoodle_logo_1024.png"
+        const val ICON_WRAPPER = "tnoodle_logo_1024_gray.png"
     }
 }
