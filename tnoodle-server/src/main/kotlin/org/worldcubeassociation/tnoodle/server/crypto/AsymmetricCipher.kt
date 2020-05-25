@@ -11,12 +11,10 @@ object AsymmetricCipher {
     const val PUBLIC_KEY_PEM = "/rsa/tnoodle_public.pem"
     private const val PRIVATE_KEY_PEM8 = "/rsa/tnoodle_private.pkcs8.pem"
 
-    val PUBLIC_KEY_BYTES = loadRSAKeyBytes(PUBLIC_KEY_PEM)
-    val PUBLIC_KEY_BYTES_BASE64 = PUBLIC_KEY_BYTES?.let { Base64.getEncoder().encodeToString(it) }
-
-    val PRIVATE_KEY_BYTES = loadRSAKeyBytes(PRIVATE_KEY_PEM8)
-
+    private val PUBLIC_KEY_BYTES = loadRSAKeyBytes(PUBLIC_KEY_PEM)
     val RSA_PUBLIC_KEY by lazy { PUBLIC_KEY_BYTES?.let(this::generatePublicKey) }
+
+    private val PRIVATE_KEY_BYTES = loadRSAKeyBytes(PRIVATE_KEY_PEM8)
     val RSA_PRIVATE_KEY by lazy { PRIVATE_KEY_BYTES?.let(this::generatePrivateKey) }
 
     private val CIPHER_KEY_FACTORY = KeyFactory.getInstance(ENCRYPTION_ALGORITHM)

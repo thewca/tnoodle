@@ -129,7 +129,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             val cliEnv = commandLineEnvironment(ktorArgs)
             embeddedServer(Netty, cliEnv).start()
 
-            LOG.info("${LocalServerEnvironmentConfig.projectTitle} started")
+            LOG.info("${LocalServerEnvironmentConfig.title} started")
 
             val url = offlineHandler.openTabInBrowser(!noBrowser)
             LOG.info("Visit $url for a readme and demo.")

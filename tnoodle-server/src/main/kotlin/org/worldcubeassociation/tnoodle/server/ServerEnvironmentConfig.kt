@@ -2,8 +2,8 @@ package org.worldcubeassociation.tnoodle.server
 
 interface ServerEnvironmentConfig {
     val projectName: String
-    val version: String
+    val projectVersion: String
 
-    val projectTitle
-        get() = "$projectName-$version"
+    val title
+        get() = "$projectName-$projectVersion"
 }

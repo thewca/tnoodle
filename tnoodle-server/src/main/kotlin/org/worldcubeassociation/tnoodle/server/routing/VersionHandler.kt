@@ -9,21 +9,14 @@ import kotlinx.serialization.json.json
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.crypto.AsymmetricCipher
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.serial.VersionInfo
 
 class VersionHandler(val version: ServerEnvironmentConfig) : RouteHandler {
+    private val serialVersionInfo = VersionInfo.fromEnvironmentConfig(version)
+
     override fun install(router: Route) {
         router.get("version") {
-            //FIXME this is a temporary stub implementation until we have actual key pairs
-            //val buildVerified = BuildVerification.BUILD_VERIFIED
-            val buildVerified = version.projectName == "TNoodle-WCA"
-
-            val json = json {
-                "runningVersion" to version.projectTitle
-                "officialBuild" to buildVerified
-                "keyBytes" to AsymmetricCipher.PUBLIC_KEY_BYTES_BASE64
-            }
-
-            call.respond(json)
+            call.respond(serialVersionInfo)
         }
     }
 }

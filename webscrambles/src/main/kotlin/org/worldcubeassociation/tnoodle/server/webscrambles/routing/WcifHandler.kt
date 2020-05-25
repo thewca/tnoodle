@@ -61,7 +61,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
                     val pdfPassword = data.request.pdfPassword
                     val zipPassword = data.request.zipPassword
 
-                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.projectTitle, data.requestUrl)
+                    val zip = WCIFDataBuilder.wcifToZip(wcif, pdfPassword, generationDate, environmentConfig.title, data.requestUrl)
                     val bytes = zip.compress(zipPassword)
 
                     JobSchedulingHandler.registerProgress(jobId, "PDF")
