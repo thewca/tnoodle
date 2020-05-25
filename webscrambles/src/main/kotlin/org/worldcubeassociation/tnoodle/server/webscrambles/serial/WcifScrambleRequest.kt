@@ -6,7 +6,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMat
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.StagingFlagExtension
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.TNoodleStatusExtension
 
 @Serializable
 data class WcifScrambleRequest(
@@ -15,7 +15,7 @@ data class WcifScrambleRequest(
     val pdfPassword: String? = null,
     val multiCubes: MultiScrambleCountExtension? = null,
     val fmcLanguages: FmcLanguagesExtension? = null,
-    val isStaging: StagingFlagExtension? = null
+    val frontendStatus: TNoodleStatusExtension? = null
 ) {
     val extendedWcif by lazy { compileExtendedWcif() }
 
@@ -25,7 +25,7 @@ data class WcifScrambleRequest(
             fmcLanguages?.to(EventData.THREE_FM)
         ).toMap()
 
-        val stagedWcif = wcif.copy(extensions = wcif.withExtension(isStaging))
-        return WCIFScrambleMatcher.installExtensions(stagedWcif, optionalExtensions)
+        val statusWcif = wcif.copy(extensions = wcif.withExtension(frontendStatus))
+        return WCIFScrambleMatcher.installExtensions(statusWcif, optionalExtensions)
     }
 }
