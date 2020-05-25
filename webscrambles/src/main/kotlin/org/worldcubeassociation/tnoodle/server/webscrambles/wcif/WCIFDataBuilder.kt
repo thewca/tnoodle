@@ -16,6 +16,10 @@ import java.util.*
 object WCIFDataBuilder {
     private val PDF_CACHE = mutableMapOf<ScrambleDrawingData, PdfContent>()
 
+    const val WATERMARK_STAGING = "STAGING"
+    const val WATERMARK_OUTDATED = "OUTDATED"
+    const val WATERMARK_UNOFFICIAL = "UNOFFICIAL"
+
     fun Competition.toScrambleSetData(): CompetitionDrawingData {
         val sheets = events.flatMap { e ->
             e.rounds.flatMap { r ->
@@ -34,12 +38,25 @@ object WCIFDataBuilder {
                     val generalExtensions = specificExtensions + r.findExtension<SheetCopyCountExtension>()
                     val extendedScrSet = it.copy(extensions = it.withExtensions(generalExtensions))
 
-                    ScrambleDrawingData(extendedScrSet, copyCode, hasExtension<StagingFlagExtension>())
+                    val frontendStatus = findExtension<TNoodleStatusExtension>()
+                    val frontendWatermark = frontendStatus?.pickWatermarkPhrase()
+
+                    ScrambleDrawingData(extendedScrSet, copyCode, frontendWatermark)
                 }
             }
         }
 
         return CompetitionDrawingData(shortName, sheets)
+    }
+
+    fun TNoodleStatusExtension.pickWatermarkPhrase(): String? {
+        return if (!isOfficialBuild) {
+            WATERMARK_UNOFFICIAL
+        } else if (!isRecentVersion) {
+            WATERMARK_OUTDATED
+        } else if (isStaging) {
+            WATERMARK_STAGING
+        } else null
     }
 
     fun wcifToZip(wcif: Competition, pdfPassword: String?, generationDate: LocalDateTime, versionTag: String, generationUrl: String): ZipArchive {

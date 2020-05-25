@@ -6,15 +6,15 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityC
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Scramble
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.TNoodleStatusExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.SheetCopyCountExtension
 import java.time.LocalDate
 import java.util.*
 
-// FIXME do we need some kind of "Scrambles for" prefix?
 data class CompetitionDrawingData(val competitionTitle: String, val scrambleSheets: List<ScrambleDrawingData>)
 
-data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode, val isStaging: Boolean = false) {
+data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode, val watermark: String? = null) {
     val isFmc: Boolean
         get() = scrambleSet.findExtension<FmcExtension>()
             ?.isFmc ?: (activityCode.eventModel == EventData.THREE_FM)
@@ -60,6 +60,6 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
         }
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking
-        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(), creationDate, versionTag, sheetTitle, isStaging)
+        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(), creationDate, versionTag, sheetTitle, watermark)
     }
 }

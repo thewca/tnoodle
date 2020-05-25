@@ -17,7 +17,7 @@ class WatermarkPdfWrapper(
     private val creationDate: LocalDate,
     private val versionTag: String,
     private val globalTitle: String?,
-    private val staging: Boolean = false
+    private val watermark: String? = null
 ) : BasePdfSheet<PdfWriter>() {
     override fun openDocument() = Document(PAGE_SIZE, 0f, 0f, 75f, 75f)
 
@@ -66,7 +66,7 @@ class WatermarkPdfWrapper(
                 (PAGE_SIZE.left + PAGE_SIZE.right) / 2, footerRect.top - footerRect.height / 4, 0f)
 
             // Staging watermark
-            if (staging) {
+            if (watermark != null) {
                 val transparentState = PdfGState().apply {
                     setFillOpacity(0.2f)
                 }
@@ -77,7 +77,7 @@ class WatermarkPdfWrapper(
                 val diagRotation = atan(PAGE_SIZE.height / PAGE_SIZE.width) * (180f / PI)
 
                 ColumnText.showTextAligned(cb,
-                    Element.ALIGN_CENTER, Phrase("STAGING", Font(FontUtil.NOTO_SANS_FONT, 100f, Font.BOLD)),
+                    Element.ALIGN_CENTER, Phrase(watermark, Font(FontUtil.NOTO_SANS_FONT, 100f, Font.BOLD)),
                     (PAGE_SIZE.left + PAGE_SIZE.right) / 2, (PAGE_SIZE.top + PAGE_SIZE.bottom) / 2, diagRotation.toFloat())
 
                 cb.restoreState()

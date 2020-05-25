@@ -103,13 +103,13 @@ data class SheetCopyCountExtension(val numCopies: Int) : ExtensionBuilder() {
 }
 
 @Serializable
-@SerialName(StagingFlagExtension.ID)
-data class StagingFlagExtension(val isStaging: Boolean) : ExtensionBuilder() {
+@SerialName(TNoodleStatusExtension.ID)
+data class TNoodleStatusExtension(val isStaging: Boolean, val isManual: Boolean, val isOfficialBuild: Boolean, val isRecentVersion: Boolean) : ExtensionBuilder() {
     override val id get() = ID
     override val specUrl get() = SPEC_URL
 
     companion object {
-        const val ID = "org.worldcubeassociation.tnoodle.StagingFlag"
+        const val ID = "org.worldcubeassociation.tnoodle.CompetitionStatus"
         const val SPEC_URL = "TODO"
     }
 }
