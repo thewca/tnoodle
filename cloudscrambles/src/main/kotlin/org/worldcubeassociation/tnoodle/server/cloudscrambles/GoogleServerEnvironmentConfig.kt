@@ -21,7 +21,7 @@ object GoogleServerEnvironmentConfig : ServerEnvironmentConfig {
         get() = CONFIG_DATA.getOrNull(0)
             ?: callerClass?.simpleName!!
 
-    override val version: String
+    override val projectVersion: String
         get() = CONFIG_DATA.getOrNull(1)
             ?: DEVEL_VERSION
 

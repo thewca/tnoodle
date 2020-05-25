@@ -71,7 +71,7 @@ data class OfflineJarUtils(val port: Int) {
 
         trayAdapter.menu.add(exitItem)
 
-        val tooltip = "${LocalServerEnvironmentConfig.projectName} v${LocalServerEnvironmentConfig.version}"
+        val tooltip = "${LocalServerEnvironmentConfig.projectName} v${LocalServerEnvironmentConfig.projectVersion}"
         trayAdapter.setTooltip(tooltip)
         trayAdapter.status = tooltip
 

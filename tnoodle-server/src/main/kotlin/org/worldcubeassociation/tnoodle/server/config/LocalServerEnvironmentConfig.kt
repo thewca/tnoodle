@@ -9,7 +9,7 @@ object LocalServerEnvironmentConfig : ServerEnvironmentConfig {
         get() = this::class.java.getPackage()?.implementationTitle
             ?: WebServerUtils.callerClass?.simpleName!!
 
-    override val version
+    override val projectVersion
         get() = this::class.java.getPackage()?.implementationVersion
             ?: DEVEL_VERSION
 }
