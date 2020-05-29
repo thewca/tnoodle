@@ -90,13 +90,15 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
 
             val desiredJsEnv by parser.adding("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
 
-            val port by parser.storing("-p", "--port", help = "Start TNoodle on given port. Should be numeric. Defaults to ${OfflineJarUtils.TNOODLE_PORT}", transform = { toInt() })
+            val cliPort by parser.storing("-p", "--port", help = "Start TNoodle on given port. Should be numeric. Defaults to ${OfflineJarUtils.TNOODLE_PORT}", transform = { toInt() })
                 .default(OfflineJarUtils.TNOODLE_PORT)
 
             val noBrowser by parser.flagging("-n", "--nobrowser", help = "Don't open the browser when starting the server")
             val noUpgrade by parser.flagging("-u", "--noupgrade", help = "If an instance of TNoodle is running on the desired port(s), do not attempt to kill it and start up")
             val noReexec by parser.flagging(NO_REEXEC_OPT, help = "Do not reexec. This is sometimes done to rename java.exe on Windows, or to get a larger heap size.")
+            val onlineConfig by parser.flagging("-o", "--online", help = "Change configuration for online mode. This will override port bindings and sun.awt.fontconfig")
 
+            val port = System.getenv("PORT")?.takeIf { onlineConfig }?.toIntOrNull() ?: cliPort
             val offlineHandler = OfflineJarUtils(port)
 
             offlineHandler.setApplicationIcon()
