@@ -113,6 +113,7 @@ tasks.getByName("shadowJar") {
         val targetProject = project.name
 
         val originFile = file("$buildDir/libs/$targetProject-$version-all.jar")
+            .relativeToOrSelf(rootProject.projectDir)
         val targetLn = rootProject.file("TNoodle-Docker-latest.jar")
 
         val created = symlink(targetLn, originFile)
