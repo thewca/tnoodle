@@ -16,5 +16,13 @@ USER $APPLICATION_USER
 COPY ./TNoodle-Docker-latest.jar /app/tnoodle-application.jar
 WORKDIR /app
 
+# allow deployments to online Docker containers
+# (requires TNoodle to mangle with Java runtime, see WebscramblesServer#main for details)
+ARG ONLINE
+# If the arg ONLINE was passed, add flag
+ENV ONLINE_MODE=${ONLINE:+"--online"}
+# If no flag is present yet, explicitly assign an empty string
+ENV ONLINE_MODE=${ONLINE_MODE:-""}
+
 # We launch java to execute the jar, with good defauls intended for containers.
-CMD ["java", "-server", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-XX:InitialRAMFraction=2", "-XX:MinRAMFraction=2", "-XX:MaxRAMFraction=2", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "tnoodle-application.jar"]
+CMD java -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:InitialRAMFraction=2 -XX:MinRAMFraction=2 -XX:MaxRAMFraction=2 -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseStringDeduplication -jar tnoodle-application.jar $ONLINE_MODE
