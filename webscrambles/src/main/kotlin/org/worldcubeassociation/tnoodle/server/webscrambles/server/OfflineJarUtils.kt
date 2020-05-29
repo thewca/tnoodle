@@ -85,7 +85,11 @@ data class OfflineJarUtils(val port: Int) {
     companion object {
         val LOG = LoggerFactory.getLogger(OfflineJarUtils::class.java)
 
-        const val TNOODLE_PORT = 2014
+        const val TNOODLE_DEFAULT_PORT = 2014
+        const val TNOODLE_PORT_ENV_KEY = "TNOODLE_PORT"
+
+        val TNOODLE_PORT = System.getenv(TNOODLE_PORT_ENV_KEY)?.toIntOrNull()
+            ?: TNOODLE_DEFAULT_PORT
 
         const val ICONS_FOLDER = "icons"
 

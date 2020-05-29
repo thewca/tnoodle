@@ -2,7 +2,7 @@
 FROM openjdk:8-jre-alpine
 
 # We define the user we will use in this instance to prevent using root that even in a container, can be a security risk.
-ENV APPLICATION_USER ktor
+ENV APPLICATION_USER=ktor
 
 # Then we add the user, create the /app folder and give permissions to our user.
 RUN adduser -D -g '' $APPLICATION_USER
