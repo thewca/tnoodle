@@ -92,7 +92,7 @@ object PdfDrawUtil {
         addText(Paragraph(text, font))
     }
 
-    fun PdfContentByte.populateRect(rect: Rectangle, itemsWithAlignment: List<Pair<String, Int>>, font: Font) {
+    fun PdfContentByte.populateRect(rect: Rectangle, itemsWithAlignment: List<Pair<String, Int>>, font: Font, leadingMultiplier: Float = 1f) {
         val totalHeight = rect.height
         val width = rect.width
 
@@ -103,7 +103,7 @@ object PdfDrawUtil {
 
         for ((i, content) in itemsWithAlignment.withIndex()) {
             val temp = Rectangle(x, y + height * i - totalHeight - font.size, x + width, y + height * i - totalHeight)
-            fitAndShowText(content.first, temp, font, content.second)
+            fitAndShowText(content.first, temp, font, content.second, leadingMultiplier)
         }
     }
 }

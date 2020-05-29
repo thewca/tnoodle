@@ -160,13 +160,14 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
 
         cb.fitAndShowText(Translate.translate("fmc.event", locale), titleRect, titleFont, Element.ALIGN_CENTER)
 
-        val personalDetailsItems = mutableListOf<Pair<String, Int>>()
+        // Both competitor com competition details
+        val compDetailItems = mutableListOf<Pair<String, Int>>()
 
         if (withScramble) {
             val activityTitle = activityCode.compileTitleString()
 
-            personalDetailsItems.add(competitionTitle to Element.ALIGN_CENTER)
-            personalDetailsItems.add(activityTitle to Element.ALIGN_CENTER)
+            compDetailItems.add(competitionTitle to Element.ALIGN_CENTER)
+            compDetailItems.add(activityTitle to Element.ALIGN_CENTER)
 
             if (showScrambleCount) {
                 // this is for ordered scrambles
@@ -179,43 +180,43 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
                 )
 
                 val translatedInfo = Translate.translate("fmc.scrambleXofY", locale, substitutions)
-                personalDetailsItems.add(translatedInfo to Element.ALIGN_CENTER)
+                compDetailItems.add(translatedInfo to Element.ALIGN_CENTER)
             }
         } else {
             val competitionDesc = Translate.translate("fmc.competition", locale) + LONG_FILL
             val roundDesc = Translate.translate("fmc.round", locale) + SHORT_FILL
             val attemptDesc = Translate.translate("fmc.attempt", locale) + SHORT_FILL
 
-            personalDetailsItems.add(competitionDesc to Element.ALIGN_LEFT)
-            personalDetailsItems.add(roundDesc to Element.ALIGN_LEFT)
-            personalDetailsItems.add(attemptDesc to Element.ALIGN_LEFT)
+            compDetailItems.add(competitionDesc to Element.ALIGN_LEFT)
+            compDetailItems.add(roundDesc to Element.ALIGN_LEFT)
+            compDetailItems.add(attemptDesc to Element.ALIGN_LEFT)
         }
 
         if (withScramble) { // more space for filling name
-            personalDetailsItems.add("" to Element.ALIGN_LEFT)
+            compDetailItems.add("" to Element.ALIGN_LEFT)
         }
 
         val competitorDesc = Translate.translate("fmc.competitor", locale) + LONG_FILL
-        personalDetailsItems.add(competitorDesc to Element.ALIGN_LEFT)
+        compDetailItems.add(competitorDesc to Element.ALIGN_LEFT)
 
         if (withScramble) {
-            personalDetailsItems.add("" to Element.ALIGN_LEFT)
+            compDetailItems.add("" to Element.ALIGN_LEFT)
         }
 
-        personalDetailsItems.add(FORM_TEMPLATE_WCA_ID to Element.ALIGN_LEFT)
+        compDetailItems.add(FORM_TEMPLATE_WCA_ID to Element.ALIGN_LEFT)
 
         if (withScramble) { // add space below
-            personalDetailsItems.add("" to Element.ALIGN_LEFT)
+            compDetailItems.add("" to Element.ALIGN_LEFT)
         }
 
         val registrantIdDesc = Translate.translate("fmc.registrantId", locale) + SHORT_FILL
-        personalDetailsItems.add(registrantIdDesc to Element.ALIGN_LEFT)
+        compDetailItems.add(registrantIdDesc to Element.ALIGN_LEFT)
 
         if (withScramble) {
-            personalDetailsItems.add("" to Element.ALIGN_LEFT)
+            compDetailItems.add("" to Element.ALIGN_LEFT)
         }
 
-        cb.populateRect(competitorInfoRect, personalDetailsItems, font)
+        cb.populateRect(competitorInfoRect, compDetailItems, font, LEADING_MULTIPLIER)
 
         // graded
         val gradingTextGradedBy = Translate.translate("fmc.graded", locale) + LONG_FILL
@@ -372,5 +373,7 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val WCA_ROTATIONS = arrayOf("x", "y", "z", "", "", "")
 
         val DIRECTION_MODIFIERS = arrayOf("", "'", "2")
+
+        var LEADING_MULTIPLIER = 1.3f;
     }
 }
