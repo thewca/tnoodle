@@ -13,7 +13,7 @@ abstract class BaseScrambleSheet(val scrambleSet: ScrambleSet, val activityCode:
         Document(PAGE_SIZE, 0f, 0f, 75f, 75f).apply {
             addCreationDate()
             addProducer()
-            addTitle(activityCode.compileTitleString(includeGroupID=scrambleSet.hasGroupID))
+            addTitle(activityCode.compileTitleString())
         }
 
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter {

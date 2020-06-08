@@ -13,12 +13,10 @@ import java.util.*
 
 data class CompetitionDrawingData(val competitionTitle: String, val scrambleSheets: List<ScrambleDrawingData>)
 
-data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode, val watermark: String? = null) {
+data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: ActivityCode, val watermark: String? = null, val hasGroupID: Boolean = true) {
     val isFmc: Boolean
         get() = scrambleSet.findExtension<FmcExtension>()
             ?.isFmc ?: (activityCode.eventModel == EventData.THREE_FM)
-
-    val hasGroupID: Boolean = scrambleSet.hasGroupID
 
     val numCopies: Int
         get() = scrambleSet.findExtension<SheetCopyCountExtension>()
@@ -61,7 +59,7 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
         }
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking
-        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(includeGroupID = scrambleSet.hasGroupID), creationDate, versionTag, sheetTitle, watermark)
+        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(includeGroupID = hasGroupID), creationDate, versionTag, sheetTitle, watermark)
     }
 
     fun copyForAttempt(attempt: Int): ScrambleDrawingData {
