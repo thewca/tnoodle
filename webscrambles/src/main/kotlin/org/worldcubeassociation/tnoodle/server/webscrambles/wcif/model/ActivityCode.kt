@@ -46,7 +46,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
             val translateValue = v.takeUnless { k == WCIF_PREFIX_GROUP }
                 ?: v.toIntOrNull()?.toColumnIndexString()
 
-            if (!includeGroupID && k == WCIF_PREFIX_GROUP) "" else "$translatePrefix $translateValue"
+            "$translatePrefix $translateValue".takeUnless { !includeGroupID && k == WCIF_PREFIX_GROUP }.orEmpty()
         }.joinToString(TRANSLATION_DELIMITER)
 
         if (!includeEvent) {
