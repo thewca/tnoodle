@@ -41,7 +41,7 @@ object WCIFDataBuilder {
                     val frontendStatus = findExtension<TNoodleStatusExtension>()
                     val frontendWatermark = frontendStatus?.pickWatermarkPhrase()
 
-                    ScrambleDrawingData(extendedScrSet, copyCode, frontendWatermark)
+                    ScrambleDrawingData(extendedScrSet, copyCode, frontendWatermark, r.scrambleSetCount > 1)
                 }
             }
         }
