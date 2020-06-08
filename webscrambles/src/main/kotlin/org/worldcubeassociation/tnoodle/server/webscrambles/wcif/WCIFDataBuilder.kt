@@ -63,7 +63,7 @@ object WCIFDataBuilder {
         val drawingData = wcif.toScrambleSetData()
 
         val namedSheets = drawingData.scrambleSheets
-            .withUniqueTitles { it.activityCode.compileTitleString() }
+            .withUniqueTitles { it.activityCode.compileTitleString(includeGroupID = it.hasGroupID) }
 
         val zippingData = CompetitionZippingData(wcif, namedSheets)
         return requestsToZip(zippingData, pdfPassword, generationDate, versionTag, generationUrl)
@@ -87,7 +87,7 @@ object WCIFDataBuilder {
         }
 
         val configurations = scrambleRequests.map {
-            Triple(it.activityCode.compileTitleString(false), it.activityCode.eventModel?.description.orEmpty(), it.numCopies)
+            Triple(it.activityCode.compileTitleString(false, includeGroupID = it.hasGroupID), it.activityCode.eventModel?.description.orEmpty(), it.numCopies)
         }
 
         return MergedPdfWithOutline(originalPdfs, configurations)
