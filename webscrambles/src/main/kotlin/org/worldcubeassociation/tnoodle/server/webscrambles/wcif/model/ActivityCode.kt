@@ -40,13 +40,13 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
         return compile(eventId, roundNumber, groupNumber, attemptNumber)
     }
 
-    fun compileTitleString(includeEvent: Boolean = true): String {
+    fun compileTitleString(includeEvent: Boolean = true, includeGroupID: Boolean = false): String {
         val parts = structureParts.map { (k, v) ->
             val translatePrefix = PREFIX_TRANSLATIONS[k]
             val translateValue = v.takeUnless { k == WCIF_PREFIX_GROUP }
                 ?: v.toIntOrNull()?.toColumnIndexString()
 
-            "$translatePrefix $translateValue"
+            if (!includeGroupID && k == WCIF_PREFIX_GROUP) "" else "$translatePrefix $translateValue"
         }.joinToString(TRANSLATION_DELIMITER)
 
         if (!includeEvent) {

@@ -110,7 +110,7 @@ object WCIFScrambleMatcher {
         val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum) { onUpdate(puzzle, it) }.map(::Scramble)
 
         // dummy ID -- indexing happens afterwards
-        return ScrambleSet(ID_PENDING, scrambles, extraScrambles)
+        return ScrambleSet(ID_PENDING, scrambles, extraScrambles, hasGroupID = round.scrambleSetCount > 1)
     }
 
     private fun standardScrambleCountPerSet(round: Round): Int {

@@ -18,6 +18,8 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
         get() = scrambleSet.findExtension<FmcExtension>()
             ?.isFmc ?: (activityCode.eventModel == EventData.THREE_FM)
 
+    val hasGroupID: Boolean = scrambleSet.hasGroupID
+
     val numCopies: Int
         get() = scrambleSet.findExtension<SheetCopyCountExtension>()
             ?.numCopies ?: 1
@@ -59,7 +61,7 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
         }
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking
-        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(), creationDate, versionTag, sheetTitle, watermark)
+        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(includeGroupID = scrambleSet.hasGroupID), creationDate, versionTag, sheetTitle, watermark)
     }
 
     fun copyForAttempt(attempt: Int): ScrambleDrawingData {
