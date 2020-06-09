@@ -254,6 +254,13 @@ object WCIFScrambleMatcher {
             return activity
         }
 
+        val registeredEventIds = events.map { it.id }
+
+        // manually compensating for https://github.com/thewca/worldcubeassociation.org/issues/4653
+        if (activity.activityCode.eventId !in registeredEventIds) {
+            return activity
+        }
+
         val children = activity.childActivities
 
         // we have children that need to be specified!
@@ -289,8 +296,12 @@ object WCIFScrambleMatcher {
             return activity.copy(scrambleSetId = onlyPossibleSet.id)
         }
 
-        val scrambleSet = matchedRound.scrambleSets[actGroup - 1]
+        // manually compensating for https://github.com/thewca/worldcubeassociation.org/issues/4653
+        if (actGroup > matchedRound.scrambleSetCount) {
+            return activity
+        }
 
+        val scrambleSet = matchedRound.scrambleSets[actGroup - 1]
         return activity.copy(scrambleSetId = scrambleSet.id)
     }
 

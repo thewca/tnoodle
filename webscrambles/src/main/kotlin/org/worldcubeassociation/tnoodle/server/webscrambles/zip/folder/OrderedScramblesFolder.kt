@@ -4,7 +4,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleM
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
@@ -15,19 +14,13 @@ import java.time.ZonedDateTime
 data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingData: CompetitionDrawingData) {
     fun assemble(wcifSchedule: Schedule, generationDate: LocalDate, versionTag: String): Folder {
         val wcifBindings = wcifSchedule.allActivities
-            .filter { it.activityCode.eventId !in ActivityCode.IGNORABLE_KEYS }
+            // scrambleSetId as assigned by WCIFScrambleMatcher#matchActivity
             .filter { it.scrambleSetId != null }
             .associateWith { ac ->
                 scrambleDrawingData.scrambleSheets.find { it.scrambleSet.id == ac.scrambleSetId }
                     ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
             }.mapValues { (act, scr) ->
-                act.activityCode.attemptNumber?.let {
-                    val origScrambles = scr.scrambleSet.allScrambles
-                    val designatedScramble = origScrambles[it - 1]
-
-                    val modifiedSet = scr.scrambleSet.copy(scrambles = listOf(designatedScramble))
-                    scr.copy(scrambleSet = modifiedSet)
-                } ?: scr
+                act.activityCode.attemptNumber?.let(scr::copyForAttempt) ?: scr
             }
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
@@ -57,7 +50,6 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
 
                     val activitiesPerDay = room.activities
                         .flatMap { it.leafChildActivities }
-                        .filter { it.activityCode.eventId !in ActivityCode.IGNORABLE_KEYS }
                         .groupBy {
                             Period.between(
                                 competitionStartDate.atLocalStartOfDay(),
@@ -66,7 +58,8 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                         }
 
                     for ((nthDay, activities) in activitiesPerDay) {
-                        val scrambles = activities.associateWith { wcifBindings.getValue(it) }
+                        val scrambles = activities.associateWith(wcifBindings::get)
+                            .filterValuesNotNull()
 
                         val activitiesHaveScrambles = scrambles.values.isNotEmpty()
 
@@ -105,7 +98,8 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
             // Generate all scrambles ordered
             val allScramblesOrdered = wcifSchedule.activitiesWithLocalStartTimes.entries
                 .sortedBy { it.value }
-                .mapNotNull { wcifBindings[it.key] } // the notNull will effectively never happen, because we guarantee that all relevant activities are indexed
+                // the notNull will effectively never happen, because we guarantee that all relevant activities are indexed
+                .mapNotNull { wcifBindings[it.key] }
                 .distinct()
 
             val allScramblesData = scrambleDrawingData.copy(scrambleSheets = allScramblesOrdered)
@@ -118,5 +112,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
 
     companion object {
         fun ZonedDateTime.atLocalStartOfDay() = toLocalDate().atStartOfDay(zone).toLocalDate()
+
+        fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = mapNotNull { (k, v) -> v?.let { k to it } }.toMap()
     }
 }

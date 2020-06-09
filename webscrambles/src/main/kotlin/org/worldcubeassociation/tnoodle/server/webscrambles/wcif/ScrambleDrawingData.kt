@@ -6,7 +6,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityC
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Scramble
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.TNoodleStatusExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.MultiScrambleCountExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.SheetCopyCountExtension
 import java.time.LocalDate
@@ -61,5 +60,14 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking
         return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(), creationDate, versionTag, sheetTitle, watermark)
+    }
+
+    fun copyForAttempt(attempt: Int): ScrambleDrawingData {
+        val origScrambles = scrambleSet.allScrambles
+        val designatedScramble = origScrambles[attempt - 1]
+
+        val modifiedSet = scrambleSet.copy(scrambles = listOf(designatedScramble))
+
+        return copy(scrambleSet = modifiedSet)
     }
 }
