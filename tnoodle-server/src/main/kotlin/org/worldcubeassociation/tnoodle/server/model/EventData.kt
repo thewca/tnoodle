@@ -25,6 +25,6 @@ enum class EventData(val key: String, val description: String, val scrambler: Pu
         val WCA_EVENTS = values().associateBy { it.key }.toSortedMap()
 
         val ONE_HOUR_EVENTS = setOf(THREE_FM, THREE_MULTI_BLD)
-        val ATTEMPT_BASED_EVENTS = setOf(THREE_MULTI_BLD)
+        val ATTEMPT_BASED_EVENTS = setOf(THREE_FM, THREE_MULTI_BLD)
     }
 }

@@ -32,7 +32,7 @@ object WCIFDataBuilder {
                     .flatMap { splitAttemptBasedEvents(e, r, it.index, it.value) }
                     .map {
                         val extendedScrSet = it.scrambleSet.copy(extensions = it.scrambleSet.withExtension(copyCountExtension))
-                        it.copy(scrambleSet = extendedScrSet, watermark = frontendWatermark, hasGroupID = r.scrambleSetCount > 1)
+                        it.copy(scrambleSet = extendedScrSet, watermark = frontendWatermark)
                     }
             }
         }
@@ -50,31 +50,28 @@ object WCIFDataBuilder {
         if (event.eventModel in EventData.ATTEMPT_BASED_EVENTS) {
             return set.scrambles.mapIndexed { nthAttempt, scrambleStr ->
                 val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
-                val attemptExtensions = computeAttemptExtensions(event, round, scrambles)
-
-                val pseudoCode = baseCode.copyParts(attemptNumber = nthAttempt)
 
                 val attemptScrambles = set.copy(
                     scrambles = scrambles,
-                    extraScrambles = listOf(),
-                    extensions = set.withExtensions(attemptExtensions)
+                    extraScrambles = listOf()
                 )
 
-                defaultScrambleDrawingData(attemptScrambles, pseudoCode)
+                val pseudoCode = baseCode.copyParts(attemptNumber = nthAttempt)
+                defaultScrambleDrawingData(event, round, attemptScrambles, pseudoCode)
             }
         }
 
-        val defaultExtensions = computeAttemptExtensions(event, round, set.scrambles)
+        return listOf(defaultScrambleDrawingData(event, round, set, baseCode))
+    }
+
+    private fun defaultScrambleDrawingData(event: Event, round: Round, set: ScrambleSet, ac: ActivityCode): ScrambleDrawingData {
+        val defaultExtensions = computeDefaultExtensions(event, round, set.scrambles)
         val extendedSet = set.copy(extensions = set.withExtensions(defaultExtensions))
 
-        return listOf(defaultScrambleDrawingData(extendedSet, baseCode))
+        return ScrambleDrawingData(extendedSet, ac, hasGroupID = round.scrambleSetCount > 1)
     }
 
-    private fun defaultScrambleDrawingData(set: ScrambleSet, ac: ActivityCode): ScrambleDrawingData {
-        return ScrambleDrawingData(set, ac)
-    }
-
-    private fun computeAttemptExtensions(event: Event, round: Round, scrambles: List<Scramble>): List<ExtensionBuilder> {
+    private fun computeDefaultExtensions(event: Event, round: Round, scrambles: List<Scramble>): List<ExtensionBuilder> {
         return when (event.eventModel) {
             EventData.THREE_FM -> {
                 val formatExtension = FmcAttemptCountExtension(round.expectedAttemptNum)
