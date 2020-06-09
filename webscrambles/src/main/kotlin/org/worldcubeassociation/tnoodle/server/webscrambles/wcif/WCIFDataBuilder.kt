@@ -41,7 +41,7 @@ object WCIFDataBuilder {
     }
 
     private fun splitAttemptBasedEvents(event: Event, round: Round, group: Int, set: ScrambleSet): List<ScrambleDrawingData> {
-        val baseCode = round.idCode.copyParts(groupNumber = group + 1)
+        val baseCode = round.idCode.copyParts(groupNumber = group)
 
         // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
         // list of 333ni scrambles.
@@ -52,8 +52,7 @@ object WCIFDataBuilder {
                 val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
                 val attemptExtensions = computeAttemptExtensions(event, round, scrambles)
 
-                // +1 for human readability so the first attempt (index 0) gets printed as "Attempt 1"
-                val pseudoCode = baseCode.copyParts(attemptNumber = nthAttempt + 1)
+                val pseudoCode = baseCode.copyParts(attemptNumber = nthAttempt)
 
                 val attemptScrambles = set.copy(
                     scrambles = scrambles,

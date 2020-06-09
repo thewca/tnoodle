@@ -279,7 +279,7 @@ object WCIFScrambleMatcher {
             // resort to creating them ourselves…
             if (actAttempt == null) {
                 val inventedChildren = List(matchedRound.scrambleSetCount) {
-                    val copiedActCode = activity.activityCode.copyParts(groupNumber = it + 1)
+                    val copiedActCode = activity.activityCode.copyParts(groupNumber = it)
                     val childSetId = matchedRound.scrambleSets[it].id
 
                     activity.copy(id = ID_PENDING, activityCode = copiedActCode, childActivities = listOf(), scrambleSetId = childSetId)
@@ -297,11 +297,11 @@ object WCIFScrambleMatcher {
         }
 
         // manually compensating for https://github.com/thewca/worldcubeassociation.org/issues/4653
-        if (actGroup > matchedRound.scrambleSetCount) {
+        if (actGroup >= matchedRound.scrambleSetCount) {
             return activity
         }
 
-        val scrambleSet = matchedRound.scrambleSets[actGroup - 1]
+        val scrambleSet = matchedRound.scrambleSets[actGroup]
         return activity.copy(scrambleSetId = scrambleSet.id)
     }
 

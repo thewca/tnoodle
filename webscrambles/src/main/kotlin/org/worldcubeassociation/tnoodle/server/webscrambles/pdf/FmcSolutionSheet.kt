@@ -172,7 +172,7 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
             if (showScrambleCount) {
                 // this is for ordered scrambles
                 val attemptIndex = activityCode.attemptNumber ?: index
-                val orderedIndex = max(attemptIndex, index + 1)
+                val orderedIndex = max(attemptIndex, index) + 1
 
                 val substitutions = mapOf(
                     "scrambleIndex" to orderedIndex.toString(),

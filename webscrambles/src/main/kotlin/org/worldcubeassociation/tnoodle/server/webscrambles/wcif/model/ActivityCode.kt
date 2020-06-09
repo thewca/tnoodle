@@ -29,7 +29,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
     val attemptNumber: Int?
         get() = intPart(WCIF_PREFIX_ATTEMPT)
 
-    private fun intPart(prefix: Char): Int? = structureParts[prefix]?.toIntOrNull()
+    private fun intPart(prefix: Char): Int? = structureParts[prefix]?.toIntOrNull()?.minus(1)
 
     fun isParentOf(child: ActivityCode): Boolean {
         return eventId == child.eventId
@@ -81,18 +81,20 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
             val iterLength = max(1, ceil(log(this.toFloat(), 26f)).roundToInt())
 
             return List(iterLength) {
-                'A' + ((this / 26f.pow(it).toInt()) % 26)
+                '@' + ((this / 26f.pow(it).toInt()) % 26)
             }.joinToString("").reversed()
         }
 
         fun compile(event: String, round: Int? = null, group: Int? = null, attempt: Int? = null): ActivityCode {
-            val parts = listOfNotNull(
-                round?.let { "$WCIF_PREFIX_ROUND$it" },
-                group?.let { "$WCIF_PREFIX_GROUP$it" },
-                attempt?.let { "$WCIF_PREFIX_ATTEMPT$it" }
-            )
+            val sections = listOfNotNull(
+                round?.let { WCIF_PREFIX_ROUND to it },
+                group?.let { WCIF_PREFIX_GROUP to it },
+                attempt?.let { WCIF_PREFIX_ATTEMPT to it }
+            ).toMap()
 
-            val specifier = parts.joinToString(WCIF_DELIMITER)
+            val parts = sections.mapValues { it.value + 1 }
+
+            val specifier = parts.entries.joinToString(WCIF_DELIMITER) { (k, v) -> "$k$v" }
             val codeString = "$event$WCIF_DELIMITER$specifier"
 
             return ActivityCode(codeString)
