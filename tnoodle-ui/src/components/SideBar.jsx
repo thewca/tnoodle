@@ -125,6 +125,14 @@ const SideBar = connect(
             return string + (number > 1 ? "s" : "");
         };
 
+        currentLocationWithoutQuery = () => {
+            return window.location.origin + window.location.pathname;
+        };
+
+        setPageWithoutRedirect = (url) => {
+            window.history.pushState(null, '', url);
+        }
+
         handleManualSelection = () => {
             this.props.updateEditingStatus(false);
             this.props.updateCompetitionId(null);
@@ -229,21 +237,13 @@ const SideBar = connect(
         updateCompetitionIdQueryParam = (competitionId) => {
             var searchParams = new URLSearchParams(window.location.search);
             searchParams.set("competitionId", competitionId);
-            window.history.pushState(
-                {},
-                "",
-                window.location.origin + "?" + searchParams.toString()
-            );
+            this.setPageWithoutRedirect(this.currentLocationWithoutQuery() + "?" + searchParams.toString())
         };
 
         removeCompetitionIdQueryParam = () => {
             var searchParams = new URLSearchParams(window.location.search);
             searchParams.delete("competitionId");
-            window.history.pushState(
-                {},
-                "",
-                window.location.origin + "?" + searchParams.toString()
-            );
+            this.setPageWithoutRedirect(this.currentLocationWithoutQuery() + "?" + searchParams.toString())
         };
 
         setWcif = (wcif) => {
