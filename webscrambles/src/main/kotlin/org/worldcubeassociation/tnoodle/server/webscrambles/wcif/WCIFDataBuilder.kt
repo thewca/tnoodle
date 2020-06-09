@@ -98,7 +98,7 @@ object WCIFDataBuilder {
         val drawingData = wcif.toScrambleSetData()
 
         val namedSheets = drawingData.scrambleSheets
-            .withUniqueTitles { it.compileTitleString() }
+            .withUniqueTitles { it.compileTitleString(Translate.DEFAULT_LOCALE) }
 
         val zippingData = CompetitionZippingData(wcif, namedSheets)
         return requestsToZip(zippingData, pdfPassword, generationDate, versionTag, generationUrl)
@@ -109,12 +109,12 @@ object WCIFDataBuilder {
         return scrambleZip.assemble(generationDate, versionTag, pdfPassword, generationUrl)
     }
 
-    fun wcifToCompletePdf(wcif: Competition, generationDate: LocalDate, versionTag: String): PdfContent {
+    fun wcifToCompletePdf(wcif: Competition, generationDate: LocalDate, versionTag: String, locale: Locale): PdfContent {
         val drawingData = wcif.toScrambleSetData()
-        return requestsToCompletePdf(drawingData, generationDate, versionTag)
+        return requestsToCompletePdf(drawingData, generationDate, versionTag, locale)
     }
 
-    fun requestsToCompletePdf(sheetRequest: CompetitionDrawingData, generationDate: LocalDate, versionTag: String): PdfContent {
+    fun requestsToCompletePdf(sheetRequest: CompetitionDrawingData, generationDate: LocalDate, versionTag: String, locale: Locale): PdfContent {
         val scrambleRequests = sheetRequest.scrambleSheets
 
         val originalPdfs = scrambleRequests.map {
@@ -122,7 +122,7 @@ object WCIFDataBuilder {
         }
 
         val configurations = scrambleRequests.map {
-            Triple(it.compileTitleString(false), it.activityCode.eventModel?.description.orEmpty(), it.numCopies)
+            Triple(it.compileTitleString(locale, false), it.activityCode.eventModel?.description.orEmpty(), it.numCopies)
         }
 
         return MergedPdfWithOutline(originalPdfs, configurations)

@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDrawingData
@@ -21,7 +22,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                     ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${act.scrambleSetId} associated with Activity $act")
             }.mapValues { (act, scrs) ->
                 scrs.filter { act.activityCode.isParentOf(it.activityCode) }.unlessEmpty()
-                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find any scramble sheet for activities affiliated with ${act.scrambleSetId}")
+                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find any activity for scramble sheets affiliated with ScrambleSet ${act.scrambleSetId}")
             }
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
@@ -87,7 +88,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                                     .flatMap { it.value }
 
                                 val sheetData = scrambleDrawingData.copy(scrambleSheets = sortedScrambles)
-                                val sheet = WCIFDataBuilder.requestsToCompletePdf(sheetData, generationDate, versionTag)
+                                val sheet = WCIFDataBuilder.requestsToCompletePdf(sheetData, generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
                                 file(pdfFileName, sheet.render())
                             }
@@ -105,7 +106,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                 .distinct()
 
             val allScramblesData = scrambleDrawingData.copy(scrambleSheets = allScramblesOrdered)
-            val completeOrderedPdf = WCIFDataBuilder.requestsToCompletePdf(allScramblesData, generationDate, versionTag)
+            val completeOrderedPdf = WCIFDataBuilder.requestsToCompletePdf(allScramblesData, generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
             val safeGlobalTitle = globalTitle.toFileSafeString()
             file("Ordered $safeGlobalTitle - All Scrambles.pdf", completeOrderedPdf.render())
