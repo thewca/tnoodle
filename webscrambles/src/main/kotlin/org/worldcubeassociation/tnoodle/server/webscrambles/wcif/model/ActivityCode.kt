@@ -41,12 +41,12 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
     }
 
     fun compileTitleString(includeEvent: Boolean = true, includeGroupID: Boolean = false): String {
-        val parts = structureParts.map { (k, v) ->
+        val parts = structureParts.mapNotNull { (k, v) ->
             val translatePrefix = PREFIX_TRANSLATIONS[k]
             val translateValue = v.takeUnless { k == WCIF_PREFIX_GROUP }
                 ?: v.toIntOrNull()?.toColumnIndexString()
 
-            "$translatePrefix $translateValue".takeUnless { !includeGroupID && k == WCIF_PREFIX_GROUP }.orEmpty()
+            "$translatePrefix $translateValue".takeUnless { !includeGroupID && k == WCIF_PREFIX_GROUP }
         }.joinToString(TRANSLATION_DELIMITER)
 
         if (!includeEvent) {

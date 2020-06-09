@@ -30,7 +30,7 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
         }
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking
-        return WatermarkPdfWrapper(genericSheet, activityCode.compileTitleString(includeGroupID = hasGroupID), creationDate, versionTag, sheetTitle, watermark)
+        return WatermarkPdfWrapper(genericSheet, compileTitleString(), creationDate, versionTag, sheetTitle, watermark)
     }
 
     fun copyForAttempt(attempt: Int): ScrambleDrawingData {
@@ -41,4 +41,6 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
 
         return copy(activityCode = modifiedActivityCode, scrambleSet = modifiedSet)
     }
+
+    fun compileTitleString(includeEvent: Boolean = true): String = activityCode.compileTitleString(includeEvent, hasGroupID)
 }
