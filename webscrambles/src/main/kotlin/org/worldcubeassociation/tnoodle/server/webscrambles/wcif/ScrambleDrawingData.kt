@@ -34,11 +34,11 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
     }
 
     fun copyForAttempt(attempt: Int): ScrambleDrawingData {
-        val origScrambles = scrambleSet.allScrambles
-        val designatedScramble = origScrambles[attempt - 1]
+        val modifiedActivityCode = activityCode.copyParts(attemptNumber = attempt)
 
+        val designatedScramble = scrambleSet.allScrambles[attempt]
         val modifiedSet = scrambleSet.copy(scrambles = listOf(designatedScramble))
 
-        return copy(scrambleSet = modifiedSet)
+        return copy(activityCode = modifiedActivityCode, scrambleSet = modifiedSet)
     }
 }
