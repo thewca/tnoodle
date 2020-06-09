@@ -1,11 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcAttemptCountExtension
 import java.util.Locale
 
-abstract class FmcSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, val competitionTitle: String, val locale: Locale = Translate.DEFAULT_LOCALE) : BaseScrambleSheet(scrambleSet, activityCode) {
+abstract class FmcSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, val competitionTitle: String, val locale: Locale) : BaseScrambleSheet(scrambleSet, activityCode) {
     val expectedAttemptNum: Int
         get() = scrambleSet.findExtension<FmcAttemptCountExtension>()
             ?.totalAttempts ?: 1
