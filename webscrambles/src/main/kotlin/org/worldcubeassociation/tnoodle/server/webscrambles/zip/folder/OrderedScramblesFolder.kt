@@ -16,13 +16,12 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
         val wcifBindings = wcifSchedule.allActivities
             // scrambleSetId as assigned by WCIFScrambleMatcher#matchActivity
             .filter { it.scrambleSetId != null }
-            .associateWith { ac ->
-                scrambleDrawingData.scrambleSheets.filter { it.scrambleSet.id == ac.scrambleSetId }.unlessEmpty()
-                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
+            .associateWith { act ->
+                scrambleDrawingData.scrambleSheets.filter { it.scrambleSet.id == act.scrambleSetId }.unlessEmpty()
+                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${act.scrambleSetId} associated with Activity $act")
             }.mapValues { (act, scrs) ->
-                scrs.singleOrNull { act.activityCode.isParentOf(it.activityCode) }
-                    ?: act.activityCode.attemptNumber?.let { scrs.singleOrNull()?.copyForAttempt(it) }
-                    ?: ScheduleMatchingException.error("Ordered Scrambles: Ambiguous matching for ScrambleSet ${act.scrambleSetId} associated with Activity $act")
+                scrs.filter { act.activityCode.isParentOf(it.activityCode) }.unlessEmpty()
+                    ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find any scramble sheet for activities affiliated with ${act.scrambleSetId}")
             }
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
@@ -63,7 +62,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                         val scrambles = activities.associateWith(wcifBindings::get)
                             .filterValuesNotNull()
 
-                        val activitiesHaveScrambles = scrambles.values.isNotEmpty()
+                        val activitiesHaveScrambles = scrambles.values.flatten().isNotEmpty()
 
                         if (activitiesHaveScrambles) {
                             val filenameDay = nthDay + 1
@@ -85,7 +84,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
 
                                 val sortedScrambles = scrambles.entries
                                     .sortedBy { it.key.getLocalStartTime(timezone) }
-                                    .map { it.value }
+                                    .flatMap { it.value }
 
                                 val sheetData = scrambleDrawingData.copy(scrambleSheets = sortedScrambles)
                                 val sheet = WCIFDataBuilder.requestsToCompletePdf(sheetData, generationDate, versionTag)
@@ -102,6 +101,7 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
                 .sortedBy { it.value }
                 // the notNull will effectively never happen, because we guarantee that all relevant activities are indexed
                 .mapNotNull { wcifBindings[it.key] }
+                .flatten()
                 .distinct()
 
             val allScramblesData = scrambleDrawingData.copy(scrambleSheets = allScramblesOrdered)
