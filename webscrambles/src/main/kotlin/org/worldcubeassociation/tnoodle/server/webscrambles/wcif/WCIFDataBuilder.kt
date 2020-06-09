@@ -28,13 +28,11 @@ object WCIFDataBuilder {
             e.rounds.flatMap { r ->
                 val copyCountExtension = r.findExtension<SheetCopyCountExtension>()
 
-                r.scrambleSets
-                    .flatMap { splitAttemptBasedEvents(e, r, it) }
-                    .mapIndexed { scrNum, it ->
-                        val copyCode = it.activityCode.copyParts(groupNumber = scrNum)
+                r.scrambleSets.withIndex()
+                    .flatMap { splitAttemptBasedEvents(e, r, it.index, it.value) }
+                    .map {
                         val extendedScrSet = it.scrambleSet.copy(extensions = it.scrambleSet.withExtension(copyCountExtension))
-
-                        it.copy(scrambleSet = extendedScrSet, activityCode = copyCode, watermark = frontendWatermark, hasGroupID = r.scrambleSetCount > 1)
+                        it.copy(scrambleSet = extendedScrSet, watermark = frontendWatermark, hasGroupID = r.scrambleSetCount > 1)
                     }
             }
         }
@@ -42,7 +40,9 @@ object WCIFDataBuilder {
         return CompetitionDrawingData(shortName, sheets)
     }
 
-    private fun splitAttemptBasedEvents(event: Event, round: Round, set: ScrambleSet): List<ScrambleDrawingData> {
+    private fun splitAttemptBasedEvents(event: Event, round: Round, group: Int, set: ScrambleSet): List<ScrambleDrawingData> {
+        val baseCode = round.idCode.copyParts(groupNumber = group + 1)
+
         // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
         // list of 333ni scrambles.
         // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
@@ -53,7 +53,7 @@ object WCIFDataBuilder {
                 val attemptExtensions = computeAttemptExtensions(event, round, scrambles)
 
                 // +1 for human readability so the first attempt (index 0) gets printed as "Attempt 1"
-                val pseudoCode = round.idCode.copyParts(attemptNumber = nthAttempt + 1)
+                val pseudoCode = baseCode.copyParts(attemptNumber = nthAttempt + 1)
 
                 val attemptScrambles = set.copy(
                     scrambles = scrambles,
@@ -65,11 +65,15 @@ object WCIFDataBuilder {
             }
         }
 
-        return listOf(defaultScrambleDrawingData(set, round.idCode))
+        val defaultExtensions = computeAttemptExtensions(event, round, set.scrambles)
+        val extendedSet = set.copy(extensions = set.withExtensions(defaultExtensions))
+
+        return listOf(defaultScrambleDrawingData(extendedSet, baseCode))
     }
 
-    private fun defaultScrambleDrawingData(set: ScrambleSet, ac: ActivityCode) =
-        ScrambleDrawingData(set, ac)
+    private fun defaultScrambleDrawingData(set: ScrambleSet, ac: ActivityCode): ScrambleDrawingData {
+        return ScrambleDrawingData(set, ac)
+    }
 
     private fun computeAttemptExtensions(event: Event, round: Round, scrambles: List<Scramble>): List<ExtensionBuilder> {
         return when (event.eventModel) {
