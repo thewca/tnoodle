@@ -10,7 +10,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
 
-class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String, locale: Locale) : FmcSheet(scrambleSet, activityCode, competitionTitle, locale) {
+class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String, locale: Locale, hasGroupID: Boolean) : FmcSheet(scrambleSet, activityCode, competitionTitle, locale, hasGroupID) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleSet.scrambles.indices) {
             addFmcScrambleCutoutSheet(document, i)
@@ -47,7 +47,7 @@ class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCod
         val scrambleSuffix = Translate.translate("fmc.scrambleXofY", locale, substitutions)
             .takeIf { expectedAttemptNum > 1 } ?: ""
 
-        val attemptTitle = activityCode.compileTitleString(locale)
+        val attemptTitle = activityCode.compileTitleString(locale, includeGroupID = hasGroupID)
         val title = "$competitionTitle - $attemptTitle$scrambleSuffix"
 
         // empty strings for space above and below

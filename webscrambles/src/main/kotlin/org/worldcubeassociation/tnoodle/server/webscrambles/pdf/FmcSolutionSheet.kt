@@ -17,7 +17,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String, locale: Locale) : FmcSheet(scrambleSet, activityCode, competitionTitle, locale) {
+open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String, locale: Locale, hasGroupID: Boolean) : FmcSheet(scrambleSet, activityCode, competitionTitle, locale, hasGroupID) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleSet.scrambles.indices) {
             addFmcSolutionSheet(document, i)
@@ -164,7 +164,8 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val compDetailItems = mutableListOf<Pair<String, Int>>()
 
         if (withScramble) {
-            val activityTitle = activityCode.copyParts(attemptNumber = null).compileTitleString(locale)
+            val activityTitle = activityCode.copyParts(attemptNumber = null)
+                .compileTitleString(locale, includeGroupID = hasGroupID)
 
             compDetailItems.add(competitionTitle to Element.ALIGN_CENTER)
             compDetailItems.add(activityTitle to Element.ALIGN_CENTER)

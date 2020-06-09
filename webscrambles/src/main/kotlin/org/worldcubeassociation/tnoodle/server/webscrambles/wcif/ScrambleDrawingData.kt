@@ -26,7 +26,7 @@ data class ScrambleDrawingData(val scrambleSet: ScrambleSet, val activityCode: A
         if (isFmc) {
             // We don't watermark the FMC sheets because they already have
             // the competition name on them. So we encrypt directly.
-            return FmcSolutionSheet(scrambleSet, activityCode, sheetTitle, locale)
+            return FmcSolutionSheet(scrambleSet, activityCode, sheetTitle, locale, hasGroupID)
         }
 
         val genericSheet = GeneralScrambleSheet(scrambleSet, activityCode) // encrypt when watermarking

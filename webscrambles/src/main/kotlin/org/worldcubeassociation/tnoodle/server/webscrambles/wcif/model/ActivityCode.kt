@@ -43,7 +43,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
         return compile(eventId, roundNumber, groupNumber, attemptNumber)
     }
 
-    fun compileTitleString(locale: Locale, includeEvent: Boolean = true, includeGroupID: Boolean = false): String {
+    fun compileTitleString(locale: Locale, includeEvent: Boolean = true, includeGroupID: Boolean = true): String {
         val parts = structureParts.mapNotNull { (k, v) ->
             getPrefixTranslation(locale, k, v).trim()
                 .takeUnless { k == WCIF_PREFIX_GROUP && !includeGroupID }
