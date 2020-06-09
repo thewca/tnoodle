@@ -41,7 +41,7 @@ object APIIntegrationTest {
             val scrambledWcif = WCIFScrambleMatcher.fillScrambleSets(blankWcif)
 
             println("Scrambles generated successfully. On to rendering the PDF…")
-            val completePdf = WCIFDataBuilder.wcifToCompletePdf(scrambledWcif, generationDate.toLocalDate(), "JUnit-Test")
+            val completePdf = WCIFDataBuilder.wcifToCompletePdf(scrambledWcif, generationDate.toLocalDate(), "JUnit-Test", Translate.DEFAULT_LOCALE)
             val renderedPdf = Assertions.assertDoesNotThrow(ThrowingSupplier { completePdf.render() })
             Assertions.assertTrue(renderedPdf.isNotEmpty())
 

@@ -7,6 +7,10 @@ import java.util.*
 
 class FmcGenericSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String, locale: Locale) : FmcSolutionSheet(scrambleSet, activityCode, competitionTitle, locale) {
     override fun PdfWriter.writeContents(document: Document) {
-        addFmcSolutionSheet(document, -1, locale)
+        addFmcSolutionSheet(document, INDEX_SKIP_SCRAMBLE)
+    }
+
+    companion object {
+        const val INDEX_SKIP_SCRAMBLE = -1
     }
 }

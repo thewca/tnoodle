@@ -20,13 +20,13 @@ import kotlin.math.min
 open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode, competitionTitle: String, locale: Locale) : FmcSheet(scrambleSet, activityCode, competitionTitle, locale) {
     override fun PdfWriter.writeContents(document: Document) {
         for (i in scrambleSet.scrambles.indices) {
-            addFmcSolutionSheet(document, i, locale)
+            addFmcSolutionSheet(document, i)
             document.newPage()
         }
     }
 
-    protected fun PdfWriter.addFmcSolutionSheet(doc: Document, index: Int, locale: Locale) {
-        val withScramble = index != -1
+    protected fun PdfWriter.addFmcSolutionSheet(doc: Document, index: Int) {
+        val withScramble = index != FmcGenericSolutionSheet.INDEX_SKIP_SCRAMBLE
         val pageSize = doc.pageSize
 
         val cb = directContent
@@ -164,7 +164,7 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val compDetailItems = mutableListOf<Pair<String, Int>>()
 
         if (withScramble) {
-            val activityTitle = activityCode.compileTitleString()
+            val activityTitle = activityCode.copyParts(attemptNumber = null).compileTitleString(locale)
 
             compDetailItems.add(competitionTitle to Element.ALIGN_CENTER)
             compDetailItems.add(activityTitle to Element.ALIGN_CENTER)

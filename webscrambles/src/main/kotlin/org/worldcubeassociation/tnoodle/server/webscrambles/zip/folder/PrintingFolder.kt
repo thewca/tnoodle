@@ -27,7 +27,7 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
 
         val pseudoActivityCode = ActivityCode.compile(EventData.THREE_FM, round = 1)
         val genericSolutionSheetPdf = FmcGenericSolutionSheet(ScrambleSet.empty(), pseudoActivityCode, globalTitle, Translate.DEFAULT_LOCALE)
-        val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag)
+        val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
         return folder("Printing") {
             folder("Scramble Sets") {

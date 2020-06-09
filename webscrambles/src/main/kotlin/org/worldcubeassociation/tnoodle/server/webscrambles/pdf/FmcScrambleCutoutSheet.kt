@@ -41,7 +41,7 @@ class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCod
         val scrambleSuffix = " - Scramble ${index + 1} of $expectedAttemptNum"
             .takeIf { expectedAttemptNum > 1 } ?: ""
 
-        val attemptTitle = activityCode.compileTitleString()
+        val attemptTitle = activityCode.compileTitleString(locale)
         val title = "$competitionTitle - $attemptTitle$scrambleSuffix"
 
         // empty strings for space above and below

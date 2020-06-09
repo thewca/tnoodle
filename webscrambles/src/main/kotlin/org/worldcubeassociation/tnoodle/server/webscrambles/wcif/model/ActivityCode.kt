@@ -3,7 +3,10 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 import kotlinx.serialization.*
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.serial.SingletonStringEncoder
+import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
+import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.TranslationException
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.provider.EventIdProvider
+import java.util.*
 import kotlin.math.*
 
 @Serializable
@@ -40,14 +43,11 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
         return compile(eventId, roundNumber, groupNumber, attemptNumber)
     }
 
-    fun compileTitleString(includeEvent: Boolean = true, includeGroupID: Boolean = false): String {
+    fun compileTitleString(locale: Locale, includeEvent: Boolean = true, includeGroupID: Boolean = false): String {
         val parts = structureParts.mapNotNull { (k, v) ->
-            val translatePrefix = PREFIX_TRANSLATIONS[k]
-            val translateValue = v.takeUnless { k == WCIF_PREFIX_GROUP }
-                ?: v.toIntOrNull()?.toColumnIndexString()
-
-            "$translatePrefix $translateValue".takeUnless { !includeGroupID && k == WCIF_PREFIX_GROUP }
-        }.joinToString(TRANSLATION_DELIMITER)
+            getPrefixTranslation(locale, k, v).trim()
+                .takeUnless { k == WCIF_PREFIX_GROUP && !includeGroupID }
+        }.filterNot { it.isEmpty() }.joinToString(TRANSLATION_DELIMITER)
 
         if (!includeEvent) {
             return parts
@@ -68,14 +68,26 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
         const val WCIF_PREFIX_GROUP = 'g'
         const val WCIF_PREFIX_ATTEMPT = 'a'
 
-        // TODO i18n
-        val PREFIX_TRANSLATIONS = mapOf(
-            WCIF_PREFIX_ROUND to "Round",
-            WCIF_PREFIX_GROUP to "Scramble Set", // FIXME I feel this is cheating. Better idea how to handle!
-            WCIF_PREFIX_ATTEMPT to "Attempt"
+        val PREFIX_TRANSLATION_KEYS = mapOf(
+            WCIF_PREFIX_ROUND to "round",
+            WCIF_PREFIX_GROUP to "Scramble Set", // FIXME Hack. Better idea how to handle!
+            WCIF_PREFIX_ATTEMPT to "attempt"
         )
 
         const val TRANSLATION_DELIMITER = " "
+
+        private fun getPrefixTranslation(locale: Locale, prefix: Char, value: String): String {
+            val prefixKey = PREFIX_TRANSLATION_KEYS[prefix]
+                ?: TranslationException.error("Untranslatable ActivityCode prefix: $prefix")
+
+            if (prefix == WCIF_PREFIX_GROUP) {
+                val convertedLetter = value.toIntOrNull()?.toColumnIndexString()
+                return "$prefixKey $convertedLetter"
+            }
+
+            val translatedKey = Translate.translate("fmc.$prefixKey", locale)
+            return "$translatedKey $value"
+        }
 
         fun Int.toColumnIndexString(): String {
             val iterLength = max(1, ceil(log(this.toFloat(), 26f)).roundToInt())

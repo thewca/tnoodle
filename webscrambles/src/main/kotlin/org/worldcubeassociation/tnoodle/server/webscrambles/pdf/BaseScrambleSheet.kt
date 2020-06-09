@@ -4,6 +4,7 @@ import com.itextpdf.text.Document
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfWriter
+import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import java.io.ByteArrayOutputStream
@@ -13,7 +14,7 @@ abstract class BaseScrambleSheet(val scrambleSet: ScrambleSet, val activityCode:
         Document(PAGE_SIZE, 0f, 0f, 75f, 75f).apply {
             addCreationDate()
             addProducer()
-            addTitle(activityCode.compileTitleString())
+            addTitle(activityCode.compileTitleString(Translate.DEFAULT_LOCALE))
         }
 
     override fun Document.getWriter(bytes: ByteArrayOutputStream): PdfWriter {
