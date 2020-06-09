@@ -21,32 +21,67 @@ object WCIFDataBuilder {
     const val WATERMARK_UNOFFICIAL = "UNOFFICIAL"
 
     fun Competition.toScrambleSetData(): CompetitionDrawingData {
+        val frontendStatus = findExtension<TNoodleStatusExtension>()
+        val frontendWatermark = frontendStatus?.pickWatermarkPhrase()
+
         val sheets = events.flatMap { e ->
             e.rounds.flatMap { r ->
-                r.scrambleSets.mapIndexed { scrNum, it ->
-                    val copyCode = r.idCode.copyParts(groupNumber = scrNum)
+                val copyCountExtension = r.findExtension<SheetCopyCountExtension>()
 
-                    val specificExtensions = if (e.eventModel == EventData.THREE_FM) {
-                        val formatExtension = FmcAttemptCountExtension(r.expectedAttemptNum)
-                        val languageExtension = r.findExtension<FmcLanguagesExtension>()
+                r.scrambleSets
+                    .flatMap { splitAttemptBasedEvents(e, r, it) }
+                    .mapIndexed { scrNum, it ->
+                        val copyCode = it.activityCode.copyParts(groupNumber = scrNum)
+                        val extendedScrSet = it.scrambleSet.copy(extensions = it.scrambleSet.withExtension(copyCountExtension))
 
-                        listOfNotNull(formatExtension, languageExtension)
-                    } else {
-                        listOf()
+                        it.copy(scrambleSet = extendedScrSet, activityCode = copyCode, watermark = frontendWatermark, hasGroupID = r.scrambleSetCount > 1)
                     }
-
-                    val generalExtensions = specificExtensions + r.findExtension<SheetCopyCountExtension>()
-                    val extendedScrSet = it.copy(extensions = it.withExtensions(generalExtensions))
-
-                    val frontendStatus = findExtension<TNoodleStatusExtension>()
-                    val frontendWatermark = frontendStatus?.pickWatermarkPhrase()
-
-                    ScrambleDrawingData(extendedScrSet, copyCode, frontendWatermark, r.scrambleSetCount > 1)
-                }
             }
         }
 
         return CompetitionDrawingData(shortName, sheets)
+    }
+
+    private fun splitAttemptBasedEvents(event: Event, round: Round, set: ScrambleSet): List<ScrambleDrawingData> {
+        // 333mbf is handled pretty specially: each "scramble" is actually a newline separated
+        // list of 333ni scrambles.
+        // If we detect that we're dealing with 333mbf, then we will generate 1 sheet per attempt,
+        // rather than 1 sheet per round (as we do with every other event).
+        if (event.eventModel in EventData.ATTEMPT_BASED_EVENTS) {
+            return set.scrambles.mapIndexed { nthAttempt, scrambleStr ->
+                val scrambles = scrambleStr.allScrambleStrings.map { Scramble(it) }
+                val attemptExtensions = computeAttemptExtensions(event, round, scrambles)
+
+                // +1 for human readability so the first attempt (index 0) gets printed as "Attempt 1"
+                val pseudoCode = round.idCode.copyParts(attemptNumber = nthAttempt + 1)
+
+                val attemptScrambles = set.copy(
+                    scrambles = scrambles,
+                    extraScrambles = listOf(),
+                    extensions = set.withExtensions(attemptExtensions)
+                )
+
+                defaultScrambleDrawingData(attemptScrambles, pseudoCode)
+            }
+        }
+
+        return listOf(defaultScrambleDrawingData(set, round.idCode))
+    }
+
+    private fun defaultScrambleDrawingData(set: ScrambleSet, ac: ActivityCode) =
+        ScrambleDrawingData(set, ac)
+
+    private fun computeAttemptExtensions(event: Event, round: Round, scrambles: List<Scramble>): List<ExtensionBuilder> {
+        return when (event.eventModel) {
+            EventData.THREE_FM -> {
+                val formatExtension = FmcAttemptCountExtension(round.expectedAttemptNum)
+                val languageExtension = round.findExtension<FmcLanguagesExtension>()
+
+                listOfNotNull(formatExtension, languageExtension)
+            }
+            EventData.THREE_MULTI_BLD -> listOf(FmcExtension(false), MultiScrambleCountExtension(scrambles.size))
+            else -> listOf()
+        }
     }
 
     fun TNoodleStatusExtension.pickWatermarkPhrase(): String? {
