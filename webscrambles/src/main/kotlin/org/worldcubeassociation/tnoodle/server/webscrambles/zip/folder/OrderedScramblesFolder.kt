@@ -17,10 +17,12 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
             // scrambleSetId as assigned by WCIFScrambleMatcher#matchActivity
             .filter { it.scrambleSetId != null }
             .associateWith { ac ->
-                scrambleDrawingData.scrambleSheets.find { it.scrambleSet.id == ac.scrambleSetId }
+                scrambleDrawingData.scrambleSheets.filter { it.scrambleSet.id == ac.scrambleSetId }.unlessEmpty()
                     ?: ScheduleMatchingException.error("Ordered Scrambles: Could not find ScrambleSet ${ac.scrambleSetId} associated with Activity $ac")
-            }.mapValues { (act, scr) ->
-                act.activityCode.attemptNumber?.let(scr::copyForAttempt) ?: scr
+            }.mapValues { (act, scrs) ->
+                scrs.singleOrNull { act.activityCode.isParentOf(it.activityCode) }
+                    ?: act.activityCode.attemptNumber?.let { scrs.singleOrNull()?.copyForAttempt(it) }
+                    ?: ScheduleMatchingException.error("Ordered Scrambles: Ambiguous matching for ScrambleSet ${act.scrambleSetId} associated with Activity $act")
             }
 
         val activityDays = wcifSchedule.activitiesWithLocalStartTimes
@@ -114,5 +116,6 @@ data class OrderedScramblesFolder(val globalTitle: String, val scrambleDrawingDa
         fun ZonedDateTime.atLocalStartOfDay() = toLocalDate().atStartOfDay(zone).toLocalDate()
 
         fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = mapNotNull { (k, v) -> v?.let { k to it } }.toMap()
+        fun <T, C : Collection<T>> C.unlessEmpty(): C? = takeIf { it.isNotEmpty() }
     }
 }
