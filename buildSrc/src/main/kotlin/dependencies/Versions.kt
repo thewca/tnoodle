@@ -6,15 +6,15 @@ object Versions {
     val KOTLIN = "1.3.72"
     val KTOR = "1.3.2"
     val PROGUARD = "6.2.2"
-    val KOTLESS = "0.1.3"
+    val KOTLESS = "0.1.5"
 
     val MARKDOWNJ_CORE = "0.4"
-    val ZIP4J = "2.5.2"
+    val ZIP4J = "2.6.1"
     val ITEXTPDF = "5.5.13.1"
     val BATIK_TRANSCODER = BATIK
     val SNAKEYAML = "1.26"
     val SYSTEM_TRAY = "3.17"
-    val BOUNCYCASTLE = "1.65"
+    val BOUNCYCASTLE = "1.65.01"
     val JUNIT_JUPITER_API = JUNIT_JUPITER
     val JUNIT_JUPITER_ENGINE = JUNIT_JUPITER
     val KOTLIN_STDLIB_JVM = KOTLIN
@@ -30,15 +30,15 @@ object Versions {
     val KOTLIN_ARGPARSER = "2.0.7"
     val PROGUARD_GRADLE = PROGUARD
     val WCA_I18N = "0.4.3"
-    val GOOGLE_APPENGINE_GRADLE = "2.2.0"
-    val GOOGLE_CLOUD_STORAGE = "1.108.0"
+    val GOOGLE_APPENGINE_GRADLE = "2.3.0"
+    val GOOGLE_CLOUD_STORAGE = "1.110.0"
     val TNOODLE_SCRAMBLES = "0.18.0"
     val APACHE_COMMONS_LANG3 = "3.10"
     val KOTLESS_KTOR = KOTLESS
     val TESTING_MOCKK = "1.10.0"
 
     object Plugins {
-        val SHADOW = "5.2.0"
+        val SHADOW = "6.0.0"
         val NODEJS = "2.2.4"
         val DEPENDENCY_VERSIONS = "0.28.0"
         val GIT_VERSION_TAG = "0.12.3"
