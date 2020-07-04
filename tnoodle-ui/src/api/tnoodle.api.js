@@ -1,5 +1,5 @@
 //let baseUrl = window.location.origin;
-let baseUrl = window.location.origin;
+let baseUrl = "https://secret-atoll-71628.herokuapp.com";
 
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
