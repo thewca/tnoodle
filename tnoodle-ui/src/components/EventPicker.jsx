@@ -199,8 +199,6 @@ const EventPicker = connect(
             let secondColumnStyle = { width: "25%" };
             let lastTwoColumnsStyle = { width: "35%" };
 
-            let disabled = this.props.editingDisabled;
-
             return (
                 <table className="table table-sm shadow rounded">
                     <thead>

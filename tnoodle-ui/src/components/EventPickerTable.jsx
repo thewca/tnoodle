@@ -196,7 +196,7 @@ const EventPickerTable = connect(
             }
             return (
                 <div className="row">
-                    <div class="col-12">
+                    <div className="col-12">
                         <p>
                             Found {this.props.wcif.events.length} event
                             {this.props.wcif.events.length > 1

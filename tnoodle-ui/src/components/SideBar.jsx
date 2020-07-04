@@ -220,6 +220,9 @@ const SideBar = connect(
         // In case we use competitionId from query params, it's not fetched.
         // We add it to the list.
         maybeAddCompetition = (competitionId, competitionName) => {
+            if (!this.state.competitions) {
+                return;
+            }
             if (
                 !this.state.competitions.find(
                     (competition) => competition.name === competitionName
