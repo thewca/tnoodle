@@ -1,5 +1,6 @@
-//let baseUrl = window.location.origin;
-let baseUrl = "https://secret-atoll-71628.herokuapp.com";
+// let baseUrl = window.location.origin;
+// let baseUrl = "http://localhost:2014";
+let baseUrl = "https://secret-atoll-71628.herokuapp.com"; // Fake tnoodle API. It does not generate scrambles.
 
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";

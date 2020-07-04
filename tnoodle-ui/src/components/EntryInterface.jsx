@@ -2,20 +2,20 @@ import React, { Component } from "react";
 import {
     updatePassword,
     updateCompetitionName,
-    updateFileZipBlob
+    updateFileZipBlob,
 } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
     editingDisabled: store.editingDisabled,
-    competitionName: store.wcif.name
+    competitionName: store.wcif.name,
 });
 
 const mapDispatchToProps = {
     updatePassword,
     updateCompetitionName,
-    updateFileZipBlob
+    updateFileZipBlob,
 };
 
 const EntryInterface = connect(
@@ -29,7 +29,7 @@ const EntryInterface = connect(
             this.state = {
                 editingDisabled: props.editingDisabled,
                 password: "",
-                showPassword: false
+                showPassword: false,
             };
         }
 
@@ -37,14 +37,14 @@ const EntryInterface = connect(
             this.props.updateCompetitionName(getDefaultCompetitionName());
         }
 
-        handleCompetitionNameChange = event => {
+        handleCompetitionNameChange = (event) => {
             this.props.updateCompetitionName(event.target.value);
 
             // Require another zip with the new name.
             this.props.updateFileZipBlob(null);
         };
 
-        handlePasswordChange = event => {
+        handlePasswordChange = (event) => {
             let state = this.state;
             state.password = event.target.value;
             this.setState(state);
@@ -65,39 +65,45 @@ const EntryInterface = connect(
             let competitionName = this.props.competitionName;
             let disabled = this.props.editingDisabled;
             return (
-                <div className="container mt-2">
-                    <div className="row">
-                        <div className="col-md-6 text-left form-group">
-                            <label className="font-weight-bold pr-1">
-                                Competition Name
-                            </label>
-                            <input
-                                className="form-control"
-                                placeholder="Competition Name"
-                                onChange={this.handleCompetitionNameChange}
-                                value={competitionName}
-                                disabled={disabled ? "disabled" : ""}
-                            />
-                        </div>
-
-                        <div className="col-md-6 text-left form-group">
-                            <label className="font-weight-bold pr-1">
-                                Password
-                            </label>
-                            <input
-                                className="form-control"
-                                placeholder="Password"
-                                type={this.state.showPassword ? "" : "password"}
-                                onChange={this.handlePasswordChange}
-                                value={this.state.password}
-                            />
-                            <div onClick={this.toogleShowPassword}>
+                <div className="row">
+                    <div className="container mt-2">
+                        <div className="row">
+                            <div className="col-md-6 text-left form-group">
+                                <label className="font-weight-bold pr-1">
+                                    Competition Name
+                                </label>
                                 <input
-                                    type="checkbox"
-                                    checked={this.state.showPassword}
-                                    readOnly
+                                    className="form-control"
+                                    placeholder="Competition Name"
+                                    onChange={this.handleCompetitionNameChange}
+                                    value={competitionName}
+                                    disabled={disabled ? "disabled" : ""}
                                 />
-                                <label>Show password</label>
+                            </div>
+
+                            <div className="col-md-6 text-left form-group">
+                                <label className="font-weight-bold pr-1">
+                                    Password
+                                </label>
+                                <input
+                                    className="form-control"
+                                    placeholder="Password"
+                                    type={
+                                        this.state.showPassword
+                                            ? ""
+                                            : "password"
+                                    }
+                                    onChange={this.handlePasswordChange}
+                                    value={this.state.password}
+                                />
+                                <div onClick={this.toogleShowPassword}>
+                                    <input
+                                        type="checkbox"
+                                        checked={this.state.showPassword}
+                                        readOnly
+                                    />
+                                    <label>Show password</label>
+                                </div>
                             </div>
                         </div>
                     </div>

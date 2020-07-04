@@ -346,13 +346,16 @@ const SideBar = connect(
                         style={{ listStyleType: "none" }}
                     >
                         <li>
-                            <button
-                                type="button"
-                                className="btn btn-primary btn-lg btn-block mb-2"
-                                onClick={this.handleManualSelection}
-                            >
-                                Manual Selection
-                            </button>
+                            {(this.state.competitions != null &&
+                                this.state.competitions.length) > 0 && (
+                                <button
+                                    type="button"
+                                    className="btn btn-primary btn-lg btn-block mb-2"
+                                    onClick={this.handleManualSelection}
+                                >
+                                    Manual Selection
+                                </button>
+                            )}
                         </li>
                         {this.state.competitions != null &&
                             this.state.competitions.map((competition, i) => (
