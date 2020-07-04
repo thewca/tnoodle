@@ -29,13 +29,8 @@ const EventPicker = connect(
             return { id: this.props.event.id, rounds };
         };
 
-        handleNumberOfRoundsChange = (rounds, value) => {
-            let numberOfRounds = Number(value);
-
-            if (numberOfRounds < 0 || numberOfRounds > MAX_WCA_ROUNDS) {
-                return;
-            }
-
+        handleNumberOfRoundsChange = (numberOfRounds, rounds) => {
+            console.log(numberOfRounds, rounds);
             // Ajust the number of rounds in case we have to remove
             while (rounds.length > numberOfRounds) {
                 rounds.pop();
@@ -125,6 +120,7 @@ const EventPicker = connect(
                                 </th>
                                 <td className="align-middle">
                                     <select
+                                        className="form-control"
                                         value={rounds[i].format}
                                         onChange={(evt) =>
                                             this.handleRoundFormatChanged(
@@ -199,24 +195,25 @@ const EventPicker = connect(
             );
             let rounds = wcaEvent != null ? wcaEvent.rounds : [];
 
-            let styleFirstTwoColumns = { width: "10%" };
-            let styleLastTwoColumns = { width: "40%" };
+            let firstCColumnStyle = { width: "5%" };
+            let secondColumnStyle = { width: "25%" };
+            let lastTwoColumnsStyle = { width: "35%" };
 
             let disabled = this.props.editingDisabled;
 
             return (
-                <table className="table table-sm m-0 shadow rounded">
+                <table className="table table-sm shadow rounded">
                     <thead>
                         <tr
                             className={
                                 rounds.length === 0
-                                    ? "bg-dark text-white"
+                                    ? "thead-dark text-white"
                                     : "thead-light"
                             }
                         >
-                            <th style={styleFirstTwoColumns} scope="col"></th>
+                            <th style={firstCColumnStyle} scope="col"></th>
                             <th
-                                style={styleFirstTwoColumns}
+                                style={secondColumnStyle}
                                 scope="col"
                                 className="align-middle"
                             >
@@ -224,10 +221,11 @@ const EventPicker = connect(
                                     className="img-thumbnail"
                                     src={require(`../assets/cubing-icon/${this.props.event.id}.svg`)}
                                     alt="TNoodle logo"
+                                    style={{ height: "10vh" }}
                                 />
                             </th>
                             <th
-                                style={styleLastTwoColumns}
+                                style={lastTwoColumnsStyle}
                                 className="align-middle"
                                 scope="col"
                             >
@@ -235,22 +233,32 @@ const EventPicker = connect(
                                     {this.props.event.name}
                                 </h5>
                             </th>
-                            <th style={styleLastTwoColumns} scope="col">
+                            <th style={lastTwoColumnsStyle} scope="col">
                                 <label>Rounds</label>
-                                <input
-                                    className="bg-light form-control"
-                                    type="number"
+                                <select
+                                    className="form-control"
                                     value={rounds.length}
                                     onChange={(evt) =>
                                         this.handleNumberOfRoundsChange(
-                                            rounds,
-                                            Number(evt.target.value)
+                                            evt.target.value,
+                                            rounds
                                         )
                                     }
-                                    min={0}
-                                    max={MAX_WCA_ROUNDS}
-                                    disabled={disabled ? "disabled" : ""}
-                                />
+                                    disabled={
+                                        this.props.editingDisabled
+                                            ? "disabled"
+                                            : ""
+                                    }
+                                >
+                                    {Array.from(
+                                        { length: MAX_WCA_ROUNDS + 1 },
+                                        (_, i) => (
+                                            <option key={i} value={i}>
+                                                {i}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
                             </th>
                         </tr>
                         {this.maybeShowTableTitles(rounds)}

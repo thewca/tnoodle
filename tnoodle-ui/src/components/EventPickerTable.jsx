@@ -196,26 +196,29 @@ const EventPickerTable = connect(
             }
             return (
                 <div className="row">
-                    <p>
-                        Found {this.props.wcif.events.length} event
-                        {this.props.wcif.events.length > 1 ? "s" : ""} for{" "}
-                        {this.props.wcif.name}.
-                    </p>
-                    <p>
-                        You can view and change the rounds over on{" "}
-                        <a
-                            href={toWcaUrl(
-                                `/competitions/${this.props.competitionId}/events/edit`
-                            )}
-                        >
-                            the WCA.
-                        </a>
-                        <strong>
-                            {" "}
-                            Refresh this page after making any changes on the
-                            WCA website.
-                        </strong>
-                    </p>
+                    <div class="col-12">
+                        <p>
+                            Found {this.props.wcif.events.length} event
+                            {this.props.wcif.events.length > 1
+                                ? "s"
+                                : ""} for {this.props.wcif.name}.
+                        </p>
+                        <p>
+                            You can view and change the rounds over on{" "}
+                            <a
+                                href={toWcaUrl(
+                                    `/competitions/${this.props.competitionId}/events/edit`
+                                )}
+                            >
+                                the WCA.
+                            </a>
+                            <strong>
+                                {" "}
+                                Refresh this page after making any changes on
+                                the WCA website.
+                            </strong>
+                        </p>
+                    </div>
                 </div>
             );
         };
@@ -278,9 +281,7 @@ const EventPickerTable = connect(
 
             let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
 
-            let classColPerEvent = `p-1 col-${
-                BOOTSTRAP_GRID / EVENTS_PER_LINE
-            }`;
+            let classColPerEvent = ` col-${BOOTSTRAP_GRID / EVENTS_PER_LINE}`;
             return (
                 <div className="row">
                     <div className="container-fluid">

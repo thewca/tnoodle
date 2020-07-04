@@ -198,7 +198,7 @@ const FmcTranslationsDetail = connect(
                     <tr>
                         <th colSpan={4} className="text-center">
                             <button
-                                className="btn btn-info"
+                                className="btn btn-primary"
                                 onClick={this.toggleTranslations}
                             >
                                 Translations
