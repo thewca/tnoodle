@@ -5,7 +5,7 @@ import { fetchVersionInfo } from "../api/wca.api";
 import { updateOfficialZipStatus } from "../redux/ActionCreators";
 
 const mapDispatchToProps = {
-    updateOfficialZipStatus
+    updateOfficialZipStatus,
 };
 
 const VersionInfo = connect(
@@ -19,33 +19,33 @@ const VersionInfo = connect(
                 currentTnoodle: null,
                 allowedTnoodleVersions: null,
                 runningVersion: null,
-                officialBuild: null
+                officialBuild: null,
             };
         }
 
         componentDidMount() {
             // Fetch from WCA API.
             fetchVersionInfo()
-                .then(response => {
+                .then((response) => {
                     this.setState({
                         ...this.state,
                         currentTnoodle: response.current,
-                        allowedTnoodleVersions: response.allowed
+                        allowedTnoodleVersions: response.allowed,
                     });
                 })
-                .catch(e => console.error(e));
+                .catch((e) => console.error(e));
 
             fetchRunningVersion()
-                .then(response => response.json())
-                .then(version => {
+                .then((response) => response.json())
+                .then((version) => {
                     let { runningVersion, officialBuild } = version;
                     this.setState({
                         ...this.state,
                         runningVersion,
-                        officialBuild
+                        officialBuild,
                     });
                 })
-                .catch(e => console.error(e));
+                .catch((e) => console.error(e));
         }
 
         render() {
@@ -68,8 +68,8 @@ const VersionInfo = connect(
             if (!officialBuild) {
                 this.props.updateOfficialZipStatus(false);
                 return (
-                    <div className="row text-white text-right">
-                        <div className="col-12 bg-danger">
+                    <div className="row text-right">
+                        <div className="col-12 alert alert-danger">
                             This TNoodle version is not official and scrambles
                             generated with this must not be used in competition.
                             You are on version {runningVersion}, you should use{" "}
@@ -85,7 +85,7 @@ const VersionInfo = connect(
                 this.props.updateOfficialZipStatus(false);
                 return (
                     <div className="row text-white text-right">
-                        <div className="col-12 bg-danger">
+                        <div className="col-12 alert alert-danger">
                             This TNoodle version is not allowed. Do not use
                             scrambles generated in any official competition and
                             consider downloading the latest version{" "}
@@ -105,7 +105,7 @@ const VersionInfo = connect(
             ) {
                 return (
                     <div className="row text-white text-right">
-                        <div className="col-12 bg-info">
+                        <div className="col-12 alert alert-info">
                             You are running {runningVersion}, which is still
                             allowed, but you should upgrade to{" "}
                             {currentTnoodle.name} available{" "}
