@@ -18,6 +18,7 @@ const defaultStore = {
     wcaFormats: null,
     wcaEvents: null,
     flashMessage: { text: "", bootstrapBackground: "" },
+    competitions: null,
 };
 
 export const Reducer = (store, action) => {
