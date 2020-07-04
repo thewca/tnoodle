@@ -210,7 +210,7 @@ const EventPicker = connect(
                         <tr
                             className={
                                 rounds.length === 0
-                                    ? "bg-secondary text-white"
+                                    ? "bg-dark text-white"
                                     : "thead-light"
                             }
                         >

@@ -29,6 +29,7 @@ import {
     fetchBestMbldAttempt,
 } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
+import "./SideBar.css";
 
 const mapStateToProps = (store) => ({
     me: store.me,
@@ -130,8 +131,8 @@ const SideBar = connect(
         };
 
         setPageWithoutRedirect = (url) => {
-            window.history.pushState(null, '', url);
-        }
+            window.history.pushState(null, "", url);
+        };
 
         handleManualSelection = () => {
             this.props.updateEditingStatus(false);
@@ -237,13 +238,21 @@ const SideBar = connect(
         updateCompetitionIdQueryParam = (competitionId) => {
             var searchParams = new URLSearchParams(window.location.search);
             searchParams.set("competitionId", competitionId);
-            this.setPageWithoutRedirect(this.currentLocationWithoutQuery() + "?" + searchParams.toString())
+            this.setPageWithoutRedirect(
+                this.currentLocationWithoutQuery() +
+                    "?" +
+                    searchParams.toString()
+            );
         };
 
         removeCompetitionIdQueryParam = () => {
             var searchParams = new URLSearchParams(window.location.search);
             searchParams.delete("competitionId");
-            this.setPageWithoutRedirect(this.currentLocationWithoutQuery() + "?" + searchParams.toString())
+            this.setPageWithoutRedirect(
+                this.currentLocationWithoutQuery() +
+                    "?" +
+                    searchParams.toString()
+            );
         };
 
         setWcif = (wcif) => {
@@ -265,10 +274,10 @@ const SideBar = connect(
 
         logInButton = () => {
             return (
-                <li className="pt-2">
+                <div id="login-area" className="w-100">
                     <button
                         type="button"
-                        className="btn btn-light btn-lg btn-block btn-outline-secondary"
+                        className="btn btn-primary btn-lg btn-block"
                         onClick={isLogged() ? logOut : logIn}
                     >
                         {isLogged() ? "Log Out" : "Log In"}
@@ -285,7 +294,7 @@ const SideBar = connect(
                                 )} upcoming.`}
                         </p>
                     )}
-                </li>
+                </div>
             );
         };
 
@@ -323,7 +332,7 @@ const SideBar = connect(
 
         render() {
             return (
-                <div className="sticky-top">
+                <div className="sticky-top h-100">
                     <img
                         className="tnoodle-logo mt-2"
                         src={require("../assets/tnoodle_logo.svg")}
@@ -339,7 +348,7 @@ const SideBar = connect(
                         <li>
                             <button
                                 type="button"
-                                className="btn btn-dark btn-lg btn-block btn-outline-light mb-2"
+                                className="btn btn-primary btn-lg btn-block mb-2"
                                 onClick={this.handleManualSelection}
                             >
                                 Manual Selection
@@ -350,7 +359,7 @@ const SideBar = connect(
                                 <li key={i}>
                                     <button
                                         type="button"
-                                        className="btn btn-dark btn-lg btn-block btn-outline-light"
+                                        className="btn btn-primary btn-lg btn-block"
                                         onClick={(_) =>
                                             this.handleCompetitionSelection(
                                                 competition.id
@@ -361,9 +370,9 @@ const SideBar = connect(
                                     </button>
                                 </li>
                             ))}
-                        {this.logInButton()}
                     </ul>
                     {this.loadingArea()}
+                    {this.logInButton()}
                 </div>
             );
         }

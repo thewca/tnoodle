@@ -278,7 +278,7 @@ const EventPickerTable = connect(
 
             let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
 
-            let classColPerEvent = `border border-dark p-1 col-${
+            let classColPerEvent = `p-1 col-${
                 BOOTSTRAP_GRID / EVENTS_PER_LINE
             }`;
             return (
