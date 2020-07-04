@@ -29,7 +29,6 @@ import {
     fetchBestMbldAttempt,
 } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
-import "./SideBar.css";
 
 const mapStateToProps = (store) => ({
     me: store.me,
@@ -68,6 +67,7 @@ const SideBar = connect(
                 competitionId: null,
             };
         }
+        margin = 1; // Margin for login button and "Manual Selection"
 
         componentDidMount() {
             if (this.state.me == null && isLogged()) {
@@ -274,10 +274,10 @@ const SideBar = connect(
 
         logInButton = () => {
             return (
-                <div id="login-area" className="w-100">
+                <div id="login-area" className={`w-100 mt-${this.margin}`}>
                     <button
                         type="button"
-                        className="btn btn-primary btn-lg btn-block"
+                        className="btn btn-primary btn-lg btn-block btn-outline-light"
                         onClick={isLogged() ? logOut : logIn}
                     >
                         {isLogged() ? "Log Out" : "Log In"}
@@ -332,7 +332,7 @@ const SideBar = connect(
 
         render() {
             return (
-                <div className="sticky-top h-100">
+                <div className="h-100">
                     <img
                         className="tnoodle-logo mt-2"
                         src={require("../assets/tnoodle_logo.svg")}
@@ -341,40 +341,45 @@ const SideBar = connect(
                     <h1 className="display-3" id="title">
                         TNoodle
                     </h1>
-                    <ul
-                        className="list-group"
-                        style={{ listStyleType: "none" }}
-                    >
-                        <li>
-                            {(this.state.competitions != null &&
-                                this.state.competitions.length) > 0 && (
-                                <button
-                                    type="button"
-                                    className="btn btn-primary btn-lg btn-block mb-2"
-                                    onClick={this.handleManualSelection}
-                                >
-                                    Manual Selection
-                                </button>
-                            )}
-                        </li>
-                        {this.state.competitions != null &&
-                            this.state.competitions.map((competition, i) => (
-                                <li key={i}>
+                    <div>
+                        <ul
+                            className="list-group"
+                            style={{ listStyleType: "none" }}
+                        >
+                            <li>
+                                {(this.state.competitions != null &&
+                                    this.state.competitions.length) > 0 && (
                                     <button
                                         type="button"
-                                        className="btn btn-primary btn-lg btn-block"
-                                        onClick={(_) =>
-                                            this.handleCompetitionSelection(
-                                                competition.id
-                                            )
-                                        }
+                                        className={`btn btn-primary btn-lg btn-block btn-outline-light mb-${this.margin}`}
+                                        onClick={this.handleManualSelection}
                                     >
-                                        {competition.name}
+                                        Manual Selection
                                     </button>
-                                </li>
-                            ))}
-                    </ul>
-                    {this.loadingArea()}
+                                )}
+                            </li>
+                            {this.state.competitions != null &&
+                                this.state.competitions.map(
+                                    (competition, i) => (
+                                        <li key={i}>
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary btn-lg btn-block m-1"
+                                                onClick={(_) =>
+                                                    this.handleCompetitionSelection(
+                                                        competition.id
+                                                    )
+                                                }
+                                            >
+                                                {competition.name}
+                                            </button>
+                                        </li>
+                                    )
+                                )}
+                        </ul>
+
+                        {this.loadingArea()}
+                    </div>
                     {this.logInButton()}
                 </div>
             );
