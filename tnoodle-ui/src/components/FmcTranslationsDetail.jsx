@@ -76,15 +76,6 @@ const FmcTranslationsDetail = connect(
                 TRANSLATIONS_PER_LINE
             );
 
-            let chunkWidth = 100.0 / TRANSLATIONS_PER_LINE; // For each translation
-            let labelWidth = 0.7 * chunkWidth;
-            let checkboxAndSpaceWidth = (chunkWidth - labelWidth) / 2;
-            let labelStyle = {
-                width: `${labelWidth}%`,
-            };
-            let checkboxAndSpaceStyle = {
-                width: `${checkboxAndSpaceWidth}%`,
-            };
             return (
                 <React.Fragment>
                     <tr>
@@ -130,11 +121,7 @@ const FmcTranslationsDetail = connect(
                                                             <React.Fragment
                                                                 key={j}
                                                             >
-                                                                <th
-                                                                    style={
-                                                                        labelStyle
-                                                                    }
-                                                                >
+                                                                <th>
                                                                     <label
                                                                         htmlFor={
                                                                             checkboxId
@@ -145,11 +132,7 @@ const FmcTranslationsDetail = connect(
                                                                         )}
                                                                     </label>
                                                                 </th>
-                                                                <th
-                                                                    style={
-                                                                        checkboxAndSpaceStyle
-                                                                    }
-                                                                >
+                                                                <th>
                                                                     <input
                                                                         type="checkbox"
                                                                         id={
@@ -168,11 +151,7 @@ const FmcTranslationsDetail = connect(
                                                                 {j <
                                                                     TRANSLATIONS_PER_LINE -
                                                                         1 && (
-                                                                    <th
-                                                                        style={
-                                                                            checkboxAndSpaceStyle
-                                                                        }
-                                                                    />
+                                                                    <th />
                                                                 )}
                                                             </React.Fragment>
                                                         );
