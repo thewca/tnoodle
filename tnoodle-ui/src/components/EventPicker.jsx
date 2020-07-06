@@ -8,6 +8,7 @@ import {
 } from "../api/tnoodle.api";
 import MbldDetail from "./MbldDetail";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
+import "./EventPicker.css";
 
 const mapStateToProps = (store) => ({
     editingDisabled: store.editingDisabled,
@@ -30,7 +31,6 @@ const EventPicker = connect(
         };
 
         handleNumberOfRoundsChange = (numberOfRounds, rounds) => {
-            console.log(numberOfRounds, rounds);
             // Ajust the number of rounds in case we have to remove
             while (rounds.length > numberOfRounds) {
                 rounds.pop();
@@ -195,10 +195,6 @@ const EventPicker = connect(
             );
             let rounds = wcaEvent != null ? wcaEvent.rounds : [];
 
-            let firstCColumnStyle = { width: "5%" };
-            let secondColumnStyle = { width: "25%" };
-            let lastTwoColumnsStyle = { width: "35%" };
-
             return (
                 <table className="table table-sm shadow rounded">
                     <thead>
@@ -209,29 +205,26 @@ const EventPicker = connect(
                                     : "thead-light"
                             }
                         >
-                            <th style={firstCColumnStyle} scope="col"></th>
+                            <th className="firstColumn" scope="col"></th>
                             <th
-                                style={secondColumnStyle}
                                 scope="col"
-                                className="align-middle"
+                                className="align-middle secondColumn"
                             >
                                 <img
-                                    className="img-thumbnail"
+                                    className="img-thumbnail cubingIcon"
                                     src={require(`../assets/cubing-icon/${this.props.event.id}.svg`)}
                                     alt="TNoodle logo"
-                                    style={{ height: "10vh" }}
                                 />
                             </th>
                             <th
-                                style={lastTwoColumnsStyle}
-                                className="align-middle"
+                                className="align-middle lastTwoColumns"
                                 scope="col"
                             >
                                 <h5 className="font-weight-bold">
                                     {this.props.event.name}
                                 </h5>
                             </th>
-                            <th style={lastTwoColumnsStyle} scope="col">
+                            <th className="lastTwoColumns" scope="col">
                                 <label>Rounds</label>
                                 <select
                                     className="form-control"

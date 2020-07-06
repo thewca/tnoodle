@@ -1,0 +1,15 @@
+.firstColumn {
+    width: 5%;
+}
+
+.secondColumn {
+    width: 25%;
+}
+
+.lastTwoColumns {
+    width: 35%;
+}
+
+.cubingIcon {
+    height: 10vh !important;
+}
