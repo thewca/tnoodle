@@ -29,6 +29,7 @@ import {
     fetchBestMbldAttempt,
 } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
+import "./SideBar.css";
 
 const mapStateToProps = (store) => ({
     me: store.me,
@@ -345,10 +346,7 @@ const SideBar = connect(
                         TNoodle
                     </h1>
                     <div>
-                        <ul
-                            className="list-group"
-                            style={{ listStyleType: "none" }}
-                        >
+                        <ul className="list-group">
                             <li>
                                 {(this.state.competitions != null &&
                                     this.state.competitions.length) > 0 && (
