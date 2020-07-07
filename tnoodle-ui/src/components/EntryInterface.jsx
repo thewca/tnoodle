@@ -96,13 +96,21 @@ const EntryInterface = connect(
                                     onChange={this.handlePasswordChange}
                                     value={this.state.password}
                                 />
-                                <div onClick={this.toogleShowPassword}>
+                                <div className="form-check">
                                     <input
                                         type="checkbox"
                                         checked={this.state.showPassword}
+                                        id="showPassword"
                                         readOnly
+                                        onClick={this.toogleShowPassword}
+                                        class="form-check-input"
                                     />
-                                    <label>Show password</label>
+                                    <label
+                                        htmlFor="showPassword"
+                                        className="form-check-label"
+                                    >
+                                        Show password
+                                    </label>
                                 </div>
                             </div>
                         </div>
