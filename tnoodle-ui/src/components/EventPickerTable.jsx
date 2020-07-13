@@ -16,6 +16,7 @@ import {
     updateFlashMessage,
 } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
+import "./EventPickerTable.css";
 
 let DANGER = "danger";
 
@@ -227,7 +228,7 @@ const EventPickerTable = connect(
             if (this.state.generatingScrambles) {
                 return (
                     <button
-                        className="btn btn-primary btn-lg"
+                        className="btn btn-primary btn-lg button-transparent"
                         title="Wait until the process is done"
                         disabled
                     >

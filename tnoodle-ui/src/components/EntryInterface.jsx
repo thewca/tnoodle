@@ -103,7 +103,7 @@ const EntryInterface = connect(
                                         id="showPassword"
                                         readOnly
                                         onClick={this.toogleShowPassword}
-                                        class="form-check-input"
+                                        className="form-check-input"
                                     />
                                     <label
                                         htmlFor="showPassword"
