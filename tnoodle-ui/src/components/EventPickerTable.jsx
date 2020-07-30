@@ -251,9 +251,14 @@ const EventPickerTable = connect(
             let disableScrambleButton = !this.props.wcif.events
                 .map((event) => event.rounds.length > 0)
                 .reduce((flag1, flag2) => flag1 || flag2, false);
+
+            // In case the user did not select any events, we make the button a little more transparent than disabled
+            let btnClass =
+                "btn btn-primary btn-lg" +
+                (disableScrambleButton ? " button-transparent" : "");
             return (
                 <button
-                    className="btn btn-primary btn-lg"
+                    className={btnClass}
                     onClick={this.handleScrambleButton}
                     disabled={disableScrambleButton}
                     title={disableScrambleButton ? "No events selected." : ""}
