@@ -287,7 +287,9 @@ const EventPickerTable = connect(
 
             let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
 
-            let classColPerEvent = ` col-${BOOTSTRAP_GRID / EVENTS_PER_LINE}`;
+            let classColPerEvent = ` col-md-${
+                BOOTSTRAP_GRID / EVENTS_PER_LINE
+            }`;
             return (
                 <div className="row">
                     <div className="container-fluid">
