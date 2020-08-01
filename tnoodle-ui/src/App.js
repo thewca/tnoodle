@@ -6,6 +6,15 @@ import FlashMessage from "./components/FlashMessage";
 import VersionInfo from "./components/VersionInfo";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
+import fetchIntercept from "fetch-intercept";
+
+// http-interceptor
+fetchIntercept.register({
+    responseError: function (error) {
+        debugger;
+        return Promise.reject(error);
+    },
+});
 
 class App extends Component {
     render() {
