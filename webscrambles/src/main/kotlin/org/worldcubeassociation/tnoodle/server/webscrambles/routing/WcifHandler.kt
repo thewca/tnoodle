@@ -17,6 +17,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.serial.WcifScrambleR
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFScrambleMatcher
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.SheetCopyCountExtension
 import java.time.LocalDateTime
 
 class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler {
@@ -31,7 +32,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
             if (!validateRequest(requestData)) {
                 // This is the most generic fallback.
-                // The #validateRequest method itself _should_ throw more specific errors by itself
+                // The #validateRequest method _should_ throw more specific errors by itself
                 BadWcifParameterException.error("WCIF request not valid")
             }
 
@@ -61,6 +62,9 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
             // heuristic so that iText PDF doesn't blow up. No rationale other than experience
             const val MAX_SCRAMBLE_SET_COPIES = 100
 
+            // The WCA identifies groups with letters internally, so having more than 26 is unlikely.
+            const val MAX_SCRAMBLE_SET_COUNT = 26
+
             fun validateRequest(req: WcifScrambleRequest): Boolean {
                 val checkMultiCubes = req.multiCubes?.requestedScrambles ?: 0
 
@@ -74,7 +78,14 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
                     }
 
                     for (round in event.rounds) {
-                        if (round.scrambleSetCount > MAX_SCRAMBLE_SET_COPIES) {
+                        if (round.scrambleSetCount > MAX_SCRAMBLE_SET_COUNT) {
+                            BadWcifParameterException.error("The maximum number of scramble sets for Round ${round.id} is $MAX_SCRAMBLE_SET_COUNT")
+                        }
+
+                        val roundCopies = round.findExtension<SheetCopyCountExtension>()
+                        val checkRoundCopies = roundCopies?.numCopies ?: 0
+
+                        if (checkRoundCopies > MAX_SCRAMBLE_SET_COPIES) {
                             BadWcifParameterException.error("The maximum number of copies for Round ${round.id} is $MAX_SCRAMBLE_SET_COPIES")
                         }
                     }
