@@ -3,11 +3,9 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import io.ktor.application.Application
-import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.commandLineEnvironment
@@ -27,11 +25,10 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScrambleM
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.TranslationException
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.ApplicationDataHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend.WcifDataHandler
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.FrontendErrorMessage.Companion.frontendException
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher
 import org.worldcubeassociation.tnoodle.server.webscrambles.server.OfflineJarUtils
 import java.io.IOException
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.net.URL
 
 class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : ApplicationHandler {
@@ -57,17 +54,9 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
         }
 
         app.install(StatusPages) {
-            exception<ScheduleMatchingException> {
-                call.respond(HttpStatusCode.BadRequest, it.humanStackTrace())
-            }
-
-            exception<ScrambleMatchingException> {
-                call.respond(HttpStatusCode.BadRequest, it.humanStackTrace())
-            }
-
-            exception<TranslationException> {
-                call.respond(HttpStatusCode.FailedDependency, it.humanStackTrace())
-            }
+            frontendException<ScheduleMatchingException>(HttpStatusCode.BadRequest)
+            frontendException<ScrambleMatchingException>(HttpStatusCode.BadRequest)
+            frontendException<TranslationException>(HttpStatusCode.FailedDependency)
         }
 
         baseServer.spinUp(app)
@@ -80,9 +69,6 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
 
         fun spinUpLocally(app: Application) =
             WebscramblesServer(LocalServerEnvironmentConfig).spinUp(app)
-
-        fun Throwable.humanStackTrace() =
-            StringWriter().also { PrintWriter(it).use(this::printStackTrace) }.toString()
 
         @JvmStatic
         fun main(args: Array<String>) {
