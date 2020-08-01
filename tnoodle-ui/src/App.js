@@ -22,8 +22,10 @@ class App extends Component {
                         <div className="col-9">
                             <Interceptor />
                             <VersionInfo />
-                            <EntryInterface />
-                            <EventPickerTable />
+                            <form>
+                                <EntryInterface />
+                                <EventPickerTable />
+                            </form>
                         </div>
                     </div>
                 </div>

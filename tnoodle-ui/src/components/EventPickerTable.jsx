@@ -224,6 +224,7 @@ const EventPickerTable = connect(
                 (disableScrambleButton ? " button-transparent" : "");
             return (
                 <button
+                    type="submit"
                     className={btnClass}
                     onClick={this.handleScrambleButton}
                     disabled={disableScrambleButton}
