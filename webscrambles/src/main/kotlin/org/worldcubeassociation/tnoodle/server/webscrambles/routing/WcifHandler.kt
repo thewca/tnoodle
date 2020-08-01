@@ -9,6 +9,7 @@ import io.ktor.routing.route
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.BadWcifParameterException
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler.registerJobPaths
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.LongRunningJob
@@ -28,6 +29,12 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
             val requestData = receive<WcifScrambleRequest>()
             val requestUrl = request.uri
 
+            if (!validateRequest(requestData)) {
+                // This is the most generic fallback.
+                // The #validateRequest method itself _should_ throw more specific errors by itself
+                BadWcifParameterException.error("WCIF request not valid")
+            }
+
             return ScramblingJobData(requestData, requestUrl)
         }
 
@@ -41,6 +48,41 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
         override fun getTargetState(data: ScramblingJobData) =
             WCIFScrambleMatcher.getScrambleCountsPerEvent(data.request.extendedWcif) + extraTargetData
+
+        companion object {
+            // rationale: The current 3BLD single WR is just below 20 seconds,
+            // so this max assumes that somebody would do a 3BLD-WR-worthy solve
+            // 60 minutes in a row (formula is (minutes * seconds) / WR)
+            const val MAX_MULTI_CUBES = (60 * 60) / 20
+
+            // see https://www.worldcubeassociation.org/regulations/#9m
+            const val MAX_WCA_ROUNDS = 4
+
+            // heuristic so that iText PDF doesn't blow up. No rationale other than experience
+            const val MAX_SCRAMBLE_SET_COPIES = 100
+
+            fun validateRequest(req: WcifScrambleRequest): Boolean {
+                val checkMultiCubes = req.multiCubes?.requestedScrambles ?: 0
+
+                if (checkMultiCubes > MAX_MULTI_CUBES) {
+                    BadWcifParameterException.error("The maximum amount of MBLD cubes is $MAX_MULTI_CUBES")
+                }
+
+                for (event in req.wcif.events) {
+                    if (event.rounds.size > MAX_WCA_ROUNDS) {
+                        BadWcifParameterException.error("Event ${event.id} has more than $MAX_WCA_ROUNDS rounds")
+                    }
+
+                    for (round in event.rounds) {
+                        if (round.scrambleSetCount > MAX_SCRAMBLE_SET_COPIES) {
+                            BadWcifParameterException.error("The maximum number of copies for Round ${round.id} is $MAX_SCRAMBLE_SET_COPIES")
+                        }
+                    }
+                }
+
+                return true
+            }
+        }
     }
 
     override fun install(router: Route) {

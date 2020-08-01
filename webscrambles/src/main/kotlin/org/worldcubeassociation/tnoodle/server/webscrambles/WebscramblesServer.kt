@@ -20,6 +20,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.server.MainLauncher.
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.routing.job.JobSchedulingHandler
 import org.worldcubeassociation.tnoodle.server.config.LocalServerEnvironmentConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.BadWcifParameterException
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScrambleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.TranslationException
@@ -56,6 +57,8 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
         app.install(StatusPages) {
             frontendException<ScheduleMatchingException>(HttpStatusCode.BadRequest)
             frontendException<ScrambleMatchingException>(HttpStatusCode.BadRequest)
+            frontendException<BadWcifParameterException>(HttpStatusCode.BadRequest)
+
             frontendException<TranslationException>(HttpStatusCode.FailedDependency)
         }
 
