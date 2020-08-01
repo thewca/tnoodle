@@ -11,6 +11,8 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kotlinx.serialization.MissingFieldException
+import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
@@ -58,6 +60,8 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             frontendException<ScheduleMatchingException>(HttpStatusCode.BadRequest)
             frontendException<ScrambleMatchingException>(HttpStatusCode.BadRequest)
             frontendException<BadWcifParameterException>(HttpStatusCode.BadRequest)
+
+            frontendException<SerializationException>(HttpStatusCode.BadRequest)
 
             frontendException<TranslationException>(HttpStatusCode.FailedDependency)
         }
