@@ -10,26 +10,28 @@ const mapDispatchToProps = {
     updateFlashMessage,
 };
 
+const messageDuration = 10; // seconds
+
 const FlashMessage = connect(
     mapStateToProps,
     mapDispatchToProps
 )(
     class extends Component {
         render() {
-            let text = this.props.flashMessage.text;
-            let bg = this.props.flashMessage.bootstrapBackground;
-            if (!text || !bg) {
+            let text = this.props.flashMessage.text || this.props.errorMessage;
+            let bg = this.props.flashMessage.bootstrapBackground || "danger";
+            if (!text) {
                 return null;
             }
 
-            // Clear the message after 5 seconds
+            // Clear the message after some seconds
             setTimeout(() => {
                 this.props.updateFlashMessage("", "");
-            }, 5 * 1000);
+            }, 1000 * messageDuration);
 
             return (
                 <div className="row sticky-top">
-                    <div className={`col-12 bg-${bg}`}>{text}</div>
+                    <div className={`col-12 alert alert-${bg}`}>{text}</div>
                 </div>
             );
         }
