@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import fetchIntercept from "fetch-intercept";
 
 class Interceptor extends Component {
-    errorMessageDurationInSeconds = 10;
+    messageDurationInSeconds = 10;
 
     constructor() {
         super();
@@ -24,40 +24,62 @@ class Interceptor extends Component {
             },
         });
 
-        this.state = { errorMessage: "" };
+        this.state = { message: "", stackTrace: "", showMore: false };
     }
 
     handleHttpError = (error) => {
         if (error.json) {
             error.json().then((data) => {
-                let message =
-                    data.message || data.statusText || JSON.stringify(data);
-                this.updateErrorMessage(message);
+                this.updateMessage(data);
             });
         } else {
-            let message =
-                error.message || error.statusText || JSON.stringify(error);
-            this.updateErrorMessage(message);
+            this.updateMessage(error);
         }
     };
 
-    updateErrorMessage = (errorMessage) => {
+    updateMessage = (data) => {
         // Clear the message after some seconds
-        setTimeout(() => {
-            this.setState({ ...this.state, errorMessage: "" });
-        }, 1000 * this.errorMessageDurationInSeconds);
+        let message = data.message || data.statusText || JSON.stringify(data);
+        let stackTrace = data.stackTrace;
 
-        this.setState({ ...this.state, errorMessage });
+        setTimeout(() => {
+            this.setState({
+                ...this.state,
+                message: "",
+                showMore: false,
+                stackTrace: "",
+            });
+        }, 1000 * this.messageDurationInSeconds);
+
+        this.setState({ ...this.state, message, stackTrace });
+    };
+
+    setShowMore = () => this.setState({ ...this.state, showMore: true });
+
+    showMore = () => {
+        if (this.state.showMore) {
+            return <React.Fragment>{this.state.stackTrace}</React.Fragment>;
+        }
+        return (
+            <button
+                role="button"
+                className="btn btn-primary"
+                onClick={this.setShowMore}
+            >
+                Show more
+            </button>
+        );
     };
 
     render() {
-        if (!this.state.errorMessage) {
+        if (!this.state.message) {
             return null;
         }
         return (
             <div className="row sticky-top">
                 <div className={"col-12 alert alert-danger"}>
-                    {this.state.errorMessage}
+                    <p>{this.state.message}</p>
+                    <p>{this.showMore()}</p>
                 </div>
             </div>
         );
