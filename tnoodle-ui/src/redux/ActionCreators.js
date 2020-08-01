@@ -128,8 +128,3 @@ export const setWcaEvents = (wcaEvents) => ({
     type: ActionTypes.SET_WCA_EVENTS,
     payload: { wcaEvents },
 });
-
-export const updateFlashMessage = (text, bootstrapBackground) => ({
-    type: ActionTypes.UPDATE_FLASH_MESSAGE,
-    payload: { text, bootstrapBackground },
-});
