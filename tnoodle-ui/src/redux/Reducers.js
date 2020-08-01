@@ -17,7 +17,6 @@ const defaultStore = {
     bestMbldAttempt: null,
     wcaFormats: null,
     wcaEvents: null,
-    flashMessage: { text: "", bootstrapBackground: "" },
     competitions: null,
 };
 
@@ -220,16 +219,6 @@ export const Reducer = (store, action) => {
         return {
             ...store,
             wcaEvents: action.payload.wcaEvents,
-        };
-    }
-
-    if (action.type === ActionTypes.UPDATE_FLASH_MESSAGE) {
-        return {
-            ...store,
-            flashMessage: {
-                text: action.payload.text,
-                bootstrapBackground: action.payload.bootstrapBackground,
-            },
         };
     }
 

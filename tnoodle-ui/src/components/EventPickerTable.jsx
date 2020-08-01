@@ -13,12 +13,9 @@ import {
     updateTranslations,
     setWcaFormats,
     setWcaEvents,
-    updateFlashMessage,
 } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
 import "./EventPickerTable.css";
-
-let DANGER = "danger";
 
 const mapStateToProps = (store) => ({
     wcif: store.wcif,
@@ -37,7 +34,6 @@ const mapDispatchToProps = {
     updateTranslations,
     setWcaFormats,
     setWcaEvents,
-    updateFlashMessage,
 };
 
 const BOOTSTRAP_GRID = 12;
@@ -62,23 +58,12 @@ const EventPickerTable = connect(
             this.getFmcTranslations();
         };
 
-        setFlashMessage = (text, bg, response) => {
-            this.props.updateFlashMessage(text + " " + response.statusText, bg);
-        };
-
         getFormats = () => {
             fetchFormats()
                 .then((response) => {
                     if (response.ok) {
                         return response.json();
                     }
-
-                    // Error
-                    this.setFlashMessage(
-                        "Could not get WCA formats",
-                        DANGER,
-                        response
-                    );
                 })
                 .then((formats) => {
                     this.props.setWcaFormats(formats);
@@ -91,13 +76,6 @@ const EventPickerTable = connect(
                     if (response.ok) {
                         return response.json();
                     }
-
-                    // Error
-                    this.setFlashMessage(
-                        "Could get WCA events",
-                        DANGER,
-                        response
-                    );
                 })
                 .then((wcaEvents) => {
                     this.props.setWcaEvents(wcaEvents);
@@ -110,13 +88,6 @@ const EventPickerTable = connect(
                     if (response.ok) {
                         return response.json();
                     }
-
-                    // Error
-                    this.setFlashMessage(
-                        "Could not get FMC translations.",
-                        DANGER,
-                        response
-                    );
                 })
                 .then((availableTranslations) => {
                     if (!availableTranslations) {
@@ -151,11 +122,6 @@ const EventPickerTable = connect(
                     if (response.ok) {
                         return response.blob();
                     }
-                    this.setFlashMessage(
-                        "Could not get scrambles.",
-                        DANGER,
-                        response
-                    );
                 })
                 .then((blob) => this.props.updateFileZipBlob(blob));
         };
