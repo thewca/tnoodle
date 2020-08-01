@@ -292,7 +292,7 @@ const SideBar = connect(
                             {this.state.competitions != null &&
                                 `You have ${
                                     this.state.competitions.length
-                                } manegeable ${this.pluralize(
+                                } manageable ${this.pluralize(
                                     " competition",
                                     this.state.competitions.length
                                 )} upcoming.`}

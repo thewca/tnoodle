@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import fetchIntercept from "fetch-intercept";
+import "./Interceptor.css";
 
 class Interceptor extends Component {
     messageDurationInSeconds = 10;
@@ -24,7 +25,12 @@ class Interceptor extends Component {
             },
         });
 
-        this.state = { message: "", stackTrace: "", showMore: false };
+        this.state = {
+            message: "",
+            stackTrace: "",
+            showMore: false,
+            showThis: false,
+        };
     }
 
     handleHttpError = (error) => {
@@ -43,32 +49,50 @@ class Interceptor extends Component {
         let stackTrace = data.stackTrace;
 
         setTimeout(() => {
-            this.setState({
-                ...this.state,
-                message: "",
-                showMore: false,
-                stackTrace: "",
-            });
+            // We only clear the message if the user did not click "Show more"
+            if (!this.state.showThis) {
+                this.clear();
+            }
         }, 1000 * this.messageDurationInSeconds);
 
         this.setState({ ...this.state, message, stackTrace });
     };
 
-    setShowMore = () => this.setState({ ...this.state, showMore: true });
+    // If the user clicks show more, message will be there until close.
+    setShowMore = () =>
+        this.setState({ ...this.state, showMore: true, showThis: true });
 
     showMore = () => {
         if (this.state.showMore) {
-            return <React.Fragment>{this.state.stackTrace}</React.Fragment>;
+            return (
+                <textarea
+                    className="form-control"
+                    value={this.state.stackTrace}
+                    rows="10"
+                    disabled
+                />
+            );
         }
         return (
-            <button
-                role="button"
-                className="btn btn-primary"
-                onClick={this.setShowMore}
-            >
-                Show more
-            </button>
+            <p className="text-right">
+                <button
+                    role="button"
+                    className="btn btn-primary"
+                    onClick={this.setShowMore}
+                >
+                    Show more
+                </button>
+            </p>
         );
+    };
+
+    clear = () => {
+        this.setState({
+            ...this.state,
+            message: "",
+            showMore: false,
+            stackTrace: "",
+        });
     };
 
     render() {
@@ -78,8 +102,19 @@ class Interceptor extends Component {
         return (
             <div className="row sticky-top">
                 <div className={"col-12 alert alert-danger"}>
-                    <p>{this.state.message}</p>
-                    <p>{this.showMore()}</p>
+                    <p>
+                        {this.state.message}
+                        <button
+                            type="button"
+                            className="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                            onClick={this.clear}
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </p>
+                    {this.showMore()}
                 </div>
             </div>
         );
