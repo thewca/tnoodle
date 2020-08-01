@@ -75,11 +75,7 @@ class Interceptor extends Component {
         }
         return (
             <p className="text-right">
-                <button
-                    role="button"
-                    className="btn btn-primary"
-                    onClick={this.setShowMore}
-                >
+                <button className="btn btn-primary" onClick={this.setShowMore}>
                     Show more
                 </button>
             </p>
