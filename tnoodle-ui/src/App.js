@@ -8,6 +8,8 @@ import "./App.css";
 import fetchIntercept from "fetch-intercept";
 
 class App extends Component {
+    errorMessageDurationInSeconds = 10;
+
     constructor() {
         super();
 
@@ -40,7 +42,7 @@ class App extends Component {
         // Clear the message after some seconds
         setTimeout(() => {
             this.setState({ ...this.state, errorMessage: "" });
-        }, 1000 * 10);
+        }, 1000 * this.errorMessageDurationInSeconds);
 
         this.setState({ ...this.state, errorMessage });
     };
