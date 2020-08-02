@@ -19,7 +19,7 @@ const mapDispatchToProps = {
     updateFileZipBlob,
 };
 
-const Layout = connect(
+const UserInterface = connect(
     mapStateToProps,
     mapDispatchToProps
 )(
@@ -97,15 +97,57 @@ const Layout = connect(
             link.remove();
         };
 
+        scrambleButton = () => {
+            if (this.state.generatingScrambles) {
+                return (
+                    <button
+                        className="btn btn-primary btn-lg button-transparent"
+                        title="Wait until the process is done"
+                        disabled
+                    >
+                        Generating Scrambles
+                    </button>
+                );
+            }
+            if (this.props.fileZipBlob != null) {
+                return (
+                    <button type="submit" className="btn btn-success btn-lg">
+                        Download Scrambles
+                    </button>
+                );
+            }
+
+            // At least 1 events must have at least 1 round.
+            let disableScrambleButton = !this.props.wcif.events
+                .map((event) => event.rounds.length > 0)
+                .reduce((flag1, flag2) => flag1 || flag2, false);
+
+            // In case the user did not select any events, we make the button a little more transparent than disabled
+            let btnClass =
+                "btn btn-primary btn-lg" +
+                (disableScrambleButton ? " button-transparent" : "");
+            return (
+                <button
+                    type="submit"
+                    className={btnClass}
+                    disabled={disableScrambleButton}
+                    title={disableScrambleButton ? "No events selected." : ""}
+                >
+                    Generate Scrambles
+                </button>
+            );
+        };
+
         render() {
             return (
                 <form onSubmit={this.onSubmit}>
                     <EntryInterface />
                     <EventPickerTable />
+                    {this.scrambleButton()}
                 </form>
             );
         }
     }
 );
 
-export default Layout;
+export default UserInterface;
