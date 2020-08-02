@@ -2,14 +2,12 @@ import React, { Component } from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
 import {
-    fetchZip,
     fetchAvailableFmcTranslations,
     fetchFormats,
     fetchWcaEvents,
 } from "../api/tnoodle.api";
-import { toWcaUrl, isUsingStaging } from "../api/wca.api";
+import { toWcaUrl } from "../api/wca.api";
 import {
-    updateFileZipBlob,
     updateTranslations,
     setWcaFormats,
     setWcaEvents,
@@ -19,18 +17,14 @@ import "./EventPickerTable.css";
 
 const mapStateToProps = (store) => ({
     wcif: store.wcif,
-    mbld: store.mbld,
-    password: store.password,
     editingDisabled: store.editingDisabled,
     competitionId: store.competitionId,
-    officialZip: store.officialZip,
     fileZipBlob: store.fileZipBlob,
     translations: store.translations,
     wcaEvents: store.wcaEvents,
 });
 
 const mapDispatchToProps = {
-    updateFileZipBlob,
     updateTranslations,
     setWcaFormats,
     setWcaEvents,
