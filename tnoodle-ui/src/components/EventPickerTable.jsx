@@ -104,7 +104,9 @@ const EventPickerTable = connect(
                 });
         };
 
-        handleScrambleButton = () => {
+        handleScrambleButton = (evt) => {
+            evt.preventDefault();
+
             // If user navigates during generation proccess, we still get the correct name
             this.setState({
                 ...this.state,
@@ -130,7 +132,9 @@ const EventPickerTable = connect(
             this.setState({ ...this.state, generatingScrambles: flag });
         };
 
-        downloadZip = () => {
+        downloadZip = (evt) => {
+            evt.preventDefault();
+
             // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
             // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
             // a competition from staging, add a [Unofficial]
@@ -205,6 +209,7 @@ const EventPickerTable = connect(
             if (this.props.fileZipBlob != null) {
                 return (
                     <button
+                        type="submit"
                         className="btn btn-success btn-lg"
                         onClick={this.downloadZip}
                     >
