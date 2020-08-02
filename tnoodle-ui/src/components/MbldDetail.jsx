@@ -3,14 +3,14 @@ import { connect } from "react-redux";
 import { MBLD_MIN } from "../constants/wca.constants";
 import { updateMbld, updateFileZipBlob } from "../redux/ActionCreators";
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
     mbld: store.mbld,
-    bestMbldAttempt: store.bestMbldAttempt
+    bestMbldAttempt: store.bestMbldAttempt,
 });
 
 const mapDispatchToProps = {
     updateMbld,
-    updateFileZipBlob
+    updateFileZipBlob,
 };
 
 const MbldDetail = connect(
@@ -18,20 +18,15 @@ const MbldDetail = connect(
     mapDispatchToProps
 )(
     class extends Component {
-        handleMbldChange = mbld => {
+        handleMbldChange = (mbld) => {
             this.props.updateMbld(mbld);
         };
 
-        // When mbld loses focus
-        verifyMbld = () => {
-            let mbld = this.props.mbld;
-            if (mbld < MBLD_MIN) {
-                mbld = MBLD_MIN;
-                this.handleMbldChange(mbld);
-            }
-        };
-
         showMbldWarning = () => {
+            if (!this.props.mbld) {
+                return null;
+            }
+
             let bestMbldAttempt = this.props.bestMbldAttempt;
             let showMbldWarning =
                 bestMbldAttempt != null && this.props.mbld < bestMbldAttempt;
@@ -61,13 +56,11 @@ const MbldDetail = connect(
                                 className="form-control bg-dark text-white"
                                 type="number"
                                 value={this.props.mbld}
-                                onChange={evt =>
-                                    this.handleMbldChange(
-                                        Number(evt.target.value)
-                                    )
+                                onChange={(evt) =>
+                                    this.handleMbldChange(evt.target.value)
                                 }
                                 min={MBLD_MIN}
-                                onBlur={this.verifyMbld}
+                                required
                             />
                         </td>
                     </tr>
