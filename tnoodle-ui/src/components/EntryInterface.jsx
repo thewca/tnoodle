@@ -78,6 +78,7 @@ const EntryInterface = connect(
                                     onChange={this.handleCompetitionNameChange}
                                     value={competitionName}
                                     disabled={disabled ? "disabled" : ""}
+                                    required
                                 />
                             </div>
 

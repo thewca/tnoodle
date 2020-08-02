@@ -40,9 +40,18 @@ const Layout = connect(
     mapDispatchToProps
 )(
     class extends Component {
+        constructor(props) {
+            super(props);
+
+            this.state = { generatingScrambles: false };
+        }
         onSubmit = (evt) => {
             console.log("Submit");
             evt.preventDefault();
+
+            if (this.state.generatingScrambles) {
+                return;
+            }
 
             if (this.props.fileZipBlob != null) {
                 this.downloadZip();
