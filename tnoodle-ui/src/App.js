@@ -4,7 +4,7 @@ import VersionInfo from "./components/VersionInfo";
 import Interceptor from "./components/Interceptor";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
-import Layout from "./components/Layout";
+import UserInterface from "./components/UserInterface";
 
 class App extends Component {
     render() {
@@ -21,7 +21,7 @@ class App extends Component {
                         <div className="col-9">
                             <Interceptor />
                             <VersionInfo />
-                            <Layout />
+                            <UserInterface />
                         </div>
                     </div>
                 </div>
