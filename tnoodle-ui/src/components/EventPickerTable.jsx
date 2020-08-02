@@ -108,39 +108,6 @@ const EventPickerTable = connect(
             evt.preventDefault();
         };
 
-        setGeneratingScrambles = (flag) => {
-            this.setState({ ...this.state, generatingScrambles: flag });
-        };
-
-        downloadZip = (evt) => {
-            evt.preventDefault();
-
-            // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
-            // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
-            // a competition from staging, add a [Unofficial]
-
-            let isUnofficialZip =
-                !this.props.officialZip ||
-                (this.props.competitionId != null && isUsingStaging());
-
-            let fileName =
-                (isUnofficialZip ? "[UNOFFICIAL] " : "") +
-                this.state.competitionNameFileZip +
-                ".zip";
-
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(this.props.fileZipBlob);
-            link.download = fileName;
-            link.target = "_blank";
-            link.setAttribute("type", "hidden");
-
-            // This is needed for firefox
-            document.body.appendChild(link);
-
-            link.click();
-            link.remove();
-        };
-
         maybeShowEditWarning = () => {
             if (this.props.competitionId == null) {
                 return;
