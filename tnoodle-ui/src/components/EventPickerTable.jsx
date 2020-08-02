@@ -106,26 +106,6 @@ const EventPickerTable = connect(
 
         handleScrambleButton = (evt) => {
             evt.preventDefault();
-
-            // If user navigates during generation proccess, we still get the correct name
-            this.setState({
-                ...this.state,
-                competitionNameFileZip: this.props.wcif.name,
-                generatingScrambles: true,
-            });
-            fetchZip(
-                this.props.wcif,
-                this.props.mbld,
-                this.props.password,
-                this.props.translations
-            )
-                .then((response) => {
-                    this.setGeneratingScrambles(false);
-                    if (response.ok) {
-                        return response.blob();
-                    }
-                })
-                .then((blob) => this.props.updateFileZipBlob(blob));
         };
 
         setGeneratingScrambles = (flag) => {
@@ -208,11 +188,7 @@ const EventPickerTable = connect(
             }
             if (this.props.fileZipBlob != null) {
                 return (
-                    <button
-                        type="submit"
-                        className="btn btn-success btn-lg"
-                        onClick={this.downloadZip}
-                    >
+                    <button type="submit" className="btn btn-success btn-lg">
                         Download Scrambles
                     </button>
                 );
@@ -231,7 +207,6 @@ const EventPickerTable = connect(
                 <button
                     type="submit"
                     className={btnClass}
-                    onClick={this.handleScrambleButton}
                     disabled={disableScrambleButton}
                     title={disableScrambleButton ? "No events selected." : ""}
                 >
