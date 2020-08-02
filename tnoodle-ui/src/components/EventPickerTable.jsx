@@ -13,7 +13,6 @@ import {
     setWcaEvents,
 } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
-import "./EventPickerTable.css";
 
 const mapStateToProps = (store) => ({
     wcif: store.wcif,

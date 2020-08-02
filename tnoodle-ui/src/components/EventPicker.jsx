@@ -51,7 +51,7 @@ const EventPicker = connect(
         };
 
         handleNumberOfScrambleSetsChange = (round, value, rounds) => {
-            rounds[round].scrambleSetCount = Number(value);
+            rounds[round].scrambleSetCount = value;
             let wcaEvent = this.getWcaEvent(rounds);
             this.updateEvent(wcaEvent);
         };
@@ -149,7 +149,7 @@ const EventPicker = connect(
                                         onChange={(evt) =>
                                             this.handleNumberOfScrambleSetsChange(
                                                 i,
-                                                Number(evt.target.value),
+                                                evt.target.value,
                                                 rounds
                                             )
                                         }
@@ -170,7 +170,7 @@ const EventPicker = connect(
                                         onChange={(evt) =>
                                             this.handleNumberOfCopiesChange(
                                                 i,
-                                                Number(evt.target.value),
+                                                evt.target.value,
                                                 rounds
                                             )
                                         }
