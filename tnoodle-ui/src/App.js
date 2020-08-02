@@ -1,11 +1,10 @@
 import React, { Component } from "react";
-import EntryInterface from "./components/EntryInterface";
-import EventPickerTable from "./components/EventPickerTable";
 import SideBar from "./components/SideBar";
 import VersionInfo from "./components/VersionInfo";
 import Interceptor from "./components/Interceptor";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
+import Layout from "./components/Layout";
 
 class App extends Component {
     render() {
@@ -22,10 +21,7 @@ class App extends Component {
                         <div className="col-9">
                             <Interceptor />
                             <VersionInfo />
-                            <form>
-                                <EntryInterface />
-                                <EventPickerTable />
-                            </form>
+                            <Layout />
                         </div>
                     </div>
                 </div>
