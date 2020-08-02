@@ -63,6 +63,9 @@ class Interceptor extends Component {
         this.setState({ ...this.state, showMore: true, showThis: true });
 
     showMore = () => {
+        if (!this.state.stackTrace) {
+            return null;
+        }
         if (this.state.showMore) {
             return (
                 <textarea
