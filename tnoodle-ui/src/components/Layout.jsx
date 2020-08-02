@@ -14,6 +14,7 @@ import {
     setWcaEvents,
 } from "../redux/ActionCreators";
 import { connect } from "react-redux";
+import { toWcaUrl, isUsingStaging } from "../api/wca.api";
 
 const mapStateToProps = (store) => ({
     wcif: store.wcif,
@@ -42,6 +43,16 @@ const Layout = connect(
         onSubmit = (evt) => {
             console.log("Submit");
             evt.preventDefault();
+
+            if (this.props.fileZipBlob != null) {
+                this.downloadZip();
+            } else {
+                this.generateZip();
+            }
+        };
+
+        setGeneratingScrambles = (flag) => {
+            this.setState({ ...this.state, generatingScrambles: flag });
         };
 
         generateZip = () => {
@@ -64,6 +75,33 @@ const Layout = connect(
                     }
                 })
                 .then((blob) => this.props.updateFileZipBlob(blob));
+        };
+
+        downloadZip = () => {
+            // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
+            // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
+            // a competition from staging, add a [Unofficial]
+
+            let isUnofficialZip =
+                !this.props.officialZip ||
+                (this.props.competitionId != null && isUsingStaging());
+
+            let fileName =
+                (isUnofficialZip ? "[UNOFFICIAL] " : "") +
+                this.state.competitionNameFileZip +
+                ".zip";
+
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(this.props.fileZipBlob);
+            link.download = fileName;
+            link.target = "_blank";
+            link.setAttribute("type", "hidden");
+
+            // This is needed for firefox
+            document.body.appendChild(link);
+
+            link.click();
+            link.remove();
         };
 
         render() {
