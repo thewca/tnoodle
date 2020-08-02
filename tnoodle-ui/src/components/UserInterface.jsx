@@ -27,10 +27,12 @@ const UserInterface = connect(
         constructor(props) {
             super(props);
 
-            this.state = { generatingScrambles: false };
+            this.state = {
+                generatingScrambles: false,
+                competitionNameFileZip: "",
+            };
         }
         onSubmit = (evt) => {
-            console.log("Submit");
             evt.preventDefault();
 
             if (this.state.generatingScrambles) {
@@ -143,7 +145,7 @@ const UserInterface = connect(
                 <form onSubmit={this.onSubmit}>
                     <EntryInterface />
                     <EventPickerTable />
-                    {this.scrambleButton()}
+                    <div className="mb-2">{this.scrambleButton()}</div>
                 </form>
             );
         }
