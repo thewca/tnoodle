@@ -51,9 +51,6 @@ const EventPicker = connect(
         };
 
         handleNumberOfScrambleSetsChange = (round, value, rounds) => {
-            if (value < 1) {
-                return;
-            }
             rounds[round].scrambleSetCount = Number(value);
             let wcaEvent = this.getWcaEvent(rounds);
             this.updateEvent(wcaEvent);
@@ -66,9 +63,6 @@ const EventPicker = connect(
         };
 
         handleNumberOfCopiesChange = (round, value, rounds) => {
-            if (value < 1) {
-                return;
-            }
             rounds[round].extensions.find(
                 (extension) => extension.id === copiesExtensionId
             ).data.numCopies = value;
@@ -160,6 +154,7 @@ const EventPicker = connect(
                                             )
                                         }
                                         min={1}
+                                        required
                                         disabled={
                                             this.props.editingDisabled
                                                 ? "disabled"
@@ -180,6 +175,7 @@ const EventPicker = connect(
                                             )
                                         }
                                         min={1}
+                                        required
                                     />
                                 </td>
                             </tr>
