@@ -1,38 +1,22 @@
 import React, { Component } from "react";
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
-import {
-    fetchZip,
-    fetchAvailableFmcTranslations,
-    fetchFormats,
-    fetchWcaEvents,
-} from "../api/tnoodle.api";
-import {
-    updateFileZipBlob,
-    updateTranslations,
-    setWcaFormats,
-    setWcaEvents,
-} from "../redux/ActionCreators";
+import { fetchZip } from "../api/tnoodle.api";
+import { updateFileZipBlob } from "../redux/ActionCreators";
 import { connect } from "react-redux";
-import { toWcaUrl, isUsingStaging } from "../api/wca.api";
+import { isUsingStaging } from "../api/wca.api";
 
 const mapStateToProps = (store) => ({
     wcif: store.wcif,
     mbld: store.mbld,
     password: store.password,
-    editingDisabled: store.editingDisabled,
     competitionId: store.competitionId,
     officialZip: store.officialZip,
     fileZipBlob: store.fileZipBlob,
-    translations: store.translations,
-    wcaEvents: store.wcaEvents,
 });
 
 const mapDispatchToProps = {
     updateFileZipBlob,
-    updateTranslations,
-    setWcaFormats,
-    setWcaEvents,
 };
 
 const Layout = connect(
