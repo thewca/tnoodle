@@ -104,10 +104,6 @@ const EventPickerTable = connect(
                 });
         };
 
-        handleScrambleButton = (evt) => {
-            evt.preventDefault();
-        };
-
         maybeShowEditWarning = () => {
             if (this.props.competitionId == null) {
                 return;
