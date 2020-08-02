@@ -5,6 +5,7 @@ import { fetchZip } from "../api/tnoodle.api";
 import { updateFileZipBlob } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { isUsingStaging } from "../api/wca.api";
+import "./UserInterface.css";
 
 const mapStateToProps = (store) => ({
     wcif: store.wcif,
@@ -103,7 +104,7 @@ const UserInterface = connect(
             if (this.state.generatingScrambles) {
                 return (
                     <button
-                        className="btn btn-primary btn-lg button-transparent"
+                        className="btn btn-default btn-primary button-transparent"
                         title="Wait until the process is done"
                         disabled
                     >
@@ -143,9 +144,17 @@ const UserInterface = connect(
         render() {
             return (
                 <form onSubmit={this.onSubmit}>
-                    <EntryInterface />
-                    <EventPickerTable />
-                    <div className="mb-2">{this.scrambleButton()}</div>
+                    <div id="content">
+                        <EntryInterface />
+                        <EventPickerTable />
+                    </div>
+                    <div className="container" id="footer">
+                        <div className="row text-center">
+                            <div className="col-12">
+                                {this.scrambleButton()}
+                            </div>
+                        </div>
+                    </div>
                 </form>
             );
         }

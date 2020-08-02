@@ -1,0 +1,14 @@
+#content {
+    min-height: 100%;
+    padding-bottom: 50px;
+}
+#footer {
+    height: 50px;
+    width: 75%;
+    position: fixed;
+    bottom: 0;
+}
+
+.button-transparent {
+    opacity: 0.4 !important;
+}
