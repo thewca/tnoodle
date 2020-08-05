@@ -65,28 +65,36 @@ const EntryInterface = connect(
             let competitionName = this.props.competitionName;
             let disabled = this.props.editingDisabled;
             return (
-                <div className="row">
-                    <div className="container mt-2">
-                        <div className="row">
-                            <div className="col-md-6 text-left form-group">
-                                <label className="font-weight-bold pr-1">
-                                    Competition Name
-                                </label>
-                                <input
-                                    className="form-control"
-                                    placeholder="Competition Name"
-                                    onChange={this.handleCompetitionNameChange}
-                                    value={competitionName}
-                                    disabled={disabled ? "disabled" : ""}
-                                    required
-                                />
-                            </div>
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-sm-6 text-left form-group">
+                            <label
+                                className="font-weight-bold"
+                                htmlFor="competition-name"
+                            >
+                                Competition Name
+                            </label>
+                            <input
+                                id="competition-name"
+                                className="form-control"
+                                placeholder="Competition Name"
+                                onChange={this.handleCompetitionNameChange}
+                                value={competitionName}
+                                disabled={disabled ? "disabled" : ""}
+                                required
+                            />
+                        </div>
 
-                            <div className="col-md-6 text-left form-group">
-                                <label className="font-weight-bold pr-1">
-                                    Password
-                                </label>
+                        <div className="col-sm-6 text-left form-group">
+                            <label
+                                className="font-weight-bold"
+                                htmlFor="password"
+                            >
+                                Password
+                            </label>
+                            <div className="input-group">
                                 <input
+                                    id="password"
                                     className="form-control"
                                     placeholder="Password"
                                     type={
@@ -97,21 +105,13 @@ const EntryInterface = connect(
                                     onChange={this.handlePasswordChange}
                                     value={this.state.password}
                                 />
-                                <div className="form-check">
-                                    <input
-                                        type="checkbox"
-                                        checked={this.state.showPassword}
-                                        id="showPassword"
-                                        readOnly
-                                        onClick={this.toogleShowPassword}
-                                        className="form-check-input"
-                                    />
-                                    <label
-                                        htmlFor="showPassword"
-                                        className="form-check-label"
-                                    >
-                                        Show password
-                                    </label>
+                                <div class="input-group-addon">
+                                    <a href="">
+                                        <i
+                                            class="fa fa-eye-slash"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
