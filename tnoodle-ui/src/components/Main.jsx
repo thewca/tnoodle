@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
+import Interceptor from "./Interceptor";
+import VersionInfo from "./VersionInfo";
 import { fetchZip } from "../api/tnoodle.api";
 import { updateFileZipBlob } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { isUsingStaging } from "../api/wca.api";
-import "./UserInterface.css";
+import "./Main.css";
 
 const mapStateToProps = (store) => ({
     wcif: store.wcif,
@@ -20,7 +22,7 @@ const mapDispatchToProps = {
     updateFileZipBlob,
 };
 
-const UserInterface = connect(
+const Main = connect(
     mapStateToProps,
     mapDispatchToProps
 )(
@@ -144,21 +146,25 @@ const UserInterface = connect(
         render() {
             return (
                 <form onSubmit={this.onSubmit}>
-                    <div id="content">
-                        <EntryInterface />
-                        <EventPickerTable />
-                    </div>
-                    <div className="container" id="footer">
-                        <div className="row text-center">
-                            <div className="col-12">
-                                {this.scrambleButton()}
+                    <div className="sticky-top bg-light">
+                        <Interceptor />
+                        <VersionInfo />
+                        <div className="container-fluid">
+                            <div className="row">
+                                <div className="col-sm-8">
+                                    <EntryInterface />
+                                </div>
+                                <div className="col-sm-4">
+                                    {this.scrambleButton()}
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <EventPickerTable />
                 </form>
             );
         }
     }
 );
 
-export default UserInterface;
+export default Main;
