@@ -106,7 +106,7 @@ const Main = connect(
             if (this.state.generatingScrambles) {
                 return (
                     <button
-                        className="btn btn-primary button-transparent"
+                        className="btn btn-primary button-transparent form-control"
                         title="Wait until the process is done"
                         disabled
                     >
@@ -116,7 +116,10 @@ const Main = connect(
             }
             if (this.props.fileZipBlob != null) {
                 return (
-                    <button type="submit" className="btn btn-success">
+                    <button
+                        type="submit"
+                        className="btn btn-success form-control"
+                    >
                         Download Scrambles
                     </button>
                 );
@@ -129,7 +132,7 @@ const Main = connect(
 
             // In case the user did not select any events, we make the button a little more transparent than disabled
             let btnClass =
-                "btn btn-primary" +
+                "btn btn-primary form-control" +
                 (disableScrambleButton ? " button-transparent" : "");
             return (
                 <button
@@ -154,7 +157,8 @@ const Main = connect(
                                 <div className="col-sm-8">
                                     <EntryInterface />
                                 </div>
-                                <div className="col-sm-4">
+                                <div className="col-sm-4 form-group">
+                                    <label>&nbsp;</label>
                                     {this.scrambleButton()}
                                 </div>
                             </div>
