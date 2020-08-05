@@ -6,6 +6,7 @@ import {
 } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const mapStateToProps = (store) => ({
     editingDisabled: store.editingDisabled,
@@ -105,13 +106,16 @@ const EntryInterface = connect(
                                     onChange={this.handlePasswordChange}
                                     value={this.state.password}
                                 />
-                                <div class="input-group-addon">
-                                    <a href="">
-                                        <i
-                                            class="fa fa-eye-slash"
-                                            aria-hidden="true"
-                                        ></i>
-                                    </a>
+                                <div
+                                    className="input-group-prepend"
+                                    onClick={this.toogleShowPassword}
+                                >
+                                    <span className="input-group-text">
+                                        {!this.state.showPassword && <FaEye />}
+                                        {this.state.showPassword && (
+                                            <FaEyeSlash />
+                                        )}
+                                    </span>
                                 </div>
                             </div>
                         </div>
