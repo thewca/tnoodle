@@ -98,21 +98,23 @@ class Interceptor extends Component {
             return null;
         }
         return (
-            <div className="row sticky-top">
-                <div className={"col-12 alert alert-danger"}>
-                    <p>
-                        {this.state.message}
-                        <button
-                            type="button"
-                            className="close"
-                            data-dismiss="modal"
-                            aria-label="Close"
-                            onClick={this.clear}
-                        >
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </p>
-                    {this.showMore()}
+            <div className="container-fluid">
+                <div className="row">
+                    <div className={"col-12 alert alert-danger"}>
+                        <p>
+                            {this.state.message}
+                            <button
+                                type="button"
+                                className="close"
+                                data-dismiss="modal"
+                                aria-label="Close"
+                                onClick={this.clear}
+                            >
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </p>
+                        {this.showMore()}
+                    </div>
                 </div>
             </div>
         );

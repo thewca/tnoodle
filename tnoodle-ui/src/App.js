@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import SideBar from "./components/SideBar";
-import VersionInfo from "./components/VersionInfo";
-import Interceptor from "./components/Interceptor";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
-import UserInterface from "./components/UserInterface";
+import Main from "./components/Main";
 
 class App extends Component {
     render() {
@@ -19,9 +17,7 @@ class App extends Component {
                             <SideBar />
                         </div>
                         <div className="col-9">
-                            <Interceptor />
-                            <VersionInfo />
-                            <UserInterface />
+                            <Main />
                         </div>
                     </div>
                 </div>
