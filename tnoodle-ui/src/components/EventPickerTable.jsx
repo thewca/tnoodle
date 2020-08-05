@@ -144,36 +144,32 @@ const EventPickerTable = connect(
                 BOOTSTRAP_GRID / EVENTS_PER_LINE
             }`;
             return (
-                <div className="row">
-                    <div className="container-fluid">
-                        {this.maybeShowEditWarning()}
-                        {eventChunks.map((chunk, i) => {
-                            return (
-                                <div className="row p-0" key={i}>
-                                    {chunk.map((event) => {
-                                        return (
-                                            <div
-                                                className={classColPerEvent}
-                                                key={event.id}
-                                            >
-                                                <EventPicker
-                                                    event={event}
-                                                    wcifEvent={this.props.wcif.events.find(
-                                                        (item) =>
-                                                            item.id === event.id
-                                                    )}
-                                                    disabled={editingDisabled}
-                                                    setBlobNull={
-                                                        this.setBlobNull
-                                                    }
-                                                />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            );
-                        })}
-                    </div>
+                <div className="container-fluid">
+                    {this.maybeShowEditWarning()}
+                    {eventChunks.map((chunk, i) => {
+                        return (
+                            <div className="row p-0" key={i}>
+                                {chunk.map((event) => {
+                                    return (
+                                        <div
+                                            className={classColPerEvent}
+                                            key={event.id}
+                                        >
+                                            <EventPicker
+                                                event={event}
+                                                wcifEvent={this.props.wcif.events.find(
+                                                    (item) =>
+                                                        item.id === event.id
+                                                )}
+                                                disabled={editingDisabled}
+                                                setBlobNull={this.setBlobNull}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
                 </div>
             );
         }

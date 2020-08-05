@@ -154,9 +154,7 @@ const Main = connect(
                         <VersionInfo />
                         <div className="container-fluid">
                             <div className="row">
-                                <div className="col-sm-8">
-                                    <EntryInterface />
-                                </div>
+                                <EntryInterface />
                                 <div className="col-sm-4 form-group">
                                     <label>&nbsp;</label>
                                     {this.scrambleButton()}
