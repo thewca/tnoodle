@@ -111,8 +111,9 @@ const EntryInterface = connect(
                                     onClick={this.toogleShowPassword}
                                 >
                                     <span className="input-group-text">
-                                        {!this.state.showPassword && <FaEye />}
-                                        {this.state.showPassword && (
+                                        {this.state.showPassword ? (
+                                            <FaEye />
+                                        ) : (
                                             <FaEyeSlash />
                                         )}
                                     </span>
