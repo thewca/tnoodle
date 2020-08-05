@@ -7,18 +7,16 @@ import Main from "./components/Main";
 class App extends Component {
     render() {
         return (
-            <div className="App">
-                <div className="container-fluid">
-                    <div className="row">
-                        <div
-                            className="col-3 bg-dark sticky-top overflow-auto"
-                            id="side-bar"
-                        >
-                            <SideBar />
-                        </div>
-                        <div className="col-9">
-                            <Main />
-                        </div>
+            <div className="App container-fluid">
+                <div className="row">
+                    <div
+                        className="col-3 bg-dark sticky-top overflow-auto"
+                        id="side-bar"
+                    >
+                        <SideBar />
+                    </div>
+                    <div className="col-9 m-0 p-0">
+                        <Main />
                     </div>
                 </div>
             </div>

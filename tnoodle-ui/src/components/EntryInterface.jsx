@@ -66,62 +66,53 @@ const EntryInterface = connect(
             let competitionName = this.props.competitionName;
             let disabled = this.props.editingDisabled;
             return (
-                <div className="container-fluid">
-                    <div className="row">
-                        <div className="col-sm-6 text-left form-group">
-                            <label
-                                className="font-weight-bold"
-                                htmlFor="competition-name"
-                            >
-                                Competition Name
-                            </label>
-                            <input
-                                id="competition-name"
-                                className="form-control"
-                                placeholder="Competition Name"
-                                onChange={this.handleCompetitionNameChange}
-                                value={competitionName}
-                                disabled={disabled ? "disabled" : ""}
-                                required
-                            />
-                        </div>
+                <React.Fragment>
+                    <div className="col-sm-4 text-left form-group">
+                        <label
+                            className="font-weight-bold"
+                            htmlFor="competition-name"
+                        >
+                            Competition Name
+                        </label>
+                        <input
+                            id="competition-name"
+                            className="form-control"
+                            placeholder="Competition Name"
+                            onChange={this.handleCompetitionNameChange}
+                            value={competitionName}
+                            disabled={disabled ? "disabled" : ""}
+                            required
+                        />
+                    </div>
 
-                        <div className="col-sm-6 text-left form-group">
-                            <label
-                                className="font-weight-bold"
-                                htmlFor="password"
+                    <div className="col-sm-4 text-left form-group">
+                        <label className="font-weight-bold" htmlFor="password">
+                            Password
+                        </label>
+                        <div className="input-group">
+                            <input
+                                id="password"
+                                className="form-control"
+                                placeholder="Password"
+                                type={this.state.showPassword ? "" : "password"}
+                                onChange={this.handlePasswordChange}
+                                value={this.state.password}
+                            />
+                            <div
+                                className="input-group-prepend"
+                                onClick={this.toogleShowPassword}
                             >
-                                Password
-                            </label>
-                            <div className="input-group">
-                                <input
-                                    id="password"
-                                    className="form-control"
-                                    placeholder="Password"
-                                    type={
-                                        this.state.showPassword
-                                            ? ""
-                                            : "password"
-                                    }
-                                    onChange={this.handlePasswordChange}
-                                    value={this.state.password}
-                                />
-                                <div
-                                    className="input-group-prepend"
-                                    onClick={this.toogleShowPassword}
-                                >
-                                    <span className="input-group-text">
-                                        {this.state.showPassword ? (
-                                            <FaEye />
-                                        ) : (
-                                            <FaEyeSlash />
-                                        )}
-                                    </span>
-                                </div>
+                                <span className="input-group-text">
+                                    {this.state.showPassword ? (
+                                        <FaEye />
+                                    ) : (
+                                        <FaEyeSlash />
+                                    )}
+                                </span>
                             </div>
                         </div>
                     </div>
-                </div>
+                </React.Fragment>
             );
         }
     }
