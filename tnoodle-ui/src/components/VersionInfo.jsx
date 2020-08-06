@@ -65,7 +65,7 @@ const VersionInfo = connect(
             }
 
             // Generated version is not an official jar
-            if (officialBuild) {
+            if (!officialBuild) {
                 this.props.updateOfficialZipStatus(false);
                 return (
                     <div className="alert alert-danger">
