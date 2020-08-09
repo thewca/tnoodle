@@ -4,10 +4,17 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.close
+import io.ktor.http.cio.websocket.send
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
 import io.ktor.routing.*
+import io.ktor.websocket.webSocket
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 
 object JobSchedulingHandler : RouteHandler {
     private val JOBS = mutableMapOf<Int, MutableMap<String, Int>>()
@@ -83,7 +90,7 @@ object JobSchedulingHandler : RouteHandler {
     fun <T> Route.registerJobPaths(job: LongRunningJob<T>) {
         post {
             val request = job.extractCall(call)
-            val (type, data) = job.computeBlocking(request)
+            val (type, data) = job.runBlocking(request)
 
             call.respondBytes(data, type)
         }
@@ -93,6 +100,31 @@ object JobSchedulingHandler : RouteHandler {
             val jobCreation = job.launch(request)
 
             call.respond(HttpStatusCode.Created, jobCreation)
+        }
+
+        webSocket {
+            for (frame in incoming) {
+                if (frame is Frame.Text) {
+                    val request = job.extractFrame(call, frame)
+
+                    val target = job.getTargetState(request)
+                    val targetEnc = JsonConfig.SERIALIZER.encodeToString(MapSerializer(String.serializer(), Int.serializer()), target)
+                    send(targetEnc)
+
+                    val (type, data) = job.channel(request, this)
+
+                    val targetMarker = job.getResultMarker(request)
+                    val encodedData = data.toString(Charsets.UTF_8)
+
+                    // signal that the computation result is about to start
+                    send(targetMarker)
+
+                    send(type.toString())
+                    send(encodedData)
+
+                    close()
+                }
+            }
         }
     }
 }

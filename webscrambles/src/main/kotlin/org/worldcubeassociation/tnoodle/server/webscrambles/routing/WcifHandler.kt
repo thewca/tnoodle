@@ -2,6 +2,8 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
 import io.ktor.application.ApplicationCall
 import io.ktor.http.ContentType
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.readText
 import io.ktor.request.receive
 import io.ktor.request.uri
 import io.ktor.routing.Route
@@ -28,15 +30,24 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
         override suspend fun extractCall(call: ApplicationCall): ScramblingJobData {
             val requestData = call.receive<WcifScrambleRequest>()
+            return call.verifyAndWrapWcifRequest(requestData)
+        }
 
+        override suspend fun extractFrame(call: ApplicationCall, frame: Frame.Text): ScramblingJobData {
+            val frameText = frame.readText()
+            val requestData = JsonConfig.SERIALIZER.decodeFromString(WcifScrambleRequest.serializer(), frameText)
+
+            return call.verifyAndWrapWcifRequest(requestData)
+        }
+
+        protected fun ApplicationCall.verifyAndWrapWcifRequest(requestData: WcifScrambleRequest): ScramblingJobData {
             if (!validateRequest(requestData)) {
                 // This is the most generic fallback.
                 // The #validateRequest method _should_ throw more specific errors by itself
                 BadWcifParameterException.error("WCIF request not valid")
             }
 
-            val requestUrl = call.request.uri
-            return ScramblingJobData(requestData, requestUrl)
+            return ScramblingJobData(requestData, request.uri)
         }
 
         override suspend fun ScramblingJobData.compute(statusBackend: StatusBackend): Pair<ContentType, ByteArray> {
@@ -49,6 +60,9 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
 
         override fun getTargetState(data: ScramblingJobData) =
             WCIFScrambleMatcher.getScrambleCountsPerEvent(data.request.extendedWcif) + extraTargetData
+
+        override fun getResultMarker(data: ScramblingJobData) =
+            data.request.wcif.id
 
         companion object {
             // rationale: The current 3BLD single WR is just below 20 seconds,
