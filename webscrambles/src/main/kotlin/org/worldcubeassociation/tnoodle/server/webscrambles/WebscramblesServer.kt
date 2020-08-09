@@ -11,6 +11,7 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.websocket.WebSockets
 import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
@@ -38,6 +39,8 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
 
     override fun spinUp(app: Application) {
         val wcifHandler = WcifHandler(environmentConfig)
+
+        app.install(WebSockets)
 
         app.routing {
             route("frontend") {
