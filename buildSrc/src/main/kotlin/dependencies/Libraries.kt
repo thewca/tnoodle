@@ -16,6 +16,7 @@ object Libraries {
     val KTOR_SERVER_SERVLET = "io.ktor:ktor-server-servlet:${Versions.KTOR_SERVER_SERVLET}"
     val KTOR_SERIALIZATION = "io.ktor:ktor-serialization:${Versions.KTOR_SERIALIZATION}"
     val KTOR_SERVER_HOST_COMMON = "io.ktor:ktor-server-host-common:${Versions.KTOR_SERVER_HOST_COMMON}"
+    val KTOR_WEBSOCKETS = "io.ktor:ktor-websockets:${Versions.KTOR_WEBSOCKETS}"
     val LOGBACK_CLASSIC = "ch.qos.logback:logback-classic:${Versions.LOGBACK_CLASSIC}"
     val KOTLIN_ARGPARSER = "com.xenomachina:kotlin-argparser:${Versions.KOTLIN_ARGPARSER}"
     val PROGUARD_GRADLE = "com.guardsquare:proguard-gradle:${Versions.PROGUARD_GRADLE}"
