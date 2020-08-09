@@ -5,6 +5,7 @@ import proguard.gradle.ProGuardTask
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {

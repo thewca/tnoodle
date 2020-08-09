@@ -21,7 +21,7 @@ object Libraries {
     val KTOR_SERVER_HOST_COMMON = "io.ktor:ktor-server-host-common:${Versions.KTOR_SERVER_HOST_COMMON}"
     val LOGBACK_CLASSIC = "ch.qos.logback:logback-classic:${Versions.LOGBACK_CLASSIC}"
     val KOTLIN_ARGPARSER = "com.xenomachina:kotlin-argparser:${Versions.KOTLIN_ARGPARSER}"
-    val PROGUARD_GRADLE = "net.sf.proguard:proguard-gradle:${Versions.PROGUARD_GRADLE}"
+    val PROGUARD_GRADLE = "com.guardsquare:proguard-gradle:${Versions.PROGUARD_GRADLE}"
     val WCA_I18N = "com.github.thewca:wca_i18n:${Versions.WCA_I18N}"
     val GOOGLE_APPENGINE_GRADLE = "com.google.cloud.tools:appengine-gradle-plugin:${Versions.GOOGLE_APPENGINE_GRADLE}"
     val GOOGLE_CLOUD_STORAGE = "com.google.cloud:google-cloud-storage:${Versions.GOOGLE_CLOUD_STORAGE}"
