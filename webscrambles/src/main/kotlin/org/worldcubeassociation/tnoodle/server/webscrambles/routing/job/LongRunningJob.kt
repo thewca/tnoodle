@@ -15,18 +15,19 @@ abstract class LongRunningJob<T> : CoroutineScope {
 
     open val errorCodes: Map<Throwable, HttpStatusCode> = emptyMap()
 
-    abstract suspend fun ApplicationCall.extractData(): T
-    abstract suspend fun T.compute(jobId: Int): Pair<ContentType, ByteArray>
+    abstract suspend fun extractCall(call: ApplicationCall): T
+
+    abstract suspend fun T.compute(statusBackend: StatusBackend): Pair<ContentType, ByteArray>
 
     abstract fun getTargetState(data: T): Map<String, Int>
 
-    fun launch(call: ApplicationCall): JobCreationMessage {
+    fun launch(request: T): JobCreationMessage {
         val jobId = JobSchedulingHandler.nextJobID()
-        val execData = runBlocking { call.extractData() } // FIXME is there a prettier alternative than blocking?
+        val statusBackend = StatusBackend.JobRegistry(jobId)
 
         launch {
             try {
-                val (type, resultData) = execData.compute(jobId)
+                val (type, resultData) = request.compute(statusBackend)
                 JobSchedulingHandler.registerResult(jobId, type, resultData)
             } catch (t: Throwable) {
                 val probableCode = errorCodes[t] ?: HttpStatusCode.InternalServerError
@@ -34,18 +35,11 @@ abstract class LongRunningJob<T> : CoroutineScope {
             }
         }
 
-        val targetState = getTargetState(execData)
+        val targetState = getTargetState(request)
         return JobCreationMessage(jobId, targetState)
     }
 
-    fun computeBlocking(call: ApplicationCall): Pair<ContentType, ByteArray> {
-        // we don't _effectively_ need a jobId, but we register one
-        // just to be sure the execution doesn't collide with other async executions
-        val idleJobId = JobSchedulingHandler.nextJobID()
-
-        return runBlocking {
-            call.extractData()
-                .compute(idleJobId)
-        }
+    fun computeBlocking(request: T): Pair<ContentType, ByteArray> {
+        return runBlocking { request.compute(StatusBackend.NoOp) }
     }
 }

@@ -82,12 +82,16 @@ object JobSchedulingHandler : RouteHandler {
 
     fun <T> Route.registerJobPaths(job: LongRunningJob<T>) {
         post {
-            val (type, data) = job.computeBlocking(call)
+            val request = job.extractCall(call)
+            val (type, data) = job.computeBlocking(request)
+
             call.respondBytes(data, type)
         }
 
         put {
-            val jobCreation = job.launch(call)
+            val request = job.extractCall(call)
+            val jobCreation = job.launch(request)
+
             call.respond(HttpStatusCode.Created, jobCreation)
         }
     }
