@@ -9,6 +9,7 @@ import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.ITEXTPDF
 import dependencies.Libraries.KOTLIN_ARGPARSER
+import dependencies.Libraries.KTOR_WEBSOCKETS
 import dependencies.Libraries.MARKDOWNJ_CORE
 import dependencies.Libraries.SNAKEYAML
 import dependencies.Libraries.SYSTEM_TRAY
@@ -52,6 +53,7 @@ dependencies {
     implementation(KOTLIN_ARGPARSER)
     implementation(SYSTEM_TRAY)
     implementation(APACHE_COMMONS_LANG3)
+    implementation(KTOR_WEBSOCKETS)
 
     runtimeOnly(BOUNCYCASTLE)
     runtimeOnly(project(":tnoodle-ui"))
