@@ -9,7 +9,9 @@ buildscript {
     }
 
     dependencies {
-        classpath(PROGUARD_GRADLE)
+        classpath(PROGUARD_GRADLE) {
+            exclude(group = "com.android.tools.build")
+        }
         classpath(GOOGLE_APPENGINE_GRADLE)
     }
 }
