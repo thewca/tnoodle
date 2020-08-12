@@ -152,7 +152,7 @@ const Main = connect(
                     <div className="sticky-top bg-light">
                         <Interceptor />
                         <VersionInfo />
-                        <div className="container-fluid mt-2">
+                        <div className="container-fluid pt-2">
                             <div className="row">
                                 <EntryInterface />
                                 <div className="col-sm-4 form-group">
