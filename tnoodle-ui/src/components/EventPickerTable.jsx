@@ -144,7 +144,7 @@ const EventPickerTable = connect(
                 BOOTSTRAP_GRID / EVENTS_PER_LINE
             }`;
             return (
-                <div className="container-fluid">
+                <div className="container-fluid mt-2">
                     {this.maybeShowEditWarning()}
                     {eventChunks.map((chunk, i) => {
                         return (

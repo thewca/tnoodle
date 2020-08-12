@@ -68,7 +68,7 @@ const VersionInfo = connect(
             if (!officialBuild) {
                 this.props.updateOfficialZipStatus(false);
                 return (
-                    <div className="alert alert-danger">
+                    <div className="alert alert-danger m-0">
                         This TNoodle version is not official and scrambles
                         generated with this must not be used in competition. You
                         are on version {runningVersion}, you should use{" "}
@@ -82,7 +82,7 @@ const VersionInfo = connect(
             if (!allowedVersions.includes(runningVersion)) {
                 this.props.updateOfficialZipStatus(false);
                 return (
-                    <div className="alert alert-danger">
+                    <div className="alert alert-danger m-0">
                         This TNoodle version is not allowed. Do not use
                         scrambles generated in any official competition and
                         consider downloading the latest version{" "}
@@ -97,7 +97,7 @@ const VersionInfo = connect(
                 runningVersion !== currentTnoodle.name
             ) {
                 return (
-                    <div className="alert alert-info">
+                    <div className="alert alert-info m-0">
                         You are running {runningVersion}, which is still
                         allowed, but you should upgrade to {currentTnoodle.name}{" "}
                         available <a href={currentTnoodle.download}>here</a>.

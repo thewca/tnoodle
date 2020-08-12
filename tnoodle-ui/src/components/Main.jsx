@@ -149,10 +149,10 @@ const Main = connect(
         render() {
             return (
                 <form onSubmit={this.onSubmit}>
-                    <div className="sticky-top bg-light mb-2">
+                    <div className="sticky-top bg-light">
                         <Interceptor />
                         <VersionInfo />
-                        <div className="container-fluid">
+                        <div className="container-fluid mt-2">
                             <div className="row">
                                 <EntryInterface />
                                 <div className="col-sm-4 form-group">
