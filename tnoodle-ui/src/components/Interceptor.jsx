@@ -44,7 +44,7 @@ class Interceptor extends Component {
 
     updateMessage = (data) => {
         // Clear the message after some seconds
-        let message = data.message || data.statusText || "" + data;
+        let message = data.message || data.statusText || JSON.stringify(data);
         let stackTrace = data.stackTrace;
 
         setTimeout(() => {
