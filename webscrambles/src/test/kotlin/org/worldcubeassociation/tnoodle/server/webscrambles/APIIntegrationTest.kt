@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles
 
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
@@ -20,7 +20,7 @@ object APIIntegrationTest {
     @Test
     fun `test that every upcoming competition produces some output without error`() {
         val upcomingRaw = URL("https://www.worldcubeassociation.org/api/v0/competitions/").readText()
-        val upcomingComps = JsonConfig.SERIALIZER.parse(UpcomingCompetition.serializer().list, upcomingRaw)
+        val upcomingComps = JsonConfig.SERIALIZER.decodeFromString(ListSerializer(UpcomingCompetition.serializer()), upcomingRaw)
 
         val generationDate = LocalDateTime.now()
         val testCompCount = upcomingComps.size
@@ -34,7 +34,7 @@ object APIIntegrationTest {
             val wcifRaw = URL(url).readText()
             val multiCubes = MultiScrambleCountExtension(Random.nextInt(10, 20))
 
-            val websiteWcif = JsonConfig.SERIALIZER.parse(Competition.serializer(), wcifRaw)
+            val websiteWcif = JsonConfig.SERIALIZER.decodeFromString(Competition.serializer(), wcifRaw)
             val blankWcif = WCIFScrambleMatcher.installExtensionForEvents(websiteWcif, multiCubes, EventData.THREE_MULTI_BLD)
 
             println("Fetched WCIF. On to computing scrambles…")
