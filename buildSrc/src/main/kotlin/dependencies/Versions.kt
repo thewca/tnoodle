@@ -3,8 +3,8 @@ package dependencies
 object Versions {
     val JUNIT_JUPITER = "5.6.1"
     val BATIK = "1.13"
-    val KOTLIN = "1.3.72"
-    val KTOR = "1.3.2"
+    val KOTLIN = "1.4.0"
+    val KTOR = "1.4.0"
     val PROGUARD = "7.0.0"
     val KOTLESS = "0.1.5"
 
@@ -17,11 +17,8 @@ object Versions {
     val BOUNCYCASTLE = "1.66"
     val JUNIT_JUPITER_API = JUNIT_JUPITER
     val JUNIT_JUPITER_ENGINE = JUNIT_JUPITER
-    val KOTLIN_STDLIB_JVM = KOTLIN
-    val KOTLIN_STDLIB_JS = KOTLIN
-    val KOTLIN_STDLIB_COMMON = KOTLIN
-    val KOTLIN_SERIALIZATION_JVM = "0.20.0"
-    val KOTLIN_COROUTINES_CORE = "1.3.6"
+    val KOTLIN_SERIALIZATION_JVM = "1.0.0-RC"
+    val KOTLIN_COROUTINES_CORE = "1.3.9"
     val KTOR_SERVER_NETTY = KTOR
     val KTOR_SERVER_SERVLET = KTOR
     val KTOR_SERIALIZATION = KTOR
