@@ -75,8 +75,8 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     }
 
     private fun getFontConfiguration(availableArea: Rectangle, scrambles: List<String>): Font {
-        val longestScramble = scrambles.flatMap { it.split(NEW_LINE) }.maxBy { it.length }.orEmpty()
-        val maxLines = scrambles.map { it.split(NEW_LINE) }.map { it.count() }.max() ?: 1
+        val longestScramble = scrambles.flatMap { it.split(NEW_LINE) }.maxByOrNull { it.length }.orEmpty()
+        val maxLines = scrambles.map { it.split(NEW_LINE) }.map { it.count() }.maxOrNull() ?: 1
 
         val fontSize = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScramble, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true) // FIXME const
         val fontSizeIfIncludingNewlines = availableArea.height / maxLines

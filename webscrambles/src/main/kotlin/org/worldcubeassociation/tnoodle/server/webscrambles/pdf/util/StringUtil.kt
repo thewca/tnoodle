@@ -11,7 +11,7 @@ object StringUtil {
     private const val PASSCODE_NUM_CHARS = 8
 
     fun padTurnsUniformly(scramble: String, padding: String): String {
-        val maxTurnLength = scramble.split("\\s+".toRegex()).map { it.length }.max() ?: 0
+        val maxTurnLength = scramble.split("\\s+".toRegex()).map { it.length }.maxOrNull() ?: 0
 
         val lines = scramble.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }
 

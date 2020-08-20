@@ -32,7 +32,7 @@ data class Schedule(val numberOfDays: Int, val venues: List<Venue>) {
 
     val earliestActivity: Activity
         get() = activitiesWithLocalStartTimes
-            .minBy { it.value }?.key
+            .minByOrNull { it.value }?.key
             ?: ScheduleMatchingException.error("Unable to compute earliest activity")
 
     val hasMultipleDays: Boolean get() = numberOfDays > 1
