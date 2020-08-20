@@ -8,14 +8,14 @@ import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.close
 import io.ktor.websocket.WebSocketServerSession
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.worldcubeassociation.tnoodle.server.model.cache.CoroutineScrambleCacher
 import kotlin.coroutines.CoroutineContext
 
 abstract class LongRunningJob<T> : CoroutineScope {
     override val coroutineContext: CoroutineContext
-        get() = CoroutineScrambleCacher.JOB_CONTEXT
+        get() = Dispatchers.Unconfined
 
     open val errorCodes: Map<Throwable, HttpStatusCode> = emptyMap()
 
