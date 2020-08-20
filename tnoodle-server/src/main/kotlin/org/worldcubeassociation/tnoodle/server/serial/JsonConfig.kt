@@ -6,8 +6,9 @@ import kotlinx.serialization.json.JsonConfiguration
 object JsonConfig {
     const val CLASS_DISCRIMINATOR = "id"
 
-    val TNOODLE_DEFAULT = JsonConfiguration.Stable
-        .copy(encodeDefaults = false, ignoreUnknownKeys = true, classDiscriminator = CLASS_DISCRIMINATOR)
-
-    val SERIALIZER by lazy { Json(TNOODLE_DEFAULT) }
+    val SERIALIZER by lazy { Json {
+        encodeDefaults = false
+        ignoreUnknownKeys = true
+        classDiscriminator = CLASS_DISCRIMINATOR
+    } }
 }

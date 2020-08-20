@@ -16,7 +16,7 @@ object JsEnvHandler : RouteHandler {
     override fun install(router: Route) {
         router.get("env.js") {
             val serial = MapSerializer(String.serializer(), String.serializer())
-            val js = "window.TNOODLE_ENV = ${JsonConfig.SERIALIZER.stringify(serial, JS_ENV)};"
+            val js = "window.TNOODLE_ENV = ${JsonConfig.SERIALIZER.encodeToString(serial, JS_ENV)};"
             call.respondText(js, ContentType.Application.JavaScript)
         }
 
