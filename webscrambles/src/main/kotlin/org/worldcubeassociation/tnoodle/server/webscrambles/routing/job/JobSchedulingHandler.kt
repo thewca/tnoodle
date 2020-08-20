@@ -58,7 +58,7 @@ object JobSchedulingHandler : RouteHandler {
             val jobId = listedJobs.indices
                 .map(Int::inc)
                 .firstOrNull { it !in JOBS }
-                ?: listedJobs.max()?.plus(1)
+                ?: listedJobs.maxOrNull()?.plus(1)
                 ?: 1
 
             return jobId

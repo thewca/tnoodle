@@ -41,6 +41,6 @@ object WCIFCompetitorInfo {
             .filter { it.eventModel == EventData.THREE_MULTI_BLD }
             .mapNotNull { it.best.asMultiResult }
 
-        return mbldResults.maxBy { comparator(it) }
+        return mbldResults.maxByOrNull { comparator(it) }
     }
 }

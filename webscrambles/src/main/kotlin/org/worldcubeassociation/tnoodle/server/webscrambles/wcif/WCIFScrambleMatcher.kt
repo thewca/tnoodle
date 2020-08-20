@@ -222,7 +222,7 @@ object WCIFScrambleMatcher {
     private fun <T : IndexingIdProvider> buildReindexingMap(candidates: List<T>): Map<T, Int> {
         val forReindexing = candidates.filter { it.id == ID_PENDING }
         val maxAssignedId = (candidates - forReindexing)
-            .maxBy { it.id }?.id ?: 1
+            .maxByOrNull { it.id }?.id ?: 1
 
         return forReindexing.mapIndexed { i, elem -> elem to i + maxAssignedId + 1 }
             .toMap()

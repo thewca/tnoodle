@@ -281,20 +281,20 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val firstColumnBaseFontSize = PdfUtil.fitText(Font(bf), movesType[0], firstColumnRectangle, 10f, false, 1f)
 
         val movesTypeMinFont = movesType.map { PdfUtil.fitText(Font(bf, firstColumnBaseFontSize, Font.BOLD), it, firstColumnRectangle, 10f, false, 1f) }
-            .min() ?: firstColumnBaseFontSize
+            .minOrNull() ?: firstColumnBaseFontSize
 
         val directionMinFont = direction.map { PdfUtil.fitText(Font(bf, firstColumnBaseFontSize), it, firstColumnRectangle, 10f, false, 1f) }
-            .min() ?: firstColumnBaseFontSize
+            .minOrNull() ?: firstColumnBaseFontSize
 
         val firstColumnFontSize = min(firstColumnBaseFontSize, min(movesTypeMinFont, directionMinFont))
 
         // Center the table
-        val movesTypeMaxWidth = movesType.map { bf.getWidthPoint(it, firstColumnFontSize) }.max() ?: 0f
-        val directionMaxWidth = direction.map { bf.getWidthPoint(it, firstColumnFontSize) }.max() ?: 0f
+        val movesTypeMaxWidth = movesType.map { bf.getWidthPoint(it, firstColumnFontSize) }.maxOrNull() ?: 0f
+        val directionMaxWidth = direction.map { bf.getWidthPoint(it, firstColumnFontSize) }.maxOrNull() ?: 0f
         val maxFirstColumnWidth = max(movesTypeMaxWidth, directionMaxWidth)
 
         val lastColumnValues = movesCell.flatMap { c -> c.map { it.filterNotNull().last() } }
-        val maxLastColumnWidth = lastColumnValues.map { bf.getWidthPoint(it, movesFontSize.toFloat()) }.max() ?: 0f
+        val maxLastColumnWidth = lastColumnValues.map { bf.getWidthPoint(it, movesFontSize.toFloat()) }.maxOrNull() ?: 0f
 
         for (i in movesType.indices) {
             val explanationStringCell = PdfPCell(Phrase(movesType[i], Font(bf, firstColumnFontSize, Font.BOLD))).apply {
@@ -375,6 +375,6 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
 
         val DIRECTION_MODIFIERS = arrayOf("", "'", "2")
 
-        var LEADING_MULTIPLIER = 1.3f;
+        var LEADING_MULTIPLIER = 1.3f
     }
 }
