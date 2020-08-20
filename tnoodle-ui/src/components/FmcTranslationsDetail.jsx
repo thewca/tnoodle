@@ -150,9 +150,9 @@ const FmcTranslationsDetail = connect(
                                                                 </th>
                                                                 {j <
                                                                     TRANSLATIONS_PER_LINE -
-                                                                        1 && (
-                                                                    <th />
-                                                                )}
+                                                                    1 && (
+                                                                        <th />
+                                                                    )}
                                                             </React.Fragment>
                                                         );
                                                     }
@@ -177,6 +177,7 @@ const FmcTranslationsDetail = connect(
                     <tr>
                         <th colSpan={4} className="text-center">
                             <button
+                                type="button"
                                 className="btn btn-primary"
                                 onClick={this.toggleTranslations}
                             >
