@@ -15,7 +15,7 @@ data class InterchangeFolder(val wcif: Competition, val uniqueTitles: Map<String
         val safeGlobalTitle = globalTitle.toFileSafeString()
 
         val jsonInterchangeData = ZipInterchangeInfo(globalTitle, versionTag, generationDate, generationUrl, wcif)
-        val jsonStr = JsonConfig.SERIALIZER.stringify(ZipInterchangeInfo.serializer(), jsonInterchangeData)
+        val jsonStr = JsonConfig.SERIALIZER.encodeToString(ZipInterchangeInfo.serializer(), jsonInterchangeData)
 
         val jsonpFileName = "$safeGlobalTitle.jsonp"
         val jsonpStr = "var SCRAMBLES_JSON = $jsonStr;"

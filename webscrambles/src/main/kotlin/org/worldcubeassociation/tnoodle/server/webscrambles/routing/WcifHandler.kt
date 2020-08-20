@@ -100,7 +100,7 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
         router.route("wcif") {
             route("scrambles") {
                 val job = ScramblingJob { wcif, _, _ ->
-                    val resultBytes = JsonConfig.SERIALIZER.stringify(Competition.serializer(), wcif)
+                    val resultBytes = JsonConfig.SERIALIZER.encodeToString(Competition.serializer(), wcif)
                     ContentType.Application.Json to resultBytes.toByteArray()
                 }
 

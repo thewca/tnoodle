@@ -2,7 +2,8 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model
 
 import kotlinx.serialization.*
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
 
@@ -13,9 +14,9 @@ data class Extension(val id: String, val specUrl: String, val data: JsonObject) 
             return null
         }
 
-        val mockData = json { JsonConfig.CLASS_DISCRIMINATOR to id } + data
+        val mockData = buildJsonObject { put(JsonConfig.CLASS_DISCRIMINATOR, id) } + data
         val mockExtension = JsonObject(mockData)
 
-        return JsonConfig.SERIALIZER.fromJson(ExtensionBuilder.serializer(), mockExtension) as? T
+        return JsonConfig.SERIALIZER.decodeFromJsonElement(ExtensionBuilder.serializer(), mockExtension) as? T
     }
 }
