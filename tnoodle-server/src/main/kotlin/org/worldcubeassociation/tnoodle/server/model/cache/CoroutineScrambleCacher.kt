@@ -28,8 +28,7 @@ class CoroutineScrambleCacher(val puzzle: Puzzle, capacity: Int) : CoroutineScop
     fun getScramble(): String = runBlocking { yieldScramble() }
 
     companion object {
-        val DAEMON_FACTORY = ThreadFactory { Executors.defaultThreadFactory().newThread(it).apply { isDaemon = true } }
-
-        val JOB_CONTEXT = Executors.newFixedThreadPool(2, DAEMON_FACTORY).asCoroutineDispatcher()
+        private val DAEMON_FACTORY = ThreadFactory { Executors.defaultThreadFactory().newThread(it).apply { isDaemon = true } }
+        private val JOB_CONTEXT = Executors.newFixedThreadPool(2, DAEMON_FACTORY).asCoroutineDispatcher()
     }
 }
