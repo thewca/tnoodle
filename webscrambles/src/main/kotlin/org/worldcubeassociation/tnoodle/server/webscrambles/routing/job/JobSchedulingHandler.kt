@@ -14,6 +14,7 @@ import io.ktor.websocket.webSocket
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import org.worldcubeassociation.tnoodle.server.RouteHandler
+import org.worldcubeassociation.tnoodle.server.crypto.StringEncryption.encodeBase64
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 
 object JobSchedulingHandler : RouteHandler {
@@ -114,7 +115,7 @@ object JobSchedulingHandler : RouteHandler {
                     val (type, data) = job.channel(request, this)
 
                     val targetMarker = job.getResultMarker(request)
-                    val encodedData = data.toString(Charsets.UTF_8)
+                    val encodedData = data.encodeBase64()
 
                     // signal that the computation result is about to start
                     send(targetMarker)
