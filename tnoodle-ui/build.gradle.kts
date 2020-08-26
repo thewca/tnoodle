@@ -1,4 +1,4 @@
-import com.moowork.gradle.node.NodeExtension
+import com.github.gradle.node.NodeExtension
 
 description = "A web ui for TNoodle that uses modern technology"
 
@@ -8,12 +8,19 @@ plugins {
 }
 
 configure<NodeExtension> {
-    download = true
-    version = "12.18.3"
+    download.set(true)
+    version.set("12.18.3")
 }
 
-tasks.getByName("yarn_build") {
-    dependsOn("yarn_install")
+val yarnInstall = tasks.named("yarn_install") {
+    inputs.file("package.json")
+    inputs.file("yarn.lock")
+
+    outputs.dir("node_modules")
+}
+
+val yarnBuild = tasks.named("yarn_build") {
+    dependsOn(yarnInstall)
 
     inputs.files(fileTree("src").exclude("*.css"))
     inputs.dir("public")
@@ -23,32 +30,25 @@ tasks.getByName("yarn_build") {
     outputs.file("${project.buildDir}/index.html")
 }
 
-tasks.getByName("yarn_install") {
-    inputs.file("package.json")
-    inputs.file("yarn.lock")
+val yarnTest = tasks.named("yarn_test") {
+    dependsOn(yarnBuild)
+}
 
-    outputs.dir("node_modules")
+val yarnPrettier = tasks.named("yarn_prettier") {
+    dependsOn(yarnInstall)
+}
+
+tasks.getByName("check") {
+    dependsOn(yarnTest)
+    dependsOn(yarnPrettier)
 }
 
 tasks.getByName("assemble") {
     dependsOn("packageReactFrontend")
 }
 
-tasks.getByName("check") {
-    dependsOn("yarn_test")
-    dependsOn("yarn_prettier")
-}
-
-tasks.getByName("yarn_test") {
-    dependsOn("yarn_install")
-}
-
-tasks.getByName("yarn_prettier") {
-    dependsOn("yarn_install")
-}
-
 tasks.create<Zip>("packageReactFrontend") {
-    dependsOn("yarn_build")
+    dependsOn(yarnBuild)
 
     archiveBaseName.set("react-new-frontend")
     archiveExtension.set("jar")

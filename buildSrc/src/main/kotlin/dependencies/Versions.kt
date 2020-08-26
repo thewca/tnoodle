@@ -39,7 +39,7 @@ object Versions {
 
     object Plugins {
         val SHADOW = "6.1.0"
-        val NODEJS = "2.2.4"
+        val NODEJS = "3.0.0"
         val DEPENDENCY_VERSIONS = "0.36.0"
         val GIT_VERSION_TAG = "0.12.3"
 
