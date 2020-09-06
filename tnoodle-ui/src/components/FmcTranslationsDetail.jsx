@@ -35,9 +35,9 @@ const FmcTranslationsDetail = connect(
             this.state = { showTranslations: false };
         }
 
-        handleTranslation = (id) => {
+        handleTranslation = (id, status) => {
             this.props.updateFileZipBlob(null);
-            this.props.updateTranslation(id);
+            this.props.updateTranslation(id, status);
         };
 
         selectAllTranslations = () => {
@@ -141,9 +141,9 @@ const FmcTranslationsDetail = connect(
                                                                         checked={
                                                                             translation.status
                                                                         }
-                                                                        onChange={() =>
+                                                                        onChange={(e) =>
                                                                             this.handleTranslation(
-                                                                                translation.id
+                                                                                translation.id, e.target.checked
                                                                             )
                                                                         }
                                                                     />
