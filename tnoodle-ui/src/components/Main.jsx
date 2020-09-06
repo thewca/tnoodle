@@ -16,6 +16,7 @@ const mapStateToProps = (store) => ({
     competitionId: store.competitionId,
     officialZip: store.officialZip,
     fileZipBlob: store.fileZipBlob,
+    translations: store.translations,
 });
 
 const mapDispatchToProps = {
