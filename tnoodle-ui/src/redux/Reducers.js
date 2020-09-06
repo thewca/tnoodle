@@ -155,7 +155,7 @@ export const Reducer = (store, action) => {
                     ...translation,
                     status:
                         translation.id === action.payload.id
-                            ? !translation.status
+                            ? action.payload.status
                             : translation.status,
                 })),
             ],
