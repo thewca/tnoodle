@@ -38,11 +38,11 @@ const VersionInfo = connect(
             fetchRunningVersion()
                 .then((response) => response.json())
                 .then((version) => {
-                    let { runningVersion, officialBuild } = version;
+                    let { runningVersion, signedBuild } = version;
                     this.setState({
                         ...this.state,
                         runningVersion,
-                        officialBuild,
+                        officialBuild: signedBuild,
                     });
                 })
                 .catch((e) => console.error(e));
