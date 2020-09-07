@@ -80,9 +80,9 @@ export const updateTranslations = (translations) => ({
     payload: { translations },
 });
 
-export const updateTranslation = (id) => ({
+export const updateTranslation = (id, status) => ({
     type: ActionTypes.UPDATE_TRANSLATION,
-    payload: { id },
+    payload: { id, status },
 });
 
 export const resetTranslations = () => ({
