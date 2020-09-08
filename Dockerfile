@@ -19,7 +19,7 @@ RUN chown -R $APPLICATION_USER /app
 USER $APPLICATION_USER
 
 # We copy the FAT Jar we built into the /app folder and sets that folder as the working directory.
-COPY ./TNoodle-Docker-latest.jar /app/tnoodle-application.jar
+COPY ./TNoodle-Build-latest.jar /app/tnoodle-application.jar
 WORKDIR /app
 
 # allow deployments to online Docker containers

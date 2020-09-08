@@ -1,7 +1,7 @@
-import com.google.cloud.tools.gradle.appengine.standard.AppEngineStandardExtension
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
-import configurations.ProjectVersions.gitVersionTag
+import configurations.ProjectVersions.tNoodleImplOrDefault
+import configurations.ProjectVersions.tNoodleVersionOrDefault
 import dependencies.Libraries.BATIK_TRANSCODER
 import dependencies.Libraries.GOOGLE_CLOUD_STORAGE
 import dependencies.Libraries.KOTLESS_KTOR
@@ -21,8 +21,6 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-
     implementation(project(":tnoodle-server"))
 
     implementation(KOTLESS_KTOR)
@@ -34,7 +32,7 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
 
-configure<AppEngineStandardExtension> {
+appengine {
     run {
         projectId = "wca-scrambles-unofficial"
     }
@@ -46,17 +44,16 @@ configure<AppEngineStandardExtension> {
 
 tasks.create("dumpVersionToFile") {
     tasks.withType<ProcessResources> {
-        dependsOn("dumpVersionToFile")
+        dependsOn(this@create)
     }
 
+    val outFile = file("$projectDir/src/main/resources/version.tnoodle")
+    outputs.file(outFile)
+
     doLast {
-        val tNoodleTitle = project.findProperty("TNOODLE_IMPL")
-            ?: "TNoodle-LOCAL"
+        val tNoodleTitle = project.tNoodleImplOrDefault()
+        val tNoodleVersion = project.tNoodleVersionOrDefault()
 
-        val tNoodleVersion = project.findProperty("TNOODLE_VERSION")
-            ?: "devel-${project.gitVersionTag()}"
-
-        val fileDir = "$projectDir/src/main/resources/version.tnoodle"
-        file(fileDir).writeText("$tNoodleTitle\n$tNoodleVersion")
+        outFile.writeText("$tNoodleTitle\n$tNoodleVersion")
     }
 }

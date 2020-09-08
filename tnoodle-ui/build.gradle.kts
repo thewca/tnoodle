@@ -42,10 +42,6 @@ tasks.getByName("yarn_test") {
     dependsOn("yarn_build")
 }
 
-configurations.create("reactFrontendBundle") {
-    configurations.getByName("default").extendsFrom(this)
-}
-
 tasks.create<Zip>("packageReactFrontend") {
     dependsOn("yarn_build")
 
@@ -61,6 +57,8 @@ tasks.create<Zip>("packageReactFrontend") {
 
         into("wca/tnoodle-ui")
     }
+}
 
-    artifacts.add("reactFrontendBundle", this)
+artifacts {
+    add("default", tasks["packageReactFrontend"])
 }

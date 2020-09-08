@@ -1,4 +1,6 @@
 import configurations.Languages.attachLocalRepositories
+import configurations.ProjectVersions.TNOODLE_SYMLINK
+import configurations.ProjectVersions.setTNoodleRelease
 
 import proguard.gradle.ProGuardTask
 
@@ -29,34 +31,22 @@ plugins {
 }
 
 val releasePrefix = "TNoodle-WCA"
+val releaseProject = "webscrambles"
 
 tasks.create("registerReleaseTag") {
-    doFirst {
-        project.ext.set("TNOODLE_IMPL", releasePrefix)
-        project.ext.set("TNOODLE_VERSION", project.version)
-    }
+    setTNoodleRelease(project.ext, releasePrefix)
 }
 
 tasks.create("registerCloudReleaseTag") {
-    dependsOn("registerReleaseTag")
-
-    doFirst {
-        project.ext.set("TNOODLE_IMPL", "TNoodle-CLOUD")
-    }
+    setTNoodleRelease(project.ext, "TNoodle-CLOUD")
 }
 
-tasks.create<ProGuardTask>("generateOfficialRelease") {
-    description = "Generate an official WCA release artifact."
-    group = "WCA"
+tasks.create<ProGuardTask>("minifyRelease") {
+    dependsOn("buildOfficial")
 
-    val targetProject = "webscrambles"
+    configuration("proguard-rules.pro")
 
-    val targetBuildDir = project(":$targetProject").buildDir
-    val targetConfigurations = project(":$targetProject").configurations
-
-    dependsOn("registerReleaseTag", ":$targetProject:cleanShadowJar", ":$targetProject:shadowJar")
-
-    injars("$targetBuildDir/libs/$targetProject-$version-all.jar")
+    injars(TNOODLE_SYMLINK)
     outjars("$releasePrefix-$version.jar")
 
     if (JavaVersion.current().isJava9Compatible) {
@@ -66,87 +56,47 @@ tasks.create<ProGuardTask>("generateOfficialRelease") {
         libraryjars("${System.getProperty("java.home")}/lib/jce.jar")
     }
 
+    val targetConfigurations = project(":$releaseProject").configurations
     libraryjars(targetConfigurations.findByName("runtimeClasspath")?.files)
 
     printmapping("$buildDir/minified/proguard.map")
-    allowaccessmodification()
-    dontskipnonpubliclibraryclassmembers()
-
-    // FIXME...? Routes currently don't work in the browser when code gets obfuscated or optimised
-    dontobfuscate()
-    dontoptimize()
-
-    dontnote("kotlinx.serialization.SerializationKt")
-
-    // cf. https://github.com/ktorio/ktor-samples/tree/master/other/proguard
-    keep("class org.worldcubeassociation.tnoodle.server.** { *; }")
-    keep("class io.ktor.server.netty.Netty { *; }")
-    keep("class kotlin.reflect.jvm.internal.** { *; }")
-    keep("class kotlin.text.RegexOption { *; }")
-
-    // CSS rendering uses reflection black magic, so static bytecode optimisers need a little help
-    keep("class org.apache.batik.css.parser.** { *; }")
-    keep("class org.apache.batik.dom.** { *; }")
-    keep("class com.itextpdf.text.ImgTemplate { *; }")
-
-    keep("class ch.qos.logback.core.** { *; }")
-
-    keep("class com.sun.jna.** { *; }")
-    keep("class dorkbox.util.jna.** { *; }")
-    keep("class dorkbox.systemTray.** { *; }")
-
-    keep(mapOf("includedescriptorclasses" to true), "class org.worldcubeassociation.tnoodle.server.webscrambles.**\$\$serializer { *; }")
-
-    keepattributes("*Annotation")
-    keepattributes("InnerClasses")
-
-    keepclasseswithmembers("""
-        class org.worldcubeassociation.tnoodle.server.webscrambles.** {
-            kotlinx.serialization.KSerializer serializer(...);
-        }
-    """.trimIndent())
-
-    keepclassmembers("""
-        class org.worldcubeassociation.tnoodle.server.webscrambles.** {
-            *** Companion;
-        }
-    """.trimIndent())
-
-    keepclasseswithmembernames("""class * {
-        native <methods>;
-    }""".trimIndent())
-
-    keepclasseswithmembernames("""enum * {
-        <fields>;
-        public static **[] values();
-        public static ** valueOf(java.lang.String);
-    }""")
-
-    dontwarn()
 }
 
-tasks.create<JavaExec>("startOfficialServer") {
+tasks.create("buildOfficial") {
+    description = "Generate an official WCA release artifact."
+    group = "WCA"
+
+    dependsOn("registerReleaseTag", ":$releaseProject:shadowJar")
+}
+
+tasks.create<JavaExec>("runOfficial") {
     description = "Starts the TNoodle server from an official release artifact. Builds one if necessary."
     group = "WCA"
 
-    dependsOn("generateOfficialRelease")
+    dependsOn("buildOfficial", "minifyRelease")
 
     main = "-jar"
     args = listOf("$releasePrefix-$version.jar")
 }
 
-tasks.create("generateDebugRelease") {
-    dependsOn(":webscrambles:shadowJar")
+tasks.create("buildDebug") {
+    description = "Generate an unofficial JAR for testing purposes"
+    group = "Development"
+
+    dependsOn(":$releaseProject:shadowJar")
 }
 
-tasks.create("startDebugServer") {
-    dependsOn(":webscrambles:runShadow")
+tasks.create("runDebug") {
+    description = "Run an unofficial JAR for testing purposes"
+    group = "Development"
+
+    dependsOn(":$releaseProject:runShadow")
 }
 
-tasks.create("deployToCloud") {
+tasks.create("installCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineDeploy")
 }
 
-tasks.create("emulateCloudLocal") {
+tasks.create("installEmulateCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineRun")
 }

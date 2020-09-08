@@ -15,7 +15,7 @@ node_modules/
 .gradle/
 local.properties
 TNoodle-WCA-*.jar
-TNoodle-Docker-*.jar
+TNoodle-Build-latest.jar
 tnoodle_resources/
 tnoodle_pruning_cache/
 **/logging/*.log
