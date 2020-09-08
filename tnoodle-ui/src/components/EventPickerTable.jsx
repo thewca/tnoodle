@@ -36,11 +36,11 @@ const EventPickerTable = connect(
     mapDispatchToProps
 )(
     class extends Component {
-        componentDidMount = function () {
+        componentDidMount() {
             this.getFormats();
             this.getWcaEvents();
             this.getFmcTranslations();
-        };
+        }
 
         getFormats = () => {
             fetchFormats()
