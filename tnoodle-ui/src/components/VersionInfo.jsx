@@ -38,11 +38,11 @@ const VersionInfo = connect(
             fetchRunningVersion()
                 .then((response) => response.json())
                 .then((version) => {
-                    let { runningVersion, officialBuild } = version;
+                    let { runningVersion, signedBuild } = version;
                     this.setState({
                         ...this.state,
                         runningVersion,
-                        officialBuild,
+                        officialBuild: signedBuild,
                     });
                 })
                 .catch((e) => console.error(e));
@@ -59,11 +59,6 @@ const VersionInfo = connect(
                 return null;
             }
 
-            // Best case scenario
-            if (runningVersion === currentTnoodle.name) {
-                return null;
-            }
-
             // Generated version is not an official jar
             if (!officialBuild) {
                 this.props.updateOfficialZipStatus(false);
@@ -76,6 +71,12 @@ const VersionInfo = connect(
                         <a href={currentTnoodle.download}>here</a>
                     </div>
                 );
+            }
+
+            // Best case scenario. We place this after the officialBuild
+            // so we can avoid not official build from being accidentally used.
+            if (runningVersion === currentTnoodle.name) {
+                return null;
             }
 
             // Running version is not allowed anymore.
