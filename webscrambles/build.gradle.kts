@@ -43,6 +43,12 @@ plugins {
     KOTLIN_SERIALIZATION
 }
 
+configurations {
+    create("deployable") {
+        extendsFrom(configurations["default"])
+    }
+}
+
 dependencies {
     implementation(project(":tnoodle-server"))
 
@@ -57,7 +63,8 @@ dependencies {
     implementation(KTOR_WEBSOCKETS)
 
     runtimeOnly(BOUNCYCASTLE)
-    runtimeOnly(project(":tnoodle-ui"))
+
+    "deployable"(project(":tnoodle-ui"))
 
     testImplementation(TESTING_MOCKK)
 }
@@ -106,6 +113,8 @@ tasks.create("registerManifest") {
 }
 
 tasks.getByName<ShadowJar>("shadowJar") {
+    configurations = listOf(project.configurations["deployable"])
+
     val targetLn = rootProject.file(TNOODLE_SYMLINK)
     outputs.file(targetLn)
 
@@ -117,4 +126,8 @@ tasks.getByName<ShadowJar>("shadowJar") {
             logger.warn("Unable to (re-)create symlink for latest release! Using top-level Gradle tasks will implicitly reference an older build!")
         }
     }
+}
+
+tasks.getByName<JavaExec>("run") {
+    args = listOf("--nobrowser")
 }

@@ -93,6 +93,13 @@ tasks.create("runDebug") {
     dependsOn(":$releaseProject:runShadow")
 }
 
+tasks.create("runBackend") {
+    description = "Run an unofficial JAR that only holds the backend and nothing else. Visiting the localhost website WILL NOT WORK"
+    group = "Development"
+
+    dependsOn(":$releaseProject:run")
+}
+
 tasks.create("installCloud") {
     dependsOn("registerCloudReleaseTag", ":cloudscrambles:appengineDeploy")
 }
