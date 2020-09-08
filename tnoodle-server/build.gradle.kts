@@ -1,6 +1,9 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 
+import crypto.BuildVerification.SIGNATURE_PACKAGE
+import crypto.BuildVerification.SIGNATURE_SUFFIX
+
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.KOTLIN_COROUTINES_CORE
 import dependencies.Libraries.KTOR_SERIALIZATION
@@ -39,4 +42,10 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
+}
+
+afterEvaluate {
+    delete(fileTree("src/main/resources/$SIGNATURE_PACKAGE").matching {
+        include("**/*.$SIGNATURE_SUFFIX")
+    })
 }

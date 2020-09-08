@@ -1,2 +1,1 @@
 src/main/resources/signature/**/*.sign
-src/main/resources/rsa/*.pkcs8.pem

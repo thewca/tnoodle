@@ -1,6 +1,10 @@
 import configurations.Languages.attachLocalRepositories
 import configurations.ProjectVersions.TNOODLE_SYMLINK
 import configurations.ProjectVersions.setTNoodleRelease
+import crypto.BuildVerification.SIGNATURE_PACKAGE
+import crypto.BuildVerification.SIGNATURE_SUFFIX
+
+import crypto.BuildVerification.createBuildSignature
 
 import proguard.gradle.ProGuardTask
 
@@ -35,6 +39,23 @@ val releasePrefix = "TNoodle-WCA"
 val releaseProject = "webscrambles"
 
 tasks.create("registerReleaseTag") {
+    val signatureProject = project(":tnoodle-server")
+    val filenameToSign = "rsa/tnoodle_public.pem"
+
+    val signatureStorage = signatureProject.file("src/main/resources/$SIGNATURE_PACKAGE/$filenameToSign.$SIGNATURE_SUFFIX")
+
+    outputs.file(signatureStorage)
+
+    doFirst {
+        val privateKeyPath = project.findProperty("wca.wst.signature-private-key")?.toString()
+            ?: error("You have to provide a path to a PKCS8 private key for official releases!")
+
+        val fileToSign = signatureProject.file("src/main/resources/$filenameToSign")
+        val signature = createBuildSignature(privateKeyPath, fileToSign)
+
+        signatureStorage.writeBytes(signature)
+    }
+
     setTNoodleRelease(project.ext, releasePrefix)
 }
 
