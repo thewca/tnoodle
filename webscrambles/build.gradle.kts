@@ -1,8 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.FileUtils.symlink
 import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
-import configurations.ProjectVersions.gitVersionTag
+import configurations.ProjectVersions.TNOODLE_SYMLINK
+import configurations.ProjectVersions.tNoodleImplOrDefault
+import configurations.ProjectVersions.tNoodleVersionOrDefault
 
 import dependencies.Libraries.APACHE_COMMONS_LANG3
 import dependencies.Libraries.BATIK_TRANSCODER
@@ -41,8 +44,6 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-
     implementation(project(":tnoodle-server"))
 
     implementation(ZIP4J)
@@ -89,39 +90,31 @@ tasks.getByName("check") {
 
 tasks.create("registerManifest") {
     tasks.withType<Jar> {
-        dependsOn("registerManifest")
+        dependsOn(this@create)
     }
 
     doLast {
         tasks.withType<Jar> {
             manifest {
-                val tnoodleTitle = project.findProperty("TNOODLE_IMPL")
-                    ?: "TNoodle-LOCAL"
-
-                val tnoodleVersion = project.findProperty("TNOODLE_VERSION")
-                    ?: "devel-${project.gitVersionTag()}"
-
                 attributes(
-                    "Implementation-Title" to tnoodleTitle,
-                    "Implementation-Version" to tnoodleVersion
+                    "Implementation-Title" to project.tNoodleImplOrDefault(),
+                    "Implementation-Version" to project.tNoodleVersionOrDefault()
                 )
             }
         }
     }
 }
 
-tasks.getByName("shadowJar") {
+tasks.getByName<ShadowJar>("shadowJar") {
+    val targetLn = rootProject.file(TNOODLE_SYMLINK)
+    outputs.file(targetLn)
+
     doLast {
-        val targetProject = project.name
-
-        val originFile = file("$buildDir/libs/$targetProject-$version-all.jar")
-            .relativeToOrSelf(rootProject.projectDir)
-        val targetLn = rootProject.file("TNoodle-Docker-latest.jar")
-
-        val created = symlink(targetLn, originFile)
+        val created = archiveFile.orNull?.asFile
+            ?.let { symlink(targetLn, it) } ?: false
 
         if (!created) {
-            logger.warn("Unable to (re-)create symlink for Docker container! Building a Docker image might result in out-of-date deployments")
+            logger.warn("Unable to (re-)create symlink for latest release! Using top-level Gradle tasks will implicitly reference an older build!")
         }
     }
 }

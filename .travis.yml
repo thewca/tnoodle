@@ -5,4 +5,4 @@ sudo: true
 script:
   - ./gradlew assemble
   - ./gradlew check
-  - ./gradlew generateDebugRelease
+  - ./gradlew buildOfficial
