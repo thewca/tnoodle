@@ -6,6 +6,5 @@ jobs:
           script:
               - ./gradlew assemble
               - ./gradlew check
-              - ./gradlew buildOfficial
           after_script:
               - COVERALLS_REPO_TOKEN=$coveralls_repo_token ./gradlew yarn_coveralls
