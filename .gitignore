@@ -21,6 +21,7 @@ tnoodle_pruning_cache/
 **/tnoodle.log
 version.tnoodle
 *.hprof
+gradle.properties
 
 .idea/
 .vscode/
