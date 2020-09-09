@@ -13,4 +13,6 @@ jobs:
           script:
               - cd tnoodle-ui
               - npm install
-              - npm run test
+              - npm test -- --coverage
+          after_script:
+              - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coveralls
