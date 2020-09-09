@@ -38,10 +38,14 @@ const VersionInfo = connect(
             fetchRunningVersion()
                 .then((response) => response.json())
                 .then((version) => {
-                    let { runningVersion, signedBuild } = version;
+                    let { projectName, projectVersion, signedBuild } = version;
                     this.setState({
                         ...this.state,
-                        runningVersion,
+                        // Running version is based on projectName and projectVersion
+                        runningVersion:
+                            projectVersion != null && projectVersion != null
+                                ? `${projectName}-${projectVersion}`
+                                : "",
                         officialBuild: signedBuild,
                     });
                 })

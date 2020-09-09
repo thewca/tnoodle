@@ -28,7 +28,6 @@ afterEach(() => {
 it("Current version is the correct one", async () => {
     // Define mock objects
     const version = {
-        runningVersion: "TNoodle-WCA-2",
         projectName: "TNoodle-WCA",
         projectVersion: "2",
         signedBuild: true,
@@ -79,7 +78,6 @@ it("Current version is the correct one", async () => {
 
 it("Current version is allowed, but it's not the latest one", async () => {
     const version = {
-        runningVersion: "TNoodle-WCA-2",
         projectName: "TNoodle-WCA",
         projectVersion: "2",
         signedBuild: true,
@@ -137,7 +135,6 @@ it("Current version is allowed, but it's not the latest one", async () => {
 
 it("Not official version alert", async () => {
     const version = {
-        runningVersion: "TNoodle-WCA-3",
         projectName: "TNoodle-WCA",
         projectVersion: "3",
         signedBuild: false, // This should trigger an alert, even with currentVersion == runningVersion
@@ -192,7 +189,6 @@ it("Not official version alert", async () => {
 
 it("Not allowed TNoodle version, despite it's official", async () => {
     const version = {
-        runningVersion: "TNoodle-WCA-1",
         projectName: "TNoodle-WCA",
         projectVersion: "1",
         signedBuild: true,
