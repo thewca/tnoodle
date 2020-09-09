@@ -4,7 +4,7 @@
 
 TNoodle is a software suite that contains the official WCA scramble program. It consists of the core scrambling code (primarily written in Java) as well as a UI and server to generate a fully autonomous JAR file
 
-[![Build Status](https://travis-ci.org/thewca/tnoodle.svg?branch=master)](https://travis-ci.org/thewca/tnoodle)
+[![Build Status](https://travis-ci.org/thewca/tnoodle.svg?branch=master)](https://travis-ci.org/thewca/tnoodle) [![Coverage Status](https://coveralls.io/repos/github/thewca/tnoodle/badge.svg?branch=master)](https://coveralls.io/github/thewca/tnoodle?branch=master)
 
 ## WCA Scramble Program
 
