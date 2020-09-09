@@ -1,8 +1,16 @@
-language: java
-jdk: openjdk8
-sudo: true
+jobs:
+    include:
+        - language: java
+          jdk: openjdk8
+          sudo: true
+          script:
+              - ./gradlew assemble
+              - ./gradlew check
+              - ./gradlew buildOfficial
 
-script:
-  - ./gradlew assemble
-  - ./gradlew check
-  - ./gradlew buildOfficial
+        - language: node_js
+          node_js: 10
+          script:
+              - cd tnoodle-ui
+              - npm install
+              - npm run test
