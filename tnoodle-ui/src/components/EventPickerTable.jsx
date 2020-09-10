@@ -49,8 +49,8 @@ const EventPickerTable = connect(
                         return response.json();
                     }
                 })
-                .then((formats) => {
-                    this.props.setWcaFormats(formats);
+                .then((response) => {
+                    this.props.setWcaFormats(response);
                 });
         };
 
@@ -61,8 +61,8 @@ const EventPickerTable = connect(
                         return response.json();
                     }
                 })
-                .then((wcaEvents) => {
-                    this.props.setWcaEvents(wcaEvents);
+                .then((response) => {
+                    this.props.setWcaEvents(response);
                 });
         };
 
