@@ -141,18 +141,23 @@ const FmcTranslationsDetail = connect(
                                                                         checked={
                                                                             translation.status
                                                                         }
-                                                                        onChange={(e) =>
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
                                                                             this.handleTranslation(
-                                                                                translation.id, e.target.checked
+                                                                                translation.id,
+                                                                                e
+                                                                                    .target
+                                                                                    .checked
                                                                             )
                                                                         }
                                                                     />
                                                                 </th>
                                                                 {j <
                                                                     TRANSLATIONS_PER_LINE -
-                                                                    1 && (
-                                                                        <th />
-                                                                    )}
+                                                                        1 && (
+                                                                    <th />
+                                                                )}
                                                             </React.Fragment>
                                                         );
                                                     }
