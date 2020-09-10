@@ -280,4 +280,8 @@ it("There should be only 1 button of type submit", async () => {
     // The only submit button must be Generate Scrambles
     const button = buttonsTypeSubmit[0];
     expect(button.innerHTML).toBe("Generate Scrambles");
+
+    // Here we are neglecting the button Select Suggested.
+    // To cover it, we should pretend to be logged and with a competition,
+    // or change the store
 });
