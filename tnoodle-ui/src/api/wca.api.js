@@ -83,16 +83,16 @@ export function gotoPreLoginPath() {
 
 export function fetchMe() {
     return wcaApiFetch("/me")
-        .then(response => response.json())
-        .then(json => json.me);
+        .then((response) => response.json())
+        .then((json) => json.me);
 }
 
 export function fetchVersionInfo() {
-    return wcaApiFetch("/scramble-program").then(response => response.json());
+    return wcaApiFetch("/scramble-program").then((response) => response.json());
 }
 
 export function getCompetitionJson(competitionId) {
-    return wcaApiFetch(`/competitions/${competitionId}/wcif`).then(response =>
+    return wcaApiFetch(`/competitions/${competitionId}/wcif`).then((response) =>
         response.json()
     );
 }
@@ -101,7 +101,7 @@ export function getUpcomingManageableCompetitions() {
     let oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     return wcaApiFetch(
         `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
-    ).then(response => response.json());
+    ).then((response) => response.json());
 }
 
 function getHashParameter(name) {
@@ -141,11 +141,11 @@ function wcaApiFetch(path, fetchOptions) {
     fetchOptions = Object.assign({}, fetchOptions, {
         headers: new Headers({
             Authorization: `Bearer ${wcaAccessToken}`,
-            "Content-Type": "application/json"
-        })
+            "Content-Type": "application/json",
+        }),
     });
 
-    return fetch(`${baseApiUrl}${path}`, fetchOptions).then(response => {
+    return fetch(`${baseApiUrl}${path}`, fetchOptions).then((response) => {
         if (!response.ok) {
             throw new Error(`${response.status}: ${response.statusText}`);
         }
