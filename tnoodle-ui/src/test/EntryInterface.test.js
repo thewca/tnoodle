@@ -23,7 +23,7 @@ afterEach(() => {
     container = null;
 });
 
-it("Competition name should be already filled with current date", () => {
+it("Competition name should be already filled with current date and changes should go to the store", () => {
     // Render component
     act(() => {
         render(
@@ -36,11 +36,19 @@ it("Competition name should be already filled with current date", () => {
 
     const today = new Date().toISOString().split("T")[0];
 
-    const competitionNameInput = container.querySelector("#competition-name");
-    expect(competitionNameInput.value).toEqual("Scrambles for " + today);
+    const input = container.querySelector("#competition-name");
+    const expected = "Scrambles for " + today;
+    expect(input.value).toEqual(expected);
+
+    const typed = "Competition Name 2020";
+    fireEvent.change(input, { target: { value: typed } });
+
+    // New competition name should go to the store
+    expect(store.getState().wcif.name).toBe(typed);
+    expect(store.getState().wcif.shortName).toBe(typed);
 });
 
-it("Password should toggle", () => {
+it("Password should toggle and changes to it should go to the store", () => {
     // Render component
     act(() => {
         render(
@@ -54,7 +62,10 @@ it("Password should toggle", () => {
     const input = container.querySelector("#password");
     const passwordToggler = container.querySelector(".input-group-prepend");
 
-    fireEvent.change(input, { target: { value: "123456" } });
+    expect(store.getState().password).toBe("");
+
+    const password = "123456";
+    fireEvent.change(input, { target: { value: password } });
 
     // Type password at first
     expect(input.type).toBe("password");
@@ -63,5 +74,6 @@ it("Password should toggle", () => {
     fireEvent.click(passwordToggler);
     expect(input.type).toBe("text");
 
-    expect(input.value).toBe("123456");
+    // Password should go to the store
+    expect(store.getState().password).toBe(password);
 });

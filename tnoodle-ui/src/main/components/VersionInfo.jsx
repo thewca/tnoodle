@@ -25,15 +25,13 @@ const VersionInfo = connect(
 
         componentDidMount() {
             // Fetch from WCA API.
-            fetchVersionInfo()
-                .then((response) => {
-                    this.setState({
-                        ...this.state,
-                        currentTnoodle: response.current,
-                        allowedTnoodleVersions: response.allowed,
-                    });
-                })
-                .catch((e) => console.error(e));
+            fetchVersionInfo().then((response) => {
+                this.setState({
+                    ...this.state,
+                    currentTnoodle: response.current,
+                    allowedTnoodleVersions: response.allowed,
+                });
+            });
 
             fetchRunningVersion()
                 .then((response) => response.json())
@@ -48,8 +46,7 @@ const VersionInfo = connect(
                                 : "",
                         officialBuild: signedBuild,
                     });
-                })
-                .catch((e) => console.error(e));
+                });
         }
 
         render() {
