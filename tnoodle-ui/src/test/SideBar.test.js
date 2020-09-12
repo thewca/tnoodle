@@ -4,11 +4,11 @@ import { act } from "react-dom/test-utils";
 import { render, unmountComponentAtNode } from "react-dom";
 
 import { Provider } from "react-redux";
-import store from "../redux/Store";
+import store from "../main/redux/Store";
 
-import SideBar from "./SideBar";
+import SideBar from "../main/components/SideBar";
 
-const wcaApi = require("../api/wca.api");
+const wcaApi = require("../main/api/wca.api");
 
 let container = null;
 beforeEach(() => {

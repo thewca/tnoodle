@@ -1,4 +1,4 @@
-import { BASE_PATH } from "../App";
+import { BASE_PATH } from "../../App";
 
 // Members of the Software Team can configure this here: https://www.worldcubeassociation.org/oauth/applications/123.
 

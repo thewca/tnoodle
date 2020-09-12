@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import SideBar from "./components/SideBar";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
-import Main from "./components/Main";
+import SideBar from "./main/components/SideBar";
+import Main from "./main/components/Main";
 
 class App extends Component {
     render() {
