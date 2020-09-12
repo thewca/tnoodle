@@ -5,9 +5,9 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { fireEvent } from "@testing-library/react";
 
 import { Provider } from "react-redux";
-import store from "../redux/Store";
+import store from "../main/redux/Store";
 
-import EntryInterface from "./EntryInterface";
+import EntryInterface from "../main/components/EntryInterface";
 
 let container = null;
 beforeEach(() => {

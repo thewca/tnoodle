@@ -5,12 +5,12 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { fireEvent } from "@testing-library/react";
 
 import { Provider } from "react-redux";
-import store from "../redux/Store";
+import store from "../main/redux/Store";
 
-import Main from "./Main";
+import Main from "../main/components/Main";
 
-const tnoodleApi = require("../api/tnoodle.api");
-const wcaApi = require("../api/wca.api");
+const tnoodleApi = require("../main/api/tnoodle.api");
+const wcaApi = require("../main/api/wca.api");
 
 let container = null;
 beforeEach(() => {
@@ -281,6 +281,7 @@ it("There should be only 1 button of type submit", async () => {
         });
 
     const completeButtons = Array.from(form.querySelectorAll("button"));
+    completeButtons.forEach((b) => console.log(b.innerHTML));
 
     const buttonsTypeSubmit = completeButtons.filter(
         (button) => button.type === "submit"

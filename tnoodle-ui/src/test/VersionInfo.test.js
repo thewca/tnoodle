@@ -4,12 +4,12 @@ import { act } from "react-dom/test-utils";
 import { render, unmountComponentAtNode } from "react-dom";
 
 import { Provider } from "react-redux";
-import store from "../redux/Store";
+import store from "../main/redux/Store";
 
-import VersionInfo from "./VersionInfo";
+import VersionInfo from "../main/components/VersionInfo";
 
-const tnoodleApi = require("../api/tnoodle.api");
-const wcaApi = require("../api/wca.api");
+const tnoodleApi = require("../main/api/tnoodle.api");
+const wcaApi = require("../main/api/wca.api");
 
 let container = null;
 beforeEach(() => {
