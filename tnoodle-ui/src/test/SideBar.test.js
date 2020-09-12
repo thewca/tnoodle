@@ -8,6 +8,8 @@ import store from "../main/redux/Store";
 
 import SideBar from "../main/components/SideBar";
 
+import { competitions, me } from "./mock/wca.api.mock";
+
 const wcaApi = require("../main/api/wca.api");
 
 let container = null;
@@ -25,24 +27,6 @@ afterEach(() => {
 });
 
 it("Each competition fetched from the website must become a button", async () => {
-    // Define mock objects
-    const year = new Date().getFullYear();
-    const competitions = [
-        {
-            id: "WCAWorldChampionship" + year,
-            name: "WCA World Championship " + year,
-        },
-        {
-            id: "Nationals" + year,
-            name: "Nationals " + year,
-        },
-    ];
-
-    const me = {
-        wca_id: "2010AAAA01",
-        name: "User Name",
-    };
-
     // Turn on mocking behavior
     jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
