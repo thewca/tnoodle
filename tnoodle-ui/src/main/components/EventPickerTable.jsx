@@ -162,7 +162,6 @@ const EventPickerTable = connect(
                                                         item.id === event.id
                                                 )}
                                                 disabled={editingDisabled}
-                                                setBlobNull={this.setBlobNull}
                                             />
                                         </div>
                                     );

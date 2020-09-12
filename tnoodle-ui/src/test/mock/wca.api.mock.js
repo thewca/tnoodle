@@ -1,3 +1,6 @@
+// This file contains only mocks reused.
+// Single used mocker are defined within the file.
+
 const year = new Date().getFullYear();
 export const competitions = [
     {
