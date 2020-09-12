@@ -38,6 +38,11 @@ it("Each competition fetched from the website must become a button", async () =>
         },
     ];
 
+    const me = {
+        wca_id: "2010AAAA01",
+        name: "User Name",
+    };
+
     // Turn on mocking behavior
     jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
@@ -45,6 +50,8 @@ it("Each competition fetched from the website must become a button", async () =>
         wcaApi,
         "getUpcomingManageableCompetitions"
     ).mockImplementation(() => Promise.resolve(competitions));
+
+    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() => Promise.resolve(me));
 
     // Render component
     await act(async () => {
@@ -68,6 +75,10 @@ it("Each competition fetched from the website must become a button", async () =>
     for (let i = 0; i < competitions.length; i++) {
         expect(competitions[i].name).toBe(buttons[i + 1].innerHTML);
     }
+
+    // We should welcome the user
+    const welcome = container.querySelector("p");
+    expect(welcome.innerHTML).toContain(me.name);
 
     // Clear mock
     wcaApi.isLogged.mockRestore();

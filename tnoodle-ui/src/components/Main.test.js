@@ -10,6 +10,7 @@ import store from "../redux/Store";
 import Main from "./Main";
 
 const tnoodleApi = require("../api/tnoodle.api");
+const wcaApi = require("../api/wca.api");
 
 let container = null;
 beforeEach(() => {
@@ -216,6 +217,13 @@ it("There should be only 1 button of type submit", async () => {
         "zh-TW": "Chinese (Taiwan)",
     };
 
+    const me = {
+        me: {
+            wca_id: "2010AAAA01",
+            name: "User Name",
+        },
+    };
+
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
         Promise.resolve(new Response(JSON.stringify(events)))
@@ -230,6 +238,10 @@ it("There should be only 1 button of type submit", async () => {
         "fetchAvailableFmcTranslations"
     ).mockImplementation(() =>
         Promise.resolve(new Response(JSON.stringify(languages)))
+    );
+
+    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
+        Promise.resolve(new Response(JSON.stringify(me)))
     );
 
     // Render component
