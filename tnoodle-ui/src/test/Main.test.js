@@ -14,7 +14,6 @@ import {
 import Main from "../main/components/Main";
 
 const tnoodleApi = require("../main/api/tnoodle.api");
-const wcaApi = require("../main/api/wca.api");
 
 let container = null;
 beforeEach(() => {
