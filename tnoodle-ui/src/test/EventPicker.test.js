@@ -13,6 +13,8 @@ import { events } from "./mock/tnoodle.api.mock";
 
 import { defaultWcif } from "../main/constants/default.wcif";
 
+import { updateEditingStatus } from "../main/redux/ActionCreators";
+
 let container = null;
 beforeEach(() => {
     // setup a DOM element as a render target
@@ -31,15 +33,14 @@ it("Changing values from event", () => {
     const event = events[0];
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
+    // Enforce that fields are not disabled
+    store.dispatch(updateEditingStatus(false));
+
     // Render component
     act(() => {
         render(
             <Provider store={store}>
-                <EventPicker
-                    event={event}
-                    wcifEvent={wcifEvent}
-                    disabled={false}
-                />
+                <EventPicker event={event} wcifEvent={wcifEvent} />
             </Provider>,
             container
         );
@@ -48,6 +49,10 @@ it("Changing values from event", () => {
     const inputs = Array.from(container.querySelectorAll("input"));
     const scrambleSets = inputs[0];
     const copies = inputs[1];
+
+    // Jsdom allow editing even disabled inputs so this test makes sense
+    expect(scrambleSets.disabled).toBe(false);
+    expect(copies.disabled).toBe(false);
 
     // There's a harmless change of type here. 1 -> "1"
 
@@ -72,4 +77,32 @@ it("Changing values from event", () => {
     expect(
         store.getState().wcif.events[0].rounds[0].extensions[0].data.numCopies
     ).toBe(newCopies);
+});
+
+it("Editing disabled", () => {
+    const event = events[0];
+    const wcifEvent = defaultWcif.events[0]; // This is one round of 333
+
+    // Enforce that fields are not disabled
+    store.dispatch(updateEditingStatus(true));
+
+    // Render component
+    act(() => {
+        render(
+            <Provider store={store}>
+                <EventPicker event={event} wcifEvent={wcifEvent} />
+            </Provider>,
+            container
+        );
+    });
+
+    const inputs = Array.from(container.querySelectorAll("input"));
+    const scrambleSets = inputs[0];
+    const copies = inputs[1];
+
+    // Jsdom allow editing even disabled inputs so this test makes sense
+    expect(scrambleSets.disabled).toBe(true);
+
+    // Copies must be editable anyways
+    expect(copies.disabled).toBe(false);
 });

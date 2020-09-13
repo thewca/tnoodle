@@ -40,6 +40,10 @@ export const updateWcif = (wcif) => ({
     payload: { wcif },
 });
 
+/**
+ * False means we can edit, that is, it's not disabled
+ * @param {boolean} flag
+ */
 export const updateEditingStatus = (flag) => ({
     type: ActionTypes.UPDATE_EDITING_STATUS,
     payload: { editingDisabled: flag },

@@ -161,7 +161,6 @@ const EventPickerTable = connect(
                                                     (item) =>
                                                         item.id === event.id
                                                 )}
-                                                disabled={editingDisabled}
                                             />
                                         </div>
                                     );
