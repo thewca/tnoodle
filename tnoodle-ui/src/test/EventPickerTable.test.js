@@ -93,10 +93,6 @@ it("Show editing warn if case of competition selected", async () => {
 it("Singular event", async () => {
     const store = createStore(Reducer);
 
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(events)))
-    );
-
     // Choose a competition
     const competitionId = competitions[0].id;
     store.dispatch(updateCompetitionId(competitionId));
@@ -114,8 +110,20 @@ it("Singular event", async () => {
         );
     });
 
-    const paragraphs = Array.from(container.querySelectorAll("p"));
-
     // Singular 1 events
-    expect(paragraphs[0].innerHTML).toContain("event ");
+    expect(container.querySelector("p").innerHTML).toContain("event ");
+});
+
+it("Changes in FMC and MBLD should go to the store", async () => {
+    const store = createStore(Reducer);
+
+    // Render component
+    await act(async () => {
+        render(
+            <Provider store={store}>
+                <EventPickerTable />
+            </Provider>,
+            container
+        );
+    });
 });
