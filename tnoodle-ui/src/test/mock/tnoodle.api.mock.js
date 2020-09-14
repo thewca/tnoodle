@@ -178,3 +178,11 @@ export const languages = {
     "zh-CN": "Chinese (China)",
     "zh-TW": "Chinese (Taiwan)",
 };
+
+export const formats = {
+    1: { name: "Best of 1", shortName: "Bo1" },
+    2: { name: "Best of 2", shortName: "Bo2" },
+    3: { name: "Best of 3", shortName: "Bo3" },
+    a: { name: "Average of 5", shortName: "Ao5" },
+    m: { name: "Mean of 3", shortName: "Mo3" },
+};
