@@ -13,7 +13,7 @@ import {
 
 import Main from "../main/components/Main";
 
-import { events, languages } from "./mock/tnoodle.api.mock";
+import { events, languages, formats } from "./mock/tnoodle.api.mock";
 
 const tnoodleApi = require("../main/api/tnoodle.api");
 
@@ -31,17 +31,7 @@ afterEach(() => {
     container = null;
 });
 
-it("There should be only 1 button of type submit", async () => {
-    // Define mock objects
-
-    const formats = {
-        1: { name: "Best of 1", shortName: "Bo1" },
-        2: { name: "Best of 2", shortName: "Bo2" },
-        3: { name: "Best of 3", shortName: "Bo3" },
-        a: { name: "Average of 5", shortName: "Ao5" },
-        m: { name: "Mean of 3", shortName: "Mo3" },
-    };
-
+it("There should be only 1 button of type submit, check FMC buttons", async () => {
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
         Promise.resolve(new Response(JSON.stringify(events)))
@@ -107,6 +97,30 @@ it("There should be only 1 button of type submit", async () => {
     expect(buttonsTypeSubmit.length).toBe(1);
 
     // The only submit button must be Generate Scrambles
-    const button = buttonsTypeSubmit[0];
-    expect(button.innerHTML).toBe("Generate Scrambles");
+    expect(buttonsTypeSubmit[0].innerHTML).toBe("Generate Scrambles");
+
+    // At first, all translations should be selected
+    store.getState().translations.forEach((translation) => {
+        expect(translation.status).toEqual(true);
+    });
+
+    // Select suggested
+    fireEvent.click(completeButtons[completeButtons.length - 1]);
+    store.getState().translations.forEach((translation) => {
+        expect(translation.status).toEqual(
+            suggestedFmcTranslations.indexOf(translation.id) >= 0
+        );
+    });
+
+    // Select None
+    fireEvent.click(completeButtons[completeButtons.length - 2]);
+    store.getState().translations.forEach((translation) => {
+        expect(translation.status).toEqual(false);
+    });
+
+    // Select All
+    fireEvent.click(completeButtons[completeButtons.length - 3]);
+    store.getState().translations.forEach((translation) => {
+        expect(translation.status).toEqual(true);
+    });
 });

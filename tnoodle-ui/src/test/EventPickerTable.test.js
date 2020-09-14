@@ -20,6 +20,8 @@ import {
 
 import { getDefaultCopiesExtension } from "../main/helper/wcif.helper";
 
+import { fireEvent } from "@testing-library/react";
+
 const tnoodleApi = require("../main/api/tnoodle.api");
 
 let container = null;
@@ -88,10 +90,17 @@ it("Show editing warn if case of competition selected", async () => {
     // Disabled events should not appear
     const tables = Array.from(container.querySelectorAll("table"));
     expect(tables.length).toBe(store.getState().wcif.events.length);
+
+    // Clear mock
+    tnoodleApi.fetchWcaEvents.mockRestore();
 });
 
 it("Singular event", async () => {
     const store = createStore(Reducer);
+
+    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
+        Promise.resolve(new Response(JSON.stringify(events)))
+    );
 
     // Choose a competition
     const competitionId = competitions[0].id;
@@ -110,12 +119,18 @@ it("Singular event", async () => {
         );
     });
 
-    // Singular 1 events
+    // Singular for 1 event
     expect(container.querySelector("p").innerHTML).toContain("event ");
+
+    tnoodleApi.fetchWcaEvents.mockRestore();
 });
 
 it("Changes in FMC and MBLD should go to the store", async () => {
     const store = createStore(Reducer);
+
+    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
+        Promise.resolve(new Response(JSON.stringify(events)))
+    );
 
     // Render component
     await act(async () => {
@@ -126,4 +141,31 @@ it("Changes in FMC and MBLD should go to the store", async () => {
             container
         );
     });
+
+    const names = ["3x3x3 Multiple Blindfolded", "3x3x3 Fewest Moves"];
+
+    // Increase number of rounds from FMC and MBLD
+    const tables = Array.from(container.querySelectorAll("table"))
+        .filter(
+            (table) => names.indexOf(table.querySelector("h5").innerHTML) >= 0
+        )
+        .map((table) => {
+            let select = table.querySelector("select");
+            fireEvent.change(select, { target: { value: 1 } });
+            return table;
+        });
+
+    // MBLD should be the last table
+    const mbldTable = tables[tables.length - 1];
+    const mbldInputs = mbldTable.querySelectorAll("input");
+    const newMbldScrambles = "70";
+    fireEvent.change(mbldInputs[mbldInputs.length - 1], {
+        target: { value: newMbldScrambles },
+    });
+
+    // It should go to the store
+    expect(store.getState().mbld).toBe(newMbldScrambles);
+
+    // Clear mock
+    tnoodleApi.fetchWcaEvents.mockRestore();
 });
