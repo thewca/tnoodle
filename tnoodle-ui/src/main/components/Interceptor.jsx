@@ -12,6 +12,12 @@ class Interceptor extends Component {
 
         // http interceptor
         fetchIntercept.register({
+            request: function (...request) {
+                // TODO set loading
+                console.log(request);
+                return request;
+            },
+
             response: function (response) {
                 if (!response.ok) {
                     that.handleHttpError(response);
