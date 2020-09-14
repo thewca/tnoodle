@@ -23,7 +23,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test --watchAll --watchAll=true",
+        "test": "react-scripts test --watchAll --watchAll=false",
         "eject": "react-scripts eject",
         "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
     },
