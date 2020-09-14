@@ -5,7 +5,8 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { fireEvent } from "@testing-library/react";
 
 import { Provider } from "react-redux";
-import store from "../main/redux/Store";
+import { createStore } from "redux";
+import { Reducer } from "../main/redux/Reducers";
 
 import EventPicker from "../main/components/EventPicker";
 
@@ -30,6 +31,8 @@ afterEach(() => {
 });
 
 it("Changing values from event", () => {
+    const store = createStore(Reducer);
+
     const event = events[0];
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
@@ -46,7 +49,34 @@ it("Changing values from event", () => {
         );
     });
 
+    // Change number of rounds to 4
+    let numberOfRounds = 4;
+    const roundsSelector = container.querySelector("select");
+    fireEvent.change(roundsSelector, { target: { value: numberOfRounds } });
+    expect(store.getState().wcif.events[0].rounds.length).toEqual(
+        numberOfRounds
+    );
+
     const inputs = Array.from(container.querySelectorAll("input"));
+
+    // Change last scramble sets to 10
+    fireEvent.change(inputs[inputs.length - 2], { target: { value: 10 } });
+    expect(
+        store.getState().wcif.events[0].rounds[numberOfRounds - 1]
+            .scrambleSetCount
+    ).toEqual("10");
+
+    // Remove 1 round
+    numberOfRounds--;
+    fireEvent.change(roundsSelector, { target: { value: numberOfRounds } });
+    expect(store.getState().wcif.events[0].rounds.length).toEqual(
+        numberOfRounds
+    );
+    expect(
+        store.getState().wcif.events[0].rounds[numberOfRounds - 1]
+            .scrambleSetCount
+    ).not.toEqual("10");
+
     const scrambleSets = inputs[0];
     const copies = inputs[1];
 
@@ -80,6 +110,8 @@ it("Changing values from event", () => {
 });
 
 it("Editing disabled", () => {
+    const store = createStore(Reducer);
+
     const event = events[0];
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
