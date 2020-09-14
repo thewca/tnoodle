@@ -74,9 +74,10 @@ const EventPickerTable = connect(
                     }
                 })
                 .then((availableTranslations) => {
-                    if (!availableTranslations) {
+                    // TODO evaluate impact of this. It's probably a useless check
+                    /*if (!availableTranslations) {
                         return;
-                    }
+                    }*/
                     let translations = Object.keys(availableTranslations).map(
                         (translationId) => ({
                             id: translationId,

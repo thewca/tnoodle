@@ -153,3 +153,28 @@ export const events = [
         is_multiple_blindfolded: true,
     },
 ];
+
+export const languages = {
+    da: "Danish",
+    de: "German",
+    en: "English",
+    es: "Spanish",
+    et: "Estonian",
+    fi: "Finnish",
+    fr: "French",
+    hr: "Croatian",
+    hu: "Hungarian",
+    id: "Indonesian",
+    it: "Italian",
+    ja: "Japanese",
+    ko: "Korean",
+    pl: "Polish",
+    pt: "Portuguese",
+    "pt-BR": "Portuguese (Brazil)",
+    ro: "Romanian",
+    ru: "Russian",
+    sl: "Slovenian",
+    vi: "Vietnamese",
+    "zh-CN": "Chinese (China)",
+    "zh-TW": "Chinese (Taiwan)",
+};

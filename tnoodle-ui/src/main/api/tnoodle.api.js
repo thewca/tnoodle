@@ -9,9 +9,6 @@ let bestMbldAttemptEndpoint = "/frontend/mbld/best";
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
 
-export const copiesExtensionId =
-    "org.worldcubeassociation.tnoodle.SheetCopyCount";
-
 export const fetchZip = (wcif, mbld, password, translations) => {
     let payload = {
         wcif,
@@ -44,20 +41,6 @@ export const fetchBestMbldAttempt = (wcif) => {
 
 export const fetchRunningVersion = () => {
     return fetch(baseUrl + versionEndpoint);
-};
-
-/**
- * This is the default extension object the backend expects
- * @param {} copies
- */
-export const getDefaultCopiesExtension = (copies = 1) => {
-    return {
-        id: copiesExtensionId,
-        specUrl: "",
-        data: {
-            numCopies: copies,
-        },
-    };
 };
 
 export const fetchAvailableFmcTranslations = () => {

@@ -1,4 +1,4 @@
-import { getDefaultCopiesExtension } from "../api/tnoodle.api";
+import { getDefaultCopiesExtension } from "../helper/wcif.helper";
 
 // Add 1 round of 3x3x3
 let default333 = {
