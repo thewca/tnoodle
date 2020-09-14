@@ -16,7 +16,7 @@ export const fetchZip = (wcif, mbld, password, translations) => {
         fmcLanguages: fmcTranslationsHelper(translations),
     };
 
-    if (password != null && password.length > 0) {
+    if (!!password) {
         payload.zipPassword = password;
     }
 
