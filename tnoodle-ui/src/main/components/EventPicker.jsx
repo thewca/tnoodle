@@ -5,7 +5,7 @@ import { updateWcaEvent, updateFileZipBlob } from "../redux/ActionCreators";
 import {
     getDefaultCopiesExtension,
     copiesExtensionId,
-} from "../api/tnoodle.api";
+} from "../helper/wcif.helper";
 import MbldDetail from "./MbldDetail";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import "./EventPicker.css";

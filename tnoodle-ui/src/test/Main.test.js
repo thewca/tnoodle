@@ -13,7 +13,7 @@ import {
 
 import Main from "../main/components/Main";
 
-import { events } from "./mock/tnoodle.api.mock";
+import { events, languages } from "./mock/tnoodle.api.mock";
 
 const tnoodleApi = require("../main/api/tnoodle.api");
 
@@ -40,31 +40,6 @@ it("There should be only 1 button of type submit", async () => {
         3: { name: "Best of 3", shortName: "Bo3" },
         a: { name: "Average of 5", shortName: "Ao5" },
         m: { name: "Mean of 3", shortName: "Mo3" },
-    };
-
-    const languages = {
-        da: "Danish",
-        de: "German",
-        en: "English",
-        es: "Spanish",
-        et: "Estonian",
-        fi: "Finnish",
-        fr: "French",
-        hr: "Croatian",
-        hu: "Hungarian",
-        id: "Indonesian",
-        it: "Italian",
-        ja: "Japanese",
-        ko: "Korean",
-        pl: "Polish",
-        pt: "Portuguese",
-        "pt-BR": "Portuguese (Brazil)",
-        ro: "Romanian",
-        ru: "Russian",
-        sl: "Slovenian",
-        vi: "Vietnamese",
-        "zh-CN": "Chinese (China)",
-        "zh-TW": "Chinese (Taiwan)",
     };
 
     // Turn on mocking behavior

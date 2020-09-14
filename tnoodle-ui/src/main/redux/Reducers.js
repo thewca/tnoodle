@@ -1,7 +1,7 @@
 import { ActionTypes } from "./Types";
 import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
-import { getDefaultCopiesExtension } from "../api/tnoodle.api";
+import { getDefaultCopiesExtension } from "../helper/wcif.helper";
 import { competitionName2Id } from "../util/competition.name.util";
 
 const defaultStore = {
