@@ -31,7 +31,7 @@ afterEach(() => {
     container = null;
 });
 
-it("There should be only 1 button of type submit, check FMC buttons", async () => {
+it("There should be only 1 button of type submit, check FMC changes", async () => {
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
         Promise.resolve(new Response(JSON.stringify(events)))
@@ -39,6 +39,13 @@ it("There should be only 1 button of type submit, check FMC buttons", async () =
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
         Promise.resolve(new Response(JSON.stringify(formats)))
+    );
+
+    jest.spyOn(
+        tnoodleApi,
+        "fetchAvailableFmcTranslations"
+    ).mockImplementation(() =>
+        Promise.resolve(new Response(JSON.stringify(languages)))
     );
 
     // We add suggested FMC so the button Select Suggested appears as well
@@ -123,4 +130,24 @@ it("There should be only 1 button of type submit, check FMC buttons", async () =
     store.getState().translations.forEach((translation) => {
         expect(translation.status).toEqual(true);
     });
+
+    // Here, we test just a single random language toggle
+    let index = Math.floor(Math.random() * Object.keys(languages).length);
+    const checkbox = container.querySelectorAll("input[type=checkbox]")[index];
+    expect(checkbox.id).toBe("fmc-" + store.getState().translations[index].id);
+
+    // Check toggle behavior and its value in the store
+    expect(checkbox.checked).toBe(true);
+    expect(store.getState().translations[index].status).toBe(true);
+    fireEvent.click(checkbox);
+    expect(checkbox.checked).toBe(false);
+    expect(store.getState().translations[index].status).toBe(false);
+    fireEvent.click(checkbox);
+    expect(checkbox.checked).toBe(true);
+    expect(store.getState().translations[index].status).toBe(true);
+
+    // Clear mock fetchWcaEvents
+    tnoodleApi.fetchWcaEvents.mockRestore();
+    tnoodleApi.fetchFormats.mockRestore();
+    tnoodleApi.fetchAvailableFmcTranslations.mockRestore();
 });

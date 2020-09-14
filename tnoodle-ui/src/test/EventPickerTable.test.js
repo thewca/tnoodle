@@ -122,10 +122,11 @@ it("Singular event", async () => {
     // Singular for 1 event
     expect(container.querySelector("p").innerHTML).toContain("event ");
 
+    // Clear mock
     tnoodleApi.fetchWcaEvents.mockRestore();
 });
 
-it("Changes in FMC and MBLD should go to the store", async () => {
+it("Changes in MBLD should go to the store", async () => {
     const store = createStore(Reducer);
 
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
@@ -142,7 +143,7 @@ it("Changes in FMC and MBLD should go to the store", async () => {
         );
     });
 
-    const names = ["3x3x3 Multiple Blindfolded", "3x3x3 Fewest Moves"];
+    const names = ["3x3x3 Multiple Blindfolded"];
 
     // Increase number of rounds from FMC and MBLD
     const tables = Array.from(container.querySelectorAll("table"))
