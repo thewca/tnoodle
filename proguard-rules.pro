@@ -5,7 +5,7 @@
 -dontobfuscate
 -dontoptimize
 
--dontnote kotlinx.serialization.SerializationKt
+-dontnote kotlinx.serialization.AnnotationsKt
 
 # cf. https://github.com/ktorio/ktor-samples/tree/master/other/proguard
 -keep class org.worldcubeassociation.tnoodle.server.** { *; }
@@ -24,9 +24,10 @@
 -keep class dorkbox.util.jna.** { *; }
 -keep class dorkbox.systemTray.** { *; }
 
+-keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
 -keep,includedescriptorclasses class org.worldcubeassociation.tnoodle.server.webscrambles.**$$serializer { *; }
 
--keepattributes *Annotation
+-keepattributes *Annotation*
 -keepattributes InnerClasses
 
 -keepclasseswithmembers class org.worldcubeassociation.tnoodle.server.webscrambles.** {

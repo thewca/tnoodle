@@ -8,7 +8,7 @@ import dependencies.Libraries.KTOR_SERVER_NETTY
 import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
 import dependencies.Libraries.KTOR_SERVER_SERVLET
 import dependencies.Libraries.LOGBACK_CLASSIC
-import dependencies.Libraries.KOTLIN_SERIALIZATION_JVM
+import dependencies.Libraries.KOTLIN_SERIALIZATION_JSON
 import dependencies.Libraries.TNOODLE_SCRAMBLES
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -24,7 +24,7 @@ plugins {
 
 dependencies {
     api(KTOR_SERVER_NETTY)
-    api(KOTLIN_SERIALIZATION_JVM)
+    api(KOTLIN_SERIALIZATION_JSON)
     api(KOTLIN_COROUTINES_CORE)
     api(TNOODLE_SCRAMBLES)
 
