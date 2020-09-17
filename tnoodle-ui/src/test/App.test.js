@@ -5,33 +5,25 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { fireEvent } from "@testing-library/react";
 
 import { Provider } from "react-redux";
-import store from "../main/redux/Store";
-import {
-    updateTranslations,
-    addSuggestedFmcTranslations,
-} from "../main/redux/ActionCreators";
+import { createStore } from "redux";
+import { Reducer } from "../main/redux/Reducers";
 
 import App from "../App";
 
-import { events, languages, formats } from "./mock/tnoodle.api.mock";
+import { version, formats, events, languages } from "./mock/tnoodle.api.mock";
+import { scrambleProgram } from "./mock/wca.api.mock";
 
 const tnoodleApi = require("../main/api/tnoodle.api");
+const wcaApi = require("../main/api/wca.api");
 
 let container = null;
+
+let wcif, mbld, password, translations;
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
-});
 
-afterEach(() => {
-    // cleanup on exiting
-    unmountComponentAtNode(container);
-    container.remove();
-    container = null;
-});
-
-it("There should be only 1 button of type submit, check FMC changes", async () => {
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
         Promise.resolve(new Response(JSON.stringify(events)))
@@ -48,16 +40,46 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         Promise.resolve(new Response(JSON.stringify(languages)))
     );
 
-    // We add suggested FMC so the button Select Suggested appears as well
-    const translations = Object.keys(languages).map((translationId) => ({
-        id: translationId,
-        display: languages[translationId],
-        status: true,
-    }));
-    const suggestedFmcTranslations = ["de", "en", "pt-BR"];
+    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+        Promise.resolve({
+            json: () => Promise.resolve(version),
+        })
+    );
 
-    store.dispatch(updateTranslations(translations));
-    store.dispatch(addSuggestedFmcTranslations(suggestedFmcTranslations));
+    jest.spyOn(tnoodleApi, "fetchZip").mockImplementation((...payload) => {
+        wcif = payload[0];
+        mbld = payload[1];
+        password = payload[2];
+        translations = payload[3];
+        return Promise.resolve(scrambleProgram);
+    });
+
+    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+        Promise.resolve(scrambleProgram)
+    );
+});
+
+afterEach(() => {
+    // cleanup on exiting
+    unmountComponentAtNode(container);
+    container.remove();
+    container = null;
+
+    wcif = null;
+    mbld = null;
+    password = null;
+    translations = null;
+
+    // Clear mock
+    tnoodleApi.fetchWcaEvents.mockRestore();
+    tnoodleApi.fetchFormats.mockRestore();
+    tnoodleApi.fetchAvailableFmcTranslations.mockRestore();
+    tnoodleApi.fetchRunningVersion.mockRestore();
+    wcaApi.fetchVersionInfo.mockRestore();
+});
+
+it("Just generate scrambles", async () => {
+    const store = createStore(Reducer);
 
     // Render component
     await act(async () => {
@@ -69,85 +91,83 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         );
     });
 
-    // Pick all <select>. This will include 17 rounds selector
-    // and 1 format selector (for 3x3x3, which already has 1 round)
-    const selects = container.querySelectorAll("select");
+    const scrambleButton = container.querySelector("form button");
+    expect(scrambleButton.innerHTML).toEqual("Generate Scrambles");
 
-    // Change all rounds from 0 to 1 (side effect, change 3x3x3 from Ao5 to another value)
-    // the objective here is to open all events
-    selects.forEach((select) => {
-        fireEvent.change(select, {
-            target: { value: "1" },
-        });
-    });
+    // Generate scrambles
+    fireEvent.click(scrambleButton);
 
-    // Take the form and all the buttons inside of it
-    const form = container.querySelector("form");
-    const buttons = Array.from(form.querySelectorAll("button"));
+    // Only 333
+    expect(wcif.events.length).toBe(1);
 
-    // Click almost all buttons. The point here is to open translations,
-    // but it won't hurt click other buttons as well.
-    // By avoiding Generate Scrambles button, we avoid triggering zip generation,
-    // therefore button text, which is used later.
-    buttons
-        .filter((button) => button.innerHTML !== "Generate Scrambles")
-        .forEach((button) => {
-            fireEvent.click(button);
-        });
+    expect(password).toBe("");
+});
 
-    const completeButtons = Array.from(form.querySelectorAll("button"));
-    const buttonsTypeSubmit = completeButtons.filter(
-        (button) => button.type === "submit"
-    );
+it("Changes on 333, scramble", async () => {
+    const store = createStore(Reducer);
 
-    // There can be only 1 button of type submit inside the form
-    expect(buttonsTypeSubmit.length).toBe(1);
-
-    // The only submit button must be Generate Scrambles
-    expect(buttonsTypeSubmit[0].innerHTML).toBe("Generate Scrambles");
-
-    // At first, all translations should be selected
-    store.getState().translations.forEach((translation) => {
-        expect(translation.status).toEqual(true);
-    });
-
-    // Select suggested
-    fireEvent.click(completeButtons[completeButtons.length - 1]);
-    store.getState().translations.forEach((translation) => {
-        expect(translation.status).toEqual(
-            suggestedFmcTranslations.indexOf(translation.id) >= 0
+    // Render component
+    await act(async () => {
+        render(
+            <Provider store={store}>
+                <App />
+            </Provider>,
+            container
         );
     });
 
-    // Select None
-    fireEvent.click(completeButtons[completeButtons.length - 2]);
-    store.getState().translations.forEach((translation) => {
-        expect(translation.status).toEqual(false);
+    let selects = Array.from(container.querySelectorAll("select"));
+
+    // We add rounds of 333
+    let numberOfRounds = 4;
+    fireEvent.change(selects[0], { target: { value: numberOfRounds } });
+
+    // Look for selects again
+    selects = Array.from(container.querySelectorAll("select"));
+
+    // Change 2nd round to mo3
+    let roundFormat = "3";
+    fireEvent.change(selects[2], { target: { value: roundFormat } });
+
+    let inputs = Array.from(container.querySelectorAll("form input"));
+
+    // Change 2nd round
+    let scrambleSets = "6";
+    let copies = "7";
+    fireEvent.change(inputs[4], { target: { value: scrambleSets } });
+    fireEvent.change(inputs[5], { target: { value: copies } });
+
+    // Change password
+    let newPassword = "wca123";
+    fireEvent.change(inputs[1], { target: { value: newPassword } });
+
+    // Generate scrambles
+    const scrambleButton = container.querySelector("form button");
+    fireEvent.click(scrambleButton);
+
+    // Only 333
+    expect(wcif.events.length).toBe(1);
+
+    // Correct number of rounds
+    expect(wcif.events[0].rounds.length).toBe(numberOfRounds);
+
+    // Changes should be done to the 2nd round only
+    wcif.events[0].rounds.forEach((round, i) => {
+        if (i === 1) {
+            expect(round.format).toBe(roundFormat);
+            expect(round.scrambleSetCount).toBe(scrambleSets);
+            expect(round.extensions[0].data.numCopies).toBe(copies);
+        } else {
+            expect(round.format).toBe("a");
+            expect(round.scrambleSetCount).toBe(1);
+            expect(round.extensions[0].data.numCopies).toBe(1);
+        }
+
+        expect(round.id).toBe("333-r" + (i + 1));
+
+        // We only send 1 extension for now
+        expect(round.extensions.length).toBe(1);
     });
 
-    // Select All
-    fireEvent.click(completeButtons[completeButtons.length - 3]);
-    store.getState().translations.forEach((translation) => {
-        expect(translation.status).toEqual(true);
-    });
-
-    // Here, we test just a single random language toggle
-    let index = Math.floor(Math.random() * Object.keys(languages).length);
-    const checkbox = container.querySelectorAll("input[type=checkbox]")[index];
-    expect(checkbox.id).toBe("fmc-" + store.getState().translations[index].id);
-
-    // Check toggle behavior and its value in the store
-    expect(checkbox.checked).toBe(true);
-    expect(store.getState().translations[index].status).toBe(true);
-    fireEvent.click(checkbox);
-    expect(checkbox.checked).toBe(false);
-    expect(store.getState().translations[index].status).toBe(false);
-    fireEvent.click(checkbox);
-    expect(checkbox.checked).toBe(true);
-    expect(store.getState().translations[index].status).toBe(true);
-
-    // Clear mock fetchWcaEvents
-    tnoodleApi.fetchWcaEvents.mockRestore();
-    tnoodleApi.fetchFormats.mockRestore();
-    tnoodleApi.fetchAvailableFmcTranslations.mockRestore();
+    expect(password).toBe(newPassword);
 });
