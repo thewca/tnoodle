@@ -11,7 +11,7 @@ import { Reducer } from "../main/redux/Reducers";
 import App from "../App";
 
 import { version, formats, events, languages } from "./mock/tnoodle.api.mock";
-import { scrambleProgram } from "./mock/wca.api.mock";
+import { scrambleProgram, competitions, me, wcifs } from "./mock/wca.api.mock";
 
 import _ from "lodash";
 
@@ -265,4 +265,72 @@ it("Remove 333, add FMC and MBLD", async () => {
     expect([...selected, ...deselected].sort()).toStrictEqual(
         laguageKeys.sort()
     );
+});
+
+it("Online user", async () => {
+    const store = createStore(Reducer);
+
+    jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
+
+    jest.spyOn(
+        wcaApi,
+        "getUpcomingManageableCompetitions"
+    ).mockImplementation(() => Promise.resolve(competitions));
+
+    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() => Promise.resolve(me));
+
+    jest.spyOn(
+        wcaApi,
+        "getCompetitionJson"
+    ).mockImplementation((competitionId) =>
+        Promise.resolve(wcifs[competitionId])
+    );
+
+    jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
+        Promise.resolve(
+            JSON.stringify({ solved: 70, attempted: 70, time: 3012 })
+        )
+    );
+
+    jest.spyOn(
+        tnoodleApi,
+        "fetchSuggestedFmcTranslations"
+    ).mockImplementation(() =>
+        Promise.resolve(JSON.stringify(["de", "es", "pt-BR"]))
+    );
+
+    // Render component
+    await act(async () => {
+        render(
+            <Provider store={store}>
+                <App />
+            </Provider>,
+            container
+        );
+    });
+
+    let competitionButtons = Array.from(
+        container.querySelectorAll("ul button")
+    );
+
+    // Skip Manual Selection, click the other buttons
+    competitionButtons.slice(1, competitionButtons.length).forEach((button) => {
+        // Select current competition
+        console.log(button.innerHTML);
+        fireEvent.click(button);
+
+        let scrambleButton = container.querySelector("form button");
+        fireEvent.click(scrambleButton);
+
+        console.log(scrambleButton.innerHTML);
+
+        console.log(wcif);
+    });
+
+    wcaApi.isLogged.mockRestore();
+    wcaApi.getUpcomingManageableCompetitions.mockRestore();
+    wcaApi.fetchMe.mockRestore();
+    wcaApi.getCompetitionJson.mockRestore();
+    tnoodleApi.fetchBestMbldAttempt.mockRestore();
+    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();
 });
