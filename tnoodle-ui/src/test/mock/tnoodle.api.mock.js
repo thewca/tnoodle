@@ -186,3 +186,10 @@ export const formats = {
     a: { name: "Average of 5", shortName: "Ao5" },
     m: { name: "Mean of 3", shortName: "Mo3" },
 };
+
+export const version = {
+    projectName: "TNoodle-WCA",
+    projectVersion: "2",
+    signedBuild: true,
+    signatureKeyBytes: "key",
+};

@@ -8,6 +8,8 @@ import store from "../main/redux/Store";
 
 import VersionInfo from "../main/components/VersionInfo";
 
+import { scrambleProgram, version } from "./mock/wca.api.mock";
+
 const tnoodleApi = require("../main/api/tnoodle.api");
 const wcaApi = require("../main/api/wca.api");
 
@@ -26,7 +28,7 @@ afterEach(() => {
 });
 
 it("Current version is the correct one", async () => {
-    // Define mock objects
+    // Mock objects
     const version = {
         projectName: "TNoodle-WCA",
         projectVersion: "2",
