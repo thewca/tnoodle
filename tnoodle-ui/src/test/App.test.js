@@ -13,6 +13,8 @@ import App from "../App";
 import { version, formats, events, languages } from "./mock/tnoodle.api.mock";
 import { scrambleProgram } from "./mock/wca.api.mock";
 
+import _ from "lodash";
+
 const tnoodleApi = require("../main/api/tnoodle.api");
 const wcaApi = require("../main/api/wca.api");
 
@@ -75,6 +77,7 @@ afterEach(() => {
     tnoodleApi.fetchFormats.mockRestore();
     tnoodleApi.fetchAvailableFmcTranslations.mockRestore();
     tnoodleApi.fetchRunningVersion.mockRestore();
+    tnoodleApi.fetchZip.mockRestore();
     wcaApi.fetchVersionInfo.mockRestore();
 });
 
@@ -170,4 +173,96 @@ it("Changes on 333, scramble", async () => {
     });
 
     expect(password).toBe(newPassword);
+});
+
+it("Remove 333, add FMC and MBLD", async () => {
+    const store = createStore(Reducer);
+
+    // Render component
+    await act(async () => {
+        render(
+            <Provider store={store}>
+                <App />
+            </Provider>,
+            container
+        );
+    });
+
+    const mbldEvent = "3x3x3 Multiple Blindfolded";
+    const fmcEvent = "3x3x3 Fewest Moves";
+
+    let events = Array.from(container.querySelectorAll("form table"));
+    const names = [mbldEvent, fmcEvent];
+
+    let mbldCubes = "70";
+
+    // Pick random indexes from fmc to deselect
+    let laguageKeys = Object.keys(languages);
+    let numberOfLanguages = laguageKeys.length;
+
+    // At least 1, we do not deselect every translation
+    let languagesToDeselect =
+        Math.floor(Math.random() * numberOfLanguages - 2) + 1;
+
+    let languagesIndexToDelesect = _.shuffle([
+        ...Array(numberOfLanguages).keys(),
+    ]).slice(languagesToDeselect);
+
+    events.forEach((event) => {
+        let title = event.querySelector("h5").innerHTML;
+
+        let rounds = event.querySelector("select");
+
+        if (names.includes(title)) {
+            fireEvent.change(rounds, { target: { value: 3 } });
+        } else {
+            fireEvent.change(rounds, { target: { value: 0 } });
+        }
+
+        let inputs = Array.from(event.querySelectorAll("input"));
+
+        // Change to 70 mbld
+        if (title === mbldEvent) {
+            fireEvent.change(inputs[inputs.length - 1], {
+                target: { value: mbldCubes },
+            });
+        } else if (title === fmcEvent) {
+            // Open translations
+            fireEvent.click(event.querySelector("button"));
+
+            // Deselesect random translations
+            let checkboxes = event.querySelectorAll("input[type=checkbox]");
+
+            languagesIndexToDelesect.forEach((index) =>
+                fireEvent.click(checkboxes[index])
+            );
+        }
+    });
+
+    // Generate scrambles
+    const scrambleButton = container.querySelector("form button");
+    fireEvent.click(scrambleButton);
+
+    expect(wcif.events.length).toBe(events.length);
+
+    expect(mbld).toBe(mbldCubes);
+
+    let selected = translations
+        .filter((translation) => translation.status)
+        .map((translation) => translation.id);
+
+    let deselected = translations
+        .filter((translation) => !translation.status)
+        .map((translation) => translation.id)
+        .sort();
+
+    // Deselected should be with status false
+    expect(deselected).toEqual(
+        languagesIndexToDelesect.map((index) => laguageKeys[index]).sort()
+    );
+
+    // Selected and deselected should cover every languages
+    expect([...selected, ...deselected].sort()).toStrictEqual(
+        laguageKeys.sort()
+    );
 });
