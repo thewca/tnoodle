@@ -50,6 +50,7 @@ beforeEach(() => {
         mbld = payload[1];
         password = payload[2];
         translations = payload[3];
+
         return Promise.resolve(new Blob([]));
     });
 
@@ -267,6 +268,9 @@ it("Remove 333, add FMC and MBLD", async () => {
 it("Online user", async () => {
     const store = createStore(Reducer);
 
+    // Allow downloads
+    global.URL.createObjectURL = jest.fn();
+
     jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
     jest.spyOn(
@@ -326,6 +330,13 @@ it("Online user", async () => {
 
         // We should send received wcif to tnoodle
         expect(wcif).toStrictEqual(wcifs[competitions[i].id]);
+
+        // Download
+        await act(async () => {
+            scrambleButton.dispatchEvent(
+                new MouseEvent("click", { bubbles: true })
+            );
+        });
     }
 
     // Get back to manual selection
@@ -341,10 +352,32 @@ it("Online user", async () => {
         );
     });
 
-    console.log(container.querySelector("input").value);
-    console.log(wcif.events);
-    //expect(wcif.events.length).toEqual(1);
+    // After manual selection, events should be restored
+    expect(store.getState().wcif.events).toStrictEqual(defaultWcif.events);
 
+    // Wcifs should be cached
+    Object.keys(wcifs).forEach((competitionId) => {
+        expect(store.getState().cachedObjects[competitionId].wcif).toEqual(
+            wcifs[competitionId]
+        );
+    });
+
+    // Click all buttons again
+    for (let i = 0; i < competitionButtons.length; i++) {
+        await act(async () => {
+            competitionButtons[i].dispatchEvent(
+                new MouseEvent("click", { bubbles: true })
+            );
+        });
+    }
+
+    // On the 2nd competition selection, we should use cached information,
+    // so no wcif should be called
+    expect(wcaApi.getCompetitionJson).toHaveBeenCalledTimes(
+        competitions.length
+    );
+
+    global.URL.createObjectURL.mockRestore();
     wcaApi.isLogged.mockRestore();
     wcaApi.getUpcomingManageableCompetitions.mockRestore();
     wcaApi.fetchMe.mockRestore();
