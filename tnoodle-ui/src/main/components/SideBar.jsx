@@ -204,6 +204,9 @@ const SideBar = connect(
 
         getAndCacheBestMbldAttempt = (wcif) => {
             fetchBestMbldAttempt(wcif).then((bestAttempt) => {
+                if (!bestAttempt) {
+                    return;
+                }
                 let attempted = bestAttempt.attempted;
                 this.props.addCachedObject(
                     wcif.id,

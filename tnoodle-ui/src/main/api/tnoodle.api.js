@@ -20,42 +20,45 @@ export const fetchZip = (wcif, mbld, password, translations) => {
         payload.zipPassword = password;
     }
 
-    return postToTnoodle(zipEndpoint, payload).then((response) =>
-        response.blob()
-    );
+    return postToTnoodle(zipEndpoint, payload)
+        .then((response) => response.blob())
+        .catch((error) => console.error(error));
 };
 
 export const fetchWcaEvents = () => {
-    return fetch(baseUrl + wcaEventsEndpoint).then((response) =>
-        response.json()
-    );
+    return fetch(baseUrl + wcaEventsEndpoint)
+        .then((response) => response.json())
+        .catch((error) => console.error(error));
 };
 
 export const fetchFormats = () => {
-    return fetch(baseUrl + formatsEndpoint).then((response) => response.json());
+    return fetch(baseUrl + formatsEndpoint)
+        .then((response) => response.json())
+        .catch((error) => console.error(error));
 };
 
 export const fetchSuggestedFmcTranslations = (wcif) => {
-    return postToTnoodle(
-        suggestedFmcTranslationsEndpoint,
-        wcif
-    ).then((response) => response.json());
+    return postToTnoodle(suggestedFmcTranslationsEndpoint, wcif)
+        .then((response) => response.json())
+        .catch((error) => console.error(error));
 };
 
 export const fetchBestMbldAttempt = (wcif) => {
-    return postToTnoodle(bestMbldAttemptEndpoint, wcif).then((response) =>
-        response.json()
-    );
+    return postToTnoodle(bestMbldAttemptEndpoint, wcif)
+        .then((response) => response.json())
+        .catch((error) => console.error(error));
 };
 
 export const fetchRunningVersion = () => {
-    return fetch(baseUrl + versionEndpoint).then((response) => response.json());
+    return fetch(baseUrl + versionEndpoint)
+        .then((response) => response.json())
+        .catch((error) => console.error(error));
 };
 
 export const fetchAvailableFmcTranslations = () => {
-    return fetch(baseUrl + fmcTranslationsEndpoint).then((response) =>
-        response.json()
-    );
+    return fetch(baseUrl + fmcTranslationsEndpoint)
+        .then((response) => response.json())
+        .catch((error) => console.error(error));
 };
 
 /**
