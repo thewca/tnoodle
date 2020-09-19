@@ -44,5 +44,12 @@
         "@testing-library/react": "^11.0.4",
         "@testing-library/user-event": "^12.1.4",
         "coveralls": "^3.1.0"
+    },
+    "jest": {
+        "collectCoverageFrom": [
+            "src/**/*.{js,jsx}",
+            "!src/index.js",
+            "!src/serviceWorker.js"
+        ]
     }
 }
