@@ -2,7 +2,7 @@ import React from "react";
 import { act } from "react-dom/test-utils";
 
 import { render, unmountComponentAtNode } from "react-dom";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 
 import { Provider } from "react-redux";
 import { createStore } from "redux";
