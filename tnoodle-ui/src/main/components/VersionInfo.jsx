@@ -28,6 +28,9 @@ const VersionInfo = connect(
         componentDidMount() {
             // Fetch from WCA API.
             fetchVersionInfo().then((response) => {
+                if (!response) {
+                    return;
+                }
                 this.setState({
                     ...this.state,
                     currentTnoodle: response.current,
@@ -37,8 +40,11 @@ const VersionInfo = connect(
                 this.analizeVersion();
             });
 
-            fetchRunningVersion().then((version) => {
-                let { projectName, projectVersion, signedBuild } = version;
+            fetchRunningVersion().then((response) => {
+                if (!response) {
+                    return;
+                }
+                let { projectName, projectVersion, signedBuild } = response;
                 this.setState({
                     ...this.state,
                     // Running version is based on projectName and projectVersion

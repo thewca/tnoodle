@@ -56,10 +56,9 @@ const EventPickerTable = connect(
 
         getFmcTranslations = () => {
             fetchAvailableFmcTranslations().then((availableTranslations) => {
-                // TODO evaluate impact of this. It's probably a useless check
-                /*if (!availableTranslations) {
-                        return;
-                    }*/
+                if (!availableTranslations) {
+                    return;
+                }
                 let translations = Object.keys(availableTranslations).map(
                     (translationId) => ({
                         id: translationId,
