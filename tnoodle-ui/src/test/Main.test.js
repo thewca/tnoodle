@@ -13,15 +13,25 @@ import {
 
 import Main from "../main/components/Main";
 
-import { events, languages, formats } from "./mock/tnoodle.api.mock";
+import { events, languages, formats, version } from "./mock/tnoodle.api.mock";
+import { scrambleProgram } from "./mock/wca.api.mock";
 
 const tnoodleApi = require("../main/api/tnoodle.api");
+const wcaApi = require("../main/api/wca.api");
 
 let container = null;
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
+
+    jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
+        Promise.resolve(version)
+    );
+
+    jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
+        Promise.resolve(scrambleProgram)
+    );
 });
 
 afterEach(() => {
@@ -29,6 +39,9 @@ afterEach(() => {
     unmountComponentAtNode(container);
     container.remove();
     container = null;
+
+    tnoodleApi.fetchRunningVersion.mockRestore();
+    wcaApi.fetchVersionInfo.mockRestore();
 });
 
 it("There should be only 1 button of type submit, check FMC changes", async () => {

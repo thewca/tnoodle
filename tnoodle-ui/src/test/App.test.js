@@ -41,9 +41,7 @@ beforeEach(() => {
     ).mockImplementation(() => Promise.resolve(languages));
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({
-            json: () => Promise.resolve(version),
-        })
+        Promise.resolve(version)
     );
 
     jest.spyOn(tnoodleApi, "fetchZip").mockImplementation((...payload) => {
@@ -51,7 +49,7 @@ beforeEach(() => {
         mbld = payload[1];
         password = payload[2];
         translations = payload[3];
-        return Promise.resolve(scrambleProgram);
+        return Promise.resolve(new Blob([]));
     });
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
@@ -293,11 +291,6 @@ it("Online user", async () => {
         "fetchSuggestedFmcTranslations"
     ).mockImplementation(() => Promise.resolve(["de", "es", "pt-BR"]));
 
-    jest.spyOn(tnoodleApi, "fetchZip").mockImplementation(() => {
-        console.log("Generating zip");
-        return Promise.resolve(new Blob());
-    });
-
     // Render component
     await act(async () => {
         render(
@@ -331,6 +324,5 @@ it("Online user", async () => {
     wcaApi.fetchMe.mockRestore();
     wcaApi.getCompetitionJson.mockRestore();
     tnoodleApi.fetchBestMbldAttempt.mockRestore();
-    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();
-    tnoodleApi.fetchZip.mockRestore();*/
+    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();*/
 });
