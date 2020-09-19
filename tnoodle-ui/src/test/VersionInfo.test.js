@@ -50,9 +50,7 @@ it("Current version is the correct one", async () => {
 
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({
-            json: () => Promise.resolve(version),
-        })
+        Promise.resolve(version)
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
@@ -104,9 +102,7 @@ it("Current version is allowed, but it's not the latest one", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({
-            json: () => Promise.resolve(version),
-        })
+        Promise.resolve(version)
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
@@ -161,9 +157,7 @@ it("Not official version alert", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({
-            json: () => Promise.resolve(version),
-        })
+        Promise.resolve(version)
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
@@ -215,9 +209,7 @@ it("Not allowed TNoodle version, despite it's official", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({
-            json: () => Promise.resolve(version),
-        })
+        Promise.resolve(version)
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>
@@ -262,9 +254,7 @@ it("Do not bother the user if we can't be sure", async () => {
     };
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
-        Promise.resolve({
-            json: () => Promise.resolve(version),
-        })
+        Promise.resolve(version)
     );
 
     jest.spyOn(wcaApi, "fetchVersionInfo").mockImplementation(() =>

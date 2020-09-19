@@ -34,19 +34,17 @@ afterEach(() => {
 it("There should be only 1 button of type submit, check FMC changes", async () => {
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(events)))
+        Promise.resolve(events)
     );
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(formats)))
+        Promise.resolve(formats)
     );
 
     jest.spyOn(
         tnoodleApi,
         "fetchAvailableFmcTranslations"
-    ).mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(languages)))
-    );
+    ).mockImplementation(() => Promise.resolve(languages));
 
     // We add suggested FMC so the button Select Suggested appears as well
     const translations = Object.keys(languages).map((translationId) => ({
