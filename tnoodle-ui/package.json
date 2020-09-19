@@ -49,7 +49,9 @@
         "collectCoverageFrom": [
             "src/**/*.{js,jsx}",
             "!src/index.js",
-            "!src/serviceWorker.js"
+            "!src/serviceWorker.js",
+            "!src/main/api/**.js",
+            "!**/Interceptor.jsx"
         ]
     }
 }
