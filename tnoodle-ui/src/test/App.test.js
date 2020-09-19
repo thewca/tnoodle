@@ -268,6 +268,8 @@ it("Remove 333, add FMC and MBLD", async () => {
 it("Online user", async () => {
     const store = createStore(Reducer);
 
+    const maxCubes = "70";
+
     // Allow downloads
     global.URL.createObjectURL = jest.fn();
 
@@ -288,7 +290,7 @@ it("Online user", async () => {
     );
 
     jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
-        Promise.resolve({ solved: 70, attempted: 70, time: 3012 })
+        Promise.resolve({ solved: maxCubes, attempted: maxCubes, time: 3012 })
     );
 
     jest.spyOn(
@@ -337,6 +339,20 @@ it("Online user", async () => {
                 new MouseEvent("click", { bubbles: true })
             );
         });
+
+        // We should warn in case of mbld
+        if (
+            !!store
+                .getState()
+                .wcif.events.find((event) => event.id === "333mbf") &&
+            store.getState().bestMbldAttempt > store.getState().mbld
+        ) {
+            let items = container.querySelectorAll("tfoot tr th[colspan]");
+            expect(items[items.length - 1].innerHTML).toContain(
+                `a competitor who already tried ${maxCubes} at a competition. Proceed if you are really certain of it.`
+            );
+            console.log();
+        }
     }
 
     // Get back to manual selection
