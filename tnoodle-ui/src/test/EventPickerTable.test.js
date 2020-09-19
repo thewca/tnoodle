@@ -10,7 +10,7 @@ import { updateCompetitionId } from "../main/redux/ActionCreators";
 
 import EventPickerTable from "../main/components/EventPickerTable";
 
-import { events, languages } from "./mock/tnoodle.api.mock";
+import { events, formats, languages } from "./mock/tnoodle.api.mock";
 import { competitions } from "./mock/wca.api.mock";
 
 import {
@@ -29,6 +29,19 @@ beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
     document.body.appendChild(container);
+
+    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
+        Promise.resolve(events)
+    );
+
+    jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
+        Promise.resolve(formats)
+    );
+
+    jest.spyOn(
+        tnoodleApi,
+        "fetchAvailableFmcTranslations"
+    ).mockImplementation(() => Promise.resolve(languages));
 });
 
 afterEach(() => {
@@ -36,14 +49,15 @@ afterEach(() => {
     unmountComponentAtNode(container);
     container.remove();
     container = null;
+
+    // Clear mock
+    tnoodleApi.fetchWcaEvents.mockRestore();
+    tnoodleApi.fetchFormats.mockRestore();
+    tnoodleApi.fetchAvailableFmcTranslations.mockRestore();
 });
 
 it("Show editing warn if case of competition selected", async () => {
     const store = createStore(Reducer);
-
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(events)
-    );
 
     // Choose a competition
     const competitionId = competitions[0].id;
@@ -90,17 +104,10 @@ it("Show editing warn if case of competition selected", async () => {
     // Disabled events should not appear
     const tables = Array.from(container.querySelectorAll("table"));
     expect(tables.length).toBe(store.getState().wcif.events.length);
-
-    // Clear mock
-    tnoodleApi.fetchWcaEvents.mockRestore();
 });
 
 it("Singular event", async () => {
     const store = createStore(Reducer);
-
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(events)
-    );
 
     // Choose a competition
     const competitionId = competitions[0].id;
@@ -121,17 +128,10 @@ it("Singular event", async () => {
 
     // Singular for 1 event
     expect(container.querySelector("p").innerHTML).toContain("event ");
-
-    // Clear mock
-    tnoodleApi.fetchWcaEvents.mockRestore();
 });
 
 it("Changes in MBLD should go to the store", async () => {
     const store = createStore(Reducer);
-
-    jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(events)
-    );
 
     // Render component
     await act(async () => {
@@ -166,7 +166,4 @@ it("Changes in MBLD should go to the store", async () => {
 
     // It should go to the store
     expect(store.getState().mbld).toBe(newMbldScrambles);
-
-    // Clear mock
-    tnoodleApi.fetchWcaEvents.mockRestore();
 });
