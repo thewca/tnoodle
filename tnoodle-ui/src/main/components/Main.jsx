@@ -66,14 +66,10 @@ const Main = connect(
                 this.props.mbld,
                 this.props.password,
                 this.props.translations
-            )
-                .then((response) => {
-                    this.setGeneratingScrambles(false);
-                    if (response.ok) {
-                        return response.blob();
-                    }
-                })
-                .then((blob) => this.props.updateFileZipBlob(blob));
+            ).then((blob) => {
+                this.props.updateFileZipBlob(blob);
+                this.setGeneratingScrambles(false);
+            });
         };
 
         downloadZip = () => {

@@ -20,7 +20,9 @@ export const fetchZip = (wcif, mbld, password, translations) => {
         payload.zipPassword = password;
     }
 
-    return postToTnoodle(zipEndpoint, payload);
+    return postToTnoodle(zipEndpoint, payload).then((response) =>
+        response.blob()
+    );
 };
 
 export const fetchWcaEvents = () => {
