@@ -21,7 +21,7 @@ object APIIntegrationTest {
     fun `test that every upcoming competition produces some output without error`() {
         val competitionsLimit = 10
         val upcomingRaw = URL("https://www.worldcubeassociation.org/api/v0/competitions/").readText()
-        val upcomingComps = JsonConfig.SERIALIZER.decodeFromString(ListSerializer(UpcomingCompetition.serializer()), upcomingRaw).take(competitionsLimit)
+        val upcomingComps = JsonConfig.SERIALIZER.decodeFromString(ListSerializer(UpcomingCompetition.serializer()), upcomingRaw).shuffled().take(competitionsLimit)
 
         val generationDate = LocalDateTime.now()
         val testCompCount = upcomingComps.size

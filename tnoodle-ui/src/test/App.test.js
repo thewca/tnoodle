@@ -351,7 +351,6 @@ it("Online user", async () => {
             expect(items[items.length - 1].innerHTML).toContain(
                 `a competitor who already tried ${maxCubes} at a competition. Proceed if you are really certain of it.`
             );
-            console.log();
         }
     }
 
