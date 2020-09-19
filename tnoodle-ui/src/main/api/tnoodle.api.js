@@ -24,27 +24,36 @@ export const fetchZip = (wcif, mbld, password, translations) => {
 };
 
 export const fetchWcaEvents = () => {
-    return fetch(baseUrl + wcaEventsEndpoint);
+    return fetch(baseUrl + wcaEventsEndpoint).then((response) =>
+        response.json()
+    );
 };
 
 export const fetchFormats = () => {
-    return fetch(baseUrl + formatsEndpoint);
+    return fetch(baseUrl + formatsEndpoint).then((response) => response.json());
 };
 
 export const fetchSuggestedFmcTranslations = (wcif) => {
-    return postToTnoodle(suggestedFmcTranslationsEndpoint, wcif);
+    return postToTnoodle(
+        suggestedFmcTranslationsEndpoint,
+        wcif
+    ).then((response) => response.json());
 };
 
 export const fetchBestMbldAttempt = (wcif) => {
-    return postToTnoodle(bestMbldAttemptEndpoint, wcif);
+    return postToTnoodle(bestMbldAttemptEndpoint, wcif).then((response) =>
+        response.json()
+    );
 };
 
 export const fetchRunningVersion = () => {
-    return fetch(baseUrl + versionEndpoint);
+    return fetch(baseUrl + versionEndpoint).then((response) => response.json());
 };
 
 export const fetchAvailableFmcTranslations = () => {
-    return fetch(baseUrl + fmcTranslationsEndpoint);
+    return fetch(baseUrl + fmcTranslationsEndpoint).then((response) =>
+        response.json()
+    );
 };
 
 /**

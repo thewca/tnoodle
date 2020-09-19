@@ -20,6 +20,8 @@ const VersionInfo = connect(
                 allowedTnoodleVersions: null,
                 runningVersion: null,
                 officialBuild: null,
+                wcaResponse: false,
+                tnoodleResponse: false,
             };
         }
 
@@ -30,23 +32,41 @@ const VersionInfo = connect(
                     ...this.state,
                     currentTnoodle: response.current,
                     allowedTnoodleVersions: response.allowed,
+                    wcaResponse: true,
                 });
+                this.analizeVersion();
             });
 
-            fetchRunningVersion()
-                .then((response) => response.json())
-                .then((version) => {
-                    let { projectName, projectVersion, signedBuild } = version;
-                    this.setState({
-                        ...this.state,
-                        // Running version is based on projectName and projectVersion
-                        runningVersion:
-                            projectVersion != null && projectVersion != null
-                                ? `${projectName}-${projectVersion}`
-                                : "",
-                        officialBuild: signedBuild,
-                    });
+            fetchRunningVersion().then((version) => {
+                let { projectName, projectVersion, signedBuild } = version;
+                this.setState({
+                    ...this.state,
+                    // Running version is based on projectName and projectVersion
+                    runningVersion:
+                        projectVersion != null && projectVersion != null
+                            ? `${projectName}-${projectVersion}`
+                            : "",
+                    officialBuild: signedBuild,
+                    tnoodleResponse: true,
                 });
+                this.analizeVersion();
+            });
+        }
+
+        // This method avoids global state update while rendering
+        analizeVersion() {
+            // We wait until both wca and tnoodle answes
+            if (!this.state.tnoodleResponse || !this.state.wcaResponse) {
+                return;
+            }
+
+            let runningVersion = this.state.runningVersion;
+            let allowedVersions = this.state.allowedTnoodleVersions;
+            let officialBuild = this.state.officialBuild;
+
+            if (!officialBuild || !allowedVersions.includes(runningVersion)) {
+                this.props.updateOfficialZipStatus(false);
+            }
         }
 
         render() {
@@ -62,7 +82,6 @@ const VersionInfo = connect(
 
             // Generated version is not an official jar
             if (!officialBuild) {
-                this.props.updateOfficialZipStatus(false);
                 return (
                     <div className="alert alert-danger m-0">
                         This TNoodle version is not official and scrambles
@@ -82,7 +101,6 @@ const VersionInfo = connect(
 
             // Running version is not allowed anymore.
             if (!allowedVersions.includes(runningVersion)) {
-                this.props.updateOfficialZipStatus(false);
                 return (
                     <div className="alert alert-danger m-0">
                         This TNoodle version is not allowed. Do not use
