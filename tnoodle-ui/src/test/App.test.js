@@ -293,6 +293,11 @@ it("Online user", async () => {
         "fetchSuggestedFmcTranslations"
     ).mockImplementation(() => Promise.resolve(["de", "es", "pt-BR"]));
 
+    jest.spyOn(tnoodleApi, "fetchZip").mockImplementation(() => {
+        console.log("Generating zip");
+        return Promise.resolve(new Blob());
+    });
+
     // Render component
     await act(async () => {
         render(
@@ -308,29 +313,24 @@ it("Online user", async () => {
     );
 
     // Skip Manual Selection, click the other buttons
-    competitionButtons
-        .slice(1, competitionButtons.length)
-        .forEach(async (button) => {
-            // Select current competition
-            console.log(button.innerHTML);
-            fireEvent.click(button);
+    // Select current competition
+    fireEvent.click(competitionButtons[1]);
 
-            let scrambleButton = container.querySelector("form button");
-            fireEvent.click(scrambleButton);
+    let scrambleButton = container.querySelector("form button");
+    fireEvent.click(scrambleButton);
 
-            console.log(scrambleButton.innerHTML);
+    console.log(scrambleButton.innerHTML);
 
-            console.log(wcif);
+    console.log(store.getState().wcif);
 
-            await waitFor(() =>
-                expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(1)
-            );
-        });
+    fireEvent.click(scrambleButton);
+    console.log(container.querySelector("input").value);
 
     /*wcaApi.isLogged.mockRestore();
     wcaApi.getUpcomingManageableCompetitions.mockRestore();
     wcaApi.fetchMe.mockRestore();
     wcaApi.getCompetitionJson.mockRestore();
     tnoodleApi.fetchBestMbldAttempt.mockRestore();
-    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();*/
+    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();
+    tnoodleApi.fetchZip.mockRestore();*/
 });
