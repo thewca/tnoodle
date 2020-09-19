@@ -14,7 +14,6 @@ class Interceptor extends Component {
         fetchIntercept.register({
             request: function (...request) {
                 // TODO set loading
-                console.log(request[0]);
                 return request;
             },
 

@@ -385,3 +385,92 @@ it("Online user", async () => {
     tnoodleApi.fetchBestMbldAttempt.mockRestore();
     tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();
 });
+
+it("Comfort features should not block zip generation", async () => {
+    const store = createStore(Reducer);
+
+    // Allow downloads
+    global.URL.createObjectURL = jest.fn();
+
+    jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
+
+    jest.spyOn(
+        wcaApi,
+        "getUpcomingManageableCompetitions"
+    ).mockImplementation(() => Promise.resolve(competitions));
+
+    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() => Promise.resolve(me));
+
+    jest.spyOn(
+        wcaApi,
+        "getCompetitionJson"
+    ).mockImplementation((competitionId) =>
+        Promise.resolve(wcifs[competitionId])
+    );
+
+    // Comfort features
+    jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
+        Promise.resolve(undefined)
+    );
+
+    jest.spyOn(
+        tnoodleApi,
+        "fetchSuggestedFmcTranslations"
+    ).mockImplementation(() => Promise.resolve(undefined));
+
+    // Render component
+    await act(async () => {
+        render(
+            <Provider store={store}>
+                <App />
+            </Provider>,
+            container
+        );
+    });
+
+    let competitionButtons = Array.from(
+        container.querySelectorAll("ul button")
+    );
+
+    let scrambleButton = container.querySelector("form button");
+
+    // Click competitions
+    for (let i = 0; i < competitionButtons.length; i++) {
+        await act(async () => {
+            competitionButtons[i].dispatchEvent(
+                new MouseEvent("click", { bubbles: true })
+            );
+        });
+
+        // Round changes from previous tests also changes defaultWcif
+        // to avoid empty rounds, we try to change rounds here
+        // It should have effect just on in Manual Selection
+        fireEvent.change(container.querySelector("select"), {
+            target: { value: 1 },
+        });
+
+        await act(async () => {
+            scrambleButton.dispatchEvent(
+                new MouseEvent("click", { bubbles: true })
+            );
+        });
+
+        await act(async () => {
+            scrambleButton.dispatchEvent(
+                new MouseEvent("click", { bubbles: true })
+            );
+        });
+    }
+
+    expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(
+        competitionButtons.length
+    );
+
+    global.URL.createObjectURL.mockRestore();
+    wcaApi.isLogged.mockRestore();
+    wcaApi.getUpcomingManageableCompetitions.mockRestore();
+    wcaApi.fetchMe.mockRestore();
+    wcaApi.getCompetitionJson.mockRestore();
+    tnoodleApi.fetchBestMbldAttempt.mockRestore();
+    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();
+});
