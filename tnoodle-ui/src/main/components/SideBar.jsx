@@ -192,30 +192,26 @@ const SideBar = connect(
         };
 
         getAndCacheSuggestedFmcTranslations = (wcif) => {
-            fetchSuggestedFmcTranslations(wcif)
-                .then((response) => response.json())
-                .then((translations) => {
-                    this.props.addCachedObject(
-                        wcif.id,
-                        "suggestedFmcTranslations",
-                        translations
-                    );
-                    this.props.addSuggestedFmcTranslations(translations);
-                });
+            fetchSuggestedFmcTranslations(wcif).then((translations) => {
+                this.props.addCachedObject(
+                    wcif.id,
+                    "suggestedFmcTranslations",
+                    translations
+                );
+                this.props.addSuggestedFmcTranslations(translations);
+            });
         };
 
         getAndCacheBestMbldAttempt = (wcif) => {
-            fetchBestMbldAttempt(wcif)
-                .then((response) => response.json())
-                .then((bestAttempt) => {
-                    let attempted = bestAttempt.attempted;
-                    this.props.addCachedObject(
-                        wcif.id,
-                        "bestMbldAttempt",
-                        attempted
-                    );
-                    this.props.setBestMbldAttempt(attempted);
-                });
+            fetchBestMbldAttempt(wcif).then((bestAttempt) => {
+                let attempted = bestAttempt.attempted;
+                this.props.addCachedObject(
+                    wcif.id,
+                    "bestMbldAttempt",
+                    attempted
+                );
+                this.props.setBestMbldAttempt(attempted);
+            });
         };
 
         // In case we use competitionId from query params, it's not fetched.
