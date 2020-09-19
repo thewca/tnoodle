@@ -2,7 +2,7 @@ import React from "react";
 import { act } from "react-dom/test-utils";
 
 import { render, unmountComponentAtNode } from "react-dom";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 
 import { Provider } from "react-redux";
 import { createStore } from "redux";
@@ -28,19 +28,17 @@ beforeEach(() => {
 
     // Turn on mocking behavior
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(events)))
+        Promise.resolve(events)
     );
 
     jest.spyOn(tnoodleApi, "fetchFormats").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(formats)))
+        Promise.resolve(formats)
     );
 
     jest.spyOn(
         tnoodleApi,
         "fetchAvailableFmcTranslations"
-    ).mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(languages)))
-    );
+    ).mockImplementation(() => Promise.resolve(languages));
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
         Promise.resolve({
@@ -287,17 +285,13 @@ it("Online user", async () => {
     );
 
     jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
-        Promise.resolve(
-            JSON.stringify({ solved: 70, attempted: 70, time: 3012 })
-        )
+        Promise.resolve({ solved: 70, attempted: 70, time: 3012 })
     );
 
     jest.spyOn(
         tnoodleApi,
         "fetchSuggestedFmcTranslations"
-    ).mockImplementation(() =>
-        Promise.resolve(JSON.stringify(["de", "es", "pt-BR"]))
-    );
+    ).mockImplementation(() => Promise.resolve(["de", "es", "pt-BR"]));
 
     // Render component
     await act(async () => {
@@ -314,23 +308,29 @@ it("Online user", async () => {
     );
 
     // Skip Manual Selection, click the other buttons
-    competitionButtons.slice(1, competitionButtons.length).forEach((button) => {
-        // Select current competition
-        console.log(button.innerHTML);
-        fireEvent.click(button);
+    competitionButtons
+        .slice(1, competitionButtons.length)
+        .forEach(async (button) => {
+            // Select current competition
+            console.log(button.innerHTML);
+            fireEvent.click(button);
 
-        let scrambleButton = container.querySelector("form button");
-        fireEvent.click(scrambleButton);
+            let scrambleButton = container.querySelector("form button");
+            fireEvent.click(scrambleButton);
 
-        console.log(scrambleButton.innerHTML);
+            console.log(scrambleButton.innerHTML);
 
-        console.log(wcif);
-    });
+            console.log(wcif);
 
-    wcaApi.isLogged.mockRestore();
+            await waitFor(() =>
+                expect(tnoodleApi.fetchZip).toHaveBeenCalledTimes(1)
+            );
+        });
+
+    /*wcaApi.isLogged.mockRestore();
     wcaApi.getUpcomingManageableCompetitions.mockRestore();
     wcaApi.fetchMe.mockRestore();
     wcaApi.getCompetitionJson.mockRestore();
     tnoodleApi.fetchBestMbldAttempt.mockRestore();
-    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();
+    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();*/
 });

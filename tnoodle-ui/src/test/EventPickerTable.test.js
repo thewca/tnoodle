@@ -42,7 +42,7 @@ it("Show editing warn if case of competition selected", async () => {
     const store = createStore(Reducer);
 
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(events)))
+        Promise.resolve(events)
     );
 
     // Choose a competition
@@ -99,7 +99,7 @@ it("Singular event", async () => {
     const store = createStore(Reducer);
 
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(events)))
+        Promise.resolve(events)
     );
 
     // Choose a competition
@@ -130,7 +130,7 @@ it("Changes in MBLD should go to the store", async () => {
     const store = createStore(Reducer);
 
     jest.spyOn(tnoodleApi, "fetchWcaEvents").mockImplementation(() =>
-        Promise.resolve(new Response(JSON.stringify(events)))
+        Promise.resolve(events)
     );
 
     // Render component
