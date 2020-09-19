@@ -14,6 +14,7 @@ import { version, formats, events, languages } from "./mock/tnoodle.api.mock";
 import { scrambleProgram, competitions, me, wcifs } from "./mock/wca.api.mock";
 
 import _ from "lodash";
+import { defaultWcif } from "../main/constants/default.wcif";
 
 const tnoodleApi = require("../main/api/tnoodle.api");
 const wcaApi = require("../main/api/wca.api");
@@ -305,24 +306,49 @@ it("Online user", async () => {
         container.querySelectorAll("ul button")
     );
 
-    // Skip Manual Selection, click the other buttons
-    // Select current competition
-    fireEvent.click(competitionButtons[1]);
-
     let scrambleButton = container.querySelector("form button");
-    fireEvent.click(scrambleButton);
 
-    console.log(scrambleButton.innerHTML);
+    // Skip Manual Selection, click the other buttons
+    for (let i = 0; i < competitions.length; i++) {
+        // Select current competition
+        await act(async () => {
+            // +1 to skip manual selection
+            competitionButtons[i + 1].dispatchEvent(
+                new MouseEvent("click", { bubbles: true })
+            );
+        });
 
-    console.log(store.getState().wcif);
+        await act(async () => {
+            scrambleButton.dispatchEvent(
+                new MouseEvent("click", { bubbles: true })
+            );
+        });
 
-    fireEvent.click(scrambleButton);
+        // We should send received wcif to tnoodle
+        expect(wcif).toStrictEqual(wcifs[competitions[i].id]);
+    }
+
+    // Get back to manual selection
+    await act(async () => {
+        competitionButtons[0].dispatchEvent(
+            new MouseEvent("click", { bubbles: true })
+        );
+    });
+
+    await act(async () => {
+        scrambleButton.dispatchEvent(
+            new MouseEvent("click", { bubbles: true })
+        );
+    });
+
     console.log(container.querySelector("input").value);
+    console.log(wcif.events);
+    //expect(wcif.events.length).toEqual(1);
 
-    /*wcaApi.isLogged.mockRestore();
+    wcaApi.isLogged.mockRestore();
     wcaApi.getUpcomingManageableCompetitions.mockRestore();
     wcaApi.fetchMe.mockRestore();
     wcaApi.getCompetitionJson.mockRestore();
     tnoodleApi.fetchBestMbldAttempt.mockRestore();
-    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();*/
+    tnoodleApi.fetchSuggestedFmcTranslations.mockRestore();
 });
