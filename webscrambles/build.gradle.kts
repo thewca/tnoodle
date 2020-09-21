@@ -119,8 +119,10 @@ tasks.getByName<ShadowJar>("shadowJar") {
     outputs.file(targetLn)
 
     doLast {
-        val created = archiveFile.orNull?.asFile
-            ?.let { symlink(targetLn, it) } ?: false
+        val targetFileAbs = archiveFile.orNull?.asFile
+            ?.relativeToOrNull(rootProject.projectDir)
+
+        val created = targetFileAbs?.let { symlink(targetLn, it) } ?: false
 
         if (!created) {
             logger.warn("Unable to (re-)create symlink for latest release! Using top-level Gradle tasks will implicitly reference an older build!")
