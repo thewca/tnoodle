@@ -18,7 +18,7 @@ import java.security.Key
 import javax.crypto.Cipher
 
 object WCIFScrambleMatcher {
-    const val ID_PENDING = 0 // FIXME should this be -1?
+    const val ID_PENDING = 0
 
     // SCRAMBLE SET ENCRYPTION / DECRYPTION -----
 
@@ -222,9 +222,9 @@ object WCIFScrambleMatcher {
     private fun <T : IndexingIdProvider> buildReindexingMap(candidates: List<T>): Map<T, Int> {
         val forReindexing = candidates.filter { it.id == ID_PENDING }
         val maxAssignedId = (candidates - forReindexing)
-            .maxByOrNull { it.id }?.id ?: 1
+            .map { it.id }.maxOrNull() ?: ID_PENDING
 
-        return forReindexing.mapIndexed { i, elem -> elem to i + maxAssignedId + 1 }
+        return forReindexing.mapIndexed { i, elem -> elem to maxAssignedId + 1 + i }
             .toMap()
     }
 
