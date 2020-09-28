@@ -2,8 +2,8 @@ package org.worldcubeassociation.tnoodle.server
 
 import io.ktor.application.Application
 import io.ktor.application.install
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.DefaultHeaders
+import io.ktor.features.*
+import io.ktor.http.*
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 import io.ktor.server.engine.ShutDownUrl
@@ -28,6 +28,11 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         }
 
         app.install(DefaultHeaders)
+
+        app.install(CORS) {
+            anyHost()
+            method(HttpMethod.Put)
+        }
 
         app.install(ContentNegotiation) {
             json(json = JsonConfig.SERIALIZER)
