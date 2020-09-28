@@ -17,13 +17,13 @@ plugins {
     GIT_VERSION_TAG
     KOTLIN_SERIALIZATION
     GOOGLE_APPENGINE
-    KOTLESS
+    //KOTLESS
 }
 
 dependencies {
     implementation(project(":tnoodle-server"))
 
-    implementation(KOTLESS_KTOR)
+    //implementation(KOTLESS_KTOR)
     implementation(GOOGLE_CLOUD_STORAGE)
     implementation(BATIK_TRANSCODER)
 }
