@@ -9,42 +9,25 @@ import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.apache.batik.anim.dom.SVGDOMImplementation
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.TranscodingHints
 import org.apache.batik.transcoder.image.ImageTranscoder
+import org.apache.batik.transcoder.image.PNGTranscoder
 import org.apache.batik.util.SVGConstants
 import org.worldcubeassociation.tnoodle.scrambles.Puzzle
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleImageJsonData
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 import org.worldcubeassociation.tnoodle.svglite.Svg
-import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
 
 object ScrambleViewHandler : RouteHandler {
     private const val PUZZLE_KEY_PARAM = PuzzleListHandler.PUZZLE_KEY_PARAM
 
     private const val QUERY_SCRAMBLE_PARAM = "scramble"
     private const val QUERY_COLOR_SCHEME_PARAM = "scheme"
-
-    // Copied from http://bbgen.net/blog/2011/06/java-svg-to-bufferedimage/
-    internal class BufferedImageTranscoder : ImageTranscoder() {
-        var bufferedImage: BufferedImage? = null
-            private set
-
-        override fun createImage(w: Int, h: Int): BufferedImage {
-            return BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
-        }
-
-        override fun writeImage(img: BufferedImage, output: TranscoderOutput) {
-            this.bufferedImage = img
-        }
-    }
 
     private suspend fun ApplicationCall.withScramble(handle: suspend ApplicationCall.(Puzzle, Svg) -> Unit) {
         val name = parameters[PUZZLE_KEY_PARAM]
@@ -67,37 +50,32 @@ object ScrambleViewHandler : RouteHandler {
             route("{$PUZZLE_KEY_PARAM}") {
                 get("png") {
                     call.withScramble { puzzle, svg ->
-                        val svgFile = svg.toString().byteInputStream()
-
                         val (width, height) = puzzle.preferredSize.let { it.width to it.height }
-                        val imageTranscoder = BufferedImageTranscoder()
 
                         // Copied from http://stackoverflow.com/a/6634963
                         // with some tweaks.
-                        val impl = SVGDOMImplementation.getDOMImplementation()
-
                         val hints = TranscodingHints().apply {
                             this[ImageTranscoder.KEY_WIDTH] = width.toFloat()
                             this[ImageTranscoder.KEY_HEIGHT] = height.toFloat()
-                            this[ImageTranscoder.KEY_DOM_IMPLEMENTATION] = impl
+                            this[ImageTranscoder.KEY_DOM_IMPLEMENTATION] = SVGDOMImplementation.getDOMImplementation()
                             this[ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI] = SVGConstants.SVG_NAMESPACE_URI
                             this[ImageTranscoder.KEY_DOCUMENT_ELEMENT_NAMESPACE_URI] = SVGConstants.SVG_NAMESPACE_URI
                             this[ImageTranscoder.KEY_DOCUMENT_ELEMENT] = SVGConstants.SVG_SVG_TAG
                             this[ImageTranscoder.KEY_XML_PARSER_VALIDATING] = false
                         }
 
-                        imageTranscoder.transcodingHints = hints
-
-                        val input = TranscoderInput(svgFile)
-                        imageTranscoder.transcode(input, TranscoderOutput())
-
-                        val img = imageTranscoder.bufferedImage
-
-                        val bytes = ByteArrayOutputStream().also {
-                            withContext(Dispatchers.IO) { ImageIO.write(img, "png", it) }
+                        val imageTranscoder = PNGTranscoder().apply {
+                            transcodingHints = hints
                         }
 
-                        respondBytes(bytes.toByteArray(), ContentType.Image.PNG)
+                        val svgFile = svg.toString().byteInputStream()
+                        val input = TranscoderInput(svgFile)
+
+                        val outputBytes = ByteArrayOutputStream()
+                        val output = TranscoderOutput(outputBytes)
+                        imageTranscoder.transcode(input, output)
+
+                        respondBytes(outputBytes.toByteArray(), ContentType.Image.PNG)
                     }
                 }
                 get("svg") {

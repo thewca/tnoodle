@@ -3,6 +3,7 @@ import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
 import dependencies.Libraries.BATIK_TRANSCODER
+import dependencies.Libraries.BATIK_CODEC
 import dependencies.Libraries.GOOGLE_CLOUD_STORAGE
 import dependencies.Libraries.KOTLESS_KTOR
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -26,6 +27,8 @@ dependencies {
     //implementation(KOTLESS_KTOR)
     implementation(GOOGLE_CLOUD_STORAGE)
     implementation(BATIK_TRANSCODER)
+
+    runtimeOnly(BATIK_CODEC)
 }
 
 tasks.withType<KotlinCompile> {

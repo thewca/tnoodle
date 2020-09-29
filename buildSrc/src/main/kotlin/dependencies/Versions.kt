@@ -12,6 +12,7 @@ object Versions {
     val ZIP4J = "2.6.3"
     val ITEXTPDF = "5.5.13.2"
     val BATIK_TRANSCODER = BATIK
+    val BATIK_CODEC = BATIK
     val SNAKEYAML = "1.27"
     val SYSTEM_TRAY = "3.17"
     val BOUNCYCASTLE = "1.66"
