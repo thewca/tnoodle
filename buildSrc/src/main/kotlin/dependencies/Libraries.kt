@@ -5,6 +5,7 @@ object Libraries {
     val ZIP4J = "net.lingala.zip4j:zip4j:${Versions.ZIP4J}"
     val ITEXTPDF = "com.itextpdf:itextpdf:${Versions.ITEXTPDF}"
     val BATIK_TRANSCODER = "org.apache.xmlgraphics:batik-transcoder:${Versions.BATIK_TRANSCODER}"
+    val BATIK_CODEC = "org.apache.xmlgraphics:batik-codec:${Versions.BATIK_CODEC}"
     val SNAKEYAML = "org.yaml:snakeyaml:${Versions.SNAKEYAML}"
     val SYSTEM_TRAY = "com.dorkbox:SystemTray:${Versions.SYSTEM_TRAY}"
     val BOUNCYCASTLE = "org.bouncycastle:bcprov-jdk15on:${Versions.BOUNCYCASTLE}"
