@@ -67,7 +67,6 @@ const Main = connect(
                 ...this.state,
                 competitionNameFileZip: this.props.wcif.name,
             });
-            this.props.updateGeneratingScrambles(true);
             let scrambleClient = new ScrambleClient(this.props.updateScramblingProgressTarget, this.props.updateScramblingProgressCurrentEvent);
             fetchZip(
                 scrambleClient,
@@ -80,6 +79,7 @@ const Main = connect(
                 this.props.updateGeneratingScrambles(false);
                 this.props.resetScramblingProgressCurrent();
             });
+            this.props.updateGeneratingScrambles(true);
         };
 
         downloadZip = () => {

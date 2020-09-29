@@ -65,8 +65,7 @@ export class ScrambleClient {
     }
 }
 
-//const BASE_URL = window.location.origin.replace(/^https?:\/\//,'ws://');
-const BASE_URL = "ws://localhost:2014/";
+const BASE_URL = window.location.origin.replace(/^https?:\/\//,'ws://');
 
 const SCRAMBLING_STATES = {
     IDLE: "IDLE",
