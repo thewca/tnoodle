@@ -3,6 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.*
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.OutlineConfiguration
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.CompetitionZippingData
@@ -122,7 +123,7 @@ object WCIFDataBuilder {
         }
 
         val configurations = scrambleRequests.map {
-            Triple(it.compileTitleString(locale, false), it.activityCode.eventModel?.description.orEmpty(), it.numCopies)
+            OutlineConfiguration(it.compileTitleString(locale, false), it.activityCode.eventModel?.description.orEmpty(), it.numCopies)
         }
 
         return MergedPdfWithOutline(originalPdfs, configurations)
