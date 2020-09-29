@@ -191,43 +191,32 @@ const EventPicker = connect(
         };
 
         maybeShowProgressBar = (rounds) => {
-            if (rounds.length === 0) {
-                return;
-            }
-
-            if (this.props.fileZipBlob != null) {
-                return (
-                    <ProgressBar striped variant={"success"} now={100}/>
-                );
-            }
-
-            if (!this.props.generatingScrambles) {
-                return;
-            }
-
             let eventId = this.props.event.id;
 
             let current = this.props.scramblingProgressCurrent[eventId] || 0;
             let target = this.props.scramblingProgressTarget[eventId];
 
-            if (target === undefined) {
+            if (rounds.length === 0 || !this.props.generatingScrambles || target === undefined) {
                 return;
             }
 
-            if (current === 0) {
-                return (
-                    <ProgressBar animated now={1}/>
-                );
+            let progress = (current / target) * 100
+            let miniThreshold = 2;
+
+            if (progress === 0) {
+                progress = miniThreshold;
             }
 
-            let progress = (current / target) * 100
-
             return (
-                <ProgressBar animated variant={
+                <ProgressBar animated fade variant={
                     progress === 100
                         ? "success"
                         : "info"
-                } now={progress}/>
+                } now={progress} label={
+                    progress === 100 || progress < miniThreshold
+                        ? ""
+                        : `${current} / ${target}`
+                }/>
             );
         };
 
