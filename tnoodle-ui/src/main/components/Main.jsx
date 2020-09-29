@@ -4,7 +4,12 @@ import EventPickerTable from "./EventPickerTable";
 import Interceptor from "./Interceptor";
 import VersionInfo from "./VersionInfo";
 import { fetchZip } from "../api/tnoodle.api";
-import { updateFileZipBlob, updateGeneratingScrambles } from "../redux/ActionCreators";
+import {
+    updateFileZipBlob,
+    updateGeneratingScrambles,
+    updateScramblingProgressTarget,
+    updateScramblingProgressCurrent
+} from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { isUsingStaging } from "../api/wca.api";
 import "./Main.css";
@@ -22,7 +27,9 @@ const mapStateToProps = (store) => ({
 
 const mapDispatchToProps = {
     updateFileZipBlob,
-    updateGeneratingScrambles
+    updateGeneratingScrambles,
+    updateScramblingProgressTarget,
+    updateScramblingProgressCurrent
 };
 
 const Main = connect(

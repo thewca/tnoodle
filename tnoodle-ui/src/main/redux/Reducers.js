@@ -12,6 +12,8 @@ const defaultStore = {
     officialZip: true,
     fileZipBlob: null,
     generatingScrambles: null,
+    scramblingProgressTarget: {},
+    scramblingProgressCurrent: {},
     cachedObjects: {},
     translations: null,
     suggestedFmcTranslations: null,
@@ -125,6 +127,14 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_GENERATING_SCRAMBLES) {
         return { ...store, generatingScrambles: action.payload.generatingScrambles };
+    }
+
+    if (action.type === ActionTypes.UPDATE_SCRAMBLING_PROGRESS_TARGET) {
+        return { ...store, scramblingProgressTarget: action.payload.scramblingProgressTarget };
+    }
+
+    if (action.type === ActionTypes.UPDATE_SCRAMBLING_PROGRESS_CURRENT) {
+        return { ...store, scramblingProgressCurrent: action.payload.scramblingProgressCurrent };
     }
 
     if (action.type === ActionTypes.ADD_CACHED_OBJECT) {
