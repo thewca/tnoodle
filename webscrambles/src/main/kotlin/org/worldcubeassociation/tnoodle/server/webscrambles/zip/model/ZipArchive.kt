@@ -13,10 +13,14 @@ class ZipArchive(private val entries: List<ZipNode>) {
     val allFiles: List<File>
         get() = Folder.flattenFiles(entries)
 
-    private var zippingCache: ByteArray? = null
+    private val zippingCache by lazy { directCompress(null) }
 
     fun compress(password: String? = null): ByteArray {
-        return zippingCache?.takeIf { password == null } ?: directCompress(password)
+        if (password == null) {
+            return zippingCache
+        }
+
+        return directCompress(password)
     }
 
     fun directCompress(password: String?): ByteArray {
@@ -39,7 +43,6 @@ class ZipArchive(private val entries: List<ZipNode>) {
         zipOut.close()
 
         return baosZip.toByteArray()
-            .also { if (password == null) zippingCache = it }
     }
 
     companion object {

@@ -362,8 +362,9 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
 
     companion object {
         const val FMC_LINE_THICKNESS = 0.5f
-
         const val UNDERLINE_THICKNESS = 0.2f
+
+        const val LEADING_MULTIPLIER = 1.3f
 
         const val FORM_TEMPLATE_WCA_ID = "WCA ID: __ __ __ __  __ __ __ __  __ __"
 
@@ -374,7 +375,5 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val WCA_ROTATIONS = arrayOf("x", "y", "z", "", "", "")
 
         val DIRECTION_MODIFIERS = arrayOf("", "'", "2")
-
-        var LEADING_MULTIPLIER = 1.3f
     }
 }

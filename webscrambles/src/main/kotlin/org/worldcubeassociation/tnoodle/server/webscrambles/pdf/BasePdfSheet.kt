@@ -8,10 +8,14 @@ import java.io.ByteArrayOutputStream
 abstract class BasePdfSheet<W : PdfWriter> : PdfContent {
     open fun openDocument() = Document()
 
-    private var renderingCache: ByteArray? = null
+    private val renderingCache by lazy { directRender(null) }
 
     override fun render(password: String?): ByteArray {
-        return renderingCache?.takeIf { password == null } ?: directRender(password)
+        if (password == null) {
+            return renderingCache
+        }
+
+        return directRender(password)
     }
 
     private fun directRender(password: String?): ByteArray {
@@ -29,7 +33,6 @@ abstract class BasePdfSheet<W : PdfWriter> : PdfContent {
         pdfDocument.close()
 
         return this.finalise(pdfBytes, password)
-            .also { if (password == null) renderingCache = it }
     }
 
     abstract fun W.writeContents(document: Document)
