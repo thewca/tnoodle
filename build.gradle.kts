@@ -15,6 +15,7 @@ buildscript {
             exclude(group = "com.android.tools.build")
         }
         classpath(GOOGLE_APPENGINE_GRADLE)
+        classpath(KOTLINX_ATOMICFU_GRADLE)
     }
 }
 
