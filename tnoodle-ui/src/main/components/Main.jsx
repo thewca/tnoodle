@@ -61,14 +61,6 @@ const Main = connect(
             }
         };
 
-        onScrambleSocketHandshake = (target) => {
-            this.props.updateScramblingProgressTarget(target);
-        };
-
-        onScrambleSocketProgress = (eventId) => {
-            this.props.updateScramblingProgressCurrentEvent(eventId);
-        };
-
         generateZip = () => {
             // If user navigates during generation proccess, we still get the correct name
             this.setState({
@@ -76,7 +68,7 @@ const Main = connect(
                 competitionNameFileZip: this.props.wcif.name,
             });
             this.props.updateGeneratingScrambles(true);
-            let scrambleClient = new ScrambleClient(this.onScrambleSocketHandshake, this.onScrambleSocketProgress);
+            let scrambleClient = new ScrambleClient(this.props.updateScramblingProgressTarget, this.props.updateScramblingProgressCurrentEvent);
             fetchZip(
                 scrambleClient,
                 this.props.wcif,
@@ -86,6 +78,7 @@ const Main = connect(
             ).then((blob) => {
                 this.props.updateFileZipBlob(blob);
                 this.props.updateGeneratingScrambles(false);
+                this.props.resetScramblingProgressCurrent();
             });
         };
 

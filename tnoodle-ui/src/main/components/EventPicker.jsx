@@ -18,6 +18,7 @@ const mapStateToProps = (store) => ({
     generatingScrambles: store.generatingScrambles,
     scramblingProgressTarget: store.scramblingProgressTarget,
     scramblingProgressCurrent: store.scramblingProgressCurrent,
+    fileZipBlob: store.fileZipBlob
 });
 
 const mapDispatchToProps = {
@@ -190,18 +191,32 @@ const EventPicker = connect(
         };
 
         maybeShowProgressBar = (rounds) => {
-            if (!this.props.generatingScrambles || rounds.length === 0) {
+            if (rounds.length === 0) {
+                return;
+            }
+
+            if (this.props.fileZipBlob != null) {
+                return (
+                    <ProgressBar striped variant={"success"} now={100}/>
+                );
+            }
+
+            if (!this.props.generatingScrambles) {
                 return;
             }
 
             let eventId = this.props.event.id;
 
-            let current = this.props.scramblingProgressCurrent[eventId];
+            let current = this.props.scramblingProgressCurrent[eventId] || 0;
             let target = this.props.scramblingProgressTarget[eventId];
 
-            if (current === undefined || target === undefined) {
+            if (target === undefined) {
+                return;
+            }
+
+            if (current === 0) {
                 return (
-                    <ProgressBar striped variant={"danger"} now={100}/>
+                    <ProgressBar animated now={1}/>
                 );
             }
 
@@ -209,7 +224,7 @@ const EventPicker = connect(
 
             return (
                 <ProgressBar animated variant={
-                    target === 1
+                    progress === 100
                         ? "success"
                         : "info"
                 } now={progress}/>
