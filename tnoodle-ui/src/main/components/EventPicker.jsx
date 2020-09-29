@@ -9,11 +9,13 @@ import {
 import MbldDetail from "./MbldDetail";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import "./EventPicker.css";
+import { ProgressBar } from "react-bootstrap";
 
 const mapStateToProps = (store) => ({
     editingDisabled: store.editingDisabled,
     wcif: store.wcif,
     wcaFormats: store.wcaFormats,
+    generatingScrambles: store.generatingScrambles
 });
 
 const mapDispatchToProps = {
@@ -185,10 +187,18 @@ const EventPicker = connect(
             );
         };
 
-        render() {
-            let wcaEvent = this.props.wcif.events.find(
-                (event) => event.id === this.props.event.id
+        maybeShowProgressBar = (rounds) => {
+            if (!this.props.generatingScrambles || rounds.length === 0) {
+                return;
+            }
+
+            return (
+                <ProgressBar animated now={60}/>
             );
+        };
+
+        render() {
+            let wcaEvent = this.props.wcifEvent;
             let rounds = wcaEvent != null ? wcaEvent.rounds : [];
 
             return (
@@ -219,6 +229,7 @@ const EventPicker = connect(
                                 <h5 className="font-weight-bold">
                                     {this.props.event.name}
                                 </h5>
+                                {this.maybeShowProgressBar(rounds)}
                             </th>
                             <th className="lastTwoColumns" scope="col">
                                 <label>Rounds</label>

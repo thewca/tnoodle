@@ -11,6 +11,7 @@ const defaultStore = {
     editingDisabled: false,
     officialZip: true,
     fileZipBlob: null,
+    generatingScrambles: null,
     cachedObjects: {},
     translations: null,
     suggestedFmcTranslations: null,
@@ -120,6 +121,10 @@ export const Reducer = (store, action) => {
 
     if (action.type === ActionTypes.UPDATE_FILE_ZIP_BLOB) {
         return { ...store, fileZipBlob: action.payload.fileZipBlob };
+    }
+
+    if (action.type === ActionTypes.UPDATE_GENERATING_SCRAMBLES) {
+        return { ...store, generatingScrambles: action.payload.generatingScrambles };
     }
 
     if (action.type === ActionTypes.ADD_CACHED_OBJECT) {

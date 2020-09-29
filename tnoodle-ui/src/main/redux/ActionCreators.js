@@ -66,7 +66,12 @@ export const updateOfficialZipStatus = (flag) => ({
  */
 export const updateFileZipBlob = (fileZipBlob) => ({
     type: ActionTypes.UPDATE_FILE_ZIP_BLOB,
-    payload: { fileZipBlob: fileZipBlob },
+    payload: { fileZipBlob },
+});
+
+export const updateGeneratingScrambles = (generatingScrambles) => ({
+    type: ActionTypes.UPDATE_GENERATING_SCRAMBLES,
+    payload: { generatingScrambles },
 });
 
 /**
