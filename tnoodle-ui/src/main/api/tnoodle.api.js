@@ -1,5 +1,7 @@
-let baseUrl = window.location.origin;
-// let baseUrl = "http://localhost:2014";
+let backendUrl = new URL(window.location.origin);
+backendUrl.port = 2014;
+
+export const tNoodleBackend = backendUrl.toString();
 
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
@@ -20,9 +22,7 @@ export const fetchZip = (scrambleClient, wcif, mbld, password, translations) => 
         payload.zipPassword = password;
     }
 
-    let targetMarker = wcif.id;
-
-    return scrambleClient.loadScrambles(zipEndpoint, payload, targetMarker)
+    return scrambleClient.loadScrambles(zipEndpoint, payload, wcif.id)
         .then((result) => convertToBlob(result))
         .catch((error) => console.error(error));
 };
@@ -35,13 +35,13 @@ const convertToBlob = async (result) => {
 };
 
 export const fetchWcaEvents = () => {
-    return fetch(baseUrl + wcaEventsEndpoint)
+    return fetch(tNoodleBackend + wcaEventsEndpoint)
         .then((response) => response.json())
         .catch((error) => console.error(error));
 };
 
 export const fetchFormats = () => {
-    return fetch(baseUrl + formatsEndpoint)
+    return fetch(tNoodleBackend + formatsEndpoint)
         .then((response) => response.json())
         .catch((error) => console.error(error));
 };
@@ -59,13 +59,13 @@ export const fetchBestMbldAttempt = (wcif) => {
 };
 
 export const fetchRunningVersion = () => {
-    return fetch(baseUrl + versionEndpoint)
+    return fetch(tNoodleBackend + versionEndpoint)
         .then((response) => response.json())
         .catch((error) => console.error(error));
 };
 
 export const fetchAvailableFmcTranslations = () => {
-    return fetch(baseUrl + fmcTranslationsEndpoint)
+    return fetch(tNoodleBackend + fmcTranslationsEndpoint)
         .then((response) => response.json())
         .catch((error) => console.error(error));
 };
@@ -86,7 +86,7 @@ const fmcTranslationsHelper = (translations) => {
 };
 
 const postToTnoodle = (endpoint, payload) =>
-    fetch(baseUrl + endpoint, {
+    fetch(tNoodleBackend + endpoint, {
         method: "POST",
         headers: {
             Accept: "application/json",

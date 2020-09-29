@@ -3,7 +3,6 @@
     "version": "0.1.0",
     "private": true,
     "homepage": "http://localhost:2014/scramble",
-    "proxy": "http://localhost:2014",
     "dependencies": {
         "bootstrap": "^4.4.1",
         "fetch-intercept": "^2.3.1",

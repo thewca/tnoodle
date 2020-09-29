@@ -1,3 +1,5 @@
+import { tNoodleBackend } from "./tnoodle.api";
+
 export class ScrambleClient {
     constructor(onHandshake, onProgress) {
         this.onHandshake = onHandshake;
@@ -65,7 +67,10 @@ export class ScrambleClient {
     }
 }
 
-const BASE_URL = window.location.origin.replace(/^https?:\/\//,'ws://');
+let wsTNoodleBackend = new URL(tNoodleBackend);
+wsTNoodleBackend.protocol = "ws:";
+
+const BASE_URL = wsTNoodleBackend.toString();
 
 const SCRAMBLING_STATES = {
     IDLE: "IDLE",
