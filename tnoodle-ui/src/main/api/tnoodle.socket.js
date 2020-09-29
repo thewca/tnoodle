@@ -45,23 +45,17 @@ export class ScrambleClient {
                     let targetPayload = JSON.parse(rawPayload);
 
                     that.onHandshake(targetPayload);
-                }
-
-                if (that.state === SCRAMBLING_STATES.SCRAMBLING) {
+                } else if (that.state === SCRAMBLING_STATES.SCRAMBLING) {
                     if (msg.data === targetMarker) {
                         that.state = SCRAMBLING_STATES.COMPUTED_TYPE;
+                    } else {
+                        that.onProgress(msg.data);
                     }
-
-                    that.onProgress(msg.data);
-                }
-
-                if (that.state === SCRAMBLING_STATES.COMPUTED_TYPE) {
+                } else if (that.state === SCRAMBLING_STATES.COMPUTED_TYPE) {
                     that.state = SCRAMBLING_STATES.COMPUTED_DATA;
 
                     that.contentType = msg.data;
-                }
-
-                if (that.state === SCRAMBLING_STATES.COMPUTED_DATA) {
+                } else if (that.state === SCRAMBLING_STATES.COMPUTED_DATA) {
                     that.state = SCRAMBLING_STATES.DONE;
 
                     that.resultPayload = msg.data;
@@ -78,7 +72,7 @@ const SCRAMBLING_STATES = {
     IDLE: "IDLE",
     INITIATE: "INITIATE",
     SCRAMBLING: "SCRAMBLING",
-    COMPUTED_TYPE: "COMPUTED",
-    COMPUTED_DATA: "COMPUTED",
+    COMPUTED_TYPE: "COMPUTED_TYPE",
+    COMPUTED_DATA: "COMPUTED_DATA",
     DONE: "DONE"
 };
