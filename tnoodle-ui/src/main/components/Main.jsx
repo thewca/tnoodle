@@ -4,7 +4,7 @@ import EventPickerTable from "./EventPickerTable";
 import Interceptor from "./Interceptor";
 import VersionInfo from "./VersionInfo";
 import { fetchZip } from "../api/tnoodle.api";
-import { updateFileZipBlob } from "../redux/ActionCreators";
+import { updateFileZipBlob, updateGeneratingScrambles } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { isUsingStaging } from "../api/wca.api";
 import "./Main.css";
@@ -17,10 +17,12 @@ const mapStateToProps = (store) => ({
     officialZip: store.officialZip,
     fileZipBlob: store.fileZipBlob,
     translations: store.translations,
+    generatingScrambles: store.generatingScrambles
 });
 
 const mapDispatchToProps = {
     updateFileZipBlob,
+    updateGeneratingScrambles
 };
 
 const Main = connect(
@@ -32,14 +34,13 @@ const Main = connect(
             super(props);
 
             this.state = {
-                generatingScrambles: false,
                 competitionNameFileZip: "",
             };
         }
         onSubmit = (evt) => {
             evt.preventDefault();
 
-            if (this.state.generatingScrambles) {
+            if (this.props.generatingScrambles) {
                 return;
             }
 
@@ -50,17 +51,13 @@ const Main = connect(
             }
         };
 
-        setGeneratingScrambles = (flag) => {
-            this.setState({ ...this.state, generatingScrambles: flag });
-        };
-
         generateZip = () => {
             // If user navigates during generation proccess, we still get the correct name
             this.setState({
                 ...this.state,
                 competitionNameFileZip: this.props.wcif.name,
-                generatingScrambles: true,
             });
+            this.props.updateGeneratingScrambles(true);
             fetchZip(
                 this.props.wcif,
                 this.props.mbld,
@@ -68,7 +65,7 @@ const Main = connect(
                 this.props.translations
             ).then((blob) => {
                 this.props.updateFileZipBlob(blob);
-                this.setGeneratingScrambles(false);
+                this.props.updateGeneratingScrambles(false);
             });
         };
 
@@ -100,7 +97,7 @@ const Main = connect(
         };
 
         scrambleButton = () => {
-            if (this.state.generatingScrambles) {
+            if (this.props.generatingScrambles) {
                 return (
                     <button
                         className="btn btn-primary button-transparent form-control"

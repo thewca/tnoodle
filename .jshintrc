@@ -1,11 +1,9 @@
 {
     "browser": true,
-    "jquery": true,
-    "mootools": true,
-    "node": true,
     "undef": true,
     "sub": true,
     "newcap": false,
+    "esversion": 9,
     "indent": 4,
     "globals": {
         "alert": true,
