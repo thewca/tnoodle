@@ -11,48 +11,37 @@ import java.net.URISyntaxException
 import kotlin.system.exitProcess
 
 data class OfflineJarUtils(val port: Int) {
-    fun openTabInBrowser(browse: Boolean): String {
-        val url = "http://localhost:$port"
+    val url = "http://localhost:$port"
 
-        if (browse) {
-            if (Desktop.isDesktopSupported()) {
-                val d = Desktop.getDesktop()
+    fun openTabInBrowser() {
+        if (Desktop.isDesktopSupported()) {
+            val d = Desktop.getDesktop()
 
-                if (d.isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        val uri = URI(url)
-                        LOG.info("Attempting to open $uri in browser.")
-                        d.browse(uri)
-                    } catch (e: URISyntaxException) {
-                        LOG.warn("Could not convert $url to URI", e)
-                    } catch (e: IOException) {
-                        LOG.warn("Error opening tab in browser", e)
-                    }
-
-                } else {
-                    LOG.error("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.")
+            if (d.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    val uri = URI(url)
+                    LOG.info("Attempting to open $uri in browser.")
+                    d.browse(uri)
+                } catch (e: URISyntaxException) {
+                    LOG.warn("Could not convert $url to URI", e)
+                } catch (e: IOException) {
+                    LOG.warn("Error opening tab in browser", e)
                 }
-            } else {
-                LOG.error("Sorry, it appears the Desktop api is not supported on your platform.")
-            }
-        }
 
-        return url
+            } else {
+                LOG.error("Sorry, it appears the Desktop api is supported on your platform, but the BROWSE action is not.")
+            }
+        } else {
+            LOG.error("Sorry, it appears the Desktop api is not supported on your platform.")
+        }
     }
 
     /*
-     * Sets the dock icon in OSX. Could be made to have uses in other operating systems.
+     * Sets the dock icon in the operating system.
      */
-    fun setApplicationIcon() {
+    fun setApplicationIcon(isWrapper: Boolean = false) {
         // Find out which icon to use.
-        val processType = MainLauncher.processType
-
-        val iconFileName = if (processType === MainLauncher.ProcessType.WORKER) ICON_WORKER else ICON_WRAPPER
-
-        if (iconFileName != ICON_WORKER) {
-            // Only want to create one tray icon.
-            return
-        }
+        val iconFileName = if (isWrapper) ICON_WRAPPER else ICON_WORKER
 
         val trayAdapter = SystemTray.get()
 
@@ -61,7 +50,7 @@ data class OfflineJarUtils(val port: Int) {
             return
         }
 
-        val openItem = MenuItem("Open") { openTabInBrowser(true) }
+        val openItem = MenuItem("Open") { openTabInBrowser() }
         trayAdapter.menu.add(openItem)
 
         val exitItem = MenuItem("Exit") {

@@ -85,7 +85,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
 
             val desiredJsEnv by parser.adding("--jsenv", help = "Add entry to global js object TNOODLE_ENV in /env.js. Treated as strings, so FOO=42 will create the entry TNOODLE_ENV['FOO'] = '42';")
 
-            val cliPort by parser.storing("-p", "--port", help = "Start TNoodle on given port. Should be numeric. Defaults to ${OfflineJarUtils.TNOODLE_PORT}", transform = { toInt() })
+            val cliPort by parser.storing("-p", "--port", help = "Start TNoodle on given port. Should be numeric. Defaults to ${OfflineJarUtils.TNOODLE_PORT}", transform = String::toInt)
                 .default(OfflineJarUtils.TNOODLE_PORT)
 
             val noBrowser by parser.flagging("-n", "--nobrowser", help = "Don't open the browser when starting the server")
@@ -96,15 +96,11 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
             val port = System.getenv("PORT")?.takeIf { onlineConfig }?.toIntOrNull() ?: cliPort
             val offlineHandler = OfflineJarUtils(port)
 
-            offlineHandler.setApplicationIcon()
-
-            if (!noReexec) {
+            val isWrapped = if (!noReexec) {
                 MainLauncher.wrapMain(args, MIN_HEAP_SIZE_MEGS)
+            } else false
 
-                // This second call to setApplicationIcon() is intentional.
-                // We want different icons for the parent and child processes.
-                offlineHandler.setApplicationIcon()
-            }
+            offlineHandler.setApplicationIcon(isWrapped)
 
             for (jsEnv in desiredJsEnv) {
                 val (key, strValue) = jsEnv.split("=", limit = 2)
@@ -113,7 +109,7 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
 
             if (!noUpgrade) {
                 try {
-                    val shutdownMaybe = URL("http://localhost:$port${TNoodleServer.KILL_URL}").openStream()
+                    val shutdownMaybe = URL("${offlineHandler.url}${TNoodleServer.KILL_URL}").openStream()
                     shutdownMaybe.close()
                 } catch (ignored: IOException) {
                     // NOOP. This means we couldn't connect to localhost:$PORT
@@ -129,8 +125,11 @@ class WebscramblesServer(val environmentConfig: ServerEnvironmentConfig) : Appli
 
             LOG.info("${LocalServerEnvironmentConfig.title} started")
 
-            val url = offlineHandler.openTabInBrowser(!noBrowser)
-            LOG.info("Visit $url for a readme and demo.")
+            if (!noBrowser) {
+                offlineHandler.openTabInBrowser()
+            } else {
+                LOG.info("Visit ${offlineHandler.url} for a readme and demo.")
+            }
         }
     }
 }

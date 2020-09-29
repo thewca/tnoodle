@@ -12,15 +12,6 @@ object MainLauncher {
 
     const val NO_REEXEC_OPT = "--noReexec"
 
-    var processType = ProcessType.UNKNOWN
-        private set
-
-    enum class ProcessType {
-        UNKNOWN,
-        WRAPPER,
-        WORKER
-    }
-
     /*
      * Windows doesn't give good names for java programs in the task manager,
      * they all just show up as instances of java.exe.
@@ -31,12 +22,11 @@ object MainLauncher {
      * minHeapSizeMegs mb of heap space, and if not, reexecs itself and passes
      * an appropriate -Xmx to the jvm.
      */
-    fun wrapMain(args: Array<String>, minHeapSizeMegs: Int, name: String? = null) {
+    fun wrapMain(args: Array<String>, minHeapSizeMegs: Int, name: String? = null): Boolean {
         LOG.trace("Entering ${MainLauncher::class.java}, method wrapMain, args ${args + minHeapSizeMegs.toString()}")
 
         if (NO_REEXEC_OPT in args) {
-            processType = ProcessType.WORKER
-            return
+            return false
         }
 
         val t = Thread.currentThread()
@@ -59,11 +49,8 @@ object MainLauncher {
         val needsReExecing = needsHeapSizeReExec || needsJvmReExec
         LOG.info("needsReExecing: $needsReExecing")
 
-        if (needsReExecing) {
-            processType = ProcessType.WRAPPER
-        } else {
-            processType = ProcessType.WORKER
-            return
+        if (!needsReExecing) {
+            return false
         }
 
         // Fortunately, classpath contains our jar file if we were run
@@ -95,6 +82,8 @@ object MainLauncher {
         } catch (e: IOException) {
             LOG.warn("Starting the child process failed!", e)
         }
+
+        return true
     }
 
     private fun detectJVM(os: String, name: String?, mainClass: String): Pair<String, Boolean> {
