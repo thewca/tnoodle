@@ -9,7 +9,7 @@ let bestMbldAttemptEndpoint = "/frontend/mbld/best";
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
 
-export const fetchZip = (wcif, mbld, password, translations) => {
+export const fetchZip = (scrambleClient, wcif, mbld, password, translations) => {
     let payload = {
         wcif,
         multiCubes: { requestedScrambles: mbld },
@@ -20,9 +20,18 @@ export const fetchZip = (wcif, mbld, password, translations) => {
         payload.zipPassword = password;
     }
 
-    return postToTnoodle(zipEndpoint, payload)
-        .then((response) => response.blob())
+    let targetMarker = wcif.id;
+
+    return scrambleClient.loadScrambles(zipEndpoint, payload, targetMarker)
+        .then((result) => convertToBlob(result))
         .catch((error) => console.error(error));
+};
+
+const convertToBlob = async (result) => {
+    let {contentType, payload} = result;
+    let res = await fetch(`data:${contentType};base64,${payload}`);
+
+    return await res.blob();
 };
 
 export const fetchWcaEvents = () => {

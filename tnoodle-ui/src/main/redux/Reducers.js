@@ -133,8 +133,18 @@ export const Reducer = (store, action) => {
         return { ...store, scramblingProgressTarget: action.payload.scramblingProgressTarget };
     }
 
-    if (action.type === ActionTypes.UPDATE_SCRAMBLING_PROGRESS_CURRENT) {
-        return { ...store, scramblingProgressCurrent: action.payload.scramblingProgressCurrent };
+    if (action.type === ActionTypes.UPDATE_SCRAMBLING_PROGRESS_CURRENT_EVENT) {
+        return {
+            ...store,
+            scramblingProgressCurrent: {
+                ...store.scramblingProgressCurrent,
+                [action.payload.eventId]: (store.scramblingProgressCurrent[action.payload.eventId] || 0) + 1
+            }
+        };
+    }
+
+    if (action.type === ActionTypes.RESET_SCRAMBLING_PROGRESS_CURRENT) {
+        return { ...store, scramblingProgressCurrent: {} };
     }
 
     if (action.type === ActionTypes.ADD_CACHED_OBJECT) {

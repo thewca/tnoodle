@@ -4,11 +4,13 @@ import EventPickerTable from "./EventPickerTable";
 import Interceptor from "./Interceptor";
 import VersionInfo from "./VersionInfo";
 import { fetchZip } from "../api/tnoodle.api";
+import { ScrambleClient } from "../api/tnoodle.socket";
 import {
     updateFileZipBlob,
     updateGeneratingScrambles,
     updateScramblingProgressTarget,
-    updateScramblingProgressCurrent
+    updateScramblingProgressCurrentEvent,
+    resetScramblingProgressCurrent
 } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { isUsingStaging } from "../api/wca.api";
@@ -29,7 +31,8 @@ const mapDispatchToProps = {
     updateFileZipBlob,
     updateGeneratingScrambles,
     updateScramblingProgressTarget,
-    updateScramblingProgressCurrent
+    updateScramblingProgressCurrentEvent,
+    resetScramblingProgressCurrent
 };
 
 const Main = connect(
@@ -58,6 +61,14 @@ const Main = connect(
             }
         };
 
+        onScrambleSocketHandshake = (target) => {
+            this.props.updateScramblingProgressTarget(target);
+        };
+
+        onScrambleSocketProgress = (eventId) => {
+            this.props.updateScramblingProgressCurrentEvent(eventId);
+        };
+
         generateZip = () => {
             // If user navigates during generation proccess, we still get the correct name
             this.setState({
@@ -65,7 +76,9 @@ const Main = connect(
                 competitionNameFileZip: this.props.wcif.name,
             });
             this.props.updateGeneratingScrambles(true);
+            let scrambleClient = new ScrambleClient(this.onScrambleSocketHandshake, this.onScrambleSocketProgress);
             fetchZip(
+                scrambleClient,
                 this.props.wcif,
                 this.props.mbld,
                 this.props.password,
