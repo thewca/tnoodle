@@ -79,9 +79,14 @@ export const updateScramblingProgressTarget = (scramblingProgressTarget) => ({
     payload: { scramblingProgressTarget },
 });
 
-export const updateScramblingProgressCurrent = (scramblingProgressCurrent) => ({
-    type: ActionTypes.UPDATE_SCRAMBLING_PROGRESS_CURRENT,
-    payload: { scramblingProgressCurrent },
+export const updateScramblingProgressCurrentEvent = (eventId) => ({
+    type: ActionTypes.UPDATE_SCRAMBLING_PROGRESS_CURRENT_EVENT,
+    payload: { eventId },
+});
+
+export const resetScramblingProgressCurrent = () => ({
+    type: ActionTypes.RESET_SCRAMBLING_PROGRESS_CURRENT,
+    payload: {},
 });
 
 /**
