@@ -27,10 +27,12 @@ object Libraries {
     val APACHE_COMMONS_LANG3 = "org.apache.commons:commons-lang3:${Versions.APACHE_COMMONS_LANG3}"
     val KOTLESS_KTOR = "io.kotless:ktor-lang:${Versions.KOTLESS_KTOR}"
     val TESTING_MOCKK = "io.mockk:mockk:${Versions.TESTING_MOCKK}"
+    val KOTLINX_ATOMICFU_GRADLE = "org.jetbrains.kotlinx:atomicfu-gradle-plugin:${Versions.KOTLINX_ATOMICFU_GRADLE}"
 
     object Buildscript {
         val PROGUARD_GRADLE_ACTUAL = PROGUARD_GRADLE
         val WCA_I18N_ACTUAL = WCA_I18N
         val GOOGLE_APPENGINE_GRADLE_ACTUAL = GOOGLE_APPENGINE_GRADLE
+        val KOTLINX_ATOMICFU_GRADLE_ACTUAL = KOTLINX_ATOMICFU_GRADLE
     }
 }

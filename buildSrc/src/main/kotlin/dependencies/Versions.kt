@@ -34,6 +34,7 @@ object Versions {
     val APACHE_COMMONS_LANG3 = "3.11"
     val KOTLESS_KTOR = KOTLESS
     val TESTING_MOCKK = "1.10.2"
+    val KOTLINX_ATOMICFU_GRADLE = "0.14.4"
 
     object Plugins {
         val SHADOW = "6.0.0"

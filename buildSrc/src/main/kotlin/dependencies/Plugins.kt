@@ -26,10 +26,13 @@ object Plugins {
     inline val PluginDependenciesSpec.GIT_VERSION_TAG_ACTUAL: PluginDependencySpec
         get() = id("com.palantir.git-version").version(Versions.Plugins.GIT_VERSION_TAG)
 
+    inline val PluginDependenciesSpec.KOTLESS_ACTUAL: PluginDependencySpec
+        get() = id("io.kotless").version(Versions.Plugins.KOTLESS)
+
     // not versioned because the classpath from the buildscript {} block already implies a version
     inline val PluginDependenciesSpec.GOOGLE_APPENGINE_ACTUAL: PluginDependencySpec
         get() = id("com.google.cloud.tools.appengine")
 
-    inline val PluginDependenciesSpec.KOTLESS_ACTUAL: PluginDependencySpec
-        get() = id("io.kotless").version(Versions.Plugins.KOTLESS)
+    inline val PluginDependenciesSpec.KOTLINX_ATOMICFU_ACTUAL: PluginDependencySpec
+        get() = id("kotlinx-atomicfu")
 }
