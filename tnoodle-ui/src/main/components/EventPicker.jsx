@@ -15,7 +15,9 @@ const mapStateToProps = (store) => ({
     editingDisabled: store.editingDisabled,
     wcif: store.wcif,
     wcaFormats: store.wcaFormats,
-    generatingScrambles: store.generatingScrambles
+    generatingScrambles: store.generatingScrambles,
+    scramblingProgressTarget: store.scramblingProgressTarget,
+    scramblingProgressCurrent: store.scramblingProgressCurrent,
 });
 
 const mapDispatchToProps = {
@@ -192,8 +194,25 @@ const EventPicker = connect(
                 return;
             }
 
+            let eventId = this.props.event.id;
+
+            let current = this.props.scramblingProgressCurrent[eventId];
+            let target = this.props.scramblingProgressTarget[eventId];
+
+            if (current === undefined || target === undefined) {
+                return (
+                    <ProgressBar striped variant={"danger"} now={100}/>
+                );
+            }
+
+            let progress = (current / target) * 100
+
             return (
-                <ProgressBar animated now={60}/>
+                <ProgressBar animated variant={
+                    target === 1
+                        ? "success"
+                        : "info"
+                } now={progress}/>
             );
         };
 

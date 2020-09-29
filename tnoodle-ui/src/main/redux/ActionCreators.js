@@ -74,6 +74,16 @@ export const updateGeneratingScrambles = (generatingScrambles) => ({
     payload: { generatingScrambles },
 });
 
+export const updateScramblingProgressTarget = (scramblingProgressTarget) => ({
+    type: ActionTypes.UPDATE_SCRAMBLING_PROGRESS_TARGET,
+    payload: { scramblingProgressTarget },
+});
+
+export const updateScramblingProgressCurrent = (scramblingProgressCurrent) => ({
+    type: ActionTypes.UPDATE_SCRAMBLING_PROGRESS_CURRENT,
+    payload: { scramblingProgressCurrent },
+});
+
 /**
  * @param {string} competitionId Since we cache information considering competitions, use id like WC2015.
  * @param {string} identifier WCIF or suggestedFmcLanguages
