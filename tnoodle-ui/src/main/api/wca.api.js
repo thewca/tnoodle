@@ -112,35 +112,35 @@ export function gotoPreLoginPath() {
     window.location.replace(preLoginHref);
 }
 
-export function fetchMe() {
-    return wcaApiFetch("/me")
-        .then((response) => response.json())
-        .then((json) => json.me);
+export async function fetchMe() {
+    const response = await wcaApiFetch("/me");
+    const json = await response.json();
+    return json.me;
 }
 
-export function fetchVersionInfo() {
-    return wcaApiFetch("/scramble-program").then((response) => response.json());
+export async function fetchVersionInfo() {
+    const response = await wcaApiFetch("/scramble-program");
+    return await response.json();
 }
 
-export function getCompetitionJson(competitionId) {
-    return wcaApiFetch(`/competitions/${competitionId}/wcif`).then((response) =>
-        response.json()
-    );
+export async function getCompetitionJson(competitionId) {
+    const response = await wcaApiFetch(`/competitions/${competitionId}/wcif`);
+    return await response.json();
 }
 
-export function getUpcomingManageableCompetitions() {
+export async function getUpcomingManageableCompetitions() {
     let oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    return wcaApiFetch(
+    const response = await wcaApiFetch(
         `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
-    ).then((response) => response.json());
+    );
+    return await response.json();
 }
 
 const getLastLoginEnv = () => localStorage[TNOODLE_LAST_LOGIN_ENV];
 
 const getCurrentEnv = () => (isUsingStaging() ? STAGING : PRODUCTION);
 
-function wcaApiFetch(path, fetchOptions) {
-    // TODO - look into refresh token https://github.com/doorkeeper-gem/doorkeeper/wiki/Enable-Refresh-Token-Credentials
+async function wcaApiFetch(path, fetchOptions) {
     var baseApiUrl = toWcaUrl("/api/v0");
     fetchOptions = Object.assign({}, fetchOptions, {
         headers: new Headers({
@@ -149,10 +149,9 @@ function wcaApiFetch(path, fetchOptions) {
         }),
     });
 
-    return fetch(`${baseApiUrl}${path}`, fetchOptions).then((response) => {
-        if (!response.ok) {
-            throw new Error(`${response.status}: ${response.statusText}`);
-        }
-        return response;
-    });
+    const response = await fetch(`${baseApiUrl}${path}`, fetchOptions);
+    if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+    }
+    return response;
 }
