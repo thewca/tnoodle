@@ -7,13 +7,5 @@ jobs:
               - ./gradlew assemble
               - ./gradlew check
               - ./gradlew buildOfficial
-
-        - language: node_js
-          node_js: 10
-          script:
-              - cd tnoodle-ui
-              - echo $coveralls_repo_token
-              - npm install
-              - npm test -- --coverage
           after_script:
-              - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coveralls
+              - COVERALLS_REPO_TOKEN=$coveralls_repo_token ./gradlew yarn_coveralls

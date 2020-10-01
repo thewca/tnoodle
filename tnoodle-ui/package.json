@@ -22,9 +22,9 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test --watchAll --watchAll=false",
+        "test": "react-scripts test --watchAll --watchAll=false --coverage",
         "eject": "react-scripts eject",
-        "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
+        "coveralls": "cat ./coverage/lcov.info | coveralls"
     },
     "browserslist": {
         "production": [
@@ -50,6 +50,7 @@
             "src/**/*.{js,jsx}",
             "!src/index.js",
             "!src/serviceWorker.js",
+            "!src/setupProxy.js",
             "!src/main/api/**.js",
             "!**/Interceptor.jsx"
         ]
