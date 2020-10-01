@@ -22,8 +22,8 @@ import {
     fetchMe,
     getUpcomingManageableCompetitions,
     getCompetitionJson,
-    getQueryParameter,
 } from "../api/wca.api";
+import { getQueryParameter } from "../util/query.param.util";
 import {
     fetchSuggestedFmcTranslations,
     fetchBestMbldAttempt,
