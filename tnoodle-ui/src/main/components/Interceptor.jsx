@@ -8,24 +8,23 @@ class Interceptor extends Component {
     constructor() {
         super();
 
-        const that = this;
-
         // http interceptor
         fetchIntercept.register({
-            request: function (...request) {
+            request: (...request) => {
                 // TODO set loading
                 return request;
             },
 
-            response: function (response) {
+            response: (response) => {
                 if (!response.ok) {
-                    that.handleHttpError(response);
+                    this.handleHttpError(response);
                 }
+
                 return response;
             },
 
-            responseError: function (error) {
-                that.handleHttpError(error);
+            responseError: (error) => {
+                this.handleHttpError(error);
                 return Promise.reject(error);
             },
         });
