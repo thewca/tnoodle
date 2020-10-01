@@ -5,8 +5,12 @@ import { getHashParameter, getQueryParameter } from "../util/query.param.util";
 
 const TNOODLE_ACCESS_TOKEN_KEY = "TNoodle.accessToken";
 const TNOODLE_LAST_LOGIN_ENV = "TNoodle.lastLoginEnv";
+const TNOODLE_EXPIRATION = "TNoodle.expiration";
 const STAGING = "staging";
 const PRODUCTION = "production";
+
+const ACCESS_TOKEN = "access_token";
+const EXPIRES_IN = "expires_in";
 
 // See https://github.com/thewca/worldcubeassociation.org/wiki/OAuth-documentation-notes#staging-oauth-application
 let getWcaOrigin = () => {
@@ -29,13 +33,21 @@ let getTnoodleAppId = () => {
     );
 };
 
-let wcaAccessToken = getHashParameter("access_token");
-if (wcaAccessToken) {
+let wcaAccessToken = getHashParameter(ACCESS_TOKEN);
+let expiresIn = getHashParameter(EXPIRES_IN);
+if (!!wcaAccessToken) {
     window.location.hash = "";
+
+    let now = new Date();
+    let expiration = now.setSeconds(now.getSeconds() + Number(expiresIn));
+
     localStorage[TNOODLE_ACCESS_TOKEN_KEY] = wcaAccessToken;
+    localStorage[TNOODLE_EXPIRATION] = expiration;
+
     gotoPreLoginPath();
 } else {
     wcaAccessToken = localStorage[TNOODLE_ACCESS_TOKEN_KEY];
+    expiresIn = localStorage[TNOODLE_EXPIRATION];
 }
 
 export function isUsingStaging() {
@@ -60,16 +72,34 @@ export function logIn() {
 }
 
 export function isLogged() {
-    return (
-        localStorage[TNOODLE_ACCESS_TOKEN_KEY] != null &&
-        getCurrentEnv() === getLastLoginEnv()
-    );
+    if (localStorage[TNOODLE_ACCESS_TOKEN_KEY] == null) {
+        return false;
+    }
+
+    if (getCurrentEnv() !== getLastLoginEnv()) {
+        return false;
+    }
+
+    let expiration = localStorage[TNOODLE_EXPIRATION];
+
+    if (expiration == null) {
+        return false;
+    }
+
+    if (new Date() < new Date(Number(expiration))) {
+        return true;
+    }
+
+    logOut();
+    return false;
 }
 
 export function logOut() {
     delete localStorage[TNOODLE_LAST_LOGIN_ENV];
     delete localStorage[TNOODLE_ACCESS_TOKEN_KEY];
+    delete localStorage[TNOODLE_EXPIRATION];
     wcaAccessToken = null;
+    expiresIn = null;
     window.location.reload();
 }
 

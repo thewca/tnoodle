@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { capitalize } from "../util/string.util";
 import _ from "lodash";
 import {
     updateFileZipBlob,
@@ -9,6 +8,7 @@ import {
     resetTranslations,
     setSuggestedFmcTranslations,
 } from "../redux/ActionCreators";
+import "./FmcTranslationsDetail.css";
 
 const TRANSLATIONS_PER_LINE = 3;
 
@@ -30,8 +30,8 @@ const FmcTranslationsDetail = connect(
     mapDispatchToProps
 )(
     class extends Component {
-        constructor(props) {
-            super(props);
+        constructor() {
+            super();
             this.state = { showTranslations: false };
         }
 
@@ -123,13 +123,14 @@ const FmcTranslationsDetail = connect(
                                                             >
                                                                 <th>
                                                                     <label
+                                                                        className="fmc-label"
                                                                         htmlFor={
                                                                             checkboxId
                                                                         }
                                                                     >
-                                                                        {capitalize(
+                                                                        {
                                                                             translation.display
-                                                                        )}
+                                                                        }
                                                                     </label>
                                                                 </th>
                                                                 <th>
