@@ -39,40 +39,37 @@ const convertToBlob = async (result) => {
     return await res.blob();
 };
 
-export const fetchWcaEvents = () => {
-    return fetch(tNoodleBackend + wcaEventsEndpoint)
-        .then((response) => response.json())
-        .catch((error) => console.error(error));
+export const fetchWcaEvents = async () => {
+    const response = await fetch(tNoodleBackend + wcaEventsEndpoint);
+    return await response.json();
 };
 
-export const fetchFormats = () => {
-    return fetch(tNoodleBackend + formatsEndpoint)
-        .then((response) => response.json())
-        .catch((error) => console.error(error));
+export const fetchFormats = async () => {
+    const response = await fetch(tNoodleBackend + formatsEndpoint);
+    return await response.json();
 };
 
-export const fetchSuggestedFmcTranslations = (wcif) => {
-    return postToTnoodle(suggestedFmcTranslationsEndpoint, wcif)
-        .then((response) => response.json())
-        .catch((error) => console.error(error));
+export const fetchSuggestedFmcTranslations = async (wcif) => {
+    const response = await postToTnoodle(
+        suggestedFmcTranslationsEndpoint,
+        wcif
+    );
+    return await response.json();
 };
 
-export const fetchBestMbldAttempt = (wcif) => {
-    return postToTnoodle(bestMbldAttemptEndpoint, wcif)
-        .then((response) => response.json())
-        .catch((error) => console.error(error));
+export const fetchBestMbldAttempt = async (wcif) => {
+    const response = await postToTnoodle(bestMbldAttemptEndpoint, wcif);
+    return await response.json();
 };
 
-export const fetchRunningVersion = () => {
-    return fetch(tNoodleBackend + versionEndpoint)
-        .then((response) => response.json())
-        .catch((error) => console.error(error));
+export const fetchRunningVersion = async () => {
+    const response = await fetch(tNoodleBackend + versionEndpoint);
+    return await response.json();
 };
 
-export const fetchAvailableFmcTranslations = () => {
-    return fetch(tNoodleBackend + fmcTranslationsEndpoint)
-        .then((response) => response.json())
-        .catch((error) => console.error(error));
+export const fetchAvailableFmcTranslations = async () => {
+    const response = await fetch(tNoodleBackend + fmcTranslationsEndpoint);
+    return await response.json();
 };
 
 /**
