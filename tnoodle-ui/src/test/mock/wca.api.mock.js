@@ -12,6 +12,7 @@ export const scrambleProgram = {
             "https://www.worldcubeassociation.org/regulations/scrambles/tnoodle/TNoodle-WCA-2.jar",
     },
     allowed: ["TNoodle-WCA-2"],
+    publicKeyBytes: "key",
     history: ["TNoodle-WCA-0", "TNoodle-WCA-1", "TNoodle-WCA-2"],
 };
 

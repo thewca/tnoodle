@@ -6,7 +6,6 @@ import org.worldcubeassociation.tnoodle.server.crypto.BuildVerification
 
 @Serializable
 data class VersionInfo(
-    val runningVersion: String,
     val projectName: String,
     val projectVersion: String,
     val signedBuild: Boolean,
@@ -15,7 +14,6 @@ data class VersionInfo(
     companion object {
         fun fromEnvironmentConfig(config: ServerEnvironmentConfig): VersionInfo {
             return VersionInfo(
-                config.title,
                 config.projectName,
                 config.projectVersion,
                 BuildVerification.BUILD_VERIFIED,

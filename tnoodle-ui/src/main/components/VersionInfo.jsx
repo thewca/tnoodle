@@ -19,7 +19,9 @@ const VersionInfo = connect(
                 currentTnoodle: null,
                 allowedTnoodleVersions: null,
                 runningVersion: null,
-                officialBuild: null,
+                signedBuild: null,
+                signatureKeyBytes: null,
+                wcaPublicKeyBytes: null,
                 wcaResponse: false,
                 tnoodleResponse: false,
             };
@@ -31,46 +33,53 @@ const VersionInfo = connect(
                 if (!response) {
                     return;
                 }
+                let {current, allowed, publicKeyBytes} = response;
                 this.setState({
                     ...this.state,
-                    currentTnoodle: response.current,
-                    allowedTnoodleVersions: response.allowed,
+                    currentTnoodle: current,
+                    allowedTnoodleVersions: allowed,
+                    wcaPublicKeyBytes: publicKeyBytes,
                     wcaResponse: true,
                 });
-                this.analizeVersion();
+                this.analyzeVersion();
             });
 
             fetchRunningVersion().then((response) => {
                 if (!response) {
                     return;
                 }
-                let { projectName, projectVersion, signedBuild } = response;
+                let {projectName, projectVersion, signedBuild, signatureKeyBytes} = response;
                 this.setState({
                     ...this.state,
                     // Running version is based on projectName and projectVersion
                     runningVersion:
-                        projectVersion != null && projectVersion != null
+                        projectName != null && projectVersion != null
                             ? `${projectName}-${projectVersion}`
                             : "",
-                    officialBuild: signedBuild,
+                    signedBuild: signedBuild,
+                    signatureKeyBytes: signatureKeyBytes,
                     tnoodleResponse: true,
                 });
-                this.analizeVersion();
+                this.analyzeVersion();
             });
         }
 
+        signatureValid() {
+            return this.state.signedBuild && this.state.signatureKeyBytes === this.state.wcaPublicKeyBytes;
+        }
+
         // This method avoids global state update while rendering
-        analizeVersion() {
-            // We wait until both wca and tnoodle answes
+        analyzeVersion() {
+            // We wait until both wca and tnoodle answers
             if (!this.state.tnoodleResponse || !this.state.wcaResponse) {
                 return;
             }
 
             let runningVersion = this.state.runningVersion;
             let allowedVersions = this.state.allowedTnoodleVersions;
-            let officialBuild = this.state.officialBuild;
+            let signedBuild = this.signatureValid();
 
-            if (!officialBuild || !allowedVersions.includes(runningVersion)) {
+            if (!signedBuild || !allowedVersions.includes(runningVersion)) {
                 this.props.updateOfficialZipStatus(false);
             }
         }
@@ -79,54 +88,45 @@ const VersionInfo = connect(
             let runningVersion = this.state.runningVersion;
             let allowedVersions = this.state.allowedTnoodleVersions;
             let currentTnoodle = this.state.currentTnoodle;
-            let officialBuild = this.state.officialBuild;
+            let signedBuild = this.signatureValid();
 
             // We cannot analyze TNoodle version here. We do not bother the user.
             if (!runningVersion || !allowedVersions) {
                 return null;
             }
 
-            // Generated version is not an official jar
-            if (!officialBuild) {
+            // Running version is not the most recent release
+            if (runningVersion !== currentTnoodle.name) {
+                // Running version is allowed, but not the latest.
+                if (allowedVersions.includes(runningVersion)) {
+                    return (
+                        <div className="alert alert-info m-0">
+                            You are running {runningVersion}, which is still
+                            allowed, but you should upgrade to {currentTnoodle.name}{" "}
+                            available <a href={currentTnoodle.download}>here</a>{" "}
+                            as soon as possible.
+                        </div>
+                    );
+                }
+
                 return (
                     <div className="alert alert-danger m-0">
-                        This TNoodle version is not official and scrambles
-                        generated with this must not be used in competition. You
-                        are on version {runningVersion}, you should use{" "}
-                        {currentTnoodle.name} available{" "}
+                        You are running {runningVersion}, which is not allowed.
+                        Do not use scrambles generated in any official competition
+                        and consider downloading the latest version{" "}
+                        <a href={currentTnoodle.download}>here</a>.
+                    </div>
+                );
+            }
+
+            // Generated version is not an officially signed jar
+            if (!signedBuild) {
+                return (
+                    <div className="alert alert-danger m-0">
+                        You are running an unsigned TNoodle release.
+                        Do not use scrambles generated in any official competition
+                        and consider downloading the official program{" "}
                         <a href={currentTnoodle.download}>here</a>
-                    </div>
-                );
-            }
-
-            // Best case scenario. We place this after the officialBuild
-            // so we can avoid not official build from being accidentally used.
-            if (runningVersion === currentTnoodle.name) {
-                return null;
-            }
-
-            // Running version is not allowed anymore.
-            if (!allowedVersions.includes(runningVersion)) {
-                return (
-                    <div className="alert alert-danger m-0">
-                        This TNoodle version is not allowed. Do not use
-                        scrambles generated in any official competition and
-                        consider downloading the latest version{" "}
-                        <a href={this.state.currentTnoodle.download}>here</a>.
-                    </div>
-                );
-            }
-
-            // Running version is allowed, but not the latest.
-            if (
-                allowedVersions.includes(runningVersion) &&
-                runningVersion !== currentTnoodle.name
-            ) {
-                return (
-                    <div className="alert alert-info m-0">
-                        You are running {runningVersion}, which is still
-                        allowed, but you should upgrade to {currentTnoodle.name}{" "}
-                        available <a href={currentTnoodle.download}>here</a>.
                     </div>
                 );
             }
