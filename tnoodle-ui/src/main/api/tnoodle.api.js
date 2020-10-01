@@ -1,7 +1,5 @@
 let backendUrl = new URL(window.location.origin);
-backendUrl.port = 2014;
-
-export const tNoodleBackend = backendUrl.toString();
+export const tNoodleBackend = backendUrl.toString().replace(/\/$/g, '');
 
 let zipEndpoint = "/wcif/zip";
 let versionEndpoint = "/version";
