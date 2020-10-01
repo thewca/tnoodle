@@ -14,7 +14,12 @@ import { events } from "./mock/tnoodle.api.mock";
 
 import { defaultWcif } from "../main/constants/default.wcif";
 
-import { updateEditingStatus } from "../main/redux/ActionCreators";
+import {
+    updateEditingStatus,
+    updateScramblingProgressTarget,
+    updateScramblingProgressCurrentEvent,
+    updateGeneratingScrambles
+} from "../main/redux/ActionCreators";
 
 let container = null;
 beforeEach(() => {
@@ -137,4 +142,58 @@ it("Editing disabled", () => {
 
     // Copies must be editable anyways
     expect(copies.disabled).toBe(false);
+});
+
+it("Progress Bar showing/hiding", () => {
+    const store = createStore(Reducer);
+
+    const event = events[0];
+    const wcifEvent = defaultWcif.events[0]; // This is one round of 333
+
+    // Enforce that fields are not disabled
+    store.dispatch(updateEditingStatus(true));
+
+    // Render component
+    act(() => {
+        render(
+            <Provider store={store}>
+                <EventPicker event={event} wcifEvent={wcifEvent} />
+            </Provider>,
+            container
+        );
+    });
+
+    const progressBefore = Array.from(container.querySelectorAll("div.progress"));
+
+    expect(progressBefore.length).toBe(0);
+
+    store.dispatch(updateScramblingProgressTarget({[event.id]:3}));
+    store.dispatch(updateGeneratingScrambles(true));
+
+    const progressDuringEarly = Array.from(container.querySelectorAll("div.progress>div"));
+
+    expect(progressDuringEarly.length).toBe(1);
+
+    store.dispatch(updateScramblingProgressCurrentEvent(event.id));
+    store.dispatch(updateScramblingProgressCurrentEvent(event.id));
+
+    const progressDuringLate = Array.from(container.querySelectorAll("div.progress>div"));
+
+    expect(progressDuringLate.length).toBe(1);
+    const lateProgress = parseFloat(progressDuringLate[0].getAttribute('aria-valuenow'))
+    expect(Math.trunc(lateProgress)).toBe(66);
+
+    store.dispatch(updateScramblingProgressCurrentEvent(event.id));
+
+    const progressAfter = Array.from(container.querySelectorAll("div.progress>div"));
+
+    expect(progressAfter.length).toBe(1);
+    const completeProgress = parseInt(progressAfter[0].getAttribute('aria-valuenow'))
+    expect(completeProgress).toBe(100);
+
+    store.dispatch(updateGeneratingScrambles(false));
+
+    const progressGone = Array.from(container.querySelectorAll("div.progress"));
+
+    expect(progressGone.length).toBe(0);
 });

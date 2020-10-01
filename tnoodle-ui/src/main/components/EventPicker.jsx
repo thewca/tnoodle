@@ -208,7 +208,7 @@ const EventPicker = connect(
             }
 
             return (
-                <ProgressBar animated fade variant={
+                <ProgressBar animated variant={
                     progress === 100
                         ? "success"
                         : "info"
