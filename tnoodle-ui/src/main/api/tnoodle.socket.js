@@ -12,13 +12,11 @@ export class ScrambleClient {
     }
 
     loadScrambles(endpoint, payload, targetMarker) {
-        let that = this;
-
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             let ws = new WebSocket(BASE_URL + endpoint);
 
             ws.onopen = () => {
-                that.state = SCRAMBLING_STATES.INITIATE;
+                this.state = SCRAMBLING_STATES.INITIATE;
                 ws.send(JSON.stringify(payload));
             };
 
@@ -27,10 +25,10 @@ export class ScrambleClient {
             };
 
             ws.onclose = (cls) => {
-                if (that.state === SCRAMBLING_STATES.DONE && cls.wasClean) {
+                if (this.state === SCRAMBLING_STATES.DONE && cls.wasClean) {
                     let resultObject = {
-                        contentType: that.contentType,
-                        payload: that.resultPayload
+                        contentType: this.contentType,
+                        payload: this.resultPayload
                     };
 
                     resolve(resultObject);
@@ -40,27 +38,27 @@ export class ScrambleClient {
             };
 
             ws.onmessage = (msg) => {
-                if (that.state === SCRAMBLING_STATES.INITIATE) {
-                    that.state = SCRAMBLING_STATES.SCRAMBLING;
+                if (this.state === SCRAMBLING_STATES.INITIATE) {
+                    this.state = SCRAMBLING_STATES.SCRAMBLING;
 
                     let rawPayload = msg.data.toString();
                     let targetPayload = JSON.parse(rawPayload);
 
-                    that.onHandshake(targetPayload);
-                } else if (that.state === SCRAMBLING_STATES.SCRAMBLING) {
+                    this.onHandshake(targetPayload);
+                } else if (this.state === SCRAMBLING_STATES.SCRAMBLING) {
                     if (msg.data === targetMarker) {
-                        that.state = SCRAMBLING_STATES.COMPUTED_TYPE;
+                        this.state = SCRAMBLING_STATES.COMPUTED_TYPE;
                     } else {
-                        that.onProgress(msg.data);
+                        this.onProgress(msg.data);
                     }
-                } else if (that.state === SCRAMBLING_STATES.COMPUTED_TYPE) {
-                    that.state = SCRAMBLING_STATES.COMPUTED_DATA;
+                } else if (this.state === SCRAMBLING_STATES.COMPUTED_TYPE) {
+                    this.state = SCRAMBLING_STATES.COMPUTED_DATA;
 
-                    that.contentType = msg.data;
-                } else if (that.state === SCRAMBLING_STATES.COMPUTED_DATA) {
-                    that.state = SCRAMBLING_STATES.DONE;
+                    this.contentType = msg.data;
+                } else if (this.state === SCRAMBLING_STATES.COMPUTED_DATA) {
+                    this.state = SCRAMBLING_STATES.DONE;
 
-                    that.resultPayload = msg.data;
+                    this.resultPayload = msg.data;
                 }
             };
         });
