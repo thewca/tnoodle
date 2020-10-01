@@ -39,7 +39,7 @@ tasks.getByName("check") {
 }
 
 tasks.getByName("yarn_test") {
-    dependsOn("yarn_build")
+    dependsOn("yarn_install")
 }
 
 tasks.create<Zip>("packageReactFrontend") {
