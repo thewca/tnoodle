@@ -12,6 +12,7 @@ jobs:
           node_js: 10
           script:
               - cd tnoodle-ui
+              - echo $coveralls_repo_token
               - npm install
               - npm test -- --coverage
           after_script:

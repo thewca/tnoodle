@@ -46,10 +46,11 @@ beforeEach(() => {
     );
 
     jest.spyOn(tnoodleApi, "fetchZip").mockImplementation((...payload) => {
-        wcif = payload[0];
-        mbld = payload[1];
-        password = payload[2];
-        translations = payload[3];
+        // payload[0] is the socket client, ignore it
+        wcif = payload[1];
+        mbld = payload[2];
+        password = payload[3];
+        translations = payload[4];
 
         return Promise.resolve(new Blob([]));
     });
