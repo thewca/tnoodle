@@ -44,8 +44,14 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
 }
 
-afterEvaluate {
-    delete(fileTree("src/main/resources/$SIGNATURE_PACKAGE").matching {
-        include("**/*.$SIGNATURE_SUFFIX")
-    })
+tasks.create("deleteSignatures") {
+    doLast {
+        delete(fileTree("src/main/resources/$SIGNATURE_PACKAGE").matching {
+            include("**/*.$SIGNATURE_SUFFIX")
+        })
+    }
+}
+
+tasks.withType<ProcessResources> {
+    finalizedBy("deleteSignatures")
 }
