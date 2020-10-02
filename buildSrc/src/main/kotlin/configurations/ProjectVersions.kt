@@ -21,10 +21,8 @@ object ProjectVersions {
     }
 
     fun Task.setTNoodleRelease(ext: ExtraPropertiesExtension, name: String, version: String? = null) {
-        doFirst {
-            ext.set(TNOODLE_IMPL_KEY, name)
-            ext.set(TNOODLE_VERSION_KEY, version ?: project.version)
-        }
+        ext.set(TNOODLE_IMPL_KEY, name)
+        ext.set(TNOODLE_VERSION_KEY, version ?: project.version)
     }
 
     fun Project.tNoodleImplOrDefault(): String {

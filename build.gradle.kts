@@ -54,13 +54,15 @@ tasks.create("registerReleaseTag") {
         val signature = createBuildSignature(privateKeyPath, fileToSign)
 
         signatureStorage.writeBytes(signature)
-    }
 
-    setTNoodleRelease(project.ext, releasePrefix)
+        setTNoodleRelease(project.ext, releasePrefix)
+    }
 }
 
 tasks.create("registerCloudReleaseTag") {
-    setTNoodleRelease(project.ext, "TNoodle-CLOUD")
+    doFirst {
+        setTNoodleRelease(project.ext, "TNoodle-CLOUD")
+    }
 }
 
 tasks.create<ProGuardTask>("minifyRelease") {
