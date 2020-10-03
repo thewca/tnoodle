@@ -1,0 +1,6 @@
+# Ignore artifacts:
+build
+coverage
+
+public/manifest.json
+src/serviceWorker.js
