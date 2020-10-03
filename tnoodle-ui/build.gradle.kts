@@ -1,6 +1,6 @@
 import com.moowork.gradle.node.NodeExtension
 
-description = "A web ui for TNoodle that uses modern technology, and finally gets rid of the stupid legacy interface"
+description = "A web ui for TNoodle that uses modern technology"
 
 plugins {
     base
