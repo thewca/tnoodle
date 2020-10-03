@@ -120,7 +120,9 @@ it("Current version is allowed, but it's not the latest one", async () => {
 
     // The warning should be "your version is ok, but please upgrade"
     const alert = container.querySelector(".alert-info");
-    expect(alert.textContent).toContain("which is still allowed, but you should upgrade to");
+    expect(alert.textContent).toContain(
+        "which is still allowed, but you should upgrade to"
+    );
 
     const downloadLink = container.querySelector("a").href;
     expect(downloadLink).toBe(scrambleProgram.current.download);
@@ -174,7 +176,9 @@ it("Not signed version alert", async () => {
 
     // The warning should be "do not use this"
     const alert = container.querySelector(".alert-danger");
-    expect(alert.textContent).toContain("You are running an unsigned TNoodle release.");
+    expect(alert.textContent).toContain(
+        "You are running an unsigned TNoodle release."
+    );
 
     tnoodleApi.fetchRunningVersion.mockRestore();
     wcaApi.fetchVersionInfo.mockRestore();
@@ -225,7 +229,9 @@ it("Signed with different key", async () => {
 
     // The warning should be "do not use this"
     const alert = container.querySelector(".alert-danger");
-    expect(alert.textContent).toContain("You are running an unsigned TNoodle release.");
+    expect(alert.textContent).toContain(
+        "You are running an unsigned TNoodle release."
+    );
 
     tnoodleApi.fetchRunningVersion.mockRestore();
     wcaApi.fetchVersionInfo.mockRestore();

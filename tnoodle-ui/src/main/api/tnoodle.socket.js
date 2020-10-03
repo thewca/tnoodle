@@ -28,7 +28,7 @@ export class ScrambleClient {
                 if (this.state === SCRAMBLING_STATES.DONE && cls.wasClean) {
                     let resultObject = {
                         contentType: this.contentType,
-                        payload: this.resultPayload
+                        payload: this.resultPayload,
                     };
 
                     resolve(resultObject);
@@ -68,7 +68,7 @@ export class ScrambleClient {
 let wsTNoodleBackend = new URL(tNoodleBackend);
 wsTNoodleBackend.protocol = "ws:";
 
-const BASE_URL = wsTNoodleBackend.toString().replace(/\/$/g, '');
+const BASE_URL = wsTNoodleBackend.toString().replace(/\/$/g, "");
 
 const SCRAMBLING_STATES = {
     IDLE: "IDLE",
@@ -76,5 +76,5 @@ const SCRAMBLING_STATES = {
     SCRAMBLING: "SCRAMBLING",
     COMPUTED_TYPE: "COMPUTED_TYPE",
     COMPUTED_DATA: "COMPUTED_DATA",
-    DONE: "DONE"
+    DONE: "DONE",
 };

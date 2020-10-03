@@ -33,7 +33,7 @@ const VersionInfo = connect(
                 if (!response) {
                     return;
                 }
-                let {current, allowed, publicKeyBytes} = response;
+                let { current, allowed, publicKeyBytes } = response;
                 this.setState({
                     ...this.state,
                     currentTnoodle: current,
@@ -48,7 +48,12 @@ const VersionInfo = connect(
                 if (!response) {
                     return;
                 }
-                let {projectName, projectVersion, signedBuild, signatureKeyBytes} = response;
+                let {
+                    projectName,
+                    projectVersion,
+                    signedBuild,
+                    signatureKeyBytes,
+                } = response;
                 this.setState({
                     ...this.state,
                     // Running version is based on projectName and projectVersion
@@ -65,7 +70,10 @@ const VersionInfo = connect(
         }
 
         signatureValid() {
-            return this.state.signedBuild && this.state.signatureKeyBytes === this.state.wcaPublicKeyBytes;
+            return (
+                this.state.signedBuild &&
+                this.state.signatureKeyBytes === this.state.wcaPublicKeyBytes
+            );
         }
 
         // This method avoids global state update while rendering
@@ -102,9 +110,10 @@ const VersionInfo = connect(
                     return (
                         <div className="alert alert-info m-0">
                             You are running {runningVersion}, which is still
-                            allowed, but you should upgrade to {currentTnoodle.name}{" "}
-                            available <a href={currentTnoodle.download}>here</a>{" "}
-                            as soon as possible.
+                            allowed, but you should upgrade to{" "}
+                            {currentTnoodle.name} available{" "}
+                            <a href={currentTnoodle.download}>here</a> as soon
+                            as possible.
                         </div>
                     );
                 }
@@ -112,8 +121,8 @@ const VersionInfo = connect(
                 return (
                     <div className="alert alert-danger m-0">
                         You are running {runningVersion}, which is not allowed.
-                        Do not use scrambles generated in any official competition
-                        and consider downloading the latest version{" "}
+                        Do not use scrambles generated in any official
+                        competition and consider downloading the latest version{" "}
                         <a href={currentTnoodle.download}>here</a>.
                     </div>
                 );
@@ -123,9 +132,9 @@ const VersionInfo = connect(
             if (!signedBuild) {
                 return (
                     <div className="alert alert-danger m-0">
-                        You are running an unsigned TNoodle release.
-                        Do not use scrambles generated in any official competition
-                        and consider downloading the official program{" "}
+                        You are running an unsigned TNoodle release. Do not use
+                        scrambles generated in any official competition and
+                        consider downloading the official program{" "}
                         <a href={currentTnoodle.download}>here</a>
                     </div>
                 );

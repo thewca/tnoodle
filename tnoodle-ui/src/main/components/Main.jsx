@@ -10,7 +10,7 @@ import {
     updateGeneratingScrambles,
     updateScramblingProgressTarget,
     updateScramblingProgressCurrentEvent,
-    resetScramblingProgressCurrent
+    resetScramblingProgressCurrent,
 } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import { isUsingStaging } from "../api/wca.api";
@@ -24,7 +24,7 @@ const mapStateToProps = (store) => ({
     officialZip: store.officialZip,
     fileZipBlob: store.fileZipBlob,
     translations: store.translations,
-    generatingScrambles: store.generatingScrambles
+    generatingScrambles: store.generatingScrambles,
 });
 
 const mapDispatchToProps = {
@@ -32,7 +32,7 @@ const mapDispatchToProps = {
     updateGeneratingScrambles,
     updateScramblingProgressTarget,
     updateScramblingProgressCurrentEvent,
-    resetScramblingProgressCurrent
+    resetScramblingProgressCurrent,
 };
 
 const Main = connect(
@@ -67,7 +67,10 @@ const Main = connect(
                 ...this.state,
                 competitionNameFileZip: this.props.wcif.name,
             });
-            let scrambleClient = new ScrambleClient(this.props.updateScramblingProgressTarget, this.props.updateScramblingProgressCurrentEvent);
+            let scrambleClient = new ScrambleClient(
+                this.props.updateScramblingProgressTarget,
+                this.props.updateScramblingProgressCurrentEvent
+            );
             fetchZip(
                 scrambleClient,
                 this.props.wcif,

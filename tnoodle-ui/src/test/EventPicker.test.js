@@ -18,7 +18,7 @@ import {
     updateEditingStatus,
     updateScramblingProgressTarget,
     updateScramblingProgressCurrentEvent,
-    updateGeneratingScrambles
+    updateGeneratingScrambles,
 } from "../main/redux/ActionCreators";
 
 let container = null;
@@ -163,32 +163,44 @@ it("Progress Bar showing/hiding", () => {
         );
     });
 
-    const progressBefore = Array.from(container.querySelectorAll("div.progress"));
+    const progressBefore = Array.from(
+        container.querySelectorAll("div.progress")
+    );
 
     expect(progressBefore.length).toBe(0);
 
-    store.dispatch(updateScramblingProgressTarget({[event.id]:3}));
+    store.dispatch(updateScramblingProgressTarget({ [event.id]: 3 }));
     store.dispatch(updateGeneratingScrambles(true));
 
-    const progressDuringEarly = Array.from(container.querySelectorAll("div.progress>div"));
+    const progressDuringEarly = Array.from(
+        container.querySelectorAll("div.progress>div")
+    );
 
     expect(progressDuringEarly.length).toBe(1);
 
     store.dispatch(updateScramblingProgressCurrentEvent(event.id));
     store.dispatch(updateScramblingProgressCurrentEvent(event.id));
 
-    const progressDuringLate = Array.from(container.querySelectorAll("div.progress>div"));
+    const progressDuringLate = Array.from(
+        container.querySelectorAll("div.progress>div")
+    );
 
     expect(progressDuringLate.length).toBe(1);
-    const lateProgress = parseFloat(progressDuringLate[0].getAttribute('aria-valuenow'))
+    const lateProgress = parseFloat(
+        progressDuringLate[0].getAttribute("aria-valuenow")
+    );
     expect(Math.trunc(lateProgress)).toBe(66);
 
     store.dispatch(updateScramblingProgressCurrentEvent(event.id));
 
-    const progressAfter = Array.from(container.querySelectorAll("div.progress>div"));
+    const progressAfter = Array.from(
+        container.querySelectorAll("div.progress>div")
+    );
 
     expect(progressAfter.length).toBe(1);
-    const completeProgress = parseInt(progressAfter[0].getAttribute('aria-valuenow'))
+    const completeProgress = parseInt(
+        progressAfter[0].getAttribute("aria-valuenow")
+    );
     expect(completeProgress).toBe(100);
 
     store.dispatch(updateGeneratingScrambles(false));
