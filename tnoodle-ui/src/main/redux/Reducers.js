@@ -126,11 +126,17 @@ export const Reducer = (store, action) => {
     }
 
     if (action.type === ActionTypes.UPDATE_GENERATING_SCRAMBLES) {
-        return { ...store, generatingScrambles: action.payload.generatingScrambles };
+        return {
+            ...store,
+            generatingScrambles: action.payload.generatingScrambles,
+        };
     }
 
     if (action.type === ActionTypes.UPDATE_SCRAMBLING_PROGRESS_TARGET) {
-        return { ...store, scramblingProgressTarget: action.payload.scramblingProgressTarget };
+        return {
+            ...store,
+            scramblingProgressTarget: action.payload.scramblingProgressTarget,
+        };
     }
 
     if (action.type === ActionTypes.UPDATE_SCRAMBLING_PROGRESS_CURRENT_EVENT) {
@@ -138,8 +144,10 @@ export const Reducer = (store, action) => {
             ...store,
             scramblingProgressCurrent: {
                 ...store.scramblingProgressCurrent,
-                [action.payload.eventId]: (store.scramblingProgressCurrent[action.payload.eventId] || 0) + 1
-            }
+                [action.payload.eventId]:
+                    (store.scramblingProgressCurrent[action.payload.eventId] ||
+                        0) + 1,
+            },
         };
     }
 

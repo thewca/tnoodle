@@ -18,7 +18,7 @@ const mapStateToProps = (store) => ({
     generatingScrambles: store.generatingScrambles,
     scramblingProgressTarget: store.scramblingProgressTarget,
     scramblingProgressCurrent: store.scramblingProgressCurrent,
-    fileZipBlob: store.fileZipBlob
+    fileZipBlob: store.fileZipBlob,
 });
 
 const mapDispatchToProps = {
@@ -196,11 +196,15 @@ const EventPicker = connect(
             let current = this.props.scramblingProgressCurrent[eventId] || 0;
             let target = this.props.scramblingProgressTarget[eventId];
 
-            if (rounds.length === 0 || !this.props.generatingScrambles || target === undefined) {
+            if (
+                rounds.length === 0 ||
+                !this.props.generatingScrambles ||
+                target === undefined
+            ) {
                 return;
             }
 
-            let progress = (current / target) * 100
+            let progress = (current / target) * 100;
             let miniThreshold = 2;
 
             if (progress === 0) {
@@ -208,15 +212,16 @@ const EventPicker = connect(
             }
 
             return (
-                <ProgressBar animated variant={
-                    progress === 100
-                        ? "success"
-                        : "info"
-                } now={progress} label={
-                    progress === 100 || progress < miniThreshold
-                        ? ""
-                        : `${current} / ${target}`
-                }/>
+                <ProgressBar
+                    animated
+                    variant={progress === 100 ? "success" : "info"}
+                    now={progress}
+                    label={
+                        progress === 100 || progress < miniThreshold
+                            ? ""
+                            : `${current} / ${target}`
+                    }
+                />
             );
         };
 
