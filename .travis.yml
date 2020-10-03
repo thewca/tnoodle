@@ -8,3 +8,4 @@ jobs:
               - ./gradlew check
           after_script:
               - COVERALLS_REPO_TOKEN=$coveralls_repo_token ./gradlew yarn_coveralls
+              - cd tnoodle-ui && yarn prettier --check .
