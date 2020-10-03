@@ -36,9 +36,14 @@ tasks.getByName("assemble") {
 
 tasks.getByName("check") {
     dependsOn("yarn_test")
+    dependsOn("yarn_prettier")
 }
 
 tasks.getByName("yarn_test") {
+    dependsOn("yarn_install")
+}
+
+tasks.getByName("yarn_prettier") {
     dependsOn("yarn_install")
 }
 

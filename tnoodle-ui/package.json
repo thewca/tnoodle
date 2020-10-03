@@ -24,7 +24,8 @@
         "build": "react-scripts build",
         "test": "react-scripts test --watchAll --watchAll=false --coverage",
         "eject": "react-scripts eject",
-        "coveralls": "cat ./coverage/lcov.info | coveralls"
+        "coveralls": "cat ./coverage/lcov.info | coveralls",
+        "prettier": "prettier --check ."
     },
     "browserslist": {
         "production": [
