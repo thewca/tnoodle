@@ -46,6 +46,8 @@ const Main = connect(
             this.state = {
                 competitionNameFileZip: "",
             };
+
+            this.interceptor = React.createRef();
         }
         onSubmit = (evt) => {
             evt.preventDefault();
@@ -77,11 +79,17 @@ const Main = connect(
                 this.props.mbld,
                 this.props.password,
                 this.props.translations
-            ).then((blob) => {
-                this.props.updateFileZipBlob(blob);
-                this.props.updateGeneratingScrambles(false);
-                this.props.resetScramblingProgressCurrent();
-            });
+            )
+                .then((blob) => {
+                    this.props.updateFileZipBlob(blob);
+                })
+                .catch((err) => {
+                    this.interceptor.current.updateMessage(err);
+                })
+                .finally(() => {
+                    this.props.updateGeneratingScrambles(false);
+                    this.props.resetScramblingProgressCurrent();
+                });
             this.props.updateGeneratingScrambles(true);
         };
 
@@ -160,7 +168,7 @@ const Main = connect(
             return (
                 <form onSubmit={this.onSubmit}>
                     <div className="sticky-top bg-light">
-                        <Interceptor />
+                        <Interceptor ref={this.interceptor} />
                         <VersionInfo />
                         <div className="container-fluid pt-2">
                             <div className="row">

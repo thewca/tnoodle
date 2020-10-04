@@ -4,9 +4,7 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.close
-import io.ktor.http.cio.websocket.send
+import io.ktor.http.cio.websocket.*
 import io.ktor.response.respond
 import io.ktor.response.respondBytes
 import io.ktor.routing.*
@@ -16,6 +14,8 @@ import kotlinx.serialization.builtins.serializer
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.crypto.StringEncryption.encodeBase64
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.FrontendErrorMessage
+import org.worldcubeassociation.tnoodle.server.webscrambles.serial.FrontendErrorMessage.Companion.asFrontendError
 
 object JobSchedulingHandler : RouteHandler {
     private val JOBS = mutableMapOf<Int, MutableMap<String, Int>>()
@@ -23,6 +23,8 @@ object JobSchedulingHandler : RouteHandler {
     private val ERRORS = mutableMapOf<Int, Pair<HttpStatusCode, Throwable>>()
 
     private const val JOB_ID_PARAM = "jobId"
+
+    const val MARKER_ERROR_MESSAGE = "%%ERROR%%";
 
     private suspend fun ApplicationCall.checkAndYieldJobId(): Int? {
         val jobId = parameters[JOB_ID_PARAM]?.toIntOrNull() ?: -1
@@ -106,24 +108,34 @@ object JobSchedulingHandler : RouteHandler {
         webSocket {
             for (frame in incoming) {
                 if (frame is Frame.Text) {
-                    val request = job.extractFrame(call, frame)
+                    try {
+                        val request = job.extractFrame(call, frame)
 
-                    val target = job.getTargetState(request)
-                    val targetEnc = JsonConfig.SERIALIZER.encodeToString(MapSerializer(String.serializer(), Int.serializer()), target)
-                    send(targetEnc)
+                        val target = job.getTargetState(request)
+                        val targetEnc = JsonConfig.SERIALIZER.encodeToString(MapSerializer(String.serializer(), Int.serializer()), target)
+                        send(targetEnc)
 
-                    val (type, data) = job.channel(request, this)
+                        val (type, data) = job.channel(request, this)
 
-                    val targetMarker = job.getResultMarker(request)
-                    val encodedData = data.encodeBase64()
+                        val targetMarker = job.getResultMarker(request)
+                        val encodedData = data.encodeBase64()
 
-                    // signal that the computation result is about to start
-                    send(targetMarker)
+                        // signal that the computation result is about to start
+                        send(targetMarker)
 
-                    send(type.toString())
-                    send(encodedData)
+                        send(type.toString())
+                        send(encodedData)
 
-                    close()
+                        close()
+                    } catch (e: Throwable) {
+                        val errorModel = e.asFrontendError()
+                        val errorSerial = JsonConfig.SERIALIZER.encodeToString(FrontendErrorMessage.serializer(), errorModel)
+
+                        send(MARKER_ERROR_MESSAGE)
+                        send(errorSerial)
+
+                        close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, ""))
+                    }
                 }
             }
         }

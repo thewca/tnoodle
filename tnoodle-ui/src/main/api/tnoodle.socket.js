@@ -9,6 +9,8 @@ export class ScrambleClient {
 
         this.contentType = null;
         this.resultPayload = null;
+
+        this.errorPayload = null;
     }
 
     loadScrambles(endpoint, payload, targetMarker) {
@@ -20,8 +22,8 @@ export class ScrambleClient {
                 ws.send(JSON.stringify(payload));
             };
 
-            ws.onerror = (err) => {
-                reject(err);
+            ws.onerror = () => {
+                reject(this.errorPayload);
             };
 
             ws.onclose = (cls) => {
@@ -33,11 +35,20 @@ export class ScrambleClient {
 
                     resolve(resultObject);
                 } else {
-                    reject(cls);
+                    reject(this.errorPayload);
                 }
             };
 
             ws.onmessage = (msg) => {
+                if (this.state === MARKER_ERROR_MESSAGE) {
+                    let rawPayload = msg.data.toString();
+                    this.errorPayload = JSON.parse(rawPayload);
+                }
+
+                if (msg.data === MARKER_ERROR_MESSAGE) {
+                    this.state = MARKER_ERROR_MESSAGE; // purposefully go into an error state
+                }
+
                 if (this.state === SCRAMBLING_STATES.INITIATE) {
                     this.state = SCRAMBLING_STATES.SCRAMBLING;
 
@@ -78,3 +89,6 @@ const SCRAMBLING_STATES = {
     COMPUTED_DATA: "COMPUTED_DATA",
     DONE: "DONE",
 };
+
+// this has to be identical with backend value in JobSchedulingHandler.kt
+const MARKER_ERROR_MESSAGE = "%%ERROR%%";
