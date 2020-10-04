@@ -7,7 +7,6 @@ import kotlinx.coroutines.runBlocking
 import org.worldcubeassociation.tnoodle.server.crypto.StringEncryption
 import org.worldcubeassociation.tnoodle.server.crypto.SymmetricCipher
 import org.worldcubeassociation.tnoodle.server.model.EventData
-import org.worldcubeassociation.tnoodle.server.model.PuzzleData
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScrambleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.ExtensionBuilder
@@ -61,7 +60,7 @@ object WCIFScrambleMatcher {
 
     // SCRAMBLE SET FILLING -----
 
-    suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (PuzzleData, String) -> Unit): Competition {
+    suspend fun fillScrambleSetsAsync(wcif: Competition, onUpdate: (EventData, String) -> Unit): Competition {
         val scrambledEvents = wcif.events.map { e ->
             val scrambledRounds = coroutineScope {
                 e.rounds.map { r -> async { scrambleRound(r, onUpdate) } }.awaitAll()
@@ -79,7 +78,7 @@ object WCIFScrambleMatcher {
     // helper fn for synchronously running tests
     fun fillScrambleSets(wcif: Competition) = runBlocking { fillScrambleSetsAsync(wcif) { _, _ -> Unit } }
 
-    private suspend fun scrambleRound(round: Round, onUpdate: (PuzzleData, String) -> Unit): Round {
+    private suspend fun scrambleRound(round: Round, onUpdate: (EventData, String) -> Unit): Round {
         val scrambles = coroutineScope {
             List(round.scrambleSetCount) { async { generateScrambleSet(round, onUpdate) } }.awaitAll()
         }
@@ -87,27 +86,28 @@ object WCIFScrambleMatcher {
         return round.copy(scrambleSets = scrambles)
     }
 
-    private fun generateScrambleSet(round: Round, onUpdate: (PuzzleData, String) -> Unit): ScrambleSet {
-        val puzzle = round.idCode.eventModel?.scrambler
+    private fun generateScrambleSet(round: Round, onUpdate: (EventData, String) -> Unit): ScrambleSet {
+        val eventModel = round.idCode.eventModel
             ?: ScrambleMatchingException.error("Unable to load scrambler for Round ${round.idCode}")
 
         val standardScrambleNum = standardScrambleCountPerSet(round)
+        val puzzle = eventModel.scrambler
 
-        val scrambles = if (round.idCode.eventModel == EventData.THREE_MULTI_BLD) {
+        val scrambles = if (eventModel == EventData.THREE_MULTI_BLD) {
             val countPerAttempt = standardScrambleNum / round.expectedAttemptNum
 
             List(round.expectedAttemptNum) { _ ->
-                val scrambles = puzzle.generateEfficientScrambles(countPerAttempt) { onUpdate(puzzle, it) }
+                val scrambles = puzzle.generateEfficientScrambles(countPerAttempt) { onUpdate(eventModel, it) }
                     .joinToString(Scramble.WCIF_NEWLINE_CHAR)
 
                 Scramble(scrambles)
             }
         } else {
-            puzzle.generateEfficientScrambles(standardScrambleNum) { onUpdate(puzzle, it) }.map(::Scramble)
+            puzzle.generateEfficientScrambles(standardScrambleNum) { onUpdate(eventModel, it) }.map(::Scramble)
         }
 
         val extraScrambleNum = extraScrambleCountPerSet(round)
-        val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum) { onUpdate(puzzle, it) }.map(::Scramble)
+        val extraScrambles = puzzle.generateEfficientScrambles(extraScrambleNum) { onUpdate(eventModel, it) }.map(::Scramble)
 
         // dummy ID -- indexing happens afterwards
         return ScrambleSet(ID_PENDING, scrambles, extraScrambles)

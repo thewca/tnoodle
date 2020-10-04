@@ -51,8 +51,8 @@ class WcifHandler(val environmentConfig: ServerEnvironmentConfig) : RouteHandler
         }
 
         override suspend fun ScramblingJobData.compute(statusBackend: StatusBackend): Pair<ContentType, ByteArray> {
-            val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(request.extendedWcif) { pzl, _ ->
-                statusBackend.onProgress(pzl.key)
+            val wcif = WCIFScrambleMatcher.fillScrambleSetsAsync(request.extendedWcif) { evt, _ ->
+                statusBackend.onProgress(evt.key)
             }
 
             return scrambledToResult(this, wcif, statusBackend)
