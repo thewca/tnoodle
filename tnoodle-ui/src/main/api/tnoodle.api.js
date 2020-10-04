@@ -28,8 +28,7 @@ export const fetchZip = (
 
     return scrambleClient
         .loadScrambles(zipEndpoint, payload, wcif.id)
-        .then((result) => convertToBlob(result))
-        .catch((error) => console.error(error));
+        .then((result) => convertToBlob(result));
 };
 
 const convertToBlob = async (result) => {
