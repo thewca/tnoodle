@@ -77,7 +77,8 @@ export class ScrambleClient {
 }
 
 let wsTNoodleBackend = new URL(tNoodleBackend);
-wsTNoodleBackend.protocol = "ws:";
+wsTNoodleBackend.protocol =
+    window.location.protocol === "https:" ? "wss" : "ws";
 
 const BASE_URL = wsTNoodleBackend.toString().replace(/\/$/g, "");
 
