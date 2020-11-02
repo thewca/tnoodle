@@ -72,7 +72,7 @@ const EntryInterface = connect(
                             className="font-weight-bold"
                             htmlFor="competition-name"
                         >
-                            Competition Name
+                            TEST
                         </label>
                         <input
                             id="competition-name"
