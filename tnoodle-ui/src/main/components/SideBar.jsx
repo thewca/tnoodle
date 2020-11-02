@@ -342,7 +342,7 @@ const SideBar = connect(
                         alt="TNoodle logo"
                     />
                     <h1 className="display-3" id="title">
-                        TNoodle
+                        test
                     </h1>
                     <div>
                         <ul className="list-group">
@@ -354,7 +354,7 @@ const SideBar = connect(
                                         className={`btn btn-primary btn-lg btn-block btn-outline-light mb-${this.margin}`}
                                         onClick={this.handleManualSelection}
                                     >
-                                        Manual Selection
+                                        test 
                                     </button>
                                 )}
                             </li>
