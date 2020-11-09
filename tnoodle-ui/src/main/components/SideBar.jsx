@@ -355,7 +355,9 @@ const SideBar = connect(
                                         type="button"
                                         className={`btn btn-primary btn-lg btn-block btn-outline-light mb-${this.margin}`}
                                         onClick={this.handleManualSelection}
-                                        disabled={this.props.generatingScrambles}
+                                        disabled={
+                                            this.props.generatingScrambles
+                                        }
                                     >
                                         Manual Selection
                                     </button>
@@ -368,7 +370,10 @@ const SideBar = connect(
                                             <button
                                                 type="button"
                                                 className="btn btn-primary btn-lg btn-block m-1"
-                                                disabled={this.props.generatingScrambles}
+                                                disabled={
+                                                    this.props
+                                                        .generatingScrambles
+                                                }
                                                 onClick={(_) =>
                                                     this.handleCompetitionSelection(
                                                         competition.id
