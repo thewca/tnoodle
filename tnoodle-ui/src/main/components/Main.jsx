@@ -64,7 +64,6 @@ const Main = connect(
         };
 
         generateZip = () => {
-            // If user navigates during generation proccess, we still get the correct name
             this.setState({
                 ...this.state,
                 competitionNameFileZip: this.props.wcif.name,

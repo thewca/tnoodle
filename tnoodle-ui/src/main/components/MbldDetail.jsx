@@ -6,6 +6,7 @@ import { updateMbld, updateFileZipBlob } from "../redux/ActionCreators";
 const mapStateToProps = (store) => ({
     mbld: store.mbld,
     bestMbldAttempt: store.bestMbldAttempt,
+    generatingScrambles: store.generatingScrambles,
 });
 
 const mapDispatchToProps = {
@@ -61,6 +62,7 @@ const MbldDetail = connect(
                                 }
                                 min={MBLD_MIN}
                                 required
+                                disabled={this.props.generatingScrambles}
                             />
                         </td>
                     </tr>

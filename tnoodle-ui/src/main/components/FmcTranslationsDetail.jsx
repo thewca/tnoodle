@@ -15,6 +15,7 @@ const TRANSLATIONS_PER_LINE = 3;
 const mapStateToProps = (store) => ({
     translations: store.translations,
     suggestedFmcTranslations: store.suggestedFmcTranslations,
+    generatingScrambles: store.generatingScrambles,
 });
 
 const mapDispatchToProps = {
@@ -186,6 +187,7 @@ const FmcTranslationsDetail = connect(
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={this.toggleTranslations}
+                                disabled={this.props.generatingScrambles}
                             >
                                 Translations
                             </button>

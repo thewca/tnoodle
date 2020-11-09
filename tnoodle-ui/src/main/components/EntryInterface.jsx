@@ -11,6 +11,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 const mapStateToProps = (store) => ({
     editingDisabled: store.editingDisabled,
     competitionName: store.wcif.name,
+    generatingScrambles: store.generatingScrambles,
 });
 
 const mapDispatchToProps = {
@@ -97,6 +98,7 @@ const EntryInterface = connect(
                                 type={this.state.showPassword ? "" : "password"}
                                 onChange={this.handlePasswordChange}
                                 value={this.state.password}
+                                disabled={this.props.generatingScrambles}
                             />
                             <div
                                 className="input-group-prepend"
