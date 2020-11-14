@@ -181,6 +181,9 @@ const EventPicker = connect(
                                         }
                                         min={1}
                                         required
+                                        disabled={
+                                            this.props.generatingScrambles
+                                        }
                                     />
                                 </td>
                             </tr>

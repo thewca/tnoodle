@@ -35,6 +35,7 @@ const mapStateToProps = (store) => ({
     me: store.me,
     competitions: store.competitions,
     cachedObjects: store.cachedObjects,
+    generatingScrambles: store.generatingScrambles,
 });
 
 const mapDispatchToProps = {
@@ -282,6 +283,7 @@ const SideBar = connect(
                         type="button"
                         className="btn btn-primary btn-lg btn-block btn-outline-light"
                         onClick={isLogged() ? logOut : logIn}
+                        disabled={this.props.generatingScrambles}
                     >
                         {isLogged() ? "Log Out" : "Log In"}
                     </button>
@@ -353,6 +355,9 @@ const SideBar = connect(
                                         type="button"
                                         className={`btn btn-primary btn-lg btn-block btn-outline-light mb-${this.margin}`}
                                         onClick={this.handleManualSelection}
+                                        disabled={
+                                            this.props.generatingScrambles
+                                        }
                                     >
                                         Manual Selection
                                     </button>
@@ -365,6 +370,10 @@ const SideBar = connect(
                                             <button
                                                 type="button"
                                                 className="btn btn-primary btn-lg btn-block m-1"
+                                                disabled={
+                                                    this.props
+                                                        .generatingScrambles
+                                                }
                                                 onClick={(_) =>
                                                     this.handleCompetitionSelection(
                                                         competition.id

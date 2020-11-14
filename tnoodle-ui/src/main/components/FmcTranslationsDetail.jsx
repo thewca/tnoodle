@@ -15,6 +15,7 @@ const TRANSLATIONS_PER_LINE = 3;
 const mapStateToProps = (store) => ({
     translations: store.translations,
     suggestedFmcTranslations: store.suggestedFmcTranslations,
+    generatingScrambles: store.generatingScrambles,
 });
 
 const mapDispatchToProps = {
@@ -84,6 +85,7 @@ const FmcTranslationsDetail = connect(
                                 type="button"
                                 className="btn btn-outline-secondary"
                                 onClick={this.selectAllTranslations}
+                                disabled={this.props.generatingScrambles}
                             >
                                 Select All
                             </button>
@@ -91,6 +93,7 @@ const FmcTranslationsDetail = connect(
                                 type="button"
                                 className="btn btn-outline-secondary"
                                 onClick={this.selectNoneTranslation}
+                                disabled={this.props.generatingScrambles}
                             >
                                 Select None
                             </button>
@@ -100,6 +103,7 @@ const FmcTranslationsDetail = connect(
                                     className="btn btn-outline-secondary"
                                     onClick={this.selectSuggestedTranslations}
                                     title="This selection is based on competitor's nationalities."
+                                    disabled={this.props.generatingScrambles}
                                 >
                                     Select Suggested
                                 </button>
@@ -135,6 +139,11 @@ const FmcTranslationsDetail = connect(
                                                                 </th>
                                                                 <th>
                                                                     <input
+                                                                        disabled={
+                                                                            this
+                                                                                .props
+                                                                                .generatingScrambles
+                                                                        }
                                                                         type="checkbox"
                                                                         id={
                                                                             checkboxId
@@ -186,6 +195,7 @@ const FmcTranslationsDetail = connect(
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={this.toggleTranslations}
+                                disabled={this.props.generatingScrambles}
                             >
                                 Translations
                             </button>
