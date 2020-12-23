@@ -8,10 +8,10 @@ const defaultStore = {
     wcif: defaultWcif,
     mbld: MBLD_DEFAULT,
     password: "",
-    editingDisabled: false,
+    editingDisabled: false, // If we fetch competition info, some fields can't be changed
     officialZip: true,
     fileZipBlob: null,
-    generatingScrambles: null,
+    generatingScrambles: false,
     scramblingProgressTarget: {},
     scramblingProgressCurrent: {},
     cachedObjects: {},
