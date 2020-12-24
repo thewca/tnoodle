@@ -49,7 +49,7 @@ it("Each competition fetched from the website must become a button", async () =>
 
     const buttons = Array.from(container.querySelectorAll("button"));
 
-    // First button should be svg icon
+    // First button should be the collapse button
     expect(buttons[0].innerHTML).toBe(
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path></svg>`
     );

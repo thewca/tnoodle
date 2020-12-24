@@ -119,11 +119,7 @@ const SideBar = connect(
         }
 
         setIsOpen = () => {
-            if (window.innerWidth <= 992) {
-                this.setState({ isOpen: false });
-            } else {
-                this.setState({ isOpen: true });
-            }
+            this.setState({ isOpen: window.innerWidth > 992 });
         };
 
         setLoadingUser = (flag) => {
