@@ -32,8 +32,7 @@ import {
 } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 import "./SideBar.css";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -49,7 +48,7 @@ const SideBar = () => {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
+    const fetchInformation = () => {
         if (!isLogged()) {
             return;
         }
@@ -75,7 +74,8 @@ const SideBar = () => {
         if (!!competitionId) {
             handleCompetitionSelection(competitionId);
         }
-    }, []);
+    };
+    useEffect(fetchInformation, []);
 
     const pluralize = (string, number) => string + (number > 1 ? "s" : "");
 

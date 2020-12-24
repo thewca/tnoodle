@@ -44,7 +44,7 @@ const VersionInfo = () => {
     }, []);
 
     // This avoids global state update while rendering
-    useEffect(() => {
+    const analyzeVerion = () => {
         // We wait until both wca and tnoodle answers
         if (!allowedTnoodleVersions || !runningVersion) {
             return;
@@ -56,7 +56,8 @@ const VersionInfo = () => {
                     allowedTnoodleVersions.includes(runningVersion)
             )
         );
-    }, [allowedTnoodleVersions, runningVersion]);
+    };
+    useEffect(analyzeVerion, [allowedTnoodleVersions, runningVersion]);
 
     // We cannot analyze TNoodle version here. We do not bother the user.
     if (!runningVersion || !allowedTnoodleVersions) {
