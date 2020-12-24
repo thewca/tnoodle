@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import Loading from "./Loading";
+import { Collapse } from "react-bootstrap";
 import {
     updateWcif,
     updateEditingStatus,
@@ -67,6 +68,7 @@ const SideBar = connect(
                 loadingCompetitions: false,
                 loadingCompetitionInformation: false,
                 competitionId: null,
+                isOpen: true,
             };
         }
         margin = 1; // Margin for login button and "Manual Selection"
@@ -107,7 +109,18 @@ const SideBar = connect(
             if (competitionId != null) {
                 this.handleCompetitionSelection(competitionId);
             }
+
+            this.setIsOpen();
+            window.addEventListener("resize", this.setIsOpen);
         }
+
+        componentWillUnmount() {
+            window.removeEventListener("resize", this.setIsOpen);
+        }
+
+        setIsOpen = () => {
+            this.setState({ isOpen: window.innerWidth > 992 });
+        };
 
         setLoadingUser = (flag) => {
             this.setState({ ...this.state, loadingUser: flag });
@@ -337,59 +350,94 @@ const SideBar = connect(
 
         render() {
             return (
-                <div className="h-100">
-                    <img
-                        className="tnoodle-logo mt-2"
-                        src={require("../assets/tnoodle_logo.svg")}
-                        alt="TNoodle logo"
-                    />
-                    <h1 className="display-3" id="title">
-                        TNoodle
-                    </h1>
-                    <div>
-                        <ul className="list-group">
-                            <li>
-                                {(this.state.competitions != null &&
-                                    this.state.competitions.length) > 0 && (
-                                    <button
-                                        type="button"
-                                        className={`btn btn-primary btn-lg btn-block btn-outline-light mb-${this.margin}`}
-                                        onClick={this.handleManualSelection}
-                                        disabled={
-                                            this.props.generatingScrambles
-                                        }
-                                    >
-                                        Manual Selection
-                                    </button>
-                                )}
-                            </li>
-                            {this.state.competitions != null &&
-                                this.state.competitions.map(
-                                    (competition, i) => (
-                                        <li key={i}>
-                                            <button
-                                                type="button"
-                                                className="btn btn-primary btn-lg btn-block m-1"
-                                                disabled={
-                                                    this.props
-                                                        .generatingScrambles
-                                                }
-                                                onClick={(_) =>
-                                                    this.handleCompetitionSelection(
-                                                        competition.id
-                                                    )
-                                                }
-                                            >
-                                                {competition.name}
-                                            </button>
-                                        </li>
-                                    )
-                                )}
-                        </ul>
-
-                        {this.loadingArea()}
+                <div className="h-100 pb-2">
+                    <div className="d-flex flex-lg-column align-items-center overflow-hidden">
+                        <img
+                            className="tnoodle-logo mt-2"
+                            src={require("../assets/tnoodle_logo.svg")}
+                            alt="TNoodle logo"
+                        />
+                        <h1 className="display-3" id="title">
+                            TNoodle
+                        </h1>
+                        <button
+                            type="button"
+                            className="btn btn-primary btn-lg btn-outline-light ml-auto d-lg-none"
+                            onClick={() =>
+                                this.setState({ isOpen: !this.state.isOpen })
+                            }
+                            disabled={this.props.generatingScrambles}
+                            aria-label="Toggle menu"
+                            aria-expanded={this.state.isOpen}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 30 30"
+                                width={30}
+                                height={30}
+                            >
+                                <path
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    strokeLinecap="round"
+                                    strokeMiterlimit={10}
+                                    d="M4 7h22M4 15h22M4 23h22"
+                                />
+                            </svg>
+                        </button>
                     </div>
-                    {this.logInButton()}
+                    <Collapse in={this.state.isOpen}>
+                        <div className="pt-2">
+                            <div>
+                                <ul className="list-group">
+                                    <li>
+                                        {this.state.competitions != null &&
+                                            this.state.competitions.length >
+                                                0 && (
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-primary btn-lg btn-block btn-outline-light mb-${this.margin}`}
+                                                    onClick={
+                                                        this
+                                                            .handleManualSelection
+                                                    }
+                                                    disabled={
+                                                        this.props
+                                                            .generatingScrambles
+                                                    }
+                                                >
+                                                    Manual Selection
+                                                </button>
+                                            )}
+                                    </li>
+                                    {this.state.competitions != null &&
+                                        this.state.competitions.map(
+                                            (competition, i) => (
+                                                <li key={i}>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-primary btn-lg btn-block m-1"
+                                                        disabled={
+                                                            this.props
+                                                                .generatingScrambles
+                                                        }
+                                                        onClick={(_) =>
+                                                            this.handleCompetitionSelection(
+                                                                competition.id
+                                                            )
+                                                        }
+                                                    >
+                                                        {competition.name}
+                                                    </button>
+                                                </li>
+                                            )
+                                        )}
+                                </ul>
+                                {this.loadingArea()}
+                            </div>
+                            {this.logInButton()}
+                        </div>
+                    </Collapse>
                 </div>
             );
         }

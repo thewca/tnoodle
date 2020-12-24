@@ -59,6 +59,18 @@ nav li {
     padding-top: 10px;
 }
 
-#side-bar {
-    height: 100vh;
+@media (min-width: 992px) {
+    #side-bar {
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
+}
+
+@media (max-width: 991.98px) {
+    #title {
+        margin-bottom: 0;
+        margin-left: 12px;
+    }
 }
