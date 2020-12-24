@@ -351,8 +351,9 @@ const SideBar = connect(
         render() {
             return (
                 <div className="h-100 pb-2">
-                    <div className="d-lg-none d-flex align-items-center pt-2 overflow-hidden">
+                    <div className="d-flex flex-lg-column align-items-center overflow-hidden">
                         <img
+                            className="tnoodle-logo mt-2"
                             src={require("../assets/tnoodle_logo.svg")}
                             alt="TNoodle logo"
                         />
@@ -361,7 +362,7 @@ const SideBar = connect(
                         </h1>
                         <button
                             type="button"
-                            className="btn btn-primary btn-lg btn-outline-light ml-auto"
+                            className="btn btn-primary btn-lg btn-outline-light ml-auto d-lg-none"
                             onClick={() =>
                                 this.setState({ isOpen: !this.state.isOpen })
                             }
@@ -386,17 +387,7 @@ const SideBar = connect(
                         </button>
                     </div>
                     <Collapse in={this.state.isOpen}>
-                        <div className="pt-2" id="sidebar-buttons">
-                            <div className="d-none d-lg-block">
-                                <img
-                                    className="tnoodle-logo mt-2"
-                                    src={require("../assets/tnoodle_logo.svg")}
-                                    alt="TNoodle logo"
-                                />
-                                <h1 className="display-3" id="title">
-                                    TNoodle
-                                </h1>
-                            </div>
+                        <div className="pt-2">
                             <div>
                                 <ul className="list-group">
                                     <li>
