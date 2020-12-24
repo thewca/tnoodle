@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Loading from "./Loading";
+import { Collapse } from "react-bootstrap";
 import {
     updateWcif,
     updateEditingStatus,
@@ -45,10 +46,15 @@ const SideBar = () => {
     const generatingScrambles = useSelector(
         (state) => state.generatingScrambles
     );
+    const [isOpen, setIsOpen] = useState(true);
 
     const dispatch = useDispatch();
 
-    const fetchInformation = () => {
+    const handleIsOpen = () => setIsOpen(window.innerWidth > 992);
+
+    const init = () => {
+        window.addEventListener("resize", handleIsOpen);
+
         if (!isLogged()) {
             return;
         }
@@ -75,7 +81,7 @@ const SideBar = () => {
             handleCompetitionSelection(competitionId);
         }
     };
-    useEffect(fetchInformation, []);
+    useEffect(init, []);
 
     const pluralize = (string, number) => string + (number > 1 ? "s" : "");
 
@@ -223,53 +229,80 @@ const SideBar = () => {
             return loadingElement("Loading competition information");
         }
     };
-
     return (
-        <div className="h-100">
-            <img
-                className="tnoodle-logo mt-2"
-                src={require("../assets/tnoodle_logo.svg")}
-                alt="TNoodle logo"
-            />
-            <h1 className="display-3" id="title">
-                TNoodle
-            </h1>
-            <div>
-                <ul className="list-group">
-                    <li>
-                        {(!!competitions && competitions.length) > 0 && (
-                            <button
-                                type="button"
-                                className="btn btn-primary btn-lg btn-block btn-outline-light mb-1"
-                                onClick={handleManualSelection}
-                                disabled={generatingScrambles}
-                            >
-                                Manual Selection
-                            </button>
-                        )}
-                    </li>
-                    {!!competitions &&
-                        competitions.map((competition) => (
-                            <li key={competition.id}>
-                                <button
-                                    type="button"
-                                    className="btn btn-primary btn-lg btn-block m-1"
-                                    disabled={generatingScrambles}
-                                    onClick={() =>
-                                        handleCompetitionSelection(
-                                            competition.id
-                                        )
-                                    }
-                                >
-                                    {competition.name}
-                                </button>
-                            </li>
-                        ))}
-                </ul>
-
-                {loadingArea()}
+        <div className="h-100 pb-2">
+            <div className="d-flex flex-lg-column align-items-center overflow-hidden">
+                <img
+                    className="tnoodle-logo mt-2"
+                    src={require("../assets/tnoodle_logo.svg")}
+                    alt="TNoodle logo"
+                />
+                <h1 className="display-3" id="title">
+                    TNoodle
+                </h1>
+                <button
+                    type="button"
+                    className="btn btn-primary btn-lg btn-outline-light ml-auto d-lg-none"
+                    onClick={() => setIsOpen(!isOpen)}
+                    disabled={generatingScrambles}
+                    aria-label="Toggle menu"
+                    aria-expanded={isOpen}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 30 30"
+                        width={30}
+                        height={30}
+                    >
+                        <path
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeMiterlimit={10}
+                            d="M4 7h22M4 15h22M4 23h22"
+                        />
+                    </svg>
+                </button>
             </div>
-            {logInButton()}
+            <Collapse in={isOpen}>
+                <div className="pt-2">
+                    <div>
+                        <ul className="list-group">
+                            <li>
+                                {!!competitions && competitions.length > 0 && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary btn-lg btn-block btn-outline-light mb-1"
+                                        onClick={handleManualSelection}
+                                        disabled={generatingScrambles}
+                                    >
+                                        Manual Selection
+                                    </button>
+                                )}
+                            </li>
+                            {!!competitions &&
+                                competitions.map((competition) => (
+                                    <li key={competition.id}>
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary btn-lg btn-block m-1"
+                                            disabled={generatingScrambles}
+                                            onClick={() =>
+                                                handleCompetitionSelection(
+                                                    competition.id
+                                                )
+                                            }
+                                        >
+                                            {competition.name}
+                                        </button>
+                                    </li>
+                                ))}
+                        </ul>
+                        {loadingArea()}
+                    </div>
+                    {logInButton()}
+                </div>
+            </Collapse>
         </div>
     );
 };
