@@ -41,11 +41,13 @@ const EventPickerTable = () => {
         });
     };
 
-    useEffect(() => {
+    const fetchInformation = () => {
         fetchFormats().then((response) => dispatch(setWcaFormats(response)));
         fetchWcaEvents().then((response) => dispatch(setWcaEvents(response)));
         getFmcTranslations();
-    }, []);
+    };
+
+    useEffect(fetchInformation, []);
 
     const maybeShowEditWarning = () => {
         if (!competitionId) {

@@ -11,9 +11,15 @@ const VersionInfo = () => {
     const [signedBuild, setSignedBuild] = useState(null);
     const [signatureKeyBytes, setSignatureKeyBytes] = useState(null);
     const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState(null);
+    const [signatureValid, setSignatureValid] = useState(true);
 
-    const signatureValid = () =>
-        signedBuild && signatureKeyBytes === wcaPublicKeyBytes;
+    useEffect(
+        () =>
+            setSignatureValid(
+                signedBuild && signatureKeyBytes === wcaPublicKeyBytes
+            ),
+        [signedBuild, signatureKeyBytes, wcaPublicKeyBytes]
+    );
 
     const dispatch = useDispatch();
 
@@ -39,7 +45,7 @@ const VersionInfo = () => {
                     : ""
             );
             setSignedBuild(response.signedBuild);
-            setSignatureKeyBytes(response.setSignatureKeyBytes);
+            setSignatureKeyBytes(response.signatureKeyBytes);
         });
     }, []);
 
@@ -52,7 +58,7 @@ const VersionInfo = () => {
 
         dispatch(
             updateOfficialZipStatus(
-                signatureValid() &&
+                signatureValid &&
                     allowedTnoodleVersions.includes(runningVersion)
             )
         );
@@ -89,7 +95,7 @@ const VersionInfo = () => {
     }
 
     // Generated version is not an officially signed jar
-    if (!signatureValid()) {
+    if (!signatureValid) {
         return (
             <div className="alert alert-danger m-0">
                 You are running an unsigned TNoodle release. Do not use

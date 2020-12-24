@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React from "react";
 import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import { updateWcaEvent, updateFileZipBlob } from "../redux/ActionCreators";
 import {
@@ -10,298 +9,252 @@ import MbldDetail from "./MbldDetail";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import "./EventPicker.css";
 import { ProgressBar } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
-const mapStateToProps = (store) => ({
-    editingDisabled: store.editingDisabled,
-    wcif: store.wcif,
-    wcaFormats: store.wcaFormats,
-    generatingScrambles: store.generatingScrambles,
-    scramblingProgressTarget: store.scramblingProgressTarget,
-    scramblingProgressCurrent: store.scramblingProgressCurrent,
-    fileZipBlob: store.fileZipBlob,
-});
+const EventPicker = ({ event, wcifEvent }) => {
+    const wcaFormats = useSelector((state) => state.wcaFormats);
+    const editingDisabled = useSelector((state) => state.editingDisabled);
+    const generatingScrambles = useSelector(
+        (state) => state.generatingScrambles
+    );
+    const scramblingProgressCurrent = useSelector(
+        (state) => state.scramblingProgressCurrent
+    );
+    const scramblingProgressTarget = useSelector(
+        (state) => state.scramblingProgressTarget
+    );
 
-const mapDispatchToProps = {
-    updateWcaEvent,
-    updateFileZipBlob,
-};
+    const dispatch = useDispatch();
 
-const EventPicker = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(
-    class extends Component {
-        getWcaEvent = (rounds) => {
-            return { id: this.props.event.id, rounds };
-        };
+    const getWcaEvent = (rounds) => ({ id: event.id, rounds });
 
-        handleNumberOfRoundsChange = (numberOfRounds, rounds) => {
-            // Ajust the number of rounds in case we have to remove
-            while (rounds.length > numberOfRounds) {
-                rounds.pop();
-            }
+    const updateEvent = (rounds) => {
+        let wcaEvent = getWcaEvent(rounds);
+        dispatch(updateFileZipBlob(null));
+        dispatch(updateWcaEvent(wcaEvent));
+    };
 
-            // case we have to add
-            let eventId = this.props.event.id;
-            while (rounds.length < numberOfRounds) {
-                rounds.push({
-                    id: eventId + "-r" + (rounds.length + 1),
-                    format: this.props.event.format_ids[0],
-                    scrambleSetCount: 1,
-                    extensions: [getDefaultCopiesExtension()],
-                });
-            }
-            let wcaEvent = this.getWcaEvent(rounds);
-            this.updateEvent(wcaEvent);
-        };
+    const handleNumberOfRoundsChange = (numberOfRounds, rounds) => {
+        // Ajust the number of rounds in case we have to remove
+        while (rounds.length > numberOfRounds) {
+            rounds.pop();
+        }
 
-        handleNumberOfScrambleSetsChange = (round, value, rounds) => {
-            rounds[round].scrambleSetCount = value;
-            let wcaEvent = this.getWcaEvent(rounds);
-            this.updateEvent(wcaEvent);
-        };
+        // case we have to add
+        while (rounds.length < numberOfRounds) {
+            rounds.push({
+                id: event.id + "-r" + (rounds.length + 1),
+                format: event.format_ids[0],
+                scrambleSetCount: 1,
+                extensions: [getDefaultCopiesExtension()],
+            });
+        }
+        updateEvent(rounds);
+    };
 
-        handleRoundFormatChanged = (round, value, rounds) => {
-            rounds[round].format = value;
-            let wcaEvent = this.getWcaEvent(rounds);
-            this.updateEvent(wcaEvent);
-        };
+    const handleGeneralRoundChange = (round, value, rounds, name) => {
+        rounds[round][name] = value;
+        updateEvent(rounds);
+    };
 
-        handleNumberOfCopiesChange = (round, value, rounds) => {
-            rounds[round].extensions.find(
-                (extension) => extension.id === copiesExtensionId
-            ).data.numCopies = value;
-            let wcaEvent = this.getWcaEvent(rounds);
-            this.updateEvent(wcaEvent);
-        };
+    const handleNumberOfCopiesChange = (round, value, rounds) => {
+        rounds[round].extensions.find(
+            (extension) => extension.id === copiesExtensionId
+        ).data.numCopies = value;
+        updateEvent(rounds);
+    };
 
-        abbreviate = (str) => {
-            if (this.props.wcaFormats != null) {
-                return this.props.wcaFormats[str].shortName;
-            }
-            return "-";
-        };
+    const abbreviate = (str) =>
+        !!wcaFormats ? wcaFormats[str].shortName : "-";
 
-        updateEvent = (wcaEvent) => {
-            this.props.updateFileZipBlob(null);
-            this.props.updateWcaEvent(wcaEvent);
-        };
+    const maybeShowTableTitles = (rounds) => {
+        if (rounds.length === 0) {
+            return null;
+        }
+        return (
+            <tr className="thead-light">
+                <th scope="col">#</th>
+                <th scope="col">Format</th>
+                <th scope="col">Scramble Sets</th>
+                <th scope="col">Copies</th>
+            </tr>
+        );
+    };
 
-        maybeShowTableTitles = (rounds) => {
-            if (rounds.length === 0) {
-                return null;
-            }
-            return (
-                <tr className="thead-light">
-                    <th scope="col">#</th>
-                    <th scope="col">Format</th>
-                    <th scope="col">Scramble Sets</th>
-                    <th scope="col">Copies</th>
-                </tr>
-            );
-        };
+    const maybeShowTableBody = (rounds) => {
+        if (rounds.length === 0) {
+            return;
+        }
 
-        maybeShowTableBody = (rounds) => {
-            if (rounds.length === 0) {
-                return;
-            }
-
-            return (
-                <tbody>
-                    {Array.from({ length: rounds.length }, (_, i) => {
-                        let copies = rounds[i].extensions.find(
-                            (extension) => extension.id === copiesExtensionId
-                        ).data.numCopies;
-                        return (
-                            <tr key={i} className="form-group">
-                                <th scope="row" className="align-middle">
-                                    {i + 1}
-                                </th>
-                                <td className="align-middle">
-                                    <select
-                                        className="form-control"
-                                        value={rounds[i].format}
-                                        onChange={(evt) =>
-                                            this.handleRoundFormatChanged(
-                                                i,
-                                                evt.target.value,
-                                                rounds
-                                            )
-                                        }
-                                        disabled={
-                                            this.props.editingDisabled
-                                                ? "disabled"
-                                                : ""
-                                        }
-                                    >
-                                        {this.props.event.format_ids.map(
-                                            (format) => (
-                                                <option
-                                                    key={format}
-                                                    value={format}
-                                                >
-                                                    {this.abbreviate(format)}
-                                                </option>
-                                            )
-                                        )}
-                                    </select>
-                                </td>
-                                <td>
-                                    <input
-                                        className="form-control"
-                                        type="number"
-                                        value={rounds[i].scrambleSetCount}
-                                        onChange={(evt) =>
-                                            this.handleNumberOfScrambleSetsChange(
-                                                i,
-                                                evt.target.value,
-                                                rounds
-                                            )
-                                        }
-                                        min={1}
-                                        required
-                                        disabled={
-                                            this.props.editingDisabled
-                                                ? "disabled"
-                                                : ""
-                                        }
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        className="form-control"
-                                        type="number"
-                                        value={copies}
-                                        onChange={(evt) =>
-                                            this.handleNumberOfCopiesChange(
-                                                i,
-                                                evt.target.value,
-                                                rounds
-                                            )
-                                        }
-                                        min={1}
-                                        required
-                                        disabled={
-                                            this.props.generatingScrambles
-                                        }
-                                    />
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            );
-        };
-
-        maybeShowProgressBar = (rounds) => {
-            let eventId = this.props.event.id;
-
-            let current = this.props.scramblingProgressCurrent[eventId] || 0;
-            let target = this.props.scramblingProgressTarget[eventId];
-
-            if (
-                rounds.length === 0 ||
-                !this.props.generatingScrambles ||
-                target === undefined
-            ) {
-                return;
-            }
-
-            let progress = (current / target) * 100;
-            let miniThreshold = 2;
-
-            if (progress === 0) {
-                progress = miniThreshold;
-            }
-
-            return (
-                <ProgressBar
-                    animated
-                    variant={progress === 100 ? "success" : "info"}
-                    now={progress}
-                    label={
-                        progress === 100 || progress < miniThreshold
-                            ? ""
-                            : `${current} / ${target}`
-                    }
-                />
-            );
-        };
-
-        render() {
-            let wcaEvent = this.props.wcifEvent;
-            let rounds = wcaEvent != null ? wcaEvent.rounds : [];
-
-            return (
-                <table className="table table-sm shadow rounded">
-                    <thead>
-                        <tr
-                            className={
-                                rounds.length === 0
-                                    ? "thead-dark text-white"
-                                    : "thead-light"
-                            }
-                        >
-                            <th className="firstColumn" scope="col"></th>
-                            <th
-                                scope="col"
-                                className="align-middle secondColumn"
-                            >
-                                <img
-                                    className="img-thumbnail cubingIcon"
-                                    src={require(`../assets/cubing-icon/${this.props.event.id}.svg`)}
-                                    alt="TNoodle logo"
-                                />
+        return (
+            <tbody>
+                {Array.from({ length: rounds.length }, (_, i) => {
+                    let copies = rounds[i].extensions.find(
+                        (extension) => extension.id === copiesExtensionId
+                    ).data.numCopies;
+                    return (
+                        <tr key={i} className="form-group">
+                            <th scope="row" className="align-middle">
+                                {i + 1}
                             </th>
-                            <th
-                                className="align-middle lastTwoColumns"
-                                scope="col"
-                            >
-                                <h5 className="font-weight-bold">
-                                    {this.props.event.name}
-                                </h5>
-                                {this.maybeShowProgressBar(rounds)}
-                            </th>
-                            <th className="lastTwoColumns" scope="col">
-                                <label>Rounds</label>
+                            <td className="align-middle">
                                 <select
                                     className="form-control"
-                                    value={rounds.length}
+                                    value={rounds[i].format}
                                     onChange={(evt) =>
-                                        this.handleNumberOfRoundsChange(
+                                        handleGeneralRoundChange(
+                                            i,
+                                            evt.target.value,
+                                            rounds,
+                                            "format"
+                                        )
+                                    }
+                                    disabled={
+                                        editingDisabled || generatingScrambles
+                                    }
+                                >
+                                    {event.format_ids.map((format) => (
+                                        <option key={format} value={format}>
+                                            {abbreviate(format)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </td>
+                            <td>
+                                <input
+                                    className="form-control"
+                                    type="number"
+                                    value={rounds[i].scrambleSetCount}
+                                    onChange={(evt) =>
+                                        handleGeneralRoundChange(
+                                            i,
+                                            evt.target.value,
+                                            rounds,
+                                            "scrambleSetCount"
+                                        )
+                                    }
+                                    min={1}
+                                    required
+                                    disabled={
+                                        editingDisabled || generatingScrambles
+                                    }
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    className="form-control"
+                                    type="number"
+                                    value={copies}
+                                    onChange={(evt) =>
+                                        handleNumberOfCopiesChange(
+                                            i,
                                             evt.target.value,
                                             rounds
                                         )
                                     }
-                                    disabled={
-                                        this.props.editingDisabled
-                                            ? "disabled"
-                                            : ""
-                                    }
-                                >
-                                    {Array.from(
-                                        { length: MAX_WCA_ROUNDS + 1 },
-                                        (_, i) => (
-                                            <option key={i} value={i}>
-                                                {i}
-                                            </option>
-                                        )
-                                    )}
-                                </select>
-                            </th>
+                                    min={1}
+                                    required
+                                    disabled={generatingScrambles}
+                                />
+                            </td>
                         </tr>
-                        {this.maybeShowTableTitles(rounds)}
-                    </thead>
-                    {this.maybeShowTableBody(rounds)}
-                    {this.props.event.is_multiple_blindfolded &&
-                        rounds.length > 0 && <MbldDetail />}
-                    {this.props.event.is_fewest_moves && rounds.length > 0 && (
-                        <FmcTranslationsDetail />
-                    )}
-                </table>
-            );
+                    );
+                })}
+            </tbody>
+        );
+    };
+
+    const maybeShowProgressBar = (rounds) => {
+        let eventId = event.id;
+
+        let current = scramblingProgressCurrent[eventId] || 0;
+        let target = scramblingProgressTarget[eventId];
+
+        if (rounds.length === 0 || !generatingScrambles || !target) {
+            return;
         }
-    }
-);
+
+        let progress = (current / target) * 100;
+        let miniThreshold = 2;
+
+        if (progress === 0) {
+            progress = miniThreshold;
+        }
+
+        return (
+            <ProgressBar
+                animated
+                variant={progress === 100 ? "success" : "info"}
+                now={progress}
+                label={
+                    progress === 100 || progress < miniThreshold
+                        ? ""
+                        : `${current} / ${target}`
+                }
+            />
+        );
+    };
+
+    let rounds = !!wcifEvent ? wcifEvent.rounds : [];
+
+    return (
+        <table className="table table-sm shadow rounded">
+            <thead>
+                <tr
+                    className={
+                        rounds.length === 0
+                            ? "thead-dark text-white"
+                            : "thead-light"
+                    }
+                >
+                    <th className="firstColumn" scope="col"></th>
+                    <th scope="col" className="align-middle secondColumn">
+                        <img
+                            className="img-thumbnail cubingIcon"
+                            src={require(`../assets/cubing-icon/${event.id}.svg`)}
+                            alt="TNoodle logo"
+                        />
+                    </th>
+                    <th className="align-middle lastTwoColumns" scope="col">
+                        <h5 className="font-weight-bold">{event.name}</h5>
+                        {maybeShowProgressBar(rounds)}
+                    </th>
+                    <th className="lastTwoColumns" scope="col">
+                        <label>Rounds</label>
+                        <select
+                            className="form-control"
+                            value={rounds.length}
+                            onChange={(evt) =>
+                                handleNumberOfRoundsChange(
+                                    evt.target.value,
+                                    rounds
+                                )
+                            }
+                            disabled={editingDisabled || generatingScrambles}
+                        >
+                            {Array.from(
+                                { length: MAX_WCA_ROUNDS + 1 },
+                                (_, i) => (
+                                    <option key={i} value={i}>
+                                        {i}
+                                    </option>
+                                )
+                            )}
+                        </select>
+                    </th>
+                </tr>
+                {maybeShowTableTitles(rounds)}
+            </thead>
+            {maybeShowTableBody(rounds)}
+            {event.is_multiple_blindfolded && rounds.length > 0 && (
+                <MbldDetail />
+            )}
+            {event.is_fewest_moves && rounds.length > 0 && (
+                <FmcTranslationsDetail />
+            )}
+        </table>
+    );
+};
 
 export default EventPicker;
