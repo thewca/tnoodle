@@ -86,6 +86,7 @@ const SideBar = () => {
         dispatch(setBestMbldAttempt(null));
         dispatch(updateCompetitionName(getDefaultCompetitionName()));
         dispatch(updateFileZipBlob(null));
+        dispatch(addSuggestedFmcTranslations(null));
 
         removeQueryParam("competitionId");
     };
