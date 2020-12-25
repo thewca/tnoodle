@@ -1,6 +1,5 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import _ from "lodash";
-import { connect } from "react-redux";
 import {
     fetchAvailableFmcTranslations,
     fetchFormats,
@@ -13,147 +12,109 @@ import {
     setWcaEvents,
 } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
+import { useDispatch, useSelector } from "react-redux";
 
-const mapStateToProps = (store) => ({
-    wcif: store.wcif,
-    editingDisabled: store.editingDisabled,
-    competitionId: store.competitionId,
-    translations: store.translations,
-    wcaEvents: store.wcaEvents,
-});
-
-const mapDispatchToProps = {
-    updateTranslations,
-    setWcaFormats,
-    setWcaEvents,
-};
-
-const BOOTSTRAP_GRID = 12;
 const EVENTS_PER_LINE = 2;
 
-const EventPickerTable = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(
-    class extends Component {
-        componentDidMount() {
-            this.getFormats();
-            this.getWcaEvents();
-            this.getFmcTranslations();
-        }
+const EventPickerTable = () => {
+    const competitionId = useSelector((state) => state.competitionId);
+    const wcif = useSelector((state) => state.wcif);
+    const wcaEvents = useSelector((state) => state.wcaEvents);
+    const editingDisabled = useSelector((state) => state.editingDisabled);
 
-        getFormats = () => {
-            fetchFormats().then((response) => {
-                this.props.setWcaFormats(response);
-            });
-        };
+    const dispatch = useDispatch();
 
-        getWcaEvents = () => {
-            fetchWcaEvents().then((response) => {
-                this.props.setWcaEvents(response);
-            });
-        };
-
-        getFmcTranslations = () => {
-            fetchAvailableFmcTranslations().then((availableTranslations) => {
-                if (!availableTranslations) {
-                    return;
-                }
-                let translations = Object.keys(availableTranslations).map(
-                    (translationId) => ({
-                        id: translationId,
-                        display: availableTranslations[translationId],
-                        status: true,
-                    })
-                );
-                this.props.updateTranslations(translations);
-            });
-        };
-
-        maybeShowEditWarning = () => {
-            if (this.props.competitionId == null) {
+    const getFmcTranslations = () => {
+        fetchAvailableFmcTranslations().then((availableTranslations) => {
+            if (!availableTranslations) {
                 return;
             }
-            return (
-                <div className="row">
-                    <div className="col-12">
-                        <p>
-                            Found {this.props.wcif.events.length} event
-                            {this.props.wcif.events.length > 1
-                                ? "s"
-                                : ""} for {this.props.wcif.name}.
-                        </p>
-                        <p>
-                            You can view and change the rounds over on{" "}
-                            <a
-                                href={toWcaUrl(
-                                    `/competitions/${this.props.competitionId}/events/edit`
-                                )}
-                            >
-                                the WCA.
-                            </a>
-                            <strong>
-                                {" "}
-                                Refresh this page after making any changes on
-                                the WCA website.
-                            </strong>
-                        </p>
-                    </div>
-                </div>
+            let translations = Object.keys(availableTranslations).map(
+                (translationId) => ({
+                    id: translationId,
+                    display: availableTranslations[translationId],
+                    status: true,
+                })
             );
-        };
+            dispatch(updateTranslations(translations));
+        });
+    };
 
-        render() {
-            // Prevent from remembering previous order
-            let wcaEvents = this.props.wcaEvents;
-            if (wcaEvents == null) {
-                return null;
-            }
+    const fetchInformation = () => {
+        fetchFormats().then((response) => dispatch(setWcaFormats(response)));
+        fetchWcaEvents().then((response) => dispatch(setWcaEvents(response)));
+        getFmcTranslations();
+    };
 
-            let events = this.props.wcif.events;
-            let editingDisabled = this.props.editingDisabled;
+    useEffect(fetchInformation, []);
 
-            // This filters events to show only those in the competition.
-            if (editingDisabled) {
-                wcaEvents = wcaEvents.filter((wcaEvent) =>
-                    events.find((item) => item.id === wcaEvent.id)
-                );
-            }
-
-            let eventChunks = _.chunk(wcaEvents, EVENTS_PER_LINE);
-
-            let classColPerEvent = ` col-md-${
-                BOOTSTRAP_GRID / EVENTS_PER_LINE
-            }`;
-            return (
-                <div className="container-fluid mt-2">
-                    {this.maybeShowEditWarning()}
-                    {eventChunks.map((chunk, i) => {
-                        return (
-                            <div className="row p-0" key={i}>
-                                {chunk.map((event) => {
-                                    return (
-                                        <div
-                                            className={classColPerEvent}
-                                            key={event.id}
-                                        >
-                                            <EventPicker
-                                                event={event}
-                                                wcifEvent={this.props.wcif.events.find(
-                                                    (item) =>
-                                                        item.id === event.id
-                                                )}
-                                            />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        );
-                    })}
-                </div>
-            );
+    const maybeShowEditWarning = () => {
+        if (!competitionId) {
+            return;
         }
+        return (
+            <div className="row">
+                <div className="col-12">
+                    <p>
+                        Found {wcif.events.length} event
+                        {wcif.events.length > 1 ? "s" : ""} for {wcif.name}.
+                    </p>
+                    <p>
+                        You can view and change the rounds over on
+                        <a
+                            href={toWcaUrl(
+                                `/competitions/${competitionId}/events/edit`
+                            )}
+                        >
+                            the WCA.
+                        </a>
+                        <strong>
+                            Refresh this page after making any changes on the
+                            WCA website.
+                        </strong>
+                    </p>
+                </div>
+            </div>
+        );
+    };
+
+    // Prevent from remembering previous order
+    if (!wcaEvents) {
+        return null;
     }
-);
+
+    // This filters events to show only those in the competition.
+    let filteredEvents = wcaEvents.filter(
+        (wcaEvent) =>
+            !editingDisabled ||
+            wcif.events.find((item) => item.id === wcaEvent.id)
+    );
+
+    let eventChunks = _.chunk(filteredEvents, EVENTS_PER_LINE);
+
+    return (
+        <div className="container-fluid mt-2">
+            {maybeShowEditWarning()}
+            {eventChunks.map((chunk, i) => {
+                return (
+                    <div className="row p-0" key={i}>
+                        {chunk.map((event) => {
+                            return (
+                                <div className="col-lg-6" key={event.id}>
+                                    <EventPicker
+                                        event={event}
+                                        wcifEvent={wcif.events.find(
+                                            (item) => item.id === event.id
+                                        )}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
 export default EventPickerTable;

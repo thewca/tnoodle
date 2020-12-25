@@ -49,15 +49,20 @@ it("Each competition fetched from the website must become a button", async () =>
 
     const buttons = Array.from(container.querySelectorAll("button"));
 
-    // First button should be manual selection
-    expect(buttons[0].innerHTML).toBe("Manual Selection");
+    // First button should be the collapse button
+    expect(buttons[0].innerHTML).toBe(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path></svg>`
+    );
+
+    // Second button should be manual selection
+    expect(buttons[1].innerHTML).toBe("Manual Selection");
 
     // Last button should be Log Out
     expect(buttons[buttons.length - 1].innerHTML).toBe("Log Out");
 
     // Each competition must have a button
     for (let i = 0; i < competitions.length; i++) {
-        expect(competitions[i].name).toBe(buttons[i + 1].innerHTML);
+        expect(competitions[i].name).toBe(buttons[i + 2].innerHTML);
     }
 
     // We should welcome the user

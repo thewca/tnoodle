@@ -1,148 +1,112 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { fetchRunningVersion } from "../api/tnoodle.api";
 import { fetchVersionInfo } from "../api/wca.api";
 import { updateOfficialZipStatus } from "../redux/ActionCreators";
 
-const mapDispatchToProps = {
-    updateOfficialZipStatus,
-};
+const VersionInfo = () => {
+    const [currentTnoodle, setCurrentTnoodle] = useState(null);
+    const [allowedTnoodleVersions, setAllowedTnoodleVersions] = useState(null);
+    const [runningVersion, setRunningVersion] = useState(null);
+    const [signedBuild, setSignedBuild] = useState(null);
+    const [signatureKeyBytes, setSignatureKeyBytes] = useState(null);
+    const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState(null);
+    const [signatureValid, setSignatureValid] = useState(true);
 
-const VersionInfo = connect(
-    null,
-    mapDispatchToProps
-)(
-    class extends Component {
-        constructor(props) {
-            super(props);
-            this.state = {
-                currentTnoodle: null,
-                allowedTnoodleVersions: null,
-                runningVersion: null,
-                signedBuild: null,
-                signatureKeyBytes: null,
-                wcaPublicKeyBytes: null,
-                wcaResponse: false,
-                tnoodleResponse: false,
-            };
-        }
+    useEffect(
+        () =>
+            setSignatureValid(
+                signedBuild && signatureKeyBytes === wcaPublicKeyBytes
+            ),
+        [signedBuild, signatureKeyBytes, wcaPublicKeyBytes]
+    );
 
-        componentDidMount() {
-            // Fetch from WCA API.
-            fetchVersionInfo().then((response) => {
-                if (!response) {
-                    return;
-                }
-                let { current, allowed, publicKeyBytes } = response;
-                this.setState({
-                    ...this.state,
-                    currentTnoodle: current,
-                    allowedTnoodleVersions: allowed,
-                    wcaPublicKeyBytes: publicKeyBytes,
-                    wcaResponse: true,
-                });
-                this.analyzeVersion();
-            });
+    const dispatch = useDispatch();
 
-            fetchRunningVersion().then((response) => {
-                if (!response) {
-                    return;
-                }
-                let {
-                    projectName,
-                    projectVersion,
-                    signedBuild,
-                    signatureKeyBytes,
-                } = response;
-                this.setState({
-                    ...this.state,
-                    // Running version is based on projectName and projectVersion
-                    runningVersion:
-                        projectName != null && projectVersion != null
-                            ? `${projectName}-${projectVersion}`
-                            : "",
-                    signedBuild: signedBuild,
-                    signatureKeyBytes: signatureKeyBytes,
-                    tnoodleResponse: true,
-                });
-                this.analyzeVersion();
-            });
-        }
+    useEffect(() => {
+        // Fetch from WCA API.
+        fetchVersionInfo().then((response) => {
+            if (!response) {
+                return;
+            }
+            setCurrentTnoodle(response.current);
+            setAllowedTnoodleVersions(response.allowed);
+            setWcaPublicKeyBytes(response.publicKeyBytes);
+        });
 
-        signatureValid() {
-            return (
-                this.state.signedBuild &&
-                this.state.signatureKeyBytes === this.state.wcaPublicKeyBytes
-            );
-        }
-
-        // This method avoids global state update while rendering
-        analyzeVersion() {
-            // We wait until both wca and tnoodle answers
-            if (!this.state.tnoodleResponse || !this.state.wcaResponse) {
+        fetchRunningVersion().then((response) => {
+            if (!response) {
                 return;
             }
 
-            let runningVersion = this.state.runningVersion;
-            let allowedVersions = this.state.allowedTnoodleVersions;
-            let signedBuild = this.signatureValid();
+            setRunningVersion(
+                !!response.projectName && !!response.projectVersion
+                    ? `${response.projectName}-${response.projectVersion}`
+                    : ""
+            );
+            setSignedBuild(response.signedBuild);
+            setSignatureKeyBytes(response.signatureKeyBytes);
+        });
+    }, []);
 
-            if (!signedBuild || !allowedVersions.includes(runningVersion)) {
-                this.props.updateOfficialZipStatus(false);
-            }
+    // This avoids global state update while rendering
+    const analyzeVerion = () => {
+        // We wait until both wca and tnoodle answers
+        if (!allowedTnoodleVersions || !runningVersion) {
+            return;
         }
 
-        render() {
-            let runningVersion = this.state.runningVersion;
-            let allowedVersions = this.state.allowedTnoodleVersions;
-            let currentTnoodle = this.state.currentTnoodle;
-            let signedBuild = this.signatureValid();
+        dispatch(
+            updateOfficialZipStatus(
+                signatureValid &&
+                    allowedTnoodleVersions.includes(runningVersion)
+            )
+        );
+    };
+    useEffect(analyzeVerion, [allowedTnoodleVersions, runningVersion]);
 
-            // We cannot analyze TNoodle version here. We do not bother the user.
-            if (!runningVersion || !allowedVersions) {
-                return null;
-            }
-
-            // Running version is not the most recent release
-            if (runningVersion !== currentTnoodle.name) {
-                // Running version is allowed, but not the latest.
-                if (allowedVersions.includes(runningVersion)) {
-                    return (
-                        <div className="alert alert-info m-0">
-                            You are running {runningVersion}, which is still
-                            allowed, but you should upgrade to{" "}
-                            {currentTnoodle.name} available{" "}
-                            <a href={currentTnoodle.download}>here</a> as soon
-                            as possible.
-                        </div>
-                    );
-                }
-
-                return (
-                    <div className="alert alert-danger m-0">
-                        You are running {runningVersion}, which is not allowed.
-                        Do not use scrambles generated in any official
-                        competition and consider downloading the latest version{" "}
-                        <a href={currentTnoodle.download}>here</a>.
-                    </div>
-                );
-            }
-
-            // Generated version is not an officially signed jar
-            if (!signedBuild) {
-                return (
-                    <div className="alert alert-danger m-0">
-                        You are running an unsigned TNoodle release. Do not use
-                        scrambles generated in any official competition and
-                        consider downloading the official program{" "}
-                        <a href={currentTnoodle.download}>here</a>
-                    </div>
-                );
-            }
-
-            return null;
-        }
+    // We cannot analyze TNoodle version here. We do not bother the user.
+    if (!runningVersion || !allowedTnoodleVersions) {
+        return null;
     }
-);
+
+    // Running version is not the most recent release
+    if (runningVersion !== currentTnoodle.name) {
+        // Running version is allowed, but not the latest.
+        if (allowedTnoodleVersions.includes(runningVersion)) {
+            return (
+                <div className="alert alert-info m-0">
+                    You are running {runningVersion}, which is still allowed,
+                    but you should upgrade to {currentTnoodle.name} available{" "}
+                    <a href={currentTnoodle.download}>here</a> as soon as
+                    possible.
+                </div>
+            );
+        }
+
+        return (
+            <div className="alert alert-danger m-0">
+                You are running {runningVersion}, which is not allowed. Do not
+                use scrambles generated in any official competition and consider
+                downloading the latest version{" "}
+                <a href={currentTnoodle.download}>here</a>.
+            </div>
+        );
+    }
+
+    // Generated version is not an officially signed jar
+    if (!signatureValid) {
+        return (
+            <div className="alert alert-danger m-0">
+                You are running an unsigned TNoodle release. Do not use
+                scrambles generated in any official competition and consider
+                downloading the official program{" "}
+                <a href={currentTnoodle.download}>here</a>
+            </div>
+        );
+    }
+
+    return null;
+};
 
 export default VersionInfo;

@@ -151,7 +151,7 @@ async function wcaApiFetch(path, fetchOptions) {
 
     const response = await fetch(`${baseApiUrl}${path}`, fetchOptions);
     if (!response.ok) {
-        throw new Error(`${response.status}: ${response.statusText}`);
+        return Promise.reject();
     }
     return response;
 }

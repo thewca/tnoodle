@@ -24,3 +24,24 @@ function parseQueryString(query) {
             return params;
         }, {});
 }
+
+const setPageWithoutRedirect = (url) => window.history.pushState(null, "", url);
+
+const currentLocationWithoutQuery = () =>
+    window.location.origin + window.location.pathname;
+
+export const updateQueryParam = (name, value) => {
+    var searchParams = new URLSearchParams(window.location.search);
+    searchParams.set(name, value);
+    setPageWithoutRedirect(
+        currentLocationWithoutQuery() + "?" + searchParams.toString()
+    );
+};
+
+export const removeQueryParam = (name) => {
+    var searchParams = new URLSearchParams(window.location.search);
+    searchParams.delete(name);
+    setPageWithoutRedirect(
+        currentLocationWithoutQuery() + "?" + searchParams.toString()
+    );
+};
