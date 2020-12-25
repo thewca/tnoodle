@@ -62,14 +62,22 @@ it("Changing values from event", () => {
         numberOfRounds
     );
 
+    // There's a harmless change of type here. 1 -> "1"
+    // Initial value should be 1
+    expect(store.getState().wcif.events[0].rounds[0].scrambleSetCount).toBe(1);
+
+    // This should be numberOfRounds * 2, since each round has 2 inputs.
+    // It's not, probably because not updating DOM after dispatching
     const inputs = Array.from(container.querySelectorAll("input"));
 
+    let roundToChange = 0;
+    let value = "10";
+
     // Change last scramble sets to 10
-    fireEvent.change(inputs[inputs.length - 2], { target: { value: 10 } });
+    fireEvent.change(inputs[roundToChange * 2], { target: { value } });
     expect(
-        store.getState().wcif.events[0].rounds[numberOfRounds - 1]
-            .scrambleSetCount
-    ).toEqual("10");
+        store.getState().wcif.events[0].rounds[roundToChange].scrambleSetCount
+    ).toEqual(value);
 
     // Remove 1 round
     numberOfRounds--;
@@ -77,10 +85,6 @@ it("Changing values from event", () => {
     expect(store.getState().wcif.events[0].rounds.length).toEqual(
         numberOfRounds
     );
-    expect(
-        store.getState().wcif.events[0].rounds[numberOfRounds - 1]
-            .scrambleSetCount
-    ).not.toEqual("10");
 
     const scrambleSets = inputs[0];
     const copies = inputs[1];
@@ -88,11 +92,6 @@ it("Changing values from event", () => {
     // Jsdom allow editing even disabled inputs so this test makes sense
     expect(scrambleSets.disabled).toBe(false);
     expect(copies.disabled).toBe(false);
-
-    // There's a harmless change of type here. 1 -> "1"
-
-    // Initial value should be 1
-    expect(store.getState().wcif.events[0].rounds[0].scrambleSetCount).toBe(1);
 
     // Changes to scrambleSet should go to the store
     const newScrambleSets = "3";
