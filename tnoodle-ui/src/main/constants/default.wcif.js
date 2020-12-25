@@ -1,4 +1,5 @@
 import { getDefaultCopiesExtension } from "../helper/wcif.helper";
+import { getDefaultCompetitionName } from "../util/competition.name.util";
 
 // Add 1 round of 3x3x3
 let default333 = {
@@ -13,10 +14,11 @@ let default333 = {
     ],
 };
 
+let name = getDefaultCompetitionName();
 export const defaultWcif = {
     formatVersion: "1.0",
-    name: "",
-    shortName: "",
+    name,
+    shortName: name,
     id: "",
     events: [default333],
     persons: [],

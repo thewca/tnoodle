@@ -1,123 +1,81 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import {
     updatePassword,
     updateCompetitionName,
     updateFileZipBlob,
 } from "../redux/ActionCreators";
-import { connect } from "react-redux";
-import { getDefaultCompetitionName } from "../util/competition.name.util";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
 
-const mapStateToProps = (store) => ({
-    editingDisabled: store.editingDisabled,
-    competitionName: store.wcif.name,
-    generatingScrambles: store.generatingScrambles,
-});
+const EntryInterface = () => {
+    const [showPassword, setShowPassword] = useState(false);
 
-const mapDispatchToProps = {
-    updatePassword,
-    updateCompetitionName,
-    updateFileZipBlob,
+    const editingDisabled = useSelector((state) => state.editingDisabled);
+    const password = useSelector((state) => state.password);
+    const competitionName = useSelector((state) => state.wcif.name);
+    const generatingScrambles = useSelector(
+        (state) => state.generatingScrambles
+    );
+
+    const dispatch = useDispatch();
+
+    const handleCompetitionNameChange = (event) => {
+        dispatch(updateCompetitionName(event.target.value));
+
+        // Require another zip with the new name.
+        dispatch(updateFileZipBlob(null));
+    };
+
+    const handlePasswordChange = (evt) => {
+        dispatch(updatePassword(evt.target.value));
+
+        // Require another zip with the new password, in case there was a zip generated.
+        dispatch(updateFileZipBlob(null));
+    };
+
+    return (
+        <>
+            <div className="col-sm-4 text-left form-group">
+                <label className="font-weight-bold" htmlFor="competition-name">
+                    Competition Name
+                </label>
+                <input
+                    id="competition-name"
+                    className="form-control"
+                    placeholder="Competition Name"
+                    onChange={handleCompetitionNameChange}
+                    value={competitionName}
+                    disabled={editingDisabled || generatingScrambles}
+                    required
+                />
+            </div>
+
+            <div className="col-sm-4 text-left form-group">
+                <label className="font-weight-bold" htmlFor="password">
+                    Password
+                </label>
+                <div className="input-group">
+                    <input
+                        id="password"
+                        className="form-control"
+                        placeholder="Password"
+                        type={showPassword ? "" : "password"}
+                        onChange={handlePasswordChange}
+                        value={password}
+                        disabled={generatingScrambles}
+                    />
+                    <div
+                        className="input-group-prepend"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        <span className="input-group-text">
+                            {showPassword ? <FaEye /> : <FaEyeSlash />}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 };
-
-const EntryInterface = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(
-    class EntryInterface extends Component {
-        constructor(props) {
-            super(props);
-
-            this.state = {
-                editingDisabled: props.editingDisabled,
-                password: "",
-                showPassword: false,
-            };
-        }
-
-        componentDidMount() {
-            this.props.updateCompetitionName(getDefaultCompetitionName());
-        }
-
-        handleCompetitionNameChange = (event) => {
-            this.props.updateCompetitionName(event.target.value);
-
-            // Require another zip with the new name.
-            this.props.updateFileZipBlob(null);
-        };
-
-        handlePasswordChange = (event) => {
-            let state = this.state;
-            state.password = event.target.value;
-            this.setState(state);
-
-            this.props.updatePassword(this.state.password);
-
-            // Require another zip with the new password, in case there was a zip generated.
-            this.props.updateFileZipBlob(null);
-        };
-
-        toogleShowPassword = () => {
-            let state = this.state;
-            state.showPassword = !state.showPassword;
-            this.setState(state);
-        };
-
-        render() {
-            let competitionName = this.props.competitionName;
-            let disabled = this.props.editingDisabled;
-            return (
-                <React.Fragment>
-                    <div className="col-sm-4 text-left form-group">
-                        <label
-                            className="font-weight-bold"
-                            htmlFor="competition-name"
-                        >
-                            Competition Name
-                        </label>
-                        <input
-                            id="competition-name"
-                            className="form-control"
-                            placeholder="Competition Name"
-                            onChange={this.handleCompetitionNameChange}
-                            value={competitionName}
-                            disabled={disabled ? "disabled" : ""}
-                            required
-                        />
-                    </div>
-
-                    <div className="col-sm-4 text-left form-group">
-                        <label className="font-weight-bold" htmlFor="password">
-                            Password
-                        </label>
-                        <div className="input-group">
-                            <input
-                                id="password"
-                                className="form-control"
-                                placeholder="Password"
-                                type={this.state.showPassword ? "" : "password"}
-                                onChange={this.handlePasswordChange}
-                                value={this.state.password}
-                                disabled={this.props.generatingScrambles}
-                            />
-                            <div
-                                className="input-group-prepend"
-                                onClick={this.toogleShowPassword}
-                            >
-                                <span className="input-group-text">
-                                    {this.state.showPassword ? (
-                                        <FaEye />
-                                    ) : (
-                                        <FaEyeSlash />
-                                    )}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </React.Fragment>
-            );
-        }
-    }
-);
 
 export default EntryInterface;

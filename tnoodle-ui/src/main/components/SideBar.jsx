@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, { useEffect, useState } from "react";
 import Loading from "./Loading";
 import { Collapse } from "react-bootstrap";
 import {
@@ -12,7 +11,6 @@ import {
     updateFileZipBlob,
     addCachedObject,
     addSuggestedFmcTranslations,
-    setSuggestedFmcTranslations,
     setBestMbldAttempt,
 } from "../redux/ActionCreators";
 import { defaultWcif } from "../constants/default.wcif";
@@ -24,424 +22,289 @@ import {
     getUpcomingManageableCompetitions,
     getCompetitionJson,
 } from "../api/wca.api";
-import { getQueryParameter } from "../util/query.param.util";
+import {
+    getQueryParameter,
+    removeQueryParam,
+    updateQueryParam,
+} from "../util/query.param.util";
 import {
     fetchSuggestedFmcTranslations,
     fetchBestMbldAttempt,
 } from "../api/tnoodle.api";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 import "./SideBar.css";
+import { useSelector, useDispatch } from "react-redux";
 
-const mapStateToProps = (store) => ({
-    me: store.me,
-    competitions: store.competitions,
-    cachedObjects: store.cachedObjects,
-    generatingScrambles: store.generatingScrambles,
-});
+const SideBar = () => {
+    const [loadingUser, setLoadingUser] = useState(false);
+    const [loadingCompetitions, setLoadingCompetitions] = useState(false);
+    const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
-const mapDispatchToProps = {
-    updateWcif,
-    updateEditingStatus,
-    updateCompetitionName,
-    updateCompetitions,
-    updateMe,
-    updateCompetitionId,
-    updateFileZipBlob,
-    addCachedObject,
-    addSuggestedFmcTranslations,
-    setSuggestedFmcTranslations,
-    setBestMbldAttempt,
-};
+    const me = useSelector((state) => state.me);
+    const competitions = useSelector((state) => state.competitions);
+    const cachedObjects = useSelector((state) => state.cachedObjects);
+    const generatingScrambles = useSelector(
+        (state) => state.generatingScrambles
+    );
+    const [isOpen, setIsOpen] = useState(true);
 
-const SideBar = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(
-    class extends Component {
-        constructor(props) {
-            super(props);
+    const dispatch = useDispatch();
 
-            this.state = {
-                me: props.me,
-                competitions: props.competitions,
-                loadingUser: false,
-                loadingCompetitions: false,
-                loadingCompetitionInformation: false,
-                competitionId: null,
-                isOpen: true,
-            };
+    const handleIsOpen = () => setIsOpen(window.innerWidth > 992);
+
+    const init = () => {
+        window.addEventListener("resize", handleIsOpen);
+
+        if (!isLogged()) {
+            return;
         }
-        margin = 1; // Margin for login button and "Manual Selection"
-
-        componentDidMount() {
-            if (this.state.me == null && isLogged()) {
-                this.setLoadingUser(true);
-                fetchMe()
-                    .then((me) => {
-                        this.setState({ ...this.state, me });
-                        this.props.updateMe(me);
-                        this.setLoadingUser(false);
-                    })
-                    .catch((e) => {
-                        console.error(
-                            "Could not get information about the logged user",
-                            e
-                        );
-                        this.setLoadingUser(false);
-                    });
-            }
-
-            if (this.state.competitions == null && isLogged()) {
-                this.setLoadingCompetitions(true);
-                getUpcomingManageableCompetitions()
-                    .then((competitions) => {
-                        this.setState({ ...this.state, competitions });
-                        this.props.updateCompetitions(competitions);
-                        this.setLoadingCompetitions(false);
-                    })
-                    .catch((e) => {
-                        console.error("Could not get upcoming competitions", e);
-                        this.setLoadingCompetitions(false);
-                    });
-            }
-
-            let competitionId = getQueryParameter("competitionId");
-            if (competitionId != null) {
-                this.handleCompetitionSelection(competitionId);
-            }
-
-            this.setIsOpen();
-            window.addEventListener("resize", this.setIsOpen);
+        if (!me) {
+            setLoadingUser(true);
+            fetchMe()
+                .then((me) => {
+                    dispatch(updateMe(me));
+                })
+                .finally(() => setLoadingUser(false));
         }
 
-        componentWillUnmount() {
-            window.removeEventListener("resize", this.setIsOpen);
+        if (!competitions) {
+            setLoadingCompetitions(true);
+            getUpcomingManageableCompetitions()
+                .then((competitions) =>
+                    dispatch(updateCompetitions(competitions))
+                )
+                .finally(() => setLoadingCompetitions(false));
         }
 
-        setIsOpen = () => {
-            this.setState({ isOpen: window.innerWidth > 992 });
-        };
+        let competitionId = getQueryParameter("competitionId");
+        if (!!competitionId) {
+            handleCompetitionSelection(competitionId);
+        }
+    };
+    useEffect(init, []);
 
-        setLoadingUser = (flag) => {
-            this.setState({ ...this.state, loadingUser: flag });
-        };
+    const pluralize = (string, number) => string + (number > 1 ? "s" : "");
 
-        setLoadingCompetitions = (flag) => {
-            this.setState({ ...this.state, loadingCompetitions: flag });
-        };
+    const handleManualSelection = () => {
+        dispatch(updateEditingStatus(false));
+        dispatch(updateCompetitionId(null));
+        dispatch(updateWcif({ ...defaultWcif }));
+        dispatch(setBestMbldAttempt(null));
+        dispatch(updateCompetitionName(getDefaultCompetitionName()));
+        dispatch(updateFileZipBlob(null));
+        dispatch(addSuggestedFmcTranslations(null));
 
-        setLoadingCompetitionInformation = (flag) => {
-            this.setState({
-                ...this.state,
-                loadingCompetitionInformation: flag,
-            });
-        };
+        removeQueryParam("competitionId");
+    };
 
-        pluralize = (string, number) => {
-            return string + (number > 1 ? "s" : "");
-        };
+    const handleCompetitionSelection = (competitionId) => {
+        updateQueryParam("competitionId", competitionId);
 
-        currentLocationWithoutQuery = () => {
-            return window.location.origin + window.location.pathname;
-        };
+        // For quick switching between competitions.
+        let cachedObject = cachedObjects[competitionId];
+        if (!!cachedObject) {
+            let cachedWcif = cachedObject.wcif;
+            setWcif(cachedWcif);
+            maybeAddCompetition(cachedWcif.id, cachedWcif.name);
 
-        setPageWithoutRedirect = (url) => {
-            window.history.pushState(null, "", url);
-        };
+            let cachedSuggestedFmcTranslations =
+                cachedObject.suggestedFmcTranslations;
+            dispatch(
+                addSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
+            );
 
-        handleManualSelection = () => {
-            this.props.updateEditingStatus(false);
-            this.props.updateCompetitionId(null);
-            this.props.updateWcif({ ...defaultWcif });
-            this.props.setBestMbldAttempt(null);
-            this.props.updateCompetitionName(getDefaultCompetitionName());
-            this.props.updateFileZipBlob(null);
-            this.removeCompetitionIdQueryParam();
-        };
-
-        handleCompetitionSelection = (competitionId) => {
-            this.updateCompetitionIdQueryParam(competitionId);
-
-            // For quick switching between competitions.
-            let cachedObject = this.props.cachedObjects[competitionId];
-            if (cachedObject != null) {
-                let cachedWcif = cachedObject.wcif;
-                this.setWcif(cachedWcif);
-                this.maybeAddCompetition(cachedWcif.id, cachedWcif.name);
-
-                let cachedSuggestedFmcTranslations =
-                    cachedObject.suggestedFmcTranslations;
-                this.props.addSuggestedFmcTranslations(
-                    cachedSuggestedFmcTranslations
-                );
-
-                let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
-                this.props.setBestMbldAttempt(cachedBestMbldAttempt);
-                return;
-            }
-
-            this.setState({
-                ...this.state,
-                loadingCompetitionInformation: true,
-                competitionId,
-            });
+            let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
+            dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
+        } else {
+            setLoadingCompetitionInfo(true);
 
             getCompetitionJson(competitionId)
                 .then((wcif) => {
-                    this.setWcif(wcif);
-                    this.props.addCachedObject(competitionId, "wcif", wcif);
-                    this.maybeAddCompetition(wcif.id, wcif.name);
-
-                    this.getAndCacheSuggestedFmcTranslations(wcif);
-
-                    this.getAndCacheBestMbldAttempt(wcif);
+                    setWcif(wcif);
+                    dispatch(addCachedObject(competitionId, "wcif", wcif));
+                    maybeAddCompetition(wcif.id, wcif.name);
+                    getAndCacheSuggestedFmcTranslations(wcif);
+                    getAndCacheBestMbldAttempt(wcif);
                 })
-                .catch((e) => {
-                    console.error(
-                        "Could not get information for " + competitionId,
-                        e
-                    );
-                    this.setLoadingCompetitionInformation(false);
-                });
-        };
+                .finally(() => setLoadingCompetitionInfo(false));
+        }
+    };
 
-        getAndCacheSuggestedFmcTranslations = (wcif) => {
-            fetchSuggestedFmcTranslations(wcif).then((translations) => {
-                this.props.addCachedObject(
+    const getAndCacheSuggestedFmcTranslations = (wcif) => {
+        fetchSuggestedFmcTranslations(wcif).then((translations) => {
+            dispatch(
+                addCachedObject(
                     wcif.id,
                     "suggestedFmcTranslations",
                     translations
-                );
-                this.props.addSuggestedFmcTranslations(translations);
-            });
-        };
+                )
+            );
+            dispatch(addSuggestedFmcTranslations(translations));
+        });
+    };
 
-        getAndCacheBestMbldAttempt = (wcif) => {
-            fetchBestMbldAttempt(wcif).then((bestAttempt) => {
-                if (!bestAttempt) {
-                    return;
-                }
-                let attempted = bestAttempt.attempted;
-                this.props.addCachedObject(
-                    wcif.id,
-                    "bestMbldAttempt",
-                    attempted
-                );
-                this.props.setBestMbldAttempt(attempted);
-            });
-        };
-
-        // In case we use competitionId from query params, it's not fetched.
-        // We add it to the list.
-        maybeAddCompetition = (competitionId, competitionName) => {
-            if (!this.state.competitions) {
+    const getAndCacheBestMbldAttempt = (wcif) => {
+        fetchBestMbldAttempt(wcif).then((bestAttempt) => {
+            if (!bestAttempt) {
                 return;
             }
-            if (
-                !this.state.competitions.find(
-                    (competition) => competition.name === competitionName
-                )
-            ) {
-                this.setState({
-                    ...this.state,
-                    competitions: [
-                        ...this.state.competitions,
-                        { id: competitionId, name: competitionName },
-                    ],
-                });
-            }
-        };
+            let attempted = bestAttempt.attempted;
+            dispatch(addCachedObject(wcif.id, "bestMbldAttempt", attempted));
+            dispatch(setBestMbldAttempt(attempted));
+        });
+    };
 
-        updateCompetitionIdQueryParam = (competitionId) => {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("competitionId", competitionId);
-            this.setPageWithoutRedirect(
-                this.currentLocationWithoutQuery() +
-                    "?" +
-                    searchParams.toString()
-            );
-        };
-
-        removeCompetitionIdQueryParam = () => {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.delete("competitionId");
-            this.setPageWithoutRedirect(
-                this.currentLocationWithoutQuery() +
-                    "?" +
-                    searchParams.toString()
-            );
-        };
-
-        setWcif = (wcif) => {
-            this.setLoadingCompetitionInformation(false);
-            this.props.updateEditingStatus(true);
-            this.props.updateWcif(wcif);
-            this.props.updateCompetitionId(wcif.id);
-            this.props.updateCompetitionName(wcif.name);
-            this.props.updateFileZipBlob(null);
-        };
-
-        setSuggestedFmcTranslations = (suggestedFmcTranslations) => {
-            if (suggestedFmcTranslations != null) {
-                this.props.setSuggestedFmcTranslations(
-                    suggestedFmcTranslations
-                );
-            }
-        };
-
-        logInButton = () => {
-            return (
-                <div id="login-area" className={`w-100 mt-${this.margin}`}>
-                    <button
-                        type="button"
-                        className="btn btn-primary btn-lg btn-block btn-outline-light"
-                        onClick={isLogged() ? logOut : logIn}
-                        disabled={this.props.generatingScrambles}
-                    >
-                        {isLogged() ? "Log Out" : "Log In"}
-                    </button>
-                    {this.state.me != null && (
-                        <p className="text-white mt-2">
-                            Welcome, {this.state.me.name}.{" "}
-                            {this.state.competitions != null &&
-                                `You have ${
-                                    this.state.competitions.length
-                                } manageable ${this.pluralize(
-                                    " competition",
-                                    this.state.competitions.length
-                                )} upcoming.`}
-                        </p>
-                    )}
-                </div>
-            );
-        };
-
-        loadingArea = () => {
-            if (this.state.loadingUser) {
-                return (
-                    <div className="text-white">
-                        <Loading />
-                        <p>Loading user...</p>
-                    </div>
-                );
-            }
-
-            if (this.state.loadingCompetitions) {
-                return (
-                    <div className="text-white">
-                        <Loading />
-                        <p>Loading competitions...</p>
-                    </div>
-                );
-            }
-
-            if (this.state.loadingCompetitionInformation) {
-                return (
-                    <div className="text-white">
-                        <Loading />
-                        <p>
-                            Loading information for {this.state.competitionId}
-                            ...
-                        </p>
-                    </div>
-                );
-            }
-        };
-
-        render() {
-            return (
-                <div className="h-100 pb-2">
-                    <div className="d-flex flex-lg-column align-items-center overflow-hidden">
-                        <img
-                            className="tnoodle-logo mt-2"
-                            src={require("../assets/tnoodle_logo.svg")}
-                            alt="TNoodle logo"
-                        />
-                        <h1 className="display-3" id="title">
-                            TNoodle
-                        </h1>
-                        <button
-                            type="button"
-                            className="btn btn-primary btn-lg btn-outline-light ml-auto d-lg-none"
-                            onClick={() =>
-                                this.setState({ isOpen: !this.state.isOpen })
-                            }
-                            disabled={this.props.generatingScrambles}
-                            aria-label="Toggle menu"
-                            aria-expanded={this.state.isOpen}
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 30 30"
-                                width={30}
-                                height={30}
-                            >
-                                <path
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeMiterlimit={10}
-                                    d="M4 7h22M4 15h22M4 23h22"
-                                />
-                            </svg>
-                        </button>
-                    </div>
-                    <Collapse in={this.state.isOpen}>
-                        <div className="pt-2">
-                            <div>
-                                <ul className="list-group">
-                                    <li>
-                                        {this.state.competitions != null &&
-                                            this.state.competitions.length >
-                                                0 && (
-                                                <button
-                                                    type="button"
-                                                    className={`btn btn-primary btn-lg btn-block btn-outline-light mb-${this.margin}`}
-                                                    onClick={
-                                                        this
-                                                            .handleManualSelection
-                                                    }
-                                                    disabled={
-                                                        this.props
-                                                            .generatingScrambles
-                                                    }
-                                                >
-                                                    Manual Selection
-                                                </button>
-                                            )}
-                                    </li>
-                                    {this.state.competitions != null &&
-                                        this.state.competitions.map(
-                                            (competition, i) => (
-                                                <li key={i}>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-primary btn-lg btn-block m-1"
-                                                        disabled={
-                                                            this.props
-                                                                .generatingScrambles
-                                                        }
-                                                        onClick={(_) =>
-                                                            this.handleCompetitionSelection(
-                                                                competition.id
-                                                            )
-                                                        }
-                                                    >
-                                                        {competition.name}
-                                                    </button>
-                                                </li>
-                                            )
-                                        )}
-                                </ul>
-                                {this.loadingArea()}
-                            </div>
-                            {this.logInButton()}
-                        </div>
-                    </Collapse>
-                </div>
+    // In case we use competitionId from query params, it's not fetched.
+    // We add it to the list.
+    const maybeAddCompetition = (competitionId, competitionName) => {
+        if (!competitions) {
+            return;
+        }
+        if (
+            !competitions.find(
+                (competition) => competition.name === competitionName
+            )
+        ) {
+            dispatch(
+                updateCompetitions([
+                    ...competitions,
+                    { id: competitionId, name: competitionName },
+                ])
             );
         }
-    }
-);
+    };
+
+    const setWcif = (wcif) => {
+        dispatch(updateEditingStatus(true));
+        dispatch(updateWcif(wcif));
+        dispatch(updateCompetitionId(wcif.id));
+        dispatch(updateCompetitionName(wcif.name));
+        dispatch(updateFileZipBlob(null));
+    };
+
+    const logInButton = () => {
+        return (
+            <div id="login-area" className="w-100 mt-1">
+                <button
+                    type="button"
+                    className="btn btn-primary btn-lg btn-block"
+                    onClick={isLogged() ? logOut : logIn}
+                    disabled={generatingScrambles}
+                >
+                    {isLogged() ? "Log Out" : "Log In"}
+                </button>
+                {!!me && (
+                    <p className="text-white mt-2">
+                        Welcome, {me.name}.
+                        {!!competitions &&
+                            ` You have ${
+                                competitions.length
+                            } manageable ${pluralize(
+                                " competition",
+                                competitions.length
+                            )} upcoming.`}
+                    </p>
+                )}
+            </div>
+        );
+    };
+
+    const loadingElement = (text) => (
+        <div className="text-white">
+            <Loading />
+            <p>{text}...</p>
+        </div>
+    );
+
+    const loadingArea = () => {
+        if (loadingUser) {
+            return loadingElement("Loading user");
+        }
+
+        if (loadingCompetitions) {
+            return loadingElement("Loading competitions");
+        }
+
+        if (loadingCompetitionInfo) {
+            return loadingElement("Loading competition information");
+        }
+    };
+    return (
+        <div className="h-100 pb-2">
+            <div className="d-flex flex-lg-column align-items-center overflow-hidden">
+                <img
+                    className="tnoodle-logo mt-2"
+                    src={require("../assets/tnoodle_logo.svg")}
+                    alt="TNoodle logo"
+                />
+                <h1 className="display-3" id="title">
+                    TNoodle
+                </h1>
+                <button
+                    type="button"
+                    className="btn btn-primary btn-lg btn-outline-light ml-auto d-lg-none"
+                    onClick={() => setIsOpen(!isOpen)}
+                    disabled={generatingScrambles}
+                    aria-label="Toggle menu"
+                    aria-expanded={isOpen}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 30 30"
+                        width={30}
+                        height={30}
+                    >
+                        <path
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeMiterlimit={10}
+                            d="M4 7h22M4 15h22M4 23h22"
+                        />
+                    </svg>
+                </button>
+            </div>
+            <Collapse in={isOpen}>
+                <div className="pt-2">
+                    <div>
+                        <ul className="list-group">
+                            <li>
+                                {!!competitions && competitions.length > 0 && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary btn-lg btn-block btn-outline-light mb-1"
+                                        onClick={handleManualSelection}
+                                        disabled={generatingScrambles}
+                                    >
+                                        Manual Selection
+                                    </button>
+                                )}
+                            </li>
+                            {!!competitions &&
+                                competitions.map((competition) => (
+                                    <li key={competition.id}>
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary btn-lg btn-block m-1"
+                                            disabled={generatingScrambles}
+                                            onClick={() =>
+                                                handleCompetitionSelection(
+                                                    competition.id
+                                                )
+                                            }
+                                        >
+                                            {competition.name}
+                                        </button>
+                                    </li>
+                                ))}
+                        </ul>
+                        {loadingArea()}
+                    </div>
+                    {logInButton()}
+                </div>
+            </Collapse>
+        </div>
+    );
+};
 
 export default SideBar;

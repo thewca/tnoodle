@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, { useState } from "react";
 import _ from "lodash";
 import {
     updateFileZipBlob,
@@ -9,203 +8,144 @@ import {
     setSuggestedFmcTranslations,
 } from "../redux/ActionCreators";
 import "./FmcTranslationsDetail.css";
+import { useDispatch, useSelector } from "react-redux";
 
 const TRANSLATIONS_PER_LINE = 3;
 
-const mapStateToProps = (store) => ({
-    translations: store.translations,
-    suggestedFmcTranslations: store.suggestedFmcTranslations,
-    generatingScrambles: store.generatingScrambles,
-});
+const FmcTranslationsDetail = () => {
+    const [showTranslations, setShowTranslations] = useState(false);
 
-const mapDispatchToProps = {
-    updateFileZipBlob,
-    updateTranslation,
-    selectAllTranslations,
-    resetTranslations,
-    setSuggestedFmcTranslations,
-};
+    const suggestedFmcTranslations = useSelector(
+        (state) => state.suggestedFmcTranslations
+    );
+    const translations = useSelector((state) => state.translations);
+    const generatingScrambles = useSelector(
+        (state) => state.generatingScrambles
+    );
 
-const FmcTranslationsDetail = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(
-    class extends Component {
-        constructor() {
-            super();
-            this.state = { showTranslations: false };
-        }
+    const dispatch = useDispatch();
 
-        handleTranslation = (id, status) => {
-            this.props.updateFileZipBlob(null);
-            this.props.updateTranslation(id, status);
-        };
+    const handleTranslation = (id, status) => {
+        dispatch(updateFileZipBlob(null));
+        dispatch(updateTranslation(id, status));
+    };
 
-        selectAllTranslations = () => {
-            this.props.updateFileZipBlob(null);
-            this.props.selectAllTranslations();
-        };
+    const handleSelectAllTranslations = () => {
+        dispatch(updateFileZipBlob(null));
+        dispatch(selectAllTranslations());
+    };
 
-        selectNoneTranslation = () => {
-            this.props.updateFileZipBlob(null);
-            this.props.resetTranslations();
-        };
+    const selectNoneTranslation = () => {
+        dispatch(updateFileZipBlob(null));
+        dispatch(resetTranslations());
+    };
 
-        selectSuggestedTranslations = () => {
-            this.props.updateFileZipBlob(null);
-            this.props.setSuggestedFmcTranslations(
-                this.props.suggestedFmcTranslations
-            );
-        };
+    const selectSuggestedTranslations = () => {
+        dispatch(updateFileZipBlob(null));
+        dispatch(setSuggestedFmcTranslations(suggestedFmcTranslations));
+    };
 
-        toggleTranslations = () => {
-            this.setState({
-                ...this.state,
-                showTranslations: !this.state.showTranslations,
-            });
-        };
+    const translationsDetail = () => {
+        let translationsChunks = _.chunk(translations, TRANSLATIONS_PER_LINE);
+        return translationsChunks.map((translationsChunk, i) => (
+            <tr key={i}>
+                {translationsChunk.map((translation, j) => {
+                    let checkboxId = `fmc-${translation.id}`;
+                    return (
+                        <React.Fragment key={j}>
+                            <th>
+                                <label
+                                    className="fmc-label"
+                                    htmlFor={checkboxId}
+                                >
+                                    {translation.display}
+                                </label>
+                            </th>
+                            <th>
+                                <input
+                                    disabled={generatingScrambles}
+                                    type="checkbox"
+                                    id={checkboxId}
+                                    checked={translation.status}
+                                    onChange={(e) =>
+                                        handleTranslation(
+                                            translation.id,
+                                            e.target.checked
+                                        )
+                                    }
+                                />
+                            </th>
+                            {j < TRANSLATIONS_PER_LINE - 1 && <th />}
+                        </React.Fragment>
+                    );
+                })}
+            </tr>
+        ));
+    };
 
-        maybeShowFmcTranslationsDetails = () => {
-            if (
-                !this.state.showTranslations ||
-                this.props.translations == null
-            ) {
-                return;
-            }
-            let translations = _.chunk(
-                this.props.translations,
-                TRANSLATIONS_PER_LINE
-            );
-
-            return (
-                <React.Fragment>
+    if (!translations) {
+        return null;
+    }
+    return (
+        <tfoot>
+            <tr>
+                <th colSpan={4} className="text-center">
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => setShowTranslations(!showTranslations)}
+                        disabled={generatingScrambles}
+                    >
+                        Translations
+                    </button>
+                </th>
+            </tr>
+            {showTranslations && (
+                <>
                     <tr>
                         <th colSpan={4}>
-                            <button
-                                type="button"
-                                className="btn btn-outline-secondary"
-                                onClick={this.selectAllTranslations}
-                                disabled={this.props.generatingScrambles}
-                            >
-                                Select All
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-outline-secondary"
-                                onClick={this.selectNoneTranslation}
-                                disabled={this.props.generatingScrambles}
-                            >
-                                Select None
-                            </button>
-                            {this.props.suggestedFmcTranslations != null && (
+                            <div className="btn-group">
                                 <button
                                     type="button"
-                                    className="btn btn-outline-secondary"
-                                    onClick={this.selectSuggestedTranslations}
-                                    title="This selection is based on competitor's nationalities."
-                                    disabled={this.props.generatingScrambles}
+                                    className="btn btn-primary"
+                                    onClick={handleSelectAllTranslations}
+                                    disabled={generatingScrambles}
                                 >
-                                    Select Suggested
+                                    Select All
                                 </button>
-                            )}
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={selectNoneTranslation}
+                                    disabled={generatingScrambles}
+                                >
+                                    Select None
+                                </button>
+                                {!!suggestedFmcTranslations && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={selectSuggestedTranslations}
+                                        title="This selection is based on competitor's nationalities."
+                                        disabled={generatingScrambles}
+                                    >
+                                        Select Suggested
+                                    </button>
+                                )}
+                            </div>
                         </th>
                     </tr>
-
                     <tr>
                         <th colSpan={4} className="text-center">
                             <table className="table table-hover">
-                                <tbody>
-                                    {translations.map(
-                                        (translationsChunk, i) => (
-                                            <tr key={i}>
-                                                {translationsChunk.map(
-                                                    (translation, j) => {
-                                                        let checkboxId = `fmc-${translation.id}`;
-                                                        return (
-                                                            <React.Fragment
-                                                                key={j}
-                                                            >
-                                                                <th>
-                                                                    <label
-                                                                        className="fmc-label"
-                                                                        htmlFor={
-                                                                            checkboxId
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            translation.display
-                                                                        }
-                                                                    </label>
-                                                                </th>
-                                                                <th>
-                                                                    <input
-                                                                        disabled={
-                                                                            this
-                                                                                .props
-                                                                                .generatingScrambles
-                                                                        }
-                                                                        type="checkbox"
-                                                                        id={
-                                                                            checkboxId
-                                                                        }
-                                                                        checked={
-                                                                            translation.status
-                                                                        }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            this.handleTranslation(
-                                                                                translation.id,
-                                                                                e
-                                                                                    .target
-                                                                                    .checked
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </th>
-                                                                {j <
-                                                                    TRANSLATIONS_PER_LINE -
-                                                                        1 && (
-                                                                    <th />
-                                                                )}
-                                                            </React.Fragment>
-                                                        );
-                                                    }
-                                                )}
-                                            </tr>
-                                        )
-                                    )}
-                                </tbody>
+                                <tbody>{translationsDetail()}</tbody>
                             </table>
                         </th>
                     </tr>
-                </React.Fragment>
-            );
-        };
-
-        render() {
-            if (this.props.translations == null) {
-                return null;
-            }
-            return (
-                <tfoot>
-                    <tr>
-                        <th colSpan={4} className="text-center">
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={this.toggleTranslations}
-                                disabled={this.props.generatingScrambles}
-                            >
-                                Translations
-                            </button>
-                        </th>
-                    </tr>
-                    {this.maybeShowFmcTranslationsDetails()}
-                </tfoot>
-            );
-        }
-    }
-);
+                </>
+            )}
+        </tfoot>
+    );
+};
 
 export default FmcTranslationsDetail;
