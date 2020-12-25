@@ -12,8 +12,7 @@ import {
     setWcaEvents,
 } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const EVENTS_PER_LINE = 2;
 

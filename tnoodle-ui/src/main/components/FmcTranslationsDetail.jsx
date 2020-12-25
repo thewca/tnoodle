@@ -8,8 +8,7 @@ import {
     setSuggestedFmcTranslations,
 } from "../redux/ActionCreators";
 import "./FmcTranslationsDetail.css";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const TRANSLATIONS_PER_LINE = 3;
 

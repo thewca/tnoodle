@@ -5,8 +5,7 @@ import {
     updateFileZipBlob,
 } from "../redux/ActionCreators";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 const EntryInterface = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +34,7 @@ const EntryInterface = () => {
     };
 
     return (
-        <React.Fragment>
+        <>
             <div className="col-sm-4 text-left form-group">
                 <label className="font-weight-bold" htmlFor="competition-name">
                     Competition Name
@@ -75,7 +74,7 @@ const EntryInterface = () => {
                     </div>
                 </div>
             </div>
-        </React.Fragment>
+        </>
     );
 };
 

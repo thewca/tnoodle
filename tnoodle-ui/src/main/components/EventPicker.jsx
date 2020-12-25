@@ -9,8 +9,7 @@ import MbldDetail from "./MbldDetail";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import "./EventPicker.css";
 import { ProgressBar } from "react-bootstrap";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const EventPicker = ({ event, wcifEvent }) => {
     const wcaFormats = useSelector((state) => state.wcaFormats);
@@ -27,10 +26,8 @@ const EventPicker = ({ event, wcifEvent }) => {
 
     const dispatch = useDispatch();
 
-    const getWcaEvent = (rounds) => ({ id: event.id, rounds });
-
     const updateEvent = (rounds) => {
-        let wcaEvent = getWcaEvent(rounds);
+        let wcaEvent = { id: event.id, rounds };
         dispatch(updateFileZipBlob(null));
         dispatch(updateWcaEvent(wcaEvent));
     };
