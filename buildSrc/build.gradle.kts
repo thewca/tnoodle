@@ -8,5 +8,5 @@ repositories {
 }
 
 dependencies {
-    implementation("org.bouncycastle:bcprov-jdk15on:1.66")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.68")
 }
