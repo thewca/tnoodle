@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
+import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcGenericSolutionSheet
@@ -77,10 +78,21 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
             }
 
             if (wcifSchedule.isNotEmpty()) {
-                val orderedScramblesFolder = OrderedScramblesFolder(globalTitle, scrambleDrawingData)
-                val orderedScramblesNode = orderedScramblesFolder.assemble(wcifSchedule, generationDate, versionTag)
+                val drawingScrambleSets = scrambleDrawingData.scrambleSheets.map { it.scrambleSet }
 
-                folder(orderedScramblesNode)
+                if (wcifSchedule.containsAll(drawingScrambleSets)) {
+                    val orderedScramblesFolder = OrderedScramblesFolder(globalTitle, scrambleDrawingData)
+                    val orderedScramblesNode = orderedScramblesFolder.assemble(wcifSchedule, generationDate, versionTag)
+
+                    folder(orderedScramblesNode)
+                } else {
+                    val requiredIds = drawingScrambleSets.map { it.id }
+                    val unmatchedActivities = wcifSchedule.leafActivities
+                        .filter { it.activityCode.eventModel != null } // don't want to report that "lunch" or "other" is unmatched
+                        .filter { it.scrambleSetId !in requiredIds }
+
+                    LOGGER.warn("Skipping OrderedScrambles because there are unmatched activities: $unmatchedActivities")
+                }
             }
 
             val safeGlobalTitle = globalTitle.toFileSafeString()
@@ -92,7 +104,16 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
     }
 
     companion object {
+        val LOGGER = LoggerFactory.getLogger(PrintingFolder::class.java)
+
         private fun Schedule.isNotEmpty() = leafActivities.isNotEmpty()
+
+        private fun Schedule.containsAll(scrambleSets: Collection<ScrambleSet>): Boolean {
+            val scheduleMatchedIds = allActivities.mapNotNull { it.scrambleSetId }
+            val requiredIds = scrambleSets.map { it.id }
+
+            return scheduleMatchedIds.containsAll(requiredIds)
+        }
 
         val FMC_LOCALES_BY_TAG = Translate.TRANSLATED_LOCALES.associateBy { it.toLanguageTag() }
     }
