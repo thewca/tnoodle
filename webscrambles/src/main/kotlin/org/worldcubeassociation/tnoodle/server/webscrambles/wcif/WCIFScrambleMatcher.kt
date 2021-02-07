@@ -270,6 +270,8 @@ object WCIFScrambleMatcher {
         }
 
         val matchedRound = findRound(events, activity)
+            ?: return activity
+
         val actGroup = activity.activityCode.groupNumber
 
         // uh oh. no child activities where there should be some.
@@ -305,11 +307,10 @@ object WCIFScrambleMatcher {
         return activity.copy(scrambleSetId = scrambleSet.id)
     }
 
-    private fun findRound(events: List<Event>, activity: Activity): Round {
+    private fun findRound(events: List<Event>, activity: Activity): Round? {
         return events
             .filter { it.id == activity.activityCode.eventId }
             .flatMap { it.rounds }
             .find { it.idCode.isParentOf(activity.activityCode) }
-            ?: ScrambleMatchingException.error("An activity of the schedule did not match an event: $activity")
     }
 }
