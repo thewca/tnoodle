@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./App";
-import * as serviceWorker from "./serviceWorker";
-
 import { Provider } from "react-redux";
+import App from "./App";
+import "./index.css";
 import store from "./main/redux/Store";
+import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
     <Provider store={store}>
@@ -14,4 +13,4 @@ ReactDOM.render(
     document.getElementById("root")
 );
 
-serviceWorker.unregister();
+reportWebVitals();

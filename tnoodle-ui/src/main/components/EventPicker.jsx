@@ -1,15 +1,15 @@
 import React from "react";
-import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
-import { updateWcaEvent, updateFileZipBlob } from "../redux/ActionCreators";
-import {
-    getDefaultCopiesExtension,
-    copiesExtensionId,
-} from "../helper/wcif.helper";
-import MbldDetail from "./MbldDetail";
-import FmcTranslationsDetail from "./FmcTranslationsDetail";
-import "./EventPicker.css";
 import { ProgressBar } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
+import {
+    copiesExtensionId,
+    getDefaultCopiesExtension,
+} from "../helper/wcif.helper";
+import { updateFileZipBlob, updateWcaEvent } from "../redux/ActionCreators";
+import "./EventPicker.css";
+import FmcTranslationsDetail from "./FmcTranslationsDetail";
+import MbldDetail from "./MbldDetail";
 
 const EventPicker = ({ event, wcifEvent }) => {
     const wcaFormats = useSelector((state) => state.wcaFormats);
@@ -209,8 +209,8 @@ const EventPicker = ({ event, wcifEvent }) => {
                     <th scope="col" className="align-middle secondColumn">
                         <img
                             className="img-thumbnail cubingIcon"
-                            src={require(`../assets/cubing-icon/${event.id}.svg`)}
-                            alt="TNoodle logo"
+                            src={`assets/cubing-icon/${event.id}.svg`}
+                            alt={`${event.id} icon`}
                         />
                     </th>
                     <th className="align-middle lastTwoColumns" scope="col">
