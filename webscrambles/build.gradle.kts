@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
+import configurations.CompilerSettings.KOTLIN_USE_IR_COMPILER
 import configurations.FileUtils.symlink
 import configurations.Frameworks.configureJUnit5
 import configurations.Languages.attachRemoteRepositories
@@ -73,6 +74,7 @@ configureJUnit5()
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
+    kotlinOptions.useIR = KOTLIN_USE_IR_COMPILER
 }
 
 application {
