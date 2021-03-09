@@ -60,14 +60,16 @@ const EventPickerTable = () => {
                         {wcif.events.length > 1 ? "s" : ""} for {wcif.name}.
                     </p>
                     <p>
-                        You can view and change the rounds over on
+                        You can view and change the rounds over on{" "}
                         <a
                             href={toWcaUrl(
                                 `/competitions/${competitionId}/events/edit`
                             )}
                         >
-                            the WCA.
+                            {" "}
+                            the WCA
                         </a>
+                        .{" "}
                         <strong>
                             Refresh this page after making any changes on the
                             WCA website.
