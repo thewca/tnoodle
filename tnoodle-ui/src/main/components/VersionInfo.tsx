@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchRunningVersion } from "../api/tnoodle.api";
 import { fetchVersionInfo } from "../api/wca.api";
+import CurrentTnoodle from "../model/CurrentTnoodle";
 import { updateOfficialZipStatus } from "../redux/ActionCreators";
 
 const VersionInfo = () => {
-    const [currentTnoodle, setCurrentTnoodle] = useState(null);
-    const [allowedTnoodleVersions, setAllowedTnoodleVersions] = useState(null);
-    const [runningVersion, setRunningVersion] = useState(null);
-    const [signedBuild, setSignedBuild] = useState(null);
-    const [signatureKeyBytes, setSignatureKeyBytes] = useState(null);
-    const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState(null);
+    const [currentTnoodle, setCurrentTnoodle] = useState<CurrentTnoodle>();
+    const [allowedTnoodleVersions, setAllowedTnoodleVersions] = useState<
+        string[]
+    >();
+    const [runningVersion, setRunningVersion] = useState<string>();
+    const [signedBuild, setSignedBuild] = useState<boolean>();
+    const [signatureKeyBytes, setSignatureKeyBytes] = useState<string>();
+    const [wcaPublicKeyBytes, setWcaPublicKeyBytes] = useState<string>();
     const [signatureValid, setSignatureValid] = useState(true);
 
     useEffect(
         () =>
             setSignatureValid(
-                signedBuild && signatureKeyBytes === wcaPublicKeyBytes
+                !!signedBuild && signatureKeyBytes === wcaPublicKeyBytes
             ),
         [signedBuild, signatureKeyBytes, wcaPublicKeyBytes]
     );
@@ -76,14 +79,14 @@ const VersionInfo = () => {
     }
 
     // Running version is not the most recent release
-    if (runningVersion !== currentTnoodle.name) {
+    if (runningVersion !== currentTnoodle?.name) {
         // Running version is allowed, but not the latest.
         if (allowedTnoodleVersions.includes(runningVersion)) {
             return (
                 <div className="alert alert-info m-0">
                     You are running {runningVersion}, which is still allowed,
-                    but you should upgrade to {currentTnoodle.name} available{" "}
-                    <a href={currentTnoodle.download}>here</a> as soon as
+                    but you should upgrade to {currentTnoodle?.name} available{" "}
+                    <a href={currentTnoodle?.download}>here</a> as soon as
                     possible.
                 </div>
             );
@@ -94,7 +97,7 @@ const VersionInfo = () => {
                 You are running {runningVersion}, which is not allowed. Do not
                 use scrambles generated in any official competition and consider
                 downloading the latest version{" "}
-                <a href={currentTnoodle.download}>here</a>.
+                <a href={currentTnoodle?.download}>here</a>.
             </div>
         );
     }
