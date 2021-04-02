@@ -3,6 +3,6 @@ import Extension from "./Extension";
 export default interface Round {
     format: string;
     id: string;
-    scrambleSetCount: number;
+    scrambleSetCount: string;
     extensions: Extension[];
 }

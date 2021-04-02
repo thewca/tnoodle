@@ -1,7 +1,7 @@
-import WcaEvent from "./WcaEvent";
+import WcifEvent from "./WcifEvent";
 
 export default interface Wcif {
     name: string;
     id: string;
-    events: WcaEvent[];
+    events: WcifEvent[];
 }

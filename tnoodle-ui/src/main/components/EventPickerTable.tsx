@@ -110,13 +110,13 @@ const EventPickerTable = () => {
             {eventChunks.map((chunk, i) => {
                 return (
                     <div className="row p-0" key={i}>
-                        {chunk.map((event) => {
+                        {chunk.map((wcaEvent) => {
                             return (
-                                <div className="col-lg-6" key={event.id}>
+                                <div className="col-lg-6" key={wcaEvent.id}>
                                     <EventPicker
-                                        event={event}
+                                        wcaEvent={wcaEvent}
                                         wcifEvent={wcif.events.find(
-                                            (item) => item.id === event.id
+                                            (item) => item.id === wcaEvent.id
                                         )}
                                     />
                                 </div>

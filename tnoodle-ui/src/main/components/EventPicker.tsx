@@ -1,45 +1,59 @@
 import { useEffect, useState } from "react";
-import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
-import { updateWcaEvent, updateFileZipBlob } from "../redux/ActionCreators";
-import {
-    getDefaultCopiesExtension,
-    copiesExtensionId,
-} from "../util/wcif.util";
-import MbldDetail from "./MbldDetail";
-import FmcTranslationsDetail from "./FmcTranslationsDetail";
-import "./EventPicker.css";
 import { ProgressBar } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
+import RootState from "../model/RootState";
+import Round from "../model/Round";
+import WcaEvent from "../model/WcaEvent";
+import WcifEvent from "../model/WcifEvent";
+import { updateFileZipBlob, updateWcaEvent } from "../redux/ActionCreators";
+import {
+    copiesExtensionId,
+    getDefaultCopiesExtension,
+} from "../util/wcif.util";
+import "./EventPicker.css";
+import FmcTranslationsDetail from "./FmcTranslationsDetail";
+import MbldDetail from "./MbldDetail";
 
-const EventPicker = ({ event, wcifEvent }) => {
-    const wcaFormats = useSelector((state) => state.wcaFormats);
-    const editingDisabled = useSelector((state) => state.editingDisabled);
+interface EventPickerProps {
+    wcaEvent: WcaEvent;
+    wcifEvent?: WcifEvent;
+}
+
+const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
+    const wcaFormats = useSelector((state: RootState) => state.wcaFormats);
+    const editingDisabled = useSelector(
+        (state: RootState) => state.editingDisabled
+    );
     const generatingScrambles = useSelector(
-        (state) => state.generatingScrambles
+        (state: RootState) => state.generatingScrambles
     );
     const scramblingProgressCurrent = useSelector(
-        (state) => state.scramblingProgressCurrent
+        (state: RootState) => state.scramblingProgressCurrent
     );
     const scramblingProgressTarget = useSelector(
-        (state) => state.scramblingProgressTarget
+        (state: RootState) => state.scramblingProgressTarget
     );
 
     const dispatch = useDispatch();
 
-    const updateEvent = (rounds) => {
-        let wcaEvent = { id: event.id, rounds };
+    const updateEvent = (rounds: Round[]) => {
+        let event = { id: wcaEvent.id, rounds };
         dispatch(updateFileZipBlob(null));
-        dispatch(updateWcaEvent(wcaEvent));
+        dispatch(updateWcaEvent(event));
     };
     const [image, setImage] = useState();
 
     useEffect(() => {
-        import(`../assets/cubing-icon/${event.id}.svg`).then((response) =>
+        import(`../assets/cubing-icon/${wcaEvent.id}.svg`).then((response) =>
             setImage(response.default)
         );
-    }, [event.id]);
+    }, [wcaEvent.id]);
 
-    const handleNumberOfRoundsChange = (numberOfRounds, rounds) => {
+    const handleNumberOfRoundsChange = (
+        numberOfRounds: number,
+        rounds: Round[]
+    ) => {
         // Ajust the number of rounds in case we have to remove
         while (rounds.length > numberOfRounds) {
             rounds.pop();
@@ -48,31 +62,43 @@ const EventPicker = ({ event, wcifEvent }) => {
         // case we have to add
         while (rounds.length < numberOfRounds) {
             rounds.push({
-                id: event.id + "-r" + (rounds.length + 1),
-                format: event.format_ids[0],
-                scrambleSetCount: 1,
+                id: wcaEvent.id + "-r" + (rounds.length + 1),
+                format: wcaEvent.format_ids[0],
+                scrambleSetCount: "1",
                 extensions: [getDefaultCopiesExtension()],
             });
         }
         updateEvent(rounds);
     };
 
-    const handleGeneralRoundChange = (round, value, rounds, name) => {
+    const handleGeneralRoundChange = (
+        round: number,
+        value: string,
+        rounds: Round[],
+        name: "format" | "scrambleSetCount"
+    ) => {
         rounds[round][name] = value;
         updateEvent(rounds);
     };
 
-    const handleNumberOfCopiesChange = (round, value, rounds) => {
-        rounds[round].extensions.find(
+    const handleNumberOfCopiesChange = (
+        round: number,
+        value: any,
+        rounds: Round[]
+    ) => {
+        let data = rounds[round].extensions.find(
             (extension) => extension.id === copiesExtensionId
-        ).data.numCopies = value;
+        )?.data;
+        if (!!data) {
+            data.numCopies = value;
+        }
         updateEvent(rounds);
     };
 
-    const abbreviate = (str) =>
+    const abbreviate = (str: string) =>
         !!wcaFormats ? wcaFormats[str].shortName : "-";
 
-    const maybeShowTableTitles = (rounds) => {
+    const maybeShowTableTitles = (rounds: Round[]) => {
         if (rounds.length === 0) {
             return null;
         }
@@ -86,7 +112,7 @@ const EventPicker = ({ event, wcifEvent }) => {
         );
     };
 
-    const maybeShowTableBody = (rounds) => {
+    const maybeShowTableBody = (rounds: Round[]) => {
         if (rounds.length === 0) {
             return;
         }
@@ -96,7 +122,7 @@ const EventPicker = ({ event, wcifEvent }) => {
                 {Array.from({ length: rounds.length }, (_, i) => {
                     let copies = rounds[i].extensions.find(
                         (extension) => extension.id === copiesExtensionId
-                    ).data.numCopies;
+                    )?.data.numCopies;
                     return (
                         <tr key={i} className="form-group">
                             <th scope="row" className="align-middle">
@@ -118,7 +144,7 @@ const EventPicker = ({ event, wcifEvent }) => {
                                         editingDisabled || generatingScrambles
                                     }
                                 >
-                                    {event.format_ids.map((format) => (
+                                    {wcaEvent.format_ids.map((format) => (
                                         <option key={format} value={format}>
                                             {abbreviate(format)}
                                         </option>
@@ -169,8 +195,8 @@ const EventPicker = ({ event, wcifEvent }) => {
         );
     };
 
-    const maybeShowProgressBar = (rounds) => {
-        let eventId = event.id;
+    const maybeShowProgressBar = (rounds: Round[]) => {
+        let eventId = wcaEvent.id;
 
         let current = scramblingProgressCurrent[eventId] || 0;
         let target = scramblingProgressTarget[eventId];
@@ -200,7 +226,7 @@ const EventPicker = ({ event, wcifEvent }) => {
         );
     };
 
-    let rounds = !!wcifEvent ? wcifEvent.rounds : [];
+    let rounds = wcifEvent?.rounds || [];
 
     return (
         <table className="table table-sm shadow rounded">
@@ -217,11 +243,11 @@ const EventPicker = ({ event, wcifEvent }) => {
                         <img
                             className="img-thumbnail cubingIcon"
                             src={image}
-                            alt={event.name}
+                            alt={wcaEvent.name}
                         />
                     </th>
                     <th className="align-middle lastTwoColumns" scope="col">
-                        <h5 className="font-weight-bold">{event.name}</h5>
+                        <h5 className="font-weight-bold">{wcaEvent.name}</h5>
                         {maybeShowProgressBar(rounds)}
                     </th>
                     <th className="lastTwoColumns" scope="col">
@@ -231,7 +257,7 @@ const EventPicker = ({ event, wcifEvent }) => {
                             value={rounds.length}
                             onChange={(evt) =>
                                 handleNumberOfRoundsChange(
-                                    evt.target.value,
+                                    Number(evt.target.value),
                                     rounds
                                 )
                             }
@@ -251,10 +277,10 @@ const EventPicker = ({ event, wcifEvent }) => {
                 {maybeShowTableTitles(rounds)}
             </thead>
             {maybeShowTableBody(rounds)}
-            {event.is_multiple_blindfolded && rounds.length > 0 && (
+            {wcaEvent.is_multiple_blindfolded && rounds.length > 0 && (
                 <MbldDetail />
             )}
-            {event.is_fewest_moves && rounds.length > 0 && (
+            {wcaEvent.is_fewest_moves && rounds.length > 0 && (
                 <FmcTranslationsDetail />
             )}
         </table>
