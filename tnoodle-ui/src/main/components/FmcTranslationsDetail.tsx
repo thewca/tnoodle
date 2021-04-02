@@ -1,14 +1,15 @@
+import { chunk } from "lodash";
 import React, { useState } from "react";
-import _ from "lodash";
+import { useDispatch, useSelector } from "react-redux";
+import RootState from "../model/RootState";
 import {
+    resetTranslations,
+    selectAllTranslations,
+    setSuggestedFmcTranslations,
     updateFileZipBlob,
     updateTranslation,
-    selectAllTranslations,
-    resetTranslations,
-    setSuggestedFmcTranslations,
 } from "../redux/ActionCreators";
 import "./FmcTranslationsDetail.css";
-import { useDispatch, useSelector } from "react-redux";
 
 const TRANSLATIONS_PER_LINE = 3;
 
@@ -16,16 +17,16 @@ const FmcTranslationsDetail = () => {
     const [showTranslations, setShowTranslations] = useState(false);
 
     const suggestedFmcTranslations = useSelector(
-        (state) => state.suggestedFmcTranslations
+        (state: RootState) => state.suggestedFmcTranslations
     );
-    const translations = useSelector((state) => state.translations);
+    const translations = useSelector((state: RootState) => state.translations);
     const generatingScrambles = useSelector(
-        (state) => state.generatingScrambles
+        (state: RootState) => state.generatingScrambles
     );
 
     const dispatch = useDispatch();
 
-    const handleTranslation = (id, status) => {
+    const handleTranslation = (id: string, status: boolean) => {
         dispatch(updateFileZipBlob(null));
         dispatch(updateTranslation(id, status));
     };
@@ -46,7 +47,7 @@ const FmcTranslationsDetail = () => {
     };
 
     const translationsDetail = () => {
-        let translationsChunks = _.chunk(translations, TRANSLATIONS_PER_LINE);
+        let translationsChunks = chunk(translations, TRANSLATIONS_PER_LINE);
         return translationsChunks.map((translationsChunk, i) => (
             <tr key={i}>
                 {translationsChunk.map((translation, j) => {
@@ -58,7 +59,7 @@ const FmcTranslationsDetail = () => {
                                     className="fmc-label"
                                     htmlFor={checkboxId}
                                 >
-                                    {translation.display}
+                                    {translation.name}
                                 </label>
                             </th>
                             <th>

@@ -38,7 +38,7 @@ const EventPickerTable = () => {
             let translations = Object.keys(availableTranslations).map(
                 (translationId) => ({
                     id: translationId,
-                    display: availableTranslations[translationId],
+                    name: availableTranslations[translationId],
                     status: true,
                 })
             );
