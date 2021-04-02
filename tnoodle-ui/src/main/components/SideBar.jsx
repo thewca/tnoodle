@@ -29,8 +29,9 @@ import {
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 import {
     getQueryParameter,
-    removeQueryParam,
+    deleteParameter,
     updateQueryParam,
+    setQueryParameter,
 } from "../util/query.param.util";
 import Loading from "./Loading";
 import "./SideBar.css";
@@ -96,11 +97,11 @@ const SideBar = () => {
         dispatch(updateFileZipBlob(null));
         dispatch(addSuggestedFmcTranslations(null));
 
-        removeQueryParam("competitionId");
+        deleteParameter("competitionId");
     };
 
     const handleCompetitionSelection = (competitionId) => {
-        updateQueryParam("competitionId", competitionId);
+        setQueryParameter("competitionId", competitionId);
 
         // For quick switching between competitions.
         let cachedObject = cachedObjects[competitionId];
