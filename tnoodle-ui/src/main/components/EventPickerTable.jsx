@@ -41,7 +41,10 @@ const EventPickerTable = () => {
     };
 
     const fetchInformation = () => {
-        fetchFormats().then((response) => dispatch(setWcaFormats(response)));
+        fetchFormats().then((response) => {
+            console.log(response);
+            dispatch(setWcaFormats(response));
+        });
         fetchWcaEvents().then((response) => dispatch(setWcaEvents(response)));
         getFmcTranslations();
     };

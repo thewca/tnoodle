@@ -5,3 +5,5 @@ coverage
 
 public/manifest.json
 src/serviceWorker.js
+
+yarn.lock

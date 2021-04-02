@@ -1,4 +1,4 @@
-let backendUrl = new URL(window.location.origin);
+let backendUrl = new URL("http://localhost:2014");
 export const tNoodleBackend = backendUrl.toString().replace(/\/$/g, "");
 
 let zipEndpoint = "/wcif/zip";

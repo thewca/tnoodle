@@ -210,7 +210,7 @@ const EventPicker = ({ event, wcifEvent }) => {
                         <img
                             className="img-thumbnail cubingIcon"
                             src={require(`../assets/cubing-icon/${event.id}.svg`)}
-                            alt="TNoodle logo"
+                            alt={event.name}
                         />
                     </th>
                     <th className="align-middle lastTwoColumns" scope="col">

@@ -1,39 +1,41 @@
 import React, { useEffect, useState } from "react";
-import Loading from "./Loading";
 import { Collapse } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
 import {
-    updateWcif,
-    updateEditingStatus,
-    updateCompetitionName,
-    updateCompetitions,
-    updateMe,
-    updateCompetitionId,
-    updateFileZipBlob,
-    addCachedObject,
-    addSuggestedFmcTranslations,
-    setBestMbldAttempt,
-} from "../redux/ActionCreators";
-import { defaultWcif } from "../constants/default.wcif";
+    fetchBestMbldAttempt,
+    fetchSuggestedFmcTranslations,
+} from "../api/tnoodle.api";
 import {
+    fetchMe,
+    getCompetitionJson,
+    getUpcomingManageableCompetitions,
     isLogged,
     logIn,
     logOut,
-    fetchMe,
-    getUpcomingManageableCompetitions,
-    getCompetitionJson,
 } from "../api/wca.api";
+import { defaultWcif } from "../constants/default.wcif";
+import {
+    addCachedObject,
+    addSuggestedFmcTranslations,
+    setBestMbldAttempt,
+    updateCompetitionId,
+    updateCompetitionName,
+    updateCompetitions,
+    updateEditingStatus,
+    updateFileZipBlob,
+    updateMe,
+    updateWcif,
+} from "../redux/ActionCreators";
+import { getDefaultCompetitionName } from "../util/competition.name.util";
 import {
     getQueryParameter,
     removeQueryParam,
     updateQueryParam,
 } from "../util/query.param.util";
-import {
-    fetchSuggestedFmcTranslations,
-    fetchBestMbldAttempt,
-} from "../api/tnoodle.api";
-import { getDefaultCompetitionName } from "../util/competition.name.util";
+import Loading from "./Loading";
 import "./SideBar.css";
-import { useSelector, useDispatch } from "react-redux";
+
+import logo from "../assets/tnoodle_logo.svg";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -234,7 +236,7 @@ const SideBar = () => {
             <div className="d-flex flex-lg-column align-items-center overflow-hidden">
                 <img
                     className="tnoodle-logo mt-2"
-                    src={require("../assets/tnoodle_logo.svg")}
+                    src={logo}
                     alt="TNoodle logo"
                 />
                 <h1 className="display-3" id="title">
