@@ -1,33 +1,36 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import RootState from "../model/RootState";
 import {
-    updatePassword,
     updateCompetitionName,
     updateFileZipBlob,
+    updatePassword,
 } from "../redux/ActionCreators";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useSelector, useDispatch } from "react-redux";
 
 const EntryInterface = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const editingDisabled = useSelector((state) => state.editingDisabled);
-    const password = useSelector((state) => state.password);
-    const competitionName = useSelector((state) => state.wcif.name);
+    const editingDisabled = useSelector(
+        (state: RootState) => state.editingDisabled
+    );
+    const password = useSelector((state: RootState) => state.password);
+    const competitionName = useSelector((state: RootState) => state.wcif.name);
     const generatingScrambles = useSelector(
-        (state) => state.generatingScrambles
+        (state: RootState) => state.generatingScrambles
     );
 
     const dispatch = useDispatch();
 
-    const handleCompetitionNameChange = (event) => {
-        dispatch(updateCompetitionName(event.target.value));
+    const handleCompetitionNameChange = (name: string) => {
+        dispatch(updateCompetitionName(name));
 
         // Require another zip with the new name.
         dispatch(updateFileZipBlob(null));
     };
 
-    const handlePasswordChange = (evt) => {
-        dispatch(updatePassword(evt.target.value));
+    const handlePasswordChange = (password: string) => {
+        dispatch(updatePassword(password));
 
         // Require another zip with the new password, in case there was a zip generated.
         dispatch(updateFileZipBlob(null));
@@ -43,7 +46,9 @@ const EntryInterface = () => {
                     id="competition-name"
                     className="form-control"
                     placeholder="Competition Name"
-                    onChange={handleCompetitionNameChange}
+                    onChange={(e) =>
+                        handleCompetitionNameChange(e.target.value)
+                    }
                     value={competitionName}
                     disabled={editingDisabled || generatingScrambles}
                     required
@@ -60,7 +65,7 @@ const EntryInterface = () => {
                         className="form-control"
                         placeholder="Password"
                         type={showPassword ? "" : "password"}
-                        onChange={handlePasswordChange}
+                        onChange={(e) => handlePasswordChange(e.target.value)}
                         value={password}
                         disabled={generatingScrambles}
                     />
