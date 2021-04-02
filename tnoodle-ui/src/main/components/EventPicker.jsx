@@ -4,7 +4,7 @@ import { updateWcaEvent, updateFileZipBlob } from "../redux/ActionCreators";
 import {
     getDefaultCopiesExtension,
     copiesExtensionId,
-} from "../helper/wcif.helper";
+} from "../util/wcif.util";
 import MbldDetail from "./MbldDetail";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import "./EventPicker.css";

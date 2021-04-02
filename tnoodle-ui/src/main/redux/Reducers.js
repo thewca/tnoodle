@@ -1,8 +1,7 @@
-import { ActionTypes } from "./Types";
-import { defaultWcif } from "../constants/default.wcif";
 import { MBLD_DEFAULT } from "../constants/wca.constants";
-import { getDefaultCopiesExtension } from "../helper/wcif.helper";
 import { competitionName2Id } from "../util/competition.name.util";
+import { defaultWcif, getDefaultCopiesExtension } from "../util/wcif.util";
+import { ActionTypes } from "./Types";
 
 const defaultStore = {
     wcif: defaultWcif,

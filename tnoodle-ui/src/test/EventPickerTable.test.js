@@ -18,7 +18,7 @@ import {
     updateWcaEvent,
 } from "../main/redux/ActionCreators";
 
-import { getDefaultCopiesExtension } from "../main/helper/wcif.helper";
+import { getDefaultCopiesExtension } from "../main/util/wcif.util";
 
 import { fireEvent } from "@testing-library/react";
 

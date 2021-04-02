@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Collapse } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,7 +13,8 @@ import {
     logIn,
     logOut,
 } from "../api/wca.api";
-import { defaultWcif } from "../constants/default.wcif";
+import logo from "../assets/tnoodle_logo.svg";
+import { defaultWcif } from "../util/wcif.util";
 import {
     addCachedObject,
     addSuggestedFmcTranslations,
@@ -28,15 +29,12 @@ import {
 } from "../redux/ActionCreators";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 import {
-    getQueryParameter,
     deleteParameter,
-    updateQueryParam,
+    getQueryParameter,
     setQueryParameter,
 } from "../util/query.param.util";
 import Loading from "./Loading";
 import "./SideBar.css";
-
-import logo from "../assets/tnoodle_logo.svg";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);

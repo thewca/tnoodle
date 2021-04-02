@@ -1,5 +1,20 @@
-import { getDefaultCopiesExtension } from "../helper/wcif.helper";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
+
+export const copiesExtensionId =
+    "org.worldcubeassociation.tnoodle.SheetCopyCount";
+/**
+ * This is the default extension object the backend expects
+ * @param {} copies
+ */
+export const getDefaultCopiesExtension = () => {
+    return {
+        id: copiesExtensionId,
+        specUrl: "",
+        data: {
+            numCopies: 1,
+        },
+    };
+};
 
 // Add 1 round of 3x3x3
 let default333 = {
