@@ -1,5 +1,5 @@
 import { chunk } from "lodash";
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     fetchAvailableFmcTranslations,
@@ -7,6 +7,8 @@ import {
     fetchWcaEvents,
 } from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
+import RootState from "../model/RootState";
+import WcaEvent from "../model/WcaEvent";
 import {
     setWcaEvents,
     setWcaFormats,
@@ -17,10 +19,14 @@ import EventPicker from "./EventPicker";
 const EVENTS_PER_LINE = 2;
 
 const EventPickerTable = () => {
-    const competitionId = useSelector((state) => state.competitionId);
-    const wcif = useSelector((state) => state.wcif);
-    const wcaEvents = useSelector((state) => state.wcaEvents);
-    const editingDisabled = useSelector((state) => state.editingDisabled);
+    const competitionId = useSelector(
+        (state: RootState) => state.competitionId
+    );
+    const wcif = useSelector((state: RootState) => state.wcif);
+    const wcaEvents = useSelector((state: RootState) => state.wcaEvents);
+    const editingDisabled = useSelector(
+        (state: RootState) => state.editingDisabled
+    );
 
     const dispatch = useDispatch();
 
@@ -44,7 +50,9 @@ const EventPickerTable = () => {
         fetchFormats().then((response) => {
             dispatch(setWcaFormats(response));
         });
-        fetchWcaEvents().then((response) => dispatch(setWcaEvents(response)));
+        fetchWcaEvents().then((response: WcaEvent[]) =>
+            dispatch(setWcaEvents(response))
+        );
         getFmcTranslations();
     };
 
