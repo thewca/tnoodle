@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import _ from "lodash";
+import { chunk } from "lodash";
+import React, { useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
     fetchAvailableFmcTranslations,
     fetchFormats,
@@ -7,12 +8,11 @@ import {
 } from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
 import {
-    updateTranslations,
-    setWcaFormats,
     setWcaEvents,
+    setWcaFormats,
+    updateTranslations,
 } from "../redux/ActionCreators";
 import EventPicker from "./EventPicker";
-import { useDispatch, useSelector } from "react-redux";
 
 const EVENTS_PER_LINE = 2;
 
@@ -24,7 +24,7 @@ const EventPickerTable = () => {
 
     const dispatch = useDispatch();
 
-    const getFmcTranslations = () => {
+    const getFmcTranslations = useCallback(() => {
         fetchAvailableFmcTranslations().then((availableTranslations) => {
             if (!availableTranslations) {
                 return;
@@ -38,18 +38,17 @@ const EventPickerTable = () => {
             );
             dispatch(updateTranslations(translations));
         });
-    };
+    }, [dispatch]);
 
     const fetchInformation = () => {
         fetchFormats().then((response) => {
-            console.log(response);
             dispatch(setWcaFormats(response));
         });
         fetchWcaEvents().then((response) => dispatch(setWcaEvents(response)));
         getFmcTranslations();
     };
 
-    useEffect(fetchInformation, []);
+    useEffect(fetchInformation, [dispatch, getFmcTranslations]);
 
     const maybeShowEditWarning = () => {
         if (!competitionId) {
@@ -95,7 +94,7 @@ const EventPickerTable = () => {
             wcif.events.find((item) => item.id === wcaEvent.id)
     );
 
-    let eventChunks = _.chunk(filteredEvents, EVENTS_PER_LINE);
+    let eventChunks = chunk(filteredEvents, EVENTS_PER_LINE);
 
     return (
         <div className="container-fluid mt-2">

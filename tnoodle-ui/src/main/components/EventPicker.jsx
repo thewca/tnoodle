@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
 import { updateWcaEvent, updateFileZipBlob } from "../redux/ActionCreators";
 import {
@@ -34,11 +34,10 @@ const EventPicker = ({ event, wcifEvent }) => {
     const [image, setImage] = useState();
 
     useEffect(() => {
-        import(`../assets/cubing-icon/${event.id}.svg`).then((response) => {
-            console.log(response);
-            setImage(response.default);
-        });
-    }, []);
+        import(`../assets/cubing-icon/${event.id}.svg`).then((response) =>
+            setImage(response.default)
+        );
+    }, [event.id]);
 
     const handleNumberOfRoundsChange = (numberOfRounds, rounds) => {
         // Ajust the number of rounds in case we have to remove

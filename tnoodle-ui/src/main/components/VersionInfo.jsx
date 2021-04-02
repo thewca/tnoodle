@@ -47,7 +47,7 @@ const VersionInfo = () => {
             setSignedBuild(response.signedBuild);
             setSignatureKeyBytes(response.signatureKeyBytes);
         });
-    }, []);
+    }, [dispatch, signatureValid]);
 
     // This avoids global state update while rendering
     const analyzeVerion = () => {
@@ -63,7 +63,12 @@ const VersionInfo = () => {
             )
         );
     };
-    useEffect(analyzeVerion, [allowedTnoodleVersions, runningVersion]);
+    useEffect(analyzeVerion, [
+        allowedTnoodleVersions,
+        dispatch,
+        runningVersion,
+        signatureValid,
+    ]);
 
     // We cannot analyze TNoodle version here. We do not bother the user.
     if (!runningVersion || !allowedTnoodleVersions) {

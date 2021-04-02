@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Collapse } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,7 +14,6 @@ import {
     logOut,
 } from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
-import { defaultWcif } from "../util/wcif.util";
 import {
     addCachedObject,
     addSuggestedFmcTranslations,
@@ -33,6 +32,7 @@ import {
     getQueryParameter,
     setQueryParameter,
 } from "../util/query.param.util";
+import { defaultWcif } from "../util/wcif.util";
 import Loading from "./Loading";
 import "./SideBar.css";
 
@@ -82,7 +82,6 @@ const SideBar = () => {
             handleCompetitionSelection(competitionId);
         }
     };
-    useEffect(init, []);
 
     const pluralize = (string, number) => string + (number > 1 ? "s" : "");
 
@@ -98,90 +97,116 @@ const SideBar = () => {
         deleteParameter("competitionId");
     };
 
-    const handleCompetitionSelection = (competitionId) => {
-        setQueryParameter("competitionId", competitionId);
+    const getAndCacheBestMbldAttempt = useCallback(
+        (wcif) => {
+            fetchBestMbldAttempt(wcif).then((bestAttempt) => {
+                if (!bestAttempt) {
+                    return;
+                }
+                let attempted = bestAttempt.attempted;
+                dispatch(
+                    addCachedObject(wcif.id, "bestMbldAttempt", attempted)
+                );
+                dispatch(setBestMbldAttempt(attempted));
+            });
+        },
+        [dispatch]
+    );
 
-        // For quick switching between competitions.
-        let cachedObject = cachedObjects[competitionId];
-        if (!!cachedObject) {
-            let cachedWcif = cachedObject.wcif;
-            setWcif(cachedWcif);
-            maybeAddCompetition(cachedWcif.id, cachedWcif.name);
-
-            let cachedSuggestedFmcTranslations =
-                cachedObject.suggestedFmcTranslations;
-            dispatch(
-                addSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
-            );
-
-            let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
-            dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
-        } else {
-            setLoadingCompetitionInfo(true);
-
-            getCompetitionJson(competitionId)
-                .then((wcif) => {
-                    setWcif(wcif);
-                    dispatch(addCachedObject(competitionId, "wcif", wcif));
-                    maybeAddCompetition(wcif.id, wcif.name);
-                    getAndCacheSuggestedFmcTranslations(wcif);
-                    getAndCacheBestMbldAttempt(wcif);
-                })
-                .finally(() => setLoadingCompetitionInfo(false));
-        }
-    };
-
-    const getAndCacheSuggestedFmcTranslations = (wcif) => {
-        fetchSuggestedFmcTranslations(wcif).then((translations) => {
-            dispatch(
-                addCachedObject(
-                    wcif.id,
-                    "suggestedFmcTranslations",
-                    translations
-                )
-            );
-            dispatch(addSuggestedFmcTranslations(translations));
-        });
-    };
-
-    const getAndCacheBestMbldAttempt = (wcif) => {
-        fetchBestMbldAttempt(wcif).then((bestAttempt) => {
-            if (!bestAttempt) {
-                return;
-            }
-            let attempted = bestAttempt.attempted;
-            dispatch(addCachedObject(wcif.id, "bestMbldAttempt", attempted));
-            dispatch(setBestMbldAttempt(attempted));
-        });
-    };
+    const getAndCacheSuggestedFmcTranslations = useCallback(
+        (wcif) => {
+            fetchSuggestedFmcTranslations(wcif).then((translations) => {
+                dispatch(
+                    addCachedObject(
+                        wcif.id,
+                        "suggestedFmcTranslations",
+                        translations
+                    )
+                );
+                dispatch(addSuggestedFmcTranslations(translations));
+            });
+        },
+        [dispatch]
+    );
 
     // In case we use competitionId from query params, it's not fetched.
     // We add it to the list.
-    const maybeAddCompetition = (competitionId, competitionName) => {
-        if (!competitions) {
-            return;
-        }
-        if (
-            !competitions.find(
-                (competition) => competition.name === competitionName
-            )
-        ) {
-            dispatch(
-                updateCompetitions([
-                    ...competitions,
-                    { id: competitionId, name: competitionName },
-                ])
-            );
-        }
-    };
+    const maybeAddCompetition = useCallback(
+        (competitionId, competitionName) => {
+            if (!competitions) {
+                return;
+            }
+            if (
+                !competitions.find(
+                    (competition) => competition.name === competitionName
+                )
+            ) {
+                dispatch(
+                    updateCompetitions([
+                        ...competitions,
+                        { id: competitionId, name: competitionName },
+                    ])
+                );
+            }
+        },
+        [dispatch, competitions]
+    );
 
-    const setWcif = (wcif) => {
-        dispatch(updateEditingStatus(true));
-        dispatch(updateWcif(wcif));
-        dispatch(updateCompetitionId(wcif.id));
-        dispatch(updateCompetitionName(wcif.name));
-        dispatch(updateFileZipBlob(null));
-    };
+    const setWcif = useCallback(
+        (wcif) => {
+            dispatch(updateEditingStatus(true));
+            dispatch(updateWcif(wcif));
+            dispatch(updateCompetitionId(wcif.id));
+            dispatch(updateCompetitionName(wcif.name));
+            dispatch(updateFileZipBlob(null));
+        },
+        [dispatch]
+    );
+
+    const handleCompetitionSelection = useCallback(
+        (competitionId) => {
+            setQueryParameter("competitionId", competitionId);
+
+            // For quick switching between competitions.
+            let cachedObject = cachedObjects[competitionId];
+            if (!!cachedObject) {
+                let cachedWcif = cachedObject.wcif;
+                setWcif(cachedWcif);
+                maybeAddCompetition(cachedWcif.id, cachedWcif.name);
+
+                let cachedSuggestedFmcTranslations =
+                    cachedObject.suggestedFmcTranslations;
+                dispatch(
+                    addSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
+                );
+
+                let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
+                dispatch(setBestMbldAttempt(cachedBestMbldAttempt));
+            } else {
+                setLoadingCompetitionInfo(true);
+
+                getCompetitionJson(competitionId)
+                    .then((wcif) => {
+                        setWcif(wcif);
+                        dispatch(addCachedObject(competitionId, "wcif", wcif));
+                        maybeAddCompetition(wcif.id, wcif.name);
+                        getAndCacheSuggestedFmcTranslations(wcif);
+                        getAndCacheBestMbldAttempt(wcif);
+                    })
+                    .finally(() => setLoadingCompetitionInfo(false));
+            }
+        },
+        [
+            cachedObjects,
+            dispatch,
+            getAndCacheBestMbldAttempt,
+            getAndCacheSuggestedFmcTranslations,
+            maybeAddCompetition,
+            setWcif,
+        ]
+    );
+
+    useEffect(init, [competitions, dispatch, handleCompetitionSelection, me]);
 
     const logInButton = () => {
         return (
