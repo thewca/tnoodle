@@ -14,6 +14,7 @@ import {
     logOut,
 } from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
+import RootState from "../model/RootState";
 import {
     addCachedObject,
     addSuggestedFmcTranslations,
@@ -41,11 +42,13 @@ const SideBar = () => {
     const [loadingCompetitions, setLoadingCompetitions] = useState(false);
     const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
-    const me = useSelector((state) => state.me);
-    const competitions = useSelector((state) => state.competitions);
-    const cachedObjects = useSelector((state) => state.cachedObjects);
+    const me = useSelector((state: RootState) => state.me);
+    const competitions = useSelector((state: RootState) => state.competitions);
+    const cachedObjects = useSelector(
+        (state: RootState) => state.cachedObjects
+    );
     const generatingScrambles = useSelector(
-        (state) => state.generatingScrambles
+        (state: RootState) => state.generatingScrambles
     );
     const [isOpen, setIsOpen] = useState(true);
 
@@ -83,7 +86,8 @@ const SideBar = () => {
         }
     };
 
-    const pluralize = (string, number) => string + (number > 1 ? "s" : "");
+    const pluralize = (string: string, number: number) =>
+        string + (number > 1 ? "s" : "");
 
     const handleManualSelection = () => {
         dispatch(updateEditingStatus(false));
@@ -235,7 +239,7 @@ const SideBar = () => {
         );
     };
 
-    const loadingElement = (text) => (
+    const loadingElement = (text: string) => (
         <div className="text-white">
             <Loading />
             <p>{text}...</p>
