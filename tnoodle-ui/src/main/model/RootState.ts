@@ -12,9 +12,11 @@ export default interface RootState {
     competitionId: string;
     competitions: Competition[];
     editingDisabled: boolean;
+    fileZipBlob: Blob;
     generatingScrambles: boolean;
     mbld: string;
     me: Me;
+    officialZip: boolean;
     password: string;
     scramblingProgressCurrent: Record<string, number>;
     scramblingProgressTarget: Record<string, number>;

@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchZip } from "../api/tnoodle.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
 import { isUsingStaging } from "../api/wca.api";
+import RootState from "../model/RootState";
 import {
     resetScramblingProgressCurrent,
     updateFileZipBlob,
@@ -18,22 +19,24 @@ import VersionInfo from "./VersionInfo";
 
 const Main = () => {
     const [competitionNameFileZip, setCompetitionNameFileZip] = useState("");
-    const mbld = useSelector((state) => state.mbld);
-    const password = useSelector((state) => state.password);
-    const translations = useSelector((state) => state.translations);
-    const wcif = useSelector((state) => state.wcif);
-    const competitionId = useSelector((state) => state.competitionId);
-    const generatingScrambles = useSelector(
-        (state) => state.generatingScrambles
+    const mbld = useSelector((state: RootState) => state.mbld);
+    const password = useSelector((state: RootState) => state.password);
+    const translations = useSelector((state: RootState) => state.translations);
+    const wcif = useSelector((state: RootState) => state.wcif);
+    const competitionId = useSelector(
+        (state: RootState) => state.competitionId
     );
-    const officialZip = useSelector((state) => state.officialZip);
-    const fileZipBlob = useSelector((state) => state.fileZipBlob);
+    const generatingScrambles = useSelector(
+        (state: RootState) => state.generatingScrambles
+    );
+    const officialZip = useSelector((state: RootState) => state.officialZip);
+    const fileZipBlob = useSelector((state: RootState) => state.fileZipBlob);
 
-    const interceptorRef = useRef();
+    const interceptorRef = useRef<Interceptor>(null);
 
     const dispatch = useDispatch();
 
-    const onSubmit = (evt) => {
+    const onSubmit = (evt: SyntheticEvent) => {
         evt.preventDefault();
 
         if (generatingScrambles) {
@@ -56,8 +59,8 @@ const Main = () => {
         );
 
         fetchZip(scrambleClient, wcif, mbld, password, translations)
-            .then((blob) => dispatch(updateFileZipBlob(blob)))
-            .catch((err) => interceptorRef.current.updateMessage(err))
+            .then((blob: Blob) => dispatch(updateFileZipBlob(blob)))
+            .catch((err: any) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
                 dispatch(updateGeneratingScrambles(false));
                 dispatch(resetScramblingProgressCurrent());
