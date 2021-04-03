@@ -26,14 +26,14 @@ const EntryInterface = () => {
         dispatch(updateCompetitionName(name));
 
         // Require another zip with the new name.
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
     };
 
     const handlePasswordChange = (password: string) => {
         dispatch(updatePassword(password));
 
         // Require another zip with the new password, in case there was a zip generated.
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
     };
 
     return (

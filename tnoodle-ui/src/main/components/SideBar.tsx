@@ -91,12 +91,12 @@ const SideBar = () => {
 
     const handleManualSelection = () => {
         dispatch(updateEditingStatus(false));
-        dispatch(updateCompetitionId(null));
+        dispatch(updateCompetitionId());
         dispatch(updateWcif({ ...defaultWcif }));
-        dispatch(setBestMbldAttempt(null));
+        dispatch(setBestMbldAttempt());
         dispatch(updateCompetitionName(getDefaultCompetitionName()));
-        dispatch(updateFileZipBlob(null));
-        dispatch(addSuggestedFmcTranslations(null));
+        dispatch(updateFileZipBlob());
+        dispatch(addSuggestedFmcTranslations());
 
         deleteParameter("competitionId");
     };
@@ -162,7 +162,7 @@ const SideBar = () => {
             dispatch(updateWcif(wcif));
             dispatch(updateCompetitionId(wcif.id));
             dispatch(updateCompetitionName(wcif.name));
-            dispatch(updateFileZipBlob(null));
+            dispatch(updateFileZipBlob());
         },
         [dispatch]
     );

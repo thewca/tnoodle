@@ -16,7 +16,7 @@ const MbldDetail = () => {
 
     const handleMbldChange = (newMbld: string) => {
         dispatch(updateMbld(newMbld));
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
     };
 
     return (

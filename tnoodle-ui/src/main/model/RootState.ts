@@ -1,6 +1,6 @@
 import CachedObject from "./CachedObject";
 import Competition from "./Competition";
-import Me from "./Me";
+import Person from "./Person";
 import Translation from "./Translation";
 import WcaEvent from "./WcaEvent";
 import WcaFormat from "./WcaFormat";
@@ -15,7 +15,7 @@ export default interface RootState {
     fileZipBlob: Blob;
     generatingScrambles: boolean;
     mbld: string;
-    me: Me;
+    me: Person;
     officialZip: boolean;
     password: string;
     scramblingProgressCurrent: Record<string, number>;

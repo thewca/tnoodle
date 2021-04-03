@@ -39,7 +39,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const updateEvent = (rounds: Round[]) => {
         let event = { id: wcaEvent.id, rounds };
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
         dispatch(updateWcaEvent(event));
     };
     const [image, setImage] = useState();

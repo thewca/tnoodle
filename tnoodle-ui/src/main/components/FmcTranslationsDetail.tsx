@@ -27,22 +27,22 @@ const FmcTranslationsDetail = () => {
     const dispatch = useDispatch();
 
     const handleTranslation = (id: string, status: boolean) => {
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
         dispatch(updateTranslation(id, status));
     };
 
     const handleSelectAllTranslations = () => {
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
         dispatch(selectAllTranslations());
     };
 
     const selectNoneTranslation = () => {
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
         dispatch(resetTranslations());
     };
 
     const selectSuggestedTranslations = () => {
-        dispatch(updateFileZipBlob(null));
+        dispatch(updateFileZipBlob());
         dispatch(setSuggestedFmcTranslations(suggestedFmcTranslations));
     };
 
