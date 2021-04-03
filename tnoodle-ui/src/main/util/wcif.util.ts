@@ -13,7 +13,7 @@ export const getDefaultCopiesExtension = () => {
         id: copiesExtensionId,
         specUrl: "",
         data: {
-            numCopies: 1,
+            numCopies: "1",
         },
     };
 };

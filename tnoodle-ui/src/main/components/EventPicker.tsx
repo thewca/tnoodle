@@ -57,21 +57,22 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         numberOfRounds: number,
         rounds: Round[]
     ) => {
+        let newRounds = [...rounds];
         // Ajust the number of rounds in case we have to remove
-        while (rounds.length > numberOfRounds) {
-            rounds.pop();
+        while (newRounds.length > numberOfRounds) {
+            newRounds.pop();
         }
 
         // case we have to add
-        while (rounds.length < numberOfRounds) {
-            rounds.push({
-                id: wcaEvent.id + "-r" + (rounds.length + 1),
+        while (newRounds.length < numberOfRounds) {
+            newRounds.push({
+                id: wcaEvent.id + "-r" + (newRounds.length + 1),
                 format: wcaEvent.format_ids[0],
                 scrambleSetCount: "1",
                 extensions: [getDefaultCopiesExtension()],
             });
         }
-        updateEvent(rounds);
+        updateEvent(newRounds);
     };
 
     const handleGeneralRoundChange = (
@@ -89,6 +90,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         value: any,
         rounds: Round[]
     ) => {
+        debugger;
         let data = rounds[round].extensions.find(
             (extension) => extension.id === copiesExtensionId
         )?.data;
