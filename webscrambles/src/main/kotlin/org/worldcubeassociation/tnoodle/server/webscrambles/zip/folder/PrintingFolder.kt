@@ -1,7 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 
 import org.slf4j.LoggerFactory
-import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcGenericSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcScrambleCutoutSheet
@@ -11,13 +10,13 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.CompetitionDraw
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.ScrambleDrawingData
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder.getCachedPdf
-import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.FmcLanguagesExtension
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
 import java.time.LocalDate
+import java.util.*
 
 data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, val globalTitle: String, val wcifSchedule: Schedule) {
     val scrambleSheetsFlat = uniqueTitles.values.toList()
@@ -26,7 +25,6 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
     fun assemble(generationDate: LocalDate, versionTag: String, password: String?): Folder {
         val fmcRequests = uniqueTitles.filterValues { it.isFmc }
 
-        val pseudoActivityCode = ActivityCode.compile(EventData.THREE_FM, round = 1)
         val printingCompletePdf = WCIFDataBuilder.requestsToCompletePdf(scrambleDrawingData, generationDate, versionTag, Translate.DEFAULT_LOCALE)
 
         return folder("Printing") {
@@ -41,35 +39,42 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
 
             if (fmcRequests.isNotEmpty()) {
                 folder("Fewest Moves - Additional Files") {
-                    val defaultGenericPrintingSheet = FmcGenericSolutionSheet(ScrambleSet.empty(), pseudoActivityCode, globalTitle, Translate.DEFAULT_LOCALE)
+                    val defaultGenericPrintingSheet = FmcGenericSolutionSheet(globalTitle, Translate.DEFAULT_LOCALE)
                     file("3x3x3 Fewest Moves Solution Sheet.pdf", defaultGenericPrintingSheet.render())
+
+                    val allDistinctTranslations = fmcRequests.values
+                        .flatMap { it.getTranslationLocales() }.distinct()
+
+                    if (allDistinctTranslations.isNotEmpty()) {
+                        folder("Translations") {
+                            for (locale in allDistinctTranslations) {
+                                folder(locale.toLanguageTag()) {
+                                    val translatedGenericPrintingSheet = FmcGenericSolutionSheet(globalTitle, locale)
+                                    file("3x3x3 Fewest Moves Solution Sheet.pdf", translatedGenericPrintingSheet.render())
+                                }
+                            }
+                        }
+                    }
 
                     for ((uniq, req) in fmcRequests) {
                         val defaultCutoutSheet = FmcScrambleCutoutSheet(req.scrambleSet, req.activityCode, globalTitle, Translate.DEFAULT_LOCALE, req.hasGroupID)
                         file("$uniq - Scramble Cutout Sheet.pdf", defaultCutoutSheet.render(password))
 
-                        val requestedTranslations = req.scrambleSet.findExtension<FmcLanguagesExtension>()
-                            ?.languageTags ?: FMC_LOCALES_BY_TAG.keys
-
-                        val translationLocales = requestedTranslations.mapNotNull { FMC_LOCALES_BY_TAG[it] }
+                        val translationLocales = req.getTranslationLocales()
 
                         if (translationLocales.isNotEmpty()) {
                             folder("Translations") {
                                 for (locale in translationLocales) {
-                                    val languageMarkerTitle = "${locale.toLanguageTag()}/$uniq"
+                                    folder(locale.toLanguageTag()) {
+                                        // fewest moves regular sheet
+                                        val localPrintingSheet = FmcSolutionSheet(req.scrambleSet, req.activityCode, globalTitle, locale, req.hasGroupID)
 
-                                    // fewest moves regular sheet
-                                    val localPrintingSheet = FmcSolutionSheet(req.scrambleSet, req.activityCode, globalTitle, locale, req.hasGroupID)
+                                        // scramble cutout sheet
+                                        val localCutoutSheet = FmcScrambleCutoutSheet(req.scrambleSet, req.activityCode, globalTitle, locale, req.hasGroupID)
 
-                                    // fewest moves generic sheet
-                                    val localGenericPrintingSheet = FmcGenericSolutionSheet(req.scrambleSet, req.activityCode, globalTitle, locale)
-
-                                    // scramble cutout sheet
-                                    val localCutoutSheet = FmcScrambleCutoutSheet(req.scrambleSet, req.activityCode, globalTitle, locale, req.hasGroupID)
-
-                                    file("$languageMarkerTitle.pdf", localPrintingSheet.render(password))
-                                    file("$languageMarkerTitle Solution Sheet.pdf", localGenericPrintingSheet.render(password))
-                                    file("$languageMarkerTitle Scramble Cutout Sheet.pdf", localCutoutSheet.render(password))
+                                        file("$uniq.pdf", localPrintingSheet.render(password))
+                                        file("$uniq Scramble Cutout Sheet.pdf", localCutoutSheet.render(password))
+                                    }
                                 }
                             }
                         }
@@ -113,6 +118,13 @@ data class PrintingFolder(val uniqueTitles: Map<String, ScrambleDrawingData>, va
             val requiredIds = scrambleSets.map { it.id }
 
             return scheduleMatchedIds.containsAll(requiredIds)
+        }
+
+        private fun ScrambleDrawingData.getTranslationLocales(): List<Locale> {
+            val requestedTranslations = scrambleSet.findExtension<FmcLanguagesExtension>()
+                ?.languageTags ?: FMC_LOCALES_BY_TAG.keys
+
+            return requestedTranslations.mapNotNull { FMC_LOCALES_BY_TAG[it] }
         }
 
         val FMC_LOCALES_BY_TAG = Translate.TRANSLATED_LOCALES.associateBy { it.toLanguageTag() }
