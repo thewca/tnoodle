@@ -47,20 +47,31 @@ class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCod
         val scrambleSuffix = Translate.translate("fmc.scrambleXofY", locale, substitutions)
             .takeIf { expectedAttemptNum > 1 } ?: ""
 
-        val attemptTitle = activityCode.compileTitleString(locale, includeGroupID = hasGroupID).trim()
-        val title = "$competitionTitle - $attemptTitle $scrambleSuffix"
+        val eventTitle = Translate.translate("fmc.event", locale)
+        val attemptDetails = activityCode.compileTitleString(locale, includeEvent = false, includeGroupID = hasGroupID)
+        val attemptTitle = "$eventTitle $attemptDetails".trim()
+
+        val title = "$attemptTitle $scrambleSuffix"
+
+        val font = Font(BASE_FONT, FONT_SIZE / 2)
+        val localBaseFont = FontUtil.getFontForLocale(locale)
+        val localFont = Font(localBaseFont, FONT_SIZE)
 
         // empty strings for space above and below
-        val textList = listOf("", title, scramble, "")
+        val textList = listOf(
+            "" to font,
+            competitionTitle to font,
+            title to localFont,
+            scramble to localFont,
+            "" to font)
+
         val alignList = List(textList.size) { Element.ALIGN_LEFT }
 
-        val paddedTitleItems = textList.zip(alignList)
-
-        val font = Font(BASE_FONT, FONT_SIZE)
+        val paddedTitleItems = textList.zipTriple(alignList)
 
         for (i in 0 until SCRAMBLES_PER_SHEET) {
             val rect = Rectangle(LEFT.toFloat(), (top - i * availableScrambleHeight).toFloat(), (right - dim.width - SPACE_SCRAMBLE_IMAGE).toFloat(), (top - (i + 1) * availableScrambleHeight).toFloat())
-            directContent.populateRect(rect, paddedTitleItems, font)
+            directContent.populateRect(rect, paddedTitleItems)
 
             directContent.addImage(Image.getInstance(tp), dim.width.toDouble(), 0.0, 0.0, dim.height.toDouble(), (right - dim.width).toDouble(), top.toDouble() - (i + 1) * availableScrambleHeight + (availableScrambleHeight - dim.getHeight()) / 2)
 
@@ -82,5 +93,9 @@ class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCod
         val FONT_SIZE = 20f
 
         val SCRAMBLES_PER_SHEET = 8
+
+        private fun <A,B,C> Iterable<Pair<A,B>>.zipTriple(other: Iterable<C>): List<Triple<A,B,C>> {
+            return zip(other).map { Triple(it.first.first, it.first.second, it.second) }
+        }
     }
 }
