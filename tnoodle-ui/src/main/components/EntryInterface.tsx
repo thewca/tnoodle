@@ -2,38 +2,39 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
-import {
-    updateCompetitionName,
-    updateFileZipBlob,
-    updatePassword,
-} from "../redux/ActionCreators";
+import { setFileZipBlob, setPassword } from "../redux/slice/ScramblingSlice";
+import { setCompetitionName } from "../redux/slice/WcifSlice";
 
 const EntryInterface = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const editingDisabled = useSelector(
-        (state: RootState) => state.editingDisabled
+    const editingStatus = useSelector(
+        (state: RootState) => state.wcifSlice.editingStatus
     );
-    const password = useSelector((state: RootState) => state.password);
-    const competitionName = useSelector((state: RootState) => state.wcif.name);
+    const password = useSelector(
+        (state: RootState) => state.scramblingSlice.password
+    );
+    const competitionName = useSelector(
+        (state: RootState) => state.wcifSlice.wcif.name
+    );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
     const dispatch = useDispatch();
 
     const handleCompetitionNameChange = (name: string) => {
-        dispatch(updateCompetitionName(name));
+        dispatch(setCompetitionName(name));
 
         // Require another zip with the new name.
-        dispatch(updateFileZipBlob());
+        dispatch(setFileZipBlob());
     };
 
     const handlePasswordChange = (password: string) => {
-        dispatch(updatePassword(password));
+        dispatch(setPassword(password));
 
         // Require another zip with the new password, in case there was a zip generated.
-        dispatch(updateFileZipBlob());
+        dispatch(setFileZipBlob());
     };
 
     return (
@@ -50,7 +51,7 @@ const EntryInterface = () => {
                         handleCompetitionNameChange(e.target.value)
                     }
                     value={competitionName}
-                    disabled={editingDisabled || generatingScrambles}
+                    disabled={!editingStatus || generatingScrambles}
                     required
                 />
             </div>

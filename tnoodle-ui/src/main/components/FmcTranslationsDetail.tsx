@@ -3,12 +3,11 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import {
-    resetTranslations,
-    selectAllTranslations,
     setSuggestedFmcTranslations,
-    updateFileZipBlob,
-    updateTranslation,
-} from "../redux/ActionCreators";
+    updateAllTranslationsStatus,
+    updateTranslationStatus,
+} from "../redux/slice/FmcSlice";
+import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
 import "./FmcTranslationsDetail.css";
 
 const TRANSLATIONS_PER_LINE = 3;
@@ -17,32 +16,34 @@ const FmcTranslationsDetail = () => {
     const [showTranslations, setShowTranslations] = useState(false);
 
     const suggestedFmcTranslations = useSelector(
-        (state: RootState) => state.suggestedFmcTranslations
+        (state: RootState) => state.fmcSlice.suggestedFmcTranslations
     );
-    const translations = useSelector((state: RootState) => state.translations);
+    const translations = useSelector(
+        (state: RootState) => state.fmcSlice.translations
+    );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
     const dispatch = useDispatch();
 
     const handleTranslation = (id: string, status: boolean) => {
-        dispatch(updateFileZipBlob());
-        dispatch(updateTranslation(id, status));
+        dispatch(setFileZipBlob());
+        dispatch(updateTranslationStatus({ id, status }));
     };
 
     const handleSelectAllTranslations = () => {
-        dispatch(updateFileZipBlob());
-        dispatch(selectAllTranslations());
+        dispatch(setFileZipBlob());
+        dispatch(updateAllTranslationsStatus(true));
     };
 
     const selectNoneTranslation = () => {
-        dispatch(updateFileZipBlob());
-        dispatch(resetTranslations());
+        dispatch(setFileZipBlob());
+        dispatch(updateAllTranslationsStatus(false));
     };
 
     const selectSuggestedTranslations = () => {
-        dispatch(updateFileZipBlob());
+        dispatch(setFileZipBlob());
         dispatch(setSuggestedFmcTranslations(suggestedFmcTranslations));
     };
 

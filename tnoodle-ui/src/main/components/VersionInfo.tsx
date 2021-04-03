@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { fetchRunningVersion } from "../api/tnoodle.api";
 import { fetchVersionInfo } from "../api/wca.api";
 import CurrentTnoodle from "../model/CurrentTnoodle";
-import { updateOfficialZipStatus } from "../redux/ActionCreators";
+import { setOfficialZipStatus } from "../redux/slice/ScramblingSlice";
 
 const VersionInfo = () => {
     const [currentTnoodle, setCurrentTnoodle] = useState<CurrentTnoodle>();
@@ -60,7 +60,7 @@ const VersionInfo = () => {
         }
 
         dispatch(
-            updateOfficialZipStatus(
+            setOfficialZipStatus(
                 signatureValid &&
                     allowedTnoodleVersions.includes(runningVersion)
             )

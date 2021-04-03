@@ -6,11 +6,11 @@ import { isUsingStaging } from "../api/wca.api";
 import RootState from "../model/RootState";
 import {
     resetScramblingProgressCurrent,
-    updateFileZipBlob,
-    updateGeneratingScrambles,
-    updateScramblingProgressCurrentEvent,
-    updateScramblingProgressTarget,
-} from "../redux/ActionCreators";
+    setFileZipBlob,
+    setGeneratingScrambles,
+    setScramblingProgressCurrentEvent,
+    setScramblingProgressTarget,
+} from "../redux/slice/ScramblingSlice";
 import EntryInterface from "./EntryInterface";
 import EventPickerTable from "./EventPickerTable";
 import Interceptor from "./Interceptor";
@@ -19,18 +19,26 @@ import VersionInfo from "./VersionInfo";
 
 const Main = () => {
     const [competitionNameFileZip, setCompetitionNameFileZip] = useState("");
-    const mbld = useSelector((state: RootState) => state.mbld);
-    const password = useSelector((state: RootState) => state.password);
-    const translations = useSelector((state: RootState) => state.translations);
-    const wcif = useSelector((state: RootState) => state.wcif);
+    const mbld = useSelector((state: RootState) => state.mbldSlice.mbld);
+    const password = useSelector(
+        (state: RootState) => state.scramblingSlice.password
+    );
+    const translations = useSelector(
+        (state: RootState) => state.fmcSlice.translations
+    );
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
     const competitionId = useSelector(
-        (state: RootState) => state.competitionId
+        (state: RootState) => state.competitionSlice.competitionId
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles
     );
-    const officialZip = useSelector((state: RootState) => state.officialZip);
-    const fileZipBlob = useSelector((state: RootState) => state.fileZipBlob);
+    const officialZipStatus = useSelector(
+        (state: RootState) => state.scramblingSlice.officialZipStatus
+    );
+    const fileZipBlob = useSelector(
+        (state: RootState) => state.scramblingSlice.fileZipBlob
+    );
 
     const interceptorRef = useRef<Interceptor>(null);
 
@@ -54,18 +62,18 @@ const Main = () => {
         setCompetitionNameFileZip(wcif.name);
 
         let scrambleClient = new ScrambleClient(
-            updateScramblingProgressTarget,
-            updateScramblingProgressCurrentEvent
+            setScramblingProgressTarget,
+            setScramblingProgressCurrentEvent
         );
 
         fetchZip(scrambleClient, wcif, mbld, password, translations)
-            .then((blob: Blob) => dispatch(updateFileZipBlob(blob)))
+            .then((blob: Blob) => dispatch(setFileZipBlob(blob)))
             .catch((err: any) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
-                dispatch(updateGeneratingScrambles(false));
+                dispatch(setGeneratingScrambles(false));
                 dispatch(resetScramblingProgressCurrent());
             });
-        dispatch(updateGeneratingScrambles(true));
+        dispatch(setGeneratingScrambles(true));
     };
 
     const downloadZip = () => {
@@ -74,7 +82,7 @@ const Main = () => {
         // a competition from staging, add a [Unofficial]
 
         let isUnofficialZip =
-            !officialZip || (competitionId != null && isUsingStaging());
+            !officialZipStatus || (competitionId != null && isUsingStaging());
 
         let fileName =
             (isUnofficialZip ? "[UNOFFICIAL] " : "") +

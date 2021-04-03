@@ -9,23 +9,22 @@ import {
 import { toWcaUrl } from "../api/wca.api";
 import RootState from "../model/RootState";
 import WcaEvent from "../model/WcaEvent";
-import {
-    setWcaEvents,
-    setWcaFormats,
-    updateTranslations,
-} from "../redux/ActionCreators";
+import { setTranslations } from "../redux/slice/FmcSlice";
+import { setWcaEvents, setWcaFormats } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
 
 const EVENTS_PER_LINE = 2;
 
 const EventPickerTable = () => {
     const competitionId = useSelector(
-        (state: RootState) => state.competitionId
+        (state: RootState) => state.competitionSlice.competitionId
     );
-    const wcif = useSelector((state: RootState) => state.wcif);
-    const wcaEvents = useSelector((state: RootState) => state.wcaEvents);
-    const editingDisabled = useSelector(
-        (state: RootState) => state.editingDisabled
+    const wcif = useSelector((state: RootState) => state.wcifSlice.wcif);
+    const wcaEvents = useSelector(
+        (state: RootState) => state.wcifSlice.wcaEvents
+    );
+    const editingStatus = useSelector(
+        (state: RootState) => state.wcifSlice.editingStatus
     );
 
     const dispatch = useDispatch();
@@ -42,7 +41,7 @@ const EventPickerTable = () => {
                     status: true,
                 })
             );
-            dispatch(updateTranslations(translations));
+            dispatch(setTranslations(translations));
         });
     }, [dispatch]);
 
@@ -98,8 +97,7 @@ const EventPickerTable = () => {
     // This filters events to show only those in the competition.
     let filteredEvents = wcaEvents.filter(
         (wcaEvent) =>
-            !editingDisabled ||
-            wcif.events.find((item) => item.id === wcaEvent.id)
+            editingStatus || wcif.events.find((item) => item.id === wcaEvent.id)
     );
 
     let eventChunks = chunk(filteredEvents, EVENTS_PER_LINE);

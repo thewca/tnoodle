@@ -6,7 +6,8 @@ import RootState from "../model/RootState";
 import Round from "../model/Round";
 import WcaEvent from "../model/WcaEvent";
 import WcifEvent from "../model/WcifEvent";
-import { updateFileZipBlob, updateWcaEvent } from "../redux/ActionCreators";
+import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
+import { setWcaEvent } from "../redux/slice/WcifSlice";
 import {
     copiesExtensionId,
     getDefaultCopiesExtension,
@@ -21,26 +22,28 @@ interface EventPickerProps {
 }
 
 const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
-    const wcaFormats = useSelector((state: RootState) => state.wcaFormats);
-    const editingDisabled = useSelector(
-        (state: RootState) => state.editingDisabled
+    const wcaFormats = useSelector(
+        (state: RootState) => state.wcifSlice.wcaFormats
+    );
+    const editingStatus = useSelector(
+        (state: RootState) => state.wcifSlice.editingStatus
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles
     );
     const scramblingProgressCurrent = useSelector(
-        (state: RootState) => state.scramblingProgressCurrent
+        (state: RootState) => state.scramblingSlice.scramblingProgressCurrent
     );
     const scramblingProgressTarget = useSelector(
-        (state: RootState) => state.scramblingProgressTarget
+        (state: RootState) => state.scramblingSlice.scramblingProgressTarget
     );
 
     const dispatch = useDispatch();
 
     const updateEvent = (rounds: Round[]) => {
         let event = { id: wcaEvent.id, rounds };
-        dispatch(updateFileZipBlob());
-        dispatch(updateWcaEvent(event));
+        dispatch(setFileZipBlob());
+        dispatch(setWcaEvent(event));
     };
     const [image, setImage] = useState();
 
@@ -141,7 +144,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                         )
                                     }
                                     disabled={
-                                        editingDisabled || generatingScrambles
+                                        !editingStatus || generatingScrambles
                                     }
                                 >
                                     {wcaEvent.format_ids.map((format) => (
@@ -167,7 +170,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     min={1}
                                     required
                                     disabled={
-                                        editingDisabled || generatingScrambles
+                                        !editingStatus || generatingScrambles
                                     }
                                 />
                             </td>
@@ -261,7 +264,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                                     rounds
                                 )
                             }
-                            disabled={editingDisabled || generatingScrambles}
+                            disabled={!editingStatus || generatingScrambles}
                         >
                             {Array.from(
                                 { length: MAX_WCA_ROUNDS + 1 },

@@ -16,17 +16,14 @@ import {
 import logo from "../assets/tnoodle_logo.svg";
 import RootState from "../model/RootState";
 import {
-    addCachedObject,
-    addSuggestedFmcTranslations,
-    setBestMbldAttempt,
-    updateCompetitionId,
-    updateCompetitionName,
-    updateCompetitions,
-    updateEditingStatus,
-    updateFileZipBlob,
-    updateMe,
-    updateWcif,
-} from "../redux/ActionCreators";
+    setCompetitionId,
+    setCompetitions,
+} from "../redux/slice/CompetitionSlice";
+import { setSuggestedFmcTranslations } from "../redux/slice/FmcSlice";
+import { addCachedObject, setMe } from "../redux/slice/InformationSlice";
+import { setBestMbldAttempt } from "../redux/slice/MbldSlice";
+import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
+import { setCompetitionName, setEditingStatus } from "../redux/slice/WcifSlice";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 import {
     deleteParameter,
@@ -42,13 +39,15 @@ const SideBar = () => {
     const [loadingCompetitions, setLoadingCompetitions] = useState(false);
     const [loadingCompetitionInfo, setLoadingCompetitionInfo] = useState(false);
 
-    const me = useSelector((state: RootState) => state.me);
-    const competitions = useSelector((state: RootState) => state.competitions);
+    const me = useSelector((state: RootState) => state.informationSlice.me);
+    const competitions = useSelector(
+        (state: RootState) => state.competitionSlice.competitions
+    );
     const cachedObjects = useSelector(
-        (state: RootState) => state.cachedObjects
+        (state: RootState) => state.informationSlice.cachedObjects
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles
     );
     const [isOpen, setIsOpen] = useState(true);
 
@@ -65,18 +64,14 @@ const SideBar = () => {
         if (!me) {
             setLoadingUser(true);
             fetchMe()
-                .then((me) => {
-                    dispatch(updateMe(me));
-                })
+                .then((me) => dispatch(setMe(me)))
                 .finally(() => setLoadingUser(false));
         }
 
         if (!competitions) {
             setLoadingCompetitions(true);
             getUpcomingManageableCompetitions()
-                .then((competitions) =>
-                    dispatch(updateCompetitions(competitions))
-                )
+                .then((competitions) => dispatch(setCompetitions(competitions)))
                 .finally(() => setLoadingCompetitions(false));
         }
 
@@ -90,13 +85,13 @@ const SideBar = () => {
         string + (number > 1 ? "s" : "");
 
     const handleManualSelection = () => {
-        dispatch(updateEditingStatus(false));
-        dispatch(updateCompetitionId());
-        dispatch(updateWcif({ ...defaultWcif }));
+        dispatch(setEditingStatus(true));
+        dispatch(setCompetitionId());
+        dispatch(setWcif({ ...defaultWcif }));
         dispatch(setBestMbldAttempt());
-        dispatch(updateCompetitionName(getDefaultCompetitionName()));
-        dispatch(updateFileZipBlob());
-        dispatch(addSuggestedFmcTranslations());
+        dispatch(setCompetitionName(getDefaultCompetitionName()));
+        dispatch(setFileZipBlob());
+        dispatch(setSuggestedFmcTranslations());
 
         deleteParameter("competitionId");
     };
@@ -109,7 +104,11 @@ const SideBar = () => {
                 }
                 let attempted = bestAttempt.attempted;
                 dispatch(
-                    addCachedObject(wcif.id, "bestMbldAttempt", attempted)
+                    addCachedObject({
+                        competitionId: wcif.id,
+                        identifier: "bestMbldAttempt",
+                        object: attempted,
+                    })
                 );
                 dispatch(setBestMbldAttempt(attempted));
             });
@@ -121,13 +120,13 @@ const SideBar = () => {
         (wcif) => {
             fetchSuggestedFmcTranslations(wcif).then((translations) => {
                 dispatch(
-                    addCachedObject(
-                        wcif.id,
-                        "suggestedFmcTranslations",
-                        translations
-                    )
+                    addCachedObject({
+                        competitionId: wcif.id,
+                        identifier: "suggestedFmcTranslations",
+                        object: translations,
+                    })
                 );
-                dispatch(addSuggestedFmcTranslations(translations));
+                dispatch(setSuggestedFmcTranslations(translations));
             });
         },
         [dispatch]
@@ -146,7 +145,7 @@ const SideBar = () => {
                 )
             ) {
                 dispatch(
-                    updateCompetitions([
+                    setCompetitions([
                         ...competitions,
                         { id: competitionId, name: competitionName },
                     ])
@@ -158,11 +157,11 @@ const SideBar = () => {
 
     const setWcif = useCallback(
         (wcif) => {
-            dispatch(updateEditingStatus(true));
-            dispatch(updateWcif(wcif));
-            dispatch(updateCompetitionId(wcif.id));
-            dispatch(updateCompetitionName(wcif.name));
-            dispatch(updateFileZipBlob());
+            dispatch(setEditingStatus(false));
+            dispatch(setWcif(wcif));
+            dispatch(setCompetitionId(wcif.id));
+            dispatch(setCompetitionId(wcif.name));
+            dispatch(setFileZipBlob());
         },
         [dispatch]
     );
@@ -181,7 +180,7 @@ const SideBar = () => {
                 let cachedSuggestedFmcTranslations =
                     cachedObject.suggestedFmcTranslations;
                 dispatch(
-                    addSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
+                    setSuggestedFmcTranslations(cachedSuggestedFmcTranslations)
                 );
 
                 let cachedBestMbldAttempt = cachedObject.bestMbldAttempt;
@@ -192,7 +191,13 @@ const SideBar = () => {
                 getCompetitionJson(competitionId)
                     .then((wcif) => {
                         setWcif(wcif);
-                        dispatch(addCachedObject(competitionId, "wcif", wcif));
+                        dispatch(
+                            addCachedObject({
+                                competitionId,
+                                identifier: "wcif",
+                                object: wcif,
+                            })
+                        );
                         maybeAddCompetition(wcif.id, wcif.name);
                         getAndCacheSuggestedFmcTranslations(wcif);
                         getAndCacheBestMbldAttempt(wcif);

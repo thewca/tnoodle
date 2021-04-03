@@ -1,22 +1,23 @@
 import { useDispatch, useSelector } from "react-redux";
 import { MBLD_MIN } from "../constants/wca.constants";
 import RootState from "../model/RootState";
-import { updateFileZipBlob, updateMbld } from "../redux/ActionCreators";
+import { setMbld } from "../redux/slice/MbldSlice";
+import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
 
 const MbldDetail = () => {
-    const mbld = useSelector((state: RootState) => state.mbld);
+    const mbld = useSelector((state: RootState) => state.mbldSlice.mbld);
     const bestMbldAttempt = useSelector(
-        (state: RootState) => state.bestMbldAttempt
+        (state: RootState) => state.mbldSlice.bestMbldAttempt
     );
     const generatingScrambles = useSelector(
-        (state: RootState) => state.generatingScrambles
+        (state: RootState) => state.scramblingSlice.generatingScrambles
     );
 
     const dispatch = useDispatch();
 
     const handleMbldChange = (newMbld: string) => {
-        dispatch(updateMbld(newMbld));
-        dispatch(updateFileZipBlob());
+        dispatch(setMbld(newMbld));
+        dispatch(setFileZipBlob());
     };
 
     return (
