@@ -105,7 +105,7 @@ object PdfDrawUtil {
 
         for ((i, content) in itemsWithAlignment.withIndex()) {
             val height = slotHeights.subList(0, i).sum()
-            val proportionalFontSize = slotHeights[i]
+            val proportionalFontSize = -slotHeights[i]
 
             val temp = Rectangle(rect.left, rect.bottom + height - proportionalFontSize, rect.right, rect.bottom + height)
             fitAndShowText(content.first, temp, content.second, content.third, leadingMultiplier)

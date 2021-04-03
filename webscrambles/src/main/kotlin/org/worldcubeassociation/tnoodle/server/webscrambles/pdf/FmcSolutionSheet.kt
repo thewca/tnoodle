@@ -158,14 +158,17 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val gradeRect = Rectangle((competitorInfoLeft + margin).toFloat(), competitorInfoBottom.toFloat(), (right - margin).toFloat(), gradeBottom.toFloat())
         val scrambleImageRect = Rectangle((competitorInfoLeft + margin).toFloat(), gradeBottom.toFloat(), (right - margin).toFloat(), scrambleBorderTop.toFloat())
 
-        cb.fitAndShowText(Translate.translate("fmc.event", locale), titleRect, titleFont, Element.ALIGN_CENTER)
+        val localEventTitle = Translate.translate("fmc.event", locale)
+        cb.fitAndShowText(localEventTitle, titleRect, titleFont, Element.ALIGN_CENTER)
 
         // Both competitor com competition details
         val compDetailItems = mutableListOf<Pair<String, Int>>()
 
         if (withScramble) {
-            val activityTitle = activityCode.copyParts(attemptNumber = null)
-                .compileTitleString(locale, includeGroupID = hasGroupID)
+            val activityTitleRaw = activityCode.copyParts(attemptNumber = null)
+                .compileTitleString(locale, includeEvent = false, includeGroupID = hasGroupID)
+
+            val activityTitle = "$localEventTitle $activityTitleRaw"
 
             compDetailItems.add(competitionTitle to Element.ALIGN_CENTER)
             compDetailItems.add(activityTitle to Element.ALIGN_CENTER)
