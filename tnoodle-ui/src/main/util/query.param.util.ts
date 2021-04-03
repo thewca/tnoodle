@@ -4,7 +4,7 @@ export const getQueryParameter = (name: string) => {
 };
 
 export const getHashParameter = (name: string) => {
-    let params = new URLSearchParams(window.location.hash);
+    let params = new URLSearchParams(window.location.hash.replace("#", ""));
     return params.get(name);
 };
 
