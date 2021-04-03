@@ -76,28 +76,37 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
     };
 
     const handleGeneralRoundChange = (
-        round: number,
+        roundNumber: number,
         value: string,
         rounds: Round[],
         name: "format" | "scrambleSetCount"
     ) => {
-        rounds[round][name] = value;
-        updateEvent(rounds);
+        updateEvent(
+            rounds.map((round, i) =>
+                i !== roundNumber ? round : { ...round, [name]: value }
+            )
+        );
     };
 
     const handleNumberOfCopiesChange = (
-        round: number,
-        value: any,
+        roundNumber: number,
+        numCopies: string,
         rounds: Round[]
     ) => {
-        debugger;
-        let data = rounds[round].extensions.find(
-            (extension) => extension.id === copiesExtensionId
-        )?.data;
-        if (!!data) {
-            data.numCopies = value;
-        }
-        updateEvent(rounds);
+        updateEvent(
+            rounds.map((round, i) =>
+                i !== roundNumber
+                    ? round
+                    : {
+                          ...round,
+                          extensions: round.extensions.map((extension) =>
+                              extension.id === copiesExtensionId
+                                  ? { ...extension, data: { numCopies } }
+                                  : extension
+                          ),
+                      }
+            )
+        );
     };
 
     const abbreviate = (str: string) =>
