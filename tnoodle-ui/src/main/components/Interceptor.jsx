@@ -38,12 +38,16 @@ class Interceptor extends Component {
     }
 
     handleHttpError = (error) => {
-        error
-            .json()
-            .then((data) => {
-                this.updateMessage(data);
-            })
-            .catch(() => this.updateMessage(error));
+        try {
+            error
+                .json()
+                .then((data) => {
+                    this.updateMessage(data);
+                })
+                .catch(() => this.updateMessage(error));
+        } catch (e) {
+            this.updateMessage(e);
+        }
     };
 
     updateMessage = (data) => {

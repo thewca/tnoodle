@@ -23,7 +23,11 @@ import { setSuggestedFmcTranslations } from "../redux/slice/FmcSlice";
 import { addCachedObject, setMe } from "../redux/slice/InformationSlice";
 import { setBestMbldAttempt } from "../redux/slice/MbldSlice";
 import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
-import { setCompetitionName, setEditingStatus } from "../redux/slice/WcifSlice";
+import {
+    setCompetitionName,
+    setEditingStatus,
+    setWcif,
+} from "../redux/slice/WcifSlice";
 import { getDefaultCompetitionName } from "../util/competition.name.util";
 import {
     deleteParameter,
@@ -51,7 +55,7 @@ const SideBar = () => {
     );
     const [isOpen, setIsOpen] = useState(true);
 
-    const dispatch = useDispatch();
+    const dispatch = useCallback(useDispatch(), []);
 
     const handleIsOpen = () => setIsOpen(window.innerWidth > 992);
 
@@ -155,7 +159,7 @@ const SideBar = () => {
         [dispatch, competitions]
     );
 
-    const setWcif = useCallback(
+    const updateWcif = useCallback(
         (wcif) => {
             dispatch(setEditingStatus(false));
             dispatch(setWcif(wcif));
@@ -174,7 +178,7 @@ const SideBar = () => {
             let cachedObject = cachedObjects[competitionId];
             if (!!cachedObject) {
                 let cachedWcif = cachedObject.wcif;
-                setWcif(cachedWcif);
+                updateWcif(cachedWcif);
                 maybeAddCompetition(cachedWcif.id, cachedWcif.name);
 
                 let cachedSuggestedFmcTranslations =
@@ -190,7 +194,7 @@ const SideBar = () => {
 
                 getCompetitionJson(competitionId)
                     .then((wcif) => {
-                        setWcif(wcif);
+                        updateWcif(wcif);
                         dispatch(
                             addCachedObject({
                                 competitionId,
@@ -211,7 +215,7 @@ const SideBar = () => {
             getAndCacheBestMbldAttempt,
             getAndCacheSuggestedFmcTranslations,
             maybeAddCompetition,
-            setWcif,
+            updateWcif,
         ]
     );
 

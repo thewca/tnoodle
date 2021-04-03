@@ -4,7 +4,7 @@ import WcaFormat from "../../model/WcaFormat";
 import Wcif from "../../model/Wcif";
 import WcifEvent from "../../model/WcifEvent";
 import { competitionName2Id } from "../../util/competition.name.util";
-import { defaultWcif } from "../../util/wcif.util";
+import { defaultWcif, getDefaultCopiesExtension } from "../../util/wcif.util";
 
 interface WcifState {
     editingStatus: boolean;
@@ -24,6 +24,16 @@ export const wcifSlice = createSlice({
     name: "wcifSlice",
     initialState,
     reducers: {
+        setCompetitionName: (state, action: PayloadAction<string>) => {
+            let competitionName = action.payload;
+            let id = competitionName2Id(competitionName);
+            state.wcif = {
+                ...state.wcif,
+                name: competitionName,
+                shortName: competitionName,
+                id,
+            };
+        },
         setEditingStatus: (state, action: PayloadAction<boolean>) => {
             state.editingStatus = action.payload;
         },
@@ -47,14 +57,19 @@ export const wcifSlice = createSlice({
         ) => {
             state.wcaFormats = action.payload;
         },
-        setCompetitionName: (state, action: PayloadAction<string>) => {
-            let competitionName = action.payload;
-            let id = competitionName2Id(competitionName);
+        setWcif: (state, action: PayloadAction<Wcif>) => {
             state.wcif = {
-                ...state.wcif,
-                name: competitionName,
-                shortName: competitionName,
-                id,
+                ...action.payload,
+                events: action.payload.events.map((event) => ({
+                    ...event,
+                    rounds: event.rounds.map((round) => ({
+                        ...round,
+                        extensions: [
+                            ...round.extensions,
+                            getDefaultCopiesExtension(),
+                        ],
+                    })),
+                })),
             };
         },
     },
@@ -66,4 +81,5 @@ export const {
     setWcaEvent,
     setWcaEvents,
     setWcaFormats,
+    setWcif,
 } = wcifSlice.actions;
