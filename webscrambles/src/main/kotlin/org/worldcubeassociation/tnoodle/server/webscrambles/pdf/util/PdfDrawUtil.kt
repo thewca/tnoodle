@@ -62,7 +62,7 @@ object PdfDrawUtil {
     }
 
     fun PdfContentByte.fitAndShowText(text: String, rect: Rectangle, font: Font, align: Int = Element.ALIGN_LEFT, leadingMultiplier: Float = 1f): Int {
-        val approxFontSize = PdfUtil.binarySearchDec(1f, font.size, 1f) {
+        val approxFontSize = PdfUtil.binarySearchDec(1f, font.size, PdfUtil.FITTEXT_FONTSIZE_PRECISION) {
             val iterFont = Font(font.baseFont, it)
 
             // We create a temp pdf and check if the text fit in a rectangle there.
@@ -93,17 +93,22 @@ object PdfDrawUtil {
     }
 
     fun PdfContentByte.populateRect(rect: Rectangle, itemsWithAlignment: List<Pair<String, Int>>, font: Font, leadingMultiplier: Float = 1f) {
-        val totalHeight = rect.height
-        val width = rect.width
+        val mergedItemsWithAlignment = itemsWithAlignment.map { Triple(it.first, font, it.second) }
+        populateRect(rect, mergedItemsWithAlignment, leadingMultiplier)
+    }
 
-        val x = rect.left
-        val y = rect.top
+    fun PdfContentByte.populateRect(rect: Rectangle, itemsWithAlignment: List<Triple<String, Font, Int>>, leadingMultiplier: Float = 1f) {
+        val fontPoints = itemsWithAlignment.map { it.second.size }
+        val totalFontPoints = fontPoints.sum()
 
-        val height = totalHeight / itemsWithAlignment.size
+        val slotHeights = fontPoints.map { it / totalFontPoints }.map { it * rect.height }
 
         for ((i, content) in itemsWithAlignment.withIndex()) {
-            val temp = Rectangle(x, y + height * i - totalHeight - font.size, x + width, y + height * i - totalHeight)
-            fitAndShowText(content.first, temp, font, content.second, leadingMultiplier)
+            val height = slotHeights.subList(0, i).sum()
+            val proportionalFontSize = slotHeights[i]
+
+            val temp = Rectangle(rect.left, rect.bottom + height - proportionalFontSize, rect.right, rect.bottom + height)
+            fitAndShowText(content.first, temp, content.second, content.third, leadingMultiplier)
         }
     }
 }

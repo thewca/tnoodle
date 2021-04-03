@@ -47,8 +47,8 @@ class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCod
         val scrambleSuffix = Translate.translate("fmc.scrambleXofY", locale, substitutions)
             .takeIf { expectedAttemptNum > 1 } ?: ""
 
-        val attemptTitle = activityCode.compileTitleString(locale, includeGroupID = hasGroupID)
-        val title = "$competitionTitle - $attemptTitle$scrambleSuffix"
+        val attemptTitle = activityCode.compileTitleString(locale, includeGroupID = hasGroupID).trim()
+        val title = "$competitionTitle - $attemptTitle $scrambleSuffix"
 
         // empty strings for space above and below
         val textList = listOf("", title, scramble, "")

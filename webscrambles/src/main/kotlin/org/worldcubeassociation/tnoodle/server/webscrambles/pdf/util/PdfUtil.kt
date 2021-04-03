@@ -109,7 +109,7 @@ object PdfUtil {
         append("\n")
     }
 
-    private const val FITTEXT_FONTSIZE_PRECISION = 0.1f
+    const val FITTEXT_FONTSIZE_PRECISION = 0.1f
 
     /**
      * Adapted from ColumnText.java in the itextpdf 5.3.0 source code.
@@ -127,10 +127,8 @@ object PdfUtil {
      */
     fun fitText(font: Font, text: String, availableArea: Rectangle, maxFontSize: Float, newlinesAllowed: Boolean, leadingMultiplier: Float = 1f): Float {
         return binarySearchDec(1f, maxFontSize, FITTEXT_FONTSIZE_PRECISION) {
-            // FIXME inplace modification is no good
-            font.size = it
-
-            val lineChunks = text.splitToLineChunks(font, availableArea.width)
+            val iterFont = Font(font.baseFont, it)
+            val lineChunks = text.splitToLineChunks(iterFont, availableArea.width)
 
             // The font size seems to be a pretty good estimate for how
             // much vertical space a row actually takes up.
