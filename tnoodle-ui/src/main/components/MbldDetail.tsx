@@ -37,7 +37,7 @@ const MbldDetail = () => {
                     />
                 </td>
             </tr>
-            {!!mbld && Number(mbld) < bestMbldAttempt && (
+            {!!mbld && !!bestMbldAttempt && Number(mbld) < bestMbldAttempt && (
                 <tr className="alert alert-warning">
                     <th colSpan={4}>
                         {`You selected ${mbld} cubes for Multi-Blind, but there's a competitor who already tried ${bestMbldAttempt} at a competition. Proceed if you are really certain of it.`}

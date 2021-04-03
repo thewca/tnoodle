@@ -1,28 +1,34 @@
 import { MBLD_DEFAULT } from "../constants/wca.constants";
+import RootState from "../model/RootState";
+import Translation from "../model/Translation";
+import WcifEvent from "../model/WcifEvent";
 import { competitionName2Id } from "../util/competition.name.util";
 import { defaultWcif, getDefaultCopiesExtension } from "../util/wcif.util";
 import { ActionTypes } from "./Types";
+import { AnyAction } from "redux";
 
-const defaultStore = {
-    wcif: defaultWcif,
-    mbld: MBLD_DEFAULT,
-    password: "",
-    editingDisabled: false, // If we fetch competition info, some fields can't be changed
-    officialZip: true,
-    fileZipBlob: null,
-    generatingScrambles: false,
-    scramblingProgressTarget: {},
-    scramblingProgressCurrent: {},
+const defaultStore: RootState = {
+    bestMbldAttempt: undefined,
     cachedObjects: {},
-    translations: null,
-    suggestedFmcTranslations: null,
-    bestMbldAttempt: null,
-    wcaFormats: null,
-    wcaEvents: null,
-    competitions: null,
+    competitionId: undefined,
+    competitions: undefined,
+    editingDisabled: false, // If we fetch competition info, some fields can't be changed
+    fileZipBlob: undefined,
+    generatingScrambles: false,
+    me: undefined,
+    mbld: "" + MBLD_DEFAULT,
+    officialZip: true,
+    password: "",
+    scramblingProgressCurrent: {},
+    scramblingProgressTarget: {},
+    suggestedFmcTranslations: undefined,
+    translations: undefined,
+    wcaEvents: undefined,
+    wcaFormats: undefined,
+    wcif: defaultWcif,
 };
 
-export const Reducer = (store, action) => {
+export const Reducer = (store: RootState, action: AnyAction) => {
     if (action.type === ActionTypes.UPDATE_ME) {
         return {
             ...store,
@@ -94,7 +100,7 @@ export const Reducer = (store, action) => {
         let wcif = action.payload.wcif || defaultWcif;
 
         // Sets copies to 1 since it does not come from the website.
-        wcif.events.forEach((event) =>
+        wcif.events.forEach((event: WcifEvent) =>
             event.rounds.forEach((round) =>
                 round.extensions.push(getDefaultCopiesExtension())
             )
@@ -170,27 +176,25 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.RESET_TRANSLATIONS) {
         return {
             ...store,
-            translations: [
-                ...store.translations.map((translation) => ({
+            translations: store.translations?.map(
+                (translation: Translation) => ({
                     ...translation,
                     status: false,
-                })),
-            ],
+                })
+            ),
         };
     }
 
     if (action.type === ActionTypes.UPDATE_TRANSLATION) {
         return {
             ...store,
-            translations: [
-                ...store.translations.map((translation) => ({
-                    ...translation,
-                    status:
-                        translation.id === action.payload.id
-                            ? action.payload.status
-                            : translation.status,
-                })),
-            ],
+            translations: store.translations?.map((translation) => ({
+                ...translation,
+                status:
+                    translation.id === action.payload.id
+                        ? action.payload.status
+                        : translation.status,
+            })),
         };
     }
 
@@ -204,12 +208,10 @@ export const Reducer = (store, action) => {
     if (action.type === ActionTypes.SELECT_ALL_TRANSLATIONS) {
         return {
             ...store,
-            translations: [
-                ...store.translations.map((translation) => ({
-                    ...translation,
-                    status: true,
-                })),
-            ],
+            translations: store.translations?.map((translation) => ({
+                ...translation,
+                status: true,
+            })),
         };
     }
 
@@ -221,7 +223,7 @@ export const Reducer = (store, action) => {
     }
 
     if (action.type === ActionTypes.SET_SUGGESTED_FMC_TRANSLATIONS) {
-        let translations = store.translations.map((translation) => ({
+        let translations = store.translations?.map((translation) => ({
             ...translation,
             status: action.payload.suggestedFmcTranslations.includes(
                 translation.id
@@ -229,7 +231,7 @@ export const Reducer = (store, action) => {
         }));
         return {
             ...store,
-            translations: [...translations],
+            translations,
         };
     }
 

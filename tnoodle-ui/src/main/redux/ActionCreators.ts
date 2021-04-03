@@ -149,7 +149,7 @@ export const addSuggestedFmcTranslations = (
  * @param {array} suggestedFmcTranslations
  */
 export const setSuggestedFmcTranslations = (
-    suggestedFmcTranslations: string[]
+    suggestedFmcTranslations?: string[]
 ) => ({
     type: ActionTypes.SET_SUGGESTED_FMC_TRANSLATIONS,
     payload: { suggestedFmcTranslations },

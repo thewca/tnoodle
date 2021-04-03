@@ -7,22 +7,22 @@ import WcaFormat from "./WcaFormat";
 import Wcif from "./Wcif";
 
 export default interface RootState {
-    bestMbldAttempt: number;
+    bestMbldAttempt?: number;
     cachedObjects: Record<string, CachedObject>;
-    competitionId: string;
-    competitions: Competition[];
+    competitionId?: string;
+    competitions?: Competition[];
     editingDisabled: boolean;
-    fileZipBlob: Blob;
+    fileZipBlob?: Blob;
     generatingScrambles: boolean;
     mbld: string;
-    me: Person;
+    me?: Person;
     officialZip: boolean;
     password: string;
     scramblingProgressCurrent: Record<string, number>;
     scramblingProgressTarget: Record<string, number>;
-    suggestedFmcTranslations: string[];
-    translations: Translation[];
-    wcaEvents: WcaEvent[];
-    wcaFormats: Record<string, WcaFormat>;
+    suggestedFmcTranslations?: string[];
+    translations?: Translation[];
+    wcaEvents?: WcaEvent[];
+    wcaFormats?: Record<string, WcaFormat>;
     wcif: Wcif;
 }
