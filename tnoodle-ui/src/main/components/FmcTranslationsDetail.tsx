@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
 import {
-    setSuggestedFmcTranslations,
+    filterSuggestedFmcTranslations,
     updateAllTranslationsStatus,
     updateTranslationStatus,
 } from "../redux/slice/FmcSlice";
@@ -18,6 +18,7 @@ const FmcTranslationsDetail = () => {
     const suggestedFmcTranslations = useSelector(
         (state: RootState) => state.fmcSlice.suggestedFmcTranslations
     );
+
     const translations = useSelector(
         (state: RootState) => state.fmcSlice.translations
     );
@@ -44,7 +45,7 @@ const FmcTranslationsDetail = () => {
 
     const selectSuggestedTranslations = () => {
         dispatch(setFileZipBlob());
-        dispatch(setSuggestedFmcTranslations(suggestedFmcTranslations));
+        dispatch(filterSuggestedFmcTranslations(suggestedFmcTranslations));
     };
 
     const translationsDetail = () => {

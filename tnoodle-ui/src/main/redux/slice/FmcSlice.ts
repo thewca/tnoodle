@@ -36,6 +36,15 @@ export const fmcSlice = createSlice({
                 status: action.payload,
             }));
         },
+        filterSuggestedFmcTranslations: (
+            state,
+            action: PayloadAction<string[] | undefined>
+        ) => {
+            state.translations = state.translations!.map((translation) => ({
+                ...translation,
+                status: !!action.payload?.includes(translation.id),
+            }));
+        },
         setSuggestedFmcTranslations: (
             state,
             action: PayloadAction<string[] | undefined>
@@ -52,6 +61,7 @@ export const fmcSlice = createSlice({
 });
 
 export const {
+    filterSuggestedFmcTranslations,
     setSuggestedFmcTranslations,
     setTranslations,
     updateTranslationStatus,
