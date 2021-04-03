@@ -66,7 +66,7 @@ tasks.create("registerCloudReleaseTag") {
 }
 
 tasks.create<ProGuardTask>("minifyRelease") {
-    dependsOn("buildOfficial")
+    dependsOn("registerReleaseTag", "buildOfficial")
 
     configuration("proguard-rules.pro")
 
