@@ -55,7 +55,7 @@ const SideBar = () => {
     );
     const [isOpen, setIsOpen] = useState(true);
 
-    const dispatch = useCallback(useDispatch(), []);
+    const dispatch = useDispatch();
 
     const handleIsOpen = () => setIsOpen(window.innerWidth > 992);
 
