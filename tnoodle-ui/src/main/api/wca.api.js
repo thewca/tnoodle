@@ -1,3 +1,4 @@
+import Axios from "axios";
 import { BASE_PATH } from "../../App";
 import { getHashParameter, getQueryParameter } from "../util/query.param.util";
 
@@ -35,11 +36,12 @@ let getTnoodleAppId = () => {
 
 let wcaAccessToken = getHashParameter(ACCESS_TOKEN);
 let expiresIn = getHashParameter(EXPIRES_IN);
+let expiration = null;
 if (!!wcaAccessToken) {
     window.location.hash = "";
 
     let now = new Date();
-    let expiration = now.setSeconds(now.getSeconds() + Number(expiresIn));
+    expiration = now.setSeconds(now.getSeconds() + Number(expiresIn)) + "";
 
     localStorage[TNOODLE_ACCESS_TOKEN_KEY] = wcaAccessToken;
     localStorage[TNOODLE_EXPIRATION] = expiration;
@@ -47,7 +49,7 @@ if (!!wcaAccessToken) {
     gotoPreLoginPath();
 } else {
     wcaAccessToken = localStorage[TNOODLE_ACCESS_TOKEN_KEY];
-    expiresIn = localStorage[TNOODLE_EXPIRATION];
+    expiration = localStorage[TNOODLE_EXPIRATION];
 }
 
 export function isUsingStaging() {
@@ -72,7 +74,7 @@ export function logIn() {
 }
 
 export function isLogged() {
-    if (localStorage[TNOODLE_ACCESS_TOKEN_KEY] == null) {
+    if (!wcaAccessToken) {
         return false;
     }
 
@@ -80,9 +82,7 @@ export function isLogged() {
         return false;
     }
 
-    let expiration = localStorage[TNOODLE_EXPIRATION];
-
-    if (expiration == null) {
+    if (!expiration) {
         return false;
     }
 
@@ -99,7 +99,7 @@ export function logOut() {
     delete localStorage[TNOODLE_ACCESS_TOKEN_KEY];
     delete localStorage[TNOODLE_EXPIRATION];
     wcaAccessToken = null;
-    expiresIn = null;
+    expiration = null;
     window.location.reload();
 }
 
@@ -112,46 +112,37 @@ export function gotoPreLoginPath() {
     window.location.replace(preLoginHref);
 }
 
-export async function fetchMe() {
-    const response = await wcaApiFetch("/me");
-    const json = await response.json();
-    return json.me;
-}
-
-export async function fetchVersionInfo() {
-    const response = await wcaApiFetch("/scramble-program");
-    return await response.json();
-}
-
-export async function getCompetitionJson(competitionId) {
-    const response = await wcaApiFetch(`/competitions/${competitionId}/wcif`);
-    return await response.json();
-}
-
-export async function getUpcomingManageableCompetitions() {
-    let oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const response = await wcaApiFetch(
-        `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
-    );
-    return await response.json();
-}
-
 const getLastLoginEnv = () => localStorage[TNOODLE_LAST_LOGIN_ENV];
 
 const getCurrentEnv = () => (isUsingStaging() ? STAGING : PRODUCTION);
 
-async function wcaApiFetch(path, fetchOptions) {
-    var baseApiUrl = toWcaUrl("/api/v0");
-    fetchOptions = Object.assign({}, fetchOptions, {
-        headers: new Headers({
-            Authorization: `Bearer ${wcaAccessToken}`,
-            "Content-Type": "application/json",
-        }),
-    });
+class WcaApi {
+    fetchMe = () => this.wcaApiFetch("/me");
 
-    const response = await fetch(`${baseApiUrl}${path}`, fetchOptions);
-    if (!response.ok) {
-        return Promise.reject();
+    fetchVersionInfo = () => Axios.get(toWcaUrl("/api/v0/scramble-program"));
+
+    getCompetitionJson = (competitionId) =>
+        this.wcaApiFetch(`/competitions/${competitionId}/wcif`);
+
+    getUpcomingManageableCompetitions = () => {
+        let oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        return this.wcaApiFetch(
+            `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
+        );
+    };
+
+    wcaApiFetch(path) {
+        var baseApiUrl = toWcaUrl("/api/v0");
+        let fetchOptions = {
+            headers: {
+                Authorization: `Bearer ${wcaAccessToken}`,
+                "Content-Type": "application/json",
+            },
+        };
+
+        return Axios.get(baseApiUrl + path, fetchOptions);
     }
-    return response;
 }
+
+const wcaApi = new WcaApi();
+export default wcaApi;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import { fetchVersionInfo } from "../api/wca.api";
+import wcaApi from "../api/wca.api";
 import CurrentTnoodle from "../model/CurrentTnoodle";
 import { setOfficialZipStatus } from "../redux/slice/ScramblingSlice";
 
@@ -28,13 +28,10 @@ const VersionInfo = () => {
 
     useEffect(() => {
         // Fetch from WCA API.
-        fetchVersionInfo().then((response) => {
-            if (!response) {
-                return;
-            }
-            setCurrentTnoodle(response.current);
-            setAllowedTnoodleVersions(response.allowed);
-            setWcaPublicKeyBytes(response.publicKeyBytes);
+        wcaApi.fetchVersionInfo().then((response) => {
+            setCurrentTnoodle(response.data.current);
+            setAllowedTnoodleVersions(response.data.allowed);
+            setWcaPublicKeyBytes(response.data.publicKeyBytes);
         });
 
         tnoodleApi.fetchRunningVersion().then((response) => {

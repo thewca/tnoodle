@@ -2,14 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Collapse } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import {
-    fetchMe,
-    getCompetitionJson,
-    getUpcomingManageableCompetitions,
-    isLogged,
-    logIn,
-    logOut,
-} from "../api/wca.api";
+import wcaApi, { isLogged, logIn, logOut } from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import RootState from "../model/RootState";
 import {
@@ -64,15 +57,17 @@ const SideBar = () => {
         }
         if (!me) {
             setLoadingUser(true);
-            fetchMe()
-                .then((me) => dispatch(setMe(me)))
+            wcaApi
+                .fetchMe()
+                .then((response) => dispatch(setMe(response.data.me)))
                 .finally(() => setLoadingUser(false));
         }
 
         if (!competitions) {
             setLoadingCompetitions(true);
-            getUpcomingManageableCompetitions()
-                .then((competitions) => dispatch(setCompetitions(competitions)))
+            wcaApi
+                .getUpcomingManageableCompetitions()
+                .then((response) => dispatch(setCompetitions(response.data)))
                 .finally(() => setLoadingCompetitions(false));
         }
 
@@ -186,19 +181,23 @@ const SideBar = () => {
             } else {
                 setLoadingCompetitionInfo(true);
 
-                getCompetitionJson(competitionId)
-                    .then((wcif) => {
-                        updateWcif(wcif);
+                wcaApi
+                    .getCompetitionJson(competitionId)
+                    .then((response) => {
+                        updateWcif(response.data);
                         dispatch(
                             addCachedObject({
                                 competitionId,
                                 identifier: "wcif",
-                                object: wcif,
+                                object: response.data,
                             })
                         );
-                        maybeAddCompetition(wcif.id, wcif.name);
-                        getAndCacheSuggestedFmcTranslations(wcif);
-                        getAndCacheBestMbldAttempt(wcif);
+                        maybeAddCompetition(
+                            response.data.id,
+                            response.data.name
+                        );
+                        getAndCacheSuggestedFmcTranslations(response.data);
+                        getAndCacheBestMbldAttempt(response.data);
                     })
                     .finally(() => setLoadingCompetitionInfo(false));
             }
