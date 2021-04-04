@@ -1,5 +1,9 @@
 import Axios from "axios";
 import { BASE_PATH } from "../../App";
+import ScrambleProgram from "../components/ScrambleProgram";
+import Competition from "../model/Competition";
+import Person from "../model/Person";
+import Wcif from "../model/Wcif";
 import { getHashParameter, getQueryParameter } from "../util/query.param.util";
 
 // Members of the Software Team can configure this here: https://www.worldcubeassociation.org/oauth/applications/123.
@@ -117,21 +121,22 @@ const getLastLoginEnv = () => localStorage[TNOODLE_LAST_LOGIN_ENV];
 const getCurrentEnv = () => (isUsingStaging() ? STAGING : PRODUCTION);
 
 class WcaApi {
-    fetchMe = () => this.wcaApiFetch("/me");
+    fetchMe = () => this.wcaApiFetch<{ me: Person }>("/me");
 
-    fetchVersionInfo = () => Axios.get(toWcaUrl("/api/v0/scramble-program"));
+    fetchVersionInfo = () =>
+        Axios.get<ScrambleProgram>(toWcaUrl("/api/v0/scramble-program"));
 
     getCompetitionJson = (competitionId: string) =>
-        this.wcaApiFetch(`/competitions/${competitionId}/wcif`);
+        this.wcaApiFetch<Wcif>(`/competitions/${competitionId}/wcif`);
 
     getUpcomingManageableCompetitions = () => {
         let oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        return this.wcaApiFetch(
+        return this.wcaApiFetch<Competition[]>(
             `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
         );
     };
 
-    private wcaApiFetch(path: string) {
+    private wcaApiFetch<T>(path: string) {
         var baseApiUrl = toWcaUrl("/api/v0");
         let fetchOptions = {
             headers: {
@@ -140,7 +145,7 @@ class WcaApi {
             },
         };
 
-        return Axios.get(baseApiUrl + path, fetchOptions);
+        return Axios.get<T>(baseApiUrl + path, fetchOptions);
     }
 }
 
