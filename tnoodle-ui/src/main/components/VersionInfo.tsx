@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { fetchRunningVersion } from "../api/tnoodle.api";
+import tnoodleApi from "../api/tnoodle.api";
 import { fetchVersionInfo } from "../api/wca.api";
 import CurrentTnoodle from "../model/CurrentTnoodle";
 import { setOfficialZipStatus } from "../redux/slice/ScramblingSlice";
@@ -37,18 +37,14 @@ const VersionInfo = () => {
             setWcaPublicKeyBytes(response.publicKeyBytes);
         });
 
-        fetchRunningVersion().then((response) => {
-            if (!response) {
-                return;
-            }
-
+        tnoodleApi.fetchRunningVersion().then((response) => {
             setRunningVersion(
-                !!response.projectName && !!response.projectVersion
-                    ? `${response.projectName}-${response.projectVersion}`
+                !!response.data.projectName && !!response.data.projectVersion
+                    ? `${response.data.projectName}-${response.data.projectVersion}`
                     : ""
             );
-            setSignedBuild(response.signedBuild);
-            setSignatureKeyBytes(response.signatureKeyBytes);
+            setSignedBuild(response.data.signedBuild);
+            setSignatureKeyBytes(response.data.signatureKeyBytes);
         });
     }, [dispatch, signatureValid]);
 

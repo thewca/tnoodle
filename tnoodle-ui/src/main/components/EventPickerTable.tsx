@@ -1,14 +1,9 @@
 import { chunk } from "lodash";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    fetchAvailableFmcTranslations,
-    fetchFormats,
-    fetchWcaEvents,
-} from "../api/tnoodle.api";
+import tnoodleApi from "../api/tnoodle.api";
 import { toWcaUrl } from "../api/wca.api";
 import RootState from "../model/RootState";
-import WcaEvent from "../model/WcaEvent";
 import { setTranslations } from "../redux/slice/FmcSlice";
 import { setWcaEvents, setWcaFormats } from "../redux/slice/WcifSlice";
 import EventPicker from "./EventPicker";
@@ -30,14 +25,11 @@ const EventPickerTable = () => {
     const dispatch = useDispatch();
 
     const getFmcTranslations = useCallback(() => {
-        fetchAvailableFmcTranslations().then((availableTranslations) => {
-            if (!availableTranslations) {
-                return;
-            }
-            let translations = Object.keys(availableTranslations).map(
+        tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
+            let translations = Object.keys(response.data).map(
                 (translationId) => ({
                     id: translationId,
-                    name: availableTranslations[translationId],
+                    name: response.data[translationId],
                     status: true,
                 })
             );
@@ -46,12 +38,12 @@ const EventPickerTable = () => {
     }, [dispatch]);
 
     const fetchInformation = () => {
-        fetchFormats().then((response) => {
-            dispatch(setWcaFormats(response));
+        tnoodleApi.fetchFormats().then((response) => {
+            dispatch(setWcaFormats(response.data));
         });
-        fetchWcaEvents().then((response: WcaEvent[]) =>
-            dispatch(setWcaEvents(response))
-        );
+        tnoodleApi
+            .fetchWcaEvents()
+            .then((response) => dispatch(setWcaEvents(response.data)));
         getFmcTranslations();
     };
 

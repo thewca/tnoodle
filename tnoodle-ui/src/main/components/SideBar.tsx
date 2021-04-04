@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Collapse } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    fetchBestMbldAttempt,
-    fetchSuggestedFmcTranslations,
-} from "../api/tnoodle.api";
+import tnoodleApi from "../api/tnoodle.api";
 import {
     fetchMe,
     getCompetitionJson,
@@ -102,11 +99,8 @@ const SideBar = () => {
 
     const getAndCacheBestMbldAttempt = useCallback(
         (wcif) => {
-            fetchBestMbldAttempt(wcif).then((bestAttempt) => {
-                if (!bestAttempt) {
-                    return;
-                }
-                let attempted = bestAttempt.attempted;
+            tnoodleApi.fetchBestMbldAttempt(wcif).then((response) => {
+                let attempted = response.data.attempted;
                 dispatch(
                     addCachedObject({
                         competitionId: wcif.id,
@@ -122,15 +116,15 @@ const SideBar = () => {
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
         (wcif) => {
-            fetchSuggestedFmcTranslations(wcif).then((translations) => {
+            tnoodleApi.fetchSuggestedFmcTranslations(wcif).then((response) => {
                 dispatch(
                     addCachedObject({
                         competitionId: wcif.id,
                         identifier: "suggestedFmcTranslations",
-                        object: translations,
+                        object: response.data,
                     })
                 );
-                dispatch(setSuggestedFmcTranslations(translations));
+                dispatch(setSuggestedFmcTranslations(response.data));
             });
         },
         [dispatch]

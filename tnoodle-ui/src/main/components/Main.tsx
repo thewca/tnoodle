@@ -1,6 +1,6 @@
 import { SyntheticEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchZip } from "../api/tnoodle.api";
+import tnoodleApi from "../api/tnoodle.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
 import { isUsingStaging } from "../api/wca.api";
 import RootState from "../model/RootState";
@@ -66,7 +66,8 @@ const Main = () => {
             setScramblingProgressCurrentEvent
         );
 
-        fetchZip(scrambleClient, wcif, mbld, password, translations)
+        tnoodleApi
+            .fetchZip(scrambleClient, wcif, mbld, password, translations)
             .then((blob: Blob) => dispatch(setFileZipBlob(blob)))
             .catch((err: any) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
