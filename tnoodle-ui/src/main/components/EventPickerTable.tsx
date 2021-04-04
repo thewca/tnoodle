@@ -26,10 +26,10 @@ const EventPickerTable = () => {
 
     const getFmcTranslations = useCallback(() => {
         tnoodleApi.fetchAvailableFmcTranslations().then((response) => {
-            let translations = Object.keys(response.data).map(
-                (translationId) => ({
-                    id: translationId,
-                    name: response.data[translationId],
+            let translations = Object.entries(response.data).map(
+                ([id, name]) => ({
+                    id,
+                    name,
                     status: true,
                 })
             );

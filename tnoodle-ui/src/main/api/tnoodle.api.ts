@@ -1,5 +1,9 @@
 import Axios from "axios";
+import BestMbld from "../model/BestMbld";
+import RunningVersion from "../model/RunningVersion";
 import Translation from "../model/Translation";
+import WcaEvent from "../model/WcaEvent";
+import WcaFormat from "../model/WcaFormat";
 import Wcif from "../model/Wcif";
 import { ScrambleClient } from "./tnoodle.socket";
 
@@ -40,20 +44,28 @@ const fmcTranslationsHelper = (translations?: Translation[]) => {
 };
 
 class TnoodleApi {
-    fetchWcaEvents = () => Axios.get(tNoodleBackend + wcaEventsEndpoint);
+    fetchWcaEvents = () =>
+        Axios.get<WcaEvent[]>(tNoodleBackend + wcaEventsEndpoint);
 
-    fetchFormats = () => Axios.get(tNoodleBackend + formatsEndpoint);
+    fetchFormats = () =>
+        Axios.get<Record<string, WcaFormat>>(tNoodleBackend + formatsEndpoint);
 
     fetchSuggestedFmcTranslations = (wcif: Wcif) =>
-        Axios.post(tNoodleBackend + suggestedFmcTranslationsEndpoint, wcif);
+        Axios.post<string[]>(
+            tNoodleBackend + suggestedFmcTranslationsEndpoint,
+            wcif
+        );
 
     fetchBestMbldAttempt = (wcif: Wcif) =>
-        Axios.post(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
+        Axios.post<BestMbld>(tNoodleBackend + bestMbldAttemptEndpoint, wcif);
 
-    fetchRunningVersion = () => Axios.get(tNoodleBackend + versionEndpoint);
+    fetchRunningVersion = () =>
+        Axios.get<RunningVersion>(tNoodleBackend + versionEndpoint);
 
     fetchAvailableFmcTranslations = () =>
-        Axios.get(tNoodleBackend + fmcTranslationsEndpoint);
+        Axios.get<Record<string, string>>(
+            tNoodleBackend + fmcTranslationsEndpoint
+        );
 
     fetchZip = (
         scrambleClient: ScrambleClient,
