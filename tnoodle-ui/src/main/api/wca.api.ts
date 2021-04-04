@@ -36,7 +36,7 @@ let getTnoodleAppId = () => {
 
 let wcaAccessToken = getHashParameter(ACCESS_TOKEN);
 let expiresIn = getHashParameter(EXPIRES_IN);
-let expiration = null;
+let expiration: string | null = null;
 if (!!wcaAccessToken) {
     window.location.hash = "";
 
@@ -56,7 +56,7 @@ export function isUsingStaging() {
     return getQueryParameter("staging") === "true";
 }
 
-export function toWcaUrl(path) {
+export function toWcaUrl(path: string) {
     return `${getWcaOrigin()}${path}`;
 }
 
@@ -70,7 +70,7 @@ export function logIn() {
         `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
     );
     localStorage["TNoodle.preLoginHref"] = window.location.href;
-    window.location = logInUrl;
+    window.location.href = logInUrl;
 }
 
 export function isLogged() {
@@ -121,7 +121,7 @@ class WcaApi {
 
     fetchVersionInfo = () => Axios.get(toWcaUrl("/api/v0/scramble-program"));
 
-    getCompetitionJson = (competitionId) =>
+    getCompetitionJson = (competitionId: string) =>
         this.wcaApiFetch(`/competitions/${competitionId}/wcif`);
 
     getUpcomingManageableCompetitions = () => {
@@ -131,7 +131,7 @@ class WcaApi {
         );
     };
 
-    wcaApiFetch(path) {
+    private wcaApiFetch(path: string) {
         var baseApiUrl = toWcaUrl("/api/v0");
         let fetchOptions = {
             headers: {
