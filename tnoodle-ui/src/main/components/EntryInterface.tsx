@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import RootState from "../model/RootState";
-import { setFileZipBlob, setPassword } from "../redux/slice/ScramblingSlice";
+import { setFileZip, setPassword } from "../redux/slice/ScramblingSlice";
 import { setCompetitionName } from "../redux/slice/WcifSlice";
 
 const EntryInterface = () => {
@@ -27,14 +27,14 @@ const EntryInterface = () => {
         dispatch(setCompetitionName(name));
 
         // Require another zip with the new name.
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
     };
 
     const handlePasswordChange = (password: string) => {
         dispatch(setPassword(password));
 
         // Require another zip with the new password, in case there was a zip generated.
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
     };
 
     return (

@@ -7,7 +7,7 @@ import {
     updateAllTranslationsStatus,
     updateTranslationStatus,
 } from "../redux/slice/FmcSlice";
-import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
+import { setFileZip } from "../redux/slice/ScramblingSlice";
 import "./FmcTranslationsDetail.css";
 
 const TRANSLATIONS_PER_LINE = 3;
@@ -29,22 +29,22 @@ const FmcTranslationsDetail = () => {
     const dispatch = useDispatch();
 
     const handleTranslation = (id: string, status: boolean) => {
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
         dispatch(updateTranslationStatus({ id, status }));
     };
 
     const handleSelectAllTranslations = () => {
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
         dispatch(updateAllTranslationsStatus(true));
     };
 
     const selectNoneTranslation = () => {
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
         dispatch(updateAllTranslationsStatus(false));
     };
 
     const selectSuggestedTranslations = () => {
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
         dispatch(filterSuggestedFmcTranslations(suggestedFmcTranslations));
     };
 

@@ -6,7 +6,7 @@ import RootState from "../model/RootState";
 import Round from "../model/Round";
 import WcaEvent from "../model/WcaEvent";
 import WcifEvent from "../model/WcifEvent";
-import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
+import { setFileZip } from "../redux/slice/ScramblingSlice";
 import { setWcaEvent } from "../redux/slice/WcifSlice";
 import {
     copiesExtensionId,
@@ -42,7 +42,7 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
 
     const updateEvent = (rounds: Round[]) => {
         let event = { id: wcaEvent.id, rounds };
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
         dispatch(setWcaEvent(event));
     };
     const [image, setImage] = useState();

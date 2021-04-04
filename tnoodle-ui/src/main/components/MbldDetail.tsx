@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MBLD_MIN } from "../constants/wca.constants";
 import RootState from "../model/RootState";
 import { setMbld } from "../redux/slice/MbldSlice";
-import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
+import { setFileZip } from "../redux/slice/ScramblingSlice";
 
 const MbldDetail = () => {
     const mbld = useSelector((state: RootState) => state.mbldSlice.mbld);
@@ -17,7 +17,7 @@ const MbldDetail = () => {
 
     const handleMbldChange = (newMbld: string) => {
         dispatch(setMbld(newMbld));
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
     };
 
     return (

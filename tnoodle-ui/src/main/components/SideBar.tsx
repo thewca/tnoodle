@@ -12,7 +12,7 @@ import {
 import { setSuggestedFmcTranslations } from "../redux/slice/FmcSlice";
 import { addCachedObject, setMe } from "../redux/slice/InformationSlice";
 import { setBestMbldAttempt } from "../redux/slice/MbldSlice";
-import { setFileZipBlob } from "../redux/slice/ScramblingSlice";
+import { setFileZip } from "../redux/slice/ScramblingSlice";
 import {
     setCompetitionName,
     setEditingStatus,
@@ -86,7 +86,7 @@ const SideBar = () => {
         dispatch(setWcif({ ...defaultWcif }));
         dispatch(setBestMbldAttempt());
         dispatch(setCompetitionName(getDefaultCompetitionName()));
-        dispatch(setFileZipBlob());
+        dispatch(setFileZip());
         dispatch(setSuggestedFmcTranslations());
 
         deleteParameter("competitionId");
@@ -154,7 +154,7 @@ const SideBar = () => {
             dispatch(setWcif(wcif));
             dispatch(setCompetitionId(wcif.id));
             dispatch(setCompetitionId(wcif.name));
-            dispatch(setFileZipBlob());
+            dispatch(setFileZip());
         },
         [dispatch]
     );

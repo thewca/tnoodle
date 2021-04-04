@@ -14,7 +14,10 @@ let bestMbldAttemptEndpoint = "/frontend/mbld/best";
 let wcaEventsEndpoint = "/frontend/data/events";
 let formatsEndpoint = "/frontend/data/formats";
 
-const convertToBlob = async (result: any) => {
+export const convertToBlob = async (result: {
+    contentType: string;
+    payload: string;
+}) => {
     let { contentType, payload } = result;
     let res = await fetch(`data:${contentType};base64,${payload}`);
 
@@ -66,9 +69,7 @@ class TnoodleApi {
             password,
         };
 
-        return scrambleClient
-            .loadScrambles(zipEndpoint, payload, wcif.id)
-            .then((result) => convertToBlob(result));
+        return scrambleClient.loadScrambles(zipEndpoint, payload, wcif.id);
     };
 }
 

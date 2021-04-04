@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ScramblingState {
-    fileZipBlob?: Blob;
+    fileZip?: { contentType: string; payload: string };
     generatingScrambles: boolean;
     officialZipStatus: boolean;
     password: string;
@@ -10,7 +10,7 @@ interface ScramblingState {
 }
 
 const initialState: ScramblingState = {
-    fileZipBlob: undefined,
+    fileZip: undefined,
     generatingScrambles: false,
     password: "",
     officialZipStatus: true,
@@ -22,8 +22,13 @@ export const scramblingSlice = createSlice({
     name: "scramblingSlice",
     initialState,
     reducers: {
-        setFileZipBlob: (state, action: PayloadAction<Blob | undefined>) => {
-            state.fileZipBlob = action.payload;
+        setFileZip: (
+            state,
+            action: PayloadAction<
+                { contentType: string; payload: string } | undefined
+            >
+        ) => {
+            state.fileZip = action.payload;
         },
         setGeneratingScrambles: (state, action: PayloadAction<boolean>) => {
             state.generatingScrambles = action.payload;
@@ -57,7 +62,7 @@ export const scramblingSlice = createSlice({
 });
 
 export const {
-    setFileZipBlob,
+    setFileZip,
     setOfficialZipStatus,
     setPassword,
     setGeneratingScrambles,

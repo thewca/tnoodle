@@ -1,12 +1,12 @@
 import { SyntheticEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi from "../api/tnoodle.api";
+import tnoodleApi, { convertToBlob } from "../api/tnoodle.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
 import { isUsingStaging } from "../api/wca.api";
 import RootState from "../model/RootState";
 import {
     resetScramblingProgressCurrent,
-    setFileZipBlob,
+    setFileZip,
     setGeneratingScrambles,
     setScramblingProgressCurrentEvent,
     setScramblingProgressTarget,
@@ -36,8 +36,8 @@ const Main = () => {
     const officialZipStatus = useSelector(
         (state: RootState) => state.scramblingSlice.officialZipStatus
     );
-    const fileZipBlob = useSelector(
-        (state: RootState) => state.scramblingSlice.fileZipBlob
+    const fileZip = useSelector(
+        (state: RootState) => state.scramblingSlice.fileZip
     );
 
     const interceptorRef = useRef<Interceptor>(null);
@@ -51,8 +51,8 @@ const Main = () => {
             return;
         }
 
-        if (!!fileZipBlob) {
-            downloadZip();
+        if (!!fileZip) {
+            convertToBlob(fileZip).then((blob) => downloadZip(blob));
         } else {
             generateZip();
         }
@@ -68,7 +68,9 @@ const Main = () => {
 
         tnoodleApi
             .fetchZip(scrambleClient, wcif, mbld, password, translations)
-            .then((blob: Blob) => dispatch(setFileZipBlob(blob)))
+            .then((blob: { contentType: string; payload: string }) =>
+                dispatch(setFileZip(blob))
+            )
             .catch((err: any) => interceptorRef.current?.updateMessage(err))
             .finally(() => {
                 dispatch(setGeneratingScrambles(false));
@@ -77,7 +79,7 @@ const Main = () => {
         dispatch(setGeneratingScrambles(true));
     };
 
-    const downloadZip = () => {
+    const downloadZip = (blob: Blob) => {
         // We use the unofficialZip to stamp .zip in order to prevent delegates / organizers mistakes.
         // If TNoodle version is not official (as per VersionInfo) or if we generate scrambles using
         // a competition from staging, add a [Unofficial]
@@ -91,7 +93,7 @@ const Main = () => {
             ".zip";
 
         const link = document.createElement("a");
-        link.href = URL.createObjectURL(fileZipBlob);
+        link.href = URL.createObjectURL(blob);
         link.download = fileName;
         link.target = "_blank";
         link.setAttribute("type", "hidden");
@@ -115,7 +117,7 @@ const Main = () => {
                 </button>
             );
         }
-        if (!!fileZipBlob) {
+        if (!!fileZip) {
             return (
                 <button type="submit" className="btn btn-success form-control">
                     Download Scrambles
