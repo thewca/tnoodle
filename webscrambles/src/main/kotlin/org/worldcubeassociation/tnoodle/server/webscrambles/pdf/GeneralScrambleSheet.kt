@@ -5,12 +5,15 @@ import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.svglite.Dimension
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfUtil.splitToLineChunks
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.StringUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
+import java.io.File
 import kotlin.math.min
 
 class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode) : BaseScrambleSheet(scrambleSet, activityCode) {
@@ -75,16 +78,28 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     }
 
     private fun getFontConfiguration(availableArea: Rectangle, scrambles: List<String>): Font {
-        val longestScramble = scrambles.flatMap { it.split(NEW_LINE) }.maxByOrNull { it.length }.orEmpty()
-        val maxLines = scrambles.map { it.split(NEW_LINE) }.map { it.count() }.maxOrNull() ?: 1
+        val longestScramble = scrambles.maxByOrNull { it.length }.orEmpty()
 
-        val fontSize = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScramble, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true) // FIXME const
-        val fontSizeIfIncludingNewlines = availableArea.height / maxLines
+        val longestPaddedScramble = scrambles.map { StringUtil.padTurnsUniformly(it, WIDEST_CHAR_STRING) }
+            .maxByOrNull { it.length } ?: longestScramble
 
-        // fontSize should fit horizontally. fontSizeIfIncludingNewlines should fit considering \n
-        // In case maxLines = 1, fontSizeIfIncludingNewlines is just ignored (as 1 font size should fill the whole rectangle's height)
-        // in case we have maxLines > 1, we fit width or height and take the min of it.
-        val perfectFontSize = min(fontSize, fontSizeIfIncludingNewlines)
+        val longestScrambleOneLine = NEW_LINE !in longestPaddedScramble
+
+        // I don't know how to configure ColumnText.fitText's word wrapping characters,
+        // so instead, I just replace each character I don't want to wrap with M, which
+        // should be the widest character (we're using a monospaced font,
+        // so that doesn't really matter), and won't get wrapped.
+        val longestScrambleMasked = WIDEST_CHAR_STRING.repeat(longestScramble.length)
+        val longestPaddedScrambleMasked = longestPaddedScramble.replace(" ".toRegex(), WIDEST_CHAR_STRING)
+
+        val fontSizeWithoutPadding = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScrambleMasked, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, false)
+
+        // If the scramble contains newlines, then we *only* allow wrapping at the newlines.
+        val longestRespectingNewlines = longestPaddedScramble.takeIf { longestScrambleOneLine } ?: longestPaddedScrambleMasked
+        val fontSizeIfIncludingNewlines = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestRespectingNewlines, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true)
+
+        val oneLine = longestScrambleOneLine && fontSizeWithoutPadding >= FontUtil.MINIMUM_ONE_LINE_FONT_SIZE
+        val perfectFontSize = fontSizeWithoutPadding.takeIf { oneLine } ?: fontSizeIfIncludingNewlines
 
         return Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL)
     }
@@ -160,6 +175,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         const val SCRAMBLE_IMAGE_PADDING = 2
 
         const val SCRAMBLE_MARGIN = 5
+        const val WIDEST_CHAR_STRING = Typography.nbsp.toString()
 
         const val EMPTY_CELL_CONTENT = ""
 
@@ -179,5 +195,26 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         const val HORIZONTAL_MARGIN = 35f
 
         const val NEW_LINE = "\n"
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            val rawScrambles = listOf(
+                "F' D2 B2 Dw' Fw' U2 Dw Fw Lw' D2 Dw Bw' B' L Lw D' Lw B' F Fw' Rw' Uw D Bw2 Uw D U Rw' L2 B L2 R2 F' D F B2 Dw2 B' Dw Uw' B' Rw2 Lw' Uw' Fw Bw' R2 B' Uw Dw R' Uw' Lw2 R2 B2 Rw B' Bw' Rw2 R2 3Fw 3Uw2",
+                "Fw2 Uw2 Fw' R U2 R Bw U' Fw2 U' Rw Fw2 Uw' Bw2 B2 F2 Rw2 F' Fw D2 Fw' Uw2 R' Rw F Fw' R L2 Rw2 Uw R2 Dw' F' U2 Uw2 F2 L' U Dw' Rw2 Bw2 Dw R' F' R F' L' U2 Dw R L Rw' D F2 L2 D F B L2 F' 3Uw",
+                "Lw D2 F' U R' Dw2 L Fw F R2 Uw' Dw L' R' Rw U2 Fw' Dw2 Fw' U Bw2 Uw Bw2 B' Fw' Rw Dw2 F2 Uw Dw B R2 F B' L2 U' R' L Lw2 Uw2 Fw' U Rw Lw2 R' Bw2 Lw B' Rw Uw F D' Uw Dw Bw Lw R Uw U2 3Rw' 3Uw",
+                "D' F2 Uw2 Fw Rw' Bw L2 Uw L2 Fw2 Dw2 D Uw2 B R' F' Rw2 D' U' Bw2 Dw B' U Rw2 R2 Fw D Dw2 Bw2 Fw' Lw' Fw Dw' F' U Bw Uw2 Bw R Rw U' Bw2 Lw' Rw' Uw Lw' Uw2 Bw Fw' Dw Bw F Lw' Dw U2 Fw2 Dw Fw2 U2 Rw2 3Fw",
+                "Rw2 L Uw Rw' Fw' Rw' F Fw2 U2 D R U B' U2 B2 F' Lw' F Lw2 L2 Rw2 Fw' D2 Dw' U' Lw' B D' Fw' U Uw' Fw L' F2 R2 D2 B U D2 L B2 D' F2 Dw D Rw D' Lw F' U' Uw2 Fw' Bw' R Lw' F Lw2 Rw Fw2 F 3Rw2 3Uw"
+            )
+
+            val scrambles = rawScrambles.map { Scramble(it) }
+            val scrambleSet = ScrambleSet(42, scrambles, emptyList())
+
+            val activityCode = ActivityCode.compile(EventData.FIVE_BLD, 0, 0, 0)
+
+            val pdfSheet = GeneralScrambleSheet(scrambleSet, activityCode)
+            val pdfBytes = pdfSheet.render()
+
+            File(File(System.getProperty("user.home")), "TNoodleDummy.pdf").writeBytes(pdfBytes)
+        }
     }
 }
