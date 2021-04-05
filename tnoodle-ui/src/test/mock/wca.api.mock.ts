@@ -1,3 +1,5 @@
+import Wcif from "../../main/model/Wcif";
+
 export const me = {
     wca_id: "2010AAAA01",
     name: "User Name",
@@ -31,7 +33,7 @@ export const competitions = [
     },
 ];
 
-export const wcifs = {
+export const wcifs: Record<string, Wcif> = {
     [competitions[0].id]: {
         formatVersion: "1.0",
         id: competitions[0].id,
@@ -45,25 +47,61 @@ export const wcifs = {
                         id: "333-r1",
                         format: "a",
                         scrambleSetCount: 8,
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                     },
                     {
                         id: "333-r2",
                         format: "a",
                         scrambleSetCount: 4,
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                     },
                     {
                         id: "333-r3",
                         format: "a",
                         scrambleSetCount: 1,
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                     },
                     {
                         id: "333-r4",
                         format: "a",
                         scrambleSetCount: 1,
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                     },
                 ],
             },
@@ -74,18 +112,45 @@ export const wcifs = {
                         id: "222-r1",
                         format: "a",
                         scrambleSetCount: 5,
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                     },
                     {
                         id: "222-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                     {
                         id: "222-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -96,19 +161,46 @@ export const wcifs = {
                     {
                         id: "444-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 6,
                     },
                     {
                         id: "444-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                     {
                         id: "444-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -119,19 +211,46 @@ export const wcifs = {
                     {
                         id: "555-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 3,
                     },
                     {
                         id: "555-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                     {
                         id: "555-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -142,13 +261,31 @@ export const wcifs = {
                     {
                         id: "666-r1",
                         format: "m",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 8,
                     },
                     {
                         id: "666-r2",
                         format: "m",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -159,13 +296,31 @@ export const wcifs = {
                     {
                         id: "777-r1",
                         format: "m",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 7,
                     },
                     {
                         id: "777-r2",
                         format: "m",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -176,19 +331,46 @@ export const wcifs = {
                     {
                         id: "333bf-r1",
                         format: "3",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 3,
                     },
                     {
                         id: "333bf-r2",
                         format: "3",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                     {
                         id: "333bf-r3",
                         format: "3",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -200,7 +382,16 @@ export const wcifs = {
                         id: "333fm-r1",
                         format: "m",
                         timeLimit: null,
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -211,19 +402,46 @@ export const wcifs = {
                     {
                         id: "333oh-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 4,
                     },
                     {
                         id: "333oh-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                     {
                         id: "333oh-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -234,13 +452,31 @@ export const wcifs = {
                     {
                         id: "clock-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                     {
                         id: "clock-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -251,13 +487,31 @@ export const wcifs = {
                     {
                         id: "minx-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                     {
                         id: "minx-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -268,19 +522,46 @@ export const wcifs = {
                     {
                         id: "pyram-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 6,
                     },
                     {
                         id: "pyram-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                     {
                         id: "pyram-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -291,19 +572,46 @@ export const wcifs = {
                     {
                         id: "skewb-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 4,
                     },
                     {
                         id: "skewb-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                     {
                         id: "skewb-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -314,19 +622,46 @@ export const wcifs = {
                     {
                         id: "sq1-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 3,
                     },
                     {
                         id: "sq1-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                     {
                         id: "sq1-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -337,7 +672,16 @@ export const wcifs = {
                     {
                         id: "444bf-r1",
                         format: "3",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 3,
                     },
                 ],
@@ -348,7 +692,16 @@ export const wcifs = {
                     {
                         id: "555bf-r1",
                         format: "3",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                 ],
@@ -360,7 +713,16 @@ export const wcifs = {
                         id: "333mbf-r1",
                         format: "2",
                         timeLimit: null,
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -371,13 +733,31 @@ export const wcifs = {
                     {
                         id: "333ft-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                     {
                         id: "333ft-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -873,6 +1253,7 @@ export const wcifs = {
                 },
             ],
         },
+        persons: [],
     },
 
     [competitions[1].id]: {
@@ -887,25 +1268,61 @@ export const wcifs = {
                     {
                         id: "333-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 8,
                     },
                     {
                         id: "333-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 4,
                     },
                     {
                         id: "333-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                     {
                         id: "333-r4",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -916,19 +1333,46 @@ export const wcifs = {
                     {
                         id: "222-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 5,
                     },
                     {
                         id: "222-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                     {
                         id: "222-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
@@ -939,23 +1383,51 @@ export const wcifs = {
                     {
                         id: "444-r1",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 6,
                     },
                     {
                         id: "444-r2",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 2,
                     },
                     {
                         id: "444-r3",
                         format: "a",
-                        extensions: [],
+                        extensions: [
+                            {
+                                data: {
+                                    numCopies: "1",
+                                },
+                                id:
+                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                specUrl: "",
+                            },
+                        ],
                         scrambleSetCount: 1,
                     },
                 ],
             },
         ],
+        persons: [],
     },
 };

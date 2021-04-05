@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Collapse } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import tnoodleApi from "../api/tnoodle.api";
-import wcaApi, { isLogged, logIn, logOut } from "../api/wca.api";
+import wcaApi from "../api/wca.api";
 import logo from "../assets/tnoodle_logo.svg";
 import RootState from "../model/RootState";
 import {
@@ -52,7 +52,7 @@ const SideBar = () => {
     const init = () => {
         window.addEventListener("resize", handleIsOpen);
 
-        if (!isLogged()) {
+        if (!wcaApi.isLogged()) {
             return;
         }
         if (!me) {
@@ -220,10 +220,10 @@ const SideBar = () => {
                 <button
                     type="button"
                     className="btn btn-primary btn-lg btn-block"
-                    onClick={isLogged() ? logOut : logIn}
+                    onClick={wcaApi.isLogged() ? wcaApi.logOut : wcaApi.logIn}
                     disabled={generatingScrambles}
                 >
-                    {isLogged() ? "Log Out" : "Log In"}
+                    {wcaApi.isLogged() ? "Log Out" : "Log In"}
                 </button>
                 {!!me && (
                     <p className="text-white mt-2">

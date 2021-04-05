@@ -1,6 +1,6 @@
 import { SyntheticEvent, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import tnoodleApi, { convertToBlob } from "../api/tnoodle.api";
+import tnoodleApi from "../api/tnoodle.api";
 import { ScrambleClient } from "../api/tnoodle.socket";
 import { isUsingStaging } from "../api/wca.api";
 import RootState from "../model/RootState";
@@ -52,7 +52,7 @@ const Main = () => {
         }
 
         if (!!fileZip) {
-            convertToBlob(fileZip).then((blob) => downloadZip(blob));
+            tnoodleApi.convertToBlob(fileZip).then((blob) => downloadZip(blob));
         } else {
             generateZip();
         }
@@ -68,8 +68,8 @@ const Main = () => {
 
         tnoodleApi
             .fetchZip(scrambleClient, wcif, mbld, password, translations)
-            .then((blob: { contentType: string; payload: string }) =>
-                dispatch(setFileZip(blob))
+            .then((plainZip: { contentType: string; payload: string }) =>
+                dispatch(setFileZip(plainZip))
             )
             .catch((err: any) => interceptorRef.current?.updateMessage(err))
             .finally(() => {

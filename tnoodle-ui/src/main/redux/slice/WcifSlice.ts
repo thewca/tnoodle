@@ -4,7 +4,11 @@ import WcaFormat from "../../model/WcaFormat";
 import Wcif from "../../model/Wcif";
 import WcifEvent from "../../model/WcifEvent";
 import { competitionName2Id } from "../../util/competition.name.util";
-import { defaultWcif, getDefaultCopiesExtension } from "../../util/wcif.util";
+import {
+    copiesExtensionId,
+    defaultWcif,
+    getDefaultCopiesExtension,
+} from "../../util/wcif.util";
 
 interface WcifState {
     editingStatus: boolean;
@@ -65,7 +69,9 @@ export const wcifSlice = createSlice({
                     rounds: event.rounds.map((round) => ({
                         ...round,
                         extensions: [
-                            ...round.extensions,
+                            ...round.extensions.filter(
+                                (it) => it.id !== copiesExtensionId // avoid duplicating extension
+                            ),
                             getDefaultCopiesExtension(),
                         ],
                     })),

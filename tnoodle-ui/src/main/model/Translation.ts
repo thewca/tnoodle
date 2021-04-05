@@ -1,5 +1,5 @@
 export default interface Translation {
     id: string; // "pt-BR"
-    name: boolean; // "Portuguese (Brazil)";
+    name: string; // "Portuguese (Brazil)";
     status: boolean;
 }

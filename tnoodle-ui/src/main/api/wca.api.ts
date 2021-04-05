@@ -64,49 +64,6 @@ export function toWcaUrl(path: string) {
     return `${getWcaOrigin()}${path}`;
 }
 
-export function logIn() {
-    if (isLogged()) {
-        return;
-    }
-
-    let redirectUri = window.location.origin + BASE_PATH + "/oauth/wca";
-    let logInUrl = toWcaUrl(
-        `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
-    );
-    localStorage["TNoodle.preLoginHref"] = window.location.href;
-    window.location.href = logInUrl;
-}
-
-export function isLogged() {
-    if (!wcaAccessToken) {
-        return false;
-    }
-
-    if (getCurrentEnv() !== getLastLoginEnv()) {
-        return false;
-    }
-
-    if (!expiration) {
-        return false;
-    }
-
-    if (new Date() < new Date(Number(expiration))) {
-        return true;
-    }
-
-    logOut();
-    return false;
-}
-
-export function logOut() {
-    delete localStorage[TNOODLE_LAST_LOGIN_ENV];
-    delete localStorage[TNOODLE_ACCESS_TOKEN_KEY];
-    delete localStorage[TNOODLE_EXPIRATION];
-    wcaAccessToken = null;
-    expiration = null;
-    window.location.reload();
-}
-
 export function gotoPreLoginPath() {
     let preLoginHref = localStorage["TNoodle.preLoginHref"] || "/";
     localStorage[TNOODLE_LAST_LOGIN_ENV] = preLoginHref.includes("staging=true")
@@ -134,6 +91,49 @@ class WcaApi {
         return this.wcaApiFetch<Competition[]>(
             `/competitions?managed_by_me=true&start=${oneWeekAgo.toISOString()}`
         );
+    };
+
+    logOut = () => {
+        delete localStorage[TNOODLE_LAST_LOGIN_ENV];
+        delete localStorage[TNOODLE_ACCESS_TOKEN_KEY];
+        delete localStorage[TNOODLE_EXPIRATION];
+        wcaAccessToken = null;
+        expiration = null;
+        window.location.reload();
+    };
+
+    logIn = () => {
+        if (this.isLogged()) {
+            return;
+        }
+
+        let redirectUri = window.location.origin + BASE_PATH + "/oauth/wca";
+        let logInUrl = toWcaUrl(
+            `/oauth/authorize?client_id=${getTnoodleAppId()}&redirect_uri=${redirectUri}&response_type=token&scope=public+manage_competitions`
+        );
+        localStorage["TNoodle.preLoginHref"] = window.location.href;
+        window.location.href = logInUrl;
+    };
+
+    isLogged = () => {
+        if (!wcaAccessToken) {
+            return false;
+        }
+
+        if (getCurrentEnv() !== getLastLoginEnv()) {
+            return false;
+        }
+
+        if (!expiration) {
+            return false;
+        }
+
+        if (new Date() < new Date(Number(expiration))) {
+            return true;
+        }
+
+        this.logOut();
+        return false;
     };
 
     private wcaApiFetch<T>(path: string) {

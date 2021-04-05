@@ -193,3 +193,14 @@ export const version = {
     signedBuild: true,
     signatureKeyBytes: "key",
 };
+
+export const plainZip = {
+    contentType: "contentType",
+    payload: "UEsDBBQACAgIAK...",
+};
+
+export const bestMbldAttempt = {
+    solved: 60,
+    attempted: 60,
+    time: 3012,
+};
