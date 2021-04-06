@@ -5,6 +5,7 @@ import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.svglite.Dimension
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.PdfDrawUtil.renderSvgToPDF
@@ -37,7 +38,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
 
         val scrambleImageSize = scramblingPuzzle.getPreferredSize(maxScrambleImageWidth, maxScrambleImageHeight)
 
-        val allScrambleStrings = scrambleSet.allScrambles.toPDFStrings(scramblingPuzzle.shortName)
+        val allScrambleStrings = scrambleSet.allScrambles.toPDFStrings(activityCode.eventModel)
 
         val scrambleImageHeight = scrambleImageSize.height.toFloat()
         val scrambleColumnWidth = availableWidth - indexColumnWidth - scrambleImageSize.width
@@ -60,7 +61,11 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
                 isLockedWidth = true
             }
 
-            val extraScramblesHeader = PdfPCell(Paragraph(TABLE_HEADING_EXTRA_SCRAMBLES)).apply {
+            val extraParagraph = Paragraph(TABLE_HEADING_EXTRA_SCRAMBLES).apply {
+                font.style = Font.BOLD
+            }
+
+            val extraScramblesHeader = PdfPCell(extraParagraph).apply {
                 verticalAlignment = PdfPCell.ALIGN_MIDDLE
                 horizontalAlignment = PdfPCell.ALIGN_CENTER
                 fixedHeight = extraScrambleLabelHeight
@@ -78,18 +83,37 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     private fun getFontConfiguration(availableArea: Rectangle, scrambles: List<String>): Font {
         val paddedScrambles = scrambles.map { StringUtil.padTurnsUniformly(it, Typography.nbsp.toString()) }
 
-        val longestScramble = paddedScrambles.flatMap { it.split(NEW_LINE) }.maxByOrNull { it.length }.orEmpty()
-        val maxLines = paddedScrambles.map { it.split(NEW_LINE) }.maxOfOrNull { it.count() } ?: 1
+        val longestScrambleLine = paddedScrambles.flatMap { it.split(NEW_LINE) }.maxByOrNull { it.length }.orEmpty()
+        val maxLinesCount = paddedScrambles.map { it.split(NEW_LINE) }.maxOfOrNull { it.count() } ?: 1
 
-        val fontSize = PdfUtil.fitText(Font(FontUtil.MONO_FONT), longestScramble, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true)
-        val fontSizeIfIncludingNewlines = availableArea.height / maxLines
+        val scramblesHaveLineBreaks = scrambles.any { NEW_LINE in it }
+
+        val fontSize = fitFontSize(availableArea, longestScrambleLine, scramblesHaveLineBreaks)
+        val maxFontSizePerLine = availableArea.height / maxLinesCount
 
         // fontSize should fit horizontally. fontSizeIfIncludingNewlines should fit considering \n
         // In case maxLines = 1, fontSizeIfIncludingNewlines is just ignored (as 1 font size should fill the whole rectangle's height)
         // in case we have maxLines > 1, we fit width or height and take the min of it.
-        val perfectFontSize = min(fontSize, fontSizeIfIncludingNewlines)
+        val perfectFontSize = min(fontSize, maxFontSizePerLine)
 
         return Font(FontUtil.MONO_FONT, perfectFontSize, Font.NORMAL)
+    }
+
+    private fun fitFontSize(availableArea: Rectangle, longestScrambleLine: String, scramblesHaveLineBreaks: Boolean = false): Float {
+        val fittingFont = Font(FontUtil.MONO_FONT)
+
+        return if (scramblesHaveLineBreaks) {
+            // if our scrambles dictate line breaks, then just calculate the fitting text size right away
+            PdfUtil.fitText(fittingFont, longestScrambleLine, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true)
+        } else {
+            // try to fit them on one line
+            val oneLineFontSize = PdfUtil.fitText(fittingFont, longestScrambleLine, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, false)
+
+            // is the optimal font size too small to read?
+            if (oneLineFontSize < FontUtil.MINIMUM_ONE_LINE_FONT_SIZE) {
+                PdfUtil.fitText(fittingFont, longestScrambleLine, availableArea, FontUtil.MAX_SCRAMBLE_FONT_SIZE, true)
+            } else oneLineFontSize
+        }
     }
 
     private fun requiresHighlighting(scrambleColumnWidth: Float, scrambleFont: Font, scrambles: List<String>): Boolean {
@@ -105,7 +129,7 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
             isLockedWidth = true
         }
 
-        val strScrambles = scrambles.toPDFStrings(scramblingPuzzle.shortName)
+        val strScrambles = scrambles.toPDFStrings(activityCode.eventModel)
 
         for ((i, scramble) in strScrambles.withIndex()) {
             val indexCell = PdfPCell(Paragraph("$scrambleNumberPrefix${i + 1}")).apply {
@@ -129,6 +153,9 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
                 // let itextpdf wrap lines for us.
                 isNoWrap = true
                 verticalAlignment = PdfPCell.ALIGN_MIDDLE
+                // iText5 defines strange default margins, so we push the text up artificially
+                paddingTop = SCRAMBLE_CELL_TOP_MARGIN.toFloat()
+                setLeading(0f, SCRAMBLE_CELL_MULTIPLIED_LEADING.toFloat())
             }
 
             table.addCell(scrambleCell)
@@ -153,9 +180,9 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
     }
 
     companion object {
-        private fun List<Scramble>.toPDFStrings(puzzleName: String) =
+        private fun List<Scramble>.toPDFStrings(event: EventData?) =
             flatMap { it.allScrambleStrings }
-                .takeUnless { puzzleName == "minx" } // minx scrambles intentionally include "\n" chars for alignment
+                .takeUnless { event == EventData.MEGA } // Megaminx scrambles intentionally include "\n" chars for alignment
                 ?: map { it.scrambleString }
 
         const val MAX_SCRAMBLES_PER_PAGE = 7
@@ -163,6 +190,8 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         const val SCRAMBLE_IMAGE_PADDING = 2
 
         const val SCRAMBLE_MARGIN = 5
+        const val SCRAMBLE_CELL_TOP_MARGIN = -2
+        const val SCRAMBLE_CELL_MULTIPLIED_LEADING = 1.07
 
         const val EMPTY_CELL_CONTENT = ""
 
@@ -176,10 +205,10 @@ class GeneralScrambleSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode)
         private val HIGHLIGHT_COLOR = BaseColor(230, 230, 230)
 
         const val INDEX_COLUMN_WIDTH_RATIO = 25
-        const val EXTRA_SCRAMBLES_HEIGHT_RATIO = 30
+        const val EXTRA_SCRAMBLES_HEIGHT_RATIO = 35
 
-        const val VERTICAL_MARGIN = 15f
-        const val HORIZONTAL_MARGIN = 35f
+        const val VERTICAL_MARGIN = 15
+        const val HORIZONTAL_MARGIN = 35
 
         const val NEW_LINE = "\n"
     }

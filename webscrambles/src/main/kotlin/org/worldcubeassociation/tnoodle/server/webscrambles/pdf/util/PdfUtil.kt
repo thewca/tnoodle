@@ -25,7 +25,7 @@ object PdfUtil {
 
         // Walk past all whitespace that comes immediately after
         // the last line wrap we just inserted.
-        if (first() == ' ') {
+        if (first().isWhitespace()) {
             return drop(1)
                 .splitLineToChunks(font, availableTextWidth, acc)
         }
