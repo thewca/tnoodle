@@ -46,7 +46,7 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333-r1",
                         format: "a",
-                        scrambleSetCount: 8,
+                        scrambleSetCount: "8",
                         extensions: [
                             {
                                 data: {
@@ -61,7 +61,7 @@ export const wcifs: Record<string, Wcif> = {
                     {
                         id: "333-r2",
                         format: "a",
-                        scrambleSetCount: 4,
+                        scrambleSetCount: "4",
                         extensions: [
                             {
                                 data: {
