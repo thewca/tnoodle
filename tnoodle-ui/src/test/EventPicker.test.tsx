@@ -1,27 +1,20 @@
-import React from "react";
-import { act } from "react-dom/test-utils";
-
-import { render, unmountComponentAtNode } from "react-dom";
 import { fireEvent } from "@testing-library/react";
-
+import React from "react";
+import { render, unmountComponentAtNode } from "react-dom";
+import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
-import { createStore } from "redux";
-import { Reducer } from "../main/redux/Reducers";
-
 import EventPicker from "../main/components/EventPicker";
-
+import {
+    setGeneratingScrambles,
+    setScramblingProgressCurrentEvent,
+    setScramblingProgressTarget,
+} from "../main/redux/slice/ScramblingSlice";
+import { setEditingStatus } from "../main/redux/slice/WcifSlice";
+import store from "../main/redux/Store";
+import { defaultWcif } from "../main/util/wcif.util";
 import { events } from "./mock/tnoodle.api.mock";
 
-import { defaultWcif } from "../main/constants/default.wcif";
-
-import {
-    updateEditingStatus,
-    updateScramblingProgressTarget,
-    updateScramblingProgressCurrentEvent,
-    updateGeneratingScrambles,
-} from "../main/redux/ActionCreators";
-
-let container = null;
+let container = document.createElement("div");
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
@@ -32,39 +25,42 @@ afterEach(() => {
     // cleanup on exiting
     unmountComponentAtNode(container);
     container.remove();
-    container = null;
+    container = document.createElement("div");
 });
 
-it("Changing values from event", () => {
-    const store = createStore(Reducer);
-
+it("Changing values from event", async () => {
     const event = events[0];
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
     // Enforce that fields are not disabled
-    store.dispatch(updateEditingStatus(false));
+    store.dispatch(setEditingStatus(true));
 
     // Render component
-    act(() => {
+    await act(async () => {
         render(
-            <Provider store={store}>
-                <EventPicker event={event} wcifEvent={wcifEvent} />
-            </Provider>,
+            <React.StrictMode>
+                <Provider store={store}>
+                    <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
+                </Provider>
+            </React.StrictMode>,
             container
         );
     });
 
     // Change number of rounds to 4
     let numberOfRounds = 4;
-    const roundsSelector = container.querySelector("select");
-    fireEvent.change(roundsSelector, { target: { value: numberOfRounds } });
-    expect(store.getState().wcif.events[0].rounds.length).toEqual(
+    const roundsSelector = container.querySelector("select")!;
+    await act(async () => {
+        fireEvent.change(roundsSelector, { target: { value: numberOfRounds } });
+    });
+
+    expect(store.getState().wcifSlice.wcif.events[0].rounds.length).toEqual(
         numberOfRounds
     );
 
-    // There's a harmless change of type here. 1 -> "1"
-    // Initial value should be 1
-    expect(store.getState().wcif.events[0].rounds[0].scrambleSetCount).toBe(1);
+    expect(
+        store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount
+    ).toBe("1");
 
     // This should be numberOfRounds * 2, since each round has 2 inputs.
     // It's not, probably because not updating DOM after dispatching
@@ -76,13 +72,14 @@ it("Changing values from event", () => {
     // Change last scramble sets to 10
     fireEvent.change(inputs[roundToChange * 2], { target: { value } });
     expect(
-        store.getState().wcif.events[0].rounds[roundToChange].scrambleSetCount
+        store.getState().wcifSlice.wcif.events[0].rounds[roundToChange]
+            .scrambleSetCount
     ).toEqual(value);
 
     // Remove 1 round
     numberOfRounds--;
     fireEvent.change(roundsSelector, { target: { value: numberOfRounds } });
-    expect(store.getState().wcif.events[0].rounds.length).toEqual(
+    expect(store.getState().wcifSlice.wcif.events[0].rounds.length).toEqual(
         numberOfRounds
     );
 
@@ -96,38 +93,40 @@ it("Changing values from event", () => {
     // Changes to scrambleSet should go to the store
     const newScrambleSets = "3";
     fireEvent.change(scrambleSets, { target: { value: newScrambleSets } });
-    expect(store.getState().wcif.events[0].rounds[0].scrambleSetCount).toBe(
-        newScrambleSets
-    );
+    expect(
+        store.getState().wcifSlice.wcif.events[0].rounds[0].scrambleSetCount
+    ).toBe(newScrambleSets);
 
     // Initial value should be 1
     expect(
-        store.getState().wcif.events[0].rounds[0].extensions[0].data.numCopies
-    ).toBe(1);
+        store.getState().wcifSlice.wcif.events[0].rounds[0].extensions[0].data
+            .numCopies
+    ).toBe("1");
 
     // Changes to copies should go to the store
     const newCopies = "5";
     fireEvent.change(copies, { target: { value: newCopies } });
     expect(
-        store.getState().wcif.events[0].rounds[0].extensions[0].data.numCopies
+        store.getState().wcifSlice.wcif.events[0].rounds[0].extensions[0].data
+            .numCopies
     ).toBe(newCopies);
 });
 
-it("Editing disabled", () => {
-    const store = createStore(Reducer);
-
+it("Editing disabled", async () => {
     const event = events[0];
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
-    // Enforce that fields are not disabled
-    store.dispatch(updateEditingStatus(true));
+    // Disable inputs
+    store.dispatch(setEditingStatus(false));
 
     // Render component
-    act(() => {
+    await act(async () => {
         render(
-            <Provider store={store}>
-                <EventPicker event={event} wcifEvent={wcifEvent} />
-            </Provider>,
+            <React.StrictMode>
+                <Provider store={store}>
+                    <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
+                </Provider>
+            </React.StrictMode>,
             container
         );
     });
@@ -143,21 +142,21 @@ it("Editing disabled", () => {
     expect(copies.disabled).toBe(false);
 });
 
-it("Progress Bar showing/hiding", () => {
-    const store = createStore(Reducer);
-
+it("Progress Bar showing/hiding", async () => {
     const event = events[0];
     const wcifEvent = defaultWcif.events[0]; // This is one round of 333
 
-    // Enforce that fields are not disabled
-    store.dispatch(updateEditingStatus(true));
+    // Disable inputs
+    store.dispatch(setEditingStatus(false));
 
     // Render component
-    act(() => {
+    await act(async () => {
         render(
-            <Provider store={store}>
-                <EventPicker event={event} wcifEvent={wcifEvent} />
-            </Provider>,
+            <React.StrictMode>
+                <Provider store={store}>
+                    <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
+                </Provider>
+            </React.StrictMode>,
             container
         );
     });
@@ -168,8 +167,10 @@ it("Progress Bar showing/hiding", () => {
 
     expect(progressBefore.length).toBe(0);
 
-    store.dispatch(updateScramblingProgressTarget({ [event.id]: 3 }));
-    store.dispatch(updateGeneratingScrambles(true));
+    await act(async () => {
+        store.dispatch(setScramblingProgressTarget({ [event.id]: 3 }));
+        store.dispatch(setGeneratingScrambles(true));
+    });
 
     const progressDuringEarly = Array.from(
         container.querySelectorAll("div.progress>div")
@@ -177,8 +178,10 @@ it("Progress Bar showing/hiding", () => {
 
     expect(progressDuringEarly.length).toBe(1);
 
-    store.dispatch(updateScramblingProgressCurrentEvent(event.id));
-    store.dispatch(updateScramblingProgressCurrentEvent(event.id));
+    await act(async () => {
+        store.dispatch(setScramblingProgressCurrentEvent(event.id));
+        store.dispatch(setScramblingProgressCurrentEvent(event.id));
+    });
 
     const progressDuringLate = Array.from(
         container.querySelectorAll("div.progress>div")
@@ -186,11 +189,13 @@ it("Progress Bar showing/hiding", () => {
 
     expect(progressDuringLate.length).toBe(1);
     const lateProgress = parseFloat(
-        progressDuringLate[0].getAttribute("aria-valuenow")
+        progressDuringLate[0].getAttribute("aria-valuenow")!
     );
     expect(Math.trunc(lateProgress)).toBe(66);
 
-    store.dispatch(updateScramblingProgressCurrentEvent(event.id));
+    await act(async () => {
+        store.dispatch(setScramblingProgressCurrentEvent(event.id));
+    });
 
     const progressAfter = Array.from(
         container.querySelectorAll("div.progress>div")
@@ -198,11 +203,13 @@ it("Progress Bar showing/hiding", () => {
 
     expect(progressAfter.length).toBe(1);
     const completeProgress = parseInt(
-        progressAfter[0].getAttribute("aria-valuenow")
+        progressAfter[0].getAttribute("aria-valuenow")!
     );
     expect(completeProgress).toBe(100);
 
-    store.dispatch(updateGeneratingScrambles(false));
+    await act(async () => {
+        store.dispatch(setGeneratingScrambles(false));
+    });
 
     const progressGone = Array.from(container.querySelectorAll("div.progress"));
 

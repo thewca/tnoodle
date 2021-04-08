@@ -5,4 +5,5 @@ export default interface Round {
     id: string;
     scrambleSetCount: string;
     extensions: Extension[];
+    timeLimit?: number | null;
 }

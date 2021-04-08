@@ -1,3 +1,1 @@
-export default interface Venue {
-    name: string;
-}
+export default interface Venue {}
