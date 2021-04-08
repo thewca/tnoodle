@@ -1,11 +1,22 @@
+import { configureStore } from "@reduxjs/toolkit";
 import { fireEvent } from "@testing-library/react";
+import { shuffle } from "lodash";
+import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
+import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import Translation from "../main/model/Translation";
 import Wcif from "../main/model/Wcif";
+import { competitionSlice } from "../main/redux/slice/CompetitionSlice";
+import { fmcSlice } from "../main/redux/slice/FmcSlice";
+import { informationSlice } from "../main/redux/slice/InformationSlice";
+import { mbldSlice } from "../main/redux/slice/MbldSlice";
+import { scramblingSlice } from "../main/redux/slice/ScramblingSlice";
+import { wcifSlice } from "../main/redux/slice/WcifSlice";
+import { defaultWcif } from "../main/util/wcif.util";
 import {
     bestMbldAttempt,
     events,
@@ -13,22 +24,27 @@ import {
     languages,
     plainZip,
     version,
-} from "./mock/tnoodle.api.mock";
-import { competitions, me, scrambleProgram, wcifs } from "./mock/wca.api.mock";
-import App from "../App";
-import React from "react";
-import store from "../main/redux/Store";
-import { shuffle } from "lodash";
-import { defaultWcif } from "../main/util/wcif.util";
+} from "./mock/tnoodle.api.test.mock";
+import { axiosResponse } from "./mock/util.test.mock";
+import {
+    competitions,
+    me,
+    scrambleProgram,
+    wcifs,
+} from "./mock/wca.api.test.mock";
+
+const store = configureStore({
+    reducer: {
+        competitionSlice: competitionSlice.reducer,
+        fmcSlice: fmcSlice.reducer,
+        informationSlice: informationSlice.reducer,
+        mbldSlice: mbldSlice.reducer,
+        scramblingSlice: scramblingSlice.reducer,
+        wcifSlice: wcifSlice.reducer,
+    },
+});
 
 let container = document.createElement("div");
-
-const axiosResponse = {
-    status: 200,
-    statusText: "OK",
-    config: {},
-    headers: {},
-};
 
 let wcif: Wcif | null = null;
 let mbld: string | null = null;

@@ -12,7 +12,7 @@ import {
 import { setEditingStatus } from "../main/redux/slice/WcifSlice";
 import store from "../main/redux/Store";
 import { defaultWcif } from "../main/util/wcif.util";
-import { events } from "./mock/tnoodle.api.mock";
+import { events } from "./mock/tnoodle.api.test.mock";
 
 let container = document.createElement("div");
 beforeEach(() => {

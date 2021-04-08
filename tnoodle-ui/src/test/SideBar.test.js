@@ -8,7 +8,7 @@ import store from "../main/redux/Store";
 
 import SideBar from "../main/components/SideBar";
 
-import { competitions, me } from "./mock/wca.api.mock";
+import { competitions, me } from "./mock/wca.api.test.mock";
 
 const wcaApi = require("../main/api/wca.api");
 

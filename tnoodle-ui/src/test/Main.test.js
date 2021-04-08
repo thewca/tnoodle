@@ -1,20 +1,21 @@
-import React from "react";
-import { act } from "react-dom/test-utils";
-
-import { render, unmountComponentAtNode } from "react-dom";
 import { fireEvent } from "@testing-library/react";
-
+import React from "react";
+import { render, unmountComponentAtNode } from "react-dom";
+import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
+import Main from "../main/components/Main";
+import {
+    addSuggestedFmcTranslations,
+    updateTranslations,
+} from "../main/redux/ActionCreators";
 import store from "../main/redux/Store";
 import {
-    updateTranslations,
-    addSuggestedFmcTranslations,
-} from "../main/redux/ActionCreators";
-
-import Main from "../main/components/Main";
-
-import { events, languages, formats, version } from "./mock/tnoodle.api.mock";
-import { scrambleProgram } from "./mock/wca.api.mock";
+    events,
+    formats,
+    languages,
+    version,
+} from "./mock/tnoodle.api.test.mock";
+import { scrambleProgram } from "./mock/wca.api.test.mock";
 
 const tnoodleApi = require("../main/api/tnoodle.api");
 const wcaApi = require("../main/api/wca.api");
