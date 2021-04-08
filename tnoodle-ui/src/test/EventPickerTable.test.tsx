@@ -1,4 +1,3 @@
-import { configureStore } from "@reduxjs/toolkit";
 import { fireEvent } from "@testing-library/react";
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
@@ -6,23 +5,11 @@ import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
 import EventPickerTable from "../main/components/EventPickerTable";
-import RootState from "../main/model/RootState";
-import {
-    competitionSlice,
-    setCompetitionId,
-} from "../main/redux/slice/CompetitionSlice";
-import { fmcSlice } from "../main/redux/slice/FmcSlice";
-import { informationSlice } from "../main/redux/slice/InformationSlice";
-import { mbldSlice } from "../main/redux/slice/MbldSlice";
-import { scramblingSlice } from "../main/redux/slice/ScramblingSlice";
-import {
-    setEditingStatus,
-    setWcaEvent,
-    wcifSlice,
-} from "../main/redux/slice/WcifSlice";
+import { setCompetitionId } from "../main/redux/slice/CompetitionSlice";
+import { setEditingStatus, setWcaEvent } from "../main/redux/slice/WcifSlice";
 import { getDefaultCopiesExtension } from "../main/util/wcif.util";
 import { events, formats, languages } from "./mock/tnoodle.api.test.mock";
-import { axiosResponse } from "./mock/util.test.mock";
+import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import { competitions } from "./mock/wca.api.test.mock";
 
 let container = document.createElement("div");
@@ -63,16 +50,7 @@ afterEach(() => {
 });
 
 it("Show editing warn if case of competition selected", async () => {
-    const store = configureStore({
-        reducer: {
-            competitionSlice: competitionSlice.reducer,
-            fmcSlice: fmcSlice.reducer,
-            informationSlice: informationSlice.reducer,
-            mbldSlice: mbldSlice.reducer,
-            scramblingSlice: scramblingSlice.reducer,
-            wcifSlice: wcifSlice.reducer,
-        },
-    });
+    const store = getNewStore();
 
     // Choose a competition
     const competitionId = competitions[0].id;
@@ -124,16 +102,7 @@ it("Show editing warn if case of competition selected", async () => {
 });
 
 it("Singular event", async () => {
-    const store = configureStore({
-        reducer: {
-            competitionSlice: competitionSlice.reducer,
-            fmcSlice: fmcSlice.reducer,
-            informationSlice: informationSlice.reducer,
-            mbldSlice: mbldSlice.reducer,
-            scramblingSlice: scramblingSlice.reducer,
-            wcifSlice: wcifSlice.reducer,
-        },
-    });
+    const store = getNewStore();
 
     // Choose a competition
     const competitionId = competitions[0].id;
@@ -159,16 +128,7 @@ it("Singular event", async () => {
 });
 
 it("Changes in MBLD should go to the store", async () => {
-    const store = configureStore({
-        reducer: {
-            competitionSlice: competitionSlice.reducer,
-            fmcSlice: fmcSlice.reducer,
-            informationSlice: informationSlice.reducer,
-            mbldSlice: mbldSlice.reducer,
-            scramblingSlice: scramblingSlice.reducer,
-            wcifSlice: wcifSlice.reducer,
-        },
-    });
+    const store = getNewStore();
 
     // Render component
     await act(async () => {

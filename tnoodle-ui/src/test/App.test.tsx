@@ -25,24 +25,13 @@ import {
     plainZip,
     version,
 } from "./mock/tnoodle.api.test.mock";
-import { axiosResponse } from "./mock/util.test.mock";
+import { axiosResponse, getNewStore } from "./mock/util.test.mock";
 import {
     competitions,
     me,
     scrambleProgram,
     wcifs,
 } from "./mock/wca.api.test.mock";
-
-const store = configureStore({
-    reducer: {
-        competitionSlice: competitionSlice.reducer,
-        fmcSlice: fmcSlice.reducer,
-        informationSlice: informationSlice.reducer,
-        mbldSlice: mbldSlice.reducer,
-        scramblingSlice: scramblingSlice.reducer,
-        wcifSlice: wcifSlice.reducer,
-    },
-});
 
 let container = document.createElement("div");
 
@@ -133,6 +122,8 @@ afterEach(() => {
 });
 
 it("Just generate scrambles", async () => {
+    const store = getNewStore();
+
     // Render component
     await act(async () => {
         render(
@@ -159,6 +150,8 @@ it("Just generate scrambles", async () => {
 });
 
 it("Changes on 333, scramble", async () => {
+    const store = getNewStore();
+
     // Render component
     await act(async () => {
         render(
@@ -230,6 +223,8 @@ it("Changes on 333, scramble", async () => {
 });
 
 it("Remove 333, add FMC and MBLD", async () => {
+    const store = getNewStore();
+
     // Render component
     await act(async () => {
         render(
@@ -340,7 +335,9 @@ it("Remove 333, add FMC and MBLD", async () => {
     );
 });
 
-it("Online user", async () => {
+it("Logged user", async () => {
+    const store = getNewStore();
+
     // Allow downloads
     global.URL.createObjectURL = jest.fn();
 
@@ -474,6 +471,8 @@ it("Online user", async () => {
 });
 
 it("Comfort features should not block zip generation", async () => {
+    const store = getNewStore();
+
     // Allow downloads
     global.URL.createObjectURL = jest.fn();
 
