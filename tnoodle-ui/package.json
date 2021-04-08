@@ -56,7 +56,6 @@
             "src/**/*.{js,jsx}",
             "!src/index.js",
             "!src/serviceWorker.js",
-            "!src/setupProxy.js",
             "!src/main/api/**.js",
             "!**/Interceptor.jsx"
         ]
