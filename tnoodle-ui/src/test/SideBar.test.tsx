@@ -9,10 +9,10 @@ import store from "../main/redux/Store";
 import SideBar from "../main/components/SideBar";
 
 import { competitions, me } from "./mock/wca.api.test.mock";
+import wcaApi from "../main/api/wca.api";
+import { axiosResponse } from "./mock/util.test.mock";
 
-const wcaApi = require("../main/api/wca.api");
-
-let container = null;
+let container = document.createElement("div");
 beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement("div");
@@ -23,7 +23,7 @@ afterEach(() => {
     // cleanup on exiting
     unmountComponentAtNode(container);
     container.remove();
-    container = null;
+    container = document.createElement("div");
 });
 
 it("Each competition fetched from the website must become a button", async () => {
@@ -33,9 +33,13 @@ it("Each competition fetched from the website must become a button", async () =>
     jest.spyOn(
         wcaApi,
         "getUpcomingManageableCompetitions"
-    ).mockImplementation(() => Promise.resolve(competitions));
+    ).mockImplementation(() =>
+        Promise.resolve({ ...axiosResponse, data: competitions })
+    );
 
-    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() => Promise.resolve(me));
+    jest.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
+        Promise.resolve({ ...axiosResponse, data: { me } })
+    );
 
     // Render component
     await act(async () => {
@@ -66,10 +70,10 @@ it("Each competition fetched from the website must become a button", async () =>
     }
 
     // We should welcome the user
-    const welcome = container.querySelector("p");
+    const welcome = container.querySelector("p")!;
     expect(welcome.innerHTML).toContain(me.name);
 
     // Clear mock
-    wcaApi.isLogged.mockRestore();
-    wcaApi.getUpcomingManageableCompetitions.mockRestore();
+    jest.spyOn(wcaApi, "isLogged").mockRestore();
+    jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockRestore();
 });
