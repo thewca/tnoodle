@@ -44,19 +44,16 @@ export const scramblingSlice = createSlice({
         },
         setScramblingProgressCurrentEvent: (
             state,
-            action: PayloadAction<{ eventId: string }>
+            action: PayloadAction<string>
         ) => {
-            // Just adapting, but this should be the cause of the strange numbers in scramble generation
-            // This just increments no matter what
-            state.scramblingProgressCurrent[action.payload.eventId] =
-                (state.scramblingProgressCurrent[action.payload.eventId] || 0) +
-                1;
+            state.scramblingProgressCurrent[action.payload] =
+                (state.scramblingProgressCurrent[action.payload] || 0) + 1;
         },
         setScramblingProgressTarget: (
             state,
             action: PayloadAction<Record<string, number>>
         ) => {
-            state.scramblingProgressCurrent = action.payload;
+            state.scramblingProgressTarget = action.payload;
         },
     },
 });

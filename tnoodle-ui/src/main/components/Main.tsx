@@ -58,12 +58,18 @@ const Main = () => {
         }
     };
 
+    const onScrambleHandShake = (payload: Record<string, number>) =>
+        dispatch(setScramblingProgressTarget(payload));
+
+    const onScrambleProgress = (eventId: string) =>
+        dispatch(setScramblingProgressCurrentEvent(eventId));
+
     const generateZip = () => {
         setCompetitionNameFileZip(wcif.name);
 
         let scrambleClient = new ScrambleClient(
-            setScramblingProgressTarget,
-            setScramblingProgressCurrentEvent
+            onScrambleHandShake,
+            onScrambleProgress
         );
 
         tnoodleApi
