@@ -43,7 +43,7 @@ const VersionInfo = () => {
             setSignedBuild(response.data.signedBuild);
             setSignatureKeyBytes(response.data.signatureKeyBytes);
         });
-    }, [dispatch, signatureValid]);
+    }, [dispatch]);
 
     // This avoids global state update while rendering
     const analyzeVerion = () => {
