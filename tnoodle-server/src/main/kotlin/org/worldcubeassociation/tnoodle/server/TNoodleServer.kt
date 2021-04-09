@@ -32,6 +32,8 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
         app.install(CORS) {
             anyHost()
             method(HttpMethod.Put)
+            // gimme dat zesty application/json
+            allowNonSimpleContentTypes = true
         }
 
         app.install(ContentNegotiation) {
