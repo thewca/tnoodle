@@ -14,7 +14,7 @@ object Versions {
     val BATIK_TRANSCODER = BATIK
     val BATIK_CODEC = BATIK
     val SNAKEYAML = "1.28"
-    val SYSTEM_TRAY = "3.17"
+    val SYSTEM_TRAY = "4.1"
     val BOUNCYCASTLE = "1.68"
     val JUNIT_JUPITER_API = JUNIT_JUPITER
     val JUNIT_JUPITER_ENGINE = JUNIT_JUPITER
