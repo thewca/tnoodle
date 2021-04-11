@@ -1,32 +1,28 @@
 import React, { Component } from "react";
-import fetchIntercept from "fetch-intercept";
+import Axios, { AxiosError } from "axios";
 import "./Interceptor.css";
 
-class Interceptor extends Component {
+interface InterceptorState {
+    message: string;
+    stackTrace: string;
+    showMore: boolean;
+    showThis: boolean;
+}
+
+class Interceptor extends Component<{}, InterceptorState> {
     messageDurationInSeconds = 10;
 
-    constructor() {
-        super();
+    constructor(props: object) {
+        super(props);
 
-        // http interceptor
-        fetchIntercept.register({
-            request: (...request) => {
-                // TODO set loading
-                return request;
-            },
+        Axios.interceptors.request.use((config) => {
+            // TODO set loading
+            return config;
+        });
 
-            response: (response) => {
-                if (!response.ok) {
-                    this.handleHttpError(response);
-                }
-
-                return response;
-            },
-
-            responseError: (error) => {
-                this.handleHttpError(error);
-                return Promise.reject(error);
-            },
+        Axios.interceptors.response.use(undefined, (error) => {
+            this.handleHttpError(error);
+            return Promise.reject(error);
         });
 
         this.state = {
@@ -37,20 +33,15 @@ class Interceptor extends Component {
         };
     }
 
-    handleHttpError = (error) => {
+    handleHttpError = (error: AxiosError) => {
         try {
-            error
-                .json()
-                .then((data) => {
-                    this.updateMessage(data);
-                })
-                .catch(() => this.updateMessage(error));
+            this.updateMessage(error.response?.data);
         } catch (e) {
             this.updateMessage(e);
         }
     };
 
-    updateMessage = (data) => {
+    updateMessage = (data: any) => {
         // Clear the message after some seconds
         let message = data.message || data.statusText || JSON.stringify(data);
         let stackTrace = data.stackTrace;
@@ -78,7 +69,7 @@ class Interceptor extends Component {
                 <textarea
                     className="form-control"
                     value={this.state.stackTrace}
-                    rows="10"
+                    rows={10}
                     disabled
                 />
             );
@@ -96,12 +87,12 @@ class Interceptor extends Component {
         this.setState({
             ...this.state,
             message: "",
-            showMore: false,
             stackTrace: "",
+            showMore: false,
         });
     };
 
-    render() {
+    render = () => {
         if (!this.state.message) {
             return null;
         }
@@ -126,7 +117,7 @@ class Interceptor extends Component {
                 </div>
             </div>
         );
-    }
+    };
 }
 
 export default Interceptor;
