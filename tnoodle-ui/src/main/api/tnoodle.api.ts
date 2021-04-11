@@ -68,7 +68,7 @@ class TnoodleApi {
             wcif,
             multiCubes: { requestedScrambles: mbld },
             fmcLanguages: fmcTranslationsHelper(translations),
-            password,
+            zipPassword: !password ? null : password,
         };
 
         return scrambleClient.loadScrambles(zipEndpoint, payload, wcif.id);
