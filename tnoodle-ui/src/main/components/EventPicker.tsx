@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { MAX_WCA_ROUNDS } from "../constants/wca.constants";
@@ -15,6 +14,7 @@ import {
 import "./EventPicker.css";
 import FmcTranslationsDetail from "./FmcTranslationsDetail";
 import MbldDetail from "./MbldDetail";
+import "@cubing/icons";
 
 interface EventPickerProps {
     wcaEvent: WcaEvent;
@@ -45,13 +45,6 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
         dispatch(setFileZip());
         dispatch(setWcaEvent(event));
     };
-    const [image, setImage] = useState();
-
-    useEffect(() => {
-        import(`../assets/cubing-icon/${wcaEvent.id}.svg`).then((response) =>
-            setImage(response.default)
-        );
-    }, [wcaEvent.id]);
 
     const handleNumberOfRoundsChange = (
         numberOfRounds: number,
@@ -252,12 +245,11 @@ const EventPicker = ({ wcaEvent, wcifEvent }: EventPickerProps) => {
                             : "thead-light"
                     }
                 >
-                    <th className="firstColumn" scope="col"></th>
+                    <th className="firstColumn" scope="col" />
                     <th scope="col" className="align-middle secondColumn">
-                        <img
-                            className="img-thumbnail cubingIcon"
-                            src={image}
-                            alt={wcaEvent.name}
+                        <span
+                            className={`cubing-icon event-${wcaEvent.id}`}
+                            title={wcaEvent.name}
                         />
                     </th>
                     <th className="align-middle lastTwoColumns" scope="col">
