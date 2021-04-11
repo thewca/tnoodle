@@ -134,4 +134,5 @@ tasks.getByName<ShadowJar>("shadowJar") {
 
 tasks.getByName<JavaExec>("run") {
     args = listOf("--nobrowser")
+    jvmArgs = listOf("-Dio.ktor.development=true")
 }
