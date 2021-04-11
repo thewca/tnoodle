@@ -21,7 +21,7 @@
 -keep class ch.qos.logback.core.** { *; }
 
 -keep class com.sun.jna.** { *; }
--keep class dorkbox.util.jna.** { *; }
+-keep class dorkbox.jna.** { *; }
 -keep class dorkbox.systemTray.** { *; }
 
 -keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
