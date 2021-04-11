@@ -46,6 +46,9 @@ tasks.create("registerReleaseTag") {
 
     outputs.file(signatureStorage)
 
+    // prevent caching this task, so that it always runs no matter what
+    outputs.upToDateWhen { false }
+
     doFirst {
         val privateKeyPath = project.findProperty("wca.wst.signature-private-key")?.toString()
             ?: error("You have to provide a path to a PKCS8 private key for official releases!")
