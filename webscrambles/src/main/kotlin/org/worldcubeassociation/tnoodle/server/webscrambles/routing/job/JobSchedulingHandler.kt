@@ -24,7 +24,7 @@ object JobSchedulingHandler : RouteHandler {
 
     private const val JOB_ID_PARAM = "jobId"
 
-    const val MARKER_ERROR_MESSAGE = "%%ERROR%%";
+    const val MARKER_ERROR_MESSAGE = "%%ERROR%%"
 
     private suspend fun ApplicationCall.checkAndYieldJobId(): Int? {
         val jobId = parameters[JOB_ID_PARAM]?.toIntOrNull() ?: -1
@@ -134,7 +134,7 @@ object JobSchedulingHandler : RouteHandler {
                         send(MARKER_ERROR_MESSAGE)
                         send(errorSerial)
 
-                        close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, ""))
+                        close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, MARKER_ERROR_MESSAGE))
                     }
                 }
             }

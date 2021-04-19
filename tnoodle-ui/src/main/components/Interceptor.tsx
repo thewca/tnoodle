@@ -43,8 +43,8 @@ class Interceptor extends Component<{}, InterceptorState> {
 
     updateMessage = (data: any) => {
         // Clear the message after some seconds
-        let message = data.message || data.statusText || JSON.stringify(data);
-        let stackTrace = data.stackTrace;
+        let message = data?.message || data?.statusText || JSON.stringify(data);
+        let stackTrace = data?.stackTrace ?? "";
 
         setTimeout(() => {
             // We only clear the message if the user did not click "Show more"
