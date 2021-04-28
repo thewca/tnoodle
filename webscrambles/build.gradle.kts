@@ -40,7 +40,6 @@ plugins {
     kotlin("jvm")
     application
     SHADOW
-    GIT_VERSION_TAG
     KOTLIN_SERIALIZATION
 }
 
@@ -78,7 +77,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClassName = "org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer"
+    mainClass.set("org.worldcubeassociation.tnoodle.server.webscrambles.WebscramblesServer")
 }
 
 tasks.create<JavaExec>("i18nCheck") {

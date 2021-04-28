@@ -16,7 +16,6 @@ attachRemoteRepositories()
 plugins {
     kotlin("jvm")
     war
-    GIT_VERSION_TAG
     KOTLIN_SERIALIZATION
     GOOGLE_APPENGINE
     //KOTLESS

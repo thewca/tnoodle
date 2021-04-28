@@ -38,10 +38,9 @@ object Versions {
     val KOTLINX_ATOMICFU_GRADLE = "0.15.2"
 
     object Plugins {
-        val SHADOW = "6.1.0"
+        val SHADOW = "7.0.0"
         val NODEJS = "3.0.1"
         val DEPENDENCY_VERSIONS = "0.38.0"
-        val GIT_VERSION_TAG = "0.12.3"
 
         val KOTLIN = Versions.KOTLIN
 
