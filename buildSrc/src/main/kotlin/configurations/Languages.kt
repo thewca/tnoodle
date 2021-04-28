@@ -14,12 +14,6 @@ object Languages {
     fun Project.attachRemoteRepositories() {
         repositories {
             mavenCentral()
-            jcenter()
         }
-    }
-
-    fun Project.attachRepositories() {
-        attachLocalRepositories()
-        attachRemoteRepositories()
     }
 }
