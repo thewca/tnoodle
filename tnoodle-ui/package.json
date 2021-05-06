@@ -30,7 +30,6 @@
         "build": "react-scripts build",
         "test": "react-scripts test --watchAll --watchAll=false --coverage",
         "eject": "react-scripts eject",
-        "coveralls": "cat ./coverage/lcov.info | coveralls",
         "prettier": "prettier --check ."
     },
     "eslintConfig": {
@@ -53,16 +52,17 @@
     },
     "jest": {
         "collectCoverageFrom": [
-            "src/**/*.{js,jsx}",
-            "!src/index.js",
-            "!src/serviceWorker.js",
-            "!src/main/api/**.js",
-            "!**/Interceptor.jsx"
+            "src/**/*.{ts,tsx}",
+            "!src/index.tsx",
+            "!src/reportWebVitals.ts",
+            "!src/react-app-env.d.ts",
+            "!src/main/api/**.ts",
+            "!src/main/model/**.ts",
+            "!**/Interceptor.tsx"
         ]
     },
     "devDependencies": {
         "@types/lodash": "^4.14.168",
-        "coveralls": "^3.1.0",
         "prettier": "^2.2.1"
     }
 }

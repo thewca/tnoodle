@@ -26,6 +26,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Push coverage data to Coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: ./gradlew yarn_coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: 'tnoodle-ui/coverage/lcov.info'

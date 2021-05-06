@@ -1,6 +1,6 @@
 import Axios from "axios";
 import { BASE_PATH } from "../../App";
-import ScrambleProgram from "../components/ScrambleProgram";
+import ScrambleProgram from "../model/ScrambleProgram";
 import Competition from "../model/Competition";
 import Person from "../model/Person";
 import Wcif from "../model/Wcif";
