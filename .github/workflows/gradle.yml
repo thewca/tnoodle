@@ -30,3 +30,4 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: 'tnoodle-ui/coverage/lcov.info'
+        base-path: 'tnoodle-ui'
