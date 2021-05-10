@@ -43,6 +43,15 @@ data class OfflineJarUtils(val port: Int) {
         // Find out which icon to use.
         val iconFileName = if (isWrapper) ICON_WRAPPER else ICON_WORKER
 
+        val os = System.getProperty("os.name").toLowerCase()
+
+        if (os.contains("mac") || os.contains("darwin")) {
+            LOG.debug("Detected MacOS implementation for os.name value $os")
+            LOG.debug("Using workaround for BigSur SystemTray error!")
+
+            SystemTray.FORCE_TRAY_TYPE = SystemTray.TrayType.Awt
+        }
+
         val trayAdapter = SystemTray.get()
 
         if (trayAdapter == null) {
