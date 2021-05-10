@@ -23,6 +23,10 @@
 -keep class com.sun.jna.** { *; }
 -keep class dorkbox.jna.** { *; }
 -keep class dorkbox.systemTray.** { *; }
+-keep class sun.awt.windows.** { *; }
+-keep class sun.lwawt.macosx.** { *; }
+-keep class sun.awt.X11.** { *; }
+-keep class sun.awt.SunToolkit { *; }
 
 -keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
 -keep,includedescriptorclasses class org.worldcubeassociation.tnoodle.server.webscrambles.**$$serializer { *; }
