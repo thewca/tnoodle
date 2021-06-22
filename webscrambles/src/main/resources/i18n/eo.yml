@@ -1,0 +1,52 @@
+eo:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Mikso %{scrambleIndex} el %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Mikso
+        #original_hash: ec7b598
+        round: Raŭndo
+        #original_hash: 43d44fe
+        attempt: Provo
+        #original_hash: 4705687
+        competitor: Konkursanto
+        #original_hash: 220a57b
+        warning: NE PLENIGU TION SE VI ESTAS LA KONKURSANTO.
+        #original_hash: 0263083
+        event: Optimigita solvo
+        #original_hash: 960085a
+        graded: Kontrolita de
+        #original_hash: 5faa59d
+        result: Rezulto
+        #original_hash: 1917f4f
+        competition: Konkurso
+        #original_hash: ca817e3
+        registrantId: Registiĝidentigilo
+        #original_hash: 49debdc
+        rule1: Vi havas 60 minutojn por trovi kaj skribi solvon.
+        #original_hash: 8b6b48b
+        rule2: 'Skribu 1 movon per substreko. Por forigi movon, nigrigu ĝin klare.'
+        #original_hash: 7822590
+        rule3: >-
+            Via solvo ne devas rekte derivi de iu ajn parton de la miksa
+            movovico.
+        #original_hash: 45551a7
+        rule4: 'Via solvo devas havi maksimume %{maxMoves} movoj, inklude rotacioj.'
+        #original_hash: 1ba5f27
+        rule5: Via rezulto estos kalkulita en OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Nur uzu la notacion de la Artikolo 12 de la Regularo de la WCA. Se
+            vi estas necerta, uzu nur tiujn movojn:
+        #original_hash: dd22ec2
+        faceMoves: Movoj de facoj
+        #original_hash: 57e9da1
+        rotations: Rotacioj
+        #original_hash: c75ac6f
+        clockwise: Dekstrume
+        #original_hash: 80fe739
+        counterClockwise: Maldekstrume
+        #original_hash: 8158159
+        double: Duoble
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Bonvolu rigardi apartan folion por la miksoj.
