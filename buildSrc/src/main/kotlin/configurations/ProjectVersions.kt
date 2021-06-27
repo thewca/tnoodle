@@ -21,7 +21,8 @@ object ProjectVersions {
             .readEnvironment()
             .build()
 
-        val version = repo.findRef("HEAD").objectId.name
+        // 7 digits seems to be the consensus for "short" git hashes
+        val version = repo.findRef("HEAD").objectId.name.take(7)
         val isClean = Git.wrap(repo).status().call().isClean
         return version + (if (isClean) "" else ".dirty")
     }
