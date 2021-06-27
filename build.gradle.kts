@@ -14,9 +14,7 @@ buildscript {
     }
 
     dependencies {
-        classpath(PROGUARD_GRADLE) {
-            exclude(group = "com.android.tools.build")
-        }
+        classpath(PROGUARD_GRADLE)
         classpath(GOOGLE_APPENGINE_GRADLE)
         classpath(KOTLINX_ATOMICFU_GRADLE)
     }
