@@ -5,7 +5,7 @@ object Versions {
     val BATIK = "1.14"
     val KOTLIN = "1.5.20"
     val KTOR = "1.6.0"
-    val PROGUARD = "7.0.1"
+    val PROGUARD = "7.1.0-beta5"
     val KOTLESS = "0.1.6"
 
     val MARKDOWNJ_CORE = "0.4"
