@@ -84,7 +84,7 @@ tasks.create<JavaExec>("i18nCheck") {
 
     val ymlFiles = fileTree(i18nDir).files - baseFile
 
-    main = "JarMain" // Warbler gives *fantastic* class names to the jruby bundles :/
+    mainClass.set("JarMain") // Warbler gives *fantastic* class names to the jruby bundles :/
     classpath = buildscript.configurations["classpath"]
 
     setArgs(listOf(baseFile) + ymlFiles)
