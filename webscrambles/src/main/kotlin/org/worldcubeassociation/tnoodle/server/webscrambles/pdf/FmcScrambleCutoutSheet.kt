@@ -39,19 +39,10 @@ class FmcScrambleCutoutSheet(scrambleSet: ScrambleSet, activityCode: ActivityCod
 
         val tp = directContent.renderSvgToPDF(svg, dim)
 
-        val substitutions = mapOf(
-            "scrambleIndex" to (index + 1).toString(),
-            "scrambleCount" to expectedAttemptNum.toString()
-        )
+        val scrambleSuffix = computeLocalScrambleNumDescription(index)
+            .takeIf { expectedAttemptNum > 1 }.orEmpty()
 
-        val scrambleSuffix = Translate.translate("fmc.scrambleXofY", locale, substitutions)
-            .takeIf { expectedAttemptNum > 1 } ?: ""
-
-        val eventTitle = Translate.translate("fmc.event", locale)
-        val attemptDetails = activityCode.compileTitleString(locale, includeEvent = false, includeGroupID = hasGroupID)
-        val attemptTitle = "$eventTitle $attemptDetails".trim()
-
-        val title = "$attemptTitle $scrambleSuffix"
+        val title = "$activityTitle $scrambleSuffix"
 
         val font = Font(BASE_FONT, FONT_SIZE / 2)
         val localBaseFont = FontUtil.getFontForLocale(locale)
