@@ -1,5 +1,4 @@
 import configurations.CompilerSettings.KOTLIN_JVM_TARGET
-import configurations.CompilerSettings.KOTLIN_USE_IR_COMPILER
 import configurations.Languages.attachRemoteRepositories
 
 import crypto.BuildVerification.SIGNATURE_PACKAGE
@@ -43,7 +42,6 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = KOTLIN_JVM_TARGET
-    kotlinOptions.useIR = KOTLIN_USE_IR_COMPILER
 }
 
 tasks.create("deleteSignatures") {
