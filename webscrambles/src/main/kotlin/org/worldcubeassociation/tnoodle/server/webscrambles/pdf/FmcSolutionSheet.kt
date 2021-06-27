@@ -147,7 +147,7 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val fontSize = 15f
         val font = Font(bf, fontSize)
         val margin = 5
-        val showScrambleCount = withScramble && (scrambleSet.scrambles.size > 1 || activityCode.attemptNumber != null)
+        val showScrambleCount = withScramble && expectedAttemptNum > 1
         val titleFontSize = 25f
         val titleFont = Font(bf, titleFontSize)
         val rulesHeight = height / 6
@@ -158,32 +158,17 @@ open class FmcSolutionSheet(scrambleSet: ScrambleSet, activityCode: ActivityCode
         val gradeRect = Rectangle((competitorInfoLeft + margin).toFloat(), competitorInfoBottom.toFloat(), (right - margin).toFloat(), gradeBottom.toFloat())
         val scrambleImageRect = Rectangle((competitorInfoLeft + margin).toFloat(), gradeBottom.toFloat(), (right - margin).toFloat(), scrambleBorderTop.toFloat())
 
-        val localEventTitle = Translate.translate("fmc.event", locale)
         cb.fitAndShowText(localEventTitle, titleRect, titleFont, Element.ALIGN_CENTER)
 
         // Both competitor com competition details
         val compDetailItems = mutableListOf<Pair<String, Int>>()
 
         if (withScramble) {
-            val activityTitleRaw = activityCode.copyParts(attemptNumber = null)
-                .compileTitleString(locale, includeEvent = false, includeGroupID = hasGroupID)
-
-            val activityTitle = "$localEventTitle $activityTitleRaw"
-
             compDetailItems.add(competitionTitle to Element.ALIGN_CENTER)
             compDetailItems.add(activityTitle to Element.ALIGN_CENTER)
 
             if (showScrambleCount) {
-                // this is for ordered scrambles
-                val attemptIndex = activityCode.attemptNumber ?: index
-                val orderedIndex = max(attemptIndex, index) + 1
-
-                val substitutions = mapOf(
-                    "scrambleIndex" to orderedIndex.toString(),
-                    "scrambleCount" to expectedAttemptNum.toString()
-                )
-
-                val translatedInfo = Translate.translate("fmc.scrambleXofY", locale, substitutions)
+                val translatedInfo = computeLocalScrambleNumDescription(index)
                 compDetailItems.add(translatedInfo to Element.ALIGN_CENTER)
             }
         } else {
