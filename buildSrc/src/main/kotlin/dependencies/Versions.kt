@@ -4,12 +4,12 @@ object Versions {
     val JUNIT_JUPITER = "5.7.1"
     val BATIK = "1.14"
     val KOTLIN = "1.5.20"
-    val KTOR = "1.6.0"
-    val PROGUARD = "7.1.0-beta5"
+    val KTOR = "1.6.1"
+    val PROGUARD = "7.1.0"
     val KOTLESS = "0.1.6"
 
     val MARKDOWNJ_CORE = "0.4"
-    val ZIP4J = "2.8.0"
+    val ZIP4J = "2.9.0"
     val ITEXTPDF = "5.5.13.2"
     val BATIK_TRANSCODER = BATIK
     val BATIK_CODEC = BATIK
@@ -30,12 +30,12 @@ object Versions {
     val PROGUARD_GRADLE = PROGUARD
     val WCA_I18N = "0.4.3"
     val GOOGLE_APPENGINE_GRADLE = "2.4.1"
-    val GOOGLE_CLOUD_STORAGE = "1.116.0"
+    val GOOGLE_CLOUD_STORAGE = "1.117.1"
     val TNOODLE_SCRAMBLES = "0.18.0"
     val APACHE_COMMONS_LANG3 = "3.12.0"
     val KOTLESS_KTOR = KOTLESS
-    val TESTING_MOCKK = "1.11.0"
-    val KOTLINX_ATOMICFU_GRADLE = "0.16.1"
+    val TESTING_MOCKK = "1.12.0"
+    val KOTLINX_ATOMICFU_GRADLE = "0.16.2"
 
     object Plugins {
         val SHADOW = "7.0.0"
