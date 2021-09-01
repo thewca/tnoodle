@@ -12,7 +12,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleS
 import java.time.LocalDate
 import java.util.*
 
-object WcifDataBuilderTest {
+class WcifDataBuilderTest {
     val TEST_INSTANCE = LocalDate.now()
 
     @Test
