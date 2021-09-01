@@ -274,28 +274,16 @@ object WCIFScrambleMatcher {
 
         val actGroup = activity.activityCode.groupNumber
 
-        // uh oh. no child activities where there should be some.
+        // uh oh. no child activities where there should be some. Resort to creating them ourselves…
         if (actGroup == null) {
-            val actAttempt = activity.activityCode.attemptNumber
+            val inventedChildren = List(matchedRound.scrambleSetCount) {
+                val copiedActCode = activity.activityCode.copyParts(groupNumber = it)
+                val childSetId = matchedRound.scrambleSets[it].id
 
-            // resort to creating them ourselves…
-            if (actAttempt == null) {
-                val inventedChildren = List(matchedRound.scrambleSetCount) {
-                    val copiedActCode = activity.activityCode.copyParts(groupNumber = it)
-                    val childSetId = matchedRound.scrambleSets[it].id
-
-                    activity.copy(id = ID_PENDING, activityCode = copiedActCode, childActivities = listOf(), scrambleSetId = childSetId)
-                }
-
-                return activity.copy(childActivities = inventedChildren)
+                activity.copy(id = ID_PENDING, activityCode = copiedActCode, childActivities = listOf(), scrambleSetId = childSetId)
             }
 
-            if (matchedRound.scrambleSetCount > 1) {
-                ScrambleMatchingException.error("Attempt-only specification ${activity.activityCode} for activity ${activity.id} is impossible to match")
-            }
-
-            val onlyPossibleSet = matchedRound.scrambleSets.single()
-            return activity.copy(scrambleSetId = onlyPossibleSet.id)
+            return activity.copy(childActivities = inventedChildren)
         }
 
         // manually compensating for https://github.com/thewca/worldcubeassociation.org/issues/4653
