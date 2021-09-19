@@ -153,7 +153,7 @@ const SideBar = () => {
             dispatch(setEditingStatus(false));
             dispatch(setWcif(wcif));
             dispatch(setCompetitionId(wcif.id));
-            dispatch(setCompetitionId(wcif.name));
+            dispatch(setCompetitionName(wcif.name));
             dispatch(setFileZip());
         },
         [dispatch]
