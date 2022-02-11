@@ -1182,10 +1182,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
   integrity sha512-ij4wRiunFfaJxjB0BdrYHIH8FxBJpOwNPhhAcunlmPdXudL1WQV1qoP9un6JsEBAgQH+7UXyyjh0g7jTxXK6tg==
 
-"@cubing/icons@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-1.0.4.tgz#de05687a31ef241e120c13390dbea9cc38d723cb"
-  integrity sha512-pvOeyIiFeVLjqPFLDPJZBjUIO/Ya+P7POCS/idfXUJh/fDrzQ3AvZ4hsBbUzIs5DZjI+goIv3JKZVCet7/lw+w==
+"@cubing/icons@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@cubing/icons/-/icons-1.0.6.tgz#c05fa19fb2036eea6d38a468a11c1c426400eded"
+  integrity sha512-V9iLA0H4iRQlrXzyr6xx8lCmO+Ur25DSOxHN+cZi1Uvb4i7TZe2zzt3YfdSVkYsxyBZmQ0RKdr8WSAf803JJFg==
 
 "@eslint/eslintrc@^0.4.0":
   version "0.4.0"
