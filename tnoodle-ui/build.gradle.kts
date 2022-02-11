@@ -9,7 +9,7 @@ plugins {
 
 configure<NodeExtension> {
     download.set(true)
-    version.set("12.18.3")
+    version.set("16.14.0")
 }
 
 val yarnInstall = tasks.named("yarn_install") {
