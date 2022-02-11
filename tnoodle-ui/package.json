@@ -5,7 +5,7 @@
     "homepage": "http://localhost:2014/scramble",
     "dependencies": {
         "@cubing/icons": "^1.0.6",
-        "@reduxjs/toolkit": "^1.5.1",
+        "@reduxjs/toolkit": "^1.7.2",
         "@testing-library/jest-dom": "^5.11.4",
         "@testing-library/react": "^12.1.2",
         "@testing-library/user-event": "^12.1.10",
