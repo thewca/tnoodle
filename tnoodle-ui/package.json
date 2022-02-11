@@ -6,7 +6,7 @@
     "dependencies": {
         "@cubing/icons": "^1.0.6",
         "@reduxjs/toolkit": "^1.7.2",
-        "@testing-library/jest-dom": "^5.11.4",
+        "@testing-library/jest-dom": "^5.16.2",
         "@testing-library/react": "^12.1.2",
         "@testing-library/user-event": "^13.5.0",
         "@types/jest": "^27.4.0",
