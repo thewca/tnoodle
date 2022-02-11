@@ -52,8 +52,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -67,8 +66,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -82,8 +80,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -97,8 +94,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -117,8 +113,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -131,8 +126,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -146,8 +140,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -166,8 +159,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -181,8 +173,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -196,8 +187,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -216,8 +206,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -231,8 +220,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -246,8 +234,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -266,8 +253,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -281,8 +267,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -301,8 +286,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -316,8 +300,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -336,8 +319,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -351,8 +333,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -366,8 +347,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -387,8 +367,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -407,8 +386,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -422,8 +400,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -437,8 +414,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -457,8 +433,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -472,8 +447,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -492,8 +466,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -507,8 +480,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -527,8 +499,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -542,8 +513,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -557,8 +527,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -577,8 +546,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -592,8 +560,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -607,8 +574,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -627,8 +593,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -642,8 +607,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -657,8 +621,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -677,8 +640,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -697,8 +659,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -718,8 +679,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -738,8 +698,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -753,8 +712,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -784,8 +742,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -799,8 +756,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -814,8 +770,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -829,8 +784,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -849,8 +803,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -864,8 +817,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -879,8 +831,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -899,8 +850,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -914,8 +864,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],
@@ -929,8 +878,7 @@ export const wcifs: Record<string, Wcif> = {
                                 data: {
                                     numCopies: "1",
                                 },
-                                id:
-                                    "org.worldcubeassociation.tnoodle.SheetCopyCount",
+                                id: "org.worldcubeassociation.tnoodle.SheetCopyCount",
                                 specUrl: "",
                             },
                         ],

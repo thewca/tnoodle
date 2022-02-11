@@ -29,11 +29,8 @@ beforeEach(() => {
         Promise.resolve({ data: formats, ...axiosResponse })
     );
 
-    jest.spyOn(
-        tnoodleApi,
-        "fetchAvailableFmcTranslations"
-    ).mockImplementation(() =>
-        Promise.resolve({ data: languages, ...axiosResponse })
+    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
+        () => Promise.resolve({ data: languages, ...axiosResponse })
     );
 });
 

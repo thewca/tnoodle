@@ -7,9 +7,8 @@ import { setOfficialZipStatus } from "../redux/slice/ScramblingSlice";
 
 const VersionInfo = () => {
     const [currentTnoodle, setCurrentTnoodle] = useState<CurrentTnoodle>();
-    const [allowedTnoodleVersions, setAllowedTnoodleVersions] = useState<
-        string[]
-    >();
+    const [allowedTnoodleVersions, setAllowedTnoodleVersions] =
+        useState<string[]>();
     const [runningVersion, setRunningVersion] = useState<string>();
     const [signedBuild, setSignedBuild] = useState<boolean>();
     const [signatureKeyBytes, setSignatureKeyBytes] = useState<string>();

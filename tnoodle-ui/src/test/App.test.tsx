@@ -56,11 +56,8 @@ beforeEach(() => {
         Promise.resolve({ data: formats, ...axiosResponse })
     );
 
-    jest.spyOn(
-        tnoodleApi,
-        "fetchAvailableFmcTranslations"
-    ).mockImplementation(() =>
-        Promise.resolve({ data: languages, ...axiosResponse })
+    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
+        () => Promise.resolve({ data: languages, ...axiosResponse })
     );
 
     jest.spyOn(tnoodleApi, "fetchRunningVersion").mockImplementation(() =>
@@ -82,11 +79,8 @@ beforeEach(() => {
         Promise.resolve({ data: scrambleProgram, ...axiosResponse })
     );
 
-    jest.spyOn(
-        wcaApi,
-        "getUpcomingManageableCompetitions"
-    ).mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: competitions })
+    jest.spyOn(wcaApi, "getUpcomingManageableCompetitions").mockImplementation(
+        () => Promise.resolve({ ...axiosResponse, data: competitions })
     );
 
     jest.spyOn(wcaApi, "fetchMe").mockImplementation(() =>
@@ -343,11 +337,9 @@ it("Logged user", async () => {
 
     jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
-    jest.spyOn(
-        wcaApi,
-        "getCompetitionJson"
-    ).mockImplementation((competitionId) =>
-        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] })
+    jest.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
+        (competitionId) =>
+            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] })
     );
 
     jest.spyOn(tnoodleApi, "fetchBestMbldAttempt").mockImplementation(() =>
@@ -357,11 +349,8 @@ it("Logged user", async () => {
         })
     );
 
-    jest.spyOn(
-        tnoodleApi,
-        "fetchSuggestedFmcTranslations"
-    ).mockImplementation(() =>
-        Promise.resolve({ ...axiosResponse, data: ["de", "es", "pt-BR"] })
+    jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
+        () => Promise.resolve({ ...axiosResponse, data: ["de", "es", "pt-BR"] })
     );
 
     // Render component
@@ -478,11 +467,9 @@ it("Comfort features should not block zip generation", async () => {
 
     jest.spyOn(wcaApi, "isLogged").mockImplementation(() => true);
 
-    jest.spyOn(
-        wcaApi,
-        "getCompetitionJson"
-    ).mockImplementation((competitionId) =>
-        Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] })
+    jest.spyOn(wcaApi, "getCompetitionJson").mockImplementation(
+        (competitionId) =>
+            Promise.resolve({ ...axiosResponse, data: wcifs[competitionId] })
     );
 
     // Comfort features
@@ -490,10 +477,9 @@ it("Comfort features should not block zip generation", async () => {
         Promise.resolve({ ...axiosResponse, data: bestMbldAttempt })
     );
 
-    jest.spyOn(
-        tnoodleApi,
-        "fetchSuggestedFmcTranslations"
-    ).mockImplementation(() => Promise.resolve({ ...axiosResponse, data: [] }));
+    jest.spyOn(tnoodleApi, "fetchSuggestedFmcTranslations").mockImplementation(
+        () => Promise.resolve({ ...axiosResponse, data: [] })
+    );
 
     // Render component
     await act(async () => {

@@ -59,11 +59,8 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
         Promise.resolve({ data: formats, ...axiosResponse })
     );
 
-    jest.spyOn(
-        tnoodleApi,
-        "fetchAvailableFmcTranslations"
-    ).mockImplementation(() =>
-        Promise.resolve({ data: languages, ...axiosResponse })
+    jest.spyOn(tnoodleApi, "fetchAvailableFmcTranslations").mockImplementation(
+        () => Promise.resolve({ data: languages, ...axiosResponse })
     );
 
     // We add suggested FMC so the button Select Suggested appears as well
