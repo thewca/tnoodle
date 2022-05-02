@@ -1,12 +1,13 @@
 package org.worldcubeassociation.tnoodle.server
 
-import io.ktor.application.Application
-import io.ktor.application.install
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.routing.routing
-import io.ktor.serialization.json
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.ShutDownUrl
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.routing.JsEnvHandler
 import org.worldcubeassociation.tnoodle.server.routing.IconHandler
 import org.worldcubeassociation.tnoodle.server.routing.VersionHandler
@@ -22,7 +23,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
             versionHandler.install(this)
         }
 
-        app.install(ShutDownUrl.ApplicationCallFeature) {
+        app.install(ShutDownUrl.ApplicationCallPlugin) {
             shutDownUrl = KILL_URL
             exitCodeSupplier = { 0 }
         }
@@ -31,7 +32,7 @@ class TNoodleServer(val environmentConfig: ServerEnvironmentConfig) : Applicatio
 
         app.install(CORS) {
             anyHost()
-            method(HttpMethod.Put)
+            allowMethod(HttpMethod.Put)
             // gimme dat zesty application/json
             allowNonSimpleContentTypes = true
         }

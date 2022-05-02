@@ -1,9 +1,8 @@
 package org.worldcubeassociation.tnoodle.server.cloudscrambles.routing
 
-import io.ktor.application.call
-import io.ktor.response.respondText
-import io.ktor.routing.Route
-import io.ktor.routing.get
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object HomepageHandler : RouteHandler {

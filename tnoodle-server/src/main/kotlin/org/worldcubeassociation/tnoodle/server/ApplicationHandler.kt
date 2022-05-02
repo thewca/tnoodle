@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server
 
-import io.ktor.application.Application
+import io.ktor.server.application.Application
 
 interface ApplicationHandler {
     fun spinUp(app: Application)

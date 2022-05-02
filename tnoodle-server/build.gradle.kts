@@ -6,10 +6,13 @@ import crypto.BuildVerification.SIGNATURE_SUFFIX
 
 import dependencies.Libraries.BOUNCYCASTLE
 import dependencies.Libraries.KOTLIN_COROUTINES_CORE
-import dependencies.Libraries.KTOR_SERIALIZATION
+import dependencies.Libraries.KTOR_SERVER_CONTENT_NEGOTIATION
 import dependencies.Libraries.KTOR_SERVER_NETTY
 import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
+import dependencies.Libraries.KTOR_SERVER_DEFAULT_HEADERS
+import dependencies.Libraries.KTOR_SERVER_CORS
 import dependencies.Libraries.KTOR_SERVER_SERVLET
+import dependencies.Libraries.KTOR_SERIALIZATION_KOTLINX_JSON
 import dependencies.Libraries.LOGBACK_CLASSIC
 import dependencies.Libraries.KOTLIN_SERIALIZATION_JSON
 import dependencies.Libraries.TNOODLE_SCRAMBLES
@@ -28,12 +31,15 @@ plugins {
 
 dependencies {
     api(KTOR_SERVER_NETTY)
+    api(KTOR_SERVER_CONTENT_NEGOTIATION)
     api(KOTLIN_SERIALIZATION_JSON)
     api(KOTLIN_COROUTINES_CORE)
     api(TNOODLE_SCRAMBLES)
 
-    implementation(KTOR_SERIALIZATION)
+    implementation(KTOR_SERIALIZATION_KOTLINX_JSON)
     implementation(KTOR_SERVER_HOST_COMMON)
+    implementation(KTOR_SERVER_DEFAULT_HEADERS)
+    implementation(KTOR_SERVER_CORS)
     implementation(KTOR_SERVER_SERVLET)
     implementation(BOUNCYCASTLE)
 

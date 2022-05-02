@@ -1,9 +1,8 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.serial
 
-import io.ktor.application.call
-import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
 import kotlinx.serialization.Serializable
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -27,7 +26,7 @@ data class FrontendErrorMessage(
         fun Throwable.humanStackTrace() =
             StringWriter().also { PrintWriter(it).use(this::printStackTrace) }.toString()
 
-        inline fun <reified T : Throwable> StatusPages.Configuration.frontendException(status: HttpStatusCode) =
-            exception<T> { call.respond(status, it.asFrontendError()) }
+        inline fun <reified T : Throwable> StatusPagesConfig.frontendException(status: HttpStatusCode) =
+            exception<T> { call, cause -> call.respond(status, cause.asFrontendError()) }
     }
 }

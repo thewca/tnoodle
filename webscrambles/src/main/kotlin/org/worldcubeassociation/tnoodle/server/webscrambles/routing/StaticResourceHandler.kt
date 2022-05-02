@@ -1,10 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
-import io.ktor.http.content.defaultResource
-import io.ktor.http.content.resource
-import io.ktor.http.content.resources
-import io.ktor.http.content.static
-import io.ktor.routing.Route
+import io.ktor.server.http.content.*
+import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 
 object StaticResourceHandler : RouteHandler {

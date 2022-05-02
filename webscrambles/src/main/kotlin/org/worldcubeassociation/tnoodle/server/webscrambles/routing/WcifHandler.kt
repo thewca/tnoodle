@@ -1,13 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing
 
-import io.ktor.application.ApplicationCall
 import io.ktor.http.ContentType
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.readText
-import io.ktor.request.receive
-import io.ktor.request.uri
-import io.ktor.routing.Route
-import io.ktor.routing.route
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import io.ktor.websocket.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.serial.JsonConfig
 import org.worldcubeassociation.tnoodle.server.ServerEnvironmentConfig

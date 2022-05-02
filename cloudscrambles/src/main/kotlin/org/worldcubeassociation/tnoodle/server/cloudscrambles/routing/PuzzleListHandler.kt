@@ -1,12 +1,8 @@
 package org.worldcubeassociation.tnoodle.server.cloudscrambles.routing
 
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.response.respond
-import io.ktor.response.respondText
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.route
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.serial.PuzzleInfoJsonData
 import org.worldcubeassociation.tnoodle.server.model.PuzzleData
