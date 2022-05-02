@@ -2,16 +2,14 @@ package org.worldcubeassociation.tnoodle.server.webscrambles
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
-import io.ktor.application.Application
-import io.ktor.application.install
-import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.server.application.*
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.websocket.WebSockets
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler

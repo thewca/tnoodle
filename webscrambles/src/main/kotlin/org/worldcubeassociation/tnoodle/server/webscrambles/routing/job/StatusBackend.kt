@@ -1,7 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing.job
 
-import io.ktor.http.cio.websocket.send
-import io.ktor.websocket.WebSocketServerSession
+import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -16,7 +15,7 @@ sealed class StatusBackend {
         override fun onProgress(worker: String) {}
     }
 
-    class Websocket(val socket: WebSocketServerSession) : StatusBackend(), CoroutineScope by socket {
+    class Websocket(val socket: WebSocketSession) : StatusBackend(), CoroutineScope by socket {
         override fun onProgress(worker: String) {
             launch { socket.send(worker) }
         }

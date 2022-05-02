@@ -1,6 +1,6 @@
 package org.worldcubeassociation.tnoodle.server
 
-import io.ktor.routing.Route
+import io.ktor.server.routing.Route
 
 interface RouteHandler {
     fun install(router: Route)

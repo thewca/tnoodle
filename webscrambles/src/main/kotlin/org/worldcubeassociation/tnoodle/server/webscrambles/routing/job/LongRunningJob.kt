@@ -1,10 +1,10 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing.job
 
-import io.ktor.application.ApplicationCall
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.websocket.WebSocketServerSession
+import io.ktor.server.application.*
+import io.ktor.server.websocket.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,7 +47,7 @@ abstract class LongRunningJob<T> : CoroutineScope {
         return runBlocking { request.compute(StatusBackend.NoOp) }
     }
 
-    suspend fun channel(request: T, socket: WebSocketServerSession): Pair<ContentType, ByteArray> {
+    suspend fun channel(request: T, socket: WebSocketSession): Pair<ContentType, ByteArray> {
         val statusBackend = StatusBackend.Websocket(socket)
         return request.compute(statusBackend)
     }

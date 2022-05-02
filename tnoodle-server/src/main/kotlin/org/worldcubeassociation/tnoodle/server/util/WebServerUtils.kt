@@ -4,9 +4,6 @@ import java.io.*
 import java.net.URISyntaxException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.util.Random
 
 object WebServerUtils {
     val DEVEL_VERSION = "devel-TEMP"

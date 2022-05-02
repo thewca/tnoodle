@@ -1,9 +1,9 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.routing.frontend
 
-import io.ktor.application.call
-import io.ktor.request.receive
-import io.ktor.response.respond
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.serialization.json.JsonNull
 import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFCompetitorInfo

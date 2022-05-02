@@ -1,8 +1,7 @@
 package org.worldcubeassociation.tnoodle.server.cloudscrambles
 
-import io.ktor.application.Application
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.server.application.*
+import io.ktor.server.routing.*
 import org.worldcubeassociation.tnoodle.server.ApplicationHandler
 import org.worldcubeassociation.tnoodle.server.TNoodleServer
 import org.worldcubeassociation.tnoodle.server.cloudscrambles.routing.HomepageHandler
