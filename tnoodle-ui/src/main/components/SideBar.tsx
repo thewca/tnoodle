@@ -27,6 +27,7 @@ import {
 import { defaultWcif } from "../util/wcif.util";
 import Loading from "./Loading";
 import "./SideBar.css";
+import Wcif from "../model/Wcif";
 
 const SideBar = () => {
     const [loadingUser, setLoadingUser] = useState(false);
@@ -93,7 +94,7 @@ const SideBar = () => {
     };
 
     const getAndCacheBestMbldAttempt = useCallback(
-        (wcif) => {
+        (wcif: Wcif) => {
             tnoodleApi.fetchBestMbldAttempt(wcif).then((response) => {
                 let attempted = response.data.attempted;
                 dispatch(
@@ -110,7 +111,7 @@ const SideBar = () => {
     );
 
     const getAndCacheSuggestedFmcTranslations = useCallback(
-        (wcif) => {
+        (wcif: Wcif) => {
             tnoodleApi.fetchSuggestedFmcTranslations(wcif).then((response) => {
                 dispatch(
                     addCachedObject({
@@ -128,7 +129,7 @@ const SideBar = () => {
     // In case we use competitionId from query params, it's not fetched.
     // We add it to the list.
     const maybeAddCompetition = useCallback(
-        (competitionId, competitionName) => {
+        (competitionId: string, competitionName: string) => {
             if (!competitions) {
                 return;
             }
@@ -149,7 +150,7 @@ const SideBar = () => {
     );
 
     const updateWcif = useCallback(
-        (wcif) => {
+        (wcif: Wcif) => {
             dispatch(setEditingStatus(false));
             dispatch(setWcif(wcif));
             dispatch(setCompetitionId(wcif.id));
@@ -160,7 +161,7 @@ const SideBar = () => {
     );
 
     const handleCompetitionSelection = useCallback(
-        (competitionId) => {
+        (competitionId: string) => {
             setQueryParameter("competitionId", competitionId);
 
             // For quick switching between competitions.
