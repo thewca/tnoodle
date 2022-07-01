@@ -7,6 +7,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.bouncycastle:bcprov-jdk15on:1.69")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
+    implementation(libs.bouncycastle)
+    implementation(libs.eclipse.jgit)
+
+    // https://github.com/gradle/gradle/issues/15383#issuecomment-779893192
+    implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 }

@@ -14,9 +14,9 @@ buildscript {
     }
 
     dependencies {
-        classpath(PROGUARD_GRADLE)
-        classpath(GOOGLE_APPENGINE_GRADLE)
-        classpath(KOTLINX_ATOMICFU_GRADLE)
+        classpath(libs.proguard.gradle)
+        classpath(libs.google.appengine.gradle)
+        classpath(libs.kotlinx.atomicfu.gradle)
     }
 }
 
@@ -28,8 +28,8 @@ allprojects {
 }
 
 plugins {
-    KOTLIN_JVM apply false
-    DEPENDENCY_VERSIONS
+    kotlin("jvm") version libs.versions.kotlin apply false
+    alias(libs.plugins.dependency.versions)
 }
 
 val releasePrefix = "TNoodle-WCA"

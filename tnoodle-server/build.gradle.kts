@@ -4,19 +4,6 @@ import configurations.Languages.attachRemoteRepositories
 import crypto.BuildVerification.SIGNATURE_PACKAGE
 import crypto.BuildVerification.SIGNATURE_SUFFIX
 
-import dependencies.Libraries.BOUNCYCASTLE
-import dependencies.Libraries.KOTLIN_COROUTINES_CORE
-import dependencies.Libraries.KTOR_SERVER_CONTENT_NEGOTIATION
-import dependencies.Libraries.KTOR_SERVER_NETTY
-import dependencies.Libraries.KTOR_SERVER_HOST_COMMON
-import dependencies.Libraries.KTOR_SERVER_DEFAULT_HEADERS
-import dependencies.Libraries.KTOR_SERVER_CORS
-import dependencies.Libraries.KTOR_SERVER_SERVLET
-import dependencies.Libraries.KTOR_SERIALIZATION_KOTLINX_JSON
-import dependencies.Libraries.LOGBACK_CLASSIC
-import dependencies.Libraries.KOTLIN_SERIALIZATION_JSON
-import dependencies.Libraries.TNOODLE_SCRAMBLES
-
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "Embeddable webserver built around the Kotlin ktor framework"
@@ -25,25 +12,25 @@ attachRemoteRepositories()
 
 plugins {
     kotlin("jvm")
-    KOTLIN_SERIALIZATION
-    KOTLINX_ATOMICFU
+    alias(libs.plugins.kotlin.serialization)
+    id("kotlinx-atomicfu")
 }
 
 dependencies {
-    api(KTOR_SERVER_NETTY)
-    api(KTOR_SERVER_CONTENT_NEGOTIATION)
-    api(KOTLIN_SERIALIZATION_JSON)
-    api(KOTLIN_COROUTINES_CORE)
-    api(TNOODLE_SCRAMBLES)
+    api(libs.ktor.server.netty)
+    api(libs.ktor.server.content.negotiation)
+    api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.coroutines.core)
+    api(libs.tnoodle.scrambles)
 
-    implementation(KTOR_SERIALIZATION_KOTLINX_JSON)
-    implementation(KTOR_SERVER_HOST_COMMON)
-    implementation(KTOR_SERVER_DEFAULT_HEADERS)
-    implementation(KTOR_SERVER_CORS)
-    implementation(KTOR_SERVER_SERVLET)
-    implementation(BOUNCYCASTLE)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.host.common)
+    implementation(libs.ktor.server.default.headers)
+    implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.servlet)
+    implementation(libs.bouncycastle)
 
-    runtimeOnly(LOGBACK_CLASSIC)
+    runtimeOnly(libs.logback.classic)
 }
 
 tasks.withType<KotlinCompile> {
