@@ -3,6 +3,7 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.wcif
 import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.RegistrationStatus
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.result.MultiBldResult
 import java.util.*
 
@@ -15,10 +16,11 @@ object WCIFCompetitorInfo {
 
     fun detectTranslationLocales(wcif: Competition): Set<Locale> {
         val competitorCountries = wcif.persons
+            .filter { it.registration?.status == RegistrationStatus.ACCEPTED }
             .map { it.countryIso2.isoString }
             .distinct()
 
-        val countryLocales = competitorCountries.flatMap { getTranslatedCountryLanguages(it) }
+        val countryLocales = competitorCountries.flatMap(::getTranslatedCountryLanguages)
             .toSet() + Translate.DEFAULT_LOCALE
 
         return countryLocales.toSet()
@@ -37,10 +39,11 @@ object WCIFCompetitorInfo {
 
     fun <T : Comparable<T>> getBestMultiPB(wcif: Competition, comparator: (MultiBldResult) -> T): MultiBldResult? {
         val mbldResults = wcif.persons
+            .filter { it.registration?.status == RegistrationStatus.ACCEPTED }
             .flatMap { it.personalBests }
             .filter { it.eventModel == EventData.THREE_MULTI_BLD }
             .mapNotNull { it.best.asMultiResult }
 
-        return mbldResults.maxByOrNull { comparator(it) }
+        return mbldResults.maxByOrNull(comparator)
     }
 }
