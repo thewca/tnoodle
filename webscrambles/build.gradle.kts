@@ -7,19 +7,6 @@ import configurations.ProjectVersions.TNOODLE_SYMLINK
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
 
-import dependencies.Libraries.APACHE_COMMONS_LANG3
-import dependencies.Libraries.BATIK_TRANSCODER
-import dependencies.Libraries.BOUNCYCASTLE
-import dependencies.Libraries.ITEXTPDF
-import dependencies.Libraries.KOTLIN_ARGPARSER
-import dependencies.Libraries.KTOR_SERVER_WEBSOCKETS
-import dependencies.Libraries.KTOR_SERVER_STATUS_PAGES
-import dependencies.Libraries.MARKDOWNJ_CORE
-import dependencies.Libraries.SNAKEYAML
-import dependencies.Libraries.SYSTEM_TRAY
-import dependencies.Libraries.TESTING_MOCKK
-import dependencies.Libraries.ZIP4J
-
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "An extension over the core server to provide a user-friendly UI. Also draws PDFs."
@@ -32,15 +19,15 @@ buildscript {
     }
 
     dependencies {
-        classpath(WCA_I18N)
+        classpath(libs.wca.i18n)
     }
 }
 
 plugins {
     kotlin("jvm")
     application
-    SHADOW
-    KOTLIN_SERIALIZATION
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 configurations {
@@ -52,22 +39,22 @@ configurations {
 dependencies {
     implementation(project(":tnoodle-server"))
 
-    implementation(ZIP4J)
-    implementation(MARKDOWNJ_CORE)
-    implementation(ITEXTPDF)
-    implementation(BATIK_TRANSCODER)
-    implementation(SNAKEYAML)
-    implementation(KOTLIN_ARGPARSER)
-    implementation(SYSTEM_TRAY)
-    implementation(APACHE_COMMONS_LANG3)
-    implementation(KTOR_SERVER_WEBSOCKETS)
-    implementation(KTOR_SERVER_STATUS_PAGES)
+    implementation(libs.zip4j)
+    implementation(libs.markdownj.core)
+    implementation(libs.itextpdf)
+    implementation(libs.batik.transcoder)
+    implementation(libs.snakeyaml)
+    implementation(libs.kotlin.argparser)
+    implementation(libs.system.tray)
+    implementation(libs.apache.commons.lang3)
+    implementation(libs.ktor.server.websockets)
+    implementation(libs.ktor.server.status.pages)
 
-    runtimeOnly(BOUNCYCASTLE)
+    runtimeOnly(libs.bouncycastle)
 
     "deployable"(project(":tnoodle-ui"))
 
-    testImplementation(TESTING_MOCKK)
+    testImplementation(libs.mockk)
 }
 
 configureJUnit5()
@@ -81,15 +68,14 @@ application {
 }
 
 tasks.create<JavaExec>("i18nCheck") {
-    val i18nDir = "$projectDir/src/main/resources/i18n"
-    val baseFile = file("$i18nDir/en.yml")
-
-    val ymlFiles = fileTree(i18nDir).files - baseFile
+    val ymlFiles = sourceSets.main.get().resources.matching {
+        include("i18n/*.yml")
+    }.sortedBy { it.nameWithoutExtension != "en" }
 
     mainClass.set("JarMain") // Warbler gives *fantastic* class names to the jruby bundles :/
     classpath = buildscript.configurations["classpath"]
 
-    setArgs(listOf(baseFile) + ymlFiles)
+    setArgs(ymlFiles)
 }
 
 tasks.getByName("check") {

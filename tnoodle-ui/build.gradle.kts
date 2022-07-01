@@ -4,12 +4,12 @@ description = "A web ui for TNoodle that uses modern technology"
 
 plugins {
     base
-    NODEJS
+    alias(libs.plugins.nodejs)
 }
 
 configure<NodeExtension> {
     download.set(true)
-    version.set("16.14.0")
+    version.set(libs.versions.nodejs)
 }
 
 val yarnInstall = tasks.named("yarn_install") {

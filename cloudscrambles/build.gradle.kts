@@ -2,10 +2,6 @@ import configurations.CompilerSettings.KOTLIN_JVM_TARGET
 import configurations.Languages.attachRemoteRepositories
 import configurations.ProjectVersions.tNoodleImplOrDefault
 import configurations.ProjectVersions.tNoodleVersionOrDefault
-import dependencies.Libraries.BATIK_TRANSCODER
-import dependencies.Libraries.BATIK_CODEC
-import dependencies.Libraries.GOOGLE_CLOUD_STORAGE
-import dependencies.Libraries.KOTLESS_KTOR
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "An extension over the core server to expose scrambles in a Google Cloud environment"
@@ -15,19 +11,19 @@ attachRemoteRepositories()
 plugins {
     kotlin("jvm")
     war
-    KOTLIN_SERIALIZATION
-    GOOGLE_APPENGINE
+    alias(libs.plugins.kotlin.serialization)
+    id("com.google.cloud.tools.appengine")
     //KOTLESS
 }
 
 dependencies {
     implementation(project(":tnoodle-server"))
 
-    //implementation(KOTLESS_KTOR)
-    implementation(GOOGLE_CLOUD_STORAGE)
-    implementation(BATIK_TRANSCODER)
+    //implementation(libs.kotless.ktor)
+    implementation(libs.google.cloud.storage)
+    implementation(libs.batik.transcoder)
 
-    runtimeOnly(BATIK_CODEC)
+    runtimeOnly(libs.batik.codec)
 }
 
 tasks.withType<KotlinCompile> {
