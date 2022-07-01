@@ -1,0 +1,56 @@
+rm:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Scramble %{scrambleIndex} da %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Scramble
+        #original_hash: ec7b598
+        round: Runda
+        #original_hash: 43d44fe
+        attempt: Emprova
+        #original_hash: 4705687
+        competitor: Participont
+        #original_hash: 220a57b
+        warning: BUC EMPLEINA SCHE TI EIS SEZ IL PARTICIPONT
+        #original_hash: 0263083
+        event: Fewest Moves
+        #original_hash: 960085a
+        graded: Valetaus da
+        #original_hash: 5faa59d
+        result: Resultat
+        #original_hash: 1917f4f
+        competition: Concurrenza
+        #original_hash: ca817e3
+        registrantId: ID dil participont
+        #original_hash: 49debdc
+        rule1: Ti has 60 minutas temps per anflar e scriver si ina sligiaziun.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Scriva exactamein 1 tur per trav. Per annullar in tur, streha el
+            clar ed entelgentau.
+        #original_hash: 7822590
+        rule3: >-
+            Tia sligiaziun astga buca star en relaziun directa cun parts dil
+            scramble.
+        #original_hash: 45551a7
+        rule4: >-
+            Tia sligiaziun astga cumpigliar silpli %{maxMoves} turs, cumpriu
+            viultas dil quadrel.
+        #original_hash: 1ba5f27
+        rule5: Tiu resultat vegn valetaus en OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Drova mo la notaziun dil dudischavel artechel dallas Reglas WCA.
+            Sche ti eis malsegirs, drova exclusivamein ils turs ch'ein dai cheu:
+        #original_hash: dd22ec2
+        faceMoves: Viultas d'ina vart
+        #original_hash: 57e9da1
+        rotations: Viultas dil quadrel entir
+        #original_hash: c75ac6f
+        clockwise: En direcziun dall'ura
+        #original_hash: 80fe739
+        counterClockwise: Encunter la direcziun dall'ura
+        #original_hash: 8158159
+        double: Viulta dubla
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Il scramble anflas ti sin il fegl separat.
