@@ -1,7 +1,5 @@
-import { fireEvent } from "@testing-library/react";
+import { render, act, fireEvent } from "@testing-library/react";
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
 import EventPickerTable from "../main/components/EventPickerTable";
@@ -36,7 +34,6 @@ beforeEach(() => {
 
 afterEach(() => {
     // cleanup on exiting
-    unmountComponentAtNode(container);
     container.remove();
     container = document.createElement("div");
 
@@ -78,7 +75,7 @@ it("Show editing warn if case of competition selected", async () => {
                     <EventPickerTable />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -116,7 +113,7 @@ it("Singular event", async () => {
                     <EventPickerTable />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -135,7 +132,7 @@ it("Changes in MBLD should go to the store", async () => {
                     <EventPickerTable />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
     const names = ["3x3x3 Multiple Blindfolded"];

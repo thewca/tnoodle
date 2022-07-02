@@ -1,7 +1,5 @@
 import React from "react";
-import { act } from "react-dom/test-utils";
-
-import { render, unmountComponentAtNode } from "react-dom";
+import { render, act } from "@testing-library/react";
 
 import { Provider } from "react-redux";
 
@@ -20,7 +18,6 @@ beforeEach(() => {
 
 afterEach(() => {
     // cleanup on exiting
-    unmountComponentAtNode(container);
     container.remove();
     container = document.createElement("div");
 });
@@ -62,7 +59,7 @@ it("Current version is the correct one", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            container
+            { container }
         );
     });
 
@@ -114,7 +111,7 @@ it("Current version is allowed, but it's not the latest one", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            container
+            { container }
         );
     });
 
@@ -170,7 +167,7 @@ it("Not signed version alert", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            container
+            { container }
         );
     });
 
@@ -223,7 +220,7 @@ it("Signed with different key", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            container
+            { container }
         );
     });
 
@@ -276,7 +273,7 @@ it("Not allowed TNoodle version, despite it's official", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            container
+            { container }
         );
     });
 
@@ -322,7 +319,7 @@ it("Do not bother the user if we can't be sure", async () => {
             <Provider store={store}>
                 <VersionInfo />
             </Provider>,
-            container
+            { container }
         );
     });
 

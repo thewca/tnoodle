@@ -1,7 +1,5 @@
-import { fireEvent } from "@testing-library/react";
+import { render, act, fireEvent } from "@testing-library/react";
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import EventPicker from "../main/components/EventPicker";
 import {
@@ -23,7 +21,6 @@ beforeEach(() => {
 
 afterEach(() => {
     // cleanup on exiting
-    unmountComponentAtNode(container);
     container.remove();
     container = document.createElement("div");
 });
@@ -43,7 +40,7 @@ it("Changing values from event", async () => {
                     <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -127,7 +124,7 @@ it("Editing disabled", async () => {
                     <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -157,7 +154,7 @@ it("Progress Bar showing/hiding", async () => {
                     <EventPicker wcaEvent={event} wcifEvent={wcifEvent} />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 

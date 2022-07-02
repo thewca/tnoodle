@@ -1,7 +1,5 @@
-import { fireEvent } from "@testing-library/react";
+import { render, act, fireEvent } from "@testing-library/react";
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
@@ -36,7 +34,6 @@ beforeEach(() => {
 
 afterEach(() => {
     // cleanup on exiting
-    unmountComponentAtNode(container);
     container.remove();
     container = document.createElement("div");
 
@@ -82,7 +79,7 @@ it("There should be only 1 button of type submit, check FMC changes", async () =
                     <Main />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 

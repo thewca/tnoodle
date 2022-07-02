@@ -1,21 +1,12 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { fireEvent } from "@testing-library/react";
+import { render, act, fireEvent } from "@testing-library/react";
 import { shuffle } from "lodash";
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import App from "../App";
 import tnoodleApi from "../main/api/tnoodle.api";
 import wcaApi from "../main/api/wca.api";
 import Translation from "../main/model/Translation";
 import Wcif from "../main/model/Wcif";
-import { competitionSlice } from "../main/redux/slice/CompetitionSlice";
-import { fmcSlice } from "../main/redux/slice/FmcSlice";
-import { informationSlice } from "../main/redux/slice/InformationSlice";
-import { mbldSlice } from "../main/redux/slice/MbldSlice";
-import { scramblingSlice } from "../main/redux/slice/ScramblingSlice";
-import { wcifSlice } from "../main/redux/slice/WcifSlice";
 import { defaultWcif } from "../main/util/wcif.util";
 import {
     bestMbldAttempt,
@@ -94,7 +85,6 @@ beforeEach(() => {
 
 afterEach(() => {
     // cleanup on exiting
-    unmountComponentAtNode(container);
     container.remove();
     container = document.createElement("div");
 
@@ -126,7 +116,7 @@ it("Just generate scrambles", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
     const scrambleButton = container.querySelector("form button")!;
@@ -154,7 +144,7 @@ it("Changes on 333, scramble", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -227,7 +217,7 @@ it("Remove 333, add FMC and MBLD", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -361,7 +351,7 @@ it("Logged user", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -489,7 +479,7 @@ it("Comfort features should not block zip generation", async () => {
                     <App />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 

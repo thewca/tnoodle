@@ -1,7 +1,5 @@
-import { fireEvent } from "@testing-library/react";
+import { render, act, fireEvent } from "@testing-library/react";
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import EntryInterface from "../main/components/EntryInterface";
 import store from "../main/redux/Store";
@@ -15,7 +13,6 @@ beforeEach(() => {
 
 afterEach(() => {
     // cleanup on exiting
-    unmountComponentAtNode(container);
     container.remove();
     container = document.createElement("div");
 });
@@ -29,7 +26,7 @@ it("Competition name should be already filled with current date and changes shou
                     <EntryInterface />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 
@@ -58,7 +55,7 @@ it("Password should toggle and changes to it should go to the store", async () =
                     <EntryInterface />
                 </Provider>
             </React.StrictMode>,
-            container
+            { container }
         );
     });
 

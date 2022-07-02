@@ -1,7 +1,6 @@
 import React from "react";
-import { act } from "react-dom/test-utils";
 
-import { render, unmountComponentAtNode } from "react-dom";
+import { render, act } from "@testing-library/react";
 
 import { Provider } from "react-redux";
 import store from "../main/redux/Store";
@@ -21,7 +20,6 @@ beforeEach(() => {
 
 afterEach(() => {
     // cleanup on exiting
-    unmountComponentAtNode(container);
     container.remove();
     container = document.createElement("div");
 });
@@ -44,7 +42,7 @@ it("Each competition fetched from the website must become a button", async () =>
             <Provider store={store}>
                 <SideBar />
             </Provider>,
-            container
+            { container }
         );
     });
 
