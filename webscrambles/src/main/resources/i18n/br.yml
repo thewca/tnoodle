@@ -1,0 +1,56 @@
+br:
+    fmc:
+        #original_hash: 9e60b9f
+        scrambleXofY: 'Meskad %{scrambleIndex} diwar %{scrambleCount}'
+        #original_hash: b7126cd
+        scramble: Meskad
+        #original_hash: ec7b598
+        round: Tro
+        #original_hash: 43d44fe
+        attempt: Taol-esae
+        #original_hash: 4705687
+        competitor: Kenstriver
+        #original_hash: 220a57b
+        warning: 'MARD OC''H AR C''HENSTRIVER, LAOSKIT GOULLO.'
+        #original_hash: 0263083
+        event: Diluziadur Gwellekaet
+        #original_hash: 960085a
+        graded: Gwiriet gant
+        #original_hash: 5faa59d
+        result: Disoc'h
+        #original_hash: 1917f4f
+        competition: Kenstrivadeg
+        #original_hash: ca817e3
+        registrantId: Anaouder an enskrivadur
+        #original_hash: 49debdc
+        rule1: 60 munutenn ho peus evit kavout ha skrivañ un diskoulm.
+        #original_hash: 8b6b48b
+        rule2: >-
+            Skrivit 1 fiñvadenn dre tired. Evit dilemel ur fiñvadenn, duit
+            anezhi en un doare sklaer.
+        #original_hash: 7822590
+        rule3: >-
+            N'hall ket bezañ deveret ho tiskoulm war-eeun diwar lodenn-pe-lodenn
+            eus ar meskad.
+        #original_hash: 45551a7
+        rule4: >-
+            Rankout a ra ho tiskoulm kaout d'ar muiañ %{maxMoves} a fiñvadennoù,
+            troadur hag all.
+        #original_hash: 1ba5f27
+        rule5: Kontet e vo ho tisoc'h en OBTM.
+        #original_hash: 42e1a95
+        rule6: >-
+            Implijit notadur ar Mellad 12 Reoliadur eus ar WCA hepken. Ma n'oc'h
+            ket sur, grit gant ar fiñvadennoù-mañ hepken:
+        #original_hash: dd22ec2
+        faceMoves: Fiñvadennoù ar fasoù
+        #original_hash: 57e9da1
+        rotations: Troiadurioù
+        #original_hash: c75ac6f
+        clockwise: A-du gant an horolaj
+        #original_hash: 80fe739
+        counterClockwise: En amgin d'an horolaj
+        #original_hash: 8158159
+        double: Doubl
+        #original_hash: e014b51
+        scrambleOnSeparateSheet: Trugarez da sellet ouzh ar follenn dispartiet evit ar meskad.
