@@ -36,9 +36,11 @@ enum class PuzzleData(private val registry: PuzzleRegistry) {
     }
 
     fun generateEfficientScrambles(num: Int, action: (String) -> Unit = {}): List<String> {
-        return List(num) {
-            yieldScramble().also(action)
-        }
+        return generateSequence { yieldScramble() }
+            .distinct() // TODO ideally detect isomorphic states too, but most puzzles don't support rotations rn
+            .onEach(action)
+            .take(num)
+            .toList()
     }
 
     private fun yieldScramble() = SCRAMBLE_CACHERS[this.key]
