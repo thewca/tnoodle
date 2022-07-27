@@ -1,8 +1,8 @@
 [versions]
-kotlin = "1.6.21"
+kotlin = "1.7.10"
 ktor = "2.0.3"
 kotless = "0.1.6"
-junit-jupiter = "5.8.2"
+junit-jupiter = "5.9.0"
 batik = "1.14"
 
 nodejs = "16.15.1"
@@ -19,8 +19,8 @@ bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version = "1.70" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.3.3" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.3" }
-kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version = "0.17.2" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
+kotlinx-atomicfu-gradle = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version = "0.18.3" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-servlet = { module = "io.ktor:ktor-server-servlet", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
@@ -35,7 +35,7 @@ kotlin-argparser = { module = "com.xenomachina:kotlin-argparser", version = "2.0
 proguard-gradle = { module = "com.guardsquare:proguard-gradle", version = "7.2.2" }
 wca-i18n = { module = "com.github.thewca:wca_i18n", version = "0.4.3" }
 google-appengine-gradle = { module = "com.google.cloud.tools:appengine-gradle-plugin", version = "2.4.4" }
-google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version = "2.9.0" }
+google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version = "2.10.0" }
 tnoodle-scrambles = { module = "org.worldcubeassociation.tnoodle:lib-scrambles", version = "0.18.1" }
 apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.12.0" }
 kotless-ktor = { module = "io.kotless:ktor-lang", version.ref = "kotless" }
