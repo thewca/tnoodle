@@ -11,7 +11,8 @@ object SymmetricCipher {
     const val CIPHER_KEY_ITERATIONS = 65536
     const val CIPHER_KEY_LENGTH = 256
 
-    const val CIPHER_ALGORITHM = "AES"
+    const val CIPHER_BASE_ALGORITHM = "AES"
+    const val CIPHER_ALGORITHM = "$CIPHER_BASE_ALGORITHM/CBC/PKCS5Padding"
     const val CIPHER_KEY_ALGORITHM = "PBKDF2WithHmacSHA$CIPHER_KEY_LENGTH"
 
     val CIPHER_CHARSET = Charsets.UTF_8
@@ -24,6 +25,6 @@ object SymmetricCipher {
         val spec = PBEKeySpec(password.toCharArray(), saltBytes, CIPHER_KEY_ITERATIONS, CIPHER_KEY_LENGTH)
 
         val key = CIPHER_KEY_FACTORY.generateSecret(spec)
-        return SecretKeySpec(key.encoded, CIPHER_ALGORITHM)
+        return SecretKeySpec(key.encoded, CIPHER_BASE_ALGORITHM)
     }
 }
