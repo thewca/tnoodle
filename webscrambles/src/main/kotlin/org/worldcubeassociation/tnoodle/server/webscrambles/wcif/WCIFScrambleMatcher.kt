@@ -290,7 +290,7 @@ object WCIFScrambleMatcher {
             return activity
         }
 
-        val registeredEventIds = events.map { it.id }
+        val registeredEventIds = events.map { it.id }.toSet()
 
         // manually compensating for https://github.com/thewca/worldcubeassociation.org/issues/4653
         if (activity.activityCode.eventId !in registeredEventIds) {
@@ -312,6 +312,11 @@ object WCIFScrambleMatcher {
 
         // uh oh. no child activities where there should be some. Resort to creating them ourselves…
         if (actGroup == null) {
+            if (matchedRound.scrambleSetCount == 1) {
+                val scrambleSet = matchedRound.scrambleSets.single()
+                return activity.copy(scrambleSetId = scrambleSet.id)
+            }
+
             val inventedChildren = List(matchedRound.scrambleSetCount) {
                 val copiedActCode = activity.activityCode.copyParts(groupNumber = it)
                 val childSetId = matchedRound.scrambleSets[it].id
