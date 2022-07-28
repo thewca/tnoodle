@@ -85,7 +85,7 @@ data class ActivityCode(val activityCodeString: String) : EventIdProvider {
                 return "$prefixKey $convertedLetter"
             }
 
-            val translatedKey = Translate.translate("fmc.$prefixKey", locale)
+            val translatedKey = Translate("fmc.$prefixKey", locale)
             return "$translatedKey $value"
         }
 

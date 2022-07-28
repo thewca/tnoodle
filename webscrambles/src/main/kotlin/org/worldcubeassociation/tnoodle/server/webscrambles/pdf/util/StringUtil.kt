@@ -11,24 +11,25 @@ object StringUtil {
     private const val PASSCODE_NUM_CHARS = 8
 
     fun padTurnsUniformly(scramble: String, padding: String): String {
-        val maxTurnLength = scramble.split("\\s+".toRegex()).map { it.length }.maxOrNull() ?: 0
-
-        val lines = scramble.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }
+        val maxTurnLength = scramble.split("\\s+".toRegex()).maxOfOrNull { it.length } ?: 0
+        val lines = scramble.lines().dropLastWhile { it.isEmpty() }
 
         return lines.joinToString("\n") { line ->
             val lineTurns = line.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }
 
             lineTurns.joinToString(" ") { turn ->
-                // TODO - this is a disgusting hack for sq1. We don't pad the /
-                // turns because they're guaranteed to occur as every other turn,
-                // so stuff will line up nicely without padding them. I don't know
-                // what a good general solution to this problem is.
                 val missingPad = maxTurnLength - turn.length
                 val repetitions = ceil(missingPad.toDouble() / padding.length)
 
-                val actualPadding = padding.repeat(repetitions.toInt()).takeUnless { turn == "/" }
+                val actualPadding = padding.repeat(repetitions.toInt())
+                    // TODO - this is a disgusting hack for sq1. We don't pad the /
+                    // turns because they're guaranteed to occur as every other turn,
+                    // so stuff will line up nicely without padding them. I don't know
+                    // what a good general solution to this problem is.
+                    .takeUnless { turn == "/" }
+                    .orEmpty()
 
-                turn + actualPadding.orEmpty()
+                turn + actualPadding
             }
         }
     }

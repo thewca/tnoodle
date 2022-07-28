@@ -5,7 +5,7 @@ import com.itextpdf.text.Font
 import com.itextpdf.text.Rectangle
 
 object PdfUtil {
-    private const val NON_BREAKING_SPACE = '\u00A0'
+    private const val NON_BREAKING_SPACE = Typography.nbsp
     private const val TEXT_PADDING_HORIZONTAL = 1
 
     fun String.splitToLineChunks(font: Font, textColumnWidth: Float): List<Chunk> {
@@ -13,7 +13,7 @@ object PdfUtil {
 
         val padded = StringUtil.padTurnsUniformly(this, NON_BREAKING_SPACE.toString())
 
-        return padded.split("\n").dropLastWhile { it.isEmpty() }
+        return padded.lines().dropLastWhile { it.isEmpty() }
             .flatMap { it.splitLineToChunks(font, availableTextWidth) }
             .map { it.toLineWrapChunk(font) }
     }
