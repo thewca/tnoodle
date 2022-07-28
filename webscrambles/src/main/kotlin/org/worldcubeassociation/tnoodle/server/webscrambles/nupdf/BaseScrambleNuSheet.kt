@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.nupdf
 
-import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.Document
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.SvgImage
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.dsl.CellBuilder
@@ -9,7 +8,12 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.dsl.docu
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ActivityCode
 import java.util.*
 
-abstract class BaseScrambleNuSheet(val activityCode: ActivityCode, val locale: Locale) {
+abstract class BaseScrambleNuSheet(
+    val competitionTitle: String,
+    val activityCode: ActivityCode,
+    val hasGroupId: Boolean,
+    val locale: Locale
+) {
     fun compile(): Document {
         return document {
             title = activityCode.compileTitleString(locale)
@@ -30,9 +34,5 @@ abstract class BaseScrambleNuSheet(val activityCode: ActivityCode, val locale: L
         return svgImage(image) {
             size = fittingSize
         }
-    }
-
-    companion object {
-        val EventData.dummyActivity get() = ActivityCode.compile(this, 0, 0, 0)
     }
 }

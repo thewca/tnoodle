@@ -15,6 +15,9 @@ class PageBuilder(parent: ElementBuilder?) : ElementBuilder(parent) {
     var marginLeft: Int = Drawing.Margin.DEFAULT_HORIZONTAL
     var marginRight: Int = Drawing.Margin.DEFAULT_HORIZONTAL
 
+    var headerLines: Pair<String, String>? = null
+    var footerLine: String? = null
+
     fun setHorizontalMargins(margin: Int) {
         marginLeft = margin
         marginRight = margin
@@ -36,6 +39,6 @@ class PageBuilder(parent: ElementBuilder?) : ElementBuilder(parent) {
     }
 
     fun compile(): Page {
-        return Page(size, marginTop, marginBottom, marginLeft, marginRight, elements)
+        return Page(size, marginTop, marginBottom, marginLeft, marginRight, headerLines, footerLine, elements)
     }
 }

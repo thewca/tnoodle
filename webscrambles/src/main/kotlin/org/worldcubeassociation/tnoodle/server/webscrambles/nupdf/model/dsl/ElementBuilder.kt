@@ -3,9 +3,6 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.dsl
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Alignment
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Drawing
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Font
-import kotlin.properties.Delegates
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 sealed class ElementBuilder(val parent: ElementBuilder?) {
     fun findParentProperties(): PropertiesElementBuilder? {

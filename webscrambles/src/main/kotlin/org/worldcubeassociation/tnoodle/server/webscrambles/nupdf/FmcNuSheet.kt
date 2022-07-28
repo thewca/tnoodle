@@ -6,12 +6,12 @@ import java.util.Locale
 
 abstract class FmcNuSheet(
     val scramble: Scramble?,
-    activityCode: ActivityCode,
-    locale: Locale,
     val totalAttemptsNum: Int,
-    val competitionTitle: String,
-    val hasGroupID: Boolean
-) : BaseScrambleNuSheet(activityCode, locale) {
+    competitionTitle: String,
+    activityCode: ActivityCode,
+    hasGroupId: Boolean,
+    locale: Locale
+) : BaseScrambleNuSheet(competitionTitle, activityCode, hasGroupId, locale) {
     val currentAttemptNum: Int
         get() = activityCode.attemptNumber?.plus(1) ?: 1
 
@@ -20,7 +20,7 @@ abstract class FmcNuSheet(
 
     val attemptDetails: String
         get() = activityCode.copyParts(attemptNumber = null) // FMC is split per attempt so we count scrambleXofY instead
-            .compileTitleString(locale, includeEvent = false, includeGroupID = hasGroupID)
+            .compileTitleString(locale, includeEvent = false, includeGroupId = hasGroupId)
 
     val activityTitle: String
         get() = "$localEventTitle $attemptDetails".trim()

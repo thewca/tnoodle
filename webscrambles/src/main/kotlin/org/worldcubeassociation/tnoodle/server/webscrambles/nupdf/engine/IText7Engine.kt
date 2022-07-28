@@ -67,7 +67,9 @@ object IText7Engine {
 
         modelDocument.close()
 
-        return baos.toByteArray()
+        val rendered = baos.toByteArray()
+        // FIXME remove this massive hack of laziness
+        return IText5Engine.postProcessing(doc, rendered)
     }
 
     private fun convertPageSize(size: Paper.Size): PageSize {

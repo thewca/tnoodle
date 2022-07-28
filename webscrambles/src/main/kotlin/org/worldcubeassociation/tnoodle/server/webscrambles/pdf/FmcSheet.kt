@@ -22,7 +22,7 @@ abstract class FmcSheet(
 
     val attemptDetails: String
         get() = activityCode.copyParts(attemptNumber = null) // FMC is split per attempt so we count scrambleXofY instead
-            .compileTitleString(locale, includeEvent = false, includeGroupID = hasGroupID)
+            .compileTitleString(locale, includeEvent = false, includeGroupId = hasGroupID)
 
     val activityTitle: String
         get() = "$localEventTitle $attemptDetails".trim()

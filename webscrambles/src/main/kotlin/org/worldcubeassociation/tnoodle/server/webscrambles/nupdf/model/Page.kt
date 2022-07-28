@@ -9,5 +9,7 @@ class Page(
     val marginBottom: Int = Drawing.Margin.DEFAULT_VERTICAL,
     val marginLeft: Int = Drawing.Margin.DEFAULT_HORIZONTAL,
     val marginRight: Int = Drawing.Margin.DEFAULT_HORIZONTAL,
+    val headerLines: Pair<String, String>? = null,
+    val footerLine: String? = null,
     val elements: List<Element>
 ) : ContainerElement<Element>(elements)

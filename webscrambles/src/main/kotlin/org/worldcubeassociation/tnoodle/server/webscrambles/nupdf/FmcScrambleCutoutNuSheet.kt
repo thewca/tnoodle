@@ -6,11 +6,10 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.dsl.Page
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Alignment
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Drawing
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Font
-import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Paper
+import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Paper.inchesToPixel
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Paper.pixelsToInch
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
-import kotlin.math.roundToInt
 
 class FmcScrambleCutoutNuSheet(
     val defScramble: Scramble,
@@ -18,8 +17,8 @@ class FmcScrambleCutoutNuSheet(
     locale: Locale,
     totalAttemptsNum: Int,
     competitionTitle: String,
-    hasGroupID: Boolean
-) : FmcNuSheet(defScramble, activityCode, locale, totalAttemptsNum, competitionTitle, hasGroupID) {
+    hasGroupId: Boolean
+) : FmcNuSheet(defScramble, totalAttemptsNum, competitionTitle, activityCode, hasGroupId, locale) {
     override fun DocumentBuilder.writeContents() {
         page {
             setVerticalMargins(10)
@@ -71,7 +70,7 @@ class FmcScrambleCutoutNuSheet(
                             leading = 1f
 
                             // TODO this is a hack to prevent some margins overlapping
-                            // figure out a cleaner way moving forward!
+                            // TODO magic number factor
                             val scaledTextWidth = textWidth * 0.98f
 
                             line(competitionTitle) {
@@ -99,8 +98,7 @@ class FmcScrambleCutoutNuSheet(
                         padding = 2 * Drawing.Padding.DEFAULT
                         horizontalAlignment = Alignment.Horizontal.CENTER
 
-                        // TODO okay to round here?
-                        val scrambleWidthPx = (scrambleWidth * actualWidthIn * Paper.DPI).roundToInt()
+                        val scrambleWidthPx = (scrambleWidth * actualWidthIn).inchesToPixel
                         svgScrambleImage(defScramble.scrambleString, scrambleWidthPx)
                     }
                 }

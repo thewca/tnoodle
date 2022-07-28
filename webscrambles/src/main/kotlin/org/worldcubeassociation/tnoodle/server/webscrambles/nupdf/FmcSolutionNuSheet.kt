@@ -6,11 +6,10 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.dsl.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Alignment
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Drawing
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Font
-import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Paper
+import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Paper.inchesToPixel
 import org.worldcubeassociation.tnoodle.server.webscrambles.nupdf.model.properties.Paper.pixelsToInch
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
-import kotlin.math.roundToInt
 
 open class FmcSolutionNuSheet(
     scramble: Scramble?,
@@ -18,8 +17,8 @@ open class FmcSolutionNuSheet(
     locale: Locale,
     totalAttemptsNum: Int,
     competitionTitle: String,
-    hasGroupID: Boolean
-) : FmcNuSheet(scramble, activityCode, locale, totalAttemptsNum, competitionTitle, hasGroupID) {
+    hasGroupId: Boolean
+) : FmcNuSheet(scramble, totalAttemptsNum, competitionTitle, activityCode, hasGroupId, locale) {
     override fun DocumentBuilder.writeContents() {
         page {
             // yes, setting the *vertical* margins to the narrower *horizontal* margins on purpose.
@@ -226,8 +225,7 @@ open class FmcSolutionNuSheet(
         val actualHeightIn = size.heightIn - (marginTop + marginBottom).pixelsToInch
         val actualWidthIn = size.widthIn - (marginLeft + marginRight).pixelsToInch
 
-        // TODO okay if we round here?
-        val scrambleImageWidthPx = (actualWidthIn * 0.45f * Paper.DPI).roundToInt()
+        val scrambleImageWidthPx = (actualWidthIn * 0.45f).inchesToPixel
 
         table(2) {
             fontName = Font.fontForLocale(locale)

@@ -8,6 +8,10 @@ class DocumentBuilder : PropertiesElementBuilder(null) {
     private val pages = mutableListOf<Page>()
 
     var title: String = ""
+    var watermark: String? = null
+    var showPageNumbers: Boolean = false
+    var showHeaderTimestamp: Boolean = false
+    var outlineGroup: List<String> = emptyList()
 
     fun page(fn: PageBuilder.() -> Unit) {
         val page = PageBuilder(this).apply(fn).compile()
@@ -15,7 +19,7 @@ class DocumentBuilder : PropertiesElementBuilder(null) {
     }
 
     fun compile(): Document {
-        return Document(title, pages)
+        return Document(title, watermark, showPageNumbers, showHeaderTimestamp, outlineGroup, false, pages)
     }
 }
 
