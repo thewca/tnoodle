@@ -14,8 +14,8 @@ data class ScramblePhrase(
     companion object {
         val NBSP_STRING = Typography.nbsp.toString()
 
-        val MIN_ONE_LINE_FONT_SIZE = 15f
-        val MAX_PHRASE_FONT_SIZE = 20f
+        val MIN_ONE_LINE_FONT_SIZE = 12.5f
+        val MAX_PHRASE_FONT_SIZE = 22f
 
         fun padTurnsUniformly(scramble: String, padding: String = NBSP_STRING): String {
             val maxTurnLength = scramble.split("\\s+".toRegex()).maxOfOrNull { it.length } ?: 0

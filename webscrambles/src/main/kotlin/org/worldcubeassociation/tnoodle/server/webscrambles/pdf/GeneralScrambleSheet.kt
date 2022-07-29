@@ -34,7 +34,10 @@ class GeneralScrambleSheet(
         baseUnit: Float,
         labelPrefix: String? = null
     ) {
-        val useHighlighting = scramblePhrases.any { it.lineTokens.size >= MIN_LINES_HIGHLIGHTING }
+        val highestLineCount = scramblePhrases.maxOf { it.lineTokens.size }
+        val useHighlighting = highestLineCount >= MIN_LINES_HIGHLIGHTING
+
+        leading = 1f
 
         for ((index, scramble) in scramblePhrases.withIndex()) {
             row {
@@ -50,7 +53,8 @@ class GeneralScrambleSheet(
                     horizontalAlignment = Alignment.Horizontal.JUSTIFIED
                     verticalAlignment = Alignment.Vertical.MIDDLE
 
-                    padding = 2 * Drawing.Padding.DEFAULT
+                    val paddingFactor = if (highestLineCount == 1) 1 else 2
+                    padding = paddingFactor * 2 * Drawing.Padding.DEFAULT
 
                     paragraph {
                         fontName = Font.MONO
@@ -170,8 +174,8 @@ class GeneralScrambleSheet(
 
                     val scramblePhrases = computeScramblePhrases(
                         scramblePageChunk,
-                        relHeightPerScramble * 0.85f,
-                        scrambleTextWidth * 0.975f,
+                        relHeightPerScramble * 0.75f,
+                        scrambleTextWidth * 0.95f,
                         actualWidthIn
                     )
 

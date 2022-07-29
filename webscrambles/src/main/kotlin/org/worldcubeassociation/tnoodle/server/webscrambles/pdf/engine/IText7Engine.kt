@@ -31,6 +31,8 @@ import java.time.LocalDate
 import kotlin.math.atan
 
 object IText7Engine {
+    const val CREATOR_STRING = "iText 7" // TODO is there a cleaner alternative?
+
     fun render(doc: Document, password: String? = null): ByteArray {
         val baos = ByteArrayOutputStream()
         val creationDate = LocalDate.now() // TODO pass in from the outside world?
@@ -48,20 +50,20 @@ object IText7Engine {
         val writer = PdfWriter(baos, properties)
 
         val pdfDocument = PdfDocument(writer)
-        val modelDocument = com.itextpdf.layout.Document(pdfDocument)
+        val itextDocument = com.itextpdf.layout.Document(pdfDocument)
 
         val fontIndex = doc.exposeFontNames()
             .associateWith { PdfFontFactory.createFont("fonts/$it.ttf", PdfEncodings.IDENTITY_H, pdfDocument) }
 
         pdfDocument.documentInfo.addCreationDate()
-        pdfDocument.documentInfo.producer = "iText 7" // TODO is there a cleaner alternative?
+        pdfDocument.documentInfo.producer = CREATOR_STRING
         pdfDocument.documentInfo.title = doc.title
 
         for ((n, page) in doc.pages.withIndex()) {
             val itextPageSize = convertPageSize(page.size)
             pdfDocument.defaultPageSize = itextPageSize
 
-            modelDocument.setMargins(
+            itextDocument.setMargins(
                 page.marginTop.toFloat(),
                 page.marginRight.toFloat(),
                 page.marginBottom.toFloat(),
@@ -73,16 +75,6 @@ object IText7Engine {
             if (doc.watermark != null) {
                 val monoFont = PdfFontFactory.createFont("fonts/${Font.MONO}.ttf", PdfEncodings.IDENTITY_H, pdfDocument)
                 addedPage.addWatermark(doc.watermark, monoFont, n + 1)
-            }
-
-            for (element in page.elements) {
-                val itextElement = render(element, pdfDocument, fontIndex)
-
-                if (itextElement is IBlockElement) {
-                    modelDocument.add(itextElement)
-                } else if (itextElement is Image) {
-                    modelDocument.add(itextElement)
-                }
             }
 
             val headerHeight = 3 * page.marginTop.toFloat() / 4
@@ -99,9 +91,19 @@ object IText7Engine {
 
             if (page.footerLine != null)
                 addedPage.showFooterCenter(page.footerLine, itextPageSize, footerHeight)
+
+            for (element in page.elements) {
+                val itextElement = render(element, pdfDocument, fontIndex)
+
+                if (itextElement is IBlockElement) {
+                    itextDocument.add(itextElement)
+                } else if (itextElement is Image) {
+                    itextDocument.add(itextElement)
+                }
+            }
         }
 
-        modelDocument.close()
+        itextDocument.close()
 
         return baos.toByteArray()
     }
@@ -124,7 +126,7 @@ object IText7Engine {
     }
 
     private fun PdfPage.writeTextOutOfBounds(text: String, horizontalPos: Float, verticalPos: Float) {
-        val over = PdfCanvas(this)
+        val over = PdfCanvas(newContentStreamBefore(), resources, document)
 
         Canvas(over, pageSize)
             .showTextAligned(
@@ -267,9 +269,13 @@ object IText7Engine {
         itextCell.setBorderAround(borderType, cell.border)
         itextCell.setPadding(cell.padding.toFloat())
         itextCell.setTextAlignment(convertTextAlignment(cell.horizontalAlignment))
-        //itextCell.setPaddingTop(-0.5f) // TODO HACK
 
-        val renderedContent = render(cell.content.innerElement, pdfDocument, fontIndex)
+        val innerElement = cell.content.innerElement
+
+        val renderedContent = if (innerElement is Text) {
+            val mockParagraph = Paragraph(1f, listOf(innerElement))
+            render(mockParagraph, pdfDocument, fontIndex)
+        } else render(cell.content.innerElement, pdfDocument, fontIndex)
 
         if (renderedContent is IBlockElement) {
             itextCell.add(renderedContent)
@@ -278,12 +284,6 @@ object IText7Engine {
             renderedContent.setHorizontalAlignment(convertAlignment(cell.horizontalAlignment))
 
             itextCell.add(renderedContent)
-        } else if (renderedContent is com.itextpdf.layout.element.Text) {
-            val nestedParagraph = com.itextpdf.layout.element.Paragraph(renderedContent)
-                .setMultipliedLeading(1f)
-            //.setPaddingTop(-2f) // TODO hack!
-
-            itextCell.add(nestedParagraph)
         }
 
         return itextCell
@@ -294,7 +294,7 @@ object IText7Engine {
         fontIndex: Map<String, PdfFont>
     ): com.itextpdf.layout.element.Paragraph {
         val itextParagraph = com.itextpdf.layout.element.Paragraph()
-        itextParagraph.setMultipliedLeading(paragraph.leading * 0.6f) // TODO HACK
+        itextParagraph.setMultipliedLeading(paragraph.leading)
 
         for (line in paragraph.lines) {
             val renderedLine = renderText(line, fontIndex)
@@ -343,6 +343,9 @@ object IText7Engine {
 
         val writer = PdfWriter(baos, properties)
         val pdfDocument = PdfDocument(writer)
+
+        pdfDocument.documentInfo.addCreationDate()
+        pdfDocument.documentInfo.producer = CREATOR_STRING
 
         val root = pdfDocument.getOutlines(false)
 

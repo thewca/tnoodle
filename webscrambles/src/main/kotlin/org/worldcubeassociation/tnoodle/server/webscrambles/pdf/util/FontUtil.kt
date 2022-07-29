@@ -6,10 +6,18 @@ import com.itextpdf.kernel.font.PdfFont
 import com.itextpdf.kernel.font.PdfFontFactory
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.stripNewlines
+import kotlin.math.abs
 import kotlin.math.min
 
 object FontUtil {
     private val FONT_PROGRAM_CACHE = mutableMapOf<String, PdfFont>()
+
+    private const val FLOAT_EPSILON = 0.0001f
+
+    fun Float.epsilonEqual(f: Float): Boolean {
+        return abs(this - f) < FLOAT_EPSILON
+    }
 
     fun computeFontScale(text: String, fontName: String, bbRelativeWidth: Float): Float {
         val font = FONT_PROGRAM_CACHE.getOrPut(fontName) {
@@ -33,17 +41,28 @@ object FontUtil {
         return optimalFontScale * unitToInches * height * Paper.DPI
     }
 
-    fun generatePhrase(scramble: String, isExtra: Boolean, boxHeight: Float, boxWidth: Float, baseUnit: Float): ScramblePhrase {
-        val chunksWithBreakFlags = ScramblePhrase.splitToChunks(scramble)
+    fun generatePhrase(
+        scramble: String,
+        isExtra: Boolean,
+        boxHeight: Float,
+        boxWidth: Float,
+        baseUnit: Float
+    ): ScramblePhrase {
+        // at first, try one-line (silly for big events but not computation-intensive at all)
+        val oneLineScramble = ScramblePhrase.NBSP_STRING + scramble + ScramblePhrase.NBSP_STRING
+        // TODO magic number same as genericSheet phrase computation
+        val oneLineFontSize = computeOptimalOneLineFontSize(oneLineScramble, boxHeight, boxWidth * 0.95f, Font.MONO, baseUnit)
 
-        val oneLineScramble = chunksWithBreakFlags.joinToString(" ", prefix = ScramblePhrase.NBSP_STRING) { it.first }
-        val oneLineFontSize = computeOptimalOneLineFontSize(oneLineScramble, boxHeight, boxWidth, Font.MONO, baseUnit)
-
+        // can we fit the entire scramble on one line without making it terribly small
         if (oneLineFontSize > ScramblePhrase.MIN_ONE_LINE_FONT_SIZE) {
-            // we can fit the entire scramble on one line without making it terribly small
-            val oneLineTokens = chunksWithBreakFlags.map { it.first }
-            return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, listOf(oneLineTokens), oneLineFontSize)
+            // if the scramble ends up on one line, there's no need for padding individual moves
+            val oneLineRawTokens = scramble.stripNewlines().split(" ")
+            val oneLineChunksWithFlags = oneLineRawTokens.map { it to false }
+
+            return ScramblePhrase(scramble, isExtra, oneLineChunksWithFlags, listOf(oneLineRawTokens), oneLineFontSize)
         }
+
+        val chunksWithBreakFlags = ScramblePhrase.splitToChunks(scramble)
 
         val phraseChunks = splitAtPossibleBreaks(chunksWithBreakFlags)
         val lineTokens = splitToLines(phraseChunks, boxHeight, boxWidth)
@@ -111,7 +130,10 @@ object FontUtil {
 
         val (candidateLine, rest) = takeChunksThatFitOneLine(chunksSections, boxRelativeWidth, ScramblePhrase.NBSP_STRING)
 
-        val currentLine = if (candidateLine.isEmpty()) chunksSections.first() else candidateLine
+        val currentLine = candidateLine.ifEmpty {
+            chunksSections.first().toMutableList().apply { add(0, ScramblePhrase.NBSP_STRING) }
+        }
+
         val actRest = if (candidateLine.isEmpty()) chunksSections.drop(1) else rest
 
         return splitCurrentToLines(actRest, boxRelativeWidth, merge(accu, currentLine))
@@ -130,7 +152,11 @@ object FontUtil {
         val nextAccu = currentAccu + chunkSections.first()
         val joinedChunk = nextAccu.joinToString(" ")
 
-        if (computeFontScale(joinedChunk, Font.MONO, boxRelativeWidth) < 1f) {
+        val nextChunkFontScale = computeFontScale(joinedChunk, Font.MONO, boxRelativeWidth)
+
+        // fontScale is by definition never more than 1 so checking for "not equal" suffices.
+        if (!nextChunkFontScale.epsilonEqual(1f)) {
+            // the next chunk does NOT fit on the line anymore.
             if (lineEndPadding != null) {
                 val paddedAccu = currentAccu + lineEndPadding
                 val paddedChunk = paddedAccu.joinToString(" ")
@@ -142,7 +168,11 @@ object FontUtil {
                     return emptyList<String>() to chunkSections
                 }
 
-                if (computeFontScale(paddedChunk, Font.MONO, boxRelativeWidth) == 1f) {
+                val paddedFontScale = computeFontScale(paddedChunk, Font.MONO, boxRelativeWidth)
+
+                if (paddedFontScale.epsilonEqual(1f)) {
+                    // Top version: pad at most once. Bottom version: pad as much as possible.
+                    // return paddedAccu to chunkSections
                     return takeChunksThatFitOneLine(chunkSections, boxRelativeWidth, lineEndPadding, paddedAccu)
                 }
             }
@@ -160,6 +190,11 @@ object FontUtil {
         accu: List<List<String>> = emptyList()
     ): List<List<String>> {
         if (chunksWithBreakFlags.isEmpty()) {
+            if (accu.isEmpty()) {
+                // not a single line break in the entire sequence.
+                return listOf(currentPhraseAccu)
+            }
+
             return accu
         }
 
