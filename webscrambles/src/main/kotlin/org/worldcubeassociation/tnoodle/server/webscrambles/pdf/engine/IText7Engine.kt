@@ -28,9 +28,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.*
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
-import kotlin.math.PI
 import kotlin.math.atan
-
 
 object IText7Engine {
     fun render(doc: Document, password: String? = null): ByteArray {
@@ -87,8 +85,8 @@ object IText7Engine {
                 }
             }
 
-            // TODO magic number (ratio of entire page that is header)
-            val headerHeight = itextPageSize.height / 12
+            val headerHeight = 3 * page.marginTop.toFloat() / 4
+            val footerHeight = 3 * page.marginBottom.toFloat() / 4
 
             if (doc.showHeaderTimestamp)
                 addedPage.showHeaderLeft(creationDate.toString(), itextPageSize, headerHeight, page.marginLeft.toFloat())
@@ -100,7 +98,7 @@ object IText7Engine {
                 addedPage.showHeaderRight("${n + 1}/${doc.pages.size}", itextPageSize, headerHeight, page.marginRight.toFloat())
 
             if (page.footerLine != null)
-                addedPage.showFooterCenter(page.footerLine, itextPageSize)
+                addedPage.showFooterCenter(page.footerLine, itextPageSize, footerHeight)
         }
 
         modelDocument.close()
@@ -109,25 +107,20 @@ object IText7Engine {
     }
 
     private fun PdfPage.showHeaderLeft(text: String, pageSize: PageSize, headerHeight: Float, marginLeft: Float) {
-        writeTextOutOfBounds(text, marginLeft, pageSize.top - headerHeight)
+        writeTextOutOfBounds(text, 2 * marginLeft, pageSize.height - headerHeight)
     }
 
     private fun PdfPage.showHeaderRight(text: String, pageSize: PageSize, headerHeight: Float, marginRight: Float) {
-        writeTextOutOfBounds(text, marginRight, pageSize.top - headerHeight)
+        writeTextOutOfBounds(text, pageSize.width - 2 * marginRight, pageSize.height - headerHeight)
     }
 
     private fun PdfPage.showHeaderCenter(lineOne: String, lineTwo: String, pageSize: PageSize, headerHeight: Float) {
-        val horizontalCenter = (pageSize.left + pageSize.right) / 2
-
-        writeTextOutOfBounds(lineOne, horizontalCenter, pageSize.top / 4) // TODO magic number
-        writeTextOutOfBounds(lineTwo, horizontalCenter, pageSize.top - headerHeight)
+        writeTextOutOfBounds(lineOne, pageSize.width / 2, pageSize.top - 2 * headerHeight / 3)
+        writeTextOutOfBounds(lineTwo, pageSize.width / 2, pageSize.top - headerHeight)
     }
 
-    // TODO magic there is not even a custom footer size being passed here
-    private fun PdfPage.showFooterCenter(line: String, pageSize: PageSize) {
-        val horizontalCenter = (pageSize.left + pageSize.right) / 2
-
-        writeTextOutOfBounds(line, horizontalCenter, pageSize.bottom / 4) // TODO magic number
+    private fun PdfPage.showFooterCenter(line: String, pageSize: PageSize, footerHeight: Float) {
+        writeTextOutOfBounds(line, pageSize.width / 2, pageSize.bottom + footerHeight)
     }
 
     private fun PdfPage.writeTextOutOfBounds(text: String, horizontalPos: Float, verticalPos: Float) {
@@ -145,11 +138,10 @@ object IText7Engine {
     }
 
     private fun PdfPage.addWatermark(watermark: String, font: PdfFont, pageNumber: Int, pdf: PdfDocument) {
-        val under = PdfCanvas(newContentStreamBefore(), PdfResources(), pdf)
+        val under = PdfCanvas(newContentStreamBefore(), resources, pdf)
 
         val transparentGraphicsState = PdfExtGState()
-            .setFillOpacity(0.1f)
-            .setStrokeOpacity(0.1f)
+            .setFillOpacity(0.2f)
 
         under.saveState()
         under.setExtGState(transparentGraphicsState)
@@ -158,7 +150,7 @@ object IText7Engine {
             .setFont(font)
             .setFontSize(72f) // TODO magic number
 
-        val diagRotation = atan(pageSize.height / pageSize.width) * (180f / PI)
+        val diagRotation = atan(pageSize.height / pageSize.width)
 
         val canvasWatermark = Canvas(under, pageSize)
             .showTextAligned(
@@ -168,7 +160,7 @@ object IText7Engine {
                 pageNumber,
                 TextAlignment.CENTER,
                 VerticalAlignment.MIDDLE,
-                diagRotation.toFloat()
+                diagRotation
             )
 
         under.restoreState()

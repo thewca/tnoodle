@@ -36,7 +36,7 @@ class GeneralScrambleSheet(
         labelPrefix: String? = null
     ) {
         val basicScramblePhrases = scrambles.map {
-            FontUtil.generatePhrase(it, scrTextHeight * 0.75f, scrTextWidth, baseUnit) // FIXME magic number
+            FontUtil.generatePhrase(it, scrTextHeight * 0.75f, scrTextWidth * 0.9f, baseUnit) // FIXME magic number
         }
 
         val smallestFontSize = basicScramblePhrases.minOf { it.fontSize }

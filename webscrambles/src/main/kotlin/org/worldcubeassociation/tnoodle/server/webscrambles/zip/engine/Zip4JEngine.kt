@@ -10,7 +10,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.
 import java.io.ByteArrayOutputStream
 
 object Zip4JEngine {
-    fun compress(zip: ZipArchive, password: String?): ByteArray {
+    fun compress(zip: ZipArchive, password: String? = null): ByteArray {
         val baosZip = ByteArrayOutputStream()
 
         val zipOut = ZipOutputStream(baosZip, password?.toCharArray())

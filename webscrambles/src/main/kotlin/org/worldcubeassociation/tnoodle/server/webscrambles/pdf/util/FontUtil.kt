@@ -45,7 +45,7 @@ object FontUtil {
     fun generatePhrase(scramble: String, boxHeight: Float, boxWidth: Float, baseUnit: Float): ScramblePhrase {
         val chunksWithBreakFlags = ScramblePhrase.splitToChunks(scramble)
 
-        val oneLineScramble = chunksWithBreakFlags.joinToString(" ") { it.first }
+        val oneLineScramble = chunksWithBreakFlags.joinToString(" ", prefix = ScramblePhrase.NBSP_STRING) { it.first }
         val oneLineFontSize = computeOptimalOneLineFontSize(oneLineScramble, boxHeight, boxWidth, Font.MONO, baseUnit)
 
         if (oneLineFontSize > ScramblePhrase.MIN_ONE_LINE_FONT_SIZE) {
@@ -117,10 +117,7 @@ object FontUtil {
         val (candidateLine, rest) = takeChunksThatFitOneLine(chunksSections, boxRelativeWidth, ScramblePhrase.NBSP_STRING)
 
         val (currentLine, actRest) = if (candidateLine.isEmpty()) {
-            val nextFullPhrase = chunksSections.first()
-            val remainder = chunksSections.drop(nextFullPhrase.size)
-
-            nextFullPhrase to remainder
+            chunksSections.first() to chunksSections.drop(1)
         } else {
             candidateLine to rest
         }

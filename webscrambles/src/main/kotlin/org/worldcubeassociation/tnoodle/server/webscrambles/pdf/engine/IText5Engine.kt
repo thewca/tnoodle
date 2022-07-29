@@ -48,7 +48,6 @@ object IText5Engine {
             .associateWith { BaseFont.createFont("fonts/$it.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED) }
 
         val writer = PdfWriter.getInstance(pdfDocument, baos)
-        val cb = writer.directContent
 
         if (password != null) {
             writer.setEncryption(
@@ -73,6 +72,8 @@ object IText5Engine {
             // if we open _before_ the for-loop, stuff like setting page size and margins will have no effect :/
             pdfDocument.open()
 
+            val cb = writer.directContent
+
             if (doc.watermark != null) {
                 val baseFont = BaseFont.createFont("fonts/${Font.MONO}.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
                 cb.addWatermark(doc.watermark, baseFont, itextPageSize)
@@ -83,8 +84,8 @@ object IText5Engine {
                 pdfDocument.add(itextElement)
             }
 
-            // TODO magic number (ratio of entire page that is header)
-            val headerHeight = itextPageSize.height / 12
+            val headerHeight = 3 * page.marginTop.toFloat() / 4
+            val footerHeight = 3 * page.marginBottom.toFloat() / 4
 
             if (doc.showHeaderTimestamp)
                 cb.showHeaderLeft(creationDate.toString(), itextPageSize, headerHeight, page.marginLeft.toFloat())
@@ -96,7 +97,7 @@ object IText5Engine {
                 cb.showHeaderRight("${n + 1}/${doc.pages.size}", itextPageSize, headerHeight, page.marginRight.toFloat())
 
             if (page.footerLine != null)
-                cb.showFooterCenter(page.footerLine, itextPageSize)
+                cb.showFooterCenter(page.footerLine, itextPageSize, footerHeight)
 
             pdfDocument.newPage()
         }
@@ -107,25 +108,20 @@ object IText5Engine {
     }
 
     private fun PdfContentByte.showHeaderLeft(text: String, pageSize: Rectangle, headerHeight: Float, marginLeft: Float) {
-        writeTextOutOfBounds(text, marginLeft, pageSize.top - headerHeight)
+        writeTextOutOfBounds(text, 2 * marginLeft, pageSize.height - headerHeight)
     }
 
     private fun PdfContentByte.showHeaderRight(text: String, pageSize: Rectangle, headerHeight: Float, marginRight: Float) {
-        writeTextOutOfBounds(text, marginRight, pageSize.top - headerHeight)
+        writeTextOutOfBounds(text, pageSize.width - 2 * marginRight, pageSize.height - headerHeight)
     }
 
     private fun PdfContentByte.showHeaderCenter(lineOne: String, lineTwo: String, pageSize: Rectangle, headerHeight: Float) {
-        val horizontalCenter = (pageSize.left + pageSize.right) / 2
-
-        writeTextOutOfBounds(lineOne, horizontalCenter, pageSize.top / 4) // TODO magic number
-        writeTextOutOfBounds(lineTwo, horizontalCenter, pageSize.top - headerHeight)
+        writeTextOutOfBounds(lineOne, pageSize.width / 2, pageSize.top - 2 * headerHeight / 3)
+        writeTextOutOfBounds(lineTwo, pageSize.width / 2, pageSize.top - headerHeight)
     }
 
-    // TODO magic there is not even a custom footer size being passed here
-    private fun PdfContentByte.showFooterCenter(line: String, pageSize: Rectangle) {
-        val horizontalCenter = (pageSize.left + pageSize.right) / 2
-
-        writeTextOutOfBounds(line, horizontalCenter, pageSize.bottom / 4) // TODO magic number
+    private fun PdfContentByte.showFooterCenter(line: String, pageSize: Rectangle, footerHeight: Float) {
+        writeTextOutOfBounds(line, pageSize.width / 2, pageSize.bottom + footerHeight)
     }
 
     private fun PdfContentByte.writeTextOutOfBounds(text: String, horizontalPos: Float, verticalPos: Float) {
