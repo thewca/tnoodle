@@ -149,6 +149,13 @@ object FontUtil {
                 val paddedAccu = currentAccu + lineEndPadding
                 val paddedChunk = paddedAccu.joinToString(" ")
 
+                // prevent situations where we fill an entire line only with padding
+                val onlyPadding = paddedAccu.all { it == lineEndPadding }
+
+                if (onlyPadding) {
+                    return emptyList<String>() to chunkSections
+                }
+
                 if (computeFontScale(paddedChunk, Font.MONO, boxRelativeWidth) == 1f) {
                     return takeChunksThatFitOneLine(chunkSections, boxRelativeWidth, lineEndPadding, paddedAccu)
                 }

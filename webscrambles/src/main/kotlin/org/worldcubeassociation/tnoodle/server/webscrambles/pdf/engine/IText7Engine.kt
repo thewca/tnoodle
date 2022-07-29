@@ -352,7 +352,12 @@ object IText7Engine {
 
         val outlineGroupCache = mutableMapOf<String, PdfOutline>()
 
-        tailrec fun traverseOutline(group: List<String>, action: PdfAction, current: PdfOutline, index: Int = 0): PdfOutline {
+        tailrec fun traverseOutline(
+            group: List<String>,
+            action: PdfAction,
+            current: PdfOutline,
+            index: Int = 0
+        ): PdfOutline {
             if (index >= group.size)
                 return current
 
@@ -365,21 +370,25 @@ object IText7Engine {
         }
 
         for (document in documents) {
-            val action = PdfAction.createGoTo(PdfExplicitDestination.createFit(pdfDocument.lastPage))
+            val pdfMerger = PdfMerger(pdfDocument)
+                .setCloseSourceDocuments(true)
+
+            val renderedBytesIn = render(document).inputStream()
+            val sourcePdf = PdfDocument(PdfReader(renderedBytesIn))
+            val sourcePdfPages = sourcePdf.numberOfPages
+
+            pdfMerger.merge(sourcePdf, 1, sourcePdfPages)
 
             if (!document.isShadowCopy) {
+                val currentPageNum = pdfDocument.numberOfPages - sourcePdfPages + 1
+                val targetPage = pdfDocument.getPage(currentPageNum)
+
+                val action = PdfAction.createGoTo(PdfExplicitDestination.createFit(targetPage))
+
                 traverseOutline(document.outlineGroup, action, root)
                     .addOutline(document.title)
                     .addAction(action)
             }
-
-            val pdfMerger = PdfMerger(pdfDocument)
-
-            val renderedBytesIn = render(document).inputStream()
-            val sourcePdf = PdfDocument(PdfReader(renderedBytesIn))
-
-            pdfMerger.merge(sourcePdf, 1, sourcePdf.numberOfPages)
-            sourcePdf.close()
         }
 
         pdfDocument.close()
