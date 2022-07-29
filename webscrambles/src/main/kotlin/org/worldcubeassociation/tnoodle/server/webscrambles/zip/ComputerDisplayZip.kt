@@ -1,7 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.engine.IText5Engine
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.randomPasscode
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.dsl.zipArchive
@@ -20,11 +19,9 @@ data class ComputerDisplayZip(val scrambleSets: Map<String, ScrambleSheet>, val 
         return zipArchive {
             for ((uniqueTitle, scrambleDoc) in scrambleSets) {
                 val passcode = passcodes.getValue(uniqueTitle)
+                val pdfBytes = scrambleDoc.render(passcode)
 
-                val pdfBytes = IText5Engine.render(scrambleDoc.document)
-                val computerDisplayBytes = IText5Engine.encrypt(pdfBytes, passcode) // TODO GB
-
-                file("$uniqueTitle.pdf", computerDisplayBytes)
+                file("$uniqueTitle.pdf", pdfBytes)
             }
         }
     }

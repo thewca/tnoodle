@@ -34,7 +34,7 @@ object IText5Engine {
         CounterFactory.getInstance().counter = NoOpCounter()
     }
 
-    fun render(doc: Document): ByteArray {
+    fun render(doc: Document, password: String? = null): ByteArray {
         val pdfDocument = com.itextpdf.text.Document().apply {
             addCreationDate()
             addProducer()
@@ -42,15 +42,26 @@ object IText5Engine {
         }
 
         val baos = ByteArrayOutputStream()
+        val creationDate = LocalDate.now() // TODO pass in from the outside world?
 
         val fontIndex = doc.exposeFontNames()
             .associateWith { BaseFont.createFont("fonts/$it.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED) }
 
-        // iText 5 needs this line, otherwise the output will always appear blank
         val writer = PdfWriter.getInstance(pdfDocument, baos)
+        val cb = writer.directContent
 
-        for (page in doc.pages) {
-            pdfDocument.pageSize = convertPageSize(page.size)
+        if (password != null) {
+            writer.setEncryption(
+                password.toByteArray(),
+                password.toByteArray(),
+                PdfWriter.ALLOW_PRINTING,
+                PdfWriter.STANDARD_ENCRYPTION_128
+            )
+        }
+
+        for ((n, page) in doc.pages.withIndex()) {
+            val itextPageSize = convertPageSize(page.size)
+            pdfDocument.pageSize = itextPageSize
 
             pdfDocument.setMargins(
                 page.marginLeft.toFloat(),
@@ -62,26 +73,98 @@ object IText5Engine {
             // if we open _before_ the for-loop, stuff like setting page size and margins will have no effect :/
             pdfDocument.open()
 
+            if (doc.watermark != null) {
+                val baseFont = BaseFont.createFont("fonts/${Font.MONO}.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
+                cb.addWatermark(doc.watermark, baseFont, itextPageSize)
+            }
+
             for (element in page.elements) {
-                val itextElement = render(element, writer.directContent, fontIndex)
+                val itextElement = render(element, cb, fontIndex)
                 pdfDocument.add(itextElement)
             }
+
+            // TODO magic number (ratio of entire page that is header)
+            val headerHeight = itextPageSize.height / 12
+
+            if (doc.showHeaderTimestamp)
+                cb.showHeaderLeft(creationDate.toString(), itextPageSize, headerHeight, page.marginLeft.toFloat())
+
+            if (page.headerLines != null)
+                cb.showHeaderCenter(page.headerLines.first, page.headerLines.second, itextPageSize, headerHeight)
+
+            if (doc.showPageNumbers)
+                cb.showHeaderRight("${n + 1}/${doc.pages.size}", itextPageSize, headerHeight, page.marginRight.toFloat())
+
+            if (page.footerLine != null)
+                cb.showFooterCenter(page.footerLine, itextPageSize)
 
             pdfDocument.newPage()
         }
 
         pdfDocument.close()
 
-        val rendered = baos.toByteArray()
-        return postProcessing(doc, rendered)
+        return baos.toByteArray()
     }
 
-    fun postProcessing(doc: Document, rendered: ByteArray): ByteArray {
-        if (doc.watermark != null || doc.showPageNumbers) {
-            return addHeadersAndWatermark(doc, rendered)
+    private fun PdfContentByte.showHeaderLeft(text: String, pageSize: Rectangle, headerHeight: Float, marginLeft: Float) {
+        writeTextOutOfBounds(text, marginLeft, pageSize.top - headerHeight)
+    }
+
+    private fun PdfContentByte.showHeaderRight(text: String, pageSize: Rectangle, headerHeight: Float, marginRight: Float) {
+        writeTextOutOfBounds(text, marginRight, pageSize.top - headerHeight)
+    }
+
+    private fun PdfContentByte.showHeaderCenter(lineOne: String, lineTwo: String, pageSize: Rectangle, headerHeight: Float) {
+        val horizontalCenter = (pageSize.left + pageSize.right) / 2
+
+        writeTextOutOfBounds(lineOne, horizontalCenter, pageSize.top / 4) // TODO magic number
+        writeTextOutOfBounds(lineTwo, horizontalCenter, pageSize.top - headerHeight)
+    }
+
+    // TODO magic there is not even a custom footer size being passed here
+    private fun PdfContentByte.showFooterCenter(line: String, pageSize: Rectangle) {
+        val horizontalCenter = (pageSize.left + pageSize.right) / 2
+
+        writeTextOutOfBounds(line, horizontalCenter, pageSize.bottom / 4) // TODO magic number
+    }
+
+    private fun PdfContentByte.writeTextOutOfBounds(text: String, horizontalPos: Float, verticalPos: Float) {
+        ColumnText.showTextAligned(
+            this,
+            com.itextpdf.text.Element.ALIGN_CENTER,
+            Phrase(text),
+            horizontalPos,
+            verticalPos,
+            0f
+        )
+    }
+
+    private fun PdfContentByte.addWatermark(watermark: String, font: BaseFont, pageSize: Rectangle) {
+        val transparentState = PdfGState().apply {
+            // TODO magic number opacity const
+            setFillOpacity(0.1f)
+            setStrokeOpacity(0.1f)
         }
 
-        return rendered
+        saveState()
+        setGState(transparentState)
+
+        val diagRotation = atan(pageSize.height / pageSize.width) * (180f / PI)
+
+        ColumnText.showTextAligned(
+            this,
+            com.itextpdf.text.Element.ALIGN_CENTER,
+            Phrase(
+                watermark,
+                // TODO magic number!
+                com.itextpdf.text.Font(font, 72f, com.itextpdf.text.Font.BOLD)
+            ),
+            (pageSize.left + pageSize.right) / 2,
+            (pageSize.top + pageSize.bottom) / 2,
+            diagRotation.toFloat()
+        )
+
+        restoreState()
     }
 
     private fun convertPageSize(size: Paper.Size): Rectangle {
@@ -275,139 +358,7 @@ object IText5Engine {
         return tp
     }
 
-    fun addHeadersAndWatermark(doc: Document, renderedPdf: ByteArray): ByteArray {
-        val pdfDocument = com.itextpdf.text.Document().apply {
-            addCreationDate()
-            addProducer()
-            addTitle(doc.title)
-        }
-
-        val baos = ByteArrayOutputStream()
-
-        // iText 5 needs this line, otherwise the output will always appear blank
-        val writer = PdfWriter.getInstance(pdfDocument, baos)
-
-        val cb = writer.directContent
-        val pr = PdfReader(renderedPdf)
-
-        val currentTimestamp = LocalDate.now()
-
-        for (pageN in 1..pr.numberOfPages) {
-            pdfDocument.newPage()
-
-            val docPage = doc.pages[pageN - 1]
-            val pdfPage = writer.getImportedPage(pr, pageN)
-
-            // Frontend watermark
-            if (doc.watermark != null) {
-                val monoFont = BaseFont.createFont("fonts/NotoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
-
-                val transparentState = PdfGState().apply {
-                    // TODO magic number opacity const
-                    setFillOpacity(0.1f)
-                    setStrokeOpacity(0.1f)
-                }
-
-                cb.saveState()
-                cb.setGState(transparentState)
-
-                val diagRotation = atan(pdfPage.boundingBox.height / pdfPage.boundingBox.width) * (180f / PI)
-
-                ColumnText.showTextAligned(
-                    cb,
-                    com.itextpdf.text.Element.ALIGN_CENTER,
-                    Phrase(
-                        doc.watermark,
-                        com.itextpdf.text.Font(monoFont, 72f, com.itextpdf.text.Font.BOLD)
-                    ),
-                    (pdfPage.boundingBox.left + pdfPage.boundingBox.right) / 2,
-                    (pdfPage.boundingBox.top + pdfPage.boundingBox.bottom) / 2,
-                    diagRotation.toFloat()
-                )
-
-                cb.restoreState()
-            }
-
-            // add the imported page *after* potential watermarks
-            // so the watermark stays in the background
-            cb.addTemplate(pdfPage, 0f, 0f)
-
-            val rect = pr.getBoxSize(pageN, "art")
-            val headerHeight =
-                pdfPage.boundingBox.height / 12 // TODO magic number (ratio of entire page that is header)
-
-            val headerRect = Rectangle(
-                pdfPage.boundingBox.left,
-                pdfPage.boundingBox.top - headerHeight,
-                pdfPage.boundingBox.right,
-                pdfPage.boundingBox.top
-            )
-
-            if (doc.showHeaderTimestamp) {
-                // top left
-                ColumnText.showTextAligned(
-                    cb,
-                    com.itextpdf.text.Element.ALIGN_LEFT, Phrase(currentTimestamp.toString()),
-                    rect.left, headerRect.bottom, 0f
-                )
-            }
-
-            if (docPage.headerLines != null) {
-                // zip title middle top
-                ColumnText.showTextAligned(
-                    cb,
-                    com.itextpdf.text.Element.ALIGN_CENTER,
-                    Phrase(docPage.headerLines.first),
-                    (pdfPage.boundingBox.left + pdfPage.boundingBox.right) / 2,
-                    headerRect.bottom + headerRect.height / 4,
-                    0f
-                )
-
-                // activity title middle bottom
-                ColumnText.showTextAligned(
-                    cb,
-                    com.itextpdf.text.Element.ALIGN_CENTER, Phrase(docPage.headerLines.second),
-                    (pdfPage.boundingBox.left + pdfPage.boundingBox.right) / 2, headerRect.bottom, 0f
-                )
-            }
-
-            if (doc.showPageNumbers) {
-                // top right
-                ColumnText.showTextAligned(
-                    cb,
-                    com.itextpdf.text.Element.ALIGN_RIGHT, Phrase(pageN.toString() + "/" + pr.numberOfPages),
-                    rect.right, headerRect.bottom, 0f
-                )
-            }
-
-            // Footer
-            val footerRect = Rectangle(
-                pdfPage.boundingBox.left,
-                pdfPage.boundingBox.bottom,
-                pdfPage.boundingBox.right,
-                pdfPage.boundingBox.bottom + headerHeight
-            )
-
-            // TODO val generatedBy = "Generated by $versionTag"
-
-            if (docPage.footerLine != null) {
-                // bottom center
-                ColumnText.showTextAligned(
-                    cb,
-                    com.itextpdf.text.Element.ALIGN_CENTER,
-                    Phrase(docPage.footerLine),
-                    (pdfPage.boundingBox.left + pdfPage.boundingBox.right) / 2,
-                    footerRect.top - footerRect.height / 4,
-                    0f
-                )
-            }
-        }
-
-        pdfDocument.close()
-        return baos.toByteArray()
-    }
-
-    fun renderWithOutline(documents: List<Document>): ByteArray {
+    fun renderWithOutline(documents: List<Document>, password: String? = null): ByteArray {
         val pdfDocument = com.itextpdf.text.Document().apply {
             addCreationDate()
             addProducer()
@@ -416,25 +367,41 @@ object IText5Engine {
         val baos = ByteArrayOutputStream()
         val writer = PdfSmartCopy(pdfDocument, baos)
 
+        if (password != null) {
+            writer.setEncryption(
+                password.toByteArray(),
+                password.toByteArray(),
+                PdfWriter.ALLOW_PRINTING,
+                PdfWriter.STANDARD_ENCRYPTION_128
+            )
+        }
+
         val root = writer.directContent.rootOutline
         val pdfDestination = PdfDestination(PdfDestination.FIT)
 
-        val outlineByPuzzle = mutableMapOf<String, PdfOutline>()
+        val outlineGroupCache = mutableMapOf<String, PdfOutline>()
+
+        tailrec fun traverseOutline(group: List<String>, action: PdfAction, current: PdfOutline, index: Int = 0): PdfOutline {
+            if (index >= group.size)
+                return current
+
+            val subGroup = group.subList(0, index + 1).joinToString("")
+            val nextOutline = outlineGroupCache.getOrPut(subGroup) {
+                PdfOutline(current, action, group[index], false)
+            }
+
+            return traverseOutline(group, action, nextOutline, index + 1)
+        }
 
         for (document in documents) {
             val action = PdfAction.gotoLocalPage(writer.currentPageNumber, pdfDestination, writer)
 
-            // TODO GB proper support for nested outlines!
-            val outlineKey = document.outlineGroup.joinToString(".")
-
             if (!document.isShadowCopy) {
-                val puzzleLink = outlineByPuzzle.getOrPut(outlineKey) {
-                    PdfOutline(root, action, outlineKey, false)
-                }
+                val rootOutline = traverseOutline(document.outlineGroup, action, root)
 
                 // Yes, invoking the constructor is enough to *add* the outline to the document.
                 // We should REALLY get rid of itext5.
-                PdfOutline(puzzleLink, action, document.title)
+                PdfOutline(rootOutline, action, document.title)
             }
 
             val pdfReader = PdfReader(render(document))
@@ -447,23 +414,6 @@ object IText5Engine {
         }
 
         pdfDocument.close()
-        return baos.toByteArray()
-    }
-
-    fun encrypt(renderedPdf: ByteArray, password: String): ByteArray {
-        val pdfReader = PdfReader(renderedPdf)
-
-        val baos = ByteArrayOutputStream()
-        val stamper = PdfStamper(pdfReader, baos)
-
-        stamper.setEncryption(
-            password.toByteArray(),
-            password.toByteArray(),
-            PdfWriter.ALLOW_PRINTING,
-            PdfWriter.STANDARD_ENCRYPTION_128
-        )
-
-        stamper.close()
         return baos.toByteArray()
     }
 }

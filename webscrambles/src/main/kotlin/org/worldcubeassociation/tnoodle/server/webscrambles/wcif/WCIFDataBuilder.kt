@@ -4,7 +4,6 @@ import org.worldcubeassociation.tnoodle.server.model.EventData
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.FmcSolutionSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.GeneralScrambleSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.engine.IText5Engine
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.Document
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
@@ -154,11 +153,6 @@ object WCIFDataBuilder {
     }
 
     fun compileOutlinePdfBytes(documents: List<Document>, password: String? = null): ByteArray {
-        val outlinePdf = IText5Engine.renderWithOutline(documents)
-
-        if (password != null)
-            return IText5Engine.encrypt(outlinePdf, password)
-
-        return outlinePdf
+        return ScrambleSheet.RENDERING_ENGINE.renderWithOutline(documents, password)
     }
 }

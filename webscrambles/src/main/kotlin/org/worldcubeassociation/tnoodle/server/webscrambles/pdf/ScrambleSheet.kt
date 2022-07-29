@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.engine.IText7Engine
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.Document
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.SvgImage
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.dsl.CellBuilder
@@ -50,5 +51,9 @@ abstract class ScrambleSheet(
         return svgImage(image) {
             size = fittingSize
         }
+    }
+
+    companion object {
+        val RENDERING_ENGINE = Document.DEFAULT_ENGINE
     }
 }

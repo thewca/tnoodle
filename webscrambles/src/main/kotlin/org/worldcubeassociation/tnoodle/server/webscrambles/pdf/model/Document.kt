@@ -1,6 +1,5 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model
 
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.engine.IText5Engine
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.engine.IText7Engine
 
 class Document(
@@ -23,15 +22,12 @@ class Document(
 
     private fun directRender(password: String? = null): ByteArray {
         // TODO GB default engine configurable?
-        val pdfBytes = IText7Engine.render(this)
-
-        if (password != null)
-            return IText5Engine.encrypt(pdfBytes, password)
-
-        return pdfBytes
+        return DEFAULT_ENGINE.render(this, password)
     }
 
     companion object {
+        val DEFAULT_ENGINE = IText7Engine
+
         fun merge(title: String, vararg documents: Document): Document {
             val pages = documents.flatMap { it.pages }
 
