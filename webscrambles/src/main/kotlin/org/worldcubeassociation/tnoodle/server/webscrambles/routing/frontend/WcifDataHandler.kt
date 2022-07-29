@@ -9,7 +9,6 @@ import org.worldcubeassociation.tnoodle.server.RouteHandler
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFCompetitorInfo
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.PrintingFolder
 
 object WcifDataHandler : RouteHandler {
     override fun install(router: Route) {

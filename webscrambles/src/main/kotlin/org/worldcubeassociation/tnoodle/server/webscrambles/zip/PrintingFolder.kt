@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
+package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
 import org.slf4j.LoggerFactory
 import org.worldcubeassociation.tnoodle.server.webscrambles.Translate
@@ -12,8 +12,8 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.SheetCopyCountExtension
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.dsl.folder
 import java.util.*
 
 data class PrintingFolder(

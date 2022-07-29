@@ -18,7 +18,6 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.Element
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.Paragraph
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Font
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.OutlineData
 import org.worldcubeassociation.tnoodle.svglite.Dimension
 import org.worldcubeassociation.tnoodle.svglite.Svg
 import java.awt.geom.AffineTransform

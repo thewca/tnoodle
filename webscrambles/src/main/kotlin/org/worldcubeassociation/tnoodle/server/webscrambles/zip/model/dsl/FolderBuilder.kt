@@ -1,4 +1,4 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.zip
+package org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.dsl
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.File
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder

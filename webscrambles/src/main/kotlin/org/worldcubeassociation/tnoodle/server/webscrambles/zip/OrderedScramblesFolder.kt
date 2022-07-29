@@ -1,12 +1,12 @@
-package org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
+package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 
 import org.worldcubeassociation.tnoodle.server.webscrambles.exceptions.ScheduleMatchingException
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.WCIFDataBuilder
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Schedule
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.Folder
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.dsl.folder
 import java.time.Period
 import java.time.ZonedDateTime
 

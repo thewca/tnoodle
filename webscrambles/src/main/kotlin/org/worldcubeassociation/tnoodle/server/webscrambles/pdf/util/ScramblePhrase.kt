@@ -1,5 +1,6 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.stripNewlines
 import kotlin.math.ceil
 
 data class ScramblePhrase(
@@ -40,7 +41,7 @@ data class ScramblePhrase(
 
         fun splitToChunks(scramble: String): List<Pair<String, Boolean>> {
             // replace \n from Mega with regular spaces.
-            val flat = scramble.lines().joinToString(" ")
+            val flat = scramble.stripNewlines()
 
             // make sure we're splitting at space, NOT at non-breakable space!
             val paddedMoves = padTurnsUniformly(flat).split(" ")

@@ -10,7 +10,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.extension.*
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.ScrambleZip
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive.Companion.withUniqueTitles
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.withUniqueTitles
 import java.time.LocalDateTime
 import java.util.*
 

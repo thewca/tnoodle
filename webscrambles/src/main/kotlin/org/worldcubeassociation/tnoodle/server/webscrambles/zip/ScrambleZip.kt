@@ -3,9 +3,8 @@ package org.worldcubeassociation.tnoodle.server.webscrambles.zip
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.ScrambleSheet
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.toFileSafeString
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.Competition
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.InterchangeFolder
-import org.worldcubeassociation.tnoodle.server.webscrambles.zip.folder.PrintingFolder
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.ZipArchive
+import org.worldcubeassociation.tnoodle.server.webscrambles.zip.model.dsl.zipArchive
 import java.time.LocalDateTime
 import java.util.Locale
 
