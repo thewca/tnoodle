@@ -72,7 +72,7 @@ object IText7Engine {
 
             if (doc.watermark != null) {
                 val monoFont = PdfFontFactory.createFont("fonts/${Font.MONO}.ttf", PdfEncodings.IDENTITY_H, pdfDocument)
-                addedPage.addWatermark(doc.watermark, monoFont, n + 1, pdfDocument)
+                addedPage.addWatermark(doc.watermark, monoFont, n + 1)
             }
 
             for (element in page.elements) {
@@ -137,8 +137,8 @@ object IText7Engine {
             )
     }
 
-    private fun PdfPage.addWatermark(watermark: String, font: PdfFont, pageNumber: Int, pdf: PdfDocument) {
-        val under = PdfCanvas(newContentStreamBefore(), resources, pdf)
+    private fun PdfPage.addWatermark(watermark: String, font: PdfFont, pageNumber: Int) {
+        val under = PdfCanvas(newContentStreamBefore(), resources, document)
 
         val transparentGraphicsState = PdfExtGState()
             .setFillOpacity(0.2f)
@@ -321,7 +321,11 @@ object IText7Engine {
 
     private fun renderImage(image: SvgImage, pdfDocument: PdfDocument): Image {
         return SvgConverter.convertToImage(image.svg.toString().byteInputStream(), pdfDocument)
-            .setAutoScale(true)
+            //.setAutoScale(true)
+            .setMaxHeight(image.size.height.toFloat())
+            .setHeight(image.size.height.toFloat())
+            .setMaxWidth(image.size.width.toFloat())
+            .setWidth(image.size.width.toFloat())
     }
 
     fun renderWithOutline(documents: List<Document>, password: String? = null): ByteArray {

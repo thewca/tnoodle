@@ -24,25 +24,16 @@ object FontUtil {
 
     fun computeOptimalOneLineFontSize(
         content: String,
-        relativeWidth: Float,
-        fontName: String,
-        unitToInches: Float = 1f
-    ): Float {
-        val optimalFontScale = computeFontScale(content, fontName, relativeWidth)
-        return optimalFontScale * unitToInches * Paper.DPI
-    }
-
-    fun computeOptimalOneLineFontSize(
-        content: String,
         height: Float,
         width: Float,
         fontName: String,
         unitToInches: Float = 1f
     ): Float {
-        return computeOptimalOneLineFontSize(content, width / height, fontName, unitToInches * height)
+        val optimalFontScale = computeFontScale(content, fontName, width / height)
+        return optimalFontScale * unitToInches * height * Paper.DPI
     }
 
-    fun generatePhrase(scramble: String, boxHeight: Float, boxWidth: Float, baseUnit: Float): ScramblePhrase {
+    fun generatePhrase(scramble: String, isExtra: Boolean, boxHeight: Float, boxWidth: Float, baseUnit: Float): ScramblePhrase {
         val chunksWithBreakFlags = ScramblePhrase.splitToChunks(scramble)
 
         val oneLineScramble = chunksWithBreakFlags.joinToString(" ", prefix = ScramblePhrase.NBSP_STRING) { it.first }
@@ -51,7 +42,7 @@ object FontUtil {
         if (oneLineFontSize > ScramblePhrase.MIN_ONE_LINE_FONT_SIZE) {
             // we can fit the entire scramble on one line without making it terribly small
             val oneLineTokens = chunksWithBreakFlags.map { it.first }
-            return ScramblePhrase(scramble, chunksWithBreakFlags, listOf(oneLineTokens), oneLineFontSize)
+            return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, listOf(oneLineTokens), oneLineFontSize)
         }
 
         val phraseChunks = splitAtPossibleBreaks(chunksWithBreakFlags)
@@ -60,17 +51,21 @@ object FontUtil {
         // TODO does this magical calculation work?
         val lineHeight = boxHeight / lineTokens.size
 
-        val multiLineFontSize = lineTokens.minOf {
-            val lineRaw = it.joinToString(" ")
-            computeOptimalOneLineFontSize(lineRaw, lineHeight, boxWidth, Font.MONO, baseUnit)
-        }
+        val multiLineFontSize = lineTokens
+            .map { it.joinToString(" ") }
+            .minOf { computeOptimalOneLineFontSize(it, lineHeight, boxWidth, Font.MONO, baseUnit) }
 
         if (multiLineFontSize > ScramblePhrase.MAX_PHRASE_FONT_SIZE) {
             val maxLineTokens = splitToFixedSizeLines(phraseChunks, ScramblePhrase.MAX_PHRASE_FONT_SIZE, boxWidth, baseUnit)
-            return ScramblePhrase(scramble, chunksWithBreakFlags, maxLineTokens, ScramblePhrase.MAX_PHRASE_FONT_SIZE)
+            return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, maxLineTokens, ScramblePhrase.MAX_PHRASE_FONT_SIZE)
         }
 
-        return ScramblePhrase(scramble, chunksWithBreakFlags, lineTokens, multiLineFontSize)
+        return ScramblePhrase(scramble, isExtra, chunksWithBreakFlags, lineTokens, multiLineFontSize)
+    }
+
+    private fun <T> merge(accu: List<List<T>>, element: List<T>): List<List<T>> {
+        // FIXME for some reason, Kotlin cannot resolve the `plus` operator correctly :(
+        return accu.toMutableList().apply { add(element) }
     }
 
     fun splitToFixedSizeLines(
@@ -116,16 +111,10 @@ object FontUtil {
 
         val (candidateLine, rest) = takeChunksThatFitOneLine(chunksSections, boxRelativeWidth, ScramblePhrase.NBSP_STRING)
 
-        val (currentLine, actRest) = if (candidateLine.isEmpty()) {
-            chunksSections.first() to chunksSections.drop(1)
-        } else {
-            candidateLine to rest
-        }
+        val currentLine = if (candidateLine.isEmpty()) chunksSections.first() else candidateLine
+        val actRest = if (candidateLine.isEmpty()) chunksSections.drop(1) else rest
 
-        // FIXME for some reason, Kotlin cannot resolve the `plus` operator correctly :(
-        val newAccu = accu.toMutableList().apply { add(currentLine) }
-
-        return splitCurrentToLines(actRest, boxRelativeWidth, newAccu)
+        return splitCurrentToLines(actRest, boxRelativeWidth, merge(accu, currentLine))
     }
 
     private tailrec fun takeChunksThatFitOneLine(
@@ -179,13 +168,8 @@ object FontUtil {
 
         val phrase = currentPhraseAccu + head.first
 
-        val (nextPhraseAccu, nextAccu) = if (head.second) {
-            val newAccu = accu.toMutableList().apply { add(phrase) }
-
-            emptyList<String>() to newAccu
-        } else {
-            phrase to accu
-        }
+        val nextPhraseAccu = if (head.second) emptyList() else phrase
+        val nextAccu = if (head.second) merge(accu, phrase) else accu
 
         return splitAtPossibleBreaks(tail, nextPhraseAccu, nextAccu)
     }

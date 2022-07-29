@@ -70,12 +70,12 @@ object WCIFDataBuilder {
 
                     FmcSolutionSheet(
                         scrambleStr,
-                        attemptCode,
-                        scrambleSet.id,
-                        locale,
                         totalAttempts,
+                        scrambleSet.id,
                         comp.shortName,
+                        attemptCode,
                         hasGroupId,
+                        locale,
                         watermark
                     )
                 }

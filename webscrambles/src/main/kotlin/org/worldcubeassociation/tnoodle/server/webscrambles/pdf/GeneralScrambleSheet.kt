@@ -6,7 +6,7 @@ import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.inchesToPixel
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.model.properties.Paper.pixelsToInch
 import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.FontUtil
-import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.SheetRowScramble
+import org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util.ScramblePhrase
 import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.*
 import java.util.*
 import kotlin.math.ceil
@@ -14,7 +14,7 @@ import kotlin.math.max
 
 class GeneralScrambleSheet(
     val scrambleSet: ScrambleSet,
-    val tnoodleVersion: String,
+    val tNoodleVersion: String,
     competitionTitle: String,
     activityCode: ActivityCode,
     hasGroupId: Boolean,
@@ -28,26 +28,12 @@ class GeneralScrambleSheet(
         get() = scrambleSet.id
 
     private fun TableBuilder.scrambleRows(
-        scrambles: List<String>,
-        scrTextHeight: Float,
-        scrTextWidth: Float,
+        scramblePhrases: List<ScramblePhrase>,
+        scrLineHeight: Float,
         scrImageWidth: Float,
         baseUnit: Float,
         labelPrefix: String? = null
     ) {
-        val basicScramblePhrases = scrambles.map {
-            FontUtil.generatePhrase(it, scrTextHeight * 0.75f, scrTextWidth * 0.9f, baseUnit) // FIXME magic number
-        }
-
-        val smallestFontSize = basicScramblePhrases.minOf { it.fontSize }
-
-        val scramblePhrases = basicScramblePhrases.map {
-            val breakChunks = FontUtil.splitAtPossibleBreaks(it.rawTokens)
-            val maxLineTokens = FontUtil.splitToFixedSizeLines(breakChunks, smallestFontSize, scrTextWidth, baseUnit)
-
-            it.copy(lineTokens = maxLineTokens, fontSize = smallestFontSize)
-        }
-
         val useHighlighting = scramblePhrases.any { it.lineTokens.size >= MIN_LINES_HIGHLIGHTING }
 
         for ((index, scramble) in scramblePhrases.withIndex()) {
@@ -70,10 +56,13 @@ class GeneralScrambleSheet(
                         fontName = Font.MONO
                         fontSize = scramble.fontSize
 
-                        for ((ln, scrLine) in scramble.lineTokens.withIndex()) {
-                            val joinedLine = scrLine.joinToString(" ")
+                        val rawScrambleLines = scramble.lineTokens.map { it.joinToString(" ") }
+                        val maxLength = rawScrambleLines.maxOf { it.length }
 
-                            line(joinedLine) {
+                        for ((ln, scrLine) in rawScrambleLines.withIndex()) {
+                            val paddedLine = scrLine.padEnd(maxLength, Typography.nbsp)
+
+                            line(paddedLine) {
                                 if (useHighlighting && ln % 2 == 1) {
                                     background = SCRAMBLE_HIGHLIGHTING_COLOR
                                 }
@@ -85,17 +74,51 @@ class GeneralScrambleSheet(
                 cell {
                     background = SCRAMBLE_BACKGROUND_COLOR
 
-                    val scrImageWidthPx = (scrImageWidth * baseUnit).inchesToPixel
-                    svgScrambleImage(scramble.scramble, scrImageWidthPx)
+                    val scrImageWidthPx = (scrImageWidth * baseUnit).inchesToPixel - 5
+                    val scrLineHeightPx = (scrLineHeight * baseUnit).inchesToPixel - 5
+
+                    svgScrambleImage(scramble.scramble, scrImageWidthPx, scrLineHeightPx)
                 }
             }
+        }
+    }
+
+    private fun computeScramblePhrases(
+        scramblePageChunk: List<Pair<String, Boolean>>,
+        scrambleColHeight: Float,
+        scrambleTextWidth: Float,
+        baseUnit: Float
+    ): List<ScramblePhrase> {
+        val basicScramblePhrases = scramblePageChunk.map { (scr, type) ->
+            FontUtil.generatePhrase(
+                scr,
+                type,
+                scrambleColHeight,
+                scrambleTextWidth,
+                baseUnit
+            )
+        }
+
+        val smallestFontSize = basicScramblePhrases.minOf { it.fontSize }
+
+        return basicScramblePhrases.map {
+            val breakChunks = FontUtil.splitAtPossibleBreaks(it.rawTokens)
+
+            val maxLineTokens = FontUtil.splitToFixedSizeLines(
+                breakChunks,
+                smallestFontSize,
+                scrambleTextWidth,
+                baseUnit
+            )
+
+            it.copy(lineTokens = maxLineTokens, fontSize = smallestFontSize)
         }
     }
 
     override fun DocumentBuilder.writeContents() {
         showHeaderTimestamp = true
 
-        val allScrambles = SheetRowScramble.fromScrambleSet(scrambleSet, activityCode.eventModel)
+        val allScrambles = ScramblePhrase.splitScrambleSet(scrambleSet)
         val scramblePageChunks = allScrambles.chunked(MAX_SCRAMBLES_PER_PAGE)
 
         val scramblerPreferredSize = scramblingPuzzle.preferredSize
@@ -108,18 +131,14 @@ class GeneralScrambleSheet(
         for (scramblePageChunk in scramblePageChunks) {
             page {
                 headerLines = competitionTitle to roundDetails
-                footerLine = "Generated by $tnoodleVersion" // TODO i18n
+                footerLine = "Generated by $tNoodleVersion" // TODO i18n
 
-                val standardScrambles = scramblePageChunk.filter { it.isStandard }.map { it.scramble }
-                val extraScrambles = scramblePageChunk.filter { it.isExtra }.map { it.scramble }
-
-                val heightExtraPenalty = if (extraScrambles.isNotEmpty()) 2 * EXTRA_SCRAMBLE_LABEL_SIZE else 0f
-                val paddingHeightPenalty = scramblePageChunk.size * 2 * Drawing.Padding.DEFAULT
+                val heightExtraPenalty =
+                    if (scrambleSet.extraScrambles.isNotEmpty()) 2 * EXTRA_SCRAMBLE_LABEL_SIZE else 0f
 
                 val actualWidthIn = size.widthIn - (marginLeft + marginRight).pixelsToInch
                 val actualHeightIn = size.heightIn - (marginTop + marginBottom).pixelsToInch -
-                    ceil(heightExtraPenalty).toInt().pixelsToInch -
-                    paddingHeightPenalty.pixelsToInch
+                    ceil(heightExtraPenalty).toInt().pixelsToInch
 
                 table(3) {
                     // PDF tables are calculated by *relative* width. So to figure out the scramble image width we...
@@ -146,14 +165,21 @@ class GeneralScrambleSheet(
 
                     val totalWidth = relativeWidths.sum()
 
-                    // TODO magic number hack
-                    val scrambleDisplayWidth = scrambleStringParts / totalWidth - 0.02f
                     val scrambleImageWidth = 25f / totalWidth
+                    val scrambleTextWidth = scrambleStringParts / totalWidth
+
+                    val scramblePhrases = computeScramblePhrases(
+                        scramblePageChunk,
+                        relHeightPerScramble * 0.85f,
+                        scrambleTextWidth * 0.975f,
+                        actualWidthIn
+                    )
+
+                    val (standardScrambles, extraScrambles) = scramblePhrases.partition { !it.isExtra }
 
                     scrambleRows(
                         standardScrambles,
                         relHeightPerScramble,
-                        scrambleDisplayWidth,
                         scrambleImageWidth,
                         actualWidthIn
                     )
@@ -176,7 +202,6 @@ class GeneralScrambleSheet(
                         scrambleRows(
                             extraScrambles,
                             relHeightPerScramble,
-                            scrambleDisplayWidth,
                             scrambleImageWidth,
                             actualWidthIn,
                             EXTRA_SCRAMBLE_PREFIX

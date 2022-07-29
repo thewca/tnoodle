@@ -15,12 +15,12 @@ import java.util.*
 
 class FmcSolutionSheet(
     scramble: Scramble,
-    activityCode: ActivityCode,
-    scrambleSetId: Int,
-    locale: Locale,
     totalAttemptsNum: Int,
+    scrambleSetId: Int,
     competitionTitle: String,
+    activityCode: ActivityCode,
     hasGroupId: Boolean,
+    locale: Locale,
     watermark: String? = null
 ) : FewestMovesSheet(scramble, totalAttemptsNum, scrambleSetId, competitionTitle, activityCode, hasGroupId, locale, watermark) {
     private val drawScramble: Boolean
@@ -215,12 +215,13 @@ class FmcSolutionSheet(
         row {
             cell {
                 verticalAlignment = Alignment.Vertical.MIDDLE
+                horizontalAlignment = Alignment.Horizontal.CENTER
 
                 if (drawScramble) {
-                    svgScrambleImage(scramble.scrambleString, scrambleImageWidthPx)
+                    // when the scramble is provided, it won't be a cutout-style blank sheet
+                    // so we just take the scramble width as a heuristic for the height
+                    svgScrambleImage(scramble.scrambleString, scrambleImageWidthPx, scrambleImageWidthPx)
                 } else {
-                    horizontalAlignment = Alignment.Horizontal.CENTER
-
                     val separateSheetAdvice = Translate("fmc.scrambleOnSeparateSheet", locale)
                     text(separateSheetAdvice)
                 }
@@ -324,12 +325,12 @@ class FmcSolutionSheet(
         fun genericBlankSheet(locale: Locale, compName: String, watermark: String?): FmcSolutionSheet {
             return FmcSolutionSheet(
                 DUMMY_SCRAMBLE,
-                DUMMY_ACTIVITY,
-                WCIFScrambleMatcher.ID_PENDING,
-                locale,
                 1,
+                WCIFScrambleMatcher.ID_PENDING,
                 compName,
+                DUMMY_ACTIVITY,
                 false,
+                locale,
                 watermark
             )
         }

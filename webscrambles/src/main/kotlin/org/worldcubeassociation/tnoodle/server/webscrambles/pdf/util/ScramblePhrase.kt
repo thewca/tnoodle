@@ -1,10 +1,12 @@
 package org.worldcubeassociation.tnoodle.server.webscrambles.pdf.util
 
+import org.worldcubeassociation.tnoodle.server.webscrambles.wcif.model.ScrambleSet
 import org.worldcubeassociation.tnoodle.server.webscrambles.zip.util.StringUtil.stripNewlines
 import kotlin.math.ceil
 
 data class ScramblePhrase(
     val scramble: String,
+    val isExtra: Boolean,
     val rawTokens: List<Pair<String, Boolean>>,
     val lineTokens: List<List<String>>,
     val fontSize: Float
@@ -56,6 +58,17 @@ data class ScramblePhrase(
             }
 
             return paddedMoves.zip(lineBreaks)
+        }
+
+        fun splitScrambleSet(scrambleSet: ScrambleSet): List<Pair<String, Boolean>> {
+            val standard = scrambleSet.scrambles
+                .map { scr -> scr.scrambleString to false }
+
+            val extra = scrambleSet.extraScrambles
+                .map { scr -> scr.scrambleString to true }
+
+            // TODO can we do some shenanigans with `partition` here?
+            return standard + extra
         }
     }
 }

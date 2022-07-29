@@ -62,7 +62,16 @@ data class PrintingFolder(
                                     for (locale in fmcTranslations) {
                                         folder(locale.toLanguageTag()) {
                                             // fewest moves regular sheet
-                                            val localPrintingSheet = FmcSolutionSheet(sheet.scramble, sheet.activityCode, sheet.scrambleSetId, locale, sheet.totalAttemptsNum, competitionName, sheet.hasGroupId, sheet.watermark)
+                                            val localPrintingSheet = FmcSolutionSheet(
+                                                sheet.scramble,
+                                                sheet.totalAttemptsNum,
+                                                sheet.scrambleSetId,
+                                                competitionName,
+                                                sheet.activityCode,
+                                                sheet.hasGroupId,
+                                                locale,
+                                                sheet.watermark
+                                            )
                                             file("$uniq.pdf", localPrintingSheet.render(pdfPassword))
 
                                             // scramble cutout sheet

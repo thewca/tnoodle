@@ -43,9 +43,9 @@ abstract class ScrambleSheet(
     protected val scramblingPuzzle = activityCode.eventModel?.scrambler?.scrambler
         ?: error("Cannot draw PDF: Scrambler model for $activityCode not found")
 
-    protected fun CellBuilder.svgScrambleImage(scramble: String, maxWidthPx: Int): SvgImage {
+    protected fun CellBuilder.svgScrambleImage(scramble: String, maxWidthPx: Int, maxHeightPx: Int = 0): SvgImage {
         val image = scramblingPuzzle.drawScramble(scramble, null)
-        val fittingSize = scramblingPuzzle.getPreferredSize(maxWidthPx, 0)
+        val fittingSize = scramblingPuzzle.getPreferredSize(maxWidthPx, maxHeightPx)
 
         return svgImage(image) {
             size = fittingSize
